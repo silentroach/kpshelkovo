@@ -1,7 +1,6 @@
 {
   "extends": ["astro/tsconfigs/strict", "../../tsconfig.base.json"],
   "compilerOptions": {
-    "baseUrl": ".",
     "types": ["@yandex/ymaps3-types"],
     "paths": {
       "@/*": ["./src/*"]
