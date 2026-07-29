@@ -2,11 +2,11 @@
 title: Проезд через КПП Шелково Ривер будет закрыт
 service: dam
 kind: maintenance
-started_at: 30.07.2026 08:00
-ended_at: 30.07.2026 13:00
+started_at: 31.07.2026 08:00
+ended_at: 31.07.2026 13:00
 areas:
   - river
-source_url: https://okkomfort.domyland.app/news?targetId=116574&entityName=news&t=okkomfort
+source_url: https://okkomfort.domyland.app/news?targetId=116669&entityName=news&t=okkomfort
 ---
 
 ОК Комфорт продолжит завозить железобетонные конструкции для монтажа дамбы через Лопасню. Проехать к домам и участкам можно через КПП Шелково Форест и КПП Шелково Вилладж.
