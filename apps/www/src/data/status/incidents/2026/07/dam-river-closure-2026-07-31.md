@@ -2,8 +2,8 @@
 title: Проезд через КПП Шелково Ривер будет закрыт
 service: dam
 kind: maintenance
-started_at: 31.07.2026 08:00
-ended_at: 31.07.2026 13:00
+started_at: 31.07.2026 15:00
+ended_at: 31.07.2026 18:00
 areas:
   - river
 source_url: https://okkomfort.domyland.app/news?targetId=116669&entityName=news&t=okkomfort
