@@ -53,7 +53,12 @@ const galleryPhotos = photos.map((photo, index) => {
                 target="_blank"
                 rel="noreferrer noopener"
                 aria-label={`Открыть фото: ${photo.alt}`}
-                class="block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                class:list={[
+                  'block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent',
+                  photo.fullWidth
+                    ? undefined
+                    : 'md:aspect-[3/4] md:overflow-hidden',
+                ]}
               >
                 <Image
                   src={photo.url}
@@ -66,7 +71,10 @@ const galleryPhotos = photos.map((photo, index) => {
                   alt={photo.alt}
                   loading="lazy"
                   decoding="async"
-                  class="h-auto w-full border border-border bg-surface-muted"
+                  class:list={[
+                    'h-auto w-full border border-border bg-surface-muted',
+                    photo.fullWidth ? undefined : 'md:h-full md:object-cover',
+                  ]}
                 />
               </a>
               {photo.caption && (
