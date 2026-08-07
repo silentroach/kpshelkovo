@@ -21,7 +21,7 @@
     "test:visual:sticky-table:serve": "astro build --root tests/sticky-table-visual && astro preview --root tests/sticky-table-visual --host 127.0.0.1 --port 4329"
   },
   "dependencies": {
-    "@astrojs/markdown-satteri": "^0.3.4",
+    "@astrojs/markdown-satteri": "^0.3.5",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.3",
     "@astrojs/svelte": "^9.0.1",
@@ -31,7 +31,7 @@
     "@shelkovo/seo": "workspace:*",
     "@shelkovo/ui": "workspace:*",
     "@shelkovo/url": "workspace:*",
-    "astro": "^7.1.4",
+    "astro": "^7.1.6",
     "diff": "^9.0.0",
     "svelte": "^5.56.8",
     "vcard-creator": "^1.0.0",
