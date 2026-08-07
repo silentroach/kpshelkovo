@@ -266,6 +266,49 @@ describe('buildNewsDataset', () => {
     ]);
   });
 
+  it('normalizes mentions in photo captions', () => {
+    const data = buildNewsDataset(
+      [author({ id: 'ig', name: 'Редакция' })],
+      [
+        article({
+          id: '2026/05/photo-caption',
+          title: 'Фото с подписью',
+          summary: 'Краткая сводка',
+          date: '03.05.2026 09:00',
+          photos: [
+            {
+              url: 'https://media.kpshelkovo.online/news/2026/05/photo-caption/path.jpeg',
+              width: 1280,
+              height: 960,
+              alt: 'Фото с места',
+              caption: 'Фото предоставил @kschemelinin.',
+            },
+          ],
+        }),
+      ],
+      {
+        mentionRegistry: new Map([
+          [
+            'kschemelinin',
+            createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин'),
+          ],
+        ]),
+      },
+    );
+
+    expect({
+      caption: data.articles[0]?.photos[0]?.caption,
+      mentions: data.articles[0]?.mentions.map((item) => item.slug),
+    }).toMatchInlineSnapshot(`
+      {
+        "caption": "Фото предоставил [Кирилл Щемелинин](/people/kschemelinin/).",
+        "mentions": [
+          "kschemelinin",
+        ],
+      }
+    `);
+  });
+
   it('renders requested mention case and profile context in link title', () => {
     const data = buildNewsDataset(
       [author({ id: 'ig', name: 'Редакция' })],

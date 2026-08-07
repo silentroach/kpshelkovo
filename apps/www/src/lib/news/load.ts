@@ -149,16 +149,31 @@ const cover = (
   };
 };
 
-const photos = (
+const mapPhotos = (
   items: readonly PhotoInput[] | undefined,
-): readonly NewsPhoto[] =>
-  items?.map((item) => ({
-    url: item.url,
-    width: item.width,
-    height: item.height,
-    alt: item.alt,
-    caption: item.caption,
-  })) ?? [];
+  entryId: string,
+  mentionRegistry: SiteMentionRegistry,
+) =>
+  items?.map((item, index) => {
+    const caption = item.caption
+      ? preprocessSiteMarkdownContent(
+          item.caption,
+          `news article "${entryId}" photos[${index}].caption`,
+          mentionRegistry,
+        )
+      : undefined;
+
+    return {
+      photo: {
+        url: item.url,
+        width: item.width,
+        height: item.height,
+        alt: item.alt,
+        caption: caption?.markdown,
+      } satisfies NewsPhoto,
+      mentions: caption?.mentions ?? [],
+    };
+  }) ?? [];
 
 const attachments = (
   items: readonly AttachmentInput[] | undefined,
@@ -441,6 +456,7 @@ function normalizeArticle(
     `news article "${entry.id}"`,
   );
   const events = normalizeEvents(entry.data.events, entry.id, parts);
+  const mappedPhotos = mapPhotos(entry.data.photos, entry.id, mentionRegistry);
   const body = preprocessSiteMarkdownContent(
     entry.body ?? '',
     `news article "${entry.id}" body`,
@@ -467,12 +483,15 @@ function normalizeArticle(
     pinned: isPinnedAtBuild(entry.data),
     sourceUrl: entry.data.source_url,
     cover: articleCover,
-    photos: photos(entry.data.photos),
+    photos: mappedPhotos.map((item) => item.photo),
     attachments: attachments(entry.data.attachments),
     events,
     summary: entry.data.summary,
     body: body.markdown,
-    mentions: body.mentions,
+    mentions: [
+      ...body.mentions,
+      ...mappedPhotos.flatMap((item) => item.mentions),
+    ],
   } satisfies NewsArticle;
 
   return article;

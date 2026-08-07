@@ -22,7 +22,7 @@ export interface NewsPhoto {
   readonly width: number;
   readonly height: number;
   readonly alt: string;
-  readonly caption?: string;
+  readonly caption?: PreprocessedSiteMarkdownBody;
 }
 
 export interface NewsAttachment {

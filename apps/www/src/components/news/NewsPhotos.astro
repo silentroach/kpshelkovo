@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import { renderMarkdown } from '@/lib/markdown/render';
 import type { NewsPhoto } from '@/lib/news/types';
 
 interface Props {
@@ -22,7 +23,7 @@ const galleryPhotos = photos.map((photo, index) => {
   return {
     url: photo.url,
     alt: photo.alt,
-    caption: photo.caption,
+    captionHtml: photo.caption ? renderMarkdown(photo.caption) : undefined,
     fullWidth,
     renderedWidth: width,
     renderedHeight: Math.round((photo.height * width) / photo.width),
@@ -77,10 +78,11 @@ const galleryPhotos = photos.map((photo, index) => {
                   ]}
                 />
               </a>
-              {photo.caption && (
-                <figcaption class="text-sm leading-6 text-muted-foreground">
-                  {photo.caption}
-                </figcaption>
+              {photo.captionHtml && (
+                <figcaption
+                  class="text-sm leading-6 text-muted-foreground [&_a]:font-medium [&_a]:text-primary [&_a]:underline [&_a]:decoration-primary/40 [&_a]:underline-offset-3 [&_p]:m-0 [&_strong]:font-semibold [&_strong]:text-foreground"
+                  set:html={photo.captionHtml}
+                />
               )}
             </figure>
           ))}
