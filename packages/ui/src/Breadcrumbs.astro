@@ -14,6 +14,18 @@ const lastIndex = items.length - 1;
 const mobileItems = items.slice(0, lastIndex);
 const mobileShowsOnlyHome =
   mobileItems.length === 1 && mobileItems[0]?.href === '/';
+let structuredPosition = 0;
+const renderedItems = items.map((item, index) => {
+  const isStructuredItem = Boolean(item.href) || index === lastIndex;
+
+  if (isStructuredItem) structuredPosition += 1;
+
+  return {
+    item,
+    index,
+    structuredPosition: isStructuredItem ? structuredPosition : undefined,
+  };
+});
 ---
 
 {
@@ -22,26 +34,45 @@ const mobileShowsOnlyHome =
       aria-label="Хлебные крошки"
       class={mobileShowsOnlyHome ? 'hidden sm:block' : undefined}
     >
-      <ol class="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-muted-foreground md:gap-x-2">
-        {items.map((item, index) => (
+      <ol
+        class="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-muted-foreground md:gap-x-2"
+        itemscope
+        itemtype="https://schema.org/BreadcrumbList"
+      >
+        {renderedItems.map(({ item, index, structuredPosition }) => (
           <li
             class:list={[
               'items-center gap-1.5 md:gap-2',
               index === lastIndex ? 'hidden sm:flex' : 'flex',
             ]}
+            itemprop={structuredPosition ? 'itemListElement' : undefined}
+            itemscope={structuredPosition ? true : undefined}
+            itemtype={
+              structuredPosition ? 'https://schema.org/ListItem' : undefined
+            }
           >
             {index > 0 && <span aria-hidden="true">›</span>}
             {item.href && (linkLast || index < lastIndex) ? (
-              <a href={item.href} class="ui-link font-medium">
-                {item.label}
+              <a
+                href={item.href}
+                class="ui-link font-medium"
+                itemprop={structuredPosition ? 'item' : undefined}
+              >
+                <span itemprop={structuredPosition ? 'name' : undefined}>
+                  {item.label}
+                </span>
               </a>
             ) : (
               <span
                 class="font-medium text-foreground"
                 aria-current={index === items.length - 1 ? 'page' : undefined}
+                itemprop={structuredPosition ? 'name' : undefined}
               >
                 {item.label}
               </span>
+            )}
+            {structuredPosition && (
+              <meta itemprop="position" content={String(structuredPosition)} />
             )}
           </li>
         ))}

@@ -9,6 +9,22 @@ test.describe('Breadcrumbs visual', () => {
     const target = page.getByTestId('breadcrumbs-section');
     const list = target.locator('ol');
 
+    await expect(list).toHaveAttribute(
+      'itemtype',
+      'https://schema.org/BreadcrumbList',
+    );
+    const schemaItems = list.locator('[itemprop="itemListElement"]');
+    await expect(schemaItems).toHaveCount(2);
+    await expect(schemaItems.first()).toHaveAttribute(
+      'itemtype',
+      'https://schema.org/ListItem',
+    );
+    await expect(
+      schemaItems.first().locator('[itemprop="position"]'),
+    ).toHaveAttribute('content', '1');
+    await expect(
+      schemaItems.last().locator('[itemprop="position"]'),
+    ).toHaveAttribute('content', '2');
     await expect(target.getByRole('link', { name: 'Главная' })).toBeVisible();
     await expect(target.locator('[aria-current="page"]')).toHaveText('Новости');
     await expect(list).toHaveCSS('display', 'flex');
@@ -49,5 +65,20 @@ test.describe('Breadcrumbs visual', () => {
       caret: 'hide',
       scale: 'device',
     });
+  });
+
+  test('omits unlinked intermediate labels from structured data', async ({
+    page,
+  }) => {
+    const target = page.getByTestId('breadcrumbs-unlinked-section');
+    const items = target.locator('li');
+    const schemaItems = target.locator('[itemprop="itemListElement"]');
+
+    await expect(items).toHaveCount(3);
+    await expect(items.nth(1)).not.toHaveAttribute('itemscope', '');
+    await expect(schemaItems).toHaveCount(2);
+    await expect(
+      schemaItems.last().locator('[itemprop="position"]'),
+    ).toHaveAttribute('content', '2');
   });
 });

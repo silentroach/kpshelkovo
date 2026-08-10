@@ -17,6 +17,12 @@ const articleBreadcrumbs = [
     href: '/news/2026/05/launch-street-lighting/',
   },
 ];
+
+const breadcrumbsWithUnlinkedSection = [
+  { label: 'Главная', href: '/' },
+  { label: 'Люди' },
+  { label: 'Иван Иванов' },
+];
 ---
 
 <!doctype html>
@@ -47,6 +53,16 @@ const articleBreadcrumbs = [
           data-testid="breadcrumbs-article"
         >
           <Breadcrumbs items={articleBreadcrumbs} linkLast />
+        </div>
+      </section>
+
+      <section class="breadcrumbs-visual-card">
+        <p class="breadcrumbs-visual-label">Trail with unlinked section</p>
+        <div
+          class="breadcrumbs-visual-target"
+          data-testid="breadcrumbs-unlinked-section"
+        >
+          <Breadcrumbs items={breadcrumbsWithUnlinkedSection} />
         </div>
       </section>
     </main>
