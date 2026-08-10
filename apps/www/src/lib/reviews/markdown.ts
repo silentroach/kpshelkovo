@@ -143,7 +143,7 @@ export const buildReviewMarkdown = (review: Review): string =>
         ...parseMarkdownFragment(review.body.trim()),
         ...(review.aspects.length > 0
           ? [
-              md.heading(2, 'Аспекты'),
+              md.heading(2, 'Оценки по темам'),
               ...sortReviewAspects(review.aspects).flatMap(aspectNodes),
             ]
           : []),

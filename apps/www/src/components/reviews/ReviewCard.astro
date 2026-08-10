@@ -1,5 +1,7 @@
 ---
-import type { Review } from '@/lib/reviews/types';
+import StarRating from '@shelkovo/ui/StarRating.astro';
+
+import type { Review, ReviewAspect } from '@/lib/reviews/types';
 import { formatReviewAspectType, formatReviewTitle } from '@/lib/reviews/view';
 import ReviewMeta from './ReviewMeta.astro';
 
@@ -8,7 +10,10 @@ interface Props {
 }
 
 const { review } = Astro.props;
-const ratedAspects = review.aspects.filter((aspect) => aspect.rating);
+const ratedAspects = review.aspects.filter(
+  (aspect): aspect is ReviewAspect & { readonly rating: number } =>
+    Boolean(aspect.rating),
+);
 ---
 
 <article class="ui-shell h-full px-5 py-5 md:px-6 md:py-6">
@@ -22,10 +27,16 @@ const ratedAspects = review.aspects.filter((aspect) => aspect.rating);
 
     {
       ratedAspects.length > 0 && (
-        <ul class="flex flex-wrap gap-2 text-xs font-semibold text-muted-foreground">
+        <ul class="grid gap-x-5 gap-y-3 sm:grid-cols-3">
           {ratedAspects.map((aspect) => (
-            <li class="rounded-full border border-border/80 px-2 py-1">
-              {formatReviewAspectType(aspect.type)}: {aspect.rating} из 5
+            <li class="space-y-1">
+              <span class="block text-xs font-medium leading-4 text-muted-foreground">
+                {formatReviewAspectType(aspect.type)}
+              </span>
+              <StarRating
+                rating={aspect.rating}
+                label={`Оценка ${aspect.rating} из 5`}
+              />
             </li>
           ))}
         </ul>

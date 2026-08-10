@@ -17,6 +17,7 @@
     "./Breadcrumbs.astro": "./src/Breadcrumbs.astro",
     "./FontPreloads.astro": "./src/FontPreloads.astro",
     "./NotFoundView.astro": "./src/NotFoundView.astro",
+    "./StarRating.astro": "./src/StarRating.astro",
     "./icons": "./src/icons/index.ts",
     "./icons/areas": "./src/icons/areas/index.ts",
     "./icons/areas/Forest.astro": "./src/icons/areas/Forest.astro",

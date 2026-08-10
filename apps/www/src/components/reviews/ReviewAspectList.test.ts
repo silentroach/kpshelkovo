@@ -22,6 +22,9 @@ const visibleText = (html: string): string =>
     .replace(/[\t\n\r ]+/gu, ' ')
     .trim();
 
+const ariaLabels = (html: string): readonly string[] =>
+  [...html.matchAll(/aria-label="([^"]+)"/gu)].map((match) => match[1] ?? '');
+
 describe('ReviewAspectList', () => {
   it('renders aspects in fixed order with independent rating and body', async () => {
     const container = await createAstroContainer();
@@ -29,8 +32,17 @@ describe('ReviewAspectList', () => {
       props: { aspects },
     });
 
-    expect(visibleWhitespace(visibleText(html))).toMatchInlineSnapshot(
-      `"Аспекты Место и среда 5 из 5 Застройщик 3 из 5 Есть нейтральные впечатления. Обслуживание Отвечают не·всегда быстро."`,
-    );
+    expect({
+      text: visibleWhitespace(visibleText(html)),
+      ariaLabels: ariaLabels(html),
+    }).toMatchInlineSnapshot(`
+      {
+        "ariaLabels": [
+          "Оценка 5 из 5",
+          "Оценка 3 из 5",
+        ],
+        "text": "Оценки по темам Место и среда Застройщик Есть нейтральные впечатления. Обслуживание Отвечают не·всегда быстро.",
+      }
+    `);
   });
 });

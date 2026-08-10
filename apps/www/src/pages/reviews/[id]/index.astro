@@ -80,14 +80,11 @@ const schema = reviewPageSchema({
     <article class="space-y-8 px-5 md:px-6">
       <div class={REVIEWS_PROSE} set:html={bodyHtml} />
       <ReviewAspectList aspects={review.aspects} />
-      <section
-        aria-labelledby="review-disclaimer"
-        class="ui-shell max-w-[65ch] px-4 py-4 md:px-5"
-      >
+      <section aria-labelledby="review-disclaimer" class="ui-shell py-4">
         <h2 id="review-disclaimer" class="ui-section-label">
           Отказ от ответственности
         </h2>
-        <p class="mt-2 text-sm leading-6 text-muted-foreground">
+        <p class="mt-2 text-xs leading-5 text-muted-foreground">
           Отзывы — это авторские тексты собственников. Владелец сайта проверяет,
           что автор является текущим собственником участка или дома в Шелково,
           но не является автором отзыва, не редактирует текст и не подтверждает

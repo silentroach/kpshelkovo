@@ -1,4 +1,6 @@
 ---
+import StarRating from '@shelkovo/ui/StarRating.astro';
+
 import { renderMarkdown } from '@/lib/markdown/render';
 import type { ReviewAspect } from '@/lib/reviews/types';
 import { formatReviewAspectType, sortReviewAspects } from '@/lib/reviews/view';
@@ -13,24 +15,24 @@ const ordered = sortReviewAspects(aspects);
 
 {
   ordered.length > 0 && (
-    <section aria-labelledby="review-aspects" class="space-y-4">
+    <section aria-labelledby="review-aspects" class="space-y-5">
       <h2 id="review-aspects" class="ui-prose-title">
-        Аспекты
+        Оценки по темам
       </h2>
-      <div class="grid gap-3 md:grid-cols-3">
+      <div class="grid gap-6 md:grid-cols-3">
         {ordered.map((aspect) => (
-          <article class="ui-shell space-y-3 px-4 py-4">
-            <h3 class="ui-section-label">
-              {formatReviewAspectType(aspect.type)}
-            </h3>
-            {aspect.rating && (
-              <p
-                class="text-sm font-semibold text-primary"
-                aria-label={`Оценка ${aspect.rating} из 5`}
-              >
-                {aspect.rating} из 5
-              </p>
-            )}
+          <article class="space-y-3">
+            <div class="space-y-2">
+              <h3 class="ui-section-label">
+                {formatReviewAspectType(aspect.type)}
+              </h3>
+              {aspect.rating && (
+                <StarRating
+                  rating={aspect.rating}
+                  label={`Оценка ${aspect.rating} из 5`}
+                />
+              )}
+            </div>
             {aspect.body && (
               <div
                 class="ui-prose text-sm"

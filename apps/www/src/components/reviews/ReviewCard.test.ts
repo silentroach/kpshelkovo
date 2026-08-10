@@ -30,6 +30,9 @@ const visibleText = (html: string): string =>
     .replace(/[\t\n\r ]+/gu, ' ')
     .trim();
 
+const ariaLabels = (html: string): readonly string[] =>
+  [...html.matchAll(/aria-label="([^"]+)"/gu)].map((match) => match[1] ?? '');
+
 describe('ReviewCard', () => {
   it('renders generated title, anonymous author, area, and aspect rating', async () => {
     const container = await createAstroContainer();
@@ -37,8 +40,17 @@ describe('ReviewCard', () => {
       props: { review },
     });
 
-    expect(visibleWhitespace(visibleText(html))).toMatchInlineSnapshot(
-      `"Отзыв собственника от 25 июня 2026 25 июня 2026 • Анонимный собственник • Шелково Форест Место и среда: 5 из 5"`,
-    );
+    expect({
+      text: visibleWhitespace(visibleText(html)),
+      ariaLabels: ariaLabels(html),
+    }).toMatchInlineSnapshot(`
+      {
+        "ariaLabels": [
+          "Шелково Форест",
+          "Оценка 5 из 5",
+        ],
+        "text": "Отзыв собственника от 25 июня 2026 25 июня 2026 Анонимный собственник Место и среда",
+      }
+    `);
   });
 });

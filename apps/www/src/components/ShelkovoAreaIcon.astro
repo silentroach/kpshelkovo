@@ -6,11 +6,10 @@ import {
   VillageIcon,
 } from '@shelkovo/ui/icons';
 
-import type { NewsArea } from '../lib/news/schema';
-import { formatNewsArea } from '../lib/news/view';
+import { formatArea, type Area } from '@/lib/areas';
 
 interface Props {
-  readonly area: NewsArea;
+  readonly area: Area;
 }
 
 const { area }: Props = Astro.props;
@@ -22,7 +21,7 @@ const AREA_ICONS = {
   village: VillageIcon,
 } as const;
 
-const label = formatNewsArea(area);
+const label = formatArea(area);
 const Icon = AREA_ICONS[area];
 ---
 

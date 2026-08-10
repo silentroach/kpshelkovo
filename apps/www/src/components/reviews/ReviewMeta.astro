@@ -1,10 +1,9 @@
 ---
+import { CheckCircleIcon } from '@shelkovo/ui/icons';
+
+import ShelkovoAreaIcon from '@/components/ShelkovoAreaIcon.astro';
 import type { Review } from '@/lib/reviews/types';
-import {
-  formatReviewArea,
-  formatReviewAuthor,
-  formatReviewDate,
-} from '@/lib/reviews/view';
+import { formatReviewAuthor, formatReviewDate } from '@/lib/reviews/view';
 
 interface Props {
   readonly review: Pick<Review, 'author' | 'area' | 'publishedIso'>;
@@ -17,22 +16,19 @@ const { review, showVerified = false, className } = Astro.props;
 
 <div
   class:list={[
-    'flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm leading-5 text-muted-foreground',
+    'flex flex-wrap items-center gap-2.5 text-sm leading-6 text-muted-foreground',
     className,
   ]}
 >
-  <time datetime={review.publishedIso}>{formatReviewDate(review)}</time>
-  <span aria-hidden="true">•</span>
+  <time datetime={review.publishedIso} class="font-medium text-foreground">
+    {formatReviewDate(review)}
+  </time>
   <span>{formatReviewAuthor(review)}</span>
-  <span aria-hidden="true">•</span>
-  <span
-    class="inline-flex rounded-full border border-border/80 px-2 py-0.5 text-xs font-medium text-foreground"
-  >
-    {formatReviewArea(review.area)}
-  </span>
+  <ShelkovoAreaIcon area={review.area} />
   {
     showVerified && (
-      <span class="inline-flex rounded-full bg-primary-soft px-2 py-0.5 text-xs font-semibold text-primary">
+      <span class="inline-flex items-center gap-1 font-medium text-success">
+        <CheckCircleIcon class="size-4" />
         проверенный собственник
       </span>
     )
