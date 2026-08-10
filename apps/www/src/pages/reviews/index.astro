@@ -10,7 +10,6 @@ import {
 import { loadReviewsData } from '@/lib/reviews/load';
 import { reviewsRulesUrl, reviewsUrl } from '@/lib/reviews/routes';
 import { reviewsCollectionPageSchema } from '@/lib/reviews/seo';
-import { formatReviewTitle } from '@/lib/reviews/view';
 
 const data = await loadReviewsData();
 const title = 'Отзывы собственников — Шелково Онлайн';
@@ -35,10 +34,7 @@ const schema = reviewsCollectionPageSchema({
   breadcrumbs: withHomeSchemaBreadcrumbs([
     { name: 'Отзывы', url: reviewsUrl() },
   ]),
-  items: data.reviews.map((review) => ({
-    name: formatReviewTitle(review),
-    url: review.url,
-  })),
+  items: data.reviews,
 });
 ---
 
@@ -54,7 +50,15 @@ const schema = reviewsCollectionPageSchema({
       <div class="ui-page-header-stack">
         <Breadcrumbs items={breadcrumbs} />
 
-        <h1 class="ui-page-title">Отзывы собственников</h1>
+        <div>
+          <h1 class="ui-page-title">Отзывы собственников</h1>
+          <p class="ui-copy mt-3 max-w-3xl text-muted-foreground">
+            Вы собственник участка или дома в Шелково?{' '}
+            <a href={reviewsRulesUrl()} class="site-text-link">
+              Оставьте свой отзыв!
+            </a>
+          </p>
+        </div>
       </div>
     </section>
 

@@ -4,6 +4,7 @@ import { markdownToHtml } from 'satteri';
 import {
   createMarkdownDocument,
   extractFirstMarkdownText,
+  extractMarkdownText,
   formatDynamicHtml,
   md,
   parseMarkdownFragment,
@@ -266,5 +267,26 @@ const value = 1
     expect(
       extractFirstMarkdownText('```ts\nconst value = 1\n```'),
     ).toBeUndefined();
+  });
+
+  it('extracts all readable markdown text', () => {
+    expect(
+      extractMarkdownText(`
+# Заголовок
+
+Первый **абзац** с [ссылкой](https://example.com).
+
+![Река](river.jpg)
+
+- Первый пункт
+- Второй пункт
+
+\`\`\`ts
+const value = 1
+\`\`\`
+`),
+    ).toMatchInlineSnapshot(
+      `"Заголовок Первый абзац с ссылкой. Река Первый пункт Второй пункт"`,
+    );
   });
 });

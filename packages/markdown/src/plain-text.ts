@@ -60,3 +60,12 @@ export const extractFirstMarkdownText = (
 
   return undefined;
 };
+
+export const extractMarkdownText = (markdown: string): string | undefined => {
+  const tree = parser.parse(markdown) as MarkdownNode;
+  const value = inline(
+    (tree.children ?? []).map(text).filter(Boolean).join(' '),
+  );
+
+  return value || undefined;
+};

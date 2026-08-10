@@ -1,0 +1,288 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`reviews schema > connects the collection, item list, and review entities 1`] = `
+[
+  {
+    "@context": "https://schema.org",
+    "@id": "https://example.com/reviews/#webpage",
+    "@type": "CollectionPage",
+    "about": {
+      "@id": "https://example.com/815/compare/settlements/shelkovo/#place",
+      "@type": "Place",
+      "address": "Московская область, городской округ Ступино",
+      "alternateName": [
+        "Шелково",
+        "Шелково Эко Клаб",
+      ],
+      "name": "КП Шелково",
+      "url": "https://kpshelkovo.ru/",
+    },
+    "breadcrumb": {
+      "@id": "https://example.com/reviews/#breadcrumb",
+    },
+    "dateModified": "2026-06-25",
+    "description": "Отзывы текущих собственников.",
+    "hasPart": [
+      {
+        "@id": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#review",
+      },
+    ],
+    "inLanguage": "ru-RU",
+    "isAccessibleForFree": true,
+    "isPartOf": {
+      "@id": "https://example.com/#website",
+      "@type": "WebSite",
+      "inLanguage": "ru-RU",
+      "name": "Шелково Онлайн",
+      "url": "https://example.com/",
+    },
+    "mainEntity": {
+      "@id": "https://example.com/reviews/#items",
+    },
+    "name": "Отзывы собственников",
+    "publisher": {
+      "@id": "https://example.com/#organization",
+      "@type": "Organization",
+      "name": "Шелково Онлайн",
+      "url": "https://example.com/",
+    },
+    "publishingPrinciples": "https://example.com/reviews/rules/",
+    "significantLink": "https://example.com/reviews/rules/",
+    "url": "https://example.com/reviews/",
+  },
+  {
+    "@context": "https://schema.org",
+    "@id": "https://example.com/reviews/#items",
+    "@type": "ItemList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "item": {
+          "@id": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#review",
+          "@type": "Review",
+          "author": {
+            "@type": "Person",
+            "name": "Алексей",
+          },
+          "contentLocation": {
+            "@type": "Place",
+            "containedInPlace": {
+              "@id": "https://example.com/815/compare/settlements/shelkovo/#place",
+            },
+            "name": "Шелково Форест",
+          },
+          "datePublished": "2026-06-25",
+          "description": "Основной текст отзыва.",
+          "identifier": "2026-06-25-life-in-shelkovo-forest",
+          "inLanguage": "ru-RU",
+          "isAccessibleForFree": true,
+          "isPartOf": {
+            "@id": "https://example.com/reviews/#webpage",
+          },
+          "itemReviewed": {
+            "@id": "https://example.com/815/compare/settlements/shelkovo/#place",
+            "@type": "Place",
+            "address": "Московская область, городской округ Ступино",
+            "alternateName": [
+              "Шелково",
+              "Шелково Эко Клаб",
+            ],
+            "name": "КП Шелково",
+            "url": "https://kpshelkovo.ru/",
+          },
+          "mainEntityOfPage": {
+            "@id": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#webpage",
+          },
+          "name": "Год жизни в Шелково",
+          "publisher": {
+            "@id": "https://example.com/#organization",
+            "@type": "Organization",
+            "name": "Шелково Онлайн",
+            "url": "https://example.com/",
+          },
+          "publishingPrinciples": "https://example.com/reviews/rules/",
+          "reviewRating": [
+            {
+              "@type": "Rating",
+              "bestRating": 5,
+              "ratingValue": 5,
+              "reviewAspect": "Место и среда",
+              "worstRating": 1,
+            },
+            {
+              "@type": "Rating",
+              "bestRating": 5,
+              "ratingValue": 2,
+              "reviewAspect": "Обслуживание",
+              "worstRating": 1,
+            },
+          ],
+          "url": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/",
+        },
+        "name": "Год жизни в Шелково",
+        "position": 1,
+        "url": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/",
+      },
+    ],
+    "itemListOrder": "https://schema.org/ItemListOrderDescending",
+    "numberOfItems": 1,
+    "url": "https://example.com/reviews/",
+  },
+  {
+    "@context": "https://schema.org",
+    "@id": "https://example.com/reviews/#breadcrumb",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "item": "https://example.com/",
+        "name": "Главная",
+        "position": 1,
+      },
+      {
+        "@type": "ListItem",
+        "item": "https://example.com/reviews/",
+        "name": "Отзывы",
+        "position": 2,
+      },
+    ],
+  },
+]
+`;
+
+exports[`reviews schema > publishes the page and full review without AggregateRating 1`] = `
+[
+  {
+    "@context": "https://schema.org",
+    "@id": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#webpage",
+    "@type": "ItemPage",
+    "about": {
+      "@id": "https://example.com/815/compare/settlements/shelkovo/#place",
+      "@type": "Place",
+      "address": "Московская область, городской округ Ступино",
+      "alternateName": [
+        "Шелково",
+        "Шелково Эко Клаб",
+      ],
+      "name": "КП Шелково",
+      "url": "https://kpshelkovo.ru/",
+    },
+    "breadcrumb": {
+      "@id": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#breadcrumb",
+    },
+    "datePublished": "2026-06-25",
+    "description": "Отзыв Алексея о жизни в Шелково.",
+    "inLanguage": "ru-RU",
+    "isAccessibleForFree": true,
+    "isPartOf": {
+      "@id": "https://example.com/#website",
+      "@type": "WebSite",
+      "inLanguage": "ru-RU",
+      "name": "Шелково Онлайн",
+      "url": "https://example.com/",
+    },
+    "mainEntity": {
+      "@id": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#review",
+    },
+    "name": "Год жизни в Шелково",
+    "publisher": {
+      "@id": "https://example.com/#organization",
+      "@type": "Organization",
+      "name": "Шелково Онлайн",
+      "url": "https://example.com/",
+    },
+    "relatedLink": "https://example.com/reviews/rules/",
+    "url": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/",
+  },
+  {
+    "@context": "https://schema.org",
+    "@id": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#review",
+    "@type": "Review",
+    "author": {
+      "@type": "Person",
+      "name": "Алексей",
+    },
+    "contentLocation": {
+      "@type": "Place",
+      "containedInPlace": {
+        "@id": "https://example.com/815/compare/settlements/shelkovo/#place",
+      },
+      "name": "Шелково Форест",
+    },
+    "datePublished": "2026-06-25",
+    "description": "Отзыв Алексея о жизни в Шелково.",
+    "identifier": "2026-06-25-life-in-shelkovo-forest",
+    "inLanguage": "ru-RU",
+    "isAccessibleForFree": true,
+    "isPartOf": {
+      "@id": "https://example.com/reviews/#webpage",
+    },
+    "itemReviewed": {
+      "@id": "https://example.com/815/compare/settlements/shelkovo/#place",
+      "@type": "Place",
+      "address": "Московская область, городской округ Ступино",
+      "alternateName": [
+        "Шелково",
+        "Шелково Эко Клаб",
+      ],
+      "name": "КП Шелково",
+      "url": "https://kpshelkovo.ru/",
+    },
+    "mainEntityOfPage": {
+      "@id": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#webpage",
+    },
+    "name": "Год жизни в Шелково",
+    "publisher": {
+      "@id": "https://example.com/#organization",
+      "@type": "Organization",
+      "name": "Шелково Онлайн",
+      "url": "https://example.com/",
+    },
+    "publishingPrinciples": "https://example.com/reviews/rules/",
+    "reviewBody": "Основной текст отзыва. Второй абзац.",
+    "reviewRating": [
+      {
+        "@type": "Rating",
+        "bestRating": 5,
+        "ratingValue": 5,
+        "reviewAspect": "Место и среда",
+        "worstRating": 1,
+      },
+      {
+        "@type": "Rating",
+        "bestRating": 5,
+        "ratingValue": 2,
+        "reviewAspect": "Обслуживание",
+        "worstRating": 1,
+      },
+    ],
+    "url": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/",
+    "wordCount": 5,
+  },
+  {
+    "@context": "https://schema.org",
+    "@id": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#breadcrumb",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "item": "https://example.com/",
+        "name": "Главная",
+        "position": 1,
+      },
+      {
+        "@type": "ListItem",
+        "item": "https://example.com/reviews/",
+        "name": "Отзывы",
+        "position": 2,
+      },
+      {
+        "@type": "ListItem",
+        "item": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/",
+        "name": "Год жизни в Шелково",
+        "position": 3,
+      },
+    ],
+  },
+]
+`;

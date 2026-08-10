@@ -51,6 +51,7 @@ const breadcrumbs = withHomeBreadcrumbs([
 ]);
 const schema = reviewPageSchema({
   review,
+  description,
   breadcrumbs: withHomeSchemaBreadcrumbs([
     { name: 'Отзывы', url: reviewsUrl() },
     { name: reviewTitle, url: review.url },

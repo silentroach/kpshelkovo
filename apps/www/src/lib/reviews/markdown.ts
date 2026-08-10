@@ -33,8 +33,6 @@ const abs = (path: string): string => absoluteUrl(path);
 
 const inline = (value: string): string => value.replace(/\s+/gu, ' ').trim();
 
-const ratingText = (rating: number): string => `Оценка: ${rating} из 5`;
-
 const reviewDisclaimer =
   'Отзывы — это авторские тексты собственников. Владелец сайта проверяет, что автор является текущим собственником участка или дома в Шелково, но не является автором отзыва, не редактирует текст и не подтверждает каждое фактическое утверждение. Мнение автора может не совпадать с позицией владельца сайта. Ответственность за сведения, оценки и формулировки в отзыве несет автор в пределах закона.';
 
@@ -62,9 +60,15 @@ const reviewLine = (review: Review): MarkdownListItem =>
 
 const aspectNodes = (aspect: ReviewAspect): readonly MarkdownNode[] => [
   md.heading(3, formatReviewAspectType(aspect.type)),
-  ...(aspect.rating ? [md.paragraph(ratingText(aspect.rating))] : []),
   ...(aspect.body ? parseMarkdownFragment(aspect.body.trim()) : []),
 ];
+
+const reviewRatings = (review: Review): Readonly<Record<string, number>> =>
+  Object.fromEntries(
+    sortReviewAspects(review.aspects).flatMap((aspect) =>
+      aspect.rating ? [[aspect.type, aspect.rating] as const] : [],
+    ),
+  );
 
 const reviewFrontmatter = (
   review: Review,
@@ -73,6 +77,7 @@ const reviewFrontmatter = (
   published_at: review.publishedIso,
   author: formatReviewAuthor(review),
   area: formatReviewArea(review.area),
+  ratings: reviewRatings(review),
 });
 
 export const buildReviewsHomeMarkdown = (data: ReviewsDataset): string =>
@@ -141,10 +146,12 @@ export const buildReviewMarkdown = (review: Review): string =>
           `${formatReviewDate(review)}; ${formatReviewAuthor(review)}; ${formatReviewArea(review.area)}.`,
         ),
         ...parseMarkdownFragment(review.body.trim()),
-        ...(review.aspects.length > 0
+        ...(review.aspects.some((aspect) => aspect.body)
           ? [
-              md.heading(2, 'Оценки по темам'),
-              ...sortReviewAspects(review.aspects).flatMap(aspectNodes),
+              md.heading(2, 'Комментарии по темам'),
+              ...sortReviewAspects(review.aspects)
+                .filter((aspect) => aspect.body)
+                .flatMap(aspectNodes),
             ]
           : []),
         md.heading(2, 'Отказ от ответственности'),

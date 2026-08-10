@@ -12,7 +12,7 @@ export type {
   MarkdownListOptions,
   MarkdownPhrasingInput,
 } from './generate-types';
-export { extractFirstMarkdownText } from './plain-text';
+export { extractFirstMarkdownText, extractMarkdownText } from './plain-text';
 export {
   render,
   type MarkdownPreprocessor,
