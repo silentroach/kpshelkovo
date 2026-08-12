@@ -81,6 +81,10 @@ const schema = reviewPageSchema({
     <article class="space-y-8 px-5 md:px-6">
       <div class={REVIEWS_PROSE} set:html={bodyHtml} />
       <ReviewAspectList aspects={review.aspects} />
+    </article>
+
+    <!--noindex-->
+    <footer class="mt-8 px-5 md:px-6" data-nosnippet>
       <section aria-labelledby="review-disclaimer" class="ui-shell py-4">
         <h2 id="review-disclaimer" class="ui-section-label">
           Отказ от ответственности
@@ -94,6 +98,7 @@ const schema = reviewPageSchema({
           формулировки в отзыве несет автор в пределах закона.
         </p>
       </section>
-    </article>
+    </footer>
+    <!--/noindex-->
   </main>
 </BaseLayout>

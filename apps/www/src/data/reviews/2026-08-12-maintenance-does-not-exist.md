@@ -4,6 +4,9 @@ slug: maintenance-does-not-exist
 area: park
 title: Обслуживания нет. От слова совсем
 author: Артём Агафонов
+seo:
+  description: >-
+    Почему спустя год после покупки участка я разочаровался в Шелково Эко Клаб: обещания остались обещаниями, а обслуживания почти нет.
 aspects:
   - type: place
     rating: 5
