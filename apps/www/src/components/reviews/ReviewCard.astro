@@ -2,7 +2,11 @@
 import StarRating from '@shelkovo/ui/StarRating.astro';
 
 import type { Review, ReviewAspect } from '@/lib/reviews/types';
-import { formatReviewAspectType, formatReviewTitle } from '@/lib/reviews/view';
+import {
+  formatReviewAspectTitle,
+  formatReviewAspectType,
+  formatReviewTitle,
+} from '@/lib/reviews/view';
 import ReviewMeta from './ReviewMeta.astro';
 
 interface Props {
@@ -30,7 +34,10 @@ const ratedAspects = review.aspects.filter(
         <ul class="grid gap-x-5 gap-y-3 sm:grid-cols-3">
           {ratedAspects.map((aspect) => (
             <li class="space-y-1">
-              <span class="block text-xs font-medium leading-4 text-muted-foreground">
+              <span
+                class="block text-xs font-medium leading-4 text-muted-foreground"
+                title={formatReviewAspectTitle(aspect.type)}
+              >
                 {formatReviewAspectType(aspect.type)}
               </span>
               <StarRating

@@ -11,6 +11,11 @@ const ASPECT_LABELS: Record<ReviewAspectType, string> = {
   management: 'Обслуживание',
 };
 
+const ASPECT_TITLES: Partial<Record<ReviewAspectType, string>> = {
+  developer: 'Земля МО',
+  management: 'ОК Комфорт',
+};
+
 const ASPECT_ORDER: Record<ReviewAspectType, number> = {
   place: 0,
   developer: 1,
@@ -35,6 +40,10 @@ export const formatReviewTitle = (
 
 export const formatReviewAspectType = (type: ReviewAspectType): string =>
   ASPECT_LABELS[type];
+
+export const formatReviewAspectTitle = (
+  type: ReviewAspectType,
+): string | undefined => ASPECT_TITLES[type];
 
 export const sortReviewAspects = (
   aspects: readonly ReviewAspect[],

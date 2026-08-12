@@ -25,6 +25,9 @@ const visibleText = (html: string): string =>
 const ariaLabels = (html: string): readonly string[] =>
   [...html.matchAll(/aria-label="([^"]+)"/gu)].map((match) => match[1] ?? '');
 
+const titles = (html: string): readonly string[] =>
+  [...html.matchAll(/title="([^"]+)"/gu)].map((match) => match[1] ?? '');
+
 describe('ReviewAspectList', () => {
   it('renders aspects in fixed order with independent rating and body', async () => {
     const container = await createAstroContainer();
@@ -35,6 +38,7 @@ describe('ReviewAspectList', () => {
     expect({
       text: visibleWhitespace(visibleText(html)),
       ariaLabels: ariaLabels(html),
+      titles: titles(html),
     }).toMatchInlineSnapshot(`
       {
         "ariaLabels": [
@@ -42,6 +46,10 @@ describe('ReviewAspectList', () => {
           "Оценка 3 из 5",
         ],
         "text": "Оценки по темам Место и среда Застройщик Есть нейтральные впечатления. Обслуживание Отвечают не·всегда быстро.",
+        "titles": [
+          "Земля МО",
+          "ОК Комфорт",
+        ],
       }
     `);
   });
