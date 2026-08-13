@@ -6,8 +6,6 @@ author: ig
 tags:
   - благоустройство
   - инфраструктура
-  - сроки
-  - отчет
 source_url: https://okkomfort.domyland.app/news?targetId=117478&entityName=news&t=okkomfort
 seo:
   description: ОК ответила на жалобы отчётом о благоустройстве, но не опубликовала исправленный график. Сверяем статусы с исходным планом и просрочками.
