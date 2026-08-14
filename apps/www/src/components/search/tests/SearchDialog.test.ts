@@ -108,6 +108,15 @@ describe('SearchDialog', () => {
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
     await waitFor(() => expect(document.activeElement).toBe(input));
     expect(dialog.open).toBe(true);
+    expect(input.getAttribute('placeholder')).toBe('Что найти?');
+    expect(
+      view.queryByRole('region', { name: 'Результаты поиска' }),
+    ).toBeNull();
+    expect(
+      view.queryByText(
+        'Введите запрос, чтобы найти новости, статусы и справочные материалы.',
+      ),
+    ).toBeNull();
     expect(dialog.getAttribute('aria-labelledby')).toBeTruthy();
     expect(
       dialog.querySelector('[aria-live="polite"][aria-atomic="true"]'),
@@ -131,7 +140,8 @@ describe('SearchDialog', () => {
 
     await fireEvent.click(firstOpener);
     await waitFor(() => expect(document.activeElement).toBe(input));
-    await fireEvent.click(view.getByRole('button', { name: 'Закрыть' }));
+    await fireEvent.click(dialog);
+    expect(dialog.open).toBe(false);
     expect(document.activeElement).toBe(firstOpener);
   });
 
@@ -304,10 +314,10 @@ describe('SearchDialog', () => {
 
     await fireEvent.click(opener);
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
+    await enterDebouncedQuery(input, 'вода');
     const resultsRegion = view.getByRole('region', {
       name: 'Результаты поиска',
     });
-    await enterDebouncedQuery(input, 'вода');
     await waitFor(() => expect(view.getByRole('link')).toBeTruthy());
 
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });

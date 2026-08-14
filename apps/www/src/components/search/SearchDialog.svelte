@@ -33,7 +33,7 @@
 
   let dialogElement: HTMLDialogElement | undefined;
   let inputElement: HTMLInputElement | undefined;
-  let resultsElement: HTMLDivElement | undefined;
+  let resultsElement = $state<HTMLDivElement>();
   let openerElement: HTMLElement | undefined;
   let restoreFocusOnClose = true;
   let pendingSearchTimer: ReturnType<typeof setTimeout> | undefined;
@@ -344,6 +344,12 @@
     void openDialog(trigger);
   };
 
+  const handleDialogClick = (event: MouseEvent): void => {
+    if (event.target === dialogElement) {
+      closeDialog();
+    }
+  };
+
   const excerptSegments = (
     excerptHtml: string,
   ): readonly SearchExcerptSegment[] => {
@@ -398,26 +404,25 @@
   data-pagefind-ignore="all"
   data-search-state={viewState}
   onclose={finishClose}
+  onclick={handleDialogClick}
   onkeydown={handleKeydown}
 >
-  <div class="flex min-h-0 flex-1 flex-col">
-    <header class="border-b border-border px-4 py-4 sm:px-5">
-      <div class="flex items-start justify-between gap-4">
-        <h2
-          id={headingId}
-          class="ui-prose-title min-w-0 [overflow-wrap:anywhere]"
-        >
-          Поиск по сайту
-        </h2>
-        <button
-          type="button"
-          class="ui-btn ui-btn-sm ui-btn-ghost shrink-0"
-          onclick={() => closeDialog()}
-        >
-          Закрыть
-        </button>
-      </div>
-
+  <div class="site-search-dialog__surface">
+    <h2 id={headingId} class="sr-only">Поиск по сайту</h2>
+    <div class="site-search-dialog__field">
+      <svg
+        class="size-5 shrink-0 text-muted-foreground"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.9"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="10.75" cy="10.75" r="6.5"></circle>
+        <path d="m15.5 15.5 4.25 4.25"></path>
+      </svg>
       <label for={inputId} class="sr-only">Что найти на сайте</label>
       <input
         bind:this={inputElement}
@@ -425,120 +430,129 @@
         id={inputId}
         type="search"
         name="site-search"
-        class="mt-4 min-h-12 w-full min-w-0 border border-border bg-surface-raised px-4 py-3 text-base leading-6 text-foreground placeholder:text-muted-foreground"
-        placeholder="Новости, статусы, документы"
+        class="site-search-dialog__input"
+        placeholder="Что найти?"
         autocomplete="off"
         maxlength={SEARCH_QUERY_MAX_LENGTH}
-        aria-controls={resultsId}
+        aria-controls={viewState === 'initial' ? undefined : resultsId}
         oninput={handleInput}
       />
-    </header>
-
-    <div
-      bind:this={resultsElement}
-      id={resultsId}
-      class="site-search-dialog__results min-h-0 flex-1 overflow-y-auto"
-      role="region"
-      aria-label="Результаты поиска"
-      aria-busy={isSearching || isLoadingMore}
-    >
-      {#if viewState === 'initial'}
-        <p
-          class="max-w-[62ch] px-4 py-8 leading-7 text-muted-foreground sm:px-5"
+      <button
+        type="button"
+        class="site-search-dialog__close"
+        aria-label="Закрыть"
+        onclick={() => closeDialog()}
+      >
+        <svg
+          class="size-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.9"
+          stroke-linecap="round"
+          aria-hidden="true"
         >
-          Введите запрос, чтобы найти новости, статусы и справочные материалы.
-        </p>
-      {:else if viewState === 'loading'}
-        <p class="px-4 py-8 font-medium text-foreground sm:px-5">Ищем…</p>
-      {:else if viewState === 'empty'}
-        <div class="space-y-1 px-4 py-8 sm:px-5">
-          <p class="font-semibold text-foreground">Ничего не нашли</p>
-          <p class="leading-7 text-muted-foreground">
-            Попробуйте изменить запрос.
-          </p>
-        </div>
-      {:else if viewState === 'error'}
-        <div class="space-y-4 px-4 py-8 sm:px-5">
-          <div class="space-y-1">
-            <p class="font-semibold text-foreground">
-              Поиск сейчас не работает
-            </p>
-            <p class="leading-7 text-muted-foreground">Попробуйте еще раз.</p>
-          </div>
-          <button
-            type="button"
-            class="ui-btn ui-btn-md ui-btn-outline"
-            onclick={retrySearch}
-          >
-            Повторить
-          </button>
-        </div>
-      {:else if viewState === 'dev-unavailable'}
-        <div class="space-y-1 px-4 py-8 sm:px-5">
-          <p class="font-semibold text-foreground">
-            Локальный поиск пока недоступен
-          </p>
-          <p class="leading-7 text-muted-foreground">
-            Подготовьте локальный индекс и обновите страницу.
-          </p>
-        </div>
-      {:else}
-        <ul aria-label="Найденные страницы">
-          {#each resultRows as row, index (row.result.url)}
-            <li class="border-b border-border last:border-b-0">
-              <a
-                id={`${resultsId}-${index}`}
-                href={row.url}
-                class="block min-w-0 px-4 py-4 text-foreground hover:bg-primary-soft-2 sm:px-5"
-                data-search-result
-                onclick={() => closeDialog(false)}
-              >
-                <span
-                  class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm leading-5 text-muted-foreground"
-                >
-                  <span class="font-semibold">{row.result.section.label}</span>
-                  {#if row.result.publishedAt}
-                    <time datetime={row.result.publishedAt}>
-                      {formatDate(row.result.publishedAt)}
-                    </time>
-                  {/if}
-                </span>
-                <h3 class="ui-card-title mt-1.5 [overflow-wrap:anywhere]">
-                  {row.result.title}
-                </h3>
-                {#if row.excerptHtml}
-                  {@const segments = excerptSegments(row.excerptHtml)}
-                  <p
-                    class="site-search-result-excerpt mt-2 [overflow-wrap:anywhere] text-sm leading-6 text-muted-foreground"
-                  >
-                    {#each segments as segment, segmentIndex (segmentIndex)}
-                      {#if segment.highlighted}<mark>{segment.text}</mark
-                        >{:else}{segment.text}{/if}
-                    {/each}
-                  </p>
-                {:else if row.result.description}
-                  <p
-                    class="mt-2 [overflow-wrap:anywhere] text-sm leading-6 text-muted-foreground"
-                  >
-                    {row.result.description}
-                  </p>
-                {/if}
-              </a>
-            </li>
-          {/each}
-        </ul>
-
-        {#if hasMoreResults}
-          {#key requestedLimit}
-            <div
-              class="h-px"
-              aria-hidden="true"
-              {@attach loadMoreOnIntersect}
-            ></div>
-          {/key}
-        {/if}
-      {/if}
+          <path d="m6.75 6.75 10.5 10.5"></path>
+          <path d="m17.25 6.75-10.5 10.5"></path>
+        </svg>
+      </button>
     </div>
+
+    {#if viewState !== 'initial'}
+      <div
+        bind:this={resultsElement}
+        id={resultsId}
+        class="site-search-dialog__results min-h-0 overflow-y-auto"
+        role="region"
+        aria-label="Результаты поиска"
+        aria-busy={isSearching || isLoadingMore}
+      >
+        {#if viewState === 'loading'}
+          <p class="px-4 py-4 text-sm font-medium text-muted-foreground">
+            Ищем…
+          </p>
+        {:else if viewState === 'empty'}
+          <p class="px-4 py-4 text-sm font-medium text-muted-foreground">
+            Ничего не нашли
+          </p>
+        {:else if viewState === 'error'}
+          <div class="flex items-center justify-between gap-4 px-4 py-3">
+            <p class="text-sm font-medium text-muted-foreground">
+              Поиск не работает
+            </p>
+            <button
+              type="button"
+              class="ui-btn ui-btn-sm ui-btn-ghost shrink-0"
+              onclick={retrySearch}
+            >
+              Повторить
+            </button>
+          </div>
+        {:else if viewState === 'dev-unavailable'}
+          <p class="px-4 py-4 text-sm font-medium text-muted-foreground">
+            Локальный поиск недоступен
+          </p>
+        {:else}
+          <ul aria-label="Найденные страницы">
+            {#each resultRows as row, index (row.result.url)}
+              <li class="border-b border-border last:border-b-0">
+                <a
+                  id={`${resultsId}-${index}`}
+                  href={row.url}
+                  class="block min-w-0 px-4 py-3 text-foreground hover:bg-primary-soft-2"
+                  data-search-result
+                  onclick={() => closeDialog(false)}
+                >
+                  <span
+                    class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs leading-5 text-muted-foreground"
+                  >
+                    <span class="font-semibold">{row.result.section.label}</span
+                    >
+                    {#if row.result.publishedAt}
+                      <time datetime={row.result.publishedAt}>
+                        {formatDate(row.result.publishedAt)}
+                      </time>
+                    {/if}
+                  </span>
+                  <h3
+                    class="mt-1 text-base font-semibold leading-6 [overflow-wrap:anywhere]"
+                  >
+                    {row.result.title}
+                  </h3>
+                  {#if row.excerptHtml}
+                    {@const segments = excerptSegments(row.excerptHtml)}
+                    <p
+                      class="site-search-result-excerpt mt-1 line-clamp-2 [overflow-wrap:anywhere] text-sm leading-5 text-muted-foreground"
+                    >
+                      {#each segments as segment, segmentIndex (segmentIndex)}
+                        {#if segment.highlighted}<mark>{segment.text}</mark
+                          >{:else}{segment.text}{/if}
+                      {/each}
+                    </p>
+                  {:else if row.result.description}
+                    <p
+                      class="mt-1 line-clamp-2 [overflow-wrap:anywhere] text-sm leading-5 text-muted-foreground"
+                    >
+                      {row.result.description}
+                    </p>
+                  {/if}
+                </a>
+              </li>
+            {/each}
+          </ul>
+
+          {#if hasMoreResults}
+            {#key requestedLimit}
+              <div
+                class="h-px"
+                aria-hidden="true"
+                {@attach loadMoreOnIntersect}
+              ></div>
+            {/key}
+          {/if}
+        {/if}
+      </div>
+    {/if}
   </div>
 
   <p class="sr-only" aria-live="polite" aria-atomic="true">
