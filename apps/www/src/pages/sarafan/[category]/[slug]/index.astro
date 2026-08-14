@@ -80,12 +80,12 @@ const schema = contactPageSchema({
   <main class="ui-page pb-8 md:pb-12 lg:pb-14">
     <header class="ui-page-header">
       <div class="ui-page-header-stack max-w-4xl">
-        <div data-pagefind-body>
-          <Breadcrumbs items={breadcrumbs} linkLast />
-        </div>
+        <Breadcrumbs items={breadcrumbs} linkLast />
 
         <div class="flex items-center gap-5 md:gap-7">
-          <h1 class="ui-page-title" data-pagefind-body>{contact.title}</h1>
+          <h1 class="ui-page-title" data-pagefind-ignore="all">
+            {contact.title}
+          </h1>
           {
             contact.vcf ? (
               <span class="inline-flex translate-y-1 md:translate-y-1.5">
@@ -98,7 +98,7 @@ const schema = contactPageSchema({
     </header>
 
     <article class="space-y-8 px-5 md:px-6">
-      <div data-pagefind-body>
+      <div data-pagefind-ignore="all">
         <ContactMethods
           contacts={contact.contacts}
           location={contact.location}
@@ -107,7 +107,7 @@ const schema = contactPageSchema({
       <div class={CONTACTS_PROSE} data-pagefind-body set:html={bodyHtml} />
       {
         contact.reviews.length > 0 ? (
-          <section class="max-w-[65ch] space-y-3">
+          <section class="max-w-[65ch] space-y-3" data-pagefind-ignore="all">
             <h2 id={reviewsHeadingId} class="ui-prose-title">
               Отзывы
             </h2>

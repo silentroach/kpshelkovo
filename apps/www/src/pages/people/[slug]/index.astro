@@ -98,7 +98,7 @@ const schema = personProfilePageSchema({
 
         <div class="space-y-4">
           <div class="space-y-2.5">
-            <h1 class="ui-page-title" data-pagefind-body>
+            <h1 class="ui-page-title" data-pagefind-ignore="all">
               {profile.name}
             </h1>
 
@@ -113,12 +113,16 @@ const schema = personProfilePageSchema({
             }
           </div>
 
-          <section aria-labelledby="person-contacts" class="space-y-3">
+          <section
+            aria-labelledby="person-contacts"
+            class="space-y-3"
+            data-pagefind-ignore="all"
+          >
             <h2 id="person-contacts" class="ui-section-label">Контакты</h2>
 
             {
               profile.contacts.length > 0 ? (
-                <ul class="space-y-2.5 text-sm leading-6" data-pagefind-body>
+                <ul class="space-y-2.5 text-sm leading-6">
                   {profile.contacts.map((contact) => (
                     <li class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
                       {contact.type === 'telegram' ? (
