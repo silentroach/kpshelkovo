@@ -1,11 +1,11 @@
 export const CONTACT_CATEGORIES = [
   'electricity',
   'construction',
+  'fence',
   'waste-removal',
   'education',
   'garden',
   'food',
-  'fence',
 ] as const;
 export type ContactCategory = (typeof CONTACT_CATEGORIES)[number];
 

@@ -104,10 +104,10 @@ describe('buildContactsDataset', () => {
     expect(data.categories.map((item) => item.category)).toEqual([
       'electricity',
       'construction',
+      'fence',
       'waste-removal',
       'education',
       'garden',
-      'fence',
     ]);
   });
 
