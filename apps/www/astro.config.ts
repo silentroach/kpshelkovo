@@ -12,6 +12,7 @@ import {
 } from './src/lib/sitemap';
 import { loadSitemapMetadataIndex } from './src/lib/sitemap-data';
 import { createAstroMarkdownProcessor } from './src/lib/markdown/astro-processor';
+import { pagefindDevSnapshot } from './src/integrations/pagefind-dev-snapshot';
 
 const plugins = [tailwindcss()];
 const devServerPort = 4321;
@@ -76,6 +77,7 @@ export default defineConfig({
     },
   },
   integrations: [
+    pagefindDevSnapshot(),
     svelte(),
     sitemap({
       filter(page) {

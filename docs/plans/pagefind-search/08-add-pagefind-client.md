@@ -9,6 +9,7 @@
 - Описать readonly внутренний result DTO отдельно от кода.
 - Лениво импортировать `/pagefind/pagefind.js` только при первой попытке поиска в production/preview.
 - Настроить ranking metadata так, чтобы section/date не повышали результат.
+- Не передавать опцию `sort`: подготовленный у новостей sort key `date` не меняет relevance order MVP и не получает видимого управления.
 - Нормализовать URL, title, section, date, excerpt и optional sub-result anchor.
 - Использовать Pagefind debounce/preload или эквивалентную отмену устаревших запросов без нескольких конкурирующих механизмов.
 - Ограничить длину запроса на уровне UX.
@@ -42,4 +43,6 @@
 ## Вне задачи
 
 - Видимый dialog UI.
+- Sort UI и любой режим выдачи по дате.
+- Query parameter для подсветки и скрипт подсветки на целевых страницах; это отдельное post-release исследование.
 - Search analytics и query persistence.

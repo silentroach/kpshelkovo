@@ -3,6 +3,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { createAstroContainer } from '@/test/astro-container';
+import { SEARCH_SECTIONS } from '@/lib/search/sections';
+import type { SearchDocument, SearchScope } from '@/lib/search/types';
 
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import BaseLayout from './BaseLayout.astro';
@@ -14,6 +16,17 @@ const renderLayout = async (pathname: string) => {
     request: new Request(`https://example.com${pathname}`),
   });
 };
+
+const searchDocument = (
+  scope: SearchScope,
+  description?: string,
+): SearchDocument => ({
+  scope,
+  title: 'Чистый заголовок',
+  description,
+  section: SEARCH_SECTIONS.news,
+  publishedAt: '2026-08-14',
+});
 
 describe('BaseLayout site header', () => {
   it('shows the common site header on tariff pages', async () => {
@@ -46,5 +59,65 @@ describe('BaseLayout markdown discovery', () => {
     });
 
     expect(html).not.toContain('type="text/markdown"');
+  });
+});
+
+describe('BaseLayout search contract', () => {
+  it('mounts one global dialog outside the indexed content', async () => {
+    const container = await createAstroContainer();
+    const html = await container.renderToString(BaseLayout, {
+      request: new Request('https://example.com/news/'),
+      props: { search: searchDocument('page') },
+    });
+
+    expect(html.match(/<dialog/g)).toHaveLength(1);
+    expect(html.match(/data-search-trigger/g)).toHaveLength(2);
+    expect(html.indexOf('<dialog')).toBeGreaterThan(
+      html.indexOf('data-pagefind-root'),
+    );
+  });
+
+  it('does not opt a page into Pagefind by default', async () => {
+    const html = await renderLayout('/news/');
+
+    expect(html).not.toContain('data-pagefind-root');
+    expect(html).not.toContain('data-pagefind-body');
+  });
+
+  it('publishes clean metadata and marks the page scope as searchable', async () => {
+    const container = await createAstroContainer();
+    const html = await container.renderToString(BaseLayout, {
+      request: new Request('https://example.com/news/2026/08/example/'),
+      props: {
+        title: 'Чистый заголовок — Новости — Шелково Онлайн',
+        search: searchDocument('page', 'Описание для поиска'),
+      },
+      slots: { default: '<h1>Чистый заголовок</h1>' },
+    });
+
+    expect(html).toContain('data-pagefind-root');
+    expect(html).toContain('data-pagefind-body');
+    expect(html).toContain('data-search-title="Чистый заголовок"');
+    expect(html).toContain('data-search-description="Описание для поиска"');
+    expect(html).toContain('data-search-section-id="news"');
+    expect(html).toContain('data-search-section-label="Новости"');
+    expect(html).toContain('data-search-published-at="2026-08-14"');
+    expect(html).toContain(
+      'data-pagefind-sort="date[data-search-published-at]"',
+    );
+  });
+
+  it('publishes metadata without choosing a body for manual scope', async () => {
+    const container = await createAstroContainer();
+    const html = await container.renderToString(BaseLayout, {
+      request: new Request('https://example.com/manual/'),
+      props: { search: searchDocument('manual') },
+    });
+
+    expect(html).toContain('data-pagefind-root');
+    expect(html).toContain('data-pagefind-meta=');
+    expect(html).not.toContain('description[data-search-description]');
+    expect(html).not.toContain('data-search-description');
+    expect(html).not.toContain('data-pagefind-body');
   });
 });

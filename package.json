@@ -9,6 +9,7 @@
     "dev": "turbo run dev",
     "start": "pnpm dev",
     "build": "turbo run build",
+    "search:prepare": "pnpm --filter @shelkovo/www search:prepare",
     "preview": "turbo run preview",
     "typecheck": "turbo run typecheck",
     "format": "prettier --write .",

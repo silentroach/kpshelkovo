@@ -239,3 +239,48 @@ html[data-site-navigation-pending] .site-navigation-progress::before {
   color: var(--color-muted-foreground);
   font-size: 0.75rem;
 }
+
+.site-search-dialog {
+  width: min(46rem, calc(100vw - 2rem));
+  height: min(40rem, calc(100dvh - 2rem));
+  max-width: none;
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0.75rem;
+  color: var(--color-foreground);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-2);
+}
+
+.site-search-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.site-search-dialog::backdrop {
+  background: var(--color-overlay);
+}
+
+.site-search-dialog__results {
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.site-search-result-excerpt mark {
+  color: inherit;
+  background: var(--color-accent-soft);
+}
+
+@media (max-width: 47.999rem) {
+  .site-search-dialog {
+    width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
+}

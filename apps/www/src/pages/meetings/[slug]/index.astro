@@ -19,6 +19,8 @@ import {
   formatTranscriptTime,
 } from '@/lib/meetings/view';
 import { techArticleSchema } from '@/lib/news/seo';
+import { SEARCH_SECTIONS } from '@/lib/search/sections';
+import type { SearchDocument } from '@/lib/search/types';
 
 export const getStaticPaths = (async () => {
   const meetings = await loadMeetings();
@@ -44,6 +46,13 @@ if (!meeting) {
 
 const title = `${meeting.title} — Архив встреч — Шелково Онлайн`;
 const description = describeMeeting(meeting);
+const search = {
+  scope: 'page',
+  title: meeting.title,
+  description,
+  section: SEARCH_SECTIONS.meetings,
+  publishedAt: meeting.date.iso.slice(0, 10),
+} satisfies SearchDocument;
 const hasTranscriptParts = meeting.transcript.parts.length > 1;
 const sourceLinks = meeting.sourceUrls.map((href, index) => ({
   href,
@@ -71,6 +80,7 @@ const schema = techArticleSchema({
   canonical={meeting.canonical}
   type="article"
   schema={schema}
+  search={search}
 >
   <main class="ui-page pb-8 md:pb-12 lg:pb-14">
     <header class="ui-page-header">
@@ -95,11 +105,13 @@ const schema = techArticleSchema({
 
               {
                 sourceLinks.map((source) => (
-                  <LinkWithIcon
-                    href={source.href}
-                    label={source.label}
-                    ariaLabelPrefix={source.label}
-                  />
+                  <span data-pagefind-ignore="all">
+                    <LinkWithIcon
+                      href={source.href}
+                      label={source.label}
+                      ariaLabelPrefix={source.label}
+                    />
+                  </span>
                 ))
               }
             </div>
@@ -170,11 +182,20 @@ const schema = techArticleSchema({
                     const timestamp = formatTranscriptTime(segment.start);
 
                     return (
-                      <li
-                        id={segment.anchor}
-                        class="meeting-transcript-segment scroll-mt-24 py-2.5 md:grid md:grid-cols-[11rem_minmax(0,1fr)] md:gap-x-4 md:py-3"
-                      >
-                        <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 md:block md:space-y-0.5 md:pt-0.5">
+                      <li class="meeting-transcript-segment py-2.5 md:grid md:grid-cols-[11rem_minmax(0,1fr)] md:gap-x-4 md:py-3">
+                        <h3
+                          id={segment.anchor}
+                          class="meeting-transcript-anchor sr-only scroll-mt-24"
+                          aria-hidden="true"
+                          data-pagefind-weight="0"
+                        >
+                          Фрагмент {timestamp}
+                        </h3>
+
+                        <div
+                          class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 md:block md:space-y-0.5 md:pt-0.5"
+                          data-pagefind-ignore="all"
+                        >
                           <a
                             href={`#${segment.anchor}`}
                             aria-label={`Ссылка на фрагмент ${timestamp}`}
@@ -247,15 +268,16 @@ const schema = techArticleSchema({
     }
   }
 
-  .meeting-transcript-segment:target {
+  .meeting-transcript-segment:has(> .meeting-transcript-anchor:target) {
     background: var(--meeting-transcript-target-bg);
   }
 
-  .meeting-transcript-segment:target::before {
+  .meeting-transcript-segment:has(> .meeting-transcript-anchor:target)::before {
     background: var(--color-primary);
   }
 
-  .meeting-transcript-segment:target a[href^='#t-'] {
+  .meeting-transcript-segment:has(> .meeting-transcript-anchor:target)
+    a[href^='#t-'] {
     color: var(--color-primary);
   }
 

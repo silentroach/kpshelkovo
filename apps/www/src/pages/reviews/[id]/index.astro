@@ -18,6 +18,8 @@ import {
   formatReviewTitle,
   REVIEWS_PROSE,
 } from '@/lib/reviews/view';
+import { SEARCH_SECTIONS } from '@/lib/search/sections';
+import type { SearchDocument } from '@/lib/search/types';
 
 export const getStaticPaths = (async () => {
   const reviews = await loadReviews();
@@ -44,6 +46,12 @@ const title = `${reviewTitle} — Отзывы — Шелково Онлайн`;
 const description =
   review.seo?.description ??
   `Отзыв собственника ${formatReviewAuthor(review)} о жизни в Шелково.`;
+const search = {
+  scope: 'manual',
+  title: reviewTitle,
+  description,
+  section: SEARCH_SECTIONS.reviews,
+} satisfies SearchDocument;
 const bodyHtml = renderMarkdown(review.body);
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Отзывы', href: reviewsUrl() },
@@ -66,25 +74,26 @@ const schema = reviewPageSchema({
   type="article"
   keywords={['отзывы Шелково', reviewTitle]}
   schema={schema}
+  search={search}
 >
   <main class="ui-page pb-8 md:pb-12 lg:pb-14">
     <header class="ui-page-header">
       <div class="ui-page-header-stack max-w-4xl">
         <Breadcrumbs items={breadcrumbs} linkLast />
         <div class="space-y-4">
-          <h1 class="ui-page-title">{reviewTitle}</h1>
+          <h1 class="ui-page-title" data-pagefind-body>{reviewTitle}</h1>
           <ReviewMeta review={review} showVerified />
         </div>
       </div>
     </header>
 
-    <article class="space-y-8 px-5 md:px-6">
+    <article class="space-y-8 px-5 md:px-6" data-pagefind-body>
       <div class={REVIEWS_PROSE} set:html={bodyHtml} />
       <ReviewAspectList aspects={review.aspects} />
     </article>
 
     <!--noindex-->
-    <footer class="mt-8 px-5 md:px-6" data-nosnippet>
+    <footer class="mt-8 px-5 md:px-6" data-nosnippet data-pagefind-ignore="all">
       <section aria-labelledby="review-disclaimer" class="ui-shell py-4">
         <h2 id="review-disclaimer" class="ui-section-label">
           Отказ от ответственности

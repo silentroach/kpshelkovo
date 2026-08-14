@@ -1,4 +1,5 @@
 ---
+import SearchTrigger from '@/components/search/SearchTrigger.astro';
 import SiteNav from '@/components/site/SiteNav.astro';
 import {
   getHomeStatusAriaLabel,
@@ -19,11 +20,11 @@ const maintenanceWindows = getHomeStatusMaintenanceWindows(
 
 <header class="site-header z-40 border-b md:sticky md:top-0">
   <div
-    class="ui-page flex min-h-12 items-center justify-between gap-4 px-5 py-2 md:min-h-14 md:px-6 md:py-2.5"
+    class="ui-page flex min-h-12 items-center justify-between gap-2 px-5 py-2 md:min-h-14 md:gap-4 md:px-6 md:py-2.5"
   >
     <a href="/" class="site-header-brand"> Шелково Онлайн </a>
 
-    <div class="hidden md:block">
+    <div class="hidden min-w-0 md:block">
       <SiteNav
         variant="header"
         statusState={statusState}
@@ -31,21 +32,24 @@ const maintenanceWindows = getHomeStatusMaintenanceWindows(
       />
     </div>
 
-    <details class="site-header-menu md:hidden">
-      <summary class="site-header-menu-button">
-        <span>Меню</span>
-        <span aria-hidden="true" class="site-header-menu-icon"></span>
-      </summary>
+    <div class="flex shrink-0 items-center gap-1.5 md:hidden">
+      <SearchTrigger variant="mobile" />
+      <details class="site-header-menu">
+        <summary class="site-header-menu-button">
+          <span>Меню</span>
+          <span aria-hidden="true" class="site-header-menu-icon"></span>
+        </summary>
 
-      <div class="site-header-mobile-panel">
-        <SiteNav
-          variant="mobile"
-          statusState={statusState}
-          statusAriaLabel={statusAriaLabel}
-          ariaLabel="Главное меню сайта"
-        />
-      </div>
-    </details>
+        <div class="site-header-mobile-panel">
+          <SiteNav
+            variant="mobile"
+            statusState={statusState}
+            statusAriaLabel={statusAriaLabel}
+            ariaLabel="Главное меню сайта"
+          />
+        </div>
+      </details>
+    </div>
   </div>
 
   <script
@@ -87,7 +91,8 @@ const maintenanceWindows = getHomeStatusMaintenanceWindows(
   }
 
   .site-header-brand {
-    flex: none;
+    min-width: 0;
+    flex: 1;
     font-family: var(--font-heading);
     font-size: 1rem;
     font-weight: 700;
@@ -178,6 +183,7 @@ const maintenanceWindows = getHomeStatusMaintenanceWindows(
 
   @media (min-width: 48rem) {
     .site-header-brand {
+      flex: none;
       font-size: 1.0625rem;
     }
   }

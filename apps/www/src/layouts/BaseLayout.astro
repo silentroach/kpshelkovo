@@ -12,7 +12,9 @@ import FontPreloads from '@shelkovo/ui/FontPreloads.astro';
 import type { SchemaDoc } from '@shelkovo/seo';
 import SiteFooter from '@shelkovo/ui/SiteFooter.astro';
 import { browserColor, themeColor } from '@shelkovo/ui/theme';
+import SearchDialog from '@/components/search/SearchDialog.svelte';
 import SiteHeader from '@/components/site/SiteHeader.astro';
+import type { SearchDocument } from '@/lib/search/types';
 import { absoluteUrl, canon } from '../lib/site';
 
 interface Props {
@@ -28,6 +30,7 @@ interface Props {
   preconnectYandexMaps?: boolean;
   bodyClass?: string;
   showSiteHeader?: boolean;
+  search?: SearchDocument;
 }
 
 const defaultShowSiteHeader = Astro.url.pathname !== '/';
@@ -45,6 +48,7 @@ const {
   preconnectYandexMaps = false,
   bodyClass,
   showSiteHeader = defaultShowSiteHeader,
+  search,
 } = Astro.props;
 
 const canonical = canon(href ?? Astro.url.pathname);
@@ -73,6 +77,17 @@ const bodyClasses = [
 ]
   .filter(Boolean)
   .join(' ');
+const searchMetadata = search
+  ? [
+      'title[data-search-title]',
+      search.description && 'description[data-search-description]',
+      'sectionId[data-search-section-id]',
+      'sectionLabel[data-search-section-label]',
+      search.publishedAt && 'publishedAt[data-search-published-at]',
+    ]
+      .filter(Boolean)
+      .join(', ')
+  : undefined;
 ---
 
 <!doctype html>
@@ -176,11 +191,26 @@ const bodyClasses = [
     {showSiteHeader && <SiteHeader />}
     <div
       class="flex-1"
+      data-pagefind-root={search ? true : undefined}
+      data-pagefind-body={search?.scope === 'page' ? true : undefined}
+      data-pagefind-meta={searchMetadata}
+      data-pagefind-filter={search
+        ? 'section[data-search-section-id]'
+        : undefined}
+      data-pagefind-sort={search?.publishedAt
+        ? 'date[data-search-published-at]'
+        : undefined}
+      data-search-title={search?.title}
+      data-search-description={search?.description}
+      data-search-section-id={search?.section.id}
+      data-search-section-label={search?.section.label}
+      data-search-published-at={search?.publishedAt}
       transition:name="site-content"
       transition:animate={contentTransition}
     >
       <slot />
     </div>
+    <SearchDialog client:load />
     <SiteFooter />
   </body>
 </html>

@@ -28,6 +28,8 @@ import {
 import { reglamentSectionsByOfficialTariff } from '@/lib/reglament/section-order';
 import type { CostBreakdown, EditableFieldKey } from '@/lib/reglament/schema';
 import { formatEstimateSourceRefLabel } from '@/lib/reglament/source-labels';
+import { SEARCH_SECTIONS } from '@/lib/search/sections';
+import type { SearchDocument } from '@/lib/search/types';
 
 export const prerender = true;
 
@@ -36,6 +38,12 @@ const htmlSections = reglamentSectionsByOfficialTariff(payload.sections);
 const title = 'Смета 2026: калькулятор тарифа — Шелково Онлайн';
 const description =
   'Интерактивная смета регламента 2026: тариф за сотку в месяц, строки расходов, источники из PDF и быстрый пересчет итогов.';
+const search = {
+  scope: 'manual',
+  title: 'Калькулятор тарифа по смете 2026',
+  description,
+  section: SEARCH_SECTIONS.regulation,
+} satisfies SearchDocument;
 const keywords = [
   'смета 2026 Шелково',
   'калькулятор тарифа Шелково',
@@ -350,6 +358,7 @@ const formatInputUnit = (unit: string): string =>
   canonical={reglamentUrl()}
   keywords={keywords}
   schema={schema}
+  search={search}
 >
   <main class="ui-page pb-8 md:pb-12 lg:pb-16" data-reglament-calculator>
     <section class="ui-page-header">
@@ -357,7 +366,7 @@ const formatInputUnit = (unit: string): string =>
         <div class="ui-page-header-stack">
           <Breadcrumbs items={breadcrumbs} />
 
-          <div class="space-y-4">
+          <div class="space-y-4" data-pagefind-body>
             <h1 class="ui-page-title max-w-4xl">
               Калькулятор тарифа по смете 2026
             </h1>
@@ -497,7 +506,7 @@ const formatInputUnit = (unit: string): string =>
 
     <section class="px-5 md:px-6" aria-labelledby="estimate-sections-title">
       <div class="max-w-6xl space-y-10">
-        <div class="max-w-3xl space-y-2">
+        <div class="max-w-3xl space-y-2" data-pagefind-body>
           <h2 id="estimate-sections-title" class="ui-section-title">
             Разделы сметы
           </h2>
@@ -513,7 +522,7 @@ const formatInputUnit = (unit: string): string =>
           viewSections.map((section) => (
             <section id={section.id}>
               <div class="mb-4 flex flex-col gap-3 md:mb-5 md:flex-row md:items-end md:justify-between">
-                <div class="space-y-1.5">
+                <div class="space-y-1.5" data-pagefind-body>
                   <h3 class="ui-prose-title">{section.title}</h3>
                   <p class="text-xs leading-5 text-muted-foreground">
                     Источники раздела:{' '}
@@ -596,7 +605,7 @@ const formatInputUnit = (unit: string): string =>
                   <tbody>
                     {section.rows.map((row) => (
                       <>
-                        <tr class="border-t border-border">
+                        <tr class="border-t border-border" data-pagefind-body>
                           <td class="border-t border-border px-4 py-2.5 align-top">
                             <div class="space-y-1.5">
                               <div class="flex items-start gap-2">
@@ -607,6 +616,7 @@ const formatInputUnit = (unit: string): string =>
                                     checked={row.baseline.is_enabled}
                                     aria-label="Включить позицию"
                                     aria-describedby={row.titleId}
+                                    data-pagefind-ignore="all"
                                     data-reglament-field="enabled"
                                     data-reglament-row-id={row.id}
                                     data-reglament-baseline={String(
@@ -628,7 +638,7 @@ const formatInputUnit = (unit: string): string =>
                           </td>
                           <td class="border-t border-border px-4 py-2.5 align-top text-muted-foreground">
                             {row.controls.base ? (
-                              <label class="block">
+                              <label class="block" data-pagefind-ignore="all">
                                 <span class={inputShellClass}>
                                   <input
                                     class={inputClass}
@@ -659,7 +669,10 @@ const formatInputUnit = (unit: string): string =>
                                 {formatDisplayValue(row.baseline.base)}
                               </span>
                             ) : (
-                              <span class={`${tableTextClass} space-y-1`}>
+                              <span
+                                class={`${tableTextClass} space-y-1`}
+                                data-pagefind-ignore="all"
+                              >
                                 <span class="inline-flex items-center gap-1.5">
                                   <span class="font-semibold">
                                     {row.missing.base.label}
@@ -689,7 +702,7 @@ const formatInputUnit = (unit: string): string =>
                           </td>
                           <td class="border-t border-border px-4 py-2.5 align-top text-muted-foreground">
                             {row.controls.frequency ? (
-                              <label class="block">
+                              <label class="block" data-pagefind-ignore="all">
                                 <span class={inputShellClass}>
                                   <input
                                     class={inputClass}
@@ -728,7 +741,10 @@ const formatInputUnit = (unit: string): string =>
                                 {formatDisplayValue(row.baseline.frequency)}
                               </span>
                             ) : (
-                              <span class={`${tableTextClass} space-y-1`}>
+                              <span
+                                class={`${tableTextClass} space-y-1`}
+                                data-pagefind-ignore="all"
+                              >
                                 <span class="inline-flex items-center gap-1.5">
                                   <span class="font-semibold">
                                     {row.missing.frequency.label}
@@ -758,7 +774,7 @@ const formatInputUnit = (unit: string): string =>
                           </td>
                           <td class="border-t border-border px-4 py-2.5 align-top text-muted-foreground">
                             {row.controls.rate ? (
-                              <label class="block">
+                              <label class="block" data-pagefind-ignore="all">
                                 <span class={inputShellClass}>
                                   <input
                                     class={inputClass}
@@ -789,7 +805,10 @@ const formatInputUnit = (unit: string): string =>
                                 {formatDisplayValue(row.baseline.price)}
                               </span>
                             ) : (
-                              <span class={`${tableTextClass} space-y-1`}>
+                              <span
+                                class={`${tableTextClass} space-y-1`}
+                                data-pagefind-ignore="all"
+                              >
                                 <span class="inline-flex items-center gap-1.5">
                                   <span class="font-semibold">
                                     {row.missing.rate.label}
@@ -822,7 +841,10 @@ const formatInputUnit = (unit: string): string =>
                               </span>
                             )}
                           </td>
-                          <td class="border-t border-border px-4 py-2.5 text-right align-top font-semibold text-foreground">
+                          <td
+                            class="border-t border-border px-4 py-2.5 text-right align-top font-semibold text-foreground"
+                            data-pagefind-ignore="all"
+                          >
                             <span
                               class={tableTextClass}
                               data-reglament-row-tariff={row.id}
@@ -853,7 +875,10 @@ const formatInputUnit = (unit: string): string =>
                                 </svg>
                                 <span>Детали расчета и источники</span>
                               </summary>
-                              <div class="mt-3 space-y-4 border-l border-border pl-3 md:pl-4">
+                              <div
+                                class="mt-3 space-y-4 border-l border-border pl-3 md:pl-4"
+                                data-pagefind-body
+                              >
                                 {row.description && (
                                   <p class="text-muted-foreground">
                                     {row.description}
@@ -885,7 +910,10 @@ const formatInputUnit = (unit: string): string =>
                                       ))}
                                     </ul>
                                   </div>
-                                  <div class="space-y-1">
+                                  <div
+                                    class="space-y-1"
+                                    data-pagefind-ignore="all"
+                                  >
                                     <p class="font-bold uppercase tracking-[0.06em] text-muted-foreground">
                                       Сумма за год
                                     </p>
@@ -900,7 +928,10 @@ const formatInputUnit = (unit: string): string =>
                                   </div>
                                 </div>
 
-                                <div class="space-y-2">
+                                <div
+                                  class="space-y-2"
+                                  data-pagefind-ignore="all"
+                                >
                                   <p class="font-bold uppercase tracking-[0.06em] text-muted-foreground">
                                     Состав расчета
                                   </p>
@@ -984,7 +1015,10 @@ const formatInputUnit = (unit: string): string =>
                                 </div>
 
                                 {row.controls.expert.length > 0 && (
-                                  <fieldset class="space-y-2 border-t border-border pt-3">
+                                  <fieldset
+                                    class="space-y-2 border-t border-border pt-3"
+                                    data-pagefind-ignore="all"
+                                  >
                                     <legend class="font-bold uppercase tracking-[0.06em] text-muted-foreground">
                                       Дополнительные поля
                                     </legend>

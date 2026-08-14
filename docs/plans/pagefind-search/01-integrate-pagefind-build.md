@@ -17,6 +17,7 @@
 - Встроить Pagefind после `astro build` и до копирования `dist/site`.
 - Оставить обычный `pnpm dev` быстрым и независимым от индекса.
 - Добавить корневую команду `pnpm search:prepare`, которая делает актуальный Astro build и пишет Pagefind в отдельный игнорируемый dev-кеш.
+- Хранить dev snapshot в явном корневом кеше `.cache/pagefind`; `pnpm search:prepare` полностью заменяет этот каталог.
 - Через dev-only Vite middleware отдавать подготовленный кеш по `/pagefind/`, не копируя generated files в `public`.
 - Передать клиенту при старте dev явный признак доступности snapshot, чтобы отсутствие кеша не создавало ожидаемый 404.
 - Сохранить `pnpm build && pnpm preview` как финальный production-like сценарий.

@@ -9,7 +9,7 @@
 - По умолчанию ресурсы разрешены только с текущего источника (origin).
 - Внешние сервисы разрешены явно и только в тех директивах, которые им нужны.
 - Широкие источники вроде `https:` или `*` не используются.
-- `unsafe-eval` разрешен только из-за JS API Яндекс Карт v3: официальная документация требует его для работы векторного движка при парсинге тайлов.
+- `unsafe-eval` разрешен из-за JS API Яндекс Карт v3: официальная документация требует его для работы векторного движка при парсинге тайлов. Pagefind также использует уже существующее разрешение для компиляции WebAssembly, но не требует расширять политику.
 - Wildcard оставлены только там, где внешний сервис использует много служебных поддоменов.
 
 ## Базовые директивы
@@ -49,19 +49,19 @@
 
 `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://mc.yandex.ru https://mc.yandex.com https://api-maps.yandex.ru https://*.api-maps.yandex.ru https://yastatic.net`
 
-- `'self'` нужен для собранных Astro-ассетов в `/static/`.
+- `'self'` нужен для собранных Astro-ассетов в `/static/` и runtime Pagefind в `/pagefind/`.
 - `'unsafe-inline'` сейчас нужен, потому что Astro генерирует inline bootstrap-скрипты и загрузчики islands прямо в HTML.
 - `https://mc.yandex.ru` и `https://mc.yandex.com` нужны для Яндекс Метрики.
 - `https://api-maps.yandex.ru` нужен для JS API Яндекс Карт v3.
 - `https://*.api-maps.yandex.ru` нужен для ресурсов JS API Яндекс Карт v3 на служебных поддоменах.
 - `https://yastatic.net` нужен для рантайм-бандлов Яндекс Карт, которые загружает API.
-- `'unsafe-eval'` нужен Яндекс Картам для работы векторного движка при парсинге тайлов. Без него возможны ошибки вида `vector: internal error`.
+- `'unsafe-eval'` нужен Яндекс Картам для работы векторного движка при парсинге тайлов. Без него возможны ошибки вида `vector: internal error`. Это же существующее разрешение покрывает компиляцию WebAssembly в Pagefind 1.5.2; отдельное исключение для поиска не добавлено.
 
 ## Сетевые запросы
 
 `connect-src 'self' https://mc.yandex.ru https://mc.yandex.com wss://mc.yandex.ru wss://mc.yandex.com https://api-maps.yandex.ru https://*.api-maps.yandex.ru https://*.maps.yandex.net https://*.maps.yandex.ru https://*.yandex.ru`
 
-- `'self'` покрывает same-origin API и запросы данных.
+- `'self'` покрывает same-origin API, запросы данных и загрузку Pagefind metadata, index chunks и fragments из `/pagefind/`.
 - Яндекс Метрика использует HTTPS и WebSocket точки доступа на `mc.yandex.ru` и `mc.yandex.com`.
 - JS API Яндекс Карт использует `api-maps.yandex.ru` и служебные поддомены `*.api-maps.yandex.ru`.
 - Яндекс Карты загружают стили карты, списки объектов, тайлы и renderer-данные с `*.maps.yandex.net`, `*.maps.yandex.ru` и части точек доступа `*.yandex.ru`.
@@ -110,8 +110,8 @@ JS API Яндекс Карт v3 не является iframe. Для него н
 
 `worker-src 'self' blob: data: https://api-maps.yandex.ru https://*.api-maps.yandex.ru https://yastatic.net`
 
-- `'self'` разрешает same-origin воркеры, если мы добавим локальные воркеры позже.
-- `blob:` разрешает воркеры, созданные из собранного или сгенерированного кода.
+- `'self'` разрешает same-origin воркер Pagefind `/pagefind/pagefind-worker.js`.
+- `blob:` разрешает обертку воркера Pagefind и воркеры, созданные из собранного или сгенерированного кода.
 - `data:` нужен JS API Яндекс Карт v3. API создает небольшие `data:application/javascript` обертки воркеров, которые вызывают `importScripts(...)` для worker-бандлов с `https://yastatic.net`.
 - `https://api-maps.yandex.ru`, `https://*.api-maps.yandex.ru` и `https://yastatic.net` перечислены в официальных CSP-правилах Яндекс Карт для `worker-src`.
 
@@ -139,3 +139,11 @@ JS API Яндекс Карт v3:
 - Данные карт через fetch/xhr: `https://*.maps.yandex.net`, `https://*.maps.yandex.ru`, `https://*.yandex.ru`.
 - Обертки воркеров: `data:` и иногда `blob:`.
 - Векторный движок требует `'unsafe-eval'` для парсинга тайлов; это указано в официальной документации Яндекс Карт.
+
+Pagefind 1.5.2:
+
+- Официальная справка по hosting и CSP: `https://pagefind.app/docs/hosting/`.
+- Runtime, WebAssembly, metadata и шардированный индекс загружаются только с текущего origin из `/pagefind/`; внешних источников нет.
+- `connect-src 'self'` покрывает fetch-запросы metadata, index chunks и fragments.
+- `worker-src 'self' blob:` покрывает same-origin worker и создаваемую Pagefind worker-обертку.
+- Pagefind компилирует WebAssembly. Рекомендованный Pagefind токен `'wasm-unsafe-eval'` отдельно не добавлен, потому что текущий более широкий `'unsafe-eval'` уже нужен Яндекс Картам и фактически разрешает эту компиляцию.

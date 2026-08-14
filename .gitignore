@@ -5,6 +5,7 @@ apps/*/dist/
 apps/*/.astro/
 .turbo/
 .lighthouseci/
+.cache/pagefind/
 .agents/skills/*
 !.agents/skills/news-maker/
 !.agents/skills/news-maker/**

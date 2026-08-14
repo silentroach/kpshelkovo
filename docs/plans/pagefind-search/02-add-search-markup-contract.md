@@ -13,6 +13,8 @@
 
 Metadata должны использовать чистый пользовательский title, section id/label, description и optional date. Значения остаются в production HTML.
 
+Pagefind не задает отдельный тип или обязательный формат даты для sorting: значения сортируются как числа, только если каждое из них парсится как число, иначе - как строки в алфавитном порядке. Документация использует `YYYY-MM-DD`; этот нормализованный ISO 8601 формат дает новостям стабильный хронологический порядок.
+
 ## Объем работы
 
 - Вынести readonly search types и стабильные section definitions в отдельные TypeScript-модули.
@@ -20,6 +22,7 @@ Metadata должны использовать чистый пользовате
 - Для scope `page` ставить `data-pagefind-body` на текущую content-wrapper внутри layout.
 - Для scope `manual` не ставить автоматический body marker.
 - Публиковать metadata и section filter без влияния section/date на ranking.
+- Для новости дополнительно публиковать sort key `date` со значением `publishedAt` в формате `YYYY-MM-DD`, например через `data-pagefind-sort="date[datetime]"` на `<time datetime="...">`.
 - Подключить контракт к detail template новости как первый сквозной пример.
 - Явно исключить related или action-only блоки новости, если они создают дублирование.
 
@@ -27,6 +30,7 @@ Metadata должны использовать чистый пользовате
 
 - После build Pagefind индексирует detail pages новостей и не индексирует news archives, tags, 404 и verification HTML.
 - Результат новости содержит чистые title, section label, canonical URL, description/excerpt и дату.
+- Новость предоставляет Pagefind sort key `date` со значением `YYYY-MM-DD`; обычный поиск без опции `sort` по-прежнему использует стандартную релевантность.
 - Scope `manual` доступен сложным страницам, но не включает их автоматически.
 
 ## Проверка
@@ -52,3 +56,9 @@ Metadata должны использовать чистый пользовате
 - Остальные разделы корпуса.
 - Видимый поисковый UI.
 - Видимые section filters.
+- Sort UI и запросы с опцией `sort`; наличие `date` в индексе только подготавливает будущую возможность.
+
+## Источники Pagefind
+
+- Разметка sort values и правила сравнения: https://pagefind.app/docs/sorts/
+- Активация sorting через JavaScript API и замена relevance order: https://pagefind.app/docs/js-api-sorting/

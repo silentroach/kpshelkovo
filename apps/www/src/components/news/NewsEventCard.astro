@@ -93,7 +93,7 @@ const titleId = `news-event-title-${event.slug}`;
           )}
         </ul>
 
-        <div class="news-event-compact-actions">
+        <div class="news-event-compact-actions" data-pagefind-ignore>
           <ResourceLink
             href={event.icsUrl}
             download={calendarFilename}
@@ -168,7 +168,7 @@ const titleId = `news-event-title-${event.slug}`;
             )}
           </p>
 
-          <div class="news-event-actions">
+          <div class="news-event-actions" data-pagefind-ignore>
             <ResourceLink
               href={event.icsUrl}
               download={calendarFilename}

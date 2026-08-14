@@ -5,6 +5,7 @@ import { getViteConfig } from 'astro/config';
 const visualTests = ['tests/**/*.visual.local.spec.ts'];
 const domTests = [
   'src/compare/components/**/*.test.ts',
+  'src/components/search/tests/**/*.test.ts',
   'src/lib/home/hero.dom.test.ts',
   'src/lib/home/status.dom.test.ts',
   'src/lib/status/timeline.dom.test.ts',

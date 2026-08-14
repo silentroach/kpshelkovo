@@ -16,6 +16,7 @@ export {
   GlobeIcon,
   MapPinIcon,
   PhoneIcon,
+  SearchIcon,
   StarIcon,
   TelegramIcon,
   WhatsAppIcon,

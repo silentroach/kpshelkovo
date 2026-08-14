@@ -198,7 +198,12 @@ jobs:
           # для уже существующих файлов; новые файлы получат mtime деплоя)
           rsync_opts="-azc --no-t --delete --mkpath --chmod=D755,F644"
 
+          # Active clients may still request chunks from earlier index generations.
           rsync $rsync_opts \
+            --filter='protect /pagefind/pagefind.*.pf_meta' \
+            --filter='protect /pagefind/index/*.pf_index' \
+            --filter='protect /pagefind/filter/*.pf_filter' \
+            --filter='protect /pagefind/fragment/*.pf_fragment' \
             -e "ssh $ssh_opts" \
             dist/www/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_WWW_PATH/"
 
@@ -206,6 +211,9 @@ jobs:
           rsync $rsync_opts \
             -e "ssh $ssh_opts" \
             dist/media/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_MEDIA_PATH/"
+
+      - name: Smoke Pagefind production delivery
+        run: sh scripts/smoke-pagefind-delivery.sh https://kpshelkovo.online dist/www
 
       - name: Publish deployed URLs
         run: |

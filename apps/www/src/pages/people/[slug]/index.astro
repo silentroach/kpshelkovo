@@ -26,6 +26,8 @@ import {
   personBacklinkGroups,
   PEOPLE_PROSE,
 } from '@/lib/people/view';
+import { SEARCH_SECTIONS } from '@/lib/search/sections';
+import type { SearchDocument } from '@/lib/search/types';
 
 export const getStaticPaths = (async () => {
   const profiles = await loadPeopleProfiles();
@@ -54,6 +56,12 @@ const description = profile.seo?.description ?? describePersonProfile(profile);
 const headline = formatPersonHeadline(profile);
 const headlineHtml = headline ? formatDynamicHtml(headline) : undefined;
 const title = `${profile.name} — Люди — Шелково Онлайн`;
+const search = {
+  scope: 'manual',
+  title: profile.name,
+  description,
+  section: SEARCH_SECTIONS.people,
+} satisfies SearchDocument;
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Люди' },
   { label: profile.name },
@@ -81,6 +89,7 @@ const schema = personProfilePageSchema({
   type="profile"
   keywords={['люди Шелково', profile.name]}
   schema={schema}
+  search={search}
 >
   <main class="ui-page pb-8 md:pb-12 lg:pb-14">
     <header class="ui-page-header">
@@ -89,7 +98,7 @@ const schema = personProfilePageSchema({
 
         <div class="space-y-4">
           <div class="space-y-2.5">
-            <h1 class="ui-page-title">
+            <h1 class="ui-page-title" data-pagefind-body>
               {profile.name}
             </h1>
 
@@ -97,6 +106,7 @@ const schema = personProfilePageSchema({
               headlineHtml && (
                 <p
                   class="max-w-3xl text-sm leading-6 text-muted-foreground md:text-base"
+                  data-pagefind-body
                   set:html={headlineHtml}
                 />
               )
@@ -108,7 +118,7 @@ const schema = personProfilePageSchema({
 
             {
               profile.contacts.length > 0 ? (
-                <ul class="space-y-2.5 text-sm leading-6">
+                <ul class="space-y-2.5 text-sm leading-6" data-pagefind-body>
                   {profile.contacts.map((contact) => (
                     <li class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
                       {contact.type === 'telegram' ? (
@@ -144,14 +154,18 @@ const schema = personProfilePageSchema({
     {
       profile.body && (
         <article class="px-5 md:px-6">
-          <div class={`max-w-4xl ${PEOPLE_PROSE}`} set:html={bodyHtml} />
+          <div
+            class={`max-w-4xl ${PEOPLE_PROSE}`}
+            data-pagefind-body
+            set:html={bodyHtml}
+          />
         </article>
       )
     }
 
     {
       showBacklinks && (
-        <section class="px-5 pt-8 md:px-6 md:pt-10">
+        <section class="px-5 pt-8 md:px-6 md:pt-10" data-pagefind-ignore="all">
           <div class="max-w-4xl space-y-5">
             <div class="space-y-1.5">
               <h2 class="ui-section-label">Где упоминается</h2>

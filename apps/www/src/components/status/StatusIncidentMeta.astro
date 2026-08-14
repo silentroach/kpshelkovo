@@ -28,5 +28,11 @@ const sourceUrl = incident.sourceUrl;
       incident.areas.map((area) => <ShelkovoAreaIcon area={area} />)
   }
 
-  {sourceUrl && <LinkWithIcon href={sourceUrl} ariaLabelPrefix="Источник" />}
+  {
+    sourceUrl && (
+      <span data-pagefind-ignore="all">
+        <LinkWithIcon href={sourceUrl} ariaLabelPrefix="Источник" />
+      </span>
+    )
+  }
 </div>

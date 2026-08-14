@@ -217,6 +217,16 @@ Manticore является современным продолжением Sphin
 4. Добавить smoke/quality/performance checks, cache policy для `/pagefind/` и синхронное пояснение CSP.
 5. После production-like проверки выпустить поиск либо зафиксировать новым ADR причину перехода к серверному пилоту.
 
+## Состояние реализации
+
+На 14 августа 2026 года задачи 01-11 реализованы в текущем незакоммиченном worktree. Локальный production build создает 221 страницу, а Pagefind 1.5.2 индексирует 156 русскоязычных документов; query matrix, morphology, exclusions, responsive layout, Chromium accessibility smoke и контролируемая nginx-доставка проверены.
+
+Локальные критерии задачи 12 пройдены, но поиск еще не выпущен. Повторная RC-проверка подтвердила переходы по `Enter`, догрузку следующей порции без дублей и холодный запрос `тарифы` на 145 102 байта Pagefind-ресурсов при бюджете 300 КБ.
+
+Query-scoped result cache снял локальный latency blocker. На профиле 390 x 844, DPR 2 и CPU slowdown 4x один явно измеренный uncached client call для прежнего тяжелого intent занял 304,2 мс и заполнил cache. Следующие 150 same-query initial-8 samples дали 1,6 мс p95 и для raw `search()`, и для полного клиента при бюджете 100 мс. Browser smoke также подтвердил, что смена запроса не переиспользует чужой excerpt: один документ получает разные корректные highlights и anchors для разных терминов.
+
+Задача 12 остается незавершенной только из-за отложенных проверок dev-режима, реального deploy и public smoke, non-Chromium и screen reader. Эта заметка фиксирует состояние release candidate, а не production release и не изменение принятого архитектурного решения.
+
 ## Источники
 
 - Pagefind, обзор и сетевой бюджет: https://pagefind.app/

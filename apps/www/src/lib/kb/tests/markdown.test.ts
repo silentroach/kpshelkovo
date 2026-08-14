@@ -38,7 +38,7 @@ describe('kb markdown companions', () => {
   it('renders a kb page as markdown and points kb links to markdown companions', () => {
     const markdown = buildKbPageMarkdown(
       page({
-        id: 'services/internet',
+        id: 'services/internet/index',
         title: 'Интернет',
         routeSlug: 'services/internet',
         body: '- [База знаний](/kb/)\n- [Оптоволоконный интернет](/kb/services/internet/fiber/)\n- [Новости](/news/)\n',
