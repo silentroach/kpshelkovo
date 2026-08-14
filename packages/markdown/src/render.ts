@@ -40,6 +40,7 @@ const headingAnchor = (slug: string): HtmlTreeNode => ({
   properties: {
     ariaLabel: HEADING_ANCHOR_LABEL,
     className: ['ui-heading-anchor'],
+    dataPagefindIgnore: 'all',
     href: `#${slug}`,
     title: HEADING_ANCHOR_LABEL,
   },
