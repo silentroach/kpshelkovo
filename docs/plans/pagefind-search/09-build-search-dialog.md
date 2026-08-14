@@ -10,7 +10,7 @@
 - Сделать desktop raised surface около `46rem` и полноэкранный mobile layout.
 - Реализовать состояния до ввода, загрузки, результатов, пустой выдачи, ошибки и dev-unavailable.
 - Показать section, optional date, title и excerpt плоскими строками с разделителями.
-- Показывать первые восемь результатов и действие «Показать еще».
+- Показывать первые восемь результатов и автоматически подгружать следующие при прокрутке.
 - Реализовать focus on open, focus restoration, `Escape`, arrows, `Enter`, normal tab order и `aria-live`.
 - Закрывать dialog перед Astro page swap.
 - Использовать существующие tokens, PT Serif/Fira Sans и текущие focus styles; не подключать CSS Pagefind UI.

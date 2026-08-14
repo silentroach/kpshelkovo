@@ -12,7 +12,7 @@
 - Проверить, что 404, verification, `noindex`, archives, tags и повторяющие lists отсутствуют.
 - Измерить Pagefind network payload холодного типичного запроса.
 - Измерить warmed search latency на согласованном среднем mobile profile.
-- Проверить отсутствие запросов `/pagefind/` до открытия поиска.
+- Проверить отсутствие запросов `/search/` до открытия поиска.
 - Выполнить keyboard, screen-reader smoke, 200% zoom и responsive проверку.
 - После успешного release добавить короткую implementation note в ADR-025.
 
@@ -39,7 +39,7 @@
 ### Локальные критерии и повторная проверка
 
 - [x] Переход по `Enter` исправлен. В свежем production preview сценарий `тарифы` -> `ArrowDown` -> `Enter` и отдельный `Enter` из поля переводят на первый canonical URL. На целевой странице остается один закрытый dialog с очищенным полем, повторного открытия нет.
-- [x] Холодный сетевой бюджет пройден после ограничения первой выдачи восемью результатами. Свежая cache-disabled сессия с запросом `тарифы` получила 14 Pagefind-ресурсов на **145 102 байта (141,70 КиБ)** без учета HTTP-заголовков: runtime, worker, entry, metadata, WASM, один index chunk и восемь fragments. «Показать еще» увеличивает выдачу с 8 до 16 уникальных результатов без зависшего loading state.
+- [x] Холодный сетевой бюджет пройден после ограничения первой выдачи восемью результатами. Свежая cache-disabled сессия с запросом `тарифы` получила 14 Pagefind-ресурсов на **145 102 байта (141,70 КиБ)** без учета HTTP-заголовков: runtime, worker, entry, metadata, WASM, один index chunk и восемь fragments. При прокрутке выдача автоматически увеличивается с 8 до 16 уникальных результатов без зависшего loading state.
 - [x] Warmed end-to-end p95 не более 100 мс. На профиле 390 x 844 CSS px, DPR 2 и CPU slowdown 4x один явный uncached client call для тяжелого intent `категорически не рекомендую покупать участок` занял **304,2 мс** при raw `search()` 2,2 мс и заполнил query-scoped cache. Следующие 150 same-query initial-8 samples дали **1,6 мс p95** и для raw `search()`, и для полного клиента; максимум полного клиента - 3,3 мс. Контрольный прогон `тарифы` с восемью видимыми результатами дал **1,0 мс p95** для обоих измерений и максимум 8,9 мс после отдельного uncached client call на 2,2 мс.
 
 ### Команды и артефакт
@@ -82,13 +82,13 @@
 
 ### Browser smoke
 
-- [x] До открытия диалога - 0 запросов `/pagefind/`; после открытия до ввода - также 0.
+- [x] До открытия диалога - 0 запросов `/search/`; после открытия до ввода - также 0.
 - [x] Открытие с клавиатуры, focus input, `ArrowDown`, `ArrowUp`, `Escape` и возврат фокуса в фактический trigger работают.
 - [x] `Enter` из выбранного результата и прямо из поля переводит на первый canonical URL; dialog после перехода закрыт и не открывается повторно.
-- [x] Первая выдача содержит 8 уникальных результатов; «Показать еще» догружает следующие 8 без дублей и зависшего состояния.
+- [x] Первая выдача содержит 8 уникальных результатов; прокрутка догружает следующие 8 без дублей и зависшего состояния.
 - [x] Query-scoped cache не смешивает excerpts одного документа: запросы `категорически` и `полгода` подсвечивают разные совпадения и ведут на разные подходящие anchors одного отзыва; возврат к `категорически` снова дает исходную подсветку и anchor.
 - [x] После переходов `/` -> `/news/` -> news detail -> `/status/` в DOM остается один dialog.
-- [x] Production empty state проверен реальным бессмысленным запросом; error state - abort всех `/pagefind/` в отдельной production-preview сессии.
+- [x] Production empty state проверен реальным бессмысленным запросом; error state - abort всех `/search/` в отдельной production-preview сессии.
 - [x] `dev-unavailable` прошел focused component test с fake adapter.
 - [x] На 320, 768, 1024 и 1440 px нет горизонтального overflow. Layout-equivalent проверка 1440 x 900 при 200% zoom выполнена как viewport 720 x 450 с DPR 2; overflow также отсутствует.
 - [x] Accessibility tree сохраняет dialog, heading, labeled searchbox, results region, list и live announcement. Axe 4.12.1 для открытого dialog: 0 violations, 18 passes, один incomplete contrast rule для двух перекрытых узлов.
@@ -97,7 +97,7 @@
 
 ### Performance method
 
-Холодный повторный замер выполнен в отдельной сессии agent-browser Chromium 147 на 390 x 844, DPR 2. Сессия запущена с `--disable-cache` и минимальным disk/media cache. Прозрачный локальный счетчик перед свежим `pnpm preview` суммировал фактические response-body bytes всех `/pagefind/`, включая запросы worker. HTTP-заголовки не вошли в сумму, поэтому 145 102 байта - нижняя граница transferred payload.
+Холодный повторный замер выполнен в отдельной сессии agent-browser Chromium 147 на 390 x 844, DPR 2. Сессия запущена с `--disable-cache` и минимальным disk/media cache. Прозрачный локальный счетчик перед свежим `pnpm preview` суммировал фактические response-body bytes всех `/search/`, включая запросы worker. HTTP-заголовки не вошли в сумму, поэтому 145 102 байта - нижняя граница transferred payload.
 
 Warmed повторный замер выполнен на том же production bundle через instrumented production client без изменения приложения. Профиль: 390 x 844, DPR 2, CDP CPU slowdown 4x, warm HTTP cache. После прогрева Pagefind и HTTP-кеша один явно измеренный uncached client call загрузил initial-8 и заполнил query-scoped result cache. Затем 150 раз подряд измерялись raw `pagefind.search(query)` внутри клиента и полный `client.search(query, 8)`; debounce и Svelte render не включались. Основной прогон использовал прежний самый тяжелый intent длинного отзыва, контрольный - `тарифы` с 30 совпадениями и восемью материализованными результатами.
 

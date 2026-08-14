@@ -4,7 +4,7 @@ set -eu
 
 base_url=${1:?production base URL is required}
 artifact_root=${2:-dist/www}
-pagefind_dir="$artifact_root/pagefind"
+search_dir="$artifact_root/search"
 stable_cache=public,max-age=60,must-revalidate
 immutable_cache=public,max-age=31536000,immutable
 tmp=$(mktemp -d)
@@ -21,7 +21,7 @@ fail() {
 pick_file() {
   for candidate do
     if [ -f "$candidate" ]; then
-      printf '%s\n' "${candidate#"$pagefind_dir"/}"
+      printf '%s\n' "${candidate#"$search_dir"/}"
       return
     fi
   done
@@ -30,14 +30,14 @@ pick_file() {
 }
 
 pick_wasm() {
-  for candidate in "$pagefind_dir"/wasm.*.pagefind; do
+  for candidate in "$search_dir"/wasm.*.pagefind; do
     if [ -f "$candidate" ] && [ "${candidate##*/}" != wasm.unknown.pagefind ]; then
-      printf '%s\n' "${candidate#"$pagefind_dir"/}"
+      printf '%s\n' "${candidate#"$search_dir"/}"
       return
     fi
   done
 
-  pick_file "$pagefind_dir"/wasm.*.pagefind
+  pick_file "$search_dir"/wasm.*.pagefind
 }
 
 header_value() {
@@ -82,9 +82,9 @@ check_asset() {
   expected_type=$2
   expected_cache=$3
   headers="$tmp/headers"
-  url="$base_url/pagefind/$relative"
+  url="$base_url/search/$relative"
 
-  [ -f "$pagefind_dir/$relative" ] || fail "artifact is missing pagefind/$relative"
+  [ -f "$search_dir/$relative" ] || fail "artifact is missing search/$relative"
   : > "$headers"
 
   status=$(curl \
@@ -100,7 +100,7 @@ check_asset() {
     --write-out '%{http_code}' \
     "$url")
 
-  [ "$status" = 200 ] || fail "pagefind/$relative returned HTTP $status"
+  [ "$status" = 200 ] || fail "search/$relative returned HTTP $status"
   assert_header "$headers" Strict-Transport-Security max-age=31536000 "$relative"
   assert_header "$headers" X-Content-Type-Options nosniff "$relative"
   assert_header "$headers" X-Frame-Options SAMEORIGIN "$relative"
@@ -110,7 +110,7 @@ check_asset() {
   assert_header "$headers" Cache-Control "$expected_cache" "$relative"
   assert_content_type "$headers" "$expected_type" "$relative"
 
-  printf 'Verified /pagefind/%s\n' "$relative"
+  printf 'Verified /search/%s\n' "$relative"
 }
 
 trap cleanup EXIT
@@ -120,13 +120,13 @@ case "$base_url" in
   *) fail "base URL must start with http:// or https://" ;;
 esac
 
-[ -d "$pagefind_dir" ] || fail "artifact directory does not exist: $pagefind_dir"
+[ -d "$search_dir" ] || fail "artifact directory does not exist: $search_dir"
 
 wasm=$(pick_wasm)
-metadata=$(pick_file "$pagefind_dir"/pagefind.*_*.pf_meta)
-index_chunk=$(pick_file "$pagefind_dir"/index/*_*.pf_index)
-filter_chunk=$(pick_file "$pagefind_dir"/filter/*_*.pf_filter)
-fragment=$(pick_file "$pagefind_dir"/fragment/*_*.pf_fragment)
+metadata=$(pick_file "$search_dir"/pagefind.*_*.pf_meta)
+index_chunk=$(pick_file "$search_dir"/index/*_*.pf_index)
+filter_chunk=$(pick_file "$search_dir"/filter/*_*.pf_filter)
+fragment=$(pick_file "$search_dir"/fragment/*_*.pf_fragment)
 
 check_asset pagefind.js application/javascript "$stable_cache"
 check_asset pagefind-worker.js application/javascript "$stable_cache"

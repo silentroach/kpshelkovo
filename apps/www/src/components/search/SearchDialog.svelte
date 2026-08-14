@@ -1,6 +1,7 @@
 <script lang="ts">
   import { count, formatDate, pluralize } from '@shelkovo/format';
   import { onMount, tick } from 'svelte';
+  import type { Attachment } from 'svelte/attachments';
   import { on } from 'svelte/events';
 
   import { pagefindSearchClient } from '@/lib/search/client';
@@ -32,6 +33,7 @@
 
   let dialogElement: HTMLDialogElement | undefined;
   let inputElement: HTMLInputElement | undefined;
+  let resultsElement: HTMLDivElement | undefined;
   let openerElement: HTMLElement | undefined;
   let restoreFocusOnClose = true;
   let pendingSearchTimer: ReturnType<typeof setTimeout> | undefined;
@@ -41,6 +43,7 @@
   let results = $state.raw<readonly SearchResult[]>([]);
   let requestedLimit = $state(SEARCH_RESULT_DEFAULT_LIMIT);
   let total = $state(0);
+  let isSearching = $state(false);
   let isLoadingMore = $state(false);
 
   const hasAnchor = (url: string): boolean => {
@@ -61,7 +64,7 @@
   };
 
   let resultRows = $derived(results.map((result) => resultRow(result)));
-  let hasMoreResults = $derived(requestedLimit < total);
+  let hasMoreResults = $derived(!isSearching && requestedLimit < total);
   let announcement = $derived.by(() => {
     switch (viewState) {
       case 'loading':
@@ -83,6 +86,7 @@
     results = [];
     requestedLimit = SEARCH_RESULT_DEFAULT_LIMIT;
     total = 0;
+    isSearching = false;
     isLoadingMore = false;
   };
 
@@ -143,8 +147,11 @@
     Boolean(dialogElement?.open && query === requestedQuery);
 
   const beginSearch = (): void => {
-    viewState = 'loading';
-    clearResults();
+    isSearching = true;
+    isLoadingMore = false;
+    if (results.length === 0) {
+      viewState = 'loading';
+    }
   };
 
   const isCurrentRequest = (
@@ -152,7 +159,7 @@
     mode: SearchDialogRequestMode,
   ): boolean =>
     isCurrentVisibleQuery(requestedQuery) &&
-    (mode === 'initial' || isLoadingMore);
+    (mode === 'initial' ? isSearching : isLoadingMore);
 
   const runSearch = async (
     requestedQuery: string,
@@ -180,6 +187,7 @@
           isLoadingMore = false;
           return;
         }
+        clearResults();
         viewState = 'dev-unavailable';
         return;
       }
@@ -187,7 +195,9 @@
       results = response.results;
       total = response.total;
       requestedLimit = limit;
-      if (mode === 'more') {
+      if (mode === 'initial') {
+        isSearching = false;
+      } else {
         isLoadingMore = false;
       }
       viewState = total > 0 ? 'results' : 'empty';
@@ -232,6 +242,20 @@
 
     isLoadingMore = true;
     void runSearch(query, requestedLimit + SEARCH_RESULT_DEFAULT_LIMIT, 'more');
+  };
+
+  const loadMoreOnIntersect: Attachment<HTMLElement> = (element) => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          loadMore();
+        }
+      },
+      { root: resultsElement, rootMargin: '0px 0px 25%' },
+    );
+    observer.observe(element);
+
+    return () => observer.disconnect();
   };
 
   const handleInput = (event: Event): void => {
@@ -411,11 +435,12 @@
     </header>
 
     <div
+      bind:this={resultsElement}
       id={resultsId}
       class="site-search-dialog__results min-h-0 flex-1 overflow-y-auto"
       role="region"
       aria-label="Результаты поиска"
-      aria-busy={viewState === 'loading'}
+      aria-busy={isSearching || isLoadingMore}
     >
       {#if viewState === 'initial'}
         <p
@@ -504,17 +529,13 @@
         </ul>
 
         {#if hasMoreResults}
-          <div class="border-t border-border px-4 py-4 sm:px-5">
-            <button
-              type="button"
-              class="ui-btn ui-btn-md ui-btn-outline w-full sm:w-auto"
-              disabled={isLoadingMore}
-              aria-busy={isLoadingMore}
-              onclick={loadMore}
-            >
-              Показать еще
-            </button>
-          </div>
+          {#key requestedLimit}
+            <div
+              class="h-px"
+              aria-hidden="true"
+              {@attach loadMoreOnIntersect}
+            ></div>
+          {/key}
         {/if}
       {/if}
     </div>

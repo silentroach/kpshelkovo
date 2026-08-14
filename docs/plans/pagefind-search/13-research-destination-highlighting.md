@@ -7,7 +7,7 @@ Post-release backlog. Задача не входит в MVP, не блокиру
 ## Что подтверждает Pagefind
 
 - `pagefind.options({ highlightParam: "highlight" })` добавляет поисковый термин в query parameter ссылок результатов.
-- Целевая страница должна отдельно включить подсветку: можно обработать параметр своим кодом или импортировать сгенерированный `/pagefind/pagefind-highlight.js` и создать `PagefindHighlight` с тем же `highlightParam`.
+- Целевая страница должна отдельно включить подсветку: можно обработать параметр своим кодом или импортировать сгенерированный `/search/pagefind-highlight.js` и создать `PagefindHighlight` с тем же `highlightParam`.
 - `PagefindHighlight` по умолчанию ищет внутри `[data-pagefind-body]`, а если marker отсутствует - внутри `document.body`. Он исключает `[data-pagefind-ignore]`, добавляет класс `pagefind-highlight` и минимальные стили; context, exclusions, класс и стили настраиваются.
 - Документация Search API отдельно гарантирует HTML-экранирование для `excerpt` и `plain_excerpt`, но называет `content` и `meta` сырыми данными. Эта гарантия относится к рендерингу результата и не является заявлением о безопасности входного query parameter на целевой странице.
 - Официальная документация не заявляет отдельных security- или accessibility-гарантий для destination highlighting.

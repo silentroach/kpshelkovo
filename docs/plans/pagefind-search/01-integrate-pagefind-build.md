@@ -6,7 +6,7 @@
 
 ## Контекст
 
-Сейчас `apps/www` выполняет `astro build`, затем копирует `apps/www/dist/site` в корневой `dist/www`. Pagefind должен запускаться между этими шагами и писать индекс внутрь `dist/site/pagefind`.
+Сейчас `apps/www` выполняет `astro build`, затем копирует `apps/www/dist/site` в корневой `dist/www`. Pagefind должен запускаться между этими шагами и писать индекс внутрь `dist/site/search`.
 
 Обычный `pnpm dev` не должен автоматически запускать Pagefind или предварительный Astro build. Полный локальный поиск включается последовательностью `pnpm search:prepare` и `pnpm dev`.
 
@@ -18,7 +18,7 @@
 - Оставить обычный `pnpm dev` быстрым и независимым от индекса.
 - Добавить корневую команду `pnpm search:prepare`, которая делает актуальный Astro build и пишет Pagefind в отдельный игнорируемый dev-кеш.
 - Хранить dev snapshot в явном корневом кеше `.cache/pagefind`; `pnpm search:prepare` полностью заменяет этот каталог.
-- Через dev-only Vite middleware отдавать подготовленный кеш по `/pagefind/`, не копируя generated files в `public`.
+- Через dev-only Vite middleware отдавать подготовленный кеш по `/search/`, не копируя generated files в `public`.
 - Передать клиенту при старте dev явный признак доступности snapshot, чтобы отсутствие кеша не создавало ожидаемый 404.
 - Сохранить `pnpm build && pnpm preview` как финальный production-like сценарий.
 
@@ -26,9 +26,9 @@
 
 ## Критерии приемки
 
-- `pnpm --filter @shelkovo/www build` создает `dist/site/pagefind` и корневой `dist/www/pagefind`.
+- `pnpm --filter @shelkovo/www build` создает `dist/site/search` и корневой `dist/www/search`.
 - Ошибка Pagefind завершает build с ненулевым кодом.
-- После `pnpm search:prepare` обычный `pnpm dev` отдает подготовленный `/pagefind/`; без подготовки dev запускается без индекса и без автоматического build.
+- После `pnpm search:prepare` обычный `pnpm dev` отдает подготовленный `/search/`; без подготовки dev запускается без индекса и без автоматического build.
 
 ## Проверка
 

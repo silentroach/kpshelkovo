@@ -7,7 +7,7 @@ Post-release backlog. Задача не входит в MVP, не блокиру
 ## Что подтверждает Pagefind
 
 - Pagefind Playground - сгенерированная диагностическая страница для исследования ranking parameters, отладки поиска и просмотра всех данных, которые Pagefind возвращает для контента.
-- При запуске CLI с `--serve` Playground всегда доступен по `/pagefind/playground/` для текущего bundle.
+- Во встроенном сервере Pagefind с `--serve` Playground всегда доступен по служебному пути `/pagefind/playground/` для текущего bundle.
 - Опция `write_playground` или флаг `--write-playground` записывает Playground в bundle и позволяет хостить его вместе с сайтом. По умолчанию опция выключена, поэтому production bundle эту страницу не получает.
 - Playground работает с созданным Pagefind bundle независимо от визуального search UI. Headless-клиент сайта не обязан поддерживать его и не мешает использовать диагностическую страницу.
 - Официальная документация описывает только отдельную сгенерированную страницу. Она не описывает API для встраивания Playground в custom UI, его стилизации или ограничения доступа.
@@ -26,7 +26,7 @@ Post-release backlog. Задача не входит в MVP, не блокиру
 
 Режим выбирается отдельным решением после MVP:
 
-- Для local/preview режима Playground открывается через документированный `--serve` workflow, читает тот же актуальный bundle, а production artifact не содержит `/pagefind/playground/`.
+- Для local/preview режима Playground открывается через документированный `--serve` workflow, читает тот же актуальный bundle, а production artifact не содержит `/search/playground/`.
 - Для публичного режима `write_playground` включается только явно; route, assets, cache/CSP и отсутствие Playground в поисковом корпусе проверены production smoke.
 - Перед публичным режимом просмотрены все доступные через Playground данные и зафиксировано, почему дополнительная диагностическая поверхность приемлема.
 - Custom headless UI не дублирует Playground и не получает новый код, пока отдельная пользовательская потребность не доказана.

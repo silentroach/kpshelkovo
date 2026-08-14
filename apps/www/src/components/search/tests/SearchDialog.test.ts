@@ -85,6 +85,7 @@ const enterDebouncedQuery = async (
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.unstubAllGlobals();
   document
     .querySelectorAll('[data-search-test-opener]')
     .forEach((element) => element.remove());
@@ -135,6 +136,32 @@ describe('SearchDialog', () => {
   });
 
   it('renders trusted results progressively and supports arrows and Enter', async () => {
+    const intersections: Array<() => void> = [];
+    const observe = vi.fn();
+    const disconnect = vi.fn();
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        readonly root = null;
+        readonly rootMargin = '0px';
+        readonly scrollMargin = '0px';
+        readonly thresholds: readonly number[] = [];
+
+        constructor(callback: IntersectionObserverCallback) {
+          intersections.push(() =>
+            callback(
+              [{ isIntersecting: true } as IntersectionObserverEntry],
+              this,
+            ),
+          );
+        }
+
+        readonly disconnect = disconnect;
+        readonly observe = observe;
+        readonly takeRecords = (): IntersectionObserverEntry[] => [];
+        readonly unobserve = vi.fn();
+      },
+    );
     const initialPending = deferred<SearchResponse | undefined>();
     const firstExpansion = deferred<SearchResponse | undefined>();
     const secondExpansion = deferred<SearchResponse | undefined>();
@@ -206,17 +233,12 @@ describe('SearchDialog', () => {
     input.dispatchEvent(tabEvent);
     expect(tabEvent.defaultPrevented).toBe(false);
 
-    const firstMoreButton = view.getByRole('button', {
-      name: 'Показать еще',
-    }) as HTMLButtonElement;
-    await fireEvent.click(firstMoreButton);
+    expect(observe).toHaveBeenCalledOnce();
+    intersections[0]?.();
 
-    expect(search).toHaveBeenLastCalledWith('вода', 16);
-    expect(firstMoreButton.disabled).toBe(true);
-    expect(firstMoreButton.getAttribute('aria-busy')).toBe('true');
+    await waitFor(() => expect(search).toHaveBeenLastCalledWith('вода', 16));
     expect(view.getAllByRole('link')).toHaveLength(8);
-
-    await fireEvent.click(firstMoreButton);
+    intersections[0]?.();
     expect(search).toHaveBeenCalledTimes(2);
 
     firstExpansion.resolve(
@@ -228,12 +250,10 @@ describe('SearchDialog', () => {
     );
     await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(14));
 
-    const secondMoreButton = view.getByRole('button', {
-      name: 'Показать еще',
-    }) as HTMLButtonElement;
-    expect(secondMoreButton.disabled).toBe(false);
-    await fireEvent.click(secondMoreButton);
-    expect(search).toHaveBeenLastCalledWith('вода', 24);
+    expect(disconnect).toHaveBeenCalled();
+    expect(observe).toHaveBeenCalledTimes(2);
+    intersections[1]?.();
+    await waitFor(() => expect(search).toHaveBeenLastCalledWith('вода', 24));
     expect(view.getAllByRole('link')).toHaveLength(14);
 
     secondExpansion.resolve(
@@ -244,7 +264,7 @@ describe('SearchDialog', () => {
       ),
     );
     await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(16));
-    expect(view.queryByRole('button', { name: 'Показать еще' })).toBeNull();
+    expect(observe).toHaveBeenCalledTimes(2);
 
     input.focus();
     await fireEvent.keyDown(input, { key: 'ArrowDown' });
@@ -267,6 +287,49 @@ describe('SearchDialog', () => {
     expect(activation).toHaveBeenCalledOnce();
     expect(dialog.open).toBe(false);
     expect(document.activeElement).not.toBe(opener);
+  });
+
+  it('keeps current results visible until a refined search completes', async () => {
+    const refinedSearch = deferred<SearchResponse | undefined>();
+    const search = vi.fn(
+      (query: string): Promise<SearchResponse | undefined> =>
+        query === 'вода горячая'
+          ? refinedSearch.promise
+          : Promise.resolve(readyResponse(query, [resultAt(1)])),
+    );
+    const client: SearchClient = { search };
+    const opener = addOpener('Поиск');
+    const view = render(SearchDialog, { props: { client } });
+    const dialog = dialogFrom(view.container);
+
+    await fireEvent.click(opener);
+    const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
+    const resultsRegion = view.getByRole('region', {
+      name: 'Результаты поиска',
+    });
+    await enterDebouncedQuery(input, 'вода');
+    await waitFor(() => expect(view.getByRole('link')).toBeTruthy());
+
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    await fireEvent.input(input, { target: { value: 'вода горячая' } });
+
+    expect(dialog.dataset.searchState).toBe('results');
+    expect(resultsRegion.getAttribute('aria-busy')).toBe('true');
+    expect(view.getByRole('link').getAttribute('href')).toBe('/news/result-1/');
+    expect(view.queryByText('Ищем…')).toBeNull();
+
+    vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS);
+    vi.useRealTimers();
+    expect(search).toHaveBeenLastCalledWith('вода горячая', 8);
+    expect(view.getByRole('link').getAttribute('href')).toBe('/news/result-1/');
+
+    refinedSearch.resolve(readyResponse('вода горячая', [resultAt(2)]));
+    await waitFor(() =>
+      expect(view.getByRole('link').getAttribute('href')).toBe(
+        '/news/result-2/',
+      ),
+    );
+    expect(resultsRegion.getAttribute('aria-busy')).toBe('false');
   });
 
   it('leaves focused result Enter native and closes on its click', async () => {
@@ -388,6 +451,11 @@ describe('SearchDialog', () => {
     await waitFor(() =>
       expect(dialog.dataset.searchState).toBe('dev-unavailable'),
     );
+    expect(
+      view
+        .getByRole('region', { name: 'Результаты поиска' })
+        .getAttribute('aria-busy'),
+    ).toBe('false');
 
     await enterDebouncedQuery(input, 'ошибка');
     await waitFor(() => expect(dialog.dataset.searchState).toBe('error'));

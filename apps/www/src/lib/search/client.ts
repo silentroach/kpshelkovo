@@ -15,7 +15,7 @@ import type {
   PagefindRuntime,
 } from './client.internal.types';
 
-const pagefindEntrypoint = '/pagefind/pagefind.js';
+const pagefindEntrypoint = '/search/pagefind.js';
 const canonicalUrlBase = 'https://kpshelkovo.online';
 const pagefindOptions = {
   ranking: {

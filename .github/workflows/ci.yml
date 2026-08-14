@@ -200,10 +200,10 @@ jobs:
 
           # Active clients may still request chunks from earlier index generations.
           rsync $rsync_opts \
-            --filter='protect /pagefind/pagefind.*.pf_meta' \
-            --filter='protect /pagefind/index/*.pf_index' \
-            --filter='protect /pagefind/filter/*.pf_filter' \
-            --filter='protect /pagefind/fragment/*.pf_fragment' \
+            --filter='protect /search/pagefind.*.pf_meta' \
+            --filter='protect /search/index/*.pf_index' \
+            --filter='protect /search/filter/*.pf_filter' \
+            --filter='protect /search/fragment/*.pf_fragment' \
             -e "ssh $ssh_opts" \
             dist/www/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_WWW_PATH/"
 

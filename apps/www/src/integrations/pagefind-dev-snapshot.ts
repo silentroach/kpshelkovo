@@ -4,7 +4,7 @@ import { extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AstroIntegration } from 'astro';
 
-const pagefindPathPrefix = '/pagefind/';
+const searchPathPrefix = '/search/';
 const snapshotDirectory = resolve(
   fileURLToPath(new URL('../../../../.cache/pagefind/', import.meta.url)),
 );
@@ -53,13 +53,13 @@ export const pagefindDevSnapshot = (): AstroIntegration => {
             return next();
           }
 
-          if (!pathname.startsWith(pagefindPathPrefix)) {
+          if (!pathname.startsWith(searchPathPrefix)) {
             return next();
           }
 
           const filePath = resolve(
             snapshotDirectory,
-            pathname.slice(pagefindPathPrefix.length),
+            pathname.slice(searchPathPrefix.length),
           );
           if (!filePath.startsWith(`${snapshotDirectory}${sep}`)) {
             return next();
