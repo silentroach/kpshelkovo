@@ -6,6 +6,8 @@ import remarkRehype from 'remark-rehype';
 import { unified, type Plugin } from 'unified';
 
 import { uniqueHeadingSlug } from './heading-slugs';
+import type { HtmlTreeNode } from './html-tree.types';
+import { rehypeImageFigures } from './image-figures';
 import { assertNoMarkdownTables } from './no-tables';
 import { rehypeTaskListItemLabels } from './task-list-labels';
 import { expandTableOfContents } from './toc';
@@ -19,14 +21,6 @@ export interface RenderOptions {
 
 const remarkNoMarkdownTables: Plugin<[], Root> = () => (tree) => {
   assertNoMarkdownTables(tree);
-};
-
-type HtmlTreeNode = {
-  readonly type: string;
-  readonly tagName?: string;
-  readonly value?: string;
-  properties?: Record<string, unknown>;
-  children?: HtmlTreeNode[];
 };
 
 const HEADING_TAGS = new Set(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']);
@@ -103,6 +97,7 @@ const processor = unified()
   .use(remarkRehype)
   .use(rehypeHeadingIds)
   .use(rehypeTaskListItemLabels)
+  .use(rehypeImageFigures)
   .use(rehypeTypograf)
   .use(rehypeStringify);
 

@@ -634,6 +634,46 @@ a.ui-chip:hover {
   font-style: italic;
 }
 
+.ui-media-caption {
+  color: var(--color-muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}
+
+.ui-media-caption p {
+  margin: 0;
+}
+
+.ui-media-caption a {
+  color: var(--color-primary);
+  font-weight: 500;
+  text-decoration-color: color-mix(
+    in oklab,
+    var(--color-primary) 40%,
+    transparent
+  );
+  text-decoration-line: underline;
+  text-underline-offset: 0.1875rem;
+}
+
+.ui-media-caption strong {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+
+.ui-prose .ui-markdown-figure {
+  margin-block: 1.5rem;
+}
+
+.ui-prose .ui-markdown-figure > img {
+  display: block;
+  width: 100%;
+}
+
+.ui-prose .ui-markdown-figure > .ui-media-caption {
+  margin-block-start: 0.5rem;
+}
+
 .ui-prose ul,
 .ui-prose ol {
   padding-left: 1.5rem;

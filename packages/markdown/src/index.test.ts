@@ -188,6 +188,22 @@ describe('@shelkovo/markdown', () => {
       `);
   });
 
+  it('renders a standalone image title as its visible caption', () => {
+    expect(
+      showNbsp(
+        render(`![Карта](https://example.com/map.png "Скриншот от 14 августа 2026 года.")
+
+Текст с ![иконкой](https://example.com/icon.png "Подсказка").
+
+![Изображение без подписи](https://example.com/photo.png)`),
+      ),
+    ).toMatchInlineSnapshot(`
+      "<figure class="ui-markdown-figure"><img src="https://example.com/map.png" alt="Карта"><figcaption class="ui-media-caption">Скриншот от·14·августа 2026 года.</figcaption></figure>
+      <p>Текст с <img src="https://example.com/icon.png" alt="иконкой" title="Подсказка">.</p>
+      <p><img src="https://example.com/photo.png" alt="Изображение без подписи"></p>"
+    `);
+  });
+
   it('adds stable heading ids for in-page links', () => {
     expect(render('## Что сделать сразу\n\nТекст\n\n## Что сделать сразу'))
       .toMatchInlineSnapshot(`

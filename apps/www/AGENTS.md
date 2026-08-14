@@ -40,6 +40,7 @@ pnpm typecheck
 - Динамические текстовые блоки, которые рендерятся в HTML из markdown, CMS или других данных, прогонять через типограф на этапе рендера.
 - Типограф применять точечно к самому динамическому контенту, а не к целому layout или полной HTML-странице.
 - Для body markdown в `apps/www` использовать `@/lib/markdown/render`, а не пакетный `render` напрямую: app-wrapper подключает общий app-level слой mentions.
+- У отдельного Markdown-изображения непустой `title` рендерится видимой подписью: `![alt](url "Подпись")`. У изображения внутри текстового абзаца `title` остается обычной всплывающей подсказкой.
 - Если loader хранит уже подготовленный body markdown, он должен получать его через helper из `@/lib/markdown/render`, чтобы mentions/backlinks и HTML-render использовали один app-level pipeline.
 - Для публичных `.md`, `llms.txt` и `llms-full.txt` генерировать Markdown через `@shelkovo/markdown` AST API (`createMarkdownDocument`, `md`, `parseMarkdownFragment`, `serializeMarkdownDocument`) или общий app-helper поверх него, а не через ручной `lines.join('\n')` всего документа.
 - Из `@shelkovo/markdown` напрямую в app использовать только низкоуровневые helpers по назначению: `formatDynamicHtml` для короткого готового HTML/text, `extractFirstMarkdownText` для excerpt, `rehypeTypograf` только в markdown pipeline config, AST API — для генерации публичного Markdown.
