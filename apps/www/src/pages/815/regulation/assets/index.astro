@@ -100,7 +100,7 @@ const villageIcons = {
   'shelkovo-river': RiverIcon,
 } as const satisfies Record<FullReglamentVillageId, typeof VillageIcon>;
 const tableHeaderCellClass =
-  'sticky top-0 z-10 border-b border-border bg-muted px-4 py-2.5 align-bottom';
+  'sticky top-[var(--ui-sticky-table-header-top)] z-10 border-b border-border bg-muted px-4 py-2.5 align-bottom';
 const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
 ---
 

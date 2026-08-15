@@ -346,7 +346,7 @@ const inputUnitClass =
   'flex shrink-0 items-center border-l border-border bg-muted px-2 text-[0.6875rem] font-semibold leading-none text-muted-foreground';
 const tableTextClass = 'block pt-[0.4375rem] leading-snug';
 const tableHeaderCellClass =
-  'sticky top-0 z-10 border-b border-border bg-muted px-4 py-2.5 align-bottom lg:top-[calc(2.875rem-1px)]';
+  'sticky top-[var(--ui-sticky-table-header-top)] z-10 border-b border-border bg-muted px-4 py-2.5 align-bottom lg:top-[calc(var(--ui-sticky-table-header-top)+2.875rem-1px)]';
 const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
 const formatInputUnit = (unit: string): string =>
   unit === '₽/год' ? '₽' : unit;
@@ -459,7 +459,7 @@ const formatInputUnit = (unit: string): string =>
     </section>
 
     <div
-      class="reglament-sticky-total sticky top-0 z-20 border-y border-border px-5 py-1 md:px-6"
+      class="reglament-sticky-total sticky top-[var(--site-sticky-offset)] z-20 border-y border-border px-5 py-1 md:px-6"
     >
       <div
         class="flex h-9 w-full max-w-6xl items-center gap-3 overflow-hidden whitespace-nowrap text-xs text-muted-foreground md:text-sm"

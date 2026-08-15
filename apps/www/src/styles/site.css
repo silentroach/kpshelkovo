@@ -1,5 +1,11 @@
 .ui-root-site {
+  --site-sticky-offset: 0rem;
+
   background: var(--color-bg);
+}
+
+.ui-root-site .ui-sticky-table-shell {
+  --ui-sticky-table-header-top: var(--site-sticky-offset);
 }
 
 .ui-root-site.site-has-header .ui-page-header {
@@ -7,6 +13,10 @@
 }
 
 @media (min-width: 48rem) {
+  .ui-root-site.site-has-header {
+    --site-sticky-offset: 3.5625rem;
+  }
+
   .ui-root-site.site-has-header .ui-page-header {
     padding-top: 1rem;
   }
