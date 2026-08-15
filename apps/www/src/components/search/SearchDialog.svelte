@@ -323,7 +323,7 @@
       return;
     }
 
-    if (event.target === inputElement) {
+    if (event.target === inputElement && !isSearching) {
       event.preventDefault();
       links[0]?.click();
       return;

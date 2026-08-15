@@ -299,7 +299,7 @@ describe('SearchDialog', () => {
     expect(document.activeElement).not.toBe(opener);
   });
 
-  it('keeps current results visible until a refined search completes', async () => {
+  it('keeps current results visible without activating them during a refined search', async () => {
     const refinedSearch = deferred<SearchResponse | undefined>();
     const search = vi.fn(
       (query: string): Promise<SearchResponse | undefined> =>
@@ -327,6 +327,14 @@ describe('SearchDialog', () => {
     expect(resultsRegion.getAttribute('aria-busy')).toBe('true');
     expect(view.getByRole('link').getAttribute('href')).toBe('/news/result-1/');
     expect(view.queryByText('Ищем…')).toBeNull();
+
+    const staleResultActivation = vi.fn((event: Event) =>
+      event.preventDefault(),
+    );
+    view.getByRole('link').addEventListener('click', staleResultActivation);
+    await fireEvent.keyDown(input, { key: 'Enter' });
+    expect(staleResultActivation).not.toHaveBeenCalled();
+    expect(dialog.open).toBe(true);
 
     vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS);
     vi.useRealTimers();
