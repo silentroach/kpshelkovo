@@ -22,6 +22,7 @@ declare global {
 }
 
 const METRIKA_SCRIPT_SRC = 'https://mc.yandex.ru/metrika/tag.js';
+const METRIKA_WEBVISOR_ENABLED = true;
 const NAVIGATION_PENDING_ATTR = 'data-site-navigation-pending';
 const NAVIGATION_DELAY_MS = 50;
 const SITE_NAV_DROPDOWN_SELECTOR = '[data-site-nav-dropdown]';
@@ -66,30 +67,34 @@ const installMetrikaStub = (): YandexMetrika => {
   return ym;
 };
 
-const loadMetrika = (id: number): void => {
+const loadMetrika = (id: number, webvisorEnabled: boolean): void => {
   if (window.__shelkovoYmLoaded) {
     return;
   }
 
   window.__shelkovoYmLoaded = true;
   const ym = installMetrikaStub();
+  const scriptSrc = `${METRIKA_SCRIPT_SRC}?id=${id}`;
   const hasScript = Array.from(document.scripts).some(
-    (script) => script.src === METRIKA_SCRIPT_SRC,
+    (script) => script.src === scriptSrc,
   );
 
   if (!hasScript) {
     const script = document.createElement('script');
 
     script.async = true;
-    script.src = METRIKA_SCRIPT_SRC;
+    script.src = scriptSrc;
     document.head.append(script);
   }
 
   ym(id, 'init', {
     accurateTrackBounce: true,
-    clickmap: false,
+    clickmap: webvisorEnabled,
+    referrer: document.referrer,
+    ssr: true,
     trackLinks: true,
-    webvisor: false,
+    url: location.href,
+    webvisor: webvisorEnabled,
   });
 };
 
@@ -102,7 +107,7 @@ const bindMetrikaLoader = (): void => {
 
   window.__shelkovoYmDeferred = true;
   const scheduleAfterLoad = (): void => {
-    window.setTimeout(() => loadMetrika(id), 1000);
+    window.setTimeout(() => loadMetrika(id, METRIKA_WEBVISOR_ENABLED), 1000);
   };
 
   if (document.readyState === 'complete') {

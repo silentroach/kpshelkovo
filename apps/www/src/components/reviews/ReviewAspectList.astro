@@ -43,6 +43,7 @@ const ordered = sortReviewAspects(aspects);
             {aspect.body && (
               <div
                 class="ui-prose text-sm"
+                data-pagefind-body
                 set:html={renderMarkdown(aspect.body)}
               />
             )}

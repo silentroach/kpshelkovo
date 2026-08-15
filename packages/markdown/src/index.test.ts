@@ -207,9 +207,9 @@ describe('@shelkovo/markdown', () => {
   it('adds stable heading ids for in-page links', () => {
     expect(render('## Что сделать сразу\n\nТекст\n\n## Что сделать сразу'))
       .toMatchInlineSnapshot(`
-        "<h2 id="что-сделать-сразу" aria-label="Что сделать сразу">Что сделать сразу<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" href="#что-сделать-сразу" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>
+        "<h2 id="что-сделать-сразу" aria-label="Что сделать сразу">Что сделать сразу<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" data-pagefind-ignore="all" href="#что-сделать-сразу" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>
         <p>Текст</p>
-        <h2 id="что-сделать-сразу-2" aria-label="Что сделать сразу">Что сделать сразу<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" href="#что-сделать-сразу-2" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>"
+        <h2 id="что-сделать-сразу-2" aria-label="Что сделать сразу">Что сделать сразу<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" data-pagefind-ignore="all" href="#что-сделать-сразу-2" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>"
       `);
   });
 
@@ -226,9 +226,9 @@ describe('@shelkovo/markdown', () => {
         <li><a href="#раздел-2">Раздел</a></li>
         </ul>
         <hr>
-        <h2 id="раздел" aria-label="Раздел">Раздел<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" href="#раздел" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>
-        <h3 id="детали" aria-label="Детали">Детали<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" href="#детали" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h3>
-        <h2 id="раздел-2" aria-label="Раздел">Раздел<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" href="#раздел-2" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>"
+        <h2 id="раздел" aria-label="Раздел">Раздел<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" data-pagefind-ignore="all" href="#раздел" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>
+        <h3 id="детали" aria-label="Детали">Детали<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" data-pagefind-ignore="all" href="#детали" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h3>
+        <h2 id="раздел-2" aria-label="Раздел">Раздел<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" data-pagefind-ignore="all" href="#раздел-2" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>"
       `);
   });
 

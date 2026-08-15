@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && rm -rf ../../dist/www && mkdir -p ../../dist && cp -R dist/site ../../dist/www",
+    "build": "astro build && pagefind && rm -rf ../../dist/www && mkdir -p ../../dist && cp -R dist/site ../../dist/www",
+    "search:prepare": "rm -rf ../../.cache/pagefind && astro build && pagefind --output-path ../../.cache/pagefind",
     "preview": "astro preview",
     "typecheck": "astro sync && tsc --noEmit",
     "test": "vitest run",
@@ -46,6 +47,7 @@
     "@yandex/ymaps3-types": "^1.0.20315584",
     "astro-compressor": "^1.3.0",
     "happy-dom": "^20.11.2",
+    "pagefind": "1.5.2",
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "sharp": "^0.35.3",

@@ -42,6 +42,27 @@ const expectStickyState = async (tableShell: Locator): Promise<void> => {
 };
 
 test.describe('Shared sticky table visual', () => {
+  test('places sticky table headers below the desktop site header', async ({
+    page,
+  }) => {
+    const section = await openFixtureSection(page, 'sticky-table-wide-section');
+    const headerCell = section.locator('thead th').first();
+
+    await page.locator('body').evaluate((body) => {
+      body.classList.add('site-has-header');
+    });
+
+    await expect
+      .poll(() => headerCell.evaluate((cell) => getComputedStyle(cell).top))
+      .toBe('57px');
+
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await expect
+      .poll(() => headerCell.evaluate((cell) => getComputedStyle(cell).top))
+      .toBe('0px');
+  });
+
   test('renders a wide table before vertical sticking', async ({ page }) => {
     const section = await openFixtureSection(page, 'sticky-table-wide-section');
     const tableShell = section.locator('[data-ui-sticky-table-shell]');

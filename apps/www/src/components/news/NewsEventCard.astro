@@ -40,6 +40,7 @@ const titleId = `news-event-title-${event.slug}`;
         hasCoordinates ? 'news-event-compact-card--mapped' : undefined,
       ]}
       aria-labelledby={titleId}
+      data-pagefind-body
     >
       {mapEmbedUrl && (
         <div class="news-event-compact-map" aria-hidden="true">
@@ -93,7 +94,7 @@ const titleId = `news-event-title-${event.slug}`;
           )}
         </ul>
 
-        <div class="news-event-compact-actions">
+        <div class="news-event-compact-actions" data-pagefind-ignore>
           <ResourceLink
             href={event.icsUrl}
             download={calendarFilename}
@@ -133,7 +134,11 @@ const titleId = `news-event-title-${event.slug}`;
       </div>
     </aside>
   ) : (
-    <section class="news-event-card" aria-labelledby={titleId}>
+    <section
+      class="news-event-card"
+      aria-labelledby={titleId}
+      data-pagefind-body
+    >
       <div
         class:list={[
           'news-event-map-layer',
@@ -168,7 +173,7 @@ const titleId = `news-event-title-${event.slug}`;
             )}
           </p>
 
-          <div class="news-event-actions">
+          <div class="news-event-actions" data-pagefind-ignore>
             <ResourceLink
               href={event.icsUrl}
               download={calendarFilename}

@@ -8,6 +8,7 @@ export { default as FilePdfIcon } from './FilePdf.astro';
 export { default as GlobeIcon } from './Globe.astro';
 export { default as MapPinIcon } from './MapPin.astro';
 export { default as PhoneIcon } from './Phone.astro';
+export { default as SearchIcon } from './Search.astro';
 export { default as StarIcon } from './Star.astro';
 export { default as TelegramIcon } from './Telegram.astro';
 export { default as WhatsAppIcon } from './WhatsApp.astro';

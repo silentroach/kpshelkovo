@@ -104,6 +104,28 @@ const validateUniquePublicUrls = (pages: readonly KbPage[]): void => {
   }
 };
 
+const validateHubSourceIds = (pages: readonly KbPage[]): void => {
+  for (const page of pages) {
+    if (page.sourceId === 'index' || page.sourceId.endsWith('/index')) {
+      continue;
+    }
+
+    const descendantRoutePrefix = `${page.routeSlug}/`;
+    const descendant = pages.find((candidate) =>
+      candidate.routeSlug?.startsWith(descendantRoutePrefix),
+    );
+
+    if (!descendant) {
+      continue;
+    }
+
+    failSourceId(
+      page.sourceId,
+      `has descendant public route "${descendant.url}"; non-root hub source ids must end with "/index" (expected "${page.routeSlug}/index")`,
+    );
+  }
+};
+
 export const buildKbDataset = (
   entries: readonly KbPageEntry[],
   opts?: {
@@ -114,6 +136,7 @@ export const buildKbDataset = (
   const pages = entries.map((entry) => mapEntry(entry, mentionRegistry));
 
   validateUniquePublicUrls(pages);
+  validateHubSourceIds(pages);
 
   return {
     pages,

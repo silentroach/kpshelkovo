@@ -40,6 +40,8 @@ const headingAnchor = (slug: string): HtmlTreeNode => ({
   properties: {
     ariaLabel: HEADING_ANCHOR_LABEL,
     className: ['ui-heading-anchor'],
+    // Keep the visible "#" permalink marker out of the Pagefind index.
+    dataPagefindIgnore: 'all',
     href: `#${slug}`,
     title: HEADING_ANCHOR_LABEL,
   },

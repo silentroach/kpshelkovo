@@ -6,9 +6,12 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import type { BreadcrumbItem } from '@/lib/breadcrumbs';
 import { kbBreadcrumbs } from '@/lib/kb/breadcrumbs';
 import { loadKbPages } from '@/lib/kb/load';
+import { isKbPageSearchable } from '@/lib/kb/search';
 import { kbPageDescription, kbPageSchema } from '@/lib/kb/seo';
 import type { KbPage } from '@/lib/kb/types';
 import { renderMarkdown } from '@/lib/markdown/render';
+import { SEARCH_SECTIONS } from '@/lib/search/sections';
+import type { SearchDocument } from '@/lib/search/types';
 
 interface Props {
   readonly page: KbPage;
@@ -46,6 +49,14 @@ const title = page.routeSlug
   ? `${page.title} — ${KB_TITLE} — Шелково Онлайн`
   : `${KB_TITLE} — Шелково Онлайн`;
 const description = kbPageDescription(page);
+const search = isKbPageSearchable(page)
+  ? ({
+      scope: 'page',
+      title: page.title,
+      description,
+      section: SEARCH_SECTIONS.knowledgeBase,
+    } satisfies SearchDocument)
+  : undefined;
 const schema = kbPageSchema({
   page,
   pages,
@@ -62,6 +73,7 @@ const bodyHtml = page.body ? renderMarkdown(page.body) : undefined;
   robots={page.robots}
   type={page.routeSlug ? 'article' : 'website'}
   schema={schema}
+  search={search}
 >
   <main class="ui-page pb-8 md:pb-12 lg:pb-14">
     <header class="ui-page-header">

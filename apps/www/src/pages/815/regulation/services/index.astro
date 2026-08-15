@@ -18,6 +18,8 @@ import {
   reglamentServicesUrl,
   reglamentUrl,
 } from '@/lib/reglament/routes';
+import { SEARCH_SECTIONS } from '@/lib/search/sections';
+import type { SearchDocument } from '@/lib/search/types';
 
 type ServiceGroup = FullReglamentService['group'];
 type MappingStatus = FullReglamentServiceToEstimateMapItem['status'];
@@ -25,6 +27,12 @@ type MappingStatus = FullReglamentServiceToEstimateMapItem['status'];
 const title = 'Услуги регламента — Регламент — Шелково Онлайн';
 const description =
   'Перечень услуг из полного регламента Шелково: периодичность работ и сверка со строками текущей сметы 2026.';
+const search = {
+  scope: 'manual',
+  title: 'Какие услуги указаны в регламенте',
+  description,
+  section: SEARCH_SECTIONS.regulation,
+} satisfies SearchDocument;
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Регламент', href: reglamentUrl() },
   { label: 'Услуги' },
@@ -93,7 +101,7 @@ const mappingVerificationNote = (
     ? null
     : mapping.verification_note;
 const tableHeaderCellClass =
-  'sticky top-0 z-10 border-b border-border bg-muted px-4 py-2.5 align-bottom';
+  'sticky top-[var(--ui-sticky-table-header-top)] z-10 border-b border-border bg-muted px-4 py-2.5 align-bottom';
 ---
 
 <BaseLayout
@@ -106,13 +114,14 @@ const tableHeaderCellClass =
     'Шелково полный регламент услуги',
   ]}
   schema={schema}
+  search={search}
 >
   <main class="ui-page pb-8 md:pb-12 lg:pb-16">
     <section class="ui-page-header">
       <div class="ui-page-header-stack max-w-5xl">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div class="space-y-4">
+        <div class="space-y-4" data-pagefind-body>
           <h1 class="ui-page-title max-w-4xl">
             Какие услуги указаны в регламенте
           </h1>
@@ -135,7 +144,7 @@ const tableHeaderCellClass =
 
         {
           groups.map((group) => (
-            <section id={group.group} class="space-y-4">
+            <section id={group.group} class="space-y-4" data-pagefind-body>
               <div class="max-w-3xl space-y-1.5">
                 <h3 class="ui-section-title">{group.title}</h3>
                 <p class="text-sm leading-6 text-muted-foreground md:text-base md:leading-7">

@@ -25,12 +25,20 @@ import {
   reglamentFullSourcePdfUrl,
   reglamentUrl,
 } from '@/lib/reglament/routes';
+import { SEARCH_SECTIONS } from '@/lib/search/sections';
+import type { SearchDocument } from '@/lib/search/types';
 
 type AssetCategory = FullReglamentCommonAsset['category'];
 
 const title = 'Общее имущество — Регламент — Шелково Онлайн';
 const description =
   'Справочник общего имущества Шелково из полного регламента: дороги, ливневые траншеи, зелень, благоустройство, электроснабжение и охрана.';
+const search = {
+  scope: 'manual',
+  title: 'Что входит в общее имущество',
+  description,
+  section: SEARCH_SECTIONS.regulation,
+} satisfies SearchDocument;
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Регламент', href: reglamentUrl() },
   { label: 'Общее имущество' },
@@ -92,7 +100,7 @@ const villageIcons = {
   'shelkovo-river': RiverIcon,
 } as const satisfies Record<FullReglamentVillageId, typeof VillageIcon>;
 const tableHeaderCellClass =
-  'sticky top-0 z-10 border-b border-border bg-muted px-4 py-2.5 align-bottom';
+  'sticky top-[var(--ui-sticky-table-header-top)] z-10 border-b border-border bg-muted px-4 py-2.5 align-bottom';
 const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
 ---
 
@@ -106,13 +114,14 @@ const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
     'Шелково дороги охрана освещение',
   ]}
   schema={schema}
+  search={search}
 >
   <main class="ui-page pb-8 md:pb-12 lg:pb-16">
     <section class="ui-page-header">
       <div class="ui-page-header-stack max-w-5xl">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div class="space-y-4">
+        <div class="space-y-4" data-pagefind-body>
           <h1 class="ui-page-title max-w-4xl">Что входит в общее имущество</h1>
           <div
             class="max-w-3xl space-y-3 text-sm leading-6 text-muted-foreground md:text-[0.9375rem]"
@@ -133,7 +142,7 @@ const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
 
         {
           groups.map((group) => (
-            <section id={group.category} class="space-y-4">
+            <section id={group.category} class="space-y-4" data-pagefind-body>
               <div class="max-w-3xl space-y-1.5">
                 <h3 class="ui-section-title">{group.title}</h3>
                 <p class="text-sm leading-6 text-muted-foreground md:text-base md:leading-7">

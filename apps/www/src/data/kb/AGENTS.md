@@ -6,7 +6,7 @@
 - В frontmatter разрешены `title`, опциональный `flags` и опциональный `seo.description`; сейчас поддержан только флаг `noindex`.
 - `seo.description` использовать только для HTML meta description, когда автоматическая выдержка из Markdown слишком общая, короткая или повторяется на похожих страницах.
 - `flags: [noindex]` не добавляет страницу в sitemap и ставит на HTML-страницу `robots: noindex, follow`.
-- URL строится из пути: `index.md` дает `/kb/`, `services/internet.md` дает `/kb/services/internet/`, `services/index.md` дает `/kb/services/`.
+- URL строится из пути: `index.md` дает `/kb/`, `services/internet/index.md` дает `/kb/services/internet/`, `services/gas.md` дает `/kb/services/gas/`.
 - У каждой HTML-страницы есть Markdown companion: `/kb/index.md` для корня и `/kb/<slug>/index.md` для вложенных страниц.
 - В Markdown companion внутренние ссылки на `/kb/.../` ведут на соответствующие `.md` companion-страницы.
 - Не создавай одновременно `foo.md` и `foo/index.md`: они конфликтуют за один публичный URL.
