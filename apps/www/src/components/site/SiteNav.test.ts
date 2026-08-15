@@ -72,7 +72,8 @@ describe('SiteNav', () => {
 
       expect(html.match(/data-search-trigger/g)).toHaveLength(1);
       expect(html).toContain('data-pagefind-ignore="all"');
-      expect(html).toContain('Поиск');
+      expect(html).toContain('aria-label="Поиск"');
+      expect(html).not.toContain('<span>Поиск</span>');
     },
   );
 
