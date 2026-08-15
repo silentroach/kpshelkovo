@@ -102,6 +102,30 @@ describe('Pagefind search client', () => {
     `);
   });
 
+  it('retries runtime loading and configuration after failures', async () => {
+    const { options, runtime } = runtimeWith(responseWith());
+    options
+      .mockRejectedValueOnce(new Error('options failed'))
+      .mockResolvedValue(undefined);
+    const loadPagefind = vi
+      .fn<() => Promise<PagefindRuntime>>()
+      .mockRejectedValueOnce(new Error('load failed'))
+      .mockResolvedValue(runtime);
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind,
+    });
+
+    await expect(client.search('первый')).rejects.toThrow('load failed');
+    await expect(client.search('второй')).rejects.toThrow('options failed');
+    await expect(client.search('третий')).resolves.toMatchObject({
+      state: 'ready',
+      query: 'третий',
+    });
+    expect(loadPagefind).toHaveBeenCalledTimes(3);
+    expect(options).toHaveBeenCalledTimes(2);
+  });
+
   it('reuses result IDs and only loads additions for a larger batch', async () => {
     const tracked = trackedResponseWith(
       ...Array.from({ length: 16 }, (_, index) => validResult(index + 1)),

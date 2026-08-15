@@ -174,12 +174,22 @@ export const createPagefindSearchClient = (
   let resultCache = new Map<string, Promise<SearchResult | undefined>>();
 
   const loadPagefind = (): Promise<PagefindRuntime> => {
-    pagefindPromise ??= dependencies.loadPagefind().then(async (pagefind) => {
+    if (pagefindPromise) {
+      return pagefindPromise;
+    }
+
+    const promise = dependencies.loadPagefind().then(async (pagefind) => {
       await pagefind.options(pagefindOptions);
       return pagefind;
     });
+    pagefindPromise = promise;
+    void promise.catch(() => {
+      if (pagefindPromise === promise) {
+        pagefindPromise = undefined;
+      }
+    });
 
-    return pagefindPromise;
+    return promise;
   };
 
   const loadResult = async (
