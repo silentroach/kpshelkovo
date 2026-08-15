@@ -87,8 +87,8 @@ const schema = reviewPageSchema({
       </div>
     </header>
 
-    <article class="space-y-8 px-5 md:px-6" data-pagefind-body>
-      <div class={REVIEWS_PROSE} set:html={bodyHtml} />
+    <article class="space-y-8 px-5 md:px-6">
+      <div class={REVIEWS_PROSE} data-pagefind-body set:html={bodyHtml} />
       <ReviewAspectList aspects={review.aspects} />
     </article>
 

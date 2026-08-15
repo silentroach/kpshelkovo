@@ -1,5 +1,6 @@
 <script lang="ts">
   import { count, formatDate, pluralize } from '@shelkovo/format';
+  import SearchIcon from '@shelkovo/ui/icons/system/Search.svelte';
   import { onMount, tick } from 'svelte';
   import type { Attachment } from 'svelte/attachments';
   import { on } from 'svelte/events';
@@ -435,19 +436,7 @@
   <div class="site-search-dialog__surface">
     <h2 id={headingId} class="sr-only">Поиск по сайту</h2>
     <div class="site-search-dialog__field">
-      <svg
-        class="size-5 shrink-0 text-muted-foreground"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.9"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="10.75" cy="10.75" r="6.5"></circle>
-        <path d="m15.5 15.5 4.25 4.25"></path>
-      </svg>
+      <SearchIcon class="size-5 shrink-0 text-muted-foreground" />
       <label for={inputId} class="sr-only">Что найти на сайте</label>
       <input
         bind:this={inputElement}

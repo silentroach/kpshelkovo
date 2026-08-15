@@ -39,6 +39,7 @@
     "./icons/system/Globe.astro": "./src/icons/system/Globe.astro",
     "./icons/system/MapPin.astro": "./src/icons/system/MapPin.astro",
     "./icons/system/Search.astro": "./src/icons/system/Search.astro",
+    "./icons/system/Search.svelte": "./src/icons/system/Search.svelte",
     "./icons/system/Star.astro": "./src/icons/system/Star.astro",
     "./icons/system/Telegram.astro": "./src/icons/system/Telegram.astro",
     "./icons/system/WhatsApp.astro": "./src/icons/system/WhatsApp.astro",
