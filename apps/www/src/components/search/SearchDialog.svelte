@@ -523,6 +523,7 @@
                   id={`${resultsId}-${index}`}
                   href={row.url}
                   class="block min-w-0 px-4 py-3 text-foreground hover:bg-primary-soft-2"
+                  data-astro-prefetch="false"
                   data-search-result
                   onclick={handleResultClick}
                 >

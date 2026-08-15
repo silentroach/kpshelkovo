@@ -468,6 +468,7 @@ describe('SearchDialog', () => {
 
     const [anchoredLink, describedLink] = view.getAllByRole('link');
     expect(anchoredLink?.getAttribute('href')).toBe('/news/long-page/#details');
+    expect(anchoredLink?.getAttribute('data-astro-prefetch')).toBe('false');
     expect(anchoredLink?.querySelector('h3')?.textContent?.trim()).toBe(
       'Основная страница',
     );

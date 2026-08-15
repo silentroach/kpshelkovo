@@ -82,7 +82,7 @@ const heroImageStyle = heroCoverUrl
 const title = `${article.seo?.title ?? article.title} — Новости — Шелково Онлайн`;
 const description = article.seo?.description ?? article.summary;
 const search = {
-  scope: 'page',
+  scope: 'manual',
   title: article.title,
   description,
   section: SEARCH_SECTIONS.news,
@@ -255,7 +255,7 @@ const schema = newsArticleSchema({
                 hasEvents ? 'news-article-body-layout--with-event' : undefined,
               ]}
             >
-              <div class={NEWS_PROSE} set:html={bodyHtml} />
+              <div class={NEWS_PROSE} data-pagefind-body set:html={bodyHtml} />
 
               {hasEvents && (
                 <div class="news-article-event-aside">
