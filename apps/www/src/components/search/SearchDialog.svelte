@@ -45,6 +45,7 @@
   let total = $state(0);
   let isSearching = $state(false);
   let isLoadingMore = $state(false);
+  let loadMoreFailed = $state(false);
 
   const hasAnchor = (url: string): boolean => {
     const hashIndex = url.indexOf('#');
@@ -88,6 +89,7 @@
     total = 0;
     isSearching = false;
     isLoadingMore = false;
+    loadMoreFailed = false;
   };
 
   const clearPendingSearch = (): void => {
@@ -149,6 +151,7 @@
   const beginSearch = (): void => {
     isSearching = true;
     isLoadingMore = false;
+    loadMoreFailed = false;
     if (results.length === 0) {
       viewState = 'loading';
     }
@@ -207,6 +210,7 @@
       }
       if (mode === 'more') {
         isLoadingMore = false;
+        loadMoreFailed = true;
         return;
       }
 
@@ -241,6 +245,7 @@
     }
 
     isLoadingMore = true;
+    loadMoreFailed = false;
     void runSearch(query, requestedLimit + SEARCH_RESULT_DEFAULT_LIMIT, 'more');
   };
 
@@ -560,13 +565,31 @@
           </ul>
 
           {#if hasMoreResults}
-            {#key requestedLimit}
+            {#if loadMoreFailed}
               <div
-                class="h-px"
-                aria-hidden="true"
-                {@attach loadMoreOnIntersect}
-              ></div>
-            {/key}
+                class="flex items-center justify-between gap-4 px-4 py-3"
+                role="status"
+              >
+                <p class="text-sm font-medium text-muted-foreground">
+                  Не удалось загрузить остальные результаты
+                </p>
+                <button
+                  type="button"
+                  class="ui-btn ui-btn-sm ui-btn-ghost shrink-0"
+                  onclick={loadMore}
+                >
+                  Повторить
+                </button>
+              </div>
+            {:else}
+              {#key requestedLimit}
+                <div
+                  class="h-px"
+                  aria-hidden="true"
+                  {@attach loadMoreOnIntersect}
+                ></div>
+              {/key}
+            {/if}
           {/if}
         {/if}
       </div>

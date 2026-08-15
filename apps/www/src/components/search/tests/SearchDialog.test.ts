@@ -174,7 +174,9 @@ describe('SearchDialog', () => {
     );
     const initialPending = deferred<SearchResponse | undefined>();
     const firstExpansion = deferred<SearchResponse | undefined>();
-    const secondExpansion = deferred<SearchResponse | undefined>();
+    const failedSecondExpansion = deferred<SearchResponse | undefined>();
+    const retriedSecondExpansion = deferred<SearchResponse | undefined>();
+    let secondExpansionRequests = 0;
     const search = vi.fn(
       (_query: string, limit?: number): Promise<SearchResponse | undefined> => {
         switch (limit) {
@@ -183,7 +185,10 @@ describe('SearchDialog', () => {
           case 16:
             return firstExpansion.promise;
           case 24:
-            return secondExpansion.promise;
+            secondExpansionRequests += 1;
+            return secondExpansionRequests === 1
+              ? failedSecondExpansion.promise
+              : retriedSecondExpansion.promise;
           default:
             return Promise.reject(new Error(`Unexpected limit: ${limit}`));
         }
@@ -266,7 +271,15 @@ describe('SearchDialog', () => {
     await waitFor(() => expect(search).toHaveBeenLastCalledWith('вода', 24));
     expect(view.getAllByRole('link')).toHaveLength(14);
 
-    secondExpansion.resolve(
+    failedSecondExpansion.reject(new Error('Pagefind fragment failed'));
+    const retryButton = await waitFor(() =>
+      view.getByRole('button', { name: 'Повторить' }),
+    );
+    expect(view.getAllByRole('link')).toHaveLength(14);
+
+    await fireEvent.click(retryButton);
+    await waitFor(() => expect(search).toHaveBeenLastCalledWith('вода', 24));
+    retriedSecondExpansion.resolve(
       readyResponse(
         'вода',
         Array.from({ length: 16 }, (_, index) => resultAt(index + 1)),
@@ -274,7 +287,7 @@ describe('SearchDialog', () => {
       ),
     );
     await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(16));
-    expect(observe).toHaveBeenCalledTimes(2);
+    expect(observe).toHaveBeenCalledTimes(3);
 
     input.focus();
     await fireEvent.keyDown(input, { key: 'ArrowDown' });
