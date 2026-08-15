@@ -197,6 +197,14 @@ jobs:
           # (-c сравнивает по checksum, без -t mtime на сервере остается прежним
           # для уже существующих файлов; новые файлы получат mtime деплоя)
           rsync_opts="-azc --no-t --delete --mkpath --chmod=D755,F644"
+          pagefind_manifest=$(mktemp)
+          pagefind_retention_minutes=$((7 * 24 * 60))
+          trap 'rm -f "$pagefind_manifest"' EXIT
+
+          find dist/www/search -type f \
+            \( -name 'pagefind.*.pf_meta' -o -name '*.pf_index' -o -name '*.pf_filter' -o -name '*.pf_fragment' \) \
+            -printf '%P\0' > "$pagefind_manifest"
+          test -s "$pagefind_manifest"
 
           # Active clients may still request chunks from earlier index generations.
           rsync $rsync_opts \
@@ -206,6 +214,16 @@ jobs:
             --filter='protect /search/fragment/*.pf_fragment' \
             -e "ssh $ssh_opts" \
             dist/www/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_WWW_PATH/"
+
+          # Keep current chunks and prune generations outside the client activity window.
+          ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -eu
+            cd '$DEPLOY_WWW_PATH/search'
+            xargs -0 touch --
+            find . -type f \\
+              \\( -name 'pagefind.*.pf_meta' -o -name '*.pf_index' -o -name '*.pf_filter' -o -name '*.pf_fragment' \\) \\
+              -mmin +$pagefind_retention_minutes -delete
+          " < "$pagefind_manifest"
 
           ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "test -d '$DEPLOY_MEDIA_PATH' && test -w '$DEPLOY_MEDIA_PATH'"
           rsync $rsync_opts \
