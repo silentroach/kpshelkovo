@@ -350,6 +350,20 @@
     }
   };
 
+  const handleResultClick = (event: MouseEvent): void => {
+    if (
+      event.button !== 0 ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey
+    ) {
+      return;
+    }
+
+    closeDialog(false);
+  };
+
   const excerptSegments = (
     excerptHtml: string,
   ): readonly SearchExcerptSegment[] => {
@@ -501,7 +515,7 @@
                   href={row.url}
                   class="block min-w-0 px-4 py-3 text-foreground hover:bg-primary-soft-2"
                   data-search-result
-                  onclick={() => closeDialog(false)}
+                  onclick={handleResultClick}
                 >
                   <span
                     class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs leading-5 text-muted-foreground"

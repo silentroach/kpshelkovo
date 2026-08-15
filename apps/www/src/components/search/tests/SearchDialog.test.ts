@@ -350,7 +350,7 @@ describe('SearchDialog', () => {
     expect(resultsRegion.getAttribute('aria-busy')).toBe('false');
   });
 
-  it('leaves focused result Enter native and closes on its click', async () => {
+  it('leaves focused result navigation native and only closes for the current tab', async () => {
     const search = vi.fn(async (query: string) =>
       readyResponse(query, [resultAt(1)]),
     );
@@ -374,6 +374,11 @@ describe('SearchDialog', () => {
 
     expect(enterEvent.defaultPrevented).toBe(false);
     expect(dialog.open).toBe(true);
+
+    await fireEvent.click(resultLink, { ctrlKey: true });
+    await fireEvent.click(resultLink, { button: 1 });
+    expect(dialog.open).toBe(true);
+    expect((input as HTMLInputElement).value).toBe('вода');
 
     const activation = vi.fn((event: Event) => event.preventDefault());
     resultLink.addEventListener('click', activation);
