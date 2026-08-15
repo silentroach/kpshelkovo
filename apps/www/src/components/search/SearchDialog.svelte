@@ -78,6 +78,7 @@
     );
 
     return {
+      contextTitle: anchoredResult?.title,
       result,
       url: anchoredResult?.url ?? result.url,
       excerptHtml: anchoredResult?.excerptHtml ?? result.excerptHtml,
@@ -400,8 +401,27 @@
     closeDialog(false);
   };
 
+  const excerptStartsWithTitle = (
+    segments: readonly SearchExcerptSegment[],
+    title: string,
+  ): boolean => {
+    const excerpt = segments
+      .map((segment) => segment.text)
+      .join('')
+      .replace(/\s+/gu, ' ')
+      .trim();
+    const normalizedTitle = title.replace(/\s+/gu, ' ').trim();
+
+    return (
+      excerpt === normalizedTitle ||
+      excerpt.startsWith(`${normalizedTitle}.`) ||
+      excerpt.startsWith(`${normalizedTitle} `)
+    );
+  };
+
   const excerptSegments = (
     excerptHtml: string,
+    contextTitle?: string,
   ): readonly SearchExcerptSegment[] => {
     const decoder = document.createElement('textarea');
     const segments: SearchExcerptSegment[] = [];
@@ -422,6 +442,13 @@
       if (decoder.value) {
         segments.push({ highlighted, text: decoder.value });
       }
+    }
+
+    if (contextTitle && !excerptStartsWithTitle(segments, contextTitle)) {
+      segments.unshift({
+        highlighted: false,
+        text: `${contextTitle}:\u00a0`,
+      });
     }
 
     return segments;
@@ -559,7 +586,10 @@
                     {row.result.title}
                   </h3>
                   {#if row.excerptHtml}
-                    {@const segments = excerptSegments(row.excerptHtml)}
+                    {@const segments = excerptSegments(
+                      row.excerptHtml,
+                      row.contextTitle,
+                    )}
                     <p
                       class="site-search-result-excerpt mt-1 line-clamp-2 [overflow-wrap:anywhere] text-sm leading-5 text-muted-foreground"
                     >
@@ -567,6 +597,12 @@
                         {#if segment.highlighted}<mark>{segment.text}</mark
                           >{:else}{segment.text}{/if}
                       {/each}
+                    </p>
+                  {:else if row.result.matchContext}
+                    <p
+                      class="site-search-result-excerpt mt-1 line-clamp-2 [overflow-wrap:anywhere] text-sm leading-5 text-muted-foreground"
+                    >
+                      {row.result.matchContext}
                     </p>
                   {:else if row.result.description}
                     <p

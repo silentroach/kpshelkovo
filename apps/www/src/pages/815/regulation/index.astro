@@ -103,6 +103,25 @@ interface MissingFieldHint {
 
 const formatDisplayValue = (value: NonNullable<DisplayValue>): string =>
   `${formatReglamentNumber(value.value)} ${value.unit}${value.label ? `, ${value.label}` : ''}`;
+const estimateRowSearchText = (row: PayloadRow): string =>
+  [
+    row.description,
+    row.baseline.base
+      ? `База по исходной смете: ${formatDisplayValue(row.baseline.base)}.`
+      : undefined,
+    row.baseline.frequency
+      ? `Периодичность по исходной смете: ${formatDisplayValue(row.baseline.frequency)}.`
+      : undefined,
+    row.baseline.price
+      ? `Ставка по исходной смете: ${formatDisplayValue(row.baseline.price)}.`
+      : undefined,
+    `Вклад в тариф по исходной смете: ${formatReglamentTariffValue(row.baseline.tariff_per_sotka_month)}.`,
+    `Сумма за год по исходной смете: ${formatReglamentAnnualMoney(row.baseline.annual_gross)}.`,
+  ]
+    .filter((part): part is string => Boolean(part))
+    .join(' ');
+const estimateRowSearchSources = (row: PayloadRow): string =>
+  `Источники: ${row.source_refs.map(formatEstimateSourceRefLabel).join('; ')}.`;
 const missingFieldHint = (
   row: PayloadRow,
   key: BasicDisplayFieldKey,
@@ -320,6 +339,8 @@ const viewSections = htmlSections.map((section) => ({
     return {
       ...row,
       titleId: `reglament-row-title-${row.id}`,
+      searchText: estimateRowSearchText(row),
+      searchSources: estimateRowSearchSources(row),
       controls: {
         enabled: hasEnabledControl(row),
         base: numberControl(row, 'volume'),
@@ -520,11 +541,20 @@ const formatInputUnit = (unit: string): string =>
 
         {
           viewSections.map((section) => (
-            <section id={section.id}>
+            <section aria-labelledby={section.id}>
               <div class="mb-4 flex flex-col gap-3 md:mb-5 md:flex-row md:items-end md:justify-between">
                 <div class="space-y-1.5" data-pagefind-body>
-                  <h3 class="ui-prose-title">{section.title}</h3>
-                  <p class="text-xs leading-5 text-muted-foreground">
+                  <h3
+                    id={section.id}
+                    class="ui-prose-title"
+                    data-pagefind-weight="1.5"
+                  >
+                    {section.title}
+                  </h3>
+                  <p
+                    class="text-xs leading-5 text-muted-foreground"
+                    data-pagefind-weight="0.3"
+                  >
                     Источники раздела:{' '}
                     {section.source_refs.map((ref, index) => (
                       <>
@@ -605,9 +635,9 @@ const formatInputUnit = (unit: string): string =>
                   <tbody>
                     {section.rows.map((row) => (
                       <>
-                        <tr class="border-t border-border" data-pagefind-body>
+                        <tr class="border-t border-border">
                           <td class="border-t border-border px-4 py-2.5 align-top">
-                            <div class="space-y-1.5">
+                            <div class="space-y-1.5" data-pagefind-body>
                               <div class="flex items-start gap-2">
                                 {row.controls.enabled && (
                                   <input
@@ -624,16 +654,27 @@ const formatInputUnit = (unit: string): string =>
                                     )}
                                   />
                                 )}
-                                <p
+                                <h4
                                   id={row.titleId}
                                   class:list={[
                                     tableTextClass,
                                     'min-w-0 flex-1 font-semibold text-foreground',
                                   ]}
+                                  data-pagefind-weight="2"
                                 >
                                   {row.title}
-                                </p>
+                                </h4>
                               </div>
+                              <p class="sr-only" aria-hidden="true">
+                                {row.searchText}
+                              </p>
+                              <p
+                                class="sr-only"
+                                aria-hidden="true"
+                                data-pagefind-weight="0.3"
+                              >
+                                {row.searchSources}
+                              </p>
                             </div>
                           </td>
                           <td class="border-t border-border px-4 py-2.5 align-top text-muted-foreground">
@@ -875,10 +916,7 @@ const formatInputUnit = (unit: string): string =>
                                 </svg>
                                 <span>Детали расчета и источники</span>
                               </summary>
-                              <div
-                                class="mt-3 space-y-4 border-l border-border pl-3 md:pl-4"
-                                data-pagefind-body
-                              >
+                              <div class="mt-3 space-y-4 border-l border-border pl-3 md:pl-4">
                                 {row.description && (
                                   <p class="text-muted-foreground">
                                     {row.description}

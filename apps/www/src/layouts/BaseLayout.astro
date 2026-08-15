@@ -84,6 +84,7 @@ const searchMetadata = search
       'sectionId[data-search-section-id]',
       'sectionLabel[data-search-section-label]',
       search.publishedAt && 'publishedAt[data-search-published-at]',
+      search.tags?.length && 'tags[data-search-tags]',
     ]
       .filter(Boolean)
       .join(', ')
@@ -205,6 +206,7 @@ const searchMetadata = search
       data-search-section-id={search?.section.id}
       data-search-section-label={search?.section.label}
       data-search-published-at={search?.publishedAt}
+      data-search-tags={search?.tags?.join(', ')}
       transition:name="site-content"
       transition:animate={contentTransition}
     >

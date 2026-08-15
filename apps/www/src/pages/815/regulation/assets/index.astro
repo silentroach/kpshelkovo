@@ -93,6 +93,27 @@ const displayQuantity = (
 const publicVerificationNote = (
   note: FullReglamentCommonAsset['verification_note'],
 ): string | null => note;
+const assetSearchText = (
+  asset: FullReglamentCommonAsset,
+  category: string,
+): string => {
+  const quantities = fullReglamentDataset2026.villages
+    .map(
+      (village) =>
+        `${village.title}: ${displayQuantity(asset.values_by_village[village.id])}`,
+    )
+    .join('; ');
+
+  return [
+    `Категория: ${category}.`,
+    asset.unit
+      ? `Единица измерения: ${asset.unit.replace(/\.$/u, '')}.`
+      : undefined,
+    `Количество по поселкам: ${quantities}; всего: ${displayQuantity(asset.total)}.`,
+  ]
+    .filter((part): part is string => Boolean(part))
+    .join(' ');
+};
 const villageIcons = {
   'shelkovo-village': VillageIcon,
   'shelkovo-forest': ForestIcon,
@@ -142,10 +163,19 @@ const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
 
         {
           groups.map((group) => (
-            <section id={group.category} class="space-y-4" data-pagefind-body>
-              <div class="max-w-3xl space-y-1.5">
-                <h3 class="ui-section-title">{group.title}</h3>
-                <p class="text-sm leading-6 text-muted-foreground md:text-base md:leading-7">
+            <section class="space-y-4" aria-labelledby={group.category}>
+              <div class="max-w-3xl space-y-1.5" data-pagefind-body>
+                <h3
+                  id={group.category}
+                  class="ui-section-title"
+                  data-pagefind-weight="1.5"
+                >
+                  {group.title}
+                </h3>
+                <p
+                  class="text-sm leading-6 text-muted-foreground md:text-base md:leading-7"
+                  data-pagefind-weight="0.3"
+                >
                   Источник:{' '}
                   <ResourceLink
                     class="ui-link text-primary"
@@ -210,9 +240,16 @@ const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
                       return (
                         <tr class="border-t border-border">
                           <td class="border-t border-border px-4 py-3 align-top">
-                            <div class="space-y-1.5">
-                              <p class="font-semibold text-foreground">
+                            <div class="space-y-1.5" data-pagefind-body>
+                              <h4
+                                id={`reglament-asset-${asset.id}`}
+                                class="font-semibold text-foreground"
+                                data-pagefind-weight="2"
+                              >
                                 {asset.title}
+                              </h4>
+                              <p class="sr-only" aria-hidden="true">
+                                {assetSearchText(asset, group.title)}
                               </p>
                               {note && (
                                 <p class="text-xs font-semibold leading-5 text-primary">

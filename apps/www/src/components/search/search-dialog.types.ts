@@ -10,6 +10,7 @@ export interface SearchExcerptSegment {
 }
 
 export interface SearchDialogResultRow {
+  readonly contextTitle?: string;
   readonly excerptHtml?: string;
   readonly result: SearchResult;
   readonly url: string;

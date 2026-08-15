@@ -87,6 +87,7 @@ const search = {
   description,
   section: SEARCH_SECTIONS.news,
   publishedAt: article.publishedIso.slice(0, 10),
+  tags: article.tags.map((tag) => tag.label),
 } satisfies SearchDocument;
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Новости', href: newsUrl() },

@@ -521,7 +521,7 @@ describe('SearchDialog', () => {
     expect(dialog.open).toBe(true);
   });
 
-  it('uses an anchored sub-result and a plain description fallback', async () => {
+  it('keeps page titles while using sub-result and tag context excerpts', async () => {
     const anchoredResult: SearchResult = {
       url: '/news/long-page/',
       title: 'Основная страница',
@@ -535,7 +535,7 @@ describe('SearchDialog', () => {
         },
         {
           url: '/news/long-page/#details',
-          title: 'Детали',
+          title: 'Юрий Кизилов в 00:26:20',
           excerptHtml: 'Якорный <mark>фрагмент</mark>',
         },
       ],
@@ -547,8 +547,16 @@ describe('SearchDialog', () => {
       section: { id: 'status', label: 'Статус' },
       subResults: [],
     };
+    const taggedResult: SearchResult = {
+      url: '/news/tagged/',
+      title: 'Новость с тегами',
+      description: 'Это описание не должно заменить контекст тегов',
+      matchContext: 'Темы новости: благоустройство, дороги.',
+      section: { id: 'news', label: 'Новости' },
+      subResults: [],
+    };
     const search = vi.fn(async (query: string) =>
-      readyResponse(query, [anchoredResult, describedResult]),
+      readyResponse(query, [anchoredResult, taggedResult, describedResult]),
     );
     const client: SearchClient = { search };
     const opener = addOpener('Поиск');
@@ -557,15 +565,24 @@ describe('SearchDialog', () => {
     await fireEvent.click(opener);
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
     await enterDebouncedQuery(input, 'детали');
-    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(2));
+    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(3));
 
-    const [anchoredLink, describedLink] = view.getAllByRole('link');
+    const [anchoredLink, taggedLink, describedLink] = view.getAllByRole('link');
     expect(anchoredLink?.getAttribute('href')).toBe('/news/long-page/#details');
     expect(anchoredLink?.getAttribute('data-astro-prefetch')).toBe('false');
     expect(anchoredLink?.querySelector('h3')?.textContent?.trim()).toBe(
       'Основная страница',
     );
+    expect(anchoredLink?.textContent).toContain(
+      'Юрий Кизилов в 00:26:20:\u00a0Якорный фрагмент',
+    );
     expect(anchoredLink?.querySelector('mark')?.textContent).toBe('фрагмент');
+    expect(taggedLink?.textContent).toContain(
+      'Темы новости: благоустройство, дороги.',
+    );
+    expect(taggedLink?.textContent).not.toContain(
+      'Это описание не должно заменить контекст тегов',
+    );
     expect(describedLink?.textContent).toContain(
       'Описание <strong>остается текстом</strong>',
     );

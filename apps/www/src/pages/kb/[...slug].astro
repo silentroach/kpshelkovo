@@ -80,7 +80,7 @@ const bodyHtml = page.body ? renderMarkdown(page.body) : undefined;
       <div class="ui-page-header-stack max-w-4xl">
         <Breadcrumbs items={breadcrumbs} />
 
-        <h1 class="ui-page-title">{page.title}</h1>
+        <h1 class="ui-page-title" data-pagefind-ignore="all">{page.title}</h1>
       </div>
     </header>
 

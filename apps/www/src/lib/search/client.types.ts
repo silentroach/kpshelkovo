@@ -19,6 +19,7 @@ export interface SearchResult {
   readonly description?: string;
   readonly section: SearchResultSection;
   readonly publishedAt?: string;
+  readonly matchContext?: string;
   /** Pagefind-escaped text with Pagefind-added highlight <mark> elements. */
   readonly excerptHtml?: string;
   readonly subResults: readonly SearchSubResult[];

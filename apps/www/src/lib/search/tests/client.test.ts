@@ -89,6 +89,7 @@ describe('Pagefind search client', () => {
                 "publishedAt": 0,
                 "sectionId": 0,
                 "sectionLabel": 0,
+                "tags": 1.75,
               },
             },
           },
@@ -220,9 +221,16 @@ describe('Pagefind search client', () => {
               excerpt: 'Без якоря',
             },
             {
+              url: '/news/item/#overview',
+              title: 'Обзор',
+              excerpt: 'Общий фрагмент',
+              weighted_locations: [{ balanced_score: 1 }],
+            },
+            {
               url: '/news/item/#details',
               title: '  Подробности  ',
               excerpt: 'Еще <mark>текст</mark>',
+              weighted_locations: [{ balanced_score: 10 }],
             },
             {
               url: '/news/other/#details',
@@ -253,6 +261,7 @@ describe('Pagefind search client', () => {
           {
             "description": "Короткое описание",
             "excerptHtml": "Текст с <mark>совпадением</mark> и &lt;script&gt;alert(1)&lt;/script&gt;",
+            "matchContext": undefined,
             "publishedAt": "2026-08-14",
             "section": {
               "id": "news",
@@ -264,6 +273,11 @@ describe('Pagefind search client', () => {
                 "title": "Подробности",
                 "url": "/news/item/#details",
               },
+              {
+                "excerptHtml": "Общий фрагмент",
+                "title": "Обзор",
+                "url": "/news/item/#overview",
+              },
             ],
             "title": "Заголовок новости",
             "url": "/news/item/",
@@ -271,6 +285,7 @@ describe('Pagefind search client', () => {
           {
             "description": undefined,
             "excerptHtml": undefined,
+            "matchContext": undefined,
             "publishedAt": undefined,
             "section": {
               "id": "compare",
@@ -284,6 +299,110 @@ describe('Pagefind search client', () => {
         "state": "ready",
         "total": 2,
       }
+    `);
+  });
+
+  it('uses a natural context when only news tags match', async () => {
+    const response: PagefindSearchResponse = {
+      results: [
+        {
+          id: 'tagged-news',
+          matchedMetaFields: ['tags'],
+          score: 4,
+          words: [],
+          data: async () => ({
+            url: '/news/tagged/',
+            excerpt: 'Случайное начало статьи, не связанное с запросом',
+            meta: {
+              title: 'Новость с тегами',
+              description: 'Описание новости',
+              sectionId: 'news',
+              sectionLabel: 'Новости',
+              tags: 'благоустройство, дороги',
+            },
+          }),
+        },
+      ],
+    };
+    const { runtime } = runtimeWith(response);
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => runtime,
+    });
+
+    await expect(client.search('благоустройство')).resolves.toMatchObject({
+      results: [
+        {
+          excerptHtml: undefined,
+          matchContext: 'Темы новости: благоустройство, дороги.',
+        },
+      ],
+    });
+  });
+
+  it('softly reranks loaded news, incidents, and meetings by age', async () => {
+    const result = (
+      id: string,
+      score: number,
+      title: string,
+      sectionId: 'meetings' | 'news' | 'status',
+      publishedAt: string,
+    ) => ({
+      id,
+      score,
+      data: async () => ({
+        url: `/${sectionId}/${id}/`,
+        meta: {
+          title,
+          sectionId,
+          sectionLabel: sectionId,
+          publishedAt,
+        },
+      }),
+    });
+    const response: PagefindSearchResponse = {
+      results: [
+        result(
+          'old-exact-news',
+          12,
+          'Старая точная новость',
+          'news',
+          '2025-08-15',
+        ),
+        result(
+          'old-close-news',
+          11.4,
+          'Старая близкая новость',
+          'news',
+          '2025-08-15',
+        ),
+        result('fresh-news', 10, 'Свежая новость', 'news', '2026-08-01'),
+        result('old-incident', 10, 'Старый инцидент', 'status', '2025-08-15'),
+        result('fresh-incident', 4, 'Свежий инцидент', 'status', '2026-08-01'),
+        result('old-meeting', 10, 'Старая встреча', 'meetings', '2022-08-14'),
+        result('fresh-meeting', 6, 'Свежая встреча', 'meetings', '2026-02-21'),
+      ],
+    };
+    const { runtime } = runtimeWith(response);
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => runtime,
+      now: () => new Date('2026-08-15T12:00:00Z'),
+    });
+    const search = await client.search('общий запрос');
+
+    expect(
+      search?.state === 'ready' ? search.results.map(({ title }) => title) : [],
+    ).toMatchInlineSnapshot(`
+      [
+        "Старая точная новость",
+        "Свежая новость",
+        "Старая близкая новость",
+        "Свежая встреча",
+        "Старая встреча",
+        "Свежий инцидент",
+        "Старый инцидент",
+      ]
     `);
   });
 

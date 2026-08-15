@@ -10,8 +10,6 @@ import {
   withHomeSchemaBreadcrumbs,
 } from '@/lib/breadcrumbs';
 import { collectionPageSchema } from '@/lib/news/seo';
-import { SEARCH_SECTIONS } from '@/lib/search/sections';
-import type { SearchDocument } from '@/lib/search/types';
 import { loadStatusService } from '@/lib/status/load';
 import { STATUS_SERVICES, type StatusService } from '@/lib/status/schema';
 import {
@@ -63,12 +61,6 @@ const schemaItems = latestIncidents
   .map((item) => ({ name: item.title, url: item.url }));
 const title = `${serviceLabel} — Статус — Шелково Онлайн`;
 const description = `Текущее состояние сервиса ${serviceLabel.toLowerCase()} в КП Шелково: последние инциденты, плановые работы и история изменений.`;
-const search = {
-  scope: 'manual',
-  title: serviceLabel,
-  description,
-  section: SEARCH_SECTIONS.status,
-} satisfies SearchDocument;
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Статус', href: statusUrl() },
   { label: serviceLabel },
@@ -91,7 +83,6 @@ const schema = collectionPageSchema({
   canonical={statusServiceCanonical(service)}
   keywords={['статус Шелково', serviceLabel, `${serviceLabel} Шелково`]}
   schema={schema}
-  search={search}
 >
   <main class="ui-page pb-6 md:pb-10 lg:pb-12">
     <header class="ui-page-header">
@@ -99,7 +90,7 @@ const schema = collectionPageSchema({
         <Breadcrumbs items={breadcrumbs} />
 
         <div>
-          <h1 class="ui-page-title" data-pagefind-body>
+          <h1 class="ui-page-title">
             {serviceLabel}
           </h1>
         </div>
@@ -109,7 +100,6 @@ const schema = collectionPageSchema({
     <section class="mt-8 px-5 md:px-6">
       <div class="max-w-6xl space-y-3">
         <p
-          data-pagefind-body
           class:list={[
             'text-base font-medium',
             stateClass[summary.serviceStatus],

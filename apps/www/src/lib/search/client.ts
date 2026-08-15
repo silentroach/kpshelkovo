@@ -10,6 +10,7 @@ import {
 } from './client.types';
 import type {
   PagefindClientDependencies,
+  LoadedPagefindResult,
   PagefindOptions,
   PagefindResultReference,
   PagefindRuntime,
@@ -23,6 +24,7 @@ const pagefindOptions = {
       sectionId: 0,
       sectionLabel: 0,
       publishedAt: 0,
+      tags: 1.75,
     },
   },
 } as const satisfies PagefindOptions;
@@ -51,6 +53,35 @@ const asRecord = (
   }
 
   return value as Readonly<Record<string, unknown>>;
+};
+
+const pagefindScore = (value: unknown): number =>
+  typeof value === 'number' && Number.isFinite(value) ? Math.max(value, 0) : 0;
+
+const asStringList = (value: unknown): readonly string[] =>
+  Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string')
+    : [];
+
+const subResultScore = (value: unknown): number =>
+  Array.isArray(value)
+    ? value.reduce((total, item) => {
+        const score = asRecord(item)?.balanced_score;
+        return total + pagefindScore(score);
+      }, 0)
+    : 0;
+
+const newsTagContext = (value: unknown): string | undefined => {
+  const labels = cleanText(value)
+    ?.split(',')
+    .map((label) => label.trim())
+    .filter(Boolean);
+  if (!labels?.length) {
+    return;
+  }
+
+  const prefix = labels.length === 1 ? 'Тема новости' : 'Темы новости';
+  return `${prefix}: ${labels.join(', ')}.`;
 };
 
 const normalizeUrl = (
@@ -87,25 +118,35 @@ const normalizeSubResults = (
     return [];
   }
 
-  return value.flatMap((item): readonly SearchSubResult[] => {
-    const rawSubResult = asRecord(item);
-    const url = normalizeUrl(rawSubResult?.url, true);
-    const title = cleanText(rawSubResult?.title);
-    if (!url || !title || url.slice(0, url.indexOf('#')) !== pageUrl) {
-      return [];
-    }
+  return value
+    .flatMap((item, index) => {
+      const rawSubResult = asRecord(item);
+      const url = normalizeUrl(rawSubResult?.url, true);
+      const title = cleanText(rawSubResult?.title);
+      if (!url || !title || url.slice(0, url.indexOf('#')) !== pageUrl) {
+        return [];
+      }
 
-    return [
-      {
-        url,
-        title,
-        excerptHtml: trustedPagefindExcerpt(rawSubResult?.excerpt),
-      },
-    ];
-  });
+      return [
+        {
+          index,
+          score: subResultScore(rawSubResult?.weighted_locations),
+          result: {
+            url,
+            title,
+            excerptHtml: trustedPagefindExcerpt(rawSubResult?.excerpt),
+          } satisfies SearchSubResult,
+        },
+      ];
+    })
+    .sort((left, right) => right.score - left.score || left.index - right.index)
+    .map((item) => item.result);
 };
 
-const normalizeResult = (value: unknown): SearchResult | undefined => {
+const normalizeResult = (
+  value: unknown,
+  reference: PagefindResultReference,
+): SearchResult | undefined => {
   const rawResult = asRecord(value);
   const meta = asRecord(rawResult?.meta);
   const url = normalizeUrl(rawResult?.url);
@@ -116,6 +157,13 @@ const normalizeResult = (value: unknown): SearchResult | undefined => {
     return;
   }
 
+  const matchedMetaFields = asStringList(reference.matchedMetaFields);
+  const matchContext =
+    (!Array.isArray(reference.words) || reference.words.length === 0) &&
+    matchedMetaFields.includes('tags')
+      ? newsTagContext(meta?.tags)
+      : undefined;
+
   return {
     url,
     title,
@@ -125,10 +173,78 @@ const normalizeResult = (value: unknown): SearchResult | undefined => {
       label: sectionLabel,
     },
     publishedAt: cleanText(meta?.publishedAt),
-    excerptHtml: trustedPagefindExcerpt(rawResult?.excerpt),
+    matchContext,
+    excerptHtml: matchContext
+      ? undefined
+      : trustedPagefindExcerpt(rawResult?.excerpt),
     subResults: normalizeSubResults(rawResult?.sub_results, url),
   };
 };
+
+const publishedDate = (value: string): Date | undefined => {
+  const date = new Date(`${value}T00:00:00Z`);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+};
+
+const elapsedCalendarMonths = (date: Date, now: Date): number =>
+  Math.max(
+    0,
+    (now.getUTCFullYear() - date.getUTCFullYear()) * 12 +
+      now.getUTCMonth() -
+      date.getUTCMonth(),
+  );
+
+const elapsedFullYears = (date: Date, now: Date): number => {
+  const beforeAnniversary =
+    now.getUTCMonth() < date.getUTCMonth() ||
+    (now.getUTCMonth() === date.getUTCMonth() &&
+      now.getUTCDate() < date.getUTCDate());
+
+  return Math.max(
+    0,
+    now.getUTCFullYear() - date.getUTCFullYear() - (beforeAnniversary ? 1 : 0),
+  );
+};
+
+const newsRecencyFactor = (months: number): number => {
+  const bonuses = [0.15, 0.1, 0.06, 0.03] as const;
+  return 1 + (bonuses[months] ?? 0);
+};
+
+const recencyFactor = (result: SearchResult, now: Date): number => {
+  if (!result.publishedAt) {
+    return 1;
+  }
+
+  const date = publishedDate(result.publishedAt);
+  if (!date) {
+    return 1;
+  }
+
+  switch (result.section.id) {
+    case 'news':
+      return newsRecencyFactor(elapsedCalendarMonths(date, now));
+    case 'status':
+      return Math.max(0.35, 0.9 ** elapsedCalendarMonths(date, now));
+    case 'meetings':
+      return Math.max(0.5, 0.8 ** elapsedFullYears(date, now));
+    default:
+      return 1;
+  }
+};
+
+const rankResults = (
+  loaded: readonly LoadedPagefindResult[],
+  now: Date,
+): readonly SearchResult[] =>
+  loaded
+    .map((item, index) => ({
+      index,
+      result: item.result,
+      score: item.score * recencyFactor(item.result, now),
+    }))
+    .sort((left, right) => right.score - left.score || left.index - right.index)
+    .map((item) => item.result);
 
 const normalizeQuery = (query: string): string =>
   Array.from(query.replace(/\s+/gu, ' ').trim())
@@ -171,7 +287,10 @@ export const createPagefindSearchClient = (
   let pagefindPromise: Promise<PagefindRuntime> | undefined;
   let latestRequestId = 0;
   let cachedQuery: string | undefined;
-  let resultCache = new Map<string, Promise<SearchResult | undefined>>();
+  let resultCache = new Map<
+    string,
+    Promise<LoadedPagefindResult | undefined>
+  >();
 
   const loadPagefind = (): Promise<PagefindRuntime> => {
     if (pagefindPromise) {
@@ -213,13 +332,17 @@ export const createPagefindSearchClient = (
 
   const loadResult = async (
     reference: PagefindResultReference,
-  ): Promise<SearchResult | undefined> =>
-    normalizeResult(await reference.data());
+  ): Promise<LoadedPagefindResult | undefined> => {
+    const result = normalizeResult(await reference.data(), reference);
+    return result
+      ? { result, score: pagefindScore(reference.score) }
+      : undefined;
+  };
 
   const loadCachedResult = (
     reference: PagefindResultReference,
-    cache: Map<string, Promise<SearchResult | undefined>>,
-  ): Promise<SearchResult | undefined> => {
+    cache: Map<string, Promise<LoadedPagefindResult | undefined>>,
+  ): Promise<LoadedPagefindResult | undefined> => {
     const id = cacheableResultId(reference.id);
     if (!id) {
       return loadResult(reference);
@@ -243,7 +366,7 @@ export const createPagefindSearchClient = (
 
   const resultCacheFor = (
     query: string,
-  ): Map<string, Promise<SearchResult | undefined>> => {
+  ): Map<string, Promise<LoadedPagefindResult | undefined>> => {
     if (query !== cachedQuery) {
       cachedQuery = query;
       resultCache = new Map();
@@ -277,7 +400,7 @@ export const createPagefindSearchClient = (
     }
 
     const response = await pagefind.search(query);
-    const results = await Promise.all(
+    const loaded = await Promise.all(
       response.results
         .slice(0, limit)
         .map((result) => loadCachedResult(result, queryCache)),
@@ -290,8 +413,11 @@ export const createPagefindSearchClient = (
       state: 'ready',
       query,
       total: response.results.length,
-      results: results.filter((result): result is SearchResult =>
-        Boolean(result),
+      results: rankResults(
+        loaded.filter((result): result is LoadedPagefindResult =>
+          Boolean(result),
+        ),
+        dependencies.now?.() ?? new Date(),
       ),
     };
   };
