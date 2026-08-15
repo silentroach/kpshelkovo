@@ -287,6 +287,10 @@
       : [];
 
   const handleKeydown = (event: KeyboardEvent): void => {
+    if (event.isComposing) {
+      return;
+    }
+
     if (event.key === 'Escape') {
       event.preventDefault();
       closeDialog();

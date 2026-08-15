@@ -389,6 +389,32 @@ describe('SearchDialog', () => {
     expect(document.activeElement).not.toBe(opener);
   });
 
+  it('leaves search keyboard handling inactive during IME composition', async () => {
+    const search = vi.fn(async (query: string) =>
+      readyResponse(query, [resultAt(1)]),
+    );
+    const client: SearchClient = { search };
+    const opener = addOpener('Поиск');
+    const view = render(SearchDialog, { props: { client } });
+    const dialog = dialogFrom(view.container);
+
+    await fireEvent.click(opener);
+    const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
+    await enterDebouncedQuery(input, 'вода');
+    const resultLink = await waitFor(() => view.getByRole('link'));
+    const activation = vi.fn((event: Event) => event.preventDefault());
+    resultLink.addEventListener('click', activation);
+    input.focus();
+
+    await fireEvent.keyDown(input, { key: 'ArrowDown', isComposing: true });
+    await fireEvent.keyDown(input, { key: 'Enter', isComposing: true });
+    await fireEvent.keyDown(input, { key: 'Escape', isComposing: true });
+
+    expect(document.activeElement).toBe(input);
+    expect(activation).not.toHaveBeenCalled();
+    expect(dialog.open).toBe(true);
+  });
+
   it('uses an anchored sub-result and a plain description fallback', async () => {
     const anchoredResult: SearchResult = {
       url: '/news/long-page/',
