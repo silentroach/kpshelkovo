@@ -40,6 +40,8 @@ export interface SearchDevUnavailableResponse {
 export type SearchResponse = SearchReadyResponse | SearchDevUnavailableResponse;
 
 export interface SearchClient {
+  readonly init?: () => Promise<void>;
+  readonly preload?: (query: string) => Promise<void>;
   /** A stale request resolves to undefined so callers can leave newer state intact. */
   readonly search: (
     query: string,

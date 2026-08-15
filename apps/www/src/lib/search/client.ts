@@ -180,6 +180,7 @@ export const createPagefindSearchClient = (
 
     const promise = dependencies.loadPagefind().then(async (pagefind) => {
       await pagefind.options(pagefindOptions);
+      await pagefind.init();
       return pagefind;
     });
     pagefindPromise = promise;
@@ -190,6 +191,24 @@ export const createPagefindSearchClient = (
     });
 
     return promise;
+  };
+
+  const init = async (): Promise<void> => {
+    if (!dependencies.available) {
+      return;
+    }
+
+    await loadPagefind();
+  };
+
+  const preload = async (rawQuery: string): Promise<void> => {
+    const query = normalizeQuery(rawQuery);
+    if (!dependencies.available || !query) {
+      return;
+    }
+
+    const pagefind = await loadPagefind();
+    await pagefind.preload(query);
   };
 
   const loadResult = async (
@@ -277,7 +296,7 @@ export const createPagefindSearchClient = (
     };
   };
 
-  return { search };
+  return { init, preload, search };
 };
 
 export const pagefindSearchClient = createPagefindSearchClient();

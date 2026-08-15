@@ -14,7 +14,9 @@ export interface PagefindSearchResponse {
 }
 
 export interface PagefindRuntime {
+  readonly init: () => Promise<void>;
   readonly options: (options: PagefindOptions) => Promise<void>;
+  readonly preload: (query: string) => Promise<void>;
   readonly search: (query: string) => Promise<PagefindSearchResponse>;
 }
 

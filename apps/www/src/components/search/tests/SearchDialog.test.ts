@@ -92,6 +92,49 @@ afterEach(() => {
 });
 
 describe('SearchDialog', () => {
+  it('initializes on open and preloads input without surfacing optimization failures', async () => {
+    const init = vi.fn(async () => {
+      throw new Error('Pagefind init failed');
+    });
+    const preload = vi.fn(async () => {
+      throw new Error('Pagefind preload failed');
+    });
+    const search = vi.fn(async (query: string) =>
+      readyResponse(query, [resultAt(1)]),
+    );
+    const client: SearchClient = { init, preload, search };
+    const opener = addOpener('Поиск');
+    const view = render(SearchDialog, { props: { client } });
+    const dialog = dialogFrom(view.container);
+
+    expect(init).not.toHaveBeenCalled();
+    await fireEvent.click(opener);
+    const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
+    await waitFor(() => expect(init).toHaveBeenCalledOnce());
+
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    await fireEvent.input(input, { target: { value: '   ' } });
+    await fireEvent.input(input, { target: { value: 'вод' } });
+    await fireEvent.input(input, { target: { value: 'вода' } });
+
+    expect(preload.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "вод",
+        ],
+        [
+          "вода",
+        ],
+      ]
+    `);
+    vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS);
+    vi.useRealTimers();
+
+    await waitFor(() => expect(dialog.dataset.searchState).toBe('results'));
+    expect(search).toHaveBeenCalledOnce();
+    expect(search).toHaveBeenCalledWith('вода', 8);
+  });
+
   it('opens lazily from the delegated trigger and restores the exact opener', async () => {
     const search = vi.fn(async () => readyResponse('', []));
     const client: SearchClient = { search };

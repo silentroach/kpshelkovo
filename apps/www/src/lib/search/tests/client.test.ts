@@ -45,16 +45,18 @@ const dataCallCount = (
   loaders.reduce((total, loader) => total + loader.mock.calls.length, 0);
 
 const runtimeWith = (response: PagefindSearchResponse) => {
+  const init = vi.fn(async () => {});
   const options = vi.fn(async () => {});
+  const preload = vi.fn(async () => {});
   const search = vi.fn(async () => response);
-  const runtime: PagefindRuntime = { options, search };
+  const runtime: PagefindRuntime = { init, options, preload, search };
 
-  return { options, runtime, search };
+  return { init, options, preload, runtime, search };
 };
 
 describe('Pagefind search client', () => {
-  it('loads and configures one runtime lazily without applying sort', async () => {
-    const { options, runtime, search } = runtimeWith(responseWith());
+  it('loads, configures, and initializes one runtime lazily without applying sort', async () => {
+    const { init, options, runtime, search } = runtimeWith(responseWith());
     const loadPagefind = vi.fn(async () => runtime);
     const client = createPagefindSearchClient({
       available: true,
@@ -71,10 +73,13 @@ describe('Pagefind search client', () => {
       }
     `);
     expect(loadPagefind).not.toHaveBeenCalled();
+    await client.init?.();
+    await client.init?.();
     await client.search('первый');
     await client.search('второй');
 
     expect(loadPagefind).toHaveBeenCalledOnce();
+    expect(init).toHaveBeenCalledOnce();
     expect(options.mock.calls).toMatchInlineSnapshot(`
       [
         [
@@ -187,6 +192,8 @@ describe('Pagefind search client', () => {
         "state": "devUnavailable",
       }
     `);
+    await client.init?.();
+    await client.preload?.('тариф');
     expect(loadPagefind).not.toHaveBeenCalled();
   });
 
@@ -333,7 +340,9 @@ describe('Pagefind search client', () => {
       }),
     );
     const runtime: PagefindRuntime = {
+      init: vi.fn(async () => {}),
       options: vi.fn(async () => {}),
+      preload: vi.fn(async () => {}),
       search,
     };
     const client = createPagefindSearchClient({
@@ -396,7 +405,9 @@ describe('Pagefind search client', () => {
       }),
     );
     const runtime: PagefindRuntime = {
+      init: vi.fn(async () => {}),
       options: vi.fn(async () => {}),
+      preload: vi.fn(async () => {}),
       search,
     };
     const client = createPagefindSearchClient({
@@ -430,7 +441,9 @@ describe('Pagefind search client', () => {
         results: [{ id: '  ', data: invalidData }],
       });
     const runtime: PagefindRuntime = {
+      init: vi.fn(async () => {}),
       options: vi.fn(async () => {}),
+      preload: vi.fn(async () => {}),
       search,
     };
     const client = createPagefindSearchClient({
@@ -452,16 +465,20 @@ describe('Pagefind search client', () => {
     expect(invalidData).toHaveBeenCalledTimes(2);
   });
 
-  it('normalizes whitespace and limits the query before searching', async () => {
-    const { runtime, search } = runtimeWith(responseWith());
+  it('normalizes whitespace and limits the query before preloading and searching', async () => {
+    const { preload, runtime, search } = runtimeWith(responseWith());
     const client = createPagefindSearchClient({
       available: true,
       loadPagefind: async () => runtime,
     });
     const limitedQuery = `  ${'я'.repeat(SEARCH_QUERY_MAX_LENGTH + 10)}  `;
 
+    await client.preload?.('   ');
+    await client.preload?.(limitedQuery);
     const result = await client.search(limitedQuery);
 
+    expect(preload).toHaveBeenCalledOnce();
+    expect(preload).toHaveBeenCalledWith('я'.repeat(SEARCH_QUERY_MAX_LENGTH));
     expect(search).toHaveBeenCalledWith('я'.repeat(SEARCH_QUERY_MAX_LENGTH));
     expect(result?.query).toHaveLength(SEARCH_QUERY_MAX_LENGTH);
   });
@@ -487,7 +504,12 @@ describe('Pagefind search client', () => {
             }),
           ),
     );
-    const runtime: PagefindRuntime = { options, search };
+    const runtime: PagefindRuntime = {
+      init: vi.fn(async () => {}),
+      options,
+      preload: vi.fn(async () => {}),
+      search,
+    };
     const client = createPagefindSearchClient({
       available: true,
       loadPagefind: async () => runtime,

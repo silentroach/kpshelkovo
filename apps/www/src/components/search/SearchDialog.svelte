@@ -141,6 +141,7 @@
     restoreFocusOnClose = true;
     resetSearch();
     dialogElement.showModal();
+    void client.init?.().catch(() => {});
     await tick();
     inputElement?.focus();
   };
@@ -279,6 +280,7 @@
       return;
     }
 
+    void client.preload?.(query).catch(() => {});
     scheduleSearch(query);
   };
 
