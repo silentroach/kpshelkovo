@@ -27,11 +27,10 @@
 
 - Запрещает устаревшее выполнение через object/embed/plugin.
 
-`frame-ancestors 'self' https://metrika.yandex.ru`
+`frame-ancestors 'self'`
 
-- Сохраняет возможность встраивать страницы с текущего источника.
-- Разрешает интерфейсу Яндекс Метрики открыть страницу для поведенческих отчетов.
-- Не дает остальным внешним сайтам открывать страницы внутри iframe.
+- Разрешает встраивать страницы только с текущего источника.
+- Не дает внешним сайтам открывать страницы внутри iframe.
 
 `form-action 'self'`
 
@@ -60,11 +59,10 @@
 
 ## Сетевые запросы
 
-`connect-src 'self' https://mc.yandex.ru https://mc.yandex.com https://mc.webvisor.com https://mc.webvisor.org wss://mc.yandex.ru wss://mc.yandex.com wss://mc.webvisor.com wss://mc.webvisor.org https://api-maps.yandex.ru https://*.api-maps.yandex.ru https://*.maps.yandex.net https://*.maps.yandex.ru https://*.yandex.ru`
+`connect-src 'self' https://mc.yandex.ru https://mc.yandex.com wss://mc.yandex.ru wss://mc.yandex.com https://api-maps.yandex.ru https://*.api-maps.yandex.ru https://*.maps.yandex.net https://*.maps.yandex.ru https://*.yandex.ru`
 
 - `'self'` покрывает same-origin API, запросы данных и загрузку Pagefind metadata, index chunks и fragments из `/search/`.
 - Яндекс Метрика использует HTTPS и WebSocket точки доступа на `mc.yandex.ru` и `mc.yandex.com`.
-- Вебвизор передает записи через HTTPS и WebSocket точки доступа `mc.webvisor.com` и `mc.webvisor.org`.
 - JS API Яндекс Карт использует `api-maps.yandex.ru` и служебные поддомены `*.api-maps.yandex.ru`.
 - Яндекс Карты загружают стили карты, списки объектов, тайлы и renderer-данные с `*.maps.yandex.net`, `*.maps.yandex.ru` и части точек доступа `*.yandex.ru`.
 
@@ -122,11 +120,10 @@ JS API Яндекс Карт v3 не является iframe. Для него н
 Яндекс Метрика:
 
 - Официальная справка: `https://yandex.ru/support/metrica/ru/code/install-counter-csp`.
-- Родительский фрейм для поведенческих отчетов: `https://metrika.yandex.ru`.
 - Скрипты: `https://mc.yandex.ru`, `https://mc.yandex.com`.
-- Соединения: `https://mc.yandex.ru`, `https://mc.yandex.com`, `https://mc.webvisor.com`, `https://mc.webvisor.org` и соответствующие WebSocket-адреса.
+- Соединения: `https://mc.yandex.ru`, `https://mc.yandex.com`, `wss://mc.yandex.ru`, `wss://mc.yandex.com`.
 - Beacon-изображения: `https://mc.yandex.ru`, `https://mc.yandex.com`.
-- В текущей инициализации включены Вебвизор и карта кликов; отдельные внешние фреймы для их записи на сайте не используются.
+- Документация Метрики также описывает `child-src` и `frame-src` для Вебвизора, карт кликов, ссылок и скроллинга. Эти источники не добавлены, потому что в текущей инициализации счетчика `webvisor: false` и `clickmap: false`.
 
 Яндекс Карты через iframe-виджеты:
 

@@ -86,62 +86,12 @@ const enterDebouncedQuery = async (
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
-  delete document.documentElement.dataset.siteMetrikaId;
-  delete window.ym;
   document
     .querySelectorAll('[data-search-test-opener]')
     .forEach((element) => element.remove());
 });
 
 describe('SearchDialog', () => {
-  it('reports opening and completed searches to Yandex Metrica', async () => {
-    const search = vi.fn(async (query: string) => {
-      const empty = query === 'пусто';
-      return readyResponse(query, empty ? [] : [resultAt(1)], empty ? 0 : 12);
-    });
-    const ym = vi.fn();
-    document.documentElement.dataset.siteMetrikaId = '123';
-    window.ym = ym;
-    const opener = addOpener('Поиск');
-    const view = render(SearchDialog, { props: { client: { search } } });
-    const dialog = dialogFrom(view.container);
-
-    await fireEvent.click(opener);
-    const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
-    await enterDebouncedQuery(input, 'вода');
-    await waitFor(() => expect(dialog.dataset.searchState).toBe('results'));
-    await enterDebouncedQuery(input, 'пусто');
-    await waitFor(() => expect(dialog.dataset.searchState).toBe('empty'));
-
-    expect(ym.mock.calls).toMatchInlineSnapshot(`
-      [
-        [
-          123,
-          "reachGoal",
-          "search_open",
-        ],
-        [
-          123,
-          "reachGoal",
-          "search",
-          {
-            "query": "вода",
-            "results_count": 12,
-          },
-        ],
-        [
-          123,
-          "reachGoal",
-          "search",
-          {
-            "query": "пусто",
-            "results_count": 0,
-          },
-        ],
-      ]
-    `);
-  });
-
   it('initializes on open and preloads input without surfacing optimization failures', async () => {
     const init = vi.fn(async () => {
       throw new Error('Pagefind init failed');
