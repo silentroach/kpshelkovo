@@ -250,6 +250,16 @@ html[data-site-navigation-pending] .site-navigation-progress::before {
   font-size: 0.75rem;
 }
 
+html:has(.site-search-dialog[open]),
+html:has(.site-search-dialog[open]) body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html:has(.site-search-dialog[open]) {
+  scrollbar-gutter: stable;
+}
+
 .site-search-dialog {
   --color-border: oklch(88% 0 0);
   --color-border-strong: oklch(78% 0 0);

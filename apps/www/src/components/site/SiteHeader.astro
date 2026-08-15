@@ -8,6 +8,11 @@ import {
 } from '@/lib/home/status';
 import { loadStatusData } from '@/lib/status/load';
 
+interface Props {
+  readonly mobileOnly?: boolean;
+}
+
+const { mobileOnly = false }: Props = Astro.props;
 const status = await loadStatusData();
 const buildNow = Date.now();
 const statusState = getHomeStatusState(status.incidents, buildNow);
@@ -18,25 +23,45 @@ const maintenanceWindows = getHomeStatusMaintenanceWindows(
 );
 ---
 
-<header class="site-header z-40 border-b md:sticky md:top-0">
+<header
+  class:list={[
+    'site-header z-40 border-b md:sticky md:top-0',
+    mobileOnly && 'md:hidden',
+  ]}
+  data-mobile-only={mobileOnly ? '' : undefined}
+>
   <div
-    class="ui-page flex min-h-12 items-center justify-between gap-2 px-5 py-2 md:min-h-14 md:gap-4 md:px-6 md:py-2.5"
+    class="site-header-inner ui-page flex min-h-12 items-center justify-between gap-2 px-5 py-2 md:min-h-14 md:gap-4 md:px-6 md:py-2.5"
   >
     <a href="/" class="site-header-brand"> Шелково Онлайн </a>
 
-    <div class="hidden min-w-0 md:block">
-      <SiteNav
-        variant="header"
-        statusState={statusState}
-        statusAriaLabel={statusAriaLabel}
-      />
-    </div>
+    {
+      !mobileOnly && (
+        <div class="hidden min-w-0 md:block">
+          <SiteNav
+            variant="header"
+            statusState={statusState}
+            statusAriaLabel={statusAriaLabel}
+          />
+        </div>
+      )
+    }
 
     <div class="flex shrink-0 items-center gap-1.5 md:hidden">
+      <a
+        href="/status/"
+        aria-label={statusAriaLabel}
+        title={statusAriaLabel}
+        class="site-header-status-link"
+        data-home-status-link
+        data-home-status-state={statusState}
+      >
+        <span aria-hidden="true" class="site-header-status-dot"></span>
+      </a>
       <SearchTrigger variant="mobile" />
       <details class="site-header-menu">
-        <summary class="site-header-menu-button">
-          <span>Меню</span>
+        <summary class="site-header-menu-button" aria-label="Меню">
+          <span class="site-header-menu-label">Меню</span>
           <span aria-hidden="true" class="site-header-menu-icon"></span>
         </summary>
 
@@ -113,6 +138,50 @@ const maintenanceWindows = getHomeStatusMaintenanceWindows(
     flex: none;
   }
 
+  .site-header-status-link {
+    display: inline-flex;
+    width: 2.25rem;
+    min-height: 2.25rem;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    color: var(--color-foreground);
+    transition: background-color 0.2s ease;
+  }
+
+  .site-header-status-link:is(:hover, :focus-visible) {
+    background: color-mix(in oklab, var(--color-primary-soft) 76%, transparent);
+    outline: none;
+  }
+
+  .site-header-status-link:focus-visible {
+    box-shadow: 0 0 0 2px var(--color-ring);
+  }
+
+  .site-header-status-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 999px;
+    box-shadow: 0 0 0 1px
+      color-mix(in oklab, var(--color-surface-raised) 72%, transparent);
+  }
+
+  .site-header-status-link[data-home-status-state='green']
+    .site-header-status-dot {
+    background: var(--color-success);
+  }
+
+  .site-header-status-link[data-home-status-state='amber']
+    .site-header-status-dot {
+    background: var(--color-warning);
+  }
+
+  .site-header-status-link[data-home-status-state='red']
+    .site-header-status-dot {
+    background: var(--color-danger);
+  }
+
   .site-header-menu-button {
     display: inline-flex;
     min-height: 2.25rem;
@@ -179,6 +248,51 @@ const maintenanceWindows = getHomeStatusMaintenanceWindows(
       0 1rem 2rem oklch(24% 0.04 145 / 0.12);
     -webkit-backdrop-filter: saturate(165%) blur(16px);
     backdrop-filter: saturate(165%) blur(16px);
+  }
+
+  @media (max-width: 24rem) {
+    .site-header-menu-button {
+      width: 2.25rem;
+      justify-content: center;
+      padding-inline: 0.4375rem;
+    }
+
+    .site-header-menu-label {
+      display: none;
+    }
+
+    .site-header-menu-icon {
+      width: 1rem;
+      height: 0.75rem;
+      border: 0;
+      background: linear-gradient(
+        to bottom,
+        currentColor 0 0.125rem,
+        transparent 0.125rem 0.3125rem,
+        currentColor 0.3125rem 0.4375rem,
+        transparent 0.4375rem 0.625rem,
+        currentColor 0.625rem 0.75rem
+      );
+    }
+
+    .site-header-menu[open] .site-header-menu-icon {
+      transform: none;
+    }
+  }
+
+  @media (max-width: 22rem) {
+    .site-header-inner {
+      gap: 0.375rem;
+      padding-inline: 0.75rem;
+    }
+
+    .site-header-brand {
+      white-space: nowrap;
+    }
+
+    .site-header-mobile-panel {
+      width: min(20rem, calc(100vw - 2.75rem));
+    }
   }
 
   @media (min-width: 48rem) {

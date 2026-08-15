@@ -17,7 +17,7 @@ const renderNav = async (
     props: {
       variant,
       statusState: 'green',
-      statusAriaLabel: 'Статус: все сервисы работают',
+      statusAriaLabel: 'Статус: всё работает',
     },
     request: new Request(`https://example.com${pathname}`),
   });

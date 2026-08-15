@@ -12,6 +12,7 @@ type YandexMetrika = ((...args: readonly unknown[]) => void) & {
 declare global {
   interface Window {
     __shelkovoNavigationProgress?: boolean;
+    __shelkovoSiteHeaderMenu?: boolean;
     __shelkovoSiteNavDropdowns?: boolean;
     __shelkovoSettlementsFallback?: boolean;
     __shelkovoYmDeferred?: boolean;
@@ -24,6 +25,8 @@ declare global {
 const METRIKA_SCRIPT_SRC = 'https://mc.yandex.ru/metrika/tag.js';
 const NAVIGATION_PENDING_ATTR = 'data-site-navigation-pending';
 const NAVIGATION_DELAY_MS = 50;
+const SEARCH_TRIGGER_SELECTOR = '[data-search-trigger]';
+const SITE_HEADER_MENU_SELECTOR = 'details.site-header-menu[open]';
 const SITE_NAV_DROPDOWN_SELECTOR = '[data-site-nav-dropdown]';
 const SITE_NAV_DROPDOWN_BUTTON_SELECTOR = '[data-site-nav-dropdown-button]';
 
@@ -272,6 +275,28 @@ const installSiteNavDropdowns = (): void => {
   document.addEventListener('astro:page-load', bind);
 };
 
+const bindSiteHeaderMenu = (): void => {
+  if (window.__shelkovoSiteHeaderMenu) {
+    return;
+  }
+
+  window.__shelkovoSiteHeaderMenu = true;
+  document.addEventListener('click', (event) => {
+    if (
+      !(event.target instanceof Element) ||
+      !event.target.closest(SEARCH_TRIGGER_SELECTOR)
+    ) {
+      return;
+    }
+
+    document
+      .querySelectorAll<HTMLDetailsElement>(SITE_HEADER_MENU_SELECTOR)
+      .forEach((menu) => {
+        menu.open = false;
+      });
+  });
+};
+
 const bindSettlementsFallback = (): void => {
   if (window.__shelkovoSettlementsFallback) {
     return;
@@ -286,6 +311,7 @@ const bindSettlementsFallback = (): void => {
 };
 
 bindNavigationProgress();
+bindSiteHeaderMenu();
 installSiteNavDropdowns();
 runWhenDocumentReady(() => installHomeStatusHydration());
 bindMetrikaLoader();

@@ -16,9 +16,9 @@ const HOME_STATUS_MAINTENANCE_WINDOWS_SELECTOR =
   '[data-home-status-maintenance-windows]';
 
 export const HOME_STATUS_LABELS = {
-  green: 'все сервисы работают',
-  amber: 'идут плановые работы',
-  red: 'есть активные проблемы',
+  green: 'всё работает',
+  amber: 'плановые работы',
+  red: 'есть проблемы',
 } as const satisfies Record<HomeStatusState, string>;
 
 export const getHomeStatusAriaLabel = (state: HomeStatusState): string =>
@@ -121,8 +121,11 @@ const setHomeStatusState = (
   link: HTMLElement,
   state: HomeStatusState,
 ): void => {
+  const label = getHomeStatusAriaLabel(state);
+
   link.dataset.homeStatusState = state;
-  link.setAttribute('aria-label', getHomeStatusAriaLabel(state));
+  link.setAttribute('aria-label', label);
+  link.setAttribute('title', label);
 };
 
 const homeStatusLinks = (root: ParentNode): readonly HTMLElement[] =>

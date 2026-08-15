@@ -43,7 +43,7 @@ const reviewsCurrent = getCurrent('/reviews/');
 const statusCurrent = getCurrent('/status/');
 const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
 const navClass = isHero
-  ? 'home-hero-nav flex flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm font-medium md:flex-nowrap md:gap-8 md:text-base lg:gap-10'
+  ? 'home-hero-nav hidden flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm font-medium md:flex md:flex-nowrap md:gap-8 md:text-base lg:gap-10'
   : 'site-nav site-nav-header flex items-center justify-end gap-3 text-sm font-semibold lg:gap-6';
 const dropdownClass = isHero
   ? 'home-hero-nav-dropdown site-nav-dropdown group relative'
@@ -349,7 +349,7 @@ const statusLinkClass = isHero
     display: flex;
     flex-direction: column;
     gap: 0.125rem;
-    font-size: 1rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     line-height: 1.35;
   }
@@ -419,7 +419,7 @@ const statusLinkClass = isHero
   .site-nav-mobile-nested {
     margin-left: 0.5rem;
     padding-left: 1rem;
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     font-weight: 500;
   }
 

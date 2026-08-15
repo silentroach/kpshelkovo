@@ -33,7 +33,7 @@ interface Props {
   search?: SearchDocument;
 }
 
-const defaultShowSiteHeader = Astro.url.pathname !== '/';
+const isHomePage = Astro.url.pathname === '/';
 
 const {
   title = 'Шелково Онлайн',
@@ -47,7 +47,7 @@ const {
   schema,
   preconnectYandexMaps = false,
   bodyClass,
-  showSiteHeader = defaultShowSiteHeader,
+  showSiteHeader = true,
   search,
 } = Astro.props;
 
@@ -71,7 +71,7 @@ const ymId = 108975391;
 const contentTransition = fade({ duration: '60ms' });
 const bodyClasses = [
   'ui-root-site',
-  showSiteHeader && 'site-has-header',
+  showSiteHeader && !isHomePage && 'site-has-header',
   bodyClass,
   'flex min-h-screen flex-col text-foreground',
 ]
@@ -188,7 +188,7 @@ const searchMetadata = search
         </noscript>
       )
     }
-    {showSiteHeader && <SiteHeader />}
+    {showSiteHeader && <SiteHeader mobileOnly={isHomePage} />}
     <div
       class="flex-1"
       data-pagefind-root={search ? true : undefined}

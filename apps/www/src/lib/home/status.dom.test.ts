@@ -11,12 +11,12 @@ import {
 const WINDOW_START = 1779094800000;
 const WINDOW_END = 1779105600000;
 const DEFAULT_WINDOWS_PAYLOAD = `[{"start":${WINDOW_START},"end":${WINDOW_END}}]`;
-const AMBER_ARIA_LABEL = 'Статус: идут плановые работы';
-const GREEN_ARIA_LABEL = 'Статус: все сервисы работают';
+const AMBER_ARIA_LABEL = 'Статус: плановые работы';
+const GREEN_ARIA_LABEL = 'Статус: всё работает';
 const STATUS_LABELS = {
-  green: 'все сервисы работают',
-  amber: 'идут плановые работы',
-  red: 'есть активные проблемы',
+  green: 'всё работает',
+  amber: 'плановые работы',
+  red: 'есть проблемы',
 } as const;
 const MAINTENANCE_WINDOW = {
   kind: 'maintenance',
@@ -134,12 +134,13 @@ describe('hydrateHomeStatus', () => {
     expect(getStatusLink().dataset.homeStatusState).toBe('red');
   });
 
-  it('updates aria-label when it changes the state to amber', () => {
+  it('updates the accessible label and hover hint with the state', () => {
     renderHomeStatus();
 
     hydrateHomeStatus(document, WINDOW_START + 1);
 
     expect(getStatusLink().getAttribute('aria-label')).toBe(AMBER_ARIA_LABEL);
+    expect(getStatusLink().getAttribute('title')).toBe(AMBER_ARIA_LABEL);
   });
 
   it('updates every rendered status link', () => {
@@ -159,11 +160,11 @@ describe('hydrateHomeStatus', () => {
     ).toMatchInlineSnapshot(`
       [
         {
-          "label": "Статус: идут плановые работы",
+          "label": "Статус: плановые работы",
           "state": "amber",
         },
         {
-          "label": "Статус: идут плановые работы",
+          "label": "Статус: плановые работы",
           "state": "amber",
         },
       ]

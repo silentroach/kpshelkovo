@@ -35,10 +35,11 @@ describe('BaseLayout site header', () => {
     expect(html).toContain('<header class="site-header');
   });
 
-  it('keeps the site header out of the home hero', async () => {
+  it('shows a mobile-only site header on the home page', async () => {
     const html = await renderLayout('/');
 
-    expect(html).not.toContain('<header class="site-header');
+    expect(html).toContain('<header class="site-header');
+    expect(html).toContain('data-mobile-only');
   });
 });
 

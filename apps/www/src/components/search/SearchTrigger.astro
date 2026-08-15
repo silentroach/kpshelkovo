@@ -14,6 +14,7 @@ const { variant }: Props = Astro.props;
   type="button"
   class:list={['site-search-trigger', `site-search-trigger--${variant}`]}
   aria-label="Поиск"
+  title="Поиск"
   aria-haspopup="dialog"
   data-search-trigger
   data-pagefind-ignore="all"
@@ -38,6 +39,7 @@ const { variant }: Props = Astro.props;
     line-height: 1.25;
     cursor: pointer;
     transition:
+      background-color 0.2s ease,
       color 0.2s ease,
       opacity 0.2s ease;
   }
@@ -50,6 +52,10 @@ const { variant }: Props = Astro.props;
   .site-search-trigger--header:is(:hover, :focus-visible),
   .site-search-trigger--mobile:is(:hover, :focus-visible) {
     color: var(--color-primary-hover);
+  }
+
+  .site-search-trigger--mobile:is(:hover, :focus-visible) {
+    background: color-mix(in oklab, var(--color-primary-soft) 76%, transparent);
   }
 
   .site-search-trigger--hero:is(:hover, :focus-visible) {
