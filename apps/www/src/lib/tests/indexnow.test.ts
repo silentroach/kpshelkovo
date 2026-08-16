@@ -19,16 +19,10 @@ const createTemporaryDirectory = async (): Promise<string> => {
   return directory;
 };
 
-const writeSitemap = async (
-  siteRoot: string,
+const writeUrlManifest = async (
+  manifestPath: string,
   urls: readonly string[],
-): Promise<void> => {
-  const entries = urls.map((url) => `<url><loc>${url}</loc></url>`).join('');
-  await writeFile(
-    join(siteRoot, 'sitemap-0.xml'),
-    `<?xml version="1.0" encoding="UTF-8"?><urlset>${entries}</urlset>`,
-  );
-};
+): Promise<void> => writeFile(manifestPath, JSON.stringify(urls));
 
 afterEach(async () => {
   await Promise.all(
@@ -71,11 +65,12 @@ describe('writeIndexNowKeyFile', () => {
 });
 
 describe('submitIndexNowChanges', () => {
-  it('submits changed sitemap pages and deleted routes after verifying the key', async () => {
+  it('submits changed indexable pages and deleted routes after verifying the key', async () => {
     const siteRoot = await createTemporaryDirectory();
+    const urlManifestPath = join(siteRoot, 'indexnow-urls.json');
     const changesPath = join(siteRoot, 'rsync-changes.txt');
 
-    await writeSitemap(siteRoot, [
+    await writeUrlManifest(urlManifestPath, [
       'https://kpshelkovo.online/',
       'https://kpshelkovo.online/news/new/',
       'https://kpshelkovo.online/news/tags/%D0%B2%D0%BE%D0%B4%D0%B0/',
@@ -98,7 +93,7 @@ describe('submitIndexNowChanges', () => {
       .mockResolvedValueOnce(new Response('', { status: 202 }));
 
     await expect(
-      submitIndexNowChanges(siteRoot, changesPath, TEST_KEY, request),
+      submitIndexNowChanges(urlManifestPath, changesPath, TEST_KEY, request),
     ).resolves.toMatchInlineSnapshot(`
       [
         [

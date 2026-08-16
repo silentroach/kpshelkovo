@@ -34,7 +34,7 @@ const appendIndexNowSummary = async (
   await appendFile(summaryPath, `${lines.join('\n')}\n`, 'utf8');
 };
 
-const [command, siteRoot, changesPath] = process.argv.slice(2);
+const [command, targetPath, changesPath] = process.argv.slice(2);
 const key = process.env.INDEXNOW_KEY;
 
 if (!key) {
@@ -43,22 +43,22 @@ if (!key) {
 
 switch (command) {
   case 'prepare': {
-    if (!siteRoot || changesPath) {
+    if (!targetPath || changesPath) {
       throw new Error('usage: indexnow prepare <site-root>');
     }
 
-    await writeIndexNowKeyFile(siteRoot, key);
+    await writeIndexNowKeyFile(targetPath, key);
     console.log('IndexNow ownership file prepared.');
     break;
   }
 
   case 'submit': {
-    if (!siteRoot || !changesPath) {
-      throw new Error('usage: indexnow submit <site-root> <rsync-changes>');
+    if (!targetPath || !changesPath) {
+      throw new Error('usage: indexnow submit <url-manifest> <rsync-changes>');
     }
 
     const [urls, requestCount] = await submitIndexNowChanges(
-      siteRoot,
+      targetPath,
       changesPath,
       key,
     );

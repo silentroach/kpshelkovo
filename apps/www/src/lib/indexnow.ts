@@ -1,7 +1,6 @@
-import { readFile, readdir, writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { XMLParser } from 'fast-xml-parser';
 import { z } from 'zod';
 
 const INDEXNOW_ENDPOINT = 'https://api.indexnow.org/indexnow';
@@ -10,15 +9,7 @@ const INDEXNOW_MAX_URLS = 10_000;
 const INDEXNOW_RESERVED_KEYS: ReadonlySet<string> = new Set(['llms-full']);
 const INDEXNOW_SITE = new URL('https://kpshelkovo.online');
 const INDEXNOW_TIMEOUT_MS = 15_000;
-const SITEMAP_FILE_PATTERN = /^sitemap-[0-9]+\.xml$/u;
-const SITEMAP_SCHEMA = z.object({
-  urlset: z.object({
-    url: z.array(z.object({ loc: z.string() })),
-  }),
-});
-const SITEMAP_XML_PARSER = new XMLParser({
-  isArray: (_tagName, path) => path === 'urlset.url',
-});
+const INDEXNOW_URL_MANIFEST_SCHEMA = z.array(z.string().url()).min(1);
 
 const validateIndexNowKey = (key: string): void => {
   if (!INDEXNOW_KEY_PATTERN.test(key)) {
@@ -36,35 +27,20 @@ const canonicalSiteUrl = (value: string): string => {
   const url = new URL(value);
 
   if (url.origin !== INDEXNOW_SITE.origin) {
-    throw new Error(`sitemap URL must use ${INDEXNOW_SITE.origin}`);
+    throw new Error(`IndexNow URL must use ${INDEXNOW_SITE.origin}`);
   }
 
   return url.toString();
 };
 
-const readSitemapUrls = async (
-  siteRoot: string,
+const readIndexNowUrls = async (
+  manifestPath: string,
 ): Promise<ReadonlySet<string>> => {
-  const sitemapFiles = (await readdir(siteRoot))
-    .filter((name) => SITEMAP_FILE_PATTERN.test(name))
-    .sort();
+  const urls = INDEXNOW_URL_MANIFEST_SCHEMA.parse(
+    JSON.parse(await readFile(manifestPath, 'utf8')),
+  );
 
-  if (sitemapFiles.length === 0) {
-    throw new Error(`no generated sitemap files found in ${siteRoot}`);
-  }
-
-  const urls = new Set<string>();
-
-  for (const sitemapFile of sitemapFiles) {
-    const xml = await readFile(join(siteRoot, sitemapFile), 'utf8');
-    const sitemap = SITEMAP_SCHEMA.parse(SITEMAP_XML_PARSER.parse(xml));
-
-    for (const entry of sitemap.urlset.url) {
-      urls.add(canonicalSiteUrl(entry.loc));
-    }
-  }
-
-  return urls;
+  return new Set(urls.map(canonicalSiteUrl));
 };
 
 const htmlFileUrl = (file: string): string | undefined => {
@@ -84,10 +60,10 @@ const htmlFileUrl = (file: string): string | undefined => {
 };
 
 const changedIndexableUrls = async (
-  siteRoot: string,
+  urlManifestPath: string,
   changesPath: string,
 ): Promise<readonly string[]> => {
-  const sitemapUrls = await readSitemapUrls(siteRoot);
+  const indexNowUrls = await readIndexNowUrls(urlManifestPath);
   const changes = await readFile(changesPath, 'utf8');
   const urls = new Set<string>();
 
@@ -103,7 +79,7 @@ const changedIndexableUrls = async (
 
     if (
       url &&
-      (itemizedChange.startsWith('*deleting') || sitemapUrls.has(url))
+      (itemizedChange.startsWith('*deleting') || indexNowUrls.has(url))
     ) {
       urls.add(url);
     }
@@ -181,7 +157,7 @@ export const submitIndexNowUrls = async (
 };
 
 export const submitIndexNowChanges = async (
-  siteRoot: string,
+  urlManifestPath: string,
   changesPath: string,
   key: string,
   request: typeof fetch = fetch,
@@ -189,7 +165,7 @@ export const submitIndexNowChanges = async (
   readonly [submittedUrls: readonly string[], requestCount: number]
 > => {
   validateIndexNowKey(key);
-  const urls = await changedIndexableUrls(siteRoot, changesPath);
+  const urls = await changedIndexableUrls(urlManifestPath, changesPath);
 
   await verifyIndexNowKey(key, request);
 

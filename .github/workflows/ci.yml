@@ -266,7 +266,7 @@ jobs:
         run: |
           ssh_opts="-p $DEPLOY_PORT -o ControlMaster=auto -o ControlPersist=600 -o ControlPath=$HOME/.ssh/cm-%C"
 
-          node scripts/indexnow.ts submit dist/www "$RUNNER_TEMP/indexnow-rsync-changes.txt"
+          node scripts/indexnow.ts submit apps/www/dist/indexnow-urls.json "$RUNNER_TEMP/indexnow-rsync-changes.txt"
           ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "rm -f '$INDEXNOW_PENDING_PATH'"
 
       - name: Publish deployed URLs
