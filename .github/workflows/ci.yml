@@ -81,6 +81,7 @@ jobs:
       DEPLOY_USER: ${{ secrets.DEPLOY_USER || 'deploy' }}
       DEPLOY_WWW_PATH: ${{ secrets.DEPLOY_WWW_PATH }}
       DEPLOY_MEDIA_PATH: /var/www/media-kpshelkovo-online
+      INDEXNOW_PENDING_PATH: .cache/kpshelkovo/indexnow-rsync-changes.txt
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -101,6 +102,11 @@ jobs:
         env:
           PUBLIC_YANDEX_MAPS_API_KEY: ${{ secrets.YANDEX_MAPS_API_KEY }}
         run: pnpm build
+
+      - name: Prepare IndexNow ownership file
+        env:
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+        run: node scripts/indexnow.ts prepare dist/www
 
       - name: Validate deploy settings
         run: |
@@ -198,13 +204,34 @@ jobs:
           # для уже существующих файлов; новые файлы получат mtime деплоя)
           rsync_opts="-azc --no-t --delete --mkpath --chmod=D755,F644"
           pagefind_manifest=$(mktemp)
+          indexnow_deploy_manifest=$(mktemp)
+          indexnow_manifest="$RUNNER_TEMP/indexnow-rsync-changes.txt"
           pagefind_retention_minutes=$((7 * 24 * 60))
-          trap 'rm -f "$pagefind_manifest"' EXIT
+          trap 'rm -f "$pagefind_manifest" "$indexnow_deploy_manifest"' EXIT
 
           find dist/www/search -type f \
             \( -name 'pagefind.*.pf_meta' -o -name '*.pf_index' -o -name '*.pf_filter' -o -name '*.pf_fragment' \) \
             -printf '%P\0' > "$pagefind_manifest"
           test -s "$pagefind_manifest"
+
+          # IndexNow submits only canonical HTML changed by this deployment.
+          rsync $rsync_opts --dry-run --itemize-changes --out-format='%i|%n' \
+            --filter='protect /search/pagefind.*.pf_meta' \
+            --filter='protect /search/index/*.pf_index' \
+            --filter='protect /search/filter/*.pf_filter' \
+            --filter='protect /search/fragment/*.pf_fragment' \
+            -e "ssh $ssh_opts" \
+            dist/www/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_WWW_PATH/" \
+            > "$indexnow_deploy_manifest"
+
+          # Keep unacknowledged changes outside the web root so a retry can submit them.
+          ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -eu
+            mkdir -p '.cache/kpshelkovo'
+            cat >> '$INDEXNOW_PENDING_PATH'
+          " < "$indexnow_deploy_manifest"
+          ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" \
+            "cat '$INDEXNOW_PENDING_PATH'" > "$indexnow_manifest"
 
           # Active clients may still request chunks from earlier index generations.
           rsync $rsync_opts \
@@ -232,6 +259,15 @@ jobs:
 
       - name: Smoke Pagefind production delivery
         run: sh scripts/smoke-pagefind-delivery.sh https://kpshelkovo.online dist/www
+
+      - name: Submit changed URLs to IndexNow
+        env:
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+        run: |
+          ssh_opts="-p $DEPLOY_PORT -o ControlMaster=auto -o ControlPersist=600 -o ControlPath=$HOME/.ssh/cm-%C"
+
+          node scripts/indexnow.ts submit apps/www/dist/indexnow-urls.json "$RUNNER_TEMP/indexnow-rsync-changes.txt"
+          ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "rm -f '$INDEXNOW_PENDING_PATH'"
 
       - name: Publish deployed URLs
         run: |

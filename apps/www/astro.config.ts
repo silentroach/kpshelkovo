@@ -12,12 +12,14 @@ import {
 } from './src/lib/sitemap';
 import { loadSitemapMetadataIndex } from './src/lib/sitemap-data';
 import { createAstroMarkdownProcessor } from './src/lib/markdown/astro-processor';
+import { indexNowUrlManifest } from './src/integrations/indexnow-url-manifest';
 import { pagefindDevSnapshot } from './src/integrations/pagefind-dev-snapshot';
 
 const plugins = [tailwindcss()];
 const devServerPort = 4321;
 const site = 'https://kpshelkovo.online';
 let sitemapMetadataIndex: Promise<SitemapMetadataIndex> | undefined;
+const indexNowUrls = new Set<string>();
 
 const loadSitemapMetadata = (): Promise<SitemapMetadataIndex> => {
   sitemapMetadataIndex ??= loadSitemapMetadataIndex();
@@ -27,8 +29,18 @@ const loadSitemapMetadata = (): Promise<SitemapMetadataIndex> => {
 
 const serializeSitemapItem = async (
   item: SitemapItem,
-): Promise<SitemapItem | undefined> =>
-  applySitemapMetadata(item, await loadSitemapMetadata());
+): Promise<SitemapItem | undefined> => {
+  const serializedItem = applySitemapMetadata(
+    item,
+    await loadSitemapMetadata(),
+  );
+
+  if (serializedItem) {
+    indexNowUrls.add(serializedItem.url);
+  }
+
+  return serializedItem;
+};
 
 export default defineConfig({
   output: 'static',
@@ -85,6 +97,7 @@ export default defineConfig({
       },
       serialize: serializeSitemapItem,
     }),
+    indexNowUrlManifest(indexNowUrls),
     compressor({
       gzip: {
         level: 9,
