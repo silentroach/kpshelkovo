@@ -58,6 +58,16 @@ describe('writeIndexNowKeyFile', () => {
       `[Error: INDEXNOW_KEY must contain 8-128 ASCII letters, numbers, or dashes]`,
     );
   });
+
+  it('rejects keys reserved by generated root text routes', async () => {
+    const siteRoot = await createTemporaryDirectory();
+
+    await expect(
+      writeIndexNowKeyFile(siteRoot, 'llms-full'),
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `[Error: INDEXNOW_KEY must not match a generated root text route]`,
+    );
+  });
 });
 
 describe('submitIndexNowChanges', () => {
@@ -89,7 +99,17 @@ describe('submitIndexNowChanges', () => {
 
     await expect(
       submitIndexNowChanges(siteRoot, changesPath, TEST_KEY, request),
-    ).resolves.toEqual([4, 1]);
+    ).resolves.toMatchInlineSnapshot(`
+      [
+        [
+          "https://kpshelkovo.online/",
+          "https://kpshelkovo.online/news/new/",
+          "https://kpshelkovo.online/news/old/",
+          "https://kpshelkovo.online/news/tags/%D0%B2%D0%BE%D0%B4%D0%B0/",
+        ],
+        1,
+      ]
+    `);
 
     expect(
       request.mock.calls.map(([url, init]) => ({

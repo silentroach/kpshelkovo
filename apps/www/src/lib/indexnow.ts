@@ -1,20 +1,24 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+import { XMLParser } from 'fast-xml-parser';
+import { z } from 'zod';
+
 const INDEXNOW_ENDPOINT = 'https://api.indexnow.org/indexnow';
 const INDEXNOW_KEY_PATTERN = /^[A-Za-z0-9-]{8,128}$/u;
 const INDEXNOW_MAX_URLS = 10_000;
+const INDEXNOW_RESERVED_KEYS: ReadonlySet<string> = new Set(['llms-full']);
 const INDEXNOW_SITE = new URL('https://kpshelkovo.online');
 const INDEXNOW_TIMEOUT_MS = 15_000;
 const SITEMAP_FILE_PATTERN = /^sitemap-[0-9]+\.xml$/u;
-const SITEMAP_LOCATION_PATTERN = /<loc>([^<]+)<\/loc>/gu;
-const XML_ENTITIES: Readonly<Record<string, string>> = {
-  amp: '&',
-  apos: "'",
-  gt: '>',
-  lt: '<',
-  quot: '"',
-};
+const SITEMAP_SCHEMA = z.object({
+  urlset: z.object({
+    url: z.array(z.object({ loc: z.string() })),
+  }),
+});
+const SITEMAP_XML_PARSER = new XMLParser({
+  isArray: (_tagName, path) => path === 'urlset.url',
+});
 
 const validateIndexNowKey = (key: string): void => {
   if (!INDEXNOW_KEY_PATTERN.test(key)) {
@@ -22,13 +26,11 @@ const validateIndexNowKey = (key: string): void => {
       'INDEXNOW_KEY must contain 8-128 ASCII letters, numbers, or dashes',
     );
   }
-};
 
-const decodeXmlText = (value: string): string =>
-  value.replace(
-    /&(amp|apos|gt|lt|quot);/gu,
-    (_, entity: string) => XML_ENTITIES[entity] ?? entity,
-  );
+  if (INDEXNOW_RESERVED_KEYS.has(key)) {
+    throw new Error('INDEXNOW_KEY must not match a generated root text route');
+  }
+};
 
 const canonicalSiteUrl = (value: string): string => {
   const url = new URL(value);
@@ -55,13 +57,10 @@ const readSitemapUrls = async (
 
   for (const sitemapFile of sitemapFiles) {
     const xml = await readFile(join(siteRoot, sitemapFile), 'utf8');
+    const sitemap = SITEMAP_SCHEMA.parse(SITEMAP_XML_PARSER.parse(xml));
 
-    for (const match of xml.matchAll(SITEMAP_LOCATION_PATTERN)) {
-      const location = match[1];
-
-      if (location) {
-        urls.add(canonicalSiteUrl(decodeXmlText(location)));
-      }
+    for (const entry of sitemap.urlset.url) {
+      urls.add(canonicalSiteUrl(entry.loc));
     }
   }
 
@@ -186,11 +185,13 @@ export const submitIndexNowChanges = async (
   changesPath: string,
   key: string,
   request: typeof fetch = fetch,
-): Promise<readonly [submittedUrlCount: number, requestCount: number]> => {
+): Promise<
+  readonly [submittedUrls: readonly string[], requestCount: number]
+> => {
   validateIndexNowKey(key);
   const urls = await changedIndexableUrls(siteRoot, changesPath);
 
   await verifyIndexNowKey(key, request);
 
-  return [urls.length, await submitIndexNowUrls(key, urls, request)];
+  return [urls, await submitIndexNowUrls(key, urls, request)];
 };

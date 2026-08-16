@@ -34,6 +34,7 @@
     "@shelkovo/url": "workspace:*",
     "astro": "^7.2.0",
     "diff": "^9.0.0",
+    "fast-xml-parser": "^5.9.3",
     "svelte": "^5.56.8",
     "vcard-creator": "^1.0.0",
     "yaml": "^2.9.0",

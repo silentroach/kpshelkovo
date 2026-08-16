@@ -1,7 +1,38 @@
+import { appendFile } from 'node:fs/promises';
+
 import {
   submitIndexNowChanges,
   writeIndexNowKeyFile,
 } from '../apps/www/src/lib/indexnow.ts';
+
+const appendIndexNowSummary = async (
+  urls: readonly string[],
+  requestCount: number,
+): Promise<void> => {
+  const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+
+  if (!summaryPath) {
+    return;
+  }
+
+  const lines = [
+    '## IndexNow submission',
+    '',
+    `- URLs submitted: **${urls.length}**`,
+    `- Requests accepted: **${requestCount}**`,
+  ];
+
+  if (urls.length > 0) {
+    lines.push(
+      '',
+      '### Submitted URLs',
+      '',
+      ...urls.map((url) => `- <${url}>`),
+    );
+  }
+
+  await appendFile(summaryPath, `${lines.join('\n')}\n`, 'utf8');
+};
 
 const [command, siteRoot, changesPath] = process.argv.slice(2);
 const key = process.env.INDEXNOW_KEY;
@@ -26,17 +57,18 @@ switch (command) {
       throw new Error('usage: indexnow submit <site-root> <rsync-changes>');
     }
 
-    const [urlCount, requestCount] = await submitIndexNowChanges(
+    const [urls, requestCount] = await submitIndexNowChanges(
       siteRoot,
       changesPath,
       key,
     );
 
     console.log(
-      urlCount === 0
+      urls.length === 0
         ? 'IndexNow ownership file verified; no changed URLs to submit.'
-        : `IndexNow submitted ${urlCount} changed URLs in ${requestCount} request(s).`,
+        : `IndexNow submitted ${urls.length} changed URLs in ${requestCount} request(s).`,
     );
+    await appendIndexNowSummary(urls, requestCount);
     break;
   }
 
