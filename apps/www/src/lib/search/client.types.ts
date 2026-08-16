@@ -28,6 +28,7 @@ export interface SearchResult {
 export interface SearchReadyResponse {
   readonly state: 'ready';
   readonly query: string;
+  readonly searchQuery: string;
   readonly results: readonly SearchResult[];
   /** Total Pagefind references before result data is materialized. */
   readonly total: number;

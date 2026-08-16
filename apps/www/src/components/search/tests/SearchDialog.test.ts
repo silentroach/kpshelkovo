@@ -46,9 +46,11 @@ const readyResponse = (
   query: string,
   results: readonly SearchResult[],
   total = results.length,
+  searchQuery = query,
 ): SearchResponse => ({
   state: 'ready',
   query,
+  searchQuery,
   results,
   total,
 });
@@ -96,8 +98,14 @@ afterEach(() => {
 describe('SearchDialog', () => {
   it('reports opening and completed searches to Yandex Metrica', async () => {
     const search = vi.fn(async (query: string) => {
-      const empty = query === 'пусто';
-      return readyResponse(query, empty ? [] : [resultAt(1)], empty ? 0 : 12);
+      if (query === 'подать в суд тариф') {
+        return readyResponse(query, [resultAt(1)], 12, 'подать суд тариф');
+      }
+      if (query === 'в') {
+        return readyResponse(query, [], 0, '');
+      }
+
+      return readyResponse(query, [], 0);
     });
     const ym = vi.fn();
     document.documentElement.dataset.siteMetrikaId = '123';
@@ -108,8 +116,10 @@ describe('SearchDialog', () => {
 
     await fireEvent.click(opener);
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
-    await enterDebouncedQuery(input, 'вода');
+    await enterDebouncedQuery(input, 'подать в суд тариф');
     await waitFor(() => expect(dialog.dataset.searchState).toBe('results'));
+    await enterDebouncedQuery(input, 'в');
+    await waitFor(() => expect(dialog.dataset.searchState).toBe('empty'));
     await enterDebouncedQuery(input, 'пусто');
     await waitFor(() => expect(dialog.dataset.searchState).toBe('empty'));
 
@@ -125,8 +135,19 @@ describe('SearchDialog', () => {
           "reachGoal",
           "search",
           {
-            "query": "вода",
+            "normalized_query": "подать суд тариф",
+            "query": "подать в суд тариф",
             "results_count": 12,
+          },
+        ],
+        [
+          123,
+          "reachGoal",
+          "search",
+          {
+            "normalized_query": "",
+            "query": "в",
+            "results_count": 0,
           },
         ],
         [

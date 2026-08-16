@@ -222,10 +222,18 @@
       total = response.total;
       requestedLimit = limit;
       if (mode === 'initial') {
-        reachMetrikaGoal(SEARCH_GOAL, {
-          query: response.query,
-          results_count: response.total,
-        });
+        const goalParams =
+          response.searchQuery === response.query
+            ? {
+                query: response.query,
+                results_count: response.total,
+              }
+            : {
+                query: response.query,
+                normalized_query: response.searchQuery,
+                results_count: response.total,
+              };
+        reachMetrikaGoal(SEARCH_GOAL, goalParams);
         isSearching = false;
       } else {
         isLoadingMore = false;

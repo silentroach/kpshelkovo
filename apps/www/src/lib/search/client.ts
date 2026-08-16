@@ -458,7 +458,13 @@ export const createPagefindSearchClient = (
     if (!effectiveQuery) {
       cachedQuery = undefined;
       resultCache = new Map();
-      return { state: 'ready', query, results: [], total: 0 };
+      return {
+        state: 'ready',
+        query,
+        searchQuery: effectiveQuery,
+        results: [],
+        total: 0,
+      };
     }
 
     const limit = normalizeResultLimit(rawLimit);
@@ -485,6 +491,7 @@ export const createPagefindSearchClient = (
     return {
       state: 'ready',
       query,
+      searchQuery: effectiveQuery,
       total: results.length,
       results: rankResults(
         loaded.filter((result): result is LoadedPagefindResult =>

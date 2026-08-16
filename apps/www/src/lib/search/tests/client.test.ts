@@ -68,6 +68,7 @@ describe('Pagefind search client', () => {
       {
         "query": "",
         "results": [],
+        "searchQuery": "",
         "state": "ready",
         "total": 0,
       }
@@ -296,6 +297,7 @@ describe('Pagefind search client', () => {
             "url": "/815/compare/settlements/shelkovo/",
           },
         ],
+        "searchQuery": "текст",
         "state": "ready",
         "total": 2,
       }
@@ -625,6 +627,7 @@ describe('Pagefind search client', () => {
         "ignored": {
           "query": "в",
           "results": [],
+          "searchQuery": "",
           "state": "ready",
           "total": 0,
         },
@@ -637,6 +640,7 @@ describe('Pagefind search client', () => {
         "result": {
           "query": "подать в суд и тариф",
           "results": [],
+          "searchQuery": "подать суд тариф",
           "state": "ready",
           "total": 0,
         },
@@ -747,6 +751,7 @@ describe('Pagefind search client', () => {
               "url": "/news/result-3/",
             },
           ],
+          "searchQuery": "еда",
           "state": "ready",
           "total": 2,
         },
@@ -755,7 +760,7 @@ describe('Pagefind search client', () => {
             "еда",
           ],
           [
-            "\"еда\"",
+            ""еда"",
           ],
         ],
       }
