@@ -18,6 +18,8 @@ import type {
 
 const pagefindEntrypoint = '/search/pagefind.js';
 const canonicalUrlBase = 'https://kpshelkovo.online';
+const ignoredSingleLetterWords = new Set(['а', 'в', 'и', 'к', 'о', 'с', 'у']);
+const shortQueryMaxLength = 3;
 const pagefindOptions = {
   ranking: {
     metaWeights: {
@@ -251,6 +253,29 @@ const normalizeQuery = (query: string): string =>
     .slice(0, SEARCH_QUERY_MAX_LENGTH)
     .join('');
 
+const searchableToken = (token: string): string =>
+  Array.from(token.matchAll(/[\p{L}\p{N}]/gu), ([character]) => character)
+    .join('')
+    .toLocaleLowerCase('ru');
+
+const pagefindQuery = (query: string): string =>
+  query
+    .split(' ')
+    .filter((token) => !ignoredSingleLetterWords.has(searchableToken(token)))
+    .join(' ');
+
+const exactShortQuery = (query: string): string | undefined => {
+  const words = query.match(/[\p{L}\p{N}]+/gu);
+  if (words?.length !== 1) {
+    return;
+  }
+
+  const word = words[0];
+  return word && Array.from(word).length <= shortQueryMaxLength
+    ? `"${word}"`
+    : undefined;
+};
+
 const normalizeResultLimit = (limit?: number): number => {
   if (limit === undefined || !Number.isFinite(limit)) {
     return SEARCH_RESULT_DEFAULT_LIMIT;
@@ -321,7 +346,7 @@ export const createPagefindSearchClient = (
   };
 
   const preload = async (rawQuery: string): Promise<void> => {
-    const query = normalizeQuery(rawQuery);
+    const query = pagefindQuery(normalizeQuery(rawQuery));
     if (!dependencies.available || !query) {
       return;
     }
@@ -381,27 +406,52 @@ export const createPagefindSearchClient = (
   ): Promise<SearchResponse | undefined> => {
     const requestId = ++latestRequestId;
     const query = normalizeQuery(rawQuery);
+    const effectiveQuery = pagefindQuery(query);
 
     if (!dependencies.available) {
       return { state: 'devUnavailable', query };
     }
 
-    if (!query) {
+    if (!effectiveQuery) {
       cachedQuery = undefined;
       resultCache = new Map();
       return { state: 'ready', query, results: [], total: 0 };
     }
 
     const limit = normalizeResultLimit(rawLimit);
-    const queryCache = resultCacheFor(query);
+    const queryCache = resultCacheFor(effectiveQuery);
     const pagefind = await loadPagefind();
     if (requestId !== latestRequestId) {
       return;
     }
 
-    const response = await pagefind.search(query);
+    const broadSearch = pagefind.search(effectiveQuery);
+    const exactQuery = exactShortQuery(effectiveQuery);
+    const [broadResponse, exactResponse] = await Promise.all([
+      broadSearch,
+      exactQuery ? pagefind.search(exactQuery) : broadSearch,
+    ]);
+    const exactIds = new Set(
+      exactQuery
+        ? exactResponse.results.flatMap((reference) => {
+            const id = cacheableResultId(reference.id);
+            return id ? [id] : [];
+          })
+        : [],
+    );
+    const exactResults = exactIds.size
+      ? broadResponse.results.filter((reference) => {
+          const id = cacheableResultId(reference.id);
+          return Boolean(id && exactIds.has(id));
+        })
+      : broadResponse.results;
+    const results = exactResults.length ? exactResults : broadResponse.results;
+    if (requestId !== latestRequestId) {
+      return;
+    }
+
     const loaded = await Promise.all(
-      response.results
+      results
         .slice(0, limit)
         .map((result) => loadCachedResult(result, queryCache)),
     );
@@ -412,7 +462,7 @@ export const createPagefindSearchClient = (
     return {
       state: 'ready',
       query,
-      total: response.results.length,
+      total: results.length,
       results: rankResults(
         loaded.filter((result): result is LoadedPagefindResult =>
           Boolean(result),
