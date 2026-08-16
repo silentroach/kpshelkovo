@@ -102,6 +102,11 @@ jobs:
           PUBLIC_YANDEX_MAPS_API_KEY: ${{ secrets.YANDEX_MAPS_API_KEY }}
         run: pnpm build
 
+      - name: Prepare IndexNow ownership file
+        env:
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+        run: node scripts/indexnow.ts prepare dist/www
+
       - name: Validate deploy settings
         run: |
           host="$(printf '%s' "$DEPLOY_HOST" | tr -d '\r\n' | xargs)"
@@ -198,6 +203,7 @@ jobs:
           # для уже существующих файлов; новые файлы получат mtime деплоя)
           rsync_opts="-azc --no-t --delete --mkpath --chmod=D755,F644"
           pagefind_manifest=$(mktemp)
+          indexnow_manifest="$RUNNER_TEMP/indexnow-rsync-changes.txt"
           pagefind_retention_minutes=$((7 * 24 * 60))
           trap 'rm -f "$pagefind_manifest"' EXIT
 
@@ -205,6 +211,16 @@ jobs:
             \( -name 'pagefind.*.pf_meta' -o -name '*.pf_index' -o -name '*.pf_filter' -o -name '*.pf_fragment' \) \
             -printf '%P\0' > "$pagefind_manifest"
           test -s "$pagefind_manifest"
+
+          # IndexNow submits only canonical HTML changed by this deployment.
+          rsync $rsync_opts --dry-run --itemize-changes --out-format='%i|%n' \
+            --filter='protect /search/pagefind.*.pf_meta' \
+            --filter='protect /search/index/*.pf_index' \
+            --filter='protect /search/filter/*.pf_filter' \
+            --filter='protect /search/fragment/*.pf_fragment' \
+            -e "ssh $ssh_opts" \
+            dist/www/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_WWW_PATH/" \
+            > "$indexnow_manifest"
 
           # Active clients may still request chunks from earlier index generations.
           rsync $rsync_opts \
@@ -232,6 +248,11 @@ jobs:
 
       - name: Smoke Pagefind production delivery
         run: sh scripts/smoke-pagefind-delivery.sh https://kpshelkovo.online dist/www
+
+      - name: Submit changed URLs to IndexNow
+        env:
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+        run: node scripts/indexnow.ts submit dist/www "$RUNNER_TEMP/indexnow-rsync-changes.txt"
 
       - name: Publish deployed URLs
         run: |
