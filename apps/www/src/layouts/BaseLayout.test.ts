@@ -36,11 +36,11 @@ describe('BaseLayout site header', () => {
     expect(html).toContain('<header class="site-header');
   });
 
-  it('shows a mobile-only site header on the home page', async () => {
+  it('shows the common site header on the home page', async () => {
     const html = await renderLayout('/');
 
-    expect(html).toContain('<header class="site-header');
-    expect(html).toContain('data-mobile-only');
+    expect(html).toContain('class="ui-root-site site-has-header');
+    expect(html.match(/data-search-trigger/g)).toHaveLength(2);
   });
 });
 

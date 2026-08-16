@@ -1,7 +1,7 @@
 ---
 import '@shelkovo/ui/styles.css';
 import '../styles/site.css';
-import { ClientRouter, fade } from 'astro:transitions';
+import { ClientRouter } from 'astro:transitions';
 import {
   BRAND_KEYWORDS,
   collectKeywords,
@@ -30,10 +30,9 @@ interface Props {
   preconnectYandexMaps?: boolean;
   bodyClass?: string;
   showSiteHeader?: boolean;
+  overlaySiteHeader?: boolean;
   search?: SearchDocument;
 }
-
-const isHomePage = Astro.url.pathname === '/';
 
 const {
   title = 'Шелково Онлайн',
@@ -48,6 +47,7 @@ const {
   preconnectYandexMaps = false,
   bodyClass,
   showSiteHeader = true,
+  overlaySiteHeader = false,
   search,
 } = Astro.props;
 
@@ -68,10 +68,9 @@ const disableAnalytics =
   import.meta.env.LIGHTHOUSE_DISABLE_ANALYTICS === 'true';
 const enableMetrika = prod && !disableAnalytics;
 const ymId = 108975391;
-const contentTransition = fade({ duration: '60ms' });
 const bodyClasses = [
   'ui-root-site',
-  showSiteHeader && !isHomePage && 'site-has-header',
+  showSiteHeader && 'site-has-header',
   bodyClass,
   'flex min-h-screen flex-col text-foreground',
 ]
@@ -189,28 +188,33 @@ const searchMetadata = search
         </noscript>
       )
     }
-    {showSiteHeader && <SiteHeader mobileOnly={isHomePage} />}
     <div
-      class="flex-1"
-      data-pagefind-root={search ? true : undefined}
-      data-pagefind-body={search?.scope === 'page' ? true : undefined}
-      data-pagefind-meta={searchMetadata}
-      data-pagefind-filter={search
-        ? 'section[data-search-section-id]'
-        : undefined}
-      data-pagefind-sort={search?.publishedAt
-        ? 'date[data-search-published-at]'
-        : undefined}
-      data-search-title={search?.title}
-      data-search-description={search?.description}
-      data-search-section-id={search?.section.id}
-      data-search-section-label={search?.section.label}
-      data-search-published-at={search?.publishedAt}
-      data-search-tags={search?.tags?.join(', ')}
-      transition:name="site-content"
-      transition:animate={contentTransition}
+      class:list={[
+        'site-page-shell flex flex-1 flex-col',
+        overlaySiteHeader && 'site-page-shell--overlay-header',
+      ]}
     >
-      <slot />
+      {showSiteHeader && <SiteHeader />}
+      <div
+        class="site-page-content min-w-0 flex-1"
+        data-pagefind-root={search ? true : undefined}
+        data-pagefind-body={search?.scope === 'page' ? true : undefined}
+        data-pagefind-meta={searchMetadata}
+        data-pagefind-filter={search
+          ? 'section[data-search-section-id]'
+          : undefined}
+        data-pagefind-sort={search?.publishedAt
+          ? 'date[data-search-published-at]'
+          : undefined}
+        data-search-title={search?.title}
+        data-search-description={search?.description}
+        data-search-section-id={search?.section.id}
+        data-search-section-label={search?.section.label}
+        data-search-published-at={search?.publishedAt}
+        data-search-tags={search?.tags?.join(', ')}
+      >
+        <slot />
+      </div>
     </div>
     <SearchDialog client:load />
     <SiteFooter />

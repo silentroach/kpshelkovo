@@ -2,13 +2,12 @@
 import SearchTrigger from '@/components/search/SearchTrigger.astro';
 import type { HomeStatusState } from '@/lib/home/status.types';
 
-type SiteNavVariant = 'header' | 'hero' | 'mobile';
+type SiteNavVariant = 'header' | 'mobile';
 
 interface Props {
   readonly variant?: SiteNavVariant;
   readonly statusState: HomeStatusState;
   readonly statusAriaLabel: string;
-  readonly tariffMenuId?: string;
   readonly ariaLabel?: string;
 }
 
@@ -16,14 +15,11 @@ const {
   variant = 'header',
   statusState,
   statusAriaLabel,
-  tariffMenuId = variant === 'hero'
-    ? 'home-hero-tariff-menu'
-    : 'site-header-tariff-menu',
   ariaLabel = 'Главное меню',
 } = Astro.props;
 
-const isHero = variant === 'hero';
 const isMobile = variant === 'mobile';
+const tariffMenuId = 'site-header-tariff-menu';
 const pathname = Astro.url.pathname;
 const currentPathname =
   pathname === '/' ? pathname : `${pathname.replace(/\/+$/, '')}/`;
@@ -42,26 +38,8 @@ const sarafanCurrent = getCurrent('/sarafan/');
 const reviewsCurrent = getCurrent('/reviews/');
 const statusCurrent = getCurrent('/status/');
 const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
-const navClass = isHero
-  ? 'home-hero-nav hidden flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm font-medium md:flex md:flex-nowrap md:gap-8 md:text-base lg:gap-10'
-  : 'site-nav site-nav-header flex items-center justify-end gap-3 text-sm font-semibold lg:gap-6';
-const dropdownClass = isHero
-  ? 'home-hero-nav-dropdown site-nav-dropdown group relative'
-  : 'site-nav-dropdown group relative';
-const dropdownButtonClass = isHero
-  ? 'flex items-center gap-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-transparent'
-  : 'site-nav-link flex items-center gap-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
-const dropdownMenuClass = isHero
-  ? 'home-hero-nav-submenu invisible pointer-events-none absolute left-0 top-full z-20 min-w-[11.75rem] -translate-y-1 pt-2 opacity-0 transition-[opacity,transform,visibility] duration-150 ease-out group-hover:visible group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100'
-  : 'site-nav-submenu invisible pointer-events-none absolute left-0 top-full z-20 min-w-[12rem] -translate-y-1 pt-2 opacity-0 transition-[opacity,transform,visibility] duration-150 ease-out group-hover:visible group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100';
-const submenuPanelClass = isHero
-  ? 'rounded-xl border border-border bg-card px-1.5 py-1.5 shadow-[0_0.625rem_1.5rem_oklch(24%_0.04_145_/_0.08)]'
-  : 'site-nav-glass-panel rounded-xl border px-1.5 py-1.5 shadow-[0_0.75rem_1.75rem_oklch(24%_0.04_145_/_0.1)]';
 const submenuLinkClass =
   'block rounded-lg px-3 py-2 text-sm leading-5 text-foreground transition-colors focus-visible:outline-none';
-const statusLinkClass = isHero
-  ? 'home-hero-status-link flex min-h-6 min-w-6 items-center justify-center gap-3 md:min-h-0 md:min-w-0 md:justify-start'
-  : 'site-nav-link flex items-center gap-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
 ---
 
 {
@@ -129,17 +107,16 @@ const statusLinkClass = isHero
       </a>
     </nav>
   ) : (
-    <nav aria-label={ariaLabel} class={navClass}>
-      <a
-        href="/news/"
-        aria-current={newsCurrent}
-        class={isHero ? undefined : 'site-nav-link'}
-      >
+    <nav
+      aria-label={ariaLabel}
+      class="site-nav site-nav-header flex items-center justify-end gap-3 text-sm font-semibold lg:gap-6"
+    >
+      <a href="/news/" aria-current={newsCurrent} class="site-nav-link">
         Новости
       </a>
 
       <div
-        class={dropdownClass}
+        class="site-nav-dropdown group relative"
         data-site-nav-dropdown
         data-current-section={isTariffCurrent ? '' : undefined}
       >
@@ -149,7 +126,7 @@ const statusLinkClass = isHero
           aria-expanded="false"
           aria-controls={tariffMenuId}
           data-site-nav-dropdown-button
-          class={dropdownButtonClass}
+          class="site-nav-link flex items-center gap-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <span>Тариф 815</span>
           {isTariffCurrent && <span class="sr-only">, текущий раздел</span>}
@@ -162,9 +139,9 @@ const statusLinkClass = isHero
         <div
           id={tariffMenuId}
           data-site-nav-dropdown-menu
-          class={dropdownMenuClass}
+          class="site-nav-submenu invisible pointer-events-none absolute left-0 top-full z-20 min-w-[12rem] -translate-y-1 pt-2 opacity-0 transition-[opacity,transform,visibility] duration-150 ease-out group-hover:visible group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100"
         >
-          <div class={submenuPanelClass}>
+          <div class="site-nav-glass-panel rounded-xl border px-1.5 py-1.5 shadow-[0_0.75rem_1.75rem_oklch(24%_0.04_145_/_0.1)]">
             <a
               href="/815/compare/"
               aria-current={compareCurrent}
@@ -183,43 +160,31 @@ const statusLinkClass = isHero
         </div>
       </div>
 
-      <a
-        href="/kb/"
-        aria-current={kbCurrent}
-        class={isHero ? undefined : 'site-nav-link'}
-      >
+      <a href="/kb/" aria-current={kbCurrent} class="site-nav-link">
         База знаний
       </a>
-      <a
-        href="/sarafan/"
-        aria-current={sarafanCurrent}
-        class={isHero ? undefined : 'site-nav-link'}
-      >
+      <a href="/sarafan/" aria-current={sarafanCurrent} class="site-nav-link">
         Сарафан
       </a>
-      <a
-        href="/reviews/"
-        aria-current={reviewsCurrent}
-        class={isHero ? undefined : 'site-nav-link'}
-      >
+      <a href="/reviews/" aria-current={reviewsCurrent} class="site-nav-link">
         Отзывы
       </a>
       <a
         href="/status/"
         aria-current={statusCurrent}
         aria-label={statusAriaLabel}
-        class={statusLinkClass}
+        class="site-nav-link flex items-center gap-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         data-home-status-link
         data-home-status-state={statusState}
       >
-        <span class={isHero ? 'hidden md:inline' : undefined}>Статус</span>
+        <span>Статус</span>
         <span
           aria-hidden="true"
           data-home-status-dot
-          class="site-nav-status-dot home-hero-status-dot inline-block h-3 w-3 rounded-full"
+          class="site-nav-status-dot inline-block h-3 w-3 rounded-full"
         />
       </a>
-      <SearchTrigger variant={variant} />
+      <SearchTrigger variant="header" />
     </nav>
   )
 }
@@ -303,14 +268,12 @@ const statusLinkClass = isHero
     color: var(--color-primary-hover);
   }
 
-  .site-nav-submenu a:is(:hover, :focus-visible),
-  .home-hero-nav-submenu a:is(:hover, :focus-visible) {
+  .site-nav-submenu a:is(:hover, :focus-visible) {
     background: color-mix(in oklab, var(--color-primary-soft) 82%, transparent);
     color: var(--color-foreground);
   }
 
-  .site-nav-submenu a[aria-current],
-  .home-hero-nav-submenu a[aria-current] {
+  .site-nav-submenu a[aria-current] {
     background: color-mix(in oklab, var(--color-primary-soft) 90%, transparent);
     color: var(--color-primary-hover);
     box-shadow: inset 0 0 0 1px
@@ -333,8 +296,7 @@ const statusLinkClass = isHero
     backdrop-filter: saturate(165%) blur(16px);
   }
 
-  .site-nav-dropdown[data-open] .site-nav-submenu,
-  .home-hero-nav-dropdown[data-open] .home-hero-nav-submenu {
+  .site-nav-dropdown[data-open] .site-nav-submenu {
     visibility: visible;
     pointer-events: auto;
     transform: translateY(0);
@@ -437,51 +399,5 @@ const statusLinkClass = isHero
 
   [data-home-status-state='red'] .site-nav-status-dot {
     background: var(--color-danger);
-  }
-
-  .home-hero-nav {
-    color: var(--color-text);
-    text-shadow: 0 0.0625rem 1rem
-      color-mix(in oklab, var(--color-bg) 72%, transparent);
-  }
-
-  .home-hero-nav a,
-  .home-hero-nav button {
-    transition:
-      color 0.2s ease,
-      opacity 0.2s ease;
-  }
-
-  .home-hero-nav > a[aria-current],
-  .home-hero-nav-dropdown[data-current-section]
-    > [data-site-nav-dropdown-button] {
-    color: currentColor;
-  }
-
-  .home-hero-nav a:is(:hover, :focus-visible),
-  .home-hero-nav button:is(:hover, :focus-visible) {
-    opacity: 0.78;
-  }
-
-  .home-hero-nav-submenu {
-    color: var(--color-foreground);
-    text-shadow: none;
-  }
-
-  .home-hero-nav-submenu a:is(:hover, :focus-visible) {
-    opacity: 1;
-  }
-
-  .home-hero-status-dot {
-    box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-bg) 72%, transparent);
-  }
-
-  :global(.home-hero[data-home-hero-mode='night']) .home-hero-nav {
-    color: oklch(97% 0.004 125);
-    text-shadow: 0 0.0625rem 1rem oklch(0% 0 0 / 0.76);
-  }
-
-  :global(.home-hero[data-home-hero-mode='night']) .home-hero-status-dot {
-    box-shadow: 0 0 0 1px oklch(97% 0.004 125 / 0.62);
   }
 </style>

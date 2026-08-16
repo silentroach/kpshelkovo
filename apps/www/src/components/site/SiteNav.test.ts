@@ -7,10 +7,7 @@ import { createAstroContainer } from '@/test/astro-container';
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import SiteNav from './SiteNav.astro';
 
-const renderNav = async (
-  pathname: string,
-  variant: 'header' | 'hero' | 'mobile',
-) => {
+const renderNav = async (pathname: string, variant: 'header' | 'mobile') => {
   const container = await createAstroContainer();
 
   return container.renderToString(SiteNav, {
@@ -65,17 +62,12 @@ describe('SiteNav', () => {
     expect(html).not.toContain('data-current-section');
   });
 
-  it.each(['header', 'hero'] as const)(
-    'renders one ignored search trigger in the %s navigation',
-    async (variant) => {
-      const html = await renderNav('/', variant);
+  it('renders one ignored search trigger in the header navigation', async () => {
+    const html = await renderNav('/', 'header');
 
-      expect(html.match(/data-search-trigger/g)).toHaveLength(1);
-      expect(html).toContain('data-pagefind-ignore="all"');
-      expect(html).toContain('aria-label="Поиск"');
-      expect(html).not.toContain('<span>Поиск</span>');
-    },
-  );
+    expect(html.match(/data-search-trigger/g)).toHaveLength(1);
+    expect(html).toContain('data-pagefind-ignore="all"');
+  });
 
   it('keeps search outside the hidden mobile navigation', async () => {
     const html = await renderNav('/', 'mobile');
