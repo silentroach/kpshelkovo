@@ -33,7 +33,7 @@ const { article, featured = false } = Astro.props;
 
   <div class="space-y-4 px-5 py-5 md:px-6 md:py-6">
     <div class="space-y-3">
-      <h3 class="ui-card-title flex items-start gap-2">
+      <h3 class="ui-entry-title flex items-start gap-2">
         <a href={article.url} class="ui-link">{article.title}</a>
         {
           article.pinned && (
