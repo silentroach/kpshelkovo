@@ -10,6 +10,7 @@ const INDEXNOW_RESERVED_KEYS: ReadonlySet<string> = new Set(['llms-full']);
 const INDEXNOW_SITE = new URL('https://kpshelkovo.online');
 const INDEXNOW_TIMEOUT_MS = 15_000;
 const INDEXNOW_URL_MANIFEST_SCHEMA = z.array(z.string().url()).min(1);
+const RSYNC_NEW_FILE_CHANGE = '>f+++++++++';
 
 const validateIndexNowKey = (key: string): void => {
   if (!INDEXNOW_KEY_PATTERN.test(key)) {
@@ -59,7 +60,7 @@ const htmlFileUrl = (file: string): string | undefined => {
   return new URL(pathname, INDEXNOW_SITE).toString();
 };
 
-const changedIndexableUrls = async (
+const newIndexableUrls = async (
   urlManifestPath: string,
   changesPath: string,
 ): Promise<readonly string[]> => {
@@ -78,8 +79,9 @@ const changedIndexableUrls = async (
     const url = htmlFileUrl(line.slice(separator + 1));
 
     if (
+      itemizedChange === RSYNC_NEW_FILE_CHANGE &&
       url &&
-      (itemizedChange.startsWith('*deleting') || indexNowUrls.has(url))
+      indexNowUrls.has(url)
     ) {
       urls.add(url);
     }
@@ -156,7 +158,7 @@ export const submitIndexNowUrls = async (
   return requestCount;
 };
 
-export const submitIndexNowChanges = async (
+export const submitNewIndexNowPages = async (
   urlManifestPath: string,
   changesPath: string,
   key: string,
@@ -165,7 +167,7 @@ export const submitIndexNowChanges = async (
   readonly [submittedUrls: readonly string[], requestCount: number]
 > => {
   validateIndexNowKey(key);
-  const urls = await changedIndexableUrls(urlManifestPath, changesPath);
+  const urls = await newIndexableUrls(urlManifestPath, changesPath);
 
   await verifyIndexNowKey(key, request);
 

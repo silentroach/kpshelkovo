@@ -1,7 +1,7 @@
 import { appendFile } from 'node:fs/promises';
 
 import {
-  submitIndexNowChanges,
+  submitNewIndexNowPages,
   writeIndexNowKeyFile,
 } from '../apps/www/src/lib/indexnow.ts';
 
@@ -16,9 +16,9 @@ const appendIndexNowSummary = async (
   }
 
   const lines = [
-    '## IndexNow submission',
+    '## IndexNow new-page submission',
     '',
-    `- URLs submitted: **${urls.length}**`,
+    `- New URLs submitted: **${urls.length}**`,
     `- Requests accepted: **${requestCount}**`,
   ];
 
@@ -57,7 +57,7 @@ switch (command) {
       throw new Error('usage: indexnow submit <url-manifest> <rsync-changes>');
     }
 
-    const [urls, requestCount] = await submitIndexNowChanges(
+    const [urls, requestCount] = await submitNewIndexNowPages(
       targetPath,
       changesPath,
       key,
@@ -65,8 +65,8 @@ switch (command) {
 
     console.log(
       urls.length === 0
-        ? 'IndexNow ownership file verified; no changed URLs to submit.'
-        : `IndexNow submitted ${urls.length} changed URLs in ${requestCount} request(s).`,
+        ? 'IndexNow ownership file verified; no new URLs to submit.'
+        : `IndexNow submitted ${urls.length} new URLs in ${requestCount} request(s).`,
     );
     await appendIndexNowSummary(urls, requestCount);
     break;
