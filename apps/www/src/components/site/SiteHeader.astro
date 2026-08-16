@@ -8,11 +8,6 @@ import {
 } from '@/lib/home/status';
 import { loadStatusData } from '@/lib/status/load';
 
-interface Props {
-  readonly mobileOnly?: boolean;
-}
-
-const { mobileOnly = false }: Props = Astro.props;
 const status = await loadStatusData();
 const buildNow = Date.now();
 const statusState = getHomeStatusState(status.incidents, buildNow);
@@ -23,29 +18,19 @@ const maintenanceWindows = getHomeStatusMaintenanceWindows(
 );
 ---
 
-<header
-  class:list={[
-    'site-header z-40 border-b md:sticky md:top-0',
-    mobileOnly && 'md:hidden',
-  ]}
-  data-mobile-only={mobileOnly ? '' : undefined}
->
+<header class="site-header z-40 border-b md:sticky md:top-0">
   <div
     class="site-header-inner ui-page flex min-h-12 items-center justify-between gap-2 px-5 py-2 md:min-h-14 md:gap-4 md:px-6 md:py-2.5"
   >
     <a href="/" class="site-header-brand"> Шелково Онлайн </a>
 
-    {
-      !mobileOnly && (
-        <div class="hidden min-w-0 md:block">
-          <SiteNav
-            variant="header"
-            statusState={statusState}
-            statusAriaLabel={statusAriaLabel}
-          />
-        </div>
-      )
-    }
+    <div class="hidden min-w-0 md:block">
+      <SiteNav
+        variant="header"
+        statusState={statusState}
+        statusAriaLabel={statusAriaLabel}
+      />
+    </div>
 
     <div class="flex shrink-0 items-center gap-1.5 md:hidden">
       <a

@@ -1,7 +1,7 @@
 ---
 import { SearchIcon } from '@shelkovo/ui/icons';
 
-type SearchTriggerVariant = 'header' | 'hero' | 'mobile';
+type SearchTriggerVariant = 'header' | 'mobile';
 
 interface Props {
   readonly variant: SearchTriggerVariant;
@@ -56,10 +56,6 @@ const { variant }: Props = Astro.props;
 
   .site-search-trigger--mobile:is(:hover, :focus-visible) {
     background: color-mix(in oklab, var(--color-primary-soft) 76%, transparent);
-  }
-
-  .site-search-trigger--hero:is(:hover, :focus-visible) {
-    opacity: 0.78;
   }
 
   .site-search-trigger--mobile {
