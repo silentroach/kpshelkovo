@@ -512,6 +512,47 @@ describe('buildReglamentCalculatorChanges', () => {
     expect(rowTariff.dataset.reglamentDeltaTone).toBe('negative');
   });
 
+  it('preserves the row title used as a checkbox description', () => {
+    document.body.innerHTML = `
+      <div data-reglament-calculator>
+        <input
+          type="checkbox"
+          checked
+          aria-describedby="reglament-row-title-lighting"
+          data-reglament-field="enabled"
+          data-reglament-row-id="lighting"
+          data-reglament-baseline="true"
+        />
+        <h4 id="reglament-row-title-lighting">Освещение территории</h4>
+      </div>
+    `;
+    const root = document.querySelector('[data-reglament-calculator]');
+    const checkbox = document.querySelector('input');
+    const title = document.querySelector('h4');
+
+    if (
+      !(root instanceof HTMLElement) ||
+      !(checkbox instanceof HTMLInputElement) ||
+      !(title instanceof HTMLElement)
+    ) {
+      throw new Error('Missing checkbox description fixture nodes');
+    }
+
+    hydrateReglamentCalculator(root);
+
+    expect({
+      describedBy: checkbox.getAttribute('aria-describedby'),
+      titleHidden: title.hidden,
+      titleText: title.textContent,
+    }).toMatchInlineSnapshot(`
+      {
+        "describedBy": "reglament-row-title-lighting",
+        "titleHidden": false,
+        "titleText": "Освещение территории",
+      }
+    `);
+  });
+
   it('shows the same accessible error for negative volume, frequency and rate', () => {
     const rowId = 'cleaning-winter-mechanized';
     document.body.innerHTML = `

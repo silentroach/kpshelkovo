@@ -535,7 +535,7 @@ const formatReglamentInput = (input: HTMLInputElement): void => {
 };
 
 const reglamentInputError = (input: HTMLInputElement): string | undefined => {
-  if (input.type === 'checkbox' || !input.value.trim()) {
+  if (!input.value.trim()) {
     return undefined;
   }
 
@@ -546,7 +546,7 @@ const reglamentInputError = (input: HTMLInputElement): string | undefined => {
 
 const renderReglamentInputValidation = (root: ParentNode): void => {
   root.querySelectorAll(FIELD_SELECTOR).forEach((node) => {
-    if (!(node instanceof HTMLInputElement)) {
+    if (!(node instanceof HTMLInputElement) || node.type === 'checkbox') {
       return;
     }
 
