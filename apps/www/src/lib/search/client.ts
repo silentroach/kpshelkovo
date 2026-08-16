@@ -292,6 +292,49 @@ const cacheableResultId = (value: unknown): string | undefined => {
   return value;
 };
 
+const searchPagefind = async (
+  pagefind: PagefindRuntime,
+  query: string,
+): Promise<readonly PagefindResultReference[]> => {
+  const broadSearch = pagefind.search(query);
+  const exactQuery = exactShortQuery(query);
+  if (!exactQuery) {
+    return (await broadSearch).results;
+  }
+
+  const [broadResponse, exactResponse] = await Promise.all([
+    broadSearch,
+    pagefind.search(exactQuery),
+  ]);
+  const exactResultsById = new Map(
+    exactResponse.results.flatMap((reference) => {
+      const id = cacheableResultId(reference.id);
+      return id ? [[id, reference] as const] : [];
+    }),
+  );
+  if (!exactResultsById.size) {
+    return broadResponse.results;
+  }
+
+  const exactResults = broadResponse.results.flatMap((reference) => {
+    const id = cacheableResultId(reference.id);
+    const exactReference = id ? exactResultsById.get(id) : undefined;
+    return exactReference
+      ? [
+          {
+            id: reference.id,
+            matchedMetaFields: exactReference.matchedMetaFields,
+            score: reference.score,
+            words: exactReference.words,
+            data: exactReference.data,
+          } satisfies PagefindResultReference,
+        ]
+      : [];
+  });
+
+  return exactResults.length ? exactResults : broadResponse.results;
+};
+
 const loadGeneratedPagefind = async (): Promise<PagefindRuntime> => {
   const pagefind: PagefindRuntime = await import(
     /* @vite-ignore */ pagefindEntrypoint
@@ -425,27 +468,7 @@ export const createPagefindSearchClient = (
       return;
     }
 
-    const broadSearch = pagefind.search(effectiveQuery);
-    const exactQuery = exactShortQuery(effectiveQuery);
-    const [broadResponse, exactResponse] = await Promise.all([
-      broadSearch,
-      exactQuery ? pagefind.search(exactQuery) : broadSearch,
-    ]);
-    const exactIds = new Set(
-      exactQuery
-        ? exactResponse.results.flatMap((reference) => {
-            const id = cacheableResultId(reference.id);
-            return id ? [id] : [];
-          })
-        : [],
-    );
-    const exactResults = exactIds.size
-      ? broadResponse.results.filter((reference) => {
-          const id = cacheableResultId(reference.id);
-          return Boolean(id && exactIds.has(id));
-        })
-      : broadResponse.results;
-    const results = exactResults.length ? exactResults : broadResponse.results;
+    const results = await searchPagefind(pagefind, effectiveQuery);
     if (requestId !== latestRequestId) {
       return;
     }

@@ -651,21 +651,35 @@ describe('Pagefind search client', () => {
 
   it('uses exact short-word matches without losing Pagefind ranking data', async () => {
     const data = {
-      food: vi.fn(async () => validResult(1)),
-      meeting: vi.fn(async () => validResult(3)),
-      noise: vi.fn(async () => validResult(2)),
+      broadFood: vi.fn(async () => ({
+        ...validResult(1),
+        excerpt: 'Широкое совпадение 1',
+      })),
+      broadMeeting: vi.fn(async () => ({
+        ...validResult(3),
+        excerpt: 'Широкое совпадение 3',
+      })),
+      broadNoise: vi.fn(async () => validResult(2)),
+      exactFood: vi.fn(async () => ({
+        ...validResult(1),
+        excerpt: 'Точное совпадение 1',
+      })),
+      exactMeeting: vi.fn(async () => ({
+        ...validResult(3),
+        excerpt: 'Точное совпадение 3',
+      })),
     };
     const broadResponse: PagefindSearchResponse = {
       results: [
-        { id: 'food', score: 12, data: data.food },
-        { id: 'noise', score: 8, data: data.noise },
-        { id: 'meeting', score: 1, data: data.meeting },
+        { id: 'food', score: 12, data: data.broadFood },
+        { id: 'noise', score: 8, data: data.broadNoise },
+        { id: 'meeting', score: 1, data: data.broadMeeting },
       ],
     };
     const exactResponse: PagefindSearchResponse = {
       results: [
-        { id: 'food', data: data.food },
-        { id: 'meeting', data: data.meeting },
+        { id: 'food', data: data.exactFood },
+        { id: 'meeting', data: data.exactMeeting },
       ],
     };
     const search = vi.fn(async (query: string) =>
@@ -686,25 +700,29 @@ describe('Pagefind search client', () => {
 
     expect({
       dataCalls: {
-        food: data.food.mock.calls.length,
-        meeting: data.meeting.mock.calls.length,
-        noise: data.noise.mock.calls.length,
+        broadFood: data.broadFood.mock.calls.length,
+        broadMeeting: data.broadMeeting.mock.calls.length,
+        broadNoise: data.broadNoise.mock.calls.length,
+        exactFood: data.exactFood.mock.calls.length,
+        exactMeeting: data.exactMeeting.mock.calls.length,
       },
       result,
       searchCalls: search.mock.calls,
     }).toMatchInlineSnapshot(`
       {
         "dataCalls": {
-          "food": 1,
-          "meeting": 1,
-          "noise": 0,
+          "broadFood": 0,
+          "broadMeeting": 0,
+          "broadNoise": 0,
+          "exactFood": 1,
+          "exactMeeting": 1,
         },
         "result": {
           "query": "еда",
           "results": [
             {
               "description": undefined,
-              "excerptHtml": "Результат 1",
+              "excerptHtml": "Точное совпадение 1",
               "matchContext": undefined,
               "publishedAt": undefined,
               "section": {
@@ -717,7 +735,7 @@ describe('Pagefind search client', () => {
             },
             {
               "description": undefined,
-              "excerptHtml": "Результат 3",
+              "excerptHtml": "Точное совпадение 3",
               "matchContext": undefined,
               "publishedAt": undefined,
               "section": {
