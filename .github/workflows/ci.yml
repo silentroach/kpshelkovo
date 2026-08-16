@@ -214,7 +214,7 @@ jobs:
             -printf '%P\0' > "$pagefind_manifest"
           test -s "$pagefind_manifest"
 
-          # IndexNow submits only canonical HTML changed by this deployment.
+          # IndexNow submits only canonical HTML files added by this deployment.
           rsync $rsync_opts --dry-run --itemize-changes --out-format='%i|%n' \
             --filter='protect /search/pagefind.*.pf_meta' \
             --filter='protect /search/index/*.pf_index' \
@@ -260,7 +260,7 @@ jobs:
       - name: Smoke Pagefind production delivery
         run: sh scripts/smoke-pagefind-delivery.sh https://kpshelkovo.online dist/www
 
-      - name: Submit changed URLs to IndexNow
+      - name: Submit new URLs to IndexNow
         env:
           INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
         run: |

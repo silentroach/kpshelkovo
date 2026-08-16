@@ -5,8 +5,8 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
-  submitIndexNowChanges,
   submitIndexNowUrls,
+  submitNewIndexNowPages,
   writeIndexNowKeyFile,
 } from '../indexnow';
 
@@ -64,8 +64,8 @@ describe('writeIndexNowKeyFile', () => {
   });
 });
 
-describe('submitIndexNowChanges', () => {
-  it('submits changed indexable pages and deleted routes after verifying the key', async () => {
+describe('submitNewIndexNowPages', () => {
+  it('submits only new indexable pages after verifying the key', async () => {
     const siteRoot = await createTemporaryDirectory();
     const urlManifestPath = join(siteRoot, 'indexnow-urls.json');
     const changesPath = join(siteRoot, 'rsync-changes.txt');
@@ -93,14 +93,11 @@ describe('submitIndexNowChanges', () => {
       .mockResolvedValueOnce(new Response('', { status: 202 }));
 
     await expect(
-      submitIndexNowChanges(urlManifestPath, changesPath, TEST_KEY, request),
+      submitNewIndexNowPages(urlManifestPath, changesPath, TEST_KEY, request),
     ).resolves.toMatchInlineSnapshot(`
       [
         [
-          "https://kpshelkovo.online/",
           "https://kpshelkovo.online/news/new/",
-          "https://kpshelkovo.online/news/old/",
-          "https://kpshelkovo.online/news/tags/%D0%B2%D0%BE%D0%B4%D0%B0/",
         ],
         1,
       ]
@@ -125,10 +122,7 @@ describe('submitIndexNowChanges', () => {
             "key": "indexnow-test-key",
             "keyLocation": "https://kpshelkovo.online/indexnow-test-key.txt",
             "urlList": [
-              "https://kpshelkovo.online/",
               "https://kpshelkovo.online/news/new/",
-              "https://kpshelkovo.online/news/old/",
-              "https://kpshelkovo.online/news/tags/%D0%B2%D0%BE%D0%B4%D0%B0/",
             ],
           },
           "method": "POST",

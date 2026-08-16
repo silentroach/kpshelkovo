@@ -29,4 +29,5 @@
 - [ADR-023: Оригиналы фотографий новостей в публичном S3](023-news-images-in-public-s3.md) - принят, 2026-07-23.
 - [ADR-024: Иллюстрации отзывов в публичном S3](024-review-images-in-public-s3.md) - принят, 2026-08-10.
 - [ADR-025: Статический полнотекстовый поиск через Pagefind](025-static-full-text-search-with-pagefind.md) - принят, 2026-08-14.
-- [ADR-026: IndexNow после статического deploy](026-indexnow-after-static-deploy.md) - принят, 2026-08-16.
+- [ADR-026: IndexNow после статического deploy](026-indexnow-after-static-deploy.md) - заменён ADR-027, 2026-08-16.
+- [ADR-027: IndexNow только для новых страниц](027-indexnow-new-pages-only.md) - принят, 2026-08-16.
