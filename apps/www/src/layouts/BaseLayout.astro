@@ -1,7 +1,7 @@
 ---
 import '@shelkovo/ui/styles.css';
 import '../styles/site.css';
-import { ClientRouter, fade } from 'astro:transitions';
+import { ClientRouter } from 'astro:transitions';
 import {
   BRAND_KEYWORDS,
   collectKeywords,
@@ -68,7 +68,6 @@ const disableAnalytics =
   import.meta.env.LIGHTHOUSE_DISABLE_ANALYTICS === 'true';
 const enableMetrika = prod && !disableAnalytics;
 const ymId = 108975391;
-const contentTransition = fade({ duration: '60ms' });
 const bodyClasses = [
   'ui-root-site',
   showSiteHeader && 'site-has-header',
@@ -213,8 +212,6 @@ const searchMetadata = search
         data-search-section-label={search?.section.label}
         data-search-published-at={search?.publishedAt}
         data-search-tags={search?.tags?.join(', ')}
-        transition:name="site-content"
-        transition:animate={contentTransition}
       >
         <slot />
       </div>
