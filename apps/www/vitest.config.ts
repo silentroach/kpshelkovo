@@ -3,6 +3,7 @@
 import { getViteConfig } from 'astro/config';
 
 const visualTests = ['tests/**/*.visual.local.spec.ts'];
+const searchQualityTests = ['tests/search-quality.test.ts'];
 const domTests = [
   'src/compare/components/**/*.test.ts',
   'src/components/search/tests/**/*.test.ts',
@@ -21,7 +22,7 @@ export default getViteConfig({
           name: 'node',
           environment: 'node',
           include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
-          exclude: [...visualTests, ...domTests],
+          exclude: [...visualTests, ...searchQualityTests, ...domTests],
         },
       },
       {
@@ -33,7 +34,7 @@ export default getViteConfig({
           name: 'dom',
           environment: 'happy-dom',
           include: domTests,
-          exclude: visualTests,
+          exclude: [...visualTests, ...searchQualityTests],
           setupFiles: ['./vitest.dom.setup.ts'],
         },
       },
