@@ -50,6 +50,7 @@ title: Электричество
 Поддержанные флажки:
 
 - `noindex` - страница остается доступной по прямому URL, но не попадает в sitemap и получает HTML meta robots `noindex, follow`.
+- `exclude-from-site-search` - страница не попадает во внутрисайтовый Pagefind-индекс, но остается в sitemap и доступна внешним поисковикам.
 
 Пример служебной страницы без индексации:
 
@@ -60,7 +61,7 @@ flags: [noindex]
 ---
 ```
 
-Другие поля frontmatter не вводим в MVP. В частности, не добавляем `published_at`, `updated_at`, `status`, `owner`, `source_urls`, `related`, `redirect_from`, `order`, top-level `description` и `tags`. Все Markdown-файлы, прошедшие сборочную валидацию, считаются опубликованными, даже если закрыты от поисковой индексации флагом `noindex`.
+Другие поля frontmatter не вводим в MVP. В частности, не добавляем `published_at`, `updated_at`, `status`, `owner`, `source_urls`, `related`, `redirect_from`, `order`, top-level `description` и `tags`. Все Markdown-файлы, прошедшие сборочную валидацию, считаются опубликованными; `noindex` управляет внешней индексацией, а `exclude-from-site-search` - только внутрисайтовым поиском.
 
 Тело страницы рендерится через общий app-level Markdown pipeline `@/lib/markdown/render`, чтобы база знаний получала те же правила типографики, безопасного Markdown и mentions, что и остальные редакционные Markdown-поверхности сайта. Frontmatter `title` остается plain text: он нужен для H1, breadcrumbs и page title, а не для Markdown-рендера.
 
@@ -77,7 +78,7 @@ Markdown companion собирается из того же preprocessed Markdown
 
 Markdown companion-файлы отдаются как `text/markdown; charset=utf-8` и получают `X-Robots-Tag: noindex, follow`. HTML остается индексируемой пользовательской поверхностью, кроме страниц с `flags: [noindex]`.
 
-JSON-лента, OpenAPI, отдельные страницы тегов, `llms.txt`, `llms-full.txt`, sitemap-специализация и полнотекстовый поиск остаются вне текущей рамки. Если раздел позже получит машинные индексы или LLM-обзоры, они должны следовать ADR-008 и регистрироваться по правилам ADR-011.
+JSON-лента, OpenAPI, отдельные страницы тегов, `llms.txt`, `llms-full.txt` и sitemap-специализация остаются вне текущей рамки. Полнотекстовый поиск добавлен позднее по ADR-025. Если раздел позже получит другие машинные индексы или LLM-обзоры, они должны следовать ADR-008 и регистрироваться по правилам ADR-011.
 
 HTML- и Markdown-маршруты базы знаний регистрируются в реестре публичных поверхностей по ADR-011.
 

@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import type { KbPageEntry } from './load';
+import type { KbPageFlag } from './types';
 
 let buildKbDataset: typeof import('./load').buildKbDataset;
 let createPersonMentionTarget: typeof import('@/lib/people/mentions').createPersonMentionTarget;
@@ -19,7 +20,7 @@ const page = (input: {
   readonly id: string;
   readonly title: string;
   readonly body?: string;
-  readonly flags?: readonly ['noindex'];
+  readonly flags?: readonly KbPageFlag[];
 }): KbPageEntry => ({
   id: input.id,
   body: input.body ?? '',
@@ -156,6 +157,19 @@ describe('buildKbDataset', () => {
 
     expect(data.pages[0]?.flags).toEqual(['noindex']);
     expect(data.pages[0]?.robots).toBe('noindex, follow');
+  });
+
+  it('does not map site-search exclusion to robots metadata', () => {
+    const data = buildKbDataset([
+      page({
+        id: 'before-you-buy/how-to-choose-plot',
+        title: 'Как выбрать участок',
+        flags: ['exclude-from-site-search'],
+      }),
+    ]);
+
+    expect(data.pages[0]?.flags).toEqual(['exclude-from-site-search']);
+    expect(data.pages[0]?.robots).toBeUndefined();
   });
 
   it('normalizes body mentions through the shared registry', () => {

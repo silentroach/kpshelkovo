@@ -1,7 +1,7 @@
 import type { PreprocessedSiteMarkdownBody } from '@/lib/markdown/render';
 import type { EntityMentionTarget } from '@/lib/mentions';
 
-export type KbPageFlag = 'noindex';
+export type KbPageFlag = 'exclude-from-site-search' | 'noindex';
 
 export interface KbPage {
   readonly id: string;
