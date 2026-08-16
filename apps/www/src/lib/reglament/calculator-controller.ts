@@ -53,6 +53,8 @@ const OFFICIAL_TARIFF_TEXT = formatReglamentNumber(
   estimate2026.baseline.tariff_per_sotka_month,
 );
 const TARIFF_ARROW_TEXT = '→';
+const INVALID_NUMBER_MESSAGE =
+  'Введите 0 или положительное число. Расчет не учитывает это значение.';
 
 const EDITABLE_FIELD_KEY_SET: ReadonlySet<string> = new Set(
   EDITABLE_FIELD_KEYS,
@@ -117,6 +119,14 @@ const toFiniteNumber = (
   return parseReglamentNumberInput(value);
 };
 
+const toNonnegativeFiniteNumber = (
+  value: boolean | number | string,
+): number | undefined => {
+  const parsed = toFiniteNumber(value);
+
+  return parsed !== undefined && parsed >= 0 ? parsed : undefined;
+};
+
 const toBoolean = (value: boolean | number | string): boolean | undefined => {
   if (typeof value === 'boolean') {
     return value;
@@ -171,8 +181,8 @@ export const buildReglamentCalculatorChanges = (
       continue;
     }
 
-    const baseline = toFiniteNumber(field.baseline);
-    const value = toFiniteNumber(field.value);
+    const baseline = toNonnegativeFiniteNumber(field.baseline);
+    const value = toNonnegativeFiniteNumber(field.value);
 
     if (
       baseline !== undefined &&
@@ -205,8 +215,8 @@ const isReglamentCalculatorFieldDirty = (
     return false;
   }
 
-  const baseline = toFiniteNumber(field.baseline);
-  const value = toFiniteNumber(field.value);
+  const baseline = toNonnegativeFiniteNumber(field.baseline);
+  const value = toNonnegativeFiniteNumber(field.value);
 
   return (
     baseline !== undefined &&
@@ -524,6 +534,43 @@ const formatReglamentInput = (input: HTMLInputElement): void => {
   }
 };
 
+const reglamentInputError = (input: HTMLInputElement): string | undefined => {
+  if (input.type === 'checkbox' || !input.value.trim()) {
+    return undefined;
+  }
+
+  return toNonnegativeFiniteNumber(input.value) === undefined
+    ? INVALID_NUMBER_MESSAGE
+    : undefined;
+};
+
+const renderReglamentInputValidation = (root: ParentNode): void => {
+  root.querySelectorAll(FIELD_SELECTOR).forEach((node) => {
+    if (!(node instanceof HTMLInputElement)) {
+      return;
+    }
+
+    const error = reglamentInputError(node);
+    const errorId = node.getAttribute('aria-describedby');
+    const feedback = errorId
+      ? node.ownerDocument.getElementById(errorId)
+      : undefined;
+
+    node.setCustomValidity(error ?? '');
+
+    if (error) {
+      node.setAttribute('aria-invalid', 'true');
+    } else {
+      node.removeAttribute('aria-invalid');
+    }
+
+    if (feedback instanceof HTMLElement) {
+      feedback.hidden = !error;
+      feedback.textContent = error ?? '';
+    }
+  });
+};
+
 const setResetVisibility = (root: ParentNode, isDirty: boolean): void => {
   root.querySelectorAll(RESET_SELECTOR).forEach((node) => {
     if (node instanceof HTMLButtonElement) {
@@ -540,6 +587,7 @@ const markManualBreakdownInput = (input: HTMLInputElement): void => {
 
 export const hydrateReglamentCalculator = (root: HTMLElement): void => {
   const render = (): void => {
+    renderReglamentInputValidation(root);
     const fields = readReglamentCalculatorFields(root);
 
     renderReglamentCalculator(root, calculateReglamentCalculatorState(fields));
