@@ -1178,12 +1178,21 @@ a.ui-chip:hover {
   text-wrap: balance;
 }
 
-.ui-card-title {
+.ui-entry-title {
   font-family: var(--font-heading);
-  font-size: 1.1875rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  line-height: 1.25;
-  letter-spacing: -0.012em;
+  line-height: 1.3;
+  letter-spacing: normal;
+  text-wrap: balance;
+}
+
+.ui-card-title {
+  font-family: var(--font-body);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: normal;
   text-wrap: balance;
 }
 
