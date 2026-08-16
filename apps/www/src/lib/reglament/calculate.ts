@@ -69,11 +69,7 @@ type CostFieldKey =
   | 'contractors';
 
 type RateFieldKey =
-  | 'insurance_rate'
-  | 'overhead_rate'
-  | 'profit_rate'
-  | 'usn_rate'
-  | 'vat_rate';
+  'insurance_rate' | 'overhead_rate' | 'profit_rate' | 'usn_rate' | 'vat_rate';
 
 const COST_FIELD_KEYS = [
   'primary_salary',
@@ -106,7 +102,13 @@ const tariffFromBaseline = (
 const rowChangeValue = <Key extends keyof EstimateRowChange>(
   change: EstimateRowChange | undefined,
   key: Key,
-): EstimateRowChange[Key] | undefined => change?.[key];
+): EstimateRowChange[Key] | undefined => {
+  const value = change?.[key];
+
+  return typeof value === 'number' && (!Number.isFinite(value) || value < 0)
+    ? undefined
+    : value;
+};
 
 const hasNumberChange = <Key extends keyof EstimateRowChange>(
   change: EstimateRowChange | undefined,

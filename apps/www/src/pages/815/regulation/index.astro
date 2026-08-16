@@ -358,11 +358,13 @@ const viewSections = htmlSections.map((section) => ({
   }),
 }));
 const inputShellClass =
-  'inline-flex max-w-full overflow-hidden rounded-lg border border-border bg-surface align-top transition focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20';
+  'reglament-input-shell inline-flex max-w-full overflow-hidden rounded-lg border border-border bg-surface align-top transition focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20';
 const inputBaseClass =
   'reglament-input min-w-0 bg-transparent px-2.5 py-1.5 text-sm font-semibold text-foreground outline-none';
 const inputClass = `${inputBaseClass} w-[6.25rem]`;
 const inlineInputClass = `${inputBaseClass} w-[7.5rem] text-right`;
+const inputErrorClass =
+  'reglament-input-error mt-1 block max-w-[13rem] text-xs font-semibold leading-4 text-danger';
 const inputUnitClass =
   'flex shrink-0 items-center border-l border-border bg-muted px-2 text-[0.6875rem] font-semibold leading-none text-muted-foreground';
 const tableTextClass = 'block pt-[0.4375rem] leading-snug';
@@ -371,6 +373,8 @@ const tableHeaderCellClass =
 const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
 const formatInputUnit = (unit: string): string =>
   unit === '₽/год' ? '₽' : unit;
+const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
+  `reglament-error-${rowId}-${key}`;
 ---
 
 <BaseLayout
@@ -689,6 +693,10 @@ const formatInputUnit = (unit: string): string =>
                                       row.controls.base.value,
                                     )}
                                     aria-label={`${row.title}: ${row.controls.base.label}`}
+                                    aria-describedby={inputErrorId(
+                                      row.id,
+                                      row.controls.base.key,
+                                    )}
                                     data-reglament-field={row.controls.base.key}
                                     data-reglament-row-id={row.id}
                                     data-reglament-baseline={String(
@@ -704,6 +712,16 @@ const formatInputUnit = (unit: string): string =>
                                     </span>
                                   )}
                                 </span>
+                                <span
+                                  id={inputErrorId(
+                                    row.id,
+                                    row.controls.base.key,
+                                  )}
+                                  class={inputErrorClass}
+                                  aria-live="polite"
+                                  aria-atomic="true"
+                                  hidden
+                                />
                               </label>
                             ) : row.baseline.base ? (
                               <span class={tableTextClass}>
@@ -753,6 +771,10 @@ const formatInputUnit = (unit: string): string =>
                                       row.controls.frequency.value,
                                     )}
                                     aria-label={`${row.title}: ${row.controls.frequency.label}`}
+                                    aria-describedby={inputErrorId(
+                                      row.id,
+                                      row.controls.frequency.key,
+                                    )}
                                     data-reglament-field={
                                       row.controls.frequency.key
                                     }
@@ -776,6 +798,16 @@ const formatInputUnit = (unit: string): string =>
                                     </span>
                                   )}
                                 </span>
+                                <span
+                                  id={inputErrorId(
+                                    row.id,
+                                    row.controls.frequency.key,
+                                  )}
+                                  class={inputErrorClass}
+                                  aria-live="polite"
+                                  aria-atomic="true"
+                                  hidden
+                                />
                               </label>
                             ) : row.baseline.frequency ? (
                               <span class={tableTextClass}>
@@ -825,6 +857,10 @@ const formatInputUnit = (unit: string): string =>
                                       row.controls.rate.value,
                                     )}
                                     aria-label={`${row.title}: ${row.controls.rate.label}`}
+                                    aria-describedby={inputErrorId(
+                                      row.id,
+                                      row.controls.rate.key,
+                                    )}
                                     data-reglament-field={row.controls.rate.key}
                                     data-reglament-row-id={row.id}
                                     data-reglament-baseline={String(
@@ -840,6 +876,16 @@ const formatInputUnit = (unit: string): string =>
                                     </span>
                                   )}
                                 </span>
+                                <span
+                                  id={inputErrorId(
+                                    row.id,
+                                    row.controls.rate.key,
+                                  )}
+                                  class={inputErrorClass}
+                                  aria-live="polite"
+                                  aria-atomic="true"
+                                  hidden
+                                />
                               </label>
                             ) : row.baseline.price ? (
                               <span class={tableTextClass}>
@@ -998,6 +1044,10 @@ const formatInputUnit = (unit: string): string =>
                                                       control.value,
                                                     )}
                                                     aria-label={`${row.title}: ${control.label}`}
+                                                    aria-describedby={inputErrorId(
+                                                      row.id,
+                                                      control.key,
+                                                    )}
                                                     data-reglament-field={
                                                       control.key
                                                     }
@@ -1027,6 +1077,16 @@ const formatInputUnit = (unit: string): string =>
                                                     </span>
                                                   )}
                                                 </span>
+                                                <span
+                                                  id={inputErrorId(
+                                                    row.id,
+                                                    control.key,
+                                                  )}
+                                                  class={inputErrorClass}
+                                                  aria-live="polite"
+                                                  aria-atomic="true"
+                                                  hidden
+                                                />
                                               </label>
                                             ) : (
                                               <span
@@ -1075,6 +1135,10 @@ const formatInputUnit = (unit: string): string =>
                                                 control.value,
                                               )}
                                               aria-label={`${row.title}: ${control.label}`}
+                                              aria-describedby={inputErrorId(
+                                                row.id,
+                                                control.key,
+                                              )}
                                               data-reglament-field={control.key}
                                               data-reglament-row-id={row.id}
                                               data-reglament-baseline={String(
@@ -1090,6 +1154,16 @@ const formatInputUnit = (unit: string): string =>
                                               </span>
                                             )}
                                           </span>
+                                          <span
+                                            id={inputErrorId(
+                                              row.id,
+                                              control.key,
+                                            )}
+                                            class={inputErrorClass}
+                                            aria-live="polite"
+                                            aria-atomic="true"
+                                            hidden
+                                          />
                                         </label>
                                       ))}
                                     </div>
@@ -1126,6 +1200,14 @@ const formatInputUnit = (unit: string): string =>
       color: var(--color-text-muted);
       opacity: 0.52;
       transform: translateY(-0.04em);
+    }
+
+    .reglament-input-shell:has(.reglament-input[aria-invalid='true']) {
+      border-color: var(--color-danger);
+    }
+
+    .reglament-input[aria-invalid='true'] {
+      color: var(--color-danger-text);
     }
 
     .reglament-details-summary::-webkit-details-marker {

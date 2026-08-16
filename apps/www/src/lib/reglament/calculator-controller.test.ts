@@ -121,6 +121,37 @@ describe('buildReglamentCalculatorChanges', () => {
     });
   });
 
+  it('skips negative values for every numeric field', () => {
+    expect(
+      buildReglamentCalculatorChanges([
+        {
+          rowId: 'cleaning-winter-mechanized',
+          key: 'volume',
+          baseline: 81_778,
+          value: '-100',
+        },
+        {
+          rowId: 'cleaning-winter-mechanized',
+          key: 'frequency',
+          baseline: 116,
+          value: '−1',
+        },
+        {
+          rowId: 'cleaning-winter-mechanized',
+          key: 'rate',
+          baseline: 2.26,
+          value: '-0,5',
+        },
+        {
+          rowId: 'cleaning-winter-mechanized',
+          key: 'primary_salary',
+          baseline: 1_000,
+          value: -1,
+        },
+      ]),
+    ).toEqual({});
+  });
+
   it('renders expert field changes into row annual total and breakdown details', () => {
     const rowId = 'waste-transfer-from-homes';
     document.body.innerHTML = `
@@ -479,5 +510,152 @@ describe('buildReglamentCalculatorChanges', () => {
       formatReglamentTariffValue(expectedRow.tariff_per_sotka_month),
     );
     expect(rowTariff.dataset.reglamentDeltaTone).toBe('negative');
+  });
+
+  it('preserves the row title used as a checkbox description', () => {
+    document.body.innerHTML = `
+      <div data-reglament-calculator>
+        <input
+          type="checkbox"
+          checked
+          aria-describedby="reglament-row-title-lighting"
+          data-reglament-field="enabled"
+          data-reglament-row-id="lighting"
+          data-reglament-baseline="true"
+        />
+        <h4 id="reglament-row-title-lighting">Освещение территории</h4>
+      </div>
+    `;
+    const root = document.querySelector('[data-reglament-calculator]');
+    const checkbox = document.querySelector('input');
+    const title = document.querySelector('h4');
+
+    if (
+      !(root instanceof HTMLElement) ||
+      !(checkbox instanceof HTMLInputElement) ||
+      !(title instanceof HTMLElement)
+    ) {
+      throw new Error('Missing checkbox description fixture nodes');
+    }
+
+    hydrateReglamentCalculator(root);
+
+    expect({
+      describedBy: checkbox.getAttribute('aria-describedby'),
+      titleHidden: title.hidden,
+      titleText: title.textContent,
+    }).toMatchInlineSnapshot(`
+      {
+        "describedBy": "reglament-row-title-lighting",
+        "titleHidden": false,
+        "titleText": "Освещение территории",
+      }
+    `);
+  });
+
+  it('shows the same accessible error for negative volume, frequency and rate', () => {
+    const rowId = 'cleaning-winter-mechanized';
+    document.body.innerHTML = `
+      <div data-reglament-calculator>
+        ${[
+          ['volume', '81778'],
+          ['frequency', '116'],
+          ['rate', '2.26'],
+        ]
+          .map(
+            ([key, baseline]) => `
+              <label>
+                <span>
+                  <input
+                    type="text"
+                    data-reglament-field="${key}"
+                    data-reglament-row-id="${rowId}"
+                    data-reglament-baseline="${baseline}"
+                    aria-describedby="reglament-error-${rowId}-${key}"
+                    value="${baseline}"
+                  />
+                </span>
+                <span
+                  id="reglament-error-${rowId}-${key}"
+                  aria-live="polite"
+                  hidden
+                ></span>
+              </label>
+            `,
+          )
+          .join('')}
+        <strong data-reglament-current-tariff></strong>
+      </div>
+    `;
+    const root = document.querySelector('[data-reglament-calculator]');
+    const inputs = Array.from(document.querySelectorAll('input'));
+    const [volumeInput, frequencyInput, rateInput] = inputs;
+
+    if (
+      !(root instanceof HTMLElement) ||
+      !volumeInput ||
+      !frequencyInput ||
+      !rateInput
+    ) {
+      throw new Error('Missing invalid calculator fixture nodes');
+    }
+
+    hydrateReglamentCalculator(root);
+    volumeInput.value = '-100';
+    volumeInput.dispatchEvent(new Event('input', { bubbles: true }));
+    frequencyInput.value = '−1';
+    frequencyInput.dispatchEvent(new Event('change', { bubbles: true }));
+    rateInput.value = '-0,5';
+    rateInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+    const expectedMessage =
+      'Введите 0 или положительное число. Расчет не учитывает это значение.';
+
+    inputs.forEach((input) => {
+      const error = document.getElementById(
+        input.getAttribute('aria-describedby') ?? '',
+      );
+
+      expect({
+        ariaInvalid: input.getAttribute('aria-invalid'),
+        validationMessage: input.validationMessage,
+        errorHidden: error?.hidden,
+        errorText: error?.textContent,
+      }).toEqual({
+        ariaInvalid: 'true',
+        validationMessage: expectedMessage,
+        errorHidden: false,
+        errorText: expectedMessage,
+      });
+    });
+    expect(
+      document.querySelector('[data-reglament-current-tariff]')?.textContent,
+    ).toMatchInlineSnapshot(`"902,07 ₽/сотка"`);
+
+    volumeInput.value = '';
+    volumeInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+    expect({
+      ariaInvalid: volumeInput.getAttribute('aria-invalid'),
+      validationMessage: volumeInput.validationMessage,
+      errorHidden: document.getElementById(
+        volumeInput.getAttribute('aria-describedby') ?? '',
+      )?.hidden,
+    }).toMatchInlineSnapshot(`
+      {
+        "ariaInvalid": null,
+        "errorHidden": true,
+        "validationMessage": "",
+      }
+    `);
+
+    volumeInput.value = '81 000,5';
+    volumeInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+    expect(volumeInput.getAttribute('aria-invalid')).toBeNull();
+    expect(volumeInput.validationMessage).toBe('');
+    expect(
+      document.querySelector('[data-reglament-current-tariff]')?.textContent,
+    ).not.toBe('902,07 ₽/сотка');
   });
 });

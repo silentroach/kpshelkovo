@@ -262,6 +262,22 @@ describe('calculateEstimate', () => {
     });
   });
 
+  it('ignores negative volume, frequency and rate changes', () => {
+    const result = calculateEstimate(quantityFixture, {
+      rows: {
+        'quantity-row': { volume: -20, frequency: -3, rate: -10 },
+      },
+    });
+
+    expect(result.sections[0]?.rows[0]).toMatchObject({
+      annual_gross: 1_200,
+      tariff_per_sotka_month: 1,
+      delta_annual_gross: 0,
+      delta_tariff_per_sotka_month: 0,
+      breakdown: quantityFixture.sections[0].rows[0].baseline.breakdown,
+    });
+  });
+
   it('recalculates expert cost fields with insurance, overhead, profit, USN and VAT', () => {
     const result = calculateEstimate(formulaFixture, {
       rows: {
