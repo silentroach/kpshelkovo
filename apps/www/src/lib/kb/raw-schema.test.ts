@@ -3,15 +3,15 @@ import { describe, expect, it } from 'vitest';
 import { RawKbPageSchema } from './raw-schema';
 
 describe('RawKbPageSchema', () => {
-  it('accepts noindex as a page flag', () => {
+  it('accepts supported page flags', () => {
     expect(
       RawKbPageSchema.parse({
         title: 'Служебная статья',
-        flags: ['noindex'],
+        flags: ['exclude-from-site-search', 'noindex'],
       }),
     ).toEqual({
       title: 'Служебная статья',
-      flags: ['noindex'],
+      flags: ['exclude-from-site-search', 'noindex'],
     });
   });
 

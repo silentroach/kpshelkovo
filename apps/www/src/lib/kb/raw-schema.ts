@@ -1,7 +1,10 @@
 import { z } from 'astro/zod';
 import type { KbPageFlag } from './types';
 
-const KB_PAGE_FLAGS = ['noindex'] as const satisfies readonly KbPageFlag[];
+const KB_PAGE_FLAGS = [
+  'exclude-from-site-search',
+  'noindex',
+] as const satisfies readonly KbPageFlag[];
 
 const RawKbPageFlagsSchema = z
   .array(z.enum(KB_PAGE_FLAGS))

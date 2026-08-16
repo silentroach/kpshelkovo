@@ -45,6 +45,18 @@ describe('kbPageSitemapInput', () => {
       excludeFromSitemap: false,
     });
   });
+
+  it('keeps site-search exclusions in the sitemap', () => {
+    expect(
+      kbPageSitemapInput(
+        'before-you-buy/how-to-choose-plot',
+        'title: Как выбрать участок\nflags: [exclude-from-site-search]',
+      ),
+    ).toEqual({
+      url: '/kb/before-you-buy/how-to-choose-plot/',
+      excludeFromSitemap: false,
+    });
+  });
 });
 
 describe('contactSitemapInput', () => {
