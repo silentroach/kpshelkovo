@@ -15,6 +15,8 @@
     "format": "prettier --write .",
     "format:changed": "lint-staged",
     "test": "turbo run test",
+    "test:search-quality": "pnpm --filter @shelkovo/www test:search-quality",
+    "test:search-quality:update": "pnpm --filter @shelkovo/www test:search-quality:update",
     "test:watch": "turbo run test:watch",
     "postinstall": "node scripts/hooks.mjs"
   },
