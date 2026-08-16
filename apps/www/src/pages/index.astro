@@ -4,19 +4,12 @@ import type { ImageMetadata } from 'astro';
 import { SHELKOVO_SITE_ALTERNATE_NAMES, type SchemaDoc } from '@shelkovo/seo';
 import dayHero from '@/assets/home/home-hero-day.png';
 import nightHero from '@/assets/home/home-hero-night.png';
-import SiteNav from '@/components/site/SiteNav.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getHomeHeroMode } from '@/lib/home/hero';
-import {
-  getHomeStatusAriaLabel,
-  getHomeStatusMaintenanceWindows,
-  getHomeStatusState,
-} from '@/lib/home/status';
 import { loadNewsArticles } from '@/lib/news/load';
 import { articleUrl } from '@/lib/news/routes';
 import { formatNewsDate } from '@/lib/news/view';
 import { canon } from '@/lib/site';
-import { loadStatusData } from '@/lib/status/load';
 
 const title = 'Шелково Онлайн';
 const description =
@@ -55,17 +48,8 @@ const schema = [
   },
 ] satisfies readonly SchemaDoc[];
 
-const [news, status] = await Promise.all([
-  loadNewsArticles(),
-  loadStatusData(),
-]);
-const buildNow = Date.now();
+const news = await loadNewsArticles();
 const latestNews = news.slice(0, 3);
-const homeStatusState = getHomeStatusState(status.incidents, buildNow);
-const plannedMaintenanceWindows = getHomeStatusMaintenanceWindows(
-  status.incidents,
-  buildNow,
-);
 
 const heroWidths = [960, 1280, 1536, 1916, 2172] as const;
 const heroSizes = '100vw';
@@ -99,7 +83,7 @@ const heroImage = heroMode === 'day' ? dayHeroImage : nightHeroImage;
 >
   <main class="pb-2 md:pb-3 lg:pb-4">
     <section
-      class="home-hero relative overflow-hidden border-b border-border bg-muted"
+      class="home-hero overflow-hidden border-b border-border bg-muted"
       data-home-hero-mode={heroMode}
     >
       <div class="h-[clamp(20rem,37vw,36rem)] w-full overflow-hidden">
@@ -120,27 +104,6 @@ const heroImage = heroMode === 'day' ? dayHeroImage : nightHeroImage;
           data-night-src={nightHeroImage.src}
           data-night-srcset={nightHeroImage.srcset}
         />
-        <div
-          class="home-hero-overlay pointer-events-none absolute inset-x-0 top-0 h-28 md:h-32"
-        >
-        </div>
-        <div class="absolute inset-x-0 top-0 z-10">
-          <div
-            class="flex w-full justify-end pr-4 pt-4 md:pr-6 md:pt-5 lg:pr-8 lg:pt-6"
-          >
-            <SiteNav
-              variant="hero"
-              statusState={homeStatusState}
-              statusAriaLabel={getHomeStatusAriaLabel(homeStatusState)}
-              tariffMenuId="home-hero-tariff-menu"
-            />
-            <script
-              type="application/json"
-              data-home-status-maintenance-windows
-              set:html={JSON.stringify(plannedMaintenanceWindows)}
-            />
-          </div>
-        </div>
         <script>
           import { installHomeHeroHydration } from '@/lib/home/hero';
 
@@ -194,23 +157,3 @@ const heroImage = heroMode === 'day' ? dayHeroImage : nightHeroImage;
     }
   </main>
 </BaseLayout>
-
-<style>
-  .home-hero-overlay {
-    background: linear-gradient(
-      to bottom,
-      color-mix(in oklab, var(--color-bg) 36%, transparent),
-      color-mix(in oklab, var(--color-bg) 10%, transparent) 54%,
-      transparent
-    );
-  }
-
-  .home-hero[data-home-hero-mode='night'] .home-hero-overlay {
-    background: linear-gradient(
-      to bottom,
-      oklch(5% 0.01 250 / 0.58),
-      oklch(5% 0.01 250 / 0.22) 58%,
-      transparent
-    );
-  }
-</style>

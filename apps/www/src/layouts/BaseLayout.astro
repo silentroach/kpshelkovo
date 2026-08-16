@@ -33,8 +33,6 @@ interface Props {
   search?: SearchDocument;
 }
 
-const isHomePage = Astro.url.pathname === '/';
-
 const {
   title = 'Шелково Онлайн',
   description = 'Новости, статус сервисов и справочная информация о поселке Шелково и связанных проектах.',
@@ -71,7 +69,7 @@ const ymId = 108975391;
 const contentTransition = fade({ duration: '60ms' });
 const bodyClasses = [
   'ui-root-site',
-  showSiteHeader && !isHomePage && 'site-has-header',
+  showSiteHeader && 'site-has-header',
   bodyClass,
   'flex min-h-screen flex-col text-foreground',
 ]
@@ -189,7 +187,7 @@ const searchMetadata = search
         </noscript>
       )
     }
-    {showSiteHeader && <SiteHeader mobileOnly={isHomePage} />}
+    {showSiteHeader && <SiteHeader />}
     <div
       class="flex-1"
       data-pagefind-root={search ? true : undefined}
