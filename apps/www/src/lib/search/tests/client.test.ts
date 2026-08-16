@@ -68,6 +68,7 @@ describe('Pagefind search client', () => {
       {
         "query": "",
         "results": [],
+        "searchQuery": "",
         "state": "ready",
         "total": 0,
       }
@@ -296,6 +297,7 @@ describe('Pagefind search client', () => {
             "url": "/815/compare/settlements/shelkovo/",
           },
         ],
+        "searchQuery": "текст",
         "state": "ready",
         "total": 2,
       }
@@ -600,6 +602,191 @@ describe('Pagefind search client', () => {
     expect(preload).toHaveBeenCalledWith('я'.repeat(SEARCH_QUERY_MAX_LENGTH));
     expect(search).toHaveBeenCalledWith('я'.repeat(SEARCH_QUERY_MAX_LENGTH));
     expect(result?.query).toHaveLength(SEARCH_QUERY_MAX_LENGTH);
+  });
+
+  it('keeps the visible query but removes single-letter function words from Pagefind', async () => {
+    const { preload, runtime, search } = runtimeWith(responseWith());
+    const loadPagefind = vi.fn(async () => runtime);
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind,
+    });
+
+    await client.preload?.('  подать в суд и тариф  ');
+    const result = await client.search('  подать в суд и тариф  ');
+    const ignored = await client.search(' в ');
+
+    expect({
+      ignored,
+      loadCalls: loadPagefind.mock.calls.length,
+      preloadCalls: preload.mock.calls,
+      result,
+      searchCalls: search.mock.calls,
+    }).toMatchInlineSnapshot(`
+      {
+        "ignored": {
+          "query": "в",
+          "results": [],
+          "searchQuery": "",
+          "state": "ready",
+          "total": 0,
+        },
+        "loadCalls": 1,
+        "preloadCalls": [
+          [
+            "подать суд тариф",
+          ],
+        ],
+        "result": {
+          "query": "подать в суд и тариф",
+          "results": [],
+          "searchQuery": "подать суд тариф",
+          "state": "ready",
+          "total": 0,
+        },
+        "searchCalls": [
+          [
+            "подать суд тариф",
+          ],
+        ],
+      }
+    `);
+  });
+
+  it('uses exact short-word matches without losing Pagefind ranking data', async () => {
+    const data = {
+      broadFood: vi.fn(async () => ({
+        ...validResult(1),
+        excerpt: 'Широкое совпадение 1',
+      })),
+      broadMeeting: vi.fn(async () => ({
+        ...validResult(3),
+        excerpt: 'Широкое совпадение 3',
+      })),
+      broadNoise: vi.fn(async () => validResult(2)),
+      exactFood: vi.fn(async () => ({
+        ...validResult(1),
+        excerpt: 'Точное совпадение 1',
+      })),
+      exactMeeting: vi.fn(async () => ({
+        ...validResult(3),
+        excerpt: 'Точное совпадение 3',
+      })),
+    };
+    const broadResponse: PagefindSearchResponse = {
+      results: [
+        { id: 'food', score: 12, data: data.broadFood },
+        { id: 'noise', score: 8, data: data.broadNoise },
+        { id: 'meeting', score: 1, data: data.broadMeeting },
+      ],
+    };
+    const exactResponse: PagefindSearchResponse = {
+      results: [
+        { id: 'food', data: data.exactFood },
+        { id: 'meeting', data: data.exactMeeting },
+      ],
+    };
+    const search = vi.fn(async (query: string) =>
+      query === '"еда"' ? exactResponse : broadResponse,
+    );
+    const runtime: PagefindRuntime = {
+      init: vi.fn(async () => {}),
+      options: vi.fn(async () => {}),
+      preload: vi.fn(async () => {}),
+      search,
+    };
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => runtime,
+    });
+
+    const result = await client.search('еда');
+
+    expect({
+      dataCalls: {
+        broadFood: data.broadFood.mock.calls.length,
+        broadMeeting: data.broadMeeting.mock.calls.length,
+        broadNoise: data.broadNoise.mock.calls.length,
+        exactFood: data.exactFood.mock.calls.length,
+        exactMeeting: data.exactMeeting.mock.calls.length,
+      },
+      result,
+      searchCalls: search.mock.calls,
+    }).toMatchInlineSnapshot(`
+      {
+        "dataCalls": {
+          "broadFood": 0,
+          "broadMeeting": 0,
+          "broadNoise": 0,
+          "exactFood": 1,
+          "exactMeeting": 1,
+        },
+        "result": {
+          "query": "еда",
+          "results": [
+            {
+              "description": undefined,
+              "excerptHtml": "Точное совпадение 1",
+              "matchContext": undefined,
+              "publishedAt": undefined,
+              "section": {
+                "id": "news",
+                "label": "Новости",
+              },
+              "subResults": [],
+              "title": "Результат 1",
+              "url": "/news/result-1/",
+            },
+            {
+              "description": undefined,
+              "excerptHtml": "Точное совпадение 3",
+              "matchContext": undefined,
+              "publishedAt": undefined,
+              "section": {
+                "id": "news",
+                "label": "Новости",
+              },
+              "subResults": [],
+              "title": "Результат 3",
+              "url": "/news/result-3/",
+            },
+          ],
+          "searchQuery": "еда",
+          "state": "ready",
+          "total": 2,
+        },
+        "searchCalls": [
+          [
+            "еда",
+          ],
+          [
+            ""еда"",
+          ],
+        ],
+      }
+    `);
+  });
+
+  it('keeps prefix search for an unfinished short word without exact matches', async () => {
+    const broadResponse = responseWith(validResult(1));
+    const search = vi.fn(async (query: string) =>
+      query === '"тар"' ? responseWith() : broadResponse,
+    );
+    const runtime: PagefindRuntime = {
+      init: vi.fn(async () => {}),
+      options: vi.fn(async () => {}),
+      preload: vi.fn(async () => {}),
+      search,
+    };
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => runtime,
+    });
+
+    await expect(client.search('тар')).resolves.toMatchObject({
+      results: [{ title: 'Результат 1' }],
+      total: 1,
+    });
   });
 
   it('discards an older response after a newer request completes', async () => {

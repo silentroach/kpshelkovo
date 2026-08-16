@@ -10,6 +10,8 @@
     "preview": "astro preview",
     "typecheck": "astro sync && tsc --noEmit",
     "test": "vitest run",
+    "test:search-quality": "pnpm build && vitest run -c vitest.search-quality.config.ts",
+    "test:search-quality:update": "pnpm build && vitest run -c vitest.search-quality.config.ts -u",
     "test:watch": "vitest",
     "test:visual:status": "playwright test -c playwright.status-visual.local.config.ts",
     "test:visual:status:update": "playwright test -c playwright.status-visual.local.config.ts --update-snapshots",
