@@ -4,6 +4,19 @@
   background: var(--color-bg);
 }
 
+.site-page-shell--overlay-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.site-page-shell--overlay-header > :is(.site-header, .site-page-content) {
+  grid-area: 1 / 1;
+}
+
+.site-page-shell--overlay-header > .site-header {
+  align-self: start;
+}
+
 .ui-root-site .ui-sticky-table-shell {
   --ui-sticky-table-header-top: var(--site-sticky-offset);
 }
