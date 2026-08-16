@@ -9,6 +9,8 @@ apps/*/.astro/
 .agents/skills/*
 !.agents/skills/news-maker/
 !.agents/skills/news-maker/**
+!.agents/skills/project-issues/
+!.agents/skills/project-issues/**
 !.agents/skills/public-media-publisher/
 !.agents/skills/public-media-publisher/**
 logs/
