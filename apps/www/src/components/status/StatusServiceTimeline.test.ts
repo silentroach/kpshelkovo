@@ -289,11 +289,18 @@ describe('StatusServiceTimeline', () => {
     ]).toMatchSnapshot();
   });
 
-  it('keeps adjacent dates in separate SSR lanes with their own links', async () => {
+  it('keeps dense 6, 10, and 11 August targets in separate SSR lanes', async () => {
     vi.setSystemTime(new Date('2026-08-17T00:00:00Z'));
 
     const html = await renderTimeline(
       [
+        incident({
+          id: 'electricity-outage-2026-08-06',
+          url: '/status/incidents/2026/08/electricity-outage-2026-08-06/',
+          startedIso: '2026-08-06T09:25:00Z',
+          endedIso: '2026-08-06T09:47:00Z',
+          isActive: false,
+        }),
         incident({
           id: 'electricity-river-outage-2026-08-10',
           url: '/status/incidents/2026/08/electricity-river-outage-2026-08-10/',
@@ -315,17 +322,22 @@ describe('StatusServiceTimeline', () => {
     );
 
     expect([
+      incidentSegmentTarget(html, 'electricity-outage-2026-08-06'),
       incidentSegmentTarget(html, 'electricity-river-outage-2026-08-10'),
       incidentSegmentTarget(html, 'electricity-outage-2026-08-11'),
     ]).toMatchInlineSnapshot(`
       [
         {
+          "href": "/status/incidents/2026/08/electricity-outage-2026-08-06/",
+          "laneOffset": "-24px",
+        },
+        {
           "href": "/status/incidents/2026/08/electricity-river-outage-2026-08-10/",
-          "laneOffset": "-12px",
+          "laneOffset": "0px",
         },
         {
           "href": "/status/incidents/2026/08/electricity-outage-2026-08-11/",
-          "laneOffset": "12px",
+          "laneOffset": "24px",
         },
       ]
     `);

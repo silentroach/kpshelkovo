@@ -9,9 +9,13 @@ import {
   type StatusService,
 } from '@/lib/status/schema';
 import {
+  buildStatusTimelineLaneLayout,
   buildStatusTimelineProblemSegments,
+  getStatusTimelineHitInterval,
   getStatusTimelineSegmentGeometry,
   getStatusTimelineRange,
+  STATUS_TIMELINE_HIT_SIZE_PX,
+  STATUS_TIMELINE_MIN_TRACK_WIDTH_PX,
   type StatusTimelineIncidentInput,
   type StatusTimelineSpan,
 } from '@/lib/status/timeline';
@@ -30,9 +34,6 @@ interface Props {
   readonly incidents: readonly StatusTimelineIncidentInput[];
   readonly timelineDays?: number;
 }
-
-const STATUS_TIMELINE_HIT_SIZE_PX = 24;
-const STATUS_TIMELINE_GEOMETRY_EPSILON = 1e-7;
 
 const { service, incidents, timelineDays = 90 } = Astro.props;
 
@@ -302,61 +303,32 @@ const timelineGroups = incidents
     };
   });
 
-const timelineLaneOffsets = new Map<string, number>();
-let timelineLaneCluster: typeof timelineGroups = [];
-
-const flushTimelineLaneCluster = (): void => {
-  if (timelineLaneCluster.length > 1) {
-    const centerLane = (timelineLaneCluster.length - 1) / 2;
-
-    timelineLaneCluster.forEach((group, index) => {
-      timelineLaneOffsets.set(
-        group.id,
-        (index - centerLane) * STATUS_TIMELINE_HIT_SIZE_PX,
-      );
-    });
-  }
-
-  timelineLaneCluster = [];
-};
-
-timelineGroups.forEach((group) => {
-  if (
-    group.hidden ||
-    !group.compactMarker ||
-    group.left === undefined ||
-    group.width === undefined
-  ) {
-    flushTimelineLaneCluster();
-    return;
-  }
-
-  const previous = timelineLaneCluster.at(-1);
-  const followsPreviousDay =
-    previous?.left !== undefined &&
-    previous.width !== undefined &&
-    group.left <=
-      previous.left + previous.width + STATUS_TIMELINE_GEOMETRY_EPSILON;
-
-  if (previous && !followsPreviousDay) {
-    flushTimelineLaneCluster();
-  }
-
-  timelineLaneCluster.push(group);
-});
-flushTimelineLaneCluster();
-
-const timelineLaneSpace = Math.max(
-  0,
-  ...Array.from(timelineLaneOffsets.values(), Math.abs),
+const timelineLaneLayout = buildStatusTimelineLaneLayout(
+  timelineGroups.flatMap((group) =>
+    group.hidden || group.left === undefined || group.width === undefined
+      ? []
+      : [
+          getStatusTimelineHitInterval(
+            {
+              id: group.id,
+              leftPercent: group.left,
+              widthPercent: group.width,
+              compactMarker: group.compactMarker,
+              reachesRangeEnd: group.reachesRangeEnd,
+            },
+            STATUS_TIMELINE_MIN_TRACK_WIDTH_PX,
+          ),
+        ],
+  ),
 );
+const timelineLaneOffsets = timelineLaneLayout.offsetsById;
 ---
 
 <div
   class="js-status-service-timeline status-service-timeline"
   data-status-timeline
   data-range-days={String(timelineDays)}
-  style={`--timeline-hit-size: ${STATUS_TIMELINE_HIT_SIZE_PX}px; --timeline-lane-space: ${timelineLaneSpace}px;`}
+  style={`--timeline-hit-size: ${STATUS_TIMELINE_HIT_SIZE_PX}px; --timeline-lane-space: ${timelineLaneLayout.spacePx}px;`}
 >
   <div class="status-service-timeline__track">
     <div class="status-service-timeline__segments" data-status-timeline-track>
@@ -607,9 +579,7 @@ const timelineLaneSpace = Math.max(
     box-shadow: none;
     cursor: pointer;
     transform: translateY(calc(-50% + var(--segment-lane-offset, 0px)));
-    transition:
-      filter 160ms ease,
-      transform 160ms ease;
+    transition: filter 160ms ease;
   }
 
   .status-service-timeline__segment-marker {

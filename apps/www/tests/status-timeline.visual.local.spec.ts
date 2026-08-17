@@ -1,6 +1,25 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 const desktopViewport = { width: 1440, height: 1200 } as const;
+const mobileViewport = { width: 320, height: 900 } as const;
+const viewportCases = [
+  ['mobile', mobileViewport],
+  ['desktop', desktopViewport],
+] as const;
+const denseDateTargets = [
+  {
+    id: 'electricity-outage-2026-08-06',
+    path: '/status/incidents/2026/08/electricity-outage-2026-08-06/',
+  },
+  {
+    id: 'electricity-river-outage-2026-08-10',
+    path: '/status/incidents/2026/08/electricity-river-outage-2026-08-10/',
+  },
+  {
+    id: 'electricity-outage-2026-08-11',
+    path: '/status/incidents/2026/08/electricity-outage-2026-08-11/',
+  },
+] as const;
 
 const screenshot = {
   animations: 'disabled',
@@ -19,7 +38,7 @@ const openFixture = async (page: Page): Promise<void> => {
   await page.locator('[data-status-problem]').first().hover();
   await expect(
     page.locator('[data-status-problem][data-status-tooltip-bound="true"]'),
-  ).toHaveCount(6);
+  ).toHaveCount(7);
   await page.mouse.move(0, 0);
 };
 
@@ -38,74 +57,168 @@ const openTimelineTooltip = async (
   ).toHaveCount(1);
 };
 
-test('keeps adjacent-date hit areas separate before lazy hydration', async ({
-  browser,
-}) => {
-  const context = await browser.newContext({
-    javaScriptEnabled: false,
-    viewport: desktopViewport,
-  });
-  const page = await context.newPage();
+const openDenseDateTimeline = async (
+  page: Page,
+  hydrate: boolean,
+): Promise<Locator> => {
+  await page.goto(fixtureUrl, { waitUntil: 'networkidle' });
+  const target = page.getByTestId('status-timeline-dense-dates');
 
-  try {
-    await page.goto(fixtureUrl, { waitUntil: 'networkidle' });
+  await expect(target).toBeVisible();
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
 
-    const target = page.getByTestId('status-timeline-adjacent-dates');
-    const first = target.locator(
-      '[data-incident-id="adjacent-maintenance-first"]',
-    );
-    const second = target.locator(
-      '[data-incident-id="adjacent-maintenance-second"]',
-    );
-    const [firstBox, secondBox] = await Promise.all([
-      first.boundingBox(),
-      second.boundingBox(),
-    ]);
-
-    if (!firstBox || !secondBox) {
-      throw new Error('Adjacent timeline markers must be visible');
-    }
-
-    const overlaps =
-      firstBox.x < secondBox.x + secondBox.width &&
-      firstBox.x + firstBox.width > secondBox.x &&
-      firstBox.y < secondBox.y + secondBox.height &&
-      firstBox.y + firstBox.height > secondBox.y;
-
-    expect(overlaps).toBe(false);
-    expect(firstBox.width).toBeGreaterThanOrEqual(23.9);
-    expect(firstBox.height).toBeGreaterThanOrEqual(23.9);
-    expect(secondBox.width).toBeGreaterThanOrEqual(23.9);
-    expect(secondBox.height).toBeGreaterThanOrEqual(23.9);
-
-    for (const [incidentId, expectedPath] of [
-      [
-        'adjacent-maintenance-first',
-        '/status/incidents/adjacent-maintenance-first/',
-      ],
-      [
-        'adjacent-maintenance-second',
-        '/status/incidents/adjacent-maintenance-second/',
-      ],
-    ] as const) {
-      await page.goto(fixtureUrl, { waitUntil: 'networkidle' });
-      const segment = page
-        .getByTestId('status-timeline-adjacent-dates')
-        .locator(`[data-incident-id="${incidentId}"]`);
-      const box = await segment.boundingBox();
-
-      if (!box) {
-        throw new Error(`Timeline marker ${incidentId} must be visible`);
-      }
-
-      await segment.click({
-        position: { x: box.width / 2, y: box.height / 2 },
-      });
-      expect(new URL(page.url()).pathname).toBe(expectedPath);
-    }
-  } finally {
-    await context.close();
+  if (hydrate) {
+    await target.locator('[data-status-problem]').first().hover();
+    await expect(
+      target.locator('[data-status-problem][data-status-tooltip-bound="true"]'),
+    ).toHaveCount(denseDateTargets.length);
+    await page.mouse.move(0, 0);
   }
+
+  return target;
+};
+
+const assertDenseDateHitAreas = async (target: Locator): Promise<void> => {
+  await target.scrollIntoViewIfNeeded();
+  const track = target.locator('[data-status-timeline-track]');
+  const trackBox = await track.boundingBox();
+
+  if (!trackBox) {
+    throw new Error('Dense timeline track must be visible');
+  }
+
+  expect(trackBox.width).toBeGreaterThanOrEqual(255.9);
+
+  const metrics = await target
+    .locator('[data-status-problem]:visible')
+    .evaluateAll((segments) =>
+      segments.map((segment) => {
+        const rect = segment.getBoundingClientRect();
+        const centerTarget = document
+          .elementFromPoint(
+            rect.left + rect.width / 2,
+            rect.top + rect.height / 2,
+          )
+          ?.closest('[data-status-problem]');
+
+        return {
+          centerId:
+            centerTarget instanceof HTMLElement
+              ? centerTarget.dataset.incidentId
+              : undefined,
+          height: rect.height,
+          href: segment.getAttribute('href'),
+          id:
+            segment instanceof HTMLElement
+              ? segment.dataset.incidentId
+              : undefined,
+          width: rect.width,
+          x: rect.x,
+          y: rect.y,
+        };
+      }),
+    );
+
+  expect(metrics).toHaveLength(denseDateTargets.length);
+
+  metrics.forEach((metric, index) => {
+    const expected = denseDateTargets[index];
+
+    expect(metric.id).toBe(expected.id);
+    expect(metric.href).toBe(expected.path);
+    expect(metric.centerId).toBe(expected.id);
+    expect(metric.width).toBeGreaterThanOrEqual(23.9);
+    expect(metric.height).toBeGreaterThanOrEqual(23.9);
+  });
+
+  metrics.forEach((first, firstIndex) => {
+    metrics.slice(firstIndex + 1).forEach((second) => {
+      const overlaps =
+        first.x < second.x + second.width &&
+        first.x + first.width > second.x &&
+        first.y < second.y + second.height &&
+        first.y + first.height > second.y;
+
+      expect(overlaps, `${first.id} overlaps ${second.id}`).toBe(false);
+    });
+  });
+};
+
+const clickDenseDateTargetCenters = async (
+  page: Page,
+  hydrate: boolean,
+): Promise<void> => {
+  for (const expected of denseDateTargets) {
+    const target = await openDenseDateTimeline(page, hydrate);
+    const segment = target.locator(`[data-incident-id="${expected.id}"]`);
+    const box = await segment.boundingBox();
+
+    if (!box) {
+      throw new Error(`Timeline marker ${expected.id} must be visible`);
+    }
+
+    await segment.click({
+      position: { x: box.width / 2, y: box.height / 2 },
+    });
+    expect(new URL(page.url()).pathname).toBe(expected.path);
+  }
+};
+
+for (const [name, viewport] of viewportCases) {
+  test(`keeps dense SSR targets separate on ${name}`, async ({ browser }) => {
+    const context = await browser.newContext({
+      javaScriptEnabled: false,
+      viewport,
+    });
+    const page = await context.newPage();
+
+    try {
+      const target = await openDenseDateTimeline(page, false);
+
+      await assertDenseDateHitAreas(target);
+      await clickDenseDateTargetCenters(page, false);
+    } finally {
+      await context.close();
+    }
+  });
+
+  test(`keeps dense hydrated targets separate on ${name}`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    const target = await openDenseDateTimeline(page, true);
+
+    await assertDenseDateHitAreas(target);
+    await clickDenseDateTargetCenters(page, true);
+  });
+}
+
+test('reflows dense hydrated targets after resize', async ({ page }) => {
+  await page.setViewportSize(desktopViewport);
+  let target = await openDenseDateTimeline(page, true);
+
+  await assertDenseDateHitAreas(target);
+  await page.setViewportSize(mobileViewport);
+  target = page.getByTestId('status-timeline-dense-dates');
+  await expect
+    .poll(() =>
+      target.locator('[data-status-problem]:visible').evaluateAll((segments) =>
+        segments.flatMap((first, firstIndex) => {
+          const firstRect = first.getBoundingClientRect();
+
+          return segments.slice(firstIndex + 1).flatMap((second) => {
+            const secondRect = second.getBoundingClientRect();
+            const overlaps =
+              firstRect.left < secondRect.right &&
+              firstRect.right > secondRect.left &&
+              firstRect.top < secondRect.bottom &&
+              firstRect.bottom > secondRect.top;
+
+            return overlaps ? ['overlap'] : [];
+          });
+        }),
+      ),
+    )
+    .toEqual([]);
+  await assertDenseDateHitAreas(target);
 });
 
 test.describe('StatusServiceTimeline visual', () => {
