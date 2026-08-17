@@ -302,7 +302,7 @@ const bindSiteHeaderMenu = (): void => {
   });
 
   document.addEventListener('keydown', (event) => {
-    if (event.key !== 'Escape') {
+    if (event.defaultPrevented || event.key !== 'Escape') {
       return;
     }
 
@@ -310,6 +310,13 @@ const bindSiteHeaderMenu = (): void => {
       SITE_HEADER_MENU_SELECTOR,
     );
     if (!menu?.open) {
+      return;
+    }
+
+    const eventTargetIsInsideMenu =
+      event.target instanceof Node && menu.contains(event.target);
+    const focusIsInsideMenu = menu.contains(document.activeElement);
+    if (!eventTargetIsInsideMenu && !focusIsInsideMenu) {
       return;
     }
 
