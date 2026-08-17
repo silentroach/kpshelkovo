@@ -8,15 +8,19 @@ const screenshot = {
   scale: 'device',
 } as const;
 
+const fixtureUrl = 'http://127.0.0.1:4324/';
+
 const openFixture = async (page: Page): Promise<void> => {
   await page.setViewportSize(desktopViewport);
   expect(page.viewportSize()).toEqual(desktopViewport);
   await page.goto('/', { waitUntil: 'networkidle' });
   await expect(page.getByTestId('status-timeline-visual')).toBeVisible();
   await page.evaluate(() => document.fonts.ready.then(() => undefined));
+  await page.locator('[data-status-problem]').first().hover();
   await expect(
     page.locator('[data-status-problem][data-status-tooltip-bound="true"]'),
-  ).toHaveCount(4);
+  ).toHaveCount(6);
+  await page.mouse.move(0, 0);
 };
 
 const openTimelineTooltip = async (
@@ -33,6 +37,76 @@ const openTimelineTooltip = async (
     target.locator('[data-status-timeline][data-status-tooltip-open="true"]'),
   ).toHaveCount(1);
 };
+
+test('keeps adjacent-date hit areas separate before lazy hydration', async ({
+  browser,
+}) => {
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: desktopViewport,
+  });
+  const page = await context.newPage();
+
+  try {
+    await page.goto(fixtureUrl, { waitUntil: 'networkidle' });
+
+    const target = page.getByTestId('status-timeline-adjacent-dates');
+    const first = target.locator(
+      '[data-incident-id="adjacent-maintenance-first"]',
+    );
+    const second = target.locator(
+      '[data-incident-id="adjacent-maintenance-second"]',
+    );
+    const [firstBox, secondBox] = await Promise.all([
+      first.boundingBox(),
+      second.boundingBox(),
+    ]);
+
+    if (!firstBox || !secondBox) {
+      throw new Error('Adjacent timeline markers must be visible');
+    }
+
+    const overlaps =
+      firstBox.x < secondBox.x + secondBox.width &&
+      firstBox.x + firstBox.width > secondBox.x &&
+      firstBox.y < secondBox.y + secondBox.height &&
+      firstBox.y + firstBox.height > secondBox.y;
+
+    expect(overlaps).toBe(false);
+    expect(firstBox.width).toBeGreaterThanOrEqual(23.9);
+    expect(firstBox.height).toBeGreaterThanOrEqual(23.9);
+    expect(secondBox.width).toBeGreaterThanOrEqual(23.9);
+    expect(secondBox.height).toBeGreaterThanOrEqual(23.9);
+
+    for (const [incidentId, expectedPath] of [
+      [
+        'adjacent-maintenance-first',
+        '/status/incidents/adjacent-maintenance-first/',
+      ],
+      [
+        'adjacent-maintenance-second',
+        '/status/incidents/adjacent-maintenance-second/',
+      ],
+    ] as const) {
+      await page.goto(fixtureUrl, { waitUntil: 'networkidle' });
+      const segment = page
+        .getByTestId('status-timeline-adjacent-dates')
+        .locator(`[data-incident-id="${incidentId}"]`);
+      const box = await segment.boundingBox();
+
+      if (!box) {
+        throw new Error(`Timeline marker ${incidentId} must be visible`);
+      }
+
+      await segment.click({
+        position: { x: box.width / 2, y: box.height / 2 },
+      });
+      expect(new URL(page.url()).pathname).toBe(expectedPath);
+    }
+  } finally {
+    await context.close();
+  }
+});
 
 test.describe('StatusServiceTimeline visual', () => {
   test.beforeEach(async ({ page }) => {

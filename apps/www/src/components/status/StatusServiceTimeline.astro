@@ -31,6 +31,9 @@ interface Props {
   readonly timelineDays?: number;
 }
 
+const STATUS_TIMELINE_HIT_SIZE_PX = 24;
+const STATUS_TIMELINE_GEOMETRY_EPSILON = 1e-7;
+
 const { service, incidents, timelineDays = 90 } = Astro.props;
 
 const range = getStatusTimelineRange(Date.now(), timelineDays);
@@ -298,12 +301,62 @@ const timelineGroups = incidents
       width: geometry?.widthPercent,
     };
   });
+
+const timelineLaneOffsets = new Map<string, number>();
+let timelineLaneCluster: typeof timelineGroups = [];
+
+const flushTimelineLaneCluster = (): void => {
+  if (timelineLaneCluster.length > 1) {
+    const centerLane = (timelineLaneCluster.length - 1) / 2;
+
+    timelineLaneCluster.forEach((group, index) => {
+      timelineLaneOffsets.set(
+        group.id,
+        (index - centerLane) * STATUS_TIMELINE_HIT_SIZE_PX,
+      );
+    });
+  }
+
+  timelineLaneCluster = [];
+};
+
+timelineGroups.forEach((group) => {
+  if (
+    group.hidden ||
+    !group.compactMarker ||
+    group.left === undefined ||
+    group.width === undefined
+  ) {
+    flushTimelineLaneCluster();
+    return;
+  }
+
+  const previous = timelineLaneCluster.at(-1);
+  const followsPreviousDay =
+    previous?.left !== undefined &&
+    previous.width !== undefined &&
+    group.left <=
+      previous.left + previous.width + STATUS_TIMELINE_GEOMETRY_EPSILON;
+
+  if (previous && !followsPreviousDay) {
+    flushTimelineLaneCluster();
+  }
+
+  timelineLaneCluster.push(group);
+});
+flushTimelineLaneCluster();
+
+const timelineLaneSpace = Math.max(
+  0,
+  ...Array.from(timelineLaneOffsets.values(), Math.abs),
+);
 ---
 
 <div
   class="js-status-service-timeline status-service-timeline"
   data-status-timeline
   data-range-days={String(timelineDays)}
+  style={`--timeline-hit-size: ${STATUS_TIMELINE_HIT_SIZE_PX}px; --timeline-lane-space: ${timelineLaneSpace}px;`}
 >
   <div class="status-service-timeline__track">
     <div class="status-service-timeline__segments" data-status-timeline-track>
@@ -333,6 +386,7 @@ const timelineGroups = incidents
             width,
           }) => {
             const TimelineSegment = href ? 'a' : 'button';
+            const laneOffset = timelineLaneOffsets.get(id);
 
             return (
               <TimelineSegment
@@ -376,7 +430,7 @@ const timelineGroups = incidents
                 style={
                   hidden || left === undefined || width === undefined
                     ? undefined
-                    : `--segment-left: ${left}; --segment-width: ${width};`
+                    : `--segment-left: ${left}; --segment-width: ${width};${laneOffset === undefined ? '' : ` --segment-lane-offset: ${laneOffset}px;`}`
                 }
               >
                 <span
@@ -457,6 +511,7 @@ const timelineGroups = incidents
 
   .status-service-timeline__track {
     position: relative;
+    margin-block: var(--timeline-lane-space);
     overflow: visible;
     border: 1px solid
       color-mix(
@@ -532,7 +587,7 @@ const timelineGroups = incidents
   }
 
   .status-service-timeline__segment--problem {
-    --segment-hit-size: 24px;
+    --segment-hit-size: var(--timeline-hit-size);
     --segment-hit-inline-padding: max(
       0px,
       calc(
@@ -551,7 +606,7 @@ const timelineGroups = incidents
     background: transparent;
     box-shadow: none;
     cursor: pointer;
-    transform: translateY(-50%);
+    transform: translateY(calc(-50% + var(--segment-lane-offset, 0px)));
     transition:
       filter 160ms ease,
       transform 160ms ease;

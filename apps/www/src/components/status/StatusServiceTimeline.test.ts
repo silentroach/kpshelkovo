@@ -13,6 +13,7 @@ const NBSP = '\u00A0';
 
 interface IncidentInput {
   readonly id: string;
+  readonly url?: string;
   readonly kind?: StatusTimelineIncidentInput['kind'];
   readonly hasPage?: boolean;
   readonly title?: string;
@@ -26,7 +27,7 @@ interface IncidentInput {
 
 const incident = (input: IncidentInput): StatusTimelineIncidentInput => ({
   id: input.id,
-  url: `/status/incidents/${input.id}`,
+  url: input.url ?? `/status/incidents/${input.id}`,
   hasPage: input.hasPage ?? true,
   title: input.title ?? `Запись ${input.id}`,
   kind: input.kind ?? 'incident',
@@ -73,6 +74,18 @@ const incidentSegmentTag = (html: string, id: string): string =>
       ),
     )?.[0] ?? '',
   );
+
+const incidentSegmentTarget = (
+  html: string,
+  id: string,
+): { readonly href?: string; readonly laneOffset?: string } => {
+  const tag = incidentSegmentTag(html, id);
+
+  return {
+    href: tag.match(/\shref="([^"]+)"/u)?.[1],
+    laneOffset: tag.match(/--segment-lane-offset: ([^;]+);/u)?.[1],
+  };
+};
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -274,6 +287,48 @@ describe('StatusServiceTimeline', () => {
       incidentSegmentTag(html, 'no-page'),
       incidentSegmentTag(html, 'with-page'),
     ]).toMatchSnapshot();
+  });
+
+  it('keeps adjacent dates in separate SSR lanes with their own links', async () => {
+    vi.setSystemTime(new Date('2026-08-17T00:00:00Z'));
+
+    const html = await renderTimeline(
+      [
+        incident({
+          id: 'electricity-river-outage-2026-08-10',
+          url: '/status/incidents/2026/08/electricity-river-outage-2026-08-10/',
+          kind: 'maintenance',
+          startedIso: '2026-08-10T12:00:00Z',
+          endedIso: '2026-08-10T14:00:00Z',
+          isActive: false,
+        }),
+        incident({
+          id: 'electricity-outage-2026-08-11',
+          url: '/status/incidents/2026/08/electricity-outage-2026-08-11/',
+          kind: 'maintenance',
+          startedIso: '2026-08-11T06:00:00Z',
+          endedIso: '2026-08-11T14:00:00Z',
+          isActive: false,
+        }),
+      ],
+      90,
+    );
+
+    expect([
+      incidentSegmentTarget(html, 'electricity-river-outage-2026-08-10'),
+      incidentSegmentTarget(html, 'electricity-outage-2026-08-11'),
+    ]).toMatchInlineSnapshot(`
+      [
+        {
+          "href": "/status/incidents/2026/08/electricity-river-outage-2026-08-10/",
+          "laneOffset": "-12px",
+        },
+        {
+          "href": "/status/incidents/2026/08/electricity-outage-2026-08-11/",
+          "laneOffset": "12px",
+        },
+      ]
+    `);
   });
 
   it('marks any affected single day with the full visible day slot', async () => {
