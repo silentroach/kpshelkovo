@@ -18,17 +18,21 @@ describe('TariffRank', () => {
     ).toBeTruthy();
   });
 
-  it('renders one dot per settlement', () => {
+  it('keeps the number of markers constant as the list grows', () => {
     const { container } = render(TariffRank, {
       props: {
-        rank: 3,
-        base: 5,
-        total: 7,
+        rank: 30,
+        base: 60,
+        total: 100,
         tone: 'warning',
       },
     });
 
-    expect(container.querySelectorAll('[aria-hidden="true"]').length).toBe(8);
+    expect(
+      container.querySelectorAll(
+        '[data-testid="tariff-rank-current"], [data-testid="tariff-rank-base"]',
+      ),
+    ).toHaveLength(2);
   });
 
   it('marks current and baseline positions separately', () => {
@@ -47,6 +51,19 @@ describe('TariffRank', () => {
     expect(
       container.querySelector('[data-testid="tariff-rank-base"]'),
     ).toBeTruthy();
+    expect({
+      current: container
+        .querySelector('[data-testid="tariff-rank-current"]')
+        ?.getAttribute('style'),
+      base: container
+        .querySelector('[data-testid="tariff-rank-base"]')
+        ?.getAttribute('style'),
+    }).toMatchInlineSnapshot(`
+      {
+        "base": "left: 80%;",
+        "current": "left: 20%;",
+      }
+    `);
   });
 
   it('uses single marker when current rank matches baseline', () => {
