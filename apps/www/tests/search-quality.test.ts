@@ -107,6 +107,10 @@ const aliasExpectations: ReadonlyMap<
     'репетитор начальных классов',
     { url: '/sarafan/education/elena-robotics/', maxRank: 1 },
   ],
+  ['тариф 815', { url: '/815/regulation/', maxRank: 1 }],
+  ['тариф 815 что входит', { url: '/815/regulation/', maxRank: 2 }],
+  ['815 рублей за сотку', { url: '/815/regulation/', maxRank: 1 }],
+  ['что входит в тариф 815', { url: '/815/regulation/', maxRank: 2 }],
 ]);
 
 let browser: Browser;
