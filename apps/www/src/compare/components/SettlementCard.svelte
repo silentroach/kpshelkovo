@@ -4,25 +4,16 @@
   import type { ExplorerSettlement } from '../lib/explorer';
   import type { ComparisonResult } from '../lib/settlement/types';
   import { withBase } from '../lib/url';
-  import TariffRank from './TariffRank.svelte';
 
   interface Props {
-    settlement: ExplorerSettlement;
-    comparison?: ComparisonResult;
-    rank: number;
-    base: number;
-    total: number;
-    isBaseline: boolean;
+    readonly settlement: ExplorerSettlement;
+    readonly comparison?: ComparisonResult;
+    readonly rank: number;
+    readonly total: number;
+    readonly isBaseline: boolean;
   }
 
-  let { settlement, comparison, rank, base, total, isBaseline }: Props =
-    $props();
-
-  const tone = $derived.by(() => {
-    if (isBaseline || !comparison || comparison.tariffDelta === 0)
-      return 'info';
-    return comparison.isCheaper ? 'success' : 'warning';
-  });
+  let { settlement, comparison, rank, total, isBaseline }: Props = $props();
 
   const tariffText = $derived.by(() => {
     const text = formatTariff(settlement.tariff.normalizedPerSotkaMonth);
@@ -84,9 +75,7 @@
     </div>
   </div>
 
-  <div
-    class="border-t border-border pt-3 md:mt-auto md:space-y-3 md:border-t-0 md:pt-1"
-  >
+  <div class="border-t border-border pt-3 md:mt-auto md:border-t-0 md:pt-1">
     <div
       class="flex items-end justify-between gap-3 md:flex-wrap md:items-baseline md:gap-x-4 md:gap-y-1.5"
     >
@@ -115,10 +104,6 @@
           >базовый тариф</span
         >
       {/if}
-    </div>
-
-    <div class="hidden md:block">
-      <TariffRank {rank} {base} {total} {tone} />
     </div>
   </div>
 </article>
