@@ -204,22 +204,38 @@ jobs:
           # для уже существующих файлов; новые файлы получат mtime деплоя)
           rsync_opts="-azc --no-t --delete --mkpath --chmod=D755,F644"
           pagefind_manifest=$(mktemp)
+          static_manifest=$(mktemp)
           indexnow_deploy_manifest=$(mktemp)
           indexnow_manifest="$RUNNER_TEMP/indexnow-rsync-changes.txt"
           pagefind_retention_minutes=$((7 * 24 * 60))
-          trap 'rm -f "$pagefind_manifest" "$indexnow_deploy_manifest"' EXIT
+          static_retention_minutes=$((30 * 24 * 60))
+          rsync_filters=(
+            --filter='protect /search/pagefind.*.pf_meta'
+            --filter='protect /search/index/*.pf_index'
+            --filter='protect /search/filter/*.pf_filter'
+            --filter='protect /search/fragment/*.pf_fragment'
+            --filter='protect /static/**.css'
+            --filter='protect /static/**.css.br'
+            --filter='protect /static/**.css.gz'
+            --filter='protect /static/**.js'
+            --filter='protect /static/**.js.br'
+            --filter='protect /static/**.js.gz'
+          )
+          trap 'rm -f "$pagefind_manifest" "$static_manifest" "$indexnow_deploy_manifest"' EXIT
 
           find dist/www/search -type f \
             \( -name 'pagefind.*.pf_meta' -o -name '*.pf_index' -o -name '*.pf_filter' -o -name '*.pf_fragment' \) \
             -printf '%P\0' > "$pagefind_manifest"
           test -s "$pagefind_manifest"
 
+          find dist/www/static -type f \
+            \( -name '*.css' -o -name '*.css.br' -o -name '*.css.gz' -o -name '*.js' -o -name '*.js.br' -o -name '*.js.gz' \) \
+            -printf '%P\0' > "$static_manifest"
+          test -s "$static_manifest"
+
           # IndexNow submits only canonical HTML files added by this deployment.
           rsync $rsync_opts --dry-run --itemize-changes --out-format='%i|%n' \
-            --filter='protect /search/pagefind.*.pf_meta' \
-            --filter='protect /search/index/*.pf_index' \
-            --filter='protect /search/filter/*.pf_filter' \
-            --filter='protect /search/fragment/*.pf_fragment' \
+            "${rsync_filters[@]}" \
             -e "ssh $ssh_opts" \
             dist/www/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_WWW_PATH/" \
             > "$indexnow_deploy_manifest"
@@ -235,10 +251,7 @@ jobs:
 
           # Active clients may still request chunks from earlier index generations.
           rsync $rsync_opts \
-            --filter='protect /search/pagefind.*.pf_meta' \
-            --filter='protect /search/index/*.pf_index' \
-            --filter='protect /search/filter/*.pf_filter' \
-            --filter='protect /search/fragment/*.pf_fragment' \
+            "${rsync_filters[@]}" \
             -e "ssh $ssh_opts" \
             dist/www/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_WWW_PATH/"
 
@@ -251,6 +264,16 @@ jobs:
               \\( -name 'pagefind.*.pf_meta' -o -name '*.pf_index' -o -name '*.pf_filter' -o -name '*.pf_fragment' \\) \\
               -mmin +$pagefind_retention_minutes -delete
           " < "$pagefind_manifest"
+
+          # Retain superseded hashed styles and scripts for the browser cache window.
+          ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -eu
+            cd '$DEPLOY_WWW_PATH/static'
+            xargs -0 touch --
+            find . -type f \\
+              \\( -name '*.css' -o -name '*.css.br' -o -name '*.css.gz' -o -name '*.js' -o -name '*.js.br' -o -name '*.js.gz' \\) \\
+              -mmin +$static_retention_minutes -delete
+          " < "$static_manifest"
 
           ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "test -d '$DEPLOY_MEDIA_PATH' && test -w '$DEPLOY_MEDIA_PATH'"
           rsync $rsync_opts \
