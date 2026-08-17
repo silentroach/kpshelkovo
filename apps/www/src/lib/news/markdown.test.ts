@@ -43,7 +43,9 @@ const article = (input?: Partial<NewsArticle>): NewsArticle => ({
 
 describe('buildNewsArticleMarkdown', () => {
   it('puts article metadata into YAML frontmatter without officialness flags', () => {
-    const markdown = buildNewsArticleMarkdown(article());
+    const markdown = buildNewsArticleMarkdown(
+      article({ searchAliases: ['служебный поисковый алиас'] }),
+    );
 
     expect(markdown).toMatchInlineSnapshot(`
       "---
@@ -67,6 +69,7 @@ describe('buildNewsArticleMarkdown', () => {
       Текст новости.
       "
     `);
+    expect(markdown).not.toContain('служебный поисковый алиас');
   });
 
   it('omits settlement-wide areas', () => {

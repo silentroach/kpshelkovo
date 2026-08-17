@@ -75,6 +75,33 @@ const queryGroups = [
   },
 ] as const;
 
+const aliasExpectations: ReadonlyMap<
+  string,
+  { readonly url: string; readonly maxRank: number }
+> = new Map([
+  ['где поесть', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
+  [
+    'как въехать грузовику',
+    { url: '/news/2026/05/truck-entry-open/', maxRank: 1 },
+  ],
+  ['госномер въезд', { url: '/news/2026/05/number-plate-access/', maxRank: 1 }],
+  ['номер машины', { url: '/news/2026/05/number-plate-access/', maxRank: 1 }],
+  [
+    'собрание запись запрещена',
+    { url: '/news/2026/06/ok-meeting-recording-ban/', maxRank: 1 },
+  ],
+  [
+    'вода пахнет железом',
+    { url: '/news/2026/08/forest-home-water-test/', maxRank: 1 },
+  ],
+  ['забор', { url: '/sarafan/fence/psg-promstroy/', maxRank: 3 }],
+  ['репетитор', { url: '/sarafan/education/ekaterina-tutor/', maxRank: 1 }],
+  [
+    'репетитор начальных классов',
+    { url: '/sarafan/education/elena-robotics/', maxRank: 1 },
+  ],
+]);
+
 let browser: Browser;
 let dialog: Locator;
 let input: Locator;
@@ -164,7 +191,25 @@ for (const group of queryGroups) {
   test(group.name, async () => {
     const matrix = [];
     for (const query of group.queries) {
-      matrix.push(await searchSnapshot(query));
+      const snapshot = await searchSnapshot(query);
+      const expectation = aliasExpectations.get(query);
+      if (expectation) {
+        const rank = snapshot.results.findIndex(
+          (result) =>
+            result.url === expectation.url ||
+            result.url.startsWith(`${expectation.url}#`),
+        );
+
+        expect(
+          rank,
+          `${query}: expected ${expectation.url}`,
+        ).toBeGreaterThanOrEqual(0);
+        expect(rank + 1, `${query}: expected rank`).toBeLessThanOrEqual(
+          expectation.maxRank,
+        );
+      }
+
+      matrix.push(snapshot);
     }
 
     expect(matrix).toMatchSnapshot();

@@ -21,6 +21,7 @@ const contact = {
   category: 'fence',
   updatedAt: new Date('2026-07-06T00:00:00.000Z'),
   updatedIso: '2026-07-06',
+  searchAliases: ['служебный поисковый алиас'],
   contacts: {
     phone: '+7 900 000-00-00',
     telegram: 'https://t.me/example',
@@ -132,7 +133,9 @@ describe('contacts markdown companions', () => {
   });
 
   it('renders detail with structured frontmatter and body', () => {
-    expect(buildContactMarkdown(contact)).toMatchInlineSnapshot(`
+    const markdown = buildContactMarkdown(contact);
+
+    expect(markdown).toMatchInlineSnapshot(`
       "---
       title: Иван Петров
       slug: ivan-petrov-fence
@@ -166,5 +169,6 @@ describe('contacts markdown companions', () => {
       Перед оплатой уточняйте цену.
       "
     `);
+    expect(markdown).not.toContain('служебный поисковый алиас');
   });
 });
