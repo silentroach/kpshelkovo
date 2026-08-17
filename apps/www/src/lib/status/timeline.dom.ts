@@ -5,7 +5,7 @@ import {
   getStatusTimelineHitInterval,
   getStatusTimelineSegmentGeometry,
   getStatusTimelineRange,
-  STATUS_TIMELINE_MIN_TRACK_WIDTH_PX,
+  STATUS_TIMELINE_LANE_LAYOUT_WIDTH_PX,
   type StatusTimelineSpan,
 } from './timeline';
 import {
@@ -96,15 +96,15 @@ const showStatusTimelineSegment = (
   element.hidden = false;
 };
 
-const statusTimelineLaneObservers = new WeakMap<HTMLElement, ResizeObserver>();
+const statusTimelineResizeObservers = new WeakMap<
+  HTMLElement,
+  ResizeObserver
+>();
 
 const layoutStatusTimelineProblemLanes = (
   root: HTMLElement,
   track: HTMLElement,
 ): void => {
-  const trackWidthPx = track.getBoundingClientRect().width;
-  const layoutWidthPx =
-    trackWidthPx > 0 ? trackWidthPx : STATUS_TIMELINE_MIN_TRACK_WIDTH_PX;
   const problemNodes = Array.from(
     track.querySelectorAll(STATUS_TIMELINE_PROBLEM_SELECTOR),
   ).filter((node): node is HTMLElement => node instanceof HTMLElement);
@@ -143,7 +143,7 @@ const layoutStatusTimelineProblemLanes = (
             STATUS_TIMELINE_ACTIVE_END_CLASS,
           ),
         },
-        layoutWidthPx,
+        STATUS_TIMELINE_LANE_LAYOUT_WIDTH_PX,
       ),
     ];
   });
@@ -158,25 +158,6 @@ const layoutStatusTimelineProblemLanes = (
     }
   });
   root.style.setProperty('--timeline-lane-space', `${layout.spacePx}px`);
-};
-
-const observeStatusTimelineLaneLayout = (
-  root: HTMLElement,
-  track: HTMLElement,
-): void => {
-  if (
-    statusTimelineLaneObservers.has(root) ||
-    typeof ResizeObserver === 'undefined'
-  ) {
-    return;
-  }
-
-  const observer = new ResizeObserver(() => {
-    layoutStatusTimelineProblemLanes(root, track);
-  });
-
-  observer.observe(track);
-  statusTimelineLaneObservers.set(root, observer);
 };
 
 const getStatusTimelineTooltip = (
@@ -586,6 +567,46 @@ const positionStatusTimelineTooltip = (
   tooltip.style.left = `${left}px`;
 };
 
+const repositionOpenStatusTimelineTooltip = (
+  root: HTMLElement,
+  tooltip: StatusTimelineTooltipElements,
+): void => {
+  if (tooltip.shell.hidden) {
+    return;
+  }
+
+  const trigger = Array.from(
+    root.querySelectorAll<HTMLElement>('[aria-describedby]'),
+  ).find(
+    (element) => element.getAttribute('aria-describedby') === tooltip.shell.id,
+  );
+
+  if (trigger) {
+    positionStatusTimelineTooltip(root, trigger, tooltip.shell);
+  }
+};
+
+const observeStatusTimelineResize = (
+  root: HTMLElement,
+  track: HTMLElement,
+  tooltip?: StatusTimelineTooltipElements,
+): void => {
+  if (
+    !tooltip ||
+    statusTimelineResizeObservers.has(root) ||
+    typeof ResizeObserver === 'undefined'
+  ) {
+    return;
+  }
+
+  const observer = new ResizeObserver(() => {
+    repositionOpenStatusTimelineTooltip(root, tooltip);
+  });
+
+  observer.observe(track);
+  statusTimelineResizeObservers.set(root, observer);
+};
+
 const openStatusTimelineTooltip = (
   root: HTMLElement,
   trigger: HTMLElement,
@@ -840,7 +861,7 @@ export const hydrateStatusTimeline = (
   });
 
   layoutStatusTimelineProblemLanes(root, track);
-  observeStatusTimelineLaneLayout(root, track);
+  observeStatusTimelineResize(root, track, tooltip);
 
   buildStatusTimelineStableSegments(problemSpans, range).forEach((segment) => {
     appendStatusTimelineGreenSegment(track, segment);

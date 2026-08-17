@@ -78,6 +78,26 @@ const openDenseDateTimeline = async (
   return target;
 };
 
+const readDenseDateLayout = async (target: Locator) =>
+  target.locator('[data-status-timeline]').evaluate((root) => {
+    if (!(root instanceof HTMLElement)) {
+      throw new Error('Dense timeline root must be an HTML element');
+    }
+
+    return {
+      height: root.getBoundingClientRect().height,
+      offsets: Array.from(
+        root.querySelectorAll<HTMLElement>(
+          '[data-status-problem]:not([hidden])',
+        ),
+      ).map((segment) => ({
+        id: segment.dataset.incidentId,
+        offset: segment.style.getPropertyValue('--segment-lane-offset'),
+      })),
+      space: root.style.getPropertyValue('--timeline-lane-space'),
+    };
+  });
+
 const assertDenseDateHitAreas = async (target: Locator): Promise<void> => {
   await target.scrollIntoViewIfNeeded();
   const track = target.locator('[data-status-timeline-track]');
@@ -189,6 +209,21 @@ for (const [name, viewport] of viewportCases) {
     await assertDenseDateHitAreas(target);
     await clickDenseDateTargetCenters(page, true);
   });
+
+  test(`keeps dense SSR lanes through first hydration on ${name}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    const target = await openDenseDateTimeline(page, false);
+    const ssrLayout = await readDenseDateLayout(target);
+
+    await target.locator('[data-status-problem]').first().hover();
+    await expect(
+      target.locator('[data-status-problem][data-status-tooltip-bound="true"]'),
+    ).toHaveCount(denseDateTargets.length);
+
+    expect(await readDenseDateLayout(target)).toEqual(ssrLayout);
+  });
 }
 
 test('reflows dense hydrated targets after resize', async ({ page }) => {
@@ -219,6 +254,52 @@ test('reflows dense hydrated targets after resize', async ({ page }) => {
     )
     .toEqual([]);
   await assertDenseDateHitAreas(target);
+});
+
+test('repositions an open tooltip after desktop-to-mobile resize', async ({
+  page,
+}) => {
+  await page.setViewportSize(desktopViewport);
+  const target = await openDenseDateTimeline(page, true);
+  const timeline = target.locator('[data-status-timeline]');
+  const trigger = target.locator(
+    '[data-incident-id="electricity-outage-2026-08-11"]',
+  );
+  const tooltip = target.locator('[data-status-timeline-tooltip]');
+
+  await trigger.focus();
+  await expect(tooltip).toBeVisible();
+  const desktopPosition = await tooltip.evaluate((element) =>
+    element instanceof HTMLElement ? element.style.left : '',
+  );
+
+  await page.setViewportSize(mobileViewport);
+  await expect
+    .poll(() =>
+      tooltip.evaluate((element) =>
+        element instanceof HTMLElement ? element.style.left : '',
+      ),
+    )
+    .not.toBe(desktopPosition);
+  await expect
+    .poll(async () => {
+      const box = await tooltip.boundingBox();
+
+      if (!box) {
+        return undefined;
+      }
+
+      return {
+        anchored:
+          (await trigger.getAttribute('aria-describedby')) ===
+          (await tooltip.getAttribute('id')),
+        open:
+          (await timeline.getAttribute('data-status-tooltip-open')) === 'true',
+        withinViewport:
+          box.x >= -0.1 && box.x + box.width <= mobileViewport.width + 0.1,
+      };
+    })
+    .toEqual({ anchored: true, open: true, withinViewport: true });
 });
 
 test.describe('StatusServiceTimeline visual', () => {
