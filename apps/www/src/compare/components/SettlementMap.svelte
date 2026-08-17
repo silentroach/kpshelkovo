@@ -31,11 +31,7 @@
   };
 
   const yandexHeadKey = (node: Element): string | undefined => {
-    if (node instanceof HTMLScriptElement) {
-      if (node.dataset.yandexMapsApi === 'true') return `script:${node.src}`;
-      if (isYandexMapsHeadUrl(node.src)) return `script:${node.src}`;
-    }
-
+    // Astro executes script clones added to the next document, so preserve only inert assets.
     if (node instanceof HTMLLinkElement) {
       if (isYandexMapsHeadUrl(node.href))
         return `link:${node.rel}:${node.href}`;

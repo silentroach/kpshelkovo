@@ -70,7 +70,9 @@ describe('SettlementMap', () => {
     vi.clearAllMocks();
     markers.length = 0;
     document.head
-      .querySelectorAll('[data-yandex-maps-api="true"]')
+      .querySelectorAll(
+        '[data-yandex-maps-api="true"], [data-yandex-maps-test="true"]',
+      )
       .forEach((node) => node.remove());
 
     Object.defineProperty(window, 'ymaps3', {
@@ -84,7 +86,9 @@ describe('SettlementMap', () => {
     cleanup();
     vi.restoreAllMocks();
     document.head
-      .querySelectorAll('[data-yandex-maps-api="true"]')
+      .querySelectorAll(
+        '[data-yandex-maps-api="true"], [data-yandex-maps-test="true"]',
+      )
       .forEach((node) => node.remove());
     delete (window as { ymaps3?: unknown }).ymaps3;
   });
@@ -238,6 +242,32 @@ describe('SettlementMap', () => {
     await waitFor(() => {
       expect(mockMap.update).toHaveBeenCalled();
     });
+  });
+
+  it('preserves Yandex Maps styles without copying executed scripts', () => {
+    render(SettlementMap, {
+      props: { settlements: mockSettlements },
+    });
+
+    const script = document.createElement('script');
+    script.dataset.yandexMapsApi = 'true';
+    document.head.appendChild(script);
+
+    const style = document.createElement('style');
+    style.dataset.yandexMapsTest = 'true';
+    style.textContent = '.ymaps3--map { display: block; }';
+    document.head.appendChild(style);
+
+    const newDocument = document.implementation.createHTMLDocument();
+    const event = Object.assign(new Event('astro:before-swap'), {
+      newDocument,
+    });
+    document.dispatchEvent(event);
+
+    expect(newDocument.head.querySelector('script')).toBeNull();
+    expect(newDocument.head.querySelector('style')?.textContent).toContain(
+      'ymaps3--map',
+    );
   });
 
   it('handles empty settlements array gracefully', () => {
