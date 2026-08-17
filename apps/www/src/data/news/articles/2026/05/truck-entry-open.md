@@ -10,6 +10,8 @@ tags:
   - проезд
   - грузовая техника
   - строительство
+search_aliases:
+  - как въехать грузовику
 source_url: https://okkomfort.domyland.app/news?targetId=111708&entityName=news&t=okkomfort
 ---
 
