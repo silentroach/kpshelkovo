@@ -19,10 +19,6 @@ export default defineConfig({
     baseURL,
     browserName: 'chromium',
     headless: true,
-    viewport: {
-      width: 390,
-      height: 844,
-    },
     deviceScaleFactor: 2,
     colorScheme: 'light',
   },
@@ -30,7 +26,7 @@ export default defineConfig({
     command: 'pnpm run test:browser:compare:serve',
     cwd,
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 180_000,
   },
 });
