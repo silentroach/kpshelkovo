@@ -49,6 +49,7 @@ const search = {
   title: contact.title,
   description,
   section: SEARCH_SECTIONS.sarafan,
+  aliases: contact.searchAliases,
 } satisfies SearchDocument;
 const bodyHtml = renderMarkdown(contact.body);
 const categoryUrl = contactCategoryUrl({ category: contact.category });

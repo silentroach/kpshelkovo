@@ -137,6 +137,7 @@ export const mapRawContact = (
     updatedAt: new Date(`${entry.data.updated_at}T00:00:00.000Z`),
     updatedIso: entry.data.updated_at,
     summary: entry.data.summary,
+    searchAliases: entry.data.search_aliases,
     contacts: mapContacts(entry.data.contacts),
     location: mapLocation(entry.data.location),
     reviews: mapReviews(entry.data.reviews),

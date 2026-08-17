@@ -27,6 +27,7 @@ const searchDocument = (
   section: SEARCH_SECTIONS.news,
   publishedAt: '2026-08-14',
   tags: ['тариф', 'дороги'],
+  aliases: ['как проехать к дому'],
 });
 
 describe('BaseLayout site header', () => {
@@ -105,7 +106,9 @@ describe('BaseLayout search contract', () => {
     expect(html).toContain('data-search-section-label="Новости"');
     expect(html).toContain('data-search-published-at="2026-08-14"');
     expect(html).toContain('data-search-tags="тариф, дороги"');
+    expect(html).toContain('data-search-aliases="как проехать к дому"');
     expect(html).toContain('tags[data-search-tags]');
+    expect(html).toContain('aliases[data-search-aliases]');
     expect(html).toContain(
       'data-pagefind-sort="date[data-search-published-at]"',
     );

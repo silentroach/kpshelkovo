@@ -12,4 +12,5 @@ export interface SearchDocument {
   readonly section: SearchSection;
   readonly publishedAt?: string;
   readonly tags?: readonly string[];
+  readonly aliases?: readonly string[];
 }

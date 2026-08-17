@@ -77,6 +77,7 @@ interface ContactBase {
   readonly updatedAt: Date;
   readonly updatedIso: string;
   readonly summary?: string;
+  readonly searchAliases?: readonly string[];
   readonly contacts: ContactContacts;
   readonly location?: ContactLocation;
   readonly reviews: readonly ContactReview[];
