@@ -84,6 +84,7 @@ const searchMetadata = search
       'sectionLabel[data-search-section-label]',
       search.publishedAt && 'publishedAt[data-search-published-at]',
       search.tags?.length && 'tags[data-search-tags]',
+      search.aliases?.length && 'aliases[data-search-aliases]',
     ]
       .filter(Boolean)
       .join(', ')
@@ -212,6 +213,7 @@ const searchMetadata = search
         data-search-section-label={search?.section.label}
         data-search-published-at={search?.publishedAt}
         data-search-tags={search?.tags?.join(', ')}
+        data-search-aliases={search?.aliases?.join(', ')}
       >
         <slot />
       </div>

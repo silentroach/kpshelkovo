@@ -9,6 +9,7 @@ import {
   normalizeTagKey,
 } from './schema';
 import { normalizeNewsTimestampInput, parseNewsTimestampInput } from './date';
+import { RawSearchAliasesSchema } from '../search/raw-schema';
 
 const TAG = /^[а-яё0-9 -]+$/u;
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -260,6 +261,7 @@ export const createRawNewsArticleSchema = (image: SchemaContext['image']) =>
       pinned_until: newsDate('pinned_until').optional(),
       areas: z.array(z.enum(NEWS_AREAS)).min(1).optional(),
       tags: z.array(tag()).min(1).optional(),
+      search_aliases: RawSearchAliasesSchema.optional(),
       source_url: absoluteUrl('source_url').optional(),
       cover: image().optional(),
       cover_alt: text.optional(),

@@ -4,6 +4,8 @@ slug: elena-robotics
 category: education
 updated_at: 2026-07-11
 summary: 'Робототехника, подготовка к школе и помощь младшим школьникам с учёбой'
+search_aliases:
+  - репетитор начальных классов
 contacts:
   phone: '+7 965 614-43-54'
   telegram: https://t.me/iq_genius

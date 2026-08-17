@@ -13,6 +13,8 @@ apps/*/.astro/
 !.agents/skills/project-issues/**
 !.agents/skills/public-media-publisher/
 !.agents/skills/public-media-publisher/**
+!.agents/skills/site-search/
+!.agents/skills/site-search/**
 logs/
 .env
 .opencode/package-lock.json

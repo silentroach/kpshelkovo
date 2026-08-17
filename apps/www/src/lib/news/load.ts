@@ -480,6 +480,7 @@ function normalizeArticle(
     appliesToAllAreas: area.appliesToAllAreas,
     areas: area.areas,
     tags: buildArticleTags(entry.data.tags),
+    searchAliases: entry.data.search_aliases,
     pinned: isPinnedAtBuild(entry.data),
     sourceUrl: entry.data.source_url,
     cover: articleCover,

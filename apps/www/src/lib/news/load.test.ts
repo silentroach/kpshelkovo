@@ -48,6 +48,7 @@ const article = (input: {
   readonly pinned_until?: string;
   readonly events?: readonly ArticleEventInput[];
   readonly photos?: readonly ArticlePhotoInput[];
+  readonly searchAliases?: readonly string[];
 }): NewsArticleEntry => ({
   id: input.id,
   body: input.body ?? '',
@@ -60,6 +61,7 @@ const article = (input: {
     pinned_until: input.pinned_until,
     events: input.events,
     photos: input.photos,
+    search_aliases: input.searchAliases,
   },
 });
 
@@ -425,6 +427,7 @@ describe('buildNewsDataset', () => {
             title: 'Доменная новость',
             summary: 'Проверка доменной формы',
             date: '04.05.2026 10:00',
+            searchAliases: ['как найти новость'],
           }),
           data: {
             ...article({
@@ -432,6 +435,7 @@ describe('buildNewsDataset', () => {
               title: 'Доменная новость',
               summary: 'Проверка доменной формы',
               date: '04.05.2026 10:00',
+              searchAliases: ['как найти новость'],
             }).data,
             source_url: 'https://example.com/source',
             cover: {
@@ -450,6 +454,7 @@ describe('buildNewsDataset', () => {
       markdownUrl: '/news/2026/05/article-domain/index.md',
       publishedIso: '2026-05-04T10:00:00+03:00',
       appliesToAllAreas: true,
+      searchAliases: ['как найти новость'],
       sourceUrl: 'https://example.com/source',
       cover: {
         url: '/cover.jpg',

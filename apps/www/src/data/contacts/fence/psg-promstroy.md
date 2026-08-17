@@ -4,6 +4,8 @@ slug: psg-promstroy
 category: fence
 updated_at: 2026-08-14
 summary: 'Производство и монтаж евроштакетника, ворот и калиток по параметрам ТУ поселка'
+search_aliases:
+  - забор
 contacts:
   phone: '+7 495 150-28-55'
   telegram: https://t.me/+79261552855

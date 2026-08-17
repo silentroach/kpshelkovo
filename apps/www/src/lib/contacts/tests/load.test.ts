@@ -55,6 +55,7 @@ describe('buildContactsDataset', () => {
           seo: {
             description: 'Контакт по заборам для жителей Шелково.',
           },
+          search_aliases: ['где заказать забор'],
         },
       }),
     ]);
@@ -69,6 +70,7 @@ describe('buildContactsDataset', () => {
       markdownUrl: '/sarafan/fence/first-fence/index.md',
       url: '/sarafan/fence/first-fence/',
       title: 'Анна',
+      searchAliases: ['где заказать забор'],
     });
     expect(data.categories).toMatchObject([
       {

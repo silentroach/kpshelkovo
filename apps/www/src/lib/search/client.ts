@@ -27,6 +27,7 @@ const pagefindOptions = {
       sectionLabel: 0,
       publishedAt: 0,
       tags: 1.75,
+      aliases: 2,
     },
   },
 } as const satisfies PagefindOptions;

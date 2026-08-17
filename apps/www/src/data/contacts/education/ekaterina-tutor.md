@@ -4,6 +4,8 @@ slug: ekaterina-tutor
 category: education
 updated_at: 2026-07-11
 summary: 'Индивидуальные онлайн-занятия по математике, физике, истории и обществознанию для 7–11 классов'
+search_aliases:
+  - репетитор
 contacts:
   phone: '+7 977 395-45-30'
   telegram: https://t.me/Ekaterina9661

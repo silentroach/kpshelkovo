@@ -92,6 +92,7 @@ export interface NewsArticle {
   readonly appliesToAllAreas: boolean;
   readonly areas: readonly NewsArea[];
   readonly tags: readonly NewsTag[];
+  readonly searchAliases?: readonly string[];
   readonly pinned: boolean;
   readonly sourceUrl?: string;
   readonly cover?: NewsCover;

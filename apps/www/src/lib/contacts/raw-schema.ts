@@ -6,6 +6,7 @@ import {
   CONTACT_SLUG,
   isContactCalendarDate,
 } from './schema';
+import { RawSearchAliasesSchema } from '@/lib/search/raw-schema';
 
 const nonBlankText = z.string().trim().min(1);
 
@@ -150,6 +151,7 @@ export const RawContactSchema = z
     category: z.enum(CONTACT_CATEGORIES),
     updated_at: contactDate('updated_at'),
     summary: nonBlankText.optional(),
+    search_aliases: RawSearchAliasesSchema.optional(),
     contacts,
     location: location.optional(),
     reviews: z.array(review).optional(),

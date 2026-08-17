@@ -4,6 +4,8 @@ slug: burzhuyka
 category: food
 updated_at: 2026-08-11
 summary: 'Фудтрак в Шелково Форест: осетинские пироги, шаурма, горячие закуски, кофе и десерты; есть доставка'
+search_aliases:
+  - где поесть
 contacts:
   phone: '+7 909 620-91-59'
 location:
