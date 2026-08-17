@@ -204,22 +204,33 @@ jobs:
           # для уже существующих файлов; новые файлы получат mtime деплоя)
           rsync_opts="-azc --no-t --delete --mkpath --chmod=D755,F644"
           pagefind_manifest=$(mktemp)
+          static_manifest=$(mktemp)
           indexnow_deploy_manifest=$(mktemp)
           indexnow_manifest="$RUNNER_TEMP/indexnow-rsync-changes.txt"
           pagefind_retention_minutes=$((7 * 24 * 60))
-          trap 'rm -f "$pagefind_manifest" "$indexnow_deploy_manifest"' EXIT
+          static_retention_minutes=$((30 * 24 * 60))
+          static_current_manifest_path='.cache/kpshelkovo/static-current-files.manifest'
+          static_pending_manifest_path="$static_current_manifest_path.pending"
+          rsync_filters=(
+            --filter='protect /search/pagefind.*.pf_meta'
+            --filter='protect /search/index/*.pf_index'
+            --filter='protect /search/filter/*.pf_filter'
+            --filter='protect /search/fragment/*.pf_fragment'
+            --filter='protect /static/***'
+          )
+          trap 'rm -f "$pagefind_manifest" "$static_manifest" "$indexnow_deploy_manifest"' EXIT
 
           find dist/www/search -type f \
             \( -name 'pagefind.*.pf_meta' -o -name '*.pf_index' -o -name '*.pf_filter' -o -name '*.pf_fragment' \) \
             -printf '%P\0' > "$pagefind_manifest"
           test -s "$pagefind_manifest"
 
+          find dist/www/static -type f -printf '%P\0' > "$static_manifest"
+          test -s "$static_manifest"
+
           # IndexNow submits only canonical HTML files added by this deployment.
           rsync $rsync_opts --dry-run --itemize-changes --out-format='%i|%n' \
-            --filter='protect /search/pagefind.*.pf_meta' \
-            --filter='protect /search/index/*.pf_index' \
-            --filter='protect /search/filter/*.pf_filter' \
-            --filter='protect /search/fragment/*.pf_fragment' \
+            "${rsync_filters[@]}" \
             -e "ssh $ssh_opts" \
             dist/www/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_WWW_PATH/" \
             > "$indexnow_deploy_manifest"
@@ -233,12 +244,33 @@ jobs:
           ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" \
             "cat '$INDEXNOW_PENDING_PATH'" > "$indexnow_manifest"
 
-          # Active clients may still request chunks from earlier index generations.
+          # Give files leaving the active generation a fresh retention window.
+          ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -eu
+            if [ -d '$DEPLOY_WWW_PATH/static' ]; then
+              cd '$DEPLOY_WWW_PATH/static'
+              if [ -f \"\$HOME/$static_current_manifest_path\" ]; then
+                xargs -0r touch -c -- < \"\$HOME/$static_current_manifest_path\"
+                if [ -f \"\$HOME/$static_pending_manifest_path\" ]; then
+                  xargs -0r touch -c -- < \"\$HOME/$static_pending_manifest_path\"
+                fi
+              else
+                # Without an authoritative manifest, favor availability.
+                find . -type f -exec touch -- {} +
+              fi
+            fi
+          "
+
+          # Persist the intended generation before rsync so an interrupted deploy is recoverable.
+          ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -eu
+            mkdir -p '.cache/kpshelkovo'
+            cat > '$static_pending_manifest_path'
+          " < "$static_manifest"
+
+          # Active clients may still request files from earlier search and static generations.
           rsync $rsync_opts \
-            --filter='protect /search/pagefind.*.pf_meta' \
-            --filter='protect /search/index/*.pf_index' \
-            --filter='protect /search/filter/*.pf_filter' \
-            --filter='protect /search/fragment/*.pf_fragment' \
+            "${rsync_filters[@]}" \
             -e "ssh $ssh_opts" \
             dist/www/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_WWW_PATH/"
 
@@ -251,6 +283,15 @@ jobs:
               \\( -name 'pagefind.*.pf_meta' -o -name '*.pf_index' -o -name '*.pf_filter' -o -name '*.pf_fragment' \\) \\
               -mmin +$pagefind_retention_minutes -delete
           " < "$pagefind_manifest"
+
+          # Retain complete superseded static generations for the browser cache window.
+          ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -eu
+            cd '$DEPLOY_WWW_PATH/static'
+            xargs -0r touch -c -- < \"\$HOME/$static_pending_manifest_path\"
+            find . -type f -mmin +$static_retention_minutes -delete
+            mv \"\$HOME/$static_pending_manifest_path\" \"\$HOME/$static_current_manifest_path\"
+          "
 
           ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "test -d '$DEPLOY_MEDIA_PATH' && test -w '$DEPLOY_MEDIA_PATH'"
           rsync $rsync_opts \
