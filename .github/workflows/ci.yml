@@ -209,17 +209,13 @@ jobs:
           indexnow_manifest="$RUNNER_TEMP/indexnow-rsync-changes.txt"
           pagefind_retention_minutes=$((7 * 24 * 60))
           static_retention_minutes=$((30 * 24 * 60))
+          static_current_manifest_path='.cache/kpshelkovo/static-current-files.manifest'
           rsync_filters=(
             --filter='protect /search/pagefind.*.pf_meta'
             --filter='protect /search/index/*.pf_index'
             --filter='protect /search/filter/*.pf_filter'
             --filter='protect /search/fragment/*.pf_fragment'
-            --filter='protect /static/**.css'
-            --filter='protect /static/**.css.br'
-            --filter='protect /static/**.css.gz'
-            --filter='protect /static/**.js'
-            --filter='protect /static/**.js.br'
-            --filter='protect /static/**.js.gz'
+            --filter='protect /static/***'
           )
           trap 'rm -f "$pagefind_manifest" "$static_manifest" "$indexnow_deploy_manifest"' EXIT
 
@@ -228,9 +224,7 @@ jobs:
             -printf '%P\0' > "$pagefind_manifest"
           test -s "$pagefind_manifest"
 
-          find dist/www/static -type f \
-            \( -name '*.css' -o -name '*.css.br' -o -name '*.css.gz' -o -name '*.js' -o -name '*.js.br' -o -name '*.js.gz' \) \
-            -printf '%P\0' > "$static_manifest"
+          find dist/www/static -type f -printf '%P\0' > "$static_manifest"
           test -s "$static_manifest"
 
           # IndexNow submits only canonical HTML files added by this deployment.
@@ -249,7 +243,19 @@ jobs:
           ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" \
             "cat '$INDEXNOW_PENDING_PATH'" > "$indexnow_manifest"
 
-          # Active clients may still request chunks from earlier index generations.
+          # Give files leaving the active generation a fresh retention window.
+          ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -eu
+            cd '$DEPLOY_WWW_PATH/static'
+            if [ -f \"\$HOME/$static_current_manifest_path\" ]; then
+              xargs -0r touch -c -- < \"\$HOME/$static_current_manifest_path\"
+            else
+              # The first rollout has no manifest, so favor availability.
+              find . -type f -exec touch -- {} +
+            fi
+          "
+
+          # Active clients may still request files from earlier search and static generations.
           rsync $rsync_opts \
             "${rsync_filters[@]}" \
             -e "ssh $ssh_opts" \
@@ -265,14 +271,15 @@ jobs:
               -mmin +$pagefind_retention_minutes -delete
           " < "$pagefind_manifest"
 
-          # Retain superseded hashed styles and scripts for the browser cache window.
+          # Retain complete superseded static generations for the browser cache window.
           ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "
             set -eu
+            mkdir -p '.cache/kpshelkovo'
+            cat > '$static_current_manifest_path.new'
             cd '$DEPLOY_WWW_PATH/static'
-            xargs -0 touch --
-            find . -type f \\
-              \\( -name '*.css' -o -name '*.css.br' -o -name '*.css.gz' -o -name '*.js' -o -name '*.js.br' -o -name '*.js.gz' \\) \\
-              -mmin +$static_retention_minutes -delete
+            xargs -0r touch -c -- < \"\$HOME/$static_current_manifest_path.new\"
+            find . -type f -mmin +$static_retention_minutes -delete
+            mv \"\$HOME/$static_current_manifest_path.new\" \"\$HOME/$static_current_manifest_path\"
           " < "$static_manifest"
 
           ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "test -d '$DEPLOY_MEDIA_PATH' && test -w '$DEPLOY_MEDIA_PATH'"
