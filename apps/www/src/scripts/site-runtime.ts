@@ -300,6 +300,29 @@ const bindSiteHeaderMenu = (): void => {
         menu.open = false;
       });
   });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.defaultPrevented || event.key !== 'Escape') {
+      return;
+    }
+
+    const menu = document.querySelector<HTMLDetailsElement>(
+      SITE_HEADER_MENU_SELECTOR,
+    );
+    if (!menu?.open) {
+      return;
+    }
+
+    const eventTargetIsInsideMenu =
+      event.target instanceof Node && menu.contains(event.target);
+    const focusIsInsideMenu = menu.contains(document.activeElement);
+    if (!eventTargetIsInsideMenu && !focusIsInsideMenu) {
+      return;
+    }
+
+    menu.open = false;
+    menu.querySelector<HTMLElement>(':scope > summary')?.focus();
+  });
 };
 
 const bindSettlementsFallback = (): void => {
