@@ -1261,6 +1261,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       font-weight: 500;
       line-height: 1.45;
       opacity: 0;
+      overflow-wrap: anywhere;
       padding: 0.625rem 0.75rem;
       pointer-events: none;
       transform: translateY(-0.2rem);
@@ -1269,6 +1270,15 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
         transform 120ms ease,
         visibility 120ms ease;
       visibility: hidden;
+      white-space: normal;
+    }
+
+    @media (max-width: 47.999rem) {
+      .reglament-missing-tooltip {
+        right: 0.5rem;
+        left: auto;
+        width: min(18rem, calc(100vw - 4.5rem));
+      }
     }
 
     .reglament-missing-help:hover .reglament-missing-tooltip,
