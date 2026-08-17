@@ -210,6 +210,7 @@ jobs:
           pagefind_retention_minutes=$((7 * 24 * 60))
           static_retention_minutes=$((30 * 24 * 60))
           static_current_manifest_path='.cache/kpshelkovo/static-current-files.manifest'
+          static_pending_manifest_path="$static_current_manifest_path.pending"
           rsync_filters=(
             --filter='protect /search/pagefind.*.pf_meta'
             --filter='protect /search/index/*.pf_index'
@@ -246,14 +247,26 @@ jobs:
           # Give files leaving the active generation a fresh retention window.
           ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "
             set -eu
-            cd '$DEPLOY_WWW_PATH/static'
-            if [ -f \"\$HOME/$static_current_manifest_path\" ]; then
-              xargs -0r touch -c -- < \"\$HOME/$static_current_manifest_path\"
-            else
-              # The first rollout has no manifest, so favor availability.
-              find . -type f -exec touch -- {} +
+            if [ -d '$DEPLOY_WWW_PATH/static' ]; then
+              cd '$DEPLOY_WWW_PATH/static'
+              if [ -f \"\$HOME/$static_current_manifest_path\" ]; then
+                xargs -0r touch -c -- < \"\$HOME/$static_current_manifest_path\"
+                if [ -f \"\$HOME/$static_pending_manifest_path\" ]; then
+                  xargs -0r touch -c -- < \"\$HOME/$static_pending_manifest_path\"
+                fi
+              else
+                # Without an authoritative manifest, favor availability.
+                find . -type f -exec touch -- {} +
+              fi
             fi
           "
+
+          # Persist the intended generation before rsync so an interrupted deploy is recoverable.
+          ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -eu
+            mkdir -p '.cache/kpshelkovo'
+            cat > '$static_pending_manifest_path'
+          " < "$static_manifest"
 
           # Active clients may still request files from earlier search and static generations.
           rsync $rsync_opts \
@@ -274,13 +287,11 @@ jobs:
           # Retain complete superseded static generations for the browser cache window.
           ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "
             set -eu
-            mkdir -p '.cache/kpshelkovo'
-            cat > '$static_current_manifest_path.new'
             cd '$DEPLOY_WWW_PATH/static'
-            xargs -0r touch -c -- < \"\$HOME/$static_current_manifest_path.new\"
+            xargs -0r touch -c -- < \"\$HOME/$static_pending_manifest_path\"
             find . -type f -mmin +$static_retention_minutes -delete
-            mv \"\$HOME/$static_current_manifest_path.new\" \"\$HOME/$static_current_manifest_path\"
-          " < "$static_manifest"
+            mv \"\$HOME/$static_pending_manifest_path\" \"\$HOME/$static_current_manifest_path\"
+          "
 
           ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" "test -d '$DEPLOY_MEDIA_PATH' && test -w '$DEPLOY_MEDIA_PATH'"
           rsync $rsync_opts \
