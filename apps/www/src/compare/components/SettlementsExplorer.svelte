@@ -484,7 +484,6 @@
           {settlement}
           comparison={comparisons[settlement.slug]}
           rank={ranks.get(settlement.slug) ?? levels}
-          base={stats?.shelkovoRank ?? 1}
           total={levels}
           isBaseline={settlement.isBaseline}
         />

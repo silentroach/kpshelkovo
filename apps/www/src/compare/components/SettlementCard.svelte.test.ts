@@ -41,7 +41,6 @@ describe('SettlementCard', () => {
         settlement: mockSettlement,
         comparison: mockComparisonCheaper,
         rank: 1,
-        base: 2,
         total: 3,
         isBaseline: false,
       },
@@ -57,7 +56,6 @@ describe('SettlementCard', () => {
         settlement: mockSettlement,
         comparison: mockComparisonCheaper,
         rank: 1,
-        base: 2,
         total: 3,
         isBaseline: false,
       },
@@ -74,7 +72,6 @@ describe('SettlementCard', () => {
         settlement: mockSettlement,
         comparison: mockComparisonCheaper,
         rank: 1,
-        base: 2,
         total: 3,
         isBaseline: false,
       },
@@ -89,7 +86,6 @@ describe('SettlementCard', () => {
         settlement: mockSettlement,
         comparison: mockComparisonCheaper,
         rank: 1,
-        base: 2,
         total: 3,
         isBaseline: false,
       },
@@ -114,7 +110,6 @@ describe('SettlementCard', () => {
         settlement,
         comparison: mockComparisonCheaper,
         rank: 1,
-        base: 2,
         total: 3,
         isBaseline: false,
       },
@@ -135,7 +130,6 @@ describe('SettlementCard', () => {
         settlement: mockSettlement,
         comparison: mockComparisonCheaper,
         rank: 1,
-        base: 2,
         total: 3,
         isBaseline: false,
       },
@@ -151,7 +145,6 @@ describe('SettlementCard', () => {
         settlement: mockSettlement,
         comparison: mockComparisonExpensive,
         rank: 3,
-        base: 2,
         total: 3,
         isBaseline: false,
       },
@@ -167,7 +160,6 @@ describe('SettlementCard', () => {
       props: {
         settlement: baselineSettlement,
         rank: 2,
-        base: 2,
         total: 3,
         isBaseline: true,
       },
@@ -177,29 +169,12 @@ describe('SettlementCard', () => {
     expect(container.textContent).toContain('наш');
   });
 
-  it('renders tariff rank strip', () => {
-    const { container } = render(SettlementCard, {
-      props: {
-        settlement: mockSettlement,
-        comparison: mockComparisonCheaper,
-        rank: 1,
-        base: 2,
-        total: 3,
-        isBaseline: false,
-      },
-    });
-
-    const tariffRank = container.querySelector('[data-testid="tariff-rank"]');
-    expect(tariffRank).toBeTruthy();
-  });
-
   it('renders title link to detail page', () => {
     const { container } = render(SettlementCard, {
       props: {
         settlement: mockSettlement,
         comparison: mockComparisonCheaper,
         rank: 1,
-        base: 2,
         total: 3,
         isBaseline: false,
       },
@@ -217,7 +192,6 @@ describe('SettlementCard', () => {
         settlement: flagged,
         comparison: mockComparisonCheaper,
         rank: 1,
-        base: 2,
         total: 3,
         isBaseline: false,
       },
@@ -237,7 +211,6 @@ describe('SettlementCard', () => {
       props: {
         settlement: mockSettlement,
         rank: 1,
-        base: 2,
         total: 3,
         isBaseline: false,
       },
@@ -265,7 +238,6 @@ describe('SettlementCard', () => {
         settlement: mockSettlement,
         comparison: zeroComparison,
         rank: 2,
-        base: 2,
         total: 3,
         isBaseline: false,
       },
