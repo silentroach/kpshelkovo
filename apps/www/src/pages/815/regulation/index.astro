@@ -736,7 +736,10 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                   <span class="font-semibold">
                                     {row.missing.base.label}
                                   </span>
-                                  <span class="reglament-missing-help">
+                                  <span
+                                    class="reglament-missing-help"
+                                    data-reglament-missing-field="base"
+                                  >
                                     <button
                                       class="reglament-missing-help-button"
                                       type="button"
@@ -1273,12 +1276,14 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       white-space: normal;
     }
 
-    @media (max-width: 47.999rem) {
+    .reglament-missing-help[data-reglament-missing-tooltip-bound='true']
       .reglament-missing-tooltip {
-        right: 0.5rem;
-        left: auto;
-        width: min(18rem, calc(100vw - 4.5rem));
-      }
+      position: fixed;
+      max-width: none;
+    }
+
+    .reglament-missing-tooltip[data-reglament-tooltip-side='above'] {
+      transform: translateY(0.2rem);
     }
 
     .reglament-missing-help:hover .reglament-missing-tooltip,
@@ -1303,10 +1308,12 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
 
   <script>
     import { hydrateReglamentCalculators } from '@/lib/reglament/calculator-controller';
+    import { hydrateReglamentMissingTooltips } from '@/lib/reglament/missing-tooltip-positioning';
     import { hydrateStickyTableHeaders } from '@/lib/sticky-table-headers';
 
     const hydrate = () => {
       hydrateReglamentCalculators();
+      hydrateReglamentMissingTooltips();
       hydrateStickyTableHeaders();
     };
 
