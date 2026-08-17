@@ -1,6 +1,6 @@
 ---
 name: news-maker
-description: Use whenever the user asks to add, create, rewrite, edit, update, fix, migrate, or review a site news item in `apps/www/src/data/news` for kpshelkovo.online. Trigger on Russian and English prompts about `новость`, `новости`, `добавить новость`, `поправить новость`, `ОК Комфорт`, регулярный отчет, `source_url`, `events`, news articles, news authors, or the `/news/` section. Guides source handling, standalone reader and search value, article frontmatter, human non-bureaucratic Russian editing, Markdown emphasis, internal links, moderate emoji, people mentions, SEO fields, events, and validation; load `copy-editing` for the visible news text.
+description: Use whenever the user asks to add, create, rewrite, edit, update, fix, migrate, or review a site news item in `apps/www/src/data/news` for kpshelkovo.online. Trigger on Russian and English prompts about `новость`, `новости`, `добавить новость`, `поправить новость`, `ОК Комфорт`, регулярный отчет, `source_url`, `search_aliases`, `events`, news articles, news authors, or the `/news/` section. Guides source handling, standalone reader and search value, article frontmatter, human non-bureaucratic Russian editing, Markdown emphasis, internal links, moderate emoji, people mentions, SEO fields, events, and validation; load `copy-editing` for the visible news text.
 ---
 
 # News Maker
@@ -72,6 +72,7 @@ source_url: https://example.com/source
 - `author` должен ссылаться на существующий файл в `authors/*.yaml`; тип официального источника задается через `kind: official`, отдельный `is_official` не нужен.
 - `summary` может быть короче и нейтральнее body, если смысл новости сохраняется.
 - `tags` короткие и утилитарные; не заменяют `areas`; пишутся в нижнем регистре кириллицей, цифрами, пробелами и дефисами.
+- `search_aliases` — необязательный служебный массив только для внутрисайтового поиска. По умолчанию не добавляй это поле. Заполняй его лишь для подтвержденной пользовательской формулировки, по которой подходящий материал не находится: например, из воспроизведенного поискового сценария, аналитики или зафиксированной речи жителей. Не повторяй слова и фразы из `title`, `summary`, body или `tags`, не придумывай синонимы и опечатки «на всякий случай» и не направляй запрос на материал, который не отвечает на него. Алиасы не показываются в интерфейсе и не используются как SEO-текст или excerpt результата.
 - `areas` опционально. Не добавляй его, если новость относится ко всем частям КП Шелково.
 - `source_url` добавляй, когда есть стабильный внешний источник; значение должно быть абсолютным URL.
 - `pinned` используй только для действительно актуальных важных новостей; для временного закрепления добавляй `pinned_until`.
@@ -164,6 +165,7 @@ source_url: https://example.com/source
 - slug короткий и валидный;
 - author существует;
 - tags валидны и не дублируются после нормализации;
+- `search_aliases`, если указаны, подтверждены реальным поисковым сценарием, уникальны и не повторяют `title`, `summary`, body или `tags`;
 - `source_url`, media и attachments валидны;
 - `cover_alt` есть при `cover`;
 - события имеют время, корректные slugs и понятные descriptions;

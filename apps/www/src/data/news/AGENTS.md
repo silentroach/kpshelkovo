@@ -2,6 +2,6 @@
 
 Локальные правила для новостей в `apps/www/src/data/news` теперь живут в project skill `news-maker`.
 
-Перед добавлением или редактированием новости обязательно подключи `news-maker`. Он содержит editorial workflow, frontmatter contract, правила регулярных отчетов ОК Комфорт, events, people mentions, SEO и проверки.
+Перед добавлением или редактированием новости обязательно подключи `news-maker`. Он содержит editorial workflow, frontmatter contract, правила внутренних поисковых метаданных, регулярных отчетов ОК Комфорт, events, people mentions, SEO и проверки.
 
 Если skill недоступен, остановись и сообщи пользователю: без `news-maker` есть риск разойтись с редакционными правилами раздела.
