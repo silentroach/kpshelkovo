@@ -152,15 +152,15 @@
     role="region"
     tabindex="0"
     aria-label={title ? `${title}: таблица сравнения` : 'Таблица сравнения'}
-    style="--ui-sticky-table-min-width: 30rem"
+    style="--ui-sticky-table-min-width: 100%"
   >
     <table class="ui-table ui-sticky-table table-fixed">
       <thead>
         <tr class="ui-table-head ui-sticky-table-head">
-          <th>Общие пространства</th>
-          <th class="w-24 text-center sm:w-48">Статус</th>
+          <th class="break-words">Общие пространства</th>
+          <th class="w-20 text-center sm:w-48">Статус</th>
           {#if shelkovoSpaces}
-            <th class="w-24 text-center sm:w-48">Шелково</th>
+            <th class="w-20 text-center sm:w-48">Шелково</th>
           {/if}
         </tr>
       </thead>
@@ -183,7 +183,7 @@
               ? getDisplay(shelkovoValue)
               : undefined}
             <tr data-testid="space-row" class="ui-table-row">
-              <td class="ui-table-cell text-sm text-foreground">
+              <td class="ui-table-cell break-words text-sm text-foreground">
                 {labels[key]}
               </td>
               <td class="ui-table-cell ui-table-cell-center">
