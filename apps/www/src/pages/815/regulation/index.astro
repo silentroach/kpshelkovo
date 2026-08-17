@@ -903,7 +903,10 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                   <span class="font-semibold">
                                     {row.missing.rate.label}
                                   </span>
-                                  <span class="reglament-missing-help">
+                                  <span
+                                    class="reglament-missing-help"
+                                    data-reglament-missing-field="price"
+                                  >
                                     <button
                                       class="reglament-missing-help-button"
                                       type="button"

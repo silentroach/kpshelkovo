@@ -2,11 +2,19 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 
 const missingBaseCount = 6;
 const mobileWidths = [320, 390] as const;
+const verticalFields = ['base', 'price'] as const;
 
 const tooltipClippingIssues = (tooltip: HTMLElement): readonly string[] => {
   const rect = tooltip.getBoundingClientRect();
   const issues: string[] = [];
   const tolerance = 0.5;
+  const clipsAxis = (
+    overflow: string,
+    scrollSize: number,
+    clientSize: number,
+  ): boolean =>
+    overflow !== 'visible' &&
+    (overflow !== 'auto' || scrollSize > clientSize + 1);
 
   if (rect.left < -tolerance)
     issues.push(`viewport left: ${rect.left.toFixed(2)}`);
@@ -26,14 +34,18 @@ const tooltipClippingIssues = (tooltip: HTMLElement): readonly string[] => {
       ? 'table shell'
       : ancestor.tagName.toLowerCase();
 
-    if (style.overflowX !== 'visible') {
+    if (
+      clipsAxis(style.overflowX, ancestor.scrollWidth, ancestor.clientWidth)
+    ) {
       if (rect.left < ancestorRect.left - tolerance)
         issues.push(`${name} left: ${rect.left.toFixed(2)}`);
       if (rect.right > ancestorRect.right + tolerance)
         issues.push(`${name} right: ${rect.right.toFixed(2)}`);
     }
 
-    if (style.overflowY !== 'visible') {
+    if (
+      clipsAxis(style.overflowY, ancestor.scrollHeight, ancestor.clientHeight)
+    ) {
       if (rect.top < ancestorRect.top - tolerance)
         issues.push(`${name} top: ${rect.top.toFixed(2)}`);
       if (rect.bottom > ancestorRect.bottom + tolerance)
@@ -110,16 +122,20 @@ const placeTriggerAtShellEdge = async (
 
 const placeTriggerVertically = async (
   trigger: Locator,
-  position: 'center' | 'bottom',
+  position: 'top' | 'center' | 'bottom',
 ): Promise<void> => {
   await trigger.evaluate((element, targetPosition) => {
     const rect = element.getBoundingClientRect();
-    const target =
-      targetPosition === 'center'
-        ? window.innerHeight / 2
-        : window.innerHeight - 8;
-    const current =
-      targetPosition === 'center' ? rect.top + rect.height / 2 : rect.bottom;
+    let target = window.innerHeight / 2;
+    let current = rect.top + rect.height / 2;
+
+    if (targetPosition === 'top') {
+      target = 8;
+      current = rect.top;
+    } else if (targetPosition === 'bottom') {
+      target = window.innerHeight - 8;
+      current = rect.bottom;
+    }
 
     window.scrollTo({
       top: window.scrollY + current - target,
@@ -128,13 +144,20 @@ const placeTriggerVertically = async (
   }, position);
 };
 
+const revealTriggerHorizontally = async (trigger: Locator): Promise<void> => {
+  await trigger.evaluate((element) => {
+    element.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  });
+};
+
 const expectFullyReadable = async (tooltip: Locator): Promise<void> => {
   await expect.poll(() => tooltip.evaluate(tooltipClippingIssues)).toEqual([]);
 };
 
-const expectTooltipAboveTrigger = async (
+const expectTooltipOnSide = async (
   trigger: Locator,
   tooltip: Locator,
+  side: 'above' | 'below',
 ): Promise<void> => {
   await expect
     .poll(async () => {
@@ -143,7 +166,9 @@ const expectTooltipAboveTrigger = async (
 
       if (!triggerRect || !tooltipRect) return false;
 
-      return tooltipRect.y + tooltipRect.height <= triggerRect.y;
+      return side === 'above'
+        ? tooltipRect.y + tooltipRect.height <= triggerRect.y
+        : tooltipRect.y >= triggerRect.y + triggerRect.height;
     })
     .toBe(true);
 };
@@ -184,7 +209,49 @@ for (const width of mobileWidths) {
     await trigger.focus();
     await expect(tooltip).toBeVisible();
     await expectFullyReadable(tooltip);
-    await expectTooltipAboveTrigger(trigger, tooltip);
+    await expectTooltipOnSide(trigger, tooltip, 'above');
+  });
+
+  test(`keeps first and last base and price tooltips visible near ${String(width)}px viewport edges`, async ({
+    page,
+  }) => {
+    await openRegulation(page, { width, height: 844 });
+
+    for (const field of verticalFields) {
+      const selector = `[data-reglament-missing-field="${field}"]`;
+      const shells = page
+        .locator('[data-ui-sticky-table-shell]')
+        .filter({ has: page.locator(selector) });
+      const shellCount = await shells.count();
+
+      expect(shellCount).toBeGreaterThan(0);
+
+      for (let shellIndex = 0; shellIndex < shellCount; shellIndex += 1) {
+        const helps = shells.nth(shellIndex).locator(selector);
+        const helpCount = await helps.count();
+        const boundaryIndices = helpCount === 1 ? [0] : [0, helpCount - 1];
+
+        for (const helpIndex of boundaryIndices) {
+          const help = helps.nth(helpIndex);
+          const trigger = triggerFor(help);
+          const tooltip = tooltipFor(help);
+
+          for (const position of ['top', 'bottom'] as const) {
+            await revealTriggerHorizontally(trigger);
+            await placeTriggerVertically(trigger, position);
+            await trigger.focus();
+            await expect(tooltip).toBeVisible();
+            await expectFullyReadable(tooltip);
+            await expectTooltipOnSide(
+              trigger,
+              tooltip,
+              position === 'top' ? 'below' : 'above',
+            );
+            await trigger.blur();
+          }
+        }
+      }
+    }
   });
 }
 

@@ -4,12 +4,21 @@ const tooltipSelector = '.reglament-missing-tooltip';
 const tooltipGap = 6;
 const tooltipGutter = 8;
 const tooltipMaxWidth = 288;
+const overflowTolerance = 1;
 
 let positionRaf = 0;
 let viewportListenersBound = false;
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), Math.max(min, max));
+// Horizontal overflow can make the computed overflow-y `auto` without a vertical scroll range.
+const clipsAxis = (
+  overflow: string,
+  scrollSize: number,
+  clientSize: number,
+): boolean =>
+  overflow !== 'visible' &&
+  (overflow !== 'auto' || scrollSize > clientSize + overflowTolerance);
 
 const visibleBounds = (help: HTMLElement) => {
   let left = tooltipGutter;
@@ -22,12 +31,16 @@ const visibleBounds = (help: HTMLElement) => {
     const style = getComputedStyle(ancestor);
     const rect = ancestor.getBoundingClientRect();
 
-    if (style.overflowX !== 'visible') {
+    if (
+      clipsAxis(style.overflowX, ancestor.scrollWidth, ancestor.clientWidth)
+    ) {
       left = Math.max(left, rect.left + tooltipGutter);
       right = Math.min(right, rect.right - tooltipGutter);
     }
 
-    if (style.overflowY !== 'visible') {
+    if (
+      clipsAxis(style.overflowY, ancestor.scrollHeight, ancestor.clientHeight)
+    ) {
       top = Math.max(top, rect.top + tooltipGutter);
       bottom = Math.min(bottom, rect.bottom - tooltipGutter);
     }
