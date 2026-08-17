@@ -5,7 +5,13 @@
   import { onMount } from 'svelte';
   import type { ExplorerPayload, ExplorerSettlement } from '../lib/explorer';
   import { getRing } from '../lib/rating';
-  import { withBase } from '../lib/url';
+  import {
+    buildExplorerUrl,
+    DEFAULT_EXPLORER_QUERY,
+    readExplorerQuery,
+    withBase,
+  } from '../lib/url';
+  import type { ExplorerPriceFilter, ExplorerSort } from '../lib/url.types';
   import SettlementMap from './SettlementMap.svelte';
   import SettlementCard from './SettlementCard.svelte';
 
@@ -124,18 +130,26 @@
   }
 
   // Состояние фильтров и сортировки.
-  let sortBy = $state<
-    | 'tariff_asc'
-    | 'tariff_desc'
-    | 'rating_desc'
-    | 'rating_asc'
-    | 'mkad'
-    | 'distance'
-    | 'name'
-  >('rating_desc');
-  let priceFilter = $state<'all' | 'cheaper' | 'more_expensive'>('all');
+  let sortBy = $state<ExplorerSort>(DEFAULT_EXPLORER_QUERY.sortBy);
+  let priceFilter = $state<ExplorerPriceFilter>(
+    DEFAULT_EXPLORER_QUERY.priceFilter,
+  );
+  let queryReady = $state(false);
   let showMap = $state(false);
   let mobile = $state(false);
+
+  $effect(() => {
+    if (!queryReady) return;
+
+    const nextUrl = buildExplorerUrl(window.location.href, {
+      sortBy,
+      priceFilter,
+    });
+    const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (nextUrl === currentUrl) return;
+
+    window.history.replaceState(window.history.state, '', nextUrl);
+  });
 
   // Производный список поселков после фильтрации и сортировки.
   let filteredSettlements = $derived.by(() => {
@@ -219,6 +233,11 @@
   let levels = $derived(Math.max(new Set(ranks.values()).size, 1));
 
   onMount(() => {
+    const query = readExplorerQuery(window.location.search);
+    sortBy = query.sortBy;
+    priceFilter = query.priceFilter;
+    queryReady = true;
+
     const media = window.matchMedia('(max-width: 767px)');
     mobile = media.matches;
     showMap = !mobile;

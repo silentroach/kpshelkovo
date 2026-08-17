@@ -123,6 +123,9 @@ function cardNames(container: HTMLElement): string[] {
   ].map((el) => el.textContent?.trim() ?? '');
 }
 
+const currentPath = (): string =>
+  `${window.location.pathname}${window.location.search}${window.location.hash}`;
+
 function setScreen(mobile: boolean): void {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
@@ -141,6 +144,7 @@ function setScreen(mobile: boolean): void {
 describe('SettlementsExplorer', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.history.replaceState({}, '', '/815/compare/');
     Object.defineProperty(window, 'ymaps3', {
       value: mockYandexMaps,
       writable: true,
@@ -215,6 +219,86 @@ describe('SettlementsExplorer', () => {
 
     await waitFor(() => {
       expect(cardNames(container)).toEqual(['Усадьбы', 'Шелково', 'Лесное']);
+    });
+  });
+
+  it('restores sorting and filtering from a shared URL', async () => {
+    setScreen(false);
+    window.history.replaceState(
+      {},
+      '',
+      '/815/compare/?sort=tariff_asc&price=more_expensive',
+    );
+
+    const { container, getByTestId } = render(SettlementsExplorer, {
+      props: { settlements, comparisons, stats },
+    });
+
+    await waitFor(() => {
+      expect({
+        cards: cardNames(container),
+        price: (getByTestId('price-more') as HTMLInputElement).checked,
+        sort: (getByTestId('sort-select') as HTMLSelectElement).value,
+      }).toMatchInlineSnapshot(`
+        {
+          "cards": [
+            "Усадьбы",
+          ],
+          "price": true,
+          "sort": "tariff_asc",
+        }
+      `);
+    });
+  });
+
+  it('replaces the current URL when controls change', async () => {
+    setScreen(false);
+    window.history.replaceState(
+      { astro: 'preserved' },
+      '',
+      '/815/compare/?from=chat#results',
+    );
+    const replaceState = vi.spyOn(window.history, 'replaceState');
+    const pushState = vi.spyOn(window.history, 'pushState');
+
+    const { getByTestId } = render(SettlementsExplorer, {
+      props: { settlements, comparisons, stats },
+    });
+
+    await fireEvent.change(getByTestId('sort-select'), {
+      target: { value: 'tariff_asc' },
+    });
+    await fireEvent.click(getByTestId('price-cheaper'));
+
+    await waitFor(() => {
+      expect(currentPath()).toBe(
+        '/815/compare/?from=chat&sort=tariff_asc&price=cheaper#results',
+      );
+    });
+    expect(replaceState).toHaveBeenLastCalledWith(
+      { astro: 'preserved' },
+      '',
+      '/815/compare/?from=chat&sort=tariff_asc&price=cheaper#results',
+    );
+    expect(pushState).not.toHaveBeenCalled();
+  });
+
+  it('cleans unknown query values while keeping unrelated state', async () => {
+    setScreen(false);
+    window.history.replaceState(
+      {},
+      '',
+      '/815/compare/?sort=unknown&price=unknown&from=chat#results',
+    );
+
+    const { container, getByTestId } = render(SettlementsExplorer, {
+      props: { settlements, comparisons, stats },
+    });
+
+    await waitFor(() => {
+      expect(currentPath()).toBe('/815/compare/?from=chat#results');
+      expect(cardNames(container)).toEqual(['Усадьбы', 'Шелково', 'Лесное']);
+      expect((getByTestId('price-all') as HTMLInputElement).checked).toBe(true);
     });
   });
 
