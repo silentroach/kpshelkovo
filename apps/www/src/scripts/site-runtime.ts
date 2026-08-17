@@ -300,6 +300,19 @@ const bindSiteHeaderMenu = (): void => {
         menu.open = false;
       });
   });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') {
+      return;
+    }
+
+    document
+      .querySelectorAll<HTMLDetailsElement>(SITE_HEADER_MENU_SELECTOR)
+      .forEach((menu) => {
+        menu.open = false;
+        menu.querySelector<HTMLElement>(':scope > summary')?.focus();
+      });
+  });
 };
 
 const bindSettlementsFallback = (): void => {
