@@ -109,7 +109,10 @@ const aliasExpectations: ReadonlyMap<
   ],
   ['тариф 815', { url: '/815/regulation/', maxRank: 1 }],
   ['тариф 815 что входит', { url: '/815/regulation/', maxRank: 2 }],
-  ['815 рублей за сотку', { url: '/815/regulation/', maxRank: 1 }],
+  [
+    '815 рублей за сотку',
+    { url: '/815/regulation/#tariff-calculator-title', maxRank: 1 },
+  ],
   ['что входит в тариф 815', { url: '/815/regulation/', maxRank: 2 }],
 ]);
 
