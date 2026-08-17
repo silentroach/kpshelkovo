@@ -1,0 +1,48 @@
+name: КП Духанино
+short_name: Духанино
+slug: dukhanino
+website: https://www.skd-dom.ru/o-kompanii/kottedzhnye-poselki/kottedzhnye-poselki_2.html
+is_baseline: false
+location:
+  address_text: МО, округ Истра, комплекс КП Духанино
+  lat: 55.9719
+  lng: 36.9325
+  map_url: https://yandex.ru/maps/?ll=36.932500%2C55.971900&z=16
+  district: Истринский район
+tariff:
+  value: 14000
+  unit: rub_per_lot
+  period: month
+  note: Данные дружественного сайта, актуальны на 03.11.2025
+lots:
+  count: 125
+infrastructure:
+  gas: yes
+  water: yes
+  sewage: yes
+  retail_or_services: yes
+common_spaces:
+  playgrounds: yes
+  sports: yes
+service_model: {}
+sources:
+  - title: СКД-Дом — коттеджные поселки Духанино
+    url: https://www.skd-dom.ru/o-kompanii/kottedzhnye-poselki/kottedzhnye-poselki_2.html
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены центральные газ, вода, электричество и канализация в комплексе поселков Духанино.
+  - title: МТК — коттеджный поселок Духанино
+    url: https://www.mtk.ru/kottedgnie-poselki/kp-duhanino
+    type: media
+    date_checked: 2026-08-17
+    comment: Подтверждено разделение первых четырех очередей на 21, 29, 37 и 38 домовладений — всего 125.
+  - title: Духанино — архив официального сайта
+    url: https://web.archive.org/web/20120113023351/http://www.dukhanino2.ru/pos/duhan/description/
+    type: official
+    date_checked: 2026-08-17
+    comment: Первые четыре очереди описаны как единый комплекс; для Духанино-3 и Духанино-4 подтверждены минимаркет, детские и спортивные площадки.
+  - title: Яндекс Карты — комплекс Духанино
+    url: https://yandex.ru/maps/?ll=36.932500%2C55.971900&z=16
+    type: community
+    date_checked: 2026-08-17
+    comment: Карта подтверждает расположение четырех соседних очередей Духанино в округе Истра.

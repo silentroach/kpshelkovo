@@ -1,0 +1,54 @@
+name: Группа КП Петрухино
+short_name: Петрухино
+slug: petruhino
+website: https://petruhino-group.ru/
+management_company: УК девелопера
+is_baseline: false
+location:
+  address_text: МО, округ Серпухов, КП Петрухино
+  lat: 54.97882
+  lng: 37.548606
+  map_url: https://yandex.ru/maps/org/petrukhino_2/217227919044/
+  district: Серпуховский район
+tariff:
+  value: 4700
+  unit: rub_per_lot
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.05.2026
+infrastructure:
+  retail_or_services: yes
+common_spaces:
+  club_infrastructure: yes
+  playgrounds: yes
+  sports: yes
+  fitness_club: yes
+  walking_routes: yes
+  water_access: yes
+  bbq_zones: yes
+service_model: {}
+sources:
+  - title: Петрухино Групп — официальный сайт
+    url: https://petruhino-group.ru/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены три очереди Петрухино и собственная управляющая компания группы; самостоятельные поселки девелопера в эту карточку не включены.
+  - title: Петрухино — генеральный план
+    url: https://www.petruhino.ru/generalnyjj-plan/
+    type: official
+    date_checked: 2026-08-17
+    comment: Официальный сайт описывает Петрухино как комплекс из трех очередей с разными характеристиками.
+  - title: Петрухино Групп — общая инфраструктура
+    url: https://petruhino-group.ru/infrastruktura
+    type: official
+    date_checked: 2026-08-17
+    comment: В общем инфраструктурном кластере подтверждены конный клуб, тренажерный зал, стадион, детские площадки, магазин, тир, веревочный парк, тюбинговая горка, мини-гольф, зона барбекю, пруд и велосипедные маршруты.
+  - title: Петрухино Групп — контакты
+    url: https://petruhino-group.ru/kontakty
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтвержден общий адрес проекта в городском округе Серпухов.
+  - title: Яндекс Карты — Петрухино-2
+    url: https://yandex.ru/maps/org/petrukhino_2/217227919044/
+    type: community
+    date_checked: 2026-08-17
+    comment: Точка на карте относится к Петрухино-2 и используется как географический ориентир для группы очередей.

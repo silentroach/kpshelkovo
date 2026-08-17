@@ -1,0 +1,46 @@
+name: КП Черешневый лес
+short_name: Черешневый лес
+slug: chereshnevy-les
+website: https://kp-chereshneviy-les.ru/
+management_company: УК Простор
+is_baseline: false
+location:
+  address_text: МО, округ Чехов, территория Черешневый лес
+  lat: 55.144648
+  lng: 37.616351
+  map_url: https://yandex.ru/maps/org/chereshnevy_les/112937395102/
+  district: Чеховский район
+tariff:
+  value: 5400
+  unit: rub_per_lot
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.05.2026
+lots:
+  count: 382
+  area_ha: 32
+infrastructure:
+  roads: partial_asphalt
+  lighting: yes
+  checkpoints: yes
+  fencing: yes
+  admin_building: yes
+  retail_or_services: yes
+common_spaces:
+  playgrounds: yes
+  sports: yes
+service_model: {}
+sources:
+  - title: Черешневый лес — официальный сайт
+    url: https://kp-chereshneviy-les.ru/
+    type: official
+    date_checked: 2026-08-17
+    comment: >-
+      Подтверждены каноническое написание названия, управление компанией
+      «Простор», 382 участка на 32 га, асфальтированный подъезд и отсыпанные
+      внутренние проезды, освещение, КПП, ограждение, административное здание,
+      магазин, детская и спортивная площадки.
+  - title: Яндекс Карты — Черешневый лес
+    url: https://yandex.ru/maps/org/chereshnevy_les/112937395102/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка подтверждает название и расположение территории Черешневый лес в Чеховском округе.

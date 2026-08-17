@@ -255,7 +255,7 @@ describe('compare markdown navigation', () => {
         settlement,
         comparison: {
           tariffDelta: -100,
-          tariffDeltaPercent: -0.1,
+          tariffDeltaPercent: -10,
           isCheaper: true,
         },
         shelkovo: {

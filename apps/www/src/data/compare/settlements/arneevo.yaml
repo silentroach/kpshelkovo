@@ -1,0 +1,73 @@
+name: КП Арнеево
+short_name: Арнеево
+slug: arneevo
+website: https://poselok-arneevo.ru/
+is_baseline: false
+location:
+  address_text: МО, округ Серпухов, д. Арнеево
+  lat: 54.964123
+  lng: 37.576672
+  map_url: https://yandex.ru/maps/org/arneyevo/136735234967/
+  district: Серпуховский район
+tariff:
+  value: 4700
+  unit: rub_per_lot
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.05.2026
+infrastructure:
+  roads: partial_asphalt
+  gas: yes
+  water: yes
+  sewage: no
+  drainage: open
+  checkpoints: yes
+  security: yes
+  fencing: yes
+  admin_building: yes
+common_spaces:
+  playgrounds: yes
+  sports: yes
+  walking_routes: yes
+  water_access: yes
+  beach_zones: yes
+  bbq_zones: yes
+service_model:
+  garbage_collection: yes
+  road_cleaning: yes
+sources:
+  - title: Арнеево — официальный сайт
+    url: https://poselok-arneevo.ru/
+    type: official
+    date_checked: 2026-08-17
+    comment: >-
+      Подтверждены центральный газ у границ участков, водопровод от общей
+      скважины, детские и спортивные площадки, оборудованные зоны для купания
+      и регулярное обслуживание дорог.
+  - title: Петрухино Групп — Арнеево
+    url: https://petruhino-group.ru/poselok/arneevo
+    type: official
+    date_checked: 2026-08-17
+    comment: >-
+      Подтверждены охрана, КПП, ограждение, патрулирование, административное
+      здание, детская и спортивная инфраструктура, прогулочные маршруты,
+      доступ к воде, пляжная и BBQ-зоны.
+  - title: Петрухино Групп — дороги в Арнеево
+    url: https://petruhino-group.ru/novosti/v-kp-arneevo-polozhili-asfaltnuyu-kroshku-po-koltsevoi-i-vtorostepennym-dorogam
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждена асфальтовая крошка на кольцевой и второстепенных дорогах поселка.
+  - title: Петрухино Групп — ливневые канавы в Арнеево
+    url: https://petruhino-group.ru/novosti/v-arneevo-vykopali-livnevye-kanavy
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтвержден открытый водоотвод в виде ливневых канав.
+  - title: Яндекс Карты — Арнеево
+    url: https://yandex.ru/maps/org/arneyevo/136735234967/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка подтверждает расположение и указывает уборку дорог и вывоз мусора среди услуг поселка.
+  - title: Domzamkad — Арнеево
+    url: https://www.domzamkad.ru/villages/arneevo.html
+    type: media
+    date_checked: 2026-08-17
+    comment: Подтверждены центральные водоснабжение и газ, септики вместо центральной канализации, твердые дороги, КПП и круглосуточная охрана.

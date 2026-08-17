@@ -1,0 +1,52 @@
+name: КП Кузьминский
+short_name: Кузьминский
+slug: kuzminskiy
+website: https://kuzminskiy-kp.ru/
+is_baseline: false
+location:
+  address_text: МО, округ Домодедово, территория КП Кузьминский
+  lat: 55.254583
+  lng: 37.877813
+  map_url: https://yandex.ru/maps/geo/kp_kuzminskiy/4511298961/
+  district: Домодедовский район
+tariff:
+  value: 600
+  unit: rub_per_sotka
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.05.2026
+lots:
+  count: 303
+  area_ha: 22
+infrastructure:
+  roads: asphalt
+  lighting: yes
+  gas: no
+  water: no
+  checkpoints: yes
+  fencing: yes
+common_spaces:
+  playgrounds: yes
+  sports: yes
+  walking_routes: yes
+service_model: {}
+sources:
+  - title: Кузьминский — инфраструктура
+    url: https://kuzminskiy-kp.ru/infrastruktura/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены асфальтированные дороги, освещение, детская и спортивная площадки и парк; газ указан только как перспектива.
+  - title: Кузьминский — план поселка
+    url: https://kuzminskiy-kp.ru/plan-i-ceny/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены 303 участка и общая площадь поселка 22 га.
+  - title: Poselkino — Кузьминский
+    url: https://poselkino.ru/poselki/kuzminskiy/
+    type: media
+    date_checked: 2026-08-17
+    comment: Подтверждены асфальтированные дороги, освещение, ограждение, КПП, прогулочная зона и отсутствие центрального водопровода; постоянная физическая охрана не заявлена.
+  - title: Яндекс Карты — КП Кузьминский
+    url: https://yandex.ru/maps/geo/kp_kuzminskiy/4511298961/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка территории подтверждает название и расположение поселка в округе Домодедово.

@@ -1,0 +1,53 @@
+name: КП Всходы
+short_name: Всходы
+slug: vshody
+website: https://www.mtk.ru/kottedgnie-poselki/kp-vshodi/
+management_company: УК девелопера
+is_baseline: false
+location:
+  address_text: МО, округ Серпухов, д. Всходы, территория ТСН СНТ Всходы
+  lat: 54.974835
+  lng: 37.546273
+  map_url: https://yandex.ru/maps/?ll=37.546273%2C54.974835&mode=whatshere&whatshere%5Bpoint%5D=37.546273%2C54.974835&z=17
+  district: Серпуховский район
+tariff:
+  value: 4700
+  unit: rub_per_lot
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.05.2026
+infrastructure:
+  roads: asphalt
+  fencing: partial
+common_spaces: {}
+service_model: {}
+sources:
+  - title: МТК — коттеджный поселок Всходы
+    url: https://www.mtk.ru/kottedgnie-poselki/kp-vshodi/
+    type: media
+    date_checked: 2026-08-17
+    comment: Карточка подтверждает отдельный завершенный проект Всходы рядом с одноименной деревней; сведения о числе участков и коммуникациях исключены из-за противоречий на странице.
+  - title: НСПД — территория ТСН СНТ Всходы
+    url: https://nspd.gov.ru/api/geoportal/v2/search/geoportal?query=%D1%82%D0%B5%D1%80.%20%D0%A2%D0%A1%D0%9D%20%D0%A1%D0%9D%D0%A2%20%D0%92%D1%81%D1%85%D0%BE%D0%B4%D1%8B
+    type: official
+    date_checked: 2026-08-17
+    comment: Реестровые записи подтверждают адрес территории и отделяют ее от соседнего ТСН СНТ «Большие Всходы».
+  - title: OpenStreetMap — дорога в КП Всходы
+    url: https://www.openstreetmap.org/way/100103377
+    type: community
+    date_checked: 2026-08-17
+    comment: Картографические данные подтверждают асфальтовое покрытие одного из основных внутренних проездов.
+  - title: OpenStreetMap — внутренняя дорога в КП Всходы
+    url: https://www.openstreetmap.org/way/100103390
+    type: community
+    date_checked: 2026-08-17
+    comment: Еще один внутренний проезд территории отмечен как асфальтированный.
+  - title: OpenStreetMap — ограждение в КП Всходы
+    url: https://www.openstreetmap.org/way/985808229
+    type: community
+    date_checked: 2026-08-17
+    comment: Подтвержден отдельный участок металлического ограждения; замкнутый периметр не установлен.
+  - title: Яндекс Карты — деревня Всходы
+    url: https://yandex.ru/maps/?ll=37.546273%2C54.974835&mode=whatshere&whatshere%5Bpoint%5D=37.546273%2C54.974835&z=17
+    type: community
+    date_checked: 2026-08-17
+    comment: Карта подтверждает расположение у деревни Всходы; отдельной карточки коттеджного поселка в сервисе нет.

@@ -1,0 +1,57 @@
+name: КП Петровское Парк
+short_name: Петровское Парк
+slug: petrovskoe-park
+website: https://petrovskoe-park.ru/
+management_company: ТСН
+is_baseline: false
+location:
+  address_text: МО, округ Чехов, д. Большое Петровское
+  lat: 55.20782
+  lng: 37.413874
+  map_url: https://yandex.ru/maps/geo/kp_petrovskoye_park/4124614372/
+  district: Чеховский район
+tariff:
+  value: 400
+  unit: rub_per_sotka
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.05.2026; часть вопросов жители решают самостоятельно
+infrastructure:
+  roads: partial_asphalt
+  gas: yes
+  water: yes
+  sewage: yes
+  security: yes
+  underground_electricity: full
+  retail_or_services: yes
+common_spaces:
+  playgrounds: yes
+  sports: yes
+  walking_routes: yes
+  water_access: yes
+service_model: {}
+sources:
+  - title: Петровское Парк — официальный сайт
+    url: https://petrovskoe-park.ru/
+    type: official
+    date_checked: 2026-08-17
+    comment: >-
+      Подтверждены центральные газ, водопровод и канализация, подземная
+      электросеть, охрана, кафе, детская и спортивная площадки, прогулочный
+      бульвар, зона отдыха у реки и управление через ТСН. В первой очереди
+      строительство завершено, во второй асфальтированы бульвар и центральные
+      улицы, а остальные дороги имеют твердое покрытие.
+  - title: Петровское Парк — работа коммуникаций
+    url: https://petrovskoe-park.ru/tpost/zg6tvx8y41-vse-kommunikatsii-posyolka-rabotayut-v-p
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены запуск магистрального газа и подключение центральной канализации к городским очистным сооружениям.
+  - title: Петровское Парк — детский игровой комплекс
+    url: https://petrovskoe-park.ru/tpost/v2o0cti4t1-ustanovlen-detskii-igrovoi-kompleks
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждена установленная детская площадка в первой очереди поселка.
+  - title: Яндекс Карты — КП Петровское парк
+    url: https://yandex.ru/maps/geo/kp_petrovskoye_park/4124614372/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка территории подтверждает расположение первой очереди в деревне Большое Петровское.

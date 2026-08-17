@@ -221,7 +221,7 @@ function delta(item: Settlement, cmp?: ComparisonResult): string {
     return 'Тариф совпадает с Шелково.';
   }
 
-  return `${cmp.isCheaper ? 'Дешевле' : 'Дороже'} Шелково на ${formatCurrency(Math.abs(cmp.tariffDelta))} (${formatPercentage(Math.abs(cmp.tariffDeltaPercent), { signed: false })}).`;
+  return `${cmp.isCheaper ? 'Дешевле' : 'Дороже'} Шелково на ${formatCurrency(Math.abs(cmp.tariffDelta))} (${formatPercentage(Math.abs(cmp.tariffDeltaPercent) / 100, { signed: false })}).`;
 }
 
 function map(item: Settlement): string {

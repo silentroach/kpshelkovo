@@ -1,0 +1,85 @@
+name: КП Артёмово ИЖС
+short_name: Артёмово ИЖС
+slug: artemovo-izhs
+website: https://kp-artemovo.ru/
+is_baseline: false
+location:
+  address_text: МО, округ Домодедово, д. Матчино
+  lat: 55.25516
+  lng: 37.7895
+  map_url: https://yandex.ru/maps/geo/kp_artyomovo/5604590927/
+  district: Домодедовский район
+tariff:
+  value: 100
+  unit: rub_per_sotka
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.03.2026; поселковые инженерные сети не подключены
+lots:
+  area_ha: 33
+infrastructure:
+  roads: partial_asphalt
+  sidewalks: partial
+  lighting: partial
+  gas: no
+  water: no
+  sewage: no
+  checkpoints: yes
+  fencing: partial
+  underground_electricity: none
+common_spaces:
+  playgrounds: yes
+  sports: yes
+  walking_routes: partial
+  bbq_zones: yes
+service_model:
+  snow_removal: yes
+  landscaping: yes
+sources:
+  - title: Артемово ИЖС — инфраструктура
+    url: https://kp-artemovo.ru/infrastruktura/
+    type: official
+    date_checked: 2026-08-17
+    comment: >-
+      Подтверждены подъездная асфальтированная дорога, внутренние дороги из
+      асфальтовой крошки, освещение, КПП, детская и спортивная площадки. Газ
+      указан только как перспектива.
+  - title: Артемово ИЖС — план поселка
+    url: https://kp-artemovo.ru/plan-i-ceny/
+    type: official
+    date_checked: 2026-08-17
+    comment: Страница проекта указывает общую площадь 33 га; опубликованные на сайтах количества участков расходятся, поэтому они не перенесены в карточку.
+  - title: Земекс — завершение дорожных работ в Артёмово ИЖС
+    url: https://zemexx.ru/news/vazhnoe-dostizhenie-v-kp-artyemovo-izhs-zaversheny-dorozhnye-raboty/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждена завершенная укатка внутренних дорог из асфальтовой крошки.
+  - title: Земекс — зоны отдыха в Артёмово ИЖС
+    url: https://zemexx.ru/news/v-kp-artemovo-izhs-sozdany-velikolepnye-zony-dlya-otdykha/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены прогулочные дорожки в общественных зонах и зона барбекю.
+  - title: Земекс — въездная группа в Артёмово ИЖС
+    url: https://zemexx.ru/news/artyemovo-izhs-obnovlenie-vezdnoy-gruppy-i-parkovki/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены существующая въездная группа и гостевая парковка.
+  - title: Земекс — электрификация Артёмово ИЖС
+    url: https://zemexx.ru/news/kp-artyemovo-izhs-masshtabnye-raboty-po-elektrifikatsii/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждена воздушная электросеть на опорах; в апреле 2026 года работы еще продолжались.
+  - title: Земекс — уборка снега в Артёмово ИЖС
+    url: https://zemexx.ru/news/kp-artyemovo-izhs-uborka-snega/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждена уборка снега на дорогах, парковке и пешеходных дорожках в марте 2026 года.
+  - title: Земекс — экотропы Артёмово ИЖС
+    url: https://zemexx.ru/news/artemovo-izhs-ekotropy-i-zona-otdykha-u-lesa-privedeny-v-poryadok/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены расчистка и уход за экотропами и зоной отдыха у леса в июле 2026 года.
+  - title: Яндекс Карты — КП Артёмово
+    url: https://yandex.ru/maps/geo/kp_artyomovo/5604590927/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка территории подтверждает название и расположение поселка рядом с деревней Матчино.

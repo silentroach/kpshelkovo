@@ -1,0 +1,68 @@
+name: КП Дмитровка Life
+short_name: Дмитровка Life
+slug: dmitrovka-life
+website: https://dmitrovkalife.ru/
+is_baseline: false
+location:
+  address_text: МО, округ Дмитров, п. Андрейково
+  lat: 56.242704
+  lng: 37.653934
+  map_url: https://yandex.ru/maps/org/dmitrovka_life/85094794835/
+  district: Дмитровский район
+tariff:
+  value: 1200
+  unit: rub_per_lot
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.05.2026
+lots:
+  count: 76
+  area_ha: 8.3
+infrastructure:
+  roads: partial_asphalt
+  lighting: yes
+  gas: yes
+  checkpoints: yes
+  security: yes
+  fencing: yes
+  admin_building: yes
+common_spaces:
+  playgrounds: yes
+service_model:
+  snow_removal: yes
+  road_cleaning: yes
+sources:
+  - title: Дмитровка Life — официальный сайт
+    url: https://dmitrovkalife.ru/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены 76 участков на 8,3 га, освещение, газопровод, КПП, офис управляющей компании и уборка дорог зимой и летом.
+  - title: Дмитровка — Загородная Недвижимость — Дмитровка Life
+    url: https://dmitrovka-zn.ru/dmitrovkalife
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены 76 участков, дороги из асфальтовой крошки, въездная группа, КПП и круглосуточная охрана.
+  - title: Дмитровка Life — газопровод
+    url: https://dmitrovkalife.ru/tpost/dnknr0x8a1-v-kp-dmitrovka-life-proveden-gaz
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтвержден построенный поселковый газопровод.
+  - title: Дмитровка Life — ограждение
+    url: https://dmitrovkalife.ru/tpost/pbdge665o1-kp-dmitrovka-life-polnostyu-ogorozhen
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждено завершенное ограждение поселка по периметру.
+  - title: Дмитровка Life — детская площадка
+    url: https://dmitrovkalife.ru/tpost/i5l0xmp781-detskaya-ploschadka-v-kp-dmitrovka-life
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждена установленная детская площадка у въездной группы.
+  - title: Дмитровка Life — уборка снега
+    url: https://dmitrovkalife.ru/tpost/2hcf75xne1-v-kp-dmitrovka-life-regulyarno-chistyat
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждена регулярная очистка внутренних дорог от снега.
+  - title: Яндекс Карты — Дмитровка Life
+    url: https://yandex.ru/maps/org/dmitrovka_life/85094794835/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка организации подтверждает название и расположение поселка Андрейково.

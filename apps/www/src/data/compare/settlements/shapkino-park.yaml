@@ -1,0 +1,74 @@
+name: КП Шапкино Парк
+short_name: Шапкино Парк
+slug: shapkino-park
+website: https://zemleteka.ru/projects/shapkino-park.html
+management_company: УК девелопера
+is_baseline: false
+location:
+  address_text: МО, Наро-Фоминский округ, дачный посёлок Шапкино Парк
+  lat: 55.353197
+  lng: 36.539154
+  map_url: https://yandex.ru/maps/1/moscow-and-moscow-oblast/search/%D1%88%D0%B0%D0%BF%D0%BA%D0%B8%D0%BD%D0%BE%20%D0%BF%D0%B0%D1%80%D0%BA/
+  district: Наро-Фоминский район
+tariff:
+  value: 210
+  unit: rub_per_sotka
+  period: month
+  note: Данные дружественного сайта, актуальны на 14.03.2025
+lots:
+  count: 177
+infrastructure:
+  roads: partial_asphalt
+  lighting: yes
+  water: yes
+  sewage: yes
+  drainage: open
+  checkpoints: yes
+  security: yes
+  fencing: yes
+  video_surveillance: checkpoint_only
+  underground_electricity: none
+  retail_or_services: yes
+common_spaces:
+  playgrounds: yes
+  sports: yes
+  water_access: yes
+  beach_zones: yes
+service_model:
+  landscaping: yes
+sources:
+  - title: Землетека — Шапкино Парк
+    url: https://zemleteka.ru/projects/shapkino-park.html
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены 177 участков, дороги из асфальтовой крошки, освещение, центральные вода и канализация, КПП с постом ЧОП, видеонаблюдение, площадки, пруды с пляжами и магазин.
+  - title: Землетека — дороги в Шапкино Парке
+    url: https://zemleteka.ru/news/shapkino-park/27-07-2017-shapkino-park-asfalt.html
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтвержден верхний слой внутрипоселковых дорог из асфальтовой крошки с битумной проливкой.
+  - title: МУП «Водоканал» — ремонт водопровода в Шапкино Парке
+    url: https://vdknf.ru/ustranenie-tehnologicheskogo-narusheniya-na-vodoprovodnoj-seti-po-adresu-snt-shapkino-park/
+    type: official
+    date_checked: 2026-08-17
+    comment: Сообщение о ремонте в апреле 2026 года подтверждает действующий водопровод поселка.
+  - title: Землетека — водоотвод в Шапкино Парке
+    url: https://zemleteka.ru/news/shapkino-park/31-05-2019-shapkino-park-drenag.html
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждена открытая кюветная сеть с водопропускными трубами на перекрестках.
+  - title: Землетека — ограждение Шапкино Парка
+    url: https://zemleteka.ru/news/shapkino-park/12-06-2019-shapkino-park-zabor.html
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждено завершение ограждения поселка по периметру.
+  - title: Землетека — благоустройство Шапкино Парка
+    url: https://zemleteka.ru/news/shapkino-park/28-05-2019-shapkino-park-blagoustroistvo.html
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтвержден регулярный уход за растениями и газонами в общественных зонах.
+  - title: Яндекс Карты — Шапкино Парк
+    url: https://yandex.ru/maps/1/moscow-and-moscow-oblast/search/%D1%88%D0%B0%D0%BF%D0%BA%D0%B8%D0%BD%D0%BE%20%D0%BF%D0%B0%D1%80%D0%BA/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карта подтверждает отдельную территорию дачного поселка Шапкино Парк в Наро-Фоминском округе.

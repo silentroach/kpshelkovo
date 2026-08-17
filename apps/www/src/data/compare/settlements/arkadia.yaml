@@ -1,0 +1,73 @@
+name: Клубный поселок-парк «Аркадия»
+short_name: Аркадия
+slug: arkadia
+website: https://arkadia-kp.ru/
+management_company:
+  title: ТСН «Клубный Поселок-Парк Аркадия»
+  url: https://www.rusprofile.ru/id/2427057
+is_baseline: false
+location:
+  address_text: МО, округ Истра, д. Часовня
+  lat: 55.916096
+  lng: 36.564842
+  map_url: https://yandex.ru/maps/org/arkadiya/146852355941/
+  district: Истринский район
+tariff:
+  value: 1250
+  unit: rub_per_sotka
+  period: month
+  note: Данные дружественного сайта, актуальны на 20.05.2026; тариф указан для участков площадью 10–15 соток
+lots:
+  count: 147
+  area_ha: 30
+  average_sotka: 12.92
+  average_note: Средняя площадь рассчитана по опубликованным площадям 147 участков
+infrastructure:
+  roads: asphalt
+  lighting: yes
+  gas: yes
+  water: yes
+  sewage: yes
+  checkpoints: yes
+  security: yes
+  fencing: yes
+  underground_electricity: full
+common_spaces:
+  club_infrastructure: yes
+  playgrounds: yes
+  sports: yes
+  walking_routes: yes
+  water_access: yes
+  bbq_zones: yes
+service_model: {}
+sources:
+  - title: Клубный поселок-парк Аркадия — официальный сайт
+    url: https://arkadia-kp.ru/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены название, локация, подземная прокладка центральных коммуникаций и 147 участков в актуальном генплане.
+  - title: Аркадия — инфраструктура
+    url: https://arkadia-kp.ru/#infrastructure
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены клубный дом, детские и спортивные площадки, прогулочная аллея вдоль ручья и лесного озера и зона пикника с барбекю.
+  - title: Яндекс Недвижимость — Аркадия
+    url: https://realty.yandex.ru/moskva_i_moskovskaya_oblast/kupit/kottedzhnye-poselki/arkadiya-1799652/
+    type: media
+    date_checked: 2026-08-17
+    comment: Подтверждены площадь 30 га, дороги с покрытием, освещение, центральные газ, вода и канализация, КПП, ограждение и круглосуточная охрана.
+  - title: ТотДом — обзор поселка Аркадия
+    url: https://totdom.com/news/sravnivaem_poselki_na_novoy_rige_kp_riga_femili_kp_arkadiya_i_kp_emerald_villadzh/
+    type: media
+    date_checked: 2026-08-17
+    comment: Очный обзор подтверждает асфальт на всех внутрипоселковых дорогах.
+  - title: Яндекс Карты — Аркадия
+    url: https://yandex.ru/maps/org/arkadiya/146852355941/
+    type: community
+    date_checked: 2026-08-17
+    comment: Постоянная карточка организации подтверждает расположение поселка у деревни Часовня.
+  - title: Rusprofile — ТСН Клубный Поселок-Парк Аркадия
+    url: https://www.rusprofile.ru/id/2427057
+    type: media
+    date_checked: 2026-08-17
+    comment: Реестр подтверждает действующее ТСН по адресу в деревне Часовня.

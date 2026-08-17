@@ -1,0 +1,69 @@
+name: КП Лесной остров
+short_name: Лесной остров
+slug: lesnoy-ostrov
+website: https://zemexx.ru/zemelnye-uchastki/kashirskoe-shosse/lesnoy-ostrov/
+is_baseline: false
+location:
+  address_text: МО, округ Домодедово, территория КП Лесной остров
+  lat: 55.338157
+  lng: 37.69906
+  map_url: https://yandex.ru/maps/geo/kp_lesnoy_ostrov/4614001423/
+  district: Домодедовский район
+tariff:
+  value: 110
+  unit: rub_per_sotka
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.05.2026
+lots:
+  count: 163
+infrastructure:
+  roads: asphalt
+  sidewalks: partial
+  lighting: yes
+  checkpoints: yes
+  security: yes
+  fencing: yes
+  underground_electricity: partial
+common_spaces:
+  playgrounds: yes
+  sports: yes
+  walking_routes: yes
+service_model:
+  road_cleaning: yes
+  landscaping: yes
+sources:
+  - title: Земекс — коттеджный поселок Лесной остров
+    url: https://zemexx.ru/zemelnye-uchastki/kashirskoe-shosse/lesnoy-ostrov/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены асфальтированные дороги, освещение, ограждение, КПП и охрана; в актуальном генплане 163 участка.
+  - title: Земекс — асфальтирование Лесного острова
+    url: https://zemexx.ru/news/dorozhnye-raboty-v-poselke-lesnoy-ostrov111/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждено завершение укладки асфальта на внутрипоселковых дорогах.
+  - title: Земекс — благоустройство у КПП Лесного острова
+    url: https://zemexx.ru/news/blagoustroystvo-territorii-vozle-kpp-v-poselke-lesnoy-ostrov/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены отдельные пешеходные дорожки к детской и спортивной площадкам и гостевая парковка.
+  - title: Земекс — подземный кабель у въезда в Лесной остров
+    url: https://zemexx.ru/news/kp-lesnoy-ostrov-vezdnaya-gruppa-proizveli-podklyuchenie-kabelya-s-vozdushnogo-na-podzemnyy/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтвержден подземный участок электросети у въездной группы; внутри поселка также используются воздушные линии.
+  - title: Земекс — экотропы Лесного острова
+    url: https://zemexx.ru/news/kp-lesnoy-ostrov-ekotropy-marshruty-eshche-krasivee-i-udobnee/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены существующие лесные прогулочные маршруты и их обслуживание в июне 2026 года.
+  - title: Земекс — обслуживание дорог Лесного острова
+    url: https://zemexx.ru/news/kp-lesnoy-ostrov-podderdaniya-poryadka-na-dorogakh/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены очистка обочин и обслуживание дорожного водоотвода в июне 2026 года.
+  - title: Яндекс Карты — КП Лесной остров
+    url: https://yandex.ru/maps/geo/kp_lesnoy_ostrov/4614001423/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка территории подтверждает название и расположение поселка в округе Домодедово.

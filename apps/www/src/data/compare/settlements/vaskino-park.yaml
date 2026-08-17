@@ -1,0 +1,58 @@
+name: КП Васькино Парк
+short_name: Васькино Парк
+slug: vaskino-park
+website: https://zembery.ru/catalog/vaskino-park/
+is_baseline: false
+location:
+  address_text: МО, округ Чехов, д. Васькино
+  lat: 55.125926
+  lng: 37.598389
+  map_url: https://yandex.ru/maps/geo/kp_vaskino_park/6051298619/
+  district: Чеховский район
+tariff:
+  value: 600
+  unit: rub_per_sotka
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.05.2026
+infrastructure:
+  roads: partial_asphalt
+  sidewalks: partial
+  lighting: partial
+  gas: partial
+  checkpoints: yes
+  fencing: yes
+  underground_electricity: partial
+common_spaces:
+  playgrounds: partial
+  walking_routes: partial
+  water_access: yes
+service_model: {}
+sources:
+  - title: Зембери — Васькино Парк
+    url: https://zembery.ru/catalog/vaskino-park/
+    type: official
+    date_checked: 2026-08-17
+    comment: >-
+      Подтверждены готовая центральная асфальтированная улица с тротуарами,
+      частичная готовность дорог, освещения, подземной электросети и газа,
+      ограждение по периметру, пруд и пешеходные дорожки.
+  - title: Официальный сайт Васькино Парк
+    url: https://vaskino-park.ru/
+    type: official
+    date_checked: 2026-08-17
+    comment: Указаны ограждение по периметру и въезд через КПП.
+  - title: Зембери — тротуары в Васькино Парк
+    url: https://zembery.ru/news/read/uyutnye-trotuary-v-kp-vaskino-park/
+    type: official
+    date_checked: 2026-08-17
+    comment: Новость подтверждает работы по укладке асфальта на тротуарах.
+  - title: Зембери — детская площадка в Васькино Парк
+    url: https://zembery.ru/news/read/stroitelstvo-detskoy-ploshchadki-v-poselke-vaskino-park/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждено начатое, но не завершенное строительство детской площадки.
+  - title: Яндекс Карты — КП Васькино парк
+    url: https://yandex.ru/maps/geo/kp_vaskino_park/6051298619/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка территории подтверждает название и расположение поселка в деревне Васькино.

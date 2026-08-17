@@ -1,0 +1,66 @@
+name: КП Валуевская Слобода
+short_name: Валуевская Слобода
+slug: valuevskaya-sloboda
+website: https://valuevskaya-sloboda.ru/
+management_company: Ассоциация СЗУ «Валуевская Слобода»
+is_baseline: false
+location:
+  address_text: Москва, Филимонковский район, д. Нижнее Валуево
+  lat: 55.577169
+  lng: 37.336418
+  map_url: https://yandex.ru/maps/org/valuyevskaya_sloboda/145636139099/
+  district: Филимонковский район
+tariff:
+  value: 13500
+  unit: rub_per_lot
+  period: month
+  note: Данные дружественного сайта, актуальны на 10.02.2025
+lots:
+  count: 65
+  average_sotka: 17.52
+  average_note: Средняя площадь рассчитана по шести предложениям, опубликованным 17.08.2026
+infrastructure:
+  roads: asphalt
+  sidewalks: yes
+  lighting: yes
+  gas: yes
+  water: yes
+  sewage: yes
+  drainage: closed
+  checkpoints: yes
+  security: yes
+  fencing: yes
+  video_surveillance: checkpoint_only
+  admin_building: yes
+common_spaces:
+  playgrounds: yes
+  sports: yes
+  walking_routes: yes
+service_model:
+  garbage_collection: yes
+sources:
+  - title: Валуевская Слобода — сайт поселка
+    url: https://valuevskaya-sloboda.ru/
+    type: media
+    date_checked: 2026-08-17
+    comment: Подтверждены 65 домов, асфальт, тротуары, освещение, центральные газ, вода и канализация, закрытая ливневка, ограждение, охрана, КПП и административное здание.
+  - title: Валуевская Слобода — инфраструктура
+    url: https://valuevskaya-sloboda.ru/infrastructure.html
+    type: media
+    date_checked: 2026-08-17
+    comment: Подтверждены построенные детская площадка, спортивный комплекс и административное здание.
+  - title: Валуевская Слобода — предложения
+    url: https://valuevskaya-sloboda.ru/objects.html
+    type: media
+    date_checked: 2026-08-17
+    comment: Средняя площадь рассчитана по шести опубликованным участкам площадью от 8,5 до 42 соток.
+  - title: Официальный сайт жителей Валуевской Слободы — архив
+    url: https://web.archive.org/web/20240623101915id_/https://v-sloboda.ru/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены управление через ассоциацию собственников без внешней УК, видеонаблюдение на въезде, прогулочная тропа и вывоз мусора.
+  - title: Яндекс Карты — Валуевская Слобода
+    url: https://yandex.ru/maps/org/valuyevskaya_sloboda/145636139099/
+    type: community
+    date_checked: 2026-08-17
+    comment: Постоянная карточка подтверждает название и расположение поселка в Нижнем Валуеве.

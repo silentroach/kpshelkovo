@@ -1,0 +1,65 @@
+name: КП Белая Руза
+short_name: Белая Руза
+slug: belaya-ruza
+website: https://belaya-ruza.ru/
+is_baseline: false
+location:
+  address_text: МО, Рузский округ, п. Бородёнки, мкр. Белая Руза
+  lat: 55.885509
+  lng: 36.386143
+  district: Рузский район
+tariff:
+  value: 440
+  unit: rub_per_sotka
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.05.2026
+lots:
+  count: 238
+  average_sotka: 12.45
+  average_note: Средняя площадь рассчитана по опубликованным площадям 238 участков
+infrastructure:
+  roads: asphalt
+  gas: yes
+  water: yes
+  checkpoints: yes
+  security: yes
+  fencing: yes
+  admin_building: yes
+common_spaces:
+  playgrounds: yes
+  sports: yes
+  walking_routes: yes
+  water_access: yes
+  bbq_zones: yes
+service_model: {}
+sources:
+  - title: Белая Руза — официальный сайт
+    url: https://belaya-ruza.ru/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены 238 участков в актуальном генплане, здание администрации, детская и спортивная площадки, пруды и зона барбекю.
+  - title: Белая Руза — готовность инфраструктуры
+    url: https://t.me/newruza/1097
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены асфальтированные внутренние дороги, ограждение по периметру и центральный водопровод.
+  - title: Белая Руза — коммуникации и благоустройство
+    url: https://t.me/newruza/1055
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены газ, водопровод, охрана, прогулочные зоны, площадки и зона барбекю.
+  - title: Белая Руза — водоснабжение
+    url: https://t.me/newruza/874
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтвержден центральный водопровод, подведенный к каждому участку.
+  - title: Белая Руза — спортивная площадка
+    url: https://t.me/newruza/1133
+    type: official
+    date_checked: 2026-08-17
+    comment: Публикация 2026 года подтверждает действующую спортивную площадку.
+  - title: Белая Руза — зона отдыха у пруда
+    url: https://t.me/newruza/1136
+    type: official
+    date_checked: 2026-08-17
+    comment: Публикация 2026 года подтверждает действующую мангальную зону у пруда.

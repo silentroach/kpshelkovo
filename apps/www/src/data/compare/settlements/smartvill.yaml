@@ -1,0 +1,76 @@
+name: КП Смартвилль
+short_name: Смартвилль
+slug: smartvill
+website: https://smartvd.ru/
+management_company:
+  title: ТСН «Смартвилль»
+  url: https://smartvd.ru/
+is_baseline: false
+location:
+  address_text: МО, округ Дмитров, территория объединения Смартвилль
+  lat: 56.249489
+  lng: 37.547935
+  map_url: https://yandex.ru/maps/org/smartville_dmitrovka/14683749615/
+  district: Дмитровский район
+tariff:
+  value: 4000
+  unit: rub_per_lot
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.05.2026
+lots:
+  count: 224
+  area_ha: 31.3
+infrastructure:
+  roads: partial_asphalt
+  lighting: yes
+  gas: yes
+  water: yes
+  drainage: open
+  checkpoints: yes
+  security: yes
+  fencing: yes
+  admin_building: yes
+common_spaces:
+  playgrounds: yes
+  sports: yes
+service_model:
+  garbage_collection: yes
+  snow_removal: yes
+  road_cleaning: yes
+  landscaping: yes
+sources:
+  - title: ТСН Смартвилль — официальный сайт
+    url: https://smartvd.ru/
+    type: official
+    date_checked: 2026-08-17
+    comment: Сайт подтверждает действующее управление поселком через ТСН «Смартвилль».
+  - title: ТСН Смартвилль — отчет правления за 2024 год
+    url: https://smartvd.ru/wp-content/uploads/2024/11/%D0%9E%D1%82%D1%87%D0%B5%D1%82_%D0%BE_%D0%B4%D0%B5%D1%8F%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D0%B8_%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F_%D0%A2%D0%A1%D0%9D_%D0%A1%D0%BC%D0%B0%D1%80%D1%82%D0%B2%D0%B8%D0%BB%D0%BB%D1%8C_2024_%D0%B3%D0%BE%D0%B4.pdf
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены сочетание асфальта и асфальтовой крошки, освещение, детская и спортивная площадки, уборка снега и уход за зелеными зонами.
+  - title: ТСН Смартвилль — отчет о выполнении плановых работ
+    url: https://smartvd.ru/wp-content/uploads/2024/11/%D0%9E%D1%82%D1%87%D0%B5%D1%82-%D0%B2%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5-%D0%9F%D0%9F%D0%A0-%D0%BD%D0%B0-2024.pdf
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены действующие газовые и водопроводные сети, открытые кюветы, внешнее ограждение, административное здание и механическая уборка дорог.
+  - title: ТСН Смартвилль — правила проживания
+    url: https://smartvd.ru/wp-content/uploads/2023/11/%D0%9F%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0-%D0%BF%D1%80%D0%BE%D0%B6%D0%B8%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F-%D0%B2-%D0%9A%D0%9F-%D0%A1%D0%BC%D0%B0%D1%80%D1%82%D0%B2%D0%B8%D0%BB%D0%BB%D1%8C.pdf
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены два КПП, штатная охрана, пропускной режим и открытые кюветные трассы.
+  - title: ТСН Смартвилль — смета на 2025 год
+    url: https://smartvd.ru/wp-content/uploads/2024/11/%D0%A1%D0%BC%D0%B5%D1%82%D0%B0_%D0%B4%D0%BE%D1%85%D0%BE%D0%B4%D0%BE%D0%B2_%D0%B8_%D1%80%D0%B0%D1%81%D1%85%D0%BE%D0%B4%D0%BE%D0%B2_%D0%A2%D0%A1%D0%9D_%D0%A1%D0%BC%D0%B0%D1%80%D1%82%D0%B2%D0%B8%D0%BB%D0%BB%D1%8C_%D0%BD%D0%B0_2025_%D0%B3%D0%BE%D0%B4.pdf
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены 31,3 га обслуживаемых участков Смартвилля отдельно от соседнего Смартхилла.
+  - title: Poselkino — Смартвилль Дмитровка
+    url: https://poselkino.ru/poselki/smartville-dmitrovka/
+    type: media
+    date_checked: 2026-08-17
+    comment: Генплан и карточка подтверждают 224 участка; все участки проданы.
+  - title: Яндекс Карты — Смартвилль Дмитровка
+    url: https://yandex.ru/maps/org/smartville_dmitrovka/14683749615/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка подтверждает расположение поселка в Дмитровском округе.

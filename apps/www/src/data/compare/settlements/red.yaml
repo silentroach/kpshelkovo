@@ -1,0 +1,90 @@
+name: КП Рэд
+short_name: Рэд
+slug: red
+website: https://zemexx.ru/zemelnye-uchastki/kashirskoe-shosse/red/
+is_baseline: false
+location:
+  address_text: МО, округ Домодедово, мкр. Белые Столбы, территория КП Рэд
+  lat: 55.320993
+  lng: 37.794129
+  map_url: https://yandex.ru/maps/geo/territoriya_kp_red/4268324119/
+  district: Домодедовский район
+tariff:
+  value: 100
+  unit: rub_per_sotka
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.05.2026
+lots:
+  count: 437
+infrastructure:
+  roads: partial_asphalt
+  lighting: yes
+  gas: yes
+  drainage: open
+  checkpoints: yes
+  security: yes
+  retail_or_services: yes
+common_spaces:
+  playgrounds: yes
+  sports: yes
+  walking_routes: partial
+  water_access: yes
+service_model:
+  snow_removal: yes
+  landscaping: yes
+sources:
+  - title: Земекс — коттеджный поселок Рэд
+    url: https://zemexx.ru/zemelnye-uchastki/kashirskoe-shosse/red/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены 437 участков, дороги из асфальтовой крошки, подведенный газ, детская площадка и расположение на берегу реки Сушки.
+  - title: Земекс — освещение в поселке Рэд
+    url: https://zemexx.ru/news/fonarnoe-osveshchenie-v-poselke-red-/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены установленные в поселке фонарные столбы.
+  - title: Земекс — дренаж в поселке Рэд
+    url: https://zemexx.ru/news/kp-red-proizveli-raboty-po-blagoustroystvu-dorog-/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены открытые кюветы и локальная водопропускная труба под съездом.
+  - title: Земекс — контрольно-пропускной режим в поселке Рэд
+    url: https://zemexx.ru/news/aktivatsiya-kontrolno-propusknogo-rezhima-v-kp-red/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены действующий пропускной режим и шлагбаумы у поста охраны.
+  - title: Земекс — охрана в поселке Рэд
+    url: https://zemexx.ru/news/kp-red-zastupila-okhrana-na-post/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждена работа охраны на въездном посту.
+  - title: Земекс — спортивная площадка в поселке Рэд
+    url: https://zemexx.ru/news/ustanovka-sportivnoy-ploshchadki-v-poselke-red/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждена установленная спортивная площадка.
+  - title: Земекс — береговая зона в поселке Рэд
+    url: https://zemexx.ru/news/raboty-po-narezke-tropinki-k-beregovoy-zone-v-poselke-red/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены тропа к береговой зоне и выход к беседке у воды.
+  - title: Земекс — благоустройство поселка Рэд
+    url: https://zemexx.ru/news/v-kp-red-upravlyayushchaya-kompaniya-provela-kompleks-uluchsheniy/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены уход за газонами, озеленение и благоустройство общественных пространств в июне 2025 года.
+  - title: Земекс — уборка снега в поселке Рэд
+    url: https://zemexx.ru/news/proizvedeny-snegouborochnye-raboty-v-kp-red/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждена уборка снега с внутрипоселковых дорог и въездной группы.
+  - title: ТопШколы — центр в поселке Рэд
+    url: https://xn--80atdlcgt7b.xn--p1ai/
+    type: official
+    date_checked: 2026-08-17
+    comment: Действующий сайт подтверждает образовательный и досуговый центр на территории поселка и набор на 2026/27 учебный год.
+  - title: Яндекс Карты — территория КП Рэд
+    url: https://yandex.ru/maps/geo/territoriya_kp_red/4268324119/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка территории подтверждает название и расположение поселка в микрорайоне Белые Столбы.

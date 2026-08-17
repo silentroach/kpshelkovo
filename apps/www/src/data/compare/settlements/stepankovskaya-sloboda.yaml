@@ -1,0 +1,58 @@
+name: КП Степаньковская слобода
+short_name: Степаньковская слобода
+slug: stepankovskaya-sloboda
+website: https://rio-land.ru/poselki/stepankovskaya-sloboda/
+is_baseline: false
+location:
+  address_text: МО, округ Пушкинский, д. Степаньково
+  lat: 56.063251
+  lng: 37.806361
+  map_url: https://yandex.ru/maps/org/stepankovskaya_sloboda/144045710378/
+  district: Пушкинский район
+tariff:
+  value: 442
+  unit: rub_per_sotka
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.01.2026
+lots:
+  count: 538
+infrastructure:
+  roads: asphalt
+  sidewalks: yes
+  lighting: yes
+  gas: yes
+  water: yes
+  sewage: yes
+  checkpoints: yes
+  security: yes
+  fencing: yes
+  video_surveillance: full
+  underground_electricity: none
+common_spaces:
+  playgrounds: yes
+service_model: {}
+sources:
+  - title: Степаньковская слобода — официальный сайт РИО Ленд в веб-архиве
+    url: https://web.archive.org/web/20240224100519id_/https://rio-land.ru/poselki/stepankovskaya-sloboda/
+    type: official
+    date_checked: 2026-08-17
+    comment: >-
+      Подтверждены 538 участков, асфальтированные и освещенные дороги,
+      пешеходные дорожки, воздушные линии электроснабжения, центральные
+      водопровод и канализация, КПП, охрана, ограждение, видеонаблюдение и
+      детская площадка.
+  - title: Яндекс Карты — Степаньковская слобода
+    url: https://yandex.ru/maps/org/stepankovskaya_sloboda/144045710378/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка подтверждает название и расположение поселка в Пушкинском округе.
+  - title: ЦИАН — КП Степаньковская слобода
+    url: https://www.cian.ru/kottedzhnyj-poselok-stepankovskaya-sloboda-2432/
+    type: media
+    date_checked: 2026-08-17
+    comment: Подтверждены магистральный газ, центральные водоснабжение и канализация, асфальтированные дороги и детская площадка.
+  - title: Cottage.ru — Степаньковская слобода
+    url: https://www.cottage.ru/objects/village/stepankovo.html
+    type: media
+    date_checked: 2026-08-17
+    comment: Указано видеонаблюдение по периметру поселка.

@@ -1,0 +1,91 @@
+name: КП Триумфальный
+short_name: Триумфальный
+slug: triumfalnyy
+website: https://triumfalniy.ru/
+is_baseline: false
+location:
+  address_text: МО, округ Мытищи, д. Фелисово
+  lat: 56.071424
+  lng: 37.622738
+  map_url: https://yandex.ru/maps/geo/kp_triumfalny/5300592816/
+  district: Мытищинский район
+tariff:
+  value: 300
+  unit: rub_per_sotka
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.01.2026
+lots:
+  count: 228
+  average_sotka: 5.56
+  average_note: Средняя площадь рассчитана по опубликованным площадям 228 участков
+infrastructure:
+  roads: asphalt
+  sidewalks: yes
+  lighting: yes
+  gas: no
+  water: no
+  drainage: open
+  checkpoints: yes
+  security: yes
+  fencing: yes
+  admin_building: yes
+common_spaces:
+  club_infrastructure: yes
+  playgrounds: yes
+  sports: yes
+  walking_routes: yes
+service_model:
+  snow_removal: yes
+  road_cleaning: partial
+  landscaping: yes
+sources:
+  - title: Триумфальный — официальный сайт
+    url: https://triumfalniy.ru/
+    type: official
+    date_checked: 2026-08-17
+    comment: Сайт подтверждает название, расположение, КПП и охрану; газ указан только как перспектива.
+  - title: Земекс — асфальтирование Триумфального
+    url: https://zemexx.ru/news/kp-triumfalnyy-asfaltirovanie-zaversheno-na-100/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждено завершение асфальтирования всей дорожной сети в июне 2026 года.
+  - title: Земекс — пешеходные зоны Триумфального
+    url: https://zemexx.ru/news/novyy-uroven-komforta-v-triumfalnom-zaversheno-asfaltirovanie-peshekhodnykh-zon/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждено завершение асфальтирования тротуаров и пешеходных зон.
+  - title: Земекс — освещение Триумфального
+    url: https://zemexx.ru/news/kp-triumfalnyy-smontirovano-ulichnoe-osveshchenie/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждено уличное освещение дорог и пешеходных зон.
+  - title: Земекс — дренаж Триумфального
+    url: https://zemexx.ru/news/stroitelstvo-drenazhnoy-sistemy-v-kp-triumfalnyy/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены открытые кюветы и водоотводные каналы вдоль дорог.
+  - title: Земекс — здание охраны и коворкинга в Триумфальном
+    url: https://zemexx.ru/news/otdelochnye-raboty-v-zdanii-okhrany-i-kovorkinga-v-kp-triumfalnyy/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждено многофункциональное здание со службой охраны и общественным пространством.
+  - title: Земекс — общественные пространства Триумфального
+    url: https://zemexx.ru/news/triumfalnyy-ulichnaya-biblioteka-otkryta/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены работающий коворкинг, уличная библиотека и беседка.
+  - title: Земекс — уход за территорией Триумфального
+    url: https://zemexx.ru/news/kp-triumfalnyy-kompleksnyy-ukhod-za-territoriey-poselka/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены регулярный уход за газонами и зелеными насаждениями и обслуживание открытого водоотвода.
+  - title: Земекс — зимняя уборка Триумфального
+    url: https://zemexx.ru/news/ochistka-trotuarov-i-zon-obshchego-polzovaniya-v-triumfalnom/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждена уборка снега с тротуаров и общественных зон.
+  - title: Яндекс Карты — КП Триумфальный
+    url: https://yandex.ru/maps/geo/kp_triumfalny/5300592816/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка территории подтверждает название и расположение поселка у деревни Фелисово.

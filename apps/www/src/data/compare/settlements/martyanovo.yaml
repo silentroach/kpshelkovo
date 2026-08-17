@@ -1,0 +1,86 @@
+name: КП Мартьяново
+short_name: Мартьяново
+slug: martyanovo
+website: https://martyanovo.ru/
+management_company:
+  title: ТСН СНТ «Мартьяново»
+  url: https://www.rusprofile.ru/id/5435765
+is_baseline: false
+location:
+  address_text: МО, округ Серпухов, д. Мартьяново
+  lat: 54.957794
+  lng: 37.562423
+  map_url: https://yandex.ru/maps/geo/tsn_snt_martyanovo/1572826422/
+  district: Серпуховский район
+tariff:
+  value: 4700
+  unit: rub_per_lot
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.05.2026
+lots:
+  count: 209
+  area_ha: 27
+infrastructure:
+  roads: partial_asphalt
+  lighting: yes
+  gas: partial
+  water: yes
+  drainage: open
+  checkpoints: yes
+  security: yes
+  fencing: yes
+  underground_electricity: none
+  admin_building: yes
+common_spaces:
+  playgrounds: yes
+  sports: yes
+  walking_routes: partial
+service_model:
+  garbage_collection: yes
+  snow_removal: yes
+  road_cleaning: yes
+  landscaping: yes
+sources:
+  - title: Мартьяново — инфраструктура
+    url: https://martyanovo.ru/infrastruktura/
+    type: official
+    date_checked: 2026-08-17
+    comment: >-
+      Подтверждены щебеночные внутренние дороги, уличное освещение, водопровод,
+      КПП, ограждение, круглосуточное патрулирование, детская и спортивная
+      площадки, а также вывоз мусора и снега, уборка дорог и территории.
+  - title: Мартьяново — участки и коммуникации
+    url: https://martyanovo.ru/price/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены 209 участков на 27 га и доступ всех участков к водопроводу.
+  - title: Мартьяново — асфальтирование центральной улицы
+    url: https://martyanovo.ru/novosti/V-KP-Martyanovo-zaasfaltirovali-tsentralnuyu-ulitsu/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены асфальт на центральной улице и локальная ливневая канализация.
+  - title: Мартьяново — поселковые дороги
+    url: https://martyanovo.ru/novosti/v-kp-martyanovo-zavershilas-prokladka-vsekh-poselkovykh-dorog/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены щебеночные дороги и открытые придорожные кюветы.
+  - title: Мартьяново — подключение газопровода
+    url: https://martyanovo.ru/novosti/osushchestvleny-raboty-po-vrezke-v-gazoraspredelitelnuyu-set-moskovskoi-oblasti/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждено подключение поселкового газопровода к газораспределительной сети.
+  - title: Мартьяново — электросеть
+    url: https://martyanovo.ru/novosti/ustanovleny-tri-transformatornye-podstantsii-i-opory-linii-elektroperedach/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждена воздушная распределительная электросеть на опорах.
+  - title: Яндекс Карты — ТСН СНТ Мартьяново
+    url: https://yandex.ru/maps/geo/tsn_snt_martyanovo/1572826422/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка территории подтверждает название и расположение поселка в округе Серпухов.
+  - title: Rusprofile — ТСН СНТ Мартьяново
+    url: https://www.rusprofile.ru/id/5435765
+    type: media
+    date_checked: 2026-08-17
+    comment: Реестр подтверждает действующее ТСН по адресу в деревне Мартьяново.

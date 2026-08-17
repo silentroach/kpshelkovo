@@ -1,0 +1,62 @@
+name: КП Вымпел
+short_name: Вымпел
+slug: vympel
+website: https://homehunter.ru/mo/poselki/vympel
+is_baseline: false
+location:
+  address_text: МО, округ Красногорск, КП Вымпел
+  lat: 55.803568
+  lng: 37.171581
+  map_url: https://yandex.ru/maps/geo/kp_vympel/1624948449/
+  district: Красногорский район
+tariff:
+  value: 500
+  unit: rub_per_sotka
+  period: month
+  note: Данные дружественного сайта, актуальны на 25.06.2025
+lots:
+  count: 72
+  area_ha: 17
+infrastructure:
+  lighting: yes
+  gas: yes
+  water: yes
+  sewage: yes
+  checkpoints: yes
+  security: yes
+  fencing: yes
+  video_surveillance: full
+  admin_building: yes
+  retail_or_services: yes
+common_spaces:
+  playgrounds: yes
+  sports: yes
+  restaurant: yes
+  walking_routes: yes
+service_model: {}
+sources:
+  - title: Вымпел — архив официального сайта
+    url: https://web.archive.org/web/20240911000447id_/https://vympel-kp.ru/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены площадь 17 га, 72 домовладения, освещение, ограждение, круглосуточная охрана, КПП, видеонаблюдение, магазины, рестораны, детские и прогулочные зоны.
+  - title: Яндекс Карты — КП Вымпел
+    url: https://yandex.ru/maps/geo/kp_vympel/1624948449/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка территории подтверждает расположение поселка в округе Красногорск.
+  - title: HomeHunter — Вымпел
+    url: https://homehunter.ru/mo/poselki/vympel
+    type: media
+    date_checked: 2026-08-17
+    comment: Подтверждены КПП, охрана, ограждение, видеонаблюдение, детская и спортивная площадки и прогулочная зона.
+  - title: Fox Property — Вымпел
+    url: https://foxproperty.ru/zagorod/poselok/novorizhskoe-shosse/vympel
+    type: media
+    date_checked: 2026-08-17
+    comment: Подтверждены 72 домовладения, магистральный газ, центральные водоснабжение и канализация, магазины и детские площадки.
+  - title: Absolute Realty Advisors — Вымпел
+    url: https://rublevka-road.ru/vympel
+    type: media
+    date_checked: 2026-08-17
+    comment: Подтверждены уличное освещение, администрация, магазины, детская и спортивная площадки, охрана, ограждение, КПП и видеонаблюдение.

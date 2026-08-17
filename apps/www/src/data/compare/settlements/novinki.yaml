@@ -1,0 +1,38 @@
+name: КП Новинки
+short_name: Новинки
+slug: novinki
+website: https://dmitrovka-zn.ru/novinki
+is_baseline: false
+location:
+  address_text: МО, округ Дмитров, д. Новинки
+  lat: 56.235283
+  lng: 37.656943
+  map_url: https://yandex.ru/maps/geo/kp_novinki/1499067088/
+  district: Дмитровский район
+tariff:
+  value: 2800
+  unit: rub_per_lot
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.05.2026
+lots:
+  count: 70
+infrastructure:
+  gas: yes
+  drainage: open
+  security: yes
+  fencing: yes
+common_spaces:
+  playgrounds: yes
+  sports: yes
+service_model: {}
+sources:
+  - title: Дмитровка — Загородная Недвижимость — Новинки
+    url: https://dmitrovka-zn.ru/novinki
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены 70 участков в первой очереди, магистральный газ, круглосуточная охрана, внешнее ограждение, открытые кюветы, детская и спортивная площадки.
+  - title: Яндекс Карты — КП Новинки
+    url: https://yandex.ru/maps/geo/kp_novinki/1499067088/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка территории подтверждает расположение первой очереди рядом с деревней Новинки.

@@ -1,0 +1,68 @@
+name: КП Швейцарская долина
+short_name: Швейцарская долина
+slug: shveytsarskaya-dolina
+website: https://swissvalley.ru/
+management_company:
+  title: ООО «Простор»
+  url: https://www.ekprostor.ru/
+is_baseline: false
+location:
+  address_text: МО, округ Чехов, д. Баранцево
+  lat: 55.075487
+  lng: 37.608653
+  map_url: https://yandex.ru/maps/org/shveytsarskaya_dolina/191456296739/
+  district: Чеховский район
+tariff:
+  value: 5400
+  unit: rub_per_lot
+  period: month
+  note: Данные дружественного сайта, актуальны на 01.05.2026
+lots:
+  count: 247
+  area_ha: 35.1
+infrastructure:
+  roads: asphalt
+  checkpoints: yes
+  security: yes
+  fencing: yes
+common_spaces:
+  playgrounds: partial
+  sports: partial
+  water_access: yes
+service_model:
+  garbage_collection: yes
+  snow_removal: yes
+  road_cleaning: yes
+  landscaping: yes
+  dispatcher: yes
+sources:
+  - title: Швейцарская долина — официальный сайт
+    url: https://swissvalley.ru/
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены 247 участков, площадь 35,1 га и расположение поселка у реки.
+  - title: УК Простор — Швейцарская долина
+    url: https://www.ekprostor.ru/village/view?id=14
+    type: official
+    date_checked: 2026-08-17
+    comment: Страница подтверждает управление поселком компанией «Простор» и асфальтированные дороги.
+  - title: УК Простор — услуги
+    url: https://www.ekprostor.ru/
+    type: official
+    date_checked: 2026-08-17
+    comment: В перечне услуг указаны вывоз ТБО, уборка дорог, снега и льда, благоустройство и прием заявок жителей.
+  - title: УК Простор — развитие инфраструктуры Швейцарской долины
+    url: https://www.ekprostor.ru/news/view?id=173
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены завершенные дороги второй очереди и начатое строительство детской и спортивной площадок.
+  - title: Красная земля — Швейцарская долина
+    url: https://www.kraszem.ru/cottages/simferopolskoe-shosse/shveytsarskaya-dolina/
+    type: media
+    date_checked: 2026-08-17
+    comment: Подтверждены КПП, ограждение по периметру и круглосуточное патрулирование.
+  - title: Яндекс Карты — Швейцарская долина
+    url: https://yandex.ru/maps/org/shveytsarskaya_dolina/191456296739/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка подтверждает название и расположение поселка в деревне Баранцево.

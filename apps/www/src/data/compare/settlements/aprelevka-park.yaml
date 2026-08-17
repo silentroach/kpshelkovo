@@ -1,0 +1,68 @@
+name: КП Апрелевка Парк
+short_name: Апрелевка Парк
+slug: aprelevka-park
+website: https://ww-realty.ru/poselok/aprelevka-park-martemjanovo.html
+management_company: УК девелопера
+is_baseline: false
+location:
+  address_text: МО, Наро-Фоминский округ, д. Мартемьяново
+  lat: 55.524065
+  lng: 37.081733
+  map_url: https://yandex.ru/maps/geo/kp_aprelevka_park/53205052/
+  district: Наро-Фоминский район
+tariff:
+  value: 8000
+  unit: rub_per_lot
+  period: month
+  note: Данные дружественного сайта, актуальны на 10.02.2025
+lots:
+  count: 167
+infrastructure:
+  roads: asphalt
+  sidewalks: yes
+  lighting: yes
+  gas: yes
+  water: yes
+  sewage: yes
+  drainage: closed
+  checkpoints: yes
+  security: yes
+  fencing: yes
+  video_surveillance: full
+common_spaces:
+  playgrounds: yes
+  sports: yes
+  walking_routes: yes
+  water_access: yes
+service_model: {}
+sources:
+  - title: Апрелевка Парк — архив официального сайта
+    url: https://web.archive.org/web/20230328051844id_/http://www.aprelevka-park.ru/o-poselke
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждены 167 коттеджных участков в двух очередях, пешеходные и велосипедные дорожки, ливневая канализация, КПП, охрана, видеонаблюдение, детские и спортивные площадки.
+  - title: Апрелевка Парк — газ в поселке
+    url: https://web.archive.org/web/20230328045406id_/http://www.aprelevka-park.ru/news/gaz-v-poselke
+    type: official
+    date_checked: 2026-08-17
+    comment: Официальная новость подтверждает запуск газа в поселковый газопровод в марте 2015 года.
+  - title: Апрелевка Парк — запуск водозаборного узла
+    url: https://web.archive.org/web/20240523025109id_/http://www.aprelevka-park.ru/news/vodoprovod
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтвержден ввод в эксплуатацию поселкового водозаборного узла.
+  - title: Апрелевка Парк — вода и канализация
+    url: https://web.archive.org/web/20230328051726id_/http://www.aprelevka-park.ru/news/voda-i-ne-tolko
+    type: official
+    date_checked: 2026-08-17
+    comment: Подтверждено завершение сетей центрального водопровода и хозяйственно-бытовой канализации второй очереди.
+  - title: ЦИАН — предложение в Апрелевка Парке
+    url: https://naro-fominsk.cian.ru/sale/suburban/328622479/
+    type: media
+    date_checked: 2026-08-17
+    comment: Актуальное предложение подтверждает асфальтированные дороги, освещение, охраняемую огороженную территорию, видеонаблюдение, площадки и прогулочную зону вдоль Десны.
+  - title: Яндекс Карты — Апрелевка Парк
+    url: https://yandex.ru/maps/geo/kp_aprelevka_park/53205052/
+    type: community
+    date_checked: 2026-08-17
+    comment: Карточка подтверждает расположение поселка в деревне Мартемьяново Наро-Фоминского округа.
