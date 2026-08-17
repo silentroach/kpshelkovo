@@ -15,31 +15,31 @@ const mixedIncidents: readonly StatusTimelineIncidentInput[] = [
   {
     id: 'mixed-maintenance',
     url: '/status/water/#mixed-maintenance',
-    has_page: true,
+    hasPage: true,
     title: 'Промывка магистрали',
     kind: 'maintenance',
-    started_iso: '2026-05-02T03:00:00Z',
-    started_has_time: true,
-    ended_iso: '2026-05-02T12:00:00Z',
-    ended_has_time: true,
-    is_active: false,
+    startedIso: '2026-05-02T03:00:00Z',
+    startedHasTime: true,
+    endedIso: '2026-05-02T12:00:00Z',
+    endedHasTime: true,
+    isActive: false,
     duration: {
-      total_minutes: 540,
+      totalMinutes: 540,
     },
   },
   {
     id: 'mixed-incident',
     url: '/status/water/#mixed-incident',
-    has_page: true,
+    hasPage: true,
     title: 'Аварийное отключение воды',
     kind: 'incident',
-    started_iso: '2026-05-06T08:15:00Z',
-    started_has_time: true,
-    ended_iso: '2026-05-06T16:45:00Z',
-    ended_has_time: true,
-    is_active: false,
+    startedIso: '2026-05-06T08:15:00Z',
+    startedHasTime: true,
+    endedIso: '2026-05-06T16:45:00Z',
+    endedHasTime: true,
+    isActive: false,
     duration: {
-      total_minutes: 510,
+      totalMinutes: 510,
     },
   },
 ];
@@ -50,13 +50,40 @@ const activeEdgeIncidents: readonly StatusTimelineIncidentInput[] = [
   {
     id: 'active-edge-incident',
     url: '/status/electricity/#active-edge-incident',
-    has_page: true,
+    hasPage: true,
     title: 'Короткое отключение электричества',
     kind: 'incident',
-    started_iso: '2026-05-10T11:56:00Z',
-    started_has_time: true,
-    ended_has_time: true,
-    is_active: true,
+    startedIso: '2026-05-10T11:56:00Z',
+    startedHasTime: true,
+    endedHasTime: true,
+    isActive: true,
+  },
+];
+
+const adjacentDateIncidents: readonly StatusTimelineIncidentInput[] = [
+  {
+    id: 'adjacent-maintenance-first',
+    url: '/status/incidents/adjacent-maintenance-first/',
+    hasPage: true,
+    title: 'Плановые работы 8 мая',
+    kind: 'maintenance',
+    startedIso: '2026-05-08T12:00:00Z',
+    startedHasTime: true,
+    endedIso: '2026-05-08T14:00:00Z',
+    endedHasTime: true,
+    isActive: false,
+  },
+  {
+    id: 'adjacent-maintenance-second',
+    url: '/status/incidents/adjacent-maintenance-second/',
+    hasPage: true,
+    title: 'Плановые работы 9 мая',
+    kind: 'maintenance',
+    startedIso: '2026-05-09T06:00:00Z',
+    startedHasTime: true,
+    endedIso: '2026-05-09T14:00:00Z',
+    endedHasTime: true,
+    isActive: false,
   },
 ];
 
@@ -64,58 +91,58 @@ const denseProblemIncidents: readonly StatusTimelineIncidentInput[] = [
   {
     id: 'dense-incident-1',
     url: '/status/electricity/#dense-incident-1',
-    has_page: true,
+    hasPage: true,
     title: 'Короткое отключение 1',
     kind: 'incident',
-    started_iso: '2026-05-10T08:10:00Z',
-    started_has_time: true,
-    ended_iso: '2026-05-10T08:28:00Z',
-    ended_has_time: true,
-    is_active: false,
+    startedIso: '2026-05-10T08:10:00Z',
+    startedHasTime: true,
+    endedIso: '2026-05-10T08:28:00Z',
+    endedHasTime: true,
+    isActive: false,
     duration: {
-      total_minutes: 18,
+      totalMinutes: 18,
     },
   },
   {
     id: 'dense-incident-2',
     url: '/status/electricity/#dense-incident-2',
-    has_page: true,
+    hasPage: true,
     title: 'Короткое отключение 2',
     kind: 'incident',
-    started_iso: '2026-05-10T08:42:00Z',
-    started_has_time: true,
-    ended_iso: '2026-05-10T08:56:00Z',
-    ended_has_time: true,
-    is_active: false,
+    startedIso: '2026-05-10T08:42:00Z',
+    startedHasTime: true,
+    endedIso: '2026-05-10T08:56:00Z',
+    endedHasTime: true,
+    isActive: false,
     duration: {
-      total_minutes: 14,
+      totalMinutes: 14,
     },
   },
   {
     id: 'dense-incident-3',
     url: '/status/electricity/#dense-incident-3',
-    has_page: true,
+    hasPage: true,
     title: 'Короткое отключение 3',
     kind: 'incident',
-    started_iso: '2026-05-10T09:14:00Z',
-    started_has_time: true,
-    ended_iso: '2026-05-10T09:31:00Z',
-    ended_has_time: true,
-    is_active: false,
+    startedIso: '2026-05-10T09:14:00Z',
+    startedHasTime: true,
+    endedIso: '2026-05-10T09:31:00Z',
+    endedHasTime: true,
+    isActive: false,
     duration: {
-      total_minutes: 17,
+      totalMinutes: 17,
     },
   },
   {
     id: 'dense-incident-active',
     url: '/status/electricity/#dense-incident-active',
-    has_page: true,
+    hasPage: true,
     title: 'Текущее отключение',
     kind: 'incident',
-    started_iso: '2026-05-10T11:36:00Z',
-    started_has_time: true,
-    ended_has_time: true,
-    is_active: true,
+    startedIso: '2026-05-10T11:36:00Z',
+    startedHasTime: true,
+    endedHasTime: true,
+    isActive: true,
   },
 ];
 ---
@@ -190,6 +217,20 @@ const denseProblemIncidents: readonly StatusTimelineIncidentInput[] = [
             service="electricity"
             incidents={denseProblemIncidents}
             timelineDays={10}
+          />
+        </div>
+      </section>
+
+      <section class="status-timeline-visual-card">
+        <p class="status-timeline-visual-label">Adjacent dates</p>
+        <div
+          class="status-timeline-visual-target"
+          data-testid="status-timeline-adjacent-dates"
+        >
+          <StatusServiceTimeline
+            service="electricity"
+            incidents={adjacentDateIncidents}
+            timelineDays={90}
           />
         </div>
       </section>

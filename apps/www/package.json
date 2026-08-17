@@ -17,7 +17,7 @@
     "test:watch": "vitest",
     "test:visual:status": "playwright test -c playwright.status-visual.local.config.ts",
     "test:visual:status:update": "playwright test -c playwright.status-visual.local.config.ts --update-snapshots",
-    "test:visual:status:serve": "astro build --root tests/status-timeline-visual && astro preview --root tests/status-timeline-visual --host 127.0.0.1 --port 4324",
+    "test:visual:status:serve": "astro build --root tests/status-timeline-visual && vite preview tests/status-timeline-visual --outDir dist --host 127.0.0.1 --port 4324 --strictPort",
     "test:visual:news-event": "playwright test -c playwright.news-event-card-visual.local.config.ts",
     "test:visual:news-event:update": "playwright test -c playwright.news-event-card-visual.local.config.ts --update-snapshots",
     "test:visual:news-event:serve": "astro build --root tests/news-event-card-visual && astro preview --root tests/news-event-card-visual --host 127.0.0.1 --port 4327",
