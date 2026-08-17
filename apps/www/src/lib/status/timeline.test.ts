@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  buildStatusTimelineLaneLayout,
   buildStatusTimelineProblemSegments,
   buildStatusTimelineStableSegments,
   clipStatusTimelineSpan,
+  getStatusTimelineHitInterval,
   getStatusTimelineRange,
   mergeStatusTimelineSpans,
   STATUS_TIMELINE_DAY_MS,
@@ -39,6 +41,53 @@ const incident = (input: IncidentInput): StatusTimelineIncidentInput => ({
   endedIso: input.endedIso,
   endedHasTime: input.endedHasTime ?? true,
   isActive: input.isActive ?? !input.endedIso,
+});
+
+const laneLayoutForDays = (
+  days: number,
+  dayIndexes: readonly number[],
+): readonly (readonly [string, number])[] => {
+  const intervals = dayIndexes.map((dayIndex) =>
+    getStatusTimelineHitInterval(
+      {
+        id: String(dayIndex),
+        leftPercent: (dayIndex / days) * 100,
+        widthPercent: 100 / days,
+        compactMarker: true,
+        reachesRangeEnd: false,
+      },
+      256,
+    ),
+  );
+
+  return Array.from(
+    buildStatusTimelineLaneLayout(intervals).offsetsById.entries(),
+  );
+};
+
+describe('buildStatusTimelineLaneLayout', () => {
+  it('separates the dense 6, 10, and 11 August targets on a 90-day track', () => {
+    expect(laneLayoutForDays(90, [0, 4, 5])).toMatchInlineSnapshot(`
+      [
+        [
+          "0",
+          -24,
+        ],
+        [
+          "4",
+          0,
+        ],
+        [
+          "5",
+          24,
+        ],
+      ]
+    `);
+  });
+
+  it('keeps already separate adjacent targets centered on a 7-day track', () => {
+    expect(laneLayoutForDays(7, [0, 1])).toEqual([]);
+  });
 });
 
 describe('getStatusTimelineRange', () => {

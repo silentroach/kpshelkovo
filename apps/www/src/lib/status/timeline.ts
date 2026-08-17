@@ -4,6 +4,14 @@ import type { StatusArea, StatusKind } from './schema';
 import type { StatusDuration, StatusIncident } from './types';
 
 export const STATUS_TIMELINE_DAY_MS = 24 * 60 * 60 * 1000;
+export const STATUS_TIMELINE_HIT_SIZE_PX = 24;
+// Conservative track floor for a 320px viewport after page and component insets.
+export const STATUS_TIMELINE_MIN_TRACK_WIDTH_PX = 256;
+
+const STATUS_TIMELINE_SEGMENT_MIN_WIDTH_PX = 0.45 * 16;
+const STATUS_TIMELINE_COMPACT_MARKER_MIN_WIDTH_PX = 0.65 * 16;
+const STATUS_TIMELINE_ACTIVE_END_BLEED_PX = 0.2 * 16;
+const STATUS_TIMELINE_GEOMETRY_EPSILON = 1e-7;
 
 export interface StatusTimelineIncidentInput {
   readonly id: string;
@@ -50,6 +58,142 @@ export interface StatusTimelineSegmentGeometry {
   readonly leftPercent: number;
   readonly widthPercent: number;
 }
+
+export interface StatusTimelineHitGeometry extends StatusTimelineSegmentGeometry {
+  readonly id: string;
+  readonly compactMarker: boolean;
+  readonly reachesRangeEnd: boolean;
+}
+
+export interface StatusTimelineHitInterval {
+  readonly id: string;
+  readonly startPx: number;
+  readonly endPx: number;
+}
+
+export interface StatusTimelineLaneLayout {
+  readonly offsetsById: ReadonlyMap<string, number>;
+  readonly spacePx: number;
+}
+
+interface StatusTimelineLaneAssignment {
+  readonly interval: StatusTimelineHitInterval;
+  readonly lane: number;
+}
+
+export const getStatusTimelineHitInterval = (
+  geometry: StatusTimelineHitGeometry,
+  trackWidthPx: number,
+): StatusTimelineHitInterval => {
+  const markerMinWidthPx = geometry.compactMarker
+    ? STATUS_TIMELINE_COMPACT_MARKER_MIN_WIDTH_PX
+    : STATUS_TIMELINE_SEGMENT_MIN_WIDTH_PX;
+  const markerWidthPx = Math.max(
+    (geometry.widthPercent / 100) * trackWidthPx,
+    markerMinWidthPx,
+  );
+  const markerLeftPx = Math.max(
+    0,
+    Math.min(
+      (geometry.leftPercent / 100) * trackWidthPx,
+      trackWidthPx - markerWidthPx,
+    ),
+  );
+  const markerAndBleedWidthPx =
+    markerWidthPx +
+    (geometry.reachesRangeEnd ? STATUS_TIMELINE_ACTIVE_END_BLEED_PX : 0);
+  const hitWidthPx = Math.max(
+    STATUS_TIMELINE_HIT_SIZE_PX,
+    markerAndBleedWidthPx,
+  );
+  const hitInsetPx = (hitWidthPx - markerAndBleedWidthPx) / 2;
+
+  return {
+    id: geometry.id,
+    startPx: markerLeftPx - hitInsetPx,
+    endPx: markerLeftPx + markerAndBleedWidthPx + hitInsetPx,
+  };
+};
+
+const assignStatusTimelineLaneCluster = (
+  cluster: readonly StatusTimelineHitInterval[],
+  offsetsById: Map<string, number>,
+): number => {
+  const laneEnds: number[] = [];
+  const assignments = cluster.map((interval): StatusTimelineLaneAssignment => {
+    let lane = laneEnds.findIndex(
+      (endPx) => endPx <= interval.startPx + STATUS_TIMELINE_GEOMETRY_EPSILON,
+    );
+
+    if (lane < 0) {
+      lane = laneEnds.length;
+    }
+
+    laneEnds[lane] = interval.endPx;
+
+    return { interval, lane };
+  });
+
+  if (laneEnds.length < 2) {
+    return 0;
+  }
+
+  const centerLane = (laneEnds.length - 1) / 2;
+  let spacePx = 0;
+
+  assignments.forEach(({ interval, lane }) => {
+    const offsetPx = (lane - centerLane) * STATUS_TIMELINE_HIT_SIZE_PX;
+
+    offsetsById.set(interval.id, offsetPx);
+    spacePx = Math.max(spacePx, Math.abs(offsetPx));
+  });
+
+  return spacePx;
+};
+
+export const buildStatusTimelineLaneLayout = (
+  intervals: readonly StatusTimelineHitInterval[],
+): StatusTimelineLaneLayout => {
+  const sorted = intervals
+    .filter(
+      (interval) =>
+        Number.isFinite(interval.startPx) &&
+        Number.isFinite(interval.endPx) &&
+        interval.endPx > interval.startPx,
+    )
+    .toSorted(
+      (a, b) =>
+        a.startPx - b.startPx || a.endPx - b.endPx || compareRuText(a.id, b.id),
+    );
+  const offsetsById = new Map<string, number>();
+  let cluster: StatusTimelineHitInterval[] = [];
+  let clusterEndPx = Number.NEGATIVE_INFINITY;
+  let spacePx = 0;
+
+  const flushCluster = (): void => {
+    spacePx = Math.max(
+      spacePx,
+      assignStatusTimelineLaneCluster(cluster, offsetsById),
+    );
+    cluster = [];
+    clusterEndPx = Number.NEGATIVE_INFINITY;
+  };
+
+  sorted.forEach((interval) => {
+    if (
+      cluster.length > 0 &&
+      interval.startPx >= clusterEndPx - STATUS_TIMELINE_GEOMETRY_EPSILON
+    ) {
+      flushCluster();
+    }
+
+    cluster.push(interval);
+    clusterEndPx = Math.max(clusterEndPx, interval.endPx);
+  });
+  flushCluster();
+
+  return { offsetsById, spacePx };
+};
 
 export const toStatusTimelineIncidentInput = (
   incident: StatusIncident,
