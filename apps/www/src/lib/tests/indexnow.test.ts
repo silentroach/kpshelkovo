@@ -73,13 +73,15 @@ describe('submitNewIndexNowPages', () => {
     await writeUrlManifest(urlManifestPath, [
       'https://kpshelkovo.online/',
       'https://kpshelkovo.online/news/new/',
+      'https://kpshelkovo.online/news/received/',
       'https://kpshelkovo.online/news/tags/%D0%B2%D0%BE%D0%B4%D0%B0/',
     ]);
     await writeFile(
       changesPath,
       [
         '>fcst......|index.html',
-        '>f+++++++++|news/new/index.html',
+        '<f+++++++++|news/new/index.html',
+        '>f+++++++++|news/received/index.html',
         '>fcst......|news/tags/вода/index.html',
         '>fcst......|kb/noindex/index.html',
         '*deleting  |news/old/index.html',

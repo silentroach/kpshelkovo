@@ -10,7 +10,8 @@ const INDEXNOW_RESERVED_KEYS: ReadonlySet<string> = new Set(['llms-full']);
 const INDEXNOW_SITE = new URL('https://kpshelkovo.online');
 const INDEXNOW_TIMEOUT_MS = 15_000;
 const INDEXNOW_URL_MANIFEST_SCHEMA = z.array(z.string().url()).min(1);
-const RSYNC_NEW_FILE_CHANGE = '>f+++++++++';
+// This deploy sends local files to the remote host; rsync marks them with "<".
+const RSYNC_NEW_FILE_CHANGE = '<f+++++++++';
 
 const validateIndexNowKey = (key: string): void => {
   if (!INDEXNOW_KEY_PATTERN.test(key)) {
