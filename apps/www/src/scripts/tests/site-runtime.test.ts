@@ -34,4 +34,29 @@ describe('site header menu', () => {
     expect(menu.open).toBe(false);
     expect(document.activeElement).toBe(summary);
   });
+
+  it('keeps focus outside a closed menu on Escape', () => {
+    document.body.innerHTML = `
+      <button type="button">Outside</button>
+      <details class="site-header-menu">
+        <summary>Menu</summary>
+      </details>
+    `;
+
+    const outside = document.querySelector<HTMLElement>('button');
+    const menu = document.querySelector<HTMLDetailsElement>(
+      'details.site-header-menu',
+    );
+    if (!outside || !menu) {
+      throw new Error('Expected closed site header menu fixture');
+    }
+
+    outside.focus();
+    outside.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+    );
+
+    expect(menu.open).toBe(false);
+    expect(document.activeElement).toBe(outside);
+  });
 });

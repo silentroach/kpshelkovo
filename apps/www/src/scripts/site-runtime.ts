@@ -306,12 +306,15 @@ const bindSiteHeaderMenu = (): void => {
       return;
     }
 
-    document
-      .querySelectorAll<HTMLDetailsElement>(SITE_HEADER_MENU_SELECTOR)
-      .forEach((menu) => {
-        menu.open = false;
-        menu.querySelector<HTMLElement>(':scope > summary')?.focus();
-      });
+    const menu = document.querySelector<HTMLDetailsElement>(
+      SITE_HEADER_MENU_SELECTOR,
+    );
+    if (!menu?.open) {
+      return;
+    }
+
+    menu.open = false;
+    menu.querySelector<HTMLElement>(':scope > summary')?.focus();
   });
 };
 
