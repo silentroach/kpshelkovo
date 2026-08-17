@@ -5,8 +5,8 @@ import type { StatusDuration, StatusIncident } from './types';
 
 export const STATUS_TIMELINE_DAY_MS = 24 * 60 * 60 * 1000;
 export const STATUS_TIMELINE_HIT_SIZE_PX = 24;
-// Conservative track floor for a 320px viewport after page and component insets.
-export const STATUS_TIMELINE_MIN_TRACK_WIDTH_PX = 256;
+// A fixed conservative width keeps SSR and hydrated lane assignments identical.
+export const STATUS_TIMELINE_LANE_LAYOUT_WIDTH_PX = 256;
 
 const STATUS_TIMELINE_SEGMENT_MIN_WIDTH_PX = 0.45 * 16;
 const STATUS_TIMELINE_COMPACT_MARKER_MIN_WIDTH_PX = 0.65 * 16;

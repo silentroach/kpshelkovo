@@ -15,7 +15,7 @@ import {
   getStatusTimelineSegmentGeometry,
   getStatusTimelineRange,
   STATUS_TIMELINE_HIT_SIZE_PX,
-  STATUS_TIMELINE_MIN_TRACK_WIDTH_PX,
+  STATUS_TIMELINE_LANE_LAYOUT_WIDTH_PX,
   type StatusTimelineIncidentInput,
   type StatusTimelineSpan,
 } from '@/lib/status/timeline';
@@ -316,7 +316,7 @@ const timelineLaneLayout = buildStatusTimelineLaneLayout(
               compactMarker: group.compactMarker,
               reachesRangeEnd: group.reachesRangeEnd,
             },
-            STATUS_TIMELINE_MIN_TRACK_WIDTH_PX,
+            STATUS_TIMELINE_LANE_LAYOUT_WIDTH_PX,
           ),
         ],
   ),
