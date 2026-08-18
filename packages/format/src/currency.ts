@@ -1,11 +1,9 @@
-import { formatNumberRu } from './number';
+import { formatNumberUnitRu } from './number';
 
-function rub(value: number, suffix: string): string {
-  const rounded = Math.round(value);
-  const text = formatNumberRu(rounded, { maximumFractionDigits: 0 });
-
-  return `${text} ₽${suffix}`;
-}
+const rub = (value: number, suffix: string): string =>
+  formatNumberUnitRu(Math.round(value), `₽${suffix}`, {
+    maximumFractionDigits: 0,
+  });
 
 /**
  * Formats a number as Russian rubles.

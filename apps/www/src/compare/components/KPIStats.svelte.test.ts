@@ -25,8 +25,8 @@ describe('KPIStats', () => {
       props: { stats: mockStats },
     });
 
-    expect(container.textContent).toMatch(/3\s200 ₽\/сотка/);
-    expect(container.textContent).toMatch(/3\s650 ₽\/сотка/);
+    expect(container.textContent).toContain('3\u00A0200\u00A0₽/сотка');
+    expect(container.textContent).toContain('3\u00A0650\u00A0₽/сотка');
     expect(container.textContent).toContain('Шелково: +41%');
     expect(container.textContent).toContain('Шелково: +23%');
   });

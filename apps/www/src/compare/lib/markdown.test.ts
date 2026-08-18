@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { visibleWhitespace } from '@/lib/test/visible-whitespace';
 import { mapRawSettlement } from './settlement/mapper';
 import type { RawSettlement } from './settlement/schema';
 
@@ -155,7 +156,7 @@ describe('compare markdown navigation', () => {
   it('keeps discovery links on the markdown home page', async () => {
     const { buildHomeMd } = await loadMarkdown();
 
-    await expect(buildHomeMd()).resolves.toMatchInlineSnapshot(`
+    expect(visibleWhitespace(await buildHomeMd())).toMatchInlineSnapshot(`
       "# Сравни тариф КП Шелково с другими поселками
 
       Структурированное сравнение тарифа КП Шелково с другими коттеджными поселками по тарифам, инфраструктуре, общественным пространствам, сервисной модели и условному рейтингу качества среды.
@@ -175,8 +176,8 @@ describe('compare markdown navigation', () => {
 
       ## Подборка поселков
 
-      - [КП Шелково](https://kpshelkovo.online/815/compare/settlements/shelkovo/index.md) — тариф 100 ₽/сотка; рейтинг 81,2/100; Истринский район
-      - [КП Тестовый](https://kpshelkovo.online/815/compare/settlements/test/index.md) — тариф 90 ₽/сотка; рейтинг 74,3/100; Истринский район
+      - [КП Шелково](https://kpshelkovo.online/815/compare/settlements/shelkovo/index.md) — тариф 100·₽/сотка; рейтинг 81,2/100; Истринский район
+      - [КП Тестовый](https://kpshelkovo.online/815/compare/settlements/test/index.md) — тариф 90·₽/сотка; рейтинг 74,3/100; Истринский район
 
       ## Markdown-доступ
 
@@ -251,31 +252,33 @@ describe('compare markdown navigation', () => {
     const { buildSettlementMd } = await loadMarkdown();
 
     expect(
-      buildSettlementMd({
-        settlement,
-        comparison: {
-          tariffDelta: -100,
-          tariffDeltaPercent: -10,
-          isCheaper: true,
-        },
-        shelkovo: {
-          ...settlement,
-          name: 'КП Шелково',
-          shortName: 'Шелково',
-          slug: 'shelkovo',
-          isBaseline: true,
-          location: {
-            ...settlement.location,
-            lat: 55.7,
-            lng: 37,
+      visibleWhitespace(
+        buildSettlementMd({
+          settlement,
+          comparison: {
+            tariffDelta: -100,
+            tariffDeltaPercent: -10,
+            isCheaper: true,
           },
-        },
-        rating: {
-          score: 74.3,
-          km: 25.4,
-          ring: 12.1,
-        },
-      }),
+          shelkovo: {
+            ...settlement,
+            name: 'КП Шелково',
+            shortName: 'Шелково',
+            slug: 'shelkovo',
+            isBaseline: true,
+            location: {
+              ...settlement.location,
+              lat: 55.7,
+              lng: 37,
+            },
+          },
+          rating: {
+            score: 74.3,
+            km: 25.4,
+            ring: 12.1,
+          },
+        }),
+      ),
     ).toMatchInlineSnapshot(`
       "# КП Тестовый
 
@@ -283,7 +286,7 @@ describe('compare markdown navigation', () => {
       - Markdown: <https://kpshelkovo.online/815/compare/settlements/test/index.md>
       - Район: Истринский район
       - Адрес: Истринский район, деревня Тестовая
-      - Тариф: 900 ₽/сотка в месяц
+      - Тариф: 900·₽/сотка в месяц
       - Примечание к тарифу: по данным УК
       - Количество участков/домовладений: 120
       - Площадь поселка: 18 га
@@ -293,7 +296,7 @@ describe('compare markdown navigation', () => {
       - Примерное расстояние от Москвы: \\~30 км
       - Примерное расстояние за МКАД: \\~10 км
       - Расстояние от Шелково: \\~10 км
-      - Сравнение с Шелково: Дешевле Шелково на 100 ₽ (10%).
+      - Сравнение с Шелково: Дешевле Шелково на 100·₽ (10%).
       - Управляющая компания: УК Тест — <https://example.com/uk>
       - Сайт: <https://example.com>
       - Telegram: <https://t.me/test_village>

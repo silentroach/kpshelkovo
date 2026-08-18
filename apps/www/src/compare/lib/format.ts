@@ -1,6 +1,7 @@
 import {
   formatCurrency,
   formatNumberRu,
+  formatNumberUnitRu,
   formatTariff,
   pluralize,
 } from '@shelkovo/format';
@@ -33,6 +34,8 @@ function months(period: Tariff['period']): number {
 }
 
 const num = (value: number): string => formatNumberRu(value, NUMBER_OPTIONS);
+const money = (value: number, suffix = ''): string =>
+  formatNumberUnitRu(value, `₽${suffix}`, NUMBER_OPTIONS);
 
 function area(value: number): string {
   const text = num(value);
@@ -231,8 +234,8 @@ export function getTariffCalc(
           : 'Указан фиксированной суммой за участок.';
     const formula =
       unit(item.unit) === 'perSotka'
-        ? `${num(value)} ₽ / ${m} ${mons} = ${num(normalized)} ₽/сотка в месяц`
-        : `(${num(value)} ₽ / ${m} ${mons}) / ${area(size)} = ${num(normalized)} ₽/сотка в месяц`;
+        ? `${money(value)} / ${m} ${mons} = ${money(normalized, '/сотка')} в месяц`
+        : `(${money(value)} / ${m} ${mons}) / ${area(size)} = ${money(normalized, '/сотка')} в месяц`;
 
     return { title, source, formula };
   });
@@ -253,6 +256,6 @@ export function getTariffCalc(
         }
       : {}),
     rows,
-    total: `${num(total)} ₽/сотка в месяц`,
+    total: `${money(total, '/сотка')} в месяц`,
   };
 }

@@ -17,15 +17,15 @@ import {
 describe('format package', () => {
   describe('formatCurrency', () => {
     it('formats rounded rubles', () => {
-      expect(formatCurrency(1234.56)).toBe('1\u00A0235 ₽');
-      expect(formatCurrency(1000)).toBe('1\u00A0000 ₽');
-      expect(formatCurrency(100)).toBe('100 ₽');
-      expect(formatCurrency(0)).toBe('0 ₽');
+      expect(formatCurrency(1234.56)).toBe('1\u00A0235\u00A0₽');
+      expect(formatCurrency(1000)).toBe('1\u00A0000\u00A0₽');
+      expect(formatCurrency(100)).toBe('100\u00A0₽');
+      expect(formatCurrency(0)).toBe('0\u00A0₽');
     });
 
     it('uses nearest integer rounding', () => {
-      expect(formatCurrency(1234.4)).toBe('1\u00A0234 ₽');
-      expect(formatCurrency(1234.5)).toBe('1\u00A0235 ₽');
+      expect(formatCurrency(1234.4)).toBe('1\u00A0234\u00A0₽');
+      expect(formatCurrency(1234.5)).toBe('1\u00A0235\u00A0₽');
     });
   });
 
@@ -120,9 +120,9 @@ describe('format package', () => {
 
   describe('formatTariff', () => {
     it('formats tariffs per sotka', () => {
-      expect(formatTariff(4500)).toBe('4\u00A0500 ₽/сотка');
-      expect(formatTariff(120)).toBe('120 ₽/сотка');
-      expect(formatTariff(10000)).toBe('10\u00A0000 ₽/сотка');
+      expect(formatTariff(4500)).toBe('4\u00A0500\u00A0₽/сотка');
+      expect(formatTariff(120)).toBe('120\u00A0₽/сотка');
+      expect(formatTariff(10000)).toBe('10\u00A0000\u00A0₽/сотка');
     });
   });
 
