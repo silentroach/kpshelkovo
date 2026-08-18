@@ -59,6 +59,9 @@ const monthArchive = (year: number, month: number): NewsMonthArchive => ({
   url: `/news/${year}/${String(month).padStart(2, '0')}/`,
   markdownUrl: `/news/${year}/${String(month).padStart(2, '0')}/index.md`,
   count: 1,
+  summary: {
+    body: 'Главное за месяц: [модернизация подстанций](/news/2026/05/ktp-upgrade/).',
+  },
   articles: [article({ year, month })],
 });
 
@@ -70,6 +73,9 @@ const yearArchive = (
   url: `/news/${year}/`,
   markdownUrl: `/news/${year}/index.md`,
   count: months.reduce((total, month) => total + month.count, 0),
+  summary: {
+    body: 'Главное за год собрано из месячных выжимок.',
+  },
   months,
 });
 
@@ -164,11 +170,16 @@ ignored: true
           url: '/news/2026/05/',
           markdownUrl: '/news/2026/05/index.md',
           count: 1,
+          summary: {
+            body: 'Главное за месяц: [модернизация подстанций](/news/2026/05/ktp-upgrade/).',
+          },
           articles: [article()],
         },
       }),
     ).toMatchInlineSnapshot(`
       "# Новости Шелково за май 2026 г.
+
+      Главное за месяц: [модернизация подстанций](/news/2026/05/ktp-upgrade/).
 
       - [Россети планируют усилить три подстанции в КП Шелково](https://kpshelkovo.online/news/2026/05/ktp-upgrade/index.md) — 14 мая 2026, 22:16
 
@@ -188,6 +199,8 @@ ignored: true
 
     expect(markdown).toMatchInlineSnapshot(`
       "# Новости Шелково за 2026 год
+
+      Главное за год собрано из месячных выжимок.
 
       - [Апрель 2026 г.](https://kpshelkovo.online/news/2026/04/index.md) — 1 публикация
       - [Май 2026 г.](https://kpshelkovo.online/news/2026/05/index.md) — 1 публикация

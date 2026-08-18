@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
 import { RawKbPageSchema } from '@/lib/kb/raw-schema';
 import { RawContactSchema } from './lib/contacts/raw-schema';
 import { CONTACT_CATEGORIES, CONTACT_SLUG } from './lib/contacts/schema';
@@ -37,6 +38,9 @@ const STATUS_INCIDENTS_DIR = fileURLToPath(
   new URL('./data/status/incidents/', import.meta.url),
 );
 const REVIEWS_DIR = fileURLToPath(new URL('./data/reviews/', import.meta.url));
+const NEWS_SUMMARIES_DIR = fileURLToPath(
+  new URL('./data/news/summaries/', import.meta.url),
+);
 
 interface DateParts {
   readonly year: string;
@@ -79,6 +83,10 @@ function fail(kind: 'article', entry: string, reason: string): never {
 
 function failStatus(entry: string, reason: string): never {
   throw new Error(`status incident path \"${entry}\" ${reason}`);
+}
+
+function failNewsSummary(entry: string, reason: string): never {
+  throw new Error(`news archive summary path \"${entry}\" ${reason}`);
 }
 
 function failPerson(entry: string, reason: string): never {
@@ -327,6 +335,28 @@ function validateArticleEntry(entry: string, data: unknown): void {
   }
 }
 
+function newsArchiveSummaryId(entry: string): string {
+  if (!entry.endsWith('.md')) {
+    failNewsSummary(entry, 'must be a Markdown file');
+  }
+
+  const [year, period, ...rest] = trimMarkdown(entry).split('/');
+
+  if (
+    rest.length > 0 ||
+    !YEAR.test(year) ||
+    (period !== 'index' && !MONTH.test(period))
+  ) {
+    failNewsSummary(entry, 'must use YYYY/index.md or YYYY/MM.md');
+  }
+
+  if (!rawMarkdownBody(NEWS_SUMMARIES_DIR, entry).trim()) {
+    failNewsSummary(entry, 'body is required');
+  }
+
+  return period === 'index' ? year : `${year}/${period}`;
+}
+
 const hasStartedAt = (
   data: unknown,
 ): data is { readonly started_at: unknown } =>
@@ -401,6 +431,15 @@ const newsArticles = defineCollection({
     },
   }),
   schema: ({ image }) => createRawNewsArticleSchema(image),
+});
+
+const newsArchiveSummaries = defineCollection({
+  loader: glob({
+    pattern: ['**/*.md', '!AGENTS.md', '!**/AGENTS.md'],
+    base: './src/data/news/summaries',
+    generateId: ({ entry }) => newsArchiveSummaryId(entry),
+  }),
+  schema: z.object({}).strict(),
 });
 
 const statusIncidents = defineCollection({
@@ -483,6 +522,7 @@ const settlements = defineCollection({
 export const collections = {
   newsAuthors,
   newsArticles,
+  newsArchiveSummaries,
   settlements,
   statusIncidents,
   kbPages,

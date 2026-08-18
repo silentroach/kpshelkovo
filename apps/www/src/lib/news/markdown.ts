@@ -242,6 +242,7 @@ export function buildNewsYearMarkdown(input: {
 
   return serialize([
     md.heading(1, `Новости Шелково за ${archive.year} год`),
+    ...parseMarkdownFragment(archive.summary.body),
     md.list(
       months.length > 0
         ? months.map(monthLine)
@@ -258,6 +259,7 @@ export function buildNewsMonthMarkdown(input: {
 
   return serialize([
     md.heading(1, `Новости Шелково за ${monthLabel}`),
+    ...parseMarkdownFragment(archive.summary.body),
     ...articleBlock({
       items: archive.articles,
       empty: 'В этом месяце пока нет публикаций.',

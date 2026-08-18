@@ -73,6 +73,13 @@ const queryGroups = [
       'что входит в тариф 815',
     ],
   },
+  {
+    name: '#178 archive summaries',
+    queries: [
+      'проверяемая транскрипция встречи',
+      'регулярное обслуживание локальные объекты',
+    ],
+  },
 ] as const;
 
 const aliasExpectations: ReadonlyMap<
@@ -192,6 +199,15 @@ for (const group of queryGroups) {
     const matrix = [];
     for (const query of group.queries) {
       const snapshot = await searchSnapshot(query);
+      const archiveResult = snapshot.results.find((result) =>
+        /^\/news\/\d{4}\/(?:\d{2}\/)?$/u.test(result.url),
+      );
+
+      expect(
+        archiveResult,
+        `${query}: news archive pages must stay outside Pagefind`,
+      ).toBeUndefined();
+
       const expectation = aliasExpectations.get(query);
       if (expectation) {
         const rank = snapshot.results.findIndex(

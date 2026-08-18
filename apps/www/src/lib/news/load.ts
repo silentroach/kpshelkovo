@@ -5,6 +5,7 @@ import { preprocessSiteMarkdownContent } from '../markdown/render';
 import type { SiteMentionRegistry } from '../mentions';
 import { loadPeopleMentionRegistry } from '../people/registry';
 import { withBase } from '../site';
+import { validateArchiveSummaryMarkdown } from './archive-summary';
 import { buildArchives, newsMonthKey } from './archives';
 import { NEWS_LATEST_LIMIT } from './config';
 import { parseNewsTimestamp, parseNewsTimestampInput } from './date';
@@ -19,6 +20,7 @@ import { compareArticlesPublishedDesc } from './sort';
 import { NEWS_AREAS, normalizeTagKey, type NewsArea } from './schema';
 import type {
   NewsArticle,
+  NewsArchiveSummary,
   NewsArchives,
   NewsAttachment,
   NewsAuthor,
@@ -44,8 +46,13 @@ export type NewsAuthorEntry = Pick<
   CollectionEntry<'newsAuthors'>,
   'id' | 'data'
 >;
+export type NewsArchiveSummaryEntry = Pick<
+  CollectionEntry<'newsArchiveSummaries'>,
+  'id' | 'body'
+>;
 type ArticleEntry = NewsArticleEntry;
 type AuthorEntry = NewsAuthorEntry;
+type ArchiveSummaryEntry = NewsArchiveSummaryEntry;
 type ArticleData = ArticleEntry['data'];
 type EventData = NonNullable<ArticleData['events']>[number];
 type AttachmentInput = NonNullable<ArticleData['attachments']>[number];
@@ -522,6 +529,48 @@ const toListArticle = (article: NewsArticle): NewsListArticle => ({
   summary: article.summary,
 });
 
+const archiveSummaryMap = (
+  entries: readonly ArchiveSummaryEntry[],
+  mentionRegistry: SiteMentionRegistry,
+  articleUrls: ReadonlySet<string>,
+): ReadonlyMap<string, NewsArchiveSummary> => {
+  const summaries = new Map<string, NewsArchiveSummary>();
+
+  for (const entry of entries) {
+    if (summaries.has(entry.id)) {
+      throw new Error(`duplicate news archive summary \"${entry.id}\"`);
+    }
+
+    const body = preprocessSiteMarkdownContent(
+      entry.body ?? '',
+      `news archive summary \"${entry.id}\" body`,
+      mentionRegistry,
+    );
+
+    if (!body.markdown) {
+      throw new Error(`news archive summary \"${entry.id}\" body is required`);
+    }
+
+    if (body.mentions.length > 0) {
+      throw new Error(
+        `news archive summary \"${entry.id}\" must link to the source article instead of mentioning people directly`,
+      );
+    }
+
+    validateArchiveSummaryMarkdown(
+      body.markdown,
+      articleUrls,
+      `news archive summary \"${entry.id}\"`,
+    );
+
+    summaries.set(entry.id, {
+      body: body.markdown,
+    });
+  }
+
+  return summaries;
+};
+
 function validateUniqueIds(items: readonly NewsArticle[]): void {
   const seen = new Set<string>();
 
@@ -561,6 +610,7 @@ function validateDayKeyConflicts(items: readonly NewsArticle[]): void {
 export function buildNewsDataset(
   authorsData: readonly NewsAuthorEntry[],
   articlesData: readonly NewsArticleEntry[],
+  archiveSummariesData: readonly NewsArchiveSummaryEntry[],
   opts?: {
     readonly mentionRegistry?: SiteMentionRegistry;
   },
@@ -578,11 +628,16 @@ export function buildNewsDataset(
   validateDayKeyConflicts(articles);
 
   const list: readonly NewsListArticle[] = articles.map(toListArticle);
+  const archiveSummaries = archiveSummaryMap(
+    archiveSummariesData,
+    mentionRegistry,
+    new Set(articles.map((item) => item.url)),
+  );
   const home: NewsHomeData = {
     pinned: list.filter((item) => item.pinned),
     latest: list.filter((item) => !item.pinned).slice(0, NEWS_LATEST_LIMIT),
   };
-  const archives = buildArchives(list);
+  const archives = buildArchives(list, archiveSummaries);
   const tags = buildTagIndex(list);
 
   return {
@@ -596,13 +651,19 @@ export function buildNewsDataset(
 }
 
 async function buildNewsData(): Promise<NewsDataset> {
-  const [authorsData, articlesData, mentionRegistry] = await Promise.all([
-    getCollection('newsAuthors') as Promise<readonly NewsAuthorEntry[]>,
-    getCollection('newsArticles') as Promise<readonly NewsArticleEntry[]>,
-    loadPeopleMentionRegistry(),
-  ]);
+  const [authorsData, articlesData, archiveSummariesData, mentionRegistry] =
+    await Promise.all([
+      getCollection('newsAuthors') as Promise<readonly NewsAuthorEntry[]>,
+      getCollection('newsArticles') as Promise<readonly NewsArticleEntry[]>,
+      getCollection('newsArchiveSummaries') as Promise<
+        readonly NewsArchiveSummaryEntry[]
+      >,
+      loadPeopleMentionRegistry(),
+    ]);
 
-  return buildNewsDataset(authorsData, articlesData, { mentionRegistry });
+  return buildNewsDataset(authorsData, articlesData, archiveSummariesData, {
+    mentionRegistry,
+  });
 }
 
 export const loadNewsData = (): Promise<NewsDataset> => {

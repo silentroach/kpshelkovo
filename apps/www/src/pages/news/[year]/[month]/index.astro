@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import { padNumber } from '@shelkovo/format';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import NewsArchiveSummary from '@/components/news/NewsArchiveSummary.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import {
   withHomeBreadcrumbs,
@@ -91,6 +92,11 @@ const schema = collectionPageSchema({
             {heading}
           </h1>
         </div>
+
+        <NewsArchiveSummary
+          summary={archive.summary}
+          label={`Краткий обзор новостей за ${monthLabel}`}
+        />
       </div>
     </section>
 

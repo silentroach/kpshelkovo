@@ -3,6 +3,7 @@ import { count } from '@shelkovo/format';
 import { formatDynamicHtml } from '@shelkovo/markdown';
 import type { GetStaticPaths } from 'astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import NewsArchiveSummary from '@/components/news/NewsArchiveSummary.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import {
   withHomeBreadcrumbs,
@@ -71,6 +72,11 @@ const schema = collectionPageSchema({
         <h1 class="ui-page-title">
           Новости за {archive.year} год
         </h1>
+
+        <NewsArchiveSummary
+          summary={archive.summary}
+          label={`Краткий обзор новостей за ${archive.year} год`}
+        />
       </div>
     </section>
 
