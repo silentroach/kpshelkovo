@@ -6,6 +6,7 @@ import {
   getTariffHint,
   getTariffCalc,
 } from './format';
+import { visibleWhitespace } from '@/lib/test/visible-whitespace';
 
 describe('Format Module', () => {
   describe('formatTariffAuto', () => {
@@ -18,7 +19,7 @@ describe('Format Module', () => {
           normalizedPerSotkaMonth: 1000,
           normalizedIsEstimate: false,
         }),
-      ).toBe('1\u00A0000 ₽/сотка');
+      ).toBe('1\u00A0000\u00A0₽/сотка');
     });
 
     it('should add tilde for estimated tariffs', () => {
@@ -30,7 +31,7 @@ describe('Format Module', () => {
           normalizedPerSotkaMonth: 1200,
           normalizedIsEstimate: true,
         }),
-      ).toBe('~1\u00A0200 ₽/сотка');
+      ).toBe('~1\u00A0200\u00A0₽/сотка');
     });
   });
 
@@ -44,7 +45,7 @@ describe('Format Module', () => {
           normalizedPerSotkaMonth: 500,
           normalizedIsEstimate: false,
         }),
-      ).toBe('500 ₽/сотка');
+      ).toBe('500\u00A0₽/сотка');
     });
 
     it('should format tariff per lot', () => {
@@ -56,7 +57,7 @@ describe('Format Module', () => {
           normalizedPerSotkaMonth: 400,
           normalizedIsEstimate: true,
         }),
-      ).toBe('4\u00A0000 ₽/участок');
+      ).toBe('4\u00A0000\u00A0₽/участок');
     });
 
     it('should format fixed tariff as per lot', () => {
@@ -68,7 +69,7 @@ describe('Format Module', () => {
           normalizedPerSotkaMonth: 100,
           normalizedIsEstimate: true,
         }),
-      ).toBe('12\u00A0000 ₽/участок');
+      ).toBe('12\u00A0000\u00A0₽/участок');
     });
 
     it('should format multi-part tariff as combined formula', () => {
@@ -92,7 +93,7 @@ describe('Format Module', () => {
             },
           ],
         }),
-      ).toBe('5\u00A0813 ₽/участок + 100 ₽/сотка');
+      ).toBe('5\u00A0813\u00A0₽/участок + 100\u00A0₽/сотка');
     });
   });
 
@@ -156,18 +157,18 @@ describe('Format Module', () => {
         normalizedIsEstimate: true,
       });
 
-      expect(calc).toMatchInlineSnapshot(`
+      expect(visibleWhitespace(calc)).toMatchInlineSnapshot(`
         {
           "assumption": "Допущение: 1 участок = 10 соток. Среднюю площадь участка по подтвержденным данным не нашли.",
           "intro": "Тариф приведен к ₽/сотка в месяц для корректного сравнения.",
           "rows": [
             {
-              "formula": "(9 000 ₽ / 3 месяца) / 10 соток = 300 ₽/сотка в месяц",
+              "formula": "(9·000·₽ / 3 месяца) / 10 соток = 300·₽/сотка в месяц",
               "source": "Указан за участок.",
               "title": "Тариф",
             },
           ],
-          "total": "300 ₽/сотка в месяц",
+          "total": "300·₽/сотка в месяц",
         }
       `);
     });
@@ -188,18 +189,18 @@ describe('Format Module', () => {
         },
       );
 
-      expect(calc).toMatchInlineSnapshot(`
+      expect(visibleWhitespace(calc)).toMatchInlineSnapshot(`
         {
           "assumption": "Допущение: 1 участок = 17,8 сот. Средняя площадь рассчитана по опубликованным площадям лотов.",
           "intro": "Тариф приведен к ₽/сотка в месяц для корректного сравнения.",
           "rows": [
             {
-              "formula": "(1 780 ₽ / 1 месяц) / 17,8 сот. = 100 ₽/сотка в месяц",
+              "formula": "(1·780·₽ / 1 месяц) / 17,8 сот. = 100·₽/сотка в месяц",
               "source": "Указан за участок.",
               "title": "Тариф",
             },
           ],
-          "total": "100 ₽/сотка в месяц",
+          "total": "100·₽/сотка в месяц",
         }
       `);
     });
@@ -253,23 +254,23 @@ describe('Format Module', () => {
         ],
       });
 
-      expect(calc).toMatchInlineSnapshot(`
+      expect(visibleWhitespace(calc)).toMatchInlineSnapshot(`
         {
           "assumption": "Допущение: 1 участок = 10 соток. Среднюю площадь участка по подтвержденным данным не нашли.",
           "intro": "Тариф состоит из нескольких частей. Для сравнения каждая часть приведена к ₽/сотка в месяц, затем значения суммированы.",
           "rows": [
             {
-              "formula": "(5 813 ₽ / 1 месяц) / 10 соток = 581,3 ₽/сотка в месяц",
+              "formula": "(5·813·₽ / 1 месяц) / 10 соток = 581,3·₽/сотка в месяц",
               "source": "Указан за участок.",
               "title": "Часть 1",
             },
             {
-              "formula": "100 ₽ / 1 месяц = 100 ₽/сотка в месяц",
+              "formula": "100·₽ / 1 месяц = 100·₽/сотка в месяц",
               "source": "Указан за сотку.",
               "title": "Часть 2",
             },
           ],
-          "total": "681,3 ₽/сотка в месяц",
+          "total": "681,3·₽/сотка в месяц",
         }
       `);
     });

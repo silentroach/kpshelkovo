@@ -13,7 +13,7 @@ describe('ComparisonBadge', () => {
       },
     });
 
-    expect(container.textContent).toContain('−50 ₽');
+    expect(container.textContent).toContain('−50\u00A0₽');
     expect(container.textContent).toContain('(дешевле на 33%)');
 
     const badge = container.querySelector('[data-testid="comparison-badge"]');
@@ -30,7 +30,7 @@ describe('ComparisonBadge', () => {
       },
     });
 
-    expect(container.textContent).toContain('+30 ₽');
+    expect(container.textContent).toContain('+30\u00A0₽');
     expect(container.textContent).toContain('(дороже на 20%)');
 
     const badge = container.querySelector('[data-testid="comparison-badge"]');
@@ -47,7 +47,7 @@ describe('ComparisonBadge', () => {
       },
     });
 
-    expect(container.textContent).toContain('−1\u00A0250 ₽');
+    expect(container.textContent).toContain('−1\u00A0250\u00A0₽');
   });
 
   it('renders baseline badge', () => {

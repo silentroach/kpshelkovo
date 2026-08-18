@@ -77,7 +77,7 @@ describe('SettlementCard', () => {
       },
     });
 
-    expect(container.textContent).toContain('100 ₽/сотка');
+    expect(container.textContent).toContain('100\u00A0₽/сотка');
   });
 
   it('renders rank as plain text in header', () => {
@@ -135,8 +135,7 @@ describe('SettlementCard', () => {
       },
     });
 
-    expect(container.textContent).toContain('дешевле на');
-    expect(container.textContent).toContain('50');
+    expect(container.textContent).toContain('дешевле на 50\u00A0₽');
   });
 
   it('renders "дороже на" for more expensive settlement', () => {
@@ -150,8 +149,7 @@ describe('SettlementCard', () => {
       },
     });
 
-    expect(container.textContent).toContain('дороже на');
-    expect(container.textContent).toContain('50');
+    expect(container.textContent).toContain('дороже на 50\u00A0₽');
   });
 
   it('renders "базовый тариф" for baseline settlement', () => {
@@ -221,7 +219,7 @@ describe('SettlementCard', () => {
       container.querySelector('[data-testid="settlement-card"]'),
     ).toBeTruthy();
     // Должен рендериться тариф, но не текст сравнения.
-    expect(container.textContent).toContain('100 ₽/сотка');
+    expect(container.textContent).toContain('100\u00A0₽/сотка');
     expect(container.textContent).not.toContain('дешевле на');
     expect(container.textContent).not.toContain('дороже на');
   });
@@ -243,7 +241,7 @@ describe('SettlementCard', () => {
       },
     });
 
-    expect(container.textContent).toContain('100 ₽/сотка');
+    expect(container.textContent).toContain('100\u00A0₽/сотка');
     expect(container.textContent).not.toContain('дешевле на 0');
     expect(container.textContent).not.toContain('дороже на 0');
     expect(container.textContent).not.toContain('базовый тариф');
