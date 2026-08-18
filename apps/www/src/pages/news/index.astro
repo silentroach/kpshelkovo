@@ -1,5 +1,6 @@
 ---
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import { formatDynamicHtml } from '@shelkovo/markdown';
 import NewsList from '@/components/news/NewsList.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import {
@@ -9,9 +10,11 @@ import {
 import { loadNewsData } from '@/lib/news/load';
 import { newsUrl } from '@/lib/news/routes';
 import { collectionPageSchema } from '@/lib/news/seo';
+import { formatNewsArchiveSummary } from '@/lib/news/view';
 
 const data = await loadNewsData();
 const articles = [...data.home.pinned, ...data.home.latest];
+const latestArchive = data.archives.years[0];
 
 const title = 'Новости — Шелково Онлайн';
 const description =
@@ -50,5 +53,52 @@ const schema = collectionPageSchema({
         empty="Первые публикации для раздела готовятся. Когда новости появятся, здесь будет основная лента."
       />
     </section>
+
+    {
+      latestArchive && (
+        <section
+          class="mt-8 px-5 md:px-6"
+          aria-labelledby="news-archive-title"
+          data-pagefind-ignore
+        >
+          <div class="border-t border-border pt-8">
+            <div class="max-w-3xl">
+              <h2 id="news-archive-title" class="ui-section-title">
+                Архив новостей
+              </h2>
+              <p class="ui-copy mt-3 text-muted-foreground">
+                Выберите год и месяц, чтобы найти более ранние публикации.
+              </p>
+
+              <a
+                href={latestArchive.url}
+                class="group -mx-3 mt-5 flex min-h-16 items-center gap-4 border-y border-border px-3 py-4 transition-colors hover:bg-primary-soft-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              >
+                <span class="min-w-0">
+                  <span class="ui-card-title block text-primary transition-colors group-hover:text-primary-hover">
+                    Новости за {latestArchive.year} год
+                  </span>
+                  <span
+                    class="mt-1 block text-sm text-muted-foreground"
+                    set:html={formatDynamicHtml(
+                      formatNewsArchiveSummary(
+                        latestArchive.count,
+                        latestArchive.months.length,
+                      ),
+                    )}
+                  />
+                </span>
+                <span
+                  class="ml-auto shrink-0 text-xl text-primary transition-colors group-hover:text-primary-hover"
+                  aria-hidden="true"
+                >
+                  →
+                </span>
+              </a>
+            </div>
+          </div>
+        </section>
+      )
+    }
   </main>
 </BaseLayout>

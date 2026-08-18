@@ -1,4 +1,9 @@
-import { dateTimeFromISO, formatDate, formatMonth } from '@shelkovo/format';
+import {
+  count,
+  dateTimeFromISO,
+  formatDate,
+  formatMonth,
+} from '@shelkovo/format';
 import { formatArea } from '../areas';
 import type { NewsArea } from './schema';
 import type { NewsAuthor, NewsEvent } from './types';
@@ -70,6 +75,12 @@ export const formatNewsMonth = (
 
   return opts?.capitalize ? capitalize(label) : label;
 };
+
+export const formatNewsArchiveSummary = (
+  publicationCount: number,
+  monthCount: number,
+): string =>
+  `${count(publicationCount, ['публикация', 'публикации', 'публикаций'])} за ${count(monthCount, ['месяц', 'месяца', 'месяцев'])}`;
 
 export const formatNewsArea = (area: NewsArea): string => formatArea(area);
 

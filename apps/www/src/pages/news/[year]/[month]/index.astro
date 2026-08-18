@@ -54,7 +54,7 @@ const olderMonthName = older
   : undefined;
 const heading = `Новости за ${monthLabel}`;
 const title = `Новости за ${monthLabel} — Шелково Онлайн`;
-const description = `Архив новостей Шелково за ${monthLabel}: публикации месяца в хронологическом порядке.`;
+const description = `Архив новостей Шелково за ${monthLabel}: публикации месяца от новых к старым.`;
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Новости', href: newsUrl() },
   { label: String(archive.year), href: yearUrl(archive.year) },
@@ -92,28 +92,12 @@ const schema = collectionPageSchema({
         </div>
 
         <nav
-          class="flex max-w-3xl flex-col gap-2 pt-1 text-sm font-semibold leading-6 sm:flex-row sm:items-center sm:justify-between"
-          aria-label="Навигация по месяцам новостей"
+          aria-label={`Архив новостей за ${archive.year} год`}
+          data-pagefind-ignore
         >
-          {
-            older && olderMonthName && (
-              <a href={older.url} class="ui-link">
-                <span aria-hidden="true">← </span>
-                {olderMonthName}
-              </a>
-            )
-          }
-          {
-            newer && newerMonthName && (
-              <a
-                href={newer.url}
-                class:list={['ui-link', !older && 'sm:ml-auto']}
-              >
-                {newerMonthName}
-                <span aria-hidden="true"> →</span>
-              </a>
-            )
-          }
+          <a href={yearUrl(archive.year)} class="ui-link text-sm font-semibold">
+            Все месяцы {archive.year} года
+          </a>
         </nav>
       </div>
     </section>
@@ -127,5 +111,31 @@ const schema = collectionPageSchema({
 
       <NewsList articles={archive.articles} empty="" />
     </section>
+
+    {
+      (older || newer) && (
+        <nav
+          class="mx-5 mt-8 flex max-w-3xl flex-col gap-3 border-t border-border pt-6 text-sm font-semibold leading-6 sm:flex-row sm:items-center sm:justify-between md:mx-6"
+          aria-label="Навигация по месяцам новостей"
+          data-pagefind-ignore
+        >
+          {older && olderMonthName && (
+            <a href={older.url} class="ui-link">
+              <span aria-hidden="true">← </span>
+              {olderMonthName}
+            </a>
+          )}
+          {newer && newerMonthName && (
+            <a
+              href={newer.url}
+              class:list={['ui-link', !older && 'sm:ml-auto']}
+            >
+              {newerMonthName}
+              <span aria-hidden="true"> →</span>
+            </a>
+          )}
+        </nav>
+      )
+    }
   </main>
 </BaseLayout>

@@ -20,6 +20,7 @@ import type {
 } from './types';
 import {
   formatNewsArea,
+  formatNewsArchiveSummary,
   formatNewsAuthor,
   formatNewsDate,
   formatNewsMonth,
@@ -63,8 +64,7 @@ function areaLabels(
 
 function tagLabels(
   items:
-    | Pick<NewsListArticle, 'tags'>['tags']
-    | Pick<NewsArticle, 'tags'>['tags'],
+    Pick<NewsListArticle, 'tags'>['tags'] | Pick<NewsArticle, 'tags'>['tags'],
 ): readonly string[] {
   return items.map((item) => item.label);
 }
@@ -177,6 +177,14 @@ const monthLine = (item: NewsMonthArchive): MarkdownListItem =>
     ]),
   ]);
 
+const yearLine = (item: NewsYearArchive): MarkdownListItem =>
+  md.listItem([
+    md.paragraph([
+      md.link(abs(item.markdownUrl), `Новости за ${item.year} год`),
+      md.text(` — ${formatNewsArchiveSummary(item.count, item.months.length)}`),
+    ]),
+  ]);
+
 const tagLine = (item: NewsTagPage): MarkdownListItem =>
   md.listItem([
     md.paragraph([
@@ -189,6 +197,7 @@ const tagLine = (item: NewsTagPage): MarkdownListItem =>
 
 export function buildNewsHomeMarkdown(data: NewsDataset): string {
   const latest = [...data.home.pinned, ...data.home.latest];
+  const latestArchive = data.archives.years[0];
   const normalCount = data.articles.length - data.home.pinned.length;
 
   return serialize([
@@ -202,41 +211,34 @@ export function buildNewsHomeMarkdown(data: NewsDataset): string {
       empty: 'Первые публикации для раздела готовятся.',
       intro:
         normalCount > data.home.latest.length
-          ? `Закрепленные публикации показаны первыми. Для обычных новостей на главной Markdown-странице показываем не больше ${NEWS_LATEST_LIMIT}; более старые публикации остаются доступны в архивах.`
+          ? `Закрепленные публикации показаны первыми. Для обычных новостей на главной Markdown-странице показываем не больше ${NEWS_LATEST_LIMIT}; более ранние публикации сгруппированы по годам и месяцам.`
           : undefined,
     }),
+    ...(latestArchive
+      ? section('Архив новостей', [yearLine(latestArchive)])
+      : []),
   ]);
 }
 
-export function buildNewsYearMarkdown(archive: NewsYearArchive): string {
-  const children: MarkdownNode[] = [
+export function buildNewsYearMarkdown(input: {
+  readonly archive: NewsYearArchive;
+  readonly years: readonly NewsYearArchive[];
+}): string {
+  const { archive, years } = input;
+
+  return serialize([
     md.heading(1, `Новости Шелково за ${archive.year} год`),
+    md.paragraph(
+      formatNewsArchiveSummary(archive.count, archive.months.length),
+    ),
+    ...(years.length > 1 ? section('Годы', years.map(yearLine)) : []),
     ...section(
-      'Месяцы года',
+      `Месяцы ${archive.year} года`,
       archive.months.length > 0
         ? archive.months.map(monthLine)
         : [md.listItem('В этом году пока нет публикаций.')],
     ),
-    md.heading(2, 'Публикации по месяцам'),
-  ];
-
-  if (archive.months.length === 0) {
-    children.push(md.list([md.listItem('В этом году пока нет публикаций.')]));
-    return serialize(children);
-  }
-
-  for (const item of archive.months) {
-    children.push(
-      ...articleBlock({
-        title: formatNewsMonth(item.year, item.month, { capitalize: true }),
-        headingLevel: 3,
-        items: item.articles,
-        empty: 'В этом месяце пока нет публикаций.',
-      }),
-    );
-  }
-
-  return serialize(children);
+  ]);
 }
 
 export function buildNewsMonthMarkdown(input: {
