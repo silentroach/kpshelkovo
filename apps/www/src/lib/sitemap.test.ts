@@ -32,6 +32,7 @@ describe('buildSitemapMetadataIndex', () => {
 
     expect({
       home: index.get('/'),
+      newsArchive: index.get('/news/archive/'),
       firstArticle: index.get('/news/2026/05/first/'),
       olderArticle: index.get('/news/2026/04/older/'),
       monthArchive: index.get('/news/2026/05/'),
@@ -47,6 +48,10 @@ describe('buildSitemapMetadataIndex', () => {
           "lastmod": "2026-05-04T12:30:00+03:00",
         },
         "monthArchive": {
+          "changefreq": "daily",
+          "lastmod": "2026-05-04T12:30:00+03:00",
+        },
+        "newsArchive": {
           "changefreq": "daily",
           "lastmod": "2026-05-04T12:30:00+03:00",
         },

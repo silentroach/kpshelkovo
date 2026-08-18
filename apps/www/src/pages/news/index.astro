@@ -7,7 +7,7 @@ import {
   withHomeSchemaBreadcrumbs,
 } from '@/lib/breadcrumbs';
 import { loadNewsData } from '@/lib/news/load';
-import { newsUrl } from '@/lib/news/routes';
+import { newsArchiveUrl, newsUrl } from '@/lib/news/routes';
 import { collectionPageSchema } from '@/lib/news/seo';
 
 const data = await loadNewsData();
@@ -50,5 +50,15 @@ const schema = collectionPageSchema({
         empty="Первые публикации для раздела готовятся. Когда новости появятся, здесь будет основная лента."
       />
     </section>
+
+    {
+      data.archives.years.length > 0 && (
+        <section class="mt-8 px-5 md:px-6" data-pagefind-ignore>
+          <a class="ui-link font-semibold" href={newsArchiveUrl()}>
+            Архив новостей
+          </a>
+        </section>
+      )
+    }
   </main>
 </BaseLayout>

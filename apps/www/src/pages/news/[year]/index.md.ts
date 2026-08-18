@@ -1,6 +1,6 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
-import { loadNewsArchives, loadNewsYear } from '@/lib/news/load';
+import { loadNewsArchives } from '@/lib/news/load';
 import {
   buildNewsYearMarkdown,
   NEWS_MARKDOWN_HEADERS,
@@ -18,13 +18,14 @@ export const getStaticPaths = (async () => {
 
 export const GET: APIRoute = async ({ params }) => {
   const year = Number(params.year);
-  const archive = await loadNewsYear(year);
+  const archives = await loadNewsArchives();
+  const archive = archives.byYear.get(year);
 
   if (!archive) {
     throw new Error(`news year archive "${params.year}" not found`);
   }
 
-  return new Response(buildNewsYearMarkdown(archive), {
+  return new Response(buildNewsYearMarkdown({ archive }), {
     headers: NEWS_MARKDOWN_HEADERS,
   });
 };

@@ -10,6 +10,8 @@ import {
   feedUrl,
   llmsFullUrl,
   llmsUrl,
+  newsArchiveMarkdownUrl,
+  newsArchiveUrl,
   newsMarkdownUrl,
   newsUrl,
   tagsMarkdownUrl,
@@ -31,6 +33,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
 
   const home = absoluteUrl(newsUrl());
   const homeMarkdown = absoluteUrl(newsMarkdownUrl());
+  const archive = absoluteUrl(newsArchiveUrl());
+  const archiveMarkdown = absoluteUrl(newsArchiveMarkdownUrl());
   const feed = absoluteUrl(articlesDataUrl());
   const rss = absoluteUrl(feedUrl());
   const short = absoluteUrl(llmsUrl());
@@ -76,6 +80,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
             markdownList([
               `Пример HTML-страницы новости: ${articleHtml}`,
               `Пример Markdown-страницы новости: ${articleMarkdown}`,
+              `Архив новостей по годам: ${archive}`,
               `Годовой архив: ${yearUrl}`,
               `Месячный архив: ${monthUrl}`,
               `Индекс тегов: ${tags}`,
@@ -103,6 +108,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
             markdownList([
               `Главная новостей: ${home}`,
               `Главная новостей в Markdown: ${homeMarkdown}`,
+              `Архив новостей HTML: ${archive}`,
+              `Архив новостей Markdown: ${archiveMarkdown}`,
               `Короткий обзор llms.txt: ${short}`,
               `Подробный обзор llms-full.txt: ${full}`,
               `Основной JSON-файл: ${feed}`,
@@ -140,7 +147,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
             markdownList([
               'HTML-страницы `/news/YYYY/MM/[entry]/` остаются каноническим человекочитаемым представлением новости.',
               'Markdown-файлы `/news/.../index.md` дают текстовую версию для терминалов и прямых ссылок на чистый текст.',
-              'Во всех списках, архивах и тегах показывается только `summary`; полный `body` раскрывается только на странице новости и в основном JSON-файле.',
+              'Годовые архивы перечисляют месяцы с отдельными HTML- и Markdown-страницами; месячные архивы и страницы тегов показывают `summary` публикаций.',
+              'Полный `body` раскрывается только на странице новости и в основном JSON-файле.',
             ]),
           ]),
           llmsSection('RSS', [

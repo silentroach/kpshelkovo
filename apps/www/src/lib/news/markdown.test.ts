@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildNewsArticleMarkdown, buildNewsMonthMarkdown } from './markdown';
-import type { NewsArticle } from './types';
+import {
+  buildNewsArchiveMarkdown,
+  buildNewsArticleMarkdown,
+  buildNewsHomeMarkdown,
+  buildNewsMonthMarkdown,
+  buildNewsYearMarkdown,
+} from './markdown';
+import type {
+  NewsArticle,
+  NewsDataset,
+  NewsMonthArchive,
+  NewsYearArchive,
+} from './types';
 
 const article = (input?: Partial<NewsArticle>): NewsArticle => ({
   id: '2026/05/ktp-upgrade',
@@ -39,6 +50,27 @@ const article = (input?: Partial<NewsArticle>): NewsArticle => ({
   body: 'Текст новости.',
   mentions: [],
   ...input,
+});
+
+const monthArchive = (year: number, month: number): NewsMonthArchive => ({
+  id: `${year}/${String(month).padStart(2, '0')}`,
+  year,
+  month,
+  url: `/news/${year}/${String(month).padStart(2, '0')}/`,
+  markdownUrl: `/news/${year}/${String(month).padStart(2, '0')}/index.md`,
+  count: 1,
+  articles: [article({ year, month })],
+});
+
+const yearArchive = (
+  year: number,
+  months: readonly NewsMonthArchive[],
+): NewsYearArchive => ({
+  year,
+  url: `/news/${year}/`,
+  markdownUrl: `/news/${year}/index.md`,
+  count: months.reduce((total, month) => total + month.count, 0),
+  months,
 });
 
 describe('buildNewsArticleMarkdown', () => {
@@ -143,5 +175,60 @@ ignored: true
         Краткое описание новости.
       "
     `);
+  });
+
+  it('keeps year archives as oldest-first month directories', () => {
+    const current = yearArchive(2026, [
+      monthArchive(2026, 5),
+      monthArchive(2026, 4),
+    ]);
+    const markdown = buildNewsYearMarkdown({
+      archive: current,
+    });
+
+    expect(markdown).toMatchInlineSnapshot(`
+      "# Новости Шелково за 2026 год
+
+      - [Апрель 2026 г.](https://kpshelkovo.online/news/2026/04/index.md) — 1 публикация
+      - [Май 2026 г.](https://kpshelkovo.online/news/2026/05/index.md) — 1 публикация
+      "
+    `);
+    expect(markdown).not.toContain(article().title);
+  });
+
+  it('lists year links in the archive index', () => {
+    const current = yearArchive(2026, [monthArchive(2026, 5)]);
+    const previous = yearArchive(2025, [monthArchive(2025, 12)]);
+
+    expect(buildNewsArchiveMarkdown([current, previous]))
+      .toMatchInlineSnapshot(`
+      "# Архив новостей Шелково
+
+      - [Новости за 2026 год](https://kpshelkovo.online/news/2026/index.md)
+      - [Новости за 2025 год](https://kpshelkovo.online/news/2025/index.md)
+      "
+    `);
+  });
+
+  it('links the home Markdown feed to the archive index', () => {
+    const latestArticle = article();
+    const month = monthArchive(2026, 5);
+    const year = yearArchive(2026, [month]);
+    const data: NewsDataset = {
+      articles: [latestArticle],
+      home: { pinned: [], latest: [latestArticle] },
+      archives: {
+        years: [year],
+        byYear: new Map([[year.year, year]]),
+        byMonth: new Map([[month.id, month]]),
+      },
+      tags: [],
+      byId: new Map([[latestArticle.id, latestArticle]]),
+      byTag: new Map(),
+    };
+
+    expect(buildNewsHomeMarkdown(data)).toContain(
+      '[Архив новостей](https://kpshelkovo.online/news/archive/index.md)',
+    );
   });
 });

@@ -1,5 +1,6 @@
 ---
-import { pluralize } from '@shelkovo/format';
+import { count } from '@shelkovo/format';
+import { formatDynamicHtml } from '@shelkovo/markdown';
 import type { GetStaticPaths } from 'astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -7,11 +8,10 @@ import {
   withHomeBreadcrumbs,
   withHomeSchemaBreadcrumbs,
 } from '@/lib/breadcrumbs';
-import NewsList from '@/components/news/NewsList.astro';
-import { loadNewsArchives, loadNewsYear } from '@/lib/news/load';
+import { loadNewsArchives } from '@/lib/news/load';
 import { collectionPageSchema } from '@/lib/news/seo';
 import { formatNewsMonth } from '@/lib/news/view';
-import { monthUrl, newsUrl, yearUrl } from '@/lib/news/routes';
+import { newsArchiveUrl, yearUrl } from '@/lib/news/routes';
 
 export const getStaticPaths = (async () => {
   const archives = await loadNewsArchives();
@@ -22,16 +22,18 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths;
 
 const year = Number(Astro.params.year);
-const archive = await loadNewsYear(year);
+const archives = await loadNewsArchives();
+const archive = archives.byYear.get(year);
 
 if (!archive) {
   throw new Error(`news year archive "${Astro.params.year}" not found`);
 }
 
 const title = `Новости за ${archive.year} год — Шелково Онлайн`;
-const description = `Архив новостей Шелково за ${archive.year} год: публикации по месяцам в хронологическом порядке.`;
+const description = `Архив новостей Шелково за ${archive.year} год с переходами к публикациям каждого месяца.`;
+const months = [...archive.months].sort((a, b) => a.month - b.month);
 const breadcrumbs = withHomeBreadcrumbs([
-  { label: 'Новости', href: newsUrl() },
+  { label: 'Новости', href: newsArchiveUrl() },
   { label: String(archive.year) },
 ]);
 
@@ -40,12 +42,13 @@ const schema = collectionPageSchema({
   description,
   url: yearUrl(archive.year),
   breadcrumbs: withHomeSchemaBreadcrumbs([
-    { name: 'Новости', url: newsUrl() },
+    { name: 'Новости', url: newsArchiveUrl() },
     { name: String(archive.year), url: yearUrl(archive.year) },
   ]),
-  items: archive.months.flatMap((item) =>
-    item.articles.map((article) => ({ name: article.title, url: article.url })),
-  ),
+  items: months.map((item) => ({
+    name: formatNewsMonth(item.year, item.month, { capitalize: true }),
+    url: item.url,
+  })),
 });
 ---
 
@@ -65,46 +68,51 @@ const schema = collectionPageSchema({
       <div class="ui-page-header-stack">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div class="space-y-3">
-          <h1 class="ui-page-title">
-            Новости за {archive.year} год
-          </h1>
-        </div>
+        <h1 class="ui-page-title">
+          Новости за {archive.year} год
+        </h1>
+      </div>
+    </section>
 
-        <ul class="flex flex-wrap gap-x-5 gap-y-2">
+    <section
+      class="mt-8 px-5 md:px-6"
+      aria-label={`Новости за ${archive.year} год по месяцам`}
+    >
+      <div class="max-w-3xl">
+        <ul class="space-y-1">
           {
-            archive.months.map((item) => (
-              <li class="flex flex-wrap items-baseline gap-1.5 text-sm font-semibold">
-                <a href={monthUrl(item.year, item.month)} class="ui-link">
-                  {formatNewsMonth(item.year, item.month, {
-                    capitalize: true,
-                    includeYear: false,
-                  })}
+            months.map((item) => (
+              <li>
+                <a
+                  href={item.url}
+                  class="group -mx-3 flex min-h-16 items-center gap-4 px-3 py-4 transition-colors hover:bg-primary-soft-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                >
+                  <span class="min-w-0">
+                    <span class="ui-card-title block text-primary transition-colors group-hover:text-primary-hover">
+                      {formatNewsMonth(item.year, item.month, {
+                        capitalize: true,
+                        includeYear: false,
+                      })}
+                    </span>
+                    <span
+                      class="mt-1 block text-sm text-muted-foreground"
+                      set:html={formatDynamicHtml(
+                        count(item.count, ['новость', 'новости', 'новостей']),
+                      )}
+                    />
+                  </span>
+                  <span
+                    class="ml-auto shrink-0 text-xl text-primary transition-colors group-hover:text-primary-hover"
+                    aria-hidden="true"
+                  >
+                    →
+                  </span>
                 </a>
-                <span class="text-muted-foreground">
-                  {`(${item.count} ${pluralize(item.count, ['новость', 'новости', 'новостей'])})`}
-                </span>
               </li>
             ))
           }
         </ul>
       </div>
     </section>
-
-    <div class="mt-8 space-y-8">
-      {
-        archive.months.map((item) => (
-          <section id={`month-${item.month}`} class="space-y-4">
-            <div class="px-5 md:px-6">
-              <h2 class="ui-section-title">
-                {formatNewsMonth(item.year, item.month, { capitalize: true })}
-              </h2>
-            </div>
-
-            <NewsList articles={item.articles} empty="" />
-          </section>
-        ))
-      }
-    </div>
   </main>
 </BaseLayout>

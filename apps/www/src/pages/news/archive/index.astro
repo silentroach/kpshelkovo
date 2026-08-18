@@ -1,0 +1,92 @@
+---
+import { count } from '@shelkovo/format';
+import { formatDynamicHtml } from '@shelkovo/markdown';
+import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import {
+  withHomeBreadcrumbs,
+  withHomeSchemaBreadcrumbs,
+} from '@/lib/breadcrumbs';
+import { loadNewsArchives } from '@/lib/news/load';
+import { newsArchiveUrl, newsUrl } from '@/lib/news/routes';
+import { collectionPageSchema } from '@/lib/news/seo';
+
+const archives = await loadNewsArchives();
+const title = 'Архив новостей — Шелково Онлайн';
+const description =
+  'Архив новостей Шелково по годам с переходом к публикациям каждого месяца.';
+const breadcrumbs = withHomeBreadcrumbs([
+  { label: 'Новости', href: newsUrl() },
+  { label: 'Архив' },
+]);
+const schema = collectionPageSchema({
+  name: title,
+  description,
+  url: newsArchiveUrl(),
+  breadcrumbs: withHomeSchemaBreadcrumbs([
+    { name: 'Новости', url: newsUrl() },
+    { name: 'Архив', url: newsArchiveUrl() },
+  ]),
+  items: archives.years.map((item) => ({
+    name: `Новости за ${item.year} год`,
+    url: item.url,
+  })),
+});
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={newsArchiveUrl()}
+  keywords={['архив новостей Шелково', 'новости по годам']}
+  schema={schema}
+>
+  <main class="ui-page pb-6 md:pb-10 lg:pb-12">
+    <section class="ui-page-header">
+      <div class="ui-page-header-stack">
+        <Breadcrumbs items={breadcrumbs} />
+
+        <h1 class="ui-page-title">Архив новостей</h1>
+      </div>
+    </section>
+
+    <section class="mt-8 px-5 md:px-6" aria-label="Новости по годам">
+      <div class="max-w-3xl">
+        {
+          archives.years.length > 0 ? (
+            <ul class="space-y-1">
+              {archives.years.map((item) => (
+                <li>
+                  <a
+                    href={item.url}
+                    class="group -mx-3 flex min-h-16 items-center gap-4 px-3 py-4 transition-colors hover:bg-primary-soft-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  >
+                    <span class="min-w-0">
+                      <span class="ui-card-title block text-primary transition-colors group-hover:text-primary-hover">
+                        {item.year}
+                      </span>
+                      <span
+                        class="mt-1 block text-sm text-muted-foreground"
+                        set:html={formatDynamicHtml(
+                          count(item.count, ['новость', 'новости', 'новостей']),
+                        )}
+                      />
+                    </span>
+                    <span
+                      class="ml-auto shrink-0 text-xl text-primary transition-colors group-hover:text-primary-hover"
+                      aria-hidden="true"
+                    >
+                      →
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="ui-copy text-muted-foreground">Публикаций пока нет.</p>
+          )
+        }
+      </div>
+    </section>
+  </main>
+</BaseLayout>

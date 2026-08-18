@@ -176,6 +176,7 @@ const addNewsMetadata = (
     for (const path of [
       '/',
       '/news/',
+      '/news/archive/',
       `/news/${year}/`,
       `/news/${year}/${month}/`,
       '/news/tags/',
