@@ -2,7 +2,11 @@ import { readFile } from 'node:fs/promises';
 
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import type { NewsArticleEntry, NewsAuthorEntry } from '../news/load';
+import type {
+  NewsArchiveSummaryEntry,
+  NewsArticleEntry,
+  NewsAuthorEntry,
+} from '../news/load';
 import type { StatusIncidentEntry } from '../status/load';
 import type { StatusArea, StatusKind, StatusService } from '../status/schema';
 import type { ContactEntry } from '../contacts/load';
@@ -11,7 +15,9 @@ import type { PersonProfileEntry } from './load';
 let buildPeopleDataset: typeof import('./load').buildPeopleDataset;
 let buildPeopleGraphDataset: typeof import('./load').buildPeopleGraphDataset;
 let buildContactsDataset: typeof import('../contacts/load').buildContactsDataset;
-let buildNewsDataset: typeof import('../news/load').buildNewsDataset;
+type BuildNewsDataset = typeof import('../news/load').buildNewsDataset;
+
+let buildNewsDatasetSource: BuildNewsDataset;
 let buildStatusDataset: typeof import('../status/load').buildStatusDataset;
 let createContactMentionRefs: typeof import('../contacts/mentions').createContactMentionRefs;
 let createNewsArticleMentionRefs: typeof import('../news/mentions').createNewsArticleMentionRefs;
@@ -26,13 +32,35 @@ beforeAll(async () => {
 
   ({ buildPeopleDataset, buildPeopleGraphDataset } = await import('./load'));
   ({ buildContactsDataset } = await import('../contacts/load'));
-  ({ buildNewsDataset } = await import('../news/load'));
+  ({ buildNewsDataset: buildNewsDatasetSource } = await import('../news/load'));
   ({ buildStatusDataset } = await import('../status/load'));
   ({ createContactMentionRefs } = await import('../contacts/mentions'));
   ({ createNewsArticleMentionRefs } = await import('../news/mentions'));
   ({ createStatusIncidentMentionRefs } = await import('../status/mentions'));
   ({ createPersonProfileMentionRefs } = await import('./mention-refs'));
 });
+
+const archiveSummaries = (
+  articles: readonly NewsArticleEntry[],
+): readonly NewsArchiveSummaryEntry[] => {
+  const ids = new Set<string>();
+
+  for (const item of articles) {
+    const [year, month] = item.id.split('/');
+
+    ids.add(year);
+    ids.add(`${year}/${month}`);
+  }
+
+  return [...ids].map((id) => ({ id, body: `Выжимка ${id}.` }));
+};
+
+const buildNewsDataset = (
+  authors: Parameters<BuildNewsDataset>[0],
+  articles: Parameters<BuildNewsDataset>[1],
+  opts?: Parameters<BuildNewsDataset>[3],
+): ReturnType<BuildNewsDataset> =>
+  buildNewsDatasetSource(authors, articles, archiveSummaries(articles), opts);
 
 const sourceRefs = (input: {
   readonly people: ReturnType<typeof buildPeopleDataset>;

@@ -1,14 +1,20 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { createPersonMentionTarget } from '../people/mentions';
-import type { NewsArticleEntry, NewsAuthorEntry } from './load';
+import type {
+  NewsArchiveSummaryEntry,
+  NewsArticleEntry,
+  NewsAuthorEntry,
+} from './load';
 
 type MutableMentionRegistry = Map<
   string,
   ReturnType<typeof createPersonMentionTarget>
 >;
 
-let buildNewsDataset: typeof import('./load').buildNewsDataset;
+type BuildNewsDataset = typeof import('./load').buildNewsDataset;
+
+let buildNewsDatasetSource: BuildNewsDataset;
 
 type ArticleEventInput = NonNullable<
   NewsArticleEntry['data']['events']
@@ -23,8 +29,38 @@ beforeAll(async () => {
     BASE_URL: '/',
   });
 
-  ({ buildNewsDataset } = await import('./load'));
+  ({ buildNewsDataset: buildNewsDatasetSource } = await import('./load'));
 });
+
+const archiveSummaries = (
+  articles: readonly NewsArticleEntry[],
+): readonly NewsArchiveSummaryEntry[] => {
+  const ids = new Set<string>();
+
+  for (const item of articles) {
+    const [year, month] = item.id.split('/');
+
+    ids.add(year);
+    ids.add(`${year}/${month}`);
+  }
+
+  return [...ids].map((id) => ({ id, body: `Выжимка ${id}.` }));
+};
+
+const buildWithArchiveSummaries = (
+  builder: BuildNewsDataset,
+  authors: Parameters<BuildNewsDataset>[0],
+  articles: Parameters<BuildNewsDataset>[1],
+  opts?: Parameters<BuildNewsDataset>[3],
+): ReturnType<BuildNewsDataset> =>
+  builder(authors, articles, archiveSummaries(articles), opts);
+
+const buildNewsDataset = (
+  authors: Parameters<BuildNewsDataset>[0],
+  articles: Parameters<BuildNewsDataset>[1],
+  opts?: Parameters<BuildNewsDataset>[3],
+): ReturnType<BuildNewsDataset> =>
+  buildWithArchiveSummaries(buildNewsDatasetSource, authors, articles, opts);
 
 const author = (input: {
   readonly id: string;
@@ -266,6 +302,174 @@ describe('buildNewsDataset', () => {
     expect(data.articles[0]?.mentions.map((item) => item.slug)).toEqual([
       'kschemelinin',
     ]);
+  });
+
+  it('attaches summaries to their year and month archives', () => {
+    const data = buildNewsDatasetSource(
+      [author({ id: 'ig', name: 'Редакция' })],
+      [
+        article({
+          id: '2026/05/electricity',
+          title: 'Авария на линии',
+          summary: 'Краткая сводка',
+          date: '03.05.2026 09:00',
+        }),
+      ],
+      [
+        { id: '2026', body: 'Главное за год.' },
+        { id: '2026/05', body: 'Главное за месяц.' },
+      ],
+    );
+
+    expect({
+      year: data.archives.byYear.get(2026)?.summary.body,
+      month: data.archives.byMonth.get('2026/05')?.summary.body,
+    }).toMatchInlineSnapshot(`
+      {
+        "month": "Главное за месяц.",
+        "year": "Главное за год.",
+      }
+    `);
+  });
+
+  it('rejects direct people mentions in archive summaries', () => {
+    expect(() =>
+      buildNewsDatasetSource(
+        [author({ id: 'ig', name: 'Редакция' })],
+        [
+          article({
+            id: '2026/05/electricity',
+            title: 'Авария на линии',
+            summary: 'Краткая сводка',
+            date: '03.05.2026 09:00',
+          }),
+        ],
+        [
+          { id: '2026', body: 'Главное за год.' },
+          { id: '2026/05', body: 'Месяц про @kschemelinin.' },
+        ],
+        {
+          mentionRegistry: new Map([
+            [
+              'kschemelinin',
+              createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин'),
+            ],
+          ]),
+        },
+      ),
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: news archive summary "2026/05" must link to the source article instead of mentioning people directly]`,
+    );
+  });
+
+  it('rejects archive summary links to missing articles', () => {
+    expect(() =>
+      buildNewsDatasetSource(
+        [author({ id: 'ig', name: 'Редакция' })],
+        [
+          article({
+            id: '2026/05/electricity',
+            title: 'Авария на линии',
+            summary: 'Краткая сводка',
+            date: '03.05.2026 09:00',
+          }),
+        ],
+        [
+          { id: '2026', body: 'Главное за год.' },
+          {
+            id: '2026/05',
+            body: '[Главное за месяц](/news/2026/05/missing/).',
+          },
+        ],
+      ),
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: news archive summary "2026/05" contains invalid link "/news/2026/05/missing/"; link to an existing news article with a root-relative URL]`,
+    );
+  });
+
+  it('rejects block markup in archive summaries', () => {
+    expect(() =>
+      buildNewsDatasetSource(
+        [author({ id: 'ig', name: 'Редакция' })],
+        [
+          article({
+            id: '2026/05/electricity',
+            title: 'Авария на линии',
+            summary: 'Краткая сводка',
+            date: '03.05.2026 09:00',
+          }),
+        ],
+        [
+          { id: '2026', body: 'Главное за год.' },
+          { id: '2026/05', body: '## Главное за месяц' },
+        ],
+      ),
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: news archive summary "2026/05" may contain only paragraphs with inline formatting]`,
+    );
+  });
+
+  it('rejects a missing archive summary', () => {
+    expect(() =>
+      buildNewsDatasetSource(
+        [author({ id: 'ig', name: 'Редакция' })],
+        [
+          article({
+            id: '2026/05/electricity',
+            title: 'Авария на линии',
+            summary: 'Краткая сводка',
+            date: '03.05.2026 09:00',
+          }),
+        ],
+        [{ id: '2026', body: 'Выжимка за год.' }],
+      ),
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: news archive "2026/05" is missing its summary]`,
+    );
+  });
+
+  it('rejects a summary without a matching archive', () => {
+    const currentArticle = article({
+      id: '2026/05/electricity',
+      title: 'Авария на линии',
+      summary: 'Краткая сводка',
+      date: '03.05.2026 09:00',
+    });
+
+    expect(() =>
+      buildNewsDatasetSource(
+        [author({ id: 'ig', name: 'Редакция' })],
+        [currentArticle],
+        [
+          ...archiveSummaries([currentArticle]),
+          { id: '2025', body: 'Лишняя выжимка.' },
+        ],
+      ),
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: news archive summary "2025" has no matching archive]`,
+    );
+  });
+
+  it('rejects a blank archive summary', () => {
+    expect(() =>
+      buildNewsDatasetSource(
+        [author({ id: 'ig', name: 'Редакция' })],
+        [
+          article({
+            id: '2026/05/electricity',
+            title: 'Авария на линии',
+            summary: 'Краткая сводка',
+            date: '03.05.2026 09:00',
+          }),
+        ],
+        [
+          { id: '2026', body: 'Выжимка за год.' },
+          { id: '2026/05', body: '   ' },
+        ],
+      ),
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: news archive summary "2026/05" body is required]`,
+    );
   });
 
   it('normalizes mentions in photo captions', () => {
@@ -724,7 +928,8 @@ describe('buildNewsDataset', () => {
       const { buildNewsDataset: buildWithMockedPreprocessor } =
         await import('./load');
 
-      buildWithMockedPreprocessor(
+      buildWithArchiveSummaries(
+        buildWithMockedPreprocessor,
         [author({ id: 'ig', name: 'Редакция' })],
         [
           article({
@@ -737,7 +942,8 @@ describe('buildNewsDataset', () => {
         ],
       );
 
-      const data = buildWithMockedPreprocessor(
+      const data = buildWithArchiveSummaries(
+        buildWithMockedPreprocessor,
         [author({ id: 'ig', name: 'Редакция' })],
         [
           article({
@@ -792,7 +998,8 @@ describe('buildNewsDataset', () => {
       const { buildNewsDataset: buildWithMutablePreprocessor } =
         await import('./load');
 
-      buildWithMutablePreprocessor(
+      buildWithArchiveSummaries(
+        buildWithMutablePreprocessor,
         [author({ id: 'ig', name: 'Редакция' })],
         [
           article({
@@ -806,7 +1013,8 @@ describe('buildNewsDataset', () => {
       );
 
       expect(() =>
-        buildWithMutablePreprocessor(
+        buildWithArchiveSummaries(
+          buildWithMutablePreprocessor,
           [author({ id: 'ig', name: 'Редакция' })],
           [
             article({

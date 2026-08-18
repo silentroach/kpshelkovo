@@ -1,6 +1,7 @@
 import { padNumber } from '@shelkovo/format';
 
 import type {
+  NewsArchiveSummary,
   NewsArchives,
   NewsListArticle,
   NewsMonthArchive,
@@ -16,8 +17,27 @@ interface YearBucket {
 export const newsMonthKey = (year: number, month: number): string =>
   `${year}/${padNumber(month)}`;
 
-export function buildArchives(items: readonly NewsListArticle[]): NewsArchives {
+const takeSummary = (
+  summaries: ReadonlyMap<string, NewsArchiveSummary>,
+  used: Set<string>,
+  id: string,
+): NewsArchiveSummary => {
+  const summary = summaries.get(id);
+
+  if (!summary) {
+    throw new Error(`news archive \"${id}\" is missing its summary`);
+  }
+
+  used.add(id);
+  return summary;
+};
+
+export function buildArchives(
+  items: readonly NewsListArticle[],
+  summaries: ReadonlyMap<string, NewsArchiveSummary>,
+): NewsArchives {
   const years = new Map<number, YearBucket>();
+  const usedSummaries = new Set<string>();
 
   for (const item of items) {
     const year = years.get(item.year) ?? {
@@ -45,6 +65,11 @@ export function buildArchives(items: readonly NewsListArticle[]): NewsArchives {
             url: monthUrl(year, month),
             markdownUrl: monthMarkdownUrl(year, month),
             count: articles.length,
+            summary: takeSummary(
+              summaries,
+              usedSummaries,
+              newsMonthKey(year, month),
+            ),
             articles: latestFirst(articles),
           };
 
@@ -56,12 +81,22 @@ export function buildArchives(items: readonly NewsListArticle[]): NewsArchives {
         url: yearUrl(year),
         markdownUrl: yearMarkdownUrl(year),
         count: months.reduce((sum, month) => sum + month.count, 0),
+        summary: takeSummary(summaries, usedSummaries, String(year)),
         months,
       };
 
       byYear.set(year, item);
       return item;
     });
+  const orphanSummaryId = [...summaries.keys()].find(
+    (id) => !usedSummaries.has(id),
+  );
+
+  if (orphanSummaryId) {
+    throw new Error(
+      `news archive summary \"${orphanSummaryId}\" has no matching archive`,
+    );
+  }
 
   return {
     years: list,

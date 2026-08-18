@@ -128,6 +128,10 @@ export interface NewsListArticle {
   readonly events: readonly NewsEvent[];
 }
 
+export interface NewsArchiveSummary {
+  readonly body: PreprocessedSiteMarkdownBody;
+}
+
 export interface NewsMonthArchive {
   readonly id: string;
   readonly year: number;
@@ -135,6 +139,7 @@ export interface NewsMonthArchive {
   readonly url: string;
   readonly markdownUrl: string;
   readonly count: number;
+  readonly summary: NewsArchiveSummary;
   readonly articles: readonly NewsListArticle[];
 }
 
@@ -143,6 +148,7 @@ export interface NewsYearArchive {
   readonly url: string;
   readonly markdownUrl: string;
   readonly count: number;
+  readonly summary: NewsArchiveSummary;
   readonly months: readonly NewsMonthArchive[];
 }
 

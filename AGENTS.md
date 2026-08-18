@@ -18,7 +18,7 @@ scripts/     # build/deploy helper scripts
 
 - Перед работой в `apps/www` обязательно читать `apps/www/AGENTS.md`.
 - Для устойчивых названий, терминов, юрлиц и написаний сверяться с корневым `GLOSSARY.md`; новые подтвержденные термины добавлять туда.
-- Данные новостей лежат в `apps/www/src/data/news`: авторы в `authors/*.yaml`, статьи в `articles/**/*.md`; при добавлении или редактировании новостей обязательно использовать skill `news-maker`.
+- Данные новостей лежат в `apps/www/src/data/news`: авторы в `authors/*.yaml`, статьи в `articles/**/*.md`, выжимки архивов в `summaries/YYYY/index.md` и `summaries/YYYY/MM.md`; при добавлении или редактировании новостей обязательно использовать skill `news-maker`.
 - Перед изменением внутрисайтового поиска, Pagefind, поисковых весов, quality-матрицы или `search_aliases` обязательно использовать skill `site-search`.
 - Данные статуса сервисов лежат в `apps/www/src/data/status/incidents/**/*.md`; перед добавлением или редактированием читать локальный `apps/www/src/data/status/incidents/AGENTS.md`.
 - Перед загрузкой, заменой, удалением или проверкой публичных файлов в `kps-public` обязательно использовать skill `public-media-publisher`.

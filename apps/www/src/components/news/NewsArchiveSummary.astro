@@ -1,0 +1,31 @@
+---
+import { renderMarkdown } from '@/lib/markdown/render';
+import type { NewsArchiveSummary } from '@/lib/news/types';
+import { NEWS_PROSE } from '@/lib/news/view';
+
+interface Props {
+  readonly summary: NewsArchiveSummary;
+  readonly label: string;
+}
+
+const { summary, label } = Astro.props;
+const html = renderMarkdown(summary.body);
+---
+
+<section
+  aria-label={label}
+  class:list={[
+    NEWS_PROSE,
+    'news-archive-summary',
+    '[&>:first-child]:mt-0 [&>:last-child]:mb-0',
+  ]}
+  set:html={html}
+/>
+
+<style>
+  .news-archive-summary {
+    color: var(--color-muted-foreground);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+</style>
