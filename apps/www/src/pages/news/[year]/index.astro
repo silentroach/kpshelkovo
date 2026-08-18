@@ -11,7 +11,7 @@ import {
 import { loadNewsArchives } from '@/lib/news/load';
 import { collectionPageSchema } from '@/lib/news/seo';
 import { formatNewsMonth } from '@/lib/news/view';
-import { newsArchiveUrl, newsUrl, yearUrl } from '@/lib/news/routes';
+import { newsArchiveUrl, yearUrl } from '@/lib/news/routes';
 
 export const getStaticPaths = (async () => {
   const archives = await loadNewsArchives();
@@ -33,8 +33,7 @@ const title = `Новости за ${archive.year} год — Шелково О�
 const description = `Архив новостей Шелково за ${archive.year} год с переходами к публикациям каждого месяца.`;
 const months = [...archive.months].sort((a, b) => a.month - b.month);
 const breadcrumbs = withHomeBreadcrumbs([
-  { label: 'Новости', href: newsUrl() },
-  { label: 'Архив', href: newsArchiveUrl() },
+  { label: 'Новости', href: newsArchiveUrl() },
   { label: String(archive.year) },
 ]);
 
@@ -43,8 +42,7 @@ const schema = collectionPageSchema({
   description,
   url: yearUrl(archive.year),
   breadcrumbs: withHomeSchemaBreadcrumbs([
-    { name: 'Новости', url: newsUrl() },
-    { name: 'Архив', url: newsArchiveUrl() },
+    { name: 'Новости', url: newsArchiveUrl() },
     { name: String(archive.year), url: yearUrl(archive.year) },
   ]),
   items: months.map((item) => ({

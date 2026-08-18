@@ -45,6 +45,7 @@ const older =
 const monthLabel = formatNewsMonth(archive.year, archive.month);
 const monthName = formatNewsMonth(archive.year, archive.month, {
   capitalize: true,
+  includeYear: false,
 });
 const newerMonthName = newer
   ? formatNewsMonth(newer.year, newer.month, { capitalize: true })
@@ -90,52 +91,46 @@ const schema = collectionPageSchema({
             {heading}
           </h1>
         </div>
+      </div>
+    </section>
 
-        <nav
-          aria-label={`Архив новостей за ${archive.year} год`}
-          data-pagefind-ignore
-        >
-          <a href={yearUrl(archive.year)} class="ui-link text-sm font-semibold">
-            Все месяцы {archive.year} года
+    <section class="mt-8">
+      <h2 class="sr-only">Новости за месяц</h2>
+      <NewsList articles={archive.articles} empty="" hideFirstBorder />
+    </section>
+
+    <nav
+      class="mt-8 grid gap-3 bg-primary-soft-2 px-5 py-5 text-sm font-semibold leading-6 sm:grid-cols-[1fr_auto_1fr] sm:items-center md:px-6"
+      aria-label="Навигация по архиву новостей"
+      data-pagefind-ignore
+    >
+      {
+        older && olderMonthName && (
+          <a href={older.url} class="ui-link sm:col-start-1 sm:row-start-1">
+            <span aria-hidden="true">← </span>
+            {olderMonthName}
           </a>
-        </nav>
-      </div>
-    </section>
+        )
+      }
 
-    <section class="mt-8 space-y-4">
-      <div
-        class="flex flex-wrap items-center justify-between gap-3 px-5 md:px-6"
+      {
+        newer && newerMonthName && (
+          <a
+            href={newer.url}
+            class="ui-link sm:col-start-3 sm:row-start-1 sm:justify-self-end"
+          >
+            {newerMonthName}
+            <span aria-hidden="true"> →</span>
+          </a>
+        )
+      }
+
+      <a
+        href={yearUrl(archive.year)}
+        class="ui-link sm:col-start-2 sm:row-start-1 sm:justify-self-center"
       >
-        <h2 class="ui-section-title">Новости за месяц</h2>
-      </div>
-
-      <NewsList articles={archive.articles} empty="" />
-    </section>
-
-    {
-      (older || newer) && (
-        <nav
-          class="mx-5 mt-8 flex max-w-3xl flex-col gap-3 border-t border-border pt-6 text-sm font-semibold leading-6 sm:flex-row sm:items-center sm:justify-between md:mx-6"
-          aria-label="Навигация по месяцам новостей"
-          data-pagefind-ignore
-        >
-          {older && olderMonthName && (
-            <a href={older.url} class="ui-link">
-              <span aria-hidden="true">← </span>
-              {olderMonthName}
-            </a>
-          )}
-          {newer && newerMonthName && (
-            <a
-              href={newer.url}
-              class:list={['ui-link', !older && 'sm:ml-auto']}
-            >
-              {newerMonthName}
-              <span aria-hidden="true"> →</span>
-            </a>
-          )}
-        </nav>
-      )
-    }
+        Архив за весь {archive.year} год
+      </a>
+    </nav>
   </main>
 </BaseLayout>
