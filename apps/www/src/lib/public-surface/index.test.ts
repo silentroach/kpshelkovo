@@ -50,6 +50,8 @@ import {
   feedPath as newsFeedPath,
   llmsFullPath as newsLlmsFullPath,
   llmsPath as newsLlmsPath,
+  newsArchiveMarkdownPath,
+  newsArchivePath,
   newsMarkdownPath,
   newsPath,
 } from '@/lib/news/routes';
@@ -293,6 +295,12 @@ describe('public surface registry', () => {
     expect(byId.get('news:index')).toMatchObject({ path: newsPath() });
     expect(byId.get('news:index-markdown')).toMatchObject({
       path: newsMarkdownPath(),
+    });
+    expect(byId.get('news:archive')).toMatchObject({
+      path: newsArchivePath(),
+    });
+    expect(byId.get('news:archive-markdown')).toMatchObject({
+      path: newsArchiveMarkdownPath(),
     });
     expect(byId.get('news:article')).toMatchObject({
       routePattern: articlePattern(),

@@ -64,6 +64,7 @@ describe('news llms', () => {
 
       - Пример HTML-страницы новости: <https://example.com/news/2026/05/event/>
       - Пример Markdown-страницы новости: <https://example.com/news/2026/05/event/index.md>
+      - Архив новостей по годам: <https://example.com/news/archive/>
       - Годовой архив: <https://example.com/news/2026/>
       - Месячный архив: <https://example.com/news/2026/05/>
       - Индекс тегов: <https://example.com/news/tags/>

@@ -18,9 +18,9 @@ import type {
   NewsTagPage,
   NewsYearArchive,
 } from './types';
+import { newsArchiveMarkdownUrl } from './routes';
 import {
   formatNewsArea,
-  formatNewsArchiveSummary,
   formatNewsAuthor,
   formatNewsDate,
   formatNewsMonth,
@@ -181,7 +181,6 @@ const yearLine = (item: NewsYearArchive): MarkdownListItem =>
   md.listItem([
     md.paragraph([
       md.link(abs(item.markdownUrl), `Новости за ${item.year} год`),
-      md.text(` — ${formatNewsArchiveSummary(item.count, item.months.length)}`),
     ]),
   ]);
 
@@ -197,7 +196,6 @@ const tagLine = (item: NewsTagPage): MarkdownListItem =>
 
 export function buildNewsHomeMarkdown(data: NewsDataset): string {
   const latest = [...data.home.pinned, ...data.home.latest];
-  const latestArchive = data.archives.years[0];
   const normalCount = data.articles.length - data.home.pinned.length;
 
   return serialize([
@@ -214,28 +212,39 @@ export function buildNewsHomeMarkdown(data: NewsDataset): string {
           ? `Закрепленные публикации показаны первыми. Для обычных новостей на главной Markdown-странице показываем не больше ${NEWS_LATEST_LIMIT}; более ранние публикации сгруппированы по годам и месяцам.`
           : undefined,
     }),
-    ...(latestArchive
-      ? section('Архив новостей', [yearLine(latestArchive)])
+    ...(data.archives.years.length > 0
+      ? [
+          md.paragraph([
+            md.link(abs(newsArchiveMarkdownUrl()), 'Архив новостей'),
+          ]),
+        ]
       : []),
   ]);
 }
 
+export const buildNewsArchiveMarkdown = (
+  years: readonly NewsYearArchive[],
+): string =>
+  serialize([
+    md.heading(1, 'Архив новостей Шелково'),
+    md.list(
+      years.length > 0
+        ? years.map(yearLine)
+        : [md.listItem('Публикаций пока нет.')],
+    ),
+  ]);
+
 export function buildNewsYearMarkdown(input: {
   readonly archive: NewsYearArchive;
-  readonly years: readonly NewsYearArchive[];
 }): string {
-  const { archive, years } = input;
+  const { archive } = input;
+  const months = [...archive.months].sort((a, b) => a.month - b.month);
 
   return serialize([
     md.heading(1, `Новости Шелково за ${archive.year} год`),
-    md.paragraph(
-      formatNewsArchiveSummary(archive.count, archive.months.length),
-    ),
-    ...(years.length > 1 ? section('Годы', years.map(yearLine)) : []),
-    ...section(
-      `Месяцы ${archive.year} года`,
-      archive.months.length > 0
-        ? archive.months.map(monthLine)
+    md.list(
+      months.length > 0
+        ? months.map(monthLine)
         : [md.listItem('В этом году пока нет публикаций.')],
     ),
   ]);

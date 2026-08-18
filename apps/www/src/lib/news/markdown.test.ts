@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  buildNewsArchiveMarkdown,
   buildNewsArticleMarkdown,
   buildNewsHomeMarkdown,
   buildNewsMonthMarkdown,
@@ -176,37 +177,40 @@ ignored: true
     `);
   });
 
-  it('keeps year archives as month directories without duplicating articles', () => {
+  it('keeps year archives as oldest-first month directories', () => {
     const current = yearArchive(2026, [
       monthArchive(2026, 5),
       monthArchive(2026, 4),
     ]);
-    const previous = yearArchive(2025, [monthArchive(2025, 12)]);
     const markdown = buildNewsYearMarkdown({
       archive: current,
-      years: [current, previous],
     });
 
     expect(markdown).toMatchInlineSnapshot(`
       "# Новости Шелково за 2026 год
 
-      2 публикации за 2 месяца
-
-      ## Годы
-
-      - [Новости за 2026 год](https://kpshelkovo.online/news/2026/index.md) — 2 публикации за 2 месяца
-      - [Новости за 2025 год](https://kpshelkovo.online/news/2025/index.md) — 1 публикация за 1 месяц
-
-      ## Месяцы 2026 года
-
-      - [Май 2026 г.](https://kpshelkovo.online/news/2026/05/index.md) — 1 публикация
       - [Апрель 2026 г.](https://kpshelkovo.online/news/2026/04/index.md) — 1 публикация
+      - [Май 2026 г.](https://kpshelkovo.online/news/2026/05/index.md) — 1 публикация
       "
     `);
     expect(markdown).not.toContain(article().title);
   });
 
-  it('links the home Markdown feed to the latest year archive', () => {
+  it('lists year links in the archive index', () => {
+    const current = yearArchive(2026, [monthArchive(2026, 5)]);
+    const previous = yearArchive(2025, [monthArchive(2025, 12)]);
+
+    expect(buildNewsArchiveMarkdown([current, previous]))
+      .toMatchInlineSnapshot(`
+      "# Архив новостей Шелково
+
+      - [Новости за 2026 год](https://kpshelkovo.online/news/2026/index.md)
+      - [Новости за 2025 год](https://kpshelkovo.online/news/2025/index.md)
+      "
+    `);
+  });
+
+  it('links the home Markdown feed to the archive index', () => {
     const latestArticle = article();
     const month = monthArchive(2026, 5);
     const year = yearArchive(2026, [month]);
@@ -224,7 +228,7 @@ ignored: true
     };
 
     expect(buildNewsHomeMarkdown(data)).toContain(
-      '[Новости за 2026 год](https://kpshelkovo.online/news/2026/index.md)',
+      '[Архив новостей](https://kpshelkovo.online/news/archive/index.md)',
     );
   });
 });

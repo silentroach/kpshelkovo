@@ -5,6 +5,8 @@ import { normalizeTagKey } from './schema';
 
 const NEWS_ROOT = '/news/';
 const NEWS_MARKDOWN = '/news/index.md';
+const NEWS_ARCHIVE_ROOT = '/news/archive/';
+const NEWS_ARCHIVE_MARKDOWN = '/news/archive/index.md';
 const TAGS_ROOT = '/news/tags/';
 const TAGS_MARKDOWN = '/news/tags/index.md';
 const DATA_ARTICLES = '/news/data/articles.json';
@@ -18,6 +20,10 @@ const ARTICLES_OPENAPI = '/news/openapi/articles.openapi.json';
 export const newsPath = (): string => NEWS_ROOT;
 
 export const newsMarkdownPath = (): string => NEWS_MARKDOWN;
+
+export const newsArchivePath = (): string => NEWS_ARCHIVE_ROOT;
+
+export const newsArchiveMarkdownPath = (): string => NEWS_ARCHIVE_MARKDOWN;
 
 export const articlesDataPath = (): string => DATA_ARTICLES;
 
@@ -101,6 +107,11 @@ export const tagMarkdownPattern = (): string => '/news/tags/:tag/index.md';
 export const newsUrl = (): string => withBase(NEWS_ROOT);
 
 export const newsMarkdownUrl = (): string => withBase(NEWS_MARKDOWN);
+
+export const newsArchiveUrl = (): string => withBase(NEWS_ARCHIVE_ROOT);
+
+export const newsArchiveMarkdownUrl = (): string =>
+  withBase(NEWS_ARCHIVE_MARKDOWN);
 
 export const newsCanonical = (): string => canon(NEWS_ROOT);
 

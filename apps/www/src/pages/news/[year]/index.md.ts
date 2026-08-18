@@ -25,10 +25,7 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error(`news year archive "${params.year}" not found`);
   }
 
-  return new Response(
-    buildNewsYearMarkdown({ archive, years: archives.years }),
-    {
-      headers: NEWS_MARKDOWN_HEADERS,
-    },
-  );
+  return new Response(buildNewsYearMarkdown({ archive }), {
+    headers: NEWS_MARKDOWN_HEADERS,
+  });
 };

@@ -10,8 +10,8 @@ import {
 } from '@/lib/breadcrumbs';
 import { loadNewsArchives } from '@/lib/news/load';
 import { collectionPageSchema } from '@/lib/news/seo';
-import { formatNewsArchiveSummary, formatNewsMonth } from '@/lib/news/view';
-import { monthUrl, newsUrl, yearUrl } from '@/lib/news/routes';
+import { formatNewsMonth } from '@/lib/news/view';
+import { newsArchiveUrl, newsUrl, yearUrl } from '@/lib/news/routes';
 
 export const getStaticPaths = (async () => {
   const archives = await loadNewsArchives();
@@ -31,12 +31,10 @@ if (!archive) {
 
 const title = `Новости за ${archive.year} год — Шелково Онлайн`;
 const description = `Архив новостей Шелково за ${archive.year} год с переходами к публикациям каждого месяца.`;
-const archiveSummary = formatNewsArchiveSummary(
-  archive.count,
-  archive.months.length,
-);
+const months = [...archive.months].sort((a, b) => a.month - b.month);
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Новости', href: newsUrl() },
+  { label: 'Архив', href: newsArchiveUrl() },
   { label: String(archive.year) },
 ]);
 
@@ -46,9 +44,10 @@ const schema = collectionPageSchema({
   url: yearUrl(archive.year),
   breadcrumbs: withHomeSchemaBreadcrumbs([
     { name: 'Новости', url: newsUrl() },
+    { name: 'Архив', url: newsArchiveUrl() },
     { name: String(archive.year), url: yearUrl(archive.year) },
   ]),
-  items: archive.months.map((item) => ({
+  items: months.map((item) => ({
     name: formatNewsMonth(item.year, item.month, { capitalize: true }),
     url: item.url,
   })),
@@ -71,75 +70,41 @@ const schema = collectionPageSchema({
       <div class="ui-page-header-stack">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div class="space-y-3">
-          <h1 class="ui-page-title">
-            Новости за {archive.year} год
-          </h1>
-          <p
-            class="ui-copy text-muted-foreground"
-            set:html={formatDynamicHtml(archiveSummary)}
-          />
-        </div>
-
-        {
-          archives.years.length > 1 && (
-            <nav aria-label="Архив новостей по годам" data-pagefind-ignore>
-              <ul class="flex flex-wrap gap-x-5 gap-y-3">
-                {archives.years.map((item) => {
-                  const current = item.year === archive.year;
-
-                  return (
-                    <li>
-                      <a
-                        href={item.url}
-                        aria-current={current ? 'page' : undefined}
-                        class:list={[
-                          'border-b-2 pb-1 text-sm font-semibold',
-                          current
-                            ? 'border-primary text-foreground'
-                            : 'ui-link border-transparent',
-                        ]}
-                      >
-                        {item.year}
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
-            </nav>
-          )
-        }
+        <h1 class="ui-page-title">
+          Новости за {archive.year} год
+        </h1>
       </div>
     </section>
 
-    <section class="mt-8 px-5 md:px-6" aria-labelledby="news-months-title">
+    <section
+      class="mt-8 px-5 md:px-6"
+      aria-label={`Новости за ${archive.year} год по месяцам`}
+    >
       <div class="max-w-3xl">
-        <h2 id="news-months-title" class="ui-section-title">
-          Месяцы {archive.year} года
-        </h2>
-
-        <ul class="mt-5 border-y border-border">
+        <ul class="space-y-1">
           {
-            archive.months.map((item) => (
-              <li class="border-b border-border last:border-b-0">
+            months.map((item) => (
+              <li>
                 <a
-                  href={monthUrl(item.year, item.month)}
+                  href={item.url}
                   class="group -mx-3 flex min-h-16 items-center gap-4 px-3 py-4 transition-colors hover:bg-primary-soft-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                 >
-                  <span class="ui-card-title text-primary transition-colors group-hover:text-primary-hover">
-                    {formatNewsMonth(item.year, item.month, {
-                      capitalize: true,
-                      includeYear: false,
-                    })}
+                  <span class="min-w-0">
+                    <span class="ui-card-title block text-primary transition-colors group-hover:text-primary-hover">
+                      {formatNewsMonth(item.year, item.month, {
+                        capitalize: true,
+                        includeYear: false,
+                      })}
+                    </span>
+                    <span
+                      class="mt-1 block text-sm text-muted-foreground"
+                      set:html={formatDynamicHtml(
+                        count(item.count, ['новость', 'новости', 'новостей']),
+                      )}
+                    />
                   </span>
                   <span
-                    class="ml-auto text-sm font-semibold text-muted-foreground"
-                    set:html={formatDynamicHtml(
-                      count(item.count, ['новость', 'новости', 'новостей']),
-                    )}
-                  />
-                  <span
-                    class="shrink-0 text-xl text-primary transition-colors group-hover:text-primary-hover"
+                    class="ml-auto shrink-0 text-xl text-primary transition-colors group-hover:text-primary-hover"
                     aria-hidden="true"
                   >
                     →
