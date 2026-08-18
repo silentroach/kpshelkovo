@@ -478,7 +478,9 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4 lg:grid-cols-3">
+    <div
+      class="grid grid-cols-1 border-b border-border md:grid-cols-2 md:gap-4 md:border-b-0 lg:grid-cols-3"
+    >
       {#each displayedSettlements as settlement (settlement.slug)}
         <SettlementCard
           {settlement}

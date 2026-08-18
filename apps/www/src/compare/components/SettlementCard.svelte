@@ -29,11 +29,11 @@
 
 <article
   data-testid="settlement-card"
-  class="ui-shell compare-settlement-card grid min-h-full gap-3 p-3.5 md:flex md:flex-col md:p-5"
+  class="ui-shell compare-settlement-card grid min-h-full grid-cols-[minmax(0,1fr)_auto] gap-3 py-3 md:flex md:flex-col md:p-5"
 >
-  <div class="flex items-start justify-between gap-3">
+  <div class="min-w-0 md:flex md:items-start md:justify-between md:gap-3">
     <div class="min-w-0 space-y-1">
-      <h3 class="text-lg font-bold leading-tight text-foreground md:text-xl">
+      <h3 class="text-base font-bold leading-tight text-foreground md:text-xl">
         <Link
           href={withBase(`settlements/${settlement.slug}/`)}
           class="ui-link"
@@ -46,7 +46,7 @@
       </p>
     </div>
     <div
-      class="flex shrink-0 flex-wrap items-center justify-end gap-1.5 text-right"
+      class="mt-1.5 flex flex-wrap items-center gap-1.5 md:mt-0 md:shrink-0 md:justify-end md:text-right"
     >
       {#if settlement.rabstvo}
         <a
@@ -75,12 +75,12 @@
     </div>
   </div>
 
-  <div class="border-t border-border pt-3 md:mt-auto md:border-t-0 md:pt-1">
+  <div class="text-right md:mt-auto md:pt-1 md:text-left">
     <div
-      class="flex items-end justify-between gap-3 md:flex-wrap md:items-baseline md:gap-x-4 md:gap-y-1.5"
+      class="flex flex-col items-end gap-1 md:flex-row md:flex-wrap md:items-baseline md:justify-between md:gap-x-4 md:gap-y-1.5"
     >
       <span
-        class="ui-num text-[1.65rem] font-bold leading-none text-foreground md:text-2xl"
+        class="ui-num whitespace-nowrap text-xl font-bold leading-none text-foreground md:text-2xl"
         title={tariffHint}
       >
         {tariffText}
@@ -109,8 +109,10 @@
 </article>
 
 <style>
-  .compare-settlement-card {
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
+  @media (min-width: 48rem) {
+    .compare-settlement-card {
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+    }
   }
 </style>

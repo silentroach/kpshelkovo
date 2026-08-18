@@ -83,7 +83,7 @@ const schema = {
     <section
       id="settlements"
       aria-labelledby="settlements-title"
-      class="mt-6 space-y-6 px-5 md:px-6"
+      class="mt-6 space-y-6 px-0 md:px-6"
     >
       <h2 id="settlements-title" class="sr-only font-bold">
         Список поселков для сравнения
@@ -91,7 +91,9 @@ const schema = {
       <SettlementsExplorer dataUrl={dataUrl} client:only="svelte" />
 
       <div id="settlements-static">
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div
+          class="grid grid-cols-1 border-b border-border md:grid-cols-2 md:gap-4 md:border-b-0 lg:grid-cols-3"
+        >
           {
             cards.map((settlement) => (
               <SettlementCard
