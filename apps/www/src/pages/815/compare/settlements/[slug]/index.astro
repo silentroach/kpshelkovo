@@ -170,13 +170,13 @@ const heroMap = hasPoint
     <h1 class="sr-only" data-pagefind-body>{settlement.name}</h1>
 
     <div
-      class="relative z-20 mb-4 px-5 md:px-6 lg:absolute lg:inset-x-0 lg:top-6 lg:mb-0"
+      class="relative z-30 mb-4 px-5 md:px-6 lg:absolute lg:inset-x-0 lg:top-6 lg:mb-0"
     >
       <Breadcrumbs items={breadcrumbs} />
     </div>
 
     <section
-      class="hero-bleed relative hidden lg:block"
+      class="hero-bleed relative z-20 hidden lg:block"
       data-testid="settlement-hero"
     >
       <div
@@ -574,7 +574,7 @@ const heroMap = hasPoint
     </header>
 
     <section
-      class="mb-5 px-6 py-0 md:mb-8 md:px-8 lg:hidden"
+      class="relative z-20 mb-5 px-6 py-0 md:mb-8 md:px-8 lg:hidden"
       data-testid="base-info-section"
     >
       <h2 class="sr-only">Паспорт поселка</h2>
