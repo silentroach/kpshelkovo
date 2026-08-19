@@ -60,6 +60,9 @@ export const buildPlaceMarkdown = (place: Place): string =>
       md.listItem(`Категория: ${formatPlaceCategory(place.category)}`),
       md.listItem(`Статус: ${formatPlaceStatus(place.status)}`),
       md.listItem(`Адрес: ${place.address}`),
+      ...(place.openingHours
+        ? [md.listItem(`Время работы: ${place.openingHours.description}`)]
+        : []),
       md.listItem(
         `Координаты: ${place.coordinates.lat}, ${place.coordinates.lng}`,
       ),

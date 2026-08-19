@@ -4,6 +4,7 @@ import type { GetStaticPaths } from 'astro';
 import { formatDynamicHtml } from '@shelkovo/markdown';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 
+import PlaceOpeningHours from '@/components/places/PlaceOpeningHours.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
 import { renderMarkdown } from '@/lib/markdown/render';
@@ -102,6 +103,11 @@ const schema = {
             set:html={addressHtml}
           />
         </div>
+        {
+          place.openingHours ? (
+            <PlaceOpeningHours openingHours={place.openingHours} />
+          ) : null
+        }
         {
           place.evidence ? (
             <div class="grid gap-1 border-t border-border py-4 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4">

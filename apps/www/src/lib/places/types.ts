@@ -4,7 +4,7 @@ import type { PreprocessedSiteMarkdownBody } from '@/lib/markdown/render';
 import type { EntityMentionTarget } from '@/lib/mentions';
 
 import type { RawPlace } from './raw-schema';
-import type { PlaceCategory, PlaceStatus } from './schema';
+import type { PlaceCategory, PlaceStatus, PlaceWeekday } from './schema';
 
 export type PlaceEntry = Pick<CollectionEntry<'places'>, 'id' | 'body'> & {
   readonly data: RawPlace;
@@ -26,6 +26,17 @@ export interface PlaceEvidence {
   readonly checkedIso: string;
 }
 
+export interface PlaceOpeningHoursPeriod {
+  readonly days: readonly PlaceWeekday[];
+  readonly opensAt: string;
+  readonly closesAt: string;
+}
+
+export interface PlaceOpeningHours {
+  readonly description: string;
+  readonly periods: readonly PlaceOpeningHoursPeriod[];
+}
+
 export interface Place {
   readonly slug: string;
   readonly name: string;
@@ -37,6 +48,7 @@ export interface Place {
   readonly address: string;
   readonly coordinates: PlaceCoordinates;
   readonly mapUrl: string;
+  readonly openingHours?: PlaceOpeningHours;
   readonly contact?: PlaceContact;
   readonly evidence?: PlaceEvidence;
   readonly updatedAt: Date;

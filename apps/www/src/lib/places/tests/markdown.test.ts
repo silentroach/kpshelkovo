@@ -16,6 +16,16 @@ const place: Place = {
   address: 'Шелково Форест, Берёзовая улица, 21А',
   coordinates: { lat: 55.060526, lng: 37.716242 },
   mapUrl: 'https://yandex.ru/navi/-/CTfgq-5r',
+  openingHours: {
+    description: 'С 10:00 до 22:00, вторник — выходной',
+    periods: [
+      {
+        days: ['mon', 'wed', 'thu', 'fri', 'sat', 'sun'],
+        opensAt: '10:00',
+        closesAt: '22:00',
+      },
+    ],
+  },
   contact: {
     id: 'food/burzhuyka',
     url: '/sarafan/food/burzhuyka/',

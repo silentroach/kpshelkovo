@@ -13,6 +13,16 @@ const place = {
     address: 'Шелково Форест, Берёзовая улица, 21А',
     coordinates: { lat: 55.060526, lng: 37.716242 },
   },
+  opening_hours: {
+    description: 'С 10:00 до 22:00, вторник — выходной',
+    periods: [
+      {
+        days: ['mon', 'wed', 'thu', 'fri', 'sat', 'sun'],
+        opens_at: '10:00',
+        closes_at: '22:00',
+      },
+    ],
+  },
   contact: 'food/burzhuyka',
 } as const;
 
@@ -29,6 +39,23 @@ describe('RawPlaceSchema', () => {
             "lng": 37.716242,
           },
           "map_url": "https://yandex.ru/navi/-/CTfgq-5r",
+        },
+        "opening_hours": {
+          "description": "С 10:00 до 22:00, вторник — выходной",
+          "periods": [
+            {
+              "closes_at": "22:00",
+              "days": [
+                "mon",
+                "wed",
+                "thu",
+                "fri",
+                "sat",
+                "sun",
+              ],
+              "opens_at": "10:00",
+            },
+          ],
         },
         "status": "existing",
         "summary": "Фудтрак в Шелково Форест",

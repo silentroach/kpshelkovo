@@ -6,6 +6,7 @@
     loadYandexMaps,
     waitForStableLayout,
   } from '@/lib/yandex-maps/runtime';
+  import { isPlaceOpen } from '@/lib/places/opening-hours';
   import { PLACE_MAP_BOUNDS } from '@/lib/places/schema';
   import type { Place } from '@/lib/places/types';
   import { formatPlaceStatus } from '@/lib/places/view';
@@ -36,10 +37,27 @@
     link.className = 'place-map-marker';
     link.href = place.url;
     link.dataset.status = place.status;
+    const isOpen = place.openingHours
+      ? isPlaceOpen(place.openingHours)
+      : undefined;
+
+    if (isOpen !== undefined) {
+      link.dataset.open = String(isOpen);
+    }
+
     const status =
       place.status === 'existing' ? '' : `, ${formatPlaceStatus(place.status)}`;
-    link.setAttribute('aria-label', `Открыть место «${place.name}»${status}`);
-    link.title = `${place.name}${status}`;
+    let openingStatus = '';
+
+    if (isOpen !== undefined) {
+      openingStatus = isOpen ? ', открыто сейчас' : ', сейчас закрыто';
+    }
+
+    link.setAttribute(
+      'aria-label',
+      `Открыть место «${place.name}»${status}${openingStatus}`,
+    );
+    link.title = `${place.name}${status}${openingStatus}`;
     link.addEventListener('click', (event) => event.stopPropagation());
     link.addEventListener('keydown', (event) => {
       if (event.key !== ' ') return;
@@ -215,7 +233,9 @@
     --ui-map-marker-border: 0.1875rem solid var(--color-surface-raised);
 
     flex: none;
-    transition: transform 0.15s ease;
+    transition:
+      filter 0.15s ease,
+      transform 0.15s ease;
   }
 
   :global(.place-map-marker:is(:hover, :focus-visible)) {
@@ -230,6 +250,10 @@
 
   :global(.place-map-marker:focus-visible) {
     box-shadow: 0 0 0 0.1875rem var(--color-ring);
+  }
+
+  :global(.place-map-marker[data-open='false'] .place-map-marker-point) {
+    filter: grayscale(1);
   }
 
   :global(.place-map-marker[data-status='planned'] .place-map-marker-point) {

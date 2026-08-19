@@ -34,6 +34,16 @@ export const mapRawPlace = (
     address: entry.data.location.address,
     coordinates: entry.data.location.coordinates,
     mapUrl: entry.data.location.map_url,
+    openingHours: entry.data.opening_hours
+      ? {
+          description: entry.data.opening_hours.description,
+          periods: entry.data.opening_hours.periods.map((period) => ({
+            days: period.days,
+            opensAt: period.opens_at,
+            closesAt: period.closes_at,
+          })),
+        }
+      : undefined,
     contact: opts?.contact,
     evidence: entry.data.evidence
       ? {

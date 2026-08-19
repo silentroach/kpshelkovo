@@ -1,0 +1,75 @@
+---
+import { formatDynamicHtml } from '@shelkovo/markdown';
+
+import type { PlaceOpeningHours } from '@/lib/places/types';
+
+interface Props {
+  readonly openingHours: PlaceOpeningHours;
+}
+
+const { openingHours } = Astro.props;
+const descriptionHtml = formatDynamicHtml(openingHours.description);
+---
+
+<div
+  class="grid gap-1 border-t border-border py-4 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4"
+>
+  <dt class="text-sm font-semibold leading-7 text-muted-foreground">
+    Время работы
+  </dt>
+  <dd class="flex flex-wrap items-center gap-x-3 gap-y-2">
+    <span
+      class="ui-num text-base leading-7 text-foreground"
+      set:html={descriptionHtml}
+    />
+    <place-opening-hours data-opening-hours={JSON.stringify(openingHours)}>
+      <span
+        data-place-opening-status
+        data-open="false"
+        class="whitespace-nowrap rounded-full border border-border bg-[color:var(--color-surface-muted)] px-2.5 py-1 text-xs font-semibold leading-5 text-muted-foreground data-[open=true]:border-success-border data-[open=true]:bg-success-soft data-[open=true]:text-success-text"
+        aria-live="polite"
+        hidden></span>
+    </place-opening-hours>
+  </dd>
+</div>
+
+<script>
+  import { isPlaceOpen } from '@/lib/places/opening-hours';
+  import type { PlaceOpeningHours } from '@/lib/places/types';
+
+  class PlaceOpeningHoursElement extends HTMLElement {
+    updateTimer?: number;
+
+    connectedCallback(): void {
+      const value = this.dataset.openingHours;
+      const status = this.querySelector<HTMLElement>(
+        '[data-place-opening-status]',
+      );
+
+      if (!value || !status) return;
+
+      const openingHours = JSON.parse(value) as PlaceOpeningHours;
+      const update = (): void => {
+        const open = isPlaceOpen(openingHours);
+
+        status.dataset.open = String(open);
+        status.textContent = open ? 'Открыто сейчас' : 'Сейчас закрыто';
+        status.hidden = false;
+      };
+
+      update();
+      this.updateTimer = window.setInterval(update, 60_000);
+    }
+
+    disconnectedCallback(): void {
+      if (this.updateTimer === undefined) return;
+
+      window.clearInterval(this.updateTimer);
+      this.updateTimer = undefined;
+    }
+  }
+
+  if (!customElements.get('place-opening-hours')) {
+    customElements.define('place-opening-hours', PlaceOpeningHoursElement);
+  }
+</script>

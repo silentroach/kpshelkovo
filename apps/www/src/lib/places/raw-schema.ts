@@ -7,6 +7,8 @@ import {
   PLACE_CATEGORIES,
   PLACE_MAP_BOUNDS,
   PLACE_STATUSES,
+  PLACE_TIME,
+  PLACE_WEEKDAYS,
 } from './schema';
 
 const nonBlankText = z.string().trim().min(1);
@@ -100,6 +102,29 @@ const evidence = z
   })
   .strict();
 
+const placeTime = nonBlankText.regex(PLACE_TIME, {
+  message: 'time must use HH:mm',
+});
+
+const openingHoursPeriod = z
+  .object({
+    days: z.array(z.enum(PLACE_WEEKDAYS)).min(1),
+    opens_at: placeTime,
+    closes_at: placeTime,
+  })
+  .strict()
+  .refine(({ opens_at, closes_at }) => opens_at < closes_at, {
+    path: ['closes_at'],
+    message: 'opening-hours periods must start before they end',
+  });
+
+const openingHours = z
+  .object({
+    description: nonBlankText,
+    periods: z.array(openingHoursPeriod).min(1),
+  })
+  .strict();
+
 export const RawPlaceSchema = z
   .object({
     title: nonBlankText,
@@ -108,6 +133,7 @@ export const RawPlaceSchema = z
     updated_at: placeDate('updated_at'),
     summary: nonBlankText,
     location,
+    opening_hours: openingHours.optional(),
     contact: nonBlankText
       .refine(isContactReference, {
         message: 'contact must use a known category and slug: category/slug',

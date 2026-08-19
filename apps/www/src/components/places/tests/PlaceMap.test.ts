@@ -31,6 +31,16 @@ const place: Place = {
   address: 'Шелково Форест, Берёзовая улица, 21А',
   coordinates: { lat: 55.060526, lng: 37.716242 },
   mapUrl: 'https://yandex.ru/navi/-/CTfgq-5r',
+  openingHours: {
+    description: 'С 10:00 до 22:00, вторник — выходной',
+    periods: [
+      {
+        days: ['mon', 'wed', 'thu', 'fri', 'sat', 'sun'],
+        opensAt: '10:00',
+        closesAt: '22:00',
+      },
+    ],
+  },
   contact: {
     id: 'food/burzhuyka',
     url: '/sarafan/food/burzhuyka/',
@@ -75,6 +85,8 @@ const installYandexMaps = (): void => {
 describe('PlaceMap', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-08-18T12:00:00.000Z'));
     markerElements.length = 0;
     schemeLayerProps.length = 0;
     mapProps.length = 0;
@@ -83,6 +95,7 @@ describe('PlaceMap', () => {
 
   afterEach(() => {
     cleanup();
+    vi.useRealTimers();
     vi.unstubAllGlobals();
   });
 
@@ -95,11 +108,12 @@ describe('PlaceMap', () => {
 
     expect(markerElements[0]).toMatchInlineSnapshot(`
       <a
-        aria-label="Открыть место «Буржуйка»"
+        aria-label="Открыть место «Буржуйка», сейчас закрыто"
         class="place-map-marker"
+        data-open="false"
         data-status="existing"
         href="/places/burzhuyka/"
-        title="Буржуйка"
+        title="Буржуйка, сейчас закрыто"
       >
         <span
           aria-hidden="true"

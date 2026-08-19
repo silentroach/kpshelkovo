@@ -15,6 +15,16 @@ const rawPlace = (overrides?: Partial<RawPlace>): RawPlace => ({
     address: 'Шелково Форест, Берёзовая улица, 21А',
     coordinates: { lat: 55.060526, lng: 37.716242 },
   },
+  opening_hours: {
+    description: 'С 10:00 до 22:00, вторник — выходной',
+    periods: [
+      {
+        days: ['mon', 'wed', 'thu', 'fri', 'sat', 'sun'],
+        opens_at: '10:00',
+        closes_at: '22:00',
+      },
+    ],
+  },
   contact: 'food/burzhuyka',
   ...overrides,
 });
@@ -57,6 +67,23 @@ describe('buildPlacesDataset', () => {
         "markdownUrl": "/places/burzhuyka/index.md",
         "mentions": [],
         "name": "Буржуйка",
+        "openingHours": {
+          "description": "С 10:00 до 22:00, вторник — выходной",
+          "periods": [
+            {
+              "closesAt": "22:00",
+              "days": [
+                "mon",
+                "wed",
+                "thu",
+                "fri",
+                "sat",
+                "sun",
+              ],
+              "opensAt": "10:00",
+            },
+          ],
+        },
         "slug": "burzhuyka",
         "status": "existing",
         "summary": "Фудтрак в Шелково Форест",
@@ -78,9 +105,19 @@ describe('buildPlacesDataset', () => {
 
   it('loads a standalone place without a contact', () => {
     const data = buildPlacesDataset([
-      entry({ data: rawPlace({ contact: undefined }) }),
+      entry({
+        data: rawPlace({ contact: undefined, opening_hours: undefined }),
+      }),
     ]);
 
-    expect(data.places[0]?.contact).toBeUndefined();
+    expect({
+      contact: data.places[0]?.contact,
+      openingHours: data.places[0]?.openingHours,
+    }).toMatchInlineSnapshot(`
+      {
+        "contact": undefined,
+        "openingHours": undefined,
+      }
+    `);
   });
 });
