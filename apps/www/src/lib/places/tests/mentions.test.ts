@@ -12,8 +12,6 @@ const place = (mentions: Place['mentions'] = [target]) => ({
   name: 'Буржуйка',
   body: 'Первый абзац с [Кирилл Щемелинин](/people/kschemelinin/).\n\nВторой абзац.',
   mentions,
-  updatedAt: new Date('2026-08-11T00:00:00.000Z'),
-  updatedIso: '2026-08-11',
   url: '/map/burzhuyka/',
   markdownUrl: '/map/burzhuyka/index.md',
 });
@@ -26,8 +24,6 @@ describe('createPlaceMentionRefs', () => {
           "excerpt": "Первый абзац с Кирилл Щемелинин.",
           "htmlUrl": "/map/burzhuyka/",
           "markdownUrl": "/map/burzhuyka/index.md",
-          "mentionedAt": "2026-08-11T00:00:00.000Z",
-          "sortKey": 1786406400000,
           "source": {
             "id": "burzhuyka",
             "kind": "place",

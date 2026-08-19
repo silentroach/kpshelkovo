@@ -9,7 +9,6 @@ const rawPlace = (overrides?: Partial<RawPlace>): RawPlace => ({
   category: 'food',
   marker: 'foodtruck',
   status: 'existing',
-  updated_at: '2026-08-11',
   summary: 'Фудтрак в Шелково Форест',
   location: {
     map_url: 'https://yandex.ru/navi/-/CTfgq-5r',
@@ -44,12 +43,7 @@ describe('buildPlacesDataset', () => {
     });
     const place = data.places[0];
 
-    expect(
-      place && {
-        ...place,
-        updatedAt: place.updatedAt.toISOString(),
-      },
-    ).toMatchInlineSnapshot(`
+    expect(place).toMatchInlineSnapshot(`
       {
         "address": "Шелково Форест, Берёзовая улица, 21А",
         "body": "Описание **места**.",
@@ -63,7 +57,6 @@ describe('buildPlacesDataset', () => {
           "lat": 55.060526,
           "lng": 37.716242,
         },
-        "evidence": undefined,
         "mapUrl": "https://yandex.ru/navi/-/CTfgq-5r",
         "markdownUrl": "/map/burzhuyka/index.md",
         "marker": "foodtruck",
@@ -89,8 +82,6 @@ describe('buildPlacesDataset', () => {
         "slug": "burzhuyka",
         "status": "existing",
         "summary": "Фудтрак в Шелково Форест",
-        "updatedAt": "2026-08-11T00:00:00.000Z",
-        "updatedIso": "2026-08-11",
         "url": "/map/burzhuyka/",
       }
     `);
@@ -105,19 +96,29 @@ describe('buildPlacesDataset', () => {
     );
   });
 
-  it('loads a standalone place without a contact', () => {
+  it('loads a standalone place with a generated map URL', () => {
     const data = buildPlacesDataset([
       entry({
-        data: rawPlace({ contact: undefined, opening_hours: undefined }),
+        data: rawPlace({
+          contact: undefined,
+          location: {
+            coordinates: { lat: 55.060703, lng: 37.746894 },
+          },
+          opening_hours: undefined,
+        }),
       }),
     ]);
 
     expect({
+      address: data.places[0]?.address,
       contact: data.places[0]?.contact,
+      mapUrl: data.places[0]?.mapUrl,
       openingHours: data.places[0]?.openingHours,
     }).toMatchInlineSnapshot(`
       {
+        "address": undefined,
         "contact": undefined,
+        "mapUrl": "https://yandex.ru/maps/?pt=37.746894,55.060703&z=18&l=map",
         "openingHours": undefined,
       }
     `);

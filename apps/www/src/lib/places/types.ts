@@ -25,12 +25,6 @@ export interface PlaceContact {
   readonly url: string;
 }
 
-export interface PlaceEvidence {
-  readonly sourceUrl: string;
-  readonly checkedAt: Date;
-  readonly checkedIso: string;
-}
-
 export interface PlaceOpeningHoursPeriod {
   readonly days: readonly PlaceWeekday[];
   readonly opensAt: string;
@@ -51,14 +45,11 @@ export interface Place {
   readonly summary: string;
   readonly body: PreprocessedSiteMarkdownBody;
   readonly mentions: readonly EntityMentionTarget[];
-  readonly address: string;
+  readonly address?: string;
   readonly coordinates: PlaceCoordinates;
   readonly mapUrl: string;
   readonly openingHours?: PlaceOpeningHours;
   readonly contact?: PlaceContact;
-  readonly evidence?: PlaceEvidence;
-  readonly updatedAt: Date;
-  readonly updatedIso: string;
   readonly url: string;
   readonly markdownUrl: string;
   readonly canonical: string;

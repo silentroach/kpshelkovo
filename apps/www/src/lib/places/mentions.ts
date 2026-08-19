@@ -7,14 +7,7 @@ import type { Place } from './types';
 
 type PlaceMentionRefSource = Pick<
   Place,
-  | 'body'
-  | 'markdownUrl'
-  | 'mentions'
-  | 'name'
-  | 'slug'
-  | 'updatedAt'
-  | 'updatedIso'
-  | 'url'
+  'body' | 'markdownUrl' | 'mentions' | 'name' | 'slug' | 'url'
 >;
 
 const SPACE = /\s+/gu;
@@ -38,6 +31,4 @@ export const createPlaceMentionRefs = (
     htmlUrl: place.url,
     markdownUrl: place.markdownUrl,
     excerpt: excerpt(place.body),
-    mentionedAt: `${place.updatedIso}T00:00:00.000Z`,
-    sortKey: place.updatedAt.valueOf(),
   });

@@ -1,7 +1,4 @@
-import { formatDate } from '@shelkovo/format';
-
 import type { PlaceCategory, PlaceStatus } from './schema';
-import type { PlaceEvidence } from './types';
 
 const PLACE_CATEGORY_LABELS = {
   entrance: 'Въезды',
@@ -26,6 +23,3 @@ const PLACE_STATUS_LABELS = {
 
 export const formatPlaceStatus = (status: PlaceStatus): string =>
   PLACE_STATUS_LABELS[status];
-
-export const formatPlaceEvidenceDate = (evidence: PlaceEvidence): string =>
-  formatDate(evidence.checkedIso);

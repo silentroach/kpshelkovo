@@ -30,8 +30,6 @@ const place: Place = {
     id: 'food/burzhuyka',
     url: '/sarafan/food/burzhuyka/',
   },
-  updatedAt: new Date('2026-08-11T00:00:00.000Z'),
-  updatedIso: '2026-08-11',
   url: '/map/burzhuyka/',
   markdownUrl: '/map/burzhuyka/index.md',
   canonical: 'https://kpshelkovo.online/map/burzhuyka/',
@@ -62,19 +60,14 @@ describe('places Markdown', () => {
     expect(markdown).not.toMatch(/apps\/www|src\/|repo:/u);
   });
 
-  it('publishes the status and source of a future place', () => {
+  it('omits a missing optional address', () => {
     const markdown = buildPlaceMarkdown({
       ...place,
+      address: undefined,
       status: 'planned',
-      evidence: {
-        sourceUrl: 'https://example.com/source',
-        checkedAt: new Date('2026-08-12T00:00:00.000Z'),
-        checkedIso: '2026-08-12',
-      },
     });
 
     expect(markdown).toContain('Статус: Планируется');
-    expect(markdown).toContain('https://example.com/source');
-    expect(markdown).toContain('12 августа 2026');
+    expect(markdown).not.toContain('Адрес:');
   });
 });

@@ -2,14 +2,13 @@
 
 - Один Markdown-файл в этой папке равен одному месту на карте.
 - Имя файла без `.md` задает канонический `slug`; отдельное поле `slug` во frontmatter не нужно.
-- Обязательные поля: `title`, `category`, `status`, `updated_at`, `summary` и `location`.
-- В `location` хранить `map_url`, понятный `address` и точные `coordinates` с числовыми `lat` и `lng`.
-- `map_url` должен быть HTTPS-ссылкой вида `https://yandex.ru/maps…` или `https://yandex.ru/navi…`; ссылки на другие продукты и домены не принимаются.
+- Обязательные поля: `title`, `category`, `status`, `summary` и `location`.
+- В `location` хранить точные `coordinates` с числовыми `lat` и `lng`; `map_url` и понятный `address` необязательны.
+- Если `map_url` не указан, ссылка на Яндекс Карты строится из координат. Явный `map_url` должен быть HTTPS-ссылкой вида `https://yandex.ru/maps…` или `https://yandex.ru/navi…`; ссылки на другие продукты и домены не принимаются.
 - `location.coordinates` задает основную точку места и будущую точку подписи. Линии и полигоны добавлять как GeoJSON features или соседний `[slug].geojson`, когда появится их renderer; не кодировать сложную геометрию произвольными полями frontmatter.
 - Поддерживаемые категории: `entrance`, `children`, `sport`, `walking`, `food`, `services`, `nature`, `water`, `infrastructure`.
 - `marker` — необязательный кастомный маркер. Без него карта рисует стандартную точку; сейчас поддерживаются `foodtruck`, `titanic` и `construction`.
 - Поддерживаемые статусы: `existing`, `planned`, `underConstruction`.
-- Для `planned` и `underConstruction` обязателен блок `evidence` с `source_url` и `checked_at`.
 - Не публиковать точные координаты частных домов и чувствительной инфраструктуры без отдельного редакционного решения.
 - `contact` — необязательная ссылка на существующую подробную карточку «Сарафана» в формате `category/slug`. Место остается источником истины для названия, описания, адреса и координат.
 - `opening_hours` — необязательное время работы по часовому поясу `Europe/Moscow`: видимый текст хранить в `description`, а интервалы — в `periods` с днями `mon`–`sun` и временем `HH:mm`. Один интервал должен начинаться и заканчиваться в пределах одного дня.

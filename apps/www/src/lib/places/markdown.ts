@@ -9,11 +9,7 @@ import { absoluteUrl } from '@/lib/site';
 
 import { placesMarkdownUrl, placesUrl } from './routes';
 import type { Place } from './types';
-import {
-  formatPlaceCategory,
-  formatPlaceEvidenceDate,
-  formatPlaceStatus,
-} from './view';
+import { formatPlaceCategory, formatPlaceStatus } from './view';
 
 export const PLACES_MARKDOWN_HEADERS = {
   'Content-Type': 'text/markdown; charset=utf-8',
@@ -59,26 +55,14 @@ export const buildPlaceMarkdown = (place: Place): string =>
     md.list([
       md.listItem(`Категория: ${formatPlaceCategory(place.category)}`),
       md.listItem(`Статус: ${formatPlaceStatus(place.status)}`),
-      md.listItem(`Адрес: ${place.address}`),
+      ...(place.address ? [md.listItem(`Адрес: ${place.address}`)] : []),
       ...(place.openingHours
         ? [md.listItem(`Время работы: ${place.openingHours.description}`)]
         : []),
       md.listItem(
         `Координаты: ${place.coordinates.lat}, ${place.coordinates.lng}`,
       ),
-      md.listItem(`Обновлено: ${place.updatedIso}`),
     ]),
-    ...(place.evidence
-      ? [
-          md.heading(2, 'Источник статуса'),
-          md.paragraph([
-            md.link(place.evidence.sourceUrl, 'Открыть источник'),
-            md.text(
-              `; сведения проверены ${formatPlaceEvidenceDate(place.evidence)}.`,
-            ),
-          ]),
-        ]
-      : []),
     md.heading(2, 'Ссылки'),
     md.list([
       md.listItem([

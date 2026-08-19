@@ -3,7 +3,6 @@ import { z } from 'astro/zod';
 import { CONTACT_CATEGORIES, CONTACT_SLUG } from '@/lib/contacts/schema';
 
 import {
-  isPlaceCalendarDate,
   PLACE_CATEGORIES,
   PLACE_MAP_BOUNDS,
   PLACE_MARKERS,
@@ -47,23 +46,6 @@ const yandexMapUrl = httpsUrl.refine(isYandexMapUrl, {
   message: 'map_url must point to Yandex Maps',
 });
 
-const placeDate = (name: string) =>
-  z.union([nonBlankText, z.date()]).transform((value, ctx) => {
-    const normalized =
-      value instanceof Date ? value.toISOString().slice(0, 10) : value;
-
-    if (isPlaceCalendarDate(normalized)) {
-      return normalized;
-    }
-
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `${name} must use YYYY-MM-DD`,
-    });
-
-    return z.NEVER;
-  });
-
 const contactCategories = new Set<string>(CONTACT_CATEGORIES);
 const isContactReference = (value: string): boolean => {
   const [category, slug, ...rest] = value.split('/');
@@ -92,16 +74,9 @@ const coordinates = z
 
 const location = z
   .object({
-    map_url: yandexMapUrl,
-    address: nonBlankText,
+    map_url: yandexMapUrl.optional(),
+    address: nonBlankText.optional(),
     coordinates,
-  })
-  .strict();
-
-const evidence = z
-  .object({
-    source_url: httpsUrl,
-    checked_at: placeDate('evidence.checked_at'),
   })
   .strict();
 
@@ -134,7 +109,6 @@ export const RawPlaceSchema = z
     category: z.enum(PLACE_CATEGORIES),
     marker: z.enum(PLACE_MARKERS).optional(),
     status: z.enum(PLACE_STATUSES),
-    updated_at: placeDate('updated_at'),
     summary: nonBlankText,
     location,
     opening_hours: openingHours.optional(),
@@ -143,19 +117,7 @@ export const RawPlaceSchema = z
         message: 'contact must use a known category and slug: category/slug',
       })
       .optional(),
-    evidence: evidence.optional(),
   })
-  .strict()
-  .superRefine((place, ctx) => {
-    if (place.status === 'existing' || place.evidence) {
-      return;
-    }
-
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['evidence'],
-      message: 'planned and under-construction places require evidence',
-    });
-  });
+  .strict();
 
 export type RawPlace = z.output<typeof RawPlaceSchema>;

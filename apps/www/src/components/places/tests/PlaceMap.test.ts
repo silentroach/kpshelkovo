@@ -5,19 +5,35 @@ import {
   screen,
   waitFor,
 } from '@testing-library/svelte';
+import type { YMapClustererProps } from '@yandex/ymaps3-clusterer';
+import type { MapEventUpdateHandler } from '@yandex/ymaps3-types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Place } from '@/lib/places/types';
 
 import PlaceMap from '../PlaceMap.svelte';
 
+const clustererProps = vi.hoisted(() => [] as YMapClustererProps[]);
+
+vi.mock('@yandex/ymaps3-clusterer', () => ({
+  YMapClusterer: vi.fn(function YMapClusterer(props: YMapClustererProps) {
+    clustererProps.push(props);
+    for (const feature of props.features) props.marker(feature);
+    return {};
+  }),
+  clusterByGrid: vi.fn(() => ({ render: vi.fn() })),
+}));
+
 const map = {
   addChild: vi.fn(),
   removeChild: vi.fn(),
   update: vi.fn(),
   destroy: vi.fn(),
+  zoom: 15,
 };
 const markerElements: HTMLElement[] = [];
+const mapElements: HTMLElement[] = [];
+const mapUpdateHandlers: MapEventUpdateHandler[] = [];
 const schemeLayerProps: unknown[] = [];
 const mapProps: {
   readonly behaviors?: readonly string[];
@@ -51,8 +67,6 @@ const place: Place = {
     id: 'food/burzhuyka',
     url: '/sarafan/food/burzhuyka/',
   },
-  updatedAt: new Date('2026-08-11T00:00:00.000Z'),
-  updatedIso: '2026-08-11',
   url: '/map/burzhuyka/',
   markdownUrl: '/map/burzhuyka/index.md',
   canonical: 'https://kpshelkovo.online/map/burzhuyka/',
@@ -76,9 +90,10 @@ const installYandexMaps = (): void => {
     value: {
       ready: Promise.resolve(),
       YMap: vi.fn(function YMap(
-        _: HTMLElement,
+        element: HTMLElement,
         props: (typeof mapProps)[number],
       ) {
+        mapElements.push(element);
         mapProps.push(props);
         return map;
       }),
@@ -89,6 +104,12 @@ const installYandexMaps = (): void => {
         return {};
       }),
       YMapDefaultFeaturesLayer: vi.fn(function YMapDefaultFeaturesLayer() {
+        return {};
+      }),
+      YMapListener: vi.fn(function YMapListener(props: {
+        readonly onUpdate?: MapEventUpdateHandler;
+      }) {
+        if (props.onUpdate) mapUpdateHandlers.push(props.onUpdate);
         return {};
       }),
       YMapMarker: vi.fn(function YMapMarker(_: unknown, element: HTMLElement) {
@@ -105,6 +126,9 @@ describe('PlaceMap', () => {
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-08-18T12:00:00.000Z'));
     markerElements.length = 0;
+    mapElements.length = 0;
+    mapUpdateHandlers.length = 0;
+    clustererProps.length = 0;
     schemeLayerProps.length = 0;
     mapProps.length = 0;
     installYandexMaps();
@@ -188,6 +212,7 @@ describe('PlaceMap', () => {
             slug: 'construction',
             name: 'Строительство',
             marker: 'construction',
+            status: 'underConstruction',
           },
         ],
       },
@@ -226,7 +251,7 @@ describe('PlaceMap', () => {
           "imageClass": "place-map-marker-image",
           "imageDimensions": [
             144,
-            128,
+            137,
           ],
           "imageFile": "Titanic.png",
           "marker": "titanic",
@@ -244,6 +269,15 @@ describe('PlaceMap', () => {
           "usesDefaultPoint": false,
         },
       ]
+    `);
+    expect({
+      ariaLabel: markerElements[2]?.getAttribute('aria-label'),
+      title: markerElements[2]?.title,
+    }).toMatchInlineSnapshot(`
+      {
+        "ariaLabel": "Открыть место «Строительство», Строится, сейчас закрыто",
+        "title": "Строительство",
+      }
     `);
     expect(mapProps[0]?.location.bounds).toMatchInlineSnapshot(`
       [
@@ -309,6 +343,125 @@ describe('PlaceMap', () => {
 
     view.unmount();
     expect(clearInterval).toHaveBeenCalledWith(timer);
+  });
+
+  it('shrinks marker graphics smoothly while preserving their hit areas', async () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+
+    render(PlaceMap, { props: { places: [place] } });
+
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+
+    const mapElement = mapElements[0];
+    const update = mapUpdateHandlers[0];
+
+    if (!mapElement || !update)
+      throw new Error('map update listener is missing');
+
+    const scales = [
+      mapElement.style.getPropertyValue('--place-map-marker-scale'),
+    ];
+    for (const zoom of [13.5, 16]) {
+      update({
+        type: 'update',
+        location: {
+          center: [37.74, 55.06],
+          zoom,
+          bounds: [
+            [37.7, 55.04],
+            [37.77, 55.08],
+          ],
+        },
+        camera: {},
+        mapInAction: false,
+      });
+      scales.push(
+        mapElement.style.getPropertyValue('--place-map-marker-scale'),
+      );
+    }
+
+    expect(scales).toMatchInlineSnapshot(`
+      [
+        "0.850",
+        "0.625",
+        "1.000",
+      ]
+    `);
+  });
+
+  it('renders an accessible cluster that zooms to its places', async () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+
+    render(PlaceMap, { props: { places: [place, titanicPlace] } });
+
+    await waitFor(() => expect(clustererProps).toHaveLength(1));
+
+    const props = clustererProps[0];
+
+    if (!props) throw new Error('clusterer props are missing');
+
+    props.cluster([37.731568, 55.060615], props.features);
+    const cluster = markerElements.at(-1);
+
+    expect(cluster).toMatchInlineSnapshot(`
+      <button
+        aria-label="2 места рядом. Приблизить карту"
+        class="place-map-cluster"
+        data-place-ids="burzhuyka titanic"
+        title="2 места рядом"
+        type="button"
+      >
+        2
+      </button>
+    `);
+
+    const mapElement = mapElements[0];
+    const marker = markerElements[0];
+    const update = mapUpdateHandlers[0];
+
+    if (!cluster || !mapElement || !marker || !update) {
+      throw new Error('cluster focus fixtures are missing');
+    }
+
+    mapElement.append(cluster);
+
+    await fireEvent.click(cluster, { detail: 1 });
+
+    expect(map.update).toHaveBeenLastCalledWith({
+      location: {
+        bounds: [
+          [37.707046, 55.060473],
+          [37.75609, 55.060756],
+        ],
+        duration: 220,
+        easing: 'ease-in-out',
+      },
+      margin: [112, 80, 32, 80],
+    });
+
+    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    await fireEvent.click(cluster, { detail: 1 });
+
+    expect(map.update.mock.lastCall?.[0].location.duration).toBe(0);
+
+    cluster.focus();
+    await fireEvent.click(cluster, { detail: 0 });
+    cluster.replaceWith(marker);
+    update({
+      type: 'update',
+      location: {
+        center: [37.74, 55.06],
+        zoom: 16,
+        bounds: [
+          [37.7, 55.04],
+          [37.77, 55.08],
+        ],
+      },
+      camera: {},
+      mapInAction: false,
+    });
+
+    await waitFor(() => expect(document.activeElement).toBe(marker));
   });
 
   it('shows the fallback when the loaded API global is missing', async () => {

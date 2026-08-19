@@ -10,11 +10,7 @@ import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
 import { renderMarkdown } from '@/lib/markdown/render';
 import { loadPlace, loadPlaces } from '@/lib/places/load';
 import { placesUrl } from '@/lib/places/routes';
-import {
-  formatPlaceCategory,
-  formatPlaceEvidenceDate,
-  formatPlaceStatus,
-} from '@/lib/places/view';
+import { formatPlaceCategory } from '@/lib/places/view';
 import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
 
@@ -37,12 +33,16 @@ if (!place) {
 }
 
 const title = `${place.name} — Карта — Шелково Онлайн`;
-const description = `${place.summary}. Адрес: ${place.address}.`;
+const description = place.address
+  ? `${place.summary}. Адрес: ${place.address}.`
+  : `${place.summary}.`;
 const summaryHtml = formatDynamicHtml(place.summary);
 const bodyHtml = place.body ? renderMarkdown(place.body) : undefined;
-const addressHtml = formatDynamicHtml(place.address);
-const category = formatPlaceCategory(place.category);
-const status = formatPlaceStatus(place.status);
+const addressHtml = place.address
+  ? formatDynamicHtml(place.address)
+  : undefined;
+const displayName =
+  place.status === 'underConstruction' ? `🚧 ${place.name}` : place.name;
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Карта', href: placesUrl() },
   { label: place.name },
@@ -52,6 +52,7 @@ const search = {
   title: place.name,
   description,
   section: SEARCH_SECTIONS.places,
+  aliases: [formatPlaceCategory(place.category)],
 } satisfies SearchDocument;
 const schema = {
   '@context': 'https://schema.org',
@@ -66,7 +67,6 @@ const schema = {
     longitude: place.coordinates.lng,
   },
   sameAs: place.mapUrl,
-  dateModified: place.updatedIso,
 };
 ---
 
@@ -83,12 +83,7 @@ const schema = {
         <Breadcrumbs items={breadcrumbs} />
 
         <div>
-          <p
-            class="mb-2 text-xs font-bold uppercase tracking-[0.06em] text-muted-foreground"
-          >
-            {category}{place.status === 'existing' ? '' : ` · ${status}`}
-          </p>
-          <h1 class="ui-page-title">{place.name}</h1>
+          <h1 class="ui-page-title">{displayName}</h1>
         </div>
       </div>
     </header>
@@ -102,36 +97,26 @@ const schema = {
         ) : null
       }
 
-      <dl class="mt-6 border-y border-border">
-        <div class="grid gap-1 py-4 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4">
-          <dt class="text-sm font-semibold leading-7 text-muted-foreground">
-            Адрес
-          </dt>
-          <dd
-            class="text-base leading-7 text-foreground"
-            set:html={addressHtml}
-          />
-        </div>
-        {
-          place.openingHours ? (
-            <PlaceOpeningHours openingHours={place.openingHours} />
-          ) : null
-        }
-        {
-          place.evidence ? (
-            <div class="grid gap-1 border-t border-border py-4 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4">
-              <dt class="text-sm font-semibold leading-7 text-muted-foreground">
-                Источник
-              </dt>
-              <dd class="text-base leading-7 text-foreground">
-                <a href={place.evidence.sourceUrl} class="site-text-link">
-                  Проверено {formatPlaceEvidenceDate(place.evidence)}
-                </a>
-              </dd>
-            </div>
-          ) : null
-        }
-      </dl>
+      {
+        addressHtml || place.openingHours ? (
+          <dl class="mt-6 border-y border-border">
+            {addressHtml ? (
+              <div class="grid gap-1 py-4 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4">
+                <dt class="text-sm font-semibold leading-7 text-muted-foreground">
+                  Адрес
+                </dt>
+                <dd
+                  class="text-base leading-7 text-foreground"
+                  set:html={addressHtml}
+                />
+              </div>
+            ) : null}
+            {place.openingHours ? (
+              <PlaceOpeningHours openingHours={place.openingHours} />
+            ) : null}
+          </dl>
+        ) : null
+      }
 
       <nav
         aria-label="Действия с местом"

@@ -7,7 +7,6 @@ const place = {
   category: 'food',
   marker: 'foodtruck',
   status: 'existing',
-  updated_at: '2026-08-11',
   summary: 'Фудтрак в Шелково Форест',
   location: {
     map_url: 'https://yandex.ru/navi/-/CTfgq-5r',
@@ -62,7 +61,22 @@ describe('RawPlaceSchema', () => {
         "status": "existing",
         "summary": "Фудтрак в Шелково Форест",
         "title": "Буржуйка",
-        "updated_at": "2026-08-11",
+      }
+    `);
+  });
+
+  it('accepts a place with coordinates only', () => {
+    expect(
+      RawPlaceSchema.parse({
+        ...place,
+        location: { coordinates: place.location.coordinates },
+      }).location,
+    ).toMatchInlineSnapshot(`
+      {
+        "coordinates": {
+          "lat": 55.060526,
+          "lng": 37.716242,
+        },
       }
     `);
   });
@@ -101,11 +115,5 @@ describe('RawPlaceSchema', () => {
         (issue) => issue.path.join('.') === 'location.map_url',
       ),
     ).toBe(true);
-  });
-
-  it('requires evidence for a future place', () => {
-    expect(() =>
-      RawPlaceSchema.parse({ ...place, status: 'planned' }),
-    ).toThrowError(/require evidence/u);
   });
 });

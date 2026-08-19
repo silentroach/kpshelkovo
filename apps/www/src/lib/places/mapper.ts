@@ -5,7 +5,15 @@ import {
 import type { SiteMentionRegistry } from '@/lib/mentions';
 
 import { placeCanonical, placeMarkdownUrl, placeUrl } from './routes';
-import type { Place, PlaceContact, PlaceEntry } from './types';
+import type {
+  Place,
+  PlaceContact,
+  PlaceCoordinates,
+  PlaceEntry,
+} from './types';
+
+const buildYandexMapUrl = (coordinates: PlaceCoordinates): string =>
+  `https://yandex.ru/maps/?pt=${coordinates.lng},${coordinates.lat}&z=18&l=map`;
 
 export const mapRawPlace = (
   entry: PlaceEntry,
@@ -15,6 +23,7 @@ export const mapRawPlace = (
   },
 ): Place => {
   const markdown = entry.body?.trim() ?? '';
+  const coordinates = entry.data.location.coordinates;
   const body = opts?.mentionRegistry
     ? preprocessSiteMarkdownContent(
         markdown,
@@ -33,8 +42,8 @@ export const mapRawPlace = (
     body: body.markdown,
     mentions: body.mentions,
     address: entry.data.location.address,
-    coordinates: entry.data.location.coordinates,
-    mapUrl: entry.data.location.map_url,
+    coordinates,
+    mapUrl: entry.data.location.map_url ?? buildYandexMapUrl(coordinates),
     openingHours: entry.data.opening_hours
       ? {
           description: entry.data.opening_hours.description,
@@ -46,17 +55,6 @@ export const mapRawPlace = (
         }
       : undefined,
     contact: opts?.contact,
-    evidence: entry.data.evidence
-      ? {
-          sourceUrl: entry.data.evidence.source_url,
-          checkedAt: new Date(
-            `${entry.data.evidence.checked_at}T00:00:00.000Z`,
-          ),
-          checkedIso: entry.data.evidence.checked_at,
-        }
-      : undefined,
-    updatedAt: new Date(`${entry.data.updated_at}T00:00:00.000Z`),
-    updatedIso: entry.data.updated_at,
     url: placeUrl(entry.id),
     markdownUrl: placeMarkdownUrl(entry.id),
     canonical: placeCanonical(entry.id),

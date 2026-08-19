@@ -193,7 +193,6 @@ const place = (input: {
     title: input.title,
     category: 'children',
     status: 'existing',
-    updated_at: '2026-08-19',
     summary: 'Детская площадка в виде корабля',
     location: {
       map_url: 'https://yandex.ru/maps/?ll=37.746894%2C55.060703&z=18',

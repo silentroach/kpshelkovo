@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { pluralize } from '@shelkovo/format';
+  import type { Feature } from '@yandex/ymaps3-clusterer';
   import {
     CONSTRUCTION_MARKER,
     FOODTRUCK_MARKER,
@@ -25,6 +27,11 @@
   ];
   const VIEW_MARGIN: ymaps3.Margin = [112, 80, 32, 80];
   const BOUNDS_PADDING_RATIO = 0.3;
+  const CLUSTER_GRID_SIZE = 48;
+  const CLUSTER_ZOOM_DURATION_MS = 220;
+  const MARKER_MIN_SCALE = 30 / 48;
+  const MARKER_MIN_ZOOM = 13.5;
+  const MARKER_MAX_ZOOM = 16;
   const roundCoordinate = (value: number): number => Number(value.toFixed(6));
   const CUSTOM_MARKER_IMAGES: Readonly<
     Record<
@@ -36,11 +43,13 @@
     titanic: TITANIC_MARKER,
     construction: CONSTRUCTION_MARKER,
   };
-  const getPlaceBounds = (): ymaps3.LngLatBounds => {
-    if (places.length < 2) return SETTLEMENT_BOUNDS;
+  const getPaddedBounds = (
+    coordinates: readonly ymaps3.LngLat[],
+  ): ymaps3.LngLatBounds => {
+    if (coordinates.length < 2) return SETTLEMENT_BOUNDS;
 
-    const longitudes = places.map((place) => place.coordinates.lng);
-    const latitudes = places.map((place) => place.coordinates.lat);
+    const longitudes = coordinates.map(([lng]) => lng);
+    const latitudes = coordinates.map(([, lat]) => lat);
     const minLng = Math.min(...longitudes);
     const maxLng = Math.max(...longitudes);
     const minLat = Math.min(...latitudes);
@@ -59,11 +68,36 @@
       ],
     ];
   };
+  const getPlaceBounds = (): ymaps3.LngLatBounds =>
+    getPaddedBounds(
+      places.map((place): ymaps3.LngLat => [
+        place.coordinates.lng,
+        place.coordinates.lat,
+      ]),
+    );
+  const getMarkerScale = (zoom: number): number => {
+    const progress = Math.min(
+      1,
+      Math.max(
+        0,
+        (zoom - MARKER_MIN_ZOOM) / (MARKER_MAX_ZOOM - MARKER_MIN_ZOOM),
+      ),
+    );
+
+    return MARKER_MIN_SCALE + (1 - MARKER_MIN_SCALE) * progress;
+  };
+  const getClusterZoomDuration = (): number =>
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      ? 0
+      : CLUSTER_ZOOM_DURATION_MS;
 
   let mapContainer: HTMLDivElement | undefined = $state(undefined);
   let map: ymaps3.YMap | undefined;
-  let markers: ymaps3.YMapMarker[] = [];
+  let mapClusterer: ymaps3.YMapEntity<unknown> | undefined;
+  let mapListener: ymaps3.YMapListener | undefined;
   let markerContents: Array<readonly [Place, HTMLAnchorElement]> = [];
+  let pendingClusterFocusId: Feature['id'] | undefined;
+  let clusterFocusFrame: number | undefined;
   let isLoading = $state(true);
   let error: string | undefined = $state(undefined);
 
@@ -95,7 +129,10 @@
       'aria-label',
       `Открыть место «${place.name}»${status}${openingStatus}`,
     );
-    link.title = `${place.name}${status}${openingStatus}`;
+    link.title =
+      place.status === 'underConstruction'
+        ? place.name
+        : `${place.name}${status}${openingStatus}`;
   };
 
   const refreshMarkerContents = (): void => {
@@ -143,6 +180,85 @@
     return link;
   };
 
+  const createFeatures = (): Feature[] =>
+    places.map((place) => ({
+      type: 'Feature',
+      id: place.slug,
+      geometry: {
+        type: 'Point',
+        coordinates: [place.coordinates.lng, place.coordinates.lat],
+      },
+    }));
+
+  const updateMarkerScale = (zoom: number): void => {
+    mapContainer?.style.setProperty(
+      '--place-map-marker-scale',
+      getMarkerScale(zoom).toFixed(3),
+    );
+  };
+
+  const zoomToCluster = (features: readonly Feature[]): void => {
+    map?.update({
+      location: {
+        bounds: getPaddedBounds(
+          features.map((feature) => feature.geometry.coordinates),
+        ),
+        duration: getClusterZoomDuration(),
+        easing: 'ease-in-out',
+      },
+      margin: VIEW_MARGIN,
+    });
+  };
+
+  const restoreClusterFocus = (): void => {
+    const featureId = pendingClusterFocusId;
+
+    if (featureId === undefined) return;
+
+    pendingClusterFocusId = undefined;
+    clusterFocusFrame = window.requestAnimationFrame(() => {
+      clusterFocusFrame = undefined;
+      const id = String(featureId);
+      const marker = markerContents.find(([place]) => place.slug === id)?.[1];
+
+      if (marker?.isConnected) {
+        marker.focus();
+        return;
+      }
+
+      const clusters =
+        mapContainer?.querySelectorAll<HTMLButtonElement>(
+          '.place-map-cluster',
+        ) ?? [];
+      const cluster = Array.from(clusters).find((candidate) =>
+        candidate.dataset.placeIds?.split(' ').includes(id),
+      );
+
+      cluster?.focus();
+    });
+  };
+
+  const createClusterContent = (
+    features: readonly Feature[],
+  ): HTMLButtonElement => {
+    const button = document.createElement('button');
+    const label = `${features.length} ${pluralize(features.length, ['место', 'места', 'мест'])} рядом`;
+
+    button.type = 'button';
+    button.className = 'place-map-cluster';
+    button.dataset.placeIds = features.map(({ id }) => String(id)).join(' ');
+    button.textContent = String(features.length);
+    button.title = label;
+    button.setAttribute('aria-label', `${label}. Приблизить карту`);
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      pendingClusterFocusId = event.detail === 0 ? features[0]?.id : undefined;
+      zoomToCluster(features);
+    });
+
+    return button;
+  };
+
   const fitPlaces = (): void => {
     map?.update?.({
       location: { bounds: getPlaceBounds(), duration: 0 },
@@ -152,15 +268,20 @@
 
   const clearMap = (): void => {
     if (map) {
-      for (const marker of markers) {
-        map.removeChild(marker);
-      }
-
+      if (mapClusterer) map.removeChild(mapClusterer);
+      if (mapListener) map.removeChild(mapListener);
       map.destroy();
     }
 
-    markers = [];
+    mapClusterer = undefined;
+    mapListener = undefined;
     markerContents = [];
+    pendingClusterFocusId = undefined;
+    if (clusterFocusFrame !== undefined) {
+      window.cancelAnimationFrame(clusterFocusFrame);
+    }
+    clusterFocusFrame = undefined;
+    mapContainer?.style.removeProperty('--place-map-marker-scale');
     map = undefined;
   };
 
@@ -199,12 +320,19 @@
         }
 
         await ymaps3.ready;
+        const { YMapClusterer, clusterByGrid } =
+          await import('@yandex/ymaps3-clusterer');
         await waitForStableLayout();
 
         if (destroyed || !mapContainer) return;
 
-        const { YMap, YMapDefaultFeaturesLayer, YMapDefaultSchemeLayer } =
-          ymaps3;
+        const {
+          YMap,
+          YMapDefaultFeaturesLayer,
+          YMapDefaultSchemeLayer,
+          YMapListener,
+          YMapMarker,
+        } = ymaps3;
 
         map = new YMap(
           mapContainer,
@@ -226,19 +354,37 @@
           ],
         );
 
-        markers = places.map((place) => {
-          const content = createMarkerContent(place);
-          const marker = new ymaps3.YMapMarker(
-            {
-              coordinates: [place.coordinates.lng, place.coordinates.lat],
-            },
-            content,
-          );
-
-          markerContents.push([place, content]);
-          map?.addChild(marker);
-          return marker;
+        markerContents = places.map(
+          (place) => [place, createMarkerContent(place)] as const,
+        );
+        mapListener = new YMapListener({
+          onUpdate: ({ location, mapInAction }) => {
+            updateMarkerScale(location.zoom);
+            if (!mapInAction) restoreClusterFocus();
+          },
         });
+        mapClusterer = new YMapClusterer({
+          method: clusterByGrid({ gridSize: CLUSTER_GRID_SIZE }),
+          features: createFeatures(),
+          marker: (feature) => {
+            const content = markerContents.find(
+              ([place]) => place.slug === feature.id,
+            )?.[1];
+
+            if (!content)
+              throw new Error(`Не найден маркер места ${feature.id}`);
+
+            return new YMapMarker(
+              { coordinates: feature.geometry.coordinates },
+              content,
+            );
+          },
+          cluster: (coordinates, features) =>
+            new YMapMarker({ coordinates }, createClusterContent(features)),
+        });
+        map.addChild(mapListener);
+        map.addChild(mapClusterer);
+        updateMarkerScale(map.zoom);
 
         fitPlaces();
         if (markerContents.some(([place]) => place.openingHours)) {
@@ -331,8 +477,10 @@
     --ui-map-marker-border: 0.1875rem solid var(--color-surface-raised);
 
     flex: none;
+    scale: var(--place-map-marker-scale, 1);
     transition:
       filter 0.15s ease,
+      scale 0.15s ease,
       transform 0.15s ease;
   }
 
@@ -345,9 +493,17 @@
     filter: var(--place-map-marker-state-filter)
       drop-shadow(0 0 0.1rem oklch(100% 0 0 / 0.96))
       drop-shadow(0 0.25rem 0.35rem oklch(24% 0.04 145 / 0.4));
+    scale: var(--place-map-marker-scale, 1);
     transition:
       filter 0.15s ease,
+      scale 0.15s ease,
       transform 0.15s ease;
+  }
+
+  :global(
+    .place-map-marker[data-marker='construction'] .place-map-marker-graphic
+  ) {
+    width: 2rem;
   }
 
   :global(.place-map-marker-image) {
@@ -393,6 +549,66 @@
     .place-map-marker[data-status='underConstruction'] .place-map-marker-point
   ) {
     border-radius: 0.25rem;
+  }
+
+  :global(.place-map-cluster) {
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    place-items: center;
+    border: 0.125rem solid var(--color-primary);
+    border-radius: 999px;
+    background: var(--color-surface-raised);
+    box-shadow:
+      0 0 0 0.125rem color-mix(in oklab, var(--color-surface) 88%, transparent),
+      0 0.2rem 0.45rem oklch(24% 0.04 145 / 0.28);
+    color: var(--color-foreground);
+    cursor: pointer;
+    font: inherit;
+    font-size: 1rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    line-height: 1;
+    touch-action: manipulation;
+    transform: translate(-50%, -50%);
+    animation: place-map-cluster-enter 0.16s ease-out;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  :global(.place-map-cluster:hover) {
+    border-color: var(--color-primary-hover);
+    background: var(--color-primary-soft);
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+
+  :global(.place-map-cluster:focus-visible) {
+    outline: 0.1875rem solid var(--color-ring);
+    outline-offset: 0.125rem;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+
+  :global(.place-map-cluster:active) {
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+
+  @keyframes place-map-cluster-enter {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.72);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.place-map-marker-point),
+    :global(.place-map-marker-graphic),
+    :global(.place-map-cluster) {
+      animation: none;
+      transition: none;
+    }
   }
 
   .map-placeholder {

@@ -85,8 +85,12 @@ const queryGroups = [
     queries: [
       'титаник',
       'детская площадка титаник',
-      'корабль на центральной улице',
+      'корабль недалеко от дамбы',
       'детская площадка',
+      'пляж',
+      'строящийся пляж',
+      'лесное озеро в ривере',
+      'лесное озеро в парке',
       'буржуйка',
       'буржуйка на карте',
       'адрес буржуйки',
@@ -102,6 +106,7 @@ const rankExpectations: ReadonlyMap<
   { readonly url: string; readonly maxRank: number }
 > = new Map([
   ['где поесть', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
+  ['еда', { url: '/map/burzhuyka/', maxRank: 2 }],
   [
     'как въехать грузовику',
     { url: '/news/2026/05/truck-entry-open/', maxRank: 1 },
@@ -131,8 +136,12 @@ const rankExpectations: ReadonlyMap<
   ['что входит в тариф 815', { url: '/815/regulation/', maxRank: 2 }],
   ['титаник', { url: '/map/titanic/', maxRank: 1 }],
   ['детская площадка титаник', { url: '/map/titanic/', maxRank: 1 }],
-  ['корабль на центральной улице', { url: '/map/titanic/', maxRank: 1 }],
+  ['корабль недалеко от дамбы', { url: '/map/titanic/', maxRank: 1 }],
   ['детская площадка', { url: '/map/titanic/', maxRank: 3 }],
+  ['пляж', { url: '/map/beach/', maxRank: 1 }],
+  ['строящийся пляж', { url: '/map/beach/', maxRank: 1 }],
+  ['лесное озеро в ривере', { url: '/map/river-forest-lake/', maxRank: 1 }],
+  ['лесное озеро в парке', { url: '/map/park-forest-lake/', maxRank: 1 }],
   ['буржуйка', { url: '/map/burzhuyka/', maxRank: 1 }],
   ['буржуйка на карте', { url: '/map/burzhuyka/', maxRank: 2 }],
   ['адрес буржуйки', { url: '/map/burzhuyka/', maxRank: 1 }],

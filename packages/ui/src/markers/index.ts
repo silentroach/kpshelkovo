@@ -17,5 +17,5 @@ export const FOODTRUCK_MARKER = {
 export const TITANIC_MARKER = {
   src: titanicMarkerUrl,
   width: 144,
-  height: 128,
+  height: 137,
 } as const;
