@@ -1,0 +1,57 @@
+---
+import PlaceMap from '@/components/places/PlaceMap.svelte';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { loadPlaces } from '@/lib/places/load';
+import { placesUrl } from '@/lib/places/routes';
+
+const places = await loadPlaces();
+const title = 'Карта — Шелково Онлайн';
+const description =
+  'Карта мест и полезных объектов в поселках Шелково. Откройте точку на карте, чтобы перейти к подробной карточке.';
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: title,
+  description,
+  url: placesUrl(),
+  inLanguage: 'ru-RU',
+  mainEntity: {
+    '@type': 'ItemList',
+    numberOfItems: places.length,
+    itemListElement: places.map((place, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: place.name,
+      item: place.canonical,
+    })),
+  },
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={placesUrl()}
+  schema={schema}
+  preconnectYandexMaps
+>
+  <main
+    class="relative h-[calc(100svh-3.0625rem)] min-h-[30rem] overflow-hidden md:h-[calc(100svh-3.5625rem)]"
+  >
+    <h1 class="sr-only">Карта мест и объектов Шелково</h1>
+    <PlaceMap {places} client:load />
+
+    <noscript>
+      <div
+        class="absolute inset-x-4 bottom-4 z-30 border border-border bg-[color:var(--color-surface)] p-4 md:inset-x-auto md:bottom-6 md:left-6 md:max-w-sm"
+      >
+        <p class="text-sm leading-6 text-muted-foreground">
+          Для карты нужен JavaScript. <a
+            href={places[0]?.url ?? placesUrl()}
+            class="site-text-link font-semibold">Открыть карточку «Буржуйки»</a
+          >.
+        </p>
+      </div>
+    </noscript>
+  </main>
+</BaseLayout>

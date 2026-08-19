@@ -31,6 +31,7 @@ const getCurrent = (href: string): 'page' | 'location' | undefined => {
   return currentPathname.startsWith(href) ? 'location' : undefined;
 };
 const newsCurrent = getCurrent('/news/');
+const placesCurrent = getCurrent('/places/');
 const compareCurrent = getCurrent('/815/compare/');
 const regulationCurrent = getCurrent('/815/regulation/');
 const kbCurrent = getCurrent('/kb/');
@@ -48,7 +49,6 @@ const submenuLinkClass =
       <a href="/news/" aria-current={newsCurrent} class="site-nav-mobile-link">
         Новости
       </a>
-
       <div
         class="site-nav-mobile-group"
         data-current-section={isTariffCurrent ? '' : undefined}
@@ -72,6 +72,14 @@ const submenuLinkClass =
           Регламент
         </a>
       </div>
+
+      <a
+        href="/places/"
+        aria-current={placesCurrent}
+        class="site-nav-mobile-link"
+      >
+        Карта
+      </a>
 
       <a href="/kb/" aria-current={kbCurrent} class="site-nav-mobile-link">
         База знаний
@@ -114,7 +122,6 @@ const submenuLinkClass =
       <a href="/news/" aria-current={newsCurrent} class="site-nav-link">
         Новости
       </a>
-
       <div
         class="site-nav-dropdown group relative"
         data-site-nav-dropdown
@@ -159,6 +166,10 @@ const submenuLinkClass =
           </div>
         </div>
       </div>
+
+      <a href="/places/" aria-current={placesCurrent} class="site-nav-link">
+        Карта
+      </a>
 
       <a href="/kb/" aria-current={kbCurrent} class="site-nav-link">
         База знаний

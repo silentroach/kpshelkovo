@@ -24,6 +24,8 @@ describe('SiteNav', () => {
   it.each([
     ['header', '/news/', 'page'],
     ['header', '/news/2026/07/report/', 'location'],
+    ['header', '/places/', 'page'],
+    ['mobile', '/places/burzhuyka/', 'location'],
     ['mobile', '/status/', 'page'],
     ['mobile', '/status/water/', 'location'],
   ] as const)(
