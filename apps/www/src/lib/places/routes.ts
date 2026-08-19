@@ -31,6 +31,9 @@ export const placeMarkdownPattern = (): string => '/map/:slug/index.md';
 
 export const placesUrl = (): string => withBase(placesPath());
 
+export const placeHighlightUrl = (slug: string): string =>
+  withBase(`${placesPath()}?h=${requireSlug(slug)}`);
+
 export const placesMarkdownUrl = (): string => withBase(placesMarkdownPath());
 
 export const placeUrl = (slug: string): string => withBase(placePath(slug));

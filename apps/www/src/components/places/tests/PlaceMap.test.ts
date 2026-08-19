@@ -131,6 +131,7 @@ describe('PlaceMap', () => {
     clustererProps.length = 0;
     schemeLayerProps.length = 0;
     mapProps.length = 0;
+    window.history.replaceState({}, '', '/map/');
     installYandexMaps();
   });
 
@@ -304,6 +305,152 @@ describe('PlaceMap', () => {
         ],
       ]
     `);
+  });
+
+  it('focuses and highlights the requested place for five seconds', async () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+    const historyState = { navigation: 'map' };
+    window.history.replaceState(
+      historyState,
+      '',
+      '/map/?q=a%20b&flag&h=titanic#map',
+    );
+    const replaceState = vi.spyOn(window.history, 'replaceState');
+    const setTimeout = vi.spyOn(window, 'setTimeout');
+
+    render(PlaceMap, { props: { places: [place, titanicPlace] } });
+
+    await waitFor(() => expect(markerElements).toHaveLength(2));
+
+    const marker = markerElements[1];
+    const focusUpdate = map.update.mock.calls
+      .map(([update]) => update)
+      .find((update) => update.location?.center);
+    const timerIndex = setTimeout.mock.calls.findIndex(
+      ([, delay]) => delay === 5_000,
+    );
+    const expireHighlight = setTimeout.mock.calls[timerIndex]?.[0];
+    const timer = setTimeout.mock.results[timerIndex]?.value;
+
+    expect({
+      marker: {
+        current: marker?.getAttribute('aria-current'),
+        highlighted: marker?.dataset.highlighted,
+      },
+      focusUpdate,
+      clusterMaxZoom: clustererProps[0]?.maxZoom,
+      url: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+    }).toMatchInlineSnapshot(`
+      {
+        "clusterMaxZoom": 15,
+        "focusUpdate": {
+          "location": {
+            "center": [
+              37.746894,
+              55.060703,
+            ],
+            "duration": 220,
+            "easing": "ease-in-out",
+            "zoom": 16,
+          },
+        },
+        "marker": {
+          "current": "location",
+          "highlighted": "true",
+        },
+        "url": "/map/?q=a%20b&flag&h=titanic#map",
+      }
+    `);
+
+    if (typeof expireHighlight !== 'function') {
+      throw new Error('place highlight callback was not scheduled');
+    }
+
+    window.clearTimeout(timer);
+    expireHighlight();
+
+    expect({
+      marker: {
+        current: marker?.getAttribute('aria-current'),
+        highlighted: marker?.dataset.highlighted,
+      },
+      replaceState: replaceState.mock.lastCall,
+      url: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+    }).toMatchInlineSnapshot(`
+      {
+        "marker": {
+          "current": null,
+          "highlighted": undefined,
+        },
+        "replaceState": [
+          {
+            "navigation": "map",
+          },
+          "",
+          "/map/?q=a%20b&flag#map",
+        ],
+        "url": "/map/?q=a%20b&flag#map",
+      }
+    `);
+  });
+
+  it('removes an unknown highlight slug without changing the map view', async () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+    const historyState = { navigation: 'map' };
+    window.history.replaceState(historyState, '', '/map/?h=titanik&from=issue');
+    const replaceState = vi.spyOn(window.history, 'replaceState');
+
+    render(PlaceMap, { props: { places: [place, titanicPlace] } });
+
+    await waitFor(() => expect(markerElements).toHaveLength(2));
+
+    expect({
+      focused: map.update.mock.calls.some(([update]) =>
+        Boolean(update.location?.center),
+      ),
+      highlights: markerElements.map((marker) => marker.dataset.highlighted),
+      replaceState: replaceState.mock.lastCall,
+      url: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+    }).toMatchInlineSnapshot(`
+      {
+        "focused": false,
+        "highlights": [
+          undefined,
+          undefined,
+        ],
+        "replaceState": [
+          {
+            "navigation": "map",
+          },
+          "",
+          "/map/?from=issue",
+        ],
+        "url": "/map/?from=issue",
+      }
+    `);
+  });
+
+  it('cancels the place highlight timer when the map unmounts', async () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+    window.history.replaceState({}, '', '/map/?h=burzhuyka');
+    const setTimeout = vi.spyOn(window, 'setTimeout');
+    const clearTimeout = vi.spyOn(window, 'clearTimeout');
+    const view = render(PlaceMap, { props: { places: [place] } });
+
+    await waitFor(() =>
+      expect(setTimeout.mock.calls.some(([, delay]) => delay === 5_000)).toBe(
+        true,
+      ),
+    );
+
+    const timerIndex = setTimeout.mock.calls.findIndex(
+      ([, delay]) => delay === 5_000,
+    );
+    const timer = setTimeout.mock.results[timerIndex]?.value;
+
+    view.unmount();
+
+    expect(clearTimeout).toHaveBeenCalledWith(timer);
   });
 
   it('refreshes opening state while the map remains open', async () => {
