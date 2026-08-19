@@ -106,10 +106,13 @@
   let isLoading = $state(true);
   let error: string | undefined = $state(undefined);
 
-  const mapBehaviors = (): ymaps3.BehaviorType[] =>
-    window.matchMedia?.('(any-pointer: coarse)').matches
-      ? ['drag', 'pinchZoom', 'dblClick']
-      : ['drag', 'scrollZoom', 'dblClick'];
+  const mapBehaviors = (): ymaps3.BehaviorType[] => [
+    'drag',
+    'scrollZoom',
+    'pinchZoom',
+    'dblClick',
+    'oneFingerZoom',
+  ];
 
   const updateMarkerContent = (place: Place, link: HTMLAnchorElement): void => {
     const isOpen = place.openingHours

@@ -164,7 +164,13 @@ describe('PlaceMap', () => {
       </a>
     `);
     expect(mapProps[0]).toMatchObject({
-      behaviors: ['drag', 'scrollZoom', 'dblClick'],
+      behaviors: [
+        'drag',
+        'scrollZoom',
+        'pinchZoom',
+        'dblClick',
+        'oneFingerZoom',
+      ],
       mode: 'vector',
       location: {
         bounds: [
@@ -189,14 +195,20 @@ describe('PlaceMap', () => {
     expect(click).toHaveBeenCalledOnce();
   });
 
-  it('supports dragging and a closer fit on mobile', async () => {
+  it('supports navigation gestures and a closer fit on mobile', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: true }));
 
     render(PlaceMap, { props: { places: [place] } });
 
     await waitFor(() => expect(mapProps).toHaveLength(1));
 
-    expect(mapProps[0]?.behaviors).toEqual(['drag', 'pinchZoom', 'dblClick']);
+    expect(mapProps[0]?.behaviors).toEqual([
+      'drag',
+      'scrollZoom',
+      'pinchZoom',
+      'dblClick',
+      'oneFingerZoom',
+    ]);
     expect(map.update.mock.lastCall?.[0].margin).toEqual([112, 32, 32, 32]);
   });
 
