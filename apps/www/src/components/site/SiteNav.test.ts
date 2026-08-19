@@ -24,8 +24,6 @@ describe('SiteNav', () => {
   it.each([
     ['header', '/news/', 'page'],
     ['header', '/news/2026/07/report/', 'location'],
-    ['header', '/places/', 'page'],
-    ['mobile', '/places/burzhuyka/', 'location'],
     ['mobile', '/status/', 'page'],
     ['mobile', '/status/water/', 'location'],
   ] as const)(
@@ -34,6 +32,15 @@ describe('SiteNav', () => {
       const html = await renderNav(pathname, variant);
 
       expect(html).toContain(`aria-current="${current}"`);
+    },
+  );
+
+  it.each(['header', 'mobile'] as const)(
+    'keeps places out of the %s primary navigation during rollout',
+    async (variant) => {
+      const html = await renderNav('/places/', variant);
+
+      expect(html).not.toContain('href="/places/"');
     },
   );
 
