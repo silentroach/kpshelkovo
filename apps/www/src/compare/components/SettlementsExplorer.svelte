@@ -273,6 +273,7 @@
           <legend class="sr-only">Фильтр по тарифу</legend>
           <div
             class="flex min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto pr-1 md:gap-2"
+            data-testid="price-filter-group"
           >
             <span
               class="mr-1 whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground md:text-xs"
