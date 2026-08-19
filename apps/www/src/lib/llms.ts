@@ -16,6 +16,7 @@ import {
 } from './meetings/routes';
 import { loadNewsData } from './news/load';
 import { loadPeopleDataWithBacklinks } from './people/load';
+import { loadPlaces } from './places/load';
 import { loadReviewsData } from './reviews/load';
 import { absoluteUrl } from './site';
 import { estimate2026 } from '@/data/reglament/estimate-2026';
@@ -56,29 +57,30 @@ const registeredSurfaceUrl = (surfaceId: PublicSurfaceId): string =>
   absoluteUrl(registeredSurfacePath(surfaceId));
 
 async function snapshot() {
-  const [contacts, news, people, reviews, status, meetings] = await Promise.all(
-    [
+  const [contacts, news, people, places, reviews, status, meetings] =
+    await Promise.all([
       loadContactsData(),
       loadNewsData(),
       loadPeopleDataWithBacklinks(),
+      loadPlaces(),
       loadReviewsData(),
       loadStatusData(),
       loadMeetings(),
-    ],
-  );
+    ]);
 
   return {
     contacts,
     meetings,
     news,
     people,
+    places,
     reviews,
     status,
   };
 }
 
 export async function build(kind: 'short' | 'full'): Promise<string> {
-  const { contacts, meetings, news, people, reviews, status } =
+  const { contacts, meetings, news, people, places, reviews, status } =
     await snapshot();
   const activeStatus = status.active.filter((item) => item.kind === 'incident');
   const meeting = meetings[0];
@@ -153,6 +155,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
   const personMarkdown = person
     ? absoluteUrl(person.markdownUrl)
     : '/people/[slug]/index.md';
+  const placesHome = registeredSurfaceUrl('places:index');
+  const placesMarkdown = registeredSurfaceUrl('places:index-markdown');
   const compareHome = registeredSurfaceUrl('compare:index');
   const compareMarkdown = registeredSurfaceUrl('compare:index-markdown');
   const compareFeed = registeredSurfaceUrl('compare:data-settlements');
@@ -169,8 +173,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
           llmsSection('Описание', [
             markdownList([
               'Это карта публичных данных и точек входа kpshelkovo.online.',
-              'Основные разделы: новости, статус сервисов, отзывы собственников, сарафан, архив встреч, регламент и смета тарифа 815, профили людей и сравнение тарифов поселков.',
-              `Сейчас в новостях ${count(news.articles.length, ['статья', 'статьи', 'статей'])}, в статусе ${count(status.incidents.length, ['запись', 'записи', 'записей'])} и ${count(activeStatus.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])}, в сарафане ${count(contacts.contacts.length, ['контакт', 'контакта', 'контактов'])}, в отзывах ${count(reviews.reviews.length, ['отзыв', 'отзыва', 'отзывов'])}, в архиве встреч ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}, в людях ${count(people.profiles.length, ['профиль', 'профиля', 'профилей'])}.`,
+              'Основные разделы: новости, статус сервисов, карта мест, отзывы собственников, сарафан, архив встреч, регламент и смета тарифа 815, профили людей и сравнение тарифов поселков.',
+              `Сейчас в новостях ${count(news.articles.length, ['статья', 'статьи', 'статей'])}, в статусе ${count(status.incidents.length, ['запись', 'записи', 'записей'])} и ${count(activeStatus.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])}, на карте ${count(places.length, ['место', 'места', 'мест'])}, в сарафане ${count(contacts.contacts.length, ['контакт', 'контакта', 'контактов'])}, в отзывах ${count(reviews.reviews.length, ['отзыв', 'отзыва', 'отзывов'])}, в архиве встреч ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}, в людях ${count(people.profiles.length, ['профиль', 'профиля', 'профилей'])}.`,
               'Для массового чтения используйте JSON-ленты там, где они есть; HTML и Markdown удобнее для ссылок и точечного чтения.',
             ]),
           ]),
@@ -182,6 +186,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Инструкции для автоматического чтения сайта: ${skills}`,
               `Новости: ${newsHome}`,
               `Статус: ${statusHome}`,
+              `Карта мест: ${placesHome}`,
               `Отзывы: ${reviewsHome}`,
               `Сарафан: ${contactsHome}`,
               `Архив встреч в Markdown: ${meetingsMarkdown}`,
@@ -196,6 +201,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'Если задача относится к одному разделу, сначала откройте его `llms.txt` или Markdown-индекс; если нужны данные массово, сразу берите JSON-ленту там, где она есть.',
               `Новости: ${newsLlms}; основная лента: ${newsFeed}; календарные события лежат в \`articles[].events[].ics_url\`.`,
               `Статус сервисов: ${statusLlms}; основная лента: ${statusFeed}.`,
+              `Карта мест: ${placesMarkdown}; карточки: \`/map/[slug]/\` и \`/map/[slug]/index.md\`.`,
               `Отзывы собственников: ${reviewsMarkdown}; правила публикации: ${reviewsRulesMarkdown}; детальные страницы: \`/reviews/[id]/\` и \`/reviews/[id]/index.md\`.`,
               `Сарафан: ${contactsMarkdown}; разделы: \`/sarafan/[category]/\` и \`/sarafan/[category]/index.md\`; детальные страницы есть только у контактов с body и используют \`/sarafan/[category]/[slug]/\` и \`/sarafan/[category]/[slug]/index.md\`; если для контакта доступна vCard, ее адрес указан в \`vcf_url\`.`,
               `Архив встреч: ${meetingsMarkdown}; одна встреча: ${meetingHtml} или ${meetingMarkdown}; полный текст транскрипта берите по частям, например ${meetingTranscript}.`,
@@ -214,7 +220,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
           llmsSection('Проект', [
             markdownList([
               'Это корневой сайт kpshelkovo.online и карта его публичных данных.',
-              `Разделы сайта: \`${registeredSurfacePath('news:index')}\`, \`${registeredSurfacePath('status:index')}\`, \`${registeredSurfacePath('reviews:index')}\`, \`${registeredSurfacePath('contacts:index')}\`, \`${registeredSurfacePath('meetings:index-markdown')}\`, \`${registeredSurfacePath('reglament:index')}\`, \`${registeredSurfacePath('people:index-markdown')}\` и \`${registeredSurfacePath('compare:index')}\`.`,
+              `Разделы сайта: \`${registeredSurfacePath('news:index')}\`, \`${registeredSurfacePath('status:index')}\`, \`${registeredSurfacePath('places:index')}\`, \`${registeredSurfacePath('reviews:index')}\`, \`${registeredSurfacePath('contacts:index')}\`, \`${registeredSurfacePath('meetings:index-markdown')}\`, \`${registeredSurfacePath('reglament:index')}\`, \`${registeredSurfacePath('people:index-markdown')}\` и \`${registeredSurfacePath('compare:index')}\`.`,
               'Все JSON-ленты доступны только для чтения и отражают состояние на момент сборки сайта.',
               'У раздела людей нет публичной HTML-страницы индекса `/people/`; используйте `/people/index.md` и `/people/data/people.json`.',
               'У архива встреч нет публичной HTML-страницы индекса `/meetings/`; используйте `/meetings/index.md`, описание одной встречи и файлы транскрипта по частям.',
@@ -251,6 +257,15 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `RSS: ${statusRss}`,
               `Каталог API: ${statusCatalog}`,
               `Сейчас в разделе ${count(status.incidents.length, ['запись', 'записи', 'записей'])} и ${count(activeStatus.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])}.`,
+            ]),
+          ]),
+          llmsSection('Карта мест', [
+            markdownList([
+              `Интерактивная карта: ${placesHome}`,
+              `Markdown-версия раздела: ${placesMarkdown}`,
+              'Карточки мест используют `/map/[slug]/` и `/map/[slug]/index.md`.',
+              `Сейчас на карте ${count(places.length, ['место', 'места', 'мест'])}.`,
+              'Структурированной JSON-ленты пока нет; для машинного чтения используйте Markdown-страницы.',
             ]),
           ]),
           llmsSection('Отзывы собственников', [
@@ -332,6 +347,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'Когда нужна текстовая версия главной страницы и быстрые ссылки на разделы, используйте `/index.md`.',
               'Для новостей при массовом чтении используйте `/news/data/articles.json`, а HTML/Markdown-страницы оставляйте для одной конкретной записи; если у статьи есть `events`, календарь берите из `events[].ics_url`.',
               'Для статуса при массовом чтении используйте `/status/data/status.json`, а HTML/Markdown-страницы сервисов и инцидентов оставляйте для фокусной проверки одной линии или одного события.',
+              'Для карты начинайте с `/map/index.md`; одно место открывается через `/map/[slug]/` или `/map/[slug]/index.md`.',
               'Для отзывов начинайте с `/reviews/index.md`; правила публикации лежат в `/reviews/rules/index.md`, а один отзыв читается через `/reviews/[id]/` или `/reviews/[id]/index.md`.',
               'Для сарафана начинайте с `/sarafan/index.md`; разделы читаются через `/sarafan/[category]/` или `/sarafan/[category]/index.md`; отдельная страница контакта есть только у записей с body и читается через `/sarafan/[category]/[slug]/` или `/sarafan/[category]/[slug]/index.md`; структурированной ленты нет.',
               'Для встреч начинайте с `/meetings/index.md`; для одной встречи откройте `/meetings/[slug]/index.md`, а полный текст берите из `/meetings/[slug]/transcript/[part].md`.',
@@ -352,7 +368,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
 }
 
 export async function buildHomeMarkdown(): Promise<string> {
-  const { contacts, meetings, news, people, reviews, status } =
+  const { contacts, meetings, news, people, places, reviews, status } =
     await snapshot();
   const activeStatus = status.active.filter((item) => item.kind === 'incident');
   const newsHome = registeredSurfaceUrl('news:index');
@@ -382,6 +398,8 @@ export async function buildHomeMarkdown(): Promise<string> {
   const peopleFeed = registeredSurfaceUrl('people:data');
   const peopleLlms = registeredSurfaceUrl('people:llms');
   const peopleCatalog = registeredSurfaceUrl('people:api-catalog');
+  const placesHome = registeredSurfaceUrl('places:index');
+  const placesMarkdown = registeredSurfaceUrl('places:index-markdown');
   const compareHome = registeredSurfaceUrl('compare:index');
   const compareFeed = registeredSurfaceUrl('compare:data-settlements');
   const compareLlms = registeredSurfaceUrl('compare:llms');
@@ -400,6 +418,7 @@ export async function buildHomeMarkdown(): Promise<string> {
     markdownList([
       `[Новости](${newsHome}) — ${count(news.articles.length, ['статья', 'статьи', 'статей'])}; структурированная лента: ${newsFeed}; RSS: ${newsRss}; события: необязательный \`articles[].events[]\` с локальным для статьи \`[event-slug].ics\``,
       `[Статус](${statusHome}) — ${count(status.incidents.length, ['запись', 'записи', 'записей'])}, ${count(activeStatus.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])}; структурированная лента: ${statusFeed}; RSS: ${statusRss}`,
+      `[Карта](${placesHome}) — ${count(places.length, ['место', 'места', 'мест'])}; Markdown-обзор: ${placesMarkdown}; структурированной ленты пока нет`,
       `[Отзывы](${reviewsHome}) — ${count(reviews.reviews.length, ['отзыв', 'отзыва', 'отзывов'])}; Markdown-обзор: ${reviewsMarkdown}; правила публикации: ${reviewsRulesMarkdown}; структурированной ленты нет`,
       `[Сарафан](${contactsHome}) — ${count(contacts.contacts.length, ['контакт', 'контакта', 'контактов'])}; Markdown-обзор: ${contactsMarkdown}; структурированной ленты нет`,
       `Архив встреч — ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}; Markdown-индекс без HTML-аналога: ${meetingsMarkdown}; полные транскрипты: \`/meetings/[slug]/transcript/[part].md\``,
@@ -418,6 +437,7 @@ export async function buildHomeMarkdown(): Promise<string> {
     markdownList([
       `Новости: ${newsLlms}, ${newsCatalog}`,
       `Статус: ${statusLlms}, ${statusCatalog}`,
+      `Карта: ${placesMarkdown}`,
       `Отзывы: ${reviewsMarkdown}`,
       `Сарафан: ${contactsMarkdown}`,
       `Архив встреч: ${meetingsMarkdown}`,

@@ -73,6 +73,12 @@ import {
   personPattern,
 } from '@/lib/people/routes';
 import {
+  placeMarkdownPattern,
+  placePattern,
+  placesMarkdownPath,
+  placesPath,
+} from '@/lib/places/routes';
+import {
   reviewMarkdownPattern,
   reviewPattern,
   reviewsMarkdownPath,
@@ -539,6 +545,30 @@ describe('public surface registry', () => {
     );
     expect(
       contacts.some((surface) => surface.discoveryRoles.includes('llms')),
+    ).toBe(false);
+  });
+
+  it('registers places HTML and Markdown surfaces without a data feed', () => {
+    const places = publicSurfaceRegistry.surfacesByOwner('places');
+
+    expect(places.map((surface) => surface.id)).toEqual([
+      'places:index',
+      'places:index-markdown',
+      'places:detail',
+      'places:detail-markdown',
+    ]);
+    expect(
+      places.map((surface) =>
+        'path' in surface ? surface.path : surface.routePattern,
+      ),
+    ).toEqual([
+      placesPath(),
+      placesMarkdownPath(),
+      placePattern(),
+      placeMarkdownPattern(),
+    ]);
+    expect(
+      places.some((surface) => surface.discoveryRoles.includes('data-feed')),
     ).toBe(false);
   });
 

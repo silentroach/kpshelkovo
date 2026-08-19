@@ -32,6 +32,7 @@ const fixtures = vi.hoisted(() => ({
       },
     ],
   },
+  places: [{ slug: 'burzhuyka' }],
   status: {
     incidents: [{ id: 'status-1' }, { id: 'status-2' }],
     active: [{ kind: 'incident' }, { kind: 'maintenance' }],
@@ -56,6 +57,10 @@ vi.mock('./contacts/load', () => ({
 
 vi.mock('./people/load', () => ({
   loadPeopleDataWithBacklinks: async () => fixtures.people,
+}));
+
+vi.mock('./places/load', () => ({
+  loadPlaces: async () => fixtures.places,
 }));
 
 vi.mock('./status/load', () => ({
@@ -88,8 +93,8 @@ describe('root llms', () => {
       ## Описание
 
       - Это карта публичных данных и точек входа kpshelkovo.online.
-      - Основные разделы: новости, статус сервисов, отзывы собственников, сарафан, архив встреч, регламент и смета тарифа 815, профили людей и сравнение тарифов поселков.
-      - Сейчас в новостях 3 статьи, в статусе 2 записи и 1 активный инцидент, в сарафане 1 контакт, в отзывах 2 отзыва, в архиве встреч 1 встреча, в людях 1 профиль.
+      - Основные разделы: новости, статус сервисов, карта мест, отзывы собственников, сарафан, архив встреч, регламент и смета тарифа 815, профили людей и сравнение тарифов поселков.
+      - Сейчас в новостях 3 статьи, в статусе 2 записи и 1 активный инцидент, на карте 1 место, в сарафане 1 контакт, в отзывах 2 отзыва, в архиве встреч 1 встреча, в людях 1 профиль.
       - Для массового чтения используйте JSON-ленты там, где они есть; HTML и Markdown удобнее для ссылок и точечного чтения.
 
       ## Главные URL
@@ -100,6 +105,7 @@ describe('root llms', () => {
       - Инструкции для автоматического чтения сайта: <https://example.com/.well-known/agent-skills/index.json>
       - Новости: <https://example.com/news/>
       - Статус: <https://example.com/status/>
+      - Карта мест: <https://example.com/map/>
       - Отзывы: <https://example.com/reviews/>
       - Сарафан: <https://example.com/sarafan/>
       - Архив встреч в Markdown: <https://example.com/meetings/index.md>
@@ -113,6 +119,7 @@ describe('root llms', () => {
       - Если задача относится к одному разделу, сначала откройте его \`llms.txt\` или Markdown-индекс; если нужны данные массово, сразу берите JSON-ленту там, где она есть.
       - Новости: <https://example.com/news/llms.txt>; основная лента: <https://example.com/news/data/articles.json>; календарные события лежат в \`articles[].events[].ics_url\`.
       - Статус сервисов: <https://example.com/status/llms.txt>; основная лента: <https://example.com/status/data/status.json>.
+      - Карта мест: <https://example.com/map/index.md>; карточки: \`/map/[slug]/\` и \`/map/[slug]/index.md\`.
       - Отзывы собственников: <https://example.com/reviews/index.md>; правила публикации: <https://example.com/reviews/rules/index.md>; детальные страницы: \`/reviews/[id]/\` и \`/reviews/[id]/index.md\`.
       - Сарафан: <https://example.com/sarafan/index.md>; разделы: \`/sarafan/[category]/\` и \`/sarafan/[category]/index.md\`; детальные страницы есть только у контактов с body и используют \`/sarafan/[category]/[slug]/\` и \`/sarafan/[category]/[slug]/index.md\`; если для контакта доступна vCard, ее адрес указан в \`vcf_url\`.
       - Архив встреч: <https://example.com/meetings/index.md>; одна встреча: <https://example.com/meetings/2026-06-13-ok-comfort/> или <https://example.com/meetings/2026-06-13-ok-comfort/index.md>; полный текст транскрипта берите по частям, например <https://example.com/meetings/2026-06-13-ok-comfort/transcript/1.md>.
@@ -137,6 +144,8 @@ describe('root llms', () => {
       'https://example.com/news/data/articles.json',
       'https://example.com/status/llms.txt',
       'https://example.com/status/data/status.json',
+      'https://example.com/map/',
+      'https://example.com/map/index.md',
       'https://example.com/reviews/',
       'https://example.com/reviews/index.md',
       'https://example.com/reviews/rules/index.md',
@@ -183,6 +192,8 @@ describe('root llms', () => {
       'status:index',
       'status:llms',
       'status:data',
+      'places:index',
+      'places:index-markdown',
       'reviews:index',
       'reviews:index-markdown',
       'reviews:rules-markdown',

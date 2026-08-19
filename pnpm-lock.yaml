@@ -111,6 +111,9 @@ importers:
       '@shelkovo/url':
         specifier: workspace:*
         version: link:../../packages/url
+      '@yandex/ymaps3-clusterer':
+        specifier: ^0.0.12
+        version: 0.0.12
       astro:
         specifier: ^7.2.0
         version: 7.2.0(@types/node@26.2.0)(jiti@2.7.0)(yaml@2.9.0)
@@ -1442,6 +1445,9 @@ packages:
 
   '@vitest/utils@4.1.10':
     resolution: {integrity: sha512-fy9am/HWxbaGt/Sawrp90vt6Y6jQwf1RX77cz3uwoJwJVMli/e1IEwRPnMNJ7vKfPTwo0diXifkpPvwH9v7nGA==}
+
+  '@yandex/ymaps3-clusterer@0.0.12':
+    resolution: {integrity: sha512-APRJc4mZ+amPwoC7pKhVC1quvsX3mLkCi7V3AJUyp7noV/3w0yDzCdWqnMnMzu4JHR1YXP2TfPqYqQ1b8cEoeQ==}
 
   '@yandex/ymaps3-types@1.0.20315584':
     resolution: {integrity: sha512-fJ6K8uat1RYt9ASE1wMlcg2IpPQDHdQBDtcRKHvLrWHhQRTRnFGbvYY8XVo5rTYRN9Mr94X7f2BZOMtrxN16ag==}
@@ -4781,6 +4787,8 @@ snapshots:
       '@vitest/pretty-format': 4.1.10
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
+
+  '@yandex/ymaps3-clusterer@0.0.12': {}
 
   '@yandex/ymaps3-types@1.0.20315584': {}
 

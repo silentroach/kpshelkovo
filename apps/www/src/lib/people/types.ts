@@ -13,17 +13,9 @@ export interface PersonContact {
 }
 
 export type PersonMentionSection =
-  | 'news'
-  | 'status'
-  | 'reviews'
-  | 'people'
-  | 'contacts';
+  'news' | 'status' | 'reviews' | 'places' | 'people' | 'contacts';
 export type PersonBacklinkKind =
-  | 'article'
-  | 'incident'
-  | 'review'
-  | 'person'
-  | 'contact';
+  'article' | 'incident' | 'review' | 'place' | 'person' | 'contact';
 
 export interface PersonMentionRef {
   readonly section: PersonMentionSection;
@@ -41,6 +33,7 @@ export interface PersonBacklinks {
   readonly news: readonly PersonMentionRef[];
   readonly status: readonly PersonMentionRef[];
   readonly reviews: readonly PersonMentionRef[];
+  readonly places: readonly PersonMentionRef[];
   readonly people: readonly PersonMentionRef[];
   readonly contacts: readonly PersonMentionRef[];
 }
@@ -74,6 +67,7 @@ export const EMPTY_PERSON_BACKLINKS: PersonBacklinks = {
   news: [],
   status: [],
   reviews: [],
+  places: [],
   people: [],
   contacts: [],
 };

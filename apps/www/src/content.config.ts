@@ -17,6 +17,8 @@ import {
   RawMeetingTranscriptSchema,
 } from './lib/meetings/raw-schema';
 import { RawPersonProfileSchema } from './lib/people/raw-schema';
+import { RawPlaceSchema } from './lib/places/raw-schema';
+import { PLACE_SLUG } from './lib/places/schema';
 import { RawReviewSchema } from './lib/reviews/raw-schema';
 import {
   REVIEW_DATE,
@@ -91,6 +93,10 @@ function failNewsSummary(entry: string, reason: string): never {
 
 function failPerson(entry: string, reason: string): never {
   throw new Error(`person profile path \"${entry}\" ${reason}`);
+}
+
+function failPlace(entry: string, reason: string): never {
+  throw new Error(`place path \"${entry}\" ${reason}`);
 }
 
 function failMeeting(entry: string, reason: string): never {
@@ -413,6 +419,23 @@ function validatePersonEntry(entry: string): void {
   }
 }
 
+function placeSourceId(entry: string): string {
+  if (!entry.endsWith('.md') || entry.includes('/')) {
+    failPlace(entry, 'must be a Markdown file directly under src/data/places');
+  }
+
+  const slug = trimMarkdown(entry);
+
+  if (!PLACE_SLUG.test(slug)) {
+    failPlace(
+      entry,
+      'slug must use lower-case Latin letters, digits, and hyphen',
+    );
+  }
+
+  return slug;
+}
+
 const newsAuthors = defineCollection({
   loader: glob({
     pattern: '**/*.yaml',
@@ -464,6 +487,15 @@ const peopleProfiles = defineCollection({
     },
   }),
   schema: RawPersonProfileSchema,
+});
+
+const places = defineCollection({
+  loader: glob({
+    pattern: ['*.md', '!AGENTS.md'],
+    base: './src/data/places',
+    generateId: ({ entry }) => placeSourceId(entry),
+  }),
+  schema: RawPlaceSchema,
 });
 
 const kbPages = defineCollection({
@@ -527,6 +559,7 @@ export const collections = {
   statusIncidents,
   kbPages,
   peopleProfiles,
+  places,
   meetingEntries,
   meetingTranscripts,
   reviews,

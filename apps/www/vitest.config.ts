@@ -6,6 +6,7 @@ const visualTests = ['tests/**/*.visual.local.spec.ts'];
 const searchQualityTests = ['tests/search-quality.test.ts'];
 const domTests = [
   'src/compare/components/**/*.test.ts',
+  'src/components/places/tests/**/*.test.ts',
   'src/components/search/tests/**/*.test.ts',
   'src/lib/home/hero.dom.test.ts',
   'src/lib/home/status.dom.test.ts',

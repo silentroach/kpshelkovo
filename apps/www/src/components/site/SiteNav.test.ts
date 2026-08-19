@@ -36,6 +36,15 @@ describe('SiteNav', () => {
   );
 
   it.each(['header', 'mobile'] as const)(
+    'keeps places out of the %s primary navigation during rollout',
+    async (variant) => {
+      const html = await renderNav('/map/', variant);
+
+      expect(html).not.toContain('href="/map/"');
+    },
+  );
+
+  it.each(['header', 'mobile'] as const)(
     'marks the tariff parent and exact child in the %s navigation',
     async (variant) => {
       const html = await renderNav('/815/compare/', variant);

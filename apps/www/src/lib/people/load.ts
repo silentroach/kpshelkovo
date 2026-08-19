@@ -4,6 +4,7 @@ import {
 } from '../mentions';
 import { createContactMentionRefs } from '../contacts/mentions';
 import { createNewsArticleMentionRefs } from '../news/mentions';
+import { createPlaceMentionRefs } from '../places/mentions';
 import { createReviewMentionRefs } from '../reviews/mentions';
 import { createStatusIncidentMentionRefs } from '../status/mentions';
 import { createPeopleBacklinksFromGraph } from './backlinks';
@@ -44,19 +45,22 @@ const buildPeopleDataWithBacklinks = async (): Promise<PeopleDataset> => {
     { loadNewsData },
     { loadStatusData },
     { loadReviewsData },
+    { loadPlacesData },
     people,
   ] = await Promise.all([
     import('../contacts/load'),
     import('../news/load'),
     import('../status/load'),
     import('../reviews/load'),
+    import('../places/load'),
     loadPeopleData(),
   ]);
-  const [contacts, news, status, reviews] = await Promise.all([
+  const [contacts, news, status, reviews, places] = await Promise.all([
     loadContactsData(),
     loadNewsData(),
     loadStatusData(),
     loadReviewsData(),
+    loadPlacesData(),
   ]);
   const refs = [
     ...contacts.contacts.flatMap((contact) =>
@@ -65,6 +69,7 @@ const buildPeopleDataWithBacklinks = async (): Promise<PeopleDataset> => {
     ...news.articles.flatMap(createNewsArticleMentionRefs),
     ...status.incidents.flatMap(createStatusIncidentMentionRefs),
     ...reviews.reviews.flatMap(createReviewMentionRefs),
+    ...places.places.flatMap(createPlaceMentionRefs),
     ...people.profiles.flatMap(createPersonProfileMentionRefs),
   ];
 

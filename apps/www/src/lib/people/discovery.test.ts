@@ -71,6 +71,7 @@ const profile = (): PersonProfile => ({
       },
     ],
     reviews: [],
+    places: [],
     people: [],
     contacts: [],
   },
@@ -254,6 +255,23 @@ describe('people discovery payload', () => {
       'news',
       'status',
       'reviews',
+      'places',
+      'people',
+      'contacts',
+    ]);
+    expect(openapiDefs.kind?.enum).toEqual([
+      'article',
+      'incident',
+      'review',
+      'place',
+      'person',
+      'contact',
+    ]);
+    expect(defs.backlinks?.required).toEqual([
+      'news',
+      'status',
+      'reviews',
+      'places',
       'people',
       'contacts',
     ]);

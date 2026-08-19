@@ -1,0 +1,138 @@
+---
+import type { GetStaticPaths } from 'astro';
+
+import { formatDynamicHtml } from '@shelkovo/markdown';
+import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+
+import PlaceOpeningHours from '@/components/places/PlaceOpeningHours.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
+import { renderMarkdown } from '@/lib/markdown/render';
+import { loadPlace, loadPlaces } from '@/lib/places/load';
+import { placesUrl } from '@/lib/places/routes';
+import { formatPlaceCategory } from '@/lib/places/view';
+import { SEARCH_SECTIONS } from '@/lib/search/sections';
+import type { SearchDocument } from '@/lib/search/types';
+
+export const getStaticPaths = (async () => {
+  const places = await loadPlaces();
+
+  return places.map((place) => ({ params: { slug: place.slug } }));
+}) satisfies GetStaticPaths;
+
+const slug = Astro.params.slug;
+
+if (!slug) {
+  throw new Error('place slug is required');
+}
+
+const place = await loadPlace(slug);
+
+if (!place) {
+  throw new Error(`place "${slug}" not found`);
+}
+
+const title = `${place.name} — Карта — Шелково Онлайн`;
+const description = place.address
+  ? `${place.summary}. Адрес: ${place.address}.`
+  : `${place.summary}.`;
+const summaryHtml = formatDynamicHtml(place.summary);
+const bodyHtml = place.body ? renderMarkdown(place.body) : undefined;
+const addressHtml = place.address
+  ? formatDynamicHtml(place.address)
+  : undefined;
+const displayName =
+  place.status === 'underConstruction' ? `🚧 ${place.name}` : place.name;
+const breadcrumbs = withHomeBreadcrumbs([
+  { label: 'Карта', href: placesUrl() },
+  { label: place.name },
+]);
+const search = {
+  scope: 'page',
+  title: place.name,
+  description,
+  section: SEARCH_SECTIONS.places,
+  aliases: [formatPlaceCategory(place.category)],
+} satisfies SearchDocument;
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Place',
+  name: place.name,
+  description: place.summary,
+  url: place.canonical,
+  address: place.address,
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: place.coordinates.lat,
+    longitude: place.coordinates.lng,
+  },
+  sameAs: place.mapUrl,
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={place.url}
+  schema={schema}
+  search={search}
+>
+  <main class="ui-page pb-8 md:pb-12 lg:pb-14">
+    <header class="ui-page-header">
+      <div class="ui-page-header-stack max-w-4xl">
+        <Breadcrumbs items={breadcrumbs} />
+
+        <div>
+          <h1 class="ui-page-title">{displayName}</h1>
+        </div>
+      </div>
+    </header>
+
+    <article class="max-w-3xl px-5 md:px-6">
+      <p class="ui-copy max-w-[65ch] text-foreground" set:html={summaryHtml} />
+
+      {
+        bodyHtml ? (
+          <div class="ui-prose mt-5 max-w-[65ch]" set:html={bodyHtml} />
+        ) : null
+      }
+
+      {
+        addressHtml || place.openingHours ? (
+          <dl class="mt-6 border-y border-border">
+            {addressHtml ? (
+              <div class="grid gap-1 py-4 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4">
+                <dt class="text-sm font-semibold leading-7 text-muted-foreground">
+                  Адрес
+                </dt>
+                <dd
+                  class="text-base leading-7 text-foreground"
+                  set:html={addressHtml}
+                />
+              </div>
+            ) : null}
+            {place.openingHours ? (
+              <PlaceOpeningHours openingHours={place.openingHours} />
+            ) : null}
+          </dl>
+        ) : null
+      }
+
+      <nav
+        aria-label="Действия с местом"
+        class="mt-6 flex flex-wrap gap-x-5 gap-y-3 text-sm font-semibold"
+      >
+        <a href={placesUrl()} class="site-text-link">Показать на общей карте</a>
+        <a href={place.mapUrl} class="site-text-link">Открыть в Яндекс Картах</a
+        >
+        {
+          place.contact ? (
+            <a href={place.contact.url} class="site-text-link">
+              Контакты и отзывы
+            </a>
+          ) : null
+        }
+      </nav>
+    </article>
+  </main>
+</BaseLayout>

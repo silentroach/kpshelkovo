@@ -9,6 +9,10 @@ export const SEARCH_SECTIONS = {
     id: 'status',
     label: 'Статус',
   },
+  places: {
+    id: 'places',
+    label: 'Карта',
+  },
   knowledgeBase: {
     id: 'knowledge-base',
     label: 'База знаний',

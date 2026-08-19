@@ -57,6 +57,17 @@ const profile = (): PersonProfile => ({
     ],
     status: [],
     reviews: [],
+    places: [
+      {
+        section: 'places',
+        kind: 'place',
+        sourceId: 'titanic',
+        title: 'Детская площадка «Титаник»',
+        htmlUrl: '/map/titanic/',
+        markdownUrl: '/map/titanic/index.md',
+        mentionedAt: '2026-08-19T00:00:00.000Z',
+      },
+    ],
     people: [],
     contacts: [],
   },
@@ -70,7 +81,7 @@ describe('people public DTO adapters', () => {
       {
         "profiles": [
           {
-            "backlink_count": 1,
+            "backlink_count": 2,
             "backlinks": {
               "contacts": [],
               "news": [
@@ -85,6 +96,17 @@ describe('people public DTO adapters', () => {
                 },
               ],
               "people": [],
+              "places": [
+                {
+                  "html_url": "https://example.com/map/titanic/",
+                  "kind": "place",
+                  "markdown_url": "https://example.com/map/titanic/index.md",
+                  "mentioned_at": "2026-08-19T00:00:00.000Z",
+                  "section": "places",
+                  "source_id": "titanic",
+                  "title": "Детская площадка «Титаник»",
+                },
+              ],
               "reviews": [],
               "status": [],
             },
@@ -119,7 +141,7 @@ describe('people public DTO adapters', () => {
           },
         ],
         "stats": {
-          "backlink_count": 1,
+          "backlink_count": 2,
           "mention_count": 1,
           "profile_count": 1,
         },
