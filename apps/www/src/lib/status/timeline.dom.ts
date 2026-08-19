@@ -105,6 +105,11 @@ const layoutStatusTimelineProblemLanes = (
   root: HTMLElement,
   track: HTMLElement,
 ): void => {
+  const measuredTrackWidthPx = track.getBoundingClientRect().width;
+  const trackWidthPx =
+    measuredTrackWidthPx > 0
+      ? measuredTrackWidthPx
+      : STATUS_TIMELINE_LANE_LAYOUT_WIDTH_PX;
   const problemNodes = Array.from(
     track.querySelectorAll(STATUS_TIMELINE_PROBLEM_SELECTOR),
   ).filter((node): node is HTMLElement => node instanceof HTMLElement);
@@ -143,7 +148,7 @@ const layoutStatusTimelineProblemLanes = (
             STATUS_TIMELINE_ACTIVE_END_CLASS,
           ),
         },
-        STATUS_TIMELINE_LANE_LAYOUT_WIDTH_PX,
+        trackWidthPx,
       ),
     ];
   });
@@ -592,7 +597,6 @@ const observeStatusTimelineResize = (
   tooltip?: StatusTimelineTooltipElements,
 ): void => {
   if (
-    !tooltip ||
     statusTimelineResizeObservers.has(root) ||
     typeof ResizeObserver === 'undefined'
   ) {
@@ -600,7 +604,11 @@ const observeStatusTimelineResize = (
   }
 
   const observer = new ResizeObserver(() => {
-    repositionOpenStatusTimelineTooltip(root, tooltip);
+    layoutStatusTimelineProblemLanes(root, track);
+
+    if (tooltip) {
+      repositionOpenStatusTimelineTooltip(root, tooltip);
+    }
   });
 
   observer.observe(track);

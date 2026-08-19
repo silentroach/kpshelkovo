@@ -46,6 +46,7 @@ const incident = (input: IncidentInput): StatusTimelineIncidentInput => ({
 const laneLayoutForDays = (
   days: number,
   dayIndexes: readonly number[],
+  trackWidthPx = 256,
 ): readonly (readonly [string, number])[] => {
   const intervals = dayIndexes.map((dayIndex) =>
     getStatusTimelineHitInterval(
@@ -56,7 +57,7 @@ const laneLayoutForDays = (
         compactMarker: true,
         reachesRangeEnd: false,
       },
-      256,
+      trackWidthPx,
     ),
   );
 
@@ -87,6 +88,21 @@ describe('buildStatusTimelineLaneLayout', () => {
 
   it('keeps already separate adjacent targets centered on a 7-day track', () => {
     expect(laneLayoutForDays(7, [0, 1])).toEqual([]);
+  });
+
+  it('separates only targets whose hit areas overlap on a wide track', () => {
+    expect(laneLayoutForDays(90, [0, 4, 5], 790)).toMatchInlineSnapshot(`
+      [
+        [
+          "4",
+          -12,
+        ],
+        [
+          "5",
+          12,
+        ],
+      ]
+    `);
   });
 });
 

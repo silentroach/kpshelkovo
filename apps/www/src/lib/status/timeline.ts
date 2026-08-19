@@ -5,7 +5,7 @@ import type { StatusDuration, StatusIncident } from './types';
 
 export const STATUS_TIMELINE_DAY_MS = 24 * 60 * 60 * 1000;
 export const STATUS_TIMELINE_HIT_SIZE_PX = 24;
-// A fixed conservative width keeps SSR and hydrated lane assignments identical.
+// SSR and non-layout environments use a conservative mobile-width fallback.
 export const STATUS_TIMELINE_LANE_LAYOUT_WIDTH_PX = 256;
 
 const STATUS_TIMELINE_SEGMENT_MIN_WIDTH_PX = 0.45 * 16;
