@@ -1,64 +1,76 @@
-import { loadContact } from '@/lib/contacts/load';
+import { getCollection } from 'astro:content';
+import { compareRuText } from '@shelkovo/format';
 
-import { placeCanonical, placeMarkdownUrl, placeUrl } from './routes';
-import type { Place, PlaceSourceContact } from './types';
+import { loadContactDetails } from '@/lib/contacts/load';
+import type { SiteMentionRegistry } from '@/lib/mentions';
+import { loadPeopleMentionRegistry } from '@/lib/people/registry';
 
-const PLACE_CONTACTS = [{ category: 'food', slug: 'burzhuyka' }] as const;
+import { mapRawPlace } from './mapper';
+import type { Place, PlaceEntry, PlacesDataset } from './types';
 
-let cache: Promise<readonly Place[]> | undefined;
+let cache: Promise<PlacesDataset> | undefined;
 
-export const createPlaceFromContact = (contact: PlaceSourceContact): Place => {
-  const location = contact.location;
+export const buildPlacesDataset = (
+  entries: readonly PlaceEntry[],
+  opts?: {
+    readonly contactUrls?: ReadonlyMap<string, string>;
+    readonly mentionRegistry?: SiteMentionRegistry;
+  },
+): PlacesDataset => {
+  const contactUrls = opts?.contactUrls ?? new Map<string, string>();
+  const places = entries
+    .map((entry) => {
+      const contactId = entry.data.contact;
+      const contactUrl = contactId ? contactUrls.get(contactId) : undefined;
 
-  if (!contact.hasDetailPage || !contact.url) {
-    throw new Error(
-      `place source contact "${contact.slug}" needs a detail page`,
+      if (contactId && !contactUrl) {
+        throw new Error(
+          `place "${entry.id}" references missing contact "${contactId}"`,
+        );
+      }
+
+      return mapRawPlace(entry, {
+        contact:
+          contactId && contactUrl
+            ? { id: contactId, url: contactUrl }
+            : undefined,
+        mentionRegistry: opts?.mentionRegistry,
+      });
+    })
+    .sort(
+      (a, b) => compareRuText(a.name, b.name) || compareRuText(a.slug, b.slug),
     );
-  }
-
-  if (!contact.summary) {
-    throw new Error(`place source contact "${contact.slug}" needs a summary`);
-  }
-
-  if (!location?.address || !location.coordinates) {
-    throw new Error(
-      `place source contact "${contact.slug}" needs an address and coordinates`,
-    );
-  }
 
   return {
-    slug: contact.slug,
-    name: contact.title,
-    summary: contact.summary,
-    address: location.address,
-    coordinates: location.coordinates,
-    mapUrl: location.url,
-    contactUrl: contact.url,
-    updatedIso: contact.updatedIso,
-    url: placeUrl(contact.slug),
-    markdownUrl: placeMarkdownUrl(contact.slug),
-    canonical: placeCanonical(contact.slug),
+    places,
+    bySlug: new Map(places.map((place) => [place.slug, place] as const)),
   };
 };
 
-const buildPlaces = async (): Promise<readonly Place[]> =>
-  Promise.all(
-    PLACE_CONTACTS.map(async ({ category, slug }) => {
-      const contact = await loadContact(category, slug);
-
-      if (!contact) {
-        throw new Error(`place source contact "${category}/${slug}" not found`);
-      }
-
-      return createPlaceFromContact(contact);
-    }),
+const buildPlacesData = async (): Promise<PlacesDataset> => {
+  const [entries, contacts, mentionRegistry] = await Promise.all([
+    getCollection('places'),
+    loadContactDetails(),
+    loadPeopleMentionRegistry(),
+  ]);
+  const contactUrls = new Map(
+    contacts.map((contact) => [
+      `${contact.category}/${contact.slug}`,
+      contact.url,
+    ]),
   );
 
-export const loadPlaces = (): Promise<readonly Place[]> => {
-  cache ??= buildPlaces();
+  return buildPlacesDataset(entries, { contactUrls, mentionRegistry });
+};
+
+export const loadPlacesData = (): Promise<PlacesDataset> => {
+  cache ??= buildPlacesData();
 
   return cache;
 };
 
+export const loadPlaces = async (): Promise<readonly Place[]> =>
+  (await loadPlacesData()).places;
+
 export const loadPlace = async (slug: string): Promise<Place | undefined> =>
-  (await loadPlaces()).find((place) => place.slug === slug.trim());
+  (await loadPlacesData()).bySlug.get(slug.trim());

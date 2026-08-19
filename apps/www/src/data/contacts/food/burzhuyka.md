@@ -8,6 +8,8 @@ search_aliases:
   - где поесть
 contacts:
   phone: '+7 909 620-91-59'
+# Связано с src/data/places/burzhuyka.md.
+# Если меняются общие сведения, адрес, ссылка на карту или координаты, обновите оба файла.
 location:
   title: Фудтрак в Форесте
   url: https://yandex.ru/navi/-/CTfgq-5r

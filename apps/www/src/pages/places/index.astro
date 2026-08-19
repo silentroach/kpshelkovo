@@ -48,7 +48,12 @@ const schema = {
         <p class="text-sm leading-6 text-muted-foreground">
           Для карты нужен JavaScript. <a
             href={places[0]?.url ?? placesUrl()}
-            class="site-text-link font-semibold">Открыть карточку «Буржуйки»</a
+            class="site-text-link font-semibold"
+            >{
+              places[0]
+                ? `Открыть карточку «${places[0].name}»`
+                : 'Открыть раздел'
+            }</a
           >.
         </p>
       </div>

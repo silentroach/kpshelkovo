@@ -6,13 +6,15 @@
     loadYandexMaps,
     waitForStableLayout,
   } from '@/lib/yandex-maps/runtime';
+  import { PLACE_MAP_BOUNDS } from '@/lib/places/schema';
   import type { Place } from '@/lib/places/types';
+  import { formatPlaceStatus } from '@/lib/places/view';
 
   let { places }: { readonly places: readonly Place[] } = $props();
 
   const SETTLEMENT_BOUNDS: ymaps3.LngLatBounds = [
-    [37.709, 55.049],
-    [37.764, 55.081],
+    [PLACE_MAP_BOUNDS.minLng, PLACE_MAP_BOUNDS.minLat],
+    [PLACE_MAP_BOUNDS.maxLng, PLACE_MAP_BOUNDS.maxLat],
   ];
   const VIEW_MARGIN: ymaps3.Margin = [64, 32, 48, 32];
 
@@ -33,8 +35,11 @@
 
     link.className = 'place-map-marker';
     link.href = place.url;
-    link.setAttribute('aria-label', `Открыть место «${place.name}»`);
-    link.title = place.name;
+    link.dataset.status = place.status;
+    const status =
+      place.status === 'existing' ? '' : `, ${formatPlaceStatus(place.status)}`;
+    link.setAttribute('aria-label', `Открыть место «${place.name}»${status}`);
+    link.title = `${place.name}${status}`;
     link.addEventListener('click', (event) => event.stopPropagation());
     link.addEventListener('keydown', (event) => {
       if (event.key !== ' ') return;
@@ -225,6 +230,17 @@
 
   :global(.place-map-marker:focus-visible) {
     box-shadow: 0 0 0 0.1875rem var(--color-ring);
+  }
+
+  :global(.place-map-marker[data-status='planned'] .place-map-marker-point) {
+    border-style: dashed;
+    opacity: 0.76;
+  }
+
+  :global(
+    .place-map-marker[data-status='underConstruction'] .place-map-marker-point
+  ) {
+    border-radius: 0.25rem;
   }
 
   .map-placeholder {

@@ -8,11 +8,19 @@ let buildPlacesMarkdown: typeof import('../markdown').buildPlacesMarkdown;
 const place: Place = {
   slug: 'burzhuyka',
   name: 'Буржуйка',
+  category: 'food',
+  status: 'existing',
   summary: 'Фудтрак в Шелково Форест',
+  body: 'Описание **места**.',
+  mentions: [],
   address: 'Шелково Форест, Берёзовая улица, 21А',
   coordinates: { lat: 55.060526, lng: 37.716242 },
   mapUrl: 'https://yandex.ru/navi/-/CTfgq-5r',
-  contactUrl: '/sarafan/food/burzhuyka/',
+  contact: {
+    id: 'food/burzhuyka',
+    url: '/sarafan/food/burzhuyka/',
+  },
+  updatedAt: new Date('2026-08-11T00:00:00.000Z'),
   updatedIso: '2026-08-11',
   url: '/places/burzhuyka/',
   markdownUrl: '/places/burzhuyka/index.md',
@@ -39,6 +47,24 @@ describe('places Markdown', () => {
     expect(markdown).toContain('https://example.com/places/burzhuyka/index.md');
     expect(markdown).toContain('https://example.com/sarafan/food/burzhuyka/');
     expect(markdown).toContain('https://yandex.ru/navi/-/CTfgq-5r');
+    expect(markdown).toContain('Фудтрак в Шелково Форест');
+    expect(markdown).toContain('Описание **места**.');
     expect(markdown).not.toMatch(/apps\/www|src\/|repo:/u);
+  });
+
+  it('publishes the status and source of a future place', () => {
+    const markdown = buildPlaceMarkdown({
+      ...place,
+      status: 'planned',
+      evidence: {
+        sourceUrl: 'https://example.com/source',
+        checkedAt: new Date('2026-08-12T00:00:00.000Z'),
+        checkedIso: '2026-08-12',
+      },
+    });
+
+    expect(markdown).toContain('Статус: Планируется');
+    expect(markdown).toContain('https://example.com/source');
+    expect(markdown).toContain('12 августа 2026');
   });
 });

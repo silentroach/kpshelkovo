@@ -1,0 +1,13 @@
+# Данные мест
+
+- Один Markdown-файл в этой папке равен одному месту на карте.
+- Имя файла без `.md` задает канонический `slug`; отдельное поле `slug` во frontmatter не нужно.
+- Обязательные поля: `title`, `category`, `status`, `updated_at`, `summary` и `location`.
+- В `location` хранить `map_url`, понятный `address` и точные `coordinates` с числовыми `lat` и `lng`.
+- `location.coordinates` задает основную точку места и будущую точку подписи. Линии и полигоны добавлять как GeoJSON features или соседний `[slug].geojson`, когда появится их renderer; не кодировать сложную геометрию произвольными полями frontmatter.
+- Поддерживаемые категории: `entrance`, `children`, `sport`, `walking`, `food`, `services`, `nature`, `water`, `infrastructure`.
+- Поддерживаемые статусы: `existing`, `planned`, `underConstruction`.
+- Для `planned` и `underConstruction` обязателен блок `evidence` с `source_url` и `checked_at`.
+- Не публиковать точные координаты частных домов и чувствительной инфраструктуры без отдельного редакционного решения.
+- `contact` — необязательная ссылка на существующую подробную карточку «Сарафана» в формате `category/slug`. Место остается источником истины для названия, описания, адреса и координат.
+- Markdown body необязателен; использовать его для подробностей, которых нет в кратком `summary`.

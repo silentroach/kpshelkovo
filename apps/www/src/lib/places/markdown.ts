@@ -1,6 +1,7 @@
 import {
   createMarkdownDocument,
   md,
+  parseMarkdownFragment,
   serializeMarkdownDocument,
 } from '@shelkovo/markdown';
 
@@ -8,6 +9,11 @@ import { absoluteUrl } from '@/lib/site';
 
 import { placesMarkdownUrl, placesUrl } from './routes';
 import type { Place } from './types';
+import {
+  formatPlaceCategory,
+  formatPlaceEvidenceDate,
+  formatPlaceStatus,
+} from './view';
 
 export const PLACES_MARKDOWN_HEADERS = {
   'Content-Type': 'text/markdown; charset=utf-8',
@@ -48,13 +54,28 @@ export const buildPlaceMarkdown = (place: Place): string =>
   serialize([
     md.heading(1, place.name),
     md.paragraph(place.summary),
-    md.heading(2, 'Расположение'),
+    ...(place.body ? parseMarkdownFragment(place.body) : []),
+    md.heading(2, 'Сведения'),
     md.list([
+      md.listItem(`Категория: ${formatPlaceCategory(place.category)}`),
+      md.listItem(`Статус: ${formatPlaceStatus(place.status)}`),
       md.listItem(`Адрес: ${place.address}`),
       md.listItem(
         `Координаты: ${place.coordinates.lat}, ${place.coordinates.lng}`,
       ),
+      md.listItem(`Обновлено: ${place.updatedIso}`),
     ]),
+    ...(place.evidence
+      ? [
+          md.heading(2, 'Источник статуса'),
+          md.paragraph([
+            md.link(place.evidence.sourceUrl, 'Открыть источник'),
+            md.text(
+              `; сведения проверены ${formatPlaceEvidenceDate(place.evidence)}.`,
+            ),
+          ]),
+        ]
+      : []),
     md.heading(2, 'Ссылки'),
     md.list([
       md.listItem([
@@ -62,14 +83,18 @@ export const buildPlaceMarkdown = (place: Place): string =>
           md.link(absoluteUrl(place.mapUrl), 'Открыть в Яндекс Картах'),
         ]),
       ]),
-      md.listItem([
-        md.paragraph([
-          md.link(
-            absoluteUrl(place.contactUrl),
-            'Меню, телефон и отзывы в «Сарафане»',
-          ),
-        ]),
-      ]),
+      ...(place.contact
+        ? [
+            md.listItem([
+              md.paragraph([
+                md.link(
+                  absoluteUrl(place.contact.url),
+                  'Контакты и отзывы в «Сарафане»',
+                ),
+              ]),
+            ]),
+          ]
+        : []),
       md.listItem([
         md.paragraph([
           md.link(absoluteUrl(placesMarkdownUrl()), 'Все места на карте'),

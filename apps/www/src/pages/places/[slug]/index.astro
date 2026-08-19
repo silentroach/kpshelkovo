@@ -6,8 +6,14 @@ import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
+import { renderMarkdown } from '@/lib/markdown/render';
 import { loadPlace, loadPlaces } from '@/lib/places/load';
 import { placesUrl } from '@/lib/places/routes';
+import {
+  formatPlaceCategory,
+  formatPlaceEvidenceDate,
+  formatPlaceStatus,
+} from '@/lib/places/view';
 
 export const getStaticPaths = (async () => {
   const places = await loadPlaces();
@@ -30,7 +36,10 @@ if (!place) {
 const title = `${place.name} — Карта — Шелково Онлайн`;
 const description = `${place.summary}. Адрес: ${place.address}.`;
 const summaryHtml = formatDynamicHtml(place.summary);
+const bodyHtml = place.body ? renderMarkdown(place.body) : undefined;
 const addressHtml = formatDynamicHtml(place.address);
+const category = formatPlaceCategory(place.category);
+const status = formatPlaceStatus(place.status);
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Карта', href: placesUrl() },
   { label: place.name },
@@ -67,7 +76,7 @@ const schema = {
           <p
             class="mb-2 text-xs font-bold uppercase tracking-[0.06em] text-muted-foreground"
           >
-            Фудтрак
+            {category}{place.status === 'existing' ? '' : ` · ${status}`}
           </p>
           <h1 class="ui-page-title">{place.name}</h1>
         </div>
@@ -76,6 +85,12 @@ const schema = {
 
     <article class="max-w-3xl px-5 md:px-6">
       <p class="ui-copy max-w-[65ch] text-foreground" set:html={summaryHtml} />
+
+      {
+        bodyHtml ? (
+          <div class="ui-prose mt-5 max-w-[65ch]" set:html={bodyHtml} />
+        ) : null
+      }
 
       <dl class="mt-6 border-y border-border">
         <div class="grid gap-1 py-4 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4">
@@ -87,6 +102,20 @@ const schema = {
             set:html={addressHtml}
           />
         </div>
+        {
+          place.evidence ? (
+            <div class="grid gap-1 border-t border-border py-4 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4">
+              <dt class="text-sm font-semibold leading-7 text-muted-foreground">
+                Источник
+              </dt>
+              <dd class="text-base leading-7 text-foreground">
+                <a href={place.evidence.sourceUrl} class="site-text-link">
+                  Проверено {formatPlaceEvidenceDate(place.evidence)}
+                </a>
+              </dd>
+            </div>
+          ) : null
+        }
       </dl>
 
       <nav
@@ -96,9 +125,13 @@ const schema = {
         <a href={placesUrl()} class="site-text-link">Показать на общей карте</a>
         <a href={place.mapUrl} class="site-text-link">Открыть в Яндекс Картах</a
         >
-        <a href={place.contactUrl} class="site-text-link"
-          >Меню, телефон и отзывы</a
-        >
+        {
+          place.contact ? (
+            <a href={place.contact.url} class="site-text-link">
+              Контакты и отзывы
+            </a>
+          ) : null
+        }
       </nav>
     </article>
   </main>

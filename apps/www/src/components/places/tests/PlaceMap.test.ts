@@ -23,11 +23,19 @@ const mapProps: {
 const place: Place = {
   slug: 'burzhuyka',
   name: 'Буржуйка',
+  category: 'food',
+  status: 'existing',
   summary: 'Фудтрак в Шелково Форест',
+  body: '',
+  mentions: [],
   address: 'Шелково Форест, Берёзовая улица, 21А',
   coordinates: { lat: 55.060526, lng: 37.716242 },
   mapUrl: 'https://yandex.ru/navi/-/CTfgq-5r',
-  contactUrl: '/sarafan/food/burzhuyka/',
+  contact: {
+    id: 'food/burzhuyka',
+    url: '/sarafan/food/burzhuyka/',
+  },
+  updatedAt: new Date('2026-08-11T00:00:00.000Z'),
   updatedIso: '2026-08-11',
   url: '/places/burzhuyka/',
   markdownUrl: '/places/burzhuyka/index.md',
@@ -89,6 +97,7 @@ describe('PlaceMap', () => {
       <a
         aria-label="Открыть место «Буржуйка»"
         class="place-map-marker"
+        data-status="existing"
         href="/places/burzhuyka/"
         title="Буржуйка"
       >
