@@ -80,11 +80,11 @@ const triggerFor = (help: Locator): Locator =>
 
 const tooltipFor = (help: Locator): Locator => help.getByRole('tooltip');
 
-const placeTriggerAtShellEdge = async (
+const scrollTriggerTowardShellEdge = async (
   trigger: Locator,
   edge: 'left' | 'right',
 ): Promise<void> => {
-  await trigger.evaluate((element, targetEdge) => {
+  const expectedScrollLeft = await trigger.evaluate((element, targetEdge) => {
     const shell = element.closest<HTMLElement>('[data-ui-sticky-table-shell]');
 
     if (!shell) throw new Error('Missing table shell');
@@ -94,28 +94,31 @@ const placeTriggerAtShellEdge = async (
     const contentLeft = triggerRect.left - shellRect.left + shell.scrollLeft;
     const edgeInset = 4;
 
-    shell.scrollLeft =
+    const desiredScrollLeft =
       targetEdge === 'left'
         ? contentLeft - edgeInset
         : contentLeft + triggerRect.width - shell.clientWidth + edgeInset;
+    const maxScrollLeft = shell.scrollWidth - shell.clientWidth;
+    const nextScrollLeft = Math.min(
+      Math.max(desiredScrollLeft, 0),
+      maxScrollLeft,
+    );
+
+    shell.scrollLeft = nextScrollLeft;
+    return nextScrollLeft;
   }, edge);
 
   await expect
     .poll(() =>
-      trigger.evaluate((element, targetEdge) => {
+      trigger.evaluate((element, targetScrollLeft) => {
         const shell = element.closest<HTMLElement>(
           '[data-ui-sticky-table-shell]',
         );
 
         if (!shell) return false;
 
-        const shellRect = shell.getBoundingClientRect();
-        const triggerRect = element.getBoundingClientRect();
-
-        return targetEdge === 'left'
-          ? triggerRect.left <= shellRect.left + 5
-          : triggerRect.right >= shellRect.right - 5;
-      }, edge),
+        return Math.abs(shell.scrollLeft - targetScrollLeft) <= 1;
+      }, expectedScrollLeft),
     )
     .toBe(true);
 };
@@ -185,7 +188,7 @@ for (const width of mobileWidths) {
       const tooltip = tooltipFor(help);
 
       for (const edge of ['right', 'left'] as const) {
-        await placeTriggerAtShellEdge(trigger, edge);
+        await scrollTriggerTowardShellEdge(trigger, edge);
         await placeTriggerVertically(trigger, 'center');
         await trigger.focus();
         await expect(tooltip).toBeVisible();
@@ -204,7 +207,7 @@ for (const width of mobileWidths) {
     const trigger = triggerFor(help);
     const tooltip = tooltipFor(help);
 
-    await placeTriggerAtShellEdge(trigger, 'left');
+    await scrollTriggerTowardShellEdge(trigger, 'left');
     await placeTriggerVertically(trigger, 'bottom');
     await trigger.focus();
     await expect(tooltip).toBeVisible();
@@ -281,7 +284,7 @@ test('preserves pointer and keyboard behavior after horizontal scrolling', async
   const trigger = triggerFor(help);
   const tooltip = tooltipFor(help);
 
-  await placeTriggerAtShellEdge(trigger, 'left');
+  await scrollTriggerTowardShellEdge(trigger, 'left');
   await placeTriggerVertically(trigger, 'center');
   await trigger.hover();
   await expect(tooltip).toBeVisible();
@@ -304,7 +307,7 @@ test.describe('touch', () => {
     const trigger = triggerFor(help);
     const tooltip = tooltipFor(help);
 
-    await placeTriggerAtShellEdge(trigger, 'left');
+    await scrollTriggerTowardShellEdge(trigger, 'left');
     await placeTriggerVertically(trigger, 'center');
     await trigger.tap();
     await expect(tooltip).toBeVisible();
