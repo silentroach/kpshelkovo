@@ -30,9 +30,12 @@
   const BOUNDS_PADDING_RATIO = 0.3;
   const CLUSTER_GRID_SIZE = 48;
   const CLUSTER_ZOOM_DURATION_MS = 220;
+  const HIGHLIGHT_DURATION_MS = 5_000;
+  const HIGHLIGHT_QUERY_PARAM = 'h';
   const MARKER_MIN_SCALE = 30 / 48;
   const MARKER_MIN_ZOOM = 13.5;
   const MARKER_MAX_ZOOM = 16;
+  const PLACE_FOCUS_ZOOM = MARKER_MAX_ZOOM;
   const roundCoordinate = (value: number): number => Number(value.toFixed(6));
   const CUSTOM_MARKER_IMAGES: Readonly<
     Record<
@@ -87,7 +90,7 @@
 
     return MARKER_MIN_SCALE + (1 - MARKER_MIN_SCALE) * progress;
   };
-  const getClusterZoomDuration = (): number =>
+  const getMapZoomDuration = (): number =>
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
       ? 0
       : CLUSTER_ZOOM_DURATION_MS;
@@ -95,6 +98,41 @@
     window.matchMedia?.('(max-width: 40rem)').matches
       ? MOBILE_VIEW_MARGIN
       : VIEW_MARGIN;
+  const removeHighlightQuery = (expectedSlug?: string): void => {
+    const url = new URL(window.location.href);
+
+    if (!url.searchParams.has(HIGHLIGHT_QUERY_PARAM)) return;
+
+    const currentSlug =
+      url.searchParams.get(HIGHLIGHT_QUERY_PARAM) || undefined;
+
+    if (currentSlug !== expectedSlug) return;
+
+    const query = url.search
+      .slice(1)
+      .split('&')
+      .filter((part) => {
+        const separator = part.indexOf('=');
+        const encodedName = separator === -1 ? part : part.slice(0, separator);
+
+        try {
+          return (
+            decodeURIComponent(encodedName.replaceAll('+', ' ')) !==
+            HIGHLIGHT_QUERY_PARAM
+          );
+        } catch {
+          return true;
+        }
+      })
+      .join('&');
+
+    url.search = query ? `?${query}` : '';
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${url.pathname}${url.search}${url.hash}`,
+    );
+  };
 
   let mapContainer: HTMLDivElement | undefined = $state(undefined);
   let map: ymaps3.YMap | undefined;
@@ -211,10 +249,21 @@
         bounds: getPaddedBounds(
           features.map((feature) => feature.geometry.coordinates),
         ),
-        duration: getClusterZoomDuration(),
+        duration: getMapZoomDuration(),
         easing: 'ease-in-out',
       },
       margin: getViewMargin(),
+    });
+  };
+
+  const focusPlace = (place: Place, duration: number): void => {
+    map?.update({
+      location: {
+        center: [place.coordinates.lng, place.coordinates.lat],
+        zoom: PLACE_FOCUS_ZOOM,
+        duration,
+        easing: 'ease-in-out',
+      },
     });
   };
 
@@ -295,14 +344,58 @@
 
   onMount(() => {
     let destroyed = false;
+    let highlightTimer: number | undefined;
     let markerUpdateTimer: number | undefined;
     let resizeObserver: ResizeObserver | undefined;
+    const highlightUrl = new URL(window.location.href);
+    const requestedSlug =
+      highlightUrl.searchParams.get(HIGHLIGHT_QUERY_PARAM) || undefined;
+    let highlightedPlace = requestedSlug
+      ? places.find((place) => place.slug === requestedSlug)
+      : undefined;
+
+    if (
+      highlightUrl.searchParams.has(HIGHLIGHT_QUERY_PARAM) &&
+      !highlightedPlace
+    ) {
+      removeHighlightQuery(requestedSlug);
+    }
+
+    const startPlaceHighlight = (place: Place): void => {
+      const marker = markerContents.find(
+        ([candidate]) => candidate.slug === place.slug,
+      )?.[1];
+
+      if (!marker) {
+        highlightedPlace = undefined;
+        removeHighlightQuery(place.slug);
+        return;
+      }
+
+      marker.dataset.highlighted = 'true';
+      marker.setAttribute('aria-current', 'location');
+      focusPlace(place, getMapZoomDuration());
+      highlightTimer = window.setTimeout(() => {
+        highlightTimer = undefined;
+        delete marker.dataset.highlighted;
+        marker.removeAttribute('aria-current');
+        highlightedPlace = undefined;
+        removeHighlightQuery(place.slug);
+      }, HIGHLIGHT_DURATION_MS);
+    };
 
     installYandexMapsRuntimeHeadPersistence();
 
     const refresh = (): void => {
       void waitForStableLayout().then(() => {
-        if (!destroyed) fitPlaces();
+        if (destroyed) return;
+
+        if (highlightedPlace) {
+          focusPlace(highlightedPlace, 0);
+          return;
+        }
+
+        fitPlaces();
       });
     };
 
@@ -322,6 +415,8 @@
         const ymaps3 = window.ymaps3;
 
         if (!ymaps3) {
+          removeHighlightQuery(highlightedPlace?.slug);
+          highlightedPlace = undefined;
           error = 'Yandex Maps API недоступен';
           isLoading = false;
           return;
@@ -374,6 +469,7 @@
         mapClusterer = new YMapClusterer({
           method: clusterByGrid({ gridSize: CLUSTER_GRID_SIZE }),
           features: createFeatures(),
+          maxZoom: PLACE_FOCUS_ZOOM - 1,
           marker: (feature) => {
             const content = markerContents.find(
               ([place]) => place.slug === feature.id,
@@ -394,7 +490,11 @@
         map.addChild(mapClusterer);
         updateMarkerScale(map.zoom);
 
-        fitPlaces();
+        if (highlightedPlace) {
+          startPlaceHighlight(highlightedPlace);
+        } else {
+          fitPlaces();
+        }
         if (markerContents.some(([place]) => place.openingHours)) {
           markerUpdateTimer = window.setInterval(refreshMarkerContents, 60_000);
         }
@@ -404,6 +504,8 @@
         clearMap();
 
         if (!destroyed) {
+          removeHighlightQuery(highlightedPlace?.slug);
+          highlightedPlace = undefined;
           error = reason instanceof Error ? reason.message : 'Карта недоступна';
           isLoading = false;
         }
@@ -414,6 +516,9 @@
       destroyed = true;
       document.removeEventListener('astro:page-load', refresh);
       resizeObserver?.disconnect();
+      if (highlightTimer !== undefined) {
+        window.clearTimeout(highlightTimer);
+      }
       if (markerUpdateTimer !== undefined) {
         window.clearInterval(markerUpdateTimer);
       }
@@ -465,6 +570,7 @@
 
 <style>
   :global(.place-map-marker) {
+    position: relative;
     display: grid;
     width: 2.75rem;
     height: 2.75rem;
@@ -473,6 +579,36 @@
     border-radius: 999px;
     transform: translate(-50%, -50%);
     text-decoration: none;
+  }
+
+  :global(.place-map-marker[data-highlighted='true']::before) {
+    position: absolute;
+    inset: -0.3125rem;
+    border: 0.1875rem solid var(--color-accent-text);
+    border-radius: 999px;
+    box-shadow: 0 0 0 0.1875rem var(--color-surface-raised);
+    content: '';
+    pointer-events: none;
+  }
+
+  :global(.place-map-marker[data-highlighted='true']) {
+    z-index: 1;
+  }
+
+  :global(.place-map-marker[data-highlighted='true']::after) {
+    position: absolute;
+    top: -1.125rem;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-top: 0.625rem solid var(--color-accent-text);
+    border-right: 0.4375rem solid transparent;
+    border-left: 0.4375rem solid transparent;
+    content: '';
+    filter: drop-shadow(0 0.125rem 0 var(--color-surface-raised));
+    pointer-events: none;
+    transform: translateX(-50%);
+    animation: place-map-highlight-arrow 0.7s ease-in-out infinite alternate;
   }
 
   :global(.place-map-marker[data-marker]) {
@@ -610,9 +746,16 @@
     }
   }
 
+  @keyframes place-map-highlight-arrow {
+    to {
+      transform: translate(-50%, 0.25rem);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     :global(.place-map-marker-point),
     :global(.place-map-marker-graphic),
+    :global(.place-map-marker[data-highlighted='true']::after),
     :global(.place-map-cluster) {
       animation: none;
       transition: none;

@@ -9,7 +9,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
 import { renderMarkdown } from '@/lib/markdown/render';
 import { loadPlace, loadPlaces } from '@/lib/places/load';
-import { placesUrl } from '@/lib/places/routes';
+import { placeHighlightUrl, placesUrl } from '@/lib/places/routes';
 import { formatPlaceCategory } from '@/lib/places/view';
 import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
@@ -122,7 +122,9 @@ const schema = {
         aria-label="Действия с местом"
         class="mt-6 flex flex-wrap gap-x-5 gap-y-3 text-sm font-semibold"
       >
-        <a href={placesUrl()} class="site-text-link">Показать на общей карте</a>
+        <a href={placeHighlightUrl(place.slug)} class="site-text-link"
+          >Показать на общей карте</a
+        >
         <a href={place.mapUrl} class="site-text-link">Открыть в Яндекс Картах</a
         >
         {
