@@ -6,6 +6,7 @@
 - В `location` хранить `map_url`, понятный `address` и точные `coordinates` с числовыми `lat` и `lng`.
 - `location.coordinates` задает основную точку места и будущую точку подписи. Линии и полигоны добавлять как GeoJSON features или соседний `[slug].geojson`, когда появится их renderer; не кодировать сложную геометрию произвольными полями frontmatter.
 - Поддерживаемые категории: `entrance`, `children`, `sport`, `walking`, `food`, `services`, `nature`, `water`, `infrastructure`.
+- `marker` — необязательный кастомный маркер. Без него карта рисует стандартную точку; сейчас поддерживается `foodtruck`.
 - Поддерживаемые статусы: `existing`, `planned`, `underConstruction`.
 - Для `planned` и `underConstruction` обязателен блок `evidence` с `source_url` и `checked_at`.
 - Не публиковать точные координаты частных домов и чувствительной инфраструктуры без отдельного редакционного решения.

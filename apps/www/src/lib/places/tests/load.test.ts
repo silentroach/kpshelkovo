@@ -7,6 +7,7 @@ import type { PlaceEntry } from '../types';
 const rawPlace = (overrides?: Partial<RawPlace>): RawPlace => ({
   title: 'Буржуйка',
   category: 'food',
+  marker: 'foodtruck',
   status: 'existing',
   updated_at: '2026-08-11',
   summary: 'Фудтрак в Шелково Форест',
@@ -65,6 +66,7 @@ describe('buildPlacesDataset', () => {
         "evidence": undefined,
         "mapUrl": "https://yandex.ru/navi/-/CTfgq-5r",
         "markdownUrl": "/places/burzhuyka/index.md",
+        "marker": "foodtruck",
         "mentions": [],
         "name": "Буржуйка",
         "openingHours": {

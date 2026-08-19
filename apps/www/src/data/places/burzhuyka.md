@@ -1,6 +1,7 @@
 ---
 title: Буржуйка
 category: food
+marker: foodtruck
 status: existing
 updated_at: 2026-08-11
 summary: 'Фудтрак в Шелково Форест: осетинские пироги, шаурма, горячие закуски, кофе и десерты; есть доставка'

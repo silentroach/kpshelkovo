@@ -30,6 +30,7 @@ interface Props {
   preconnectYandexMaps?: boolean;
   bodyClass?: string;
   showSiteHeader?: boolean;
+  showSiteFooter?: boolean;
   overlaySiteHeader?: boolean;
   search?: SearchDocument;
 }
@@ -47,6 +48,7 @@ const {
   preconnectYandexMaps = false,
   bodyClass,
   showSiteHeader = true,
+  showSiteFooter = true,
   overlaySiteHeader = false,
   search,
 } = Astro.props;
@@ -219,6 +221,6 @@ const searchMetadata = search
       </div>
     </div>
     <SearchDialog client:load />
-    <SiteFooter />
+    {showSiteFooter && <SiteFooter />}
   </body>
 </html>

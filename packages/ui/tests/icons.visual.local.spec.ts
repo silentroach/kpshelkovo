@@ -16,6 +16,7 @@ test.describe('Icons visual', () => {
       target.getByRole('heading', { name: 'Каталог иконок' }),
     ).toBeVisible();
     await expect(target.locator('[data-icon-item]')).toHaveCount(20);
+    await expect(target.locator('[data-marker-item]')).toHaveCount(1);
 
     await expect(target).toHaveScreenshot('icons-catalog.png', screenshot);
   });

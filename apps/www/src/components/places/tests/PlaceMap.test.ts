@@ -156,4 +156,37 @@ describe('PlaceMap', () => {
 
     expect(mapProps[0]?.behaviors).toEqual(['pinchZoom', 'dblClick']);
   });
+
+  it('uses a custom marker when the place selects one', async () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+
+    render(PlaceMap, {
+      props: { places: [{ ...place, marker: 'foodtruck' }] },
+    });
+
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+
+    const marker = markerElements[0];
+    const image = marker?.querySelector('img');
+
+    expect({
+      marker: marker?.dataset.marker,
+      graphicClass: marker?.querySelector('[aria-hidden="true"]')?.className,
+      imageClass: image?.className,
+      imageDimensions: [image?.width, image?.height],
+      usesDefaultPoint: Boolean(marker?.querySelector('.ui-map-marker')),
+    }).toMatchInlineSnapshot(`
+      {
+        "graphicClass": "place-map-marker-graphic",
+        "imageClass": "place-map-marker-image",
+        "imageDimensions": [
+          120,
+          106,
+        ],
+        "marker": "foodtruck",
+        "usesDefaultPoint": false,
+      }
+    `);
+    expect(image?.src).toMatch(/Foodtruck\.png/u);
+  });
 });

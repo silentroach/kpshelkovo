@@ -22,6 +22,7 @@ import {
   WaterDropIcon,
   WhatsAppIcon,
 } from '@shelkovo/ui/icons';
+import { FOODTRUCK_MARKER } from '@shelkovo/ui/markers';
 
 const standaloneGroups = [
   {
@@ -103,6 +104,13 @@ const linkIcons = [
     Icon: WhatsAppIcon,
   },
 ] as const;
+
+const markers = [
+  {
+    name: 'foodtruck',
+    image: FOODTRUCK_MARKER,
+  },
+] as const;
 ---
 
 <!doctype html>
@@ -116,7 +124,7 @@ const linkIcons = [
     <main class="icons-visual-shell" data-testid="icons-catalog">
       <header class="icons-visual-header">
         <h1>Каталог иконок</h1>
-        <p>Самостоятельные иконки и примеры ссылок в рабочем размере.</p>
+        <p>Иконки, ссылки и маркеры карты в рабочем размере.</p>
       </header>
 
       <section class="icons-visual-section" aria-labelledby="standalone-icons">
@@ -154,6 +162,35 @@ const linkIcons = [
             ))
           }
         </div>
+      </section>
+
+      <section class="icons-visual-section" aria-labelledby="map-markers">
+        <div class="icons-visual-section-heading">
+          <h2 id="map-markers">Маркеры карты</h2>
+          <p>
+            Размер на карте: 40 CSS-пикселей; растр подготовлен для экранов до
+            3×
+          </p>
+        </div>
+
+        <ul class="icons-visual-markers">
+          {
+            markers.map(({ name, image }) => (
+              <li data-marker-item data-marker-name={name}>
+                <div class="icons-visual-marker-stage" aria-hidden="true">
+                  <img
+                    class="icons-visual-marker"
+                    src={image.src}
+                    width={image.width}
+                    height={image.height}
+                    alt=""
+                  />
+                </div>
+                <span>{name}</span>
+              </li>
+            ))
+          }
+        </ul>
       </section>
 
       <section class="icons-visual-section" aria-labelledby="link-icons">
@@ -264,14 +301,16 @@ const linkIcons = [
   }
 
   .icons-visual-list,
-  .icons-visual-links {
+  .icons-visual-links,
+  .icons-visual-markers {
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
   .icons-visual-list,
-  .icons-visual-links {
+  .icons-visual-links,
+  .icons-visual-markers {
     border-top: 1px solid var(--color-border);
   }
 
@@ -291,6 +330,49 @@ const linkIcons = [
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 2rem;
+  }
+
+  .icons-visual-markers {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+    border-top: 0;
+  }
+
+  .icons-visual-markers li {
+    display: grid;
+    gap: 0.75rem;
+    border-bottom: 0;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .icons-visual-marker-stage {
+    display: grid;
+    min-height: 10rem;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    background:
+      linear-gradient(
+        color-mix(in oklab, var(--color-border) 48%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        color-mix(in oklab, var(--color-border) 48%, transparent) 1px,
+        transparent 1px
+      ),
+      var(--color-bg-soft);
+    background-size: 1.5rem 1.5rem;
+  }
+
+  .icons-visual-marker {
+    display: block;
+    width: 2.5rem;
+    height: auto;
+    filter: drop-shadow(0 0.4rem 0.4rem oklch(24% 0.04 145 / 0.12));
   }
 
   .icons-visual-link {
@@ -350,7 +432,8 @@ const linkIcons = [
 
   @media (max-width: 44rem) {
     .icons-visual-groups,
-    .icons-visual-links {
+    .icons-visual-links,
+    .icons-visual-markers {
       grid-template-columns: 1fr;
     }
   }

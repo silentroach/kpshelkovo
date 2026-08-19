@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { FOODTRUCK_MARKER } from '@shelkovo/ui/markers';
   import { onMount } from 'svelte';
 
   import {
@@ -8,6 +9,7 @@
   } from '@/lib/yandex-maps/runtime';
   import { isPlaceOpen } from '@/lib/places/opening-hours';
   import { PLACE_MAP_BOUNDS } from '@/lib/places/schema';
+  import type { PlaceMarker } from '@/lib/places/schema';
   import type { Place } from '@/lib/places/types';
   import { formatPlaceStatus } from '@/lib/places/view';
 
@@ -18,6 +20,14 @@
     [PLACE_MAP_BOUNDS.maxLng, PLACE_MAP_BOUNDS.maxLat],
   ];
   const VIEW_MARGIN: ymaps3.Margin = [64, 32, 48, 32];
+  const CUSTOM_MARKER_IMAGES: Readonly<
+    Record<
+      PlaceMarker,
+      { readonly src: string; readonly width: number; readonly height: number }
+    >
+  > = {
+    foodtruck: FOODTRUCK_MARKER,
+  };
 
   let mapContainer: HTMLDivElement | undefined = $state(undefined);
   let map: ymaps3.YMap | undefined;
@@ -32,7 +42,7 @@
 
   const createMarkerContent = (place: Place): HTMLAnchorElement => {
     const link = document.createElement('a');
-    const point = document.createElement('span');
+    const visual = document.createElement('span');
 
     link.className = 'place-map-marker';
     link.href = place.url;
@@ -66,9 +76,25 @@
       link.click();
     });
 
-    point.className = 'place-map-marker-point ui-map-marker';
-    point.setAttribute('aria-hidden', 'true');
-    link.append(point);
+    if (place.marker) {
+      const markerImage = CUSTOM_MARKER_IMAGES[place.marker];
+      const image = document.createElement('img');
+
+      link.dataset.marker = place.marker;
+      visual.className = 'place-map-marker-graphic';
+      image.className = 'place-map-marker-image';
+      image.src = markerImage.src;
+      image.alt = '';
+      image.width = markerImage.width;
+      image.height = markerImage.height;
+      image.draggable = false;
+      visual.append(image);
+    } else {
+      visual.className = 'place-map-marker-point ui-map-marker';
+    }
+
+    visual.setAttribute('aria-hidden', 'true');
+    link.append(visual);
 
     return link;
   };
@@ -238,12 +264,30 @@
       transform 0.15s ease;
   }
 
+  :global(.place-map-marker-graphic) {
+    display: block;
+    width: 2.5rem;
+    flex: none;
+    filter: drop-shadow(0 0.25rem 0.3rem oklch(24% 0.04 145 / 0.16));
+    transition:
+      filter 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  :global(.place-map-marker-image) {
+    display: block;
+    width: 100%;
+    height: auto;
+    user-select: none;
+  }
+
   :global(.place-map-marker:is(:hover, :focus-visible)) {
     outline: none;
   }
 
+  :global(.place-map-marker:is(:hover, :focus-visible) .place-map-marker-point),
   :global(
-    .place-map-marker:is(:hover, :focus-visible) .place-map-marker-point
+    .place-map-marker:is(:hover, :focus-visible) .place-map-marker-graphic
   ) {
     transform: scale(1.16);
   }
@@ -252,12 +296,17 @@
     box-shadow: 0 0 0 0.1875rem var(--color-ring);
   }
 
-  :global(.place-map-marker[data-open='false'] .place-map-marker-point) {
+  :global(.place-map-marker[data-open='false'] .place-map-marker-point),
+  :global(.place-map-marker[data-open='false'] .place-map-marker-graphic) {
     filter: grayscale(1);
   }
 
   :global(.place-map-marker[data-status='planned'] .place-map-marker-point) {
     border-style: dashed;
+    opacity: 0.76;
+  }
+
+  :global(.place-map-marker[data-status='planned'] .place-map-marker-graphic) {
     opacity: 0.76;
   }
 

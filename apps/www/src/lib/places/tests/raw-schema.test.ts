@@ -5,6 +5,7 @@ import { RawPlaceSchema } from '../raw-schema';
 const place = {
   title: 'Буржуйка',
   category: 'food',
+  marker: 'foodtruck',
   status: 'existing',
   updated_at: '2026-08-11',
   summary: 'Фудтрак в Шелково Форест',
@@ -40,6 +41,7 @@ describe('RawPlaceSchema', () => {
           },
           "map_url": "https://yandex.ru/navi/-/CTfgq-5r",
         },
+        "marker": "foodtruck",
         "opening_hours": {
           "description": "С 10:00 до 22:00, вторник — выходной",
           "periods": [

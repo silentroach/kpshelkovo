@@ -34,10 +34,10 @@ const schema = {
   canonical={placesUrl()}
   schema={schema}
   preconnectYandexMaps
+  showSiteFooter={false}
+  overlaySiteHeader
 >
-  <main
-    class="relative h-[calc(100svh-3.0625rem)] min-h-[30rem] overflow-hidden md:h-[calc(100svh-3.5625rem)]"
-  >
+  <main class="relative h-svh min-h-[30rem] overflow-hidden">
     <h1 class="sr-only">Карта мест и объектов Шелково</h1>
     <PlaceMap {places} client:load />
 

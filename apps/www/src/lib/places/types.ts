@@ -4,7 +4,12 @@ import type { PreprocessedSiteMarkdownBody } from '@/lib/markdown/render';
 import type { EntityMentionTarget } from '@/lib/mentions';
 
 import type { RawPlace } from './raw-schema';
-import type { PlaceCategory, PlaceStatus, PlaceWeekday } from './schema';
+import type {
+  PlaceCategory,
+  PlaceMarker,
+  PlaceStatus,
+  PlaceWeekday,
+} from './schema';
 
 export type PlaceEntry = Pick<CollectionEntry<'places'>, 'id' | 'body'> & {
   readonly data: RawPlace;
@@ -41,6 +46,7 @@ export interface Place {
   readonly slug: string;
   readonly name: string;
   readonly category: PlaceCategory;
+  readonly marker?: PlaceMarker;
   readonly status: PlaceStatus;
   readonly summary: string;
   readonly body: PreprocessedSiteMarkdownBody;

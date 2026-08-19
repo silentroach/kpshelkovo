@@ -6,6 +6,7 @@ import {
   isPlaceCalendarDate,
   PLACE_CATEGORIES,
   PLACE_MAP_BOUNDS,
+  PLACE_MARKERS,
   PLACE_STATUSES,
   PLACE_TIME,
   PLACE_WEEKDAYS,
@@ -129,6 +130,7 @@ export const RawPlaceSchema = z
   .object({
     title: nonBlankText,
     category: z.enum(PLACE_CATEGORIES),
+    marker: z.enum(PLACE_MARKERS).optional(),
     status: z.enum(PLACE_STATUSES),
     updated_at: placeDate('updated_at'),
     summary: nonBlankText,

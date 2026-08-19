@@ -8,7 +8,7 @@
     "test:watch": "vitest",
     "test:visual:icons": "playwright test -c playwright.icons-visual.local.config.ts",
     "test:visual:icons:update": "playwright test -c playwright.icons-visual.local.config.ts --update-snapshots",
-    "test:visual:icons:serve": "astro build --root tests/icons-visual && astro preview --root tests/icons-visual --host 127.0.0.1 --port 4328",
+    "test:visual:icons:serve": "astro build --root tests/icons-visual && ASTRO_PREVIEW_BACKGROUND=0 astro preview --root tests/icons-visual --host 127.0.0.1 --port 4328",
     "test:visual:breadcrumbs": "playwright test -c playwright.breadcrumbs-visual.local.config.ts",
     "test:visual:breadcrumbs:update": "playwright test -c playwright.breadcrumbs-visual.local.config.ts --update-snapshots",
     "test:visual:breadcrumbs:serve": "astro build --root tests/breadcrumbs-visual && astro preview --root tests/breadcrumbs-visual --host 127.0.0.1 --port 4325"
@@ -43,6 +43,8 @@
     "./icons/system/Star.astro": "./src/icons/system/Star.astro",
     "./icons/system/Telegram.astro": "./src/icons/system/Telegram.astro",
     "./icons/system/WhatsApp.astro": "./src/icons/system/WhatsApp.astro",
+    "./markers": "./src/markers/index.ts",
+    "./markers/Foodtruck.png": "./src/markers/Foodtruck.png",
     "./theme": "./src/theme.ts",
     "./Link.svelte": "./src/Link.svelte",
     "./SiteFooter.astro": "./src/SiteFooter.astro",

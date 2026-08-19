@@ -27,6 +27,7 @@ export const mapRawPlace = (
     slug: entry.id,
     name: entry.data.title,
     category: entry.data.category,
+    marker: entry.data.marker,
     status: entry.data.status,
     summary: entry.data.summary,
     body: body.markdown,
