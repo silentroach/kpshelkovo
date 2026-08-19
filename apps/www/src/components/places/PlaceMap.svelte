@@ -26,6 +26,7 @@
     [PLACE_MAP_BOUNDS.maxLng, PLACE_MAP_BOUNDS.maxLat],
   ];
   const VIEW_MARGIN: ymaps3.Margin = [112, 80, 32, 80];
+  const MOBILE_VIEW_MARGIN: ymaps3.Margin = [112, 32, 32, 32];
   const BOUNDS_PADDING_RATIO = 0.3;
   const CLUSTER_GRID_SIZE = 48;
   const CLUSTER_ZOOM_DURATION_MS = 220;
@@ -90,6 +91,10 @@
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
       ? 0
       : CLUSTER_ZOOM_DURATION_MS;
+  const getViewMargin = (): ymaps3.Margin =>
+    window.matchMedia?.('(max-width: 40rem)').matches
+      ? MOBILE_VIEW_MARGIN
+      : VIEW_MARGIN;
 
   let mapContainer: HTMLDivElement | undefined = $state(undefined);
   let map: ymaps3.YMap | undefined;
@@ -103,7 +108,7 @@
 
   const mapBehaviors = (): ymaps3.BehaviorType[] =>
     window.matchMedia?.('(any-pointer: coarse)').matches
-      ? ['pinchZoom', 'dblClick']
+      ? ['drag', 'pinchZoom', 'dblClick']
       : ['drag', 'scrollZoom', 'dblClick'];
 
   const updateMarkerContent = (place: Place, link: HTMLAnchorElement): void => {
@@ -206,7 +211,7 @@
         duration: getClusterZoomDuration(),
         easing: 'ease-in-out',
       },
-      margin: VIEW_MARGIN,
+      margin: getViewMargin(),
     });
   };
 
@@ -262,7 +267,7 @@
   const fitPlaces = (): void => {
     map?.update?.({
       location: { bounds: getPlaceBounds(), duration: 0 },
-      margin: VIEW_MARGIN,
+      margin: getViewMargin(),
     });
   };
 

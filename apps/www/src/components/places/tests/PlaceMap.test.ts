@@ -189,14 +189,15 @@ describe('PlaceMap', () => {
     expect(click).toHaveBeenCalledOnce();
   });
 
-  it('leaves one-finger scrolling to the page on coarse pointers', async () => {
+  it('supports dragging and a closer fit on mobile', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: true }));
 
     render(PlaceMap, { props: { places: [place] } });
 
     await waitFor(() => expect(mapProps).toHaveLength(1));
 
-    expect(mapProps[0]?.behaviors).toEqual(['pinchZoom', 'dblClick']);
+    expect(mapProps[0]?.behaviors).toEqual(['drag', 'pinchZoom', 'dblClick']);
+    expect(map.update.mock.lastCall?.[0].margin).toEqual([112, 32, 32, 32]);
   });
 
   it('uses the selected custom marker', async () => {
