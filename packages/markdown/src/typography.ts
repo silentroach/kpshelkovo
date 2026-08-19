@@ -60,15 +60,11 @@ for (const tag of TYPOGRAPHY_SKIP_TAGS) {
 
 const hasText = (value: string): boolean => /\S/u.test(value);
 
-const edge = (value: string, pattern: RegExp): string =>
-  value.match(pattern)?.[0] ?? '';
-
 function formatTextNode(value: string): string {
-  const prefix = edge(value, /^\s+/u);
-  const suffix = edge(value, /\s+$/u);
-  const start = prefix.length;
-  const end = value.length - suffix.length;
-  const core = value.slice(start, end);
+  const withoutPrefix = value.trimStart();
+  const core = withoutPrefix.trimEnd();
+  const prefix = value.slice(0, value.length - withoutPrefix.length);
+  const suffix = withoutPrefix.slice(core.length);
 
   return core ? `${prefix}${typograf.execute(core)}${suffix}` : value;
 }

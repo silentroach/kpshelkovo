@@ -4,7 +4,7 @@ export const headingSlug = (text: string): string => {
     .toLowerCase()
     .replace(/['"«»“”„]/gu, '')
     .replace(/[^\p{Letter}\p{Number}]+/gu, '-')
-    .replace(/^-+|-+$/gu, '');
+    .replace(/^-|-$/gu, '');
 
   return slug || 'section';
 };

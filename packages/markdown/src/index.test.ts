@@ -8,10 +8,12 @@ import {
   formatDynamicHtml,
   md,
   parseMarkdownFragment,
+  rehypeTypograf,
   render,
   satteriTypograf,
   serializeMarkdownDocument,
 } from './index';
+import { headingSlug } from './heading-slugs';
 
 const showNbsp = (value: string): string =>
   value.replaceAll('\u00A0', '·').replaceAll('\u202F', '·');
@@ -181,6 +183,15 @@ describe('@shelkovo/markdown', () => {
     `);
   });
 
+  it('preserves text edges with a long whitespace prefix', () => {
+    const value = `${' '.repeat(50_000)}Текст\t\n`;
+    const textNode = { type: 'text', value };
+
+    rehypeTypograf()({ type: 'root', children: [textNode] });
+
+    expect(textNode.value).toBe(value);
+  });
+
   it('renders markdown and drops raw HTML', () => {
     expect(render('Текст **важный**\n\n<script>alert(1)</script>'))
       .toMatchInlineSnapshot(`
@@ -210,7 +221,11 @@ describe('@shelkovo/markdown', () => {
         "<h2 id="что-сделать-сразу" aria-label="Что сделать сразу">Что сделать сразу<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" data-pagefind-ignore="all" href="#что-сделать-сразу" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>
         <p>Текст</p>
         <h2 id="что-сделать-сразу-2" aria-label="Что сделать сразу">Что сделать сразу<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" data-pagefind-ignore="all" href="#что-сделать-сразу-2" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>"
-      `);
+    `);
+  });
+
+  it('creates a heading slug from a long separator run', () => {
+    expect(headingSlug(`${'-'.repeat(50_000)}Раздел`)).toBe('раздел');
   });
 
   it('expands [TOC] before rendering Markdown to HTML', () => {
