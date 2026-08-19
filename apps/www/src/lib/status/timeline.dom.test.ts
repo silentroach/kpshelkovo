@@ -319,6 +319,14 @@ describe('hydrateStatusTimeline', () => {
       'electricity-river-outage-2026-08-10',
       'electricity-outage-2026-08-11',
     ] as const;
+    const track = root.querySelector('[data-status-timeline-track]');
+
+    if (!track) {
+      throw new Error('Timeline track must exist');
+    }
+
+    mockRect(track, { left: 0, top: 0, width: 790, height: 24 });
+
     const readLayout = () => ({
       offsets: ids.map((id) =>
         getProblemNode(id).style.getPropertyValue('--segment-lane-offset'),
@@ -339,11 +347,11 @@ describe('hydrateStatusTimeline', () => {
           true,
         ],
         "offsets": [
-          "-12px",
-          "12px",
+          "",
+          "",
           "",
         ],
-        "space": "12px",
+        "space": "0px",
       }
     `);
 
@@ -359,11 +367,11 @@ describe('hydrateStatusTimeline', () => {
           false,
         ],
         "offsets": [
-          "-24px",
-          "24px",
-          "0px",
+          "",
+          "-12px",
+          "12px",
         ],
-        "space": "24px",
+        "space": "12px",
       }
     `);
   });

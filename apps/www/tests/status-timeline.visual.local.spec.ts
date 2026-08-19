@@ -20,6 +20,22 @@ const denseDateTargets = [
     path: '/status/incidents/2026/08/electricity-outage-2026-08-11/',
   },
 ] as const;
+const denseDateSsrLayout = {
+  offsets: [
+    { id: denseDateTargets[0].id, offset: '-24px' },
+    { id: denseDateTargets[1].id, offset: '0px' },
+    { id: denseDateTargets[2].id, offset: '24px' },
+  ],
+  space: '24px',
+} as const;
+const denseDateDesktopLayout = {
+  offsets: [
+    { id: denseDateTargets[0].id, offset: '' },
+    { id: denseDateTargets[1].id, offset: '-12px' },
+    { id: denseDateTargets[2].id, offset: '12px' },
+  ],
+  space: '12px',
+} as const;
 
 const screenshot = {
   animations: 'disabled',
@@ -85,7 +101,6 @@ const readDenseDateLayout = async (target: Locator) =>
     }
 
     return {
-      height: root.getBoundingClientRect().height,
       offsets: Array.from(
         root.querySelectorAll<HTMLElement>(
           '[data-status-problem]:not([hidden])',
@@ -210,19 +225,22 @@ for (const [name, viewport] of viewportCases) {
     await clickDenseDateTargetCenters(page, true);
   });
 
-  test(`keeps dense SSR lanes through first hydration on ${name}`, async ({
+  test(`uses measured lanes after first hydration on ${name}`, async ({
     page,
   }) => {
     await page.setViewportSize(viewport);
     const target = await openDenseDateTimeline(page, false);
-    const ssrLayout = await readDenseDateLayout(target);
+
+    expect(await readDenseDateLayout(target)).toEqual(denseDateSsrLayout);
 
     await target.locator('[data-status-problem]').first().hover();
     await expect(
       target.locator('[data-status-problem][data-status-tooltip-bound="true"]'),
     ).toHaveCount(denseDateTargets.length);
 
-    expect(await readDenseDateLayout(target)).toEqual(ssrLayout);
+    expect(await readDenseDateLayout(target)).toEqual(
+      name === 'desktop' ? denseDateDesktopLayout : denseDateSsrLayout,
+    );
   });
 }
 
@@ -230,6 +248,7 @@ test('reflows dense hydrated targets after resize', async ({ page }) => {
   await page.setViewportSize(desktopViewport);
   let target = await openDenseDateTimeline(page, true);
 
+  expect(await readDenseDateLayout(target)).toEqual(denseDateDesktopLayout);
   await assertDenseDateHitAreas(target);
   await page.setViewportSize(mobileViewport);
   target = page.getByTestId('status-timeline-dense-dates');
@@ -253,6 +272,9 @@ test('reflows dense hydrated targets after resize', async ({ page }) => {
       ),
     )
     .toEqual([]);
+  await expect
+    .poll(() => readDenseDateLayout(target))
+    .toEqual(denseDateSsrLayout);
   await assertDenseDateHitAreas(target);
 });
 
