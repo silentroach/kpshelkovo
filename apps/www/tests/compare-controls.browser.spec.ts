@@ -37,7 +37,27 @@ test('keeps every tariff filter usable beside the map button on mobile', async (
       await expect(filterGroup.locator('label')).toHaveCount(3);
       for (const [radio, label] of radioControls) {
         await expect(radio).toBeEnabled();
-        await expect(label).toBeVisible();
+        await label.scrollIntoViewIfNeeded();
+        await expect
+          .poll(() =>
+            label.evaluate((element) => {
+              const scroller = element.closest<HTMLElement>(
+                '[data-testid="price-filter-group"]',
+              );
+
+              if (!scroller) return false;
+
+              const scrollerRect = scroller.getBoundingClientRect();
+              const labelRect = element.getBoundingClientRect();
+              const tolerance = 1;
+
+              return (
+                labelRect.left >= scrollerRect.left - tolerance &&
+                labelRect.right <= scrollerRect.right + tolerance
+              );
+            }),
+          )
+          .toBe(true);
         await label.click();
         await expect(radio).toBeChecked();
       }
@@ -58,34 +78,43 @@ test('keeps every tariff filter usable beside the map button on mobile', async (
         const filterRects = [...tariffFilters.querySelectorAll('label')].map(
           (label) => label.getBoundingClientRect(),
         );
+        const firstFilterRect = filterRects[0];
+
+        if (!firstFilterRect) {
+          throw new Error('Не удалось измерить кнопки фильтра тарифов');
+        }
+
         const mapRect = mapToggle.getBoundingClientRect();
-        const controlRects = [...filterRects, mapRect];
+        const filterStyle = getComputedStyle(tariffFilters);
+        const tolerance = 1;
 
         return {
-          controlsAreClipped:
-            controlRects.some(
-              (rect) => rect.left < 0 || rect.right > window.innerWidth,
-            ) ||
-            filterRects.some(
-              (rect) =>
-                rect.left < filterGroupRect.left ||
-                rect.right > filterGroupRect.right ||
-                rect.top < filterGroupRect.top ||
-                rect.bottom > filterGroupRect.bottom,
-            ),
-          filtersOverlapMap: filterRects.some(
-            (rect) =>
-              rect.left < mapRect.right &&
-              rect.right > mapRect.left &&
-              rect.top < mapRect.bottom &&
-              rect.bottom > mapRect.top,
+          filtersUseHorizontalOverflow:
+            filterStyle.overflowX === 'auto' &&
+            tariffFilters.scrollWidth > tariffFilters.clientWidth,
+          filtersStayOnOneRow: filterRects.every(
+            (rect) => Math.abs(rect.top - firstFilterRect.top) <= tolerance,
           ),
+          controlsStayOnOneRow:
+            Math.abs(filterGroupRect.top - mapRect.top) <= tolerance,
+          filterViewportOverlapsMap:
+            filterGroupRect.right > mapRect.left + tolerance,
+          mapOutsideViewport:
+            mapRect.left < -tolerance ||
+            mapRect.right > window.innerWidth + tolerance,
+          pageHasHorizontalOverflow:
+            document.documentElement.scrollWidth >
+            document.documentElement.clientWidth + tolerance,
         };
       });
 
       expect(geometry).toEqual({
-        controlsAreClipped: false,
-        filtersOverlapMap: false,
+        filtersUseHorizontalOverflow: true,
+        filtersStayOnOneRow: true,
+        controlsStayOnOneRow: true,
+        filterViewportOverlapsMap: false,
+        mapOutsideViewport: false,
+        pageHasHorizontalOverflow: false,
       });
     });
   }
