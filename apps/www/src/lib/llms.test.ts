@@ -105,7 +105,7 @@ describe('root llms', () => {
       - Инструкции для автоматического чтения сайта: <https://example.com/.well-known/agent-skills/index.json>
       - Новости: <https://example.com/news/>
       - Статус: <https://example.com/status/>
-      - Карта мест: <https://example.com/places/>
+      - Карта мест: <https://example.com/map/>
       - Отзывы: <https://example.com/reviews/>
       - Сарафан: <https://example.com/sarafan/>
       - Архив встреч в Markdown: <https://example.com/meetings/index.md>
@@ -119,7 +119,7 @@ describe('root llms', () => {
       - Если задача относится к одному разделу, сначала откройте его \`llms.txt\` или Markdown-индекс; если нужны данные массово, сразу берите JSON-ленту там, где она есть.
       - Новости: <https://example.com/news/llms.txt>; основная лента: <https://example.com/news/data/articles.json>; календарные события лежат в \`articles[].events[].ics_url\`.
       - Статус сервисов: <https://example.com/status/llms.txt>; основная лента: <https://example.com/status/data/status.json>.
-      - Карта мест: <https://example.com/places/index.md>; карточки: \`/places/[slug]/\` и \`/places/[slug]/index.md\`.
+      - Карта мест: <https://example.com/map/index.md>; карточки: \`/map/[slug]/\` и \`/map/[slug]/index.md\`.
       - Отзывы собственников: <https://example.com/reviews/index.md>; правила публикации: <https://example.com/reviews/rules/index.md>; детальные страницы: \`/reviews/[id]/\` и \`/reviews/[id]/index.md\`.
       - Сарафан: <https://example.com/sarafan/index.md>; разделы: \`/sarafan/[category]/\` и \`/sarafan/[category]/index.md\`; детальные страницы есть только у контактов с body и используют \`/sarafan/[category]/[slug]/\` и \`/sarafan/[category]/[slug]/index.md\`; если для контакта доступна vCard, ее адрес указан в \`vcf_url\`.
       - Архив встреч: <https://example.com/meetings/index.md>; одна встреча: <https://example.com/meetings/2026-06-13-ok-comfort/> или <https://example.com/meetings/2026-06-13-ok-comfort/index.md>; полный текст транскрипта берите по частям, например <https://example.com/meetings/2026-06-13-ok-comfort/transcript/1.md>.
@@ -144,8 +144,8 @@ describe('root llms', () => {
       'https://example.com/news/data/articles.json',
       'https://example.com/status/llms.txt',
       'https://example.com/status/data/status.json',
-      'https://example.com/places/',
-      'https://example.com/places/index.md',
+      'https://example.com/map/',
+      'https://example.com/map/index.md',
       'https://example.com/reviews/',
       'https://example.com/reviews/index.md',
       'https://example.com/reviews/rules/index.md',

@@ -12,12 +12,12 @@ import {
 
 describe('place routes', () => {
   it('builds stable section and detail URLs', () => {
-    expect(placesUrl()).toBe('/places/');
-    expect(placesMarkdownUrl()).toBe('/places/index.md');
-    expect(placeUrl('burzhuyka')).toBe('/places/burzhuyka/');
-    expect(placeMarkdownUrl('burzhuyka')).toBe('/places/burzhuyka/index.md');
+    expect(placesUrl()).toBe('/map/');
+    expect(placesMarkdownUrl()).toBe('/map/index.md');
+    expect(placeUrl('burzhuyka')).toBe('/map/burzhuyka/');
+    expect(placeMarkdownUrl('burzhuyka')).toBe('/map/burzhuyka/index.md');
     expect(placeCanonical('burzhuyka')).toBe(
-      'https://kpshelkovo.online/places/burzhuyka/',
+      'https://kpshelkovo.online/map/burzhuyka/',
     );
   });
 
@@ -26,7 +26,7 @@ describe('place routes', () => {
   });
 
   it('exposes route patterns for public surface registration', () => {
-    expect(placePattern()).toBe('/places/:slug/');
-    expect(placeMarkdownPattern()).toBe('/places/:slug/index.md');
+    expect(placePattern()).toBe('/map/:slug/');
+    expect(placeMarkdownPattern()).toBe('/map/:slug/index.md');
   });
 });

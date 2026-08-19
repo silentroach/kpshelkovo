@@ -2,8 +2,8 @@ import { canon, withBase } from '@/lib/site';
 
 import { PLACE_SLUG } from './schema';
 
-const PLACES_ROOT = '/places/';
-const PLACES_MARKDOWN = '/places/index.md';
+const MAP_ROOT = '/map/';
+const MAP_MARKDOWN = '/map/index.md';
 
 const requireSlug = (slug: string): string => {
   const value = slug.trim();
@@ -15,19 +15,19 @@ const requireSlug = (slug: string): string => {
   return value;
 };
 
-export const placesPath = (): string => PLACES_ROOT;
+export const placesPath = (): string => MAP_ROOT;
 
-export const placesMarkdownPath = (): string => PLACES_MARKDOWN;
+export const placesMarkdownPath = (): string => MAP_MARKDOWN;
 
 export const placePath = (slug: string): string =>
-  `${PLACES_ROOT}${requireSlug(slug)}/`;
+  `${MAP_ROOT}${requireSlug(slug)}/`;
 
 export const placeMarkdownPath = (slug: string): string =>
   `${placePath(slug)}index.md`;
 
-export const placePattern = (): string => '/places/:slug/';
+export const placePattern = (): string => '/map/:slug/';
 
-export const placeMarkdownPattern = (): string => '/places/:slug/index.md';
+export const placeMarkdownPattern = (): string => '/map/:slug/index.md';
 
 export const placesUrl = (): string => withBase(placesPath());
 

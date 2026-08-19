@@ -53,7 +53,7 @@ describe('buildPlacesDataset', () => {
       {
         "address": "Шелково Форест, Берёзовая улица, 21А",
         "body": "Описание **места**.",
-        "canonical": "https://kpshelkovo.online/places/burzhuyka/",
+        "canonical": "https://kpshelkovo.online/map/burzhuyka/",
         "category": "food",
         "contact": {
           "id": "food/burzhuyka",
@@ -65,7 +65,7 @@ describe('buildPlacesDataset', () => {
         },
         "evidence": undefined,
         "mapUrl": "https://yandex.ru/navi/-/CTfgq-5r",
-        "markdownUrl": "/places/burzhuyka/index.md",
+        "markdownUrl": "/map/burzhuyka/index.md",
         "marker": "foodtruck",
         "mentions": [],
         "name": "Буржуйка",
@@ -91,7 +91,7 @@ describe('buildPlacesDataset', () => {
         "summary": "Фудтрак в Шелково Форест",
         "updatedAt": "2026-08-11T00:00:00.000Z",
         "updatedIso": "2026-08-11",
-        "url": "/places/burzhuyka/",
+        "url": "/map/burzhuyka/",
       }
     `);
     expect(data.bySlug.get('burzhuyka')).toBe(place);

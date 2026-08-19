@@ -38,9 +38,9 @@ describe('SiteNav', () => {
   it.each(['header', 'mobile'] as const)(
     'keeps places out of the %s primary navigation during rollout',
     async (variant) => {
-      const html = await renderNav('/places/', variant);
+      const html = await renderNav('/map/', variant);
 
-      expect(html).not.toContain('href="/places/"');
+      expect(html).not.toContain('href="/map/"');
     },
   );
 

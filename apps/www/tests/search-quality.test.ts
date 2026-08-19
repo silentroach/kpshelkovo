@@ -80,9 +80,24 @@ const queryGroups = [
       'регулярное обслуживание локальные объекты',
     ],
   },
+  {
+    name: '#183 places',
+    queries: [
+      'титаник',
+      'детская площадка титаник',
+      'корабль на центральной улице',
+      'детская площадка',
+      'буржуйка',
+      'буржуйка на карте',
+      'адрес буржуйки',
+      'телефон буржуйки',
+      'меню буржуйки',
+      'фудтрак',
+    ],
+  },
 ] as const;
 
-const aliasExpectations: ReadonlyMap<
+const rankExpectations: ReadonlyMap<
   string,
   { readonly url: string; readonly maxRank: number }
 > = new Map([
@@ -114,6 +129,15 @@ const aliasExpectations: ReadonlyMap<
     { url: '/815/regulation/#tariff-calculator-title', maxRank: 1 },
   ],
   ['что входит в тариф 815', { url: '/815/regulation/', maxRank: 2 }],
+  ['титаник', { url: '/map/titanic/', maxRank: 1 }],
+  ['детская площадка титаник', { url: '/map/titanic/', maxRank: 1 }],
+  ['корабль на центральной улице', { url: '/map/titanic/', maxRank: 1 }],
+  ['детская площадка', { url: '/map/titanic/', maxRank: 3 }],
+  ['буржуйка', { url: '/map/burzhuyka/', maxRank: 1 }],
+  ['буржуйка на карте', { url: '/map/burzhuyka/', maxRank: 2 }],
+  ['адрес буржуйки', { url: '/map/burzhuyka/', maxRank: 1 }],
+  ['телефон буржуйки', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
+  ['меню буржуйки', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
 ]);
 
 let browser: Browser;
@@ -215,7 +239,7 @@ for (const group of queryGroups) {
         `${query}: news archive pages must stay outside Pagefind`,
       ).toBeUndefined();
 
-      const expectation = aliasExpectations.get(query);
+      const expectation = rankExpectations.get(query);
       if (expectation) {
         const rank = snapshot.results.findIndex(
           (result) =>

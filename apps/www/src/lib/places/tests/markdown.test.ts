@@ -32,9 +32,9 @@ const place: Place = {
   },
   updatedAt: new Date('2026-08-11T00:00:00.000Z'),
   updatedIso: '2026-08-11',
-  url: '/places/burzhuyka/',
-  markdownUrl: '/places/burzhuyka/index.md',
-  canonical: 'https://kpshelkovo.online/places/burzhuyka/',
+  url: '/map/burzhuyka/',
+  markdownUrl: '/map/burzhuyka/index.md',
+  canonical: 'https://kpshelkovo.online/map/burzhuyka/',
 };
 
 beforeAll(async () => {
@@ -53,8 +53,8 @@ describe('places Markdown', () => {
       buildPlaceMarkdown(place),
     ].join('\n');
 
-    expect(markdown).toContain('https://example.com/places/');
-    expect(markdown).toContain('https://example.com/places/burzhuyka/index.md');
+    expect(markdown).toContain('https://example.com/map/');
+    expect(markdown).toContain('https://example.com/map/burzhuyka/index.md');
     expect(markdown).toContain('https://example.com/sarafan/food/burzhuyka/');
     expect(markdown).toContain('https://yandex.ru/navi/-/CTfgq-5r');
     expect(markdown).toContain('Фудтрак в Шелково Форест');

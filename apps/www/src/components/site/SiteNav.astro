@@ -33,7 +33,7 @@ const getCurrent = (href: string): 'page' | 'location' | undefined => {
   return currentPathname.startsWith(href) ? 'location' : undefined;
 };
 const newsCurrent = getCurrent('/news/');
-const placesCurrent = getCurrent('/places/');
+const placesCurrent = getCurrent('/map/');
 const compareCurrent = getCurrent('/815/compare/');
 const regulationCurrent = getCurrent('/815/regulation/');
 const kbCurrent = getCurrent('/kb/');
@@ -77,7 +77,7 @@ const submenuLinkClass =
 
       {showPlacesInPrimaryNavigation && (
         <a
-          href="/places/"
+          href="/map/"
           aria-current={placesCurrent}
           class="site-nav-mobile-link"
         >
@@ -172,7 +172,7 @@ const submenuLinkClass =
       </div>
 
       {showPlacesInPrimaryNavigation && (
-        <a href="/places/" aria-current={placesCurrent} class="site-nav-link">
+        <a href="/map/" aria-current={placesCurrent} class="site-nav-link">
           Карта
         </a>
       )}

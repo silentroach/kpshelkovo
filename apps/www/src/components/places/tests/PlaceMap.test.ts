@@ -47,9 +47,9 @@ const place: Place = {
   },
   updatedAt: new Date('2026-08-11T00:00:00.000Z'),
   updatedIso: '2026-08-11',
-  url: '/places/burzhuyka/',
-  markdownUrl: '/places/burzhuyka/index.md',
-  canonical: 'https://kpshelkovo.online/places/burzhuyka/',
+  url: '/map/burzhuyka/',
+  markdownUrl: '/map/burzhuyka/index.md',
+  canonical: 'https://kpshelkovo.online/map/burzhuyka/',
 };
 const titanicPlace: Place = {
   ...place,
@@ -58,9 +58,9 @@ const titanicPlace: Place = {
   category: 'children',
   marker: 'titanic',
   coordinates: { lat: 55.060703, lng: 37.746894 },
-  url: '/places/titanic/',
-  markdownUrl: '/places/titanic/index.md',
-  canonical: 'https://kpshelkovo.online/places/titanic/',
+  url: '/map/titanic/',
+  markdownUrl: '/map/titanic/index.md',
+  canonical: 'https://kpshelkovo.online/map/titanic/',
 };
 
 const installYandexMaps = (): void => {
@@ -123,7 +123,7 @@ describe('PlaceMap', () => {
         class="place-map-marker"
         data-open="false"
         data-status="existing"
-        href="/places/burzhuyka/"
+        href="/map/burzhuyka/"
         title="Буржуйка, сейчас закрыто"
       >
         <span

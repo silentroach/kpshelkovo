@@ -22,7 +22,7 @@ description: Используй для навигации по корневом�
 
 - `/news/` — новости, объявления, необязательные события и архивы; основная лента: `/news/data/articles.json`, календарь события: `/news/YYYY/MM/[entry]/[event-slug].ics`.
 - `/status/` — текущее состояние сервисов, инциденты и плановые работы; основная лента: `/status/data/status.json`.
-- `/places/` — интерактивная карта мест и объектов; текстовый индекс: `/places/index.md`, карточка места: `/places/[slug]/index.md`.
+- `/map/` — интерактивная карта мест и объектов; текстовый индекс: `/map/index.md`, карточка места: `/map/[slug]/index.md`.
 - `/meetings/index.md` — Markdown-индекс архива встреч без публичного HTML-индекса; одна встреча: `/meetings/[slug]/index.md`, полный транскрипт: `/meetings/[slug]/transcript/[part].md`.
 - `/people/index.md` — Markdown-обзор профилей людей без публичного HTML-индекса; основная лента: `/people/data/people.json`.
 - `/815/compare/` — сравнение тарифов поселков и рейтинга; основная лента: `/815/compare/data/settlements.json`.
