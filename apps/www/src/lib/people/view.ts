@@ -32,6 +32,7 @@ const BACKLINK_SECTION_LABELS: Record<PersonMentionSection, string> = {
   news: 'Новости',
   status: 'Статус',
   reviews: 'Отзывы',
+  places: 'Карта',
   people: 'Люди',
   contacts: 'Сарафан',
 };
@@ -40,6 +41,7 @@ const BACKLINK_KIND_LABELS: Record<PersonBacklinkKind, string> = {
   article: 'Новость',
   incident: 'Инцидент',
   review: 'Отзыв',
+  place: 'Место',
   person: 'Профиль',
   contact: 'Контакт',
 };

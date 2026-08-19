@@ -185,6 +185,9 @@ export function schema(root: string): Record<string, unknown> {
           reviews: list({
             $ref: '#/$defs/backlink',
           }),
+          places: list({
+            $ref: '#/$defs/backlink',
+          }),
           people: list({
             $ref: '#/$defs/backlink',
           }),

@@ -181,6 +181,19 @@ describe('buildPersonMarkdown', () => {
           },
         ],
         reviews: [],
+        places: [
+          {
+            section: 'places',
+            kind: 'place',
+            sourceId: 'titanic',
+            title: 'Детская площадка «Титаник»',
+            htmlUrl: '/map/titanic/',
+            markdownUrl: '/map/titanic/index.md',
+            excerpt: 'Площадку показал Кирилл Щемелинин.',
+            mentionedAt: '2026-08-19T00:00:00.000Z',
+            sortKey: 3,
+          },
+        ],
         people: [],
         contacts: [],
       },
@@ -214,6 +227,12 @@ describe('buildPersonMarkdown', () => {
       - [Отключение электричества в Шелково Ривер](https://example.com/status/incidents/2026/04/electricity-river-10kv-line-damage/index.md) — Инцидент; 22 апреля
 
         Как отметил Кирилл Щемелинин, повреждение было редким.
+
+      ### Карта
+
+      - [Детская площадка «Титаник»](https://example.com/map/titanic/index.md) — Место; 19 августа 2026
+
+        Площадку показал Кирилл Щемелинин.
       "
     `);
   });
@@ -243,6 +262,7 @@ describe('buildPersonMarkdown', () => {
         news: [],
         status: [],
         reviews: [],
+        places: [],
         people: [],
         contacts: [],
       },
@@ -296,6 +316,7 @@ describe('buildPersonMarkdown', () => {
         news: [],
         status: [],
         reviews: [],
+        places: [],
         people: [],
         contacts: [],
       },

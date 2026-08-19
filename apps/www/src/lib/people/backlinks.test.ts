@@ -34,6 +34,15 @@ const refs: readonly EntityMentionSourceRef[] = [
     mentionedAt: '2026-07-06T00:00:00.000Z',
     sortKey: 1783296000000,
   },
+  {
+    target: { type: 'person', slug: 'kschemelinin' },
+    source: { section: 'places', kind: 'place', id: 'titanic' },
+    title: 'Детская площадка «Титаник»',
+    htmlUrl: '/map/titanic/',
+    markdownUrl: '/map/titanic/index.md',
+    mentionedAt: '2026-08-19T00:00:00.000Z',
+    sortKey: 1787097600000,
+  },
 ];
 
 describe('createPeopleBacklinksFromGraph', () => {
@@ -71,6 +80,19 @@ describe('createPeopleBacklinksFromGraph', () => {
           },
         ],
         "people": [],
+        "places": [
+          {
+            "excerpt": undefined,
+            "htmlUrl": "/map/titanic/",
+            "kind": "place",
+            "markdownUrl": "/map/titanic/index.md",
+            "mentionedAt": "2026-08-19T00:00:00.000Z",
+            "section": "places",
+            "sortKey": 1787097600000,
+            "sourceId": "titanic",
+            "title": "Детская площадка «Титаник»",
+          },
+        ],
         "reviews": [
           {
             "excerpt": undefined,

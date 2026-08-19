@@ -10,6 +10,7 @@ import type {
 import type { StatusIncidentEntry } from '../status/load';
 import type { StatusArea, StatusKind, StatusService } from '../status/schema';
 import type { ContactEntry } from '../contacts/load';
+import type { PlaceEntry } from '../places/types';
 import type { PersonProfileEntry } from './load';
 
 let buildPeopleDataset: typeof import('./load').buildPeopleDataset;
@@ -18,9 +19,11 @@ let buildContactsDataset: typeof import('../contacts/load').buildContactsDataset
 type BuildNewsDataset = typeof import('../news/load').buildNewsDataset;
 
 let buildNewsDatasetSource: BuildNewsDataset;
+let buildPlacesDataset: typeof import('../places/load').buildPlacesDataset;
 let buildStatusDataset: typeof import('../status/load').buildStatusDataset;
 let createContactMentionRefs: typeof import('../contacts/mentions').createContactMentionRefs;
 let createNewsArticleMentionRefs: typeof import('../news/mentions').createNewsArticleMentionRefs;
+let createPlaceMentionRefs: typeof import('../places/mentions').createPlaceMentionRefs;
 let createStatusIncidentMentionRefs: typeof import('../status/mentions').createStatusIncidentMentionRefs;
 let createPersonProfileMentionRefs: typeof import('./mention-refs').createPersonProfileMentionRefs;
 
@@ -33,9 +36,11 @@ beforeAll(async () => {
   ({ buildPeopleDataset, buildPeopleGraphDataset } = await import('./load'));
   ({ buildContactsDataset } = await import('../contacts/load'));
   ({ buildNewsDataset: buildNewsDatasetSource } = await import('../news/load'));
+  ({ buildPlacesDataset } = await import('../places/load'));
   ({ buildStatusDataset } = await import('../status/load'));
   ({ createContactMentionRefs } = await import('../contacts/mentions'));
   ({ createNewsArticleMentionRefs } = await import('../news/mentions'));
+  ({ createPlaceMentionRefs } = await import('../places/mentions'));
   ({ createStatusIncidentMentionRefs } = await import('../status/mentions'));
   ({ createPersonProfileMentionRefs } = await import('./mention-refs'));
 });
@@ -66,12 +71,14 @@ const sourceRefs = (input: {
   readonly people: ReturnType<typeof buildPeopleDataset>;
   readonly contacts?: ReturnType<typeof buildContactsDataset>;
   readonly news: ReturnType<typeof buildNewsDataset>;
+  readonly places?: ReturnType<typeof buildPlacesDataset>;
   readonly status: ReturnType<typeof buildStatusDataset>;
 }) => [
   ...(input.contacts?.contacts.flatMap((contact) =>
     contact.hasDetailPage ? createContactMentionRefs(contact) : [],
   ) ?? []),
   ...input.news.articles.flatMap(createNewsArticleMentionRefs),
+  ...(input.places?.places.flatMap(createPlaceMentionRefs) ?? []),
   ...input.status.incidents.flatMap(createStatusIncidentMentionRefs),
   ...input.people.profiles.flatMap(createPersonProfileMentionRefs),
 ];
@@ -175,16 +182,40 @@ const contact = (input: {
   },
 });
 
+const place = (input: {
+  readonly id: string;
+  readonly title: string;
+  readonly body?: string;
+}): PlaceEntry => ({
+  id: input.id,
+  body: input.body ?? '',
+  data: {
+    title: input.title,
+    category: 'children',
+    status: 'existing',
+    updated_at: '2026-08-19',
+    summary: 'Детская площадка в виде корабля',
+    location: {
+      map_url: 'https://yandex.ru/maps/?ll=37.746894%2C55.060703&z=18',
+      address: 'ТСН «Шелково», Центральная улица',
+      coordinates: { lat: 55.060703, lng: 37.746894 },
+    },
+  },
+});
+
 describe('buildPeopleDataset', () => {
   it('keeps news and status loaders off the backlink-enabled people loader', async () => {
-    const [peopleLoad, newsLoad, statusLoad] = await Promise.all([
+    const [peopleLoad, newsLoad, placesLoad, statusLoad] = await Promise.all([
       readFile(new URL('./load.ts', import.meta.url), 'utf8'),
       readFile(new URL('../news/load.ts', import.meta.url), 'utf8'),
+      readFile(new URL('../places/load.ts', import.meta.url), 'utf8'),
       readFile(new URL('../status/load.ts', import.meta.url), 'utf8'),
     ]);
 
     expect(peopleLoad).not.toContain("from './public-dto'");
     expect(newsLoad).not.toContain('../people/load');
+    expect(placesLoad).not.toContain('../people/load');
+    expect(placesLoad).toContain('@/lib/people/registry');
     expect(statusLoad).not.toContain('../people/load');
   });
 
@@ -306,7 +337,7 @@ describe('buildPeopleDataset', () => {
     ).toThrow('duplicate person profile slug in mention registry');
   });
 
-  it('builds grouped backlinks from news, status, people, and contact mentions', () => {
+  it('builds grouped backlinks from site section mentions', () => {
     const people = buildPeopleDataset([
       entry({
         id: 'kschemelinin',
@@ -363,9 +394,21 @@ describe('buildPeopleDataset', () => {
         mentionRegistry: people.mentionRegistry,
       },
     );
+    const places = buildPlacesDataset(
+      [
+        place({
+          id: 'titanic',
+          title: 'Детская площадка «Титаник»',
+          body: 'Площадку показал @kschemelinin.',
+        }),
+      ],
+      {
+        mentionRegistry: people.mentionRegistry,
+      },
+    );
     const graph = buildPeopleGraphDataset(
       people,
-      sourceRefs({ people, contacts, news, status }),
+      sourceRefs({ people, contacts, news, places, status }),
     );
 
     expect(graph.bySlug.get('kschemelinin')?.backlinks).toMatchObject({
@@ -400,6 +443,16 @@ describe('buildPeopleDataset', () => {
           title: 'Иван Петров',
           excerpt:
             'Перед началом работ стоит согласовать сроки с Кирилл Щемелинин.',
+        },
+      ],
+      places: [
+        {
+          kind: 'place',
+          sourceId: 'titanic',
+          title: 'Детская площадка «Титаник»',
+          htmlUrl: '/map/titanic/',
+          markdownUrl: '/map/titanic/index.md',
+          excerpt: 'Площадку показал Кирилл Щемелинин.',
         },
       ],
     });
