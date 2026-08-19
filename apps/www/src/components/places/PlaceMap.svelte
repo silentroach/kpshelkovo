@@ -63,6 +63,7 @@
   let mapContainer: HTMLDivElement | undefined = $state(undefined);
   let map: ymaps3.YMap | undefined;
   let markers: ymaps3.YMapMarker[] = [];
+  let markerContents: Array<readonly [Place, HTMLAnchorElement]> = [];
   let isLoading = $state(true);
   let error: string | undefined = $state(undefined);
 
@@ -71,18 +72,14 @@
       ? ['pinchZoom', 'dblClick']
       : ['drag', 'scrollZoom', 'dblClick'];
 
-  const createMarkerContent = (place: Place): HTMLAnchorElement => {
-    const link = document.createElement('a');
-    const visual = document.createElement('span');
-
-    link.className = 'place-map-marker';
-    link.href = place.url;
-    link.dataset.status = place.status;
+  const updateMarkerContent = (place: Place, link: HTMLAnchorElement): void => {
     const isOpen = place.openingHours
       ? isPlaceOpen(place.openingHours)
       : undefined;
 
-    if (isOpen !== undefined) {
+    if (isOpen === undefined) {
+      delete link.dataset.open;
+    } else {
       link.dataset.open = String(isOpen);
     }
 
@@ -99,6 +96,22 @@
       `Открыть место «${place.name}»${status}${openingStatus}`,
     );
     link.title = `${place.name}${status}${openingStatus}`;
+  };
+
+  const refreshMarkerContents = (): void => {
+    for (const [place, link] of markerContents) {
+      updateMarkerContent(place, link);
+    }
+  };
+
+  const createMarkerContent = (place: Place): HTMLAnchorElement => {
+    const link = document.createElement('a');
+    const visual = document.createElement('span');
+
+    link.className = 'place-map-marker';
+    link.href = place.url;
+    link.dataset.status = place.status;
+    updateMarkerContent(place, link);
     link.addEventListener('click', (event) => event.stopPropagation());
     link.addEventListener('keydown', (event) => {
       if (event.key !== ' ') return;
@@ -138,19 +151,22 @@
   };
 
   const clearMap = (): void => {
-    if (!map) return;
+    if (map) {
+      for (const marker of markers) {
+        map.removeChild(marker);
+      }
 
-    for (const marker of markers) {
-      map.removeChild(marker);
+      map.destroy();
     }
 
     markers = [];
-    map.destroy();
+    markerContents = [];
     map = undefined;
   };
 
   onMount(() => {
     let destroyed = false;
+    let markerUpdateTimer: number | undefined;
     let resizeObserver: ResizeObserver | undefined;
 
     installYandexMapsRuntimeHeadPersistence();
@@ -172,15 +188,23 @@
       try {
         await loadYandexMaps();
 
-        if (destroyed || !mapContainer || !window.ymaps3) return;
+        if (destroyed || !mapContainer) return;
 
-        await window.ymaps3.ready;
+        const ymaps3 = window.ymaps3;
+
+        if (!ymaps3) {
+          error = 'Yandex Maps API недоступен';
+          isLoading = false;
+          return;
+        }
+
+        await ymaps3.ready;
         await waitForStableLayout();
 
-        if (destroyed || !mapContainer || !window.ymaps3) return;
+        if (destroyed || !mapContainer) return;
 
         const { YMap, YMapDefaultFeaturesLayer, YMapDefaultSchemeLayer } =
-          window.ymaps3;
+          ymaps3;
 
         map = new YMap(
           mapContainer,
@@ -203,18 +227,23 @@
         );
 
         markers = places.map((place) => {
-          const marker = new window.ymaps3!.YMapMarker(
+          const content = createMarkerContent(place);
+          const marker = new ymaps3.YMapMarker(
             {
               coordinates: [place.coordinates.lng, place.coordinates.lat],
             },
-            createMarkerContent(place),
+            content,
           );
 
+          markerContents.push([place, content]);
           map?.addChild(marker);
           return marker;
         });
 
         fitPlaces();
+        if (markerContents.some(([place]) => place.openingHours)) {
+          markerUpdateTimer = window.setInterval(refreshMarkerContents, 60_000);
+        }
         isLoading = false;
       } catch (reason) {
         console.error('Places map setup error:', reason);
@@ -231,6 +260,9 @@
       destroyed = true;
       document.removeEventListener('astro:page-load', refresh);
       resizeObserver?.disconnect();
+      if (markerUpdateTimer !== undefined) {
+        window.clearInterval(markerUpdateTimer);
+      }
       clearMap();
     };
   });

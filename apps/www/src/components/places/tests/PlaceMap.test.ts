@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, waitFor } from '@testing-library/svelte';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Place } from '@/lib/places/types';
@@ -106,6 +112,7 @@ describe('PlaceMap', () => {
 
   afterEach(() => {
     cleanup();
+    vi.restoreAllMocks();
     vi.useRealTimers();
     vi.unstubAllGlobals();
   });
@@ -250,5 +257,74 @@ describe('PlaceMap', () => {
         ],
       ]
     `);
+  });
+
+  it('refreshes opening state while the map remains open', async () => {
+    vi.setSystemTime(new Date('2026-08-17T06:59:00.000Z'));
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+    const setInterval = vi.spyOn(window, 'setInterval');
+    const clearInterval = vi.spyOn(window, 'clearInterval');
+    const view = render(PlaceMap, { props: { places: [place] } });
+
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+
+    const marker = markerElements[0];
+    expect({
+      open: marker?.dataset.open,
+      title: marker?.title,
+      ariaLabel: marker?.getAttribute('aria-label'),
+    }).toMatchInlineSnapshot(`
+      {
+        "ariaLabel": "Открыть место «Буржуйка», сейчас закрыто",
+        "open": "false",
+        "title": "Буржуйка, сейчас закрыто",
+      }
+    `);
+
+    const timerIndex = setInterval.mock.calls.findIndex(
+      ([, delay]) => delay === 60_000,
+    );
+    const update = setInterval.mock.calls[timerIndex]?.[0];
+    const timer = setInterval.mock.results[timerIndex]?.value;
+
+    expect(timerIndex).toBeGreaterThanOrEqual(0);
+    if (typeof update !== 'function') {
+      throw new Error('marker refresh callback was not scheduled');
+    }
+
+    vi.setSystemTime(new Date('2026-08-17T07:00:00.000Z'));
+    update();
+
+    expect({
+      open: marker?.dataset.open,
+      title: marker?.title,
+      ariaLabel: marker?.getAttribute('aria-label'),
+    }).toMatchInlineSnapshot(`
+      {
+        "ariaLabel": "Открыть место «Буржуйка», открыто сейчас",
+        "open": "true",
+        "title": "Буржуйка, открыто сейчас",
+      }
+    `);
+
+    view.unmount();
+    expect(clearInterval).toHaveBeenCalledWith(timer);
+  });
+
+  it('shows the fallback when the loaded API global is missing', async () => {
+    const api = window.ymaps3;
+    let reads = 0;
+
+    Object.defineProperty(window, 'ymaps3', {
+      configurable: true,
+      get: () => (++reads === 1 ? api : undefined),
+    });
+
+    render(PlaceMap, { props: { places: [place] } });
+
+    const status = await screen.findByRole('status');
+
+    expect(status.textContent).toContain('Карта сейчас недоступна');
+    expect(screen.queryByText('Загружаем карту…')).toBeNull();
   });
 });
