@@ -22,7 +22,11 @@ import {
   WaterDropIcon,
   WhatsAppIcon,
 } from '@shelkovo/ui/icons';
-import { FOODTRUCK_MARKER } from '@shelkovo/ui/markers';
+import {
+  CONSTRUCTION_MARKER,
+  FOODTRUCK_MARKER,
+  TITANIC_MARKER,
+} from '@shelkovo/ui/markers';
 
 const standaloneGroups = [
   {
@@ -110,6 +114,14 @@ const markers = [
     name: 'foodtruck',
     image: FOODTRUCK_MARKER,
   },
+  {
+    name: 'titanic',
+    image: TITANIC_MARKER,
+  },
+  {
+    name: 'construction',
+    image: CONSTRUCTION_MARKER,
+  },
 ] as const;
 ---
 
@@ -168,7 +180,7 @@ const markers = [
         <div class="icons-visual-section-heading">
           <h2 id="map-markers">Маркеры карты</h2>
           <p>
-            Размер на карте: 40 CSS-пикселей; растр подготовлен для экранов до
+            Размер на карте: 48 CSS-пикселей; растр подготовлен для экранов до
             3×
           </p>
         </div>
@@ -370,7 +382,7 @@ const markers = [
 
   .icons-visual-marker {
     display: block;
-    width: 2.5rem;
+    width: 3rem;
     height: auto;
     filter: drop-shadow(0 0.4rem 0.4rem oklch(24% 0.04 145 / 0.12));
   }

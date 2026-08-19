@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { FOODTRUCK_MARKER } from '@shelkovo/ui/markers';
+  import {
+    CONSTRUCTION_MARKER,
+    FOODTRUCK_MARKER,
+    TITANIC_MARKER,
+  } from '@shelkovo/ui/markers';
   import { onMount } from 'svelte';
 
   import {
@@ -19,7 +23,9 @@
     [PLACE_MAP_BOUNDS.minLng, PLACE_MAP_BOUNDS.minLat],
     [PLACE_MAP_BOUNDS.maxLng, PLACE_MAP_BOUNDS.maxLat],
   ];
-  const VIEW_MARGIN: ymaps3.Margin = [64, 32, 48, 32];
+  const VIEW_MARGIN: ymaps3.Margin = [112, 80, 32, 80];
+  const BOUNDS_PADDING_RATIO = 0.3;
+  const roundCoordinate = (value: number): number => Number(value.toFixed(6));
   const CUSTOM_MARKER_IMAGES: Readonly<
     Record<
       PlaceMarker,
@@ -27,6 +33,31 @@
     >
   > = {
     foodtruck: FOODTRUCK_MARKER,
+    titanic: TITANIC_MARKER,
+    construction: CONSTRUCTION_MARKER,
+  };
+  const getPlaceBounds = (): ymaps3.LngLatBounds => {
+    if (places.length < 2) return SETTLEMENT_BOUNDS;
+
+    const longitudes = places.map((place) => place.coordinates.lng);
+    const latitudes = places.map((place) => place.coordinates.lat);
+    const minLng = Math.min(...longitudes);
+    const maxLng = Math.max(...longitudes);
+    const minLat = Math.min(...latitudes);
+    const maxLat = Math.max(...latitudes);
+    const lngPadding = (maxLng - minLng) * BOUNDS_PADDING_RATIO;
+    const latPadding = (maxLat - minLat) * BOUNDS_PADDING_RATIO;
+
+    return [
+      [
+        roundCoordinate(minLng - lngPadding),
+        roundCoordinate(minLat - latPadding),
+      ],
+      [
+        roundCoordinate(maxLng + lngPadding),
+        roundCoordinate(maxLat + latPadding),
+      ],
+    ];
   };
 
   let mapContainer: HTMLDivElement | undefined = $state(undefined);
@@ -99,9 +130,9 @@
     return link;
   };
 
-  const fitSettlement = (): void => {
+  const fitPlaces = (): void => {
     map?.update?.({
-      location: { bounds: SETTLEMENT_BOUNDS, duration: 0 },
+      location: { bounds: getPlaceBounds(), duration: 0 },
       margin: VIEW_MARGIN,
     });
   };
@@ -124,7 +155,11 @@
 
     installYandexMapsRuntimeHeadPersistence();
 
-    const refresh = (): void => fitSettlement();
+    const refresh = (): void => {
+      void waitForStableLayout().then(() => {
+        if (!destroyed) fitPlaces();
+      });
+    };
 
     document.addEventListener('astro:page-load', refresh);
 
@@ -150,7 +185,7 @@
         map = new YMap(
           mapContainer,
           {
-            location: { bounds: SETTLEMENT_BOUNDS },
+            location: { bounds: getPlaceBounds() },
             behaviors: mapBehaviors(),
             mode: 'vector',
           },
@@ -179,7 +214,7 @@
           return marker;
         });
 
-        fitSettlement();
+        fitPlaces();
         isLoading = false;
       } catch (reason) {
         console.error('Places map setup error:', reason);
@@ -254,6 +289,11 @@
     text-decoration: none;
   }
 
+  :global(.place-map-marker[data-marker]) {
+    width: 3rem;
+    height: 3rem;
+  }
+
   :global(.place-map-marker-point) {
     --ui-map-marker-size: 1.4rem;
     --ui-map-marker-border: 0.1875rem solid var(--color-surface-raised);
@@ -265,10 +305,14 @@
   }
 
   :global(.place-map-marker-graphic) {
+    --place-map-marker-state-filter: saturate(1);
+
     display: block;
-    width: 2.5rem;
+    width: 3rem;
     flex: none;
-    filter: drop-shadow(0 0.25rem 0.3rem oklch(24% 0.04 145 / 0.16));
+    filter: var(--place-map-marker-state-filter)
+      drop-shadow(0 0 0.1rem oklch(100% 0 0 / 0.96))
+      drop-shadow(0 0.25rem 0.35rem oklch(24% 0.04 145 / 0.4));
     transition:
       filter 0.15s ease,
       transform 0.15s ease;
@@ -296,9 +340,12 @@
     box-shadow: 0 0 0 0.1875rem var(--color-ring);
   }
 
-  :global(.place-map-marker[data-open='false'] .place-map-marker-point),
-  :global(.place-map-marker[data-open='false'] .place-map-marker-graphic) {
+  :global(.place-map-marker[data-open='false'] .place-map-marker-point) {
     filter: grayscale(1);
+  }
+
+  :global(.place-map-marker[data-open='false'] .place-map-marker-graphic) {
+    --place-map-marker-state-filter: grayscale(1);
   }
 
   :global(.place-map-marker[data-status='planned'] .place-map-marker-point) {

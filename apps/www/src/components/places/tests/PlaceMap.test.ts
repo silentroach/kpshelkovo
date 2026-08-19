@@ -51,6 +51,17 @@ const place: Place = {
   markdownUrl: '/places/burzhuyka/index.md',
   canonical: 'https://kpshelkovo.online/places/burzhuyka/',
 };
+const titanicPlace: Place = {
+  ...place,
+  slug: 'titanic',
+  name: 'Детская площадка «Титаник»',
+  category: 'children',
+  marker: 'titanic',
+  coordinates: { lat: 55.060703, lng: 37.746894 },
+  url: '/places/titanic/',
+  markdownUrl: '/places/titanic/index.md',
+  canonical: 'https://kpshelkovo.online/places/titanic/',
+};
 
 const installYandexMaps = (): void => {
   Object.defineProperty(window, 'ymaps3', {
@@ -157,36 +168,87 @@ describe('PlaceMap', () => {
     expect(mapProps[0]?.behaviors).toEqual(['pinchZoom', 'dblClick']);
   });
 
-  it('uses a custom marker when the place selects one', async () => {
+  it('uses the selected custom marker', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: false }));
 
     render(PlaceMap, {
-      props: { places: [{ ...place, marker: 'foodtruck' }] },
+      props: {
+        places: [
+          { ...place, marker: 'foodtruck' },
+          titanicPlace,
+          {
+            ...titanicPlace,
+            slug: 'construction',
+            name: 'Строительство',
+            marker: 'construction',
+          },
+        ],
+      },
     });
 
-    await waitFor(() => expect(markerElements).toHaveLength(1));
+    await waitFor(() => expect(markerElements).toHaveLength(3));
 
-    const marker = markerElements[0];
-    const image = marker?.querySelector('img');
+    const markerDetails = markerElements.map((marker) => {
+      const image = marker.querySelector('img');
 
-    expect({
-      marker: marker?.dataset.marker,
-      graphicClass: marker?.querySelector('[aria-hidden="true"]')?.className,
-      imageClass: image?.className,
-      imageDimensions: [image?.width, image?.height],
-      usesDefaultPoint: Boolean(marker?.querySelector('.ui-map-marker')),
-    }).toMatchInlineSnapshot(`
-      {
-        "graphicClass": "place-map-marker-graphic",
-        "imageClass": "place-map-marker-image",
-        "imageDimensions": [
-          120,
-          106,
-        ],
-        "marker": "foodtruck",
-        "usesDefaultPoint": false,
-      }
+      return {
+        marker: marker.dataset.marker,
+        graphicClass: marker.querySelector('[aria-hidden="true"]')?.className,
+        imageClass: image?.className,
+        imageDimensions: [image?.width, image?.height],
+        imageFile: image?.src.split('/').at(-1),
+        usesDefaultPoint: Boolean(marker.querySelector('.ui-map-marker')),
+      };
+    });
+
+    expect(markerDetails).toMatchInlineSnapshot(`
+      [
+        {
+          "graphicClass": "place-map-marker-graphic",
+          "imageClass": "place-map-marker-image",
+          "imageDimensions": [
+            144,
+            128,
+          ],
+          "imageFile": "Foodtruck.png",
+          "marker": "foodtruck",
+          "usesDefaultPoint": false,
+        },
+        {
+          "graphicClass": "place-map-marker-graphic",
+          "imageClass": "place-map-marker-image",
+          "imageDimensions": [
+            144,
+            128,
+          ],
+          "imageFile": "Titanic.png",
+          "marker": "titanic",
+          "usesDefaultPoint": false,
+        },
+        {
+          "graphicClass": "place-map-marker-graphic",
+          "imageClass": "place-map-marker-image",
+          "imageDimensions": [
+            144,
+            141,
+          ],
+          "imageFile": "Construction.png",
+          "marker": "construction",
+          "usesDefaultPoint": false,
+        },
+      ]
     `);
-    expect(image?.src).toMatch(/Foodtruck\.png/u);
+    expect(mapProps[0]?.location.bounds).toMatchInlineSnapshot(`
+      [
+        [
+          37.707046,
+          55.060473,
+        ],
+        [
+          37.75609,
+          55.060756,
+        ],
+      ]
+    `);
   });
 });
