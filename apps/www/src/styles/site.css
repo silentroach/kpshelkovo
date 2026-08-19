@@ -21,6 +21,11 @@
   --ui-sticky-table-header-top: var(--site-sticky-offset);
 }
 
+.ui-root-site .reglament-table-shell {
+  width: auto;
+  max-width: none;
+}
+
 .ui-root-site.site-has-header .ui-page-header {
   padding-top: 1rem;
 }
