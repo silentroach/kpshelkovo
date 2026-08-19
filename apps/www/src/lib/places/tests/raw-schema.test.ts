@@ -67,6 +67,42 @@ describe('RawPlaceSchema', () => {
     `);
   });
 
+  it('accepts a Yandex Maps coordinate URL', () => {
+    const mapUrl = 'https://yandex.ru/maps/?ll=37.746894%2C55.060703&z=18';
+
+    expect(
+      RawPlaceSchema.parse({
+        ...place,
+        location: { ...place.location, map_url: mapUrl },
+      }).location.map_url,
+    ).toBe(mapUrl);
+  });
+
+  it.each([
+    'https://mail.yandex.ru/',
+    'https://yandex.ru/mail/',
+    'https://yandex.ru/maps-and-more/',
+    'https://yandex.ru@evil.example/maps/',
+    'http://yandex.ru/maps/',
+    'https://yandex.com/maps/',
+  ])('rejects a non-map URL: %s', (mapUrl) => {
+    const result = RawPlaceSchema.safeParse({
+      ...place,
+      location: { ...place.location, map_url: mapUrl },
+    });
+
+    expect(result.success).toBe(false);
+    if (result.success) {
+      throw new Error('non-map URL passed validation');
+    }
+
+    expect(
+      result.error.issues.some(
+        (issue) => issue.path.join('.') === 'location.map_url',
+      ),
+    ).toBe(true);
+  });
+
   it('requires evidence for a future place', () => {
     expect(() =>
       RawPlaceSchema.parse({ ...place, status: 'planned' }),

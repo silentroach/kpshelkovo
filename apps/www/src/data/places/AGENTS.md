@@ -4,6 +4,7 @@
 - Имя файла без `.md` задает канонический `slug`; отдельное поле `slug` во frontmatter не нужно.
 - Обязательные поля: `title`, `category`, `status`, `updated_at`, `summary` и `location`.
 - В `location` хранить `map_url`, понятный `address` и точные `coordinates` с числовыми `lat` и `lng`.
+- `map_url` должен быть HTTPS-ссылкой вида `https://yandex.ru/maps…` или `https://yandex.ru/navi…`; ссылки на другие продукты и домены не принимаются.
 - `location.coordinates` задает основную точку места и будущую точку подписи. Линии и полигоны добавлять как GeoJSON features или соседний `[slug].geojson`, когда появится их renderer; не кодировать сложную геометрию произвольными полями frontmatter.
 - Поддерживаемые категории: `entrance`, `children`, `sport`, `walking`, `food`, `services`, `nature`, `water`, `infrastructure`.
 - `marker` — необязательный кастомный маркер. Без него карта рисует стандартную точку; сейчас поддерживаются `foodtruck`, `titanic` и `construction`.

@@ -26,15 +26,17 @@ const httpsUrl = nonBlankText.url().refine(isHttpsUrl, {
   message: 'url must use https://',
 });
 
+const YANDEX_MAP_ORIGIN = 'https://yandex.ru';
+const YANDEX_MAP_PATH = /^\/(?:maps|navi)(?:\/|$)/u;
 const isYandexMapUrl = (value: string): boolean => {
   try {
-    const hostname = new URL(value).hostname;
+    const url = new URL(value);
 
     return (
-      hostname === 'yandex.ru' ||
-      hostname.endsWith('.yandex.ru') ||
-      hostname === 'yandex.com' ||
-      hostname.endsWith('.yandex.com')
+      url.origin === YANDEX_MAP_ORIGIN &&
+      !url.username &&
+      !url.password &&
+      YANDEX_MAP_PATH.test(url.pathname)
     );
   } catch {
     return false;
