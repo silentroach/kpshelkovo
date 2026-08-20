@@ -108,4 +108,27 @@ describe('reviews schema', () => {
       ]
     `);
   });
+
+  it('does not publish Review markup for an organization without a rating', () => {
+    const schema = reviewPageSchema({
+      review: {
+        ...review,
+        aspects: [
+          { type: 'developer', body: 'Дороги еще строят.' },
+          { type: 'management', rating: 2 },
+        ],
+      },
+      description: 'Отзыв Алексея о жизни в Шелково.',
+    });
+
+    expect(
+      schema
+        .filter((item) => item['@type'] === 'Review')
+        .map((item) => item['@id']),
+    ).toMatchInlineSnapshot(`
+      [
+        "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#review-management",
+      ]
+    `);
+  });
 });

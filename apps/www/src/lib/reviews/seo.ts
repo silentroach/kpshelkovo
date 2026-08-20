@@ -112,7 +112,7 @@ const reviewedOrganizationSchema = (
 const reviewEntitySchemas = (review: Review): readonly SchemaDoc[] => {
   const url = absoluteUrl(review.url);
   return review.aspects.flatMap((aspect) => {
-    if (aspect.type === 'place' || (!aspect.rating && !aspect.body)) return [];
+    if (aspect.type === 'place' || !aspect.rating) return [];
 
     const reviewBody = aspect.body
       ? extractMarkdownText(aspect.body)
@@ -138,14 +138,12 @@ const reviewEntitySchemas = (review: Review): readonly SchemaDoc[] => {
         reviewAspect: formatReviewAspectType(aspect.type),
         reviewBody,
         wordCount: reviewBody ? countWords(reviewBody) : undefined,
-        reviewRating: aspect.rating
-          ? {
-              '@type': 'Rating',
-              ratingValue: aspect.rating,
-              bestRating: 5,
-              worstRating: 1,
-            }
-          : undefined,
+        reviewRating: {
+          '@type': 'Rating',
+          ratingValue: aspect.rating,
+          bestRating: 5,
+          worstRating: 1,
+        },
       },
     ];
   });
