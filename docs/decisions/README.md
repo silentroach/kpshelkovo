@@ -32,3 +32,4 @@
 - [ADR-026: IndexNow после статического deploy](026-indexnow-after-static-deploy.md) - заменён ADR-027, 2026-08-16.
 - [ADR-027: IndexNow только для новых страниц](027-indexnow-new-pages-only.md) - принят, 2026-08-16.
 - [ADR-028: Markdown-first карта мест с типизированными маркерами](028-markdown-first-places-map.md) - принят, 2026-08-19.
+- [ADR-029: Аспектные оценки как отзывы об организациях](029-review-aspects-as-organization-reviews.md) - принят, 2026-08-20.
