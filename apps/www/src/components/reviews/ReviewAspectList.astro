@@ -3,11 +3,7 @@ import StarRating from '@shelkovo/ui/StarRating.astro';
 
 import { renderMarkdown } from '@/lib/markdown/render';
 import type { ReviewAspect } from '@/lib/reviews/types';
-import {
-  formatReviewAspectTitle,
-  formatReviewAspectType,
-  sortReviewAspects,
-} from '@/lib/reviews/view';
+import { formatReviewAspectLabel, sortReviewAspects } from '@/lib/reviews/view';
 
 interface Props {
   readonly aspects: readonly ReviewAspect[];
@@ -27,11 +23,8 @@ const ordered = sortReviewAspects(aspects);
         {ordered.map((aspect) => (
           <article class="space-y-3">
             <div class="space-y-2">
-              <h3
-                class="ui-section-label"
-                title={formatReviewAspectTitle(aspect.type)}
-              >
-                {formatReviewAspectType(aspect.type)}
+              <h3 class="ui-section-label">
+                {formatReviewAspectLabel(aspect.type)}
               </h3>
               {aspect.rating && (
                 <StarRating

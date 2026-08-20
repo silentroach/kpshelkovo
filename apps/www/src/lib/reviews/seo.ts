@@ -1,16 +1,18 @@
-import {
-  extractFirstMarkdownText,
-  extractMarkdownText,
-} from '@shelkovo/markdown';
+import { extractMarkdownText } from '@shelkovo/markdown';
 import type { SchemaDoc } from '@shelkovo/seo';
 
 import { absoluteUrl } from '@/lib/site';
 
 import { reviewsRulesUrl, reviewsUrl } from './routes';
-import { REVIEW_AUTHOR_FALLBACK } from './schema';
+import {
+  REVIEW_ASPECT_ORGANIZATIONS,
+  REVIEW_AUTHOR_FALLBACK,
+  type ReviewOrganizationAspectType,
+} from './schema';
 import type { Review } from './types';
 import {
   formatReviewArea,
+  formatReviewAspectLabel,
   formatReviewAspectType,
   formatReviewTitle,
 } from './view';
@@ -86,21 +88,6 @@ const breadcrumbSchema = (
   })),
 });
 
-const reviewRatings = (review: Review): readonly SchemaDoc[] =>
-  review.aspects.flatMap((aspect) =>
-    aspect.rating
-      ? [
-          {
-            '@type': 'Rating',
-            ratingValue: aspect.rating,
-            bestRating: 5,
-            worstRating: 1,
-            reviewAspect: formatReviewAspectType(aspect.type),
-          },
-        ]
-      : [],
-  );
-
 const reviewAuthorSchema = (review: Review): SchemaDoc => ({
   '@type': 'Person',
   name: review.author ?? REVIEW_AUTHOR_FALLBACK,
@@ -115,40 +102,53 @@ const reviewMentionsSchema = (review: Review): readonly SchemaDoc[] =>
 
 const countWords = (text: string): number => text.split(/\s+/u).length;
 
-const reviewEntitySchema = (
-  review: Review,
-  options?: {
-    readonly description?: string;
-    readonly reviewBody?: string;
-  },
-): SchemaDoc => {
-  const url = absoluteUrl(review.url);
-  const reviewBody = options?.reviewBody;
-  const summary = options?.description ?? extractFirstMarkdownText(review.body);
-  const ratings = reviewRatings(review);
-  const mentions = reviewMentionsSchema(review);
+const reviewedOrganizationSchema = (
+  type: ReviewOrganizationAspectType,
+): SchemaDoc => ({
+  '@type': 'Organization',
+  name: REVIEW_ASPECT_ORGANIZATIONS[type].name,
+});
 
-  return {
-    '@type': 'Review',
-    '@id': `${url}#review`,
-    identifier: review.id,
-    name: formatReviewTitle(review),
-    description: summary,
-    author: reviewAuthorSchema(review),
-    publisher: organizationSchema(),
-    datePublished: review.publishedIso,
-    url,
-    mainEntityOfPage: { '@id': `${url}#webpage` },
-    isPartOf: { '@id': `${absoluteUrl(reviewsUrl())}#webpage` },
-    inLanguage: LANG,
-    isAccessibleForFree: true,
-    publishingPrinciples: absoluteUrl(reviewsRulesUrl()),
-    itemReviewed: shelkovoPlaceSchema(),
-    contentLocation: reviewLocationSchema(review),
-    ...(reviewBody ? { reviewBody, wordCount: countWords(reviewBody) } : {}),
-    ...(ratings.length > 0 ? { reviewRating: ratings } : {}),
-    ...(mentions.length > 0 ? { mentions } : {}),
-  };
+const reviewEntitySchemas = (review: Review): readonly SchemaDoc[] => {
+  const url = absoluteUrl(review.url);
+  return review.aspects.flatMap((aspect) => {
+    if (aspect.type === 'place' || (!aspect.rating && !aspect.body)) return [];
+
+    const reviewBody = aspect.body
+      ? extractMarkdownText(aspect.body)
+      : undefined;
+
+    return [
+      {
+        '@type': 'Review',
+        '@id': `${url}#review-${aspect.type}`,
+        identifier: `${review.id}-${aspect.type}`,
+        name: `${formatReviewTitle(review)}. ${formatReviewAspectLabel(aspect.type)}`,
+        author: reviewAuthorSchema(review),
+        publisher: organizationSchema(),
+        datePublished: review.publishedIso,
+        url,
+        mainEntityOfPage: { '@id': `${url}#webpage` },
+        isPartOf: { '@id': `${absoluteUrl(reviewsUrl())}#webpage` },
+        inLanguage: LANG,
+        isAccessibleForFree: true,
+        publishingPrinciples: absoluteUrl(reviewsRulesUrl()),
+        itemReviewed: reviewedOrganizationSchema(aspect.type),
+        contentLocation: reviewLocationSchema(review),
+        reviewAspect: formatReviewAspectType(aspect.type),
+        reviewBody,
+        wordCount: reviewBody ? countWords(reviewBody) : undefined,
+        reviewRating: aspect.rating
+          ? {
+              '@type': 'Rating',
+              ratingValue: aspect.rating,
+              bestRating: 5,
+              worstRating: 1,
+            }
+          : undefined,
+      },
+    ];
+  });
 };
 
 const itemListSchema = (
@@ -166,7 +166,12 @@ const itemListSchema = (
     position: index + 1,
     name: formatReviewTitle(review),
     url: absoluteUrl(review.url),
-    item: reviewEntitySchema(review),
+    item: {
+      '@type': 'ItemPage',
+      '@id': `${absoluteUrl(review.url)}#webpage`,
+      name: formatReviewTitle(review),
+      url: absoluteUrl(review.url),
+    },
   })),
 });
 
@@ -202,7 +207,7 @@ export const reviewsCollectionPageSchema = (
         ? {
             mainEntity: { '@id': list['@id'] },
             hasPart: input.items.map((review) => ({
-              '@id': `${absoluteUrl(review.url)}#review`,
+              '@id': `${absoluteUrl(review.url)}#webpage`,
             })),
           }
         : {}),
@@ -222,10 +227,9 @@ export const reviewPageSchema = (
   const { review } = input;
   const url = absoluteUrl(review.url);
   const pageId = `${url}#webpage`;
-  const reviewEntity = reviewEntitySchema(review, {
-    description: input.description,
-    reviewBody: extractMarkdownText(review.body),
-  });
+  const reviewEntities = reviewEntitySchemas(review);
+  const reviewBody = extractMarkdownText(review.body);
+  const mentions = reviewMentionsSchema(review);
   const breadcrumb = input.breadcrumbs?.length
     ? breadcrumbSchema(url, input.breadcrumbs)
     : undefined;
@@ -237,20 +241,28 @@ export const reviewPageSchema = (
       name: formatReviewTitle(review),
       description: input.description,
       url,
+      identifier: review.id,
       datePublished: review.publishedIso,
+      author: reviewAuthorSchema(review),
       inLanguage: LANG,
       isAccessibleForFree: true,
       isPartOf: websiteSchema(),
       publisher: organizationSchema(),
       about: shelkovoPlaceSchema(),
-      mainEntity: { '@id': reviewEntity['@id'] },
+      contentLocation: reviewLocationSchema(review),
+      text: reviewBody,
+      wordCount: reviewBody ? countWords(reviewBody) : undefined,
+      mainEntity: reviewEntities.length
+        ? reviewEntities.map((entity) => ({ '@id': entity['@id'] }))
+        : undefined,
+      mentions: mentions.length ? mentions : undefined,
       relatedLink: absoluteUrl(reviewsRulesUrl()),
       ...(breadcrumb ? { breadcrumb: { '@id': breadcrumb['@id'] } } : {}),
     },
-    {
+    ...reviewEntities.map((entity) => ({
       '@context': CONTEXT,
-      ...reviewEntity,
-    },
+      ...entity,
+    })),
   ];
 
   if (breadcrumb) docs.push(breadcrumb);
