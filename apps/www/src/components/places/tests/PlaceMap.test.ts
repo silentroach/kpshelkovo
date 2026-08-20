@@ -575,7 +575,7 @@ describe('PlaceMap', () => {
     const scales = [
       mapElement.style.getPropertyValue('--place-map-marker-scale'),
     ];
-    for (const zoom of [13.5, 16]) {
+    for (const zoom of [13.5, 16, 17, 18]) {
       update({
         type: 'update',
         location: {
@@ -599,6 +599,8 @@ describe('PlaceMap', () => {
         "0.850",
         "0.625",
         "1.000",
+        "1.150",
+        "1.300",
       ]
     `);
   });

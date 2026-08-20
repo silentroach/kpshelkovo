@@ -38,6 +38,8 @@
   const MARKER_MIN_SCALE = 20 / 32;
   const MARKER_MIN_ZOOM = 13.5;
   const MARKER_MAX_ZOOM = 16;
+  const MARKER_CLOSEUP_MAX_ZOOM = 18;
+  const MARKER_CLOSEUP_MAX_SCALE = 1.3;
   const PLACE_FOCUS_ZOOM = MARKER_MAX_ZOOM;
   const roundCoordinate = (value: number): number => Number(value.toFixed(6));
   const CUSTOM_MARKER_IMAGES: Readonly<
@@ -86,6 +88,15 @@
       ]),
     );
   const getMarkerScale = (zoom: number): number => {
+    if (zoom > MARKER_MAX_ZOOM) {
+      const closeupProgress = Math.min(
+        1,
+        (zoom - MARKER_MAX_ZOOM) / (MARKER_CLOSEUP_MAX_ZOOM - MARKER_MAX_ZOOM),
+      );
+
+      return 1 + (MARKER_CLOSEUP_MAX_SCALE - 1) * closeupProgress;
+    }
+
     const progress = Math.min(
       1,
       Math.max(
