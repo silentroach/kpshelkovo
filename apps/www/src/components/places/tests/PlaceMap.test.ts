@@ -228,11 +228,17 @@ describe('PlaceMap', () => {
             marker: 'construction',
             status: 'underConstruction',
           },
+          {
+            ...titanicPlace,
+            slug: 'hunting-ponds',
+            name: 'Охотничьи пруды',
+            marker: 'fish',
+          },
         ],
       },
     });
 
-    await waitFor(() => expect(markerElements).toHaveLength(3));
+    await waitFor(() => expect(markerElements).toHaveLength(4));
 
     const markerDetails = markerElements.map((marker) => {
       const image = marker.querySelector('img');
@@ -280,6 +286,17 @@ describe('PlaceMap', () => {
           ],
           "imageFile": "Construction.png",
           "marker": "construction",
+          "usesDefaultPoint": false,
+        },
+        {
+          "graphicClass": "place-map-marker-graphic",
+          "imageClass": "place-map-marker-image",
+          "imageDimensions": [
+            144,
+            144,
+          ],
+          "imageFile": "Fish.png",
+          "marker": "fish",
           "usesDefaultPoint": false,
         },
       ]

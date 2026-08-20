@@ -11,7 +11,12 @@ export const PLACE_CATEGORIES = [
 ] as const;
 export type PlaceCategory = (typeof PLACE_CATEGORIES)[number];
 
-export const PLACE_MARKERS = ['foodtruck', 'titanic', 'construction'] as const;
+export const PLACE_MARKERS = [
+  'foodtruck',
+  'titanic',
+  'construction',
+  'fish',
+] as const;
 export type PlaceMarker = (typeof PLACE_MARKERS)[number];
 
 export const PLACE_STATUSES = [

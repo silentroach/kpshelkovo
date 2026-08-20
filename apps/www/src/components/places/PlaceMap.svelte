@@ -3,6 +3,7 @@
   import type { Feature } from '@yandex/ymaps3-clusterer';
   import {
     CONSTRUCTION_MARKER,
+    FISH_MARKER,
     FOODTRUCK_MARKER,
     TITANIC_MARKER,
   } from '@shelkovo/ui/markers';
@@ -46,6 +47,7 @@
     foodtruck: FOODTRUCK_MARKER,
     titanic: TITANIC_MARKER,
     construction: CONSTRUCTION_MARKER,
+    fish: FISH_MARKER,
   };
   const getPaddedBounds = (
     coordinates: readonly ymaps3.LngLat[],
