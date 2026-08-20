@@ -16,6 +16,7 @@ export const PLACE_MARKERS = [
   'titanic',
   'construction',
   'fish',
+  'kpp',
 ] as const;
 export type PlaceMarker = (typeof PLACE_MARKERS)[number];
 

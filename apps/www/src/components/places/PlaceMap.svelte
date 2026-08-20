@@ -5,6 +5,7 @@
     CONSTRUCTION_MARKER,
     FISH_MARKER,
     FOODTRUCK_MARKER,
+    KPP_MARKER,
     TITANIC_MARKER,
   } from '@shelkovo/ui/markers';
   import { onMount } from 'svelte';
@@ -14,7 +15,7 @@
     loadYandexMaps,
     waitForStableLayout,
   } from '@/lib/yandex-maps/runtime';
-  import { isPlaceOpen } from '@/lib/places/opening-hours';
+  import { getPlaceClosingTime } from '@/lib/places/opening-hours';
   import { PLACE_MAP_BOUNDS } from '@/lib/places/schema';
   import type { PlaceMarker } from '@/lib/places/schema';
   import type { Place } from '@/lib/places/types';
@@ -48,6 +49,7 @@
     titanic: TITANIC_MARKER,
     construction: CONSTRUCTION_MARKER,
     fish: FISH_MARKER,
+    kpp: KPP_MARKER,
   };
   const getPaddedBounds = (
     coordinates: readonly ymaps3.LngLat[],
@@ -155,32 +157,34 @@
   ];
 
   const updateMarkerContent = (place: Place, link: HTMLAnchorElement): void => {
-    const isOpen = place.openingHours
-      ? isPlaceOpen(place.openingHours)
+    const closingTime = place.openingHours
+      ? getPlaceClosingTime(place.openingHours)
       : undefined;
 
-    if (isOpen === undefined) {
+    if (!place.openingHours) {
       delete link.dataset.open;
     } else {
-      link.dataset.open = String(isOpen);
+      link.dataset.open = String(Boolean(closingTime));
     }
 
     const status =
       place.status === 'existing' ? '' : `, ${formatPlaceStatus(place.status)}`;
     let openingStatus = '';
 
-    if (isOpen !== undefined) {
-      openingStatus = isOpen ? ', открыто сейчас' : ', сейчас закрыто';
+    if (place.openingHours) {
+      openingStatus = closingTime
+        ? `открыто до ${closingTime}`
+        : 'сейчас закрыто';
     }
 
     link.setAttribute(
       'aria-label',
-      `Открыть место «${place.name}»${status}${openingStatus}`,
+      `Открыть место «${place.name}»${status}${openingStatus ? `, ${openingStatus}` : ''}`,
     );
     link.title =
       place.status === 'underConstruction'
         ? place.name
-        : `${place.name}${status}${openingStatus}`;
+        : `${place.name}${status}${openingStatus ? `\n${openingStatus}` : ''}`;
   };
 
   const refreshMarkerContents = (): void => {

@@ -47,6 +47,7 @@
     "./markers/Construction.png": "./src/markers/Construction.png",
     "./markers/Fish.png": "./src/markers/Fish.png",
     "./markers/Foodtruck.png": "./src/markers/Foodtruck.png",
+    "./markers/Kpp.png": "./src/markers/Kpp.png",
     "./markers/Titanic.png": "./src/markers/Titanic.png",
     "./theme": "./src/theme.ts",
     "./Link.svelte": "./src/Link.svelte",

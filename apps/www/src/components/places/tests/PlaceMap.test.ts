@@ -156,7 +156,8 @@ describe('PlaceMap', () => {
         data-open="false"
         data-status="existing"
         href="/map/burzhuyka/"
-        title="Буржуйка, сейчас закрыто"
+        title="Буржуйка
+      сейчас закрыто"
       >
         <span
           aria-hidden="true"
@@ -234,11 +235,17 @@ describe('PlaceMap', () => {
             name: 'Охотничьи пруды',
             marker: 'fish',
           },
+          {
+            ...titanicPlace,
+            slug: 'forest-checkpoint',
+            name: 'КПП Фореста',
+            marker: 'kpp',
+          },
         ],
       },
     });
 
-    await waitFor(() => expect(markerElements).toHaveLength(4));
+    await waitFor(() => expect(markerElements).toHaveLength(5));
 
     const markerDetails = markerElements.map((marker) => {
       const image = marker.querySelector('img');
@@ -297,6 +304,17 @@ describe('PlaceMap', () => {
           ],
           "imageFile": "Fish.png",
           "marker": "fish",
+          "usesDefaultPoint": false,
+        },
+        {
+          "graphicClass": "place-map-marker-graphic",
+          "imageClass": "place-map-marker-image",
+          "imageDimensions": [
+            144,
+            137,
+          ],
+          "imageFile": "Kpp.png",
+          "marker": "kpp",
           "usesDefaultPoint": false,
         },
       ]
@@ -488,7 +506,8 @@ describe('PlaceMap', () => {
       {
         "ariaLabel": "Открыть место «Буржуйка», сейчас закрыто",
         "open": "false",
-        "title": "Буржуйка, сейчас закрыто",
+        "title": "Буржуйка
+      сейчас закрыто",
       }
     `);
 
@@ -512,9 +531,10 @@ describe('PlaceMap', () => {
       ariaLabel: marker?.getAttribute('aria-label'),
     }).toMatchInlineSnapshot(`
       {
-        "ariaLabel": "Открыть место «Буржуйка», открыто сейчас",
+        "ariaLabel": "Открыть место «Буржуйка», открыто до 22:00",
         "open": "true",
-        "title": "Буржуйка, открыто сейчас",
+        "title": "Буржуйка
+      открыто до 22:00",
       }
     `);
 

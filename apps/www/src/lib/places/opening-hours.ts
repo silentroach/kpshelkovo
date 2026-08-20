@@ -48,16 +48,21 @@ const placeLocalTime = (
   };
 };
 
-export const isPlaceOpen = (
+export const getPlaceClosingTime = (
   openingHours: PlaceOpeningHours,
   date = new Date(),
-): boolean => {
+): string | undefined => {
   const localTime = placeLocalTime(date);
 
-  return openingHours.periods.some(
+  return openingHours.periods.find(
     (period) =>
       period.days.includes(localTime.weekday) &&
       localTime.minutes >= minutesFromTime(period.opensAt) &&
       localTime.minutes < minutesFromTime(period.closesAt),
-  );
+  )?.closesAt;
 };
+
+export const isPlaceOpen = (
+  openingHours: PlaceOpeningHours,
+  date = new Date(),
+): boolean => Boolean(getPlaceClosingTime(openingHours, date));
