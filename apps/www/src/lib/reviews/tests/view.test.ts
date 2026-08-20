@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { Review } from '../types';
 import {
   formatReviewArea,
-  formatReviewAspectTitle,
+  formatReviewAspectLabel,
   formatReviewAspectType,
   formatReviewAuthor,
   formatReviewDate,
@@ -40,9 +40,11 @@ describe('review view helpers', () => {
     expect(formatReviewAspectType('place')).toBe('Место и среда');
     expect(formatReviewAspectType('developer')).toBe('Застройщик');
     expect(formatReviewAspectType('management')).toBe('Обслуживание');
-    expect(formatReviewAspectTitle('place')).toBeUndefined();
-    expect(formatReviewAspectTitle('developer')).toBe('Земля МО');
-    expect(formatReviewAspectTitle('management')).toBe('ОК Комфорт');
+    expect(formatReviewAspectLabel('place')).toBe('Место и среда');
+    expect(formatReviewAspectLabel('developer')).toBe('Земля МО: застройщик');
+    expect(formatReviewAspectLabel('management')).toBe(
+      'ОК Комфорт: обслуживание',
+    );
     expect(
       sortReviewAspects([
         { type: 'management', rating: 2 },

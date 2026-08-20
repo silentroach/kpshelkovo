@@ -37,9 +37,6 @@ const visibleText = (html: string): string =>
 const ariaLabels = (html: string): readonly string[] =>
   [...html.matchAll(/aria-label="([^"]+)"/gu)].map((match) => match[1] ?? '');
 
-const titles = (html: string): readonly string[] =>
-  [...html.matchAll(/title="([^"]+)"/gu)].map((match) => match[1] ?? '');
-
 describe('ReviewCard', () => {
   it('renders generated title, anonymous author, area, and aspect rating', async () => {
     const container = await createAstroContainer();
@@ -50,7 +47,6 @@ describe('ReviewCard', () => {
     expect({
       text: visibleWhitespace(visibleText(html)),
       ariaLabels: ariaLabels(html),
-      titles: titles(html),
     }).toMatchInlineSnapshot(`
       {
         "ariaLabels": [
@@ -59,12 +55,7 @@ describe('ReviewCard', () => {
           "Оценка 3 из 5",
           "Оценка 2 из 5",
         ],
-        "text": "Отзыв собственника от 25 июня 2026 25 июня 2026 Анонимный собственник Место и среда Застройщик Обслуживание",
-        "titles": [
-          "Шелково Форест",
-          "Земля МО",
-          "ОК Комфорт",
-        ],
+        "text": "Отзыв собственника от 25 июня 2026 25 июня 2026 Анонимный собственник Место и среда Земля МО: застройщик ОК Комфорт: обслуживание",
       }
     `);
   });

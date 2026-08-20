@@ -4,6 +4,8 @@
 
 Принят
 
+Решение о JSON-LD-разметке отзывов заменено [ADR-029](029-review-aspects-as-organization-reviews.md).
+
 ## Дата
 
 2026-06-25
@@ -111,6 +113,8 @@ Markdown companion:
 В MVP не публикуем JSON feed и OpenAPI schema, чтобы не стабилизировать лишний публичный DTO.
 
 ### JSON-LD
+
+Этот подраздел хранит первоначальное решение. Актуальная модель описана в [ADR-029](029-review-aspects-as-organization-reviews.md).
 
 На странице отдельного отзыва публикуем JSON-LD `Review`, где это уместно:
 

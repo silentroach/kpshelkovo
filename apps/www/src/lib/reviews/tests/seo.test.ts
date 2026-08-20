@@ -28,6 +28,7 @@ const review = {
   body: 'Основной **текст** отзыва.\n\nВторой абзац.',
   aspects: [
     { type: 'place', rating: 5 },
+    { type: 'developer', rating: 3, body: 'Дороги еще строят.' },
     { type: 'management', rating: 2 },
   ],
   mentions: [],
@@ -61,5 +62,73 @@ describe('reviews schema', () => {
     });
 
     expect(schema).toMatchSnapshot();
+  });
+
+  it('publishes one supported organization and rating per review aspect', () => {
+    const schema = reviewPageSchema({
+      review,
+      description: 'Отзыв Алексея о жизни в Шелково.',
+    });
+    const reviews = schema.filter((item) => item['@type'] === 'Review');
+
+    expect(
+      reviews.map((item) => ({
+        id: item['@id'],
+        itemReviewed: item.itemReviewed,
+        reviewRating: item.reviewRating,
+      })),
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "id": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#review-developer",
+          "itemReviewed": {
+            "@type": "Organization",
+            "name": "Земля МО",
+          },
+          "reviewRating": {
+            "@type": "Rating",
+            "bestRating": 5,
+            "ratingValue": 3,
+            "worstRating": 1,
+          },
+        },
+        {
+          "id": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#review-management",
+          "itemReviewed": {
+            "@type": "Organization",
+            "name": "ОК Комфорт",
+          },
+          "reviewRating": {
+            "@type": "Rating",
+            "bestRating": 5,
+            "ratingValue": 2,
+            "worstRating": 1,
+          },
+        },
+      ]
+    `);
+  });
+
+  it('does not publish Review markup for an organization without a rating', () => {
+    const schema = reviewPageSchema({
+      review: {
+        ...review,
+        aspects: [
+          { type: 'developer', body: 'Дороги еще строят.' },
+          { type: 'management', rating: 2 },
+        ],
+      },
+      description: 'Отзыв Алексея о жизни в Шелково.',
+    });
+
+    expect(
+      schema
+        .filter((item) => item['@type'] === 'Review')
+        .map((item) => item['@id']),
+    ).toMatchInlineSnapshot(`
+      [
+        "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#review-management",
+      ]
+    `);
   });
 });
