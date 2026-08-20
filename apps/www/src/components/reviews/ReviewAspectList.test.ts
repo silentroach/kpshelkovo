@@ -35,13 +35,20 @@ describe('ReviewAspectList', () => {
     expect({
       text: visibleWhitespace(visibleText(html)),
       ariaLabels: ariaLabels(html),
+      titles: [...html.matchAll(/ title="([^"]+)"/gu)].map(
+        (match) => match[1] ?? '',
+      ),
     }).toMatchInlineSnapshot(`
       {
         "ariaLabels": [
           "Оценка 5 из 5",
           "Оценка 3 из 5",
         ],
-        "text": "Оценки по темам Место и среда Земля МО: застройщик Есть нейтральные впечатления. ОК Комфорт: обслуживание Отвечают не·всегда быстро.",
+        "text": "Оценки по темам Место и среда Застройщик Есть нейтральные впечатления. Обслуживание Отвечают не·всегда быстро.",
+        "titles": [
+          "Земля МО",
+          "ОК Комфорт",
+        ],
       }
     `);
   });

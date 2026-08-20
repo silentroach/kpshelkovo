@@ -41,10 +41,8 @@ describe('review view helpers', () => {
     expect(formatReviewAspectType('developer')).toBe('Застройщик');
     expect(formatReviewAspectType('management')).toBe('Обслуживание');
     expect(formatReviewAspectLabel('place')).toBe('Место и среда');
-    expect(formatReviewAspectLabel('developer')).toBe('Земля МО: застройщик');
-    expect(formatReviewAspectLabel('management')).toBe(
-      'ОК Комфорт: обслуживание',
-    );
+    expect(formatReviewAspectLabel('developer')).toBe('Застройщик');
+    expect(formatReviewAspectLabel('management')).toBe('Обслуживание');
     expect(
       sortReviewAspects([
         { type: 'management', rating: 2 },

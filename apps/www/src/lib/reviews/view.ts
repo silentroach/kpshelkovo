@@ -40,14 +40,12 @@ export const formatReviewTitle = (
 export const formatReviewAspectType = (type: ReviewAspectType): string =>
   ASPECT_LABELS[type];
 
-export const formatReviewAspectLabel = (type: ReviewAspectType): string => {
-  if (type === 'place') {
-    return formatReviewAspectType(type);
-  }
+export const formatReviewAspectLabel = formatReviewAspectType;
 
-  const organization = REVIEW_ASPECT_ORGANIZATIONS[type];
-  return `${organization.name}: ${organization.role}`;
-};
+export const formatReviewAspectLabelHint = (
+  type: ReviewAspectType,
+): string | undefined =>
+  type === 'place' ? undefined : REVIEW_ASPECT_ORGANIZATIONS[type].name;
 
 export const sortReviewAspects = (
   aspects: readonly ReviewAspect[],

@@ -187,7 +187,7 @@ exports[`reviews schema > publishes the page and full review without AggregateRa
     "mainEntityOfPage": {
       "@id": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#webpage",
     },
-    "name": "Год жизни в Шелково. Земля МО: застройщик",
+    "name": "Год жизни в Шелково. Застройщик",
     "publisher": {
       "@id": "https://example.com/#organization",
       "@type": "Organization",
@@ -235,7 +235,7 @@ exports[`reviews schema > publishes the page and full review without AggregateRa
     "mainEntityOfPage": {
       "@id": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#webpage",
     },
-    "name": "Год жизни в Шелково. ОК Комфорт: обслуживание",
+    "name": "Год жизни в Шелково. Обслуживание",
     "publisher": {
       "@id": "https://example.com/#organization",
       "@type": "Organization",

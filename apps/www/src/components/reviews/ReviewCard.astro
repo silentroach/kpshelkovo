@@ -2,7 +2,11 @@
 import StarRating from '@shelkovo/ui/StarRating.astro';
 
 import type { Review, ReviewAspect } from '@/lib/reviews/types';
-import { formatReviewAspectLabel, formatReviewTitle } from '@/lib/reviews/view';
+import {
+  formatReviewAspectLabel,
+  formatReviewAspectLabelHint,
+  formatReviewTitle,
+} from '@/lib/reviews/view';
 import ReviewMeta from './ReviewMeta.astro';
 
 interface Props {
@@ -17,7 +21,12 @@ const ratedAspects = review.aspects.filter(
 ---
 
 <article class="ui-shell h-full px-5 py-5 md:px-6 md:py-6">
-  <div class="space-y-4">
+  <div
+    class:list={[
+      'grid gap-4 xl:items-center xl:gap-8',
+      ratedAspects.length > 0 && 'xl:grid-cols-2',
+    ]}
+  >
     <div class="space-y-3">
       <h3 class="ui-entry-title">
         <a href={review.url} class="ui-link">{formatReviewTitle(review)}</a>
@@ -27,15 +36,19 @@ const ratedAspects = review.aspects.filter(
 
     {
       ratedAspects.length > 0 && (
-        <ul class="grid gap-x-5 gap-y-3 sm:grid-cols-3">
+        <ul class="grid gap-x-6 gap-y-3 sm:grid-cols-3">
           {ratedAspects.map((aspect) => (
-            <li class="space-y-1">
-              <span class="block text-xs font-medium leading-4 text-muted-foreground">
+            <li class="grid grid-cols-[auto_1fr] items-center gap-x-3 sm:block">
+              <span
+                class="col-start-2 row-start-1 block text-xs font-medium leading-4 text-muted-foreground"
+                title={formatReviewAspectLabelHint(aspect.type)}
+              >
                 {formatReviewAspectLabel(aspect.type)}
               </span>
               <StarRating
                 rating={aspect.rating}
                 label={`Оценка ${aspect.rating} из 5`}
+                class="col-start-1 row-start-1 sm:mt-1"
               />
             </li>
           ))}

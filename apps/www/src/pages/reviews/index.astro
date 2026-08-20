@@ -66,7 +66,7 @@ const schema = reviewsCollectionPageSchema({
       <h2 class="sr-only">Список отзывов</h2>
       {
         data.reviews.length > 0 ? (
-          <ul class="reviews-list--flush-first-row grid gap-4 lg:grid-cols-2">
+          <ul class="reviews-list--flush-first space-y-4">
             {data.reviews.map((review) => (
               <li>
                 <ReviewCard review={review} />

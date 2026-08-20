@@ -47,6 +47,9 @@ describe('ReviewCard', () => {
     expect({
       text: visibleWhitespace(visibleText(html)),
       ariaLabels: ariaLabels(html),
+      titles: [...html.matchAll(/ title="([^"]+)"/gu)].map(
+        (match) => match[1] ?? '',
+      ),
     }).toMatchInlineSnapshot(`
       {
         "ariaLabels": [
@@ -55,7 +58,12 @@ describe('ReviewCard', () => {
           "Оценка 3 из 5",
           "Оценка 2 из 5",
         ],
-        "text": "Отзыв собственника от 25 июня 2026 25 июня 2026 Анонимный собственник Место и среда Земля МО: застройщик ОК Комфорт: обслуживание",
+        "text": "Отзыв собственника от 25 июня 2026 25 июня 2026 Анонимный собственник Место и среда Застройщик Обслуживание",
+        "titles": [
+          "Шелково Форест",
+          "Земля МО",
+          "ОК Комфорт",
+        ],
       }
     `);
   });

@@ -161,16 +161,10 @@ html[data-site-navigation-pending] .site-navigation-progress::before {
 }
 
 .ui-root-site
-  :is(.news-list--flush-first, .reviews-list--flush-first-row)
+  :is(.news-list--flush-first, .reviews-list--flush-first)
   > li:first-child
   > .ui-shell {
   border-top: 0;
-}
-
-@media (min-width: 64rem) {
-  .ui-root-site .reviews-list--flush-first-row > li:nth-child(2) > .ui-shell {
-    border-top: 0;
-  }
 }
 
 .ui-root-site .news-hero {
