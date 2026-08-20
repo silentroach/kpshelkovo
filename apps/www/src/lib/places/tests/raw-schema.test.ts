@@ -8,6 +8,7 @@ const place = {
   marker: 'foodtruck',
   status: 'existing',
   summary: 'Фудтрак в Шелково Форест',
+  search_aliases: ['где поесть в Форесте'],
   location: {
     map_url: 'https://yandex.ru/navi/-/CTfgq-5r',
     address: 'Шелково Форест, Берёзовая улица, 21А',
@@ -58,6 +59,9 @@ describe('RawPlaceSchema', () => {
             },
           ],
         },
+        "search_aliases": [
+          "где поесть в Форесте",
+        ],
         "status": "existing",
         "summary": "Фудтрак в Шелково Форест",
         "title": "Буржуйка",

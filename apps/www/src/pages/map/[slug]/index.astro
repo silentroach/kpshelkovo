@@ -52,7 +52,10 @@ const search = {
   title: place.name,
   description,
   section: SEARCH_SECTIONS.places,
-  aliases: [formatPlaceCategory(place.category)],
+  aliases: [
+    formatPlaceCategory(place.category),
+    ...(place.searchAliases ?? []),
+  ],
 } satisfies SearchDocument;
 const schema = {
   '@context': 'https://schema.org',
@@ -83,17 +86,27 @@ const schema = {
         <Breadcrumbs items={breadcrumbs} />
 
         <div>
-          <h1 class="ui-page-title">{displayName}</h1>
+          <h1 class="ui-page-title" data-pagefind-ignore="all">
+            {displayName}
+          </h1>
         </div>
       </div>
     </header>
 
     <article class="max-w-3xl px-5 md:px-6">
-      <p class="ui-copy max-w-[65ch] text-foreground" set:html={summaryHtml} />
+      <p
+        class="ui-copy max-w-[65ch] text-foreground"
+        data-pagefind-weight="5"
+        set:html={summaryHtml}
+      />
 
       {
         bodyHtml ? (
-          <div class="ui-prose mt-5 max-w-[65ch]" set:html={bodyHtml} />
+          <div
+            class="ui-prose mt-5 max-w-[65ch]"
+            data-pagefind-weight="5"
+            set:html={bodyHtml}
+          />
         ) : null
       }
 

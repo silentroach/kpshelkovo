@@ -43,6 +43,7 @@ export interface Place {
   readonly marker?: PlaceMarker;
   readonly status: PlaceStatus;
   readonly summary: string;
+  readonly searchAliases?: readonly string[];
   readonly body: PreprocessedSiteMarkdownBody;
   readonly mentions: readonly EntityMentionTarget[];
   readonly address?: string;

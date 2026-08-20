@@ -87,7 +87,7 @@ describe('Pagefind search client', () => {
           {
             "ranking": {
               "metaWeights": {
-                "aliases": 2,
+                "aliases": 3,
                 "publishedAt": 0,
                 "sectionId": 0,
                 "sectionLabel": 0,

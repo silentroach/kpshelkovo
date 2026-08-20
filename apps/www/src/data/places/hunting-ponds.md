@@ -4,6 +4,10 @@ category: water
 marker: fish
 status: existing
 summary: Каскад озёр рядом с поселком
+search_aliases:
+  - рыболовные пруды
+  - озера для рыбной ловли
+  - рыбалка
 location:
   coordinates:
     lat: 55.057170

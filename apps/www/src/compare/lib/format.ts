@@ -129,6 +129,19 @@ export function formatTariffOriginal(tariff: Tariff): string {
 }
 
 /**
+ * Format the source tariff and its normalized monthly value when they differ.
+ */
+export function formatTariffSummary(tariff: Tariff): string {
+  const normalized = `${formatTariffAuto(tariff)} в месяц`;
+  const alreadyNormalized =
+    !tariff.parts && tariff.unit === 'perSotka' && tariff.period === 'month';
+
+  return alreadyNormalized
+    ? normalized
+    : `${formatTariffOriginal(tariff)}, это ${normalized}`;
+}
+
+/**
  * True when any part of the tariff is not expressed in ₽/сотка.
  */
 export function hasNonSotkaUnit(tariff: Tariff): boolean {

@@ -259,6 +259,35 @@ describe('SearchDialog', () => {
     expect(document.activeElement).toBe(firstOpener);
   });
 
+  it('starts the settlement comparison on a new line', async () => {
+    const result: SearchResult = {
+      ...resultAt(1),
+      section: { id: 'compare', label: 'Сравнение поселков' },
+      excerptHtml:
+        '5 813 ₽/участок в месяц, это ~581 ₽/сотка в месяц. Дешевле Шелково на 234 ₽/сотка.',
+    };
+    const search = vi.fn(async (query: string) =>
+      readyResponse(query, [result]),
+    );
+    const opener = addOpener('Поиск');
+    const view = render(SearchDialog, { props: { client: { search } } });
+
+    await fireEvent.click(opener);
+    await enterDebouncedQuery(
+      view.getByRole('searchbox', { name: 'Что найти на сайте' }),
+      'ивушкино',
+    );
+    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(1));
+
+    expect(
+      view.container
+        .querySelector('.site-search-result-excerpt')
+        ?.innerHTML.replaceAll('<!---->', ''),
+    ).toMatchInlineSnapshot(
+      `"5 813 ₽/участок в месяц, это ~581 ₽/сотка в месяц. <br>Дешевле Шелково на 234 ₽/сотка."`,
+    );
+  });
+
   it('renders trusted results progressively and supports arrows and Enter', async () => {
     const intersections: Array<() => void> = [];
     const observe = vi.fn();

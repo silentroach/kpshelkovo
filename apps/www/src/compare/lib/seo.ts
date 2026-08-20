@@ -1,7 +1,7 @@
 import { formatCurrency } from '@shelkovo/format';
 import { BRAND_KEYWORDS, collectKeywords } from '@shelkovo/seo';
 
-import { formatTariffAuto } from './format';
+import { formatTariffAuto, formatTariffSummary } from './format';
 import type { ComparisonResult, Settlement } from './settlement/types';
 
 export const COMPARE_PRODUCT_NAME = 'Сравни с Шелково';
@@ -70,8 +70,19 @@ const deltaDescription = (
   if (!comparison) return;
   if (comparison.tariffDelta === 0) return 'Тариф как в Шелково.';
 
-  return `${comparison.isCheaper ? 'Дешевле' : 'Дороже'} Шелково на ${formatCurrency(Math.abs(comparison.tariffDelta))}.`;
+  return `${comparison.isCheaper ? 'Дешевле' : 'Дороже'} Шелково на ${formatCurrency(Math.abs(comparison.tariffDelta))}/сотка.`;
 };
+
+export const settlementSearchDescription = (
+  settlement: Settlement,
+  comparison: ComparisonResult | undefined,
+): string =>
+  [
+    `${formatTariffSummary(settlement.tariff)}.`,
+    deltaDescription(settlement, comparison),
+  ]
+    .filter((item): item is string => Boolean(item))
+    .join(' ');
 
 export const compareHomeMeta = (totalSettlements: number) => ({
   title: compareTitle('Сравнение тарифов поселков'),

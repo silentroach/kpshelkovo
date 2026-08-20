@@ -430,6 +430,7 @@
   const excerptSegments = (
     excerptHtml: string,
     contextTitle?: string,
+    breakBeforeComparison = false,
   ): readonly SearchExcerptSegment[] => {
     const decoder = document.createElement('textarea');
     const segments: SearchExcerptSegment[] = [];
@@ -459,7 +460,35 @@
       });
     }
 
-    return segments;
+    if (!breakBeforeComparison) {
+      return segments;
+    }
+
+    let foundComparison = false;
+    return segments.flatMap((segment) => {
+      if (foundComparison) {
+        return [segment];
+      }
+
+      const index = segment.text.search(/(?:Дешевле|Дороже|Тариф|Базовый)/u);
+      if (index < 0) {
+        return [segment];
+      }
+
+      foundComparison = true;
+      if (index === 0) {
+        return [{ ...segment, breakBefore: true }];
+      }
+
+      return [
+        { ...segment, text: segment.text.slice(0, index) },
+        {
+          ...segment,
+          breakBefore: true,
+          text: segment.text.slice(index),
+        },
+      ];
+    });
   };
 
   onMount(() => {
@@ -597,12 +626,20 @@
                     {@const segments = excerptSegments(
                       row.excerptHtml,
                       row.contextTitle,
+                      row.result.section.id === 'compare',
                     )}
                     <p
-                      class="site-search-result-excerpt mt-1 line-clamp-2 [overflow-wrap:anywhere] text-sm leading-5 text-muted-foreground"
+                      class={[
+                        'site-search-result-excerpt mt-1 [overflow-wrap:anywhere] text-sm leading-5 text-muted-foreground',
+                        row.result.section.id === 'compare'
+                          ? 'line-clamp-3 sm:line-clamp-2'
+                          : 'line-clamp-2',
+                      ]}
                     >
                       {#each segments as segment, segmentIndex (segmentIndex)}
-                        {#if segment.highlighted}<mark>{segment.text}</mark
+                        {#if segment.breakBefore}<br
+                          />{/if}{#if segment.highlighted}<mark
+                            >{segment.text}</mark
                           >{:else}{segment.text}{/if}
                       {/each}
                     </p>

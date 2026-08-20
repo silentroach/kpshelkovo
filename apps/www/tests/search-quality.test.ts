@@ -91,6 +91,9 @@ const queryGroups = [
       'строящийся пляж',
       'лесное озеро в ривере',
       'лесное озеро в парке',
+      'лесной пруд в ривере',
+      'лесной пруд в парке',
+      'охотничьи пруды',
       'буржуйка',
       'буржуйка на карте',
       'адрес буржуйки',
@@ -98,6 +101,14 @@ const queryGroups = [
       'меню буржуйки',
       'фудтрак',
     ],
+  },
+  {
+    name: '#183 fishing aliases',
+    queries: ['рыболовные пруды', 'озера для рыбной ловли', 'рыбалка'],
+  },
+  {
+    name: '#184 compare settlements',
+    queries: ['парк', 'петровское парк', 'ивушкино'],
   },
 ] as const;
 
@@ -142,11 +153,32 @@ const rankExpectations: ReadonlyMap<
   ['строящийся пляж', { url: '/map/beach/', maxRank: 1 }],
   ['лесное озеро в ривере', { url: '/map/river-forest-lake/', maxRank: 1 }],
   ['лесное озеро в парке', { url: '/map/park-forest-lake/', maxRank: 1 }],
+  ['лесной пруд в ривере', { url: '/map/river-forest-lake/', maxRank: 2 }],
+  ['лесной пруд в парке', { url: '/map/park-forest-lake/', maxRank: 2 }],
+  ['рыболовные пруды', { url: '/map/hunting-ponds/', maxRank: 1 }],
+  ['озера для рыбной ловли', { url: '/map/hunting-ponds/', maxRank: 1 }],
+  ['рыбалка', { url: '/map/hunting-ponds/', maxRank: 1 }],
   ['буржуйка', { url: '/map/burzhuyka/', maxRank: 1 }],
   ['буржуйка на карте', { url: '/map/burzhuyka/', maxRank: 2 }],
   ['адрес буржуйки', { url: '/map/burzhuyka/', maxRank: 1 }],
   ['телефон буржуйки', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
   ['меню буржуйки', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
+  [
+    'петровское парк',
+    { url: '/815/compare/settlements/petrovskoe-park/', maxRank: 1 },
+  ],
+  ['ивушкино', { url: '/815/compare/settlements/ivushkino/', maxRank: 1 }],
+]);
+
+const placeSnippetUrls: ReadonlyMap<string, string> = new Map([
+  ['лесное озеро в ривере', '/map/river-forest-lake/'],
+  ['лесное озеро в парке', '/map/park-forest-lake/'],
+  ['лесной пруд в ривере', '/map/river-forest-lake/'],
+  ['лесной пруд в парке', '/map/park-forest-lake/'],
+  ['охотничьи пруды', '/map/hunting-ponds/'],
+  ['рыболовные пруды', '/map/hunting-ponds/'],
+  ['озера для рыбной ловли', '/map/hunting-ponds/'],
+  ['рыбалка', '/map/hunting-ponds/'],
 ]);
 
 let browser: Browser;
@@ -263,6 +295,44 @@ for (const group of queryGroups) {
         expect(rank + 1, `${query}: expected rank`).toBeLessThanOrEqual(
           expectation.maxRank,
         );
+      }
+
+      const placeSnippetUrl = placeSnippetUrls.get(query);
+      if (placeSnippetUrl) {
+        const result = snapshot.results.find(
+          (item) => item.url === placeSnippetUrl,
+        );
+
+        expect(result, `${query}: expected map snippet`).toBeDefined();
+        if (result) {
+          expect(
+            result.excerpt,
+            `${query}: map snippet must omit its title`,
+          ).not.toContain(result.title);
+        }
+      }
+
+      if (group.name === '#184 compare settlements') {
+        const compareResults = snapshot.results.filter(
+          (result) => result.section === 'Сравнение поселков',
+        );
+
+        for (const result of compareResults) {
+          expect(
+            result.excerpt,
+            `${query}: compare snippet must omit its title`,
+          ).not.toContain(result.title);
+          expect(
+            result.excerpt,
+            `${query}: compare snippet must show the normalized monthly tariff`,
+          ).toMatch(/₽\/сотка в месяц/u);
+        }
+
+        if (query === 'ивушкино') {
+          expect(compareResults[0]?.excerpt).toMatch(
+            /^5 813 ₽\/участок в месяц \+ 100 ₽\/сотка в месяц, это ~681 ₽\/сотка в месяц\./u,
+          );
+        }
       }
 
       matrix.push(snapshot);

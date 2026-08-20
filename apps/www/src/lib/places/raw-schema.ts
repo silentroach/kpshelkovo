@@ -1,6 +1,7 @@
 import { z } from 'astro/zod';
 
 import { CONTACT_CATEGORIES, CONTACT_SLUG } from '@/lib/contacts/schema';
+import { RawSearchAliasesSchema } from '@/lib/search/raw-schema';
 
 import {
   PLACE_CATEGORIES,
@@ -110,6 +111,7 @@ export const RawPlaceSchema = z
     marker: z.enum(PLACE_MARKERS).optional(),
     status: z.enum(PLACE_STATUSES),
     summary: nonBlankText,
+    search_aliases: RawSearchAliasesSchema.optional(),
     location,
     opening_hours: openingHours.optional(),
     contact: nonBlankText

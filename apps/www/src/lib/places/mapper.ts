@@ -39,6 +39,7 @@ export const mapRawPlace = (
     marker: entry.data.marker,
     status: entry.data.status,
     summary: entry.data.summary,
+    searchAliases: entry.data.search_aliases,
     body: body.markdown,
     mentions: body.mentions,
     address: entry.data.location.address,

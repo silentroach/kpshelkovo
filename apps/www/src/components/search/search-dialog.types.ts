@@ -5,6 +5,7 @@ export interface SearchDialogProps {
 }
 
 export interface SearchExcerptSegment {
+  readonly breakBefore?: boolean;
   readonly highlighted: boolean;
   readonly text: string;
 }

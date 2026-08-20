@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   formatTariffAuto,
   formatTariffBase,
+  formatTariffSummary,
   getLotCalc,
   getTariffHint,
   getTariffCalc,
@@ -94,6 +95,46 @@ describe('Format Module', () => {
           ],
         }),
       ).toBe('5\u00A0813\u00A0₽/участок + 100\u00A0₽/сотка');
+    });
+  });
+
+  describe('formatTariffSummary', () => {
+    it('includes the source tariff only when normalization changes it', () => {
+      expect(
+        visibleWhitespace([
+          formatTariffSummary({
+            value: 815,
+            unit: 'perSotka',
+            period: 'month',
+            normalizedPerSotkaMonth: 815,
+            normalizedIsEstimate: false,
+          }),
+          formatTariffSummary({
+            value: 5813,
+            unit: 'perLot',
+            period: 'month',
+            normalizedPerSotkaMonth: 681.3,
+            normalizedIsEstimate: true,
+            parts: [
+              { value: 5813, unit: 'perLot', period: 'month' },
+              { value: 100, unit: 'perSotka', period: 'month' },
+            ],
+          }),
+          formatTariffSummary({
+            value: 9780,
+            unit: 'perSotka',
+            period: 'year',
+            normalizedPerSotkaMonth: 815,
+            normalizedIsEstimate: false,
+          }),
+        ]),
+      ).toMatchInlineSnapshot(`
+        [
+          "815·₽/сотка в месяц",
+          "5·813·₽/участок в месяц + 100·₽/сотка в месяц, это ~681·₽/сотка в месяц",
+          "9·780·₽/сотка в год, это 815·₽/сотка в месяц",
+        ]
+      `);
     });
   });
 
