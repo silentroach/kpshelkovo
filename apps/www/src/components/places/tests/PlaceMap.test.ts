@@ -220,6 +220,12 @@ describe('PlaceMap', () => {
     render(PlaceMap, {
       props: {
         places: [
+          {
+            ...titanicPlace,
+            slug: 'apple-garden',
+            name: 'Яблоневый сад',
+            marker: 'apple',
+          },
           { ...place, marker: 'foodtruck' },
           titanicPlace,
           {
@@ -245,7 +251,7 @@ describe('PlaceMap', () => {
       },
     });
 
-    await waitFor(() => expect(markerElements).toHaveLength(5));
+    await waitFor(() => expect(markerElements).toHaveLength(6));
 
     const markerDetails = markerElements.map((marker) => {
       const image = marker.querySelector('img');
@@ -262,6 +268,17 @@ describe('PlaceMap', () => {
 
     expect(markerDetails).toMatchInlineSnapshot(`
       [
+        {
+          "graphicClass": "place-map-marker-graphic",
+          "imageClass": "place-map-marker-image",
+          "imageDimensions": [
+            144,
+            144,
+          ],
+          "imageFile": "Apple.png",
+          "marker": "apple",
+          "usesDefaultPoint": false,
+        },
         {
           "graphicClass": "place-map-marker-graphic",
           "imageClass": "place-map-marker-image",
@@ -320,8 +337,8 @@ describe('PlaceMap', () => {
       ]
     `);
     expect({
-      ariaLabel: markerElements[2]?.getAttribute('aria-label'),
-      title: markerElements[2]?.title,
+      ariaLabel: markerElements[3]?.getAttribute('aria-label'),
+      title: markerElements[3]?.title,
     }).toMatchInlineSnapshot(`
       {
         "ariaLabel": "Открыть место «Строительство», Строится, сейчас закрыто",

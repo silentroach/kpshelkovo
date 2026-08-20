@@ -2,6 +2,7 @@
   import { pluralize } from '@shelkovo/format';
   import type { Feature } from '@yandex/ymaps3-clusterer';
   import {
+    APPLE_MARKER,
     CONSTRUCTION_MARKER,
     FISH_MARKER,
     FOODTRUCK_MARKER,
@@ -34,7 +35,7 @@
   const CLUSTER_ZOOM_DURATION_MS = 220;
   const HIGHLIGHT_DURATION_MS = 5_000;
   const HIGHLIGHT_QUERY_PARAM = 'h';
-  const MARKER_MIN_SCALE = 30 / 48;
+  const MARKER_MIN_SCALE = 20 / 32;
   const MARKER_MIN_ZOOM = 13.5;
   const MARKER_MAX_ZOOM = 16;
   const PLACE_FOCUS_ZOOM = MARKER_MAX_ZOOM;
@@ -45,6 +46,7 @@
       { readonly src: string; readonly width: number; readonly height: number }
     >
   > = {
+    apple: APPLE_MARKER,
     foodtruck: FOODTRUCK_MARKER,
     titanic: TITANIC_MARKER,
     construction: CONSTRUCTION_MARKER,
@@ -623,7 +625,7 @@
   }
 
   :global(.place-map-marker-point) {
-    --ui-map-marker-size: 1.4rem;
+    --ui-map-marker-size: 0.9375rem;
     --ui-map-marker-border: 0.1875rem solid var(--color-surface-raised);
 
     flex: none;
@@ -638,7 +640,7 @@
     --place-map-marker-state-filter: saturate(1);
 
     display: block;
-    width: 3rem;
+    width: 2rem;
     flex: none;
     filter: var(--place-map-marker-state-filter)
       drop-shadow(0 0 0.1rem oklch(100% 0 0 / 0.96))
@@ -650,10 +652,14 @@
       transform 0.15s ease;
   }
 
+  :global(.place-map-marker[data-marker='apple'] .place-map-marker-graphic) {
+    width: 1.75rem;
+  }
+
   :global(
     .place-map-marker[data-marker='construction'] .place-map-marker-graphic
   ) {
-    width: 2rem;
+    width: 1.3333rem;
   }
 
   :global(.place-map-marker-image) {

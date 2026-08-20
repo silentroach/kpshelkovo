@@ -44,6 +44,7 @@
     "./icons/system/Telegram.astro": "./src/icons/system/Telegram.astro",
     "./icons/system/WhatsApp.astro": "./src/icons/system/WhatsApp.astro",
     "./markers": "./src/markers/index.ts",
+    "./markers/Apple.png": "./src/markers/Apple.png",
     "./markers/Construction.png": "./src/markers/Construction.png",
     "./markers/Fish.png": "./src/markers/Fish.png",
     "./markers/Foodtruck.png": "./src/markers/Foodtruck.png",
