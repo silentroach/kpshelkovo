@@ -51,6 +51,29 @@ describe('site header menu', () => {
     expect(menu.open).toBe(true);
   });
 
+  it('closes when search is activated without a pointer press', () => {
+    document.body.innerHTML = `
+      <button type="button" data-search-trigger>Search</button>
+      <details class="site-header-menu" open>
+        <summary>Menu</summary>
+      </details>
+    `;
+
+    const searchTrigger = document.querySelector<HTMLButtonElement>(
+      '[data-search-trigger]',
+    );
+    const menu = document.querySelector<HTMLDetailsElement>(
+      'details.site-header-menu',
+    );
+    if (!searchTrigger || !menu) {
+      throw new Error('Expected search trigger and open site header menu');
+    }
+
+    searchTrigger.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(menu.open).toBe(false);
+  });
+
   it('closes on Escape and returns focus to its summary', () => {
     document.body.innerHTML = `
       <details class="site-header-menu" open>
