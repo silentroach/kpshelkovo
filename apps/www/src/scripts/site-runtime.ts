@@ -26,7 +26,6 @@ const METRIKA_SCRIPT_SRC = 'https://mc.yandex.ru/metrika/tag.js';
 const METRIKA_WEBVISOR_ENABLED = true;
 const NAVIGATION_PENDING_ATTR = 'data-site-navigation-pending';
 const NAVIGATION_DELAY_MS = 50;
-const SEARCH_TRIGGER_SELECTOR = '[data-search-trigger]';
 const SITE_HEADER_MENU_SELECTOR = 'details.site-header-menu[open]';
 const SITE_NAV_DROPDOWN_SELECTOR = '[data-site-nav-dropdown]';
 const SITE_NAV_DROPDOWN_BUTTON_SELECTOR = '[data-site-nav-dropdown-button]';
@@ -286,18 +285,18 @@ const bindSiteHeaderMenu = (): void => {
   }
 
   window.__shelkovoSiteHeaderMenu = true;
-  document.addEventListener('click', (event) => {
-    if (
-      !(event.target instanceof Element) ||
-      !event.target.closest(SEARCH_TRIGGER_SELECTOR)
-    ) {
+  document.addEventListener('pointerdown', (event) => {
+    const target = event.target;
+    if (!(target instanceof Node)) {
       return;
     }
 
     document
       .querySelectorAll<HTMLDetailsElement>(SITE_HEADER_MENU_SELECTOR)
       .forEach((menu) => {
-        menu.open = false;
+        if (!menu.contains(target)) {
+          menu.open = false;
+        }
       });
   });
 

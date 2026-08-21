@@ -9,6 +9,48 @@ afterEach(() => {
 });
 
 describe('site header menu', () => {
+  it('closes after a pointer press outside', () => {
+    document.body.innerHTML = `
+      <button type="button">Outside</button>
+      <details class="site-header-menu" open>
+        <summary>Menu</summary>
+      </details>
+    `;
+
+    const outside = document.querySelector<HTMLElement>('button');
+    const menu = document.querySelector<HTMLDetailsElement>(
+      'details.site-header-menu',
+    );
+    if (!outside || !menu) {
+      throw new Error('Expected open site header menu fixture');
+    }
+
+    outside.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+
+    expect(menu.open).toBe(false);
+  });
+
+  it('stays open after a pointer press inside', () => {
+    document.body.innerHTML = `
+      <details class="site-header-menu" open>
+        <summary>Menu</summary>
+        <a href="/news/">News</a>
+      </details>
+    `;
+
+    const menu = document.querySelector<HTMLDetailsElement>(
+      'details.site-header-menu',
+    );
+    const link = menu?.querySelector<HTMLAnchorElement>('a');
+    if (!menu || !link) {
+      throw new Error('Expected open site header menu fixture');
+    }
+
+    link.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+
+    expect(menu.open).toBe(true);
+  });
+
   it('closes on Escape and returns focus to its summary', () => {
     document.body.innerHTML = `
       <details class="site-header-menu" open>
