@@ -20,6 +20,29 @@ export interface PlaceCoordinates {
   readonly lng: number;
 }
 
+export type PlaceGeometryPosition = readonly [lng: number, lat: number];
+export type PlacePolygonCoordinates =
+  readonly (readonly PlaceGeometryPosition[])[];
+
+export type PlacePolygonGeometry =
+  | {
+      readonly type: 'Polygon';
+      readonly coordinates: PlacePolygonCoordinates;
+    }
+  | {
+      readonly type: 'MultiPolygon';
+      readonly coordinates: readonly PlacePolygonCoordinates[];
+    };
+
+export interface PlaceAreaGeometry {
+  readonly precision: 'approximate';
+  readonly geometry: PlacePolygonGeometry;
+}
+
+export interface PlaceGeometry {
+  readonly area: PlaceAreaGeometry;
+}
+
 export interface PlaceContact {
   readonly id: string;
   readonly url: string;
@@ -48,6 +71,7 @@ export interface Place {
   readonly mentions: readonly EntityMentionTarget[];
   readonly address?: string;
   readonly coordinates: PlaceCoordinates;
+  readonly geometry?: PlaceGeometry;
   readonly mapUrl: string;
   readonly openingHours?: PlaceOpeningHours;
   readonly contact?: PlaceContact;

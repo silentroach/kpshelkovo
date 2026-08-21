@@ -1,6 +1,12 @@
 <script lang="ts">
   import { pluralize } from '@shelkovo/format';
   import type { Feature } from '@yandex/ymaps3-clusterer';
+  import type {
+    DrawingStyle,
+    LngLat,
+    MultiPolygonGeometry,
+    PolygonGeometry,
+  } from '@yandex/ymaps3-types';
   import {
     APPLE_MARKER,
     CONSTRUCTION_MARKER,
@@ -10,6 +16,7 @@
     TITANIC_MARKER,
   } from '@shelkovo/ui/markers';
   import { onMount } from 'svelte';
+  import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
   import {
     installYandexMapsRuntimeHeadPersistence,
@@ -19,7 +26,11 @@
   import { getPlaceClosingTime } from '@/lib/places/opening-hours';
   import { PLACE_MAP_BOUNDS } from '@/lib/places/schema';
   import type { PlaceMarker } from '@/lib/places/schema';
-  import type { Place } from '@/lib/places/types';
+  import type {
+    Place,
+    PlaceGeometryPosition,
+    PlacePolygonGeometry,
+  } from '@/lib/places/types';
   import { formatPlaceStatus } from '@/lib/places/view';
 
   let { places }: { readonly places: readonly Place[] } = $props();
@@ -35,6 +46,7 @@
   const CLUSTER_ZOOM_DURATION_MS = 220;
   const HIGHLIGHT_DURATION_MS = 5_000;
   const HIGHLIGHT_QUERY_PARAM = 'h';
+  const AREA_HOVER_LEAVE_DELAY_MS = 80;
   const MARKER_MIN_SCALE = 20 / 32;
   const MARKER_MIN_ZOOM = 13.5;
   const MARKER_MAX_ZOOM = 16;
@@ -42,6 +54,26 @@
   const MARKER_CLOSEUP_MAX_SCALE = 1.3;
   const PLACE_FOCUS_ZOOM = MARKER_MAX_ZOOM;
   const roundCoordinate = (value: number): number => Number(value.toFixed(6));
+  const copyGeometryRing = (ring: readonly PlaceGeometryPosition[]): LngLat[] =>
+    ring.map(([lng, lat]) => [lng, lat]);
+  const toMapGeometry = (
+    geometry: PlacePolygonGeometry,
+  ): PolygonGeometry | MultiPolygonGeometry => {
+    switch (geometry.type) {
+      case 'Polygon':
+        return {
+          type: geometry.type,
+          coordinates: geometry.coordinates.map(copyGeometryRing),
+        };
+      case 'MultiPolygon':
+        return {
+          type: geometry.type,
+          coordinates: geometry.coordinates.map((polygon) =>
+            polygon.map(copyGeometryRing),
+          ),
+        };
+    }
+  };
   const CUSTOM_MARKER_IMAGES: Readonly<
     Record<
       PlaceMarker,
@@ -155,7 +187,13 @@
   let map: ymaps3.YMap | undefined;
   let mapClusterer: ymaps3.YMapEntity<unknown> | undefined;
   let mapListener: ymaps3.YMapListener | undefined;
+  let mapAreaFeatures = new SvelteMap<string, ymaps3.YMapFeature>();
   let markerContents: Array<readonly [Place, HTMLAnchorElement]> = [];
+  const markerHoveredAreas = new SvelteSet<string>();
+  const featureHoveredAreas = new SvelteSet<string>();
+  const focusedAreas = new SvelteSet<string>();
+  const highlightedAreas = new SvelteSet<string>();
+  const areaHoverLeaveTimers = new SvelteMap<string, number>();
   let pendingClusterFocusId: Feature['id'] | undefined;
   let clusterFocusFrame: number | undefined;
   let isLoading = $state(true);
@@ -168,6 +206,137 @@
     'dblClick',
     'oneFingerZoom',
   ];
+
+  const supportsAreaHover = (): boolean =>
+    window.matchMedia?.('(hover: hover) and (pointer: fine)').matches ?? false;
+
+  const getMapToken = (name: string): string => {
+    const inheritedValue = mapContainer
+      ? getComputedStyle(mapContainer).getPropertyValue(name).trim()
+      : '';
+    const value =
+      inheritedValue ||
+      document.documentElement.style.getPropertyValue(name).trim();
+
+    if (!value) throw new Error(`Не найден цвет карты ${name}`);
+
+    return value;
+  };
+
+  const createAreaStyle = (
+    state: 'hidden' | 'preview' | 'highlighted',
+  ): DrawingStyle => {
+    if (state === 'hidden') {
+      return {
+        zIndex: 0,
+        fillOpacity: 0,
+        interactive: false,
+        stroke: [],
+      };
+    }
+
+    const highlighted = state === 'highlighted';
+    const water = getMapToken('--color-water');
+    const dash = highlighted ? [6, 3] : [5, 4];
+
+    return {
+      zIndex: 0,
+      fill: water,
+      fillOpacity: 0,
+      interactive: supportsAreaHover(),
+      simplificationRate: 0,
+      stroke: [
+        {
+          color: water,
+          dash,
+          opacity: 0.42,
+          width: highlighted ? 5 : 4,
+        },
+        {
+          color: water,
+          dash,
+          opacity: 1,
+          width: highlighted ? 2.5 : 2,
+        },
+      ],
+    };
+  };
+
+  const updateAreaVisibility = (place: Place): void => {
+    const feature = mapAreaFeatures.get(place.slug);
+
+    if (!feature) return;
+
+    const highlighted = highlightedAreas.has(place.slug);
+    const previewed =
+      markerHoveredAreas.has(place.slug) ||
+      featureHoveredAreas.has(place.slug) ||
+      focusedAreas.has(place.slug);
+
+    feature.update({
+      style: createAreaStyle(
+        highlighted ? 'highlighted' : previewed ? 'preview' : 'hidden',
+      ),
+    });
+  };
+
+  const setAreaState = (
+    place: Place,
+    states: Set<string>,
+    active: boolean,
+  ): void => {
+    if (!place.geometry) return;
+
+    if (active) {
+      states.add(place.slug);
+    } else {
+      states.delete(place.slug);
+    }
+    updateAreaVisibility(place);
+  };
+
+  const cancelAreaHoverLeave = (place: Place): void => {
+    const timer = areaHoverLeaveTimers.get(place.slug);
+
+    if (timer === undefined) return;
+
+    window.clearTimeout(timer);
+    areaHoverLeaveTimers.delete(place.slug);
+  };
+
+  const scheduleAreaHoverLeave = (place: Place): void => {
+    cancelAreaHoverLeave(place);
+    areaHoverLeaveTimers.set(
+      place.slug,
+      window.setTimeout(() => {
+        areaHoverLeaveTimers.delete(place.slug);
+        setAreaState(place, markerHoveredAreas, false);
+      }, AREA_HOVER_LEAVE_DELAY_MS),
+    );
+  };
+
+  const createAreaFeature = (
+    place: Place,
+    YMapFeature: typeof ymaps3.YMapFeature,
+  ): ymaps3.YMapFeature | undefined => {
+    const area = place.geometry?.area;
+
+    if (!area) return;
+
+    return new YMapFeature({
+      id: `${place.slug}-area`,
+      geometry: toMapGeometry(area.geometry),
+      style: createAreaStyle('hidden'),
+      onMouseEnter: () => {
+        if (!supportsAreaHover()) return;
+
+        cancelAreaHoverLeave(place);
+        setAreaState(place, featureHoveredAreas, true);
+        setAreaState(place, markerHoveredAreas, false);
+      },
+      onMouseLeave: () => setAreaState(place, featureHoveredAreas, false),
+    });
+  };
 
   const updateMarkerContent = (place: Place, link: HTMLAnchorElement): void => {
     const closingTime = place.openingHours
@@ -215,7 +384,24 @@
     link.dataset.status = place.status;
     updateMarkerContent(place, link);
     link.addEventListener('click', (event) => event.stopPropagation());
+    link.addEventListener('mouseenter', () => {
+      if (!supportsAreaHover()) return;
+
+      cancelAreaHoverLeave(place);
+      setAreaState(place, markerHoveredAreas, true);
+    });
+    link.addEventListener('mouseleave', () => scheduleAreaHoverLeave(place));
+    link.addEventListener('focus', () =>
+      setAreaState(place, focusedAreas, true),
+    );
+    link.addEventListener('blur', () =>
+      setAreaState(place, focusedAreas, false),
+    );
     link.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        setAreaState(place, focusedAreas, false);
+        return;
+      }
       if (event.key !== ' ') return;
 
       event.preventDefault();
@@ -343,7 +529,13 @@
   };
 
   const clearMap = (): void => {
+    for (const timer of areaHoverLeaveTimers.values()) {
+      window.clearTimeout(timer);
+    }
+    areaHoverLeaveTimers.clear();
+
     if (map) {
+      for (const feature of mapAreaFeatures.values()) map.removeChild(feature);
       if (mapClusterer) map.removeChild(mapClusterer);
       if (mapListener) map.removeChild(mapListener);
       map.destroy();
@@ -351,7 +543,12 @@
 
     mapClusterer = undefined;
     mapListener = undefined;
+    mapAreaFeatures = new SvelteMap();
     markerContents = [];
+    markerHoveredAreas.clear();
+    featureHoveredAreas.clear();
+    focusedAreas.clear();
+    highlightedAreas.clear();
     pendingClusterFocusId = undefined;
     if (clusterFocusFrame !== undefined) {
       window.cancelAnimationFrame(clusterFocusFrame);
@@ -393,11 +590,13 @@
 
       marker.dataset.highlighted = 'true';
       marker.setAttribute('aria-current', 'location');
+      setAreaState(place, highlightedAreas, true);
       focusPlace(place, getMapZoomDuration());
       highlightTimer = window.setTimeout(() => {
         highlightTimer = undefined;
         delete marker.dataset.highlighted;
         marker.removeAttribute('aria-current');
+        setAreaState(place, highlightedAreas, false);
         highlightedPlace = undefined;
         removeHighlightQuery(place.slug);
       }, HIGHLIGHT_DURATION_MS);
@@ -452,6 +651,7 @@
           YMap,
           YMapDefaultFeaturesLayer,
           YMapDefaultSchemeLayer,
+          YMapFeature,
           YMapListener,
           YMapMarker,
         } = ymaps3;
@@ -479,6 +679,14 @@
         markerContents = places.map(
           (place) => [place, createMarkerContent(place)] as const,
         );
+        for (const place of places) {
+          const feature = createAreaFeature(place, YMapFeature);
+
+          if (!feature) continue;
+
+          mapAreaFeatures.set(place.slug, feature);
+          map.addChild(feature);
+        }
         mapListener = new YMapListener({
           onUpdate: ({ location, mapInAction }) => {
             updateMarkerScale(location.zoom);

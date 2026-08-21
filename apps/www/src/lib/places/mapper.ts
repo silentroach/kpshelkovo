@@ -10,6 +10,7 @@ import type {
   PlaceContact,
   PlaceCoordinates,
   PlaceEntry,
+  PlaceGeometry,
 } from './types';
 
 const buildYandexMapUrl = (coordinates: PlaceCoordinates): string =>
@@ -19,6 +20,7 @@ export const mapRawPlace = (
   entry: PlaceEntry,
   opts?: {
     readonly contact?: PlaceContact;
+    readonly geometry?: PlaceGeometry;
     readonly mentionRegistry?: SiteMentionRegistry;
   },
 ): Place => {
@@ -44,6 +46,7 @@ export const mapRawPlace = (
     mentions: body.mentions,
     address: entry.data.location.address,
     coordinates,
+    geometry: opts?.geometry,
     mapUrl: entry.data.location.map_url ?? buildYandexMapUrl(coordinates),
     openingHours: entry.data.opening_hours
       ? {
