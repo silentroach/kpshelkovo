@@ -665,7 +665,12 @@ a.ui-chip:hover {
   margin-block: 1.5rem;
 }
 
-.ui-prose .ui-markdown-figure > img {
+.ui-prose .ui-markdown-figure > a {
+  display: block;
+}
+
+.ui-prose .ui-markdown-figure > img,
+.ui-prose .ui-markdown-figure > a > img {
   display: block;
   width: 100%;
 }

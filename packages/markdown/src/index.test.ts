@@ -215,6 +215,18 @@ describe('@shelkovo/markdown', () => {
     `);
   });
 
+  it('preserves the visible caption when a standalone image is linked', () => {
+    expect(
+      showNbsp(
+        render(
+          '[![Карта](https://example.com/map.png "Схема поселка.")](https://example.com/map.png)',
+        ),
+      ),
+    ).toMatchInlineSnapshot(`
+      "<figure class="ui-markdown-figure"><a href="https://example.com/map.png"><img src="https://example.com/map.png" alt="Карта"></a><figcaption class="ui-media-caption">Схема поселка.</figcaption></figure>"
+    `);
+  });
+
   it('adds stable heading ids for in-page links', () => {
     expect(render('## Что сделать сразу\n\nТекст\n\n## Что сделать сразу'))
       .toMatchInlineSnapshot(`

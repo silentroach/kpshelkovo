@@ -3,7 +3,15 @@ import type { Plugin } from 'unified';
 import type { HtmlTreeNode } from './html-tree.types';
 
 const toImageFigure = (node: HtmlTreeNode): HtmlTreeNode => {
-  const image = node.children?.length === 1 ? node.children[0] : undefined;
+  const content = node.children?.length === 1 ? node.children[0] : undefined;
+  if (!content) {
+    return node;
+  }
+
+  const image =
+    content.tagName === 'a' && content.children?.length === 1
+      ? content.children[0]
+      : content;
   if (!image || image.tagName !== 'img') {
     return node;
   }
@@ -24,7 +32,7 @@ const toImageFigure = (node: HtmlTreeNode): HtmlTreeNode => {
       className: ['ui-markdown-figure'],
     },
     children: [
-      image,
+      content,
       {
         type: 'element',
         tagName: 'figcaption',
