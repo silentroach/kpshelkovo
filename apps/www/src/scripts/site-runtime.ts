@@ -286,6 +286,21 @@ const bindSiteHeaderMenu = (): void => {
   }
 
   window.__shelkovoSiteHeaderMenu = true;
+  document.addEventListener('pointerdown', (event) => {
+    const target = event.target;
+    if (!(target instanceof Node)) {
+      return;
+    }
+
+    document
+      .querySelectorAll<HTMLDetailsElement>(SITE_HEADER_MENU_SELECTOR)
+      .forEach((menu) => {
+        if (!menu.contains(target)) {
+          menu.open = false;
+        }
+      });
+  });
+
   document.addEventListener('click', (event) => {
     if (
       !(event.target instanceof Element) ||
