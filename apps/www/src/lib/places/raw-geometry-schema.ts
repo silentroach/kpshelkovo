@@ -71,8 +71,6 @@ const areaFeature = z
       .object({
         kind: z.literal('area'),
         precision: z.literal('approximate'),
-        source: z.literal('openstreetmap'),
-        source_refs: z.array(openStreetMapWayUrl).min(1),
         outline_expansion_meters: z.number().positive().max(25).optional(),
       })
       .strict(),

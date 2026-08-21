@@ -7,7 +7,6 @@ import type { PlaceEntry, PlaceGeometry } from '../types';
 const geometry: PlaceGeometry = {
   area: {
     precision: 'approximate',
-    source: 'openstreetmap',
     geometry: {
       type: 'Polygon',
       coordinates: [

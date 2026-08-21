@@ -15,8 +15,6 @@ const geometrySource = (
         properties: {
           kind: 'area',
           precision: 'approximate',
-          source: 'openstreetmap',
-          source_refs: ['https://www.openstreetmap.org/way/123'],
           outline_expansion_meters: outlineExpansionMeters,
         },
         geometry: { type: 'Polygon', coordinates: [ring] },
@@ -62,7 +60,7 @@ describe('parsePlaceGeometryFiles', () => {
             "type": "Polygon",
           },
           "precision": "approximate",
-          "source": "openstreetmap",
+          "source": undefined,
         },
       }
     `);

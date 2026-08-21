@@ -99,7 +99,6 @@ const pondsPlace: Place = {
   geometry: {
     area: {
       precision: 'approximate',
-      source: 'openstreetmap',
       geometry: {
         type: 'MultiPolygon',
         coordinates: [

@@ -36,7 +36,6 @@ export type PlacePolygonGeometry =
 
 export interface PlaceAreaGeometry {
   readonly precision: 'approximate';
-  readonly source: 'openstreetmap';
   readonly geometry: PlacePolygonGeometry;
 }
 
