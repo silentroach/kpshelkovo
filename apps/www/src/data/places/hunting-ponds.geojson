@@ -8,6 +8,7 @@
         "kind": "area",
         "precision": "approximate",
         "source": "openstreetmap",
+        "outline_expansion_meters": 5,
         "source_refs": [
           "https://www.openstreetmap.org/way/1312176746",
           "https://www.openstreetmap.org/way/1312176742"

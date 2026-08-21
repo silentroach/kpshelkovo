@@ -31,6 +31,17 @@ const polygonRing = z
     (ring) =>
       new Set(ring.slice(0, -1).map(([lng, lat]) => `${lng},${lat}`)).size >= 3,
     { message: 'polygon rings must contain three distinct positions' },
+  )
+  .refine(
+    (ring) =>
+      Math.abs(
+        ring.slice(0, -1).reduce((area, [lng, lat], index) => {
+          const next = ring[index + 1];
+
+          return next ? area + lng * next[1] - next[0] * lat : area;
+        }, 0),
+      ) > 1e-12,
+    { message: 'polygon rings must enclose an area' },
   );
 
 const polygonCoordinates = z.array(polygonRing).min(1);
@@ -62,6 +73,7 @@ const areaFeature = z
         precision: z.literal('approximate'),
         source: z.literal('openstreetmap'),
         source_refs: z.array(openStreetMapWayUrl).min(1),
+        outline_expansion_meters: z.number().positive().max(25).optional(),
       })
       .strict(),
     geometry: polygonGeometry,

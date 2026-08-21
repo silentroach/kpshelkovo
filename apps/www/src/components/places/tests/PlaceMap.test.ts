@@ -6,7 +6,10 @@ import {
   waitFor,
 } from '@testing-library/svelte';
 import type { YMapClustererProps } from '@yandex/ymaps3-clusterer';
-import type { MapEventUpdateHandler } from '@yandex/ymaps3-types';
+import type {
+  MapEventUpdateHandler,
+  YMapFeatureProps,
+} from '@yandex/ymaps3-types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Place } from '@/lib/places/types';
@@ -34,6 +37,10 @@ const map = {
 const markerElements: HTMLElement[] = [];
 const mapElements: HTMLElement[] = [];
 const mapUpdateHandlers: MapEventUpdateHandler[] = [];
+const areaFeatures: Array<{
+  readonly props: YMapFeatureProps;
+  readonly update: ReturnType<typeof vi.fn>;
+}> = [];
 const schemeLayerProps: unknown[] = [];
 const mapProps: {
   readonly behaviors?: readonly string[];
@@ -82,6 +89,36 @@ const titanicPlace: Place = {
   markdownUrl: '/map/titanic/index.md',
   canonical: 'https://kpshelkovo.online/map/titanic/',
 };
+const pondsPlace: Place = {
+  ...titanicPlace,
+  slug: 'hunting-ponds',
+  name: 'Охотничьи пруды',
+  category: 'water',
+  marker: 'fish',
+  coordinates: { lat: 55.05717, lng: 37.744987 },
+  geometry: {
+    area: {
+      precision: 'approximate',
+      source: 'openstreetmap',
+      geometry: {
+        type: 'MultiPolygon',
+        coordinates: [
+          [
+            [
+              [37.74, 55.05],
+              [37.75, 55.05],
+              [37.75, 55.06],
+              [37.74, 55.05],
+            ],
+          ],
+        ],
+      },
+    },
+  },
+  url: '/map/hunting-ponds/',
+  markdownUrl: '/map/hunting-ponds/index.md',
+  canonical: 'https://kpshelkovo.online/map/hunting-ponds/',
+};
 
 const installYandexMaps = (): void => {
   Object.defineProperty(window, 'ymaps3', {
@@ -106,6 +143,12 @@ const installYandexMaps = (): void => {
       YMapDefaultFeaturesLayer: vi.fn(function YMapDefaultFeaturesLayer() {
         return {};
       }),
+      YMapFeature: vi.fn(function YMapFeature(props: YMapFeatureProps) {
+        const feature = { props, update: vi.fn() };
+
+        areaFeatures.push(feature);
+        return feature;
+      }),
       YMapListener: vi.fn(function YMapListener(props: {
         readonly onUpdate?: MapEventUpdateHandler;
       }) {
@@ -128,9 +171,11 @@ describe('PlaceMap', () => {
     markerElements.length = 0;
     mapElements.length = 0;
     mapUpdateHandlers.length = 0;
+    areaFeatures.length = 0;
     clustererProps.length = 0;
     schemeLayerProps.length = 0;
     mapProps.length = 0;
+    document.documentElement.style.setProperty('--color-water', '#1c668c');
     window.history.replaceState({}, '', '/map/');
     installYandexMaps();
   });
@@ -140,6 +185,7 @@ describe('PlaceMap', () => {
     vi.restoreAllMocks();
     vi.useRealTimers();
     vi.unstubAllGlobals();
+    document.documentElement.style.removeProperty('--color-water');
   });
 
   it('renders the place as an accessible detail link and fits the settlement', async () => {
@@ -444,6 +490,170 @@ describe('PlaceMap', () => {
         "url": "/map/?q=a%20b&flag#map",
       }
     `);
+  });
+
+  it('previews an area on fine-pointer hover and keyboard focus', async () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: query.includes('(hover: hover)'),
+    }));
+
+    render(PlaceMap, { props: { places: [pondsPlace] } });
+
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+
+    const feature = areaFeatures[0];
+    const marker = markerElements[0];
+
+    if (!feature || !marker)
+      throw new Error('area preview fixtures are missing');
+
+    expect({
+      id: feature.props.id,
+      geometry: feature.props.geometry,
+      initialStyle: feature.props.style,
+    }).toMatchInlineSnapshot(`
+      {
+        "geometry": {
+          "coordinates": [
+            [
+              [
+                [
+                  37.74,
+                  55.05,
+                ],
+                [
+                  37.75,
+                  55.05,
+                ],
+                [
+                  37.75,
+                  55.06,
+                ],
+                [
+                  37.74,
+                  55.05,
+                ],
+              ],
+            ],
+          ],
+          "type": "MultiPolygon",
+        },
+        "id": "hunting-ponds-area",
+        "initialStyle": {
+          "fillOpacity": 0,
+          "interactive": false,
+          "stroke": [],
+          "zIndex": 0,
+        },
+      }
+    `);
+
+    await fireEvent.mouseEnter(marker);
+    expect(feature.update.mock.lastCall?.[0].style).toMatchInlineSnapshot(`
+      {
+        "fill": "#1c668c",
+        "fillOpacity": 0,
+        "interactive": true,
+        "simplificationRate": 0,
+        "stroke": [
+          {
+            "color": "#1c668c",
+            "dash": [
+              5,
+              4,
+            ],
+            "opacity": 0.42,
+            "width": 4,
+          },
+          {
+            "color": "#1c668c",
+            "dash": [
+              5,
+              4,
+            ],
+            "opacity": 1,
+            "width": 2,
+          },
+        ],
+        "zIndex": 0,
+      }
+    `);
+
+    const featureMouseEnter = feature.props.onMouseEnter;
+    const featureMouseLeave = feature.props.onMouseLeave;
+
+    if (!featureMouseEnter || !featureMouseLeave) {
+      throw new Error('area hover handlers are missing');
+    }
+
+    await fireEvent.mouseLeave(marker);
+    featureMouseEnter(new MouseEvent('mouseenter'), {
+      screenCoordinates: [0, 0],
+      coordinates: [37.74, 55.05],
+      details: {
+        type: 'mouseenter',
+        shiftKey: false,
+        altKey: false,
+        metaKey: false,
+      },
+      stopPropagation: vi.fn(),
+    });
+    await new Promise((resolve) => window.setTimeout(resolve, 100));
+    expect(feature.update.mock.lastCall?.[0].style).toMatchObject({
+      fillOpacity: 0,
+      interactive: true,
+    });
+
+    featureMouseLeave(new MouseEvent('mouseleave'), {
+      screenCoordinates: [0, 0],
+      coordinates: [37.74, 55.05],
+      details: {
+        type: 'mouseleave',
+        shiftKey: false,
+        altKey: false,
+        metaKey: false,
+      },
+      stopPropagation: vi.fn(),
+    });
+    expect(feature.update.mock.lastCall?.[0].style).toEqual({
+      zIndex: 0,
+      fillOpacity: 0,
+      interactive: false,
+      stroke: [],
+    });
+
+    await fireEvent.focus(marker);
+    expect(feature.update.mock.lastCall?.[0].style).toMatchObject({
+      fillOpacity: 0,
+      interactive: true,
+    });
+
+    await fireEvent.keyDown(marker, { key: 'Escape' });
+    expect(feature.update.mock.lastCall?.[0].style).toEqual({
+      zIndex: 0,
+      fillOpacity: 0,
+      interactive: false,
+      stroke: [],
+    });
+  });
+
+  it('shows an area with stronger styling during URL highlight', async () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+    window.history.replaceState({}, '', '/map/?h=hunting-ponds');
+
+    render(PlaceMap, { props: { places: [pondsPlace] } });
+
+    await waitFor(() =>
+      expect(areaFeatures[0]?.update).toHaveBeenCalledWith({
+        style: expect.objectContaining({
+          fillOpacity: 0,
+          interactive: false,
+          stroke: expect.arrayContaining([
+            expect.objectContaining({ dash: [6, 3], width: 2.5 }),
+          ]),
+        }),
+      }),
+    );
   });
 
   it('removes an unknown highlight slug without changing the map view', async () => {

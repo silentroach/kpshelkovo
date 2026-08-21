@@ -6,7 +6,8 @@
 - В `location` хранить точные `coordinates` с числовыми `lat` и `lng`; `map_url` и понятный `address` необязательны.
 - Если `map_url` не указан, ссылка на Яндекс Карты строится из координат. Явный `map_url` должен быть HTTPS-ссылкой вида `https://yandex.ru/maps…` или `https://yandex.ru/navi…`; ссылки на другие продукты и домены не принимаются.
 - `location.coordinates` задает основную точку места. Примерный контур хранить в соседнем `[slug].geojson` как один `area` feature с `Polygon` или `MultiPolygon`; не кодировать сложную геометрию произвольными полями frontmatter.
-- Для геометрии из OpenStreetMap указывать `source: openstreetmap` и сохранять ссылки на исходные ways в `source_refs`; renderer обязан показывать атрибуцию OpenStreetMap.
+- Для геометрии из OpenStreetMap указывать `source: openstreetmap` и сохранять ссылки на исходные ways в `source_refs`; перед production-публикацией публичная поверхность обязана получить атрибуцию OpenStreetMap.
+- Если приблизительный контур должен проходить снаружи исходной геометрии, задавать контролируемое `outline_expansion_meters`; не подгонять отдельные вершины по подложке Яндекс Карт.
 - Поддерживаемые категории: `entrance`, `children`, `sport`, `walking`, `food`, `services`, `nature`, `water`, `infrastructure`.
 - `marker` — необязательный кастомный маркер. Без него карта рисует стандартную точку; сейчас поддерживаются `apple`, `foodtruck`, `titanic`, `construction`, `fish` и `kpp`.
 - Поддерживаемые статусы: `existing`, `planned`, `underConstruction`.
