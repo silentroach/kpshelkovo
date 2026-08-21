@@ -2,7 +2,25 @@ import { describe, expect, it } from 'vitest';
 
 import { buildPlacesDataset } from '../load';
 import type { RawPlace } from '../raw-schema';
-import type { PlaceEntry } from '../types';
+import type { PlaceEntry, PlaceGeometry } from '../types';
+
+const geometry: PlaceGeometry = {
+  area: {
+    precision: 'approximate',
+    source: 'openstreetmap',
+    geometry: {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [37.74, 55.05],
+          [37.75, 55.05],
+          [37.75, 55.06],
+          [37.74, 55.05],
+        ],
+      ],
+    },
+  },
+};
 
 const rawPlace = (overrides?: Partial<RawPlace>): RawPlace => ({
   title: 'Буржуйка',
@@ -58,6 +76,7 @@ describe('buildPlacesDataset', () => {
           "lat": 55.060526,
           "lng": 37.716242,
         },
+        "geometry": undefined,
         "mapUrl": "https://yandex.ru/navi/-/CTfgq-5r",
         "markdownUrl": "/map/burzhuyka/index.md",
         "marker": "foodtruck",
@@ -97,6 +116,25 @@ describe('buildPlacesDataset', () => {
       buildPlacesDataset([entry()]),
     ).toThrowErrorMatchingInlineSnapshot(
       `[Error: place "burzhuyka" references missing contact "food/burzhuyka"]`,
+    );
+  });
+
+  it('joins optional geometry by the canonical place slug', () => {
+    const data = buildPlacesDataset([entry()], {
+      contactUrls: new Map([['food/burzhuyka', '/sarafan/food/burzhuyka/']]),
+      geometries: new Map([['burzhuyka', geometry]]),
+    });
+
+    expect(data.places[0]?.geometry).toBe(geometry);
+  });
+
+  it('rejects geometry without a matching Markdown place', () => {
+    expect(() =>
+      buildPlacesDataset([entry()], {
+        geometries: new Map([['orphan', geometry]]),
+      }),
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: place geometry "orphan.geojson" has no matching Markdown place]`,
     );
   });
 
