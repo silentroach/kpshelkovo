@@ -13,6 +13,7 @@ import {
   DISCOMFORT_META_TITLE,
   DISCOMFORT_PAGE_TITLE,
   DISCOMFORT_QUOTE,
+  DISCOMFORT_QUOTE_TIMESTAMP,
   DISCOMFORT_QUOTE_TIMESTAMP_URL,
 } from '@/lib/discomfort/config';
 import { loadDiscomfortData } from '@/lib/discomfort/load';
@@ -29,6 +30,7 @@ interface Props {
 
 const data = Astro.props.data ?? (await loadDiscomfortData());
 const breadcrumbs = withHomeBreadcrumbs([{ label: DISCOMFORT_PAGE_TITLE }]);
+const quoteHtml = formatDynamicHtml(DISCOMFORT_QUOTE);
 const schema = collectionPageSchema({
   name: DISCOMFORT_META_TITLE,
   description: DISCOMFORT_DESCRIPTION,
@@ -73,18 +75,14 @@ const latestDateHtml = data.latestEvent
           <h1 class="ui-page-title">{DISCOMFORT_PAGE_TITLE}</h1>
 
           <figure
-            class="relative mt-7 max-w-4xl overflow-hidden bg-primary-soft px-5 py-7 md:mt-8 md:px-9 md:py-10"
+            class="mt-7 max-w-4xl bg-primary-soft px-5 py-7 md:mt-8 md:px-9 md:py-10"
           >
-            <div class="relative max-w-3xl">
-              <span class="block h-1.5 w-12 bg-accent" aria-hidden="true"
-              ></span>
-
-              <blockquote cite={DISCOMFORT_QUOTE_TIMESTAMP_URL} class="mt-5">
+            <div class="max-w-3xl">
+              <blockquote cite={DISCOMFORT_QUOTE_TIMESTAMP_URL} class="md:px-5">
                 <p
                   class="font-heading text-2xl font-bold leading-tight tracking-[-0.012em] text-balance md:text-4xl md:leading-[1.12]"
-                >
-                  {DISCOMFORT_QUOTE}
-                </p>
+                  set:html={quoteHtml}
+                />
               </blockquote>
 
               <figcaption
@@ -98,14 +96,15 @@ const latestDateHtml = data.latestEvent
                   >
                     {data.quoteAuthor.label}
                   </a>
-                  {' '}
+                  {' '}на встрече по новому тарифу,{' '}
                   <a
                     href={DISCOMFORT_QUOTE_TIMESTAMP_URL}
                     class="site-text-link"
+                    data-pagefind-ignore
                   >
-                    на встрече
+                    {DISCOMFORT_QUOTE_TIMESTAMP}
                   </a>
-                  {' '}по новому тарифу.
+                  .
                 </p>
               </figcaption>
             </div>
@@ -139,11 +138,14 @@ const latestDateHtml = data.latestEvent
           {
             events.map(({ event, bodyHtml, dateHtml, titleHtml }, index) => (
               <li class="grid grid-cols-[1rem_minmax(0,1fr)] gap-x-4 pb-10 last:pb-0 md:grid-cols-[10rem_1rem_minmax(0,1fr)] md:gap-x-6 md:pb-12">
-                <time
-                  datetime={event.dateIso}
-                  class="col-start-2 row-start-1 text-sm leading-6 text-muted-foreground ui-num md:col-start-1 md:text-right"
-                  set:html={dateHtml}
-                />
+                <a
+                  href={event.url}
+                  aria-label={`Ссылка на событие «${event.title}»`}
+                  title="Ссылка на это событие"
+                  class="site-text-link col-start-2 row-start-1 text-sm leading-6 ui-num md:col-start-1 md:text-right"
+                >
+                  <time datetime={event.dateIso} set:html={dateHtml} />
+                </a>
 
                 <span
                   class="relative col-start-1 row-span-2 row-start-1 flex justify-center md:col-start-2"

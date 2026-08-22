@@ -29,7 +29,7 @@ describe('createDiscomfortMentionRefs', () => {
     expect(createDiscomfortMentionRefs(data)).toMatchInlineSnapshot(`
       [
         {
-          "excerpt": "«Никогда никому создавать какой-то дискомфорт я не буду».",
+          "excerpt": "Никогда никому создавать какой-то дискомфорт я не буду. Мне это не надо. Я хочу развиваться дальше, но не заниматься вот этой ерундой.",
           "htmlUrl": "/815/discomfort/",
           "markdownUrl": "/815/discomfort/index.md",
           "mentionedAt": "2026-02-21",
