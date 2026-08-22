@@ -1,0 +1,179 @@
+---
+import { formatDynamicHtml } from '@shelkovo/markdown';
+import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import {
+  withHomeBreadcrumbs,
+  withHomeSchemaBreadcrumbs,
+} from '@/lib/breadcrumbs';
+import {
+  DISCOMFORT_DESCRIPTION,
+  DISCOMFORT_LEAD,
+  DISCOMFORT_META_TITLE,
+  DISCOMFORT_PAGE_TITLE,
+  DISCOMFORT_QUOTE,
+  DISCOMFORT_QUOTE_TIMESTAMP_URL,
+} from '@/lib/discomfort/config';
+import { loadDiscomfortData } from '@/lib/discomfort/load';
+import { discomfortCanonical, discomfortUrl } from '@/lib/discomfort/routes';
+import { formatDiscomfortDate } from '@/lib/discomfort/view';
+import { renderMarkdown } from '@/lib/markdown/render';
+import { collectionPageSchema } from '@/lib/news/seo';
+import { SEARCH_SECTIONS } from '@/lib/search/sections';
+import type { DiscomfortDataset } from '@/lib/discomfort/types';
+
+interface Props {
+  readonly data?: DiscomfortDataset;
+}
+
+const data = Astro.props.data ?? (await loadDiscomfortData());
+const breadcrumbs = withHomeBreadcrumbs([{ label: DISCOMFORT_PAGE_TITLE }]);
+const schema = collectionPageSchema({
+  name: DISCOMFORT_META_TITLE,
+  description: DISCOMFORT_DESCRIPTION,
+  url: discomfortUrl(),
+  breadcrumbs: withHomeSchemaBreadcrumbs([
+    { name: DISCOMFORT_PAGE_TITLE, url: discomfortUrl() },
+  ]),
+  items: data.events.map((event) => ({
+    name: event.title,
+    url: event.url,
+  })),
+});
+const events = data.events.map((event) => ({
+  event,
+  bodyHtml: renderMarkdown(event.body),
+  dateHtml: formatDynamicHtml(formatDiscomfortDate(event.dateIso)),
+  titleHtml: formatDynamicHtml(event.title),
+}));
+const latestDateHtml = data.latestEvent
+  ? formatDynamicHtml(formatDiscomfortDate(data.latestEvent.dateIso))
+  : undefined;
+---
+
+<BaseLayout
+  title={DISCOMFORT_META_TITLE}
+  description={DISCOMFORT_DESCRIPTION}
+  canonical={discomfortCanonical()}
+  schema={schema}
+  search={{
+    scope: 'page',
+    title: DISCOMFORT_PAGE_TITLE,
+    description: DISCOMFORT_DESCRIPTION,
+    section: SEARCH_SECTIONS.discomfort,
+  }}
+>
+  <main class="ui-page pb-10 md:pb-14 lg:pb-16">
+    <section class="ui-page-header">
+      <div class="ui-page-header-stack max-w-5xl">
+        <Breadcrumbs items={breadcrumbs} />
+
+        <div>
+          <h1 class="ui-page-title">{DISCOMFORT_PAGE_TITLE}</h1>
+
+          <figure
+            class="relative mt-7 max-w-4xl overflow-hidden bg-primary-soft px-5 py-7 md:mt-8 md:px-9 md:py-10"
+          >
+            <div class="relative max-w-3xl">
+              <span class="block h-1.5 w-12 bg-accent" aria-hidden="true"
+              ></span>
+
+              <blockquote cite={DISCOMFORT_QUOTE_TIMESTAMP_URL} class="mt-5">
+                <p
+                  class="font-heading text-2xl font-bold leading-tight tracking-[-0.012em] text-balance md:text-4xl md:leading-[1.12]"
+                >
+                  {DISCOMFORT_QUOTE}
+                </p>
+              </blockquote>
+
+              <figcaption
+                class="ml-auto mt-7 max-w-xl text-right text-sm leading-6 text-muted-foreground md:text-base md:leading-7"
+              >
+                <p>
+                  <a
+                    href={data.quoteAuthor.htmlUrl}
+                    title={data.quoteAuthor.linkTitle}
+                    class="site-text-link"
+                  >
+                    {data.quoteAuthor.label}
+                  </a>
+                  {' '}
+                  <a
+                    href={DISCOMFORT_QUOTE_TIMESTAMP_URL}
+                    class="site-text-link"
+                  >
+                    на встрече
+                  </a>
+                  {' '}по новому тарифу.
+                </p>
+              </figcaption>
+            </div>
+          </figure>
+
+          <div class="mt-6 max-w-3xl">
+            <p class="ui-copy text-muted-foreground">{DISCOMFORT_LEAD}</p>
+            {
+              data.latestEvent && latestDateHtml && (
+                <p class="mt-3 text-sm leading-6 text-muted-foreground">
+                  Последнее событие —{' '}
+                  <time
+                    datetime={data.latestEvent.dateIso}
+                    set:html={latestDateHtml}
+                  />
+                </p>
+              )
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="mt-8 px-5 md:mt-10 md:px-6"
+      aria-labelledby="timeline-title"
+    >
+      <div class="max-w-5xl">
+        <h2 id="timeline-title" class="sr-only">Хронология</h2>
+        <ol class="list-none" role="list">
+          {
+            events.map(({ event, bodyHtml, dateHtml, titleHtml }, index) => (
+              <li class="grid grid-cols-[1rem_minmax(0,1fr)] gap-x-4 pb-10 last:pb-0 md:grid-cols-[10rem_1rem_minmax(0,1fr)] md:gap-x-6 md:pb-12">
+                <time
+                  datetime={event.dateIso}
+                  class="col-start-2 row-start-1 text-sm leading-6 text-muted-foreground ui-num md:col-start-1 md:text-right"
+                  set:html={dateHtml}
+                />
+
+                <span
+                  class="relative col-start-1 row-span-2 row-start-1 flex justify-center md:col-start-2"
+                  aria-hidden="true"
+                >
+                  {index > 0 && (
+                    <span class="absolute left-1/2 top-0 h-2 w-px -translate-x-1/2 bg-text-soft" />
+                  )}
+                  {index < events.length - 1 && (
+                    <span class="absolute -bottom-10 left-1/2 top-2 w-px -translate-x-1/2 bg-text-soft md:-bottom-12" />
+                  )}
+                  <span class="relative mt-2 size-2 bg-primary" />
+                </span>
+
+                <div class="col-start-2 row-start-2 mt-1.5 min-w-0 md:col-start-3 md:row-start-1 md:mt-0">
+                  <h3
+                    id={event.slug}
+                    class="ui-entry-title scroll-mt-24"
+                    set:html={titleHtml}
+                  />
+                  <div
+                    class="ui-prose mt-3 max-w-[70ch] [&>:first-child]:mt-0 [&>:last-child]:mb-0"
+                    set:html={bodyHtml}
+                  />
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

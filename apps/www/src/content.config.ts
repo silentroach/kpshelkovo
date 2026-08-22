@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { RawDiscomfortEventSchema } from '@/lib/discomfort/raw-schema';
 import { RawKbPageSchema } from '@/lib/kb/raw-schema';
 import { RawContactSchema } from './lib/contacts/raw-schema';
 import { CONTACT_CATEGORIES, CONTACT_SLUG } from './lib/contacts/schema';
@@ -113,6 +114,10 @@ function failReview(entry: string, reason: string): never {
 
 function failContact(entry: string, reason: string): never {
   throw new Error(`contact path \"${entry}\" ${reason}`);
+}
+
+function failDiscomfortEvent(entry: string, reason: string): never {
+  throw new Error(`discomfort event path \"${entry}\" ${reason}`);
 }
 
 const hasReviewIdentity = (
@@ -498,6 +503,33 @@ const places = defineCollection({
   schema: RawPlaceSchema,
 });
 
+const discomfortEvents = defineCollection({
+  loader: glob({
+    pattern: ['*.md', '!AGENTS.md'],
+    base: './src/data/discomfort',
+    generateId: ({ entry }) => {
+      if (!entry.endsWith('.md') || entry.includes('/')) {
+        failDiscomfortEvent(
+          entry,
+          'must be a Markdown file directly under src/data/discomfort',
+        );
+      }
+
+      const slug = trimMarkdown(entry);
+
+      if (!SLUG.test(slug)) {
+        failDiscomfortEvent(
+          entry,
+          'slug must use lower-case Latin letters, digits, and hyphen',
+        );
+      }
+
+      return slug;
+    },
+  }),
+  schema: RawDiscomfortEventSchema,
+});
+
 const kbPages = defineCollection({
   loader: glob({
     pattern: ['**/*.md', '!AGENTS.md', '!**/AGENTS.md'],
@@ -564,4 +596,5 @@ export const collections = {
   meetingTranscripts,
   reviews,
   contacts,
+  discomfortEvents,
 };

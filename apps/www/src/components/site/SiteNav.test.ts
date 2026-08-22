@@ -64,6 +64,17 @@ describe('SiteNav', () => {
     expect(html).toContain('aria-current="location"');
   });
 
+  it.each(['header', 'mobile'] as const)(
+    'marks Discomfort as the exact tariff child in the %s navigation',
+    async (variant) => {
+      const html = await renderNav('/815/discomfort/', variant);
+
+      expect(html).toContain('data-current-section');
+      expect(html).toContain('href="/815/discomfort/" aria-current="page"');
+      expect(html).toContain('текущий раздел');
+    },
+  );
+
   it('does not mark a destination on the home page', async () => {
     const html = await renderNav('/', 'header');
 

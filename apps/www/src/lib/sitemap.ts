@@ -52,6 +52,10 @@ export interface SitemapContactInput {
   readonly updatedIso: string;
 }
 
+export interface SitemapDiscomfortEventInput {
+  readonly lastmod: string;
+}
+
 export interface SitemapMetadataSourceData {
   readonly newsArticles: readonly SitemapNewsArticleInput[];
   readonly statusIncidents: readonly SitemapStatusIncidentInput[];
@@ -59,6 +63,7 @@ export interface SitemapMetadataSourceData {
   readonly meetings: readonly SitemapMeetingInput[];
   readonly kbPages: readonly SitemapKbPageInput[];
   readonly contacts: readonly SitemapContactInput[];
+  readonly discomfortEvents: readonly SitemapDiscomfortEventInput[];
 }
 
 const EXTENSION = /\.[^/]+$/u;
@@ -299,6 +304,20 @@ const addContactsMetadata = (
   }
 };
 
+const addDiscomfortMetadata = (
+  index: Map<string, SitemapMetadata>,
+  events: readonly SitemapDiscomfortEventInput[],
+): void => {
+  const lastmod = maxLastmod(events.map((event) => event.lastmod));
+
+  if (lastmod) {
+    setMetadata(index, '/815/discomfort/', {
+      lastmod,
+      changefreq: CHANGEFREQ.monthly,
+    });
+  }
+};
+
 export const buildSitemapMetadataIndex = (
   data: SitemapMetadataSourceData,
 ): SitemapMetadataIndex => {
@@ -310,6 +329,7 @@ export const buildSitemapMetadataIndex = (
   addMeetingsMetadata(index, data.meetings);
   addKbMetadata(index, data.kbPages);
   addContactsMetadata(index, data.contacts);
+  addDiscomfortMetadata(index, data.discomfortEvents);
 
   return new Map([...index.entries()].sort(([a], [b]) => compareRuText(a, b)));
 };

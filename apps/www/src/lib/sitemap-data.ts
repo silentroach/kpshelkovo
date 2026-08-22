@@ -17,6 +17,7 @@ import {
   type SitemapSettlementInput,
   type SitemapStatusIncidentInput,
   type SitemapContactInput,
+  type SitemapDiscomfortEventInput,
 } from './sitemap';
 
 type YamlRecord = Record<string, unknown>;
@@ -76,6 +77,12 @@ const ContactFrontmatterSchema = z
     updated_at: SitemapDateInputSchema,
   })
   .passthrough();
+const DiscomfortEventFrontmatterSchema = z
+  .object({
+    date: SitemapDateInputSchema,
+    updated_at: SitemapDateInputSchema.optional(),
+  })
+  .passthrough();
 
 const newsArticlesDir = fileURLToPath(
   new URL('../data/news/articles/', import.meta.url),
@@ -92,6 +99,9 @@ const meetingsDir = fileURLToPath(
 const kbPagesDir = fileURLToPath(new URL('../data/kb/', import.meta.url));
 const contactsDir = fileURLToPath(
   new URL('../data/contacts/', import.meta.url),
+);
+const discomfortEventsDir = fileURLToPath(
+  new URL('../data/discomfort/', import.meta.url),
 );
 
 const formatYamlIssue = (issue: SitemapDataIssue): string => {
@@ -371,6 +381,29 @@ export const contactSitemapInput = (
   };
 };
 
+export const discomfortEventSitemapInput = (
+  frontmatter: string | YamlRecord,
+): SitemapDiscomfortEventInput => {
+  const context = 'discomfort event frontmatter';
+  const event = parseSitemapData(
+    DiscomfortEventFrontmatterSchema,
+    parseFrontmatterInput(frontmatter, context),
+    context,
+  );
+  const date = parseTimestamp(event.date, `${context} date`);
+  const updatedAt = event.updated_at
+    ? parseTimestamp(event.updated_at, `${context} updated_at`)
+    : undefined;
+
+  if (updatedAt && updatedAt < date) {
+    throw new Error(`${context} updated_at cannot be earlier than date`);
+  }
+
+  return {
+    lastmod: updatedAt ?? date,
+  };
+};
+
 const loadKbPagesForSitemap = (): readonly SitemapKbPageInput[] =>
   listFiles(kbPagesDir, '.md')
     .filter((path) => !path.endsWith('/AGENTS.md'))
@@ -390,6 +423,16 @@ const loadContactsForSitemap = (): readonly SitemapContactInput[] =>
       return contactSitemapInput(frontmatter);
     });
 
+const loadDiscomfortEventsForSitemap =
+  (): readonly SitemapDiscomfortEventInput[] =>
+    listFiles(discomfortEventsDir, '.md')
+      .filter((path) => !path.endsWith('/AGENTS.md'))
+      .map((path) => {
+        const { frontmatter } = markdownParts(path);
+
+        return discomfortEventSitemapInput(frontmatter);
+      });
+
 export const loadSitemapMetadataIndex =
   async (): Promise<SitemapMetadataIndex> =>
     buildSitemapMetadataIndex({
@@ -399,4 +442,5 @@ export const loadSitemapMetadataIndex =
       meetings: loadMeetingsForSitemap(),
       kbPages: loadKbPagesForSitemap(),
       contacts: loadContactsForSitemap(),
+      discomfortEvents: loadDiscomfortEventsForSitemap(),
     });

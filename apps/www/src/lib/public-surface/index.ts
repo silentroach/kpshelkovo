@@ -9,6 +9,7 @@ import type {
 } from './types';
 import { comparePublicSurfaceSlice } from '@/compare/lib/public-surface';
 import { contactsPublicSurfaceSlice } from '@/lib/contacts/public-surface';
+import { discomfortPublicSurfaceSlice } from '@/lib/discomfort/public-surface';
 import { kbPublicSurfaceSlice } from '@/lib/kb/public-surface';
 import { meetingsPublicSurfaceSlice } from '@/lib/meetings/public-surface';
 import { newsPublicSurfaceSlice } from '@/lib/news/public-surface';
@@ -99,12 +100,14 @@ export const publicSurfaceRegistry = createPublicSurfaceRegistry([
   peoplePublicSurfaceSlice,
   placesPublicSurfaceSlice,
   reviewsPublicSurfaceSlice,
+  discomfortPublicSurfaceSlice,
   reglamentPublicSurfaceSlice,
   comparePublicSurfaceSlice,
 ]);
 
 export { comparePublicSurfaceSlice } from '@/compare/lib/public-surface';
 export { contactsPublicSurfaceSlice } from '@/lib/contacts/public-surface';
+export { discomfortPublicSurfaceSlice } from '@/lib/discomfort/public-surface';
 export { kbPublicSurfaceSlice } from '@/lib/kb/public-surface';
 export { meetingsPublicSurfaceSlice } from '@/lib/meetings/public-surface';
 export { newsPublicSurfaceSlice } from '@/lib/news/public-surface';

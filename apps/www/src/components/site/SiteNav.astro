@@ -34,11 +34,14 @@ const newsCurrent = getCurrent('/news/');
 const placesCurrent = getCurrent('/map/');
 const compareCurrent = getCurrent('/815/compare/');
 const regulationCurrent = getCurrent('/815/regulation/');
+const discomfortCurrent = getCurrent('/815/discomfort/');
 const kbCurrent = getCurrent('/kb/');
 const sarafanCurrent = getCurrent('/sarafan/');
 const reviewsCurrent = getCurrent('/reviews/');
 const statusCurrent = getCurrent('/status/');
-const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
+const isTariffCurrent = Boolean(
+  compareCurrent || regulationCurrent || discomfortCurrent,
+);
 const submenuLinkClass =
   'block rounded-lg px-3 py-2 text-sm leading-5 text-foreground transition-colors focus-visible:outline-none';
 ---
@@ -70,6 +73,13 @@ const submenuLinkClass =
           class="site-nav-mobile-link site-nav-mobile-nested"
         >
           Регламент
+        </a>
+        <a
+          href="/815/discomfort/"
+          aria-current={discomfortCurrent}
+          class="site-nav-mobile-link site-nav-mobile-nested"
+        >
+          Дискомфорт
         </a>
       </div>
 
@@ -158,6 +168,13 @@ const submenuLinkClass =
               class={submenuLinkClass}
             >
               Регламент
+            </a>
+            <a
+              href="/815/discomfort/"
+              aria-current={discomfortCurrent}
+              class={submenuLinkClass}
+            >
+              Дискомфорт
             </a>
           </div>
         </div>

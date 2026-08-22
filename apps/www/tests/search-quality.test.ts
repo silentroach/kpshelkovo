@@ -115,6 +115,15 @@ const queryGroups = [
     name: '#184 compare settlements',
     queries: ['парк', 'петровское парк', 'ивушкино'],
   },
+  {
+    name: '#205 discomfort timeline',
+    queries: [
+      'ОК Дискомфорт',
+      'дискомфорт тариф',
+      '544 815',
+      'гостевые пропуска долг',
+    ],
+  },
 ] as const;
 
 const rankExpectations: ReadonlyMap<
@@ -173,6 +182,10 @@ const rankExpectations: ReadonlyMap<
     { url: '/815/compare/settlements/petrovskoe-park/', maxRank: 1 },
   ],
   ['ивушкино', { url: '/815/compare/settlements/ivushkino/', maxRank: 1 }],
+  ['ОК Дискомфорт', { url: '/815/discomfort/', maxRank: 1 }],
+  ['дискомфорт тариф', { url: '/815/discomfort/', maxRank: 1 }],
+  ['544 815', { url: '/815/discomfort/', maxRank: 1 }],
+  ['гостевые пропуска долг', { url: '/815/discomfort/', maxRank: 3 }],
 ]);
 
 const placeSnippetUrls: ReadonlyMap<string, string> = new Map([

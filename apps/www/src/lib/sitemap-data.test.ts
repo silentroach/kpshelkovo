@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { contactSitemapInput, kbPageSitemapInput } from './sitemap-data';
+import {
+  contactSitemapInput,
+  discomfortEventSitemapInput,
+  kbPageSitemapInput,
+} from './sitemap-data';
 
 describe('kbPageSitemapInput', () => {
   it('turns inline noindex flags into sitemap exclusion', () => {
@@ -72,5 +76,25 @@ describe('contactSitemapInput', () => {
         "url": "/sarafan/fence/ivan-petrov-fence/",
       }
     `);
+  });
+});
+
+describe('discomfortEventSitemapInput', () => {
+  it('uses the event date as sitemap metadata input', () => {
+    expect(
+      discomfortEventSitemapInput(
+        'date: 2026-08-20\nupdated_at: 2026-08-22\ntitle: Гостевые пропуска',
+      ),
+    ).toEqual({ lastmod: '2026-08-22' });
+  });
+
+  it('rejects updated_at earlier than the event date', () => {
+    expect(() =>
+      discomfortEventSitemapInput(
+        'date: 2026-08-20\nupdated_at: 2026-08-19\ntitle: Гостевые пропуска',
+      ),
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: discomfort event frontmatter updated_at cannot be earlier than date]`,
+    );
   });
 });
