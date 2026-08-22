@@ -69,6 +69,11 @@ const sectionLinks = () =>
       'расчет тарифа, услуги, имущество и ресурсы с источниками.'
     ),
     markdownLinkItem(
+      'ОК Дискомфорт',
+      registeredSurfaceUrl('discomfort:index-markdown'),
+      'хронология вручную отобранных событий о счетах, переговорах и ограничениях; подробности проверяйте по ссылкам внутри каждого события.'
+    ),
+    markdownLinkItem(
       'База знаний',
       registeredSurfaceUrl('kb:index-markdown'),
       'тематические документы и их части в Markdown, ссылки на исходные документы.'

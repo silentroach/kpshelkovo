@@ -4,6 +4,7 @@ import { defineCollection } from 'astro:content';
 
 import { SettlementSchema } from '@/compare/lib/schema';
 import { RawContactSchema } from '@/lib/contacts/raw-schema';
+import { RawDiscomfortEventSchema } from '@/lib/discomfort/raw-schema';
 import { contactSourceId } from '@/lib/contacts/source';
 import { rawMarkdownBody } from '@/lib/content-source';
 import { RawEventSchema } from '@/lib/events/raw-schema';
@@ -33,6 +34,20 @@ const events = defineCollection({
       eventSourceId(entry, data, () => rawMarkdownBody(base, entry))
   }),
   schema: RawEventSchema
+});
+
+const discomfortEvents = defineCollection({
+  loader: glob({
+    pattern: ['*.md', '!AGENTS.md'],
+    base: './src/data/discomfort',
+    generateId: ({ entry }) => {
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*\.md$/u.test(entry)) {
+        throw new Error(`discomfort event path "${entry}" must be a Markdown file with a lower-case Latin slug directly under src/data/discomfort`);
+      }
+      return entry.slice(0, -3);
+    }
+  }),
+  schema: RawDiscomfortEventSchema
 });
 
 const newsAuthors = defineCollection({
@@ -166,5 +181,6 @@ export const collections = {
   meetingEntries,
   meetingTranscripts,
   reviews,
-  contacts
+  contacts,
+  discomfortEvents
 };

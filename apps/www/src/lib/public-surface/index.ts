@@ -1,5 +1,6 @@
 import { comparePublicSurfaceSlice } from '@/compare/lib/public-surface';
 import { contactsPublicSurfaceSlice } from '@/lib/contacts/public-surface';
+import { discomfortPublicSurfaceSlice } from '@/lib/discomfort/public-surface';
 import { eventsPublicSurfaceSlice } from '@/lib/events/public-surface';
 import { kbPublicSurfaceSlice } from '@/lib/kb/public-surface';
 import { meetingsPublicSurfaceSlice } from '@/lib/meetings/public-surface';
@@ -110,6 +111,7 @@ export const llmsPathForPage = (pathname: string): string =>
 
 export { comparePublicSurfaceSlice } from '@/compare/lib/public-surface';
 export { contactsPublicSurfaceSlice } from '@/lib/contacts/public-surface';
+export { discomfortPublicSurfaceSlice } from '@/lib/discomfort/public-surface';
 export { eventsPublicSurfaceSlice } from '@/lib/events/public-surface';
 export { kbPublicSurfaceSlice } from '@/lib/kb/public-surface';
 export { meetingsPublicSurfaceSlice } from '@/lib/meetings/public-surface';

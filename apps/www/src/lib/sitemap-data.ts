@@ -6,13 +6,14 @@ const sitemapDateIso = (iso: string, hasTime: boolean): string =>
   hasTime ? iso : iso.slice(0, 10);
 
 const buildSitemapMetadataIndexFromDomainData = async (): Promise<SitemapMetadataIndex> => {
-  const [newsArticles, statusIncidents, compare, meetings, kbPages, contacts] = await Promise.all([
+  const [newsArticles, statusIncidents, compare, meetings, kbPages, contacts, discomfort] = await Promise.all([
     import('@/lib/news/load').then(({ loadNewsArticles }) => loadNewsArticles()),
     import('@/lib/status/load').then(({ loadStatusIncidents }) => loadStatusIncidents()),
     import('@/compare/lib/data').then(({ loadAllData }) => loadAllData()),
     import('@/lib/meetings/load').then(({ loadMeetings }) => loadMeetings()),
     import('@/lib/kb/load').then(({ loadKbPages }) => loadKbPages()),
-    import('@/lib/contacts/load').then(({ loadContacts }) => loadContacts())
+    import('@/lib/contacts/load').then(({ loadContacts }) => loadContacts()),
+    import('@/lib/discomfort/load').then(({ loadDiscomfortData }) => loadDiscomfortData())
   ]);
 
   return buildSitemapMetadataIndex({
@@ -42,6 +43,7 @@ const buildSitemapMetadataIndexFromDomainData = async (): Promise<SitemapMetadat
       url: page.url,
       excludeFromSitemap: page.flags.includes('noindex')
     })),
+    discomfortEvents: discomfort.events.map((event) => ({ lastmod: event.updatedIso ?? event.dateIso })),
     contacts: contacts.map((contact) => ({
       category: contact.category,
       url: contact.url,
