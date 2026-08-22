@@ -60,6 +60,17 @@ describe('/815/discomfort/', () => {
     expect(html.indexOf('id="bills-at-815"')).toBeLessThan(
       html.indexOf('id="guest-passes-disputed-debt"'),
     );
+    expect(
+      [...html.matchAll(/href="\/815\/discomfort\/#[^"]+"/g)].map(
+        ([href]) => href,
+      ),
+    ).toMatchInlineSnapshot(`
+      [
+        "href=\"/815/discomfort/#bills-at-815\"",
+        "href=\"/815/discomfort/#meeting-recording-ban\"",
+        "href=\"/815/discomfort/#guest-passes-disputed-debt\"",
+      ]
+    `);
     expect(html).toContain('href="/meetings/2026-02-21-ok/#t-01-39-30"');
     expect(html).toContain('title="Руководитель, ОК &quot;Комфорт&quot;"');
     expect(html).toContain('data-pagefind-body');

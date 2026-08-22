@@ -11,6 +11,7 @@ import {
   DISCOMFORT_LEAD,
   DISCOMFORT_PAGE_TITLE,
   DISCOMFORT_QUOTE,
+  DISCOMFORT_QUOTE_TIMESTAMP,
   DISCOMFORT_QUOTE_TIMESTAMP_URL,
 } from './config';
 import type { DiscomfortDataset, DiscomfortEvent } from './types';
@@ -47,9 +48,12 @@ export const buildDiscomfortMarkdown = (data: DiscomfortDataset): string =>
             data.quoteAuthor.label,
             data.quoteAuthor.linkTitle,
           ),
-          md.text(' '),
-          md.link(abs(DISCOMFORT_QUOTE_TIMESTAMP_URL), 'на встрече'),
-          md.text(' по новому тарифу.'),
+          md.text(' на встрече по новому тарифу, '),
+          md.link(
+            abs(DISCOMFORT_QUOTE_TIMESTAMP_URL),
+            DISCOMFORT_QUOTE_TIMESTAMP,
+          ),
+          md.text('.'),
         ]),
         md.paragraph(DISCOMFORT_LEAD),
         ...(data.latestEvent
