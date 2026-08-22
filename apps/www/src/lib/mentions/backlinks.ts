@@ -66,4 +66,5 @@ export const createSiteBacklinksFromGraph = (
   places: sectionBacklinks(graph, target, 'places'),
   people: sectionBacklinks(graph, target, 'people'),
   contacts: sectionBacklinks(graph, target, 'contacts'),
+  discomfort: sectionBacklinks(graph, target, 'discomfort'),
 });

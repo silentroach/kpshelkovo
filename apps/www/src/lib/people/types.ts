@@ -55,4 +55,5 @@ export const EMPTY_PERSON_BACKLINKS: PersonBacklinks = {
   places: [],
   people: [],
   contacts: [],
+  discomfort: [],
 };

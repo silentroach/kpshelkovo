@@ -1,7 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 
 import type { SiteMentionRegistry } from '@/lib/mentions';
-import { loadPeopleMentionRegistry } from '@/lib/people/registry';
+import { loadSiteMentionRegistry } from '@/lib/mentions/registry';
 
 import { DISCOMFORT_QUOTE_AUTHOR_SLUG } from './config';
 import { mapRawDiscomfortEvent } from './mapper';
@@ -59,7 +59,7 @@ export const buildDiscomfortDataset = (
 
 const buildDiscomfortData = async (): Promise<DiscomfortDataset> =>
   buildDiscomfortDataset(await getCollection('discomfortEvents'), {
-    mentionRegistry: await loadPeopleMentionRegistry(),
+    mentionRegistry: await loadSiteMentionRegistry(),
   });
 
 export const loadDiscomfortData = (): Promise<DiscomfortDataset> => {

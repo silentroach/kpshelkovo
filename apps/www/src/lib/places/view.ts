@@ -1,3 +1,4 @@
+import { formatDiscomfortDate } from '@/lib/discomfort/view';
 import { formatNewsDate } from '@/lib/news/view';
 import { formatReviewDate } from '@/lib/reviews/view';
 import { formatStatusDate } from '@/lib/status/view';
@@ -42,6 +43,7 @@ const PLACE_BACKLINK_SECTION_LABELS = {
   places: 'Карта',
   people: 'Люди',
   contacts: 'Сарафан',
+  discomfort: 'ОК Дискомфорт',
 } as const satisfies Readonly<Record<PlaceMentionSection, string>>;
 
 const PLACE_BACKLINK_KIND_LABELS = {
@@ -51,6 +53,8 @@ const PLACE_BACKLINK_KIND_LABELS = {
   place: 'Место',
   person: 'Профиль',
   contact: 'Контакт',
+  event: 'Событие',
+  quote: 'Цитата',
 } as const satisfies Readonly<Record<PlaceBacklinkKind, string>>;
 
 export const formatPlaceBacklinkSection = (
@@ -73,6 +77,10 @@ export const formatPlaceBacklinkDate = (
 
   if (backlink.section === 'reviews') {
     return formatReviewDate({ publishedIso: backlink.mentionedAt });
+  }
+
+  if (backlink.section === 'discomfort') {
+    return formatDiscomfortDate(backlink.mentionedAt);
   }
 
   return formatNewsDate(backlink.mentionedAt);

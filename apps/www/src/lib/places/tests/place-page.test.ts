@@ -37,6 +37,7 @@ const fixture = vi.hoisted(() => ({
       places: [],
       people: [],
       contacts: [],
+      discomfort: [],
     },
   },
 }));

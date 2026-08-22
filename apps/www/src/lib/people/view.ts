@@ -7,6 +7,7 @@ import {
   type MarkdownPhrasingInput,
 } from '@shelkovo/markdown';
 
+import { formatDiscomfortDate } from '../discomfort/view';
 import { formatNewsDate, NEWS_PROSE } from '../news/view';
 import { formatReviewDate } from '../reviews/view';
 import { absoluteUrl } from '../site';
@@ -34,6 +35,7 @@ const BACKLINK_SECTION_LABELS: Record<PersonMentionSection, string> = {
   places: 'Карта',
   people: 'Люди',
   contacts: 'Сарафан',
+  discomfort: 'ОК Дискомфорт',
 };
 
 const BACKLINK_KIND_LABELS: Record<PersonBacklinkKind, string> = {
@@ -43,6 +45,8 @@ const BACKLINK_KIND_LABELS: Record<PersonBacklinkKind, string> = {
   place: 'Место',
   person: 'Профиль',
   contact: 'Контакт',
+  event: 'Событие',
+  quote: 'Цитата',
 };
 
 export const PEOPLE_PROSE = NEWS_PROSE;
@@ -84,6 +88,10 @@ const backlinkDate = (backlink: PersonMentionRef): string | undefined => {
 
   if (backlink.section === 'reviews') {
     return formatReviewDate({ publishedIso: backlink.mentionedAt });
+  }
+
+  if (backlink.section === 'discomfort') {
+    return formatDiscomfortDate(backlink.mentionedAt);
   }
 
   return formatNewsDate(backlink.mentionedAt);

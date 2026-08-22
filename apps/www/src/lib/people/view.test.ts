@@ -196,6 +196,7 @@ describe('buildPersonMarkdown', () => {
         ],
         people: [],
         contacts: [],
+        discomfort: [],
       },
     };
 
@@ -265,6 +266,7 @@ describe('buildPersonMarkdown', () => {
         places: [],
         people: [],
         contacts: [],
+        discomfort: [],
       },
     };
 
@@ -319,6 +321,7 @@ describe('buildPersonMarkdown', () => {
         places: [],
         people: [],
         contacts: [],
+        discomfort: [],
       },
     };
 
