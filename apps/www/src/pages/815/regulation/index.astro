@@ -738,7 +738,10 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                   <span class="font-semibold">
                                     {row.missing.base.label}
                                   </span>
-                                  <span class="reglament-missing-help">
+                                  <span
+                                    class="reglament-missing-help"
+                                    data-reglament-missing-field="base"
+                                  >
                                     <button
                                       class="reglament-missing-help-button"
                                       type="button"
@@ -902,7 +905,10 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                   <span class="font-semibold">
                                     {row.missing.rate.label}
                                   </span>
-                                  <span class="reglament-missing-help">
+                                  <span
+                                    class="reglament-missing-help"
+                                    data-reglament-missing-field="price"
+                                  >
                                     <button
                                       class="reglament-missing-help-button"
                                       type="button"
@@ -1263,6 +1269,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       font-weight: 500;
       line-height: 1.45;
       opacity: 0;
+      overflow-wrap: anywhere;
       padding: 0.625rem 0.75rem;
       pointer-events: none;
       transform: translateY(-0.2rem);
@@ -1271,6 +1278,17 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
         transform 120ms ease,
         visibility 120ms ease;
       visibility: hidden;
+      white-space: normal;
+    }
+
+    .reglament-missing-help[data-reglament-missing-tooltip-bound='true']
+      .reglament-missing-tooltip {
+      position: fixed;
+      max-width: none;
+    }
+
+    .reglament-missing-tooltip[data-reglament-tooltip-side='above'] {
+      transform: translateY(0.2rem);
     }
 
     .reglament-missing-help:hover .reglament-missing-tooltip,
@@ -1295,10 +1313,12 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
 
   <script>
     import { hydrateReglamentCalculators } from '@/lib/reglament/calculator-controller';
+    import { hydrateReglamentMissingTooltips } from '@/lib/reglament/missing-tooltip-positioning';
     import { hydrateStickyTableHeaders } from '@/lib/sticky-table-headers';
 
     const hydrate = () => {
       hydrateReglamentCalculators();
+      hydrateReglamentMissingTooltips();
       hydrateStickyTableHeaders();
     };
 

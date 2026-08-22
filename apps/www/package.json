@@ -23,7 +23,9 @@
     "test:visual:news-event:serve": "astro build --root tests/news-event-card-visual && astro preview --root tests/news-event-card-visual --host 127.0.0.1 --port 4327",
     "test:visual:sticky-table": "playwright test -c playwright.sticky-table-visual.local.config.ts",
     "test:visual:sticky-table:update": "playwright test -c playwright.sticky-table-visual.local.config.ts --update-snapshots",
-    "test:visual:sticky-table:serve": "astro build --root tests/sticky-table-visual && astro preview --root tests/sticky-table-visual --host 127.0.0.1 --port 4329"
+    "test:visual:sticky-table:serve": "astro build --root tests/sticky-table-visual && astro preview --root tests/sticky-table-visual --host 127.0.0.1 --port 4329",
+    "test:regulation-tooltip": "playwright test -c playwright.regulation-tooltip.config.ts",
+    "test:regulation-tooltip:serve": "astro build && ASTRO_PREVIEW_BACKGROUND=0 astro preview --host 127.0.0.1 --port 4331"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.3.5",

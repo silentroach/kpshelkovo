@@ -61,6 +61,12 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         run: pnpm test
 
+      - name: Install Playwright Chromium
+        run: pnpm --filter @shelkovo/www exec playwright install --with-deps chromium
+
+      - name: Run regulation tooltip browser tests
+        run: pnpm --filter @shelkovo/www test:regulation-tooltip
+
       - name: Save Turbo cache
         if: ${{ steps.restore-turbo-cache.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
