@@ -365,7 +365,8 @@ html:has(.site-search-dialog[open]) {
   scrollbar-gutter: stable;
 }
 
-.site-search-result-excerpt mark {
+.site-search-result-excerpt mark,
+.pagefind-highlight {
   color: inherit;
   background: var(--color-accent-soft);
 }

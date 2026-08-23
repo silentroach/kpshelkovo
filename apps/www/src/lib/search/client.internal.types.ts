@@ -1,6 +1,7 @@
 import type { SearchResult } from './client.types';
 
 export interface PagefindOptions {
+  readonly highlightParam: string;
   readonly ranking: {
     readonly metaWeights: Readonly<Record<string, number>>;
   };

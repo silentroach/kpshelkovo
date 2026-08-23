@@ -7,6 +7,8 @@ import {
 import { preview, type PreviewServer } from 'vite';
 import { afterAll, beforeAll, expect, test } from 'vitest';
 
+import { SEARCH_HIGHLIGHT_PARAM } from '../src/lib/search/highlight';
+
 const port = 4330;
 const baseURL = `http://127.0.0.1:${String(port)}`;
 const queryGroups = [
@@ -264,6 +266,42 @@ beforeAll(async () => {
 afterAll(async () => {
   await browser.close();
   await server.close();
+});
+
+test('#154 search result highlighting', async () => {
+  const page = await browser.newPage({
+    viewport: { width: 1280, height: 800 },
+  });
+  await page.clock.setFixedTime('2026-08-16T12:00:00Z');
+  await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
+  await page.locator('[data-search-trigger]').first().click();
+  const searchDialog = page.locator('dialog[data-search-state]');
+  await searchDialog
+    .getByRole('searchbox', { name: 'Что найти на сайте' })
+    .fill('тариф');
+  await expectPage(searchDialog).toHaveAttribute(
+    'data-search-state',
+    'results',
+  );
+
+  const result = searchDialog
+    .locator('[data-search-result][href^="/815/regulation/"]')
+    .first();
+  const href = await result.getAttribute('href');
+  if (!href) {
+    throw new Error('Expected regulation search result URL');
+  }
+  const target = new URL(href, baseURL);
+
+  expect(target.searchParams.getAll(SEARCH_HIGHLIGHT_PARAM)).toEqual(['тариф']);
+  expect(target.hash).not.toBe('');
+
+  await result.click();
+  await expectPage(page).toHaveURL(target.href);
+  await expectPage(
+    page.locator('mark.pagefind-highlight').first(),
+  ).toBeVisible();
+  await page.close();
 });
 
 for (const group of queryGroups) {

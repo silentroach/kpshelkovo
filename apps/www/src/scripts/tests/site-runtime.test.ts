@@ -1,11 +1,31 @@
 // @vitest-environment happy-dom
 
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+const highlightSearchTerms = vi.hoisted(() => vi.fn(async () => {}));
+
+vi.mock('@/lib/search/highlight', () => ({ highlightSearchTerms }));
 
 import '../site-runtime';
 
+beforeEach(() => {
+  highlightSearchTerms.mockClear();
+});
+
 afterEach(() => {
   document.body.innerHTML = '';
+  history.replaceState({}, '', '/');
+});
+
+describe('search highlights', () => {
+  it('runs after an Astro navigation with the destination query', () => {
+    history.replaceState({}, '', '/news/?pagefind-highlight=tariff');
+
+    document.dispatchEvent(new Event('astro:page-load'));
+
+    expect(highlightSearchTerms).toHaveBeenCalledOnce();
+    expect(highlightSearchTerms).toHaveBeenCalledWith(location.href);
+  });
 });
 
 describe('site header menu', () => {
