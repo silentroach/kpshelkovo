@@ -206,8 +206,11 @@ describe('PlaceMap', () => {
       >
         <span
           aria-hidden="true"
-          class="place-map-marker-point ui-map-marker"
+          class="place-map-marker-point"
         >
+          <span
+            class="place-map-marker-point-surface ui-map-marker"
+          />
           <span
             class="place-map-marker-closed-indicator"
           />

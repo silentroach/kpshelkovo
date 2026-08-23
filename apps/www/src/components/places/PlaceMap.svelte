@@ -422,7 +422,11 @@
       image.draggable = false;
       visual.append(image);
     } else {
-      visual.className = 'place-map-marker-point ui-map-marker';
+      const point = document.createElement('span');
+
+      visual.className = 'place-map-marker-point';
+      point.className = 'place-map-marker-point-surface ui-map-marker';
+      visual.append(point);
     }
 
     if (place.openingHours) {
@@ -855,27 +859,28 @@
     --ui-map-marker-border: 0.1875rem solid var(--color-surface-raised);
 
     position: relative;
+    display: block;
+    width: var(--ui-map-marker-size);
+    height: var(--ui-map-marker-size);
     flex: none;
     scale: var(--place-map-marker-scale, 1);
     transition:
-      filter 0.15s ease,
       scale 0.15s ease,
       transform 0.15s ease;
   }
 
-  :global(.place-map-marker-graphic) {
-    --place-map-marker-state-filter: saturate(1);
+  :global(.place-map-marker-point-surface) {
+    display: block;
+    transition: filter 0.15s ease;
+  }
 
+  :global(.place-map-marker-graphic) {
     position: relative;
     display: block;
     width: 2rem;
     flex: none;
-    filter: var(--place-map-marker-state-filter)
-      drop-shadow(0 0 0.1rem oklch(100% 0 0 / 0.96))
-      drop-shadow(0 0.25rem 0.35rem oklch(24% 0.04 145 / 0.4));
     scale: var(--place-map-marker-scale, 1);
     transition:
-      filter 0.15s ease,
       scale 0.15s ease,
       transform 0.15s ease;
   }
@@ -891,9 +896,15 @@
   }
 
   :global(.place-map-marker-image) {
+    --place-map-marker-state-filter: saturate(1);
+
     display: block;
     width: 100%;
     height: auto;
+    filter: var(--place-map-marker-state-filter)
+      drop-shadow(0 0 0.1rem oklch(100% 0 0 / 0.96))
+      drop-shadow(0 0.25rem 0.35rem oklch(24% 0.04 145 / 0.4));
+    transition: filter 0.15s ease;
     user-select: none;
   }
 
@@ -912,18 +923,20 @@
     box-shadow: 0 0 0 0.1875rem var(--color-ring);
   }
 
-  :global(.place-map-marker[data-open='false'] .place-map-marker-point) {
+  :global(
+    .place-map-marker[data-open='false'] .place-map-marker-point-surface
+  ) {
     filter: grayscale(1);
   }
 
-  :global(.place-map-marker[data-open='false'] .place-map-marker-graphic) {
+  :global(.place-map-marker[data-open='false'] .place-map-marker-image) {
     --place-map-marker-state-filter: grayscale(1);
   }
 
   :global(.place-map-marker-closed-indicator) {
     position: absolute;
+    top: -0.375rem;
     right: -0.375rem;
-    bottom: -0.375rem;
     z-index: 1;
     display: none;
     box-sizing: border-box;
@@ -931,7 +944,7 @@
     height: 0.75rem;
     border: 0.09375rem solid currentColor;
     border-radius: 999px;
-    background: var(--color-surface-raised);
+    background: var(--color-accent);
     box-shadow: 0 0 0 0.0625rem var(--color-surface-raised);
     color: var(--color-foreground);
     pointer-events: none;
@@ -1041,7 +1054,9 @@
 
   @media (prefers-reduced-motion: reduce) {
     :global(.place-map-marker-point),
+    :global(.place-map-marker-point-surface),
     :global(.place-map-marker-graphic),
+    :global(.place-map-marker-image),
     :global(.place-map-marker[data-highlighted='true']::after),
     :global(.place-map-cluster) {
       animation: none;
