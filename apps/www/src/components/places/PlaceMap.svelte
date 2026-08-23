@@ -425,6 +425,13 @@
       visual.className = 'place-map-marker-point ui-map-marker';
     }
 
+    if (place.openingHours) {
+      const closedIndicator = document.createElement('span');
+
+      closedIndicator.className = 'place-map-marker-closed-indicator';
+      visual.append(closedIndicator);
+    }
+
     visual.setAttribute('aria-hidden', 'true');
     link.append(visual);
 
@@ -847,6 +854,7 @@
     --ui-map-marker-size: 0.9375rem;
     --ui-map-marker-border: 0.1875rem solid var(--color-surface-raised);
 
+    position: relative;
     flex: none;
     scale: var(--place-map-marker-scale, 1);
     transition:
@@ -858,6 +866,7 @@
   :global(.place-map-marker-graphic) {
     --place-map-marker-state-filter: saturate(1);
 
+    position: relative;
     display: block;
     width: 2rem;
     flex: none;
@@ -909,6 +918,53 @@
 
   :global(.place-map-marker[data-open='false'] .place-map-marker-graphic) {
     --place-map-marker-state-filter: grayscale(1);
+  }
+
+  :global(.place-map-marker-closed-indicator) {
+    position: absolute;
+    right: -0.375rem;
+    bottom: -0.375rem;
+    z-index: 1;
+    display: none;
+    box-sizing: border-box;
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 0.09375rem solid currentColor;
+    border-radius: 999px;
+    background: var(--color-surface-raised);
+    box-shadow: 0 0 0 0.0625rem var(--color-surface-raised);
+    color: var(--color-foreground);
+    pointer-events: none;
+  }
+
+  :global(.place-map-marker-closed-indicator::before),
+  :global(.place-map-marker-closed-indicator::after) {
+    position: absolute;
+    left: 50%;
+    border-radius: 999px;
+    background: currentColor;
+    content: '';
+    transform-origin: left center;
+  }
+
+  :global(.place-map-marker-closed-indicator::before) {
+    top: 0.125rem;
+    width: 0.09375rem;
+    height: 0.25rem;
+    transform: translateX(-50%);
+  }
+
+  :global(.place-map-marker-closed-indicator::after) {
+    top: calc(50% - 0.046875rem);
+    width: 0.21875rem;
+    height: 0.09375rem;
+    transform: rotate(30deg);
+  }
+
+  :global(
+    .place-map-marker[data-open='false'] .place-map-marker-closed-indicator
+  ) {
+    display: block;
   }
 
   :global(.place-map-marker[data-status='planned'] .place-map-marker-point) {
