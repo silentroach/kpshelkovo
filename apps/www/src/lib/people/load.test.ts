@@ -2,7 +2,10 @@ import { readFile } from 'node:fs/promises';
 
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import type { EntityMentionTarget } from '../mentions';
+import {
+  createEntityMentionGraph,
+  type EntityMentionTarget,
+} from '../mentions';
 import type {
   NewsArchiveSummaryEntry,
   NewsArticleEntry,
@@ -437,7 +440,9 @@ describe('buildPeopleDataset', () => {
     );
     const graph = buildPeopleGraphDataset(
       people,
-      sourceRefs({ people, contacts, news, places, status }),
+      createEntityMentionGraph(
+        sourceRefs({ people, contacts, news, places, status }),
+      ),
     );
 
     expect(graph.bySlug.get('kschemelinin')?.backlinks).toMatchObject({
@@ -534,7 +539,7 @@ describe('buildPeopleDataset', () => {
     );
     const graph = buildPeopleGraphDataset(
       people,
-      sourceRefs({ people, news, status }),
+      createEntityMentionGraph(sourceRefs({ people, news, status })),
     );
     const backlinks = graph.bySlug.get('kschemelinin')?.backlinks;
 

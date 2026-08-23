@@ -8,8 +8,14 @@ import {
 import { absoluteUrl } from '@/lib/site';
 
 import { placesMarkdownUrl, placesUrl } from './routes';
-import type { Place } from './types';
-import { formatPlaceCategory, formatPlaceStatus } from './view';
+import type { Place, PlaceMentionRef, PlaceWithBacklinks } from './types';
+import {
+  formatPlaceBacklinkDate,
+  formatPlaceBacklinkKind,
+  formatPlaceCategory,
+  formatPlaceStatus,
+  placeBacklinkGroups,
+} from './view';
 
 export const PLACES_MARKDOWN_HEADERS = {
   'Content-Type': 'text/markdown; charset=utf-8',
@@ -27,6 +33,38 @@ const placeLine = (place: Place) =>
       md.text(` — ${place.summary}`),
     ]),
   ]);
+
+const inline = (value: string): string => value.replace(/\s+/gu, ' ').trim();
+
+const backlinkLine = (backlink: PlaceMentionRef) => {
+  const meta = [
+    formatPlaceBacklinkKind(backlink.kind),
+    formatPlaceBacklinkDate(backlink),
+  ].filter((value): value is string => Boolean(value));
+  const details = meta.length > 0 ? ` — ${meta.join('; ')}` : '';
+
+  return md.listItem([
+    md.paragraph([
+      md.link(absoluteUrl(backlink.markdownUrl), backlink.title),
+      ...(details ? [md.text(details)] : []),
+    ]),
+    ...(backlink.excerpt ? [md.paragraph(inline(backlink.excerpt))] : []),
+  ]);
+};
+
+const backlinksSection = (place: PlaceWithBacklinks) => {
+  const groups = placeBacklinkGroups(place.backlinks);
+
+  return [
+    md.heading(2, 'Где упоминается'),
+    ...(groups.length > 0
+      ? groups.flatMap((group) => [
+          md.heading(3, group.label),
+          md.list(group.items.map(backlinkLine)),
+        ])
+      : [md.list([md.listItem('Пока публичных упоминаний не найдено.')])]),
+  ];
+};
 
 export const buildPlacesMarkdown = (places: readonly Place[]): string =>
   serialize([
@@ -46,7 +84,7 @@ export const buildPlacesMarkdown = (places: readonly Place[]): string =>
     ),
   ]);
 
-export const buildPlaceMarkdown = (place: Place): string =>
+export const buildPlaceMarkdown = (place: PlaceWithBacklinks): string =>
   serialize([
     md.heading(1, place.name),
     md.paragraph(place.summary),
@@ -88,4 +126,5 @@ export const buildPlaceMarkdown = (place: Place): string =>
         ]),
       ]),
     ]),
+    ...backlinksSection(place),
   ]);

@@ -4,6 +4,10 @@ import type { PreprocessedSiteMarkdownBody } from '@/lib/markdown/render';
 import type {
   EntityMentionLabelCaseForms,
   EntityMentionTarget,
+  SiteBacklinkKind,
+  SiteBacklinks,
+  SiteMentionRef,
+  SiteMentionSection,
 } from '@/lib/mentions';
 
 import type { RawPlace } from './raw-schema';
@@ -70,6 +74,11 @@ export interface PlaceMentionTarget extends EntityMentionTarget {
   readonly nameCases?: PlaceNameCaseForms;
 }
 
+export type PlaceMentionSection = SiteMentionSection;
+export type PlaceBacklinkKind = SiteBacklinkKind;
+export type PlaceMentionRef = SiteMentionRef;
+export type PlaceBacklinks = SiteBacklinks;
+
 export interface Place {
   readonly slug: string;
   readonly name: string;
@@ -95,4 +104,13 @@ export interface Place {
 export interface PlacesDataset {
   readonly places: readonly Place[];
   readonly bySlug: ReadonlyMap<string, Place>;
+}
+
+export interface PlaceWithBacklinks extends Place {
+  readonly backlinks: PlaceBacklinks;
+}
+
+export interface PlacesWithBacklinksDataset {
+  readonly places: readonly PlaceWithBacklinks[];
+  readonly bySlug: ReadonlyMap<string, PlaceWithBacklinks>;
 }

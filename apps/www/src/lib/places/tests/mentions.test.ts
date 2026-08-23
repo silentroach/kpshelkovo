@@ -6,6 +6,7 @@ import { createPlaceMentionRefs, createPlaceMentionTarget } from '../mentions';
 import type { Place } from '../types';
 
 const target = createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин');
+const placeTarget = createPlaceMentionTarget('apple-garden', 'Яблоневый сад');
 
 const place = (mentions: Place['mentions'] = [target]) => ({
   slug: 'burzhuyka',
@@ -68,5 +69,12 @@ describe('createPlaceMentionRefs', () => {
 
   it('dedupes repeated targets inside one place', () => {
     expect(createPlaceMentionRefs(place([target, target]))).toHaveLength(1);
+  });
+
+  it('preserves a place target in a place source ref', () => {
+    expect(createPlaceMentionRefs(place([placeTarget]))[0]?.target).toEqual({
+      type: 'place',
+      slug: 'apple-garden',
+    });
   });
 });

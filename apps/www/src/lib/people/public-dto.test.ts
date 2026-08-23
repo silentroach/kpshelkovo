@@ -36,11 +36,11 @@ const profile = (): PersonProfile => ({
   body: 'Публичный профиль.',
   mentions: [
     {
-      type: 'person',
-      slug: 'apetrov',
-      label: 'Андрей Петров',
-      htmlUrl: '/people/apetrov/',
-      markdownUrl: '/people/apetrov/index.md',
+      type: 'place',
+      slug: 'apple-garden',
+      label: 'Яблоневый сад',
+      htmlUrl: '/map/apple-garden/',
+      markdownUrl: '/map/apple-garden/index.md',
     },
   ],
   backlinks: {
@@ -126,10 +126,11 @@ describe('people public DTO adapters', () => {
             "mention_count": 1,
             "mentions": [
               {
-                "html_url": "https://example.com/people/apetrov/",
-                "markdown_url": "https://example.com/people/apetrov/index.md",
-                "name": "Андрей Петров",
-                "slug": "apetrov",
+                "html_url": "https://example.com/map/apple-garden/",
+                "markdown_url": "https://example.com/map/apple-garden/index.md",
+                "name": "Яблоневый сад",
+                "slug": "apple-garden",
+                "type": "place",
               },
             ],
             "name": "Кирилл Щемелинин",
