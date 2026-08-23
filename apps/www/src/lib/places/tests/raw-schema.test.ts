@@ -4,6 +4,9 @@ import { RawPlaceSchema } from '../raw-schema';
 
 const place = {
   title: 'Буржуйка',
+  name_cases: {
+    gen: 'Буржуйки',
+  },
   category: 'food',
   marker: 'foodtruck',
   status: 'existing',
@@ -42,6 +45,9 @@ describe('RawPlaceSchema', () => {
           "map_url": "https://yandex.ru/navi/-/CTfgq-5r",
         },
         "marker": "foodtruck",
+        "name_cases": {
+          "gen": "Буржуйки",
+        },
         "opening_hours": {
           "description": "С 10:00 до 22:00, вторник — выходной",
           "periods": [

@@ -3,7 +3,8 @@ import { extractFirstMarkdownText } from '@shelkovo/markdown';
 import { createEntityMentionSourceRefs } from '@/lib/mentions';
 import type { EntityMentionSourceRef } from '@/lib/mentions';
 
-import type { Place } from './types';
+import { placeMarkdownUrl, placeUrl } from './routes';
+import type { Place, PlaceMentionTarget, PlaceNameCaseForms } from './types';
 
 type PlaceMentionRefSource = Pick<
   Place,
@@ -11,6 +12,21 @@ type PlaceMentionRefSource = Pick<
 >;
 
 const SPACE = /\s+/gu;
+
+export const createPlaceMentionTarget = (
+  slug: string,
+  name: string,
+  nameCases?: PlaceNameCaseForms,
+): PlaceMentionTarget => ({
+  type: 'place',
+  slug,
+  label: name,
+  name,
+  labelCases: nameCases,
+  nameCases,
+  htmlUrl: placeUrl(slug),
+  markdownUrl: placeMarkdownUrl(slug),
+});
 
 const excerpt = (markdown: string): string | undefined => {
   const first = extractFirstMarkdownText(markdown);
@@ -31,4 +47,5 @@ export const createPlaceMentionRefs = (
     htmlUrl: place.url,
     markdownUrl: place.markdownUrl,
     excerpt: excerpt(place.body),
+    sourceEntity: { type: 'place', slug: place.slug },
   });

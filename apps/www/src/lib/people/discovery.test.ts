@@ -7,6 +7,14 @@ import type {
 } from '@/lib/public-surface';
 import type { expectSectionCatalogMatchesRegistry as expectSectionCatalogMatchesRegistryType } from '@/lib/public-surface/catalog-contract.test-helper';
 
+interface SchemaDefinition {
+  readonly required?: readonly string[];
+  readonly enum?: readonly string[];
+  readonly properties?: Readonly<
+    Record<string, { readonly enum?: readonly string[] }>
+  >;
+}
+
 let buildPeoplePayload: typeof import('./discovery').buildPeoplePayload;
 let catalog: typeof import('./discovery').catalog;
 let expectSectionCatalogMatchesRegistry: typeof expectSectionCatalogMatchesRegistryType;
@@ -36,11 +44,11 @@ const profile = (): PersonProfile => ({
   body: 'Как отметил [Кирилл Щемелинин](/people/kschemelinin/), проблема редкая.',
   mentions: [
     {
-      type: 'person',
-      slug: 'apetrov',
-      label: 'Андрей Петров',
-      htmlUrl: '/people/apetrov/',
-      markdownUrl: '/people/apetrov/index.md',
+      type: 'place',
+      slug: 'apple-garden',
+      label: 'Яблоневый сад',
+      htmlUrl: '/map/apple-garden/',
+      markdownUrl: '/map/apple-garden/index.md',
     },
   ],
   backlinks: {
@@ -124,9 +132,10 @@ describe('people discovery payload', () => {
       ],
       mentions: [
         {
-          slug: 'apetrov',
-          html_url: 'https://example.com/people/apetrov/',
-          markdown_url: 'https://example.com/people/apetrov/index.md',
+          type: 'place',
+          slug: 'apple-garden',
+          html_url: 'https://example.com/map/apple-garden/',
+          markdown_url: 'https://example.com/map/apple-garden/index.md',
         },
       ],
       backlinks: {
@@ -155,15 +164,9 @@ describe('people discovery payload', () => {
     const root = 'https://example.com';
     const jsonSchema = schema(root) as {
       readonly description?: string;
-      readonly $defs?: Record<
-        string,
-        { readonly required?: readonly string[] }
-      >;
+      readonly $defs?: Record<string, SchemaDefinition>;
     };
-    const defs = (jsonSchema.$defs ?? {}) as Record<
-      string,
-      { readonly required?: readonly string[] }
-    >;
+    const defs = jsonSchema.$defs ?? {};
     const api = openapi(root) as {
       readonly info?: { readonly description?: string };
       readonly paths?: Record<
@@ -187,13 +190,7 @@ describe('people discovery payload', () => {
         readonly schemas?: Record<
           string,
           {
-            readonly $defs?: Record<
-              string,
-              {
-                readonly required?: readonly string[];
-                readonly enum?: readonly string[];
-              }
-            >;
+            readonly $defs?: Record<string, SchemaDefinition>;
           }
         >;
       };
@@ -251,6 +248,13 @@ describe('people discovery payload', () => {
       ]),
     );
     expect(openapiDefs.contactType?.enum).toEqual(['phone', 'telegram']);
+    expect(defs.mention).toMatchObject({
+      required: ['type', 'slug', 'name', 'html_url', 'markdown_url'],
+      properties: {
+        type: { enum: ['person', 'place'] },
+      },
+    });
+    expect(openapiDefs.mention).toMatchObject(defs.mention ?? {});
     expect(openapiDefs.section?.enum).toEqual([
       'news',
       'status',

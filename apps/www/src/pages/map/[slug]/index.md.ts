@@ -1,6 +1,6 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
-import { loadPlace, loadPlaces } from '@/lib/places/load';
+import { loadPlaces, loadPlaceWithBacklinks } from '@/lib/places/load';
 import {
   buildPlaceMarkdown,
   PLACES_MARKDOWN_HEADERS,
@@ -21,7 +21,7 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error('place slug is required');
   }
 
-  const place = await loadPlace(slug);
+  const place = await loadPlaceWithBacklinks(slug);
 
   if (!place) {
     throw new Error(`place "${slug}" not found`);

@@ -1,14 +1,6 @@
-import {
-  createEntityMentionGraph,
-  type EntityMentionSourceRef,
-} from '../mentions';
-import { createContactMentionRefs } from '../contacts/mentions';
-import { createNewsArticleMentionRefs } from '../news/mentions';
-import { createPlaceMentionRefs } from '../places/mentions';
-import { createReviewMentionRefs } from '../reviews/mentions';
-import { createStatusIncidentMentionRefs } from '../status/mentions';
+import type { EntityMentionGraph } from '../mentions';
+import { loadSiteMentionGraph } from '../site-mention-graph';
 import { createPeopleBacklinksFromGraph } from './backlinks';
-import { createPersonProfileMentionRefs } from './mention-refs';
 import { loadPeopleData, type PeopleDataset } from './registry';
 import type { PersonProfile } from './types';
 
@@ -23,10 +15,8 @@ let graphCache: Promise<PeopleDataset> | undefined;
 
 export const buildPeopleGraphDataset = (
   people: PeopleDataset,
-  refs: readonly EntityMentionSourceRef[],
+  graph: EntityMentionGraph,
 ): PeopleDataset => {
-  const graph = createEntityMentionGraph(refs);
-
   const profiles = people.profiles.map((profile) => ({
     ...profile,
     backlinks: createPeopleBacklinksFromGraph(graph, profile),
@@ -40,40 +30,12 @@ export const buildPeopleGraphDataset = (
 };
 
 const buildPeopleDataWithBacklinks = async (): Promise<PeopleDataset> => {
-  const [
-    { loadContactsData },
-    { loadNewsData },
-    { loadStatusData },
-    { loadReviewsData },
-    { loadPlacesData },
-    people,
-  ] = await Promise.all([
-    import('../contacts/load'),
-    import('../news/load'),
-    import('../status/load'),
-    import('../reviews/load'),
-    import('../places/load'),
+  const [people, graph] = await Promise.all([
     loadPeopleData(),
+    loadSiteMentionGraph(),
   ]);
-  const [contacts, news, status, reviews, places] = await Promise.all([
-    loadContactsData(),
-    loadNewsData(),
-    loadStatusData(),
-    loadReviewsData(),
-    loadPlacesData(),
-  ]);
-  const refs = [
-    ...contacts.contacts.flatMap((contact) =>
-      contact.hasDetailPage ? createContactMentionRefs(contact) : [],
-    ),
-    ...news.articles.flatMap(createNewsArticleMentionRefs),
-    ...status.incidents.flatMap(createStatusIncidentMentionRefs),
-    ...reviews.reviews.flatMap(createReviewMentionRefs),
-    ...places.places.flatMap(createPlaceMentionRefs),
-    ...people.profiles.flatMap(createPersonProfileMentionRefs),
-  ];
 
-  return buildPeopleGraphDataset(people, refs);
+  return buildPeopleGraphDataset(people, graph);
 };
 
 export const loadPeopleDataWithBacklinks = (): Promise<PeopleDataset> => {

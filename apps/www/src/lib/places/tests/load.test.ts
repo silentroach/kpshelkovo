@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildPlacesDataset } from '../load';
+import {
+  createEntityMentionGraph,
+  createSiteMentionRegistry,
+} from '@/lib/mentions';
+
+import { buildPlacesDataset, buildPlacesGraphDataset } from '../load';
+import { createPlaceMentionTarget } from '../mentions';
 import type { RawPlace } from '../raw-schema';
 import type { PlaceEntry, PlaceGeometry } from '../types';
 
@@ -23,6 +29,9 @@ const geometry: PlaceGeometry = {
 
 const rawPlace = (overrides?: Partial<RawPlace>): RawPlace => ({
   title: 'Буржуйка',
+  name_cases: {
+    gen: 'Буржуйки',
+  },
   category: 'food',
   marker: 'foodtruck',
   status: 'existing',
@@ -81,6 +90,9 @@ describe('buildPlacesDataset', () => {
         "marker": "foodtruck",
         "mentions": [],
         "name": "Буржуйка",
+        "nameCases": {
+          "gen": "Буржуйки",
+        },
         "openingHours": {
           "description": "С 10:00 до 22:00, вторник — выходной",
           "periods": [
@@ -163,5 +175,73 @@ describe('buildPlacesDataset', () => {
         "openingHours": undefined,
       }
     `);
+  });
+
+  it('resolves another place in a place body', () => {
+    const mentionRegistry = createSiteMentionRegistry([
+      createPlaceMentionTarget('burzhuyka', 'Буржуйка'),
+      createPlaceMentionTarget('apple-garden', 'Яблоневый сад', {
+        gen: 'Яблоневого сада',
+      }),
+    ]);
+    const data = buildPlacesDataset(
+      [entry({ body: 'Можно дойти от @apple-garden:gen.' })],
+      {
+        contactUrls: new Map([['food/burzhuyka', '/sarafan/food/burzhuyka/']]),
+        mentionRegistry,
+      },
+    );
+
+    expect(data.places[0]?.body).toBe(
+      'Можно дойти от [Яблоневого сада](/map/apple-garden/).',
+    );
+  });
+
+  it('projects site graph refs targeting a place onto the detail dataset', () => {
+    const places = buildPlacesDataset([entry()], {
+      contactUrls: new Map([['food/burzhuyka', '/sarafan/food/burzhuyka/']]),
+    });
+    const graph = createEntityMentionGraph([
+      {
+        target: { type: 'place', slug: 'burzhuyka' },
+        source: { section: 'news', kind: 'article', id: '2026/07/food-truck' },
+        title: 'В Шелково открылся фудтрак',
+        htmlUrl: '/news/2026/07/food-truck/',
+        markdownUrl: '/news/2026/07/food-truck/index.md',
+      },
+    ]);
+    const enriched = buildPlacesGraphDataset(places, graph);
+
+    expect(enriched.bySlug.get('burzhuyka')).toBe(enriched.places[0]);
+    expect(enriched.places[0]?.backlinks.news).toMatchInlineSnapshot(`
+      [
+        {
+          "excerpt": undefined,
+          "htmlUrl": "/news/2026/07/food-truck/",
+          "kind": "article",
+          "markdownUrl": "/news/2026/07/food-truck/index.md",
+          "mentionedAt": undefined,
+          "section": "news",
+          "sortKey": undefined,
+          "sourceId": "2026/07/food-truck",
+          "title": "В Шелково открылся фудтрак",
+        },
+      ]
+    `);
+  });
+
+  it('rejects a place that mentions itself', () => {
+    const mentionRegistry = createSiteMentionRegistry([
+      createPlaceMentionTarget('burzhuyka', 'Буржуйка'),
+    ]);
+
+    expect(() =>
+      buildPlacesDataset([entry({ body: 'Описание @burzhuyka.' })], {
+        contactUrls: new Map([['food/burzhuyka', '/sarafan/food/burzhuyka/']]),
+        mentionRegistry,
+      }),
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: place "burzhuyka" body contains self entity mention "place:burzhuyka"]`,
+    );
   });
 });

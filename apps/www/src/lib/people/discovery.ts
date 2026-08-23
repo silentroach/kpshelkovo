@@ -8,6 +8,7 @@ export {
   type PeoplePublicProfileDto as PeopleDiscoveryProfile,
 } from './public-dto';
 import { PERSON_BACKLINK_KINDS, PERSON_MENTION_SECTIONS } from './schema';
+import { ENTITY_MENTION_TYPES } from '@/lib/mentions';
 import {
   peopleApiCatalogPath,
   peopleDataPath,
@@ -103,7 +104,7 @@ export function schema(root: string): Record<string, unknown> {
     $id: abs(root, peopleSchemaPath()),
     title: 'PeoplePayload',
     description:
-      'Полная лента профилей людей только для чтения с публичными контактами, упоминаниями и обратными ссылками по всему сайту. Упоминания учитывают `@slug`, `@slug:case` и `[текст](@slug)`; `[текст](@slug:case)` не поддерживается.',
+      'Полная лента профилей людей только для чтения с публичными контактами, упоминаниями и обратными ссылками по всему сайту. Исходящие упоминания людей и мест различаются по обязательному полю `type`. Упоминания учитывают `@slug`, `@slug:case` и `[текст](@slug)`; `[текст](@slug:case)` не поддерживается.',
     type: 'object',
     additionalProperties: false,
     required: ['stats', 'profiles'],
@@ -148,6 +149,9 @@ export function schema(root: string): Record<string, unknown> {
       ),
       mention: obj(
         {
+          type: {
+            enum: ENTITY_MENTION_TYPES,
+          },
           slug: text(1),
           name: text(1),
           company: text(1),
@@ -155,7 +159,7 @@ export function schema(root: string): Record<string, unknown> {
           html_url: uri(),
           markdown_url: uri(),
         },
-        ['slug', 'name', 'html_url', 'markdown_url'],
+        ['type', 'slug', 'name', 'html_url', 'markdown_url'],
       ),
       backlink: obj(
         {
@@ -264,7 +268,7 @@ export function openapi(root: string): Record<string, unknown> {
       title: 'Шелково People Feed',
       version: '1.0.0',
       description:
-        'OpenAPI-описание /people/data/people.json только для чтения с публичными профилями, контактами, упоминаниями и обратными ссылками. Упоминания учитывают `@slug`, `@slug:case` и `[текст](@slug)`; `[текст](@slug:case)` не поддерживается.',
+        'OpenAPI-описание /people/data/people.json только для чтения с публичными профилями, контактами, упоминаниями и обратными ссылками. Исходящие упоминания людей и мест различаются по обязательному полю `type`. Упоминания учитывают `@slug`, `@slug:case` и `[текст](@slug)`; `[текст](@slug:case)` не поддерживается.',
     },
     servers: [
       {
@@ -277,7 +281,7 @@ export function openapi(root: string): Record<string, unknown> {
           operationId: 'getPeopleProfiles',
           summary: 'Получить полную ленту профилей людей',
           description:
-            'Возвращает основную структурированную ленту профилей людей с контактами, упоминаниями и обратными ссылками. Упоминания учитывают `@slug`, `@slug:case` и `[текст](@slug)`; `[текст](@slug:case)` не поддерживается.',
+            'Возвращает основную структурированную ленту профилей людей с контактами, упоминаниями и обратными ссылками. Поле `mentions[].type` различает людей и места. Упоминания учитывают `@slug`, `@slug:case` и `[текст](@slug)`; `[текст](@slug:case)` не поддерживается.',
           responses: {
             200: {
               description: 'Полная лента профилей людей',

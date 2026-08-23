@@ -1,5 +1,8 @@
 import type { SiteMentionRegistry } from '@/lib/mentions';
-import { renderMarkdown } from '@/lib/markdown/render';
+import {
+  preprocessSiteMarkdownContent,
+  renderMarkdown,
+} from '@/lib/markdown/render';
 
 import { parseMeetingTimestamp } from './date';
 import type {
@@ -142,18 +145,20 @@ const mapSegment = (
     throw new Error(`${context} start cannot be earlier than previous segment`);
   }
 
+  const textMarkdown = preprocessSiteMarkdownContent(
+    raw.text,
+    `${context} text`,
+    mentionRegistry,
+  ).markdown;
+
   return {
     anchor: segmentAnchor(start, anchorCounts),
     start,
     speakerId: raw.speaker,
     speaker,
     text: raw.text,
-    textHtml: renderMarkdown(raw.text, {
-      mentions: {
-        context: `${context} text`,
-        registry: mentionRegistry,
-      },
-    }),
+    textMarkdown,
+    textHtml: renderMarkdown(textMarkdown),
   };
 };
 

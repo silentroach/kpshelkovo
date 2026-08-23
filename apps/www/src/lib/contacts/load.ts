@@ -2,7 +2,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { compareRuText } from '@shelkovo/format';
 
 import type { SiteMentionRegistry } from '@/lib/mentions';
-import { loadPeopleMentionRegistry } from '@/lib/people/registry';
+import { loadSiteMentionRegistry } from '@/lib/mentions/registry';
 
 import { mapRawContact } from './mapper';
 import type { RawContact } from './raw-schema';
@@ -85,7 +85,7 @@ export const buildContactsDataset = (
 
 const buildContactsData = async (): Promise<ContactsDataset> =>
   buildContactsDataset(await getCollection('contacts'), {
-    mentionRegistry: await loadPeopleMentionRegistry(),
+    mentionRegistry: await loadSiteMentionRegistry(),
   });
 
 export const loadContactsData = (): Promise<ContactsDataset> => {

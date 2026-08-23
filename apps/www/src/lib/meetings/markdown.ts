@@ -140,7 +140,7 @@ const segmentLine = (
   segment: MeetingTranscriptSegment,
 ): MarkdownListItem => {
   const lead = segmentLead(meeting, segment);
-  const blocks = segmentTextBlocks(segment.text);
+  const blocks = segmentTextBlocks(segment.textMarkdown);
   const [first, ...rest] = blocks;
 
   if (first?.type === 'paragraph') {

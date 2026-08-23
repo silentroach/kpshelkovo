@@ -33,6 +33,7 @@ const meeting = (): Meeting => {
     speakerId: speaker.id,
     speaker,
     text: 'Добрый день. Начинаем встречу.',
+    textMarkdown: 'Добрый день. Начинаем встречу.',
     textHtml: '<p>Добрый день. Начинаем встречу.</p>',
   };
   const second = {
@@ -41,6 +42,7 @@ const meeting = (): Meeting => {
     speakerId: speaker.id,
     speaker,
     text: 'Полный текст второй реплики хранится только в файле части.',
+    textMarkdown: 'Полный текст второй реплики хранится только в файле части.',
     textHtml:
       '<p>Полный текст второй реплики хранится только в файле части.</p>',
   };
@@ -50,6 +52,7 @@ const meeting = (): Meeting => {
     speakerId: speaker.id,
     speaker,
     text: 'Вторая часть начинается заново с нуля.',
+    textMarkdown: 'Вторая часть начинается заново с нуля.',
     textHtml: '<p>Вторая часть начинается заново с нуля.</p>',
   };
 
@@ -187,6 +190,7 @@ describe('meetings markdown', () => {
         {
           ...segment,
           text: 'Категории:\n\n- Первая.\n- Вторая.\n- Третья.',
+          textMarkdown: 'Категории:\n\n- Первая.\n- Вторая.\n- Третья.',
         },
       ],
     };

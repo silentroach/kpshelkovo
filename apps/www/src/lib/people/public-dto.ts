@@ -17,6 +17,7 @@ export interface PeoplePublicContactDto {
 }
 
 export interface PeoplePublicMentionDto {
+  readonly type: EntityMentionTarget['type'];
   readonly slug: string;
   readonly name: string;
   readonly company?: string;
@@ -91,6 +92,7 @@ const mentionDto = (item: EntityMentionTarget): PeoplePublicMentionDto => {
   const position = 'position' in item ? item.position : undefined;
 
   return {
+    type: item.type,
     slug: item.slug,
     name: item.label,
     ...(typeof company === 'string' ? { company } : {}),

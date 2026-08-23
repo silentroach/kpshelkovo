@@ -2,7 +2,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import { preprocessSiteMarkdownContent } from '@/lib/markdown/render';
 import type { SiteMentionRegistry } from '@/lib/mentions';
-import { loadPeopleMentionRegistry } from '@/lib/people/registry';
+import { loadSiteMentionRegistry } from '@/lib/mentions/registry';
 import { kbCanonical, kbDetailCanonical, kbDetailUrl, kbUrl } from './routes';
 import type { KbDataset, KbPage, KbPageFlag } from './types';
 
@@ -151,7 +151,7 @@ export const loadKbData = (): Promise<KbDataset> => {
       ({ getCollection }) =>
         getCollection('kbPages') as Promise<readonly KbPageEntry[]>,
     ),
-    loadPeopleMentionRegistry(),
+    loadSiteMentionRegistry(),
   ]).then(([entries, mentionRegistry]) =>
     buildKbDataset(entries, { mentionRegistry }),
   );

@@ -8,9 +8,14 @@ import PlaceOpeningHours from '@/components/places/PlaceOpeningHours.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
 import { renderMarkdown } from '@/lib/markdown/render';
-import { loadPlace, loadPlaces } from '@/lib/places/load';
+import { loadPlaces, loadPlaceWithBacklinks } from '@/lib/places/load';
 import { placeHighlightUrl, placesUrl } from '@/lib/places/routes';
-import { formatPlaceCategory } from '@/lib/places/view';
+import {
+  formatPlaceBacklinkDate,
+  formatPlaceBacklinkKind,
+  formatPlaceCategory,
+  placeBacklinkGroups,
+} from '@/lib/places/view';
 import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
 
@@ -26,7 +31,7 @@ if (!slug) {
   throw new Error('place slug is required');
 }
 
-const place = await loadPlace(slug);
+const place = await loadPlaceWithBacklinks(slug);
 
 if (!place) {
   throw new Error(`place "${slug}" not found`);
@@ -47,6 +52,7 @@ const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Карта', href: placesUrl() },
   { label: place.name },
 ]);
+const backlinkGroups = placeBacklinkGroups(place.backlinks);
 const search = {
   scope: 'page',
   title: place.name,
@@ -148,6 +154,71 @@ const schema = {
           ) : null
         }
       </nav>
+
+      {
+        backlinkGroups.length > 0 ? (
+          <section
+            aria-labelledby="place-backlinks"
+            class="mt-10 border-t border-border pt-8"
+            data-pagefind-ignore="all"
+          >
+            <div class="space-y-1.5">
+              <h2 id="place-backlinks" class="ui-section-label">
+                Где упоминается
+              </h2>
+              <p class="text-sm leading-6 text-muted-foreground">
+                Материалы сайта, в которых упомянуто это место.
+              </p>
+            </div>
+
+            <div class="mt-6 space-y-7">
+              {backlinkGroups.map((group) => (
+                <section
+                  aria-labelledby={`place-backlinks-${group.section}`}
+                  class="space-y-2"
+                >
+                  <h3
+                    id={`place-backlinks-${group.section}`}
+                    class="font-body text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
+                  >
+                    {group.label}
+                  </h3>
+
+                  <ul class="divide-y divide-border border-y border-border">
+                    {group.items.map((backlink) => (
+                      <li class="py-4">
+                        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5 text-muted-foreground">
+                          <span class="font-semibold uppercase tracking-[0.06em]">
+                            {formatPlaceBacklinkKind(backlink.kind)}
+                          </span>
+                          {backlink.mentionedAt && (
+                            <time datetime={backlink.mentionedAt}>
+                              {formatPlaceBacklinkDate(backlink)}
+                            </time>
+                          )}
+                        </div>
+
+                        <a
+                          href={backlink.htmlUrl}
+                          class="site-text-link mt-1 block max-w-[65ch] text-base font-semibold leading-6"
+                          set:html={formatDynamicHtml(backlink.title)}
+                        />
+
+                        {backlink.excerpt && (
+                          <p
+                            class="mt-1.5 max-w-[65ch] text-sm leading-6 text-muted-foreground"
+                            set:html={formatDynamicHtml(backlink.excerpt)}
+                          />
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
+            </div>
+          </section>
+        ) : null
+      }
     </article>
   </main>
 </BaseLayout>

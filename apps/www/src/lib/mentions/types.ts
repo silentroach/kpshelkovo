@@ -11,7 +11,27 @@ export const ENTITY_MENTION_LABEL_CASES = [
   ...ENTITY_MENTION_ALTERNATE_LABEL_CASES,
 ] as const;
 
-export type EntityMentionType = 'person';
+export const ENTITY_MENTION_TYPES = ['person', 'place'] as const;
+export const SITE_MENTION_SECTIONS = [
+  'news',
+  'status',
+  'reviews',
+  'places',
+  'people',
+  'contacts',
+] as const;
+export const SITE_BACKLINK_KINDS = [
+  'article',
+  'incident',
+  'review',
+  'place',
+  'person',
+  'contact',
+] as const;
+
+export type EntityMentionType = (typeof ENTITY_MENTION_TYPES)[number];
+export type SiteMentionSection = (typeof SITE_MENTION_SECTIONS)[number];
+export type SiteBacklinkKind = (typeof SITE_BACKLINK_KINDS)[number];
 export type EntityMentionAlternateLabelCase =
   (typeof ENTITY_MENTION_ALTERNATE_LABEL_CASES)[number];
 export type EntityMentionLabelCase =
@@ -69,6 +89,27 @@ export interface EntityMentionGraphTarget {
 
 export interface EntityMentionGraph {
   readonly targets: ReadonlyMap<string, EntityMentionGraphTarget>;
+}
+
+export interface SiteMentionRef {
+  readonly section: SiteMentionSection;
+  readonly kind: SiteBacklinkKind;
+  readonly sourceId: string;
+  readonly title: string;
+  readonly htmlUrl: string;
+  readonly markdownUrl: string;
+  readonly excerpt?: string;
+  readonly mentionedAt?: string;
+  readonly sortKey?: number;
+}
+
+export interface SiteBacklinks {
+  readonly news: readonly SiteMentionRef[];
+  readonly status: readonly SiteMentionRef[];
+  readonly reviews: readonly SiteMentionRef[];
+  readonly places: readonly SiteMentionRef[];
+  readonly people: readonly SiteMentionRef[];
+  readonly contacts: readonly SiteMentionRef[];
 }
 
 export type SiteMentionRegistry = ReadonlyMap<string, EntityMentionTarget>;

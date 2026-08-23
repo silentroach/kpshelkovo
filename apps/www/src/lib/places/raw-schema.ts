@@ -14,6 +14,16 @@ import {
 
 const nonBlankText = z.string().trim().min(1);
 
+const nameCases = z
+  .object({
+    gen: nonBlankText.optional(),
+    dat: nonBlankText.optional(),
+    acc: nonBlankText.optional(),
+    ins: nonBlankText.optional(),
+    prep: nonBlankText.optional(),
+  })
+  .strict();
+
 const isHttpsUrl = (value: string): boolean => {
   try {
     return new URL(value).protocol === 'https:';
@@ -107,6 +117,7 @@ const openingHours = z
 export const RawPlaceSchema = z
   .object({
     title: nonBlankText,
+    name_cases: nameCases.optional(),
     category: z.enum(PLACE_CATEGORIES),
     marker: z.enum(PLACE_MARKERS).optional(),
     status: z.enum(PLACE_STATUSES),

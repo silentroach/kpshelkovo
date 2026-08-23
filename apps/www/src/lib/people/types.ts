@@ -1,5 +1,11 @@
 import type { PreprocessedSiteMarkdownBody } from '../markdown/render';
-import type { EntityMentionTarget } from '../mentions';
+import type {
+  EntityMentionTarget,
+  SiteBacklinkKind,
+  SiteBacklinks,
+  SiteMentionRef,
+  SiteMentionSection,
+} from '../mentions';
 import type { PersonNameCaseForms } from './name-cases';
 import type { PeopleMentionRegistry } from './mentions';
 
@@ -12,31 +18,10 @@ export interface PersonContact {
   readonly href: string;
 }
 
-export type PersonMentionSection =
-  'news' | 'status' | 'reviews' | 'places' | 'people' | 'contacts';
-export type PersonBacklinkKind =
-  'article' | 'incident' | 'review' | 'place' | 'person' | 'contact';
-
-export interface PersonMentionRef {
-  readonly section: PersonMentionSection;
-  readonly kind: PersonBacklinkKind;
-  readonly sourceId: string;
-  readonly title: string;
-  readonly htmlUrl: string;
-  readonly markdownUrl: string;
-  readonly excerpt?: string;
-  readonly mentionedAt?: string;
-  readonly sortKey?: number;
-}
-
-export interface PersonBacklinks {
-  readonly news: readonly PersonMentionRef[];
-  readonly status: readonly PersonMentionRef[];
-  readonly reviews: readonly PersonMentionRef[];
-  readonly places: readonly PersonMentionRef[];
-  readonly people: readonly PersonMentionRef[];
-  readonly contacts: readonly PersonMentionRef[];
-}
+export type PersonMentionSection = SiteMentionSection;
+export type PersonBacklinkKind = SiteBacklinkKind;
+export type PersonMentionRef = SiteMentionRef;
+export type PersonBacklinks = SiteBacklinks;
 
 export interface PersonProfile {
   readonly id: string;

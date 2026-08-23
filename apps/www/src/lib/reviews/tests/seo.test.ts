@@ -64,6 +64,46 @@ describe('reviews schema', () => {
     expect(schema).toMatchSnapshot();
   });
 
+  it('publishes people and places with their matching schema types', () => {
+    const schema = reviewPageSchema({
+      review: {
+        ...review,
+        mentions: [
+          {
+            type: 'person',
+            slug: 'kschemelinin',
+            label: 'Кирилл Щемелинин',
+            htmlUrl: '/people/kschemelinin/',
+            markdownUrl: '/people/kschemelinin/index.md',
+          },
+          {
+            type: 'place',
+            slug: 'apple-garden',
+            label: 'Яблоневый сад',
+            htmlUrl: '/map/apple-garden/',
+            markdownUrl: '/map/apple-garden/index.md',
+          },
+        ],
+      },
+      description: 'Отзыв Алексея о жизни в Шелково.',
+    });
+
+    expect(schema[0]?.mentions).toMatchInlineSnapshot(`
+      [
+        {
+          "@type": "Person",
+          "name": "Кирилл Щемелинин",
+          "url": "https://example.com/people/kschemelinin/",
+        },
+        {
+          "@type": "Place",
+          "name": "Яблоневый сад",
+          "url": "https://example.com/map/apple-garden/",
+        },
+      ]
+    `);
+  });
+
   it('publishes one supported organization and rating per review aspect', () => {
     const schema = reviewPageSchema({
       review,

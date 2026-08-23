@@ -6,7 +6,7 @@ const fixtures = vi.hoisted(() => ({
       {
         canonical: 'https://example.com/people/kschemelinin/',
         markdownUrl: '/people/kschemelinin/index.md',
-        mentions: [{ slug: 'apetrov' }],
+        mentions: [{ type: 'place', slug: 'apple-garden' }],
         backlinks: {
           news: [{ sourceId: '2026/05/power-outage' }],
           status: [{ sourceId: '2026/04/electricity' }],
@@ -63,10 +63,16 @@ describe('people llms', () => {
 
       - Для массового обхода начинайте с <https://example.com/people/data/people.json>.
       - Для одной персоны переходите на <https://example.com/people/kschemelinin/> или <https://example.com/people/kschemelinin/index.md>.
-      - В \`mentions\` лежат исходящие упоминания из body профиля, если body заполнен; учитываются \`@slug\`, \`@slug:case\` и \`[текст](@slug)\`, а \`[текст](@slug:case)\` не поддерживается.
+      - В \`mentions\` лежат исходящие упоминания людей и мест из body профиля; обязательное поле \`type\` различает \`person\` и \`place\`. Учитываются \`@slug\`, \`@slug:case\` и \`[текст](@slug)\`, а \`[текст](@slug:case)\` не поддерживается.
       - В \`backlinks\` лежат входящие ссылки из новостей, статуса, отзывов, карты мест, других профилей и сарафана, собранные из тех же канонических и подписанных синтаксисов упоминаний.
       - Контакты публикуются открыто и не маскируются в ленте или Markdown-версиях.
       "
     `);
+  });
+
+  it('documents the mention target discriminator in the full overview', async () => {
+    await expect(build('full')).resolves.toContain(
+      'обязательное поле `type` со значением `person` или `place`',
+    );
   });
 });

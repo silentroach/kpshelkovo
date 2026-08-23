@@ -31,12 +31,14 @@ export const mapRawPlace = (
         markdown,
         `place "${entry.id}" body`,
         opts.mentionRegistry,
+        { type: 'place', slug: entry.id },
       )
     : preprocessSiteMarkdown(markdown);
 
   return {
     slug: entry.id,
     name: entry.data.title,
+    nameCases: entry.data.name_cases,
     category: entry.data.category,
     marker: entry.data.marker,
     status: entry.data.status,

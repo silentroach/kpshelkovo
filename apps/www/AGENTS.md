@@ -50,9 +50,10 @@ pnpm typecheck
 - Если нужна ссылка на compare, вести на `/815/compare/`, а не на legacy домен.
 - Если меняется deploy/base/root behavior, синхронно обновлять `ops/nginx/kpshelkovo-online.conf`.
 
-## People Mentions
+## Entity Mentions
 
 - Упоминания людей работают через общий app-level слой `src/lib/mentions`; `src/lib/people/mentions.ts` только адаптирует профиль человека в generic mention target.
+- Люди и места входят в единый `SiteMentionRegistry`; их короткие slug не должны пересекаться.
 - В `src/data/people/*.md` живут профили людей для раздела `/people/`; canonical slug человека равен имени файла без `.md`, например `kschemelinin`.
 - Если человек из `people` упоминается в `news`, `status` или другом редакционном Markdown body, в source markdown нужно писать `@slug`, `@slug:case` или `[видимый текст](@slug)`, а не plain text имя и не ручную ссылку на `/people/.../`.
 - `@slug` использовать, когда в тексте нужно показать каноническое имя человека в именительном падеже.
@@ -63,6 +64,8 @@ pnpm typecheck
 - При рендере canonical mention автоматически раскрывается в имя нужного падежа и ссылку на профиль; labelled mention сохраняет авторский видимый текст и заменяет `@slug` на ссылку профиля.
 - Не использовать `[текст](@slug:case)`: этот формат не поддерживается, потому что падеж в labelled mention должен быть написан в самом видимом тексте.
 - Неизвестный `@slug` или отсутствующий `name_cases.case` должен падать на билде и исправляться до merge.
+- Каноническое упоминание места раскрывается в название и ссылку `/map/[slug]/`; нужные падежные формы хранятся в `name_cases` места.
+- Профиль человека и место не могут упоминать сами себя в собственном Markdown body.
 - Если у профиля есть `position` и/или `company`, они должны попадать в title markdown-ссылки mention как контекст человека.
 - Для атрибуции к внешнему источнику ссылку ставь на вводную фразу, например `[По словам](https://t.me/...) @kschemelinin, ...`.
 - Source refs для backlinks публикуют соседние адаптеры разделов: `contacts/mentions.ts`, `news/mentions.ts`, `places/mentions.ts`, `reviews/mentions.ts`, `status/mentions.ts`, `people/mention-refs.ts`; общий graph не должен импортировать доменные datasets источников.

@@ -201,7 +201,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'Если задача относится к одному разделу, сначала откройте его `llms.txt` или Markdown-индекс; если нужны данные массово, сразу берите JSON-ленту там, где она есть.',
               `Новости: ${newsLlms}; основная лента: ${newsFeed}; календарные события лежат в \`articles[].events[].ics_url\`.`,
               `Статус сервисов: ${statusLlms}; основная лента: ${statusFeed}.`,
-              `Карта мест: ${placesMarkdown}; карточки: \`/map/[slug]/\` и \`/map/[slug]/index.md\`.`,
+              `Карта мест: ${placesMarkdown}; карточки: \`/map/[slug]/\` и \`/map/[slug]/index.md\`, включая входящие ссылки на материалы, где упомянуто место.`,
               `Отзывы собственников: ${reviewsMarkdown}; правила публикации: ${reviewsRulesMarkdown}; детальные страницы: \`/reviews/[id]/\` и \`/reviews/[id]/index.md\`.`,
               `Сарафан: ${contactsMarkdown}; разделы: \`/sarafan/[category]/\` и \`/sarafan/[category]/index.md\`; детальные страницы есть только у контактов с body и используют \`/sarafan/[category]/[slug]/\` и \`/sarafan/[category]/[slug]/index.md\`; если для контакта доступна vCard, ее адрес указан в \`vcf_url\`.`,
               `Архив встреч: ${meetingsMarkdown}; одна встреча: ${meetingHtml} или ${meetingMarkdown}; полный текст транскрипта берите по частям, например ${meetingTranscript}.`,
@@ -263,7 +263,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
             markdownList([
               `Интерактивная карта: ${placesHome}`,
               `Markdown-версия раздела: ${placesMarkdown}`,
-              'Карточки мест используют `/map/[slug]/` и `/map/[slug]/index.md`.',
+              'Карточки мест используют `/map/[slug]/` и `/map/[slug]/index.md` и показывают входящие ссылки на материалы, где упомянуто место.',
               `Сейчас на карте ${count(places.length, ['место', 'места', 'мест'])}.`,
               'Структурированной JSON-ленты пока нет; для машинного чтения используйте Markdown-страницы.',
             ]),

@@ -3,7 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import { compareRuText } from '@shelkovo/format';
 
 import type { SiteMentionRegistry } from '@/lib/mentions';
-import { loadPeopleMentionRegistry } from '@/lib/people/registry';
+import { loadSiteMentionRegistry } from '@/lib/mentions/registry';
 
 import { mapRawMeeting } from './mapper';
 import type { RawMeetingTranscriptEntryInput } from './mapper';
@@ -109,7 +109,7 @@ export const buildMeetingsDataset = (
 const buildMeetingsData = async (): Promise<MeetingsDataset> => {
   const [{ getCollection }, mentionRegistry] = await Promise.all([
     import('astro:content'),
-    loadPeopleMentionRegistry(),
+    loadSiteMentionRegistry(),
   ]);
   const [entries, transcripts] = await Promise.all([
     getCollection('meetingEntries') as Promise<readonly MeetingEntry[]>,
