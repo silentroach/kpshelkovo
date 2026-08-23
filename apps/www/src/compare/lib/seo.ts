@@ -109,9 +109,9 @@ export const settlementPageMeta = (
   const title = companyTitle(settlement);
   const name = companyName(settlement);
   const description = [
-    `${settlement.shortName}, ${settlement.location.district}.`,
+    `Сколько стоит жить в ${settlement.shortName}? Тариф на обслуживание — ${formatTariffAuto(settlement.tariff)} в месяц.`,
+    `${settlement.location.district}.`,
     companyDescription(settlement),
-    `Тариф ${formatTariffAuto(settlement.tariff)} в месяц.`,
     deltaDescription(settlement, comparison),
   ]
     .filter((item): item is string => Boolean(item))
