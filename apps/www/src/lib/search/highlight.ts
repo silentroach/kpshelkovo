@@ -6,6 +6,7 @@ import type {
 } from './highlight.types';
 
 export const SEARCH_HIGHLIGHT_PARAM = 'h';
+export const SEARCH_HIGHLIGHT_CLASS = 'search-highlight';
 
 const pagefindHighlightEntrypoint = '/search/pagefind-highlight.js';
 const searchHighlightMaxTerms = 20;
@@ -56,5 +57,8 @@ export const highlightSearchTerms = async (
   new PagefindHighlight({
     addStyles: false,
     highlightParam: SEARCH_HIGHLIGHT_PARAM,
+    markOptions: {
+      className: SEARCH_HIGHLIGHT_CLASS,
+    },
   });
 };

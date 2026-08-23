@@ -7,7 +7,10 @@ import {
 import { preview, type PreviewServer } from 'vite';
 import { afterAll, beforeAll, expect, test } from 'vitest';
 
-import { SEARCH_HIGHLIGHT_PARAM } from '../src/lib/search/highlight';
+import {
+  SEARCH_HIGHLIGHT_CLASS,
+  SEARCH_HIGHLIGHT_PARAM,
+} from '../src/lib/search/highlight';
 
 const port = 4330;
 const baseURL = `http://127.0.0.1:${String(port)}`;
@@ -299,7 +302,7 @@ test('#154 search result highlighting', async () => {
   await result.click();
   await expectPage(page).toHaveURL(target.href);
   await expectPage(
-    page.locator('mark.pagefind-highlight').first(),
+    page.locator(`mark.${SEARCH_HIGHLIGHT_CLASS}`).first(),
   ).toBeVisible();
   await page.close();
 });

@@ -366,7 +366,7 @@ html:has(.site-search-dialog[open]) {
 }
 
 .site-search-result-excerpt mark,
-.pagefind-highlight {
+.search-highlight {
   color: inherit;
   background: var(--color-accent-soft);
 }

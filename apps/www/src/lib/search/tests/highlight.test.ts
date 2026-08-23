@@ -61,6 +61,9 @@ describe('Pagefind result highlighting', () => {
             {
               "addStyles": false,
               "highlightParam": "h",
+              "markOptions": {
+                "className": "search-highlight",
+              },
             },
           ],
         ],
