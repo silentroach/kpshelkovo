@@ -129,6 +129,7 @@ filter_chunk=$(pick_file "$search_dir"/filter/*_*.pf_filter)
 fragment=$(pick_file "$search_dir"/fragment/*_*.pf_fragment)
 
 check_asset pagefind.js application/javascript "$stable_cache"
+check_asset pagefind-highlight.js application/javascript "$stable_cache"
 check_asset pagefind-worker.js application/javascript "$stable_cache"
 check_asset pagefind-entry.json application/json "$stable_cache"
 check_asset pagefind-ui.css text/css "$stable_cache"

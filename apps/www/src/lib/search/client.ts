@@ -15,12 +15,17 @@ import type {
   PagefindResultReference,
   PagefindRuntime,
 } from './client.internal.types';
+import {
+  normalizeSearchHighlightQuery,
+  SEARCH_HIGHLIGHT_PARAM,
+} from './highlight';
 
 const pagefindEntrypoint = '/search/pagefind.js';
 const canonicalUrlBase = 'https://kpshelkovo.online';
 const ignoredSingleLetterWords = new Set(['а', 'в', 'и', 'к', 'о', 'с', 'у']);
 const shortQueryMaxLength = 3;
 const pagefindOptions = {
+  highlightParam: SEARCH_HIGHLIGHT_PARAM,
   ranking: {
     metaWeights: {
       sectionId: 0,
@@ -107,7 +112,9 @@ const normalizeUrl = (
       return;
     }
 
-    return `${pathname}${requireAnchor ? url.hash : ''}`;
+    return `${pathname}${normalizeSearchHighlightQuery(url.search)}${
+      requireAnchor ? url.hash : ''
+    }`;
   } catch {
     return;
   }

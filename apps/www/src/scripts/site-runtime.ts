@@ -1,4 +1,5 @@
 import { installHomeStatusHydration } from '@/lib/home/status';
+import { highlightSearchTerms } from '@/lib/search/highlight';
 
 interface AstroBeforePreparationEvent extends Event {
   loader: () => Promise<void>;
@@ -15,6 +16,7 @@ declare global {
     __shelkovoSiteHeaderMenu?: boolean;
     __shelkovoSiteNavDropdowns?: boolean;
     __shelkovoSettlementsFallback?: boolean;
+    __shelkovoSearchHighlights?: boolean;
     __shelkovoYmDeferred?: boolean;
     __shelkovoYmLoaded?: boolean;
     __shelkovoYmTransitions?: boolean;
@@ -353,6 +355,31 @@ const bindSettlementsFallback = (): void => {
   });
 };
 
+const installSearchHighlights = (): void => {
+  if (window.__shelkovoSearchHighlights) {
+    return;
+  }
+
+  window.__shelkovoSearchHighlights = true;
+  let highlightedHref: string | undefined;
+  const highlight = (): void => {
+    const href = location.href;
+    if (highlightedHref === href) {
+      return;
+    }
+
+    highlightedHref = href;
+    void highlightSearchTerms(href).catch(() => {
+      if (highlightedHref === href) {
+        highlightedHref = undefined;
+      }
+    });
+  };
+
+  runWhenDocumentReady(highlight);
+  document.addEventListener('astro:page-load', highlight);
+};
+
 bindNavigationProgress();
 bindSiteHeaderMenu();
 installSiteNavDropdowns();
@@ -360,5 +387,6 @@ runWhenDocumentReady(() => installHomeStatusHydration());
 bindMetrikaLoader();
 bindMetrikaTransitions();
 bindSettlementsFallback();
+installSearchHighlights();
 
 export {};
