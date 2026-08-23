@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 import type { SiteMentionRegistry } from '@/lib/mentions';
 import type { createPersonMentionTarget as createPersonMentionTargetType } from '@/lib/people/mentions';
+import type { createPlaceMentionTarget as createPlaceMentionTargetType } from '@/lib/places/mentions';
 
 import type {
   RawMeetingTranscriptEntryInput,
@@ -11,6 +12,8 @@ import type { RawMeeting, RawMeetingTranscript } from './raw-schema';
 
 let mapRawMeeting: typeof mapRawMeetingType;
 let createPersonMentionTarget: typeof createPersonMentionTargetType;
+let createPlaceMentionTarget: typeof createPlaceMentionTargetType;
+let buildMeetingTranscriptPartMarkdown: typeof import('./markdown').buildMeetingTranscriptPartMarkdown;
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
@@ -20,6 +23,8 @@ beforeAll(async () => {
 
   ({ mapRawMeeting } = await import('./mapper'));
   ({ createPersonMentionTarget } = await import('@/lib/people/mentions'));
+  ({ createPlaceMentionTarget } = await import('@/lib/places/mentions'));
+  ({ buildMeetingTranscriptPartMarkdown } = await import('./markdown'));
 });
 
 const meeting = (data?: Partial<RawMeeting>) => ({
@@ -187,6 +192,45 @@ describe('mapRawMeeting', () => {
     expect(result.transcript.segments[0]?.textHtml).toContain(
       '<a href="/people/sminakov/" title="Бывший руководитель, группа компаний «Земля МО»">Сергеем Александровичем Минаковым</a>',
     );
+  });
+
+  it('keeps place mention targets consistent in HTML and Markdown transcripts', () => {
+    const result = map({
+      transcript: {
+        segments: [
+          {
+            start: '00:00:00',
+            speaker: 'moderator',
+            text: 'Встретимся у @apple-garden:gen.',
+          },
+        ],
+      },
+      mentionRegistry: new Map([
+        [
+          'apple-garden',
+          createPlaceMentionTarget('apple-garden', 'Яблоневый сад', {
+            gen: 'Яблоневого сада',
+          }),
+        ],
+      ]),
+    });
+    const segment = result.transcript.segments[0];
+    const part = result.transcript.parts[0];
+
+    expect({
+      text: segment?.text,
+      textMarkdown: segment?.textMarkdown,
+      textHtml: segment?.textHtml,
+    }).toMatchInlineSnapshot(`
+        {
+          "text": "Встретимся у @apple-garden:gen.",
+          "textHtml": "<p>Встретимся у <a href=\"/map/apple-garden/\">Яблоневого сада</a>.</p>",
+          "textMarkdown": "Встретимся у [Яблоневого сада](/map/apple-garden/).",
+        }
+      `);
+    expect(
+      part ? buildMeetingTranscriptPartMarkdown(result, part) : '',
+    ).toContain('[Яблоневого сада](/map/apple-garden/)');
   });
 
   it('maps local speaker descriptions and person description overrides', () => {

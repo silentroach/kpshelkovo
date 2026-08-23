@@ -1,6 +1,7 @@
 import { extractMarkdownText } from '@shelkovo/markdown';
 import type { SchemaDoc } from '@shelkovo/seo';
 
+import type { EntityMentionType } from '@/lib/mentions';
 import { absoluteUrl } from '@/lib/site';
 
 import { reviewsRulesUrl, reviewsUrl } from './routes';
@@ -93,9 +94,14 @@ const reviewAuthorSchema = (review: Review): SchemaDoc => ({
   name: review.author ?? REVIEW_AUTHOR_FALLBACK,
 });
 
+const REVIEW_MENTION_SCHEMA_TYPES = {
+  person: 'Person',
+  place: 'Place',
+} as const satisfies Readonly<Record<EntityMentionType, 'Person' | 'Place'>>;
+
 const reviewMentionsSchema = (review: Review): readonly SchemaDoc[] =>
   review.mentions.map((mention) => ({
-    '@type': 'Person',
+    '@type': REVIEW_MENTION_SCHEMA_TYPES[mention.type],
     name: mention.label,
     url: absoluteUrl(mention.htmlUrl),
   }));
