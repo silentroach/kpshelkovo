@@ -5,7 +5,7 @@ import type {
   PagefindHighlightModule,
 } from './highlight.types';
 
-export const SEARCH_HIGHLIGHT_PARAM = 'pagefind-highlight';
+export const SEARCH_HIGHLIGHT_PARAM = 'h';
 
 const pagefindHighlightEntrypoint = '/search/pagefind-highlight.js';
 const searchHighlightMaxTerms = 20;

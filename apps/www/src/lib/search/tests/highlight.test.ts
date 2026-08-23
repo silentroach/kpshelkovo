@@ -12,25 +12,22 @@ import type { PagefindHighlightOptions } from '../highlight.types';
 describe('Pagefind result highlighting', () => {
   it('keeps only bounded, non-empty highlight parameters', () => {
     const excessiveTerms = new URLSearchParams(
-      Array.from({ length: 21 }, (_, index) => [
-        'pagefind-highlight',
-        `x${String(index)}`,
-      ]),
+      Array.from({ length: 21 }, (_, index) => ['h', `x${String(index)}`]),
     );
 
     expect([
       normalizeSearchHighlightQuery(
-        '?source=search&pagefind-highlight=%D1%8F&pagefind-highlight=%D1%82%D0%B0%D1%80%D0%B8%D1%84&pagefind-highlight=%D1%82%D0%B0%D1%80%D0%B8%D1%84&pagefind-highlight=815',
+        '?source=search&h=%D1%8F&h=%D1%82%D0%B0%D1%80%D0%B8%D1%84&h=%D1%82%D0%B0%D1%80%D0%B8%D1%84&h=815',
       ),
-      normalizeSearchHighlightQuery('?pagefind-highlight=%D1%8F'),
-      normalizeSearchHighlightQuery('?pagefind-highlight='),
+      normalizeSearchHighlightQuery('?h=%D1%8F'),
+      normalizeSearchHighlightQuery('?h='),
       normalizeSearchHighlightQuery(
-        `?pagefind-highlight=${'x'.repeat(SEARCH_QUERY_MAX_LENGTH + 1)}`,
+        `?h=${'x'.repeat(SEARCH_QUERY_MAX_LENGTH + 1)}`,
       ),
       normalizeSearchHighlightQuery(`?${excessiveTerms.toString()}`),
     ]).toMatchInlineSnapshot(`
       [
-        "?pagefind-highlight=%D1%82%D0%B0%D1%80%D0%B8%D1%84&pagefind-highlight=815",
+        "?h=%D1%82%D0%B0%D1%80%D0%B8%D1%84&h=815",
         "",
         "",
         "",
@@ -52,7 +49,7 @@ describe('Pagefind result highlighting', () => {
     await highlightSearchTerms(location.href, loadPagefindHighlight);
     expect(loadPagefindHighlight).not.toHaveBeenCalled();
 
-    history.replaceState({}, '', '/?pagefind-highlight=tariff');
+    history.replaceState({}, '', '/?h=tariff');
     await highlightSearchTerms(location.href, loadPagefindHighlight);
     expect({
       constructCalls: construct.mock.calls,
@@ -63,7 +60,7 @@ describe('Pagefind result highlighting', () => {
           [
             {
               "addStyles": false,
-              "highlightParam": "pagefind-highlight",
+              "highlightParam": "h",
             },
           ],
         ],
@@ -84,13 +81,13 @@ describe('Pagefind result highlighting', () => {
       new Promise<typeof PagefindHighlight>((resolve) => {
         resolveLoader = resolve;
       });
-    history.replaceState({}, '', '/first/?pagefind-highlight=tariff');
+    history.replaceState({}, '', '/first/?h=tariff');
 
     const highlighting = highlightSearchTerms(
       location.href,
       loadPagefindHighlight,
     );
-    history.replaceState({}, '', '/second/?pagefind-highlight=tariff');
+    history.replaceState({}, '', '/second/?h=tariff');
     resolveLoader(PagefindHighlight);
     await highlighting;
 

@@ -85,7 +85,7 @@ describe('Pagefind search client', () => {
       [
         [
           {
-            "highlightParam": "pagefind-highlight",
+            "highlightParam": "h",
             "ranking": {
               "metaWeights": {
                 "aliases": 3,
@@ -205,7 +205,7 @@ describe('Pagefind search client', () => {
     const { runtime } = runtimeWith(
       responseWith(
         {
-          url: 'https://kpshelkovo.online/news/item/index.html?source=test&pagefind-highlight=%D1%82%D0%B5%D0%BA%D1%81%D1%82&pagefind-highlight=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#old',
+          url: 'https://kpshelkovo.online/news/item/index.html?source=test&h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#old',
           excerpt:
             'Текст с <mark>совпадением</mark> и &lt;script&gt;alert(1)&lt;/script&gt;',
           content: '<script>alert(1)</script>',
@@ -219,18 +219,18 @@ describe('Pagefind search client', () => {
           },
           sub_results: [
             {
-              url: '/news/item/?pagefind-highlight=%D1%82%D0%B5%D0%BA%D1%81%D1%82&pagefind-highlight=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5',
+              url: '/news/item/?h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5',
               title: 'Страница целиком',
               excerpt: 'Без якоря',
             },
             {
-              url: '/news/item/?pagefind-highlight=%D1%82%D0%B5%D0%BA%D1%81%D1%82&pagefind-highlight=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#overview',
+              url: '/news/item/?h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#overview',
               title: 'Обзор',
               excerpt: 'Общий фрагмент',
               weighted_locations: [{ balanced_score: 1 }],
             },
             {
-              url: '/news/item/?pagefind-highlight=%D1%82%D0%B5%D0%BA%D1%81%D1%82&pagefind-highlight=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#details',
+              url: '/news/item/?h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#details',
               title: '  Подробности  ',
               excerpt: 'Еще <mark>текст</mark>',
               weighted_locations: [{ balanced_score: 10 }],
@@ -274,16 +274,16 @@ describe('Pagefind search client', () => {
               {
                 "excerptHtml": "Еще <mark>текст</mark>",
                 "title": "Подробности",
-                "url": "/news/item/?pagefind-highlight=%D1%82%D0%B5%D0%BA%D1%81%D1%82&pagefind-highlight=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#details",
+                "url": "/news/item/?h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#details",
               },
               {
                 "excerptHtml": "Общий фрагмент",
                 "title": "Обзор",
-                "url": "/news/item/?pagefind-highlight=%D1%82%D0%B5%D0%BA%D1%81%D1%82&pagefind-highlight=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#overview",
+                "url": "/news/item/?h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#overview",
               },
             ],
             "title": "Заголовок новости",
-            "url": "/news/item/?pagefind-highlight=%D1%82%D0%B5%D0%BA%D1%81%D1%82&pagefind-highlight=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5",
+            "url": "/news/item/?h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5",
           },
           {
             "description": undefined,

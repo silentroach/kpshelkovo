@@ -19,7 +19,7 @@ afterEach(() => {
 
 describe('search highlights', () => {
   it('runs after an Astro navigation with the destination query', () => {
-    history.replaceState({}, '', '/news/?pagefind-highlight=tariff');
+    history.replaceState({}, '', '/news/?h=tariff');
 
     document.dispatchEvent(new Event('astro:page-load'));
 
