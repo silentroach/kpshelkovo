@@ -206,8 +206,15 @@ describe('PlaceMap', () => {
       >
         <span
           aria-hidden="true"
-          class="place-map-marker-point ui-map-marker"
-        />
+          class="place-map-marker-point"
+        >
+          <span
+            class="place-map-marker-point-surface ui-map-marker"
+          />
+          <span
+            class="place-map-marker-closed-indicator"
+          />
+        </span>
       </a>
     `);
     expect(mapProps[0]).toMatchObject({
@@ -304,6 +311,9 @@ describe('PlaceMap', () => {
       return {
         marker: marker.dataset.marker,
         graphicClass: marker.querySelector('[aria-hidden="true"]')?.className,
+        hasClosedIndicator: Boolean(
+          marker.querySelector('.place-map-marker-closed-indicator'),
+        ),
         imageClass: image?.className,
         imageDimensions: [image?.width, image?.height],
         imageFile: image?.src.split('/').at(-1),
@@ -315,6 +325,7 @@ describe('PlaceMap', () => {
       [
         {
           "graphicClass": "place-map-marker-graphic",
+          "hasClosedIndicator": true,
           "imageClass": "place-map-marker-image",
           "imageDimensions": [
             144,
@@ -326,6 +337,7 @@ describe('PlaceMap', () => {
         },
         {
           "graphicClass": "place-map-marker-graphic",
+          "hasClosedIndicator": true,
           "imageClass": "place-map-marker-image",
           "imageDimensions": [
             144,
@@ -337,6 +349,7 @@ describe('PlaceMap', () => {
         },
         {
           "graphicClass": "place-map-marker-graphic",
+          "hasClosedIndicator": true,
           "imageClass": "place-map-marker-image",
           "imageDimensions": [
             144,
@@ -348,6 +361,7 @@ describe('PlaceMap', () => {
         },
         {
           "graphicClass": "place-map-marker-graphic",
+          "hasClosedIndicator": true,
           "imageClass": "place-map-marker-image",
           "imageDimensions": [
             144,
@@ -359,6 +373,7 @@ describe('PlaceMap', () => {
         },
         {
           "graphicClass": "place-map-marker-graphic",
+          "hasClosedIndicator": true,
           "imageClass": "place-map-marker-image",
           "imageDimensions": [
             144,
@@ -370,6 +385,7 @@ describe('PlaceMap', () => {
         },
         {
           "graphicClass": "place-map-marker-graphic",
+          "hasClosedIndicator": true,
           "imageClass": "place-map-marker-image",
           "imageDimensions": [
             144,
