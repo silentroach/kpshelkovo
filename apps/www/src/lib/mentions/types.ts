@@ -11,7 +11,7 @@ export const ENTITY_MENTION_LABEL_CASES = [
   ...ENTITY_MENTION_ALTERNATE_LABEL_CASES,
 ] as const;
 
-export type EntityMentionType = 'person';
+export type EntityMentionType = 'person' | 'place';
 export type EntityMentionAlternateLabelCase =
   (typeof ENTITY_MENTION_ALTERNATE_LABEL_CASES)[number];
 export type EntityMentionLabelCase =

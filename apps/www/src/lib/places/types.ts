@@ -1,7 +1,10 @@
 import type { CollectionEntry } from 'astro:content';
 
 import type { PreprocessedSiteMarkdownBody } from '@/lib/markdown/render';
-import type { EntityMentionTarget } from '@/lib/mentions';
+import type {
+  EntityMentionLabelCaseForms,
+  EntityMentionTarget,
+} from '@/lib/mentions';
 
 import type { RawPlace } from './raw-schema';
 import type {
@@ -59,9 +62,18 @@ export interface PlaceOpeningHours {
   readonly periods: readonly PlaceOpeningHoursPeriod[];
 }
 
+export type PlaceNameCaseForms = EntityMentionLabelCaseForms;
+
+export interface PlaceMentionTarget extends EntityMentionTarget {
+  readonly type: 'place';
+  readonly name: string;
+  readonly nameCases?: PlaceNameCaseForms;
+}
+
 export interface Place {
   readonly slug: string;
   readonly name: string;
+  readonly nameCases?: PlaceNameCaseForms;
   readonly category: PlaceCategory;
   readonly marker?: PlaceMarker;
   readonly status: PlaceStatus;

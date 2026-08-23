@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createPersonMentionTarget } from '@/lib/people/mentions';
 
-import { createPlaceMentionRefs } from '../mentions';
+import { createPlaceMentionRefs, createPlaceMentionTarget } from '../mentions';
 import type { Place } from '../types';
 
 const target = createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин');
@@ -17,6 +17,29 @@ const place = (mentions: Place['mentions'] = [target]) => ({
 });
 
 describe('createPlaceMentionRefs', () => {
+  it('maps a place to a mention target with HTML and Markdown URLs', () => {
+    expect(
+      createPlaceMentionTarget('apple-garden', 'Яблоневый сад', {
+        gen: 'Яблоневого сада',
+      }),
+    ).toMatchInlineSnapshot(`
+      {
+        "htmlUrl": "/map/apple-garden/",
+        "label": "Яблоневый сад",
+        "labelCases": {
+          "gen": "Яблоневого сада",
+        },
+        "markdownUrl": "/map/apple-garden/index.md",
+        "name": "Яблоневый сад",
+        "nameCases": {
+          "gen": "Яблоневого сада",
+        },
+        "slug": "apple-garden",
+        "type": "place",
+      }
+    `);
+  });
+
   it('adapts place body mentions into graph refs', () => {
     expect(createPlaceMentionRefs(place())).toMatchInlineSnapshot(`
       [
@@ -28,6 +51,10 @@ describe('createPlaceMentionRefs', () => {
             "id": "burzhuyka",
             "kind": "place",
             "section": "places",
+          },
+          "sourceEntity": {
+            "slug": "burzhuyka",
+            "type": "place",
           },
           "target": {
             "slug": "kschemelinin",

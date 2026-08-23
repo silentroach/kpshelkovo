@@ -32,6 +32,16 @@ const targets = [
     htmlUrl: '/people/иван%20петров/',
     markdownUrl: '/people/иван%20петров/index.md',
   },
+  {
+    type: 'place',
+    slug: 'apple-garden',
+    label: 'Яблоневый сад',
+    labelCases: {
+      gen: 'Яблоневого сада',
+    },
+    htmlUrl: '/map/apple-garden/',
+    markdownUrl: '/map/apple-garden/index.md',
+  },
 ] as const;
 
 const registry = createSiteMentionRegistry(targets);
@@ -42,11 +52,11 @@ describe('createSiteMentionRegistry', () => {
       createSiteMentionRegistry([
         targets[0],
         {
-          type: 'person',
+          type: 'place',
           slug: 'kschemelinin',
-          label: 'Другой Кирилл',
-          htmlUrl: '/people/other/',
-          markdownUrl: '/people/other/index.md',
+          label: 'Одноимённое место',
+          htmlUrl: '/map/kschemelinin/',
+          markdownUrl: '/map/kschemelinin/index.md',
         },
       ]),
     ).toThrow('duplicate entity mention slug "kschemelinin"');
@@ -82,6 +92,33 @@ describe('normalizeEntityMentions', () => {
         'По словам [главного по электричеству](/people/kschemelinin/), работы идут.',
       mentions: [targets[0]],
     });
+  });
+
+  it('resolves canonical and labelled place mentions to the place page', () => {
+    expect(
+      normalizeEntityMentions({
+        markdown:
+          'Гуляли у @apple-garden:gen и вернулись к [саду](@apple-garden).',
+        context: 'news article "2026/08/test" body',
+        registry,
+      }),
+    ).toMatchInlineSnapshot(`
+      {
+        "markdown": "Гуляли у [Яблоневого сада](/map/apple-garden/) и вернулись к [саду](/map/apple-garden/).",
+        "mentions": [
+          {
+            "htmlUrl": "/map/apple-garden/",
+            "label": "Яблоневый сад",
+            "labelCases": {
+              "gen": "Яблоневого сада",
+            },
+            "markdownUrl": "/map/apple-garden/index.md",
+            "slug": "apple-garden",
+            "type": "place",
+          },
+        ],
+      }
+    `);
   });
 
   it('replaces only the raw labelled mention destination before link title and adjacent text', () => {
@@ -136,6 +173,18 @@ describe('normalizeEntityMentions', () => {
       }),
     ).toThrow(
       'news article "2026/05/test" body contains entity mention "@apetrov:gen", but entity "person:apetrov" has no "gen" label case',
+    );
+  });
+
+  it('fails when a place mention requests a missing label case', () => {
+    expect(() =>
+      normalizeEntityMentions({
+        markdown: 'Встретимся у @apple-garden:dat.',
+        context: 'review "test" body',
+        registry,
+      }),
+    ).toThrow(
+      'review "test" body contains entity mention "@apple-garden:dat", but entity "place:apple-garden" has no "dat" label case',
     );
   });
 
@@ -198,6 +247,19 @@ describe('normalizeEntityMentions', () => {
       }),
     ).toThrow(
       'people profile "kschemelinin" body contains self entity mention "person:kschemelinin"',
+    );
+  });
+
+  it('fails when a place body mentions the same place', () => {
+    expect(() =>
+      normalizeEntityMentions({
+        markdown: 'Описание @apple-garden.',
+        context: 'place "apple-garden" body',
+        registry,
+        sourceEntity: { type: 'place', slug: 'apple-garden' },
+      }),
+    ).toThrow(
+      'place "apple-garden" body contains self entity mention "place:apple-garden"',
     );
   });
 

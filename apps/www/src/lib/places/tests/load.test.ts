@@ -23,6 +23,9 @@ const geometry: PlaceGeometry = {
 
 const rawPlace = (overrides?: Partial<RawPlace>): RawPlace => ({
   title: 'Буржуйка',
+  name_cases: {
+    gen: 'Буржуйки',
+  },
   category: 'food',
   marker: 'foodtruck',
   status: 'existing',
@@ -81,6 +84,9 @@ describe('buildPlacesDataset', () => {
         "marker": "foodtruck",
         "mentions": [],
         "name": "Буржуйка",
+        "nameCases": {
+          "gen": "Буржуйки",
+        },
         "openingHours": {
           "description": "С 10:00 до 22:00, вторник — выходной",
           "periods": [

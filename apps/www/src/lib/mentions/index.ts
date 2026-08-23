@@ -4,6 +4,7 @@ export {
 } from './normalize';
 export { createEntityMentionSourceRefs } from './source-refs';
 export { createEntityMentionGraph, getEntityMentionGraphRefs } from './graph';
+export { buildSiteMentionRegistry, loadSiteMentionRegistry } from './registry';
 export {
   ENTITY_MENTION_ALTERNATE_LABEL_CASES,
   ENTITY_MENTION_DEFAULT_LABEL_CASE,
