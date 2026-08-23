@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 
 import { beforeAll, describe, expect, it } from 'vitest';
 
+import type { EntityMentionTarget } from '../mentions';
 import type {
   NewsArchiveSummaryEntry,
   NewsArticleEntry,
@@ -24,6 +25,7 @@ let buildStatusDataset: typeof import('../status/load').buildStatusDataset;
 let createContactMentionRefs: typeof import('../contacts/mentions').createContactMentionRefs;
 let createNewsArticleMentionRefs: typeof import('../news/mentions').createNewsArticleMentionRefs;
 let createPlaceMentionRefs: typeof import('../places/mentions').createPlaceMentionRefs;
+let createPlaceMentionTarget: typeof import('../places/mentions').createPlaceMentionTarget;
 let createStatusIncidentMentionRefs: typeof import('../status/mentions').createStatusIncidentMentionRefs;
 let createPersonProfileMentionRefs: typeof import('./mention-refs').createPersonProfileMentionRefs;
 
@@ -40,7 +42,8 @@ beforeAll(async () => {
   ({ buildStatusDataset } = await import('../status/load'));
   ({ createContactMentionRefs } = await import('../contacts/mentions'));
   ({ createNewsArticleMentionRefs } = await import('../news/mentions'));
-  ({ createPlaceMentionRefs } = await import('../places/mentions'));
+  ({ createPlaceMentionRefs, createPlaceMentionTarget } =
+    await import('../places/mentions'));
   ({ createStatusIncidentMentionRefs } = await import('../status/mentions'));
   ({ createPersonProfileMentionRefs } = await import('./mention-refs'));
 });
@@ -214,8 +217,35 @@ describe('buildPeopleDataset', () => {
     expect(peopleLoad).not.toContain("from './public-dto'");
     expect(newsLoad).not.toContain('../people/load');
     expect(placesLoad).not.toContain('../people/load');
-    expect(placesLoad).toContain('@/lib/people/registry');
+    expect(placesLoad).toContain('@/lib/mentions/registry');
     expect(statusLoad).not.toContain('../people/load');
+  });
+
+  it('resolves place mentions in people profiles through the site registry', () => {
+    const entries = [
+      entry({
+        id: 'apetrov',
+        name: 'Андрей Петров',
+        body: 'Гуляет у @apple-garden:gen.',
+      }),
+    ];
+    const people = buildPeopleDataset([
+      entry({ id: 'apetrov', name: 'Андрей Петров' }),
+    ]);
+    const mentionRegistry = new Map<string, EntityMentionTarget>(
+      people.mentionRegistry,
+    );
+
+    mentionRegistry.set(
+      'apple-garden',
+      createPlaceMentionTarget('apple-garden', 'Яблоневый сад', {
+        gen: 'Яблоневого сада',
+      }),
+    );
+
+    expect(
+      buildPeopleDataset(entries, { mentionRegistry }).profiles[0]?.body,
+    ).toBe('Гуляет у [Яблоневого сада](/map/apple-garden/).');
   });
 
   it('accepts a valid person entry with normalized contacts and body mentions', () => {

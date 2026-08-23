@@ -1,7 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 
 import type { SiteMentionRegistry } from '@/lib/mentions';
-import { loadPeopleMentionRegistry } from '@/lib/people/registry';
+import { loadSiteMentionRegistry } from '@/lib/mentions/registry';
 
 import { mapRawReview } from './mapper';
 import type { RawReview } from './raw-schema';
@@ -49,7 +49,7 @@ export const buildReviewsDataset = (
 
 const buildReviewsData = async (): Promise<ReviewsDataset> =>
   buildReviewsDataset(await getCollection('reviews'), {
-    mentionRegistry: await loadPeopleMentionRegistry(),
+    mentionRegistry: await loadSiteMentionRegistry(),
   });
 
 export const loadReviewsData = (): Promise<ReviewsDataset> => {

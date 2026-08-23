@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import { createSiteMentionRegistry } from '@/lib/mentions';
+
 import { buildPlacesDataset } from '../load';
+import { createPlaceMentionTarget } from '../mentions';
 import type { RawPlace } from '../raw-schema';
 import type { PlaceEntry, PlaceGeometry } from '../types';
 
@@ -169,5 +172,40 @@ describe('buildPlacesDataset', () => {
         "openingHours": undefined,
       }
     `);
+  });
+
+  it('resolves another place in a place body', () => {
+    const mentionRegistry = createSiteMentionRegistry([
+      createPlaceMentionTarget('burzhuyka', 'Буржуйка'),
+      createPlaceMentionTarget('apple-garden', 'Яблоневый сад', {
+        gen: 'Яблоневого сада',
+      }),
+    ]);
+    const data = buildPlacesDataset(
+      [entry({ body: 'Можно дойти от @apple-garden:gen.' })],
+      {
+        contactUrls: new Map([['food/burzhuyka', '/sarafan/food/burzhuyka/']]),
+        mentionRegistry,
+      },
+    );
+
+    expect(data.places[0]?.body).toBe(
+      'Можно дойти от [Яблоневого сада](/map/apple-garden/).',
+    );
+  });
+
+  it('rejects a place that mentions itself', () => {
+    const mentionRegistry = createSiteMentionRegistry([
+      createPlaceMentionTarget('burzhuyka', 'Буржуйка'),
+    ]);
+
+    expect(() =>
+      buildPlacesDataset([entry({ body: 'Описание @burzhuyka.' })], {
+        contactUrls: new Map([['food/burzhuyka', '/sarafan/food/burzhuyka/']]),
+        mentionRegistry,
+      }),
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: place "burzhuyka" body contains self entity mention "place:burzhuyka"]`,
+    );
   });
 });

@@ -3,7 +3,7 @@ import { compareRuText } from '@shelkovo/format';
 
 import { loadContactDetails } from '@/lib/contacts/load';
 import type { SiteMentionRegistry } from '@/lib/mentions';
-import { loadPeopleMentionRegistry } from '@/lib/people/registry';
+import { loadSiteMentionRegistry } from '@/lib/mentions/registry';
 
 import { parsePlaceGeometryFiles } from './geometry';
 import { mapRawPlace } from './mapper';
@@ -71,7 +71,7 @@ const buildPlacesData = async (): Promise<PlacesDataset> => {
   const [entries, contacts, mentionRegistry] = await Promise.all([
     getCollection('places'),
     loadContactDetails(),
-    loadPeopleMentionRegistry(),
+    loadSiteMentionRegistry(),
   ]);
   const contactUrls = new Map(
     contacts.map((contact) => [

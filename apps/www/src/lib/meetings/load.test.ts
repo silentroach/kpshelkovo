@@ -11,15 +11,15 @@ import type {
 
 const mocks = vi.hoisted(() => ({
   getCollection: vi.fn(),
-  loadPeopleMentionRegistry: vi.fn(),
+  loadSiteMentionRegistry: vi.fn(),
 }));
 
 vi.mock('astro:content', () => ({
   getCollection: mocks.getCollection,
 }));
 
-vi.mock('@/lib/people/registry', () => ({
-  loadPeopleMentionRegistry: mocks.loadPeopleMentionRegistry,
+vi.mock('@/lib/mentions/registry', () => ({
+  loadSiteMentionRegistry: mocks.loadSiteMentionRegistry,
 }));
 
 let buildMeetingsDataset: typeof buildMeetingsDatasetType;
@@ -173,7 +173,7 @@ describe('loadMeeting', () => {
 
       return Promise.resolve([]);
     });
-    mocks.loadPeopleMentionRegistry.mockResolvedValue(new Map());
+    mocks.loadSiteMentionRegistry.mockResolvedValue(new Map());
 
     await expect(loadMeeting('   ')).resolves.toBeUndefined();
     await expect(loadMeeting(' trimmed ')).resolves.toMatchObject({

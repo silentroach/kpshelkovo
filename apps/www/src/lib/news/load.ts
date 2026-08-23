@@ -3,7 +3,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 
 import { preprocessSiteMarkdownContent } from '../markdown/render';
 import type { SiteMentionRegistry } from '../mentions';
-import { loadPeopleMentionRegistry } from '../people/registry';
+import { loadSiteMentionRegistry } from '../mentions/registry';
 import { withBase } from '../site';
 import { validateArchiveSummaryMarkdown } from './archive-summary';
 import { buildArchives, newsMonthKey } from './archives';
@@ -658,7 +658,7 @@ async function buildNewsData(): Promise<NewsDataset> {
       getCollection('newsArchiveSummaries') as Promise<
         readonly NewsArchiveSummaryEntry[]
       >,
-      loadPeopleMentionRegistry(),
+      loadSiteMentionRegistry(),
     ]);
 
   return buildNewsDataset(authorsData, articlesData, archiveSummariesData, {
