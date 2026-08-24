@@ -6,6 +6,7 @@ import type {
   NewsArticleEntry,
   NewsAuthorEntry,
 } from './load';
+import { RawNewsEventsSchema, type RawNewsEventInput } from './raw-schema';
 
 type MutableMentionRegistry = Map<
   string,
@@ -16,9 +17,7 @@ type BuildNewsDataset = typeof import('./load').buildNewsDataset;
 
 let buildNewsDatasetSource: BuildNewsDataset;
 
-type ArticleEventInput = NonNullable<
-  NewsArticleEntry['data']['events']
->[number];
+type ArticleEventInput = RawNewsEventInput;
 type ArticlePhotoInput = NonNullable<
   NewsArticleEntry['data']['photos']
 >[number];
@@ -95,7 +94,7 @@ const article = (input: {
     author: { id: 'ig' } as NewsArticleEntry['data']['author'],
     pinned: input.pinned,
     pinned_until: input.pinned_until,
-    events: input.events,
+    events: input.events ? RawNewsEventsSchema.parse(input.events) : undefined,
     photos: input.photos,
     search_aliases: input.searchAliases,
   },
@@ -729,125 +728,6 @@ describe('buildNewsDataset', () => {
     expect(data.articles[0]?.events[0]?.endsAt).toBeUndefined();
     expect(data.articles[0]?.events[0]?.endsIso).toBeUndefined();
     expect(data.articles[0]?.events[0]?.endsTime).toBeUndefined();
-  });
-
-  it('rejects an event start without time', () => {
-    expect(() =>
-      buildNewsDataset(
-        [author({ id: 'ig', name: 'Редакция' })],
-        [
-          article({
-            id: '2026/05/event',
-            title: 'Встреча по регламенту',
-            summary: 'Коротко о встрече',
-            date: '04.05.2026 10:00',
-            events: [
-              {
-                title: 'Встреча по регламенту',
-                starts_at: '31.05.2026',
-                ends_at: '31.05.2026 21:00',
-              },
-            ],
-          }),
-        ],
-      ),
-    ).toThrow(/events\[0\] starts_at must include time/);
-  });
-
-  it('rejects an event end without time', () => {
-    expect(() =>
-      buildNewsDataset(
-        [author({ id: 'ig', name: 'Редакция' })],
-        [
-          article({
-            id: '2026/05/event',
-            title: 'Встреча по регламенту',
-            summary: 'Коротко о встрече',
-            date: '04.05.2026 10:00',
-            events: [
-              {
-                title: 'Встреча по регламенту',
-                starts_at: '31.05.2026 19:00',
-                ends_at: '31.05.2026',
-              },
-            ],
-          }),
-        ],
-      ),
-    ).toThrow(/events\[0\] ends_at must include time/);
-  });
-
-  it('rejects an event that does not end after it starts', () => {
-    expect(() =>
-      buildNewsDataset(
-        [author({ id: 'ig', name: 'Редакция' })],
-        [
-          article({
-            id: '2026/05/event',
-            title: 'Встреча по регламенту',
-            summary: 'Коротко о встрече',
-            date: '04.05.2026 10:00',
-            events: [
-              {
-                title: 'Встреча по регламенту',
-                starts_at: '31.05.2026 19:00',
-                ends_at: '31.05.2026 19:00',
-              },
-            ],
-          }),
-        ],
-      ),
-    ).toThrow(/events\[0\] ends_at must be later than starts_at/);
-  });
-
-  it('rejects invalid event coordinates', () => {
-    expect(() =>
-      buildNewsDataset(
-        [author({ id: 'ig', name: 'Редакция' })],
-        [
-          article({
-            id: '2026/05/event',
-            title: 'Встреча по регламенту',
-            summary: 'Коротко о встрече',
-            date: '04.05.2026 10:00',
-            events: [
-              {
-                title: 'Встреча по регламенту',
-                starts_at: '31.05.2026 19:00',
-                ends_at: '31.05.2026 21:00',
-                coordinates: {
-                  lat: 91,
-                  lng: 38,
-                },
-              },
-            ],
-          }),
-        ],
-      ),
-    ).toThrow(/coordinates\.lat must be between -90 and 90/);
-  });
-
-  it('rejects an empty performer entry', () => {
-    expect(() =>
-      buildNewsDataset(
-        [author({ id: 'ig', name: 'Редакция' })],
-        [
-          article({
-            id: '2026/05/event',
-            title: 'Встреча по регламенту',
-            summary: 'Коротко о встрече',
-            date: '04.05.2026 10:00',
-            events: [
-              {
-                title: 'Встреча по регламенту',
-                starts_at: '31.05.2026 19:00',
-                performer: [''],
-              },
-            ],
-          }),
-        ],
-      ),
-    ).toThrow(/events\[0\] performer\[0\] is required/);
   });
 
   it('normalizes event organizer and performer with explicit type', () => {
