@@ -327,6 +327,15 @@
         ]
       : [];
 
+  const tabStops = (): readonly HTMLElement[] =>
+    dialogElement
+      ? [
+          ...dialogElement.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), input:not([disabled])',
+          ),
+        ]
+      : [];
+
   const handleKeydown = (event: KeyboardEvent): void => {
     if (event.isComposing) {
       return;
@@ -335,6 +344,32 @@
     if (event.key === 'Escape') {
       event.preventDefault();
       closeDialog();
+      return;
+    }
+
+    if (
+      event.key === 'Tab' &&
+      !event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey
+    ) {
+      const stops = tabStops();
+      if (stops.length === 0) {
+        return;
+      }
+
+      const focusedIndex = stops.findIndex(
+        (element) => element === document.activeElement,
+      );
+      const movesPastStart = event.shiftKey && focusedIndex <= 0;
+      const movesPastEnd = !event.shiftKey && focusedIndex === stops.length - 1;
+
+      if (!movesPastStart && !movesPastEnd) {
+        return;
+      }
+
+      event.preventDefault();
+      stops[event.shiftKey ? stops.length - 1 : 0]?.focus();
       return;
     }
 
