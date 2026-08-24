@@ -281,7 +281,7 @@ describe('SettlementMap', () => {
     ).toBeTruthy();
   });
 
-  it('opens popup on marker click with details link', async () => {
+  it('moves focus into a keyboard-opened popup and restores it on close', async () => {
     const { container } = render(SettlementMap, {
       props: { settlements: mockSettlements },
     });
@@ -290,7 +290,28 @@ describe('SettlementMap', () => {
       expect(markers.length).toBe(mockSettlements.length);
     });
 
-    markers[1]?.click();
+    const marker = markers[1];
+    if (marker) container.append(marker);
+
+    expect({
+      ariaExpanded: marker?.getAttribute('aria-expanded'),
+      ariaLabel: marker?.getAttribute('aria-label'),
+      tabIndex: marker?.tabIndex,
+      tagName: marker?.tagName,
+      type: marker?.getAttribute('type'),
+    }).toMatchInlineSnapshot(`
+      {
+        "ariaExpanded": "false",
+        "ariaLabel": "Показать данные о поселке «КП Лесное»",
+        "tabIndex": 0,
+        "tagName": "BUTTON",
+        "type": "button",
+      }
+    `);
+
+    marker?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, detail: 0 }),
+    );
 
     await waitFor(() => {
       expect(container.querySelector('[data-testid="map-popup"]')).toBeTruthy();
@@ -298,8 +319,53 @@ describe('SettlementMap', () => {
       expect(container.textContent).toContain('УК Лесное');
     });
 
-    const link = container.querySelector('[data-testid="map-popup-link"]');
+    const link = container.querySelector<HTMLAnchorElement>(
+      '[data-testid="map-popup-link"]',
+    );
     expect(link?.getAttribute('href')).toContain('/settlements/lesnoe/');
+    await waitFor(() => {
+      expect(document.activeElement).toBe(link);
+      expect(marker?.getAttribute('aria-expanded')).toBe('true');
+    });
+
+    container
+      .querySelector<HTMLButtonElement>('button[aria-label="Закрыть попап"]')
+      ?.click();
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(marker);
+      expect(marker?.getAttribute('aria-expanded')).toBe('false');
+    });
+  });
+
+  it('keeps non-interactive markers out of the accessibility tree', async () => {
+    render(SettlementMap, {
+      props: {
+        settlements: [mockSettlements[0]],
+        interactive: false,
+        popup: false,
+      },
+    });
+
+    await waitFor(() => {
+      expect(markers.length).toBe(1);
+    });
+
+    const marker = markers[0];
+
+    expect({
+      ariaHidden: marker?.getAttribute('aria-hidden'),
+      ariaLabel: marker?.getAttribute('aria-label') ?? undefined,
+      tabIndex: marker?.tabIndex,
+      tagName: marker?.tagName,
+    }).toMatchInlineSnapshot(`
+      {
+        "ariaHidden": "true",
+        "ariaLabel": undefined,
+        "tabIndex": -1,
+        "tagName": "DIV",
+      }
+    `);
   });
 
   it('renders fallback message when API is unavailable', async () => {

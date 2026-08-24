@@ -1,6 +1,6 @@
 <script lang="ts">
   import { formatTariff } from '@shelkovo/format';
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, tick } from 'svelte';
   import {
     installYandexMapsRuntimeHeadPersistence,
     loadYandexMaps,
@@ -54,8 +54,10 @@
 
   let mapContainer: HTMLDivElement | undefined = $state(undefined);
   let popupEl: HTMLDivElement | undefined = $state(undefined);
+  let popupLink: HTMLAnchorElement | undefined = $state(undefined);
   let map: ymaps3.YMap | undefined = $state(undefined);
   let marks: MarkerLike[] = $state([]);
+  let activeMarker: HTMLElement | undefined;
   let isLoading = $state(true);
   let error: string | undefined = $state(undefined);
   let ymapsLoaded = $state(false);
@@ -156,6 +158,7 @@
   function clearMarkers(): void {
     if (!map) return;
 
+    closePopup();
     for (const item of marks) {
       map.removeChild?.(item.marker);
     }
@@ -167,10 +170,12 @@
 
     const { YMapMarker } = ym;
     const range = getRange(settlements);
+    const canOpenPopup = interactive && popup;
     const currentSlugs = new Set(settlements.map((s) => s.slug));
 
     for (const item of [...marks]) {
       if (!currentSlugs.has(item.slug)) {
+        if (item.el === activeMarker) closePopup();
         map.removeChild?.(item.marker);
         marks = marks.filter((m) => m !== item);
       }
@@ -188,27 +193,34 @@
       const existing = bySlug.get(settlement.slug);
       if (existing) {
         existing.el.style.background = color;
-        existing.el.style.cursor = interactive && popup ? 'pointer' : 'default';
+        existing.el.style.cursor = canOpenPopup ? 'pointer' : 'default';
         existing.marker.update?.({
           coordinates: [settlement.lng, settlement.lat],
         });
         continue;
       }
 
-      const el = document.createElement('div');
-      el.className = 'ui-map-marker';
+      const el = document.createElement(canOpenPopup ? 'button' : 'div');
+      el.className = 'settlement-map-marker ui-map-marker';
       el.style.cssText = `
         background: ${color};
-        cursor: ${interactive && popup ? 'pointer' : 'default'};
+        cursor: ${canOpenPopup ? 'pointer' : 'default'};
       `;
       el.setAttribute('title', settlement.name);
-      el.setAttribute('aria-label', `Маркер: ${settlement.name}`);
-      if (interactive && popup) {
+      if (canOpenPopup) {
+        el.setAttribute('type', 'button');
+        el.setAttribute(
+          'aria-label',
+          `Показать данные о поселке «${settlement.name}»`,
+        );
+        el.setAttribute('aria-expanded', 'false');
         el.addEventListener('click', (evt) => {
           evt.stopPropagation();
           const current = settlements.find((s) => s.slug === settlement.slug);
-          open(current ?? settlement, el);
+          void open(current ?? settlement, el, evt.detail === 0);
         });
+      } else {
+        el.setAttribute('aria-hidden', 'true');
       }
 
       const marker = new YMapMarker(
@@ -285,7 +297,7 @@
       return;
     }
 
-    tip = undefined;
+    closePopup();
     syncMarkers(ymaps3);
     const view = getMapView();
     if (!map.update) {
@@ -303,23 +315,44 @@
     });
   }
 
-  function open(item: SettlementMapData, el: HTMLElement): void {
+  function closePopup(restoreFocus = false): void {
+    const marker = activeMarker;
+    marker?.setAttribute('aria-expanded', 'false');
+    activeMarker = undefined;
+    tip = undefined;
+
+    if (restoreFocus && marker?.isConnected) marker.focus();
+  }
+
+  async function open(
+    item: SettlementMapData,
+    el: HTMLElement,
+    moveFocus: boolean,
+  ): Promise<void> {
+    activeMarker?.setAttribute('aria-expanded', 'false');
+    activeMarker = el;
+    el.setAttribute('aria-expanded', 'true');
+
     if (!mapContainer) {
       tip = { item, x: 24, y: 24, up: false };
-      return;
+    } else {
+      const mapBox = mapContainer.getBoundingClientRect();
+      const dotBox = el.getBoundingClientRect();
+      const w = 256;
+      const p = 12;
+      const cx = dotBox.left - mapBox.left + dotBox.width / 2;
+      const cy = dotBox.top - mapBox.top + dotBox.height / 2;
+      const x = Math.max(p + w / 2, Math.min(mapBox.width - p - w / 2, cx));
+      const up = cy > 120;
+      const y = up ? cy - 16 : cy + 16;
+
+      tip = { item, x, y, up };
     }
 
-    const mapBox = mapContainer.getBoundingClientRect();
-    const dotBox = el.getBoundingClientRect();
-    const w = 256;
-    const p = 12;
-    const cx = dotBox.left - mapBox.left + dotBox.width / 2;
-    const cy = dotBox.top - mapBox.top + dotBox.height / 2;
-    const x = Math.max(p + w / 2, Math.min(mapBox.width - p - w / 2, cx));
-    const up = cy > 120;
-    const y = up ? cy - 16 : cy + 16;
+    if (!moveFocus) return;
 
-    tip = { item, x, y, up };
+    await tick();
+    if (activeMarker === el) popupLink?.focus();
   }
 
   onMount(() => {
@@ -335,7 +368,7 @@
       if (!(node instanceof Node)) return;
       if (popupEl?.contains(node)) return;
 
-      tip = undefined;
+      closePopup();
     };
 
     const refresh = (): void => {
@@ -445,6 +478,7 @@
         >
           <div class="mb-0 flex items-start justify-between gap-3">
             <a
+              bind:this={popupLink}
               class="text-base font-semibold text-foreground hover:text-primary"
               href={withBase(`settlements/${tip.item.slug}/`)}
               target="_parent"
@@ -457,7 +491,7 @@
               class="p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
               aria-label="Закрыть попап"
               onclick={() => {
-                tip = undefined;
+                closePopup(true);
               }}
             >
               <svg
@@ -510,6 +544,11 @@
   :global(.ymaps-2-1-79-map) {
     width: 100% !important;
     height: 100% !important;
+  }
+
+  :global(.settlement-map-marker:focus-visible) {
+    outline: 0.1875rem solid var(--color-ring);
+    outline-offset: 0.125rem;
   }
 
   .map-muted {
