@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
-const fixtures = vi.hoisted(() => ({
-  news: {
+vi.mock('./load', () => {
+  const news = {
     articles: [
       {
         canonical: 'https://example.com/news/2026/05/event/',
@@ -17,12 +17,12 @@ const fixtures = vi.hoisted(() => ({
       ],
     },
     tags: [{ url: '/news/tags/electricity/' }],
-  },
-}));
+  };
 
-vi.mock('./load', () => ({
-  loadNewsData: async () => fixtures.news,
-}));
+  return {
+    loadNewsData: async () => news,
+  };
+});
 
 let build: typeof import('./llms').build;
 
