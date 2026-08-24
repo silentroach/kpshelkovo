@@ -228,7 +228,7 @@ describe('PlaceMap', () => {
       mode: 'vector',
       location: {
         bounds: [
-          [37.709, 55.049],
+          [37.708, 55.049],
           [37.764, 55.081],
         ],
       },

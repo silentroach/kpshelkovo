@@ -50,6 +50,6 @@ export const PLACE_TIME = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 export const PLACE_MAP_BOUNDS = {
   minLat: 55.049,
   maxLat: 55.081,
-  minLng: 37.709,
+  minLng: 37.708,
   maxLng: 37.764,
 } as const;
