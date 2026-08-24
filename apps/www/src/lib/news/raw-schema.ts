@@ -15,6 +15,7 @@ const TAG = /^[а-яё0-9 -]+$/u;
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const text = z.string().trim();
+const eventText = (name: string) => text.min(1, `${name} must not be blank`);
 
 const absoluteUrl = (name: string) =>
   text.refine(
@@ -116,69 +117,66 @@ const media = () => ({
   attachments: z.array(attachment()).min(1).optional(),
 });
 
-const eventOrganizer = () =>
+const eventParticipant = (name: string) =>
   z.union([
-    text,
+    eventText(name),
     z.object({
-      name: text,
+      name: eventText(`${name}.name`),
       type: z.enum(['organization', 'person']).optional(),
     }),
   ]);
 
-const eventPerformer = () =>
-  z.union([
-    text,
-    z.object({
-      name: text,
-      type: z.enum(['organization', 'person']).optional(),
-    }),
-  ]);
+const RawNewsEventSchema = z
+  .object({
+    slug: text
+      .refine((value) => SLUG.test(value), 'events[].slug must be a slug')
+      .optional(),
+    title: eventText('events[].title'),
+    description: eventText('events[].description').optional(),
+    starts_at: newsDateTime('events[].starts_at'),
+    ends_at: newsDateTime('events[].ends_at').optional(),
+    location: eventText('events[].location').optional(),
+    coordinates: z
+      .object({
+        lat: z
+          .number()
+          .min(-90, 'events[].coordinates.lat must be between -90 and 90')
+          .max(90, 'events[].coordinates.lat must be between -90 and 90'),
+        lng: z
+          .number()
+          .min(-180, 'events[].coordinates.lng must be between -180 and 180')
+          .max(180, 'events[].coordinates.lng must be between -180 and 180'),
+      })
+      .optional(),
+    organizer: eventParticipant('events[].organizer').optional(),
+    performer: z
+      .array(eventParticipant('events[].performer[]'))
+      .min(1)
+      .optional(),
+  })
+  .superRefine((data, ctx) => {
+    const starts = parseNewsTimestampInput(data.starts_at);
+    const ends = data.ends_at
+      ? parseNewsTimestampInput(data.ends_at)
+      : undefined;
 
-const event = () =>
-  z
-    .object({
-      slug: text
-        .refine((value) => SLUG.test(value), 'events[].slug must be a slug')
-        .optional(),
-      title: text,
-      description: text.optional(),
-      starts_at: newsDateTime('events[].starts_at'),
-      ends_at: newsDateTime('events[].ends_at').optional(),
-      location: text.optional(),
-      coordinates: z
-        .object({
-          lat: z.number().min(-90).max(90),
-          lng: z.number().min(-180).max(180),
-        })
-        .optional(),
-      organizer: eventOrganizer().optional(),
-      performer: z.array(eventPerformer()).min(1).optional(),
-    })
-    .superRefine((data, ctx) => {
-      const starts = parseNewsTimestampInput(data.starts_at);
-      const ends = data.ends_at
-        ? parseNewsTimestampInput(data.ends_at)
-        : undefined;
+    if (starts && ends && ends.at.valueOf() <= starts.at.valueOf()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['ends_at'],
+        message: 'events[].ends_at must be later than events[].starts_at',
+      });
+    }
+  });
 
-      if (starts && ends && ends.at.valueOf() <= starts.at.valueOf()) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['ends_at'],
-          message: 'events[].ends_at must be later than events[].starts_at',
-        });
-      }
-    });
+export type RawNewsEventInput = z.input<typeof RawNewsEventSchema>;
 
-type NewsEventInput = z.infer<ReturnType<typeof event>>;
+type NewsEventInput = z.output<typeof RawNewsEventSchema>;
 
 function validateEventSlugs(
-  events: readonly NewsEventInput[] | undefined,
+  events: readonly NewsEventInput[],
   ctx: z.RefinementCtx,
 ): void {
-  if (!events?.length) {
-    return;
-  }
-
   const seen = new Set<string>();
   const requiresExplicitSlug = events.length > 1;
 
@@ -186,7 +184,7 @@ function validateEventSlugs(
     if (requiresExplicitSlug && !item.slug) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ['events', index, 'slug'],
+        path: [index, 'slug'],
         message: 'events[].slug is required when article has multiple events',
       });
       return;
@@ -199,7 +197,7 @@ function validateEventSlugs(
     if (seen.has(item.slug)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ['events', index, 'slug'],
+        path: [index, 'slug'],
         message: `duplicate event slug "${item.slug}"`,
       });
       return;
@@ -208,6 +206,11 @@ function validateEventSlugs(
     seen.add(item.slug);
   });
 }
+
+export const RawNewsEventsSchema = z
+  .array(RawNewsEventSchema)
+  .min(1)
+  .superRefine(validateEventSlugs);
 
 function validateTags(
   tags: readonly string[] | undefined,
@@ -265,7 +268,7 @@ export const createRawNewsArticleSchema = (image: SchemaContext['image']) =>
       source_url: absoluteUrl('source_url').optional(),
       cover: image().optional(),
       cover_alt: text.optional(),
-      events: z.array(event()).min(1).optional(),
+      events: RawNewsEventsSchema.optional(),
       ...media(),
       seo: z
         .object({
@@ -284,7 +287,6 @@ export const createRawNewsArticleSchema = (image: SchemaContext['image']) =>
       }
 
       validateTags(data.tags, ctx);
-      validateEventSlugs(data.events, ctx);
     });
 
 export type RawNewsArticle = z.output<

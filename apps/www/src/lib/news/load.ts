@@ -27,7 +27,6 @@ import type {
   NewsCover,
   NewsDataset,
   NewsEvent,
-  NewsEventCoordinates,
   NewsEventPerformer,
   NewsHomeData,
   NewsListArticle,
@@ -192,212 +191,94 @@ const attachments = (
     size: item.size,
   })) ?? [];
 
-const requiredEventText = (value: string, context: string): string => {
-  const normalized = value.trim();
-
-  if (!normalized) {
-    throw new Error(`${context} is required`);
-  }
-
-  return normalized;
-};
-
-const optionalEventText = (
-  value: string | undefined,
-  context: string,
-): string | undefined => {
-  if (value === undefined) {
-    return undefined;
-  }
-
-  const normalized = value.trim();
-
-  if (!normalized) {
-    throw new Error(`${context} must not be blank`);
-  }
-
-  return normalized;
-};
-
-function parseEventTimestamp(
-  value: string,
-  context: string,
-): NewsTimestampWithTime {
-  const timestamp = parseNewsTimestampInput(value);
-
-  if (!timestamp) {
-    throw new Error(`${context} must use dd.mm.yyyy hh:mm`);
-  }
-
-  if (!timestamp.has_time || !timestamp.time) {
-    throw new Error(`${context} must include time`);
-  }
-
-  return timestamp as NewsTimestampWithTime;
-}
-
-function normalizeEventCoordinates(
-  input: EventData['coordinates'] | undefined,
-  context: string,
-): NewsEventCoordinates | undefined {
-  if (!input) {
-    return undefined;
-  }
-
-  if (!Number.isFinite(input.lat) || input.lat < -90 || input.lat > 90) {
-    throw new Error(`${context} coordinates.lat must be between -90 and 90`);
-  }
-
-  if (!Number.isFinite(input.lng) || input.lng < -180 || input.lng > 180) {
-    throw new Error(`${context} coordinates.lng must be between -180 and 180`);
-  }
-
-  return {
-    lat: input.lat,
-    lng: input.lng,
-  };
-}
+const parseValidatedEventTimestamp = (value: string): NewsTimestampWithTime =>
+  parseNewsTimestampInput(value) as NewsTimestampWithTime;
 
 const normalizeEventOrganizer = (
   input: EventData['organizer'],
-  context: string,
 ): NewsEvent['organizer'] => {
   if (!input) {
     return undefined;
   }
 
   if (typeof input === 'string') {
-    const name = optionalEventText(input, context);
-
-    return name ? { name, type: 'organization' as const } : undefined;
+    return { name: input, type: 'organization' };
   }
 
-  const name = requiredEventText(input.name, `${context}.name`);
-
   return {
-    name,
-    type: input.type ?? ('organization' as const),
+    name: input.name,
+    type: input.type ?? 'organization',
   };
 };
 
 const normalizeEventPerformerItem = (
   input: NonNullable<EventData['performer']>[number],
-  context: string,
 ): NewsEventPerformer => {
   if (typeof input === 'string') {
-    const name = requiredEventText(input, context);
-
-    return { name, type: 'organization' as const };
+    return { name: input, type: 'organization' };
   }
 
-  const name = requiredEventText(input.name, `${context}.name`);
-
   return {
-    name,
-    type: input.type ?? ('organization' as const),
+    name: input.name,
+    type: input.type ?? 'organization',
   };
 };
 
 const normalizeEventPerformers = (
   input: EventData['performer'],
-  context: string,
 ): NewsEvent['performer'] => {
-  if (!input?.length) {
+  if (!input) {
     return undefined;
   }
 
-  return input.map(
-    (item: NonNullable<EventData['performer']>[number], index: number) =>
-      normalizeEventPerformerItem(item, `${context}[${index}]`),
-  );
+  return input.map(normalizeEventPerformerItem);
 };
 
 function normalizeEvent(
   input: EventData,
-  entryId: string,
   route: {
     readonly year: string;
     readonly month: string;
     readonly entry: string;
   },
-  index: number,
-  count: number,
 ): NewsEvent {
-  const context = `news article "${entryId}" events[${index}]`;
-  const slug = optionalEventText(input.slug, `${context} slug`);
-  const starts = parseEventTimestamp(input.starts_at, `${context} starts_at`);
+  const slug = input.slug ?? 'event';
+  const starts = parseValidatedEventTimestamp(input.starts_at);
   const ends = input.ends_at
-    ? parseEventTimestamp(input.ends_at, `${context} ends_at`)
+    ? parseValidatedEventTimestamp(input.ends_at)
     : undefined;
-  const location = optionalEventText(input.location, `${context} location`);
-  const coordinates = normalizeEventCoordinates(input.coordinates, context);
-  const organizer = normalizeEventOrganizer(
-    input.organizer,
-    `${context} organizer`,
-  );
-  const performer = normalizeEventPerformers(
-    input.performer,
-    `${context} performer`,
-  );
-
-  if (ends && ends.at.valueOf() <= starts.at.valueOf()) {
-    throw new Error(`${context} ends_at must be later than starts_at`);
-  }
-
-  if (count > 1 && !slug) {
-    throw new Error(
-      `${context} slug is required when article has multiple events`,
-    );
-  }
 
   return {
-    slug: slug ?? 'event',
-    title: requiredEventText(input.title, `${context} title`),
-    description: input.description
-      ? requiredEventText(input.description, `${context} description`)
-      : undefined,
+    slug,
+    title: input.title,
+    description: input.description,
     startsAt: starts.at,
     startsIso: starts.iso,
     startsTime: starts.time,
-    icsUrl: articleEventIcsUrl({ ...route, event: slug ?? 'event' }),
+    icsUrl: articleEventIcsUrl({ ...route, event: slug }),
     endsAt: ends?.at,
     endsIso: ends?.iso,
     endsTime: ends?.time,
-    location,
-    coordinates,
-    organizer,
-    performer,
+    location: input.location,
+    coordinates: input.coordinates,
+    organizer: normalizeEventOrganizer(input.organizer),
+    performer: normalizeEventPerformers(input.performer),
   };
 }
 
 function normalizeEvents(
   input: readonly EventData[] | undefined,
-  entryId: string,
   route: {
     readonly year: string;
     readonly month: string;
     readonly entry: string;
   },
 ): readonly NewsEvent[] {
-  if (!input?.length) {
+  if (!input) {
     return [];
   }
 
-  const seen = new Set<string>();
-
-  return input.map((item, index) => {
-    const event = normalizeEvent(item, entryId, route, index, input.length);
-
-    if (seen.has(event.slug)) {
-      throw new Error(
-        `news article "${entryId}" duplicate event slug "${event.slug}"`,
-      );
-    }
-
-    seen.add(event.slug);
-
-    return event;
-  });
+  return input.map((item) => normalizeEvent(item, route));
 }
 
 function articleParts(entry: ArticleEntry): {
@@ -462,7 +343,7 @@ function normalizeArticle(
     entry.data.cover_alt,
     `news article "${entry.id}"`,
   );
-  const events = normalizeEvents(entry.data.events, entry.id, parts);
+  const events = normalizeEvents(entry.data.events, parts);
   const mappedPhotos = mapPhotos(entry.data.photos, entry.id, mentionRegistry);
   const body = preprocessSiteMarkdownContent(
     entry.body ?? '',
