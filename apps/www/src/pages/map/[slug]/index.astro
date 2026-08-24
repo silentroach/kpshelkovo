@@ -100,25 +100,9 @@ const schema = {
     </header>
 
     <article class="max-w-3xl px-5 md:px-6">
-      <p
-        class="ui-copy max-w-[65ch] text-foreground"
-        data-pagefind-weight="5"
-        set:html={summaryHtml}
-      />
-
-      {
-        bodyHtml ? (
-          <div
-            class="ui-prose mt-5 max-w-[65ch]"
-            data-pagefind-weight="5"
-            set:html={bodyHtml}
-          />
-        ) : null
-      }
-
       {
         addressHtml || place.openingHours ? (
-          <dl class="mt-6 border-y border-border">
+          <dl class="border-y border-border">
             {addressHtml ? (
               <div class="grid gap-1 py-4 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4">
                 <dt class="text-sm font-semibold leading-7 text-muted-foreground">
@@ -154,6 +138,22 @@ const schema = {
           ) : null
         }
       </nav>
+
+      {
+        bodyHtml ? (
+          <div
+            class="ui-prose mt-8 max-w-[65ch]"
+            data-pagefind-weight="5"
+            set:html={bodyHtml}
+          />
+        ) : (
+          <p
+            class="ui-copy mt-8 max-w-[65ch] text-foreground"
+            data-pagefind-weight="5"
+            set:html={summaryHtml}
+          />
+        )
+      }
 
       {
         backlinkGroups.length > 0 ? (

@@ -11,8 +11,9 @@ const fixture = vi.hoisted(() => ({
     category: 'nature' as const,
     status: 'existing' as const,
     summary: 'Сад рядом со спортивной площадкой',
-    body: '',
+    body: 'Подробное описание места.',
     mentions: [],
+    address: 'Адрес места',
     coordinates: { lat: 55.06371, lng: 37.724333 },
     mapUrl: 'https://yandex.ru/maps/?pt=37.724333,55.06371',
     url: '/map/apple-garden/',
@@ -49,6 +50,37 @@ vi.mock('@/lib/places/load', () => ({
 import PlacePage from '@/pages/map/[slug]/index.astro';
 
 describe('/map/[slug]/', () => {
+  it('renders practical information before the detailed description', async () => {
+    const container = await createAstroContainer();
+    const html = await container.renderToString(PlacePage, {
+      params: { slug: 'apple-garden' },
+      request: new Request('https://example.com/map/apple-garden/'),
+    });
+    const article = html.slice(
+      html.indexOf('<article'),
+      html.indexOf('</article>'),
+    );
+    const positions = [
+      article.indexOf(fixture.place.address),
+      article.indexOf('aria-label="Действия с местом"'),
+      article.indexOf(fixture.place.body),
+    ];
+
+    expect({
+      allRendered: positions.every((position) => position >= 0),
+      inOrder: positions.every(
+        (position, index) => index === 0 || position > positions[index - 1]!,
+      ),
+      summaryRendered: article.includes(fixture.place.summary),
+    }).toMatchInlineSnapshot(`
+      {
+        "allRendered": true,
+        "inOrder": true,
+        "summaryRendered": false,
+      }
+    `);
+  });
+
   it('renders incoming links outside the Pagefind document', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(PlacePage, {

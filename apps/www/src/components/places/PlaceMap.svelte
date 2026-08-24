@@ -9,6 +9,7 @@
   } from '@yandex/ymaps3-types';
   import {
     APPLE_MARKER,
+    ANIMALS_MARKER,
     CONSTRUCTION_MARKER,
     FISH_MARKER,
     FOODTRUCK_MARKER,
@@ -81,6 +82,7 @@
     >
   > = {
     apple: APPLE_MARKER,
+    animals: ANIMALS_MARKER,
     foodtruck: FOODTRUCK_MARKER,
     titanic: TITANIC_MARKER,
     construction: CONSTRUCTION_MARKER,

@@ -299,11 +299,17 @@ describe('PlaceMap', () => {
             name: 'КПП Фореста',
             marker: 'kpp',
           },
+          {
+            ...titanicPlace,
+            slug: 'animals-wehome',
+            name: 'Животные в Зеркальных домах',
+            marker: 'animals',
+          },
         ],
       },
     });
 
-    await waitFor(() => expect(markerElements).toHaveLength(6));
+    await waitFor(() => expect(markerElements).toHaveLength(7));
 
     const markerDetails = markerElements.map((marker) => {
       const image = marker.querySelector('img');
@@ -393,6 +399,18 @@ describe('PlaceMap', () => {
           ],
           "imageFile": "Kpp.png",
           "marker": "kpp",
+          "usesDefaultPoint": false,
+        },
+        {
+          "graphicClass": "place-map-marker-graphic",
+          "hasClosedIndicator": true,
+          "imageClass": "place-map-marker-image",
+          "imageDimensions": [
+            144,
+            144,
+          ],
+          "imageFile": "Animals.png",
+          "marker": "animals",
           "usesDefaultPoint": false,
         },
       ]

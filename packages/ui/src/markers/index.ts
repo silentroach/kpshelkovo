@@ -1,4 +1,5 @@
 import appleMarkerUrl from './Apple.png?url';
+import animalsMarkerUrl from './Animals.png?url';
 import constructionMarkerUrl from './Construction.png?url';
 import fishMarkerUrl from './Fish.png?url';
 import foodtruckMarkerUrl from './Foodtruck.png?url';
@@ -7,6 +8,12 @@ import titanicMarkerUrl from './Titanic.png?url';
 
 export const APPLE_MARKER = {
   src: appleMarkerUrl,
+  width: 144,
+  height: 144,
+} as const;
+
+export const ANIMALS_MARKER = {
+  src: animalsMarkerUrl,
   width: 144,
   height: 144,
 } as const;
