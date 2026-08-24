@@ -36,11 +36,11 @@ describe('SiteNav', () => {
   );
 
   it.each(['header', 'mobile'] as const)(
-    'keeps places out of the %s primary navigation during rollout',
+    'links to the map from the %s primary navigation',
     async (variant) => {
       const html = await renderNav('/map/', variant);
 
-      expect(html).not.toContain('href="/map/"');
+      expect(html).toContain('href="/map/" aria-current="page"');
     },
   );
 

@@ -20,8 +20,6 @@ const {
 
 const isMobile = variant === 'mobile';
 const tariffMenuId = 'site-header-tariff-menu';
-// Keep the section link-only until the map is ready for primary navigation.
-const showPlacesInPrimaryNavigation = false;
 const pathname = Astro.url.pathname;
 const currentPathname =
   pathname === '/' ? pathname : `${pathname.replace(/\/+$/, '')}/`;
@@ -75,15 +73,9 @@ const submenuLinkClass =
         </a>
       </div>
 
-      {showPlacesInPrimaryNavigation && (
-        <a
-          href="/map/"
-          aria-current={placesCurrent}
-          class="site-nav-mobile-link"
-        >
-          Карта
-        </a>
-      )}
+      <a href="/map/" aria-current={placesCurrent} class="site-nav-mobile-link">
+        Карта
+      </a>
 
       <a href="/kb/" aria-current={kbCurrent} class="site-nav-mobile-link">
         База знаний
@@ -171,11 +163,9 @@ const submenuLinkClass =
         </div>
       </div>
 
-      {showPlacesInPrimaryNavigation && (
-        <a href="/map/" aria-current={placesCurrent} class="site-nav-link">
-          Карта
-        </a>
-      )}
+      <a href="/map/" aria-current={placesCurrent} class="site-nav-link">
+        Карта
+      </a>
 
       <a href="/kb/" aria-current={kbCurrent} class="site-nav-link">
         База знаний
