@@ -259,6 +259,32 @@ describe('SearchDialog', () => {
     expect(document.activeElement).toBe(firstOpener);
   });
 
+  it('keeps Tab navigation inside the dialog with and without results', async () => {
+    const search = vi.fn(async (query: string) =>
+      readyResponse(query, [resultAt(1)]),
+    );
+    const opener = addOpener('Поиск');
+    const view = render(SearchDialog, { props: { client: { search } } });
+
+    await fireEvent.click(opener);
+    const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
+    const closeButton = view.getByRole('button', { name: 'Закрыть' });
+
+    closeButton.focus();
+    await fireEvent.keyDown(closeButton, { key: 'Tab' });
+    expect(document.activeElement).toBe(input);
+
+    await enterDebouncedQuery(input, 'вода');
+    const resultLink = await waitFor(() => view.getByRole('link'));
+
+    resultLink.focus();
+    await fireEvent.keyDown(resultLink, { key: 'Tab' });
+    expect(document.activeElement).toBe(input);
+
+    await fireEvent.keyDown(input, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(resultLink);
+  });
+
   it('starts the settlement comparison on a new line', async () => {
     const result: SearchResult = {
       ...resultAt(1),
