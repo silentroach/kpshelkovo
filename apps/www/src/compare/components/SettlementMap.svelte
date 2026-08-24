@@ -167,6 +167,7 @@
 
     const { YMapMarker } = ym;
     const range = getRange(settlements);
+    const canOpenPopup = interactive && popup;
     const currentSlugs = new Set(settlements.map((s) => s.slug));
 
     for (const item of [...marks]) {
@@ -188,27 +189,33 @@
       const existing = bySlug.get(settlement.slug);
       if (existing) {
         existing.el.style.background = color;
-        existing.el.style.cursor = interactive && popup ? 'pointer' : 'default';
+        existing.el.style.cursor = canOpenPopup ? 'pointer' : 'default';
         existing.marker.update?.({
           coordinates: [settlement.lng, settlement.lat],
         });
         continue;
       }
 
-      const el = document.createElement('div');
-      el.className = 'ui-map-marker';
+      const el = document.createElement(canOpenPopup ? 'button' : 'div');
+      el.className = 'settlement-map-marker ui-map-marker';
       el.style.cssText = `
         background: ${color};
-        cursor: ${interactive && popup ? 'pointer' : 'default'};
+        cursor: ${canOpenPopup ? 'pointer' : 'default'};
       `;
       el.setAttribute('title', settlement.name);
-      el.setAttribute('aria-label', `Маркер: ${settlement.name}`);
-      if (interactive && popup) {
+      if (canOpenPopup) {
+        el.setAttribute('type', 'button');
+        el.setAttribute(
+          'aria-label',
+          `Показать данные о поселке «${settlement.name}»`,
+        );
         el.addEventListener('click', (evt) => {
           evt.stopPropagation();
           const current = settlements.find((s) => s.slug === settlement.slug);
           open(current ?? settlement, el);
         });
+      } else {
+        el.setAttribute('aria-hidden', 'true');
       }
 
       const marker = new YMapMarker(
@@ -510,6 +517,11 @@
   :global(.ymaps-2-1-79-map) {
     width: 100% !important;
     height: 100% !important;
+  }
+
+  :global(.settlement-map-marker:focus-visible) {
+    outline: 0.1875rem solid var(--color-ring);
+    outline-offset: 0.125rem;
   }
 
   .map-muted {
