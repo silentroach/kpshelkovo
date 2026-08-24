@@ -244,7 +244,7 @@ const timelineGroups = incidents
               : undefined;
 
       return {
-        href: firstItem.hasPage ? firstItem.url : undefined,
+        href: firstItem.href,
         hidden: !hasVisibleSpan,
         id: firstItem.id,
         left: geometry?.leftPercent,

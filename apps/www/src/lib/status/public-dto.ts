@@ -6,11 +6,7 @@ import type {
   StatusIncident,
   StatusServiceSummary,
 } from './types';
-import {
-  statusIncidentMarkdownUrl,
-  statusServiceMarkdownUrl,
-  statusServiceUrl,
-} from './routes';
+import { statusServiceMarkdownUrl, statusServiceUrl } from './routes';
 import {
   formatStatusDuration,
   formatStatusDaysWithoutIncidents,
@@ -22,9 +18,7 @@ import {
 
 export type StatusPublicIncidentPhase = 'active' | 'resolved' | 'scheduled';
 export type StatusPublicDaysWithoutIncidentsMode =
-  | 'count'
-  | 'active_incident'
-  | 'no_incidents';
+  'count' | 'active_incident' | 'no_incidents';
 
 export interface StatusPublicDurationDto {
   readonly total_minutes: number;
@@ -130,9 +124,7 @@ const daysWithoutIncidentsMode = (
 
 const incidentLinks = (item: StatusIncident): StatusPublicIncidentLinksDto => ({
   html_url: item.hasPage ? item.canonical : undefined,
-  markdown_url: item.hasPage
-    ? fullUrl(statusIncidentMarkdownUrl(item))
-    : undefined,
+  markdown_url: item.hasPage ? fullUrl(item.markdownUrl) : undefined,
 });
 
 function incidentRef(item: StatusIncident): StatusPublicIncidentRefDto {

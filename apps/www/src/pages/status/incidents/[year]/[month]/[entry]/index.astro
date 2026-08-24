@@ -10,7 +10,10 @@ import {
   withHomeSchemaBreadcrumbs,
 } from '@/lib/breadcrumbs';
 import { renderMarkdown } from '@/lib/markdown/render';
-import { loadStatusIncident, loadStatusIncidents } from '@/lib/status/load';
+import {
+  loadStatusIncidentDetail,
+  loadStatusIncidentDetails,
+} from '@/lib/status/load';
 import { statusUrl } from '@/lib/status/routes';
 import { techArticleSchema } from '@/lib/news/seo';
 import { NEWS_PROSE } from '@/lib/news/view';
@@ -18,17 +21,15 @@ import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
 
 export const getStaticPaths = (async () => {
-  const incidents = await loadStatusIncidents();
+  const incidents = await loadStatusIncidentDetails();
 
-  return incidents
-    .filter((item) => item.hasPage)
-    .map((item) => ({
-      params: {
-        year: String(item.year),
-        month: padNumber(item.month),
-        entry: item.slug,
-      },
-    }));
+  return incidents.map((item) => ({
+    params: {
+      year: String(item.year),
+      month: padNumber(item.month),
+      entry: item.slug,
+    },
+  }));
 }) satisfies GetStaticPaths;
 
 const year = Astro.params.year;
@@ -40,9 +41,9 @@ if (!year || !month || !entry) {
 }
 
 const id = `${year}/${month}/${entry}`;
-const incident = await loadStatusIncident(id);
+const incident = await loadStatusIncidentDetail(id);
 
-if (!incident || !incident.hasPage) {
+if (!incident) {
   throw new Error(`status incident "${id}" not found`);
 }
 

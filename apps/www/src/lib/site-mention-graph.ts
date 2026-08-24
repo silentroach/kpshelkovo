@@ -38,7 +38,9 @@ const buildSiteMentionGraph = async (): Promise<EntityMentionGraph> => {
       contact.hasDetailPage ? createContactMentionRefs(contact) : [],
     ),
     ...news.articles.flatMap(createNewsArticleMentionRefs),
-    ...status.incidents.flatMap(createStatusIncidentMentionRefs),
+    ...status.incidents.flatMap((incident) =>
+      incident.hasPage ? createStatusIncidentMentionRefs(incident) : [],
+    ),
     ...reviews.reviews.flatMap(createReviewMentionRefs),
     ...places.places.flatMap(createPlaceMentionRefs),
     ...people.profiles.flatMap(createPersonProfileMentionRefs),

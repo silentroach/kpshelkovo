@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { createPersonMentionTarget } from '../people/mentions';
-import type { StatusIncident } from './types';
+import type { StatusIncidentWithDetail } from './types';
 
 let createStatusIncidentMentionRefs: typeof import('./mentions').createStatusIncidentMentionRefs;
 
@@ -12,15 +12,13 @@ beforeAll(async () => {
 const target = createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин');
 
 const incident = (input?: {
-  readonly mentions?: StatusIncident['mentions'];
+  readonly mentions?: StatusIncidentWithDetail['mentions'];
 }): Pick<
-  StatusIncident,
+  StatusIncidentWithDetail,
   | 'id'
   | 'title'
   | 'url'
-  | 'year'
-  | 'month'
-  | 'slug'
+  | 'markdownUrl'
   | 'excerpt'
   | 'mentions'
   | 'started'
@@ -29,9 +27,8 @@ const incident = (input?: {
   id: '2026/04/electricity-river-10kv-line-damage',
   title: 'Отключение электричества в Шелково Ривер',
   url: '/status/incidents/2026/04/electricity-river-10kv-line-damage/',
-  year: 2026,
-  month: 4,
-  slug: 'electricity-river-10kv-line-damage',
+  markdownUrl:
+    '/status/incidents/2026/04/electricity-river-10kv-line-damage/index.md',
   excerpt: 'Как отметил Кирилл Щемелинин, повреждение было редким.',
   mentions: input?.mentions ?? [target],
   started: {

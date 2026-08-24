@@ -26,8 +26,7 @@ interface IncidentInput {
 
 const incident = (input: IncidentInput): StatusTimelineIncidentInput => ({
   id: input.id,
-  url: `/status/incidents/${input.id}`,
-  hasPage: input.hasPage ?? true,
+  href: input.hasPage === false ? undefined : `/status/incidents/${input.id}`,
   title: input.title ?? `Запись ${input.id}`,
   kind: input.kind ?? 'incident',
   startedIso: input.startedIso,

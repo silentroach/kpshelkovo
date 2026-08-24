@@ -1,16 +1,13 @@
 import { createEntityMentionSourceRefs } from '../mentions';
 import type { EntityMentionSourceRef } from '../mentions';
-import { statusIncidentMarkdownUrl } from './routes';
-import type { StatusIncident } from './types';
+import type { StatusIncidentWithDetail } from './types';
 
 type StatusIncidentMentionRefSource = Pick<
-  StatusIncident,
+  StatusIncidentWithDetail,
   | 'id'
   | 'title'
   | 'url'
-  | 'year'
-  | 'month'
-  | 'slug'
+  | 'markdownUrl'
   | 'excerpt'
   | 'mentions'
   | 'started'
@@ -28,7 +25,7 @@ export const createStatusIncidentMentionRefs = (
     },
     title: incident.title,
     htmlUrl: incident.url,
-    markdownUrl: statusIncidentMarkdownUrl(incident),
+    markdownUrl: incident.markdownUrl,
     excerpt: incident.excerpt,
     mentionedAt: incident.started.iso,
     sortKey: incident.sortLastChangeAt,

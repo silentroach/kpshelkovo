@@ -1,6 +1,10 @@
 import { preprocessSiteMarkdownContent } from '../markdown/render';
 import type { SiteMentionRegistry } from '../mentions';
-import { statusIncidentCanonical, statusIncidentUrl } from './routes';
+import {
+  statusIncidentCanonical,
+  statusIncidentMarkdownUrl,
+  statusIncidentUrl,
+} from './routes';
 import {
   parseStatusTimestamp,
   STATUS_AREAS,
@@ -168,8 +172,7 @@ export const mapRawStatusIncident = (
     opts.mentionRegistry,
   );
   const changeAt = ended?.at ?? started.at;
-
-  return {
+  const incident = {
     id: entry.id,
     title: entry.data.title ?? deriveStatusIncidentTitle({ kind, service }),
     seo: entry.data.seo,
@@ -178,8 +181,6 @@ export const mapRawStatusIncident = (
     year: Number(parts.year),
     month: Number(parts.month),
     slug: parts.slug,
-    url: statusIncidentUrl(parts),
-    canonical: statusIncidentCanonical(parts),
     started: {
       at: started.at,
       iso: started.iso,
@@ -199,11 +200,25 @@ export const mapRawStatusIncident = (
     areas: area.areas,
     sourceUrl: entry.data.source_url,
     excerpt: body.markdown ? extractStatusExcerpt(body.markdown) : undefined,
-    hasPage: body.markdown.length > 0,
     body: body.markdown,
     mentions: body.mentions,
     sortStartedAt: started.at.valueOf(),
     sortLastChangeAt: changeAt.valueOf(),
     duration: ended ? duration(started.at, ended.at) : undefined,
-  } satisfies StatusIncident;
+  };
+
+  if (!body.markdown) {
+    return {
+      ...incident,
+      hasPage: false,
+    };
+  }
+
+  return {
+    ...incident,
+    hasPage: true,
+    url: statusIncidentUrl(parts),
+    markdownUrl: statusIncidentMarkdownUrl(parts),
+    canonical: statusIncidentCanonical(parts),
+  };
 };

@@ -7,8 +7,7 @@ export const STATUS_TIMELINE_DAY_MS = 24 * 60 * 60 * 1000;
 
 export interface StatusTimelineIncidentInput {
   readonly id: string;
-  readonly url: string;
-  readonly hasPage: boolean;
+  readonly href?: string;
   readonly title: string;
   readonly kind: StatusKind;
   readonly startedIso: string;
@@ -56,8 +55,7 @@ export const toStatusTimelineIncidentInput = (
   incident: StatusIncident,
 ): StatusTimelineIncidentInput => ({
   id: incident.id,
-  url: incident.url,
-  hasPage: incident.hasPage,
+  href: incident.url,
   title: incident.title,
   kind: incident.kind,
   startedIso: incident.started.iso,
@@ -189,7 +187,7 @@ export const buildStatusTimelineProblemSegments = ({
       return toStatusTimelineSegment(
         {
           id: incident.id,
-          href: incident.hasPage ? incident.url : undefined,
+          href: incident.href,
           tone: incident.kind === 'maintenance' ? 'amber' : 'red',
           startedIso: incident.startedIso,
           endedIso: incident.endedIso,

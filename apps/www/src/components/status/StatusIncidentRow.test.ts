@@ -17,6 +17,7 @@ const incident = {
   month: 5,
   slug: 'outage',
   url: '/status/incidents/2026/05/outage/',
+  markdownUrl: '/status/incidents/2026/05/outage/index.md',
   canonical: 'https://kpshelkovo.online/status/incidents/2026/05/outage/',
   started: {
     at: new Date('2026-05-01T07:32:00+03:00'),
