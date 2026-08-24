@@ -18,18 +18,6 @@ type ReviewMentionRefSource = Pick<
   | 'publishedAt'
 >;
 
-const SPACE = /\s+/gu;
-
-const excerpt = (markdown: string): string | undefined => {
-  const first = extractFirstMarkdownText(markdown);
-
-  if (!first) {
-    return;
-  }
-
-  return first.replace(SPACE, ' ').trim();
-};
-
 export const createReviewMentionRefs = (
   review: ReviewMentionRefSource,
 ): readonly EntityMentionSourceRef[] =>
@@ -42,7 +30,7 @@ export const createReviewMentionRefs = (
     title: formatReviewTitle(review),
     htmlUrl: review.url,
     markdownUrl: review.markdownUrl,
-    excerpt: excerpt(review.body),
+    excerpt: extractFirstMarkdownText(review.body),
     mentionedAt: review.publishedAt.toISOString(),
     sortKey: review.publishedAt.valueOf(),
   });
