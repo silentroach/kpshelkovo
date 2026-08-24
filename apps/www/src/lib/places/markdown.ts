@@ -17,11 +17,6 @@ import {
   placeBacklinkGroups,
 } from './view';
 
-export const PLACES_MARKDOWN_HEADERS = {
-  'Content-Type': 'text/markdown; charset=utf-8',
-  'X-Robots-Tag': 'noindex, follow',
-} as const;
-
 const serialize = (
   children: Parameters<typeof createMarkdownDocument>[0]['children'],
 ): string => serializeMarkdownDocument(createMarkdownDocument({ children }));

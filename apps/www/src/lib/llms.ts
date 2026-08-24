@@ -36,11 +36,6 @@ export {
   siteMarkdownUrl,
 } from './root-routes';
 
-export const SITE_MARKDOWN_HEADERS = {
-  'Content-Type': 'text/markdown; charset=utf-8',
-  'X-Robots-Tag': 'noindex, follow',
-} as const;
-
 const registeredSurfacePath = (surfaceId: PublicSurfaceId): string => {
   const surface = publicSurfaceRegistry.surfaces.find(
     (item) => item.id === surfaceId,

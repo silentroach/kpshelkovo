@@ -1,10 +1,8 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
+import { createMarkdownResponse } from '@/lib/markdown/response';
 import { loadPlaces, loadPlaceWithBacklinks } from '@/lib/places/load';
-import {
-  buildPlaceMarkdown,
-  PLACES_MARKDOWN_HEADERS,
-} from '@/lib/places/markdown';
+import { buildPlaceMarkdown } from '@/lib/places/markdown';
 
 export const prerender = true;
 
@@ -27,7 +25,5 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error(`place "${slug}" not found`);
   }
 
-  return new Response(buildPlaceMarkdown(place), {
-    headers: PLACES_MARKDOWN_HEADERS,
-  });
+  return createMarkdownResponse(buildPlaceMarkdown(place));
 };

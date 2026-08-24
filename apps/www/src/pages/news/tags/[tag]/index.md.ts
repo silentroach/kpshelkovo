@@ -1,10 +1,8 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
+import { createMarkdownResponse } from '@/lib/markdown/response';
 import { loadNewsTag, loadNewsTags } from '@/lib/news/load';
-import {
-  buildNewsTagMarkdown,
-  NEWS_MARKDOWN_HEADERS,
-} from '@/lib/news/markdown';
+import { buildNewsTagMarkdown } from '@/lib/news/markdown';
 
 export const prerender = true;
 
@@ -29,7 +27,5 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error(`news tag page "${key}" not found`);
   }
 
-  return new Response(buildNewsTagMarkdown(tag), {
-    headers: NEWS_MARKDOWN_HEADERS,
-  });
+  return createMarkdownResponse(buildNewsTagMarkdown(tag));
 };

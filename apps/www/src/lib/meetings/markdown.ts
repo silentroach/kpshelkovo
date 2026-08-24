@@ -26,11 +26,6 @@ import {
   formatTranscriptTime,
 } from './view';
 
-export const MEETINGS_MARKDOWN_HEADERS = {
-  'Content-Type': 'text/markdown; charset=utf-8',
-  'X-Robots-Tag': 'noindex, follow',
-} as const;
-
 type MarkdownNode = ReturnType<typeof parseMarkdownFragment>[number];
 type MarkdownListItem = ReturnType<typeof md.listItem>;
 type MarkdownParagraph = ReturnType<typeof md.paragraph>;

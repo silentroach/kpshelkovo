@@ -1,10 +1,8 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
-import {
-  buildStatusServiceMarkdown,
-  STATUS_MARKDOWN_HEADERS,
-} from '@/lib/status/markdown';
+import { createMarkdownResponse } from '@/lib/markdown/response';
 import { loadStatusService } from '@/lib/status/load';
+import { buildStatusServiceMarkdown } from '@/lib/status/markdown';
 import { STATUS_SERVICES, type StatusService } from '@/lib/status/schema';
 
 export const prerender = true;
@@ -22,8 +20,7 @@ export const GET: APIRoute = async ({ params }) => {
   }
 
   const service = STATUS_SERVICES.find((item) => item === serviceParam) as
-    | StatusService
-    | undefined;
+    StatusService | undefined;
 
   if (!service) {
     throw new Error(`status service "${serviceParam}" not found`);
@@ -35,7 +32,5 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error(`status service "${service}" not found`);
   }
 
-  return new Response(buildStatusServiceMarkdown(summary), {
-    headers: STATUS_MARKDOWN_HEADERS,
-  });
+  return createMarkdownResponse(buildStatusServiceMarkdown(summary));
 };

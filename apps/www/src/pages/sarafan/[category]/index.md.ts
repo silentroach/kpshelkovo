@@ -1,13 +1,11 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
+import { createMarkdownResponse } from '@/lib/markdown/response';
 import {
   loadContactCategories,
   loadContactCategory,
 } from '@/lib/contacts/load';
-import {
-  buildContactsCategoryMarkdown,
-  CONTACTS_MARKDOWN_HEADERS,
-} from '@/lib/contacts/markdown';
+import { buildContactsCategoryMarkdown } from '@/lib/contacts/markdown';
 
 export const prerender = true;
 
@@ -32,7 +30,5 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error(`contact category "${key}" not found`);
   }
 
-  return new Response(buildContactsCategoryMarkdown(category), {
-    headers: CONTACTS_MARKDOWN_HEADERS,
-  });
+  return createMarkdownResponse(buildContactsCategoryMarkdown(category));
 };

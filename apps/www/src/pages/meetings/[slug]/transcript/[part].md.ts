@@ -1,10 +1,8 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
+import { createMarkdownResponse } from '@/lib/markdown/response';
 import { loadMeeting, loadMeetings } from '@/lib/meetings/load';
-import {
-  buildMeetingTranscriptPartMarkdown,
-  MEETINGS_MARKDOWN_HEADERS,
-} from '@/lib/meetings/markdown';
+import { buildMeetingTranscriptPartMarkdown } from '@/lib/meetings/markdown';
 
 export const prerender = true;
 
@@ -39,7 +37,7 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error(`meeting transcript "${slug}/${partParam}" not found`);
   }
 
-  return new Response(buildMeetingTranscriptPartMarkdown(meeting, part), {
-    headers: MEETINGS_MARKDOWN_HEADERS,
-  });
+  return createMarkdownResponse(
+    buildMeetingTranscriptPartMarkdown(meeting, part),
+  );
 };

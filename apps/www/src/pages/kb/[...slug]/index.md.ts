@@ -1,7 +1,8 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
 import { loadKbPages } from '@/lib/kb/load';
-import { buildKbPageMarkdown, KB_MARKDOWN_HEADERS } from '@/lib/kb/markdown';
+import { buildKbPageMarkdown } from '@/lib/kb/markdown';
+import { createMarkdownResponse } from '@/lib/markdown/response';
 
 export const prerender = true;
 
@@ -22,7 +23,5 @@ export const GET: APIRoute = async ({ params }) => {
     );
   }
 
-  return new Response(buildKbPageMarkdown(page), {
-    headers: KB_MARKDOWN_HEADERS,
-  });
+  return createMarkdownResponse(buildKbPageMarkdown(page));
 };

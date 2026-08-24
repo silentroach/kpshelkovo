@@ -1,10 +1,9 @@
 import type { APIRoute } from 'astro';
 
-import { buildHomeMarkdown, SITE_MARKDOWN_HEADERS } from '@/lib/llms';
+import { buildHomeMarkdown } from '@/lib/llms';
+import { createMarkdownResponse } from '@/lib/markdown/response';
 
 export const prerender = true;
 
 export const GET: APIRoute = async () =>
-  new Response(await buildHomeMarkdown(), {
-    headers: SITE_MARKDOWN_HEADERS,
-  });
+  createMarkdownResponse(await buildHomeMarkdown());

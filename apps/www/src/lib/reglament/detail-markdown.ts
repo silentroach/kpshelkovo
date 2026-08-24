@@ -29,11 +29,6 @@ import {
   reglamentSourcePdfUrl,
 } from './routes';
 
-export const ESTIMATE_DETAIL_MARKDOWN_HEADERS = {
-  'Content-Type': 'text/markdown; charset=utf-8',
-  'X-Robots-Tag': 'noindex, follow',
-} as const;
-
 const RESOURCE_KIND_LABELS = {
   labor: 'труд',
   machinist_labor: 'труд машинистов',
