@@ -10,11 +10,6 @@ import { absoluteUrl } from '@/lib/site';
 import { kbDetailMarkdownUrl, kbMarkdownUrl } from './routes';
 import type { KbPage, KbPageFlag } from './types';
 
-export const KB_MARKDOWN_HEADERS = {
-  'Content-Type': 'text/markdown; charset=utf-8',
-  'X-Robots-Tag': 'noindex, follow',
-} as const;
-
 const KB_HTML_LINK_DESTINATION =
   /(\]\()(\/kb(?:\/[a-z0-9][a-z0-9/-]*)?\/?)(\))/gu;
 

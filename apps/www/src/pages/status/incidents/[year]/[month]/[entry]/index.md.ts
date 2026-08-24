@@ -1,11 +1,9 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { padNumber } from '@shelkovo/format';
 
-import {
-  buildStatusIncidentMarkdown,
-  STATUS_MARKDOWN_HEADERS,
-} from '@/lib/status/markdown';
+import { createMarkdownResponse } from '@/lib/markdown/response';
 import { loadStatusIncident, loadStatusIncidents } from '@/lib/status/load';
+import { buildStatusIncidentMarkdown } from '@/lib/status/markdown';
 
 export const prerender = true;
 
@@ -38,7 +36,5 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error(`status incident "${year}/${month}/${entry}" not found`);
   }
 
-  return new Response(buildStatusIncidentMarkdown(incident), {
-    headers: STATUS_MARKDOWN_HEADERS,
-  });
+  return createMarkdownResponse(buildStatusIncidentMarkdown(incident));
 };

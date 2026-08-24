@@ -1,10 +1,8 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
+import { createMarkdownResponse } from '@/lib/markdown/response';
 import { loadNewsArchives } from '@/lib/news/load';
-import {
-  buildNewsYearMarkdown,
-  NEWS_MARKDOWN_HEADERS,
-} from '@/lib/news/markdown';
+import { buildNewsYearMarkdown } from '@/lib/news/markdown';
 
 export const prerender = true;
 
@@ -25,7 +23,5 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error(`news year archive "${params.year}" not found`);
   }
 
-  return new Response(buildNewsYearMarkdown({ archive }), {
-    headers: NEWS_MARKDOWN_HEADERS,
-  });
+  return createMarkdownResponse(buildNewsYearMarkdown({ archive }));
 };

@@ -1,10 +1,8 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
+import { createMarkdownResponse } from '@/lib/markdown/response';
 import { loadMeeting, loadMeetings } from '@/lib/meetings/load';
-import {
-  buildMeetingMarkdown,
-  MEETINGS_MARKDOWN_HEADERS,
-} from '@/lib/meetings/markdown';
+import { buildMeetingMarkdown } from '@/lib/meetings/markdown';
 
 export const prerender = true;
 
@@ -31,7 +29,5 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error(`meeting "${slug}" not found`);
   }
 
-  return new Response(buildMeetingMarkdown(meeting), {
-    headers: MEETINGS_MARKDOWN_HEADERS,
-  });
+  return createMarkdownResponse(buildMeetingMarkdown(meeting));
 };

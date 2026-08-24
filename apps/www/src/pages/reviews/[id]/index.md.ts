@@ -1,10 +1,8 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
+import { createMarkdownResponse } from '@/lib/markdown/response';
 import { loadReview, loadReviews } from '@/lib/reviews/load';
-import {
-  buildReviewMarkdown,
-  REVIEWS_MARKDOWN_HEADERS,
-} from '@/lib/reviews/markdown';
+import { buildReviewMarkdown } from '@/lib/reviews/markdown';
 
 export const prerender = true;
 
@@ -27,7 +25,5 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error(`review "${id}" not found`);
   }
 
-  return new Response(buildReviewMarkdown(review), {
-    headers: REVIEWS_MARKDOWN_HEADERS,
-  });
+  return createMarkdownResponse(buildReviewMarkdown(review));
 };

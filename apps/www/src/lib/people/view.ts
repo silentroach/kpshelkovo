@@ -7,7 +7,6 @@ import {
   type MarkdownPhrasingInput,
 } from '@shelkovo/markdown';
 
-import { MARKDOWN_ROBOTS } from '../news/seo';
 import { formatNewsDate, NEWS_PROSE } from '../news/view';
 import { formatReviewDate } from '../reviews/view';
 import { absoluteUrl } from '../site';
@@ -47,11 +46,6 @@ const BACKLINK_KIND_LABELS: Record<PersonBacklinkKind, string> = {
 };
 
 export const PEOPLE_PROSE = NEWS_PROSE;
-
-export const PEOPLE_MARKDOWN_HEADERS = {
-  'Content-Type': 'text/markdown; charset=utf-8',
-  'X-Robots-Tag': MARKDOWN_ROBOTS,
-} as const;
 
 type MarkdownNode = ReturnType<typeof parseMarkdownFragment>[number];
 type MarkdownListItem = ReturnType<typeof md.listItem>;

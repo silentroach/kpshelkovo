@@ -1,9 +1,7 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
-import {
-  PEOPLE_MARKDOWN_HEADERS,
-  buildPersonMarkdown,
-} from '@/lib/people/markdown';
+import { createMarkdownResponse } from '@/lib/markdown/response';
+import { buildPersonMarkdown } from '@/lib/people/markdown';
 import {
   loadPeopleProfiles,
   loadPersonProfileWithBacklinks,
@@ -34,7 +32,5 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error(`person profile "${slug}" not found`);
   }
 
-  return new Response(buildPersonMarkdown(profile), {
-    headers: PEOPLE_MARKDOWN_HEADERS,
-  });
+  return createMarkdownResponse(buildPersonMarkdown(profile));
 };

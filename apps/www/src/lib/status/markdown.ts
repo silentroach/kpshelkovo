@@ -22,11 +22,6 @@ import {
   getStatusIncidentPhase,
 } from './view';
 
-export const STATUS_MARKDOWN_HEADERS = {
-  'Content-Type': 'text/markdown; charset=utf-8',
-  'X-Robots-Tag': 'noindex, follow',
-} as const;
-
 const abs = (value: string): string => absoluteUrl(value);
 
 type MarkdownNode = ReturnType<typeof parseMarkdownFragment>[number];

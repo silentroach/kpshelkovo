@@ -5,8 +5,6 @@ import type { NewsEvent } from './types';
 const CONTEXT = 'https://schema.org';
 const LANG = 'ru-RU';
 
-export const MARKDOWN_ROBOTS = 'noindex, follow';
-
 export interface BreadcrumbLink {
   readonly name: string;
   readonly url: string;

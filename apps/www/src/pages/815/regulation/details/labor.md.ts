@@ -1,13 +1,9 @@
 import type { APIRoute } from 'astro';
 
-import {
-  ESTIMATE_DETAIL_MARKDOWN_HEADERS,
-  buildEstimateDetailLaborMarkdown,
-} from '@/lib/reglament/detail-markdown';
+import { createMarkdownResponse } from '@/lib/markdown/response';
+import { buildEstimateDetailLaborMarkdown } from '@/lib/reglament/detail-markdown';
 
 export const prerender = true;
 
 export const GET: APIRoute = async () =>
-  new Response(buildEstimateDetailLaborMarkdown(), {
-    headers: ESTIMATE_DETAIL_MARKDOWN_HEADERS,
-  });
+  createMarkdownResponse(buildEstimateDetailLaborMarkdown());

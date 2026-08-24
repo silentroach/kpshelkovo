@@ -1,11 +1,9 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { padNumber } from '@shelkovo/format';
 
+import { createMarkdownResponse } from '@/lib/markdown/response';
 import { loadNewsArticle, loadNewsArticles } from '@/lib/news/load';
-import {
-  buildNewsArticleMarkdown,
-  NEWS_MARKDOWN_HEADERS,
-} from '@/lib/news/markdown';
+import { buildNewsArticleMarkdown } from '@/lib/news/markdown';
 
 export const prerender = true;
 
@@ -36,7 +34,5 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error(`news article "${year}/${month}/${entry}" not found`);
   }
 
-  return new Response(buildNewsArticleMarkdown(article), {
-    headers: NEWS_MARKDOWN_HEADERS,
-  });
+  return createMarkdownResponse(buildNewsArticleMarkdown(article));
 };

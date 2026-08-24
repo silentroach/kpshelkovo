@@ -1,17 +1,13 @@
 import type { APIRoute } from 'astro';
 
+import { createMarkdownResponse } from '@/lib/markdown/response';
 import { loadStatusData } from '@/lib/status/load';
-import {
-  buildStatusHomeMarkdown,
-  STATUS_MARKDOWN_HEADERS,
-} from '@/lib/status/markdown';
+import { buildStatusHomeMarkdown } from '@/lib/status/markdown';
 
 export const prerender = true;
 
 export const GET: APIRoute = async () => {
   const data = await loadStatusData();
 
-  return new Response(buildStatusHomeMarkdown(data), {
-    headers: STATUS_MARKDOWN_HEADERS,
-  });
+  return createMarkdownResponse(buildStatusHomeMarkdown(data));
 };
