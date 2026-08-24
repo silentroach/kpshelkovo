@@ -16,7 +16,7 @@ const RANGE = getStatusTimelineRange(NOW_MS, 10);
 interface IncidentInput {
   readonly id: string;
   readonly kind?: StatusTimelineIncidentInput['kind'];
-  readonly url?: string;
+  readonly href?: string;
   readonly hasPage?: boolean;
   readonly title?: string;
   readonly startedIso: string;
@@ -28,8 +28,10 @@ interface IncidentInput {
 
 const incident = (input: IncidentInput): StatusTimelineIncidentInput => ({
   id: input.id,
-  url: input.url ?? `/status/incidents/${input.id}`,
-  hasPage: input.hasPage ?? true,
+  href:
+    input.hasPage === false
+      ? undefined
+      : (input.href ?? `/status/incidents/${input.id}`),
   title: input.title ?? `Incident ${input.id}`,
   kind: input.kind ?? 'incident',
   startedIso: input.startedIso,

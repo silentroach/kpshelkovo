@@ -326,6 +326,68 @@ describe('buildStatusDataset', () => {
     );
   });
 
+  it('adds detail URLs only to incidents with a non-empty body', () => {
+    const data = buildStatusDataset([
+      entry({
+        id: '2026/05/water-no-page',
+        title: 'Краткая запись без body',
+        service: 'water',
+        kind: 'incident',
+        started_at: '03.05.2026 10:00',
+      }),
+      entry({
+        id: '2026/05/water-with-page',
+        title: 'Подробная запись с body',
+        service: 'water',
+        kind: 'maintenance',
+        started_at: '02.05.2026 10:00',
+        body: 'Первый абзац.',
+      }),
+      entry({
+        id: '2026/05/water-whitespace-body',
+        title: 'Запись с пустым body',
+        service: 'water',
+        kind: 'incident',
+        started_at: '01.05.2026 10:00',
+        body: ' \n ',
+      }),
+    ]);
+
+    expect(
+      data.incidents.map((item) => ({
+        id: item.id,
+        hasPage: item.hasPage,
+        url: item.url,
+        markdownUrl: item.markdownUrl,
+        canonical: item.canonical,
+      })),
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "canonical": undefined,
+          "hasPage": false,
+          "id": "2026/05/water-no-page",
+          "markdownUrl": undefined,
+          "url": undefined,
+        },
+        {
+          "canonical": "https://kpshelkovo.online/status/incidents/2026/05/water-with-page/",
+          "hasPage": true,
+          "id": "2026/05/water-with-page",
+          "markdownUrl": "/status/incidents/2026/05/water-with-page/index.md",
+          "url": "/status/incidents/2026/05/water-with-page/",
+        },
+        {
+          "canonical": undefined,
+          "hasPage": false,
+          "id": "2026/05/water-whitespace-body",
+          "markdownUrl": undefined,
+          "url": undefined,
+        },
+      ]
+    `);
+  });
+
   it('keeps excerpts plain-text after mention expansion', () => {
     const data = buildStatusDataset(
       [

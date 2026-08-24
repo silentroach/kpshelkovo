@@ -17,6 +17,7 @@ const incident = (): StatusIncident => ({
   month: 5,
   slug: 'overview-tooltip',
   url: '/status/incidents/overview-tooltip',
+  markdownUrl: '/status/incidents/overview-tooltip/index.md',
   canonical: 'https://kpshelkovo.online/status/incidents/overview-tooltip/',
   started: {
     at: new Date('2026-05-09T00:00:00Z'),

@@ -17,7 +17,7 @@ export interface StatusIncidentMoment {
   readonly hasTime: boolean;
 }
 
-export interface StatusIncident {
+interface StatusIncidentBase {
   readonly id: string;
   readonly title: string;
   readonly seo?: {
@@ -28,8 +28,6 @@ export interface StatusIncident {
   readonly year: number;
   readonly month: number;
   readonly slug: string;
-  readonly url: string;
-  readonly canonical: string;
   readonly started: StatusIncidentMoment;
   readonly ended?: StatusIncidentMoment;
   readonly isActive: boolean;
@@ -37,13 +35,28 @@ export interface StatusIncident {
   readonly areas: readonly StatusArea[];
   readonly sourceUrl?: string;
   readonly excerpt?: string;
-  readonly hasPage: boolean;
   readonly body: PreprocessedSiteMarkdownBody;
   readonly mentions: readonly EntityMentionTarget[];
   readonly sortStartedAt: number;
   readonly sortLastChangeAt: number;
   readonly duration?: StatusDuration;
 }
+
+export interface StatusIncidentWithDetail extends StatusIncidentBase {
+  readonly hasPage: true;
+  readonly url: string;
+  readonly markdownUrl: string;
+  readonly canonical: string;
+}
+
+export interface StatusIncidentListOnly extends StatusIncidentBase {
+  readonly hasPage: false;
+  readonly url?: undefined;
+  readonly markdownUrl?: undefined;
+  readonly canonical?: undefined;
+}
+
+export type StatusIncident = StatusIncidentWithDetail | StatusIncidentListOnly;
 
 export interface StatusDaysWithoutIncidents {
   readonly mode: 'count' | 'activeIncident' | 'noIncidents';

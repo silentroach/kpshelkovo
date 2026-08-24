@@ -11,6 +11,7 @@ import type {
   StatusDataset,
   StatusDaysWithoutIncidents,
   StatusIncident,
+  StatusIncidentWithDetail,
   StatusServiceSummary,
 } from './types';
 
@@ -140,6 +141,14 @@ export const loadStatusIncidents = async (): Promise<
   readonly StatusIncident[]
 > => (await loadStatusData()).incidents;
 
+export const hasStatusIncidentDetail = (
+  incident: StatusIncident,
+): incident is StatusIncidentWithDetail => incident.hasPage;
+
+export const loadStatusIncidentDetails = async (): Promise<
+  readonly StatusIncidentWithDetail[]
+> => (await loadStatusIncidents()).filter(hasStatusIncidentDetail);
+
 export const loadActiveStatusIncidents = async (): Promise<
   readonly StatusIncident[]
 > => (await loadStatusData()).active;
@@ -151,6 +160,14 @@ export const loadStatusServices = async (): Promise<
 export const loadStatusIncident = async (
   id: string,
 ): Promise<StatusIncident | undefined> => (await loadStatusData()).byId.get(id);
+
+export const loadStatusIncidentDetail = async (
+  id: string,
+): Promise<StatusIncidentWithDetail | undefined> => {
+  const incident = await loadStatusIncident(id);
+
+  return incident?.hasPage ? incident : undefined;
+};
 
 export const loadStatusService = async (
   service: StatusService,

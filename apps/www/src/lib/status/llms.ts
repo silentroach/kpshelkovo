@@ -11,8 +11,6 @@ import {
   statusApiCatalogUrl,
   statusDataUrl,
   statusFeedUrl,
-  statusIncidentMarkdownUrl,
-  statusIncidentUrl,
   statusLlmsFullUrl,
   statusLlmsUrl,
   statusMarkdownUrl,
@@ -34,7 +32,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
     (item) => item.kind === 'maintenance',
   );
   const service = data.services[0];
-  const incident = data.incidents[0];
+  const incident = data.incidents.find((item) => item.hasPage);
 
   const home = absoluteUrl(statusUrl());
   const homeMarkdown = absoluteUrl(statusMarkdownUrl());
@@ -54,12 +52,12 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
   const serviceLabel = service
     ? formatStatusService(service.service)
     : 'Страница сервиса';
-  const incidentHtml = incident
-    ? absoluteUrl(statusIncidentUrl(incident))
-    : '/status/incidents/YYYY/MM/[entry]/';
-  const incidentMarkdown = incident
-    ? absoluteUrl(statusIncidentMarkdownUrl(incident))
-    : '/status/incidents/YYYY/MM/[entry]/index.md';
+  const incidentLinks = incident
+    ? [
+        `Пример HTML-страницы инцидента: ${incident.canonical}`,
+        `Пример Markdown-версии инцидента: ${absoluteUrl(incident.markdownUrl)}`,
+      ]
+    : [];
 
   return kind === 'short'
     ? serializeLlmsDocument({
@@ -90,8 +88,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Markdown-версия раздела: ${homeMarkdown}`,
               `Пример HTML-страницы сервиса (${serviceLabel}): ${serviceHtml}`,
               `Пример Markdown-версии сервиса: ${serviceMarkdown}`,
-              `Пример HTML-страницы инцидента: ${incidentHtml}`,
-              `Пример Markdown-версии инцидента: ${incidentMarkdown}`,
+              ...incidentLinks,
               'В status.json сервисные сводки выводятся из массива incidents.',
               'Сервисы: `electricity`, `water`, `internet`, `dam`.',
               'Типы записей: `incident`, `maintenance`.',
@@ -124,8 +121,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `OpenAPI: ${openapi}`,
               `Пример HTML-страницы сервиса (${serviceLabel}): ${serviceHtml}`,
               `Пример Markdown-версии сервиса: ${serviceMarkdown}`,
-              `Пример HTML-страницы инцидента: ${incidentHtml}`,
-              `Пример Markdown-версии инцидента: ${incidentMarkdown}`,
+              ...incidentLinks,
             ]),
           ]),
           llmsSection('Описание status.json', [

@@ -10,9 +10,10 @@ import { absoluteUrl } from '../site';
 import type {
   StatusDataset,
   StatusIncident,
+  StatusIncidentWithDetail,
   StatusServiceSummary,
 } from './types';
-import { statusIncidentMarkdownUrl, statusServiceMarkdownUrl } from './routes';
+import { statusServiceMarkdownUrl } from './routes';
 import {
   formatStatusArea,
   formatStatusIncidentPeriodText,
@@ -69,12 +70,8 @@ const incidentMarkdownLabel = (
   incident: StatusIncident,
 ): MarkdownPhrasingNodes =>
   incident.hasPage
-    ? [md.link(incidentMarkdownHref(incident), incident.title)]
+    ? [md.link(abs(incident.markdownUrl), incident.title)]
     : [md.text(incident.title)];
-
-const incidentMarkdownHref = (
-  incident: Pick<StatusIncident, 'year' | 'month' | 'slug'>,
-): string => abs(statusIncidentMarkdownUrl(incident));
 
 const areaLabels = (
   incident: Pick<StatusIncident, 'appliesToAllAreas' | 'areas'>,
@@ -286,7 +283,9 @@ export function buildStatusServiceMarkdown(
   ]);
 }
 
-export function buildStatusIncidentMarkdown(incident: StatusIncident): string {
+export function buildStatusIncidentMarkdown(
+  incident: StatusIncidentWithDetail,
+): string {
   return serializeMarkdownDocument(
     createMarkdownDocument({
       frontmatter: incidentFrontmatter(incident),

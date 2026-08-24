@@ -85,7 +85,9 @@ const sourceRefs = (input: {
   ) ?? []),
   ...input.news.articles.flatMap(createNewsArticleMentionRefs),
   ...(input.places?.places.flatMap(createPlaceMentionRefs) ?? []),
-  ...input.status.incidents.flatMap(createStatusIncidentMentionRefs),
+  ...input.status.incidents.flatMap((incident) =>
+    incident.hasPage ? createStatusIncidentMentionRefs(incident) : [],
+  ),
   ...input.people.profiles.flatMap(createPersonProfileMentionRefs),
 ];
 

@@ -1,18 +1,33 @@
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const fixtures = vi.hoisted(() => ({
-  status: {
-    active: [{ kind: 'incident' }, { kind: 'maintenance' }],
-    services: [{ service: 'electricity' }],
-    incidents: [
-      {
-        year: 2026,
-        month: 5,
-        slug: 'electricity-river-outage',
-      },
-    ],
-  },
-}));
+const fixtures = vi.hoisted(() => {
+  const listOnly = {
+    hasPage: false,
+    year: 2026,
+    month: 6,
+    slug: 'water-no-page',
+  };
+  const withDetail = {
+    hasPage: true,
+    year: 2026,
+    month: 5,
+    slug: 'electricity-river-outage',
+    url: '/status/incidents/2026/05/electricity-river-outage/',
+    markdownUrl: '/status/incidents/2026/05/electricity-river-outage/index.md',
+    canonical:
+      'https://example.com/status/incidents/2026/05/electricity-river-outage/',
+  };
+
+  return {
+    listOnly,
+    withDetail,
+    status: {
+      active: [{ kind: 'incident' }, { kind: 'maintenance' }],
+      services: [{ service: 'electricity' }],
+      incidents: [listOnly, withDetail],
+    },
+  };
+});
 
 vi.mock('./load', () => ({
   loadStatusData: async () => fixtures.status,
@@ -29,43 +44,34 @@ beforeAll(async () => {
   ({ build } = await import('./llms'));
 });
 
+beforeEach(() => {
+  fixtures.status.incidents = [fixtures.listOnly, fixtures.withDetail];
+});
+
 describe('status llms', () => {
-  it('serializes the short agent overview as Markdown AST output', async () => {
-    await expect(build('short')).resolves.toMatchInlineSnapshot(`
-      "# Статус КП Шелково
+  it.each(['short', 'full'] as const)(
+    'uses the latest published detail page in the %s document',
+    async (kind) => {
+      const markdown = await build(kind);
 
-      Файл: llms.txt
-      Язык: русский
+      expect(markdown).toContain(fixtures.withDetail.canonical);
+      expect(markdown).toContain(
+        `https://example.com${fixtures.withDetail.markdownUrl}`,
+      );
+      expect(markdown).not.toContain(fixtures.listOnly.slug);
+    },
+  );
 
-      ## Описание
+  it.each(['short', 'full'] as const)(
+    'omits incident examples from the %s document when no detail page exists',
+    async (kind) => {
+      fixtures.status.incidents = [fixtures.listOnly];
 
-      - Раздел \`/status/\` показывает текущие проблемы, плановые работы и историю по сервисам КП Шелково.
-      - Сейчас в разделе 1 запись, 1 активный инцидент и 1 активная работа.
-      - Раздел покрывает 1 сервис: electricity, water, internet, dam.
-      - HTML-страницы остаются каноническим представлением для людей, а /status/data/status.json служит основной структурированной лентой.
+      const markdown = await build(kind);
 
-      ## Главные URL
-
-      - Главная страница /status: <https://example.com/status/>
-      - Основная JSON-лента: <https://example.com/status/data/status.json>
-      - RSS: <https://example.com/status/feed.xml>
-      - Каталог API: <https://example.com/status/.well-known/api-catalog>
-      - JSON Schema: <https://example.com/status/schemas/status.schema.json>
-      - OpenAPI: <https://example.com/status/openapi/status.openapi.json>
-      - Расширенная версия этого текста: <https://example.com/status/llms-full.txt>
-
-      ## Как читать раздел
-
-      - Markdown-версия раздела: <https://example.com/status/index.md>
-      - Пример HTML-страницы сервиса (Электричество): <https://example.com/status/electricity/>
-      - Пример Markdown-версии сервиса: <https://example.com/status/electricity/index.md>
-      - Пример HTML-страницы инцидента: <https://example.com/status/incidents/2026/05/electricity-river-outage/>
-      - Пример Markdown-версии инцидента: <https://example.com/status/incidents/2026/05/electricity-river-outage/index.md>
-      - В status.json сервисные сводки выводятся из массива incidents.
-      - Сервисы: \`electricity\`, \`water\`, \`internet\`, \`dam\`.
-      - Типы записей: \`incident\`, \`maintenance\`.
-      - Текущий статус сервиса выводится как \`red\`, \`amber\` или \`green\`.
-      "
-    `);
-  });
+      expect(markdown).not.toContain('https://example.com/status/incidents/');
+      expect(markdown).not.toContain('Пример HTML-страницы инцидента');
+      expect(markdown).not.toContain('Пример Markdown-версии инцидента');
+    },
+  );
 });

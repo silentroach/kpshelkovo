@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import type { StatusIncident, StatusServiceSummary } from './types';
+import type { StatusIncidentWithDetail, StatusServiceSummary } from './types';
 
 let buildStatusHomeMarkdown: typeof import('./markdown').buildStatusHomeMarkdown;
 let buildStatusIncidentMarkdown: typeof import('./markdown').buildStatusIncidentMarkdown;
@@ -15,7 +15,9 @@ beforeAll(async () => {
     await import('./markdown'));
 });
 
-const incident = (input?: Partial<StatusIncident>): StatusIncident => ({
+const incident = (
+  input?: Partial<StatusIncidentWithDetail>,
+): StatusIncidentWithDetail => ({
   id: '2026/05/electricity-river-outage',
   title: 'Отключение электричества в Шелково Ривер',
   service: 'electricity',
@@ -24,6 +26,7 @@ const incident = (input?: Partial<StatusIncident>): StatusIncident => ({
   month: 5,
   slug: 'electricity-river-outage',
   url: '/status/incidents/2026/05/electricity-river-outage/',
+  markdownUrl: '/status/incidents/2026/05/electricity-river-outage/index.md',
   canonical:
     'https://example.com/status/incidents/2026/05/electricity-river-outage/',
   started: {
