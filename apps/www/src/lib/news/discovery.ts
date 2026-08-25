@@ -10,6 +10,7 @@ import {
   newsPath,
 } from './routes';
 import { NEWS_AREAS, NEWS_AUTHOR_KINDS } from './schema';
+import type { RequiredProperties } from './discovery.types';
 import type { NewsDataset } from './types';
 import {
   NEWS_PUBLIC_PAYLOAD_SCHEMA_VERSION,
@@ -115,10 +116,6 @@ const obj = (
   properties,
   required,
 });
-
-type RequiredProperties<T> = {
-  readonly [Key in keyof T as undefined extends T[Key] ? never : Key]: true;
-};
 
 const requiredKeys = <T extends object>(
   properties: RequiredProperties<T>,
