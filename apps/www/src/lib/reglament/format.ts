@@ -1,8 +1,4 @@
-import {
-  formatNumberRu,
-  formatNumberUnitRu,
-  parseNumberInputRu,
-} from '@shelkovo/format';
+import { createNumberFormatterRu, parseNumberInputRu } from '@shelkovo/format';
 
 const MONEY_OPTIONS = {
   maximumFractionDigits: 2,
@@ -20,21 +16,22 @@ const SIGNED_MONEY_OPTIONS = {
   signDisplay: 'exceptZero',
 } as const;
 
-export const formatReglamentNumber = (value: number): string =>
-  formatNumberRu(value, MONEY_OPTIONS);
+const NBSP = '\u00A0';
 
-export const formatReglamentInputNumber = (value: number): string =>
-  formatNumberRu(value, INPUT_NUMBER_OPTIONS);
+export const formatReglamentNumber = createNumberFormatterRu(MONEY_OPTIONS);
+
+export const formatReglamentInputNumber =
+  createNumberFormatterRu(INPUT_NUMBER_OPTIONS);
 
 export const parseReglamentNumberInput = (
   value: number | string,
 ): number | undefined => parseNumberInputRu(value);
 
-export const formatReglamentSignedNumber = (value: number): string =>
-  formatNumberRu(value, SIGNED_MONEY_OPTIONS);
+export const formatReglamentSignedNumber =
+  createNumberFormatterRu(SIGNED_MONEY_OPTIONS);
 
 export const formatReglamentMoney = (value: number): string =>
-  formatNumberUnitRu(value, '₽', MONEY_OPTIONS);
+  `${formatReglamentNumber(value)}${NBSP}₽`;
 
 export const formatReglamentAnnualMoney = (value: number): string =>
   `${formatReglamentMoney(value)}/год`;
@@ -46,4 +43,4 @@ export const formatReglamentTariff = (value: number): string =>
   `${formatReglamentTariffValue(value)}/сотка`;
 
 export const formatReglamentMoneyDelta = (value: number): string =>
-  formatNumberUnitRu(value, '₽', SIGNED_MONEY_OPTIONS);
+  `${formatReglamentSignedNumber(value)}${NBSP}₽`;
