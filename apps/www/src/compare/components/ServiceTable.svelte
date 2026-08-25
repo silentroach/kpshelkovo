@@ -80,11 +80,10 @@
     serviceOrder.map((key): ComparisonTableRow => ({
       key,
       label: labels[key],
+      value: services[key],
+      shelkovoValue: shelkovoServices?.[key],
       status: getDisplay(services[key]),
       shelkovoStatus: getDisplay(shelkovoServices?.[key]),
-      differs: shelkovoServices
-        ? services[key] !== shelkovoServices[key]
-        : false,
     })),
   );
 </script>

@@ -92,9 +92,10 @@
     order.map((key): ComparisonTableRow => ({
       key,
       label: labels[key],
+      value: spaces[key],
+      shelkovoValue: shelkovoSpaces?.[key],
       status: getDisplay(spaces[key]),
       shelkovoStatus: getDisplay(shelkovoSpaces?.[key]),
-      differs: shelkovoSpaces ? spaces[key] !== shelkovoSpaces[key] : false,
     })),
   );
 </script>

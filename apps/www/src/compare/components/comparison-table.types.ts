@@ -7,9 +7,10 @@ export interface ComparisonStatus {
 export interface ComparisonTableRow {
   readonly key: string;
   readonly label: string;
+  readonly value?: string;
+  readonly shelkovoValue?: string;
   readonly status: ComparisonStatus;
   readonly shelkovoStatus: ComparisonStatus;
-  readonly differs: boolean;
 }
 
 export interface ComparisonTableProps {

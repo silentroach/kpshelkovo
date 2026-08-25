@@ -14,7 +14,7 @@
 
   const visibleRows = $derived(
     showOnlyDifferences && showShelkovo
-      ? rows.filter((row) => row.differs)
+      ? rows.filter((row) => row.value !== row.shelkovoValue)
       : rows,
   );
 </script>

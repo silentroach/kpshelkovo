@@ -162,9 +162,10 @@
     infraOrder.map((key): ComparisonTableRow => ({
       key,
       label: labels[key],
+      value: infra[key],
+      shelkovoValue: shelkovoInfra?.[key],
       status: getDisplayConfig(key, infra),
       shelkovoStatus: getDisplayConfig(key, shelkovoInfra ?? {}),
-      differs: shelkovoInfra ? infra[key] !== shelkovoInfra[key] : false,
     })),
   );
 </script>

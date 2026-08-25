@@ -22,16 +22,18 @@ const rows: readonly ComparisonTableRow[] = [
   {
     key: 'same',
     label: 'Совпадает',
+    value: 'yes',
+    shelkovoValue: 'yes',
     status: available,
     shelkovoStatus: available,
-    differs: false,
   },
   {
     key: 'different',
     label: 'Отличается',
+    value: 'no',
+    shelkovoValue: 'yes',
     status: unavailable,
     shelkovoStatus: available,
-    differs: true,
   },
 ];
 
