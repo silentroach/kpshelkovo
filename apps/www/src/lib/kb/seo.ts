@@ -6,7 +6,6 @@ import {
   collectionPageSchema,
   techArticleSchema,
   type BreadcrumbLink,
-  type ListEntry,
 } from '@/lib/news/seo';
 
 import type { KbPage } from './types';
@@ -63,21 +62,8 @@ const breadcrumbLinks = (
     url: item.href ?? currentUrl,
   }));
 
-const kbListEntries = (
-  pages: readonly KbPage[],
-  currentPage: KbPage,
-): readonly ListEntry[] =>
-  pages
-    .filter((page) => page.url !== currentPage.url)
-    .filter((page) => !page.flags.includes('noindex'))
-    .map((page) => ({
-      name: page.title,
-      url: page.url,
-    }));
-
 export const kbPageSchema = (input: {
   readonly page: KbPage;
-  readonly pages: readonly KbPage[];
   readonly breadcrumbs: readonly BreadcrumbItem[];
   readonly description: string;
 }): readonly SchemaDoc[] => {
@@ -89,7 +75,6 @@ export const kbPageSchema = (input: {
       description: input.description,
       url: input.page.url,
       breadcrumbs,
-      items: kbListEntries(input.pages, input.page),
     });
   }
 

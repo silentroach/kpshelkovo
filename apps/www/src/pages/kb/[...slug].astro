@@ -15,7 +15,6 @@ import type { SearchDocument } from '@/lib/search/types';
 
 interface Props {
   readonly page: KbPage;
-  readonly pages: readonly KbPage[];
   readonly breadcrumbs: readonly BreadcrumbItem[];
 }
 
@@ -38,13 +37,12 @@ export const getStaticPaths = (async () => {
     },
     props: {
       page,
-      pages,
       breadcrumbs: kbBreadcrumbs(page, pages),
     },
   }));
 }) satisfies GetStaticPaths;
 
-const { page, pages, breadcrumbs } = Astro.props;
+const { page, breadcrumbs } = Astro.props;
 const title = page.routeSlug
   ? `${page.title} — ${KB_TITLE} — Шелково Онлайн`
   : `${KB_TITLE} — Шелково Онлайн`;
@@ -59,7 +57,6 @@ const search = isKbPageSearchable(page)
   : undefined;
 const schema = kbPageSchema({
   page,
-  pages,
   breadcrumbs,
   description,
 });
