@@ -51,6 +51,8 @@ const CONTACT_REVIEW_SENTIMENT_LABELS: Record<
   negative: 'Минус',
 };
 
+const MANY_POSITIVE_CONTACT_REVIEWS_THRESHOLD = 5;
+
 export const CONTACTS_PROSE = 'ui-prose max-w-[65ch]';
 
 export const CONTACTS_CHAT_LABEL = 'чате жителей Шелково';
@@ -113,6 +115,13 @@ export const formatContactReviewSentiment = (
 
 export const formatContactReviewDate = (review: ContactReview): string =>
   formatDate(review.publishedIso);
+
+export const hasManyPositiveContactReviews = (
+  reviews: readonly Pick<ContactReview, 'sentiment'>[],
+): boolean =>
+  !reviews.some(({ sentiment }) => sentiment === 'negative') &&
+  reviews.filter(({ sentiment }) => sentiment === 'positive').length >=
+    MANY_POSITIVE_CONTACT_REVIEWS_THRESHOLD;
 
 export const contactExcerpt = (
   contact: Pick<Contact, 'body' | 'summary'>,
