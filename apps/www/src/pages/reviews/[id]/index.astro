@@ -11,6 +11,7 @@ import {
 } from '@/lib/breadcrumbs';
 import { renderMarkdown } from '@/lib/markdown/render';
 import { loadReview, loadReviews } from '@/lib/reviews/load';
+import { REVIEW_RULES } from '@/lib/reviews/rules';
 import { reviewPageSchema } from '@/lib/reviews/seo';
 import { reviewsUrl } from '@/lib/reviews/routes';
 import {
@@ -96,15 +97,10 @@ const schema = reviewPageSchema({
     <footer class="mt-8 px-5 md:px-6" data-nosnippet data-pagefind-ignore="all">
       <section aria-labelledby="review-disclaimer" class="ui-shell py-4">
         <h2 id="review-disclaimer" class="ui-section-label">
-          Отказ от ответственности
+          {REVIEW_RULES.disclaimer.heading}
         </h2>
         <p class="mt-2 text-xs leading-5 text-muted-foreground">
-          Отзывы — это авторские тексты собственников. Мнение автора может не
-          совпадать с позицией владельца сайта. Ответственность за сведения,
-          оценки и формулировки в отзыве несет автор в пределах закона. Владелец
-          сайта не является автором отзыва, не редактирует текст и не
-          подтверждает каждое фактическое утверждение, а только проверяет, что
-          автор является текущим собственником участка или дома в Шелково.
+          {REVIEW_RULES.disclaimer.text}
         </p>
       </section>
     </footer>
