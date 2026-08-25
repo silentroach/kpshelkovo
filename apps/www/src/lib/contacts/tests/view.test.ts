@@ -5,6 +5,7 @@ import {
   contactPlace,
   formatContactCategory,
   formatContactReviewDate,
+  hasManyPositiveContactReviews,
 } from '../view';
 
 describe('contact view helpers', () => {
@@ -31,6 +32,30 @@ describe('contact view helpers', () => {
         url: 'https://t.me/example/1',
       }),
     ).toBe('7 апреля 2026');
+  });
+
+  it('marks contacts with at least three positive and no negative reviews', () => {
+    expect(
+      hasManyPositiveContactReviews([
+        { sentiment: 'positive' },
+        { sentiment: 'positive' },
+        { sentiment: 'positive' },
+      ]),
+    ).toBe(true);
+    expect(
+      hasManyPositiveContactReviews([
+        { sentiment: 'positive' },
+        { sentiment: 'positive' },
+      ]),
+    ).toBe(false);
+    expect(
+      hasManyPositiveContactReviews([
+        { sentiment: 'positive' },
+        { sentiment: 'positive' },
+        { sentiment: 'positive' },
+        { sentiment: 'negative' },
+      ]),
+    ).toBe(false);
   });
 
   it('builds display methods in stable order with safe hrefs', () => {
