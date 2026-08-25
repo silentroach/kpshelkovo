@@ -56,7 +56,7 @@ const renderedItems = items.map((item, index) => {
             {item.href && (linkLast || index < lastIndex) ? (
               <a
                 href={item.href}
-                class="ui-link font-medium"
+                class="ui-link font-normal"
                 itemprop={structuredPosition ? 'item' : undefined}
               >
                 <span itemprop={structuredPosition ? 'name' : undefined}>
@@ -65,7 +65,7 @@ const renderedItems = items.map((item, index) => {
               </a>
             ) : (
               <span
-                class="font-medium text-foreground"
+                class="font-normal text-foreground"
                 aria-current={index === items.length - 1 ? 'page' : undefined}
                 itemprop={structuredPosition ? 'name' : undefined}
               >
