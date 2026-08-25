@@ -2,11 +2,15 @@
 title: Баха
 slug: bakha
 category: construction
-updated_at: 2026-08-12
+updated_at: 2026-08-24
 summary: 'Разнорабочие, обшивка домов профлистом и покраска деревянных фасадов, покос участков'
 contacts:
   phone: '+7 926 983-01-21'
 reviews:
+  - sentiment: positive
+    summary: 'Баха обшил цоколь гостевого домика; автор отзыва отметил аккуратную и быструю работу с учётом пожеланий.'
+    published_at: 2026-08-24
+    url: https://t.me/shelkovoecoclub/53800
   - sentiment: positive
     summary: 'Баха быстро покосил участок; автор отзыва положительно оценил цену, качество работы и общение.'
     published_at: 2026-08-12
