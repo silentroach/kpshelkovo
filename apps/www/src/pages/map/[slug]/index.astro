@@ -52,6 +52,7 @@ const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Карта', href: placesUrl() },
   { label: place.name },
 ]);
+const showBacklinks = false;
 const backlinkGroups = placeBacklinkGroups(place.backlinks);
 const search = {
   scope: 'page',
@@ -156,7 +157,7 @@ const schema = {
       }
 
       {
-        backlinkGroups.length > 0 ? (
+        showBacklinks && backlinkGroups.length > 0 ? (
           <section
             aria-labelledby="place-backlinks"
             class="mt-10 border-t border-border pt-8"

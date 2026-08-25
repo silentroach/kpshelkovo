@@ -81,7 +81,7 @@ describe('/map/[slug]/', () => {
     `);
   });
 
-  it('renders incoming links outside the Pagefind document', async () => {
+  it('hides incoming links', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(PlacePage, {
       params: { slug: 'apple-garden' },
@@ -91,14 +91,10 @@ describe('/map/[slug]/', () => {
     expect({
       hasBacklink: html.includes('href="/news/2026/05/apple-garden/"'),
       hasBacklinkHeading: html.includes('Где упоминается'),
-      ignoresBacklinksInPagefind: html.includes(
-        'aria-labelledby="place-backlinks" class="mt-10 border-t border-border pt-8" data-pagefind-ignore="all"',
-      ),
     }).toMatchInlineSnapshot(`
       {
-        "hasBacklink": true,
-        "hasBacklinkHeading": true,
-        "ignoresBacklinksInPagefind": true,
+        "hasBacklink": false,
+        "hasBacklinkHeading": false,
       }
     `);
   });
