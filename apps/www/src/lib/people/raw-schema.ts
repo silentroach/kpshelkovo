@@ -2,38 +2,38 @@ import { z } from 'astro/zod';
 
 import { PERSON_CONTACT_TYPES } from './schema';
 
-const text = z.string().trim();
+const nonBlankText = z.string().trim().min(1, 'must not be blank');
 
 const personNameCases = () =>
   z
     .object({
-      gen: text.optional(),
-      dat: text.optional(),
-      acc: text.optional(),
-      ins: text.optional(),
-      prep: text.optional(),
+      gen: nonBlankText.optional(),
+      dat: nonBlankText.optional(),
+      acc: nonBlankText.optional(),
+      ins: nonBlankText.optional(),
+      prep: nonBlankText.optional(),
     })
     .strict();
 
 const personContact = () =>
   z.object({
     type: z.enum(PERSON_CONTACT_TYPES),
-    value: text,
+    value: nonBlankText,
   });
 
 const personSeo = () =>
   z
     .object({
-      description: text.optional(),
+      description: nonBlankText.optional(),
     })
     .strict();
 
 export const RawPersonProfileSchema = z.object({
-  name: text,
+  name: nonBlankText,
   seo: personSeo().optional(),
   name_cases: personNameCases().optional(),
-  company: text.optional(),
-  position: text.optional(),
+  company: nonBlankText.optional(),
+  position: nonBlankText.optional(),
   contacts: z.array(personContact()),
 });
 
