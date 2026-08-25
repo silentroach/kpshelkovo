@@ -116,6 +116,53 @@ const obj = (
   required,
 });
 
+type RequiredProperties<T> = {
+  readonly [Key in keyof T as undefined extends T[Key] ? never : Key]: true;
+};
+
+const requiredKeys = <T extends object>(
+  properties: RequiredProperties<T>,
+): readonly string[] => Object.keys(properties);
+
+const eventParticipantProperties = {
+  name: text(1),
+  type: {
+    enum: ['organization', 'person'],
+  },
+} satisfies Record<keyof NewsDiscoveryEventOrganizer, Record<string, unknown>>;
+
+const eventParticipantRequired = requiredKeys<NewsDiscoveryEventOrganizer>({
+  name: true,
+  type: true,
+});
+
+const eventProperties = {
+  slug: text(1),
+  title: text(1),
+  description: text(1),
+  starts_at: dateTime(),
+  ends_at: dateTime(),
+  location: text(1),
+  coordinates: {
+    $ref: '#/$defs/coordinates',
+  },
+  map_url: uri(),
+  ics_url: uri(),
+  organizer: {
+    $ref: '#/$defs/eventParticipant',
+  },
+  performer: list({
+    $ref: '#/$defs/eventParticipant',
+  }),
+} satisfies Record<keyof NewsDiscoveryEvent, Record<string, unknown>>;
+
+const eventRequired = requiredKeys<NewsDiscoveryEvent>({
+  slug: true,
+  title: true,
+  starts_at: true,
+  ics_url: true,
+});
+
 function rewriteSchemaRefs(value: unknown, schemaRef: string): unknown {
   if (Array.isArray(value)) {
     return value.map((item) => rewriteSchemaRefs(item, schemaRef));
@@ -251,22 +298,11 @@ export function schema(root: string): Record<string, unknown> {
         },
         ['lat', 'lng'],
       ),
-      event: obj(
-        {
-          slug: text(1),
-          title: text(1),
-          description: text(1),
-          starts_at: dateTime(),
-          ends_at: dateTime(),
-          location: text(1),
-          coordinates: {
-            $ref: '#/$defs/coordinates',
-          },
-          map_url: uri(),
-          ics_url: uri(),
-        },
-        ['slug', 'title', 'starts_at', 'ics_url'],
+      eventParticipant: obj(
+        eventParticipantProperties,
+        eventParticipantRequired,
       ),
+      event: obj(eventProperties, eventRequired),
       article: obj(
         {
           id: {

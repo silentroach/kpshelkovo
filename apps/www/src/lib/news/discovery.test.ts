@@ -56,6 +56,16 @@ const articleWithEvent = (): NewsArticle => ({
         lat: 55,
         lng: 38,
       },
+      organizer: {
+        name: 'Редакция',
+        type: 'organization',
+      },
+      performer: [
+        {
+          name: 'Ведущий',
+          type: 'person',
+        },
+      ],
     },
   ],
   summary: 'Будет обсуждение регламента.',
@@ -139,6 +149,16 @@ describe('news discovery payload', () => {
         },
         map_url: 'https://yandex.ru/maps/?pt=38,55&z=16&l=map',
         ics_url: 'https://example.com/news/2026/05/event/event.ics',
+        organizer: {
+          name: 'Редакция',
+          type: 'organization',
+        },
+        performer: [
+          {
+            name: 'Ведущий',
+            type: 'person',
+          },
+        ],
       },
     ]);
   });
@@ -228,6 +248,16 @@ describe('news discovery payload', () => {
     const apiCatalog = catalog(root) as { readonly linkset: unknown };
     const openapiDefs =
       api.components?.schemas?.NewsArticlesPayload?.$defs ?? {};
+    const publicEvent = buildNewsPayload(dataset([articleWithEvent()]))
+      .articles[0]?.events?.[0];
+    const serializedEvent = JSON.parse(JSON.stringify(publicEvent)) as Record<
+      string,
+      unknown
+    >;
+    const serializedOrganizer = serializedEvent.organizer as Record<
+      string,
+      unknown
+    >;
 
     expect(jsonSchema.required).toEqual([
       'schema_version',
@@ -263,6 +293,33 @@ describe('news discovery payload', () => {
       'starts_at',
       'ics_url',
     ]);
+    expect(defs.event?.required).not.toContain('organizer');
+    expect(defs.event?.required).not.toContain('performer');
+    expect(Object.keys(defs.event?.properties ?? {}).sort()).toEqual(
+      Object.keys(serializedEvent).sort(),
+    );
+    expect(defs.event?.properties).toMatchObject({
+      organizer: {
+        $ref: '#/$defs/eventParticipant',
+      },
+      performer: {
+        type: 'array',
+        items: {
+          $ref: '#/$defs/eventParticipant',
+        },
+      },
+    });
+    expect(defs.eventParticipant).toMatchObject({
+      additionalProperties: false,
+      required: ['name', 'type'],
+      properties: {
+        name: { type: 'string', minLength: 1 },
+        type: { enum: ['organization', 'person'] },
+      },
+    });
+    expect(Object.keys(defs.eventParticipant?.properties ?? {}).sort()).toEqual(
+      Object.keys(serializedOrganizer).sort(),
+    );
     expect(defs.article?.required).not.toContain('events');
     expect(defs.event?.properties?.starts_at).toMatchObject({
       format: 'date-time',
@@ -277,6 +334,18 @@ describe('news discovery payload', () => {
       maximum: 180,
     });
     expect(openapiDefs.event?.required).toEqual(defs.event?.required);
+    expect(openapiDefs.event?.properties).toMatchObject({
+      organizer: {
+        $ref: '#/components/schemas/NewsArticlesPayload/$defs/eventParticipant',
+      },
+      performer: {
+        type: 'array',
+        items: {
+          $ref: '#/components/schemas/NewsArticlesPayload/$defs/eventParticipant',
+        },
+      },
+    });
+    expect(openapiDefs.eventParticipant).toEqual(defs.eventParticipant);
     expect(openapiDefs.article?.properties?.events).toMatchObject({
       type: 'array',
       items: {
