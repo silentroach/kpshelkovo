@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   count,
+  createNumberFormatterRu,
   formatCurrency,
   formatDate,
   formatDistance,
@@ -13,6 +14,10 @@ import {
   parseNumberInputRu,
   pluralize,
 } from './index';
+
+afterEach(() => vi.restoreAllMocks());
+
+const visibleNbsp = (value: string): string => value.replaceAll('\u00A0', '·');
 
 describe('format package', () => {
   describe('formatCurrency', () => {
@@ -47,6 +52,30 @@ describe('format package', () => {
           signDisplay: 'exceptZero',
         }),
       ).toBe('+40,87');
+    });
+
+    it('reuses a prepared formatter', () => {
+      const NativeNumberFormat = Intl.NumberFormat;
+      const numberFormat = vi
+        .spyOn(Intl, 'NumberFormat')
+        .mockImplementation(function NumberFormat(locales, options) {
+          return new NativeNumberFormat(locales, options);
+        });
+      const format = createNumberFormatterRu({
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 0,
+      });
+
+      expect(
+        [format(3_418_555.1), format(40.87), format(-40.87)].map(visibleNbsp),
+      ).toMatchInlineSnapshot(`
+          [
+            "3·418·555,1",
+            "40,87",
+            "-40,87",
+          ]
+        `);
+      expect(numberFormat).toHaveBeenCalledTimes(1);
     });
   });
 

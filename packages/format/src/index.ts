@@ -11,6 +11,7 @@ export {
   formatTariff,
 } from './currency';
 export {
+  createNumberFormatterRu,
   formatNumberRu,
   formatNumberUnitRu,
   padNumber,
