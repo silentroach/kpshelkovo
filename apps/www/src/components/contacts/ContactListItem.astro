@@ -62,7 +62,8 @@ const methodIconColors = {
         showReviewHighlight && (
           <span class="group relative mt-0.5 inline-flex shrink-0">
             <span
-              class="inline-flex cursor-help rounded-sm text-star focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              class="inline-flex cursor-help rounded-sm text-accent-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:text-star"
+              data-contact-review-highlight-trigger
               tabindex={0}
               role="img"
               aria-label="Отзывы"
@@ -143,3 +144,47 @@ const methodIconColors = {
     }
   </div>
 </article>
+
+<script>
+  const contactReviewTooltip = (
+    target: EventTarget,
+  ): HTMLElement | undefined => {
+    if (!(target instanceof Element)) {
+      return;
+    }
+
+    const tooltipId = target
+      .closest<HTMLElement>('[data-contact-review-highlight-trigger]')
+      ?.getAttribute('aria-describedby');
+    if (!tooltipId) {
+      return;
+    }
+
+    return document.getElementById(tooltipId) ?? undefined;
+  };
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !event.target) {
+      return;
+    }
+
+    const tooltip = contactReviewTooltip(event.target);
+    if (!tooltip) {
+      return;
+    }
+
+    tooltip.hidden = true;
+    event.stopPropagation();
+  });
+
+  document.addEventListener('focusout', (event) => {
+    if (!event.target) {
+      return;
+    }
+
+    const tooltip = contactReviewTooltip(event.target);
+    if (tooltip) {
+      tooltip.hidden = false;
+    }
+  });
+</script>

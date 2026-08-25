@@ -44,7 +44,7 @@ describe('ContactListItem', () => {
     });
 
     expect(html).toContain(
-      'tabindex="0" role="img" aria-label="Отзывы" aria-describedby="contact-review-highlight-construction-example"',
+      'data-contact-review-highlight-trigger tabindex="0" role="img" aria-label="Отзывы" aria-describedby="contact-review-highlight-construction-example"',
     );
     expect(html).toContain(
       'id="contact-review-highlight-construction-example" role="tooltip"',
