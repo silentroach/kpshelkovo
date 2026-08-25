@@ -29,7 +29,6 @@ const place = contactPlace(contact.location);
 const excerpt = contactExcerpt(contact);
 const showReviewHighlight = hasManyPositiveContactReviews(contact.reviews);
 const reviewHighlightLabel = 'Много положительных отзывов';
-const reviewHighlightTooltipId = `contact-review-highlight-${contact.category}-${contact.slug}`;
 const methodIcons = {
   phone: PhoneIcon,
   telegram: TelegramIcon,
@@ -60,24 +59,13 @@ const methodIconColors = {
       }
       {
         showReviewHighlight && (
-          <span class="group relative mt-0.5 inline-flex shrink-0">
-            <span
-              class="inline-flex cursor-help rounded-sm text-accent-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:text-star"
-              data-contact-review-highlight-trigger
-              tabindex={0}
-              role="img"
-              aria-label="Отзывы"
-              aria-describedby={reviewHighlightTooltipId}
-            >
-              <StarIcon class="size-5 fill-current" />
-            </span>
-            <span
-              id={reviewHighlightTooltipId}
-              role="tooltip"
-              class="pointer-events-none absolute left-0 top-full z-20 mt-2 hidden w-max max-w-56 border border-border-strong bg-surface px-2.5 py-1.5 text-left text-xs font-normal leading-5 text-foreground shadow-1 group-hover:block group-focus-within:block"
-            >
-              {reviewHighlightLabel}
-            </span>
+          <span
+            class="mt-0.5 inline-flex shrink-0 text-accent-text dark:text-star"
+            role="img"
+            aria-label={reviewHighlightLabel}
+            title={reviewHighlightLabel}
+          >
+            <StarIcon class="size-5 fill-current" />
           </span>
         )
       }
@@ -144,9 +132,3 @@ const methodIconColors = {
     }
   </div>
 </article>
-
-<script>
-  import { bindContactReviewHighlightTooltips } from '@/lib/contacts/review-highlight.dom';
-
-  bindContactReviewHighlightTooltips();
-</script>

@@ -37,19 +37,16 @@ const contact = {
 } satisfies Contact;
 
 describe('ContactListItem', () => {
-  it('exposes the review highlight tooltip to pointer, keyboard, and touch users', async () => {
+  it('describes the review highlight with a native title', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(ContactListItem, {
       props: { contact },
     });
 
     expect(html).toContain(
-      'data-contact-review-highlight-trigger tabindex="0" role="img" aria-label="Отзывы" aria-describedby="contact-review-highlight-construction-example"',
+      'role="img" aria-label="Много положительных отзывов" title="Много положительных отзывов"',
     );
-    expect(html).toContain(
-      'id="contact-review-highlight-construction-example" role="tooltip"',
-    );
-    expect(html).toContain('Много положительных отзывов');
+    expect(html).not.toContain('role="tooltip"');
     expect(html).toMatch(/<svg[^>]+aria-hidden="true"/u);
   });
 });
