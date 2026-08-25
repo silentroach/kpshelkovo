@@ -82,33 +82,7 @@ export const buildReviewsHomeMarkdown = (data: ReviewsDataset): string =>
         ]),
   ]);
 
-export const buildReviewsRulesMarkdown = (): string =>
-  serialize([
-    md.heading(1, REVIEW_RULES.title),
-    md.paragraph(
-      'Раздел собирает авторские отзывы текущих собственников о жизни в Шелково.',
-    ),
-    md.heading(2, REVIEW_RULES.eligibility.heading),
-    md.paragraph(REVIEW_RULES.eligibility.text),
-    md.heading(2, REVIEW_RULES.submission.heading),
-    md.paragraph([
-      md.text('Напишите владельцу сайта в Telegram: '),
-      md.link(
-        REVIEW_RULES.submission.telegram.href,
-        REVIEW_RULES.submission.telegram.label,
-      ),
-      md.text(`. ${REVIEW_RULES.submission.ownershipVerification}`),
-    ]),
-    md.paragraph(REVIEW_RULES.submission.dataHandling),
-    md.heading(2, REVIEW_RULES.editing.heading),
-    md.paragraph(REVIEW_RULES.editing.text),
-    md.heading(2, REVIEW_RULES.rejection.heading),
-    md.list(REVIEW_RULES.rejection.reasons.map((item) => md.listItem(item))),
-    md.heading(2, REVIEW_RULES.disclaimer.heading),
-    md.paragraph(REVIEW_RULES.disclaimer.text),
-    md.heading(2, REVIEW_RULES.rightsViolation.heading),
-    md.paragraph(REVIEW_RULES.rightsViolation.text),
-  ]);
+export const buildReviewsRulesMarkdown = (): string => REVIEW_RULES.markdown;
 
 export const buildReviewMarkdown = (review: Review): string =>
   serializeMarkdownDocument(
@@ -129,7 +103,7 @@ export const buildReviewMarkdown = (review: Review): string =>
             ]
           : []),
         md.heading(2, REVIEW_RULES.disclaimer.heading),
-        md.paragraph(REVIEW_RULES.disclaimer.text),
+        ...parseMarkdownFragment(REVIEW_RULES.disclaimer.bodyMarkdown),
       ],
     }),
   );

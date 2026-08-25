@@ -3,6 +3,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { type Element, type HTMLElement, Window } from 'happy-dom';
 
+import { renderMarkdown } from '@/lib/markdown/render';
 import { createAstroContainer } from '@/test/astro-container';
 
 import { buildReviewMarkdown, buildReviewsRulesMarkdown } from '../markdown';
@@ -47,42 +48,21 @@ const parseMain = (html: string): HTMLElement => {
   return main;
 };
 
-const elementText = (element: Element): string =>
-  (element.textContent ?? '').replace(/\s+/gu, ' ').trim();
+const elementText = (element: Element): string => {
+  const content = element.cloneNode(true) as Element;
+  content.querySelectorAll('.ui-heading-anchor').forEach((anchor) => {
+    anchor.remove();
+  });
 
-const missingCopy = (
-  content: string,
-  copy: readonly string[],
-): readonly string[] =>
-  copy.filter((statement) => !content.includes(statement));
+  return (content.textContent ?? '').replace(/\s+/gu, ' ').trim();
+};
 
-const sharedRulesCopy = [
-  REVIEW_RULES.title,
-  REVIEW_RULES.eligibility.heading,
-  REVIEW_RULES.eligibility.text,
-  REVIEW_RULES.submission.heading,
-  REVIEW_RULES.submission.telegram.label,
-  REVIEW_RULES.submission.ownershipVerification,
-  REVIEW_RULES.submission.dataHandling,
-  REVIEW_RULES.editing.heading,
-  REVIEW_RULES.editing.text,
-  REVIEW_RULES.rejection.heading,
-  ...REVIEW_RULES.rejection.reasons,
-  REVIEW_RULES.disclaimer.heading,
-  REVIEW_RULES.disclaimer.text,
-  REVIEW_RULES.rightsViolation.heading,
-  REVIEW_RULES.rightsViolation.text,
-] as const;
+const markdownText = (markdown: string): string => {
+  const document = new Window().document;
+  document.body.innerHTML = renderMarkdown(markdown);
 
-const rulesHeadings = [
-  ['H1', REVIEW_RULES.title],
-  ['H2', REVIEW_RULES.eligibility.heading],
-  ['H2', REVIEW_RULES.submission.heading],
-  ['H2', REVIEW_RULES.editing.heading],
-  ['H2', REVIEW_RULES.rejection.heading],
-  ['H2', REVIEW_RULES.disclaimer.heading],
-  ['H2', REVIEW_RULES.rightsViolation.heading],
-] as const;
+  return elementText(document.body);
+};
 
 describe('review rules public surfaces', () => {
   it('renders the shared contract in HTML and Markdown', async () => {
@@ -92,37 +72,25 @@ describe('review rules public surfaces', () => {
     });
     const main = parseMain(html);
     const markdown = buildReviewsRulesMarkdown();
-    const telegramLink = [...main.querySelectorAll('a')].find(
-      (link) => elementText(link) === REVIEW_RULES.submission.telegram.label,
-    );
+    const title = main.querySelector('h1');
+    const rules = main.querySelector('article');
+    if (!title || !rules) {
+      throw new Error('review rules page content not found');
+    }
 
     expect({
-      missingFromHtml: missingCopy(elementText(main), sharedRulesCopy),
-      missingFromMarkdown: missingCopy(markdown, sharedRulesCopy),
-      markdownHasTelegramLink: markdown.includes(
-        `[${REVIEW_RULES.submission.telegram.label}](${REVIEW_RULES.submission.telegram.href})`,
-      ),
+      htmlMatchesMarkdown:
+        `${elementText(title)} ${elementText(rules)}` ===
+        markdownText(markdown),
+      telegramHref: rules
+        .querySelector('a[href="https://t.me/silentroach"]')
+        ?.getAttribute('href'),
     }).toMatchInlineSnapshot(`
       {
-        "markdownHasTelegramLink": true,
-        "missingFromHtml": [],
-        "missingFromMarkdown": [],
+        "htmlMatchesMarkdown": true,
+        "telegramHref": "https://t.me/silentroach",
       }
     `);
-
-    expect(
-      [...main.querySelectorAll('h1, h2')].map((heading) => [
-        heading.tagName,
-        elementText(heading),
-      ]),
-    ).toEqual(rulesHeadings);
-    expect([...main.querySelectorAll('ul > li')].map(elementText)).toEqual(
-      REVIEW_RULES.rejection.reasons,
-    );
-    expect({
-      href: telegramLink?.getAttribute('href'),
-      label: telegramLink ? elementText(telegramLink) : undefined,
-    }).toEqual(REVIEW_RULES.submission.telegram);
   });
 
   it('uses the shared disclaimer on review detail surfaces', async () => {
@@ -140,18 +108,24 @@ describe('review rules public surfaces', () => {
       throw new Error('review disclaimer not found');
     }
     const markdown = buildReviewMarkdown(fixture.review);
-    const disclaimerCopy = [
-      REVIEW_RULES.disclaimer.heading,
-      REVIEW_RULES.disclaimer.text,
-    ];
+    const disclaimerHeading = disclaimer.querySelector('h2');
+    const disclaimerBody = disclaimer.querySelector('div');
+    if (!disclaimerHeading || !disclaimerBody) {
+      throw new Error('review disclaimer content not found');
+    }
+    const expectedBody = markdownText(REVIEW_RULES.disclaimer.bodyMarkdown);
+    const expectedDisclaimerMarkdown = `## ${REVIEW_RULES.disclaimer.heading}\n\n${REVIEW_RULES.disclaimer.bodyMarkdown}`;
 
     expect({
-      missingFromHtml: missingCopy(elementText(disclaimer), disclaimerCopy),
-      missingFromMarkdown: missingCopy(markdown, disclaimerCopy),
+      htmlBodyMatchesSource: elementText(disclaimerBody) === expectedBody,
+      htmlHeadingMatchesSource:
+        elementText(disclaimerHeading) === REVIEW_RULES.disclaimer.heading,
+      markdownEndsWithSource: markdown.endsWith(expectedDisclaimerMarkdown),
     }).toMatchInlineSnapshot(`
       {
-        "missingFromHtml": [],
-        "missingFromMarkdown": [],
+        "htmlBodyMatchesSource": true,
+        "htmlHeadingMatchesSource": true,
+        "markdownEndsWithSource": true,
       }
     `);
   });

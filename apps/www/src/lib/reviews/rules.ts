@@ -1,41 +1,66 @@
+import {
+  createMarkdownDocument,
+  parseMarkdownFragment,
+  serializeMarkdownDocument,
+} from '@shelkovo/markdown';
+
+import reviewRulesSource from '@/data/review-rules.md?raw';
+
+type MarkdownNode = ReturnType<typeof parseMarkdownFragment>[number];
+
+const DISCLAIMER_HEADING = 'Отказ от ответственности';
+
+const serialize = (children: readonly MarkdownNode[]): string =>
+  serializeMarkdownDocument(createMarkdownDocument({ children }));
+
+const headingText = (heading: MarkdownNode): string => {
+  if (
+    heading.type !== 'heading' ||
+    heading.children.length !== 1 ||
+    heading.children[0]?.type !== 'text'
+  ) {
+    throw new Error('review rules headings must contain plain text');
+  }
+
+  return heading.children[0].value;
+};
+
+const nodes = parseMarkdownFragment(reviewRulesSource);
+const titleNode = nodes[0];
+if (titleNode?.type !== 'heading' || titleNode.depth !== 1) {
+  throw new Error('review rules must start with an H1 heading');
+}
+
+const disclaimerStart = nodes.findIndex(
+  (node) =>
+    node.type === 'heading' &&
+    node.depth === 2 &&
+    headingText(node) === DISCLAIMER_HEADING,
+);
+if (disclaimerStart < 0) {
+  throw new Error(`review rules must contain "${DISCLAIMER_HEADING}" section`);
+}
+
+const disclaimerEnd = nodes.findIndex(
+  (node, index) =>
+    index > disclaimerStart && node.type === 'heading' && node.depth <= 2,
+);
+const disclaimerNodes = nodes.slice(
+  disclaimerStart + 1,
+  disclaimerEnd < 0 ? nodes.length : disclaimerEnd,
+);
+if (disclaimerNodes.length === 0) {
+  throw new Error(
+    `review rules "${DISCLAIMER_HEADING}" section must not be empty`,
+  );
+}
+
 export const REVIEW_RULES = {
-  title: 'Правила публикации отзывов',
-  eligibility: {
-    heading: 'Кто может оставить отзыв',
-    text: 'Отзыв могут оставить текущие собственники участков или домов в Шелково.',
-  },
-  submission: {
-    heading: 'Как отправить отзыв',
-    telegram: {
-      href: 'https://t.me/silentroach',
-      label: 't.me/silentroach',
-    },
-    ownershipVerification:
-      'Для проверки владения могут понадобиться выписка из ЕГРН и скриншот из приложения Домиленд.',
-    dataHandling:
-      'Сайт не хранит документы проверки, контакты, черновики и внутренние заметки. Публикация отзыва означает, что автор прошел ручную проверку до публикации.',
-  },
-  editing: {
-    heading: 'Редактура',
-    text: 'Текст отзыва публикуется без редакторских правок. Если в тексте есть проблема, отзыв не публикуется до новой версии от автора.',
-  },
-  rejection: {
-    heading: 'Почему отзыв могут не принять',
-    reasons: [
-      'не подтверждено владение;',
-      'спам;',
-      'угрозы;',
-      'незаконный контент;',
-      'чужие персональные данные;',
-      'серьезные обвинения вроде преступлений или мошенничества без фактов.',
-    ],
-  },
+  title: headingText(titleNode),
+  markdown: serialize(nodes),
+  bodyMarkdown: serialize(nodes.slice(1)),
   disclaimer: {
-    heading: 'Отказ от ответственности',
-    text: 'Отзывы — это авторские тексты собственников. Мнение автора может не совпадать с позицией владельца сайта. Ответственность за сведения, оценки и формулировки в отзыве несет автор в пределах закона. Владелец сайта не является автором отзыва, не редактирует текст и не подтверждает каждое фактическое утверждение, а только проверяет, что автор является текущим собственником участка или дома в Шелково.',
-  },
-  rightsViolation: {
-    heading: 'Если отзыв нарушает права',
-    text: 'Если вы считаете, что отзыв нарушает ваши права, содержит чужие персональные данные, угрозы или недостоверные сведения, напишите владельцу сайта со ссылкой на страницу и описанием проблемы. Мы рассмотрим обращение и при необходимости скроем или удалим материал.',
+    heading: DISCLAIMER_HEADING,
+    bodyMarkdown: serialize(disclaimerNodes),
   },
 } as const;

@@ -6,6 +6,7 @@ import {
   withHomeBreadcrumbs,
   withHomeSchemaBreadcrumbs,
 } from '@/lib/breadcrumbs';
+import { renderMarkdown } from '@/lib/markdown/render';
 import { reviewsRulesUrl, reviewsUrl } from '@/lib/reviews/routes';
 import { REVIEW_RULES } from '@/lib/reviews/rules';
 import { reviewsCollectionPageSchema } from '@/lib/reviews/seo';
@@ -13,6 +14,7 @@ import { reviewsCollectionPageSchema } from '@/lib/reviews/seo';
 const title = 'Правила отзывов — Отзывы — Шелково Онлайн';
 const description =
   'Как текущим собственникам Шелково отправить отзыв, как проходит ручная проверка и почему материал могут не принять.';
+const rulesHtml = renderMarkdown(REVIEW_RULES.bodyMarkdown);
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Отзывы', href: reviewsUrl() },
   { label: 'Правила' },
@@ -45,32 +47,7 @@ const schema = reviewsCollectionPageSchema({
     </header>
 
     <article class="px-5 md:px-6">
-      <div class="ui-prose max-w-[65ch]">
-        <h2>{REVIEW_RULES.eligibility.heading}</h2>
-        <p>{REVIEW_RULES.eligibility.text}</p>
-
-        <h2>{REVIEW_RULES.submission.heading}</h2>
-        <p>
-          Напишите в Telegram: <a href={REVIEW_RULES.submission.telegram.href}
-            >{REVIEW_RULES.submission.telegram.label}</a
-          >. {REVIEW_RULES.submission.ownershipVerification}
-        </p>
-        <p>{REVIEW_RULES.submission.dataHandling}</p>
-
-        <h2>{REVIEW_RULES.editing.heading}</h2>
-        <p>{REVIEW_RULES.editing.text}</p>
-
-        <h2>{REVIEW_RULES.rejection.heading}</h2>
-        <ul>
-          {REVIEW_RULES.rejection.reasons.map((reason) => <li>{reason}</li>)}
-        </ul>
-
-        <h2>{REVIEW_RULES.disclaimer.heading}</h2>
-        <p>{REVIEW_RULES.disclaimer.text}</p>
-
-        <h2>{REVIEW_RULES.rightsViolation.heading}</h2>
-        <p>{REVIEW_RULES.rightsViolation.text}</p>
-      </div>
+      <div class="ui-prose max-w-[65ch]" set:html={rulesHtml} />
     </article>
   </main>
 </BaseLayout>

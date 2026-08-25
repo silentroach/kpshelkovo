@@ -47,6 +47,7 @@ const title = `${reviewTitle} — Отзывы — Шелково Онлайн`;
 const description =
   review.seo?.description ??
   `Отзыв собственника ${formatReviewAuthor(review)} о жизни в Шелково.`;
+const disclaimerHtml = renderMarkdown(REVIEW_RULES.disclaimer.bodyMarkdown);
 const search = {
   scope: 'manual',
   title: reviewTitle,
@@ -99,9 +100,10 @@ const schema = reviewPageSchema({
         <h2 id="review-disclaimer" class="ui-section-label">
           {REVIEW_RULES.disclaimer.heading}
         </h2>
-        <p class="mt-2 text-xs leading-5 text-muted-foreground">
-          {REVIEW_RULES.disclaimer.text}
-        </p>
+        <div
+          class="mt-2 text-xs leading-5 text-muted-foreground"
+          set:html={disclaimerHtml}
+        />
       </section>
     </footer>
     <!--/noindex-->
