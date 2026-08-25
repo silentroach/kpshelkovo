@@ -12,6 +12,7 @@ const domTests = [
   'src/lib/home/status.dom.test.ts',
   'src/lib/status/timeline.dom.test.ts',
   'src/lib/reglament/calculator-controller.test.ts',
+  'src/scripts/tests/site-runtime.test.ts',
 ];
 
 export default getViteConfig({

@@ -1,4 +1,4 @@
-import { flushSync, mount, unmount } from 'svelte';
+import { flushSync, hydrate, unmount } from 'svelte';
 
 import SearchDialog from './SearchDialog.svelte';
 import { SEARCH_DIALOG_OPEN_EVENT } from './search-dialog.events';
@@ -16,10 +16,18 @@ const unmountSearchDialog = (): void => {
 
 document.addEventListener('astro:before-swap', unmountSearchDialog);
 
-export const openSearchDialog = (opener: HTMLElement): void => {
+export const openSearchDialog = (
+  root: HTMLElement,
+  opener: HTMLElement,
+  initialQuery: string,
+): void => {
   if (!component) {
-    component = mount(SearchDialog, { target: document.body });
+    component = hydrate(SearchDialog, {
+      target: root,
+      props: { initialQuery },
+    });
     flushSync();
+    root.setAttribute('data-search-dialog-hydrated', '');
   }
 
   document.dispatchEvent(

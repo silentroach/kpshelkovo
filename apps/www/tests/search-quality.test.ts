@@ -271,6 +271,86 @@ afterAll(async () => {
   await server.close();
 });
 
+test('#243 cold search activation survives a delayed lazy chunk', async () => {
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
+
+  let releaseLazyChunk = (): void => {};
+  const lazyChunkGate = new Promise<void>((resolve) => {
+    releaseLazyChunk = resolve;
+  });
+  let delayedScripts = 0;
+  await page.route('**/static/*.js', async (route) => {
+    delayedScripts += 1;
+    await lazyChunkGate;
+    await route.continue();
+  });
+
+  await page.evaluate(() => {
+    document.addEventListener(
+      'click',
+      () => {
+        const dialog = document.querySelector<HTMLDialogElement>(
+          '[data-search-dialog]',
+        );
+        const input = document.querySelector<HTMLInputElement>(
+          '[data-search-input]',
+        );
+        const state = {
+          focused: document.activeElement === input,
+          open: dialog?.open ?? false,
+        };
+
+        Object.assign(window, { __issue243Activation: state });
+      },
+      { once: true },
+    );
+  });
+
+  const opener = page.locator('[data-search-trigger]:visible').first();
+  const searchDialog = page.locator('[data-search-dialog]');
+  const searchInput = searchDialog.getByRole('searchbox', {
+    name: 'Что найти на сайте',
+  });
+  await opener.click();
+
+  expect(
+    await page.evaluate(
+      () =>
+        (
+          window as Window & {
+            __issue243Activation?: {
+              readonly focused: boolean;
+              readonly open: boolean;
+            };
+          }
+        ).__issue243Activation,
+    ),
+  ).toEqual({ focused: true, open: true });
+  await searchInput.pressSequentially('вода');
+  await expectPage(searchInput).toHaveValue('вода');
+  await expect.poll(() => delayedScripts).toBeGreaterThan(0);
+
+  releaseLazyChunk();
+  await expectPage(searchDialog).toHaveAttribute(
+    'data-search-state',
+    /^(?:empty|results)$/u,
+  );
+  await expectPage(searchInput).toHaveValue('вода');
+
+  await searchInput.press('Escape');
+  await expectPage(opener).toBeFocused();
+  await opener.click();
+  await expectPage(searchInput).toBeFocused();
+
+  await page.evaluate(() => {
+    document.dispatchEvent(new Event('astro:before-swap'));
+  });
+  await expectPage(searchDialog).toHaveCount(0);
+  await expectPage(opener).not.toBeFocused();
+  await page.close();
+});
+
 test('#154 search result highlighting', async () => {
   const page = await browser.newPage({
     viewport: { width: 1280, height: 800 },

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { count, formatDate, pluralize } from '@shelkovo/format';
   import SearchIcon from '@shelkovo/ui/icons/system/Search.svelte';
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
   import type { Attachment } from 'svelte/attachments';
   import { on } from 'svelte/events';
 
@@ -26,7 +26,8 @@
   const RESULT_FORMS = ['результат', 'результата', 'результатов'] as const;
   const FOUND_FORMS = ['Найден', 'Найдено', 'Найдено'] as const;
 
-  let { client = pagefindSearchClient }: SearchDialogProps = $props();
+  let { client = pagefindSearchClient, initialQuery = '' }: SearchDialogProps =
+    $props();
 
   const id = $props.id();
   const dialogId = `${id}-dialog`;
@@ -41,7 +42,7 @@
   let restoreFocusOnClose = true;
   let pendingSearchTimer: ReturnType<typeof setTimeout> | undefined;
 
-  let query = $state('');
+  let query = $derived(initialQuery);
   let viewState = $state<SearchDialogState>('initial');
   let results = $state.raw<readonly SearchResult[]>([]);
   let requestedLimit = $state(SEARCH_RESULT_DEFAULT_LIMIT);
@@ -153,19 +154,29 @@
     finishClose();
   };
 
-  const openDialog = async (opener: HTMLElement): Promise<void> => {
-    if (!dialogElement || dialogElement.open) {
+  const openDialog = (opener: HTMLElement): void => {
+    if (!dialogElement) {
       return;
     }
 
+    const queryBeforeHydration = inputElement?.value ?? '';
+    const shellAlreadyOpened = dialogElement.open;
     openerElement = opener;
     restoreFocusOnClose = true;
     resetSearch();
-    dialogElement.showModal();
+    if (queryBeforeHydration) {
+      query = queryBeforeHydration;
+      if (query.trim()) {
+        void client.preload?.(query).catch(() => {});
+        scheduleSearch(query);
+      }
+    }
+    if (!shellAlreadyOpened) {
+      dialogElement.showModal();
+      inputElement?.focus();
+    }
     reachMetrikaGoal(SEARCH_OPEN_GOAL);
     void client.init?.().catch(() => {});
-    await tick();
-    inputElement?.focus();
   };
 
   const isCurrentVisibleQuery = (requestedQuery: string): boolean =>
@@ -418,7 +429,7 @@
       return;
     }
 
-    void openDialog(event.detail);
+    openDialog(event.detail);
   };
 
   const handleDialogClick = (event: MouseEvent): void => {
@@ -548,6 +559,7 @@
   class="site-search-dialog"
   aria-labelledby={headingId}
   data-pagefind-ignore="all"
+  data-search-dialog
   data-search-state={viewState}
   onclose={finishClose}
   onclick={handleDialogClick}
@@ -569,12 +581,14 @@
         autocomplete="off"
         maxlength={SEARCH_QUERY_MAX_LENGTH}
         aria-controls={viewState === 'initial' ? undefined : resultsId}
+        data-search-input
         oninput={handleInput}
       />
       <button
         type="button"
         class="site-search-dialog__close"
         aria-label="Закрыть"
+        data-search-close
         onclick={() => closeDialog()}
       >
         <svg
