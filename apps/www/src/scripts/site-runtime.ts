@@ -13,6 +13,7 @@ type YandexMetrika = ((...args: readonly unknown[]) => void) & {
 declare global {
   interface Window {
     __shelkovoNavigationProgress?: boolean;
+    __shelkovoSearchDialogLoader?: boolean;
     __shelkovoSiteHeaderMenu?: boolean;
     __shelkovoSiteNavDropdowns?: boolean;
     __shelkovoSettlementsFallback?: boolean;
@@ -342,6 +343,45 @@ const bindSiteHeaderMenu = (): void => {
   });
 };
 
+let latestSearchDialogRequest = 0;
+
+const requestSearchDialog = async (
+  opener: HTMLElement,
+  requestId: number,
+): Promise<void> => {
+  const { openSearchDialog } = await import('@/components/search/lazy');
+  if (requestId !== latestSearchDialogRequest || !opener.isConnected) {
+    return;
+  }
+
+  openSearchDialog(opener);
+};
+
+const bindSearchDialogLoader = (): void => {
+  if (window.__shelkovoSearchDialogLoader) {
+    return;
+  }
+
+  window.__shelkovoSearchDialogLoader = true;
+  document.addEventListener('astro:before-swap', () => {
+    latestSearchDialogRequest += 1;
+  });
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const trigger = event.target.closest(SEARCH_TRIGGER_SELECTOR);
+    if (!(trigger instanceof HTMLElement)) {
+      return;
+    }
+
+    event.preventDefault();
+    const requestId = ++latestSearchDialogRequest;
+    void requestSearchDialog(trigger, requestId).catch(() => {});
+  });
+};
+
 const bindSettlementsFallback = (): void => {
   if (window.__shelkovoSettlementsFallback) {
     return;
@@ -382,6 +422,7 @@ const installSearchHighlights = (): void => {
 
 bindNavigationProgress();
 bindSiteHeaderMenu();
+bindSearchDialogLoader();
 installSiteNavDropdowns();
 runWhenDocumentReady(() => installHomeStatusHydration());
 bindMetrikaLoader();

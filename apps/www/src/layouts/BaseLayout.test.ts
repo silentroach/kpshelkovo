@@ -66,18 +66,15 @@ describe('BaseLayout markdown discovery', () => {
 });
 
 describe('BaseLayout search contract', () => {
-  it('mounts one global dialog outside the indexed content', async () => {
+  it('leaves the global dialog out of the initial HTML', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(BaseLayout, {
       request: new Request('https://example.com/news/'),
       props: { search: searchDocument('page') },
     });
 
-    expect(html.match(/<dialog/g)).toHaveLength(1);
+    expect(html).not.toContain('<dialog');
     expect(html.match(/data-search-trigger/g)).toHaveLength(2);
-    expect(html.indexOf('<dialog')).toBeGreaterThan(
-      html.indexOf('data-pagefind-root'),
-    );
   });
 
   it('does not opt a page into Pagefind by default', async () => {
