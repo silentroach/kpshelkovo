@@ -51,7 +51,7 @@ const CONTACT_REVIEW_SENTIMENT_LABELS: Record<
   negative: 'Минус',
 };
 
-const MANY_POSITIVE_CONTACT_REVIEWS_THRESHOLD = 3;
+const MANY_POSITIVE_CONTACT_REVIEWS_THRESHOLD = 5;
 
 export const CONTACTS_PROSE = 'ui-prose max-w-[65ch]';
 

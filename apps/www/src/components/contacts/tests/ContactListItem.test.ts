@@ -24,7 +24,13 @@ const contact = {
   updatedAt: new Date('2026-08-01T00:00:00.000Z'),
   updatedIso: '2026-08-01',
   contacts: { phone: '+7 900 000-00-00' },
-  reviews: [positiveReview, positiveReview, positiveReview],
+  reviews: [
+    positiveReview,
+    positiveReview,
+    positiveReview,
+    positiveReview,
+    positiveReview,
+  ],
   hasDetailPage: false,
   body: '',
   mentions: [],
@@ -37,11 +43,9 @@ describe('ContactListItem', () => {
       props: { contact },
     });
 
+    expect(html).toContain('title="Много положительных отзывов"');
     expect(html).toContain(
-      'title="В карточке минимум три положительных отзыва соседей, отрицательных нет"',
-    );
-    expect(html).toContain(
-      '<span class="sr-only">В карточке минимум три положительных отзыва соседей, отрицательных нет</span>',
+      '<span class="sr-only">Много положительных отзывов</span>',
     );
     expect(html).toMatch(/<svg[^>]+aria-hidden="true"/u);
   });

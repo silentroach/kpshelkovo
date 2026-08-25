@@ -28,8 +28,7 @@ const methods = contactMethods(contact.contacts);
 const place = contactPlace(contact.location);
 const excerpt = contactExcerpt(contact);
 const showReviewHighlight = hasManyPositiveContactReviews(contact.reviews);
-const reviewHighlightLabel =
-  'В карточке минимум три положительных отзыва соседей, отрицательных нет';
+const reviewHighlightLabel = 'Много положительных отзывов';
 const methodIcons = {
   phone: PhoneIcon,
   telegram: TelegramIcon,

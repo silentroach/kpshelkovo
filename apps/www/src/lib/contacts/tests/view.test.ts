@@ -34,9 +34,11 @@ describe('contact view helpers', () => {
     ).toBe('7 апреля 2026');
   });
 
-  it('marks contacts with at least three positive and no negative reviews', () => {
+  it('marks contacts with at least five positive and no negative reviews', () => {
     expect(
       hasManyPositiveContactReviews([
+        { sentiment: 'positive' },
+        { sentiment: 'positive' },
         { sentiment: 'positive' },
         { sentiment: 'positive' },
         { sentiment: 'positive' },
@@ -46,10 +48,14 @@ describe('contact view helpers', () => {
       hasManyPositiveContactReviews([
         { sentiment: 'positive' },
         { sentiment: 'positive' },
+        { sentiment: 'positive' },
+        { sentiment: 'positive' },
       ]),
     ).toBe(false);
     expect(
       hasManyPositiveContactReviews([
+        { sentiment: 'positive' },
+        { sentiment: 'positive' },
         { sentiment: 'positive' },
         { sentiment: 'positive' },
         { sentiment: 'positive' },
