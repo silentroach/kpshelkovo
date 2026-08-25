@@ -3,13 +3,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const highlightSearchTerms = vi.hoisted(() => vi.fn(async () => {}));
+const openSearchDialog = vi.hoisted(() => vi.fn());
 
 vi.mock('@/lib/search/highlight', () => ({ highlightSearchTerms }));
+vi.mock('@/components/search/lazy', () => ({ openSearchDialog }));
 
 import '../site-runtime';
 
 beforeEach(() => {
   highlightSearchTerms.mockClear();
+  openSearchDialog.mockClear();
 });
 
 afterEach(() => {
@@ -25,6 +28,51 @@ describe('search highlights', () => {
 
     expect(highlightSearchTerms).toHaveBeenCalledOnce();
     expect(highlightSearchTerms).toHaveBeenCalledWith(location.href);
+  });
+});
+
+describe('search dialog loader', () => {
+  it('loads the dialog on demand and forwards the exact opener', async () => {
+    document.body.innerHTML = `
+      <button type="button" data-search-trigger>
+        <span>Search</span>
+      </button>
+    `;
+    const opener = document.querySelector<HTMLButtonElement>(
+      '[data-search-trigger]',
+    );
+    const icon = opener?.querySelector('span');
+    if (!opener || !icon) {
+      throw new Error('Expected search trigger fixture');
+    }
+
+    const click = new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true,
+    });
+    icon.dispatchEvent(click);
+
+    await vi.waitFor(() => expect(openSearchDialog).toHaveBeenCalledOnce());
+    expect(openSearchDialog).toHaveBeenCalledWith(opener);
+    expect(click.defaultPrevented).toBe(true);
+  });
+
+  it('drops a pending open request when Astro replaces the page', async () => {
+    document.body.innerHTML = `
+      <button type="button" data-search-trigger>Search</button>
+    `;
+    const opener = document.querySelector<HTMLButtonElement>(
+      '[data-search-trigger]',
+    );
+    if (!opener) {
+      throw new Error('Expected search trigger fixture');
+    }
+
+    opener.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    document.dispatchEvent(new Event('astro:before-swap'));
+    await import('@/components/search/lazy');
+
+    expect(openSearchDialog).not.toHaveBeenCalled();
   });
 });
 

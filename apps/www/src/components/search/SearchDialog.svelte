@@ -11,6 +11,7 @@
     SEARCH_QUERY_MAX_LENGTH,
     SEARCH_RESULT_DEFAULT_LIMIT,
   } from '@/lib/search/client.types';
+  import { SEARCH_DIALOG_OPEN_EVENT } from './search-dialog.events';
   import type {
     SearchDialogProps,
     SearchDialogRequestMode,
@@ -19,7 +20,6 @@
     SearchExcerptSegment,
   } from './search-dialog.types';
 
-  const SEARCH_TRIGGER_SELECTOR = '[data-search-trigger]';
   const SEARCH_DEBOUNCE_MS = 150;
   const SEARCH_OPEN_GOAL = 'search_open';
   const SEARCH_GOAL = 'search';
@@ -410,18 +410,15 @@
     }
   };
 
-  const handleDocumentClick = (event: MouseEvent): void => {
-    if (!(event.target instanceof Element)) {
+  const handleOpenRequest = (event: Event): void => {
+    if (
+      !(event instanceof CustomEvent) ||
+      !(event.detail instanceof HTMLElement)
+    ) {
       return;
     }
 
-    const trigger = event.target.closest(SEARCH_TRIGGER_SELECTOR);
-    if (!(trigger instanceof HTMLElement)) {
-      return;
-    }
-
-    event.preventDefault();
-    void openDialog(trigger);
+    void openDialog(event.detail);
   };
 
   const handleDialogClick = (event: MouseEvent): void => {
@@ -527,14 +524,14 @@
   };
 
   onMount(() => {
-    const removeClickListener = on(document, 'click', handleDocumentClick);
-    const removeBeforeSwapListener = on(document, 'astro:before-swap', () => {
-      closeDialog(false);
-    });
+    const removeOpenListener = on(
+      document,
+      SEARCH_DIALOG_OPEN_EVENT,
+      handleOpenRequest,
+    );
 
     return () => {
-      removeClickListener();
-      removeBeforeSwapListener();
+      removeOpenListener();
       clearPendingSearch();
       restoreFocusOnClose = false;
       if (dialogElement?.open) {

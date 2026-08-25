@@ -12,7 +12,6 @@ import FontPreloads from '@shelkovo/ui/FontPreloads.astro';
 import type { SchemaDoc } from '@shelkovo/seo';
 import SiteFooter from '@shelkovo/ui/SiteFooter.astro';
 import { browserColor, themeColor } from '@shelkovo/ui/theme';
-import SearchDialog from '@/components/search/SearchDialog.svelte';
 import SiteHeader from '@/components/site/SiteHeader.astro';
 import type { SearchDocument } from '@/lib/search/types';
 import { absoluteUrl, canon } from '../lib/site';
@@ -220,7 +219,6 @@ const searchMetadata = search
         <slot />
       </div>
     </div>
-    <SearchDialog client:load />
     {showSiteFooter && <SiteFooter />}
   </body>
 </html>

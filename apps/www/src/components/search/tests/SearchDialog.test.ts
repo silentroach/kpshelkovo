@@ -7,6 +7,7 @@ import type {
   SearchResult,
 } from '@/lib/search/client.types';
 import SearchDialog from '../SearchDialog.svelte';
+import { SEARCH_DIALOG_OPEN_EVENT } from '../search-dialog.events';
 
 interface Deferred<T> {
   readonly promise: Promise<T>;
@@ -66,6 +67,13 @@ const addOpener = (label: string): HTMLButtonElement => {
   return opener;
 };
 
+const requestOpen = async (opener: HTMLElement): Promise<void> => {
+  await fireEvent(
+    document,
+    new CustomEvent(SEARCH_DIALOG_OPEN_EVENT, { detail: opener }),
+  );
+};
+
 const dialogFrom = (container: HTMLElement): HTMLDialogElement => {
   const dialog = container.querySelector('dialog');
   if (!(dialog instanceof HTMLDialogElement)) {
@@ -114,7 +122,7 @@ describe('SearchDialog', () => {
     const view = render(SearchDialog, { props: { client: { search } } });
     const dialog = dialogFrom(view.container);
 
-    await fireEvent.click(opener);
+    await requestOpen(opener);
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
     await enterDebouncedQuery(input, 'подать в суд тариф');
     await waitFor(() => expect(dialog.dataset.searchState).toBe('results'));
@@ -179,7 +187,7 @@ describe('SearchDialog', () => {
     const dialog = dialogFrom(view.container);
 
     expect(init).not.toHaveBeenCalled();
-    await fireEvent.click(opener);
+    await requestOpen(opener);
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
     await waitFor(() => expect(init).toHaveBeenCalledOnce());
 
@@ -206,7 +214,7 @@ describe('SearchDialog', () => {
     expect(search).toHaveBeenCalledWith('вода', 8);
   });
 
-  it('opens lazily from the delegated trigger and restores the exact opener', async () => {
+  it('opens from a delegated request and restores the exact opener', async () => {
     const search = vi.fn(async () => readyResponse('', []));
     const client: SearchClient = { search };
     const firstOpener = addOpener('Первый поиск');
@@ -217,7 +225,7 @@ describe('SearchDialog', () => {
     expect(search).not.toHaveBeenCalled();
     expect(dialog.open).toBe(false);
 
-    await fireEvent.click(secondOpener);
+    await requestOpen(secondOpener);
 
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
     await waitFor(() => expect(document.activeElement).toBe(input));
@@ -252,7 +260,7 @@ describe('SearchDialog', () => {
     expect(search).not.toHaveBeenCalled();
     expect(document.activeElement).toBe(secondOpener);
 
-    await fireEvent.click(firstOpener);
+    await requestOpen(firstOpener);
     await waitFor(() => expect(document.activeElement).toBe(input));
     await fireEvent.click(dialog);
     expect(dialog.open).toBe(false);
@@ -266,7 +274,7 @@ describe('SearchDialog', () => {
     const opener = addOpener('Поиск');
     const view = render(SearchDialog, { props: { client: { search } } });
 
-    await fireEvent.click(opener);
+    await requestOpen(opener);
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
     const closeButton = view.getByRole('button', { name: 'Закрыть' });
 
@@ -298,7 +306,7 @@ describe('SearchDialog', () => {
     const opener = addOpener('Поиск');
     const view = render(SearchDialog, { props: { client: { search } } });
 
-    await fireEvent.click(opener);
+    await requestOpen(opener);
     await enterDebouncedQuery(
       view.getByRole('searchbox', { name: 'Что найти на сайте' }),
       'ивушкино',
@@ -368,7 +376,7 @@ describe('SearchDialog', () => {
     const view = render(SearchDialog, { props: { client } });
     const dialog = dialogFrom(view.container);
 
-    await fireEvent.click(opener);
+    await requestOpen(opener);
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     await fireEvent.input(input, { target: { value: 'вод' } });
@@ -494,7 +502,7 @@ describe('SearchDialog', () => {
     const view = render(SearchDialog, { props: { client } });
     const dialog = dialogFrom(view.container);
 
-    await fireEvent.click(opener);
+    await requestOpen(opener);
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
     await enterDebouncedQuery(input, 'вода');
     const resultsRegion = view.getByRole('region', {
@@ -541,7 +549,7 @@ describe('SearchDialog', () => {
     const view = render(SearchDialog, { props: { client } });
     const dialog = dialogFrom(view.container);
 
-    await fireEvent.click(opener);
+    await requestOpen(opener);
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
     await enterDebouncedQuery(input, 'вода');
     const resultLink = await waitFor(() => view.getByRole('link'));
@@ -580,7 +588,7 @@ describe('SearchDialog', () => {
     const view = render(SearchDialog, { props: { client } });
     const dialog = dialogFrom(view.container);
 
-    await fireEvent.click(opener);
+    await requestOpen(opener);
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
     await enterDebouncedQuery(input, 'вода');
     const resultLink = await waitFor(() => view.getByRole('link'));
@@ -638,7 +646,7 @@ describe('SearchDialog', () => {
     const opener = addOpener('Поиск');
     const view = render(SearchDialog, { props: { client } });
 
-    await fireEvent.click(opener);
+    await requestOpen(opener);
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
     await enterDebouncedQuery(input, 'детали');
     await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(3));
@@ -690,7 +698,7 @@ describe('SearchDialog', () => {
     const view = render(SearchDialog, { props: { client } });
     const dialog = dialogFrom(view.container);
 
-    await fireEvent.click(opener);
+    await requestOpen(opener);
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
 
     await enterDebouncedQuery(input, 'пусто');
@@ -723,34 +731,23 @@ describe('SearchDialog', () => {
     );
   });
 
-  it('closes before an Astro swap without focusing the outgoing opener', async () => {
+  it('cleans up a pending search without focusing the opener on unmount', async () => {
     const search = vi.fn(async (query: string) => readyResponse(query, []));
     const client: SearchClient = { search };
     const opener = addOpener('Поиск');
     const view = render(SearchDialog, { props: { client } });
-    const dialog = dialogFrom(view.container);
 
-    await fireEvent.click(opener);
+    await requestOpen(opener);
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
     await waitFor(() => expect(document.activeElement).toBe(input));
 
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     await fireEvent.input(input, { target: { value: 'до перехода' } });
-    await fireEvent(document, new Event('astro:before-swap'));
+    view.unmount();
     vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS);
     vi.useRealTimers();
 
-    expect(dialog.open).toBe(false);
     expect(search).not.toHaveBeenCalled();
     expect(document.activeElement).not.toBe(opener);
-    expect(dialog.dataset.searchState).toBe('initial');
-
-    await fireEvent.click(opener);
-    await waitFor(() => expect(document.activeElement).toBe(input));
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
-    await fireEvent.input(input, { target: { value: 'до удаления' } });
-    view.unmount();
-    vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS);
-    expect(search).not.toHaveBeenCalled();
   });
 });
