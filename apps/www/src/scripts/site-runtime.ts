@@ -29,6 +29,11 @@ const METRIKA_SCRIPT_SRC = 'https://mc.yandex.ru/metrika/tag.js';
 const METRIKA_WEBVISOR_ENABLED = true;
 const NAVIGATION_PENDING_ATTR = 'data-site-navigation-pending';
 const NAVIGATION_DELAY_MS = 50;
+const SEARCH_DIALOG_HYDRATED_ATTR = 'data-search-dialog-hydrated';
+const SEARCH_DIALOG_ROOT_SELECTOR = '[data-search-dialog-root]';
+const SEARCH_DIALOG_SELECTOR = '[data-search-dialog]';
+const SEARCH_INPUT_SELECTOR = '[data-search-input]';
+const SEARCH_CLOSE_SELECTOR = '[data-search-close]';
 const SEARCH_TRIGGER_SELECTOR = '[data-search-trigger]';
 const SITE_HEADER_MENU_SELECTOR = 'details.site-header-menu[open]';
 const SITE_NAV_DROPDOWN_SELECTOR = '[data-site-nav-dropdown]';
@@ -344,17 +349,64 @@ const bindSiteHeaderMenu = (): void => {
 };
 
 let latestSearchDialogRequest = 0;
+let nativeSearchDialogOpener: HTMLElement | undefined;
 
 const requestSearchDialog = async (
+  root: HTMLElement,
   opener: HTMLElement,
   requestId: number,
 ): Promise<void> => {
   const { openSearchDialog } = await import('@/components/search/lazy');
-  if (requestId !== latestSearchDialogRequest || !opener.isConnected) {
+  const dialog = root.querySelector<HTMLDialogElement>(SEARCH_DIALOG_SELECTOR);
+  const input = root.querySelector<HTMLInputElement>(SEARCH_INPUT_SELECTOR);
+  if (
+    requestId !== latestSearchDialogRequest ||
+    !root.isConnected ||
+    !dialog?.open ||
+    !input
+  ) {
     return;
   }
 
-  openSearchDialog(opener);
+  openSearchDialog(root, opener, input.value);
+  nativeSearchDialogOpener = undefined;
+};
+
+const closeNativeSearchDialog = (target: Element): void => {
+  const closeButton = target.closest(SEARCH_CLOSE_SELECTOR);
+  const dialog =
+    target instanceof HTMLDialogElement &&
+    target.matches(SEARCH_DIALOG_SELECTOR)
+      ? target
+      : closeButton?.closest<HTMLDialogElement>(SEARCH_DIALOG_SELECTOR);
+  const root = dialog?.closest<HTMLElement>(SEARCH_DIALOG_ROOT_SELECTOR);
+  if (
+    !dialog?.open ||
+    !root ||
+    root.hasAttribute(SEARCH_DIALOG_HYDRATED_ATTR)
+  ) {
+    return;
+  }
+
+  dialog.close();
+};
+
+const finishNativeSearchDialogClose = (dialog: HTMLDialogElement): void => {
+  const root = dialog.closest<HTMLElement>(SEARCH_DIALOG_ROOT_SELECTOR);
+  if (!root || root.hasAttribute(SEARCH_DIALOG_HYDRATED_ATTR)) {
+    return;
+  }
+
+  latestSearchDialogRequest += 1;
+  const opener = nativeSearchDialogOpener;
+  nativeSearchDialogOpener = undefined;
+  const input = dialog.querySelector<HTMLInputElement>(SEARCH_INPUT_SELECTOR);
+  if (input) {
+    input.value = '';
+  }
+  if (opener?.isConnected) {
+    opener.focus();
+  }
 };
 
 const bindSearchDialogLoader = (): void => {
@@ -365,7 +417,30 @@ const bindSearchDialogLoader = (): void => {
   window.__shelkovoSearchDialogLoader = true;
   document.addEventListener('astro:before-swap', () => {
     latestSearchDialogRequest += 1;
+    nativeSearchDialogOpener = undefined;
+    const root = document.querySelector<HTMLElement>(
+      SEARCH_DIALOG_ROOT_SELECTOR,
+    );
+    if (!root || root.hasAttribute(SEARCH_DIALOG_HYDRATED_ATTR)) {
+      return;
+    }
+
+    const dialog = root.querySelector<HTMLDialogElement>(
+      SEARCH_DIALOG_SELECTOR,
+    );
+    if (dialog?.open) {
+      dialog.close();
+    }
   });
+  document.addEventListener(
+    'close',
+    (event) => {
+      if (event.target instanceof HTMLDialogElement) {
+        finishNativeSearchDialogClose(event.target);
+      }
+    },
+    true,
+  );
   document.addEventListener('click', (event) => {
     if (!(event.target instanceof Element)) {
       return;
@@ -373,12 +448,33 @@ const bindSearchDialogLoader = (): void => {
 
     const trigger = event.target.closest(SEARCH_TRIGGER_SELECTOR);
     if (!(trigger instanceof HTMLElement)) {
+      closeNativeSearchDialog(event.target);
+      return;
+    }
+
+    const root = document.querySelector<HTMLElement>(
+      SEARCH_DIALOG_ROOT_SELECTOR,
+    );
+    const dialog = root?.querySelector<HTMLDialogElement>(
+      SEARCH_DIALOG_SELECTOR,
+    );
+    const input = root?.querySelector<HTMLInputElement>(SEARCH_INPUT_SELECTOR);
+    if (!root || !dialog || !input) {
       return;
     }
 
     event.preventDefault();
+    input.value = '';
+    if (!root.hasAttribute(SEARCH_DIALOG_HYDRATED_ATTR)) {
+      nativeSearchDialogOpener = trigger;
+    }
+    if (!dialog.open) {
+      dialog.showModal();
+    }
+    input.focus();
+
     const requestId = ++latestSearchDialogRequest;
-    void requestSearchDialog(trigger, requestId).catch(() => {});
+    void requestSearchDialog(root, trigger, requestId).catch(() => {});
   });
 };
 

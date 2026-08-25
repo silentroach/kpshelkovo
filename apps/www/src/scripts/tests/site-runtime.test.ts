@@ -1,14 +1,27 @@
-// @vitest-environment happy-dom
-
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const highlightSearchTerms = vi.hoisted(() => vi.fn(async () => {}));
 const openSearchDialog = vi.hoisted(() => vi.fn());
 
-vi.mock('@/lib/search/highlight', () => ({ highlightSearchTerms }));
+vi.mock('@/lib/search/highlight', () => ({
+  highlightSearchTerms,
+  SEARCH_HIGHLIGHT_PARAM: 'h',
+}));
 vi.mock('@/components/search/lazy', () => ({ openSearchDialog }));
 
 import '../site-runtime';
+
+const renderSearchShell = (): void => {
+  document.body.innerHTML = `
+    <button type="button" data-search-trigger>Search</button>
+    <div data-search-dialog-root>
+      <dialog data-search-dialog>
+        <input type="search" data-search-input />
+        <button type="button" data-search-close>Close</button>
+      </dialog>
+    </div>
+  `;
+};
 
 beforeEach(() => {
   highlightSearchTerms.mockClear();
@@ -16,6 +29,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  document.dispatchEvent(new Event('astro:before-swap'));
   document.body.innerHTML = '';
   history.replaceState({}, '', '/');
 });
@@ -32,47 +46,84 @@ describe('search highlights', () => {
 });
 
 describe('search dialog loader', () => {
-  it('loads the dialog on demand and forwards the exact opener', async () => {
-    document.body.innerHTML = `
-      <button type="button" data-search-trigger>
-        <span>Search</span>
-      </button>
-    `;
-    const opener = document.querySelector<HTMLButtonElement>(
-      '[data-search-trigger]',
+  it('opens synchronously and forwards the exact pre-hydration query', async () => {
+    renderSearchShell();
+    const opener = document.querySelector<HTMLElement>('[data-search-trigger]');
+    const root = document.querySelector<HTMLElement>(
+      '[data-search-dialog-root]',
     );
-    const icon = opener?.querySelector('span');
-    if (!opener || !icon) {
-      throw new Error('Expected search trigger fixture');
+    const dialog = root?.querySelector<HTMLDialogElement>(
+      '[data-search-dialog]',
+    );
+    const input = root?.querySelector<HTMLInputElement>('[data-search-input]');
+    if (!opener || !root || !dialog || !input) {
+      throw new Error('Expected server-rendered search shell');
     }
 
     const click = new MouseEvent('click', {
       bubbles: true,
       cancelable: true,
     });
-    icon.dispatchEvent(click);
+    opener.dispatchEvent(click);
+
+    expect(dialog.open).toBe(true);
+    expect(document.activeElement).toBe(input);
+    expect(click.defaultPrevented).toBe(true);
+
+    input.value = 'вода';
 
     await vi.waitFor(() => expect(openSearchDialog).toHaveBeenCalledOnce());
-    expect(openSearchDialog).toHaveBeenCalledWith(opener);
-    expect(click.defaultPrevented).toBe(true);
+    expect(openSearchDialog).toHaveBeenCalledWith(root, opener, 'вода');
+    expect(input.value).toBe('вода');
   });
 
-  it('drops a pending open request when Astro replaces the page', async () => {
-    document.body.innerHTML = `
-      <button type="button" data-search-trigger>Search</button>
-    `;
-    const opener = document.querySelector<HTMLButtonElement>(
-      '[data-search-trigger]',
+  it('restores the opener when the native shell closes before hydration', () => {
+    renderSearchShell();
+    const opener = document.querySelector<HTMLElement>('[data-search-trigger]');
+    const dialog = document.querySelector<HTMLDialogElement>(
+      '[data-search-dialog]',
     );
-    if (!opener) {
-      throw new Error('Expected search trigger fixture');
+    const input = document.querySelector<HTMLInputElement>(
+      '[data-search-input]',
+    );
+    if (!opener || !dialog || !input) {
+      throw new Error('Expected server-rendered search shell');
     }
 
     opener.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    dialog.close();
+    expect(dialog.open).toBe(false);
+    expect(document.activeElement).toBe(opener);
+
+    opener.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(dialog.open).toBe(true);
+    expect(document.activeElement).toBe(input);
+    expect(input.value).toBe('');
+  });
+
+  it('drops a pending hydration on Astro swap without restoring focus', async () => {
+    renderSearchShell();
+    const opener = document.querySelector<HTMLElement>('[data-search-trigger]');
+    const root = document.querySelector<HTMLElement>(
+      '[data-search-dialog-root]',
+    );
+    const dialog = root?.querySelector<HTMLDialogElement>(
+      '[data-search-dialog]',
+    );
+    const input = root?.querySelector<HTMLInputElement>('[data-search-input]');
+    if (!opener || !root || !dialog || !input) {
+      throw new Error('Expected server-rendered search shell');
+    }
+
+    opener.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(document.activeElement).toBe(input);
+
     document.dispatchEvent(new Event('astro:before-swap'));
     await import('@/components/search/lazy');
 
     expect(openSearchDialog).not.toHaveBeenCalled();
+    expect(dialog.open).toBe(false);
+    expect(document.activeElement).not.toBe(opener);
   });
 });
 

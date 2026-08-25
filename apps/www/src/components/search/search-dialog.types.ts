@@ -2,6 +2,7 @@ import type { SearchClient, SearchResult } from '@/lib/search/client.types';
 
 export interface SearchDialogProps {
   readonly client?: SearchClient;
+  readonly initialQuery?: string;
 }
 
 export interface SearchExcerptSegment {
