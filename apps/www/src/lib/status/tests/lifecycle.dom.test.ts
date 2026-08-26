@@ -5,32 +5,41 @@ import { hydrateStatusServiceStates } from '../lifecycle.dom';
 const START_MS = Date.parse('2026-08-18T10:00:00+03:00');
 const END_MS = Date.parse('2026-08-18T11:00:00+03:00');
 
-const renderServiceCard = (): HTMLElement => {
-  document.body.innerHTML = `
-    <article data-status-service-card data-status-service-state="green">
-      <p data-status-service-state-label>В норме</p>
-    </article>
+const renderServiceState = (
+  kind: 'incident' | 'maintenance',
+  overview = false,
+): HTMLElement => {
+  const state = `
+    <p
+      data-status-service-state-label
+      data-status-service-state="green"
+      role="status"
+    >В норме</p>
   `;
+  document.body.innerHTML = overview
+    ? `<article data-status-service-card>${state}</article>`
+    : `<section aria-label="Текущее состояние">${state}</section>`;
 
-  const card = document.querySelector('[data-status-service-card]');
-  if (!(card instanceof HTMLElement)) {
-    throw new Error('status service card fixture is missing');
+  const label = document.querySelector('[data-status-service-state-label]');
+  if (!(label instanceof HTMLElement)) {
+    throw new Error('status service state fixture is missing');
   }
 
-  card.dataset.statusServiceIncidents = JSON.stringify([
+  label.dataset.statusServiceIncidents = JSON.stringify([
     {
-      kind: 'maintenance',
+      kind,
       startedAt: START_MS,
       endedAt: END_MS,
     },
   ]);
 
-  return card;
+  return label;
 };
 
-const currentCardState = (card: HTMLElement) => ({
-  state: card.dataset.statusServiceState,
-  label: card.querySelector('[data-status-service-state-label]')?.textContent,
+const currentServiceState = (label: HTMLElement) => ({
+  state: label.dataset.statusServiceState,
+  label: label.textContent,
+  role: label.getAttribute('role'),
 });
 
 afterEach(() => {
@@ -39,36 +48,69 @@ afterEach(() => {
 });
 
 describe('hydrateStatusServiceStates', () => {
-  it('keeps a future maintenance window out of the current service state', () => {
-    const card = renderServiceCard();
+  it('updates a detail summary after a future incident starts and ends', () => {
+    const label = renderServiceState('incident');
+    const states = [currentServiceState(label)];
 
     hydrateStatusServiceStates(document, START_MS - 1);
+    states.push(currentServiceState(label));
+    hydrateStatusServiceStates(document, START_MS);
+    states.push(currentServiceState(label));
+    hydrateStatusServiceStates(document, END_MS);
+    states.push(currentServiceState(label));
 
-    expect(currentCardState(card)).toEqual({
-      state: 'green',
-      label: 'В норме',
-    });
+    expect(states).toMatchInlineSnapshot(`
+      [
+        {
+          "label": "В норме",
+          "role": "status",
+          "state": "green",
+        },
+        {
+          "label": "В норме",
+          "role": "status",
+          "state": "green",
+        },
+        {
+          "label": "Инцидент",
+          "role": "status",
+          "state": "red",
+        },
+        {
+          "label": "В норме",
+          "role": "status",
+          "state": "green",
+        },
+      ]
+    `);
   });
 
-  it('marks maintenance active at the exact start boundary', () => {
-    const card = renderServiceCard();
+  it('continues to hydrate the overview service card', () => {
+    const label = renderServiceState('maintenance', true);
+    const card = document.querySelector('[data-status-service-card]');
 
     hydrateStatusServiceStates(document, START_MS);
-
-    expect(currentCardState(card)).toEqual({
-      state: 'amber',
-      label: 'Работы',
-    });
-  });
-
-  it('clears maintenance at the exact end boundary', () => {
-    const card = renderServiceCard();
-
+    const active = currentServiceState(label);
     hydrateStatusServiceStates(document, END_MS);
 
-    expect(currentCardState(card)).toEqual({
-      state: 'green',
-      label: 'В норме',
-    });
+    expect({
+      active,
+      cardFound: card instanceof HTMLElement,
+      ended: currentServiceState(label),
+    }).toMatchInlineSnapshot(`
+      {
+        "active": {
+          "label": "Работы",
+          "role": "status",
+          "state": "amber",
+        },
+        "cardFound": true,
+        "ended": {
+          "label": "В норме",
+          "role": "status",
+          "state": "green",
+        },
+      }
+    `);
   });
 });

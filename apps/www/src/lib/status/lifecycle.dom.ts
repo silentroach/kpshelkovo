@@ -8,8 +8,8 @@ declare global {
   }
 }
 
-const STATUS_SERVICE_CARD_SELECTOR = '[data-status-service-card]';
-const STATUS_SERVICE_STATE_LABEL_SELECTOR = '[data-status-service-state-label]';
+const STATUS_SERVICE_STATE_SELECTOR =
+  '[data-status-service-state-label][data-status-service-incidents]';
 
 const isStatusIncidentWindow = (
   value: unknown,
@@ -52,7 +52,7 @@ export const hydrateStatusServiceStates = (
   root: ParentNode = document,
   nowMs: number = Date.now(),
 ): void => {
-  root.querySelectorAll(STATUS_SERVICE_CARD_SELECTOR).forEach((node) => {
+  root.querySelectorAll(STATUS_SERVICE_STATE_SELECTOR).forEach((node) => {
     if (!(node instanceof HTMLElement)) {
       return;
     }
@@ -60,15 +60,19 @@ export const hydrateStatusServiceStates = (
     const incidents = parseStatusIncidentWindows(
       node.dataset.statusServiceIncidents,
     );
-    const label = node.querySelector(STATUS_SERVICE_STATE_LABEL_SELECTOR);
-    if (!incidents || !(label instanceof HTMLElement)) {
+    if (!incidents) {
       return;
     }
 
     const state = resolveStatusServiceState(incidents, nowMs);
+    const label = formatStatusServiceState(state);
 
-    node.dataset.statusServiceState = state;
-    label.textContent = formatStatusServiceState(state);
+    if (node.dataset.statusServiceState !== state) {
+      node.dataset.statusServiceState = state;
+    }
+    if (node.textContent !== label) {
+      node.textContent = label;
+    }
   });
 };
 

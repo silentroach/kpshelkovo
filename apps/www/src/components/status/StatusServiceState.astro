@@ -1,0 +1,37 @@
+---
+import { toStatusIncidentWindowInput } from '@/lib/status/lifecycle';
+import type { StatusServiceSummary } from '@/lib/status/types';
+import { formatStatusServiceState } from '@/lib/status/view';
+
+interface Props {
+  readonly class?: string;
+  readonly summary: Pick<StatusServiceSummary, 'incidents' | 'serviceStatus'>;
+}
+
+const { class: className, summary } = Astro.props;
+const lifecycleWindows = summary.incidents.map(toStatusIncidentWindowInput);
+---
+
+<p
+  class:list={['status-service-state', className]}
+  data-status-service-state-label
+  data-status-service-state={summary.serviceStatus}
+  data-status-service-incidents={JSON.stringify(lifecycleWindows)}
+  role="status"
+>
+  {formatStatusServiceState(summary.serviceStatus)}
+</p>
+
+<style>
+  .status-service-state[data-status-service-state='green'] {
+    color: var(--color-success);
+  }
+
+  .status-service-state[data-status-service-state='amber'] {
+    color: var(--color-warning-text);
+  }
+
+  .status-service-state[data-status-service-state='red'] {
+    color: var(--color-danger);
+  }
+</style>

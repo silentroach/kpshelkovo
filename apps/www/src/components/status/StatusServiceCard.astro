@@ -8,13 +8,13 @@ import {
 
 import ShelkovoAreaIcon from '@/components/ShelkovoAreaIcon.astro';
 import { toStatusTimelineIncidentInput } from '@/lib/status/timeline';
+import StatusServiceState from './StatusServiceState.astro';
 import StatusServiceTimeline from './StatusServiceTimeline.astro';
 import type { StatusServiceSummary } from '../../lib/status/types';
 import {
   formatStatusDate,
   formatStatusDuration,
   formatStatusService,
-  formatStatusServiceState,
 } from '../../lib/status/view';
 
 interface Props {
@@ -32,7 +32,6 @@ const {
 } = Astro.props;
 
 const serviceLabel = formatStatusService(summary.service);
-const stateLabel = formatStatusServiceState(summary.serviceStatus);
 const latestRecord = summary.incidents[0];
 const latestMoment = latestRecord
   ? formatStatusDate(latestRecord.started.iso, {
@@ -47,11 +46,6 @@ const latestDuration =
 const latestAreas =
   latestRecord && !latestRecord.appliesToAllAreas ? latestRecord.areas : [];
 const timelineIncidents = summary.incidents.map(toStatusTimelineIncidentInput);
-const lifecycleWindows = summary.incidents.map((item) => ({
-  kind: item.kind,
-  startedAt: item.started.at.valueOf(),
-  endedAt: item.ended?.at.valueOf(),
-}));
 const serviceMeta = {
   electricity: {
     Icon: LightningIcon,
@@ -82,8 +76,6 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
 <article
   class="status-service-row ui-shell px-5 py-4 md:px-6 md:py-5"
   data-status-service-card
-  data-status-service-state={summary.serviceStatus}
-  data-status-service-incidents={JSON.stringify(lifecycleWindows)}
 >
   <div
     class="flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_minmax(0,11rem)_minmax(0,21rem)] lg:items-center lg:gap-5"
@@ -158,12 +150,10 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
     </div>
 
     <div>
-      <p
+      <StatusServiceState
+        summary={summary}
         class="status-service-row__state text-[0.9375rem] font-semibold leading-5"
-        data-status-service-state-label
-      >
-        {stateLabel}
-      </p>
+      />
     </div>
 
     <div class="hidden lg:block">
@@ -214,20 +204,3 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
     </div>
   </div>
 </article>
-
-<style>
-  .status-service-row[data-status-service-state='green']
-    .status-service-row__state {
-    color: var(--color-success);
-  }
-
-  .status-service-row[data-status-service-state='amber']
-    .status-service-row__state {
-    color: var(--color-warning-text);
-  }
-
-  .status-service-row[data-status-service-state='red']
-    .status-service-row__state {
-    color: var(--color-danger);
-  }
-</style>

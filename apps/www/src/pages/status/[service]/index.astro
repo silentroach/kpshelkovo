@@ -3,6 +3,7 @@ import type { GetStaticPaths } from 'astro';
 
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import StatusIncidentRow from '@/components/status/StatusIncidentRow.astro';
+import StatusServiceState from '@/components/status/StatusServiceState.astro';
 import StatusServiceTimeline from '@/components/status/StatusServiceTimeline.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import {
@@ -18,10 +19,7 @@ import {
   statusUrl,
 } from '@/lib/status/routes';
 import { toStatusTimelineIncidentInput } from '@/lib/status/timeline';
-import {
-  formatStatusService,
-  formatStatusServiceState,
-} from '@/lib/status/view';
+import { formatStatusService } from '@/lib/status/view';
 
 export const getStaticPaths = (async () =>
   STATUS_SERVICES.map((service) => ({
@@ -48,12 +46,6 @@ if (!summary) {
 }
 
 const serviceLabel = formatStatusService(service);
-const stateLabel = formatStatusServiceState(summary.serviceStatus);
-const stateClass = {
-  green: 'text-[color:var(--color-success)]',
-  amber: 'text-[color:var(--color-warning-text)]',
-  red: 'text-[color:var(--color-danger)]',
-} as const;
 const latestIncidents = summary.incidents.slice(0, 10);
 const timelineIncidents = summary.incidents.map(toStatusTimelineIncidentInput);
 const schemaItems = latestIncidents
@@ -99,14 +91,7 @@ const schema = collectionPageSchema({
 
     <section class="mt-8 px-5 md:px-6">
       <div class="max-w-6xl space-y-3">
-        <p
-          class:list={[
-            'text-base font-semibold',
-            stateClass[summary.serviceStatus],
-          ]}
-        >
-          {stateLabel}
-        </p>
+        <StatusServiceState summary={summary} class="text-base font-semibold" />
         <StatusServiceTimeline
           service={summary.service}
           incidents={timelineIncidents}

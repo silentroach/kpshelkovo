@@ -155,6 +155,34 @@ describe('/status/', () => {
     ).not.toBeNull();
     expectItemListMatchesHistory(document);
   });
+
+  it('keeps the overview service state on the shared hydration contract', async () => {
+    const container = await createAstroContainer();
+    const html = await container.renderToString(StatusPage);
+    const document = parseHtml(html);
+    const state = document.querySelector(
+      '[data-status-service-card] [data-status-service-state-label]',
+    );
+    if (!state) {
+      throw new Error('Overview service state is missing');
+    }
+
+    const windows = JSON.parse(
+      state.getAttribute('data-status-service-incidents') ?? '[]',
+    ) as readonly unknown[];
+
+    expect({
+      hasLifecyclePayload: windows.length > 0,
+      role: state.getAttribute('role'),
+      state: state.getAttribute('data-status-service-state'),
+    }).toMatchInlineSnapshot(`
+      {
+        "hasLifecyclePayload": true,
+        "role": "status",
+        "state": "green",
+      }
+    `);
+  });
 });
 
 describe('/status/history/', () => {
