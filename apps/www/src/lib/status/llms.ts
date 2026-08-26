@@ -11,6 +11,7 @@ import {
   statusApiCatalogUrl,
   statusDataUrl,
   statusFeedUrl,
+  statusHistoryUrl,
   statusLlmsFullUrl,
   statusLlmsUrl,
   statusMarkdownUrl,
@@ -35,6 +36,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
   const incident = data.incidents.find((item) => item.hasPage);
 
   const home = absoluteUrl(statusUrl());
+  const history = absoluteUrl(statusHistoryUrl());
   const homeMarkdown = absoluteUrl(statusMarkdownUrl());
   const feed = absoluteUrl(statusDataUrl());
   const rss = absoluteUrl(statusFeedUrl());
@@ -66,15 +68,17 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
         sections: [
           llmsSection('Описание', [
             markdownList([
-              'Раздел `/status/` показывает текущие проблемы, плановые работы и историю по сервисам КП Шелково.',
+              'Раздел `/status/` показывает состояние сервисов, текущие проблемы, плановые работы и до 10 последних записей.',
+              `Полная история доступна в HTML-архиве: ${history}`,
               `Сейчас в разделе ${count(data.incidents.length, ['запись', 'записи', 'записей'])}, ${count(activeIncidents.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])} и ${count(activeMaintenance.length, ['активная работа', 'активные работы', 'активных работ'])}.`,
               `Раздел покрывает ${count(data.services.length, ['сервис', 'сервиса', 'сервисов'])}: ${STATUS_SERVICES.join(', ')}.`,
-              'HTML-страницы остаются каноническим представлением для людей, а /status/data/status.json служит основной структурированной лентой.',
+              'HTML-страницы удобны для чтения отдельных записей, а `/status/data/status.json` используйте для массового анализа.',
             ]),
           ]),
           llmsSection('Главные URL', [
             markdownList([
               `Главная страница /status: ${home}`,
+              `Полный HTML-архив: ${history}`,
               `Основная JSON-лента: ${feed}`,
               `RSS: ${rss}`,
               `Каталог API: ${catalog}`,
@@ -103,7 +107,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
         sections: [
           llmsSection('Проект', [
             markdownList([
-              'Раздел `/status/` публикует состояние сервисов КП Шелково, активные инциденты, плановые работы и историю отключений/ограничений.',
+              'Раздел `/status/` публикует состояние сервисов КП Шелково, активные инциденты, плановые работы и до 10 последних записей.',
+              `Полная история отключений и ограничений доступна в HTML-архиве: ${history}`,
               'Для массового чтения используйте JSON-ленту; HTML и Markdown удобнее для одной линии или одного события.',
               `Сейчас в разделе ${count(data.incidents.length, ['запись', 'записи', 'записей'])}, ${count(activeIncidents.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])} и ${count(activeMaintenance.length, ['активная работа', 'активные работы', 'активных работ'])}.`,
             ]),
@@ -111,6 +116,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
           llmsSection('Канонические URL', [
             markdownList([
               `Главная страница /status: ${home}`,
+              `Полный HTML-архив: ${history}`,
               `Markdown-версия раздела: ${homeMarkdown}`,
               `Короткий обзор llms.txt: ${short}`,
               `Подробный обзор llms-full.txt: ${full}`,
@@ -137,6 +143,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
           llmsSection('HTML и Markdown', [
             markdownList([
               'HTML-страница `/status/` остается каноническим человекочитаемым представлением сводки по поселку.',
+              'HTML-страница `/status/history/` содержит полный архив записей, тогда как история на `/status/` ограничена десятью последними записями.',
               'Markdown-версия `/status/index.md` дает текстовую версию сводки для терминалов и прямых ссылок.',
               'Страницы сервисов `/status/[service]/` и их Markdown-версии `/status/[service]/index.md` удобны для фокусного чтения одной линии: электричество, вода, интернет или дамба.',
               'Страницы инцидентов `/status/incidents/YYYY/MM/[entry]/` и их Markdown-версии `/status/incidents/.../index.md` публикуются только для записей с body и тогда же появляются в `html_url`/`markdown_url`.',

@@ -33,6 +33,8 @@ const need = (value: string, name: string): string => {
 
 export const statusPath = (): string => STATUS_ROOT;
 
+export const statusHistoryPath = (): string => STATUS_HISTORY;
+
 export const statusMarkdownPath = (): string => STATUS_MARKDOWN;
 
 export const statusDataPath = (): string => STATUS_DATA;
@@ -68,7 +70,7 @@ export const statusIncidentMarkdownPattern = (): string =>
 
 export const statusUrl = (): string => withBase(STATUS_ROOT);
 
-export const statusHistoryUrl = (): string => withBase(STATUS_HISTORY);
+export const statusHistoryUrl = (): string => withBase(statusHistoryPath());
 
 export const statusMarkdownUrl = (): string => withBase(STATUS_MARKDOWN);
 

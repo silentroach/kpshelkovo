@@ -37,9 +37,10 @@ const keywords = [
   'история инцидентов Шелково',
 ];
 const breadcrumbs = withHomeBreadcrumbs([{ label: 'Статус' }]);
-const schemaItems = recentIncidents
-  .filter((item) => item.hasPage)
-  .map((item) => ({ name: item.title, url: item.url }));
+const historySchemaItems = recentIncidents.map((item) => ({
+  name: item.title,
+  url: item.url,
+}));
 const schema = collectionPageSchema({
   name: title,
   description,
@@ -47,7 +48,7 @@ const schema = collectionPageSchema({
   breadcrumbs: withHomeSchemaBreadcrumbs([
     { name: 'Статус', url: statusUrl() },
   ]),
-  items: schemaItems,
+  items: historySchemaItems,
 });
 ---
 

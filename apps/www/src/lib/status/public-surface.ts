@@ -4,6 +4,7 @@ import {
   statusApiCatalogPath,
   statusDataPath,
   statusFeedPath,
+  statusHistoryPath,
   statusIncidentMarkdownPattern,
   statusIncidentPattern,
   statusLlmsFullPath,
@@ -40,6 +41,22 @@ export const statusPublicSurfaceSlice = {
       cacheClass: 'markdown',
       discoveryRoles: ['markdown-companion'],
       catalogRole: 'item',
+    },
+    {
+      id: 'status:history',
+      label: 'Полная история статусов',
+      path: statusHistoryPath(),
+      mediaType: 'text/html',
+      cacheClass: 'html',
+      discoveryRoles: ['detail-page'],
+      linkRelations: [
+        {
+          rel: 'alternate',
+          href: statusMarkdownPath(),
+          mediaType: 'text/markdown',
+        },
+      ],
+      acceptsNegotiation: 'required',
     },
     {
       id: 'status:service',

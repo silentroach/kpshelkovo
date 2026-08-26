@@ -74,4 +74,14 @@ describe('status llms', () => {
       expect(markdown).not.toContain('Пример Markdown-версии инцидента');
     },
   );
+
+  it.each(['short', 'full'] as const)(
+    'links the full HTML archive from the %s document',
+    async (kind) => {
+      const markdown = await build(kind);
+
+      expect(markdown).toContain('https://example.com/status/history/');
+      expect(markdown).toContain('https://example.com/status/data/status.json');
+    },
+  );
 });

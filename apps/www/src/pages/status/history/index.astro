@@ -22,6 +22,10 @@ const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Статус', href: statusUrl() },
   { label: 'История' },
 ]);
+const historySchemaItems = data.incidents.map((item) => ({
+  name: item.title,
+  url: item.url,
+}));
 const schema = collectionPageSchema({
   name: title,
   description,
@@ -30,9 +34,7 @@ const schema = collectionPageSchema({
     { name: 'Статус', url: statusUrl() },
     { name: 'История', url: statusHistoryUrl() },
   ]),
-  items: data.incidents
-    .filter((item) => item.hasPage)
-    .map((item) => ({ name: item.title, url: item.url })),
+  items: historySchemaItems,
 });
 ---
 
