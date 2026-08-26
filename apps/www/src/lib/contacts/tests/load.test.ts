@@ -1,9 +1,22 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createSiteMentionRegistry } from '@/lib/mentions';
 import { createPersonMentionTarget } from '@/lib/people/mentions';
 
 import type { ContactEntry } from '../load';
+
+const mocks = vi.hoisted(() => ({
+  renderMarkdown: vi.fn(),
+}));
+
+vi.mock('@/lib/markdown/render', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/markdown/render')>();
+
+  return {
+    ...actual,
+    renderMarkdown: mocks.renderMarkdown,
+  };
+});
 
 let buildContactsDataset: typeof import('../load').buildContactsDataset;
 
@@ -14,6 +27,10 @@ beforeAll(async () => {
   });
 
   ({ buildContactsDataset } = await import('../load'));
+});
+
+beforeEach(() => {
+  mocks.renderMarkdown.mockClear();
 });
 
 const entry = (input: {
@@ -153,7 +170,7 @@ describe('buildContactsDataset', () => {
     });
   });
 
-  it('renders review summary markdown to html', () => {
+  it('keeps review markdown out of the HTML presentation boundary', () => {
     const data = buildContactsDataset([
       entry({
         id: 'fence/with-review',
@@ -177,11 +194,11 @@ describe('buildContactsDataset', () => {
           "publishedIso": "2026-04-07",
           "sentiment": "positive",
           "summary": "Помог с **электричеством**.",
-          "summaryHtml": "<p>Помог с <strong>электричеством</strong>.</p>",
           "url": "https://t.me/example/1",
         },
       ]
     `);
+    expect(mocks.renderMarkdown).not.toHaveBeenCalled();
   });
 
   it('maps enabled vCard options and ignores disabled ones', () => {
