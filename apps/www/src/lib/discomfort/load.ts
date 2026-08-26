@@ -38,7 +38,7 @@ export const buildDiscomfortDataset = (
 ): DiscomfortDataset => {
   const quoteAuthor = opts.mentionRegistry.get(DISCOMFORT_QUOTE_AUTHOR_SLUG);
 
-  if (!quoteAuthor) {
+  if (quoteAuthor?.type !== 'person') {
     throw new Error(
       `discomfort quote author "${DISCOMFORT_QUOTE_AUTHOR_SLUG}" is required`,
     );

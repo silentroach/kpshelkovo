@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { createPersonMentionTarget } from '@/lib/people/mentions';
+import { createPlaceMentionTarget } from '@/lib/places/mentions';
 
 import type { DiscomfortEventEntry } from '../load';
 
@@ -126,5 +127,16 @@ describe('buildDiscomfortDataset', () => {
     ).toThrowErrorMatchingInlineSnapshot(
       `[Error: discomfort quote author "ykizilov" is required]`,
     );
+
+    expect(() =>
+      buildDiscomfortDataset([entry({ id: 'event', date: '2026-04-29' })], {
+        mentionRegistry: new Map([
+          [
+            'ykizilov',
+            createPlaceMentionTarget('ykizilov', 'Место с совпавшим slug'),
+          ],
+        ]),
+      }),
+    ).toThrow('discomfort quote author "ykizilov" is required');
   });
 });

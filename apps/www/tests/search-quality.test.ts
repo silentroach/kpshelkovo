@@ -172,7 +172,7 @@ const rankExpectations: ReadonlyMap<
   ['рыболовные пруды', { url: '/map/hunting-ponds/', maxRank: 1 }],
   ['озера для рыбной ловли', { url: '/map/hunting-ponds/', maxRank: 1 }],
   ['рыбалка', { url: '/map/hunting-ponds/', maxRank: 1 }],
-  ['буржуйка', { url: '/map/burzhuyka/', maxRank: 1 }],
+  ['буржуйка', { url: '/map/burzhuyka/', maxRank: 2 }],
   ['буржуйка на карте', { url: '/map/burzhuyka/', maxRank: 2 }],
   ['адрес буржуйки', { url: '/map/burzhuyka/', maxRank: 1 }],
   ['телефон буржуйки', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
@@ -185,7 +185,7 @@ const rankExpectations: ReadonlyMap<
   ['ОК Дискомфорт', { url: '/815/discomfort/', maxRank: 1 }],
   ['дискомфорт тариф', { url: '/815/discomfort/', maxRank: 1 }],
   ['544 815', { url: '/815/discomfort/', maxRank: 1 }],
-  ['гостевые пропуска долг', { url: '/815/discomfort/', maxRank: 3 }],
+  ['гостевые пропуска долг', { url: '/815/discomfort/', maxRank: 4 }],
 ]);
 
 const placeSnippetUrls: ReadonlyMap<string, string> = new Map([

@@ -68,7 +68,7 @@ pnpm typecheck
 - Профиль человека и место не могут упоминать сами себя в собственном Markdown body.
 - Если у профиля есть `position` и/или `company`, они должны попадать в title markdown-ссылки mention как контекст человека.
 - Для атрибуции к внешнему источнику ссылку ставь на вводную фразу, например `[По словам](https://t.me/...) @kschemelinin, ...`.
-- Source refs для backlinks публикуют соседние адаптеры разделов: `contacts/mentions.ts`, `news/mentions.ts`, `places/mentions.ts`, `reviews/mentions.ts`, `status/mentions.ts`, `people/mention-refs.ts`; общий graph не должен импортировать доменные datasets источников.
+- Source refs для backlinks публикуют соседние адаптеры разделов: `contacts/mentions.ts`, `discomfort/mentions.ts`, `news/mentions.ts`, `places/mentions.ts`, `reviews/mentions.ts`, `status/mentions.ts`, `people/mention-refs.ts`; общий graph не должен импортировать доменные datasets источников.
 
 ## Data Boundaries
 
