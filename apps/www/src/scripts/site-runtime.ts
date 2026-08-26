@@ -39,6 +39,7 @@ const SEARCH_TRIGGER_SELECTOR = '[data-search-trigger]';
 const SITE_HEADER_MENU_SELECTOR = 'details.site-header-menu[open]';
 const SITE_NAV_DROPDOWN_SELECTOR = '[data-site-nav-dropdown]';
 const SITE_NAV_DROPDOWN_BUTTON_SELECTOR = '[data-site-nav-dropdown-button]';
+const SITE_NAV_DROPDOWN_MENU_SELECTOR = '[data-site-nav-dropdown-menu]';
 
 const runWhenDocumentReady = (callback: () => void): void => {
   if (document.readyState === 'loading') {
@@ -198,7 +199,11 @@ const bindSiteNavDropdown = (dropdown: HTMLElement): void => {
   }
 
   const button = dropdown.querySelector(SITE_NAV_DROPDOWN_BUTTON_SELECTOR);
-  if (!(button instanceof HTMLButtonElement)) {
+  const menu = dropdown.querySelector(SITE_NAV_DROPDOWN_MENU_SELECTOR);
+  if (
+    !(button instanceof HTMLButtonElement) ||
+    !(menu instanceof HTMLElement)
+  ) {
     return;
   }
 
@@ -209,11 +214,40 @@ const bindSiteNavDropdown = (dropdown: HTMLElement): void => {
   const setOpen = (isOpen: boolean): void => {
     dropdown.toggleAttribute('data-open', isOpen);
     button.setAttribute('aria-expanded', String(isOpen));
+    menu.hidden = !isOpen;
   };
+
+  setOpen(false);
 
   button.addEventListener(
     'click',
     () => setOpen(!dropdown.hasAttribute('data-open')),
+    { signal },
+  );
+
+  dropdown.addEventListener(
+    'pointerenter',
+    (event) => {
+      if (event.pointerType !== 'mouse') {
+        return;
+      }
+
+      setOpen(true);
+    },
+    { signal },
+  );
+
+  dropdown.addEventListener(
+    'pointerleave',
+    (event) => {
+      if (event.pointerType !== 'mouse') {
+        return;
+      }
+
+      if (!dropdown.contains(document.activeElement)) {
+        setOpen(false);
+      }
+    },
     { signal },
   );
 

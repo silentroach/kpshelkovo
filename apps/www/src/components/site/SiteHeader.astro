@@ -198,6 +198,12 @@ const statusWindows = getHomeStatusWindows(status.incidents, buildNow);
     outline: none;
   }
 
+  .site-header-brand:focus-visible,
+  .site-header-menu-button:focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 0.2rem;
+  }
+
   .site-header-menu-icon {
     width: 0;
     height: 0;
