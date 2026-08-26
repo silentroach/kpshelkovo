@@ -17,7 +17,7 @@ export const indexNowUrlManifest = (
       // Keep the deploy-only manifest outside the public site artifact.
       await writeFile(
         new URL('../indexnow-urls.json', dir),
-        `${JSON.stringify([...urls].sort(), undefined, 2)}\n`,
+        JSON.stringify([...urls].sort()),
         'utf8',
       );
     },

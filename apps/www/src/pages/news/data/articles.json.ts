@@ -8,7 +8,7 @@ export const prerender = true;
 
 export const GET: APIRoute = async () => {
   const root = canonRoot();
-  const body = `${JSON.stringify(buildNewsPayload(await loadNewsData()), null, 2)}\n`;
+  const body = JSON.stringify(buildNewsPayload(await loadNewsData()));
 
   return new Response(body, {
     headers: {

@@ -14,7 +14,7 @@ function headers(root: string): HeadersInit {
 
 export const GET: APIRoute = async () => {
   const root = canonRoot();
-  const body = `${JSON.stringify(catalog(root), null, 2)}\n`;
+  const body = JSON.stringify(catalog(root));
 
   return new Response(body, {
     headers: headers(root),

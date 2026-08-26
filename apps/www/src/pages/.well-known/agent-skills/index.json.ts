@@ -5,7 +5,7 @@ import { build } from '@/lib/skills';
 export const prerender = true;
 
 export const GET: APIRoute = async () => {
-  const body = `${JSON.stringify(await build(), null, 2)}\n`;
+  const body = JSON.stringify(await build());
 
   return new Response(body, {
     headers: {

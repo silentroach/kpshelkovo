@@ -229,14 +229,14 @@ describe('reglament discovery route smoke', () => {
         load: () =>
           import('../../pages/815/regulation/data/estimate-2026.json'),
         contentType: 'application/json',
-        marker: '"id": "estimate-2026"',
+        marker: '"id":"estimate-2026"',
       },
       {
         name: 'estimate details json feed',
         load: () =>
           import('../../pages/815/regulation/data/estimate-details-2026.json'),
         contentType: 'application/json',
-        marker: '"dataset_id": "estimate-details-2026"',
+        marker: '"dataset_id":"estimate-details-2026"',
       },
       {
         name: 'full reglament markdown companion',
@@ -284,7 +284,7 @@ describe('reglament discovery route smoke', () => {
         name: 'full reglament json feed',
         load: () => import('../../pages/815/regulation/data/full-2026.json'),
         contentType: 'application/json',
-        marker: '"dataset_id": "full-reglament-2026"',
+        marker: '"dataset_id":"full-reglament-2026"',
       },
       {
         name: 'short llms',

@@ -73,6 +73,7 @@ pnpm typecheck
 ## Data Boundaries
 
 - YAML/frontmatter читать как Raw DTO через Zod-схему, переводить в handwritten readonly domain model через mapper, а публичные JSON/agent-facing форматы собирать отдельным Public DTO adapter. `snake_case` допустим только на raw/public legacy границах, fixtures и в документации внешнего формата.
+- JSON-ответы и JSON-артефакты сборки сериализовать компактно, без отступов и завершающего перевода строки.
 
 ## Agent-Facing Surfaces
 
