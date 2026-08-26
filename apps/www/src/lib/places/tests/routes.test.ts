@@ -6,6 +6,7 @@ import {
   placeMarkdownPattern,
   placeMarkdownUrl,
   placePattern,
+  placesDataUrl,
   placesMarkdownUrl,
   placesUrl,
   placeUrl,
@@ -15,6 +16,7 @@ describe('place routes', () => {
   it('builds stable section and detail URLs', () => {
     expect(placesUrl()).toBe('/map/');
     expect(placeHighlightUrl('titanic')).toBe('/map/?h=titanic');
+    expect(placesDataUrl()).toBe('/map/data/places.json');
     expect(placesMarkdownUrl()).toBe('/map/index.md');
     expect(placeUrl('burzhuyka')).toBe('/map/burzhuyka/');
     expect(placeMarkdownUrl('burzhuyka')).toBe('/map/burzhuyka/index.md');

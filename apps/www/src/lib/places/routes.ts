@@ -4,6 +4,7 @@ import { PLACE_SLUG } from './schema';
 
 const MAP_ROOT = '/map/';
 const MAP_MARKDOWN = '/map/index.md';
+const MAP_DATA = '/map/data/places.json';
 
 const requireSlug = (slug: string): string => {
   const value = slug.trim();
@@ -18,6 +19,8 @@ const requireSlug = (slug: string): string => {
 export const placesPath = (): string => MAP_ROOT;
 
 export const placesMarkdownPath = (): string => MAP_MARKDOWN;
+
+export const placesDataPath = (): string => MAP_DATA;
 
 export const placePath = (slug: string): string =>
   `${MAP_ROOT}${requireSlug(slug)}/`;
@@ -35,6 +38,8 @@ export const placeHighlightUrl = (slug: string): string =>
   withBase(`${placesPath()}?h=${requireSlug(slug)}`);
 
 export const placesMarkdownUrl = (): string => withBase(placesMarkdownPath());
+
+export const placesDataUrl = (): string => withBase(placesDataPath());
 
 export const placeUrl = (slug: string): string => withBase(placePath(slug));
 

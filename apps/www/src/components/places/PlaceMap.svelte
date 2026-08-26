@@ -25,7 +25,12 @@
     waitForStableLayout,
   } from '@/lib/yandex-maps/runtime';
   import { getPlaceClosingTime } from '@/lib/places/opening-hours';
-  import type { PlaceMapItem } from '@/lib/places/map-types';
+  import type {
+    PlaceMapPublicItemDto,
+    PlaceMapPublicPayloadDto,
+  } from '@/lib/places/map-public-dto';
+  import type { PlaceMapItem, PlaceMapProps } from '@/lib/places/map-types';
+  import { placeUrl } from '@/lib/places/routes';
   import { PLACE_MAP_BOUNDS } from '@/lib/places/schema';
   import type { PlaceMarker } from '@/lib/places/schema';
   import type {
@@ -34,7 +39,11 @@
   } from '@/lib/places/types';
   import { formatPlaceStatus } from '@/lib/places/view';
 
-  let { places }: { readonly places: readonly PlaceMapItem[] } = $props();
+  let {
+    dataUrl = '',
+    fallbackPlace,
+    places = [] as readonly PlaceMapItem[],
+  }: PlaceMapProps = $props();
 
   const SETTLEMENT_BOUNDS: ymaps3.LngLatBounds = [
     [PLACE_MAP_BOUNDS.minLng, PLACE_MAP_BOUNDS.minLat],
@@ -55,6 +64,34 @@
   const MARKER_CLOSEUP_MAX_SCALE = 1.3;
   const PLACE_FOCUS_ZOOM = MARKER_MAX_ZOOM;
   const roundCoordinate = (value: number): number => Number(value.toFixed(6));
+  const toPlaceMapItem = (place: PlaceMapPublicItemDto): PlaceMapItem => ({
+    slug: place.slug,
+    name: place.name,
+    marker: place.marker,
+    status: place.status,
+    coordinates: place.coordinates,
+    geometry: place.geometry,
+    openingHours: place.opening_hours
+      ? {
+          description: place.opening_hours.description,
+          periods: place.opening_hours.periods.map((period) => ({
+            days: period.days,
+            opensAt: period.opens_at,
+            closesAt: period.closes_at,
+          })),
+        }
+      : undefined,
+    url: placeUrl(place.slug),
+  });
+  const fetchPlaces = async (url: string): Promise<readonly PlaceMapItem[]> => {
+    if (!url) throw new Error('Не указан источник данных карты');
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Не удалось загрузить данные карты');
+
+    const payload = (await response.json()) as PlaceMapPublicPayloadDto;
+    return payload.places.map(toPlaceMapItem);
+  };
   const copyGeometryRing = (ring: readonly PlaceGeometryPosition[]): LngLat[] =>
     ring.map(([lng, lat]) => [lng, lat]);
   const toMapGeometry = (
@@ -200,6 +237,7 @@
   let clusterFocusFrame: number | undefined;
   let isLoading = $state(true);
   let error: string | undefined = $state(undefined);
+  let errorPlace = $derived(places[0] ?? fallbackPlace);
 
   const mapBehaviors = (): ymaps3.BehaviorType[] => [
     'drag',
@@ -582,16 +620,7 @@
     const highlightUrl = new URL(window.location.href);
     const requestedSlug =
       highlightUrl.searchParams.get(HIGHLIGHT_QUERY_PARAM) || undefined;
-    let highlightedPlace = requestedSlug
-      ? places.find((place) => place.slug === requestedSlug)
-      : undefined;
-
-    if (
-      highlightUrl.searchParams.has(HIGHLIGHT_QUERY_PARAM) &&
-      !highlightedPlace
-    ) {
-      removeHighlightQuery(requestedSlug);
-    }
+    let highlightedPlace: PlaceMapItem | undefined;
 
     const startPlaceHighlight = (place: PlaceMapItem): void => {
       const marker = markerContents.find(
@@ -642,9 +671,27 @@
 
     void (async () => {
       try {
-        await loadYandexMaps();
+        const placesRequest = places.length
+          ? Promise.resolve(places)
+          : fetchPlaces(dataUrl);
+        const [loadedPlaces] = await Promise.all([
+          placesRequest,
+          loadYandexMaps(),
+        ]);
 
         if (destroyed || !mapContainer) return;
+
+        places = loadedPlaces;
+        highlightedPlace = requestedSlug
+          ? places.find((place) => place.slug === requestedSlug)
+          : undefined;
+
+        if (
+          highlightUrl.searchParams.has(HIGHLIGHT_QUERY_PARAM) &&
+          !highlightedPlace
+        ) {
+          removeHighlightQuery(requestedSlug);
+        }
 
         const ymaps3 = window.ymaps3;
 
@@ -747,7 +794,7 @@
         clearMap();
 
         if (!destroyed) {
-          removeHighlightQuery(highlightedPlace?.slug);
+          removeHighlightQuery(highlightedPlace?.slug ?? requestedSlug);
           highlightedPlace = undefined;
           error = reason instanceof Error ? reason.message : 'Карта недоступна';
           isLoading = false;
@@ -796,12 +843,12 @@
         class="max-w-sm border border-border bg-[color:var(--color-surface)] p-5 text-center"
       >
         <p class="font-semibold text-foreground">Карта сейчас недоступна</p>
-        {#if places[0]}
+        {#if errorPlace}
           <a
-            href={places[0].url}
+            href={errorPlace.url}
             class="site-text-link mt-2 inline-flex font-semibold"
           >
-            Открыть карточку «{places[0].name}»
+            Открыть карточку «{errorPlace.name}»
           </a>
         {/if}
       </div>

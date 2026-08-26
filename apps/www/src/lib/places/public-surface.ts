@@ -3,6 +3,7 @@ import type { PublicSurfaceSlice } from '@/lib/public-surface/types';
 import {
   placeMarkdownPattern,
   placePattern,
+  placesDataPath,
   placesMarkdownPath,
   placesPath,
 } from './routes';
@@ -30,6 +31,15 @@ export const placesPublicSurfaceSlice = {
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
       discoveryRoles: ['markdown-companion'],
+      catalogRole: 'item',
+    },
+    {
+      id: 'places:data',
+      label: 'Облегчённые данные интерактивной карты',
+      path: placesDataPath(),
+      mediaType: 'application/json',
+      cacheClass: 'data',
+      discoveryRoles: ['data-feed'],
       catalogRole: 'item',
     },
     {

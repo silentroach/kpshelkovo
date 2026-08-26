@@ -13,6 +13,7 @@ import type {
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { PlaceMapItem } from '@/lib/places/map-types';
+import type { PlaceMapPublicItemDto } from '@/lib/places/map-public-dto';
 
 import PlaceMap from '../PlaceMap.svelte';
 
@@ -65,6 +66,23 @@ const place: PlaceMapItem = {
     ],
   },
   url: '/map/burzhuyka/',
+};
+const publicPlace: PlaceMapPublicItemDto = {
+  slug: 'burzhuyka',
+  name: 'Буржуйка',
+  status: 'existing',
+  coordinates: { lat: 55.060526, lng: 37.716242 },
+  opening_hours: {
+    description: 'С 10:00 до 22:00, вторник — выходной',
+    periods: [
+      {
+        days: ['mon', 'wed', 'thu', 'fri', 'sat', 'sun'],
+        opens_at: '10:00',
+        closes_at: '22:00',
+      },
+    ],
+  },
+  html_url: 'https://kpshelkovo.online/map/burzhuyka/',
 };
 const titanicPlace: PlaceMapItem = {
   ...place,
@@ -229,6 +247,61 @@ describe('PlaceMap', () => {
 
     await fireEvent.keyDown(marker, { key: ' ' });
     expect(click).toHaveBeenCalledOnce();
+  });
+
+  it('loads map places from JSON before applying a requested highlight', async () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+    window.history.replaceState({}, '', '/map/?h=burzhuyka');
+    const fetch = vi.fn(async () =>
+      Response.json({
+        places: [publicPlace],
+      }),
+    );
+    vi.stubGlobal('fetch', fetch);
+
+    render(PlaceMap, {
+      props: {
+        dataUrl: '/map/data/places.json',
+      },
+    });
+
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+
+    expect(fetch).toHaveBeenCalledWith('/map/data/places.json');
+    expect(markerElements[0]?.getAttribute('href')).toBe('/map/burzhuyka/');
+    expect(markerElements[0]?.dataset.highlighted).toBe('true');
+  });
+
+  it('clears a requested highlight when map data cannot be loaded', async () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+    window.history.replaceState({}, '', '/map/?h=burzhuyka&from=issue');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(undefined, { status: 503 })),
+    );
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    render(PlaceMap, {
+      props: {
+        dataUrl: '/map/data/places.json',
+        fallbackPlace: {
+          name: place.name,
+          url: place.url,
+        },
+      },
+    });
+
+    await screen.findByRole('status');
+
+    expect({
+      href: screen.getByRole('link').getAttribute('href'),
+      url: `${window.location.pathname}${window.location.search}`,
+    }).toMatchInlineSnapshot(`
+      {
+        "href": "/map/burzhuyka/",
+        "url": "/map/?from=issue",
+      }
+    `);
   });
 
   it('supports navigation gestures and a closer fit on mobile', async () => {
