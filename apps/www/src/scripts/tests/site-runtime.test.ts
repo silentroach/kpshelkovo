@@ -269,3 +269,80 @@ describe('site header menu', () => {
     expect(document.activeElement).toBe(outside);
   });
 });
+
+describe('desktop site navigation dropdown', () => {
+  const renderDropdown = (): {
+    readonly dropdown: HTMLElement;
+    readonly button: HTMLButtonElement;
+    readonly menu: HTMLElement;
+    readonly submenuLink: HTMLAnchorElement;
+  } => {
+    document.body.innerHTML = `
+      <div data-site-nav-dropdown>
+        <button
+          type="button"
+          aria-expanded="false"
+          data-site-nav-dropdown-button
+        >Tariff</button>
+        <div hidden data-site-nav-dropdown-menu>
+          <a href="/815/compare/">Compare</a>
+        </div>
+      </div>
+      <a href="/map/">Map</a>
+    `;
+    document.dispatchEvent(new Event('astro:page-load'));
+
+    const dropdown = document.querySelector<HTMLElement>(
+      '[data-site-nav-dropdown]',
+    );
+    const button = dropdown?.querySelector<HTMLButtonElement>(
+      '[data-site-nav-dropdown-button]',
+    );
+    const menu = dropdown?.querySelector<HTMLElement>(
+      '[data-site-nav-dropdown-menu]',
+    );
+    const submenuLink = menu?.querySelector<HTMLAnchorElement>('a');
+    if (!dropdown || !button || !menu || !submenuLink) {
+      throw new Error('Expected desktop navigation dropdown fixture');
+    }
+
+    return { dropdown, button, menu, submenuLink };
+  };
+
+  it('hides closed links semantically and restores the trigger on Escape', () => {
+    const { button, menu, submenuLink } = renderDropdown();
+
+    button.focus();
+    button.click();
+    expect(menu.hidden).toBe(false);
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+
+    submenuLink.focus();
+    submenuLink.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+    );
+
+    expect({
+      expanded: button.getAttribute('aria-expanded'),
+      focusRestored: document.activeElement === button,
+      menuHidden: menu.hidden,
+    }).toMatchInlineSnapshot(`
+      {
+        "expanded": "false",
+        "focusRestored": true,
+        "menuHidden": true,
+      }
+    `);
+  });
+
+  it('keeps hover opening and outside pointer closing intact', () => {
+    const { button, dropdown, menu } = renderDropdown();
+
+    dropdown.dispatchEvent(new Event('pointerenter'));
+    button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+    expect(menu.hidden).toBe(false);
+
+    document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    expect(menu.hidden).toBe(true);
+  });
+});
