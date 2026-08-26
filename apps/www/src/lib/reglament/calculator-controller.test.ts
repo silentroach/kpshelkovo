@@ -1,7 +1,6 @@
 // @vitest-environment happy-dom
 
-import { afterEach } from 'vitest';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   buildReglamentCalculatorChanges,
@@ -657,5 +656,60 @@ describe('buildReglamentCalculatorChanges', () => {
     expect(
       document.querySelector('[data-reglament-current-tariff]')?.textContent,
     ).not.toBe('902,07 ₽/сотка');
+  });
+
+  it('does not rescan calculator DOM on input after a page replacement', () => {
+    const calculator = `
+      <div data-reglament-calculator>
+        <input
+          type="number"
+          data-reglament-field="fixed_price"
+          data-reglament-row-id="lighting-electricity"
+          data-reglament-baseline="1473084"
+          value="1473084"
+        />
+        <strong data-reglament-current-tariff></strong>
+      </div>
+    `;
+    document.body.innerHTML = calculator;
+
+    const firstRoot = document.querySelector('[data-reglament-calculator]');
+
+    if (!(firstRoot instanceof HTMLElement)) {
+      throw new Error('Missing first calculator fixture root');
+    }
+
+    hydrateReglamentCalculator(firstRoot);
+    document.body.innerHTML = calculator;
+
+    const root = document.querySelector('[data-reglament-calculator]');
+    const input = document.querySelector('input');
+    const currentTariff = document.querySelector(
+      '[data-reglament-current-tariff]',
+    );
+
+    if (
+      !(root instanceof HTMLElement) ||
+      !(input instanceof HTMLInputElement) ||
+      !(currentTariff instanceof HTMLElement)
+    ) {
+      throw new Error('Missing replacement calculator fixture nodes');
+    }
+
+    hydrateReglamentCalculator(root);
+    const querySelectorAll = vi.spyOn(root, 'querySelectorAll');
+
+    input.value = '1573084';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+
+    expect({
+      fullDomSearches: querySelectorAll.mock.calls.length,
+      tariff: currentTariff.textContent,
+    }).toMatchInlineSnapshot(`
+      {
+        "fullDomSearches": 0,
+        "tariff": "902,48 ₽/сотка",
+      }
+    `);
   });
 });
