@@ -39,9 +39,35 @@ export const surfaceToLinksetItem = (
   ...(surface.label ? { title: surface.label } : {}),
 });
 
+const assertUniqueRegistryIds = (
+  slices: readonly PublicSurfaceSlice[],
+): void => {
+  const ownerIds = new Set<PublicSurfaceOwnerId>();
+
+  for (const slice of slices) {
+    if (ownerIds.has(slice.owner.id)) {
+      throw new Error(`duplicate public surface owner id "${slice.owner.id}"`);
+    }
+    ownerIds.add(slice.owner.id);
+  }
+
+  const surfaceIds = new Set<PublicSurfaceId>();
+
+  for (const slice of slices) {
+    for (const surface of slice.surfaces) {
+      if (surfaceIds.has(surface.id)) {
+        throw new Error(`duplicate public surface id "${surface.id}"`);
+      }
+      surfaceIds.add(surface.id);
+    }
+  }
+};
+
 export const createPublicSurfaceRegistry = (
   slices: readonly PublicSurfaceSlice[],
 ): PublicSurfaceRegistry => {
+  assertUniqueRegistryIds(slices);
+
   const sections = slices.map((slice) => slice.owner);
   const surfaces = slices.flatMap((slice) => slice.surfaces);
   const ownerBySurfaceId = new Map<PublicSurfaceId, PublicSurfaceOwner>(
