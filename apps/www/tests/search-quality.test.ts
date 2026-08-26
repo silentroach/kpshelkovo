@@ -19,10 +19,15 @@ const queryGroups = [
     name: '#121 short queries',
     queries: [
       'еда',
+      'медицина',
+      'м',
       'подать в суд тариф',
       'подать суд тариф',
       'тар',
       'в',
+      'ок',
+      'тсн',
+      'суд',
       'вода',
       'газ',
       'слабый напор воды',
@@ -150,6 +155,9 @@ const rankExpectations: ReadonlyMap<
     { url: '/815/regulation/#tariff-calculator-title', maxRank: 1 },
   ],
   ['что входит в тариф 815', { url: '/815/regulation/', maxRank: 2 }],
+  ['тсн', { url: '/kb/tsn/manipulations/', maxRank: 1 }],
+  ['суд', { url: '/kb/court/order-debt/', maxRank: 1 }],
+  ['газ', { url: '/kb/services/gas/', maxRank: 1 }],
   ['титаник', { url: '/map/titanic/', maxRank: 1 }],
   ['детская площадка титаник', { url: '/map/titanic/', maxRank: 1 }],
   ['корабль недалеко от дамбы', { url: '/map/titanic/', maxRank: 1 }],
@@ -174,6 +182,8 @@ const rankExpectations: ReadonlyMap<
   ],
   ['ивушкино', { url: '/815/compare/settlements/ivushkino/', maxRank: 1 }],
 ]);
+
+const emptyQueryExpectations = new Set(['медицина', 'м', 'в']);
 
 const placeSnippetUrls: ReadonlyMap<string, string> = new Map([
   ['лесное озеро в ривере', '/map/river-forest-lake/'],
@@ -401,6 +411,24 @@ for (const group of queryGroups) {
         `${query}: news archive pages must stay outside Pagefind`,
       ).toBeUndefined();
 
+      if (emptyQueryExpectations.has(query)) {
+        expect(snapshot, `${query}: expected no prefix fallback`).toMatchObject(
+          {
+            results: [],
+            total: 0,
+          },
+        );
+      }
+
+      if (query === 'еда') {
+        expect(
+          snapshot.results.flatMap((result) => result.highlights),
+          'еда: prefix-only words must not be highlighted',
+        ).not.toEqual(
+          expect.arrayContaining([expect.stringMatching(/^(?:едва|един)/iu)]),
+        );
+      }
+
       const expectation = rankExpectations.get(query);
       if (expectation) {
         const rank = snapshot.results.findIndex(
@@ -457,6 +485,18 @@ for (const group of queryGroups) {
       }
 
       matrix.push(snapshot);
+    }
+
+    if (group.name === '#121 short queries') {
+      const withPreposition = matrix.find(
+        (snapshot) => snapshot.query === 'подать в суд тариф',
+      );
+      const withoutPreposition = matrix.find(
+        (snapshot) => snapshot.query === 'подать суд тариф',
+      );
+
+      expect(withPreposition?.results).toEqual(withoutPreposition?.results);
+      expect(withPreposition?.total).toBe(withoutPreposition?.total);
     }
 
     expect(matrix).toMatchSnapshot();
