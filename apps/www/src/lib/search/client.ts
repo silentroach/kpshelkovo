@@ -263,6 +263,50 @@ const normalizeQuery = (query: string): string =>
 
 const tokenLength = (token: string): number => Array.from(token).length;
 
+const comparableWord = (word: string): string =>
+  word.normalize('NFKD').replace(/\p{M}/gu, '').toLocaleLowerCase('ru');
+
+const textHasForwardPrefix = (value: unknown, token: string): boolean =>
+  typeof value === 'string' &&
+  (value.match(/[\p{L}\p{N}]+/gu) ?? []).some((word) =>
+    comparableWord(word).startsWith(token),
+  );
+
+const asPagefindLocations = (value: unknown): readonly number[] =>
+  Array.isArray(value)
+    ? value.filter(
+        (item): item is number =>
+          typeof item === 'number' && Number.isSafeInteger(item) && item >= 0,
+      )
+    : [];
+
+const hasForwardPrefixMatch = (
+  value: unknown,
+  reference: PagefindResultReference,
+  token: string,
+): boolean => {
+  const rawResult = asRecord(value);
+  const content = cleanText(rawResult?.content)?.split(' ') ?? [];
+  const resultLocations = asPagefindLocations(rawResult?.locations);
+  const locations = resultLocations.length
+    ? resultLocations
+    : asPagefindLocations(reference.words);
+  const comparableToken = comparableWord(token);
+
+  if (
+    locations.some((location) =>
+      textHasForwardPrefix(content[location], comparableToken),
+    )
+  ) {
+    return true;
+  }
+
+  const meta = asRecord(rawResult?.meta);
+  return asStringList(reference.matchedMetaFields).some((field) =>
+    textHasForwardPrefix(meta?.[field], comparableToken),
+  );
+};
+
 const pagefindTokens = (query: string): readonly string[] =>
   query
     .split(' ')
@@ -307,9 +351,22 @@ const searchPagefind = async (
     broadSearch,
     searchExactToken(token),
   ]);
-  // Pagefind can fall back to a one-letter prefix when a long token is absent.
   if (tokenLength(token) > prefixFallbackMaxLength) {
-    return exactResponse.results.length ? broadResponse.results : [];
+    if (exactResponse.results.length) {
+      return broadResponse.results;
+    }
+
+    const [firstResult, ...remainingResults] = broadResponse.results;
+    if (!firstResult) {
+      return [];
+    }
+
+    // Pagefind uses either forward extensions or one inverse prefix for the
+    // whole term, so the first result identifies the direction of the set.
+    const firstData = await firstResult.data();
+    return hasForwardPrefixMatch(firstData, firstResult, token)
+      ? [{ ...firstResult, data: async () => firstData }, ...remainingResults]
+      : [];
   }
   if (!exactResponse.results.length) {
     return broadResponse.results;
