@@ -8,6 +8,7 @@ import {
   buildEstimateDetailMarkdown,
   buildEstimateDetailMaterialsMarkdown,
 } from './detail-markdown';
+import type { PublicEstimateDetailDataset } from './detail-public';
 
 const fixtureDataset = {
   schema_version: '1',
@@ -252,6 +253,22 @@ describe('estimate detail markdown companions', () => {
     }
   });
 
+  it('publishes the same schema version in JSON and Markdown routes', async () => {
+    const [jsonRoute, markdownRoute] = await Promise.all([
+      import('../../pages/815/regulation/data/estimate-details-2026.json'),
+      import('../../pages/815/regulation/details.md'),
+    ]);
+    const [jsonResponse, markdownResponse] = await Promise.all([
+      jsonRoute.GET({} as never),
+      markdownRoute.GET({} as never),
+    ]);
+    const json = (await jsonResponse.json()) as PublicEstimateDetailDataset;
+    const markdown = await markdownResponse.text();
+    const markdownSchemaVersion = markdown.match(/версия схемы: ([^;]+)/)?.[1];
+
+    expect(markdownSchemaVersion).toBe(json.schema_version);
+  });
+
   it('builds an overview from dataset counts and links topical files', () => {
     const markdown = buildEstimateDetailMarkdown(fixtureDataset);
 
@@ -292,7 +309,7 @@ describe('estimate detail markdown companions', () => {
 
       ## Сводка
 
-      - Набор данных: estimate-details-2026; версия схемы: 1; год: 2026
+      - Набор данных: estimate-details-2026; версия схемы: 2; год: 2026
       - PDF-источники: 1
       - Работы: 2
       - Ресурсы: 4

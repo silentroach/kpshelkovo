@@ -5,6 +5,8 @@ import type {
   EstimateDetailSourcePdf,
 } from './detail-schema';
 
+export const ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_VERSION = '2' as const;
+
 export type PublicEstimateDetailSourceId = `s${number}`;
 
 export interface PublicEstimateDetailQuantityValue {
@@ -86,7 +88,7 @@ export interface PublicEstimateDetailControlTotal extends PublicEstimateDetailSt
 }
 
 export interface PublicEstimateDetailDataset {
-  readonly schema_version: '2';
+  readonly schema_version: typeof ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_VERSION;
   readonly dataset_id: 'estimate-details-2026';
   readonly title: string;
   readonly year: 2026;

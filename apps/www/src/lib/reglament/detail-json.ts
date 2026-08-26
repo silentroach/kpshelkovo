@@ -5,13 +5,14 @@ import type {
   EstimateDetailQuantityValue,
   EstimateDetailSourceRef,
 } from './detail-schema';
-import type {
-  PublicEstimateDetailDataset,
-  PublicEstimateDetailMoneyValue,
-  PublicEstimateDetailNeedsCheck,
-  PublicEstimateDetailQuantityValue,
-  PublicEstimateDetailSourceId,
-  PublicEstimateDetailSourceValue,
+import {
+  ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_VERSION,
+  type PublicEstimateDetailDataset,
+  type PublicEstimateDetailMoneyValue,
+  type PublicEstimateDetailNeedsCheck,
+  type PublicEstimateDetailQuantityValue,
+  type PublicEstimateDetailSourceId,
+  type PublicEstimateDetailSourceValue,
 } from './detail-public';
 
 const publicQuantity = (
@@ -141,7 +142,7 @@ export const buildPublicEstimateDetails2026Json = (
     needs_check: needsCheck(controlTotal.needs_check),
   }));
   const publicDataset: PublicEstimateDetailDataset = {
-    schema_version: '2',
+    schema_version: ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_VERSION,
     dataset_id: dataset.dataset_id,
     title: dataset.title,
     year: dataset.year,
