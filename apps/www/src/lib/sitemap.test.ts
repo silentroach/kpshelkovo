@@ -219,7 +219,7 @@ describe('buildSitemapMetadataIndex', () => {
     ).toEqual({ url: 'https://kpshelkovo.online/kb/public/' });
   });
 
-  it('uses contact updated_at dates for contacts pages', () => {
+  it('uses the latest contact updated_at regardless of input order', () => {
     const index = buildSitemapMetadataIndex({
       newsArticles: [],
       statusIncidents: [],
@@ -230,12 +230,12 @@ describe('buildSitemapMetadataIndex', () => {
         {
           category: 'fence',
           url: '/sarafan/fence/ivan-petrov-fence/',
-          updatedIso: '2026-07-06',
+          updatedIso: '2026-07-07',
         },
         {
           category: 'fence',
           url: '/sarafan/fence/sergey/',
-          updatedIso: '2026-07-07',
+          updatedIso: '2026-07-06',
         },
       ],
     });
@@ -244,18 +244,18 @@ describe('buildSitemapMetadataIndex', () => {
       section: index.get('/sarafan/'),
       category: index.get('/sarafan/fence/'),
       contact: index.get('/sarafan/fence/ivan-petrov-fence/'),
-      blankBodyContact: index.get('/sarafan/fence/sergey/'),
+      olderContact: index.get('/sarafan/fence/sergey/'),
     }).toMatchInlineSnapshot(`
       {
-        "blankBodyContact": {
-          "changefreq": "monthly",
-          "lastmod": "2026-07-07",
-        },
         "category": {
           "changefreq": "monthly",
           "lastmod": "2026-07-07",
         },
         "contact": {
+          "changefreq": "monthly",
+          "lastmod": "2026-07-07",
+        },
+        "olderContact": {
           "changefreq": "monthly",
           "lastmod": "2026-07-06",
         },
