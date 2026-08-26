@@ -220,32 +220,41 @@ describe('buildSitemapMetadataIndex', () => {
   });
 
   it('uses the latest contact updated_at regardless of input order', () => {
-    const index = buildSitemapMetadataIndex({
-      newsArticles: [],
-      statusIncidents: [],
-      settlements: [],
-      meetings: [],
-      kbPages: [],
-      contacts: [
-        {
-          category: 'fence',
-          url: '/sarafan/fence/ivan-petrov-fence/',
-          updatedIso: '2026-07-07',
-        },
-        {
-          category: 'fence',
-          url: '/sarafan/fence/sergey/',
-          updatedIso: '2026-07-06',
-        },
-      ],
-    });
+    const contacts = [
+      {
+        category: 'fence',
+        url: '/sarafan/fence/ivan-petrov-fence/',
+        updatedIso: '2026-07-07',
+      },
+      {
+        category: 'fence',
+        url: '/sarafan/fence/sergey/',
+        updatedIso: '2026-07-06',
+      },
+    ];
+    const metadataByOrder = [contacts, contacts.toReversed()].map(
+      (orderedContacts) => {
+        const index = buildSitemapMetadataIndex({
+          newsArticles: [],
+          statusIncidents: [],
+          settlements: [],
+          meetings: [],
+          kbPages: [],
+          contacts: orderedContacts,
+        });
 
-    expect({
-      section: index.get('/sarafan/'),
-      category: index.get('/sarafan/fence/'),
-      contact: index.get('/sarafan/fence/ivan-petrov-fence/'),
-      olderContact: index.get('/sarafan/fence/sergey/'),
-    }).toMatchInlineSnapshot(`
+        return {
+          section: index.get('/sarafan/'),
+          category: index.get('/sarafan/fence/'),
+          contact: index.get('/sarafan/fence/ivan-petrov-fence/'),
+          olderContact: index.get('/sarafan/fence/sergey/'),
+        };
+      },
+    );
+    const [newestFirst, newestLast] = metadataByOrder;
+
+    expect(newestFirst).toEqual(newestLast);
+    expect(newestFirst).toMatchInlineSnapshot(`
       {
         "category": {
           "changefreq": "monthly",
