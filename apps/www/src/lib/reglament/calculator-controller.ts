@@ -627,15 +627,10 @@ const formatReglamentInput = (input: HTMLInputElement): void => {
   }
 };
 
-const reglamentInputError = (input: HTMLInputElement): string | undefined => {
-  if (!input.value.trim()) {
-    return undefined;
-  }
-
-  return toNonnegativeFiniteNumber(input.value) === undefined
+const reglamentInputError = (input: HTMLInputElement): string | undefined =>
+  toNonnegativeFiniteNumber(input.value) === undefined
     ? INVALID_NUMBER_MESSAGE
     : undefined;
-};
 
 const renderReglamentInputValidation = (
   index: ReglamentCalculatorDomIndex,
