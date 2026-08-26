@@ -16,10 +16,6 @@ export interface PlaceMapItem {
   readonly url: string;
 }
 
-export interface PlaceMapPayload {
-  readonly places: readonly PlaceMapItem[];
-}
-
 export interface PlaceMapFallback {
   readonly name: string;
   readonly url: string;

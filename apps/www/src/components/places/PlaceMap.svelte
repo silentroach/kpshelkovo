@@ -26,10 +26,10 @@
   } from '@/lib/yandex-maps/runtime';
   import { getPlaceClosingTime } from '@/lib/places/opening-hours';
   import type {
-    PlaceMapItem,
-    PlaceMapPayload,
-    PlaceMapProps,
-  } from '@/lib/places/map-types';
+    PlaceMapPublicItemDto,
+    PlaceMapPublicPayloadDto,
+  } from '@/lib/places/map-public-dto';
+  import type { PlaceMapItem, PlaceMapProps } from '@/lib/places/map-types';
   import { PLACE_MAP_BOUNDS } from '@/lib/places/schema';
   import type { PlaceMarker } from '@/lib/places/schema';
   import type {
@@ -63,14 +63,33 @@
   const MARKER_CLOSEUP_MAX_SCALE = 1.3;
   const PLACE_FOCUS_ZOOM = MARKER_MAX_ZOOM;
   const roundCoordinate = (value: number): number => Number(value.toFixed(6));
+  const toPlaceMapItem = (place: PlaceMapPublicItemDto): PlaceMapItem => ({
+    slug: place.slug,
+    name: place.name,
+    marker: place.marker,
+    status: place.status,
+    coordinates: place.coordinates,
+    geometry: place.geometry,
+    openingHours: place.opening_hours
+      ? {
+          description: place.opening_hours.description,
+          periods: place.opening_hours.periods.map((period) => ({
+            days: period.days,
+            opensAt: period.opens_at,
+            closesAt: period.closes_at,
+          })),
+        }
+      : undefined,
+    url: place.html_url,
+  });
   const fetchPlaces = async (url: string): Promise<readonly PlaceMapItem[]> => {
     if (!url) throw new Error('Не указан источник данных карты');
 
     const response = await fetch(url);
     if (!response.ok) throw new Error('Не удалось загрузить данные карты');
 
-    const payload = (await response.json()) as PlaceMapPayload;
-    return payload.places;
+    const payload = (await response.json()) as PlaceMapPublicPayloadDto;
+    return payload.places.map(toPlaceMapItem);
   };
   const copyGeometryRing = (ring: readonly PlaceGeometryPosition[]): LngLat[] =>
     ring.map(([lng, lat]) => [lng, lat]);
@@ -774,7 +793,7 @@
         clearMap();
 
         if (!destroyed) {
-          removeHighlightQuery(highlightedPlace?.slug);
+          removeHighlightQuery(highlightedPlace?.slug ?? requestedSlug);
           highlightedPlace = undefined;
           error = reason instanceof Error ? reason.message : 'Карта недоступна';
           isLoading = false;

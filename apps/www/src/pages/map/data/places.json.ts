@@ -1,24 +1,12 @@
 import type { APIRoute } from 'astro';
 
 import { loadPlaces } from '@/lib/places/load';
-import type { PlaceMapPayload } from '@/lib/places/map-types';
+import { buildPlaceMapPublicPayload } from '@/lib/places/map-public';
 
 export const prerender = true;
 
 export const GET: APIRoute = async () => {
-  const places = await loadPlaces();
-  const body: PlaceMapPayload = {
-    places: places.map((place) => ({
-      slug: place.slug,
-      name: place.name,
-      marker: place.marker,
-      status: place.status,
-      coordinates: place.coordinates,
-      geometry: place.geometry,
-      openingHours: place.openingHours,
-      url: place.url,
-    })),
-  };
+  const body = buildPlaceMapPublicPayload(await loadPlaces());
 
   return new Response(`${JSON.stringify(body)}\n`, {
     headers: {
