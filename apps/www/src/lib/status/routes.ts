@@ -4,6 +4,7 @@ import type { StatusService } from './schema';
 import { canon, withBase } from '../site';
 
 const STATUS_ROOT = '/status/';
+const STATUS_HISTORY = '/status/history/';
 const STATUS_MARKDOWN = '/status/index.md';
 const STATUS_INCIDENTS_ROOT = '/status/incidents/';
 const STATUS_DATA = '/status/data/status.json';
@@ -31,6 +32,8 @@ const need = (value: string, name: string): string => {
 };
 
 export const statusPath = (): string => STATUS_ROOT;
+
+export const statusHistoryPath = (): string => STATUS_HISTORY;
 
 export const statusMarkdownPath = (): string => STATUS_MARKDOWN;
 
@@ -66,6 +69,8 @@ export const statusIncidentMarkdownPattern = (): string =>
   '/status/incidents/:year/:month/:entry/index.md';
 
 export const statusUrl = (): string => withBase(STATUS_ROOT);
+
+export const statusHistoryUrl = (): string => withBase(statusHistoryPath());
 
 export const statusMarkdownUrl = (): string => withBase(STATUS_MARKDOWN);
 

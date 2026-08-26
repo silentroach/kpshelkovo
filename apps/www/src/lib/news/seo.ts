@@ -12,7 +12,7 @@ export interface BreadcrumbLink {
 
 export interface ListEntry {
   readonly name: string;
-  readonly url: string;
+  readonly url?: string;
 }
 
 interface BasePageInput {
@@ -75,12 +75,16 @@ const itemListSchema = (
   '@id': `${url}#items`,
   url,
   numberOfItems: items.length,
-  itemListElement: items.map((item, index) => ({
-    '@type': 'ListItem',
-    position: index + 1,
-    name: item.name,
-    item: absoluteUrl(item.url),
-  })),
+  itemListElement: items.map((item, index) => {
+    const itemUrl = item.url;
+
+    return {
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: itemUrl ? absoluteUrl(itemUrl) : undefined,
+    };
+  }),
 });
 
 const imageValue = (

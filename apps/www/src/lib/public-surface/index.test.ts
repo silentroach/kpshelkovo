@@ -97,6 +97,7 @@ import {
   statusApiCatalogPath,
   statusDataPath,
   statusFeedPath,
+  statusHistoryPath,
   statusIncidentMarkdownPattern,
   statusIncidentPattern,
   statusLlmsFullPath,
@@ -339,6 +340,17 @@ describe('public surface registry', () => {
     expect(byId.get('status:index')).toMatchObject({ path: statusPath() });
     expect(byId.get('status:index-markdown')).toMatchObject({
       path: statusMarkdownPath(),
+    });
+    expect(byId.get('status:history')).toMatchObject({
+      path: statusHistoryPath(),
+      linkRelations: [
+        {
+          rel: 'alternate',
+          href: statusMarkdownPath(),
+          mediaType: 'text/markdown',
+        },
+      ],
+      acceptsNegotiation: 'required',
     });
     expect(byId.get('status:service')).toMatchObject({
       routePattern: statusServicePattern(),

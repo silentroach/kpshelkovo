@@ -207,6 +207,7 @@ const addStatusMetadata = (
 
     setMetadata(index, '/', { lastmod, changefreq: CHANGEFREQ.daily });
     setMetadata(index, '/status/', hourly);
+    setMetadata(index, '/status/history/', hourly);
     setMetadata(index, `/status/${incident.service}/`, hourly);
 
     if (incident.hasPage) {

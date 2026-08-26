@@ -1,0 +1,80 @@
+---
+import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import StatusIncidentRow from '@/components/status/StatusIncidentRow.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import {
+  withHomeBreadcrumbs,
+  withHomeSchemaBreadcrumbs,
+} from '@/lib/breadcrumbs';
+import { collectionPageSchema } from '@/lib/news/seo';
+import { loadStatusData } from '@/lib/status/load';
+import {
+  statusHistoryUrl,
+  statusMarkdownUrl,
+  statusUrl,
+} from '@/lib/status/routes';
+
+const data = await loadStatusData();
+const title = 'История статусов — Шелково Онлайн';
+const description =
+  'Полная история отключений, ограничений и плановых работ по сервисам КП Шелково: электричество, вода, интернет и проезд через дамбу.';
+const breadcrumbs = withHomeBreadcrumbs([
+  { label: 'Статус', href: statusUrl() },
+  { label: 'История' },
+]);
+const historySchemaItems = data.incidents.map((item) => ({
+  name: item.title,
+  url: item.url,
+}));
+const schema = collectionPageSchema({
+  name: title,
+  description,
+  url: statusHistoryUrl(),
+  breadcrumbs: withHomeSchemaBreadcrumbs([
+    { name: 'Статус', url: statusUrl() },
+    { name: 'История', url: statusHistoryUrl() },
+  ]),
+  items: historySchemaItems,
+});
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={statusHistoryUrl()}
+  markdownAlternate={statusMarkdownUrl()}
+  keywords={['история статусов Шелково', 'архив отключений Шелково']}
+  schema={schema}
+>
+  <main class="ui-page pb-6 md:pb-10 lg:pb-12">
+    <section class="ui-page-header">
+      <div class="ui-page-header-stack max-w-4xl">
+        <Breadcrumbs items={breadcrumbs} />
+
+        <div class="space-y-3">
+          <h1 class="ui-page-title">История статусов</h1>
+          <p class="max-w-3xl text-base leading-7 text-muted-foreground">
+            Все записи об отключениях, ограничениях и плановых работах — от
+            новых к старым.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="mt-8 px-5 md:px-6"
+      aria-labelledby="status-history-title"
+      data-status-history
+    >
+      <h2 id="status-history-title" class="sr-only">Все записи</h2>
+
+      <div class="-mx-5 md:-mx-6">
+        {
+          data.incidents.map((incident) => (
+            <StatusIncidentRow incident={incident} />
+          ))
+        }
+      </div>
+    </section>
+  </main>
+</BaseLayout>
