@@ -8,12 +8,7 @@ import { count } from '@shelkovo/format';
 
 import { absoluteUrl } from '@/lib/site';
 
-import type {
-  Contact,
-  ContactCategoryPage,
-  ContactsDataset,
-  ContactWithDetail,
-} from './types';
+import type { Contact, ContactCategoryPage, ContactsDataset } from './types';
 import {
   CONTACTS_CHAT_LABEL,
   CONTACTS_CHAT_URL,
@@ -24,16 +19,11 @@ import {
   CONTACTS_NEIGHBOR_TABLE_PREFIX,
   CONTACTS_NEIGHBOR_TABLE_SUFFIX,
   CONTACTS_NEIGHBOR_TABLE_URL,
-  type ContactMethod,
-  type ContactPlace,
   contactExcerpt,
-  contactMethods,
-  contactPlace,
   formatContactCategory,
 } from './view';
 
 type MarkdownNode = ReturnType<typeof parseMarkdownFragment>[number];
-type MarkdownListItem = ReturnType<typeof md.listItem>;
 
 type ContactFrontmatterLocation = Exclude<Contact['location'], undefined>;
 
@@ -109,62 +99,18 @@ const contactsIntro = (): MarkdownNode =>
 
 const contactsEmpty = (): MarkdownNode => md.paragraph(CONTACTS_EMPTY_MESSAGE);
 
-const methodLine = (method: ContactMethod): MarkdownListItem =>
-  md.listItem([
-    md.paragraph(
-      method.href
-        ? [md.text(`${method.label}: `), md.link(method.href, method.value)]
-        : `${method.label}: ${method.value}`,
-    ),
-  ]);
-
-const placeLine = (place: ContactPlace): MarkdownListItem =>
-  md.listItem([
-    md.paragraph([
-      md.text(`${place.label}: `),
-      md.link(place.href, place.title),
-      ...(place.address ? [md.text(` — ${place.address}`)] : []),
-    ]),
-  ]);
-
-const contactInfoLines = (contact: Contact): readonly MarkdownListItem[] => {
-  const place = contactPlace(contact.location);
-
-  return [
-    ...(place ? [placeLine(place)] : []),
-    ...contactMethods(contact.contacts).map(methodLine),
-    ...(contact.vcf
-      ? [
-          md.listItem([
-            md.paragraph([
-              md.text('vCard: '),
-              md.link(abs(contact.vcf.downloadUrl), 'Добавить в контакты'),
-            ]),
-          ]),
-        ]
-      : []),
-  ];
-};
-
-const contactTitle = (contact: Contact) =>
-  contact.hasDetailPage
-    ? [md.link(abs(contact.markdownUrl), contact.title)]
-    : [md.text(contact.title)];
-
-const contactLine = (contact: Contact): MarkdownListItem => {
+const contactLine = (contact: Contact) => {
   const excerpt = contactExcerpt(contact);
-  const children = [
+
+  return md.listItem([
     md.paragraph([
-      ...contactTitle(contact),
+      md.link(abs(contact.markdownUrl), contact.title),
       ...(excerpt ? [md.text(` — ${excerpt}`)] : []),
     ]),
-    md.list(contactInfoLines(contact)),
-  ];
-
-  return md.listItem(children);
+  ]);
 };
 
-const categoryLine = (category: ContactCategoryPage): MarkdownListItem =>
+const categoryLine = (category: ContactCategoryPage) =>
   md.listItem([
     md.paragraph([
       md.link(
@@ -177,7 +123,7 @@ const categoryLine = (category: ContactCategoryPage): MarkdownListItem =>
     ]),
   ]);
 
-const contactFrontmatter = (contact: ContactWithDetail): ContactFrontmatter => {
+const contactFrontmatter = (contact: Contact): ContactFrontmatter => {
   const frontmatter: MutableContactFrontmatter = {
     title: contact.title,
     slug: contact.slug,
@@ -278,7 +224,7 @@ export const buildContactsCategoryMarkdown = (
     md.list(category.contacts.map(contactLine)),
   ]);
 
-export const buildContactMarkdown = (contact: ContactWithDetail): string =>
+export const buildContactMarkdown = (contact: Contact): string =>
   serializeMarkdownDocument(
     createMarkdownDocument({
       frontmatter: contactFrontmatter(contact),

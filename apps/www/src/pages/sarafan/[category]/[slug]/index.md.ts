@@ -1,13 +1,13 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
 import { createMarkdownResponse } from '@/lib/markdown/response';
-import { loadContactDetail, loadContactDetails } from '@/lib/contacts/load';
+import { loadContact, loadContacts } from '@/lib/contacts/load';
 import { buildContactMarkdown } from '@/lib/contacts/markdown';
 
 export const prerender = true;
 
 export const getStaticPaths = (async () => {
-  const contacts = await loadContactDetails();
+  const contacts = await loadContacts();
 
   return contacts.map((contact) => ({
     params: { category: contact.category, slug: contact.slug },
@@ -22,7 +22,7 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error('contact category and slug are required');
   }
 
-  const contact = await loadContactDetail(category, slug);
+  const contact = await loadContact(category, slug);
 
   if (!contact) {
     throw new Error(`contact "${category}/${slug}" not found`);

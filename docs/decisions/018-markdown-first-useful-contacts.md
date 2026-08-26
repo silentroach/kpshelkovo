@@ -180,6 +180,8 @@ Markdown companion генерируется через `@shelkovo/markdown` AST 
 
 ADR-025 позднее включил detail-страницы контактов в Pagefind и заменил исходное ограничение MVP «без поиска». Frontmatter контакта может содержать необязательные `search_aliases` по правилам ADR-025; поле не выводится в карточке, detail body или Markdown companion и по умолчанию отсутствует.
 
+Задача [#269](https://github.com/silentroach/kpshelkovo/issues/269) позднее перенесла контактные данные со страниц-списков в карточки. Каждый опубликованный контакт теперь получает HTML-страницу `/sarafan/<category>/<slug>/` и Markdown companion `/sarafan/<category>/<slug>/index.md`, даже если body пустой. Списки показывают название и доступную выжимку со ссылкой на карточку; адрес, способы связи и vCard публикуются только в карточке.
+
 ## Рассмотренные альтернативы
 
 ### URL `/recommendations/`

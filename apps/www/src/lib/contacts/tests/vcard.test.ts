@@ -24,7 +24,6 @@ const contact = {
     coordinates: { lat: 55.123456, lng: 38.654321 },
   },
   reviews: [],
-  hasDetailPage: true,
   url: '/sarafan/electricity/alexander-eremin/',
   markdownUrl: '/sarafan/electricity/alexander-eremin/index.md',
   canonical: 'https://kpshelkovo.online/sarafan/electricity/alexander-eremin/',

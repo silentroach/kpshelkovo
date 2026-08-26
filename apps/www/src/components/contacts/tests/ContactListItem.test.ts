@@ -24,6 +24,10 @@ const contact = {
   updatedAt: new Date('2026-08-01T00:00:00.000Z'),
   updatedIso: '2026-08-01',
   contacts: { phone: '+7 900 000-00-00' },
+  location: {
+    title: 'Пример места',
+    url: 'https://yandex.ru/maps/example',
+  },
   reviews: [
     positiveReview,
     positiveReview,
@@ -31,12 +35,24 @@ const contact = {
     positiveReview,
     positiveReview,
   ],
-  hasDetailPage: false,
+  url: '/sarafan/construction/example/',
+  markdownUrl: '/sarafan/construction/example/index.md',
+  canonical: 'https://example.com/sarafan/construction/example/',
   body: '',
   mentions: [],
 } satisfies Contact;
 
 describe('ContactListItem', () => {
+  it('does not expose contact details in a list item', async () => {
+    const container = await createAstroContainer();
+    const html = await container.renderToString(ContactListItem, {
+      props: { contact },
+    });
+
+    expect(html).toContain('href="/sarafan/construction/example/"');
+    expect(html).not.toMatch(/\+7 900 000-00-00|yandex\.ru\/maps\/example/u);
+  });
+
   it('describes the review highlight with a native title', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(ContactListItem, {

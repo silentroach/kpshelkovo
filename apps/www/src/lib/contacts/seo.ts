@@ -2,7 +2,7 @@ import type { SchemaDoc } from '@shelkovo/seo';
 
 import { absoluteUrl } from '@/lib/site';
 
-import type { ContactWithDetail } from './types';
+import type { Contact } from './types';
 import { contactExcerpt, formatContactCategory } from './view';
 
 const CONTEXT = 'https://schema.org';
@@ -27,7 +27,7 @@ interface ContactsCollectionPageInput {
 }
 
 interface ContactPageInput {
-  readonly contact: ContactWithDetail;
+  readonly contact: Contact;
   readonly description: string;
   readonly breadcrumbs?: readonly BreadcrumbLink[];
 }
@@ -60,17 +60,14 @@ const itemListSchema = (
   })),
 });
 
-const externalContactUrls = (contact: ContactWithDetail): readonly string[] =>
+const externalContactUrls = (contact: Contact): readonly string[] =>
   [
     contact.contacts.telegram,
     contact.contacts.whatsapp,
     contact.contacts.website,
   ].filter((url): url is string => Boolean(url));
 
-const contactPointSchema = (
-  contact: ContactWithDetail,
-  url: string,
-): SchemaDoc => {
+const contactPointSchema = (contact: Contact, url: string): SchemaDoc => {
   const sameAs = externalContactUrls(contact);
 
   const schema: SchemaDoc = {

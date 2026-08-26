@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { createContactMentionRefs } from '../mentions';
-import type { ContactWithDetail } from '../types';
+import type { Contact } from '../types';
 
 const contact = {
   slug: 'ivan-petrov-fence',
@@ -13,7 +13,6 @@ const contact = {
     phone: '+7 900 000-00-00',
   },
   reviews: [],
-  hasDetailPage: true,
   url: '/sarafan/fence/ivan-petrov-fence/',
   markdownUrl: '/sarafan/fence/ivan-petrov-fence/index.md',
   canonical: 'https://example.com/sarafan/fence/ivan-petrov-fence/',
@@ -27,7 +26,7 @@ const contact = {
       markdownUrl: '/people/kschemelinin/index.md',
     },
   ],
-} satisfies ContactWithDetail;
+} satisfies Contact;
 
 describe('createContactMentionRefs', () => {
   it('adapts contact body mentions into graph refs', () => {

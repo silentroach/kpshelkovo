@@ -64,30 +64,12 @@ describe('contactSitemapInput', () => {
     expect(
       contactSitemapInput(
         'title: Иван Петров\ncategory: fence\nslug: ivan-petrov-fence\nupdated_at: 2026-07-06',
-        'Работает с заборами.',
       ),
     ).toMatchInlineSnapshot(`
       {
         "category": "fence",
-        "hasPage": true,
         "updatedIso": "2026-07-06",
         "url": "/sarafan/fence/ivan-petrov-fence/",
-      }
-    `);
-  });
-
-  it('marks blank-body contacts as list-only sitemap inputs', () => {
-    expect(
-      contactSitemapInput(
-        'title: Сергей\ncategory: fence\nslug: sergey\nupdated_at: 2026-07-07',
-        '',
-      ),
-    ).toMatchInlineSnapshot(`
-      {
-        "category": "fence",
-        "hasPage": false,
-        "updatedIso": "2026-07-07",
-        "url": "/sarafan/fence/sergey/",
       }
     `);
   });

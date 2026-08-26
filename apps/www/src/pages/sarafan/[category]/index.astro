@@ -51,12 +51,10 @@ const schema = contactsCollectionPageSchema({
     { name: 'Сарафан', url: contactsUrl() },
     { name: label, url: category.url },
   ]),
-  items: category.contacts
-    .filter((contact) => contact.hasDetailPage)
-    .map((contact) => ({
-      name: contact.title,
-      url: contact.url,
-    })),
+  items: category.contacts.map((contact) => ({
+    name: contact.title,
+    url: contact.url,
+  })),
 });
 ---
 

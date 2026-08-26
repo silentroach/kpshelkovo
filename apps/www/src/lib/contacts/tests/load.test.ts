@@ -65,7 +65,6 @@ describe('buildContactsDataset', () => {
       'second-fence',
     ]);
     expect(data.byRoute.get('fence/first-fence')).toMatchObject({
-      hasDetailPage: true,
       canonical: 'https://kpshelkovo.online/sarafan/fence/first-fence/',
       markdownUrl: '/sarafan/fence/first-fence/index.md',
       url: '/sarafan/fence/first-fence/',
@@ -113,20 +112,25 @@ describe('buildContactsDataset', () => {
     ]);
   });
 
-  it('keeps blank-body contacts in lists without detail URLs', () => {
+  it('gives blank-body contacts reachable detail URLs', () => {
     const data = buildContactsDataset([
-      entry({ id: 'fence/list-only', body: '' }),
+      entry({ id: 'fence/blank-body', body: '' }),
     ]);
+    const contact = data.byRoute.get('fence/blank-body');
 
-    expect(data.byRoute.get('fence/list-only')).toMatchObject({
-      hasDetailPage: false,
-      body: '',
-    });
-    expect(data.byRoute.get('fence/list-only')).not.toHaveProperty('url');
-    expect(data.byRoute.get('fence/list-only')).not.toHaveProperty(
-      'markdownUrl',
-    );
-    expect(data.byRoute.get('fence/list-only')).not.toHaveProperty('canonical');
+    expect({
+      body: contact?.body,
+      canonical: contact?.canonical,
+      markdownUrl: contact?.markdownUrl,
+      url: contact?.url,
+    }).toMatchInlineSnapshot(`
+      {
+        "body": "",
+        "canonical": "https://kpshelkovo.online/sarafan/fence/blank-body/",
+        "markdownUrl": "/sarafan/fence/blank-body/index.md",
+        "url": "/sarafan/fence/blank-body/",
+      }
+    `);
   });
 
   it('preprocesses body mentions with the app-level registry when provided', () => {

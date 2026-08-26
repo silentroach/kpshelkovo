@@ -1,62 +1,28 @@
 ---
-import {
-  EmailIcon,
-  GlobeIcon,
-  MapPinIcon,
-  PhoneIcon,
-  StarIcon,
-  TelegramIcon,
-  WhatsAppIcon,
-} from '@shelkovo/ui/icons';
+import { StarIcon } from '@shelkovo/ui/icons';
 
-import type { Contact, ContactContacts } from '@/lib/contacts/types';
+import type { Contact } from '@/lib/contacts/types';
 import {
   contactExcerpt,
-  contactMethods,
-  contactPlace,
   hasManyPositiveContactReviews,
 } from '@/lib/contacts/view';
-
-type ContactMethodType = keyof ContactContacts;
 
 interface Props {
   readonly contact: Contact;
 }
 
 const { contact } = Astro.props;
-const methods = contactMethods(contact.contacts);
-const place = contactPlace(contact.location);
 const excerpt = contactExcerpt(contact);
 const showReviewHighlight = hasManyPositiveContactReviews(contact.reviews);
 const reviewHighlightLabel = 'Много положительных отзывов';
-const methodIcons = {
-  phone: PhoneIcon,
-  telegram: TelegramIcon,
-  whatsapp: WhatsAppIcon,
-  email: EmailIcon,
-  website: GlobeIcon,
-} as const satisfies Record<ContactMethodType, typeof PhoneIcon>;
-const methodIconColors = {
-  phone: undefined,
-  telegram: 'text-telegram',
-  whatsapp: 'text-whatsapp',
-  email: undefined,
-  website: undefined,
-} as const satisfies Record<ContactMethodType, string | undefined>;
 ---
 
 <article class="py-5 md:py-6">
   <div class="space-y-3">
     <h3 class="ui-card-title flex items-start gap-2">
-      {
-        contact.hasDetailPage ? (
-          <a href={contact.url} class="ui-link">
-            {contact.title}
-          </a>
-        ) : (
-          contact.title
-        )
-      }
+      <a href={contact.url} class="ui-link">
+        {contact.title}
+      </a>
       {
         showReviewHighlight && (
           <span
@@ -70,58 +36,6 @@ const methodIconColors = {
         )
       }
     </h3>
-
-    <ul
-      class="flex flex-wrap gap-x-4 gap-y-2 text-sm leading-6 text-foreground md:text-base md:leading-7"
-    >
-      {
-        place ? (
-          <li>
-            <span class="sr-only">{place.label}: </span>
-            <a
-              href={place.href}
-              class="inline-flex items-center gap-1.5 ui-link font-semibold"
-            >
-              <MapPinIcon class="size-4 shrink-0" />
-              {place.title}
-            </a>
-          </li>
-        ) : null
-      }
-
-      {
-        methods.map((method) => {
-          const Icon = methodIcons[method.type];
-          const iconColor =
-            methodIconColors[method.type] ??
-            (!method.href ? 'text-primary' : undefined);
-          const value =
-            method.type === 'telegram'
-              ? method.value.replace(/^@/u, '')
-              : method.value;
-
-          return (
-            <li>
-              <span class="sr-only">{method.label}: </span>
-              {method.href ? (
-                <a
-                  href={method.href}
-                  class="inline-flex items-center gap-1.5 ui-link font-semibold"
-                >
-                  <Icon class:list={['size-4 shrink-0', iconColor]} />
-                  {value}
-                </a>
-              ) : (
-                <span class="inline-flex items-center gap-1.5">
-                  <Icon class:list={['size-4 shrink-0', iconColor]} />
-                  {value}
-                </span>
-              )}
-            </li>
-          );
-        })
-      }
-    </ul>
 
     {
       excerpt ? (

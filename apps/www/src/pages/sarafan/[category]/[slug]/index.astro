@@ -10,7 +10,7 @@ import {
   withHomeBreadcrumbs,
   withHomeSchemaBreadcrumbs,
 } from '@/lib/breadcrumbs';
-import { loadContactDetail, loadContactDetails } from '@/lib/contacts/load';
+import { loadContact, loadContacts } from '@/lib/contacts/load';
 import { contactCategoryUrl, contactsUrl } from '@/lib/contacts/routes';
 import { contactPageSchema } from '@/lib/contacts/seo';
 import { CONTACTS_PROSE, formatContactCategory } from '@/lib/contacts/view';
@@ -19,7 +19,7 @@ import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
 
 export const getStaticPaths = (async () => {
-  const contacts = await loadContactDetails();
+  const contacts = await loadContacts();
 
   return contacts.map((contact) => ({
     params: { category: contact.category, slug: contact.slug },
@@ -33,7 +33,7 @@ if (!categoryKey || !slug) {
   throw new Error('contact category and slug are required');
 }
 
-const contact = await loadContactDetail(categoryKey, slug);
+const contact = await loadContact(categoryKey, slug);
 
 if (!contact) {
   throw new Error(`contact "${categoryKey}/${slug}" not found`);
@@ -51,7 +51,7 @@ const search = {
   section: SEARCH_SECTIONS.sarafan,
   aliases: contact.searchAliases,
 } satisfies SearchDocument;
-const bodyHtml = renderMarkdown(contact.body);
+const bodyHtml = renderMarkdown(contact.body || contact.summary || description);
 const categoryUrl = contactCategoryUrl({ category: contact.category });
 const reviewsHeadingId = 'contact-reviews';
 const breadcrumbs = withHomeBreadcrumbs([

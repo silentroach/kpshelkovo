@@ -1,8 +1,9 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import type { Contact, ContactCategoryPage, ContactWithDetail } from '../types';
+import type { Contact, ContactCategoryPage } from '../types';
 
 let buildContactMarkdown: typeof import('../markdown').buildContactMarkdown;
+let buildContactsCategoryMarkdown: typeof import('../markdown').buildContactsCategoryMarkdown;
 let buildContactsHomeMarkdown: typeof import('../markdown').buildContactsHomeMarkdown;
 
 beforeAll(async () => {
@@ -11,8 +12,11 @@ beforeAll(async () => {
     BASE_URL: '/',
   });
 
-  ({ buildContactMarkdown, buildContactsHomeMarkdown } =
-    await import('../markdown'));
+  ({
+    buildContactMarkdown,
+    buildContactsCategoryMarkdown,
+    buildContactsHomeMarkdown,
+  } = await import('../markdown'));
 });
 
 const contact = {
@@ -43,7 +47,6 @@ const contact = {
     address: 'Пионерская ул., 21, пгт Малино',
     coordinates: { lat: 55.116326, lng: 38.16951 },
   },
-  hasDetailPage: true,
   url: '/sarafan/fence/ivan-petrov-fence/',
   markdownUrl: '/sarafan/fence/ivan-petrov-fence/index.md',
   canonical: 'https://example.com/sarafan/fence/ivan-petrov-fence/',
@@ -55,9 +58,9 @@ const contact = {
   },
   body: 'Работает с заборами и воротами. Перед началом работ стоит отдельно согласовать сроки, материалы и гарантию.\n\n## Что уточнить\n\nПеред оплатой уточняйте цену.',
   mentions: [],
-} satisfies ContactWithDetail;
+} satisfies Contact;
 
-const listOnlyContact = {
+const blankBodyContact = {
   slug: 'sergey',
   title: 'Сергей',
   category: 'fence',
@@ -67,14 +70,16 @@ const listOnlyContact = {
     phone: '+7 985 774-75-04',
   },
   reviews: [],
-  hasDetailPage: false,
+  url: '/sarafan/fence/sergey/',
+  markdownUrl: '/sarafan/fence/sergey/index.md',
+  canonical: 'https://example.com/sarafan/fence/sergey/',
   body: '',
   mentions: [],
 } satisfies Contact;
 
 const category = {
   category: 'fence',
-  contacts: [contact, listOnlyContact],
+  contacts: [contact, blankBodyContact],
   url: '/sarafan/fence/',
   markdownUrl: '/sarafan/fence/index.md',
 } satisfies ContactCategoryPage;
@@ -101,35 +106,30 @@ describe('contacts markdown companions', () => {
     expect(markdown).not.toMatch(/apps\/www|src\/|repo:/u);
   });
 
-  it('renders populated index with contact markdown links', () => {
-    const markdown = buildContactsHomeMarkdown({
-      contacts: [contact, listOnlyContact],
+  it('renders list pages with contact links but without contact details', () => {
+    const homeMarkdown = buildContactsHomeMarkdown({
+      contacts: [contact, blankBodyContact],
       categories: [category],
       byRoute: new Map<string, Contact>([
         ['fence/ivan-petrov-fence', contact],
-        ['fence/sergey', listOnlyContact],
+        ['fence/sergey', blankBodyContact],
       ]),
       byCategory: new Map([['fence', category]]),
     });
+    const listPages = [homeMarkdown, buildContactsCategoryMarkdown(category)];
 
-    expect(markdown).toContain(
-      '[Иван Петров](https://example.com/sarafan/fence/ivan-petrov-fence/index.md)',
-    );
-    expect(markdown).toContain(
+    expect(homeMarkdown).toContain(
       '[Забор](https://example.com/sarafan/fence/index.md)',
     );
-    expect(markdown).toContain('Телефон: [+7 900 000-00-00](tel:+79000000000)');
-    expect(markdown).toContain('Telegram: [@example](https://t.me/example)');
-    expect(markdown).not.toContain('Отзывы:');
-    expect(markdown).toContain(
-      'Адрес: [Золото Сибири](https://yandex.ru/maps/-/CTq-BEOk) — Пионерская ул., 21, пгт Малино',
-    );
-    expect(markdown).toContain(
-      'vCard: [Добавить в контакты](https://example.com/sarafan/fence/ivan-petrov-fence/contact.vcf)',
-    );
-    expect(markdown).toContain(
-      '- Сергей\n  - Телефон: [+7 985 774-75-04](tel:+79857747504)',
-    );
+
+    for (const markdown of listPages) {
+      expect(markdown).toContain(
+        '[Сергей](https://example.com/sarafan/fence/sergey/index.md)',
+      );
+      expect(markdown).not.toMatch(
+        /\+7 900 000-00-00|t\.me\/example|yandex\.ru\/maps|contact\.vcf/u,
+      );
+    }
   });
 
   it('renders detail with structured frontmatter and body', () => {
@@ -170,5 +170,21 @@ describe('contacts markdown companions', () => {
       "
     `);
     expect(markdown).not.toContain('служебный поисковый алиас');
+  });
+
+  it('renders a detail page for a contact with an empty body', () => {
+    expect(buildContactMarkdown(blankBodyContact)).toMatchInlineSnapshot(`
+      "---
+      title: Сергей
+      slug: sergey
+      category: Забор
+      updated_at: 2026-07-06
+      contacts:
+        phone: +7 985 774-75-04
+      ---
+
+      # Сергей
+      "
+    `);
   });
 });

@@ -1,7 +1,7 @@
 import { getCollection } from 'astro:content';
 import { compareRuText } from '@shelkovo/format';
 
-import { loadContactDetails } from '@/lib/contacts/load';
+import { loadContacts } from '@/lib/contacts/load';
 import type { EntityMentionGraph, SiteMentionRegistry } from '@/lib/mentions';
 import { loadSiteMentionRegistry } from '@/lib/mentions/registry';
 import { loadSiteMentionGraph } from '@/lib/site-mention-graph';
@@ -80,7 +80,7 @@ export const buildPlacesDataset = (
 const buildPlacesData = async (): Promise<PlacesDataset> => {
   const [entries, contacts, mentionRegistry] = await Promise.all([
     getCollection('places'),
-    loadContactDetails(),
+    loadContacts(),
     loadSiteMentionRegistry(),
   ]);
   const contactUrls = new Map(
