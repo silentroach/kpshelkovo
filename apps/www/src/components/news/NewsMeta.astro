@@ -34,7 +34,7 @@ const visibleAreas = appliesToAllAreas ? [] : areas;
     className,
   ]}
 >
-  <time datetime={publishedIso} class="font-medium text-foreground">
+  <time datetime={publishedIso} class="font-semibold text-foreground">
     {formatNewsDate(publishedIso)}
   </time>
   {
@@ -44,7 +44,7 @@ const visibleAreas = appliesToAllAreas ? [] : areas;
           href={author.url}
           target="_blank"
           rel="noreferrer noopener"
-          class="ui-link font-medium"
+          class="ui-link font-semibold"
         >
           {formatNewsAuthor(author, { short: !fullAuthorName })}
         </a>

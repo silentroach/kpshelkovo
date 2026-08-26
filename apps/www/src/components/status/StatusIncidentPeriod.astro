@@ -14,4 +14,4 @@ const period = getStatusIncidentPeriod(incident, { nonBreaking: true });
 ---
 
 <!-- prettier-ignore -->
-<span>{period.prefix && `${period.prefix}\u00A0`}<time datetime={period.start.iso} class="font-medium text-foreground">{period.start.text}</time>{period.end && <>{' -\u00A0'}<time datetime={period.end.iso} class="font-medium text-foreground">{period.end.text}</time></>}{period.duration && ` (${period.duration})`}</span>
+<span>{period.prefix && `${period.prefix}\u00A0`}<time datetime={period.start.iso} class="font-semibold text-foreground">{period.start.text}</time>{period.end && <>{' -\u00A0'}<time datetime={period.end.iso} class="font-semibold text-foreground">{period.end.text}</time></>}{period.duration && ` (${period.duration})`}</span>

@@ -616,16 +616,16 @@
         aria-busy={isSearching || isLoadingMore}
       >
         {#if viewState === 'loading'}
-          <p class="px-4 py-4 text-sm font-medium text-muted-foreground">
+          <p class="px-4 py-4 text-sm font-semibold text-muted-foreground">
             Ищем…
           </p>
         {:else if viewState === 'empty'}
-          <p class="px-4 py-4 text-sm font-medium text-muted-foreground">
+          <p class="px-4 py-4 text-sm font-semibold text-muted-foreground">
             Ничего не нашли
           </p>
         {:else if viewState === 'error'}
           <div class="flex items-center justify-between gap-4 px-4 py-3">
-            <p class="text-sm font-medium text-muted-foreground">
+            <p class="text-sm font-semibold text-muted-foreground">
               Поиск не работает
             </p>
             <button
@@ -637,7 +637,7 @@
             </button>
           </div>
         {:else if viewState === 'dev-unavailable'}
-          <p class="px-4 py-4 text-sm font-medium text-muted-foreground">
+          <p class="px-4 py-4 text-sm font-semibold text-muted-foreground">
             Локальный поиск недоступен
           </p>
         {:else}
@@ -713,7 +713,7 @@
                 class="flex items-center justify-between gap-4 px-4 py-3"
                 role="status"
               >
-                <p class="text-sm font-medium text-muted-foreground">
+                <p class="text-sm font-semibold text-muted-foreground">
                   Не удалось загрузить остальные результаты
                 </p>
                 <button

@@ -429,11 +429,13 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
             class="border-b border-border p-4 md:border-b-0 md:border-r md:p-5"
           >
             <p
-              class="text-xs font-bold uppercase tracking-[0.06em] text-muted-foreground"
+              class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
             >
               Официальный тариф
             </p>
-            <p class="mt-2 text-2xl font-bold tracking-tight text-foreground">
+            <p
+              class="mt-2 text-2xl font-semibold tracking-tight text-foreground"
+            >
               {formatReglamentTariff(payload.official.tariff_per_sotka_month)}
             </p>
             <p class="mt-1 text-xs text-muted-foreground">
@@ -444,12 +446,12 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
             class="border-b border-border p-4 md:border-b-0 md:border-r md:p-5"
           >
             <p
-              class="text-xs font-bold uppercase tracking-[0.06em] text-muted-foreground"
+              class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
             >
               Текущий пересчет
             </p>
             <p
-              class="mt-2 text-2xl font-bold tracking-tight text-foreground"
+              class="mt-2 text-2xl font-semibold tracking-tight text-foreground"
               data-reglament-current-tariff
             >
               {formatReglamentTariff(payload.computed.tariff_per_sotka_month)}
@@ -463,12 +465,12 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
           </div>
           <div class="p-4 md:p-5">
             <p
-              class="text-xs font-bold uppercase tracking-[0.06em] text-muted-foreground"
+              class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
             >
               Разница
             </p>
             <p
-              class="mt-2 text-2xl font-bold tracking-tight text-foreground"
+              class="mt-2 text-2xl font-semibold tracking-tight text-foreground"
               data-reglament-current-delta
             >
               {
@@ -492,7 +494,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
         class="flex h-9 w-full max-w-6xl items-center gap-3 overflow-hidden whitespace-nowrap text-xs text-muted-foreground md:text-sm"
       >
         <button
-          class="shrink-0 cursor-pointer rounded-full border border-border-strong bg-surface px-2.5 py-0.5 text-xs font-bold text-primary hover:border-primary hover:bg-muted md:px-3 md:text-sm"
+          class="shrink-0 cursor-pointer rounded-full border border-border-strong bg-surface px-2.5 py-0.5 text-xs font-semibold text-primary hover:border-primary hover:bg-muted md:px-3 md:text-sm"
           type="button"
           data-reglament-reset
           hidden
@@ -506,14 +508,14 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
           class="ml-auto flex min-w-0 items-baseline justify-end gap-1.5 text-right"
         >
           <span
-            class="reglament-sticky-total-original shrink-0 text-[0.8125rem] font-bold md:text-sm"
+            class="reglament-sticky-total-original shrink-0 text-[0.8125rem] font-semibold md:text-sm"
             data-reglament-current-original-tariff
             hidden
           >
             {formatReglamentNumber(payload.official.tariff_per_sotka_month)}
           </span>
           <span
-            class="reglament-sticky-total-arrow shrink-0 text-sm font-bold md:text-base"
+            class="reglament-sticky-total-arrow shrink-0 text-sm font-semibold md:text-base"
             data-reglament-current-tariff-arrow
             aria-hidden="true"
             hidden
@@ -579,7 +581,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                 </div>
                 <div class="shrink-0 text-left md:text-right">
                   <p
-                    class="text-lg font-bold tracking-tight text-foreground"
+                    class="text-lg font-semibold tracking-tight text-foreground"
                     data-reglament-section-tariff={section.id}
                   >
                     {formatReglamentTariff(
@@ -609,7 +611,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
               >
                 <table class="min-w-[48rem] w-full border-separate border-spacing-0 text-left text-sm">
                   <caption class="sr-only">{section.title}</caption>
-                  <thead class="text-xs font-bold uppercase tracking-[0.06em] text-muted-foreground">
+                  <thead class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground">
                     <tr>
                       <th
                         class:list={[
@@ -664,7 +666,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                   id={row.titleId}
                                   class:list={[
                                     tableTextClass,
-                                    'min-w-0 flex-1 font-semibold text-foreground',
+                                    'min-w-0 flex-1 font-body font-semibold text-foreground',
                                   ]}
                                   data-pagefind-weight="2"
                                 >
@@ -947,7 +949,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                         <tr>
                           <td class="px-4 pb-3 pt-0 align-top" colspan="5">
                             <details class="ml-1.5 max-w-[calc(100vw-2.875rem)] text-xs leading-5 text-muted-foreground sm:max-w-[calc(100vw-6.375rem)] lg:max-w-none">
-                              <summary class="reglament-details-summary inline-flex cursor-pointer list-none items-center gap-1.5 font-bold text-primary outline-none focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-primary/25">
+                              <summary class="reglament-details-summary inline-flex cursor-pointer list-none items-center gap-1.5 font-semibold text-primary outline-none focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-primary/25">
                                 <svg
                                   class="reglament-details-icon h-3 w-3 shrink-0 transition-transform"
                                   viewBox="0 0 12 12"
@@ -973,7 +975,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
 
                                 <div class="grid gap-3 sm:grid-cols-2">
                                   <div class="space-y-1">
-                                    <p class="font-bold uppercase tracking-[0.06em] text-muted-foreground">
+                                    <p class="font-semibold uppercase tracking-[0.06em] text-muted-foreground">
                                       Источники
                                     </p>
                                     <ul class="space-y-1">
@@ -1000,7 +1002,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                     class="space-y-1"
                                     data-pagefind-ignore="all"
                                   >
-                                    <p class="font-bold uppercase tracking-[0.06em] text-muted-foreground">
+                                    <p class="font-semibold uppercase tracking-[0.06em] text-muted-foreground">
                                       Сумма за год
                                     </p>
                                     <p
@@ -1018,7 +1020,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                   class="space-y-2"
                                   data-pagefind-ignore="all"
                                 >
-                                  <p class="font-bold uppercase tracking-[0.06em] text-muted-foreground">
+                                  <p class="font-semibold uppercase tracking-[0.06em] text-muted-foreground">
                                     Состав расчета
                                   </p>
                                   <dl class="grid gap-x-3 gap-y-2 sm:grid-cols-2">
@@ -1119,13 +1121,13 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                     class="space-y-2 border-t border-border pt-3"
                                     data-pagefind-ignore="all"
                                   >
-                                    <legend class="font-bold uppercase tracking-[0.06em] text-muted-foreground">
+                                    <legend class="font-semibold uppercase tracking-[0.06em] text-muted-foreground">
                                       Дополнительные поля
                                     </legend>
                                     <div class="grid gap-2 sm:grid-cols-2">
                                       {row.controls.expert.map((control) => (
                                         <label class="block space-y-1">
-                                          <span class="font-bold text-muted-foreground">
+                                          <span class="font-semibold text-muted-foreground">
                                             {control.label}
                                           </span>
                                           <span class={inputShellClass}>
@@ -1238,7 +1240,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       background: var(--color-surface);
       color: var(--color-text-muted);
       font-size: 0.6875rem;
-      font-weight: 800;
+      font-weight: 600;
       line-height: 1;
     }
 
@@ -1260,7 +1262,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       box-shadow: 0 0.75rem 1.6rem oklch(27% 0.05 142 / 0.12);
       color: var(--color-foreground);
       font-size: 0.75rem;
-      font-weight: 500;
+      font-weight: 600;
       line-height: 1.45;
       opacity: 0;
       padding: 0.625rem 0.75rem;

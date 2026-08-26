@@ -456,7 +456,7 @@
     >
       <div class="text-center max-w-md px-4">
         <div class="text-4xl mb-3">🗺️</div>
-        <p class="mb-2 font-medium text-foreground">{error}</p>
+        <p class="mb-2 font-semibold text-foreground">{error}</p>
         <p class="text-sm text-muted-foreground">
           Попробуйте обновить страницу
         </p>
