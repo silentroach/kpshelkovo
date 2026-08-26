@@ -35,6 +35,10 @@ import {
 } from '@/lib/contacts/routes';
 import { catalog } from '@/lib/discovery';
 import {
+  discomfortMarkdownPath,
+  discomfortPath,
+} from '@/lib/discomfort/routes';
+import {
   kbDetailMarkdownPattern,
   kbDetailPattern,
   kbMarkdownPath,
@@ -555,6 +559,39 @@ describe('public surface registry', () => {
     expect(
       reviews.some((surface) => surface.discoveryRoles.includes('llms')),
     ).toBe(false);
+  });
+
+  it('registers the Discomfort HTML and Markdown surfaces', () => {
+    const surfaces = publicSurfaceRegistry.surfacesByOwner('discomfort');
+
+    expect(
+      surfaces.map((surface) => ({
+        id: surface.id,
+        path: 'path' in surface ? surface.path : surface.routePattern,
+        roles: surface.discoveryRoles,
+      })),
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "id": "discomfort:index",
+          "path": "/815/discomfort/",
+          "roles": [
+            "section-entry",
+          ],
+        },
+        {
+          "id": "discomfort:index-markdown",
+          "path": "/815/discomfort/index.md",
+          "roles": [
+            "markdown-companion",
+          ],
+        },
+      ]
+    `);
+    expect(surfaces.map((surface) => surface.path)).toEqual([
+      discomfortPath(),
+      discomfortMarkdownPath(),
+    ]);
   });
 
   it('registers contacts HTML, Markdown and vCard surfaces without feeds or APIs', () => {

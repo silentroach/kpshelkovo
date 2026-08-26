@@ -31,6 +31,7 @@ const place: PlaceWithBacklinks = {
     places: [],
     people: [],
     contacts: [],
+    discomfort: [],
   },
   address: 'Шелково Форест, Берёзовая улица, 21А',
   coordinates: { lat: 55.060526, lng: 37.716242 },
@@ -105,6 +106,7 @@ describe('places Markdown', () => {
         places: [],
         people: [],
         contacts: [],
+        discomfort: [],
       },
     });
 

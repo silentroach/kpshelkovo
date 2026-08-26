@@ -15,6 +15,7 @@ const refs: readonly EntityMentionSourceRef[] = [
   ['places', 'place', 'place-item'],
   ['people', 'person', 'person-item'],
   ['contacts', 'contact', 'contact-item'],
+  ['discomfort', 'event', 'event-item'],
 ].map(([section, kind, id]) => ({
   target: { type: 'place', slug: 'apple-garden' },
   source: { section, kind, id },
@@ -46,6 +47,9 @@ describe('createPlaceBacklinksFromGraph', () => {
       {
         "contacts": [
           "contact-item",
+        ],
+        "discomfort": [
+          "event-item",
         ],
         "news": [
           "news-item",

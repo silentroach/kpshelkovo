@@ -101,6 +101,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
   const reviewsMarkdown = registeredSurfaceUrl('reviews:index-markdown');
   const reviewsRules = registeredSurfaceUrl('reviews:rules');
   const reviewsRulesMarkdown = registeredSurfaceUrl('reviews:rules-markdown');
+  const discomfortHome = registeredSurfaceUrl('discomfort:index');
+  const discomfortMarkdown = registeredSurfaceUrl('discomfort:index-markdown');
   const contactsHome = registeredSurfaceUrl('contacts:index');
   const contactsMarkdown = registeredSurfaceUrl('contacts:index-markdown');
   const meetingsMarkdown = registeredSurfaceUrl('meetings:index-markdown');
@@ -169,7 +171,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
           llmsSection('Описание', [
             markdownList([
               'Это карта публичных данных и точек входа kpshelkovo.online.',
-              'Основные разделы: новости, статус сервисов, карта мест, отзывы собственников, сарафан, архив встреч, регламент и смета тарифа 815, профили людей и сравнение тарифов поселков.',
+              'Основные разделы: новости, статус сервисов, карта мест, отзывы собственников, сарафан, архив встреч, регламент и смета тарифа 815, ОК Дискомфорт, профили людей и сравнение тарифов поселков.',
               `Сейчас в новостях ${count(news.articles.length, ['статья', 'статьи', 'статей'])}, в статусе ${count(status.incidents.length, ['запись', 'записи', 'записей'])} и ${count(activeStatus.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])}, на карте ${count(places.length, ['место', 'места', 'мест'])}, в сарафане ${count(contacts.contacts.length, ['контакт', 'контакта', 'контактов'])}, в отзывах ${count(reviews.reviews.length, ['отзыв', 'отзыва', 'отзывов'])}, в архиве встреч ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}, в людях ${count(people.profiles.length, ['профиль', 'профиля', 'профилей'])}.`,
               'Для массового чтения используйте JSON-ленты там, где они есть; HTML и Markdown удобнее для ссылок и точечного чтения.',
             ]),
@@ -187,6 +189,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Сарафан: ${contactsHome}`,
               `Архив встреч в Markdown: ${meetingsMarkdown}`,
               `Регламент: ${reglamentHome}`,
+              `ОК Дискомфорт: ${discomfortHome}`,
               `Люди в Markdown: ${peopleMarkdown}`,
               `Сравнение тарифов: ${compareHome}`,
               `Расширенная версия этого текста: ${full}`,
@@ -202,6 +205,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Сарафан: ${contactsMarkdown}; разделы: \`/sarafan/[category]/\` и \`/sarafan/[category]/index.md\`; карточки контактов используют \`/sarafan/[category]/[slug]/\` и \`/sarafan/[category]/[slug]/index.md\`; если для контакта доступна vCard, ее адрес указан в \`vcf_url\`.`,
               `Архив встреч: ${meetingsMarkdown}; одна встреча: ${meetingHtml} или ${meetingMarkdown}; полный текст транскрипта берите по частям, например ${meetingTranscript}.`,
               `Регламент и смета: ${reglamentLlms}; смета: ${reglamentFeed}; полный регламент: ${reglamentFullMarkdown}; набор данных: ${reglamentFullDataset}.`,
+              `ОК Дискомфорт: ${discomfortMarkdown}; хронология вручную отобранных событий со ссылками на подробные материалы.`,
               `Люди: ${peopleShort}; основная лента: ${peopleFeed}; одна персона: ${personHtml} или ${personMarkdown}.`,
               `Сравнение тарифов поселков: ${compareLlms}; основная лента: ${compareFeed}.`,
               'Публичные инструкции помогают с типовыми задачами; у сравнения тарифов есть отдельный индекс.',
@@ -216,7 +220,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
           llmsSection('Проект', [
             markdownList([
               'Это корневой сайт kpshelkovo.online и карта его публичных данных.',
-              `Разделы сайта: \`${registeredSurfacePath('news:index')}\`, \`${registeredSurfacePath('status:index')}\`, \`${registeredSurfacePath('places:index')}\`, \`${registeredSurfacePath('reviews:index')}\`, \`${registeredSurfacePath('contacts:index')}\`, \`${registeredSurfacePath('meetings:index-markdown')}\`, \`${registeredSurfacePath('reglament:index')}\`, \`${registeredSurfacePath('people:index-markdown')}\` и \`${registeredSurfacePath('compare:index')}\`.`,
+              `Разделы сайта: \`${registeredSurfacePath('news:index')}\`, \`${registeredSurfacePath('status:index')}\`, \`${registeredSurfacePath('places:index')}\`, \`${registeredSurfacePath('reviews:index')}\`, \`${registeredSurfacePath('contacts:index')}\`, \`${registeredSurfacePath('meetings:index-markdown')}\`, \`${registeredSurfacePath('reglament:index')}\`, \`${registeredSurfacePath('discomfort:index')}\`, \`${registeredSurfacePath('people:index-markdown')}\` и \`${registeredSurfacePath('compare:index')}\`.`,
               'Все JSON-ленты доступны только для чтения и отражают состояние на момент сборки сайта.',
               'У раздела людей нет публичной HTML-страницы индекса `/people/`; используйте `/people/index.md` и `/people/data/people.json`.',
               'У архива встреч нет публичной HTML-страницы индекса `/meetings/`; используйте `/meetings/index.md`, описание одной встречи и файлы транскрипта по частям.',
@@ -328,6 +332,14 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Сейчас в разделе ${count(people.profiles.length, ['профиль', 'профиля', 'профилей'])}.`,
             ]),
           ]),
+          llmsSection('ОК Дискомфорт', [
+            markdownList([
+              `HTML-страница раздела: ${discomfortHome}`,
+              `Markdown-версия раздела: ${discomfortMarkdown}`,
+              'Раздел хранит хронологию вручную отобранных событий; отдельных страниц событий, JSON-ленты, RSS и llms.txt нет.',
+              'Каждое событие датировано и ссылается на новость, встречу, инструкцию или отзыв с подробным контекстом.',
+            ]),
+          ]),
           llmsSection('Сравнение тарифов поселков', [
             markdownList([
               `HTML-страница раздела: ${compareHome}`,
@@ -349,6 +361,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'Для сарафана начинайте с `/sarafan/index.md`; разделы читаются через `/sarafan/[category]/` или `/sarafan/[category]/index.md`; карточка контакта читается через `/sarafan/[category]/[slug]/` или `/sarafan/[category]/[slug]/index.md`; структурированной ленты нет.',
               'Для встреч начинайте с `/meetings/index.md`; для одной встречи откройте `/meetings/[slug]/index.md`, а полный текст берите из `/meetings/[slug]/transcript/[part].md`.',
               'Для регламента при массовом чтении используйте `/815/regulation/data/estimate-2026.json` для расчетной сметы и `/815/regulation/data/full-2026.json` для полного структурированного набора данных; для текстового чтения начинайте с `/815/regulation/full.md`, затем переходите в тематические файлы `/815/regulation/full/*.md`.',
+              'Для хронологии «ОК Дискомфорт» начинайте с `/815/discomfort/index.md`, а подробности проверяйте по ссылкам внутри каждого события.',
               'Для людей при массовом чтении используйте `/people/data/people.json`, а `/people/[slug]/` и `/people/[slug]/index.md` оставляйте для чтения одного профиля.',
               `Для сравнения тарифов используйте \`${registeredSurfacePath('compare:data-settlements')}\` как основную структурированную ленту, а HTML/Markdown-страницы - для чтения по одному поселку.`,
             ]),
@@ -381,6 +394,8 @@ export async function buildHomeMarkdown(): Promise<string> {
   const reviewsHome = registeredSurfaceUrl('reviews:index');
   const reviewsMarkdown = registeredSurfaceUrl('reviews:index-markdown');
   const reviewsRulesMarkdown = registeredSurfaceUrl('reviews:rules-markdown');
+  const discomfortHome = registeredSurfaceUrl('discomfort:index');
+  const discomfortMarkdown = registeredSurfaceUrl('discomfort:index-markdown');
   const contactsHome = registeredSurfaceUrl('contacts:index');
   const contactsMarkdown = registeredSurfaceUrl('contacts:index-markdown');
   const meetingsMarkdown = registeredSurfaceUrl('meetings:index-markdown');
@@ -421,6 +436,7 @@ export async function buildHomeMarkdown(): Promise<string> {
       `[Сарафан](${contactsHome}) — ${count(contacts.contacts.length, ['контакт', 'контакта', 'контактов'])}; Markdown-обзор: ${contactsMarkdown}; структурированной ленты нет`,
       `Архив встреч — ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}; Markdown-индекс без HTML-аналога: ${meetingsMarkdown}; полные транскрипты: \`/meetings/[slug]/transcript/[part].md\``,
       `[Регламент](${reglamentHome}) — смета тарифа 2026; структурированная лента: ${reglamentFeed}; полный индекс: ${reglamentFullMarkdown}; полный набор данных: ${reglamentFullDataset}; Markdown-обзор: ${reglamentMarkdown}`,
+      `[ОК Дискомфорт](${discomfortHome}) — хронология вручную отобранных событий о счетах, переговорах и ограничениях; Markdown-версия: ${discomfortMarkdown}`,
       `Люди — ${count(people.profiles.length, ['профиль', 'профиля', 'профилей'])}; Markdown-обзор: ${peopleMarkdown}; структурированная лента: ${peopleFeed}; публичного HTML-индекса нет`,
       `[Compare](${compareHome}) — сравнение тарифов поселков и рейтинга; структурированная лента: ${compareFeed}`,
     ]),
@@ -440,6 +456,7 @@ export async function buildHomeMarkdown(): Promise<string> {
       `Сарафан: ${contactsMarkdown}`,
       `Архив встреч: ${meetingsMarkdown}`,
       `Регламент: ${reglamentLlms}, ${reglamentCatalog}`,
+      `ОК Дискомфорт: ${discomfortMarkdown}`,
       `Люди: ${peopleLlms}, ${peopleCatalog}`,
       `Compare: ${compareLlms}, ${compareCatalog}`,
     ]),

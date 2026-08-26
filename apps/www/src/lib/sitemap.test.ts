@@ -28,6 +28,7 @@ describe('buildSitemapMetadataIndex', () => {
       meetings: [],
       kbPages: [],
       contacts: [],
+      discomfortEvents: [],
     });
 
     expect({
@@ -101,6 +102,7 @@ describe('buildSitemapMetadataIndex', () => {
       meetings: [],
       kbPages: [],
       contacts: [],
+      discomfortEvents: [],
     });
 
     expect({
@@ -163,6 +165,7 @@ describe('buildSitemapMetadataIndex', () => {
       ],
       kbPages: [],
       contacts: [],
+      discomfortEvents: [],
     });
 
     expect({
@@ -203,6 +206,7 @@ describe('buildSitemapMetadataIndex', () => {
         },
       ],
       contacts: [],
+      discomfortEvents: [],
     });
 
     expect(
@@ -238,6 +242,7 @@ describe('buildSitemapMetadataIndex', () => {
           updatedIso: '2026-07-07',
         },
       ],
+      discomfortEvents: [],
     });
 
     expect({
@@ -265,6 +270,27 @@ describe('buildSitemapMetadataIndex', () => {
         },
       }
     `);
+  });
+
+  it('uses the latest Discomfort update for the section lastmod', () => {
+    const index = buildSitemapMetadataIndex({
+      newsArticles: [],
+      statusIncidents: [],
+      settlements: [],
+      meetings: [],
+      kbPages: [],
+      contacts: [],
+      discomfortEvents: [
+        { lastmod: '2026-04-29' },
+        { lastmod: '2026-08-22' },
+        { lastmod: '2026-06-13' },
+      ],
+    });
+
+    expect(index.get('/815/discomfort/')).toEqual({
+      lastmod: '2026-08-22',
+      changefreq: 'monthly',
+    });
   });
 });
 

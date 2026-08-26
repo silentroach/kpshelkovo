@@ -19,6 +19,7 @@ export const SITE_MENTION_SECTIONS = [
   'places',
   'people',
   'contacts',
+  'discomfort',
 ] as const;
 export const SITE_BACKLINK_KINDS = [
   'article',
@@ -27,6 +28,8 @@ export const SITE_BACKLINK_KINDS = [
   'place',
   'person',
   'contact',
+  'event',
+  'quote',
 ] as const;
 
 export type EntityMentionType = (typeof ENTITY_MENTION_TYPES)[number];
@@ -110,6 +113,7 @@ export interface SiteBacklinks {
   readonly places: readonly SiteMentionRef[];
   readonly people: readonly SiteMentionRef[];
   readonly contacts: readonly SiteMentionRef[];
+  readonly discomfort: readonly SiteMentionRef[];
 }
 
 export type SiteMentionRegistry = ReadonlyMap<string, EntityMentionTarget>;

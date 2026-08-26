@@ -43,6 +43,15 @@ const refs: readonly EntityMentionSourceRef[] = [
     mentionedAt: '2026-08-19T00:00:00.000Z',
     sortKey: 1787097600000,
   },
+  {
+    target: { type: 'person', slug: 'kschemelinin' },
+    source: { section: 'discomfort', kind: 'quote', id: 'quote' },
+    title: 'ОК Дискомфорт',
+    htmlUrl: '/815/discomfort/',
+    markdownUrl: '/815/discomfort/index.md',
+    mentionedAt: '2026-02-21',
+    sortKey: 1771632000000,
+  },
 ];
 
 describe('createPeopleBacklinksFromGraph', () => {
@@ -64,6 +73,19 @@ describe('createPeopleBacklinksFromGraph', () => {
             "sortKey": 1783296000000,
             "sourceId": "fence/ivan",
             "title": "Иван Петров",
+          },
+        ],
+        "discomfort": [
+          {
+            "excerpt": undefined,
+            "htmlUrl": "/815/discomfort/",
+            "kind": "quote",
+            "markdownUrl": "/815/discomfort/index.md",
+            "mentionedAt": "2026-02-21",
+            "section": "discomfort",
+            "sortKey": 1771632000000,
+            "sourceId": "quote",
+            "title": "ОК Дискомфорт",
           },
         ],
         "news": [

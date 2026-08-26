@@ -82,6 +82,7 @@ const profile = (): PersonProfile => ({
     places: [],
     people: [],
     contacts: [],
+    discomfort: [],
   },
 });
 
@@ -262,6 +263,7 @@ describe('people discovery payload', () => {
       'places',
       'people',
       'contacts',
+      'discomfort',
     ]);
     expect(openapiDefs.kind?.enum).toEqual([
       'article',
@@ -270,6 +272,8 @@ describe('people discovery payload', () => {
       'place',
       'person',
       'contact',
+      'event',
+      'quote',
     ]);
     expect(defs.backlinks?.required).toEqual([
       'news',
@@ -278,6 +282,7 @@ describe('people discovery payload', () => {
       'places',
       'people',
       'contacts',
+      'discomfort',
     ]);
     expect(openapiDefs.profile?.required).toEqual(defs.profile?.required);
     expect(
