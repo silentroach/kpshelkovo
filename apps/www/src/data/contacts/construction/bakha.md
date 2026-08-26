@@ -3,7 +3,7 @@ title: Баха
 slug: bakha
 category: construction
 updated_at: 2026-08-25
-summary: 'Разнорабочие, монолитные плиты, обшивка и покраска фасадов, покос участков'
+summary: 'По отзывам, бригада Бахи выполняет широкий спектр работ'
 contacts:
   phone: '+7 926 983-01-21'
 reviews:
