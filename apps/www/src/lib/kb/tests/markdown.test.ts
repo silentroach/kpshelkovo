@@ -59,6 +59,44 @@ describe('kb markdown companions', () => {
     `);
   });
 
+  it('rewrites only kb link nodes and preserves their query and hash', () => {
+    const markdown = buildKbPageMarkdown(
+      page({
+        id: 'services/gas',
+        title: 'Газ',
+        routeSlug: 'services/gas',
+        body: `Откройте [подключение газа](/kb/services/gas/connection/?from=guide#documents).
+
+[Абсолютная ссылка](https://example.com/kb/services/gas/) и [новости](/news/).
+
+\`[Пример](/kb/services/gas/)\`
+
+\`\`\`md
+[Пример](/kb/services/gas/)
+\`\`\``,
+      }),
+    );
+
+    expect(markdown).toMatchInlineSnapshot(`
+      "---
+      title: Газ
+      ---
+
+      # Газ
+
+      Откройте [подключение газа](https://example.com/kb/services/gas/connection/index.md?from=guide#documents).
+
+      [Абсолютная ссылка](https://example.com/kb/services/gas/) и [новости](/news/).
+
+      \`[Пример](/kb/services/gas/)\`
+
+      \`\`\`md
+      [Пример](/kb/services/gas/)
+      \`\`\`
+      "
+    `);
+  });
+
   it('keeps supported page flags in markdown frontmatter', () => {
     const markdown = buildKbPageMarkdown(
       page({
