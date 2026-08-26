@@ -87,21 +87,11 @@ interface ContactBase {
   readonly mentions: readonly EntityMentionTarget[];
 }
 
-export interface ContactWithDetail extends ContactBase {
-  readonly hasDetailPage: true;
+export interface Contact extends ContactBase {
   readonly url: string;
   readonly markdownUrl: string;
   readonly canonical: string;
 }
-
-export interface ContactListOnly extends ContactBase {
-  readonly hasDetailPage: false;
-  readonly url?: undefined;
-  readonly markdownUrl?: undefined;
-  readonly canonical?: undefined;
-}
-
-export type Contact = ContactWithDetail | ContactListOnly;
 
 export type ContactWithVcf = Contact & { readonly vcf: ContactVcf };
 

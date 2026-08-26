@@ -50,7 +50,6 @@ export interface SitemapContactInput {
   readonly category: string;
   readonly url: string;
   readonly updatedIso: string;
-  readonly hasPage: boolean;
 }
 
 export interface SitemapMetadataSourceData {
@@ -291,10 +290,6 @@ const addContactsMetadata = (
       lastmod: contact.updatedIso,
       changefreq: CHANGEFREQ.monthly,
     });
-
-    if (!contact.hasPage) {
-      continue;
-    }
 
     setMetadata(index, contact.url, {
       lastmod: contact.updatedIso,

@@ -80,9 +80,7 @@ const sourceRefs = (input: {
   readonly places?: ReturnType<typeof buildPlacesDataset>;
   readonly status: ReturnType<typeof buildStatusDataset>;
 }) => [
-  ...(input.contacts?.contacts.flatMap((contact) =>
-    contact.hasDetailPage ? createContactMentionRefs(contact) : [],
-  ) ?? []),
+  ...(input.contacts?.contacts.flatMap(createContactMentionRefs) ?? []),
   ...input.news.articles.flatMap(createNewsArticleMentionRefs),
   ...(input.places?.places.flatMap(createPlaceMentionRefs) ?? []),
   ...input.status.incidents.flatMap((incident) =>

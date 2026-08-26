@@ -20,15 +20,9 @@ const reviewHighlightLabel = 'Много положительных отзыво
 <article class="py-5 md:py-6">
   <div class="space-y-3">
     <h3 class="ui-card-title flex items-start gap-2">
-      {
-        contact.hasDetailPage ? (
-          <a href={contact.url} class="ui-link">
-            {contact.title}
-          </a>
-        ) : (
-          contact.title
-        )
-      }
+      <a href={contact.url} class="ui-link">
+        {contact.title}
+      </a>
       {
         showReviewHighlight && (
           <span

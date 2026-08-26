@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import type { ContactWithDetail } from '../types';
+import type { Contact } from '../types';
 
 let contactPageSchema: typeof import('../seo').contactPageSchema;
 
@@ -24,13 +24,12 @@ const contact = {
     telegram: 'https://t.me/example',
   },
   reviews: [],
-  hasDetailPage: true,
   url: '/sarafan/fence/ivan-petrov-fence/',
   markdownUrl: '/sarafan/fence/ivan-petrov-fence/index.md',
   canonical: 'https://example.com/sarafan/fence/ivan-petrov-fence/',
   body: 'Работает с заборами и воротами.',
   mentions: [],
-} satisfies ContactWithDetail;
+} satisfies Contact;
 
 describe('contactPageSchema', () => {
   it('publishes a ContactPage with a ContactPoint without ratings or review claims', () => {

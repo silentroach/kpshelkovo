@@ -49,7 +49,7 @@ export const buildContactVcard = (contact: ContactWithVcf): string => {
   const email = vcf.email ?? contact.contacts.email;
   const website = vcf.website ?? contact.contacts.website;
   const address = vcf.address ?? contact.location?.address;
-  const profileUrl = contact.hasDetailPage ? contact.canonical : undefined;
+  const profileUrl = contact.canonical;
   const note = vcf.note ?? contactExcerpt(contact);
 
   // Explicit charset prevents Apple Contacts from decoding Cyrillic as MacRoman.

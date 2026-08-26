@@ -130,7 +130,7 @@ export const mapRawContact = (
     `contact "${entry.id}" body`,
     mentionRegistry,
   );
-  const contact = {
+  return {
     slug,
     title: entry.data.title,
     category,
@@ -145,18 +145,6 @@ export const mapRawContact = (
     vcf: mapVcf(entry.data.vcf, category, slug),
     body: body.markdown,
     mentions: body.mentions,
-  };
-
-  if (!body.markdown.trim()) {
-    return {
-      ...contact,
-      hasDetailPage: false,
-    };
-  }
-
-  return {
-    ...contact,
-    hasDetailPage: true,
     url: contactUrl({ category, slug }),
     markdownUrl: contactMarkdownUrl({ category, slug }),
     canonical: contactCanonical({ category, slug }),

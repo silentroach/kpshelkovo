@@ -356,7 +356,6 @@ export const kbPageSitemapInput = (
 
 export const contactSitemapInput = (
   frontmatter: string | YamlRecord,
-  body: string,
 ): SitemapContactInput => {
   const context = 'contact frontmatter';
   const contact = parseSitemapData(
@@ -369,7 +368,6 @@ export const contactSitemapInput = (
     category: contact.category,
     url: `/sarafan/${contact.category}/${contact.slug}/`,
     updatedIso: parseTimestamp(contact.updated_at, `${context} updated_at`),
-    hasPage: Boolean(body.trim()),
   };
 };
 
@@ -387,9 +385,9 @@ const loadContactsForSitemap = (): readonly SitemapContactInput[] =>
   listFiles(contactsDir, '.md')
     .filter((path) => !path.endsWith('/AGENTS.md'))
     .map((path) => {
-      const { body, frontmatter } = markdownParts(path);
+      const { frontmatter } = markdownParts(path);
 
-      return contactSitemapInput(frontmatter, body);
+      return contactSitemapInput(frontmatter);
     });
 
 export const loadSitemapMetadataIndex =

@@ -35,7 +35,9 @@ const contact = {
     positiveReview,
     positiveReview,
   ],
-  hasDetailPage: false,
+  url: '/sarafan/construction/example/',
+  markdownUrl: '/sarafan/construction/example/index.md',
+  canonical: 'https://example.com/sarafan/construction/example/',
   body: '',
   mentions: [],
 } satisfies Contact;
@@ -47,6 +49,7 @@ describe('ContactListItem', () => {
       props: { contact },
     });
 
+    expect(html).toContain('href="/sarafan/construction/example/"');
     expect(html).not.toMatch(/\+7 900 000-00-00|yandex\.ru\/maps\/example/u);
   });
 

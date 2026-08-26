@@ -7,12 +7,7 @@ import { loadSiteMentionRegistry } from '@/lib/mentions/registry';
 import { mapRawContact } from './mapper';
 import type { RawContact } from './raw-schema';
 import { CONTACT_CATEGORIES, isContactCategory, isContactSlug } from './schema';
-import type {
-  Contact,
-  ContactsDataset,
-  ContactWithDetail,
-  ContactWithVcf,
-} from './types';
+import type { Contact, ContactsDataset, ContactWithVcf } from './types';
 import {
   contactCategoryMarkdownUrl,
   contactCategoryUrl,
@@ -97,16 +92,8 @@ export const loadContactsData = (): Promise<ContactsDataset> => {
 export const loadContacts = async (): Promise<readonly Contact[]> =>
   (await loadContactsData()).contacts;
 
-export const hasContactDetail = (
-  contact: Contact,
-): contact is ContactWithDetail => contact.hasDetailPage;
-
 export const hasContactVcf = (contact: Contact): contact is ContactWithVcf =>
   Boolean(contact.vcf);
-
-export const loadContactDetails = async (): Promise<
-  readonly ContactWithDetail[]
-> => (await loadContacts()).filter(hasContactDetail);
 
 export const loadContactsWithVcf = async (): Promise<
   readonly ContactWithVcf[]
@@ -138,15 +125,6 @@ export const loadContact = async (
   return (await loadContactsData()).byRoute.get(
     contactRouteKey({ category: categoryKey, slug: slugKey }),
   );
-};
-
-export const loadContactDetail = async (
-  category: string,
-  slug: string,
-): Promise<ContactWithDetail | undefined> => {
-  const contact = await loadContact(category, slug);
-
-  return contact?.hasDetailPage ? contact : undefined;
 };
 
 export const loadContactWithVcf = async (

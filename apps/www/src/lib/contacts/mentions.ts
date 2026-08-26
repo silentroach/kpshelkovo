@@ -4,10 +4,10 @@ import { createEntityMentionSourceRefs } from '@/lib/mentions';
 import type { EntityMentionSourceRef } from '@/lib/mentions';
 
 import { contactRouteKey } from './routes';
-import type { ContactWithDetail } from './types';
+import type { Contact } from './types';
 
 type ContactMentionRefSource = Pick<
-  ContactWithDetail,
+  Contact,
   | 'body'
   | 'category'
   | 'markdownUrl'

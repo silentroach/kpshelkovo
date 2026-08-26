@@ -8,12 +8,7 @@ import { count } from '@shelkovo/format';
 
 import { absoluteUrl } from '@/lib/site';
 
-import type {
-  Contact,
-  ContactCategoryPage,
-  ContactsDataset,
-  ContactWithDetail,
-} from './types';
+import type { Contact, ContactCategoryPage, ContactsDataset } from './types';
 import {
   CONTACTS_CHAT_LABEL,
   CONTACTS_CHAT_URL,
@@ -104,17 +99,12 @@ const contactsIntro = (): MarkdownNode =>
 
 const contactsEmpty = (): MarkdownNode => md.paragraph(CONTACTS_EMPTY_MESSAGE);
 
-const contactTitle = (contact: Contact) =>
-  contact.hasDetailPage
-    ? [md.link(abs(contact.markdownUrl), contact.title)]
-    : [md.text(contact.title)];
-
 const contactLine = (contact: Contact) => {
   const excerpt = contactExcerpt(contact);
 
   return md.listItem([
     md.paragraph([
-      ...contactTitle(contact),
+      md.link(abs(contact.markdownUrl), contact.title),
       ...(excerpt ? [md.text(` — ${excerpt}`)] : []),
     ]),
   ]);
@@ -133,7 +123,7 @@ const categoryLine = (category: ContactCategoryPage) =>
     ]),
   ]);
 
-const contactFrontmatter = (contact: ContactWithDetail): ContactFrontmatter => {
+const contactFrontmatter = (contact: Contact): ContactFrontmatter => {
   const frontmatter: MutableContactFrontmatter = {
     title: contact.title,
     slug: contact.slug,
@@ -234,7 +224,7 @@ export const buildContactsCategoryMarkdown = (
     md.list(category.contacts.map(contactLine)),
   ]);
 
-export const buildContactMarkdown = (contact: ContactWithDetail): string =>
+export const buildContactMarkdown = (contact: Contact): string =>
   serializeMarkdownDocument(
     createMarkdownDocument({
       frontmatter: contactFrontmatter(contact),
