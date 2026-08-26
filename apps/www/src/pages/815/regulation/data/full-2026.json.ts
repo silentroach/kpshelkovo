@@ -11,7 +11,7 @@ const abs = (root: string, path: string): string =>
 
 export const GET: APIRoute = async () => {
   const root = canonRoot();
-  const body = `${JSON.stringify(fullReglamentDataset2026, null, 2)}\n`;
+  const body = JSON.stringify(fullReglamentDataset2026);
 
   return new Response(body, {
     headers: {

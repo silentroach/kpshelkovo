@@ -7,7 +7,7 @@ export const prerender = true;
 
 export const GET: APIRoute = async () => {
   const root = canonRoot();
-  const body = `${JSON.stringify(schema(root), null, 2)}\n`;
+  const body = JSON.stringify(schema(root));
 
   return new Response(body, {
     headers: {

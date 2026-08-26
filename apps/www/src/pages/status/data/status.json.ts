@@ -9,7 +9,7 @@ export const prerender = true;
 
 export const GET: APIRoute = async () => {
   const root = canonRoot();
-  const body = `${JSON.stringify(buildStatusPublicPayload(await loadStatusData()), null, 2)}\n`;
+  const body = JSON.stringify(buildStatusPublicPayload(await loadStatusData()));
 
   return new Response(body, {
     headers: {

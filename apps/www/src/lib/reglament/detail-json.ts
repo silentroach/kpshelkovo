@@ -26,4 +26,4 @@ const publicEstimateDetailsReplacer = function (
 
 export const buildPublicEstimateDetails2026Json = (
   dataset: EstimateDetailDataset,
-): string => `${JSON.stringify(dataset, publicEstimateDetailsReplacer, 2)}\n`;
+): string => JSON.stringify(dataset, publicEstimateDetailsReplacer);

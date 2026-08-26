@@ -8,7 +8,7 @@ export const prerender = true;
 export const GET: APIRoute = async () => {
   const body = buildPlaceMapPublicPayload(await loadPlaces());
 
-  return new Response(`${JSON.stringify(body)}\n`, {
+  return new Response(JSON.stringify(body), {
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
     },
