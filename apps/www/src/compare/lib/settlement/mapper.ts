@@ -1,6 +1,7 @@
 import type {
   RawCommonSpaces,
   RawInfrastructure,
+  RawLots,
   RawManagementCompany,
   RawRoadType,
   RawSettlement,
@@ -11,6 +12,7 @@ import type {
 import type {
   CommonSpaces,
   Infrastructure,
+  Lots,
   ManagementCompany,
   RoadType,
   Settlement,
@@ -19,6 +21,7 @@ import type {
   TariffUnit,
   VideoSurveillance,
 } from './types';
+import { DEFAULT_LOT_SOTKA, getLotAverage } from './lots';
 
 const mapTariffUnit = (unit: RawTariffUnit): TariffUnit => {
   if (unit === 'rub_per_sotka') return 'perSotka';
@@ -51,12 +54,36 @@ const mapTariffPart = (tariff: {
   note: tariff.note,
 });
 
-const mapTariff = (tariff: RawTariff): Tariff => ({
-  ...mapTariffPart(tariff),
-  normalizedPerSotkaMonth: tariff.normalized_per_sotka_month,
-  normalizedIsEstimate: tariff.normalized_is_estimate,
-  parts: 'parts' in tariff ? tariff.parts.map(mapTariffPart) : undefined,
-});
+const months = (period: TariffPart['period']): number => {
+  if (period === 'month') return 1;
+  if (period === 'quarter') return 3;
+  return 12;
+};
+
+const normalizeTariffPart = (part: TariffPart, lot: number): number => {
+  const monthly = part.value / months(part.period);
+  return part.unit === 'perSotka' ? monthly : monthly / lot;
+};
+
+const mapTariff = (tariff: RawTariff, averageLot?: number): Tariff => {
+  const first = mapTariffPart(tariff);
+  const parts = 'parts' in tariff ? tariff.parts.map(mapTariffPart) : undefined;
+  const list = parts ?? [first];
+  const lot = averageLot ?? DEFAULT_LOT_SOTKA;
+
+  return {
+    value: first.value,
+    unit: first.unit,
+    period: first.period,
+    note: first.note,
+    normalizedPerSotkaMonth: list.reduce(
+      (sum, part) => sum + normalizeTariffPart(part, lot),
+      0,
+    ),
+    normalizedIsEstimate: list.some((part) => part.unit !== 'perSotka'),
+    parts,
+  };
+};
 
 const mapManagementCompany = (
   company?: RawManagementCompany,
@@ -102,47 +129,57 @@ const mapCommonSpaces = (item: RawCommonSpaces): CommonSpaces => ({
   bbqZones: item.bbq_zones,
 });
 
-export const mapRawSettlement = (raw: RawSettlement): Settlement => ({
-  name: raw.name,
-  shortName: raw.short_name,
-  slug: raw.slug,
-  website: raw.website,
-  telegram: raw.telegram,
-  managementCompany: mapManagementCompany(raw.management_company),
-  isBaseline: raw.is_baseline,
-  location: {
-    addressText: raw.location.address_text,
-    lat: raw.location.lat,
-    lng: raw.location.lng,
-    mapUrl: raw.location.map_url,
-    district: raw.location.district,
-  },
-  tariff: mapTariff(raw.tariff),
-  lots: raw.lots
-    ? {
-        count: raw.lots.count,
-        areaHa: raw.lots.area_ha,
-        averageSotka: raw.lots.average_sotka,
-        averageNote: raw.lots.average_note,
-      }
-    : undefined,
-  waterInTariff: raw.water_in_tariff,
-  rabstvo: raw.rabstvo,
-  infrastructure: mapInfrastructure(raw.infrastructure),
-  commonSpaces: mapCommonSpaces(raw.common_spaces),
-  serviceModel: {
-    garbageCollection: raw.service_model.garbage_collection,
-    snowRemoval: raw.service_model.snow_removal,
-    roadCleaning: raw.service_model.road_cleaning,
-    landscaping: raw.service_model.landscaping,
-    emergencyService: raw.service_model.emergency_service,
-    dispatcher: raw.service_model.dispatcher,
-  },
-  sources: raw.sources.map((source) => ({
-    title: source.title,
-    url: source.url,
-    type: source.type,
-    dateChecked: source.date_checked,
-    comment: source.comment,
-  })),
-});
+const mapLots = (lots?: RawLots): Lots | undefined => {
+  if (!lots) return;
+  return {
+    count: lots.count,
+    areaHa: lots.area_ha,
+    averageSotka: lots.average_sotka,
+    averageNote: lots.average_note,
+  };
+};
+
+export const mapRawSettlement = (raw: RawSettlement): Settlement => {
+  const lots = mapLots(raw.lots);
+  const infrastructure = mapInfrastructure(raw.infrastructure);
+  const commonSpaces = mapCommonSpaces(raw.common_spaces);
+  const averageLot = getLotAverage(lots, infrastructure, commonSpaces);
+
+  return {
+    name: raw.name,
+    shortName: raw.short_name,
+    slug: raw.slug,
+    website: raw.website,
+    telegram: raw.telegram,
+    managementCompany: mapManagementCompany(raw.management_company),
+    isBaseline: raw.is_baseline,
+    location: {
+      addressText: raw.location.address_text,
+      lat: raw.location.lat,
+      lng: raw.location.lng,
+      mapUrl: raw.location.map_url,
+      district: raw.location.district,
+    },
+    tariff: mapTariff(raw.tariff, averageLot),
+    lots,
+    waterInTariff: raw.water_in_tariff,
+    rabstvo: raw.rabstvo,
+    infrastructure,
+    commonSpaces,
+    serviceModel: {
+      garbageCollection: raw.service_model.garbage_collection,
+      snowRemoval: raw.service_model.snow_removal,
+      roadCleaning: raw.service_model.road_cleaning,
+      landscaping: raw.service_model.landscaping,
+      emergencyService: raw.service_model.emergency_service,
+      dispatcher: raw.service_model.dispatcher,
+    },
+    sources: raw.sources.map((source) => ({
+      title: source.title,
+      url: source.url,
+      type: source.type,
+      dateChecked: source.date_checked,
+      comment: source.comment,
+    })),
+  };
+};

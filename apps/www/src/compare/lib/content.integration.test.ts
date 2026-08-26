@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { parse as parseYaml } from 'yaml';
 
 import { SettlementSchema } from './schema';
+import { mapRawSettlement } from './settlement/mapper';
+import { DEFAULT_LOT_SOTKA, getLotAverage } from './settlement/lots';
 
 const dir = fileURLToPath(
   new URL('../../data/compare/settlements/', import.meta.url),
@@ -110,5 +112,33 @@ describe('settlements content collection', () => {
 
     const base = rows.filter((row) => row.base).map((row) => row.name);
     expect(base, `Baseline files: ${base.join(', ')}`).toHaveLength(1);
+  });
+
+  it('normalizes every tariff from the shared domain lot estimate', () => {
+    const files = list();
+    expect(files.length).toBeGreaterThan(0);
+
+    for (const file of files) {
+      const raw = SettlementSchema.parse(parseYaml(file.code));
+      const settlement = mapRawSettlement(raw);
+      const lot =
+        getLotAverage(
+          settlement.lots,
+          settlement.infrastructure,
+          settlement.commonSpaces,
+        ) ?? DEFAULT_LOT_SOTKA;
+      const parts = settlement.tariff.parts ?? [settlement.tariff];
+      const expected = parts.reduce((sum, part) => {
+        const months =
+          part.period === 'month' ? 1 : part.period === 'quarter' ? 3 : 12;
+        const monthly = part.value / months;
+        return sum + (part.unit === 'perSotka' ? monthly : monthly / lot);
+      }, 0);
+
+      expect(raw.tariff).not.toHaveProperty('normalized_per_sotka_month');
+      expect(settlement.tariff.normalizedPerSotkaMonth, file.name).toBe(
+        expected,
+      );
+    }
   });
 });

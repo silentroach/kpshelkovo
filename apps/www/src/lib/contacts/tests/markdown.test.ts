@@ -35,7 +35,6 @@ const contact = {
     {
       sentiment: 'positive',
       summary: 'Помог с **электричеством**.',
-      summaryHtml: '<p>Помог с <strong>электричеством</strong>.</p>',
       publishedAt: new Date('2026-04-07T00:00:00.000Z'),
       publishedIso: '2026-04-07',
       url: 'https://t.me/example/1',
