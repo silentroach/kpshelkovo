@@ -25,16 +25,16 @@
     waitForStableLayout,
   } from '@/lib/yandex-maps/runtime';
   import { getPlaceClosingTime } from '@/lib/places/opening-hours';
+  import type { PlaceMapItem } from '@/lib/places/map-types';
   import { PLACE_MAP_BOUNDS } from '@/lib/places/schema';
   import type { PlaceMarker } from '@/lib/places/schema';
   import type {
-    Place,
     PlaceGeometryPosition,
     PlacePolygonGeometry,
   } from '@/lib/places/types';
   import { formatPlaceStatus } from '@/lib/places/view';
 
-  let { places }: { readonly places: readonly Place[] } = $props();
+  let { places }: { readonly places: readonly PlaceMapItem[] } = $props();
 
   const SETTLEMENT_BOUNDS: ymaps3.LngLatBounds = [
     [PLACE_MAP_BOUNDS.minLng, PLACE_MAP_BOUNDS.minLat],
@@ -190,7 +190,7 @@
   let mapClusterer: ymaps3.YMapEntity<unknown> | undefined;
   let mapListener: ymaps3.YMapListener | undefined;
   let mapAreaFeatures = new SvelteMap<string, ymaps3.YMapFeature>();
-  let markerContents: Array<readonly [Place, HTMLAnchorElement]> = [];
+  let markerContents: Array<readonly [PlaceMapItem, HTMLAnchorElement]> = [];
   const markerHoveredAreas = new SvelteSet<string>();
   const featureHoveredAreas = new SvelteSet<string>();
   const focusedAreas = new SvelteSet<string>();
@@ -264,7 +264,7 @@
     };
   };
 
-  const updateAreaVisibility = (place: Place): void => {
+  const updateAreaVisibility = (place: PlaceMapItem): void => {
     const feature = mapAreaFeatures.get(place.slug);
 
     if (!feature) return;
@@ -283,7 +283,7 @@
   };
 
   const setAreaState = (
-    place: Place,
+    place: PlaceMapItem,
     states: Set<string>,
     active: boolean,
   ): void => {
@@ -297,7 +297,7 @@
     updateAreaVisibility(place);
   };
 
-  const cancelAreaHoverLeave = (place: Place): void => {
+  const cancelAreaHoverLeave = (place: PlaceMapItem): void => {
     const timer = areaHoverLeaveTimers.get(place.slug);
 
     if (timer === undefined) return;
@@ -306,7 +306,7 @@
     areaHoverLeaveTimers.delete(place.slug);
   };
 
-  const scheduleAreaHoverLeave = (place: Place): void => {
+  const scheduleAreaHoverLeave = (place: PlaceMapItem): void => {
     cancelAreaHoverLeave(place);
     areaHoverLeaveTimers.set(
       place.slug,
@@ -318,7 +318,7 @@
   };
 
   const createAreaFeature = (
-    place: Place,
+    place: PlaceMapItem,
     YMapFeature: typeof ymaps3.YMapFeature,
   ): ymaps3.YMapFeature | undefined => {
     const area = place.geometry?.area;
@@ -340,7 +340,10 @@
     });
   };
 
-  const updateMarkerContent = (place: Place, link: HTMLAnchorElement): void => {
+  const updateMarkerContent = (
+    place: PlaceMapItem,
+    link: HTMLAnchorElement,
+  ): void => {
     const closingTime = place.openingHours
       ? getPlaceClosingTime(place.openingHours)
       : undefined;
@@ -377,7 +380,7 @@
     }
   };
 
-  const createMarkerContent = (place: Place): HTMLAnchorElement => {
+  const createMarkerContent = (place: PlaceMapItem): HTMLAnchorElement => {
     const link = document.createElement('a');
     const visual = document.createElement('span');
 
@@ -474,7 +477,7 @@
     });
   };
 
-  const focusPlace = (place: Place, duration: number): void => {
+  const focusPlace = (place: PlaceMapItem, duration: number): void => {
     map?.update({
       location: {
         center: [place.coordinates.lng, place.coordinates.lat],
@@ -590,7 +593,7 @@
       removeHighlightQuery(requestedSlug);
     }
 
-    const startPlaceHighlight = (place: Place): void => {
+    const startPlaceHighlight = (place: PlaceMapItem): void => {
       const marker = markerContents.find(
         ([candidate]) => candidate.slug === place.slug,
       )?.[1];

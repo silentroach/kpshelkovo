@@ -12,7 +12,7 @@ import type {
 } from '@yandex/ymaps3-types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Place } from '@/lib/places/types';
+import type { PlaceMapItem } from '@/lib/places/map-types';
 
 import PlaceMap from '../PlaceMap.svelte';
 
@@ -49,17 +49,11 @@ const mapProps: {
   };
 }[] = [];
 
-const place: Place = {
+const place: PlaceMapItem = {
   slug: 'burzhuyka',
   name: 'Буржуйка',
-  category: 'food',
   status: 'existing',
-  summary: 'Фудтрак в Шелково Форест',
-  body: '',
-  mentions: [],
-  address: 'Шелково Форест, Берёзовая улица, 21А',
   coordinates: { lat: 55.060526, lng: 37.716242 },
-  mapUrl: 'https://yandex.ru/navi/-/CTfgq-5r',
   openingHours: {
     description: 'С 10:00 до 22:00, вторник — выходной',
     periods: [
@@ -70,30 +64,20 @@ const place: Place = {
       },
     ],
   },
-  contact: {
-    id: 'food/burzhuyka',
-    url: '/sarafan/food/burzhuyka/',
-  },
   url: '/map/burzhuyka/',
-  markdownUrl: '/map/burzhuyka/index.md',
-  canonical: 'https://kpshelkovo.online/map/burzhuyka/',
 };
-const titanicPlace: Place = {
+const titanicPlace: PlaceMapItem = {
   ...place,
   slug: 'titanic',
   name: 'Детская площадка «Титаник»',
-  category: 'children',
   marker: 'titanic',
   coordinates: { lat: 55.060703, lng: 37.746894 },
   url: '/map/titanic/',
-  markdownUrl: '/map/titanic/index.md',
-  canonical: 'https://kpshelkovo.online/map/titanic/',
 };
-const pondsPlace: Place = {
+const pondsPlace: PlaceMapItem = {
   ...titanicPlace,
   slug: 'hunting-ponds',
   name: 'Охотничьи пруды',
-  category: 'water',
   marker: 'fish',
   coordinates: { lat: 55.05717, lng: 37.744987 },
   geometry: {
@@ -115,8 +99,6 @@ const pondsPlace: Place = {
     },
   },
   url: '/map/hunting-ponds/',
-  markdownUrl: '/map/hunting-ponds/index.md',
-  canonical: 'https://kpshelkovo.online/map/hunting-ponds/',
 };
 
 const installYandexMaps = (): void => {
