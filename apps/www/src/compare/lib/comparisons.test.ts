@@ -21,8 +21,6 @@ describe('Comparisons Module', () => {
       value: 120,
       unit: 'rub_per_sotka',
       period: 'month',
-      normalized_per_sotka_month: 120,
-      normalized_is_estimate: false,
       note: '',
     },
     infrastructure: {

@@ -19,8 +19,6 @@ const rawSettlement: RawSettlement = {
     value: 12_000,
     unit: 'rub_per_lot',
     period: 'month',
-    normalized_per_sotka_month: 1_200,
-    normalized_is_estimate: true,
   },
   infrastructure: {
     roads: 'partial_asphalt',

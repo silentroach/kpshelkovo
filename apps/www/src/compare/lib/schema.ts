@@ -2,23 +2,14 @@ import { z } from 'zod';
 
 // Перечисления.
 export const AvailabilityStatusEnum = z.enum(['yes', 'no', 'partial']);
-type RawAvailabilityStatus = z.output<typeof AvailabilityStatusEnum>;
 
 export const TariffUnitEnum = z.enum([
   'rub_per_sotka',
   'rub_per_lot',
   'rub_fixed',
 ]);
-type RawTariffUnit = z.output<typeof TariffUnitEnum>;
 
 export const TariffPeriodEnum = z.enum(['month', 'quarter', 'year']);
-type RawTariffPeriod = z.output<typeof TariffPeriodEnum>;
-
-type TariffValue = {
-  value: number;
-  unit: RawTariffUnit;
-  period: RawTariffPeriod;
-};
 
 export const SourceTypeEnum = z.enum([
   'official',
@@ -34,11 +25,9 @@ export const RoadTypeEnum = z.enum([
   'gravel',
   'dirt',
 ]);
-type RawRoadType = z.output<typeof RoadTypeEnum>;
 
 // Типы ливневки от лучшего к худшему.
 export const DrainageTypeEnum = z.enum(['closed', 'open', 'none']);
-type RawDrainageType = z.output<typeof DrainageTypeEnum>;
 
 // Типы видеонаблюдения от лучшего к худшему.
 export const VideoSurveillanceEnum = z.enum([
@@ -59,34 +48,6 @@ export const LocationSchema = z.object({
   district: z.string().min(1),
 });
 
-// Схема тарифа.
-const LOT = 10;
-const SOTKA = 100;
-
-function month(period: RawTariffPeriod): number {
-  if (period === 'month') return 1;
-  if (period === 'quarter') return 3;
-  return 12;
-}
-
-function norm(
-  value: number,
-  unit: RawTariffUnit,
-  period: RawTariffPeriod,
-  lot = LOT,
-): number {
-  const monthly = value / month(period);
-  if (unit === 'rub_per_sotka') return monthly;
-  return monthly / lot;
-}
-
-function total(list: TariffValue[], lot = LOT): number {
-  return list.reduce(
-    (sum, item) => sum + norm(item.value, item.unit, item.period, lot),
-    0,
-  );
-}
-
 const TariffPartSchema = z.object({
   value: z.number().nonnegative(),
   unit: TariffUnitEnum,
@@ -99,8 +60,6 @@ export const TariffSchema = z
   .transform((raw) => {
     const list = Array.isArray(raw) ? raw : [raw];
     const first = list[0];
-    const normalized = total(list);
-    const estimated = list.some((item) => item.unit !== 'rub_per_sotka');
     const notes = list.flatMap((item) => (item.note ? [item.note] : []));
     const note = notes.length ? [...new Set(notes)].join('; ') : undefined;
 
@@ -108,8 +67,6 @@ export const TariffSchema = z
       value: first.value,
       unit: first.unit,
       period: first.period,
-      normalized_per_sotka_month: normalized,
-      normalized_is_estimate: estimated,
       ...(note ? { note } : {}),
     };
 
@@ -128,253 +85,6 @@ export const LotsSchema = z
     message: 'average_note requires average_sotka',
     path: ['average_note'],
   });
-
-type Lots = z.output<typeof LotsSchema>;
-type Infrastructure = z.output<typeof InfrastructureSchema>;
-type CommonSpaces = z.output<typeof CommonSpacesSchema>;
-type Tariff = z.output<typeof TariffSchema>;
-
-export interface LotPart {
-  title: string;
-  value: number;
-  note?: string;
-}
-
-export interface LotExact {
-  size: number;
-  exact: true;
-  count?: number;
-  area_ha?: number;
-  note?: string;
-}
-
-export interface LotEstimate {
-  size: number;
-  exact: false;
-  count: number;
-  area_ha: number;
-  gross: number;
-  shared: number;
-  cap: boolean;
-  rows: LotPart[];
-}
-
-export type LotBreakdown = LotExact | LotEstimate;
-
-function share(
-  value: RawAvailabilityStatus | undefined,
-  yes: number,
-  part = yes / 2,
-): number {
-  if (value === 'yes') return yes;
-  if (value === 'partial') return part;
-  return 0;
-}
-
-function road(value?: RawRoadType): number {
-  if (value === 'asphalt') return 0.9;
-  if (value === 'partial_asphalt') return 0.8;
-  if (value === 'gravel') return 0.7;
-  if (value === 'dirt') return 0.6;
-  return 0;
-}
-
-function drain(value?: RawDrainageType): number {
-  if (value === 'closed') return 0.25;
-  if (value === 'open') return 0.15;
-  return 0;
-}
-
-function note(value?: RawAvailabilityStatus): string | undefined {
-  if (value === 'yes') return 'подтверждено';
-  if (value === 'partial') return 'частично подтверждено';
-  return;
-}
-
-function roadNote(value?: RawRoadType): string | undefined {
-  if (value === 'asphalt') return 'асфальт';
-  if (value === 'partial_asphalt') return 'частично асфальт';
-  if (value === 'gravel') return 'гравий';
-  if (value === 'dirt') return 'грунт';
-  return;
-}
-
-function drainNote(value?: RawDrainageType): string | undefined {
-  if (value === 'closed') return 'закрытая';
-  if (value === 'open') return 'открытая';
-  return;
-}
-
-function add(
-  rows: LotPart[],
-  title: string,
-  value: number,
-  item?: string,
-): void {
-  if (!value) return;
-  rows.push({ title, value, note: item });
-}
-
-export function getLotBreakdown(
-  lots?: Lots,
-  infra?: Infrastructure,
-  common?: CommonSpaces,
-): LotBreakdown | undefined {
-  if (lots?.average_sotka) {
-    return {
-      size: lots.average_sotka,
-      exact: true,
-      count: lots.count,
-      area_ha: lots.area_ha,
-      note: lots.average_note,
-    };
-  }
-
-  if (!lots?.count || !lots.area_ha) return;
-
-  const rows: LotPart[] = [];
-  add(rows, 'Дороги', road(infra?.roads), roadNote(infra?.roads));
-  add(
-    rows,
-    'Тротуары',
-    share(infra?.sidewalks, 0.2, 0.1),
-    note(infra?.sidewalks),
-  );
-  add(rows, 'Ливневки', drain(infra?.drainage), drainNote(infra?.drainage));
-  add(
-    rows,
-    'КПП',
-    share(infra?.checkpoints, 0.1, 0.05),
-    note(infra?.checkpoints),
-  );
-  add(
-    rows,
-    'Админка',
-    share(infra?.admin_building, 0.1, 0.05),
-    note(infra?.admin_building),
-  );
-  add(
-    rows,
-    'Сервисы на территории',
-    share(infra?.retail_or_services, 0.15, 0.08),
-    note(infra?.retail_or_services),
-  );
-  add(
-    rows,
-    'Детские площадки',
-    share(common?.playgrounds, 0.15, 0.08),
-    note(common?.playgrounds),
-  );
-  add(rows, 'Спорт', share(common?.sports, 0.15, 0.08), note(common?.sports));
-  add(
-    rows,
-    'Маршруты для прогулок',
-    share(common?.walking_routes, 0.15, 0.08),
-    note(common?.walking_routes),
-  );
-  add(
-    rows,
-    'Доступ к воде',
-    share(common?.water_access, 0.1, 0.05),
-    note(common?.water_access),
-  );
-  add(
-    rows,
-    'Пляжные зоны',
-    share(common?.beach_zones, 0.15, 0.08),
-    note(common?.beach_zones),
-  );
-  add(
-    rows,
-    'Детский клуб',
-    share(common?.kids_club, 0.15, 0.08),
-    note(common?.kids_club),
-  );
-  add(
-    rows,
-    'BBQ-зоны',
-    share(common?.bbq_zones, 0.1, 0.05),
-    note(common?.bbq_zones),
-  );
-  add(rows, 'Бассейн', share(common?.pool, 0.2, 0.1), note(common?.pool));
-  add(
-    rows,
-    'Фитнес',
-    share(common?.fitness_club, 0.2, 0.1),
-    note(common?.fitness_club),
-  );
-  add(
-    rows,
-    'Ресторан',
-    share(common?.restaurant, 0.2, 0.1),
-    note(common?.restaurant),
-  );
-  add(
-    rows,
-    'SPA',
-    share(common?.spa_center, 0.25, 0.12),
-    note(common?.spa_center),
-  );
-  add(
-    rows,
-    'Спортивный лагерь',
-    share(common?.sports_camp, 0.25, 0.12),
-    note(common?.sports_camp),
-  );
-  add(
-    rows,
-    'Школа',
-    share(common?.primary_school, 0.3, 0.15),
-    note(common?.primary_school),
-  );
-
-  const gross = (lots.area_ha * SOTKA) / lots.count;
-  const raw = rows.reduce((sum, item) => sum + item.value, 0);
-  const cap = raw > 2.5;
-  const shared = Math.min(raw, 2.5);
-
-  return {
-    size: Math.max(gross - shared, 1),
-    exact: false,
-    count: lots.count,
-    area_ha: lots.area_ha,
-    gross,
-    shared,
-    cap,
-    rows,
-  };
-}
-
-export function getLotAverage(
-  lots?: Lots,
-  infra?: Infrastructure,
-  common?: CommonSpaces,
-): number | undefined {
-  return getLotBreakdown(lots, infra, common)?.size;
-}
-
-export function normalizeSettlement<
-  T extends {
-    lots?: Lots;
-    tariff: Tariff;
-    infrastructure?: Infrastructure;
-    common_spaces?: CommonSpaces;
-  },
->(item: T): T {
-  const lot = getLotAverage(item.lots, item.infrastructure, item.common_spaces);
-
-  if (!lot) return item;
-
-  const list = 'parts' in item.tariff ? item.tariff.parts : [item.tariff];
-
-  return {
-    ...item,
-    tariff: {
-      ...item.tariff,
-      normalized_per_sotka_month: total(list, lot),
-    },
-  };
-}
 
 // Схема инфраструктуры: все поля необязательные.
 export const InfrastructureSchema = z.object({
@@ -487,5 +197,4 @@ export const SettlementSchema = z
           'water_in_tariff can only be used when central water supply is confirmed',
       });
     }
-  })
-  .transform((item) => normalizeSettlement(item));
+  });
