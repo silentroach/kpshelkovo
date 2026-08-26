@@ -137,38 +137,34 @@ describe('buildNewsDataset', () => {
   });
 
   it('keeps pinned news only before pinned_until date', () => {
-    const now = Date.now;
-    Date.now = () => new Date('2026-05-06T12:00:00.000Z').valueOf();
+    const data = buildNewsDataset(
+      [author({ id: 'ig', name: 'Редакция' })],
+      [
+        article({
+          id: '2026/05/pinned-active',
+          title: 'Активный пин',
+          summary: 'До срока',
+          date: '04.05.2026',
+          pinned: true,
+          pinned_until: '2026-05-07',
+        }),
+        article({
+          id: '2026/05/pinned-expired',
+          title: 'Истекший пин',
+          summary: 'После срока',
+          date: '03.05.2026',
+          pinned: true,
+          pinned_until: '2026-05-06',
+        }),
+      ],
+      {
+        now: new Date('2026-05-06T00:00:00+03:00'),
+      },
+    );
 
-    try {
-      const data = buildNewsDataset(
-        [author({ id: 'ig', name: 'Редакция' })],
-        [
-          article({
-            id: '2026/05/pinned-active',
-            title: 'Активный пин',
-            summary: 'До срока',
-            date: '04.05.2026',
-            pinned: true,
-            pinned_until: '2026-05-07',
-          }),
-          article({
-            id: '2026/05/pinned-expired',
-            title: 'Истекший пин',
-            summary: 'После срока',
-            date: '03.05.2026',
-            pinned: true,
-            pinned_until: '2026-05-05',
-          }),
-        ],
-      );
-
-      expect(data.home.pinned.map((item) => item.id)).toEqual([
-        '2026/05/pinned-active',
-      ]);
-    } finally {
-      Date.now = now;
-    }
+    expect(data.home.pinned.map((item) => item.id)).toEqual([
+      '2026/05/pinned-active',
+    ]);
   });
 
   it('shows multiple pinned news on top in publication-date order', () => {
