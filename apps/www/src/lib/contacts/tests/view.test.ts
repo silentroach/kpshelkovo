@@ -26,7 +26,6 @@ describe('contact view helpers', () => {
       formatContactReviewDate({
         sentiment: 'positive',
         summary: 'Помогли с электричеством.',
-        summaryHtml: '<p>Помогли с электричеством.</p>',
         publishedAt: new Date('2026-04-07T00:00:00.000Z'),
         publishedIso: '2026-04-07',
         url: 'https://t.me/example/1',

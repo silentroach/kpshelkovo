@@ -11,7 +11,6 @@ import ContactListItem from '../ContactListItem.astro';
 const positiveReview = {
   sentiment: 'positive',
   summary: 'Работу оценили положительно.',
-  summaryHtml: '<p>Работу оценили положительно.</p>',
   publishedAt: new Date('2026-08-01T00:00:00.000Z'),
   publishedIso: '2026-08-01',
   url: 'https://t.me/example/1',

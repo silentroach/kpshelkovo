@@ -28,7 +28,6 @@ export interface ContactLocation {
 export interface ContactReview {
   readonly sentiment: ContactReviewSentiment;
   readonly summary: string;
-  readonly summaryHtml: string;
   readonly publishedAt: Date;
   readonly publishedIso: string;
   readonly url: string;

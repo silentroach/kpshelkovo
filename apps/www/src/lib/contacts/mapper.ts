@@ -1,6 +1,5 @@
 import {
   preprocessSiteMarkdownContent,
-  renderMarkdown,
   type PreprocessedSiteMarkdown,
 } from '@/lib/markdown/render';
 import type { SiteMentionRegistry } from '@/lib/mentions';
@@ -65,7 +64,6 @@ const mapReviews = (
   reviews?.map((review) => ({
     sentiment: review.sentiment,
     summary: review.summary,
-    summaryHtml: renderMarkdown(review.summary),
     publishedAt: new Date(`${review.published_at}T00:00:00.000Z`),
     publishedIso: review.published_at,
     url: review.url,
