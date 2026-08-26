@@ -105,7 +105,13 @@ describe('Pagefind search client', () => {
           "первый",
         ],
         [
+          "\"первый\"",
+        ],
+        [
           "второй",
+        ],
+        [
+          "\"второй\"",
         ],
       ]
     `);
@@ -175,7 +181,7 @@ describe('Pagefind search client', () => {
       total: 16,
       results: { length: 16 },
     });
-    expect(search).toHaveBeenCalledTimes(3);
+    expect(search).toHaveBeenCalledTimes(4);
     expect(dataCallCount(tracked.data)).toBe(16);
     expect(tracked.data.every((load) => load.mock.calls.length === 1)).toBe(
       true,
@@ -457,7 +463,7 @@ describe('Pagefind search client', () => {
         results: [
           {
             id: 'shared-result',
-            data: query === 'первый' ? firstData : secondData,
+            data: query.includes('первый') ? firstData : secondData,
           },
         ],
       }),
@@ -522,7 +528,7 @@ describe('Pagefind search client', () => {
         results: [
           {
             id: 'shared-result',
-            data: query === 'старый' ? olderData : newerData,
+            data: query.includes('старый') ? olderData : newerData,
           },
         ],
       }),
@@ -552,17 +558,16 @@ describe('Pagefind search client', () => {
     const firstData = vi.fn(async () => validResult(1));
     const secondData = vi.fn(async () => validResult(2));
     const invalidData = vi.fn(async () => validResult(3));
-    const search = vi
-      .fn<PagefindRuntime['search']>()
-      .mockResolvedValueOnce({
-        results: [{ id: 'first-result', data: firstData }],
-      })
-      .mockResolvedValueOnce({
-        results: [{ id: 'second-result', data: secondData }],
-      })
-      .mockResolvedValue({
-        results: [{ id: '  ', data: invalidData }],
-      });
+    const search = vi.fn<PagefindRuntime['search']>(async (query) => {
+      if (query.includes('первый')) {
+        return { results: [{ id: 'first-result', data: firstData }] };
+      }
+      if (query.includes('второй')) {
+        return { results: [{ id: 'second-result', data: secondData }] };
+      }
+
+      return { results: [{ id: '  ', data: invalidData }] };
+    });
     const runtime: PagefindRuntime = {
       init: vi.fn(async () => {}),
       options: vi.fn(async () => {}),
@@ -606,7 +611,7 @@ describe('Pagefind search client', () => {
     expect(result?.query).toHaveLength(SEARCH_QUERY_MAX_LENGTH);
   });
 
-  it('keeps the visible query but removes single-letter function words from Pagefind', async () => {
+  it('keeps the visible query but removes every one-character token from Pagefind', async () => {
     const { preload, runtime, search } = runtimeWith(responseWith());
     const loadPagefind = vi.fn(async () => runtime);
     const client = createPagefindSearchClient({
@@ -614,20 +619,29 @@ describe('Pagefind search client', () => {
       loadPagefind,
     });
 
-    await client.preload?.('  подать в суд и тариф  ');
-    const result = await client.search('  подать в суд и тариф  ');
-    const ignored = await client.search(' в ');
+    await client.preload?.('  подать в суд и тариф м  ');
+    const result = await client.search('  подать в суд и тариф м  ');
+    const ignoredLetter = await client.search(' м ');
+    const ignoredNumber = await client.search(' 1 ');
 
     expect({
-      ignored,
+      ignoredLetter,
+      ignoredNumber,
       loadCalls: loadPagefind.mock.calls.length,
       preloadCalls: preload.mock.calls,
       result,
       searchCalls: search.mock.calls,
     }).toMatchInlineSnapshot(`
       {
-        "ignored": {
-          "query": "в",
+        "ignoredLetter": {
+          "query": "м",
+          "results": [],
+          "searchQuery": "",
+          "state": "ready",
+          "total": 0,
+        },
+        "ignoredNumber": {
+          "query": "1",
           "results": [],
           "searchQuery": "",
           "state": "ready",
@@ -640,7 +654,7 @@ describe('Pagefind search client', () => {
           ],
         ],
         "result": {
-          "query": "подать в суд и тариф",
+          "query": "подать в суд и тариф м",
           "results": [],
           "searchQuery": "подать суд тариф",
           "state": "ready",
@@ -649,6 +663,46 @@ describe('Pagefind search client', () => {
         "searchCalls": [
           [
             "подать суд тариф",
+          ],
+        ],
+      }
+    `);
+  });
+
+  it('rejects Pagefind inverse-prefix fallback for a missing long token', async () => {
+    const broadResponse = responseWith(validResult(1));
+    const search = vi.fn(async (query: string) =>
+      query === '"медицина"' ? responseWith() : broadResponse,
+    );
+    const runtime: PagefindRuntime = {
+      init: vi.fn(async () => {}),
+      options: vi.fn(async () => {}),
+      preload: vi.fn(async () => {}),
+      search,
+    };
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => runtime,
+    });
+
+    expect({
+      result: await client.search('медицина'),
+      searchCalls: search.mock.calls,
+    }).toMatchInlineSnapshot(`
+      {
+        "result": {
+          "query": "медицина",
+          "results": [],
+          "searchQuery": "медицина",
+          "state": "ready",
+          "total": 0,
+        },
+        "searchCalls": [
+          [
+            "медицина",
+          ],
+          [
+            "\"медицина\"",
           ],
         ],
       }

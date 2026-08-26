@@ -14,6 +14,7 @@ import type {
   PagefindOptions,
   PagefindResultReference,
   PagefindRuntime,
+  PagefindSearchResponse,
 } from './client.internal.types';
 import {
   normalizeSearchHighlightQuery,
@@ -22,8 +23,7 @@ import {
 
 const pagefindEntrypoint = '/search/pagefind.js';
 const canonicalUrlBase = 'https://kpshelkovo.online';
-const ignoredSingleLetterWords = new Set(['а', 'в', 'и', 'к', 'о', 'с', 'у']);
-const shortQueryMaxLength = 3;
+const prefixFallbackMaxLength = 3;
 const pagefindOptions = {
   highlightParam: SEARCH_HIGHLIGHT_PARAM,
   ranking: {
@@ -261,27 +261,19 @@ const normalizeQuery = (query: string): string =>
     .slice(0, SEARCH_QUERY_MAX_LENGTH)
     .join('');
 
-const searchableToken = (token: string): string =>
-  Array.from(token.matchAll(/[\p{L}\p{N}]/gu), ([character]) => character)
-    .join('')
-    .toLocaleLowerCase('ru');
+const tokenLength = (token: string): number => Array.from(token).length;
 
-const pagefindQuery = (query: string): string =>
+const pagefindTokens = (query: string): readonly string[] =>
   query
     .split(' ')
-    .filter((token) => !ignoredSingleLetterWords.has(searchableToken(token)))
-    .join(' ');
+    .filter((token) => (token.match(/[\p{L}\p{N}]/gu)?.length ?? 0) > 1);
 
-const exactShortQuery = (query: string): string | undefined => {
+const pagefindQuery = (query: string): string =>
+  pagefindTokens(query).join(' ');
+
+const exactSingleToken = (query: string): string | undefined => {
   const words = query.match(/[\p{L}\p{N}]+/gu);
-  if (words?.length !== 1) {
-    return;
-  }
-
-  const word = words[0];
-  return word && Array.from(word).length <= shortQueryMaxLength
-    ? `"${word}"`
-    : undefined;
+  return words?.length === 1 ? words[0]?.toLocaleLowerCase('ru') : undefined;
 };
 
 const normalizeResultLimit = (limit?: number): number => {
@@ -303,27 +295,32 @@ const cacheableResultId = (value: unknown): string | undefined => {
 const searchPagefind = async (
   pagefind: PagefindRuntime,
   query: string,
+  searchExactToken: (token: string) => Promise<PagefindSearchResponse>,
 ): Promise<readonly PagefindResultReference[]> => {
   const broadSearch = pagefind.search(query);
-  const exactQuery = exactShortQuery(query);
-  if (!exactQuery) {
+  const token = exactSingleToken(query);
+  if (!token) {
     return (await broadSearch).results;
   }
 
   const [broadResponse, exactResponse] = await Promise.all([
     broadSearch,
-    pagefind.search(exactQuery),
+    searchExactToken(token),
   ]);
+  // Pagefind can fall back to a one-letter prefix when a long token is absent.
+  if (tokenLength(token) > prefixFallbackMaxLength) {
+    return exactResponse.results.length ? broadResponse.results : [];
+  }
+  if (!exactResponse.results.length) {
+    return broadResponse.results;
+  }
+
   const exactResultsById = new Map(
     exactResponse.results.flatMap((reference) => {
       const id = cacheableResultId(reference.id);
       return id ? [[id, reference] as const] : [];
     }),
   );
-  if (!exactResultsById.size) {
-    return broadResponse.results;
-  }
-
   const exactResults = broadResponse.results.flatMap((reference) => {
     const id = cacheableResultId(reference.id);
     const exactReference = id ? exactResultsById.get(id) : undefined;
@@ -363,6 +360,7 @@ export const createPagefindSearchClient = (
   let pagefindPromise: Promise<PagefindRuntime> | undefined;
   let latestRequestId = 0;
   let cachedQuery: string | undefined;
+  const exactSearchCache = new Map<string, Promise<PagefindSearchResponse>>();
   let resultCache = new Map<
     string,
     Promise<LoadedPagefindResult | undefined>
@@ -394,6 +392,26 @@ export const createPagefindSearchClient = (
     }
 
     await loadPagefind();
+  };
+
+  const searchExactToken = (
+    pagefind: PagefindRuntime,
+    token: string,
+  ): Promise<PagefindSearchResponse> => {
+    const cached = exactSearchCache.get(token);
+    if (cached) {
+      return cached;
+    }
+
+    const response = pagefind.search(`"${token}"`);
+    exactSearchCache.set(token, response);
+    void response.catch(() => {
+      if (exactSearchCache.get(token) === response) {
+        exactSearchCache.delete(token);
+      }
+    });
+
+    return response;
   };
 
   const preload = async (rawQuery: string): Promise<void> => {
@@ -482,7 +500,9 @@ export const createPagefindSearchClient = (
       return;
     }
 
-    const results = await searchPagefind(pagefind, effectiveQuery);
+    const results = await searchPagefind(pagefind, effectiveQuery, (token) =>
+      searchExactToken(pagefind, token),
+    );
     if (requestId !== latestRequestId) {
       return;
     }
