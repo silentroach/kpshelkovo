@@ -2,18 +2,26 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { estimate2026 } from '@/data/reglament/estimate-2026';
+import { projectEstimateCalculationInput } from '@/lib/reglament/calculation-projection';
+
 import {
   buildReglamentCalculatorChanges,
   calculateReglamentCalculatorState,
   hydrateReglamentCalculator,
 } from './calculator-controller';
-import type { CalculatedEstimate, CalculatedEstimateRow } from './calculate';
+import type {
+  CalculatedEstimate,
+  CalculatedEstimateRow,
+} from './calculate.types';
 import {
   formatReglamentInputNumber,
   formatReglamentAnnualMoney,
   formatReglamentMoney,
   formatReglamentTariffValue,
 } from './format';
+
+const calculationInput = projectEstimateCalculationInput(estimate2026);
 
 const findCalculatedRow = (
   result: CalculatedEstimate,
@@ -183,12 +191,12 @@ describe('buildReglamentCalculatorChanges', () => {
       throw new Error('Missing calculator fixture nodes');
     }
 
-    hydrateReglamentCalculator(root);
+    hydrateReglamentCalculator(root, calculationInput);
     input.value = '3000000';
     input.dispatchEvent(new Event('input', { bubbles: true }));
 
     const expectedRow = findCalculatedRow(
-      calculateReglamentCalculatorState([
+      calculateReglamentCalculatorState(calculationInput, [
         {
           rowId,
           key: 'primary_salary',
@@ -263,13 +271,13 @@ describe('buildReglamentCalculatorChanges', () => {
       throw new Error('Missing breakdown sync calculator fixture nodes');
     }
 
-    hydrateReglamentCalculator(root);
+    hydrateReglamentCalculator(root, calculationInput);
 
     volumeInput.value = '3100.8';
     volumeInput.dispatchEvent(new Event('input', { bubbles: true }));
 
     const volumeResultRow = findCalculatedRow(
-      calculateReglamentCalculatorState([
+      calculateReglamentCalculatorState(calculationInput, [
         {
           rowId,
           key: 'volume',
@@ -288,7 +296,7 @@ describe('buildReglamentCalculatorChanges', () => {
     frequencyInput.dispatchEvent(new Event('input', { bubbles: true }));
 
     const volumeAndFrequencyResultRow = findCalculatedRow(
-      calculateReglamentCalculatorState([
+      calculateReglamentCalculatorState(calculationInput, [
         {
           rowId,
           key: 'volume',
@@ -318,6 +326,7 @@ describe('buildReglamentCalculatorChanges', () => {
   it('renders fixed annual price changes from row details with short sotka unit', () => {
     document.body.innerHTML = `
       <div data-reglament-calculator>
+        <script type="application/json" data-reglament-calculation-input>${JSON.stringify(calculationInput)}</script>
         <details open>
           <summary>Детали расчета и источники</summary>
           <input
@@ -391,7 +400,7 @@ describe('buildReglamentCalculatorChanges', () => {
       throw new Error('Missing sticky calculator fixture nodes');
     }
 
-    hydrateReglamentCalculator(root);
+    hydrateReglamentCalculator(root, calculationInput);
 
     expect(reset.hidden).toBe(true);
     expect(originalTariff.hidden).toBe(true);
@@ -456,7 +465,7 @@ describe('buildReglamentCalculatorChanges', () => {
       throw new Error('Missing grouped money calculator fixture nodes');
     }
 
-    hydrateReglamentCalculator(root);
+    hydrateReglamentCalculator(root, calculationInput);
     input.value = formatReglamentInputNumber(1_573_084);
     input.dispatchEvent(new Event('input', { bubbles: true }));
 
@@ -509,7 +518,7 @@ describe('buildReglamentCalculatorChanges', () => {
       throw new Error('Missing readable input calculator fixture nodes');
     }
 
-    hydrateReglamentCalculator(root);
+    hydrateReglamentCalculator(root, calculationInput);
     frequencyInput.value = '182,5';
     frequencyInput.dispatchEvent(new Event('input', { bubbles: true }));
     primarySalaryInput.value = '3 000 000,5';
@@ -549,10 +558,10 @@ describe('buildReglamentCalculatorChanges', () => {
       throw new Error('Missing row tariff fixture nodes');
     }
 
-    hydrateReglamentCalculator(root);
+    hydrateReglamentCalculator(root, calculationInput);
 
     const expectedRow = findCalculatedRow(
-      calculateReglamentCalculatorState([
+      calculateReglamentCalculatorState(calculationInput, [
         {
           rowId,
           key: 'frequency',
@@ -595,7 +604,7 @@ describe('buildReglamentCalculatorChanges', () => {
       throw new Error('Missing checkbox description fixture nodes');
     }
 
-    hydrateReglamentCalculator(root);
+    hydrateReglamentCalculator(root, calculationInput);
 
     expect({
       describedBy: checkbox.getAttribute('aria-describedby'),
@@ -657,7 +666,7 @@ describe('buildReglamentCalculatorChanges', () => {
       throw new Error('Missing invalid calculator fixture nodes');
     }
 
-    hydrateReglamentCalculator(root);
+    hydrateReglamentCalculator(root, calculationInput);
     volumeInput.value = '-100';
     volumeInput.dispatchEvent(new Event('input', { bubbles: true }));
     frequencyInput.value = '−1';
@@ -719,6 +728,7 @@ describe('buildReglamentCalculatorChanges', () => {
   it('does not rescan calculator DOM on input after a page replacement', () => {
     const calculator = `
       <div data-reglament-calculator>
+        <script type="application/json" data-reglament-calculation-input>${JSON.stringify(calculationInput)}</script>
         <input
           type="number"
           data-reglament-field="fixed_price"
