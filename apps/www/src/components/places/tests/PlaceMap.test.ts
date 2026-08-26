@@ -231,6 +231,28 @@ describe('PlaceMap', () => {
     expect(click).toHaveBeenCalledOnce();
   });
 
+  it('loads map places from JSON before applying a requested highlight', async () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+    window.history.replaceState({}, '', '/map/?h=burzhuyka');
+    const fetch = vi.fn(async () =>
+      Response.json({
+        places: [place],
+      }),
+    );
+    vi.stubGlobal('fetch', fetch);
+
+    render(PlaceMap, {
+      props: {
+        dataUrl: '/map/data/places.json',
+      },
+    });
+
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+
+    expect(fetch).toHaveBeenCalledWith('/map/data/places.json');
+    expect(markerElements[0]?.dataset.highlighted).toBe('true');
+  });
+
   it('supports navigation gestures and a closer fit on mobile', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: true }));
 

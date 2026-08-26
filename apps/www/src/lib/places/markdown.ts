@@ -7,7 +7,7 @@ import {
 
 import { absoluteUrl } from '@/lib/site';
 
-import { placesMarkdownUrl, placesUrl } from './routes';
+import { placesDataUrl, placesMarkdownUrl, placesUrl } from './routes';
 import type { Place, PlaceMentionRef, PlaceWithBacklinks } from './types';
 import {
   formatPlaceBacklinkDate,
@@ -70,6 +70,10 @@ export const buildPlacesMarkdown = (places: readonly Place[]): string =>
     md.paragraph([
       md.text('Интерактивная карта: '),
       md.link(absoluteUrl(placesUrl()), absoluteUrl(placesUrl())),
+    ]),
+    md.paragraph([
+      md.text('Данные для интерактивной карты: '),
+      md.link(absoluteUrl(placesDataUrl()), absoluteUrl(placesDataUrl())),
     ]),
     md.heading(2, 'Места'),
     md.list(

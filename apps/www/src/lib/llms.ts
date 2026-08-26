@@ -152,6 +152,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
     : '/people/[slug]/index.md';
   const placesHome = registeredSurfaceUrl('places:index');
   const placesMarkdown = registeredSurfaceUrl('places:index-markdown');
+  const placesFeed = registeredSurfaceUrl('places:data');
   const compareHome = registeredSurfaceUrl('compare:index');
   const compareMarkdown = registeredSurfaceUrl('compare:index-markdown');
   const compareFeed = registeredSurfaceUrl('compare:data-settlements');
@@ -196,7 +197,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'Если задача относится к одному разделу, сначала откройте его `llms.txt` или Markdown-индекс; если нужны данные массово, сразу берите JSON-ленту там, где она есть.',
               `Новости: ${newsLlms}; основная лента: ${newsFeed}; календарные события лежат в \`articles[].events[].ics_url\`.`,
               `Статус сервисов: ${statusLlms}; основная лента: ${statusFeed}.`,
-              `Карта мест: ${placesMarkdown}; карточки: \`/map/[slug]/\` и \`/map/[slug]/index.md\`, включая входящие ссылки на материалы, где упомянуто место.`,
+              `Карта мест: ${placesMarkdown}; облегчённые данные маркеров и геометрии: ${placesFeed}; карточки: \`/map/[slug]/\` и \`/map/[slug]/index.md\`, включая входящие ссылки на материалы, где упомянуто место.`,
               `Отзывы собственников: ${reviewsMarkdown}; правила публикации: ${reviewsRulesMarkdown}; детальные страницы: \`/reviews/[id]/\` и \`/reviews/[id]/index.md\`.`,
               `Сарафан: ${contactsMarkdown}; разделы: \`/sarafan/[category]/\` и \`/sarafan/[category]/index.md\`; детальные страницы есть только у контактов с body и используют \`/sarafan/[category]/[slug]/\` и \`/sarafan/[category]/[slug]/index.md\`; если для контакта доступна vCard, ее адрес указан в \`vcf_url\`.`,
               `Архив встреч: ${meetingsMarkdown}; одна встреча: ${meetingHtml} или ${meetingMarkdown}; полный текст транскрипта берите по частям, например ${meetingTranscript}.`,
@@ -258,9 +259,10 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
             markdownList([
               `Интерактивная карта: ${placesHome}`,
               `Markdown-версия раздела: ${placesMarkdown}`,
+              `JSON для маркеров и геометрии карты: ${placesFeed}`,
               'Карточки мест используют `/map/[slug]/` и `/map/[slug]/index.md` и показывают входящие ссылки на материалы, где упомянуто место.',
               `Сейчас на карте ${count(places.length, ['место', 'места', 'мест'])}.`,
-              'Структурированной JSON-ленты пока нет; для машинного чтения используйте Markdown-страницы.',
+              'JSON оптимизирован для интерактивной карты; описания мест и входящие ссылки читайте в Markdown-страницах.',
             ]),
           ]),
           llmsSection('Отзывы собственников', [
@@ -395,6 +397,7 @@ export async function buildHomeMarkdown(): Promise<string> {
   const peopleCatalog = registeredSurfaceUrl('people:api-catalog');
   const placesHome = registeredSurfaceUrl('places:index');
   const placesMarkdown = registeredSurfaceUrl('places:index-markdown');
+  const placesFeed = registeredSurfaceUrl('places:data');
   const compareHome = registeredSurfaceUrl('compare:index');
   const compareFeed = registeredSurfaceUrl('compare:data-settlements');
   const compareLlms = registeredSurfaceUrl('compare:llms');
@@ -413,7 +416,7 @@ export async function buildHomeMarkdown(): Promise<string> {
     markdownList([
       `[Новости](${newsHome}) — ${count(news.articles.length, ['статья', 'статьи', 'статей'])}; структурированная лента: ${newsFeed}; RSS: ${newsRss}; события: необязательный \`articles[].events[]\` с локальным для статьи \`[event-slug].ics\``,
       `[Статус](${statusHome}) — ${count(status.incidents.length, ['запись', 'записи', 'записей'])}, ${count(activeStatus.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])}; структурированная лента: ${statusFeed}; RSS: ${statusRss}`,
-      `[Карта](${placesHome}) — ${count(places.length, ['место', 'места', 'мест'])}; Markdown-обзор: ${placesMarkdown}; структурированной ленты пока нет`,
+      `[Карта](${placesHome}) — ${count(places.length, ['место', 'места', 'мест'])}; Markdown-обзор: ${placesMarkdown}; данные маркеров и геометрии: ${placesFeed}`,
       `[Отзывы](${reviewsHome}) — ${count(reviews.reviews.length, ['отзыв', 'отзыва', 'отзывов'])}; Markdown-обзор: ${reviewsMarkdown}; правила публикации: ${reviewsRulesMarkdown}; структурированной ленты нет`,
       `[Сарафан](${contactsHome}) — ${count(contacts.contacts.length, ['контакт', 'контакта', 'контактов'])}; Markdown-обзор: ${contactsMarkdown}; структурированной ленты нет`,
       `Архив встреч — ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}; Markdown-индекс без HTML-аналога: ${meetingsMarkdown}; полные транскрипты: \`/meetings/[slug]/transcript/[part].md\``,
@@ -432,7 +435,7 @@ export async function buildHomeMarkdown(): Promise<string> {
     markdownList([
       `Новости: ${newsLlms}, ${newsCatalog}`,
       `Статус: ${statusLlms}, ${statusCatalog}`,
-      `Карта: ${placesMarkdown}`,
+      `Карта: ${placesMarkdown}, ${placesFeed}`,
       `Отзывы: ${reviewsMarkdown}`,
       `Сарафан: ${contactsMarkdown}`,
       `Архив встреч: ${meetingsMarkdown}`,

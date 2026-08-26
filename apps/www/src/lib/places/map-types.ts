@@ -15,3 +15,18 @@ export interface PlaceMapItem {
   readonly openingHours?: PlaceOpeningHours;
   readonly url: string;
 }
+
+export interface PlaceMapPayload {
+  readonly places: readonly PlaceMapItem[];
+}
+
+export interface PlaceMapFallback {
+  readonly name: string;
+  readonly url: string;
+}
+
+export interface PlaceMapProps {
+  readonly dataUrl?: string;
+  readonly fallbackPlace?: PlaceMapFallback;
+  readonly places?: readonly PlaceMapItem[];
+}

@@ -71,6 +71,7 @@ describe('places Markdown', () => {
     ].join('\n');
 
     expect(markdown).toContain('https://example.com/map/');
+    expect(markdown).toContain('https://example.com/map/data/places.json');
     expect(markdown).toContain('https://example.com/map/burzhuyka/index.md');
     expect(markdown).toContain('https://example.com/sarafan/food/burzhuyka/');
     expect(markdown).toContain('https://yandex.ru/navi/-/CTfgq-5r');

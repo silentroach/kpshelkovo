@@ -75,6 +75,7 @@ import {
 import {
   placeMarkdownPattern,
   placePattern,
+  placesDataPath,
   placesMarkdownPath,
   placesPath,
 } from '@/lib/places/routes';
@@ -548,12 +549,13 @@ describe('public surface registry', () => {
     ).toBe(false);
   });
 
-  it('registers places HTML and Markdown surfaces without a data feed', () => {
+  it('registers places HTML, Markdown, and map data surfaces', () => {
     const places = publicSurfaceRegistry.surfacesByOwner('places');
 
     expect(places.map((surface) => surface.id)).toEqual([
       'places:index',
       'places:index-markdown',
+      'places:data',
       'places:detail',
       'places:detail-markdown',
     ]);
@@ -564,12 +566,13 @@ describe('public surface registry', () => {
     ).toEqual([
       placesPath(),
       placesMarkdownPath(),
+      placesDataPath(),
       placePattern(),
       placeMarkdownPattern(),
     ]);
     expect(
       places.some((surface) => surface.discoveryRoles.includes('data-feed')),
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it('registers every reglament public path from the reglament-owned slice', () => {

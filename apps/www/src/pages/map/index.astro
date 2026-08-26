@@ -2,20 +2,13 @@
 import PlaceMap from '@/components/places/PlaceMap.svelte';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { loadPlaces } from '@/lib/places/load';
-import type { PlaceMapItem } from '@/lib/places/map-types';
-import { placesUrl } from '@/lib/places/routes';
+import { placesDataUrl, placesUrl } from '@/lib/places/routes';
 
 const places = await loadPlaces();
-const mapPlaces: readonly PlaceMapItem[] = places.map((place) => ({
-  slug: place.slug,
-  name: place.name,
-  marker: place.marker,
-  status: place.status,
-  coordinates: place.coordinates,
-  geometry: place.geometry,
-  openingHours: place.openingHours,
-  url: place.url,
-}));
+const firstPlace = places[0];
+const fallbackPlace = firstPlace
+  ? { name: firstPlace.name, url: firstPlace.url }
+  : undefined;
 const title = 'Карта — Шелково Онлайн';
 const description =
   'Карта мест и полезных объектов в поселках Шелково. Откройте точку на карте, чтобы перейти к подробной карточке.';
@@ -50,7 +43,7 @@ const schema = {
 >
   <main class="relative h-svh min-h-[30rem] overflow-hidden">
     <h1 class="sr-only">Карта мест и объектов Шелково</h1>
-    <PlaceMap places={mapPlaces} client:load />
+    <PlaceMap dataUrl={placesDataUrl()} {fallbackPlace} client:load />
 
     <noscript>
       <div

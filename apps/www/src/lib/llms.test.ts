@@ -119,7 +119,7 @@ describe('root llms', () => {
       - Если задача относится к одному разделу, сначала откройте его \`llms.txt\` или Markdown-индекс; если нужны данные массово, сразу берите JSON-ленту там, где она есть.
       - Новости: <https://example.com/news/llms.txt>; основная лента: <https://example.com/news/data/articles.json>; календарные события лежат в \`articles[].events[].ics_url\`.
       - Статус сервисов: <https://example.com/status/llms.txt>; основная лента: <https://example.com/status/data/status.json>.
-      - Карта мест: <https://example.com/map/index.md>; карточки: \`/map/[slug]/\` и \`/map/[slug]/index.md\`, включая входящие ссылки на материалы, где упомянуто место.
+      - Карта мест: <https://example.com/map/index.md>; облегчённые данные маркеров и геометрии: <https://example.com/map/data/places.json>; карточки: \`/map/[slug]/\` и \`/map/[slug]/index.md\`, включая входящие ссылки на материалы, где упомянуто место.
       - Отзывы собственников: <https://example.com/reviews/index.md>; правила публикации: <https://example.com/reviews/rules/index.md>; детальные страницы: \`/reviews/[id]/\` и \`/reviews/[id]/index.md\`.
       - Сарафан: <https://example.com/sarafan/index.md>; разделы: \`/sarafan/[category]/\` и \`/sarafan/[category]/index.md\`; детальные страницы есть только у контактов с body и используют \`/sarafan/[category]/[slug]/\` и \`/sarafan/[category]/[slug]/index.md\`; если для контакта доступна vCard, ее адрес указан в \`vcf_url\`.
       - Архив встреч: <https://example.com/meetings/index.md>; одна встреча: <https://example.com/meetings/2026-06-13-ok-comfort/> или <https://example.com/meetings/2026-06-13-ok-comfort/index.md>; полный текст транскрипта берите по частям, например <https://example.com/meetings/2026-06-13-ok-comfort/transcript/1.md>.
@@ -146,6 +146,7 @@ describe('root llms', () => {
       'https://example.com/status/data/status.json',
       'https://example.com/map/',
       'https://example.com/map/index.md',
+      'https://example.com/map/data/places.json',
       'https://example.com/reviews/',
       'https://example.com/reviews/index.md',
       'https://example.com/reviews/rules/index.md',
