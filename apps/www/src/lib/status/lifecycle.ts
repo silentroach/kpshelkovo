@@ -9,6 +9,14 @@ import type {
 
 type StatusIncidentServiceStateInput = Pick<StatusIncident, 'kind' | 'phase'>;
 
+export const toStatusIncidentWindowInput = (
+  incident: Pick<StatusIncident, 'ended' | 'kind' | 'started'>,
+): StatusIncidentWindowInput => ({
+  kind: incident.kind,
+  startedAt: incident.started.at.valueOf(),
+  endedAt: incident.ended?.at.valueOf(),
+});
+
 export const getStatusIncidentState = (
   input: StatusIncidentPhaseInput,
 ): StatusIncidentState => {
