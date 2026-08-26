@@ -11,6 +11,22 @@ const hasNonColorFocusIndicator = (locator: Locator): Promise<boolean> =>
     return hasOutline || style.boxShadow !== 'none';
   });
 
+const expectChevronExpanded = (
+  locator: Locator,
+  expanded: boolean,
+): Promise<void> =>
+  expect
+    .poll(() =>
+      locator.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return (
+          style.transform !== 'none' ||
+          (style.rotate !== 'none' && style.rotate !== '0deg')
+        );
+      }),
+    )
+    .toBe(expanded);
+
 test('removes the closed tariff submenu from desktop keyboard flow', async ({
   page,
 }) => {
@@ -19,6 +35,7 @@ test('removes the closed tariff submenu from desktop keyboard flow', async ({
 
   const tariffButton = page.getByRole('button', { name: 'Тариф 815' });
   const menu = page.locator('[data-site-nav-dropdown-menu]');
+  const icon = page.locator('[data-site-nav-dropdown-icon]');
   const compareLink = page.getByRole('link', { name: 'Сравнение тарифов' });
 
   await expect(menu).toHaveAttribute('hidden', '');
@@ -26,10 +43,13 @@ test('removes the closed tariff submenu from desktop keyboard flow', async ({
   await page.keyboard.press('Tab');
   await page.keyboard.press('Tab');
   await expect(tariffButton).toBeFocused();
+  await expect(tariffButton).toHaveAttribute('aria-expanded', 'false');
+  await expectChevronExpanded(icon, false);
 
   await page.keyboard.press('Enter');
   await expect(tariffButton).toHaveAttribute('aria-expanded', 'true');
   await expect(menu).not.toHaveAttribute('hidden', '');
+  await expectChevronExpanded(icon, true);
   await page.keyboard.press('Tab');
   await expect(compareLink).toBeFocused();
 
@@ -37,6 +57,7 @@ test('removes the closed tariff submenu from desktop keyboard flow', async ({
   await expect(tariffButton).toHaveAttribute('aria-expanded', 'false');
   await expect(menu).toHaveAttribute('hidden', '');
   await expect(tariffButton).toBeFocused();
+  await expectChevronExpanded(icon, false);
 
   await page.keyboard.press('Tab');
   await expect(
@@ -52,17 +73,22 @@ test('toggles the hovered tariff submenu and closes it from outside', async ({
 
   const tariffButton = page.getByRole('button', { name: 'Тариф 815' });
   const menu = page.locator('[data-site-nav-dropdown-menu]');
+  const icon = page.locator('[data-site-nav-dropdown-icon]');
 
   await tariffButton.hover();
   await expect(menu).toBeVisible();
+  await expectChevronExpanded(icon, true);
 
   await tariffButton.click();
   await expect(menu).toHaveAttribute('hidden', '');
+  await expectChevronExpanded(icon, false);
 
   await tariffButton.click();
   await expect(menu).toBeVisible();
+  await expectChevronExpanded(icon, true);
   await tariffButton.click();
   await expect(menu).toHaveAttribute('hidden', '');
+  await expectChevronExpanded(icon, false);
 
   await page.getByRole('link', { name: 'Шелково Онлайн' }).hover();
   await tariffButton.hover();
@@ -175,20 +201,25 @@ test('keeps tariff links available without JavaScript', async ({
     const brand = page.getByRole('link', { name: 'Шелково Онлайн' });
     const tariffButton = page.getByRole('button', { name: 'Тариф 815' });
     const menu = page.locator('[data-site-nav-dropdown-menu]');
+    const icon = page.locator('[data-site-nav-dropdown-icon]');
     const compareLink = page.getByRole('link', { name: 'Сравнение тарифов' });
 
     await expect(menu).not.toHaveAttribute('hidden', '');
     await expect(menu).toBeHidden();
+    await expectChevronExpanded(icon, false);
     await tariffButton.hover();
     await expect(menu).toBeVisible();
+    await expectChevronExpanded(icon, true);
     await brand.hover();
     await expect(menu).toBeHidden();
+    await expectChevronExpanded(icon, false);
 
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
     await expect(tariffButton).toBeFocused();
     await expect(menu).toBeVisible();
+    await expectChevronExpanded(icon, true);
     await page.keyboard.press('Tab');
     await expect(compareLink).toBeFocused();
   } finally {

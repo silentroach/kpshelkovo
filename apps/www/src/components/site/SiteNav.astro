@@ -136,7 +136,7 @@ const submenuLinkClass =
           <span
             aria-hidden="true"
             data-site-nav-dropdown-icon
-            class="size-0 border-x-[0.25rem] border-t-[0.3125rem] border-x-transparent border-t-current opacity-70 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180"
+            class="size-0 border-x-[0.25rem] border-t-[0.3125rem] border-x-transparent border-t-current opacity-70 transition-transform duration-200"
           />
         </button>
         <div
@@ -314,6 +314,11 @@ const submenuLinkClass =
     display: none;
   }
 
+  .site-nav-dropdown:not([data-site-nav-dropdown-hydrated]):is(
+      :hover,
+      :focus-within
+    )
+    [data-site-nav-dropdown-icon],
   .site-nav-dropdown[data-open] [data-site-nav-dropdown-icon] {
     transform: rotate(180deg);
   }
