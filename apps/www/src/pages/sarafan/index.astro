@@ -105,13 +105,22 @@ const sectionId = (category: string): string => category;
                       id={sectionId(category.category)}
                       class="ui-group-title scroll-mt-[calc(var(--site-sticky-offset)+1rem)]"
                     >
-                      <a href={category.url} class="ui-link">
+                      <a
+                        href={category.url}
+                        class="ui-link relative inline-block max-w-full"
+                      >
+                        <span
+                          aria-hidden="true"
+                          class="absolute right-full top-1/2 mr-3 hidden w-5 -translate-y-1/2 items-center text-lg leading-none opacity-70 md:inline-flex"
+                        >
+                          {formatContactCategoryEmoji(category.category)}
+                        </span>
                         {label}
                       </a>
                     </h2>
                   </div>
 
-                  <div class="border-t border-border px-5 md:px-6">
+                  <div class="ml-5 border-t border-border pr-5 md:ml-6 md:pr-6">
                     <div class="grid gap-x-8 md:grid-cols-2">
                       {category.contacts.map((contact) => (
                         <ContactListItem contact={contact} />
