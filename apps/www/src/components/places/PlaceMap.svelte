@@ -30,6 +30,7 @@
     PlaceMapPublicPayloadDto,
   } from '@/lib/places/map-public-dto';
   import type { PlaceMapItem, PlaceMapProps } from '@/lib/places/map-types';
+  import { placeUrl } from '@/lib/places/routes';
   import { PLACE_MAP_BOUNDS } from '@/lib/places/schema';
   import type { PlaceMarker } from '@/lib/places/schema';
   import type {
@@ -80,7 +81,7 @@
           })),
         }
       : undefined,
-    url: place.html_url,
+    url: placeUrl(place.slug),
   });
   const fetchPlaces = async (url: string): Promise<readonly PlaceMapItem[]> => {
     if (!url) throw new Error('Не указан источник данных карты');

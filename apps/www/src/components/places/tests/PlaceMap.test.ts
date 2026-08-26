@@ -268,6 +268,7 @@ describe('PlaceMap', () => {
     await waitFor(() => expect(markerElements).toHaveLength(1));
 
     expect(fetch).toHaveBeenCalledWith('/map/data/places.json');
+    expect(markerElements[0]?.getAttribute('href')).toBe('/map/burzhuyka/');
     expect(markerElements[0]?.dataset.highlighted).toBe('true');
   });
 
