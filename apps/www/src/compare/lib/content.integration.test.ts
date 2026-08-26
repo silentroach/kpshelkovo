@@ -1,12 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { parse } from 'yaml';
+import { fileURLToPath } from 'node:url';
+import { parse as parseYaml } from 'yaml';
+
 import { SettlementSchema } from './schema';
 import { mapRawSettlement } from './settlement/mapper';
 import { DEFAULT_LOT_SOTKA, getLotAverage } from './settlement/lots';
 
-const dir = join(process.cwd(), 'src/data/compare/settlements');
+const dir = fileURLToPath(
+  new URL('../../data/compare/settlements/', import.meta.url),
+);
 
 function list() {
   return readdirSync(dir)
@@ -17,8 +21,26 @@ function list() {
     }));
 }
 
-function parseSlug(code: string): string | undefined {
-  return code.match(/^slug:\s*["']?([^"'\n]+)["']?/m)?.[1];
+const parseSlug = (code: string): string =>
+  SettlementSchema.parse(parseYaml(code)).slug;
+
+function findDuplicateSlugs(files: ReturnType<typeof list>) {
+  const filesBySlug = new Map<string, string[]>();
+
+  for (const file of files) {
+    const slug = parseSlug(file.code);
+    const names = filesBySlug.get(slug);
+
+    if (names) {
+      names.push(file.name);
+    } else {
+      filesBySlug.set(slug, [file.name]);
+    }
+  }
+
+  return [...filesBySlug.entries()]
+    .filter(([, names]) => names.length > 1)
+    .map(([slug, names]) => ({ slug, files: names }));
 }
 
 function parseBase(code: string): boolean | undefined {
@@ -32,27 +54,47 @@ function parseBase(code: string): boolean | undefined {
 
 describe('settlements content collection', () => {
   it('does not include settlement-slug in route data', () => {
-    const slugs = list()
-      .map((file) => parseSlug(file.code))
-      .filter((slug): slug is string => Boolean(slug));
+    const slugs = list().map((file) => parseSlug(file.code));
 
     expect(slugs).not.toContain('settlement-slug');
   });
 
   it('uses unique slug values', () => {
-    const rows = list().map((file) => ({
-      name: file.name,
-      slug: parseSlug(file.code),
+    const duplicates = findDuplicateSlugs(list());
+    const conflicts = duplicates
+      .map(({ slug, files }) => `${slug}: ${files.join(', ')}`)
+      .join('; ');
+
+    expect(duplicates, `Duplicate slugs: ${conflicts}`).toEqual([]);
+  });
+
+  it('detects duplicate parsed slugs across valid YAML spellings', () => {
+    const source = list().find((file) => file.name === 'shelkovo.yaml');
+    if (!source) {
+      throw new Error('shelkovo.yaml fixture not found');
+    }
+
+    const files = [
+      { name: 'comment.yaml', code: 'slug: semantic-duplicate # comment' },
+      { name: 'spaces.yaml', code: 'slug: semantic-duplicate  ' },
+      { name: 'quoted.yaml', code: 'slug: "semantic-duplicate"' },
+    ].map(({ name, code }) => ({
+      name,
+      code: source.code.replace(/^slug:.*$/m, code),
     }));
 
-    const miss = rows.filter((row) => !row.slug).map((row) => row.name);
-    expect(miss, `Missing slug in files: ${miss.join(', ')}`).toEqual([]);
-
-    const slugs = rows
-      .map((row) => row.slug)
-      .filter((slug): slug is string => Boolean(slug));
-    const dup = slugs.filter((slug, idx) => slugs.indexOf(slug) !== idx);
-    expect(dup, `Duplicate slugs: ${dup.join(', ')}`).toEqual([]);
+    expect(findDuplicateSlugs(files)).toMatchInlineSnapshot(`
+      [
+        {
+          "files": [
+            "comment.yaml",
+            "spaces.yaml",
+            "quoted.yaml",
+          ],
+          "slug": "semantic-duplicate",
+        },
+      ]
+    `);
   });
 
   it('has exactly one baseline settlement', () => {
@@ -77,7 +119,7 @@ describe('settlements content collection', () => {
     expect(files.length).toBeGreaterThan(0);
 
     for (const file of files) {
-      const raw = SettlementSchema.parse(parse(file.code));
+      const raw = SettlementSchema.parse(parseYaml(file.code));
       const settlement = mapRawSettlement(raw);
       const lot =
         getLotAverage(
