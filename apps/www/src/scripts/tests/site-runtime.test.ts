@@ -284,7 +284,7 @@ describe('desktop site navigation dropdown', () => {
           aria-expanded="false"
           data-site-nav-dropdown-button
         >Tariff</button>
-        <div hidden data-site-nav-dropdown-menu>
+        <div data-site-nav-dropdown-menu>
           <a href="/815/compare/">Compare</a>
         </div>
       </div>
@@ -312,6 +312,7 @@ describe('desktop site navigation dropdown', () => {
   it('hides closed links semantically and restores the trigger on Escape', () => {
     const { button, menu, submenuLink } = renderDropdown();
 
+    expect(menu.hidden).toBe(true);
     button.focus();
     button.click();
     expect(menu.hidden).toBe(false);
@@ -335,14 +336,38 @@ describe('desktop site navigation dropdown', () => {
     `);
   });
 
-  it('keeps hover opening and outside pointer closing intact', () => {
+  it('toggles after hover and still closes after an outside pointer press', () => {
     const { button, dropdown, menu } = renderDropdown();
 
-    dropdown.dispatchEvent(new Event('pointerenter'));
+    dropdown.dispatchEvent(
+      new PointerEvent('pointerenter', { pointerType: 'mouse' }),
+    );
+    const hiddenStates = [menu.hidden];
+
     button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
-    expect(menu.hidden).toBe(false);
+    hiddenStates.push(menu.hidden);
+    button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+    hiddenStates.push(menu.hidden);
+    button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+    hiddenStates.push(menu.hidden);
+
+    dropdown.dispatchEvent(
+      new PointerEvent('pointerenter', { pointerType: 'mouse' }),
+    );
+    hiddenStates.push(menu.hidden);
 
     document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
-    expect(menu.hidden).toBe(true);
+    hiddenStates.push(menu.hidden);
+
+    expect(hiddenStates).toMatchInlineSnapshot(`
+      [
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+      ]
+    `);
   });
 });
