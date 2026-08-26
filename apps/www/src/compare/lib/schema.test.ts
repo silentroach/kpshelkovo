@@ -1,7 +1,9 @@
 import { describe, it, expect, expectTypeOf } from 'vitest';
 import type { CollectionEntry } from 'astro:content';
 import type { RawSettlement } from './settlement/schema';
-import { getLotAverage, SettlementSchema } from '../lib/schema';
+import { mapRawSettlement } from './settlement/mapper';
+import { getLotAverage } from './settlement/lots';
+import { SettlementSchema } from '../lib/schema';
 
 describe('Schema Validation', () => {
   describe('Valid Settlement Parses', () => {
@@ -82,12 +84,13 @@ describe('Schema Validation', () => {
       const result = SettlementSchema.safeParse(validSettlement);
       expect(result.success).toBe(true);
       if (result.success) {
+        const settlement = mapRawSettlement(result.data);
         expect(result.data.name).toBe('Коттеджный поселок Тестовый');
         expect(result.data.slug).toBe('testovyy');
         expect(result.data.telegram).toBe('test_settlement');
         expect(result.data.is_baseline).toBe(false);
-        expect(result.data.tariff.normalized_per_sotka_month).toBe(3000);
-        expect(result.data.tariff.normalized_is_estimate).toBe(false);
+        expect(settlement.tariff.normalizedPerSotkaMonth).toBe(3000);
+        expect(settlement.tariff.normalizedIsEstimate).toBe(false);
         expect(result.data.water_in_tariff).toBe(true);
         expect(result.data.rabstvo).toBe(true);
       }
@@ -205,8 +208,9 @@ describe('Schema Validation', () => {
       const result = SettlementSchema.safeParse(validSettlement);
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.tariff.normalized_per_sotka_month).toBe(1200);
-        expect(result.data.tariff.normalized_is_estimate).toBe(true);
+        const settlement = mapRawSettlement(result.data);
+        expect(settlement.tariff.normalizedPerSotkaMonth).toBe(1200);
+        expect(settlement.tariff.normalizedIsEstimate).toBe(true);
       }
     });
 
@@ -247,8 +251,9 @@ describe('Schema Validation', () => {
       const result = SettlementSchema.safeParse(validSettlement);
       expect(result.success).toBe(true);
       if (result.success) {
+        const settlement = mapRawSettlement(result.data);
         expect(result.data.lots?.average_sotka).toBe(20.4);
-        expect(result.data.tariff.normalized_per_sotka_month).toBeCloseTo(
+        expect(settlement.tariff.normalizedPerSotkaMonth).toBeCloseTo(
           588.235294,
           6,
         );
@@ -304,14 +309,15 @@ describe('Schema Validation', () => {
       const result = SettlementSchema.safeParse(validSettlement);
       expect(result.success).toBe(true);
       if (result.success) {
+        const settlement = mapRawSettlement(result.data);
         expect(
           getLotAverage(
-            result.data.lots,
-            result.data.infrastructure,
-            result.data.common_spaces,
+            settlement.lots,
+            settlement.infrastructure,
+            settlement.commonSpaces,
           ),
         ).toBeCloseTo(31.56, 2);
-        expect(result.data.tariff.normalized_per_sotka_month).toBeCloseTo(
+        expect(settlement.tariff.normalizedPerSotkaMonth).toBeCloseTo(
           383.43,
           2,
         );
@@ -358,11 +364,9 @@ describe('Schema Validation', () => {
       const result = SettlementSchema.safeParse(validSettlement);
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.tariff.normalized_per_sotka_month).toBeCloseTo(
-          681.3,
-          6,
-        );
-        expect(result.data.tariff.normalized_is_estimate).toBe(true);
+        const settlement = mapRawSettlement(result.data);
+        expect(settlement.tariff.normalizedPerSotkaMonth).toBeCloseTo(681.3, 6);
+        expect(settlement.tariff.normalizedIsEstimate).toBe(true);
         expect(result.data.tariff.note).toBe('тариф взят с сайта');
         expect('parts' in result.data.tariff).toBe(true);
         if ('parts' in result.data.tariff) {

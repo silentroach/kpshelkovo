@@ -8,6 +8,7 @@ import type {
 } from './types';
 
 const SOTKA = 100;
+export const DEFAULT_LOT_SOTKA = 10;
 
 export interface LotPart {
   readonly title: string;

@@ -25,8 +25,6 @@ const rawSettlement: RawSettlement = {
     value: 12000,
     unit: 'rub_per_lot',
     period: 'month',
-    normalized_per_sotka_month: 1200,
-    normalized_is_estimate: true,
     note: 'тариф взят с сайта',
     parts: [
       {
@@ -180,7 +178,7 @@ describe('mapRawSettlement', () => {
         ],
         "tariff": {
           "normalizedIsEstimate": true,
-          "normalizedPerSotkaMonth": 1200,
+          "normalizedPerSotkaMonth": 688.2352941176471,
           "note": "тариф взят с сайта",
           "parts": [
             {

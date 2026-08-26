@@ -26,8 +26,6 @@ const settlement = mapRawSettlement({
     value: 120,
     unit: 'rub_per_sotka',
     period: 'month',
-    normalized_per_sotka_month: 120,
-    normalized_is_estimate: true,
     note: 'Тестовое примечание',
   },
   rabstvo: true,
@@ -75,7 +73,7 @@ describe('toExplorer', () => {
       },
       tariff: {
         normalizedPerSotkaMonth: 120,
-        normalizedIsEstimate: true,
+        normalizedIsEstimate: false,
       },
     });
 

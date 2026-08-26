@@ -32,8 +32,6 @@ function mk(
       value: 100,
       unit: 'rub_per_sotka',
       period: 'month',
-      normalized_per_sotka_month: 100,
-      normalized_is_estimate: false,
     },
     infrastructure: {},
     common_spaces: {},

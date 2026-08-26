@@ -5,7 +5,11 @@ import {
   formatTariff,
   pluralize,
 } from '@shelkovo/format';
-import { getLotBreakdown, getLotAverage } from './settlement/lots';
+import {
+  DEFAULT_LOT_SOTKA,
+  getLotBreakdown,
+  getLotAverage,
+} from './settlement/lots';
 import type {
   CommonSpaces,
   Infrastructure,
@@ -20,7 +24,6 @@ type TariffView = Pick<
 >;
 type TariffLike = Tariff | TariffView;
 
-const LOT = 10;
 const NUMBER_OPTIONS = {
   style: 'decimal',
   minimumFractionDigits: 0,
@@ -224,7 +227,7 @@ export function getTariffCalc(
   infra?: Infrastructure,
   common?: CommonSpaces,
 ): TariffCalc | undefined {
-  const size = getLotAverage(lots, infra, common) ?? LOT;
+  const size = getLotAverage(lots, infra, common) ?? DEFAULT_LOT_SOTKA;
   const list = tariffParts(tariff);
   const multi = list.length > 1;
   const lot = list.some((item) => unit(item.unit) !== 'perSotka');
@@ -253,12 +256,6 @@ export function getTariffCalc(
     return { title, source, formula };
   });
 
-  const total = list.reduce((sum, item) => {
-    const monthly = item.value / months(item.period);
-    if (unit(item.unit) === 'perSotka') return sum + monthly;
-    return sum + monthly / size;
-  }, 0);
-
   return {
     intro: multi
       ? 'Тариф состоит из нескольких частей. Для сравнения каждая часть приведена к ₽/сотка в месяц, затем значения суммированы.'
@@ -269,6 +266,6 @@ export function getTariffCalc(
         }
       : {}),
     rows,
-    total: `${money(total, '/сотка')} в месяц`,
+    total: `${money(tariff.normalizedPerSotkaMonth, '/сотка')} в месяц`,
   };
 }
