@@ -471,6 +471,64 @@ describe('buildReglamentCalculatorChanges', () => {
     expect(reset.hidden).toBe(true);
   });
 
+  it('calculates from readable decimal input in basic and expert fields', () => {
+    const rowId = 'waste-transfer-from-homes';
+    document.body.innerHTML = `
+      <div data-reglament-calculator>
+        <input
+          type="text"
+          data-reglament-field="frequency"
+          data-reglament-row-id="${rowId}"
+          data-reglament-baseline="365"
+          value="365"
+        />
+        <input
+          type="text"
+          data-reglament-field="primary_salary"
+          data-reglament-row-id="${rowId}"
+          data-reglament-baseline="3418555.1"
+          value="${formatReglamentInputNumber(3_418_555.1)}"
+        />
+        <span data-reglament-row-annual="${rowId}"></span>
+      </div>
+    `;
+    const root = document.querySelector('[data-reglament-calculator]');
+    const frequencyInput = document.querySelector(
+      '[data-reglament-field="frequency"]',
+    );
+    const primarySalaryInput = document.querySelector(
+      '[data-reglament-field="primary_salary"]',
+    );
+    const rowAnnual = document.querySelector('[data-reglament-row-annual]');
+
+    if (
+      !(root instanceof HTMLElement) ||
+      !(frequencyInput instanceof HTMLInputElement) ||
+      !(primarySalaryInput instanceof HTMLInputElement) ||
+      !(rowAnnual instanceof HTMLElement)
+    ) {
+      throw new Error('Missing readable input calculator fixture nodes');
+    }
+
+    hydrateReglamentCalculator(root);
+    frequencyInput.value = '182,5';
+    frequencyInput.dispatchEvent(new Event('input', { bubbles: true }));
+    primarySalaryInput.value = '3 000 000,5';
+    primarySalaryInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+    expect({
+      frequencyValidation: frequencyInput.validationMessage,
+      primarySalaryValidation: primarySalaryInput.validationMessage,
+      rowAnnual: rowAnnual.textContent,
+    }).toMatchInlineSnapshot(`
+      {
+        "frequencyValidation": "",
+        "primarySalaryValidation": "",
+        "rowAnnual": "9 762 237,36 ₽/год",
+      }
+    `);
+  });
+
   it('renders changed row contribution in the tariff cell with delta tone', () => {
     const rowId = 'cleaning-winter-mechanized';
     document.body.innerHTML = `
