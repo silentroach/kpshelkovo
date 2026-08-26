@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { load as parseYaml } from 'js-yaml';
+import { fileURLToPath } from 'node:url';
+import { parse as parseYaml } from 'yaml';
 
 import { SettlementSchema } from './schema';
 
-const dir = join(process.cwd(), 'src/data/compare/settlements');
+const dir = fileURLToPath(
+  new URL('../../data/compare/settlements/', import.meta.url),
+);
 
 function list() {
   return readdirSync(dir)
@@ -16,14 +19,14 @@ function list() {
     }));
 }
 
-const parseSlug = (name: string, code: string): string =>
-  SettlementSchema.parse(parseYaml(code, { filename: name })).slug;
+const parseSlug = (code: string): string =>
+  SettlementSchema.parse(parseYaml(code)).slug;
 
 function findDuplicateSlugs(files: ReturnType<typeof list>) {
   const filesBySlug = new Map<string, string[]>();
 
   for (const file of files) {
-    const slug = parseSlug(file.name, file.code);
+    const slug = parseSlug(file.code);
     const names = filesBySlug.get(slug);
 
     if (names) {
@@ -49,7 +52,7 @@ function parseBase(code: string): boolean | undefined {
 
 describe('settlements content collection', () => {
   it('does not include settlement-slug in route data', () => {
-    const slugs = list().map((file) => parseSlug(file.name, file.code));
+    const slugs = list().map((file) => parseSlug(file.code));
 
     expect(slugs).not.toContain('settlement-slug');
   });
