@@ -1,44 +1,47 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import type { ComparisonResult, Settlement, Stats } from './settlement/types';
+import type { CompareData, SettlementData } from './data.types';
+import type { ComparisonResult, Settlement } from './settlement/types';
 import { computeStats } from './stats';
 import { compareSettlements } from './comparisons';
-import { buildRatings, type Rating } from './rating';
+import { buildRatings } from './rating';
 import { mapRawSettlement } from './settlement/mapper';
 import type { RawSettlement } from './settlement/schema';
 
-/**
- * Load all settlements from content collection
- */
-export async function loadSettlements(): Promise<Settlement[]> {
+const requireBaseline = (settlements: readonly Settlement[]): Settlement => {
+  const baselines = settlements.filter((settlement) => settlement.isBaseline);
+  const [baseline] = baselines;
+
+  if (!baseline) {
+    throw new Error(
+      'Settlements collection must contain exactly one baseline settlement; found 0',
+    );
+  }
+
+  if (baselines.length > 1) {
+    const slugs = baselines
+      .map((settlement) => settlement.slug)
+      .sort()
+      .join(', ');
+
+    throw new Error(
+      `Settlements collection must contain exactly one baseline settlement; found ${baselines.length} (${slugs})`,
+    );
+  }
+
+  return baseline;
+};
+
+export async function loadSettlements(): Promise<SettlementData> {
   const settlements = await getCollection('settlements');
-  return settlements.map(
+  const mapped = settlements.map(
     (entry: CollectionEntry<'settlements'>): Settlement =>
       mapRawSettlement(entry.data as RawSettlement),
   );
-}
 
-/**
- * Find the baseline settlement (Shelkovo)
- */
-export function findBaseline(
-  settlements: Settlement[],
-): Settlement | undefined {
-  return settlements.find((s) => s.isBaseline);
-}
-
-/**
- * Load settlements with computed statistics
- */
-export async function loadSettlementsWithStats(): Promise<{
-  settlements: Settlement[];
-  stats: Stats;
-  ratings: Map<string, Rating>;
-}> {
-  const settlements = await loadSettlements();
-  const ratings = buildRatings(settlements);
-  const stats = computeStats(settlements, ratings);
-
-  return { settlements, stats, ratings };
+  return {
+    settlements: mapped,
+    baseline: requireBaseline(mapped),
+  };
 }
 
 /**
@@ -47,13 +50,8 @@ export async function loadSettlementsWithStats(): Promise<{
  */
 export function compareAllSettlements(
   settlements: Settlement[],
+  baseline: Settlement,
 ): Map<string, ComparisonResult> {
-  const baseline = findBaseline(settlements);
-
-  if (!baseline) {
-    throw new Error('Baseline settlement (Shelkovo) not found');
-  }
-
   const comparisons = new Map<string, ComparisonResult>();
 
   for (const settlement of settlements) {
@@ -64,17 +62,11 @@ export function compareAllSettlements(
   return comparisons;
 }
 
-/**
- * Load all data needed for the application
- */
-export async function loadAllData(): Promise<{
-  settlements: Settlement[];
-  stats: Stats;
-  comparisons: Map<string, ComparisonResult>;
-  ratings: Map<string, Rating>;
-}> {
-  const { settlements, stats, ratings } = await loadSettlementsWithStats();
-  const comparisons = compareAllSettlements(settlements);
+export async function loadAllData(): Promise<CompareData> {
+  const { settlements, baseline } = await loadSettlements();
+  const ratings = buildRatings(settlements);
+  const stats = computeStats(settlements, ratings, baseline);
+  const comparisons = compareAllSettlements(settlements, baseline);
 
-  return { settlements, stats, comparisons, ratings };
+  return { settlements, baseline, stats, comparisons, ratings };
 }

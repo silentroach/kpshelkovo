@@ -17,7 +17,7 @@ import {
   compareBreadcrumbSchema,
   settlementBreadcrumbs,
 } from '@/compare/lib/breadcrumbs';
-import { loadAllData, findBaseline } from '@/compare/lib/data';
+import { loadAllData } from '@/compare/lib/data';
 import {
   getLotCalc,
   formatTariffAuto,
@@ -36,15 +36,14 @@ import type { SearchDocument } from '@/lib/search/types';
 
 // Generate static paths for all settlements
 export async function getStaticPaths() {
-  const { settlements, comparisons } = await loadAllData();
-  const shelkovo = findBaseline(settlements);
+  const { settlements, baseline, comparisons } = await loadAllData();
 
   return settlements.map((settlement) => ({
     params: { slug: settlement.slug },
     props: {
       settlement,
       comparison: comparisons.get(settlement.slug),
-      shelkovo,
+      baseline,
     },
   }));
 }
@@ -58,21 +57,21 @@ interface Props {
         isCheaper: boolean;
       }
     | undefined;
-  shelkovo?: Settlement;
+  baseline: Settlement;
 }
 
-const { settlement, comparison, shelkovo } = Astro.props;
+const { settlement, comparison, baseline } = Astro.props;
+const isBaseline = settlement.slug === baseline.slug;
 
 // Calculate distance from Shelkovo
-const distanceFromShelkovo =
-  shelkovo && !settlement.isBaseline
-    ? calculateDistance(
-        shelkovo.location.lat,
-        shelkovo.location.lng,
-        settlement.location.lat,
-        settlement.location.lng,
-      )
-    : 0;
+const distanceFromShelkovo = !isBaseline
+  ? calculateDistance(
+      baseline.location.lat,
+      baseline.location.lng,
+      settlement.location.lat,
+      settlement.location.lng,
+    )
+  : 0;
 
 const hasPoint =
   Number.isFinite(settlement.location.lat) &&
@@ -84,11 +83,10 @@ const tg = settlement.telegram ? telegram(settlement.telegram) : undefined;
 const waterInc = settlement.waterInTariff === true;
 const obman = settlement.rabstvo === true;
 const obmanUrl = telegram('obmandachniki');
-const hasLabels = waterInc || obman || settlement.isBaseline;
+const hasLabels = waterInc || obman || isBaseline;
 const waterTitle =
   'Центральная вода уже включена в тариф и доступна без отдельной доплаты.';
-const hasDelta =
-  !settlement.isBaseline && !!comparison && comparison.tariffDelta !== 0;
+const hasDelta = !isBaseline && !!comparison && comparison.tariffDelta !== 0;
 const pageUrl = canon(`/settlements/${settlement.slug}/`);
 const pageMeta = settlementPageMeta(settlement, comparison);
 const searchDescription = settlementSearchDescription(settlement, comparison);
@@ -101,7 +99,7 @@ const search = {
 const delta =
   hasDelta && comparison
     ? `${comparison.isCheaper ? 'Дешевле' : 'Дороже'} Шелково на ${formatCurrency(Math.abs(comparison.tariffDelta))}.`
-    : settlement.isBaseline
+    : isBaseline
       ? 'Базовый поселок для сравнения.'
       : comparison
         ? 'Тариф как в Шелково.'
@@ -157,7 +155,7 @@ const heroMap = hasPoint
         lat: settlement.location.lat,
         lng: settlement.location.lng,
         normalizedTariff: settlement.tariff.normalizedPerSotkaMonth,
-        isBaseline: settlement.isBaseline,
+        isBaseline,
       },
     ]
   : [];
@@ -235,7 +233,7 @@ const heroMap = hasPoint
               )
             }
             {
-              settlement.isBaseline && (
+              isBaseline && (
                 <span class="ui-badge ui-badge-info">Наш посёлок</span>
               )
             }
@@ -571,7 +569,7 @@ const heroMap = hasPoint
                 Коттеджное рабство
               </a>
             )}
-            {settlement.isBaseline && (
+            {isBaseline && (
               <span class="ui-badge ui-badge-info">Наш посёлок</span>
             )}
           </div>
@@ -712,9 +710,7 @@ const heroMap = hasPoint
       <InfrastructureTable
         title="Инфраструктура"
         infra={settlement.infrastructure}
-        shelkovoInfra={!settlement.isBaseline
-          ? shelkovo?.infrastructure
-          : undefined}
+        shelkovoInfra={!isBaseline ? baseline.infrastructure : undefined}
         client:idle
       />
     </section>
@@ -726,9 +722,7 @@ const heroMap = hasPoint
       <CommonSpacesTable
         title="Общие пространства"
         spaces={settlement.commonSpaces}
-        shelkovoSpaces={!settlement.isBaseline
-          ? shelkovo?.commonSpaces
-          : undefined}
+        shelkovoSpaces={!isBaseline ? baseline.commonSpaces : undefined}
         client:idle
       />
     </section>
@@ -740,9 +734,7 @@ const heroMap = hasPoint
       <ServiceTable
         title="Модель обслуживания"
         services={settlement.serviceModel}
-        shelkovoServices={!settlement.isBaseline
-          ? shelkovo?.serviceModel
-          : undefined}
+        shelkovoServices={!isBaseline ? baseline.serviceModel : undefined}
         client:idle
       />
     </section>

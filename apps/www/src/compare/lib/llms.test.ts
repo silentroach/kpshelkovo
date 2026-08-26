@@ -1,18 +1,23 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 vi.mock('./data', () => ({
-  loadAllData: async () => ({
-    ratings: new Map([
-      ['greenwood', { score: 71 }],
-      ['white-park', { score: 84 }],
-    ]),
-    settlements: [
+  loadAllData: async () => {
+    const settlements = [
       { isBaseline: true, shortName: 'Шелково', slug: 'shelkovo' },
       { isBaseline: false, shortName: 'Гринвуд', slug: 'greenwood' },
       { isBaseline: false, shortName: 'Белый парк', slug: 'white-park' },
-    ],
-    stats: { totalSettlements: 3 },
-  }),
+    ];
+
+    return {
+      ratings: new Map([
+        ['greenwood', { score: 71 }],
+        ['white-park', { score: 84 }],
+      ]),
+      settlements,
+      baseline: settlements[0],
+      stats: { totalSettlements: 3 },
+    };
+  },
 }));
 
 let build: typeof import('./llms').build;

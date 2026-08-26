@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { loadSettlements } from './data';
 import type { RawSettlement } from './settlement/schema';
@@ -41,13 +41,19 @@ const rawSettlement: RawSettlement = {
   ],
 };
 
+let rawSettlements = [rawSettlement];
+
 vi.mock('astro:content', () => ({
-  getCollection: vi.fn(async () => [{ data: rawSettlement }]),
+  getCollection: vi.fn(async () => rawSettlements.map((data) => ({ data }))),
 }));
 
 describe('loadSettlements', () => {
+  beforeEach(() => {
+    rawSettlements = [rawSettlement];
+  });
+
   it('maps raw collection entries into domain settlements', async () => {
-    const settlements = await loadSettlements();
+    const { settlements, baseline } = await loadSettlements();
 
     expect(settlements).toHaveLength(1);
     expect(settlements[0]).toMatchObject({
@@ -74,5 +80,31 @@ describe('loadSettlements', () => {
     });
     expect('short_name' in settlements[0]).toBe(false);
     expect('common_spaces' in settlements[0]).toBe(false);
+    expect(baseline).toBe(settlements[0]);
+  });
+
+  it('rejects a collection without a baseline settlement', async () => {
+    rawSettlements = [{ ...rawSettlement, is_baseline: false }];
+
+    await expect(loadSettlements()).rejects.toThrowErrorMatchingInlineSnapshot(
+      `[Error: Settlements collection must contain exactly one baseline settlement; found 0]`,
+    );
+  });
+
+  it('rejects multiple baseline settlements without depending on input order', async () => {
+    rawSettlements = [
+      rawSettlement,
+      {
+        ...rawSettlement,
+        name: 'Другая база',
+        short_name: 'Другая',
+        slug: 'duplicate-baseline',
+        website: 'https://example.com/duplicate',
+      },
+    ];
+
+    await expect(loadSettlements()).rejects.toThrowErrorMatchingInlineSnapshot(
+      `[Error: Settlements collection must contain exactly one baseline settlement; found 2 (duplicate-baseline, test)]`,
+    );
   });
 });

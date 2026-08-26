@@ -67,6 +67,7 @@ export interface FullPayload {
 
 export interface FullPayloadInput {
   readonly settlements: Settlement[];
+  readonly baseline: Settlement;
   readonly stats: PublicStats;
   readonly comparisons: ReadonlyMap<string, PublicComparison>;
   readonly ratings: Map<string, Rating>;
@@ -99,16 +100,12 @@ const video = (
 export function toFull(
   settlements: Settlement[],
   ratings: Map<string, Rating>,
+  baseline: Settlement,
 ): FullSettlement[] {
-  const base = settlements.find((item) => item.isBaseline);
-
-  if (!base) {
-    throw new Error('Baseline settlement (Shelkovo) not found');
-  }
-
   return settlements.map((item) => {
     const company = item.managementCompany;
     const rating = ratings.get(item.slug);
+    const isBaseline = item.slug === baseline.slug;
 
     return {
       name: item.name,
@@ -124,7 +121,7 @@ export function toFull(
             }
           : company.title
         : undefined,
-      is_baseline: item.isBaseline,
+      is_baseline: isBaseline,
       location: {
         address_text: item.location.addressText,
         lat: item.location.lat,
@@ -202,12 +199,12 @@ export function toFull(
           rating?.km ?? round(getKm(item.location.lat, item.location.lng)),
         mkad_km:
           rating?.ring ?? round(getRing(item.location.lat, item.location.lng)),
-        shelkovo_km: item.isBaseline
+        shelkovo_km: isBaseline
           ? 0
           : round(
               calculateDistance(
-                base.location.lat,
-                base.location.lng,
+                baseline.location.lat,
+                baseline.location.lng,
                 item.location.lat,
                 item.location.lng,
               ),
@@ -219,11 +216,12 @@ export function toFull(
 
 export const toFullPayload = ({
   settlements,
+  baseline,
   stats,
   comparisons,
   ratings,
 }: FullPayloadInput): FullPayload => ({
-  settlements: toFull(settlements, ratings),
+  settlements: toFull(settlements, ratings, baseline),
   stats: toPublicStats(stats),
   comparisons: toPublicComparisons(comparisons),
 });

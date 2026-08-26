@@ -1,21 +1,20 @@
 import type { APIRoute } from 'astro';
 
-import { findBaseline, loadAllData } from '@/compare/lib/data';
+import { loadAllData } from '@/compare/lib/data';
 import { buildSettlementMd } from '@/compare/lib/markdown';
 import type { Settlement } from '@/compare/lib/settlement/types';
 
 export const prerender = true;
 
 export async function getStaticPaths() {
-  const { settlements, comparisons, ratings } = await loadAllData();
-  const shelkovo = findBaseline(settlements);
+  const { settlements, baseline, comparisons, ratings } = await loadAllData();
 
   return settlements.map((settlement) => ({
     params: { slug: settlement.slug },
     props: {
       settlement,
       comparison: comparisons.get(settlement.slug),
-      shelkovo,
+      baseline,
       rating: ratings.get(settlement.slug),
     },
   }));
@@ -28,7 +27,7 @@ interface Props {
     tariffDeltaPercent: number;
     isCheaper: boolean;
   };
-  shelkovo?: Settlement;
+  baseline: Settlement;
   rating?: {
     score: number;
     km: number;

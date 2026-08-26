@@ -99,7 +99,7 @@ const ratings = new Map<string, Rating>([
 
 describe('toFull', () => {
   it('keeps full data, adds distance, and omits sources', () => {
-    const list = toFull([base, row], ratings);
+    const list = toFull([base, row], ratings, base);
     const home = list.find((item) => item.slug === 'shelkovo');
     const item = list.find((item) => item.slug === 'test');
 
@@ -132,6 +132,7 @@ describe('toFull', () => {
   it('builds the full public payload through explicit DTO adapters', () => {
     const payload = toFullPayload({
       settlements: [base, row],
+      baseline: base,
       ratings,
       stats: {
         shelkovoTariff: 100,

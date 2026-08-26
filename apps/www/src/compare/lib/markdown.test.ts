@@ -7,8 +7,8 @@ import type { RawSettlement } from './settlement/schema';
 const toDomain = (item: RawSettlement) => mapRawSettlement(item);
 
 vi.mock('./data', () => ({
-  loadAllData: async () => ({
-    settlements: [
+  loadAllData: async () => {
+    const settlements = [
       {
         name: 'КП Шелково',
         short_name: 'Шелково',
@@ -67,17 +67,22 @@ vi.mock('./data', () => ({
           },
         ],
       },
-    ].map((item) => toDomain(item as RawSettlement)),
-    stats: {
-      totalSettlements: 2,
-      cheaperCount: 1,
-      moreExpensiveCount: 0,
-    },
-    ratings: new Map([
-      ['shelkovo', { score: 81.2 }],
-      ['test', { score: 74.3 }],
-    ]),
-  }),
+    ].map((item) => toDomain(item as RawSettlement));
+
+    return {
+      settlements,
+      baseline: settlements[0],
+      stats: {
+        totalSettlements: 2,
+        cheaperCount: 1,
+        moreExpensiveCount: 0,
+      },
+      ratings: new Map([
+        ['shelkovo', { score: 81.2 }],
+        ['test', { score: 74.3 }],
+      ]),
+    };
+  },
 }));
 
 vi.mock('./site', () => ({
@@ -254,7 +259,7 @@ describe('compare markdown navigation', () => {
             tariffDeltaPercent: -10,
             isCheaper: true,
           },
-          shelkovo: {
+          baseline: {
             ...settlement,
             name: 'КП Шелково',
             shortName: 'Шелково',
