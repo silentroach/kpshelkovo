@@ -10,8 +10,13 @@ import { absoluteUrl } from '@/lib/site';
 import { kbDetailMarkdownUrl, kbMarkdownUrl } from './routes';
 import type { KbPage, KbPageFlag } from './types';
 
-const KB_HTML_LINK_DESTINATION =
-  /(\]\()(\/kb(?:\/[a-z0-9][a-z0-9/-]*)?\/?)(\))/gu;
+interface MarkdownNode {
+  readonly type: string;
+  readonly children?: readonly MarkdownNode[];
+  url?: string;
+}
+
+const KB_HTML_LINK_PATH = /^\/kb(?:\/[a-z0-9][a-z0-9/-]*)?\/?(?=[?#]|$)/u;
 
 const kbMarkdownHref = (path: string): string => {
   const routeSlug = path.slice('/kb'.length).replace(/^\/+|\/+$/gu, '');
@@ -21,12 +26,31 @@ const kbMarkdownHref = (path: string): string => {
   );
 };
 
-const rewriteKbLinksToMarkdown = (markdown: string): string =>
-  markdown.replace(
-    KB_HTML_LINK_DESTINATION,
-    (_match, prefix: string, path: string, suffix: string) =>
-      `${prefix}${kbMarkdownHref(path)}${suffix}`,
-  );
+const rewriteKbLinkUrl = (url: string): string => {
+  const path = KB_HTML_LINK_PATH.exec(url)?.[0];
+
+  return path ? `${kbMarkdownHref(path)}${url.slice(path.length)}` : url;
+};
+
+const rewriteKbLinkNode = (node: MarkdownNode): void => {
+  if (node.type === 'link' && node.url) {
+    node.url = rewriteKbLinkUrl(node.url);
+  }
+
+  for (const child of node.children ?? []) {
+    rewriteKbLinkNode(child);
+  }
+};
+
+const kbMarkdownBody = (markdown: string) => {
+  const nodes = parseMarkdownFragment(markdown);
+
+  for (const node of nodes) {
+    rewriteKbLinkNode(node);
+  }
+
+  return nodes;
+};
 
 const kbFrontmatter = (
   page: KbPage,
@@ -48,7 +72,7 @@ export const buildKbPageMarkdown = (page: KbPage): string =>
       frontmatter: kbFrontmatter(page),
       children: [
         md.heading(1, page.title),
-        ...parseMarkdownFragment(rewriteKbLinksToMarkdown(page.body.trim())),
+        ...kbMarkdownBody(page.body.trim()),
       ],
     }),
   );
