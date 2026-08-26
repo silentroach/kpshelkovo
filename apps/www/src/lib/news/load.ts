@@ -67,10 +67,13 @@ type NewsTimestampWithTime = NonNullable<
 
 let cache: Promise<NewsDataset> | undefined;
 
-const isPinnedAtBuild = (input: {
-  readonly pinned?: boolean;
-  readonly pinned_until?: string;
-}): boolean => {
+const isPinnedAtBuild = (
+  input: {
+    readonly pinned?: boolean;
+    readonly pinned_until?: string;
+  },
+  now: Date,
+): boolean => {
   if (!input.pinned) {
     return false;
   }
@@ -79,7 +82,7 @@ const isPinnedAtBuild = (input: {
     ? parseNewsTimestampInput(input.pinned_until)
     : undefined;
 
-  return until ? Date.now() < until.at.valueOf() : true;
+  return until ? now.valueOf() < until.at.valueOf() : true;
 };
 
 function parseEntryTimestamp(
@@ -322,6 +325,7 @@ function normalizeArticle(
   entry: ArticleEntry,
   authors: ReadonlyMap<string, NewsAuthor>,
   mentionRegistry: SiteMentionRegistry,
+  now: Date,
 ): NewsArticle {
   const parts = articleParts(entry);
   const published = parseEntryTimestamp(
@@ -369,7 +373,7 @@ function normalizeArticle(
     areas: area.areas,
     tags: buildArticleTags(entry.data.tags),
     searchAliases: entry.data.search_aliases,
-    pinned: isPinnedAtBuild(entry.data),
+    pinned: isPinnedAtBuild(entry.data, now),
     sourceUrl: entry.data.source_url,
     cover: articleCover,
     photos: mappedPhotos.map((item) => item.photo),
@@ -493,15 +497,17 @@ export function buildNewsDataset(
   articlesData: readonly NewsArticleEntry[],
   archiveSummariesData: readonly NewsArchiveSummaryEntry[],
   opts?: {
+    readonly now?: Date;
     readonly mentionRegistry?: SiteMentionRegistry;
   },
 ): NewsDataset {
+  const now = opts?.now ?? new Date();
   const mentionRegistry = opts?.mentionRegistry ?? new Map();
   const authors = authorMap(authorsData);
 
   const articles: readonly NewsArticle[] = articlesData
     .map((item: ArticleEntry) =>
-      normalizeArticle(item, authors, mentionRegistry),
+      normalizeArticle(item, authors, mentionRegistry, now),
     )
     .sort(compareArticlesPublishedDesc);
 
