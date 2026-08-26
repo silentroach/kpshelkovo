@@ -24,10 +24,9 @@ function refs(
 }
 
 export async function build(kind: 'short' | 'full'): Promise<string> {
-  const { settlements, stats, ratings } = await loadAllData();
-  const base = settlements.find((item) => item.isBaseline);
+  const { settlements, baseline, stats, ratings } = await loadAllData();
   const top = settlements
-    .filter((item) => !item.isBaseline)
+    .filter((item) => item.slug !== baseline.slug)
     .sort((a, b) => {
       const d =
         (ratings.get(b.slug)?.score ?? 0) - (ratings.get(a.slug)?.score ?? 0);
@@ -35,7 +34,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
       return compareRuText(a.shortName, b.shortName);
     })
     .slice(0, 2);
-  const list = [...(base ? [base] : []), ...top];
+  const list = [baseline, ...top];
   const home = abs('/');
   const rating = abs('/rating/');
   const feed = abs('/data/settlements.json');

@@ -125,14 +125,10 @@ function peers(
 export function computeStats(
   settlements: Settlement[],
   ratings: Map<string, Rating>,
+  baseline: Settlement,
 ): Stats {
   if (settlements.length === 0) {
     throw new Error('No settlements provided');
-  }
-
-  const baseline = settlements.find((s) => s.isBaseline);
-  if (!baseline) {
-    throw new Error('Baseline settlement (Shelkovo) not found');
   }
 
   const tariffs = settlements.map((s) => s.tariff.normalizedPerSotkaMonth);

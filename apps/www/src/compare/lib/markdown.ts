@@ -208,8 +208,8 @@ function serviceRows(item: Settlement): readonly MarkdownListItem[] {
   ].filter((item): item is MarkdownListItem => Boolean(item));
 }
 
-function delta(item: Settlement, cmp?: ComparisonResult): string {
-  if (item.isBaseline) {
+function delta(isBaseline: boolean, cmp?: ComparisonResult): string {
+  if (isBaseline) {
     return 'Базовый поселок для сравнения.';
   }
 
@@ -269,15 +269,8 @@ const settlementLine = (item: {
   ]);
 
 function baselineRow(
-  base:
-    | {
-        readonly name: string;
-        readonly slug: string;
-      }
-    | undefined,
+  base: Pick<Settlement, 'name' | 'slug'>,
 ): MarkdownListItem {
-  if (!base) return md.listItem('Базовый поселок: не найден');
-
   const url = abs(`/settlements/${base.slug}/`);
   return md.listItem([
     md.paragraph([
@@ -292,7 +285,7 @@ const codeListItem = (value: string): MarkdownListItem =>
   md.listItem(parseMarkdownFragment(value) as MarkdownListItemInput);
 
 export async function buildHomeMd(): Promise<string> {
-  const { settlements, stats, ratings } = await loadAllData();
+  const { settlements, baseline, stats, ratings } = await loadAllData();
   const list = settlements
     .map((item) => ({
       name: item.name,
@@ -301,17 +294,15 @@ export async function buildHomeMd(): Promise<string> {
       tariff: item.tariff,
       rating: ratings.get(item.slug)?.score ?? 0,
       location: { district: item.location.district },
-      isBaseline: item.isBaseline,
     }))
     .sort((a, b) => {
       const d = b.rating - a.rating;
       if (d !== 0) return d;
       return compareRuText(a.shortName, b.shortName);
     });
-  const base = list.find((item) => item.isBaseline);
   const picks = [
-    ...(base ? [base] : []),
-    ...list.filter((item) => !item.isBaseline).slice(0, 5),
+    ...list.filter((item) => item.slug === baseline.slug),
+    ...list.filter((item) => item.slug !== baseline.slug).slice(0, 5),
   ];
 
   return serialize([
@@ -323,7 +314,7 @@ export async function buildHomeMd(): Promise<string> {
     md.heading(2, 'Что здесь сравнивается'),
     md.list([
       md.listItem(`Поселков в базе: ${stats.totalSettlements}`),
-      baselineRow(base),
+      baselineRow(baseline),
       md.listItem(`Поселков дешевле Шелково: ${stats.cheaperCount}`),
       md.listItem(`Поселков дороже Шелково: ${stats.moreExpensiveCount}`),
     ]),
@@ -426,30 +417,30 @@ export async function buildRatingMd(): Promise<string> {
 interface Page {
   settlement: Settlement;
   comparison?: ComparisonResult;
-  shelkovo?: Settlement;
+  baseline: Settlement;
   rating?: Rating;
 }
 
 export function buildSettlementMd({
   settlement,
   comparison,
-  shelkovo,
+  baseline,
   rating,
 }: Page): string {
   const html = abs(`/settlements/${settlement.slug}/`);
   const markdownUrl = abs(`/settlements/${settlement.slug}/index.md`);
   const tg = settlement.telegram ? telegram(settlement.telegram) : undefined;
-  const dist =
-    shelkovo && !settlement.isBaseline
-      ? formatDistance(
-          calculateDistance(
-            shelkovo.location.lat,
-            shelkovo.location.lng,
-            settlement.location.lat,
-            settlement.location.lng,
-          ),
-        )
-      : undefined;
+  const isBaseline = settlement.slug === baseline.slug;
+  const dist = !isBaseline
+    ? formatDistance(
+        calculateDistance(
+          baseline.location.lat,
+          baseline.location.lng,
+          settlement.location.lat,
+          settlement.location.lng,
+        ),
+      )
+    : undefined;
   const company = settlement.managementCompany;
   const companyLine: MarkdownPhrasingInput | undefined =
     company && company.url
@@ -493,8 +484,8 @@ export function buildSettlementMd({
             ]
           : []),
         ...(dist ? [md.listItem(`Расстояние от Шелково: ${dist}`)] : []),
-        md.listItem(`Сравнение с Шелково: ${delta(settlement, comparison)}`),
-        ...(settlement.isBaseline ? [md.listItem('Базовый поселок: да')] : []),
+        md.listItem(`Сравнение с Шелково: ${delta(isBaseline, comparison)}`),
+        ...(isBaseline ? [md.listItem('Базовый поселок: да')] : []),
         ...(settlement.waterInTariff
           ? [md.listItem('Вода уже включена в тариф: да')]
           : []),

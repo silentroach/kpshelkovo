@@ -40,6 +40,7 @@ export interface ExplorerPayload {
 
 export interface ExplorerPayloadInput {
   readonly settlements: Settlement[];
+  readonly baseline: Settlement;
   readonly stats: PublicStats;
   readonly comparisons: ReadonlyMap<string, PublicComparison>;
   readonly ratings: Map<string, Rating>;
@@ -48,6 +49,7 @@ export interface ExplorerPayloadInput {
 export function toExplorer(
   settlements: Settlement[],
   ratings: Map<string, Rating>,
+  baseline: Settlement,
 ): ExplorerSettlement[] {
   return settlements.map((item) => {
     const company = item.managementCompany;
@@ -65,7 +67,7 @@ export function toExplorer(
               : company.title,
           }
         : {}),
-      isBaseline: item.isBaseline,
+      isBaseline: item.slug === baseline.slug,
       location: {
         lat: item.location.lat,
         lng: item.location.lng,
@@ -81,11 +83,12 @@ export function toExplorer(
 
 export const toExplorerPayload = ({
   settlements,
+  baseline,
   stats,
   comparisons,
   ratings,
 }: ExplorerPayloadInput): ExplorerPayload => ({
-  settlements: toExplorer(settlements, ratings),
+  settlements: toExplorer(settlements, ratings, baseline),
   stats: toPublicStats(stats),
   comparisons: toPublicComparisons(comparisons),
 });

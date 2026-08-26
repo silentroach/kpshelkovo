@@ -43,6 +43,14 @@ const settlement = mapRawSettlement({
   ],
 } satisfies RawSettlement);
 
+const baseline = {
+  ...settlement,
+  name: 'КП Шелково',
+  shortName: 'Шелково',
+  slug: 'shelkovo',
+  isBaseline: true,
+};
+
 const ratings = new Map<string, Rating>([
   [
     'test',
@@ -56,7 +64,7 @@ const ratings = new Map<string, Rating>([
 
 describe('toExplorer', () => {
   it('keeps only fields needed by the main explorer', () => {
-    const [item] = toExplorer([settlement], ratings);
+    const [item] = toExplorer([settlement], ratings, baseline);
 
     expect(item).toEqual({
       name: 'КП Тестовый',
@@ -94,6 +102,7 @@ describe('toExplorer', () => {
   it('builds the explorer public payload through explicit DTO adapters', () => {
     const payload = toExplorerPayload({
       settlements: [settlement],
+      baseline,
       ratings,
       stats: {
         shelkovoTariff: 100,

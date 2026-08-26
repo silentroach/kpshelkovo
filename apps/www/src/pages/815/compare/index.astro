@@ -17,10 +17,11 @@ import { rankSettlements } from '@/compare/lib/stats';
 import { withBase } from '@/compare/lib/url';
 
 // Load all data at build time
-const { settlements, stats, comparisons, ratings } = await loadAllData();
+const { settlements, baseline, stats, comparisons, ratings } =
+  await loadAllData();
 const ranks = rankSettlements(settlements);
 const levels = Math.max(new Set(ranks.values()).size, 1);
-const list = toExplorer(settlements, ratings);
+const list = toExplorer(settlements, ratings, baseline);
 
 // Convert comparisons Map to a plain object for serialization
 const comparisonsObj = Object.fromEntries(comparisons);

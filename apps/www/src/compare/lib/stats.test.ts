@@ -388,7 +388,7 @@ describe('Stats Module', () => {
     ]);
 
     it('should compute correct stats for settlements', () => {
-      const stats = computeStats(mockSettlements, ratings);
+      const stats = computeStats(mockSettlements, ratings, mockSettlements[0]);
 
       expect(stats.shelkovoTariff).toBe(4500);
       expect(stats.medianTariff).toBe(4500); // Среднее значение из [3500, 4500, 5500].
@@ -422,23 +422,13 @@ describe('Stats Module', () => {
         ring: 0,
       });
 
-      const stats = computeStats(tied, tiedRatings);
+      const stats = computeStats(tied, tiedRatings, mockSettlements[0]);
 
       expect(stats.shelkovoRank).toBe(2);
     });
 
-    it('should throw error when no baseline settlement found', () => {
-      const noBaselineSettlements = mockSettlements.map((s) => ({
-        ...s,
-        isBaseline: false,
-      }));
-      expect(() => computeStats(noBaselineSettlements, ratings)).toThrow(
-        'Baseline settlement (Shelkovo) not found',
-      );
-    });
-
     it('should throw error when settlements array is empty', () => {
-      expect(() => computeStats([], ratings)).toThrow(
+      expect(() => computeStats([], ratings, mockSettlements[0])).toThrow(
         'No settlements provided',
       );
     });
@@ -489,7 +479,7 @@ describe('Stats Module', () => {
         ['row-9', { score: 78, km: 0, ring: 0 }],
       ]);
 
-      const stats = computeStats(settlements, ratings);
+      const stats = computeStats(settlements, ratings, mockSettlements[0]);
 
       expect(stats.peerMedianTariff).toBe(3200);
       expect(stats.shelkovoVsPeerMedianPercent).toBe(41);
