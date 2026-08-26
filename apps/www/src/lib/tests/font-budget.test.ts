@@ -4,10 +4,14 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-const appSrcRoot = fileURLToPath(new URL('../', import.meta.url));
-const workspaceRoot = fileURLToPath(new URL('../../../../', import.meta.url));
+const appSrcRoot = fileURLToPath(new URL('../../', import.meta.url));
+const appTestsRoot = fileURLToPath(new URL('../../../tests/', import.meta.url));
+const workspaceRoot = fileURLToPath(
+  new URL('../../../../../', import.meta.url),
+);
 const uiRoot = join(workspaceRoot, 'packages/ui');
 const sourceExtensions = new Set(['.astro', '.css', '.svelte']);
+const ignoredSourceDirectories = new Set(['.astro', 'dist', 'node_modules']);
 const allowedCssWeights = new Set(['400', '600', '700', 'inherit']);
 const disallowedWeightClassPattern =
   /\bfont-(?:thin|extralight|light|medium|bold|extrabold|black)\b/gu;
@@ -18,7 +22,11 @@ const collectSourceFiles = (directory: string): readonly string[] =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const entryPath = join(directory, entry.name);
 
-    if (entry.isDirectory()) return collectSourceFiles(entryPath);
+    if (entry.isDirectory()) {
+      return ignoredSourceDirectories.has(entry.name)
+        ? []
+        : collectSourceFiles(entryPath);
+    }
 
     return sourceExtensions.has(extname(entry.name)) ? [entryPath] : [];
   });
@@ -69,6 +77,7 @@ describe('font budget', () => {
     const preloadsPath = join(uiRoot, 'src/FontPreloads.astro');
     const sourceFiles = [
       ...collectSourceFiles(appSrcRoot),
+      ...collectSourceFiles(appTestsRoot),
       ...collectSourceFiles(join(uiRoot, 'src')),
       stylesPath,
       standaloneStylesPath,
