@@ -5,10 +5,10 @@ import {
   getStatusTimelineRange,
   type StatusTimelineSpan,
 } from './timeline';
+import { resolveStatusIncidentState } from './lifecycle';
 import {
   buildStatusTimelineTooltipListItemData,
   formatStatusTimelineTooltipGroupLabel,
-  getStatusIncidentPhase,
   type StatusTimelineTooltipListItemData,
 } from './view';
 import { STATUS_SERVICES, type StatusArea, type StatusService } from './schema';
@@ -22,8 +22,6 @@ interface StatusTimelineProblemNode {
   readonly element: HTMLElement;
   readonly kind?: 'incident' | 'maintenance';
   readonly service?: StatusService;
-  readonly startIso: string;
-  readonly endIso?: string;
   readonly startMs: number;
   readonly endMs?: number;
   readonly geometryStartMs?: number;
@@ -183,7 +181,9 @@ const isTimelineTooltipSerializedItem = (
   return (
     (candidate.kind === 'incident' || candidate.kind === 'maintenance') &&
     typeof candidate.title === 'string' &&
-    typeof candidate.isActive === 'boolean' &&
+    (candidate.phase === 'active' ||
+      candidate.phase === 'resolved' ||
+      candidate.phase === 'scheduled') &&
     typeof candidate.startedIso === 'string' &&
     Number.isFinite(Date.parse(candidate.startedIso)) &&
     typeof candidate.startedHasTime === 'boolean' &&
@@ -398,52 +398,43 @@ const syncStatusTimelineProblemPhase = (
     return;
   }
 
-  if (problemNode.startMs > nowMs) {
-    problemNode.element.dataset.tooltipPhaseLabel =
-      problemNode.kind === 'maintenance' ? 'запланировано' : 'ожидается';
-    delete problemNode.element.dataset.tooltipPhaseIcon;
-    setStatusTimelineProblemAriaLabel(problemNode.element);
-    return;
+  const tooltipItems = parseStatusTimelineTooltipItems(
+    problemNode.element.dataset.tooltipItems,
+  );
+  if (tooltipItems) {
+    problemNode.element.dataset.tooltipItems = JSON.stringify(
+      tooltipItems.map((item) => ({
+        ...item,
+        phase: resolveStatusIncidentState(
+          {
+            kind: item.kind,
+            service: problemNode.service,
+            startedAt: Date.parse(item.startedIso),
+            endedAt: item.endedIso ? Date.parse(item.endedIso) : undefined,
+          },
+          nowMs,
+        ).phase,
+      })),
+    );
   }
 
-  if (problemNode.endMs === undefined || problemNode.endMs > nowMs) {
-    problemNode.element.dataset.tooltipPhaseLabel = 'идет';
-
-    if (problemNode.kind === 'incident') {
-      problemNode.element.dataset.tooltipPhaseIcon = 'alert';
-    } else {
-      delete problemNode.element.dataset.tooltipPhaseIcon;
-    }
-
-    setStatusTimelineProblemAriaLabel(problemNode.element);
-    return;
-  }
-
-  if (!problemNode.endIso) {
-    return;
-  }
-
-  problemNode.element.dataset.tooltipPhaseLabel = getStatusIncidentPhase(
+  const state = resolveStatusIncidentState(
     {
       kind: problemNode.kind,
-      isActive: false,
-      started: {
-        iso: problemNode.startIso,
-        hasTime: true,
-      },
-      ended: {
-        iso: problemNode.endIso,
-        hasTime: true,
-      },
       service: problemNode.service,
+      startedAt: problemNode.startMs,
+      endedAt: problemNode.endMs,
     },
-    { nowMs },
-  ).label;
+    nowMs,
+  );
 
-  if (problemNode.kind === 'incident') {
-    problemNode.element.dataset.tooltipPhaseIcon = 'check';
-  } else {
+  problemNode.element.dataset.tooltipPhaseLabel = state.label;
+
+  if (problemNode.kind !== 'incident' || state.phase === 'scheduled') {
     delete problemNode.element.dataset.tooltipPhaseIcon;
+  } else {
+    problemNode.element.dataset.tooltipPhaseIcon =
+      state.phase === 'active' ? 'alert' : 'check';
   }
 
   setStatusTimelineProblemAriaLabel(problemNode.element);
@@ -605,7 +596,6 @@ const parseStatusTimelineProblemNode = (
           ? element.dataset.statusKind
           : undefined,
       service: isStatusTimelineService(service) ? service : undefined,
-      startIso,
       startMs,
       geometryStartMs: Number.isFinite(geometryStartMs)
         ? geometryStartMs
@@ -628,8 +618,6 @@ const parseStatusTimelineProblemNode = (
         ? element.dataset.statusKind
         : undefined,
     service: isStatusTimelineService(service) ? service : undefined,
-    startIso,
-    endIso: rawEnd,
     startMs,
     endMs,
     geometryStartMs: Number.isFinite(geometryStartMs)

@@ -1,5 +1,6 @@
 import { installHomeStatusHydration } from '@/lib/home/status';
 import { highlightSearchTerms } from '@/lib/search/highlight';
+import { installStatusServiceStateHydration } from '@/lib/status/lifecycle.dom';
 
 interface AstroBeforePreparationEvent extends Event {
   loader: () => Promise<void>;
@@ -521,6 +522,7 @@ bindSiteHeaderMenu();
 bindSearchDialogLoader();
 installSiteNavDropdowns();
 runWhenDocumentReady(() => installHomeStatusHydration());
+runWhenDocumentReady(() => installStatusServiceStateHydration());
 bindMetrikaLoader();
 bindMetrikaTransitions();
 bindSettlementsFallback();

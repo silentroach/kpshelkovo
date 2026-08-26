@@ -240,13 +240,15 @@ describe('buildStatusDataset', () => {
       },
     );
 
-    expect(data.byId.get('2026/05/electricity-active-incident')?.isActive).toBe(
-      true,
+    expect(data.byId.get('2026/05/electricity-active-incident')?.phase).toBe(
+      'active',
     );
-    expect(data.byId.get('2026/05/water-active-maintenance')?.isActive).toBe(
-      true,
+    expect(data.byId.get('2026/05/water-active-maintenance')?.phase).toBe(
+      'active',
     );
-    expect(data.byId.get('2026/05/dam-closed-incident')?.isActive).toBe(false);
+    expect(data.byId.get('2026/05/dam-closed-incident')?.phase).toBe(
+      'resolved',
+    );
   });
 
   it('does not mark future events as active before they start', () => {

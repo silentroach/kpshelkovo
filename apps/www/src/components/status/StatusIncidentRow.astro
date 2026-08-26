@@ -17,7 +17,7 @@ const excerptHtml = incident.excerpt
 const titleIcon =
   incident.kind !== 'incident'
     ? undefined
-    : incident.isActive
+    : incident.phase === 'active'
       ? {
           Icon: AlertCircleIcon,
           toneClass: 'text-[color:var(--color-danger)]',

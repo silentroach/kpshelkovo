@@ -1,9 +1,7 @@
 import type { StatusIncident } from '@/lib/status/types';
+import { resolveStatusServiceState } from '@/lib/status/lifecycle';
 
-import type {
-  HomeStatusMaintenanceWindow,
-  HomeStatusState,
-} from './status.types';
+import type { HomeStatusState, HomeStatusWindow } from './status.types';
 
 declare global {
   interface Window {
@@ -12,8 +10,7 @@ declare global {
 }
 
 const HOME_STATUS_LINK_SELECTOR = '[data-home-status-link]';
-const HOME_STATUS_MAINTENANCE_WINDOWS_SELECTOR =
-  '[data-home-status-maintenance-windows]';
+const HOME_STATUS_WINDOWS_SELECTOR = '[data-home-status-windows]';
 
 export const HOME_STATUS_LABELS = {
   green: 'всё работает',
@@ -24,98 +21,79 @@ export const HOME_STATUS_LABELS = {
 export const getHomeStatusAriaLabel = (state: HomeStatusState): string =>
   `Статус: ${HOME_STATUS_LABELS[state]}`;
 
-const isActiveAt = (
-  item: Pick<StatusIncident, 'started' | 'ended'>,
-  now: number,
-): boolean =>
-  item.started.at.valueOf() <= now &&
-  (item.ended === undefined || now < item.ended.at.valueOf());
-
 export const getHomeStatusState = (
   incidents: readonly StatusIncident[],
   now: number,
-): HomeStatusState => {
-  if (
-    incidents.some((item) => item.kind === 'incident' && isActiveAt(item, now))
-  ) {
-    return 'red';
-  }
+): HomeStatusState =>
+  resolveStatusServiceState(
+    incidents.map((item) => ({
+      kind: item.kind,
+      service: item.service,
+      startedAt: item.started.at.valueOf(),
+      endedAt: item.ended?.at.valueOf(),
+    })),
+    now,
+  );
 
-  return incidents.some(
-    (item) => item.kind === 'maintenance' && isActiveAt(item, now),
-  )
-    ? 'amber'
-    : 'green';
-};
-
-export const getHomeStatusMaintenanceWindows = (
+export const getHomeStatusWindows = (
   incidents: readonly Pick<StatusIncident, 'kind' | 'started' | 'ended'>[],
   buildNow: number,
-): readonly HomeStatusMaintenanceWindow[] =>
+): readonly HomeStatusWindow[] =>
   incidents
-    .flatMap((item): HomeStatusMaintenanceWindow[] => {
-      if (item.kind !== 'maintenance' || item.ended === undefined) {
-        return [];
-      }
-
+    .flatMap((item): HomeStatusWindow[] => {
       const start = item.started.at.valueOf();
-      const end = item.ended.at.valueOf();
-      if (end <= buildNow) {
+      const end = item.ended?.at.valueOf();
+      if (end !== undefined && end <= buildNow) {
         return [];
       }
 
       return [
         {
+          kind: item.kind,
           start,
           end,
         },
       ];
     })
-    .sort((a, b) => a.start - b.start || a.end - b.end);
+    .sort((a, b) => a.start - b.start || (a.end ?? 0) - (b.end ?? 0));
 
-const isHomeStatusMaintenanceWindow = (
-  value: unknown,
-): value is HomeStatusMaintenanceWindow => {
+const isHomeStatusWindow = (value: unknown): value is HomeStatusWindow => {
   if (!(value instanceof Object) || Array.isArray(value)) {
     return false;
   }
 
-  const { start, end } = value as {
+  const { kind, start, end } = value as {
+    readonly kind?: unknown;
     readonly start?: unknown;
     readonly end?: unknown;
   };
 
   return (
+    (kind === 'incident' || kind === 'maintenance') &&
     typeof start === 'number' &&
-    typeof end === 'number' &&
     Number.isFinite(start) &&
-    Number.isFinite(end) &&
-    start < end
+    (end === undefined ||
+      (typeof end === 'number' && Number.isFinite(end) && start <= end))
   );
 };
 
-const parseHomeStatusMaintenanceWindows = (
+const parseHomeStatusWindows = (
   source: string | undefined,
-): readonly HomeStatusMaintenanceWindow[] => {
+): readonly HomeStatusWindow[] | undefined => {
   if (source === undefined) {
-    return [];
+    return undefined;
   }
 
   try {
     const parsed: unknown = JSON.parse(source);
 
-    return Array.isArray(parsed)
-      ? parsed.filter(isHomeStatusMaintenanceWindow)
-      : [];
+    return Array.isArray(parsed) && parsed.every(isHomeStatusWindow)
+      ? parsed
+      : undefined;
   } catch {
-    return [];
+    return undefined;
   }
 };
-
-const hasActiveMaintenanceWindow = (
-  windows: readonly HomeStatusMaintenanceWindow[],
-  now: number,
-): boolean => windows.some((item) => item.start <= now && now < item.end);
 
 const setHomeStatusState = (
   link: HTMLElement,
@@ -137,31 +115,31 @@ export const hydrateHomeStatus = (
   root: ParentNode = document,
   now: number = Date.now(),
 ): void => {
-  const links = homeStatusLinks(root).filter(
-    (link) => link.dataset.homeStatusState !== 'red',
-  );
+  const links = homeStatusLinks(root);
   if (links.length === 0) {
     return;
   }
 
-  const payload = root.querySelector(HOME_STATUS_MAINTENANCE_WINDOWS_SELECTOR);
+  const payload = root.querySelector(HOME_STATUS_WINDOWS_SELECTOR);
   if (!(payload instanceof HTMLScriptElement)) {
     return;
   }
 
-  const windows = parseHomeStatusMaintenanceWindows(
-    payload.textContent ?? undefined,
-  );
-  if (hasActiveMaintenanceWindow(windows, now)) {
-    links.forEach((link) => setHomeStatusState(link, 'amber'));
+  const windows = parseHomeStatusWindows(payload.textContent ?? undefined);
+  if (!windows) {
     return;
   }
 
-  if (windows.length > 0) {
-    links
-      .filter((link) => link.dataset.homeStatusState === 'amber')
-      .forEach((link) => setHomeStatusState(link, 'green'));
-  }
+  const state = resolveStatusServiceState(
+    windows.map((item) => ({
+      kind: item.kind,
+      startedAt: item.start,
+      endedAt: item.end,
+    })),
+    now,
+  );
+
+  links.forEach((link) => setHomeStatusState(link, state));
 };
 
 export const installHomeStatusHydration = (

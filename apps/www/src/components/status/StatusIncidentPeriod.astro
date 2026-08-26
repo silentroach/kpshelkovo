@@ -5,7 +5,7 @@ import { getStatusIncidentPeriod } from '../../lib/status/view';
 interface Props {
   readonly incident: Pick<
     StatusIncident,
-    'isActive' | 'started' | 'ended' | 'duration'
+    'phase' | 'started' | 'ended' | 'duration'
   >;
 }
 

@@ -33,7 +33,12 @@ const incident = (input: IncidentInput): StatusTimelineIncidentInput => ({
   startedHasTime: input.startedHasTime ?? true,
   endedIso: input.endedIso,
   endedHasTime: input.endedHasTime ?? true,
-  isActive: input.isActive ?? !input.endedIso,
+  phase:
+    (input.isActive ?? !input.endedIso)
+      ? 'active'
+      : Date.parse(input.startedIso) > Date.now()
+        ? 'scheduled'
+        : 'resolved',
   areas: input.areas,
 });
 

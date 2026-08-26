@@ -4,6 +4,7 @@ import type {
   StatusDaysWithoutIncidents,
   StatusDuration,
   StatusIncident,
+  StatusIncidentPhase,
   StatusServiceSummary,
 } from './types';
 import { statusServiceMarkdownUrl, statusServiceUrl } from './routes';
@@ -16,7 +17,7 @@ import {
   getStatusIncidentPhase,
 } from './view';
 
-export type StatusPublicIncidentPhase = 'active' | 'resolved' | 'scheduled';
+export type StatusPublicIncidentPhase = StatusIncidentPhase;
 export type StatusPublicDaysWithoutIncidentsMode =
   'count' | 'active_incident' | 'no_incidents';
 
@@ -99,11 +100,6 @@ export interface StatusPublicPayloadDto {
 
 const fullUrl = (value: string): string => absoluteUrl(value);
 
-const phase = (
-  item: Pick<StatusIncident, 'isActive' | 'ended'>,
-): StatusPublicIncidentPhase =>
-  item.isActive ? 'active' : item.ended ? 'resolved' : 'scheduled';
-
 const duration = (item: StatusDuration): StatusPublicDurationDto => ({
   total_minutes: item.totalMinutes,
   human: formatStatusDuration(item),
@@ -136,7 +132,7 @@ function incidentRef(item: StatusIncident): StatusPublicIncidentRefDto {
     title: item.title,
     html_url: links.html_url,
     markdown_url: links.markdown_url,
-    phase: phase(item),
+    phase: current.phase,
     phase_label: current.label,
   };
 }
@@ -172,8 +168,8 @@ function incident(item: StatusIncident): StatusPublicIncidentDto {
     started_has_time: item.started.hasTime,
     ended_at: item.ended?.iso,
     ended_has_time: item.ended?.hasTime ?? false,
-    is_active: item.isActive,
-    phase: phase(item),
+    is_active: current.isActive,
+    phase: current.phase,
     phase_label: current.label,
     applies_to_all_areas: item.appliesToAllAreas,
     areas: [...item.areas],

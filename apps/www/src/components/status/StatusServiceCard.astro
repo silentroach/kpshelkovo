@@ -41,17 +41,17 @@ const latestMoment = latestRecord
     })
   : undefined;
 const latestDuration =
-  latestRecord && !latestRecord.isActive && latestRecord.duration
+  latestRecord && latestRecord.phase !== 'active' && latestRecord.duration
     ? formatStatusDuration(latestRecord.duration, { nonBreaking: true })
     : undefined;
 const latestAreas =
   latestRecord && !latestRecord.appliesToAllAreas ? latestRecord.areas : [];
 const timelineIncidents = summary.incidents.map(toStatusTimelineIncidentInput);
-const stateClass = {
-  green: 'text-[color:var(--color-success)]',
-  amber: 'text-[color:var(--color-warning-text)]',
-  red: 'text-[color:var(--color-danger)]',
-} as const;
+const lifecycleWindows = summary.incidents.map((item) => ({
+  kind: item.kind,
+  startedAt: item.started.at.valueOf(),
+  endedAt: item.ended?.at.valueOf(),
+}));
 const serviceMeta = {
   electricity: {
     Icon: LightningIcon,
@@ -79,7 +79,12 @@ const resolvedMobileTimelineDays = mobileTimelineDays ?? timelineDays;
 const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
 ---
 
-<article class="status-service-row ui-shell px-5 py-4 md:px-6 md:py-5">
+<article
+  class="status-service-row ui-shell px-5 py-4 md:px-6 md:py-5"
+  data-status-service-card
+  data-status-service-state={summary.serviceStatus}
+  data-status-service-incidents={JSON.stringify(lifecycleWindows)}
+>
   <div
     class="flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_minmax(0,11rem)_minmax(0,21rem)] lg:items-center lg:gap-5"
   >
@@ -154,10 +159,8 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
 
     <div>
       <p
-        class:list={[
-          'text-[0.9375rem] font-semibold leading-5',
-          stateClass[summary.serviceStatus],
-        ]}
+        class="status-service-row__state text-[0.9375rem] font-semibold leading-5"
+        data-status-service-state-label
       >
         {stateLabel}
       </p>
@@ -211,3 +214,20 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
     </div>
   </div>
 </article>
+
+<style>
+  .status-service-row[data-status-service-state='green']
+    .status-service-row__state {
+    color: var(--color-success);
+  }
+
+  .status-service-row[data-status-service-state='amber']
+    .status-service-row__state {
+    color: var(--color-warning-text);
+  }
+
+  .status-service-row[data-status-service-state='red']
+    .status-service-row__state {
+    color: var(--color-danger);
+  }
+</style>

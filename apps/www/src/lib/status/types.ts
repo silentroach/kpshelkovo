@@ -17,6 +17,28 @@ export interface StatusIncidentMoment {
   readonly hasTime: boolean;
 }
 
+export type StatusIncidentPhase = 'active' | 'resolved' | 'scheduled';
+
+export interface StatusIncidentState {
+  readonly phase: StatusIncidentPhase;
+  readonly label: string;
+  readonly tone: 'danger' | 'warning' | 'success' | 'muted' | 'info';
+  readonly isActive: boolean;
+}
+
+export interface StatusIncidentPhaseInput {
+  readonly kind: StatusKind;
+  readonly service?: StatusService;
+  readonly phase: StatusIncidentPhase;
+}
+
+export interface StatusIncidentWindowInput {
+  readonly kind: StatusKind;
+  readonly service?: StatusService;
+  readonly startedAt: number;
+  readonly endedAt?: number;
+}
+
 interface StatusIncidentBase {
   readonly id: string;
   readonly title: string;
@@ -30,7 +52,7 @@ interface StatusIncidentBase {
   readonly slug: string;
   readonly started: StatusIncidentMoment;
   readonly ended?: StatusIncidentMoment;
-  readonly isActive: boolean;
+  readonly phase: StatusIncidentPhase;
   readonly appliesToAllAreas: boolean;
   readonly areas: readonly StatusArea[];
   readonly sourceUrl?: string;

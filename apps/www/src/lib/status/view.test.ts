@@ -26,7 +26,7 @@ const period = (input: {
   readonly endedHasTime: boolean;
   readonly duration?: { readonly totalMinutes: number };
 }) => ({
-  isActive: input.isActive,
+  phase: input.isActive ? ('active' as const) : ('resolved' as const),
   started: {
     iso: input.startedIso,
     hasTime: input.startedHasTime,
@@ -232,7 +232,7 @@ describe('buildStatusTimelineTooltipData', () => {
       incident: {
         kind: 'incident',
         title: 'Нет воды на Центральной',
-        isActive: true,
+        phase: 'active',
         startedIso: `${currentYear}-05-01T07:32:00+03:00`,
         startedHasTime: true,
         endedHasTime: false,
@@ -263,7 +263,7 @@ describe('buildStatusTimelineTooltipData', () => {
           incident: {
             kind: 'maintenance',
             title: 'Плановая профилактика сети',
-            isActive: false,
+            phase: 'scheduled',
             startedIso: `${currentYear}-05-03T00:00:00+03:00`,
             startedHasTime: false,
             endedHasTime: false,
@@ -288,7 +288,7 @@ describe('buildStatusTimelineTooltipData', () => {
         incident: {
           kind: 'maintenance',
           title: 'Плановая профилактика сети',
-          isActive: false,
+          phase: 'scheduled',
           startedIso: `${nextYear}-05-03T00:00:00+03:00`,
           startedHasTime: false,
           endedIso: `${nextYear}-05-04T00:00:00+03:00`,
@@ -310,7 +310,7 @@ describe('buildStatusTimelineTooltipData', () => {
       incident: {
         kind: 'incident',
         title: 'Нет воды на Центральной',
-        isActive: true,
+        phase: 'active',
         startedIso: `${currentYear}-05-01T07:32:00+03:00`,
         startedHasTime: true,
         endedHasTime: false,
@@ -344,7 +344,7 @@ describe('grouped timeline tooltip text', () => {
       buildStatusTimelineTooltipListItemData({
         kind: 'incident',
         title: 'Отключение 1',
-        isActive: false,
+        phase: 'resolved',
         startedIso: `${currentYear}-05-09T07:32:00+03:00`,
         startedHasTime: true,
         endedIso: `${currentYear}-05-09T08:10:00+03:00`,
@@ -356,7 +356,7 @@ describe('grouped timeline tooltip text', () => {
       buildStatusTimelineTooltipListItemData({
         kind: 'incident',
         title: 'Отключение 2',
-        isActive: true,
+        phase: 'active',
         startedIso: `${currentYear}-05-09T12:15:00+03:00`,
         startedHasTime: true,
         endedHasTime: false,

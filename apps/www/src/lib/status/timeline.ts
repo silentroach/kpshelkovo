@@ -1,7 +1,11 @@
 import { compareRuText } from '@shelkovo/format';
 
 import type { StatusArea, StatusKind } from './schema';
-import type { StatusDuration, StatusIncident } from './types';
+import type {
+  StatusDuration,
+  StatusIncident,
+  StatusIncidentPhase,
+} from './types';
 
 export const STATUS_TIMELINE_DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -14,7 +18,7 @@ export interface StatusTimelineIncidentInput {
   readonly startedHasTime: boolean;
   readonly endedIso?: string;
   readonly endedHasTime: boolean;
-  readonly isActive: boolean;
+  readonly phase: StatusIncidentPhase;
   readonly areas?: readonly StatusArea[];
   readonly duration?: StatusDuration;
 }
@@ -62,7 +66,7 @@ export const toStatusTimelineIncidentInput = (
   startedHasTime: incident.started.hasTime,
   endedIso: incident.ended?.iso,
   endedHasTime: incident.ended?.hasTime ?? false,
-  isActive: incident.isActive,
+  phase: incident.phase,
   areas: incident.appliesToAllAreas ? undefined : incident.areas,
   duration: incident.duration,
 });

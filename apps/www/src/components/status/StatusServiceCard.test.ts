@@ -29,7 +29,7 @@ const incident = (): StatusIncident => ({
     iso: '2026-05-09T01:00:00Z',
     hasTime: true,
   },
-  isActive: false,
+  phase: 'resolved',
   appliesToAllAreas: true,
   areas: [],
   hasPage: true,

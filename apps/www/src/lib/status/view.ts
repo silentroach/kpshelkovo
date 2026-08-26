@@ -5,13 +5,20 @@ import {
 } from '@shelkovo/markdown';
 
 import { formatArea } from '../areas';
+import { getStatusIncidentState } from './lifecycle';
 import type {
   StatusArea,
   StatusKind,
   StatusService,
   StatusServiceState,
 } from './schema';
-import type { StatusDaysWithoutIncidents, StatusDuration } from './types';
+import type {
+  StatusDaysWithoutIncidents,
+  StatusDuration,
+  StatusIncidentPhase,
+  StatusIncidentPhaseInput,
+  StatusIncidentState,
+} from './types';
 
 const SERVICE_LABELS: Record<StatusService, string> = {
   electricity: 'Электричество',
@@ -45,11 +52,6 @@ const SERVICE_STATE_LABELS: Record<StatusServiceState, string> = {
   red: 'Инцидент',
 };
 
-interface StatusIncidentPhase {
-  readonly label: string;
-  readonly tone: 'danger' | 'warning' | 'success' | 'muted' | 'info';
-}
-
 interface StatusIncidentPeriodPart {
   readonly iso: string;
   readonly text: string;
@@ -61,18 +63,10 @@ interface StatusIncidentPeriodMoment {
 }
 
 interface StatusIncidentPeriodInput {
-  readonly isActive: boolean;
+  readonly phase: StatusIncidentPhase;
   readonly started: StatusIncidentPeriodMoment;
   readonly ended?: StatusIncidentPeriodMoment;
   readonly duration?: StatusDuration;
-}
-
-interface StatusIncidentPhaseInput {
-  readonly kind: StatusKind;
-  readonly isActive: boolean;
-  readonly started: StatusIncidentPeriodMoment;
-  readonly ended?: StatusIncidentPeriodMoment;
-  readonly service?: StatusService;
 }
 
 export interface StatusIncidentPeriod {
@@ -102,7 +96,7 @@ export interface StatusTimelineTooltipListItemData {
 interface StatusTimelineTooltipIncident {
   readonly kind: StatusKind;
   readonly title: string;
-  readonly isActive: boolean;
+  readonly phase: StatusIncidentPhase;
   readonly startedIso: string;
   readonly startedHasTime: boolean;
   readonly endedIso?: string;
@@ -156,7 +150,7 @@ const isSameStatusDay = (startIso: string, endIso: string): boolean =>
 const toStatusIncidentPeriodInput = (
   incident: StatusTimelineTooltipIncident,
 ): StatusIncidentPeriodInput => ({
-  isActive: incident.isActive,
+  phase: incident.phase,
   started: {
     iso: incident.startedIso,
     hasTime: incident.startedHasTime,
@@ -225,7 +219,7 @@ export const getStatusIncidentPeriod = (
 
   if (!ended) {
     return {
-      prefix: incident.isActive ? 'Начиная с' : 'Начало',
+      prefix: incident.phase === 'active' ? 'Начиная с' : 'Начало',
       start,
     };
   }
@@ -327,7 +321,7 @@ export const buildStatusTimelineTooltipData = (input: {
       getStatusIncidentPhase({
         kind: input.incident.kind,
         service: input.service,
-        ...periodIncident,
+        phase: input.incident.phase,
       }).label,
     ),
     periodLabel: formatStatusTooltipText(
@@ -366,9 +360,9 @@ export const buildStatusTimelineTooltipListItemData = (
   const phaseIcon =
     incident.kind !== 'incident'
       ? undefined
-      : incident.isActive
+      : incident.phase === 'active'
         ? 'alert'
-        : incident.endedIso
+        : incident.phase === 'resolved'
           ? 'check'
           : undefined;
   const item: {
@@ -451,41 +445,7 @@ export const formatStatusDaysWithoutIncidents = (
 
 export const getStatusIncidentPhase = (
   incident: StatusIncidentPhaseInput,
-  opts?: {
-    readonly nowMs?: number;
-  },
-): StatusIncidentPhase => {
-  if (incident.isActive) {
-    return {
-      label: 'идет',
-      tone: incident.kind === 'maintenance' ? 'warning' : 'danger',
-    };
-  }
-
-  if (Date.parse(incident.started.iso) > (opts?.nowMs ?? Date.now())) {
-    return {
-      label: incident.kind === 'maintenance' ? 'запланировано' : 'ожидается',
-      tone: incident.kind === 'maintenance' ? 'warning' : 'info',
-    };
-  }
-
-  if (incident.ended) {
-    return {
-      label:
-        incident.kind === 'maintenance'
-          ? 'завершено'
-          : incident.service === 'dam'
-            ? 'проезд открыт'
-            : 'восстановлено',
-      tone: incident.kind === 'maintenance' ? 'muted' : 'success',
-    };
-  }
-
-  return {
-    label: incident.kind === 'maintenance' ? 'запланировано' : 'ожидается',
-    tone: incident.kind === 'maintenance' ? 'warning' : 'info',
-  };
-};
+): StatusIncidentState => getStatusIncidentState(incident);
 
 export const formatStatusArea = (area: StatusArea): string => formatArea(area);
 

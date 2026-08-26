@@ -6,6 +6,7 @@ import { compareRuText } from '@shelkovo/format';
 import type { SiteMentionRegistry } from '../mentions';
 import { loadSiteMentionRegistry } from '../mentions/registry';
 import { mapRawStatusIncident } from './mapper';
+import { getStatusServiceState } from './lifecycle';
 import { STATUS_SERVICES, type StatusService } from './schema';
 import type {
   StatusDataset,
@@ -43,7 +44,7 @@ function daysWithoutIncidents(
   now: Date,
 ): StatusDaysWithoutIncidents {
   const activeIncident = incidents.find(
-    (item) => item.kind === 'incident' && item.isActive,
+    (item) => item.kind === 'incident' && item.phase === 'active',
   );
 
   if (activeIncident) {
@@ -75,20 +76,15 @@ function serviceSummary(
 ): StatusServiceSummary {
   const list = incidents.filter((item) => item.service === service);
   const activeIncidents = list.filter(
-    (item) => item.kind === 'incident' && item.isActive,
+    (item) => item.kind === 'incident' && item.phase === 'active',
   );
   const activeMaintenance = list.filter(
-    (item) => item.kind === 'maintenance' && item.isActive,
+    (item) => item.kind === 'maintenance' && item.phase === 'active',
   );
 
   return {
     service,
-    serviceStatus:
-      activeIncidents.length > 0
-        ? 'red'
-        : activeMaintenance.length > 0
-          ? 'amber'
-          : 'green',
+    serviceStatus: getStatusServiceState(list),
     incidents: list,
     activeIncidents,
     activeMaintenance,
@@ -114,7 +110,7 @@ export const buildStatusDataset = (
 
   return {
     incidents,
-    active: incidents.filter((item) => item.isActive),
+    active: incidents.filter((item) => item.phase === 'active'),
     services,
     byId: new Map(incidents.map((item) => [item.id, item])),
     byService: new Map(services.map((item) => [item.service, item])),

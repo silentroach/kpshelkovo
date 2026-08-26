@@ -195,7 +195,7 @@ export function buildStatusHomeMarkdown(
   const plannedWorks = data.incidents.filter(
     (item) =>
       item.kind === 'maintenance' &&
-      (item.isActive || item.started.at.valueOf() > now.valueOf()),
+      (item.phase === 'active' || item.started.at.valueOf() > now.valueOf()),
   );
 
   return serialize([
@@ -238,7 +238,7 @@ export function buildStatusServiceMarkdown(
   const plannedWorks = summary.incidents.filter(
     (item) =>
       item.kind === 'maintenance' &&
-      (item.isActive || item.started.at.valueOf() > now.valueOf()),
+      (item.phase === 'active' || item.started.at.valueOf() > now.valueOf()),
   );
   const serviceLabel = formatStatusService(summary.service);
 
