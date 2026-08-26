@@ -130,14 +130,14 @@ const schema = personProfilePageSchema({
                       ) : contact.type === 'phone' ? (
                         <PhoneIcon class="size-4 shrink-0 text-primary" />
                       ) : (
-                        <span class="text-sm font-medium text-muted-foreground">
+                        <span class="text-sm font-semibold text-muted-foreground">
                           {formatPersonContactType(contact.type)}
                         </span>
                       )}
 
                       <a
                         href={contact.href}
-                        class="text-base font-medium text-foreground transition-colors hover:text-primary"
+                        class="text-base font-semibold text-foreground transition-colors hover:text-primary"
                       >
                         {formatPersonContactCompactDisplay(contact)}
                       </a>
@@ -211,7 +211,7 @@ const schema = personProfilePageSchema({
                               )}
                             </div>
 
-                            <h4 class="text-base font-medium leading-6 text-foreground transition-colors group-hover:text-primary">
+                            <h4 class="font-body text-base font-semibold leading-6 text-foreground transition-colors group-hover:text-primary">
                               {backlink.title}
                             </h4>
 

@@ -33,7 +33,7 @@
 >
   <div class="min-w-0 md:flex md:items-start md:justify-between md:gap-3">
     <div class="min-w-0 space-y-1">
-      <h3 class="text-base font-bold leading-tight text-foreground md:text-xl">
+      <h3 class="text-base leading-tight text-foreground md:text-xl">
         <Link
           href={withBase(`settlements/${settlement.slug}/`)}
           class="ui-link"
@@ -80,7 +80,7 @@
       class="flex flex-col items-end gap-1 md:flex-row md:flex-wrap md:items-baseline md:justify-between md:gap-x-4 md:gap-y-1.5"
     >
       <span
-        class="ui-num whitespace-nowrap text-xl font-bold leading-none text-foreground md:text-2xl"
+        class="ui-num whitespace-nowrap text-xl font-semibold leading-none text-foreground md:text-2xl"
         title={tariffHint}
       >
         {tariffText}
@@ -100,7 +100,7 @@
           </span>
         {/if}
       {:else if isBaseline}
-        <span class="text-sm font-medium text-muted-foreground"
+        <span class="text-sm font-semibold text-muted-foreground"
           >базовый тариф</span
         >
       {/if}

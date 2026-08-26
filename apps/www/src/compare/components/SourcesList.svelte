@@ -35,7 +35,7 @@
             href={source.url}
             target="_blank"
             rel="noopener noreferrer"
-            class="truncate font-medium text-foreground hover:text-primary"
+            class="truncate font-semibold text-foreground hover:text-primary"
             data-testid="source-link"
           >
             {source.title}

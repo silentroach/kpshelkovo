@@ -30,7 +30,7 @@
       {#if subtitleLinkHref && subtitleLinkText}
         <a
           href={subtitleLinkHref}
-          class="ui-link font-medium underline decoration-border underline-offset-4"
+          class="ui-link font-semibold underline decoration-border underline-offset-4"
         >
           {subtitleLinkText}
         </a>

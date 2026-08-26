@@ -22,7 +22,7 @@
 <div>
   {#if title}
     <div class="mb-5 flex items-center justify-between gap-4">
-      <h2 class="text-xl font-bold text-foreground">
+      <h2 class="text-xl text-foreground">
         {title}
       </h2>
       {#if showShelkovo}

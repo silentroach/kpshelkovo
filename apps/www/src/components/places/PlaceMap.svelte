@@ -827,7 +827,7 @@
       aria-live="polite"
     >
       <p
-        class="border border-border bg-[color:var(--color-surface)] px-4 py-2 text-sm font-medium text-muted-foreground"
+        class="border border-border bg-[color:var(--color-surface)] px-4 py-2 text-sm font-semibold text-muted-foreground"
       >
         Загружаем карту…
       </p>
@@ -1063,7 +1063,7 @@
     font: inherit;
     font-size: 1rem;
     font-variant-numeric: tabular-nums;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1;
     touch-action: manipulation;
     transform: translate(-50%, -50%);

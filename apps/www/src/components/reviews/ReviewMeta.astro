@@ -20,14 +20,14 @@ const { review, showVerified = false, className } = Astro.props;
     className,
   ]}
 >
-  <time datetime={review.publishedIso} class="font-medium text-foreground">
+  <time datetime={review.publishedIso} class="font-semibold text-foreground">
     {formatReviewDate(review)}
   </time>
   <span>{formatReviewAuthor(review)}</span>
   <ShelkovoAreaIcon area={review.area} />
   {
     showVerified && (
-      <span class="inline-flex items-center gap-1 font-medium text-success">
+      <span class="inline-flex items-center gap-1 font-semibold text-success">
         <CheckCircleIcon class="size-4" />
         проверенный собственник
       </span>

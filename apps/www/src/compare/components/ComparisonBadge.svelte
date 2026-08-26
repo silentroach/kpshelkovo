@@ -19,7 +19,7 @@
     data-testid="comparison-badge"
     class="flex items-center justify-between gap-2"
   >
-    <span class="text-sm font-medium text-muted-foreground">Разница:</span>
+    <span class="text-sm font-semibold text-muted-foreground">Разница:</span>
     {#if isBaseline}
       <span class="ui-badge ui-badge-info">Наш</span>
     {:else if isCheaper}
