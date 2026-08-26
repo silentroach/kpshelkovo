@@ -3,14 +3,14 @@ import { afterEach, describe, expect, it } from 'vitest';
 import type { StatusIncident } from '@/lib/status/types';
 
 import {
-  getHomeStatusMaintenanceWindows,
+  getHomeStatusWindows,
   hydrateHomeStatus,
   installHomeStatusHydration,
 } from './status';
 
 const WINDOW_START = 1779094800000;
 const WINDOW_END = 1779105600000;
-const DEFAULT_WINDOWS_PAYLOAD = `[{"start":${WINDOW_START},"end":${WINDOW_END}}]`;
+const DEFAULT_WINDOWS_PAYLOAD = `[{"kind":"maintenance","start":${WINDOW_START},"end":${WINDOW_END}}]`;
 const AMBER_ARIA_LABEL = 'Статус: плановые работы';
 const GREEN_ARIA_LABEL = 'Статус: всё работает';
 const STATUS_LABELS = {
@@ -55,7 +55,7 @@ const renderHomeStatus = ({
     </a>
     ${
       includePayload
-        ? `<script type="application/json" data-home-status-maintenance-windows>${payload}</script>`
+        ? `<script type="application/json" data-home-status-windows>${payload}</script>`
         : ''
     }
   `;
@@ -74,13 +74,13 @@ afterEach(() => {
   delete window.__shelkovoHomeStatusHydration;
 });
 
-describe('getHomeStatusMaintenanceWindows', () => {
+describe('getHomeStatusWindows', () => {
   it('keeps a finite maintenance window that is active at build time', () => {
     const buildNow = WINDOW_START + 1;
 
-    expect(
-      getHomeStatusMaintenanceWindows([MAINTENANCE_WINDOW], buildNow),
-    ).toEqual([{ start: WINDOW_START, end: WINDOW_END }]);
+    expect(getHomeStatusWindows([MAINTENANCE_WINDOW], buildNow)).toEqual([
+      { kind: 'maintenance', start: WINDOW_START, end: WINDOW_END },
+    ]);
   });
 });
 
@@ -126,12 +126,36 @@ describe('hydrateHomeStatus', () => {
     expect(getStatusLink().dataset.homeStatusState).toBe('amber');
   });
 
-  it('keeps red when now is inside a maintenance window', () => {
-    renderHomeStatus({ state: 'red' });
+  it('prefers an active incident over maintenance', () => {
+    renderHomeStatus({
+      state: 'red',
+      payload: `[{"kind":"maintenance","start":${WINDOW_START},"end":${WINDOW_END}},{"kind":"incident","start":${WINDOW_START}}]`,
+    });
 
     hydrateHomeStatus(document, WINDOW_START + 1);
 
     expect(getStatusLink().dataset.homeStatusState).toBe('red');
+  });
+
+  it('turns red when an incident without an end reaches its start', () => {
+    renderHomeStatus({
+      payload: `[{"kind":"incident","start":${WINDOW_START}}]`,
+    });
+
+    hydrateHomeStatus(document, WINDOW_START);
+
+    expect(getStatusLink().dataset.homeStatusState).toBe('red');
+  });
+
+  it('clears build-time red when the incident window has ended', () => {
+    renderHomeStatus({
+      state: 'red',
+      payload: `[{"kind":"incident","start":${WINDOW_START},"end":${WINDOW_END}}]`,
+    });
+
+    hydrateHomeStatus(document, WINDOW_END);
+
+    expect(getStatusLink().dataset.homeStatusState).toBe('green');
   });
 
   it('updates the accessible label and hover hint with the state', () => {

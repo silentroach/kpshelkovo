@@ -237,7 +237,7 @@ const timelineGroups = incidents
       const phaseIcon =
         firstItem.kind !== 'incident'
           ? undefined
-          : firstItem.isActive
+          : firstItem.phase === 'active'
             ? 'alert'
             : firstItem.endedIso
               ? 'check'

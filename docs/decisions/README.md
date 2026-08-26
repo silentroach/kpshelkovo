@@ -13,7 +13,7 @@
 - [ADR-007: COOP без COEP для изоляции `opener`-связей](007-coop-origin-isolation.md) - принят, 2026-05-15.
 - [ADR-008: Генерация Markdown через AST](008-markdown-ast-generation.md) - принят, 2026-05-14.
 - [ADR-009: Markdown через `Accept` negotiation](009-markdown-accept-negotiation.md) - принят, 2026-05-17.
-- [ADR-010: Плановые работы в индикаторе статуса на главной](010-home-status-maintenance-indicator.md) - принят, 2026-05-18.
+- [ADR-010: Плановые работы в индикаторе статуса на главной](010-home-status-maintenance-indicator.md) - заменен ADR-031, 2026-05-18.
 - [ADR-011: Реестр публичных поверхностей](011-public-surface-registry.md) - принят, 2026-05-19.
 - [ADR-012: Единый граф упоминаний сущностей в Markdown](012-entity-mention-graph.md) - принят, 2026-05-20.
 - [ADR-013: Граница между внешними DTO, доменной моделью и публичными DTO](013-raw-domain-public-data-boundary.md) - принят, 2026-05-20.
@@ -34,3 +34,4 @@
 - [ADR-028: Markdown-first карта мест с типизированными маркерами](028-markdown-first-places-map.md) - принят, 2026-08-19.
 - [ADR-029: Аспектные оценки как отзывы об организациях](029-review-aspects-as-organization-reviews.md) - принят, 2026-08-20.
 - [ADR-030: Нормализованные источники детальной сметы](030-normalized-estimate-detail-sources.md) - принят, 2026-08-26.
+- [ADR-031: Единый жизненный цикл status-событий](031-status-incident-lifecycle.md) - принят, 2026-08-26.

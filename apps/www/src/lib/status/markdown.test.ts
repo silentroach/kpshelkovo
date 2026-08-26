@@ -39,7 +39,7 @@ const incident = (
     iso: '2026-05-01T16:38:00+03:00',
     hasTime: true,
   },
-  isActive: false,
+  phase: 'resolved',
   appliesToAllAreas: false,
   areas: ['river'],
   sourceUrl: 'https://example.com/source',

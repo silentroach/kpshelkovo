@@ -3,8 +3,8 @@ import SearchTrigger from '@/components/search/SearchTrigger.astro';
 import SiteNav from '@/components/site/SiteNav.astro';
 import {
   getHomeStatusAriaLabel,
-  getHomeStatusMaintenanceWindows,
   getHomeStatusState,
+  getHomeStatusWindows,
 } from '@/lib/home/status';
 import { loadStatusData } from '@/lib/status/load';
 
@@ -12,10 +12,7 @@ const status = await loadStatusData();
 const buildNow = Date.now();
 const statusState = getHomeStatusState(status.incidents, buildNow);
 const statusAriaLabel = getHomeStatusAriaLabel(statusState);
-const maintenanceWindows = getHomeStatusMaintenanceWindows(
-  status.incidents,
-  buildNow,
-);
+const statusWindows = getHomeStatusWindows(status.incidents, buildNow);
 ---
 
 <header class="site-header z-40 border-b md:sticky md:top-0">
@@ -64,8 +61,8 @@ const maintenanceWindows = getHomeStatusMaintenanceWindows(
 
   <script
     type="application/json"
-    data-home-status-maintenance-windows
-    set:html={JSON.stringify(maintenanceWindows)}
+    data-home-status-windows
+    set:html={JSON.stringify(statusWindows)}
   />
 </header>
 

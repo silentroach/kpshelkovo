@@ -29,7 +29,7 @@ const fixtures = vi.hoisted(() => {
         iso: `2026-08-${String(number).padStart(2, '0')}T12:00:00+03:00`,
         hasTime: true,
       },
-      isActive: false,
+      phase: 'resolved',
       appliesToAllAreas: true,
       areas: [],
       body: '',

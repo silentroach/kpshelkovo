@@ -17,7 +17,7 @@ describe('StatusIncidentPeriod', () => {
     const html = await container.renderToString(StatusIncidentPeriod, {
       props: {
         incident: {
-          isActive: false,
+          phase: 'resolved',
           started: {
             at: new Date(`${currentYear}-05-01T07:32:00+03:00`),
             iso: `${currentYear}-05-01T07:32:00+03:00`,

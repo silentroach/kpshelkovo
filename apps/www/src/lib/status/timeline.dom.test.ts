@@ -535,7 +535,7 @@ describe('hydrateStatusTimeline', () => {
             data-end="2026-05-09T20:05:00Z"
             data-tooltip-service-label="Электричество"
             data-tooltip-group-title="3 события за 9 мая"
-            data-tooltip-items='[{"kind":"incident","title":"Отключение 1","isActive":false,"startedIso":"2026-05-09T03:00:00Z","startedHasTime":true,"endedIso":"2026-05-09T03:40:00Z","endedHasTime":true,"duration":{"totalMinutes":40}},{"kind":"incident","title":"Отключение 2","isActive":false,"startedIso":"2026-05-09T08:10:00Z","startedHasTime":true,"endedIso":"2026-05-09T08:45:00Z","endedHasTime":true,"duration":{"totalMinutes":35}},{"kind":"incident","title":"Отключение 3","isActive":true,"startedIso":"2026-05-09T19:20:00Z","startedHasTime":true,"endedHasTime":false}]'
+            data-tooltip-items='[{"kind":"incident","title":"Отключение 1","phase":"resolved","startedIso":"2026-05-09T03:00:00Z","startedHasTime":true,"endedIso":"2026-05-09T03:40:00Z","endedHasTime":true,"duration":{"totalMinutes":40}},{"kind":"incident","title":"Отключение 2","phase":"resolved","startedIso":"2026-05-09T08:10:00Z","startedHasTime":true,"endedIso":"2026-05-09T08:45:00Z","endedHasTime":true,"duration":{"totalMinutes":35}},{"kind":"incident","title":"Отключение 3","phase":"active","startedIso":"2026-05-09T19:20:00Z","startedHasTime":true,"endedHasTime":false}]'
             class="status-service-timeline__segment status-service-timeline__segment--problem status-service-timeline__segment--red"
           ></a>
         </div>

@@ -15,6 +15,7 @@ import {
 import type { RawStatusIncident } from './raw-schema';
 import type { StatusDuration, StatusIncident } from './types';
 import { deriveStatusIncidentTitle, extractStatusExcerpt } from './view';
+import { resolveStatusIncidentState } from './lifecycle';
 
 interface EntryParts {
   readonly year: string;
@@ -90,10 +91,6 @@ const mapRawStatusAreas = (
     areas: values.map(mapRawStatusArea),
   };
 };
-
-const isActive = (now: Date, start: Date, end?: Date): boolean =>
-  start.valueOf() <= now.valueOf() &&
-  (end === undefined || end.valueOf() > now.valueOf());
 
 const duration = (start: Date, end: Date): StatusDuration => ({
   totalMinutes: Math.max(
@@ -171,6 +168,15 @@ export const mapRawStatusIncident = (
     `status incident "${entry.id}" body`,
     opts.mentionRegistry,
   );
+  const state = resolveStatusIncidentState(
+    {
+      kind,
+      service,
+      startedAt: started.at.valueOf(),
+      endedAt: ended?.at.valueOf(),
+    },
+    opts.now.valueOf(),
+  );
   const changeAt = ended?.at ?? started.at;
   const incident = {
     id: entry.id,
@@ -195,7 +201,7 @@ export const mapRawStatusIncident = (
           },
         }
       : {}),
-    isActive: isActive(opts.now, started.at, ended?.at),
+    phase: state.phase,
     appliesToAllAreas: area.appliesToAllAreas,
     areas: area.areas,
     sourceUrl: entry.data.source_url,

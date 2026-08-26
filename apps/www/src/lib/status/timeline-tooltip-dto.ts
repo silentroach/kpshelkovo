@@ -1,11 +1,11 @@
 import type { StatusArea, StatusKind } from './schema';
 import type { StatusTimelineIncidentInput } from './timeline';
-import type { StatusDuration } from './types';
+import type { StatusDuration, StatusIncidentPhase } from './types';
 
 export interface StatusTimelineTooltipItemDto {
   readonly kind: StatusKind;
   readonly title: string;
-  readonly isActive: boolean;
+  readonly phase: StatusIncidentPhase;
   readonly startedIso: string;
   readonly startedHasTime: boolean;
   readonly endedIso?: string;
@@ -19,7 +19,7 @@ export const toStatusTimelineTooltipItemDto = (
 ): StatusTimelineTooltipItemDto => ({
   kind: item.kind,
   title: item.title,
-  isActive: item.isActive,
+  phase: item.phase,
   startedIso: item.startedIso,
   startedHasTime: item.startedHasTime,
   endedIso: item.endedIso,
