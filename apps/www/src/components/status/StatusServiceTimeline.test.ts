@@ -298,7 +298,7 @@ describe('StatusServiceTimeline', () => {
       [
         incident({
           id: 'electricity-outage-2026-08-06',
-          url: '/status/incidents/2026/08/electricity-outage-2026-08-06/',
+          href: '/status/incidents/2026/08/electricity-outage-2026-08-06/',
           startedIso: '2026-08-06T09:25:00Z',
           endedIso: '2026-08-06T09:47:00Z',
           isActive: false,
