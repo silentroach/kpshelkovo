@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import type { Contact, ContactCategoryPage, ContactWithDetail } from '../types';
 
 let buildContactMarkdown: typeof import('../markdown').buildContactMarkdown;
+let buildContactsCategoryMarkdown: typeof import('../markdown').buildContactsCategoryMarkdown;
 let buildContactsHomeMarkdown: typeof import('../markdown').buildContactsHomeMarkdown;
 
 beforeAll(async () => {
@@ -11,8 +12,11 @@ beforeAll(async () => {
     BASE_URL: '/',
   });
 
-  ({ buildContactMarkdown, buildContactsHomeMarkdown } =
-    await import('../markdown'));
+  ({
+    buildContactMarkdown,
+    buildContactsCategoryMarkdown,
+    buildContactsHomeMarkdown,
+  } = await import('../markdown'));
 });
 
 const contact = {
@@ -101,8 +105,8 @@ describe('contacts markdown companions', () => {
     expect(markdown).not.toMatch(/apps\/www|src\/|repo:/u);
   });
 
-  it('renders populated index with contact markdown links', () => {
-    const markdown = buildContactsHomeMarkdown({
+  it('renders list pages with contact links but without contact details', () => {
+    const homeMarkdown = buildContactsHomeMarkdown({
       contacts: [contact, listOnlyContact],
       categories: [category],
       byRoute: new Map<string, Contact>([
@@ -111,25 +115,17 @@ describe('contacts markdown companions', () => {
       ]),
       byCategory: new Map([['fence', category]]),
     });
+    const listPages = [homeMarkdown, buildContactsCategoryMarkdown(category)];
 
-    expect(markdown).toContain(
-      '[Иван Петров](https://example.com/sarafan/fence/ivan-petrov-fence/index.md)',
+    expect(homeMarkdown).toMatch(
+      /\[Забор\]\(https:\/\/example\.com\/sarafan\/fence\/index\.md\)[\s\S]*\[Иван Петров\]\(https:\/\/example\.com\/sarafan\/fence\/ivan-petrov-fence\/index\.md\)/u,
     );
-    expect(markdown).toContain(
-      '[Забор](https://example.com/sarafan/fence/index.md)',
-    );
-    expect(markdown).toContain('Телефон: [+7 900 000-00-00](tel:+79000000000)');
-    expect(markdown).toContain('Telegram: [@example](https://t.me/example)');
-    expect(markdown).not.toContain('Отзывы:');
-    expect(markdown).toContain(
-      'Адрес: [Золото Сибири](https://yandex.ru/maps/-/CTq-BEOk) — Пионерская ул., 21, пгт Малино',
-    );
-    expect(markdown).toContain(
-      'vCard: [Добавить в контакты](https://example.com/sarafan/fence/ivan-petrov-fence/contact.vcf)',
-    );
-    expect(markdown).toContain(
-      '- Сергей\n  - Телефон: [+7 985 774-75-04](tel:+79857747504)',
-    );
+
+    for (const markdown of listPages) {
+      expect(markdown).not.toMatch(
+        /\+7 900 000-00-00|t\.me\/example|yandex\.ru\/maps|contact\.vcf/u,
+      );
+    }
   });
 
   it('renders detail with structured frontmatter and body', () => {
