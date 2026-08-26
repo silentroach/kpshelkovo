@@ -41,14 +41,48 @@ type MutableEstimateRowChange = {
   -readonly [Key in keyof EstimateRowChange]?: EstimateRowChange[Key];
 };
 
-const FIELD_SELECTOR = '[data-reglament-field]';
-const RESET_SELECTOR = '[data-reglament-reset]';
 const ROOT_SELECTOR = '[data-reglament-calculator]';
-const CURRENT_TARIFF_SELECTOR = '[data-reglament-current-tariff]';
-const CURRENT_TARIFF_TONE_SELECTOR = '[data-reglament-current-tariff-tone]';
-const CURRENT_ORIGINAL_TARIFF_SELECTOR =
-  '[data-reglament-current-original-tariff]';
-const CURRENT_TARIFF_ARROW_SELECTOR = '[data-reglament-current-tariff-arrow]';
+const FIELD_ATTRIBUTE = 'data-reglament-field';
+const RESET_ATTRIBUTE = 'data-reglament-reset';
+const CURRENT_TARIFF_ATTRIBUTE = 'data-reglament-current-tariff';
+const CURRENT_TARIFF_TONE_ATTRIBUTE = 'data-reglament-current-tariff-tone';
+const CURRENT_ORIGINAL_TARIFF_ATTRIBUTE =
+  'data-reglament-current-original-tariff';
+const CURRENT_TARIFF_ARROW_ATTRIBUTE = 'data-reglament-current-tariff-arrow';
+const CURRENT_ANNUAL_ATTRIBUTE = 'data-reglament-current-annual';
+const CURRENT_DELTA_ATTRIBUTE = 'data-reglament-current-delta';
+const SECTION_TARIFF_ATTRIBUTE = 'data-reglament-section-tariff';
+const SECTION_ANNUAL_ATTRIBUTE = 'data-reglament-section-annual';
+const SECTION_DELTA_ATTRIBUTE = 'data-reglament-section-delta';
+const ROW_TARIFF_ATTRIBUTE = 'data-reglament-row-tariff';
+const ROW_ANNUAL_ATTRIBUTE = 'data-reglament-row-annual';
+const ROW_BREAKDOWN_ATTRIBUTE = 'data-reglament-row-breakdown';
+const BREAKDOWN_FIELD_ATTRIBUTE = 'data-reglament-breakdown-field';
+const STATIC_ELEMENT_ATTRIBUTES = [
+  CURRENT_TARIFF_ATTRIBUTE,
+  CURRENT_TARIFF_TONE_ATTRIBUTE,
+  CURRENT_ORIGINAL_TARIFF_ATTRIBUTE,
+  CURRENT_TARIFF_ARROW_ATTRIBUTE,
+  CURRENT_ANNUAL_ATTRIBUTE,
+  CURRENT_DELTA_ATTRIBUTE,
+] as const;
+const ID_ELEMENT_ATTRIBUTES = [
+  SECTION_TARIFF_ATTRIBUTE,
+  SECTION_ANNUAL_ATTRIBUTE,
+  SECTION_DELTA_ATTRIBUTE,
+  ROW_TARIFF_ATTRIBUTE,
+  ROW_ANNUAL_ATTRIBUTE,
+] as const;
+const CACHED_ELEMENT_ATTRIBUTES = [
+  FIELD_ATTRIBUTE,
+  RESET_ATTRIBUTE,
+  ...STATIC_ELEMENT_ATTRIBUTES,
+  ...ID_ELEMENT_ATTRIBUTES,
+  ROW_BREAKDOWN_ATTRIBUTE,
+] as const;
+const CACHED_ELEMENT_SELECTOR = CACHED_ELEMENT_ATTRIBUTES.map(
+  (attribute) => `[${attribute}]`,
+).join(',');
 const OFFICIAL_TARIFF_TEXT = formatReglamentNumber(
   estimate2026.baseline.tariff_per_sotka_month,
 );
@@ -90,6 +124,14 @@ const BREAKDOWN_FIELD_KEYS = [
   'vat',
   'gross',
 ] as const satisfies readonly BreakdownFieldKey[];
+
+interface ReglamentCalculatorDomIndex {
+  readonly fields: readonly HTMLInputElement[];
+  readonly resetButtons: readonly HTMLButtonElement[];
+  readonly validationFeedback: ReadonlyMap<HTMLInputElement, HTMLElement>;
+  readonly elements: ReadonlyMap<string, readonly HTMLElement[]>;
+  readonly breakdownInputs: ReadonlyMap<string, readonly HTMLInputElement[]>;
+}
 
 const isEditableFieldKey = (
   value: string | undefined,
@@ -236,44 +278,158 @@ const deltaTone = (value: number): 'negative' | 'positive' | 'zero' => {
   return 'zero';
 };
 
-const setText = (root: ParentNode, selector: string, value: string): void => {
-  root.querySelectorAll(selector).forEach((node) => {
-    if (node instanceof HTMLElement) {
-      node.textContent = value;
+const indexedElementKey = (...parts: readonly string[]): string =>
+  parts.join('\0');
+
+const addIndexedElement = <ElementType extends HTMLElement>(
+  index: Map<string, ElementType[]>,
+  element: ElementType,
+  ...keyParts: readonly string[]
+): void => {
+  const key = indexedElementKey(...keyParts);
+  const elements = index.get(key);
+
+  if (elements) {
+    elements.push(element);
+    return;
+  }
+
+  index.set(key, [element]);
+};
+
+const indexAttributeElement = (
+  index: Map<string, HTMLElement[]>,
+  element: HTMLElement,
+  attribute: string,
+): void => {
+  const value = element.getAttribute(attribute) ?? undefined;
+
+  if (value) {
+    addIndexedElement(index, element, attribute, value);
+  }
+};
+
+const getIndexedElements = (
+  index: ReglamentCalculatorDomIndex,
+  ...keyParts: readonly string[]
+): readonly HTMLElement[] =>
+  index.elements.get(indexedElementKey(...keyParts)) ?? [];
+
+const getIndexedBreakdownInputs = (
+  index: ReglamentCalculatorDomIndex,
+  rowId: string,
+  field: EditableBreakdownFieldKey,
+): readonly HTMLInputElement[] =>
+  index.breakdownInputs.get(indexedElementKey(rowId, field)) ?? [];
+
+const createReglamentCalculatorDomIndex = (
+  root: ParentNode,
+): ReglamentCalculatorDomIndex => {
+  const fields: HTMLInputElement[] = [];
+  const resetButtons: HTMLButtonElement[] = [];
+  const validationFeedback = new Map<HTMLInputElement, HTMLElement>();
+  const elements = new Map<string, HTMLElement[]>();
+  const breakdownInputs = new Map<string, HTMLInputElement[]>();
+
+  root.querySelectorAll(CACHED_ELEMENT_SELECTOR).forEach((node) => {
+    if (!(node instanceof HTMLElement)) {
+      return;
     }
+
+    if (
+      node instanceof HTMLInputElement &&
+      node.hasAttribute(FIELD_ATTRIBUTE)
+    ) {
+      fields.push(node);
+
+      if (node.type !== 'checkbox') {
+        const errorId = node.getAttribute('aria-describedby') ?? undefined;
+        const feedback = errorId
+          ? node.ownerDocument.getElementById(errorId)
+          : undefined;
+
+        if (feedback instanceof HTMLElement) {
+          validationFeedback.set(node, feedback);
+        }
+      }
+
+      const rowId = node.dataset.reglamentRowId;
+      const field = node.dataset.reglamentField;
+
+      if (rowId && isAutoSyncedBreakdownFieldKey(field)) {
+        addIndexedElement(breakdownInputs, node, rowId, field);
+      }
+    }
+
+    if (
+      node instanceof HTMLButtonElement &&
+      node.hasAttribute(RESET_ATTRIBUTE)
+    ) {
+      resetButtons.push(node);
+    }
+
+    STATIC_ELEMENT_ATTRIBUTES.forEach((attribute) => {
+      if (node.hasAttribute(attribute)) {
+        addIndexedElement(elements, node, attribute);
+      }
+    });
+    ID_ELEMENT_ATTRIBUTES.forEach((attribute) => {
+      indexAttributeElement(elements, node, attribute);
+    });
+
+    const breakdownRowId =
+      node.getAttribute(ROW_BREAKDOWN_ATTRIBUTE) ?? undefined;
+    const breakdownField =
+      node.getAttribute(BREAKDOWN_FIELD_ATTRIBUTE) ?? undefined;
+
+    if (breakdownRowId && breakdownField) {
+      addIndexedElement(
+        elements,
+        node,
+        ROW_BREAKDOWN_ATTRIBUTE,
+        breakdownRowId,
+        breakdownField,
+      );
+    }
+  });
+
+  return {
+    fields,
+    resetButtons,
+    validationFeedback,
+    elements,
+    breakdownInputs,
+  };
+};
+
+const setText = (elements: readonly HTMLElement[], value: string): void => {
+  elements.forEach((element) => {
+    element.textContent = value;
   });
 };
 
 const setDeltaText = (
-  root: ParentNode,
-  selector: string,
+  elements: readonly HTMLElement[],
   value: number,
 ): void => {
-  root.querySelectorAll(selector).forEach((node) => {
-    if (node instanceof HTMLElement) {
-      node.textContent = formatReglamentMoneyDelta(value);
-      node.dataset.reglamentDeltaTone = deltaTone(value);
-    }
+  elements.forEach((element) => {
+    element.textContent = formatReglamentMoneyDelta(value);
+    element.dataset.reglamentDeltaTone = deltaTone(value);
   });
 };
 
 const setCurrentTariffText = (
-  root: ParentNode,
+  index: ReglamentCalculatorDomIndex,
   result: CalculatedEstimate,
 ): void => {
   const tone = deltaTone(result.delta_tariff_per_sotka_month);
   const isBaseline = tone === 'zero';
 
   setText(
-    root,
-    CURRENT_TARIFF_SELECTOR,
+    getIndexedElements(index, CURRENT_TARIFF_ATTRIBUTE),
     formatReglamentTariff(result.tariff_per_sotka_month),
   );
-  root.querySelectorAll(CURRENT_TARIFF_TONE_SELECTOR).forEach((node) => {
-    if (!(node instanceof HTMLElement)) {
-      return;
-    }
-
+  getIndexedElements(index, CURRENT_TARIFF_TONE_ATTRIBUTE).forEach((node) => {
     if (isBaseline) {
       delete node.dataset.reglamentDeltaTone;
       return;
@@ -281,94 +437,37 @@ const setCurrentTariffText = (
 
     node.dataset.reglamentDeltaTone = tone;
   });
-  root.querySelectorAll(CURRENT_ORIGINAL_TARIFF_SELECTOR).forEach((node) => {
-    if (node instanceof HTMLElement) {
+  getIndexedElements(index, CURRENT_ORIGINAL_TARIFF_ATTRIBUTE).forEach(
+    (node) => {
       node.textContent = OFFICIAL_TARIFF_TEXT;
       node.hidden = isBaseline;
-    }
-  });
-  root.querySelectorAll(CURRENT_TARIFF_ARROW_SELECTOR).forEach((node) => {
-    if (node instanceof HTMLElement) {
-      node.textContent = TARIFF_ARROW_TEXT;
-      node.hidden = isBaseline;
-    }
+    },
+  );
+  getIndexedElements(index, CURRENT_TARIFF_ARROW_ATTRIBUTE).forEach((node) => {
+    node.textContent = TARIFF_ARROW_TEXT;
+    node.hidden = isBaseline;
   });
 };
 
-const setMatchingText = (
-  root: ParentNode,
-  selector: string,
-  attr: string,
-  id: string,
-  value: string,
-): void => {
-  root.querySelectorAll(selector).forEach((node) => {
-    if (node instanceof HTMLElement && node.getAttribute(attr) === id) {
-      node.textContent = value;
-    }
-  });
-};
-
-const setMatchingDeltaText = (
-  root: ParentNode,
-  selector: string,
-  attr: string,
-  id: string,
-  value: number,
-): void => {
-  root.querySelectorAll(selector).forEach((node) => {
-    if (node instanceof HTMLElement && node.getAttribute(attr) === id) {
-      node.textContent = formatReglamentMoneyDelta(value);
-      node.dataset.reglamentDeltaTone = deltaTone(value);
-    }
-  });
-};
-
-const setMatchingRowTariffText = (
-  root: ParentNode,
+const setRowTariffText = (
+  index: ReglamentCalculatorDomIndex,
   row: CalculatedEstimateRow,
 ): void => {
-  root.querySelectorAll('[data-reglament-row-tariff]').forEach((node) => {
-    if (
-      node instanceof HTMLElement &&
-      node.getAttribute('data-reglament-row-tariff') === row.id
-    ) {
-      node.textContent = formatReglamentTariffValue(row.tariff_per_sotka_month);
-      const tone = deltaTone(row.delta_tariff_per_sotka_month);
+  getIndexedElements(index, ROW_TARIFF_ATTRIBUTE, row.id).forEach((node) => {
+    node.textContent = formatReglamentTariffValue(row.tariff_per_sotka_month);
+    const tone = deltaTone(row.delta_tariff_per_sotka_month);
 
-      if (tone === 'zero') {
-        delete node.dataset.reglamentDeltaTone;
-        return;
-      }
-
-      node.dataset.reglamentDeltaTone = tone;
+    if (tone === 'zero') {
+      delete node.dataset.reglamentDeltaTone;
+      return;
     }
+
+    node.dataset.reglamentDeltaTone = tone;
   });
 };
 
-const setMatchingBreakdownText = (
-  root: ParentNode,
-  rowId: string,
-  field: BreakdownFieldKey,
-  value: string,
-): void => {
-  root
-    .querySelectorAll(
-      '[data-reglament-row-breakdown][data-reglament-breakdown-field]',
-    )
-    .forEach((node) => {
-      if (
-        node instanceof HTMLElement &&
-        node.getAttribute('data-reglament-row-breakdown') === rowId &&
-        node.getAttribute('data-reglament-breakdown-field') === field
-      ) {
-        node.textContent = value;
-      }
-    });
-};
-
-const setMatchingBreakdownInputValue = (
-  root: ParentNode,
+const setBreakdownInputValue = (
+  index: ReglamentCalculatorDomIndex,
   rowId: string,
   field: BreakdownFieldKey,
   value: number,
@@ -377,11 +476,8 @@ const setMatchingBreakdownInputValue = (
     return;
   }
 
-  root.querySelectorAll(FIELD_SELECTOR).forEach((node) => {
+  getIndexedBreakdownInputs(index, rowId, field).forEach((node) => {
     if (
-      node instanceof HTMLInputElement &&
-      node.dataset.reglamentRowId === rowId &&
-      node.dataset.reglamentField === field &&
       node.dataset.reglamentManualValue !== 'true' &&
       (typeof document === 'undefined' || document.activeElement !== node)
     ) {
@@ -390,64 +486,56 @@ const setMatchingBreakdownInputValue = (
   });
 };
 
-const renderRow = (root: ParentNode, row: CalculatedEstimateRow): void => {
-  setMatchingText(
-    root,
-    '[data-reglament-row-annual]',
-    'data-reglament-row-annual',
-    row.id,
+const renderRow = (
+  index: ReglamentCalculatorDomIndex,
+  row: CalculatedEstimateRow,
+): void => {
+  setText(
+    getIndexedElements(index, ROW_ANNUAL_ATTRIBUTE, row.id),
     formatReglamentAnnualMoney(row.annual_gross),
   );
-  setMatchingRowTariffText(root, row);
+  setRowTariffText(index, row);
   BREAKDOWN_FIELD_KEYS.forEach((field) => {
     const value = row.breakdown[field];
 
-    setMatchingBreakdownText(root, row.id, field, formatReglamentMoney(value));
-    setMatchingBreakdownInputValue(root, row.id, field, value);
+    setText(
+      getIndexedElements(index, ROW_BREAKDOWN_ATTRIBUTE, row.id, field),
+      formatReglamentMoney(value),
+    );
+    setBreakdownInputValue(index, row.id, field, value);
   });
 
-  row.children?.forEach((child) => renderRow(root, child));
+  row.children?.forEach((child) => renderRow(index, child));
 };
 
 const renderReglamentCalculator = (
-  root: ParentNode,
+  index: ReglamentCalculatorDomIndex,
   result: CalculatedEstimate,
 ): void => {
-  setCurrentTariffText(root, result);
+  setCurrentTariffText(index, result);
   setText(
-    root,
-    '[data-reglament-current-annual]',
+    getIndexedElements(index, CURRENT_ANNUAL_ATTRIBUTE),
     formatReglamentAnnualMoney(result.annual_gross),
   );
   setDeltaText(
-    root,
-    '[data-reglament-current-delta]',
+    getIndexedElements(index, CURRENT_DELTA_ATTRIBUTE),
     result.delta_tariff_per_sotka_month,
   );
 
   for (const section of result.sections) {
-    setMatchingText(
-      root,
-      '[data-reglament-section-tariff]',
-      'data-reglament-section-tariff',
-      section.id,
+    setText(
+      getIndexedElements(index, SECTION_TARIFF_ATTRIBUTE, section.id),
       formatReglamentTariff(section.tariff_per_sotka_month),
     );
-    setMatchingText(
-      root,
-      '[data-reglament-section-annual]',
-      'data-reglament-section-annual',
-      section.id,
+    setText(
+      getIndexedElements(index, SECTION_ANNUAL_ATTRIBUTE, section.id),
       formatReglamentAnnualMoney(section.annual_gross),
     );
-    setMatchingDeltaText(
-      root,
-      '[data-reglament-section-delta]',
-      'data-reglament-section-delta',
-      section.id,
+    setDeltaText(
+      getIndexedElements(index, SECTION_DELTA_ATTRIBUTE, section.id),
       section.delta_tariff_per_sotka_month,
     );
-    section.rows.forEach((row) => renderRow(root, row));
+    section.rows.forEach((row) => renderRow(index, row));
   }
 };
 
@@ -490,24 +578,18 @@ const readReglamentCalculatorField = (
 };
 
 const readReglamentCalculatorFields = (
-  root: ParentNode,
+  index: ReglamentCalculatorDomIndex,
 ): readonly ReglamentCalculatorFieldState[] =>
-  Array.from(root.querySelectorAll(FIELD_SELECTOR)).flatMap((node) => {
-    if (!(node instanceof HTMLInputElement)) {
-      return [];
-    }
-
+  index.fields.flatMap((node) => {
     const field = readReglamentCalculatorField(node);
 
     return field ? [field] : [];
   });
 
-const resetReglamentCalculatorFields = (root: ParentNode): void => {
-  root.querySelectorAll(FIELD_SELECTOR).forEach((node) => {
-    if (!(node instanceof HTMLInputElement)) {
-      return;
-    }
-
+const resetReglamentCalculatorFields = (
+  index: ReglamentCalculatorDomIndex,
+): void => {
+  index.fields.forEach((node) => {
     if (node.type === 'checkbox') {
       node.checked = node.dataset.reglamentBaseline === 'true';
       return;
@@ -544,17 +626,16 @@ const reglamentInputError = (input: HTMLInputElement): string | undefined => {
     : undefined;
 };
 
-const renderReglamentInputValidation = (root: ParentNode): void => {
-  root.querySelectorAll(FIELD_SELECTOR).forEach((node) => {
-    if (!(node instanceof HTMLInputElement) || node.type === 'checkbox') {
+const renderReglamentInputValidation = (
+  index: ReglamentCalculatorDomIndex,
+): void => {
+  index.fields.forEach((node) => {
+    if (node.type === 'checkbox') {
       return;
     }
 
     const error = reglamentInputError(node);
-    const errorId = node.getAttribute('aria-describedby');
-    const feedback = errorId
-      ? node.ownerDocument.getElementById(errorId)
-      : undefined;
+    const feedback = index.validationFeedback.get(node);
 
     node.setCustomValidity(error ?? '');
 
@@ -571,11 +652,12 @@ const renderReglamentInputValidation = (root: ParentNode): void => {
   });
 };
 
-const setResetVisibility = (root: ParentNode, isDirty: boolean): void => {
-  root.querySelectorAll(RESET_SELECTOR).forEach((node) => {
-    if (node instanceof HTMLButtonElement) {
-      node.hidden = !isDirty;
-    }
+const setResetVisibility = (
+  index: ReglamentCalculatorDomIndex,
+  isDirty: boolean,
+): void => {
+  index.resetButtons.forEach((node) => {
+    node.hidden = !isDirty;
   });
 };
 
@@ -586,12 +668,13 @@ const markManualBreakdownInput = (input: HTMLInputElement): void => {
 };
 
 export const hydrateReglamentCalculator = (root: HTMLElement): void => {
+  const index = createReglamentCalculatorDomIndex(root);
   const render = (): void => {
-    renderReglamentInputValidation(root);
-    const fields = readReglamentCalculatorFields(root);
+    renderReglamentInputValidation(index);
+    const fields = readReglamentCalculatorFields(index);
 
-    renderReglamentCalculator(root, calculateReglamentCalculatorState(fields));
-    setResetVisibility(root, fields.some(isReglamentCalculatorFieldDirty));
+    renderReglamentCalculator(index, calculateReglamentCalculatorState(fields));
+    setResetVisibility(index, fields.some(isReglamentCalculatorFieldDirty));
   };
 
   if (root.dataset.reglamentCalculatorHydrated === 'true') {
@@ -621,13 +704,11 @@ export const hydrateReglamentCalculator = (root: HTMLElement): void => {
     },
     true,
   );
-  root.querySelectorAll(RESET_SELECTOR).forEach((node) => {
-    if (node instanceof HTMLButtonElement) {
-      node.addEventListener('click', () => {
-        resetReglamentCalculatorFields(root);
-        render();
-      });
-    }
+  index.resetButtons.forEach((node) => {
+    node.addEventListener('click', () => {
+      resetReglamentCalculatorFields(index);
+      render();
+    });
   });
 
   render();
