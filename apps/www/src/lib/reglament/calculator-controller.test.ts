@@ -619,7 +619,7 @@ describe('buildReglamentCalculatorChanges', () => {
     `);
   });
 
-  it('shows the same accessible error for negative volume, frequency and rate', () => {
+  it('shows the same accessible error for negative, textual and infinite values', () => {
     const rowId = 'cleaning-winter-mechanized';
     document.body.innerHTML = `
       <div data-reglament-calculator>
@@ -669,9 +669,9 @@ describe('buildReglamentCalculatorChanges', () => {
     hydrateReglamentCalculator(root, calculationInput);
     volumeInput.value = '-100';
     volumeInput.dispatchEvent(new Event('input', { bubbles: true }));
-    frequencyInput.value = '−1';
+    frequencyInput.value = 'не число';
     frequencyInput.dispatchEvent(new Event('change', { bubbles: true }));
-    rateInput.value = '-0,5';
+    rateInput.value = 'Infinity';
     rateInput.dispatchEvent(new Event('input', { bubbles: true }));
 
     const expectedMessage =
@@ -698,23 +698,6 @@ describe('buildReglamentCalculatorChanges', () => {
       document.querySelector('[data-reglament-current-tariff]')?.textContent,
     ).toMatchInlineSnapshot(`"902,07 ₽/сотка"`);
 
-    volumeInput.value = '';
-    volumeInput.dispatchEvent(new Event('input', { bubbles: true }));
-
-    expect({
-      ariaInvalid: volumeInput.getAttribute('aria-invalid'),
-      validationMessage: volumeInput.validationMessage,
-      errorHidden: document.getElementById(
-        volumeInput.getAttribute('aria-describedby') ?? '',
-      )?.hidden,
-    }).toMatchInlineSnapshot(`
-      {
-        "ariaInvalid": null,
-        "errorHidden": true,
-        "validationMessage": "",
-      }
-    `);
-
     volumeInput.value = '81 000,5';
     volumeInput.dispatchEvent(new Event('change', { bubbles: true }));
 
@@ -723,6 +706,79 @@ describe('buildReglamentCalculatorChanges', () => {
     expect(
       document.querySelector('[data-reglament-current-tariff]')?.textContent,
     ).not.toBe('902,07 ₽/сотка');
+  });
+
+  it('keeps a cleared volume invalid after keyboard blur without hiding the baseline calculation', () => {
+    const rowId = 'cleaning-winter-mechanized';
+    document.body.innerHTML = `
+      <div data-reglament-calculator>
+        <label>
+          <input
+            type="text"
+            data-reglament-field="volume"
+            data-reglament-row-id="${rowId}"
+            data-reglament-baseline="81778"
+            aria-describedby="reglament-error-${rowId}-volume"
+            value="81778"
+          />
+          <span
+            id="reglament-error-${rowId}-volume"
+            aria-live="polite"
+            hidden
+          ></span>
+        </label>
+        <button type="button">Следующее поле</button>
+        <span data-reglament-row-tariff="${rowId}"></span>
+        <strong data-reglament-current-tariff></strong>
+      </div>
+    `;
+    const root = document.querySelector('[data-reglament-calculator]');
+    const volumeInput = document.querySelector('input');
+    const nextField = document.querySelector('button');
+    const error = document.getElementById(`reglament-error-${rowId}-volume`);
+    const rowTariff = document.querySelector('[data-reglament-row-tariff]');
+    const currentTariff = document.querySelector(
+      '[data-reglament-current-tariff]',
+    );
+
+    if (
+      !(root instanceof HTMLElement) ||
+      !(volumeInput instanceof HTMLInputElement) ||
+      !(nextField instanceof HTMLButtonElement) ||
+      !(error instanceof HTMLElement) ||
+      !(rowTariff instanceof HTMLElement) ||
+      !(currentTariff instanceof HTMLElement)
+    ) {
+      throw new Error('Missing cleared calculator fixture nodes');
+    }
+
+    hydrateReglamentCalculator(root, calculationInput);
+    volumeInput.focus();
+    volumeInput.value = '';
+    volumeInput.dispatchEvent(new Event('input', { bubbles: true }));
+    nextField.focus();
+
+    expect({
+      value: volumeInput.value,
+      activeElement: document.activeElement?.tagName,
+      ariaInvalid: volumeInput.getAttribute('aria-invalid'),
+      validationMessage: volumeInput.validationMessage,
+      errorHidden: error.hidden,
+      errorText: error.textContent,
+      rowTariff: rowTariff.textContent,
+      currentTariff: currentTariff.textContent,
+    }).toMatchInlineSnapshot(`
+      {
+        "activeElement": "BUTTON",
+        "ariaInvalid": "true",
+        "currentTariff": "902,07 ₽/сотка",
+        "errorHidden": false,
+        "errorText": "Введите 0 или положительное число. Расчет не учитывает это значение.",
+        "rowTariff": "87,53 ₽",
+        "validationMessage": "Введите 0 или положительное число. Расчет не учитывает это значение.",
+        "value": "",
+      }
+    `);
   });
 
   it('does not rescan calculator DOM on input after a page replacement', () => {
