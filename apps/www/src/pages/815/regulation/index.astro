@@ -19,7 +19,6 @@ import {
   formatReglamentTariff,
   formatReglamentTariffValue,
 } from '@/lib/reglament/format';
-import { reglamentNumberInputStep } from '@/lib/reglament/input-step';
 import {
   reglamentAssetsUrl,
   reglamentServicesUrl,
@@ -90,9 +89,6 @@ interface NumberControl<Key extends EditableFieldKey = BasicNumberFieldKey> {
   readonly label: string;
   readonly value: number;
   readonly unit?: string;
-  readonly min?: number;
-  readonly max?: number;
-  readonly step: number;
 }
 
 interface MissingFieldHint {
@@ -260,9 +256,6 @@ const numberControl = (
     label: field.label,
     value,
     unit: fieldUnit(row, key, field.unit),
-    min: field.min,
-    max: field.max,
-    step: reglamentNumberInputStep(field, value),
   };
 };
 const expertFieldValue = (
@@ -311,9 +304,6 @@ const expertNumberControls = (
         label: field.label,
         value,
         unit: field.unit ?? (field.key.endsWith('_rate') ? 'доля' : '₽/год'),
-        min: field.min,
-        max: field.max,
-        step: reglamentNumberInputStep(field, value),
       },
     ];
   });
@@ -706,9 +696,6 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                     data-reglament-baseline={String(
                                       row.controls.base.value,
                                     )}
-                                    data-reglament-min={row.controls.base.min}
-                                    data-reglament-max={row.controls.base.max}
-                                    data-reglament-step={row.controls.base.step}
                                   />
                                   {row.controls.base.unit && (
                                     <span class={inputUnitClass}>
@@ -786,15 +773,6 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                     data-reglament-baseline={String(
                                       row.controls.frequency.value,
                                     )}
-                                    data-reglament-min={
-                                      row.controls.frequency.min
-                                    }
-                                    data-reglament-max={
-                                      row.controls.frequency.max
-                                    }
-                                    data-reglament-step={
-                                      row.controls.frequency.step
-                                    }
                                   />
                                   {row.controls.frequency.unit && (
                                     <span class={inputUnitClass}>
@@ -870,9 +848,6 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                     data-reglament-baseline={String(
                                       row.controls.rate.value,
                                     )}
-                                    data-reglament-min={row.controls.rate.min}
-                                    data-reglament-max={row.controls.rate.max}
-                                    data-reglament-step={row.controls.rate.step}
                                   />
                                   {row.controls.rate.unit && (
                                     <span class={inputUnitClass}>
@@ -1061,15 +1036,6 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                                     data-reglament-baseline={String(
                                                       control.value,
                                                     )}
-                                                    data-reglament-min={
-                                                      control.min
-                                                    }
-                                                    data-reglament-max={
-                                                      control.max
-                                                    }
-                                                    data-reglament-step={
-                                                      control.step
-                                                    }
                                                   />
                                                   {control.unit && (
                                                     <span
@@ -1148,9 +1114,6 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                               data-reglament-baseline={String(
                                                 control.value,
                                               )}
-                                              data-reglament-min={control.min}
-                                              data-reglament-max={control.max}
-                                              data-reglament-step={control.step}
                                             />
                                             {control.unit && (
                                               <span class={inputUnitClass}>
