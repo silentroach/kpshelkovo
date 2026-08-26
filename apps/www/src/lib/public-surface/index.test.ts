@@ -178,19 +178,68 @@ const compareSlice: PublicSurfaceSlice = {
 };
 
 describe('public surface registry', () => {
-  it('aggregates section-owned slices without losing ownership', () => {
+  it('preserves slice and surface order for valid fragments', () => {
     const registry = createPublicSurfaceRegistry([newsSlice, compareSlice]);
 
-    expect(registry.sections).toEqual([newsSlice.owner, compareSlice.owner]);
-    expect(registry.surfaces.map((surface) => surface.id)).toEqual([
-      'news:index',
-      'news:article',
-      'compare:data',
-    ]);
-    expect(
-      registry.surfacesByOwner('news').map((surface) => surface.id),
-    ).toEqual(['news:index', 'news:article']);
-    expect(registry.surfaceOwner('compare:data')).toEqual(compareSlice.owner);
+    expect({
+      slices: registry.slices.map((slice) => slice.owner.id),
+      sections: registry.sections.map((owner) => owner.id),
+      surfaces: registry.surfaces.map((surface) => surface.id),
+      newsSurfaces: registry
+        .surfacesByOwner('news')
+        .map((surface) => surface.id),
+      compareDataOwner: registry.surfaceOwner('compare:data')?.id,
+    }).toMatchInlineSnapshot(`
+      {
+        "compareDataOwner": "compare",
+        "newsSurfaces": [
+          "news:index",
+          "news:article",
+        ],
+        "sections": [
+          "news",
+          "compare",
+        ],
+        "slices": [
+          "news",
+          "compare",
+        ],
+        "surfaces": [
+          "news:index",
+          "news:article",
+          "compare:data",
+        ],
+      }
+    `);
+  });
+
+  it('rejects duplicate owner ids', () => {
+    const conflictingOwnerSlice: PublicSurfaceSlice = {
+      owner: {
+        id: 'news',
+        label: 'Другой раздел',
+      },
+      surfaces: compareSlice.surfaces,
+    };
+
+    expect(() =>
+      createPublicSurfaceRegistry([newsSlice, conflictingOwnerSlice]),
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: duplicate public surface owner id "news"]`,
+    );
+  });
+
+  it('rejects duplicate surface ids across owners', () => {
+    const conflictingSurfaceSlice: PublicSurfaceSlice = {
+      owner: compareSlice.owner,
+      surfaces: newsSlice.surfaces,
+    };
+
+    expect(() =>
+      createPublicSurfaceRegistry([newsSlice, conflictingSurfaceSlice]),
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: duplicate public surface id "news:index"]`,
+    );
   });
 
   it('keeps path and route-pattern surfaces linkset-friendly', () => {
