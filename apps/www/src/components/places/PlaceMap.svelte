@@ -1,12 +1,7 @@
 <script lang="ts">
   import { pluralize } from '@shelkovo/format';
   import type { Feature } from '@yandex/ymaps3-clusterer';
-  import type {
-    DrawingStyle,
-    LngLat,
-    MultiPolygonGeometry,
-    PolygonGeometry,
-  } from '@yandex/ymaps3-types';
+  import type { DrawingStyle } from '@yandex/ymaps3-types';
   import {
     APPLE_MARKER,
     ANIMALS_MARKER,
@@ -31,13 +26,20 @@
   } from '@/lib/places/map-public-dto';
   import type { PlaceMapItem, PlaceMapProps } from '@/lib/places/map-types';
   import { placeUrl } from '@/lib/places/routes';
-  import { PLACE_MAP_BOUNDS } from '@/lib/places/schema';
   import type { PlaceMarker } from '@/lib/places/schema';
-  import type {
-    PlaceGeometryPosition,
-    PlacePolygonGeometry,
-  } from '@/lib/places/types';
   import { formatPlaceStatus } from '@/lib/places/view';
+
+  import {
+    createMapFeatures,
+    getMarkerScale,
+    getPaddedBounds,
+    getPlaceBounds,
+    toMapGeometry,
+  } from './place-map-geometry';
+  import {
+    getUrlWithoutPlaceHighlight,
+    PLACE_HIGHLIGHT_QUERY_PARAM,
+  } from './place-map-url';
 
   let {
     dataUrl = '',
@@ -45,25 +47,14 @@
     places = [] as readonly PlaceMapItem[],
   }: PlaceMapProps = $props();
 
-  const SETTLEMENT_BOUNDS: ymaps3.LngLatBounds = [
-    [PLACE_MAP_BOUNDS.minLng, PLACE_MAP_BOUNDS.minLat],
-    [PLACE_MAP_BOUNDS.maxLng, PLACE_MAP_BOUNDS.maxLat],
-  ];
   const VIEW_MARGIN: ymaps3.Margin = [112, 80, 32, 80];
   const MOBILE_VIEW_MARGIN: ymaps3.Margin = [112, 32, 32, 32];
-  const BOUNDS_PADDING_RATIO = 0.3;
   const CLUSTER_GRID_SIZE = 48;
   const CLUSTER_ZOOM_DURATION_MS = 220;
   const HIGHLIGHT_DURATION_MS = 5_000;
-  const HIGHLIGHT_QUERY_PARAM = 'h';
   const AREA_HOVER_LEAVE_DELAY_MS = 80;
-  const MARKER_MIN_SCALE = 20 / 32;
-  const MARKER_MIN_ZOOM = 13.5;
   const MARKER_MAX_ZOOM = 16;
-  const MARKER_CLOSEUP_MAX_ZOOM = 18;
-  const MARKER_CLOSEUP_MAX_SCALE = 1.3;
   const PLACE_FOCUS_ZOOM = MARKER_MAX_ZOOM;
-  const roundCoordinate = (value: number): number => Number(value.toFixed(6));
   const toPlaceMapItem = (place: PlaceMapPublicItemDto): PlaceMapItem => ({
     slug: place.slug,
     name: place.name,
@@ -92,26 +83,6 @@
     const payload = (await response.json()) as PlaceMapPublicPayloadDto;
     return payload.places.map(toPlaceMapItem);
   };
-  const copyGeometryRing = (ring: readonly PlaceGeometryPosition[]): LngLat[] =>
-    ring.map(([lng, lat]) => [lng, lat]);
-  const toMapGeometry = (
-    geometry: PlacePolygonGeometry,
-  ): PolygonGeometry | MultiPolygonGeometry => {
-    switch (geometry.type) {
-      case 'Polygon':
-        return {
-          type: geometry.type,
-          coordinates: geometry.coordinates.map(copyGeometryRing),
-        };
-      case 'MultiPolygon':
-        return {
-          type: geometry.type,
-          coordinates: geometry.coordinates.map((polygon) =>
-            polygon.map(copyGeometryRing),
-          ),
-        };
-    }
-  };
   const CUSTOM_MARKER_IMAGES: Readonly<
     Record<
       PlaceMarker,
@@ -126,58 +97,8 @@
     fish: FISH_MARKER,
     kpp: KPP_MARKER,
   };
-  const getPaddedBounds = (
-    coordinates: readonly ymaps3.LngLat[],
-  ): ymaps3.LngLatBounds => {
-    if (coordinates.length < 2) return SETTLEMENT_BOUNDS;
-
-    const longitudes = coordinates.map(([lng]) => lng);
-    const latitudes = coordinates.map(([, lat]) => lat);
-    const minLng = Math.min(...longitudes);
-    const maxLng = Math.max(...longitudes);
-    const minLat = Math.min(...latitudes);
-    const maxLat = Math.max(...latitudes);
-    const lngPadding = (maxLng - minLng) * BOUNDS_PADDING_RATIO;
-    const latPadding = (maxLat - minLat) * BOUNDS_PADDING_RATIO;
-
-    return [
-      [
-        roundCoordinate(minLng - lngPadding),
-        roundCoordinate(minLat - latPadding),
-      ],
-      [
-        roundCoordinate(maxLng + lngPadding),
-        roundCoordinate(maxLat + latPadding),
-      ],
-    ];
-  };
-  const getPlaceBounds = (): ymaps3.LngLatBounds =>
-    getPaddedBounds(
-      places.map((place): ymaps3.LngLat => [
-        place.coordinates.lng,
-        place.coordinates.lat,
-      ]),
-    );
-  const getMarkerScale = (zoom: number): number => {
-    if (zoom > MARKER_MAX_ZOOM) {
-      const closeupProgress = Math.min(
-        1,
-        (zoom - MARKER_MAX_ZOOM) / (MARKER_CLOSEUP_MAX_ZOOM - MARKER_MAX_ZOOM),
-      );
-
-      return 1 + (MARKER_CLOSEUP_MAX_SCALE - 1) * closeupProgress;
-    }
-
-    const progress = Math.min(
-      1,
-      Math.max(
-        0,
-        (zoom - MARKER_MIN_ZOOM) / (MARKER_MAX_ZOOM - MARKER_MIN_ZOOM),
-      ),
-    );
-
-    return MARKER_MIN_SCALE + (1 - MARKER_MIN_SCALE) * progress;
-  };
+  const getCurrentPlaceBounds = (): ymaps3.LngLatBounds =>
+    getPlaceBounds(places);
   const getMapZoomDuration = (): number =>
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
       ? 0
@@ -187,39 +108,11 @@
       ? MOBILE_VIEW_MARGIN
       : VIEW_MARGIN;
   const removeHighlightQuery = (expectedSlug?: string): void => {
-    const url = new URL(window.location.href);
+    const url = getUrlWithoutPlaceHighlight(window.location.href, expectedSlug);
 
-    if (!url.searchParams.has(HIGHLIGHT_QUERY_PARAM)) return;
+    if (!url) return;
 
-    const currentSlug =
-      url.searchParams.get(HIGHLIGHT_QUERY_PARAM) || undefined;
-
-    if (currentSlug !== expectedSlug) return;
-
-    const query = url.search
-      .slice(1)
-      .split('&')
-      .filter((part) => {
-        const separator = part.indexOf('=');
-        const encodedName = separator === -1 ? part : part.slice(0, separator);
-
-        try {
-          return (
-            decodeURIComponent(encodedName.replaceAll('+', ' ')) !==
-            HIGHLIGHT_QUERY_PARAM
-          );
-        } catch {
-          return true;
-        }
-      })
-      .join('&');
-
-    url.search = query ? `?${query}` : '';
-    window.history.replaceState(
-      window.history.state,
-      '',
-      `${url.pathname}${url.search}${url.hash}`,
-    );
+    window.history.replaceState(window.history.state, '', url);
   };
 
   let mapContainer: HTMLDivElement | undefined = $state(undefined);
@@ -485,16 +378,6 @@
     return link;
   };
 
-  const createFeatures = (): Feature[] =>
-    places.map((place) => ({
-      type: 'Feature',
-      id: place.slug,
-      geometry: {
-        type: 'Point',
-        coordinates: [place.coordinates.lng, place.coordinates.lat],
-      },
-    }));
-
   const updateMarkerScale = (zoom: number): void => {
     mapContainer?.style.setProperty(
       '--place-map-marker-scale',
@@ -577,7 +460,7 @@
 
   const fitPlaces = (): void => {
     map?.update?.({
-      location: { bounds: getPlaceBounds(), duration: 0 },
+      location: { bounds: getCurrentPlaceBounds(), duration: 0 },
       margin: getViewMargin(),
     });
   };
@@ -619,7 +502,7 @@
     let resizeObserver: ResizeObserver | undefined;
     const highlightUrl = new URL(window.location.href);
     const requestedSlug =
-      highlightUrl.searchParams.get(HIGHLIGHT_QUERY_PARAM) || undefined;
+      highlightUrl.searchParams.get(PLACE_HIGHLIGHT_QUERY_PARAM) || undefined;
     let highlightedPlace: PlaceMapItem | undefined;
 
     const startPlaceHighlight = (place: PlaceMapItem): void => {
@@ -687,7 +570,7 @@
           : undefined;
 
         if (
-          highlightUrl.searchParams.has(HIGHLIGHT_QUERY_PARAM) &&
+          highlightUrl.searchParams.has(PLACE_HIGHLIGHT_QUERY_PARAM) &&
           !highlightedPlace
         ) {
           removeHighlightQuery(requestedSlug);
@@ -722,7 +605,7 @@
         map = new YMap(
           mapContainer,
           {
-            location: { bounds: getPlaceBounds() },
+            location: { bounds: getCurrentPlaceBounds() },
             behaviors: mapBehaviors(),
             mode: 'vector',
           },
@@ -758,7 +641,7 @@
         });
         mapClusterer = new YMapClusterer({
           method: clusterByGrid({ gridSize: CLUSTER_GRID_SIZE }),
-          features: createFeatures(),
+          features: createMapFeatures(places),
           maxZoom: PLACE_FOCUS_ZOOM - 1,
           marker: (feature) => {
             const content = markerContents.find(

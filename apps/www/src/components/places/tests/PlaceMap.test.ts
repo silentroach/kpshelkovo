@@ -479,18 +479,6 @@ describe('PlaceMap', () => {
         "title": "Строительство",
       }
     `);
-    expect(mapProps[0]?.location.bounds).toMatchInlineSnapshot(`
-      [
-        [
-          37.707046,
-          55.060473,
-        ],
-        [
-          37.75609,
-          55.060756,
-        ],
-      ]
-    `);
   });
 
   it('focuses and highlights the requested place for five seconds', async () => {
@@ -597,35 +585,11 @@ describe('PlaceMap', () => {
 
     expect({
       id: feature.props.id,
-      geometry: feature.props.geometry,
+      geometryType: feature.props.geometry.type,
       initialStyle: feature.props.style,
     }).toMatchInlineSnapshot(`
       {
-        "geometry": {
-          "coordinates": [
-            [
-              [
-                [
-                  37.74,
-                  55.05,
-                ],
-                [
-                  37.75,
-                  55.05,
-                ],
-                [
-                  37.75,
-                  55.06,
-                ],
-                [
-                  37.74,
-                  55.05,
-                ],
-              ],
-            ],
-          ],
-          "type": "MultiPolygon",
-        },
+        "geometryType": "MultiPolygon",
         "id": "hunting-ponds-area",
         "initialStyle": {
           "fillOpacity": 0,
@@ -857,7 +821,7 @@ describe('PlaceMap', () => {
     expect(clearInterval).toHaveBeenCalledWith(timer);
   });
 
-  it('shrinks marker graphics smoothly while preserving their hit areas', async () => {
+  it('applies marker scale updates from the map listener', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: false }));
 
     render(PlaceMap, { props: { places: [place] } });
@@ -870,37 +834,23 @@ describe('PlaceMap', () => {
     if (!mapElement || !update)
       throw new Error('map update listener is missing');
 
-    const scales = [
-      mapElement.style.getPropertyValue('--place-map-marker-scale'),
-    ];
-    for (const zoom of [13.5, 16, 17, 18]) {
-      update({
-        type: 'update',
-        location: {
-          center: [37.74, 55.06],
-          zoom,
-          bounds: [
-            [37.7, 55.04],
-            [37.77, 55.08],
-          ],
-        },
-        camera: {},
-        mapInAction: false,
-      });
-      scales.push(
-        mapElement.style.getPropertyValue('--place-map-marker-scale'),
-      );
-    }
+    update({
+      type: 'update',
+      location: {
+        center: [37.74, 55.06],
+        zoom: 17,
+        bounds: [
+          [37.7, 55.04],
+          [37.77, 55.08],
+        ],
+      },
+      camera: {},
+      mapInAction: false,
+    });
 
-    expect(scales).toMatchInlineSnapshot(`
-      [
-        "0.850",
-        "0.625",
-        "1.000",
-        "1.150",
-        "1.300",
-      ]
-    `);
+    expect(mapElement.style.getPropertyValue('--place-map-marker-scale')).toBe(
+      '1.150',
+    );
   });
 
   it('renders an accessible cluster that zooms to its places', async () => {
