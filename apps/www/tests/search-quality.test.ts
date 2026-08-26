@@ -19,6 +19,7 @@ const queryGroups = [
     name: '#121 short queries',
     queries: [
       'еда',
+      'калькуля',
       'медицина',
       'м',
       'подать в суд тариф',
@@ -155,6 +156,7 @@ const rankExpectations: ReadonlyMap<
     { url: '/815/regulation/#tariff-calculator-title', maxRank: 1 },
   ],
   ['что входит в тариф 815', { url: '/815/regulation/', maxRank: 2 }],
+  ['калькуля', { url: '/815/regulation/#tariff-calculator-title', maxRank: 1 }],
   ['тсн', { url: '/kb/tsn/manipulations/', maxRank: 1 }],
   ['суд', { url: '/kb/court/order-debt/', maxRank: 1 }],
   ['газ', { url: '/kb/services/gas/', maxRank: 1 }],

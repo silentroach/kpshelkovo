@@ -709,6 +709,95 @@ describe('Pagefind search client', () => {
     `);
   });
 
+  it('keeps Pagefind forward-prefix results for a missing long token', async () => {
+    const firstData = vi.fn(async () => ({
+      ...validResult(1),
+      content: 'Калькулятор тарифа',
+      locations: [0],
+    }));
+    const secondData = vi.fn(async () => ({
+      ...validResult(2),
+      content: 'Возьмите калькулятор',
+      locations: [1],
+    }));
+    const broadResponse: PagefindSearchResponse = {
+      results: [
+        { id: 'calculator', score: 10, words: [0], data: firstData },
+        { id: 'meeting', score: 1, words: [1], data: secondData },
+      ],
+    };
+    const search = vi.fn(async (query: string) =>
+      query === '"калькуля"' ? responseWith() : broadResponse,
+    );
+    const runtime: PagefindRuntime = {
+      init: vi.fn(async () => {}),
+      options: vi.fn(async () => {}),
+      preload: vi.fn(async () => {}),
+      search,
+    };
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => runtime,
+    });
+
+    const result = await client.search('калькуля');
+
+    expect({
+      dataCalls: [firstData.mock.calls.length, secondData.mock.calls.length],
+      result,
+      searchCalls: search.mock.calls,
+    }).toMatchInlineSnapshot(`
+      {
+        "dataCalls": [
+          1,
+          1,
+        ],
+        "result": {
+          "query": "калькуля",
+          "results": [
+            {
+              "description": undefined,
+              "excerptHtml": "Результат 1",
+              "matchContext": undefined,
+              "publishedAt": undefined,
+              "section": {
+                "id": "news",
+                "label": "Новости",
+              },
+              "subResults": [],
+              "title": "Результат 1",
+              "url": "/news/result-1/",
+            },
+            {
+              "description": undefined,
+              "excerptHtml": "Результат 2",
+              "matchContext": undefined,
+              "publishedAt": undefined,
+              "section": {
+                "id": "news",
+                "label": "Новости",
+              },
+              "subResults": [],
+              "title": "Результат 2",
+              "url": "/news/result-2/",
+            },
+          ],
+          "searchQuery": "калькуля",
+          "state": "ready",
+          "total": 2,
+        },
+        "searchCalls": [
+          [
+            "калькуля",
+          ],
+          [
+            "\"калькуля\"",
+          ],
+        ],
+      }
+    `);
+  });
+
   it('uses exact short-word matches without losing Pagefind ranking data', async () => {
     const data = {
       broadFood: vi.fn(async () => ({
