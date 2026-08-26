@@ -9,12 +9,17 @@ import {
 } from '@/lib/breadcrumbs';
 import { collectionPageSchema } from '@/lib/news/seo';
 import { loadStatusData } from '@/lib/status/load';
-import { statusServiceUrl, statusUrl } from '@/lib/status/routes';
+import {
+  statusHistoryUrl,
+  statusServiceUrl,
+  statusUrl,
+} from '@/lib/status/routes';
 
 const data = await loadStatusData();
 const now = Date.now();
 const overviewTimelineDays = 30;
 const mobileOverviewTimelineDays = 7;
+const recentIncidents = data.incidents.slice(0, 10);
 const activeIncidents = data.active.filter((item) => item.kind === 'incident');
 const plannedWorks = data.incidents.filter(
   (item) =>
@@ -32,7 +37,7 @@ const keywords = [
   'история инцидентов Шелково',
 ];
 const breadcrumbs = withHomeBreadcrumbs([{ label: 'Статус' }]);
-const schemaItems = data.incidents
+const schemaItems = recentIncidents
   .filter((item) => item.hasPage)
   .map((item) => ({ name: item.title, url: item.url }));
 const schema = collectionPageSchema({
@@ -151,19 +156,31 @@ const schema = collectionPageSchema({
       )
     }
 
-    <section class="mt-12 px-5 md:mt-14 md:px-6">
+    <section
+      class="mt-12 px-5 md:mt-14 md:px-6"
+      aria-labelledby="status-history-title"
+      data-status-history
+    >
       <div class="space-y-4">
         <div>
-          <h2 class="ui-section-title">История</h2>
+          <h2 id="status-history-title" class="ui-section-title">
+            Последние записи
+          </h2>
         </div>
 
         <div class="-mx-5 md:-mx-6">
           {
-            data.incidents.map((incident) => (
+            recentIncidents.map((incident) => (
               <StatusIncidentRow incident={incident} />
             ))
           }
         </div>
+
+        <p>
+          <a class="ui-link font-semibold" href={statusHistoryUrl()}>
+            Вся история статусов
+          </a>
+        </p>
       </div>
     </section>
   </main>

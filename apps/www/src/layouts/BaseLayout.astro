@@ -29,6 +29,7 @@ interface Props {
   schema?: SchemaDoc | readonly SchemaDoc[];
   preconnectYandexMaps?: boolean;
   bodyClass?: string;
+  markdownAlternate?: string;
   showSiteHeader?: boolean;
   showSiteFooter?: boolean;
   overlaySiteHeader?: boolean;
@@ -47,6 +48,7 @@ const {
   schema,
   preconnectYandexMaps = false,
   bodyClass,
+  markdownAlternate: markdownAlternatePath,
   showSiteHeader = true,
   showSiteFooter = true,
   overlaySiteHeader = false,
@@ -59,7 +61,9 @@ const markdownPath =
     ? '/index.md'
     : `${Astro.url.pathname.replace(/\/$/u, '')}/index.md`;
 const markdownAlternate =
-  robots === 'noindex, nofollow' ? undefined : absoluteUrl(markdownPath);
+  robots === 'noindex, nofollow'
+    ? undefined
+    : absoluteUrl(markdownAlternatePath ?? markdownPath);
 const keywordContent = collectKeywords(keywords, BRAND_KEYWORDS).join(', ');
 const social = image ? absoluteUrl(image) : undefined;
 const socialAlt = social ? (imageAlt ?? title) : undefined;

@@ -105,6 +105,7 @@ describe('buildSitemapMetadataIndex', () => {
 
     expect({
       home: index.get('/'),
+      statusHistory: index.get('/status/history/'),
       electricityService: index.get('/status/electricity/'),
       electricityIncident: index.get('/status/incidents/2026/05/electricity/'),
       compareHome: index.get('/815/compare/'),
@@ -134,6 +135,10 @@ describe('buildSitemapMetadataIndex', () => {
         "riverSettlement": {
           "changefreq": "monthly",
           "lastmod": "2026-04-12",
+        },
+        "statusHistory": {
+          "changefreq": "hourly",
+          "lastmod": "2026-05-03T14:00:00+03:00",
         },
       }
     `);
