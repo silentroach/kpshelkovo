@@ -1,12 +1,11 @@
-import { estimate2026 } from '@/data/reglament/estimate-2026';
-
+import { calculateEstimate } from './calculate';
 import {
-  calculateEstimate,
   type CalculatedEstimate,
   type CalculatedEstimateRow,
   type EstimateCalculationChanges,
+  type EstimateCalculationInput,
   type EstimateRowChange,
-} from './calculate';
+} from './calculate.types';
 import {
   formatReglamentInputNumber,
   formatReglamentAnnualMoney,
@@ -43,6 +42,7 @@ type MutableEstimateRowChange = {
 
 const ROOT_SELECTOR = '[data-reglament-calculator]';
 const FIELD_ATTRIBUTE = 'data-reglament-field';
+const CALCULATION_INPUT_ATTRIBUTE = 'data-reglament-calculation-input';
 const RESET_ATTRIBUTE = 'data-reglament-reset';
 const CURRENT_TARIFF_ATTRIBUTE = 'data-reglament-current-tariff';
 const CURRENT_TARIFF_TONE_ATTRIBUTE = 'data-reglament-current-tariff-tone';
@@ -75,6 +75,7 @@ const ID_ELEMENT_ATTRIBUTES = [
 ] as const;
 const CACHED_ELEMENT_ATTRIBUTES = [
   FIELD_ATTRIBUTE,
+  CALCULATION_INPUT_ATTRIBUTE,
   RESET_ATTRIBUTE,
   ...STATIC_ELEMENT_ATTRIBUTES,
   ...ID_ELEMENT_ATTRIBUTES,
@@ -83,9 +84,6 @@ const CACHED_ELEMENT_ATTRIBUTES = [
 const CACHED_ELEMENT_SELECTOR = CACHED_ELEMENT_ATTRIBUTES.map(
   (attribute) => `[${attribute}]`,
 ).join(',');
-const OFFICIAL_TARIFF_TEXT = formatReglamentNumber(
-  estimate2026.baseline.tariff_per_sotka_month,
-);
 const TARIFF_ARROW_TEXT = '→';
 const INVALID_NUMBER_MESSAGE =
   'Введите 0 или положительное число. Расчет не учитывает это значение.';
@@ -126,6 +124,7 @@ const BREAKDOWN_FIELD_KEYS = [
 ] as const satisfies readonly BreakdownFieldKey[];
 
 interface ReglamentCalculatorDomIndex {
+  readonly calculationInput?: HTMLScriptElement;
   readonly fields: readonly HTMLInputElement[];
   readonly resetButtons: readonly HTMLButtonElement[];
   readonly validationFeedback: ReadonlyMap<HTMLInputElement, HTMLElement>;
@@ -239,9 +238,10 @@ export const buildReglamentCalculatorChanges = (
 };
 
 export const calculateReglamentCalculatorState = (
+  calculationInput: EstimateCalculationInput,
   fields: readonly ReglamentCalculatorFieldState[],
 ): CalculatedEstimate =>
-  calculateEstimate(estimate2026, buildReglamentCalculatorChanges(fields));
+  calculateEstimate(calculationInput, buildReglamentCalculatorChanges(fields));
 
 const isReglamentCalculatorFieldDirty = (
   field: ReglamentCalculatorFieldState,
@@ -325,6 +325,7 @@ const getIndexedBreakdownInputs = (
 const createReglamentCalculatorDomIndex = (
   root: ParentNode,
 ): ReglamentCalculatorDomIndex => {
+  let calculationInput: HTMLScriptElement | undefined;
   const fields: HTMLInputElement[] = [];
   const resetButtons: HTMLButtonElement[] = [];
   const validationFeedback = new Map<HTMLInputElement, HTMLElement>();
@@ -334,6 +335,13 @@ const createReglamentCalculatorDomIndex = (
   root.querySelectorAll(CACHED_ELEMENT_SELECTOR).forEach((node) => {
     if (!(node instanceof HTMLElement)) {
       return;
+    }
+
+    if (
+      node instanceof HTMLScriptElement &&
+      node.hasAttribute(CALCULATION_INPUT_ATTRIBUTE)
+    ) {
+      calculationInput = node;
     }
 
     if (
@@ -394,6 +402,7 @@ const createReglamentCalculatorDomIndex = (
   });
 
   return {
+    calculationInput,
     fields,
     resetButtons,
     validationFeedback,
@@ -421,6 +430,7 @@ const setDeltaText = (
 const setCurrentTariffText = (
   index: ReglamentCalculatorDomIndex,
   result: CalculatedEstimate,
+  officialTariffText: string,
 ): void => {
   const tone = deltaTone(result.delta_tariff_per_sotka_month);
   const isBaseline = tone === 'zero';
@@ -439,7 +449,7 @@ const setCurrentTariffText = (
   });
   getIndexedElements(index, CURRENT_ORIGINAL_TARIFF_ATTRIBUTE).forEach(
     (node) => {
-      node.textContent = OFFICIAL_TARIFF_TEXT;
+      node.textContent = officialTariffText;
       node.hidden = isBaseline;
     },
   );
@@ -511,8 +521,9 @@ const renderRow = (
 const renderReglamentCalculator = (
   index: ReglamentCalculatorDomIndex,
   result: CalculatedEstimate,
+  officialTariffText: string,
 ): void => {
-  setCurrentTariffText(index, result);
+  setCurrentTariffText(index, result, officialTariffText);
   setText(
     getIndexedElements(index, CURRENT_ANNUAL_ATTRIBUTE),
     formatReglamentAnnualMoney(result.annual_gross),
@@ -667,13 +678,36 @@ const markManualBreakdownInput = (input: HTMLInputElement): void => {
   }
 };
 
-export const hydrateReglamentCalculator = (root: HTMLElement): void => {
+const readReglamentCalculationInput = (
+  index: ReglamentCalculatorDomIndex,
+): EstimateCalculationInput => {
+  const data = index.calculationInput;
+
+  if (!data?.textContent) {
+    throw new Error('Missing reglament calculator input');
+  }
+
+  return JSON.parse(data.textContent) as EstimateCalculationInput;
+};
+
+export const hydrateReglamentCalculator = (
+  root: HTMLElement,
+  calculationInput?: EstimateCalculationInput,
+): void => {
   const index = createReglamentCalculatorDomIndex(root);
+  const input = calculationInput ?? readReglamentCalculationInput(index);
+  const officialTariffText = formatReglamentNumber(
+    input.baseline.tariff_per_sotka_month,
+  );
   const render = (): void => {
     renderReglamentInputValidation(index);
     const fields = readReglamentCalculatorFields(index);
 
-    renderReglamentCalculator(index, calculateReglamentCalculatorState(fields));
+    renderReglamentCalculator(
+      index,
+      calculateReglamentCalculatorState(input, fields),
+      officialTariffText,
+    );
     setResetVisibility(index, fields.some(isReglamentCalculatorFieldDirty));
   };
 

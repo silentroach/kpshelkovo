@@ -1,65 +1,14 @@
 import type {
-  CostBreakdown,
-  Estimate,
-  EstimateCoefficients,
-  EstimateRow,
-  EstimateSection,
-} from './schema';
-
-export interface EstimateRowChange {
-  readonly enabled?: boolean;
-  readonly volume?: number;
-  readonly frequency?: number;
-  readonly rate?: number;
-  readonly fixed_price?: number;
-  readonly primary_salary?: number;
-  readonly machinist_salary?: number;
-  readonly machines?: number;
-  readonly materials?: number;
-  readonly contractors?: number;
-  readonly insurance_rate?: number;
-  readonly overhead_rate?: number;
-  readonly profit_rate?: number;
-  readonly usn_rate?: number;
-  readonly vat_rate?: number;
-}
-
-export interface EstimateCalculationChanges {
-  readonly rows?: Readonly<Record<string, EstimateRowChange>>;
-}
-
-export interface CalculatedEstimateRow {
-  readonly id: string;
-  readonly title: string;
-  readonly is_enabled: boolean;
-  readonly annual_gross: number;
-  readonly tariff_per_sotka_month: number;
-  readonly delta_annual_gross: number;
-  readonly delta_tariff_per_sotka_month: number;
-  readonly breakdown: CostBreakdown;
-  readonly children?: readonly CalculatedEstimateRow[];
-}
-
-export interface CalculatedEstimateSection {
-  readonly id: string;
-  readonly title: string;
-  readonly annual_gross: number;
-  readonly tariff_per_sotka_month: number;
-  readonly delta_annual_gross: number;
-  readonly delta_tariff_per_sotka_month: number;
-  readonly rows: readonly CalculatedEstimateRow[];
-}
-
-export interface CalculatedEstimate {
-  readonly id: string;
-  readonly year: number;
-  readonly title: string;
-  readonly annual_gross: number;
-  readonly tariff_per_sotka_month: number;
-  readonly delta_annual_gross: number;
-  readonly delta_tariff_per_sotka_month: number;
-  readonly sections: readonly CalculatedEstimateSection[];
-}
+  CalculatedEstimate,
+  CalculatedEstimateRow,
+  CalculatedEstimateSection,
+  EstimateCalculationChanges,
+  EstimateCalculationInput,
+  EstimateCalculationRow,
+  EstimateCalculationSection,
+  EstimateRowChange,
+} from './calculate.types';
+import type { CostBreakdown, EstimateCoefficients } from './schema';
 
 type CostFieldKey =
   | 'primary_salary'
@@ -197,7 +146,7 @@ const coefficient = (
 ): number => rowChangeValue(change, key) ?? coefficients[key];
 
 const calculateFormulaBreakdown = (
-  row: EstimateRow,
+  row: EstimateCalculationRow,
   change: EstimateRowChange | undefined,
   multiplier: number,
   coefficients: EstimateCoefficients,
@@ -277,7 +226,7 @@ const calculateFormulaBreakdown = (
 };
 
 const ratioForChange = (
-  row: EstimateRow,
+  row: EstimateCalculationRow,
   key: 'volume' | 'frequency' | 'rate',
   changeValue: number | undefined,
 ): number => {
@@ -300,7 +249,7 @@ const ratioForChange = (
 };
 
 const quantityMultiplier = (
-  row: EstimateRow,
+  row: EstimateCalculationRow,
   change: EstimateRowChange | undefined,
 ): number =>
   ratioForChange(row, 'volume', rowChangeValue(change, 'volume')) *
@@ -308,7 +257,7 @@ const quantityMultiplier = (
   ratioForChange(row, 'rate', rowChangeValue(change, 'rate'));
 
 const rowBreakdown = (
-  row: EstimateRow,
+  row: EstimateCalculationRow,
   change: EstimateRowChange | undefined,
   coefficients: EstimateCoefficients,
 ): { readonly isEnabled: boolean; readonly breakdown: CostBreakdown } => {
@@ -370,7 +319,7 @@ const rowBreakdown = (
 };
 
 const calculateRow = (
-  row: EstimateRow,
+  row: EstimateCalculationRow,
   changes: EstimateCalculationChanges,
   coefficients: EstimateCoefficients,
   areaSotki: number,
@@ -406,7 +355,6 @@ const calculateRow = (
 
   return {
     id: row.id,
-    title: row.title,
     is_enabled: calculated.isEnabled,
     annual_gross: annualGross,
     tariff_per_sotka_month: tariffPerSotkaMonth,
@@ -420,7 +368,7 @@ const calculateRow = (
 };
 
 const calculateSection = (
-  section: EstimateSection,
+  section: EstimateCalculationSection,
   changes: EstimateCalculationChanges,
   coefficients: EstimateCoefficients,
   areaSotki: number,
@@ -441,7 +389,6 @@ const calculateSection = (
 
   return {
     id: section.id,
-    title: section.title,
     annual_gross: annualGross,
     tariff_per_sotka_month: tariffPerSotkaMonth,
     delta_annual_gross: deltaAnnualGross,
@@ -453,7 +400,7 @@ const calculateSection = (
 };
 
 export const calculateEstimate = (
-  estimate: Estimate,
+  estimate: EstimateCalculationInput,
   changes: EstimateCalculationChanges = {},
 ): CalculatedEstimate => {
   const remainingRowChangeIds = new Set(Object.keys(changes.rows ?? {}));
@@ -483,9 +430,6 @@ export const calculateEstimate = (
   );
 
   return {
-    id: estimate.id,
-    year: estimate.year,
-    title: estimate.title,
     annual_gross: round2(estimate.baseline.annual_gross + deltaAnnualGross),
     tariff_per_sotka_month: tariffPerSotkaMonth,
     delta_annual_gross: deltaAnnualGross,
