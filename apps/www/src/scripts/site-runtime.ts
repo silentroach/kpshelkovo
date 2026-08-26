@@ -210,7 +210,6 @@ const bindSiteNavDropdown = (dropdown: HTMLElement): void => {
   dropdown.dataset.siteNavDropdownHydrated = 'true';
   const controller = new AbortController();
   const { signal } = controller;
-  const supportsHover = window.matchMedia('(any-hover: hover)').matches;
 
   const setOpen = (isOpen: boolean): void => {
     dropdown.toggleAttribute('data-open', isOpen);
@@ -229,7 +228,7 @@ const bindSiteNavDropdown = (dropdown: HTMLElement): void => {
   dropdown.addEventListener(
     'pointerenter',
     (event) => {
-      if (!supportsHover || event.pointerType === 'touch') {
+      if (event.pointerType !== 'mouse') {
         return;
       }
 
@@ -240,7 +239,11 @@ const bindSiteNavDropdown = (dropdown: HTMLElement): void => {
 
   dropdown.addEventListener(
     'pointerleave',
-    () => {
+    (event) => {
+      if (event.pointerType !== 'mouse') {
+        return;
+      }
+
       if (!dropdown.contains(document.activeElement)) {
         setOpen(false);
       }

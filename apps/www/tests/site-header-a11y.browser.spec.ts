@@ -97,6 +97,67 @@ test('toggles the tariff submenu with touch activation', async ({
   }
 });
 
+test('keeps non-hover pen and touch activation open through pointer leave', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/reviews/', { waitUntil: 'networkidle' });
+
+  const dropdown = page.locator('[data-site-nav-dropdown]');
+
+  for (const pointerType of ['pen', 'touch'] as const) {
+    const state = await dropdown.evaluate((element, currentPointerType) => {
+      const button = element.querySelector<HTMLButtonElement>(
+        '[data-site-nav-dropdown-button]',
+      );
+      const menu = element.querySelector<HTMLElement>(
+        '[data-site-nav-dropdown-menu]',
+      );
+      if (!button || !menu) {
+        throw new Error('Expected hydrated tariff dropdown');
+      }
+
+      element.dispatchEvent(
+        new PointerEvent('pointerenter', {
+          pointerId: 7,
+          pointerType: currentPointerType,
+        }),
+      );
+      const hiddenAfterEnter = menu.hidden;
+      button.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, detail: 1 }),
+      );
+      const buttonFocused = document.activeElement === button;
+      const hiddenAfterClick = menu.hidden;
+      element.dispatchEvent(
+        new PointerEvent('pointerleave', {
+          pointerId: 7,
+          pointerType: currentPointerType,
+        }),
+      );
+      const hiddenAfterLeave = menu.hidden;
+      button.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, detail: 1 }),
+      );
+
+      return {
+        buttonFocused,
+        hiddenStates: [
+          hiddenAfterEnter,
+          hiddenAfterClick,
+          hiddenAfterLeave,
+          menu.hidden,
+        ],
+      };
+    }, pointerType);
+
+    expect(state).toEqual({
+      buttonFocused: false,
+      hiddenStates: [true, false, false, true],
+    });
+  }
+});
+
 test('keeps tariff links available without JavaScript', async ({
   baseURL,
   browser,

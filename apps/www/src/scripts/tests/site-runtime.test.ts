@@ -370,4 +370,45 @@ describe('desktop site navigation dropdown', () => {
       ]
     `);
   });
+
+  it.each(['pen', 'touch'] as const)(
+    'keeps a %s click-opened menu open after non-hover pointer leave',
+    (pointerType) => {
+      const { button, dropdown, menu } = renderDropdown();
+      const hiddenStates = [menu.hidden];
+
+      dropdown.dispatchEvent(
+        new PointerEvent('pointerenter', { pointerId: 7, pointerType }),
+      );
+      hiddenStates.push(menu.hidden);
+      button.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, detail: 1 }),
+      );
+      hiddenStates.push(menu.hidden);
+      dropdown.dispatchEvent(
+        new PointerEvent('pointerleave', { pointerId: 7, pointerType }),
+      );
+      hiddenStates.push(menu.hidden);
+      button.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, detail: 1 }),
+      );
+      hiddenStates.push(menu.hidden);
+
+      expect({
+        buttonFocused: document.activeElement === button,
+        hiddenStates,
+      }).toMatchInlineSnapshot(`
+        {
+          "buttonFocused": false,
+          "hiddenStates": [
+            true,
+            true,
+            false,
+            false,
+            true,
+          ],
+        }
+      `);
+    },
+  );
 });
