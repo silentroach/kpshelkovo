@@ -3,8 +3,6 @@ import type { SiteMentionRegistry } from '../mentions';
 import type { RawPersonContact, RawPersonProfile } from './raw-schema';
 import { personCanonical, personMarkdownUrl, personUrl } from './routes';
 import { EMPTY_PERSON_BACKLINKS } from './types';
-import { createPersonMentionTarget } from './mentions';
-import type { PersonMentionTarget } from './mentions';
 import type { PersonContact, PersonContactType, PersonProfile } from './types';
 
 interface RawPersonProfileInput {
@@ -89,17 +87,6 @@ export const mapRawPersonContact = (
     href: telegram.href,
   };
 };
-
-export const mapRawPersonMentionTarget = (
-  entry: Pick<RawPersonProfileInput, 'id' | 'data'>,
-): PersonMentionTarget =>
-  createPersonMentionTarget(
-    entry.id,
-    entry.data.name,
-    entry.data.name_cases,
-    entry.data.company,
-    entry.data.position,
-  );
 
 export const mapRawPersonProfile = (
   entry: RawPersonProfileInput,
