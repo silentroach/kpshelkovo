@@ -5,6 +5,89 @@ const monthPath = '/status/calendar/2026/08/';
 const dayPath = `${monthPath}#${dayId}`;
 const yearPath = '/status/calendar/2026/';
 
+for (const viewport of [
+  { name: 'desktop', width: 1280, height: 800 },
+  { name: 'mobile', width: 390, height: 844 },
+] as const) {
+  test(`opens a calendar day and returns to the list on ${viewport.name}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await page.goto('/status/', { waitUntil: 'networkidle' });
+
+    const entry = page.getByRole('link', {
+      name: 'Календарь статусов',
+      exact: true,
+    });
+    const entryHref = await entry.getAttribute('href');
+    if (!entryHref) {
+      throw new Error('Expected status calendar entry URL');
+    }
+
+    const entryLayout = await entry.evaluate((link) => {
+      const copy = document.querySelector('[data-status-page-header-copy]');
+      const description = copy?.querySelector('p');
+
+      if (!copy || !description) {
+        throw new Error('Expected status page header copy');
+      }
+
+      const linkRect = link.getBoundingClientRect();
+      const copyRect = copy.getBoundingClientRect();
+      const descriptionRect = description.getBoundingClientRect();
+
+      return {
+        linkLeft: linkRect.left,
+        linkTop: linkRect.top,
+        copyBottom: copyRect.bottom,
+        copyRight: copyRect.right,
+        descriptionBottom: descriptionRect.bottom,
+      };
+    });
+
+    if (viewport.name === 'mobile') {
+      expect(entryLayout.linkTop).toBeGreaterThanOrEqual(
+        entryLayout.copyBottom,
+      );
+    } else {
+      expect(entryLayout.linkLeft).toBeGreaterThanOrEqual(
+        entryLayout.copyRight,
+      );
+      expect(entryLayout.linkTop).toBeLessThan(entryLayout.descriptionBottom);
+    }
+
+    await entry.click();
+    await page.waitForURL(entryHref);
+
+    let dayLink = page.locator('[data-status-calendar-day-link]').first();
+    if ((await dayLink.count()) === 0) {
+      await page.locator('a[data-status-calendar-previous]').click();
+      dayLink = page.locator('[data-status-calendar-day-link]').first();
+    }
+
+    const href = await dayLink.getAttribute('href');
+    if (!href) {
+      throw new Error('Expected an affected calendar day URL');
+    }
+    const targetId = new URL(href, page.url()).hash.slice(1);
+
+    await dayLink.click();
+    await page.waitForURL(href);
+    await expect(page.locator(`h2[id="${targetId}"]`)).toBeFocused();
+
+    await page.getByRole('link', { name: 'Списком', exact: true }).click();
+    await page.waitForURL('/status/history/');
+
+    const calendarView = page.getByRole('link', {
+      name: 'Календарь',
+      exact: true,
+    });
+    await expect(calendarView).toHaveAttribute('href', entryHref);
+    await calendarView.click();
+    await page.waitForURL(entryHref);
+  });
+}
+
 const trackCalendarFocus = (page: Page): Promise<void> =>
   page.addInitScript(() => {
     const focus = HTMLElement.prototype.focus;

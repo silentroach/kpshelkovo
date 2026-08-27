@@ -163,9 +163,7 @@ describe('/status/', () => {
     const data = await loadStatusData();
     const container = await createAstroContainer();
     const document = parseHtml(await container.renderToString(StatusPage));
-    const link = document.querySelector<HTMLAnchorElement>(
-      '[data-status-calendar-entry]',
-    );
+    const link = document.querySelector('[data-status-calendar-entry]');
 
     expect({
       href: link?.getAttribute('href'),

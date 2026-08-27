@@ -8,7 +8,7 @@ import {
 } from './sitemap';
 
 describe('shouldIncludeSitemapPage', () => {
-  it('keeps error pages and dark-launched status months out of the sitemap', () => {
+  it('keeps error pages out and publishes status calendars', () => {
     expect({
       rootErrorPage: shouldIncludeSitemapPage(
         'https://kpshelkovo.online/404/index.html',
@@ -30,8 +30,8 @@ describe('shouldIncludeSitemapPage', () => {
         "nestedErrorPage": false,
         "rootErrorPage": false,
         "statusIncident": true,
-        "statusMonth": false,
-        "statusYear": false,
+        "statusMonth": true,
+        "statusYear": true,
       }
     `);
   });
@@ -102,44 +102,52 @@ describe('buildSitemapMetadataIndex', () => {
   });
 
   it('uses incident end/start dates and settlement source check dates', () => {
-    const index = buildSitemapMetadataIndex({
-      newsArticles: [],
-      statusIncidents: [
-        {
-          url: '/status/incidents/2026/05/electricity/',
-          service: 'electricity',
-          startedIso: '2026-05-01T08:00:00+03:00',
-          endedIso: '2026-05-01T09:00:00+03:00',
-          hasPage: true,
-        },
-        {
-          url: '/status/incidents/2026/05/water/',
-          service: 'water',
-          startedIso: '2026-05-03T14:00:00+03:00',
-          hasPage: false,
-        },
-      ],
-      settlements: [
-        {
-          slug: 'river',
-          sources: [
-            { dateChecked: '2026-04-03' },
-            { dateChecked: '2026-04-12' },
-          ],
-        },
-        {
-          slug: 'forest',
-          sources: [{ dateChecked: '2026-03-10' }],
-        },
-      ],
-      meetings: [],
-      kbPages: [],
-      contacts: [],
-    });
+    const index = buildSitemapMetadataIndex(
+      {
+        newsArticles: [],
+        statusIncidents: [
+          {
+            url: '/status/incidents/2026/05/electricity/',
+            service: 'electricity',
+            kind: 'incident',
+            startedIso: '2026-05-01T08:00:00+03:00',
+            endedIso: '2026-05-01T09:00:00+03:00',
+            hasPage: true,
+          },
+          {
+            url: '/status/incidents/2026/05/water/',
+            service: 'water',
+            kind: 'incident',
+            startedIso: '2026-05-03T14:00:00+03:00',
+            hasPage: false,
+          },
+        ],
+        settlements: [
+          {
+            slug: 'river',
+            sources: [
+              { dateChecked: '2026-04-03' },
+              { dateChecked: '2026-04-12' },
+            ],
+          },
+          {
+            slug: 'forest',
+            sources: [{ dateChecked: '2026-03-10' }],
+          },
+        ],
+        meetings: [],
+        kbPages: [],
+        contacts: [],
+      },
+      Date.parse('2026-06-02T12:00:00+03:00'),
+    );
 
     expect({
       home: index.get('/'),
       statusHistory: index.get('/status/history/'),
+      statusYear: index.get('/status/calendar/2026/'),
+      statusMay: index.get('/status/calendar/2026/05/'),
+      statusJune: index.get('/status/calendar/2026/06/'),
       electricityService: index.get('/status/electricity/'),
       electricityIncident: index.get('/status/incidents/2026/05/electricity/'),
       compareHome: index.get('/815/compare/'),
@@ -174,9 +182,39 @@ describe('buildSitemapMetadataIndex', () => {
           "changefreq": "hourly",
           "lastmod": "2026-05-03T14:00:00+03:00",
         },
+        "statusJune": {
+          "changefreq": "hourly",
+          "lastmod": "2026-05-03T14:00:00+03:00",
+        },
+        "statusMay": {
+          "changefreq": "hourly",
+          "lastmod": "2026-05-03T14:00:00+03:00",
+        },
+        "statusYear": {
+          "changefreq": "hourly",
+          "lastmod": "2026-05-03T14:00:00+03:00",
+        },
       }
     `);
     expect(index.has('/status/incidents/2026/05/water/')).toBe(false);
+  });
+
+  it('publishes the empty current Moscow year with sitemap metadata', () => {
+    const index = buildSitemapMetadataIndex(
+      {
+        newsArticles: [],
+        statusIncidents: [],
+        settlements: [],
+        meetings: [],
+        kbPages: [],
+        contacts: [],
+      },
+      Date.parse('2027-01-01T00:30:00+03:00'),
+    );
+
+    expect(index.get('/status/calendar/2027/')).toEqual({
+      changefreq: ChangeFreqEnum.HOURLY,
+    });
   });
 
   it('uses meeting dates for detail pages without adding a section index', () => {
