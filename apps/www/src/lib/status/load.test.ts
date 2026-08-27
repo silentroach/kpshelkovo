@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
+import { contentDateSchema } from '../content-date';
 import { createPersonMentionTarget } from '../people/mentions';
 import type { StatusIncidentEntry } from './load';
 import type { StatusArea, StatusKind, StatusService } from './schema';
@@ -16,6 +17,8 @@ interface EntryInput {
   readonly body?: string;
 }
 
+const testDate = contentDateSchema('test date');
+
 const entry = (input: EntryInput): StatusIncidentEntry => ({
   id: input.id,
   body: input.body ?? '',
@@ -23,8 +26,8 @@ const entry = (input: EntryInput): StatusIncidentEntry => ({
     title: input.title,
     service: input.service,
     kind: input.kind,
-    started_at: input.started_at,
-    ended_at: input.ended_at,
+    started_at: testDate.parse(input.started_at),
+    ended_at: input.ended_at ? testDate.parse(input.ended_at) : undefined,
     areas: input.areas ? [...input.areas] : undefined,
     source_url: input.source_url ?? `https://example.com/${input.id}`,
   },
@@ -42,56 +45,6 @@ beforeAll(async () => {
 });
 
 describe('buildStatusDataset', () => {
-  it('accepts supported status timestamp formats', () => {
-    const data = buildStatusDataset(
-      [
-        entry({
-          id: '2026/05/day-only',
-          title: 'Дата без времени',
-          service: 'water',
-          kind: 'maintenance',
-          started_at: '01.05.2026',
-        }),
-        entry({
-          id: '2026/05/day-time',
-          title: 'Дата со временем',
-          service: 'dam',
-          kind: 'incident',
-          started_at: '02.05.2026 14:05',
-        }),
-        entry({
-          id: '2026/05/iso-day',
-          title: 'ISO-дата',
-          service: 'electricity',
-          kind: 'incident',
-          started_at: '2026-05-03',
-        }),
-      ],
-      {
-        now: new Date('2026-05-04T09:00:00+03:00'),
-      },
-    );
-
-    expect(data.byId.get('2026/05/day-only')).toMatchObject({
-      started: {
-        iso: '2026-05-01T00:00:00+03:00',
-        hasTime: false,
-      },
-    });
-    expect(data.byId.get('2026/05/day-time')).toMatchObject({
-      started: {
-        iso: '2026-05-02T14:05:00+03:00',
-        hasTime: true,
-      },
-    });
-    expect(data.byId.get('2026/05/iso-day')).toMatchObject({
-      started: {
-        iso: '2026-05-03T00:00:00+03:00',
-        hasTime: false,
-      },
-    });
-  });
-
   it('derives incidents and service summaries', () => {
     const data = buildStatusDataset(
       [

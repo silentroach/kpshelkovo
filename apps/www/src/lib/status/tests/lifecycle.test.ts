@@ -1,10 +1,12 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
+import { contentDateSchema } from '@/lib/content-date';
 import type { StatusIncidentEntry } from '../load';
 import { resolveStatusIncidentState } from '../lifecycle';
 
 const START = '2026-08-26T10:00:00+03:00';
 const END = '2026-08-26T13:00:00+03:00';
+const testDate = contentDateSchema('test date');
 
 const maintenanceEntry: StatusIncidentEntry = {
   id: '2026/08/dam-maintenance',
@@ -13,8 +15,8 @@ const maintenanceEntry: StatusIncidentEntry = {
     title: 'Плановые работы на дамбе',
     service: 'dam',
     kind: 'maintenance',
-    started_at: '26.08.2026 10:00',
-    ended_at: '26.08.2026 13:00',
+    started_at: testDate.parse('26.08.2026 10:00'),
+    ended_at: testDate.parse('26.08.2026 13:00'),
     source_url: 'https://example.com/dam-maintenance',
   },
 };

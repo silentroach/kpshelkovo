@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
+import { contentDateSchema } from '../content-date';
 import { createPersonMentionTarget } from '../people/mentions';
 import type {
   NewsArchiveSummaryEntry,
@@ -16,6 +17,7 @@ type MutableMentionRegistry = Map<
 type BuildNewsDataset = typeof import('./load').buildNewsDataset;
 
 let buildNewsDatasetSource: BuildNewsDataset;
+const testDate = contentDateSchema('test date');
 
 type ArticleEventInput = RawNewsEventInput;
 type ArticlePhotoInput = NonNullable<
@@ -90,10 +92,12 @@ const article = (input: {
   data: {
     title: input.title,
     summary: input.summary,
-    date: input.date,
+    date: testDate.parse(input.date),
     author: { id: 'ig' } as NewsArticleEntry['data']['author'],
     pinned: input.pinned,
-    pinned_until: input.pinned_until,
+    pinned_until: input.pinned_until
+      ? testDate.parse(input.pinned_until)
+      : undefined,
     events: input.events ? RawNewsEventsSchema.parse(input.events) : undefined,
     photos: input.photos,
     search_aliases: input.searchAliases,

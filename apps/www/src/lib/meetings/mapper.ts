@@ -4,7 +4,6 @@ import {
   renderMarkdown,
 } from '@/lib/markdown/render';
 
-import { parseMeetingTimestamp } from './date';
 import type {
   RawMeeting,
   RawMeetingTranscript,
@@ -38,21 +37,11 @@ interface MapRawMeetingOptions {
 const TRANSCRIPT_TIME =
   /^(?<hours>\d{2}):(?<minutes>[0-5]\d):(?<seconds>[0-5]\d)$/;
 
-const parseMoment = (value: string, context: string): MeetingMoment => {
-  const timestamp = parseMeetingTimestamp(value);
-
-  if (!timestamp) {
-    throw new Error(
-      `${context} must use dd.mm.yyyy, dd.mm.yyyy hh:mm, or YYYY-MM-DD`,
-    );
-  }
-
-  return {
-    at: timestamp.at,
-    iso: timestamp.iso,
-    hasTime: timestamp.has_time,
-  };
-};
+const mapMeetingMoment = (date: RawMeeting['date']): MeetingMoment => ({
+  at: date.at,
+  iso: date.iso,
+  hasTime: date.hasTime,
+});
 
 export const parseMeetingTranscriptTime = (
   value: string,
@@ -252,9 +241,9 @@ export const mapRawMeeting = (
     throw new Error(`meeting "${entry.id}" has no matching transcript`);
   }
 
-  const date = parseMoment(entry.data.date, `meeting "${entry.id}" date`);
+  const date = mapMeetingMoment(entry.data.date);
   const updatedAt = entry.data.updated_at
-    ? parseMoment(entry.data.updated_at, `meeting "${entry.id}" updated_at`)
+    ? mapMeetingMoment(entry.data.updated_at)
     : undefined;
 
   if (updatedAt && updatedAt.at.valueOf() < date.at.valueOf()) {
