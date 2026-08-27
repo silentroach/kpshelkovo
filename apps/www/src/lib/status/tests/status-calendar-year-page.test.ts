@@ -576,7 +576,7 @@ describe('/status/calendar/YYYY/', () => {
     `);
   });
 
-  it('shows the compact legend and keeps the dark launch out of search surfaces', async () => {
+  it('shows the compact legend, publishes Markdown, and stays out of Pagefind', async () => {
     const document = parseHtml(await renderPage());
     const legend = document.querySelector('[data-status-calendar-legend]');
 
@@ -605,9 +605,9 @@ describe('/status/calendar/YYYY/', () => {
           "maintenance",
         ],
         "metadata": {
-          "markdownAlternate": undefined,
+          "markdownAlternate": "https://kpshelkovo.online/status/calendar/2026/index.md",
           "pagefindRoot": undefined,
-          "robots": "noindex, nofollow",
+          "robots": undefined,
         },
         "todayLegend": false,
       }
