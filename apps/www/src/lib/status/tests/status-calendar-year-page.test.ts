@@ -125,13 +125,20 @@ const renderMarkdownRoute = (year = 2026): Response | Promise<Response> =>
 
 const affectedLinks = (document: ReturnType<typeof parseHtml>) =>
   [...document.querySelectorAll('[data-status-calendar-day-link]')].map(
-    (link) => ({
-      id: link.getAttribute('data-status-calendar-day-link') ?? undefined,
-      href: link.getAttribute('href'),
-      marker: link.getAttribute('data-status-calendar-marker') ?? undefined,
-      label: link.getAttribute('aria-label'),
-      hasDescription: link.hasAttribute('aria-describedby'),
-    }),
+    (link) => {
+      const describedBy = link.getAttribute('aria-describedby') ?? undefined;
+
+      return {
+        id: link.getAttribute('data-status-calendar-day-link') ?? undefined,
+        href: link.getAttribute('href'),
+        marker: link.getAttribute('data-status-calendar-marker') ?? undefined,
+        label: link.getAttribute('aria-label'),
+        describedBy,
+        descriptionExists: describedBy
+          ? Boolean(document.getElementById(describedBy))
+          : false,
+      };
+    },
   );
 
 const staticPathYears = (
@@ -475,30 +482,36 @@ describe('/status/calendar/YYYY/', () => {
       tooltips: [
         ...document.querySelectorAll('[data-status-calendar-tooltip]'),
       ].map((tooltip) => ({
+        id: tooltip.id,
         role: tooltip.getAttribute('role'),
-        lines: [...tooltip.querySelectorAll(':scope > span')].map((line) =>
-          visibleWhitespace(line.textContent.trim()),
-        ),
+        ariaHidden: tooltip.getAttribute('aria-hidden'),
+        text: visibleWhitespace(cleanText(tooltip.textContent)),
+        interactiveElements: tooltip.querySelectorAll(
+          'a, button, input, select, textarea, [tabindex]',
+        ).length,
       })),
     }).toMatchInlineSnapshot(`
       {
         "links": [
           {
-            "hasDescription": false,
+            "describedBy": "status-calendar-tooltip-2026-01-01",
+            "descriptionExists": true,
             "href": "/status/calendar/2026/01/#2026-01-01",
             "id": "2026-01-01",
             "label": "1 января 2026: 1 плановая работа",
             "marker": "maintenance",
           },
           {
-            "hasDescription": false,
+            "describedBy": "status-calendar-tooltip-2026-08-23",
+            "descriptionExists": true,
             "href": "/status/calendar/2026/08/#2026-08-23",
             "id": "2026-08-23",
             "label": "23 августа 2026: 1 проблема",
             "marker": "incident",
           },
           {
-            "hasDescription": false,
+            "describedBy": "status-calendar-tooltip-2026-08-24",
+            "descriptionExists": true,
             "href": "/status/calendar/2026/08/#2026-08-24",
             "id": "2026-08-24",
             "label": "24 августа 2026: 2 проблемы, 1 плановая работа",
@@ -524,23 +537,25 @@ describe('/status/calendar/YYYY/', () => {
         ],
         "tooltips": [
           {
-            "lines": [
-              "1 плановая работа",
-            ],
+            "ariaHidden": "true",
+            "id": "status-calendar-tooltip-2026-01-01",
+            "interactiveElements": 0,
             "role": "tooltip",
+            "text": "1 января 2026: 1 плановая работа",
           },
           {
-            "lines": [
-              "1 проблема",
-            ],
+            "ariaHidden": "true",
+            "id": "status-calendar-tooltip-2026-08-23",
+            "interactiveElements": 0,
             "role": "tooltip",
+            "text": "23 августа 2026: 1 проблема",
           },
           {
-            "lines": [
-              "2 проблемы",
-              "1 плановая работа",
-            ],
+            "ariaHidden": "true",
+            "id": "status-calendar-tooltip-2026-08-24",
+            "interactiveElements": 0,
             "role": "tooltip",
+            "text": "24 августа 2026: 2 проблемы, 1 плановая работа",
           },
         ],
       }

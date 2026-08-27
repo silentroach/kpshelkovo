@@ -1,12 +1,7 @@
 ---
-import { formatDynamicHtml } from '@shelkovo/markdown';
-
 import type { StatusCalendarMonthGrid } from '@/lib/status/calendar.types';
 import { statusCalendarDayUrl } from '@/lib/status/routes';
-import {
-  formatStatusCalendarDayCountLines,
-  formatStatusCalendarDayLabel,
-} from '@/lib/status/view';
+import { formatStatusCalendarDayLabel } from '@/lib/status/view';
 
 interface Props {
   readonly month: StatusCalendarMonthGrid;
@@ -53,9 +48,12 @@ const weekdays = [
           <tr>
             {week.map((day) => {
               const status = day.status;
-              const tooltipLines = status
-                ? formatStatusCalendarDayCountLines(status)
-                : [];
+              const tooltipSummary = status
+                ? formatStatusCalendarDayLabel(status)
+                : undefined;
+              const tooltipId = status
+                ? `status-calendar-tooltip-${day.id}`
+                : undefined;
 
               return (
                 <td
@@ -74,6 +72,7 @@ const weekdays = [
                     data-status-calendar-tooltip-root={
                       status ? day.id : undefined
                     }
+                    data-status-calendar-tooltip-summary={tooltipSummary}
                   >
                     {!day.isInMonth ? (
                       <span class="ui-num text-sm text-muted-foreground/40">
@@ -86,7 +85,8 @@ const weekdays = [
                           month: month.month,
                           id: day.id,
                         })}
-                        aria-label={formatStatusCalendarDayLabel(status)}
+                        aria-label={tooltipSummary}
+                        aria-describedby={tooltipId}
                         class="status-calendar-date__link inline-flex size-9 items-center justify-center rounded-full border-2 border-transparent text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text"
                         data-status-calendar-day-link={day.id}
                         data-status-calendar-marker={status.kind}
@@ -113,16 +113,13 @@ const weekdays = [
 
                     {status && (
                       <span
+                        id={tooltipId}
                         role="tooltip"
+                        aria-hidden="true"
                         class="status-calendar-date__tooltip"
                         data-status-calendar-tooltip={day.id}
                       >
-                        {tooltipLines.map((line) => (
-                          <span
-                            class="block"
-                            set:html={formatDynamicHtml(line)}
-                          />
-                        ))}
+                        {tooltipSummary}
                       </span>
                     )}
                   </div>
@@ -164,12 +161,20 @@ const weekdays = [
     font-size: 0.8125rem;
     font-weight: 400;
     line-height: 1.4;
-    pointer-events: none;
+    pointer-events: auto;
+    text-align: left;
   }
 
-  .status-calendar-date:not([data-tooltip-dismissed]):hover
-    .status-calendar-date__tooltip,
-  .status-calendar-date:not([data-tooltip-dismissed]):focus-within
+  .status-calendar-date__tooltip::before {
+    position: absolute;
+    right: 0;
+    bottom: 100%;
+    left: 0;
+    height: 0.375rem;
+    content: '';
+  }
+
+  .status-calendar-date[data-status-calendar-tooltip-open]
     .status-calendar-date__tooltip {
     display: block;
   }
