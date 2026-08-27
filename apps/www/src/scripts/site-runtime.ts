@@ -6,6 +6,10 @@ interface AstroBeforePreparationEvent extends Event {
   loader: () => Promise<void>;
 }
 
+interface AstroBeforeSwapEvent extends Event {
+  readonly newDocument?: Document;
+}
+
 type YandexMetrika = ((...args: readonly unknown[]) => void) & {
   a?: readonly (readonly unknown[])[];
   l?: number;
@@ -28,6 +32,7 @@ declare global {
 
 const METRIKA_SCRIPT_SRC = 'https://mc.yandex.ru/metrika/tag.js';
 const METRIKA_WEBVISOR_ENABLED = true;
+const HOME_HERO_FALLBACK_SELECTOR = '[data-home-hero-fallback]';
 const NAVIGATION_PENDING_ATTR = 'data-site-navigation-pending';
 const NAVIGATION_DELAY_MS = 50;
 const SEARCH_DIALOG_HYDRATED_ATTR = 'data-search-dialog-hydrated';
@@ -48,6 +53,12 @@ const runWhenDocumentReady = (callback: () => void): void => {
   }
 
   callback();
+};
+
+const removeIncomingHomeHeroFallback = (event: Event): void => {
+  (event as AstroBeforeSwapEvent).newDocument
+    ?.querySelector(HOME_HERO_FALLBACK_SELECTOR)
+    ?.remove();
 };
 
 const isAstroBeforePreparationEvent = (
@@ -552,6 +563,7 @@ const installSearchHighlights = (): void => {
 };
 
 bindNavigationProgress();
+document.addEventListener('astro:before-swap', removeIncomingHomeHeroFallback);
 bindSiteHeaderMenu();
 bindSearchDialogLoader();
 installSiteNavDropdowns();

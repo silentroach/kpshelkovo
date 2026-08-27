@@ -33,14 +33,24 @@ describe('home hero markup', () => {
     const activeImage = getImageTag(hero, 'data-home-hero-image');
     const fallbackMarkup = hero.match(/<noscript>([\s\S]*?)<\/noscript>/u)?.[1];
     if (!fallbackMarkup) throw new Error('Expected no-JS hero fallback');
+    const fallbackImage = getImageTag(
+      fallbackMarkup,
+      'data-home-hero-fallback',
+    );
 
     expect({
       activeHidden: /\shidden(?:[\s=>])/u.test(activeImage),
       activePriority: /\sfetchpriority="high"/u.test(activeImage),
       activeResourceAttributes: getResourceAttributes(activeImage),
-      fallbackBackground: /background-image:\s*url\(/u.test(fallbackMarkup),
-      fallbackImageCount: [...fallbackMarkup.matchAll(/<img\b/gu)].length,
-      fallbackRole: /\srole="img"/u.test(fallbackMarkup),
+      fallbackAlt: /\salt="Панорама поселка Шелково"/u.test(fallbackImage),
+      fallbackDimensions: [
+        fallbackImage.match(/\swidth="([^"]+)"/u)?.[1],
+        fallbackImage.match(/\sheight="([^"]+)"/u)?.[1],
+      ],
+      fallbackLoading: fallbackImage.match(/\sloading="([^"]+)"/u)?.[1],
+      fallbackPriority: /\sfetchpriority="high"/u.test(fallbackImage),
+      fallbackResourceAttributes: getResourceAttributes(fallbackImage),
+      fallbackSizes: fallbackImage.match(/\ssizes="([^"]+)"/u)?.[1],
       runtimeSources: [
         ...activeImage.matchAll(/\sdata-(day|night)-(src|srcset)="([^"]+)"/gu),
       ].map((match) => `${match[1]}-${match[2]}`),
@@ -49,9 +59,18 @@ describe('home hero markup', () => {
         "activeHidden": true,
         "activePriority": true,
         "activeResourceAttributes": [],
-        "fallbackBackground": true,
-        "fallbackImageCount": 0,
-        "fallbackRole": true,
+        "fallbackAlt": true,
+        "fallbackDimensions": [
+          "2172",
+          "724",
+        ],
+        "fallbackLoading": "eager",
+        "fallbackPriority": true,
+        "fallbackResourceAttributes": [
+          "src",
+          "srcset",
+        ],
+        "fallbackSizes": "100vw",
         "runtimeSources": [
           "day-src",
           "day-srcset",

@@ -100,16 +100,40 @@ test('loads the built panorama on a direct no-JavaScript visit', async ({
     const heroRequests = collectHeroRequests(page);
 
     await page.goto('/', { waitUntil: 'networkidle' });
-    const fallback = page.locator('[data-home-hero-fallback]');
+    const fallback = page.locator('img[data-home-hero-fallback]');
 
     await expect(fallback).toBeVisible();
-    expect(
-      getHeroAssetMode(
-        await fallback.evaluate(
-          (element) => getComputedStyle(element).backgroundImage,
-        ),
-      ),
-    ).toBe(buildMode);
+    const resourceContract = await fallback.evaluate((element) => {
+      if (!(element instanceof HTMLImageElement)) {
+        throw new Error('Expected the no-JS hero image');
+      }
+
+      return {
+        alt: element.alt,
+        currentSrc: element.currentSrc,
+        decoding: element.decoding,
+        fetchPriority: element.fetchPriority,
+        height: element.getAttribute('height'),
+        loading: element.loading,
+        sizes: element.sizes,
+        srcsetWidths: element.srcset
+          .split(',')
+          .map((candidate) => candidate.trim().split(' ').at(-1)),
+        width: element.getAttribute('width'),
+      };
+    });
+
+    expect(resourceContract).toMatchObject({
+      alt: 'Панорама поселка Шелково',
+      decoding: 'async',
+      fetchPriority: 'high',
+      height: '724',
+      loading: 'eager',
+      sizes: '100vw',
+      srcsetWidths: ['960w', '1280w', '1536w', '1916w', '2172w'],
+      width: '2172',
+    });
+    expect(getHeroAssetMode(resourceContract.currentSrc)).toBe(buildMode);
     expect(heroRequests).toEqual([buildMode]);
   } finally {
     await context.close();

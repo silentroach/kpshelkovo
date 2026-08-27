@@ -45,6 +45,24 @@ describe('search highlights', () => {
   });
 });
 
+describe('home hero fallback', () => {
+  it('removes the no-JS image from the incoming Astro document', () => {
+    const newDocument = document.implementation.createHTMLDocument();
+    const fallback = newDocument.createElement('img');
+    fallback.setAttribute('data-home-hero-fallback', '');
+    newDocument.body.append(fallback);
+    const event = Object.assign(new Event('astro:before-swap'), {
+      newDocument,
+    });
+
+    document.dispatchEvent(event);
+
+    expect(
+      newDocument.querySelectorAll('[data-home-hero-fallback]'),
+    ).toHaveLength(0);
+  });
+});
+
 describe('search dialog loader', () => {
   it('opens synchronously and forwards the exact pre-hydration query', async () => {
     renderSearchShell();
