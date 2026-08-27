@@ -134,6 +134,9 @@ const affectedLinks = (document: ReturnType<typeof parseHtml>) =>
         marker: link.getAttribute('data-status-calendar-marker') ?? undefined,
         label: link.getAttribute('aria-label'),
         describedBy,
+        description: describedBy
+          ? document.getElementById(describedBy)?.getAttribute('aria-label')
+          : undefined,
         descriptionExists: describedBy
           ? Boolean(document.getElementById(describedBy))
           : false,
@@ -484,8 +487,13 @@ describe('/status/calendar/YYYY/', () => {
       ].map((tooltip) => ({
         id: tooltip.id,
         role: tooltip.getAttribute('role'),
+        label: tooltip.getAttribute('aria-label'),
         ariaHidden: tooltip.getAttribute('aria-hidden'),
-        text: visibleWhitespace(cleanText(tooltip.textContent)),
+        text: visibleWhitespace(
+          tooltip
+            .querySelector('[data-status-calendar-tooltip-text]')
+            ?.textContent.trim() ?? '',
+        ),
         interactiveElements: tooltip.querySelectorAll(
           'a, button, input, select, textarea, [tabindex]',
         ).length,
@@ -495,26 +503,29 @@ describe('/status/calendar/YYYY/', () => {
         "links": [
           {
             "describedBy": "status-calendar-tooltip-2026-01-01",
+            "description": "1 плановая работа",
             "descriptionExists": true,
             "href": "/status/calendar/2026/01/#2026-01-01",
             "id": "2026-01-01",
-            "label": "1 января 2026: 1 плановая работа",
+            "label": "1 января 2026",
             "marker": "maintenance",
           },
           {
             "describedBy": "status-calendar-tooltip-2026-08-23",
+            "description": "1 проблема",
             "descriptionExists": true,
             "href": "/status/calendar/2026/08/#2026-08-23",
             "id": "2026-08-23",
-            "label": "23 августа 2026: 1 проблема",
+            "label": "23 августа 2026",
             "marker": "incident",
           },
           {
             "describedBy": "status-calendar-tooltip-2026-08-24",
+            "description": "2 проблемы, 1 плановая работа",
             "descriptionExists": true,
             "href": "/status/calendar/2026/08/#2026-08-24",
             "id": "2026-08-24",
-            "label": "24 августа 2026: 2 проблемы, 1 плановая работа",
+            "label": "24 августа 2026",
             "marker": "mixed",
           },
         ],
@@ -540,22 +551,25 @@ describe('/status/calendar/YYYY/', () => {
             "ariaHidden": "true",
             "id": "status-calendar-tooltip-2026-01-01",
             "interactiveElements": 0,
+            "label": "1 плановая работа",
             "role": "tooltip",
-            "text": "1 января 2026: 1 плановая работа",
+            "text": "1·января·2026: 1·плановая·работа",
           },
           {
             "ariaHidden": "true",
             "id": "status-calendar-tooltip-2026-08-23",
             "interactiveElements": 0,
+            "label": "1 проблема",
             "role": "tooltip",
-            "text": "23 августа 2026: 1 проблема",
+            "text": "23·августа·2026: 1·проблема",
           },
           {
             "ariaHidden": "true",
             "id": "status-calendar-tooltip-2026-08-24",
             "interactiveElements": 0,
+            "label": "2 проблемы, 1 плановая работа",
             "role": "tooltip",
-            "text": "24 августа 2026: 2 проблемы, 1 плановая работа",
+            "text": "24·августа·2026: 2·проблемы, 1·плановая·работа",
           },
         ],
       }
@@ -607,7 +621,9 @@ describe('/status/calendar/YYYY/', () => {
     ]);
     const htmlLinks = affectedLinks(parseHtml(html)).map((link) => ({
       href: new URL(link.href ?? '', 'https://kpshelkovo.online').toString(),
-      label: link.label,
+      label: link.description
+        ? `${link.label}: ${link.description}`
+        : link.label,
     }));
     const markdown = await markdownResponse.text();
     const markdownLinks = [

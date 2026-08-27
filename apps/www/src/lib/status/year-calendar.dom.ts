@@ -1,5 +1,6 @@
 const TOOLTIP_ROOT_SELECTOR = '[data-status-calendar-tooltip-root]';
 const TOOLTIP_SELECTOR = '[data-status-calendar-tooltip]';
+const TOOLTIP_TEXT_SELECTOR = '[data-status-calendar-tooltip-text]';
 const TOOLTIP_OPEN_ATTRIBUTE = 'data-status-calendar-tooltip-open';
 const TOOLTIP_HOVER_ATTRIBUTE = 'data-status-calendar-tooltip-hovered';
 const TOOLTIP_FOCUS_ATTRIBUTE = 'data-status-calendar-tooltip-focused';
@@ -111,13 +112,16 @@ const openStatusCalendarTooltip = (root: HTMLElement): void => {
   }
 
   const tooltip = root.querySelector<HTMLElement>(TOOLTIP_SELECTOR);
+  const tooltipText = tooltip?.querySelector<HTMLElement>(
+    TOOLTIP_TEXT_SELECTOR,
+  );
   const summary = root.dataset.statusCalendarTooltipSummary;
 
-  if (!tooltip || !summary) {
+  if (!tooltip || !tooltipText || !summary) {
     return;
   }
 
-  tooltip.textContent = summary;
+  tooltipText.textContent = summary;
   tooltip.setAttribute('aria-hidden', 'false');
   root.setAttribute(TOOLTIP_OPEN_ATTRIBUTE, '');
   positionStatusCalendarTooltip(root);
@@ -156,7 +160,7 @@ export const installStatusCalendarYearInteractions = (): void => {
     }
   });
   document.addEventListener('pointerover', (event) => {
-    if (event.pointerType !== 'mouse') {
+    if (event.pointerType === 'touch') {
       return;
     }
 
@@ -190,7 +194,7 @@ export const installStatusCalendarYearInteractions = (): void => {
     }
   });
   document.addEventListener('pointerout', (event) => {
-    if (event.pointerType !== 'mouse') {
+    if (event.pointerType === 'touch') {
       return;
     }
 

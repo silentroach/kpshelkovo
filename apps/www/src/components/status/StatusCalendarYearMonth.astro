@@ -1,7 +1,11 @@
 ---
 import type { StatusCalendarMonthGrid } from '@/lib/status/calendar.types';
 import { statusCalendarDayUrl } from '@/lib/status/routes';
-import { formatStatusCalendarDayLabel } from '@/lib/status/view';
+import {
+  formatStatusCalendarDayCounts,
+  formatStatusCalendarDayDate,
+  formatStatusCalendarDayTooltipSummary,
+} from '@/lib/status/view';
 
 interface Props {
   readonly month: StatusCalendarMonthGrid;
@@ -48,8 +52,14 @@ const weekdays = [
           <tr>
             {week.map((day) => {
               const status = day.status;
+              const dateLabel = status
+                ? formatStatusCalendarDayDate(status)
+                : undefined;
+              const tooltipDescription = status
+                ? formatStatusCalendarDayCounts(status)
+                : undefined;
               const tooltipSummary = status
-                ? formatStatusCalendarDayLabel(status)
+                ? formatStatusCalendarDayTooltipSummary(status)
                 : undefined;
               const tooltipId = status
                 ? `status-calendar-tooltip-${day.id}`
@@ -85,7 +95,7 @@ const weekdays = [
                           month: month.month,
                           id: day.id,
                         })}
-                        aria-label={tooltipSummary}
+                        aria-label={dateLabel}
                         aria-describedby={tooltipId}
                         class="status-calendar-date__link inline-flex size-9 items-center justify-center rounded-full border-2 border-transparent text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text"
                         data-status-calendar-day-link={day.id}
@@ -115,11 +125,17 @@ const weekdays = [
                       <span
                         id={tooltipId}
                         role="tooltip"
+                        aria-label={tooltipDescription}
                         aria-hidden="true"
                         class="status-calendar-date__tooltip"
                         data-status-calendar-tooltip={day.id}
                       >
-                        {tooltipSummary}
+                        <span
+                          aria-hidden="true"
+                          data-status-calendar-tooltip-text
+                        >
+                          {tooltipSummary}
+                        </span>
                       </span>
                     )}
                   </div>

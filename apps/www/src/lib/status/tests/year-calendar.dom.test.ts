@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { visibleWhitespace } from '@/lib/test/visible-whitespace';
+
 import {
   installStatusCalendarYearInteractions,
   positionStatusCalendarTooltip,
@@ -95,20 +97,21 @@ describe('installStatusCalendarYearInteractions', () => {
     document.body.innerHTML = `
       <span
         data-status-calendar-tooltip-root="2026-08-24"
-        data-status-calendar-tooltip-summary="24 августа 2026: 2 проблемы, 1 плановая работа"
+        data-status-calendar-tooltip-summary="24 августа 2026: 2 проблемы, 1 плановая работа"
       >
         <a
           href="#2026-08-24"
-          aria-label="24 августа 2026: 2 проблемы, 1 плановая работа"
+          aria-label="24 августа 2026"
           aria-describedby="status-calendar-tooltip-2026-08-24"
           data-status-calendar-day-link
         >24</a>
         <span
           id="status-calendar-tooltip-2026-08-24"
           role="tooltip"
+          aria-label="2 проблемы, 1 плановая работа"
           aria-hidden="true"
           data-status-calendar-tooltip
-        >Fallback</span>
+        ><span aria-hidden="true" data-status-calendar-tooltip-text>Fallback</span></span>
       </span>
       <button type="button">После календаря</button>
     `;
@@ -172,7 +175,7 @@ describe('installStatusCalendarYearInteractions', () => {
       openOverTooltip,
       closedOnEscape,
       reopened: root.hasAttribute('data-status-calendar-tooltip-open'),
-      summary: tooltip.textContent,
+      summary: visibleWhitespace(tooltip.textContent),
       ariaHidden: tooltip.getAttribute('aria-hidden'),
     }).toMatchInlineSnapshot(`
       {
@@ -181,7 +184,37 @@ describe('installStatusCalendarYearInteractions', () => {
         "openOverTooltip": true,
         "opened": true,
         "reopened": true,
-        "summary": "24 августа 2026: 2 проблемы, 1 плановая работа",
+        "summary": "24·августа·2026: 2·проблемы, 1·плановая работа",
+      }
+    `);
+  });
+
+  it('opens and closes for a pen pointer', () => {
+    const { root, link, button } = renderTooltip();
+
+    installStatusCalendarYearInteractions();
+    link.dispatchEvent(
+      new PointerEvent('pointerover', {
+        bubbles: true,
+        pointerType: 'pen',
+      }),
+    );
+    const opened = root.hasAttribute('data-status-calendar-tooltip-open');
+    link.dispatchEvent(
+      new PointerEvent('pointerout', {
+        bubbles: true,
+        pointerType: 'pen',
+        relatedTarget: button,
+      }),
+    );
+
+    expect({
+      opened,
+      closed: !root.hasAttribute('data-status-calendar-tooltip-open'),
+    }).toMatchInlineSnapshot(`
+      {
+        "closed": true,
+        "opened": true,
       }
     `);
   });
@@ -251,7 +284,8 @@ describe('installStatusCalendarYearInteractions', () => {
       clickAllowed,
       clickPrevented: click.defaultPrevented,
       text: tooltip.textContent,
-      html: tooltip.innerHTML,
+      html: tooltip.querySelector('[data-status-calendar-tooltip-text]')
+        ?.innerHTML,
       injectedImage: Boolean(tooltip.querySelector('img')),
     }).toMatchInlineSnapshot(`
       {
