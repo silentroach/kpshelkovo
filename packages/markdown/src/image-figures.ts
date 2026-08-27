@@ -50,17 +50,23 @@ const toImageFigure = (node: HtmlTreeNode): HtmlTreeNode => {
   };
 };
 
-const wrapCaptionedImages = (node: HtmlTreeNode): void => {
+const processImages = (node: HtmlTreeNode): void => {
+  if (node.tagName === 'img') {
+    node.properties = node.properties ?? {};
+    node.properties.loading = 'lazy';
+    node.properties.decoding = 'async';
+  }
+
   if (!node.children) {
     return;
   }
 
   node.children = node.children.map((child) => {
-    wrapCaptionedImages(child);
+    processImages(child);
     return child.tagName === 'p' ? toImageFigure(child) : child;
   });
 };
 
 export const rehypeImageFigures: Plugin<[], HtmlTreeNode> = () => (tree) => {
-  wrapCaptionedImages(tree);
+  processImages(tree);
 };

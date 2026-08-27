@@ -232,9 +232,9 @@ describe('@shelkovo/markdown', () => {
 ![Изображение без подписи](https://example.com/photo.png)`),
       ),
     ).toMatchInlineSnapshot(`
-      "<figure class="ui-markdown-figure"><img src="https://example.com/map.png" alt="Карта"><figcaption class="ui-media-caption">Скриншот от·14·августа 2026 года.</figcaption></figure>
-      <p>Текст с <img src="https://example.com/icon.png" alt="иконкой" title="Подсказка">.</p>
-      <p><img src="https://example.com/photo.png" alt="Изображение без подписи"></p>"
+      "<figure class="ui-markdown-figure"><img src="https://example.com/map.png" alt="Карта" loading="lazy" decoding="async"><figcaption class="ui-media-caption">Скриншот от·14·августа 2026 года.</figcaption></figure>
+      <p>Текст с <img src="https://example.com/icon.png" alt="иконкой" title="Подсказка" loading="lazy" decoding="async">.</p>
+      <p><img src="https://example.com/photo.png" alt="Изображение без подписи" loading="lazy" decoding="async"></p>"
     `);
   });
 
@@ -246,7 +246,7 @@ describe('@shelkovo/markdown', () => {
         ),
       ),
     ).toMatchInlineSnapshot(`
-      "<figure class="ui-markdown-figure"><a href="https://example.com/map.png"><img src="https://example.com/map.png" alt="Карта"></a><figcaption class="ui-media-caption">Схема поселка.</figcaption></figure>"
+      "<figure class="ui-markdown-figure"><a href="https://example.com/map.png"><img src="https://example.com/map.png" alt="Карта" loading="lazy" decoding="async"></a><figcaption class="ui-media-caption">Схема поселка.</figcaption></figure>"
     `);
   });
 
