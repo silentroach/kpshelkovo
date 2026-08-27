@@ -1,3 +1,6 @@
+// @vitest-environment happy-dom
+
+import { getAllByRole, getByRole } from '@testing-library/dom';
 import { describe, expect, it } from 'vitest';
 import { markdownToHtml } from 'satteri';
 
@@ -17,6 +20,26 @@ import { headingSlug } from './heading-slugs';
 
 const showNbsp = (value: string): string =>
   value.replaceAll('\u00A0', '·').replaceAll('\u202F', '·');
+
+const renderDom = (markdown: string) => {
+  document.body.innerHTML = render(markdown);
+
+  return document;
+};
+
+const checkboxLabel = (checkbox: HTMLElement): HTMLElement => {
+  const labelId = checkbox.getAttribute('aria-labelledby');
+  if (!labelId) {
+    throw new Error('task checkbox label id not found');
+  }
+
+  const label = checkbox.ownerDocument.getElementById(labelId);
+  if (!label) {
+    throw new Error('task checkbox label not found');
+  }
+
+  return label;
+};
 
 describe('@shelkovo/markdown', () => {
   it('serializes YAML frontmatter without quoting every string', () => {
@@ -266,23 +289,160 @@ describe('@shelkovo/markdown', () => {
   });
 
   it('links task list checkboxes to their item text via aria-labelledby', () => {
-    const html = render('- [x] First task\n- [ ] Second task');
-    const checkboxPattern =
-      /<input[^>]*type="checkbox"[^>]*aria-labelledby="([^"]+)"[^>]*>/g;
-    const matches = Array.from(html.matchAll(checkboxPattern));
+    const document = renderDom('- [x] First task\n- [ ] Second task');
+    const checkboxes = getAllByRole(document.body, 'checkbox');
+    const first = getByRole(document.body, 'checkbox', {
+      name: 'First task',
+    }) as HTMLInputElement;
+    const second = getByRole(document.body, 'checkbox', {
+      name: 'Second task',
+    }) as HTMLInputElement;
 
-    expect(matches).toHaveLength(2);
+    expect({
+      count: checkboxes.length,
+      distinctLabels:
+        first.getAttribute('aria-labelledby') !==
+        second.getAttribute('aria-labelledby'),
+      first: { checked: first.checked, disabled: first.disabled },
+      second: { checked: second.checked, disabled: second.disabled },
+    }).toMatchInlineSnapshot(`
+      {
+        "count": 2,
+        "distinctLabels": true,
+        "first": {
+          "checked": true,
+          "disabled": true,
+        },
+        "second": {
+          "checked": false,
+          "disabled": true,
+        },
+      }
+    `);
+  });
 
-    const firstId = matches[0]?.[1];
-    const secondId = matches[1]?.[1];
+  it('gives nested task checkboxes only their own item names', () => {
+    const document = renderDom(`- [ ] Parent task
+  - [x] Child task
+    1. [ ] Grandchild task`);
+    const checkboxes = getAllByRole(document.body, 'checkbox');
+    const labels = Array.from(
+      document.querySelectorAll('li.task-list-item > span[id]'),
+    );
 
-    expect(firstId).toBeDefined();
-    expect(secondId).toBeDefined();
-    expect(firstId).not.toBe(secondId);
-    expect(html).toContain(`<span id="${firstId}">First task</span>`);
-    expect(html).toContain(`<span id="${secondId}">Second task</span>`);
-    expect(html).toContain('checked');
-    expect(html).toContain('disabled');
+    expect(getByRole(document.body, 'checkbox', { name: 'Parent task' })).toBe(
+      checkboxes[0],
+    );
+    expect(getByRole(document.body, 'checkbox', { name: 'Child task' })).toBe(
+      checkboxes[1],
+    );
+    expect(
+      getByRole(document.body, 'checkbox', { name: 'Grandchild task' }),
+    ).toBe(checkboxes[2]);
+    expect(labels).toHaveLength(3);
+    expect(labels.every((label) => !label.querySelector('ul, ol'))).toBe(true);
+    expect(labels.slice(0, 2).map((label) => label.nextElementSibling?.tagName))
+      .toMatchInlineSnapshot(`
+      [
+        "UL",
+        "OL",
+      ]
+    `);
+  });
+
+  it('labels a task checkbox inside a loose-list paragraph', () => {
+    const document = renderDom(`- [ ] Loose parent
+
+  Additional context.
+
+  - [x] Loose child`);
+    const parentCheckbox = getByRole(document.body, 'checkbox', {
+      name: 'Loose parent',
+    });
+    const childCheckbox = getByRole(document.body, 'checkbox', {
+      name: 'Loose child',
+    });
+    const parentLabel = checkboxLabel(parentCheckbox);
+
+    expect({
+      checkboxCount: getAllByRole(document.body, 'checkbox').length,
+      labelContainer: parentLabel.parentElement?.tagName,
+      labelHasBlockContent: Boolean(
+        parentLabel.querySelector('blockquote, ol, p, pre, ul'),
+      ),
+      parentContainer: parentCheckbox.parentElement?.tagName,
+      childChecked: (childCheckbox as HTMLInputElement).checked,
+    }).toMatchInlineSnapshot(`
+      {
+        "checkboxCount": 2,
+        "childChecked": true,
+        "labelContainer": "P",
+        "labelHasBlockContent": false,
+        "parentContainer": "P",
+      }
+    `);
+  });
+
+  it('keeps a task list inside a blockquote outside the parent label', () => {
+    const document = renderDom(`- [ ] Parent task
+  > - [x] Quoted child`);
+    const parentCheckbox = getByRole(document.body, 'checkbox', {
+      name: 'Parent task',
+    });
+    const childCheckbox = getByRole(document.body, 'checkbox', {
+      name: 'Quoted child',
+    });
+    const parentLabel = checkboxLabel(parentCheckbox);
+    const childLabel = checkboxLabel(childCheckbox);
+    const blockquote = parentCheckbox
+      .closest('li')
+      ?.querySelector('blockquote');
+
+    if (!blockquote) {
+      throw new Error('nested task blockquote not found');
+    }
+
+    expect({
+      blockquoteIsLabelSibling: parentLabel.nextElementSibling === blockquote,
+      labelsHaveBlockContent: [parentLabel, childLabel].some((label) =>
+        Boolean(label.querySelector('blockquote, ol, p, pre, ul')),
+      ),
+      parentLabelContainsBlockquote: parentLabel.contains(blockquote),
+    }).toMatchInlineSnapshot(`
+      {
+        "blockquoteIsLabelSibling": true,
+        "labelsHaveBlockContent": false,
+        "parentLabelContainsBlockquote": false,
+      }
+    `);
+  });
+
+  it('preserves links and formatting in nested task labels', () => {
+    const document =
+      renderDom(`- [ ] **Parent** with [guide](https://example.com/guide)
+  - [x] _Child_ with \`code\``);
+    const parentCheckbox = getByRole(document.body, 'checkbox', {
+      name: 'Parent with guide',
+    });
+    const childCheckbox = getByRole(document.body, 'checkbox', {
+      name: 'Child with code',
+    });
+    const parentLabel = checkboxLabel(parentCheckbox);
+    const childLabel = checkboxLabel(childCheckbox);
+
+    expect({
+      childCode: childLabel.querySelector('code')?.textContent,
+      childEmphasis: childLabel.querySelector('em')?.textContent,
+      parentLink: parentLabel.querySelector('a')?.getAttribute('href'),
+      parentStrong: parentLabel.querySelector('strong')?.textContent,
+    }).toMatchInlineSnapshot(`
+      {
+        "childCode": "code",
+        "childEmphasis": "Child",
+        "parentLink": "https://example.com/guide",
+        "parentStrong": "Parent",
+      }
+    `);
   });
 
   it('preprocesses markdown before rendering', () => {
