@@ -84,4 +84,24 @@ describe('status llms', () => {
       expect(markdown).toContain('https://example.com/status/data/status.json');
     },
   );
+
+  it.each(['short', 'full'] as const)(
+    'documents calendar HTML, Markdown, and ISO day anchors in the %s document',
+    async (kind) => {
+      const markdown = await build(kind);
+
+      for (const route of [
+        '/status/calendar/YYYY/',
+        '/status/calendar/YYYY/index.md',
+        '/status/calendar/YYYY/MM/',
+        '/status/calendar/YYYY/MM/index.md',
+        '/status/calendar/YYYY/MM/#YYYY-MM-DD',
+      ]) {
+        expect(markdown).toContain(route);
+      }
+
+      expect(markdown).toContain('отдельного календарного JSON нет');
+      expect(markdown).not.toMatch(/\/status\/calendar(?:\/data)?\.json/u);
+    },
+  );
 });

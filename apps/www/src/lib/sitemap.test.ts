@@ -8,7 +8,7 @@ import {
 } from './sitemap';
 
 describe('shouldIncludeSitemapPage', () => {
-  it('keeps error pages and dark-launched status months out of the sitemap', () => {
+  it('keeps error pages out and publishes status calendars', () => {
     expect({
       rootErrorPage: shouldIncludeSitemapPage(
         'https://kpshelkovo.online/404/index.html',
@@ -30,8 +30,8 @@ describe('shouldIncludeSitemapPage', () => {
         "nestedErrorPage": false,
         "rootErrorPage": false,
         "statusIncident": true,
-        "statusMonth": false,
-        "statusYear": false,
+        "statusMonth": true,
+        "statusYear": true,
       }
     `);
   });
@@ -102,44 +102,52 @@ describe('buildSitemapMetadataIndex', () => {
   });
 
   it('uses incident end/start dates and settlement source check dates', () => {
-    const index = buildSitemapMetadataIndex({
-      newsArticles: [],
-      statusIncidents: [
-        {
-          url: '/status/incidents/2026/05/electricity/',
-          service: 'electricity',
-          startedIso: '2026-05-01T08:00:00+03:00',
-          endedIso: '2026-05-01T09:00:00+03:00',
-          hasPage: true,
-        },
-        {
-          url: '/status/incidents/2026/05/water/',
-          service: 'water',
-          startedIso: '2026-05-03T14:00:00+03:00',
-          hasPage: false,
-        },
-      ],
-      settlements: [
-        {
-          slug: 'river',
-          sources: [
-            { dateChecked: '2026-04-03' },
-            { dateChecked: '2026-04-12' },
-          ],
-        },
-        {
-          slug: 'forest',
-          sources: [{ dateChecked: '2026-03-10' }],
-        },
-      ],
-      meetings: [],
-      kbPages: [],
-      contacts: [],
-    });
+    const index = buildSitemapMetadataIndex(
+      {
+        newsArticles: [],
+        statusIncidents: [
+          {
+            url: '/status/incidents/2026/05/electricity/',
+            service: 'electricity',
+            kind: 'incident',
+            startedIso: '2026-05-01T08:00:00+03:00',
+            endedIso: '2026-05-01T09:00:00+03:00',
+            hasPage: true,
+          },
+          {
+            url: '/status/incidents/2026/05/water/',
+            service: 'water',
+            kind: 'incident',
+            startedIso: '2026-05-03T14:00:00+03:00',
+            hasPage: false,
+          },
+        ],
+        settlements: [
+          {
+            slug: 'river',
+            sources: [
+              { dateChecked: '2026-04-03' },
+              { dateChecked: '2026-04-12' },
+            ],
+          },
+          {
+            slug: 'forest',
+            sources: [{ dateChecked: '2026-03-10' }],
+          },
+        ],
+        meetings: [],
+        kbPages: [],
+        contacts: [],
+      },
+      Date.parse('2026-06-02T12:00:00+03:00'),
+    );
 
     expect({
       home: index.get('/'),
       statusHistory: index.get('/status/history/'),
+      statusYear: index.get('/status/calendar/2026/'),
+      statusMay: index.get('/status/calendar/2026/05/'),
+      statusJune: index.get('/status/calendar/2026/06/'),
       electricityService: index.get('/status/electricity/'),
       electricityIncident: index.get('/status/incidents/2026/05/electricity/'),
       compareHome: index.get('/815/compare/'),
@@ -174,9 +182,145 @@ describe('buildSitemapMetadataIndex', () => {
           "changefreq": "hourly",
           "lastmod": "2026-05-03T14:00:00+03:00",
         },
+        "statusJune": {
+          "changefreq": "hourly",
+          "lastmod": "2026-06-02T09:00:00.000Z",
+        },
+        "statusMay": {
+          "changefreq": "hourly",
+          "lastmod": "2026-06-02T09:00:00.000Z",
+        },
+        "statusYear": {
+          "changefreq": "hourly",
+          "lastmod": "2026-06-02T09:00:00.000Z",
+        },
       }
     `);
     expect(index.has('/status/incidents/2026/05/water/')).toBe(false);
+  });
+
+  it('keeps bounded calendar windows fresh until their lifecycle ends', () => {
+    const data = {
+      newsArticles: [],
+      statusIncidents: [
+        {
+          url: '/status/incidents/2026/06/maintenance/',
+          service: 'electricity',
+          kind: 'maintenance' as const,
+          startedIso: '2026-06-10T08:00:00+03:00',
+          endedIso: '2026-06-10T12:00:00+03:00',
+          hasPage: true,
+        },
+      ],
+      settlements: [],
+      meetings: [],
+      kbPages: [],
+      contacts: [],
+    };
+    const monthMetadataAt = (nowIso: string) =>
+      buildSitemapMetadataIndex(data, Date.parse(nowIso)).get(
+        '/status/calendar/2026/06/',
+      );
+
+    expect([
+      monthMetadataAt('2026-06-09T12:00:00+03:00'),
+      monthMetadataAt('2026-06-10T10:00:00+03:00'),
+      monthMetadataAt('2026-06-10T12:00:00+03:00'),
+    ]).toMatchInlineSnapshot(`
+      [
+        {
+          "changefreq": "hourly",
+          "lastmod": "2026-06-09T09:00:00.000Z",
+        },
+        {
+          "changefreq": "hourly",
+          "lastmod": "2026-06-10T07:00:00.000Z",
+        },
+        {
+          "changefreq": "yearly",
+          "lastmod": "2026-06-10T12:00:00+03:00",
+        },
+      ]
+    `);
+  });
+
+  it('parses date-only calendar windows in Moscow time', () => {
+    const index = buildSitemapMetadataIndex(
+      {
+        newsArticles: [],
+        statusIncidents: [
+          {
+            url: '/status/incidents/2026/04/maintenance/',
+            service: 'electricity',
+            kind: 'maintenance',
+            startedIso: '2026-04-30',
+            endedIso: '2026-05-01',
+            hasPage: true,
+          },
+        ],
+        settlements: [],
+        meetings: [],
+        kbPages: [],
+        contacts: [],
+      },
+      Date.parse('2026-05-01T00:30:00+03:00'),
+    );
+
+    expect({
+      april: index.get('/status/calendar/2026/04/'),
+      may: index.get('/status/calendar/2026/05/'),
+    }).toMatchInlineSnapshot(`
+      {
+        "april": {
+          "changefreq": "yearly",
+          "lastmod": "2026-05-01",
+        },
+        "may": undefined,
+      }
+    `);
+  });
+
+  it('publishes the empty current Moscow year and refreshes status navigation', () => {
+    const index = buildSitemapMetadataIndex(
+      {
+        newsArticles: [],
+        statusIncidents: [
+          {
+            url: '/status/incidents/2026/12/old/',
+            service: 'electricity',
+            kind: 'incident',
+            startedIso: '2026-12-30T08:00:00+03:00',
+            endedIso: '2026-12-30T09:00:00+03:00',
+            hasPage: true,
+          },
+        ],
+        settlements: [],
+        meetings: [],
+        kbPages: [],
+        contacts: [],
+      },
+      Date.parse('2027-01-01T00:30:00+03:00'),
+    );
+
+    expect({
+      currentYear: index.get('/status/calendar/2027/'),
+      history: index.get('/status/history/'),
+      status: index.get('/status/'),
+    }).toMatchInlineSnapshot(`
+      {
+        "currentYear": {
+          "changefreq": "hourly",
+        },
+        "history": {
+          "changefreq": "hourly",
+          "lastmod": "2026-12-31T21:00:00.000Z",
+        },
+        "status": {
+          "changefreq": "hourly",
+          "lastmod": "2026-12-31T21:00:00.000Z",
+        },
+      }
+    `);
   });
 
   it('uses meeting dates for detail pages without adding a section index', () => {

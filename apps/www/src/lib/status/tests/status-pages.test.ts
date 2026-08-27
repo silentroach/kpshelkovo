@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createAstroContainer } from '@/test/astro-container';
 import { loadStatusData } from '@/lib/status/load';
-import { statusHistoryUrl } from '@/lib/status/routes';
+import { statusCalendarYearUrl, statusHistoryUrl } from '@/lib/status/routes';
 
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import StatusPage from '@/pages/status/index.astro';
@@ -65,6 +65,9 @@ const fixtures = vi.hoisted(() => {
       incidents,
       active: [],
       services: [service],
+      calendar: {
+        buildYear: 2026,
+      },
       byId: new Map(),
       byService: new Map([['electricity', service]]),
     },
@@ -156,6 +159,30 @@ describe('/status/', () => {
     expectItemListMatchesHistory(document);
   });
 
+  it('links the current Moscow year calendar from the page header', async () => {
+    const data = await loadStatusData();
+    const container = await createAstroContainer();
+    const document = parseHtml(await container.renderToString(StatusPage));
+    const link = document.querySelector('[data-status-calendar-entry]');
+
+    expect({
+      accessibleName: link?.getAttribute('aria-label'),
+      href: link?.getAttribute('href'),
+      decorativeIcon: link?.querySelector('svg')?.getAttribute('aria-hidden'),
+      title: link?.getAttribute('title'),
+    }).toMatchInlineSnapshot(`
+      {
+        "accessibleName": "Проблемы и плановые работы за 2026 год",
+        "decorativeIcon": "true",
+        "href": "/status/calendar/2026/",
+        "title": "Проблемы и плановые работы за 2026 год",
+      }
+    `);
+    expect(link?.getAttribute('href')).toBe(
+      statusCalendarYearUrl({ year: data.calendar.buildYear }),
+    );
+  });
+
   it('keeps the overview service state on the shared hydration contract', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(StatusPage);
@@ -205,5 +232,19 @@ describe('/status/history/', () => {
     for (const index of listOnlyIndexes) {
       expect(schemaItems[index]).not.toHaveProperty('item');
     }
+  });
+
+  it('links the calendar view for the current Moscow year', async () => {
+    const data = await loadStatusData();
+    const container = await createAstroContainer();
+    const document = parseHtml(
+      await container.renderToString(StatusHistoryPage),
+    );
+
+    expect(
+      document
+        .querySelector('[data-status-history-calendar]')
+        ?.getAttribute('href'),
+    ).toBe(statusCalendarYearUrl({ year: data.calendar.buildYear }));
   });
 });

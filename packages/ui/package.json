@@ -31,6 +31,7 @@
     "./icons/services/WaterDrop.astro": "./src/icons/services/WaterDrop.astro",
     "./icons/system": "./src/icons/system/index.ts",
     "./icons/system/AlertCircle.astro": "./src/icons/system/AlertCircle.astro",
+    "./icons/system/Calendar.astro": "./src/icons/system/Calendar.astro",
     "./icons/system/CalendarPlus.astro": "./src/icons/system/CalendarPlus.astro",
     "./icons/system/CheckCircle.astro": "./src/icons/system/CheckCircle.astro",
     "./icons/system/Phone.astro": "./src/icons/system/Phone.astro",

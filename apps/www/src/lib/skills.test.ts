@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
 
 import { build, names } from './skills';
@@ -25,5 +26,28 @@ describe('agent skills index', () => {
       expect(row.url).toBe(`./${row.name}/SKILL.md`);
       expect(row.digest).toMatch(/^sha256:[a-f0-9]{64}$/);
     }
+  });
+
+  it('documents status calendar discovery without inventing a JSON feed', async () => {
+    const skill = await readFile(
+      new URL(
+        '../../public/.well-known/agent-skills/status-feed/SKILL.md',
+        import.meta.url,
+      ),
+      'utf8',
+    );
+
+    for (const route of [
+      '/status/calendar/YYYY/',
+      '/status/calendar/YYYY/index.md',
+      '/status/calendar/YYYY/MM/',
+      '/status/calendar/YYYY/MM/index.md',
+      '/status/calendar/YYYY/MM/#YYYY-MM-DD',
+    ]) {
+      expect(skill).toContain(route);
+    }
+
+    expect(skill).toContain('отдельного календарного JSON нет');
+    expect(skill).not.toMatch(/\/status\/calendar(?:\/data)?\.json/u);
   });
 });

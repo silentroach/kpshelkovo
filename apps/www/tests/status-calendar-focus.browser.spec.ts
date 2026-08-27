@@ -5,6 +5,64 @@ const monthPath = '/status/calendar/2026/08/';
 const dayPath = `${monthPath}#${dayId}`;
 const yearPath = '/status/calendar/2026/';
 
+for (const viewport of [
+  { name: 'desktop', width: 1280, height: 800 },
+  { name: 'mobile', width: 390, height: 844 },
+] as const) {
+  test(`opens a calendar day and returns to status on ${viewport.name}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await page.goto('/status/', { waitUntil: 'networkidle' });
+
+    const entry = page.locator('[data-status-calendar-entry]');
+    const entryHref = await entry.getAttribute('href');
+    if (!entryHref) {
+      throw new Error('Expected status calendar entry URL');
+    }
+    const calendarYear = new URL(entryHref, page.url()).pathname.match(
+      /^\/status\/calendar\/(\d{4})\/$/,
+    )?.[1];
+    if (!calendarYear) {
+      throw new Error('Expected a year status calendar entry URL');
+    }
+    const calendarHeading = `Проблемы и плановые работы за ${calendarYear} год`;
+
+    await expect(entry).toHaveAccessibleName(calendarHeading);
+
+    await entry.click();
+    await page.waitForURL(entryHref);
+
+    let dayLink = page.locator('[data-status-calendar-day-link]').first();
+    if ((await dayLink.count()) === 0) {
+      await page.locator('a[data-status-calendar-previous]').click();
+      dayLink = page.locator('[data-status-calendar-day-link]').first();
+    }
+
+    const href = await dayLink.getAttribute('href');
+    if (!href) {
+      throw new Error('Expected an affected calendar day URL');
+    }
+    const targetId = new URL(href, page.url()).hash.slice(1);
+
+    await dayLink.click();
+    await page.waitForURL(href);
+    await expect(page.locator(`h2[id="${targetId}"]`)).toBeFocused();
+
+    await page
+      .getByRole('navigation', { name: 'Хлебные крошки' })
+      .getByRole('link', { name: 'Статус', exact: true })
+      .click();
+    await page.waitForURL('/status/');
+
+    const calendarView = page.locator('[data-status-calendar-entry]');
+    await expect(calendarView).toHaveAccessibleName(calendarHeading);
+    await expect(calendarView).toHaveAttribute('href', entryHref);
+    await calendarView.click();
+    await page.waitForURL(entryHref);
+  });
+}
+
 const trackCalendarFocus = (page: Page): Promise<void> =>
   page.addInitScript(() => {
     const focus = HTMLElement.prototype.focus;

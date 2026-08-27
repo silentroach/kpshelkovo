@@ -2,6 +2,7 @@
 import StatusIncidentRow from '@/components/status/StatusIncidentRow.astro';
 import StatusServiceCard from '@/components/status/StatusServiceCard.astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import { CalendarIcon } from '@shelkovo/ui/icons';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import {
   withHomeBreadcrumbs,
@@ -10,6 +11,7 @@ import {
 import { collectionPageSchema } from '@/lib/news/seo';
 import { loadStatusData } from '@/lib/status/load';
 import {
+  statusCalendarYearUrl,
   statusHistoryUrl,
   statusServiceUrl,
   statusUrl,
@@ -17,6 +19,8 @@ import {
 
 const data = await loadStatusData();
 const now = Date.now();
+const calendarYear = data.calendar.buildYear;
+const calendarHeading = `Проблемы и плановые работы за ${calendarYear} год`;
 const overviewTimelineDays = 30;
 const mobileOverviewTimelineDays = 7;
 const recentIncidents = data.incidents.slice(0, 10);
@@ -64,15 +68,28 @@ const schema = collectionPageSchema({
       <div class="ui-page-header-stack max-w-4xl">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div>
-          <div class="space-y-3">
+        <div class="space-y-3" data-status-page-header-copy>
+          <div class="flex items-center gap-5 md:gap-7">
             <h1 class="ui-page-title">Статус КП Шелково</h1>
-            <p class="max-w-3xl text-base leading-7 text-muted-foreground">
-              Журнал отключений и ограничений в КП Шелково: электричество, вода,
-              интернет и проезд через дамбу. Фиксируем время, зону, источник и
-              ход восстановления.
-            </p>
+
+            <span class="inline-flex translate-y-1 md:translate-y-1.5">
+              <a
+                class="ui-btn ui-icon-action focus-visible:outline-none"
+                href={statusCalendarYearUrl({ year: calendarYear })}
+                aria-label={calendarHeading}
+                title={calendarHeading}
+                data-status-calendar-entry
+              >
+                <CalendarIcon />
+              </a>
+            </span>
           </div>
+
+          <p class="max-w-3xl text-base leading-7 text-muted-foreground">
+            Журнал отключений и ограничений в КП Шелково: электричество, вода,
+            интернет и проезд через дамбу. Фиксируем время, зону, источник и ход
+            восстановления.
+          </p>
         </div>
       </div>
     </section>

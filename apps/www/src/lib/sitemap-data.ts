@@ -8,6 +8,7 @@ import { z } from 'zod';
 
 import { parseNewsTimestampInput } from './news/date';
 import { normalizeTagKey } from './news/schema';
+import { STATUS_KINDS } from './status/schema';
 import {
   buildSitemapMetadataIndex,
   type SitemapMetadataIndex,
@@ -43,6 +44,7 @@ const NewsArticleFrontmatterSchema = z
 const StatusIncidentFrontmatterSchema = z
   .object({
     service: z.string(),
+    kind: z.enum(STATUS_KINDS),
     started_at: SitemapDateInputSchema,
     ended_at: SitemapDateInputSchema.optional(),
   })
@@ -270,6 +272,7 @@ const loadStatusIncidentsForSitemap =
         return {
           url: `/status/incidents/${year}/${month}/${slug}/`,
           service: incident.service,
+          kind: incident.kind,
           startedIso: parseTimestamp(
             incident.started_at,
             `${context} started_at`,

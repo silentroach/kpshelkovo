@@ -399,6 +399,40 @@ test('#154 search result highlighting', async () => {
   await page.close();
 });
 
+test('#321 status calendars stay outside Pagefind', async () => {
+  const page = await browser.newPage({
+    viewport: { width: 1280, height: 800 },
+  });
+
+  try {
+    await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
+    await page.addScriptTag({
+      type: 'module',
+      content: `
+        import * as pagefind from '/search/pagefind.js';
+        await pagefind.init();
+        const search = await pagefind.search(null);
+        const results = await Promise.all(search.results.map((result) => result.data()));
+        document.documentElement.dataset.pagefindUrls = JSON.stringify(
+          results.map((result) => new URL(result.url, window.location.origin).pathname),
+        );
+      `,
+    });
+    const root = page.locator('html');
+    await expectPage(root).toHaveAttribute('data-pagefind-urls', /^\[/u);
+    const urls = JSON.parse(
+      (await root.getAttribute('data-pagefind-urls')) ?? '[]',
+    ) as readonly string[];
+
+    expect(urls.length).toBeGreaterThan(0);
+    expect(urls.filter((url) => url.startsWith('/status/calendar/'))).toEqual(
+      [],
+    );
+  } finally {
+    await page.close();
+  }
+});
+
 for (const group of queryGroups) {
   test(group.name, async () => {
     const matrix = [];

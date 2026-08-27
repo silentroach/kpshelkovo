@@ -9,6 +9,7 @@ import {
 import { collectionPageSchema } from '@/lib/news/seo';
 import { loadStatusData } from '@/lib/status/load';
 import {
+  statusCalendarYearUrl,
   statusHistoryUrl,
   statusMarkdownUrl,
   statusUrl,
@@ -57,6 +58,15 @@ const schema = collectionPageSchema({
             Все записи об отключениях, ограничениях и плановых работах — от
             новых к старым.
           </p>
+          <nav aria-label="Представление истории статусов">
+            <a
+              class="ui-link font-semibold"
+              href={statusCalendarYearUrl({ year: data.calendar.buildYear })}
+              data-status-history-calendar
+            >
+              Календарь
+            </a>
+          </nav>
         </div>
       </div>
     </section>

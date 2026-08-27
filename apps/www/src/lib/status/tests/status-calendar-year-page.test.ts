@@ -553,7 +553,8 @@ describe('/status/calendar/YYYY/', () => {
             "interactiveElements": 0,
             "label": "1 плановая работа",
             "role": "tooltip",
-            "text": "1·января·2026: 1·плановая·работа",
+            "text": "1·января·2026
+      1·плановая·работа",
           },
           {
             "ariaHidden": "true",
@@ -561,7 +562,8 @@ describe('/status/calendar/YYYY/', () => {
             "interactiveElements": 0,
             "label": "1 проблема",
             "role": "tooltip",
-            "text": "23·августа·2026: 1·проблема",
+            "text": "23·августа·2026
+      1·проблема",
           },
           {
             "ariaHidden": "true",
@@ -569,7 +571,9 @@ describe('/status/calendar/YYYY/', () => {
             "interactiveElements": 0,
             "label": "2 проблемы, 1 плановая работа",
             "role": "tooltip",
-            "text": "24·августа·2026: 2·проблемы, 1·плановая·работа",
+            "text": "24·августа·2026
+      2·проблемы
+      1·плановая·работа",
           },
         ],
       }
@@ -589,6 +593,12 @@ describe('/status/calendar/YYYY/', () => {
         legend?.querySelector('[data-status-calendar-today-legend]'),
       ),
       metadata: {
+        historyLinkCount: document.querySelectorAll(
+          'main a[href="/status/history/"]',
+        ).length,
+        statusBreadcrumbHref: document
+          .querySelector('nav[aria-label="Хлебные крошки"] a[href="/status/"]')
+          ?.getAttribute('href'),
         robots: document
           .querySelector('meta[name="robots"]')
           ?.getAttribute('content'),
@@ -605,9 +615,11 @@ describe('/status/calendar/YYYY/', () => {
           "maintenance",
         ],
         "metadata": {
+          "historyLinkCount": 0,
           "markdownAlternate": "https://kpshelkovo.online/status/calendar/2026/index.md",
           "pagefindRoot": undefined,
           "robots": undefined,
+          "statusBreadcrumbHref": "/status/",
         },
         "todayLegend": false,
       }

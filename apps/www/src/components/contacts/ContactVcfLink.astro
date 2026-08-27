@@ -14,35 +14,9 @@ const { vcf } = Astro.props;
 <ResourceLink
   href={vcf.downloadUrl}
   download={vcf.filename}
-  class="contact-vcf-link ui-btn size-10 shrink-0 focus-visible:outline-none"
+  class="ui-btn ui-icon-action focus-visible:outline-none"
   aria-label="Добавить в контакты"
   title="Добавить в контакты"
 >
-  <ContactPlusIcon class="size-[1.125rem] shrink-0" />
+  <ContactPlusIcon />
 </ResourceLink>
-
-<style>
-  .contact-vcf-link {
-    border-radius: 999px;
-    border-color: color-mix(
-      in oklch,
-      var(--color-accent-text) 18%,
-      transparent
-    );
-    background: color-mix(in oklch, var(--color-accent-soft) 48%, transparent);
-    color: var(--color-accent-text);
-    box-shadow: none;
-  }
-
-  .contact-vcf-link:hover,
-  .contact-vcf-link:focus-visible {
-    border-color: var(--color-accent-hover);
-    background: var(--color-accent-soft);
-    color: var(--color-accent-text);
-  }
-
-  .contact-vcf-link:focus-visible {
-    outline: 2px solid var(--color-accent-text);
-    outline-offset: 2px;
-  }
-</style>

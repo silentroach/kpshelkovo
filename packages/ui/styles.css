@@ -1427,6 +1427,35 @@ a.ui-chip:hover {
   color: var(--color-foreground);
 }
 
+.ui-icon-action {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: none;
+  border-radius: 999px;
+  border-color: color-mix(in oklch, var(--color-accent-text) 18%, transparent);
+  background: color-mix(in oklch, var(--color-accent-soft) 48%, transparent);
+  color: var(--color-accent-text);
+  box-shadow: none;
+}
+
+.ui-icon-action > svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: none;
+}
+
+.ui-icon-action:hover,
+.ui-icon-action:focus-visible {
+  border-color: var(--color-accent-hover);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+
+.ui-icon-action:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 2px;
+}
+
 .ui-badge {
   display: inline-flex;
   align-items: center;
