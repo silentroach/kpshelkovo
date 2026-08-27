@@ -49,63 +49,6 @@ const breadcrumbs = withHomeBreadcrumbs([
     <header class="ui-page-header">
       <div class="ui-page-header-stack max-w-4xl">
         <Breadcrumbs items={breadcrumbs} />
-        <nav
-          aria-label="Переключение лет"
-          class="flex w-full max-w-md items-center justify-between gap-3"
-          data-status-calendar-year-navigation
-        >
-          {
-            previousYear !== undefined ? (
-              <a
-                href={statusCalendarYearUrl({ year: previousYear })}
-                aria-label={`Календарь за ${previousYear} год`}
-                class="ui-btn ui-btn-sm ui-btn-ghost ui-num min-h-10 w-24 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text"
-                data-status-calendar-previous
-              >
-                <span aria-hidden="true">←</span>
-                <span>{previousYear}</span>
-              </a>
-            ) : (
-              <button
-                type="button"
-                disabled
-                aria-label="Предыдущего года нет"
-                class="ui-btn ui-btn-sm ui-btn-ghost ui-num min-h-10 w-24"
-                data-status-calendar-previous
-              >
-                <span aria-hidden="true">←</span>
-              </button>
-            )
-          }
-
-          <span class="ui-num text-xl font-semibold" aria-current="page">
-            {year}
-          </span>
-
-          {
-            nextYear !== undefined ? (
-              <a
-                href={statusCalendarYearUrl({ year: nextYear })}
-                aria-label={`Календарь за ${nextYear} год`}
-                class="ui-btn ui-btn-sm ui-btn-ghost ui-num min-h-10 w-24 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text"
-                data-status-calendar-next
-              >
-                <span>{nextYear}</span>
-                <span aria-hidden="true">→</span>
-              </a>
-            ) : (
-              <button
-                type="button"
-                disabled
-                aria-label="Следующего года нет"
-                class="ui-btn ui-btn-sm ui-btn-ghost ui-num min-h-10 w-24"
-                data-status-calendar-next
-              >
-                <span aria-hidden="true">→</span>
-              </button>
-            )
-          }
-        </nav>
         <h1 class="ui-page-title">{heading}</h1>
       </div>
     </header>
@@ -123,6 +66,64 @@ const breadcrumbs = withHomeBreadcrumbs([
       </div>
 
       <StatusCalendarLegend />
+
+      <nav
+        aria-label="Переключение лет"
+        class="mx-auto mt-8 flex w-full max-w-md items-center justify-between gap-3"
+        data-status-calendar-year-navigation
+      >
+        {
+          previousYear !== undefined ? (
+            <a
+              href={statusCalendarYearUrl({ year: previousYear })}
+              aria-label={`Календарь за ${previousYear} год`}
+              class="ui-btn ui-btn-sm ui-btn-ghost ui-num min-h-10 w-24 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text"
+              data-status-calendar-previous
+            >
+              <span aria-hidden="true">←</span>
+              <span>{previousYear}</span>
+            </a>
+          ) : (
+            <button
+              type="button"
+              disabled
+              aria-label="Нет данных за предыдущий год"
+              class="ui-btn ui-btn-sm ui-btn-ghost ui-num min-h-10 w-24"
+              data-status-calendar-previous
+            >
+              <span aria-hidden="true">←</span>
+            </button>
+          )
+        }
+
+        <span class="ui-num text-xl font-semibold" aria-current="page">
+          {year}
+        </span>
+
+        {
+          nextYear !== undefined ? (
+            <a
+              href={statusCalendarYearUrl({ year: nextYear })}
+              aria-label={`Календарь за ${nextYear} год`}
+              class="ui-btn ui-btn-sm ui-btn-ghost ui-num min-h-10 w-24 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text"
+              data-status-calendar-next
+            >
+              <span>{nextYear}</span>
+              <span aria-hidden="true">→</span>
+            </a>
+          ) : (
+            <button
+              type="button"
+              disabled
+              aria-label="Нет данных за следующий год"
+              class="ui-btn ui-btn-sm ui-btn-ghost ui-num min-h-10 w-24"
+              data-status-calendar-next
+            >
+              <span aria-hidden="true">→</span>
+            </button>
+          )
+        }
+      </nav>
     </div>
   </main>
 </BaseLayout>
