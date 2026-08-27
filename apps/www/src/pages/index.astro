@@ -87,7 +87,7 @@ const heroImage = heroMode === 'day' ? dayHeroImage : nightHeroImage;
       class="home-hero overflow-hidden border-b border-border bg-muted"
       data-home-hero-mode={heroMode}
     >
-      <div class="h-[clamp(20rem,37vw,36rem)] w-full overflow-hidden">
+      <div class="relative h-[clamp(20rem,37vw,36rem)] w-full overflow-hidden">
         <img
           sizes={heroSizes}
           alt="Панорама поселка Шелково"
@@ -105,18 +105,14 @@ const heroImage = heroMode === 'day' ? dayHeroImage : nightHeroImage;
           data-night-srcset={nightHeroImage.srcset}
         />
         <noscript>
-          <img
-            src={heroImage.src}
-            srcset={heroImage.srcset}
-            sizes={heroSizes}
-            alt="Панорама поселка Шелково"
-            width={dayHero.width}
-            height={dayHero.height}
-            class="h-full w-full object-cover object-left md:object-center"
-            loading="eager"
-            fetchpriority="high"
-            decoding="async"
-          />
+          <div
+            role="img"
+            aria-label="Панорама поселка Шелково"
+            class="absolute inset-0 bg-cover bg-left md:bg-center"
+            style={`background-image: url("${heroImage.src}")`}
+            data-home-hero-fallback
+          >
+          </div>
         </noscript>
         <script>
           import { installHomeHeroHydration } from '@/lib/home/hero';

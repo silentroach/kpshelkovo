@@ -14,6 +14,8 @@
     "test:browser:compare:serve": "astro build && ASTRO_PREVIEW_BACKGROUND=0 astro preview --host 127.0.0.1 --port 4330",
     "test:browser:header-a11y": "playwright test -c playwright.header-a11y.local.config.ts",
     "test:browser:header-a11y:serve": "astro build && ASTRO_PREVIEW_BACKGROUND=0 astro preview --host 127.0.0.1 --port 14331",
+    "test:browser:home-hero": "playwright test -c playwright.home-hero.local.config.ts",
+    "test:browser:home-hero:serve": "astro build && ASTRO_PREVIEW_BACKGROUND=0 astro preview --host 127.0.0.1 --port 14333",
     "test:browser:status-calendar-focus": "playwright test -c playwright.status-calendar-focus.local.config.ts",
     "test:browser:status-calendar-focus:serve": "astro build && ASTRO_PREVIEW_BACKGROUND=0 astro preview --host 127.0.0.1 --port 14332",
     "test:search-quality": "pnpm build && vitest run -c vitest.search-quality.config.ts",

@@ -33,27 +33,25 @@ describe('home hero markup', () => {
     const activeImage = getImageTag(hero, 'data-home-hero-image');
     const fallbackMarkup = hero.match(/<noscript>([\s\S]*?)<\/noscript>/u)?.[1];
     if (!fallbackMarkup) throw new Error('Expected no-JS hero fallback');
-    const fallbackImage = getImageTag(fallbackMarkup);
 
     expect({
       activeHidden: /\shidden(?:[\s=>])/u.test(activeImage),
       activePriority: /\sfetchpriority="high"/u.test(activeImage),
       activeResourceAttributes: getResourceAttributes(activeImage),
+      fallbackBackground: /background-image:\s*url\(/u.test(fallbackMarkup),
+      fallbackImageCount: [...fallbackMarkup.matchAll(/<img\b/gu)].length,
+      fallbackRole: /\srole="img"/u.test(fallbackMarkup),
       runtimeSources: [
         ...activeImage.matchAll(/\sdata-(day|night)-(src|srcset)="([^"]+)"/gu),
       ].map((match) => `${match[1]}-${match[2]}`),
-      fallbackPriority: /\sfetchpriority="high"/u.test(fallbackImage),
-      fallbackResourceAttributes: getResourceAttributes(fallbackImage),
     }).toMatchInlineSnapshot(`
       {
         "activeHidden": true,
         "activePriority": true,
         "activeResourceAttributes": [],
-        "fallbackPriority": true,
-        "fallbackResourceAttributes": [
-          "src",
-          "srcset",
-        ],
+        "fallbackBackground": true,
+        "fallbackImageCount": 0,
+        "fallbackRole": true,
         "runtimeSources": [
           "day-src",
           "day-srcset",
