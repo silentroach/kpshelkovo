@@ -15,6 +15,7 @@ import { loadSitemapMetadataIndex } from './src/lib/sitemap-data';
 import { createAstroMarkdownProcessor } from './src/lib/markdown/astro-processor';
 import { indexNowUrlManifest } from './src/integrations/indexnow-url-manifest';
 import { pagefindDevSnapshot } from './src/integrations/pagefind-dev-snapshot';
+import { statusCalendarAlternateValidation } from './src/integrations/status-calendar-alternate-validation';
 
 const plugins = [tailwindcss()];
 const devServerPort = 4321;
@@ -96,6 +97,7 @@ export default defineConfig({
       filter: shouldIncludeSitemapPage,
       serialize: serializeSitemapItem,
     }),
+    statusCalendarAlternateValidation(new URL(site)),
     indexNowUrlManifest(indexNowUrls),
     compressor({
       gzip: {
