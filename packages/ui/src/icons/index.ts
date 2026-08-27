@@ -7,6 +7,7 @@ export {
 } from './services/index.ts';
 export {
   AlertCircleIcon,
+  CalendarIcon,
   CalendarPlusIcon,
   CheckCircleIcon,
   ContactPlusIcon,

@@ -589,6 +589,9 @@ describe('/status/calendar/YYYY/', () => {
         legend?.querySelector('[data-status-calendar-today-legend]'),
       ),
       metadata: {
+        listHref: document
+          .querySelector('[data-status-calendar-list]')
+          ?.getAttribute('href'),
         robots: document
           .querySelector('meta[name="robots"]')
           ?.getAttribute('content'),
@@ -605,6 +608,7 @@ describe('/status/calendar/YYYY/', () => {
           "maintenance",
         ],
         "metadata": {
+          "listHref": "/status/history/",
           "markdownAlternate": "https://kpshelkovo.online/status/calendar/2026/index.md",
           "pagefindRoot": undefined,
           "robots": undefined,
