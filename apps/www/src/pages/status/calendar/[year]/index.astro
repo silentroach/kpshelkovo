@@ -12,7 +12,6 @@ import {
 } from '@/lib/status/calendar';
 import { loadStatusData } from '@/lib/status/load';
 import {
-  isStatusCalendarYearAvailable,
   statusCalendarYearCanonical,
   statusCalendarYearStaticPaths,
   statusUrl,
@@ -24,13 +23,6 @@ export const getStaticPaths = (() =>
   )) satisfies GetStaticPaths;
 
 const year = Number(Astro.params.year);
-const now = new Date();
-const currentYear = currentStatusCalendarYear(now);
-
-if (!isStatusCalendarYearAvailable(year, currentYear)) {
-  throw new Error(`status calendar year "${Astro.params.year}" not found`);
-}
-
 const calendar = buildStatusCalendarYearGrid(
   (await loadStatusData()).calendar,
   year,

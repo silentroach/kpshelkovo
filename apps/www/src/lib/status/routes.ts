@@ -69,11 +69,6 @@ export const statusCalendarYearPath = (
   input: StatusCalendarYearRouteInput,
 ): string => `${STATUS_CALENDAR_ROOT}${padNumber(input.year, 4)}/`;
 
-export const isStatusCalendarYearAvailable = (
-  year: number,
-  currentYear: number,
-): boolean => year === currentYear || year === currentYear + 1;
-
 export const statusCalendarYearStaticPaths = (currentYear: number) =>
   [currentYear, currentYear + 1].map((year) => ({
     params: { year: String(year) },

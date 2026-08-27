@@ -7,10 +7,7 @@ import {
 } from '@/lib/status/calendar';
 import { loadStatusData } from '@/lib/status/load';
 import { buildStatusYearMarkdown } from '@/lib/status/markdown';
-import {
-  isStatusCalendarYearAvailable,
-  statusCalendarYearStaticPaths,
-} from '@/lib/status/routes';
+import { statusCalendarYearStaticPaths } from '@/lib/status/routes';
 
 export const prerender = true;
 
@@ -21,13 +18,6 @@ export const getStaticPaths = (() =>
 
 export const GET: APIRoute = async ({ params }) => {
   const year = Number(params.year);
-  const now = new Date();
-  const currentYear = currentStatusCalendarYear(now);
-
-  if (!isStatusCalendarYearAvailable(year, currentYear)) {
-    throw new Error(`status calendar year "${params.year}" not found`);
-  }
-
   const calendar = buildStatusCalendarYearGrid(
     (await loadStatusData()).calendar,
     year,

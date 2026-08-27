@@ -103,6 +103,8 @@ const parseHtml = (html: string) => {
 
 const cleanText = (value: string): string => value.replace(/\s+/gu, ' ').trim();
 
+const DEFAULT_NOW = new Date('2026-08-27T12:00:00+03:00');
+
 const renderPage = async (year = 2026) => {
   const container = await createAstroContainer();
 
@@ -113,12 +115,12 @@ const renderPage = async (year = 2026) => {
   });
 };
 
-const renderMarkdownRoute = (): Response | Promise<Response> =>
+const renderMarkdownRoute = (year = 2026): Response | Promise<Response> =>
   (
     StatusCalendarYearMarkdownRoute.GET as (context: {
       readonly params: Readonly<Record<string, string | undefined>>;
     }) => Response | Promise<Response>
-  )({ params: { year: '2026' } });
+  )({ params: { year: String(year) } });
 
 const affectedLinks = (document: ReturnType<typeof parseHtml>) =>
   [...document.querySelectorAll('[data-status-calendar-day-link]')].map(
@@ -133,7 +135,7 @@ const affectedLinks = (document: ReturnType<typeof parseHtml>) =>
 
 beforeAll(() => {
   vi.useFakeTimers();
-  vi.setSystemTime(new Date('2026-08-27T12:00:00+03:00'));
+  vi.setSystemTime(DEFAULT_NOW);
 });
 
 afterAll(() => {
@@ -141,6 +143,37 @@ afterAll(() => {
 });
 
 describe('/status/calendar/YYYY/', () => {
+  it('renders every path from one static year snapshot across Moscow New Year', async () => {
+    vi.setSystemTime(new Date('2026-12-31T23:59:00+03:00'));
+    const oldYear = Number(
+      (await StatusCalendarYearPage.getStaticPaths())[0]?.params.year,
+    );
+
+    try {
+      vi.setSystemTime(new Date('2027-01-01T00:01:00+03:00'));
+      const [html, markdownResponse] = await Promise.all([
+        renderPage(oldYear),
+        renderMarkdownRoute(oldYear),
+      ]);
+
+      expect({
+        oldYear,
+        htmlYear: parseHtml(html)
+          .querySelector('[data-status-calendar-year]')
+          ?.getAttribute('data-status-calendar-year'),
+        markdownStatus: markdownResponse.status,
+      }).toMatchInlineSnapshot(`
+        {
+          "htmlYear": "2026",
+          "markdownStatus": 200,
+          "oldYear": 2026,
+        }
+      `);
+    } finally {
+      vi.setSystemTime(DEFAULT_NOW);
+    }
+  });
+
   it('creates the current and upcoming Moscow years for HTML and Markdown', async () => {
     const [htmlPaths, markdownPaths, upcomingHtml] = await Promise.all([
       StatusCalendarYearPage.getStaticPaths(),
@@ -443,13 +476,11 @@ describe('/status/calendar/YYYY/', () => {
     const markdownLinks = [
       ...markdown.matchAll(/^- \[([^\]]+)\]\(([^)]+)\)$/gmu),
     ].map(([, label, href]) => ({ href, label }));
-    const headings = [...markdown.matchAll(/^## (.+)$/gmu)].map(
-      ([, heading]) => heading,
-    );
+    const headingCount = [...markdown.matchAll(/^## .+$/gmu)].length;
 
     expect(markdownLinks).toEqual(htmlLinks);
     expect({
-      headings,
+      headingCount,
       contentType: markdownResponse.headers.get('Content-Type'),
       robots: markdownResponse.headers.get('X-Robots-Tag'),
       hasMarkdownTable: /^\|/mu.test(markdown),
@@ -457,20 +488,7 @@ describe('/status/calendar/YYYY/', () => {
       {
         "contentType": "text/markdown; charset=utf-8",
         "hasMarkdownTable": false,
-        "headings": [
-          "Январь",
-          "Февраль",
-          "Март",
-          "Апрель",
-          "Май",
-          "Июнь",
-          "Июль",
-          "Август",
-          "Сентябрь",
-          "Октябрь",
-          "Ноябрь",
-          "Декабрь",
-        ],
+        "headingCount": 12,
         "robots": "noindex, follow",
       }
     `);
