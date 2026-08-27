@@ -220,8 +220,17 @@ export const formatStatusCalendarDayCounts = (
   day: Pick<StatusCalendarDay, 'incidentCount' | 'maintenanceCount'>,
 ): string => formatStatusCalendarDayCountLines(day).join(', ');
 
+export const formatStatusCalendarDayDate = (
+  day: Pick<StatusCalendarDay, 'id'>,
+): string => formatDate(day.id);
+
 export const formatStatusCalendarDayLabel = (day: StatusCalendarDay): string =>
-  `${formatDate(day.id)}: ${formatStatusCalendarDayCounts(day)}`;
+  `${formatStatusCalendarDayDate(day)}: ${formatStatusCalendarDayCounts(day)}`;
+
+export const formatStatusCalendarDayTooltipSummary = (
+  day: StatusCalendarDay,
+): string =>
+  `${formatStatusNbsp(formatStatusCalendarDayDate(day))}: ${formatStatusCalendarDayCountLines(day).map(formatStatusNbsp).join(', ')}`;
 
 export const formatStatusDuration = (
   duration: StatusDuration,

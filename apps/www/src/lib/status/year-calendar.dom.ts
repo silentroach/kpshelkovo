@@ -1,5 +1,10 @@
 const TOOLTIP_ROOT_SELECTOR = '[data-status-calendar-tooltip-root]';
 const TOOLTIP_SELECTOR = '[data-status-calendar-tooltip]';
+const TOOLTIP_TEXT_SELECTOR = '[data-status-calendar-tooltip-text]';
+const TOOLTIP_OPEN_ATTRIBUTE = 'data-status-calendar-tooltip-open';
+const TOOLTIP_HOVER_ATTRIBUTE = 'data-status-calendar-tooltip-hovered';
+const TOOLTIP_FOCUS_ATTRIBUTE = 'data-status-calendar-tooltip-focused';
+const TOOLTIP_DISMISSED_ATTRIBUTE = 'data-tooltip-dismissed';
 const TODAY_SELECTOR =
   '[data-status-calendar-today], .status-calendar-date--today';
 const TOOLTIP_SHIFT_PROPERTY = '--status-calendar-tooltip-shift-x';
@@ -13,8 +18,6 @@ const MOSCOW_DATE_FORMAT = new Intl.DateTimeFormat('en-US', {
 });
 
 let installed = false;
-let focusedTooltipRoot: HTMLElement | undefined;
-let hoveredTooltipRoot: HTMLElement | undefined;
 
 const tooltipRoot = (
   target: EventTarget | undefined,
@@ -25,12 +28,6 @@ const tooltipRoot = (
 
 const movedOutside = (root: HTMLElement, target: EventTarget | undefined) =>
   !(target instanceof Node) || !root.contains(target);
-
-const resetTooltipDismissal = (root: HTMLElement): void => {
-  if (focusedTooltipRoot !== root && hoveredTooltipRoot !== root) {
-    root.removeAttribute('data-tooltip-dismissed');
-  }
-};
 
 const tooltipHorizontalShift = (
   bounds: Pick<DOMRect, 'left' | 'right'>,
@@ -102,6 +99,46 @@ export const positionStatusCalendarTooltip = (
   tooltip.style.setProperty(TOOLTIP_SHIFT_PROPERTY, `${shift}px`);
 };
 
+const closeStatusCalendarTooltip = (root: HTMLElement): void => {
+  root.removeAttribute(TOOLTIP_OPEN_ATTRIBUTE);
+  root
+    .querySelector<HTMLElement>(TOOLTIP_SELECTOR)
+    ?.setAttribute('aria-hidden', 'true');
+};
+
+const openStatusCalendarTooltip = (root: HTMLElement): void => {
+  if (root.hasAttribute(TOOLTIP_DISMISSED_ATTRIBUTE)) {
+    return;
+  }
+
+  const tooltip = root.querySelector<HTMLElement>(TOOLTIP_SELECTOR);
+  const tooltipText = tooltip?.querySelector<HTMLElement>(
+    TOOLTIP_TEXT_SELECTOR,
+  );
+  const summary = root.dataset.statusCalendarTooltipSummary;
+
+  if (!tooltip || !tooltipText || !summary) {
+    return;
+  }
+
+  tooltipText.textContent = summary;
+  tooltip.setAttribute('aria-hidden', 'false');
+  root.setAttribute(TOOLTIP_OPEN_ATTRIBUTE, '');
+  positionStatusCalendarTooltip(root);
+};
+
+const settleStatusCalendarTooltip = (root: HTMLElement): void => {
+  if (
+    root.hasAttribute(TOOLTIP_HOVER_ATTRIBUTE) ||
+    root.hasAttribute(TOOLTIP_FOCUS_ATTRIBUTE)
+  ) {
+    return;
+  }
+
+  root.removeAttribute(TOOLTIP_DISMISSED_ATTRIBUTE);
+  closeStatusCalendarTooltip(root);
+};
+
 export const installStatusCalendarYearInteractions = (): void => {
   refreshStatusCalendarToday();
 
@@ -111,8 +148,6 @@ export const installStatusCalendarYearInteractions = (): void => {
 
   installed = true;
   document.addEventListener('astro:page-load', () => {
-    focusedTooltipRoot = undefined;
-    hoveredTooltipRoot = undefined;
     refreshStatusCalendarToday();
   });
   window.setInterval(refreshStatusCalendarToday, TODAY_REFRESH_INTERVAL);
@@ -120,16 +155,20 @@ export const installStatusCalendarYearInteractions = (): void => {
     const root = tooltipRoot(event.target || undefined);
 
     if (root) {
-      focusedTooltipRoot = root;
-      positionStatusCalendarTooltip(root);
+      root.setAttribute(TOOLTIP_FOCUS_ATTRIBUTE, '');
+      openStatusCalendarTooltip(root);
     }
   });
   document.addEventListener('pointerover', (event) => {
+    if (event.pointerType === 'touch') {
+      return;
+    }
+
     const root = tooltipRoot(event.target || undefined);
 
-    if (root) {
-      hoveredTooltipRoot = root;
-      positionStatusCalendarTooltip(root);
+    if (root && movedOutside(root, event.relatedTarget || undefined)) {
+      root.setAttribute(TOOLTIP_HOVER_ATTRIBUTE, '');
+      openStatusCalendarTooltip(root);
     }
   });
   document.addEventListener('keydown', (event) => {
@@ -137,33 +176,33 @@ export const installStatusCalendarYearInteractions = (): void => {
       return;
     }
 
-    tooltipRoot(event.target || undefined)?.setAttribute(
-      'data-tooltip-dismissed',
-      '',
-    );
-    focusedTooltipRoot?.setAttribute('data-tooltip-dismissed', '');
-    hoveredTooltipRoot?.setAttribute('data-tooltip-dismissed', '');
+    document
+      .querySelectorAll<HTMLElement>(
+        `${TOOLTIP_ROOT_SELECTOR}[${TOOLTIP_OPEN_ATTRIBUTE}]`,
+      )
+      .forEach((root) => {
+        root.setAttribute(TOOLTIP_DISMISSED_ATTRIBUTE, '');
+        closeStatusCalendarTooltip(root);
+      });
   });
   document.addEventListener('focusout', (event) => {
     const root = tooltipRoot(event.target || undefined);
 
     if (root && movedOutside(root, event.relatedTarget || undefined)) {
-      if (focusedTooltipRoot === root) {
-        focusedTooltipRoot = undefined;
-      }
-
-      resetTooltipDismissal(root);
+      root.removeAttribute(TOOLTIP_FOCUS_ATTRIBUTE);
+      settleStatusCalendarTooltip(root);
     }
   });
   document.addEventListener('pointerout', (event) => {
+    if (event.pointerType === 'touch') {
+      return;
+    }
+
     const root = tooltipRoot(event.target || undefined);
 
     if (root && movedOutside(root, event.relatedTarget || undefined)) {
-      if (hoveredTooltipRoot === root) {
-        hoveredTooltipRoot = undefined;
-      }
-
-      resetTooltipDismissal(root);
+      root.removeAttribute(TOOLTIP_HOVER_ATTRIBUTE);
+      settleStatusCalendarTooltip(root);
     }
   });
 };

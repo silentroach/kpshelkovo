@@ -125,13 +125,23 @@ const renderMarkdownRoute = (year = 2026): Response | Promise<Response> =>
 
 const affectedLinks = (document: ReturnType<typeof parseHtml>) =>
   [...document.querySelectorAll('[data-status-calendar-day-link]')].map(
-    (link) => ({
-      id: link.getAttribute('data-status-calendar-day-link') ?? undefined,
-      href: link.getAttribute('href'),
-      marker: link.getAttribute('data-status-calendar-marker') ?? undefined,
-      label: link.getAttribute('aria-label'),
-      hasDescription: link.hasAttribute('aria-describedby'),
-    }),
+    (link) => {
+      const describedBy = link.getAttribute('aria-describedby') ?? undefined;
+
+      return {
+        id: link.getAttribute('data-status-calendar-day-link') ?? undefined,
+        href: link.getAttribute('href'),
+        marker: link.getAttribute('data-status-calendar-marker') ?? undefined,
+        label: link.getAttribute('aria-label'),
+        describedBy,
+        description: describedBy
+          ? document.getElementById(describedBy)?.getAttribute('aria-label')
+          : undefined,
+        descriptionExists: describedBy
+          ? Boolean(document.getElementById(describedBy))
+          : false,
+      };
+    },
   );
 
 const staticPathYears = (
@@ -475,33 +485,47 @@ describe('/status/calendar/YYYY/', () => {
       tooltips: [
         ...document.querySelectorAll('[data-status-calendar-tooltip]'),
       ].map((tooltip) => ({
+        id: tooltip.id,
         role: tooltip.getAttribute('role'),
-        lines: [...tooltip.querySelectorAll(':scope > span')].map((line) =>
-          visibleWhitespace(line.textContent.trim()),
+        label: tooltip.getAttribute('aria-label'),
+        ariaHidden: tooltip.getAttribute('aria-hidden'),
+        text: visibleWhitespace(
+          tooltip
+            .querySelector('[data-status-calendar-tooltip-text]')
+            ?.textContent.trim() ?? '',
         ),
+        interactiveElements: tooltip.querySelectorAll(
+          'a, button, input, select, textarea, [tabindex]',
+        ).length,
       })),
     }).toMatchInlineSnapshot(`
       {
         "links": [
           {
-            "hasDescription": false,
+            "describedBy": "status-calendar-tooltip-2026-01-01",
+            "description": "1 плановая работа",
+            "descriptionExists": true,
             "href": "/status/calendar/2026/01/#2026-01-01",
             "id": "2026-01-01",
-            "label": "1 января 2026: 1 плановая работа",
+            "label": "1 января 2026",
             "marker": "maintenance",
           },
           {
-            "hasDescription": false,
+            "describedBy": "status-calendar-tooltip-2026-08-23",
+            "description": "1 проблема",
+            "descriptionExists": true,
             "href": "/status/calendar/2026/08/#2026-08-23",
             "id": "2026-08-23",
-            "label": "23 августа 2026: 1 проблема",
+            "label": "23 августа 2026",
             "marker": "incident",
           },
           {
-            "hasDescription": false,
+            "describedBy": "status-calendar-tooltip-2026-08-24",
+            "description": "2 проблемы, 1 плановая работа",
+            "descriptionExists": true,
             "href": "/status/calendar/2026/08/#2026-08-24",
             "id": "2026-08-24",
-            "label": "24 августа 2026: 2 проблемы, 1 плановая работа",
+            "label": "24 августа 2026",
             "marker": "mixed",
           },
         ],
@@ -524,23 +548,28 @@ describe('/status/calendar/YYYY/', () => {
         ],
         "tooltips": [
           {
-            "lines": [
-              "1 плановая работа",
-            ],
+            "ariaHidden": "true",
+            "id": "status-calendar-tooltip-2026-01-01",
+            "interactiveElements": 0,
+            "label": "1 плановая работа",
             "role": "tooltip",
+            "text": "1·января·2026: 1·плановая·работа",
           },
           {
-            "lines": [
-              "1 проблема",
-            ],
+            "ariaHidden": "true",
+            "id": "status-calendar-tooltip-2026-08-23",
+            "interactiveElements": 0,
+            "label": "1 проблема",
             "role": "tooltip",
+            "text": "23·августа·2026: 1·проблема",
           },
           {
-            "lines": [
-              "2 проблемы",
-              "1 плановая работа",
-            ],
+            "ariaHidden": "true",
+            "id": "status-calendar-tooltip-2026-08-24",
+            "interactiveElements": 0,
+            "label": "2 проблемы, 1 плановая работа",
             "role": "tooltip",
+            "text": "24·августа·2026: 2·проблемы, 1·плановая·работа",
           },
         ],
       }
@@ -592,7 +621,9 @@ describe('/status/calendar/YYYY/', () => {
     ]);
     const htmlLinks = affectedLinks(parseHtml(html)).map((link) => ({
       href: new URL(link.href ?? '', 'https://kpshelkovo.online').toString(),
-      label: link.label,
+      label: link.description
+        ? `${link.label}: ${link.description}`
+        : link.label,
     }));
     const markdown = await markdownResponse.text();
     const markdownLinks = [

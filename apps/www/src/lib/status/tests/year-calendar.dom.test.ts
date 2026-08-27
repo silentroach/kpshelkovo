@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { visibleWhitespace } from '@/lib/test/visible-whitespace';
+
 import {
   installStatusCalendarYearInteractions,
   positionStatusCalendarTooltip,
@@ -91,118 +93,208 @@ describe('positionStatusCalendarTooltip', () => {
 });
 
 describe('installStatusCalendarYearInteractions', () => {
-  it('dismisses focused and hovered tooltips on Escape until they close', () => {
+  const renderTooltip = () => {
     document.body.innerHTML = `
-      <span data-status-calendar-tooltip-root="focused">
-        <a href="#day" data-status-calendar-day-link>24</a>
-        <span role="tooltip">24 августа: 1 проблема</span>
-      </span>
-      <span data-status-calendar-tooltip-root="hovered">
-        <a href="#other-day" data-status-calendar-day-link>25</a>
-        <span role="tooltip">25 августа: 1 проблема</span>
+      <span
+        data-status-calendar-tooltip-root="2026-08-24"
+        data-status-calendar-tooltip-summary="24 августа 2026: 2 проблемы, 1 плановая работа"
+      >
+        <a
+          href="#2026-08-24"
+          aria-label="24 августа 2026"
+          aria-describedby="status-calendar-tooltip-2026-08-24"
+          data-status-calendar-day-link
+        >24</a>
+        <span
+          id="status-calendar-tooltip-2026-08-24"
+          role="tooltip"
+          aria-label="2 проблемы, 1 плановая работа"
+          aria-hidden="true"
+          data-status-calendar-tooltip
+        ><span aria-hidden="true" data-status-calendar-tooltip-text>Fallback</span></span>
       </span>
       <button type="button">После календаря</button>
     `;
     const root = document.querySelector<HTMLElement>(
-      '[data-status-calendar-tooltip-root="focused"]',
-    );
-    const hoveredRoot = document.querySelector<HTMLElement>(
-      '[data-status-calendar-tooltip-root="hovered"]',
+      '[data-status-calendar-tooltip-root]',
     );
     const link = root?.querySelector<HTMLAnchorElement>('a');
+    const tooltip = root?.querySelector<HTMLElement>('[role="tooltip"]');
     const button = document.querySelector<HTMLButtonElement>('button');
 
-    if (!root || !hoveredRoot || !link || !button) {
+    if (!root || !link || !tooltip || !button) {
       throw new Error('status calendar tooltip fixture is incomplete');
     }
 
+    return { root, link, tooltip, button };
+  };
+
+  it('opens on mouse hover, remains hoverable, and reopens after Escape', () => {
+    const { root, link, tooltip, button } = renderTooltip();
+
     installStatusCalendarYearInteractions();
-    root.dispatchEvent(new Event('pointerover', { bubbles: true }));
+    link.dispatchEvent(
+      new PointerEvent('pointerover', {
+        bubbles: true,
+        pointerType: 'mouse',
+      }),
+    );
+    const opened = root.hasAttribute('data-status-calendar-tooltip-open');
+    link.dispatchEvent(
+      new PointerEvent('pointerout', {
+        bubbles: true,
+        pointerType: 'mouse',
+        relatedTarget: tooltip,
+      }),
+    );
+    const openOverTooltip = root.hasAttribute(
+      'data-status-calendar-tooltip-open',
+    );
     document.body.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
     );
-    const dismissedOnHover = root.hasAttribute('data-tooltip-dismissed');
-    root.dispatchEvent(
-      new MouseEvent('pointerout', {
+    const closedOnEscape = !root.hasAttribute(
+      'data-status-calendar-tooltip-open',
+    );
+    tooltip.dispatchEvent(
+      new PointerEvent('pointerout', {
         bubbles: true,
+        pointerType: 'mouse',
         relatedTarget: button,
       }),
     );
-    const resetAfterPointerLeaves = root.hasAttribute('data-tooltip-dismissed');
-
-    link.focus();
     link.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
-    );
-    const dismissedOnFocus = root.hasAttribute('data-tooltip-dismissed');
-    button.focus();
-    const resetAfterBlur = root.hasAttribute('data-tooltip-dismissed');
-
-    root.dispatchEvent(new Event('pointerover', { bubbles: true }));
-    link.focus();
-    link.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
-    );
-    root.dispatchEvent(
-      new MouseEvent('pointerout', {
+      new PointerEvent('pointerover', {
         bubbles: true,
-        relatedTarget: button,
+        pointerType: 'mouse',
       }),
-    );
-    const dismissedWhileFocused = root.hasAttribute('data-tooltip-dismissed');
-    button.focus();
-    const resetAfterFocusAndPointerLeave = root.hasAttribute(
-      'data-tooltip-dismissed',
-    );
-
-    root.dispatchEvent(new Event('pointerover', { bubbles: true }));
-    link.focus();
-    link.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
-    );
-    button.focus();
-    const dismissedWhileHovered = root.hasAttribute('data-tooltip-dismissed');
-    root.dispatchEvent(
-      new MouseEvent('pointerout', {
-        bubbles: true,
-        relatedTarget: button,
-      }),
-    );
-    const resetAfterBlurAndPointerLeave = root.hasAttribute(
-      'data-tooltip-dismissed',
-    );
-
-    link.focus();
-    hoveredRoot.dispatchEvent(new Event('pointerover', { bubbles: true }));
-    link.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
     );
 
     expect({
-      dismissedOnHover,
-      resetAfterPointerLeaves,
-      dismissedOnFocus,
-      resetAfterBlur,
-      dismissedWhileFocused,
-      resetAfterFocusAndPointerLeave,
-      dismissedWhileHovered,
-      resetAfterBlurAndPointerLeave,
-      separateFocusedRootDismissed: root.hasAttribute('data-tooltip-dismissed'),
-      separateHoveredRootDismissed: hoveredRoot.hasAttribute(
-        'data-tooltip-dismissed',
-      ),
+      opened,
+      openOverTooltip,
+      closedOnEscape,
+      reopened: root.hasAttribute('data-status-calendar-tooltip-open'),
+      summary: visibleWhitespace(tooltip.textContent),
+      ariaHidden: tooltip.getAttribute('aria-hidden'),
     }).toMatchInlineSnapshot(`
       {
-        "dismissedOnFocus": true,
-        "dismissedOnHover": true,
-        "dismissedWhileFocused": true,
-        "dismissedWhileHovered": true,
-        "resetAfterBlur": false,
-        "resetAfterBlurAndPointerLeave": false,
-        "resetAfterFocusAndPointerLeave": false,
-        "resetAfterPointerLeaves": false,
-        "separateFocusedRootDismissed": true,
-        "separateHoveredRootDismissed": true,
+        "ariaHidden": "false",
+        "closedOnEscape": true,
+        "openOverTooltip": true,
+        "opened": true,
+        "reopened": true,
+        "summary": "24·августа·2026: 2·проблемы, 1·плановая работа",
+      }
+    `);
+  });
+
+  it('opens and closes for a pen pointer', () => {
+    const { root, link, button } = renderTooltip();
+
+    installStatusCalendarYearInteractions();
+    link.dispatchEvent(
+      new PointerEvent('pointerover', {
+        bubbles: true,
+        pointerType: 'pen',
+      }),
+    );
+    const opened = root.hasAttribute('data-status-calendar-tooltip-open');
+    link.dispatchEvent(
+      new PointerEvent('pointerout', {
+        bubbles: true,
+        pointerType: 'pen',
+        relatedTarget: button,
+      }),
+    );
+
+    expect({
+      opened,
+      closed: !root.hasAttribute('data-status-calendar-tooltip-open'),
+    }).toMatchInlineSnapshot(`
+      {
+        "closed": true,
+        "opened": true,
+      }
+    `);
+  });
+
+  it('opens on keyboard focus and reopens after Escape and blur', () => {
+    const { root, link, tooltip, button } = renderTooltip();
+
+    installStatusCalendarYearInteractions();
+    link.focus();
+    const opened = root.hasAttribute('data-status-calendar-tooltip-open');
+    link.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+    );
+    const closedOnEscape = !root.hasAttribute(
+      'data-status-calendar-tooltip-open',
+    );
+    button.focus();
+    link.focus();
+
+    expect({
+      opened,
+      closedOnEscape,
+      reopened: root.hasAttribute('data-status-calendar-tooltip-open'),
+      ariaHidden: tooltip.getAttribute('aria-hidden'),
+      describedBy: link.getAttribute('aria-describedby'),
+    }).toMatchInlineSnapshot(`
+      {
+        "ariaHidden": "false",
+        "closedOnEscape": true,
+        "describedBy": "status-calendar-tooltip-2026-08-24",
+        "opened": true,
+        "reopened": true,
+      }
+    `);
+  });
+
+  it('ignores touch hover, preserves the first click, and inserts text safely', () => {
+    const { root, link, tooltip } = renderTooltip();
+    const unsafeSummary = '<img src=x onerror="alert(1)">';
+
+    root.dataset.statusCalendarTooltipSummary = unsafeSummary;
+    installStatusCalendarYearInteractions();
+    link.dispatchEvent(
+      new PointerEvent('pointerover', {
+        bubbles: true,
+        pointerType: 'touch',
+      }),
+    );
+    const openAfterTouch = root.hasAttribute(
+      'data-status-calendar-tooltip-open',
+    );
+    const click = new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true,
+    });
+    const clickAllowed = link.dispatchEvent(click);
+
+    link.dispatchEvent(
+      new PointerEvent('pointerover', {
+        bubbles: true,
+        pointerType: 'mouse',
+      }),
+    );
+
+    expect({
+      openAfterTouch,
+      clickAllowed,
+      clickPrevented: click.defaultPrevented,
+      text: tooltip.textContent,
+      html: tooltip.querySelector('[data-status-calendar-tooltip-text]')
+        ?.innerHTML,
+      injectedImage: Boolean(tooltip.querySelector('img')),
+    }).toMatchInlineSnapshot(`
+      {
+        "clickAllowed": true,
+        "clickPrevented": false,
+        "html": "&lt;img src=x onerror=\"alert(1)\"&gt;",
+        "injectedImage": false,
+        "openAfterTouch": false,
+        "text": "<img src=x onerror=\"alert(1)\">",
       }
     `);
   });
