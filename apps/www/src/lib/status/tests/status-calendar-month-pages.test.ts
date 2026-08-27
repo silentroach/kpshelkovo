@@ -320,6 +320,13 @@ describe('/status/calendar/YYYY/MM/', () => {
     expect({
       days: htmlJournal(document),
       metadata: {
+        yearBreadcrumbHref: [
+          ...document.querySelectorAll(
+            'nav[aria-label="Хлебные крошки"] a[href]',
+          ),
+        ]
+          .at(-1)
+          ?.getAttribute('href'),
         robots: document
           .querySelector('meta[name="robots"]')
           ?.getAttribute('content'),
@@ -374,6 +381,7 @@ describe('/status/calendar/YYYY/MM/', () => {
           "markdownAlternate": undefined,
           "pagefindRoot": undefined,
           "robots": "noindex, nofollow",
+          "yearBreadcrumbHref": "/status/calendar/2026/",
         },
       }
     `);

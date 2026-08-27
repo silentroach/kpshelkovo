@@ -39,25 +39,55 @@ test('focuses an initial day deep link without hiding it under the sticky header
   const targetPresentation = await day.evaluate((section) => {
     const heading = section.querySelector('h2');
     const header = document.querySelector('.site-header');
+    const firstDay = document.querySelector('[data-status-calendar-day]');
     const style = getComputedStyle(section);
 
-    if (!heading || !header) {
-      throw new Error('Expected calendar day and site header');
+    if (!heading || !header || !firstDay) {
+      throw new Error('Expected calendar days and site header');
     }
+
+    const headingStyle = getComputedStyle(heading);
+    const dayDividerWidths = [
+      ...document.querySelectorAll(
+        '[data-status-calendar-day]:not(:first-child)',
+      ),
+    ].map((element) =>
+      Number.parseFloat(getComputedStyle(element).borderTopWidth),
+    );
+    const recordDividerWidths = [
+      ...document.querySelectorAll('.status-calendar-day-records > article'),
+    ].map((element) =>
+      Number.parseFloat(getComputedStyle(element).borderTopWidth),
+    );
 
     return {
       headingTop: heading.getBoundingClientRect().top,
+      headingWidth: heading.getBoundingClientRect().width,
       headerBottom: header.getBoundingClientRect().bottom,
-      outlineStyle: style.outlineStyle,
-      outlineWidth: Number.parseFloat(style.outlineWidth),
+      sectionWidth: section.getBoundingClientRect().width,
+      sectionOutlineStyle: style.outlineStyle,
+      headingOutlineStyle: headingStyle.outlineStyle,
+      headingOutlineWidth: Number.parseFloat(headingStyle.outlineWidth),
+      firstDayBorderTopWidth: Number.parseFloat(
+        getComputedStyle(firstDay).borderTopWidth,
+      ),
+      dayDividerWidths,
+      recordDividerWidths,
     };
   });
 
   expect(targetPresentation.headingTop).toBeGreaterThan(
     targetPresentation.headerBottom,
   );
-  expect(targetPresentation.outlineStyle).not.toBe('none');
-  expect(targetPresentation.outlineWidth).toBeGreaterThanOrEqual(2);
+  expect(targetPresentation.sectionOutlineStyle).toBe('none');
+  expect(targetPresentation.headingOutlineStyle).not.toBe('none');
+  expect(targetPresentation.headingOutlineWidth).toBeGreaterThanOrEqual(2);
+  expect(targetPresentation.headingWidth).toBeLessThan(
+    targetPresentation.sectionWidth,
+  );
+  expect(targetPresentation.firstDayBorderTopWidth).toBe(0);
+  expect(new Set(targetPresentation.dayDividerWidths)).toEqual(new Set([1]));
+  expect(new Set(targetPresentation.recordDividerWidths)).toEqual(new Set([0]));
 });
 
 test('restores day focus after a client transition, Back, and Forward', async ({
@@ -174,18 +204,24 @@ test('keeps native anchor navigation and target presentation without JavaScript'
         document.querySelector('.site-header')?.getBoundingClientRect()
           .bottom ?? 0,
     }));
-    const outline = await day.evaluate((element) => {
+    const targetPresentation = await day.evaluate((element) => {
       const style = getComputedStyle(element);
+      const nextDay = element.nextElementSibling;
 
       return {
-        style: style.outlineStyle,
-        width: Number.parseFloat(style.outlineWidth),
+        background: style.backgroundColor,
+        nextDayBackground: nextDay
+          ? getComputedStyle(nextDay).backgroundColor
+          : undefined,
+        outlineStyle: style.outlineStyle,
       };
     });
 
     expect(position.top).toBeGreaterThan(position.headerBottom);
-    expect(outline.style).not.toBe('none');
-    expect(outline.width).toBeGreaterThanOrEqual(2);
+    expect(targetPresentation.background).not.toBe(
+      targetPresentation.nextDayBackground,
+    );
+    expect(targetPresentation.outlineStyle).toBe('none');
   } finally {
     await context.close();
   }

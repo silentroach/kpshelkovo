@@ -1,6 +1,6 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import { formatDate } from '@shelkovo/format';
+import { formatDate, formatMonth } from '@shelkovo/format';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 
 import StatusCalendarDayMarker from '@/components/status/StatusCalendarDayMarker.astro';
@@ -12,6 +12,7 @@ import { loadStatusData } from '@/lib/status/load';
 import {
   statusCalendarMonthCanonical,
   statusCalendarMonthStaticPaths,
+  statusCalendarYearUrl,
   statusUrl,
 } from '@/lib/status/routes';
 import { formatStatusMonth } from '@/lib/status/view';
@@ -33,15 +34,20 @@ if (!journal) {
 }
 
 const monthLabel = formatStatusMonth(journal.year, journal.month);
-const monthName = formatStatusMonth(journal.year, journal.month, {
-  capitalize: true,
+const breadcrumbMonth = formatMonth(journal.year, journal.month, {
+  includeYear: false,
 });
+const monthName = `${breadcrumbMonth.charAt(0).toLocaleUpperCase('ru')}${breadcrumbMonth.slice(1)}`;
 const heading = `Статусы за ${monthLabel} года`;
 const title = `${heading} — Шелково Онлайн`;
 const description = `Отключения, ограничения и плановые работы в Шелково за ${monthLabel} года — по дням от новых к старым.`;
 const canonical = statusCalendarMonthCanonical(journal);
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Статус', href: statusUrl() },
+  {
+    label: String(journal.year),
+    href: statusCalendarYearUrl({ year: journal.year }),
+  },
   { label: monthName },
 ]);
 ---
@@ -56,33 +62,30 @@ const breadcrumbs = withHomeBreadcrumbs([
     <header class="ui-page-header">
       <div class="ui-page-header-stack max-w-4xl">
         <Breadcrumbs items={breadcrumbs} />
-
-        <div class="space-y-3">
-          <h1 class="ui-page-title">{heading}</h1>
-          <p class="max-w-3xl text-base leading-7 text-muted-foreground">
-            Затронутые дни и все записи статуса — от новых к старым.
-          </p>
-        </div>
+        <h1 class="ui-page-title">{heading}</h1>
       </div>
     </header>
 
     <div class="mt-8" data-status-calendar-month={journal.id}>
       {
-        journal.days.map(({ day, incidents }) => (
+        journal.days.map(({ day, incidents }, dayIndex) => (
           <section
-            class="status-calendar-day border-t-2 border-border-strong pb-2 pt-6"
+            class:list={[
+              'status-calendar-day pb-2 pt-6',
+              dayIndex > 0 && 'border-t border-border-strong',
+            ]}
             data-status-calendar-day={day.id}
           >
             <h2
               id={day.id}
               tabindex="-1"
-              class="ui-group-title scroll-mt-[calc(var(--site-sticky-offset)+1rem)] flex items-center gap-3 px-5 md:px-6"
+              class="ui-group-title scroll-mt-[calc(var(--site-sticky-offset)+1rem)] flex w-fit items-center gap-3 px-5 md:px-6"
             >
               <StatusCalendarDayMarker kind={day.kind} />
               <time datetime={day.id}>{formatDate(day.id)}</time>
             </h2>
 
-            <div class="mt-4">
+            <div class="status-calendar-day-records mt-4">
               {incidents.map((incident) => (
                 <StatusIncidentRow incident={incident} />
               ))}
@@ -97,13 +100,15 @@ const breadcrumbs = withHomeBreadcrumbs([
 <style>
   .status-calendar-day:has(> h2:target) {
     background: var(--color-primary-soft-2);
-    outline: 2px solid var(--color-primary);
-    outline-offset: -2px;
   }
 
   .status-calendar-day > h2:focus-visible {
     outline: 2px solid var(--color-ring);
     outline-offset: 0.35rem;
+  }
+
+  :global(.status-calendar-day-records > article) {
+    border-top: 0;
   }
 </style>
 
