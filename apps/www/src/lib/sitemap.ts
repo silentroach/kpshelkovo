@@ -5,6 +5,7 @@ import {
   availableStatusCalendarYears,
   buildStatusCalendarProjection,
 } from './status/calendar';
+import type { StatusCalendarDay } from './status/calendar.types';
 import {
   statusCalendarMonthPath,
   statusCalendarYearPath,
@@ -146,9 +147,15 @@ const maxLastmod = (values: readonly string[]): string | undefined =>
 const incidentLastmod = (incident: SitemapStatusIncidentInput): string =>
   incident.endedIso ?? incident.startedIso;
 
-const uniqueCalendarRecordIds = (
-  days: readonly { readonly recordIds: readonly string[] }[],
-): readonly string[] => [...new Set(days.flatMap((day) => day.recordIds))];
+const calendarIncidents = (
+  days: readonly StatusCalendarDay[],
+  incidentsById: ReadonlyMap<string, SitemapStatusIncidentInput>,
+): readonly SitemapStatusIncidentInput[] =>
+  [...new Set(days.flatMap((day) => day.recordIds))].flatMap((id) => {
+    const incident = incidentsById.get(id);
+
+    return incident ? [incident] : [];
+  });
 
 const addStatusCalendarMetadata = (
   index: Map<string, SitemapMetadata>,
@@ -170,14 +177,10 @@ const addStatusCalendarMetadata = (
 
   for (const year of availableStatusCalendarYears(calendar)) {
     const months = calendar.byYear.get(year)?.months ?? [];
-    const yearRecordIds = uniqueCalendarRecordIds(
+    const yearIncidents = calendarIncidents(
       months.flatMap((month) => month.days),
+      incidentsById,
     );
-    const yearIncidents = yearRecordIds.flatMap((id) => {
-      const incident = incidentsById.get(id);
-
-      return incident ? [incident] : [];
-    });
 
     setMetadata(index, statusCalendarYearPath({ year }), {
       lastmod: maxLastmod(yearIncidents.map(incidentLastmod)),
@@ -189,13 +192,7 @@ const addStatusCalendarMetadata = (
     });
 
     for (const month of months) {
-      const monthIncidents = uniqueCalendarRecordIds(month.days).flatMap(
-        (id) => {
-          const incident = incidentsById.get(id);
-
-          return incident ? [incident] : [];
-        },
-      );
+      const monthIncidents = calendarIncidents(month.days, incidentsById);
 
       setMetadata(index, statusCalendarMonthPath(month), {
         lastmod: maxLastmod(monthIncidents.map(incidentLastmod)),
