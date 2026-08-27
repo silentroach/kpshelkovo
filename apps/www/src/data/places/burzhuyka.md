@@ -13,11 +13,14 @@ location:
     lat: 55.060526
     lng: 37.716242
 opening_hours:
-  description: 'С 10:00 до 22:00, вторник — выходной'
+  description: 'Пн, ср–пт — 10:00–19:00; сб–вс — 10:00–20:00; вторник — выходной'
   periods:
-    - days: [mon, wed, thu, fri, sat, sun]
+    - days: [mon, wed, thu, fri]
       opens_at: '10:00'
-      closes_at: '22:00'
+      closes_at: '19:00'
+    - days: [sat, sun]
+      opens_at: '10:00'
+      closes_at: '20:00'
 contact: food/burzhuyka
 ---
 
