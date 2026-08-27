@@ -200,19 +200,21 @@ export const formatStatusMonth = (
     : label;
 };
 
+const formatStatusCalendarIncidentCount = (value: number): string =>
+  count(value, ['проблема', 'проблемы', 'проблем']);
+
+const formatStatusCalendarMaintenanceCount = (value: number): string =>
+  count(value, ['плановая работа', 'плановые работы', 'плановых работ']);
+
 export const formatStatusCalendarDayCountLines = (
   day: Pick<StatusCalendarDay, 'incidentCount' | 'maintenanceCount'>,
 ): readonly string[] =>
   [
     day.incidentCount
-      ? count(day.incidentCount, ['проблема', 'проблемы', 'проблем'])
+      ? formatStatusCalendarIncidentCount(day.incidentCount)
       : undefined,
     day.maintenanceCount
-      ? count(day.maintenanceCount, [
-          'плановая работа',
-          'плановые работы',
-          'плановых работ',
-        ])
+      ? formatStatusCalendarMaintenanceCount(day.maintenanceCount)
       : undefined,
   ].filter((part): part is string => Boolean(part));
 
@@ -225,7 +227,7 @@ export const formatStatusCalendarDayDate = (
 ): string => formatDate(day.id);
 
 export const formatStatusCalendarDayLabel = (day: StatusCalendarDay): string =>
-  `${formatStatusCalendarDayDate(day)}: ${formatStatusCalendarDayCounts(day)}`;
+  `${formatStatusCalendarDayDate(day)}: ${formatStatusCalendarIncidentCount(day.incidentCount)}, ${formatStatusCalendarMaintenanceCount(day.maintenanceCount)}`;
 
 export const formatStatusCalendarDayTooltipSummary = (
   day: StatusCalendarDay,

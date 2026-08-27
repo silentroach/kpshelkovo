@@ -101,7 +101,7 @@ describe('installStatusCalendarYearInteractions', () => {
       >
         <a
           href="#2026-08-24"
-          aria-label="24 августа 2026"
+          aria-label="24 августа 2026: 2 проблемы, 1 плановая работа"
           aria-describedby="status-calendar-tooltip-2026-08-24"
           data-status-calendar-day-link
         >24</a>

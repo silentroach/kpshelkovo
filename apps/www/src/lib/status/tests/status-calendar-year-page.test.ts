@@ -507,7 +507,7 @@ describe('/status/calendar/YYYY/', () => {
             "descriptionExists": true,
             "href": "/status/calendar/2026/01/#2026-01-01",
             "id": "2026-01-01",
-            "label": "1 января 2026",
+            "label": "1 января 2026: 0 проблем, 1 плановая работа",
             "marker": "maintenance",
           },
           {
@@ -516,7 +516,7 @@ describe('/status/calendar/YYYY/', () => {
             "descriptionExists": true,
             "href": "/status/calendar/2026/08/#2026-08-23",
             "id": "2026-08-23",
-            "label": "23 августа 2026",
+            "label": "23 августа 2026: 1 проблема, 0 плановых работ",
             "marker": "incident",
           },
           {
@@ -525,7 +525,7 @@ describe('/status/calendar/YYYY/', () => {
             "descriptionExists": true,
             "href": "/status/calendar/2026/08/#2026-08-24",
             "id": "2026-08-24",
-            "label": "24 августа 2026",
+            "label": "24 августа 2026: 2 проблемы, 1 плановая работа",
             "marker": "mixed",
           },
         ],
@@ -633,9 +633,7 @@ describe('/status/calendar/YYYY/', () => {
     ]);
     const htmlLinks = affectedLinks(parseHtml(html)).map((link) => ({
       href: new URL(link.href ?? '', 'https://kpshelkovo.online').toString(),
-      label: link.description
-        ? `${link.label}: ${link.description}`
-        : link.label,
+      label: link.label,
     }));
     const markdown = await markdownResponse.text();
     const markdownLinks = [

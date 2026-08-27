@@ -3,7 +3,7 @@ import type { StatusCalendarMonthGrid } from '@/lib/status/calendar.types';
 import { statusCalendarDayUrl } from '@/lib/status/routes';
 import {
   formatStatusCalendarDayCounts,
-  formatStatusCalendarDayDate,
+  formatStatusCalendarDayLabel,
   formatStatusCalendarDayTooltipSummary,
 } from '@/lib/status/view';
 
@@ -52,8 +52,8 @@ const weekdays = [
           <tr>
             {week.map((day) => {
               const status = day.status;
-              const dateLabel = status
-                ? formatStatusCalendarDayDate(status)
+              const linkLabel = status
+                ? formatStatusCalendarDayLabel(status)
                 : undefined;
               const tooltipDescription = status
                 ? formatStatusCalendarDayCounts(status)
@@ -95,7 +95,7 @@ const weekdays = [
                           month: month.month,
                           id: day.id,
                         })}
-                        aria-label={dateLabel}
+                        aria-label={linkLabel}
                         aria-describedby={tooltipId}
                         class="status-calendar-date__link inline-flex size-9 items-center justify-center rounded-full border-2 border-transparent text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text"
                         data-status-calendar-day-link={day.id}
