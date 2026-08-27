@@ -102,6 +102,18 @@ export const statusServicePattern = (): string => '/status/:service/';
 export const statusServiceMarkdownPattern = (): string =>
   '/status/:service/index.md';
 
+export const statusCalendarYearPattern = (): string =>
+  '/status/calendar/:year/';
+
+export const statusCalendarYearMarkdownPattern = (): string =>
+  '/status/calendar/:year/index.md';
+
+export const statusCalendarMonthPattern = (): string =>
+  '/status/calendar/:year/:month/';
+
+export const statusCalendarMonthMarkdownPattern = (): string =>
+  '/status/calendar/:year/:month/index.md';
+
 export const statusIncidentPattern = (): string =>
   '/status/incidents/:year/:month/:entry/';
 

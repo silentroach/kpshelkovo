@@ -2,6 +2,10 @@ import type { PublicSurfaceSlice } from '@/lib/public-surface/types';
 
 import {
   statusApiCatalogPath,
+  statusCalendarMonthMarkdownPattern,
+  statusCalendarMonthPattern,
+  statusCalendarYearMarkdownPattern,
+  statusCalendarYearPattern,
   statusDataPath,
   statusFeedPath,
   statusHistoryPath,
@@ -57,6 +61,54 @@ export const statusPublicSurfaceSlice = {
         },
       ],
       acceptsNegotiation: 'required',
+    },
+    {
+      id: 'status:calendar-year',
+      label: 'Годовой календарь статусов',
+      routePattern: statusCalendarYearPattern(),
+      mediaType: 'text/html',
+      cacheClass: 'html',
+      discoveryRoles: ['detail-page'],
+      linkRelations: [
+        {
+          rel: 'alternate',
+          href: statusCalendarYearMarkdownPattern(),
+          mediaType: 'text/markdown',
+        },
+      ],
+      acceptsNegotiation: 'required',
+    },
+    {
+      id: 'status:calendar-year-markdown',
+      label: 'Markdown-версия годового календаря статусов',
+      routePattern: statusCalendarYearMarkdownPattern(),
+      mediaType: 'text/markdown',
+      cacheClass: 'markdown',
+      discoveryRoles: ['markdown-companion'],
+    },
+    {
+      id: 'status:calendar-month',
+      label: 'Месячный журнал статусов',
+      routePattern: statusCalendarMonthPattern(),
+      mediaType: 'text/html',
+      cacheClass: 'html',
+      discoveryRoles: ['detail-page'],
+      linkRelations: [
+        {
+          rel: 'alternate',
+          href: statusCalendarMonthMarkdownPattern(),
+          mediaType: 'text/markdown',
+        },
+      ],
+      acceptsNegotiation: 'required',
+    },
+    {
+      id: 'status:calendar-month-markdown',
+      label: 'Markdown-версия месячного журнала статусов',
+      routePattern: statusCalendarMonthMarkdownPattern(),
+      mediaType: 'text/markdown',
+      cacheClass: 'markdown',
+      discoveryRoles: ['markdown-companion'],
     },
     {
       id: 'status:service',

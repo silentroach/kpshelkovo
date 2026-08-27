@@ -95,6 +95,10 @@ import {
 } from '@/lib/reglament/routes';
 import {
   statusApiCatalogPath,
+  statusCalendarMonthMarkdownPattern,
+  statusCalendarMonthPattern,
+  statusCalendarYearMarkdownPattern,
+  statusCalendarYearPattern,
   statusDataPath,
   statusFeedPath,
   statusHistoryPath,
@@ -400,6 +404,46 @@ describe('public surface registry', () => {
         },
       ],
       acceptsNegotiation: 'required',
+    });
+    expect(byId.get('status:calendar-year')).toMatchObject({
+      routePattern: statusCalendarYearPattern(),
+      mediaType: 'text/html',
+      cacheClass: 'html',
+      discoveryRoles: ['detail-page'],
+      linkRelations: [
+        {
+          rel: 'alternate',
+          href: statusCalendarYearMarkdownPattern(),
+          mediaType: 'text/markdown',
+        },
+      ],
+      acceptsNegotiation: 'required',
+    });
+    expect(byId.get('status:calendar-year-markdown')).toMatchObject({
+      routePattern: statusCalendarYearMarkdownPattern(),
+      mediaType: 'text/markdown',
+      cacheClass: 'markdown',
+      discoveryRoles: ['markdown-companion'],
+    });
+    expect(byId.get('status:calendar-month')).toMatchObject({
+      routePattern: statusCalendarMonthPattern(),
+      mediaType: 'text/html',
+      cacheClass: 'html',
+      discoveryRoles: ['detail-page'],
+      linkRelations: [
+        {
+          rel: 'alternate',
+          href: statusCalendarMonthMarkdownPattern(),
+          mediaType: 'text/markdown',
+        },
+      ],
+      acceptsNegotiation: 'required',
+    });
+    expect(byId.get('status:calendar-month-markdown')).toMatchObject({
+      routePattern: statusCalendarMonthMarkdownPattern(),
+      mediaType: 'text/markdown',
+      cacheClass: 'markdown',
+      discoveryRoles: ['markdown-companion'],
     });
     expect(byId.get('status:service')).toMatchObject({
       routePattern: statusServicePattern(),
