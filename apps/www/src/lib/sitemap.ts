@@ -6,6 +6,7 @@ import {
   buildStatusCalendarProjection,
 } from './status/calendar';
 import type { StatusCalendarDay } from './status/calendar.types';
+import { resolveStatusIncidentPhase } from './status/lifecycle';
 import {
   statusCalendarMonthPath,
   statusCalendarYearPath,
@@ -147,6 +148,24 @@ const maxLastmod = (values: readonly string[]): string | undefined =>
 const incidentLastmod = (incident: SitemapStatusIncidentInput): string =>
   incident.endedIso ?? incident.startedIso;
 
+const calendarIncidentLastmod = (
+  incident: SitemapStatusIncidentInput,
+  buildNowIso: string,
+): string => incident.endedIso ?? buildNowIso;
+
+const isCalendarIncidentChanging = (
+  incident: SitemapStatusIncidentInput,
+  buildNowMs: number,
+): boolean =>
+  resolveStatusIncidentPhase(
+    {
+      kind: incident.kind,
+      startedAt: timestampMs(incident.startedIso),
+      endedAt: incident.endedIso ? timestampMs(incident.endedIso) : undefined,
+    },
+    buildNowMs,
+  ) !== 'resolved';
+
 const calendarIncidents = (
   days: readonly StatusCalendarDay[],
   incidentsById: ReadonlyMap<string, SitemapStatusIncidentInput>,
@@ -174,6 +193,7 @@ const addStatusCalendarMetadata = (
     })),
     buildNowMs,
   );
+  const buildNowIso = new Date(buildNowMs).toISOString();
 
   for (const year of availableStatusCalendarYears(calendar)) {
     const months = calendar.byYear.get(year)?.months ?? [];
@@ -183,10 +203,16 @@ const addStatusCalendarMetadata = (
     );
 
     setMetadata(index, statusCalendarYearPath({ year }), {
-      lastmod: maxLastmod(yearIncidents.map(incidentLastmod)),
+      lastmod: maxLastmod(
+        yearIncidents.map((incident) =>
+          calendarIncidentLastmod(incident, buildNowIso),
+        ),
+      ),
       changefreq:
         year === calendar.buildYear ||
-        yearIncidents.some((incident) => !incident.endedIso)
+        yearIncidents.some((incident) =>
+          isCalendarIncidentChanging(incident, buildNowMs),
+        )
           ? CHANGEFREQ.hourly
           : CHANGEFREQ.yearly,
     });
@@ -195,8 +221,14 @@ const addStatusCalendarMetadata = (
       const monthIncidents = calendarIncidents(month.days, incidentsById);
 
       setMetadata(index, statusCalendarMonthPath(month), {
-        lastmod: maxLastmod(monthIncidents.map(incidentLastmod)),
-        changefreq: monthIncidents.some((incident) => !incident.endedIso)
+        lastmod: maxLastmod(
+          monthIncidents.map((incident) =>
+            calendarIncidentLastmod(incident, buildNowIso),
+          ),
+        ),
+        changefreq: monthIncidents.some((incident) =>
+          isCalendarIncidentChanging(incident, buildNowMs),
+        )
           ? CHANGEFREQ.hourly
           : CHANGEFREQ.yearly,
       });
