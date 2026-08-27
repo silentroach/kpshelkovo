@@ -72,15 +72,17 @@ const schema = collectionPageSchema({
           <div class="flex items-center gap-5 md:gap-7">
             <h1 class="ui-page-title">Статус КП Шелково</h1>
 
-            <a
-              class="ui-btn ui-icon-action focus-visible:outline-none"
-              href={statusCalendarYearUrl({ year: calendarYear })}
-              aria-label={calendarHeading}
-              title={calendarHeading}
-              data-status-calendar-entry
-            >
-              <CalendarIcon />
-            </a>
+            <span class="inline-flex translate-y-1 md:translate-y-1.5">
+              <a
+                class="ui-btn ui-icon-action focus-visible:outline-none"
+                href={statusCalendarYearUrl({ year: calendarYear })}
+                aria-label={calendarHeading}
+                title={calendarHeading}
+                data-status-calendar-entry
+              >
+                <CalendarIcon />
+              </a>
+            </span>
           </div>
 
           <p class="max-w-3xl text-base leading-7 text-muted-foreground">

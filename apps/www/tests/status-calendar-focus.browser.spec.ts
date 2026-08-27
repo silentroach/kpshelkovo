@@ -52,7 +52,10 @@ for (const viewport of [
       0,
     );
     expect(entryLayout.linkWidth).toBeCloseTo(40, 0);
-    expect(entryLayout.linkCenter).toBeCloseTo(entryLayout.titleCenter, 0);
+    expect(entryLayout.linkCenter - entryLayout.titleCenter).toBeCloseTo(
+      viewport.name === 'mobile' ? 4 : 6,
+      0,
+    );
 
     await entry.click();
     await page.waitForURL(entryHref);
