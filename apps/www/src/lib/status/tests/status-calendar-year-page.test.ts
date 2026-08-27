@@ -503,29 +503,29 @@ describe('/status/calendar/YYYY/', () => {
         "links": [
           {
             "describedBy": "status-calendar-tooltip-2026-01-01",
-            "description": "1 плановая работа",
+            "description": "Откроется журнал за этот день",
             "descriptionExists": true,
             "href": "/status/calendar/2026/01/#2026-01-01",
             "id": "2026-01-01",
-            "label": "1 января 2026",
+            "label": "1 января 2026: 0 проблем, 1 плановая работа",
             "marker": "maintenance",
           },
           {
             "describedBy": "status-calendar-tooltip-2026-08-23",
-            "description": "1 проблема",
+            "description": "Откроется журнал за этот день",
             "descriptionExists": true,
             "href": "/status/calendar/2026/08/#2026-08-23",
             "id": "2026-08-23",
-            "label": "23 августа 2026",
+            "label": "23 августа 2026: 1 проблема, 0 плановых работ",
             "marker": "incident",
           },
           {
             "describedBy": "status-calendar-tooltip-2026-08-24",
-            "description": "2 проблемы, 1 плановая работа",
+            "description": "Откроется журнал за этот день",
             "descriptionExists": true,
             "href": "/status/calendar/2026/08/#2026-08-24",
             "id": "2026-08-24",
-            "label": "24 августа 2026",
+            "label": "24 августа 2026: 2 проблемы, 1 плановая работа",
             "marker": "mixed",
           },
         ],
@@ -551,7 +551,7 @@ describe('/status/calendar/YYYY/', () => {
             "ariaHidden": "true",
             "id": "status-calendar-tooltip-2026-01-01",
             "interactiveElements": 0,
-            "label": "1 плановая работа",
+            "label": "Откроется журнал за этот день",
             "role": "tooltip",
             "text": "1·января·2026
       1·плановая·работа",
@@ -560,7 +560,7 @@ describe('/status/calendar/YYYY/', () => {
             "ariaHidden": "true",
             "id": "status-calendar-tooltip-2026-08-23",
             "interactiveElements": 0,
-            "label": "1 проблема",
+            "label": "Откроется журнал за этот день",
             "role": "tooltip",
             "text": "23·августа·2026
       1·проблема",
@@ -569,7 +569,7 @@ describe('/status/calendar/YYYY/', () => {
             "ariaHidden": "true",
             "id": "status-calendar-tooltip-2026-08-24",
             "interactiveElements": 0,
-            "label": "2 проблемы, 1 плановая работа",
+            "label": "Откроется журнал за этот день",
             "role": "tooltip",
             "text": "24·августа·2026
       2·проблемы
@@ -633,9 +633,7 @@ describe('/status/calendar/YYYY/', () => {
     ]);
     const htmlLinks = affectedLinks(parseHtml(html)).map((link) => ({
       href: new URL(link.href ?? '', 'https://kpshelkovo.online').toString(),
-      label: link.description
-        ? `${link.label}: ${link.description}`
-        : link.label,
+      label: link.label,
     }));
     const markdown = await markdownResponse.text();
     const markdownLinks = [

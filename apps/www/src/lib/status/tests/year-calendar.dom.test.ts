@@ -101,14 +101,14 @@ describe('installStatusCalendarYearInteractions', () => {
       >
         <a
           href="#2026-08-24"
-          aria-label="24 августа 2026"
+          aria-label="24 августа 2026: 2 проблемы, 1 плановая работа"
           aria-describedby="status-calendar-tooltip-2026-08-24"
           data-status-calendar-day-link
         >24</a>
         <span
           id="status-calendar-tooltip-2026-08-24"
           role="tooltip"
-          aria-label="2 проблемы, 1 плановая работа"
+          aria-label="Откроется журнал за этот день"
           aria-hidden="true"
           data-status-calendar-tooltip
         ><span aria-hidden="true" data-status-calendar-tooltip-text>Fallback</span></span>
