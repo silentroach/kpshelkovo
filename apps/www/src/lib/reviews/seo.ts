@@ -16,6 +16,7 @@ import {
   formatReviewAspectLabel,
   formatReviewAspectType,
   formatReviewTitle,
+  sortReviewAspects,
 } from './view';
 
 const CONTEXT = 'https://schema.org';
@@ -117,7 +118,7 @@ const reviewedOrganizationSchema = (
 
 const reviewEntitySchemas = (review: Review): readonly SchemaDoc[] => {
   const url = absoluteUrl(review.url);
-  return review.aspects.flatMap((aspect) => {
+  return sortReviewAspects(review.aspects).flatMap((aspect) => {
     if (aspect.type === 'place' || !aspect.rating) return [];
 
     const reviewBody = aspect.body

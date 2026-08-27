@@ -20,9 +20,9 @@ const review = {
   canonical: 'https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/',
   body: 'Основной текст отзыва.',
   aspects: [
+    { type: 'management', rating: 2 },
     { type: 'place', rating: 5 },
     { type: 'developer', rating: 3 },
-    { type: 'management', rating: 2 },
   ],
   mentions: [],
 } satisfies Review;

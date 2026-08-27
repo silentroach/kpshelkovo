@@ -32,8 +32,8 @@ const review = {
   canonical: 'https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/',
   body: 'Основной текст отзыва.',
   aspects: [
+    { type: 'management', body: 'Отвечают не всегда быстро.' },
     { type: 'place', rating: 5, body: 'Лес, пруды и тишина.' },
-    { type: 'management', rating: 2 },
   ],
   mentions: [],
 } satisfies Review;
@@ -107,7 +107,6 @@ describe('reviews markdown companions', () => {
       area: Шелково Форест
       ratings:
         place: 5
-        management: 2
       ---
 
       # Год жизни в Шелково
@@ -121,6 +120,10 @@ describe('reviews markdown companions', () => {
       ### Место и среда
 
       Лес, пруды и тишина.
+
+      ### Обслуживание
+
+      Отвечают не всегда быстро.
 
       ## Отказ от ответственности
 
