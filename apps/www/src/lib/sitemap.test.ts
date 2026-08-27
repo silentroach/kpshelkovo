@@ -230,11 +230,11 @@ describe('buildSitemapMetadataIndex', () => {
       [
         {
           "changefreq": "hourly",
-          "lastmod": "2026-06-10T12:00:00+03:00",
+          "lastmod": "2026-06-09T09:00:00.000Z",
         },
         {
           "changefreq": "hourly",
-          "lastmod": "2026-06-10T12:00:00+03:00",
+          "lastmod": "2026-06-10T07:00:00.000Z",
         },
         {
           "changefreq": "yearly",

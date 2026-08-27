@@ -148,11 +148,6 @@ const maxLastmod = (values: readonly string[]): string | undefined =>
 const incidentLastmod = (incident: SitemapStatusIncidentInput): string =>
   incident.endedIso ?? incident.startedIso;
 
-const calendarIncidentLastmod = (
-  incident: SitemapStatusIncidentInput,
-  buildNowIso: string,
-): string => incident.endedIso ?? buildNowIso;
-
 const isCalendarIncidentChanging = (
   incident: SitemapStatusIncidentInput,
   buildNowMs: number,
@@ -165,6 +160,15 @@ const isCalendarIncidentChanging = (
     },
     buildNowMs,
   ) !== 'resolved';
+
+const calendarIncidentLastmod = (
+  incident: SitemapStatusIncidentInput,
+  buildNowMs: number,
+  buildNowIso: string,
+): string =>
+  isCalendarIncidentChanging(incident, buildNowMs)
+    ? buildNowIso
+    : incidentLastmod(incident);
 
 const calendarIncidents = (
   days: readonly StatusCalendarDay[],
@@ -205,7 +209,7 @@ const addStatusCalendarMetadata = (
     setMetadata(index, statusCalendarYearPath({ year }), {
       lastmod: maxLastmod(
         yearIncidents.map((incident) =>
-          calendarIncidentLastmod(incident, buildNowIso),
+          calendarIncidentLastmod(incident, buildNowMs, buildNowIso),
         ),
       ),
       changefreq:
@@ -223,7 +227,7 @@ const addStatusCalendarMetadata = (
       setMetadata(index, statusCalendarMonthPath(month), {
         lastmod: maxLastmod(
           monthIncidents.map((incident) =>
-            calendarIncidentLastmod(incident, buildNowIso),
+            calendarIncidentLastmod(incident, buildNowMs, buildNowIso),
           ),
         ),
         changefreq: monthIncidents.some((incident) =>
