@@ -12,6 +12,7 @@ import {
 } from '@/lib/status/calendar';
 import { loadStatusData } from '@/lib/status/load';
 import {
+  isStatusCalendarYearAvailable,
   statusCalendarYearCanonical,
   statusCalendarYearStaticPaths,
   statusUrl,
@@ -26,7 +27,7 @@ const year = Number(Astro.params.year);
 const now = new Date();
 const currentYear = currentStatusCalendarYear(now);
 
-if (year !== currentYear) {
+if (!isStatusCalendarYearAvailable(year, currentYear)) {
   throw new Error(`status calendar year "${Astro.params.year}" not found`);
 }
 
@@ -34,12 +35,12 @@ const calendar = buildStatusCalendarYearGrid(
   (await loadStatusData()).calendar,
   year,
 );
-const heading = `Календарь статусов за ${year} год`;
+const heading = `Проблемы и плановые работы за ${year} год`;
 const title = `${heading} — Шелково Онлайн`;
-const description = `Инциденты и плановые работы в Шелково по дням за ${year} год с переходом к месячным журналам.`;
+const description = `Проблемы и плановые работы в Шелково по дням за ${year} год с переходом к месячным журналам.`;
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Статус', href: statusUrl() },
-  { label: `Календарь ${year}` },
+  { label: `${year} год` },
 ]);
 ---
 
@@ -53,22 +54,13 @@ const breadcrumbs = withHomeBreadcrumbs([
     <header class="ui-page-header">
       <div class="ui-page-header-stack max-w-4xl">
         <Breadcrumbs items={breadcrumbs} />
-
-        <div class="space-y-3">
-          <h1 class="ui-page-title">{heading}</h1>
-          <p class="max-w-3xl text-base leading-7 text-muted-foreground">
-            Отмеченные даты ведут к записям месячного журнала. Пустые дни
-            остаются обычными датами без ссылок.
-          </p>
-        </div>
+        <h1 class="ui-page-title">{heading}</h1>
       </div>
     </header>
 
-    <div class="px-5 md:px-6">
-      <StatusCalendarLegend />
-
+    <div class="mt-4 px-5 md:px-6">
       <div
-        class="mt-8 grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2 xl:grid-cols-3"
+        class="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2 xl:grid-cols-3"
         data-status-calendar-year={year}
       >
         {
@@ -77,6 +69,8 @@ const breadcrumbs = withHomeBreadcrumbs([
           ))
         }
       </div>
+
+      <StatusCalendarLegend />
     </div>
   </main>
 </BaseLayout>

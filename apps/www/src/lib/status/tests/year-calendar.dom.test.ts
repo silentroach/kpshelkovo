@@ -91,11 +91,11 @@ describe('positionStatusCalendarTooltip', () => {
 });
 
 describe('installStatusCalendarYearInteractions', () => {
-  it('dismisses a focused tooltip on Escape and resets after focus leaves', () => {
+  it('dismisses focused and hovered tooltips on Escape until they close', () => {
     document.body.innerHTML = `
       <span data-status-calendar-tooltip-root>
         <a href="#day" data-status-calendar-day-link>24</a>
-        <span role="tooltip">24 августа: 1 инцидент</span>
+        <span role="tooltip">24 августа: 1 проблема</span>
       </span>
       <button type="button">После календаря</button>
     `;
@@ -110,16 +110,36 @@ describe('installStatusCalendarYearInteractions', () => {
     }
 
     installStatusCalendarYearInteractions();
+    root.dispatchEvent(new Event('pointerover', { bubbles: true }));
+    document.body.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+    );
+    const dismissedOnHover = root.hasAttribute('data-tooltip-dismissed');
+    root.dispatchEvent(
+      new MouseEvent('pointerout', {
+        bubbles: true,
+        relatedTarget: button,
+      }),
+    );
+    const resetAfterPointerLeaves = root.hasAttribute('data-tooltip-dismissed');
+
     link.focus();
     link.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
     );
-    const dismissed = root.hasAttribute('data-tooltip-dismissed');
+    const dismissedOnFocus = root.hasAttribute('data-tooltip-dismissed');
     button.focus();
 
     expect({
-      dismissed,
+      dismissedOnHover,
+      resetAfterPointerLeaves,
+      dismissedOnFocus,
       resetAfterBlur: root.hasAttribute('data-tooltip-dismissed'),
-    }).toEqual({ dismissed: true, resetAfterBlur: false });
+    }).toEqual({
+      dismissedOnHover: true,
+      resetAfterPointerLeaves: false,
+      dismissedOnFocus: true,
+      resetAfterBlur: false,
+    });
   });
 });

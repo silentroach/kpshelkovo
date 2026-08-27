@@ -361,20 +361,9 @@ export const buildStatusYearMarkdown = (
   calendar: StatusCalendarYearGrid,
 ): string =>
   serialize([
-    md.heading(1, `Календарь статусов за ${calendar.year} год`),
+    md.heading(1, `Проблемы и плановые работы за ${calendar.year} год`),
     md.paragraph(
-      'Инциденты и плановые работы по дням. Отмеченные даты ведут к записям месячного журнала.',
+      'Проблемы и плановые работы по дням. Отмеченные даты ведут к записям месячного журнала.',
     ),
-    md.heading(2, 'Обозначения'),
-    md.list([
-      md.listItem('Инцидент — красный круг.'),
-      md.listItem('Плановые работы — янтарное кольцо.'),
-      md.listItem(
-        'Оба типа записей — красный круг с янтарным внешним кольцом.',
-      ),
-      md.listItem(
-        'Сегодня — зелёная квадратная рамка независимо от отметки дня.',
-      ),
-    ]),
     ...calendar.months.flatMap(yearMonthSection),
   ]);

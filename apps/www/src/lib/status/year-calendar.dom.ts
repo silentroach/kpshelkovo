@@ -1,5 +1,4 @@
 const TOOLTIP_ROOT_SELECTOR = '[data-status-calendar-tooltip-root]';
-const TOOLTIP_LINK_SELECTOR = '[data-status-calendar-day-link]';
 const TOOLTIP_SELECTOR = '[data-status-calendar-tooltip]';
 const TODAY_SELECTOR =
   '[data-status-calendar-today], .status-calendar-date--today';
@@ -14,6 +13,7 @@ const MOSCOW_DATE_FORMAT = new Intl.DateTimeFormat('en-US', {
 });
 
 let installed = false;
+let hoveredTooltipRoot: HTMLElement | undefined;
 
 const tooltipRoot = (
   target: EventTarget | undefined,
@@ -103,9 +103,10 @@ export const installStatusCalendarYearInteractions = (): void => {
   }
 
   installed = true;
-  document.addEventListener('astro:page-load', () =>
-    refreshStatusCalendarToday(),
-  );
+  document.addEventListener('astro:page-load', () => {
+    hoveredTooltipRoot = undefined;
+    refreshStatusCalendarToday();
+  });
   window.setInterval(refreshStatusCalendarToday, TODAY_REFRESH_INTERVAL);
   document.addEventListener('focusin', (event) => {
     const root = tooltipRoot(event.target || undefined);
@@ -118,6 +119,7 @@ export const installStatusCalendarYearInteractions = (): void => {
     const root = tooltipRoot(event.target || undefined);
 
     if (root) {
+      hoveredTooltipRoot = root;
       positionStatusCalendarTooltip(root);
     }
   });
@@ -128,8 +130,7 @@ export const installStatusCalendarYearInteractions = (): void => {
 
     const target =
       event.target instanceof Element ? event.target : document.activeElement;
-    const link = target?.closest(TOOLTIP_LINK_SELECTOR);
-    const root = tooltipRoot(link || undefined);
+    const root = tooltipRoot(target || undefined) ?? hoveredTooltipRoot;
 
     root?.setAttribute('data-tooltip-dismissed', '');
   });
@@ -145,6 +146,10 @@ export const installStatusCalendarYearInteractions = (): void => {
 
     if (root && movedOutside(root, event.relatedTarget || undefined)) {
       root.removeAttribute('data-tooltip-dismissed');
+
+      if (hoveredTooltipRoot === root) {
+        hoveredTooltipRoot = undefined;
+      }
     }
   });
 };

@@ -335,7 +335,7 @@ describe('/status/calendar/YYYY/MM/', () => {
             "heading": "24 августа 2026",
             "id": "2026-08-24",
             "marker": "mixed",
-            "markerLabel": "Есть инциденты и плановые работы",
+            "markerLabel": "Есть проблемы и плановые работы",
             "markerRole": "img",
             "records": [
               {
@@ -354,7 +354,7 @@ describe('/status/calendar/YYYY/MM/', () => {
             "heading": "23 августа 2026",
             "id": "2026-08-23",
             "marker": "incident",
-            "markerLabel": "Есть инциденты",
+            "markerLabel": "Есть проблемы",
             "markerRole": "img",
             "records": [
               {

@@ -4,8 +4,8 @@ import { formatDynamicHtml } from '@shelkovo/markdown';
 import type { StatusCalendarMonthGrid } from '@/lib/status/calendar.types';
 import { statusCalendarDayUrl } from '@/lib/status/routes';
 import {
+  formatStatusCalendarDayCountLines,
   formatStatusCalendarDayLabel,
-  formatStatusCalendarDayTooltip,
 } from '@/lib/status/view';
 
 interface Props {
@@ -26,11 +26,11 @@ const weekdays = [
 ---
 
 <section class="min-w-0" data-status-calendar-month={month.month}>
-  <h2 id={titleId} class="ui-card-title px-1">{month.name}</h2>
+  <h2 id={titleId} class="ui-section-title px-1">{month.name}</h2>
 
   <table
     aria-labelledby={titleId}
-    class="mt-3 w-full table-fixed border-separate border-spacing-0"
+    class="mt-6 w-full table-fixed border-separate border-spacing-0"
   >
     <thead>
       <tr>
@@ -39,7 +39,7 @@ const weekdays = [
             <th
               scope="col"
               aria-label={full}
-              class="h-8 text-center text-xs font-semibold text-muted-foreground"
+              class="h-8 text-center text-xs font-normal text-muted-foreground"
             >
               <span aria-hidden="true">{short}</span>
             </th>
@@ -53,9 +53,9 @@ const weekdays = [
           <tr>
             {week.map((day) => {
               const status = day.status;
-              const tooltipId = status
-                ? `status-calendar-tooltip-${day.id}`
-                : undefined;
+              const tooltipLines = status
+                ? formatStatusCalendarDayCountLines(status)
+                : [];
 
               return (
                 <td
@@ -76,7 +76,7 @@ const weekdays = [
                     }
                   >
                     {!day.isInMonth ? (
-                      <span class="ui-num text-sm text-soft-foreground">
+                      <span class="ui-num text-sm text-muted-foreground/40">
                         {day.day}
                       </span>
                     ) : status ? (
@@ -87,7 +87,6 @@ const weekdays = [
                           id: day.id,
                         })}
                         aria-label={formatStatusCalendarDayLabel(status)}
-                        aria-describedby={tooltipId}
                         class="status-calendar-date__link inline-flex size-9 items-center justify-center rounded-full border-2 border-transparent text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                         data-status-calendar-day-link={day.id}
                         data-status-calendar-marker={status.kind}
@@ -114,14 +113,17 @@ const weekdays = [
 
                     {status && (
                       <span
-                        id={tooltipId}
                         role="tooltip"
                         class="status-calendar-date__tooltip"
                         data-status-calendar-tooltip={day.id}
-                        set:html={formatDynamicHtml(
-                          formatStatusCalendarDayTooltip(status),
-                        )}
-                      />
+                      >
+                        {tooltipLines.map((line) => (
+                          <span
+                            class="block"
+                            set:html={formatDynamicHtml(line)}
+                          />
+                        ))}
+                      </span>
                     )}
                   </div>
                 </td>
@@ -141,7 +143,7 @@ const weekdays = [
 
   .status-calendar-date__link[data-status-calendar-marker='maintenance'],
   .status-calendar-date__link[data-status-calendar-marker='mixed'] {
-    border-color: var(--color-accent-text);
+    border-color: var(--color-warning);
   }
 
   .status-calendar-date__tooltip {

@@ -103,12 +103,12 @@ const parseHtml = (html: string) => {
 
 const cleanText = (value: string): string => value.replace(/\s+/gu, ' ').trim();
 
-const renderPage = async () => {
+const renderPage = async (year = 2026) => {
   const container = await createAstroContainer();
 
   return container.renderToString(StatusCalendarYearPage.default, {
-    params: { year: '2026' },
-    request: new Request('https://example.com/status/calendar/2026/'),
+    params: { year: String(year) },
+    request: new Request(`https://example.com/status/calendar/${year}/`),
     partial: false,
   });
 };
@@ -127,7 +127,7 @@ const affectedLinks = (document: ReturnType<typeof parseHtml>) =>
       href: link.getAttribute('href'),
       marker: link.getAttribute('data-status-calendar-marker') ?? undefined,
       label: link.getAttribute('aria-label'),
-      describedBy: link.getAttribute('aria-describedby'),
+      hasDescription: link.hasAttribute('aria-describedby'),
     }),
   );
 
@@ -141,18 +141,36 @@ afterAll(() => {
 });
 
 describe('/status/calendar/YYYY/', () => {
-  it('creates the current Moscow year for HTML and Markdown', async () => {
-    const [htmlPaths, markdownPaths] = await Promise.all([
+  it('creates the current and upcoming Moscow years for HTML and Markdown', async () => {
+    const [htmlPaths, markdownPaths, upcomingHtml] = await Promise.all([
       StatusCalendarYearPage.getStaticPaths(),
       StatusCalendarYearMarkdownRoute.getStaticPaths(),
+      renderPage(2027),
     ]);
+    const upcomingDocument = parseHtml(upcomingHtml);
 
-    expect({ htmlPaths, markdownPaths }).toMatchInlineSnapshot(`
+    expect({
+      htmlPaths,
+      markdownPaths,
+      upcomingYear: upcomingDocument
+        .querySelector('[data-status-calendar-year]')
+        ?.getAttribute('data-status-calendar-year'),
+      upcomingNewYearDate: Boolean(
+        upcomingDocument.querySelector(
+          '[data-status-calendar-date="2027-01-01"]',
+        ),
+      ),
+    }).toMatchInlineSnapshot(`
       {
         "htmlPaths": [
           {
             "params": {
               "year": "2026",
+            },
+          },
+          {
+            "params": {
+              "year": "2027",
             },
           },
         ],
@@ -162,7 +180,14 @@ describe('/status/calendar/YYYY/', () => {
               "year": "2026",
             },
           },
+          {
+            "params": {
+              "year": "2027",
+            },
+          },
         ],
+        "upcomingNewYearDate": true,
+        "upcomingYear": "2027",
       }
     `);
   });
@@ -295,32 +320,33 @@ describe('/status/calendar/YYYY/', () => {
       tooltips: [
         ...document.querySelectorAll('[data-status-calendar-tooltip]'),
       ].map((tooltip) => ({
-        id: tooltip.id,
         role: tooltip.getAttribute('role'),
-        text: visibleWhitespace(tooltip.textContent.trim()),
+        lines: [...tooltip.querySelectorAll(':scope > span')].map((line) =>
+          visibleWhitespace(line.textContent.trim()),
+        ),
       })),
     }).toMatchInlineSnapshot(`
       {
         "links": [
           {
-            "describedBy": "status-calendar-tooltip-2026-01-01",
+            "hasDescription": false,
             "href": "/status/calendar/2026/01/#2026-01-01",
             "id": "2026-01-01",
             "label": "1 января 2026: 1 плановая работа",
             "marker": "maintenance",
           },
           {
-            "describedBy": "status-calendar-tooltip-2026-08-23",
+            "hasDescription": false,
             "href": "/status/calendar/2026/08/#2026-08-23",
             "id": "2026-08-23",
-            "label": "23 августа 2026: 1 инцидент",
+            "label": "23 августа 2026: 1 проблема",
             "marker": "incident",
           },
           {
-            "describedBy": "status-calendar-tooltip-2026-08-24",
+            "hasDescription": false,
             "href": "/status/calendar/2026/08/#2026-08-24",
             "id": "2026-08-24",
-            "label": "24 августа 2026: 2 инцидента, 1 плановая работа",
+            "label": "24 августа 2026: 2 проблемы, 1 плановая работа",
             "marker": "mixed",
           },
         ],
@@ -343,26 +369,30 @@ describe('/status/calendar/YYYY/', () => {
         ],
         "tooltips": [
           {
-            "id": "status-calendar-tooltip-2026-01-01",
+            "lines": [
+              "1 плановая работа",
+            ],
             "role": "tooltip",
-            "text": "1·января: 1 плановая работа",
           },
           {
-            "id": "status-calendar-tooltip-2026-08-23",
+            "lines": [
+              "1 проблема",
+            ],
             "role": "tooltip",
-            "text": "23·августа: 1 инцидент",
           },
           {
-            "id": "status-calendar-tooltip-2026-08-24",
+            "lines": [
+              "2 проблемы",
+              "1 плановая работа",
+            ],
             "role": "tooltip",
-            "text": "24·августа: 2 инцидента, 1 плановая работа",
           },
         ],
       }
     `);
   });
 
-  it('explains marker forms and keeps the dark launch out of search surfaces', async () => {
+  it('shows the compact legend and keeps the dark launch out of search surfaces', async () => {
     const document = parseHtml(await renderPage());
     const legend = document.querySelector('[data-status-calendar-legend]');
 
@@ -385,18 +415,17 @@ describe('/status/calendar/YYYY/', () => {
       },
     }).toMatchInlineSnapshot(`
       {
-        "legendItemCount": 4,
+        "legendItemCount": 2,
         "legendMarkers": [
           "incident",
           "maintenance",
-          "mixed",
         ],
         "metadata": {
           "markdownAlternate": undefined,
           "pagefindRoot": undefined,
           "robots": "noindex, nofollow",
         },
-        "todayLegend": true,
+        "todayLegend": false,
       }
     `);
   });
@@ -429,7 +458,6 @@ describe('/status/calendar/YYYY/', () => {
         "contentType": "text/markdown; charset=utf-8",
         "hasMarkdownTable": false,
         "headings": [
-          "Обозначения",
           "Январь",
           "Февраль",
           "Март",

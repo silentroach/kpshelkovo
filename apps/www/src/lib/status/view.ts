@@ -200,12 +200,12 @@ export const formatStatusMonth = (
     : label;
 };
 
-export const formatStatusCalendarDayCounts = (
+export const formatStatusCalendarDayCountLines = (
   day: Pick<StatusCalendarDay, 'incidentCount' | 'maintenanceCount'>,
-): string =>
+): readonly string[] =>
   [
     day.incidentCount
-      ? count(day.incidentCount, ['инцидент', 'инцидента', 'инцидентов'])
+      ? count(day.incidentCount, ['проблема', 'проблемы', 'проблем'])
       : undefined,
     day.maintenanceCount
       ? count(day.maintenanceCount, [
@@ -214,17 +214,14 @@ export const formatStatusCalendarDayCounts = (
           'плановых работ',
         ])
       : undefined,
-  ]
-    .filter((part): part is string => Boolean(part))
-    .join(', ');
+  ].filter((part): part is string => Boolean(part));
+
+export const formatStatusCalendarDayCounts = (
+  day: Pick<StatusCalendarDay, 'incidentCount' | 'maintenanceCount'>,
+): string => formatStatusCalendarDayCountLines(day).join(', ');
 
 export const formatStatusCalendarDayLabel = (day: StatusCalendarDay): string =>
   `${formatDate(day.id)}: ${formatStatusCalendarDayCounts(day)}`;
-
-export const formatStatusCalendarDayTooltip = (
-  day: StatusCalendarDay,
-): string =>
-  `${dateTimeFromISO(day.id).toFormat('d MMMM')}: ${formatStatusCalendarDayCounts(day)}`;
 
 export const formatStatusDuration = (
   duration: StatusDuration,
