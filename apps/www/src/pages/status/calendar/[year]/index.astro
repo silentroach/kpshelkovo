@@ -1,0 +1,90 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+
+import StatusCalendarLegend from '@/components/status/StatusCalendarLegend.astro';
+import StatusCalendarYearMonth from '@/components/status/StatusCalendarYearMonth.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
+import {
+  buildStatusCalendarYearGrid,
+  currentStatusCalendarYear,
+  statusCalendarTodayId,
+} from '@/lib/status/calendar';
+import { loadStatusData } from '@/lib/status/load';
+import {
+  statusCalendarYearCanonical,
+  statusCalendarYearStaticPaths,
+  statusUrl,
+} from '@/lib/status/routes';
+
+export const getStaticPaths = (() =>
+  statusCalendarYearStaticPaths(
+    currentStatusCalendarYear(),
+  )) satisfies GetStaticPaths;
+
+const year = Number(Astro.params.year);
+const now = new Date();
+const currentYear = currentStatusCalendarYear(now);
+
+if (year !== currentYear) {
+  throw new Error(`status calendar year "${Astro.params.year}" not found`);
+}
+
+const calendar = buildStatusCalendarYearGrid(
+  (await loadStatusData()).calendar,
+  year,
+  statusCalendarTodayId(now),
+);
+const heading = `Календарь статусов за ${year} год`;
+const title = `${heading} — Шелково Онлайн`;
+const description = `Инциденты и плановые работы в Шелково по дням за ${year} год с переходом к месячным журналам.`;
+const breadcrumbs = withHomeBreadcrumbs([
+  { label: 'Статус', href: statusUrl() },
+  { label: `Календарь ${year}` },
+]);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={statusCalendarYearCanonical({ year })}
+  robots="noindex, nofollow"
+>
+  <main class="ui-page pb-8 md:pb-12 lg:pb-16">
+    <header class="ui-page-header">
+      <div class="ui-page-header-stack max-w-4xl">
+        <Breadcrumbs items={breadcrumbs} />
+
+        <div class="space-y-3">
+          <h1 class="ui-page-title">{heading}</h1>
+          <p class="max-w-3xl text-base leading-7 text-muted-foreground">
+            Отмеченные даты ведут к записям месячного журнала. Пустые дни
+            остаются обычными датами без ссылок.
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <div class="px-5 md:px-6">
+      <StatusCalendarLegend />
+
+      <div
+        class="mt-8 grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2 xl:grid-cols-3"
+        data-status-calendar-year={year}
+      >
+        {
+          calendar.months.map((month) => (
+            <StatusCalendarYearMonth month={month} />
+          ))
+        }
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  import { installStatusCalendarYearTooltips } from '@/lib/status/year-calendar.dom';
+
+  installStatusCalendarYearTooltips();
+</script>

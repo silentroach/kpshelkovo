@@ -31,7 +31,7 @@ describe('shouldIncludeSitemapPage', () => {
         "rootErrorPage": false,
         "statusIncident": true,
         "statusMonth": false,
-        "statusYear": true,
+        "statusYear": false,
       }
     `);
   });

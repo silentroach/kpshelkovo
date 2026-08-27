@@ -1,0 +1,48 @@
+---
+import StatusCalendarDayMarker from './StatusCalendarDayMarker.astro';
+---
+
+<section
+  aria-labelledby="status-calendar-legend-title"
+  class="border-y border-border py-5"
+  data-status-calendar-legend
+>
+  <h2 id="status-calendar-legend-title" class="ui-section-label">
+    Обозначения
+  </h2>
+
+  <ul
+    class="mt-3 grid gap-x-8 gap-y-3 text-sm leading-6 text-muted-foreground sm:grid-cols-2 lg:grid-cols-4"
+  >
+    <li class="flex items-center gap-3">
+      <StatusCalendarDayMarker kind="incident" decorative />
+      <span
+        ><strong class="text-foreground">Инцидент</strong> — красный круг.</span
+      >
+    </li>
+    <li class="flex items-center gap-3">
+      <StatusCalendarDayMarker kind="maintenance" decorative />
+      <span
+        ><strong class="text-foreground">Плановые работы</strong> — янтарное кольцо.</span
+      >
+    </li>
+    <li class="flex items-center gap-3">
+      <StatusCalendarDayMarker kind="mixed" decorative />
+      <span
+        ><strong class="text-foreground">Оба типа</strong> — круг с внешним кольцом.</span
+      >
+    </li>
+    <li class="flex items-center gap-3">
+      <span
+        aria-hidden="true"
+        class="ui-num inline-flex size-6 shrink-0 items-center justify-center rounded-sm border-2 border-primary text-xs text-foreground"
+        data-status-calendar-today-legend
+      >
+        24
+      </span>
+      <span
+        ><strong class="text-foreground">Сегодня</strong> — зелёная квадратная рамка.</span
+      >
+    </li>
+  </ul>
+</section>

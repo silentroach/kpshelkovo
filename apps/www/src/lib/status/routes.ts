@@ -28,6 +28,10 @@ export interface StatusCalendarMonthRouteInput {
   readonly month: number | string;
 }
 
+export interface StatusCalendarYearRouteInput {
+  readonly year: number | string;
+}
+
 const need = (value: string, name: string): string => {
   const text = value.trim();
 
@@ -60,6 +64,14 @@ export const statusOpenApiPath = (): string => STATUS_OPENAPI;
 
 export const statusServicePath = (service: StatusService): string =>
   `${STATUS_ROOT}${service}/`;
+
+export const statusCalendarYearPath = (
+  input: StatusCalendarYearRouteInput,
+): string => `${STATUS_CALENDAR_ROOT}${padNumber(input.year, 4)}/`;
+
+export const statusCalendarYearStaticPaths = (year: number) => [
+  { params: { year: String(year) } },
+];
 
 export const statusCalendarMonthPath = (
   input: StatusCalendarMonthRouteInput,
@@ -122,6 +134,14 @@ export const statusCalendarMonthUrl = (
   input: StatusCalendarMonthRouteInput,
 ): string => withBase(statusCalendarMonthPath(input));
 
+export const statusCalendarYearUrl = (
+  input: StatusCalendarYearRouteInput,
+): string => withBase(statusCalendarYearPath(input));
+
+export const statusCalendarDayUrl = (
+  input: StatusCalendarMonthRouteInput & { readonly id: string },
+): string => `${statusCalendarMonthUrl(input)}#${need(input.id, 'id')}`;
+
 export const statusCanonical = (): string => canon(STATUS_ROOT);
 
 export const statusServiceCanonical = (service: StatusService): string =>
@@ -130,6 +150,10 @@ export const statusServiceCanonical = (service: StatusService): string =>
 export const statusCalendarMonthCanonical = (
   input: StatusCalendarMonthRouteInput,
 ): string => canon(statusCalendarMonthPath(input));
+
+export const statusCalendarYearCanonical = (
+  input: StatusCalendarYearRouteInput,
+): string => canon(statusCalendarYearPath(input));
 
 export const statusIncidentUrl = (input: StatusIncidentRouteInput): string =>
   withBase(statusIncidentPath(input));

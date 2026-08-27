@@ -1,0 +1,190 @@
+---
+import type { StatusCalendarMonthGrid } from '@/lib/status/calendar.types';
+import { statusCalendarDayUrl } from '@/lib/status/routes';
+import {
+  formatStatusCalendarDayLabel,
+  formatStatusCalendarDayTooltip,
+} from '@/lib/status/view';
+
+interface Props {
+  readonly month: StatusCalendarMonthGrid;
+}
+
+const { month } = Astro.props;
+const titleId = `status-calendar-month-${month.month}`;
+const weekdays = [
+  ['Пн', 'Понедельник'],
+  ['Вт', 'Вторник'],
+  ['Ср', 'Среда'],
+  ['Чт', 'Четверг'],
+  ['Пт', 'Пятница'],
+  ['Сб', 'Суббота'],
+  ['Вс', 'Воскресенье'],
+] as const;
+---
+
+<section class="min-w-0" data-status-calendar-month={month.month}>
+  <h2 id={titleId} class="ui-card-title px-1">{month.name}</h2>
+
+  <table
+    aria-labelledby={titleId}
+    class="mt-3 w-full table-fixed border-separate border-spacing-0"
+  >
+    <thead>
+      <tr>
+        {
+          weekdays.map(([short, full]) => (
+            <th
+              scope="col"
+              aria-label={full}
+              class="h-8 text-center text-xs font-semibold text-muted-foreground"
+            >
+              <span aria-hidden="true">{short}</span>
+            </th>
+          ))
+        }
+      </tr>
+    </thead>
+    <tbody>
+      {
+        month.weeks.map((week) => (
+          <tr>
+            {week.map((day) => {
+              const status = day.status;
+              const tooltipId = status
+                ? `status-calendar-tooltip-${day.id}`
+                : undefined;
+
+              return (
+                <td
+                  aria-hidden={!day.isInMonth ? 'true' : undefined}
+                  class="relative h-11 p-0 text-center align-middle"
+                  data-status-calendar-cell={day.id}
+                  data-status-calendar-adjacent={
+                    !day.isInMonth ? day.id : undefined
+                  }
+                >
+                  <div
+                    class:list={[
+                      'status-calendar-date relative mx-auto inline-flex size-10 items-center justify-center rounded-sm',
+                      day.isToday && 'status-calendar-date--today',
+                    ]}
+                    data-status-calendar-tooltip-root={
+                      status ? day.id : undefined
+                    }
+                    data-status-calendar-today={
+                      day.isToday ? day.id : undefined
+                    }
+                  >
+                    {!day.isInMonth ? (
+                      <span class="ui-num text-sm text-soft-foreground">
+                        {day.day}
+                      </span>
+                    ) : status ? (
+                      <a
+                        href={statusCalendarDayUrl({
+                          year: month.year,
+                          month: month.month,
+                          id: day.id,
+                        })}
+                        aria-current={day.isToday ? 'date' : undefined}
+                        aria-label={formatStatusCalendarDayLabel(status)}
+                        aria-describedby={tooltipId}
+                        class="status-calendar-date__link inline-flex size-9 items-center justify-center rounded-full border-2 border-transparent text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                        data-status-calendar-day-link={day.id}
+                        data-status-calendar-marker={status.kind}
+                      >
+                        <span
+                          aria-hidden="true"
+                          class:list={[
+                            'ui-num inline-flex size-7 items-center justify-center rounded-full',
+                            status.kind !== 'maintenance' &&
+                              'bg-[color:var(--color-danger)] text-white',
+                          ]}
+                        >
+                          {day.day}
+                        </span>
+                      </a>
+                    ) : (
+                      <time
+                        datetime={day.id}
+                        aria-current={day.isToday ? 'date' : undefined}
+                        class="ui-num inline-flex size-9 items-center justify-center text-sm text-foreground"
+                      >
+                        {day.day}
+                      </time>
+                    )}
+
+                    {status && (
+                      <span
+                        id={tooltipId}
+                        role="tooltip"
+                        class="status-calendar-date__tooltip"
+                        data-status-calendar-tooltip={day.id}
+                      >
+                        {formatStatusCalendarDayTooltip(status)}
+                      </span>
+                    )}
+                  </div>
+                </td>
+              );
+            })}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</section>
+
+<style>
+  .status-calendar-date--today {
+    border: 2px solid var(--color-primary);
+  }
+
+  .status-calendar-date__link[data-status-calendar-marker='maintenance'],
+  .status-calendar-date__link[data-status-calendar-marker='mixed'] {
+    border-color: var(--color-accent-text);
+  }
+
+  .status-calendar-date__tooltip {
+    position: absolute;
+    z-index: 30;
+    top: calc(100% + 0.375rem);
+    left: 50%;
+    width: max-content;
+    max-width: min(15rem, calc(100vw - 2rem));
+    padding: 0.5rem 0.625rem;
+    translate: -50% 0;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-raised);
+    box-shadow: var(--shadow-1);
+    color: var(--color-text);
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.4;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  td:first-child .status-calendar-date__tooltip {
+    left: 0;
+    translate: 0 0;
+  }
+
+  td:last-child .status-calendar-date__tooltip {
+    right: 0;
+    left: auto;
+    translate: 0 0;
+  }
+
+  .status-calendar-date:not([data-tooltip-dismissed]):hover
+    .status-calendar-date__tooltip,
+  .status-calendar-date:not([data-tooltip-dismissed]):focus-within
+    .status-calendar-date__tooltip {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+  }
+</style>
