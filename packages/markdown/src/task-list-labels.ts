@@ -16,6 +16,9 @@ const isTaskListItemCheckbox = (node: HastNode): boolean =>
   node.tagName === 'input' &&
   (node.properties?.type as string | undefined) === 'checkbox';
 
+const isList = (node: HastNode): boolean =>
+  node.type === 'element' && (node.tagName === 'ul' || node.tagName === 'ol');
+
 const nodeText = (node: HastNode): string => {
   if (typeof node.value === 'string') {
     return node.value;
@@ -101,14 +104,23 @@ const labelTaskListItems = (node: HastNode, usedIds: Set<string>): void => {
   const checkboxIndex = children.findIndex(isTaskListItemCheckbox);
 
   if (checkboxIndex === -1) {
+    children.forEach((child) => labelTaskListItems(child, usedIds));
+
     return;
   }
 
   const checkbox = children[checkboxIndex];
-  const labelNodes = children.slice(checkboxIndex + 1);
+  const followingNodes = children.slice(checkboxIndex + 1);
+  const nestedListIndex = followingNodes.findIndex(isList);
+  const labelEnd =
+    nestedListIndex === -1 ? followingNodes.length : nestedListIndex;
+  const labelNodes = followingNodes.slice(0, labelEnd);
+  const remainingNodes = followingNodes.slice(labelEnd);
   const { before, label } = splitLeadingWhitespace(labelNodes);
 
   if (label.length === 0) {
+    children.forEach((child) => labelTaskListItems(child, usedIds));
+
     return;
   }
 
@@ -129,7 +141,10 @@ const labelTaskListItems = (node: HastNode, usedIds: Set<string>): void => {
     ...children.slice(0, checkboxIndex + 1),
     ...before,
     labelSpan,
+    ...remainingNodes,
   ];
+
+  node.children.forEach((child) => labelTaskListItems(child, usedIds));
 };
 
 export const rehypeTaskListItemLabels: Plugin<[], HastNode> = () => (tree) => {
