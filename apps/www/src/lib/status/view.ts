@@ -230,7 +230,9 @@ export const formatStatusCalendarDayLabel = (day: StatusCalendarDay): string =>
 export const formatStatusCalendarDayTooltipSummary = (
   day: StatusCalendarDay,
 ): string =>
-  `${formatStatusNbsp(formatStatusCalendarDayDate(day))}: ${formatStatusCalendarDayCountLines(day).map(formatStatusNbsp).join(', ')}`;
+  [formatStatusCalendarDayDate(day), ...formatStatusCalendarDayCountLines(day)]
+    .map(formatStatusNbsp)
+    .join('\n');
 
 export const formatStatusDuration = (
   duration: StatusDuration,
