@@ -1,5 +1,8 @@
 import type { SchemaDoc } from '@shelkovo/seo';
 
+import { breadcrumbListSchema } from '@/lib/json-ld';
+import type { BreadcrumbLink } from '@/lib/json-ld-types';
+
 import { absoluteUrl } from '../site';
 import type { PersonContact } from './types';
 
@@ -15,22 +18,6 @@ interface PersonProfilePageInput {
   readonly contacts: readonly PersonContact[];
   readonly breadcrumbs?: readonly BreadcrumbLink[];
 }
-
-interface BreadcrumbLink {
-  readonly name: string;
-  readonly url: string;
-}
-
-const breadcrumbSchema = (items: readonly BreadcrumbLink[]): SchemaDoc => ({
-  '@context': CONTEXT,
-  '@type': 'BreadcrumbList',
-  itemListElement: items.map((item, index) => ({
-    '@type': 'ListItem',
-    position: index + 1,
-    name: item.name,
-    item: absoluteUrl(item.url),
-  })),
-});
 
 const personEntity = (input: PersonProfilePageInput): SchemaDoc => {
   const url = absoluteUrl(input.url);
@@ -88,7 +75,7 @@ export const personProfilePageSchema = (
   ];
 
   if (input.breadcrumbs?.length) {
-    docs.push(breadcrumbSchema(input.breadcrumbs));
+    docs.push(breadcrumbListSchema(input.breadcrumbs));
   }
 
   return docs;

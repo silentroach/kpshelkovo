@@ -1,4 +1,4 @@
-import type { BreadcrumbLink } from '@/lib/news/seo';
+import type { BreadcrumbLink } from '@/lib/json-ld-types';
 
 import { withBase } from './site';
 

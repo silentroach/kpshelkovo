@@ -2,11 +2,9 @@ import { extractFirstMarkdownText } from '@shelkovo/markdown';
 import type { SchemaDoc } from '@shelkovo/seo';
 
 import type { BreadcrumbItem } from '@/lib/breadcrumbs';
-import {
-  collectionPageSchema,
-  techArticleSchema,
-  type BreadcrumbLink,
-} from '@/lib/news/seo';
+import { collectionPageSchema } from '@/lib/json-ld';
+import type { BreadcrumbLink } from '@/lib/json-ld-types';
+import { techArticleSchema } from '@/lib/news/seo';
 
 import type { KbPage } from './types';
 

@@ -7,9 +7,9 @@ import {
   withHomeBreadcrumbs,
   withHomeSchemaBreadcrumbs,
 } from '@/lib/breadcrumbs';
+import { collectionPageSchema } from '@/lib/json-ld';
 import { loadNewsArchives } from '@/lib/news/load';
 import { newsArchiveUrl, newsUrl } from '@/lib/news/routes';
-import { collectionPageSchema } from '@/lib/news/seo';
 
 const archives = await loadNewsArchives();
 const title = 'Архив новостей — Шелково Онлайн';
