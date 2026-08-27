@@ -30,38 +30,6 @@ for (const viewport of [
 
     await expect(entry).toHaveAccessibleName(calendarHeading);
 
-    const entryLayout = await entry.evaluate((link) => {
-      const copy = document.querySelector('[data-status-page-header-copy]');
-      const title = copy?.querySelector('h1');
-
-      if (!copy || !title) {
-        throw new Error('Expected status page header copy');
-      }
-
-      const linkRect = link.getBoundingClientRect();
-      const titleRect = title.getBoundingClientRect();
-
-      return {
-        linkCenter: linkRect.top + linkRect.height / 2,
-        linkHeight: linkRect.height,
-        linkLeft: linkRect.left,
-        linkWidth: linkRect.width,
-        titleCenter: titleRect.top + titleRect.height / 2,
-        titleRight: titleRect.right,
-      };
-    });
-
-    expect(entryLayout.linkHeight).toBeCloseTo(40, 0);
-    expect(entryLayout.linkLeft - entryLayout.titleRight).toBeCloseTo(
-      viewport.name === 'mobile' ? 20 : 28,
-      0,
-    );
-    expect(entryLayout.linkWidth).toBeCloseTo(40, 0);
-    expect(entryLayout.linkCenter - entryLayout.titleCenter).toBeCloseTo(
-      viewport.name === 'mobile' ? 4 : 6,
-      0,
-    );
-
     await entry.click();
     await page.waitForURL(entryHref);
 

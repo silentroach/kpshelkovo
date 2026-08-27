@@ -11,7 +11,7 @@ import {
   statusCalendarMonthPath,
   statusCalendarYearPath,
 } from './status/routes';
-import type { StatusKind } from './status/schema';
+import { parseStatusTimestamp, type StatusKind } from './status/schema';
 
 export interface SitemapMetadata {
   readonly lastmod?: string;
@@ -124,6 +124,9 @@ const timestampMs = (value: string): number => {
   return ms;
 };
 
+const statusTimestampMs = (value: string): number =>
+  parseStatusTimestamp(value)?.at.valueOf() ?? timestampMs(value);
+
 const laterLastmod = (
   a: string | undefined,
   b: string | undefined,
@@ -161,8 +164,10 @@ const isCalendarIncidentChanging = (
   resolveStatusIncidentPhase(
     {
       kind: incident.kind,
-      startedAt: timestampMs(incident.startedIso),
-      endedAt: incident.endedIso ? timestampMs(incident.endedIso) : undefined,
+      startedAt: statusTimestampMs(incident.startedIso),
+      endedAt: incident.endedIso
+        ? statusTimestampMs(incident.endedIso)
+        : undefined,
     },
     buildNowMs,
   ) !== 'resolved';
@@ -198,8 +203,10 @@ const addStatusCalendarMetadata = (
     incidents.map((incident) => ({
       id: incident.url,
       kind: incident.kind,
-      startedAt: timestampMs(incident.startedIso),
-      endedAt: incident.endedIso ? timestampMs(incident.endedIso) : undefined,
+      startedAt: statusTimestampMs(incident.startedIso),
+      endedAt: incident.endedIso
+        ? statusTimestampMs(incident.endedIso)
+        : undefined,
     })),
     buildNowMs,
   );

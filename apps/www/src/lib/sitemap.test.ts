@@ -244,6 +244,42 @@ describe('buildSitemapMetadataIndex', () => {
     `);
   });
 
+  it('parses date-only calendar windows in Moscow time', () => {
+    const index = buildSitemapMetadataIndex(
+      {
+        newsArticles: [],
+        statusIncidents: [
+          {
+            url: '/status/incidents/2026/04/maintenance/',
+            service: 'electricity',
+            kind: 'maintenance',
+            startedIso: '2026-04-30',
+            endedIso: '2026-05-01',
+            hasPage: true,
+          },
+        ],
+        settlements: [],
+        meetings: [],
+        kbPages: [],
+        contacts: [],
+      },
+      Date.parse('2026-05-01T00:30:00+03:00'),
+    );
+
+    expect({
+      april: index.get('/status/calendar/2026/04/'),
+      may: index.get('/status/calendar/2026/05/'),
+    }).toMatchInlineSnapshot(`
+      {
+        "april": {
+          "changefreq": "yearly",
+          "lastmod": "2026-05-01",
+        },
+        "may": undefined,
+      }
+    `);
+  });
+
   it('publishes the empty current Moscow year and refreshes status navigation', () => {
     const index = buildSitemapMetadataIndex(
       {
