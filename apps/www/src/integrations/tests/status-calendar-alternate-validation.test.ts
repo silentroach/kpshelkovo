@@ -64,8 +64,20 @@ describe('status calendar alternate validation', () => {
     await expect(
       validateStatusCalendarAlternates(pathToFileURL(`${directory}/`), site),
     ).rejects.toThrowErrorMatchingInlineSnapshot(`
-      [Error: Missing status calendar Markdown alternates:
+      [Error: Invalid status calendar Markdown alternates:
       - status/calendar/2026/index.html -> /status/calendar/2026/index.md]
+    `);
+  });
+
+  it('rejects a calendar HTML without a local Markdown alternate', async () => {
+    const directory = await createOutput();
+    await writeCalendarHtml(directory, 'https://example.com/calendar.md');
+
+    await expect(
+      validateStatusCalendarAlternates(pathToFileURL(`${directory}/`), site),
+    ).rejects.toThrowErrorMatchingInlineSnapshot(`
+      [Error: Invalid status calendar Markdown alternates:
+      - status/calendar/2026/index.html -> expected one same-origin Markdown alternate, found 0]
     `);
   });
 });

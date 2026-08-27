@@ -40,25 +40,38 @@ export const validateStatusCalendarAlternates = async (
   site: URL,
 ): Promise<void> => {
   const outputDirectory = fileURLToPath(dir);
-  const missing: string[] = [];
+  const failures: string[] = [];
+  let calendarDocumentCount = 0;
 
   for await (const htmlPath of glob(calendarHtmlPattern, {
     cwd: outputDirectory,
   })) {
+    calendarDocumentCount += 1;
     const html = await readFile(resolve(outputDirectory, htmlPath), 'utf8');
+    const alternatePaths = markdownAlternatePaths(html, site);
 
-    for (const alternatePath of markdownAlternatePaths(html, site)) {
-      try {
-        await access(resolve(outputDirectory, `.${alternatePath}`));
-      } catch {
-        missing.push(`${htmlPath} -> ${alternatePath}`);
-      }
+    if (alternatePaths.length !== 1) {
+      failures.push(
+        `${htmlPath} -> expected one same-origin Markdown alternate, found ${alternatePaths.length}`,
+      );
+      continue;
+    }
+
+    const [alternatePath] = alternatePaths;
+    try {
+      await access(resolve(outputDirectory, `.${alternatePath}`));
+    } catch {
+      failures.push(`${htmlPath} -> ${alternatePath}`);
     }
   }
 
-  if (missing.length > 0) {
+  if (calendarDocumentCount === 0) {
+    failures.push(`${calendarHtmlPattern} -> no HTML documents`);
+  }
+
+  if (failures.length > 0) {
     throw new Error(
-      `Missing status calendar Markdown alternates:\n${missing
+      `Invalid status calendar Markdown alternates:\n${failures
         .sort()
         .map((item) => `- ${item}`)
         .join('\n')}`,
