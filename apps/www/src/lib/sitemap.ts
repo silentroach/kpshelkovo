@@ -1,5 +1,5 @@
 import { ChangeFreqEnum, type SitemapItem } from '@astrojs/sitemap';
-import { compareRuText, padNumber } from '@shelkovo/format';
+import { compareRuText, dateTimeFromISO, padNumber } from '@shelkovo/format';
 
 import {
   availableStatusCalendarYears,
@@ -147,6 +147,12 @@ const maxLastmod = (values: readonly string[]): string | undefined =>
 
 const incidentLastmod = (incident: SitemapStatusIncidentInput): string =>
   incident.endedIso ?? incident.startedIso;
+
+const moscowYearStartIso = (buildNowMs: number): string =>
+  dateTimeFromISO(new Date(buildNowMs).toISOString())
+    .startOf('year')
+    .toJSDate()
+    .toISOString();
 
 const isCalendarIncidentChanging = (
   incident: SitemapStatusIncidentInput,
@@ -312,7 +318,16 @@ const addNewsMetadata = (
 const addStatusMetadata = (
   index: Map<string, SitemapMetadata>,
   incidents: readonly SitemapStatusIncidentInput[],
+  buildNowMs: number,
 ): void => {
+  const calendarNavigationMetadata = {
+    lastmod: moscowYearStartIso(buildNowMs),
+    changefreq: CHANGEFREQ.hourly,
+  };
+
+  setMetadata(index, '/status/', calendarNavigationMetadata);
+  setMetadata(index, '/status/history/', calendarNavigationMetadata);
+
   for (const incident of incidents) {
     const lastmod = incidentLastmod(incident);
     const hourly = { lastmod, changefreq: CHANGEFREQ.hourly };
@@ -418,7 +433,7 @@ export const buildSitemapMetadataIndex = (
   const index = new Map<string, SitemapMetadata>();
 
   addNewsMetadata(index, data.newsArticles);
-  addStatusMetadata(index, data.statusIncidents);
+  addStatusMetadata(index, data.statusIncidents, buildNowMs);
   addStatusCalendarMetadata(index, data.statusIncidents, buildNowMs);
   addCompareMetadata(index, data.settlements);
   addMeetingsMetadata(index, data.meetings);

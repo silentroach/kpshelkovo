@@ -4,19 +4,20 @@ const dayId = '2026-08-26';
 const monthPath = '/status/calendar/2026/08/';
 const dayPath = `${monthPath}#${dayId}`;
 const yearPath = '/status/calendar/2026/';
+const calendarHeading = 'Проблемы и плановые работы за 2026 год';
 
 for (const viewport of [
   { name: 'desktop', width: 1280, height: 800 },
   { name: 'mobile', width: 390, height: 844 },
 ] as const) {
-  test(`opens a calendar day and returns to the list on ${viewport.name}`, async ({
+  test(`opens a calendar day and returns to status on ${viewport.name}`, async ({
     page,
   }) => {
     await page.setViewportSize(viewport);
     await page.goto('/status/', { waitUntil: 'networkidle' });
 
     const entry = page.getByRole('link', {
-      name: 'Календарь статусов',
+      name: calendarHeading,
       exact: true,
     });
     const entryHref = await entry.getAttribute('href');
@@ -26,35 +27,32 @@ for (const viewport of [
 
     const entryLayout = await entry.evaluate((link) => {
       const copy = document.querySelector('[data-status-page-header-copy]');
-      const description = copy?.querySelector('p');
+      const title = copy?.querySelector('h1');
 
-      if (!copy || !description) {
+      if (!copy || !title) {
         throw new Error('Expected status page header copy');
       }
 
       const linkRect = link.getBoundingClientRect();
-      const copyRect = copy.getBoundingClientRect();
-      const descriptionRect = description.getBoundingClientRect();
+      const titleRect = title.getBoundingClientRect();
 
       return {
+        linkCenter: linkRect.top + linkRect.height / 2,
+        linkHeight: linkRect.height,
         linkLeft: linkRect.left,
-        linkTop: linkRect.top,
-        copyBottom: copyRect.bottom,
-        copyRight: copyRect.right,
-        descriptionBottom: descriptionRect.bottom,
+        linkWidth: linkRect.width,
+        titleCenter: titleRect.top + titleRect.height / 2,
+        titleRight: titleRect.right,
       };
     });
 
-    if (viewport.name === 'mobile') {
-      expect(entryLayout.linkTop).toBeGreaterThanOrEqual(
-        entryLayout.copyBottom,
-      );
-    } else {
-      expect(entryLayout.linkLeft).toBeGreaterThanOrEqual(
-        entryLayout.copyRight,
-      );
-      expect(entryLayout.linkTop).toBeLessThan(entryLayout.descriptionBottom);
-    }
+    expect(entryLayout.linkHeight).toBeCloseTo(40, 0);
+    expect(entryLayout.linkLeft - entryLayout.titleRight).toBeCloseTo(
+      viewport.name === 'mobile' ? 20 : 28,
+      0,
+    );
+    expect(entryLayout.linkWidth).toBeCloseTo(40, 0);
+    expect(entryLayout.linkCenter).toBeCloseTo(entryLayout.titleCenter, 0);
 
     await entry.click();
     await page.waitForURL(entryHref);
@@ -75,11 +73,14 @@ for (const viewport of [
     await page.waitForURL(href);
     await expect(page.locator(`h2[id="${targetId}"]`)).toBeFocused();
 
-    await page.getByRole('link', { name: 'Списком', exact: true }).click();
-    await page.waitForURL('/status/history/');
+    await page
+      .getByRole('navigation', { name: 'Хлебные крошки' })
+      .getByRole('link', { name: 'Статус', exact: true })
+      .click();
+    await page.waitForURL('/status/');
 
     const calendarView = page.getByRole('link', {
-      name: 'Календарь',
+      name: calendarHeading,
       exact: true,
     });
     await expect(calendarView).toHaveAttribute('href', entryHref);

@@ -244,11 +244,20 @@ describe('buildSitemapMetadataIndex', () => {
     `);
   });
 
-  it('publishes the empty current Moscow year with sitemap metadata', () => {
+  it('publishes the empty current Moscow year and refreshes status navigation', () => {
     const index = buildSitemapMetadataIndex(
       {
         newsArticles: [],
-        statusIncidents: [],
+        statusIncidents: [
+          {
+            url: '/status/incidents/2026/12/old/',
+            service: 'electricity',
+            kind: 'incident',
+            startedIso: '2026-12-30T08:00:00+03:00',
+            endedIso: '2026-12-30T09:00:00+03:00',
+            hasPage: true,
+          },
+        ],
         settlements: [],
         meetings: [],
         kbPages: [],
@@ -257,9 +266,25 @@ describe('buildSitemapMetadataIndex', () => {
       Date.parse('2027-01-01T00:30:00+03:00'),
     );
 
-    expect(index.get('/status/calendar/2027/')).toEqual({
-      changefreq: ChangeFreqEnum.HOURLY,
-    });
+    expect({
+      currentYear: index.get('/status/calendar/2027/'),
+      history: index.get('/status/history/'),
+      status: index.get('/status/'),
+    }).toMatchInlineSnapshot(`
+      {
+        "currentYear": {
+          "changefreq": "hourly",
+        },
+        "history": {
+          "changefreq": "hourly",
+          "lastmod": "2026-12-31T21:00:00.000Z",
+        },
+        "status": {
+          "changefreq": "hourly",
+          "lastmod": "2026-12-31T21:00:00.000Z",
+        },
+      }
+    `);
   });
 
   it('uses meeting dates for detail pages without adding a section index', () => {

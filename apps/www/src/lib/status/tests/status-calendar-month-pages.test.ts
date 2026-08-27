@@ -320,8 +320,11 @@ describe('/status/calendar/YYYY/MM/', () => {
     expect({
       days: htmlJournal(document),
       metadata: {
-        listHref: document
-          .querySelector('[data-status-calendar-list]')
+        historyLinkCount: document.querySelectorAll(
+          'main a[href="/status/history/"]',
+        ).length,
+        statusBreadcrumbHref: document
+          .querySelector('nav[aria-label="Хлебные крошки"] a[href="/status/"]')
           ?.getAttribute('href'),
         yearBreadcrumbHref: [
           ...document.querySelectorAll(
@@ -381,10 +384,11 @@ describe('/status/calendar/YYYY/MM/', () => {
           },
         ],
         "metadata": {
-          "listHref": "/status/history/",
+          "historyLinkCount": 0,
           "markdownAlternate": "https://kpshelkovo.online/status/calendar/2026/08/index.md",
           "pagefindRoot": undefined,
           "robots": undefined,
+          "statusBreadcrumbHref": "/status/",
           "yearBreadcrumbHref": "/status/calendar/2026/",
         },
       }

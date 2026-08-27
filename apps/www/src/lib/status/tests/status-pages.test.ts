@@ -166,14 +166,16 @@ describe('/status/', () => {
     const link = document.querySelector('[data-status-calendar-entry]');
 
     expect({
+      accessibleName: link?.getAttribute('aria-label'),
       href: link?.getAttribute('href'),
-      label: link?.textContent.replace(/\s+/gu, ' ').trim(),
       decorativeIcon: link?.querySelector('svg')?.getAttribute('aria-hidden'),
+      title: link?.getAttribute('title'),
     }).toMatchInlineSnapshot(`
       {
+        "accessibleName": "Проблемы и плановые работы за 2026 год",
         "decorativeIcon": "true",
         "href": "/status/calendar/2026/",
-        "label": "Календарь статусов",
+        "title": "Проблемы и плановые работы за 2026 год",
       }
     `);
     expect(link?.getAttribute('href')).toBe(
