@@ -22,32 +22,37 @@ const validationIssues = (input: unknown) => {
 
 describe('RawNewsEventsSchema', () => {
   it('trims valid event text at the raw boundary', () => {
-    expect(
-      RawNewsEventsSchema.parse([
-        {
-          title: '  Встреча по регламенту  ',
-          description: '  Обсудим новый регламент.  ',
-          starts_at: '31.05.2026 19:00',
-          ends_at: '31.05.2026 21:00',
-          location: '  Эко-клуб  ',
-          organizer: '  ОК Комфорт  ',
-          performer: ['  Ведущий  '],
-        },
-      ]),
-    ).toMatchInlineSnapshot(`
-      [
-        {
-          "description": "Обсудим новый регламент.",
-          "ends_at": "31.05.2026 21:00",
-          "location": "Эко-клуб",
-          "organizer": "ОК Комфорт",
-          "performer": [
-            "Ведущий",
-          ],
-          "starts_at": "31.05.2026 19:00",
-          "title": "Встреча по регламенту",
-        },
-      ]
+    const [parsed] = RawNewsEventsSchema.parse([
+      {
+        title: '  Встреча по регламенту  ',
+        description: '  Обсудим новый регламент.  ',
+        starts_at: '31.05.2026 19:00',
+        ends_at: '31.05.2026 21:00',
+        location: '  Эко-клуб  ',
+        organizer: '  ОК Комфорт  ',
+        performer: ['  Ведущий  '],
+      },
+    ]);
+    if (!parsed) {
+      throw new Error('Expected a parsed news event');
+    }
+
+    expect({
+      title: parsed.title,
+      description: parsed.description,
+      location: parsed.location,
+      organizer: parsed.organizer,
+      performer: parsed.performer,
+    }).toMatchInlineSnapshot(`
+      {
+        "description": "Обсудим новый регламент.",
+        "location": "Эко-клуб",
+        "organizer": "ОК Комфорт",
+        "performer": [
+          "Ведущий",
+        ],
+        "title": "Встреча по регламенту",
+      }
     `);
   });
 

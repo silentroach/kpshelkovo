@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import type { SiteMentionRegistry } from '@/lib/mentions';
+import { contentDateSchema } from '@/lib/content-date';
 import type { createPersonMentionTarget as createPersonMentionTargetType } from '@/lib/people/mentions';
 import type { createPlaceMentionTarget as createPlaceMentionTargetType } from '@/lib/places/mentions';
 
@@ -14,6 +15,7 @@ let mapRawMeeting: typeof mapRawMeetingType;
 let createPersonMentionTarget: typeof createPersonMentionTargetType;
 let createPlaceMentionTarget: typeof createPlaceMentionTargetType;
 let buildMeetingTranscriptPartMarkdown: typeof import('./markdown').buildMeetingTranscriptPartMarkdown;
+const testDate = contentDateSchema('test date');
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
@@ -31,7 +33,7 @@ const meeting = (data?: Partial<RawMeeting>) => ({
   id: '2026-06-13-ok-comfort',
   data: {
     title: 'Встреча ОК Комфорт с жителями КП Шелково',
-    date: '13.06.2026 16:00',
+    date: testDate.parse('13.06.2026 16:00'),
     context: 'Встреча управляющей компании с жителями.',
     speakers: {
       moderator: {
@@ -485,8 +487,8 @@ describe('mapRawMeeting', () => {
     expect(() =>
       map({
         meeting: {
-          date: '13.06.2026 16:00',
-          updated_at: '13.06.2026 15:59',
+          date: testDate.parse('13.06.2026 16:00'),
+          updated_at: testDate.parse('13.06.2026 15:59'),
         },
       }),
     ).toThrow('updated_at cannot be earlier than date');

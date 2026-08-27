@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import type { SiteMentionRegistry } from '@/lib/mentions';
+import { contentDateSchema } from '@/lib/content-date';
 
 import type {
   buildMeetingsDataset as buildMeetingsDatasetType,
@@ -24,6 +25,7 @@ vi.mock('@/lib/mentions/registry', () => ({
 
 let buildMeetingsDataset: typeof buildMeetingsDatasetType;
 let loadMeeting: typeof loadMeetingType;
+const testDate = contentDateSchema('test date');
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
@@ -42,7 +44,7 @@ const entry = (input: {
   id: input.id,
   data: {
     title: input.title ?? `Встреча ${input.id}`,
-    date: input.date ?? '13.06.2026 16:00',
+    date: testDate.parse(input.date ?? '13.06.2026 16:00'),
     context: 'Контекст встречи.',
     speakers: {
       moderator: {

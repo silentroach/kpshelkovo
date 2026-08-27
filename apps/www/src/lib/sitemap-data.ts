@@ -6,7 +6,7 @@ import { compareRuText } from '@shelkovo/format';
 import { parse as parseYaml } from 'yaml';
 import { z } from 'zod';
 
-import { parseNewsTimestampInput } from './news/date';
+import { parseContentDate } from './content-date';
 import { normalizeTagKey } from './news/schema';
 import { STATUS_KINDS } from './status/schema';
 import {
@@ -204,13 +204,13 @@ const relativeEntryId = (
 };
 
 const parseTimestamp = (value: SitemapDateInput, context: string): string => {
-  const timestamp = parseNewsTimestampInput(value);
+  const timestamp = parseContentDate(value);
 
   if (!timestamp) {
     throw new Error(`${context} must use a supported date format`);
   }
 
-  return timestamp.has_time
+  return timestamp.hasTime
     ? timestamp.iso
     : `${timestamp.year}-${timestamp.month}-${timestamp.day}`;
 };

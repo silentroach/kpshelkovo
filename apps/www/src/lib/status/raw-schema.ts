@@ -1,9 +1,9 @@
 import { z } from 'astro/zod';
 
+import { contentDateSchema } from '@/lib/content-date';
+
 import {
   isAbsoluteUrl,
-  normalizeStatusTimestampInput,
-  parseStatusTimestampInput,
   STATUS_AREAS,
   STATUS_KINDS,
   STATUS_SERVICES,
@@ -16,22 +16,6 @@ const absoluteUrl = (name: string) =>
     (value) => isAbsoluteUrl(value),
     `${name} must be an absolute URL`,
   );
-
-const statusDate = (name: string) =>
-  z.union([text, z.date()]).transform((value, ctx) => {
-    const normalized = normalizeStatusTimestampInput(value);
-
-    if (normalized && parseStatusTimestampInput(value)) {
-      return normalized;
-    }
-
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `${name} must use dd.mm.yyyy, dd.mm.yyyy hh:mm, or YYYY-MM-DD`,
-    });
-
-    return z.NEVER;
-  });
 
 const statusSeo = () =>
   z
@@ -46,18 +30,16 @@ export const RawStatusIncidentSchema = z
     seo: statusSeo().optional(),
     service: z.enum(STATUS_SERVICES),
     kind: z.enum(STATUS_KINDS),
-    started_at: statusDate('started_at'),
-    ended_at: statusDate('ended_at').optional(),
+    started_at: contentDateSchema('started_at'),
+    ended_at: contentDateSchema('ended_at').optional(),
     areas: z.array(z.enum(STATUS_AREAS)).min(1).optional(),
     source_url: absoluteUrl('source_url').optional(),
   })
   .superRefine((data, ctx) => {
-    const started = parseStatusTimestampInput(data.started_at);
-    const ended = data.ended_at
-      ? parseStatusTimestampInput(data.ended_at)
-      : undefined;
+    const started = data.started_at;
+    const ended = data.ended_at;
 
-    if (started && ended && ended.at.valueOf() < started.at.valueOf()) {
+    if (ended && ended.at.valueOf() < started.at.valueOf()) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['ended_at'],

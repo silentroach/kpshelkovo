@@ -1,6 +1,8 @@
 import { reference, type SchemaContext } from 'astro:content';
 import { z } from 'astro/zod';
 
+import { contentDateSchema, contentDateTimeSchema } from '@/lib/content-date';
+
 import {
   NEWS_AREAS,
   NEWS_AUTHOR_KINDS,
@@ -8,7 +10,6 @@ import {
   isAttachmentUrl,
   normalizeTagKey,
 } from './schema';
-import { normalizeNewsTimestampInput, parseNewsTimestampInput } from './date';
 import { RawSearchAliasesSchema } from '../search/raw-schema';
 
 const TAG = /^[а-яё0-9 -]+$/u;
@@ -28,39 +29,6 @@ const attachmentUrl = (name: string) =>
     (value) => isAttachmentUrl(value),
     `${name} must be an absolute URL or a root-relative path`,
   );
-
-const newsDate = (name: string) =>
-  z.union([text, z.date()]).transform((value, ctx) => {
-    const normalized = normalizeNewsTimestampInput(value);
-
-    if (normalized && parseNewsTimestampInput(value)) {
-      return normalized;
-    }
-
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `${name} must use dd.mm.yyyy, dd.mm.yyyy hh:mm, or YYYY-MM-DD`,
-    });
-
-    return z.NEVER;
-  });
-
-const newsDateTime = (name: string) =>
-  z.union([text, z.date()]).transform((value, ctx) => {
-    const normalized = normalizeNewsTimestampInput(value);
-    const parsed = parseNewsTimestampInput(value);
-
-    if (normalized && parsed?.has_time) {
-      return normalized;
-    }
-
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `${name} must use dd.mm.yyyy hh:mm and include time`,
-    });
-
-    return z.NEVER;
-  });
 
 const forbiddenTime = (name: string) =>
   text.refine(
@@ -133,8 +101,8 @@ const RawNewsEventSchema = z
       .optional(),
     title: eventText('events[].title'),
     description: eventText('events[].description').optional(),
-    starts_at: newsDateTime('events[].starts_at'),
-    ends_at: newsDateTime('events[].ends_at').optional(),
+    starts_at: contentDateTimeSchema('events[].starts_at'),
+    ends_at: contentDateTimeSchema('events[].ends_at').optional(),
     location: eventText('events[].location').optional(),
     coordinates: z
       .object({
@@ -155,12 +123,10 @@ const RawNewsEventSchema = z
       .optional(),
   })
   .superRefine((data, ctx) => {
-    const starts = parseNewsTimestampInput(data.starts_at);
-    const ends = data.ends_at
-      ? parseNewsTimestampInput(data.ends_at)
-      : undefined;
+    const starts = data.starts_at;
+    const ends = data.ends_at;
 
-    if (starts && ends && ends.at.valueOf() <= starts.at.valueOf()) {
+    if (ends && ends.at.valueOf() <= starts.at.valueOf()) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['ends_at'],
@@ -257,11 +223,11 @@ export const createRawNewsArticleSchema = (image: SchemaContext['image']) =>
     .object({
       title: text,
       summary: text,
-      date: newsDate('date'),
+      date: contentDateSchema('date'),
       time: forbiddenTime('time').optional(),
       author: reference('newsAuthors'),
       pinned: z.boolean().optional(),
-      pinned_until: newsDate('pinned_until').optional(),
+      pinned_until: contentDateSchema('pinned_until').optional(),
       areas: z.array(z.enum(NEWS_AREAS)).min(1).optional(),
       tags: z.array(tag()).min(1).optional(),
       search_aliases: RawSearchAliasesSchema.optional(),

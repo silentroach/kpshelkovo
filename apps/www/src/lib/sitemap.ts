@@ -11,7 +11,8 @@ import {
   statusCalendarMonthPath,
   statusCalendarYearPath,
 } from './status/routes';
-import { parseStatusTimestamp, type StatusKind } from './status/schema';
+import { parseContentDate } from './content-date';
+import type { StatusKind } from './status/schema';
 
 export interface SitemapMetadata {
   readonly lastmod?: string;
@@ -125,7 +126,7 @@ const timestampMs = (value: string): number => {
 };
 
 const statusTimestampMs = (value: string): number =>
-  parseStatusTimestamp(value)?.at.valueOf() ?? timestampMs(value);
+  parseContentDate(value)?.at.valueOf() ?? timestampMs(value);
 
 const laterLastmod = (
   a: string | undefined,

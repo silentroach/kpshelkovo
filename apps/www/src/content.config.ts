@@ -5,9 +5,9 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { RawKbPageSchema } from '@/lib/kb/raw-schema';
+import { parseContentDate } from '@/lib/content-date';
 import { RawContactSchema } from './lib/contacts/raw-schema';
 import { CONTACT_CATEGORIES, CONTACT_SLUG } from './lib/contacts/schema';
-import { parseNewsTimestampInput } from './lib/news/date';
 import {
   RawNewsAuthorSchema,
   createRawNewsArticleSchema,
@@ -26,7 +26,6 @@ import {
   reviewIdFromParts,
 } from './lib/reviews/schema';
 import { RawStatusIncidentSchema } from './lib/status/raw-schema';
-import { parseStatusTimestampInput } from './lib/status/schema';
 import { SettlementSchema } from './compare/lib/schema';
 
 const YEAR = /^\d{4}$/;
@@ -44,12 +43,6 @@ const NEWS_SUMMARIES_DIR = fileURLToPath(
   new URL('./data/news/summaries/', import.meta.url),
 );
 
-interface DateParts {
-  readonly year: string;
-  readonly month: string;
-  readonly day: string;
-}
-
 const trimMarkdown = (entry: string): string => entry.replace(/\.md$/i, '');
 
 const rawMarkdownBody = (root: string, entry: string): string =>
@@ -60,24 +53,6 @@ const articleId = (entry: string): string =>
 
 const hasDate = (data: unknown): data is { readonly date: unknown } =>
   typeof data === 'object' && data !== null && 'date' in data;
-
-function readDateParts(data: unknown): readonly DateParts[] {
-  if (!hasDate(data)) {
-    return [];
-  }
-
-  const parsed = parseNewsTimestampInput(data.date);
-
-  return parsed
-    ? [
-        {
-          year: parsed.year,
-          month: parsed.month,
-          day: parsed.day,
-        },
-      ]
-    : [];
-}
 
 function fail(kind: 'article', entry: string, reason: string): never {
   throw new Error(`news ${kind} path \"${entry}\" ${reason}`);
@@ -312,12 +287,9 @@ function validateArticleEntry(entry: string, data: unknown): void {
     );
   }
 
-  const dates = readDateParts(data);
+  const date = hasDate(data) ? parseContentDate(data.date) : undefined;
 
-  if (
-    dates.length > 0 &&
-    !dates.some((date) => date.year === year && date.month === month)
-  ) {
+  if (date && (date.year !== year || date.month !== month)) {
     fail('article', entry, 'must match the frontmatter date year and month');
   }
 
@@ -329,10 +301,7 @@ function validateArticleEntry(entry: string, data: unknown): void {
     fail('article', entry, 'numeric day keys must be valid calendar days');
   }
 
-  if (
-    dates.length > 0 &&
-    !dates.some((date) => Number(key) === Number(date.day))
-  ) {
+  if (date && Number(key) !== Number(date.day)) {
     fail(
       'article',
       entry,
@@ -390,7 +359,7 @@ function validateStatusEntry(entry: string, data: unknown): void {
   }
 
   const started = hasStartedAt(data)
-    ? parseStatusTimestampInput(data.started_at)
+    ? parseContentDate(data.started_at)
     : undefined;
 
   if (started && (started.year !== year || started.month !== month)) {

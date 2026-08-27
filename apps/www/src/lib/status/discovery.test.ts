@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
+import { contentDateSchema } from '@/lib/content-date';
 import type { StatusIncidentEntry } from './load';
 import type { StatusArea, StatusKind, StatusService } from './schema';
 import type {
@@ -20,6 +21,8 @@ interface EntryInput {
   readonly body?: string;
 }
 
+const testDate = contentDateSchema('test date');
+
 const entry = (input: EntryInput): StatusIncidentEntry => ({
   id: input.id,
   body: input.body ?? '',
@@ -27,8 +30,8 @@ const entry = (input: EntryInput): StatusIncidentEntry => ({
     title: input.title,
     service: input.service,
     kind: input.kind,
-    started_at: input.started_at,
-    ended_at: input.ended_at,
+    started_at: testDate.parse(input.started_at),
+    ended_at: input.ended_at ? testDate.parse(input.ended_at) : undefined,
     areas: input.areas ? [...input.areas] : undefined,
     source_url: input.source_url ?? `https://example.com/${input.id}`,
   },

@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 
 import { beforeAll, describe, expect, it } from 'vitest';
 
+import { contentDateSchema } from '../content-date';
 import {
   createEntityMentionGraph,
   type EntityMentionTarget,
@@ -31,6 +32,7 @@ let createPlaceMentionRefs: typeof import('../places/mentions').createPlaceMenti
 let createPlaceMentionTarget: typeof import('../places/mentions').createPlaceMentionTarget;
 let createStatusIncidentMentionRefs: typeof import('../status/mentions').createStatusIncidentMentionRefs;
 let createPersonProfileMentionRefs: typeof import('./mention-refs').createPersonProfileMentionRefs;
+const testDate = contentDateSchema('test date');
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
@@ -142,7 +144,7 @@ const article = (input: {
   data: {
     title: input.title,
     summary: input.summary,
-    date: input.date,
+    date: testDate.parse(input.date),
     author: { id: 'ig' } as NewsArticleEntry['data']['author'],
   },
 });
@@ -163,8 +165,8 @@ const incident = (input: {
     title: input.title,
     service: input.service,
     kind: input.kind,
-    started_at: input.started_at,
-    ended_at: input.ended_at,
+    started_at: testDate.parse(input.started_at),
+    ended_at: input.ended_at ? testDate.parse(input.ended_at) : undefined,
     areas: input.areas ? [...input.areas] : undefined,
     source_url: `https://example.com/${input.id}`,
   },

@@ -1,10 +1,7 @@
 import { isAbsoluteUrl } from '@shelkovo/url';
 import { z } from 'astro/zod';
 
-import {
-  normalizeNewsTimestampInput,
-  parseNewsTimestampInput,
-} from '@/lib/news/date';
+import { contentDateSchema } from '@/lib/content-date';
 
 const SPEAKER_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const TIME = /^\d{2}:[0-5]\d:[0-5]\d$/;
@@ -16,22 +13,6 @@ const absoluteUrl = (name: string) =>
     (value) => isAbsoluteUrl(value),
     `${name} must be an absolute URL`,
   );
-
-const meetingDate = (name: string) =>
-  z.union([text, z.date()]).transform((value, ctx) => {
-    const normalized = normalizeNewsTimestampInput(value);
-
-    if (normalized && parseNewsTimestampInput(value)) {
-      return normalized;
-    }
-
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `${name} must use dd.mm.yyyy, dd.mm.yyyy hh:mm, or YYYY-MM-DD`,
-    });
-
-    return z.NEVER;
-  });
 
 const speakerId = (name: string) =>
   text.refine(
@@ -100,10 +81,10 @@ const RawMeetingSpeakersSchema = z
 export const RawMeetingSchema = z
   .object({
     title: text,
-    date: meetingDate('date'),
+    date: contentDateSchema('date'),
     context: text,
     speakers: RawMeetingSpeakersSchema,
-    updated_at: meetingDate('updated_at').optional(),
+    updated_at: contentDateSchema('updated_at').optional(),
     source_urls: z.array(absoluteUrl('source_urls[]')).min(1).optional(),
   })
   .strict();

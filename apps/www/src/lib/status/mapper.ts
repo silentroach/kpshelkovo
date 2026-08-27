@@ -6,7 +6,6 @@ import {
   statusIncidentUrl,
 } from './routes';
 import {
-  parseStatusTimestamp,
   STATUS_AREAS,
   type StatusArea,
   type StatusKind,
@@ -33,31 +32,6 @@ interface MapRawStatusIncidentOptions {
   readonly now: Date;
   readonly mentionRegistry: SiteMentionRegistry;
 }
-
-const parseEntryTimestamp = (
-  value: string,
-  context: string,
-  expected?: { readonly year: string; readonly month: string },
-): NonNullable<ReturnType<typeof parseStatusTimestamp>> => {
-  const timestamp = parseStatusTimestamp(value);
-
-  if (!timestamp) {
-    throw new Error(
-      `${context} must use dd.mm.yyyy, dd.mm.yyyy hh:mm, or YYYY-MM-DD`,
-    );
-  }
-
-  if (
-    expected &&
-    (timestamp.year !== expected.year || timestamp.month !== expected.month)
-  ) {
-    throw new Error(
-      `${context} ${timestamp.iso} must match ${expected.year}/${expected.month}`,
-    );
-  }
-
-  return timestamp;
-};
 
 const incidentParts = (entry: RawStatusIncidentInput): EntryParts => {
   const parts = entry.id.split('/');
@@ -139,20 +113,14 @@ export const mapRawStatusIncident = (
   opts: MapRawStatusIncidentOptions,
 ): StatusIncident => {
   const parts = incidentParts(entry);
-  const started = parseEntryTimestamp(
-    entry.data.started_at,
-    `status incident "${entry.id}" started_at`,
-    {
-      year: parts.year,
-      month: parts.month,
-    },
-  );
-  const ended = entry.data.ended_at
-    ? parseEntryTimestamp(
-        entry.data.ended_at,
-        `status incident "${entry.id}" ended_at`,
-      )
-    : undefined;
+  const started = entry.data.started_at;
+  const ended = entry.data.ended_at;
+
+  if (started.year !== parts.year || started.month !== parts.month) {
+    throw new Error(
+      `status incident "${entry.id}" started_at ${started.iso} must match ${parts.year}/${parts.month}`,
+    );
+  }
 
   if (ended && ended.at.valueOf() < started.at.valueOf()) {
     throw new Error(
@@ -190,14 +158,14 @@ export const mapRawStatusIncident = (
     started: {
       at: started.at,
       iso: started.iso,
-      hasTime: started.has_time,
+      hasTime: started.hasTime,
     },
     ...(ended
       ? {
           ended: {
             at: ended.at,
             iso: ended.iso,
-            hasTime: ended.has_time,
+            hasTime: ended.hasTime,
           },
         }
       : {}),

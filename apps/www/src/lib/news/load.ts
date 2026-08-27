@@ -8,7 +8,6 @@ import { withBase } from '../site';
 import { validateArchiveSummaryMarkdown } from './archive-summary';
 import { buildArchives, newsMonthKey } from './archives';
 import { NEWS_LATEST_LIMIT } from './config';
-import { parseNewsTimestamp, parseNewsTimestampInput } from './date';
 import { mapRawNewsAuthor } from './mapper';
 import {
   articleCanonical,
@@ -58,58 +57,20 @@ type AttachmentInput = NonNullable<ArticleData['attachments']>[number];
 type AuthorReference = ArticleData['author'];
 type CoverInput = NonNullable<ArticleData['cover']>;
 type PhotoInput = NonNullable<ArticleData['photos']>[number];
-type NewsTimestampWithTime = NonNullable<
-  ReturnType<typeof parseNewsTimestampInput>
-> & {
-  readonly has_time: true;
-  readonly time: string;
-};
-
 let cache: Promise<NewsDataset> | undefined;
 
 const isPinnedAtBuild = (
-  input: {
-    readonly pinned?: boolean;
-    readonly pinned_until?: string;
-  },
+  input: Pick<ArticleData, 'pinned' | 'pinned_until'>,
   now: Date,
 ): boolean => {
   if (!input.pinned) {
     return false;
   }
 
-  const until = input.pinned_until
-    ? parseNewsTimestampInput(input.pinned_until)
-    : undefined;
-
-  return until ? now.valueOf() < until.at.valueOf() : true;
+  return input.pinned_until
+    ? now.valueOf() < input.pinned_until.at.valueOf()
+    : true;
 };
-
-function parseEntryTimestamp(
-  value: string,
-  context: string,
-  expected?: { readonly year: string; readonly month: string },
-): NonNullable<ReturnType<typeof parseNewsTimestamp>> {
-  const timestamp = parseNewsTimestamp(value);
-
-  if (!timestamp) {
-    throw new Error(
-      `${context} date must use dd.mm.yyyy, dd.mm.yyyy hh:mm, or YYYY-MM-DD`,
-    );
-  }
-
-  if (!expected) {
-    return timestamp;
-  }
-
-  if (timestamp.year !== expected.year || timestamp.month !== expected.month) {
-    throw new Error(
-      `${context} date ${timestamp.iso} must match ${expected.year}/${expected.month}`,
-    );
-  }
-
-  return timestamp;
-}
 
 const authorId = (ref: AuthorReference): string => ref.id;
 
@@ -194,9 +155,6 @@ const attachments = (
     size: item.size,
   })) ?? [];
 
-const parseValidatedEventTimestamp = (value: string): NewsTimestampWithTime =>
-  parseNewsTimestampInput(value) as NewsTimestampWithTime;
-
 const normalizeEventOrganizer = (
   input: EventData['organizer'],
 ): NewsEvent['organizer'] => {
@@ -246,10 +204,8 @@ function normalizeEvent(
   },
 ): NewsEvent {
   const slug = input.slug ?? 'event';
-  const starts = parseValidatedEventTimestamp(input.starts_at);
-  const ends = input.ends_at
-    ? parseValidatedEventTimestamp(input.ends_at)
-    : undefined;
+  const starts = input.starts_at;
+  const ends = input.ends_at;
 
   return {
     slug,
@@ -328,14 +284,13 @@ function normalizeArticle(
   now: Date,
 ): NewsArticle {
   const parts = articleParts(entry);
-  const published = parseEntryTimestamp(
-    entry.data.date,
-    `news article "${entry.id}"`,
-    {
-      year: parts.year,
-      month: parts.month,
-    },
-  );
+  const published = entry.data.date;
+  if (published.year !== parts.year || published.month !== parts.month) {
+    throw new Error(
+      `news article "${entry.id}" date ${published.iso} must match ${parts.year}/${parts.month}`,
+    );
+  }
+
   const area = areas(entry.data.areas);
   const author = needAuthor(
     authors,
