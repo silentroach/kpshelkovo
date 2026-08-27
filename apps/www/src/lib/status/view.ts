@@ -218,10 +218,6 @@ export const formatStatusCalendarDayCountLines = (
       : undefined,
   ].filter((part): part is string => Boolean(part));
 
-export const formatStatusCalendarDayCounts = (
-  day: Pick<StatusCalendarDay, 'incidentCount' | 'maintenanceCount'>,
-): string => formatStatusCalendarDayCountLines(day).join(', ');
-
 export const formatStatusCalendarDayDate = (
   day: Pick<StatusCalendarDay, 'id'>,
 ): string => formatDate(day.id);

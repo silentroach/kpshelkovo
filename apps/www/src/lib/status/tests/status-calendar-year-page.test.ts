@@ -503,7 +503,7 @@ describe('/status/calendar/YYYY/', () => {
         "links": [
           {
             "describedBy": "status-calendar-tooltip-2026-01-01",
-            "description": "1 плановая работа",
+            "description": "Откроется журнал за этот день",
             "descriptionExists": true,
             "href": "/status/calendar/2026/01/#2026-01-01",
             "id": "2026-01-01",
@@ -512,7 +512,7 @@ describe('/status/calendar/YYYY/', () => {
           },
           {
             "describedBy": "status-calendar-tooltip-2026-08-23",
-            "description": "1 проблема",
+            "description": "Откроется журнал за этот день",
             "descriptionExists": true,
             "href": "/status/calendar/2026/08/#2026-08-23",
             "id": "2026-08-23",
@@ -521,7 +521,7 @@ describe('/status/calendar/YYYY/', () => {
           },
           {
             "describedBy": "status-calendar-tooltip-2026-08-24",
-            "description": "2 проблемы, 1 плановая работа",
+            "description": "Откроется журнал за этот день",
             "descriptionExists": true,
             "href": "/status/calendar/2026/08/#2026-08-24",
             "id": "2026-08-24",
@@ -551,7 +551,7 @@ describe('/status/calendar/YYYY/', () => {
             "ariaHidden": "true",
             "id": "status-calendar-tooltip-2026-01-01",
             "interactiveElements": 0,
-            "label": "1 плановая работа",
+            "label": "Откроется журнал за этот день",
             "role": "tooltip",
             "text": "1·января·2026
       1·плановая·работа",
@@ -560,7 +560,7 @@ describe('/status/calendar/YYYY/', () => {
             "ariaHidden": "true",
             "id": "status-calendar-tooltip-2026-08-23",
             "interactiveElements": 0,
-            "label": "1 проблема",
+            "label": "Откроется журнал за этот день",
             "role": "tooltip",
             "text": "23·августа·2026
       1·проблема",
@@ -569,7 +569,7 @@ describe('/status/calendar/YYYY/', () => {
             "ariaHidden": "true",
             "id": "status-calendar-tooltip-2026-08-24",
             "interactiveElements": 0,
-            "label": "2 проблемы, 1 плановая работа",
+            "label": "Откроется журнал за этот день",
             "role": "tooltip",
             "text": "24·августа·2026
       2·проблемы

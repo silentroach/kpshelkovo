@@ -2,7 +2,6 @@
 import type { StatusCalendarMonthGrid } from '@/lib/status/calendar.types';
 import { statusCalendarDayUrl } from '@/lib/status/routes';
 import {
-  formatStatusCalendarDayCounts,
   formatStatusCalendarDayLabel,
   formatStatusCalendarDayTooltipSummary,
 } from '@/lib/status/view';
@@ -13,6 +12,7 @@ interface Props {
 
 const { month } = Astro.props;
 const titleId = `status-calendar-month-${month.month}`;
+const tooltipDescription = 'Откроется журнал за этот день';
 const weekdays = [
   ['Пн', 'Понедельник'],
   ['Вт', 'Вторник'],
@@ -54,9 +54,6 @@ const weekdays = [
               const status = day.status;
               const linkLabel = status
                 ? formatStatusCalendarDayLabel(status)
-                : undefined;
-              const tooltipDescription = status
-                ? formatStatusCalendarDayCounts(status)
                 : undefined;
               const tooltipSummary = status
                 ? formatStatusCalendarDayTooltipSummary(status)
