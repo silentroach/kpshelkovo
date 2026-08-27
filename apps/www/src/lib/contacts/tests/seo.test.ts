@@ -1,8 +1,9 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, expectTypeOf, it } from 'vitest';
 
 import type { Contact } from '../types';
 
 let contactPageSchema: typeof import('../seo').contactPageSchema;
+let contactsCollectionPageSchema: typeof import('../seo').contactsCollectionPageSchema;
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
@@ -10,7 +11,8 @@ beforeAll(async () => {
     BASE_URL: '/',
   });
 
-  ({ contactPageSchema } = await import('../seo'));
+  ({ contactPageSchema, contactsCollectionPageSchema } =
+    await import('../seo'));
 });
 
 const contact = {
@@ -79,5 +81,18 @@ describe('contactPageSchema', () => {
     expect(JSON.stringify(schema)).not.toMatch(
       /Review|Rating|AggregateRating/u,
     );
+  });
+});
+
+describe('contactsCollectionPageSchema', () => {
+  it('keeps URLs required for contact list entries', () => {
+    type ContactListEntry = Parameters<
+      typeof contactsCollectionPageSchema
+    >[0]['items'][number];
+
+    expectTypeOf<ContactListEntry>().toEqualTypeOf<{
+      readonly name: string;
+      readonly url: string;
+    }>();
   });
 });

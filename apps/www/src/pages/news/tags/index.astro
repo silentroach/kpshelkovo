@@ -6,8 +6,8 @@ import {
   withHomeBreadcrumbs,
   withHomeSchemaBreadcrumbs,
 } from '@/lib/breadcrumbs';
+import { collectionPageSchema } from '@/lib/json-ld';
 import { loadNewsTags } from '@/lib/news/load';
-import { collectionPageSchema } from '@/lib/news/seo';
 import { newsUrl, tagsUrl } from '@/lib/news/routes';
 
 const tags = await loadNewsTags();

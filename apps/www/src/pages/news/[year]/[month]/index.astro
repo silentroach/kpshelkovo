@@ -9,8 +9,8 @@ import {
   withHomeSchemaBreadcrumbs,
 } from '@/lib/breadcrumbs';
 import NewsList from '@/components/news/NewsList.astro';
+import { collectionPageSchema } from '@/lib/json-ld';
 import { loadNewsArchives, loadNewsMonth } from '@/lib/news/load';
-import { collectionPageSchema } from '@/lib/news/seo';
 import { formatNewsMonth } from '@/lib/news/view';
 import { monthUrl, newsUrl, yearUrl } from '@/lib/news/routes';
 

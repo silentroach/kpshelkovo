@@ -8,9 +8,9 @@ import {
   withHomeSchemaBreadcrumbs,
 } from '@/lib/breadcrumbs';
 import NewsList from '@/components/news/NewsList.astro';
+import { collectionPageSchema } from '@/lib/json-ld';
 import { NEWS_LATEST_LIMIT } from '@/lib/news/config';
 import { loadNewsTag, loadNewsTags } from '@/lib/news/load';
-import { collectionPageSchema } from '@/lib/news/seo';
 import { newsUrl, tagUrl, tagsUrl } from '@/lib/news/routes';
 
 export const getStaticPaths = (async () => {

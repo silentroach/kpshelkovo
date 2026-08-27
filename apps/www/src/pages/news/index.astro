@@ -6,9 +6,9 @@ import {
   withHomeBreadcrumbs,
   withHomeSchemaBreadcrumbs,
 } from '@/lib/breadcrumbs';
+import { collectionPageSchema } from '@/lib/json-ld';
 import { loadNewsData } from '@/lib/news/load';
 import { newsArchiveUrl, newsUrl } from '@/lib/news/routes';
-import { collectionPageSchema } from '@/lib/news/seo';
 
 const data = await loadNewsData();
 const articles = [...data.home.pinned, ...data.home.latest];
