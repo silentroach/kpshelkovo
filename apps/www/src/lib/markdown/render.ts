@@ -19,7 +19,103 @@ const FENCED_CODE_BLOCK_LINE = /^[ \t]{0,3}(`{3,}|~{3,})/;
 const HYPHENATED_ORDERED_LIST_ITEM_LINE = /^([ \t]*)-\s+(\d+)([.)])(\s+)/;
 const MARKDOWN_SECTION_BOUNDARY_LINE = /^[ \t]{0,3}(?:#{1,6}\s|[-*_]{3,}\s*$)/;
 const TOP_LEVEL_ORDERED_LIST_ITEM_LINE = /^([ \t]{0,3})(\d+)\.(\s+)/;
-const LEGAL_SUBCLAUSE_LINE = /^[ \t]{0,3}(\d+)\.\d+(?:\.\d+)*\.\s+/;
+const LEGAL_OUTLINE_LINE = /^([ \t]{0,3})(\d+(?:\.\d+)+)\.\s+/;
+const UNORDERED_LIST_ITEM_LINE = /^[ \t]{0,3}[-+*]\s+/;
+
+const continuesLegalOutline = (
+  previous: string,
+  candidate: string,
+): boolean => {
+  const previousSeparator = previous.lastIndexOf('.');
+  const candidateSeparator = candidate.lastIndexOf('.');
+  const previousParent = previous.slice(0, previousSeparator);
+  const candidateParent = candidate.slice(0, candidateSeparator);
+  const previousIndex = Number(previous.slice(previousSeparator + 1));
+  const candidateIndex = Number(candidate.slice(candidateSeparator + 1));
+
+  return (
+    (candidateParent === previousParent &&
+      candidateIndex === previousIndex + 1) ||
+    (candidateParent === previous && candidateIndex === 1)
+  );
+};
+
+const restoreLegalOutlineListBoundaries = (markdown: string): string => {
+  let fenceMarker: string | undefined;
+  let fenceLength = 0;
+  let previousLegalOutline: string | undefined;
+  let hasUnorderedList = false;
+
+  return markdown
+    .split('\n')
+    .map((line) => {
+      const fence = FENCED_CODE_BLOCK_LINE.exec(line)?.[1];
+
+      if (fence) {
+        const marker = fence[0];
+
+        if (!fenceMarker) {
+          fenceMarker = marker;
+          fenceLength = fence.length;
+          previousLegalOutline = undefined;
+          hasUnorderedList = false;
+
+          return line;
+        }
+
+        if (marker === fenceMarker && fence.length >= fenceLength) {
+          fenceMarker = undefined;
+          fenceLength = 0;
+        }
+
+        return line;
+      }
+
+      if (fenceMarker) {
+        return line;
+      }
+
+      if (MARKDOWN_SECTION_BOUNDARY_LINE.test(line)) {
+        previousLegalOutline = undefined;
+        hasUnorderedList = false;
+
+        return line;
+      }
+
+      const legalOutline = LEGAL_OUTLINE_LINE.exec(line);
+
+      if (legalOutline) {
+        const indentation = legalOutline[1] ?? '';
+        const marker = legalOutline[2] ?? '';
+        const restoresBoundary =
+          indentation.length > 0 &&
+          hasUnorderedList &&
+          !!previousLegalOutline &&
+          continuesLegalOutline(previousLegalOutline, marker);
+
+        if (indentation.length === 0 || restoresBoundary) {
+          previousLegalOutline = marker;
+          hasUnorderedList = false;
+        }
+
+        return restoresBoundary ? line.slice(indentation.length) : line;
+      }
+
+      if (UNORDERED_LIST_ITEM_LINE.test(line)) {
+        hasUnorderedList = true;
+
+        return line;
+      }
+
+      if (/^\S/.test(line)) {
+        previousLegalOutline = undefined;
+        hasUnorderedList = false;
+      }
+
+      return line;
+    })
+    .join('\n');
+};
 
 const normalizeHyphenatedOrderedListMarkdown = (markdown: string): string => {
   let fenceMarker: string | undefined;
@@ -74,7 +170,7 @@ const hasMatchingLegalSubclause = (
       return false;
     }
 
-    if (LEGAL_SUBCLAUSE_LINE.exec(line)?.[1] === prefix) {
+    if (LEGAL_OUTLINE_LINE.exec(line)?.[2]?.split('.')[0] === prefix) {
       return true;
     }
   }
@@ -135,7 +231,9 @@ export const preprocessSiteMarkdown = (
   options?: RenderSiteMarkdownOptions,
 ): PreprocessedSiteMarkdown => {
   const normalizedMarkdown = escapeLegalOutlineTopLevelMarkers(
-    normalizeHyphenatedOrderedListMarkdown(markdown),
+    normalizeHyphenatedOrderedListMarkdown(
+      restoreLegalOutlineListBoundaries(markdown),
+    ),
   );
 
   if (!options?.mentions) {
