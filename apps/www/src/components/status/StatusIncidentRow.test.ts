@@ -40,6 +40,9 @@ const incident = {
   duration: { totalMinutes: 9 * 60 + 6 },
 } satisfies StatusIncident;
 
+const lifecycleTone = (html: string): string =>
+  html.match(/text-\[color:var\(--color-(danger|success)\)\]/u)?.[1] ?? 'none';
+
 describe('StatusIncidentRow', () => {
   it('renders incident title links without leading whitespace', async () => {
     const container = await createAstroContainer();
@@ -53,5 +56,30 @@ describe('StatusIncidentRow', () => {
     expect(html).not.toMatch(
       /<a(?=[^>]*class="[^"]*\bui-link\b[^"]*")[^>]*>\s+Отключение/u,
     );
+  });
+
+  it('renders incident lifecycle icons from phase', async () => {
+    const container = await createAstroContainer();
+    const render = (
+      kind: StatusIncident['kind'],
+      phase: StatusIncident['phase'],
+    ) =>
+      container.renderToString(StatusIncidentRow, {
+        props: { incident: { ...incident, kind, phase } },
+      });
+
+    expect({
+      scheduled: lifecycleTone(await render('incident', 'scheduled')),
+      active: lifecycleTone(await render('incident', 'active')),
+      resolved: lifecycleTone(await render('incident', 'resolved')),
+      maintenance: lifecycleTone(await render('maintenance', 'resolved')),
+    }).toMatchInlineSnapshot(`
+      {
+        "active": "danger",
+        "maintenance": "none",
+        "resolved": "success",
+        "scheduled": "none",
+      }
+    `);
   });
 });

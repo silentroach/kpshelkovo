@@ -22,7 +22,7 @@ const titleIcon =
           Icon: AlertCircleIcon,
           toneClass: 'text-[color:var(--color-danger)]',
         }
-      : incident.ended
+      : incident.phase === 'resolved'
         ? {
             Icon: CheckCircleIcon,
             toneClass: 'text-[color:var(--color-success)]',
