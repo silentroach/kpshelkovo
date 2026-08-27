@@ -8,6 +8,7 @@ import compressor from 'astro-compressor';
 import tailwindcss from '@tailwindcss/vite';
 import {
   applySitemapMetadata,
+  shouldIncludeSitemapPage,
   type SitemapMetadataIndex,
 } from './src/lib/sitemap';
 import { loadSitemapMetadataIndex } from './src/lib/sitemap-data';
@@ -92,9 +93,7 @@ export default defineConfig({
     pagefindDevSnapshot(),
     svelte(),
     sitemap({
-      filter(page) {
-        return !/\/404(?:\/|\.html)?$/.test(page);
-      },
+      filter: shouldIncludeSitemapPage,
       serialize: serializeSitemapItem,
     }),
     indexNowUrlManifest(indexNowUrls),

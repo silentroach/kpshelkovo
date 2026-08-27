@@ -1,0 +1,35 @@
+---
+import type { StatusCalendarDayKind } from '@/lib/status/calendar.types';
+
+interface Props {
+  readonly kind: StatusCalendarDayKind;
+}
+
+const { kind } = Astro.props;
+const label =
+  kind === 'incident'
+    ? 'Есть инциденты'
+    : kind === 'maintenance'
+      ? 'Есть плановые работы'
+      : 'Есть инциденты и плановые работы';
+---
+
+<span
+  role="img"
+  aria-label={label}
+  data-status-calendar-marker={kind}
+  class:list={[
+    'inline-flex size-4 shrink-0 items-center justify-center rounded-full',
+    kind === 'incident' && 'bg-[color:var(--color-danger)]',
+    kind !== 'incident' && 'border-2 border-[color:var(--color-accent-text)]',
+  ]}
+>
+  {
+    kind === 'mixed' && (
+      <span
+        aria-hidden="true"
+        class="size-2 rounded-full bg-[color:var(--color-danger)]"
+      />
+    )
+  }
+</span>
