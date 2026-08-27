@@ -31,8 +31,9 @@ export const hydrateHomeHero = (
   }
 
   if (src && srcset) {
-    image.src = src;
     image.srcset = srcset;
+    image.src = src;
+    image.hidden = false;
   }
 };
 
