@@ -69,7 +69,7 @@ export default defineConfig({
   },
   prefetch: {
     prefetchAll: true,
-    defaultStrategy: 'hover',
+    defaultStrategy: 'tap',
   },
   outDir: 'dist/site',
   srcDir: 'src',

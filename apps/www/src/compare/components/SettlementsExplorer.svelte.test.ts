@@ -157,8 +157,8 @@ describe('SettlementsExplorer', () => {
     delete (window as { ymaps3?: unknown }).ymaps3;
   });
 
-  it('hides map by default on mobile', async () => {
-    setScreen(true);
+  it('hides map until requested', async () => {
+    setScreen(false);
 
     const { container } = render(SettlementsExplorer, {
       props: { settlements, comparisons, stats },
@@ -194,9 +194,11 @@ describe('SettlementsExplorer', () => {
   it('updates map markers after filter change', async () => {
     setScreen(false);
 
-    const { getByLabelText } = render(SettlementsExplorer, {
+    const { getByLabelText, getByTestId } = render(SettlementsExplorer, {
       props: { settlements, comparisons, stats },
     });
+
+    await fireEvent.click(getByTestId('map-toggle'));
 
     await waitFor(() => {
       expect(mockYandexMaps.YMapMarker).toHaveBeenCalledTimes(3);
@@ -444,6 +446,11 @@ describe('SettlementsExplorer', () => {
     expect(getByTestId('price-more-count').textContent).toBe('0');
 
     const btn = getByTestId('map-toggle');
+    await fireEvent.click(btn);
+
+    await waitFor(() => {
+      expect(btn.getAttribute('aria-expanded')).toBe('true');
+    });
     const mapid = btn.getAttribute('aria-controls');
     expect(mapid).toBeTruthy();
     expect(container.querySelector(`#${mapid}`)).toBeTruthy();

@@ -17,7 +17,6 @@ declare global {
     __shelkovoSearchDialogLoader?: boolean;
     __shelkovoSiteHeaderMenu?: boolean;
     __shelkovoSiteNavDropdowns?: boolean;
-    __shelkovoSettlementsFallback?: boolean;
     __shelkovoSearchHighlights?: boolean;
     __shelkovoYmDeferred?: boolean;
     __shelkovoYmLoaded?: boolean;
@@ -513,19 +512,6 @@ const bindSearchDialogLoader = (): void => {
   });
 };
 
-const bindSettlementsFallback = (): void => {
-  if (window.__shelkovoSettlementsFallback) {
-    return;
-  }
-
-  window.__shelkovoSettlementsFallback = true;
-  window.addEventListener('explorer:ready', () => {
-    document
-      .getElementById('settlements-static')
-      ?.style.setProperty('display', 'none');
-  });
-};
-
 const installSearchHighlights = (): void => {
   if (window.__shelkovoSearchHighlights) {
     return;
@@ -559,7 +545,6 @@ runWhenDocumentReady(() => installHomeStatusHydration());
 runWhenDocumentReady(() => installStatusServiceStateHydration());
 bindMetrikaLoader();
 bindMetrikaTransitions();
-bindSettlementsFallback();
 installSearchHighlights();
 
 export {};

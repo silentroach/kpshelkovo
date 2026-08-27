@@ -711,7 +711,7 @@ const heroMap = hasPoint
         title="Инфраструктура"
         infra={settlement.infrastructure}
         shelkovoInfra={!isBaseline ? baseline.infrastructure : undefined}
-        client:idle
+        client:visible
       />
     </section>
 
@@ -723,7 +723,7 @@ const heroMap = hasPoint
         title="Общие пространства"
         spaces={settlement.commonSpaces}
         shelkovoSpaces={!isBaseline ? baseline.commonSpaces : undefined}
-        client:idle
+        client:visible
       />
     </section>
 
@@ -735,7 +735,7 @@ const heroMap = hasPoint
         title="Модель обслуживания"
         services={settlement.serviceModel}
         shelkovoServices={!isBaseline ? baseline.serviceModel : undefined}
-        client:idle
+        client:visible
       />
     </section>
 

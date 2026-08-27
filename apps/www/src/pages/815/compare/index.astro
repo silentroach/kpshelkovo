@@ -2,7 +2,6 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/compare/components/Hero.svelte';
 import KPIStats from '@/compare/components/KPIStats.svelte';
-import SettlementCard from '@/compare/components/SettlementCard.svelte';
 import SettlementsExplorer from '@/compare/components/SettlementsExplorer.svelte';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import {
@@ -10,25 +9,17 @@ import {
   compareBreadcrumbSchema,
 } from '@/compare/lib/breadcrumbs';
 import { loadAllData } from '@/compare/lib/data';
-import { toExplorer } from '@/compare/lib/explorer';
+import { toExplorerPayload } from '@/compare/lib/explorer';
 import { compareHomeMeta } from '@/compare/lib/seo';
 import { canon } from '@/compare/lib/site';
-import { rankSettlements } from '@/compare/lib/stats';
 import { withBase } from '@/compare/lib/url';
 
-// Load all data at build time
-const { settlements, baseline, stats, comparisons, ratings } =
-  await loadAllData();
-const ranks = rankSettlements(settlements);
-const levels = Math.max(new Set(ranks.values()).size, 1);
-const list = toExplorer(settlements, ratings, baseline);
-
-// Convert comparisons Map to a plain object for serialization
-const comparisonsObj = Object.fromEntries(comparisons);
-const dataUrl = withBase('data/explorer.json');
+const data = await loadAllData();
+const { stats } = data;
+const explorer = toExplorerPayload(data);
 const ratingUrl = withBase('/rating/');
 
-const cards = [...list].sort((a, b) => {
+const cards = [...explorer.settlements].sort((a, b) => {
   const d = b.rating - a.rating;
   if (d !== 0) return d;
   return a.shortName.localeCompare(b.shortName, 'ru');
@@ -63,7 +54,6 @@ const schema = {
   description={pageMeta.description}
   keywords={pageMeta.keywords}
   schema={[schema, breadcrumb]}
-  preconnectYandexMaps
 >
   <main class="ui-page pb-6 md:pb-10 lg:pb-12">
     <section class="ui-page-header">
@@ -89,26 +79,12 @@ const schema = {
       <h2 id="settlements-title" class="sr-only">
         Список поселков для сравнения
       </h2>
-      <SettlementsExplorer dataUrl={dataUrl} client:only="svelte" />
-
-      <div id="settlements-static">
-        <div
-          class="grid grid-cols-1 border-b border-border md:grid-cols-2 md:gap-4 md:border-b-0 lg:grid-cols-3"
-        >
-          {
-            cards.map((settlement) => (
-              <SettlementCard
-                settlement={settlement}
-                comparison={comparisonsObj[settlement.slug]}
-                rank={ranks.get(settlement.slug) ?? levels}
-                base={stats.shelkovoRank}
-                total={levels}
-                isBaseline={settlement.isBaseline}
-              />
-            ))
-          }
-        </div>
-      </div>
+      <SettlementsExplorer
+        settlements={explorer.settlements}
+        comparisons={explorer.comparisons}
+        stats={explorer.stats}
+        client:load
+      />
     </section>
   </main>
 </BaseLayout>

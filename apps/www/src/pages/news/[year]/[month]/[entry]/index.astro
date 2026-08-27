@@ -1,5 +1,5 @@
 ---
-import { getImage } from 'astro:assets';
+import { Image } from 'astro:assets';
 import { getEntry } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import { padNumber } from '@shelkovo/format';
@@ -57,22 +57,10 @@ const monthBreadcrumbName = formatNewsMonth(article.year, article.month, {
   capitalize: true,
   includeYear: false,
 });
-const heroCoverWidth = source.data.cover
-  ? Math.min(source.data.cover.width, 2200)
-  : undefined;
-const heroCover =
-  source.data.cover && heroCoverWidth
-    ? await getImage({
-        src: source.data.cover,
-        width: heroCoverWidth,
-        format: 'webp',
-        quality: 82,
-      })
-    : undefined;
-const heroCoverUrl = heroCover?.src;
-const hasHeroCover = Boolean(heroCoverUrl);
+const heroCover = source.data.cover;
+const hasHeroCover = Boolean(heroCover);
 const hasEvents = article.events.length > 0;
-const heroImageStyle = heroCoverUrl
+const heroImageStyle = heroCover
   ? [
       'object-position: 50% 64%',
       '-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 68%, rgba(0, 0, 0, 0.86) 82%, rgba(0, 0, 0, 0) 100%)',
@@ -144,13 +132,19 @@ const schema = newsArticleSchema({
 >
   <main class="pb-6 md:pb-10 lg:pb-12">
     {
-      hasHeroCover ? (
+      heroCover ? (
         <header class="news-hero relative isolate overflow-hidden bg-background">
-          <img
-            src={heroCoverUrl}
+          <Image
+            src={heroCover}
+            widths={[480, 640, 960, 1280, 1600, 2200]}
+            sizes="100vw"
+            format="webp"
+            quality={82}
             alt=""
             aria-hidden="true"
             loading="eager"
+            decoding="async"
+            fetchpriority="high"
             class="absolute inset-0 h-full w-full object-cover brightness-105"
             style={heroImageStyle}
           />

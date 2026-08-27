@@ -7,7 +7,7 @@ import { unified, type Plugin } from 'unified';
 
 import { uniqueHeadingSlug } from './heading-slugs';
 import type { HtmlTreeNode } from './html-tree.types';
-import { rehypeImageFigures } from './image-figures';
+import { rehypeMarkdownImages } from './image-figures';
 import { assertNoMarkdownTables } from './no-tables';
 import { rehypeTaskListItemLabels } from './task-list-labels';
 import { expandTableOfContents } from './toc';
@@ -99,7 +99,7 @@ const processor = unified()
   .use(remarkRehype)
   .use(rehypeHeadingIds)
   .use(rehypeTaskListItemLabels)
-  .use(rehypeImageFigures)
+  .use(rehypeMarkdownImages)
   .use(rehypeTypograf)
   .use(rehypeStringify);
 
