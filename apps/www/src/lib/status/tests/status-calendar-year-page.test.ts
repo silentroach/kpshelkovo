@@ -140,6 +140,22 @@ const staticPathYears = (
   }[],
 ): readonly (string | undefined)[] => paths.map((path) => path.params.year);
 
+const yearNavigation = (document: ReturnType<typeof parseHtml>) =>
+  ['previous', 'next'].map((direction) => {
+    const control = document.querySelector(
+      `[data-status-calendar-${direction}]`,
+    );
+
+    return {
+      direction,
+      tag: control?.tagName,
+      href: control?.getAttribute('href') ?? undefined,
+      disabled: control?.hasAttribute('disabled'),
+      label: control?.getAttribute('aria-label'),
+      text: cleanText(control?.textContent ?? ''),
+    };
+  });
+
 beforeAll(() => {
   vi.useFakeTimers();
   vi.setSystemTime(DEFAULT_NOW);
@@ -150,169 +166,185 @@ afterAll(() => {
 });
 
 describe('/status/calendar/YYYY/', () => {
-  it('shares one build-year snapshot between HTML and Markdown routes', async () => {
-    vi.setSystemTime(new Date('2026-12-31T23:59:00+03:00'));
+  it('renders an empty current year as a regular single-year calendar', async () => {
+    const originalYears = fixtures.data.calendar.years;
+    const originalByDay = fixtures.data.calendar.byDay;
+    fixtures.data.calendar.years = [];
+    fixtures.data.calendar.byDay = new Map();
 
     try {
-      const htmlPaths = await StatusCalendarYearPage.getStaticPaths();
-
-      vi.setSystemTime(new Date('2027-01-01T00:01:00+03:00'));
-
-      const markdownPaths =
-        await StatusCalendarYearMarkdownRoute.getStaticPaths();
+      const [htmlPaths, markdownPaths, html] = await Promise.all([
+        StatusCalendarYearPage.getStaticPaths(),
+        StatusCalendarYearMarkdownRoute.getStaticPaths(),
+        renderPage(),
+      ]);
+      const document = parseHtml(html);
 
       expect({
         htmlYears: staticPathYears(htmlPaths),
         markdownYears: staticPathYears(markdownPaths),
+        monthCount: document.querySelectorAll('[data-status-calendar-month]')
+          .length,
+        hasEmptyState: cleanText(document.body.textContent).includes(
+          'Нет записей',
+        ),
+        navigation: yearNavigation(document),
       }).toMatchInlineSnapshot(`
         {
+          "hasEmptyState": false,
           "htmlYears": [
             "2026",
-            "2027",
           ],
           "markdownYears": [
             "2026",
-            "2027",
           ],
-        }
-      `);
-    } finally {
-      vi.setSystemTime(DEFAULT_NOW);
-    }
-  });
-
-  it('keeps completed calendar years after a Moscow New Year deployment', async () => {
-    fixtures.data.calendar.buildYear = 2027;
-
-    try {
-      const [htmlPaths, markdownPaths] = await Promise.all([
-        StatusCalendarYearPage.getStaticPaths(),
-        StatusCalendarYearMarkdownRoute.getStaticPaths(),
-      ]);
-
-      expect({ htmlPaths, markdownPaths }).toMatchInlineSnapshot(`
-        {
-          "htmlPaths": [
+          "monthCount": 12,
+          "navigation": [
             {
-              "params": {
-                "year": "2026",
-              },
+              "direction": "previous",
+              "disabled": true,
+              "href": undefined,
+              "label": "Предыдущего года нет",
+              "tag": "BUTTON",
+              "text": "←",
             },
             {
-              "params": {
-                "year": "2027",
-              },
-            },
-            {
-              "params": {
-                "year": "2028",
-              },
-            },
-          ],
-          "markdownPaths": [
-            {
-              "params": {
-                "year": "2026",
-              },
-            },
-            {
-              "params": {
-                "year": "2027",
-              },
-            },
-            {
-              "params": {
-                "year": "2028",
-              },
+              "direction": "next",
+              "disabled": true,
+              "href": undefined,
+              "label": "Следующего года нет",
+              "tag": "BUTTON",
+              "text": "→",
             },
           ],
         }
       `);
     } finally {
-      fixtures.data.calendar.buildYear = 2026;
+      fixtures.data.calendar.years = originalYears;
+      fixtures.data.calendar.byDay = originalByDay;
     }
   });
 
-  it('renders every path from one static year snapshot across Moscow New Year', async () => {
-    vi.setSystemTime(new Date('2026-12-31T23:59:00+03:00'));
-    const oldYear = Number(
-      (await StatusCalendarYearPage.getStaticPaths())[0]?.params.year,
-    );
+  it('jumps year gaps and only links matching HTML and Markdown targets', async () => {
+    const originalYears = fixtures.data.calendar.years;
+    fixtures.data.calendar.years = [
+      { year: 2028, months: [] },
+      ...originalYears,
+      { year: 2022, months: [] },
+    ];
 
     try {
-      vi.setSystemTime(new Date('2027-01-01T00:01:00+03:00'));
-      const [html, markdownResponse] = await Promise.all([
-        renderPage(oldYear),
-        renderMarkdownRoute(oldYear),
-      ]);
+      const [htmlPaths, markdownPaths, currentHtml, firstHtml, lastHtml] =
+        await Promise.all([
+          StatusCalendarYearPage.getStaticPaths(),
+          StatusCalendarYearMarkdownRoute.getStaticPaths(),
+          renderPage(2026),
+          renderPage(2022),
+          renderPage(2028),
+        ]);
+      const htmlYears = staticPathYears(htmlPaths);
+      const markdownYears = staticPathYears(markdownPaths);
+      const currentDocument = parseHtml(currentHtml);
+      const linkedYears = [
+        ...currentDocument.querySelectorAll(
+          '[data-status-calendar-year-navigation] a[href]',
+        ),
+      ].map((link) => link.getAttribute('href')?.match(/\/(\d{4})\/$/u)?.[1]);
 
       expect({
-        oldYear,
-        htmlYear: parseHtml(html)
-          .querySelector('[data-status-calendar-year]')
-          ?.getAttribute('data-status-calendar-year'),
-        markdownStatus: markdownResponse.status,
+        htmlYears,
+        markdownYears,
+        current: yearNavigation(currentDocument),
+        first: yearNavigation(parseHtml(firstHtml)),
+        last: yearNavigation(parseHtml(lastHtml)),
+        linkedTargetsExist: linkedYears.map((year) => ({
+          year,
+          html: htmlYears.includes(year),
+          markdown: markdownYears.includes(year),
+        })),
       }).toMatchInlineSnapshot(`
         {
-          "htmlYear": "2026",
-          "markdownStatus": 200,
-          "oldYear": 2026,
+          "current": [
+            {
+              "direction": "previous",
+              "disabled": false,
+              "href": "/status/calendar/2022/",
+              "label": "Календарь за 2022 год",
+              "tag": "A",
+              "text": "←2022",
+            },
+            {
+              "direction": "next",
+              "disabled": false,
+              "href": "/status/calendar/2028/",
+              "label": "Календарь за 2028 год",
+              "tag": "A",
+              "text": "2028→",
+            },
+          ],
+          "first": [
+            {
+              "direction": "previous",
+              "disabled": true,
+              "href": undefined,
+              "label": "Предыдущего года нет",
+              "tag": "BUTTON",
+              "text": "←",
+            },
+            {
+              "direction": "next",
+              "disabled": false,
+              "href": "/status/calendar/2026/",
+              "label": "Календарь за 2026 год",
+              "tag": "A",
+              "text": "2026→",
+            },
+          ],
+          "htmlYears": [
+            "2022",
+            "2026",
+            "2028",
+          ],
+          "last": [
+            {
+              "direction": "previous",
+              "disabled": false,
+              "href": "/status/calendar/2026/",
+              "label": "Календарь за 2026 год",
+              "tag": "A",
+              "text": "←2026",
+            },
+            {
+              "direction": "next",
+              "disabled": true,
+              "href": undefined,
+              "label": "Следующего года нет",
+              "tag": "BUTTON",
+              "text": "→",
+            },
+          ],
+          "linkedTargetsExist": [
+            {
+              "html": true,
+              "markdown": true,
+              "year": "2022",
+            },
+            {
+              "html": true,
+              "markdown": true,
+              "year": "2028",
+            },
+          ],
+          "markdownYears": [
+            "2022",
+            "2026",
+            "2028",
+          ],
         }
       `);
     } finally {
-      vi.setSystemTime(DEFAULT_NOW);
+      fixtures.data.calendar.years = originalYears;
     }
-  });
-
-  it('creates the current and upcoming Moscow years for HTML and Markdown', async () => {
-    const [htmlPaths, markdownPaths, upcomingHtml] = await Promise.all([
-      StatusCalendarYearPage.getStaticPaths(),
-      StatusCalendarYearMarkdownRoute.getStaticPaths(),
-      renderPage(2027),
-    ]);
-    const upcomingDocument = parseHtml(upcomingHtml);
-
-    expect({
-      htmlPaths,
-      markdownPaths,
-      upcomingYear: upcomingDocument
-        .querySelector('[data-status-calendar-year]')
-        ?.getAttribute('data-status-calendar-year'),
-      upcomingNewYearDate: Boolean(
-        upcomingDocument.querySelector(
-          '[data-status-calendar-date="2027-01-01"]',
-        ),
-      ),
-    }).toMatchInlineSnapshot(`
-      {
-        "htmlPaths": [
-          {
-            "params": {
-              "year": "2026",
-            },
-          },
-          {
-            "params": {
-              "year": "2027",
-            },
-          },
-        ],
-        "markdownPaths": [
-          {
-            "params": {
-              "year": "2026",
-            },
-          },
-          {
-            "params": {
-              "year": "2027",
-            },
-          },
-        ],
-        "upcomingNewYearDate": true,
-        "upcomingYear": "2027",
-      }
-    `);
   });
 
   it('renders a Monday-first 12-month matrix with decorative adjacent dates', async () => {

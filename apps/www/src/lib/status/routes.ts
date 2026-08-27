@@ -1,5 +1,6 @@
 import { padNumber } from '@shelkovo/format';
 
+import { availableStatusCalendarYears } from './calendar';
 import type { StatusCalendarProjection } from './calendar.types';
 import type { StatusService } from './schema';
 import { canon, withBase } from '../site';
@@ -72,17 +73,9 @@ export const statusCalendarYearPath = (
 export const statusCalendarYearStaticPaths = (
   calendar: StatusCalendarProjection,
 ) =>
-  [
-    ...new Set([
-      ...calendar.years.map(({ year }) => year),
-      calendar.buildYear,
-      calendar.buildYear + 1,
-    ]),
-  ]
-    .sort((first, second) => first - second)
-    .map((year) => ({
-      params: { year: String(year) },
-    }));
+  availableStatusCalendarYears(calendar).map((year) => ({
+    params: { year: String(year) },
+  }));
 
 export const statusCalendarMonthPath = (
   input: StatusCalendarMonthRouteInput,
