@@ -6,6 +6,7 @@ import {
   formatReviewAspectLabel,
   formatReviewAspectLabelHint,
   formatReviewTitle,
+  sortReviewAspects,
 } from '@/lib/reviews/view';
 import ReviewMeta from './ReviewMeta.astro';
 
@@ -14,7 +15,7 @@ interface Props {
 }
 
 const { review } = Astro.props;
-const ratedAspects = review.aspects.filter(
+const ratedAspects = sortReviewAspects(review.aspects).filter(
   (aspect): aspect is ReviewAspect & { readonly rating: number } =>
     Boolean(aspect.rating),
 );
