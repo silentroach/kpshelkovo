@@ -12,9 +12,7 @@ import type {
 import type { StatusIncident } from '@/lib/status/types';
 
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
-import StatusCalendarMonthPage, {
-  getStaticPaths as getHtmlStaticPaths,
-} from '@/pages/status/calendar/[year]/[month]/index.astro';
+import * as StatusCalendarMonthPage from '@/pages/status/calendar/[year]/[month]/index.astro';
 import * as StatusCalendarMonthMarkdownRoute from '@/pages/status/calendar/[year]/[month]/index.md';
 
 const fixtures = vi.hoisted(() => {
@@ -266,7 +264,7 @@ const renderMarkdownRoute = (
 describe('/status/calendar/YYYY/MM/', () => {
   it('creates matching HTML and Markdown paths only for affected months', async () => {
     const [htmlPaths, markdownPaths] = await Promise.all([
-      getHtmlStaticPaths(),
+      StatusCalendarMonthPage.getStaticPaths(),
       StatusCalendarMonthMarkdownRoute.getStaticPaths(),
     ]);
 
@@ -306,13 +304,16 @@ describe('/status/calendar/YYYY/MM/', () => {
 
   it('renders descending ISO day anchors and list-only records without a detail link', async () => {
     const container = await createAstroContainer();
-    const html = await container.renderToString(StatusCalendarMonthPage, {
-      params: { year: '2026', month: '08' },
-      request: new Request(
-        'https://example.com/status/calendar/2026/08/#2026-08-24',
-      ),
-      partial: false,
-    });
+    const html = await container.renderToString(
+      StatusCalendarMonthPage.default,
+      {
+        params: { year: '2026', month: '08' },
+        request: new Request(
+          'https://example.com/status/calendar/2026/08/#2026-08-24',
+        ),
+        partial: false,
+      },
+    );
     const document = parseHtml(html);
 
     expect({
@@ -382,7 +383,7 @@ describe('/status/calendar/YYYY/MM/', () => {
     const params = { year: '2026', month: '08' };
     const request = new Request('https://example.com/status/calendar/2026/08/');
     const [html, markdownResponse] = await Promise.all([
-      container.renderToString(StatusCalendarMonthPage, {
+      container.renderToString(StatusCalendarMonthPage.default, {
         params,
         request,
         partial: false,
