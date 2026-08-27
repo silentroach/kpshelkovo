@@ -76,6 +76,7 @@ const fixtures = vi.hoisted(() => {
       active: [],
       services: [],
       calendar: {
+        buildYear: 2026,
         years: [year],
         byYear: new Map([[year.year, year]]),
         byMonth: new Map([
@@ -143,8 +144,39 @@ afterAll(() => {
 });
 
 describe('/status/calendar/YYYY/', () => {
+  it('shares one build-year snapshot between HTML and Markdown routes', async () => {
+    vi.setSystemTime(new Date('2026-12-31T23:59:00+03:00'));
+
+    try {
+      const htmlPaths = await StatusCalendarYearPage.getStaticPaths();
+
+      vi.setSystemTime(new Date('2027-01-01T00:01:00+03:00'));
+
+      const markdownPaths =
+        await StatusCalendarYearMarkdownRoute.getStaticPaths();
+
+      expect({
+        htmlYears: htmlPaths.map(({ params }) => params.year),
+        markdownYears: markdownPaths.map(({ params }) => params.year),
+      }).toMatchInlineSnapshot(`
+        {
+          "htmlYears": [
+            "2026",
+            "2027",
+          ],
+          "markdownYears": [
+            "2026",
+            "2027",
+          ],
+        }
+      `);
+    } finally {
+      vi.setSystemTime(DEFAULT_NOW);
+    }
+  });
+
   it('keeps completed calendar years after a Moscow New Year deployment', async () => {
-    vi.setSystemTime(new Date('2027-01-01T00:01:00+03:00'));
+    fixtures.data.calendar.buildYear = 2027;
 
     try {
       const [htmlPaths, markdownPaths] = await Promise.all([
@@ -191,7 +223,7 @@ describe('/status/calendar/YYYY/', () => {
         }
       `);
     } finally {
-      vi.setSystemTime(DEFAULT_NOW);
+      fixtures.data.calendar.buildYear = 2026;
     }
   });
 

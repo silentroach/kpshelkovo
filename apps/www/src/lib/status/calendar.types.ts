@@ -33,6 +33,7 @@ export interface StatusCalendarYear {
 }
 
 export interface StatusCalendarProjection {
+  readonly buildYear: number;
   readonly years: readonly StatusCalendarYear[];
   readonly byYear: ReadonlyMap<number, StatusCalendarYear>;
   readonly byMonth: ReadonlyMap<string, StatusCalendarMonth>;

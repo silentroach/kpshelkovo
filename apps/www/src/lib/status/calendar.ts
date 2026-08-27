@@ -304,6 +304,7 @@ export const buildStatusCalendarProjection = (
   const years = buildYears(months);
 
   return {
+    buildYear: currentStatusCalendarYear(new Date(buildNowMs)),
     years,
     byYear: new Map(years.map((year) => [year.year, year])),
     byMonth: new Map(months.map((month) => [month.id, month])),

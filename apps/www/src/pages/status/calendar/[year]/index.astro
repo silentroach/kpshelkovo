@@ -6,10 +6,7 @@ import StatusCalendarLegend from '@/components/status/StatusCalendarLegend.astro
 import StatusCalendarYearMonth from '@/components/status/StatusCalendarYearMonth.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
-import {
-  buildStatusCalendarYearGrid,
-  currentStatusCalendarYear,
-} from '@/lib/status/calendar';
+import { buildStatusCalendarYearGrid } from '@/lib/status/calendar';
 import { loadStatusData } from '@/lib/status/load';
 import {
   statusCalendarYearCanonical,
@@ -20,7 +17,6 @@ import {
 export const getStaticPaths = (async () =>
   statusCalendarYearStaticPaths(
     (await loadStatusData()).calendar,
-    currentStatusCalendarYear(),
   )) satisfies GetStaticPaths;
 
 const year = Number(Astro.params.year);

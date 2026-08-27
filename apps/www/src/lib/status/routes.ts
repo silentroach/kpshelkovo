@@ -71,13 +71,12 @@ export const statusCalendarYearPath = (
 
 export const statusCalendarYearStaticPaths = (
   calendar: StatusCalendarProjection,
-  currentYear: number,
 ) =>
   [
     ...new Set([
       ...calendar.years.map(({ year }) => year),
-      currentYear,
-      currentYear + 1,
+      calendar.buildYear,
+      calendar.buildYear + 1,
     ]),
   ]
     .sort((first, second) => first - second)

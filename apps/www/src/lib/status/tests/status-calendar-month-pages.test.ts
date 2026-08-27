@@ -178,6 +178,7 @@ const fixtures = vi.hoisted(() => {
       active: [],
       services: [],
       calendar: {
+        buildYear: 2026,
         years: [{ year: 2026, months: [august, july] }],
         byYear: new Map<number, StatusCalendarYear>([
           [2026, { year: 2026, months: [august, july] }],
