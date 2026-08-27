@@ -153,27 +153,39 @@ describe('buildStatusCalendarProjection', () => {
     const activeId = '2026/05/active-open-incident';
     const futureOpenId = '2026/05/future-open-maintenance';
     const futureKnownId = '2026/05/future-known-maintenance';
+    const records = [
+      record(activeId, 'incident', '2026-05-02T10:00:00+03:00'),
+      record(futureOpenId, 'maintenance', '2026-05-10T10:00:00+03:00'),
+      record(
+        futureKnownId,
+        'maintenance',
+        '2026-05-12T10:00:00+03:00',
+        '2026-05-14T00:00:00+03:00',
+      ),
+    ];
     const projection = buildStatusCalendarProjection(
-      [
-        record(activeId, 'incident', '2026-05-02T10:00:00+03:00'),
-        record(futureOpenId, 'maintenance', '2026-05-10T10:00:00+03:00'),
-        record(
-          futureKnownId,
-          'maintenance',
-          '2026-05-12T10:00:00+03:00',
-          '2026-05-14T00:00:00+03:00',
-        ),
-      ],
+      records,
       Date.parse('2026-05-03T21:30:00Z'),
+    );
+    const nextDayProjection = buildStatusCalendarProjection(
+      records,
+      Date.parse('2026-05-04T21:30:00Z'),
     );
 
     expect({
       active: datesForRecord(projection, activeId),
+      activeAfterNextBuild: datesForRecord(nextDayProjection, activeId),
       futureOpen: datesForRecord(projection, futureOpenId),
       futureKnown: datesForRecord(projection, futureKnownId),
     }).toMatchInlineSnapshot(`
       {
         "active": [
+          "2026-05-04",
+          "2026-05-03",
+          "2026-05-02",
+        ],
+        "activeAfterNextBuild": [
+          "2026-05-05",
           "2026-05-04",
           "2026-05-03",
           "2026-05-02",
