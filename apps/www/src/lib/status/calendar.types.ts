@@ -39,6 +39,26 @@ export interface StatusCalendarProjection {
   readonly byDay: ReadonlyMap<string, StatusCalendarDay>;
 }
 
+export interface StatusCalendarGridDay {
+  readonly id: string;
+  readonly day: number;
+  readonly isInMonth: boolean;
+  readonly isToday: boolean;
+  readonly status?: StatusCalendarDay;
+}
+
+export interface StatusCalendarMonthGrid {
+  readonly year: number;
+  readonly month: number;
+  readonly name: string;
+  readonly weeks: readonly (readonly StatusCalendarGridDay[])[];
+}
+
+export interface StatusCalendarYearGrid {
+  readonly year: number;
+  readonly months: readonly StatusCalendarMonthGrid[];
+}
+
 export interface StatusCalendarDayBucket {
   readonly id: string;
   readonly year: number;
