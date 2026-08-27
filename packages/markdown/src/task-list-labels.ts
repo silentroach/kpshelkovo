@@ -10,14 +10,47 @@ type HastNode = {
 
 const TASK_LIST_ITEM_CLASS = 'task-list-item';
 const TASK_LABEL_ID_PREFIX = 'task-label';
+const PHRASING_TAG_NAMES: ReadonlySet<string> = new Set([
+  'a',
+  'br',
+  'code',
+  'del',
+  'em',
+  'img',
+  'strong',
+]);
 
 const isTaskListItemCheckbox = (node: HastNode): boolean =>
   node.type === 'element' &&
   node.tagName === 'input' &&
   (node.properties?.type as string | undefined) === 'checkbox';
 
-const isList = (node: HastNode): boolean =>
-  node.type === 'element' && (node.tagName === 'ul' || node.tagName === 'ol');
+const isPhrasingContent = (node: HastNode): boolean =>
+  node.type === 'text' ||
+  (node.type === 'element' &&
+    typeof node.tagName === 'string' &&
+    PHRASING_TAG_NAMES.has(node.tagName));
+
+const isTaskListItem = (node: HastNode): boolean =>
+  node.type === 'element' &&
+  node.tagName === 'li' &&
+  Array.isArray(node.properties?.className) &&
+  (node.properties.className as readonly string[]).includes(
+    TASK_LIST_ITEM_CLASS,
+  );
+
+const findLabelContainer = (item: HastNode): HastNode | undefined => {
+  if (item.children?.some(isTaskListItemCheckbox)) {
+    return item;
+  }
+
+  return item.children?.find(
+    (child) =>
+      child.type === 'element' &&
+      child.tagName === 'p' &&
+      child.children?.some(isTaskListItemCheckbox),
+  );
+};
 
 const nodeText = (node: HastNode): string => {
   if (typeof node.value === 'string') {
@@ -86,41 +119,30 @@ const createLabelId = (text: string, usedIds: Set<string>): string => {
   return id;
 };
 
-const labelTaskListItems = (node: HastNode, usedIds: Set<string>): void => {
-  if (
-    node.type !== 'element' ||
-    node.tagName !== 'li' ||
-    !Array.isArray(node.properties?.className) ||
-    !(node.properties.className as readonly string[]).includes(
-      TASK_LIST_ITEM_CLASS,
-    )
-  ) {
-    node.children?.forEach((child) => labelTaskListItems(child, usedIds));
-
+const labelTaskListItem = (item: HastNode, usedIds: Set<string>): void => {
+  const container = findLabelContainer(item);
+  if (!container) {
     return;
   }
 
-  const children = node.children ?? [];
+  const children = container.children ?? [];
   const checkboxIndex = children.findIndex(isTaskListItemCheckbox);
-
   if (checkboxIndex === -1) {
-    children.forEach((child) => labelTaskListItems(child, usedIds));
-
     return;
   }
 
   const checkbox = children[checkboxIndex];
   const followingNodes = children.slice(checkboxIndex + 1);
-  const nestedListIndex = followingNodes.findIndex(isList);
+  const firstBlockIndex = followingNodes.findIndex(
+    (node) => !isPhrasingContent(node),
+  );
   const labelEnd =
-    nestedListIndex === -1 ? followingNodes.length : nestedListIndex;
+    firstBlockIndex === -1 ? followingNodes.length : firstBlockIndex;
   const labelNodes = followingNodes.slice(0, labelEnd);
   const remainingNodes = followingNodes.slice(labelEnd);
   const { before, label } = splitLeadingWhitespace(labelNodes);
 
   if (label.length === 0) {
-    children.forEach((child) => labelTaskListItems(child, usedIds));
-
     return;
   }
 
@@ -137,14 +159,20 @@ const labelTaskListItems = (node: HastNode, usedIds: Set<string>): void => {
     children: label,
   };
 
-  node.children = [
+  container.children = [
     ...children.slice(0, checkboxIndex + 1),
     ...before,
     labelSpan,
     ...remainingNodes,
   ];
+};
 
-  node.children.forEach((child) => labelTaskListItems(child, usedIds));
+const labelTaskListItems = (node: HastNode, usedIds: Set<string>): void => {
+  if (isTaskListItem(node)) {
+    labelTaskListItem(node, usedIds);
+  }
+
+  node.children?.forEach((child) => labelTaskListItems(child, usedIds));
 };
 
 export const rehypeTaskListItemLabels: Plugin<[], HastNode> = () => (tree) => {

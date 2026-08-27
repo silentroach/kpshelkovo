@@ -27,6 +27,20 @@ const renderDom = (markdown: string) => {
   return document;
 };
 
+const checkboxLabel = (checkbox: HTMLElement): HTMLElement => {
+  const labelId = checkbox.getAttribute('aria-labelledby');
+  if (!labelId) {
+    throw new Error('task checkbox label id not found');
+  }
+
+  const label = checkbox.ownerDocument.getElementById(labelId);
+  if (!label) {
+    throw new Error('task checkbox label not found');
+  }
+
+  return label;
+};
+
 describe('@shelkovo/markdown', () => {
   it('serializes YAML frontmatter without quoting every string', () => {
     const document = createMarkdownDocument({
@@ -336,6 +350,73 @@ describe('@shelkovo/markdown', () => {
     `);
   });
 
+  it('labels a task checkbox inside a loose-list paragraph', () => {
+    const document = renderDom(`- [ ] Loose parent
+
+  Additional context.
+
+  - [x] Loose child`);
+    const parentCheckbox = getByRole(document.body, 'checkbox', {
+      name: 'Loose parent',
+    });
+    const childCheckbox = getByRole(document.body, 'checkbox', {
+      name: 'Loose child',
+    });
+    const parentLabel = checkboxLabel(parentCheckbox);
+
+    expect({
+      checkboxCount: getAllByRole(document.body, 'checkbox').length,
+      labelContainer: parentLabel.parentElement?.tagName,
+      labelHasBlockContent: Boolean(
+        parentLabel.querySelector('blockquote, ol, p, pre, ul'),
+      ),
+      parentContainer: parentCheckbox.parentElement?.tagName,
+      childChecked: (childCheckbox as HTMLInputElement).checked,
+    }).toMatchInlineSnapshot(`
+      {
+        "checkboxCount": 2,
+        "childChecked": true,
+        "labelContainer": "P",
+        "labelHasBlockContent": false,
+        "parentContainer": "P",
+      }
+    `);
+  });
+
+  it('keeps a task list inside a blockquote outside the parent label', () => {
+    const document = renderDom(`- [ ] Parent task
+  > - [x] Quoted child`);
+    const parentCheckbox = getByRole(document.body, 'checkbox', {
+      name: 'Parent task',
+    });
+    const childCheckbox = getByRole(document.body, 'checkbox', {
+      name: 'Quoted child',
+    });
+    const parentLabel = checkboxLabel(parentCheckbox);
+    const childLabel = checkboxLabel(childCheckbox);
+    const blockquote = parentCheckbox
+      .closest('li')
+      ?.querySelector('blockquote');
+
+    if (!blockquote) {
+      throw new Error('nested task blockquote not found');
+    }
+
+    expect({
+      blockquoteIsLabelSibling: parentLabel.nextElementSibling === blockquote,
+      labelsHaveBlockContent: [parentLabel, childLabel].some((label) =>
+        Boolean(label.querySelector('blockquote, ol, p, pre, ul')),
+      ),
+      parentLabelContainsBlockquote: parentLabel.contains(blockquote),
+    }).toMatchInlineSnapshot(`
+      {
+        "blockquoteIsLabelSibling": true,
+        "labelsHaveBlockContent": false,
+        "parentLabelContainsBlockquote": false,
+      }
+    `);
+  });
+
   it('preserves links and formatting in nested task labels', () => {
     const document =
       renderDom(`- [ ] **Parent** with [guide](https://example.com/guide)
@@ -346,16 +427,8 @@ describe('@shelkovo/markdown', () => {
     const childCheckbox = getByRole(document.body, 'checkbox', {
       name: 'Child with code',
     });
-    const parentLabel = document.getElementById(
-      parentCheckbox.getAttribute('aria-labelledby') ?? '',
-    );
-    const childLabel = document.getElementById(
-      childCheckbox.getAttribute('aria-labelledby') ?? '',
-    );
-
-    if (!parentLabel || !childLabel) {
-      throw new Error('task checkbox label not found');
-    }
+    const parentLabel = checkboxLabel(parentCheckbox);
+    const childLabel = checkboxLabel(childCheckbox);
 
     expect({
       childCode: childLabel.querySelector('code')?.textContent,
