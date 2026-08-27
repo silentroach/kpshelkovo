@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  availableStatusCalendarYears,
   buildStatusCalendarYearGrid,
   buildStatusCalendarProjection,
   currentStatusCalendarYear,
@@ -386,5 +387,66 @@ describe('buildStatusCalendarYearGrid', () => {
       currentStatusCalendarYear(beforeMoscowMidnight),
       currentStatusCalendarYear(afterMoscowMidnight),
     ]).toEqual([2026, 2027]);
+  });
+});
+
+describe('availableStatusCalendarYears', () => {
+  it('keeps an empty current Moscow year as the only available calendar', () => {
+    const projection = buildStatusCalendarProjection([], BUILD_NOW_MS);
+
+    expect({
+      years: availableStatusCalendarYears(projection),
+      months: buildStatusCalendarYearGrid(projection, projection.buildYear)
+        .months.length,
+    }).toMatchInlineSnapshot(`
+      {
+        "months": 12,
+        "years": [
+          2026,
+        ],
+      }
+    `);
+  });
+
+  it('skips empty gaps while retaining record-backed past and future years', () => {
+    const projection = buildStatusCalendarProjection(
+      [
+        record(
+          '2022/05/past-incident',
+          'incident',
+          '2022-05-01T10:00:00+03:00',
+          '2022-05-01T11:00:00+03:00',
+        ),
+        record(
+          '2028/09/future-maintenance',
+          'maintenance',
+          '2028-09-10T10:00:00+03:00',
+          '2028-09-10T11:00:00+03:00',
+        ),
+      ],
+      BUILD_NOW_MS,
+    );
+
+    expect(availableStatusCalendarYears(projection)).toEqual([
+      2022, 2026, 2028,
+    ]);
+  });
+
+  it('includes both years touched by an interval across New Year', () => {
+    const projection = buildStatusCalendarProjection(
+      [
+        record(
+          '2024/12/new-year-outage',
+          'incident',
+          '2024-12-31T23:55:00+03:00',
+          '2025-01-01T00:06:00+03:00',
+        ),
+      ],
+      BUILD_NOW_MS,
+    );
+
+    expect(availableStatusCalendarYears(projection)).toEqual([
+      2024, 2025, 2026,
+    ]);
   });
 });

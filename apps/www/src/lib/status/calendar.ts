@@ -66,6 +66,13 @@ const buildMonthGrid = (
 export const currentStatusCalendarYear = (now = new Date()): number =>
   toMoscowDateTime(now.valueOf()).year;
 
+export const availableStatusCalendarYears = (
+  calendar: StatusCalendarProjection,
+): readonly number[] =>
+  [
+    ...new Set([calendar.buildYear, ...calendar.years.map(({ year }) => year)]),
+  ].sort((first, second) => first - second);
+
 export const buildStatusCalendarYearGrid = (
   calendar: StatusCalendarProjection,
   year: number,
