@@ -182,6 +182,55 @@ Regular list:
     `);
   });
 
+  it.each([
+    ['1.1', '1.2', '- Первое условие;\n- Второе условие.'],
+    ['3.5', '3.6', '- 1. Погрузчик;\n- 2. Самосвал.'],
+    ['3.14', '3.15', '- В будние дни;\n- В выходные дни.'],
+    ['4.1', '4.1.1', '- Первая обязанность;\n- Вторая обязанность.'],
+  ])(
+    'restores the legal list boundary from %s to %s',
+    (previous, candidate, list) => {
+      const markdown = `${previous}. Юридический пункт:
+
+${list}
+
+  ${candidate}. Следующий юридический пункт.`;
+
+      expect(preprocessSiteMarkdown(markdown).markdown).toContain(
+        `\n\n${candidate}. Следующий юридический пункт.`,
+      );
+    },
+  );
+
+  it('preserves list continuations, nested lists, fences, and regular ordered lists', () => {
+    const markdown = `1.1. Юридический пункт:
+
+- Первое условие;
+- Второе условие.
+
+  Обычное продолжение последнего условия.
+
+  9.9. Ссылка на другой подпункт внутри условия.
+
+  - Вложенное условие
+
+  1. Первый вложенный пункт
+  2. Второй вложенный пункт
+
+\`\`\`txt
+- Не список.
+
+  1.2. Не юридический пункт.
+\`\`\`
+
+Обычный нумерованный список:
+
+1. Первый пункт
+2. Второй пункт`;
+
+    expect(preprocessSiteMarkdown(markdown).markdown).toBe(markdown);
+  });
+
   it('renders change fences as readable word-level diffs', () => {
     expect(
       renderMarkdown(`\`\`\`change
