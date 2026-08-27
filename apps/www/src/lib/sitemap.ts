@@ -62,7 +62,7 @@ export interface SitemapMetadataSourceData {
 }
 
 const EXTENSION = /\.[^/]+$/u;
-const ERROR_PAGE = /^\/404(?:\/|\.html)$/u;
+const ERROR_PAGE = /\/404(?:\/|\.html)$/u;
 const PRIVATE_STATUS_MONTH = /^\/status\/calendar\/\d{4}\/\d{2}\/$/u;
 const CHANGEFREQ = {
   daily: ChangeFreqEnum.DAILY,
