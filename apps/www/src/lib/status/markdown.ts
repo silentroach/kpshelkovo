@@ -5,8 +5,10 @@ import {
   serializeMarkdownDocument,
   type MarkdownPhrasingInput,
 } from '@shelkovo/markdown';
+import { formatDate } from '@shelkovo/format';
 
 import { absoluteUrl } from '../site';
+import type { StatusMonthJournal } from './journal.types';
 import type {
   StatusDataset,
   StatusIncident,
@@ -18,6 +20,7 @@ import {
   formatStatusArea,
   formatStatusIncidentPeriodText,
   formatStatusKind,
+  formatStatusMonth,
   formatStatusService,
   formatStatusServiceState,
   getStatusIncidentPhase,
@@ -163,6 +166,13 @@ function incidentSection(input: {
   ];
 }
 
+const monthDaySection = (
+  item: StatusMonthJournal['days'][number],
+): readonly MarkdownNode[] => [
+  md.heading(2, formatDate(item.day.id)),
+  md.list(item.incidents.map((incident) => incidentLine(incident))),
+];
+
 const serviceLine = (summary: StatusServiceSummary): MarkdownListItem => {
   const latest = summary.incidents[0];
 
@@ -296,3 +306,12 @@ export function buildStatusIncidentMarkdown(
     }),
   );
 }
+
+export const buildStatusMonthMarkdown = (journal: StatusMonthJournal): string =>
+  serialize([
+    md.heading(
+      1,
+      `Статусы за ${formatStatusMonth(journal.year, journal.month)} года`,
+    ),
+    ...journal.days.flatMap(monthDaySection),
+  ]);

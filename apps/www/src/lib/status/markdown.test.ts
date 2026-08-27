@@ -4,10 +4,12 @@ import {
   buildStatusCalendarProjection,
   toStatusCalendarRecord,
 } from './calendar';
+import { getStatusMonthJournal } from './journal';
 import type { StatusIncidentWithDetail, StatusServiceSummary } from './types';
 
 let buildStatusHomeMarkdown: typeof import('./markdown').buildStatusHomeMarkdown;
 let buildStatusIncidentMarkdown: typeof import('./markdown').buildStatusIncidentMarkdown;
+let buildStatusMonthMarkdown: typeof import('./markdown').buildStatusMonthMarkdown;
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
@@ -15,8 +17,11 @@ beforeAll(async () => {
     BASE_URL: '/',
   });
 
-  ({ buildStatusHomeMarkdown, buildStatusIncidentMarkdown } =
-    await import('./markdown'));
+  ({
+    buildStatusHomeMarkdown,
+    buildStatusIncidentMarkdown,
+    buildStatusMonthMarkdown,
+  } = await import('./markdown'));
 });
 
 const incident = (
@@ -181,6 +186,86 @@ describe('buildStatusIncidentMarkdown', () => {
       Тело с [ссылкой](https://example.com/body).
 
       - пункт 1
+      "
+    `);
+  });
+});
+
+describe('buildStatusMonthMarkdown', () => {
+  it('uses the calendar day and record order', () => {
+    const carryover = incident({
+      id: '2026/05/carryover',
+      title: 'Продолжающееся отключение',
+      slug: 'carryover',
+      url: '/status/incidents/2026/05/carryover/',
+      markdownUrl: '/status/incidents/2026/05/carryover/index.md',
+      canonical: 'https://example.com/status/incidents/2026/05/carryover/',
+      started: {
+        at: new Date('2026-05-01T20:00:00.000Z'),
+        iso: '2026-05-01T23:00:00+03:00',
+        hasTime: true,
+      },
+      ended: {
+        at: new Date('2026-05-01T23:30:00.000Z'),
+        iso: '2026-05-02T02:30:00+03:00',
+        hasTime: true,
+      },
+      sortStartedAt: new Date('2026-05-01T20:00:00.000Z').valueOf(),
+      sortLastChangeAt: new Date('2026-05-01T23:30:00.000Z').valueOf(),
+      duration: { totalMinutes: 210 },
+    });
+    const newIncident = incident({
+      id: '2026/05/new-incident',
+      title: 'Новое отключение',
+      slug: 'new-incident',
+      url: '/status/incidents/2026/05/new-incident/',
+      markdownUrl: '/status/incidents/2026/05/new-incident/index.md',
+      canonical: 'https://example.com/status/incidents/2026/05/new-incident/',
+      started: {
+        at: new Date('2026-05-01T22:00:00.000Z'),
+        iso: '2026-05-02T01:00:00+03:00',
+        hasTime: true,
+      },
+      ended: {
+        at: new Date('2026-05-01T23:00:00.000Z'),
+        iso: '2026-05-02T02:00:00+03:00',
+        hasTime: true,
+      },
+      sortStartedAt: new Date('2026-05-01T22:00:00.000Z').valueOf(),
+      sortLastChangeAt: new Date('2026-05-01T23:00:00.000Z').valueOf(),
+      duration: { totalMinutes: 60 },
+    });
+    const calendar = buildStatusCalendarProjection(
+      [carryover, newIncident].map(toStatusCalendarRecord),
+      new Date('2026-05-03T09:00:00+03:00').valueOf(),
+    );
+    const journal = getStatusMonthJournal(
+      {
+        calendar,
+        byId: new Map([
+          [carryover.id, carryover],
+          [newIncident.id, newIncident],
+        ]),
+      },
+      2026,
+      5,
+    );
+
+    if (!journal) {
+      throw new Error('Expected May status journal');
+    }
+
+    expect(buildStatusMonthMarkdown(journal)).toMatchInlineSnapshot(`
+      "# Статусы за май 2026 года
+
+      ## 2 мая 2026
+
+      - [Продолжающееся отключение](https://example.com/status/incidents/2026/05/carryover/index.md) — Электричество; Инцидент; восстановлено; 1 мая, 23:00 - 2 мая, 02:30 (3 ч. 30 мин.)
+      - [Новое отключение](https://example.com/status/incidents/2026/05/new-incident/index.md) — Электричество; Инцидент; восстановлено; 2 мая, 01:00 - 02:00 (1 ч.)
+
+      ## 1 мая 2026
+
+      - [Продолжающееся отключение](https://example.com/status/incidents/2026/05/carryover/index.md) — Электричество; Инцидент; восстановлено; 1 мая, 23:00 - 2 мая, 02:30 (3 ч. 30 мин.)
       "
     `);
   });
