@@ -134,6 +134,12 @@ const affectedLinks = (document: ReturnType<typeof parseHtml>) =>
     }),
   );
 
+const staticPathYears = (
+  paths: readonly {
+    readonly params: Readonly<Record<string, string | undefined>>;
+  }[],
+): readonly (string | undefined)[] => paths.map((path) => path.params.year);
+
 beforeAll(() => {
   vi.useFakeTimers();
   vi.setSystemTime(DEFAULT_NOW);
@@ -156,8 +162,8 @@ describe('/status/calendar/YYYY/', () => {
         await StatusCalendarYearMarkdownRoute.getStaticPaths();
 
       expect({
-        htmlYears: htmlPaths.map(({ params }) => params.year),
-        markdownYears: markdownPaths.map(({ params }) => params.year),
+        htmlYears: staticPathYears(htmlPaths),
+        markdownYears: staticPathYears(markdownPaths),
       }).toMatchInlineSnapshot(`
         {
           "htmlYears": [
