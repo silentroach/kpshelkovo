@@ -1,13 +1,22 @@
-import { compareRuText, dateTimeFromISO, padNumber } from '@shelkovo/format';
+import {
+  compareRuText,
+  dateTimeFromISO,
+  dateTimeFromParts,
+  formatMonth,
+  padNumber,
+} from '@shelkovo/format';
 
 import type {
   StatusCalendarDay,
   StatusCalendarDayBucket,
   StatusCalendarDayKind,
+  StatusCalendarGridDay,
   StatusCalendarMonth,
+  StatusCalendarMonthGrid,
   StatusCalendarProjection,
   StatusCalendarRecordInput,
   StatusCalendarYear,
+  StatusCalendarYearGrid,
 } from './calendar.types';
 import type { StatusIncident } from './types';
 
@@ -16,6 +25,62 @@ const toMoscowDateTime = (timestamp: number) =>
 
 const dayId = (year: number, month: number, day: number): string =>
   `${year}-${padNumber(month)}-${padNumber(day)}`;
+
+const capitalize = (value: string): string =>
+  `${value.charAt(0).toLocaleUpperCase('ru')}${value.slice(1)}`;
+
+const buildMonthGrid = (
+  calendar: StatusCalendarProjection,
+  year: number,
+  month: number,
+): StatusCalendarMonthGrid => {
+  const firstDay = dateTimeFromParts({ year, month, day: 1 });
+  const gridStart = firstDay.minus({ days: firstDay.weekday - 1 });
+  const days: StatusCalendarGridDay[] = Array.from(
+    { length: 42 },
+    (_, index) => {
+      const date = gridStart.plus({ days: index });
+      const id = dayId(date.year, date.month, date.day);
+      const isInMonth = date.year === year && date.month === month;
+
+      return {
+        id,
+        day: date.day,
+        isInMonth,
+        status: isInMonth ? calendar.byDay.get(id) : undefined,
+      };
+    },
+  );
+  const weeks = Array.from({ length: 6 }, (_, index) =>
+    days.slice(index * 7, (index + 1) * 7),
+  );
+
+  return {
+    year,
+    month,
+    name: capitalize(formatMonth(year, month, { includeYear: false })),
+    weeks,
+  };
+};
+
+export const currentStatusCalendarYear = (now = new Date()): number =>
+  toMoscowDateTime(now.valueOf()).year;
+
+export const buildStatusCalendarYearGrid = (
+  calendar: StatusCalendarProjection,
+  year: number,
+): StatusCalendarYearGrid => {
+  if (!Number.isInteger(year)) {
+    throw new Error('status calendar year must be an integer');
+  }
+
+  return {
+    year,
+    months: Array.from({ length: 12 }, (_, index) =>
+      buildMonthGrid(calendar, year, index + 1),
+    ),
+  };
+};
 
 export const statusCalendarMonthId = (year: number, month: number): string =>
   `${year}/${padNumber(month)}`;
@@ -239,6 +304,7 @@ export const buildStatusCalendarProjection = (
   const years = buildYears(months);
 
   return {
+    buildYear: currentStatusCalendarYear(new Date(buildNowMs)),
     years,
     byYear: new Map(years.map((year) => [year.year, year])),
     byMonth: new Map(months.map((month) => [month.id, month])),

@@ -1,0 +1,71 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+
+import StatusCalendarLegend from '@/components/status/StatusCalendarLegend.astro';
+import StatusCalendarYearMonth from '@/components/status/StatusCalendarYearMonth.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
+import { buildStatusCalendarYearGrid } from '@/lib/status/calendar';
+import { loadStatusData } from '@/lib/status/load';
+import {
+  statusCalendarYearCanonical,
+  statusCalendarYearStaticPaths,
+  statusUrl,
+} from '@/lib/status/routes';
+
+export const getStaticPaths = (async () =>
+  statusCalendarYearStaticPaths(
+    (await loadStatusData()).calendar,
+  )) satisfies GetStaticPaths;
+
+const year = Number(Astro.params.year);
+const calendar = buildStatusCalendarYearGrid(
+  (await loadStatusData()).calendar,
+  year,
+);
+const heading = `Проблемы и плановые работы за ${year} год`;
+const title = `${heading} — Шелково Онлайн`;
+const description = `Проблемы и плановые работы в Шелково по дням за ${year} год с переходом к месячным журналам.`;
+const breadcrumbs = withHomeBreadcrumbs([
+  { label: 'Статус', href: statusUrl() },
+  { label: `${year} год` },
+]);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={statusCalendarYearCanonical({ year })}
+  robots="noindex, nofollow"
+>
+  <main class="ui-page pb-8 md:pb-12 lg:pb-16">
+    <header class="ui-page-header">
+      <div class="ui-page-header-stack max-w-4xl">
+        <Breadcrumbs items={breadcrumbs} />
+        <h1 class="ui-page-title">{heading}</h1>
+      </div>
+    </header>
+
+    <div class="mt-4 px-5 md:px-6">
+      <div
+        class="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2 xl:grid-cols-3"
+        data-status-calendar-year={year}
+      >
+        {
+          calendar.months.map((month) => (
+            <StatusCalendarYearMonth month={month} />
+          ))
+        }
+      </div>
+
+      <StatusCalendarLegend />
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  import { installStatusCalendarYearInteractions } from '@/lib/status/year-calendar.dom';
+
+  installStatusCalendarYearInteractions();
+</script>

@@ -178,6 +178,7 @@ const fixtures = vi.hoisted(() => {
       active: [],
       services: [],
       calendar: {
+        buildYear: 2026,
         years: [{ year: 2026, months: [august, july] }],
         byYear: new Map<number, StatusCalendarYear>([
           [2026, { year: 2026, months: [august, july] }],
@@ -335,7 +336,7 @@ describe('/status/calendar/YYYY/MM/', () => {
             "heading": "24 августа 2026",
             "id": "2026-08-24",
             "marker": "mixed",
-            "markerLabel": "Есть инциденты и плановые работы",
+            "markerLabel": "Есть проблемы и плановые работы",
             "markerRole": "img",
             "records": [
               {
@@ -354,7 +355,7 @@ describe('/status/calendar/YYYY/MM/', () => {
             "heading": "23 августа 2026",
             "id": "2026-08-23",
             "marker": "incident",
-            "markerLabel": "Есть инциденты",
+            "markerLabel": "Есть проблемы",
             "markerRole": "img",
             "records": [
               {

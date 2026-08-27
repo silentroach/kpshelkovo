@@ -1,6 +1,7 @@
 import {
   count,
   dateTimeFromISO,
+  formatDate,
   formatMonth,
   pluralize,
 } from '@shelkovo/format';
@@ -10,6 +11,7 @@ import {
 } from '@shelkovo/markdown';
 
 import { formatArea } from '../areas';
+import type { StatusCalendarDay } from './calendar.types';
 import { getStatusIncidentState } from './lifecycle';
 import type {
   StatusArea,
@@ -197,6 +199,29 @@ export const formatStatusMonth = (
     ? `${label.charAt(0).toLocaleUpperCase('ru')}${label.slice(1)}`
     : label;
 };
+
+export const formatStatusCalendarDayCountLines = (
+  day: Pick<StatusCalendarDay, 'incidentCount' | 'maintenanceCount'>,
+): readonly string[] =>
+  [
+    day.incidentCount
+      ? count(day.incidentCount, ['проблема', 'проблемы', 'проблем'])
+      : undefined,
+    day.maintenanceCount
+      ? count(day.maintenanceCount, [
+          'плановая работа',
+          'плановые работы',
+          'плановых работ',
+        ])
+      : undefined,
+  ].filter((part): part is string => Boolean(part));
+
+export const formatStatusCalendarDayCounts = (
+  day: Pick<StatusCalendarDay, 'incidentCount' | 'maintenanceCount'>,
+): string => formatStatusCalendarDayCountLines(day).join(', ');
+
+export const formatStatusCalendarDayLabel = (day: StatusCalendarDay): string =>
+  `${formatDate(day.id)}: ${formatStatusCalendarDayCounts(day)}`;
 
 export const formatStatusDuration = (
   duration: StatusDuration,

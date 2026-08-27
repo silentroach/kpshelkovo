@@ -1,0 +1,18 @@
+---
+import StatusCalendarDayMarker from './StatusCalendarDayMarker.astro';
+---
+
+<section aria-label="Обозначения" class="mt-10" data-status-calendar-legend>
+  <ul
+    class="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm leading-5 text-foreground"
+  >
+    <li class="flex items-center gap-2">
+      <StatusCalendarDayMarker kind="incident" decorative />
+      <span>Проблемы</span>
+    </li>
+    <li class="flex items-center gap-2">
+      <StatusCalendarDayMarker kind="maintenance" decorative />
+      <span>Плановые работы</span>
+    </li>
+  </ul>
+</section>

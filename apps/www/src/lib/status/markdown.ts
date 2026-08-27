@@ -10,14 +10,19 @@ import { formatDate } from '@shelkovo/format';
 import { absoluteUrl } from '../site';
 import type { StatusMonthJournal } from './journal.types';
 import type {
+  StatusCalendarMonthGrid,
+  StatusCalendarYearGrid,
+} from './calendar.types';
+import type {
   StatusDataset,
   StatusIncident,
   StatusIncidentWithDetail,
   StatusServiceSummary,
 } from './types';
-import { statusServiceMarkdownUrl } from './routes';
+import { statusCalendarDayUrl, statusServiceMarkdownUrl } from './routes';
 import {
   formatStatusArea,
+  formatStatusCalendarDayLabel,
   formatStatusIncidentPeriodText,
   formatStatusKind,
   formatStatusMonth,
@@ -173,6 +178,42 @@ const monthDaySection = (
   md.list(item.incidents.map((incident) => incidentLine(incident))),
 ];
 
+const yearMonthSection = (
+  month: StatusCalendarMonthGrid,
+): readonly MarkdownNode[] => {
+  const affectedDays = month.weeks
+    .flat()
+    .filter((day) => day.status !== undefined);
+
+  return [
+    md.heading(2, month.name),
+    md.list(
+      affectedDays.length > 0
+        ? affectedDays.map((day) => {
+            if (!day.status) {
+              throw new Error(`status calendar day "${day.id}" is missing`);
+            }
+
+            return md.listItem([
+              md.paragraph([
+                md.link(
+                  abs(
+                    statusCalendarDayUrl({
+                      year: month.year,
+                      month: month.month,
+                      id: day.id,
+                    }),
+                  ),
+                  formatStatusCalendarDayLabel(day.status),
+                ),
+              ]),
+            ]);
+          })
+        : [md.listItem('Нет записей.')],
+    ),
+  ];
+};
+
 const serviceLine = (summary: StatusServiceSummary): MarkdownListItem => {
   const latest = summary.incidents[0];
 
@@ -314,4 +355,15 @@ export const buildStatusMonthMarkdown = (journal: StatusMonthJournal): string =>
       `Статусы за ${formatStatusMonth(journal.year, journal.month)} года`,
     ),
     ...journal.days.flatMap(monthDaySection),
+  ]);
+
+export const buildStatusYearMarkdown = (
+  calendar: StatusCalendarYearGrid,
+): string =>
+  serialize([
+    md.heading(1, `Проблемы и плановые работы за ${calendar.year} год`),
+    md.paragraph(
+      'Проблемы и плановые работы по дням. Отмеченные даты ведут к записям месячного журнала.',
+    ),
+    ...calendar.months.flatMap(yearMonthSection),
   ]);

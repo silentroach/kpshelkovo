@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  buildStatusCalendarYearGrid,
   buildStatusCalendarProjection,
+  currentStatusCalendarYear,
   statusCalendarMonthId,
 } from '../calendar';
 import type {
@@ -151,27 +153,39 @@ describe('buildStatusCalendarProjection', () => {
     const activeId = '2026/05/active-open-incident';
     const futureOpenId = '2026/05/future-open-maintenance';
     const futureKnownId = '2026/05/future-known-maintenance';
+    const records = [
+      record(activeId, 'incident', '2026-05-02T10:00:00+03:00'),
+      record(futureOpenId, 'maintenance', '2026-05-10T10:00:00+03:00'),
+      record(
+        futureKnownId,
+        'maintenance',
+        '2026-05-12T10:00:00+03:00',
+        '2026-05-14T00:00:00+03:00',
+      ),
+    ];
     const projection = buildStatusCalendarProjection(
-      [
-        record(activeId, 'incident', '2026-05-02T10:00:00+03:00'),
-        record(futureOpenId, 'maintenance', '2026-05-10T10:00:00+03:00'),
-        record(
-          futureKnownId,
-          'maintenance',
-          '2026-05-12T10:00:00+03:00',
-          '2026-05-14T00:00:00+03:00',
-        ),
-      ],
+      records,
       Date.parse('2026-05-03T21:30:00Z'),
+    );
+    const nextDayProjection = buildStatusCalendarProjection(
+      records,
+      Date.parse('2026-05-04T21:30:00Z'),
     );
 
     expect({
       active: datesForRecord(projection, activeId),
+      activeAfterNextBuild: datesForRecord(nextDayProjection, activeId),
       futureOpen: datesForRecord(projection, futureOpenId),
       futureKnown: datesForRecord(projection, futureKnownId),
     }).toMatchInlineSnapshot(`
       {
         "active": [
+          "2026-05-04",
+          "2026-05-03",
+          "2026-05-02",
+        ],
+        "activeAfterNextBuild": [
+          "2026-05-05",
           "2026-05-04",
           "2026-05-03",
           "2026-05-02",
@@ -287,5 +301,90 @@ describe('buildStatusCalendarProjection', () => {
       byDay: new Map(),
     });
     expect(statusCalendarMonthId(2026, 6)).toBe('2026/06');
+  });
+});
+
+describe('buildStatusCalendarYearGrid', () => {
+  it('builds twelve six-week Monday-first months even without records', () => {
+    const projection = buildStatusCalendarProjection([], BUILD_NOW_MS);
+    const year = buildStatusCalendarYearGrid(projection, 2026);
+
+    expect({
+      months: year.months.length,
+      weeksPerMonth: year.months.map((month) => month.weeks.length),
+      januaryFirstWeek: year.months[0]?.weeks[0],
+    }).toMatchInlineSnapshot(`
+      {
+        "januaryFirstWeek": [
+          {
+            "day": 29,
+            "id": "2025-12-29",
+            "isInMonth": false,
+            "status": undefined,
+          },
+          {
+            "day": 30,
+            "id": "2025-12-30",
+            "isInMonth": false,
+            "status": undefined,
+          },
+          {
+            "day": 31,
+            "id": "2025-12-31",
+            "isInMonth": false,
+            "status": undefined,
+          },
+          {
+            "day": 1,
+            "id": "2026-01-01",
+            "isInMonth": true,
+            "status": undefined,
+          },
+          {
+            "day": 2,
+            "id": "2026-01-02",
+            "isInMonth": true,
+            "status": undefined,
+          },
+          {
+            "day": 3,
+            "id": "2026-01-03",
+            "isInMonth": true,
+            "status": undefined,
+          },
+          {
+            "day": 4,
+            "id": "2026-01-04",
+            "isInMonth": true,
+            "status": undefined,
+          },
+        ],
+        "months": 12,
+        "weeksPerMonth": [
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+        ],
+      }
+    `);
+  });
+
+  it('uses Moscow time for the current year', () => {
+    const beforeMoscowMidnight = new Date('2026-12-31T20:59:59.000Z');
+    const afterMoscowMidnight = new Date('2026-12-31T21:00:00.000Z');
+
+    expect([
+      currentStatusCalendarYear(beforeMoscowMidnight),
+      currentStatusCalendarYear(afterMoscowMidnight),
+    ]).toEqual([2026, 2027]);
   });
 });
