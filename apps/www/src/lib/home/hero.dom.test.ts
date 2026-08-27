@@ -15,8 +15,7 @@ const renderHomeHero = (): void => {
         data-day-srcset="/day-960.webp 960w, /day-1280.webp 1280w"
         data-night-src="/night.webp"
         data-night-srcset="/night-960.webp 960w, /night-1280.webp 1280w"
-        src="/day.webp"
-        srcset="/day-960.webp 960w, /day-1280.webp 1280w"
+        hidden
       />
     </section>
   `;
@@ -41,7 +40,7 @@ describe('getHomeHeroMode', () => {
 });
 
 describe('hydrateHomeHero', () => {
-  it('switches the server-rendered image to the client time mode', () => {
+  it('selects the client time mode before revealing the image', () => {
     renderHomeHero();
 
     hydrateHomeHero(document, new Date('2026-05-11T17:30:00Z'));
@@ -51,6 +50,32 @@ describe('hydrateHomeHero', () => {
     expect(getImage().getAttribute('srcset')).toBe(
       '/night-960.webp 960w, /night-1280.webp 1280w',
     );
+    expect(getImage().hidden).toBe(false);
+  });
+
+  it('makes the current srcset the first discoverable image source', async () => {
+    renderHomeHero();
+    const sourceAttributes: string[] = [];
+    const observer = new MutationObserver((records) => {
+      for (const record of records) {
+        if (record.attributeName) sourceAttributes.push(record.attributeName);
+      }
+    });
+    observer.observe(getImage(), {
+      attributes: true,
+      attributeFilter: ['src', 'srcset'],
+    });
+
+    hydrateHomeHero(document, new Date('2026-05-11T17:30:00Z'));
+    await Promise.resolve();
+    observer.disconnect();
+
+    expect(sourceAttributes).toMatchInlineSnapshot(`
+      [
+        "srcset",
+        "src",
+      ]
+    `);
   });
 });
 
@@ -62,9 +87,10 @@ describe('installHomeHeroHydration', () => {
     installHomeHeroHydration({ now });
 
     renderHomeHero();
-    document.dispatchEvent(new Event('astro:page-load'));
+    document.dispatchEvent(new Event('astro:after-swap'));
 
     expect(getShell().dataset.homeHeroMode).toBe('night');
     expect(getImage().getAttribute('src')).toBe('/night.webp');
+    expect(getImage().hidden).toBe(false);
   });
 });
