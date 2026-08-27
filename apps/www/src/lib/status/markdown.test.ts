@@ -1,5 +1,9 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
+import {
+  buildStatusCalendarProjection,
+  toStatusCalendarRecord,
+} from './calendar';
 import type { StatusIncidentWithDetail, StatusServiceSummary } from './types';
 
 let buildStatusHomeMarkdown: typeof import('./markdown').buildStatusHomeMarkdown;
@@ -72,6 +76,10 @@ describe('buildStatusHomeMarkdown', () => {
       incidents: [testIncident],
       active: [],
       services: [testSummary],
+      calendar: buildStatusCalendarProjection(
+        [toStatusCalendarRecord(testIncident)],
+        new Date('2026-05-04T09:00:00+03:00').valueOf(),
+      ),
       byId: new Map([[testIncident.id, testIncident]]),
       byService: new Map([['electricity', testSummary]]),
     });

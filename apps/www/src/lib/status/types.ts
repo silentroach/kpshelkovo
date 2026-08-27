@@ -1,5 +1,6 @@
 import type { PreprocessedSiteMarkdownBody } from '../markdown/render';
 import type { EntityMentionTarget } from '../mentions';
+import type { StatusCalendarProjection } from './calendar.types';
 import type {
   StatusArea,
   StatusKind,
@@ -99,6 +100,7 @@ export interface StatusDataset {
   readonly incidents: readonly StatusIncident[];
   readonly active: readonly StatusIncident[];
   readonly services: readonly StatusServiceSummary[];
+  readonly calendar: StatusCalendarProjection;
   readonly byId: ReadonlyMap<string, StatusIncident>;
   readonly byService: ReadonlyMap<StatusService, StatusServiceSummary>;
 }

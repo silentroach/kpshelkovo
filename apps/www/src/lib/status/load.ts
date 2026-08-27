@@ -5,6 +5,10 @@ import { compareRuText } from '@shelkovo/format';
 
 import type { SiteMentionRegistry } from '../mentions';
 import { loadSiteMentionRegistry } from '../mentions/registry';
+import {
+  buildStatusCalendarProjection,
+  toStatusCalendarRecord,
+} from './calendar';
 import { mapRawStatusIncident } from './mapper';
 import { getStatusServiceState } from './lifecycle';
 import { STATUS_SERVICES, type StatusService } from './schema';
@@ -112,6 +116,10 @@ export const buildStatusDataset = (
     incidents,
     active: incidents.filter((item) => item.phase === 'active'),
     services,
+    calendar: buildStatusCalendarProjection(
+      incidents.map(toStatusCalendarRecord),
+      now.valueOf(),
+    ),
     byId: new Map(incidents.map((item) => [item.id, item])),
     byService: new Map(services.map((item) => [item.service, item])),
   };
