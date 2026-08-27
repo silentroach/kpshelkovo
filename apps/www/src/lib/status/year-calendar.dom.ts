@@ -137,12 +137,12 @@ export const installStatusCalendarYearInteractions = (): void => {
       return;
     }
 
-    const root =
-      tooltipRoot(event.target || undefined) ??
-      focusedTooltipRoot ??
-      hoveredTooltipRoot;
-
-    root?.setAttribute('data-tooltip-dismissed', '');
+    tooltipRoot(event.target || undefined)?.setAttribute(
+      'data-tooltip-dismissed',
+      '',
+    );
+    focusedTooltipRoot?.setAttribute('data-tooltip-dismissed', '');
+    hoveredTooltipRoot?.setAttribute('data-tooltip-dismissed', '');
   });
   document.addEventListener('focusout', (event) => {
     const root = tooltipRoot(event.target || undefined);

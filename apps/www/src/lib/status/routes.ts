@@ -69,10 +69,21 @@ export const statusCalendarYearPath = (
   input: StatusCalendarYearRouteInput,
 ): string => `${STATUS_CALENDAR_ROOT}${padNumber(input.year, 4)}/`;
 
-export const statusCalendarYearStaticPaths = (currentYear: number) =>
-  [currentYear, currentYear + 1].map((year) => ({
-    params: { year: String(year) },
-  }));
+export const statusCalendarYearStaticPaths = (
+  calendar: StatusCalendarProjection,
+  currentYear: number,
+) =>
+  [
+    ...new Set([
+      ...calendar.years.map(({ year }) => year),
+      currentYear,
+      currentYear + 1,
+    ]),
+  ]
+    .sort((first, second) => first - second)
+    .map((year) => ({
+      params: { year: String(year) },
+    }));
 
 export const statusCalendarMonthPath = (
   input: StatusCalendarMonthRouteInput,

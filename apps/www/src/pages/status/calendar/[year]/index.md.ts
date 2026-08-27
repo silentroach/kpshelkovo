@@ -11,8 +11,9 @@ import { statusCalendarYearStaticPaths } from '@/lib/status/routes';
 
 export const prerender = true;
 
-export const getStaticPaths = (() =>
+export const getStaticPaths = (async () =>
   statusCalendarYearStaticPaths(
+    (await loadStatusData()).calendar,
     currentStatusCalendarYear(),
   )) satisfies GetStaticPaths;
 

@@ -93,19 +93,26 @@ describe('positionStatusCalendarTooltip', () => {
 describe('installStatusCalendarYearInteractions', () => {
   it('dismisses focused and hovered tooltips on Escape until they close', () => {
     document.body.innerHTML = `
-      <span data-status-calendar-tooltip-root>
+      <span data-status-calendar-tooltip-root="focused">
         <a href="#day" data-status-calendar-day-link>24</a>
         <span role="tooltip">24 августа: 1 проблема</span>
+      </span>
+      <span data-status-calendar-tooltip-root="hovered">
+        <a href="#other-day" data-status-calendar-day-link>25</a>
+        <span role="tooltip">25 августа: 1 проблема</span>
       </span>
       <button type="button">После календаря</button>
     `;
     const root = document.querySelector<HTMLElement>(
-      '[data-status-calendar-tooltip-root]',
+      '[data-status-calendar-tooltip-root="focused"]',
+    );
+    const hoveredRoot = document.querySelector<HTMLElement>(
+      '[data-status-calendar-tooltip-root="hovered"]',
     );
     const link = root?.querySelector<HTMLAnchorElement>('a');
     const button = document.querySelector<HTMLButtonElement>('button');
 
-    if (!root || !link || !button) {
+    if (!root || !hoveredRoot || !link || !button) {
       throw new Error('status calendar tooltip fixture is incomplete');
     }
 
@@ -161,6 +168,15 @@ describe('installStatusCalendarYearInteractions', () => {
         relatedTarget: button,
       }),
     );
+    const resetAfterBlurAndPointerLeave = root.hasAttribute(
+      'data-tooltip-dismissed',
+    );
+
+    link.focus();
+    hoveredRoot.dispatchEvent(new Event('pointerover', { bubbles: true }));
+    link.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+    );
 
     expect({
       dismissedOnHover,
@@ -170,7 +186,9 @@ describe('installStatusCalendarYearInteractions', () => {
       dismissedWhileFocused,
       resetAfterFocusAndPointerLeave,
       dismissedWhileHovered,
-      resetAfterBlurAndPointerLeave: root.hasAttribute(
+      resetAfterBlurAndPointerLeave,
+      separateFocusedRootDismissed: root.hasAttribute('data-tooltip-dismissed'),
+      separateHoveredRootDismissed: hoveredRoot.hasAttribute(
         'data-tooltip-dismissed',
       ),
     }).toMatchInlineSnapshot(`
@@ -183,6 +201,8 @@ describe('installStatusCalendarYearInteractions', () => {
         "resetAfterBlurAndPointerLeave": false,
         "resetAfterFocusAndPointerLeave": false,
         "resetAfterPointerLeaves": false,
+        "separateFocusedRootDismissed": true,
+        "separateHoveredRootDismissed": true,
       }
     `);
   });

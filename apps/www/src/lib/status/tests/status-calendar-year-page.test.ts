@@ -143,6 +143,58 @@ afterAll(() => {
 });
 
 describe('/status/calendar/YYYY/', () => {
+  it('keeps completed calendar years after a Moscow New Year deployment', async () => {
+    vi.setSystemTime(new Date('2027-01-01T00:01:00+03:00'));
+
+    try {
+      const [htmlPaths, markdownPaths] = await Promise.all([
+        StatusCalendarYearPage.getStaticPaths(),
+        StatusCalendarYearMarkdownRoute.getStaticPaths(),
+      ]);
+
+      expect({ htmlPaths, markdownPaths }).toMatchInlineSnapshot(`
+        {
+          "htmlPaths": [
+            {
+              "params": {
+                "year": "2026",
+              },
+            },
+            {
+              "params": {
+                "year": "2027",
+              },
+            },
+            {
+              "params": {
+                "year": "2028",
+              },
+            },
+          ],
+          "markdownPaths": [
+            {
+              "params": {
+                "year": "2026",
+              },
+            },
+            {
+              "params": {
+                "year": "2027",
+              },
+            },
+            {
+              "params": {
+                "year": "2028",
+              },
+            },
+          ],
+        }
+      `);
+    } finally {
+      vi.setSystemTime(DEFAULT_NOW);
+    }
+  });
+
   it('renders every path from one static year snapshot across Moscow New Year', async () => {
     vi.setSystemTime(new Date('2026-12-31T23:59:00+03:00'));
     const oldYear = Number(
