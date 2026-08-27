@@ -1,6 +1,6 @@
 import { getCollection } from 'astro:content';
 
-import { createPersonMentionTarget } from '@/lib/people/mentions';
+import { mapRawPersonMentionTarget } from '@/lib/people/mentions';
 import { createPlaceMentionTarget } from '@/lib/places/mentions';
 
 import { createSiteMentionRegistry } from './normalize';
@@ -17,15 +17,7 @@ export const buildSiteMentionRegistry = (
   places: readonly SiteMentionPlaceEntry[],
 ): SiteMentionRegistry =>
   createSiteMentionRegistry([
-    ...people.map((entry) =>
-      createPersonMentionTarget(
-        entry.id,
-        entry.data.name,
-        entry.data.name_cases,
-        entry.data.company,
-        entry.data.position,
-      ),
-    ),
+    ...people.map(mapRawPersonMentionTarget),
     ...places.map((entry) =>
       createPlaceMentionTarget(
         entry.id,

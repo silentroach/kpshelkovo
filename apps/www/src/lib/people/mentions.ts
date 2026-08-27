@@ -1,5 +1,6 @@
 import type { EntityMentionTarget } from '../mentions';
 import type { PersonNameCaseForms } from './name-cases';
+import type { RawPersonProfile } from './raw-schema';
 import { personMarkdownUrl, personUrl } from './routes';
 
 export interface PersonMentionTarget extends EntityMentionTarget {
@@ -46,3 +47,15 @@ export const createPersonMentionTarget = (
     markdownUrl: personMarkdownUrl(slug),
   };
 };
+
+export const mapRawPersonMentionTarget = (entry: {
+  readonly id: string;
+  readonly data: RawPersonProfile;
+}): PersonMentionTarget =>
+  createPersonMentionTarget(
+    entry.id,
+    entry.data.name,
+    entry.data.name_cases,
+    entry.data.company,
+    entry.data.position,
+  );

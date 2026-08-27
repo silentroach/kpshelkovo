@@ -1,17 +1,20 @@
 import { describe, expect, it } from 'vitest';
 
-import { createPersonMentionTarget } from './mentions';
+import { mapRawPersonMentionTarget } from './mentions';
 
-describe('createPersonMentionTarget', () => {
-  it('adapts person profile fields to the generic entity mention contract', () => {
+describe('mapRawPersonMentionTarget', () => {
+  it('adapts raw person identity fields to the generic mention contract', () => {
     expect(
-      createPersonMentionTarget(
-        'kschemelinin',
-        'Кирилл Щемелинин',
-        { gen: 'Кирилла Щемелинина' },
-        'КПРФ',
-        'депутат',
-      ),
+      mapRawPersonMentionTarget({
+        id: 'kschemelinin',
+        data: {
+          name: 'Кирилл Щемелинин',
+          name_cases: { gen: 'Кирилла Щемелинина' },
+          company: 'КПРФ',
+          position: 'депутат',
+          contacts: [],
+        },
+      }),
     ).toMatchInlineSnapshot(`
       {
         "company": "КПРФ",

@@ -4,8 +4,11 @@ import { compareRuText } from '@shelkovo/format';
 
 import type { SiteMentionRegistry } from '../mentions';
 import { loadSiteMentionRegistry } from '../mentions/registry';
-import { mapRawPersonMentionTarget, mapRawPersonProfile } from './mapper';
-import type { PeopleMentionRegistry } from './mentions';
+import { mapRawPersonProfile } from './mapper';
+import {
+  mapRawPersonMentionTarget,
+  type PeopleMentionRegistry,
+} from './mentions';
 import type { PeopleDataset, PersonProfile } from './types';
 
 export type { PeopleDataset } from './types';

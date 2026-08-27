@@ -11,6 +11,8 @@ const person = (id = 'kschemelinin'): SiteMentionPersonEntry => ({
   data: {
     name: 'Кирилл Щемелинин',
     name_cases: { gen: 'Кирилла Щемелинина' },
+    company: 'КПРФ',
+    position: 'депутат',
     contacts: [],
   },
 });
@@ -35,19 +37,19 @@ describe('buildSiteMentionRegistry', () => {
       .toMatchInlineSnapshot(`
         [
           {
-            "company": undefined,
+            "company": "КПРФ",
             "htmlUrl": "/people/kschemelinin/",
             "label": "Кирилл Щемелинин",
             "labelCases": {
               "gen": "Кирилла Щемелинина",
             },
-            "linkTitle": undefined,
+            "linkTitle": "депутат, КПРФ",
             "markdownUrl": "/people/kschemelinin/index.md",
             "name": "Кирилл Щемелинин",
             "nameCases": {
               "gen": "Кирилла Щемелинина",
             },
-            "position": undefined,
+            "position": "депутат",
             "slug": "kschemelinin",
             "type": "person",
           },
