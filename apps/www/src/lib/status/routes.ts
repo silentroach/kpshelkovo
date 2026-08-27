@@ -1,11 +1,13 @@
 import { padNumber } from '@shelkovo/format';
 
+import type { StatusCalendarProjection } from './calendar.types';
 import type { StatusService } from './schema';
 import { canon, withBase } from '../site';
 
 const STATUS_ROOT = '/status/';
 const STATUS_HISTORY = '/status/history/';
 const STATUS_MARKDOWN = '/status/index.md';
+const STATUS_CALENDAR_ROOT = '/status/calendar/';
 const STATUS_INCIDENTS_ROOT = '/status/incidents/';
 const STATUS_DATA = '/status/data/status.json';
 const STATUS_FEED = '/status/feed.xml';
@@ -19,6 +21,11 @@ export interface StatusIncidentRouteInput {
   readonly year: number | string;
   readonly month: number | string;
   readonly slug: string;
+}
+
+export interface StatusCalendarMonthRouteInput {
+  readonly year: number | string;
+  readonly month: number | string;
 }
 
 const need = (value: string, name: string): string => {
@@ -53,6 +60,23 @@ export const statusOpenApiPath = (): string => STATUS_OPENAPI;
 
 export const statusServicePath = (service: StatusService): string =>
   `${STATUS_ROOT}${service}/`;
+
+export const statusCalendarMonthPath = (
+  input: StatusCalendarMonthRouteInput,
+): string =>
+  `${STATUS_CALENDAR_ROOT}${padNumber(input.year, 4)}/${padNumber(input.month, 2)}/`;
+
+export const statusCalendarMonthStaticPaths = (
+  calendar: StatusCalendarProjection,
+) =>
+  calendar.years.flatMap((year) =>
+    year.months.map((month) => ({
+      params: {
+        year: String(month.year),
+        month: padNumber(month.month),
+      },
+    })),
+  );
 
 export const statusIncidentPath = (input: StatusIncidentRouteInput): string =>
   `${STATUS_INCIDENTS_ROOT}${padNumber(input.year, 4)}/${padNumber(input.month, 2)}/${need(input.slug, 'slug')}/`;
@@ -94,10 +118,18 @@ export const statusServiceUrl = (service: StatusService): string =>
 export const statusServiceMarkdownUrl = (service: StatusService): string =>
   withBase(`${statusServicePath(service)}index.md`);
 
+export const statusCalendarMonthUrl = (
+  input: StatusCalendarMonthRouteInput,
+): string => withBase(statusCalendarMonthPath(input));
+
 export const statusCanonical = (): string => canon(STATUS_ROOT);
 
 export const statusServiceCanonical = (service: StatusService): string =>
   canon(statusServicePath(service));
+
+export const statusCalendarMonthCanonical = (
+  input: StatusCalendarMonthRouteInput,
+): string => canon(statusCalendarMonthPath(input));
 
 export const statusIncidentUrl = (input: StatusIncidentRouteInput): string =>
   withBase(statusIncidentPath(input));

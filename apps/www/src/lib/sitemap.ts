@@ -62,6 +62,8 @@ export interface SitemapMetadataSourceData {
 }
 
 const EXTENSION = /\.[^/]+$/u;
+const ERROR_PAGE = /\/404(?:\/|\.html)$/u;
+const PRIVATE_STATUS_MONTH = /^\/status\/calendar\/\d{4}\/\d{2}\/$/u;
 const CHANGEFREQ = {
   daily: ChangeFreqEnum.DAILY,
   hourly: ChangeFreqEnum.HOURLY,
@@ -92,6 +94,12 @@ export const sitemapPathKey = (url: string): string => {
   return normalized.endsWith('/') || EXTENSION.test(normalized)
     ? normalized
     : `${normalized}/`;
+};
+
+export const shouldIncludeSitemapPage = (url: string): boolean => {
+  const path = sitemapPathKey(url);
+
+  return !ERROR_PAGE.test(path) && !PRIVATE_STATUS_MONTH.test(path);
 };
 
 const timestampMs = (value: string): number => {

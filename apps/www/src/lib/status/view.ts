@@ -1,4 +1,9 @@
-import { count, dateTimeFromISO, pluralize } from '@shelkovo/format';
+import {
+  count,
+  dateTimeFromISO,
+  formatMonth,
+  pluralize,
+} from '@shelkovo/format';
 import {
   extractFirstMarkdownText,
   formatDynamicHtml,
@@ -177,6 +182,20 @@ export const formatStatusDate = (
   const date = formatStatusCalendarDate(iso, opts);
 
   return opts?.hasTime ? `${date}, ${formatStatusTime(iso)}` : date;
+};
+
+export const formatStatusMonth = (
+  year: number,
+  month: number,
+  opts?: {
+    readonly capitalize?: boolean;
+  },
+): string => {
+  const label = `${formatMonth(year, month, { includeYear: false })} ${year}`;
+
+  return opts?.capitalize
+    ? `${label.charAt(0).toLocaleUpperCase('ru')}${label.slice(1)}`
+    : label;
 };
 
 export const formatStatusDuration = (

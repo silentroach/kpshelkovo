@@ -1,7 +1,41 @@
 import { ChangeFreqEnum } from '@astrojs/sitemap';
 import { describe, expect, it } from 'vitest';
 
-import { applySitemapMetadata, buildSitemapMetadataIndex } from './sitemap';
+import {
+  applySitemapMetadata,
+  buildSitemapMetadataIndex,
+  shouldIncludeSitemapPage,
+} from './sitemap';
+
+describe('shouldIncludeSitemapPage', () => {
+  it('keeps error pages and dark-launched status months out of the sitemap', () => {
+    expect({
+      rootErrorPage: shouldIncludeSitemapPage(
+        'https://kpshelkovo.online/404/index.html',
+      ),
+      nestedErrorPage: shouldIncludeSitemapPage(
+        'https://kpshelkovo.online/815/compare/404/',
+      ),
+      statusMonth: shouldIncludeSitemapPage(
+        'https://kpshelkovo.online/status/calendar/2026/08/',
+      ),
+      statusYear: shouldIncludeSitemapPage(
+        'https://kpshelkovo.online/status/calendar/2026/',
+      ),
+      statusIncident: shouldIncludeSitemapPage(
+        'https://kpshelkovo.online/status/incidents/2026/08/outage/',
+      ),
+    }).toMatchInlineSnapshot(`
+      {
+        "nestedErrorPage": false,
+        "rootErrorPage": false,
+        "statusIncident": true,
+        "statusMonth": false,
+        "statusYear": true,
+      }
+    `);
+  });
+});
 
 describe('buildSitemapMetadataIndex', () => {
   it('uses publication and update dates for news pages and archives', () => {
