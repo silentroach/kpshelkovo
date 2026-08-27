@@ -2,11 +2,15 @@
 title: Баха
 slug: bakha
 category: construction
-updated_at: 2026-08-25
+updated_at: 2026-08-27
 summary: 'По отзывам, бригада Бахи выполняет широкий спектр работ'
 contacts:
   phone: '+7 926 983-01-21'
 reviews:
+  - sentiment: positive
+    summary: 'Баха подготовил стены под окраску; автор отзыва приложил фотографию результата.'
+    published_at: 2026-08-26
+    url: https://t.me/shelkovoecoclub/54053
   - sentiment: positive
     summary: 'Бригада изготовила две монолитные плиты; автор отзыва отметил качество, ответственный подход и порядок после работ.'
     published_at: 2026-08-25
