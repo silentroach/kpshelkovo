@@ -13,6 +13,7 @@ const MOSCOW_DATE_FORMAT = new Intl.DateTimeFormat('en-US', {
 });
 
 let installed = false;
+let focusedTooltipRoot: HTMLElement | undefined;
 let hoveredTooltipRoot: HTMLElement | undefined;
 
 const tooltipRoot = (
@@ -24,6 +25,12 @@ const tooltipRoot = (
 
 const movedOutside = (root: HTMLElement, target: EventTarget | undefined) =>
   !(target instanceof Node) || !root.contains(target);
+
+const resetTooltipDismissal = (root: HTMLElement): void => {
+  if (focusedTooltipRoot !== root && hoveredTooltipRoot !== root) {
+    root.removeAttribute('data-tooltip-dismissed');
+  }
+};
 
 const tooltipHorizontalShift = (
   bounds: Pick<DOMRect, 'left' | 'right'>,
@@ -104,6 +111,7 @@ export const installStatusCalendarYearInteractions = (): void => {
 
   installed = true;
   document.addEventListener('astro:page-load', () => {
+    focusedTooltipRoot = undefined;
     hoveredTooltipRoot = undefined;
     refreshStatusCalendarToday();
   });
@@ -112,6 +120,7 @@ export const installStatusCalendarYearInteractions = (): void => {
     const root = tooltipRoot(event.target || undefined);
 
     if (root) {
+      focusedTooltipRoot = root;
       positionStatusCalendarTooltip(root);
     }
   });
@@ -128,9 +137,10 @@ export const installStatusCalendarYearInteractions = (): void => {
       return;
     }
 
-    const target =
-      event.target instanceof Element ? event.target : document.activeElement;
-    const root = tooltipRoot(target || undefined) ?? hoveredTooltipRoot;
+    const root =
+      tooltipRoot(event.target || undefined) ??
+      focusedTooltipRoot ??
+      hoveredTooltipRoot;
 
     root?.setAttribute('data-tooltip-dismissed', '');
   });
@@ -138,18 +148,22 @@ export const installStatusCalendarYearInteractions = (): void => {
     const root = tooltipRoot(event.target || undefined);
 
     if (root && movedOutside(root, event.relatedTarget || undefined)) {
-      root.removeAttribute('data-tooltip-dismissed');
+      if (focusedTooltipRoot === root) {
+        focusedTooltipRoot = undefined;
+      }
+
+      resetTooltipDismissal(root);
     }
   });
   document.addEventListener('pointerout', (event) => {
     const root = tooltipRoot(event.target || undefined);
 
     if (root && movedOutside(root, event.relatedTarget || undefined)) {
-      root.removeAttribute('data-tooltip-dismissed');
-
       if (hoveredTooltipRoot === root) {
         hoveredTooltipRoot = undefined;
       }
+
+      resetTooltipDismissal(root);
     }
   });
 };

@@ -129,17 +129,61 @@ describe('installStatusCalendarYearInteractions', () => {
     );
     const dismissedOnFocus = root.hasAttribute('data-tooltip-dismissed');
     button.focus();
+    const resetAfterBlur = root.hasAttribute('data-tooltip-dismissed');
+
+    root.dispatchEvent(new Event('pointerover', { bubbles: true }));
+    link.focus();
+    link.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+    );
+    root.dispatchEvent(
+      new MouseEvent('pointerout', {
+        bubbles: true,
+        relatedTarget: button,
+      }),
+    );
+    const dismissedWhileFocused = root.hasAttribute('data-tooltip-dismissed');
+    button.focus();
+    const resetAfterFocusAndPointerLeave = root.hasAttribute(
+      'data-tooltip-dismissed',
+    );
+
+    root.dispatchEvent(new Event('pointerover', { bubbles: true }));
+    link.focus();
+    link.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+    );
+    button.focus();
+    const dismissedWhileHovered = root.hasAttribute('data-tooltip-dismissed');
+    root.dispatchEvent(
+      new MouseEvent('pointerout', {
+        bubbles: true,
+        relatedTarget: button,
+      }),
+    );
 
     expect({
       dismissedOnHover,
       resetAfterPointerLeaves,
       dismissedOnFocus,
-      resetAfterBlur: root.hasAttribute('data-tooltip-dismissed'),
-    }).toEqual({
-      dismissedOnHover: true,
-      resetAfterPointerLeaves: false,
-      dismissedOnFocus: true,
-      resetAfterBlur: false,
-    });
+      resetAfterBlur,
+      dismissedWhileFocused,
+      resetAfterFocusAndPointerLeave,
+      dismissedWhileHovered,
+      resetAfterBlurAndPointerLeave: root.hasAttribute(
+        'data-tooltip-dismissed',
+      ),
+    }).toMatchInlineSnapshot(`
+      {
+        "dismissedOnFocus": true,
+        "dismissedOnHover": true,
+        "dismissedWhileFocused": true,
+        "dismissedWhileHovered": true,
+        "resetAfterBlur": false,
+        "resetAfterBlurAndPointerLeave": false,
+        "resetAfterFocusAndPointerLeave": false,
+        "resetAfterPointerLeaves": false,
+      }
+    `);
   });
 });
