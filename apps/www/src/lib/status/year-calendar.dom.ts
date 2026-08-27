@@ -1,5 +1,17 @@
 const TOOLTIP_ROOT_SELECTOR = '[data-status-calendar-tooltip-root]';
 const TOOLTIP_LINK_SELECTOR = '[data-status-calendar-day-link]';
+const TOOLTIP_SELECTOR = '[data-status-calendar-tooltip]';
+const TODAY_SELECTOR =
+  '[data-status-calendar-today], .status-calendar-date--today';
+const TOOLTIP_SHIFT_PROPERTY = '--status-calendar-tooltip-shift-x';
+const TOOLTIP_VIEWPORT_MARGIN = 16;
+const TODAY_REFRESH_INTERVAL = 60_000;
+const MOSCOW_DATE_FORMAT = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'Europe/Moscow',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
 
 let installed = false;
 
@@ -13,12 +25,102 @@ const tooltipRoot = (
 const movedOutside = (root: HTMLElement, target: EventTarget | undefined) =>
   !(target instanceof Node) || !root.contains(target);
 
-export const installStatusCalendarYearTooltips = (): void => {
+const tooltipHorizontalShift = (
+  bounds: Pick<DOMRect, 'left' | 'right'>,
+  viewportWidth: number,
+): number => {
+  if (bounds.left < TOOLTIP_VIEWPORT_MARGIN) {
+    return TOOLTIP_VIEWPORT_MARGIN - bounds.left;
+  }
+
+  const maxRight = viewportWidth - TOOLTIP_VIEWPORT_MARGIN;
+
+  return bounds.right > maxRight ? maxRight - bounds.right : 0;
+};
+
+const moscowDateId = (now: Date): string => {
+  const parts = new Map(
+    MOSCOW_DATE_FORMAT.formatToParts(now).map((part) => [
+      part.type,
+      part.value,
+    ]),
+  );
+  const year = parts.get('year');
+  const month = parts.get('month');
+  const day = parts.get('day');
+
+  if (!year || !month || !day) {
+    throw new Error('Moscow calendar date could not be formatted');
+  }
+
+  return `${year}-${month}-${day}`;
+};
+
+export const refreshStatusCalendarToday = (now = new Date()): void => {
+  document.querySelectorAll<HTMLElement>(TODAY_SELECTOR).forEach((element) => {
+    element.classList.remove('status-calendar-date--today');
+    element.removeAttribute('data-status-calendar-today');
+    element.querySelector('a, time')?.removeAttribute('aria-current');
+  });
+
+  const todayId = moscowDateId(now);
+  const today = document.querySelector<HTMLElement>(
+    `[data-status-calendar-date="${todayId}"]`,
+  );
+
+  if (!today) {
+    return;
+  }
+
+  today.classList.add('status-calendar-date--today');
+  today.dataset.statusCalendarToday = todayId;
+  today.querySelector('a, time')?.setAttribute('aria-current', 'date');
+};
+
+export const positionStatusCalendarTooltip = (
+  root: HTMLElement,
+  viewportWidth = window.innerWidth,
+): void => {
+  const tooltip = root.querySelector<HTMLElement>(TOOLTIP_SELECTOR);
+
+  if (!tooltip) {
+    return;
+  }
+
+  tooltip.style.removeProperty(TOOLTIP_SHIFT_PROPERTY);
+
+  const bounds = tooltip.getBoundingClientRect();
+  const shift = tooltipHorizontalShift(bounds, viewportWidth);
+
+  tooltip.style.setProperty(TOOLTIP_SHIFT_PROPERTY, `${shift}px`);
+};
+
+export const installStatusCalendarYearInteractions = (): void => {
+  refreshStatusCalendarToday();
+
   if (installed) {
     return;
   }
 
   installed = true;
+  document.addEventListener('astro:page-load', () =>
+    refreshStatusCalendarToday(),
+  );
+  window.setInterval(refreshStatusCalendarToday, TODAY_REFRESH_INTERVAL);
+  document.addEventListener('focusin', (event) => {
+    const root = tooltipRoot(event.target || undefined);
+
+    if (root) {
+      positionStatusCalendarTooltip(root);
+    }
+  });
+  document.addEventListener('pointerover', (event) => {
+    const root = tooltipRoot(event.target || undefined);
+
+    if (root) {
+      positionStatusCalendarTooltip(root);
+    }
+  });
   document.addEventListener('keydown', (event) => {
     if (event.defaultPrevented || event.key !== 'Escape') {
       return;

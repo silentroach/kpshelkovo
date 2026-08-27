@@ -1,4 +1,6 @@
 ---
+import { formatDynamicHtml } from '@shelkovo/markdown';
+
 import type { StatusCalendarMonthGrid } from '@/lib/status/calendar.types';
 import { statusCalendarDayUrl } from '@/lib/status/routes';
 import {
@@ -65,15 +67,12 @@ const weekdays = [
                   }
                 >
                   <div
-                    class:list={[
-                      'status-calendar-date relative mx-auto inline-flex size-10 items-center justify-center rounded-sm',
-                      day.isToday && 'status-calendar-date--today',
-                    ]}
+                    class="status-calendar-date relative mx-auto inline-flex size-10 items-center justify-center rounded-sm"
+                    data-status-calendar-date={
+                      day.isInMonth ? day.id : undefined
+                    }
                     data-status-calendar-tooltip-root={
                       status ? day.id : undefined
-                    }
-                    data-status-calendar-today={
-                      day.isToday ? day.id : undefined
                     }
                   >
                     {!day.isInMonth ? (
@@ -87,7 +86,6 @@ const weekdays = [
                           month: month.month,
                           id: day.id,
                         })}
-                        aria-current={day.isToday ? 'date' : undefined}
                         aria-label={formatStatusCalendarDayLabel(status)}
                         aria-describedby={tooltipId}
                         class="status-calendar-date__link inline-flex size-9 items-center justify-center rounded-full border-2 border-transparent text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
@@ -108,7 +106,6 @@ const weekdays = [
                     ) : (
                       <time
                         datetime={day.id}
-                        aria-current={day.isToday ? 'date' : undefined}
                         class="ui-num inline-flex size-9 items-center justify-center text-sm text-foreground"
                       >
                         {day.day}
@@ -121,9 +118,10 @@ const weekdays = [
                         role="tooltip"
                         class="status-calendar-date__tooltip"
                         data-status-calendar-tooltip={day.id}
-                      >
-                        {formatStatusCalendarDayTooltip(status)}
-                      </span>
+                        set:html={formatDynamicHtml(
+                          formatStatusCalendarDayTooltip(status),
+                        )}
+                      />
                     )}
                   </div>
                 </td>
@@ -154,37 +152,24 @@ const weekdays = [
     width: max-content;
     max-width: min(15rem, calc(100vw - 2rem));
     padding: 0.5rem 0.625rem;
-    translate: -50% 0;
+    translate: calc(-50% + var(--status-calendar-tooltip-shift-x, 0px)) 0;
     border: 1px solid var(--color-border-strong);
     border-radius: var(--radius-sm);
     background: var(--color-surface-raised);
     box-shadow: var(--shadow-1);
     color: var(--color-text);
+    display: none;
     font-size: 0.8125rem;
     font-weight: 400;
     line-height: 1.4;
-    opacity: 0;
     pointer-events: none;
-    visibility: hidden;
-  }
-
-  td:first-child .status-calendar-date__tooltip {
-    left: 0;
-    translate: 0 0;
-  }
-
-  td:last-child .status-calendar-date__tooltip {
-    right: 0;
-    left: auto;
-    translate: 0 0;
   }
 
   .status-calendar-date:not([data-tooltip-dismissed]):hover
     .status-calendar-date__tooltip,
   .status-calendar-date:not([data-tooltip-dismissed]):focus-within
     .status-calendar-date__tooltip {
-    opacity: 1;
+    display: block;
     pointer-events: auto;
-    visibility: visible;
   }
 </style>

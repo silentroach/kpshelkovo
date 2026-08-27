@@ -4,7 +4,6 @@ import { createMarkdownResponse } from '@/lib/markdown/response';
 import {
   buildStatusCalendarYearGrid,
   currentStatusCalendarYear,
-  statusCalendarTodayId,
 } from '@/lib/status/calendar';
 import { loadStatusData } from '@/lib/status/load';
 import { buildStatusYearMarkdown } from '@/lib/status/markdown';
@@ -29,7 +28,6 @@ export const GET: APIRoute = async ({ params }) => {
   const calendar = buildStatusCalendarYearGrid(
     (await loadStatusData()).calendar,
     year,
-    statusCalendarTodayId(now),
   );
 
   return createMarkdownResponse(buildStatusYearMarkdown(calendar));

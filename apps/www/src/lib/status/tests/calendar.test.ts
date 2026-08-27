@@ -5,7 +5,6 @@ import {
   buildStatusCalendarProjection,
   currentStatusCalendarYear,
   statusCalendarMonthId,
-  statusCalendarTodayId,
 } from '../calendar';
 import type {
   StatusCalendarProjection,
@@ -296,70 +295,55 @@ describe('buildStatusCalendarProjection', () => {
 describe('buildStatusCalendarYearGrid', () => {
   it('builds twelve six-week Monday-first months even without records', () => {
     const projection = buildStatusCalendarProjection([], BUILD_NOW_MS);
-    const year = buildStatusCalendarYearGrid(projection, 2026, '2026-08-27');
+    const year = buildStatusCalendarYearGrid(projection, 2026);
 
     expect({
       months: year.months.length,
       weeksPerMonth: year.months.map((month) => month.weeks.length),
       januaryFirstWeek: year.months[0]?.weeks[0],
-      augustToday: year.months[7]?.weeks.flat().find((day) => day.isToday),
     }).toMatchInlineSnapshot(`
       {
-        "augustToday": {
-          "day": 27,
-          "id": "2026-08-27",
-          "isInMonth": true,
-          "isToday": true,
-          "status": undefined,
-        },
         "januaryFirstWeek": [
           {
             "day": 29,
             "id": "2025-12-29",
             "isInMonth": false,
-            "isToday": false,
             "status": undefined,
           },
           {
             "day": 30,
             "id": "2025-12-30",
             "isInMonth": false,
-            "isToday": false,
             "status": undefined,
           },
           {
             "day": 31,
             "id": "2025-12-31",
             "isInMonth": false,
-            "isToday": false,
             "status": undefined,
           },
           {
             "day": 1,
             "id": "2026-01-01",
             "isInMonth": true,
-            "isToday": false,
             "status": undefined,
           },
           {
             "day": 2,
             "id": "2026-01-02",
             "isInMonth": true,
-            "isToday": false,
             "status": undefined,
           },
           {
             "day": 3,
             "id": "2026-01-03",
             "isInMonth": true,
-            "isToday": false,
             "status": undefined,
           },
           {
             "day": 4,
             "id": "2026-01-04",
             "isInMonth": true,
-            "isToday": false,
             "status": undefined,
           },
         ],
@@ -382,15 +366,13 @@ describe('buildStatusCalendarYearGrid', () => {
     `);
   });
 
-  it('uses Moscow time for the current year and date', () => {
+  it('uses Moscow time for the current year', () => {
     const beforeMoscowMidnight = new Date('2026-12-31T20:59:59.000Z');
     const afterMoscowMidnight = new Date('2026-12-31T21:00:00.000Z');
 
     expect([
       currentStatusCalendarYear(beforeMoscowMidnight),
-      statusCalendarTodayId(beforeMoscowMidnight),
       currentStatusCalendarYear(afterMoscowMidnight),
-      statusCalendarTodayId(afterMoscowMidnight),
-    ]).toEqual([2026, '2026-12-31', 2027, '2027-01-01']);
+    ]).toEqual([2026, 2027]);
   });
 });

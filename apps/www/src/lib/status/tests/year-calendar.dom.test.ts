@@ -1,8 +1,96 @@
 import { describe, expect, it } from 'vitest';
 
-import { installStatusCalendarYearTooltips } from '../year-calendar.dom';
+import {
+  installStatusCalendarYearInteractions,
+  positionStatusCalendarTooltip,
+  refreshStatusCalendarToday,
+} from '../year-calendar.dom';
 
-describe('installStatusCalendarYearTooltips', () => {
+const calendarDate = (id: string): string => `
+  <span data-status-calendar-date="${id}">
+    <time datetime="${id}">${Number(id.slice(-2))}</time>
+  </span>
+`;
+
+describe('refreshStatusCalendarToday', () => {
+  it('moves the marker to the current Moscow date after midnight', () => {
+    document.body.innerHTML = `
+      ${calendarDate('2026-08-27')}
+      ${calendarDate('2026-08-28')}
+    `;
+
+    refreshStatusCalendarToday(new Date('2026-08-27T20:59:59.000Z'));
+    refreshStatusCalendarToday(new Date('2026-08-27T21:00:00.000Z'));
+
+    expect(
+      [...document.querySelectorAll('[data-status-calendar-date]')].map(
+        (date) => ({
+          id: date.getAttribute('data-status-calendar-date'),
+          today: date.getAttribute('data-status-calendar-today'),
+          current: date.querySelector('time')?.getAttribute('aria-current'),
+        }),
+      ),
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "current": null,
+          "id": "2026-08-27",
+          "today": null,
+        },
+        {
+          "current": "date",
+          "id": "2026-08-28",
+          "today": "2026-08-28",
+        },
+      ]
+    `);
+  });
+});
+
+describe('positionStatusCalendarTooltip', () => {
+  it('shifts long tooltips inside both viewport edges', () => {
+    document.body.innerHTML = `
+      <span data-status-calendar-tooltip-root>
+        <span data-status-calendar-tooltip>Tooltip</span>
+      </span>
+    `;
+    const root = document.querySelector<HTMLElement>(
+      '[data-status-calendar-tooltip-root]',
+    );
+    const tooltip = root?.querySelector<HTMLElement>(
+      '[data-status-calendar-tooltip]',
+    );
+
+    if (!root || !tooltip) {
+      throw new Error('status calendar positioning fixture is incomplete');
+    }
+
+    tooltip.getBoundingClientRect = () =>
+      ({ left: -40, right: 200 }) as DOMRect;
+    positionStatusCalendarTooltip(root, 320);
+    const leftShift = tooltip.style.getPropertyValue(
+      '--status-calendar-tooltip-shift-x',
+    );
+
+    tooltip.getBoundingClientRect = () =>
+      ({ left: 100, right: 340 }) as DOMRect;
+    positionStatusCalendarTooltip(root, 320);
+
+    expect({
+      leftShift,
+      rightShift: tooltip.style.getPropertyValue(
+        '--status-calendar-tooltip-shift-x',
+      ),
+    }).toMatchInlineSnapshot(`
+      {
+        "leftShift": "56px",
+        "rightShift": "-36px",
+      }
+    `);
+  });
+});
+
+describe('installStatusCalendarYearInteractions', () => {
   it('dismisses a focused tooltip on Escape and resets after focus leaves', () => {
     document.body.innerHTML = `
       <span data-status-calendar-tooltip-root>
@@ -21,7 +109,7 @@ describe('installStatusCalendarYearTooltips', () => {
       throw new Error('status calendar tooltip fixture is incomplete');
     }
 
-    installStatusCalendarYearTooltips();
+    installStatusCalendarYearInteractions();
     link.focus();
     link.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),

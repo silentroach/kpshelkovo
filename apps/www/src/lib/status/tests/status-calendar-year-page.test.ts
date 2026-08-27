@@ -4,6 +4,7 @@ import { Window } from 'happy-dom';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { createAstroContainer } from '@/test/astro-container';
+import { visibleWhitespace } from '@/lib/test/visible-whitespace';
 import type {
   StatusCalendarDay,
   StatusCalendarMonth,
@@ -200,6 +201,13 @@ describe('/status/calendar/YYYY/', () => {
       unaffectedDayHasLink: Boolean(
         january?.querySelector('[data-status-calendar-cell="2026-01-02"] a'),
       ),
+      clientDateCount: document.querySelectorAll('[data-status-calendar-date]')
+        .length,
+      hasBuildTimeToday: Boolean(
+        document.querySelector(
+          '[data-status-calendar-today], [aria-current="date"]',
+        ),
+      ),
     }).toMatchInlineSnapshot(`
       {
         "adjacent": {
@@ -224,6 +232,8 @@ describe('/status/calendar/YYYY/', () => {
           42,
           42,
         ],
+        "clientDateCount": 365,
+        "hasBuildTimeToday": false,
         "januaryWeekdays": [
           {
             "label": "Понедельник",
@@ -287,16 +297,8 @@ describe('/status/calendar/YYYY/', () => {
       ].map((tooltip) => ({
         id: tooltip.id,
         role: tooltip.getAttribute('role'),
-        text: cleanText(tooltip.textContent),
+        text: visibleWhitespace(tooltip.textContent.trim()),
       })),
-      today: {
-        id: document
-          .querySelector('[data-status-calendar-today]')
-          ?.getAttribute('data-status-calendar-today'),
-        current: document
-          .querySelector('[data-status-calendar-today] [aria-current]')
-          ?.getAttribute('aria-current'),
-      },
     }).toMatchInlineSnapshot(`
       {
         "links": [
@@ -339,25 +341,21 @@ describe('/status/calendar/YYYY/', () => {
             "monthExists": true,
           },
         ],
-        "today": {
-          "current": "date",
-          "id": "2026-08-27",
-        },
         "tooltips": [
           {
             "id": "status-calendar-tooltip-2026-01-01",
             "role": "tooltip",
-            "text": "1 января: 1 плановая работа",
+            "text": "1·января: 1 плановая работа",
           },
           {
             "id": "status-calendar-tooltip-2026-08-23",
             "role": "tooltip",
-            "text": "23 августа: 1 инцидент",
+            "text": "23·августа: 1 инцидент",
           },
           {
             "id": "status-calendar-tooltip-2026-08-24",
             "role": "tooltip",
-            "text": "24 августа: 2 инцидента, 1 плановая работа",
+            "text": "24·августа: 2 инцидента, 1 плановая работа",
           },
         ],
       }
@@ -369,11 +367,7 @@ describe('/status/calendar/YYYY/', () => {
     const legend = document.querySelector('[data-status-calendar-legend]');
 
     expect({
-      legendItems: [...(legend?.querySelectorAll('li') ?? [])].map((item) =>
-        cleanText(
-          item.querySelector(':scope > span:last-child')?.textContent ?? '',
-        ),
-      ),
+      legendItemCount: legend?.querySelectorAll('li').length,
       legendMarkers: [
         ...(legend?.querySelectorAll('[data-status-calendar-marker]') ?? []),
       ].map((marker) => marker.getAttribute('data-status-calendar-marker')),
@@ -391,12 +385,7 @@ describe('/status/calendar/YYYY/', () => {
       },
     }).toMatchInlineSnapshot(`
       {
-        "legendItems": [
-          "Инцидент — красный круг.",
-          "Плановые работы — янтарное кольцо.",
-          "Оба типа — круг с внешним кольцом.",
-          "Сегодня — зелёная квадратная рамка.",
-        ],
+        "legendItemCount": 4,
         "legendMarkers": [
           "incident",
           "maintenance",

@@ -33,7 +33,6 @@ const buildMonthGrid = (
   calendar: StatusCalendarProjection,
   year: number,
   month: number,
-  todayId: string,
 ): StatusCalendarMonthGrid => {
   const firstDay = dateTimeFromParts({ year, month, day: 1 });
   const gridStart = firstDay.minus({ days: firstDay.weekday - 1 });
@@ -48,7 +47,6 @@ const buildMonthGrid = (
         id,
         day: date.day,
         isInMonth,
-        isToday: isInMonth && id === todayId,
         status: isInMonth ? calendar.byDay.get(id) : undefined,
       };
     },
@@ -68,16 +66,9 @@ const buildMonthGrid = (
 export const currentStatusCalendarYear = (now = new Date()): number =>
   toMoscowDateTime(now.valueOf()).year;
 
-export const statusCalendarTodayId = (now = new Date()): string => {
-  const today = toMoscowDateTime(now.valueOf());
-
-  return dayId(today.year, today.month, today.day);
-};
-
 export const buildStatusCalendarYearGrid = (
   calendar: StatusCalendarProjection,
   year: number,
-  todayId: string,
 ): StatusCalendarYearGrid => {
   if (!Number.isInteger(year)) {
     throw new Error('status calendar year must be an integer');
@@ -86,7 +77,7 @@ export const buildStatusCalendarYearGrid = (
   return {
     year,
     months: Array.from({ length: 12 }, (_, index) =>
-      buildMonthGrid(calendar, year, index + 1, todayId),
+      buildMonthGrid(calendar, year, index + 1),
     ),
   };
 };

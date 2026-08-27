@@ -43,7 +43,6 @@ export interface StatusCalendarGridDay {
   readonly id: string;
   readonly day: number;
   readonly isInMonth: boolean;
-  readonly isToday: boolean;
   readonly status?: StatusCalendarDay;
 }
 
