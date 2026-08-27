@@ -4,7 +4,6 @@ const dayId = '2026-08-26';
 const monthPath = '/status/calendar/2026/08/';
 const dayPath = `${monthPath}#${dayId}`;
 const yearPath = '/status/calendar/2026/';
-const calendarHeading = 'Проблемы и плановые работы за 2026 год';
 
 for (const viewport of [
   { name: 'desktop', width: 1280, height: 800 },
@@ -16,14 +15,20 @@ for (const viewport of [
     await page.setViewportSize(viewport);
     await page.goto('/status/', { waitUntil: 'networkidle' });
 
-    const entry = page.getByRole('link', {
-      name: calendarHeading,
-      exact: true,
-    });
+    const entry = page.locator('[data-status-calendar-entry]');
     const entryHref = await entry.getAttribute('href');
     if (!entryHref) {
       throw new Error('Expected status calendar entry URL');
     }
+    const calendarYear = new URL(entryHref, page.url()).pathname.match(
+      /^\/status\/calendar\/(\d{4})\/$/,
+    )?.[1];
+    if (!calendarYear) {
+      throw new Error('Expected a year status calendar entry URL');
+    }
+    const calendarHeading = `Проблемы и плановые работы за ${calendarYear} год`;
+
+    await expect(entry).toHaveAccessibleName(calendarHeading);
 
     const entryLayout = await entry.evaluate((link) => {
       const copy = document.querySelector('[data-status-page-header-copy]');
@@ -82,10 +87,8 @@ for (const viewport of [
       .click();
     await page.waitForURL('/status/');
 
-    const calendarView = page.getByRole('link', {
-      name: calendarHeading,
-      exact: true,
-    });
+    const calendarView = page.locator('[data-status-calendar-entry]');
+    await expect(calendarView).toHaveAccessibleName(calendarHeading);
     await expect(calendarView).toHaveAttribute('href', entryHref);
     await calendarView.click();
     await page.waitForURL(entryHref);
