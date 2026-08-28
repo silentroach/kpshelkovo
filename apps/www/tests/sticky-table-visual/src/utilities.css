@@ -1,4 +1,0 @@
-@import 'tailwindcss/utilities' source(none);
-@reference '@shelkovo/ui/styles.css';
-
-@source './pages/index.astro';

@@ -1,9 +1,0 @@
-@reference '@shelkovo/ui/styles.css';
-@import 'tailwindcss/utilities.css' layer(utilities) source(none);
-
-@source '../../pages/news/index.astro';
-@source '../../components/ShelkovoAreaIcon.astro';
-@source '../../components/news/NewsList.astro';
-@source '../../components/news/NewsCard.astro';
-@source '../../components/news/NewsMeta.astro';
-@source '../../components/news/NewsTagList.astro';
