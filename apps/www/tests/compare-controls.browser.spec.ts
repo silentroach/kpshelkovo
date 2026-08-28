@@ -4,6 +4,61 @@ const mobileViewports = [
   { width: 320, height: 760 },
   { width: 390, height: 844 },
 ] as const;
+const explorerControlSelector =
+  '[data-testid="explorer-controls"] input, [data-testid="explorer-controls"] button, [data-testid="sort-select"]';
+
+test('keeps one settlement list before and after hydration', async ({
+  baseURL,
+  browser,
+  page,
+  request,
+}) => {
+  const dataResponse = await request.get('/815/compare/data/explorer.json');
+  expect(dataResponse.ok()).toBe(true);
+  const payload = (await dataResponse.json()) as {
+    readonly settlements: readonly unknown[];
+  };
+  const expectedCount = payload.settlements.length;
+  const noJavaScriptContext = await browser.newContext({
+    baseURL,
+    javaScriptEnabled: false,
+    viewport: mobileViewports[1],
+  });
+  const noJavaScriptPage = await noJavaScriptContext.newPage();
+
+  try {
+    await noJavaScriptPage.goto('/815/compare/', {
+      waitUntil: 'networkidle',
+    });
+
+    await expect(noJavaScriptPage.getByTestId('settlement-card')).toHaveCount(
+      expectedCount,
+    );
+    await expect(noJavaScriptPage.locator('#settlements-static')).toHaveCount(
+      0,
+    );
+
+    const controls = noJavaScriptPage.getByTestId('explorer-controls');
+    await expect(controls).toBeVisible();
+    const controlElements = noJavaScriptPage.locator(explorerControlSelector);
+    await expect(controlElements).toHaveCount(5);
+    for (const control of await controlElements.all()) {
+      await expect(control).toBeDisabled();
+    }
+  } finally {
+    await noJavaScriptContext.close();
+  }
+
+  await page.setViewportSize(mobileViewports[1]);
+  await page.goto('/815/compare/', { waitUntil: 'networkidle' });
+
+  await expect(page.getByTestId('settlement-card')).toHaveCount(expectedCount);
+  const controlElements = page.locator(explorerControlSelector);
+  await expect(controlElements).toHaveCount(5);
+  for (const control of await controlElements.all()) {
+    await expect(control).toBeEnabled();
+  }
+});
 
 test('keeps every tariff filter usable beside the map button on mobile', async ({
   page,
