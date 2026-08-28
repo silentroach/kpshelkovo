@@ -1,6 +1,6 @@
 import { resolveStatusServiceState } from './lifecycle';
 import type { StatusIncidentWindowInput } from './types';
-import { formatStatusServiceState } from './view';
+import { formatStatusServiceState } from './service-state';
 
 declare global {
   interface Window {
