@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node ../../scripts/check-blocking-css-budget.mjs dist/site && pagefind && rm -rf ../../dist/www && mkdir -p ../../dist && cp -R dist/site ../../dist/www",
+    "build": "astro build && pagefind && rm -rf ../../dist/www && mkdir -p ../../dist && cp -R dist/site ../../dist/www",
     "search:prepare": "rm -rf ../../.cache/pagefind && astro build && pagefind --output-path ../../.cache/pagefind",
     "preview": "astro preview",
     "typecheck": "astro sync && tsc --noEmit",

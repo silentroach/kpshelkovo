@@ -2,29 +2,22 @@
 import firaSansCyrillic400 from '@fontsource/fira-sans/files/fira-sans-cyrillic-400-normal.woff2';
 import firaSansCyrillic600 from '@fontsource/fira-sans/files/fira-sans-cyrillic-600-normal.woff2';
 import ptSerifCyrillic700 from '@fontsource/pt-serif/files/pt-serif-cyrillic-700-normal.woff2';
+
+const fonts = [
+  firaSansCyrillic400,
+  firaSansCyrillic600,
+  ptSerifCyrillic700,
+] as const;
 ---
 
-<link
-  rel="preload"
-  href={firaSansCyrillic400}
-  as="font"
-  type="font/woff2"
-  crossorigin="anonymous"
-  fetchpriority="high"
-/>
-<link
-  rel="preload"
-  href={firaSansCyrillic600}
-  as="font"
-  type="font/woff2"
-  crossorigin="anonymous"
-  fetchpriority="low"
-/>
-<link
-  rel="preload"
-  href={ptSerifCyrillic700}
-  as="font"
-  type="font/woff2"
-  crossorigin="anonymous"
-  fetchpriority="low"
-/>
+{
+  fonts.map((href) => (
+    <link
+      rel="preload"
+      href={href}
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+  ))
+}

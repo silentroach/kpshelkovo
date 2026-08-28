@@ -3,11 +3,9 @@ import type { GetStaticPaths } from 'astro';
 
 import { formatDynamicHtml } from '@shelkovo/markdown';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
-import '@shelkovo/ui/prose.css';
 
 import PlaceOpeningHours from '@/components/places/PlaceOpeningHours.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import '@/styles/routes/content.css';
 import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
 import { renderMarkdown } from '@/lib/markdown/render';
 import { loadPlaces, loadPlaceWithBacklinks } from '@/lib/places/load';

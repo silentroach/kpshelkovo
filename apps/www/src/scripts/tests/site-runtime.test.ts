@@ -8,9 +8,6 @@ vi.mock('@/lib/search/highlight', () => ({
   SEARCH_HIGHLIGHT_PARAM: 'h',
 }));
 vi.mock('@/components/search/lazy', () => ({ openSearchDialog }));
-vi.mock('@/styles/search-dialog.css?url', () => ({
-  default: 'data:text/css,',
-}));
 
 import '../site-runtime';
 
@@ -92,11 +89,6 @@ describe('search dialog loader', () => {
     expect(click.defaultPrevented).toBe(true);
 
     input.value = 'вода';
-
-    expect(openSearchDialog).not.toHaveBeenCalled();
-    document
-      .querySelector<HTMLLinkElement>('[data-search-dialog-styles]')
-      ?.dispatchEvent(new Event('load'));
 
     await vi.waitFor(() => expect(openSearchDialog).toHaveBeenCalledOnce());
     expect(openSearchDialog).toHaveBeenCalledWith(root, opener, 'вода');
