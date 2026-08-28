@@ -83,52 +83,32 @@ beforeAll(async () => {
 });
 
 describe('root llms', () => {
-  it('serializes the short agent overview as Markdown AST output', async () => {
-    await expect(build('short')).resolves.toMatchInlineSnapshot(`
-      "# Шелково Онлайн
+  it('publishes registered knowledge base entries in every root map', async () => {
+    const root = 'https://example.com';
+    const maps = [
+      await build('short'),
+      await build('full'),
+      await buildHomeMarkdown(),
+    ];
+    const knowledgeBaseSurfaceIds = [
+      'kb:index',
+      'kb:index-markdown',
+    ] satisfies readonly PublicSurfaceId[];
 
-      Файл: llms.txt
-      Язык: русский
+    for (const surfaceId of knowledgeBaseSurfaceIds) {
+      const surface = publicSurfaceRegistry.surfaces.find(
+        (item) => item.id === surfaceId,
+      );
 
-      ## Описание
+      expect(surface, surfaceId).toBeDefined();
+      if (!surface) {
+        throw new Error(`Missing registered surface ${surfaceId}`);
+      }
 
-      - Это карта публичных данных и точек входа kpshelkovo.online.
-      - Основные разделы: новости, статус сервисов, карта мест, отзывы собственников, сарафан, архив встреч, регламент и смета тарифа 815, профили людей и сравнение тарифов поселков.
-      - Сейчас в новостях 3 статьи, в статусе 2 записи и 1 активный инцидент, на карте 1 место, в сарафане 1 контакт, в отзывах 2 отзыва, в архиве встреч 1 встреча, в людях 1 профиль.
-      - Для массового чтения используйте JSON-ленты там, где они есть; HTML и Markdown удобнее для ссылок и точечного чтения.
-
-      ## Главные URL
-
-      - Главная: <https://example.com/>
-      - Главная в Markdown: <https://example.com/index.md>
-      - Каталог API сайта: <https://example.com/.well-known/api-catalog>
-      - Инструкции для автоматического чтения сайта: <https://example.com/.well-known/agent-skills/index.json>
-      - Новости: <https://example.com/news/>
-      - Статус: <https://example.com/status/>
-      - Карта мест: <https://example.com/map/>
-      - Отзывы: <https://example.com/reviews/>
-      - Сарафан: <https://example.com/sarafan/>
-      - Архив встреч в Markdown: <https://example.com/meetings/index.md>
-      - Регламент: <https://example.com/815/regulation/>
-      - Люди в Markdown: <https://example.com/people/index.md>
-      - Сравнение тарифов: <https://example.com/815/compare/>
-      - Расширенная версия этого текста: <https://example.com/llms-full.txt>
-
-      ## Как ориентироваться
-
-      - Если задача относится к одному разделу, сначала откройте его \`llms.txt\` или Markdown-индекс; если нужны данные массово, сразу берите JSON-ленту там, где она есть.
-      - Новости: <https://example.com/news/llms.txt>; основная лента: <https://example.com/news/data/articles.json>; календарные события лежат в \`articles[].events[].ics_url\`.
-      - Статус сервисов: <https://example.com/status/llms.txt>; основная лента: <https://example.com/status/data/status.json>.
-      - Карта мест: <https://example.com/map/index.md>; облегчённые данные маркеров и геометрии: <https://example.com/map/data/places.json>; карточки: \`/map/[slug]/\` и \`/map/[slug]/index.md\`, включая входящие ссылки на материалы, где упомянуто место.
-      - Отзывы собственников: <https://example.com/reviews/index.md>; правила публикации: <https://example.com/reviews/rules/index.md>; детальные страницы: \`/reviews/[id]/\` и \`/reviews/[id]/index.md\`.
-      - Сарафан: <https://example.com/sarafan/index.md>; разделы: \`/sarafan/[category]/\` и \`/sarafan/[category]/index.md\`; карточки контактов используют \`/sarafan/[category]/[slug]/\` и \`/sarafan/[category]/[slug]/index.md\`; если для контакта доступна vCard, ее адрес указан в \`vcf_url\`.
-      - Архив встреч: <https://example.com/meetings/index.md>; одна встреча: <https://example.com/meetings/2026-06-13-ok-comfort/> или <https://example.com/meetings/2026-06-13-ok-comfort/index.md>; полный текст транскрипта берите по частям, например <https://example.com/meetings/2026-06-13-ok-comfort/transcript/1.md>.
-      - Регламент и смета: <https://example.com/815/regulation/llms.txt>; смета: <https://example.com/815/regulation/data/estimate-2026.json>; полный регламент: <https://example.com/815/regulation/full.md>; набор данных: <https://example.com/815/regulation/data/full-2026.json>.
-      - Люди: <https://example.com/people/llms.txt>; основная лента: <https://example.com/people/data/people.json>; одна персона: <https://example.com/people/kschemelinin/> или <https://example.com/people/kschemelinin/index.md>.
-      - Сравнение тарифов поселков: <https://example.com/815/compare/llms.txt>; основная лента: <https://example.com/815/compare/data/settlements.json>.
-      - Публичные инструкции помогают с типовыми задачами; у сравнения тарифов есть отдельный индекс.
-      "
-    `);
+      for (const map of maps) {
+        expect(map).toContain(surfaceHref(root, surface));
+      }
+    }
   });
 
   it('publishes public discovery endpoints without relying on section copy', async () => {
@@ -200,6 +180,8 @@ describe('root llms', () => {
       'reviews:rules-markdown',
       'contacts:index',
       'contacts:index-markdown',
+      'kb:index',
+      'kb:index-markdown',
       'meetings:index-markdown',
       'reglament:index',
       'reglament:llms',

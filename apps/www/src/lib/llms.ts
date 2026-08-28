@@ -101,6 +101,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
   const reviewsMarkdown = registeredSurfaceUrl('reviews:index-markdown');
   const reviewsRules = registeredSurfaceUrl('reviews:rules');
   const reviewsRulesMarkdown = registeredSurfaceUrl('reviews:rules-markdown');
+  const kbHome = registeredSurfaceUrl('kb:index');
+  const kbMarkdown = registeredSurfaceUrl('kb:index-markdown');
   const contactsHome = registeredSurfaceUrl('contacts:index');
   const contactsMarkdown = registeredSurfaceUrl('contacts:index-markdown');
   const meetingsMarkdown = registeredSurfaceUrl('meetings:index-markdown');
@@ -169,7 +171,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
           llmsSection('Описание', [
             markdownList([
               'Это карта публичных данных и точек входа kpshelkovo.online.',
-              'Основные разделы: новости, статус сервисов, карта мест, отзывы собственников, сарафан, архив встреч, регламент и смета тарифа 815, профили людей и сравнение тарифов поселков.',
+              'Основные разделы: новости, статус сервисов, карта мест, отзывы собственников, сарафан, база знаний, архив встреч, регламент и смета тарифа 815, профили людей и сравнение тарифов поселков.',
               `Сейчас в новостях ${count(news.articles.length, ['статья', 'статьи', 'статей'])}, в статусе ${count(status.incidents.length, ['запись', 'записи', 'записей'])} и ${count(activeStatus.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])}, на карте ${count(places.length, ['место', 'места', 'мест'])}, в сарафане ${count(contacts.contacts.length, ['контакт', 'контакта', 'контактов'])}, в отзывах ${count(reviews.reviews.length, ['отзыв', 'отзыва', 'отзывов'])}, в архиве встреч ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}, в людях ${count(people.profiles.length, ['профиль', 'профиля', 'профилей'])}.`,
               'Для массового чтения используйте JSON-ленты там, где они есть; HTML и Markdown удобнее для ссылок и точечного чтения.',
             ]),
@@ -185,6 +187,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Карта мест: ${placesHome}`,
               `Отзывы: ${reviewsHome}`,
               `Сарафан: ${contactsHome}`,
+              `База знаний: ${kbHome}; Markdown-версия: ${kbMarkdown}`,
               `Архив встреч в Markdown: ${meetingsMarkdown}`,
               `Регламент: ${reglamentHome}`,
               `Люди в Markdown: ${peopleMarkdown}`,
@@ -216,7 +219,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
           llmsSection('Проект', [
             markdownList([
               'Это корневой сайт kpshelkovo.online и карта его публичных данных.',
-              `Разделы сайта: \`${registeredSurfacePath('news:index')}\`, \`${registeredSurfacePath('status:index')}\`, \`${registeredSurfacePath('places:index')}\`, \`${registeredSurfacePath('reviews:index')}\`, \`${registeredSurfacePath('contacts:index')}\`, \`${registeredSurfacePath('meetings:index-markdown')}\`, \`${registeredSurfacePath('reglament:index')}\`, \`${registeredSurfacePath('people:index-markdown')}\` и \`${registeredSurfacePath('compare:index')}\`.`,
+              `Разделы сайта: \`${registeredSurfacePath('news:index')}\`, \`${registeredSurfacePath('status:index')}\`, \`${registeredSurfacePath('places:index')}\`, \`${registeredSurfacePath('reviews:index')}\`, \`${registeredSurfacePath('contacts:index')}\`, \`${registeredSurfacePath('kb:index')}\`, \`${registeredSurfacePath('meetings:index-markdown')}\`, \`${registeredSurfacePath('reglament:index')}\`, \`${registeredSurfacePath('people:index-markdown')}\` и \`${registeredSurfacePath('compare:index')}\`.`,
               'Все JSON-ленты доступны только для чтения и отражают состояние на момент сборки сайта.',
               'У раздела людей нет публичной HTML-страницы индекса `/people/`; используйте `/people/index.md` и `/people/data/people.json`.',
               'У архива встреч нет публичной HTML-страницы индекса `/meetings/`; используйте `/meetings/index.md`, описание одной встречи и файлы транскрипта по частям.',
@@ -284,6 +287,12 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Сейчас в разделе ${count(contacts.contacts.length, ['контакт', 'контакта', 'контактов'])}.`,
               'Структурированной JSON-ленты сарафана в MVP нет; для машинного чтения используйте Markdown-страницы.',
               'Сайт публикует редакционный контекст и способы связи, но не гарантирует качество услуги.',
+            ]),
+          ]),
+          llmsSection('База знаний', [
+            markdownList([
+              `HTML-страница раздела: ${kbHome}`,
+              `Markdown-версия раздела: ${kbMarkdown}`,
             ]),
           ]),
           llmsSection('Архив встреч', [
@@ -381,6 +390,8 @@ export async function buildHomeMarkdown(): Promise<string> {
   const reviewsHome = registeredSurfaceUrl('reviews:index');
   const reviewsMarkdown = registeredSurfaceUrl('reviews:index-markdown');
   const reviewsRulesMarkdown = registeredSurfaceUrl('reviews:rules-markdown');
+  const kbHome = registeredSurfaceUrl('kb:index');
+  const kbMarkdown = registeredSurfaceUrl('kb:index-markdown');
   const contactsHome = registeredSurfaceUrl('contacts:index');
   const contactsMarkdown = registeredSurfaceUrl('contacts:index-markdown');
   const meetingsMarkdown = registeredSurfaceUrl('meetings:index-markdown');
@@ -419,6 +430,7 @@ export async function buildHomeMarkdown(): Promise<string> {
       `[Карта](${placesHome}) — ${count(places.length, ['место', 'места', 'мест'])}; Markdown-обзор: ${placesMarkdown}; данные маркеров и геометрии: ${placesFeed}`,
       `[Отзывы](${reviewsHome}) — ${count(reviews.reviews.length, ['отзыв', 'отзыва', 'отзывов'])}; Markdown-обзор: ${reviewsMarkdown}; правила публикации: ${reviewsRulesMarkdown}; структурированной ленты нет`,
       `[Сарафан](${contactsHome}) — ${count(contacts.contacts.length, ['контакт', 'контакта', 'контактов'])}; Markdown-обзор: ${contactsMarkdown}; структурированной ленты нет`,
+      `[База знаний](${kbHome}); Markdown-версия: ${kbMarkdown}`,
       `Архив встреч — ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}; Markdown-индекс без HTML-аналога: ${meetingsMarkdown}; полные транскрипты: \`/meetings/[slug]/transcript/[part].md\``,
       `[Регламент](${reglamentHome}) — смета тарифа 2026; структурированная лента: ${reglamentFeed}; полный индекс: ${reglamentFullMarkdown}; полный набор данных: ${reglamentFullDataset}; Markdown-обзор: ${reglamentMarkdown}`,
       `Люди — ${count(people.profiles.length, ['профиль', 'профиля', 'профилей'])}; Markdown-обзор: ${peopleMarkdown}; структурированная лента: ${peopleFeed}; публичного HTML-индекса нет`,
