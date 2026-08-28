@@ -1,18 +1,13 @@
-import type { APIRoute, GetStaticPaths } from 'astro';
+import type { APIRoute } from 'astro';
 
 import { createMarkdownResponse } from '@/lib/markdown/response';
-import { loadNewsTag, loadNewsTags } from '@/lib/news/load';
+import { loadNewsTag } from '@/lib/news/load';
 import { buildNewsTagMarkdown } from '@/lib/news/markdown';
+import { newsTagStaticPaths } from '@/lib/news/static-paths';
 
 export const prerender = true;
 
-export const getStaticPaths = (async () => {
-  const tags = await loadNewsTags();
-
-  return tags.map((item) => ({
-    params: { tag: item.key },
-  }));
-}) satisfies GetStaticPaths;
+export const getStaticPaths = newsTagStaticPaths;
 
 export const GET: APIRoute = async ({ params }) => {
   const key = params.tag;

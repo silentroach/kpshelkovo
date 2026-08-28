@@ -1,8 +1,6 @@
 ---
 import { getImage } from 'astro:assets';
 import { getEntry } from 'astro:content';
-import type { GetStaticPaths } from 'astro';
-import { padNumber } from '@shelkovo/format';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import NewsAttachments from '@/components/news/NewsAttachments.astro';
@@ -14,24 +12,15 @@ import {
   withHomeSchemaBreadcrumbs,
 } from '@/lib/breadcrumbs';
 import { renderMarkdown } from '@/lib/markdown/render';
-import { loadNewsArticle, loadNewsArticles } from '@/lib/news/load';
+import { loadNewsArticle } from '@/lib/news/load';
 import { newsArticleSchema } from '@/lib/news/seo';
+import { newsArticleStaticPaths } from '@/lib/news/static-paths';
 import { NEWS_PROSE, formatNewsMonth } from '@/lib/news/view';
 import { articleUrl, monthUrl, newsUrl, yearUrl } from '@/lib/news/routes';
 import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
 
-export const getStaticPaths = (async () => {
-  const articles = await loadNewsArticles();
-
-  return articles.map((item) => ({
-    params: {
-      year: String(item.year),
-      month: padNumber(item.month),
-      entry: item.entry,
-    },
-  }));
-}) satisfies GetStaticPaths;
+export const getStaticPaths = newsArticleStaticPaths;
 
 const year = Astro.params.year;
 const month = Astro.params.month;
