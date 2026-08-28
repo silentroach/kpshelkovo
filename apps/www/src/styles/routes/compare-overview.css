@@ -1,0 +1,12 @@
+@import '@shelkovo/ui/buttons.css';
+@import '@shelkovo/ui/indicators.css';
+@import '@shelkovo/ui/map-marker.css';
+@reference '@shelkovo/ui/styles.css';
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+
+@source '../../pages/815/compare/index.astro';
+@source '../../compare/components/Hero.svelte';
+@source '../../compare/components/KPIStats.svelte';
+@source '../../compare/components/SettlementCard.svelte';
+@source '../../compare/components/SettlementMap.svelte';
+@source '../../compare/components/SettlementsExplorer.svelte';

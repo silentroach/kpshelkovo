@@ -1,0 +1,5 @@
+@import '@shelkovo/ui/tables.css';
+@reference '@shelkovo/ui/styles.css';
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+
+@source '../../pages/815/regulation/index.astro';
