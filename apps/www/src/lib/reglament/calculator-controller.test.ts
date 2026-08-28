@@ -357,6 +357,161 @@ describe('buildReglamentCalculatorChanges', () => {
     ).toMatchInlineSnapshot(`"48,27 ₽/сотка"`);
   });
 
+  it('creates and registers expert controls when row details first open', async () => {
+    const rowId = 'lighting-electricity';
+    document.body.innerHTML = `
+      <div data-reglament-calculator>
+        <script type="application/json" data-reglament-calculation-input>${JSON.stringify(calculationInput)}</script>
+        <script type="application/json" data-reglament-editor-config>${JSON.stringify(
+          {
+            rows: [
+              {
+                id: rowId,
+                breakdown: [],
+                expert: [
+                  {
+                    key: 'fixed_price',
+                    label: 'Годовая стоимость',
+                    value: 1_473_084,
+                    unit: '₽/год',
+                  },
+                ],
+              },
+            ],
+          },
+        )}</script>
+        <h4 id="reglament-row-title-${rowId}">Электроэнергия для освещения</h4>
+        <details
+          data-reglament-editor-row="${rowId}"
+          data-reglament-editor-title-id="reglament-row-title-${rowId}"
+        >
+          <summary>Детали расчета и источники</summary>
+          <p data-explanation>Расчет по показаниям счетчика.</p>
+          <a data-source href="/source.pdf">Источник</a>
+          <div data-reglament-editor-host></div>
+        </details>
+        <template data-reglament-editor-template>
+          <div data-reglament-editor>
+            <div data-reglament-breakdown-row="gross">
+              <span data-reglament-breakdown-value></span>
+            </div>
+            <fieldset data-reglament-expert-fields>
+              <div data-reglament-expert-fields-list></div>
+            </fieldset>
+          </div>
+        </template>
+        <template data-reglament-expert-control-template>
+          <label>
+            <span data-reglament-control-visible-label></span>
+            <input type="text" />
+            <span data-reglament-control-unit></span>
+            <span data-reglament-control-error hidden></span>
+          </label>
+        </template>
+        <button type="button" data-reglament-reset hidden>Сбросить</button>
+        <strong data-reglament-current-tariff></strong>
+      </div>
+    `;
+    const root = document.querySelector('[data-reglament-calculator]');
+    const details = document.querySelector('details');
+
+    if (
+      !(root instanceof HTMLElement) ||
+      !(details instanceof HTMLDetailsElement)
+    ) {
+      throw new Error('Missing lazy editor calculator fixture nodes');
+    }
+
+    hydrateReglamentCalculator(root);
+
+    expect({
+      explanation: document.querySelector('[data-explanation]')?.textContent,
+      source: document.querySelector('[data-source]')?.getAttribute('href'),
+      fields: document.querySelectorAll('[data-reglament-field]').length,
+    }).toMatchInlineSnapshot(`
+      {
+        "explanation": "Расчет по показаниям счетчика.",
+        "fields": 0,
+        "source": "/source.pdf",
+      }
+    `);
+
+    details.open = true;
+    details.dispatchEvent(new Event('toggle'));
+
+    await vi.waitFor(() => {
+      expect(
+        document.querySelector('[data-reglament-field="fixed_price"]'),
+      ).toBeInstanceOf(HTMLInputElement);
+    });
+
+    const fixedPrice = document.querySelector(
+      '[data-reglament-field="fixed_price"]',
+    );
+    const gross = document.querySelector(
+      '[data-reglament-breakdown-field="gross"]',
+    );
+    const reset = document.querySelector('[data-reglament-reset]');
+
+    if (
+      !(fixedPrice instanceof HTMLInputElement) ||
+      !(gross instanceof HTMLElement) ||
+      !(reset instanceof HTMLButtonElement)
+    ) {
+      throw new Error('Missing rendered lazy editor nodes');
+    }
+
+    expect({
+      ariaLabel: fixedPrice.getAttribute('aria-label'),
+      fields: document.querySelectorAll('[data-reglament-field]').length,
+      gross: gross.textContent,
+      unit: document.querySelector('[data-reglament-control-unit]')
+        ?.textContent,
+      value: fixedPrice.value,
+    }).toMatchInlineSnapshot(`
+      {
+        "ariaLabel": "Электроэнергия для освещения: Годовая стоимость",
+        "fields": 1,
+        "gross": "1 473 084 ₽",
+        "unit": "₽",
+        "value": "1 473 084",
+      }
+    `);
+
+    fixedPrice.value = '1573084';
+    fixedPrice.dispatchEvent(new Event('input', { bubbles: true }));
+
+    expect({
+      gross: gross.textContent,
+      resetHidden: reset.hidden,
+      tariff: document.querySelector('[data-reglament-current-tariff]')
+        ?.textContent,
+    }).toMatchInlineSnapshot(`
+      {
+        "gross": "1 573 084 ₽",
+        "resetHidden": false,
+        "tariff": "902,48 ₽/сотка",
+      }
+    `);
+
+    reset.click();
+    details.open = false;
+    details.open = true;
+    details.dispatchEvent(new Event('toggle'));
+
+    expect({
+      fields: document.querySelectorAll('[data-reglament-field]').length,
+      resetHidden: reset.hidden,
+      value: fixedPrice.value,
+    }).toMatchInlineSnapshot(`
+      {
+        "fields": 1,
+        "resetHidden": true,
+        "value": "1 473 084",
+      }
+    `);
+  });
+
   it('updates a single sticky current tariff and shows reset only while dirty', () => {
     document.body.innerHTML = `
       <div data-reglament-calculator>

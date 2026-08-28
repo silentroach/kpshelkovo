@@ -10,11 +10,11 @@ import {
 } from '@/lib/breadcrumbs';
 import { collectionPageSchema } from '@/lib/json-ld';
 import { projectEstimateCalculationInput } from '@/lib/reglament/calculation-projection';
+import type { ReglamentEditorConfig } from '@/lib/reglament/calculator-editor.types';
 import { buildReglamentPayload } from '@/lib/reglament/discovery';
 import {
   formatReglamentAnnualMoney,
   formatReglamentInputNumber,
-  formatReglamentMoney,
   formatReglamentMoneyDelta,
   formatReglamentNumber,
   formatReglamentTariff,
@@ -318,10 +318,7 @@ const inlineBreakdownControls = (
 const extraExpertControls = (
   controls: readonly NumberControl<ExpertNumberFieldKey>[],
 ): readonly NumberControl<ExpertNumberFieldKey>[] =>
-  controls.filter(
-    (control) =>
-      control.key !== 'fixed_price' && !isInlineBreakdownControl(control),
-  );
+  controls.filter((control) => !isInlineBreakdownControl(control));
 const hasEnabledControl = (row: PayloadRow): boolean =>
   row.editable_fields.some(
     (field) => field.key === 'enabled' && field.level === 'basic',
@@ -352,6 +349,15 @@ const viewSections = htmlSections.map((section) => ({
     };
   }),
 }));
+const editorConfigJson = JSON.stringify({
+  rows: viewSections.flatMap((section) =>
+    section.rows.map((row) => ({
+      id: row.id,
+      breakdown: row.controls.breakdown,
+      expert: row.controls.expert,
+    })),
+  ),
+} satisfies ReglamentEditorConfig).replaceAll('<', '\\u003c');
 const inputShellClass =
   'reglament-input-shell inline-flex max-w-full overflow-hidden rounded-lg border border-border bg-surface align-top transition focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20';
 const inputBaseClass =
@@ -366,8 +372,6 @@ const tableTextClass = 'block pt-[0.4375rem] leading-snug';
 const tableHeaderCellClass =
   'sticky top-[var(--ui-sticky-table-header-top)] z-10 border-b border-border bg-muted px-4 py-2.5 align-bottom lg:top-[calc(var(--ui-sticky-table-header-top)+2.875rem-1px)]';
 const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
-const formatInputUnit = (unit: string): string =>
-  unit === '₽/год' ? '₽' : unit;
 const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
   `reglament-error-${rowId}-${key}`;
 ---
@@ -932,7 +936,11 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                         </tr>
                         <tr>
                           <td class="px-4 pb-3 pt-0 align-top" colspan="5">
-                            <details class="ml-1.5 max-w-[calc(100vw-2.875rem)] text-xs leading-5 text-muted-foreground sm:max-w-[calc(100vw-6.375rem)] lg:max-w-none">
+                            <details
+                              class="ml-1.5 max-w-[calc(100vw-2.875rem)] text-xs leading-5 text-muted-foreground sm:max-w-[calc(100vw-6.375rem)] lg:max-w-none"
+                              data-reglament-editor-row={row.id}
+                              data-reglament-editor-title-id={row.titleId}
+                            >
                               <summary class="reglament-details-summary inline-flex cursor-pointer list-none items-center gap-1.5 font-semibold text-primary outline-none focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-primary/25">
                                 <svg
                                   class="reglament-details-icon h-3 w-3 shrink-0 transition-transform"
@@ -1001,150 +1009,9 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                 </div>
 
                                 <div
-                                  class="space-y-2"
+                                  data-reglament-editor-host={row.id}
                                   data-pagefind-ignore="all"
-                                >
-                                  <p class="font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                                    Состав расчета
-                                  </p>
-                                  <dl class="grid gap-x-3 gap-y-2 sm:grid-cols-2">
-                                    {breakdownFields.map((field) => {
-                                      const control =
-                                        row.controls.breakdown.find(
-                                          (item) => item.key === field.key,
-                                        );
-
-                                      return (
-                                        <div class="flex items-start justify-between gap-3 border-b border-border pb-1">
-                                          <dt class="pt-1.5">{field.label}</dt>
-                                          <dd class="min-w-[10rem] text-right font-semibold text-foreground">
-                                            {control ? (
-                                              <label class="block">
-                                                <span class="sr-only">
-                                                  {row.title}: {control.label}
-                                                </span>
-                                                <span class={inputShellClass}>
-                                                  <input
-                                                    class={inlineInputClass}
-                                                    type="text"
-                                                    inputmode="decimal"
-                                                    value={formatReglamentInputNumber(
-                                                      control.value,
-                                                    )}
-                                                    aria-label={`${row.title}: ${control.label}`}
-                                                    aria-describedby={inputErrorId(
-                                                      row.id,
-                                                      control.key,
-                                                    )}
-                                                    data-reglament-field={
-                                                      control.key
-                                                    }
-                                                    data-reglament-row-id={
-                                                      row.id
-                                                    }
-                                                    data-reglament-baseline={String(
-                                                      control.value,
-                                                    )}
-                                                  />
-                                                  {control.unit && (
-                                                    <span
-                                                      class={inputUnitClass}
-                                                    >
-                                                      {formatInputUnit(
-                                                        control.unit,
-                                                      )}
-                                                    </span>
-                                                  )}
-                                                </span>
-                                                <span
-                                                  id={inputErrorId(
-                                                    row.id,
-                                                    control.key,
-                                                  )}
-                                                  class={inputErrorClass}
-                                                  aria-live="polite"
-                                                  aria-atomic="true"
-                                                  hidden
-                                                />
-                                              </label>
-                                            ) : (
-                                              <span
-                                                class="block pt-1.5"
-                                                data-reglament-row-breakdown={
-                                                  row.id
-                                                }
-                                                data-reglament-breakdown-field={
-                                                  field.key
-                                                }
-                                              >
-                                                {formatReglamentMoney(
-                                                  row.computed.breakdown[
-                                                    field.key
-                                                  ],
-                                                )}
-                                              </span>
-                                            )}
-                                          </dd>
-                                        </div>
-                                      );
-                                    })}
-                                  </dl>
-                                </div>
-
-                                {row.controls.expert.length > 0 && (
-                                  <fieldset
-                                    class="space-y-2 border-t border-border pt-3"
-                                    data-pagefind-ignore="all"
-                                  >
-                                    <legend class="font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                                      Дополнительные поля
-                                    </legend>
-                                    <div class="grid gap-2 sm:grid-cols-2">
-                                      {row.controls.expert.map((control) => (
-                                        <label class="block space-y-1">
-                                          <span class="font-semibold text-muted-foreground">
-                                            {control.label}
-                                          </span>
-                                          <span class={inputShellClass}>
-                                            <input
-                                              class={inputClass}
-                                              type="text"
-                                              inputmode="decimal"
-                                              value={formatReglamentInputNumber(
-                                                control.value,
-                                              )}
-                                              aria-label={`${row.title}: ${control.label}`}
-                                              aria-describedby={inputErrorId(
-                                                row.id,
-                                                control.key,
-                                              )}
-                                              data-reglament-field={control.key}
-                                              data-reglament-row-id={row.id}
-                                              data-reglament-baseline={String(
-                                                control.value,
-                                              )}
-                                            />
-                                            {control.unit && (
-                                              <span class={inputUnitClass}>
-                                                {formatInputUnit(control.unit)}
-                                              </span>
-                                            )}
-                                          </span>
-                                          <span
-                                            id={inputErrorId(
-                                              row.id,
-                                              control.key,
-                                            )}
-                                            class={inputErrorClass}
-                                            aria-live="polite"
-                                            aria-atomic="true"
-                                            hidden
-                                          />
-                                        </label>
-                                      ))}
-                                    </div>
-                                  </fieldset>
-                                )}
+                                />
                               </div>
                             </details>
                           </td>
@@ -1159,6 +1026,90 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
         }
       </div>
     </section>
+
+    <script
+      type="application/json"
+      data-reglament-editor-config
+      set:html={editorConfigJson}
+    />
+
+    <template data-reglament-editor-template data-pagefind-ignore="all">
+      <div class="space-y-4" data-reglament-editor>
+        <div class="space-y-2">
+          <p
+            class="font-semibold uppercase tracking-[0.06em] text-muted-foreground"
+          >
+            Состав расчета
+          </p>
+          <dl class="grid gap-x-3 gap-y-2 sm:grid-cols-2">
+            {
+              breakdownFields.map((field) => (
+                <div
+                  class="flex items-start justify-between gap-3 border-b border-border pb-1"
+                  data-reglament-breakdown-row={field.key}
+                >
+                  <dt class="pt-1.5">{field.label}</dt>
+                  <dd
+                    class="min-w-[10rem] text-right font-semibold text-foreground"
+                    data-reglament-breakdown-value
+                  />
+                </div>
+              ))
+            }
+          </dl>
+        </div>
+
+        <fieldset
+          class="space-y-2 border-t border-border pt-3"
+          data-reglament-expert-fields
+        >
+          <legend
+            class="font-semibold uppercase tracking-[0.06em] text-muted-foreground"
+          >
+            Дополнительные поля
+          </legend>
+          <div
+            class="grid gap-2 sm:grid-cols-2"
+            data-reglament-expert-fields-list
+          >
+          </div>
+        </fieldset>
+      </div>
+    </template>
+
+    <template data-reglament-inline-control-template data-pagefind-ignore="all">
+      <label class="block">
+        <span class="sr-only" data-reglament-control-label></span>
+        <span class={inputShellClass}>
+          <input class={inlineInputClass} type="text" inputmode="decimal" />
+          <span class={inputUnitClass} data-reglament-control-unit></span>
+        </span>
+        <span
+          class={inputErrorClass}
+          aria-live="polite"
+          aria-atomic="true"
+          data-reglament-control-error
+          hidden></span>
+      </label>
+    </template>
+
+    <template data-reglament-expert-control-template data-pagefind-ignore="all">
+      <label class="block space-y-1">
+        <span
+          class="font-semibold text-muted-foreground"
+          data-reglament-control-visible-label></span>
+        <span class={inputShellClass}>
+          <input class={inputClass} type="text" inputmode="decimal" />
+          <span class={inputUnitClass} data-reglament-control-unit></span>
+        </span>
+        <span
+          class={inputErrorClass}
+          aria-live="polite"
+          aria-atomic="true"
+          data-reglament-control-error
+          hidden></span>
+      </label>
+    </template>
   </main>
 
   <style>
@@ -1268,11 +1219,69 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
   </style>
 
   <script>
-    import { hydrateReglamentCalculators } from '@/lib/reglament/calculator-controller';
     import { hydrateStickyTableHeaders } from '@/lib/sticky-table-headers';
 
+    const calculatorRootSelector = '[data-reglament-calculator]';
+    const calculatorDetailsSelector = 'details[data-reglament-editor-row]';
+    const calculatorControlSelector = `[data-reglament-field],[data-reglament-reset],${calculatorDetailsSelector}`;
+    let calculatorController:
+      | Promise<typeof import('@/lib/reglament/calculator-controller')>
+      | undefined;
+
+    const prepareReglamentCalculator = (root: HTMLElement): void => {
+      if (root.dataset.reglamentCalculatorLoader === 'true') {
+        return;
+      }
+
+      root.dataset.reglamentCalculatorLoader = 'true';
+      let calculatorHydration: Promise<void> | undefined;
+      const load = (): void => {
+        calculatorController ??=
+          import('@/lib/reglament/calculator-controller');
+        calculatorHydration ??= calculatorController.then(
+          ({ hydrateReglamentCalculator }) => {
+            hydrateReglamentCalculator(root);
+            root.removeEventListener('focusin', handleIntent);
+            root.removeEventListener('pointerover', handleIntent);
+            root.removeEventListener('input', load);
+            root.removeEventListener('toggle', handleToggle, true);
+          },
+        );
+      };
+      const handleIntent = (event: Event): void => {
+        if (
+          event.target instanceof Element &&
+          event.target.closest(calculatorControlSelector)
+        ) {
+          load();
+        }
+      };
+      const handleToggle = (event: Event): void => {
+        if (
+          event.target instanceof HTMLDetailsElement &&
+          event.target.matches(calculatorDetailsSelector) &&
+          event.target.open
+        ) {
+          load();
+        }
+      };
+
+      root.addEventListener('focusin', handleIntent);
+      root.addEventListener('pointerover', handleIntent);
+      root.addEventListener('input', load);
+      root.addEventListener('toggle', handleToggle, true);
+
+      if (root.querySelector(`${calculatorDetailsSelector}[open]`)) {
+        load();
+      }
+    };
+
     const hydrate = () => {
-      hydrateReglamentCalculators();
+      document.querySelectorAll(calculatorRootSelector).forEach((root) => {
+        if (root instanceof HTMLElement) {
+          prepareReglamentCalculator(root);
+        }
+      });
       hydrateStickyTableHeaders();
     };
 

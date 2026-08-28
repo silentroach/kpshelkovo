@@ -58,6 +58,7 @@ const ROW_TARIFF_ATTRIBUTE = 'data-reglament-row-tariff';
 const ROW_ANNUAL_ATTRIBUTE = 'data-reglament-row-annual';
 const ROW_BREAKDOWN_ATTRIBUTE = 'data-reglament-row-breakdown';
 const BREAKDOWN_FIELD_ATTRIBUTE = 'data-reglament-breakdown-field';
+const EDITOR_DETAILS_SELECTOR = 'details[data-reglament-editor-row]';
 const STATIC_ELEMENT_ATTRIBUTES = [
   CURRENT_TARIFF_ATTRIBUTE,
   CURRENT_TARIFF_TONE_ATTRIBUTE,
@@ -124,12 +125,12 @@ const BREAKDOWN_FIELD_KEYS = [
 ] as const satisfies readonly BreakdownFieldKey[];
 
 interface ReglamentCalculatorDomIndex {
-  readonly calculationInput?: HTMLScriptElement;
-  readonly fields: readonly HTMLInputElement[];
-  readonly resetButtons: readonly HTMLButtonElement[];
-  readonly validationFeedback: ReadonlyMap<HTMLInputElement, HTMLElement>;
-  readonly elements: ReadonlyMap<string, readonly HTMLElement[]>;
-  readonly breakdownInputs: ReadonlyMap<string, readonly HTMLInputElement[]>;
+  calculationInput?: HTMLScriptElement;
+  readonly fields: HTMLInputElement[];
+  readonly resetButtons: HTMLButtonElement[];
+  readonly validationFeedback: Map<HTMLInputElement, HTMLElement>;
+  readonly elements: Map<string, HTMLElement[]>;
+  readonly breakdownInputs: Map<string, HTMLInputElement[]>;
 }
 
 const isEditableFieldKey = (
@@ -322,16 +323,10 @@ const getIndexedBreakdownInputs = (
 ): readonly HTMLInputElement[] =>
   index.breakdownInputs.get(indexedElementKey(rowId, field)) ?? [];
 
-const createReglamentCalculatorDomIndex = (
+const indexReglamentCalculatorDom = (
+  index: ReglamentCalculatorDomIndex,
   root: ParentNode,
-): ReglamentCalculatorDomIndex => {
-  let calculationInput: HTMLScriptElement | undefined;
-  const fields: HTMLInputElement[] = [];
-  const resetButtons: HTMLButtonElement[] = [];
-  const validationFeedback = new Map<HTMLInputElement, HTMLElement>();
-  const elements = new Map<string, HTMLElement[]>();
-  const breakdownInputs = new Map<string, HTMLInputElement[]>();
-
+): void => {
   root.querySelectorAll(CACHED_ELEMENT_SELECTOR).forEach((node) => {
     if (!(node instanceof HTMLElement)) {
       return;
@@ -341,14 +336,14 @@ const createReglamentCalculatorDomIndex = (
       node instanceof HTMLScriptElement &&
       node.hasAttribute(CALCULATION_INPUT_ATTRIBUTE)
     ) {
-      calculationInput = node;
+      index.calculationInput = node;
     }
 
     if (
       node instanceof HTMLInputElement &&
       node.hasAttribute(FIELD_ATTRIBUTE)
     ) {
-      fields.push(node);
+      index.fields.push(node);
 
       if (node.type !== 'checkbox') {
         const errorId = node.getAttribute('aria-describedby') ?? undefined;
@@ -357,7 +352,7 @@ const createReglamentCalculatorDomIndex = (
           : undefined;
 
         if (feedback instanceof HTMLElement) {
-          validationFeedback.set(node, feedback);
+          index.validationFeedback.set(node, feedback);
         }
       }
 
@@ -365,7 +360,7 @@ const createReglamentCalculatorDomIndex = (
       const field = node.dataset.reglamentField;
 
       if (rowId && isAutoSyncedBreakdownFieldKey(field)) {
-        addIndexedElement(breakdownInputs, node, rowId, field);
+        addIndexedElement(index.breakdownInputs, node, rowId, field);
       }
     }
 
@@ -373,16 +368,16 @@ const createReglamentCalculatorDomIndex = (
       node instanceof HTMLButtonElement &&
       node.hasAttribute(RESET_ATTRIBUTE)
     ) {
-      resetButtons.push(node);
+      index.resetButtons.push(node);
     }
 
     STATIC_ELEMENT_ATTRIBUTES.forEach((attribute) => {
       if (node.hasAttribute(attribute)) {
-        addIndexedElement(elements, node, attribute);
+        addIndexedElement(index.elements, node, attribute);
       }
     });
     ID_ELEMENT_ATTRIBUTES.forEach((attribute) => {
-      indexAttributeElement(elements, node, attribute);
+      indexAttributeElement(index.elements, node, attribute);
     });
 
     const breakdownRowId =
@@ -392,7 +387,7 @@ const createReglamentCalculatorDomIndex = (
 
     if (breakdownRowId && breakdownField) {
       addIndexedElement(
-        elements,
+        index.elements,
         node,
         ROW_BREAKDOWN_ATTRIBUTE,
         breakdownRowId,
@@ -400,15 +395,22 @@ const createReglamentCalculatorDomIndex = (
       );
     }
   });
+};
 
-  return {
-    calculationInput,
-    fields,
-    resetButtons,
-    validationFeedback,
-    elements,
-    breakdownInputs,
+const createReglamentCalculatorDomIndex = (
+  root: ParentNode,
+): ReglamentCalculatorDomIndex => {
+  const index: ReglamentCalculatorDomIndex = {
+    fields: [],
+    resetButtons: [],
+    validationFeedback: new Map(),
+    elements: new Map(),
+    breakdownInputs: new Map(),
   };
+
+  indexReglamentCalculatorDom(index, root);
+
+  return index;
 };
 
 const setText = (elements: readonly HTMLElement[], value: string): void => {
@@ -712,6 +714,45 @@ export const hydrateReglamentCalculator = (
   }
 
   root.dataset.reglamentCalculatorHydrated = 'true';
+  let editorHydration: Promise<void> | undefined;
+  const hydrateEditors = async (): Promise<void> => {
+    const { hydrateReglamentEditors } = await import('./calculator-editor');
+    hydrateReglamentEditors(root, (editor) => {
+      indexReglamentCalculatorDom(index, editor);
+      render();
+    });
+    root.removeEventListener('focusin', handleEditorIntent);
+    root.removeEventListener('pointerover', handleEditorIntent);
+    root.removeEventListener('toggle', handleEditorToggle, true);
+  };
+  const loadEditors = (): void => {
+    editorHydration ??= hydrateEditors();
+  };
+  const handleEditorIntent = (event: Event): void => {
+    if (
+      event.target instanceof Element &&
+      event.target.closest(EDITOR_DETAILS_SELECTOR)
+    ) {
+      loadEditors();
+    }
+  };
+  const handleEditorToggle = (event: Event): void => {
+    if (
+      event.target instanceof HTMLDetailsElement &&
+      event.target.matches(EDITOR_DETAILS_SELECTOR) &&
+      event.target.open
+    ) {
+      loadEditors();
+    }
+  };
+  root.addEventListener('focusin', handleEditorIntent);
+  root.addEventListener('pointerover', handleEditorIntent);
+  root.addEventListener('toggle', handleEditorToggle, true);
+
+  if (root.querySelector(`${EDITOR_DETAILS_SELECTOR}[open]`)) {
+    loadEditors();
+  }
+
   root.addEventListener('input', (event) => {
     if (event.target instanceof HTMLInputElement) {
       markManualBreakdownInput(event.target);
