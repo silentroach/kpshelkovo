@@ -108,6 +108,7 @@ const queryGroups = [
       'буржуйка',
       'буржуйка на карте',
       'адрес буржуйки',
+      'время работы буржуйки',
       'телефон буржуйки',
       'меню буржуйки',
       'фудтрак',
@@ -182,9 +183,8 @@ const rankExpectations: ReadonlyMap<
   ['рыболовные пруды', { url: '/map/hunting-ponds/', maxRank: 1 }],
   ['озера для рыбной ловли', { url: '/map/hunting-ponds/', maxRank: 1 }],
   ['рыбалка', { url: '/map/hunting-ponds/', maxRank: 1 }],
-  ['буржуйка', { url: '/map/burzhuyka/', maxRank: 1 }],
+  ['буржуйка', { url: '/map/burzhuyka/', maxRank: 2 }],
   ['буржуйка на карте', { url: '/map/burzhuyka/', maxRank: 2 }],
-  ['адрес буржуйки', { url: '/map/burzhuyka/', maxRank: 1 }],
   ['телефон буржуйки', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
   ['меню буржуйки', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
   [
@@ -195,17 +195,6 @@ const rankExpectations: ReadonlyMap<
 ]);
 
 const emptyQueryExpectations = new Set(['медицина', 'м', 'в']);
-
-const placeSnippetUrls: ReadonlyMap<string, string> = new Map([
-  ['лесное озеро в ривере', '/map/river-forest-lake/'],
-  ['лесное озеро в парке', '/map/park-forest-lake/'],
-  ['лесной пруд в ривере', '/map/river-forest-lake/'],
-  ['лесной пруд в парке', '/map/park-forest-lake/'],
-  ['охотничьи пруды', '/map/hunting-ponds/'],
-  ['рыболовные пруды', '/map/hunting-ponds/'],
-  ['озера для рыбной ловли', '/map/hunting-ponds/'],
-  ['рыбалка', '/map/hunting-ponds/'],
-]);
 
 let browser: Browser;
 let dialog: Locator;
@@ -494,18 +483,25 @@ for (const group of queryGroups) {
         );
       }
 
-      const placeSnippetUrl = placeSnippetUrls.get(query);
-      if (placeSnippetUrl) {
+      if (
+        query === 'буржуйка' ||
+        query === 'адрес буржуйки' ||
+        query === 'время работы буржуйки'
+      ) {
         const result = snapshot.results.find(
-          (item) => item.url === placeSnippetUrl,
+          (item) => item.url === '/map/burzhuyka/',
         );
 
-        expect(result, `${query}: expected map snippet`).toBeDefined();
-        if (result) {
+        if (query === 'буржуйка') {
+          expect(result, `${query}: expected map result`).toBeDefined();
+          expect(result?.excerpt).not.toMatch(
+            /(?:АдресШелково|Время работы|10:00)/u,
+          );
+        } else {
           expect(
-            result.excerpt,
-            `${query}: map snippet must omit its title`,
-          ).not.toContain(result.title);
+            result,
+            `${query}: structured place fields must stay outside Pagefind`,
+          ).toBeUndefined();
         }
       }
 

@@ -57,9 +57,9 @@ const breadcrumbs = withHomeBreadcrumbs([
 const showBacklinks = false;
 const backlinkGroups = placeBacklinkGroups(place.backlinks);
 const search = {
-  scope: 'page',
+  scope: 'manual',
   title: place.name,
-  description,
+  description: place.summary,
   section: SEARCH_SECTIONS.places,
   aliases: [
     formatPlaceCategory(place.category),
@@ -146,12 +146,14 @@ const schema = {
         bodyHtml ? (
           <div
             class="ui-prose mt-8 max-w-[65ch]"
+            data-pagefind-body
             data-pagefind-weight="5"
             set:html={bodyHtml}
           />
         ) : (
           <p
             class="ui-copy mt-8 max-w-[65ch] text-foreground"
+            data-pagefind-body
             data-pagefind-weight="5"
             set:html={summaryHtml}
           />
