@@ -1,5 +1,5 @@
 ---
-import { getImage } from 'astro:assets';
+import { Image } from 'astro:assets';
 import { getEntry } from 'astro:content';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -21,6 +21,8 @@ import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
 
 export const getStaticPaths = newsArticleStaticPaths;
+
+const HERO_COVER_WIDTHS = [480, 768, 960, 1280, 1600, 2200] as const;
 
 const year = Astro.params.year;
 const month = Astro.params.month;
@@ -51,17 +53,23 @@ const heroCoverWidth = source.data.cover
   : undefined;
 const heroCover =
   source.data.cover && heroCoverWidth
-    ? await getImage({
+    ? {
         src: source.data.cover,
         width: heroCoverWidth,
-        format: 'webp',
-        quality: 82,
-      })
+        height: Math.round(
+          (source.data.cover.height * heroCoverWidth) / source.data.cover.width,
+        ),
+        widths: [
+          ...HERO_COVER_WIDTHS.filter(
+            (candidate) => candidate < heroCoverWidth,
+          ),
+          heroCoverWidth,
+        ],
+      }
     : undefined;
-const heroCoverUrl = heroCover?.src;
-const hasHeroCover = Boolean(heroCoverUrl);
+const hasHeroCover = Boolean(heroCover);
 const hasEvents = article.events.length > 0;
-const heroImageStyle = heroCoverUrl
+const heroImageStyle = heroCover
   ? [
       'object-position: 50% 64%',
       '-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 68%, rgba(0, 0, 0, 0.86) 82%, rgba(0, 0, 0, 0) 100%)',
@@ -135,11 +143,17 @@ const schema = newsArticleSchema({
     {
       hasHeroCover ? (
         <header class="news-hero relative isolate overflow-hidden bg-background">
-          <img
-            src={heroCoverUrl}
+          <Image
+            src={heroCover.src}
+            width={heroCover.width}
+            height={heroCover.height}
+            widths={heroCover.widths}
+            sizes="100vw"
+            format="webp"
+            quality={82}
             alt=""
             aria-hidden="true"
-            loading="eager"
+            priority
             class="absolute inset-0 h-full w-full object-cover brightness-105"
             style={heroImageStyle}
           />
