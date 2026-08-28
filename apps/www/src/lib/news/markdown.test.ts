@@ -160,6 +160,31 @@ ignored: true
     `);
   });
 
+  it('preserves Markdown semantics in photo captions', () => {
+    const markdown = buildNewsArticleMarkdown(
+      article({
+        photos: [
+          {
+            url: 'https://media.kpshelkovo.online/news/2026/05/ktp-upgrade/protocol.jpeg',
+            width: 1280,
+            height: 960,
+            alt: 'Протокол проверки воды',
+            caption:
+              'Протокол **проверил** [Кирилл Щемелинин](/people/kschemelinin/) и [уточнил ошибку](https://example.com/correction).\n\nФото предоставили жители.',
+          },
+        ],
+      }),
+    );
+
+    expect(markdown.slice(markdown.indexOf('— подпись: ')))
+      .toMatchInlineSnapshot(`
+      "— подпись: Протокол **проверил** [Кирилл Щемелинин](/people/kschemelinin/) и [уточнил ошибку](https://example.com/correction).
+
+        Фото предоставили жители.
+      "
+    `);
+  });
+
   it('keeps month archives without a redundant news subsection', () => {
     expect(
       buildNewsMonthMarkdown({

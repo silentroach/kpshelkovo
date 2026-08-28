@@ -30,6 +30,11 @@ const abs = (value: string): string => absoluteUrl(value);
 
 type MarkdownNode = ReturnType<typeof parseMarkdownFragment>[number];
 type MarkdownListItem = ReturnType<typeof md.listItem>;
+type MarkdownListItemChildren = Exclude<
+  Parameters<typeof md.listItem>[0],
+  string
+>;
+type MarkdownBlockContent = MarkdownListItemChildren[number];
 
 const serialize = (children: readonly MarkdownNode[]): string =>
   serializeMarkdownDocument(createMarkdownDocument({ children }));
@@ -46,6 +51,9 @@ const section = (
 ];
 
 const inline = (value: string): string => value.replace(/\s+/g, ' ').trim();
+
+const isBlockContent = (node: MarkdownNode): node is MarkdownBlockContent =>
+  node.type !== 'definition' && node.type !== 'footnoteDefinition';
 
 function areaLabels(
   item: Pick<NewsArticle, 'appliesToAllAreas' | 'areas'>,
@@ -70,14 +78,34 @@ const when = (iso: string, time?: string): string =>
 const machineDate = (iso: string, time?: string): string =>
   time ? iso : iso.slice(0, 10);
 
-const photoLine = (label: string, photo: NewsPhoto): MarkdownListItem =>
-  md.listItem(
+const photoLine = (label: string, photo: NewsPhoto): MarkdownListItem => {
+  const lead = md.paragraph(
     `${label}: ${pick([
       abs(photo.url),
       `alt: ${inline(photo.alt)}`,
-      photo.caption ? `подпись: ${inline(photo.caption)}` : undefined,
+      photo.caption ? 'подпись: ' : undefined,
     ]).join(' — ')}`,
   );
+  const blocks = photo.caption
+    ? parseMarkdownFragment(photo.caption.trim()).filter(isBlockContent)
+    : [];
+  const [first, ...rest] = blocks;
+
+  if (first?.type === 'paragraph') {
+    return md.listItem(
+      [
+        {
+          ...lead,
+          children: [...lead.children, ...first.children],
+        },
+        ...rest,
+      ],
+      { spread: blocks.length > 1 },
+    );
+  }
+
+  return md.listItem([lead, ...blocks], { spread: blocks.length > 0 });
+};
 
 function photoSection(article: NewsArticle): readonly MarkdownNode[] {
   const rows = pick<MarkdownListItem>([
