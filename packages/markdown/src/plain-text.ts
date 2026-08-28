@@ -1,8 +1,5 @@
-import remarkGfm from 'remark-gfm';
-import remarkParse from 'remark-parse';
-import { unified } from 'unified';
+import { parseMarkdownFragment } from './generate';
 
-const parser = unified().use(remarkParse).use(remarkGfm);
 const SPACE = /\s+/gu;
 const BLOCK_JOIN_TYPES = new Set([
   'blockquote',
@@ -12,12 +9,12 @@ const BLOCK_JOIN_TYPES = new Set([
   'tableCell',
   'tableRow',
 ]);
-const SKIPPED_NODE_TYPES = new Set(['code', 'definition', 'html', 'yaml']);
+const SKIPPED_NODE_TYPES = new Set(['code', 'definition', 'html']);
 
 interface MarkdownNode {
   readonly type: string;
   readonly value?: string;
-  readonly alt?: string;
+  readonly alt?: unknown;
   readonly children?: readonly MarkdownNode[];
 }
 
@@ -33,7 +30,7 @@ function text(node: MarkdownNode): string {
   }
 
   if (node.type === 'image') {
-    return node.alt ?? '';
+    return typeof node.alt === 'string' ? node.alt : '';
   }
 
   if (node.type === 'break') {
@@ -48,9 +45,7 @@ function text(node: MarkdownNode): string {
 export const extractFirstMarkdownText = (
   markdown: string,
 ): string | undefined => {
-  const tree = parser.parse(markdown) as MarkdownNode;
-
-  for (const child of tree.children ?? []) {
+  for (const child of parseMarkdownFragment(markdown)) {
     const value = inline(text(child));
 
     if (value.length > 0) {
@@ -62,9 +57,8 @@ export const extractFirstMarkdownText = (
 };
 
 export const extractMarkdownText = (markdown: string): string | undefined => {
-  const tree = parser.parse(markdown) as MarkdownNode;
   const value = inline(
-    (tree.children ?? []).map(text).filter(Boolean).join(' '),
+    parseMarkdownFragment(markdown).map(text).filter(Boolean).join(' '),
   );
 
   return value || undefined;
