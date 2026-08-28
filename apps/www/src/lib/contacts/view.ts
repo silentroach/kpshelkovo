@@ -26,6 +26,7 @@ export interface ContactPlace {
 const CONTACT_CATEGORY_LABELS: Record<ContactCategory, string> = {
   fence: 'Забор',
   construction: 'Строительство и ремонт',
+  furniture: 'Мебель',
   'waste-removal': 'Вывоз мусора',
   garden: 'Сад и участок',
   food: 'Еда и продукты',
@@ -36,6 +37,7 @@ const CONTACT_CATEGORY_LABELS: Record<ContactCategory, string> = {
 const CONTACT_CATEGORY_EMOJI: Record<ContactCategory, string> = {
   fence: '🚧',
   construction: '🛠️',
+  furniture: '🪑',
   'waste-removal': '🚛',
   garden: '🌿',
   food: '🍕',
