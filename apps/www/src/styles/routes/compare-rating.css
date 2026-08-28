@@ -1,0 +1,4 @@
+@reference '@shelkovo/ui/styles.css';
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+
+@source '../../pages/815/compare/rating.astro';

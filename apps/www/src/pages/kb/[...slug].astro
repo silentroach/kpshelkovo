@@ -2,7 +2,9 @@
 import type { GetStaticPaths } from 'astro';
 
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import '@shelkovo/ui/prose.css';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import '@/styles/routes/content.css';
 import type { BreadcrumbItem } from '@/lib/breadcrumbs';
 import { kbBreadcrumbs } from '@/lib/kb/breadcrumbs';
 import { loadKbPages } from '@/lib/kb/load';

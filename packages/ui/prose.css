@@ -1,0 +1,464 @@
+.ui-prose {
+  max-width: 70ch;
+  color: var(--color-foreground);
+  font-size: 1rem;
+  line-height: 1.75;
+  text-wrap: pretty;
+}
+
+.ui-prose p,
+.ui-prose ul,
+.ui-prose ol {
+  margin-block: 1rem;
+}
+
+.ui-prose a {
+  color: var(--color-primary);
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in oklab, currentColor 38%, transparent);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.22em;
+  transition:
+    color 0.2s ease,
+    text-decoration-color 0.2s ease,
+    text-underline-offset 0.2s ease;
+}
+
+.ui-prose a:is(:hover, :focus-visible) {
+  color: var(--color-primary-hover);
+  text-decoration-color: color-mix(in oklab, currentColor 72%, transparent);
+  text-underline-offset: 0.18em;
+}
+
+.ui-prose a.ui-file-link {
+  font-weight: 600;
+}
+
+.ui-prose .ui-file-link__icon {
+  display: inline-block;
+  width: 1.45em;
+  height: 1.25em;
+  margin-inline-end: 0.3em;
+  vertical-align: -0.25em;
+}
+
+.ui-file-pdf-icon__page {
+  fill: var(--color-danger);
+  stroke: var(--color-danger);
+}
+
+.ui-file-pdf-icon__label {
+  stroke: var(--color-danger-foreground);
+}
+
+.ui-prose strong {
+  font-weight: 600;
+}
+
+.ui-prose em {
+  font-style: italic;
+}
+
+.ui-media-caption {
+  color: var(--color-muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}
+
+.ui-media-caption p {
+  margin: 0;
+}
+
+.ui-media-caption a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration-color: color-mix(
+    in oklab,
+    var(--color-primary) 40%,
+    transparent
+  );
+  text-decoration-line: underline;
+  text-underline-offset: 0.1875rem;
+}
+
+.ui-media-caption strong {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+
+.ui-prose .ui-markdown-figure {
+  margin-block: 1.5rem;
+}
+
+.ui-prose .ui-markdown-figure > a {
+  display: block;
+}
+
+.ui-prose .ui-markdown-figure > img,
+.ui-prose .ui-markdown-figure > a > img {
+  display: block;
+  width: 100%;
+}
+
+.ui-prose .ui-markdown-figure > .ui-media-caption {
+  margin-block-start: 0.5rem;
+}
+
+.ui-prose ul,
+.ui-prose ol {
+  padding-left: 1.5rem;
+}
+
+.ui-prose :is(ul, ol) :is(ul, ol) {
+  margin-block: 0.35rem 0;
+}
+
+.ui-prose ul {
+  list-style: disc;
+}
+
+.ui-prose ol {
+  list-style: decimal;
+}
+
+.ui-prose li {
+  margin-block: 0.35rem;
+  padding-left: 0.1rem;
+}
+
+.ui-prose .contains-task-list {
+  padding-left: 0;
+  list-style: none;
+}
+
+.ui-prose .task-list-item {
+  position: relative;
+  padding-left: 1.75rem;
+}
+
+.ui-prose .task-list-item > input[type='checkbox'] {
+  position: absolute;
+  top: 0.35em;
+  left: 0;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: var(--color-primary);
+}
+
+.ui-prose li > p {
+  margin-block: 0.35rem;
+}
+
+.ui-prose li > :is(ul, ol):first-child {
+  margin-block-start: 0.35rem;
+}
+
+.ui-prose li > :is(ul, ol):last-child {
+  margin-block-end: 0;
+}
+
+.ui-prose blockquote {
+  margin-block: 1.5rem;
+  border-left: 2px solid var(--color-border);
+  padding-left: 1rem;
+  color: var(--color-muted-foreground);
+}
+
+.ui-prose ul.ui-markdown-toc__list a {
+  font-weight: 400;
+  text-decoration-line: none;
+}
+
+.ui-prose ul.ui-markdown-toc__list a:is(:hover, :focus-visible) {
+  text-decoration-line: underline;
+}
+
+.ui-prose ul.ui-markdown-toc__list,
+.ui-prose ul.ui-markdown-toc__list ul {
+  margin-block: 0.5rem;
+  line-height: 1.45;
+}
+
+.ui-prose ul.ui-markdown-toc__list p {
+  margin-block: 0;
+}
+
+.ui-prose ul.ui-markdown-toc__list li {
+  margin-block: 0.2rem;
+}
+
+.ui-prose hr {
+  margin-block: 2rem;
+  border-color: var(--color-border);
+}
+
+.ui-prose .ui-content-diff {
+  display: grid;
+  margin-block: 1.5rem;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-surface);
+}
+
+.ui-prose .ui-content-diff__side {
+  padding: 0.95rem 1rem 1rem;
+}
+
+.ui-prose .ui-content-diff__side--removed {
+  background: color-mix(
+    in oklab,
+    var(--color-danger-soft) 62%,
+    var(--color-surface) 38%
+  );
+  box-shadow: inset 0.25rem 0 0 var(--color-danger-border);
+}
+
+.ui-prose .ui-content-diff__side--added {
+  border-top: 1px solid var(--color-border);
+  background: color-mix(
+    in oklab,
+    var(--color-success-soft) 64%,
+    var(--color-surface) 36%
+  );
+  box-shadow: inset 0.25rem 0 0 var(--color-success-border);
+}
+
+.ui-prose .ui-content-diff__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.ui-prose .ui-content-diff__side--removed .ui-content-diff__label {
+  color: var(--color-danger-text);
+}
+
+.ui-prose .ui-content-diff__side--added .ui-content-diff__label {
+  color: var(--color-success-text);
+}
+
+.ui-prose .ui-content-diff__text {
+  margin: 0;
+  color: var(--color-foreground);
+  font-size: 0.98em;
+  line-height: 1.65;
+  text-wrap: pretty;
+  white-space: pre-wrap;
+}
+
+.ui-prose .ui-content-diff--block .ui-content-diff__text {
+  font-size: 1em;
+  line-height: 1.7;
+}
+
+.ui-prose .ui-content-diff__change {
+  border-radius: 0.35rem;
+  box-decoration-break: clone;
+  padding: 0.02em 0.16em 0.04em;
+  font-weight: 600;
+  -webkit-box-decoration-break: clone;
+}
+
+.ui-prose .ui-content-diff__change--removed {
+  background: color-mix(
+    in oklab,
+    var(--color-danger-soft) 78%,
+    var(--color-danger-border) 22%
+  );
+  color: var(--color-danger-text);
+  text-decoration-color: color-mix(in oklab, currentColor 58%, transparent);
+  text-decoration-line: line-through;
+  text-decoration-thickness: 0.08em;
+}
+
+.ui-prose .ui-content-diff__change--added {
+  background: color-mix(
+    in oklab,
+    var(--color-success-soft) 80%,
+    var(--color-success-border) 20%
+  );
+  color: var(--color-success-text);
+  text-decoration: none;
+}
+
+@media (min-width: 48rem) {
+  .ui-prose .ui-content-diff--inline {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .ui-prose .ui-content-diff__side {
+    padding: 1rem 1.1rem 1.1rem;
+  }
+
+  .ui-prose .ui-content-diff--inline .ui-content-diff__side--added {
+    border-top: 0;
+    border-left: 1px solid var(--color-border);
+  }
+}
+
+.ui-prose h1 {
+  margin-top: 2.5rem;
+  color: var(--color-foreground);
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.018em;
+}
+
+.ui-prose h2 {
+  margin-top: 2rem;
+  color: var(--color-foreground);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
+}
+
+.ui-prose h3 {
+  margin-top: 1.5rem;
+  color: var(--color-foreground);
+  font-size: 1.1875rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
+}
+
+.ui-prose :is(h1, h2, h3, h4, h5, h6)[id] {
+  position: relative;
+  scroll-margin-top: 5rem;
+}
+
+.ui-prose .ui-heading-anchor {
+  display: inline-flex;
+  width: 1.55rem;
+  height: 1.55rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  margin-left: 0.35rem;
+  color: var(--color-text-soft);
+  font-family: var(--font-body);
+  font-size: inherit;
+  line-height: inherit;
+  text-decoration: none;
+  text-wrap: nowrap;
+  vertical-align: 0.12em;
+}
+
+.ui-prose .ui-heading-anchor > span {
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1;
+  /* The # glyph sits visually high in the chosen font; nudge it down so the
+     anchor looks centered against the heading text on both desktop and mobile. */
+  transform: translateY(0.15em);
+}
+
+.ui-prose .ui-heading-anchor:is(:hover, :focus-visible) {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-hover);
+  text-decoration: none;
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 48rem) {
+  .ui-prose .ui-heading-anchor {
+    position: absolute;
+    top: calc((1lh - 1.55rem) / 2);
+    right: calc(100% + 0.35rem);
+    margin-left: 0;
+    opacity: 0;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      opacity 0.2s ease;
+  }
+
+  .ui-prose
+    :is(h1, h2, h3, h4, h5, h6)[id]:is(:hover, :focus-within)
+    > .ui-heading-anchor {
+    opacity: 1;
+  }
+}
+
+.ui-prose table {
+  margin-block: 1.5rem;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  border-collapse: collapse;
+  background:
+    linear-gradient(to right, var(--color-surface) 35%, transparent) left
+      center / 2rem 100% no-repeat local,
+    linear-gradient(to left, var(--color-surface) 35%, transparent) right
+      center / 2rem 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, var(--color-shadow), transparent)
+      left center / 1rem 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, var(--color-shadow), transparent)
+      right center / 1rem 100% no-repeat scroll;
+  background-color: var(--color-surface);
+}
+
+.ui-prose thead th {
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ui-prose tbody td {
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.5rem 0.75rem;
+}
+
+@media (min-width: 64rem) {
+  .ui-prose table {
+    display: table;
+    overflow: visible;
+    background: transparent;
+  }
+}
+
+.ui-prose img {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+}
+
+.ui-prose code {
+  background: var(--color-surface-muted);
+  padding: 0.125rem 0.375rem;
+  font-size: 0.95em;
+}
+
+.ui-prose pre {
+  margin-block: 1.5rem;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  padding: 1rem;
+  font-size: 0.875rem;
+}
+
+.ui-prose pre code {
+  background: transparent;
+  padding: 0;
+}
+
+@media (min-width: 48rem) {
+  .ui-prose {
+    font-size: 1.0625rem;
+  }
+}

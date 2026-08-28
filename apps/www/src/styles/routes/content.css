@@ -1,0 +1,13 @@
+@reference '@shelkovo/ui/styles.css';
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+
+@source '../../pages/404.astro';
+@source '../../pages/kb';
+@source '../../pages/map';
+@source '../../pages/meetings';
+@source '../../pages/people';
+@source '../../pages/reviews';
+@source '../../pages/sarafan';
+@source '../../components/contacts';
+@source '../../components/places';
+@source '../../components/reviews';
