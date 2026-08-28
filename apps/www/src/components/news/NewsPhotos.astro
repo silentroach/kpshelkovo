@@ -12,8 +12,17 @@ interface Props {
 const { photos, title = 'Фото', heading = 'h2' } = Astro.props;
 
 const Heading = heading;
-const MAX_RENDERED_WIDTH = 1600;
-const RESPONSIVE_WIDTHS = [480, 768, 960, 1280, 1600];
+const MAX_FULL_WIDTH = 1132;
+const MAX_RENDERED_WIDTH = 2560;
+const RESPONSIVE_WIDTHS = [
+  480,
+  768,
+  960,
+  1280,
+  1600,
+  MAX_FULL_WIDTH * 2,
+  MAX_RENDERED_WIDTH,
+];
 const galleryPhotos = photos.map((photo, index) => {
   const fullWidth =
     photos.length >= 3 &&
@@ -29,7 +38,7 @@ const galleryPhotos = photos.map((photo, index) => {
     renderedHeight: Math.round((photo.height * width) / photo.width),
     widths: RESPONSIVE_WIDTHS.filter((candidate) => candidate <= width),
     sizes: fullWidth
-      ? '(min-width: 1180px) 1132px, calc(100vw - 2.5rem)'
+      ? `(min-width: 1180px) ${MAX_FULL_WIDTH}px, calc(100vw - 2.5rem)`
       : '(min-width: 1180px) 558px, (min-width: 768px) calc((100vw - 3.5rem) / 2), calc(100vw - 2.5rem)',
   };
 });
