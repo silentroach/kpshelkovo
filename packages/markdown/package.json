@@ -26,6 +26,7 @@
     "satteri": "^0.9.5",
     "typograf": "^7.7.0",
     "unified": "^11.0.5",
+    "unist-util-visit": "^5.1.0",
     "yaml": "^2.9.0"
   },
   "devDependencies": {

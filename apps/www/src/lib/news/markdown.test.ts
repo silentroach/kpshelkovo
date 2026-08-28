@@ -160,6 +160,67 @@ ignored: true
     `);
   });
 
+  it('preserves Markdown semantics in photo captions', () => {
+    const markdown = buildNewsArticleMarkdown(
+      article({
+        photos: [
+          {
+            url: 'https://media.kpshelkovo.online/news/2026/05/ktp-upgrade/protocol.jpeg',
+            width: 1280,
+            height: 960,
+            alt: 'Протокол проверки воды',
+            caption:
+              'Протокол **проверил** [Кирилл Щемелинин](/people/kschemelinin/) и [уточнил ошибку](https://example.com/correction).\n\nФото предоставили жители.',
+          },
+        ],
+      }),
+    );
+
+    expect(markdown.slice(markdown.indexOf('— подпись: ')))
+      .toMatchInlineSnapshot(`
+      "— подпись: Протокол **проверил** [Кирилл Щемелинин](/people/kschemelinin/) и [уточнил ошибку](https://example.com/correction).
+
+        Фото предоставили жители.
+      "
+    `);
+  });
+
+  it('resolves reference links independently in each photo caption', () => {
+    const markdown = buildNewsArticleMarkdown(
+      article({
+        photos: [
+          {
+            url: 'https://media.kpshelkovo.online/news/2026/05/ktp-upgrade/first.jpeg',
+            width: 1280,
+            height: 960,
+            alt: 'Первый протокол',
+            caption:
+              '[Исправление][source]\n\n[source]: https://example.com/first',
+          },
+          {
+            url: 'https://media.kpshelkovo.online/news/2026/05/ktp-upgrade/second.jpeg',
+            width: 1280,
+            height: 960,
+            alt: 'Второй протокол',
+            caption:
+              '[Уточнение][source]\n\n[source]: https://example.com/second',
+          },
+        ],
+      }),
+    );
+    const captions = Array.from(
+      markdown.matchAll(/— подпись: (.+)$/gmu),
+      (match) => match[1],
+    );
+
+    expect(captions).toMatchInlineSnapshot(`
+      [
+        "[Исправление](https://example.com/first)",
+        "[Уточнение](https://example.com/second)",
+      ]
+    `);
+  });
+
   it('keeps month archives without a redundant news subsection', () => {
     expect(
       buildNewsMonthMarkdown({
