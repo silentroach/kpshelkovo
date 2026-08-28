@@ -3,7 +3,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { visibleWhitespace } from '../test/visible-whitespace';
-import type { StatusService } from './schema';
+import { STATUS_AREAS, type StatusService } from './schema';
 import { hydrateStatusTimeline, hydrateStatusTimelines } from './timeline.dom';
 import { bindStatusTimelineLazyHydration } from './timeline.lazy';
 
@@ -18,15 +18,16 @@ interface TooltipInput {
 
 const AREA_TEMPLATES = `
   <div data-status-tooltip-area-templates hidden>
-    <span data-status-tooltip-area-template="river"><span role="img">river</span></span>
-    <span data-status-tooltip-area-template="forest"><span role="img">forest</span></span>
-    <span data-status-tooltip-area-template="park"><span role="img">park</span></span>
-    <span data-status-tooltip-area-template="village"><span role="img">village</span></span>
+    ${STATUS_AREAS.map(
+      (area) =>
+        `<span data-status-tooltip-area-template="${area}"><span role="img" data-area="${area}"></span></span>`,
+    ).join('')}
   </div>
 `;
 
 interface ProblemNodeInput {
   readonly id: string;
+  readonly areas?: readonly string[];
   readonly kind?: 'incident' | 'maintenance';
   readonly service?: StatusService;
   readonly tag?: 'a' | 'button';
@@ -76,6 +77,7 @@ const renderTimeline = (
         ${nodes
           .map(
             ({
+              areas,
               end,
               hidden = false,
               id,
@@ -102,6 +104,7 @@ const renderTimeline = (
                 data-tooltip-phase-label="${escapeAttribute(tooltip.phaseLabel)}"
                 ${tooltip.phaseIcon ? `data-tooltip-phase-icon="${tooltip.phaseIcon}"` : ''}
                 data-tooltip-period-label="${escapeAttribute(tooltip.periodLabel)}"
+                ${areas ? `data-tooltip-areas="${escapeAttribute(JSON.stringify(areas))}"` : ''}
                 class="status-service-timeline__segment status-service-timeline__segment--problem status-service-timeline__segment--${tone}"
                 ${hidden ? 'hidden' : ''}
               `;
@@ -521,6 +524,53 @@ describe('hydrateStatusTimeline', () => {
     );
   });
 
+  it('renders every canonical area from single tooltip runtime data', () => {
+    const root = renderTimeline([
+      {
+        id: 'all-canonical-areas',
+        areas: STATUS_AREAS,
+        start: '2026-05-08T00:00:00Z',
+      },
+    ]);
+
+    hydrateStatusTimeline(root, {
+      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+    });
+
+    getProblemNode('all-canonical-areas').dispatchEvent(
+      new Event('mouseenter'),
+    );
+
+    expect(
+      Array.from(
+        getTooltipField('[data-status-tooltip-title-areas]').querySelectorAll(
+          '[role="img"]',
+        ),
+        (icon) => icon.getAttribute('data-area'),
+      ),
+    ).toEqual(STATUS_AREAS);
+  });
+
+  it('rejects unknown areas in single tooltip runtime data', () => {
+    const root = renderTimeline([
+      {
+        id: 'unknown-area',
+        areas: ['outside'],
+        start: '2026-05-08T00:00:00Z',
+      },
+    ]);
+
+    hydrateStatusTimeline(root, {
+      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+    });
+
+    getProblemNode('unknown-area').dispatchEvent(new Event('mouseenter'));
+
+    const renderedAreas = getTooltipField('[data-status-tooltip-title-areas]');
+    expect(renderedAreas.hidden).toBe(true);
+    expect(renderedAreas.childElementCount).toBe(0);
+  });
+
   it('renders grouped tooltip entries as stacked single-record blocks', () => {
     document.body.innerHTML = `
       <div data-status-timeline data-range-days="10">
@@ -535,7 +585,7 @@ describe('hydrateStatusTimeline', () => {
             data-end="2026-05-09T20:05:00Z"
             data-tooltip-service-label="Электричество"
             data-tooltip-group-title="3 события за 9 мая"
-            data-tooltip-items='[{"kind":"incident","title":"Отключение 1","phase":"resolved","startedIso":"2026-05-09T03:00:00Z","startedHasTime":true,"endedIso":"2026-05-09T03:40:00Z","endedHasTime":true,"duration":{"totalMinutes":40}},{"kind":"incident","title":"Отключение 2","phase":"resolved","startedIso":"2026-05-09T08:10:00Z","startedHasTime":true,"endedIso":"2026-05-09T08:45:00Z","endedHasTime":true,"duration":{"totalMinutes":35}},{"kind":"incident","title":"Отключение 3","phase":"active","startedIso":"2026-05-09T19:20:00Z","startedHasTime":true,"endedHasTime":false}]'
+            data-tooltip-items='[{"kind":"incident","title":"Отключение 1","phase":"resolved","startedIso":"2026-05-09T03:00:00Z","startedHasTime":true,"endedIso":"2026-05-09T03:40:00Z","endedHasTime":true,"areas":${JSON.stringify(STATUS_AREAS)},"duration":{"totalMinutes":40}},{"kind":"incident","title":"Отключение 2","phase":"resolved","startedIso":"2026-05-09T08:10:00Z","startedHasTime":true,"endedIso":"2026-05-09T08:45:00Z","endedHasTime":true,"duration":{"totalMinutes":35}},{"kind":"incident","title":"Отключение 3","phase":"active","startedIso":"2026-05-09T19:20:00Z","startedHasTime":true,"endedHasTime":false}]'
             class="status-service-timeline__segment status-service-timeline__segment--problem status-service-timeline__segment--red"
           ></a>
         </div>
@@ -614,6 +664,14 @@ describe('hydrateStatusTimeline', () => {
         '.status-service-timeline__tooltip-phase-icon--alert:not([hidden])',
       ),
     ).toHaveLength(1);
+    expect(
+      Array.from(
+        getTooltipField('[data-status-tooltip-list]').querySelectorAll(
+          '[role="img"]',
+        ),
+        (icon) => icon.getAttribute('data-area'),
+      ),
+    ).toEqual(STATUS_AREAS);
   });
 
   it('clamps tooltip position within the component width', () => {
