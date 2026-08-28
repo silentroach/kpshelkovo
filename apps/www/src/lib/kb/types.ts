@@ -15,6 +15,7 @@ export interface KbPage {
   readonly url: string;
   readonly canonical: string;
   readonly routeSlug?: string;
+  readonly isSection: boolean;
   readonly body: PreprocessedSiteMarkdownBody;
   readonly mentions: readonly EntityMentionTarget[];
 }

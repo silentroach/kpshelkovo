@@ -35,14 +35,14 @@ const page = (input: {
 });
 
 describe('buildKbDataset', () => {
-  it('maps index.md and nested markdown entries to public URLs', () => {
+  it('maps an ordinary parent source and its child to stable public URLs', () => {
     const data = buildKbDataset([
       page({
         id: 'index',
         title: 'База знаний',
       }),
       page({
-        id: 'services/internet/index',
+        id: 'services/internet',
         title: 'Интернет в поселке',
       }),
       page({
@@ -58,16 +58,19 @@ describe('buildKbDataset', () => {
       url: '/kb/',
       canonical: 'https://example.com/kb/',
       routeSlug: undefined,
+      isSection: true,
     });
-    const internetPage = data.byId.get('services/internet/index');
+    const internetPage = data.byId.get('services/internet');
 
     expect(internetPage).toMatchObject({
-      id: 'services/internet/index',
-      sourceId: 'services/internet/index',
+      id: 'services/internet',
+      sourceId: 'services/internet',
       url: '/kb/services/internet/',
       canonical: 'https://example.com/kb/services/internet/',
       routeSlug: 'services/internet',
+      isSection: true,
     });
+    expect(data.byId.get('services/internet/fiber')?.isSection).toBe(false);
     expect(internetPage).not.toHaveProperty('description');
     expect(internetPage).not.toHaveProperty('tags');
   });
@@ -89,21 +92,15 @@ describe('buildKbDataset', () => {
     );
   });
 
-  it('rejects a non-index source whose public route has descendants', () => {
-    expect(() =>
-      buildKbDataset([
-        page({
-          id: 'communication',
-          title: 'Связь и сообщества',
-        }),
-        page({
-          id: 'communication/meshtastic',
-          title: 'Meshtastic',
-        }),
-      ]),
-    ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: kb page source id "communication" has descendant public route "/kb/communication/meshtastic/"; non-root hub source ids must end with "/index" (expected "communication/index")]`,
-    );
+  it('does not infer section role from an index source name', () => {
+    const data = buildKbDataset([
+      page({
+        id: 'sos/index',
+        title: 'Что делать, если…',
+      }),
+    ]);
+
+    expect(data.pages[0]?.isSection).toBe(false);
   });
 
   it('rejects invalid URL segments', () => {

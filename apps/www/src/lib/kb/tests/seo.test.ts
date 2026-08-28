@@ -20,6 +20,7 @@ const rootPage: KbPage = {
   flags: [],
   url: '/kb/',
   canonical: 'https://example.com/kb/',
+  isSection: true,
   body: '',
   mentions: [],
 };

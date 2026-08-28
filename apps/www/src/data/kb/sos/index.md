@@ -1,5 +1,6 @@
 ---
 title: Что делать, если…
+flags: [exclude-from-site-search]
 ---
 
 - [ОК Комфорт не пропускает вас или гостей](/kb/ok/ne-propuskaet/)

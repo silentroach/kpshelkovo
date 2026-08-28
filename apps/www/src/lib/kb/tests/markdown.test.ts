@@ -30,6 +30,7 @@ const page = (input: {
     ? `https://example.com/kb/${input.routeSlug}/`
     : 'https://example.com/kb/',
   routeSlug: input.routeSlug,
+  isSection: !input.routeSlug,
   body: input.body ?? '',
   mentions: [],
 });

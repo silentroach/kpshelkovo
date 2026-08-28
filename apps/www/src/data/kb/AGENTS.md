@@ -7,7 +7,9 @@
 - `seo.description` использовать только для HTML meta description, когда автоматическая выдержка из Markdown слишком общая, короткая или повторяется на похожих страницах.
 - `flags: [noindex]` не добавляет страницу в sitemap и ставит на HTML-страницу `robots: noindex, follow`.
 - `flags: [exclude-from-site-search]` исключает страницу только из внутрисайтового Pagefind-поиска; HTML остается в sitemap и доступен внешним поисковикам.
-- URL строится из пути: `index.md` дает `/kb/`, `services/internet/index.md` дает `/kb/services/internet/`, `services/gas.md` дает `/kb/services/gas/`.
+- URL строится из пути: `index.md` дает `/kb/`, а `services/internet.md` и `services/internet/index.md` дают `/kb/services/internet/`.
+- Корень и страница с хотя бы одним дочерним публичным маршрутом считаются страницами-разделами независимо от имени исходного файла; добавление дочернего маршрута не требует переименовывать родителя в `index.md`.
+- Страницы-разделы не входят в Pagefind. Если самостоятельную landing page без дочерних маршрутов тоже нужно исключить, укажи `flags: [exclude-from-site-search]` явно.
 - У каждой HTML-страницы есть Markdown companion: `/kb/index.md` для корня и `/kb/<slug>/index.md` для вложенных страниц.
 - В Markdown companion внутренние ссылки на `/kb/.../` ведут на соответствующие `.md` companion-страницы.
 - Не создавай одновременно `foo.md` и `foo/index.md`: они конфликтуют за один публичный URL.
