@@ -2,6 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import { estimate2026 } from '@/data/reglament/estimate-2026';
 import { estimateDetails2026 } from '@/data/reglament/estimate-details-2026';
+import {
+  lightingControlTotals,
+  lightingResources,
+} from '@/data/reglament/estimate-details-2026/lighting';
+import { resolveSectionControlTotals } from '@/data/reglament/estimate-details-2026/shared';
 import { fullReglamentDataset2026 } from '@/data/reglament/full-2026';
 import type {
   EstimateDetailControlTotal,
@@ -33,13 +38,21 @@ const round2 = (value: number): number => Math.round(value * 100) / 100;
 const flattenRows = (rows: readonly EstimateRow[]): readonly EstimateRow[] =>
   rows.flatMap((row) => [row, ...flattenRows(row.children ?? [])]);
 
+const estimateRows = flattenRows(
+  estimate2026.sections.flatMap((section) => section.rows),
+);
+
 const estimateItemIds = new Set([
   estimate2026.id,
   ...estimate2026.sections.map((section) => section.id),
-  ...flattenRows(estimate2026.sections.flatMap((section) => section.rows)).map(
-    (row) => row.id,
-  ),
+  ...estimateRows.map((row) => row.id),
 ]);
+
+const estimateRowsById = new Map(estimateRows.map((row) => [row.id, row]));
+
+const estimateSectionsById = new Map(
+  estimate2026.sections.map((section) => [section.id, section]),
+);
 
 const sourcePdfIds = new Set(
   estimateDetails2026.source_pdfs.map((sourcePdf) => sourcePdf.pdf),
@@ -104,7 +117,67 @@ const resourcesForControlTotal = (
   );
 };
 
+const aggregateTotalForControl = (
+  controlTotal: EstimateDetailControlTotal,
+): number | undefined => {
+  if (controlTotal.cost_bucket === 'other_cost') return;
+
+  const costBucket = controlTotal.cost_bucket;
+  const row = estimateRowsById.get(controlTotal.estimate_row_id);
+
+  if (row) return row.baseline.breakdown[costBucket];
+
+  const section = estimateSectionsById.get(controlTotal.estimate_row_id);
+
+  if (!section) return;
+
+  return round2(
+    sum(
+      section.rows.map(
+        (sectionRow) => sectionRow.baseline.breakdown[costBucket],
+      ),
+    ),
+  );
+};
+
 describe('estimate details 2026 dataset', () => {
+  it('marks a section control for review when a resource changes', () => {
+    const controlInput = lightingControlTotals.find(
+      (controlTotal) => controlTotal.id === 'lighting-street-materials',
+    );
+
+    if (!controlInput) throw new Error('lighting materials control is missing');
+
+    const resources = lightingResources.map((resource) =>
+      resource.id === controlInput.resource_ids[0]
+        ? {
+            ...resource,
+            total_rub: { ...resource.total_rub, value: 97_000 },
+          }
+        : resource,
+    );
+    const [controlTotal] = resolveSectionControlTotals(
+      [controlInput],
+      resources,
+    );
+
+    expect({
+      detail_total_rub: controlTotal?.detail_total_rub?.value,
+      aggregate_total_rub: controlTotal?.aggregate_total_rub?.value,
+      delta_rub: controlTotal?.delta_rub,
+      status: controlTotal?.status,
+      reason: controlTotal?.needs_check?.reason,
+    }).toMatchInlineSnapshot(`
+      {
+        "aggregate_total_rub": 97820,
+        "delta_rub": -820,
+        "detail_total_rub": 97000,
+        "reason": "Контроль не сходится при допуске 0.01 ₽: детализация и источник расходятся на -820 ₽; детализация и агрегированная смета расходятся на -820 ₽.",
+        "status": "needs_check",
+      }
+    `);
+  });
+
   it('uses final.pdf as a gross control index', () => {
     const finalControls = estimateDetails2026.control_totals
       .filter((controlTotal) => controlTotal.control_source === 'final_pdf')
@@ -1907,7 +1980,7 @@ describe('estimate details 2026 dataset', () => {
             "status": "verified",
           },
           {
-            "aggregate_total_rub": 352872.12,
+            "aggregate_total_rub": 352872.11,
             "cost_bucket": "usn",
             "id": "cleaning-winter-mechanized-usn",
             "source_total_rub": 352872.12,
@@ -2915,7 +2988,7 @@ describe('estimate details 2026 dataset', () => {
       [
         {
           "cost_bucket": "primary_salary",
-          "detail_total_rub": 17641901.84,
+          "detail_total_rub": 17641901.83,
           "estimate_row_id": "cleaning",
           "id": "cleaning-resource-statement-primary-salary",
           "source_total_rub": 17641901.84,
@@ -2923,7 +2996,7 @@ describe('estimate details 2026 dataset', () => {
         },
         {
           "cost_bucket": "machinist_salary",
-          "detail_total_rub": 25917429.4,
+          "detail_total_rub": 25917429.39,
           "estimate_row_id": "cleaning",
           "id": "cleaning-resource-statement-machinist-salary",
           "source_total_rub": 25917429.4,
@@ -3117,11 +3190,90 @@ describe('estimate details 2026 dataset', () => {
               ];
         },
       );
+    const derivedValueMismatches = estimateDetails2026.control_totals.flatMap(
+      (controlTotal) => {
+        if (controlTotal.control_source === 'final_pdf') return [];
 
-    expect({ missingTolerance, missingResourceIds, sumMismatches }).toEqual({
+        const detailTotal = controlTotal.detail_total_rub?.value;
+        const aggregateTotal = controlTotal.aggregate_total_rub?.value;
+        const expectedAggregateTotal = aggregateTotalForControl(controlTotal);
+
+        if (
+          detailTotal === null ||
+          detailTotal === undefined ||
+          aggregateTotal === null ||
+          expectedAggregateTotal === undefined
+        ) {
+          return [];
+        }
+
+        const expectedDelta = round2(detailTotal - expectedAggregateTotal);
+
+        return aggregateTotal === expectedAggregateTotal &&
+          controlTotal.delta_rub === expectedDelta
+          ? []
+          : [
+              {
+                control_total_id: controlTotal.id,
+                aggregate_total_rub: aggregateTotal,
+                expected_aggregate_total_rub: expectedAggregateTotal,
+                delta_rub: controlTotal.delta_rub,
+                expected_delta_rub: expectedDelta,
+              },
+            ];
+      },
+    );
+    const uncheckedMismatches = estimateDetails2026.control_totals.flatMap(
+      (controlTotal) => {
+        const tolerance = controlTotal.tolerance_rub;
+
+        if (
+          controlTotal.control_source === 'final_pdf' ||
+          controlTotal.status === 'needs_check' ||
+          tolerance === undefined
+        ) {
+          return [];
+        }
+
+        const sourceTotal = controlTotal.source_total_rub.value;
+        const detailTotal = controlTotal.detail_total_rub?.value;
+        const aggregateTotal = controlTotal.aggregate_total_rub?.value;
+
+        if (
+          sourceTotal === null ||
+          detailTotal === null ||
+          detailTotal === undefined
+        ) {
+          return [controlTotal.id];
+        }
+
+        const deltas = [round2(detailTotal - sourceTotal)];
+
+        if (aggregateTotal !== null && aggregateTotal !== undefined) {
+          deltas.push(
+            round2(aggregateTotal - sourceTotal),
+            round2(detailTotal - aggregateTotal),
+          );
+        }
+
+        return deltas.some((delta) => Math.abs(delta) > tolerance)
+          ? [controlTotal.id]
+          : [];
+      },
+    );
+
+    expect({
+      missingTolerance,
+      missingResourceIds,
+      sumMismatches,
+      derivedValueMismatches,
+      uncheckedMismatches,
+    }).toEqual({
       missingTolerance: [],
       missingResourceIds: [],
       sumMismatches: [],
+      derivedValueMismatches: [],
+      uncheckedMismatches: [],
     });
   });
 });

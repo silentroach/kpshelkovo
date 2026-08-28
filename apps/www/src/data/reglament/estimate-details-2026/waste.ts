@@ -1,5 +1,5 @@
 import type {
-  EstimateDetailControlTotal,
+  EstimateDetailControlTotalInput,
   EstimateDetailResource,
   EstimateDetailWorkItem,
 } from '@/lib/reglament/detail-schema';
@@ -509,9 +509,6 @@ export const wasteControlTotals = [
     estimate_row_id: 'waste-operator-service',
     cost_bucket: 'contractors',
     source_total_rub: detailMoney(7_623_207.58),
-    detail_total_rub: detailMoney(7_623_207.58),
-    aggregate_total_rub: detailMoney(7_623_207.58),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [wasteOperatorRegionalOperatorResourceId],
     source_refs: detailSourceRefs(
@@ -525,11 +522,7 @@ export const wasteControlTotals = [
     estimate_row_id: 'waste-operator-service',
     cost_bucket: 'income',
     source_total_rub: detailMoney(7_623_208),
-    detail_total_rub: detailMoney(7_623_207.58, {
-      note: 'точное значение из локального ресурсного расчета',
-    }),
-    aggregate_total_rub: detailMoney(7_623_207.58),
-    delta_rub: -0.42,
+    detail_total_note: 'Точное значение из локального ресурсного расчета.',
     tolerance_rub: 1,
     resource_ids: [wasteOperatorRegionalOperatorResourceId],
     source_refs: detailSourceRefs(wasteOperatorCalculationSource),
@@ -541,9 +534,6 @@ export const wasteControlTotals = [
     estimate_row_id: 'waste-operator-service',
     cost_bucket: 'gross',
     source_total_rub: detailMoney(8_004_367.96),
-    detail_total_rub: detailMoney(8_004_367.96),
-    aggregate_total_rub: detailMoney(8_004_368),
-    delta_rub: -0.04,
     tolerance_rub: 1,
     resource_ids: wasteOperatorGrossResourceIds,
     source_refs: detailSourceRefs(
@@ -557,9 +547,6 @@ export const wasteControlTotals = [
     estimate_row_id: 'waste-operator-service',
     cost_bucket: 'materials',
     source_total_rub: detailMoney(7_623_208),
-    detail_total_rub: detailMoney(7_623_208),
-    aggregate_total_rub: detailMoney(0),
-    delta_rub: 7_623_208,
     tolerance_rub: 0.01,
     resource_ids: [wasteOperatorMaterialsCalculationResourceId],
     source_refs: detailSourceRefs(
@@ -579,9 +566,6 @@ export const wasteControlTotals = [
     estimate_row_id: 'waste-transfer-from-homes',
     cost_bucket: 'primary_salary',
     source_total_rub: detailMoney(3_418_555.1),
-    detail_total_rub: detailMoney(3_418_555.1),
-    aggregate_total_rub: detailMoney(3_418_555.1),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: wasteTransferPrimarySalaryResourceIds,
     source_refs: detailSourceRefs(
@@ -595,9 +579,6 @@ export const wasteControlTotals = [
     estimate_row_id: 'waste-transfer-from-homes',
     cost_bucket: 'machinist_salary',
     source_total_rub: detailMoney(1_364_107.2),
-    detail_total_rub: detailMoney(1_364_107.2),
-    aggregate_total_rub: detailMoney(1_364_107.2),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: wasteTransferMachinistSalaryResourceIds,
     source_refs: detailSourceRefs(
@@ -611,9 +592,6 @@ export const wasteControlTotals = [
     estimate_row_id: 'waste-transfer-from-homes',
     cost_bucket: 'machines',
     source_total_rub: detailMoney(464_303.42),
-    detail_total_rub: detailMoney(464_303.42),
-    aggregate_total_rub: detailMoney(464_303.42),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: wasteTransferMachineResourceIds,
     source_refs: detailSourceRefs(
@@ -627,9 +605,6 @@ export const wasteControlTotals = [
     estimate_row_id: 'waste-transfer-from-homes',
     cost_bucket: 'insurance',
     source_total_rub: detailMoney(1_444_364.01),
-    detail_total_rub: detailMoney(1_444_364.01),
-    aggregate_total_rub: detailMoney(1_444_364.01),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: wasteTransferInsuranceResourceIds,
     source_refs: detailSourceRefs(wasteTransferDocumentTotalsSource),
@@ -640,9 +615,6 @@ export const wasteControlTotals = [
     estimate_row_id: 'waste-transfer-from-homes',
     cost_bucket: 'overhead',
     source_total_rub: detailMoney(3_347_863.61),
-    detail_total_rub: detailMoney(3_347_863.61),
-    aggregate_total_rub: detailMoney(3_347_863.61),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: wasteTransferOverheadResourceIds,
     source_refs: detailSourceRefs(wasteTransferDocumentTotalsSource),
@@ -653,9 +625,6 @@ export const wasteControlTotals = [
     estimate_row_id: 'waste-transfer-from-homes',
     cost_bucket: 'profit',
     source_total_rub: detailMoney(1_913_064.92),
-    detail_total_rub: detailMoney(1_913_064.92),
-    aggregate_total_rub: detailMoney(1_913_064.92),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: wasteTransferProfitResourceIds,
     source_refs: detailSourceRefs(wasteTransferDocumentTotalsSource),
@@ -666,10 +635,10 @@ export const wasteControlTotals = [
     estimate_row_id: 'waste-transfer-from-homes',
     cost_bucket: 'usn',
     source_total_rub: detailMoney(286_960),
-    detail_total_rub: detailMoney(286_960),
-    aggregate_total_rub: detailMoney(null, {
+    aggregate_total_unknown: {
+      value: null,
       note: 'в breakdown строки estimate-2026 отдельного bucket usn нет',
-    }),
+    },
     tolerance_rub: 0.01,
     resource_ids: [wasteTransferUsnResourceId],
     source_refs: detailSourceRefs(wasteTransferCalculationSource),
@@ -680,11 +649,7 @@ export const wasteControlTotals = [
     estimate_row_id: 'waste-transfer-from-homes',
     cost_bucket: 'gross',
     source_total_rub: detailMoney(12_851_177.85),
-    detail_total_rub: detailMoney(12_851_177.85, {
-      note: 'калькуляционный доход плюс расчетный НДС 5%',
-    }),
-    aggregate_total_rub: detailMoney(12_851_178),
-    delta_rub: -0.15,
+    detail_total_note: 'Сумма строковых ресурсов с расчетным НДС 5%.',
     tolerance_rub: 2,
     resource_ids: wasteTransferGrossResourceIds,
     source_refs: detailSourceRefs(
@@ -700,4 +665,4 @@ export const wasteControlTotals = [
       ),
     ),
   }),
-] satisfies readonly EstimateDetailControlTotal[];
+] satisfies readonly EstimateDetailControlTotalInput[];

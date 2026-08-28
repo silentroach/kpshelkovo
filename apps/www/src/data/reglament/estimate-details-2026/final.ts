@@ -9,7 +9,6 @@ import type {
 } from '@/lib/reglament/schema';
 
 import {
-  detailControlTotal,
   detailMoney,
   detailNeedsCheckStatus,
   detailSource,
@@ -116,7 +115,7 @@ const finalGrossControl = (
       ? detailStatus('verified')
       : detailNeedsCheckStatus(reasons.join(' '), input.source_refs);
 
-  return detailControlTotal({
+  return {
     id: input.id,
     estimate_row_id: input.estimate_row_id,
     control_source: 'final_pdf',
@@ -124,12 +123,12 @@ const finalGrossControl = (
     source_total_rub: detailMoney(input.source_total_rub),
     detail_total_rub: detailMoney(detailTotal),
     aggregate_total_rub: detailMoney(aggregateTotal),
-    delta_rub: detailDelta === 0 ? aggregateDelta : detailDelta,
+    delta_rub: round2(detailTotal - aggregateTotal),
     tolerance_rub: 0,
     source_refs: input.source_refs,
     note: input.note ?? finalControlNote,
     ...status,
-  });
+  };
 };
 
 const finalEstimateTotalSource = detailSource(
