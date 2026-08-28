@@ -12,6 +12,7 @@ export type {
   MarkdownListOptions,
   MarkdownPhrasingInput,
 } from './generate-types';
+export { resolveMarkdownResourceReferences } from './references';
 export { extractFirstMarkdownText, extractMarkdownText } from './plain-text';
 export {
   render,

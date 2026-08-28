@@ -13,6 +13,7 @@ import {
   parseMarkdownFragment,
   rehypeTypograf,
   render,
+  resolveMarkdownResourceReferences,
   satteriTypograf,
   serializeMarkdownDocument,
 } from './index';
@@ -123,6 +124,32 @@ describe('@shelkovo/markdown', () => {
       "## Фрагмент
 
       Авторский **текст** с [ссылкой](https://example.com).
+      "
+    `);
+  });
+
+  it('resolves local resource references before combining fragments', () => {
+    const first = resolveMarkdownResourceReferences(
+      parseMarkdownFragment(
+        '[Исправление][source]\n\n![Схема][image]\n\n[source]: https://example.com/first\n[image]: https://example.com/image.png "Протокол"',
+      ),
+    );
+    const second = resolveMarkdownResourceReferences(
+      parseMarkdownFragment(
+        '[Уточнение][source]\n\n[source]: https://example.com/second',
+      ),
+    );
+
+    expect(
+      serializeMarkdownDocument(
+        createMarkdownDocument({ children: [...first, ...second] }),
+      ),
+    ).toMatchInlineSnapshot(`
+      "[Исправление](https://example.com/first)
+
+      ![Схема](https://example.com/image.png "Протокол")
+
+      [Уточнение](https://example.com/second)
       "
     `);
   });

@@ -3,6 +3,7 @@ import {
   createMarkdownDocument,
   md,
   parseMarkdownFragment,
+  resolveMarkdownResourceReferences,
   serializeMarkdownDocument,
 } from '@shelkovo/markdown';
 
@@ -87,7 +88,9 @@ const photoLine = (label: string, photo: NewsPhoto): MarkdownListItem => {
     ]).join(' — ')}`,
   );
   const blocks = photo.caption
-    ? parseMarkdownFragment(photo.caption.trim()).filter(isBlockContent)
+    ? resolveMarkdownResourceReferences(
+        parseMarkdownFragment(photo.caption.trim()),
+      ).filter(isBlockContent)
     : [];
   const [first, ...rest] = blocks;
 
