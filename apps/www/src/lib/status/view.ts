@@ -13,12 +13,7 @@ import {
 import { formatArea } from '../areas';
 import type { StatusCalendarDay } from './calendar.types';
 import { getStatusIncidentState } from './lifecycle';
-import type {
-  StatusArea,
-  StatusKind,
-  StatusService,
-  StatusServiceState,
-} from './schema';
+import type { StatusArea, StatusKind, StatusService } from './schema';
 import type {
   StatusDaysWithoutIncidents,
   StatusDuration,
@@ -51,12 +46,6 @@ const MAINTENANCE_TITLE_LABELS: Record<StatusService, string> = {
   water: 'Плановые работы: вода',
   internet: 'Плановые работы: интернет',
   dam: 'Плановые работы: дамба',
-};
-
-const SERVICE_STATE_LABELS: Record<StatusServiceState, string> = {
-  green: 'В норме',
-  amber: 'Работы',
-  red: 'Инцидент',
 };
 
 interface StatusIncidentPeriodPart {
@@ -515,5 +504,4 @@ export const formatStatusService = (service: StatusService): string =>
 
 export const formatStatusKind = (kind: StatusKind): string => KIND_LABELS[kind];
 
-export const formatStatusServiceState = (state: StatusServiceState): string =>
-  SERVICE_STATE_LABELS[state];
+export { formatStatusServiceState } from './service-state';
