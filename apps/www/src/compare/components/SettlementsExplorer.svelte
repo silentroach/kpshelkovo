@@ -29,6 +29,7 @@
   const moreid = `${uid}-price-more`;
   const sortid = `${uid}-sort`;
   const mapid = `${uid}-map`;
+  const mapHeight = 375;
 
   // Находим Шелково как базу для расчета расстояний.
   const shelkovo = $derived(settlements.find((s) => s.isBaseline));
@@ -334,8 +335,14 @@
 
   {#if showMap}
     <section id={mapid} class="space-y-4" data-testid="filtered-map">
-      <SettlementMap settlements={mapSettlements} />
+      <SettlementMap settlements={mapSettlements} height={mapHeight} />
     </section>
+  {:else if !controlsReady}
+    <div
+      class="hidden border border-border bg-[color:var(--color-bg-soft)] md:block"
+      style={`height: ${mapHeight}px; min-height: ${mapHeight}px;`}
+      aria-hidden="true"
+    ></div>
   {/if}
 
   <div

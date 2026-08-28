@@ -4,6 +4,7 @@ const mobileViewports = [
   { width: 320, height: 760 },
   { width: 390, height: 844 },
 ] as const;
+const desktopViewport = { width: 1440, height: 900 } as const;
 const explorerControlSelector =
   '[data-testid="explorer-controls"] input, [data-testid="explorer-controls"] button, [data-testid="sort-select"]';
 
@@ -58,6 +59,40 @@ test('keeps one settlement list before and after hydration', async ({
   for (const control of await controlElements.all()) {
     await expect(control).toBeEnabled();
   }
+});
+
+test('keeps the desktop list position through hydration', async ({
+  baseURL,
+  browser,
+  page,
+}) => {
+  const noJavaScriptContext = await browser.newContext({
+    baseURL,
+    javaScriptEnabled: false,
+    viewport: desktopViewport,
+  });
+  const noJavaScriptPage = await noJavaScriptContext.newPage();
+  let serverListTop: number;
+
+  try {
+    await noJavaScriptPage.goto('/815/compare/', {
+      waitUntil: 'networkidle',
+    });
+    serverListTop = await noJavaScriptPage
+      .getByTestId('explorer-summary-row')
+      .evaluate((element) => element.getBoundingClientRect().top);
+  } finally {
+    await noJavaScriptContext.close();
+  }
+
+  await page.setViewportSize(desktopViewport);
+  await page.goto('/815/compare/', { waitUntil: 'networkidle' });
+  await expect(page.getByTestId('filtered-map')).toBeVisible();
+  const hydratedListTop = await page
+    .getByTestId('explorer-summary-row')
+    .evaluate((element) => element.getBoundingClientRect().top);
+
+  expect(hydratedListTop).toBeCloseTo(serverListTop, 0);
 });
 
 test('keeps every tariff filter usable beside the map button on mobile', async ({
