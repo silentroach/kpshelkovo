@@ -60,4 +60,15 @@ describe('createReviewMentionRefs', () => {
       createReviewMentionRefs(review({ mentions: [target, target] })),
     ).toHaveLength(1);
   });
+
+  it('does not read the body when the review has no mentions', () => {
+    expect(
+      createReviewMentionRefs({
+        ...review({ mentions: [] }),
+        get body(): string {
+          throw new Error('body should not be read');
+        },
+      }),
+    ).toEqual([]);
+  });
 });

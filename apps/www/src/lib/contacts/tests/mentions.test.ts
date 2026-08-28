@@ -52,4 +52,16 @@ describe('createContactMentionRefs', () => {
       ]
     `);
   });
+
+  it('does not read the body when the contact has no mentions', () => {
+    expect(
+      createContactMentionRefs({
+        ...contact,
+        get body(): string {
+          throw new Error('body should not be read');
+        },
+        mentions: [],
+      }),
+    ).toEqual([]);
+  });
 });

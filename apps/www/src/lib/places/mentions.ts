@@ -36,8 +36,12 @@ const excerpt = (markdown: string): string | undefined => {
 
 export const createPlaceMentionRefs = (
   place: PlaceMentionRefSource,
-): readonly EntityMentionSourceRef[] =>
-  createEntityMentionSourceRefs(place.mentions, {
+): readonly EntityMentionSourceRef[] => {
+  if (!place.mentions.length) {
+    return [];
+  }
+
+  return createEntityMentionSourceRefs(place.mentions, {
     source: {
       section: 'places',
       kind: 'place',
@@ -49,3 +53,4 @@ export const createPlaceMentionRefs = (
     excerpt: excerpt(place.body),
     sourceEntity: { type: 'place', slug: place.slug },
   });
+};
