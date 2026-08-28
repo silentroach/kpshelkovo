@@ -1,6 +1,7 @@
 import { installHomeStatusHydration } from '@/lib/home/status';
 import { highlightSearchTerms } from '@/lib/search/highlight';
 import { installStatusServiceStateHydration } from '@/lib/status/lifecycle.dom';
+import searchDialogStylesUrl from '@/styles/search-dialog.css?url';
 
 interface AstroBeforePreparationEvent extends Event {
   loader: () => Promise<void>;
@@ -395,13 +396,49 @@ const bindSiteHeaderMenu = (): void => {
 
 let latestSearchDialogRequest = 0;
 let nativeSearchDialogOpener: HTMLElement | undefined;
+let searchDialogStylesLink: HTMLLinkElement | undefined;
+let searchDialogStylesPromise: Promise<void> | undefined;
+
+const loadSearchDialogStyles = (): Promise<void> => {
+  if (searchDialogStylesLink?.isConnected && searchDialogStylesPromise) {
+    return searchDialogStylesPromise;
+  }
+
+  const link = document.createElement('link');
+
+  link.rel = 'stylesheet';
+  link.href = searchDialogStylesUrl;
+  link.dataset.searchDialogStyles = '';
+  searchDialogStylesLink = link;
+  searchDialogStylesPromise = new Promise((resolve, reject) => {
+    link.addEventListener('load', () => resolve(), { once: true });
+    link.addEventListener(
+      'error',
+      () => {
+        link.remove();
+        if (searchDialogStylesLink === link) {
+          searchDialogStylesLink = undefined;
+          searchDialogStylesPromise = undefined;
+        }
+        reject(new Error('Failed to load search dialog styles'));
+      },
+      { once: true },
+    );
+  });
+  document.head.append(link);
+
+  return searchDialogStylesPromise;
+};
 
 const requestSearchDialog = async (
   root: HTMLElement,
   opener: HTMLElement,
   requestId: number,
 ): Promise<void> => {
-  const { openSearchDialog } = await import('@/components/search/lazy');
+  const [{ openSearchDialog }] = await Promise.all([
+    import('@/components/search/lazy'),
+    loadSearchDialogStyles(),
+  ]);
   const dialog = root.querySelector<HTMLDialogElement>(SEARCH_DIALOG_SELECTOR);
   const input = root.querySelector<HTMLInputElement>(SEARCH_INPUT_SELECTOR);
   if (
