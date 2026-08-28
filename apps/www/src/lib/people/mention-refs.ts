@@ -20,6 +20,10 @@ const excerpt = (markdown: string): string | undefined => {
 export const createPersonProfileMentionRefs = (
   profile: PersonProfileMentionRefSource,
 ): readonly EntityMentionSourceRef[] => {
+  if (!profile.mentions.length) {
+    return [];
+  }
+
   const summary = excerpt(profile.body);
 
   return createEntityMentionSourceRefs(profile.mentions, {

@@ -20,8 +20,12 @@ type ReviewMentionRefSource = Pick<
 
 export const createReviewMentionRefs = (
   review: ReviewMentionRefSource,
-): readonly EntityMentionSourceRef[] =>
-  createEntityMentionSourceRefs(review.mentions, {
+): readonly EntityMentionSourceRef[] => {
+  if (!review.mentions.length) {
+    return [];
+  }
+
+  return createEntityMentionSourceRefs(review.mentions, {
     source: {
       section: 'reviews',
       kind: 'review',
@@ -34,3 +38,4 @@ export const createReviewMentionRefs = (
     mentionedAt: review.publishedAt.toISOString(),
     sortKey: review.publishedAt.valueOf(),
   });
+};
