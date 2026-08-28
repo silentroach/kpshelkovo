@@ -519,4 +519,42 @@ const value = 1
       `"Заголовок Первый абзац с ссылкой. Река Первый пункт Второй пункт"`,
     );
   });
+
+  it('excludes YAML frontmatter from extracted text', () => {
+    const frontmatterOnly = `---
+title: Служебный заголовок
+description: Служебное описание
+---`;
+    const document = `${frontmatterOnly}
+
+# Заголовок
+
+Первый **абзац**.
+
+- Первый пункт
+
+![Река](river.jpg)`;
+
+    expect({
+      allFromDocument: extractMarkdownText(document),
+      allFromFrontmatterOnly: extractMarkdownText(frontmatterOnly),
+      firstFromDocument: extractFirstMarkdownText(document),
+      firstFromEmptyFrontmatter: extractFirstMarkdownText(
+        '---\n---\n\nТекст после пустых настроек.',
+      ),
+      firstFromFrontmatterOnly: extractFirstMarkdownText(frontmatterOnly),
+      firstFromUnclosedDelimiter: extractFirstMarkdownText(
+        '---\n\n# Это обычный Markdown',
+      ),
+    }).toMatchInlineSnapshot(`
+      {
+        "allFromDocument": "Заголовок Первый абзац. Первый пункт Река",
+        "allFromFrontmatterOnly": undefined,
+        "firstFromDocument": "Заголовок",
+        "firstFromEmptyFrontmatter": "Текст после пустых настроек.",
+        "firstFromFrontmatterOnly": undefined,
+        "firstFromUnclosedDelimiter": "Это обычный Markdown",
+      }
+    `);
+  });
 });
