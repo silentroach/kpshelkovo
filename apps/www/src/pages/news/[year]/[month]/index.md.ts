@@ -1,24 +1,13 @@
-import type { APIRoute, GetStaticPaths } from 'astro';
-import { padNumber } from '@shelkovo/format';
+import type { APIRoute } from 'astro';
 
 import { createMarkdownResponse } from '@/lib/markdown/response';
-import { loadNewsArchives, loadNewsMonth } from '@/lib/news/load';
+import { loadNewsMonth } from '@/lib/news/load';
 import { buildNewsMonthMarkdown } from '@/lib/news/markdown';
+import { newsMonthStaticPaths } from '@/lib/news/static-paths';
 
 export const prerender = true;
 
-export const getStaticPaths = (async () => {
-  const archives = await loadNewsArchives();
-
-  return archives.years.flatMap((item) =>
-    item.months.map((month) => ({
-      params: {
-        year: String(month.year),
-        month: padNumber(month.month),
-      },
-    })),
-  );
-}) satisfies GetStaticPaths;
+export const getStaticPaths = newsMonthStaticPaths;
 
 export const GET: APIRoute = async ({ params }) => {
   const year = Number(params.year);

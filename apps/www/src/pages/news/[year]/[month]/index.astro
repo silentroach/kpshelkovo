@@ -1,6 +1,4 @@
 ---
-import type { GetStaticPaths } from 'astro';
-import { padNumber } from '@shelkovo/format';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import NewsArchiveSummary from '@/components/news/NewsArchiveSummary.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -11,21 +9,11 @@ import {
 import NewsList from '@/components/news/NewsList.astro';
 import { collectionPageSchema } from '@/lib/json-ld';
 import { loadNewsArchives, loadNewsMonth } from '@/lib/news/load';
+import { newsMonthStaticPaths } from '@/lib/news/static-paths';
 import { formatNewsMonth } from '@/lib/news/view';
 import { monthUrl, newsUrl, yearUrl } from '@/lib/news/routes';
 
-export const getStaticPaths = (async () => {
-  const archives = await loadNewsArchives();
-
-  return archives.years.flatMap((item) =>
-    item.months.map((month) => ({
-      params: {
-        year: String(month.year),
-        month: padNumber(month.month),
-      },
-    })),
-  );
-}) satisfies GetStaticPaths;
+export const getStaticPaths = newsMonthStaticPaths;
 
 const year = Number(Astro.params.year);
 const month = Number(Astro.params.month);

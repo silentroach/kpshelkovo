@@ -1,5 +1,4 @@
 ---
-import type { GetStaticPaths } from 'astro';
 import { pluralize } from '@shelkovo/format';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -10,16 +9,11 @@ import {
 import NewsList from '@/components/news/NewsList.astro';
 import { collectionPageSchema } from '@/lib/json-ld';
 import { NEWS_LATEST_LIMIT } from '@/lib/news/config';
-import { loadNewsTag, loadNewsTags } from '@/lib/news/load';
+import { loadNewsTag } from '@/lib/news/load';
 import { newsUrl, tagUrl, tagsUrl } from '@/lib/news/routes';
+import { newsTagStaticPaths } from '@/lib/news/static-paths';
 
-export const getStaticPaths = (async () => {
-  const tags = await loadNewsTags();
-
-  return tags.map((item) => ({
-    params: { tag: item.key },
-  }));
-}) satisfies GetStaticPaths;
+export const getStaticPaths = newsTagStaticPaths;
 
 const key = Astro.params.tag;
 
