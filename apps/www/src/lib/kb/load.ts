@@ -64,8 +64,9 @@ const entryRouteSlug = (sourceId: string): string | undefined => {
 const mapEntry = (
   entry: KbPageEntry,
   mentionRegistry: SiteMentionRegistry,
+  routeSlug: string | undefined,
+  isSection: boolean,
 ): KbPage => {
-  const routeSlug = entryRouteSlug(entry.id);
   const flags = entry.data.flags ?? [];
   const body = preprocessSiteMarkdownContent(
     entry.body ?? '',
@@ -83,6 +84,7 @@ const mapEntry = (
     url: routeSlug ? kbDetailUrl(routeSlug) : kbUrl(),
     canonical: routeSlug ? kbDetailCanonical(routeSlug) : kbCanonical(),
     routeSlug,
+    isSection,
     body: body.markdown,
     mentions: body.mentions,
   } satisfies KbPage;
@@ -104,27 +106,14 @@ const validateUniquePublicUrls = (pages: readonly KbPage[]): void => {
   }
 };
 
-const validateHubSourceIds = (pages: readonly KbPage[]): void => {
-  for (const page of pages) {
-    if (page.sourceId === 'index' || page.sourceId.endsWith('/index')) {
-      continue;
-    }
-
-    const descendantRoutePrefix = `${page.routeSlug}/`;
-    const descendant = pages.find((candidate) =>
-      candidate.routeSlug?.startsWith(descendantRoutePrefix),
-    );
-
-    if (!descendant) {
-      continue;
-    }
-
-    failSourceId(
-      page.sourceId,
-      `has descendant public route "${descendant.url}"; non-root hub source ids must end with "/index" (expected "${page.routeSlug}/index")`,
-    );
-  }
-};
+const isSectionRoute = (
+  routeSlug: string | undefined,
+  routeSlugs: readonly (string | undefined)[],
+): boolean =>
+  !routeSlug ||
+  routeSlugs.some(
+    (candidate) => candidate?.startsWith(`${routeSlug}/`) ?? false,
+  );
 
 export const buildKbDataset = (
   entries: readonly KbPageEntry[],
@@ -133,10 +122,19 @@ export const buildKbDataset = (
   },
 ): KbDataset => {
   const mentionRegistry = opts?.mentionRegistry ?? new Map();
-  const pages = entries.map((entry) => mapEntry(entry, mentionRegistry));
+  const routeSlugs = entries.map((entry) => entryRouteSlug(entry.id));
+  const pages = entries.map((entry, index) => {
+    const routeSlug = routeSlugs[index];
+
+    return mapEntry(
+      entry,
+      mentionRegistry,
+      routeSlug,
+      isSectionRoute(routeSlug, routeSlugs),
+    );
+  });
 
   validateUniquePublicUrls(pages);
-  validateHubSourceIds(pages);
 
   return {
     pages,

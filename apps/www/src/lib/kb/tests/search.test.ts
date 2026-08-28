@@ -3,15 +3,28 @@ import { describe, expect, it } from 'vitest';
 import { isKbPageSearchable } from '../search';
 
 describe('isKbPageSearchable', () => {
-  it('includes leaves and excludes root, hub, noindex, and opted-out sources', () => {
+  it('includes articles and excludes sections, noindex, and opted-out pages', () => {
     const cases = [
-      { sourceId: 'services/internet/fiber', flags: [] as const },
-      { sourceId: 'index', flags: [] as const },
-      { sourceId: 'services/internet/index', flags: [] as const },
-      { sourceId: 'court/order-debt', flags: ['noindex'] as const },
+      {
+        sourceId: 'services/internet/fiber',
+        flags: [] as const,
+        isSection: false,
+      },
+      { sourceId: 'index', flags: [] as const, isSection: true },
+      {
+        sourceId: 'services/internet',
+        flags: [] as const,
+        isSection: true,
+      },
+      {
+        sourceId: 'court/order-debt',
+        flags: ['noindex'] as const,
+        isSection: false,
+      },
       {
         sourceId: 'before-you-buy/how-to-choose-plot',
         flags: ['exclude-from-site-search'] as const,
+        isSection: false,
       },
     ].map((page) => ({
       sourceId: page.sourceId,
@@ -30,7 +43,7 @@ describe('isKbPageSearchable', () => {
         },
         {
           "searchable": false,
-          "sourceId": "services/internet/index",
+          "sourceId": "services/internet",
         },
         {
           "searchable": false,

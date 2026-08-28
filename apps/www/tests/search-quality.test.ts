@@ -121,6 +121,10 @@ const queryGroups = [
     name: '#184 compare settlements',
     queries: ['парк', 'петровское парк', 'ивушкино'],
   },
+  {
+    name: '#372 KB section role',
+    queries: ['интернет', 'оптоволоконный интернет'],
+  },
 ] as const;
 
 const rankExpectations: ReadonlyMap<
@@ -160,6 +164,11 @@ const rankExpectations: ReadonlyMap<
   ['тсн', { url: '/kb/tsn/manipulations/', maxRank: 1 }],
   ['суд', { url: '/kb/court/order-debt/', maxRank: 1 }],
   ['газ', { url: '/kb/services/gas/', maxRank: 1 }],
+  ['интернет', { url: '/kb/services/internet/fiber/', maxRank: 4 }],
+  [
+    'оптоволоконный интернет',
+    { url: '/kb/services/internet/fiber/', maxRank: 1 },
+  ],
   ['титаник', { url: '/map/titanic/', maxRank: 1 }],
   ['детская площадка титаник', { url: '/map/titanic/', maxRank: 1 }],
   ['корабль недалеко от дамбы', { url: '/map/titanic/', maxRank: 1 }],
@@ -399,7 +408,7 @@ test('#154 search result highlighting', async () => {
   await page.close();
 });
 
-test('#321 status calendars stay outside Pagefind', async () => {
+test('#321 status calendars and #372 KB sections stay outside Pagefind', async () => {
   const page = await browser.newPage({
     viewport: { width: 1280, height: 800 },
   });
@@ -428,6 +437,9 @@ test('#321 status calendars stay outside Pagefind', async () => {
     expect(urls.filter((url) => url.startsWith('/status/calendar/'))).toEqual(
       [],
     );
+    expect(urls).toContain('/kb/services/internet/fiber/');
+    expect(urls).not.toContain('/kb/services/internet/');
+    expect(urls).not.toContain('/kb/sos/');
   } finally {
     await page.close();
   }

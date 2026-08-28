@@ -27,6 +27,7 @@ const page = (input: {
     ? `https://example.com/kb/${input.routeSlug}/`
     : 'https://example.com/kb/',
   routeSlug: input.routeSlug,
+  isSection: !input.routeSlug,
   body: '',
   mentions: [],
 });
@@ -44,7 +45,7 @@ describe('kbBreadcrumbs', () => {
   it('includes existing parent pages for nested KB articles', () => {
     const root = page({ id: 'index', title: 'База знаний' });
     const internet = page({
-      id: 'services/internet/index',
+      id: 'services/internet',
       title: 'Интернет',
       routeSlug: 'services/internet',
     });
