@@ -1,5 +1,5 @@
 import type {
-  EstimateDetailControlTotal,
+  EstimateDetailControlTotalInput,
   EstimateDetailResource,
   EstimateDetailWorkItem,
 } from '@/lib/reglament/detail-schema';
@@ -1140,9 +1140,6 @@ export const improvementControlTotals = [
     estimate_row_id: 'improvement-objects-maintenance',
     cost_bucket: 'primary_salary',
     source_total_rub: detailMoney(1_669_095.98),
-    detail_total_rub: detailMoney(1_669_095.98),
-    aggregate_total_rub: detailMoney(1_669_095.98),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: improvementObjectLaborResourceIds,
     source_refs: detailSourceRefs(
@@ -1159,9 +1156,6 @@ export const improvementControlTotals = [
     source_total_rub: detailMoney(56_347.2, {
       note: 'материалы локального расчета без спорной строки ограждения',
     }),
-    detail_total_rub: detailMoney(56_347.2),
-    aggregate_total_rub: detailMoney(56_347.2),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: improvementObjectMaterialResourceIds,
     source_refs: detailSourceRefs(
@@ -1175,9 +1169,6 @@ export const improvementControlTotals = [
     estimate_row_id: 'improvement-objects-maintenance',
     cost_bucket: 'insurance',
     source_total_rub: detailMoney(504_066.99),
-    detail_total_rub: detailMoney(504_066.99),
-    aggregate_total_rub: detailMoney(504_066.99),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [improvementObjectsInsuranceResourceId],
     source_refs: detailSourceRefs(improvementDocumentTotalsSource),
@@ -1188,9 +1179,6 @@ export const improvementControlTotals = [
     estimate_row_id: 'improvement-objects-maintenance',
     cost_bucket: 'overhead',
     source_total_rub: detailMoney(1_168_367.19),
-    detail_total_rub: detailMoney(1_168_367.19),
-    aggregate_total_rub: detailMoney(1_168_367.19),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [improvementObjectsOverheadResourceId],
     source_refs: detailSourceRefs(improvementDocumentTotalsSource),
@@ -1201,9 +1189,6 @@ export const improvementControlTotals = [
     estimate_row_id: 'improvement-objects-maintenance',
     cost_bucket: 'profit',
     source_total_rub: detailMoney(667_638.39),
-    detail_total_rub: detailMoney(667_638.39),
-    aggregate_total_rub: detailMoney(667_638.39),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [improvementObjectsProfitResourceId],
     source_refs: detailSourceRefs(improvementDocumentTotalsSource),
@@ -1214,9 +1199,6 @@ export const improvementControlTotals = [
     estimate_row_id: 'improvement-objects-maintenance',
     cost_bucket: 'usn',
     source_total_rub: detailMoney(93_299.49),
-    detail_total_rub: detailMoney(93_299.49),
-    aggregate_total_rub: detailMoney(93_299.49),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [improvementObjectsUsnResourceId],
     source_refs: detailSourceRefs(
@@ -1231,9 +1213,6 @@ export const improvementControlTotals = [
     estimate_row_id: 'improvement-objects-maintenance',
     cost_bucket: 'vat',
     source_total_rub: detailMoney(207_940.76),
-    detail_total_rub: detailMoney(207_940.76),
-    aggregate_total_rub: detailMoney(207_940.76),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [improvementObjectsVatResourceId],
     source_refs: detailSourceRefs(
@@ -1248,9 +1227,6 @@ export const improvementControlTotals = [
     estimate_row_id: 'improvement-objects-maintenance',
     cost_bucket: 'gross',
     source_total_rub: detailMoney(4_366_756),
-    detail_total_rub: detailMoney(4_366_756),
-    aggregate_total_rub: detailMoney(4_366_756),
-    delta_rub: 0,
     tolerance_rub: 1,
     resource_ids: improvementObjectsGrossResourceIds,
     source_refs: detailSourceRefs(
@@ -1267,9 +1243,6 @@ export const improvementControlTotals = [
     estimate_row_id: 'improvement-road-surface-repair',
     cost_bucket: 'materials',
     source_total_rub: detailMoney(298_320),
-    detail_total_rub: detailMoney(298_320),
-    aggregate_total_rub: detailMoney(298_320),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [improvementFenceProfileSheetResourceId],
     source_refs: improvementFenceMismatchRefs,
@@ -1284,9 +1257,6 @@ export const improvementControlTotals = [
     estimate_row_id: 'improvement-road-surface-repair',
     cost_bucket: 'usn',
     source_total_rub: detailMoney(6_845.71),
-    detail_total_rub: detailMoney(6_845.71),
-    aggregate_total_rub: detailMoney(6_845.71),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [improvementFenceUsnResourceId],
     source_refs: detailSourceRefs(
@@ -1305,9 +1275,6 @@ export const improvementControlTotals = [
     estimate_row_id: 'improvement-road-surface-repair',
     cost_bucket: 'vat',
     source_total_rub: detailMoney(15_258.29),
-    detail_total_rub: detailMoney(15_258.29),
-    aggregate_total_rub: detailMoney(15_258.29),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [improvementFenceVatResourceId],
     source_refs: detailSourceRefs(
@@ -1326,9 +1293,6 @@ export const improvementControlTotals = [
     estimate_row_id: 'improvement-road-surface-repair',
     cost_bucket: 'gross',
     source_total_rub: detailMoney(320_424),
-    detail_total_rub: detailMoney(320_424),
-    aggregate_total_rub: detailMoney(320_424),
-    delta_rub: 0,
     tolerance_rub: 1,
     resource_ids: improvementFenceGrossResourceIds,
     source_refs: improvementFenceMismatchRefs,
@@ -1338,4 +1302,4 @@ export const improvementControlTotals = [
       improvementFenceMismatchRefs,
     ),
   }),
-] satisfies readonly EstimateDetailControlTotal[];
+] satisfies readonly EstimateDetailControlTotalInput[];

@@ -1,5 +1,5 @@
 import type {
-  EstimateDetailControlTotal,
+  EstimateDetailControlTotalInput,
   EstimateDetailResource,
   EstimateDetailWorkItem,
 } from '@/lib/reglament/detail-schema';
@@ -793,9 +793,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-street-maintenance',
     cost_bucket: 'primary_salary',
     source_total_rub: detailMoney(2_549_913.41),
-    detail_total_rub: detailMoney(2_549_913.41),
-    aggregate_total_rub: detailMoney(2_549_913.41),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: lightingStreetPrimarySalaryResourceIds,
     source_refs: detailSourceRefs(
@@ -810,9 +807,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-street-maintenance',
     cost_bucket: 'materials',
     source_total_rub: detailMoney(97_820),
-    detail_total_rub: detailMoney(97_820),
-    aggregate_total_rub: detailMoney(97_820),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: lightingStreetMaterialResourceIds,
     source_refs: detailSourceRefs(
@@ -826,9 +820,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-street-maintenance',
     cost_bucket: 'insurance',
     source_total_rub: detailMoney(770_073.85),
-    detail_total_rub: detailMoney(770_073.85),
-    aggregate_total_rub: detailMoney(770_073.85),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingStreetInsuranceResourceId],
     source_refs: detailSourceRefs(
@@ -843,9 +834,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-street-maintenance',
     cost_bucket: 'overhead',
     source_total_rub: detailMoney(1_784_939.39),
-    detail_total_rub: detailMoney(1_784_939.39),
-    aggregate_total_rub: detailMoney(1_784_939.39),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingStreetOverheadResourceId],
     source_refs: detailSourceRefs(
@@ -860,9 +848,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-street-maintenance',
     cost_bucket: 'profit',
     source_total_rub: detailMoney(1_019_965.36),
-    detail_total_rub: detailMoney(1_019_965.36),
-    aggregate_total_rub: detailMoney(1_019_965.36),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingStreetProfitResourceId],
     source_refs: detailSourceRefs(
@@ -877,9 +862,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-street-maintenance',
     cost_bucket: 'usn',
     source_total_rub: detailMoney(130_601.32),
-    detail_total_rub: detailMoney(130_601.32),
-    aggregate_total_rub: detailMoney(130_601.32),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingStreetUsnResourceId],
     source_refs: detailSourceRefs(
@@ -893,9 +875,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-street-maintenance',
     cost_bucket: 'vat',
     source_total_rub: detailMoney(317_665.67),
-    detail_total_rub: detailMoney(317_665.67),
-    aggregate_total_rub: detailMoney(317_665.67),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingStreetVatResourceId],
     source_refs: detailSourceRefs(
@@ -913,9 +892,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-street-maintenance',
     cost_bucket: 'gross',
     source_total_rub: detailMoney(6_670_979),
-    detail_total_rub: detailMoney(6_670_979),
-    aggregate_total_rub: detailMoney(6_670_979),
-    delta_rub: 0,
     tolerance_rub: 1,
     resource_ids: lightingStreetGrossResourceIds,
     source_refs: detailSourceRefs(
@@ -934,9 +910,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-electricity',
     cost_bucket: 'materials',
     source_total_rub: detailMoney(1_374_097.6),
-    detail_total_rub: detailMoney(1_374_097.6),
-    aggregate_total_rub: detailMoney(1_374_097.6),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingElectricityMaterialResourceId],
     source_refs: detailSourceRefs(
@@ -950,9 +923,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-electricity',
     cost_bucket: 'usn',
     source_total_rub: detailMoney(28_839.54),
-    detail_total_rub: detailMoney(28_839.54),
-    aggregate_total_rub: detailMoney(28_839.54),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingElectricityUsnResourceId],
     source_refs: detailSourceRefs(
@@ -966,9 +936,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-electricity',
     cost_bucket: 'vat',
     source_total_rub: detailMoney(70_146.86),
-    detail_total_rub: detailMoney(70_146.86),
-    aggregate_total_rub: detailMoney(70_146.86),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingElectricityVatResourceId],
     source_refs: detailSourceRefs(
@@ -986,9 +953,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-electricity',
     cost_bucket: 'gross',
     source_total_rub: detailMoney(1_473_084),
-    detail_total_rub: detailMoney(1_473_084),
-    aggregate_total_rub: detailMoney(1_473_084),
-    delta_rub: 0,
     tolerance_rub: 1,
     resource_ids: lightingElectricityGrossResourceIds,
     source_refs: detailSourceRefs(
@@ -1007,9 +971,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-poles-repair',
     cost_bucket: 'primary_salary',
     source_total_rub: detailMoney(222_066.98),
-    detail_total_rub: detailMoney(222_066.98),
-    aggregate_total_rub: detailMoney(222_066.98),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingPolesPaintLaborResourceId],
     source_refs: detailSourceRefs(
@@ -1023,9 +984,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-poles-repair',
     cost_bucket: 'materials',
     source_total_rub: detailMoney(277_692.8),
-    detail_total_rub: detailMoney(277_692.8),
-    aggregate_total_rub: detailMoney(277_692.8),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingPolesPaintMaterialResourceId],
     source_refs: detailSourceRefs(
@@ -1039,9 +997,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-poles-repair',
     cost_bucket: 'insurance',
     source_total_rub: detailMoney(67_064.23),
-    detail_total_rub: detailMoney(67_064.23),
-    aggregate_total_rub: detailMoney(67_064.23),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingPolesInsuranceResourceId],
     source_refs: detailSourceRefs(lightingPolesTotalsSource),
@@ -1052,9 +1007,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-poles-repair',
     cost_bucket: 'overhead',
     source_total_rub: detailMoney(155_446.88),
-    detail_total_rub: detailMoney(155_446.88),
-    aggregate_total_rub: detailMoney(155_446.88),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingPolesOverheadResourceId],
     source_refs: detailSourceRefs(lightingPolesTotalsSource),
@@ -1065,9 +1017,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-poles-repair',
     cost_bucket: 'profit',
     source_total_rub: detailMoney(88_826.79),
-    detail_total_rub: detailMoney(88_826.79),
-    aggregate_total_rub: detailMoney(88_826.79),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingPolesProfitResourceId],
     source_refs: detailSourceRefs(lightingPolesTotalsSource),
@@ -1078,9 +1027,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-poles-repair',
     cost_bucket: 'usn',
     source_total_rub: detailMoney(17_023.27),
-    detail_total_rub: detailMoney(17_023.27),
-    aggregate_total_rub: detailMoney(17_023.27),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingPolesUsnResourceId],
     source_refs: detailSourceRefs(
@@ -1094,9 +1040,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-poles-repair',
     cost_bucket: 'vat',
     source_total_rub: detailMoney(41_406.05),
-    detail_total_rub: detailMoney(41_406.05),
-    aggregate_total_rub: detailMoney(41_406.05),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingPolesVatResourceId],
     source_refs: detailSourceRefs(
@@ -1114,9 +1057,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-poles-repair',
     cost_bucket: 'gross',
     source_total_rub: detailMoney(869_527),
-    detail_total_rub: detailMoney(869_527),
-    aggregate_total_rub: detailMoney(869_527),
-    delta_rub: 0,
     tolerance_rub: 1,
     resource_ids: lightingPolesGrossResourceIds,
     source_refs: detailSourceRefs(
@@ -1135,9 +1075,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-power-system-repair',
     cost_bucket: 'primary_salary',
     source_total_rub: detailMoney(1_058_236.64),
-    detail_total_rub: detailMoney(1_058_236.64),
-    aggregate_total_rub: detailMoney(1_058_236.64),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: lightingPowerSystemPrimarySalaryResourceIds,
     source_refs: detailSourceRefs(
@@ -1152,9 +1089,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-power-system-repair',
     cost_bucket: 'insurance',
     source_total_rub: detailMoney(319_587.46),
-    detail_total_rub: detailMoney(319_587.46),
-    aggregate_total_rub: detailMoney(319_587.46),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingPowerSystemInsuranceResourceId],
     source_refs: detailSourceRefs(
@@ -1169,9 +1103,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-power-system-repair',
     cost_bucket: 'overhead',
     source_total_rub: detailMoney(740_765.64),
-    detail_total_rub: detailMoney(740_765.64),
-    aggregate_total_rub: detailMoney(740_765.64),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingPowerSystemOverheadResourceId],
     source_refs: detailSourceRefs(
@@ -1186,9 +1117,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-power-system-repair',
     cost_bucket: 'profit',
     source_total_rub: detailMoney(423_294.65),
-    detail_total_rub: detailMoney(423_294.65),
-    aggregate_total_rub: detailMoney(423_294.65),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingPowerSystemProfitResourceId],
     source_refs: detailSourceRefs(
@@ -1203,9 +1131,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-power-system-repair',
     cost_bucket: 'usn',
     source_total_rub: detailMoney(53_348.94),
-    detail_total_rub: detailMoney(53_348.94),
-    aggregate_total_rub: detailMoney(53_348.94),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingPowerSystemUsnResourceId],
     source_refs: detailSourceRefs(
@@ -1220,9 +1145,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-power-system-repair',
     cost_bucket: 'vat',
     source_total_rub: detailMoney(129_761.67),
-    detail_total_rub: detailMoney(129_761.67),
-    aggregate_total_rub: detailMoney(129_761.67),
-    delta_rub: 0,
     tolerance_rub: 0.01,
     resource_ids: [lightingPowerSystemVatResourceId],
     source_refs: detailSourceRefs(
@@ -1240,9 +1162,6 @@ export const lightingControlTotals = [
     estimate_row_id: 'lighting-power-system-repair',
     cost_bucket: 'gross',
     source_total_rub: detailMoney(2_724_995),
-    detail_total_rub: detailMoney(2_724_995),
-    aggregate_total_rub: detailMoney(2_724_995),
-    delta_rub: 0,
     tolerance_rub: 1,
     resource_ids: lightingPowerSystemGrossResourceIds,
     source_refs: detailSourceRefs(
@@ -1257,4 +1176,4 @@ export const lightingControlTotals = [
       lightingDerivedAllocationRefs,
     ),
   }),
-] satisfies readonly EstimateDetailControlTotal[];
+] satisfies readonly EstimateDetailControlTotalInput[];

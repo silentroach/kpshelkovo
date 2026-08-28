@@ -25,12 +25,36 @@ import {
   securityResources,
   securityWorkItems,
 } from '@/data/reglament/estimate-details-2026/security';
-import { estimateDetailSourcePdfs } from '@/data/reglament/estimate-details-2026/shared';
+import {
+  estimateDetailSourcePdfs,
+  resolveSectionControlTotals,
+} from '@/data/reglament/estimate-details-2026/shared';
 import {
   wasteControlTotals,
   wasteResources,
   wasteWorkItems,
 } from '@/data/reglament/estimate-details-2026/waste';
+
+const resources = [
+  ...cleaningResources,
+  ...wasteResources,
+  ...securityResources,
+  ...lightingResources,
+  ...landscapingResources,
+  ...improvementResources,
+];
+
+const sectionControlTotals = resolveSectionControlTotals(
+  [
+    ...cleaningControlTotals,
+    ...wasteControlTotals,
+    ...securityControlTotals,
+    ...lightingControlTotals,
+    ...landscapingControlTotals,
+    ...improvementControlTotals,
+  ],
+  resources,
+);
 
 export const estimateDetails2026 = {
   schema_version: '1',
@@ -43,6 +67,7 @@ export const estimateDetails2026 = {
     'PDF не парсятся во время runtime или build страницы: этот файл является curated dataset для ручного пополнения.',
     'Каждый будущий work item, resource и control total должен иметь source_refs с PDF, страницей и фрагментом; неоднозначные строки помечаются needs_check.',
     'Итоги с control_source=final_pdf сверяют строки и разделы final.pdf с estimate-2026; control_source=section_pdf сверяет ресурсы и итоги секционных PDF.',
+    'В секционных итогах detail_total_rub равен сумме ресурсов, aggregate_total_rub берется из estimate-2026; во всех итогах delta_rub равен разнице между детализацией и агрегированной сметой.',
   ],
   work_items: [
     ...cleaningWorkItems,
@@ -52,21 +77,6 @@ export const estimateDetails2026 = {
     ...landscapingWorkItems,
     ...improvementWorkItems,
   ],
-  resources: [
-    ...cleaningResources,
-    ...wasteResources,
-    ...securityResources,
-    ...lightingResources,
-    ...landscapingResources,
-    ...improvementResources,
-  ],
-  control_totals: [
-    ...finalControlTotals,
-    ...cleaningControlTotals,
-    ...wasteControlTotals,
-    ...securityControlTotals,
-    ...lightingControlTotals,
-    ...landscapingControlTotals,
-    ...improvementControlTotals,
-  ],
+  resources,
+  control_totals: [...finalControlTotals, ...sectionControlTotals],
 } satisfies EstimateDetailDataset;

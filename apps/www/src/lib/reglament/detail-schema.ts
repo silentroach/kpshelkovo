@@ -97,6 +97,13 @@ export interface EstimateDetailMoneyValue {
   readonly note?: string;
 }
 
+export type EstimateDetailUnknownMoneyValue = Omit<
+  EstimateDetailMoneyValue,
+  'value'
+> & {
+  readonly value: null;
+};
+
 export interface EstimateDetailNeedsCheck {
   readonly reason: string;
   readonly source_refs?: readonly EstimateDetailSourceRef[];
@@ -154,10 +161,19 @@ export type EstimateDetailControlTotalBase = {
 
 export type EstimateDetailControlTotalInput = Omit<
   EstimateDetailControlTotalBase,
-  'control_source'
-> &
-  Partial<Pick<EstimateDetailControlTotalBase, 'control_source'>> &
-  EstimateDetailStatusInfo;
+  | 'control_source'
+  | 'detail_total_rub'
+  | 'aggregate_total_rub'
+  | 'delta_rub'
+  | 'tolerance_rub'
+  | 'resource_ids'
+> & {
+  readonly control_source?: 'section_pdf';
+  readonly detail_total_note?: string;
+  readonly aggregate_total_unknown?: EstimateDetailUnknownMoneyValue;
+  readonly tolerance_rub: number;
+  readonly resource_ids: NonEmptyReadonlyArray<EstimateDetailResourceId>;
+} & EstimateDetailStatusInfo;
 
 export type EstimateDetailControlTotal = EstimateDetailControlTotalBase &
   EstimateDetailStatusInfo;
