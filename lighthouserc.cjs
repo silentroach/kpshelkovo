@@ -43,6 +43,8 @@ module.exports = {
           { minScore: bestPracticesMinScore },
         ],
         'categories:seo': ['warn', { minScore: 0.9 }],
+        // scripts/lighthouse-summary.mjs checks robots.txt and normalized SEO.
+        'robots-txt': 'off',
       },
     },
     upload: {
