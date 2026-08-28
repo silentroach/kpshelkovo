@@ -13,21 +13,22 @@ const { photos, title = 'Фото', heading = 'h2' } = Astro.props;
 
 const Heading = heading;
 const MAX_FULL_WIDTH = 1132;
-const MAX_RENDERED_WIDTH = 2560;
-const RESPONSIVE_WIDTHS = [
-  480,
-  768,
-  960,
-  1280,
-  1600,
+const MAX_RENDERED_WIDTH = 1600;
+const MAX_FULL_RENDERED_WIDTH = 2560;
+const RESPONSIVE_WIDTHS = [480, 768, 960, 1280, MAX_RENDERED_WIDTH];
+const FULL_RESPONSIVE_WIDTHS = [
+  ...RESPONSIVE_WIDTHS,
   MAX_FULL_WIDTH * 2,
-  MAX_RENDERED_WIDTH,
+  MAX_FULL_RENDERED_WIDTH,
 ];
 const galleryPhotos = photos.map((photo, index) => {
   const fullWidth =
     photos.length >= 3 &&
     (index === 0 || (photos.length % 2 === 0 && index === photos.length - 1));
-  const width = Math.min(photo.width, MAX_RENDERED_WIDTH);
+  const maxRenderedWidth = fullWidth
+    ? MAX_FULL_RENDERED_WIDTH
+    : MAX_RENDERED_WIDTH;
+  const width = Math.min(photo.width, maxRenderedWidth);
 
   return {
     url: photo.url,
@@ -36,7 +37,9 @@ const galleryPhotos = photos.map((photo, index) => {
     fullWidth,
     renderedWidth: width,
     renderedHeight: Math.round((photo.height * width) / photo.width),
-    widths: RESPONSIVE_WIDTHS.filter((candidate) => candidate <= width),
+    widths: (fullWidth ? FULL_RESPONSIVE_WIDTHS : RESPONSIVE_WIDTHS).filter(
+      (candidate) => candidate <= width,
+    ),
     sizes: fullWidth
       ? `(min-width: 1180px) ${MAX_FULL_WIDTH}px, calc(100vw - 2.5rem)`
       : '(min-width: 1180px) 558px, (min-width: 768px) calc((100vw - 3.5rem) / 2), calc(100vw - 2.5rem)',

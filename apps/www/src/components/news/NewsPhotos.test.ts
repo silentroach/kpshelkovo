@@ -36,13 +36,19 @@ describe('NewsPhotos', () => {
     );
   });
 
-  it('offers a 2x full-width variant without upscaling smaller photos', async () => {
+  it('scopes Retina variants to full-width photos without upscaling', async () => {
     const container = await createAstroContainer();
     const fullWidthPhoto = {
       url: 'https://media.kpshelkovo.online/news/2026/08/retina-test/original.jpeg',
       width: 2560,
       height: 1920,
       alt: 'Полноширинная фотография',
+    };
+    const halfWidthPhoto = {
+      url: 'https://media.kpshelkovo.online/news/2026/08/retina-test/half-width.jpeg',
+      width: 2560,
+      height: 1920,
+      alt: 'Двухколоночная фотография',
     };
     const smallPhoto = {
       url: 'https://media.kpshelkovo.online/news/2026/08/retina-test/small.jpeg',
@@ -52,20 +58,23 @@ describe('NewsPhotos', () => {
     };
     const html = await container.renderToString(NewsPhotos, {
       props: {
-        photos: [fullWidthPhoto, smallPhoto, smallPhoto],
+        photos: [fullWidthPhoto, halfWidthPhoto, smallPhoto],
       },
     });
     const linkedImages = [...html.matchAll(/<a[\s\S]*?<\/a>/gu)].map(
       (match) => match[0],
     );
     const fullWidthImage = linkedImages[0];
-    const smallImage = linkedImages[1];
+    const halfWidthImage = linkedImages[1];
+    const smallImage = linkedImages[2];
 
     expect({
       fullWidthHref: fullWidthImage?.match(/\shref="([^"]+)"/u)?.[1],
       fullWidthIntrinsicWidth: fullWidthImage?.match(/\swidth="(\d+)"/u)?.[1],
       fullWidthSizes: fullWidthImage?.match(/\ssizes="([^"]+)"/u)?.[1],
       fullWidthSrcsetWidths: getSrcsetWidths(fullWidthImage),
+      halfWidthIntrinsicWidth: halfWidthImage?.match(/\swidth="(\d+)"/u)?.[1],
+      halfWidthSrcsetWidths: getSrcsetWidths(halfWidthImage),
       smallIntrinsicWidth: smallImage?.match(/\swidth="(\d+)"/u)?.[1],
       smallSrcsetWidths: getSrcsetWidths(smallImage),
     }).toMatchInlineSnapshot(`
@@ -81,6 +90,14 @@ describe('NewsPhotos', () => {
           1600,
           2264,
           2560,
+        ],
+        "halfWidthIntrinsicWidth": "1600",
+        "halfWidthSrcsetWidths": [
+          480,
+          768,
+          960,
+          1280,
+          1600,
         ],
         "smallIntrinsicWidth": "960",
         "smallSrcsetWidths": [
