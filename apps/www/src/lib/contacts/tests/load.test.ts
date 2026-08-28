@@ -113,6 +113,7 @@ describe('buildContactsDataset', () => {
         id: 'construction/construction',
         data: { category: 'construction' },
       }),
+      entry({ id: 'furniture/furniture', data: { category: 'furniture' } }),
       entry({
         id: 'electricity/electricity',
         data: { category: 'electricity' },
@@ -122,6 +123,7 @@ describe('buildContactsDataset', () => {
     expect(data.categories.map((item) => item.category)).toEqual([
       'electricity',
       'construction',
+      'furniture',
       'fence',
       'waste-removal',
       'education',

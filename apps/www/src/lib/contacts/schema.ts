@@ -1,6 +1,7 @@
 export const CONTACT_CATEGORIES = [
   'electricity',
   'construction',
+  'furniture',
   'fence',
   'waste-removal',
   'education',
