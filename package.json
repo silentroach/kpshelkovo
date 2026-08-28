@@ -30,16 +30,16 @@
     "@testing-library/svelte": "^5.4.2",
     "@yandex/ymaps3-types": "^1.0.20315584",
     "astro-compressor": "^1.3.0",
-    "happy-dom": "^20.11.2",
+    "happy-dom": "^20.11.6",
     "lint-staged": "^17.3.0",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-svelte": "^4.1.1",
-    "skills": "^1.5.22",
+    "skills": "^1.5.23",
     "tailwindcss": "^4.3.3",
-    "turbo": "^2.10.10",
+    "turbo": "^2.10.11",
     "typescript": "^7.0.2",
-    "vite": "^8.2.1",
-    "vitest": "^4.1.10"
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
   }
 }
