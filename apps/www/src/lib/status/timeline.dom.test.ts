@@ -288,6 +288,94 @@ describe('hydrateStatusTimeline', () => {
     expect(readSegmentMetric(node, '--segment-width')).toBeCloseTo(10);
   });
 
+  it('recomputes dense lanes when a hidden future marker becomes visible', () => {
+    const root = renderTimeline(
+      [
+        {
+          id: 'electricity-outage-2026-08-06',
+          start: '2026-08-06T09:25:00Z',
+          end: '2026-08-06T09:47:00Z',
+        },
+        {
+          id: 'electricity-river-outage-2026-08-10',
+          kind: 'maintenance',
+          start: '2026-08-10T12:00:00Z',
+          end: '2026-08-10T14:00:00Z',
+          tone: 'amber',
+        },
+        {
+          id: 'electricity-outage-2026-08-11',
+          kind: 'maintenance',
+          start: '2026-08-11T06:00:00Z',
+          end: '2026-08-11T14:00:00Z',
+          hidden: true,
+          tone: 'amber',
+        },
+      ],
+      90,
+    );
+    const ids = [
+      'electricity-outage-2026-08-06',
+      'electricity-river-outage-2026-08-10',
+      'electricity-outage-2026-08-11',
+    ] as const;
+    const track = root.querySelector('[data-status-timeline-track]');
+
+    if (!track) {
+      throw new Error('Timeline track must exist');
+    }
+
+    mockRect(track, { left: 0, top: 0, width: 790, height: 24 });
+
+    const readLayout = () => ({
+      offsets: ids.map((id) =>
+        getProblemNode(id).style.getPropertyValue('--segment-lane-offset'),
+      ),
+      hidden: ids.map((id) => getProblemNode(id).hidden),
+      space: root.style.getPropertyValue('--timeline-lane-space'),
+    });
+
+    hydrateStatusTimeline(root, {
+      nowMs: Date.parse('2026-08-10T18:00:00Z'),
+    });
+
+    expect(readLayout()).toMatchInlineSnapshot(`
+      {
+        "hidden": [
+          false,
+          false,
+          true,
+        ],
+        "offsets": [
+          "",
+          "",
+          "",
+        ],
+        "space": "0px",
+      }
+    `);
+
+    hydrateStatusTimeline(root, {
+      nowMs: Date.parse('2026-08-12T00:00:00Z'),
+    });
+
+    expect(readLayout()).toMatchInlineSnapshot(`
+      {
+        "hidden": [
+          false,
+          false,
+          false,
+        ],
+        "offsets": [
+          "",
+          "-12px",
+          "12px",
+        ],
+        "space": "12px",
+      }
+    `);
+  });
+
   it('adds green stable gaps before, between, and after problem segments', () => {
     const root = renderTimeline([
       {

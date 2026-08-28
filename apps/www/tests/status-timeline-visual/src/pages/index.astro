@@ -5,7 +5,7 @@ import '@/styles/site.css';
 import StatusServiceTimeline from '@/components/status/StatusServiceTimeline.astro';
 import type { StatusTimelineIncidentInput } from '@/lib/status/timeline';
 
-const fixedNowIso = '2026-05-10T12:00:00Z';
+const fixedNowIso = '2026-08-17T12:00:00Z';
 const fixedNowMs = Date.parse(fixedNowIso);
 
 // The component uses Date.now() during SSR, so the fixture freezes build time too.
@@ -14,32 +14,30 @@ Date.now = () => fixedNowMs;
 const mixedIncidents: readonly StatusTimelineIncidentInput[] = [
   {
     id: 'mixed-maintenance',
-    url: '/status/water/#mixed-maintenance',
-    has_page: true,
+    href: '/status/water/#mixed-maintenance',
     title: 'Промывка магистрали',
     kind: 'maintenance',
-    started_iso: '2026-05-02T03:00:00Z',
-    started_has_time: true,
-    ended_iso: '2026-05-02T12:00:00Z',
-    ended_has_time: true,
-    is_active: false,
+    startedIso: '2026-08-09T03:00:00Z',
+    startedHasTime: true,
+    endedIso: '2026-08-09T12:00:00Z',
+    endedHasTime: true,
+    isActive: false,
     duration: {
-      total_minutes: 540,
+      totalMinutes: 540,
     },
   },
   {
     id: 'mixed-incident',
-    url: '/status/water/#mixed-incident',
-    has_page: true,
+    href: '/status/water/#mixed-incident',
     title: 'Аварийное отключение воды',
     kind: 'incident',
-    started_iso: '2026-05-06T08:15:00Z',
-    started_has_time: true,
-    ended_iso: '2026-05-06T16:45:00Z',
-    ended_has_time: true,
-    is_active: false,
+    startedIso: '2026-08-13T08:15:00Z',
+    startedHasTime: true,
+    endedIso: '2026-08-13T16:45:00Z',
+    endedHasTime: true,
+    isActive: false,
     duration: {
-      total_minutes: 510,
+      totalMinutes: 510,
     },
   },
 ];
@@ -49,73 +47,104 @@ const emptyIncidents: readonly StatusTimelineIncidentInput[] = [];
 const activeEdgeIncidents: readonly StatusTimelineIncidentInput[] = [
   {
     id: 'active-edge-incident',
-    url: '/status/electricity/#active-edge-incident',
-    has_page: true,
+    href: '/status/electricity/#active-edge-incident',
     title: 'Короткое отключение электричества',
     kind: 'incident',
-    started_iso: '2026-05-10T11:56:00Z',
-    started_has_time: true,
-    ended_has_time: true,
-    is_active: true,
+    startedIso: '2026-08-17T11:56:00Z',
+    startedHasTime: true,
+    endedHasTime: true,
+    isActive: true,
+  },
+];
+
+const denseDateIncidents: readonly StatusTimelineIncidentInput[] = [
+  {
+    id: 'electricity-outage-2026-08-06',
+    href: '/status/incidents/2026/08/electricity-outage-2026-08-06/',
+    title: 'Отключение электричества 6 августа',
+    kind: 'incident',
+    startedIso: '2026-08-06T09:25:00Z',
+    startedHasTime: true,
+    endedIso: '2026-08-06T09:47:00Z',
+    endedHasTime: true,
+    isActive: false,
+  },
+  {
+    id: 'electricity-river-outage-2026-08-10',
+    href: '/status/incidents/2026/08/electricity-river-outage-2026-08-10/',
+    title: 'Работы в Шелково Ривер 10 августа',
+    kind: 'maintenance',
+    startedIso: '2026-08-10T12:00:00Z',
+    startedHasTime: true,
+    endedIso: '2026-08-10T14:00:00Z',
+    endedHasTime: true,
+    isActive: false,
+  },
+  {
+    id: 'electricity-outage-2026-08-11',
+    href: '/status/incidents/2026/08/electricity-outage-2026-08-11/',
+    title: 'Работы во всем поселке 11 августа',
+    kind: 'maintenance',
+    startedIso: '2026-08-11T06:00:00Z',
+    startedHasTime: true,
+    endedIso: '2026-08-11T14:00:00Z',
+    endedHasTime: true,
+    isActive: false,
   },
 ];
 
 const denseProblemIncidents: readonly StatusTimelineIncidentInput[] = [
   {
     id: 'dense-incident-1',
-    url: '/status/electricity/#dense-incident-1',
-    has_page: true,
+    href: '/status/electricity/#dense-incident-1',
     title: 'Короткое отключение 1',
     kind: 'incident',
-    started_iso: '2026-05-10T08:10:00Z',
-    started_has_time: true,
-    ended_iso: '2026-05-10T08:28:00Z',
-    ended_has_time: true,
-    is_active: false,
+    startedIso: '2026-08-17T08:10:00Z',
+    startedHasTime: true,
+    endedIso: '2026-08-17T08:28:00Z',
+    endedHasTime: true,
+    isActive: false,
     duration: {
-      total_minutes: 18,
+      totalMinutes: 18,
     },
   },
   {
     id: 'dense-incident-2',
-    url: '/status/electricity/#dense-incident-2',
-    has_page: true,
+    href: '/status/electricity/#dense-incident-2',
     title: 'Короткое отключение 2',
     kind: 'incident',
-    started_iso: '2026-05-10T08:42:00Z',
-    started_has_time: true,
-    ended_iso: '2026-05-10T08:56:00Z',
-    ended_has_time: true,
-    is_active: false,
+    startedIso: '2026-08-17T08:42:00Z',
+    startedHasTime: true,
+    endedIso: '2026-08-17T08:56:00Z',
+    endedHasTime: true,
+    isActive: false,
     duration: {
-      total_minutes: 14,
+      totalMinutes: 14,
     },
   },
   {
     id: 'dense-incident-3',
-    url: '/status/electricity/#dense-incident-3',
-    has_page: true,
+    href: '/status/electricity/#dense-incident-3',
     title: 'Короткое отключение 3',
     kind: 'incident',
-    started_iso: '2026-05-10T09:14:00Z',
-    started_has_time: true,
-    ended_iso: '2026-05-10T09:31:00Z',
-    ended_has_time: true,
-    is_active: false,
+    startedIso: '2026-08-17T09:14:00Z',
+    startedHasTime: true,
+    endedIso: '2026-08-17T09:31:00Z',
+    endedHasTime: true,
+    isActive: false,
     duration: {
-      total_minutes: 17,
+      totalMinutes: 17,
     },
   },
   {
     id: 'dense-incident-active',
-    url: '/status/electricity/#dense-incident-active',
-    has_page: true,
+    href: '/status/electricity/#dense-incident-active',
     title: 'Текущее отключение',
     kind: 'incident',
-    started_iso: '2026-05-10T11:36:00Z',
-    started_has_time: true,
-    ended_has_time: true,
-    is_active: true,
+    startedIso: '2026-08-17T11:36:00Z',
+    startedHasTime: true,
+    endedHasTime: true,
+    isActive: true,
   },
 ];
 ---
@@ -193,6 +222,20 @@ const denseProblemIncidents: readonly StatusTimelineIncidentInput[] = [
           />
         </div>
       </section>
+
+      <section class="status-timeline-visual-card">
+        <p class="status-timeline-visual-label">Dense 90-day dates</p>
+        <div
+          class="status-timeline-visual-target"
+          data-testid="status-timeline-dense-dates"
+        >
+          <StatusServiceTimeline
+            service="electricity"
+            incidents={denseDateIncidents}
+            timelineDays={90}
+          />
+        </div>
+      </section>
     </main>
   </body>
 </html>
@@ -218,6 +261,7 @@ const denseProblemIncidents: readonly StatusTimelineIncidentInput[] = [
   .status-timeline-visual-card {
     display: grid;
     gap: 0.75rem;
+    min-width: 0;
   }
 
   .status-timeline-visual-label {
@@ -254,5 +298,17 @@ const denseProblemIncidents: readonly StatusTimelineIncidentInput[] = [
     [data-status-timeline][data-status-tooltip-open='true']
   ) {
     padding-bottom: 19rem;
+  }
+
+  @media (max-width: 30rem) {
+    .status-timeline-visual-shell {
+      padding: 1rem;
+    }
+
+    .status-timeline-visual-target {
+      width: 100%;
+      min-width: 0;
+      padding-inline: 0.5rem;
+    }
   }
 </style>
