@@ -11,7 +11,12 @@ import {
   formatStatusTimelineTooltipGroupLabel,
   type StatusTimelineTooltipListItemData,
 } from './view';
-import { STATUS_SERVICES, type StatusArea, type StatusService } from './schema';
+import {
+  STATUS_AREAS,
+  STATUS_SERVICES,
+  type StatusArea,
+  type StatusService,
+} from './schema';
 import type { StatusTimelineTooltipItemDto } from './timeline-tooltip-dto';
 
 export interface StatusTimelineHydrationOptions {
@@ -62,13 +67,7 @@ const STATUS_TIMELINE_PROBLEM_SELECTOR = '[data-status-problem]';
 const STATUS_TIMELINE_GREEN_SELECTOR = '[data-status-segment="green"]';
 const STATUS_TIMELINE_TOOLTIP_SELECTOR = '[data-status-timeline-tooltip]';
 const STATUS_TIMELINE_TOOLTIP_MARGIN_PX = 8;
-const STATUS_TIMELINE_AREAS = [
-  'river',
-  'forest',
-  'park',
-  'village',
-] as const satisfies readonly StatusArea[];
-const STATUS_TIMELINE_AREA_SET = new Set<string>(STATUS_TIMELINE_AREAS);
+const STATUS_TIMELINE_AREA_SET = new Set<string>(STATUS_AREAS);
 const STATUS_TIMELINE_SERVICE_SET = new Set<string>(STATUS_SERVICES);
 
 const isFiniteNumber = (value: unknown): value is number =>
@@ -108,7 +107,7 @@ const getStatusTimelineTooltip = (
   const list = shell.querySelector('[data-status-tooltip-list]');
   const titleRow = title?.parentElement;
   const areaTemplates = new Map(
-    STATUS_TIMELINE_AREAS.flatMap((area) => {
+    STATUS_AREAS.flatMap((area) => {
       const template = shell.querySelector(
         `[data-status-tooltip-area-template="${area}"]`,
       );
@@ -124,7 +123,7 @@ const getStatusTimelineTooltip = (
     !(phaseCheckIcon instanceof HTMLElement) ||
     !(period instanceof HTMLElement) ||
     !(titleAreas instanceof HTMLElement) ||
-    areaTemplates.size !== STATUS_TIMELINE_AREAS.length ||
+    areaTemplates.size !== STATUS_AREAS.length ||
     !(list instanceof HTMLElement)
   ) {
     return undefined;
