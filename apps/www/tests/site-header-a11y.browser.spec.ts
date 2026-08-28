@@ -268,3 +268,33 @@ test('shows keyboard-only focus on the mobile menu button', async ({
   );
   expect(await hasNonColorFocusIndicator(menuButton)).toBe(false);
 });
+
+test('keeps the sticky desktop header visible while search is open', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/reviews/', { waitUntil: 'networkidle' });
+
+  const header = page.locator('.site-header');
+  await page.evaluate(() => window.scrollTo(0, 600));
+  await expect
+    .poll(() => page.evaluate(() => window.scrollY))
+    .toBeGreaterThan(0);
+  await expect
+    .poll(() =>
+      header.evaluate((element) => element.getBoundingClientRect().top),
+    )
+    .toBe(0);
+  const scrollY = await page.evaluate(() => window.scrollY);
+
+  await page.getByRole('button', { name: 'Поиск' }).click();
+  await expect(page.locator('[data-search-dialog]')).toBeVisible();
+
+  await expect
+    .poll(() =>
+      header.evaluate((element) => element.getBoundingClientRect().top),
+    )
+    .toBe(0);
+  await page.mouse.wheel(0, 600);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(scrollY);
+});

@@ -264,7 +264,7 @@ html[data-site-navigation-pending] .site-navigation-progress::before {
 
 html:has(.site-search-dialog[open]),
 html:has(.site-search-dialog[open]) body {
-  overflow: hidden;
+  overflow: clip;
   overscroll-behavior: none;
 }
 
