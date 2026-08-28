@@ -1,7 +1,8 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, relative as relativePath, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { create } from 'fontkitten';
 import { describe, expect, it } from 'vitest';
 
 const appSrcRoot = fileURLToPath(new URL('../../', import.meta.url));
@@ -10,6 +11,7 @@ const workspaceRoot = fileURLToPath(
   new URL('../../../../../', import.meta.url),
 );
 const uiRoot = join(workspaceRoot, 'packages/ui');
+const fontsRoot = join(uiRoot, 'fonts');
 const sourceExtensions = new Set(['.astro', '.css', '.svelte']);
 const ignoredSourceDirectories = new Set(['.astro', 'dist', 'node_modules']);
 const allowedCssWeights = new Set(['400', '600', '700', 'inherit']);
@@ -17,6 +19,9 @@ const disallowedWeightClassPattern =
   /\bfont-(?:thin|extralight|light|medium|bold|extrabold|black)\b/gu;
 const arbitraryWeightClassPattern = /\bfont-\[(\d+)\]/gu;
 const cssWeightPattern = /font-weight:\s*([^;]+);/gu;
+const requiredSharedCharacters =
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ÀéÖßАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя́ «»‹›“”„‘’‚–—…†‡•‰€₽№™⁄−±×÷';
+const requiredFiraSansCharacters = `${requiredSharedCharacters}←↑→↓`;
 
 const collectSourceFiles = (directory: string): readonly string[] =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -41,7 +46,7 @@ const extractFontFaces = (source: string): readonly string[] =>
   [...source.matchAll(/@font-face\s*\{([\s\S]*?)\}/gu)].map(([, block]) => {
     const family = block?.match(/font-family:\s*'([^']+)'/u)?.[1];
     const weight = block?.match(/font-weight:\s*(\d+)/u)?.[1];
-    const file = block?.match(/files\/([^')]+\.woff2)/u)?.[1];
+    const file = block?.match(/fonts\/([^')]+\.woff2)/u)?.[1];
 
     return `${family} ${weight}: ${file}`;
   });
@@ -70,6 +75,32 @@ const findWeightViolations = (filePath: string): readonly string[] => {
   return violations;
 };
 
+const inspectFontAsset = (file: string) => {
+  const filePath = join(fontsRoot, file);
+  const font = create(readFileSync(filePath));
+
+  if (font.isCollection) {
+    throw new Error(`${file} must be a single WOFF2 font`);
+  }
+
+  const requiredCharacters = file.startsWith('fira-sans')
+    ? requiredFiraSansCharacters
+    : requiredSharedCharacters;
+
+  return {
+    bytes: statSync(filePath).size,
+    file,
+    fontFamily: font.familyName,
+    fullName: font.fullName,
+    missingGlyphs: [...requiredCharacters]
+      .filter(
+        (character) => !font.hasGlyphForCodePoint(character.codePointAt(0)!),
+      )
+      .join(''),
+    postscriptName: font.postscriptName,
+  };
+};
+
 describe('font budget', () => {
   it('keeps production faces and source weights within the shared budget', () => {
     const stylesPath = join(uiRoot, 'styles.css');
@@ -84,39 +115,72 @@ describe('font budget', () => {
     ];
     const preloads = [
       ...readFileSync(preloadsPath, 'utf8').matchAll(
-        /files\/([^']+\.woff2)'/gu,
+        /fonts\/([^']+\.woff2)'/gu,
       ),
     ].map(([, file]) => file);
+    const fontAssets = readdirSync(fontsRoot)
+      .filter((file) => extname(file) === '.woff2')
+      .sort()
+      .map(inspectFontAsset);
+    const totalFontBytes = fontAssets.reduce(
+      (total, font) => total + font.bytes,
+      0,
+    );
+
+    expect(totalFontBytes).toBeLessThanOrEqual(100 * 1024);
 
     expect({
+      fontAssets,
       fontFaces: extractFontFaces(readFileSync(stylesPath, 'utf8')),
       preloads,
       standaloneFontFaces: extractFontFaces(
         readFileSync(standaloneStylesPath, 'utf8'),
       ),
+      totalFontBytes,
       violations: sourceFiles.flatMap(findWeightViolations),
     }).toMatchInlineSnapshot(`
       {
+        "fontAssets": [
+          {
+            "bytes": 27352,
+            "file": "fira-sans-400-normal.woff2",
+            "fontFamily": "Fira Sans",
+            "fullName": "Fira Sans Regular",
+            "missingGlyphs": "",
+            "postscriptName": "FiraSans-Regular",
+          },
+          {
+            "bytes": 28824,
+            "file": "fira-sans-600-normal.woff2",
+            "fontFamily": "Fira Sans SemiBold",
+            "fullName": "Fira Sans SemiBold",
+            "missingGlyphs": "",
+            "postscriptName": "FiraSans-SemiBold",
+          },
+          {
+            "bytes": 41168,
+            "file": "shelkovo-serif-700-normal.woff2",
+            "fontFamily": "Shelkovo Serif",
+            "fullName": "Shelkovo Serif Bold",
+            "missingGlyphs": "",
+            "postscriptName": "ShelkovoSerif-Bold",
+          },
+        ],
         "fontFaces": [
-          "PT Serif 700: pt-serif-cyrillic-700-normal.woff2",
-          "PT Serif 700: pt-serif-latin-ext-700-normal.woff2",
-          "PT Serif 700: pt-serif-latin-700-normal.woff2",
-          "Fira Sans 400: fira-sans-cyrillic-400-normal.woff2",
-          "Fira Sans 400: fira-sans-latin-ext-400-normal.woff2",
-          "Fira Sans 400: fira-sans-latin-400-normal.woff2",
-          "Fira Sans 600: fira-sans-cyrillic-600-normal.woff2",
-          "Fira Sans 600: fira-sans-latin-ext-600-normal.woff2",
-          "Fira Sans 600: fira-sans-latin-600-normal.woff2",
+          "Shelkovo Serif 700: shelkovo-serif-700-normal.woff2",
+          "Fira Sans 400: fira-sans-400-normal.woff2",
+          "Fira Sans 600: fira-sans-600-normal.woff2",
         ],
         "preloads": [
-          "fira-sans-cyrillic-400-normal.woff2",
-          "fira-sans-cyrillic-600-normal.woff2",
-          "pt-serif-cyrillic-700-normal.woff2",
+          "fira-sans-400-normal.woff2",
+          "fira-sans-600-normal.woff2",
+          "shelkovo-serif-700-normal.woff2",
         ],
         "standaloneFontFaces": [
-          "PT Serif 700: pt-serif-cyrillic-700-normal.woff2",
-          "Fira Sans 600: fira-sans-cyrillic-600-normal.woff2",
+          "Shelkovo Serif 700: shelkovo-serif-700-normal.woff2",
+          "Fira Sans 600: fira-sans-600-normal.woff2",
         ],
+        "totalFontBytes": 97344,
         "violations": [],
       }
     `);

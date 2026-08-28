@@ -38,19 +38,19 @@ colors:
   unknown: 'oklch(48% 0.04 125)'
 typography:
   display:
-    fontFamily: 'PT Serif, Georgia, serif'
+    fontFamily: 'Shelkovo Serif, Georgia, serif'
     fontSize: 'clamp(2.25rem, 4vw, 3rem)'
     fontWeight: 700
     lineHeight: 1.08
     letterSpacing: '-0.018em'
   headline:
-    fontFamily: 'PT Serif, Georgia, serif'
+    fontFamily: 'Shelkovo Serif, Georgia, serif'
     fontSize: 'clamp(1.5rem, 2.5vw, 2rem)'
     fontWeight: 700
     lineHeight: 1.15
     letterSpacing: '-0.012em'
   proseTitle:
-    fontFamily: 'PT Serif, Georgia, serif'
+    fontFamily: 'Shelkovo Serif, Georgia, serif'
     fontSize: '1.5rem'
     fontWeight: 700
     lineHeight: 1.25
@@ -62,7 +62,7 @@ typography:
     lineHeight: 1.3333333333
     letterSpacing: 'normal'
   entryTitle:
-    fontFamily: 'PT Serif, Georgia, serif'
+    fontFamily: 'Shelkovo Serif, Georgia, serif'
     fontSize: '1.25rem'
     fontWeight: 700
     lineHeight: 1.3
@@ -252,7 +252,7 @@ WCAG AA является минимальным уровнем для публи
 
 ## 3. Typography
 
-**Display Font:** PT Serif, с fallback на Georgia и системный serif.
+**Display Font:** PT Serif, с fallback на Georgia и системный serif. Production-сабсет доступен в CSS как `Shelkovo Serif`, потому что OFL резервирует исходное имя для немодифицированного шрифта.
 **Body Font:** Fira Sans, с fallback на system-ui.
 **Label/Mono Font:** отдельного mono-шрифта нет; для чисел используется tabular-nums через `.ui-num`.
 
@@ -267,8 +267,10 @@ Fira Sans использовать только в реальных весах 4
 - **Fira Sans 400 normal:** основной и длинный текст.
 - **Fira Sans 600 normal:** интерфейсный акцент и полужирное выделение.
 - **PT Serif 700 normal:** редакционные и структурные заголовки.
-- Базовый бюджет обычной русскоязычной страницы - шесть WOFF2-файлов: Latin и Cyrillic для каждого из трех начертаний. `latin-ext` не входит в базовый бюджет и загружается только когда символы страницы действительно его требуют.
-- Preload допустим только для критических кириллических начертаний из этой матрицы. Подключение нового семейства, веса или стиля сначала обосновать пользовательской ролью, проверить на ключевых страницах и синхронно обновить этот бюджет.
+- Базовый бюджет страницы - три объединенных WOFF2-файла, по одному на каждое разрешенное начертание, общим объемом не более 100 КиБ. Текущие файлы весят 97 344 байта (95,1 КиБ): Fira Sans 400 - 27 352 байта, Fira Sans 600 - 28 824 байта, Shelkovo Serif 700 (сабсет PT Serif) - 41 168 байт.
+- Рабочий набор включает Basic Latin, Latin-1, поддерживаемую семействами кириллицу, типографические знаки, `₽`, `€`, `№` и основные стрелки для Fira Sans. Широкий `latin-ext` не входит в production-файлы; отсутствующие письменности отображаются системным fallback-шрифтом.
+- Preload допустим только для этих трех критических файлов. Подключение нового семейства, веса или стиля сначала обосновать пользовательской ролью, проверить на ключевых страницах и синхронно обновить этот бюджет.
+- Production-файлы собираются из зафиксированных исходников Google Fonts командой `pnpm fonts:build`; источник, контрольные суммы, лицензии и состав сабсета описаны в `packages/ui/fonts/README.md`.
 - Не добавлять начертание ради одного компонента. Сначала использовать размер, цвет, интервал и разрешенные веса; новый файл шрифта является последним, а не первым способом усилить иерархию.
 
 ### Hierarchy

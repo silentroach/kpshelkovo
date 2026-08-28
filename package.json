@@ -7,6 +7,7 @@
   "scripts": {
     "clean": "rm -rf dist apps/www/dist apps/www/.astro node_modules/.astro",
     "dev": "turbo run dev",
+    "fonts:build": "bash scripts/build-font-subsets.sh",
     "start": "pnpm dev",
     "build": "turbo run build",
     "search:prepare": "pnpm --filter @shelkovo/www search:prepare",
