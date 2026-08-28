@@ -27,6 +27,10 @@ const excerpt = (markdown: string): string | undefined => {
 export const createNewsArticleMentionRefs = (
   article: NewsArticleMentionRefSource,
 ): readonly EntityMentionSourceRef[] => {
+  if (!article.mentions.length) {
+    return [];
+  }
+
   const summary = excerpt(article.body);
 
   return createEntityMentionSourceRefs(article.mentions, {

@@ -38,4 +38,16 @@ describe('createPersonProfileMentionRefs', () => {
       }),
     ).toHaveLength(1);
   });
+
+  it('does not read the body when the profile has no mentions', () => {
+    expect(
+      createPersonProfileMentionRefs({
+        ...profile,
+        get body(): string {
+          throw new Error('body should not be read');
+        },
+        mentions: [],
+      }),
+    ).toEqual([]);
+  });
 });

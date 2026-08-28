@@ -72,6 +72,7 @@ describe('withBase package', () => {
 describe('telegram package', () => {
   it('detects Telegram URLs and tg:// links', () => {
     expect(isTelegramUrl('https://t.me/shelkovoecoclub')).toBe(true);
+    expect(isTelegramUrl('https://www.t.me/shelkovoecoclub')).toBe(true);
     expect(isTelegramUrl('https://telegram.me/shelkovoecoclub')).toBe(true);
     expect(isTelegramUrl('tg://resolve?domain=shelkovoecoclub')).toBe(true);
     expect(isTelegramUrl('https://example.com/shelkovoecoclub')).toBe(false);

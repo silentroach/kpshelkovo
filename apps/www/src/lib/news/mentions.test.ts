@@ -59,4 +59,15 @@ describe('createNewsArticleMentionRefs', () => {
       createNewsArticleMentionRefs(article({ mentions: [target, target] })),
     ).toHaveLength(1);
   });
+
+  it('does not read the body when the article has no mentions', () => {
+    expect(
+      createNewsArticleMentionRefs({
+        ...article({ mentions: [] }),
+        get body(): string {
+          throw new Error('body should not be read');
+        },
+      }),
+    ).toEqual([]);
+  });
 });

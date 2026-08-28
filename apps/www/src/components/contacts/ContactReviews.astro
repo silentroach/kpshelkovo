@@ -1,5 +1,6 @@
 ---
 import { TelegramIcon } from '@shelkovo/ui/icons';
+import { isTelegramUrl } from '@shelkovo/url';
 
 import type { ContactReview } from '@/lib/contacts/types';
 import {
@@ -24,16 +25,6 @@ const sentimentEmoji = {
   positive: '👍',
   negative: '👎',
 } as const satisfies Record<ContactReview['sentiment'], string>;
-
-const isTelegramUrl = (url: string): boolean => {
-  try {
-    const host = new URL(url).hostname.toLowerCase();
-
-    return host === 't.me' || host === 'telegram.me';
-  } catch {
-    return false;
-  }
-};
 ---
 
 {

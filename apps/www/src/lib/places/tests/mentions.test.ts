@@ -77,4 +77,15 @@ describe('createPlaceMentionRefs', () => {
       slug: 'apple-garden',
     });
   });
+
+  it('does not read the body when the place has no mentions', () => {
+    expect(
+      createPlaceMentionRefs({
+        ...place([]),
+        get body(): string {
+          throw new Error('body should not be read');
+        },
+      }),
+    ).toEqual([]);
+  });
 });

@@ -16,7 +16,7 @@ const review = {
     'Помог с **электричеством** в "Шелково Парк".\n\n<script>alert(1)</script>',
   publishedAt: new Date('2026-04-07T00:00:00.000Z'),
   publishedIso: '2026-04-07',
-  url: 'https://t.me/example/1',
+  url: 'https://www.t.me/example/1',
 } satisfies ContactReview;
 
 const parseComponent = (html: string): HTMLElement => {
@@ -50,6 +50,25 @@ describe('ContactReviews', () => {
         "html": "<p>Помог с <strong>электричеством</strong> в&nbsp;«Шелково&nbsp;Парк».</p>",
         "scripts": 0,
         "text": "Помог с электричеством в·«Шелково·Парк».",
+      }
+    `);
+  });
+
+  it('shows the Telegram icon without changing the source URL', async () => {
+    const container = await createAstroContainer();
+    const component = parseComponent(
+      await container.renderToString(ContactReviews, {
+        props: { reviews: [review] },
+      }),
+    );
+
+    expect({
+      icons: component.querySelectorAll('svg').length,
+      sourceUrl: component.querySelector('a')?.getAttribute('href'),
+    }).toMatchInlineSnapshot(`
+      {
+        "icons": 1,
+        "sourceUrl": "https://www.t.me/example/1",
       }
     `);
   });
