@@ -2,11 +2,15 @@
 title: Тимур
 slug: timur
 category: waste-removal
-updated_at: 2026-07-22
+updated_at: 2026-08-28
 summary: 'Вывоз мусора газелью или контейнером; команда может собрать и погрузить мусор'
 contacts:
   phone: '+7 925 536-86-36'
 reviews:
+  - sentiment: positive
+    summary: 'Команда аккуратно собрала и погрузила полную газель мусора, сложенного у въезда.'
+    published_at: 2026-08-28
+    url: https://t.me/shelkovoecoclub/15263/54292
   - sentiment: positive
     summary: 'Газель объёмом около 10–12 м³ загрузили за час; автор отзыва остался доволен работой команды.'
     published_at: 2026-07-14
