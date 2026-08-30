@@ -366,7 +366,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
             markdownList([
               '`llms.txt` дает карту маршрутов, `api-catalog` и OpenAPI/Schema описывают контракты, публичные инструкции закрывают типовые задачи.',
               'Корневой индекс навыков покрывает навигацию, новости, статус, архив встреч и профили людей.',
-              'У Compare свой индекс навыков для ленты, страниц поселков, рейтинга и уточнений по источникам.',
+              'У раздела «Сравнение поселков» свой индекс навыков для ленты, страниц поселков, рейтинга и уточнений по источникам.',
             ]),
           ]),
         ],
@@ -434,7 +434,7 @@ export async function buildHomeMarkdown(): Promise<string> {
       `Архив встреч — ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}; Markdown-индекс без HTML-аналога: ${meetingsMarkdown}; полные транскрипты: \`/meetings/[slug]/transcript/[part].md\``,
       `[Регламент](${reglamentHome}) — смета тарифа 2026; структурированная лента: ${reglamentFeed}; полный индекс: ${reglamentFullMarkdown}; полный набор данных: ${reglamentFullDataset}; Markdown-обзор: ${reglamentMarkdown}`,
       `Люди — ${count(people.profiles.length, ['профиль', 'профиля', 'профилей'])}; Markdown-обзор: ${peopleMarkdown}; структурированная лента: ${peopleFeed}; публичного HTML-индекса нет`,
-      `[Compare](${compareHome}) — сравнение тарифов поселков и рейтинга; структурированная лента: ${compareFeed}`,
+      `[Сравнение поселков](${compareHome}) — тарифы поселков и рейтинг; структурированная лента: ${compareFeed}`,
     ]),
     md.heading(2, 'Обнаружение для агентов'),
     markdownList([
@@ -453,7 +453,7 @@ export async function buildHomeMarkdown(): Promise<string> {
       `Архив встреч: ${meetingsMarkdown}`,
       `Регламент: ${reglamentLlms}, ${reglamentCatalog}`,
       `Люди: ${peopleLlms}, ${peopleCatalog}`,
-      `Compare: ${compareLlms}, ${compareCatalog}`,
+      `Сравнение поселков: ${compareLlms}, ${compareCatalog}`,
     ]),
   ]);
 }

@@ -1,6 +1,6 @@
 # Rating
 
-Internal note. This file is for future agent sessions, not for UI copy.
+Internal note for the settlement rating in `/815/compare/` within `apps/www`. This file is for future agent sessions, not for UI copy.
 
 ## Goal
 
@@ -12,7 +12,7 @@ Internal note. This file is for future agent sessions, not for UI copy.
 ## Output
 
 - One computed number per settlement: `rating`.
-- Stored as `score` in `src/lib/rating.ts`, serialized as `rating` in explorer DTO.
+- Stored as `score` in `apps/www/src/compare/lib/rating.ts`, serialized as `rating` in explorer DTO.
 - Rounded to 0.1, range `0..100`.
 
 ## Inputs
@@ -175,11 +175,11 @@ These rules belong here, not in generic YAML notes, because they exist specifica
 
 ## Files
 
-- formula: `src/lib/rating.ts`
-- data wiring: `src/lib/data.ts`
-- explorer DTO: `src/lib/explorer.ts`
-- build JSON: `src/pages/data/explorer.json.ts`
-- public explanation page: `src/pages/rating.astro`
-- schema/template/docs for extra flags: `src/lib/schema.ts`, `src/data/settlements/_template.yaml`, `README.md`
-- main page sort: `src/pages/index.astro`
-- explorer default sort: `src/components/SettlementsExplorer.svelte`
+- formula: `apps/www/src/compare/lib/rating.ts`
+- data wiring: `apps/www/src/compare/lib/data.ts`
+- explorer DTO: `apps/www/src/compare/lib/explorer.ts`
+- build JSON: `apps/www/src/pages/815/compare/data/explorer.json.ts`
+- public explanation page: `apps/www/src/pages/815/compare/rating.astro`
+- schema and template for extra flags: `apps/www/src/compare/lib/settlement/schema.ts`, `apps/www/src/data/compare/settlements/_template.yaml`
+- main page sort: `apps/www/src/pages/815/compare/index.astro`
+- explorer default sort: `apps/www/src/compare/components/SettlementsExplorer.svelte`

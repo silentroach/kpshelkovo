@@ -6,7 +6,6 @@ import { describe, expect, it } from 'vitest';
 
 const srcRoot = fileURLToPath(new URL('../', import.meta.url));
 const sourceExtensions = new Set(['.astro', '.svelte']);
-const visibleH1Exceptions = new Set(['pages/815/compare/404.astro']);
 const pageHeaderExceptions = new Set([
   'pages/815/compare/settlements/[slug]/index.astro',
 ]);
@@ -42,8 +41,6 @@ describe('page title styles', () => {
         source,
         `${relative} uses old compact page header padding`,
       ).not.toContain('px-5 pt-3');
-
-      if (visibleH1Exceptions.has(relative)) continue;
 
       const h1Tags = [...source.matchAll(/<h1\b[\s\S]*?>/gu)].map(
         ([tag]) => tag,

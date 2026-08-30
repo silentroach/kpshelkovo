@@ -36,3 +36,4 @@
 - [ADR-030: Нормализованные источники детальной сметы](030-normalized-estimate-detail-sources.md) - принят, 2026-08-26.
 - [ADR-031: Единый жизненный цикл status-событий](031-status-incident-lifecycle.md) - принят, 2026-08-26.
 - [ADR-032: Предзагрузка HTML по нажатию](032-tap-prefetch.md) - принят, 2026-08-28.
+- [ADR-033: Сравнение тарифов как часть единого сайта](033-integrated-tariff-comparison-section.md) - принят, 2026-08-30.

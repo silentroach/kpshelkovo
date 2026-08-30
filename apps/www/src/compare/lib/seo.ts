@@ -4,7 +4,7 @@ import { BRAND_KEYWORDS, collectKeywords } from '@shelkovo/seo';
 import { formatTariffAuto, formatTariffSummary } from './format';
 import type { ComparisonResult, Settlement } from './settlement/types';
 
-export const COMPARE_PRODUCT_NAME = 'Сравни с Шелково';
+const SITE_NAME = 'Шелково Онлайн';
 
 const SHORT_COMPANY_LENGTH = 18;
 
@@ -27,14 +27,13 @@ export const COMPARE_KEYWORDS = collectKeywords(
   BRAND_KEYWORDS,
   COMPARE_NAME_KEYWORDS,
   COMPARISON_KEYWORDS,
-  COMPARE_PRODUCT_NAME,
+  'сравнение поселков',
   'сравнение тарифов поселков',
   'тарифы на обслуживание поселков',
   'коттеджные поселки Московская область',
 );
 
-const compareTitle = (title: string): string =>
-  `${title} — ${COMPARE_PRODUCT_NAME}`;
+const compareTitle = (title: string): string => `${title} — ${SITE_NAME}`;
 
 const cleanCompanyName = (title: string): string =>
   title.replaceAll('"', '').replace(/\s+/g, ' ').trim();
