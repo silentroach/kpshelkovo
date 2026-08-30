@@ -1,36 +1,13 @@
-import { fileURLToPath } from 'node:url';
-import { defineConfig } from '@playwright/test';
+import { createVisualFixturePlaywrightConfig } from './tests/config/playwright-visual-fixture';
 
-const port = 4327;
-const baseURL = `http://127.0.0.1:${String(port)}`;
-const cwd = fileURLToPath(new URL('.', import.meta.url));
-
-export default defineConfig({
-  testDir: './tests',
+export default createVisualFixturePlaywrightConfig({
   testMatch: 'news-event-card-visual.spec.ts',
-  fullyParallel: false,
-  workers: 1,
-  reporter: 'list',
-  timeout: 60_000,
-  expect: {
-    timeout: 10_000,
+  port: 4327,
+  viewport: {
+    width: 1440,
+    height: 1100,
   },
-  use: {
-    baseURL,
-    browserName: 'chromium',
-    headless: true,
-    viewport: {
-      width: 1440,
-      height: 1100,
-    },
-    deviceScaleFactor: 2,
-    colorScheme: 'light',
-  },
-  webServer: {
-    command: 'pnpm run test:visual:news-event:serve',
-    cwd,
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  command: 'pnpm run test:visual:news-event:serve',
+  testTimeout: 60_000,
+  serverTimeout: 120_000,
 });
