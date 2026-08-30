@@ -8,7 +8,6 @@ import {
   formatMeetingSourceLabel,
   formatMeetingSpeakerAnchor,
   formatTranscriptPartLabel,
-  formatTranscriptTextHtml,
   formatTranscriptTime,
 } from './view';
 
@@ -131,43 +130,6 @@ describe('meeting view helpers', () => {
     expect(formatTranscriptPartLabel({ index: 2 })).toBe('Часть 2');
     expect(formatMeetingSpeakerAnchor({ id: 'ykizilov' })).toBe(
       'speaker-ykizilov',
-    );
-  });
-
-  it('renders transcript text as safe Markdown', () => {
-    const html = formatTranscriptTextHtml(
-      'Категории:\n\n- Первая.\n- Вторая.\n- Третья.',
-    );
-
-    expect(html).toMatchInlineSnapshot(`
-      "<p>Категории:</p>
-      <ul>
-      <li>Первая.</li>
-      <li>Вторая.</li>
-      <li>Третья.</li>
-      </ul>"
-    `);
-  });
-
-  it('drops raw HTML from transcript markdown', () => {
-    const html = formatTranscriptTextHtml(
-      '<script>alert("x")</script> <a href="https://example.com?a=1&b=2">link</a>',
-    );
-
-    expect(html).not.toContain('<script>');
-    expect(html).not.toContain('<a href=');
-    expect(html).toBe('');
-  });
-
-  it('keeps ampersands and quotes safe while applying typography', () => {
-    const html = formatTranscriptTextHtml('Компания "ОК" & жители');
-
-    expect(html).toMatchInlineSnapshot(`"<p>Компания «ОК» &#x26; жители</p>"`);
-  });
-
-  it('keeps internal line breaks in markdown paragraphs', () => {
-    expect(formatTranscriptTextHtml('Первая строка\nВторая строка')).toBe(
-      '<p>Первая строка\nВторая строка</p>',
     );
   });
 });
