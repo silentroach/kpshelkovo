@@ -104,13 +104,8 @@ const delta =
       : comparison
         ? 'Тариф как в Шелково.'
         : '';
-const breadcrumbs = settlementBreadcrumbs(settlement.name);
-const breadcrumb = compareBreadcrumbSchema([
-  {
-    name: settlement.name,
-    item: pageUrl,
-  },
-]);
+const breadcrumbs = settlementBreadcrumbs(settlement.name, settlement.slug);
+const breadcrumb = compareBreadcrumbSchema(breadcrumbs);
 const same = [settlement.website, ...(tg ? [tg] : [])];
 const schema = {
   '@context': 'https://schema.org',
