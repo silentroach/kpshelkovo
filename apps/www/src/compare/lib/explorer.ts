@@ -39,16 +39,16 @@ export interface ExplorerPayload {
 }
 
 export interface ExplorerPayloadInput {
-  readonly settlements: Settlement[];
+  readonly settlements: readonly Settlement[];
   readonly baseline: Settlement;
   readonly stats: PublicStats;
   readonly comparisons: ReadonlyMap<string, PublicComparison>;
-  readonly ratings: Map<string, Rating>;
+  readonly ratings: ReadonlyMap<string, Rating>;
 }
 
 export function toExplorer(
-  settlements: Settlement[],
-  ratings: Map<string, Rating>,
+  settlements: readonly Settlement[],
+  ratings: ReadonlyMap<string, Rating>,
   baseline: Settlement,
 ): ExplorerSettlement[] {
   return settlements.map((item) => {

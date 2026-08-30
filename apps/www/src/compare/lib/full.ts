@@ -66,11 +66,11 @@ export interface FullPayload {
 }
 
 export interface FullPayloadInput {
-  readonly settlements: Settlement[];
+  readonly settlements: readonly Settlement[];
   readonly baseline: Settlement;
   readonly stats: PublicStats;
   readonly comparisons: ReadonlyMap<string, PublicComparison>;
-  readonly ratings: Map<string, Rating>;
+  readonly ratings: ReadonlyMap<string, Rating>;
 }
 
 function round(value: number): number {
@@ -98,8 +98,8 @@ const video = (
 };
 
 export function toFull(
-  settlements: Settlement[],
-  ratings: Map<string, Rating>,
+  settlements: readonly Settlement[],
+  ratings: ReadonlyMap<string, Rating>,
   baseline: Settlement,
 ): FullSettlement[] {
   return settlements.map((item) => {
