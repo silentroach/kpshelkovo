@@ -1222,11 +1222,12 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
     import { bindReglamentCalculatorLazyHydration } from '@/lib/reglament/calculator-loader';
     import { hydrateStickyTableHeaders } from '@/lib/sticky-table-headers';
 
+    const hydrateCalculator = bindReglamentCalculatorLazyHydration();
     const hydrate = () => {
+      hydrateCalculator();
       hydrateStickyTableHeaders();
     };
 
-    bindReglamentCalculatorLazyHydration();
     hydrate();
     document.addEventListener('astro:after-swap', hydrate);
     document.addEventListener('astro:page-load', hydrate);

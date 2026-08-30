@@ -3,12 +3,12 @@ export type ReglamentCalculatorControllerModule = Pick<
   'hydrateReglamentCalculator'
 >;
 
-export type ReglamentCalculatorEditorModule = Pick<
-  typeof import('./calculator-editor'),
-  'hydrateReglamentEditors'
+export type ReglamentCalculatorDetailsModule = Pick<
+  typeof import('./calculator-details'),
+  'hydrateReglamentCalculator'
 >;
 
 export type ReglamentCalculatorControllerLoader =
   () => Promise<ReglamentCalculatorControllerModule>;
-export type ReglamentCalculatorEditorLoader =
-  () => Promise<ReglamentCalculatorEditorModule>;
+export type ReglamentCalculatorDetailsLoader =
+  () => Promise<ReglamentCalculatorDetailsModule>;

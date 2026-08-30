@@ -6,8 +6,8 @@ import { bindReglamentCalculatorLazyHydration } from '../calculator-loader';
 import type {
   ReglamentCalculatorControllerLoader,
   ReglamentCalculatorControllerModule,
-  ReglamentCalculatorEditorLoader,
-  ReglamentCalculatorEditorModule,
+  ReglamentCalculatorDetailsLoader,
+  ReglamentCalculatorDetailsModule,
 } from '../calculator-loader.types';
 
 const renderCalculator = (
@@ -46,28 +46,28 @@ const createModules = () => {
   const controllerModule = {
     hydrateReglamentCalculator: vi.fn(() => runtime),
   } satisfies ReglamentCalculatorControllerModule;
-  const editorModule = {
-    hydrateReglamentEditors: vi.fn(),
-  } satisfies ReglamentCalculatorEditorModule;
+  const detailsModule = {
+    hydrateReglamentCalculator: vi.fn(),
+  } satisfies ReglamentCalculatorDetailsModule;
 
-  return { controllerModule, editorModule, runtime };
+  return { controllerModule, detailsModule };
 };
 
 describe('bindReglamentCalculatorLazyHydration', () => {
-  it('starts controller and editor imports together on direct details opening', () => {
+  it('starts the details entry without waiting for the controller loader', () => {
     const rootDocument = document.implementation.createHTMLDocument();
     renderCalculator(rootDocument);
     const loadController = vi.fn(
       () => new Promise<ReglamentCalculatorControllerModule>(() => undefined),
     );
-    const loadEditor = vi.fn(
-      () => new Promise<ReglamentCalculatorEditorModule>(() => undefined),
+    const loadDetails = vi.fn(
+      () => new Promise<ReglamentCalculatorDetailsModule>(() => undefined),
     );
 
     bindReglamentCalculatorLazyHydration(
       rootDocument,
       loadController,
-      loadEditor,
+      loadDetails,
     );
 
     const details = getCalculatorNode(
@@ -75,16 +75,20 @@ describe('bindReglamentCalculatorLazyHydration', () => {
       'details',
       HTMLDetailsElement,
     );
+    details.dispatchEvent(new Event('toggle'));
+
+    expect(loadDetails).not.toHaveBeenCalled();
+
     details.open = true;
     details.dispatchEvent(new Event('toggle'));
 
     expect({
       controllerImports: loadController.mock.calls.length,
-      editorImports: loadEditor.mock.calls.length,
+      detailsImports: loadDetails.mock.calls.length,
     }).toMatchInlineSnapshot(`
       {
-        "controllerImports": 1,
-        "editorImports": 1,
+        "controllerImports": 0,
+        "detailsImports": 1,
       }
     `);
   });
@@ -92,18 +96,18 @@ describe('bindReglamentCalculatorLazyHydration', () => {
   it('loads only the controller for basic fields and connects the editor later', async () => {
     const rootDocument = document.implementation.createHTMLDocument();
     renderCalculator(rootDocument);
-    const { controllerModule, editorModule, runtime } = createModules();
+    const { controllerModule, detailsModule } = createModules();
     const loadController: ReglamentCalculatorControllerLoader = vi.fn(
       async () => controllerModule,
     );
-    const loadEditor: ReglamentCalculatorEditorLoader = vi.fn(
-      async () => editorModule,
+    const loadDetails: ReglamentCalculatorDetailsLoader = vi.fn(
+      async () => detailsModule,
     );
 
     bindReglamentCalculatorLazyHydration(
       rootDocument,
       loadController,
-      loadEditor,
+      loadDetails,
     );
 
     getCalculatorNode(rootDocument, 'input', HTMLInputElement).dispatchEvent(
@@ -115,13 +119,8 @@ describe('bindReglamentCalculatorLazyHydration', () => {
         1,
       );
     });
-    expect(loadEditor).not.toHaveBeenCalled();
+    expect(loadDetails).not.toHaveBeenCalled();
 
-    const root = getCalculatorNode(
-      rootDocument,
-      '[data-reglament-calculator]',
-      HTMLElement,
-    );
     const details = getCalculatorNode(
       rootDocument,
       'details',
@@ -131,23 +130,27 @@ describe('bindReglamentCalculatorLazyHydration', () => {
     details.dispatchEvent(new Event('toggle'));
 
     await vi.waitFor(() => {
-      expect(editorModule.hydrateReglamentEditors).toHaveBeenCalledWith(
-        root,
-        runtime.registerEditor,
+      expect(detailsModule.hydrateReglamentCalculator).toHaveBeenCalledWith(
+        getCalculatorNode(
+          rootDocument,
+          '[data-reglament-calculator]',
+          HTMLElement,
+        ),
       );
     });
     expect({
       controllerImports: vi.mocked(loadController).mock.calls.length,
       controllerHydrations:
         controllerModule.hydrateReglamentCalculator.mock.calls.length,
-      editorImports: vi.mocked(loadEditor).mock.calls.length,
-      editorHydrations: editorModule.hydrateReglamentEditors.mock.calls.length,
+      detailsImports: vi.mocked(loadDetails).mock.calls.length,
+      detailsHydrations:
+        detailsModule.hydrateReglamentCalculator.mock.calls.length,
     }).toMatchInlineSnapshot(`
       {
         "controllerHydrations": 1,
         "controllerImports": 1,
-        "editorHydrations": 1,
-        "editorImports": 1,
+        "detailsHydrations": 1,
+        "detailsImports": 1,
       }
     `);
   });
@@ -155,24 +158,22 @@ describe('bindReglamentCalculatorLazyHydration', () => {
   it('prepares each Astro replacement once across both lifecycle events', async () => {
     const rootDocument = document.implementation.createHTMLDocument();
     renderCalculator(rootDocument);
-    const { controllerModule, editorModule } = createModules();
+    const { controllerModule, detailsModule } = createModules();
     const loadController: ReglamentCalculatorControllerLoader = vi.fn(
       async () => controllerModule,
     );
-    const loadEditor: ReglamentCalculatorEditorLoader = vi.fn(
-      async () => editorModule,
+    const loadDetails: ReglamentCalculatorDetailsLoader = vi.fn(
+      async () => detailsModule,
     );
 
-    bindReglamentCalculatorLazyHydration(
+    const hydrate = bindReglamentCalculatorLazyHydration(
       rootDocument,
       loadController,
-      loadEditor,
+      loadDetails,
     );
-    bindReglamentCalculatorLazyHydration(
-      rootDocument,
-      loadController,
-      loadEditor,
-    );
+    rootDocument.addEventListener('astro:after-swap', hydrate);
+    rootDocument.addEventListener('astro:page-load', hydrate);
+
     rootDocument.dispatchEvent(new Event('astro:after-swap'));
     rootDocument.dispatchEvent(new Event('astro:page-load'));
 
@@ -192,20 +193,21 @@ describe('bindReglamentCalculatorLazyHydration', () => {
     rootDocument.dispatchEvent(new Event('astro:page-load'));
 
     await vi.waitFor(() => {
-      expect(editorModule.hydrateReglamentEditors).toHaveBeenCalledTimes(1);
+      expect(detailsModule.hydrateReglamentCalculator).toHaveBeenCalledTimes(1);
     });
     expect({
       controllerImports: vi.mocked(loadController).mock.calls.length,
       controllerHydrations:
         controllerModule.hydrateReglamentCalculator.mock.calls.length,
-      editorImports: vi.mocked(loadEditor).mock.calls.length,
-      editorHydrations: editorModule.hydrateReglamentEditors.mock.calls.length,
+      detailsImports: vi.mocked(loadDetails).mock.calls.length,
+      detailsHydrations:
+        detailsModule.hydrateReglamentCalculator.mock.calls.length,
     }).toMatchInlineSnapshot(`
       {
-        "controllerHydrations": 2,
+        "controllerHydrations": 1,
         "controllerImports": 1,
-        "editorHydrations": 1,
-        "editorImports": 1,
+        "detailsHydrations": 1,
+        "detailsImports": 1,
       }
     `);
   });

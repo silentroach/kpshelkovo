@@ -1,8 +1,8 @@
 import type {
   ReglamentCalculatorControllerLoader,
   ReglamentCalculatorControllerModule,
-  ReglamentCalculatorEditorLoader,
-  ReglamentCalculatorEditorModule,
+  ReglamentCalculatorDetailsLoader,
+  ReglamentCalculatorDetailsModule,
 } from './calculator-loader.types';
 
 const CALCULATOR_SELECTOR = '[data-reglament-calculator]';
@@ -10,119 +10,67 @@ const CALCULATOR_CONTROL_SELECTOR =
   '[data-reglament-field],[data-reglament-reset]';
 const EDITOR_DETAILS_SELECTOR = 'details[data-reglament-editor-row]';
 
-const boundDocuments = new WeakSet<Document>();
+const hydrationStates = new WeakMap<HTMLElement, number>();
+const BASIC_HYDRATION = 1;
+const DETAILS_HYDRATION = 3;
 
 const loadControllerModule = (): Promise<ReglamentCalculatorControllerModule> =>
   import('./calculator-controller');
-const loadEditorModule = (): Promise<ReglamentCalculatorEditorModule> =>
-  import('./calculator-editor');
+const loadDetailsModule = (): Promise<ReglamentCalculatorDetailsModule> =>
+  import('./calculator-details');
 
 export const bindReglamentCalculatorLazyHydration = (
   rootDocument: Document = document,
   loadController: ReglamentCalculatorControllerLoader = loadControllerModule,
-  loadEditor: ReglamentCalculatorEditorLoader = loadEditorModule,
-): void => {
-  if (boundDocuments.has(rootDocument)) {
-    return;
-  }
+  loadDetails: ReglamentCalculatorDetailsLoader = loadDetailsModule,
+): (() => void) => {
+  const hydrate = (root: HTMLElement, details: boolean): void => {
+    const requestedState = details ? DETAILS_HYDRATION : BASIC_HYDRATION;
+    const currentState = hydrationStates.get(root) ?? 0;
 
-  boundDocuments.add(rootDocument);
-
-  const preparedRoots = new WeakSet<HTMLElement>();
-  let controllerModulePromise:
-    Promise<ReglamentCalculatorControllerModule> | undefined;
-  let editorModulePromise: Promise<ReglamentCalculatorEditorModule> | undefined;
-
-  const prepare = (root: HTMLElement): void => {
-    if (preparedRoots.has(root)) {
+    if ((currentState & requestedState) === requestedState) {
       return;
     }
 
-    preparedRoots.add(root);
+    hydrationStates.set(root, currentState | requestedState);
+    const loadModule = details ? loadDetails : loadController;
 
-    let controllerHydration:
-      | Promise<
-          ReturnType<
-            ReglamentCalculatorControllerModule['hydrateReglamentCalculator']
-          >
-        >
-      | undefined;
-    let editorHydration: Promise<void> | undefined;
-
-    const removeIntentListeners = (): void => {
-      root.removeEventListener('focusin', handleIntent);
-      root.removeEventListener('pointerover', handleIntent);
-      root.removeEventListener('input', loadCalculator);
-      root.removeEventListener('toggle', handleToggle, true);
-    };
-    const loadCalculator = () => {
-      controllerModulePromise ??= loadController();
-      controllerHydration ??= controllerModulePromise.then(
-        ({ hydrateReglamentCalculator }) => {
-          const runtime = hydrateReglamentCalculator(root);
-          root.removeEventListener('input', loadCalculator);
-
-          return runtime;
-        },
-      );
-
-      return controllerHydration;
-    };
-    const loadEditors = (): void => {
-      if (editorHydration) {
-        return;
-      }
-
-      editorModulePromise ??= loadEditor();
-      const calculator = loadCalculator();
-
-      editorHydration = Promise.all([calculator, editorModulePromise]).then(
-        ([runtime, { hydrateReglamentEditors }]) => {
-          hydrateReglamentEditors(root, runtime.registerEditor);
-          removeIntentListeners();
-        },
-      );
-    };
-    function handleIntent(event: Event): void {
-      if (!(event.target instanceof Element)) {
-        return;
-      }
-
-      if (event.target.closest(EDITOR_DETAILS_SELECTOR)) {
-        loadEditors();
-      } else if (event.target.closest(CALCULATOR_CONTROL_SELECTOR)) {
-        void loadCalculator();
-      }
-    }
-    function handleToggle(event: Event): void {
-      if (
-        event.target instanceof HTMLDetailsElement &&
-        event.target.matches(EDITOR_DETAILS_SELECTOR) &&
-        event.target.open
-      ) {
-        loadEditors();
-      }
-    }
-
-    root.addEventListener('focusin', handleIntent);
-    root.addEventListener('pointerover', handleIntent);
-    root.addEventListener('input', loadCalculator);
-    root.addEventListener('toggle', handleToggle, true);
-
-    if (root.querySelector(`${EDITOR_DETAILS_SELECTOR}[open]`)) {
-      loadEditors();
-    }
-  };
-
-  const hydrate = (): void => {
-    rootDocument.querySelectorAll(CALCULATOR_SELECTOR).forEach((root) => {
-      if (root instanceof HTMLElement) {
-        prepare(root);
-      }
+    void loadModule().then(({ hydrateReglamentCalculator }) => {
+      hydrateReglamentCalculator(root);
     });
   };
 
-  hydrate();
-  rootDocument.addEventListener('astro:after-swap', hydrate);
-  rootDocument.addEventListener('astro:page-load', hydrate);
+  const hydrateOpenDetails = (): void => {
+    rootDocument
+      .querySelectorAll(`${EDITOR_DETAILS_SELECTOR}[open]`)
+      .forEach((details) => {
+        const root = details.closest(CALCULATOR_SELECTOR);
+
+        if (root instanceof HTMLElement) {
+          hydrate(root, true);
+        }
+      });
+  };
+  const handleIntent = (event: Event): void => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const details = event.target.closest(EDITOR_DETAILS_SELECTOR);
+    const intent = details ?? event.target.closest(CALCULATOR_CONTROL_SELECTOR);
+    const root = intent?.closest(CALCULATOR_SELECTOR);
+
+    if (
+      root instanceof HTMLElement &&
+      (event.type !== 'toggle' ||
+        (details instanceof HTMLDetailsElement && details.open))
+    ) {
+      hydrate(root, Boolean(details));
+    }
+  };
+  rootDocument.addEventListener('focusin', handleIntent);
+  rootDocument.addEventListener('pointerover', handleIntent);
+  rootDocument.addEventListener('input', handleIntent);
+  rootDocument.addEventListener('toggle', handleIntent, true);
+  return hydrateOpenDetails;
 };
