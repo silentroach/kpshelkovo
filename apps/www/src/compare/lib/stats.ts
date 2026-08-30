@@ -11,7 +11,7 @@ type Rated = Ranked & {
   score: number;
 };
 
-function sort<T extends Ranked>(settlements: T[]): T[] {
+function sort<T extends Ranked>(settlements: readonly T[]): T[] {
   return [...settlements].sort((a, b) => {
     const diff =
       a.tariff.normalizedPerSotkaMonth - b.tariff.normalizedPerSotkaMonth;
@@ -25,7 +25,7 @@ function sort<T extends Ranked>(settlements: T[]): T[] {
  * Returns the middle value for odd-length arrays,
  * average of two middle values for even-length arrays
  */
-export function calculateMedian(values: number[]): number {
+export function calculateMedian(values: readonly number[]): number {
   if (values.length === 0) {
     throw new Error('Cannot calculate median of empty array');
   }
@@ -44,7 +44,9 @@ export function calculateMedian(values: number[]): number {
  * Calculate stable tariff rank for every settlement.
  * Rank 1 = lowest tariff, equal tariffs share the same rank.
  */
-export function rankSettlements(settlements: Ranked[]): Map<string, number> {
+export function rankSettlements(
+  settlements: readonly Ranked[],
+): Map<string, number> {
   let prev: number | undefined;
   let rank = 0;
   const ranks = new Map<string, number>();
@@ -85,8 +87,8 @@ function bands(list: Rated[]): Rated[][] {
 }
 
 function peers(
-  settlements: Settlement[],
-  ratings: Map<string, Rating>,
+  settlements: readonly Settlement[],
+  ratings: ReadonlyMap<string, Rating>,
   base: Settlement,
 ) {
   const list = settlements
@@ -123,8 +125,8 @@ function peers(
  * Shelkovo is always the baseline settlement
  */
 export function computeStats(
-  settlements: Settlement[],
-  ratings: Map<string, Rating>,
+  settlements: readonly Settlement[],
+  ratings: ReadonlyMap<string, Rating>,
   baseline: Settlement,
 ): Stats {
   if (settlements.length === 0) {
