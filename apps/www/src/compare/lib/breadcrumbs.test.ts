@@ -1,96 +1,103 @@
-import { describe, expect, it, vi } from 'vitest';
+import { serializeSchema } from '@shelkovo/seo';
+import { beforeAll, describe, expect, it } from 'vitest';
 
-vi.mock('./site', () => ({
-  canon: (path: string) =>
-    new URL(
-      path.replace(/^\//, ''),
-      'https://kpshelkovo.online/815/compare/',
-    ).toString(),
-}));
+import type { BreadcrumbItem } from '@/lib/breadcrumbs';
 
-vi.mock('./url', () => ({
-  withBase: (path: string) =>
-    `/815/compare${path.startsWith('/') ? path : `/${path}`}`,
-}));
+let compareBreadcrumbs: typeof import('./breadcrumbs').compareBreadcrumbs;
+let compareBreadcrumbSchema: typeof import('./breadcrumbs').compareBreadcrumbSchema;
+let comparePageBreadcrumbs: typeof import('./breadcrumbs').comparePageBreadcrumbs;
+let settlementBreadcrumbs: typeof import('./breadcrumbs').settlementBreadcrumbs;
 
-const loadBreadcrumbs = () => import('./breadcrumbs');
+beforeAll(async () => {
+  Object.assign(import.meta.env, {
+    SITE: 'https://kpshelkovo.online',
+    BASE_URL: '/',
+  });
 
-interface BreadcrumbListItem {
-  readonly position: number;
-  readonly item: string;
-  readonly name: string;
-}
+  ({
+    compareBreadcrumbs,
+    compareBreadcrumbSchema,
+    comparePageBreadcrumbs,
+    settlementBreadcrumbs,
+  } = await import('./breadcrumbs'));
+});
 
-const href = <T extends { readonly label: string }>(
-  item: T,
-): string | undefined => ('href' in item ? String(item.href) : undefined);
+const pageContract = (breadcrumbs: readonly Required<BreadcrumbItem>[]) => {
+  const schema = compareBreadcrumbSchema(breadcrumbs);
+  const items = schema.itemListElement;
 
-const schemaItems = (schema: {
-  readonly itemListElement?: unknown;
-}): readonly BreadcrumbListItem[] => {
-  if (!Array.isArray(schema.itemListElement)) {
+  if (!Array.isArray(items)) {
     throw new Error('Breadcrumb schema must include itemListElement');
   }
 
-  return schema.itemListElement as readonly BreadcrumbListItem[];
+  expect(
+    (items as readonly Record<string, unknown>[]).map((item) => item.name),
+  ).toEqual(breadcrumbs.map((item) => item.label));
+
+  return {
+    visible: breadcrumbs,
+    jsonLd: serializeSchema(schema)[0],
+  };
 };
 
 describe('compare breadcrumbs', () => {
-  it('builds visible compare breadcrumbs for index and rating pages', async () => {
-    const { compareBreadcrumbs } = await loadBreadcrumbs();
-
-    expect(compareBreadcrumbs().map(href)).toMatchInlineSnapshot(`
-        [
-          "/",
-          "/815/compare/",
-        ]
-      `);
-  });
-
-  it('adds the settlement name only on settlement pages', async () => {
-    const { settlementBreadcrumbs } = await loadBreadcrumbs();
-
-    const breadcrumbs = settlementBreadcrumbs('КП Шелково');
-
-    expect(breadcrumbs).toHaveLength(3);
-    expect(breadcrumbs.map(href)).toMatchInlineSnapshot(`
-      [
-        "/",
-        "/815/compare/",
-        undefined,
-      ]
-    `);
-    expect(breadcrumbs.at(-1)?.label).toBe('КП Шелково');
-  });
-
-  it('builds schema breadcrumbs with canonical URLs', async () => {
-    const { compareBreadcrumbSchema } = await loadBreadcrumbs();
-
-    const schema = compareBreadcrumbSchema([
+  it('keeps visible and serialized breadcrumbs aligned on every compare route', () => {
+    expect({
+      index: pageContract(compareBreadcrumbs()),
+      rating: pageContract(
+        comparePageBreadcrumbs('Как считается уровень', '/rating/'),
+      ),
+      settlement: pageContract(settlementBreadcrumbs('КП Шелково', 'shelkovo')),
+    }).toMatchInlineSnapshot(`
       {
-        name: 'КП Шелково',
-        item: 'https://kpshelkovo.online/815/compare/settlements/shelkovo/',
-      },
-    ]);
-
-    expect(schema['@context']).toBe('https://schema.org');
-    expect(schema['@type']).toBe('BreadcrumbList');
-    const items = schemaItems(schema);
-
-    expect(items.map((item) => item.position)).toMatchInlineSnapshot(`
-        [
-          1,
-          2,
-          3,
-        ]
-      `);
-    expect(items.map((item) => item.item)).toMatchInlineSnapshot(`
-        [
-          "https://kpshelkovo.online/",
-          "https://kpshelkovo.online/815/compare/",
-          "https://kpshelkovo.online/815/compare/settlements/shelkovo/",
-        ]
-      `);
-    expect(items.at(-1)?.name).toBe('КП Шелково');
+        "index": {
+          "jsonLd": "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Главная\",\"item\":\"https://kpshelkovo.online/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Сравнение тарифов\",\"item\":\"https://kpshelkovo.online/815/compare/\"}]}",
+          "visible": [
+            {
+              "href": "/",
+              "label": "Главная",
+            },
+            {
+              "href": "/815/compare/",
+              "label": "Сравнение тарифов",
+            },
+          ],
+        },
+        "rating": {
+          "jsonLd": "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Главная\",\"item\":\"https://kpshelkovo.online/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Сравнение тарифов\",\"item\":\"https://kpshelkovo.online/815/compare/\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Как считается уровень\",\"item\":\"https://kpshelkovo.online/815/compare/rating/\"}]}",
+          "visible": [
+            {
+              "href": "/",
+              "label": "Главная",
+            },
+            {
+              "href": "/815/compare/",
+              "label": "Сравнение тарифов",
+            },
+            {
+              "href": "/815/compare/rating/",
+              "label": "Как считается уровень",
+            },
+          ],
+        },
+        "settlement": {
+          "jsonLd": "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Главная\",\"item\":\"https://kpshelkovo.online/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Сравнение тарифов\",\"item\":\"https://kpshelkovo.online/815/compare/\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"КП Шелково\",\"item\":\"https://kpshelkovo.online/815/compare/settlements/shelkovo/\"}]}",
+          "visible": [
+            {
+              "href": "/",
+              "label": "Главная",
+            },
+            {
+              "href": "/815/compare/",
+              "label": "Сравнение тарифов",
+            },
+            {
+              "href": "/815/compare/settlements/shelkovo/",
+              "label": "КП Шелково",
+            },
+          ],
+        },
+      }
+    `);
   });
 });
