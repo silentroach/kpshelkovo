@@ -5,8 +5,45 @@ const mobileViewports = [
   { width: 390, height: 844 },
 ] as const;
 const desktopViewport = { width: 1440, height: 900 } as const;
+const breadcrumbViewports = [
+  { name: 'mobile', viewport: { width: 640, height: 844 } },
+  { name: 'desktop', viewport: desktopViewport },
+] as const;
 const explorerControlSelector =
   '[data-testid="explorer-controls"] input, [data-testid="explorer-controls"] button, [data-testid="sort-select"]';
+
+test('aligns settlement breadcrumbs with the compare index', async ({
+  page,
+}) => {
+  for (const { name, viewport } of breadcrumbViewports) {
+    await test.step(name, async () => {
+      await page.setViewportSize(viewport);
+      await page.goto('/815/compare/', { waitUntil: 'domcontentloaded' });
+
+      const indexBreadcrumbs = page.getByRole('navigation', {
+        name: 'Хлебные крошки',
+      });
+      await expect(indexBreadcrumbs).toBeVisible();
+      const indexTop = await indexBreadcrumbs.evaluate(
+        (element) => element.getBoundingClientRect().top,
+      );
+
+      await page.goto('/815/compare/settlements/shelkovo/', {
+        waitUntil: 'domcontentloaded',
+      });
+
+      const settlementBreadcrumbs = page.getByRole('navigation', {
+        name: 'Хлебные крошки',
+      });
+      await expect(settlementBreadcrumbs).toBeVisible();
+      const settlementTop = await settlementBreadcrumbs.evaluate(
+        (element) => element.getBoundingClientRect().top,
+      );
+
+      expect(settlementTop).toBeCloseTo(indexTop, 0);
+    });
+  }
+});
 
 test('keeps one settlement list before and after hydration', async ({
   baseURL,
