@@ -53,6 +53,17 @@ const createModules = () => {
   return { controllerModule, detailsModule };
 };
 
+const createDeferred = <Value>() => {
+  let resolve = (_value: Value): void => {
+    throw new Error('Deferred promise was not initialized');
+  };
+  const promise = new Promise<Value>((onResolve) => {
+    resolve = onResolve;
+  });
+
+  return { promise, resolve } as const;
+};
+
 describe('bindReglamentCalculatorLazyHydration', () => {
   it('starts the details entry without waiting for the controller loader', () => {
     const rootDocument = document.implementation.createHTMLDocument();
@@ -153,6 +164,120 @@ describe('bindReglamentCalculatorLazyHydration', () => {
         "detailsImports": 1,
       }
     `);
+  });
+
+  it('recovers basic and details hydration after a transient details failure', async () => {
+    const rootDocument = document.implementation.createHTMLDocument();
+    renderCalculator(rootDocument);
+    const { controllerModule, detailsModule } = createModules();
+    const loadController: ReglamentCalculatorControllerLoader = vi.fn(
+      async () => controllerModule,
+    );
+    const firstDetailsLoad = Promise.reject<ReglamentCalculatorDetailsModule>(
+      new Error('Details chunk unavailable'),
+    );
+    const loadDetails = vi.fn<ReglamentCalculatorDetailsLoader>(
+      async () => detailsModule,
+    );
+    loadDetails.mockImplementationOnce(() => firstDetailsLoad);
+
+    bindReglamentCalculatorLazyHydration(
+      rootDocument,
+      loadController,
+      loadDetails,
+    );
+
+    const details = getCalculatorNode(
+      rootDocument,
+      'details',
+      HTMLDetailsElement,
+    );
+    details.open = true;
+    details.dispatchEvent(new Event('toggle'));
+
+    await firstDetailsLoad.catch(() => undefined);
+    await Promise.resolve();
+
+    const input = getCalculatorNode(rootDocument, 'input', HTMLInputElement);
+    input.dispatchEvent(new Event('pointerover', { bubbles: true }));
+    input.dispatchEvent(new Event('focusin', { bubbles: true }));
+
+    await vi.waitFor(() => {
+      expect(controllerModule.hydrateReglamentCalculator).toHaveBeenCalledTimes(
+        1,
+      );
+    });
+
+    details.dispatchEvent(new Event('toggle'));
+    details.dispatchEvent(new Event('pointerover', { bubbles: true }));
+
+    await vi.waitFor(() => {
+      expect(detailsModule.hydrateReglamentCalculator).toHaveBeenCalledTimes(1);
+    });
+    details.dispatchEvent(new Event('toggle'));
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+
+    expect({
+      controllerHydrations:
+        controllerModule.hydrateReglamentCalculator.mock.calls.length,
+      controllerImports: vi.mocked(loadController).mock.calls.length,
+      detailsHydrations:
+        detailsModule.hydrateReglamentCalculator.mock.calls.length,
+      detailsImports: loadDetails.mock.calls.length,
+    }).toMatchInlineSnapshot(`
+      {
+        "controllerHydrations": 1,
+        "controllerImports": 1,
+        "detailsHydrations": 1,
+        "detailsImports": 2,
+      }
+    `);
+  });
+
+  it('keeps an in-flight basic hydration after a details load failure', async () => {
+    const rootDocument = document.implementation.createHTMLDocument();
+    renderCalculator(rootDocument);
+    const { controllerModule } = createModules();
+    const controllerLoad =
+      createDeferred<ReglamentCalculatorControllerModule>();
+    const loadController: ReglamentCalculatorControllerLoader = vi.fn(
+      () => controllerLoad.promise,
+    );
+    const detailsLoad = Promise.reject<ReglamentCalculatorDetailsModule>(
+      new Error('Details chunk unavailable'),
+    );
+    const loadDetails: ReglamentCalculatorDetailsLoader = vi.fn(
+      () => detailsLoad,
+    );
+
+    bindReglamentCalculatorLazyHydration(
+      rootDocument,
+      loadController,
+      loadDetails,
+    );
+
+    const input = getCalculatorNode(rootDocument, 'input', HTMLInputElement);
+    input.dispatchEvent(new Event('pointerover', { bubbles: true }));
+
+    const details = getCalculatorNode(
+      rootDocument,
+      'details',
+      HTMLDetailsElement,
+    );
+    details.open = true;
+    details.dispatchEvent(new Event('toggle'));
+
+    await detailsLoad.catch(() => undefined);
+    await Promise.resolve();
+    input.dispatchEvent(new Event('focusin', { bubbles: true }));
+    controllerLoad.resolve(controllerModule);
+
+    await vi.waitFor(() => {
+      expect(controllerModule.hydrateReglamentCalculator).toHaveBeenCalledTimes(
+        1,
+      );
+    });
+    expect(loadController).toHaveBeenCalledTimes(1);
   });
 
   it('prepares each Astro replacement once across both lifecycle events', async () => {

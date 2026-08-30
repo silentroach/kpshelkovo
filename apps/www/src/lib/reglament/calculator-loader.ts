@@ -10,7 +10,8 @@ const CALCULATOR_CONTROL_SELECTOR =
   '[data-reglament-field],[data-reglament-reset]';
 const EDITOR_DETAILS_SELECTOR = 'details[data-reglament-editor-row]';
 
-const hydrationStates = new WeakMap<HTMLElement, number>();
+const completedHydrations = new WeakMap<HTMLElement, number>();
+const pendingHydrations = new WeakMap<HTMLElement, number>();
 const BASIC_HYDRATION = 1;
 const DETAILS_HYDRATION = 3;
 
@@ -26,18 +27,37 @@ export const bindReglamentCalculatorLazyHydration = (
 ): (() => void) => {
   const hydrate = (root: HTMLElement, details: boolean): void => {
     const requestedState = details ? DETAILS_HYDRATION : BASIC_HYDRATION;
-    const currentState = hydrationStates.get(root) ?? 0;
+    const completedState = completedHydrations.get(root) ?? 0;
+    const pendingState = pendingHydrations.get(root) ?? 0;
+    const claimedState = requestedState & ~(completedState | pendingState);
 
-    if ((currentState & requestedState) === requestedState) {
+    if (!claimedState) {
       return;
     }
 
-    hydrationStates.set(root, currentState | requestedState);
+    pendingHydrations.set(root, pendingState | claimedState);
     const loadModule = details ? loadDetails : loadController;
 
-    void loadModule().then(({ hydrateReglamentCalculator }) => {
-      hydrateReglamentCalculator(root);
-    });
+    void loadModule()
+      .then(({ hydrateReglamentCalculator }) => {
+        const hydratedState = completedHydrations.get(root) ?? 0;
+
+        if ((hydratedState & requestedState) !== requestedState) {
+          hydrateReglamentCalculator(root);
+          completedHydrations.set(root, hydratedState | requestedState);
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        const remainingState =
+          (pendingHydrations.get(root) ?? 0) & ~claimedState;
+
+        if (remainingState) {
+          pendingHydrations.set(root, remainingState);
+        } else {
+          pendingHydrations.delete(root);
+        }
+      });
   };
 
   const hydrateOpenDetails = (): void => {
