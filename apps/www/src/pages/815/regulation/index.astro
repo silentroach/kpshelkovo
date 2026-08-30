@@ -1219,69 +1219,12 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
   </style>
 
   <script>
+    import { bindReglamentCalculatorLazyHydration } from '@/lib/reglament/calculator-loader';
     import { hydrateStickyTableHeaders } from '@/lib/sticky-table-headers';
 
-    const calculatorRootSelector = '[data-reglament-calculator]';
-    const calculatorDetailsSelector = 'details[data-reglament-editor-row]';
-    const calculatorControlSelector = `[data-reglament-field],[data-reglament-reset],${calculatorDetailsSelector}`;
-    let calculatorController:
-      | Promise<typeof import('@/lib/reglament/calculator-controller')>
-      | undefined;
-
-    const prepareReglamentCalculator = (root: HTMLElement): void => {
-      if (root.dataset.reglamentCalculatorLoader === 'true') {
-        return;
-      }
-
-      root.dataset.reglamentCalculatorLoader = 'true';
-      let calculatorHydration: Promise<void> | undefined;
-      const load = (): void => {
-        calculatorController ??=
-          import('@/lib/reglament/calculator-controller');
-        calculatorHydration ??= calculatorController.then(
-          ({ hydrateReglamentCalculator }) => {
-            hydrateReglamentCalculator(root);
-            root.removeEventListener('focusin', handleIntent);
-            root.removeEventListener('pointerover', handleIntent);
-            root.removeEventListener('input', load);
-            root.removeEventListener('toggle', handleToggle, true);
-          },
-        );
-      };
-      const handleIntent = (event: Event): void => {
-        if (
-          event.target instanceof Element &&
-          event.target.closest(calculatorControlSelector)
-        ) {
-          load();
-        }
-      };
-      const handleToggle = (event: Event): void => {
-        if (
-          event.target instanceof HTMLDetailsElement &&
-          event.target.matches(calculatorDetailsSelector) &&
-          event.target.open
-        ) {
-          load();
-        }
-      };
-
-      root.addEventListener('focusin', handleIntent);
-      root.addEventListener('pointerover', handleIntent);
-      root.addEventListener('input', load);
-      root.addEventListener('toggle', handleToggle, true);
-
-      if (root.querySelector(`${calculatorDetailsSelector}[open]`)) {
-        load();
-      }
-    };
-
+    const hydrateCalculator = bindReglamentCalculatorLazyHydration();
     const hydrate = () => {
-      document.querySelectorAll(calculatorRootSelector).forEach((root) => {
-        if (root instanceof HTMLElement) {
-          prepareReglamentCalculator(root);
-        }
-      });
+      hydrateCalculator();
       hydrateStickyTableHeaders();
     };
 

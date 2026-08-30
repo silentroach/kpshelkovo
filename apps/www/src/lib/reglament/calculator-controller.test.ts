@@ -10,6 +10,7 @@ import {
   calculateReglamentCalculatorState,
   hydrateReglamentCalculator,
 } from './calculator-controller';
+import { bindReglamentCalculatorLazyHydration } from './calculator-loader';
 import type {
   CalculatedEstimate,
   CalculatedEstimateRow,
@@ -422,7 +423,7 @@ describe('buildReglamentCalculatorChanges', () => {
       throw new Error('Missing lazy editor calculator fixture nodes');
     }
 
-    hydrateReglamentCalculator(root);
+    bindReglamentCalculatorLazyHydration(document);
 
     expect({
       explanation: document.querySelector('[data-explanation]')?.textContent,
