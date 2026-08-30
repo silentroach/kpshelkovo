@@ -23,13 +23,13 @@
     "test:watch": "vitest",
     "test:visual:status": "playwright test -c playwright.status-visual.local.config.ts",
     "test:visual:status:update": "playwright test -c playwright.status-visual.local.config.ts --update-snapshots",
-    "test:visual:status:serve": "node src/scripts/visual-fixture-launcher.mjs tests/status-timeline-visual 4324",
+    "test:visual:status:serve": "node ../../scripts/visual-fixture-launcher.mjs tests/status-timeline-visual 4324",
     "test:visual:news-event": "playwright test -c playwright.news-event-card-visual.local.config.ts",
     "test:visual:news-event:update": "playwright test -c playwright.news-event-card-visual.local.config.ts --update-snapshots",
-    "test:visual:news-event:serve": "node src/scripts/visual-fixture-launcher.mjs tests/news-event-card-visual 4327",
+    "test:visual:news-event:serve": "node ../../scripts/visual-fixture-launcher.mjs tests/news-event-card-visual 4327",
     "test:visual:sticky-table": "playwright test -c playwright.sticky-table-visual.local.config.ts",
     "test:visual:sticky-table:update": "playwright test -c playwright.sticky-table-visual.local.config.ts --update-snapshots",
-    "test:visual:sticky-table:serve": "node src/scripts/visual-fixture-launcher.mjs tests/sticky-table-visual 4329"
+    "test:visual:sticky-table:serve": "node ../../scripts/visual-fixture-launcher.mjs tests/sticky-table-visual 4329"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.3.8",

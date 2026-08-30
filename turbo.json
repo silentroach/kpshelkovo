@@ -42,6 +42,11 @@
     },
     "test": {
       "dependsOn": ["transit"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/scripts/visual-fixture-launcher.mjs",
+        "$TURBO_ROOT$/scripts/visual-fixture-launcher.types.ts"
+      ],
       "outputs": []
     },
     "test:watch": {
@@ -59,7 +64,9 @@
         "!**/*.spec.*",
         "!tests/**",
         "!**/__snapshots__/**",
-        "!**/*-snapshots/**"
+        "!**/*-snapshots/**",
+        "$TURBO_ROOT$/scripts/visual-fixture-launcher.mjs",
+        "$TURBO_ROOT$/scripts/visual-fixture-launcher.types.ts"
       ],
       "outputs": []
     }

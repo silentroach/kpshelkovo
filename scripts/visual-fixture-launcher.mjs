@@ -5,15 +5,11 @@ import { pathToFileURL } from 'node:url';
 
 const host = '127.0.0.1';
 
-/**
- * @typedef VisualFixtureOptions
- * @property {string} fixtureRoot
- * @property {number} port
- */
+/** @typedef {import('./visual-fixture-launcher.types.ts').VisualFixtureOptions} VisualFixtureOptions */
 
 /**
  * @param {readonly string[]} args
- * @returns {Readonly<VisualFixtureOptions>}
+ * @returns {VisualFixtureOptions}
  */
 export const parseVisualFixtureArgs = (args) => {
   if (args.length !== 2) {

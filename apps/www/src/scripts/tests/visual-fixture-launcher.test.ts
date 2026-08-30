@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseVisualFixtureArgs } from '../visual-fixture-launcher.mjs';
+import { parseVisualFixtureArgs } from '../../../../../scripts/visual-fixture-launcher.mjs';
 
 describe('visual fixture launcher arguments', () => {
   it('keeps the fixture root and parses the preview port', () => {
