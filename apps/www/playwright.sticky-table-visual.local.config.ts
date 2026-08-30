@@ -1,36 +1,13 @@
-import { fileURLToPath } from 'node:url';
-import { defineConfig } from '@playwright/test';
+import { createVisualFixturePlaywrightConfig } from './tests/config/playwright-visual-fixture';
 
-const port = 4329;
-const baseURL = `http://127.0.0.1:${String(port)}`;
-const cwd = fileURLToPath(new URL('.', import.meta.url));
-
-export default defineConfig({
-  testDir: './tests',
+export default createVisualFixturePlaywrightConfig({
   testMatch: 'sticky-table.visual.local.spec.ts',
-  fullyParallel: false,
-  workers: 1,
-  reporter: 'list',
-  timeout: 120_000,
-  expect: {
-    timeout: 10_000,
+  port: 4329,
+  viewport: {
+    width: 1440,
+    height: 900,
   },
-  use: {
-    baseURL,
-    browserName: 'chromium',
-    headless: true,
-    viewport: {
-      width: 1440,
-      height: 900,
-    },
-    deviceScaleFactor: 2,
-    colorScheme: 'light',
-  },
-  webServer: {
-    command: 'pnpm run test:visual:sticky-table:serve',
-    cwd,
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
-  },
+  command: 'pnpm run test:visual:sticky-table:serve',
+  testTimeout: 120_000,
+  serverTimeout: 180_000,
 });
