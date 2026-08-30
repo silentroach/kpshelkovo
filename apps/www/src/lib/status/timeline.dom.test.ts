@@ -6,6 +6,7 @@ import { visibleWhitespace } from '../test/visible-whitespace';
 import { STATUS_AREAS, type StatusService } from './schema';
 import { hydrateStatusTimeline, hydrateStatusTimelines } from './timeline.dom';
 import { bindStatusTimelineLazyHydration } from './timeline.lazy';
+import type { StatusTimelineTooltipItemDto } from './timeline-tooltip.types';
 
 interface TooltipInput {
   readonly serviceLabel: string;
@@ -36,6 +37,16 @@ interface ProblemNodeInput {
   readonly hidden?: boolean;
   readonly tone?: 'amber' | 'red';
   readonly tooltip?: Partial<TooltipInput>;
+}
+
+interface GroupedTimelineInput {
+  readonly id: string;
+  readonly service?: StatusService;
+  readonly serviceLabel: string;
+  readonly groupTitle: string;
+  readonly start: string;
+  readonly end: string;
+  readonly items: readonly StatusTimelineTooltipItemDto[];
 }
 
 const escapeAttribute = (value: string): string =>
@@ -118,6 +129,67 @@ const renderTimeline = (
       </div>
       <div
         id="status-service-timeline-tooltip-test"
+        data-status-timeline-tooltip
+        role="tooltip"
+        aria-hidden="true"
+        hidden
+      >
+        <p>
+          <span
+            class="status-service-timeline__tooltip-phase-icon status-service-timeline__tooltip-phase-icon--alert"
+            data-status-tooltip-phase-icon-alert
+            hidden
+          ></span>
+          <span
+            class="status-service-timeline__tooltip-phase-icon status-service-timeline__tooltip-phase-icon--check"
+            data-status-tooltip-phase-icon-check
+            hidden
+          ></span>
+          <span data-status-tooltip-title></span>
+          <span data-status-tooltip-title-areas hidden></span>
+        </p>
+        <p data-status-tooltip-period></p>
+        <div data-status-tooltip-list hidden></div>
+        ${AREA_TEMPLATES}
+      </div>
+    </div>
+  `;
+
+  return document.querySelector('[data-status-timeline]') as HTMLElement;
+};
+
+const renderGroupedTimeline = ({
+  id,
+  service = 'electricity',
+  serviceLabel,
+  groupTitle,
+  start,
+  end,
+  items,
+}: GroupedTimelineInput): HTMLElement => {
+  const initialLabel = `${serviceLabel}. ${groupTitle}`;
+
+  document.body.innerHTML = `
+    <div data-status-timeline data-range-days="10">
+      <div data-status-timeline-track>
+        <a
+          href="/status/incidents/${id}"
+          title="${escapeAttribute(initialLabel)}"
+          aria-label="${escapeAttribute(initialLabel)}"
+          data-incident-id="${id}"
+          data-status-problem
+          data-status-kind="incident"
+          data-status-service="${service}"
+          data-start="${start}"
+          data-end="${end}"
+          data-tooltip-service-label="${escapeAttribute(serviceLabel)}"
+          data-tooltip-group-title="${escapeAttribute(groupTitle)}"
+          data-tooltip-items="${escapeAttribute(JSON.stringify(items))}"
+          class="status-service-timeline__segment status-service-timeline__segment--problem status-service-timeline__segment--red"
+        ></a>
+      </div>
+      <div
+        id="status-service-timeline-tooltip-${id}"
         data-status-timeline-tooltip
         role="tooltip"
         aria-hidden="true"
@@ -572,54 +644,42 @@ describe('hydrateStatusTimeline', () => {
   });
 
   it('renders grouped tooltip entries as stacked single-record blocks', () => {
-    document.body.innerHTML = `
-      <div data-status-timeline data-range-days="10">
-        <div data-status-timeline-track>
-          <a
-            href="/status/incidents/grouped"
-            title="Электричество. 3 события за 9 мая"
-            aria-label="Электричество. 3 события за 9 мая"
-            data-incident-id="grouped"
-            data-status-problem
-            data-start="2026-05-09T03:00:00Z"
-            data-end="2026-05-09T20:05:00Z"
-            data-tooltip-service-label="Электричество"
-            data-tooltip-group-title="3 события за 9 мая"
-            data-tooltip-items='[{"kind":"incident","title":"Отключение 1","phase":"resolved","startedIso":"2026-05-09T03:00:00Z","startedHasTime":true,"endedIso":"2026-05-09T03:40:00Z","endedHasTime":true,"areas":${JSON.stringify(STATUS_AREAS)},"duration":{"totalMinutes":40}},{"kind":"incident","title":"Отключение 2","phase":"resolved","startedIso":"2026-05-09T08:10:00Z","startedHasTime":true,"endedIso":"2026-05-09T08:45:00Z","endedHasTime":true,"duration":{"totalMinutes":35}},{"kind":"incident","title":"Отключение 3","phase":"active","startedIso":"2026-05-09T19:20:00Z","startedHasTime":true,"endedHasTime":false}]'
-            class="status-service-timeline__segment status-service-timeline__segment--problem status-service-timeline__segment--red"
-          ></a>
-        </div>
-        <div
-          id="status-service-timeline-tooltip-grouped"
-          data-status-timeline-tooltip
-          role="tooltip"
-          aria-hidden="true"
-          hidden
-        >
-          <p>
-            <span
-              class="status-service-timeline__tooltip-phase-icon status-service-timeline__tooltip-phase-icon--alert"
-              data-status-tooltip-phase-icon-alert
-              hidden
-            ></span>
-            <span
-              class="status-service-timeline__tooltip-phase-icon status-service-timeline__tooltip-phase-icon--check"
-              data-status-tooltip-phase-icon-check
-              hidden
-             ></span>
-             <span data-status-tooltip-title></span>
-             <span data-status-tooltip-title-areas hidden></span>
-           </p>
-           <p data-status-tooltip-period></p>
-           <div data-status-tooltip-list hidden></div>
-           ${AREA_TEMPLATES}
-         </div>
-      </div>
-    `;
-
-    const root = document.querySelector(
-      '[data-status-timeline]',
-    ) as HTMLElement;
+    const root = renderGroupedTimeline({
+      id: 'grouped',
+      serviceLabel: 'Электричество',
+      groupTitle: '3\u00A0события за\u00A09\u00A0мая',
+      start: '2026-05-09T03:00:00Z',
+      end: '2026-05-09T20:05:00Z',
+      items: [
+        {
+          kind: 'incident',
+          title: 'Отключение\u00A01',
+          phase: 'resolved',
+          startedIso: '2026-05-09T03:00:00Z',
+          endedIso: '2026-05-09T03:40:00Z',
+          areas: STATUS_AREAS,
+          areaLabel:
+            'Шелково\u00A0Ривер, Шелково\u00A0Форест, Шелково\u00A0Парк, Шелково\u00A0Вилладж',
+          periodLabel: '9\u00A0мая, 06:00\u00A0—\u00A006:40 (40\u00A0мин.)',
+        },
+        {
+          kind: 'incident',
+          title: 'Отключение\u00A02',
+          phase: 'resolved',
+          startedIso: '2026-05-09T08:10:00Z',
+          endedIso: '2026-05-09T08:45:00Z',
+          periodLabel: '9\u00A0мая, 11:10\u00A0—\u00A011:45 (35\u00A0мин.)',
+        },
+        {
+          kind: 'incident',
+          title: 'Отключение\u00A03',
+          phase: 'active',
+          startedIso: '2026-05-09T19:20:00Z',
+          periodLabel: 'Начало\u00A09\u00A0мая, 22:20',
+          activePeriodLabel: 'Начиная с\u00A09\u00A0мая, 22:20',
+        },
+      ],
+    });
 
     hydrateStatusTimeline(root, {
       nowMs: Date.parse('2026-05-10T00:00:00Z'),
@@ -672,6 +732,11 @@ describe('hydrateStatusTimeline', () => {
         (icon) => icon.getAttribute('data-area'),
       ),
     ).toEqual(STATUS_AREAS);
+    expect(
+      visibleWhitespace(getProblemNode('grouped').getAttribute('aria-label')),
+    ).toMatchInlineSnapshot(
+      `"Электричество. 3·события за·9·мая. Отключение·1. 9·мая, 06:00·—·06:40 (40·мин.). Части поселка: Шелково·Ривер, Шелково·Форест, Шелково·Парк, Шелково·Вилладж. Отключение·2. 9·мая, 11:10·—·11:45 (35·мин.). Отключение·3. Начиная с·9·мая, 22:20"`,
+    );
   });
 
   it('clamps tooltip position within the component width', () => {
@@ -817,6 +882,93 @@ describe('bindStatusTimelineLazyHydration', () => {
 
   const getLazyProblemNode = (rootDocument: Document): HTMLElement =>
     rootDocument.querySelector('[data-status-problem]') as HTMLElement;
+
+  it('keeps grouped phases and accessible labels current through the real lazy client path', async () => {
+    const root = renderGroupedTimeline({
+      id: 'phase-transition',
+      serviceLabel: 'Электричество',
+      groupTitle: '1\u00A0событие за\u00A09\u00A0мая',
+      start: '2026-05-09T03:00:00Z',
+      end: '2026-05-09T03:40:00Z',
+      items: [
+        {
+          kind: 'incident',
+          title: 'Отключение\u00A0электричества',
+          phase: 'scheduled',
+          startedIso: '2026-05-09T03:00:00Z',
+          endedIso: '2026-05-09T03:40:00Z',
+          periodLabel: '9\u00A0мая, 06:00\u00A0—\u00A006:40',
+        },
+      ],
+    });
+    const trigger = getProblemNode('phase-transition');
+    const tooltip = getTooltip();
+    const readState = () => ({
+      phaseLabel: trigger.dataset.tooltipPhaseLabel,
+      ariaLabel: visibleWhitespace(trigger.getAttribute('aria-label')),
+      describedBy: trigger.getAttribute('aria-describedby'),
+      tooltipAriaHidden: tooltip.getAttribute('aria-hidden'),
+      alertIconCount: root.querySelectorAll(
+        '.status-service-timeline__tooltip-phase-icon--alert:not([hidden])',
+      ).length,
+      checkIconCount: root.querySelectorAll(
+        '.status-service-timeline__tooltip-phase-icon--check:not([hidden])',
+      ).length,
+    });
+    const setNowAndHydrate = async (
+      nowIso: string,
+      expectedPhaseLabel: string,
+    ): Promise<void> => {
+      window.__STATUS_TIMELINE_NOW__ = Date.parse(nowIso);
+      document.dispatchEvent(new Event('astro:page-load'));
+      await vi.waitFor(() => {
+        expect(trigger.dataset.tooltipPhaseLabel).toBe(expectedPhaseLabel);
+      });
+      trigger.dispatchEvent(new Event('mouseenter'));
+    };
+
+    window.__STATUS_TIMELINE_NOW__ = Date.parse('2026-05-09T02:00:00Z');
+    bindStatusTimelineLazyHydration();
+    trigger.dispatchEvent(new Event('pointerover', { bubbles: true }));
+    await vi.waitFor(() => {
+      expect(trigger.dataset.tooltipPhaseLabel).toBe('ожидается');
+    });
+
+    expect(readState()).toMatchInlineSnapshot(`
+      {
+        "alertIconCount": 0,
+        "ariaLabel": "Электричество. 1·событие за·9·мая. Отключение·электричества. 9·мая, 06:00·—·06:40",
+        "checkIconCount": 0,
+        "describedBy": "status-service-timeline-tooltip-phase-transition",
+        "phaseLabel": "ожидается",
+        "tooltipAriaHidden": "false",
+      }
+    `);
+
+    await setNowAndHydrate('2026-05-09T03:20:00Z', 'идет');
+    expect(readState()).toMatchInlineSnapshot(`
+      {
+        "alertIconCount": 1,
+        "ariaLabel": "Электричество. 1·событие за·9·мая. Отключение·электричества. 9·мая, 06:00·—·06:40",
+        "checkIconCount": 0,
+        "describedBy": "status-service-timeline-tooltip-phase-transition",
+        "phaseLabel": "идет",
+        "tooltipAriaHidden": "false",
+      }
+    `);
+
+    await setNowAndHydrate('2026-05-09T04:00:00Z', 'восстановлено');
+    expect(readState()).toMatchInlineSnapshot(`
+      {
+        "alertIconCount": 0,
+        "ariaLabel": "Электричество. 1·событие за·9·мая. Отключение·электричества. 9·мая, 06:00·—·06:40",
+        "checkIconCount": 1,
+        "describedBy": "status-service-timeline-tooltip-phase-transition",
+        "phaseLabel": "восстановлено",
+        "tooltipAriaHidden": "false",
+      }
+    `);
+  });
 
   it('keeps the full DOM module unloaded until a timeline segment interaction', async () => {
     const rootDocument = renderLazyTimelineDocument();

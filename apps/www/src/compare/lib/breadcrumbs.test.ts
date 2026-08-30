@@ -1,96 +1,85 @@
-import { describe, expect, it, vi } from 'vitest';
+import { serializeSchema } from '@shelkovo/seo';
+import { beforeAll, describe, expect, it } from 'vitest';
 
-vi.mock('./site', () => ({
-  canon: (path: string) =>
-    new URL(
-      path.replace(/^\//, ''),
-      'https://kpshelkovo.online/815/compare/',
-    ).toString(),
-}));
+import type { BreadcrumbItem } from '@/lib/breadcrumbs';
 
-vi.mock('./url', () => ({
-  withBase: (path: string) =>
-    `/815/compare${path.startsWith('/') ? path : `/${path}`}`,
-}));
+const SITE = 'https://kpshelkovo.online';
+const FIXTURE_LABEL = 'Fixture';
 
-const loadBreadcrumbs = () => import('./breadcrumbs');
+let compareBreadcrumbs: typeof import('./breadcrumbs').compareBreadcrumbs;
+let compareBreadcrumbSchema: typeof import('./breadcrumbs').compareBreadcrumbSchema;
+let comparePageBreadcrumbs: typeof import('./breadcrumbs').comparePageBreadcrumbs;
+let settlementBreadcrumbs: typeof import('./breadcrumbs').settlementBreadcrumbs;
 
-interface BreadcrumbListItem {
-  readonly position: number;
-  readonly item: string;
-  readonly name: string;
-}
+beforeAll(async () => {
+  Object.assign(import.meta.env, {
+    SITE,
+    BASE_URL: '/',
+  });
 
-const href = <T extends { readonly label: string }>(
-  item: T,
-): string | undefined => ('href' in item ? String(item.href) : undefined);
+  ({
+    compareBreadcrumbs,
+    compareBreadcrumbSchema,
+    comparePageBreadcrumbs,
+    settlementBreadcrumbs,
+  } = await import('./breadcrumbs'));
+});
 
-const schemaItems = (schema: {
-  readonly itemListElement?: unknown;
-}): readonly BreadcrumbListItem[] => {
-  if (!Array.isArray(schema.itemListElement)) {
+const assertPageContract = (
+  breadcrumbs: readonly Required<BreadcrumbItem>[],
+) => {
+  const schema = compareBreadcrumbSchema(breadcrumbs);
+  const [serialized] = serializeSchema(schema);
+
+  if (!serialized) {
+    throw new Error('Breadcrumb schema must be serializable');
+  }
+
+  const parsed = JSON.parse(serialized) as Record<string, unknown>;
+  const items = parsed.itemListElement;
+
+  if (!Array.isArray(items)) {
     throw new Error('Breadcrumb schema must include itemListElement');
   }
 
-  return schema.itemListElement as readonly BreadcrumbListItem[];
+  expect(serialized).toBe(JSON.stringify(parsed));
+  expect(parsed).toMatchObject({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+  });
+  expect(items).toHaveLength(breadcrumbs.length);
+
+  items.forEach((item: Record<string, unknown>, index) => {
+    const breadcrumb = breadcrumbs[index];
+
+    if (!breadcrumb) {
+      throw new Error(`Missing visible breadcrumb at position ${index + 1}`);
+    }
+
+    expect(item).toMatchObject({
+      name: breadcrumb.label,
+      item: new URL(breadcrumb.href, SITE).toString(),
+      position: index + 1,
+    });
+  });
 };
 
 describe('compare breadcrumbs', () => {
-  it('builds visible compare breadcrumbs for index and rating pages', async () => {
-    const { compareBreadcrumbs } = await loadBreadcrumbs();
-
-    expect(compareBreadcrumbs().map(href)).toMatchInlineSnapshot(`
-        [
-          "/",
-          "/815/compare/",
-        ]
-      `);
+  it('keeps the canonical compare route', () => {
+    expect(compareBreadcrumbs()[1].href).toBe('/815/compare/');
   });
 
-  it('adds the settlement name only on settlement pages', async () => {
-    const { settlementBreadcrumbs } = await loadBreadcrumbs();
-
-    const breadcrumbs = settlementBreadcrumbs('КП Шелково');
-
-    expect(breadcrumbs).toHaveLength(3);
-    expect(breadcrumbs.map(href)).toMatchInlineSnapshot(`
-      [
-        "/",
-        "/815/compare/",
-        undefined,
-      ]
-    `);
-    expect(breadcrumbs.at(-1)?.label).toBe('КП Шелково');
-  });
-
-  it('builds schema breadcrumbs with canonical URLs', async () => {
-    const { compareBreadcrumbSchema } = await loadBreadcrumbs();
-
-    const schema = compareBreadcrumbSchema([
-      {
-        name: 'КП Шелково',
-        item: 'https://kpshelkovo.online/815/compare/settlements/shelkovo/',
-      },
-    ]);
-
-    expect(schema['@context']).toBe('https://schema.org');
-    expect(schema['@type']).toBe('BreadcrumbList');
-    const items = schemaItems(schema);
-
-    expect(items.map((item) => item.position)).toMatchInlineSnapshot(`
-        [
-          1,
-          2,
-          3,
-        ]
-      `);
-    expect(items.map((item) => item.item)).toMatchInlineSnapshot(`
-        [
-          "https://kpshelkovo.online/",
-          "https://kpshelkovo.online/815/compare/",
-          "https://kpshelkovo.online/815/compare/settlements/shelkovo/",
-        ]
-      `);
-    expect(items.at(-1)?.name).toBe('КП Шелково');
-  });
+  it.each([
+    ['index', () => compareBreadcrumbs()],
+    ['rating', () => comparePageBreadcrumbs(FIXTURE_LABEL, '/fixture-rating/')],
+    [
+      'settlement',
+      () => settlementBreadcrumbs(FIXTURE_LABEL, 'fixture-settlement'),
+    ],
+  ])(
+    'keeps visible and serialized breadcrumbs aligned on the %s route',
+    (_, breadcrumbs) => {
+      assertPageContract(breadcrumbs());
+    },
+  );
 });

@@ -1,26 +1,13 @@
 import type { SchemaDoc } from '@shelkovo/seo';
 
-import { canon } from './site';
-import { withBase } from './url';
+import type { BreadcrumbItem } from '@/lib/breadcrumbs';
+import { breadcrumbListSchema } from '@/lib/json-ld';
+import type { BreadcrumbLink } from '@/lib/json-ld-types';
 
-interface SchemaBreadcrumb {
-  readonly name: string;
-  readonly item: string;
-}
+import { withBase } from './url';
 
 const HOME_LABEL = 'Главная';
 const COMPARE_LABEL = 'Сравнение тарифов';
-const CANONICAL_SITE = 'https://kpshelkovo.online';
-
-const homeUrl = (): string =>
-  new URL('/', import.meta.env.SITE ?? CANONICAL_SITE).toString();
-
-const listItem = (name: string, item: string, position: number): SchemaDoc => ({
-  '@type': 'ListItem',
-  position,
-  name,
-  item,
-});
 
 export const compareBreadcrumbs = () =>
   [
@@ -28,17 +15,17 @@ export const compareBreadcrumbs = () =>
     { label: COMPARE_LABEL, href: withBase('/') },
   ] as const;
 
-export const settlementBreadcrumbs = (name: string) =>
-  [...compareBreadcrumbs(), { label: name }] as const;
+export const comparePageBreadcrumbs = (label: string, path: string) =>
+  [...compareBreadcrumbs(), { label, href: withBase(path) }] as const;
+
+export const settlementBreadcrumbs = (name: string, slug: string) =>
+  comparePageBreadcrumbs(name, `/settlements/${slug}/`);
+
+const schemaBreadcrumb = (item: Required<BreadcrumbItem>): BreadcrumbLink => ({
+  name: item.label,
+  url: item.href,
+});
 
 export const compareBreadcrumbSchema = (
-  items: readonly SchemaBreadcrumb[] = [],
-): SchemaDoc => ({
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    listItem(HOME_LABEL, homeUrl(), 1),
-    listItem(COMPARE_LABEL, canon('/'), 2),
-    ...items.map((item, index) => listItem(item.name, item.item, index + 3)),
-  ],
-});
+  items: readonly Required<BreadcrumbItem>[],
+): SchemaDoc => breadcrumbListSchema(items.map(schemaBreadcrumb));

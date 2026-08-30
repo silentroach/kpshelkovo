@@ -196,6 +196,33 @@ describe('mapRawMeeting', () => {
     );
   });
 
+  it('renders transcript source text through the safe Markdown pipeline', () => {
+    const result = map({
+      transcript: {
+        segments: [
+          {
+            start: '00:00:00',
+            speaker: 'moderator',
+            text: `Компания "ОК" & жители
+Первая строка
+Вторая строка
+
+<script>alert("x")</script>
+
+<a href="https://example.com?a=1&b=2">link</a>`,
+          },
+        ],
+      },
+    });
+
+    expect(result.transcript.segments[0]?.textHtml).toMatchInlineSnapshot(`
+      "<p>Компания «ОК» &#x26; жители
+      Первая строка
+      Вторая строка</p>
+      <p>link</p>"
+    `);
+  });
+
   it('keeps place mention targets consistent in HTML and Markdown transcripts', () => {
     const result = map({
       transcript: {

@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import * as geo from '@shelkovo/geo';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   buildRatings,
   MKAD_RADIUS,
@@ -8,6 +9,10 @@ import {
 import { mapRawSettlement } from './settlement/mapper';
 import type { RawSettlement } from './settlement/schema';
 import type { Settlement } from './settlement/types';
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 function mk(
   slug: string,
@@ -50,6 +55,14 @@ function mk(
 }
 
 describe('buildRatings', () => {
+  it('calculates distance to Moscow once per settlement', () => {
+    const calculateDistance = vi.spyOn(geo, 'calculateDistance');
+
+    buildRatings([mk('first'), mk('second')]);
+
+    expect(calculateDistance).toHaveBeenCalledTimes(2);
+  });
+
   it('uses distance from Moscow beyond MKAD radius', () => {
     const rows = buildRatings([
       mk('near', {

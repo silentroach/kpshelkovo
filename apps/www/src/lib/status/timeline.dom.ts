@@ -7,17 +7,19 @@ import {
 } from './timeline';
 import { resolveStatusIncidentState } from './lifecycle';
 import {
-  buildStatusTimelineTooltipListItemData,
   formatStatusTimelineTooltipGroupLabel,
-  type StatusTimelineTooltipListItemData,
-} from './view';
+  toStatusTimelineTooltipListItemData,
+} from './timeline-tooltip';
 import {
   STATUS_AREAS,
   STATUS_SERVICES,
   type StatusArea,
   type StatusService,
 } from './schema';
-import type { StatusTimelineTooltipItemDto } from './timeline-tooltip-dto';
+import type {
+  StatusTimelineTooltipItemDto,
+  StatusTimelineTooltipListItemData,
+} from './timeline-tooltip.types';
 
 export interface StatusTimelineHydrationOptions {
   readonly nowMs?: number;
@@ -185,16 +187,14 @@ const isTimelineTooltipSerializedItem = (
       candidate.phase === 'scheduled') &&
     typeof candidate.startedIso === 'string' &&
     Number.isFinite(Date.parse(candidate.startedIso)) &&
-    typeof candidate.startedHasTime === 'boolean' &&
-    typeof candidate.endedHasTime === 'boolean' &&
     (candidate.endedIso === undefined ||
       (typeof candidate.endedIso === 'string' &&
         Number.isFinite(Date.parse(candidate.endedIso)))) &&
-    (candidate.duration === undefined ||
-      (Boolean(candidate.duration) &&
-        typeof candidate.duration === 'object' &&
-        typeof candidate.duration.totalMinutes === 'number' &&
-        Number.isFinite(candidate.duration.totalMinutes))) &&
+    typeof candidate.periodLabel === 'string' &&
+    (candidate.activePeriodLabel === undefined ||
+      typeof candidate.activePeriodLabel === 'string') &&
+    (candidate.areaLabel === undefined ||
+      typeof candidate.areaLabel === 'string') &&
     (candidate.areas === undefined ||
       (Array.isArray(candidate.areas) &&
         candidate.areas.length > 0 &&
@@ -221,11 +221,6 @@ const parseStatusTimelineTooltipItems = (
     return undefined;
   }
 };
-
-const toStatusTimelineTooltipListItemData = (
-  item: StatusTimelineTooltipItemDto,
-): StatusTimelineTooltipListItemData =>
-  buildStatusTimelineTooltipListItemData(item, { nonBreaking: true });
 
 const readStatusTimelineTooltipData = (
   trigger: HTMLElement,

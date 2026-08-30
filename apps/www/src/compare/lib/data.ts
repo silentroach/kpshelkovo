@@ -33,9 +33,10 @@ const requireBaseline = (settlements: readonly Settlement[]): Settlement => {
 
 export async function loadSettlements(): Promise<SettlementData> {
   const settlements = await getCollection('settlements');
-  const mapped = settlements.map(
-    (entry: CollectionEntry<'settlements'>): Settlement =>
+  const mapped = Object.freeze(
+    settlements.map((entry: CollectionEntry<'settlements'>): Settlement =>
       mapRawSettlement(entry.data as RawSettlement),
+    ),
   );
 
   return {
@@ -49,9 +50,9 @@ export async function loadSettlements(): Promise<SettlementData> {
  * Returns a Map of slug -> ComparisonResult
  */
 export function compareAllSettlements(
-  settlements: Settlement[],
+  settlements: readonly Settlement[],
   baseline: Settlement,
-): Map<string, ComparisonResult> {
+): ReadonlyMap<string, ComparisonResult> {
   const comparisons = new Map<string, ComparisonResult>();
 
   for (const settlement of settlements) {
@@ -62,11 +63,20 @@ export function compareAllSettlements(
   return comparisons;
 }
 
-export async function loadAllData(): Promise<CompareData> {
+const buildData = async (): Promise<CompareData> => {
   const { settlements, baseline } = await loadSettlements();
   const ratings = buildRatings(settlements);
   const stats = computeStats(settlements, ratings, baseline);
   const comparisons = compareAllSettlements(settlements, baseline);
 
-  return { settlements, baseline, stats, comparisons, ratings };
-}
+  return Object.freeze({ settlements, baseline, stats, comparisons, ratings });
+};
+
+let buildSnapshot: Promise<CompareData> | undefined;
+
+export const loadAllData = (): Promise<CompareData> => {
+  if (import.meta.env.DEV) return buildData();
+
+  buildSnapshot ??= buildData();
+  return buildSnapshot;
+};

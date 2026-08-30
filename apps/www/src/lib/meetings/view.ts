@@ -1,7 +1,5 @@
 import { dateTimeFromISO } from '@shelkovo/format';
 
-import { renderMarkdown } from '@/lib/markdown/render';
-
 import type {
   Meeting,
   MeetingMoment,
@@ -77,6 +75,3 @@ export const formatMeetingSourceLabel = (
 export const formatMeetingSpeakerAnchor = (
   speaker: Pick<MeetingSpeaker, 'id'>,
 ): string => `speaker-${speaker.id}`;
-
-export const formatTranscriptTextHtml = (text: string): string =>
-  renderMarkdown(text);

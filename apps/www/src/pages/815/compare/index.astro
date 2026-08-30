@@ -32,7 +32,7 @@ const cards = [...list].sort((a, b) => {
 const pageMeta = compareHomeMeta(stats.totalSettlements);
 const pageUrl = canon('/');
 const breadcrumbs = compareBreadcrumbs();
-const breadcrumb = compareBreadcrumbSchema();
+const breadcrumb = compareBreadcrumbSchema(breadcrumbs);
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',

@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getCollection } from 'astro:content';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { loadSettlements } from './data';
+import { loadAllData, loadSettlements } from './data';
 import type { RawSettlement } from './settlement/schema';
 
 const rawSettlement: RawSettlement = {
@@ -47,9 +48,14 @@ vi.mock('astro:content', () => ({
   getCollection: vi.fn(async () => rawSettlements.map((data) => ({ data }))),
 }));
 
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
+
 describe('loadSettlements', () => {
   beforeEach(() => {
     rawSettlements = [rawSettlement];
+    vi.mocked(getCollection).mockClear();
   });
 
   it('maps raw collection entries into domain settlements', async () => {
@@ -106,5 +112,31 @@ describe('loadSettlements', () => {
     await expect(loadSettlements()).rejects.toThrowErrorMatchingInlineSnapshot(
       `[Error: Settlements collection must contain exactly one baseline settlement; found 2 (duplicate-baseline, test)]`,
     );
+  });
+
+  it('shares one snapshot between build consumers', async () => {
+    vi.stubEnv('DEV', false);
+    vi.resetModules();
+    const { loadAllData: loadBuildData } = await import('./data');
+
+    const [first, second] = await Promise.all([
+      loadBuildData(),
+      loadBuildData(),
+    ]);
+    const third = await loadBuildData();
+
+    expect(getCollection).toHaveBeenCalledOnce();
+    expect(first).toBe(second);
+    expect(second).toBe(third);
+  });
+
+  it('reloads data for every consumer in development', async () => {
+    vi.stubEnv('DEV', true);
+
+    const first = await loadAllData();
+    const second = await loadAllData();
+
+    expect(getCollection).toHaveBeenCalledTimes(2);
+    expect(first).not.toBe(second);
   });
 });

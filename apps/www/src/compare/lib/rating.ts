@@ -9,9 +9,9 @@ import type {
 } from './settlement/types';
 
 export interface Rating {
-  score: number;
-  km: number;
-  ring: number;
+  readonly score: number;
+  readonly km: number;
+  readonly ring: number;
 }
 
 interface Group {
@@ -233,11 +233,13 @@ function near(km: number): number {
  * Build a stable quality rating for each settlement.
  * Tariff is intentionally excluded from the score.
  */
-export function buildRatings(settlements: Settlement[]): Map<string, Rating> {
+export function buildRatings(
+  settlements: readonly Settlement[],
+): ReadonlyMap<string, Rating> {
   return new Map(
     settlements.map((item) => {
       const km = getKm(item.location.lat, item.location.lng);
-      const ring = getRing(item.location.lat, item.location.lng);
+      const ring = Math.max(km - MKAD_RADIUS, 0);
       const base =
         100 *
         (mix(infra(item)) * 0.5 +

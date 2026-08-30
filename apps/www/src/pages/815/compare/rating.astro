@@ -2,7 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import {
-  compareBreadcrumbs,
+  comparePageBreadcrumbs,
   compareBreadcrumbSchema,
 } from '@/compare/lib/breadcrumbs';
 import { compareRatingMeta } from '@/compare/lib/seo';
@@ -12,7 +12,7 @@ import { withBase } from '@/compare/lib/url';
 const pageMeta = compareRatingMeta();
 const pageUrl = canon('/rating/');
 const breadcrumbLabel = 'Как считается уровень';
-const breadcrumbs = [...compareBreadcrumbs(), { label: breadcrumbLabel }];
+const breadcrumbs = comparePageBreadcrumbs(breadcrumbLabel, '/rating/');
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
@@ -21,9 +21,7 @@ const schema = {
   url: pageUrl,
   inLanguage: 'ru-RU',
 };
-const breadcrumb = compareBreadcrumbSchema([
-  { name: breadcrumbLabel, item: pageUrl },
-]);
+const breadcrumb = compareBreadcrumbSchema(breadcrumbs);
 
 const nav = [
   ['summary', 'Что это вообще такое'],
