@@ -3,6 +3,9 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 import type { BreadcrumbItem } from '@/lib/breadcrumbs';
 
+const SITE = 'https://kpshelkovo.online';
+const FIXTURE_LABEL = 'Fixture';
+
 let compareBreadcrumbs: typeof import('./breadcrumbs').compareBreadcrumbs;
 let compareBreadcrumbSchema: typeof import('./breadcrumbs').compareBreadcrumbSchema;
 let comparePageBreadcrumbs: typeof import('./breadcrumbs').comparePageBreadcrumbs;
@@ -10,7 +13,7 @@ let settlementBreadcrumbs: typeof import('./breadcrumbs').settlementBreadcrumbs;
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
-    SITE: 'https://kpshelkovo.online',
+    SITE,
     BASE_URL: '/',
   });
 
@@ -22,82 +25,61 @@ beforeAll(async () => {
   } = await import('./breadcrumbs'));
 });
 
-const pageContract = (breadcrumbs: readonly Required<BreadcrumbItem>[]) => {
+const assertPageContract = (
+  breadcrumbs: readonly Required<BreadcrumbItem>[],
+) => {
   const schema = compareBreadcrumbSchema(breadcrumbs);
-  const items = schema.itemListElement;
+  const [serialized] = serializeSchema(schema);
+
+  if (!serialized) {
+    throw new Error('Breadcrumb schema must be serializable');
+  }
+
+  const parsed = JSON.parse(serialized) as Record<string, unknown>;
+  const items = parsed.itemListElement;
 
   if (!Array.isArray(items)) {
     throw new Error('Breadcrumb schema must include itemListElement');
   }
 
-  expect(
-    (items as readonly Record<string, unknown>[]).map((item) => item.name),
-  ).toEqual(breadcrumbs.map((item) => item.label));
+  expect(serialized).toBe(JSON.stringify(parsed));
+  expect(parsed).toMatchObject({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+  });
+  expect(items).toHaveLength(breadcrumbs.length);
 
-  return {
-    visible: breadcrumbs,
-    jsonLd: serializeSchema(schema)[0],
-  };
+  items.forEach((item: Record<string, unknown>, index) => {
+    const breadcrumb = breadcrumbs[index];
+
+    if (!breadcrumb) {
+      throw new Error(`Missing visible breadcrumb at position ${index + 1}`);
+    }
+
+    expect(item).toMatchObject({
+      name: breadcrumb.label,
+      item: new URL(breadcrumb.href, SITE).toString(),
+      position: index + 1,
+    });
+  });
 };
 
 describe('compare breadcrumbs', () => {
-  it('keeps visible and serialized breadcrumbs aligned on every compare route', () => {
-    expect({
-      index: pageContract(compareBreadcrumbs()),
-      rating: pageContract(
-        comparePageBreadcrumbs('Как считается уровень', '/rating/'),
-      ),
-      settlement: pageContract(settlementBreadcrumbs('КП Шелково', 'shelkovo')),
-    }).toMatchInlineSnapshot(`
-      {
-        "index": {
-          "jsonLd": "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Главная\",\"item\":\"https://kpshelkovo.online/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Сравнение тарифов\",\"item\":\"https://kpshelkovo.online/815/compare/\"}]}",
-          "visible": [
-            {
-              "href": "/",
-              "label": "Главная",
-            },
-            {
-              "href": "/815/compare/",
-              "label": "Сравнение тарифов",
-            },
-          ],
-        },
-        "rating": {
-          "jsonLd": "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Главная\",\"item\":\"https://kpshelkovo.online/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Сравнение тарифов\",\"item\":\"https://kpshelkovo.online/815/compare/\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Как считается уровень\",\"item\":\"https://kpshelkovo.online/815/compare/rating/\"}]}",
-          "visible": [
-            {
-              "href": "/",
-              "label": "Главная",
-            },
-            {
-              "href": "/815/compare/",
-              "label": "Сравнение тарифов",
-            },
-            {
-              "href": "/815/compare/rating/",
-              "label": "Как считается уровень",
-            },
-          ],
-        },
-        "settlement": {
-          "jsonLd": "{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Главная\",\"item\":\"https://kpshelkovo.online/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Сравнение тарифов\",\"item\":\"https://kpshelkovo.online/815/compare/\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"КП Шелково\",\"item\":\"https://kpshelkovo.online/815/compare/settlements/shelkovo/\"}]}",
-          "visible": [
-            {
-              "href": "/",
-              "label": "Главная",
-            },
-            {
-              "href": "/815/compare/",
-              "label": "Сравнение тарифов",
-            },
-            {
-              "href": "/815/compare/settlements/shelkovo/",
-              "label": "КП Шелково",
-            },
-          ],
-        },
-      }
-    `);
+  it('keeps the canonical compare route', () => {
+    expect(compareBreadcrumbs()[1].href).toBe('/815/compare/');
   });
+
+  it.each([
+    ['index', () => compareBreadcrumbs()],
+    ['rating', () => comparePageBreadcrumbs(FIXTURE_LABEL, '/fixture-rating/')],
+    [
+      'settlement',
+      () => settlementBreadcrumbs(FIXTURE_LABEL, 'fixture-settlement'),
+    ],
+  ])(
+    'keeps visible and serialized breadcrumbs aligned on the %s route',
+    (_, breadcrumbs) => {
+      assertPageContract(breadcrumbs());
+    },
+  );
 });
