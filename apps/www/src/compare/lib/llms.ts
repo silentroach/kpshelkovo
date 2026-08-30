@@ -10,6 +10,7 @@ import {
 import { loadAllData } from './data';
 import { canon } from './site';
 import type { Settlement } from './settlement/types';
+import { withBase } from './url';
 
 function abs(path: string): string {
   return canon(path);
@@ -42,6 +43,9 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
   const short = abs('/llms.txt');
   const full = abs('/llms-full.txt');
   const skills = abs('/.well-known/agent-skills/index.json');
+  const feedPath = withBase('/data/settlements.json');
+  const explorerPath = withBase('/data/explorer.json');
+  const settlementPath = withBase('/settlements/[slug]/');
 
   return kind === 'short'
     ? serializeLlmsDocument({
@@ -69,10 +73,10 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
           ]),
           llmsSection('Что открывать первым', [
             markdownList([
-              'Для анализа всех поселков используйте `data/settlements.json`.',
-              '`data/explorer.json` нужен только для облегченного списка, карты и минимального набора данных.',
+              `Для анализа всех поселков используйте \`${feedPath}\`.`,
+              `\`${explorerPath}\` нужен только для облегченного списка, карты и минимального набора данных.`,
               'Список `sources` остается на детальных страницах и не входит в общую ленту.',
-              'Если нужен первоисточник или человекочитаемый контекст, переходите на `/settlements/[slug]/`.',
+              `Если нужен первоисточник или человекочитаемый контекст, переходите на \`${settlementPath}\`.`,
             ]),
           ]),
           llmsSection('Ограничения данных', [
@@ -108,7 +112,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               ...refs(list),
             ]),
           ]),
-          llmsSection('Описание data/settlements.json', [
+          llmsSection(`Описание ${feedPath}`, [
             markdownList([
               'Это основная структурированная лента для массового анализа поселков.',
               'Структура `settlements[]` включает подтвержденные поля карточки поселка: `name`, `short_name`, `slug`, `website`, `telegram`, `management_company`, полный `location`, полный `tariff`, необязательный блок `lots`, `water_in_tariff`, `rabstvo`, `infrastructure`, `common_spaces`, `service_model`, вычисленное поле `rating` и объект `distance` с `moscow_km`, `mkad_km`, `shelkovo_km`.',
@@ -118,7 +122,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'Список первоисточников `sources` в общую ленту не включен; за ним нужно идти на детальную страницу поселка.',
             ]),
           ]),
-          llmsSection('Описание data/explorer.json', [
+          llmsSection(`Описание ${explorerPath}`, [
             markdownList([
               'Это отдельная облегченная лента для главного списка и карты, а не основной источник для анализа.',
               'Его `settlements[]` включает только `name`, `shortName`, `slug`, `rating`, `isBaseline`, `location.lat`, `location.lng`, `location.district`, `tariff.normalizedPerSotkaMonth`, `tariff.normalizedIsEstimate`, а также необязательные `rabstvo` и сокращенный `managementCompany`.',
@@ -127,9 +131,9 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
           ]),
           llmsSection('Детальные страницы поселков', [
             markdownList([
-              'Страницы вида `/settlements/[slug]/` остаются каноническим человекочитаемым представлением по одному поселку.',
+              `Страницы вида \`${settlementPath}\` остаются каноническим человекочитаемым представлением по одному поселку.`,
               'Они удобны, когда нужно дать ссылку на HTML или Markdown-страницу, а не только забрать структурированные данные.',
-              'Если нужна максимально полная структурированная картина, сначала используйте `data/settlements.json`, а затем переходите на детальную страницу по `slug`.',
+              `Если нужна максимально полная структурированная картина, сначала используйте \`${feedPath}\`, а затем переходите на детальную страницу по \`slug\`.`,
             ]),
           ]),
           llmsSection('Рейтинг', [
@@ -146,7 +150,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'Если факт не подтвержден источником, поле может быть опущено.',
               'Отсутствие поля означает «неизвестно», а не «точно нет».',
               'Основной язык сайта русский; названия поселков, разделов и часть полей заданы по-русски.',
-              '`data/explorer.json` оптимизирован для списка и карты и не заменяет полную ленту `data/settlements.json`.',
+              `\`${explorerPath}\` оптимизирован для списка и карты и не заменяет полную ленту \`${feedPath}\`.`,
             ]),
           ]),
         ],

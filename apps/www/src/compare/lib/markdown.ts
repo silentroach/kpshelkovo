@@ -37,7 +37,7 @@ import type {
 } from './settlement/types';
 import { getLotAverage } from './settlement/lots';
 import { canon } from './site';
-import { telegram } from './url';
+import { telegram, withBase } from './url';
 
 const src = {
   official: 'официальный источник',
@@ -306,7 +306,7 @@ export async function buildHomeMd(): Promise<string> {
   ];
 
   return serialize([
-    md.heading(1, 'Сравни тариф КП Шелково с другими поселками'),
+    md.heading(1, 'Сравнение тарифов поселков'),
     md.paragraph(
       'Структурированное сравнение тарифа КП Шелково с другими коттеджными поселками по тарифам, инфраструктуре, общественным пространствам, сервисной модели и условному рейтингу качества среды.',
     ),
@@ -323,10 +323,10 @@ export async function buildHomeMd(): Promise<string> {
     md.heading(2, 'Markdown-доступ'),
     md.list([
       md.listItem(
-        'HTML-маршруты /, /rating/ и страницы поселков /settlements/SLUG/ поддерживают заголовок Accept: text/markdown.',
+        `HTML-маршруты ${withBase('/')}, ${withBase('/rating/')} и страницы поселков ${withBase('/settlements/SLUG/')} поддерживают заголовок Accept: text/markdown.`,
       ),
       md.listItem(
-        'Прямые Markdown-адреса: /index.md, /rating/index.md, /settlements/SLUG/index.md.',
+        `Прямые Markdown-адреса: ${withBase('/index.md')}, ${withBase('/rating/index.md')}, ${withBase('/settlements/SLUG/index.md')}.`,
       ),
     ]),
     md.heading(2, 'Ограничения данных'),
@@ -334,10 +334,10 @@ export async function buildHomeMd(): Promise<string> {
       md.listItem('Если факт не подтвержден источником, поле опускается.'),
       md.listItem('Отсутствие поля означает «неизвестно», а не «точно нет».'),
       codeListItem(
-        '`data/settlements.json` является основным полным JSON-файлом поселков.',
+        `\`${withBase('/data/settlements.json')}\` является основным полным JSON-файлом поселков.`,
       ),
       codeListItem(
-        '`data/explorer.json` сокращен для списка, карты и массового сравнения.',
+        `\`${withBase('/data/explorer.json')}\` сокращен для списка, карты и массового сравнения.`,
       ),
       md.listItem('Тариф намеренно не входит в формулу условного рейтинга.'),
     ]),

@@ -433,7 +433,7 @@ export function openapi(root: string): Record<string, unknown> {
     openapi: '3.1.0',
     jsonSchemaDialect: 'https://json-schema.org/draft/2020-12/schema',
     info: {
-      title: 'Сравни.Шелково Settlements Feed',
+      title: 'Сравнение поселков: лента данных',
       version: '1.0.0',
       description:
         'OpenAPI-описание полной ленты поселков только для чтения с вычисленными расстояниями, пригодное для автоматического обнаружения.',

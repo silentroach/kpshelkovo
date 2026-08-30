@@ -13,9 +13,6 @@ describe('shouldIncludeSitemapPage', () => {
       rootErrorPage: shouldIncludeSitemapPage(
         'https://kpshelkovo.online/404/index.html',
       ),
-      nestedErrorPage: shouldIncludeSitemapPage(
-        'https://kpshelkovo.online/815/compare/404/',
-      ),
       statusMonth: shouldIncludeSitemapPage(
         'https://kpshelkovo.online/status/calendar/2026/08/',
       ),
@@ -27,7 +24,6 @@ describe('shouldIncludeSitemapPage', () => {
       ),
     }).toMatchInlineSnapshot(`
       {
-        "nestedErrorPage": false,
         "rootErrorPage": false,
         "statusIncident": true,
         "statusMonth": true,

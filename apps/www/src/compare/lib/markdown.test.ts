@@ -156,7 +156,7 @@ describe('compare markdown navigation', () => {
     const { buildHomeMd } = await loadMarkdown();
 
     expect(visibleWhitespace(await buildHomeMd())).toMatchInlineSnapshot(`
-      "# Сравни тариф КП Шелково с другими поселками
+      "# Сравнение тарифов поселков
 
       Структурированное сравнение тарифа КП Шелково с другими коттеджными поселками по тарифам, инфраструктуре, общественным пространствам, сервисной модели и условному рейтингу качества среды.
 
@@ -180,15 +180,15 @@ describe('compare markdown navigation', () => {
 
       ## Markdown-доступ
 
-      - HTML-маршруты /, /rating/ и страницы поселков /settlements/SLUG/ поддерживают заголовок Accept: text/markdown.
-      - Прямые Markdown-адреса: /index.md, /rating/index.md, /settlements/SLUG/index.md.
+      - HTML-маршруты /815/compare/, /815/compare/rating/ и страницы поселков /815/compare/settlements/SLUG/ поддерживают заголовок Accept: text/markdown.
+      - Прямые Markdown-адреса: /815/compare/index.md, /815/compare/rating/index.md, /815/compare/settlements/SLUG/index.md.
 
       ## Ограничения данных
 
       - Если факт не подтвержден источником, поле опускается.
       - Отсутствие поля означает «неизвестно», а не «точно нет».
-      - \`data/settlements.json\` является основным полным JSON-файлом поселков.
-      - \`data/explorer.json\` сокращен для списка, карты и массового сравнения.
+      - \`/815/compare/data/settlements.json\` является основным полным JSON-файлом поселков.
+      - \`/815/compare/data/explorer.json\` сокращен для списка, карты и массового сравнения.
       - Тариф намеренно не входит в формулу условного рейтинга.
       "
     `);
