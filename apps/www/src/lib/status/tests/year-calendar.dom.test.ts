@@ -3,9 +3,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { visibleWhitespace } from '@/lib/test/visible-whitespace';
 
 import {
-  installStatusCalendarYearInteractions,
   positionStatusCalendarTooltip,
   refreshStatusCalendarToday,
+  registerStatusCalendarYearInteractions,
 } from '../year-calendar.dom';
 
 const calendarDate = (id: string): string => `
@@ -15,13 +15,21 @@ const calendarDate = (id: string): string => `
 `;
 
 describe('refreshStatusCalendarToday', () => {
-  it('moves the marker to the current Moscow date after midnight', () => {
+  it('replaces a stale marker with the current Moscow date on initialization', () => {
     document.body.innerHTML = `
       ${calendarDate('2026-08-27')}
       ${calendarDate('2026-08-28')}
     `;
+    const staleToday = document.querySelector<HTMLElement>(
+      '[data-status-calendar-date="2026-08-27"]',
+    );
+    if (!staleToday) {
+      throw new Error('status calendar today fixture is incomplete');
+    }
 
-    refreshStatusCalendarToday(new Date('2026-08-27T20:59:59.000Z'));
+    staleToday.classList.add('status-calendar-date--today');
+    staleToday.dataset.statusCalendarToday = '2026-08-27';
+    staleToday.querySelector('time')?.setAttribute('aria-current', 'date');
     refreshStatusCalendarToday(new Date('2026-08-27T21:00:00.000Z'));
 
     expect(
@@ -92,7 +100,7 @@ describe('positionStatusCalendarTooltip', () => {
   });
 });
 
-describe('installStatusCalendarYearInteractions', () => {
+describe('registerStatusCalendarYearInteractions', () => {
   const renderTooltip = (year = 2026) => {
     const dayId = `${String(year)}-08-24`;
 
@@ -118,6 +126,7 @@ describe('installStatusCalendarYearInteractions', () => {
           ><span aria-hidden="true" data-status-calendar-tooltip-text>Fallback</span></span>
         </span>
       </div>
+      <status-year-calendar-lifecycle hidden></status-year-calendar-lifecycle>
       <button type="button">После календаря</button>
     `;
     const root = document.querySelector<HTMLElement>(
@@ -135,7 +144,6 @@ describe('installStatusCalendarYearInteractions', () => {
   };
 
   afterEach(() => {
-    document.dispatchEvent(new Event('astro:before-swap'));
     document.body.innerHTML = '';
     vi.restoreAllMocks();
     vi.useRealTimers();
@@ -144,7 +152,7 @@ describe('installStatusCalendarYearInteractions', () => {
   it('opens on mouse hover, remains hoverable, and reopens after Escape', () => {
     const { root, link, tooltip, button } = renderTooltip();
 
-    installStatusCalendarYearInteractions();
+    registerStatusCalendarYearInteractions();
     link.dispatchEvent(
       new PointerEvent('pointerover', {
         bubbles: true,
@@ -204,7 +212,7 @@ describe('installStatusCalendarYearInteractions', () => {
   it('opens and closes for a pen pointer', () => {
     const { root, link, button } = renderTooltip();
 
-    installStatusCalendarYearInteractions();
+    registerStatusCalendarYearInteractions();
     link.dispatchEvent(
       new PointerEvent('pointerover', {
         bubbles: true,
@@ -234,7 +242,7 @@ describe('installStatusCalendarYearInteractions', () => {
   it('opens on keyboard focus and reopens after Escape and blur', () => {
     const { root, link, tooltip, button } = renderTooltip();
 
-    installStatusCalendarYearInteractions();
+    registerStatusCalendarYearInteractions();
     link.focus();
     const opened = root.hasAttribute('data-status-calendar-tooltip-open');
     link.dispatchEvent(
@@ -268,7 +276,7 @@ describe('installStatusCalendarYearInteractions', () => {
     const unsafeSummary = '<img src=x onerror="alert(1)">';
 
     root.dataset.statusCalendarTooltipSummary = unsafeSummary;
-    installStatusCalendarYearInteractions();
+    registerStatusCalendarYearInteractions();
     link.dispatchEvent(
       new PointerEvent('pointerover', {
         bubbles: true,
@@ -311,56 +319,77 @@ describe('installStatusCalendarYearInteractions', () => {
     `);
   });
 
-  it('owns listeners and the minute timer only while a calendar route is active', () => {
-    vi.useFakeTimers();
+  it('initializes each calendar DOM once and stops work after disconnect', () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-08-24T12:00:00.000Z'));
-    const clearInterval = vi.spyOn(window, 'clearInterval');
+    registerStatusCalendarYearInteractions();
+    const querySelectorAll = vi.spyOn(Element.prototype, 'querySelectorAll');
     const firstCalendar = renderTooltip();
 
-    installStatusCalendarYearInteractions();
-    const firstTimer = vi.getTimerCount();
     firstCalendar.link.dispatchEvent(
       new PointerEvent('pointerover', {
         bubbles: true,
         pointerType: 'mouse',
       }),
     );
+    const firstTodayInitializations = querySelectorAll.mock.calls.filter(
+      ([selector]) =>
+        selector ===
+        '[data-status-calendar-today], .status-calendar-date--today',
+    ).length;
 
-    document.dispatchEvent(new Event('astro:before-swap'));
-    document.body.innerHTML =
-      '<main><button type="button">Обычная страница</button></main>';
-    document.dispatchEvent(new Event('astro:page-load'));
+    document.body.innerHTML = `
+      <main>
+        <span
+          data-status-calendar-tooltip-root
+          data-status-calendar-tooltip-summary="Обычная страница"
+        >
+          <button type="button">Обычная страница</button>
+          <span aria-hidden="true" data-status-calendar-tooltip>
+            <span data-status-calendar-tooltip-text>Fallback</span>
+          </span>
+        </span>
+      </main>
+    `;
+    querySelectorAll.mockClear();
+    const outsideRoot = document.querySelector<HTMLElement>(
+      '[data-status-calendar-tooltip-root]',
+    );
+    const outsideButton = outsideRoot?.querySelector('button');
+    if (!outsideRoot || !outsideButton) {
+      throw new Error('non-calendar fixture is incomplete');
+    }
 
-    const closest = vi.spyOn(Element.prototype, 'closest');
-    const querySelectorAll = vi.spyOn(document, 'querySelectorAll');
-    document.querySelector('button')?.dispatchEvent(
+    outsideButton.dispatchEvent(
       new PointerEvent('pointerover', {
         bubbles: true,
         pointerType: 'mouse',
       }),
     );
+    outsideButton.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    const openedOutsideCalendar = outsideRoot.hasAttribute(
+      'data-status-calendar-tooltip-open',
+    );
+    outsideRoot.setAttribute('data-status-calendar-tooltip-open', '');
     document.body.dispatchEvent(
       new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }),
     );
-    vi.advanceTimersByTime(120_000);
     document.dispatchEvent(new Event('astro:page-load'));
+    const todayInitializationsOutsideCalendar =
+      querySelectorAll.mock.calls.filter(
+        ([selector]) =>
+          selector ===
+          '[data-status-calendar-today], .status-calendar-date--today',
+      ).length;
 
-    const workOutsideCalendar = {
-      tooltipLookups: closest.mock.calls.filter(
-        ([selector]) => selector === '[data-status-calendar-tooltip-root]',
-      ).length,
-      todayRefreshes: querySelectorAll.mock.calls.filter(([selector]) =>
-        String(selector).includes('[data-status-calendar-today]'),
-      ).length,
-      timers: vi.getTimerCount(),
-    };
-
-    document.dispatchEvent(new Event('astro:before-swap'));
+    querySelectorAll.mockClear();
     vi.setSystemTime(new Date('2027-08-24T12:00:00.000Z'));
     const returnedCalendar = renderTooltip(2027);
     const tooltipBounds = vi
       .spyOn(returnedCalendar.tooltip, 'getBoundingClientRect')
       .mockReturnValue({ left: 20, right: 200 } as DOMRect);
+    registerStatusCalendarYearInteractions();
+    registerStatusCalendarYearInteractions();
     document.dispatchEvent(new Event('astro:page-load'));
     document.dispatchEvent(new Event('astro:page-load'));
     returnedCalendar.link.dispatchEvent(
@@ -369,15 +398,23 @@ describe('installStatusCalendarYearInteractions', () => {
         pointerType: 'mouse',
       }),
     );
+    const returnedTodayInitializations = querySelectorAll.mock.calls.filter(
+      ([selector]) =>
+        selector ===
+        '[data-status-calendar-today], .status-calendar-date--today',
+    ).length;
 
     expect({
-      firstTimer,
+      firstTodayInitializations,
       openedInitially: firstCalendar.root.hasAttribute(
         'data-status-calendar-tooltip-open',
       ),
-      clearedTimers: clearInterval.mock.calls.length,
-      workOutsideCalendar,
-      timersAfterReturn: vi.getTimerCount(),
+      openedOutsideCalendar,
+      keptOpenAfterOutsideEscape: outsideRoot.hasAttribute(
+        'data-status-calendar-tooltip-open',
+      ),
+      todayInitializationsOutsideCalendar,
+      returnedTodayInitializations,
       listenerCallsAfterReturn: tooltipBounds.mock.calls.length,
       openedAfterReturn: returnedCalendar.root.hasAttribute(
         'data-status-calendar-tooltip-open',
@@ -385,18 +422,15 @@ describe('installStatusCalendarYearInteractions', () => {
       todayAfterReturn: returnedCalendar.root.dataset.statusCalendarToday,
     }).toMatchInlineSnapshot(`
       {
-        "clearedTimers": 2,
-        "firstTimer": 1,
+        "firstTodayInitializations": 1,
+        "keptOpenAfterOutsideEscape": true,
         "listenerCallsAfterReturn": 1,
         "openedAfterReturn": true,
         "openedInitially": true,
-        "timersAfterReturn": 1,
+        "openedOutsideCalendar": false,
+        "returnedTodayInitializations": 1,
         "todayAfterReturn": "2027-08-24",
-        "workOutsideCalendar": {
-          "timers": 0,
-          "todayRefreshes": 0,
-          "tooltipLookups": 0,
-        },
+        "todayInitializationsOutsideCalendar": 0,
       }
     `);
   });

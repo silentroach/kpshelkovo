@@ -63,6 +63,7 @@ const breadcrumbs = withHomeBreadcrumbs([
           ))
         }
       </div>
+      <status-year-calendar-lifecycle hidden></status-year-calendar-lifecycle>
 
       <StatusCalendarLegend />
 
@@ -128,7 +129,7 @@ const breadcrumbs = withHomeBreadcrumbs([
 </BaseLayout>
 
 <script>
-  import { installStatusCalendarYearInteractions } from '@/lib/status/year-calendar.dom';
+  import { registerStatusCalendarYearInteractions } from '@/lib/status/year-calendar.dom';
 
-  installStatusCalendarYearInteractions();
+  registerStatusCalendarYearInteractions();
 </script>

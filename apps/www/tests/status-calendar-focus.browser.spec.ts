@@ -5,109 +5,118 @@ const monthPath = '/status/calendar/2026/08/';
 const dayPath = `${monthPath}#${dayId}`;
 const yearPath = '/status/calendar/2026/';
 
-const trackCalendarMinuteTimers = (page: Page): Promise<void> =>
-  page.addInitScript(() => {
-    const minuteTimers = new Set<number>();
-    const setInterval = window.setInterval.bind(window);
-    const clearInterval = window.clearInterval.bind(window);
+const calendarListenerWork = (page: Page) =>
+  page.evaluate(() => {
+    const querySelector = document.querySelector.bind(document);
+    let navigationQueries = 0;
 
-    window.setInterval = ((
-      handler: TimerHandler,
-      timeout?: number,
-      ...arguments_: readonly unknown[]
-    ): number => {
-      const timer = setInterval(handler, timeout, ...arguments_);
-
-      if (timeout === 60_000) {
-        minuteTimers.add(timer);
+    document.querySelector = ((selector: string) => {
+      if (selector === '[data-status-calendar-year]') {
+        navigationQueries += 1;
       }
 
-      return timer;
-    }) as typeof window.setInterval;
-    window.clearInterval = ((timer?: number): void => {
-      if (timer !== undefined) {
-        minuteTimers.delete(timer);
-      }
+      return querySelector(selector);
+    }) as typeof document.querySelector;
+    document.dispatchEvent(new Event('astro:page-load'));
+    document.querySelector = querySelector;
 
-      clearInterval(timer);
-    }) as typeof window.clearInterval;
-    Object.defineProperty(window, '__statusCalendarLifecycleTest', {
-      value: {
-        activeMinuteTimerCount: (): number => minuteTimers.size,
-      },
-    });
+    const link = document.querySelector('[data-status-calendar-day-link]');
+    const root = link?.closest('[data-status-calendar-tooltip-root]');
+    const tooltip = root?.querySelector<HTMLElement>(
+      '[data-status-calendar-tooltip]',
+    );
+    if (!(link instanceof HTMLElement) || !root || !tooltip) {
+      throw new Error('Expected an interactive year calendar day');
+    }
+
+    let positionCalls = 0;
+    tooltip.getBoundingClientRect = () => {
+      positionCalls += 1;
+
+      return { left: 20, right: 200 } as DOMRect;
+    };
+    link.dispatchEvent(
+      new PointerEvent('pointerover', {
+        bubbles: true,
+        pointerType: 'mouse',
+      }),
+    );
+
+    return {
+      navigationQueries,
+      opened: root.hasAttribute('data-status-calendar-tooltip-open'),
+      positionCalls,
+    };
   });
 
-const activeMinuteTimerCount = (page: Page): Promise<number> =>
-  page.evaluate(
-    () =>
-      (
-        window as Window & {
-          readonly __statusCalendarLifecycleTest?: {
-            readonly activeMinuteTimerCount: () => number;
-          };
-        }
-      ).__statusCalendarLifecycleTest?.activeMinuteTimerCount() ?? -1,
-  );
-
-const calendarListenerWork = (
-  page: Page,
-): Promise<{
-  readonly escapeQueries: number;
-  readonly tooltipLookups: number;
-}> =>
+const calendarWorkOutsideRoute = (page: Page) =>
   page.evaluate(() => {
-    const tooltipRootSelector = '[data-status-calendar-tooltip-root]';
-    const openTooltipSelector = `${tooltipRootSelector}[data-status-calendar-tooltip-open]`;
-    const closest = Element.prototype.closest;
-    const querySelectorAll = document.querySelectorAll.bind(document);
-    let escapeQueries = 0;
-    let tooltipLookups = 0;
+    const root = document.createElement('span');
+    const button = document.createElement('button');
 
-    Element.prototype.closest = function (selector: string): Element | null {
-      if (selector === tooltipRootSelector) {
-        tooltipLookups += 1;
+    root.dataset.statusCalendarTooltipRoot = '';
+    root.dataset.statusCalendarTooltipSummary = 'Обычная страница';
+    root.innerHTML = `
+      <span aria-hidden="true" data-status-calendar-tooltip>
+        <span data-status-calendar-tooltip-text>Fallback</span>
+      </span>
+    `;
+    button.type = 'button';
+    root.prepend(button);
+    document.body.append(root);
+
+    const querySelector = document.querySelector.bind(document);
+    let navigationQueries = 0;
+
+    document.querySelector = ((selector: string) => {
+      if (selector === '[data-status-calendar-year]') {
+        navigationQueries += 1;
       }
 
-      return closest.call(this, selector);
-    };
-    document.querySelectorAll = ((selector: string) => {
-      if (selector === openTooltipSelector) {
-        escapeQueries += 1;
-      }
-
-      return querySelectorAll(selector);
-    }) as typeof document.querySelectorAll;
+      return querySelector(selector);
+    }) as typeof document.querySelector;
 
     try {
-      const target =
-        document.querySelector('[data-status-calendar-day-link]') ??
-        document.body;
-      target.dispatchEvent(
+      button.dispatchEvent(
         new PointerEvent('pointerover', {
           bubbles: true,
           pointerType: 'mouse',
         }),
       );
+      button.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+      const openedByPointerOrFocus = root.hasAttribute(
+        'data-status-calendar-tooltip-open',
+      );
+
+      root.setAttribute('data-status-calendar-tooltip-open', '');
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }),
       );
+      document.dispatchEvent(new Event('astro:page-load'));
 
-      return { escapeQueries, tooltipLookups };
+      return {
+        navigationQueries,
+        interactions: {
+          keptOpenAfterEscape: root.hasAttribute(
+            'data-status-calendar-tooltip-open',
+          ),
+          openedByPointerOrFocus,
+        },
+      };
     } finally {
-      Element.prototype.closest = closest;
-      document.querySelectorAll = querySelectorAll;
+      document.querySelector = querySelector;
     }
   });
 
-const expectCalendarLifecycle = async (
-  page: Page,
-  expectedWorkCount: number,
-): Promise<void> => {
-  await expect.poll(() => activeMinuteTimerCount(page)).toBe(expectedWorkCount);
+const expectCalendarLifecycle = async (page: Page): Promise<void> => {
+  await expect(page.locator('status-year-calendar-lifecycle')).toHaveCount(1);
+  await expect(
+    page.locator('[data-status-calendar-year] [data-status-calendar-today]'),
+  ).toHaveCount(1);
   expect(await calendarListenerWork(page)).toEqual({
-    escapeQueries: expectedWorkCount,
-    tooltipLookups: expectedWorkCount,
+    navigationQueries: 0,
+    opened: true,
+    positionCalls: 1,
   });
 };
 
@@ -307,23 +316,34 @@ test('restores day focus after a client transition, Back, and Forward', async ({
   await expectFocusedDay(page);
 });
 
-test('scopes year calendar listeners and timer to client route lifecycle', async ({
+test('scopes year calendar work to its custom element lifecycle', async ({
   page,
 }) => {
-  await trackCalendarMinuteTimers(page);
-  await page.goto(yearPath, { waitUntil: 'networkidle' });
+  await page.goto('/status/', { waitUntil: 'networkidle' });
+  await page
+    .locator(`[data-status-calendar-entry][href="${yearPath}"]`)
+    .click();
+  await page.waitForURL(yearPath);
 
-  await expectCalendarLifecycle(page, 1);
+  await expectCalendarLifecycle(page);
 
   await page.getByRole('link', { name: 'Шелково Онлайн' }).click();
   await page.waitForURL('/');
 
-  await expectCalendarLifecycle(page, 0);
+  expect(await calendarWorkOutsideRoute(page)).toEqual({
+    navigationQueries: 0,
+    interactions: {
+      keptOpenAfterEscape: true,
+      openedByPointerOrFocus: false,
+    },
+  });
 
   await page.goBack();
   await page.waitForURL(yearPath);
+  await expectCalendarLifecycle(page);
 
-  await expectCalendarLifecycle(page, 1);
+  await page.reload({ waitUntil: 'networkidle' });
+  await expectCalendarLifecycle(page);
 });
 
 test('does not intercept focus for absent, malformed, or missing day hashes', async ({

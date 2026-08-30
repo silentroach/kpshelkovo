@@ -1,5 +1,6 @@
 const TOOLTIP_ROOT_SELECTOR = '[data-status-calendar-tooltip-root]';
 const YEAR_CALENDAR_SELECTOR = '[data-status-calendar-year]';
+const YEAR_CALENDAR_LIFECYCLE_ELEMENT = 'status-year-calendar-lifecycle';
 const TOOLTIP_SELECTOR = '[data-status-calendar-tooltip]';
 const TOOLTIP_TEXT_SELECTOR = '[data-status-calendar-tooltip-text]';
 const TOOLTIP_OPEN_ATTRIBUTE = 'data-status-calendar-tooltip-open';
@@ -10,7 +11,6 @@ const TODAY_SELECTOR =
   '[data-status-calendar-today], .status-calendar-date--today';
 const TOOLTIP_SHIFT_PROPERTY = '--status-calendar-tooltip-shift-x';
 const TOOLTIP_VIEWPORT_MARGIN = 16;
-const TODAY_REFRESH_INTERVAL = 60_000;
 const MOSCOW_DATE_FORMAT = new Intl.DateTimeFormat('en-US', {
   timeZone: 'Europe/Moscow',
   year: 'numeric',
@@ -18,16 +18,20 @@ const MOSCOW_DATE_FORMAT = new Intl.DateTimeFormat('en-US', {
   day: '2-digit',
 });
 
-let installed = false;
-let interactionController: AbortController | undefined;
-let todayRefreshTimer: number | undefined;
-
 const tooltipRoot = (
   target: EventTarget | undefined,
-): HTMLElement | undefined =>
-  target instanceof Element
-    ? (target.closest(TOOLTIP_ROOT_SELECTOR) as HTMLElement | undefined)
-    : undefined;
+): HTMLElement | undefined => {
+  if (!(target instanceof Element)) {
+    return;
+  }
+
+  const root = target.closest(TOOLTIP_ROOT_SELECTOR);
+  if (!(root instanceof HTMLElement)) {
+    return;
+  }
+
+  return root;
+};
 
 const movedOutside = (root: HTMLElement, target: EventTarget | undefined) =>
   !(target instanceof Node) || !root.contains(target);
@@ -63,15 +67,15 @@ const moscowDateId = (now: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
-export const refreshStatusCalendarToday = (now = new Date()): void => {
-  document.querySelectorAll<HTMLElement>(TODAY_SELECTOR).forEach((element) => {
+const refreshStatusCalendarTodayIn = (root: ParentNode, now: Date): void => {
+  root.querySelectorAll<HTMLElement>(TODAY_SELECTOR).forEach((element) => {
     element.classList.remove('status-calendar-date--today');
     element.removeAttribute('data-status-calendar-today');
     element.querySelector('a, time')?.removeAttribute('aria-current');
   });
 
   const todayId = moscowDateId(now);
-  const today = document.querySelector<HTMLElement>(
+  const today = root.querySelector<HTMLElement>(
     `[data-status-calendar-date="${todayId}"]`,
   );
 
@@ -83,6 +87,9 @@ export const refreshStatusCalendarToday = (now = new Date()): void => {
   today.dataset.statusCalendarToday = todayId;
   today.querySelector('a, time')?.setAttribute('aria-current', 'date');
 };
+
+export const refreshStatusCalendarToday = (now = new Date()): void =>
+  refreshStatusCalendarTodayIn(document, now);
 
 export const positionStatusCalendarTooltip = (
   root: HTMLElement,
@@ -142,122 +149,115 @@ const settleStatusCalendarTooltip = (root: HTMLElement): void => {
   closeStatusCalendarTooltip(root);
 };
 
-const stopStatusCalendarYearInteractions = (): void => {
-  interactionController?.abort();
-  interactionController = undefined;
+class StatusCalendarYearLifecycleElement extends HTMLElement {
+  readonly #interactions = new AbortController();
+  #initialized = false;
 
-  if (todayRefreshTimer !== undefined) {
-    window.clearInterval(todayRefreshTimer);
-  }
+  connectedCallback(): void {
+    if (this.#initialized) {
+      return;
+    }
 
-  todayRefreshTimer = undefined;
-};
+    const calendar = this.previousElementSibling;
+    if (
+      !(calendar instanceof HTMLElement) ||
+      !calendar.matches(YEAR_CALENDAR_SELECTOR)
+    ) {
+      return;
+    }
 
-const startStatusCalendarYearInteractions = (): void => {
-  stopStatusCalendarYearInteractions();
+    this.#initialized = true;
+    const listenerOptions = { signal: this.#interactions.signal };
 
-  if (!document.querySelector(YEAR_CALENDAR_SELECTOR)) {
-    return;
-  }
+    refreshStatusCalendarTodayIn(calendar, new Date());
+    calendar.addEventListener(
+      'focusin',
+      (event) => {
+        const root = tooltipRoot(event.target || undefined);
 
-  const controller = new AbortController();
-  const listenerOptions = { signal: controller.signal };
+        if (root) {
+          root.setAttribute(TOOLTIP_FOCUS_ATTRIBUTE, '');
+          openStatusCalendarTooltip(root);
+        }
+      },
+      listenerOptions,
+    );
+    calendar.addEventListener(
+      'pointerover',
+      (event) => {
+        if (event.pointerType === 'touch') {
+          return;
+        }
 
-  interactionController = controller;
-  document.addEventListener(
-    'astro:before-swap',
-    stopStatusCalendarYearInteractions,
-    { once: true, signal: controller.signal },
-  );
-  refreshStatusCalendarToday();
-  todayRefreshTimer = window.setInterval(
-    refreshStatusCalendarToday,
-    TODAY_REFRESH_INTERVAL,
-  );
-  document.addEventListener(
-    'focusin',
-    (event) => {
-      const root = tooltipRoot(event.target || undefined);
+        const root = tooltipRoot(event.target || undefined);
 
-      if (root) {
-        root.setAttribute(TOOLTIP_FOCUS_ATTRIBUTE, '');
-        openStatusCalendarTooltip(root);
-      }
-    },
-    listenerOptions,
-  );
-  document.addEventListener(
-    'pointerover',
-    (event) => {
-      if (event.pointerType === 'touch') {
-        return;
-      }
-
-      const root = tooltipRoot(event.target || undefined);
-
-      if (root && movedOutside(root, event.relatedTarget || undefined)) {
-        root.setAttribute(TOOLTIP_HOVER_ATTRIBUTE, '');
-        openStatusCalendarTooltip(root);
-      }
-    },
-    listenerOptions,
-  );
-  document.addEventListener(
-    'keydown',
-    (event) => {
-      if (event.defaultPrevented || event.key !== 'Escape') {
-        return;
-      }
-
-      document
-        .querySelectorAll<HTMLElement>(
-          `${TOOLTIP_ROOT_SELECTOR}[${TOOLTIP_OPEN_ATTRIBUTE}]`,
-        )
-        .forEach((root) => {
-          root.setAttribute(TOOLTIP_DISMISSED_ATTRIBUTE, '');
-          closeStatusCalendarTooltip(root);
-        });
-    },
-    listenerOptions,
-  );
-  document.addEventListener(
-    'focusout',
-    (event) => {
-      const root = tooltipRoot(event.target || undefined);
-
-      if (root && movedOutside(root, event.relatedTarget || undefined)) {
-        root.removeAttribute(TOOLTIP_FOCUS_ATTRIBUTE);
-        settleStatusCalendarTooltip(root);
-      }
-    },
-    listenerOptions,
-  );
-  document.addEventListener(
-    'pointerout',
-    (event) => {
-      if (event.pointerType === 'touch') {
-        return;
-      }
-
-      const root = tooltipRoot(event.target || undefined);
-
-      if (root && movedOutside(root, event.relatedTarget || undefined)) {
-        root.removeAttribute(TOOLTIP_HOVER_ATTRIBUTE);
-        settleStatusCalendarTooltip(root);
-      }
-    },
-    listenerOptions,
-  );
-};
-
-export const installStatusCalendarYearInteractions = (): void => {
-  if (!installed) {
-    installed = true;
+        if (root && movedOutside(root, event.relatedTarget || undefined)) {
+          root.setAttribute(TOOLTIP_HOVER_ATTRIBUTE, '');
+          openStatusCalendarTooltip(root);
+        }
+      },
+      listenerOptions,
+    );
     document.addEventListener(
-      'astro:page-load',
-      startStatusCalendarYearInteractions,
+      'keydown',
+      (event) => {
+        if (event.defaultPrevented || event.key !== 'Escape') {
+          return;
+        }
+
+        calendar
+          .querySelectorAll<HTMLElement>(
+            `${TOOLTIP_ROOT_SELECTOR}[${TOOLTIP_OPEN_ATTRIBUTE}]`,
+          )
+          .forEach((root) => {
+            root.setAttribute(TOOLTIP_DISMISSED_ATTRIBUTE, '');
+            closeStatusCalendarTooltip(root);
+          });
+      },
+      listenerOptions,
+    );
+    calendar.addEventListener(
+      'focusout',
+      (event) => {
+        const root = tooltipRoot(event.target || undefined);
+
+        if (root && movedOutside(root, event.relatedTarget || undefined)) {
+          root.removeAttribute(TOOLTIP_FOCUS_ATTRIBUTE);
+          settleStatusCalendarTooltip(root);
+        }
+      },
+      listenerOptions,
+    );
+    calendar.addEventListener(
+      'pointerout',
+      (event) => {
+        if (event.pointerType === 'touch') {
+          return;
+        }
+
+        const root = tooltipRoot(event.target || undefined);
+
+        if (root && movedOutside(root, event.relatedTarget || undefined)) {
+          root.removeAttribute(TOOLTIP_HOVER_ATTRIBUTE);
+          settleStatusCalendarTooltip(root);
+        }
+      },
+      listenerOptions,
     );
   }
 
-  startStatusCalendarYearInteractions();
+  disconnectedCallback(): void {
+    this.#interactions.abort();
+  }
+}
+
+export const registerStatusCalendarYearInteractions = (): void => {
+  if (customElements.get(YEAR_CALENDAR_LIFECYCLE_ELEMENT)) {
+    return;
+  }
+
+  customElements.define(
+    YEAR_CALENDAR_LIFECYCLE_ELEMENT,
+    StatusCalendarYearLifecycleElement,
+  );
 };
