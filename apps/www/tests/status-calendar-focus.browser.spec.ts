@@ -320,10 +320,20 @@ test('scopes year calendar work to its custom element lifecycle', async ({
   page,
 }) => {
   await page.goto('/status/', { waitUntil: 'networkidle' });
-  await page
-    .locator(`[data-status-calendar-entry][href="${yearPath}"]`)
-    .click();
-  await page.waitForURL(yearPath);
+  const calendarEntry = page.locator('[data-status-calendar-entry]');
+  const lifecycleYearPath = await calendarEntry.getAttribute('href');
+  const lifecycleYear = lifecycleYearPath?.match(
+    /^\/status\/calendar\/(\d{4})\/$/,
+  )?.[1];
+  if (!lifecycleYearPath || !lifecycleYear) {
+    throw new Error('Expected a current year status calendar entry URL');
+  }
+
+  await page.clock.setFixedTime(
+    new Date(`${lifecycleYear}-08-24T12:00:00.000Z`),
+  );
+  await calendarEntry.click();
+  await page.waitForURL(lifecycleYearPath);
 
   await expectCalendarLifecycle(page);
 
@@ -339,7 +349,7 @@ test('scopes year calendar work to its custom element lifecycle', async ({
   });
 
   await page.goBack();
-  await page.waitForURL(yearPath);
+  await page.waitForURL(lifecycleYearPath);
   await expectCalendarLifecycle(page);
 
   await page.reload({ waitUntil: 'networkidle' });

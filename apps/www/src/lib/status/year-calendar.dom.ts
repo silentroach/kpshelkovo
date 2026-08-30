@@ -150,11 +150,10 @@ const settleStatusCalendarTooltip = (root: HTMLElement): void => {
 };
 
 class StatusCalendarYearLifecycleElement extends HTMLElement {
-  readonly #interactions = new AbortController();
-  #initialized = false;
+  #interactions?: AbortController;
 
   connectedCallback(): void {
-    if (this.#initialized) {
+    if (this.#interactions) {
       return;
     }
 
@@ -166,8 +165,9 @@ class StatusCalendarYearLifecycleElement extends HTMLElement {
       return;
     }
 
-    this.#initialized = true;
-    const listenerOptions = { signal: this.#interactions.signal };
+    const interactions = new AbortController();
+    this.#interactions = interactions;
+    const listenerOptions = { signal: interactions.signal };
 
     refreshStatusCalendarTodayIn(calendar, new Date());
     calendar.addEventListener(
@@ -247,7 +247,8 @@ class StatusCalendarYearLifecycleElement extends HTMLElement {
   }
 
   disconnectedCallback(): void {
-    this.#interactions.abort();
+    this.#interactions?.abort();
+    this.#interactions = undefined;
   }
 }
 

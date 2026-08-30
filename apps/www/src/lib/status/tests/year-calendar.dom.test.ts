@@ -135,12 +135,18 @@ describe('registerStatusCalendarYearInteractions', () => {
     const link = root?.querySelector<HTMLAnchorElement>('a');
     const tooltip = root?.querySelector<HTMLElement>('[role="tooltip"]');
     const button = document.querySelector<HTMLButtonElement>('button');
+    const lifecycle = document.querySelector<HTMLElement>(
+      'status-year-calendar-lifecycle',
+    );
+    const calendar = document.querySelector<HTMLElement>(
+      '[data-status-calendar-year]',
+    );
 
-    if (!root || !link || !tooltip || !button) {
+    if (!root || !link || !tooltip || !button || !lifecycle || !calendar) {
       throw new Error('status calendar tooltip fixture is incomplete');
     }
 
-    return { root, link, tooltip, button };
+    return { root, link, tooltip, button, lifecycle, calendar };
   };
 
   afterEach(() => {
@@ -315,6 +321,61 @@ describe('registerStatusCalendarYearInteractions', () => {
         "injectedImage": false,
         "openAfterTouch": false,
         "text": "<img src=x onerror=\"alert(1)\">",
+      }
+    `);
+  });
+
+  it('restores handlers when the same lifecycle element reconnects', () => {
+    registerStatusCalendarYearInteractions();
+    const { root, link, tooltip, button, lifecycle, calendar } =
+      renderTooltip();
+    const tooltipBounds = vi
+      .spyOn(tooltip, 'getBoundingClientRect')
+      .mockReturnValue({ left: 20, right: 200 } as DOMRect);
+    const hover = () =>
+      link.dispatchEvent(
+        new PointerEvent('pointerover', {
+          bubbles: true,
+          pointerType: 'mouse',
+        }),
+      );
+
+    hover();
+    const openedInitially = root.hasAttribute(
+      'data-status-calendar-tooltip-open',
+    );
+    link.dispatchEvent(
+      new PointerEvent('pointerout', {
+        bubbles: true,
+        pointerType: 'mouse',
+        relatedTarget: button,
+      }),
+    );
+    lifecycle.remove();
+    hover();
+    const openedWhileDisconnected = root.hasAttribute(
+      'data-status-calendar-tooltip-open',
+    );
+
+    calendar.after(lifecycle);
+    hover();
+
+    expect({
+      openedInitially,
+      openedWhileDisconnected,
+      reconnectedSameInstance:
+        document.querySelector('status-year-calendar-lifecycle') === lifecycle,
+      openedAfterReconnect: root.hasAttribute(
+        'data-status-calendar-tooltip-open',
+      ),
+      positionCalls: tooltipBounds.mock.calls.length,
+    }).toMatchInlineSnapshot(`
+      {
+        "openedAfterReconnect": true,
+        "openedInitially": true,
+        "openedWhileDisconnected": false,
+        "positionCalls": 2,
+        "reconnectedSameInstance": true,
       }
     `);
   });
