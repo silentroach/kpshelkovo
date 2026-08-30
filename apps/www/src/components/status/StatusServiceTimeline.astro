@@ -17,13 +17,15 @@ import {
 } from '@/lib/status/timeline';
 import {
   buildStatusTimelineTooltipData,
-  buildStatusTimelineTooltipListItemData,
   formatStatusService,
   formatStatusTimelineGroupTitle,
-  formatStatusTimelineTooltipGroupLabel,
   formatStatusTimelineTooltipLabel,
 } from '@/lib/status/view';
 import { toStatusTimelineTooltipItemDto } from '@/lib/status/timeline-tooltip-dto';
+import {
+  formatStatusTimelineTooltipGroupLabel,
+  toStatusTimelineTooltipListItemData,
+} from '@/lib/status/timeline-tooltip';
 
 interface Props {
   readonly service: StatusService;
@@ -128,10 +130,6 @@ const buildTimelineProblemDaySpan = (
     endMs: getTimelineNextDayStartMs(Math.max(span.startMs, span.endMs - 1)),
   });
 
-const serializeTimelineTooltipItems = (
-  items: readonly StatusTimelineIncidentInput[],
-): string => JSON.stringify(items.map(toStatusTimelineTooltipItemDto));
-
 const timelineGroups = incidents
   .filter((item) => {
     const visibleSegment = visibleSegmentsById.get(item.id);
@@ -183,8 +181,9 @@ const timelineGroups = incidents
   .map((group) => {
     const [firstItem] = group.items;
     const hasVisibleSpan = group.visibleSegments.length > 0;
-    const tooltipItems = group.items.map((item) =>
-      buildStatusTimelineTooltipListItemData(item, { nonBreaking: true }),
+    const tooltipItemDtos = group.items.map(toStatusTimelineTooltipItemDto);
+    const tooltipItems = tooltipItemDtos.map(
+      toStatusTimelineTooltipListItemData,
     );
     const tooltipTitle =
       group.items.length === 1
@@ -287,7 +286,7 @@ const timelineGroups = incidents
         : 'amber',
       tooltipAreaLabel: undefined,
       tooltipAreas: undefined,
-      tooltipItems: serializeTimelineTooltipItems(group.items),
+      tooltipItems: JSON.stringify(tooltipItemDtos),
       tooltipLabel: formatStatusTimelineTooltipGroupLabel({
         serviceLabel,
         title: tooltipTitle,

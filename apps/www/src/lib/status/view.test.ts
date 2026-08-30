@@ -9,10 +9,10 @@ import {
   formatStatusDate,
   formatStatusIncidentPeriodText,
   formatStatusTimelineGroupTitle,
-  formatStatusTimelineTooltipGroupLabel,
   formatStatusTimelineTooltipLabel,
   getStatusIncidentPeriod,
 } from './view';
+import { formatStatusTimelineTooltipGroupLabel } from './timeline-tooltip';
 
 const NBSP = '\u00A0';
 const currentYear = dateTimeFromISO(new Date().toISOString()).year;
