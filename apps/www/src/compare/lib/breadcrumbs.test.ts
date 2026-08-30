@@ -65,6 +65,10 @@ const assertPageContract = (
 };
 
 describe('compare breadcrumbs', () => {
+  it('keeps the canonical compare route', () => {
+    expect(compareBreadcrumbs()[1].href).toBe('/815/compare/');
+  });
+
   it.each([
     ['index', () => compareBreadcrumbs()],
     ['rating', () => comparePageBreadcrumbs(FIXTURE_LABEL, '/fixture-rating/')],
