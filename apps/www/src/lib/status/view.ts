@@ -21,6 +21,7 @@ import type {
   StatusIncidentPhaseInput,
   StatusIncidentState,
 } from './types';
+import type { StatusTimelineTooltipListItemData } from './timeline-tooltip.types';
 
 const SERVICE_LABELS: Record<StatusService, string> = {
   electricity: 'Электричество',
@@ -79,14 +80,6 @@ export interface StatusTimelineTooltipData {
   readonly phaseLabel: string;
   readonly periodLabel: string;
   readonly areaLabel?: string;
-}
-
-export interface StatusTimelineTooltipListItemData {
-  readonly title: string;
-  readonly periodLabel: string;
-  readonly areas?: readonly StatusArea[];
-  readonly areaLabel?: string;
-  readonly phaseIcon?: 'alert' | 'check';
 }
 
 interface StatusTimelineTooltipIncident {
@@ -449,25 +442,6 @@ export const formatStatusTimelineGroupTitle = (input: {
     `${input.count}${spacer}${pluralize(input.count, ['событие', 'события', 'событий'])} за${spacer}${formatStatusCalendarDate(input.startedIso, { nonBreaking: input.nonBreaking })}`,
   );
 };
-
-export const formatStatusTimelineTooltipGroupLabel = (input: {
-  readonly serviceLabel: string;
-  readonly title: string;
-  readonly items: readonly StatusTimelineTooltipListItemData[];
-}): string =>
-  [
-    input.serviceLabel,
-    input.title,
-    ...input.items.map((item) =>
-      [
-        item.title,
-        item.periodLabel,
-        ...(item.areaLabel
-          ? [formatStatusTooltipText(`Части поселка: ${item.areaLabel}`)]
-          : []),
-      ].join('. '),
-    ),
-  ].join('. ');
 
 export const formatStatusDaysWithoutIncidents = (
   value: StatusDaysWithoutIncidents,
