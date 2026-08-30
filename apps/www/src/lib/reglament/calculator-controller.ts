@@ -16,19 +16,15 @@ import {
   formatReglamentTariffValue,
   parseReglamentNumberInput,
 } from './format';
+import type {
+  ReglamentCalculatorFieldState,
+  ReglamentCalculatorRuntime,
+} from './calculator-controller.types';
 import {
   EDITABLE_FIELD_KEYS,
   type CostBreakdown,
   type EditableFieldKey,
 } from './schema';
-
-export interface ReglamentCalculatorFieldState {
-  readonly rowId: string;
-  readonly key: EditableFieldKey;
-  readonly baseline: boolean | number;
-  readonly value: boolean | number | string;
-  readonly forceChange?: boolean;
-}
 
 type NumberEditableFieldKey = Exclude<EditableFieldKey, 'enabled'>;
 type BreakdownFieldKey = keyof CostBreakdown;
@@ -58,7 +54,6 @@ const ROW_TARIFF_ATTRIBUTE = 'data-reglament-row-tariff';
 const ROW_ANNUAL_ATTRIBUTE = 'data-reglament-row-annual';
 const ROW_BREAKDOWN_ATTRIBUTE = 'data-reglament-row-breakdown';
 const BREAKDOWN_FIELD_ATTRIBUTE = 'data-reglament-breakdown-field';
-const EDITOR_DETAILS_SELECTOR = 'details[data-reglament-editor-row]';
 const STATIC_ELEMENT_ATTRIBUTES = [
   CURRENT_TARIFF_ATTRIBUTE,
   CURRENT_TARIFF_TONE_ATTRIBUTE,
@@ -123,6 +118,10 @@ const BREAKDOWN_FIELD_KEYS = [
   'vat',
   'gross',
 ] as const satisfies readonly BreakdownFieldKey[];
+const calculatorRuntimes = new WeakMap<
+  HTMLElement,
+  ReglamentCalculatorRuntime
+>();
 
 interface ReglamentCalculatorDomIndex {
   calculationInput?: HTMLScriptElement;
@@ -690,7 +689,14 @@ const readReglamentCalculationInput = (
 export const hydrateReglamentCalculator = (
   root: HTMLElement,
   calculationInput?: EstimateCalculationInput,
-): void => {
+): ReglamentCalculatorRuntime => {
+  const existingRuntime = calculatorRuntimes.get(root);
+
+  if (existingRuntime) {
+    existingRuntime.render();
+    return existingRuntime;
+  }
+
   const index = createReglamentCalculatorDomIndex(root);
   const input = calculationInput ?? readReglamentCalculationInput(index);
   const officialTariffText = formatReglamentNumber(
@@ -708,51 +714,16 @@ export const hydrateReglamentCalculator = (
     setResetVisibility(index, fields.some(isReglamentCalculatorFieldDirty));
   };
 
-  if (root.dataset.reglamentCalculatorHydrated === 'true') {
+  const registerEditor = (editor: HTMLElement): void => {
+    indexReglamentCalculatorDom(index, editor);
     render();
-    return;
-  }
+  };
+  const runtime = {
+    registerEditor,
+    render,
+  } satisfies ReglamentCalculatorRuntime;
 
-  root.dataset.reglamentCalculatorHydrated = 'true';
-  let editorHydration: Promise<void> | undefined;
-  const hydrateEditors = async (): Promise<void> => {
-    const { hydrateReglamentEditors } = await import('./calculator-editor');
-    hydrateReglamentEditors(root, (editor) => {
-      indexReglamentCalculatorDom(index, editor);
-      render();
-    });
-    root.removeEventListener('focusin', handleEditorIntent);
-    root.removeEventListener('pointerover', handleEditorIntent);
-    root.removeEventListener('toggle', handleEditorToggle, true);
-  };
-  const loadEditors = (): void => {
-    editorHydration ??= hydrateEditors();
-  };
-  const handleEditorIntent = (event: Event): void => {
-    if (
-      event.target instanceof Element &&
-      event.target.closest(EDITOR_DETAILS_SELECTOR)
-    ) {
-      loadEditors();
-    }
-  };
-  const handleEditorToggle = (event: Event): void => {
-    if (
-      event.target instanceof HTMLDetailsElement &&
-      event.target.matches(EDITOR_DETAILS_SELECTOR) &&
-      event.target.open
-    ) {
-      loadEditors();
-    }
-  };
-  root.addEventListener('focusin', handleEditorIntent);
-  root.addEventListener('pointerover', handleEditorIntent);
-  root.addEventListener('toggle', handleEditorToggle, true);
-
-  if (root.querySelector(`${EDITOR_DETAILS_SELECTOR}[open]`)) {
-    loadEditors();
-  }
-
+  calculatorRuntimes.set(root, runtime);
   root.addEventListener('input', (event) => {
     if (event.target instanceof HTMLInputElement) {
       markManualBreakdownInput(event.target);
@@ -782,6 +753,7 @@ export const hydrateReglamentCalculator = (
   });
 
   render();
+  return runtime;
 };
 
 export const hydrateReglamentCalculators = (scope?: ParentNode): void => {
