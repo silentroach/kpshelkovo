@@ -14,11 +14,7 @@ const html = renderMarkdown(summary.body);
 
 <section
   aria-label={label}
-  class:list={[
-    NEWS_PROSE,
-    'news-archive-summary',
-    '[&>:first-child]:mt-0 [&>:last-child]:mb-0',
-  ]}
+  class:list={[NEWS_PROSE, 'news-archive-summary']}
   set:html={html}
 />
 
@@ -27,5 +23,13 @@ const html = renderMarkdown(summary.body);
     color: var(--color-muted-foreground);
     font-size: 0.9375rem;
     line-height: 1.7;
+  }
+
+  .news-archive-summary > :global(:first-child) {
+    margin-top: 0;
+  }
+
+  .news-archive-summary > :global(:last-child) {
+    margin-bottom: 0;
   }
 </style>
