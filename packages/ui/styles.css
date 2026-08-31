@@ -220,6 +220,7 @@
   color-scheme: light;
   --container: 1180px;
   --page-padding: clamp(1rem, 3vw, 2rem);
+  --radius-full: 999px;
   --shadow-1: 0 0.25rem 0.75rem oklch(27% 0.05 142 / 0.055);
   --shadow-2: 0 0.75rem 2rem oklch(27% 0.05 142 / 0.085);
   --hero-glow-a: oklch(83% 0.155 78 / 0.06);
