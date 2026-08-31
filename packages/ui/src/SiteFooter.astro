@@ -8,7 +8,7 @@ const hasRight = Astro.slots.has('right');
 ---
 
 <footer class="ui-page ui-site-footer">
-  <div class="ui-site-footer-inner px-5 md:px-6">
+  <div class="ui-site-footer-inner">
     <p>
       &copy; {year}. Инициативная группа{' '}
       <a href="https://kpshelkovo.online/" class="ui-link ui-site-footer-home">
@@ -25,3 +25,15 @@ const hasRight = Astro.slots.has('right');
     }
   </div>
 </footer>
+
+<style>
+  .ui-site-footer-inner {
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 48rem) {
+    .ui-site-footer-inner {
+      padding-inline: 1.5rem;
+    }
+  }
+</style>
