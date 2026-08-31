@@ -30,7 +30,23 @@ const Icon = AREA_ICONS[area];
   aria-label={label}
   data-pagefind-index-attrs="aria-label"
   role="img"
-  class="inline-flex shrink-0 items-center justify-center leading-none"
+  class="area-icon"
 >
-  <Icon class="block h-4 w-auto" />
+  <Icon />
 </span>
+
+<style>
+  .area-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .area-icon > :global(svg) {
+    display: block;
+    width: auto;
+    height: 1rem;
+  }
+</style>
