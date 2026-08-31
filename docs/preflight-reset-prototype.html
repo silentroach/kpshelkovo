@@ -1,0 +1,1084 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Прототип замены Tailwind Preflight</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        color: #172019;
+        background: #edf1eb;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+      }
+
+      button {
+        font: inherit;
+      }
+
+      .shell {
+        width: min(100% - 2rem, 92rem);
+        margin-inline: auto;
+        padding-block: 2rem 7rem;
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(16rem, 25rem);
+        gap: 2rem;
+        align-items: end;
+        margin-bottom: 1.5rem;
+      }
+
+      .eyebrow {
+        margin: 0 0 0.5rem;
+        color: #55705d;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        max-width: 20ch;
+        margin: 0;
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: clamp(2rem, 5vw, 4.25rem);
+        font-weight: 500;
+        line-height: 0.98;
+        letter-spacing: -0.035em;
+        text-wrap: balance;
+      }
+
+      .lead {
+        max-width: 62ch;
+        margin: 1rem 0 0;
+        color: #526158;
+        font-size: 1rem;
+        line-height: 1.55;
+      }
+
+      .decision-note {
+        padding: 1rem 1.125rem;
+        border: 1px solid #bfcbc1;
+        border-radius: 0.75rem;
+        background: #f8faf7;
+        box-shadow: 0 10px 30px rgb(29 47 34 / 7%);
+      }
+
+      .decision-note strong,
+      .decision-note span {
+        display: block;
+      }
+
+      .decision-note strong {
+        margin-bottom: 0.35rem;
+        font-size: 0.875rem;
+      }
+
+      .decision-note span {
+        color: #5f6d63;
+        font-size: 0.8125rem;
+        line-height: 1.45;
+      }
+
+      .workbench {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(18rem, 25rem);
+        gap: 1rem;
+        align-items: start;
+      }
+
+      .preview,
+      .diagnostics {
+        overflow: hidden;
+        border: 1px solid #b9c5bb;
+        border-radius: 0.9rem;
+        background: #fff;
+        box-shadow: 0 14px 44px rgb(31 46 35 / 9%);
+      }
+
+      .panel-header {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 3.25rem;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #d6ddd7;
+        background: #f7f9f6;
+      }
+
+      .panel-header h2,
+      .panel-header p {
+        margin: 0;
+      }
+
+      .panel-header h2 {
+        font-size: 0.875rem;
+      }
+
+      .panel-header p {
+        color: #667269;
+        font-size: 0.75rem;
+      }
+
+      .variant-badge {
+        flex: none;
+        padding: 0.25rem 0.5rem;
+        border-radius: 999px;
+        color: #315b3c;
+        background: #e1eee3;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.6875rem;
+        font-weight: 700;
+      }
+
+      iframe {
+        display: block;
+        width: 100%;
+        min-height: 48rem;
+        border: 0;
+        background: #fff;
+      }
+
+      .diagnostics-body {
+        padding: 1rem;
+      }
+
+      .summary {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e1e6e1;
+      }
+
+      .score {
+        display: grid;
+        flex: none;
+        width: 3.25rem;
+        height: 3.25rem;
+        place-items: center;
+        border-radius: 50%;
+        color: #fff;
+        background: #315b3c;
+        font-size: 1.125rem;
+        font-weight: 800;
+      }
+
+      .summary p {
+        margin: 0;
+        color: #5f6b62;
+        font-size: 0.8125rem;
+        line-height: 1.4;
+      }
+
+      .checks {
+        display: grid;
+        gap: 0.5rem;
+        margin: 0;
+      }
+
+      .check {
+        display: grid;
+        grid-template-columns: 1.25rem minmax(0, 1fr);
+        gap: 0.5rem;
+        align-items: start;
+        padding: 0.65rem;
+        border-radius: 0.5rem;
+        background: #f6f8f5;
+      }
+
+      .check dt,
+      .check dd {
+        margin: 0;
+      }
+
+      .check dt {
+        grid-column: 2;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+
+      .check dd {
+        grid-column: 2;
+        color: #69746b;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.6875rem;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+      }
+
+      .check::before {
+        grid-row: 1 / span 2;
+        content: '';
+        width: 0.65rem;
+        height: 0.65rem;
+        margin-top: 0.15rem;
+        border: 2px solid currentColor;
+        border-radius: 50%;
+      }
+
+      .check[data-pass='true'] {
+        color: #2e6b3d;
+        background: #eff7ef;
+      }
+
+      .check[data-pass='true'] dd {
+        color: #435347;
+      }
+
+      .check[data-pass='false'] {
+        color: #a03b34;
+        background: #fff1ef;
+      }
+
+      .check[data-pass='false'] dd {
+        color: #5d4b48;
+      }
+
+      .omissions {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e1e6e1;
+      }
+
+      .omissions h3,
+      .omissions p {
+        margin: 0;
+      }
+
+      .omissions h3 {
+        margin-bottom: 0.4rem;
+        font-size: 0.8125rem;
+      }
+
+      .omissions p {
+        color: #69746b;
+        font-size: 0.75rem;
+        line-height: 1.5;
+      }
+
+      .switcher {
+        position: fixed;
+        z-index: 10;
+        right: 50%;
+        bottom: 1.25rem;
+        display: grid;
+        grid-template-columns: 2.75rem minmax(12rem, 1fr) 2.75rem;
+        gap: 0.35rem;
+        width: min(calc(100% - 1.5rem), 29rem);
+        padding: 0.35rem;
+        transform: translateX(50%);
+        border: 1px solid rgb(255 255 255 / 18%);
+        border-radius: 999px;
+        color: #f5f8f4;
+        background: #172019;
+        box-shadow: 0 16px 45px rgb(0 0 0 / 25%);
+      }
+
+      .switcher button,
+      .switcher output {
+        min-height: 2.75rem;
+        border: 0;
+        border-radius: 999px;
+      }
+
+      .switcher button {
+        color: inherit;
+        background: #2d3930;
+        cursor: pointer;
+      }
+
+      .switcher button:hover {
+        background: #3b4a3e;
+      }
+
+      .switcher button:focus-visible {
+        outline: 3px solid #9ad6a7;
+        outline-offset: 2px;
+      }
+
+      .switcher output {
+        display: grid;
+        place-items: center;
+        padding-inline: 0.75rem;
+        text-align: center;
+      }
+
+      .switcher output strong,
+      .switcher output span {
+        display: block;
+      }
+
+      .switcher output strong {
+        font-size: 0.8125rem;
+      }
+
+      .switcher output span {
+        color: #bac7bd;
+        font-size: 0.6875rem;
+      }
+
+      @media (max-width: 60rem) {
+        .intro,
+        .workbench {
+          grid-template-columns: 1fr;
+        }
+
+        .decision-note {
+          max-width: 40rem;
+        }
+
+        iframe {
+          min-height: 43rem;
+        }
+      }
+
+      @media (max-width: 35rem) {
+        .shell {
+          width: min(100% - 1rem, 92rem);
+          padding-top: 1.25rem;
+        }
+
+        .intro {
+          gap: 1rem;
+        }
+
+        iframe {
+          min-height: 49rem;
+        }
+
+        .panel-header p {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="intro" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">Throwaway prototype · Issue 463</p>
+          <h1 id="page-title">Что останется после Preflight</h1>
+          <p class="lead">
+            Одна и та же матрица элементов под тремя режимами. Сравните текущий
+            Tailwind Preflight, браузер без reset и минимальный native CSS
+            candidate.
+          </p>
+        </div>
+        <aside class="decision-note">
+          <strong>Вопрос для решения</strong>
+          <span>
+            Достаточно ли candidate-слоя для фактического контракта сайта, если
+            не переносить неиспользуемую нормализацию Tailwind?
+          </span>
+        </aside>
+      </section>
+
+      <section class="workbench" aria-label="Сравнение reset-слоев">
+        <div class="preview">
+          <header class="panel-header">
+            <div>
+              <h2>Контрольная поверхность</h2>
+              <p>Структура, generated prose, controls, media и hidden</p>
+            </div>
+            <span class="variant-badge" id="variant-badge">current</span>
+          </header>
+          <iframe
+            id="fixture"
+            title="Контрольная поверхность выбранного reset-слоя"
+          ></iframe>
+        </div>
+
+        <aside class="diagnostics" aria-labelledby="diagnostics-title">
+          <header class="panel-header">
+            <div>
+              <h2 id="diagnostics-title">Computed-style контракт</h2>
+              <p>Проверяются только подтверждённые production-зависимости</p>
+            </div>
+          </header>
+          <div class="diagnostics-body">
+            <div class="summary">
+              <div class="score" id="score" aria-live="polite">0/0</div>
+              <p id="summary-copy">
+                Проверки появятся после загрузки контрольной поверхности.
+              </p>
+            </div>
+            <dl class="checks" id="checks"></dl>
+            <div class="omissions">
+              <h3>Что candidate намеренно не переносит</h3>
+              <p>
+                `abbr`, `small`, `sub/sup`, `progress`, `summary`, table
+                defaults, textarea, file/date/number controls, placeholder и
+                неиспользуемые media-типы. Отличия в блоке «Вне подтверждённого
+                контракта» ожидаемы.
+              </p>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <nav class="switcher" aria-label="Переключатель вариантов прототипа">
+      <button id="previous" type="button" aria-label="Предыдущий вариант">
+        ←
+      </button>
+      <output id="variant-label" aria-live="polite"></output>
+      <button id="next" type="button" aria-label="Следующий вариант">→</button>
+    </nav>
+
+    <script>
+      const CURRENT_PREFLIGHT = `
+        *, ::before, ::after, ::backdrop, ::file-selector-button {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+          border: 0 solid;
+        }
+
+        html, :host {
+          line-height: 1.5;
+          -webkit-text-size-adjust: 100%;
+          tab-size: 4;
+          font-family: ui-sans-serif, system-ui, sans-serif;
+          font-feature-settings: normal;
+          font-variation-settings: normal;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        hr {
+          height: 0;
+          color: inherit;
+          border-top-width: 1px;
+        }
+
+        abbr:where([title]) {
+          -webkit-text-decoration: underline dotted;
+          text-decoration: underline dotted;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+          font-size: inherit;
+          font-weight: inherit;
+        }
+
+        a {
+          color: inherit;
+          -webkit-text-decoration: inherit;
+          text-decoration: inherit;
+        }
+
+        b, strong { font-weight: bolder; }
+
+        code, kbd, samp, pre {
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+            "Liberation Mono", "Courier New", monospace;
+          font-feature-settings: normal;
+          font-variation-settings: normal;
+          font-size: 1em;
+        }
+
+        small { font-size: 80%; }
+
+        sub, sup {
+          position: relative;
+          font-size: 75%;
+          line-height: 0;
+          vertical-align: baseline;
+        }
+
+        sub { bottom: -0.25em; }
+        sup { top: -0.5em; }
+
+        table {
+          text-indent: 0;
+          border-color: inherit;
+          border-collapse: collapse;
+        }
+
+        :-moz-focusring:where(:not(iframe)) { outline: auto; }
+        progress { vertical-align: baseline; }
+        summary { display: list-item; }
+        ol, ul, menu { list-style: none; }
+
+        img, svg, video, canvas, audio, iframe, embed, object {
+          display: block;
+          vertical-align: middle;
+        }
+
+        img, video {
+          max-width: 100%;
+          height: auto;
+        }
+
+        button, input, select, optgroup, textarea, ::file-selector-button {
+          font: inherit;
+          font-feature-settings: inherit;
+          font-variation-settings: inherit;
+          letter-spacing: inherit;
+          color: inherit;
+          border-radius: 0;
+          background-color: transparent;
+          opacity: 1;
+        }
+
+        ::placeholder { opacity: 1; }
+        textarea { resize: vertical; }
+        ::-webkit-search-decoration { -webkit-appearance: none; }
+        :-moz-ui-invalid { box-shadow: none; }
+
+        button,
+        input:where([type="button"], [type="reset"], [type="submit"]),
+        ::file-selector-button {
+          appearance: button;
+        }
+
+        [hidden]:where(:not([hidden="until-found"])) {
+          display: none !important;
+        }
+      `;
+
+      const CANDIDATE_RESET = `
+        *, ::before, ::after {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+          border: 0 solid;
+        }
+
+        html {
+          -webkit-text-size-adjust: 100%;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+          font-size: inherit;
+        }
+
+        a {
+          color: inherit;
+          -webkit-text-decoration: inherit;
+          text-decoration: inherit;
+        }
+
+        ol, ul { list-style: none; }
+
+        hr {
+          height: 0;
+          color: inherit;
+          border-top-width: 1px;
+        }
+
+        code, pre {
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+            "Liberation Mono", "Courier New", monospace;
+          font-size: 1em;
+        }
+
+        img, svg { display: block; }
+
+        img {
+          max-width: 100%;
+          height: auto;
+        }
+
+        button, input, select {
+          font: inherit;
+          letter-spacing: inherit;
+          color: inherit;
+          border-radius: 0;
+          background-color: transparent;
+          opacity: 1;
+        }
+
+        button { appearance: button; }
+
+        input[type="search"]::-webkit-search-decoration {
+          -webkit-appearance: none;
+        }
+
+        [hidden]:where(:not([hidden="until-found"])) {
+          display: none !important;
+        }
+      `;
+
+      const APP_STYLES = `
+        :root {
+          font-family: "Trebuchet MS", Arial, sans-serif;
+          color: #172019;
+          background: #f5f7f4;
+        }
+
+        body {
+          min-width: 0;
+          color: #172019;
+          background: #f5f7f4;
+          font-family: "Trebuchet MS", Arial, sans-serif;
+          line-height: 1.5;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+          font-family: Georgia, "Times New Roman", serif;
+          font-weight: 600;
+          line-height: 1.15;
+        }
+
+        b, strong { font-weight: 600; }
+
+        .route {
+          width: min(100% - 2rem, 42rem);
+          margin-inline: auto;
+          padding-block: 1.25rem 2rem;
+        }
+
+        .site-header {
+          display: flex;
+          gap: 1rem;
+          align-items: center;
+          justify-content: space-between;
+          min-height: 3rem;
+          margin-bottom: 1.25rem;
+          padding-bottom: 0.75rem;
+          border-bottom-width: 1px;
+          border-color: #ccd5cd;
+        }
+
+        .brand { font-weight: 700; }
+
+        .nav-action {
+          display: inline-flex;
+          gap: 0.35rem;
+          align-items: center;
+          min-height: 2.25rem;
+          padding-inline: 0.75rem;
+          border-width: 1px;
+          border-color: #9aad9e;
+          cursor: pointer;
+        }
+
+        .stack {
+          display: grid;
+          gap: 1rem;
+        }
+
+        .page-title { font-size: 2rem; }
+
+        .breadcrumb {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.35rem;
+          color: #55705d;
+          font-size: 0.8125rem;
+        }
+
+        .card {
+          padding: 1rem;
+          border-width: 1px;
+          border-color: #b9c6bb;
+          border-radius: 0.65rem;
+          background: #fff;
+        }
+
+        .card h2 {
+          margin-bottom: 0.5rem;
+          font-size: 1.15rem;
+        }
+
+        .card p + p { margin-top: 0.65rem; }
+
+        .text-link {
+          color: #315b3c;
+          font-weight: 600;
+        }
+
+        .prose ul {
+          margin-block: 0.65rem;
+          padding-inline-start: 1.5rem;
+          list-style: disc;
+        }
+
+        .prose li + li { margin-top: 0.25rem; }
+
+        .prose hr {
+          margin-block: 1rem;
+          border-color: #ccd5cd;
+        }
+
+        .prose code {
+          padding: 0.12rem 0.3rem;
+          border-radius: 0.25rem;
+          background: #edf2ec;
+          font-size: 0.9em;
+        }
+
+        .controls {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 0.5rem;
+        }
+
+        .controls input,
+        .controls select {
+          min-width: 0;
+          min-height: 2.5rem;
+          padding-inline: 0.7rem;
+          border-width: 1px;
+          border-color: #9aad9e;
+        }
+
+        .controls button {
+          min-height: 2.5rem;
+          padding-inline: 0.9rem;
+          border-width: 1px;
+          border-color: #315b3c;
+          color: #fff;
+          background: #315b3c;
+        }
+
+        .media-frame {
+          overflow: hidden;
+          border-radius: 0.5rem;
+          background: #dce8dc;
+        }
+
+        .tooltip {
+          display: grid;
+          margin-top: 0.5rem;
+          padding: 0.5rem;
+          background: #fff4d8;
+        }
+
+        .outside-contract {
+          color: #647068;
+          font-size: 0.8125rem;
+        }
+
+        .outside-contract h2 {
+          margin-bottom: 0.5rem;
+          font-size: 0.95rem;
+        }
+
+        .outside-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.75rem;
+        }
+
+        .outside-grid > * {
+          padding: 0.5rem;
+          border: 1px dashed #b9c6bb;
+        }
+
+        table { width: 100%; }
+
+        @media (max-width: 31rem) {
+          .route { width: min(100% - 1rem, 42rem); }
+          .outside-grid { grid-template-columns: 1fr; }
+        }
+      `;
+
+      const FIXTURE = `
+        <header class="site-header">
+          <a class="brand" data-probe="link" href="#content">КП Шелково</a>
+          <button class="nav-action" data-probe="button" type="button">
+            Тарифы <span aria-hidden="true">↓</span>
+          </button>
+        </header>
+
+        <main id="content" class="stack">
+          <ol class="breadcrumb" data-probe="list" aria-label="Хлебные крошки">
+            <li><a href="#">Главная</a></li>
+            <li aria-hidden="true">/</li>
+            <li>База знаний</li>
+          </ol>
+
+          <h1 class="page-title" data-probe="heading">Как устроен посёлок</h1>
+
+          <article class="card prose" data-probe="card">
+            <h2>Generated prose</h2>
+            <p>
+              Здесь есть <a class="text-link" href="#">смысловая ссылка</a>,
+              список и <code data-probe="code">inline code</code>.
+            </p>
+            <ul data-probe="prose-list">
+              <li>первый пункт со своим marker;</li>
+              <li>второй пункт с восстановленным отступом.</li>
+            </ul>
+            <hr data-probe="hr" />
+            <p>Разделитель должен оставаться одной линией.</p>
+          </article>
+
+          <section class="card">
+            <h2>Controls</h2>
+            <div class="controls">
+              <input
+                data-probe="input"
+                type="search"
+                aria-label="Поиск"
+                placeholder="Найти документ"
+              />
+              <button type="button">Найти</button>
+              <select aria-label="Раздел">
+                <option>Все разделы</option>
+              </select>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>Media и runtime visibility</h2>
+            <div class="media-frame">
+              <img
+                data-probe="image"
+                width="720"
+                height="120"
+                alt="Схематичная зелёная полоса"
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='720' height='120' viewBox='0 0 720 120'%3E%3Crect width='720' height='120' fill='%23dce8dc'/%3E%3Cpath d='M0 88Q120 24 240 78T480 60T720 72V120H0Z' fill='%237fa486'/%3E%3C/svg%3E"
+              />
+            </div>
+            <div class="tooltip" data-probe="hidden" hidden>
+              Этот runtime tooltip не должен появиться.
+            </div>
+          </section>
+
+          <section class="card outside-contract">
+            <h2>Вне подтверждённого production-контракта</h2>
+            <div class="outside-grid">
+              <p><abbr title="пример">abbr</abbr>, <small>small</small>, H<sub>2</sub>O</p>
+              <details><summary>Summary default</summary><p>Детали</p></details>
+              <table><tbody><tr><td>Table</td><td>default</td></tr></tbody></table>
+              <textarea aria-label="Неиспользуемое поле">Textarea</textarea>
+            </div>
+          </section>
+        </main>
+      `;
+
+      const variants = [
+        {
+          key: 'current',
+          name: 'Текущий Preflight',
+          description: 'Контрольный baseline Tailwind 4.3.3',
+          reset: CURRENT_PREFLIGHT,
+        },
+        {
+          key: 'none',
+          name: 'Без reset',
+          description: 'Нативные browser defaults',
+          reset: '',
+        },
+        {
+          key: 'candidate',
+          name: 'Минимальный candidate',
+          description: 'Только подтверждённый контракт сайта',
+          reset: CANDIDATE_RESET,
+        },
+      ];
+
+      const probes = [
+        {
+          label: 'Глобальный box model',
+          selector: '[data-probe="card"]',
+          property: 'boxSizing',
+          expected: 'border-box',
+        },
+        {
+          label: 'Нулевой margin документа',
+          selector: 'body',
+          property: 'marginTop',
+          expected: '0px',
+        },
+        {
+          label: 'Heading без browser margin',
+          selector: '[data-probe="heading"]',
+          property: 'marginTop',
+          expected: '0px',
+        },
+        {
+          label: 'Link наследует оформление',
+          selector: '[data-probe="link"]',
+          property: 'textDecorationLine',
+          expected: 'none',
+        },
+        {
+          label: 'Структурный list без markers',
+          selector: '[data-probe="list"]',
+          property: 'listStyleType',
+          expected: 'none',
+        },
+        {
+          label: 'Generated prose возвращает markers',
+          selector: '[data-probe="prose-list"]',
+          property: 'listStyleType',
+          expected: 'disc',
+        },
+        {
+          label: 'HR остаётся одной линией',
+          selector: '[data-probe="hr"]',
+          property: 'borderTopWidth',
+          expected: '1px',
+        },
+        {
+          label: 'Code получает monospace',
+          selector: '[data-probe="code"]',
+          property: 'fontFamily',
+          test: (value) => /mono|menlo|consolas|courier/i.test(value),
+          expected: 'monospace stack',
+        },
+        {
+          label: 'Изображение block-level',
+          selector: '[data-probe="image"]',
+          property: 'display',
+          expected: 'block',
+        },
+        {
+          label: 'Изображение не шире контейнера',
+          selector: '[data-probe="image"]',
+          property: 'maxWidth',
+          expected: '100%',
+        },
+        {
+          label: 'Button наследует шрифт',
+          selector: '[data-probe="button"]',
+          property: 'fontFamily',
+          test: (value) => /trebuchet/i.test(value),
+          expected: 'Trebuchet MS',
+        },
+        {
+          label: 'Input наследует шрифт',
+          selector: '[data-probe="input"]',
+          property: 'fontFamily',
+          test: (value) => /trebuchet/i.test(value),
+          expected: 'Trebuchet MS',
+        },
+        {
+          label: 'Hidden сильнее authored display',
+          selector: '[data-probe="hidden"]',
+          property: 'display',
+          expected: 'none',
+        },
+      ];
+
+      const frame = document.querySelector('#fixture');
+      const badge = document.querySelector('#variant-badge');
+      const label = document.querySelector('#variant-label');
+      const score = document.querySelector('#score');
+      const summaryCopy = document.querySelector('#summary-copy');
+      const checks = document.querySelector('#checks');
+
+      const getVariantIndex = () => {
+        const requested = new URLSearchParams(window.location.search).get(
+          'variant',
+        );
+        const index = variants.findIndex(({ key }) => key === requested);
+        return index === -1 ? 0 : index;
+      };
+
+      let variantIndex = getVariantIndex();
+
+      const fixtureDocument = (variant) => `
+        <!doctype html>
+        <html lang="ru">
+          <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <style>${variant.reset}</style>
+            <style>${APP_STYLES}</style>
+          </head>
+          <body>
+            <div class="route">${FIXTURE}</div>
+          </body>
+        </html>
+      `;
+
+      const runDiagnostics = () => {
+        const fixtureDoc = frame.contentDocument;
+        if (!fixtureDoc?.body) return;
+
+        frame.style.height = `${fixtureDoc.documentElement.scrollHeight}px`;
+        const results = probes.map((probe) => {
+          const element = fixtureDoc.querySelector(probe.selector);
+          const value = getComputedStyle(element)[probe.property];
+          const pass = probe.test
+            ? probe.test(value)
+            : value === probe.expected;
+          return { ...probe, value, pass };
+        });
+        const passed = results.filter(({ pass }) => pass).length;
+
+        score.textContent = `${passed}/${results.length}`;
+        summaryCopy.textContent =
+          passed === results.length
+            ? 'Подтверждённый контракт сохранён полностью.'
+            : `Не совпало проверок: ${results.length - passed}.`;
+        checks.replaceChildren(
+          ...results.map((result) => {
+            const wrapper = document.createElement('div');
+            const term = document.createElement('dt');
+            const detail = document.createElement('dd');
+            wrapper.className = 'check';
+            wrapper.dataset.pass = String(result.pass);
+            term.textContent = result.label;
+            detail.textContent = `${result.property}: ${result.value} · expected ${result.expected}`;
+            wrapper.append(term, detail);
+            return wrapper;
+          }),
+        );
+      };
+
+      const render = () => {
+        const variant = variants[variantIndex];
+        const url = new URL(window.location.href);
+        url.searchParams.set('variant', variant.key);
+        history.replaceState(undefined, '', url);
+
+        badge.textContent = variant.key;
+        label.innerHTML = `<strong>${variant.name}</strong><span>${variant.description}</span>`;
+        frame.onload = runDiagnostics;
+        frame.srcdoc = fixtureDocument(variant);
+      };
+
+      const move = (direction) => {
+        variantIndex =
+          (variantIndex + direction + variants.length) % variants.length;
+        render();
+      };
+
+      document.querySelector('#previous').addEventListener('click', () => {
+        move(-1);
+      });
+      document.querySelector('#next').addEventListener('click', () => {
+        move(1);
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (
+          event.target.matches('input, textarea, select, [contenteditable]')
+        ) {
+          return;
+        }
+        if (event.key === 'ArrowLeft') move(-1);
+        if (event.key === 'ArrowRight') move(1);
+      });
+      window.addEventListener('resize', runDiagnostics);
+
+      render();
+    </script>
+  </body>
+</html>
