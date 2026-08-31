@@ -30,7 +30,6 @@ declare global {
 }
 
 const METRIKA_SCRIPT_SRC = 'https://mc.yandex.ru/metrika/tag.js';
-const METRIKA_WEBVISOR_ENABLED = true;
 const HOME_HERO_FALLBACK_SELECTOR = '[data-home-hero-fallback]';
 const NAVIGATION_PENDING_ATTR = 'data-site-navigation-pending';
 const NAVIGATION_DELAY_MS = 50;
@@ -90,7 +89,7 @@ const installMetrikaStub = (): YandexMetrika => {
   return ym;
 };
 
-const loadMetrika = (id: number, webvisorEnabled: boolean): void => {
+const loadMetrika = (id: number): void => {
   if (window.__shelkovoYmLoaded) {
     return;
   }
@@ -112,12 +111,12 @@ const loadMetrika = (id: number, webvisorEnabled: boolean): void => {
 
   ym(id, 'init', {
     accurateTrackBounce: true,
-    clickmap: webvisorEnabled,
+    clickmap: false,
     referrer: document.referrer,
     ssr: true,
     trackLinks: true,
     url: location.href,
-    webvisor: webvisorEnabled,
+    webvisor: false,
   });
 };
 
@@ -130,7 +129,7 @@ const bindMetrikaLoader = (): void => {
 
   window.__shelkovoYmDeferred = true;
   const scheduleAfterLoad = (): void => {
-    window.setTimeout(() => loadMetrika(id, METRIKA_WEBVISOR_ENABLED), 1000);
+    window.setTimeout(() => loadMetrika(id), 1000);
   };
 
   if (document.readyState === 'complete') {
