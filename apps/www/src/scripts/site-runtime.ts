@@ -111,7 +111,7 @@ const loadMetrika = (id: number): void => {
 
   ym(id, 'init', {
     accurateTrackBounce: true,
-    clickmap: true,
+    clickmap: false,
     referrer: document.referrer,
     ssr: true,
     trackLinks: true,

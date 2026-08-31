@@ -125,7 +125,7 @@ JS API Яндекс Карт v3 не является iframe. Для него н
 - Скрипты: `https://mc.yandex.ru`, `https://mc.yandex.com`.
 - Соединения: `https://mc.yandex.ru`, `https://mc.yandex.com` и соответствующие WebSocket-адреса.
 - Beacon-изображения: `https://mc.yandex.ru`, `https://mc.yandex.com`.
-- В текущей инициализации карта кликов включена, а Вебвизор отключен.
+- В текущей инициализации карта кликов и Вебвизор отключены.
 
 Яндекс Карты через iframe-виджеты:
 
