@@ -19,7 +19,7 @@ const { variant }: Props = Astro.props;
   data-search-trigger
   data-pagefind-ignore="all"
 >
-  <SearchIcon class="size-4 shrink-0" />
+  <SearchIcon />
 </button>
 
 <style>
@@ -42,6 +42,12 @@ const { variant }: Props = Astro.props;
       background-color 0.2s ease,
       color 0.2s ease,
       opacity 0.2s ease;
+  }
+
+  .site-search-trigger > :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
   }
 
   .site-search-trigger:focus-visible {
