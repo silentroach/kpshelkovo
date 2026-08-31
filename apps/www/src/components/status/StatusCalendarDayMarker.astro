@@ -20,19 +20,34 @@ const label =
   aria-label={decorative ? undefined : label}
   aria-hidden={decorative ? 'true' : undefined}
   data-status-calendar-marker={kind}
-  class:list={[
-    'inline-flex size-4 shrink-0 items-center justify-center rounded-full',
-    kind === 'incident' && 'bg-[color:var(--color-danger)]',
-    kind !== 'incident' &&
-      'border-2 border-[color:var(--color-warning-graphic)]',
-  ]}
+  class="marker"
 >
-  {
-    kind === 'mixed' && (
-      <span
-        aria-hidden="true"
-        class="size-2 rounded-full bg-[color:var(--color-danger)]"
-      />
-    )
-  }
+  {kind === 'mixed' && <span aria-hidden="true" class="marker__core" />}
 </span>
+
+<style>
+  .marker {
+    display: inline-flex;
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+  }
+
+  .marker[data-status-calendar-marker='incident'] {
+    background: var(--color-danger);
+  }
+
+  .marker:not([data-status-calendar-marker='incident']) {
+    border: 2px solid var(--color-warning-graphic);
+  }
+
+  .marker__core {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: var(--radius-full);
+    background: var(--color-danger);
+  }
+</style>
