@@ -9,6 +9,8 @@ export {
 } from './public-dto';
 import { PERSON_BACKLINK_KINDS, PERSON_MENTION_SECTIONS } from './schema';
 import { ENTITY_MENTION_TYPES } from '@/lib/mentions';
+import { apiContractLinkHeader } from '@/lib/public-surface/api-contract';
+import { peoplePublicSurfaceSlice } from './public-surface';
 import {
   peopleApiCatalogPath,
   peopleDataPath,
@@ -352,11 +354,7 @@ export function catalog(root: string): Record<string, unknown> {
 }
 
 export const links = (root: string): string =>
-  [
-    `<${abs(root, peopleSchemaPath())}>; rel="service-desc"; type="application/schema+json"`,
-    `<${abs(root, peopleOpenApiPath())}>; rel="service-desc"; type="${OAS}"`,
-    `<${abs(root, peopleApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`,
-  ].join(', ');
+  apiContractLinkHeader(peoplePublicSurfaceSlice, root);
 
 export const self = (root: string): string =>
   `<${abs(root, peopleApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`;

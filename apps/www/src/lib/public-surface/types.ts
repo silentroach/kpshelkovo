@@ -27,9 +27,7 @@ export type PublicSurfaceCacheClass =
   | 'uncached';
 
 export type PublicSurfaceAcceptNegotiation =
-  | 'not-negotiated'
-  | 'optional'
-  | 'required';
+  'not-negotiated' | 'optional' | 'required';
 
 export interface PublicSurfaceOwner {
   readonly id: PublicSurfaceOwnerId;
@@ -51,6 +49,7 @@ interface PublicSurfaceBase {
   readonly discoveryRoles: readonly PublicSurfaceDiscoveryRole[];
   readonly catalogRole?: PublicSurfaceCatalogRole;
   readonly sectionCatalogRole?: PublicSurfaceCatalogRole | false;
+  readonly prerenderedApiContract?: true;
   readonly linkRelations?: readonly PublicSurfaceLinkRelation[];
   readonly acceptsNegotiation?: PublicSurfaceAcceptNegotiation;
 }

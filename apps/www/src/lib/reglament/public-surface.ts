@@ -131,11 +131,16 @@ export const reglamentPublicSurfaceSlice = {
         path,
       ),
     ),
-    dataSurface(
-      'reglament:data-estimate-2026',
-      'Основной машиночитаемый JSON-файл сметы регламента 2026',
-      reglamentEstimate2026DataPath(),
-    ),
+    {
+      id: 'reglament:data-estimate-2026',
+      label: 'Основной машиночитаемый JSON-файл сметы регламента 2026',
+      path: reglamentEstimate2026DataPath(),
+      mediaType: 'application/json',
+      cacheClass: 'data',
+      discoveryRoles: ['data-feed', 'root-catalog'],
+      catalogRole: 'item',
+      prerenderedApiContract: true,
+    },
     dataSurface(
       'reglament:data-estimate-details-2026',
       'Детальный машиночитаемый JSON-файл сметы регламента 2026',
@@ -216,6 +221,7 @@ export const reglamentPublicSurfaceSlice = {
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
       catalogRole: 'service-desc',
+      prerenderedApiContract: true,
     },
     {
       id: 'reglament:openapi',
@@ -225,6 +231,7 @@ export const reglamentPublicSurfaceSlice = {
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
       catalogRole: 'service-desc',
+      prerenderedApiContract: true,
     },
     {
       id: 'reglament:api-catalog',

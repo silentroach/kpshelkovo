@@ -89,6 +89,7 @@ export const comparePublicSurfaceSlice = {
       cacheClass: 'data',
       discoveryRoles: ['data-feed', 'root-catalog'],
       catalogRole: 'item',
+      prerenderedApiContract: true,
     },
     {
       id: 'compare:data-explorer',
@@ -107,6 +108,7 @@ export const comparePublicSurfaceSlice = {
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
       catalogRole: 'service-desc',
+      prerenderedApiContract: true,
     },
     {
       id: 'compare:openapi',
@@ -116,6 +118,7 @@ export const comparePublicSurfaceSlice = {
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
       catalogRole: 'service-desc',
+      prerenderedApiContract: true,
     },
     {
       id: 'compare:api-catalog',

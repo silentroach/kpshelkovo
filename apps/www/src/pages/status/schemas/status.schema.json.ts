@@ -1,7 +1,9 @@
 import type { APIRoute } from 'astro';
 
 import { canonRoot } from '@/lib/site';
-import { links, schema } from '@/lib/status/discovery';
+import { apiContractResponseHeaders } from '@/lib/public-surface/api-contract';
+import { schema } from '@/lib/status/discovery';
+import { statusPublicSurfaceSlice } from '@/lib/status/public-surface';
 
 export const prerender = true;
 
@@ -10,9 +12,10 @@ export const GET: APIRoute = async () => {
   const body = JSON.stringify(schema(root));
 
   return new Response(body, {
-    headers: {
-      'Content-Type': 'application/schema+json; charset=utf-8',
-      Link: links(root),
-    },
+    headers: apiContractResponseHeaders(
+      statusPublicSurfaceSlice,
+      'status:schema',
+      root,
+    ),
   });
 };

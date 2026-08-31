@@ -52,6 +52,7 @@ export const peoplePublicSurfaceSlice = {
       cacheClass: 'data',
       discoveryRoles: ['data-feed', 'root-catalog'],
       catalogRole: 'item',
+      prerenderedApiContract: true,
     },
     {
       id: 'people:schema',
@@ -61,6 +62,7 @@ export const peoplePublicSurfaceSlice = {
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
       catalogRole: 'service-desc',
+      prerenderedApiContract: true,
     },
     {
       id: 'people:openapi',
@@ -70,6 +72,7 @@ export const peoplePublicSurfaceSlice = {
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
       catalogRole: 'service-desc',
+      prerenderedApiContract: true,
     },
     {
       id: 'people:api-catalog',

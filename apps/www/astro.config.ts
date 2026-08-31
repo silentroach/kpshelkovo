@@ -14,6 +14,7 @@ import {
 import { loadSitemapMetadataIndex } from './src/lib/sitemap-data';
 import { createAstroMarkdownProcessor } from './src/lib/markdown/astro-processor';
 import { indexNowUrlManifest } from './src/integrations/indexnow-url-manifest';
+import { apiContractHeaders } from './src/integrations/api-contract-headers';
 import { pagefindDevSnapshot } from './src/integrations/pagefind-dev-snapshot';
 import { statusCalendarAlternateValidation } from './src/integrations/status-calendar-alternate-validation';
 
@@ -91,6 +92,7 @@ export default defineConfig({
     },
   },
   integrations: [
+    apiContractHeaders(new URL(site)),
     pagefindDevSnapshot(),
     svelte(),
     sitemap({

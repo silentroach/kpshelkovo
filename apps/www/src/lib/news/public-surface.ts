@@ -162,6 +162,7 @@ export const newsPublicSurfaceSlice = {
       cacheClass: 'data',
       discoveryRoles: ['data-feed', 'root-catalog'],
       catalogRole: 'item',
+      prerenderedApiContract: true,
     },
     {
       id: 'news:rss',
@@ -180,6 +181,7 @@ export const newsPublicSurfaceSlice = {
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
       catalogRole: 'service-desc',
+      prerenderedApiContract: true,
     },
     {
       id: 'news:openapi',
@@ -189,6 +191,7 @@ export const newsPublicSurfaceSlice = {
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
       catalogRole: 'service-desc',
+      prerenderedApiContract: true,
     },
     {
       id: 'news:api-catalog',

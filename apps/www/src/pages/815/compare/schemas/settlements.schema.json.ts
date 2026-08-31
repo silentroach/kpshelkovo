@@ -1,17 +1,22 @@
 import type { APIRoute } from 'astro';
 
 import { schema } from '@/compare/lib/discovery';
-import { canonRoot } from '@/compare/lib/site';
+import { comparePublicSurfaceSlice } from '@/compare/lib/public-surface';
+import { canonRoot as compareRoot } from '@/compare/lib/site';
+import { apiContractResponseHeaders } from '@/lib/public-surface/api-contract';
+import { canonRoot } from '@/lib/site';
 
 export const prerender = true;
 
 export const GET: APIRoute = async () => {
   const root = canonRoot();
-  const body = JSON.stringify(schema(root));
+  const body = JSON.stringify(schema(compareRoot()));
 
   return new Response(body, {
-    headers: {
-      'Content-Type': 'application/schema+json; charset=utf-8',
-    },
+    headers: apiContractResponseHeaders(
+      comparePublicSurfaceSlice,
+      'compare:schema',
+      root,
+    ),
   });
 };

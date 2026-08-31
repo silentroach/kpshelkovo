@@ -1,4 +1,6 @@
 import { absoluteUrl } from '../site';
+import { apiContractLinkHeader } from '../public-surface/api-contract';
+import { statusPublicSurfaceSlice } from './public-surface';
 import {
   statusApiCatalogPath,
   statusDataPath,
@@ -404,11 +406,7 @@ export function catalog(root: string): Record<string, unknown> {
 }
 
 export const links = (root: string): string =>
-  [
-    `<${abs(root, statusSchemaPath())}>; rel="service-desc"; type="application/schema+json"`,
-    `<${abs(root, statusOpenApiPath())}>; rel="service-desc"; type="${OAS}"`,
-    `<${abs(root, statusApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`,
-  ].join(', ');
+  apiContractLinkHeader(statusPublicSurfaceSlice, root);
 
 export const self = (root: string): string =>
   `<${abs(root, statusApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`;

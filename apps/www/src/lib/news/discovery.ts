@@ -12,6 +12,8 @@ import {
 import { NEWS_AREAS, NEWS_AUTHOR_KINDS } from './schema';
 import type { RequiredProperties } from './discovery.types';
 import type { NewsDataset } from './types';
+import { apiContractLinkHeader } from '@/lib/public-surface/api-contract';
+import { newsPublicSurfaceSlice } from './public-surface';
 import {
   NEWS_PUBLIC_PAYLOAD_SCHEMA_VERSION,
   toNewsPublicPayload,
@@ -502,11 +504,7 @@ export function catalog(root: string): Record<string, unknown> {
 }
 
 export const links = (root: string): string =>
-  [
-    `<${abs(root, articlesSchemaPath())}>; rel="service-desc"; type="application/schema+json"`,
-    `<${abs(root, articlesOpenApiPath())}>; rel="service-desc"; type="${OAS}"`,
-    `<${abs(root, apiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`,
-  ].join(', ');
+  apiContractLinkHeader(newsPublicSurfaceSlice, root);
 
 export const self = (root: string): string =>
   `<${abs(root, apiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`;

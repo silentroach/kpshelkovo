@@ -1,0 +1,46 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`prerendered API contracts > keeps the five public contract triples explicit 1`] = `
+{
+  "compare": {
+    "link": "<https://kpshelkovo.online/815/compare/schemas/settlements.schema.json>; rel="service-desc"; type="application/schema+json", <https://kpshelkovo.online/815/compare/openapi/settlements.openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json", <https://kpshelkovo.online/815/compare/.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"; profile="https://www.rfc-editor.org/info/rfc9727"",
+    "routes": [
+      "application/json /815/compare/data/settlements.json",
+      "application/schema+json /815/compare/schemas/settlements.schema.json",
+      "application/vnd.oai.openapi+json /815/compare/openapi/settlements.openapi.json",
+    ],
+  },
+  "news": {
+    "link": "<https://kpshelkovo.online/news/schemas/articles.schema.json>; rel="service-desc"; type="application/schema+json", <https://kpshelkovo.online/news/openapi/articles.openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json", <https://kpshelkovo.online/news/.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"; profile="https://www.rfc-editor.org/info/rfc9727"",
+    "routes": [
+      "application/json /news/data/articles.json",
+      "application/schema+json /news/schemas/articles.schema.json",
+      "application/vnd.oai.openapi+json /news/openapi/articles.openapi.json",
+    ],
+  },
+  "people": {
+    "link": "<https://kpshelkovo.online/people/schemas/people.schema.json>; rel="service-desc"; type="application/schema+json", <https://kpshelkovo.online/people/openapi/people.openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json", <https://kpshelkovo.online/people/.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"; profile="https://www.rfc-editor.org/info/rfc9727"",
+    "routes": [
+      "application/json /people/data/people.json",
+      "application/schema+json /people/schemas/people.schema.json",
+      "application/vnd.oai.openapi+json /people/openapi/people.openapi.json",
+    ],
+  },
+  "reglament": {
+    "link": "<https://kpshelkovo.online/815/regulation/schemas/estimate-2026.schema.json>; rel="service-desc"; type="application/schema+json", <https://kpshelkovo.online/815/regulation/openapi/estimate-2026.openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json", <https://kpshelkovo.online/815/regulation/.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"; profile="https://www.rfc-editor.org/info/rfc9727"",
+    "routes": [
+      "application/json /815/regulation/data/estimate-2026.json",
+      "application/schema+json /815/regulation/schemas/estimate-2026.schema.json",
+      "application/vnd.oai.openapi+json /815/regulation/openapi/estimate-2026.openapi.json",
+    ],
+  },
+  "status": {
+    "link": "<https://kpshelkovo.online/status/schemas/status.schema.json>; rel="service-desc"; type="application/schema+json", <https://kpshelkovo.online/status/openapi/status.openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json", <https://kpshelkovo.online/status/.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"; profile="https://www.rfc-editor.org/info/rfc9727"",
+    "routes": [
+      "application/json /status/data/status.json",
+      "application/schema+json /status/schemas/status.schema.json",
+      "application/vnd.oai.openapi+json /status/openapi/status.openapi.json",
+    ],
+  },
+}
+`;

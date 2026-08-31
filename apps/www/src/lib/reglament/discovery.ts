@@ -1,4 +1,6 @@
 import { calculateEstimate } from './calculate';
+import { apiContractLinkHeader } from '../public-surface/api-contract';
+import { reglamentPublicSurfaceSlice } from './public-surface';
 import {
   reglamentApiCatalogPath,
   reglamentEstimateDetailsChecksMarkdownPath,
@@ -771,11 +773,7 @@ export function catalog(root: string): Record<string, unknown> {
 }
 
 export const links = (root: string): string =>
-  [
-    `<${abs(root, reglamentEstimate2026SchemaPath())}>; rel="service-desc"; type="application/schema+json"`,
-    `<${abs(root, reglamentEstimate2026OpenApiPath())}>; rel="service-desc"; type="${OAS}"`,
-    `<${abs(root, reglamentApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`,
-  ].join(', ');
+  apiContractLinkHeader(reglamentPublicSurfaceSlice, root);
 
 export const self = (root: string): string =>
   `<${abs(root, reglamentApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`;

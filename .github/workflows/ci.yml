@@ -177,27 +177,6 @@ jobs:
           fi
           chmod 600 ~/.ssh/known_hosts
 
-      - name: Deploy nginx config
-        run: |
-          ssh_opts="-p $DEPLOY_PORT -o ControlMaster=auto -o ControlPersist=600 -o ControlPath=$HOME/.ssh/cm-%C"
-          scp_opts="-P $DEPLOY_PORT -o ControlMaster=auto -o ControlPersist=600 -o ControlPath=$HOME/.ssh/cm-%C"
-
-          scp $scp_opts ops/nginx/deploy-nginx-site.sh "$DEPLOY_USER@$DEPLOY_HOST:/tmp/deploy-nginx-site.sh"
-          scp $scp_opts ops/nginx/kpshelkovo-online.conf "$DEPLOY_USER@$DEPLOY_HOST:/tmp/kpshelkovo-online.conf.new"
-          scp $scp_opts ops/nginx/media-kpshelkovo-online.conf "$DEPLOY_USER@$DEPLOY_HOST:/tmp/media-kpshelkovo-online.conf.new"
-          scp $scp_opts ops/nginx/sravni-shelkovo.conf "$DEPLOY_USER@$DEPLOY_HOST:/tmp/sravni-shelkovo.conf.new"
-
-          ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" '
-            set -eu
-
-            trap "rm -f /tmp/deploy-nginx-site.sh /tmp/kpshelkovo-online.conf.new /tmp/media-kpshelkovo-online.conf.new /tmp/sravni-shelkovo.conf.new" EXIT
-
-            sudo -n install -m 755 /tmp/deploy-nginx-site.sh /usr/local/sbin/deploy-nginx-site
-            sudo -n /usr/local/sbin/deploy-nginx-site /tmp/kpshelkovo-online.conf.new kpshelkovo-online
-            sudo -n /usr/local/sbin/deploy-nginx-site /tmp/media-kpshelkovo-online.conf.new media-kpshelkovo-online
-            sudo -n /usr/local/sbin/deploy-nginx-site /tmp/sravni-shelkovo.conf.new sravni-shelkovo
-          '
-
       - name: Sync build to server
         run: |
           ssh_opts="-p $DEPLOY_PORT -o ControlMaster=auto -o ControlPersist=600 -o ControlPath=$HOME/.ssh/cm-%C"
@@ -301,8 +280,33 @@ jobs:
             -e "ssh $ssh_opts" \
             dist/media/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_MEDIA_PATH/"
 
+      - name: Deploy nginx config
+        run: |
+          ssh_opts="-p $DEPLOY_PORT -o ControlMaster=auto -o ControlPersist=600 -o ControlPath=$HOME/.ssh/cm-%C"
+          scp_opts="-P $DEPLOY_PORT -o ControlMaster=auto -o ControlPersist=600 -o ControlPath=$HOME/.ssh/cm-%C"
+
+          scp $scp_opts ops/nginx/deploy-nginx-site.sh "$DEPLOY_USER@$DEPLOY_HOST:/tmp/deploy-nginx-site.sh"
+          scp $scp_opts ops/nginx/kpshelkovo-online.conf "$DEPLOY_USER@$DEPLOY_HOST:/tmp/kpshelkovo-online.conf.new"
+          scp $scp_opts apps/www/dist/api-contract-headers.conf "$DEPLOY_USER@$DEPLOY_HOST:/tmp/kpshelkovo-online-api-contract-headers.conf.new"
+          scp $scp_opts ops/nginx/media-kpshelkovo-online.conf "$DEPLOY_USER@$DEPLOY_HOST:/tmp/media-kpshelkovo-online.conf.new"
+          scp $scp_opts ops/nginx/sravni-shelkovo.conf "$DEPLOY_USER@$DEPLOY_HOST:/tmp/sravni-shelkovo.conf.new"
+
+          ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" '
+            set -eu
+
+            trap "rm -f /tmp/deploy-nginx-site.sh /tmp/kpshelkovo-online.conf.new /tmp/kpshelkovo-online-api-contract-headers.conf.new /tmp/media-kpshelkovo-online.conf.new /tmp/sravni-shelkovo.conf.new" EXIT
+
+            sudo -n install -m 755 /tmp/deploy-nginx-site.sh /usr/local/sbin/deploy-nginx-site
+            sudo -n /usr/local/sbin/deploy-nginx-site /tmp/kpshelkovo-online.conf.new kpshelkovo-online
+            sudo -n /usr/local/sbin/deploy-nginx-site /tmp/media-kpshelkovo-online.conf.new media-kpshelkovo-online
+            sudo -n /usr/local/sbin/deploy-nginx-site /tmp/sravni-shelkovo.conf.new sravni-shelkovo
+          '
+
       - name: Smoke Pagefind production delivery
         run: sh scripts/smoke-pagefind-delivery.sh https://kpshelkovo.online dist/www
+
+      - name: Smoke API contract production headers
+        run: sh scripts/smoke-api-contract-headers.sh https://kpshelkovo.online
 
       - name: Submit new URLs to IndexNow
         env:
