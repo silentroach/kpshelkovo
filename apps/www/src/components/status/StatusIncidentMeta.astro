@@ -8,16 +8,18 @@ import StatusIncidentPeriod from './StatusIncidentPeriod.astro';
 interface Props {
   readonly incident: StatusIncident;
   readonly className?: string;
+  readonly variant?: 'default' | 'prominent';
 }
 
-const { incident, className } = Astro.props;
+const { incident, className, variant = 'default' } = Astro.props;
 
 const sourceUrl = incident.sourceUrl;
 ---
 
 <div
   class:list={[
-    'flex flex-wrap items-center gap-x-2.5 gap-y-2 text-sm leading-6 text-muted-foreground',
+    'status-incident-meta',
+    { 'status-incident-meta--prominent': variant === 'prominent' },
     className,
   ]}
 >
@@ -36,3 +38,21 @@ const sourceUrl = incident.sourceUrl;
     )
   }
 </div>
+
+<style>
+  .status-incident-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 0.625rem;
+    row-gap: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  .status-incident-meta--prominent {
+    column-gap: 1rem;
+    font-size: 0.9375rem;
+  }
+</style>

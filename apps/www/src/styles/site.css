@@ -188,6 +188,8 @@ html[data-site-navigation-pending] .site-navigation-progress::before {
   --news-hero-overlay-side-mid: oklch(24% 0.04 145 / 0.18);
   --news-hero-overlay-side-soft: oklch(24% 0.04 145 / 0.06);
 
+  --color-text: var(--news-hero-foreground);
+  --color-text-muted: var(--news-hero-muted-foreground);
   --color-foreground: var(--news-hero-foreground);
   --color-muted-foreground: var(--news-hero-muted-foreground);
   --color-primary: var(--news-hero-primary);
