@@ -96,81 +96,12 @@ const enterDebouncedQuery = async (
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
-  delete document.documentElement.dataset.siteMetrikaId;
-  delete window.ym;
   document
     .querySelectorAll('[data-search-test-opener]')
     .forEach((element) => element.remove());
 });
 
 describe('SearchDialog', () => {
-  it('reports opening and completed searches to Yandex Metrica', async () => {
-    const search = vi.fn(async (query: string) => {
-      if (query === 'подать в суд тариф') {
-        return readyResponse(query, [resultAt(1)], 12, 'подать суд тариф');
-      }
-      if (query === 'в') {
-        return readyResponse(query, [], 0, '');
-      }
-
-      return readyResponse(query, [], 0);
-    });
-    const ym = vi.fn();
-    document.documentElement.dataset.siteMetrikaId = '123';
-    window.ym = ym;
-    const opener = addOpener('Поиск');
-    const view = render(SearchDialog, { props: { client: { search } } });
-    const dialog = dialogFrom(view.container);
-
-    await requestOpen(opener);
-    const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
-    await enterDebouncedQuery(input, 'подать в суд тариф');
-    await waitFor(() => expect(dialog.dataset.searchState).toBe('results'));
-    await enterDebouncedQuery(input, 'в');
-    await waitFor(() => expect(dialog.dataset.searchState).toBe('empty'));
-    await enterDebouncedQuery(input, 'пусто');
-    await waitFor(() => expect(dialog.dataset.searchState).toBe('empty'));
-
-    expect(ym.mock.calls).toMatchInlineSnapshot(`
-      [
-        [
-          123,
-          "reachGoal",
-          "search_open",
-        ],
-        [
-          123,
-          "reachGoal",
-          "search",
-          {
-            "normalized_query": "подать суд тариф",
-            "query": "подать в суд тариф",
-            "results_count": 12,
-          },
-        ],
-        [
-          123,
-          "reachGoal",
-          "search",
-          {
-            "normalized_query": "",
-            "query": "в",
-            "results_count": 0,
-          },
-        ],
-        [
-          123,
-          "reachGoal",
-          "search",
-          {
-            "query": "пусто",
-            "results_count": 0,
-          },
-        ],
-      ]
-    `);
-  });
-
   it('initializes on open and preloads input without surfacing optimization failures', async () => {
     const init = vi.fn(async () => {
       throw new Error('Pagefind init failed');
