@@ -13,6 +13,7 @@ interface Props {
   readonly appliesToAllAreas?: boolean;
   readonly sourceUrl?: string;
   readonly className?: string;
+  readonly variant?: 'default' | 'prominent';
 }
 
 const {
@@ -23,6 +24,7 @@ const {
   appliesToAllAreas = true,
   sourceUrl,
   className,
+  variant = 'default',
 } = Astro.props;
 
 const visibleAreas = appliesToAllAreas ? [] : areas;
@@ -30,11 +32,12 @@ const visibleAreas = appliesToAllAreas ? [] : areas;
 
 <div
   class:list={[
-    'flex flex-wrap items-center gap-2.5 text-sm leading-6 text-muted-foreground',
+    'news-meta',
+    { 'news-meta--prominent': variant === 'prominent' },
     className,
   ]}
 >
-  <time datetime={publishedIso} class="font-semibold text-foreground">
+  <time datetime={publishedIso} class="news-meta-date">
     {formatNewsDate(publishedIso)}
   </time>
   {
@@ -44,7 +47,7 @@ const visibleAreas = appliesToAllAreas ? [] : areas;
           href={author.url}
           target="_blank"
           rel="noreferrer noopener"
-          class="ui-link font-semibold"
+          class="ui-link news-meta-author"
         >
           {formatNewsAuthor(author, { short: !fullAuthorName })}
         </a>
@@ -55,3 +58,30 @@ const visibleAreas = appliesToAllAreas ? [] : areas;
   {visibleAreas.map((area) => <ShelkovoAreaIcon area={area} />)}
   {sourceUrl && <LinkWithIcon href={sourceUrl} ariaLabelPrefix="Источник" />}
 </div>
+
+<style>
+  .news-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  .news-meta-date {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .news-meta--prominent {
+    column-gap: 1rem;
+    row-gap: 0.375rem;
+    font-size: 0.9375rem;
+  }
+
+  .news-meta-author {
+    font-weight: 600;
+  }
+</style>
