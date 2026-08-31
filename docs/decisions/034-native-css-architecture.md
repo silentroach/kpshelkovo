@@ -69,9 +69,11 @@ Astro- и Svelte-компоненты владеют локальным офор
 - состояния: `--color-success`, `--color-success-foreground`, `--color-success-soft`, `--color-success-border`, `--color-success-text`, `--color-warning`, `--color-warning-graphic`, `--color-warning-soft`, `--color-warning-border`, `--color-warning-text`, `--color-danger`, `--color-danger-foreground`, `--color-danger-soft`, `--color-danger-border`, `--color-danger-text`, `--color-info-soft`, `--color-info-border`, `--color-info-text`, `--color-water`, `--color-water-soft`, `--color-water-border`, `--color-unknown`, `--color-unknown-soft`, `--color-unknown-border`, `--color-neutral-soft`, `--color-neutral-border`;
 - брендовые цвета: `--color-telegram`, `--color-whatsapp`, `--color-domyland-start`, `--color-domyland-end`, `--color-yandex-maps`, `--color-yandex-maps-light`, `--color-star`;
 - типографика: `--font-heading`, `--font-body`;
-- геометрия: `--radius-sm`, `--radius-md`, `--radius-lg`, `--radius-xl`, `--radius-full`, а также app-only `--page-max` и `--page-padding`.
+- геометрия: `--radius-sm`, `--radius-md`, `--radius-lg`, `--radius-xl`, `--radius-2xl`, `--radius-full`, а также app-only `--page-max` и `--page-padding`.
 
-Первый перенос задает `--radius-sm: 0.25rem`, `--radius-md: 0.375rem`, `--radius-lg: 0.5rem` и `--radius-xl: 0.75rem` по migration baseline. `--radius-full: 999px` сохраняет pill-геометрию и считается визуально эквивалентной текущему Tailwind rule `2147483647px`. Иные значения требуют явного решения о визуальном изменении.
+Первый перенос задает `--radius-sm: 0.25rem`, `--radius-md: 0.375rem`, `--radius-lg: 0.5rem`, `--radius-xl: 0.75rem` и `--radius-2xl: 1rem` по migration baseline. `--radius-full: 999px` сохраняет pill-геометрию и считается визуально эквивалентной текущему Tailwind rule `2147483647px`. Иные значения требуют явного решения о визуальном изменении.
+
+`--color-neutral-soft: oklch(96.8% 0.004 125)` и `--color-neutral-border: oklch(88.5% 0.008 130)` сохраняют при первом переносе значения текущих `muted-*` aliases. Они намеренно совпадают со стартовыми `unknown-*`, но остаются отдельными semantic tokens: последующее расхождение значений требует явного визуального решения.
 
 Общая spacing scale не вводится.
 

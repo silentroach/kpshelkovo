@@ -36,6 +36,10 @@ colors:
   yandex-maps: '#DF574E'
   yandex-maps-light: '#FF8277'
   unknown: 'oklch(48% 0.04 125)'
+  unknown-soft: 'oklch(96.8% 0.004 125)'
+  unknown-border: 'oklch(88.5% 0.008 130)'
+  neutral-soft: 'oklch(96.8% 0.004 125)'
+  neutral-border: 'oklch(88.5% 0.008 130)'
 typography:
   display:
     fontFamily: 'PT Serif, Georgia, serif'
@@ -103,6 +107,7 @@ rounded:
   md: '0.375rem'
   lg: '0.5rem'
   xl: '0.75rem'
+  2xl: '1rem'
   full: '999px'
 spacing:
   page-padding: 'clamp(1rem, 3vw, 2rem)'

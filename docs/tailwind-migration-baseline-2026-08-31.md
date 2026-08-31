@@ -110,15 +110,25 @@ pnpm --filter @shelkovo/www build
 `components` и `utilities`, 55 правил `@property` и 9 `@font-face`. Tailwind
 banner и source maps в production output отсутствуют.
 
+Текущие `--color-muted-soft` и `--color-muted-border-soft` ссылаются на
+`--color-unknown-soft: oklch(96.8% 0.004 125)` и
+`--color-unknown-border: oklch(88.5% 0.008 130)`. Первый перенос в отдельные
+`neutral-*` tokens должен сохранить эти значения.
+
 Текущая геометрия, которую нужно сохранить при первом переносе tokens:
 
 - generated `--radius-sm`: `0.25rem`;
 - generated `--radius-md`: `0.375rem`;
 - generated `--radius-lg`: `0.5rem`;
 - generated `--radius-xl`: `0.75rem`;
+- generated `--radius-2xl`: `1rem`;
 - emitted `.rounded-full`: `2147483647px`;
 - semantic CSS дополнительно использует прямые значения `0.35rem`, `0.5rem`,
   `1rem` и `999px`.
+
+Шесть элементов в страницах человека и поселка используют `rounded-2xl`.
+Первый перенос должен заменить их на scoped `1rem` или сохранить
+`--radius-2xl` до исчезновения последнего consumer.
 
 В source CSS пока нет канонических `--radius-*`. Значение будущего
 `--radius-full` может быть визуально эквивалентным pill radius, но первый перенос
