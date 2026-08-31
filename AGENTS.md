@@ -114,7 +114,7 @@ pnpm build          # dist/www
 
 ## Правила workspace
 
-- Общие стили и UI-примитивы выносить в `packages/ui`.
+- Стили и UI-компоненты, которые реально делят несколько приложений, выносить в `packages/ui`; app-owned tokens, reset и site-level `ui-*` для `apps/www` держать по `docs/decisions/034-native-css-architecture.md`.
 - Общие URL/build helper-утилиты выносить в `packages/url` или `scripts/`.
 - При изменениях deploy-потока синхронно обновлять `.github/workflows/*` и `ops/nginx/*`.
 - Если добавляется внешний ресурс или запрос вовне (`fetch`/`connect`, iframe, script, image, font, style, analytics, карты и т.п.), синхронно проверить и при необходимости обновить CSP в `ops/nginx/*`.
