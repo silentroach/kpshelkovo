@@ -70,7 +70,7 @@ importers:
         version: link:../../packages/ui
       astro:
         specifier: ^7.2.6
-        version: 7.2.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.3.0)(jiti@2.7.0)(yaml@2.9.0)
+        version: 7.2.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.3.0)(jiti@2.7.0)(yaml@2.9.0)
     devDependencies:
       sharp:
         specifier: ^0.35.3
@@ -92,7 +92,7 @@ importers:
         version: 3.7.3
       '@astrojs/svelte':
         specifier: ^9.0.1
-        version: 9.0.1(@types/node@26.3.0)(astro@7.2.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.3.0)(jiti@2.7.0)(yaml@2.9.0))(esbuild@0.28.2)(jiti@2.7.0)(svelte@5.56.10)(typescript@7.0.2)(yaml@2.9.0)
+        version: 9.0.1(@types/node@26.3.0)(astro@7.2.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.3.0)(jiti@2.7.0)(yaml@2.9.0))(esbuild@0.28.2)(jiti@2.7.0)(svelte@5.56.10)(typescript@7.0.2)(yaml@2.9.0)
       '@shelkovo/format':
         specifier: workspace:*
         version: link:../../packages/format
@@ -114,9 +114,12 @@ importers:
       '@yandex/ymaps3-clusterer':
         specifier: ^0.0.12
         version: 0.0.12
+      ajv-formats:
+        specifier: ^3.0.1
+        version: 3.0.1(ajv@8.20.0)
       astro:
         specifier: ^7.2.6
-        version: 7.2.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.3.0)(jiti@2.7.0)(yaml@2.9.0)
+        version: 7.2.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.3.0)(jiti@2.7.0)(yaml@2.9.0)
       diff:
         specifier: ^9.0.0
         version: 9.0.0
@@ -148,6 +151,9 @@ importers:
       '@yandex/ymaps3-types':
         specifier: ^1.0.20315584
         version: 1.0.20315584
+      ajv:
+        specifier: ^8.20.0
+        version: 8.20.0
       astro-compressor:
         specifier: ^1.3.0
         version: 1.3.0
@@ -278,7 +284,7 @@ importers:
         version: 4.3.3(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.0))
       astro:
         specifier: ^7.2.6
-        version: 7.2.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.3.0)(jiti@2.7.0)(yaml@2.9.0)
+        version: 7.2.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.3.0)(jiti@2.7.0)(yaml@2.9.0)
       svelte:
         specifier: ^5.56.10
         version: 5.56.10
@@ -480,9 +486,6 @@ packages:
 
   '@emnapi/runtime@1.11.1':
     resolution: {integrity: sha512-vgj7R3y3Wgx24IQaGPA/R6YFXLHVMOZ0uVEyIQPaWs+rd1AzfEMXlAC22FYwO1XkKR6NPsq7mUandH8oIRdZFw==}
-
-  '@emnapi/runtime@1.11.3':
-    resolution: {integrity: sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA==}
 
   '@emnapi/wasi-threads@1.2.2':
     resolution: {integrity: sha512-c95qOXkHdydNKhscBTebqEC1CVAZpyqOfVfBzQ1qgzyl3gfeldUjIggDbIZgDKsHLgnsM+igH7TJ/eAasaVuMA==}
@@ -1493,6 +1496,17 @@ packages:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
 
+  ajv-formats@3.0.1:
+    resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
+    peerDependencies:
+      ajv: ^8.0.0
+    peerDependenciesMeta:
+      ajv:
+        optional: true
+
+  ajv@8.20.0:
+    resolution: {integrity: sha512-Thbli+OlOj+iMPYFBVBfJ3OmCAnaSyNn4M1vz9T6Gka5Jt9ba/HIR56joy65tY6kx/FCF5VXNB819Y7/GUrBGA==}
+
   am-i-vibing@0.4.0:
     resolution: {integrity: sha512-MxT4XZL7pzLHpuvhDKdMaQHMGGkJDLluKBLsbstn+8wv9sWcFT6h+0ve9qkml95amVTZtZV83gQe2hY+ojgHLg==}
     hasBin: true
@@ -2090,6 +2104,9 @@ packages:
     engines: {node: '>= 10.17.0'}
     hasBin: true
 
+  fast-deep-equal@3.1.3:
+    resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
+
   fast-fifo@1.3.2:
     resolution: {integrity: sha512-/d9sfos4yxzpwkDkuN7k2SqFKtYNmCTzgfEpz82x34IM9/zc8KGxQoXg1liNC/izpRM/MBdt44Nmx41ZWqk+FQ==}
 
@@ -2098,6 +2115,9 @@ packages:
 
   fast-string-width@3.0.2:
     resolution: {integrity: sha512-gX8LrtNEI5hq8DVUfRQMbr5lpaS4nMIWV+7XEbXk2b8kiQIizgnlr12B4dA3ZEx3308ze0O4Q1R+cHts8kyUJg==}
+
+  fast-uri@3.1.6:
+    resolution: {integrity: sha512-7Ical1vFEMr0onbVzEDIreM22I4khW+fzyQPwvAFWBp1iwdshSZRsL4jjRvPG9JP1uiqMHRto+YU6R2/CzDz5Q==}
 
   fast-wrap-ansi@0.2.2:
     resolution: {integrity: sha512-7F2Fl+TjRSenLqlU3UjSH0iyqopqoZIu7eZVpEirP2g1GtWa2G/ecEmBdgz31+Mxr+ELclgg6sokpSFIQiZ02Q==}
@@ -2373,6 +2393,9 @@ packages:
   js-yaml@4.3.1:
     resolution: {integrity: sha512-CY6crGq313MX8GkwvB7tzgp99vjQxY1++5y10/BKN/GUfHqWaOGQMNZkBvqSzsZKWk/ijwHlWzzkLulsGHhjWQ==}
     hasBin: true
+
+  json-schema-traverse@1.0.0:
+    resolution: {integrity: sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==}
 
   jsonc-parser@3.3.1:
     resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
@@ -3112,6 +3135,10 @@ packages:
 
   require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
+    engines: {node: '>=0.10.0'}
+
+  require-from-string@2.0.2:
+    resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
     engines: {node: '>=0.10.0'}
 
   require-main-filename@2.0.0:
@@ -3854,9 +3881,9 @@ snapshots:
   '@astrojs/compiler-binding-linux-x64-musl@0.4.0':
     optional: true
 
-  '@astrojs/compiler-binding-wasm32-wasi@0.4.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)':
+  '@astrojs/compiler-binding-wasm32-wasi@0.4.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.2.3(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)
+      '@napi-rs/wasm-runtime': 1.2.3(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
@@ -3868,7 +3895,7 @@ snapshots:
   '@astrojs/compiler-binding-win32-x64-msvc@0.4.0':
     optional: true
 
-  '@astrojs/compiler-binding@0.4.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)':
+  '@astrojs/compiler-binding@0.4.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)':
     optionalDependencies:
       '@astrojs/compiler-binding-darwin-arm64': 0.4.0
       '@astrojs/compiler-binding-darwin-x64': 0.4.0
@@ -3876,16 +3903,16 @@ snapshots:
       '@astrojs/compiler-binding-linux-arm64-musl': 0.4.0
       '@astrojs/compiler-binding-linux-x64-gnu': 0.4.0
       '@astrojs/compiler-binding-linux-x64-musl': 0.4.0
-      '@astrojs/compiler-binding-wasm32-wasi': 0.4.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)
+      '@astrojs/compiler-binding-wasm32-wasi': 0.4.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
       '@astrojs/compiler-binding-win32-arm64-msvc': 0.4.0
       '@astrojs/compiler-binding-win32-x64-msvc': 0.4.0
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
 
-  '@astrojs/compiler-rs@0.4.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)':
+  '@astrojs/compiler-rs@0.4.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)':
     dependencies:
-      '@astrojs/compiler-binding': 0.4.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)
+      '@astrojs/compiler-binding': 0.4.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
@@ -3926,10 +3953,10 @@ snapshots:
       stream-replace-string: 2.0.0
       zod: 4.4.3
 
-  '@astrojs/svelte@9.0.1(@types/node@26.3.0)(astro@7.2.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.3.0)(jiti@2.7.0)(yaml@2.9.0))(esbuild@0.28.2)(jiti@2.7.0)(svelte@5.56.10)(typescript@7.0.2)(yaml@2.9.0)':
+  '@astrojs/svelte@9.0.1(@types/node@26.3.0)(astro@7.2.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.3.0)(jiti@2.7.0)(yaml@2.9.0))(esbuild@0.28.2)(jiti@2.7.0)(svelte@5.56.10)(typescript@7.0.2)(yaml@2.9.0)':
     dependencies:
       '@sveltejs/vite-plugin-svelte': 7.3.0(svelte@5.56.10)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.0))
-      astro: 7.2.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.3.0)(jiti@2.7.0)(yaml@2.9.0)
+      astro: 7.2.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.3.0)(jiti@2.7.0)(yaml@2.9.0)
       svelte: 5.56.10
       svelte2tsx: 0.7.57(svelte@5.56.10)(typescript@7.0.2)
       typescript: 7.0.2
@@ -4031,11 +4058,6 @@ snapshots:
     optional: true
 
   '@emnapi/runtime@1.11.1':
-    dependencies:
-      tslib: 2.8.1
-    optional: true
-
-  '@emnapi/runtime@1.11.3':
     dependencies:
       tslib: 2.8.1
     optional: true
@@ -4241,8 +4263,6 @@ snapshots:
     optional: true
 
   '@img/sharp-wasm32@0.35.3':
-    dependencies:
-      '@emnapi/runtime': 1.11.3
     optional: true
 
   '@img/sharp-webcontainers-wasm32@0.35.3':
@@ -4328,13 +4348,6 @@ snapshots:
     dependencies:
       '@emnapi/core': 1.11.1
       '@emnapi/runtime': 1.11.1
-      '@tybys/wasm-util': 0.10.3
-    optional: true
-
-  '@napi-rs/wasm-runtime@1.2.3(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)':
-    dependencies:
-      '@emnapi/core': 1.11.1
-      '@emnapi/runtime': 1.11.3
       '@tybys/wasm-util': 0.10.3
     optional: true
 
@@ -4842,6 +4855,17 @@ snapshots:
 
   agent-base@7.1.4: {}
 
+  ajv-formats@3.0.1(ajv@8.20.0):
+    optionalDependencies:
+      ajv: 8.20.0
+
+  ajv@8.20.0:
+    dependencies:
+      fast-deep-equal: 3.1.3
+      fast-uri: 3.1.6
+      json-schema-traverse: 1.0.0
+      require-from-string: 2.0.2
+
   am-i-vibing@0.4.0:
     dependencies:
       process-ancestry: 0.1.0
@@ -4899,9 +4923,9 @@ snapshots:
 
   astro-compressor@1.3.0: {}
 
-  astro@7.2.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.3.0)(jiti@2.7.0)(yaml@2.9.0):
+  astro@7.2.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.3.0)(jiti@2.7.0)(yaml@2.9.0):
     dependencies:
-      '@astrojs/compiler-rs': 0.4.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)
+      '@astrojs/compiler-rs': 0.4.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
       '@astrojs/internal-helpers': 0.10.4
       '@astrojs/markdown-satteri': 0.3.8
       '@astrojs/telemetry': 3.3.3
@@ -5499,6 +5523,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  fast-deep-equal@3.1.3: {}
+
   fast-fifo@1.3.2: {}
 
   fast-string-truncated-width@3.0.3: {}
@@ -5506,6 +5532,8 @@ snapshots:
   fast-string-width@3.0.2:
     dependencies:
       fast-string-truncated-width: 3.0.3
+
+  fast-uri@3.1.6: {}
 
   fast-wrap-ansi@0.2.2:
     dependencies:
@@ -5817,6 +5845,8 @@ snapshots:
   js-yaml@4.3.1:
     dependencies:
       argparse: 2.0.1
+
+  json-schema-traverse@1.0.0: {}
 
   jsonc-parser@3.3.1: {}
 
@@ -6720,6 +6750,8 @@ snapshots:
       unified: 11.0.5
 
   require-directory@2.1.1: {}
+
+  require-from-string@2.0.2: {}
 
   require-main-filename@2.0.0: {}
 

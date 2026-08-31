@@ -1,6 +1,5 @@
 import { absoluteUrl } from '../site';
 import type { EntityMentionTarget } from '../mentions';
-import type { PersonNameCaseForms } from './name-cases';
 import type {
   PersonBacklinks,
   PersonContact,
@@ -8,69 +7,24 @@ import type {
   PersonProfile,
 } from './types';
 import { PERSON_MENTION_SECTIONS } from './schema';
+import {
+  peoplePublicPayloadSchema,
+  type PeoplePublicBacklinkDto,
+  type PeoplePublicBacklinksDto,
+  type PeoplePublicContactDto,
+  type PeoplePublicMentionDto,
+  type PeoplePublicPayloadDto,
+  type PeoplePublicProfileDto,
+} from './public-schema';
 
-export interface PeoplePublicContactDto {
-  readonly type: PersonContact['type'];
-  readonly value: string;
-  readonly display: string;
-  readonly href: string;
-}
-
-export interface PeoplePublicMentionDto {
-  readonly type: EntityMentionTarget['type'];
-  readonly slug: string;
-  readonly name: string;
-  readonly company?: string;
-  readonly position?: string;
-  readonly html_url: string;
-  readonly markdown_url: string;
-}
-
-export interface PeoplePublicBacklinkDto {
-  readonly section: PersonMentionRef['section'];
-  readonly kind: PersonMentionRef['kind'];
-  readonly source_id: string;
-  readonly title: string;
-  readonly html_url: string;
-  readonly markdown_url: string;
-  readonly excerpt?: string;
-  readonly mentioned_at?: string;
-}
-
-export interface PeoplePublicBacklinksDto {
-  readonly news: readonly PeoplePublicBacklinkDto[];
-  readonly status: readonly PeoplePublicBacklinkDto[];
-  readonly reviews: readonly PeoplePublicBacklinkDto[];
-  readonly places: readonly PeoplePublicBacklinkDto[];
-  readonly people: readonly PeoplePublicBacklinkDto[];
-  readonly contacts: readonly PeoplePublicBacklinkDto[];
-}
-
-export interface PeoplePublicProfileDto {
-  readonly id: string;
-  readonly slug: string;
-  readonly name: string;
-  readonly name_cases?: PersonNameCaseForms;
-  readonly company?: string;
-  readonly position?: string;
-  readonly html_url: string;
-  readonly markdown_url: string;
-  readonly contacts: readonly PeoplePublicContactDto[];
-  readonly body_markdown: string;
-  readonly mentions: readonly PeoplePublicMentionDto[];
-  readonly mention_count: number;
-  readonly backlinks: PeoplePublicBacklinksDto;
-  readonly backlink_count: number;
-}
-
-export interface PeoplePublicPayloadDto {
-  readonly stats: {
-    readonly profile_count: number;
-    readonly mention_count: number;
-    readonly backlink_count: number;
-  };
-  readonly profiles: readonly PeoplePublicProfileDto[];
-}
+export type {
+  PeoplePublicBacklinkDto,
+  PeoplePublicBacklinksDto,
+  PeoplePublicContactDto,
+  PeoplePublicMentionDto,
+  PeoplePublicPayloadDto,
+  PeoplePublicProfileDto,
+} from './public-schema';
 
 const fullUrl = (value: string): string => absoluteUrl(value);
 
@@ -144,7 +98,7 @@ export const buildPeoplePublicPayload = (data: {
 }): PeoplePublicPayloadDto => {
   const profiles = data.profiles.map(profileDto);
 
-  return {
+  return peoplePublicPayloadSchema.parse({
     stats: {
       profile_count: profiles.length,
       mention_count: profiles.reduce(
@@ -157,5 +111,5 @@ export const buildPeoplePublicPayload = (data: {
       ),
     },
     profiles,
-  };
+  });
 };

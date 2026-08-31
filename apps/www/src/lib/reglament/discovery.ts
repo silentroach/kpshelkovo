@@ -28,42 +28,28 @@ import {
   reglamentSourcePdfUrl,
 } from './routes';
 import type {
-  CostBreakdown,
-  EditableField,
   Estimate,
   EstimateRow,
   EstimateSourcePdf,
   EstimateSourceRef,
 } from './schema';
+import { ESTIMATE_SOURCE_PDFS } from './schema';
 import {
-  EDITABLE_FIELD_KEYS,
-  EDITABLE_FIELD_LEVELS,
-  ESTIMATE_COEFFICIENT_POLICIES,
-  ESTIMATE_ROW_KINDS,
-  ESTIMATE_SOURCE_PDFS,
-} from './schema';
+  buildReglamentPublicJsonSchema,
+  REGLAMENT_FORMULAS,
+  reglamentPublicPayloadSchema,
+  type ReglamentPublicComputedTotalsDto,
+  type ReglamentPublicPayloadDto,
+  type ReglamentPublicRowDto,
+  type ReglamentPublicSourceRefDto,
+} from './public-schema';
 
 export const PROFILE = 'https://www.rfc-editor.org/info/rfc9727';
 export const OAS = 'application/vnd.oai.openapi+json';
 
 const ESTIMATE_PAYLOAD_SCHEMA = 'Estimate2026Payload';
 
-const ROW_BREAKDOWN_FORMULAS = {
-  fot: 'primary_salary + machinist_salary',
-  direct: 'fot + machines + materials + contractors',
-  insurance: 'coefficient_policy == "fot" ? fot * insurance_rate : 0',
-  overhead: 'coefficient_policy == "fot" ? fot * overhead_rate : 0',
-  profit: 'coefficient_policy == "fot" ? fot * profit_rate : 0',
-  usn: 'coefficient_policy == "fot" ? profit * usn_rate : 0',
-  income: 'direct + insurance + overhead + profit + usn',
-  gross: 'income * (1 + vat_rate)',
-  tariff_per_sotka_month: 'gross / tariff_area_sotki / 12',
-} as const;
-
-export const REGLAMENT_FORMULAS = {
-  tariff_per_sotka_month: 'annual_gross / tariff_area_sotki / 12',
-  row_breakdown: ROW_BREAKDOWN_FORMULAS,
-} as const;
+export { REGLAMENT_FORMULAS };
 
 export const REGLAMENT_CAVEATS = [
   'PDF-таблицы нормализованы вручную; исходные PDF опубликованы в публичном хранилище по адресам https://media.kpshelkovo.online/815/regulation/*.pdf.',
@@ -71,64 +57,13 @@ export const REGLAMENT_CAVEATS = [
   'Строки с тегом «требует проверки» стоит перепроверить по исходным PDF перед юридическими или финансовыми выводами.',
 ] as const;
 
-export interface ReglamentDiscoverySourceRef extends EstimateSourceRef {
-  readonly pdf_key: string;
-  readonly pdf_url: string;
-}
-
-export interface ReglamentDiscoveryComputedTotals {
-  readonly annual_gross: number;
-  readonly tariff_per_sotka_month: number;
-  readonly delta_annual_gross: number;
-  readonly delta_tariff_per_sotka_month: number;
-}
-
-export interface ReglamentDiscoveryRowComputed extends ReglamentDiscoveryComputedTotals {
-  readonly is_enabled: boolean;
-  readonly breakdown: CostBreakdown;
-}
-
-export interface ReglamentDiscoveryRow {
-  readonly id: string;
-  readonly title: string;
-  readonly kind: EstimateRow['kind'];
-  readonly coefficient_policy: EstimateRow['coefficient_policy'];
-  readonly description?: string;
-  readonly tags?: readonly string[];
-  readonly baseline: EstimateRow['baseline'];
-  readonly computed: ReglamentDiscoveryRowComputed;
-  readonly source_refs: readonly ReglamentDiscoverySourceRef[];
-  readonly editable_fields: readonly EditableField[];
-  readonly children?: readonly ReglamentDiscoveryRow[];
-}
-
-export interface ReglamentDiscoverySection {
-  readonly id: string;
-  readonly title: string;
-  readonly official: Estimate['sections'][number]['baseline'];
-  readonly computed: ReglamentDiscoveryComputedTotals;
-  readonly source_refs: readonly ReglamentDiscoverySourceRef[];
-  readonly rows: readonly ReglamentDiscoveryRow[];
-}
-
-export interface ReglamentDiscoveryPayload {
-  readonly id: string;
-  readonly year: number;
-  readonly title: string;
-  readonly tariff_area_sotki: number;
-  readonly coefficients: Estimate['coefficients'];
-  readonly official: Estimate['baseline'];
-  readonly computed: ReglamentDiscoveryComputedTotals;
-  readonly formulas: typeof REGLAMENT_FORMULAS;
-  readonly source_refs: readonly ReglamentDiscoverySourceRef[];
-  readonly sources: readonly {
-    readonly pdf: EstimateSourcePdf;
-    readonly pdf_key: string;
-    readonly pdf_url: string;
-  }[];
-  readonly caveats: readonly string[];
-  readonly sections: readonly ReglamentDiscoverySection[];
-}
+export type ReglamentDiscoverySourceRef = ReglamentPublicSourceRefDto;
+export type ReglamentDiscoveryComputedTotals = ReglamentPublicComputedTotalsDto;
+export type ReglamentDiscoveryRow = ReglamentPublicRowDto;
+export type ReglamentDiscoveryPayload = ReglamentPublicPayloadDto;
+export type ReglamentDiscoveryRowComputed = ReglamentDiscoveryRow['computed'];
+export type ReglamentDiscoverySection =
+  ReglamentDiscoveryPayload['sections'][number];
 
 const abs = (root: string, path: string): string =>
   new URL(path.replace(/^\//, ''), `${root}/`).toString();
@@ -140,42 +75,6 @@ const star = (
 ): readonly { readonly value: string; readonly language: 'ru' }[] => [
   { value, language: 'ru' },
 ];
-
-const text = (minLength = 0): Record<string, unknown> => ({
-  type: 'string',
-  ...(minLength > 0 ? { minLength } : {}),
-});
-
-const integer = (minimum = 0): Record<string, unknown> => ({
-  type: 'integer',
-  minimum,
-});
-
-const number = (minimum?: number): Record<string, unknown> => ({
-  type: 'number',
-  ...(minimum === undefined ? {} : { minimum }),
-});
-
-const flag = (): Record<string, unknown> => ({ type: 'boolean' });
-
-const list = (
-  items: Record<string, unknown>,
-  extra?: Record<string, unknown>,
-): Record<string, unknown> => ({
-  type: 'array',
-  items,
-  ...(extra ?? {}),
-});
-
-const obj = (
-  properties: Record<string, unknown>,
-  required: readonly string[],
-): Record<string, unknown> => ({
-  type: 'object',
-  additionalProperties: false,
-  properties,
-  required,
-});
 
 function rewriteSchemaRefs(value: unknown, schemaRef: string): unknown {
   if (Array.isArray(value)) {
@@ -283,7 +182,7 @@ export const buildReglamentPayload = (
     calculated.sections.map((section) => [section.id, section]),
   );
 
-  return {
+  const payload = {
     id: estimate.id,
     year: estimate.year,
     title: estimate.title,
@@ -321,255 +220,15 @@ export const buildReglamentPayload = (
         ),
       };
     }),
-  };
+  } satisfies ReglamentDiscoveryPayload;
+
+  reglamentPublicPayloadSchema.parse(payload);
+
+  return payload;
 };
 
-export function schema(root: string): Record<string, unknown> {
-  const sourceRefSchema = { $ref: '#/$defs/sourceRef' };
-  const displayValueSchema = { $ref: '#/$defs/displayValue' };
-
-  return {
-    $schema: 'https://json-schema.org/draft/2020-12/schema',
-    $id: abs(root, reglamentEstimate2026SchemaPath()),
-    title: ESTIMATE_PAYLOAD_SCHEMA,
-    description:
-      'JSON сметы регламента 2026 только для чтения: базовая смета, формулы, ссылки на источники и расчетные значения в рублях за сотку в месяц.',
-    type: 'object',
-    additionalProperties: false,
-    required: [
-      'id',
-      'year',
-      'title',
-      'tariff_area_sotki',
-      'coefficients',
-      'official',
-      'computed',
-      'formulas',
-      'source_refs',
-      'sources',
-      'caveats',
-      'sections',
-    ],
-    properties: {
-      id: text(1),
-      year: integer(2000),
-      title: text(1),
-      tariff_area_sotki: number(0),
-      coefficients: { $ref: '#/$defs/coefficients' },
-      official: { $ref: '#/$defs/officialTotals' },
-      computed: { $ref: '#/$defs/computedTotals' },
-      formulas: { $ref: '#/$defs/formulas' },
-      source_refs: list(sourceRefSchema, { minItems: 1 }),
-      sources: list({ $ref: '#/$defs/sourcePdf' }, { minItems: 1 }),
-      caveats: list(text(1), { minItems: 1 }),
-      sections: list({ $ref: '#/$defs/section' }, { minItems: 1 }),
-    },
-    $defs: {
-      sourcePdfKey: {
-        enum: [...ESTIMATE_SOURCE_PDFS],
-      },
-      rowKind: {
-        enum: [...ESTIMATE_ROW_KINDS],
-      },
-      coefficientPolicy: {
-        enum: [...ESTIMATE_COEFFICIENT_POLICIES],
-      },
-      editableFieldKey: {
-        enum: [...EDITABLE_FIELD_KEYS],
-      },
-      editableFieldLevel: {
-        enum: [...EDITABLE_FIELD_LEVELS],
-      },
-      sourcePdf: obj(
-        {
-          pdf: { $ref: '#/$defs/sourcePdfKey' },
-          pdf_key: text(1),
-          pdf_url: text(1),
-        },
-        ['pdf', 'pdf_key', 'pdf_url'],
-      ),
-      sourceRef: obj(
-        {
-          pdf: { $ref: '#/$defs/sourcePdfKey' },
-          pdf_key: text(1),
-          pdf_url: text(1),
-          page: integer(1),
-          fragment: text(1),
-          note: text(1),
-        },
-        ['pdf', 'pdf_key', 'pdf_url', 'page'],
-      ),
-      displayValue: obj(
-        {
-          value: number(),
-          unit: text(1),
-          label: text(1),
-        },
-        ['value', 'unit'],
-      ),
-      editableField: obj(
-        {
-          key: { $ref: '#/$defs/editableFieldKey' },
-          label: text(1),
-          level: { $ref: '#/$defs/editableFieldLevel' },
-          unit: text(1),
-          min: number(),
-          max: number(),
-          step: number(),
-        },
-        ['key', 'label', 'level'],
-      ),
-      coefficients: obj(
-        {
-          insurance_rate: number(0),
-          overhead_rate: number(0),
-          profit_rate: number(0),
-          usn_rate: number(0),
-          vat_rate: number(0),
-        },
-        [
-          'insurance_rate',
-          'overhead_rate',
-          'profit_rate',
-          'usn_rate',
-          'vat_rate',
-        ],
-      ),
-      costBreakdown: obj(
-        {
-          primary_salary: number(0),
-          machinist_salary: number(0),
-          fot: number(0),
-          machines: number(0),
-          materials: number(0),
-          contractors: number(0),
-          insurance: number(0),
-          overhead: number(0),
-          profit: number(0),
-          usn: number(0),
-          income: number(0),
-          vat: number(0),
-          gross: number(0),
-        },
-        [
-          'primary_salary',
-          'machinist_salary',
-          'fot',
-          'machines',
-          'materials',
-          'contractors',
-          'insurance',
-          'overhead',
-          'profit',
-          'usn',
-          'income',
-          'vat',
-          'gross',
-        ],
-      ),
-      officialTotals: obj(
-        {
-          annual_gross: number(0),
-          tariff_per_sotka_month: number(0),
-        },
-        ['annual_gross', 'tariff_per_sotka_month'],
-      ),
-      computedTotals: obj(
-        {
-          annual_gross: number(0),
-          tariff_per_sotka_month: number(0),
-          delta_annual_gross: number(),
-          delta_tariff_per_sotka_month: number(),
-        },
-        [
-          'annual_gross',
-          'tariff_per_sotka_month',
-          'delta_annual_gross',
-          'delta_tariff_per_sotka_month',
-        ],
-      ),
-      rowBaseline: obj(
-        {
-          is_enabled: flag(),
-          base: displayValueSchema,
-          frequency: displayValueSchema,
-          price: displayValueSchema,
-          annual_gross: number(0),
-          tariff_per_sotka_month: number(0),
-          breakdown: { $ref: '#/$defs/costBreakdown' },
-        },
-        ['is_enabled', 'annual_gross', 'tariff_per_sotka_month', 'breakdown'],
-      ),
-      rowComputed: obj(
-        {
-          is_enabled: flag(),
-          annual_gross: number(0),
-          tariff_per_sotka_month: number(0),
-          delta_annual_gross: number(),
-          delta_tariff_per_sotka_month: number(),
-          breakdown: { $ref: '#/$defs/costBreakdown' },
-        },
-        [
-          'is_enabled',
-          'annual_gross',
-          'tariff_per_sotka_month',
-          'delta_annual_gross',
-          'delta_tariff_per_sotka_month',
-          'breakdown',
-        ],
-      ),
-      rowBreakdownFormulas: obj(
-        Object.fromEntries(
-          Object.keys(ROW_BREAKDOWN_FORMULAS).map((key) => [key, text(1)]),
-        ),
-        Object.keys(ROW_BREAKDOWN_FORMULAS),
-      ),
-      formulas: obj(
-        {
-          tariff_per_sotka_month: text(1),
-          row_breakdown: { $ref: '#/$defs/rowBreakdownFormulas' },
-        },
-        ['tariff_per_sotka_month', 'row_breakdown'],
-      ),
-      row: obj(
-        {
-          id: text(1),
-          title: text(1),
-          kind: { $ref: '#/$defs/rowKind' },
-          coefficient_policy: { $ref: '#/$defs/coefficientPolicy' },
-          description: text(1),
-          tags: list(text(1)),
-          baseline: { $ref: '#/$defs/rowBaseline' },
-          computed: { $ref: '#/$defs/rowComputed' },
-          source_refs: list(sourceRefSchema, { minItems: 1 }),
-          editable_fields: list({ $ref: '#/$defs/editableField' }),
-          children: list({ $ref: '#/$defs/row' }),
-        },
-        [
-          'id',
-          'title',
-          'kind',
-          'coefficient_policy',
-          'baseline',
-          'computed',
-          'source_refs',
-          'editable_fields',
-        ],
-      ),
-      section: obj(
-        {
-          id: text(1),
-          title: text(1),
-          official: { $ref: '#/$defs/officialTotals' },
-          computed: { $ref: '#/$defs/computedTotals' },
-          source_refs: list(sourceRefSchema, { minItems: 1 }),
-          rows: list({ $ref: '#/$defs/row' }, { minItems: 1 }),
-        },
-        ['id', 'title', 'official', 'computed', 'source_refs', 'rows'],
-      ),
-    },
-  };
-}
+export const schema = (root: string): Record<string, unknown> =>
+  buildReglamentPublicJsonSchema(abs(root, reglamentEstimate2026SchemaPath()));
 
 export function openapi(root: string): Record<string, unknown> {
   const schemaRef = `#/components/schemas/${ESTIMATE_PAYLOAD_SCHEMA}`;

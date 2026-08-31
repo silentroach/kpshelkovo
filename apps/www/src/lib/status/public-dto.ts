@@ -4,10 +4,19 @@ import type {
   StatusDaysWithoutIncidents,
   StatusDuration,
   StatusIncident,
-  StatusIncidentPhase,
   StatusServiceSummary,
 } from './types';
 import { statusServiceMarkdownUrl, statusServiceUrl } from './routes';
+import {
+  statusPublicPayloadSchema,
+  type StatusPublicDaysWithoutIncidentsDto,
+  type StatusPublicDaysWithoutIncidentsMode,
+  type StatusPublicDurationDto,
+  type StatusPublicIncidentDto,
+  type StatusPublicIncidentRefDto,
+  type StatusPublicPayloadDto,
+  type StatusPublicServiceSummaryDto,
+} from './public-schema';
 import {
   formatStatusDuration,
   formatStatusDaysWithoutIncidents,
@@ -17,86 +26,21 @@ import {
   getStatusIncidentPhase,
 } from './view';
 
-export type StatusPublicIncidentPhase = StatusIncidentPhase;
-export type StatusPublicDaysWithoutIncidentsMode =
-  'count' | 'active_incident' | 'no_incidents';
+export type {
+  StatusPublicDaysWithoutIncidentsDto,
+  StatusPublicDaysWithoutIncidentsMode,
+  StatusPublicDurationDto,
+  StatusPublicIncidentDto,
+  StatusPublicIncidentPhase,
+  StatusPublicIncidentRefDto,
+  StatusPublicPayloadDto,
+  StatusPublicServiceSummaryDto,
+} from './public-schema';
 
-export interface StatusPublicDurationDto {
-  readonly total_minutes: number;
-  readonly human: string;
-}
-
-export interface StatusPublicDaysWithoutIncidentsDto {
-  readonly mode: StatusPublicDaysWithoutIncidentsMode;
-  readonly label: string;
-  readonly days?: number;
-  readonly last_ended_iso?: string;
-}
-
-interface StatusPublicIncidentLinksDto {
-  readonly html_url?: string;
-  readonly markdown_url?: string;
-}
-
-export interface StatusPublicIncidentRefDto extends StatusPublicIncidentLinksDto {
-  readonly id: string;
-  readonly title: string;
-  readonly phase: StatusPublicIncidentPhase;
-  readonly phase_label: string;
-}
-
-export interface StatusPublicIncidentDto extends StatusPublicIncidentLinksDto {
-  readonly id: string;
-  readonly title: string;
-  readonly service: StatusIncident['service'];
-  readonly service_label: string;
-  readonly kind: StatusIncident['kind'];
-  readonly kind_label: string;
-  readonly year: number;
-  readonly month: number;
-  readonly slug: string;
-  readonly started_at: string;
-  readonly started_has_time: boolean;
-  readonly ended_at?: string;
-  readonly ended_has_time: boolean;
-  readonly is_active: boolean;
-  readonly phase: StatusPublicIncidentPhase;
-  readonly phase_label: string;
-  readonly applies_to_all_areas: boolean;
-  readonly areas: StatusIncident['areas'];
-  readonly source_url?: string;
-  readonly excerpt?: string;
-  readonly body_markdown: string;
-  readonly duration?: StatusPublicDurationDto;
-}
-
-export interface StatusPublicServiceSummaryDto {
-  readonly service: StatusServiceSummary['service'];
-  readonly service_label: string;
-  readonly service_status: StatusServiceSummary['serviceStatus'];
-  readonly service_status_label: string;
-  readonly html_url: string;
-  readonly markdown_url: string;
-  readonly incident_ids: readonly string[];
-  readonly active_incident_ids: readonly string[];
-  readonly active_maintenance_ids: readonly string[];
-  readonly days_without_incidents: StatusPublicDaysWithoutIncidentsDto;
-  readonly latest_incident?: StatusPublicIncidentRefDto;
-}
-
-export interface StatusPublicPayloadDto {
-  readonly stats: {
-    readonly incident_count: number;
-    readonly active_count: number;
-    readonly active_incident_count: number;
-    readonly active_maintenance_count: number;
-    readonly service_count: number;
-    readonly updated_at?: string;
-  };
-  readonly active: readonly StatusPublicIncidentDto[];
-  readonly incidents: readonly StatusPublicIncidentDto[];
-  readonly services: readonly StatusPublicServiceSummaryDto[];
-}
+type StatusPublicIncidentLinksDto = Pick<
+  StatusPublicIncidentDto,
+  'html_url' | 'markdown_url'
+>;
 
 const fullUrl = (value: string): string => absoluteUrl(value);
 
@@ -213,7 +157,7 @@ export const buildStatusPublicPayload = (
 ): StatusPublicPayloadDto => {
   const updatedAt = latestUpdate(data);
 
-  return {
+  return statusPublicPayloadSchema.parse({
     stats: {
       incident_count: data.incidents.length,
       active_count: data.active.length,
@@ -229,5 +173,5 @@ export const buildStatusPublicPayload = (
     active: data.active.map(incident),
     incidents: data.incidents.map(incident),
     services: data.services.map(summary),
-  };
+  });
 };
