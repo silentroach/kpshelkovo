@@ -42,7 +42,7 @@ const schema = {
   overlaySiteHeader
 >
   <main class="relative h-svh min-h-[30rem] overflow-hidden">
-    <h1 class="sr-only">Карта мест и объектов Шелково</h1>
+    <h1 class="ui-visually-hidden">Карта мест и объектов Шелково</h1>
     <PlaceMap dataUrl={placesDataUrl()} {fallbackPlace} client:load />
 
     <noscript>

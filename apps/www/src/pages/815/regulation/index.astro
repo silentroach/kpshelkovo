@@ -506,7 +506,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
             >Сброс</span
           >
         </button>
-        <span class="sr-only">Текущий тариф</span>
+        <span class="ui-visually-hidden">Текущий тариф</span>
         <span
           class="ml-auto flex min-w-0 items-baseline justify-end gap-1.5 text-right"
         >
@@ -613,7 +613,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                 data-ui-sticky-table-shell
               >
                 <table class="min-w-[48rem] w-full border-separate border-spacing-0 text-left text-sm">
-                  <caption class="sr-only">{section.title}</caption>
+                  <caption class="ui-visually-hidden">{section.title}</caption>
                   <thead class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground">
                     <tr>
                       <th
@@ -676,11 +676,11 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                   {row.title}
                                 </h4>
                               </div>
-                              <p class="sr-only" aria-hidden="true">
+                              <p class="ui-visually-hidden" aria-hidden="true">
                                 {row.searchText}
                               </p>
                               <p
-                                class="sr-only"
+                                class="ui-visually-hidden"
                                 aria-hidden="true"
                                 data-pagefind-weight="0.3"
                               >
@@ -1079,7 +1079,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
 
     <template data-reglament-inline-control-template data-pagefind-ignore="all">
       <label class="block">
-        <span class="sr-only" data-reglament-control-label></span>
+        <span class="ui-visually-hidden" data-reglament-control-label></span>
         <span class={inputShellClass}>
           <input class={inlineInputClass} type="text" inputmode="decimal" />
           <span class={inputUnitClass} data-reglament-control-unit></span>

@@ -175,7 +175,7 @@ const searchMetadata = search
   <body class={bodyClasses}>
     {
       markdownAlternate && (
-        <div class="sr-only" aria-hidden="true">
+        <div class="ui-visually-hidden" aria-hidden="true">
           Markdown-версия этой страницы доступна по адресу {markdownAlternate}.
         </div>
       )
@@ -236,18 +236,6 @@ const searchMetadata = search
     min-height: 100vh;
     flex-direction: column;
     color: var(--color-text);
-  }
-
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
   }
 
   .site-page-shell {

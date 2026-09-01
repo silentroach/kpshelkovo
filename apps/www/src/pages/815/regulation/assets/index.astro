@@ -159,7 +159,9 @@ const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
 
     <section class="px-5 md:px-6" aria-labelledby="assets-title">
       <div class="max-w-6xl space-y-10">
-        <h2 id="assets-title" class="sr-only">Таблицы общего имущества</h2>
+        <h2 id="assets-title" class="ui-visually-hidden">
+          Таблицы общего имущества
+        </h2>
 
         {
           groups.map((group) => (
@@ -195,7 +197,7 @@ const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
                 data-ui-sticky-table-shell
               >
                 <table class="min-w-[58rem] w-full border-separate border-spacing-0 text-left text-sm">
-                  <caption class="sr-only">{group.title}</caption>
+                  <caption class="ui-visually-hidden">{group.title}</caption>
                   <thead class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground">
                     <tr>
                       <th
@@ -248,7 +250,7 @@ const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
                               >
                                 {asset.title}
                               </h4>
-                              <p class="sr-only" aria-hidden="true">
+                              <p class="ui-visually-hidden" aria-hidden="true">
                                 {assetSearchText(asset, group.title)}
                               </p>
                               {note && (

@@ -72,7 +72,7 @@ const schema = collectionPageSchema({
     </section>
 
     <section class="mt-8 space-y-4">
-      <h2 class="sr-only">Публикации по тегу {tag.label}</h2>
+      <h2 class="ui-visually-hidden">Публикации по тегу {tag.label}</h2>
       {
         tag.count > tag.latest.length && (
           <p class="px-5 text-sm leading-7 text-muted-foreground md:px-6">

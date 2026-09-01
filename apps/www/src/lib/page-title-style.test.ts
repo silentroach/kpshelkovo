@@ -47,7 +47,7 @@ describe('page title styles', () => {
       );
 
       for (const tag of h1Tags) {
-        if (tag.includes('sr-only')) continue;
+        if (tag.includes('ui-visually-hidden')) continue;
 
         expect(tag, `${relative} visible h1`).toContain('ui-page-title');
       }
