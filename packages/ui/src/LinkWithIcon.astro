@@ -25,9 +25,7 @@ const {
 
 const isTelegramLink = isTelegramUrl(href);
 const isDomylandLink = isDomylandUrl(href);
-const resolvedIconClass =
-  iconClass ??
-  (isTelegramLink ? 'size-3.5 shrink-0 text-telegram' : 'size-3.5 shrink-0');
+const resolvedIconClass = iconClass ?? 'link-with-icon__icon';
 const targetUrl =
   !isTelegramLink && !isDomylandLink
     ? new URL(href.startsWith('//') ? `https:${href}` : href)
@@ -51,8 +49,9 @@ const resolvedAriaLabel =
   rel="noreferrer noopener"
   aria-label={resolvedAriaLabel}
   class:list={[
-    'ui-link font-semibold',
-    (isTelegramLink || isDomylandLink) && 'inline-flex items-center gap-1',
+    'ui-link link-with-icon',
+    (isTelegramLink || isDomylandLink) && 'link-with-icon--branded',
+    isTelegramLink && 'link-with-icon--telegram',
     className,
   ]}
 >
@@ -60,3 +59,25 @@ const resolvedAriaLabel =
   {isDomylandLink && <DomylandIcon class={resolvedIconClass} />}
   <span class={textClass}>{resolvedLabel}</span>
 </a>
+
+<style>
+  .link-with-icon {
+    font-weight: 600;
+  }
+
+  .link-with-icon--branded {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .link-with-icon > :global(.link-with-icon__icon) {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+  }
+
+  .link-with-icon--telegram > :global(.link-with-icon__icon) {
+    color: var(--color-telegram);
+  }
+</style>
