@@ -24,18 +24,16 @@
   };
 </script>
 
-<ul data-testid="sources-list" class="border-y border-border">
+<ul data-testid="sources-list" class="sources-list">
   {#each sources as source (source.url)}
-    <li
-      class="flex flex-col gap-2 border-t border-border py-3 first:border-t-0 sm:flex-row sm:items-center sm:justify-between"
-    >
-      <div class="min-w-0 flex-1">
-        <div class="mb-1 flex items-center gap-2">
+    <li class="source-row">
+      <div class="source-content">
+        <div class="source-heading">
           <a
             href={source.url}
             target="_blank"
             rel="noopener noreferrer"
-            class="truncate font-semibold text-foreground hover:text-primary"
+            class="source-link"
             data-testid="source-link"
           >
             {source.title}
@@ -45,12 +43,81 @@
           </span>
         </div>
         {#if source.comment}
-          <p class="mt-1 text-sm text-muted-foreground">{source.comment}</p>
+          <p class="source-comment">{source.comment}</p>
         {/if}
       </div>
-      <div class="whitespace-nowrap text-sm text-muted-foreground sm:ml-4">
+      <div class="source-date">
         {formatDate(source.dateChecked)}
       </div>
     </li>
   {/each}
 </ul>
+
+<style>
+  .sources-list {
+    border-block: 1px solid var(--color-border);
+  }
+
+  .source-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-block: 0.75rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .source-row:first-child {
+    border-top: 0;
+  }
+
+  .source-content {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .source-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .source-link {
+    overflow: hidden;
+    color: var(--color-foreground);
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .source-link:is(:hover, :focus-visible) {
+    color: var(--color-primary);
+  }
+
+  .source-comment,
+  .source-date {
+    color: var(--color-muted-foreground);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .source-comment {
+    margin-top: 0.25rem;
+  }
+
+  .source-date {
+    white-space: nowrap;
+  }
+
+  @media (min-width: 40rem) {
+    .source-row {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .source-date {
+      margin-left: 1rem;
+    }
+  }
+</style>
