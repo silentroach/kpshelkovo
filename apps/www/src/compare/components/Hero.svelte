@@ -18,20 +18,15 @@
   }: Props = $props();
 </script>
 
-<div
-  class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,28rem)] lg:items-end"
->
-  <div class="space-y-3">
-    <h1 class="ui-page-title max-w-3xl">
+<div class="hero">
+  <div>
+    <h1 class="ui-page-title hero-title">
       {title}
     </h1>
-    <p class="ui-copy max-w-3xl text-muted-foreground">
+    <p class="ui-copy hero-subtitle">
       {subtitle}
       {#if subtitleLinkHref && subtitleLinkText}
-        <a
-          href={subtitleLinkHref}
-          class="ui-link font-semibold underline decoration-border underline-offset-4"
-        >
+        <a href={subtitleLinkHref} class="ui-link hero-link">
           {subtitleLinkText}
         </a>
       {/if}
@@ -39,10 +34,51 @@
   </div>
 
   {#if children}
-    <div
-      class="border-t border-border pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0"
-    >
+    <div class="hero-aside">
       {@render children()}
     </div>
   {/if}
 </div>
+
+<style>
+  .hero {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .hero-title,
+  .hero-subtitle {
+    max-width: 48rem;
+  }
+
+  .hero-title {
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-subtitle {
+    color: var(--color-text-muted);
+  }
+
+  .hero-link {
+    font-weight: 600;
+  }
+
+  .hero-aside {
+    border-top: 1px solid var(--color-border);
+    padding-top: 1rem;
+  }
+
+  @media (min-width: 64rem) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr) minmax(18rem, 28rem);
+      align-items: end;
+    }
+
+    .hero-aside {
+      border-top: 0;
+      border-left: 1px solid var(--color-border);
+      padding-top: 0;
+      padding-left: 1.5rem;
+    }
+  }
+</style>

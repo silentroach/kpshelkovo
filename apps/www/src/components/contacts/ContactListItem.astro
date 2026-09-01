@@ -17,32 +17,68 @@ const showReviewHighlight = hasManyPositiveContactReviews(contact.reviews);
 const reviewHighlightLabel = 'Много положительных отзывов';
 ---
 
-<article class="py-5 md:py-6">
-  <div class="space-y-3">
-    <h3 class="ui-card-title flex items-start gap-2">
+<article class="contact-list-item">
+  <div class="contact-list-item__content">
+    <h3 class="ui-card-title contact-list-item__title">
       <a href={contact.url} class="ui-link">
         {contact.title}
       </a>
       {
         showReviewHighlight && (
           <span
-            class="mt-0.5 inline-flex shrink-0 text-accent-text dark:text-star"
+            class="contact-list-item__review-highlight"
             role="img"
             aria-label={reviewHighlightLabel}
             title={reviewHighlightLabel}
           >
-            <StarIcon class="size-5 fill-current" />
+            <StarIcon />
           </span>
         )
       }
     </h3>
 
-    {
-      excerpt ? (
-        <p class="max-w-3xl text-base leading-7 text-muted-foreground">
-          {excerpt}
-        </p>
-      ) : null
-    }
+    {excerpt ? <p class="contact-list-item__excerpt">{excerpt}</p> : null}
   </div>
 </article>
+
+<style>
+  .contact-list-item {
+    padding-block: 1.25rem;
+  }
+
+  .contact-list-item__content > * + * {
+    margin-block-start: 0.75rem;
+  }
+
+  .contact-list-item__title {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .contact-list-item__review-highlight {
+    display: inline-flex;
+    flex-shrink: 0;
+    margin-block-start: 0.125rem;
+    color: var(--color-star);
+  }
+
+  .contact-list-item__review-highlight > :global(svg) {
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: currentColor;
+  }
+
+  .contact-list-item__excerpt {
+    max-width: 48rem;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    line-height: 1.75rem;
+  }
+
+  @media (min-width: 48rem) {
+    .contact-list-item {
+      padding-block: 1.5rem;
+    }
+  }
+</style>
