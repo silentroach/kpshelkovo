@@ -21,36 +21,39 @@ const ratedAspects = sortReviewAspects(review.aspects).filter(
 );
 ---
 
-<article class="ui-shell h-full px-5 py-5 md:px-6 md:py-6">
+<article class="ui-shell review-card">
   <div
     class:list={[
-      'grid gap-4 xl:items-center xl:gap-8',
-      ratedAspects.length > 0 && 'xl:grid-cols-2',
+      'review-card__layout',
+      ratedAspects.length > 0 && 'review-card__layout--rated',
     ]}
   >
-    <div class="space-y-3">
+    <div class="review-card__summary">
       <h3 class="ui-entry-title">
         <a href={review.url} class="ui-link">{formatReviewTitle(review)}</a>
       </h3>
-      <ReviewMeta review={review} />
+      <div class="review-card__meta">
+        <ReviewMeta review={review} />
+      </div>
     </div>
 
     {
       ratedAspects.length > 0 && (
-        <ul class="grid gap-x-6 gap-y-3 sm:grid-cols-3">
+        <ul class="review-card__aspects">
           {ratedAspects.map((aspect) => (
-            <li class="grid grid-cols-[auto_1fr] items-center gap-x-3 sm:block">
+            <li class="review-card__aspect">
               <span
-                class="col-start-2 row-start-1 block text-xs font-semibold leading-4 text-muted-foreground"
+                class="review-card__aspect-label"
                 title={formatReviewAspectLabelHint(aspect.type)}
               >
                 {formatReviewAspectLabel(aspect.type)}
               </span>
-              <StarRating
-                rating={aspect.rating}
-                label={`Оценка ${aspect.rating} из 5`}
-                class="col-start-1 row-start-1 sm:mt-1"
-              />
+              <div class="review-card__rating">
+                <StarRating
+                  rating={aspect.rating}
+                  label={`Оценка ${aspect.rating} из 5`}
+                />
+              </div>
             </li>
           ))}
         </ul>
@@ -58,3 +61,78 @@ const ratedAspects = sortReviewAspects(review.aspects).filter(
     }
   </div>
 </article>
+
+<style>
+  .review-card {
+    height: 100%;
+    padding: 1.25rem;
+  }
+
+  .review-card__layout {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .review-card__summary > * + * {
+    margin-block-start: 0.75rem;
+  }
+
+  .review-card__aspects {
+    display: grid;
+    column-gap: 1.5rem;
+    row-gap: 0.75rem;
+  }
+
+  .review-card__aspect {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 0.75rem;
+  }
+
+  .review-card__aspect-label {
+    display: block;
+    grid-column: 2;
+    grid-row: 1;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1rem;
+  }
+
+  .review-card__rating {
+    display: contents;
+  }
+
+  @media (min-width: 40rem) {
+    .review-card__aspects {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .review-card__aspect {
+      display: block;
+    }
+
+    .review-card__rating {
+      display: block;
+      margin-block-start: 0.25rem;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .review-card {
+      padding: 1.5rem;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .review-card__layout {
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .review-card__layout--rated {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
