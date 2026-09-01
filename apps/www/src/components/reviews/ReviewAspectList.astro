@@ -19,14 +19,14 @@ const ordered = sortReviewAspects(aspects);
 
 {
   ordered.length > 0 && (
-    <section aria-labelledby="review-aspects" class="space-y-5">
+    <section aria-labelledby="review-aspects" class="review-aspect-list">
       <h2 id="review-aspects" class="ui-prose-title">
         Оценки по темам
       </h2>
-      <div class="grid gap-6 md:grid-cols-3">
+      <div class="review-aspect-list__grid">
         {ordered.map((aspect) => (
-          <article class="space-y-3">
-            <div class="space-y-2">
+          <article class="review-aspect-list__aspect">
+            <div class="review-aspect-list__header">
               <h3
                 class="ui-section-label"
                 title={formatReviewAspectLabelHint(aspect.type)}
@@ -37,12 +37,13 @@ const ordered = sortReviewAspects(aspects);
                 <StarRating
                   rating={aspect.rating}
                   label={`Оценка ${aspect.rating} из 5`}
+                  class="review-aspect-list__rating"
                 />
               )}
             </div>
             {aspect.body && (
               <div
-                class="ui-prose text-sm"
+                class="ui-prose"
                 data-pagefind-body
                 set:html={renderMarkdown(aspect.body)}
               />
@@ -53,3 +54,28 @@ const ordered = sortReviewAspects(aspects);
     </section>
   )
 }
+
+<style>
+  .review-aspect-list > * + * {
+    margin-block-start: 1.25rem;
+  }
+
+  .review-aspect-list__grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .review-aspect-list__aspect > * + * {
+    margin-block-start: 0.75rem;
+  }
+
+  .review-aspect-list__header > :global(.review-aspect-list__rating) {
+    margin-block-start: 0.5rem;
+  }
+
+  @media (min-width: 48rem) {
+    .review-aspect-list__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>
