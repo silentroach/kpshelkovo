@@ -434,52 +434,45 @@
 
 <div
   data-testid="settlement-map"
-  class={`relative w-full overflow-hidden ${shell ? 'border border-border bg-[color:var(--color-surface)]' : ''}`}
+  class="settlement-map"
+  class:settlement-map--shell={shell}
   style={`height: ${height}px; min-height: ${height}px;`}
 >
   {#if isLoading}
-    <div
-      class="map-placeholder absolute inset-0 flex items-center justify-center"
-    >
-      <div class="text-center">
-        <div
-          class="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-b-2 border-foreground"
-        ></div>
-        <p class="text-sm text-muted-foreground">Загрузка карты...</p>
+    <div class="map-placeholder">
+      <div class="map-message">
+        <div class="map-spinner"></div>
+        <p class="map-loading-text">Загрузка карты...</p>
       </div>
     </div>
   {/if}
 
   {#if error}
-    <div
-      class="map-placeholder absolute inset-0 flex items-center justify-center"
-    >
-      <div class="text-center max-w-md px-4">
-        <div class="text-4xl mb-3">🗺️</div>
-        <p class="mb-2 font-semibold text-foreground">{error}</p>
-        <p class="text-sm text-muted-foreground">
-          Попробуйте обновить страницу
-        </p>
+    <div class="map-placeholder">
+      <div class="map-message map-error">
+        <div class="map-error-icon">🗺️</div>
+        <p class="map-error-title">{error}</p>
+        <p class="map-error-hint">Попробуйте обновить страницу</p>
       </div>
     </div>
   {/if}
 
   {#if tip && popup}
     <div
-      class="pointer-events-none absolute z-10"
+      class="map-popup"
       style={`left: ${tip.x}px; top: ${tip.y}px; transform: translate(-50%, ${tip.up ? '-100%' : '0%'});`}
       data-testid="map-popup"
     >
-      <div class="relative">
+      <div class="map-popup-anchor">
         <div
           bind:this={popupEl}
-          class="pointer-events-auto w-64 border border-border bg-[color:var(--color-surface)] p-3"
+          class="map-popup-panel"
           data-testid="map-popup-panel"
         >
-          <div class="mb-0 flex items-start justify-between gap-3">
+          <div class="map-popup-header">
             <a
               bind:this={popupLink}
-              class="text-base font-semibold text-foreground hover:text-primary"
+              class="map-popup-link"
               href={withBase(`settlements/${tip.item.slug}/`)}
               target="_parent"
               data-testid="map-popup-link"
@@ -488,7 +481,7 @@
             </a>
             <button
               type="button"
-              class="p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+              class="map-popup-close"
               aria-label="Закрыть попап"
               onclick={() => {
                 closePopup(true);
@@ -496,7 +489,7 @@
             >
               <svg
                 viewBox="0 0 20 20"
-                class="h-4 w-4"
+                class="map-popup-close-icon"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
@@ -507,14 +500,11 @@
             </button>
           </div>
           {#if tip.item.companyText}
-            <p class="mb-2 text-xs leading-tight text-muted-foreground">
+            <p class="map-popup-company">
               {tip.item.companyText}
             </p>
           {/if}
-          <p
-            class="mb-0 text-sm text-muted-foreground"
-            title={tip.item.tariffHint}
-          >
+          <p class="map-popup-tariff" title={tip.item.tariffHint}>
             <strong
               >{tip.item.tariffText ??
                 formatTariff(tip.item.normalizedTariff)}</strong
@@ -522,7 +512,9 @@
           </p>
         </div>
         <div
-          class={`absolute left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border border-border bg-[color:var(--color-surface)] ${tip.up ? '-bottom-1.5 border-t-0 border-l-0' : '-top-1.5 border-b-0 border-r-0'}`}
+          class="map-popup-arrow"
+          class:map-popup-arrow--up={tip.up}
+          class:map-popup-arrow--down={!tip.up}
           data-testid="map-popup-arrow"
           aria-hidden="true"
         ></div>
@@ -532,23 +524,46 @@
 
   <div
     bind:this={mapContainer}
-    class={`h-full w-full ${interactive ? '' : 'pointer-events-none'} ${muted ? 'map-muted' : ''}`}
+    class="map-canvas"
+    class:map-canvas--static={!interactive}
+    class:map-muted={muted}
   ></div>
 
   {#if !interactive}
-    <div class="absolute inset-0 z-[5]" aria-hidden="true"></div>
+    <div class="map-static-overlay" aria-hidden="true"></div>
   {/if}
 </div>
 
 <style>
+  .settlement-map {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .settlement-map--shell {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
   :global(.ymaps-2-1-79-map) {
     width: 100% !important;
     height: 100% !important;
   }
 
   :global(.settlement-map-marker:focus-visible) {
-    outline: 0.1875rem solid var(--color-ring);
+    outline: 0.1875rem solid var(--color-focus);
     outline-offset: 0.125rem;
+  }
+
+  .map-canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  .map-canvas--static,
+  .map-popup {
+    pointer-events: none;
   }
 
   .map-muted {
@@ -557,6 +572,11 @@
   }
 
   .map-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background:
       linear-gradient(
         color-mix(in oklab, var(--color-border) 62%, transparent) 1px,
@@ -568,6 +588,139 @@
         transparent 1px
       ),
       var(--color-bg-soft);
-    background-size: 32px 32px;
+    background-size: 2rem 2rem;
+  }
+
+  .map-message {
+    text-align: center;
+  }
+
+  .map-spinner {
+    width: 2rem;
+    height: 2rem;
+    margin: 0 auto 0.75rem;
+    border-bottom: 0.125rem solid var(--color-text);
+    border-radius: 999px;
+    animation: map-spin 1s linear infinite;
+  }
+
+  .map-loading-text,
+  .map-error-hint,
+  .map-popup-tariff {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .map-error {
+    max-width: 28rem;
+    padding-inline: 1rem;
+  }
+
+  .map-error-icon {
+    margin-bottom: 0.75rem;
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+
+  .map-error-title {
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .map-popup {
+    position: absolute;
+    z-index: 10;
+  }
+
+  .map-popup-anchor {
+    position: relative;
+  }
+
+  .map-popup-panel {
+    width: 16rem;
+    border: 1px solid var(--color-border);
+    padding: 0.75rem;
+    background: var(--color-surface);
+    pointer-events: auto;
+  }
+
+  .map-popup-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .map-popup-link {
+    color: var(--color-text);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+  }
+
+  .map-popup-link:hover {
+    color: var(--color-primary);
+  }
+
+  .map-popup-close {
+    padding: 0.25rem;
+    color: var(--color-text-muted);
+  }
+
+  .map-popup-close:hover {
+    background: var(--color-surface-muted);
+    color: var(--color-text);
+  }
+
+  .map-popup-close-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .map-popup-company {
+    margin-bottom: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    line-height: 0.9375rem;
+  }
+
+  .map-popup-tariff {
+    margin-bottom: 0;
+  }
+
+  .map-popup-arrow {
+    position: absolute;
+    left: 50%;
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    transform: translateX(-50%) rotate(45deg);
+  }
+
+  .map-popup-arrow--up {
+    bottom: -0.375rem;
+    border-top: 0;
+    border-left: 0;
+  }
+
+  .map-popup-arrow--down {
+    top: -0.375rem;
+    border-right: 0;
+    border-bottom: 0;
+  }
+
+  .map-static-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+  }
+
+  @keyframes map-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>
