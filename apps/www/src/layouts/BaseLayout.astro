@@ -78,7 +78,6 @@ const bodyClasses = [
   'ui-root-site',
   showSiteHeader && 'site-has-header',
   bodyClass,
-  'flex min-h-screen flex-col text-foreground',
 ]
   .filter(Boolean)
   .join(' ');
@@ -197,13 +196,13 @@ const searchMetadata = search
     }
     <div
       class:list={[
-        'site-page-shell flex flex-1 flex-col',
+        'site-page-shell',
         overlaySiteHeader && 'site-page-shell--overlay-header',
       ]}
     >
       {showSiteHeader && <SiteHeader />}
       <div
-        class="site-page-content min-w-0 flex-1"
+        class="site-page-content"
         data-pagefind-root={search ? true : undefined}
         data-pagefind-body={search?.scope === 'page' ? true : undefined}
         data-pagefind-meta={searchMetadata}
@@ -230,3 +229,35 @@ const searchMetadata = search
     {showSiteFooter && <SiteFooter />}
   </body>
 </html>
+
+<style>
+  body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    color: var(--color-text);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  .site-page-shell {
+    display: flex;
+    flex: 1 1 0%;
+    flex-direction: column;
+  }
+
+  .site-page-content {
+    min-width: 0;
+    flex: 1 1 0%;
+  }
+</style>
