@@ -48,6 +48,54 @@ test.describe('Breadcrumbs visual', () => {
     ).toBeHidden();
   });
 
+  test('preserves pointer and keyboard link affordances', async ({ page }) => {
+    const link = page
+      .getByTestId('breadcrumbs-section')
+      .getByRole('link', { name: 'Главная' });
+    const readStyles = () =>
+      link.evaluate((element) => {
+        const styles = getComputedStyle(element);
+
+        return {
+          color: styles.color,
+          decorationColor: styles.textDecorationColor,
+          decorationLine: styles.textDecorationLine,
+          underlineOffset: styles.textUnderlineOffset,
+          transitionProperty: styles.transitionProperty,
+        };
+      });
+
+    const resting = await readStyles();
+
+    expect(resting.decorationLine).toBe('underline');
+    expect(resting.decorationColor).toBe('rgba(0, 0, 0, 0)');
+    expect(resting.underlineOffset).toBe('3.08px');
+    expect(resting.transitionProperty).toBe(
+      'color, text-decoration-color, text-underline-offset',
+    );
+
+    await page.keyboard.press('Tab');
+    await expect(link).toBeFocused();
+    await expect
+      .poll(async () => (await readStyles()).decorationColor)
+      .not.toBe(resting.decorationColor);
+    await expect
+      .poll(async () => (await readStyles()).underlineOffset)
+      .toBe('2.52px');
+
+    await link.evaluate((element) => element.blur());
+    await link.hover();
+    await expect
+      .poll(async () => (await readStyles()).color)
+      .not.toBe(resting.color);
+    await expect
+      .poll(async () => (await readStyles()).decorationColor)
+      .not.toBe(resting.decorationColor);
+    await expect
+      .poll(async () => (await readStyles()).underlineOffset)
+      .toBe('2.52px');
+  });
+
   test('renders a long trail when the last item stays linked', async ({
     page,
   }) => {
