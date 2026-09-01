@@ -1,6 +1,7 @@
 <script lang="ts">
   import { formatTariff } from '@shelkovo/format';
   import { onMount, onDestroy, tick } from 'svelte';
+  import type { Attachment } from 'svelte/attachments';
   import {
     installYandexMapsRuntimeHeadPersistence,
     loadYandexMaps,
@@ -22,13 +23,15 @@
   }
 
   interface Props {
-    settlements: SettlementMapData[];
+    settlements: readonly SettlementMapData[];
     interactive?: boolean;
     popup?: boolean;
     shell?: boolean;
     muted?: boolean;
     height?: number;
     focusX?: number;
+    startFromMoscow?: boolean;
+    fitRevision?: number;
   }
 
   interface MarkerLike {
@@ -50,17 +53,21 @@
     muted = false,
     height = 375,
     focusX = 0.5,
+    startFromMoscow = false,
+    fitRevision,
   }: Props = $props();
 
-  let mapContainer: HTMLDivElement | undefined = $state(undefined);
-  let popupEl: HTMLDivElement | undefined = $state(undefined);
-  let popupLink: HTMLAnchorElement | undefined = $state(undefined);
-  let map: ymaps3.YMap | undefined = $state(undefined);
-  let marks: MarkerLike[] = $state([]);
+  let mapContainer: HTMLDivElement | undefined;
+  let popupEl: HTMLDivElement | undefined;
+  let popupLink: HTMLAnchorElement | undefined;
+  let map: ymaps3.YMap | undefined;
+  let marks: MarkerLike[] = [];
   let activeMarker: HTMLElement | undefined;
   let isLoading = $state(true);
   let error: string | undefined = $state(undefined);
   let ymapsLoaded = $state(false);
+  let destroyed = false;
+  let mapLoadRequest = 0;
   interface Tip {
     item: SettlementMapData;
     x: number;
@@ -71,6 +78,7 @@
   let tip: Tip | undefined = $state(undefined);
 
   const PAD = 32;
+  const MOSCOW_LOCATION = { center: [37.6173, 55.7558], zoom: 9 } as const;
 
   function clamp(v: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, v));
@@ -87,7 +95,7 @@
     return lng - (fx - 0.5) * w * deg;
   }
 
-  function getRange(list: SettlementMapData[]): Range | undefined {
+  function getRange(list: readonly SettlementMapData[]): Range | undefined {
     const vals = list
       .filter((item) => !item.isBaseline)
       .map((item) => item.normalizedTariff);
@@ -154,6 +162,11 @@
       margin: [PAD, PAD, PAD, PAD],
     };
   }
+
+  const getInitialMapView = (): ReturnType<typeof getMapView> =>
+    startFromMoscow
+      ? { location: MOSCOW_LOCATION, margin: [0, 0, 0, 0] }
+      : getMapView();
 
   function clearMarkers(): void {
     if (!map) return;
@@ -253,7 +266,7 @@
 
       const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer } = ymaps3;
 
-      const view = getMapView();
+      const view = getInitialMapView();
 
       map = new YMap(
         mapContainer,
@@ -282,7 +295,7 @@
     }
   }
 
-  async function syncMap(): Promise<void> {
+  async function syncMap(autofit = false): Promise<void> {
     if (!mapContainer) return;
 
     const ymaps3 = window.ymaps3;
@@ -294,11 +307,13 @@
 
     if (!map) {
       await initMap();
-      return;
+      if (!map || !autofit) return;
     }
 
     closePopup();
     syncMarkers(ymaps3);
+    if (!autofit) return;
+
     const view = getMapView();
     if (!map.update) {
       map.destroy();
@@ -355,8 +370,34 @@
     if (activeMarker === el) popupLink?.focus();
   }
 
+  const loadMap = async (): Promise<void> => {
+    const request = ++mapLoadRequest;
+    error = undefined;
+    isLoading = true;
+
+    try {
+      await loadYandexMaps();
+      if (destroyed || request !== mapLoadRequest) return;
+
+      ymapsLoaded = true;
+    } catch (loadError) {
+      if (destroyed || request !== mapLoadRequest) return;
+
+      console.error('Map setup error:', loadError);
+      error =
+        loadError instanceof Error ? loadError.message : 'Карта недоступна';
+      isLoading = false;
+    }
+  };
+
+  const retryMap = (): void => {
+    if (isLoading) return;
+
+    ymapsLoaded = false;
+    void loadMap();
+  };
+
   onMount(() => {
-    let dead = false;
     let resizeObserver: ResizeObserver | undefined;
 
     installYandexMapsRuntimeHeadPersistence();
@@ -373,7 +414,7 @@
 
     const refresh = (): void => {
       if (!ymapsLoaded || error) return;
-      void syncMap();
+      void syncMap(!startFromMoscow);
     };
 
     document.addEventListener('pointerdown', onDown);
@@ -384,21 +425,11 @@
       resizeObserver.observe(mapContainer);
     }
 
-    void (async () => {
-      try {
-        await loadYandexMaps();
-        if (!dead) ymapsLoaded = true;
-      } catch (err) {
-        if (!dead) {
-          console.error('Map setup error:', err);
-          error = err instanceof Error ? err.message : 'Карта недоступна';
-          isLoading = false;
-        }
-      }
-    })();
+    void loadMap();
 
     return () => {
-      dead = true;
+      destroyed = true;
+      mapLoadRequest += 1;
       document.removeEventListener('pointerdown', onDown);
       document.removeEventListener('astro:page-load', refresh);
       resizeObserver?.disconnect();
@@ -413,23 +444,75 @@
     }
   });
 
-  $effect(() => {
-    const sig = settlements
+  let settlementSignature = $derived(
+    settlements
       .map((s) => `${s.slug}:${s.lat}:${s.lng}:${s.normalizedTariff}`)
-      .join('|');
-    sig;
-    if (!ymapsLoaded || !mapContainer || error) return;
-    let dead = false;
-    queueMicrotask(() => {
-      if (!dead) {
-        void syncMap();
-      }
-    });
+      .join('|'),
+  );
+  let previousSettlementSignature = '';
+  let previousFitRevision: number | undefined;
+  let signatureReady = false;
+  let pendingAutofit = false;
+
+  const captureMapContainer: Attachment<HTMLDivElement> = (element) => {
+    mapContainer = element;
 
     return () => {
-      dead = true;
+      if (mapContainer === element) mapContainer = undefined;
     };
-  });
+  };
+
+  const capturePopup: Attachment<HTMLDivElement> = (element) => {
+    popupEl = element;
+
+    return () => {
+      if (popupEl === element) popupEl = undefined;
+    };
+  };
+
+  const capturePopupLink: Attachment<HTMLAnchorElement> = (element) => {
+    popupLink = element;
+
+    return () => {
+      if (popupLink === element) popupLink = undefined;
+    };
+  };
+
+  const synchronizeMap = (
+    signature: string,
+    currentFitRevision: number | undefined,
+    shouldSync: boolean,
+  ): Attachment<HTMLDivElement> => {
+    if (!signatureReady) {
+      previousSettlementSignature = signature;
+      previousFitRevision = currentFitRevision;
+      signatureReady = true;
+    } else if (signature !== previousSettlementSignature) {
+      if (currentFitRevision === undefined) pendingAutofit = true;
+      previousSettlementSignature = signature;
+    }
+    if (currentFitRevision !== previousFitRevision) {
+      pendingAutofit = true;
+      previousFitRevision = currentFitRevision;
+    }
+
+    return () => {
+      if (!shouldSync) return;
+
+      const autofit = pendingAutofit;
+      pendingAutofit = false;
+      let cancelled = false;
+      queueMicrotask(() => {
+        if (!cancelled) {
+          void syncMap(autofit);
+        }
+      });
+
+      return () => {
+        cancelled = true;
+      };
+    };
+  };
 </script>
 
 <div
@@ -452,7 +535,13 @@
       <div class="map-message map-error">
         <div class="map-error-icon">🗺️</div>
         <p class="map-error-title">{error}</p>
-        <p class="map-error-hint">Попробуйте обновить страницу</p>
+        <button
+          type="button"
+          class="ui-btn ui-btn-sm ui-btn-ghost map-retry"
+          onclick={retryMap}
+        >
+          Попробовать снова
+        </button>
       </div>
     </div>
   {/if}
@@ -465,13 +554,13 @@
     >
       <div class="map-popup-anchor">
         <div
-          bind:this={popupEl}
+          {@attach capturePopup}
           class="map-popup-panel"
           data-testid="map-popup-panel"
         >
           <div class="map-popup-header">
             <a
-              bind:this={popupLink}
+              {@attach capturePopupLink}
               class="map-popup-link"
               href={withBase(`settlements/${tip.item.slug}/`)}
               target="_parent"
@@ -523,7 +612,12 @@
   {/if}
 
   <div
-    bind:this={mapContainer}
+    {@attach captureMapContainer}
+    {@attach synchronizeMap(
+      settlementSignature,
+      fitRevision,
+      ymapsLoaded && !error,
+    )}
     class="map-canvas"
     class:map-canvas--static={!interactive}
     class:map-muted={muted}
@@ -605,7 +699,6 @@
   }
 
   .map-loading-text,
-  .map-error-hint,
   .map-popup-tariff {
     color: var(--color-text-muted);
     font-size: 0.875rem;
@@ -627,6 +720,10 @@
     margin-bottom: 0.5rem;
     color: var(--color-text);
     font-weight: 600;
+  }
+
+  .map-retry {
+    margin-inline: auto;
   }
 
   .map-popup {

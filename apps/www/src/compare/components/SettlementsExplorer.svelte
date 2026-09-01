@@ -62,10 +62,10 @@
 
   function rankExplorer(
     list: readonly ExplorerSettlement[],
-  ): Map<string, number> {
+  ): Readonly<Record<string, number>> {
     let prev: number | undefined;
     let rank = 0;
-    const ranks = new Map<string, number>();
+    const ranks: Record<string, number> = {};
 
     [...list]
       .sort((a, b) => {
@@ -80,7 +80,7 @@
           prev = tariff;
           rank += 1;
         }
-        ranks.set(item.slug, rank);
+        ranks[item.slug] = rank;
       });
 
     return ranks;
@@ -91,14 +91,12 @@
   let priceFilter = $state<ExplorerPriceFilter>(
     DEFAULT_EXPLORER_QUERY.priceFilter,
   );
-  let queryReady = $state(false);
   let showMap = $state(false);
   let mobile = $state(false);
   let controlsReady = $state(false);
+  let mapFitRevision = $state(0);
 
-  $effect(() => {
-    if (!queryReady) return;
-
+  const syncExplorerUrl = (): void => {
     const nextUrl = buildExplorerUrl(window.location.href, {
       sortBy,
       priceFilter,
@@ -107,7 +105,15 @@
     if (nextUrl === currentUrl) return;
 
     window.history.replaceState(window.history.state, '', nextUrl);
-  });
+  };
+
+  const setPriceFilter = (nextFilter: ExplorerPriceFilter): void => {
+    if (nextFilter === priceFilter) return;
+
+    priceFilter = nextFilter;
+    mapFitRevision += 1;
+    syncExplorerUrl();
+  };
 
   // Производный список поселков после фильтрации и сортировки.
   let filteredSettlements = $derived.by(() => {
@@ -188,13 +194,13 @@
     }),
   );
   let ranks = $derived(rankExplorer(settlements));
-  let levels = $derived(Math.max(new Set(ranks.values()).size, 1));
+  let levels = $derived(Math.max(new Set(Object.values(ranks)).size, 1));
 
   onMount(() => {
     const query = readExplorerQuery(window.location.search);
     sortBy = query.sortBy;
     priceFilter = query.priceFilter;
-    queryReady = true;
+    syncExplorerUrl();
 
     const media = window.matchMedia('(max-width: 767px)');
     mobile = media.matches;
@@ -225,7 +231,8 @@
               type="radio"
               name={`${uid}-price`}
               value="all"
-              bind:group={priceFilter}
+              checked={priceFilter === 'all'}
+              onchange={() => setPriceFilter('all')}
               disabled={!controlsReady}
               class="filter-input visually-hidden"
               data-testid="price-all"
@@ -245,7 +252,8 @@
               type="radio"
               name={`${uid}-price`}
               value="cheaper"
-              bind:group={priceFilter}
+              checked={priceFilter === 'cheaper'}
+              onchange={() => setPriceFilter('cheaper')}
               disabled={!controlsReady}
               class="filter-input visually-hidden"
               data-testid="price-cheaper"
@@ -272,7 +280,8 @@
               type="radio"
               name={`${uid}-price`}
               value="more_expensive"
-              bind:group={priceFilter}
+              checked={priceFilter === 'more_expensive'}
+              onchange={() => setPriceFilter('more_expensive')}
               disabled={!controlsReady}
               class="filter-input visually-hidden"
               data-testid="price-more"
@@ -327,7 +336,12 @@
 
   {#if showMap}
     <section id={mapid} data-testid="filtered-map">
-      <SettlementMap settlements={mapSettlements} height={mapHeight} />
+      <SettlementMap
+        settlements={mapSettlements}
+        height={mapHeight}
+        startFromMoscow
+        fitRevision={mapFitRevision}
+      />
     </section>
   {:else if !controlsReady}
     <div
@@ -357,6 +371,7 @@
           onchange={(e) => {
             sortBy = (e.currentTarget as HTMLSelectElement)
               .value as typeof sortBy;
+            syncExplorerUrl();
           }}
           class="sort-select"
           data-testid="sort-select"
@@ -413,7 +428,7 @@
       <SettlementCard
         {settlement}
         comparison={comparisons[settlement.slug]}
-        rank={ranks.get(settlement.slug) ?? levels}
+        rank={ranks[settlement.slug] ?? levels}
         total={levels}
         isBaseline={settlement.isBaseline}
       />
