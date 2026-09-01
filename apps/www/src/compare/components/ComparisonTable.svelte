@@ -21,8 +21,8 @@
 
 <div>
   {#if title}
-    <div class="mb-5 flex items-center justify-between gap-4">
-      <h2 class="text-xl text-foreground">
+    <div class="table-header">
+      <h2 class="table-title">
         {title}
       </h2>
       {#if showShelkovo}
@@ -35,14 +35,14 @@
           title={showOnlyDifferences
             ? 'Показать все свойства'
             : 'Показать только отличающиеся свойства'}
-          class={`ui-pill min-h-9 px-3 py-1.5 cursor-pointer text-sm font-semibold transition hover:opacity-90 active:opacity-80 ${showOnlyDifferences ? 'ui-pill-warning' : 'ui-pill-muted'}`}
+          class={`ui-pill filter-toggle ${showOnlyDifferences ? 'ui-pill-warning' : 'ui-pill-muted'}`}
           onclick={() => (showOnlyDifferences = !showOnlyDifferences)}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
             fill="currentColor"
-            class="h-4 w-4"
+            class="filter-icon"
           >
             <path
               d="M3 4.75A.75.75 0 0 1 3.75 4h12.5a.75.75 0 0 1 .57 1.238L12 10.84V15a.75.75 0 0 1-.352.636l-2.5 1.563A.75.75 0 0 1 8 16.563v-5.722L3.18 5.238A.75.75 0 0 1 3 4.75Z"
@@ -55,9 +55,8 @@
 
   {#snippet badge(status: ComparisonStatus)}
     <span class="ui-badge {status.tone}">
-      <span class="flex h-4 w-4 items-center justify-center">{status.icon}</span
-      >
-      <span class="hidden sm:inline">{status.text}</span>
+      <span class="status-icon">{status.icon}</span>
+      <span class="status-text">{status.text}</span>
     </span>
   {/snippet}
 
@@ -71,13 +70,13 @@
     aria-label={title ? `${title}: таблица сравнения` : 'Таблица сравнения'}
     style="--ui-sticky-table-min-width: 100%"
   >
-    <table class="ui-table ui-sticky-table table-fixed">
+    <table class="ui-table ui-sticky-table comparison-grid">
       <thead>
         <tr class="ui-table-head ui-sticky-table-head">
-          <th class="break-words">{itemHeading}</th>
-          <th class="w-20 text-center sm:w-48">Статус</th>
+          <th class="item-heading">{itemHeading}</th>
+          <th class="status-column">Статус</th>
           {#if showShelkovo}
-            <th class="w-20 text-center sm:w-48">Шелково</th>
+            <th class="status-column">Шелково</th>
           {/if}
         </tr>
       </thead>
@@ -85,7 +84,7 @@
         {#if visibleRows.length === 0}
           <tr class="ui-table-row">
             <td
-              class="ui-table-cell text-center text-sm text-muted-foreground"
+              class="ui-table-cell empty-state"
               colspan={showShelkovo ? 3 : 2}
             >
               Отличий с Шелково не найдено
@@ -94,7 +93,7 @@
         {:else}
           {#each visibleRows as row (row.key)}
             <tr class="ui-table-row">
-              <td class="ui-table-cell break-words text-sm text-foreground">
+              <td class="ui-table-cell item-cell">
                 {row.label}
               </td>
               <td class="ui-table-cell ui-table-cell-center">
@@ -112,3 +111,95 @@
     </table>
   </div>
 </div>
+
+<style>
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .table-title {
+    color: var(--color-text);
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+
+  .filter-toggle {
+    min-height: 2.25rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+    cursor: pointer;
+    transition: opacity 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .filter-toggle:not(:disabled):hover {
+    opacity: 0.9;
+  }
+
+  .filter-toggle:not(:disabled):active {
+    opacity: 0.8;
+  }
+
+  .filter-toggle:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .filter-icon,
+  .status-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .status-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .status-text {
+    display: none;
+  }
+
+  .comparison-grid {
+    table-layout: fixed;
+  }
+
+  .item-heading,
+  .item-cell {
+    overflow-wrap: break-word;
+  }
+
+  .status-column {
+    width: 5rem;
+    text-align: center;
+  }
+
+  .empty-state {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    text-align: center;
+  }
+
+  .item-cell {
+    color: var(--color-text);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .status-text {
+      display: inline;
+    }
+
+    .status-column {
+      width: 12rem;
+    }
+  }
+</style>
