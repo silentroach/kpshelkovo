@@ -82,18 +82,15 @@ const heroImage = heroMode === 'day' ? dayHeroImage : nightHeroImage;
   schema={schema}
   overlaySiteHeader
 >
-  <main class="pb-2 md:pb-3 lg:pb-4">
-    <section
-      class="home-hero overflow-hidden border-b border-border bg-muted"
-      data-home-hero-mode={heroMode}
-    >
-      <div class="h-[clamp(20rem,37vw,36rem)] w-full overflow-hidden">
+  <main class="home-main">
+    <section class="home-hero" data-home-hero-mode={heroMode}>
+      <div class="home-hero__media">
         <img
           sizes={heroSizes}
           alt="Панорама поселка Шелково"
           width={dayHero.width}
           height={dayHero.height}
-          class="h-full w-full object-cover object-left md:object-center"
+          class="home-hero__image"
           loading="eager"
           fetchpriority="high"
           decoding="async"
@@ -112,7 +109,7 @@ const heroImage = heroMode === 'day' ? dayHeroImage : nightHeroImage;
             alt="Панорама поселка Шелково"
             width={dayHero.width}
             height={dayHero.height}
-            class="h-full w-full object-cover object-left md:object-center"
+            class="home-hero__image"
             loading="eager"
             fetchpriority="high"
             decoding="async"
@@ -129,40 +126,33 @@ const heroImage = heroMode === 'day' ? dayHeroImage : nightHeroImage;
 
     {
       latestNews.length > 0 && (
-        <section class="ui-page pt-8 pb-4 md:pt-12 md:pb-6 lg:pt-14 lg:pb-8">
-          <div class="px-5 md:px-6">
-            <h1 class="ui-page-title border-b border-border pb-4">
-              Что нового в поселке
-            </h1>
+        <section class="ui-page home-news">
+          <div class="home-news__inner">
+            <h1 class="ui-page-title home-news__title">Что нового в поселке</h1>
 
             <div>
               {latestNews.map((article) => (
-                <article class="grid grid-cols-1 gap-4 py-6 md:grid-cols-[10rem_minmax(0,1fr)] md:gap-8 md:py-7">
-                  <p class="flex flex-wrap items-center gap-2 text-sm font-normal leading-tight tracking-tight text-foreground md:flex-col md:items-center md:gap-1 md:pt-1 md:text-center md:text-base">
+                <article class="home-news__item">
+                  <p class="home-news__date">
                     <time datetime={article.publishedIso}>
                       {formatNewsDate(article.publishedIso)}
                     </time>
                   </p>
 
-                  <div class="max-w-3xl space-y-3">
-                    <h2 class="ui-entry-title flex items-start gap-2">
+                  <div class="home-news__copy">
+                    <h2 class="ui-entry-title home-news__item-title">
                       <a href={articleUrl(article)} class="ui-link">
                         {article.title}
                       </a>
                     </h2>
-                    <p class="text-sm leading-6 text-muted-foreground md:text-base md:leading-7">
-                      {article.summary}
-                    </p>
+                    <p class="home-news__summary">{article.summary}</p>
                   </div>
                 </article>
               ))}
             </div>
 
-            <div class="grid grid-cols-1 pb-5 pt-4 md:grid-cols-[10rem_minmax(0,1fr)] md:gap-8 md:pb-6">
-              <a
-                href="/news/"
-                class="ui-link inline-flex items-center gap-2 font-semibold no-underline! md:col-start-2"
-              >
+            <div class="home-news__footer">
+              <a href="/news/" class="ui-link home-news__all-link">
                 Все новости <span aria-hidden="true">→</span>
               </a>
             </div>
@@ -172,3 +162,151 @@ const heroImage = heroMode === 'day' ? dayHeroImage : nightHeroImage;
     }
   </main>
 </BaseLayout>
+
+<style>
+  .home-main {
+    padding-block-end: 0.5rem;
+  }
+
+  .home-hero {
+    overflow: hidden;
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-surface-muted);
+  }
+
+  .home-hero__media {
+    width: 100%;
+    height: clamp(20rem, 37vw, 36rem);
+    overflow: hidden;
+  }
+
+  .home-hero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left;
+  }
+
+  .home-news {
+    padding-block: 2rem 1rem;
+  }
+
+  .home-news__inner {
+    padding-inline: 1.25rem;
+  }
+
+  .home-news__title {
+    padding-block-end: 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .home-news__item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    padding-block: 1.5rem;
+  }
+
+  .home-news__date {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text);
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: -0.025em;
+  }
+
+  .home-news__copy {
+    max-width: 48rem;
+  }
+
+  .home-news__copy > :global(:not(:last-child)) {
+    margin-block-end: 0.75rem;
+  }
+
+  .home-news__item-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .home-news__summary {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  .home-news__footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    padding-block: 1rem 1.25rem;
+  }
+
+  .home-news__all-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    text-decoration-line: none !important;
+  }
+
+  @media (min-width: 48rem) {
+    .home-main {
+      padding-block-end: 0.75rem;
+    }
+
+    .home-hero__image {
+      object-position: center;
+    }
+
+    .home-news {
+      padding-block: 3rem 1.5rem;
+    }
+
+    .home-news__inner {
+      padding-inline: 1.5rem;
+    }
+
+    .home-news__item {
+      grid-template-columns: 10rem minmax(0, 1fr);
+      gap: 2rem;
+      padding-block: 1.75rem;
+    }
+
+    .home-news__date {
+      flex-direction: column;
+      gap: 0.25rem;
+      padding-block-start: 0.25rem;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    .home-news__summary {
+      font-size: 1rem;
+      line-height: 1.75rem;
+    }
+
+    .home-news__footer {
+      grid-template-columns: 10rem minmax(0, 1fr);
+      gap: 2rem;
+      padding-block-end: 1.5rem;
+    }
+
+    .home-news__all-link {
+      grid-column-start: 2;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .home-main {
+      padding-block-end: 1rem;
+    }
+
+    .home-news {
+      padding-block: 3.5rem 2rem;
+    }
+  }
+</style>
