@@ -19,13 +19,13 @@ const tagAriaLabel = (label: string): string => `Тег ${label}`;
 {
   items.length > 0 &&
     (compact ? (
-      <ul class:list={['flex flex-wrap gap-x-4 gap-y-1.5', className]}>
+      <ul class:list={['news-tag-list news-tag-list--compact', className]}>
         {items.map((item) => (
           <li>
             <a
               href={item.url}
               aria-label={tagAriaLabel(item.label)}
-              class="news-tag-link news-tag-link-compact"
+              class="news-tag-link news-tag-link--compact"
             >
               <span>#{item.label}</span>
               {typeof item.count === 'number' && (
@@ -38,13 +38,10 @@ const tagAriaLabel = (label: string): string => `Тег ${label}`;
     ) : (
       <ul
         role="list"
-        class:list={[
-          'grid gap-x-6 gap-y-2 sm:grid-cols-2 lg:grid-cols-3',
-          className,
-        ]}
+        class:list={['news-tag-list news-tag-list--full', className]}
       >
         {items.map((item) => (
-          <li class="border-t border-border py-3">
+          <li class="news-tag-item">
             <a
               href={item.url}
               aria-label={tagAriaLabel(item.label)}
@@ -60,3 +57,82 @@ const tagAriaLabel = (label: string): string => `Тег ${label}`;
       </ul>
     ))
 }
+
+<style>
+  .news-tag-list--compact {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1rem;
+    row-gap: 0.375rem;
+  }
+
+  .news-tag-list--full {
+    display: grid;
+    column-gap: 1.5rem;
+    row-gap: 0.5rem;
+  }
+
+  .news-tag-item {
+    padding-block: 0.75rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .news-tag-link {
+    color: color-mix(
+      in oklab,
+      var(--color-primary) 38%,
+      var(--color-text-muted) 62%
+    );
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.22em;
+    transition:
+      color 0.2s ease,
+      text-decoration-color 0.2s ease,
+      text-underline-offset 0.2s ease;
+  }
+
+  .news-tag-link--compact {
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+  }
+
+  .news-tag-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .news-tag-count {
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+  }
+
+  .news-tag-link:is(:hover, :focus-visible),
+  .news-tag-row:is(:hover, :focus-visible) .news-tag-link {
+    color: color-mix(
+      in oklab,
+      var(--color-primary-hover) 52%,
+      var(--color-text-muted) 48%
+    );
+    text-decoration-color: color-mix(in oklab, currentColor 30%, transparent);
+    text-underline-offset: 0.18em;
+  }
+
+  @media (min-width: 40rem) {
+    .news-tag-list--full {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .news-tag-list--full {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

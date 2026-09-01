@@ -96,8 +96,7 @@ html[data-site-navigation-pending] .site-navigation-progress::before {
 
 .ui-root-site .ui-link,
 .ui-root-site .site-inline-link,
-.ui-root-site .news-tag-inline-link,
-.ui-root-site .news-tag-link {
+.ui-root-site .news-tag-inline-link {
   text-decoration-line: underline;
   text-decoration-color: transparent;
   text-decoration-thickness: 0.08em;
@@ -110,9 +109,7 @@ html[data-site-navigation-pending] .site-navigation-progress::before {
 
 .ui-root-site .ui-link:is(:hover, :focus-visible),
 .ui-root-site .site-inline-link:is(:hover, :focus-visible),
-.ui-root-site .news-tag-inline-link:is(:hover, :focus-visible),
-.ui-root-site .news-tag-link:is(:hover, :focus-visible),
-.ui-root-site .news-tag-row:is(:hover, :focus-visible) .news-tag-link {
+.ui-root-site .news-tag-inline-link:is(:hover, :focus-visible) {
   text-decoration-color: color-mix(in oklab, currentColor 30%, transparent);
   text-underline-offset: 0.18em;
 }
@@ -217,17 +214,6 @@ html[data-site-navigation-pending] .site-navigation-progress::before {
   );
 }
 
-.ui-root-site .news-tag-link {
-  color: color-mix(
-    in oklab,
-    var(--color-primary) 38%,
-    var(--color-muted-foreground) 62%
-  );
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
 .ui-root-site .news-tag-inline-link {
   color: color-mix(
     in oklab,
@@ -237,31 +223,12 @@ html[data-site-navigation-pending] .site-navigation-progress::before {
   font-weight: 600;
 }
 
-.ui-root-site .news-tag-link:is(:hover, :focus-visible),
-.ui-root-site .news-tag-inline-link:is(:hover, :focus-visible),
-.ui-root-site .news-tag-row:is(:hover, :focus-visible) .news-tag-link {
+.ui-root-site .news-tag-inline-link:is(:hover, :focus-visible) {
   color: color-mix(
     in oklab,
     var(--color-primary-hover) 52%,
     var(--color-muted-foreground) 48%
   );
-}
-
-.ui-root-site .news-tag-link-compact {
-  font-size: 0.8125rem;
-  line-height: 1.25rem;
-}
-
-.ui-root-site .news-tag-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.ui-root-site .news-tag-count {
-  color: var(--color-muted-foreground);
-  font-size: 0.75rem;
 }
 
 html:has(.site-search-dialog[open]),
