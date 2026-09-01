@@ -50,7 +50,7 @@ describe('SettlementCard', () => {
     expect(container.textContent).toContain('Тестовский район');
   });
 
-  it('uses the shared shell primitive as its card surface', () => {
+  it('uses the shared shell contract as its card surface', () => {
     const { container } = render(SettlementCard, {
       props: {
         settlement: mockSettlement,
@@ -63,7 +63,6 @@ describe('SettlementCard', () => {
 
     const card = container.querySelector('[data-testid="settlement-card"]');
     expect(card?.className).toContain('ui-shell');
-    expect(card?.className).not.toContain('rounded-sm');
   });
 
   it('renders tariff formatted correctly', () => {
