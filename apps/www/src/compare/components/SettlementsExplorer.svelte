@@ -212,20 +212,14 @@
   });
 </script>
 
-<div class="space-y-6">
-  <section class="ui-shell px-0 pb-0 pt-5" data-testid="explorer-controls">
-    <div class="flex items-start gap-2 md:items-center md:justify-between">
-      <fieldset class="min-w-0 flex-1">
-        <legend class="sr-only">Фильтр по тарифу</legend>
-        <div
-          class="flex min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto pr-1 md:gap-2"
-          data-testid="price-filter-group"
-        >
-          <span
-            class="mr-1 whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground md:text-xs"
-            aria-hidden="true">Фильтр:</span
-          >
-          <span class="inline-flex">
+<div class="explorer">
+  <section class="ui-shell explorer-controls" data-testid="explorer-controls">
+    <div class="controls-row">
+      <fieldset class="filter-fieldset">
+        <legend class="visually-hidden">Фильтр по тарифу</legend>
+        <div class="filter-group" data-testid="price-filter-group">
+          <span class="filter-caption" aria-hidden="true">Фильтр:</span>
+          <span class="filter-option">
             <input
               id={allid}
               type="radio"
@@ -233,20 +227,19 @@
               value="all"
               bind:group={priceFilter}
               disabled={!controlsReady}
-              class="peer sr-only"
+              class="filter-input visually-hidden"
               data-testid="price-all"
             />
             <label
               for={allid}
-              class="ui-btn ui-btn-sm min-h-9 whitespace-nowrap peer-disabled:cursor-not-allowed peer-disabled:opacity-50 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[color:var(--color-accent)] md:min-h-8 {priceFilter ===
-              'all'
+              class="ui-btn ui-btn-sm filter-label {priceFilter === 'all'
                 ? 'ui-btn-primary ui-btn-soft'
                 : 'ui-btn-ghost'}"
             >
               Все
             </label>
           </span>
-          <span class="inline-flex">
+          <span class="filter-option">
             <input
               id={cheapid}
               type="radio"
@@ -254,19 +247,18 @@
               value="cheaper"
               bind:group={priceFilter}
               disabled={!controlsReady}
-              class="peer sr-only"
+              class="filter-input visually-hidden"
               data-testid="price-cheaper"
             />
             <label
               for={cheapid}
-              class="ui-btn ui-btn-sm min-h-9 whitespace-nowrap peer-disabled:cursor-not-allowed peer-disabled:opacity-50 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[color:var(--color-accent)] md:min-h-8 {priceFilter ===
-              'cheaper'
+              class="ui-btn ui-btn-sm filter-label {priceFilter === 'cheaper'
                 ? 'ui-btn-primary ui-btn-soft'
                 : 'ui-btn-ghost'}"
             >
               {mobile ? 'Дешевле' : 'Дешевле Шелково'}
               <span
-                class="ml-1 inline-flex min-w-5 items-center justify-center rounded-full border border-success-border bg-success-soft px-1.5 py-0.5 text-[11px] font-semibold text-success-text"
+                class="filter-count filter-count--cheaper"
                 aria-hidden="true"
                 data-testid="price-cheaper-count"
               >
@@ -274,7 +266,7 @@
               </span>
             </label>
           </span>
-          <span class="inline-flex">
+          <span class="filter-option">
             <input
               id={moreid}
               type="radio"
@@ -282,19 +274,19 @@
               value="more_expensive"
               bind:group={priceFilter}
               disabled={!controlsReady}
-              class="peer sr-only"
+              class="filter-input visually-hidden"
               data-testid="price-more"
             />
             <label
               for={moreid}
-              class="ui-btn ui-btn-sm min-h-9 whitespace-nowrap peer-disabled:cursor-not-allowed peer-disabled:opacity-50 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[color:var(--color-accent)] md:min-h-8 {priceFilter ===
+              class="ui-btn ui-btn-sm filter-label {priceFilter ===
               'more_expensive'
                 ? 'ui-btn-primary ui-btn-soft'
                 : 'ui-btn-ghost'}"
             >
               {mobile ? 'Дороже' : 'Дороже Шелково'}
               <span
-                class="ml-1 inline-flex min-w-5 items-center justify-center rounded-full border border-danger-border bg-danger-soft px-1.5 py-0.5 text-[11px] font-semibold text-danger-text"
+                class="filter-count filter-count--more"
                 aria-hidden="true"
                 data-testid="price-more-count"
               >
@@ -307,7 +299,7 @@
       <button
         type="button"
         disabled={!controlsReady}
-        class="ui-btn ui-btn-sm min-h-9 shrink-0 md:min-h-8 {showMap
+        class="ui-btn ui-btn-sm map-toggle {showMap
           ? 'ui-btn-outline'
           : 'ui-btn-ghost'}"
         onclick={() => {
@@ -321,7 +313,7 @@
         <svg
           viewBox="0 0 20 20"
           fill="currentColor"
-          class="h-4 w-4"
+          class="map-toggle-icon"
           aria-hidden="true"
         >
           <path
@@ -334,45 +326,29 @@
   </section>
 
   {#if showMap}
-    <section id={mapid} class="space-y-4" data-testid="filtered-map">
+    <section id={mapid} data-testid="filtered-map">
       <SettlementMap settlements={mapSettlements} height={mapHeight} />
     </section>
   {:else if !controlsReady}
     <div
-      class="hidden border border-border bg-[color:var(--color-bg-soft)] md:block"
+      class="map-placeholder"
       style={`height: ${mapHeight}px; min-height: ${mapHeight}px;`}
       aria-hidden="true"
     ></div>
   {/if}
 
-  <div
-    class="flex flex-col gap-2 pb-1 sm:flex-row sm:items-center sm:justify-between"
-    data-testid="explorer-summary-row"
-  >
-    <p
-      class="min-w-0 text-base text-muted-foreground sm:text-sm"
-      data-testid="displayed-count"
-    >
-      Показано <span class="font-semibold text-foreground"
-        >{displayedCount}</span
-      >
+  <div class="summary-row" data-testid="explorer-summary-row">
+    <p class="summary" data-testid="displayed-count">
+      Показано <span class="summary-count">{displayedCount}</span>
       из
-      <span class="font-semibold text-foreground">{totalCount}</span>
+      <span class="summary-count">{totalCount}</span>
       {#if compact}
-        <span
-          class="ml-2 inline-flex items-center border-l border-border pl-2 text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-          >активные фильтры</span
-        >
+        <span class="active-filters">активные фильтры</span>
       {/if}
     </p>
-    <div class="flex min-w-0 shrink-0 items-center gap-3 sm:min-w-fit">
-      <label
-        for={sortid}
-        class="hidden whitespace-nowrap text-sm font-semibold text-foreground sm:inline"
-      >
-        Сортировка:
-      </label>
-      <div class="flex min-w-0 flex-1 items-center gap-2 sm:flex-none">
+    <div class="sort-controls">
+      <label for={sortid} class="sort-label"> Сортировка: </label>
+      <div class="sort-field">
         <select
           id={sortid}
           value={sortBy}
@@ -382,7 +358,7 @@
             sortBy = (e.currentTarget as HTMLSelectElement)
               .value as typeof sortBy;
           }}
-          class="block min-w-0 flex-1 rounded-sm border border-border bg-[color:var(--color-surface)] px-3 py-2 text-base text-foreground disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-auto sm:flex-none sm:text-sm"
+          class="sort-select"
           data-testid="sort-select"
         >
           <option value="rating_desc">Условный уровень (↓)</option>
@@ -394,11 +370,11 @@
           <option value="name">По названию</option>
         </select>
 
-        <span class="inline-flex h-5 w-5 items-center justify-center">
+        <span class="rating-help-slot">
           {#if help}
             <Link
               href={withBase('/rating/')}
-              class="inline-flex h-5 w-5 items-center justify-center text-muted-foreground transition-colors hover:text-primary"
+              class="rating-help"
               aria-label="Как считается условный уровень"
               title="Как считается условный уровень"
               data-testid="rating-help-link"
@@ -406,7 +382,7 @@
               <svg
                 viewBox="0 0 20 20"
                 fill="none"
-                class="h-4 w-4"
+                class="rating-help-icon"
                 stroke="currentColor"
                 stroke-width="1.6"
                 aria-hidden="true"
@@ -432,9 +408,7 @@
     </div>
   </div>
 
-  <div
-    class="grid grid-cols-1 border-b border-border md:grid-cols-2 md:gap-4 md:border-b-0 lg:grid-cols-3"
-  >
+  <div class="settlement-grid">
     {#each displayedSettlements as settlement (settlement.slug)}
       <SettlementCard
         {settlement}
@@ -447,11 +421,320 @@
   </div>
 
   {#if displayedCount === 0}
-    <div class="ui-shell p-10 text-center">
-      <p class="text-lg font-semibold text-foreground">Ничего не найдено</p>
-      <p class="mt-2 text-sm text-muted-foreground">
-        Попробуйте изменить фильтры
-      </p>
+    <div class="ui-shell empty-state">
+      <p class="empty-title">Ничего не найдено</p>
+      <p class="empty-hint">Попробуйте изменить фильтры</p>
     </div>
   {/if}
 </div>
+
+<style>
+  .explorer > :not(:first-child) {
+    margin-block-start: 1.5rem;
+  }
+
+  .explorer-controls {
+    padding: 1.25rem 0 0;
+  }
+
+  .controls-row,
+  .filter-group,
+  .sort-controls,
+  .sort-field {
+    display: flex;
+    align-items: center;
+  }
+
+  .controls-row {
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .filter-fieldset {
+    min-width: 0;
+    flex: 1 1 0%;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  .filter-group {
+    min-width: 0;
+    flex-wrap: nowrap;
+    gap: 0.375rem;
+    overflow-x: auto;
+    padding-right: 0.25rem;
+  }
+
+  .filter-caption {
+    margin-right: 0.25rem;
+    color: var(--color-text-muted);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .filter-option {
+    display: inline-flex;
+  }
+
+  .filter-label,
+  .map-toggle {
+    min-height: 2.25rem;
+  }
+
+  .filter-label {
+    white-space: nowrap;
+  }
+
+  .filter-input:disabled + .filter-label {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .filter-input:focus-visible + .filter-label {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .filter-count {
+    display: inline-flex;
+    min-width: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.25rem;
+    border: 1px solid;
+    border-radius: var(--radius-full);
+    padding: 0.125rem 0.375rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+  }
+
+  .filter-count--cheaper {
+    border-color: var(--color-success-border);
+    background: var(--color-success-soft);
+    color: var(--color-success-text);
+  }
+
+  .filter-count--more {
+    border-color: var(--color-danger-border);
+    background: var(--color-danger-soft);
+    color: var(--color-danger-text);
+  }
+
+  .map-toggle {
+    flex-shrink: 0;
+  }
+
+  .map-toggle-icon,
+  .rating-help-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .map-placeholder {
+    display: none;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-soft);
+  }
+
+  .summary-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .summary {
+    min-width: 0;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .summary-count {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .active-filters {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.5rem;
+    border-left: 1px solid var(--color-border);
+    padding-left: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .sort-controls {
+    min-width: 0;
+    flex-shrink: 0;
+    gap: 0.75rem;
+  }
+
+  .sort-label {
+    display: none;
+    color: var(--color-text);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+    white-space: nowrap;
+  }
+
+  .sort-field {
+    min-width: 0;
+    flex: 1 1 0%;
+    gap: 0.5rem;
+  }
+
+  .sort-select {
+    display: block;
+    min-width: 0;
+    flex: 1 1 0%;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.75rem;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .sort-select:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .sort-select:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-focus);
+  }
+
+  .rating-help-slot,
+  .rating-help-slot :global(.rating-help) {
+    display: inline-flex;
+    width: 1.25rem;
+    height: 1.25rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .rating-help-slot :global(.rating-help) {
+    color: var(--color-text-muted);
+    transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .rating-help-slot :global(.rating-help:hover) {
+    color: var(--color-primary);
+  }
+
+  .settlement-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .empty-state {
+    padding: 2.5rem;
+    text-align: center;
+  }
+
+  .empty-title {
+    color: var(--color-text);
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.75rem;
+  }
+
+  .empty-hint {
+    margin-top: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .summary-row {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .summary {
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+    }
+
+    .sort-controls {
+      min-width: fit-content;
+    }
+
+    .sort-label {
+      display: inline;
+    }
+
+    .sort-field {
+      flex: none;
+    }
+
+    .sort-select {
+      width: auto;
+      flex: none;
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .controls-row {
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .filter-group {
+      gap: 0.5rem;
+    }
+
+    .filter-caption {
+      font-size: 0.75rem;
+      line-height: 1rem;
+    }
+
+    .filter-label,
+    .map-toggle {
+      min-height: 2rem;
+    }
+
+    .map-placeholder {
+      display: block;
+    }
+
+    .settlement-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      border-bottom: 0;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .settlement-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>
