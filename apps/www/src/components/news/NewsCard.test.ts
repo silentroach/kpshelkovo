@@ -8,13 +8,6 @@ import type { NewsListArticle } from '../../lib/news/types';
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import NewsCard from './NewsCard.astro';
 
-const visibleText = (html: string): string =>
-  html
-    .replace(/<[^>]*aria-hidden="true"[^>]*>[\s\S]*?<\/[^>]+>/gu, '')
-    .replace(/<[^>]*>/gu, ' ')
-    .replace(/\s+/gu, ' ')
-    .trim();
-
 const baseArticle: NewsListArticle = {
   id: '2026/05/pinned',
   title: 'Важная новость',
@@ -50,14 +43,17 @@ describe('NewsCard', () => {
     const heading = html.match(/<h3[\s\S]*?<\/h3>/u)?.[0] ?? '';
 
     expect({
-      accessibleText: visibleText(heading),
+      hasAccessiblePinnedLabel:
+        /<span(?![^>]*aria-hidden)[^>]*>Закреплено сверху<\/span>/u.test(
+          heading,
+        ),
       href: heading.match(/<a href="([^"]+)"/u)?.[1],
       hasDecorativePinnedIcon:
         /title="закреплено сверху" aria-hidden="true"/u.test(heading),
       hasProhibitedAriaLabel: /aria-label=/u.test(heading),
     }).toMatchInlineSnapshot(`
       {
-        "accessibleText": "Важная новость Закреплено сверху",
+        "hasAccessiblePinnedLabel": true,
         "hasDecorativePinnedIcon": true,
         "hasProhibitedAriaLabel": false,
         "href": "/news/2026/05/pinned/",

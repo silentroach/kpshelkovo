@@ -38,7 +38,7 @@ const { article, featured = false } = Astro.props;
                 title="закреплено сверху"
                 aria-hidden="true"
               >
-                <StarIcon class="news-card__star" />
+                <StarIcon />
               </span>
               <span class="news-card__pinned-label">Закреплено сверху</span>
             </>
@@ -76,11 +76,11 @@ const { article, featured = false } = Astro.props;
     padding: 1.25rem;
   }
 
-  .news-card__content > * + * {
+  .news-card__content > :global(* + *) {
     margin-block-start: 1rem;
   }
 
-  .news-card__header > * + * {
+  .news-card__header > :global(* + *) {
     margin-block-start: 0.75rem;
   }
 
@@ -97,7 +97,7 @@ const { article, featured = false } = Astro.props;
     color: var(--color-star);
   }
 
-  .news-card__star {
+  .news-card__pinned-icon > :global(svg) {
     width: 1rem;
     height: 1rem;
   }
