@@ -46,84 +46,60 @@ const latestDuration =
 const latestAreas =
   latestRecord && !latestRecord.appliesToAllAreas ? latestRecord.areas : [];
 const timelineIncidents = summary.incidents.map(toStatusTimelineIncidentInput);
-const serviceMeta = {
-  electricity: {
-    Icon: LightningIcon,
-    iconWrapClass:
-      'bg-[color:var(--color-primary-soft)] text-[color:var(--color-primary)]',
-  },
-  water: {
-    Icon: WaterDropIcon,
-    iconWrapClass:
-      'bg-[color:var(--color-water-soft)] text-[color:var(--color-water)]',
-  },
-  internet: {
-    Icon: FiberIcon,
-    iconWrapClass:
-      'bg-[color:var(--color-unknown-soft)] text-[color:var(--color-unknown)]',
-  },
-  dam: {
-    Icon: DamIcon,
-    iconWrapClass:
-      'bg-[color:var(--color-surface-muted)] text-[color:var(--color-earth)]',
-  },
+const serviceIcons = {
+  electricity: LightningIcon,
+  water: WaterDropIcon,
+  internet: FiberIcon,
+  dam: DamIcon,
 } as const;
-const ServiceIcon = serviceMeta[summary.service].Icon;
+const ServiceIcon = serviceIcons[summary.service];
 const resolvedMobileTimelineDays = mobileTimelineDays ?? timelineDays;
 const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
 ---
 
-<article
-  class="status-service-row ui-shell px-5 py-4 md:px-6 md:py-5"
-  data-status-service-card
->
-  <div
-    class="flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_minmax(0,11rem)_minmax(0,21rem)] lg:items-center lg:gap-5"
-  >
+<article class="status-service-row ui-shell" data-status-service-card>
+  <div class="status-service-row__layout">
     {
       serviceHref ? (
-        <a
-          href={serviceHref}
-          class="group inline-flex items-center gap-3 self-start lg:self-auto"
-        >
+        <a href={serviceHref} class="status-service-row__service-link">
           <span
             class:list={[
-              'inline-flex size-9 shrink-0 items-center justify-center rounded-full md:size-10',
-              serviceMeta[summary.service].iconWrapClass,
+              'status-service-row__icon',
+              `status-service-row__icon--${summary.service}`,
             ]}
           >
-            <ServiceIcon class="size-4 md:size-5" />
+            <ServiceIcon />
           </span>
 
-          <div class="flex flex-col gap-1 lg:gap-0">
-            <h3 class="ui-card-title transition-colors group-hover:text-primary">
+          <div class="status-service-row__service-name">
+            <h3 class="ui-card-title status-service-row__linked-title">
               {serviceLabel}
             </h3>
           </div>
         </a>
       ) : (
-        <div class="flex items-center gap-3">
+        <div class="status-service-row__service">
           <span
             class:list={[
-              'inline-flex size-9 shrink-0 items-center justify-center rounded-full md:size-10',
-              serviceMeta[summary.service].iconWrapClass,
+              'status-service-row__icon',
+              `status-service-row__icon--${summary.service}`,
             ]}
           >
-            <ServiceIcon class="size-4 md:size-5" />
+            <ServiceIcon />
           </span>
 
-          <div class="flex flex-col gap-1 lg:gap-0">
+          <div class="status-service-row__service-name">
             <h3 class="ui-card-title">{serviceLabel}</h3>
           </div>
         </div>
       )
     }
 
-    <div class="flex flex-col gap-2 lg:gap-0">
+    <div class="status-service-row__timeline">
       {
         hasResponsiveTimeline ? (
           <>
-            <div class="lg:hidden">
+            <div data-status-timeline-viewport="mobile">
               <StatusServiceTimeline
                 service={summary.service}
                 incidents={timelineIncidents}
@@ -131,7 +107,7 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
               />
             </div>
 
-            <div class="hidden lg:block">
+            <div data-status-timeline-viewport="desktop">
               <StatusServiceTimeline
                 service={summary.service}
                 incidents={timelineIncidents}
@@ -150,36 +126,29 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
     </div>
 
     <div>
-      <StatusServiceState
-        summary={summary}
-        class="status-service-row__state text-[0.9375rem] font-semibold leading-5"
-      />
+      <StatusServiceState summary={summary} class="status-service-row__state" />
     </div>
 
-    <div class="hidden lg:block">
-      <p
-        class="text-[0.68rem] font-semibold uppercase tracking-[0.06em] text-muted-foreground lg:hidden"
-      >
-        Последняя запись
-      </p>
+    <div class="status-service-row__latest">
+      <p class="status-service-row__latest-label">Последняя запись</p>
 
       {
         latestRecord ? (
-          <div class="space-y-1">
+          <div class="status-service-row__latest-content">
             {latestRecord.hasPage ? (
               <a
                 href={latestRecord.url}
-                class="site-inline-link block text-[0.9375rem] font-semibold leading-[1.35] text-foreground"
+                class="site-inline-link status-service-row__latest-title"
               >
                 {latestRecord.title}
               </a>
             ) : (
-              <p class="text-[0.9375rem] font-semibold leading-[1.35] text-foreground">
+              <p class="status-service-row__latest-title">
                 {latestRecord.title}
               </p>
             )}
             {(latestMoment || latestAreas.length > 0) && (
-              <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem] leading-5 text-muted-foreground">
+              <div class="status-service-row__latest-meta">
                 {latestMoment && <span>{latestMoment}</span>}
                 {latestAreas.map((area) => (
                   <ShelkovoAreaIcon area={area} />
@@ -187,20 +156,188 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
               </div>
             )}
             {latestDuration && (
-              <p class="text-[0.8125rem] leading-5 text-muted-foreground">
+              <p class="status-service-row__latest-meta">
                 Длительность: {latestDuration}
               </p>
             )}
           </div>
         ) : (
-          <div class="space-y-1">
-            <p class="text-[0.9375rem] leading-[1.35] text-foreground">
+          <div class="status-service-row__latest-content">
+            <p class="status-service-row__latest-empty">
               Пока без записей по этому сервису
             </p>
-            <p class="text-[0.8125rem] leading-5 text-muted-foreground">-</p>
+            <p class="status-service-row__latest-meta">-</p>
           </div>
         )
       }
     </div>
   </div>
 </article>
+
+<style>
+  .status-service-row {
+    padding: 1rem 1.25rem;
+  }
+
+  .status-service-row__layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .status-service-row__service-link,
+  .status-service-row__service {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .status-service-row__service-link {
+    align-self: flex-start;
+  }
+
+  .status-service-row__icon {
+    display: inline-flex;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+  }
+
+  .status-service-row__icon--electricity {
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+  }
+
+  .status-service-row__icon--water {
+    background: var(--color-water-soft);
+    color: var(--color-water);
+  }
+
+  .status-service-row__icon--internet {
+    background: var(--color-unknown-soft);
+    color: var(--color-unknown);
+  }
+
+  .status-service-row__icon--dam {
+    background: var(--color-surface-muted);
+    color: var(--color-earth);
+  }
+
+  .status-service-row__icon > :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .status-service-row__service-name,
+  .status-service-row__timeline {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-service-row__service-name {
+    gap: 0.25rem;
+  }
+
+  .status-service-row__timeline {
+    gap: 0.5rem;
+  }
+
+  .status-service-row__linked-title {
+    transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .status-service-row__service-link:hover .status-service-row__linked-title {
+    color: var(--color-primary);
+  }
+
+  [data-status-timeline-viewport='desktop'],
+  .status-service-row__latest,
+  .status-service-row__latest-label {
+    display: none;
+  }
+
+  .status-service-row__layout
+    :global(.status-service-row__state[data-status-service-state-label]) {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+  }
+
+  .status-service-row__latest-content > * + * {
+    margin-block-start: 0.25rem;
+  }
+
+  .status-service-row__latest-title,
+  .status-service-row__latest-empty {
+    color: var(--color-text);
+    font-size: 0.9375rem;
+    line-height: 1.35;
+  }
+
+  .status-service-row__latest-title {
+    display: block;
+    font-weight: 600;
+  }
+
+  .status-service-row__latest-meta {
+    color: var(--color-text-muted);
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+  }
+
+  div.status-service-row__latest-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 0.5rem;
+    row-gap: 0.25rem;
+  }
+
+  @media (min-width: 48rem) {
+    .status-service-row {
+      padding: 1.25rem 1.5rem;
+    }
+
+    .status-service-row__icon {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+
+    .status-service-row__icon > :global(svg) {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .status-service-row__layout {
+      display: grid;
+      grid-template-columns:
+        minmax(0, 15rem) minmax(0, 1fr) minmax(0, 11rem)
+        minmax(0, 21rem);
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .status-service-row__service-link {
+      align-self: auto;
+    }
+
+    .status-service-row__service-name,
+    .status-service-row__timeline {
+      gap: 0;
+    }
+
+    [data-status-timeline-viewport='mobile'] {
+      display: none;
+    }
+
+    [data-status-timeline-viewport='desktop'],
+    .status-service-row__latest {
+      display: block;
+    }
+  }
+</style>

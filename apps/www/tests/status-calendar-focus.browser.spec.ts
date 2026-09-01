@@ -178,6 +178,29 @@ for (const viewport of [
   });
 }
 
+for (const viewport of [
+  { name: 'desktop', width: 1280, height: 800, visibleRange: '30' },
+  { name: 'mobile', width: 390, height: 844, visibleRange: '7' },
+] as const) {
+  test(`shows the matching service timeline range on ${viewport.name}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await page.goto('/status/', { waitUntil: 'networkidle' });
+
+    const card = page.locator('[data-status-service-card]').first();
+    const visibleTimeline = card.locator(
+      `[data-range-days="${viewport.visibleRange}"]`,
+    );
+    const hiddenTimeline = card.locator(
+      `[data-range-days="${viewport.visibleRange === '30' ? '7' : '30'}"]`,
+    );
+
+    await expect(visibleTimeline).toBeVisible();
+    await expect(hiddenTimeline).toBeHidden();
+  });
+}
+
 const trackCalendarFocus = (page: Page): Promise<void> =>
   page.addInitScript(() => {
     const focus = HTMLElement.prototype.focus;

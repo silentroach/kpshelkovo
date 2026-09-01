@@ -87,7 +87,7 @@ describe('StatusServiceCard', () => {
 
     expect(html.match(/data-range-days="7"/gu)?.length ?? 0).toBe(1);
     expect(html.match(/data-range-days="30"/gu)?.length ?? 0).toBe(1);
-    expect(html).toContain('class="lg:hidden"');
-    expect(html).toContain('class="hidden lg:block"');
+    expect(html).toContain('data-status-timeline-viewport="mobile"');
+    expect(html).toContain('data-status-timeline-viewport="desktop"');
   });
 });
