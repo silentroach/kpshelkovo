@@ -8,14 +8,6 @@ import type { NewsListArticle } from '../../lib/news/types';
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import NewsCard from './NewsCard.astro';
 
-const astroSourceAttribute = /\sdata-astro-source-(?:file|loc)="[^"]*"/gu;
-const normalizeHtml = (html: string): string =>
-  html
-    .replace(astroSourceAttribute, '')
-    .replace(/>\s+</gu, '><')
-    .replace(/</gu, '\n<')
-    .trim();
-
 const baseArticle: NewsListArticle = {
   id: '2026/05/pinned',
   title: 'Важная новость',
@@ -48,24 +40,24 @@ describe('NewsCard', () => {
       props: { article: baseArticle },
     });
 
-    const heading = normalizeHtml(html.match(/<h3[\s\S]*?<\/h3>/u)?.[0] ?? '')
-      .replace(/<path d="[^"]*">\n<\/path>/u, '<path />')
-      .split('\n');
+    const heading = html.match(/<h3[\s\S]*?<\/h3>/u)?.[0] ?? '';
 
-    expect(heading).toMatchInlineSnapshot(`
-      [
-        "<h3 class=\"ui-entry-title flex items-start gap-2\">",
-        "<a href=\"/news/2026/05/pinned/\" class=\"ui-link\">Важная новость",
-        "</a>",
-        "<span class=\"mt-1 inline-flex shrink-0 text-star\" title=\"закреплено сверху\" aria-hidden=\"true\">",
-        "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" class=\"size-4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">",
-        "<path />",
-        "</svg>",
-        "</span>",
-        "<span class=\"sr-only\">Закреплено сверху",
-        "</span>",
-        "</h3>",
-      ]
+    expect({
+      hasAccessiblePinnedLabel:
+        /<span(?![^>]*aria-hidden)[^>]*>Закреплено сверху<\/span>/u.test(
+          heading,
+        ),
+      href: heading.match(/<a href="([^"]+)"/u)?.[1],
+      hasDecorativePinnedIcon:
+        /title="закреплено сверху" aria-hidden="true"/u.test(heading),
+      hasProhibitedAriaLabel: /aria-label=/u.test(heading),
+    }).toMatchInlineSnapshot(`
+      {
+        "hasAccessiblePinnedLabel": true,
+        "hasDecorativePinnedIcon": true,
+        "hasProhibitedAriaLabel": false,
+        "href": "/news/2026/05/pinned/",
+      }
     `);
   });
 });

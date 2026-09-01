@@ -12,12 +12,7 @@ interface Props {
 const { article, featured = false } = Astro.props;
 ---
 
-<article
-  class:list={[
-    featured ? 'ui-shell-strong' : 'ui-shell',
-    'h-full overflow-hidden',
-  ]}
->
+<article class:list={[featured ? 'ui-shell-strong' : 'ui-shell', 'news-card']}>
   {
     featured && article.cover && (
       <img
@@ -26,26 +21,26 @@ const { article, featured = false } = Astro.props;
         loading="lazy"
         width={article.cover.width}
         height={article.cover.height}
-        class="aspect-video w-full border-b border-border-strong object-cover"
+        class="news-card__cover"
       />
     )
   }
 
-  <div class="space-y-4 px-5 py-5 md:px-6 md:py-6">
-    <div class="space-y-3">
-      <h3 class="ui-entry-title flex items-start gap-2">
+  <div class="news-card__content">
+    <div class="news-card__header">
+      <h3 class="ui-entry-title news-card__title">
         <a href={article.url} class="ui-link">{article.title}</a>
         {
           article.pinned && (
             <>
               <span
-                class="mt-1 inline-flex shrink-0 text-star"
+                class="news-card__pinned-icon"
                 title="закреплено сверху"
                 aria-hidden="true"
               >
-                <StarIcon class="size-4" />
+                <StarIcon />
               </span>
-              <span class="sr-only">Закреплено сверху</span>
+              <span class="news-card__pinned-label">Закреплено сверху</span>
             </>
           )
         }
@@ -58,8 +53,74 @@ const { article, featured = false } = Astro.props;
       />
     </div>
 
-    <p class="ui-copy text-muted-foreground">{article.summary}</p>
+    <p class="ui-copy news-card__summary">{article.summary}</p>
 
     <NewsTagList items={article.tags} compact />
   </div>
 </article>
+
+<style>
+  .news-card {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .news-card__cover {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-bottom: 1px solid var(--color-border-strong);
+    object-fit: cover;
+  }
+
+  .news-card__content {
+    padding: 1.25rem;
+  }
+
+  .news-card__content > :global(* + *) {
+    margin-block-start: 1rem;
+  }
+
+  .news-card__header > :global(* + *) {
+    margin-block-start: 0.75rem;
+  }
+
+  .news-card__title {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .news-card__pinned-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    margin-block-start: 0.25rem;
+    color: var(--color-star);
+  }
+
+  .news-card__pinned-icon > :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .news-card__pinned-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .news-card__summary {
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 48rem) {
+    .news-card__content {
+      padding: 1.5rem;
+    }
+  }
+</style>
