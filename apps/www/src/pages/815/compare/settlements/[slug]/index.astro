@@ -165,8 +165,8 @@ const heroMap = hasPoint
   search={search}
 >
   <main class="ui-page relative pb-6 md:pb-10 lg:pb-12">
-    <h1 class="sr-only">{settlement.name}</h1>
-    <p class="sr-only" data-pagefind-body>{searchDescription}</p>
+    <h1 class="ui-visually-hidden">{settlement.name}</h1>
+    <p class="ui-visually-hidden" data-pagefind-body>{searchDescription}</p>
 
     <div
       class="settlement-breadcrumbs ui-page-header relative z-30 mb-4 lg:absolute lg:inset-x-0 lg:mb-0"
@@ -576,7 +576,7 @@ const heroMap = hasPoint
       class="relative z-20 mb-5 px-6 py-0 md:mb-8 md:px-8 lg:hidden"
       data-testid="base-info-section"
     >
-      <h2 class="sr-only">Паспорт поселка</h2>
+      <h2 class="ui-visually-hidden">Паспорт поселка</h2>
 
       <div class="max-w-3xl">
         <p

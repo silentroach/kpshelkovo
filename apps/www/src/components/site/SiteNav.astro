@@ -54,7 +54,7 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
         <p class="site-nav-mobile-label">
           Тариф 815
           {isTariffCurrent && (
-            <span class="site-nav-sr-only">, текущий раздел</span>
+            <span class="ui-visually-hidden">, текущий раздел</span>
           )}
         </p>
         <a
@@ -130,7 +130,7 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
         >
           <span>Тариф 815</span>
           {isTariffCurrent && (
-            <span class="site-nav-sr-only">, текущий раздел</span>
+            <span class="ui-visually-hidden">, текущий раздел</span>
           )}
           <span
             aria-hidden="true"
@@ -196,18 +196,6 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
 }
 
 <style>
-  .site-nav-sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    border: 0;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-  }
-
   .site-nav-header {
     display: flex;
     align-items: center;
