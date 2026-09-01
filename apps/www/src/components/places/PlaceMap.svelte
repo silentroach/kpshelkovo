@@ -700,37 +700,19 @@
   });
 </script>
 
-<div
-  data-testid="place-map"
-  class="relative h-full w-full overflow-hidden bg-[color:var(--color-bg-soft)]"
->
+<div data-testid="place-map" class="place-map">
   {#if isLoading}
-    <div
-      class="map-placeholder pointer-events-none absolute inset-0 z-10 flex items-center justify-center"
-      aria-live="polite"
-    >
-      <p
-        class="border border-border bg-[color:var(--color-surface)] px-4 py-2 text-sm font-semibold text-muted-foreground"
-      >
-        Загружаем карту…
-      </p>
+    <div class="map-placeholder map-placeholder--loading" aria-live="polite">
+      <p class="map-loading-message">Загружаем карту…</p>
     </div>
   {/if}
 
   {#if error}
-    <div
-      class="map-placeholder absolute inset-0 z-10 flex items-center justify-center px-5"
-      role="status"
-    >
-      <div
-        class="max-w-sm border border-border bg-[color:var(--color-surface)] p-5 text-center"
-      >
-        <p class="font-semibold text-foreground">Карта сейчас недоступна</p>
+    <div class="map-placeholder map-placeholder--error" role="status">
+      <div class="map-error-panel">
+        <p class="map-error-title">Карта сейчас недоступна</p>
         {#if errorPlace}
-          <a
-            href={errorPlace.url}
-            class="site-text-link mt-2 inline-flex font-semibold"
-          >
+          <a href={errorPlace.url} class="site-text-link map-error-link">
             Открыть карточку «{errorPlace.name}»
           </a>
         {/if}
@@ -738,10 +720,86 @@
     </div>
   {/if}
 
-  <div bind:this={mapContainer} class="h-full w-full"></div>
+  <div bind:this={mapContainer} class="place-map__canvas"></div>
 </div>
 
 <style>
+  .place-map {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--color-bg-soft);
+  }
+
+  .place-map__canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  .map-placeholder {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      linear-gradient(
+        color-mix(in oklab, var(--color-border) 62%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        color-mix(in oklab, var(--color-border) 62%, transparent) 1px,
+        transparent 1px
+      ),
+      var(--color-bg-soft);
+    background-size: 2rem 2rem;
+  }
+
+  .map-placeholder--loading {
+    pointer-events: none;
+  }
+
+  .map-placeholder--error {
+    padding-inline: 1.25rem;
+  }
+
+  .map-loading-message,
+  .map-error-panel {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .map-loading-message {
+    padding: 0.5rem 1rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+  }
+
+  .map-error-panel {
+    max-width: 24rem;
+    padding: 1.25rem;
+    text-align: center;
+  }
+
+  .map-error-title,
+  .map-error-link {
+    font-weight: 600;
+  }
+
+  .map-error-title {
+    color: var(--color-text);
+  }
+
+  .map-error-link {
+    display: inline-flex;
+    margin-top: 0.5rem;
+  }
+
   :global(.place-map-marker) {
     position: relative;
     display: grid;
@@ -997,20 +1055,5 @@
       animation: none;
       transition: none;
     }
-  }
-
-  .map-placeholder {
-    background:
-      linear-gradient(
-        color-mix(in oklab, var(--color-border) 62%, transparent) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        90deg,
-        color-mix(in oklab, var(--color-border) 62%, transparent) 1px,
-        transparent 1px
-      ),
-      var(--color-bg-soft);
-    background-size: 2rem 2rem;
   }
 </style>
