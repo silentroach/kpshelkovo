@@ -20,40 +20,40 @@ const titleIcon =
     : incident.phase === 'active'
       ? {
           Icon: AlertCircleIcon,
-          toneClass: 'text-[color:var(--color-danger)]',
+          tone: 'danger',
         }
       : incident.phase === 'resolved'
         ? {
             Icon: CheckCircleIcon,
-            toneClass: 'text-[color:var(--color-success)]',
+            tone: 'success',
           }
         : undefined;
 const TitleIcon = titleIcon?.Icon;
 ---
 
-<article class="ui-shell px-5 py-5 md:px-6 md:py-6">
-  <div class="max-w-4xl space-y-3">
-    <div class="space-y-2">
+<article class="ui-shell status-incident-row">
+  <div class="status-incident-row__content">
+    <div class="status-incident-row__header">
       <h3 class="ui-entry-title">
         {
           titleIcon && TitleIcon && (
             <span
               aria-hidden="true"
               class:list={[
-                'mr-2 inline-flex size-5 align-[-0.1em]',
-                titleIcon.toneClass,
+                'status-incident-row__icon',
+                `status-incident-row__icon--${titleIcon.tone}`,
               ]}
             >
-              <TitleIcon class="size-5" />
+              <TitleIcon />
             </span>
           )
         }
         {
           incident.hasPage ? (
             // prettier-ignore
-            <a href={incident.url} class="ui-link min-w-0">{incident.title}</a>
+            <a href={incident.url} class="ui-link status-incident-row__title">{incident.title}</a>
           ) : (
-            <span class="min-w-0">{incident.title}</span>
+            <span class="status-incident-row__title">{incident.title}</span>
           )
         }
       </h3>
@@ -64,10 +64,68 @@ const TitleIcon = titleIcon?.Icon;
     {
       excerptHtml && (
         <div
-          class="ui-copy max-w-3xl text-muted-foreground [&_p]:my-0"
+          class="ui-copy status-incident-row__excerpt"
           set:html={excerptHtml}
         />
       )
     }
   </div>
 </article>
+
+<style>
+  .status-incident-row {
+    padding: 1.25rem;
+  }
+
+  .status-incident-row__content {
+    max-width: 56rem;
+  }
+
+  .status-incident-row__content > * + * {
+    margin-block-start: 0.75rem;
+  }
+
+  .status-incident-row__header > * + * {
+    margin-block-start: 0.5rem;
+  }
+
+  .status-incident-row__icon {
+    display: inline-flex;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-inline-end: 0.5rem;
+    vertical-align: -0.1em;
+  }
+
+  .status-incident-row__icon > :global(svg) {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .status-incident-row__icon--danger {
+    color: var(--color-danger);
+  }
+
+  .status-incident-row__icon--success {
+    color: var(--color-success);
+  }
+
+  .status-incident-row__title {
+    min-width: 0;
+  }
+
+  .status-incident-row__excerpt {
+    max-width: 48rem;
+    color: var(--color-muted-foreground);
+  }
+
+  .status-incident-row__excerpt :global(p) {
+    margin-block: 0;
+  }
+
+  @media (min-width: 48rem) {
+    .status-incident-row {
+      padding: 1.5rem;
+    }
+  }
+</style>
