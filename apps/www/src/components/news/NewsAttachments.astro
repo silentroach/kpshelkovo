@@ -24,22 +24,27 @@ function external(url: string): boolean {
 
 {
   items.length > 0 && (
-    <section class:list={framed && ['ui-shell px-5 py-6 md:px-6 md:py-7']}>
-      <div class="space-y-4">
+    <section
+      class:list={[
+        'news-attachments',
+        framed && 'ui-shell news-attachments--framed',
+      ]}
+    >
+      <div>
         <Heading class="ui-prose-title">{title}</Heading>
 
-        <ul class="grid gap-3 sm:grid-cols-2">
+        <ul class="news-attachments__list">
           {items.map((item) => (
             <li>
               <a
                 href={item.url}
                 target={external(item.url) ? '_blank' : undefined}
                 rel={external(item.url) ? 'noreferrer noopener' : undefined}
-                class="ui-shell flex h-full flex-col gap-2 p-4 transition-colors hover:border-border-strong hover:bg-surface-raised"
+                class="ui-shell news-attachment"
               >
-                <span class="font-semibold text-foreground">{item.title}</span>
+                <span class="news-attachment__title">{item.title}</span>
                 {(item.type || item.size) && (
-                  <span class="text-sm leading-6 text-muted-foreground">
+                  <span class="news-attachment__meta">
                     {[item.type, item.size].filter(Boolean).join(' · ')}
                   </span>
                 )}
@@ -51,3 +56,57 @@ function external(url: string): boolean {
     </section>
   )
 }
+
+<style>
+  .news-attachments--framed {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .news-attachments :global(.ui-prose-title) {
+    margin-block-end: 1rem;
+  }
+
+  .news-attachments__list {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .news-attachment {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 100%;
+    padding: 1rem;
+    transition:
+      border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .news-attachment:hover {
+    border-color: var(--color-border-strong);
+    background-color: var(--color-surface-raised);
+  }
+
+  .news-attachment__title {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .news-attachment__meta {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  @media (min-width: 40rem) {
+    .news-attachments__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .news-attachments--framed {
+      padding: 1.75rem 1.5rem;
+    }
+  }
+</style>
