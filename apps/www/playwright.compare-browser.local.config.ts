@@ -23,7 +23,8 @@ export default defineConfig({
     colorScheme: 'light',
   },
   webServer: {
-    command: 'pnpm run test:browser:compare:serve',
+    command:
+      'PUBLIC_YANDEX_MAPS_API_KEY=browser-test pnpm run test:browser:compare:serve',
     cwd,
     url: baseURL,
     reuseExistingServer: false,

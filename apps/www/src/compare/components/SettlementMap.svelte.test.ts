@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { cleanup, render, waitFor } from '@testing-library/svelte';
+import { cleanup, fireEvent, render, waitFor } from '@testing-library/svelte';
 import SettlementMap from './SettlementMap.svelte';
 
 const mockMap = {
@@ -16,7 +16,7 @@ const mockYandexMaps = {
   Map: vi.fn(function Map() {
     return mockMap;
   }),
-  YMap: vi.fn(function YMap() {
+  YMap: vi.fn(function YMap(_container: unknown, _options: unknown) {
     return mockMap;
   }),
   YMapDefaultSchemeLayer: vi.fn(function YMapDefaultSchemeLayer() {
@@ -120,6 +120,66 @@ describe('SettlementMap', () => {
     await waitFor(() => {
       expect(markers.length).toBe(mockSettlements.length);
     });
+  });
+
+  it('starts the explorer map over Moscow without an initial autofit', async () => {
+    render(SettlementMap, {
+      props: { settlements: mockSettlements, startFromMoscow: true },
+    });
+
+    await waitFor(() => expect(mockYandexMaps.YMap).toHaveBeenCalledOnce());
+
+    expect(mockYandexMaps.YMap.mock.calls[0]?.[1]).toMatchInlineSnapshot(`
+      {
+        "location": {
+          "center": [
+            37.6173,
+            55.7558,
+          ],
+          "zoom": 9,
+        },
+      }
+    `);
+    expect(mockMap.update).not.toHaveBeenCalled();
+  });
+
+  it('autofits after an explicit explorer filter revision', async () => {
+    const { rerender } = render(SettlementMap, {
+      props: {
+        settlements: mockSettlements,
+        startFromMoscow: true,
+        fitRevision: 0,
+      },
+    });
+
+    await waitFor(() => expect(mockYandexMaps.YMap).toHaveBeenCalledOnce());
+    expect(mockMap.update).not.toHaveBeenCalled();
+
+    await rerender({
+      settlements: [mockSettlements[1]],
+      startFromMoscow: true,
+      fitRevision: 1,
+    });
+
+    await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
+    expect(mockMap.update.mock.calls[0]?.[0]).toMatchInlineSnapshot(`
+      {
+        "location": {
+          "center": [
+            37.2,
+            55.85,
+          ],
+          "duration": 250,
+          "zoom": 12,
+        },
+        "margin": [
+          0,
+          0,
+          0,
+          0,
+        ],
+      }
+    `);
   });
 
   it('uses dynamic gradient for non-baseline markers', async () => {
@@ -375,7 +435,7 @@ describe('SettlementMap', () => {
     loadedScript.dataset.loaded = 'true';
     document.head.appendChild(loadedScript);
 
-    const { container } = render(SettlementMap, {
+    const { container, getByRole, queryByRole } = render(SettlementMap, {
       props: { settlements: mockSettlements },
     });
 
@@ -387,5 +447,19 @@ describe('SettlementMap', () => {
       },
       { timeout: 2000 },
     );
+
+    Object.defineProperty(window, 'ymaps3', {
+      value: mockYandexMaps,
+      writable: true,
+      configurable: true,
+    });
+    await fireEvent.click(getByRole('button', { name: 'Попробовать снова' }));
+
+    await waitFor(() => {
+      expect(mockYandexMaps.YMapMarker).toHaveBeenCalledTimes(
+        mockSettlements.length,
+      );
+      expect(queryByRole('button', { name: 'Попробовать снова' })).toBeNull();
+    });
   });
 });
