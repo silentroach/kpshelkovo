@@ -77,7 +77,10 @@ const comparisonRows = [
         </p>
       </section>
 
-      <section data-testid="sticky-table-wide-section" class="space-y-4">
+      <section
+        data-testid="sticky-table-wide-section"
+        class="sticky-table-visual-section"
+      >
         <div>
           <p class="sticky-table-visual-label">Estimate-like</p>
           <h2>Охрана и обслуживание, тестовая смета</h2>
@@ -88,32 +91,24 @@ const comparisonRows = [
           data-ui-sticky-table-shell
           data-testid="sticky-table-wide-shell"
         >
-          <table
-            class="ui-sticky-table sticky-table-visual-wide-table border-separate border-spacing-0 text-sm"
-          >
-            <caption class="sr-only">Тестовая смета охраны</caption>
-            <thead
-              class="ui-sticky-table-head text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-            >
+          <table class="ui-sticky-table sticky-table-visual-wide-table">
+            <caption class="sticky-table-visual-caption">
+              Тестовая смета охраны
+            </caption>
+            <thead class="ui-sticky-table-head sticky-table-visual-wide-head">
               <tr>
-                <th class="sticky-table-visual-th w-[32%] rounded-tl-xl">
-                  Работа
-                </th>
-                <th class="sticky-table-visual-th w-[18%]">База</th>
-                <th class="sticky-table-visual-th w-[18%]">Периодичность</th>
-                <th class="sticky-table-visual-th w-[18%]">Цена/ставка</th>
-                <th
-                  class="sticky-table-visual-th w-[14%] rounded-tr-xl text-right"
-                >
-                  Вклад
-                </th>
+                <th class="sticky-table-visual-th">Работа</th>
+                <th class="sticky-table-visual-th">База</th>
+                <th class="sticky-table-visual-th">Периодичность</th>
+                <th class="sticky-table-visual-th">Цена/ставка</th>
+                <th class="sticky-table-visual-th">Вклад</th>
               </tr>
             </thead>
             <tbody>
               {
                 estimateRows.map((row) => (
-                  <tr class="border-t border-border">
-                    <td class="sticky-table-visual-td font-semibold text-foreground">
+                  <tr>
+                    <td class="sticky-table-visual-td">
                       <span
                         class="sticky-table-visual-check"
                         aria-hidden="true"
@@ -122,18 +117,10 @@ const comparisonRows = [
                       </span>
                       {row.work}
                     </td>
-                    <td class="sticky-table-visual-td text-muted-foreground">
-                      {row.base}
-                    </td>
-                    <td class="sticky-table-visual-td text-muted-foreground">
-                      {row.frequency}
-                    </td>
-                    <td class="sticky-table-visual-td text-muted-foreground">
-                      {row.rate}
-                    </td>
-                    <td class="sticky-table-visual-td text-right font-semibold text-foreground">
-                      {row.contribution}
-                    </td>
+                    <td class="sticky-table-visual-td">{row.base}</td>
+                    <td class="sticky-table-visual-td">{row.frequency}</td>
+                    <td class="sticky-table-visual-td">{row.rate}</td>
+                    <td class="sticky-table-visual-td">{row.contribution}</td>
                   </tr>
                 ))
               }
@@ -142,32 +129,40 @@ const comparisonRows = [
         </div>
       </section>
 
-      <section data-testid="sticky-table-compare-section" class="space-y-4">
+      <section
+        data-testid="sticky-table-compare-section"
+        class="sticky-table-visual-section"
+      >
         <div>
           <p class="sticky-table-visual-label">Comparison-like</p>
           <h2>Сравнение инфраструктуры, тестовые поселки</h2>
         </div>
 
         <div
-          class="ui-sticky-table-shell ui-sticky-table-surface sticky-table-visual-card"
+          class="ui-sticky-table-shell ui-sticky-table-surface sticky-table-visual-card sticky-table-visual-compare-card"
           data-ui-sticky-table-shell
           data-testid="sticky-table-compare-shell"
-          style="--ui-sticky-table-min-width: 30rem"
         >
-          <table class="ui-table ui-sticky-table table-fixed">
-            <caption class="sr-only">Тестовое сравнение инфраструктуры</caption>
+          <table
+            class="ui-table ui-sticky-table sticky-table-visual-comparison-table"
+          >
+            <caption class="sticky-table-visual-caption">
+              Тестовое сравнение инфраструктуры
+            </caption>
             <thead>
               <tr class="ui-table-head ui-sticky-table-head">
                 <th>Инфраструктура</th>
-                <th class="w-48 text-center">Тестовый поселок</th>
-                <th class="w-48 text-center">Шелково</th>
+                <th class="sticky-table-visual-comparison-heading">
+                  Тестовый поселок
+                </th>
+                <th class="sticky-table-visual-comparison-heading">Шелково</th>
               </tr>
             </thead>
             <tbody>
               {
                 comparisonRows.map(([label, current, base]) => (
                   <tr class="ui-table-row">
-                    <td class="ui-table-cell text-sm font-semibold text-foreground">
+                    <td class="ui-table-cell sticky-table-visual-comparison-label">
                       {label}
                     </td>
                     <td class="ui-table-cell ui-table-cell-center">
@@ -253,8 +248,16 @@ const comparisonRows = [
     text-transform: uppercase;
   }
 
+  .sticky-table-visual-section > :not(:last-child) {
+    margin-bottom: 1rem;
+  }
+
   .sticky-table-visual-card {
     --ui-sticky-table-min-width: 58rem;
+  }
+
+  .sticky-table-visual-compare-card {
+    --ui-sticky-table-min-width: 30rem;
   }
 
   .sticky-table-visual-scroll-tail {
@@ -263,7 +266,32 @@ const comparisonRows = [
 
   .sticky-table-visual-wide-table {
     width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
     text-align: left;
+  }
+
+  .sticky-table-visual-caption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    border-width: 0;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .sticky-table-visual-wide-head {
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    line-height: 1rem;
+    text-transform: uppercase;
   }
 
   .sticky-table-visual-th {
@@ -271,10 +299,41 @@ const comparisonRows = [
     vertical-align: bottom;
   }
 
+  .sticky-table-visual-th:first-child {
+    width: 32%;
+    border-top-left-radius: var(--radius-xl);
+  }
+
+  .sticky-table-visual-th:nth-child(2),
+  .sticky-table-visual-th:nth-child(3),
+  .sticky-table-visual-th:nth-child(4) {
+    width: 18%;
+  }
+
+  .sticky-table-visual-th:last-child {
+    width: 14%;
+    border-top-right-radius: var(--radius-xl);
+    text-align: right;
+  }
+
   .sticky-table-visual-td {
     border-top: 1px solid var(--color-border);
     padding: 1.1rem 1rem;
     vertical-align: top;
+  }
+
+  .sticky-table-visual-td:first-child,
+  .sticky-table-visual-td:last-child {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .sticky-table-visual-td:not(:first-child, :last-child) {
+    color: var(--color-text-muted);
+  }
+
+  .sticky-table-visual-td:last-child {
+    text-align: right;
   }
 
   .sticky-table-visual-check {
@@ -289,5 +348,21 @@ const comparisonRows = [
     color: white;
     font-weight: 600;
     line-height: 1;
+  }
+
+  .sticky-table-visual-comparison-table {
+    table-layout: fixed;
+  }
+
+  .sticky-table-visual-comparison-heading {
+    width: 12rem;
+    text-align: center;
+  }
+
+  .sticky-table-visual-comparison-label {
+    color: var(--color-text);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
   }
 </style>
