@@ -41,7 +41,7 @@ const incident = {
 } satisfies StatusIncident;
 
 const lifecycleTone = (html: string): string =>
-  html.match(/text-\[color:var\(--color-(danger|success)\)\]/u)?.[1] ?? 'none';
+  html.match(/status-incident-row__icon--(danger|success)/u)?.[1] ?? 'none';
 
 describe('StatusIncidentRow', () => {
   it('renders incident title links without leading whitespace', async () => {
