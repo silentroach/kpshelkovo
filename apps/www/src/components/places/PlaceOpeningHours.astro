@@ -11,22 +11,18 @@ const { openingHours } = Astro.props;
 const descriptionHtml = formatDynamicHtml(openingHours.description);
 ---
 
-<div
-  class="grid gap-1 border-t border-border py-4 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4"
->
-  <dt class="text-sm font-semibold leading-7 text-muted-foreground">
-    Время работы
-  </dt>
-  <dd class="flex flex-wrap items-center gap-x-3 gap-y-2">
+<div class="place-opening-hours-row">
+  <dt class="place-opening-hours-label">Время работы</dt>
+  <dd class="place-opening-hours-value">
     <span
-      class="ui-num text-base leading-7 text-foreground"
+      class="ui-num place-opening-hours-description"
       set:html={descriptionHtml}
     />
     <place-opening-hours data-opening-hours={JSON.stringify(openingHours)}>
       <span
         data-place-opening-status
         data-open="false"
-        class="whitespace-nowrap rounded-full border border-border bg-[color:var(--color-surface-muted)] px-2.5 py-1 text-xs font-semibold leading-5 text-muted-foreground data-[open=true]:border-success-border data-[open=true]:bg-success-soft data-[open=true]:text-success-text"
+        class="place-opening-hours-status"
         aria-live="polite"
         hidden></span>
     </place-opening-hours>
@@ -73,3 +69,58 @@ const descriptionHtml = formatDynamicHtml(openingHours.description);
     customElements.define('place-opening-hours', PlaceOpeningHoursElement);
   }
 </script>
+
+<style>
+  .place-opening-hours-row {
+    display: grid;
+    gap: 0.25rem;
+    padding-block: 1rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .place-opening-hours-label {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.75rem;
+  }
+
+  .place-opening-hours-value {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 0.75rem;
+    row-gap: 0.5rem;
+  }
+
+  .place-opening-hours-description {
+    color: var(--color-text);
+    font-size: 1rem;
+    line-height: 1.75rem;
+  }
+
+  .place-opening-hours-status {
+    padding: 0.25rem 0.625rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-muted);
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+    white-space: nowrap;
+  }
+
+  .place-opening-hours-status[data-open='true'] {
+    border-color: var(--color-success-border);
+    background: var(--color-success-soft);
+    color: var(--color-success-text);
+  }
+
+  @media (min-width: 40rem) {
+    .place-opening-hours-row {
+      grid-template-columns: 8rem minmax(0, 1fr);
+      gap: 1rem;
+    }
+  }
+</style>
