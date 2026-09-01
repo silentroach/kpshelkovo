@@ -534,10 +534,10 @@
   onkeydown={handleKeydown}
 >
   <div class="site-search-dialog__surface">
-    <h2 id={headingId} class="sr-only">Поиск по сайту</h2>
+    <h2 id={headingId} class="visually-hidden">Поиск по сайту</h2>
     <div class="site-search-dialog__field">
-      <SearchIcon class="size-5 shrink-0 text-muted-foreground" />
-      <label for={inputId} class="sr-only">Что найти на сайте</label>
+      <SearchIcon />
+      <label for={inputId} class="visually-hidden">Что найти на сайте</label>
       <input
         bind:this={inputElement}
         bind:value={query}
@@ -560,7 +560,7 @@
         onclick={() => closeDialog()}
       >
         <svg
-          class="size-5"
+          class="close-icon"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -578,52 +578,43 @@
       <div
         bind:this={resultsElement}
         id={resultsId}
-        class="site-search-dialog__results min-h-0 overflow-y-auto"
+        class="site-search-dialog__results"
         role="region"
         aria-label="Результаты поиска"
         aria-busy={isSearching || isLoadingMore}
       >
         {#if viewState === 'loading'}
-          <p class="px-4 py-4 text-sm font-semibold text-muted-foreground">
-            Ищем…
-          </p>
+          <p class="state-message">Ищем…</p>
         {:else if viewState === 'empty'}
-          <p class="px-4 py-4 text-sm font-semibold text-muted-foreground">
-            Ничего не нашли
-          </p>
+          <p class="state-message">Ничего не нашли</p>
         {:else if viewState === 'error'}
-          <div class="flex items-center justify-between gap-4 px-4 py-3">
-            <p class="text-sm font-semibold text-muted-foreground">
-              Поиск не работает
-            </p>
+          <div class="action-row">
+            <p class="action-message">Поиск не работает</p>
             <button
               type="button"
-              class="ui-btn ui-btn-sm ui-btn-ghost shrink-0"
+              class="ui-btn ui-btn-sm ui-btn-ghost retry-button"
               onclick={retrySearch}
             >
               Повторить
             </button>
           </div>
         {:else if viewState === 'dev-unavailable'}
-          <p class="px-4 py-4 text-sm font-semibold text-muted-foreground">
-            Локальный поиск недоступен
-          </p>
+          <p class="state-message">Локальный поиск недоступен</p>
         {:else}
           <ul aria-label="Найденные страницы">
             {#each resultRows as row, index (row.result.url)}
-              <li class="border-b border-border last:border-b-0">
+              <li class="result-item">
                 <a
                   id={`${resultsId}-${index}`}
                   href={row.url}
-                  class="block min-w-0 px-4 py-3 text-foreground hover:bg-primary-soft-2"
+                  class="result-link"
                   data-astro-prefetch="false"
                   data-search-result
                   onclick={handleResultClick}
                 >
-                  <span
-                    class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs leading-5 text-muted-foreground"
-                  >
-                    <span class="font-semibold">{row.result.section.label}</span
+                  <span class="result-meta">
+                    <span class="result-section"
+                      >{row.result.section.label}</span
                     >
                     {#if row.result.publishedAt}
                       <time datetime={row.result.publishedAt}>
@@ -631,9 +622,7 @@
                       </time>
                     {/if}
                   </span>
-                  <h3
-                    class="mt-1 text-base font-semibold leading-6 [overflow-wrap:anywhere]"
-                  >
+                  <h3 class="result-title">
                     {row.result.title}
                   </h3>
                   {#if row.excerptHtml}
@@ -644,10 +633,10 @@
                     )}
                     <p
                       class={[
-                        'site-search-result-excerpt mt-1 [overflow-wrap:anywhere] text-sm leading-5 text-muted-foreground',
+                        'site-search-result-excerpt result-excerpt',
                         row.result.section.id === 'compare'
-                          ? 'line-clamp-3 sm:line-clamp-2'
-                          : 'line-clamp-2',
+                          ? 'result-excerpt--compare'
+                          : undefined,
                       ]}
                     >
                       {#each segments as segment, segmentIndex (segmentIndex)}
@@ -658,15 +647,11 @@
                       {/each}
                     </p>
                   {:else if row.result.matchContext}
-                    <p
-                      class="site-search-result-excerpt mt-1 line-clamp-2 [overflow-wrap:anywhere] text-sm leading-5 text-muted-foreground"
-                    >
+                    <p class="site-search-result-excerpt result-excerpt">
                       {row.result.matchContext}
                     </p>
                   {:else if row.result.description}
-                    <p
-                      class="mt-1 line-clamp-2 [overflow-wrap:anywhere] text-sm leading-5 text-muted-foreground"
-                    >
+                    <p class="result-excerpt">
                       {row.result.description}
                     </p>
                   {/if}
@@ -677,16 +662,13 @@
 
           {#if hasMoreResults}
             {#if loadMoreFailed}
-              <div
-                class="flex items-center justify-between gap-4 px-4 py-3"
-                role="status"
-              >
-                <p class="text-sm font-semibold text-muted-foreground">
+              <div class="action-row" role="status">
+                <p class="action-message">
                   Не удалось загрузить остальные результаты
                 </p>
                 <button
                   type="button"
-                  class="ui-btn ui-btn-sm ui-btn-ghost shrink-0"
+                  class="ui-btn ui-btn-sm ui-btn-ghost retry-button"
                   onclick={loadMore}
                 >
                   Повторить
@@ -695,7 +677,7 @@
             {:else}
               {#key requestedLimit}
                 <div
-                  class="h-px"
+                  class="load-more-sentinel"
                   aria-hidden="true"
                   {@attach loadMoreOnIntersect}
                 ></div>
@@ -707,7 +689,132 @@
     {/if}
   </div>
 
-  <p class="sr-only" aria-live="polite" aria-atomic="true">
+  <p class="visually-hidden" aria-live="polite" aria-atomic="true">
     {announcement}
   </p>
 </dialog>
+
+<style>
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    border-width: 0;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .site-search-dialog__field > :global(svg),
+  .close-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .site-search-dialog__field > :global(svg) {
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+  }
+
+  .site-search-dialog__results {
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .state-message {
+    padding: 1rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+  }
+
+  .action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .action-message {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+  }
+
+  .retry-button {
+    flex-shrink: 0;
+  }
+
+  .result-item {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .result-item:last-child {
+    border-bottom: 0;
+  }
+
+  .result-link {
+    display: block;
+    min-width: 0;
+    padding: 0.75rem 1rem;
+    color: var(--color-text);
+  }
+
+  .result-link:hover {
+    background: var(--color-primary-soft-2);
+  }
+
+  .result-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.75rem;
+    row-gap: 0.25rem;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+  }
+
+  .result-section,
+  .result-title {
+    font-weight: 600;
+  }
+
+  .result-title {
+    margin-top: 0.25rem;
+    overflow-wrap: anywhere;
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .result-excerpt {
+    display: -webkit-box;
+    margin-top: 0.25rem;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .result-excerpt--compare {
+    -webkit-line-clamp: 3;
+  }
+
+  .load-more-sentinel {
+    height: 1px;
+  }
+
+  @media (min-width: 40rem) {
+    .result-excerpt--compare {
+      -webkit-line-clamp: 2;
+    }
+  }
+</style>
