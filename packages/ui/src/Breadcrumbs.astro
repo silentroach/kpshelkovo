@@ -108,11 +108,23 @@ const renderedItems = items.map((item, index) => {
   .breadcrumbs-link {
     color: var(--color-primary);
     font-weight: 400;
-    transition: color 0.2s ease;
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.22em;
+    transition:
+      color 0.2s ease,
+      text-decoration-color 0.2s ease,
+      text-underline-offset 0.2s ease;
   }
 
   .breadcrumbs-link:hover {
     color: var(--color-primary-hover);
+  }
+
+  .breadcrumbs-link:is(:hover, :focus-visible) {
+    text-decoration-color: color-mix(in oklab, currentColor 30%, transparent);
+    text-underline-offset: 0.18em;
   }
 
   .breadcrumbs-current {
