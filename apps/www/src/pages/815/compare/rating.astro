@@ -41,13 +41,6 @@ const weights = [
   ['10%', 'Сервисная модель', 'Насколько поселок поддерживается в порядке'],
   ['15%', 'Близость к Москве', 'Приближенное расстояние за пределами МКАД'],
 ];
-const sectionClass = 'scroll-mt-8 py-4 md:py-5';
-const panelClass =
-  'border border-border bg-[color:var(--color-surface)] p-4 md:p-5';
-const panelClassCompact =
-  'border border-border bg-[color:var(--color-surface)] p-4';
-const panelClassRoomy =
-  'border border-border bg-[color:var(--color-surface)] p-5';
 ---
 
 <BaseLayout
@@ -56,20 +49,18 @@ const panelClassRoomy =
   keywords={pageMeta.keywords}
   schema={[schema, breadcrumb]}
 >
-  <main class="ui-page pb-6 md:pb-10 lg:pb-12">
+  <main class="ui-page rating-page">
     <section class="ui-page-header">
       <div class="ui-page-header-stack">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div
-          class="relative grid gap-8 lg:grid-cols-[minmax(0,1.25fr)_20rem] lg:gap-10"
-        >
-          <div class="max-w-3xl space-y-6">
-            <div class="space-y-3">
-              <h1 class="ui-page-title max-w-3xl">
+        <div class="rating-hero">
+          <div class="rating-intro">
+            <div class="rating-intro-heading">
+              <h1 class="ui-page-title">
                 Как считается условный уровень поселка
               </h1>
-              <p class="ui-copy max-w-2xl text-muted-foreground">
+              <p class="ui-copy rating-lede">
                 Условный уровень показывает качество среды без учета тарифа.
                 Сначала он сравнивает поселки по инфраструктуре, сервису и
                 близости к Москве, затем помогает понять, насколько разумна цена
@@ -77,27 +68,19 @@ const panelClassRoomy =
               </p>
             </div>
 
-            <div class="grid gap-4 md:grid-cols-2">
-              <div class={panelClass}>
-                <p
-                  class="text-xs font-semibold uppercase tracking-[0.06em] text-info-text/80"
-                >
-                  Важно
-                </p>
-                <p class="mt-3 text-sm leading-7 text-info-text">
+            <div class="rating-summary-grid">
+              <div class="rating-panel rating-panel--responsive">
+                <p class="rating-eyebrow rating-eyebrow--info">Важно</p>
+                <p class="rating-note rating-note--info">
                   Тариф не участвует в формуле. Так дешевые и дорогие поселки
                   сравниваются внутри близкого по качеству диапазона, без
                   смешения цены и среды в одну цифру.
                 </p>
               </div>
 
-              <div class={panelClass}>
-                <p
-                  class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-                >
-                  Коротко
-                </p>
-                <p class="mt-3 text-sm leading-7 text-muted-foreground">
+              <div class="rating-panel rating-panel--responsive">
+                <p class="rating-eyebrow">Коротко</p>
+                <p class="rating-note">
                   Больше всего весят дороги, вода, газ, канализация, охрана,
                   повседневная среда и близость к Москве. Премиальные опции
                   учитываются, но не перекрывают слабую базу; неполные карточки
@@ -107,28 +90,18 @@ const panelClassRoomy =
             </div>
           </div>
 
-          <aside class="space-y-4">
-            <div class={panelClassRoomy}>
-              <p
-                class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-              >
-                Итоговая структура
-              </p>
-              <dl class="mt-3 divide-y divide-border">
+          <aside>
+            <div class="rating-panel rating-panel--roomy">
+              <p class="rating-eyebrow">Итоговая структура</p>
+              <dl class="rating-weight-list">
                 {
                   weights.map(([weight, label, note]) => (
-                    <div class="py-3 first:pt-0 last:pb-0">
-                      <dt class="flex items-baseline justify-between gap-3">
-                        <span class="text-sm font-semibold text-foreground">
-                          {label}
-                        </span>
-                        <span class="ui-num text-lg font-semibold text-primary">
-                          {weight}
-                        </span>
+                    <div class="rating-weight-row">
+                      <dt class="rating-weight-heading">
+                        <span class="rating-weight-label">{label}</span>
+                        <span class="ui-num rating-weight-value">{weight}</span>
                       </dt>
-                      <dd class="mt-1 text-xs leading-5 text-muted-foreground">
-                        {note}
-                      </dd>
+                      <dd class="rating-weight-note">{note}</dd>
                     </div>
                   ))
                 }
@@ -139,24 +112,18 @@ const panelClassRoomy =
       </div>
     </section>
 
-    <div
-      class="mt-6 grid gap-6 px-5 md:px-6 lg:grid-cols-[minmax(0,1fr)_17rem] lg:items-start"
-    >
-      <div class="min-w-0 space-y-6">
-        <section id="summary" class={sectionClass}>
-          <div class="max-w-3xl space-y-4">
-            <p
-              class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-            >
-              Что это вообще такое
-            </p>
+    <div class="rating-content">
+      <div class="rating-sections">
+        <section id="summary" class="rating-section">
+          <div class="rating-section-body rating-section-body--compact">
+            <p class="rating-eyebrow">Что это вообще такое</p>
             <h2 class="ui-section-title">Индекс среды, а не цена жизни</h2>
-            <p class="ui-copy text-muted-foreground">
+            <p class="ui-copy rating-copy">
               Условный уровень отвечает на один вопрос: насколько сильным
               выглядит поселок по собранным данным. В расчет входят инженерия,
               охрана, среда, сервис и примерная близость к Москве.
             </p>
-            <p class="ui-copy text-muted-foreground">
+            <p class="ui-copy rating-copy">
               Один и тот же платеж может быть нормальным для сильного поселка и
               завышенным для слабого. Поэтому сначала сравниваем уровень, потом
               отдельно смотрим на стоимость содержания.
@@ -164,45 +131,33 @@ const panelClassRoomy =
           </div>
         </section>
 
-        <section id="formula" class={sectionClass}>
-          <div class="max-w-3xl space-y-5">
-            <p
-              class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-            >
-              Формула и веса
-            </p>
+        <section id="formula" class="rating-section">
+          <div class="rating-section-body">
+            <p class="rating-eyebrow">Формула и веса</p>
             <h2 class="ui-section-title">Из чего складывается цифра</h2>
-            <div
-              class="overflow-x-auto border border-border bg-[color:var(--color-surface)] p-5"
-            >
+            <div class="rating-formula">
               <pre
-                class="ui-num text-sm leading-8 text-foreground"><code>условный уровень =
+                class="ui-num rating-formula-code"><code>условный уровень =
   50% инфраструктура +
   25% общественные пространства +
   10% сервисная модель +
   15% близость к Москве</code></pre>
             </div>
-            <p class="ui-copy text-muted-foreground">
+            <p class="ui-copy rating-copy">
               Каждый блок переводится в шкалу от 0 до 1 и умножается на свой
               вес. Итоговое число от 0 до 100 показывает силу поселка по текущей
               модели оценки.
             </p>
-            <div class="grid gap-3 md:grid-cols-2">
+            <div class="rating-grid rating-grid--weights">
               {
                 weights.map(([weight, label, note]) => (
-                  <div class={panelClassCompact}>
-                    <div class="flex items-start justify-between gap-4">
+                  <div class="rating-panel rating-panel--compact">
+                    <div class="rating-card-row">
                       <div>
-                        <h3 class="font-body text-sm font-semibold text-foreground">
-                          {label}
-                        </h3>
-                        <p class="mt-1 text-sm leading-6 text-muted-foreground">
-                          {note}
-                        </p>
+                        <h3 class="rating-card-heading">{label}</h3>
+                        <p class="rating-card-copy">{note}</p>
                       </div>
-                      <span class="ui-num text-xl font-semibold text-primary">
-                        {weight}
-                      </span>
+                      <span class="ui-num rating-card-value">{weight}</span>
                     </div>
                   </div>
                 ))
@@ -211,49 +166,33 @@ const panelClassRoomy =
           </div>
         </section>
 
-        <section id="adjustments" class={sectionClass}>
-          <div class="max-w-3xl space-y-5">
-            <p
-              class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-            >
-              Дополнительные корректировки
-            </p>
+        <section id="adjustments" class="rating-section">
+          <div class="rating-section-body">
+            <p class="rating-eyebrow">Дополнительные корректировки</p>
             <h2 class="ui-section-title">Есть два дополнительных сигнала</h2>
-            <p class="ui-copy text-muted-foreground">
+            <p class="ui-copy rating-copy">
               Они не связаны с ценой и не меняют тариф. Эти поправки только
               уточняют качество среды по признакам, которые важно не потерять в
               общей формуле.
             </p>
-            <div class="grid gap-4 md:grid-cols-2">
-              <div
-                class="border border-success-border bg-[color:var(--color-surface)] p-5"
-              >
-                <p
-                  class="text-xs font-semibold uppercase tracking-[0.06em] text-success-text"
-                >
-                  Плюс к рейтингу
-                </p>
-                <h3 class="mt-2 text-lg text-success-text">
+            <div class="rating-grid rating-grid--2">
+              <div class="rating-callout rating-callout--success">
+                <p class="rating-eyebrow">Плюс к рейтингу</p>
+                <h3 class="rating-callout-title">
                   +4 балла, если вода уже включена в тариф
                 </h3>
-                <p class="mt-3 text-sm leading-7 text-success-text">
+                <p class="rating-note">
                   Бонус применяется, если подтверждено центральное
                   водоснабжение, а вода уже оплачивается внутри основного тарифа
                   без отдельной доплаты и лимитов.
                 </p>
               </div>
-              <div
-                class="border border-danger-border bg-[color:var(--color-surface)] p-5"
-              >
-                <p
-                  class="text-xs font-semibold uppercase tracking-[0.06em] text-danger-text"
-                >
-                  Минус к рейтингу
-                </p>
-                <h3 class="mt-2 text-lg text-danger-text">
+              <div class="rating-callout rating-callout--danger">
+                <p class="rating-eyebrow">Минус к рейтингу</p>
+                <h3 class="rating-callout-title">
                   −15 баллов за упоминание в «Коттеджном рабстве»
                 </h3>
-                <p class="mt-3 text-sm leading-7 text-danger-text">
+                <p class="rating-note">
                   Если поселок фигурирует в канале «Коттеджное рабство», модель
                   считает это сильным негативным сигналом и снижает условный
                   уровень.
@@ -263,25 +202,19 @@ const panelClassRoomy =
           </div>
         </section>
 
-        <section id="infra" class={sectionClass}>
-          <div class="max-w-3xl space-y-5">
-            <p
-              class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-            >
-              1. Инфраструктура
-            </p>
+        <section id="infra" class="rating-section">
+          <div class="rating-section-body">
+            <p class="rating-eyebrow">1. Инфраструктура</p>
             <h2 class="ui-section-title">Самый важный блок</h2>
-            <p class="ui-copy text-muted-foreground">
+            <p class="ui-copy rating-copy">
               Это основа пригодности поселка для жизни. Если инженерная база
               слабая, высокий уровень не получится даже при красивой концепции,
               воде рядом или премиальных объектах.
             </p>
-            <div class="grid gap-4 md:grid-cols-2">
-              <div class={panelClassRoomy}>
-                <h3 class="text-base text-foreground">Максимально влияют</h3>
-                <ul
-                  class="mt-3 space-y-2 text-sm leading-6 text-muted-foreground"
-                >
+            <div class="rating-grid rating-grid--2">
+              <div class="rating-panel rating-panel--roomy">
+                <h3 class="rating-panel-title">Максимально влияют</h3>
+                <ul class="rating-list">
                   <li>Дороги</li>
                   <li>Вода</li>
                   <li>Газ</li>
@@ -291,11 +224,9 @@ const panelClassRoomy =
                   <li>КПП</li>
                 </ul>
               </div>
-              <div class={panelClassRoomy}>
-                <h3 class="text-base text-foreground">Дополняют картину</h3>
-                <ul
-                  class="mt-3 space-y-2 text-sm leading-6 text-muted-foreground"
-                >
+              <div class="rating-panel rating-panel--roomy">
+                <h3 class="rating-panel-title">Дополняют картину</h3>
+                <ul class="rating-list">
                   <li>Освещение</li>
                   <li>Тротуары</li>
                   <li>Ливневка</li>
@@ -306,15 +237,13 @@ const panelClassRoomy =
                 </ul>
               </div>
             </div>
-            <div
-              class="border border-border bg-[color:var(--color-surface)] p-5 text-sm leading-7 text-muted-foreground"
-            >
+            <div class="rating-explainer">
               <p>
                 Подтвержденный признак получает полный балл. Ограниченный или
                 компромиссный вариант получает часть баллов. Если признака нет,
                 начисляется ноль.
               </p>
-              <p class="mt-3">
+              <p>
                 Для некоторых признаков есть градация. Например, полностью
                 асфальтированная дорога оценивается выше частичной, гравийная
                 ниже, грунтовая дает минимальный вклад.
@@ -323,29 +252,21 @@ const panelClassRoomy =
           </div>
         </section>
 
-        <section id="spaces" class={sectionClass}>
-          <div class="max-w-3xl space-y-5">
-            <p
-              class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-            >
-              2. Общественные пространства
-            </p>
+        <section id="spaces" class="rating-section">
+          <div class="rating-section-body">
+            <p class="rating-eyebrow">2. Общественные пространства</p>
             <h2 class="ui-section-title">
               Комфорт среды, а не только премиальные опции
             </h2>
-            <p class="ui-copy text-muted-foreground">
+            <p class="ui-copy rating-copy">
               Этот блок оценивает повседневные сценарии: прогулки, детские зоны,
               спорт, доступ к воде и клубную среду. Премиальные признаки не
               должны перевешивать базовую функциональность поселка.
             </p>
-            <div class="grid gap-4 md:grid-cols-2">
-              <div class={panelClassRoomy}>
-                <h3 class="text-base text-foreground">
-                  Более значимые признаки
-                </h3>
-                <ul
-                  class="mt-3 space-y-2 text-sm leading-6 text-muted-foreground"
-                >
+            <div class="rating-grid rating-grid--2">
+              <div class="rating-panel rating-panel--roomy">
+                <h3 class="rating-panel-title">Более значимые признаки</h3>
+                <ul class="rating-list">
                   <li>Детские площадки</li>
                   <li>Спортивные зоны</li>
                   <li>Пешеходные маршруты</li>
@@ -353,13 +274,9 @@ const panelClassRoomy =
                   <li>Клубная инфраструктура</li>
                 </ul>
               </div>
-              <div class={panelClassRoomy}>
-                <h3 class="text-base text-foreground">
-                  Менее значимые признаки
-                </h3>
-                <ul
-                  class="mt-3 space-y-2 text-sm leading-6 text-muted-foreground"
-                >
+              <div class="rating-panel rating-panel--roomy">
+                <h3 class="rating-panel-title">Менее значимые признаки</h3>
+                <ul class="rating-list">
                   <li>Пляжные зоны</li>
                   <li>Зоны барбекю</li>
                   <li>Бассейн</li>
@@ -370,7 +287,7 @@ const panelClassRoomy =
                 </ul>
               </div>
             </div>
-            <p class="ui-copy text-muted-foreground">
+            <p class="ui-copy rating-copy">
               Поселок без SPA или ресторана не считается слабым сам по себе.
               Поселок без нормальной среды, прогулок и детских зон обычно
               выглядит хуже для реальной жизни.
@@ -378,25 +295,19 @@ const panelClassRoomy =
           </div>
         </section>
 
-        <section id="service" class={sectionClass}>
-          <div class="max-w-3xl space-y-5">
-            <p
-              class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-            >
-              3. Сервисная модель
-            </p>
+        <section id="service" class="rating-section">
+          <div class="rating-section-body">
+            <p class="rating-eyebrow">3. Сервисная модель</p>
             <h2 class="ui-section-title">
               Насколько поселок поддерживается в рабочем состоянии
             </h2>
-            <p class="ui-copy text-muted-foreground">
+            <p class="ui-copy rating-copy">
               Здесь оцениваются признаки регулярного обслуживания: вывоз мусора,
               уборка снега и дорог, благоустройство, аварийная поддержка и
               диспетчеризация.
             </p>
-            <div class={panelClassRoomy}>
-              <ul
-                class="grid gap-2 text-sm leading-6 text-muted-foreground sm:grid-cols-2"
-              >
+            <div class="rating-panel rating-panel--roomy">
+              <ul class="rating-list rating-list--columns">
                 <li>Вывоз мусора</li>
                 <li>Уборка снега</li>
                 <li>Уборка дорог</li>
@@ -405,39 +316,33 @@ const panelClassRoomy =
                 <li>Диспетчер</li>
               </ul>
             </div>
-            <p class="ui-copy text-muted-foreground">
+            <p class="ui-copy rating-copy">
               Вес этого блока ниже, чем у инфраструктуры. Хороший сервис важен,
               но он не должен компенсировать слабую инженерную базу.
             </p>
           </div>
         </section>
 
-        <section id="distance" class={sectionClass}>
-          <div class="max-w-3xl space-y-5">
-            <p
-              class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-            >
-              4. Удаленность от Москвы
-            </p>
+        <section id="distance" class="rating-section">
+          <div class="rating-section-body">
+            <p class="rating-eyebrow">4. Удаленность от Москвы</p>
             <h2 class="ui-section-title">
               Приближенная оценка расстояния, а не времени в пути
             </h2>
-            <p class="ui-copy text-muted-foreground">
+            <p class="ui-copy rating-copy">
               Для расчета берется расстояние по координатам до центра Москвы. Из
               него вычитается приблизительный радиус МКАД. Получается условное
               расстояние «за МКАД» с весом 15%.
             </p>
-            <div class={panelClassRoomy}>
-              <p class="text-sm leading-7 text-muted-foreground">
+            <div class="rating-panel rating-panel--roomy">
+              <p class="rating-note">
                 Чем дальше поселок за расчетным радиусом, тем слабее вклад в
                 итог. Влияние ограничено, чтобы дальний, но сильный поселок не
                 проигрывал только из-за расстояния.
               </p>
             </div>
-            <div
-              class="border border-warning-border bg-[color:var(--color-surface)] p-5"
-            >
-              <p class="text-sm leading-7 text-warning-text">
+            <div class="rating-callout rating-callout--warning">
+              <p class="rating-note">
                 Важно: здесь не учитываются пробки, качество шоссе, близость к
                 станции, пересадки и реальное время дороги. Это именно
                 упрощенный прокси расстояния.
@@ -446,53 +351,47 @@ const panelClassRoomy =
           </div>
         </section>
 
-        <section id="unknown" class={sectionClass}>
-          <div class="max-w-3xl space-y-5">
-            <p
-              class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-            >
-              Неизвестные данные
-            </p>
+        <section id="unknown" class="rating-section">
+          <div class="rating-section-body">
+            <p class="rating-eyebrow">Неизвестные данные</p>
             <h2 class="ui-section-title">
               Отсутствие данных не считается автоматическим минусом, но и не
               превращается в скрытый плюс
             </h2>
-            <p class="ui-copy text-muted-foreground">
+            <p class="ui-copy rating-copy">
               Если по признаку нет подтвержденной информации, он не превращается
               в ноль автоматически. Модель считает среднее по известным полям и
               смотрит, насколько полно заполнен блок.
             </p>
-            <div
-              class="border border-warning-border bg-[color:var(--color-surface)] p-5"
-            >
-              <p class="text-sm leading-7 text-warning-text">
+            <div class="rating-callout rating-callout--warning">
+              <p class="rating-note">
                 Это консервативная настройка. Сильные стороны поселков обычно
                 подтверждаются чаще, чем полный список отсутствующих вещей.
                 Поэтому неполные карточки нельзя автоматически тянуть вверх.
               </p>
             </div>
-            <div class="grid gap-3 md:grid-cols-3">
-              <div class={panelClassCompact}>
-                <p class="text-sm font-semibold text-foreground">Шаг 1</p>
-                <p class="mt-2 text-sm leading-6 text-muted-foreground">
+            <div class="rating-grid rating-grid--steps">
+              <div class="rating-panel rating-panel--compact">
+                <p class="rating-card-heading">Шаг 1</p>
+                <p class="rating-card-copy rating-card-copy--spaced">
                   Считаем среднее только по известным полям.
                 </p>
               </div>
-              <div class={panelClassCompact}>
-                <p class="text-sm font-semibold text-foreground">Шаг 2</p>
-                <p class="mt-2 text-sm leading-6 text-muted-foreground">
+              <div class="rating-panel rating-panel--compact">
+                <p class="rating-card-heading">Шаг 2</p>
+                <p class="rating-card-copy rating-card-copy--spaced">
                   Считаем, насколько полно заполнен блок.
                 </p>
               </div>
-              <div class={panelClassCompact}>
-                <p class="text-sm font-semibold text-foreground">Шаг 3</p>
-                <p class="mt-2 text-sm leading-6 text-muted-foreground">
+              <div class="rating-panel rating-panel--compact">
+                <p class="rating-card-heading">Шаг 3</p>
+                <p class="rating-card-copy rating-card-copy--spaced">
                   Если данных мало, частично тянем результат к нейтральному
                   уровню посередине шкалы.
                 </p>
               </div>
             </div>
-            <p class="ui-copy text-muted-foreground">
+            <p class="ui-copy rating-copy">
               Так поселок не проваливается вниз из-за отсутствия данных, но и не
               улетает вверх на 1-2 подтвержденных сильных сторонах. Чем меньше
               заполнена карточка, тем ближе результат к середине диапазона.
@@ -500,48 +399,42 @@ const panelClassRoomy =
           </div>
         </section>
 
-        <section id="read" class={sectionClass}>
-          <div class="max-w-3xl space-y-5">
-            <p
-              class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-            >
-              Как читать результат
-            </p>
+        <section id="read" class="rating-section">
+          <div class="rating-section-body">
+            <p class="rating-eyebrow">Как читать результат</p>
             <h2 class="ui-section-title">
               Что означает высокий или низкий уровень
             </h2>
-            <div class="grid gap-4 md:grid-cols-3">
-              <div class={panelClassRoomy}>
-                <h3 class="text-base text-foreground">Высокий</h3>
-                <p class="mt-2 text-sm leading-6 text-muted-foreground">
+            <div class="rating-grid rating-grid--steps">
+              <div class="rating-panel rating-panel--roomy">
+                <h3 class="rating-panel-title">Высокий</h3>
+                <p class="rating-card-copy rating-card-copy--spaced">
                   Обычно это сильная базовая инфраструктура, понятная среда и
                   неплохая близость к Москве.
                 </p>
               </div>
-              <div class={panelClassRoomy}>
-                <h3 class="text-base text-foreground">Средний</h3>
-                <p class="mt-2 text-sm leading-6 text-muted-foreground">
+              <div class="rating-panel rating-panel--roomy">
+                <h3 class="rating-panel-title">Средний</h3>
+                <p class="rating-card-copy rating-card-copy--spaced">
                   Обычно это сочетание сильных и слабых сторон или заметная
                   удаленность при неплохой внутренней среде.
                 </p>
               </div>
-              <div class={panelClassRoomy}>
-                <h3 class="text-base text-foreground">Низкий</h3>
-                <p class="mt-2 text-sm leading-6 text-muted-foreground">
+              <div class="rating-panel rating-panel--roomy">
+                <h3 class="rating-panel-title">Низкий</h3>
+                <p class="rating-card-copy rating-card-copy--spaced">
                   Чаще всего это не один минус, а комбинация проблем в
                   инженерии, среде и общих условиях жизни.
                 </p>
               </div>
             </div>
-            <div
-              class="border border-primary/30 bg-[color:var(--color-surface)] p-5"
-            >
-              <p class="text-sm leading-7 text-muted-foreground">
+            <div class="rating-callout rating-callout--primary">
+              <p class="rating-note">
                 Условный уровень не заменяет тариф. Логика сравнения такая:
                 сначала смотрим, насколько поселки сопоставимы по уровню, затем
                 задаем вопрос, какой тариф выглядит разумным для этого уровня.
               </p>
-              <p class="mt-3 text-sm leading-7 text-muted-foreground">
+              <p class="rating-note">
                 Если по поселку мало подтвержденных данных, рейтинг стоит читать
                 осторожнее. Модель специально не награждает такие карточки
                 автоматически высоким уровнем.
@@ -551,19 +444,15 @@ const panelClassRoomy =
         </section>
       </div>
 
-      <aside class="space-y-4 lg:sticky lg:top-6">
-        <div class="hidden border-l border-border pl-4 lg:block">
-          <p
-            class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-          >
-            На странице
-          </p>
-          <nav class="mt-3 space-y-1">
+      <aside class="rating-sidebar">
+        <div class="rating-page-nav">
+          <p class="rating-eyebrow">На странице</p>
+          <nav class="rating-page-nav-links">
             {
               nav.map(([id, label]) => (
                 <a
                   href={withBase(`/rating/#${id}`)}
-                  class="block rounded-sm border border-transparent px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted-soft hover:text-foreground aria-[current=true]:border-primary/30 aria-[current=true]:bg-[color:var(--color-primary-soft)] aria-[current=true]:font-semibold aria-[current=true]:text-primary"
+                  class="rating-page-nav-link"
                   data-rating-nav-link
                   data-section-id={id}
                 >
@@ -574,13 +463,9 @@ const panelClassRoomy =
           </nav>
         </div>
 
-        <div class="border-t border-border pt-4">
-          <p
-            class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-          >
-            Напоминание
-          </p>
-          <p class="mt-3 text-sm leading-7 text-muted-foreground">
+        <div class="rating-reminder">
+          <p class="rating-eyebrow">Напоминание</p>
+          <p class="rating-note">
             Если вы сортируете список по условному уровню, вы сортируете именно
             по качеству среды по нашей модели, а не по цене, не по престижу и не
             по ликвидности.
@@ -633,3 +518,392 @@ const panelClassRoomy =
     window.addEventListener('hashchange', scheduleCurrentSection);
   </script>
 </BaseLayout>
+
+<style>
+  .rating-page {
+    padding-block-end: 1.5rem;
+  }
+
+  .rating-hero {
+    position: relative;
+    display: grid;
+    gap: 2rem;
+  }
+
+  .rating-intro,
+  .rating-sidebar {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .rating-intro {
+    max-width: 48rem;
+    gap: 1.5rem;
+  }
+
+  .rating-intro-heading {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .rating-lede {
+    max-width: 42rem;
+    color: var(--color-text-muted);
+  }
+
+  .rating-summary-grid,
+  .rating-grid {
+    display: grid;
+  }
+
+  .rating-summary-grid,
+  .rating-grid--2,
+  .rating-grid--steps {
+    gap: 1rem;
+  }
+
+  .rating-grid--weights {
+    gap: 0.75rem;
+  }
+
+  .rating-panel,
+  .rating-formula,
+  .rating-explainer,
+  .rating-callout {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .rating-panel--compact,
+  .rating-panel--responsive {
+    padding: 1rem;
+  }
+
+  .rating-panel--roomy,
+  .rating-formula,
+  .rating-explainer,
+  .rating-callout {
+    padding: 1.25rem;
+  }
+
+  .rating-eyebrow {
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .rating-eyebrow--info {
+    color: color-mix(in oklab, var(--color-info-text) 80%, transparent);
+  }
+
+  .rating-note {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.75rem;
+  }
+
+  .rating-eyebrow + .rating-note,
+  .rating-note + .rating-note,
+  .rating-reminder .rating-note {
+    margin-block-start: 0.75rem;
+  }
+
+  .rating-note--info {
+    color: var(--color-info-text);
+  }
+
+  .rating-weight-list {
+    margin-block-start: 0.75rem;
+  }
+
+  .rating-weight-row {
+    padding-block: 0.75rem;
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .rating-weight-row:first-child {
+    padding-block-start: 0;
+    border-block-start: 0;
+  }
+
+  .rating-weight-row:last-child {
+    padding-block-end: 0;
+  }
+
+  .rating-weight-heading,
+  .rating-card-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .rating-weight-heading {
+    align-items: baseline;
+  }
+
+  .rating-weight-label,
+  .rating-card-heading {
+    color: var(--color-text);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+  }
+
+  .rating-weight-value {
+    color: var(--color-primary);
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.75rem;
+  }
+
+  .rating-weight-note {
+    margin-block-start: 0.25rem;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+  }
+
+  .rating-content {
+    display: grid;
+    gap: 1.5rem;
+    margin-block-start: 1.5rem;
+    padding-inline: 1.25rem;
+  }
+
+  .rating-sections {
+    min-width: 0;
+  }
+
+  .rating-sections,
+  .rating-section-body {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .rating-section {
+    scroll-margin-block-start: 2rem;
+    padding-block: 1rem;
+  }
+
+  .rating-section-body {
+    max-width: 48rem;
+    gap: 1.25rem;
+  }
+
+  .rating-section-body--compact {
+    gap: 1rem;
+  }
+
+  .rating-copy,
+  .rating-card-copy,
+  .rating-list,
+  .rating-explainer {
+    color: var(--color-text-muted);
+  }
+
+  .rating-formula {
+    overflow-x: auto;
+  }
+
+  .rating-formula-code {
+    color: var(--color-text);
+    font-size: 0.875rem;
+    line-height: 2rem;
+  }
+
+  .rating-card-row {
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .rating-card-heading {
+    font-family: var(--font-body);
+  }
+
+  .rating-card-copy,
+  .rating-list {
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  .rating-list--columns {
+    margin-block-start: 0;
+  }
+
+  .rating-card-copy {
+    margin-block-start: 0.25rem;
+  }
+
+  .rating-card-copy--spaced {
+    margin-block-start: 0.5rem;
+  }
+
+  .rating-card-value {
+    color: var(--color-primary);
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.75rem;
+  }
+
+  .rating-callout--success {
+    border-color: var(--color-success-border);
+    color: var(--color-success-text);
+  }
+
+  .rating-callout--danger {
+    border-color: var(--color-danger-border);
+    color: var(--color-danger-text);
+  }
+
+  .rating-callout--warning {
+    border-color: var(--color-warning-border);
+    color: var(--color-warning-text);
+  }
+
+  .rating-callout--primary {
+    border-color: color-mix(in oklab, var(--color-primary) 30%, transparent);
+  }
+
+  .rating-callout--success .rating-eyebrow,
+  .rating-callout--success .rating-note,
+  .rating-callout--danger .rating-eyebrow,
+  .rating-callout--danger .rating-note,
+  .rating-callout--warning .rating-note {
+    color: inherit;
+  }
+
+  .rating-callout-title {
+    margin-block-start: 0.5rem;
+    color: inherit;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+
+  .rating-callout-title + .rating-note {
+    margin-block-start: 0.75rem;
+  }
+
+  .rating-panel-title {
+    color: var(--color-text);
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .rating-list {
+    display: grid;
+    gap: 0.5rem;
+    margin-block-start: 0.75rem;
+  }
+
+  .rating-explainer {
+    font-size: 0.875rem;
+    line-height: 1.75rem;
+  }
+
+  .rating-explainer p + p {
+    margin-block-start: 0.75rem;
+  }
+
+  .rating-page-nav {
+    display: none;
+  }
+
+  .rating-reminder {
+    padding-block-start: 1rem;
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  @media (min-width: 40rem) {
+    .rating-list--columns {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .rating-page {
+      padding-block-end: 2.5rem;
+    }
+
+    .rating-summary-grid,
+    .rating-grid--2,
+    .rating-grid--weights {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .rating-grid--steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .rating-panel--responsive {
+      padding: 1.25rem;
+    }
+
+    .rating-content {
+      padding-inline: 1.5rem;
+    }
+
+    .rating-section {
+      padding-block: 1.25rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .rating-page {
+      padding-block-end: 3rem;
+    }
+
+    .rating-hero {
+      grid-template-columns: minmax(0, 1.25fr) 20rem;
+      gap: 2.5rem;
+    }
+
+    .rating-content {
+      grid-template-columns: minmax(0, 1fr) 17rem;
+      align-items: start;
+    }
+
+    .rating-sidebar {
+      position: sticky;
+      top: 1.5rem;
+    }
+
+    .rating-page-nav {
+      display: block;
+      padding-inline-start: 1rem;
+      border-inline-start: 1px solid var(--color-border);
+    }
+
+    .rating-page-nav-links {
+      display: grid;
+      gap: 0.25rem;
+      margin-block-start: 0.75rem;
+    }
+
+    .rating-page-nav-link {
+      display: block;
+      padding: 0.375rem 0.75rem;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      transition-property: color, background-color, border-color;
+      transition-duration: 150ms;
+    }
+
+    .rating-page-nav-link:hover {
+      background: var(--color-muted-soft);
+      color: var(--color-text);
+    }
+
+    .rating-page-nav-link[aria-current='true'] {
+      border-color: color-mix(in oklab, var(--color-primary) 30%, transparent);
+      background: var(--color-primary-soft);
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+  }
+</style>
