@@ -10,6 +10,17 @@ const mockMap = {
 };
 
 const markers: HTMLElement[] = [];
+let resizeMap: (() => void) | undefined;
+
+class TestResizeObserver implements ResizeObserver {
+  constructor(callback: ResizeObserverCallback) {
+    resizeMap = () => callback([], this);
+  }
+
+  disconnect(): void {}
+  observe(): void {}
+  unobserve(): void {}
+}
 
 const mockYandexMaps = {
   ready: Promise.resolve(),
@@ -69,6 +80,12 @@ describe('SettlementMap', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     markers.length = 0;
+    resizeMap = undefined;
+    Object.defineProperty(mockYandexMaps, 'ready', {
+      value: Promise.resolve(),
+      writable: true,
+      configurable: true,
+    });
     document.head
       .querySelectorAll(
         '[data-yandex-maps-api="true"], [data-yandex-maps-test="true"]',
@@ -83,8 +100,10 @@ describe('SettlementMap', () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     cleanup();
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
     document.head
       .querySelectorAll(
         '[data-yandex-maps-api="true"], [data-yandex-maps-test="true"]',
@@ -210,6 +229,113 @@ describe('SettlementMap', () => {
         ],
       }
     `);
+  });
+
+  it('retries a pending autofit after transient map initialization failure', async () => {
+    mockYandexMaps.YMap.mockImplementationOnce(function YMap() {
+      throw new Error('Transient map initialization failure');
+    });
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { getByRole } = render(SettlementMap, {
+      props: {
+        settlements: [mockSettlements[1]],
+        startFromMoscow: true,
+        fitRevision: 1,
+      },
+    });
+
+    const retry = await waitFor(() =>
+      getByRole('button', { name: 'Попробовать снова' }),
+    );
+    expect(mockMap.update).not.toHaveBeenCalled();
+
+    await fireEvent.click(retry);
+
+    await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
+  });
+
+  it('creates one map when synchronization overlaps initialization', async () => {
+    vi.stubGlobal('ResizeObserver', TestResizeObserver);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockMap.update.mockImplementationOnce(() => {
+      throw new Error('Transient map update failure');
+    });
+    let readyReads = 0;
+    let resolveInitialization: (() => void) | undefined;
+    const initializationReady = new Promise<void>((resolve) => {
+      resolveInitialization = resolve;
+    });
+    Object.defineProperty(mockYandexMaps, 'ready', {
+      configurable: true,
+      get: () => {
+        readyReads += 1;
+        return readyReads === 1 ? Promise.resolve() : initializationReady;
+      },
+    });
+    const { queryByRole } = render(SettlementMap, {
+      props: {
+        settlements: mockSettlements,
+        startFromMoscow: true,
+        fitRevision: 1,
+      },
+    });
+    await waitFor(() => expect(readyReads).toBe(2));
+    if (!resizeMap) throw new Error('Expected map resize observer');
+
+    vi.useFakeTimers();
+    resizeMap();
+    resolveInitialization?.();
+    await vi.runAllTimersAsync();
+
+    expect(mockYandexMaps.YMap).toHaveBeenCalledOnce();
+    expect(queryByRole('button', { name: 'Попробовать снова' })).toBeNull();
+  });
+
+  it('retries a failed resize autofit and clears loading', async () => {
+    vi.stubGlobal('ResizeObserver', TestResizeObserver);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { getByRole, queryByText } = render(SettlementMap, {
+      props: {
+        settlements: mockSettlements,
+        startFromMoscow: true,
+        fitRevision: 1,
+      },
+    });
+    await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
+    mockMap.update.mockClear();
+    mockMap.update.mockImplementationOnce(() => {
+      throw new Error('Transient map update failure');
+    });
+    if (!resizeMap) throw new Error('Expected map resize observer');
+
+    resizeMap();
+    const retry = await waitFor(() =>
+      getByRole('button', { name: 'Попробовать снова' }),
+    );
+
+    await fireEvent.click(retry);
+
+    await waitFor(() => expect(mockMap.update).toHaveBeenCalledTimes(2));
+    expect(queryByText('Загрузка карты...')).toBeNull();
+  });
+
+  it('refits filtered markers after the map container resizes', async () => {
+    vi.stubGlobal('ResizeObserver', TestResizeObserver);
+    render(SettlementMap, {
+      props: {
+        settlements: mockSettlements,
+        startFromMoscow: true,
+        fitRevision: 1,
+      },
+    });
+
+    await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
+    mockMap.update.mockClear();
+
+    if (!resizeMap) throw new Error('Expected map resize observer');
+    resizeMap();
+
+    await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
   });
 
   it('uses dynamic gradient for non-baseline markers', async () => {

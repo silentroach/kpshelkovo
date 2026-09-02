@@ -61,6 +61,7 @@
   let popupEl: HTMLDivElement | undefined;
   let popupLink: HTMLAnchorElement | undefined;
   let map: ymaps3.YMap | undefined;
+  let mapInitialization: Promise<void> | undefined;
   let marks: MarkerLike[] = [];
   let activeMarker: HTMLElement | undefined;
   let isLoading = $state(true);
@@ -68,6 +69,7 @@
   let ymapsLoaded = $state(false);
   let destroyed = false;
   let mapLoadRequest = 0;
+  let hasAutofitted = false;
   interface Tip {
     item: SettlementMapData;
     x: number;
@@ -246,7 +248,7 @@
     }
   }
 
-  async function initMap(): Promise<void> {
+  async function initializeMap(): Promise<void> {
     if (!mapContainer || !ymapsLoaded) return;
 
     try {
@@ -289,45 +291,72 @@
         });
       }
     } catch (err) {
+      if (map) {
+        clearMarkers();
+        map.destroy();
+        map = undefined;
+      }
       console.error('Map initialization error:', err);
       error = 'Ошибка при загрузке карты';
       isLoading = false;
     }
   }
 
-  async function syncMap(autofit = false): Promise<void> {
-    if (!mapContainer) return;
+  function initMap(): Promise<void> {
+    mapInitialization ??= initializeMap().finally(() => {
+      mapInitialization = undefined;
+    });
+    return mapInitialization;
+  }
+
+  async function syncMap(autofit = false): Promise<boolean> {
+    if (!mapContainer) return false;
 
     const ymaps3 = window.ymaps3;
     if (!ymaps3) {
       error = 'Yandex Maps API не доступен';
       isLoading = false;
-      return;
+      return false;
     }
 
-    if (!map) {
-      await initMap();
-      if (!map || !autofit) return;
-    }
+    try {
+      if (!map) {
+        await initMap();
+        if (!map) return false;
+        if (!autofit) return true;
+      }
 
-    closePopup();
-    syncMarkers(ymaps3);
-    if (!autofit) return;
+      closePopup();
+      syncMarkers(ymaps3);
+      error = undefined;
+      isLoading = false;
+      if (!autofit) return true;
 
-    const view = getMapView();
-    if (!map.update) {
-      map.destroy();
-      map = undefined;
-      await initMap();
-      return;
+      const view = getMapView();
+      if (!map.update) {
+        map.destroy();
+        map = undefined;
+        hasAutofitted = false;
+        await initMap();
+        const fittedOnInit = !startFromMoscow && Boolean(map);
+        hasAutofitted = fittedOnInit;
+        return fittedOnInit;
+      }
+      map.update({
+        location: {
+          ...view.location,
+          duration: 250,
+        },
+        margin: view.margin,
+      });
+      hasAutofitted = true;
+      return true;
+    } catch (syncError) {
+      console.error('Map synchronization error:', syncError);
+      error = 'Ошибка при загрузке карты';
+      isLoading = false;
+      return false;
     }
-    map.update?.({
-      location: {
-        ...view.location,
-        duration: 250,
-      },
-      margin: view.margin,
-    });
   }
 
   function closePopup(restoreFocus = false): void {
@@ -397,6 +426,24 @@
     void loadMap();
   };
 
+  let pendingAutofit = false;
+  let pendingAutofitRequest = 0;
+
+  const requestAutofit = (): void => {
+    pendingAutofit = true;
+    pendingAutofitRequest += 1;
+  };
+
+  const synchronizePendingMap = async (): Promise<void> => {
+    const autofit = pendingAutofit;
+    const autofitRequest = pendingAutofitRequest;
+    const synchronized = await syncMap(autofit);
+
+    if (autofit && synchronized && autofitRequest === pendingAutofitRequest) {
+      pendingAutofit = false;
+    }
+  };
+
   onMount(() => {
     let resizeObserver: ResizeObserver | undefined;
 
@@ -414,7 +461,9 @@
 
     const refresh = (): void => {
       if (!ymapsLoaded || error) return;
-      void syncMap(!startFromMoscow);
+
+      if (!startFromMoscow || hasAutofitted) requestAutofit();
+      void synchronizePendingMap();
     };
 
     document.addEventListener('pointerdown', onDown);
@@ -452,7 +501,6 @@
   let previousSettlementSignature = '';
   let previousFitRevision: number | undefined;
   let signatureReady = false;
-  let pendingAutofit = false;
 
   const captureMapContainer: Attachment<HTMLDivElement> = (element) => {
     mapContainer = element;
@@ -486,26 +534,24 @@
     if (!signatureReady) {
       previousSettlementSignature = signature;
       previousFitRevision = currentFitRevision;
-      pendingAutofit = (currentFitRevision ?? 0) > 0;
+      if ((currentFitRevision ?? 0) > 0) requestAutofit();
       signatureReady = true;
     } else if (signature !== previousSettlementSignature) {
-      if (currentFitRevision === undefined) pendingAutofit = true;
+      if (currentFitRevision === undefined) requestAutofit();
       previousSettlementSignature = signature;
     }
     if (currentFitRevision !== previousFitRevision) {
-      pendingAutofit = true;
+      requestAutofit();
       previousFitRevision = currentFitRevision;
     }
 
     return () => {
       if (!shouldSync) return;
 
-      const autofit = pendingAutofit;
-      pendingAutofit = false;
       let cancelled = false;
       queueMicrotask(() => {
         if (!cancelled) {
-          void syncMap(autofit);
+          void synchronizePendingMap();
         }
       });
 
