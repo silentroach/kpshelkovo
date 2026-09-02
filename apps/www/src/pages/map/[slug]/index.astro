@@ -87,9 +87,9 @@ const schema = {
   schema={schema}
   search={search}
 >
-  <main class="ui-page pb-8 md:pb-12 lg:pb-14">
+  <main class="ui-page place-page">
     <header class="ui-page-header">
-      <div class="ui-page-header-stack max-w-4xl">
+      <div class="ui-page-header-stack place-header">
         <Breadcrumbs items={breadcrumbs} />
 
         <div>
@@ -100,19 +100,14 @@ const schema = {
       </div>
     </header>
 
-    <article class="max-w-3xl px-5 md:px-6">
+    <article class="place-details">
       {
         addressHtml || place.openingHours ? (
-          <dl class="border-y border-border">
+          <dl class="place-facts">
             {addressHtml ? (
-              <div class="grid gap-1 py-4 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4">
-                <dt class="text-sm font-semibold leading-7 text-muted-foreground">
-                  Адрес
-                </dt>
-                <dd
-                  class="text-base leading-7 text-foreground"
-                  set:html={addressHtml}
-                />
+              <div class="place-fact">
+                <dt class="place-fact__label">Адрес</dt>
+                <dd class="place-fact__value" set:html={addressHtml} />
               </div>
             ) : null}
             {place.openingHours ? (
@@ -122,10 +117,7 @@ const schema = {
         ) : null
       }
 
-      <nav
-        aria-label="Действия с местом"
-        class="mt-6 flex flex-wrap gap-x-5 gap-y-3 text-sm font-semibold"
-      >
+      <nav aria-label="Действия с местом" class="place-actions">
         <a href={placeHighlightUrl(place.slug)} class="site-text-link"
           >Показать на общей карте</a
         >
@@ -143,14 +135,14 @@ const schema = {
       {
         bodyHtml ? (
           <div
-            class="ui-prose mt-8 max-w-[65ch]"
+            class="ui-prose place-body"
             data-pagefind-body
             data-pagefind-weight="5"
             set:html={bodyHtml}
           />
         ) : (
           <p
-            class="ui-copy mt-8 max-w-[65ch] text-foreground"
+            class="ui-copy place-summary"
             data-pagefind-body
             data-pagefind-weight="5"
             set:html={summaryHtml}
@@ -162,36 +154,36 @@ const schema = {
         showBacklinks && backlinkGroups.length > 0 ? (
           <section
             aria-labelledby="place-backlinks"
-            class="mt-10 border-t border-border pt-8"
+            class="place-backlinks"
             data-pagefind-ignore="all"
           >
-            <div class="space-y-1.5">
+            <div class="place-backlinks__heading">
               <h2 id="place-backlinks" class="ui-section-label">
                 Где упоминается
               </h2>
-              <p class="text-sm leading-6 text-muted-foreground">
+              <p class="place-backlinks__description">
                 Материалы сайта, в которых упомянуто это место.
               </p>
             </div>
 
-            <div class="mt-6 space-y-7">
+            <div class="place-backlink-groups">
               {backlinkGroups.map((group) => (
                 <section
                   aria-labelledby={`place-backlinks-${group.section}`}
-                  class="space-y-2"
+                  class="place-backlink-group"
                 >
                   <h3
                     id={`place-backlinks-${group.section}`}
-                    class="font-body text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
+                    class="place-backlink-group__title"
                   >
                     {group.label}
                   </h3>
 
-                  <ul class="divide-y divide-border border-y border-border">
+                  <ul class="place-backlink-list">
                     {group.items.map((backlink) => (
-                      <li class="py-4">
-                        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5 text-muted-foreground">
-                          <span class="font-semibold uppercase tracking-[0.06em]">
+                      <li class="place-backlink">
+                        <div class="place-backlink__meta">
+                          <span class="place-backlink__kind">
                             {formatPlaceBacklinkKind(backlink.kind)}
                           </span>
                           {backlink.mentionedAt && (
@@ -203,13 +195,13 @@ const schema = {
 
                         <a
                           href={backlink.htmlUrl}
-                          class="site-text-link mt-1 block max-w-[65ch] text-base font-semibold leading-6"
+                          class="site-text-link place-backlink__title"
                           set:html={formatDynamicHtml(backlink.title)}
                         />
 
                         {backlink.excerpt && (
                           <p
-                            class="mt-1.5 max-w-[65ch] text-sm leading-6 text-muted-foreground"
+                            class="place-backlink__excerpt"
                             set:html={formatDynamicHtml(backlink.excerpt)}
                           />
                         )}
@@ -225,3 +217,160 @@ const schema = {
     </article>
   </main>
 </BaseLayout>
+
+<style>
+  .place-page {
+    padding-block-end: 2rem;
+  }
+
+  .place-header {
+    max-width: 56rem;
+  }
+
+  .place-details {
+    max-width: 48rem;
+    padding-inline: 1.25rem;
+  }
+
+  .place-facts,
+  .place-backlink-list {
+    border-block: 1px solid var(--color-border);
+  }
+
+  .place-fact {
+    display: grid;
+    gap: 0.25rem;
+    padding-block: 1rem;
+  }
+
+  .place-fact__label {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.75rem;
+  }
+
+  .place-fact__value {
+    color: var(--color-text);
+    font-size: 1rem;
+    line-height: 1.75rem;
+  }
+
+  .place-actions {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1.25rem;
+    row-gap: 0.75rem;
+    margin-block-start: 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .place-body,
+  .place-summary {
+    max-width: 65ch;
+    margin-block-start: 2rem;
+  }
+
+  .place-summary {
+    color: var(--color-text);
+  }
+
+  .place-backlinks {
+    margin-block-start: 2.5rem;
+    border-block-start: 1px solid var(--color-border);
+    padding-block-start: 2rem;
+  }
+
+  .place-backlinks__heading > :not(:last-child) {
+    margin-block-end: 0.375rem;
+  }
+
+  .place-backlinks__description,
+  .place-backlink__excerpt {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  .place-backlink-groups {
+    margin-block-start: 1.5rem;
+  }
+
+  .place-backlink-groups > :not(:last-child) {
+    margin-block-end: 1.75rem;
+  }
+
+  .place-backlink-group > :not(:last-child) {
+    margin-block-end: 0.5rem;
+  }
+
+  .place-backlink-group__title,
+  .place-backlink__kind {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .place-backlink-group__title {
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+  }
+
+  .place-backlink + .place-backlink {
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .place-backlink {
+    padding-block: 1rem;
+  }
+
+  .place-backlink__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 0.5rem;
+    row-gap: 0.25rem;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+  }
+
+  .place-backlink__title {
+    display: block;
+    max-width: 65ch;
+    margin-block-start: 0.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+  }
+
+  .place-backlink__excerpt {
+    max-width: 65ch;
+    margin-block-start: 0.375rem;
+  }
+
+  @media (min-width: 40rem) {
+    .place-fact {
+      grid-template-columns: 8rem minmax(0, 1fr);
+      gap: 1rem;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .place-page {
+      padding-block-end: 3rem;
+    }
+
+    .place-details {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .place-page {
+      padding-block-end: 3.5rem;
+    }
+  }
+</style>
