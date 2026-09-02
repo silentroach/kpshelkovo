@@ -200,6 +200,7 @@
     const query = readExplorerQuery(window.location.search);
     sortBy = query.sortBy;
     priceFilter = query.priceFilter;
+    if (priceFilter !== DEFAULT_EXPLORER_QUERY.priceFilter) mapFitRevision += 1;
     syncExplorerUrl();
 
     const media = window.matchMedia('(max-width: 767px)');

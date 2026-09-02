@@ -234,21 +234,37 @@ describe('SettlementsExplorer', () => {
       props: { settlements, comparisons, stats },
     });
 
-    await waitFor(() => {
-      expect({
-        cards: cardNames(container),
-        price: (getByTestId('price-more') as HTMLInputElement).checked,
-        sort: (getByTestId('sort-select') as HTMLSelectElement).value,
-      }).toMatchInlineSnapshot(`
-        {
-          "cards": [
-            "Усадьбы",
+    await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
+    expect({
+      cards: cardNames(container),
+      mapUpdate: mockMap.update.mock.calls[0]?.[0],
+      price: (getByTestId('price-more') as HTMLInputElement).checked,
+      sort: (getByTestId('sort-select') as HTMLSelectElement).value,
+    }).toMatchInlineSnapshot(`
+      {
+        "cards": [
+          "Усадьбы",
+        ],
+        "mapUpdate": {
+          "location": {
+            "center": [
+              37.16,
+              55.83,
+            ],
+            "duration": 250,
+            "zoom": 12,
+          },
+          "margin": [
+            0,
+            0,
+            0,
+            0,
           ],
-          "price": true,
-          "sort": "tariff_asc",
-        }
-      `);
-    });
+        },
+        "price": true,
+        "sort": "tariff_asc",
+      }
+    `);
   });
 
   it('replaces the current URL when controls change', async () => {

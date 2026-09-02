@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 const mobileViewports = [
   { width: 320, height: 760 },
@@ -40,6 +40,15 @@ const yandexMapsReadyScript = `
     YMapMarker: class { update() {} },
   };
 `;
+
+const getYandexMapUpdateCount = (page: Page): Promise<number> =>
+  page.evaluate(() => {
+    const testWindow = window as typeof window & {
+      readonly __yandexMapUpdates?: readonly unknown[];
+    };
+
+    return testWindow.__yandexMapUpdates?.length ?? 0;
+  });
 
 test.beforeEach(async ({ page }) => {
   await page.route('https://api-maps.yandex.ru/**', async (route) => {
@@ -337,16 +346,18 @@ test('hydrates filters and sorting from the shared URL', async ({
     readonly stats: { readonly cheaperCount: number };
   };
 
-  await page.setViewportSize(mobileViewports[1]);
+  await page.setViewportSize(desktopViewport);
   await page.goto('/815/compare/?sort=tariff_asc&price=cheaper', {
     waitUntil: 'networkidle',
   });
 
+  await expect(page.getByTestId('filtered-map')).toBeVisible();
   await expect(page.getByTestId('price-cheaper')).toBeChecked();
   await expect(page.getByTestId('sort-select')).toHaveValue('tariff_asc');
   await expect(page.getByTestId('settlement-card')).toHaveCount(
     payload.stats.cheaperCount,
   );
+  await expect.poll(() => getYandexMapUpdateCount(page)).toBe(1);
 });
 
 test('keeps the desktop list position through hydration', async ({
@@ -497,17 +508,7 @@ test('keeps every tariff filter usable beside the map button on mobile', async (
 
       await mapButton.click();
       await expect(page.getByTestId('settlement-map')).toBeVisible();
-      await expect
-        .poll(() =>
-          page.evaluate(() => {
-            const testWindow = window as typeof window & {
-              readonly __yandexMapUpdates?: readonly unknown[];
-            };
-
-            return testWindow.__yandexMapUpdates?.length ?? 0;
-          }),
-        )
-        .toBeGreaterThan(0);
+      await expect.poll(() => getYandexMapUpdateCount(page)).toBeGreaterThan(0);
     });
   }
 });
