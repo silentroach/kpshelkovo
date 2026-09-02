@@ -82,23 +82,21 @@ const schema = techArticleSchema({
   schema={schema}
   search={search}
 >
-  <main class="ui-page pb-8 md:pb-12 lg:pb-14">
+  <main class="ui-page meeting-page">
     <header class="ui-page-header">
-      <div class="ui-page-header-stack max-w-4xl">
+      <div class="ui-page-header-stack meeting-header">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div class="space-y-4">
-          <div class="space-y-3">
+        <div class="meeting-summary">
+          <div class="meeting-heading">
             <h1 class="ui-page-title">
               {meeting.title}
             </h1>
 
-            <div
-              class="flex flex-wrap items-center gap-2.5 text-sm leading-6 text-muted-foreground"
-            >
+            <div class="meeting-meta">
               <time
                 datetime={formatMeetingMetaDate(meeting.date)}
-                class="font-semibold text-foreground"
+                class="meeting-meta__date"
               >
                 {formatMeetingDate(meeting.date)}
               </time>
@@ -117,33 +115,28 @@ const schema = techArticleSchema({
             </div>
           </div>
 
-          <p class="max-w-3xl text-base leading-7 text-foreground">
+          <p class="meeting-context">
             {meeting.context}
           </p>
         </div>
       </div>
     </header>
 
-    <div class="px-5 md:px-6">
-      <div class="max-w-[75ch] space-y-7 md:space-y-8">
-        <section class="space-y-3" aria-labelledby="meeting-speakers">
+    <div class="meeting-content">
+      <div class="meeting-content__inner">
+        <section class="meeting-section" aria-labelledby="meeting-speakers">
           <h2 id="meeting-speakers" class="ui-section-title">Участники</h2>
 
-          <ul
-            class="list-disc space-y-1.5 pl-5 text-sm leading-6 text-foreground md:text-base"
-          >
+          <ul class="meeting-speakers">
             {
               meeting.transcript.speakers.map((speaker) => (
                 <li
                   id={formatMeetingSpeakerAnchor(speaker)}
-                  class="scroll-mt-24 pl-0.5 marker:text-muted-foreground"
+                  class="meeting-speaker"
                 >
-                  <span class="font-semibold text-foreground">
+                  <span class="meeting-speaker__name">
                     {speaker.url ? (
-                      <a
-                        href={speaker.url}
-                        class="ui-link text-foreground hover:text-primary"
-                      >
+                      <a href={speaker.url} class="ui-link">
                         {speaker.label}
                       </a>
                     ) : (
@@ -152,7 +145,7 @@ const schema = techArticleSchema({
                   </span>
 
                   {speaker.description && (
-                    <span class="text-muted-foreground">
+                    <span class="meeting-speaker__description">
                       {' '}
                       — {speaker.description}
                     </span>
@@ -163,15 +156,15 @@ const schema = techArticleSchema({
           </ul>
         </section>
 
-        <section class="space-y-3" aria-labelledby="meeting-transcript">
+        <section class="meeting-section" aria-labelledby="meeting-transcript">
           <h2 id="meeting-transcript" class="ui-section-title">Транскрипция</h2>
 
-          <ol class="divide-y divide-border border-t border-border">
+          <ol class="meeting-transcript">
             {
               meeting.transcript.parts.map((part) => (
                 <>
                   {hasTranscriptParts && (
-                    <li class="pb-4 pt-10 md:pb-5 md:pt-12">
+                    <li class="meeting-transcript-part">
                       <h3 class="ui-card-title">
                         {formatTranscriptPartLabel(part)}
                       </h3>
@@ -182,10 +175,10 @@ const schema = techArticleSchema({
                     const timestamp = formatTranscriptTime(segment.start);
 
                     return (
-                      <li class="meeting-transcript-segment py-2.5 md:grid md:grid-cols-[11rem_minmax(0,1fr)] md:gap-x-4 md:py-3">
+                      <li class="meeting-transcript-segment">
                         <h3
                           id={segment.anchor}
-                          class="meeting-transcript-anchor ui-visually-hidden scroll-mt-24"
+                          class="meeting-transcript-anchor ui-visually-hidden"
                           aria-hidden="true"
                           data-pagefind-weight="0"
                         >
@@ -193,27 +186,27 @@ const schema = techArticleSchema({
                         </h3>
 
                         <div
-                          class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 md:block md:space-y-0.5 md:pt-0.5"
+                          class="meeting-transcript-meta"
                           data-pagefind-ignore="all"
                         >
                           <a
                             href={`#${segment.anchor}`}
                             aria-label={`Ссылка на фрагмент ${timestamp}`}
-                            class="ui-link ui-num inline-block text-sm leading-6 text-muted-foreground md:block"
+                            class="ui-link ui-num meeting-transcript-time"
                           >
                             {timestamp}
                           </a>
 
                           <a
                             href={`#${formatMeetingSpeakerAnchor(segment.speaker)}`}
-                            class="ui-link text-[0.8125rem] font-semibold leading-5 text-foreground hover:text-primary md:block md:text-sm"
+                            class="ui-link meeting-transcript-speaker"
                           >
                             {segment.speaker.label}
                           </a>
                         </div>
 
                         <div
-                          class="meeting-transcript-text mt-1 min-w-0 text-[0.9375rem] leading-6 text-foreground md:mt-0 md:text-base md:leading-7"
+                          class="meeting-transcript-text"
                           set:html={segment.textHtml}
                         />
                       </li>
@@ -230,6 +223,102 @@ const schema = techArticleSchema({
 </BaseLayout>
 
 <style>
+  .meeting-page {
+    padding-block-end: 2rem;
+  }
+
+  .meeting-header {
+    max-width: 56rem;
+  }
+
+  .meeting-summary > :global(:not(:last-child)) {
+    margin-block-end: 1rem;
+  }
+
+  .meeting-heading > :global(:not(:last-child)) {
+    margin-block-end: 0.75rem;
+  }
+
+  .meeting-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  .meeting-meta__date {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .meeting-context {
+    max-width: 48rem;
+    color: var(--color-text);
+    font-size: 1rem;
+    line-height: 1.75rem;
+  }
+
+  .meeting-content {
+    padding-inline: 1.25rem;
+  }
+
+  .meeting-content__inner {
+    max-width: 75ch;
+  }
+
+  .meeting-content__inner > :global(:not(:last-child)) {
+    margin-block-end: 1.75rem;
+  }
+
+  .meeting-section > :global(:not(:last-child)) {
+    margin-block-end: 0.75rem;
+  }
+
+  .meeting-speakers {
+    padding-inline-start: 1.25rem;
+    color: var(--color-text);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+    list-style-type: disc;
+  }
+
+  .meeting-speaker {
+    padding-inline-start: 0.125rem;
+    scroll-margin-block-start: 6rem;
+  }
+
+  .meeting-speaker + .meeting-speaker {
+    margin-block-start: 0.375rem;
+  }
+
+  .meeting-speaker::marker {
+    color: var(--color-text-muted);
+  }
+
+  .meeting-speaker__name {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .meeting-speaker__description {
+    color: var(--color-text-muted);
+  }
+
+  .meeting-transcript {
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .meeting-transcript > :global(:not(:last-child)) {
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .meeting-transcript-part {
+    padding-block: 2.5rem 1rem;
+  }
+
   .meeting-transcript-segment {
     --meeting-transcript-hover-bg: color-mix(
       in oklab,
@@ -244,8 +333,40 @@ const schema = techArticleSchema({
 
     position: relative;
     margin-inline: -0.75rem;
-    padding-inline: 0.75rem;
+    padding: 0.625rem 0.75rem;
     transition: background-color 180ms ease-out;
+  }
+
+  .meeting-transcript-anchor {
+    scroll-margin-block-start: 6rem;
+  }
+
+  .meeting-transcript-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.5rem;
+    row-gap: 0.125rem;
+  }
+
+  .meeting-transcript-time {
+    display: inline-block;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  .meeting-transcript-speaker {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+  }
+
+  .meeting-transcript-text {
+    min-width: 0;
+    margin-block-start: 0.25rem;
+    color: var(--color-text);
+    font-size: 0.9375rem;
+    line-height: 1.5rem;
   }
 
   .meeting-transcript-segment::before {
@@ -279,6 +400,65 @@ const schema = techArticleSchema({
   .meeting-transcript-segment:has(> .meeting-transcript-anchor:target)
     a[href^='#t-'] {
     color: var(--color-primary);
+  }
+
+  @media (min-width: 48rem) {
+    .meeting-page {
+      padding-block-end: 3rem;
+    }
+
+    .meeting-content {
+      padding-inline: 1.5rem;
+    }
+
+    .meeting-content__inner > :global(:not(:last-child)) {
+      margin-block-end: 2rem;
+    }
+
+    .meeting-speakers {
+      font-size: 1rem;
+    }
+
+    .meeting-transcript-part {
+      padding-block: 3rem 1.25rem;
+    }
+
+    .meeting-transcript-segment {
+      display: grid;
+      grid-template-columns: 11rem minmax(0, 1fr);
+      column-gap: 1rem;
+      padding-block: 0.75rem;
+    }
+
+    .meeting-transcript-meta {
+      display: block;
+      padding-block-start: 0.125rem;
+    }
+
+    .meeting-transcript-meta > :global(:not(:last-child)) {
+      margin-block-end: 0.125rem;
+    }
+
+    .meeting-transcript-time,
+    .meeting-transcript-speaker {
+      display: block;
+    }
+
+    .meeting-transcript-speaker {
+      font-size: 0.875rem;
+    }
+
+    .meeting-transcript-text {
+      margin-block-start: 0;
+      font-size: 1rem;
+      line-height: 1.75rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .meeting-page {
+      padding-block-end: 3.5rem;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -340,7 +520,7 @@ const schema = techArticleSchema({
   .meeting-transcript-text ol > li::before {
     position: absolute;
     inset-inline-start: 0;
-    color: var(--color-muted-foreground);
+    color: var(--color-text-muted);
     content: counter(transcript-list) '.';
   }
 </style>
