@@ -16,7 +16,6 @@ import {
 } from '@/lib/status/load';
 import { statusUrl } from '@/lib/status/routes';
 import { techArticleSchema } from '@/lib/news/seo';
-import { NEWS_PROSE } from '@/lib/news/view';
 import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
 
@@ -89,12 +88,12 @@ const schema = techArticleSchema({
   schema={schema}
   search={search}
 >
-  <main class="ui-page pb-8 md:pb-12 lg:pb-14">
+  <main class="ui-page status-incident-page">
     <header class="ui-page-header">
-      <div class="ui-page-header-stack max-w-4xl">
+      <div class="ui-page-header-stack status-incident-header">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div class="space-y-3.5">
+        <div class="status-incident-header__summary">
           <h1 class="ui-page-title">
             {incident.title}
           </h1>
@@ -106,10 +105,44 @@ const schema = techArticleSchema({
 
     {
       incident.body && (
-        <article class="px-5 md:px-6">
-          <div class={NEWS_PROSE} set:html={bodyHtml} />
+        <article class="status-incident-body">
+          <div class="ui-prose" set:html={bodyHtml} />
         </article>
       )
     }
   </main>
 </BaseLayout>
+
+<style>
+  .status-incident-page {
+    padding-block-end: 2rem;
+  }
+
+  .status-incident-header {
+    max-width: 56rem;
+  }
+
+  .status-incident-header__summary > :global(:not(:last-child)) {
+    margin-block-end: 0.875rem;
+  }
+
+  .status-incident-body {
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 48rem) {
+    .status-incident-page {
+      padding-block-end: 3rem;
+    }
+
+    .status-incident-body {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .status-incident-page {
+      padding-block-end: 3.5rem;
+    }
+  }
+</style>
