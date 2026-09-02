@@ -14,11 +14,7 @@ import { loadReview, loadReviews } from '@/lib/reviews/load';
 import { REVIEW_RULES } from '@/lib/reviews/rules';
 import { reviewPageSchema } from '@/lib/reviews/seo';
 import { reviewsUrl } from '@/lib/reviews/routes';
-import {
-  formatReviewAuthor,
-  formatReviewTitle,
-  REVIEWS_PROSE,
-} from '@/lib/reviews/view';
+import { formatReviewAuthor, formatReviewTitle } from '@/lib/reviews/view';
 import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
 
@@ -78,34 +74,97 @@ const schema = reviewPageSchema({
   schema={schema}
   search={search}
 >
-  <main class="ui-page pb-8 md:pb-12 lg:pb-14">
+  <main class="ui-page review-page">
     <header class="ui-page-header">
-      <div class="ui-page-header-stack max-w-4xl">
+      <div class="ui-page-header-stack review-header">
         <Breadcrumbs items={breadcrumbs} linkLast />
-        <div class="space-y-4">
+        <div class="review-header__summary">
           <h1 class="ui-page-title">{reviewTitle}</h1>
           <ReviewMeta review={review} showVerified />
         </div>
       </div>
     </header>
 
-    <article class="space-y-8 px-5 md:px-6">
-      <div class={REVIEWS_PROSE} data-pagefind-body set:html={bodyHtml} />
+    <article class="review-body">
+      <div
+        class="ui-prose review-body__prose"
+        data-pagefind-body
+        set:html={bodyHtml}
+      />
       <ReviewAspectList aspects={review.aspects} />
     </article>
 
     <!--noindex-->
-    <footer class="mt-8 px-5 md:px-6" data-nosnippet data-pagefind-ignore="all">
-      <section aria-labelledby="review-disclaimer" class="ui-shell py-4">
+    <footer class="review-footer" data-nosnippet data-pagefind-ignore="all">
+      <section
+        aria-labelledby="review-disclaimer"
+        class="ui-shell review-disclaimer"
+      >
         <h2 id="review-disclaimer" class="ui-section-label">
           {REVIEW_RULES.disclaimer.heading}
         </h2>
-        <div
-          class="mt-2 text-xs leading-5 text-muted-foreground"
-          set:html={disclaimerHtml}
-        />
+        <div class="review-disclaimer__body" set:html={disclaimerHtml} />
       </section>
     </footer>
     <!--/noindex-->
   </main>
 </BaseLayout>
+
+<style>
+  .review-page {
+    padding-block-end: 2rem;
+  }
+
+  .review-header {
+    max-width: 56rem;
+  }
+
+  .review-header__summary > :global(:not(:last-child)) {
+    margin-block-end: 1rem;
+  }
+
+  .review-body,
+  .review-footer {
+    padding-inline: 1.25rem;
+  }
+
+  .review-body > :global(:not(:last-child)) {
+    margin-block-end: 2rem;
+  }
+
+  .review-body__prose {
+    max-width: 65ch;
+  }
+
+  .review-footer {
+    margin-block-start: 2rem;
+  }
+
+  .review-disclaimer {
+    padding-block: 1rem;
+  }
+
+  .review-disclaimer__body {
+    margin-block-start: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+  }
+
+  @media (min-width: 48rem) {
+    .review-page {
+      padding-block-end: 3rem;
+    }
+
+    .review-body,
+    .review-footer {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .review-page {
+      padding-block-end: 3.5rem;
+    }
+  }
+</style>

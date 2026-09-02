@@ -45,14 +45,14 @@ const schema = reviewsCollectionPageSchema({
   keywords={keywords}
   schema={schema}
 >
-  <main class="ui-page pb-6 md:pb-10 lg:pb-12">
+  <main class="ui-page reviews-page">
     <section class="ui-page-header">
       <div class="ui-page-header-stack">
         <Breadcrumbs items={breadcrumbs} />
 
         <div>
           <h1 class="ui-page-title">Отзывы собственников</h1>
-          <p class="ui-copy mt-3 max-w-3xl text-muted-foreground">
+          <p class="ui-copy reviews-intro">
             Вы собственник участка или дома в Шелково?{' '}
             <a href={reviewsRulesUrl()} class="site-text-link">
               Оставьте свой отзыв!
@@ -62,11 +62,11 @@ const schema = reviewsCollectionPageSchema({
       </div>
     </section>
 
-    <section class="mt-8">
+    <section class="reviews-content">
       <h2 class="ui-visually-hidden">Список отзывов</h2>
       {
         data.reviews.length > 0 ? (
-          <ul class="reviews-list--flush-first space-y-4">
+          <ul class="reviews-list--flush-first reviews-list">
             {data.reviews.map((review) => (
               <li>
                 <ReviewCard review={review} />
@@ -74,8 +74,8 @@ const schema = reviewsCollectionPageSchema({
             ))}
           </ul>
         ) : (
-          <div class="px-5 py-6 md:px-6 md:py-7">
-            <p class="ui-copy text-muted-foreground">
+          <div class="reviews-empty">
+            <p class="ui-copy reviews-muted">
               Если вы собственник участка или дома в Шелково,{' '}
               <a href={reviewsRulesUrl()} class="site-text-link">
                 посмотрите, как оставить свой отзыв
@@ -88,3 +88,47 @@ const schema = reviewsCollectionPageSchema({
     </section>
   </main>
 </BaseLayout>
+
+<style>
+  .reviews-page {
+    padding-block-end: 1.5rem;
+  }
+
+  .reviews-intro {
+    max-width: 48rem;
+    margin-block-start: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .reviews-content {
+    margin-block-start: 2rem;
+  }
+
+  .reviews-list > li + li {
+    margin-block-start: 1rem;
+  }
+
+  .reviews-empty {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .reviews-muted {
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 48rem) {
+    .reviews-page {
+      padding-block-end: 2.5rem;
+    }
+
+    .reviews-empty {
+      padding: 1.75rem 1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .reviews-page {
+      padding-block-end: 3rem;
+    }
+  }
+</style>
