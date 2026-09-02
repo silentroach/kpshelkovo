@@ -38,16 +38,50 @@ const schema = reviewsCollectionPageSchema({
   keywords={['правила отзывов Шелково', 'отзывы собственников Шелково']}
   schema={schema}
 >
-  <main class="ui-page pb-8 md:pb-12 lg:pb-14">
+  <main class="ui-page review-rules-page">
     <header class="ui-page-header">
-      <div class="ui-page-header-stack max-w-4xl">
+      <div class="ui-page-header-stack review-rules-header">
         <Breadcrumbs items={breadcrumbs} />
         <h1 class="ui-page-title">{REVIEW_RULES.title}</h1>
       </div>
     </header>
 
-    <article class="px-5 md:px-6">
-      <div class="ui-prose max-w-[65ch]" set:html={rulesHtml} />
+    <article class="review-rules-body">
+      <div class="ui-prose review-rules-prose" set:html={rulesHtml} />
     </article>
   </main>
 </BaseLayout>
+
+<style>
+  .review-rules-page {
+    padding-block-end: 2rem;
+  }
+
+  .review-rules-header {
+    max-width: 56rem;
+  }
+
+  .review-rules-body {
+    padding-inline: 1.25rem;
+  }
+
+  .review-rules-prose {
+    max-width: 65ch;
+  }
+
+  @media (min-width: 48rem) {
+    .review-rules-page {
+      padding-block-end: 3rem;
+    }
+
+    .review-rules-body {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .review-rules-page {
+      padding-block-end: 3.5rem;
+    }
+  }
+</style>
