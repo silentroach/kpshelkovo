@@ -191,6 +191,39 @@ describe('SettlementsExplorer', () => {
     });
   });
 
+  it('autofits markers after the explorer data mounts', async () => {
+    setScreen(false);
+
+    render(SettlementsExplorer, {
+      props: { settlements, comparisons, stats },
+    });
+
+    await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
+    expect(mockMap.update.mock.calls[0]?.[0]).toMatchInlineSnapshot(`
+      {
+        "location": {
+          "bounds": [
+            [
+              37.14,
+              55.82,
+            ],
+            [
+              37.2,
+              55.85,
+            ],
+          ],
+          "duration": 250,
+        },
+        "margin": [
+          32,
+          32,
+          32,
+          32,
+        ],
+      }
+    `);
+  });
+
   it('updates map markers after filter change', async () => {
     setScreen(false);
 
