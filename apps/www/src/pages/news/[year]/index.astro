@@ -58,7 +58,7 @@ const schema = collectionPageSchema({
   ]}
   schema={schema}
 >
-  <main class="ui-page pb-6 md:pb-10 lg:pb-12">
+  <main class="ui-page news-year-page">
     <section class="ui-page-header">
       <div class="ui-page-header-stack">
         <Breadcrumbs items={breadcrumbs} />
@@ -75,36 +75,30 @@ const schema = collectionPageSchema({
     </section>
 
     <section
-      class="mt-8 px-5 md:px-6"
+      class="news-year-content"
       aria-label={`Новости за ${archive.year} год по месяцам`}
     >
-      <div class="max-w-3xl">
-        <ul class="space-y-1">
+      <div class="news-archive-container">
+        <ul class="news-archive-list">
           {
             months.map((item) => (
               <li>
-                <a
-                  href={item.url}
-                  class="group -mx-3 flex min-h-16 items-center gap-4 px-3 py-4 transition-colors hover:bg-primary-soft-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-                >
-                  <span class="min-w-0">
-                    <span class="ui-card-title block text-primary transition-colors group-hover:text-primary-hover">
+                <a href={item.url} class="news-archive-row">
+                  <span class="news-archive-row__content">
+                    <span class="ui-card-title news-archive-row__title">
                       {formatNewsMonth(item.year, item.month, {
                         capitalize: true,
                         includeYear: false,
                       })}
                     </span>
                     <span
-                      class="mt-1 block text-sm text-muted-foreground"
+                      class="news-archive-row__count"
                       set:html={formatDynamicHtml(
                         count(item.count, ['новость', 'новости', 'новостей']),
                       )}
                     />
                   </span>
-                  <span
-                    class="ml-auto shrink-0 text-xl text-primary transition-colors group-hover:text-primary-hover"
-                    aria-hidden="true"
-                  >
+                  <span class="news-archive-row__arrow" aria-hidden="true">
                     →
                   </span>
                 </a>
@@ -116,3 +110,89 @@ const schema = collectionPageSchema({
     </section>
   </main>
 </BaseLayout>
+
+<style>
+  .news-year-page {
+    padding-block-end: 1.5rem;
+  }
+
+  .news-year-content {
+    margin-block-start: 2rem;
+    padding-inline: 1.25rem;
+  }
+
+  .news-archive-container {
+    max-width: 48rem;
+  }
+
+  .news-archive-list > li + li {
+    margin-block-start: 0.25rem;
+  }
+
+  .news-archive-row {
+    display: flex;
+    align-items: center;
+    min-height: 4rem;
+    gap: 1rem;
+    margin-inline: -0.75rem;
+    padding: 1rem 0.75rem;
+    transition: background-color 150ms ease;
+  }
+
+  .news-archive-row:hover {
+    background: var(--color-primary-soft-2);
+  }
+
+  .news-archive-row:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .news-archive-row__content {
+    min-width: 0;
+  }
+
+  .news-archive-row__title {
+    display: block;
+    color: var(--color-primary);
+    transition: color 150ms ease;
+  }
+
+  .news-archive-row__count {
+    display: block;
+    margin-block-start: 0.25rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .news-archive-row__arrow {
+    flex-shrink: 0;
+    margin-inline-start: auto;
+    color: var(--color-primary);
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    transition: color 150ms ease;
+  }
+
+  .news-archive-row:hover
+    :is(.news-archive-row__title, .news-archive-row__arrow) {
+    color: var(--color-primary-hover);
+  }
+
+  @media (min-width: 48rem) {
+    .news-year-page {
+      padding-block-end: 2.5rem;
+    }
+
+    .news-year-content {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .news-year-page {
+      padding-block-end: 3rem;
+    }
+  }
+</style>
