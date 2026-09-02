@@ -69,13 +69,6 @@ const heroCover =
     : undefined;
 const hasHeroCover = Boolean(heroCover);
 const hasEvents = article.events.length > 0;
-const heroImageStyle = heroCover
-  ? [
-      'object-position: 50% 64%',
-      '-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 68%, rgba(0, 0, 0, 0.86) 82%, rgba(0, 0, 0, 0) 100%)',
-      'mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 68%, rgba(0, 0, 0, 0.86) 82%, rgba(0, 0, 0, 0) 100%)',
-    ].join('; ')
-  : undefined;
 const title = `${article.seo?.title ?? article.title} — Новости — Шелково Онлайн`;
 const description = article.seo?.description ?? article.summary;
 const search = {
@@ -139,10 +132,10 @@ const schema = newsArticleSchema({
   schema={schema}
   search={search}
 >
-  <main class="pb-6 md:pb-10 lg:pb-12">
+  <main class="news-article-page">
     {
       hasHeroCover ? (
-        <header class="news-hero relative isolate overflow-hidden bg-background">
+        <header class="news-hero">
           <Image
             src={heroCover.src}
             width={heroCover.width}
@@ -154,24 +147,23 @@ const schema = newsArticleSchema({
             alt=""
             aria-hidden="true"
             priority
-            class="absolute inset-0 h-full w-full object-cover brightness-105"
-            style={heroImageStyle}
+            class="news-hero__image"
           />
-          <div class="news-hero-overlay-top absolute inset-x-0 top-0 h-24 md:h-28 lg:h-32" />
-          <div class="news-hero-overlay-side absolute inset-y-0 left-0 w-[54rem] max-w-full" />
+          <div class="news-hero-overlay-top" />
+          <div class="news-hero-overlay-side" />
 
-          <div class="ui-page relative flex min-h-[20rem] flex-col pt-4 md:min-h-[24rem] md:pt-5 lg:min-h-[28rem] lg:pt-6">
-            <div class="px-5 md:px-6">
+          <div class="ui-page news-hero__layout">
+            <div class="news-hero__breadcrumbs">
               <Breadcrumbs items={breadcrumbs} linkLast />
             </div>
 
-            <div class="mt-auto px-5 pb-4 md:px-6 md:pb-6 lg:pb-8">
-              <div class="max-w-4xl space-y-4">
-                <div class="space-y-3.5">
+            <div class="news-hero__content">
+              <div class="news-hero__content-inner">
+                <div class="news-article-heading">
                   <h1 class="ui-page-title">{article.title}</h1>
 
                   {article.tags.length > 0 && (
-                    <ul class="flex flex-wrap gap-x-3 gap-y-1.5 text-[0.8125rem] font-semibold leading-5 text-muted-foreground md:gap-x-4">
+                    <ul class="news-article-tags">
                       {article.tags.map((item) => (
                         <li>
                           <a
@@ -202,15 +194,15 @@ const schema = newsArticleSchema({
         </header>
       ) : (
         <header class="ui-page ui-page-header">
-          <div class="ui-page-header-stack max-w-4xl">
+          <div class="ui-page-header-stack news-article-header__inner">
             <Breadcrumbs items={breadcrumbs} linkLast />
 
-            <div class="space-y-4">
-              <div class="space-y-3.5">
+            <div class="news-article-header__content">
+              <div class="news-article-heading">
                 <h1 class="ui-page-title">{article.title}</h1>
 
                 {article.tags.length > 0 && (
-                  <ul class="flex flex-wrap gap-x-3 gap-y-1.5 text-[0.8125rem] font-semibold leading-5 text-muted-foreground md:gap-x-4">
+                  <ul class="news-article-tags">
                     {article.tags.map((item) => (
                       <li>
                         <a
@@ -242,16 +234,18 @@ const schema = newsArticleSchema({
 
     <article
       class:list={[
-        'ui-page relative z-10 space-y-6',
-        hasHeroCover ? 'pt-0' : undefined,
+        'ui-page news-article-content',
+        hasHeroCover ? 'news-article-content--with-cover' : undefined,
       ]}
     >
       {
         article.body && (
           <section
             class:list={[
-              'px-5 pb-6 md:px-6 md:pb-8 lg:pb-10',
-              hasHeroCover ? 'pt-6 md:pt-8 lg:pt-10' : undefined,
+              'news-article-body-section',
+              hasHeroCover
+                ? 'news-article-body-section--with-cover'
+                : undefined,
             ]}
           >
             <div
@@ -278,8 +272,10 @@ const schema = newsArticleSchema({
         !article.body && hasEvents && (
           <section
             class:list={[
-              'px-5 md:px-6',
-              hasHeroCover ? '-mt-8 md:-mt-10 lg:-mt-12' : undefined,
+              'news-article-event-section',
+              hasHeroCover
+                ? 'news-article-event-section--with-cover'
+                : undefined,
             ]}
           >
             <div class="news-article-event-only">
@@ -298,6 +294,196 @@ const schema = newsArticleSchema({
 </BaseLayout>
 
 <style>
+  .news-article-page {
+    padding-block-end: 1.5rem;
+  }
+
+  .news-hero {
+    --news-hero-foreground: oklch(97.2% 0.004 130);
+    --news-hero-muted-foreground: oklch(88.8% 0.012 130);
+    --news-hero-primary: oklch(90.5% 0.022 142);
+    --news-hero-primary-hover: oklch(96.4% 0.01 140);
+    --news-hero-border: color-mix(
+      in oklab,
+      var(--news-hero-foreground) 24%,
+      transparent
+    );
+    --news-hero-border-strong: color-mix(
+      in oklab,
+      var(--news-hero-foreground) 52%,
+      transparent
+    );
+    --news-hero-ring: oklch(97% 0.01 140);
+    --news-hero-overlay-top: oklch(24% 0.04 145 / 0.14);
+    --news-hero-overlay-side-strong: oklch(24% 0.04 145 / 0.36);
+    --news-hero-overlay-side-mid: oklch(24% 0.04 145 / 0.18);
+    --news-hero-overlay-side-soft: oklch(24% 0.04 145 / 0.06);
+    --color-text: var(--news-hero-foreground);
+    --color-text-muted: var(--news-hero-muted-foreground);
+    --color-foreground: var(--news-hero-foreground);
+    --color-muted-foreground: var(--news-hero-muted-foreground);
+    --color-primary: var(--news-hero-primary);
+    --color-primary-hover: var(--news-hero-primary-hover);
+    --color-border: var(--news-hero-border);
+    --color-border-strong: var(--news-hero-border-strong);
+    --color-ring: var(--news-hero-ring);
+
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--color-bg);
+  }
+
+  .news-hero__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 64%;
+    filter: brightness(1.05);
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgb(0 0 0) 0%,
+      rgb(0 0 0) 68%,
+      rgb(0 0 0 / 86%) 82%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      rgb(0 0 0) 0%,
+      rgb(0 0 0) 68%,
+      rgb(0 0 0 / 86%) 82%,
+      transparent 100%
+    );
+  }
+
+  .news-hero-overlay-top,
+  .news-hero-overlay-side {
+    position: absolute;
+  }
+
+  .news-hero-overlay-top {
+    inset-block-start: 0;
+    inset-inline: 0;
+    height: 6rem;
+    background: linear-gradient(
+      to bottom,
+      var(--news-hero-overlay-top),
+      transparent
+    );
+  }
+
+  .news-hero-overlay-side {
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: min(54rem, 100%);
+    background: linear-gradient(
+      90deg,
+      var(--news-hero-overlay-side-strong) 0%,
+      var(--news-hero-overlay-side-mid) 52%,
+      var(--news-hero-overlay-side-soft) 78%,
+      transparent 100%
+    );
+  }
+
+  .news-hero__layout {
+    position: relative;
+    display: flex;
+    min-height: 20rem;
+    flex-direction: column;
+    padding-block-start: 1rem;
+  }
+
+  .news-hero__breadcrumbs,
+  .news-hero__content,
+  .news-article-body-section,
+  .news-article-event-section {
+    padding-inline: 1.25rem;
+  }
+
+  .news-hero__content {
+    margin-block-start: auto;
+    padding-block-end: 1rem;
+  }
+
+  .news-hero__content-inner,
+  .news-article-header__inner {
+    max-width: 56rem;
+  }
+
+  .news-hero__content-inner > :global(:not(:last-child)),
+  .news-article-header__content > :global(:not(:last-child)) {
+    margin-block-end: 1rem;
+  }
+
+  .news-article-heading > :global(:not(:last-child)) {
+    margin-block-end: 0.875rem;
+  }
+
+  .news-article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.75rem;
+    row-gap: 0.375rem;
+    color: var(--color-text-muted);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+  }
+
+  .news-tag-inline-link {
+    color: color-mix(
+      in oklab,
+      var(--color-primary) 38%,
+      var(--color-muted-foreground) 62%
+    );
+    font-weight: 600;
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.22em;
+    transition:
+      color 0.2s ease,
+      text-decoration-color 0.2s ease,
+      text-underline-offset 0.2s ease;
+  }
+
+  .news-tag-inline-link:is(:hover, :focus-visible) {
+    color: color-mix(
+      in oklab,
+      var(--color-primary-hover) 52%,
+      var(--color-muted-foreground) 48%
+    );
+    text-decoration-color: color-mix(in oklab, currentColor 30%, transparent);
+    text-underline-offset: 0.18em;
+  }
+
+  .news-article-content {
+    position: relative;
+    z-index: 10;
+  }
+
+  .news-article-content--with-cover {
+    padding-block-start: 0;
+  }
+
+  .news-article-content > :global(:not(:last-child)) {
+    margin-block-end: 1.5rem;
+  }
+
+  .news-article-body-section {
+    padding-block-end: 1.5rem;
+  }
+
+  .news-article-body-section--with-cover {
+    padding-block-start: 1.5rem;
+  }
+
+  .news-article-event-section--with-cover {
+    margin-block-start: -2rem;
+  }
+
   .news-article-body-layout {
     display: grid;
     align-items: start;
@@ -309,6 +495,79 @@ const schema = newsArticleSchema({
     display: grid;
     gap: 1rem;
     width: min(100%, 24rem);
+  }
+
+  @media (min-width: 48rem) {
+    .news-article-page {
+      padding-block-end: 2.5rem;
+    }
+
+    .news-hero-overlay-top {
+      height: 7rem;
+    }
+
+    .news-hero__layout {
+      min-height: 24rem;
+      padding-block-start: 1.25rem;
+    }
+
+    .news-hero__breadcrumbs,
+    .news-hero__content,
+    .news-article-body-section,
+    .news-article-event-section {
+      padding-inline: 1.5rem;
+    }
+
+    .news-hero__content {
+      padding-block-end: 1.5rem;
+    }
+
+    .news-article-tags {
+      column-gap: 1rem;
+    }
+
+    .news-article-body-section {
+      padding-block-end: 2rem;
+    }
+
+    .news-article-body-section--with-cover {
+      padding-block-start: 2rem;
+    }
+
+    .news-article-event-section--with-cover {
+      margin-block-start: -2.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .news-article-page {
+      padding-block-end: 3rem;
+    }
+
+    .news-hero-overlay-top {
+      height: 8rem;
+    }
+
+    .news-hero__layout {
+      min-height: 28rem;
+      padding-block-start: 1.5rem;
+    }
+
+    .news-hero__content {
+      padding-block-end: 2rem;
+    }
+
+    .news-article-body-section {
+      padding-block-end: 2.5rem;
+    }
+
+    .news-article-body-section--with-cover {
+      padding-block-start: 2.5rem;
+    }
+
+    .news-article-event-section--with-cover {
+      margin-block-start: -3rem;
+    }
   }
 
   @media (min-width: 72rem) {
