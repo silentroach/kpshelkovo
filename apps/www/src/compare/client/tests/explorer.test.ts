@@ -28,7 +28,7 @@ const payload = {
   },
 } satisfies ExplorerPayload;
 
-const payloadUrl = '/815/compare/data/explorer.json?v=payload-digest';
+const payloadUrl = '/static/settlements-explorer/payload-digest.json';
 
 const renderBootstrap = (): ExplorerBootstrapElements => {
   document.body.innerHTML = `

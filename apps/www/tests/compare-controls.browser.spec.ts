@@ -15,10 +15,12 @@ const explorerControlSelector =
   '[data-testid="explorer-controls"] input, [data-testid="explorer-controls"] button, [data-testid="sort-select"]';
 const explorerGraphPattern =
   /\/static\/SettlementsExplorerClient\.[^/]+\.js(?:\?.*)?$/u;
-const explorerDataPath = '/815/compare/data/explorer.json';
-const explorerDataPattern = /\/815\/compare\/data\/explorer\.json(?:\?.*)?$/u;
+const explorerDataPattern =
+  /\/static\/settlements-explorer\/([a-f0-9]{64})\.json(?:\?.*)?$/u;
+const getExplorerDataVersion = (url: string): string | undefined =>
+  explorerDataPattern.exec(url)?.[1];
 const isExplorerDataUrl = (url: string): boolean =>
-  new URL(url).pathname === explorerDataPath;
+  getExplorerDataVersion(url) !== undefined;
 const yandexMapsReadyScript = `
   window.__yandexMapUpdates = [];
   class YMap {
@@ -162,7 +164,7 @@ test('keeps one settlement list before and after hydration', async ({
     await expect(control).toBeEnabled();
   }
   expect(explorerDataRequests).toHaveLength(1);
-  expect(new URL(explorerDataRequests[0] ?? '').searchParams.get('v')).toBe(
+  expect(getExplorerDataVersion(explorerDataRequests[0] ?? '')).toBe(
     createHash('sha256').update(dataBody).digest('hex'),
   );
   expect(explorerGraphRequests).toHaveLength(1);

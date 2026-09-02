@@ -1,6 +1,4 @@
 ---
-import { createHash } from 'node:crypto';
-
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/compare/components/Hero.svelte';
 import KPIStats from '@/compare/components/KPIStats.svelte';
@@ -10,21 +8,17 @@ import {
   compareBreadcrumbs,
   compareBreadcrumbSchema,
 } from '@/compare/lib/breadcrumbs';
-import { loadAllData } from '@/compare/lib/data';
-import { toExplorerPayload } from '@/compare/lib/explorer';
+import { loadExplorerSnapshot } from '@/compare/lib/explorer-snapshot';
 import { compareHomeMeta } from '@/compare/lib/seo';
 import { canon } from '@/compare/lib/site';
 import { withBase } from '@/compare/lib/url';
 
 // Load all data at build time
-const explorer = toExplorerPayload(await loadAllData());
+const explorerSnapshot = await loadExplorerSnapshot();
+const explorer = explorerSnapshot.payload;
 const { settlements: list, comparisons, stats } = explorer;
 const ratingUrl = withBase('/rating/');
-const explorerPayloadUrl = `${withBase('/data/explorer.json')}?v=${createHash(
-  'sha256',
-)
-  .update(JSON.stringify(explorer))
-  .digest('hex')}`;
+const explorerPayloadUrl = explorerSnapshot.url;
 
 const cards = [...list].sort((a, b) => {
   const d = b.rating - a.rating;
