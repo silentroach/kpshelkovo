@@ -55,27 +55,27 @@ const schema = collectionPageSchema({
   keywords={['тег новостей', tag.label, 'Шелково']}
   schema={schema}
 >
-  <main class="ui-page pb-6 md:pb-10 lg:pb-12">
+  <main class="ui-page news-tag-page">
     <section class="ui-page-header">
       <div class="ui-page-header-stack">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div class="space-y-3">
+        <div class="news-tag-heading">
           <h1 class="ui-page-title">
             #{tag.label}
           </h1>
-          <p class="ui-copy max-w-3xl text-muted-foreground">
+          <p class="ui-copy news-tag-heading__summary">
             Последние новости по тегу
           </p>
         </div>
       </div>
     </section>
 
-    <section class="mt-8 space-y-4">
+    <section class="news-tag-feed">
       <h2 class="ui-visually-hidden">Публикации по тегу {tag.label}</h2>
       {
         tag.count > tag.latest.length && (
-          <p class="px-5 text-sm leading-7 text-muted-foreground md:px-6">
+          <p class="news-tag-feed__note">
             На этой странице показаны последние {latestPublicationsLabel} по
             тегу. Более ранние материалы доступны в месячных и годовых архивах.
           </p>
@@ -86,3 +86,49 @@ const schema = collectionPageSchema({
     </section>
   </main>
 </BaseLayout>
+
+<style>
+  .news-tag-page {
+    padding-block-end: 1.5rem;
+  }
+
+  .news-tag-heading > :global(:not(:last-child)) {
+    margin-block-end: 0.75rem;
+  }
+
+  .news-tag-heading__summary {
+    max-width: 48rem;
+    color: var(--color-text-muted);
+  }
+
+  .news-tag-feed {
+    margin-block-start: 2rem;
+  }
+
+  .news-tag-feed > :global(:not(:last-child)) {
+    margin-block-end: 1rem;
+  }
+
+  .news-tag-feed__note {
+    padding-inline: 1.25rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.75rem;
+  }
+
+  @media (min-width: 48rem) {
+    .news-tag-page {
+      padding-block-end: 2.5rem;
+    }
+
+    .news-tag-feed__note {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .news-tag-page {
+      padding-block-end: 3rem;
+    }
+  }
+</style>

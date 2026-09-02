@@ -37,18 +37,18 @@ const schema = collectionPageSchema({
   keywords={['теги новостей', 'Шелково', 'темы новостей Шелково']}
   schema={schema}
 >
-  <main class="ui-page pb-6 md:pb-10 lg:pb-12">
+  <main class="ui-page news-tags-page">
     <section class="ui-page-header">
       <div class="ui-page-header-stack">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div class="space-y-3">
+        <div>
           <h1 class="ui-page-title">Теги новостей</h1>
         </div>
       </div>
     </section>
 
-    <section class="mt-8 space-y-4 px-5 md:px-6">
+    <section class="news-tags-list">
       <NewsTagList
         items={tags.map((item) => ({
           label: item.label,
@@ -59,8 +59,8 @@ const schema = collectionPageSchema({
 
       {
         tags.length === 0 && (
-          <div class="ui-shell px-5 py-6 md:px-6 md:py-7">
-            <p class="ui-copy text-muted-foreground">
+          <div class="ui-shell news-tags-empty">
+            <p class="ui-copy news-tags-empty__copy">
               Пока ни одна публикация не получила редакционный тег. Индекс
               появится автоматически после первых новостей.
             </p>
@@ -70,3 +70,46 @@ const schema = collectionPageSchema({
     </section>
   </main>
 </BaseLayout>
+
+<style>
+  .news-tags-page {
+    padding-block-end: 1.5rem;
+  }
+
+  .news-tags-list {
+    margin-block-start: 2rem;
+    padding-inline: 1.25rem;
+  }
+
+  .news-tags-list > :global(:not(:last-child)) {
+    margin-block-end: 1rem;
+  }
+
+  .news-tags-empty {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .news-tags-empty__copy {
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 48rem) {
+    .news-tags-page {
+      padding-block-end: 2.5rem;
+    }
+
+    .news-tags-list {
+      padding-inline: 1.5rem;
+    }
+
+    .news-tags-empty {
+      padding: 1.75rem 1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .news-tags-page {
+      padding-block-end: 3rem;
+    }
+  }
+</style>
