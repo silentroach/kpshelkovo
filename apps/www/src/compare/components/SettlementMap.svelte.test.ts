@@ -182,6 +182,36 @@ describe('SettlementMap', () => {
     `);
   });
 
+  it('applies a filter revision that advanced before the map mounted', async () => {
+    render(SettlementMap, {
+      props: {
+        settlements: [mockSettlements[1]],
+        startFromMoscow: true,
+        fitRevision: 1,
+      },
+    });
+
+    await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
+    expect(mockMap.update.mock.calls[0]?.[0]).toMatchInlineSnapshot(`
+      {
+        "location": {
+          "center": [
+            37.2,
+            55.85,
+          ],
+          "duration": 250,
+          "zoom": 12,
+        },
+        "margin": [
+          0,
+          0,
+          0,
+          0,
+        ],
+      }
+    `);
+  });
+
   it('uses dynamic gradient for non-baseline markers', async () => {
     render(SettlementMap, {
       props: {

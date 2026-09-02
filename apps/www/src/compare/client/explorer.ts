@@ -1,7 +1,6 @@
 import { explorerGraphUrl } from 'virtual:settlements-explorer-assets';
 
 import type { ExplorerPayload } from '../lib/explorer';
-import { withBase } from '../lib/url';
 import type {
   ExplorerBootstrapDependencies,
   ExplorerBootstrapElements,
@@ -34,8 +33,8 @@ const loadClient = (): Promise<ExplorerClientModule> => {
   return graphRequest;
 };
 
-const loadPayload = async (): Promise<ExplorerPayload> => {
-  const response = await fetch(withBase('/data/explorer.json'));
+const loadPayload = async (url: string): Promise<ExplorerPayload> => {
+  const response = await fetch(url);
 
   if (!response.ok) {
     throw new Error(`Explorer data request failed: ${response.status}`);
@@ -50,7 +49,7 @@ const dependencies: ExplorerBootstrapDependencies = {
 };
 
 export const startSettlementsExplorer = (
-  { root, error, retry }: ExplorerBootstrapElements,
+  { root, error, retry, payloadUrl }: ExplorerBootstrapElements,
   runtime: ExplorerBootstrapDependencies = dependencies,
 ): (() => void) => {
   let state: 'idle' | 'loading' | 'error' | 'hydrated' = 'idle';
@@ -67,7 +66,7 @@ export const startSettlementsExplorer = (
     try {
       const [loadedClient, payload] = await Promise.all([
         runtime.loadClient(),
-        runtime.loadPayload(),
+        runtime.loadPayload(payloadUrl),
       ]);
 
       if (disposed || !root.isConnected) return;
@@ -103,10 +102,11 @@ const getElements = (): ExplorerBootstrapElements | undefined => {
   const root = document.querySelector<HTMLElement>(ROOT_SELECTOR);
   const error = document.querySelector<HTMLElement>(ERROR_SELECTOR);
   const retry = document.querySelector<HTMLButtonElement>(RETRY_SELECTOR);
+  const payloadUrl = root?.dataset.explorerPayloadUrl;
 
-  if (!root || !error || !retry) return;
+  if (!root || !error || !retry || !payloadUrl) return;
 
-  return { root, error, retry };
+  return { root, error, retry, payloadUrl };
 };
 
 export const installSettlementsExplorer = (): void => {

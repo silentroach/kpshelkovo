@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 import { expect, test } from '@playwright/test';
 
 const mobileViewports = [
@@ -13,14 +15,19 @@ const explorerControlSelector =
   '[data-testid="explorer-controls"] input, [data-testid="explorer-controls"] button, [data-testid="sort-select"]';
 const explorerGraphPattern =
   /\/static\/SettlementsExplorerClient\.[^/]+\.js(?:\?.*)?$/u;
+const explorerDataPath = '/815/compare/data/explorer.json';
+const explorerDataPattern = /\/815\/compare\/data\/explorer\.json(?:\?.*)?$/u;
+const isExplorerDataUrl = (url: string): boolean =>
+  new URL(url).pathname === explorerDataPath;
 const yandexMapsReadyScript = `
+  window.__yandexMapUpdates = [];
   class YMap {
     constructor(_container, options) {
       this.zoom = options.location.zoom ?? 9;
     }
     addChild() {}
     removeChild() {}
-    update() {}
+    update(options) { window.__yandexMapUpdates.push(options); }
     destroy() {}
   }
   window.ymaps3 = {
@@ -87,7 +94,8 @@ test('keeps one settlement list before and after hydration', async ({
   const hydrationMessages: string[] = [];
   const dataResponse = await request.get('/815/compare/data/explorer.json');
   expect(dataResponse.ok()).toBe(true);
-  const payload = (await dataResponse.json()) as {
+  const dataBody = await dataResponse.body();
+  const payload = JSON.parse(dataBody.toString()) as {
     readonly settlements: readonly unknown[];
   };
   const expectedCount = payload.settlements.length;
@@ -98,7 +106,7 @@ test('keeps one settlement list before and after hydration', async ({
   });
   const noJavaScriptPage = await noJavaScriptContext.newPage();
   noJavaScriptPage.on('request', (pageRequest) => {
-    if (pageRequest.url().endsWith('/815/compare/data/explorer.json')) {
+    if (isExplorerDataUrl(pageRequest.url())) {
       noJavaScriptDataRequests.push(pageRequest.url());
     }
   });
@@ -130,7 +138,7 @@ test('keeps one settlement list before and after hydration', async ({
   await page.setViewportSize(mobileViewports[1]);
   page.on('request', (pageRequest) => {
     const url = pageRequest.url();
-    if (url.endsWith('/815/compare/data/explorer.json')) {
+    if (isExplorerDataUrl(url)) {
       explorerDataRequests.push(url);
     }
     if (explorerGraphPattern.test(url)) {
@@ -154,6 +162,9 @@ test('keeps one settlement list before and after hydration', async ({
     await expect(control).toBeEnabled();
   }
   expect(explorerDataRequests).toHaveLength(1);
+  expect(new URL(explorerDataRequests[0] ?? '').searchParams.get('v')).toBe(
+    createHash('sha256').update(dataBody).digest('hex'),
+  );
   expect(explorerGraphRequests).toHaveLength(1);
   expect(yandexMapRequests).toHaveLength(0);
   expect(hydrationMessages).toHaveLength(0);
@@ -172,7 +183,7 @@ test('keeps SSR cards and retries explorer hydration after a data failure', asyn
   let dataRequests = 0;
   const graphRequests: string[] = [];
   await page.setViewportSize(mobileViewports[1]);
-  await page.route('**/815/compare/data/explorer.json', async (route) => {
+  await page.route(explorerDataPattern, async (route) => {
     dataRequests += 1;
     if (dataRequests === 1) {
       await route.abort('failed');
@@ -223,7 +234,7 @@ test('retries repeated production component graph failures with fresh URLs', asy
   });
   page.on('request', (request) => {
     const url = request.url();
-    if (url.endsWith('/815/compare/data/explorer.json')) {
+    if (isExplorerDataUrl(url)) {
       explorerDataRequests.push(url);
     }
   });
@@ -283,7 +294,7 @@ test('reloads Yandex Maps after its ready promise rejects', async ({
     if (explorerGraphPattern.test(url)) {
       componentRequests.push(url);
     }
-    if (url.endsWith('/815/compare/data/explorer.json')) {
+    if (isExplorerDataUrl(url)) {
       explorerDataRequests.push(url);
     }
   });
@@ -481,6 +492,20 @@ test('keeps every tariff filter usable beside the map button on mobile', async (
         mapOutsideViewport: false,
         pageHasHorizontalOverflow: false,
       });
+
+      await mapButton.click();
+      await expect(page.getByTestId('settlement-map')).toBeVisible();
+      await expect
+        .poll(() =>
+          page.evaluate(() => {
+            const testWindow = window as typeof window & {
+              readonly __yandexMapUpdates?: readonly unknown[];
+            };
+
+            return testWindow.__yandexMapUpdates?.length ?? 0;
+          }),
+        )
+        .toBeGreaterThan(0);
     });
   }
 });

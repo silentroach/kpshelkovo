@@ -1,4 +1,6 @@
 ---
+import { createHash } from 'node:crypto';
+
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/compare/components/Hero.svelte';
 import KPIStats from '@/compare/components/KPIStats.svelte';
@@ -18,6 +20,11 @@ import { withBase } from '@/compare/lib/url';
 const explorer = toExplorerPayload(await loadAllData());
 const { settlements: list, comparisons, stats } = explorer;
 const ratingUrl = withBase('/rating/');
+const explorerPayloadUrl = `${withBase('/data/explorer.json')}?v=${createHash(
+  'sha256',
+)
+  .update(JSON.stringify(explorer))
+  .digest('hex')}`;
 
 const cards = [...list].sort((a, b) => {
   const d = b.rating - a.rating;
@@ -94,7 +101,7 @@ const schema = {
           Попробовать снова
         </button>
       </div>
-      <div data-explorer-root>
+      <div data-explorer-root data-explorer-payload-url={explorerPayloadUrl}>
         <SettlementsExplorer settlements={list} {comparisons} {stats} />
       </div>
     </section>

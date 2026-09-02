@@ -486,6 +486,7 @@
     if (!signatureReady) {
       previousSettlementSignature = signature;
       previousFitRevision = currentFitRevision;
+      pendingAutofit = (currentFitRevision ?? 0) > 0;
       signatureReady = true;
     } else if (signature !== previousSettlementSignature) {
       if (currentFitRevision === undefined) pendingAutofit = true;

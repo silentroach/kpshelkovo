@@ -14,9 +14,10 @@ export interface ExplorerBootstrapElements {
   readonly root: HTMLElement;
   readonly error: HTMLElement;
   readonly retry: HTMLButtonElement;
+  readonly payloadUrl: string;
 }
 
 export interface ExplorerBootstrapDependencies {
   readonly loadClient: () => Promise<ExplorerClientModule>;
-  readonly loadPayload: () => Promise<ExplorerPayload>;
+  readonly loadPayload: (url: string) => Promise<ExplorerPayload>;
 }

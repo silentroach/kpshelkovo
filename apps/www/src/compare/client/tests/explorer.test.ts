@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { startSettlementsExplorer } from '../explorer';
 import type {
   ExplorerBootstrapDependencies,
+  ExplorerBootstrapElements,
   ExplorerClientModule,
 } from '../explorer.types';
 import type { ExplorerPayload } from '../../lib/explorer';
@@ -27,17 +28,17 @@ const payload = {
   },
 } satisfies ExplorerPayload;
 
-const renderBootstrap = (): {
-  readonly root: HTMLElement;
-  readonly error: HTMLElement;
-  readonly retry: HTMLButtonElement;
-} => {
+const payloadUrl = '/815/compare/data/explorer.json?v=payload-digest';
+
+const renderBootstrap = (): ExplorerBootstrapElements => {
   document.body.innerHTML = `
     <div data-explorer-error hidden>
       <p>Не удалось загрузить интерактивное сравнение</p>
       <button type="button" data-explorer-retry>Попробовать снова</button>
     </div>
-    <div data-explorer-root><article data-server-card>SSR card</article></div>
+    <div data-explorer-root data-explorer-payload-url="${payloadUrl}">
+      <article data-server-card>SSR card</article>
+    </div>
   `;
   const root = document.querySelector<HTMLElement>('[data-explorer-root]');
   const error = document.querySelector<HTMLElement>('[data-explorer-error]');
@@ -47,7 +48,7 @@ const renderBootstrap = (): {
 
   if (!root || !error || !retry) throw new Error('Expected bootstrap fixture');
 
-  return { root, error, retry };
+  return { root, error, retry, payloadUrl };
 };
 
 const createRuntime = (): {
@@ -81,6 +82,7 @@ describe('settlements explorer bootstrap', () => {
 
     expect(runtime.loadClient).toHaveBeenCalledOnce();
     expect(runtime.loadPayload).toHaveBeenCalledOnce();
+    expect(runtime.loadPayload).toHaveBeenCalledWith(payloadUrl);
     await vi.waitFor(() => expect(client.hydrate).toHaveBeenCalledOnce());
 
     expect(elements.root.querySelector('[data-server-card]')).toBeTruthy();
