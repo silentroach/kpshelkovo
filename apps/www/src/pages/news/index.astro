@@ -33,7 +33,7 @@ const schema = collectionPageSchema({
   keywords={['новости Шелково', 'новости ОК Комфорт', 'архив новостей Шелково']}
   schema={schema}
 >
-  <main class="ui-page pb-6 md:pb-10 lg:pb-12">
+  <main class="ui-page news-page">
     <section class="ui-page-header">
       <div class="ui-page-header-stack">
         <Breadcrumbs items={breadcrumbs} />
@@ -42,7 +42,7 @@ const schema = collectionPageSchema({
       </div>
     </section>
 
-    <section class="mt-8">
+    <section class="news-feed">
       <h2 class="ui-visually-hidden">Лента новостей</h2>
       <NewsList
         articles={articles}
@@ -53,8 +53,8 @@ const schema = collectionPageSchema({
 
     {
       data.archives.years.length > 0 && (
-        <section class="mt-8 px-5 md:px-6" data-pagefind-ignore>
-          <a class="ui-link font-semibold" href={newsArchiveUrl()}>
+        <section class="news-archive" data-pagefind-ignore>
+          <a class="ui-link news-archive__link" href={newsArchiveUrl()}>
             Архив новостей
           </a>
         </section>
@@ -62,3 +62,38 @@ const schema = collectionPageSchema({
     }
   </main>
 </BaseLayout>
+
+<style>
+  .news-page {
+    padding-block-end: 1.5rem;
+  }
+
+  .news-feed {
+    margin-block-start: 2rem;
+  }
+
+  .news-archive {
+    margin-block-start: 2rem;
+    padding-inline: 1.25rem;
+  }
+
+  .news-archive__link {
+    font-weight: 600;
+  }
+
+  @media (min-width: 48rem) {
+    .news-page {
+      padding-block-end: 2.5rem;
+    }
+
+    .news-archive {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .news-page {
+      padding-block-end: 3rem;
+    }
+  }
+</style>
