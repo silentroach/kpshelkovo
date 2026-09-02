@@ -41,18 +41,16 @@ const schema = {
   showSiteFooter={false}
   overlaySiteHeader
 >
-  <main class="relative h-svh min-h-[30rem] overflow-hidden">
+  <main class="map-page">
     <h1 class="ui-visually-hidden">Карта мест и объектов Шелково</h1>
     <PlaceMap dataUrl={placesDataUrl()} {fallbackPlace} client:load />
 
     <noscript>
-      <div
-        class="absolute inset-x-4 bottom-4 z-30 border border-border bg-[color:var(--color-surface)] p-4 md:inset-x-auto md:bottom-6 md:left-6 md:max-w-sm"
-      >
-        <p class="text-sm leading-6 text-muted-foreground">
+      <div class="map-fallback">
+        <p class="map-fallback__copy">
           Для карты нужен JavaScript. <a
             href={places[0]?.url ?? placesUrl()}
-            class="site-text-link font-semibold"
+            class="site-text-link map-fallback__link"
             >{
               places[0]
                 ? `Открыть карточку «${places[0].name}»`
@@ -64,3 +62,42 @@ const schema = {
     </noscript>
   </main>
 </BaseLayout>
+
+<style>
+  .map-page {
+    position: relative;
+    height: 100svh;
+    min-height: 30rem;
+    overflow: hidden;
+  }
+
+  .map-fallback {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+    z-index: 30;
+    border: 1px solid var(--color-border);
+    padding: 1rem;
+    background: var(--color-surface);
+  }
+
+  .map-fallback__copy {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  .map-fallback__link {
+    font-weight: 600;
+  }
+
+  @media (min-width: 48rem) {
+    .map-fallback {
+      right: auto;
+      bottom: 1.5rem;
+      left: 1.5rem;
+      max-width: 24rem;
+    }
+  }
+</style>
