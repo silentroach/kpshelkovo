@@ -182,7 +182,9 @@ jobs:
           ssh_opts="-p $DEPLOY_PORT -o ControlMaster=auto -o ControlPersist=600 -o ControlPath=$HOME/.ssh/cm-%C"
           scp_opts="-P $DEPLOY_PORT -o ControlMaster=auto -o ControlPersist=600 -o ControlPath=$HOME/.ssh/cm-%C"
 
+          scp $scp_opts ops/nginx/deploy-nginx-service.sh "$DEPLOY_USER@$DEPLOY_HOST:/tmp/deploy-nginx-service.sh"
           scp $scp_opts ops/nginx/deploy-nginx-site.sh "$DEPLOY_USER@$DEPLOY_HOST:/tmp/deploy-nginx-site.sh"
+          scp $scp_opts ops/nginx/nginx-service-restart.conf "$DEPLOY_USER@$DEPLOY_HOST:/tmp/nginx-service-restart.conf.new"
           scp $scp_opts ops/nginx/kpshelkovo-online.conf "$DEPLOY_USER@$DEPLOY_HOST:/tmp/kpshelkovo-online.conf.new"
           scp $scp_opts ops/nginx/media-kpshelkovo-online.conf "$DEPLOY_USER@$DEPLOY_HOST:/tmp/media-kpshelkovo-online.conf.new"
           scp $scp_opts ops/nginx/sravni-shelkovo.conf "$DEPLOY_USER@$DEPLOY_HOST:/tmp/sravni-shelkovo.conf.new"
@@ -190,9 +192,11 @@ jobs:
           ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" '
             set -eu
 
-            trap "rm -f /tmp/deploy-nginx-site.sh /tmp/kpshelkovo-online.conf.new /tmp/media-kpshelkovo-online.conf.new /tmp/sravni-shelkovo.conf.new" EXIT
+            trap "rm -f /tmp/deploy-nginx-service.sh /tmp/deploy-nginx-site.sh /tmp/nginx-service-restart.conf.new /tmp/kpshelkovo-online.conf.new /tmp/media-kpshelkovo-online.conf.new /tmp/sravni-shelkovo.conf.new" EXIT
 
+            sudo -n install -m 755 /tmp/deploy-nginx-service.sh /usr/local/sbin/deploy-nginx-service
             sudo -n install -m 755 /tmp/deploy-nginx-site.sh /usr/local/sbin/deploy-nginx-site
+            sudo -n /usr/local/sbin/deploy-nginx-service /tmp/nginx-service-restart.conf.new
             sudo -n /usr/local/sbin/deploy-nginx-site /tmp/kpshelkovo-online.conf.new kpshelkovo-online
             sudo -n /usr/local/sbin/deploy-nginx-site /tmp/media-kpshelkovo-online.conf.new media-kpshelkovo-online
             sudo -n /usr/local/sbin/deploy-nginx-site /tmp/sravni-shelkovo.conf.new sravni-shelkovo
