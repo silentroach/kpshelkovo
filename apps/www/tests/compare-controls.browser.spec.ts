@@ -1,4 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { createHash } from 'node:crypto';
+
+import { expect, test, type Page } from '@playwright/test';
 
 const mobileViewports = [
   { width: 320, height: 760 },
@@ -11,6 +13,51 @@ const breadcrumbViewports = [
 ] as const;
 const explorerControlSelector =
   '[data-testid="explorer-controls"] input, [data-testid="explorer-controls"] button, [data-testid="sort-select"]';
+const explorerGraphPattern =
+  /\/static\/SettlementsExplorerClient\.[^/]+\.js(?:\?.*)?$/u;
+const explorerDataPattern =
+  /\/static\/settlements-explorer\/([a-f0-9]{64})\.json(?:\?.*)?$/u;
+const getExplorerDataVersion = (url: string): string | undefined =>
+  explorerDataPattern.exec(url)?.[1];
+const isExplorerDataUrl = (url: string): boolean =>
+  getExplorerDataVersion(url) !== undefined;
+const yandexMapsReadyScript = `
+  window.__yandexMapUpdates = [];
+  class YMap {
+    constructor(_container, options) {
+      this.zoom = options.location.zoom ?? 9;
+    }
+    addChild() {}
+    removeChild() {}
+    update(options) { window.__yandexMapUpdates.push(options); }
+    destroy() {}
+  }
+  window.ymaps3 = {
+    ready: Promise.resolve(),
+    YMap,
+    YMapDefaultSchemeLayer: class {},
+    YMapDefaultFeaturesLayer: class {},
+    YMapMarker: class { update() {} },
+  };
+`;
+
+const getYandexMapUpdateCount = (page: Page): Promise<number> =>
+  page.evaluate(() => {
+    const testWindow = window as typeof window & {
+      readonly __yandexMapUpdates?: readonly unknown[];
+    };
+
+    return testWindow.__yandexMapUpdates?.length ?? 0;
+  });
+
+test.beforeEach(async ({ page }) => {
+  await page.route('https://api-maps.yandex.ru/**', async (route) => {
+    await route.fulfill({
+      contentType: 'application/javascript',
+      body: yandexMapsReadyScript,
+    });
+  });
+});
 
 test('aligns settlement breadcrumbs with the compare index', async ({
   page,
@@ -51,9 +98,15 @@ test('keeps one settlement list before and after hydration', async ({
   page,
   request,
 }) => {
+  const noJavaScriptDataRequests: string[] = [];
+  const explorerDataRequests: string[] = [];
+  const explorerGraphRequests: string[] = [];
+  const yandexMapRequests: string[] = [];
+  const hydrationMessages: string[] = [];
   const dataResponse = await request.get('/815/compare/data/explorer.json');
   expect(dataResponse.ok()).toBe(true);
-  const payload = (await dataResponse.json()) as {
+  const dataBody = await dataResponse.body();
+  const payload = JSON.parse(dataBody.toString()) as {
     readonly settlements: readonly unknown[];
   };
   const expectedCount = payload.settlements.length;
@@ -63,6 +116,11 @@ test('keeps one settlement list before and after hydration', async ({
     viewport: mobileViewports[1],
   });
   const noJavaScriptPage = await noJavaScriptContext.newPage();
+  noJavaScriptPage.on('request', (pageRequest) => {
+    if (isExplorerDataUrl(pageRequest.url())) {
+      noJavaScriptDataRequests.push(pageRequest.url());
+    }
+  });
 
   try {
     await noJavaScriptPage.goto('/815/compare/', {
@@ -83,11 +141,29 @@ test('keeps one settlement list before and after hydration', async ({
     for (const control of await controlElements.all()) {
       await expect(control).toBeDisabled();
     }
+    expect(noJavaScriptDataRequests).toHaveLength(0);
   } finally {
     await noJavaScriptContext.close();
   }
 
   await page.setViewportSize(mobileViewports[1]);
+  page.on('request', (pageRequest) => {
+    const url = pageRequest.url();
+    if (isExplorerDataUrl(url)) {
+      explorerDataRequests.push(url);
+    }
+    if (explorerGraphPattern.test(url)) {
+      explorerGraphRequests.push(url);
+    }
+    if (url.includes('api-maps.yandex.ru')) {
+      yandexMapRequests.push(url);
+    }
+  });
+  page.on('console', (message) => {
+    if (/hydration|mismatch/iu.test(message.text())) {
+      hydrationMessages.push(message.text());
+    }
+  });
   await page.goto('/815/compare/', { waitUntil: 'networkidle' });
 
   await expect(page.getByTestId('settlement-card')).toHaveCount(expectedCount);
@@ -96,6 +172,192 @@ test('keeps one settlement list before and after hydration', async ({
   for (const control of await controlElements.all()) {
     await expect(control).toBeEnabled();
   }
+  expect(explorerDataRequests).toHaveLength(1);
+  expect(getExplorerDataVersion(explorerDataRequests[0] ?? '')).toBe(
+    createHash('sha256').update(dataBody).digest('hex'),
+  );
+  expect(explorerGraphRequests).toHaveLength(1);
+  expect(yandexMapRequests).toHaveLength(0);
+  expect(hydrationMessages).toHaveLength(0);
+  await expect(
+    page.locator('link[rel="preconnect"][href*="api-maps.yandex.ru"]'),
+  ).toHaveCount(0);
+
+  await page.getByTestId('map-toggle').click();
+  await expect(page.getByTestId('settlement-map')).toBeVisible();
+  await expect.poll(() => yandexMapRequests.length).toBe(1);
+});
+
+test('keeps SSR cards and retries explorer hydration after a data failure', async ({
+  page,
+}) => {
+  let dataRequests = 0;
+  const graphRequests: string[] = [];
+  await page.setViewportSize(mobileViewports[1]);
+  await page.route(explorerDataPattern, async (route) => {
+    dataRequests += 1;
+    if (dataRequests === 1) {
+      await route.abort('failed');
+      return;
+    }
+
+    await route.continue();
+  });
+  page.on('request', (request) => {
+    const url = request.url();
+    if (explorerGraphPattern.test(url)) graphRequests.push(url);
+  });
+
+  await page.goto('/815/compare/', { waitUntil: 'domcontentloaded' });
+
+  expect(await page.getByTestId('settlement-card').count()).toBeGreaterThan(0);
+  await expect(page.getByRole('alert')).toBeVisible();
+  for (const control of await page.locator(explorerControlSelector).all()) {
+    await expect(control).toBeDisabled();
+  }
+  expect(dataRequests).toBe(1);
+  await expect.poll(() => graphRequests.length).toBe(1);
+
+  await page.getByRole('button', { name: 'Попробовать снова' }).click();
+
+  for (const control of await page.locator(explorerControlSelector).all()) {
+    await expect(control).toBeEnabled();
+  }
+  await expect(page.getByRole('alert')).toBeHidden();
+  expect(dataRequests).toBe(2);
+  expect(graphRequests).toHaveLength(1);
+});
+
+test('retries repeated production component graph failures with fresh URLs', async ({
+  page,
+}) => {
+  const graphRequests: string[] = [];
+  const explorerDataRequests: string[] = [];
+  await page.setViewportSize(mobileViewports[1]);
+  await page.route(explorerGraphPattern, async (route) => {
+    graphRequests.push(route.request().url());
+    if (graphRequests.length <= 2) {
+      await route.abort('failed');
+      return;
+    }
+
+    await route.continue();
+  });
+  page.on('request', (request) => {
+    const url = request.url();
+    if (isExplorerDataUrl(url)) {
+      explorerDataRequests.push(url);
+    }
+  });
+
+  await page.goto('/815/compare/', { waitUntil: 'domcontentloaded' });
+
+  await expect(page.getByRole('alert')).toBeVisible();
+  expect(await page.getByTestId('settlement-card').count()).toBeGreaterThan(0);
+  expect(graphRequests).toHaveLength(1);
+  expect(explorerDataRequests).toHaveLength(1);
+
+  await page.getByRole('button', { name: 'Попробовать снова' }).click();
+
+  await expect.poll(() => explorerDataRequests.length).toBe(2);
+  await expect.poll(() => graphRequests.length).toBe(2);
+  await expect(page.getByRole('alert')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Попробовать снова' }).click();
+
+  await expect.poll(() => explorerDataRequests.length).toBe(3);
+  await expect.poll(() => graphRequests.length).toBe(3);
+  expect(new Set(graphRequests).size).toBe(3);
+  expect(
+    graphRequests.map(
+      (url) => new URL(url).searchParams.get('explorer-retry') ?? 'initial',
+    ),
+  ).toEqual(['initial', '1', '2']);
+  for (const control of await page.locator(explorerControlSelector).all()) {
+    await expect(control).toBeEnabled();
+  }
+  await expect(page.getByRole('alert')).toBeHidden();
+});
+
+test('reloads Yandex Maps after its ready promise rejects', async ({
+  page,
+}) => {
+  const componentRequests: string[] = [];
+  const explorerDataRequests: string[] = [];
+  const yandexMapRequests: string[] = [];
+  await page.unroute('https://api-maps.yandex.ru/**');
+  await page.route('https://api-maps.yandex.ru/**', async (route) => {
+    yandexMapRequests.push(route.request().url());
+    await route.fulfill({
+      contentType: 'application/javascript',
+      body:
+        yandexMapRequests.length === 1
+          ? `
+              const ready = Promise.reject(new Error('Yandex Maps initialization failed'));
+              ready.catch(() => {});
+              window.ymaps3 = { ready };
+            `
+          : yandexMapsReadyScript,
+    });
+  });
+  page.on('request', (request) => {
+    const url = request.url();
+    if (explorerGraphPattern.test(url)) {
+      componentRequests.push(url);
+    }
+    if (isExplorerDataUrl(url)) {
+      explorerDataRequests.push(url);
+    }
+  });
+  await page.setViewportSize(mobileViewports[1]);
+
+  await page.goto('/815/compare/', { waitUntil: 'networkidle' });
+
+  expect(componentRequests).toHaveLength(1);
+  expect(explorerDataRequests).toHaveLength(1);
+  expect(yandexMapRequests).toHaveLength(0);
+
+  await page.getByTestId('map-toggle').click();
+
+  await expect(
+    page.getByRole('button', { name: 'Попробовать снова' }),
+  ).toBeVisible();
+  expect(yandexMapRequests).toHaveLength(1);
+  expect(componentRequests).toHaveLength(1);
+  expect(explorerDataRequests).toHaveLength(1);
+
+  await page.getByRole('button', { name: 'Попробовать снова' }).click();
+
+  await expect.poll(() => yandexMapRequests.length).toBe(2);
+  await expect(
+    page.getByRole('button', { name: 'Попробовать снова' }),
+  ).toHaveCount(0);
+  await expect(page.getByText('Загрузка карты...')).toHaveCount(0);
+  expect(componentRequests).toHaveLength(1);
+  expect(explorerDataRequests).toHaveLength(1);
+});
+
+test('hydrates filters and sorting from the shared URL', async ({
+  page,
+  request,
+}) => {
+  const dataResponse = await request.get('/815/compare/data/explorer.json');
+  const payload = (await dataResponse.json()) as {
+    readonly stats: { readonly cheaperCount: number };
+  };
+
+  await page.setViewportSize(desktopViewport);
+  await page.goto('/815/compare/?sort=tariff_asc&price=cheaper', {
+    waitUntil: 'networkidle',
+  });
+
+  await expect(page.getByTestId('filtered-map')).toBeVisible();
+  await expect(page.getByTestId('price-cheaper')).toBeChecked();
+  await expect(page.getByTestId('sort-select')).toHaveValue('tariff_asc');
+  await expect(page.getByTestId('settlement-card')).toHaveCount(
+    payload.stats.cheaperCount,
+  );
+  await expect.poll(() => getYandexMapUpdateCount(page)).toBe(1);
 });
 
 test('keeps the desktop list position through hydration', async ({
@@ -243,6 +505,10 @@ test('keeps every tariff filter usable beside the map button on mobile', async (
         mapOutsideViewport: false,
         pageHasHorizontalOverflow: false,
       });
+
+      await mapButton.click();
+      await expect(page.getByTestId('settlement-map')).toBeVisible();
+      await expect.poll(() => getYandexMapUpdateCount(page)).toBeGreaterThan(0);
     });
   }
 });

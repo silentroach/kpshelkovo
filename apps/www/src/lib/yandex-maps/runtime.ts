@@ -96,6 +96,13 @@ export const waitForStableLayout = async (): Promise<void> => {
 const getExistingMapsScript = (): HTMLScriptElement | undefined =>
   document.querySelector<HTMLScriptElement>(MAP_SCRIPT_SELECTOR) ?? undefined;
 
+const resetYandexMapsRuntime = (): void => {
+  mapsLoadPromise = undefined;
+  getExistingMapsScript()?.remove();
+  Reflect.set(window, 'ymaps3', undefined);
+  Reflect.deleteProperty(window, 'ymaps3');
+};
+
 const appendMapsScript = (): Promise<void> =>
   new Promise((resolve, reject) => {
     const existing = getExistingMapsScript();
@@ -106,12 +113,10 @@ const appendMapsScript = (): Promise<void> =>
     }
 
     const script = existing ?? document.createElement('script');
-    const timer = window.setTimeout(() => {
-      reject(new Error('Не удалось загрузить карту'));
-    }, MAP_SCRIPT_TIMEOUT_MS);
+    let timer: number | undefined;
 
     const cleanup = (): void => {
-      window.clearTimeout(timer);
+      if (timer !== undefined) window.clearTimeout(timer);
       script.removeEventListener('load', onLoad);
       script.removeEventListener('error', onError);
     };
@@ -124,8 +129,11 @@ const appendMapsScript = (): Promise<void> =>
 
     const onError = (): void => {
       cleanup();
+      script.remove();
       reject(new Error('Не удалось загрузить карту'));
     };
+
+    timer = window.setTimeout(onError, MAP_SCRIPT_TIMEOUT_MS);
 
     script.addEventListener('load', onLoad, { once: true });
     script.addEventListener('error', onError, { once: true });
@@ -141,14 +149,26 @@ const appendMapsScript = (): Promise<void> =>
 export const loadYandexMaps = async (): Promise<void> => {
   await waitForStableLayout();
 
-  if (window.ymaps3) return;
+  if (!window.ymaps3) {
+    if (!API_KEY) throw new Error('API ключ не настроен');
 
-  if (!API_KEY) throw new Error('API ключ не настроен');
+    mapsLoadPromise ??= appendMapsScript().catch((error) => {
+      resetYandexMapsRuntime();
+      throw error;
+    });
+    await mapsLoadPromise;
+  }
 
-  mapsLoadPromise ??= appendMapsScript().catch((error) => {
-    mapsLoadPromise = undefined;
+  const maps = window.ymaps3;
+  if (!maps) {
+    resetYandexMapsRuntime();
+    throw new Error('Yandex Maps API не доступен');
+  }
+
+  try {
+    await maps.ready;
+  } catch (error) {
+    resetYandexMapsRuntime();
     throw error;
-  });
-
-  return mapsLoadPromise;
+  }
 };

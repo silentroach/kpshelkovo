@@ -15,9 +15,10 @@ import { loadSitemapMetadataIndex } from './src/lib/sitemap-data';
 import { createAstroMarkdownProcessor } from './src/lib/markdown/astro-processor';
 import { indexNowUrlManifest } from './src/integrations/indexnow-url-manifest';
 import { pagefindDevSnapshot } from './src/integrations/pagefind-dev-snapshot';
+import { retryableSettlementsExplorer } from './src/integrations/retryable-settlements-explorer';
 import { statusCalendarAlternateValidation } from './src/integrations/status-calendar-alternate-validation';
 
-const plugins = [tailwindcss()];
+const plugins = [tailwindcss(), ...retryableSettlementsExplorer()];
 const devServerPort = 4321;
 const site = 'https://kpshelkovo.online';
 let sitemapMetadataIndex: Promise<SitemapMetadataIndex> | undefined;

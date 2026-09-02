@@ -10,3 +10,7 @@ interface ImportMeta {
 interface Window {
   ymaps3?: typeof ymaps3;
 }
+
+declare module 'virtual:settlements-explorer-assets' {
+  export const explorerGraphUrl: string;
+}

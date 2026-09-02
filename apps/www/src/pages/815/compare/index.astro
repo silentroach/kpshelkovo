@@ -8,20 +8,17 @@ import {
   compareBreadcrumbs,
   compareBreadcrumbSchema,
 } from '@/compare/lib/breadcrumbs';
-import { loadAllData } from '@/compare/lib/data';
-import { toExplorer } from '@/compare/lib/explorer';
+import { loadExplorerSnapshot } from '@/compare/lib/explorer-snapshot';
 import { compareHomeMeta } from '@/compare/lib/seo';
 import { canon } from '@/compare/lib/site';
 import { withBase } from '@/compare/lib/url';
 
 // Load all data at build time
-const { settlements, baseline, stats, comparisons, ratings } =
-  await loadAllData();
-const list = toExplorer(settlements, ratings, baseline);
-
-// Convert comparisons Map to a plain object for serialization
-const comparisonsObj = Object.fromEntries(comparisons);
+const explorerSnapshot = await loadExplorerSnapshot();
+const explorer = explorerSnapshot.payload;
+const { settlements: list, comparisons, stats } = explorer;
 const ratingUrl = withBase('/rating/');
+const explorerPayloadUrl = explorerSnapshot.url;
 
 const cards = [...list].sort((a, b) => {
   const d = b.rating - a.rating;
@@ -58,7 +55,6 @@ const schema = {
   description={pageMeta.description}
   keywords={pageMeta.keywords}
   schema={[schema, breadcrumb]}
-  preconnectYandexMaps
 >
   <main class="ui-page pb-6 md:pb-10 lg:pb-12">
     <section class="ui-page-header">
@@ -84,12 +80,49 @@ const schema = {
       <h2 id="settlements-title" class="ui-visually-hidden">
         Список поселков для сравнения
       </h2>
-      <SettlementsExplorer
-        settlements={list}
-        comparisons={comparisonsObj}
-        {stats}
-        client:load
-      />
+      <div
+        class="explorer-error ui-shell"
+        data-explorer-error
+        hidden
+        role="alert"
+      >
+        <p>Не удалось загрузить интерактивное сравнение</p>
+        <button
+          type="button"
+          class="ui-btn ui-btn-sm ui-btn-ghost"
+          data-explorer-retry
+        >
+          Попробовать снова
+        </button>
+      </div>
+      <div data-explorer-root data-explorer-payload-url={explorerPayloadUrl}>
+        <SettlementsExplorer settlements={list} {comparisons} {stats} />
+      </div>
     </section>
   </main>
 </BaseLayout>
+
+<script>
+  import { installSettlementsExplorer } from '@/compare/client/explorer';
+
+  installSettlementsExplorer();
+</script>
+
+<style>
+  .explorer-error {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border: 1px solid var(--color-danger-border);
+    padding: 0.75rem 1rem;
+    color: var(--color-text);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+  }
+
+  .explorer-error[hidden] {
+    display: none;
+  }
+</style>

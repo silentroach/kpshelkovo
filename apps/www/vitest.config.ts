@@ -5,11 +5,13 @@ import { getViteConfig } from 'astro/config';
 const visualTests = ['tests/**/*.visual.local.spec.ts'];
 const searchQualityTests = ['tests/search-quality.test.ts'];
 const domTests = [
+  'src/compare/client/tests/**/*.test.ts',
   'src/compare/components/**/*.test.ts',
   'src/components/places/tests/PlaceMap.test.ts',
   'src/components/search/tests/**/*.test.ts',
   'src/lib/home/hero.dom.test.ts',
   'src/lib/home/status.dom.test.ts',
+  'src/lib/yandex-maps/tests/**/*.test.ts',
   'src/lib/status/timeline.dom.test.ts',
   'src/lib/status/tests/**/*.dom.test.ts',
   'src/lib/reglament/calculator-controller.test.ts',
