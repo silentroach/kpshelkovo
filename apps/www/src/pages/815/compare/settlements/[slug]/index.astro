@@ -164,26 +164,24 @@ const heroMap = hasPoint
   preconnectYandexMaps
   search={search}
 >
-  <main class="ui-page relative pb-6 md:pb-10 lg:pb-12">
+  <main class="ui-page settlement-page">
     <h1 class="ui-visually-hidden">{settlement.name}</h1>
     <p class="ui-visually-hidden" data-pagefind-body>{searchDescription}</p>
 
-    <div
-      class="settlement-breadcrumbs ui-page-header relative z-30 mb-4 lg:absolute lg:inset-x-0 lg:mb-0"
-    >
+    <div class="settlement-breadcrumbs ui-page-header">
       <Breadcrumbs items={breadcrumbs} />
     </div>
 
-    <section
-      class="hero-bleed relative z-20 hidden lg:block"
-      data-testid="settlement-hero"
-    >
+    <section class="settlement-hero hero-bleed" data-testid="settlement-hero">
       <div
-        class={`hero-map-fade absolute inset-0 overflow-hidden ${hasPoint ? '' : 'hero-map-placeholder'}`}
+        class:list={[
+          'settlement-hero-map hero-map-fade',
+          { 'hero-map-placeholder': !hasPoint },
+        ]}
       >
         {
           hasPoint && (
-            <div class="absolute inset-0 opacity-80">
+            <div class="settlement-hero-map-canvas">
               <SettlementMap
                 settlements={heroMap}
                 interactive={false}
@@ -198,15 +196,13 @@ const heroMap = hasPoint
           )
         }
 
-        <div class="settlement-hero-wash-top absolute inset-0"></div>
-        <div class="settlement-hero-wash-bottom absolute inset-0"></div>
+        <div class="settlement-hero-wash-top"></div>
+        <div class="settlement-hero-wash-bottom"></div>
       </div>
 
-      <div
-        class="ui-page relative z-10 flex flex-col px-5 pt-8 pb-4 md:px-6 xl:pt-10 xl:pb-6"
-      >
-        <div class="flex items-start justify-end gap-4">
-          <div class="flex flex-wrap justify-end gap-2">
+      <div class="ui-page settlement-hero-content">
+        <div class="settlement-hero-label-row">
+          <div class="settlement-labels">
             {
               waterInc && (
                 <span class="ui-badge ui-badge-water" title={waterTitle}>
@@ -220,7 +216,7 @@ const heroMap = hasPoint
                   href={obmanUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="ui-badge ui-badge-danger transition-opacity hover:opacity-90"
+                  class="ui-badge ui-badge-danger settlement-badge-link"
                   title="Открыть Telegram-канал Коттеджное рабство"
                 >
                   Коттеджное рабство
@@ -236,11 +232,14 @@ const heroMap = hasPoint
         </div>
 
         <div
-          class={`w-full max-w-3xl self-start ${hasLabels ? 'mt-0' : 'mt-8'}`}
+          class:list={[
+            'settlement-hero-summary',
+            { 'settlement-hero-summary--spaced': !hasLabels },
+          ]}
         >
-          <div class="mb-4">
-            <div class="flex items-start gap-4">
-              <div class="min-w-0">
+          <div class="settlement-hero-heading">
+            <div class="settlement-hero-title-row">
+              <div class="settlement-hero-title-wrap">
                 <div
                   aria-hidden="true"
                   class="settlement-hero-title-shadow ui-page-title"
@@ -248,7 +247,7 @@ const heroMap = hasPoint
                   {settlement.name}
                 </div>
               </div>
-              <div class="mt-1 flex shrink-0 items-center gap-2">
+              <div class="settlement-hero-actions">
                 {
                   settlement.website && (
                     <a
@@ -259,7 +258,7 @@ const heroMap = hasPoint
                       class="ui-icon-btn"
                       title="Перейти на сайт поселка"
                     >
-                      <GlobeIcon class="h-5 w-5" />
+                      <GlobeIcon class="settlement-icon settlement-icon--desktop" />
                     </a>
                   )
                 }
@@ -273,7 +272,7 @@ const heroMap = hasPoint
                       class="ui-icon-btn"
                       title="Перейти в Telegram-канал"
                     >
-                      <TelegramIcon class="h-5 w-5 text-telegram" />
+                      <TelegramIcon class="settlement-icon settlement-icon--desktop settlement-icon--telegram" />
                     </a>
                   )
                 }
@@ -286,35 +285,31 @@ const heroMap = hasPoint
                   class="ui-icon-btn"
                   title="Открыть на Яндекс.Картах"
                 >
-                  <MapPinIcon class="h-5 w-5" />
+                  <MapPinIcon
+                    class="settlement-icon settlement-icon--desktop"
+                  />
                 </a>
               </div>
             </div>
-            <p
-              class="settlement-hero-text-shadow mt-2 text-base text-muted-foreground"
-            >
+            <p class="settlement-hero-district settlement-hero-text-shadow">
               {settlement.location.district}
             </p>
             {
               companyTitle && (
-                <div class="settlement-hero-glass-pill mt-3 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm backdrop-blur-[2px]">
-                  <span class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Обслуживается
-                  </span>
+                <div class="settlement-hero-glass-pill settlement-company-pill">
+                  <span class="settlement-company-label">Обслуживается</span>
                   {companyUrl ? (
                     <a
                       href={companyUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="font-semibold text-foreground underline decoration-foreground/30 underline-offset-3 transition-colors hover:text-primary"
+                      class="settlement-company-link"
                       title="Перейти на сайт управляющей компании"
                     >
                       {companyTitle}
                     </a>
                   ) : (
-                    <span class="font-semibold text-foreground">
-                      {companyTitle}
-                    </span>
+                    <span class="settlement-company-name">{companyTitle}</span>
                   )}
                 </div>
               )
@@ -322,19 +317,20 @@ const heroMap = hasPoint
           </div>
 
           <div
-            class={`grid gap-3 ${hasDelta ? 'grid-cols-[repeat(3,minmax(0,17rem))]' : 'grid-cols-[repeat(2,minmax(0,17rem))]'}`}
+            class:list={[
+              'settlement-hero-facts',
+              { 'settlement-hero-facts--three': hasDelta },
+            ]}
           >
-            <div
-              class="settlement-hero-glass-card relative z-20 rounded-2xl border p-4 backdrop-blur-[2px]"
-            >
-              <p
-                class="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
-              >
-                Тариф
-              </p>
-              <div class="group relative inline-flex max-w-full">
+            <div class="settlement-hero-glass-card settlement-tariff-card">
+              <p class="settlement-fact-label">Тариф</p>
+              <div class="settlement-tariff-group">
                 <span
-                  class={`ui-num text-xl font-semibold text-foreground ${tariffCalc ? 'cursor-help' : ''}`}
+                  class:list={[
+                    'ui-num',
+                    'settlement-tariff-value',
+                    { 'settlement-tariff-value--interactive': tariffCalc },
+                  ]}
                   tabindex={tariffCalc ? 0 : undefined}
                   aria-describedby={tariffCalc ? tipDesktopId : undefined}
                 >
@@ -345,52 +341,51 @@ const heroMap = hasPoint
                     <div
                       id={tipDesktopId}
                       role="tooltip"
-                      class="settlement-hero-tooltip pointer-events-none absolute left-0 top-full z-[80] mt-2 hidden w-[min(88vw,25rem)] rounded-xl border p-3 text-left backdrop-blur-md group-hover:block group-focus-within:block"
+                      class="settlement-hero-tooltip"
                     >
-                      <p class="text-xs text-muted-foreground">
-                        {tariffCalc.intro}
-                      </p>
+                      <p class="settlement-tooltip-muted">{tariffCalc.intro}</p>
                       {assumption && (
-                        <p class="mt-1 text-xs text-muted-foreground">
+                        <p class="settlement-tooltip-muted settlement-tooltip-line">
                           {assumption}
                         </p>
                       )}
                       {lotCalc && (
-                        <div class="mt-2 border-t border-border/60 pt-2">
-                          <p class="text-xs font-semibold text-foreground">
+                        <div class="settlement-tooltip-section">
+                          <p class="settlement-tooltip-title">
                             Средняя площадь участка
                           </p>
-                          <p class="mt-1 text-xs text-muted-foreground">
+                          <p class="settlement-tooltip-muted settlement-tooltip-line">
                             Данные: {lotCalc.known}
                           </p>
                           {lotCalc.factors && (
-                            <p class="text-xs text-muted-foreground">
+                            <p class="settlement-tooltip-muted">
                               Вычет: {lotCalc.factors}
                             </p>
                           )}
-                          <p class="text-xs text-foreground">
+                          <p class="settlement-tooltip-text">
                             Итого: {lotCalc.total}
                           </p>
                         </div>
                       )}
                       <div
-                        class={`mt-2 space-y-2 ${lotCalc ? 'border-t border-border/60 pt-2' : ''}`}
+                        class:list={[
+                          'settlement-tooltip-rows',
+                          { 'settlement-tooltip-rows--divided': lotCalc },
+                        ]}
                       >
                         {tariffCalc.rows.map((item) => (
                           <div>
-                            <p class="text-xs font-semibold text-foreground">
-                              {item.title}
-                            </p>
-                            <p class="text-xs text-muted-foreground">
+                            <p class="settlement-tooltip-title">{item.title}</p>
+                            <p class="settlement-tooltip-muted">
                               {item.source}
                             </p>
-                            <p class="text-xs text-foreground">
+                            <p class="settlement-tooltip-text">
                               {item.formula}
                             </p>
                           </div>
                         ))}
                       </div>
-                      <p class="mt-2 text-xs font-semibold text-foreground">
+                      <p class="settlement-tooltip-total">
                         Итого: {tariffCalc.total}
                       </p>
                     </div>
@@ -399,14 +394,14 @@ const heroMap = hasPoint
               </div>
               {
                 settlement.tariff.normalizedIsEstimate && (
-                  <p class="mt-1 text-xs text-muted-foreground opacity-75">
+                  <p class="settlement-tariff-detail settlement-tariff-detail--estimate">
                     {formatTariffBase(settlement.tariff)}
                   </p>
                 )
               }
               {
                 settlement.tariff.note && (
-                  <p class="mt-1 text-xs text-muted-foreground">
+                  <p class="settlement-tariff-detail">
                     {settlement.tariff.note}
                   </p>
                 )
@@ -415,17 +410,21 @@ const heroMap = hasPoint
 
             {
               hasDelta && comparison && (
-                <div class="settlement-hero-glass-card rounded-2xl border p-4 backdrop-blur-[2px]">
-                  <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Разница с Шелково
-                  </p>
+                <div class="settlement-hero-glass-card">
+                  <p class="settlement-fact-label">Разница с Шелково</p>
                   <p
-                    class={`ui-num text-xl font-semibold ${comparison.isCheaper ? 'text-success-text' : 'text-warning-text'}`}
+                    class:list={[
+                      'ui-num',
+                      'settlement-delta-value',
+                      comparison.isCheaper
+                        ? 'settlement-delta-value--cheaper'
+                        : 'settlement-delta-value--costlier',
+                    ]}
                   >
                     {comparison.isCheaper ? '−' : '+'}
                     {formatCurrency(Math.abs(comparison.tariffDelta))}
                   </p>
-                  <p class="mt-1 text-xs text-muted-foreground">
+                  <p class="settlement-fact-detail">
                     {comparison.isCheaper ? 'Дешевле' : 'Дороже'} на{' '}
                     {formatPercentage(comparison.tariffDeltaPercent / 100, {
                       signed: false,
@@ -435,20 +434,14 @@ const heroMap = hasPoint
               )
             }
 
-            <div
-              class="settlement-hero-glass-card rounded-2xl border p-4 backdrop-blur-[2px]"
-            >
-              <p
-                class="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
-              >
-                Расположение
-              </p>
-              <p class="text-sm font-semibold text-foreground">
+            <div class="settlement-hero-glass-card">
+              <p class="settlement-fact-label">Расположение</p>
+              <p class="settlement-location-address">
                 {settlement.location.addressText}
               </p>
               {
                 distanceFromShelkovo > 0 && (
-                  <p class="mt-1 text-xs text-muted-foreground">
+                  <p class="settlement-fact-detail">
                     {formatDistance(distanceFromShelkovo)} от Шелково
                   </p>
                 )
@@ -459,20 +452,16 @@ const heroMap = hasPoint
       </div>
     </section>
 
-    <header
-      class="mb-4 px-6 pb-4 pt-1 md:mb-8 md:px-8 md:pb-8 md:pt-1 lg:hidden"
-    >
-      <div
-        class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between"
-      >
+    <header class="settlement-mobile-header">
+      <div class="settlement-mobile-heading">
         <div>
-          <div class="mb-2 space-y-3">
-            <div class="min-w-0 flex-1">
+          <div class="settlement-mobile-title-group">
+            <div class="settlement-mobile-title-wrap">
               <div aria-hidden="true" class="ui-page-title">
                 {settlement.name}
               </div>
             </div>
-            <div class="flex flex-wrap items-center gap-2">
+            <div class="settlement-mobile-actions">
               {
                 settlement.website && (
                   <a
@@ -480,10 +469,10 @@ const heroMap = hasPoint
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Открыть сайт поселка"
-                    class="ui-btn ui-btn-sm ui-btn-outline min-h-9"
+                    class="ui-btn ui-btn-sm ui-btn-outline settlement-mobile-action"
                     title="Перейти на сайт поселка"
                   >
-                    <GlobeIcon class="h-4 w-4" />
+                    <GlobeIcon class="settlement-icon" />
                     <span>Сайт</span>
                   </a>
                 )
@@ -495,10 +484,10 @@ const heroMap = hasPoint
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Открыть Telegram-канал поселка"
-                    class="ui-btn ui-btn-sm ui-btn-outline min-h-9"
+                    class="ui-btn ui-btn-sm ui-btn-outline settlement-mobile-action"
                     title="Перейти в Telegram-канал"
                   >
-                    <TelegramIcon class="h-4 w-4 text-telegram" />
+                    <TelegramIcon class="settlement-icon settlement-icon--telegram" />
                     <span>Telegram</span>
                   </a>
                 )
@@ -509,36 +498,34 @@ const heroMap = hasPoint
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Открыть поселок на Яндекс.Картах"
-                class="ui-btn ui-btn-sm ui-btn-outline min-h-9"
+                class="ui-btn ui-btn-sm ui-btn-outline settlement-mobile-action"
                 title="Открыть на Яндекс.Картах"
               >
-                <MapPinIcon class="h-4 w-4" />
+                <MapPinIcon class="settlement-icon" />
                 <span>Карта</span>
               </a>
             </div>
           </div>
         </div>
-        <p class="text-muted-foreground">
+        <p class="settlement-mobile-district">
           {settlement.location.district}
         </p>
         {
           companyTitle && (
-            <p class="mt-2 text-sm text-muted-foreground">
+            <p class="settlement-mobile-company">
               Обслуживается:{' '}
               {companyUrl ? (
                 <a
                   href={companyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="font-semibold text-foreground underline decoration-foreground/30 underline-offset-2 transition-colors hover:text-primary"
+                  class="settlement-company-link settlement-company-link--mobile"
                   title="Перейти на сайт управляющей компании"
                 >
                   {companyTitle}
                 </a>
               ) : (
-                <span class="font-semibold text-foreground">
-                  {companyTitle}
-                </span>
+                <span class="settlement-company-name">{companyTitle}</span>
               )}
             </p>
           )
@@ -547,7 +534,7 @@ const heroMap = hasPoint
 
       {
         hasLabels && (
-          <div class="mt-4 flex flex-wrap gap-2">
+          <div class="settlement-mobile-labels">
             {waterInc && (
               <span class="ui-badge ui-badge-water" title={waterTitle}>
                 Вода в тарифе
@@ -558,7 +545,7 @@ const heroMap = hasPoint
                 href={obmanUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="ui-badge ui-badge-danger transition-opacity hover:opacity-90"
+                class="ui-badge ui-badge-danger settlement-badge-link"
                 title="Открыть Telegram-канал Коттеджное рабство"
               >
                 Коттеджное рабство
@@ -572,24 +559,17 @@ const heroMap = hasPoint
       }
     </header>
 
-    <section
-      class="relative z-20 mb-5 px-6 py-0 md:mb-8 md:px-8 lg:hidden"
-      data-testid="base-info-section"
-    >
+    <section class="settlement-passport" data-testid="base-info-section">
       <h2 class="ui-visually-hidden">Паспорт поселка</h2>
 
-      <div class="max-w-3xl">
-        <p
-          class="font-body text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-        >
-          Тариф на обслуживание
-        </p>
-        <div class="mt-1 flex flex-wrap items-end gap-x-4 gap-y-1">
-          <div
-            class="ui-num group relative inline-flex max-w-full text-3xl font-semibold leading-tight text-foreground"
-          >
+      <div class="settlement-passport-content">
+        <p class="settlement-passport-label">Тариф на обслуживание</p>
+        <div class="settlement-passport-tariff">
+          <div class="ui-num settlement-passport-tariff-group">
             <span
-              class={tariffCalc ? 'cursor-help' : ''}
+              class:list={{
+                'settlement-tariff-value--interactive': tariffCalc,
+              }}
               tabindex={tariffCalc ? 0 : undefined}
               aria-describedby={tariffCalc ? tipMobileId : undefined}
             >
@@ -600,50 +580,47 @@ const heroMap = hasPoint
                 <div
                   id={tipMobileId}
                   role="tooltip"
-                  class="settlement-hero-tooltip pointer-events-none absolute left-0 top-full z-[80] mt-2 hidden w-[min(92vw,25rem)] rounded-xl border p-3 text-left text-sm backdrop-blur-md group-hover:block group-focus-within:block"
+                  class="settlement-hero-tooltip settlement-hero-tooltip--mobile"
                 >
-                  <p class="text-xs text-muted-foreground">
-                    {tariffCalc.intro}
-                  </p>
+                  <p class="settlement-tooltip-muted">{tariffCalc.intro}</p>
                   {assumption && (
-                    <p class="mt-1 text-xs text-muted-foreground">
+                    <p class="settlement-tooltip-muted settlement-tooltip-line">
                       {assumption}
                     </p>
                   )}
                   {lotCalc && (
-                    <div class="mt-2 border-t border-border/60 pt-2">
-                      <p class="text-xs font-semibold text-foreground">
+                    <div class="settlement-tooltip-section">
+                      <p class="settlement-tooltip-title">
                         Средняя площадь участка
                       </p>
-                      <p class="mt-1 text-xs text-muted-foreground">
+                      <p class="settlement-tooltip-muted settlement-tooltip-line">
                         Данные: {lotCalc.known}
                       </p>
                       {lotCalc.factors && (
-                        <p class="text-xs text-muted-foreground">
+                        <p class="settlement-tooltip-muted">
                           Вычет: {lotCalc.factors}
                         </p>
                       )}
-                      <p class="text-xs text-foreground">
+                      <p class="settlement-tooltip-text">
                         Итого: {lotCalc.total}
                       </p>
                     </div>
                   )}
                   <div
-                    class={`mt-2 space-y-2 ${lotCalc ? 'border-t border-border/60 pt-2' : ''}`}
+                    class:list={[
+                      'settlement-tooltip-rows',
+                      { 'settlement-tooltip-rows--divided': lotCalc },
+                    ]}
                   >
                     {tariffCalc.rows.map((item) => (
                       <div>
-                        <p class="text-xs font-semibold text-foreground">
-                          {item.title}
-                        </p>
-                        <p class="text-xs text-muted-foreground">
-                          {item.source}
-                        </p>
-                        <p class="text-xs text-foreground">{item.formula}</p>
+                        <p class="settlement-tooltip-title">{item.title}</p>
+                        <p class="settlement-tooltip-muted">{item.source}</p>
+                        <p class="settlement-tooltip-text">{item.formula}</p>
                       </div>
                     ))}
                   </div>
-                  <p class="mt-2 text-xs font-semibold text-foreground">
+                  <p class="settlement-tooltip-total">
                     Итого: {tariffCalc.total}
                   </p>
                 </div>
@@ -652,14 +629,14 @@ const heroMap = hasPoint
           </div>
           {
             settlement.tariff.normalizedIsEstimate && (
-              <span class="text-base text-muted-foreground">
+              <span class="settlement-passport-detail">
                 {formatTariffBase(settlement.tariff)}
               </span>
             )
           }
           {
             settlement.tariff.note && (
-              <span class="text-base text-muted-foreground">
+              <span class="settlement-passport-detail">
                 {settlement.tariff.note}
               </span>
             )
@@ -668,12 +645,16 @@ const heroMap = hasPoint
 
         {
           hasDelta && comparison && (
-            <p class="mt-3 text-base leading-7 text-muted-foreground">
-              <span class="font-semibold text-foreground">
-                Сравнение с Шелково:{' '}
-              </span>
+            <p class="settlement-passport-comparison">
+              <span class="settlement-passport-key">Сравнение с Шелково: </span>
               <span
-                class={`ui-num font-semibold ${comparison.isCheaper ? 'text-success-text' : 'text-warning-text'}`}
+                class:list={[
+                  'ui-num',
+                  'settlement-passport-delta',
+                  comparison.isCheaper
+                    ? 'settlement-delta-value--cheaper'
+                    : 'settlement-delta-value--costlier',
+                ]}
               >
                 {comparison.isCheaper ? '−' : '+'}
                 {formatCurrency(Math.abs(comparison.tariffDelta))}
@@ -686,8 +667,8 @@ const heroMap = hasPoint
           )
         }
 
-        <p class="mt-2 text-base leading-7 text-muted-foreground">
-          <span class="font-semibold text-foreground">Расположение: </span>
+        <p class="settlement-passport-location">
+          <span class="settlement-passport-key">Расположение: </span>
           {settlement.location.addressText}
           {
             distanceFromShelkovo > 0 && (
@@ -699,7 +680,7 @@ const heroMap = hasPoint
     </section>
 
     <section
-      class="mb-4 px-0 py-3 md:mb-5 md:px-6"
+      class="settlement-table-section"
       data-testid="infrastructure-section"
     >
       <InfrastructureTable
@@ -711,7 +692,7 @@ const heroMap = hasPoint
     </section>
 
     <section
-      class="mb-4 px-0 py-3 md:mb-5 md:px-6"
+      class="settlement-table-section"
       data-testid="common-spaces-section"
     >
       <CommonSpacesTable
@@ -722,10 +703,7 @@ const heroMap = hasPoint
       />
     </section>
 
-    <section
-      class="mb-4 px-0 py-3 md:mb-5 md:px-6"
-      data-testid="services-section"
-    >
+    <section class="settlement-table-section" data-testid="services-section">
       <ServiceTable
         title="Модель обслуживания"
         services={settlement.serviceModel}
@@ -737,10 +715,10 @@ const heroMap = hasPoint
     {
       settlement.sources.length > 0 && (
         <section
-          class="mb-4 px-5 py-3 md:mb-5 md:px-6"
+          class="settlement-sources-section"
           data-testid="sources-section"
         >
-          <h2 class="mb-4 text-xl text-foreground">Источники</h2>
+          <h2 class="settlement-sources-title">Источники</h2>
           <SourcesList sources={settlement.sources} />
         </section>
       )
@@ -749,8 +727,453 @@ const heroMap = hasPoint
 </BaseLayout>
 
 <style>
+  .settlement-page {
+    position: relative;
+    padding-bottom: 1.5rem;
+  }
+
   .settlement-breadcrumbs.ui-page-header {
+    position: relative;
+    z-index: 30;
+    margin-bottom: 1rem;
     padding-bottom: 0;
+  }
+
+  .settlement-hero {
+    position: relative;
+    z-index: 20;
+    display: none;
+  }
+
+  .settlement-hero-map,
+  .settlement-hero-map-canvas,
+  .settlement-hero-wash-top,
+  .settlement-hero-wash-bottom {
+    position: absolute;
+    inset: 0;
+  }
+
+  .settlement-hero-map {
+    overflow: hidden;
+  }
+
+  .settlement-hero-map-canvas {
+    opacity: 0.8;
+  }
+
+  .settlement-hero-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.25rem 1rem;
+  }
+
+  .settlement-hero-label-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  .settlement-labels,
+  .settlement-mobile-labels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .settlement-labels {
+    justify-content: flex-end;
+  }
+
+  .settlement-badge-link {
+    transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .settlement-badge-link:hover {
+    opacity: 0.9;
+  }
+
+  .settlement-hero-summary {
+    width: 100%;
+    max-width: 48rem;
+    align-self: flex-start;
+  }
+
+  .settlement-hero-summary--spaced {
+    margin-top: 2rem;
+  }
+
+  .settlement-hero-heading {
+    margin-bottom: 1rem;
+  }
+
+  .settlement-hero-title-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .settlement-hero-title-wrap,
+  .settlement-mobile-title-wrap {
+    min-width: 0;
+  }
+
+  .settlement-mobile-title-wrap {
+    flex: 1 1 0%;
+  }
+
+  .settlement-hero-actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+  }
+
+  .settlement-page :global(.settlement-icon) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .settlement-page :global(.settlement-icon--desktop) {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .settlement-page :global(.settlement-icon--telegram) {
+    color: var(--color-telegram);
+  }
+
+  .settlement-hero-district {
+    margin-top: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .settlement-company-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    border: 1px solid;
+    border-radius: var(--radius-full);
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    backdrop-filter: blur(2px);
+  }
+
+  .settlement-company-label,
+  .settlement-fact-label,
+  .settlement-passport-label {
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1rem;
+    text-transform: uppercase;
+  }
+
+  .settlement-company-label,
+  .settlement-fact-label {
+    letter-spacing: 0.025em;
+  }
+
+  .settlement-company-link,
+  .settlement-company-name {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .settlement-company-link {
+    text-decoration-line: underline;
+    text-decoration-color: color-mix(
+      in oklab,
+      var(--color-text) 30%,
+      transparent
+    );
+    text-underline-offset: 3px;
+    transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .settlement-company-link:hover {
+    color: var(--color-primary);
+  }
+
+  .settlement-company-link--mobile {
+    text-underline-offset: 2px;
+  }
+
+  .settlement-hero-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 17rem));
+    gap: 0.75rem;
+  }
+
+  .settlement-hero-facts--three {
+    grid-template-columns: repeat(3, minmax(0, 17rem));
+  }
+
+  .settlement-hero-glass-card {
+    border: 1px solid;
+    border-radius: var(--radius-2xl);
+    padding: 1rem;
+    backdrop-filter: blur(2px);
+  }
+
+  .settlement-tariff-card {
+    position: relative;
+    z-index: 20;
+  }
+
+  .settlement-fact-label {
+    margin-bottom: 0.25rem;
+  }
+
+  .settlement-tariff-group,
+  .settlement-passport-tariff-group {
+    position: relative;
+    display: inline-flex;
+    max-width: 100%;
+  }
+
+  .settlement-tariff-value,
+  .settlement-delta-value {
+    color: var(--color-text);
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.75rem;
+  }
+
+  .settlement-tariff-value--interactive {
+    cursor: help;
+  }
+
+  .settlement-hero-tooltip {
+    pointer-events: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 80;
+    display: none;
+    width: min(88vw, 25rem);
+    margin-top: 0.5rem;
+    border: 1px solid;
+    border-radius: var(--radius-xl);
+    padding: 0.75rem;
+    text-align: left;
+    backdrop-filter: blur(12px);
+  }
+
+  .settlement-hero-tooltip--mobile {
+    width: min(92vw, 25rem);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .settlement-tariff-group:hover .settlement-hero-tooltip,
+  .settlement-tariff-group:focus-within .settlement-hero-tooltip,
+  .settlement-passport-tariff-group:hover .settlement-hero-tooltip,
+  .settlement-passport-tariff-group:focus-within .settlement-hero-tooltip {
+    display: block;
+  }
+
+  .settlement-tooltip-muted,
+  .settlement-tooltip-text,
+  .settlement-tooltip-title,
+  .settlement-tooltip-total {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  .settlement-tooltip-muted {
+    color: var(--color-text-muted);
+  }
+
+  .settlement-tooltip-text,
+  .settlement-tooltip-title,
+  .settlement-tooltip-total {
+    color: var(--color-text);
+  }
+
+  .settlement-tooltip-title,
+  .settlement-tooltip-total {
+    font-weight: 600;
+  }
+
+  .settlement-tooltip-line {
+    margin-top: 0.25rem;
+  }
+
+  .settlement-tooltip-section,
+  .settlement-tooltip-rows,
+  .settlement-tooltip-total {
+    margin-top: 0.5rem;
+  }
+
+  .settlement-tooltip-section,
+  .settlement-tooltip-rows--divided {
+    border-top: 1px solid
+      color-mix(in oklab, var(--color-border) 60%, transparent);
+    padding-top: 0.5rem;
+  }
+
+  .settlement-tooltip-rows > div + div {
+    margin-top: 0.5rem;
+  }
+
+  .settlement-tariff-detail,
+  .settlement-fact-detail {
+    margin-top: 0.25rem;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  .settlement-tariff-detail--estimate {
+    opacity: 0.75;
+  }
+
+  .settlement-delta-value--cheaper {
+    color: var(--color-success-text);
+  }
+
+  .settlement-delta-value--costlier {
+    color: var(--color-warning-text);
+  }
+
+  .settlement-location-address {
+    color: var(--color-text);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+  }
+
+  .settlement-mobile-header {
+    margin-bottom: 1rem;
+    padding: 0.25rem 1.5rem 1rem;
+  }
+
+  .settlement-mobile-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .settlement-mobile-title-group {
+    margin-bottom: 0.5rem;
+  }
+
+  .settlement-mobile-title-group > * + * {
+    margin-top: 0.75rem;
+  }
+
+  .settlement-mobile-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .settlement-mobile-action {
+    min-height: 2.25rem;
+  }
+
+  .settlement-mobile-district,
+  .settlement-mobile-company,
+  .settlement-passport-detail,
+  .settlement-passport-comparison,
+  .settlement-passport-location {
+    color: var(--color-text-muted);
+  }
+
+  .settlement-mobile-company {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .settlement-mobile-labels {
+    margin-top: 1rem;
+  }
+
+  .settlement-passport {
+    position: relative;
+    z-index: 20;
+    margin-bottom: 1.25rem;
+    padding-inline: 1.5rem;
+  }
+
+  .settlement-passport-content {
+    max-width: 48rem;
+  }
+
+  .settlement-passport-label {
+    font-family: var(--font-body);
+    letter-spacing: 0.06em;
+  }
+
+  .settlement-passport-tariff {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    column-gap: 1rem;
+    row-gap: 0.25rem;
+    margin-top: 0.25rem;
+  }
+
+  .settlement-passport-tariff-group {
+    color: var(--color-text);
+    font-size: 1.875rem;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .settlement-passport-detail {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .settlement-passport-comparison,
+  .settlement-passport-location {
+    font-size: 1rem;
+    line-height: 1.75rem;
+  }
+
+  .settlement-passport-comparison {
+    margin-top: 0.75rem;
+  }
+
+  .settlement-passport-location {
+    margin-top: 0.5rem;
+  }
+
+  .settlement-passport-key {
+    color: var(--color-text);
+  }
+
+  .settlement-passport-key,
+  .settlement-passport-delta {
+    font-weight: 600;
+  }
+
+  .settlement-table-section,
+  .settlement-sources-section {
+    margin-bottom: 1rem;
+    padding-block: 0.75rem;
+  }
+
+  .settlement-sources-section {
+    padding-inline: 1.25rem;
+  }
+
+  .settlement-sources-title {
+    margin-bottom: 1rem;
+    color: var(--color-text);
+    font-size: 1.25rem;
+    line-height: 1.75rem;
   }
 
   .settlement-hero-wash-top {
@@ -848,6 +1271,67 @@ const heroMap = hasPoint
       ),
       var(--color-bg-soft);
     background-size: 32px 32px;
+  }
+
+  @media (min-width: 48rem) {
+    .settlement-page {
+      padding-bottom: 2.5rem;
+    }
+
+    .settlement-hero-content {
+      padding-inline: 1.5rem;
+    }
+
+    .settlement-mobile-header {
+      margin-bottom: 2rem;
+      padding: 0.25rem 2rem 2rem;
+    }
+
+    .settlement-mobile-heading {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .settlement-passport {
+      margin-bottom: 2rem;
+      padding-inline: 2rem;
+    }
+
+    .settlement-table-section,
+    .settlement-sources-section {
+      margin-bottom: 1.25rem;
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .settlement-page {
+      padding-bottom: 3rem;
+    }
+
+    .settlement-breadcrumbs.ui-page-header {
+      position: absolute;
+      right: 0;
+      left: 0;
+      margin-bottom: 0;
+    }
+
+    .settlement-hero {
+      display: block;
+    }
+
+    .settlement-mobile-header,
+    .settlement-passport {
+      display: none;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .settlement-hero-content {
+      padding-top: 2.5rem;
+      padding-bottom: 1.5rem;
+    }
   }
 </style>
 
