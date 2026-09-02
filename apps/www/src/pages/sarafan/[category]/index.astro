@@ -65,19 +65,19 @@ const schema = contactsCollectionPageSchema({
   keywords={['сарафан Шелково', label]}
   schema={schema}
 >
-  <main class="ui-page pb-8 md:pb-12 lg:pb-14">
+  <main class="ui-page sarafan-category-page">
     <section class="ui-page-header">
-      <div class="ui-page-header-stack max-w-4xl">
+      <div class="ui-page-header-stack sarafan-category-header">
         <Breadcrumbs items={breadcrumbs} />
 
         <h1 class="ui-page-title">{label}</h1>
       </div>
     </section>
 
-    <section class="mt-8">
+    <section class="sarafan-category-content">
       <h2 class="ui-visually-hidden">Контакты в категории {label}</h2>
-      <div class="px-5 md:px-6">
-        <div class="grid gap-x-8 md:grid-cols-2">
+      <div class="sarafan-category-list">
+        <div class="sarafan-category-grid">
           {
             category.contacts.map((contact) => (
               <ContactListItem contact={contact} />
@@ -88,3 +88,46 @@ const schema = contactsCollectionPageSchema({
     </section>
   </main>
 </BaseLayout>
+
+<style>
+  .sarafan-category-page {
+    padding-block-end: 2rem;
+  }
+
+  .sarafan-category-header {
+    max-width: 56rem;
+  }
+
+  .sarafan-category-content {
+    margin-block-start: 2rem;
+  }
+
+  .sarafan-category-list {
+    padding-inline: 1.25rem;
+  }
+
+  .sarafan-category-grid {
+    display: grid;
+    column-gap: 2rem;
+  }
+
+  @media (min-width: 48rem) {
+    .sarafan-category-page {
+      padding-block-end: 3rem;
+    }
+
+    .sarafan-category-list {
+      padding-inline: 1.5rem;
+    }
+
+    .sarafan-category-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .sarafan-category-page {
+      padding-block-end: 3.5rem;
+    }
+  }
+</style>
