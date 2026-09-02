@@ -136,10 +136,7 @@ const schema = techArticleSchema({
                 >
                   <span class="meeting-speaker__name">
                     {speaker.url ? (
-                      <a
-                        href={speaker.url}
-                        class="ui-link meeting-speaker__link"
-                      >
+                      <a href={speaker.url} class="ui-link">
                         {speaker.label}
                       </a>
                     ) : (
@@ -306,14 +303,6 @@ const schema = techArticleSchema({
     font-weight: 600;
   }
 
-  .meeting-speaker__link {
-    color: var(--color-text);
-  }
-
-  .meeting-speaker__link:hover {
-    color: var(--color-primary);
-  }
-
   .meeting-speaker__description {
     color: var(--color-text-muted);
   }
@@ -362,20 +351,14 @@ const schema = techArticleSchema({
 
   .meeting-transcript-time {
     display: inline-block;
-    color: var(--color-text-muted);
     font-size: 0.875rem;
     line-height: 1.5rem;
   }
 
   .meeting-transcript-speaker {
-    color: var(--color-text);
     font-size: 0.8125rem;
     font-weight: 600;
     line-height: 1.25rem;
-  }
-
-  .meeting-transcript-speaker:hover {
-    color: var(--color-primary);
   }
 
   .meeting-transcript-text {
