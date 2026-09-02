@@ -74,7 +74,7 @@ const schema = collectionPageSchema({
 
             <span class="status-calendar-entry">
               <a
-                class="ui-btn ui-icon-action status-calendar-link"
+                class="ui-btn ui-icon-action"
                 href={statusCalendarYearUrl({ year: calendarYear })}
                 aria-label={calendarHeading}
                 title={calendarHeading}
@@ -218,10 +218,6 @@ const schema = collectionPageSchema({
   .status-calendar-entry {
     display: inline-flex;
     transform: translateY(0.25rem);
-  }
-
-  .status-calendar-link:focus-visible {
-    outline: none;
   }
 
   .status-intro {
