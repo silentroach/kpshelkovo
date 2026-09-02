@@ -56,7 +56,7 @@ const schema = {
   keywords={pageMeta.keywords}
   schema={[schema, breadcrumb]}
 >
-  <main class="ui-page pb-6 md:pb-10 lg:pb-12">
+  <main class="ui-page compare-page">
     <section class="ui-page-header">
       <div class="ui-page-header-stack">
         <Breadcrumbs items={breadcrumbs} />
@@ -75,7 +75,7 @@ const schema = {
     <section
       id="settlements"
       aria-labelledby="settlements-title"
-      class="mt-6 space-y-6 px-0 md:px-6"
+      class="compare-explorer"
     >
       <h2 id="settlements-title" class="ui-visually-hidden">
         Список поселков для сравнения
@@ -109,6 +109,20 @@ const schema = {
 </script>
 
 <style>
+  .compare-page {
+    padding-block-end: 1.5rem;
+  }
+
+  .compare-explorer {
+    margin-block-start: 1.5rem;
+    padding-inline: 0;
+  }
+
+  .explorer-error,
+  [data-explorer-root] {
+    margin-block-start: 1.5rem;
+  }
+
   .explorer-error {
     display: flex;
     align-items: center;
@@ -124,5 +138,21 @@ const schema = {
 
   .explorer-error[hidden] {
     display: none;
+  }
+
+  @media (min-width: 48rem) {
+    .compare-page {
+      padding-block-end: 2.5rem;
+    }
+
+    .compare-explorer {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .compare-page {
+      padding-block-end: 3rem;
+    }
   }
 </style>
