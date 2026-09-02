@@ -47,20 +47,20 @@ const schema = collectionPageSchema({
   keywords={['история статусов Шелково', 'архив отключений Шелково']}
   schema={schema}
 >
-  <main class="ui-page pb-6 md:pb-10 lg:pb-12">
+  <main class="ui-page status-history-page">
     <section class="ui-page-header">
-      <div class="ui-page-header-stack max-w-4xl">
+      <div class="ui-page-header-stack status-history-header">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div class="space-y-3">
+        <div class="status-history-header__copy">
           <h1 class="ui-page-title">История статусов</h1>
-          <p class="max-w-3xl text-base leading-7 text-muted-foreground">
+          <p class="status-history-intro">
             Все записи об отключениях, ограничениях и плановых работах — от
             новых к старым.
           </p>
           <nav aria-label="Представление истории статусов">
             <a
-              class="ui-link font-semibold"
+              class="ui-link status-history-calendar"
               href={statusCalendarYearUrl({ year: data.calendar.buildYear })}
               data-status-history-calendar
             >
@@ -72,13 +72,13 @@ const schema = collectionPageSchema({
     </section>
 
     <section
-      class="mt-8 px-5 md:px-6"
+      class="status-history"
       aria-labelledby="status-history-title"
       data-status-history
     >
       <h2 id="status-history-title" class="ui-visually-hidden">Все записи</h2>
 
-      <div class="-mx-5 md:-mx-6">
+      <div class="status-history__rows">
         {
           data.incidents.map((incident) => (
             <StatusIncidentRow incident={incident} />
@@ -88,3 +88,57 @@ const schema = collectionPageSchema({
     </section>
   </main>
 </BaseLayout>
+
+<style>
+  .status-history-page {
+    padding-block-end: 1.5rem;
+  }
+
+  .status-history-header {
+    max-width: 56rem;
+  }
+
+  .status-history-header__copy > * + * {
+    margin-block-start: 0.75rem;
+  }
+
+  .status-history-intro {
+    max-width: 48rem;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    line-height: 1.75rem;
+  }
+
+  .status-history-calendar {
+    font-weight: 600;
+  }
+
+  .status-history {
+    margin-block-start: 2rem;
+    padding-inline: 1.25rem;
+  }
+
+  .status-history__rows {
+    margin-inline: -1.25rem;
+  }
+
+  @media (min-width: 48rem) {
+    .status-history-page {
+      padding-block-end: 2.5rem;
+    }
+
+    .status-history {
+      padding-inline: 1.5rem;
+    }
+
+    .status-history__rows {
+      margin-inline: -1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .status-history-page {
+      padding-block-end: 3rem;
+    }
+  }
+</style>

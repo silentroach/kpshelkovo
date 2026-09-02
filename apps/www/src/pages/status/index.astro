@@ -63,18 +63,18 @@ const schema = collectionPageSchema({
   keywords={keywords}
   schema={schema}
 >
-  <main class="ui-page pb-6 md:pb-10 lg:pb-12">
+  <main class="ui-page status-page">
     <section class="ui-page-header">
-      <div class="ui-page-header-stack max-w-4xl">
+      <div class="ui-page-header-stack status-header">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div class="space-y-3" data-status-page-header-copy>
-          <div class="flex items-center gap-5 md:gap-7">
+        <div class="status-header__copy" data-status-page-header-copy>
+          <div class="status-title-row">
             <h1 class="ui-page-title">Статус КП Шелково</h1>
 
-            <span class="inline-flex translate-y-1 md:translate-y-1.5">
+            <span class="status-calendar-entry">
               <a
-                class="ui-btn ui-icon-action focus-visible:outline-none"
+                class="ui-btn ui-icon-action"
                 href={statusCalendarYearUrl({ year: calendarYear })}
                 aria-label={calendarHeading}
                 title={calendarHeading}
@@ -85,7 +85,7 @@ const schema = collectionPageSchema({
             </span>
           </div>
 
-          <p class="max-w-3xl text-base leading-7 text-muted-foreground">
+          <p class="status-intro">
             Журнал отключений и ограничений в КП Шелково: электричество, вода,
             интернет и проезд через дамбу. Фиксируем время, зону, источник и ход
             восстановления.
@@ -94,28 +94,18 @@ const schema = collectionPageSchema({
       </div>
     </section>
 
-    <section class="mt-8" aria-labelledby="status-services-title">
-      <div class="max-w-6xl">
+    <section class="status-services" aria-labelledby="status-services-title">
+      <div class="status-content">
         <h2 id="status-services-title" class="ui-visually-hidden">
           Сводка по сервисам
         </h2>
 
-        <div class="relative">
-          <div
-            class="hidden lg:grid lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_minmax(0,11rem)_minmax(0,21rem)] lg:gap-6 lg:px-6 lg:py-3"
-          >
-            <p class="text-[0.875rem] font-semibold text-muted-foreground">
-              Сервис
-            </p>
-            <p class="text-[0.875rem] font-semibold text-muted-foreground">
-              Хронология за месяц
-            </p>
-            <p class="text-[0.875rem] font-semibold text-muted-foreground">
-              Статус
-            </p>
-            <p class="text-[0.875rem] font-semibold text-muted-foreground">
-              Последняя запись
-            </p>
+        <div>
+          <div class="status-services__header">
+            <p>Сервис</p>
+            <p>Хронология за месяц</p>
+            <p>Статус</p>
+            <p>Последняя запись</p>
           </div>
 
           <div>
@@ -136,16 +126,16 @@ const schema = collectionPageSchema({
 
     {
       activeIncidents.length > 0 && (
-        <section class="mt-12 px-5 md:mt-14 md:px-6">
-          <div class="space-y-4">
-            <div class="space-y-1.5">
+        <section class="status-section">
+          <div class="status-section__content">
+            <div class="status-section__heading">
               <h2 class="ui-section-title">Активные инциденты</h2>
-              <p class="text-sm leading-6 text-muted-foreground md:text-[0.9375rem]">
+              <p class="status-section__description">
                 Отключения и ограничения, которые еще не закрыты.
               </p>
             </div>
 
-            <div class="-mx-5 md:-mx-6">
+            <div class="status-rows">
               {activeIncidents.map((incident) => (
                 <StatusIncidentRow incident={incident} />
               ))}
@@ -157,16 +147,16 @@ const schema = collectionPageSchema({
 
     {
       plannedWorks.length > 0 && (
-        <section class="mt-12 px-5 md:mt-14 md:px-6">
-          <div class="space-y-4">
+        <section class="status-section">
+          <div class="status-section__content">
             <div>
               <h2 class="ui-section-title">Плановые работы</h2>
-              <p class="mt-1.5 text-sm leading-6 text-muted-foreground md:text-[0.9375rem]">
+              <p class="status-section__description">
                 Запланированные или уже идущие работы по сервисам поселка.
               </p>
             </div>
 
-            <div class="-mx-5 md:-mx-6">
+            <div class="status-rows">
               {plannedWorks.map((incident) => (
                 <StatusIncidentRow incident={incident} />
               ))}
@@ -177,18 +167,18 @@ const schema = collectionPageSchema({
     }
 
     <section
-      class="mt-12 px-5 md:mt-14 md:px-6"
+      class="status-section"
       aria-labelledby="status-history-title"
       data-status-history
     >
-      <div class="space-y-4">
+      <div class="status-section__content">
         <div>
           <h2 id="status-history-title" class="ui-section-title">
             Последние записи
           </h2>
         </div>
 
-        <div class="-mx-5 md:-mx-6">
+        <div class="status-rows">
           {
             recentIncidents.map((incident) => (
               <StatusIncidentRow incident={incident} />
@@ -197,7 +187,7 @@ const schema = collectionPageSchema({
         </div>
 
         <p>
-          <a class="ui-link font-semibold" href={statusHistoryUrl()}>
+          <a class="ui-link status-history-link" href={statusHistoryUrl()}>
             Вся история статусов
           </a>
         </p>
@@ -205,3 +195,123 @@ const schema = collectionPageSchema({
     </section>
   </main>
 </BaseLayout>
+
+<style>
+  .status-page {
+    padding-block-end: 1.5rem;
+  }
+
+  .status-header {
+    max-width: 56rem;
+  }
+
+  .status-header__copy > * + * {
+    margin-block-start: 0.75rem;
+  }
+
+  .status-title-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .status-calendar-entry {
+    display: inline-flex;
+    transform: translateY(0.25rem);
+  }
+
+  .status-intro {
+    max-width: 48rem;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    line-height: 1.75rem;
+  }
+
+  .status-services {
+    margin-block-start: 2rem;
+  }
+
+  .status-content {
+    max-width: 72rem;
+  }
+
+  .status-services__header {
+    display: none;
+  }
+
+  .status-section {
+    margin-block-start: 3rem;
+    padding-inline: 1.25rem;
+  }
+
+  .status-section__content > * + * {
+    margin-block-start: 1rem;
+  }
+
+  .status-section__heading > * + *,
+  .status-section__description {
+    margin-block-start: 0.375rem;
+  }
+
+  .status-section__description {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  .status-rows {
+    margin-inline: -1.25rem;
+  }
+
+  .status-history-link {
+    font-weight: 600;
+  }
+
+  @media (min-width: 48rem) {
+    .status-page {
+      padding-block-end: 2.5rem;
+    }
+
+    .status-title-row {
+      gap: 1.75rem;
+    }
+
+    .status-calendar-entry {
+      transform: translateY(0.375rem);
+    }
+
+    .status-section {
+      margin-block-start: 3.5rem;
+      padding-inline: 1.5rem;
+    }
+
+    .status-section__description {
+      font-size: 0.9375rem;
+    }
+
+    .status-rows {
+      margin-inline: -1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .status-page {
+      padding-block-end: 3rem;
+    }
+
+    .status-services__header {
+      display: grid;
+      grid-template-columns:
+        minmax(0, 15rem) minmax(0, 1fr) minmax(0, 11rem)
+        minmax(0, 21rem);
+      gap: 1.5rem;
+      padding: 0.75rem 1.5rem;
+    }
+
+    .status-services__header p {
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+  }
+</style>

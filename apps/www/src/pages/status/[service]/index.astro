@@ -76,9 +76,9 @@ const schema = collectionPageSchema({
   keywords={['статус Шелково', serviceLabel, `${serviceLabel} Шелково`]}
   schema={schema}
 >
-  <main class="ui-page pb-6 md:pb-10 lg:pb-12">
+  <main class="ui-page status-service-page">
     <header class="ui-page-header">
-      <div class="ui-page-header-stack max-w-4xl">
+      <div class="ui-page-header-stack status-service-header">
         <Breadcrumbs items={breadcrumbs} />
 
         <div>
@@ -89,9 +89,11 @@ const schema = collectionPageSchema({
       </div>
     </header>
 
-    <section class="mt-8 px-5 md:px-6">
-      <div class="max-w-6xl space-y-3">
-        <StatusServiceState summary={summary} class="text-base font-semibold" />
+    <section class="status-service-overview">
+      <div class="status-service-content status-service-overview__content">
+        <div class="status-service-state">
+          <StatusServiceState summary={summary} />
+        </div>
         <StatusServiceTimeline
           service={summary.service}
           incidents={timelineIncidents}
@@ -100,21 +102,21 @@ const schema = collectionPageSchema({
       </div>
     </section>
 
-    <section class="mt-12 px-5 md:mt-14 md:px-6">
-      <div class="max-w-6xl space-y-4">
+    <section class="status-service-history">
+      <div class="status-service-content status-service-history__content">
         <div>
           <h2 class="ui-section-title">История</h2>
         </div>
 
         {
           latestIncidents.length > 0 ? (
-            <div class="-mx-5 md:-mx-6">
+            <div class="status-service-history__rows">
               {latestIncidents.map((incident) => (
                 <StatusIncidentRow incident={incident} />
               ))}
             </div>
           ) : (
-            <p class="text-sm leading-6 text-muted-foreground md:text-[0.9375rem]">
+            <p class="status-service-history__empty">
               Пока без записей по этому сервису.
             </p>
           )
@@ -123,3 +125,82 @@ const schema = collectionPageSchema({
     </section>
   </main>
 </BaseLayout>
+
+<style>
+  .status-service-page {
+    padding-block-end: 1.5rem;
+  }
+
+  .status-service-header {
+    max-width: 56rem;
+  }
+
+  .status-service-overview,
+  .status-service-history {
+    padding-inline: 1.25rem;
+  }
+
+  .status-service-overview {
+    margin-block-start: 2rem;
+  }
+
+  .status-service-content {
+    max-width: 72rem;
+  }
+
+  .status-service-overview__content > * + * {
+    margin-block-start: 0.75rem;
+  }
+
+  .status-service-state :global([data-status-service-state-label]) {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .status-service-history {
+    margin-block-start: 3rem;
+  }
+
+  .status-service-history__content > * + * {
+    margin-block-start: 1rem;
+  }
+
+  .status-service-history__rows {
+    margin-inline: -1.25rem;
+  }
+
+  .status-service-history__empty {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  @media (min-width: 48rem) {
+    .status-service-page {
+      padding-block-end: 2.5rem;
+    }
+
+    .status-service-overview,
+    .status-service-history {
+      padding-inline: 1.5rem;
+    }
+
+    .status-service-history {
+      margin-block-start: 3.5rem;
+    }
+
+    .status-service-history__rows {
+      margin-inline: -1.5rem;
+    }
+
+    .status-service-history__empty {
+      font-size: 0.9375rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .status-service-page {
+      padding-block-end: 3rem;
+    }
+  }
+</style>

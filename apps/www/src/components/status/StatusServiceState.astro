@@ -4,16 +4,15 @@ import type { StatusServiceSummary } from '@/lib/status/types';
 import { formatStatusServiceState } from '@/lib/status/view';
 
 interface Props {
-  readonly class?: string;
   readonly summary: Pick<StatusServiceSummary, 'incidents' | 'serviceStatus'>;
 }
 
-const { class: className, summary } = Astro.props;
+const { summary } = Astro.props;
 const lifecycleWindows = summary.incidents.map(toStatusIncidentWindowInput);
 ---
 
 <p
-  class:list={['status-service-state', className]}
+  class="status-service-state"
   data-status-service-state-label
   data-status-service-state={summary.serviceStatus}
   data-status-service-incidents={JSON.stringify(lifecycleWindows)}
