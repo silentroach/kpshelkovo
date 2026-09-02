@@ -125,8 +125,8 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
       }
     </div>
 
-    <div>
-      <StatusServiceState summary={summary} class="status-service-row__state" />
+    <div class="status-service-row__state">
+      <StatusServiceState summary={summary} />
     </div>
 
     <div class="status-service-row__latest">
@@ -259,8 +259,7 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
     display: none;
   }
 
-  .status-service-row__layout
-    :global(.status-service-row__state[data-status-service-state-label]) {
+  .status-service-row__state :global([data-status-service-state-label]) {
     font-size: 0.9375rem;
     font-weight: 600;
     line-height: 1.25rem;
