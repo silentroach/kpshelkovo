@@ -161,7 +161,7 @@ components:
 
 Система намеренно плоская. Глубина появляется через типографику, строгие разделители, мягкие подложки и редкие тени, а не через тяжелые карточки. Сравнительные и табличные поверхности должны быть читаемыми прежде всего, красивыми только после этого.
 
-**Source of Truth:** до переноса runtime-значения живут в `packages/ui/styles.css`; принятая целевая граница из [ADR-034](../decisions/034-native-css-architecture.md) переносит их в app-owned `apps/www/src/styles/tokens.css`. Канонический логотип живет в `packages/ui/src/assets/logo.png`. Этот документ объясняет смысл токенов, правила применения и ограничения; при переносе или изменении значения runtime CSS и этот документ обновляются синхронно.
+**Source of Truth:** runtime-значения живут в app-owned `apps/www/src/styles/global.css`; после финального cutover из [ADR-034](../decisions/034-native-css-architecture.md) канонические tokens выделяются в `apps/www/src/styles/tokens.css`. Канонический логотип живет в `packages/ui/src/assets/logo.png`. Этот документ объясняет смысл токенов, правила применения и ограничения; при переносе или изменении значения runtime CSS и этот документ обновляются синхронно.
 
 **Key Characteristics:**
 

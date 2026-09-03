@@ -1,5 +1,5 @@
 ---
-import '@shelkovo/ui/styles.css';
+import '@/styles/global.css';
 import '../styles/site.css';
 import { ClientRouter } from 'astro:transitions';
 import {
@@ -11,9 +11,9 @@ import {
 import FontPreloads from '@shelkovo/ui/FontPreloads.astro';
 import type { SchemaDoc } from '@shelkovo/seo';
 import SiteFooter from '@shelkovo/ui/SiteFooter.astro';
-import { browserColor, themeColor } from '@shelkovo/ui/theme';
 import SearchDialog from '@/components/search/SearchDialog.svelte';
 import SiteHeader from '@/components/site/SiteHeader.astro';
+import { browserColor, themeColor } from '@/lib/browser-colors';
 import type { SearchDocument } from '@/lib/search/types';
 import { absoluteUrl, canon } from '../lib/site';
 
@@ -107,16 +107,7 @@ const searchMetadata = search
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <FontPreloads />
-    <meta
-      name="theme-color"
-      content={themeColor.light}
-      media="(prefers-color-scheme: light)"
-    />
-    <meta
-      name="theme-color"
-      content={themeColor.dark}
-      media="(prefers-color-scheme: dark)"
-    />
+    <meta name="theme-color" content={themeColor} />
     <meta name="description" content={description} />
     {keywordContent && <meta name="keywords" content={keywordContent} />}
     <meta name="generator" content={Astro.generator} />

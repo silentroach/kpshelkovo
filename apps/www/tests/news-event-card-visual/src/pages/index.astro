@@ -1,19 +1,20 @@
 ---
-import '@shelkovo/ui/styles.css';
+import '../../../../src/styles/global.css';
 import '@/styles/site.css';
 
 import NewsEventCard from '@/components/news/NewsEventCard.astro';
 import type { NewsEvent } from '@/lib/news/schema';
 
 const eventWithCoordinates = {
+  slug: 'reglament',
   title: 'Встреча по регламенту',
-  starts_at: new Date('2026-05-31T19:00:00+03:00'),
-  starts_iso: '2026-05-31T19:00:00.000+03:00',
-  starts_time: '19:00',
-  ends_at: new Date('2026-05-31T21:00:00+03:00'),
-  ends_iso: '2026-05-31T21:00:00.000+03:00',
-  ends_time: '21:00',
-  ics_url: '/news/2026/05/reglament/event.ics',
+  startsAt: new Date('2026-05-31T19:00:00+03:00'),
+  startsIso: '2026-05-31T19:00:00.000+03:00',
+  startsTime: '19:00',
+  endsAt: new Date('2026-05-31T21:00:00+03:00'),
+  endsIso: '2026-05-31T21:00:00.000+03:00',
+  endsTime: '21:00',
+  icsUrl: '/news/2026/05/reglament/event.ics',
   location: 'КП Шелково, эко-клуб',
   coordinates: {
     lat: 55.123456,
@@ -22,14 +23,15 @@ const eventWithCoordinates = {
 } satisfies NewsEvent;
 
 const eventWithoutCoordinates = {
+  slug: 'entrance',
   title: 'Обсуждение благоустройства въезда',
-  starts_at: new Date('2026-06-03T10:30:00+03:00'),
-  starts_iso: '2026-06-03T10:30:00.000+03:00',
-  starts_time: '10:30',
-  ends_at: new Date('2026-06-03T12:00:00+03:00'),
-  ends_iso: '2026-06-03T12:00:00.000+03:00',
-  ends_time: '12:00',
-  ics_url: '/news/2026/06/entrance/event.ics',
+  startsAt: new Date('2026-06-03T10:30:00+03:00'),
+  startsIso: '2026-06-03T10:30:00.000+03:00',
+  startsTime: '10:30',
+  endsAt: new Date('2026-06-03T12:00:00+03:00'),
+  endsIso: '2026-06-03T12:00:00.000+03:00',
+  endsTime: '12:00',
+  icsUrl: '/news/2026/06/entrance/event.ics',
   location: 'КП Шелково, главный въезд',
 } satisfies NewsEvent;
 ---

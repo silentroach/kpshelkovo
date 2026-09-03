@@ -62,7 +62,13 @@ const resolvedAriaLabel =
 
 <style>
   .link-with-icon {
+    color: var(--color-primary);
     font-weight: 600;
+    transition: color 0.2s ease;
+  }
+
+  .link-with-icon:hover {
+    color: var(--color-primary-hover);
   }
 
   .link-with-icon--branded {

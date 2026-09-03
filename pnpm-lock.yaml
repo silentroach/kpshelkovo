@@ -93,6 +93,12 @@ importers:
       '@astrojs/svelte':
         specifier: ^9.0.1
         version: 9.0.1(@types/node@26.3.0)(astro@7.2.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.3.0)(jiti@2.7.0)(yaml@2.9.0))(esbuild@0.28.2)(jiti@2.7.0)(svelte@5.56.10)(typescript@7.0.2)(yaml@2.9.0)
+      '@fontsource/fira-sans':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/pt-serif':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@shelkovo/format':
         specifier: workspace:*
         version: link:../../packages/format
