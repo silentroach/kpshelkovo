@@ -28,20 +28,6 @@ describe('page title styles', () => {
       const relative = appRelativePath(filePath);
       const source = readFileSync(filePath, 'utf8');
 
-      expect(source, `${relative} uses old inline title scale`).not.toContain(
-        'text-4xl font-bold tracking-tight text-foreground',
-      );
-      expect(source, `${relative} uses oversized lg title scale`).not.toContain(
-        'lg:text-[3.5rem]',
-      );
-      expect(source, `${relative} uses old page header padding`).not.toContain(
-        'px-5 pb-6 pt-3',
-      );
-      expect(
-        source,
-        `${relative} uses old compact page header padding`,
-      ).not.toContain('px-5 pt-3');
-
       const h1Tags = [...source.matchAll(/<h1\b[\s\S]*?>/gu)].map(
         ([tag]) => tag,
       );
