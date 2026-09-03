@@ -44,19 +44,16 @@ const breadcrumbs = withHomeBreadcrumbs([
   description={description}
   canonical={statusCalendarYearCanonical({ year })}
 >
-  <main class="ui-page pb-8 md:pb-12 lg:pb-16">
+  <main class="ui-page status-calendar-year-page">
     <header class="ui-page-header">
-      <div class="ui-page-header-stack max-w-4xl">
+      <div class="ui-page-header-stack status-calendar-year-header">
         <Breadcrumbs items={breadcrumbs} />
         <h1 class="ui-page-title">{heading}</h1>
       </div>
     </header>
 
-    <div class="mt-4 px-5 md:px-6">
-      <div
-        class="grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2 xl:grid-cols-3"
-        data-status-calendar-year={year}
-      >
+    <div class="status-calendar-year-content">
+      <div class="status-calendar-year-grid" data-status-calendar-year={year}>
         {
           calendar.months.map((month) => (
             <StatusCalendarYearMonth month={month} />
@@ -69,7 +66,7 @@ const breadcrumbs = withHomeBreadcrumbs([
 
       <nav
         aria-label="Переключение лет"
-        class="mx-auto mt-8 flex w-full max-w-md items-center justify-between gap-3"
+        class="status-calendar-year-navigation"
         data-status-calendar-year-navigation
       >
         {
@@ -77,7 +74,7 @@ const breadcrumbs = withHomeBreadcrumbs([
             <a
               href={statusCalendarYearUrl({ year: previousYear })}
               aria-label={`Календарь за ${previousYear} год`}
-              class="ui-btn ui-btn-sm ui-btn-ghost ui-num min-h-10 w-24 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text"
+              class="ui-btn ui-btn-sm ui-btn-ghost ui-num status-calendar-year-navigation__button"
               data-status-calendar-previous
             >
               <span aria-hidden="true">←</span>
@@ -88,7 +85,7 @@ const breadcrumbs = withHomeBreadcrumbs([
               type="button"
               disabled
               aria-label="Нет данных за предыдущий год"
-              class="ui-btn ui-btn-sm ui-btn-ghost ui-num min-h-10 w-24"
+              class="ui-btn ui-btn-sm ui-btn-ghost ui-num status-calendar-year-navigation__button"
               data-status-calendar-previous
             >
               <span aria-hidden="true">←</span>
@@ -96,7 +93,10 @@ const breadcrumbs = withHomeBreadcrumbs([
           )
         }
 
-        <span class="ui-num text-xl font-semibold" aria-current="page">
+        <span
+          class="ui-num status-calendar-year-navigation__current"
+          aria-current="page"
+        >
           {year}
         </span>
 
@@ -105,7 +105,7 @@ const breadcrumbs = withHomeBreadcrumbs([
             <a
               href={statusCalendarYearUrl({ year: nextYear })}
               aria-label={`Календарь за ${nextYear} год`}
-              class="ui-btn ui-btn-sm ui-btn-ghost ui-num min-h-10 w-24 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-text"
+              class="ui-btn ui-btn-sm ui-btn-ghost ui-num status-calendar-year-navigation__button"
               data-status-calendar-next
             >
               <span>{nextYear}</span>
@@ -116,7 +116,7 @@ const breadcrumbs = withHomeBreadcrumbs([
               type="button"
               disabled
               aria-label="Нет данных за следующий год"
-              class="ui-btn ui-btn-sm ui-btn-ghost ui-num min-h-10 w-24"
+              class="ui-btn ui-btn-sm ui-btn-ghost ui-num status-calendar-year-navigation__button"
               data-status-calendar-next
             >
               <span aria-hidden="true">→</span>
@@ -127,6 +127,81 @@ const breadcrumbs = withHomeBreadcrumbs([
     </div>
   </main>
 </BaseLayout>
+
+<style>
+  .status-calendar-year-page {
+    padding-block-end: 2rem;
+  }
+
+  .status-calendar-year-header {
+    max-width: 56rem;
+  }
+
+  .status-calendar-year-content {
+    margin-block-start: 1rem;
+    padding-inline: 1.25rem;
+  }
+
+  .status-calendar-year-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 2rem;
+    row-gap: 2.5rem;
+  }
+
+  .status-calendar-year-navigation {
+    display: flex;
+    width: 100%;
+    max-width: 28rem;
+    margin-block-start: 2rem;
+    margin-inline: auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .status-calendar-year-navigation__button {
+    width: 6rem;
+    min-height: 2.5rem;
+  }
+
+  .status-calendar-year-navigation__button:focus-visible {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 2px;
+  }
+
+  .status-calendar-year-navigation__current {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.75rem;
+  }
+
+  @media (min-width: 48rem) {
+    .status-calendar-year-page {
+      padding-block-end: 3rem;
+    }
+
+    .status-calendar-year-content {
+      padding-inline: 1.5rem;
+    }
+
+    .status-calendar-year-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .status-calendar-year-page {
+      padding-block-end: 4rem;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .status-calendar-year-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>
 
 <script>
   import { registerStatusCalendarYearInteractions } from '@/lib/status/year-calendar.dom';
