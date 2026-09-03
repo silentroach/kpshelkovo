@@ -7,18 +7,18 @@ const { year = new Date().getFullYear() } = Astro.props;
 const hasRight = Astro.slots.has('right');
 ---
 
-<footer class="ui-page ui-site-footer">
-  <div class="ui-site-footer-inner">
+<footer class="site-footer">
+  <div class="site-footer__inner">
     <p>
       &copy; {year}. Инициативная группа{' '}
-      <a href="https://kpshelkovo.online/" class="ui-link ui-site-footer-home">
+      <a href="https://kpshelkovo.online/" class="site-footer__home">
         Шелково
       </a>
     </p>
 
     {
       hasRight && (
-        <div class="ui-site-footer-side">
+        <div class="site-footer__side">
           <slot name="right" />
         </div>
       )
@@ -27,13 +27,63 @@ const hasRight = Astro.slots.has('right');
 </footer>
 
 <style>
-  .ui-site-footer-inner {
+  .site-footer {
+    width: min(calc(100% - var(--page-padding) * 2), var(--page-max));
+    margin-inline: auto;
+    border-top: 1px solid
+      color-mix(in oklab, var(--color-border) 80%, transparent);
+    padding-block: 1rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    line-height: 1.3333333333;
+  }
+
+  .site-footer__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
     padding-inline: 1.25rem;
   }
 
+  .site-footer__home {
+    color: var(--color-text);
+    font-weight: 400;
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.22em;
+    transition:
+      color 0.2s ease,
+      text-decoration-color 0.2s ease,
+      text-underline-offset 0.2s ease;
+  }
+
+  .site-footer__home:is(:hover, :focus-visible) {
+    color: var(--color-primary-hover);
+    text-decoration-color: color-mix(in oklab, currentColor 30%, transparent);
+    text-underline-offset: 0.18em;
+  }
+
+  .site-footer__side {
+    text-align: left;
+  }
+
   @media (min-width: 48rem) {
-    .ui-site-footer-inner {
+    .site-footer {
+      padding-block: 1.25rem;
+    }
+
+    .site-footer__inner {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
       padding-inline: 1.5rem;
+    }
+
+    .site-footer__side {
+      text-align: right;
     }
   }
 </style>

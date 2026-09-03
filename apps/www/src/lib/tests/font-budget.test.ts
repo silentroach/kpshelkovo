@@ -72,14 +72,13 @@ const findWeightViolations = (filePath: string): readonly string[] => {
 
 describe('font budget', () => {
   it('keeps production faces and source weights within the shared budget', () => {
-    const stylesPath = join(uiRoot, 'styles.css');
+    const stylesPath = join(appSrcRoot, 'styles/global.css');
     const standaloneStylesPath = join(uiRoot, 'standalone-error.css');
     const preloadsPath = join(uiRoot, 'src/FontPreloads.astro');
     const sourceFiles = [
       ...collectSourceFiles(appSrcRoot),
       ...collectSourceFiles(appTestsRoot),
       ...collectSourceFiles(join(uiRoot, 'src')),
-      stylesPath,
       standaloneStylesPath,
     ];
     const preloads = [

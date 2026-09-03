@@ -21,7 +21,7 @@ pnpm typecheck
 - Astro 7 (static output)
 - Svelte 5 с runes для интерактивных compare-компонентов
 - Tailwind CSS v4
-- Shared styles from `@shelkovo/ui/styles.css`
+- App-owned global styles from `src/styles/global.css`
 
 ## Дизайн
 
@@ -34,7 +34,7 @@ pnpm typecheck
 - Compare данные живут в `src/data/compare`, logic/components — в `src/compare`, routes — в `src/pages/815/compare`.
 - Перед изменением Pagefind, поискового UI, индексируемой metadata, весов, quality-матрицы или `search_aliases` подключать skill `site-search`; сначала снимать production baseline, затем сравнивать выдачу после правки.
 - Compare URL/base задается в `src/compare/lib/url.ts`; не завязывать его на Astro `base`.
-- Для CSS-владения следовать [ADR-034](../../docs/decisions/034-native-css-architecture.md): глобальные tokens, reset, site-level `ui-*` и generated-content styles принадлежат `apps/www`, а reusable package-компоненты владеют scoped CSS и документируют нужные semantic properties. До отдельного migration issue сохранять действующий runtime entry `@shelkovo/ui/styles.css`, без попутного переноса.
+- Для CSS-владения следовать [ADR-034](../../docs/decisions/034-native-css-architecture.md): глобальные tokens, reset, site-level `ui-*` и generated-content styles принадлежат `apps/www`, а reusable package-компоненты владеют scoped CSS и документируют нужные semantic properties. До финального cutover сохранять Tailwind foundation и migration bridges внутри app-owned CSS graph.
 - Для imports внутри `apps/www/src` предпочитать alias `@/…` вместо длинных relative-путей; относительные imports оставлять только для соседних файлов и путей вне `src`.
 - Новые `.test.ts` в `apps/www` хранить в ближайшей папке `tests/`, а не рядом с исходным файлом.
 - Любые UI-подписи с количеством на русском языке обязательно склонять корректно (`1 новость`, `2 новости`, `5 новостей`).
