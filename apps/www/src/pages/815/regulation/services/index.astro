@@ -123,8 +123,6 @@ const serviceSearchText = (
     .filter((part): part is string => Boolean(part))
     .join(' ');
 };
-const tableHeaderCellClass =
-  'sticky top-[var(--ui-sticky-table-header-top)] z-10 border-b border-border bg-muted px-4 py-2.5 align-bottom';
 ---
 
 <BaseLayout
@@ -139,18 +137,16 @@ const tableHeaderCellClass =
   schema={schema}
   search={search}
 >
-  <main class="ui-page pb-8 md:pb-12 lg:pb-16">
+  <main class="ui-page services-page">
     <section class="ui-page-header">
-      <div class="ui-page-header-stack max-w-5xl">
+      <div class="ui-page-header-stack services-header">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div class="space-y-4" data-pagefind-body>
-          <h1 class="ui-page-title max-w-4xl">
+        <div class="services-intro" data-pagefind-body>
+          <h1 class="ui-page-title services-title">
             Какие услуги указаны в регламенте
           </h1>
-          <div
-            class="max-w-3xl space-y-3 text-sm leading-6 text-muted-foreground md:text-[0.9375rem]"
-          >
+          <div class="services-intro-copy">
             <p>
               Перечень взят из Приложения №4 полного регламента, стр. 135. Ниже
               показана сверка со строками текущей сметы. Частичное совпадение
@@ -161,16 +157,16 @@ const tableHeaderCellClass =
       </div>
     </section>
 
-    <section class="px-5 md:px-6" aria-labelledby="services-title">
-      <div class="max-w-6xl space-y-10">
+    <section class="services-content" aria-labelledby="services-title">
+      <div class="services-groups">
         <h2 id="services-title" class="ui-visually-hidden">
           Таблицы услуг регламента
         </h2>
 
         {
           groups.map((group) => (
-            <section class="space-y-4" aria-labelledby={group.group}>
-              <div class="max-w-3xl space-y-1.5" data-pagefind-body>
+            <section class="services-group" aria-labelledby={group.group}>
+              <div class="services-group-header" data-pagefind-body>
                 <h3
                   id={group.group}
                   class="ui-section-title"
@@ -178,13 +174,10 @@ const tableHeaderCellClass =
                 >
                   {group.title}
                 </h3>
-                <p
-                  class="text-sm leading-6 text-muted-foreground md:text-base md:leading-7"
-                  data-pagefind-weight="0.3"
-                >
+                <p class="services-source" data-pagefind-weight="0.3">
                   Источник:{' '}
                   <ResourceLink
-                    class="ui-link text-primary"
+                    class="ui-link services-source-link"
                     href={reglamentFullSourcePdfUrl()}
                     type="application/pdf"
                     reload
@@ -198,33 +191,23 @@ const tableHeaderCellClass =
               </div>
 
               <div
-                class="reglament-table-shell ui-sticky-table-shell -mx-5 border-y border-border bg-surface sm:mx-0 sm:rounded-xl sm:border md:mx-0"
+                class="reglament-table-shell ui-sticky-table-shell services-table-shell"
                 data-ui-sticky-table-shell
               >
-                <table class="min-w-[58rem] w-full border-separate border-spacing-0 text-left text-sm">
+                <table class="services-table">
                   <caption class="ui-visually-hidden">{group.title}</caption>
-                  <thead class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                  <thead class="services-table-head">
                     <tr>
-                      <th
-                        class:list={[
-                          tableHeaderCellClass,
-                          'w-[34%] sm:rounded-tl-xl',
-                        ]}
-                      >
+                      <th class="services-table-heading services-table-service-heading">
                         Услуга
                       </th>
-                      <th class:list={[tableHeaderCellClass, 'w-[16%]']}>
+                      <th class="services-table-heading services-table-frequency-heading">
                         Периодичность
                       </th>
-                      <th class:list={[tableHeaderCellClass, 'w-[18%]']}>
+                      <th class="services-table-heading services-table-status-heading">
                         Статус
                       </th>
-                      <th
-                        class:list={[
-                          tableHeaderCellClass,
-                          'w-[32%] sm:rounded-tr-xl',
-                        ]}
-                      >
+                      <th class="services-table-heading services-table-mapping-heading">
                         Сопоставление
                       </th>
                     </tr>
@@ -237,12 +220,12 @@ const tableHeaderCellClass =
                         : null;
 
                       return (
-                        <tr class="border-t border-border">
-                          <td class="border-t border-border px-4 py-3 align-top">
-                            <div class="space-y-1.5" data-pagefind-body>
+                        <tr>
+                          <td class="services-table-cell">
+                            <div class="services-item" data-pagefind-body>
                               <h4
                                 id={`reglament-service-${service.id}`}
-                                class="font-semibold text-foreground"
+                                class="services-item-title"
                                 data-pagefind-weight="2"
                               >
                                 {service.title}
@@ -256,17 +239,17 @@ const tableHeaderCellClass =
                               </p>
                             </div>
                           </td>
-                          <td class="border-t border-border px-4 py-3 align-top text-muted-foreground">
-                            <span class="font-semibold text-foreground">
+                          <td class="services-table-cell services-table-muted">
+                            <span class="services-frequency">
                               {service.frequency_raw}
                             </span>
                             {service.frequency_note && (
-                              <span class="mt-1 block text-xs leading-5">
+                              <span class="services-frequency-note">
                                 {service.frequency_note}
                               </span>
                             )}
                           </td>
-                          <td class="border-t border-border px-4 py-3 align-top">
+                          <td class="services-table-cell">
                             {mapping && (
                               <span
                                 class:list={[
@@ -278,19 +261,19 @@ const tableHeaderCellClass =
                               </span>
                             )}
                           </td>
-                          <td class="border-t border-border px-4 py-3 align-top text-muted-foreground">
+                          <td class="services-table-cell services-table-muted">
                             {mapping && (
-                              <div class="space-y-1.5">
+                              <div class="services-mapping">
                                 <p>
-                                  <span class="font-semibold text-foreground">
+                                  <span class="services-estimate-source">
                                     {estimateSourceLabel(mapping)}
                                   </span>
                                 </p>
-                                <p class="text-xs leading-5">
+                                <p class="services-mapping-note">
                                   {mapping.explanation}
                                 </p>
                                 {verificationNote && (
-                                  <p class="text-xs font-semibold leading-5 text-primary">
+                                  <p class="services-verification-note">
                                     {verificationNote}
                                   </p>
                                 )}
@@ -309,6 +292,201 @@ const tableHeaderCellClass =
       </div>
     </section>
   </main>
+
+  <style>
+    .services-page {
+      padding-block-end: 2rem;
+    }
+
+    .services-header {
+      max-width: 64rem;
+    }
+
+    .services-intro > * + * {
+      margin-block-start: 1rem;
+    }
+
+    .services-title {
+      max-width: 56rem;
+    }
+
+    .services-intro-copy,
+    .services-group-header {
+      max-width: 48rem;
+    }
+
+    .services-intro-copy {
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+      line-height: 1.5rem;
+    }
+
+    .services-intro-copy > * + * {
+      margin-block-start: 0.75rem;
+    }
+
+    .services-content {
+      padding-inline: 1.25rem;
+    }
+
+    .services-groups {
+      max-width: 72rem;
+    }
+
+    .services-groups > section + section {
+      margin-block-start: 2.5rem;
+    }
+
+    .services-group > * + * {
+      margin-block-start: 1rem;
+    }
+
+    .services-group-header > * + * {
+      margin-block-start: 0.375rem;
+    }
+
+    .services-source {
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+      line-height: 1.5rem;
+    }
+
+    .services-source-link,
+    .services-verification-note {
+      color: var(--color-primary);
+    }
+
+    .services-table-shell {
+      margin-inline: -1.25rem;
+      border-block: 1px solid var(--color-border);
+      background-color: var(--color-surface);
+    }
+
+    .services-table {
+      width: 100%;
+      min-width: 58rem;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      text-align: left;
+    }
+
+    .services-table-head {
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      line-height: 1rem;
+      text-transform: uppercase;
+    }
+
+    .services-table-heading {
+      position: sticky;
+      top: var(--ui-sticky-table-header-top);
+      z-index: 10;
+      padding: 0.625rem 1rem;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-surface-muted);
+      vertical-align: bottom;
+    }
+
+    .services-table-service-heading {
+      width: 34%;
+    }
+
+    .services-table-frequency-heading {
+      width: 16%;
+    }
+
+    .services-table-status-heading {
+      width: 18%;
+    }
+
+    .services-table-mapping-heading {
+      width: 32%;
+    }
+
+    .services-table-cell {
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--color-border);
+      vertical-align: top;
+    }
+
+    .services-item > * + *,
+    .services-mapping > * + * {
+      margin-block-start: 0.375rem;
+    }
+
+    .services-item-title,
+    .services-frequency,
+    .services-estimate-source {
+      color: var(--color-text);
+      font-weight: 600;
+    }
+
+    .services-table-muted {
+      color: var(--color-text-muted);
+    }
+
+    .services-frequency-note {
+      display: block;
+      margin-block-start: 0.25rem;
+      font-size: 0.75rem;
+      line-height: 1.25rem;
+    }
+
+    .services-mapping-note,
+    .services-verification-note {
+      font-size: 0.75rem;
+      line-height: 1.25rem;
+    }
+
+    .services-verification-note {
+      font-weight: 600;
+    }
+
+    @media (min-width: 40rem) {
+      .services-table-shell {
+        margin-inline: 0;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-xl);
+      }
+
+      .services-table-service-heading {
+        border-top-left-radius: var(--radius-xl);
+      }
+
+      .services-table-mapping-heading {
+        border-top-right-radius: var(--radius-xl);
+      }
+    }
+
+    @media (min-width: 48rem) {
+      .services-page {
+        padding-block-end: 3rem;
+      }
+
+      .services-intro-copy {
+        font-size: 0.9375rem;
+      }
+
+      .services-content {
+        padding-inline: 1.5rem;
+      }
+
+      .services-source {
+        font-size: 1rem;
+        line-height: 1.75rem;
+      }
+    }
+
+    @media (min-width: 64rem) {
+      .services-page {
+        padding-block-end: 4rem;
+      }
+    }
+  </style>
 
   <script>
     import { hydrateStickyTableHeaders } from '@/lib/sticky-table-headers';

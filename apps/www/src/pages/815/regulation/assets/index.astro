@@ -120,9 +120,6 @@ const villageIcons = {
   'shelkovo-park': ParkIcon,
   'shelkovo-river': RiverIcon,
 } as const satisfies Record<FullReglamentVillageId, typeof VillageIcon>;
-const tableHeaderCellClass =
-  'sticky top-[var(--ui-sticky-table-header-top)] z-10 border-b border-border bg-muted px-4 py-2.5 align-bottom';
-const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
 ---
 
 <BaseLayout
@@ -137,16 +134,16 @@ const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
   schema={schema}
   search={search}
 >
-  <main class="ui-page pb-8 md:pb-12 lg:pb-16">
+  <main class="ui-page assets-page">
     <section class="ui-page-header">
-      <div class="ui-page-header-stack max-w-5xl">
+      <div class="ui-page-header-stack assets-header">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div class="space-y-4" data-pagefind-body>
-          <h1 class="ui-page-title max-w-4xl">Что входит в общее имущество</h1>
-          <div
-            class="max-w-3xl space-y-3 text-sm leading-6 text-muted-foreground md:text-[0.9375rem]"
-          >
+        <div class="assets-intro" data-pagefind-body>
+          <h1 class="ui-page-title assets-title">
+            Что входит в общее имущество
+          </h1>
+          <div class="assets-intro-copy">
             <p>
               Справочник по Приложению №2 полного регламента: дороги, ливневые
               траншеи, зеленые насаждения, благоустройство, электроснабжение и
@@ -157,16 +154,16 @@ const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
       </div>
     </section>
 
-    <section class="px-5 md:px-6" aria-labelledby="assets-title">
-      <div class="max-w-6xl space-y-10">
+    <section class="assets-content" aria-labelledby="assets-title">
+      <div class="assets-groups">
         <h2 id="assets-title" class="ui-visually-hidden">
           Таблицы общего имущества
         </h2>
 
         {
           groups.map((group) => (
-            <section class="space-y-4" aria-labelledby={group.category}>
-              <div class="max-w-3xl space-y-1.5" data-pagefind-body>
+            <section class="assets-group" aria-labelledby={group.category}>
+              <div class="assets-group-header" data-pagefind-body>
                 <h3
                   id={group.category}
                   class="ui-section-title"
@@ -174,13 +171,10 @@ const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
                 >
                   {group.title}
                 </h3>
-                <p
-                  class="text-sm leading-6 text-muted-foreground md:text-base md:leading-7"
-                  data-pagefind-weight="0.3"
-                >
+                <p class="assets-source" data-pagefind-weight="0.3">
                   Источник:{' '}
                   <ResourceLink
-                    class="ui-link text-primary"
+                    class="ui-link assets-source-link"
                     href={reglamentFullSourcePdfUrl()}
                     type="application/pdf"
                     reload
@@ -193,29 +187,24 @@ const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
               </div>
 
               <div
-                class="reglament-table-shell ui-sticky-table-shell -mx-5 border-y border-border bg-surface sm:mx-0 sm:rounded-xl sm:border md:mx-0"
+                class="reglament-table-shell ui-sticky-table-shell assets-table-shell"
                 data-ui-sticky-table-shell
               >
-                <table class="min-w-[58rem] w-full border-separate border-spacing-0 text-left text-sm">
+                <table class="assets-table">
                   <caption class="ui-visually-hidden">{group.title}</caption>
-                  <thead class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                  <thead class="assets-table-head">
                     <tr>
-                      <th
-                        class:list={[
-                          tableHeaderCellClass,
-                          'w-[24%] sm:rounded-tl-xl',
-                        ]}
-                      >
+                      <th class="assets-table-heading assets-table-object">
                         Объект
                       </th>
-                      <th class={tableHeaderCellClass}>Ед. изм.</th>
+                      <th class="assets-table-heading">Ед. изм.</th>
                       {fullReglamentDataset2026.villages.map((village) => {
                         const AreaIcon = villageIcons[village.id];
 
                         return (
-                          <th class={tableHeaderCellRightClass}>
-                            <span class="inline-flex items-baseline justify-end gap-1.5">
-                              <AreaIcon class="h-3.5 w-7 shrink-0" />
+                          <th class="assets-table-heading assets-table-number">
+                            <span class="assets-village">
+                              <AreaIcon class="assets-village-icon" />
                               <span>
                                 {village.title.replace('Шелково ', '')}
                               </span>
@@ -223,12 +212,7 @@ const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
                           </th>
                         );
                       })}
-                      <th
-                        class:list={[
-                          tableHeaderCellRightClass,
-                          'sm:rounded-tr-xl',
-                        ]}
-                      >
+                      <th class="assets-table-heading assets-table-number assets-table-total-heading">
                         Всего
                       </th>
                     </tr>
@@ -240,12 +224,12 @@ const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
                       );
 
                       return (
-                        <tr class="border-t border-border">
-                          <td class="border-t border-border px-4 py-3 align-top">
-                            <div class="space-y-1.5" data-pagefind-body>
+                        <tr>
+                          <td class="assets-table-cell">
+                            <div class="assets-item" data-pagefind-body>
                               <h4
                                 id={`reglament-asset-${asset.id}`}
-                                class="font-semibold text-foreground"
+                                class="assets-item-title"
                                 data-pagefind-weight="2"
                               >
                                 {asset.title}
@@ -253,24 +237,20 @@ const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
                               <p class="ui-visually-hidden" aria-hidden="true">
                                 {assetSearchText(asset, group.title)}
                               </p>
-                              {note && (
-                                <p class="text-xs font-semibold leading-5 text-primary">
-                                  {note}
-                                </p>
-                              )}
+                              {note && <p class="assets-note">{note}</p>}
                             </div>
                           </td>
-                          <td class="border-t border-border px-4 py-3 align-top text-muted-foreground">
+                          <td class="assets-table-cell assets-table-muted">
                             {asset.unit ?? '-'}
                           </td>
                           {fullReglamentDataset2026.villages.map((village) => (
-                            <td class="border-t border-border px-4 py-3 text-right align-top text-muted-foreground">
+                            <td class="assets-table-cell assets-table-number assets-table-muted">
                               {displayQuantity(
                                 asset.values_by_village[village.id],
                               )}
                             </td>
                           ))}
-                          <td class="border-t border-border px-4 py-3 text-right align-top font-semibold text-foreground">
+                          <td class="assets-table-cell assets-table-number assets-table-total">
                             {displayQuantity(asset.total)}
                           </td>
                         </tr>
@@ -285,6 +265,193 @@ const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
       </div>
     </section>
   </main>
+
+  <style>
+    .assets-page {
+      padding-block-end: 2rem;
+    }
+
+    .assets-header {
+      max-width: 64rem;
+    }
+
+    .assets-intro > * + * {
+      margin-block-start: 1rem;
+    }
+
+    .assets-title {
+      max-width: 56rem;
+    }
+
+    .assets-intro-copy,
+    .assets-group-header {
+      max-width: 48rem;
+    }
+
+    .assets-intro-copy {
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+      line-height: 1.5rem;
+    }
+
+    .assets-intro-copy > * + * {
+      margin-block-start: 0.75rem;
+    }
+
+    .assets-content {
+      padding-inline: 1.25rem;
+    }
+
+    .assets-groups {
+      max-width: 72rem;
+    }
+
+    .assets-groups > section + section {
+      margin-block-start: 2.5rem;
+    }
+
+    .assets-group > * + * {
+      margin-block-start: 1rem;
+    }
+
+    .assets-group-header > * + * {
+      margin-block-start: 0.375rem;
+    }
+
+    .assets-source {
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+      line-height: 1.5rem;
+    }
+
+    .assets-source-link,
+    .assets-note {
+      color: var(--color-primary);
+    }
+
+    .assets-table-shell {
+      margin-inline: -1.25rem;
+      border-block: 1px solid var(--color-border);
+      background-color: var(--color-surface);
+    }
+
+    .assets-table {
+      width: 100%;
+      min-width: 58rem;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      text-align: left;
+    }
+
+    .assets-table-head {
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      line-height: 1rem;
+      text-transform: uppercase;
+    }
+
+    .assets-table-heading {
+      position: sticky;
+      top: var(--ui-sticky-table-header-top);
+      z-index: 10;
+      padding: 0.625rem 1rem;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-surface-muted);
+      vertical-align: bottom;
+    }
+
+    .assets-table-object {
+      width: 24%;
+    }
+
+    .assets-table-number {
+      text-align: right;
+    }
+
+    .assets-village {
+      display: inline-flex;
+      align-items: baseline;
+      justify-content: flex-end;
+      gap: 0.375rem;
+    }
+
+    .assets-village :global(.assets-village-icon) {
+      width: 1.75rem;
+      height: 0.875rem;
+      flex-shrink: 0;
+    }
+
+    .assets-table-cell {
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--color-border);
+      vertical-align: top;
+    }
+
+    .assets-item > * + * {
+      margin-block-start: 0.375rem;
+    }
+
+    .assets-item-title,
+    .assets-table-total {
+      color: var(--color-text);
+      font-weight: 600;
+    }
+
+    .assets-note {
+      font-size: 0.75rem;
+      font-weight: 600;
+      line-height: 1.25rem;
+    }
+
+    .assets-table-muted {
+      color: var(--color-text-muted);
+    }
+
+    @media (min-width: 40rem) {
+      .assets-table-shell {
+        margin-inline: 0;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-xl);
+      }
+
+      .assets-table-object {
+        border-top-left-radius: var(--radius-xl);
+      }
+
+      .assets-table-total-heading {
+        border-top-right-radius: var(--radius-xl);
+      }
+    }
+
+    @media (min-width: 48rem) {
+      .assets-page {
+        padding-block-end: 3rem;
+      }
+
+      .assets-intro-copy {
+        font-size: 0.9375rem;
+      }
+
+      .assets-content {
+        padding-inline: 1.5rem;
+      }
+
+      .assets-source {
+        font-size: 1rem;
+        line-height: 1.75rem;
+      }
+    }
+
+    @media (min-width: 64rem) {
+      .assets-page {
+        padding-block-end: 4rem;
+      }
+    }
+  </style>
 
   <script>
     import { hydrateStickyTableHeaders } from '@/lib/sticky-table-headers';
