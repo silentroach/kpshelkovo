@@ -13,7 +13,7 @@ describe('ResourceLink', () => {
     const html = await container.renderToString(ResourceLink, {
       props: {
         href: '/815/regulation/full.pdf',
-        class: 'ui-link text-primary',
+        class: 'ui-link',
         type: 'application/pdf',
         reload: true,
         'aria-label': 'Открыть полный регламент',
@@ -24,7 +24,7 @@ describe('ResourceLink', () => {
     });
 
     expect(html).toContain('href="/815/regulation/full.pdf"');
-    expect(html).toContain('class="ui-link text-primary"');
+    expect(html).toContain('class="ui-link"');
     expect(html).toContain('type="application/pdf"');
     expect(html).toContain('aria-label="Открыть полный регламент"');
     expect(html).toContain('data-astro-prefetch="false"');
