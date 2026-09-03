@@ -116,7 +116,6 @@ const createBreakdownValue = (
   }
 
   const value = document.createElement('span');
-  value.className = 'block pt-1.5';
   value.dataset.reglamentRowBreakdown = rowId;
   value.dataset.reglamentBreakdownField = field;
 

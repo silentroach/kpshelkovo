@@ -358,20 +358,6 @@ const editorConfigJson = JSON.stringify({
     })),
   ),
 } satisfies ReglamentEditorConfig).replaceAll('<', '\\u003c');
-const inputShellClass =
-  'reglament-input-shell inline-flex max-w-full overflow-hidden rounded-lg border border-border bg-surface align-top transition focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20';
-const inputBaseClass =
-  'reglament-input min-w-0 bg-transparent px-2.5 py-1.5 text-sm font-semibold text-foreground outline-none';
-const inputClass = `${inputBaseClass} w-[6.25rem]`;
-const inlineInputClass = `${inputBaseClass} w-[7.5rem] text-right`;
-const inputErrorClass =
-  'reglament-input-error mt-1 block max-w-[13rem] text-xs font-semibold leading-4 text-danger';
-const inputUnitClass =
-  'flex shrink-0 items-center border-l border-border bg-muted px-2 text-[0.6875rem] font-semibold leading-none text-muted-foreground';
-const tableTextClass = 'block pt-[0.4375rem] leading-snug';
-const tableHeaderCellClass =
-  'sticky top-[var(--ui-sticky-table-header-top)] z-10 border-b border-border bg-muted px-4 py-2.5 align-bottom lg:top-[calc(var(--ui-sticky-table-header-top)+2.875rem-1px)]';
-const tableHeaderCellRightClass = `${tableHeaderCellClass} text-right`;
 const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
   `reglament-error-${rowId}-${key}`;
 ---
@@ -384,39 +370,39 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
   schema={schema}
   search={search}
 >
-  <main class="ui-page pb-8 md:pb-12 lg:pb-16" data-reglament-calculator>
+  <main class="ui-page reglament-page" data-reglament-calculator>
     <script
       type="application/json"
       data-reglament-calculation-input
       set:html={calculationInputJson}
     />
     <section class="ui-page-header">
-      <div class="max-w-5xl space-y-6">
+      <div class="reglament-header">
         <div class="ui-page-header-stack">
           <Breadcrumbs items={breadcrumbs} />
 
-          <div class="space-y-4" data-pagefind-body>
-            <h1 id="tariff-calculator-title" class="ui-page-title max-w-4xl">
+          <div class="reglament-intro" data-pagefind-body>
+            <h1
+              id="tariff-calculator-title"
+              class="ui-page-title reglament-title"
+            >
               Калькулятор тарифа по смете 2026
             </h1>
-            <div
-              class="max-w-3xl space-y-3 text-sm leading-6 text-muted-foreground md:text-[0.9375rem]"
-            >
+            <div class="reglament-lead">
               <p>
                 Смета разложена на разделы и строки. Меняйте объемы,
                 периодичность и цены: калькулятор сразу пересчитает тариф в{' '}
-                <span
-                  class="font-semibold text-foreground"
-                  data-pagefind-weight="5">₽/сотка за месяц</span
+                <span class="reglament-emphasis" data-pagefind-weight="5"
+                  >₽/сотка за месяц</span
                 > и покажет, как изменилась итоговая сумма.
               </p>
               <p>
                 Для проверки по полному регламенту рядом есть справочники:{' '}
-                <a class="ui-link font-semibold" href={reglamentAssetsUrl()}>
+                <a class="ui-link reglament-link" href={reglamentAssetsUrl()}>
                   что входит в общее имущество
                 </a>{' '}
                 и{' '}
-                <a class="ui-link font-semibold" href={reglamentServicesUrl()}>
+                <a class="ui-link reglament-link" href={reglamentServicesUrl()}>
                   какие услуги указаны в регламенте
                 </a>.
               </p>
@@ -424,101 +410,63 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
           </div>
         </div>
 
-        <div
-          class="grid overflow-hidden rounded-xl border border-border bg-surface md:grid-cols-3"
-          aria-label="Итоги сметы"
-        >
-          <div
-            class="border-b border-border p-4 md:border-b-0 md:border-r md:p-5"
-          >
-            <p
-              class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-            >
-              Официальный тариф
-            </p>
-            <p
-              class="mt-2 text-2xl font-semibold tracking-tight text-foreground"
-            >
+        <div class="reglament-totals" aria-label="Итоги сметы">
+          <div class="reglament-total reglament-total--divided">
+            <p class="reglament-total__label">Официальный тариф</p>
+            <p class="reglament-total__value">
               {formatReglamentTariff(payload.official.tariff_per_sotka_month)}
             </p>
-            <p class="mt-1 text-xs text-muted-foreground">
+            <p class="reglament-total__note">
               {formatReglamentAnnualMoney(payload.official.annual_gross)}
             </p>
           </div>
-          <div
-            class="border-b border-border p-4 md:border-b-0 md:border-r md:p-5"
-          >
-            <p
-              class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-            >
-              Текущий пересчет
-            </p>
-            <p
-              class="mt-2 text-2xl font-semibold tracking-tight text-foreground"
-              data-reglament-current-tariff
-            >
+          <div class="reglament-total reglament-total--divided">
+            <p class="reglament-total__label">Текущий пересчет</p>
+            <p class="reglament-total__value" data-reglament-current-tariff>
               {formatReglamentTariff(payload.computed.tariff_per_sotka_month)}
             </p>
-            <p
-              class="mt-1 text-xs text-muted-foreground"
-              data-reglament-current-annual
-            >
+            <p class="reglament-total__note" data-reglament-current-annual>
               {formatReglamentAnnualMoney(payload.computed.annual_gross)}
             </p>
           </div>
-          <div class="p-4 md:p-5">
-            <p
-              class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-            >
-              Разница
-            </p>
-            <p
-              class="mt-2 text-2xl font-semibold tracking-tight text-foreground"
-              data-reglament-current-delta
-            >
+          <div class="reglament-total">
+            <p class="reglament-total__label">Разница</p>
+            <p class="reglament-total__value" data-reglament-current-delta>
               {
                 formatReglamentMoneyDelta(
                   payload.computed.delta_tariff_per_sotka_month,
                 )
               }
             </p>
-            <p class="mt-1 text-xs text-muted-foreground">
-              к официальному тарифу
-            </p>
+            <p class="reglament-total__note">к официальному тарифу</p>
           </div>
         </div>
       </div>
     </section>
 
-    <div
-      class="reglament-sticky-total sticky top-[var(--site-sticky-offset)] z-20 border-y border-border px-5 py-1 md:px-6"
-    >
-      <div
-        class="flex h-9 w-full max-w-6xl items-center gap-3 overflow-hidden whitespace-nowrap text-xs text-muted-foreground md:text-sm"
-      >
+    <div class="reglament-sticky-total">
+      <div class="reglament-sticky-total__inner">
         <button
-          class="shrink-0 cursor-pointer rounded-full border border-border-strong bg-surface px-2.5 py-0.5 text-xs font-semibold text-primary hover:border-primary hover:bg-muted md:px-3 md:text-sm"
+          class="reglament-reset"
           type="button"
           data-reglament-reset
           hidden
         >
-          <span class="hidden sm:inline">Сбросить</span><span class="sm:hidden"
-            >Сброс</span
+          <span class="reglament-reset__long">Сбросить</span><span
+            class="reglament-reset__short">Сброс</span
           >
         </button>
         <span class="ui-visually-hidden">Текущий тариф</span>
-        <span
-          class="ml-auto flex min-w-0 items-baseline justify-end gap-1.5 text-right"
-        >
+        <span class="reglament-sticky-total__values">
           <span
-            class="reglament-sticky-total-original shrink-0 text-[0.8125rem] font-semibold md:text-sm"
+            class="reglament-sticky-total-original"
             data-reglament-current-original-tariff
             hidden
           >
             {formatReglamentNumber(payload.official.tariff_per_sotka_month)}
           </span>
           <span
-            class="reglament-sticky-total-arrow shrink-0 text-sm font-semibold md:text-base"
+            class="reglament-sticky-total-arrow"
             data-reglament-current-tariff-arrow
             aria-hidden="true"
             hidden
@@ -526,7 +474,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
             →
           </span>
           <strong
-            class="min-w-0 truncate text-base text-foreground transition-colors md:text-lg"
+            class="reglament-sticky-total__current"
             data-reglament-current-tariff
             data-reglament-current-tariff-tone
           >
@@ -536,15 +484,16 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       </div>
     </div>
 
-    <section class="px-5 md:px-6" aria-labelledby="estimate-sections-title">
-      <div class="max-w-6xl space-y-10">
-        <div class="max-w-3xl space-y-2" data-pagefind-body>
+    <section
+      class="reglament-sections"
+      aria-labelledby="estimate-sections-title"
+    >
+      <div class="reglament-sections__inner">
+        <div class="reglament-sections__intro" data-pagefind-body>
           <h2 id="estimate-sections-title" class="ui-section-title">
             Разделы сметы
           </h2>
-          <p
-            class="text-sm leading-6 text-muted-foreground md:text-base md:leading-7"
-          >
+          <p class="reglament-sections__description">
             В строках главным числом показан вклад в тариф. Годовые суммы
             оставлены в деталях и источниках, чтобы можно было свериться с PDF.
           </p>
@@ -553,8 +502,8 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
         {
           viewSections.map((section) => (
             <section aria-labelledby={section.id}>
-              <div class="mb-4 flex flex-col gap-3 md:mb-5 md:flex-row md:items-end md:justify-between">
-                <div class="space-y-1.5" data-pagefind-body>
+              <div class="reglament-section-header">
+                <div class="reglament-section-heading" data-pagefind-body>
                   <h3
                     id={section.id}
                     class="ui-prose-title"
@@ -563,7 +512,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                     {section.title}
                   </h3>
                   <p
-                    class="text-xs leading-5 text-muted-foreground"
+                    class="reglament-section-sources"
                     data-pagefind-weight="0.3"
                   >
                     Источники раздела:{' '}
@@ -571,7 +520,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                       <>
                         {index > 0 && '; '}
                         <ResourceLink
-                          class="ui-link text-primary"
+                          class="ui-link reglament-source-link"
                           href={ref.pdf_url}
                           type="application/pdf"
                           reload
@@ -582,9 +531,9 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                     ))}
                   </p>
                 </div>
-                <div class="shrink-0 text-left md:text-right">
+                <div class="reglament-section-total">
                   <p
-                    class="text-lg font-semibold tracking-tight text-foreground"
+                    class="reglament-section-total__tariff"
                     data-reglament-section-tariff={section.id}
                   >
                     {formatReglamentTariff(
@@ -592,13 +541,13 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                     )}
                   </p>
                   <p
-                    class="text-xs text-muted-foreground"
+                    class="reglament-section-total__annual"
                     data-reglament-section-annual={section.id}
                   >
                     {formatReglamentAnnualMoney(section.official.annual_gross)}
                   </p>
                   <p
-                    class="text-xs font-semibold text-muted-foreground"
+                    class="reglament-section-total__delta"
                     data-reglament-section-delta={section.id}
                   >
                     {formatReglamentMoneyDelta(
@@ -609,36 +558,26 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
               </div>
 
               <div
-                class="reglament-table-shell ui-sticky-table-shell -mx-5 border-y border-border bg-surface sm:mx-0 sm:rounded-xl sm:border md:mx-0"
+                class="reglament-table-shell ui-sticky-table-shell"
                 data-ui-sticky-table-shell
               >
-                <table class="min-w-[48rem] w-full border-separate border-spacing-0 text-left text-sm">
+                <table class="reglament-table">
                   <caption class="ui-visually-hidden">{section.title}</caption>
-                  <thead class="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                  <thead class="reglament-table__head">
                     <tr>
-                      <th
-                        class:list={[
-                          tableHeaderCellClass,
-                          'w-[32%] sm:rounded-tl-xl',
-                        ]}
-                      >
+                      <th class="reglament-table__header reglament-table__header--work">
                         Работа
                       </th>
-                      <th class:list={[tableHeaderCellClass, 'w-[18%]']}>
+                      <th class="reglament-table__header reglament-table__header--base">
                         База
                       </th>
-                      <th class:list={[tableHeaderCellClass, 'w-[14%]']}>
+                      <th class="reglament-table__header reglament-table__header--frequency">
                         Периодичность
                       </th>
-                      <th class:list={[tableHeaderCellClass, 'w-[14%]']}>
+                      <th class="reglament-table__header reglament-table__header--rate">
                         Цена/ставка
                       </th>
-                      <th
-                        class:list={[
-                          tableHeaderCellRightClass,
-                          'w-[22%] sm:rounded-tr-xl',
-                        ]}
-                      >
+                      <th class="reglament-table__header reglament-table__header--contribution">
                         Вклад в тариф
                       </th>
                     </tr>
@@ -646,13 +585,13 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                   <tbody>
                     {section.rows.map((row) => (
                       <>
-                        <tr class="border-t border-border">
-                          <td class="border-t border-border px-4 py-2.5 align-top">
-                            <div class="space-y-1.5" data-pagefind-body>
-                              <div class="flex items-start gap-2">
+                        <tr>
+                          <td class="reglament-table__cell">
+                            <div class="reglament-row-copy" data-pagefind-body>
+                              <div class="reglament-row-heading">
                                 {row.controls.enabled && (
                                   <input
-                                    class="mt-2 h-4 w-4 shrink-0 rounded border-border text-primary focus:ring-primary"
+                                    class="reglament-checkbox"
                                     type="checkbox"
                                     checked={row.baseline.is_enabled}
                                     aria-label="Включить позицию"
@@ -667,10 +606,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                 )}
                                 <h4
                                   id={row.titleId}
-                                  class:list={[
-                                    tableTextClass,
-                                    'min-w-0 flex-1 font-body font-semibold text-foreground',
-                                  ]}
+                                  class="reglament-table-text reglament-row-title"
                                   data-pagefind-weight="2"
                                 >
                                   {row.title}
@@ -688,12 +624,15 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                               </p>
                             </div>
                           </td>
-                          <td class="border-t border-border px-4 py-2.5 align-top text-muted-foreground">
+                          <td class="reglament-table__cell reglament-table__cell--muted">
                             {row.controls.base ? (
-                              <label class="block" data-pagefind-ignore="all">
-                                <span class={inputShellClass}>
+                              <label
+                                class="reglament-control"
+                                data-pagefind-ignore="all"
+                              >
+                                <span class="reglament-input-shell">
                                   <input
-                                    class={inputClass}
+                                    class="reglament-input"
                                     type="text"
                                     inputmode="decimal"
                                     value={formatReglamentInputNumber(
@@ -711,7 +650,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                     )}
                                   />
                                   {row.controls.base.unit && (
-                                    <span class={inputUnitClass}>
+                                    <span class="reglament-input-unit">
                                       {row.controls.base.unit}
                                     </span>
                                   )}
@@ -721,23 +660,23 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                     row.id,
                                     row.controls.base.key,
                                   )}
-                                  class={inputErrorClass}
+                                  class="reglament-input-error"
                                   aria-live="polite"
                                   aria-atomic="true"
                                   hidden
                                 />
                               </label>
                             ) : row.baseline.base ? (
-                              <span class={tableTextClass}>
+                              <span class="reglament-table-text">
                                 {formatDisplayValue(row.baseline.base)}
                               </span>
                             ) : (
                               <span
-                                class={`${tableTextClass} space-y-1`}
+                                class="reglament-table-text reglament-missing"
                                 data-pagefind-ignore="all"
                               >
-                                <span class="inline-flex items-center gap-1.5">
-                                  <span class="font-semibold">
+                                <span class="reglament-missing__label">
+                                  <span class="reglament-semibold">
                                     {row.missing.base.label}
                                   </span>
                                   <span class="reglament-missing-help">
@@ -763,12 +702,15 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                               </span>
                             )}
                           </td>
-                          <td class="border-t border-border px-4 py-2.5 align-top text-muted-foreground">
+                          <td class="reglament-table__cell reglament-table__cell--muted">
                             {row.controls.frequency ? (
-                              <label class="block" data-pagefind-ignore="all">
-                                <span class={inputShellClass}>
+                              <label
+                                class="reglament-control"
+                                data-pagefind-ignore="all"
+                              >
+                                <span class="reglament-input-shell">
                                   <input
-                                    class={inputClass}
+                                    class="reglament-input"
                                     type="text"
                                     inputmode="decimal"
                                     value={formatReglamentInputNumber(
@@ -788,7 +730,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                     )}
                                   />
                                   {row.controls.frequency.unit && (
-                                    <span class={inputUnitClass}>
+                                    <span class="reglament-input-unit">
                                       {row.controls.frequency.unit}
                                     </span>
                                   )}
@@ -798,23 +740,23 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                     row.id,
                                     row.controls.frequency.key,
                                   )}
-                                  class={inputErrorClass}
+                                  class="reglament-input-error"
                                   aria-live="polite"
                                   aria-atomic="true"
                                   hidden
                                 />
                               </label>
                             ) : row.baseline.frequency ? (
-                              <span class={tableTextClass}>
+                              <span class="reglament-table-text">
                                 {formatDisplayValue(row.baseline.frequency)}
                               </span>
                             ) : (
                               <span
-                                class={`${tableTextClass} space-y-1`}
+                                class="reglament-table-text reglament-missing"
                                 data-pagefind-ignore="all"
                               >
-                                <span class="inline-flex items-center gap-1.5">
-                                  <span class="font-semibold">
+                                <span class="reglament-missing__label">
+                                  <span class="reglament-semibold">
                                     {row.missing.frequency.label}
                                   </span>
                                   <span class="reglament-missing-help">
@@ -840,12 +782,15 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                               </span>
                             )}
                           </td>
-                          <td class="border-t border-border px-4 py-2.5 align-top text-muted-foreground">
+                          <td class="reglament-table__cell reglament-table__cell--muted">
                             {row.controls.rate ? (
-                              <label class="block" data-pagefind-ignore="all">
-                                <span class={inputShellClass}>
+                              <label
+                                class="reglament-control"
+                                data-pagefind-ignore="all"
+                              >
+                                <span class="reglament-input-shell">
                                   <input
-                                    class={inputClass}
+                                    class="reglament-input"
                                     type="text"
                                     inputmode="decimal"
                                     value={formatReglamentInputNumber(
@@ -863,7 +808,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                     )}
                                   />
                                   {row.controls.rate.unit && (
-                                    <span class={inputUnitClass}>
+                                    <span class="reglament-input-unit">
                                       {row.controls.rate.unit}
                                     </span>
                                   )}
@@ -873,23 +818,23 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                     row.id,
                                     row.controls.rate.key,
                                   )}
-                                  class={inputErrorClass}
+                                  class="reglament-input-error"
                                   aria-live="polite"
                                   aria-atomic="true"
                                   hidden
                                 />
                               </label>
                             ) : row.baseline.price ? (
-                              <span class={tableTextClass}>
+                              <span class="reglament-table-text">
                                 {formatDisplayValue(row.baseline.price)}
                               </span>
                             ) : (
                               <span
-                                class={`${tableTextClass} space-y-1`}
+                                class="reglament-table-text reglament-missing"
                                 data-pagefind-ignore="all"
                               >
-                                <span class="inline-flex items-center gap-1.5">
-                                  <span class="font-semibold">
+                                <span class="reglament-missing__label">
+                                  <span class="reglament-semibold">
                                     {row.missing.rate.label}
                                   </span>
                                   <span class="reglament-missing-help">
@@ -913,7 +858,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                   </span>
                                 </span>
                                 {row.missing.rate.detail && (
-                                  <span class="block text-xs font-semibold text-foreground">
+                                  <span class="reglament-missing__detail">
                                     {row.missing.rate.detail}
                                   </span>
                                 )}
@@ -921,11 +866,11 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                             )}
                           </td>
                           <td
-                            class="border-t border-border px-4 py-2.5 text-right align-top font-semibold text-foreground"
+                            class="reglament-table__cell reglament-table__cell--contribution"
                             data-pagefind-ignore="all"
                           >
                             <span
-                              class={tableTextClass}
+                              class="reglament-table-text"
                               data-reglament-row-tariff={row.id}
                             >
                               {formatReglamentTariffValue(
@@ -935,15 +880,15 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                           </td>
                         </tr>
                         <tr>
-                          <td class="px-4 pb-3 pt-0 align-top" colspan="5">
+                          <td class="reglament-details-cell" colspan="5">
                             <details
-                              class="ml-1.5 max-w-[calc(100vw-2.875rem)] text-xs leading-5 text-muted-foreground sm:max-w-[calc(100vw-6.375rem)] lg:max-w-none"
+                              class="reglament-details"
                               data-reglament-editor-row={row.id}
                               data-reglament-editor-title-id={row.titleId}
                             >
-                              <summary class="reglament-details-summary inline-flex cursor-pointer list-none items-center gap-1.5 font-semibold text-primary outline-none focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-primary/25">
+                              <summary class="reglament-details-summary">
                                 <svg
-                                  class="reglament-details-icon h-3 w-3 shrink-0 transition-transform"
+                                  class="reglament-details-icon"
                                   viewBox="0 0 12 12"
                                   aria-hidden="true"
                                 >
@@ -958,23 +903,23 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                 </svg>
                                 <span>Детали расчета и источники</span>
                               </summary>
-                              <div class="mt-3 space-y-4 border-l border-border pl-3 md:pl-4">
+                              <div class="reglament-details__content">
                                 {row.description && (
-                                  <p class="text-muted-foreground">
+                                  <p class="reglament-muted">
                                     {row.description}
                                   </p>
                                 )}
 
-                                <div class="grid gap-3 sm:grid-cols-2">
-                                  <div class="space-y-1">
-                                    <p class="font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                                <div class="reglament-details__summary">
+                                  <div class="reglament-details__group">
+                                    <p class="reglament-details__label">
                                       Источники
                                     </p>
-                                    <ul class="space-y-1">
+                                    <ul class="reglament-details__list">
                                       {row.source_refs.map((ref) => (
                                         <li>
                                           <ResourceLink
-                                            class="ui-link text-primary"
+                                            class="ui-link reglament-source-link"
                                             href={ref.pdf_url}
                                             type="application/pdf"
                                             reload
@@ -982,7 +927,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                             {formatEstimateSourceRefLabel(ref)}
                                           </ResourceLink>
                                           {ref.note && (
-                                            <span class="block text-muted-foreground">
+                                            <span class="reglament-source-note">
                                               {ref.note}
                                             </span>
                                           )}
@@ -991,14 +936,14 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                                     </ul>
                                   </div>
                                   <div
-                                    class="space-y-1"
+                                    class="reglament-details__group"
                                     data-pagefind-ignore="all"
                                   >
-                                    <p class="font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                                    <p class="reglament-details__label">
                                       Сумма за год
                                     </p>
                                     <p
-                                      class="font-semibold text-foreground"
+                                      class="reglament-details__annual"
                                       data-reglament-row-annual={row.id}
                                     >
                                       {formatReglamentAnnualMoney(
@@ -1034,23 +979,19 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
     />
 
     <template data-reglament-editor-template data-pagefind-ignore="all">
-      <div class="space-y-4" data-reglament-editor>
-        <div class="space-y-2">
-          <p
-            class="font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-          >
-            Состав расчета
-          </p>
-          <dl class="grid gap-x-3 gap-y-2 sm:grid-cols-2">
+      <div class="reglament-editor" data-reglament-editor>
+        <div class="reglament-editor__section">
+          <p class="reglament-editor__label">Состав расчета</p>
+          <dl class="reglament-breakdown">
             {
               breakdownFields.map((field) => (
                 <div
-                  class="flex items-start justify-between gap-3 border-b border-border pb-1"
+                  class="reglament-breakdown__row"
                   data-reglament-breakdown-row={field.key}
                 >
-                  <dt class="pt-1.5">{field.label}</dt>
+                  <dt class="reglament-breakdown__term">{field.label}</dt>
                   <dd
-                    class="min-w-[10rem] text-right font-semibold text-foreground"
+                    class="reglament-breakdown__value"
                     data-reglament-breakdown-value
                   />
                 </div>
@@ -1059,17 +1000,10 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
           </dl>
         </div>
 
-        <fieldset
-          class="space-y-2 border-t border-border pt-3"
-          data-reglament-expert-fields
-        >
-          <legend
-            class="font-semibold uppercase tracking-[0.06em] text-muted-foreground"
-          >
-            Дополнительные поля
-          </legend>
+        <fieldset class="reglament-expert-fields" data-reglament-expert-fields>
+          <legend class="reglament-editor__label"> Дополнительные поля </legend>
           <div
-            class="grid gap-2 sm:grid-cols-2"
+            class="reglament-expert-fields__list"
             data-reglament-expert-fields-list
           >
           </div>
@@ -1078,14 +1012,18 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
     </template>
 
     <template data-reglament-inline-control-template data-pagefind-ignore="all">
-      <label class="block">
+      <label class="reglament-control">
         <span class="ui-visually-hidden" data-reglament-control-label></span>
-        <span class={inputShellClass}>
-          <input class={inlineInputClass} type="text" inputmode="decimal" />
-          <span class={inputUnitClass} data-reglament-control-unit></span>
+        <span class="reglament-input-shell">
+          <input
+            class="reglament-input reglament-input--inline"
+            type="text"
+            inputmode="decimal"
+          />
+          <span class="reglament-input-unit" data-reglament-control-unit></span>
         </span>
         <span
-          class={inputErrorClass}
+          class="reglament-input-error"
           aria-live="polite"
           aria-atomic="true"
           data-reglament-control-error
@@ -1094,16 +1032,16 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
     </template>
 
     <template data-reglament-expert-control-template data-pagefind-ignore="all">
-      <label class="block space-y-1">
+      <label class="reglament-control reglament-control--expert">
         <span
-          class="font-semibold text-muted-foreground"
+          class="reglament-control__label"
           data-reglament-control-visible-label></span>
-        <span class={inputShellClass}>
-          <input class={inputClass} type="text" inputmode="decimal" />
-          <span class={inputUnitClass} data-reglament-control-unit></span>
+        <span class="reglament-input-shell">
+          <input class="reglament-input" type="text" inputmode="decimal" />
+          <span class="reglament-input-unit" data-reglament-control-unit></span>
         </span>
         <span
-          class={inputErrorClass}
+          class="reglament-input-error"
           aria-live="polite"
           aria-atomic="true"
           data-reglament-control-error
@@ -1113,36 +1051,574 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
   </main>
 
   <style>
+    .reglament-page {
+      padding-block-end: 2rem;
+    }
+
+    .reglament-header {
+      max-width: 64rem;
+    }
+
+    .reglament-header,
+    .reglament-intro,
+    .reglament-editor,
+    .reglament-details__content {
+      display: grid;
+    }
+
+    .reglament-header {
+      gap: 1.5rem;
+    }
+
+    .reglament-intro,
+    .reglament-editor,
+    .reglament-details__content {
+      gap: 1rem;
+    }
+
+    .reglament-title {
+      max-width: 56rem;
+    }
+
+    .reglament-lead {
+      display: grid;
+      max-width: 48rem;
+      gap: 0.75rem;
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+      line-height: 1.5rem;
+    }
+
+    .reglament-emphasis,
+    .reglament-link,
+    .reglament-semibold {
+      font-weight: 600;
+    }
+
+    .reglament-emphasis {
+      color: var(--color-text);
+    }
+
+    .reglament-totals {
+      display: grid;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      background: var(--color-surface);
+    }
+
+    .reglament-total {
+      padding: 1rem;
+    }
+
+    .reglament-total--divided {
+      border-block-end: 1px solid var(--color-border);
+    }
+
+    .reglament-total__label,
+    .reglament-details__label,
+    .reglament-editor__label {
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .reglament-total__value {
+      margin-block-start: 0.5rem;
+      color: var(--color-text);
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      line-height: 2rem;
+    }
+
+    .reglament-total__note {
+      margin-block-start: 0.25rem;
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+      line-height: 1rem;
+    }
+
     .reglament-sticky-total {
+      position: sticky;
+      top: var(--site-sticky-offset);
+      z-index: 20;
+      padding: 0.25rem 1.25rem;
+      border-block: 1px solid var(--color-border);
       background: var(--color-surface-muted);
       box-shadow: 0 0.45rem 1rem oklch(27% 0.05 142 / 0.055);
     }
 
-    .reglament-sticky-total-original {
+    .reglament-sticky-total__inner {
+      display: flex;
+      width: 100%;
+      height: 2.25rem;
+      max-width: 72rem;
+      align-items: center;
+      gap: 0.75rem;
+      overflow: hidden;
       color: var(--color-text-muted);
+      font-size: 0.75rem;
+      line-height: 1rem;
+      white-space: nowrap;
+    }
+
+    .reglament-reset {
+      flex-shrink: 0;
+      padding: 0.125rem 0.625rem;
+      border: 1px solid var(--color-border-strong);
+      border-radius: var(--radius-full);
+      background: var(--color-surface);
+      color: var(--color-primary);
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      line-height: 1rem;
+    }
+
+    .reglament-reset:hover {
+      border-color: var(--color-primary);
+      background: var(--color-surface-muted);
+    }
+
+    .reglament-reset__long {
+      display: none;
+    }
+
+    .reglament-sticky-total__values {
+      display: flex;
+      min-width: 0;
+      margin-inline-start: auto;
+      align-items: baseline;
+      justify-content: flex-end;
+      gap: 0.375rem;
+      text-align: end;
+    }
+
+    .reglament-sticky-total-original {
+      flex-shrink: 0;
+      color: var(--color-text-muted);
+      font-size: 0.8125rem;
+      font-weight: 600;
       opacity: 0.58;
     }
 
     .reglament-sticky-total-arrow {
+      flex-shrink: 0;
       color: var(--color-text-muted);
+      font-size: 0.875rem;
+      font-weight: 600;
       opacity: 0.52;
       transform: translateY(-0.04em);
+    }
+
+    .reglament-sticky-total__current {
+      min-width: 0;
+      overflow: hidden;
+      color: var(--color-text);
+      font-size: 1rem;
+      line-height: 1.5rem;
+      text-overflow: ellipsis;
+      transition: color 150ms;
+      white-space: nowrap;
+    }
+
+    .reglament-sections {
+      padding-inline: 1.25rem;
+    }
+
+    .reglament-sections__inner {
+      display: grid;
+      max-width: 72rem;
+      gap: 2.5rem;
+    }
+
+    .reglament-sections__intro {
+      display: grid;
+      max-width: 48rem;
+      gap: 0.5rem;
+    }
+
+    .reglament-sections__description {
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+      line-height: 1.5rem;
+    }
+
+    .reglament-section-header {
+      display: flex;
+      margin-block-end: 1rem;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .reglament-section-heading {
+      display: grid;
+      gap: 0.375rem;
+    }
+
+    .reglament-section-sources {
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+      line-height: 1.25rem;
+    }
+
+    .reglament-source-link {
+      color: var(--color-primary);
+    }
+
+    .reglament-section-total {
+      flex-shrink: 0;
+      text-align: start;
+    }
+
+    .reglament-section-total__tariff {
+      color: var(--color-text);
+      font-size: 1.125rem;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      line-height: 1.75rem;
+    }
+
+    .reglament-section-total__annual,
+    .reglament-section-total__delta {
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+      line-height: 1rem;
+    }
+
+    .reglament-section-total__delta {
+      font-weight: 600;
+    }
+
+    .reglament-table-shell {
+      margin-inline: -1.25rem;
+      border-block: 1px solid var(--color-border);
+      background: var(--color-surface);
+    }
+
+    .reglament-table {
+      width: 100%;
+      min-width: 48rem;
+      border-spacing: 0;
+      border-collapse: separate;
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      text-align: start;
+    }
+
+    .reglament-table__head {
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      line-height: 1rem;
+      text-transform: uppercase;
+    }
+
+    .reglament-table__header {
+      position: sticky;
+      top: var(--ui-sticky-table-header-top);
+      z-index: 10;
+      padding: 0.625rem 1rem;
+      border-block-end: 1px solid var(--color-border);
+      background: var(--color-surface-muted);
+      vertical-align: bottom;
+    }
+
+    .reglament-table__header--work {
+      width: 32%;
+    }
+
+    .reglament-table__header--base {
+      width: 18%;
+    }
+
+    .reglament-table__header--frequency,
+    .reglament-table__header--rate {
+      width: 14%;
+    }
+
+    .reglament-table__header--contribution {
+      width: 22%;
+      text-align: end;
+    }
+
+    .reglament-table__cell {
+      padding: 0.625rem 1rem;
+      border-block-start: 1px solid var(--color-border);
+      vertical-align: top;
+    }
+
+    .reglament-table__cell--muted,
+    .reglament-muted,
+    .reglament-source-note {
+      color: var(--color-text-muted);
+    }
+
+    .reglament-table__cell--contribution {
+      color: var(--color-text);
+      font-weight: 600;
+      text-align: end;
+    }
+
+    .reglament-row-copy {
+      display: grid;
+      gap: 0.375rem;
+    }
+
+    .reglament-row-heading {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .reglament-checkbox {
+      width: 1rem;
+      height: 1rem;
+      margin-block-start: 0.5rem;
+      flex-shrink: 0;
+      border-color: var(--color-border);
+      border-radius: var(--radius-sm);
+      accent-color: var(--color-primary);
+    }
+
+    .reglament-checkbox:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
+
+    .reglament-table-text {
+      display: block;
+      padding-block-start: 0.4375rem;
+      line-height: 1.375;
+    }
+
+    .reglament-row-title {
+      min-width: 0;
+      flex: 1 1 0%;
+      color: var(--color-text);
+      font-family: var(--font-body);
+      font-weight: 600;
+    }
+
+    .reglament-control {
+      display: block;
+    }
+
+    .reglament-control--expert,
+    .reglament-missing,
+    .reglament-details__group,
+    .reglament-details__list {
+      display: grid;
+      gap: 0.25rem;
+    }
+
+    .reglament-input-shell {
+      display: inline-flex;
+      max-width: 100%;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+      vertical-align: top;
+      transition:
+        border-color 150ms,
+        box-shadow 150ms;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .reglament-input-shell:focus-within {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px
+        color-mix(in oklch, var(--color-primary), transparent 80%);
     }
 
     .reglament-input-shell:has(.reglament-input[aria-invalid='true']) {
       border-color: var(--color-danger);
     }
 
+    .reglament-input {
+      width: 6.25rem;
+      min-width: 0;
+      padding: 0.375rem 0.625rem;
+      border: 0;
+      background: transparent;
+      color: var(--color-text);
+      font-size: 0.875rem;
+      font-weight: 600;
+      line-height: 1.25rem;
+      outline: none;
+    }
+
+    .reglament-input--inline {
+      width: 7.5rem;
+      text-align: end;
+    }
+
     .reglament-input[aria-invalid='true'] {
       color: var(--color-danger-text);
+    }
+
+    .reglament-input-unit {
+      display: flex;
+      flex-shrink: 0;
+      align-items: center;
+      padding-inline: 0.5rem;
+      border-inline-start: 1px solid var(--color-border);
+      background: var(--color-surface-muted);
+      color: var(--color-text-muted);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    .reglament-input-error {
+      display: block;
+      max-width: 13rem;
+      margin-block-start: 0.25rem;
+      color: var(--color-danger);
+      font-size: 0.75rem;
+      font-weight: 600;
+      line-height: 1rem;
+    }
+
+    .reglament-input-error[hidden] {
+      display: none;
+    }
+
+    .reglament-missing__label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+
+    .reglament-missing__detail {
+      display: block;
+      color: var(--color-text);
+      font-size: 0.75rem;
+      font-weight: 600;
+      line-height: 1rem;
+    }
+
+    .reglament-details-cell {
+      padding: 0 1rem 0.75rem;
+      vertical-align: top;
+    }
+
+    .reglament-details {
+      max-width: calc(100vw - 2.875rem);
+      margin-inline-start: 0.375rem;
+      color: var(--color-text-muted);
+      font-size: 0.75rem;
+      line-height: 1.25rem;
+    }
+
+    .reglament-details-summary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      color: var(--color-primary);
+      cursor: pointer;
+      font-weight: 600;
+      list-style: none;
+      outline: none;
+    }
+
+    .reglament-details-summary:focus-visible {
+      border-radius: var(--radius-md);
+      box-shadow: 0 0 0 2px
+        color-mix(in oklch, var(--color-primary), transparent 75%);
     }
 
     .reglament-details-summary::-webkit-details-marker {
       display: none;
     }
 
+    .reglament-details-icon {
+      width: 0.75rem;
+      height: 0.75rem;
+      flex-shrink: 0;
+      transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
     details[open] .reglament-details-icon {
       transform: rotate(90deg);
+    }
+
+    .reglament-details__content {
+      margin-block-start: 0.75rem;
+      padding-inline-start: 0.75rem;
+      border-inline-start: 1px solid var(--color-border);
+    }
+
+    .reglament-details__summary {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .reglament-source-note {
+      display: block;
+    }
+
+    .reglament-details__annual {
+      color: var(--color-text);
+      font-weight: 600;
+    }
+
+    .reglament-editor__section {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .reglament-breakdown {
+      display: grid;
+      column-gap: 0.75rem;
+      row-gap: 0.5rem;
+    }
+
+    .reglament-breakdown__row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding-block-end: 0.25rem;
+      border-block-end: 1px solid var(--color-border);
+    }
+
+    .reglament-breakdown__term,
+    .reglament-breakdown__value :global([data-reglament-row-breakdown]) {
+      padding-block-start: 0.375rem;
+    }
+
+    .reglament-breakdown__value {
+      min-width: 10rem;
+      color: var(--color-text);
+      font-weight: 600;
+      text-align: end;
+    }
+
+    .reglament-breakdown__value :global([data-reglament-row-breakdown]) {
+      display: block;
+    }
+
+    .reglament-expert-fields {
+      display: grid;
+      gap: 0.5rem;
+      padding-block-start: 0.75rem;
+      border-block-start: 1px solid var(--color-border);
+    }
+
+    .reglament-expert-fields__list {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .reglament-control__label {
+      color: var(--color-text-muted);
+      font-weight: 600;
     }
 
     .reglament-missing-help {
@@ -1158,7 +1634,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       cursor: help;
       align-items: center;
       justify-content: center;
-      border-radius: 9999px;
+      border-radius: var(--radius-full);
       border: 1px solid var(--color-border-strong);
       background: var(--color-surface);
       color: var(--color-text-muted);
@@ -1183,7 +1659,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       border: 1px solid var(--color-border);
       background: var(--color-surface);
       box-shadow: 0 0.75rem 1.6rem oklch(27% 0.05 142 / 0.12);
-      color: var(--color-foreground);
+      color: var(--color-text);
       font-size: 0.75rem;
       font-weight: 600;
       line-height: 1.45;
@@ -1215,6 +1691,127 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
 
     [data-reglament-delta-tone='zero'] {
       color: var(--color-text-muted);
+    }
+
+    @media (min-width: 40rem) {
+      .reglament-reset__long {
+        display: inline;
+      }
+
+      .reglament-reset__short {
+        display: none;
+      }
+
+      .reglament-table-shell {
+        margin-inline: 0;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-xl);
+      }
+
+      .reglament-table__header--work {
+        border-start-start-radius: var(--radius-xl);
+      }
+
+      .reglament-table__header--contribution {
+        border-start-end-radius: var(--radius-xl);
+      }
+
+      .reglament-details {
+        max-width: calc(100vw - 6.375rem);
+      }
+
+      .reglament-details__summary,
+      .reglament-breakdown,
+      .reglament-expert-fields__list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 48rem) {
+      .reglament-page {
+        padding-block-end: 3rem;
+      }
+
+      .reglament-lead {
+        font-size: 0.9375rem;
+      }
+
+      .reglament-totals {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .reglament-total {
+        padding: 1.25rem;
+      }
+
+      .reglament-total--divided {
+        border-inline-end: 1px solid var(--color-border);
+        border-block-end: 0;
+      }
+
+      .reglament-sticky-total,
+      .reglament-sections {
+        padding-inline: 1.5rem;
+      }
+
+      .reglament-sticky-total__inner,
+      .reglament-reset {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+      }
+
+      .reglament-reset {
+        padding-inline: 0.75rem;
+      }
+
+      .reglament-sticky-total-original {
+        font-size: 0.875rem;
+      }
+
+      .reglament-sticky-total-arrow,
+      .reglament-sticky-total__current {
+        font-size: 1rem;
+        line-height: 1.5rem;
+      }
+
+      .reglament-sticky-total__current {
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+      }
+
+      .reglament-sections__description {
+        font-size: 1rem;
+        line-height: 1.75rem;
+      }
+
+      .reglament-section-header {
+        margin-block-end: 1.25rem;
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+      }
+
+      .reglament-section-total {
+        text-align: end;
+      }
+
+      .reglament-details__content {
+        padding-inline-start: 1rem;
+      }
+    }
+
+    @media (min-width: 64rem) {
+      .reglament-page {
+        padding-block-end: 4rem;
+      }
+
+      .reglament-table__header {
+        top: calc(var(--ui-sticky-table-header-top) + 2.875rem - 1px);
+      }
+
+      .reglament-details {
+        max-width: none;
+      }
     }
   </style>
 
