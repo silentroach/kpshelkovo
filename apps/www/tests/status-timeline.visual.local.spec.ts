@@ -1,4 +1,8 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
+import {
+  expectPaintedContent,
+  waitForVisualPaint,
+} from './config/visual-content';
 
 const desktopViewport = { width: 1440, height: 1200 } as const;
 
@@ -13,10 +17,11 @@ const openFixture = async (page: Page): Promise<void> => {
   expect(page.viewportSize()).toEqual(desktopViewport);
   await page.goto('/', { waitUntil: 'networkidle' });
   await expect(page.getByTestId('status-timeline-visual')).toBeVisible();
-  await page.evaluate(() => document.fonts.ready.then(() => undefined));
+  await waitForVisualPaint(page);
 };
 
 const openTimelineTooltip = async (
+  page: Page,
   target: Locator,
   incidentId: string,
 ): Promise<void> => {
@@ -29,6 +34,13 @@ const openTimelineTooltip = async (
   await expect(
     target.locator('[data-status-timeline][data-status-tooltip-open="true"]'),
   ).toHaveCount(1);
+  await waitForVisualPaint(page);
+  await expectPaintedContent(
+    tooltip.locator('.status-service-timeline__tooltip-title:visible').first(),
+  );
+  await expectPaintedContent(
+    tooltip.locator('.status-service-timeline__tooltip-row:visible').first(),
+  );
 };
 
 test.describe('StatusServiceTimeline visual', () => {
@@ -109,7 +121,7 @@ test.describe('StatusServiceTimeline visual', () => {
   }) => {
     const target = page.getByTestId('status-timeline-mixed');
 
-    await openTimelineTooltip(target, 'mixed-incident');
+    await openTimelineTooltip(page, target, 'mixed-incident');
 
     await expect(target.locator('[data-status-segment="green"]')).toHaveCount(
       3,
@@ -165,7 +177,12 @@ test.describe('StatusServiceTimeline visual', () => {
   }) => {
     const target = page.getByTestId('status-timeline-dense-problems');
 
-    await openTimelineTooltip(target, 'dense-incident-1');
+    await openTimelineTooltip(page, target, 'dense-incident-1');
+    await expectPaintedContent(
+      target
+        .locator('.status-service-timeline__tooltip-title')
+        .filter({ hasText: 'Текущее отключение' }),
+    );
 
     await expect(target).toHaveScreenshot(
       'status-timeline-dense-problems-tooltip.png',
