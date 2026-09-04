@@ -12,6 +12,7 @@ export const STATUS_SERVICES = [
   'water',
   'internet',
   'dam',
+  'roads',
 ] as const;
 export type StatusService = (typeof STATUS_SERVICES)[number];
 

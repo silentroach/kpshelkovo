@@ -95,6 +95,7 @@ describe('buildStatusDataset', () => {
       'water',
       'internet',
       'dam',
+      'roads',
     ]);
 
     const damHistory = data.byId.get('2026/03/dam-flood-closure');

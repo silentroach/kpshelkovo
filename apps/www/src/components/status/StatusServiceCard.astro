@@ -3,6 +3,7 @@ import {
   DamIcon,
   FiberIcon,
   LightningIcon,
+  MapPinIcon,
   WaterDropIcon,
 } from '@shelkovo/ui/icons';
 
@@ -51,6 +52,7 @@ const serviceIcons = {
   water: WaterDropIcon,
   internet: FiberIcon,
   dam: DamIcon,
+  roads: MapPinIcon,
 } as const;
 const ServiceIcon = serviceIcons[summary.service];
 const resolvedMobileTimelineDays = mobileTimelineDays ?? timelineDays;
@@ -221,7 +223,8 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
     color: var(--color-unknown);
   }
 
-  .status-service-row__icon--dam {
+  .status-service-row__icon--dam,
+  .status-service-row__icon--roads {
     background: var(--color-surface-muted);
     color: var(--color-earth);
   }

@@ -83,6 +83,8 @@ export const mapRawStatusService = (value: StatusService): StatusService => {
       return 'internet';
     case 'dam':
       return 'dam';
+    case 'roads':
+      return 'roads';
   }
 };
 

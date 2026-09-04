@@ -28,6 +28,7 @@ const SERVICE_LABELS: Record<StatusService, string> = {
   water: 'Вода',
   internet: 'Интернет',
   dam: 'Дамба',
+  roads: 'Дороги',
 };
 
 const KIND_LABELS: Record<StatusKind, string> = {
@@ -40,6 +41,7 @@ const INCIDENT_TITLE_LABELS: Record<StatusService, string> = {
   water: 'Нет воды',
   internet: 'Нет интернета',
   dam: 'Проезд через дамбу закрыт',
+  roads: 'Проезд по дорогам ограничен',
 };
 
 const MAINTENANCE_TITLE_LABELS: Record<StatusService, string> = {
@@ -47,6 +49,7 @@ const MAINTENANCE_TITLE_LABELS: Record<StatusService, string> = {
   water: 'Плановые работы: вода',
   internet: 'Плановые работы: интернет',
   dam: 'Плановые работы: дамба',
+  roads: 'Плановые работы: дороги',
 };
 
 interface StatusIncidentPeriodPart {
