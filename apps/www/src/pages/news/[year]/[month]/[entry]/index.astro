@@ -320,13 +320,11 @@ const schema = newsArticleSchema({
     --news-hero-overlay-side-soft: oklch(24% 0.04 145 / 0.06);
     --color-text: var(--news-hero-foreground);
     --color-text-muted: var(--news-hero-muted-foreground);
-    --color-foreground: var(--news-hero-foreground);
-    --color-muted-foreground: var(--news-hero-muted-foreground);
     --color-primary: var(--news-hero-primary);
     --color-primary-hover: var(--news-hero-primary-hover);
     --color-border: var(--news-hero-border);
     --color-border-strong: var(--news-hero-border-strong);
-    --color-ring: var(--news-hero-ring);
+    --color-focus: var(--news-hero-ring);
 
     position: relative;
     isolation: isolate;
@@ -436,7 +434,7 @@ const schema = newsArticleSchema({
     color: color-mix(
       in oklab,
       var(--color-primary) 38%,
-      var(--color-muted-foreground) 62%
+      var(--color-text-muted) 62%
     );
     font-weight: 600;
     text-decoration-line: underline;
@@ -453,7 +451,7 @@ const schema = newsArticleSchema({
     color: color-mix(
       in oklab,
       var(--color-primary-hover) 52%,
-      var(--color-muted-foreground) 48%
+      var(--color-text-muted) 48%
     );
     text-decoration-color: color-mix(in oklab, currentColor 30%, transparent);
     text-underline-offset: 0.18em;

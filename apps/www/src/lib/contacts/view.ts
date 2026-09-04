@@ -55,7 +55,7 @@ const CONTACT_REVIEW_SENTIMENT_LABELS: Record<
 
 const MANY_POSITIVE_CONTACT_REVIEWS_THRESHOLD = 5;
 
-export const CONTACTS_PROSE = 'ui-prose max-w-[65ch]';
+export const CONTACTS_PROSE = 'ui-prose ui-prose-narrow';
 
 export const CONTACTS_CHAT_LABEL = 'чате жителей Шелково';
 export const CONTACTS_CHAT_URL = 'https://t.me/shelkovoecoclub';

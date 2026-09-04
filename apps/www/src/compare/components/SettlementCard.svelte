@@ -111,13 +111,13 @@
   }
 
   .settlement-title {
-    color: var(--color-foreground);
+    color: var(--color-text);
     font-size: 1rem;
     line-height: 1.25;
   }
 
   .settlement-location {
-    color: var(--color-muted-foreground);
+    color: var(--color-text-muted);
     font-size: 0.875rem;
     line-height: 1.375;
   }
@@ -153,7 +153,7 @@
     display: inline-flex;
     height: 1.5rem;
     align-items: center;
-    color: var(--color-muted-foreground);
+    color: var(--color-text-muted);
     font-size: 0.75rem;
     font-weight: 600;
     line-height: 1;
@@ -171,7 +171,7 @@
   }
 
   .tariff {
-    color: var(--color-foreground);
+    color: var(--color-text);
     font-size: 1.25rem;
     font-weight: 600;
     line-height: 1;
@@ -187,7 +187,7 @@
   }
 
   .baseline-label {
-    color: var(--color-muted-foreground);
+    color: var(--color-text-muted);
     font-size: 0.875rem;
     font-weight: 600;
   }
