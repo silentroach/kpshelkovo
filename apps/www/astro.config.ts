@@ -5,7 +5,6 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import svelte from '@astrojs/svelte';
 import compressor from 'astro-compressor';
-import tailwindcss from '@tailwindcss/vite';
 import {
   applySitemapMetadata,
   shouldIncludeSitemapPage,
@@ -18,7 +17,6 @@ import { pagefindDevSnapshot } from './src/integrations/pagefind-dev-snapshot';
 import { retryableSettlementsExplorer } from './src/integrations/retryable-settlements-explorer';
 import { statusCalendarAlternateValidation } from './src/integrations/status-calendar-alternate-validation';
 
-const plugins = [tailwindcss(), ...retryableSettlementsExplorer()];
 const devServerPort = 4321;
 const site = 'https://kpshelkovo.online';
 let sitemapMetadataIndex: Promise<SitemapMetadataIndex> | undefined;
@@ -84,7 +82,7 @@ export default defineConfig({
     server: {
       strictPort: true,
     },
-    plugins,
+    plugins: retryableSettlementsExplorer(),
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),

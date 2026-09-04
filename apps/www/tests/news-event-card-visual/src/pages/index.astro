@@ -108,6 +108,11 @@ const eventWithoutCoordinates = {
     background: color-mix(in oklab, white 74%, var(--color-bg) 26%);
   }
 
+  /* Keep Chromium element screenshots out of the backdrop compositing path. */
+  .news-event-visual-target :global(.news-event-panel) {
+    backdrop-filter: none;
+  }
+
   @media (max-width: 47.999rem) {
     .news-event-visual-shell {
       gap: 1rem;

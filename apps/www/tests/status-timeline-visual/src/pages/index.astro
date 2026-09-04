@@ -233,6 +233,11 @@ const denseProblemIncidents: readonly StatusTimelineIncidentInput[] = [
     overflow: clip;
   }
 
+  /* Keep Chromium element screenshots out of the backdrop compositing path. */
+  .status-timeline-visual-target :global(.status-service-timeline__tooltip) {
+    backdrop-filter: none;
+  }
+
   .status-timeline-visual-target--tooltip {
     padding-bottom: 1.1rem;
   }
