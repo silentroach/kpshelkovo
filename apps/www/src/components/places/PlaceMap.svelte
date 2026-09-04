@@ -913,7 +913,7 @@
   }
 
   :global(.place-map-marker:focus-visible) {
-    box-shadow: 0 0 0 0.1875rem var(--color-ring);
+    box-shadow: 0 0 0 0.1875rem var(--color-focus);
   }
 
   :global(
@@ -939,7 +939,7 @@
     border-radius: 999px;
     background: var(--color-accent);
     box-shadow: 0 0 0 0.0625rem var(--color-surface-raised);
-    color: var(--color-foreground);
+    color: var(--color-text);
     pointer-events: none;
   }
 
@@ -999,7 +999,7 @@
     box-shadow:
       0 0 0 0.125rem color-mix(in oklab, var(--color-surface) 88%, transparent),
       0 0.2rem 0.45rem oklch(24% 0.04 145 / 0.28);
-    color: var(--color-foreground);
+    color: var(--color-text);
     cursor: pointer;
     font: inherit;
     font-size: 1rem;
@@ -1023,7 +1023,7 @@
   }
 
   :global(.place-map-cluster:focus-visible) {
-    outline: 0.1875rem solid var(--color-ring);
+    outline: 0.1875rem solid var(--color-focus);
     outline-offset: 0.125rem;
     transform: translate(-50%, -50%) scale(1.08);
   }

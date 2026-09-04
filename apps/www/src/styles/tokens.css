@@ -1,0 +1,97 @@
+@layer tokens {
+  :root {
+    color-scheme: light;
+
+    --color-bg: oklch(99.1% 0.002 125);
+    --color-bg-soft: oklch(98.8% 0.003 125);
+    --color-surface: oklch(100% 0 0);
+    --color-surface-raised: oklch(100% 0 0);
+    --color-surface-muted: oklch(96.8% 0.008 135);
+    --color-border: oklch(89.2% 0.012 130);
+    --color-border-strong: oklch(82% 0.018 130);
+
+    --color-text: oklch(24% 0.04 145);
+    --color-text-muted: oklch(46% 0.02 135);
+    --color-text-soft: oklch(56% 0.015 132);
+
+    --color-primary: oklch(36% 0.115 143);
+    --color-primary-hover: oklch(30% 0.105 143);
+    --color-primary-soft: oklch(96.5% 0.014 140);
+    --color-primary-soft-2: oklch(98.2% 0.006 140);
+
+    --color-accent: oklch(83% 0.155 78);
+    --color-accent-hover: oklch(76% 0.165 72);
+    --color-accent-soft: oklch(95.3% 0.045 82);
+    --color-accent-text: oklch(43% 0.075 72);
+    --color-earth: oklch(45% 0.06 72);
+    --color-focus: var(--color-accent);
+
+    --color-shadow: oklch(24% 0.04 145 / 0.09);
+    --shadow-1: 0 0.25rem 0.75rem oklch(27% 0.05 142 / 0.055);
+    --shadow-2: 0 0.75rem 2rem oklch(27% 0.05 142 / 0.085);
+
+    --color-success: oklch(53% 0.12 145);
+    --color-success-foreground: var(--color-surface-raised);
+    --color-success-soft: oklch(94.5% 0.04 145);
+    --color-success-border: oklch(78% 0.07 145);
+    --color-success-text: oklch(51% 0.12 145);
+
+    --color-warning: oklch(73% 0.15 73);
+    --color-warning-graphic: oklch(65% 0.15 73);
+    --color-warning-soft: oklch(95% 0.065 78);
+    --color-warning-border: oklch(84% 0.11 76);
+    --color-warning-text: oklch(43% 0.09 68);
+
+    --color-danger: oklch(54% 0.145 28);
+    --color-danger-foreground: var(--color-surface-raised);
+    --color-danger-soft: oklch(95.2% 0.045 25);
+    --color-danger-border: oklch(81% 0.08 25);
+    --color-danger-text: oklch(52% 0.145 28);
+
+    --color-info-soft: color-mix(
+      in oklab,
+      var(--color-earth) 10%,
+      var(--color-surface-raised) 90%
+    );
+    --color-info-border: color-mix(
+      in oklab,
+      var(--color-earth) 24%,
+      var(--color-border) 76%
+    );
+    --color-info-text: color-mix(
+      in oklab,
+      var(--color-earth) 78%,
+      var(--color-text) 22%
+    );
+
+    --color-water: oklch(46% 0.09 235);
+    --color-water-soft: oklch(95.6% 0.022 230);
+    --color-water-border: oklch(84% 0.05 228);
+
+    --color-unknown: oklch(48% 0.04 125);
+    --color-unknown-soft: oklch(96.8% 0.004 125);
+    --color-unknown-border: oklch(88.5% 0.008 130);
+    --color-neutral-soft: oklch(96.8% 0.004 125);
+    --color-neutral-border: oklch(88.5% 0.008 130);
+
+    --color-telegram: #229ed9;
+    --color-whatsapp: #25d366;
+    --color-domyland-start: #7047eb;
+    --color-domyland-end: #aa62f2;
+    --color-yandex-maps: #df574e;
+    --color-yandex-maps-light: #ff8277;
+    --color-star: oklch(69% 0.12 84);
+
+    --font-heading: 'PT Serif', Georgia, serif;
+    --font-body: 'Fira Sans', system-ui, sans-serif;
+
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --radius-2xl: 1rem;
+    --radius-full: 999px;
+    --page-max: 1180px;
+    --page-padding: clamp(1rem, 3vw, 2rem);
+  }
+}

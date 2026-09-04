@@ -84,7 +84,7 @@
 
   .source-link {
     overflow: hidden;
-    color: var(--color-foreground);
+    color: var(--color-text);
     font-weight: 600;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -96,7 +96,7 @@
 
   .source-comment,
   .source-date {
-    color: var(--color-muted-foreground);
+    color: var(--color-text-muted);
     font-size: 0.875rem;
     line-height: 1.25rem;
   }
