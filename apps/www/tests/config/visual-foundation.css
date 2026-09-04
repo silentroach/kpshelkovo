@@ -1,0 +1,2 @@
+/* The app fixture host uses the same native foundation as production. */
+@import '../../src/styles/global.css';

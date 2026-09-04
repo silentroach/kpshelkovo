@@ -11,7 +11,7 @@
     "test:visual:icons:serve": "astro build --root tests/icons-visual && ASTRO_PREVIEW_BACKGROUND=0 astro preview --root tests/icons-visual --host 127.0.0.1 --port 4328",
     "test:visual:breadcrumbs": "playwright test -c playwright.breadcrumbs-visual.local.config.ts",
     "test:visual:breadcrumbs:update": "playwright test -c playwright.breadcrumbs-visual.local.config.ts --update-snapshots",
-    "test:visual:breadcrumbs:serve": "astro build --root tests/breadcrumbs-visual && astro preview --root tests/breadcrumbs-visual --host 127.0.0.1 --port 4325"
+    "test:visual:breadcrumbs:serve": "astro build --root tests/breadcrumbs-visual && ASTRO_PREVIEW_BACKGROUND=0 astro preview --root tests/breadcrumbs-visual --host 127.0.0.1 --port 4325"
   },
   "exports": {
     "./Breadcrumbs.astro": "./src/Breadcrumbs.astro",
@@ -67,10 +67,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
-    "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.2.10",
     "svelte": "^5.57.0",
-    "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2"
   }
 }

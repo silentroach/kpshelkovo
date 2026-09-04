@@ -1,2 +1,0 @@
-/* Temporary visual-fixture bridge. Production consumers must import app-owned CSS directly. */
-@import '../../apps/www/src/styles/global.css';
