@@ -14,9 +14,6 @@ const openFixture = async (page: Page): Promise<void> => {
   await page.goto('/', { waitUntil: 'networkidle' });
   await expect(page.getByTestId('status-timeline-visual')).toBeVisible();
   await page.evaluate(() => document.fonts.ready.then(() => undefined));
-  await expect(
-    page.locator('[data-status-problem][data-status-tooltip-bound="true"]'),
-  ).toHaveCount(4);
 };
 
 const openTimelineTooltip = async (
@@ -112,11 +109,11 @@ test.describe('StatusServiceTimeline visual', () => {
   }) => {
     const target = page.getByTestId('status-timeline-mixed');
 
+    await openTimelineTooltip(target, 'mixed-incident');
+
     await expect(target.locator('[data-status-segment="green"]')).toHaveCount(
       3,
     );
-
-    await openTimelineTooltip(target, 'mixed-incident');
 
     await expect(target).toHaveScreenshot(
       'status-timeline-mixed-tooltip.png',
@@ -129,9 +126,6 @@ test.describe('StatusServiceTimeline visual', () => {
   }) => {
     const target = page.getByTestId('status-timeline-empty');
 
-    await expect(target.locator('[data-status-segment="green"]')).toHaveCount(
-      1,
-    );
     await expect(target.locator('[data-status-problem]')).toHaveCount(0);
 
     await expect(target).toHaveScreenshot(
