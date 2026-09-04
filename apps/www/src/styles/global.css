@@ -259,6 +259,10 @@
     text-wrap: pretty;
   }
 
+  .ui-prose-narrow {
+    max-width: 65ch;
+  }
+
   .ui-prose p,
   .ui-prose ul,
   .ui-prose ol {

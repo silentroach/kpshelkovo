@@ -21,7 +21,7 @@ const ASPECT_ORDER: Record<ReviewAspectType, number> = {
   management: 2,
 };
 
-export const REVIEWS_PROSE = 'ui-prose max-w-[65ch]';
+export const REVIEWS_PROSE = 'ui-prose ui-prose-narrow';
 
 export const formatReviewArea = (area: Area): string => formatArea(area);
 
