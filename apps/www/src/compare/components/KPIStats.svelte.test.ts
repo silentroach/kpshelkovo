@@ -82,7 +82,7 @@ describe('KPIStats', () => {
       shelkovoVsPeerMedianPercent: 0,
     };
 
-    const { getByTestId } = render(KPIStats, {
+    const { container, getByTestId } = render(KPIStats, {
       props: { stats: equalStats },
     });
 
@@ -98,6 +98,8 @@ describe('KPIStats', () => {
       '3\u00A0650\u00A0₽/сотка',
       'на уровне Шелково',
     );
+    expect(container.textContent).not.toContain('+0%');
+    expect(container.textContent).not.toContain('−0%');
   });
 
   it('renders embedded metrics without a standalone title', () => {
