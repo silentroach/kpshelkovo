@@ -725,7 +725,10 @@ export const hydrateReglamentCalculator = (
 
   calculatorRuntimes.set(root, runtime);
   root.addEventListener('input', (event) => {
-    if (event.target instanceof HTMLInputElement) {
+    if (
+      event.target instanceof HTMLInputElement &&
+      event.target.type !== 'checkbox'
+    ) {
       markManualBreakdownInput(event.target);
       render();
     }
