@@ -178,7 +178,7 @@ describe('estimate details 2026 dataset', () => {
     `);
   });
 
-  it('uses final.pdf as a gross control index', () => {
+  it('keeps final.pdf controls traceable to exact source rows', () => {
     const finalControls = estimateDetails2026.control_totals
       .filter((controlTotal) => controlTotal.control_source === 'final_pdf')
       .map((controlTotal) => ({
@@ -189,7 +189,7 @@ describe('estimate details 2026 dataset', () => {
         aggregate_total_rub: controlTotal.aggregate_total_rub?.value ?? null,
         delta_rub: controlTotal.delta_rub ?? null,
         status: controlTotal.status,
-        source_pdf: controlTotal.source_refs[0].pdf,
+        source_ref: controlTotal.source_refs[0],
       }));
 
     expect(finalControls).toMatchSnapshot();
