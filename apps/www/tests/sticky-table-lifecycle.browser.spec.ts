@@ -1,43 +1,88 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 const stickyTableSelector = '[data-ui-sticky-table-shell]';
-const stickyQueryCountKey = '__stickyTableQueryCount';
 const browserSessionKey = '__stickyTableBrowserSession';
+const scrollListenerCountKey = '__stickyTableScrollListenerCount';
+const resizeListenerCountKey = '__stickyTableResizeListenerCount';
+const stickyRoutes = [
+  '/815/regulation/',
+  '/815/regulation/services/',
+  '/815/regulation/assets/',
+  '/815/compare/settlements/shelkovo/',
+] as const;
 
-const installStickyQueryCounter = (page: Page): Promise<void> =>
+const installWindowListenerTracker = (page: Page): Promise<void> =>
   page.addInitScript(
-    ({ queryCountKey, sessionKey, tableSelector }) => {
-      const querySelectorAll = document.querySelectorAll.bind(document);
+    ({ resizeCountKey, scrollCountKey, sessionKey }) => {
+      const trackedListeners = new Map<
+        string,
+        Set<EventListenerOrEventListenerObject>
+      >([
+        ['scroll', new Set()],
+        ['resize', new Set()],
+      ]);
+      const addEventListener = EventTarget.prototype.addEventListener;
+      const removeEventListener = EventTarget.prototype.removeEventListener;
+      const publishCounts = (): void => {
+        Reflect.set(
+          window,
+          scrollCountKey,
+          trackedListeners.get('scroll')?.size ?? 0,
+        );
+        Reflect.set(
+          window,
+          resizeCountKey,
+          trackedListeners.get('resize')?.size ?? 0,
+        );
+      };
 
-      Reflect.set(window, queryCountKey, 0);
       Reflect.set(window, sessionKey, Math.random().toString(36));
-      document.querySelectorAll = ((selectors: string) => {
-        if (selectors === tableSelector) {
-          const count = Number(Reflect.get(window, queryCountKey));
-
-          Reflect.set(window, queryCountKey, count + 1);
+      publishCounts();
+      EventTarget.prototype.addEventListener = function (
+        type,
+        listener,
+        options,
+      ): void {
+        if (this === window && listener) {
+          trackedListeners.get(type)?.add(listener);
+          publishCounts();
         }
 
-        return querySelectorAll(selectors);
-      }) as typeof document.querySelectorAll;
+        addEventListener.call(this, type, listener, options);
+      };
+      EventTarget.prototype.removeEventListener = function (
+        type,
+        listener,
+        options,
+      ): void {
+        removeEventListener.call(this, type, listener, options);
+        if (this === window && listener) {
+          trackedListeners.get(type)?.delete(listener);
+          publishCounts();
+        }
+      };
     },
     {
-      queryCountKey: stickyQueryCountKey,
+      resizeCountKey: resizeListenerCountKey,
+      scrollCountKey: scrollListenerCountKey,
       sessionKey: browserSessionKey,
-      tableSelector: stickyTableSelector,
     },
   );
 
 const getBrowserSession = (page: Page): Promise<string> =>
   page.evaluate((key) => String(Reflect.get(window, key)), browserSessionKey);
 
-const resetStickyQueryCount = (page: Page): Promise<void> =>
-  page.evaluate((key) => {
-    Reflect.set(window, key, 0);
-  }, stickyQueryCountKey);
-
-const getStickyQueryCount = (page: Page): Promise<number> =>
-  page.evaluate((key) => Number(Reflect.get(window, key)), stickyQueryCountKey);
+const getWindowListenerCounts = (page: Page) =>
+  page.evaluate(
+    ({ resizeCountKey, scrollCountKey }) => ({
+      resize: Number(Reflect.get(window, resizeCountKey)),
+      scroll: Number(Reflect.get(window, scrollCountKey)),
+    }),
+    {
+      resizeCountKey: resizeListenerCountKey,
+      scrollCountKey: scrollListenerCountKey,
+    },
+  );
 
 const scrollIntoStickyState = async (shell: Locator): Promise<void> => {
   await shell.evaluate((element) => {
@@ -50,6 +95,20 @@ const scrollIntoStickyState = async (shell: Locator): Promise<void> => {
   });
   await expect(shell).toHaveAttribute('data-ui-sticky-table-stuck');
 };
+
+const countStickyUpdatesOnPageLoad = (shell: Locator): Promise<number> =>
+  shell.evaluate((element) => {
+    const getBoundingClientRect = element.getBoundingClientRect.bind(element);
+    let updates = 0;
+
+    element.getBoundingClientRect = () => {
+      updates += 1;
+      return getBoundingClientRect();
+    };
+    document.dispatchEvent(new Event('astro:page-load'));
+
+    return updates;
+  });
 
 const navigateWithClientRouter = async (
   page: Page,
@@ -67,62 +126,57 @@ const navigateWithClientRouter = async (
   await page.waitForURL(pathname);
 };
 
-const expectNoStickyWorkOnWindowEvents = async (page: Page): Promise<void> => {
-  await resetStickyQueryCount(page);
-  await page.evaluate(
-    () =>
-      new Promise<void>((resolve) => {
-        window.dispatchEvent(new Event('scroll'));
-        window.dispatchEvent(new Event('resize'));
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      }),
-  );
-
-  expect(await getStickyQueryCount(page)).toBe(0);
-};
-
-test('scopes sticky table work to pages that contain sticky tables', async ({
+test('keeps one sticky lifecycle across every sticky route and releases it after leaving', async ({
   page,
 }) => {
-  await installStickyQueryCounter(page);
-  await page.goto('/815/regulation/services/', { waitUntil: 'networkidle' });
-
-  const browserSession = await getBrowserSession(page);
-  let shell = page.locator(stickyTableSelector).first();
-
-  await expect(shell).toBeVisible();
-  await scrollIntoStickyState(shell);
-
-  await page.getByRole('link', { name: 'Шелково Онлайн' }).click();
-  await page.waitForURL('/');
-  await expect(page.locator(stickyTableSelector)).toHaveCount(0);
-  expect(await getBrowserSession(page)).toBe(browserSession);
-  await expectNoStickyWorkOnWindowEvents(page);
-
-  await page.goBack();
-  await page.waitForURL('/815/regulation/services/');
-  shell = page.locator(stickyTableSelector).first();
-  await expect(shell).toBeVisible();
-  await scrollIntoStickyState(shell);
-  expect(await getBrowserSession(page)).toBe(browserSession);
-
-  await page.getByRole('link', { name: 'Шелково Онлайн' }).click();
-  await page.waitForURL('/');
-  await expect(page.locator(stickyTableSelector)).toHaveCount(0);
-  await expectNoStickyWorkOnWindowEvents(page);
-});
-
-test('activates sticky behavior on a fresh client destination', async ({
-  page,
-}) => {
-  await installStickyQueryCounter(page);
+  await installWindowListenerTracker(page);
   await page.goto('/', { waitUntil: 'networkidle' });
   const browserSession = await getBrowserSession(page);
+  const baseline = await getWindowListenerCounts(page);
+  const active = {
+    resize: baseline.resize + 1,
+    scroll: baseline.scroll + 1,
+  };
+
+  for (const pathname of [...stickyRoutes, ...stickyRoutes]) {
+    await navigateWithClientRouter(page, pathname);
+
+    await expect(page.locator(stickyTableSelector).first()).toBeVisible();
+    expect(await getWindowListenerCounts(page)).toEqual(active);
+    expect(await getBrowserSession(page)).toBe(browserSession);
+  }
+
+  expect(
+    await countStickyUpdatesOnPageLoad(
+      page.locator(stickyTableSelector).first(),
+    ),
+  ).toBe(1);
+
+  await navigateWithClientRouter(page, '/');
+  await expect(page.locator(stickyTableSelector)).toHaveCount(0);
+  expect(await getWindowListenerCounts(page)).toEqual(baseline);
+  expect(await getBrowserSession(page)).toBe(browserSession);
+});
+
+test('updates sticky state on direct load and a fresh client destination', async ({
+  page,
+}) => {
+  await installWindowListenerTracker(page);
+  await page.goto('/815/regulation/services/', { waitUntil: 'networkidle' });
+  const browserSession = await getBrowserSession(page);
+
+  await scrollIntoStickyState(page.locator(stickyTableSelector).first());
+  await navigateWithClientRouter(page, '/');
+  const baseline = await getWindowListenerCounts(page);
 
   await navigateWithClientRouter(page, '/815/regulation/');
 
   const shell = page.locator(stickyTableSelector).first();
   await expect(shell).toBeVisible();
+  expect(await getWindowListenerCounts(page)).toEqual({
+    resize: baseline.resize + 1,
+    scroll: baseline.scroll + 1,
+  });
   expect(await getBrowserSession(page)).toBe(browserSession);
   await scrollIntoStickyState(shell);
 });
