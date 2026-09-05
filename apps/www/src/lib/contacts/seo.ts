@@ -4,6 +4,7 @@ import { breadcrumbListSchema, collectionPageSchema } from '@/lib/json-ld';
 import type { BreadcrumbLink } from '@/lib/json-ld-types';
 import { absoluteUrl } from '@/lib/site';
 
+import { normalizeContactPhone } from './phone';
 import type { Contact } from './types';
 import { contactExcerpt, formatContactCategory } from './view';
 
@@ -54,8 +55,12 @@ const contactPointSchema = (contact: Contact, url: string): SchemaDoc => {
     url,
   };
 
-  if (contact.contacts.phone) {
-    schema.telephone = contact.contacts.phone;
+  const phone = contact.contacts.phone
+    ? normalizeContactPhone(contact.contacts.phone)
+    : undefined;
+
+  if (phone) {
+    schema.telephone = phone;
   }
 
   if (contact.contacts.email) {

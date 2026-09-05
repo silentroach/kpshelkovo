@@ -1,5 +1,6 @@
 import VCard from 'vcard-creator';
 
+import { normalizeContactPhone } from './phone';
 import type { ContactVcfName, ContactWithVcf } from './types';
 import { contactExcerpt } from './view';
 
@@ -43,7 +44,8 @@ export const buildContactVcard = (contact: ContactWithVcf): string => {
   const fullName =
     vcf.fullName ??
     (vcf.kind === 'organization' ? vcf.organization : contact.title);
-  const phone = vcf.phone ?? contact.contacts.phone;
+  const rawPhone = vcf.phone ?? contact.contacts.phone;
+  const phone = rawPhone ? normalizeContactPhone(rawPhone) : undefined;
   const telegram = vcf.telegram ?? contact.contacts.telegram;
   const whatsapp = vcf.whatsapp ?? contact.contacts.whatsapp;
   const email = vcf.email ?? contact.contacts.email;
