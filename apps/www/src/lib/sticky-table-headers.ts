@@ -91,6 +91,7 @@ export const installStickyTableHeaders = (): (() => void) => {
 
   const uninstall = (): void => {
     document.removeEventListener('astro:after-swap', hydrate);
+    document.removeEventListener('astro:page-load', hydrate);
     deactivate();
     if (uninstallStickyTableHeaders === uninstall) {
       uninstallStickyTableHeaders = undefined;
@@ -99,6 +100,7 @@ export const installStickyTableHeaders = (): (() => void) => {
 
   uninstallStickyTableHeaders = uninstall;
   document.addEventListener('astro:after-swap', hydrate);
+  document.addEventListener('astro:page-load', hydrate);
   hydrate();
 
   return uninstall;
