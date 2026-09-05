@@ -4,8 +4,6 @@ import type { EntityMentionTarget } from '@/lib/mentions';
 export type KbPageFlag = 'exclude-from-site-search' | 'noindex';
 
 export interface KbPage {
-  readonly id: string;
-  readonly sourceId: string;
   readonly title: string;
   readonly seo?: {
     readonly description?: string;
@@ -18,10 +16,4 @@ export interface KbPage {
   readonly isSection: boolean;
   readonly body: PreprocessedSiteMarkdownBody;
   readonly mentions: readonly EntityMentionTarget[];
-}
-
-export interface KbDataset {
-  readonly pages: readonly KbPage[];
-  readonly byId: ReadonlyMap<string, KbPage>;
-  readonly bySourceId: ReadonlyMap<string, KbPage>;
 }

@@ -6,52 +6,52 @@ describe('isKbPageSearchable', () => {
   it('includes articles and excludes sections, noindex, and opted-out pages', () => {
     const cases = [
       {
-        sourceId: 'services/internet/fiber',
+        label: 'article',
         flags: [] as const,
         isSection: false,
       },
-      { sourceId: 'index', flags: [] as const, isSection: true },
+      { label: 'root', flags: [] as const, isSection: true },
       {
-        sourceId: 'services/internet',
+        label: 'section',
         flags: [] as const,
         isSection: true,
       },
       {
-        sourceId: 'court/order-debt',
+        label: 'noindex',
         flags: ['noindex'] as const,
         isSection: false,
       },
       {
-        sourceId: 'before-you-buy/how-to-choose-plot',
+        label: 'excluded',
         flags: ['exclude-from-site-search'] as const,
         isSection: false,
       },
     ].map((page) => ({
-      sourceId: page.sourceId,
+      label: page.label,
       searchable: isKbPageSearchable(page),
     }));
 
     expect(cases).toMatchInlineSnapshot(`
       [
         {
+          "label": "article",
           "searchable": true,
-          "sourceId": "services/internet/fiber",
         },
         {
+          "label": "root",
           "searchable": false,
-          "sourceId": "index",
         },
         {
+          "label": "section",
           "searchable": false,
-          "sourceId": "services/internet",
         },
         {
+          "label": "noindex",
           "searchable": false,
-          "sourceId": "court/order-debt",
         },
         {
+          "label": "excluded",
           "searchable": false,
-          "sourceId": "before-you-buy/how-to-choose-plot",
         },
       ]
     `);

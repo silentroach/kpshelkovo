@@ -14,12 +14,9 @@ beforeAll(async () => {
 });
 
 const page = (input: {
-  readonly id: string;
   readonly title: string;
   readonly routeSlug?: string;
 }): KbPage => ({
-  id: input.id,
-  sourceId: input.id,
   title: input.title,
   flags: [],
   url: input.routeSlug ? `/kb/${input.routeSlug}/` : '/kb/',
@@ -34,7 +31,7 @@ const page = (input: {
 
 describe('kbBreadcrumbs', () => {
   it('keeps the root page as the current breadcrumb', () => {
-    const root = page({ id: 'index', title: 'База знаний' });
+    const root = page({ title: 'База знаний' });
 
     expect(kbBreadcrumbs(root, [root])).toEqual([
       { label: 'Главная', href: '/' },
@@ -43,14 +40,12 @@ describe('kbBreadcrumbs', () => {
   });
 
   it('includes existing parent pages for nested KB articles', () => {
-    const root = page({ id: 'index', title: 'База знаний' });
+    const root = page({ title: 'База знаний' });
     const internet = page({
-      id: 'services/internet',
       title: 'Интернет',
       routeSlug: 'services/internet',
     });
     const fiber = page({
-      id: 'services/internet/fiber',
       title: 'Оптоволокно',
       routeSlug: 'services/internet/fiber',
     });
@@ -64,9 +59,8 @@ describe('kbBreadcrumbs', () => {
   });
 
   it('skips route prefixes that do not have their own page', () => {
-    const root = page({ id: 'index', title: 'База знаний' });
+    const root = page({ title: 'База знаний' });
     const fiber = page({
-      id: 'services/internet/fiber',
       title: 'Оптоволокно',
       routeSlug: 'services/internet/fiber',
     });

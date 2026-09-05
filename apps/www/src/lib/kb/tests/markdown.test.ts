@@ -14,14 +14,11 @@ beforeAll(async () => {
 });
 
 const page = (input: {
-  readonly id: string;
   readonly title: string;
   readonly body?: string;
   readonly flags?: readonly ['noindex'];
   readonly routeSlug?: string;
 }): KbPage => ({
-  id: input.id,
-  sourceId: input.id,
   title: input.title,
   flags: input.flags ?? [],
   robots: input.flags?.includes('noindex') ? 'noindex, follow' : undefined,
@@ -39,7 +36,6 @@ describe('kb markdown companions', () => {
   it('renders a kb page as markdown and points kb links to markdown companions', () => {
     const markdown = buildKbPageMarkdown(
       page({
-        id: 'services/internet/index',
         title: 'Интернет',
         routeSlug: 'services/internet',
         body: '- [База знаний](/kb/)\n- [Оптоволоконный интернет](/kb/services/internet/fiber/)\n- [Новости](/news/)\n',
@@ -63,7 +59,6 @@ describe('kb markdown companions', () => {
   it('rewrites only kb link nodes and preserves their query and hash', () => {
     const markdown = buildKbPageMarkdown(
       page({
-        id: 'services/gas',
         title: 'Газ',
         routeSlug: 'services/gas',
         body: `Откройте [подключение газа](/kb/services/gas/connection/?from=guide#documents).
@@ -101,7 +96,6 @@ describe('kb markdown companions', () => {
   it('keeps supported page flags in markdown frontmatter', () => {
     const markdown = buildKbPageMarkdown(
       page({
-        id: 'court/documents',
         title: 'Документы',
         flags: ['noindex'],
         routeSlug: 'court/documents',
