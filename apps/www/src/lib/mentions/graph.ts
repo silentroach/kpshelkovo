@@ -3,6 +3,7 @@ import type {
   EntityMentionGraphTarget,
   EntityMentionSourceRef,
   EntityMentionType,
+  SiteMentionSection,
 } from './types';
 
 import { compareRuText } from '@shelkovo/format';
@@ -76,6 +77,6 @@ export const getEntityMentionGraphRefs = (
   graph: EntityMentionGraph,
   type: EntityMentionType,
   slug: string,
-  sourceSection: string,
+  sourceSection: SiteMentionSection,
 ): readonly EntityMentionSourceRef[] =>
   graph.targets.get(targetKey(type, slug))?.sections.get(sourceSection) ?? [];
