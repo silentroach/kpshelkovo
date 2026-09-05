@@ -21,56 +21,64 @@ vi.mock('./data', () => ({
 }));
 
 let build: typeof import('./llms').build;
+let routes: typeof import('./public-surface');
+
+const SITE = 'https://example.com';
+const absolute = (path: string): string => new URL(path, SITE).toString();
+const settlementUrl = (slug: string): string =>
+  absolute(routes.compareSettlementPattern().replace(':slug', slug));
+const extractAbsoluteUrls = (document: string): readonly string[] =>
+  [...document.matchAll(/<https:\/\/[^>]+>/gu)].map((match) =>
+    match[0].slice(1, -1),
+  );
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
-    SITE: 'https://example.com',
-    BASE_URL: '/',
+    SITE,
+    BASE_URL: '/astro-base/',
   });
 
+  routes = await import('./public-surface');
   ({ build } = await import('./llms'));
 });
 
 describe('compare llms', () => {
-  it('serializes the short agent overview as Markdown AST output', async () => {
-    await expect(build('short')).resolves.toMatchInlineSnapshot(`
-      "# Сравнение тарифов поселков
+  it('keeps Compare routes independent from a non-root Astro base', () => {
+    expect(import.meta.env.BASE_URL).toBe('/astro-base/');
+    expect(routes.comparePath()).toBe('/815/compare/');
+  });
 
-      Файл: llms.txt
-      Язык: русский
+  it('emits the short document URL sequence from Compare route helpers', async () => {
+    const document = await build('short');
 
-      ## Описание
+    expect(extractAbsoluteUrls(document)).toEqual([
+      absolute(routes.comparePath()),
+      absolute(routes.compareRatingPath()),
+      absolute(routes.compareSettlementsDataPath()),
+      absolute(routes.compareExplorerDataPath()),
+      absolute(routes.compareSkillsPath()),
+      absolute(routes.compareLlmsFullPath()),
+      settlementUrl('shelkovo'),
+      settlementUrl('white-park'),
+      settlementUrl('greenwood'),
+    ]);
+  });
 
-      - Раздел \`/815/compare/\` сравнивает тарифы на содержание коттеджных поселков с тарифом КП Шелково.
-      - В данных есть тарифы, базовая инфраструктура, общественные пространства, сервисная модель и условный рейтинг качества среды.
-      - Сейчас в базе 3 поселка.
+  it('emits the full document URL sequence from Compare route helpers', async () => {
+    const document = await build('full');
 
-      ## Главные URL
-
-      - Главная: <https://example.com/815/compare/>
-      - Методика рейтинга: <https://example.com/815/compare/rating/>
-      - Основная JSON-лента: <https://example.com/815/compare/data/settlements.json>
-      - Облегченная лента explorer: <https://example.com/815/compare/data/explorer.json>
-      - Индекс инструкций для автоматического чтения: <https://example.com/815/compare/.well-known/agent-skills/index.json>
-      - Расширенная версия этого текста: <https://example.com/815/compare/llms-full.txt>
-      - Примеры детальных страниц:
-      - Шелково: <https://example.com/815/compare/settlements/shelkovo/>
-      - Белый парк: <https://example.com/815/compare/settlements/white-park/>
-      - Гринвуд: <https://example.com/815/compare/settlements/greenwood/>
-
-      ## Что открывать первым
-
-      - Для анализа всех поселков используйте \`/815/compare/data/settlements.json\`.
-      - \`/815/compare/data/explorer.json\` нужен только для облегченного списка, карты и минимального набора данных.
-      - Список \`sources\` остается на детальных страницах и не входит в общую ленту.
-      - Если нужен первоисточник или человекочитаемый контекст, переходите на \`/815/compare/settlements/[slug]/\`.
-
-      ## Ограничения данных
-
-      - Если факт не подтвержден источником, поле может быть опущено.
-      - Отсутствие поля означает «неизвестно», а не «точно нет».
-      - Тариф не входит в формулу условного рейтинга.
-      "
-    `);
+    expect(extractAbsoluteUrls(document)).toEqual([
+      absolute(routes.comparePath()),
+      absolute(routes.compareLlmsPath()),
+      absolute(routes.compareLlmsFullPath()),
+      absolute(routes.compareRatingPath()),
+      absolute(routes.compareSettlementsDataPath()),
+      absolute(routes.compareExplorerDataPath()),
+      absolute(routes.compareSkillsPath()),
+      settlementUrl('shelkovo'),
+      settlementUrl('white-park'),
+      settlementUrl('greenwood'),
+      absolute(routes.compareRatingPath()),
+    ]);
   });
 });
