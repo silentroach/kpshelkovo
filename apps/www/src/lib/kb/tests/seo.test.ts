@@ -14,8 +14,6 @@ beforeAll(async () => {
 });
 
 const rootPage: KbPage = {
-  id: 'index',
-  sourceId: 'index',
   title: 'База знаний',
   flags: [],
   url: '/kb/',

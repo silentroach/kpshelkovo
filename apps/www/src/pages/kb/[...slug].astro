@@ -22,10 +22,7 @@ const KB_TITLE = 'База знаний';
 
 export const getStaticPaths = (async () => {
   const pages = await loadKbPages();
-  const rootSourceId = 'index';
-  const hasRootPage = pages.some(
-    (page) => page.sourceId === rootSourceId && !page.routeSlug,
-  );
+  const hasRootPage = pages.some((page) => !page.routeSlug);
 
   if (!hasRootPage) {
     throw new Error('kb root page "src/data/kb/index.md" not found');

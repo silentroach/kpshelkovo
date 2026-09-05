@@ -4,7 +4,7 @@ import { preprocessSiteMarkdownContent } from '@/lib/markdown/render';
 import type { SiteMentionRegistry } from '@/lib/mentions';
 import { loadSiteMentionRegistry } from '@/lib/mentions/registry';
 import { kbCanonical, kbDetailCanonical, kbDetailUrl, kbUrl } from './routes';
-import type { KbDataset, KbPage, KbPageFlag } from './types';
+import type { KbPage, KbPageFlag } from './types';
 
 export type KbPageEntry = Pick<CollectionEntry<'kbPages'>, 'id' | 'body'> & {
   readonly data: {
@@ -16,34 +16,34 @@ export type KbPageEntry = Pick<CollectionEntry<'kbPages'>, 'id' | 'body'> & {
   };
 };
 
-let cache: Promise<KbDataset> | undefined;
+let cache: Promise<readonly KbPage[]> | undefined;
 
 const KB_ROUTE_SEGMENT = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const KB_NOINDEX_ROBOTS = 'noindex, follow';
 
-const failSourceId = (sourceId: string, reason: string): never => {
-  throw new Error(`kb page source id "${sourceId}" ${reason}`);
+const failEntryId = (entryId: string, reason: string): never => {
+  throw new Error(`kb page source id "${entryId}" ${reason}`);
 };
 
-const validateSegment = (sourceId: string, segment: string): void => {
+const validateSegment = (entryId: string, segment: string): void => {
   if (!KB_ROUTE_SEGMENT.test(segment)) {
-    failSourceId(
-      sourceId,
+    failEntryId(
+      entryId,
       `has invalid segment "${segment}"; segments must use lower-case Latin letters, digits, and hyphen`,
     );
   }
 };
 
-const entryRouteSlug = (sourceId: string): string | undefined => {
-  if (!sourceId) {
-    failSourceId(sourceId, 'must not be empty');
+const entryRouteSlug = (entryId: string): string | undefined => {
+  if (!entryId) {
+    failEntryId(entryId, 'must not be empty');
   }
 
-  const parts = sourceId.split('/');
+  const parts = entryId.split('/');
 
   for (const part of parts) {
     if (!part) {
-      failSourceId(sourceId, 'must not contain empty path segments');
+      failEntryId(entryId, 'must not contain empty path segments');
     }
   }
 
@@ -51,7 +51,7 @@ const entryRouteSlug = (sourceId: string): string | undefined => {
     parts[parts.length - 1] === 'index' ? parts.slice(0, -1) : parts;
 
   for (const segment of routeSegments) {
-    validateSegment(sourceId, segment);
+    validateSegment(entryId, segment);
   }
 
   if (routeSegments.length === 0) {
@@ -75,8 +75,6 @@ const mapEntry = (
   );
 
   return {
-    id: entry.id,
-    sourceId: entry.id,
     title: entry.data.title,
     seo: entry.data.seo,
     flags,
@@ -90,22 +88,6 @@ const mapEntry = (
   } satisfies KbPage;
 };
 
-const validateUniquePublicUrls = (pages: readonly KbPage[]): void => {
-  const seen = new Map<string, string>();
-
-  for (const page of pages) {
-    const conflict = seen.get(page.url);
-
-    if (conflict) {
-      throw new Error(
-        `kb page "${page.sourceId}" conflicts with "${conflict}" for public URL "${page.url}"`,
-      );
-    }
-
-    seen.set(page.url, page.sourceId);
-  }
-};
-
 const isSectionRoute = (
   routeSlug: string | undefined,
   routeSlugs: readonly (string | undefined)[],
@@ -115,35 +97,40 @@ const isSectionRoute = (
     (candidate) => candidate?.startsWith(`${routeSlug}/`) ?? false,
   );
 
-export const buildKbDataset = (
+export const buildKbPages = (
   entries: readonly KbPageEntry[],
   opts?: {
     readonly mentionRegistry?: SiteMentionRegistry;
   },
-): KbDataset => {
+): readonly KbPage[] => {
   const mentionRegistry = opts?.mentionRegistry ?? new Map();
   const routeSlugs = entries.map((entry) => entryRouteSlug(entry.id));
-  const pages = entries.map((entry, index) => {
-    const routeSlug = routeSlugs[index];
+  const entryIdByPublicUrl = new Map<string, string>();
 
-    return mapEntry(
+  return entries.map((entry, index) => {
+    const entryId = entry.id;
+    const routeSlug = routeSlugs[index];
+    const page = mapEntry(
       entry,
       mentionRegistry,
       routeSlug,
       isSectionRoute(routeSlug, routeSlugs),
     );
+    const conflictingEntryId = entryIdByPublicUrl.get(page.url);
+
+    if (conflictingEntryId) {
+      throw new Error(
+        `kb page "${entryId}" conflicts with "${conflictingEntryId}" for public URL "${page.url}"`,
+      );
+    }
+
+    entryIdByPublicUrl.set(page.url, entryId);
+
+    return page;
   });
-
-  validateUniquePublicUrls(pages);
-
-  return {
-    pages,
-    byId: new Map(pages.map((page) => [page.id, page])),
-    bySourceId: new Map(pages.map((page) => [page.sourceId, page])),
-  };
 };
 
-export const loadKbData = (): Promise<KbDataset> => {
+export const loadKbPages = (): Promise<readonly KbPage[]> => {
   cache ??= Promise.all([
     import('astro:content').then(
       ({ getCollection }) =>
@@ -151,14 +138,8 @@ export const loadKbData = (): Promise<KbDataset> => {
     ),
     loadSiteMentionRegistry(),
   ]).then(([entries, mentionRegistry]) =>
-    buildKbDataset(entries, { mentionRegistry }),
+    buildKbPages(entries, { mentionRegistry }),
   );
 
   return cache;
 };
-
-export const loadKbPages = async (): Promise<readonly KbPage[]> =>
-  (await loadKbData()).pages;
-
-export const loadKbPage = async (id: string): Promise<KbPage | undefined> =>
-  (await loadKbData()).byId.get(id);

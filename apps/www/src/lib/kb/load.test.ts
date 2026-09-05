@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import type { KbPageEntry } from './load';
 import type { KbPageFlag } from './types';
 
-let buildKbDataset: typeof import('./load').buildKbDataset;
+let buildKbPages: typeof import('./load').buildKbPages;
 let createPersonMentionTarget: typeof import('@/lib/people/mentions').createPersonMentionTarget;
 
 beforeAll(async () => {
@@ -13,7 +13,7 @@ beforeAll(async () => {
   });
 
   ({ createPersonMentionTarget } = await import('@/lib/people/mentions'));
-  ({ buildKbDataset } = await import('./load'));
+  ({ buildKbPages } = await import('./load'));
 });
 
 const page = (input: {
@@ -34,9 +34,9 @@ const page = (input: {
       },
 });
 
-describe('buildKbDataset', () => {
+describe('buildKbPages', () => {
   it('maps an ordinary parent source and its child to stable public URLs', () => {
-    const data = buildKbDataset([
+    const pages = buildKbPages([
       page({
         id: 'index',
         title: 'База знаний',
@@ -51,33 +51,31 @@ describe('buildKbDataset', () => {
       }),
     ]);
 
-    expect(data.pages).toHaveLength(3);
-    expect(data.byId.get('index')).toMatchObject({
-      id: 'index',
-      sourceId: 'index',
+    expect(pages).toHaveLength(3);
+    expect(pages[0]).toMatchObject({
       url: '/kb/',
       canonical: 'https://example.com/kb/',
       routeSlug: undefined,
       isSection: true,
     });
-    const internetPage = data.byId.get('services/internet');
+    const internetPage = pages[1];
 
     expect(internetPage).toMatchObject({
-      id: 'services/internet',
-      sourceId: 'services/internet',
       url: '/kb/services/internet/',
       canonical: 'https://example.com/kb/services/internet/',
       routeSlug: 'services/internet',
       isSection: true,
     });
-    expect(data.byId.get('services/internet/fiber')?.isSection).toBe(false);
+    expect(pages[2]?.isSection).toBe(false);
+    expect(internetPage).not.toHaveProperty('id');
+    expect(internetPage).not.toHaveProperty('sourceId');
     expect(internetPage).not.toHaveProperty('description');
     expect(internetPage).not.toHaveProperty('tags');
   });
 
   it('rejects entries that resolve to the same public URL', () => {
     expect(() =>
-      buildKbDataset([
+      buildKbPages([
         page({
           id: 'foo',
           title: 'Foo',
@@ -93,19 +91,19 @@ describe('buildKbDataset', () => {
   });
 
   it('does not infer section role from an index source name', () => {
-    const data = buildKbDataset([
+    const pages = buildKbPages([
       page({
         id: 'sos/index',
         title: 'Что делать, если…',
       }),
     ]);
 
-    expect(data.pages[0]?.isSection).toBe(false);
+    expect(pages[0]?.isSection).toBe(false);
   });
 
   it('rejects invalid URL segments', () => {
     expect(() =>
-      buildKbDataset([
+      buildKbPages([
         page({
           id: 'services/Internet',
           title: 'Интернет в поселке',
@@ -117,7 +115,7 @@ describe('buildKbDataset', () => {
   });
 
   it('stores preprocessed Markdown body without rendering HTML', () => {
-    const data = buildKbDataset([
+    const pages = buildKbPages([
       page({
         id: 'services/internet/index',
         title: 'Интернет в поселке',
@@ -125,26 +123,26 @@ describe('buildKbDataset', () => {
       }),
     ]);
 
-    expect(data.pages[0]?.body).toBe(
+    expect(pages[0]?.body).toBe(
       '# Подключение\n\nТекст с **жирным** Markdown.',
     );
-    expect(data.pages[0]?.body).not.toContain('<strong>');
+    expect(pages[0]?.body).not.toContain('<strong>');
   });
 
   it('defaults omitted flags to an empty page flag list', () => {
-    const data = buildKbDataset([
+    const pages = buildKbPages([
       page({
         id: 'services/internet/index',
         title: 'Интернет в поселке',
       }),
     ]);
 
-    expect(data.pages[0]?.flags).toEqual([]);
-    expect(data.pages[0]?.robots).toBeUndefined();
+    expect(pages[0]?.flags).toEqual([]);
+    expect(pages[0]?.robots).toBeUndefined();
   });
 
   it('maps the noindex flag to page robots metadata', () => {
-    const data = buildKbDataset([
+    const pages = buildKbPages([
       page({
         id: 'court/01/documents',
         title: 'Документы по делу',
@@ -152,12 +150,12 @@ describe('buildKbDataset', () => {
       }),
     ]);
 
-    expect(data.pages[0]?.flags).toEqual(['noindex']);
-    expect(data.pages[0]?.robots).toBe('noindex, follow');
+    expect(pages[0]?.flags).toEqual(['noindex']);
+    expect(pages[0]?.robots).toBe('noindex, follow');
   });
 
   it('does not map site-search exclusion to robots metadata', () => {
-    const data = buildKbDataset([
+    const pages = buildKbPages([
       page({
         id: 'before-you-buy/how-to-choose-plot',
         title: 'Как выбрать участок',
@@ -165,12 +163,12 @@ describe('buildKbDataset', () => {
       }),
     ]);
 
-    expect(data.pages[0]?.flags).toEqual(['exclude-from-site-search']);
-    expect(data.pages[0]?.robots).toBeUndefined();
+    expect(pages[0]?.flags).toEqual(['exclude-from-site-search']);
+    expect(pages[0]?.robots).toBeUndefined();
   });
 
   it('normalizes body mentions through the shared registry', () => {
-    const data = buildKbDataset(
+    const pages = buildKbPages(
       [
         page({
           id: 'services/internet/index',
@@ -188,17 +186,17 @@ describe('buildKbDataset', () => {
       },
     );
 
-    expect(data.pages[0]?.body).toBe(
+    expect(pages[0]?.body).toBe(
       'Статус подтвердил [Кирилл Щемелинин](/people/kschemelinin/).',
     );
-    expect(data.pages[0]?.mentions.map((item) => item.slug)).toEqual([
+    expect(pages[0]?.mentions.map((item) => item.slug)).toEqual([
       'kschemelinin',
     ]);
   });
 
   it('fails clearly for unknown body mentions', () => {
     expect(() =>
-      buildKbDataset([
+      buildKbPages([
         page({
           id: 'services/internet/index',
           title: 'Интернет в поселке',
