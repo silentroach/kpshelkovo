@@ -8,6 +8,7 @@ import { count } from '@shelkovo/format';
 
 import { absoluteUrl } from '@/lib/site';
 
+import { formatContactPhone } from './phone';
 import type { Contact, ContactCategoryPage, ContactsDataset } from './types';
 import {
   CONTACTS_CHAT_LABEL,
@@ -162,7 +163,7 @@ const contactContactsFrontmatter = (
     const value = contacts[key];
 
     if (value) {
-      frontmatter[key] = value;
+      frontmatter[key] = key === 'phone' ? formatContactPhone(value) : value;
     }
   }
 

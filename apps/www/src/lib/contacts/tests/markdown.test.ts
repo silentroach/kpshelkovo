@@ -27,7 +27,7 @@ const contact = {
   updatedIso: '2026-07-06',
   searchAliases: ['служебный поисковый алиас'],
   contacts: {
-    phone: '+7 900 000-00-00',
+    phone: '8 (900) 000-00-00',
     telegram: 'https://t.me/example',
     email: 'team@example.com',
   },
@@ -66,7 +66,7 @@ const blankBodyContact = {
   updatedAt: new Date('2026-07-06T00:00:00.000Z'),
   updatedIso: '2026-07-06',
   contacts: {
-    phone: '+7 985 774-75-04',
+    phone: '+7(985) 774-75-04',
   },
   reviews: [],
   url: '/sarafan/fence/sergey/',

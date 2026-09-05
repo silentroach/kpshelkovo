@@ -16,7 +16,7 @@ const fixture = vi.hoisted(() => ({
     updatedAt: new Date('2026-07-06T00:00:00.000Z'),
     updatedIso: '2026-07-06',
     summary: 'Строительство домов под ключ.',
-    contacts: { phone: '+7 900 000-00-00' },
+    contacts: { phone: '89969670018' },
     reviews: [],
     body: '',
     mentions: [],
@@ -58,14 +58,16 @@ describe('/sarafan/[category]/[slug]/', () => {
       throw new Error('contact Pagefind body not found');
     }
 
+    const phoneLink = page.querySelector('a[href^="tel:"]');
+
     expect({
-      phoneInPage: page.textContent.includes(fixture.contact.contacts.phone),
-      phoneInSearch: searchBody.textContent.includes(
-        fixture.contact.contacts.phone,
-      ),
+      phoneInPage: page.textContent.includes('+7 996 967-00-18'),
+      phoneHref: phoneLink?.getAttribute('href'),
+      phoneInSearch: searchBody.textContent.includes('+7 996 967-00-18'),
       searchText: visibleWhitespace(searchBody.textContent.trim()),
     }).toMatchInlineSnapshot(`
       {
+        "phoneHref": "tel:+79969670018",
         "phoneInPage": true,
         "phoneInSearch": false,
         "searchText": "Строительство домов под·ключ.",

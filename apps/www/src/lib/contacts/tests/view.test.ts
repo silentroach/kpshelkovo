@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { formatContactPhone } from '../phone';
 import {
   contactMethods,
   contactPlace,
@@ -104,6 +105,94 @@ describe('contact view helpers', () => {
           "label": "Сайт",
           "type": "website",
           "value": "https://example.com",
+        },
+      ]
+    `);
+  });
+
+  it('normalizes full Russian phones from real contact formats idempotently', () => {
+    const phones = [
+      '89969670018',
+      '+7 (962) 140-34-31',
+      '+7(916) 116-09-36',
+      '+7 977 482-05-86',
+    ];
+
+    expect(
+      phones.map((phone) => {
+        const formatted = formatContactPhone(phone);
+
+        return {
+          phone,
+          formatted,
+          formattedAgain: formatContactPhone(formatted),
+          href: contactMethods({ phone })[0]?.href,
+        };
+      }),
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "formatted": "+7 996 967-00-18",
+          "formattedAgain": "+7 996 967-00-18",
+          "href": "tel:+79969670018",
+          "phone": "89969670018",
+        },
+        {
+          "formatted": "+7 962 140-34-31",
+          "formattedAgain": "+7 962 140-34-31",
+          "href": "tel:+79621403431",
+          "phone": "+7 (962) 140-34-31",
+        },
+        {
+          "formatted": "+7 916 116-09-36",
+          "formattedAgain": "+7 916 116-09-36",
+          "href": "tel:+79161160936",
+          "phone": "+7(916) 116-09-36",
+        },
+        {
+          "formatted": "+7 977 482-05-86",
+          "formattedAgain": "+7 977 482-05-86",
+          "href": "tel:+79774820586",
+          "phone": "+7 977 482-05-86",
+        },
+      ]
+    `);
+  });
+
+  it('preserves international and unsafe phone text without guessing digits', () => {
+    const phones = [
+      '+49 (30) 1234-5678',
+      '+7 900 000-00',
+      '+7 900 ***-**-00',
+      '+7 900 000-00-00 доб. 123',
+    ];
+
+    expect(phones.map((phone) => contactMethods({ phone })[0]))
+      .toMatchInlineSnapshot(`
+      [
+        {
+          "href": "tel:+493012345678",
+          "label": "Телефон",
+          "type": "phone",
+          "value": "+49 (30) 1234-5678",
+        },
+        {
+          "href": undefined,
+          "label": "Телефон",
+          "type": "phone",
+          "value": "+7 900 000-00",
+        },
+        {
+          "href": undefined,
+          "label": "Телефон",
+          "type": "phone",
+          "value": "+7 900 ***-**-00",
+        },
+        {
+          "href": undefined,
+          "label": "Телефон",
+          "type": "phone",
+          "value": "+7 900 000-00-00 доб. 123",
         },
       ]
     `);

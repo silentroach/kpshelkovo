@@ -2,6 +2,7 @@ import { extractFirstMarkdownText } from '@shelkovo/markdown';
 import { formatDate } from '@shelkovo/format';
 
 import type { ContactCategory } from './schema';
+import { formatContactPhone, normalizeContactPhone } from './phone';
 import type {
   Contact,
   ContactContacts,
@@ -73,8 +74,11 @@ export const CONTACTS_NEIGHBOR_TABLE_SUFFIX = '.';
 export const CONTACTS_EMPTY_MESSAGE =
   'Пока здесь ничего нет. Добавим контакты, когда появится живой опыт соседей.';
 
-const phoneHref = (phone: string): string =>
-  `tel:${phone.replace(/[^+\d]/gu, '')}`;
+const phoneHref = (phone: string): string | undefined => {
+  const normalized = normalizeContactPhone(phone);
+
+  return normalized ? `tel:${normalized}` : undefined;
+};
 
 const method = (
   type: keyof ContactContacts,
@@ -145,12 +149,14 @@ export const contactExcerpt = (
 
 export const contactMethods = (
   contacts: ContactContacts,
-): readonly ContactMethod[] =>
-  [
+): readonly ContactMethod[] => {
+  const phone = contacts.phone ? formatContactPhone(contacts.phone) : undefined;
+
+  return [
     method(
       'phone',
       'Телефон',
-      contacts.phone,
+      phone,
       contacts.phone ? phoneHref(contacts.phone) : undefined,
     ),
     method(
@@ -168,6 +174,7 @@ export const contactMethods = (
     ),
     method('website', 'Сайт', contacts.website, contacts.website),
   ].filter((item): item is ContactMethod => Boolean(item));
+};
 
 export const contactPlace = (
   location?: ContactLocation,

@@ -12,7 +12,7 @@ const contact = {
   summary:
     'Консультации по электричеству и помощь с взаимодействием с Россетями и Мосэнергосбытом',
   contacts: {
-    phone: '+7 985 414-57-87',
+    phone: '+7 (985) 414-57-87',
     telegram: 'https://t.me/Alexeremin2006',
     email: 'alexander@example.com',
     website: 'https://example-electrician.ru',
@@ -37,7 +37,7 @@ const contact = {
       family: 'Ерёмин',
       given: 'Александр',
     },
-    phone: '+7 900 000-00-00',
+    phone: '8 (900) 000-00-00',
     organization: 'Электрика; Шелково',
     jobTitle: 'Электрик',
     note: 'Помогает с электричеством, Россетями\nи Мосэнергосбытом.',
@@ -53,7 +53,7 @@ describe('contact vCard', () => {
         PRODID:-//vcard-creator//vcard-creator 1.0.0//EN
         FN;CHARSET=UTF-8:Александр Ерёмин
         N;CHARSET=UTF-8:Ерёмин;Александр;;;
-        TEL;TYPE=CELL,VOICE:+7 900 000-00-00
+        TEL;TYPE=CELL,VOICE:+79000000000
         EMAIL;TYPE=INTERNET:alexander@example.com
         item1.URL:https://t.me/Alexeremin2006
         item1.X-ABLABEL;CHARSET=UTF-8:Telegram
@@ -83,7 +83,7 @@ describe('contact vCard', () => {
       updatedAt: new Date('2026-07-13T00:00:00.000Z'),
       updatedIso: '2026-07-13',
       summary: 'Производство коры в Малино.',
-      contacts: { phone: '+7 991 737-55-56' },
+      contacts: { phone: '89917375556' },
       location: {
         title: 'Золото Сибири',
         url: 'https://yandex.ru/maps/-/CTq-BEOk',
@@ -106,7 +106,7 @@ describe('contact vCard', () => {
         PRODID:-//vcard-creator//vcard-creator 1.0.0//EN
         FN;CHARSET=UTF-8:Золото Сибири
         N;CHARSET=UTF-8:;;;;
-        TEL;TYPE=CELL,VOICE:+7 991 737-55-56
+        TEL;TYPE=CELL,VOICE:+79917375556
         ADR;TYPE=WORK;CHARSET=UTF-8:;;Пионерская ул.\\, 21\\, пгт Ма
          лино;;;;
         ORG;CHARSET=UTF-8:Золото Сибири
@@ -128,5 +128,32 @@ describe('contact vCard', () => {
     expect(
       lines.every((line) => new TextEncoder().encode(line).length <= 75),
     ).toBe(true);
+  });
+
+  it('only includes unambiguous international and full phone numbers', () => {
+    const phones = [
+      '+49 (30) 1234-5678',
+      '+7 900 000-00',
+      '+7 900 ***-**-00',
+      '+7 900 000-00-00 доб. 123',
+    ];
+
+    expect(
+      phones.map((phone) =>
+        buildContactVcard({
+          ...contact,
+          vcf: { ...contact.vcf, phone },
+        })
+          .split('\r\n')
+          .find((line) => line.startsWith('TEL;')),
+      ),
+    ).toMatchInlineSnapshot(`
+      [
+        "TEL;TYPE=CELL,VOICE:+493012345678",
+        undefined,
+        undefined,
+        undefined,
+      ]
+    `);
   });
 });
