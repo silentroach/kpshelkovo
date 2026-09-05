@@ -21,7 +21,6 @@ type CatalogLinkset = {
 type AssertSectionCatalogInput = {
   readonly catalog: (root: string) => Record<string, unknown>;
   readonly catalogRoot?: string;
-  readonly exact?: boolean;
   readonly siteRoot: string;
   readonly slice: PublicSurfaceSlice;
 };
@@ -58,13 +57,12 @@ const sectionCatalogRole = (
 ): PublicSurfaceCatalogRole | false | undefined =>
   surface.sectionCatalogRole ?? surface.catalogRole;
 
-export const expectSectionCatalogMatchesRegistry = ({
+const catalogContract = ({
   catalog,
   catalogRoot,
-  exact = false,
   siteRoot,
   slice,
-}: AssertSectionCatalogInput): void => {
+}: AssertSectionCatalogInput) => {
   const body = catalog(catalogRoot ?? siteRoot);
   const actual = sorted(contractEntries(body));
   const expected = sorted(
@@ -84,14 +82,25 @@ export const expectSectionCatalogMatchesRegistry = ({
     }),
   );
 
-  const expectation = expect(
+  return {
     actual,
-    `${slice.owner.id} catalog role/URL/MIME contract`,
-  );
-  if (exact) {
-    expectation.toEqual(expected);
-    return;
-  }
+    expected,
+    message: `${slice.owner.id} catalog role/URL/MIME contract`,
+  };
+};
 
-  expectation.toEqual(expect.arrayContaining([...expected]));
+export const expectSectionCatalogMatchesRegistry = (
+  input: AssertSectionCatalogInput,
+): void => {
+  const { actual, expected, message } = catalogContract(input);
+
+  expect(actual, message).toEqual(expect.arrayContaining([...expected]));
+};
+
+export const expectExactSectionCatalogMatchesRegistry = (
+  input: AssertSectionCatalogInput,
+): void => {
+  const { actual, expected, message } = catalogContract(input);
+
+  expect(actual, message).toEqual(expected);
 };

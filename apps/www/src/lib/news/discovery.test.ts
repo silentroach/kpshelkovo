@@ -3,23 +3,19 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import type { NewsArticle, NewsDataset } from './types';
 import type {
   newsPublicSurfaceSlice as newsPublicSurfaceSliceType,
-  PublicSurface,
   PublicSurfaceSlice,
-  surfaceHref as surfaceHrefType,
 } from '@/lib/public-surface';
-import type { expectSectionCatalogMatchesRegistry as expectSectionCatalogMatchesRegistryType } from '@/lib/public-surface/catalog-contract.test-helper';
+import type { expectExactSectionCatalogMatchesRegistry as expectExactSectionCatalogMatchesRegistryType } from '@/lib/public-surface/catalog-contract.test-helper';
 
 let buildNewsPayload: typeof import('./discovery').buildNewsPayload;
 let catalog: typeof import('./discovery').catalog;
-let expectSectionCatalogMatchesRegistry: typeof expectSectionCatalogMatchesRegistryType;
+let expectExactSectionCatalogMatchesRegistry: typeof expectExactSectionCatalogMatchesRegistryType;
 let links: typeof import('./discovery').links;
 let newsPublicSurfaceSlice: typeof newsPublicSurfaceSliceType &
   PublicSurfaceSlice;
 let openapi: typeof import('./discovery').openapi;
-let PROFILE: typeof import('./discovery').PROFILE;
 let schema: typeof import('./discovery').schema;
 let self: typeof import('./discovery').self;
-let surfaceHref: typeof surfaceHrefType;
 
 const articleWithEvent = (): NewsArticle => ({
   id: '2026/05/event',
@@ -101,63 +97,76 @@ beforeAll(async () => {
     BASE_URL: '/',
   });
 
-  ({ buildNewsPayload, catalog, links, openapi, PROFILE, schema, self } =
+  ({ buildNewsPayload, catalog, links, openapi, schema, self } =
     await import('./discovery'));
-  ({ expectSectionCatalogMatchesRegistry } =
+  ({ expectExactSectionCatalogMatchesRegistry } =
     await import('@/lib/public-surface/catalog-contract.test-helper'));
-  ({ newsPublicSurfaceSlice, surfaceHref } =
-    await import('@/lib/public-surface'));
+  ({ newsPublicSurfaceSlice } = await import('@/lib/public-surface'));
 });
 
 describe('news discovery payload', () => {
   it('keeps the section API catalog aligned with registry catalog surfaces', () => {
-    expectSectionCatalogMatchesRegistry({
+    expectExactSectionCatalogMatchesRegistry({
       catalog,
-      exact: true,
       siteRoot: 'https://example.com',
       slice: newsPublicSurfaceSlice,
     });
   });
 
-  it('builds Link headers from registered relations, URLs, and MIME types', () => {
+  it('keeps stable catalog URLs and MIME types grouped by role', () => {
     const root = 'https://example.com';
-    const serviceDescriptions = newsPublicSurfaceSlice.surfaces.filter(
-      (surface: PublicSurface) =>
-        (surface.sectionCatalogRole ?? surface.catalogRole) === 'service-desc',
-    );
-    const apiCatalog = newsPublicSurfaceSlice.surfaces.find(
-      (surface: PublicSurface) =>
-        surface.discoveryRoles.includes('api-catalog'),
-    );
-    if (!apiCatalog) {
-      throw new Error('news API catalog surface is missing from the registry');
-    }
+    const [linkset] = catalog(root).linkset as readonly {
+      readonly anchor: string;
+      readonly item: readonly {
+        readonly href: string;
+        readonly type: string;
+      }[];
+      readonly 'service-desc': readonly {
+        readonly href: string;
+        readonly type: string;
+      }[];
+    }[];
 
-    const apiCatalogLink = `<${surfaceHref(root, apiCatalog)}>; rel="api-catalog"; type="${apiCatalog.mediaType}"; profile="${PROFILE}"`;
-    const expected = [
-      ...serviceDescriptions.map(
-        (surface) =>
-          `<${surfaceHref(root, surface)}>; rel="service-desc"; type="${surface.mediaType}"`,
+    expect({
+      anchor: linkset?.anchor,
+      item: linkset?.item.map((entry) => `${entry.href} ${entry.type}`),
+      serviceDesc: linkset?.['service-desc'].map(
+        (entry) => `${entry.href} ${entry.type}`,
       ),
-      apiCatalogLink,
-    ];
+    }).toMatchInlineSnapshot(`
+      {
+        "anchor": "https://example.com/news/",
+        "item": [
+          "https://example.com/news/index.md text/markdown",
+          "https://example.com/news/data/articles.json application/json",
+          "https://example.com/news/feed.xml application/rss+xml",
+          "https://example.com/news/llms.txt text/plain",
+          "https://example.com/news/llms-full.txt text/plain",
+        ],
+        "serviceDesc": [
+          "https://example.com/news/schemas/articles.schema.json application/schema+json",
+          "https://example.com/news/openapi/articles.openapi.json application/vnd.oai.openapi+json",
+        ],
+      }
+    `);
+  });
 
-    expect(links(root).split(', ')).toEqual(expected);
-    expect(self(root)).toBe(apiCatalogLink);
+  it('keeps stable Link header contracts independently of the registry', () => {
+    const root = 'https://example.com';
+
+    expect({ links: links(root), self: self(root) }).toMatchInlineSnapshot(`
+      {
+        "links": "<https://example.com/news/schemas/articles.schema.json>; rel=\"service-desc\"; type=\"application/schema+json\", <https://example.com/news/openapi/articles.openapi.json>; rel=\"service-desc\"; type=\"application/vnd.oai.openapi+json\", <https://example.com/news/.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\"; profile=\"https://www.rfc-editor.org/info/rfc9727\"",
+        "self": "<https://example.com/news/.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\"; profile=\"https://www.rfc-editor.org/info/rfc9727\"",
+      }
+    `);
   });
 
   it('keeps the API catalog self-link intentionally absent', () => {
     const root = 'https://example.com';
-    const apiCatalog = newsPublicSurfaceSlice.surfaces.find(
-      (surface: PublicSurface) =>
-        surface.discoveryRoles.includes('api-catalog'),
-    );
-    if (!apiCatalog) {
-      throw new Error('news API catalog surface is missing from the registry');
-    }
 
     expect(JSON.stringify(catalog(root))).not.toContain(
-      surfaceHref(root, apiCatalog),
+      'https://example.com/news/.well-known/api-catalog',
     );
   });
 
@@ -174,32 +183,16 @@ describe('news discovery payload', () => {
         [],
     );
 
-    expect(
-      ['news:data', 'news:llms', 'news:llms-full'].map((id) => {
-        const surface = newsPublicSurfaceSlice.surfaces.find(
-          (candidate: PublicSurface) => candidate.id === id,
-        );
-        if (!surface) {
-          throw new Error(`news public surface ${id} is missing`);
-        }
-
-        return { id, title: titlesByHref.get(surfaceHref(root, surface)) };
-      }),
-    ).toMatchInlineSnapshot(`
-      [
-        {
-          "id": "news:data",
-          "title": "Основная машиночитаемая лента новостей, включая необязательные события",
-        },
-        {
-          "id": "news:llms",
-          "title": "Короткий обзор llms.txt",
-        },
-        {
-          "id": "news:llms-full",
-          "title": "Подробный обзор llms-full.txt",
-        },
-      ]
+    expect({
+      data: titlesByHref.get(`${root}/news/data/articles.json`),
+      llms: titlesByHref.get(`${root}/news/llms.txt`),
+      llmsFull: titlesByHref.get(`${root}/news/llms-full.txt`),
+    }).toMatchInlineSnapshot(`
+      {
+        "data": "Основная машиночитаемая лента новостей, включая необязательные события",
+        "llms": "Короткий обзор llms.txt",
+        "llmsFull": "Подробный обзор llms-full.txt",
+      }
     `);
   });
 
