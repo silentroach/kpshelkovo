@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { KB_PAGE_FLAGS } from './page-flags';
 import { RawKbPageSchema } from './raw-schema';
 
 describe('RawKbPageSchema', () => {
@@ -7,11 +8,11 @@ describe('RawKbPageSchema', () => {
     expect(
       RawKbPageSchema.parse({
         title: 'Служебная статья',
-        flags: ['exclude-from-site-search', 'noindex'],
+        flags: KB_PAGE_FLAGS,
       }),
     ).toEqual({
       title: 'Служебная статья',
-      flags: ['exclude-from-site-search', 'noindex'],
+      flags: KB_PAGE_FLAGS,
     });
   });
 
