@@ -4,10 +4,8 @@ import { describe, expect, it } from 'vitest';
 
 import { estimateDetails2026 } from '@/data/reglament/estimate-details-2026';
 import { buildPublicEstimateDetails2026Json } from '../detail-json';
-import {
-  publicEstimateDetailDatasetSchema,
-  type PublicEstimateDetailDataset,
-} from '../detail-public';
+import type { PublicEstimateDetailDataset } from '../detail-public';
+import { publicEstimateDetailDatasetSchema } from '../detail-public-schema';
 import { detailOpenapi, detailSchema } from '../discovery';
 import {
   reglamentApiCatalogPath,

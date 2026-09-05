@@ -15,7 +15,7 @@ import { serializeMarkdownLineDocument } from '@/lib/markdown/llms-document';
 
 import { absoluteUrl } from '../site';
 import { formatReglamentMoney, formatReglamentNumber } from './format';
-import { ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_VERSION } from './detail-public';
+import { ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_VERSION } from './detail-public-schema';
 import {
   reglamentEstimateDetailsChecksMarkdownUrl,
   reglamentEstimateDetails2026DataUrl,

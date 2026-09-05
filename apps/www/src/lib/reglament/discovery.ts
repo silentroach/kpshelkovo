@@ -2,7 +2,7 @@ import { calculateEstimate } from './calculate';
 import {
   buildPublicEstimateDetails2026JsonSchema,
   ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_NAME,
-} from './detail-public';
+} from './detail-public-schema';
 import {
   reglamentApiCatalogPath,
   reglamentEstimateDetailsChecksMarkdownPath,

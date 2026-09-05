@@ -8,12 +8,14 @@ import type {
 import {
   ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_VERSION,
   publicEstimateDetailDatasetSchema,
-  type PublicEstimateDetailDataset,
-  type PublicEstimateDetailMoneyValue,
-  type PublicEstimateDetailNeedsCheck,
-  type PublicEstimateDetailQuantityValue,
-  type PublicEstimateDetailSourceId,
-  type PublicEstimateDetailSourceValue,
+} from './detail-public-schema';
+import type {
+  PublicEstimateDetailDataset,
+  PublicEstimateDetailMoneyValue,
+  PublicEstimateDetailNeedsCheck,
+  PublicEstimateDetailQuantityValue,
+  PublicEstimateDetailSourceId,
+  PublicEstimateDetailSourceValue,
 } from './detail-public';
 
 const publicQuantity = (
