@@ -3,6 +3,17 @@ import { describe, expect, it } from 'vitest';
 import { RawContactSchema } from '../raw-schema';
 
 describe('RawContactSchema', () => {
+  it('accepts leisure contacts with a public booking link', () => {
+    expect(
+      RawContactSchema.safeParse({
+        title: 'Экскурсии',
+        slug: 'excursions',
+        category: 'leisure',
+        updated_at: '2026-09-05',
+        contacts: { website: 'https://example.com/booking' },
+      }).success,
+    ).toBe(true);
+  });
   it('accepts the minimal contacts frontmatter', () => {
     expect(
       RawContactSchema.parse({

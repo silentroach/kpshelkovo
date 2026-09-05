@@ -7,6 +7,7 @@ export const CONTACT_CATEGORIES = [
   'education',
   'garden',
   'food',
+  'leisure',
 ] as const;
 export type ContactCategory = (typeof CONTACT_CATEGORIES)[number];
 
