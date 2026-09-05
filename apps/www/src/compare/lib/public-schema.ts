@@ -1,7 +1,17 @@
+import addFormats from 'ajv-formats';
 import { z } from 'zod';
 
 const NonEmptyTextSchema = z.string().min(1).meta({ id: 'text' });
-const UriSchema = z.url().meta({ id: 'uri' });
+const uriFormat = addFormats.get('uri', 'full');
+
+if (typeof uriFormat !== 'function') {
+  throw new Error('ajv-formats did not provide the full URI validator');
+}
+
+const UriSchema = z
+  .string()
+  .refine(uriFormat, 'Invalid URI')
+  .meta({ id: 'uri', format: 'uri' });
 
 const AvailabilitySchema = z
   .enum(['yes', 'no', 'partial'])
@@ -203,10 +213,3 @@ export const ComparePublicPayloadSchema = z
     description:
       'Полная лента поселков только для чтения с детальными полями, вычисленными расстояниями, рейтингом и агрегатами.',
   });
-
-export type ComparePublicPayload = z.output<typeof ComparePublicPayloadSchema>;
-export type ComparePublicSettlement =
-  ComparePublicPayload['settlements'][number];
-export type PublicComparison = ComparePublicPayload['comparisons'][string];
-export type PublicComparisons = ComparePublicPayload['comparisons'];
-export type PublicStats = ComparePublicPayload['stats'];

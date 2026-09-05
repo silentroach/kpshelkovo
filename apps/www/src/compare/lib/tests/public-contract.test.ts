@@ -7,14 +7,13 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import { parse as parseYaml } from 'yaml';
 import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
 
 import { compareSettlements } from '@/compare/lib/comparisons';
 import { openapi, SCHEMA, schema } from '@/compare/lib/discovery';
 import { toFullPayload } from '@/compare/lib/full';
-import {
-  ComparePublicPayloadSchema,
-  type ComparePublicPayload,
-} from '@/compare/lib/public-schema';
+import type { ComparePublicPayload } from '@/compare/lib/public-dto.types';
+import { ComparePublicPayloadSchema } from '@/compare/lib/public-schema';
 import { buildRatings } from '@/compare/lib/rating';
 import { SettlementSchema } from '@/compare/lib/schema';
 import { mapRawSettlement } from '@/compare/lib/settlement/mapper';
@@ -180,8 +179,8 @@ const fullPayload: ComparePublicPayload = {
 
 type JsonPath = readonly (string | number)[];
 
-const jsonRoundTrip = <T>(value: T): T =>
-  JSON.parse(JSON.stringify(value)) as T;
+const jsonRoundTrip = (value: unknown): unknown =>
+  JSON.parse(JSON.stringify(value));
 
 const objectAt = (value: unknown): Record<string | number, unknown> => {
   if (!value || typeof value !== 'object') {
@@ -351,6 +350,30 @@ describe('Compare public contract', () => {
   );
 
   it.each([
+    {
+      uri: 'https://example.com/%zz',
+      rfcAccepted: false,
+      whatwgAccepted: true,
+    },
+    {
+      uri: 'http://example.com:99999/',
+      rfcAccepted: true,
+      whatwgAccepted: false,
+    },
+  ])(
+    'keeps Zod and JSON Schema aligned for adversarial URI $uri',
+    ({ uri, rfcAccepted, whatwgAccepted }) => {
+      const payload = withValueAt(['settlements', 0, 'website'], uri);
+
+      expect([
+        ComparePublicPayloadSchema.safeParse(payload).success,
+        validateStandalone(payload),
+      ]).toEqual([rfcAccepted, rfcAccepted]);
+      expect(z.url().safeParse(uri).success).toBe(whatwgAccepted);
+    },
+  );
+
+  it.each([
     ['root object', ['stats']],
     ['settlement', ['settlements', 0, 'name']],
     ['management company', ['settlements', 0, 'management_company', 'title']],
@@ -461,6 +484,10 @@ describe('Compare public contract', () => {
       title: 'SettlementsPayload',
       description:
         'Полная лента поселков только для чтения с детальными полями, вычисленными расстояниями, рейтингом и агрегатами.',
+    });
+    expect(resolveLocalRef(standaloneSchema, '#/$defs/uri')).toMatchObject({
+      type: 'string',
+      format: 'uri',
     });
   });
 

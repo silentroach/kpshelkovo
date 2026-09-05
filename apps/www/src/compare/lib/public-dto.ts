@@ -1,11 +1,11 @@
-import type { PublicComparisons, PublicStats } from './public-schema';
+import type { PublicComparisons, PublicStats } from './public-dto.types';
 import type { ComparisonResult, Stats } from './settlement/types';
 
 export type {
   PublicComparison,
   PublicComparisons,
   PublicStats,
-} from './public-schema';
+} from './public-dto.types';
 
 export const toPublicStats = (stats: Stats): PublicStats => ({
   shelkovoTariff: stats.shelkovoTariff,
