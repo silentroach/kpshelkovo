@@ -486,14 +486,4 @@ const serviceSearchText = (
       }
     }
   </style>
-
-  <script>
-    import { hydrateStickyTableHeaders } from '@/lib/sticky-table-headers';
-
-    const hydrate = () => hydrateStickyTableHeaders();
-
-    hydrate();
-    document.addEventListener('astro:after-swap', hydrate);
-    document.addEventListener('astro:page-load', hydrate);
-  </script>
 </BaseLayout>

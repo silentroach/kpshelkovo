@@ -1,7 +1,6 @@
 const tableShellSelector = '[data-ui-sticky-table-shell]';
 
-let stickyTableRaf = 0;
-let stickyTableListenersBound = false;
+let uninstallStickyTableHeaders: (() => void) | undefined;
 
 const isTableHeaderStuck = (
   shell: HTMLElement,
@@ -14,44 +13,93 @@ const isTableHeaderStuck = (
   return shellRect.top < top && shellRect.bottom > top + headerHeight;
 };
 
-const updateStickyTableHeaders = (): void => {
-  document
-    .querySelectorAll<HTMLElement>(tableShellSelector)
-    .forEach((shell) => {
-      const headerCell = shell.querySelector<HTMLElement>('thead th');
+const updateStickyTableHeaders = (shells: readonly HTMLElement[]): void => {
+  shells.forEach((shell) => {
+    const headerCell = shell.querySelector<HTMLElement>('thead th');
 
-      if (!headerCell) {
-        shell.removeAttribute('data-ui-sticky-table-stuck');
-        return;
-      }
+    if (!headerCell) {
+      shell.removeAttribute('data-ui-sticky-table-stuck');
+      return;
+    }
 
-      shell.toggleAttribute(
-        'data-ui-sticky-table-stuck',
-        isTableHeaderStuck(shell, headerCell),
-      );
+    shell.toggleAttribute(
+      'data-ui-sticky-table-stuck',
+      isTableHeaderStuck(shell, headerCell),
+    );
+  });
+};
+
+export const installStickyTableHeaders = (): (() => void) => {
+  if (uninstallStickyTableHeaders) {
+    return uninstallStickyTableHeaders;
+  }
+
+  let shells: readonly HTMLElement[] = [];
+  let animationFrame = 0;
+  let windowListenersBound = false;
+
+  const scheduleUpdate = (): void => {
+    if (animationFrame) return;
+
+    animationFrame = requestAnimationFrame(() => {
+      animationFrame = 0;
+      updateStickyTableHeaders(shells);
     });
-};
+  };
 
-const scheduleStickyTableHeadersUpdate = (): void => {
-  if (stickyTableRaf) return;
+  const unbindWindowListeners = (): void => {
+    if (!windowListenersBound) return;
 
-  stickyTableRaf = requestAnimationFrame(() => {
-    stickyTableRaf = 0;
-    updateStickyTableHeaders();
-  });
-};
+    window.removeEventListener('scroll', scheduleUpdate);
+    window.removeEventListener('resize', scheduleUpdate);
+    windowListenersBound = false;
+  };
 
-const bindStickyTableHeaderListeners = (): void => {
-  if (stickyTableListenersBound) return;
+  const cancelScheduledUpdate = (): void => {
+    if (animationFrame) {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+    }
+  };
 
-  window.addEventListener('scroll', scheduleStickyTableHeadersUpdate, {
-    passive: true,
-  });
-  window.addEventListener('resize', scheduleStickyTableHeadersUpdate);
-  stickyTableListenersBound = true;
-};
+  const deactivate = (): void => {
+    cancelScheduledUpdate();
 
-export const hydrateStickyTableHeaders = (): void => {
-  bindStickyTableHeaderListeners();
-  updateStickyTableHeaders();
+    shells = [];
+    unbindWindowListeners();
+  };
+
+  const hydrate = (): void => {
+    cancelScheduledUpdate();
+
+    shells = Array.from(
+      document.querySelectorAll<HTMLElement>(tableShellSelector),
+    );
+    if (shells.length === 0) {
+      deactivate();
+      return;
+    }
+
+    if (!windowListenersBound) {
+      window.addEventListener('scroll', scheduleUpdate, { passive: true });
+      window.addEventListener('resize', scheduleUpdate);
+      windowListenersBound = true;
+    }
+
+    updateStickyTableHeaders(shells);
+  };
+
+  const uninstall = (): void => {
+    document.removeEventListener('astro:after-swap', hydrate);
+    deactivate();
+    if (uninstallStickyTableHeaders === uninstall) {
+      uninstallStickyTableHeaders = undefined;
+    }
+  };
+
+  uninstallStickyTableHeaders = uninstall;
+  document.addEventListener('astro:after-swap', hydrate);
+  hydrate();
+
+  return uninstall;
 };
