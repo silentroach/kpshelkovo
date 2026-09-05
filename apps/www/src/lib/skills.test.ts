@@ -39,7 +39,7 @@ describe('agent skills index', () => {
     );
 
     for (const route of Object.values(statusCalendarAgentPatterns())) {
-      expect(skill).toContain(route);
+      expect(skill).toContain(`\`${route}\``);
     }
 
     expect(skill).toContain('отдельного календарного JSON нет');

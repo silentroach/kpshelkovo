@@ -93,7 +93,7 @@ describe('status llms', () => {
       const markdown = await build(kind);
 
       for (const route of Object.values(statusCalendarAgentPatterns())) {
-        expect(markdown).toContain(route);
+        expect(markdown).toContain(`\`${route}\``);
       }
 
       expect(markdown).toContain('отдельного календарного JSON нет');
