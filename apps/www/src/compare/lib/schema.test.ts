@@ -342,7 +342,7 @@ describe('Schema Validation', () => {
             value: 5813,
             unit: 'rub_per_lot',
             period: 'month',
-            note: 'тариф взят с сайта',
+            note: '  тариф взят с сайта  ',
           },
           {
             value: 100,
@@ -367,11 +367,25 @@ describe('Schema Validation', () => {
         const settlement = mapRawSettlement(result.data);
         expect(settlement.tariff.normalizedPerSotkaMonth).toBeCloseTo(681.3, 6);
         expect(settlement.tariff.normalizedIsEstimate).toBe(true);
-        expect(result.data.tariff.note).toBe('тариф взят с сайта');
+        expect(result.data.tariff.note).toBe('  тариф взят с сайта  ');
         expect('parts' in result.data.tariff).toBe(true);
         if ('parts' in result.data.tariff) {
           expect(result.data.tariff.parts).toHaveLength(2);
+          expect(result.data.tariff.parts[0]?.note).toBe(
+            '  тариф взят с сайта  ',
+          );
         }
+      }
+
+      for (const note of ['', ' \t\n']) {
+        const invalid = {
+          ...validSettlement,
+          tariff: validSettlement.tariff.map((part, index) =>
+            index === 0 ? { ...part, note } : part,
+          ),
+        };
+
+        expect(SettlementSchema.safeParse(invalid).success).toBe(false);
       }
     });
 
