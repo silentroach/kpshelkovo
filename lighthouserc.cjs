@@ -28,7 +28,7 @@ const urls = paths.map((path) =>
 const collect = {
   ...(target === 'static' ? { staticDistDir: './dist/www' } : {}),
   url: urls,
-  numberOfRuns: 2,
+  numberOfRuns: 3,
 };
 
 module.exports = {

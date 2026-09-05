@@ -12,6 +12,10 @@ import {
 } from './src/lib/sitemap';
 import { loadSitemapMetadataIndex } from './src/lib/sitemap-data';
 import { createAstroMarkdownProcessor } from './src/lib/markdown/astro-processor';
+import {
+  assetDeliveryValidation,
+  shouldInlineBuildAsset,
+} from './src/integrations/asset-delivery-validation';
 import { indexNowUrlManifest } from './src/integrations/indexnow-url-manifest';
 import { pagefindDevSnapshot } from './src/integrations/pagefind-dev-snapshot';
 import { retryableSettlementsExplorer } from './src/integrations/retryable-settlements-explorer';
@@ -76,8 +80,8 @@ export default defineConfig({
   vite: {
     envDir: '../..',
     build: {
-      // Keep processed scripts external so CSP does not need broad inline JS.
-      assetsInlineLimit: 0,
+      // Inline route/scoped CSS without broadening CSP for processed scripts.
+      assetsInlineLimit: shouldInlineBuildAsset,
     },
     server: {
       strictPort: true,
@@ -90,6 +94,7 @@ export default defineConfig({
     },
   },
   integrations: [
+    assetDeliveryValidation(),
     pagefindDevSnapshot(),
     svelte(),
     sitemap({
@@ -125,5 +130,6 @@ export default defineConfig({
   build: {
     format: 'directory',
     assets: 'static',
+    inlineStylesheets: 'auto',
   },
 });
