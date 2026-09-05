@@ -133,6 +133,7 @@ describe('contact vCard', () => {
   it('only includes unambiguous international and full phone numbers', () => {
     const phones = [
       '+49 (30) 1234‑5678',
+      '+7.900.123.45.67',
       '+7 900 000-00',
       '+7 900 ***-**-00',
       '+7 900 000-00-00 доб. 123',
@@ -150,6 +151,7 @@ describe('contact vCard', () => {
     ).toMatchInlineSnapshot(`
       [
         "TEL;TYPE=CELL,VOICE:+493012345678",
+        "TEL;TYPE=CELL,VOICE:+79001234567",
         undefined,
         undefined,
         undefined,
