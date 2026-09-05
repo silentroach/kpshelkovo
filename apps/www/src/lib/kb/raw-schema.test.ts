@@ -1,17 +1,18 @@
 import { describe, expect, it } from 'vitest';
 
 import { RawKbPageSchema } from './raw-schema';
+import { KB_PAGE_FLAGS } from './types';
 
 describe('RawKbPageSchema', () => {
   it('accepts supported page flags', () => {
     expect(
       RawKbPageSchema.parse({
         title: 'Служебная статья',
-        flags: ['exclude-from-site-search', 'noindex'],
+        flags: KB_PAGE_FLAGS,
       }),
     ).toEqual({
       title: 'Служебная статья',
-      flags: ['exclude-from-site-search', 'noindex'],
+      flags: KB_PAGE_FLAGS,
     });
   });
 
