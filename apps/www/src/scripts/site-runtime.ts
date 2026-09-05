@@ -1,6 +1,7 @@
 import { installHomeStatusHydration } from '@/lib/home/status';
 import { highlightSearchTerms } from '@/lib/search/highlight';
 import { installStatusServiceStateHydration } from '@/lib/status/lifecycle.dom';
+import { loadSearchDialog } from '@/scripts/search-dialog-loader';
 
 interface AstroBeforePreparationEvent extends Event {
   loader: () => Promise<void>;
@@ -34,10 +35,12 @@ const HOME_HERO_FALLBACK_SELECTOR = '[data-home-hero-fallback]';
 const NAVIGATION_PENDING_ATTR = 'data-site-navigation-pending';
 const NAVIGATION_DELAY_MS = 50;
 const SEARCH_DIALOG_HYDRATED_ATTR = 'data-search-dialog-hydrated';
+const SEARCH_DIALOG_LOAD_ERROR_SELECTOR = '[data-search-load-error]';
 const SEARCH_DIALOG_ROOT_SELECTOR = '[data-search-dialog-root]';
 const SEARCH_DIALOG_SELECTOR = '[data-search-dialog]';
 const SEARCH_INPUT_SELECTOR = '[data-search-input]';
 const SEARCH_CLOSE_SELECTOR = '[data-search-close]';
+const SEARCH_RETRY_SELECTOR = '[data-search-retry]';
 const SEARCH_TRIGGER_SELECTOR = '[data-search-trigger]';
 const SITE_HEADER_MENU_SELECTOR = 'details.site-header-menu[open]';
 const SITE_NAV_DROPDOWN_SELECTOR = '[data-site-nav-dropdown]';
@@ -395,12 +398,28 @@ const bindSiteHeaderMenu = (): void => {
 let latestSearchDialogRequest = 0;
 let nativeSearchDialogOpener: HTMLElement | undefined;
 
+const setNativeSearchDialogLoadError = (
+  root: HTMLElement,
+  visible: boolean,
+): void => {
+  const error = root.querySelector<HTMLElement>(
+    SEARCH_DIALOG_LOAD_ERROR_SELECTOR,
+  );
+  const retry = root.querySelector<HTMLButtonElement>(SEARCH_RETRY_SELECTOR);
+  if (error) {
+    error.hidden = !visible;
+  }
+  if (retry) {
+    retry.disabled = false;
+  }
+};
+
 const requestSearchDialog = async (
   root: HTMLElement,
   opener: HTMLElement,
   requestId: number,
 ): Promise<void> => {
-  const { openSearchDialog } = await import('@/components/search/lazy');
+  const { openSearchDialog } = await loadSearchDialog();
   const dialog = root.querySelector<HTMLDialogElement>(SEARCH_DIALOG_SELECTOR);
   const input = root.querySelector<HTMLInputElement>(SEARCH_INPUT_SELECTOR);
   if (
@@ -412,8 +431,37 @@ const requestSearchDialog = async (
     return;
   }
 
+  setNativeSearchDialogLoadError(root, false);
   openSearchDialog(root, opener, input.value);
   nativeSearchDialogOpener = undefined;
+};
+
+const loadNativeSearchDialog = (
+  root: HTMLElement,
+  opener: HTMLElement,
+): void => {
+  const retry = root.querySelector<HTMLButtonElement>(SEARCH_RETRY_SELECTOR);
+  if (retry) {
+    retry.disabled = true;
+  }
+
+  const requestId = ++latestSearchDialogRequest;
+  void requestSearchDialog(root, opener, requestId).catch((error: unknown) => {
+    const dialog = root.querySelector<HTMLDialogElement>(
+      SEARCH_DIALOG_SELECTOR,
+    );
+    if (
+      requestId !== latestSearchDialogRequest ||
+      !root.isConnected ||
+      !dialog?.open ||
+      root.hasAttribute(SEARCH_DIALOG_HYDRATED_ATTR)
+    ) {
+      return;
+    }
+
+    console.error('Не удалось загрузить модуль поиска.', error);
+    setNativeSearchDialogLoadError(root, true);
+  });
 };
 
 const closeNativeSearchDialog = (target: Element): void => {
@@ -442,6 +490,7 @@ const finishNativeSearchDialogClose = (dialog: HTMLDialogElement): void => {
   }
 
   latestSearchDialogRequest += 1;
+  setNativeSearchDialogLoadError(root, false);
   const opener = nativeSearchDialogOpener;
   nativeSearchDialogOpener = undefined;
   const input = dialog.querySelector<HTMLInputElement>(SEARCH_INPUT_SELECTOR);
@@ -490,6 +539,32 @@ const bindSearchDialogLoader = (): void => {
       return;
     }
 
+    const retry = event.target.closest(SEARCH_RETRY_SELECTOR);
+    if (retry instanceof HTMLButtonElement) {
+      const root = retry.closest<HTMLElement>(SEARCH_DIALOG_ROOT_SELECTOR);
+      const dialog = root?.querySelector<HTMLDialogElement>(
+        SEARCH_DIALOG_SELECTOR,
+      );
+      const input = root?.querySelector<HTMLInputElement>(
+        SEARCH_INPUT_SELECTOR,
+      );
+      const opener = nativeSearchDialogOpener;
+      if (
+        !root ||
+        !dialog?.open ||
+        !input ||
+        !opener?.isConnected ||
+        root.hasAttribute(SEARCH_DIALOG_HYDRATED_ATTR)
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      input.focus();
+      loadNativeSearchDialog(root, opener);
+      return;
+    }
+
     const trigger = event.target.closest(SEARCH_TRIGGER_SELECTOR);
     if (!(trigger instanceof HTMLElement)) {
       closeNativeSearchDialog(event.target);
@@ -509,6 +584,7 @@ const bindSearchDialogLoader = (): void => {
 
     event.preventDefault();
     input.value = '';
+    setNativeSearchDialogLoadError(root, false);
     if (!root.hasAttribute(SEARCH_DIALOG_HYDRATED_ATTR)) {
       nativeSearchDialogOpener = trigger;
     }
@@ -517,8 +593,7 @@ const bindSearchDialogLoader = (): void => {
     }
     input.focus();
 
-    const requestId = ++latestSearchDialogRequest;
-    void requestSearchDialog(root, trigger, requestId).catch(() => {});
+    loadNativeSearchDialog(root, trigger);
   });
 };
 
