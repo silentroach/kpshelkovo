@@ -8,7 +8,7 @@ contacts:
 updated_at: '2026-09-05'
 reviews:
   - sentiment: 'positive'
-    summary: 'Дмитрий тщательно прокатал участок катком, работал без спешки.'
+    summary: 'Дмитрий тщательно прокатал участок катком.'
     published_at: '2026-05-22'
     url: 'https://t.me/shelkovoecoclub/15263/46140'
   - sentiment: 'positive'
