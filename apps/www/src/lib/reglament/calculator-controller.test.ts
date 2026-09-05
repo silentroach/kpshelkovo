@@ -734,6 +734,77 @@ describe('buildReglamentCalculatorChanges', () => {
     expect(rowTariff.dataset.reglamentDeltaTone).toBe('negative');
   });
 
+  it('renders a checkbox click once and supports change-only updates after rehydration', () => {
+    const rowId = 'lighting-electricity';
+    document.body.innerHTML = `
+      <div data-reglament-calculator>
+        <input
+          type="checkbox"
+          checked
+          data-reglament-field="enabled"
+          data-reglament-row-id="${rowId}"
+          data-reglament-baseline="true"
+        />
+        <input
+          type="number"
+          data-reglament-field="fixed_price"
+          data-reglament-row-id="${rowId}"
+          data-reglament-baseline="1473084"
+          value="1473084"
+        />
+        <strong data-reglament-current-tariff></strong>
+      </div>
+    `;
+    const root = document.querySelector('[data-reglament-calculator]');
+    const checkbox = document.querySelector('[type="checkbox"]');
+    const fixedPrice = document.querySelector('[type="number"]');
+    const currentTariff = document.querySelector(
+      '[data-reglament-current-tariff]',
+    );
+
+    if (
+      !(root instanceof HTMLElement) ||
+      !(checkbox instanceof HTMLInputElement) ||
+      !(fixedPrice instanceof HTMLInputElement) ||
+      !(currentTariff instanceof HTMLElement)
+    ) {
+      throw new Error('Missing checkbox calculator fixture nodes');
+    }
+
+    hydrateReglamentCalculator(root, calculationInput);
+    hydrateReglamentCalculator(root, calculationInput);
+
+    const baselineTariff = currentTariff.textContent;
+    const validationPass = vi.spyOn(fixedPrice, 'setCustomValidity');
+
+    checkbox.click();
+
+    expect({
+      checked: checkbox.checked,
+      tariffChanged: currentTariff.textContent !== baselineTariff,
+      validationPasses: validationPass.mock.calls.length,
+    }).toMatchInlineSnapshot(`
+      {
+        "checked": false,
+        "tariffChanged": true,
+        "validationPasses": 1,
+      }
+    `);
+
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+
+    expect({
+      tariffRestored: currentTariff.textContent === baselineTariff,
+      validationPasses: validationPass.mock.calls.length,
+    }).toMatchInlineSnapshot(`
+      {
+        "tariffRestored": true,
+        "validationPasses": 2,
+      }
+    `);
+  });
+
   it('preserves the row title used as a checkbox description', () => {
     document.body.innerHTML = `
       <div data-reglament-calculator>
