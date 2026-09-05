@@ -16,7 +16,7 @@ const TAG = /^[а-яё0-9 -]+$/u;
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const text = z.string().trim();
-const eventText = (name: string) => text.min(1, `${name} must not be blank`);
+const visibleText = (name: string) => text.min(1, `${name} must not be blank`);
 
 const absoluteUrl = (name: string) =>
   text.refine(
@@ -49,10 +49,10 @@ const tag = () =>
 
 const attachment = () =>
   z.object({
-    title: text,
+    title: visibleText('attachments[].title'),
     url: attachmentUrl('attachments[].url'),
-    type: text.optional(),
-    size: text.optional(),
+    type: visibleText('attachments[].type').optional(),
+    size: visibleText('attachments[].size').optional(),
   });
 
 const newsPhotoUrl = (name: string) =>
@@ -76,8 +76,8 @@ const photo = () =>
     url: newsPhotoUrl('photos[].url'),
     width: z.number().int().positive(),
     height: z.number().int().positive(),
-    alt: text,
-    caption: text.optional(),
+    alt: visibleText('photos[].alt'),
+    caption: visibleText('photos[].caption').optional(),
   });
 
 const media = () => ({
@@ -87,9 +87,9 @@ const media = () => ({
 
 const eventParticipant = (name: string) =>
   z.union([
-    eventText(name),
+    visibleText(name),
     z.object({
-      name: eventText(`${name}.name`),
+      name: visibleText(`${name}.name`),
       type: z.enum(['organization', 'person']).optional(),
     }),
   ]);
@@ -99,11 +99,11 @@ const RawNewsEventSchema = z
     slug: text
       .refine((value) => SLUG.test(value), 'events[].slug must be a slug')
       .optional(),
-    title: eventText('events[].title'),
-    description: eventText('events[].description').optional(),
+    title: visibleText('events[].title'),
+    description: visibleText('events[].description').optional(),
     starts_at: contentDateTimeSchema('events[].starts_at'),
     ends_at: contentDateTimeSchema('events[].ends_at').optional(),
-    location: eventText('events[].location').optional(),
+    location: visibleText('events[].location').optional(),
     coordinates: z
       .object({
         lat: z
@@ -209,9 +209,9 @@ function validateTags(
 }
 
 export const RawNewsAuthorSchema = z.object({
-  name: text,
+  name: visibleText('name'),
   kind: z.enum(NEWS_AUTHOR_KINDS),
-  short_name: text.optional(),
+  short_name: visibleText('short_name').optional(),
   url: absoluteUrl('url').optional(),
   role: text.optional(),
 });
@@ -221,8 +221,8 @@ export type RawNewsAuthor = z.output<typeof RawNewsAuthorSchema>;
 export const createRawNewsArticleSchema = (image: SchemaContext['image']) =>
   z
     .object({
-      title: text,
-      summary: text,
+      title: visibleText('title'),
+      summary: visibleText('summary'),
       date: contentDateSchema('date'),
       time: forbiddenTime('time').optional(),
       author: reference('newsAuthors'),
@@ -238,8 +238,8 @@ export const createRawNewsArticleSchema = (image: SchemaContext['image']) =>
       ...media(),
       seo: z
         .object({
-          title: text.optional(),
-          description: text.optional(),
+          title: visibleText('seo.title').optional(),
+          description: visibleText('seo.description').optional(),
         })
         .optional(),
     })
