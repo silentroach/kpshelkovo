@@ -1,24 +1,41 @@
-import { rm, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { EventEmitter } from 'node:events';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import { fileURLToPath } from 'node:url';
 
-import { afterEach, describe, expect, it } from 'vitest';
-import { createServer, type ViteDevServer } from 'vite';
+import { describe, expect, it } from 'vitest';
+import type { Connect, FSWatcher, ViteDevServer } from 'vite';
 
 import { createRetryableExplorerDevPlugin } from '../retryable-settlements-explorer';
 
 const graphPath = '/__settlements-explorer/graph.js';
-const hmrFile = join(
-  fileURLToPath(new URL('../../', import.meta.url)),
-  `retryable-explorer-hmr-${String(process.pid)}.ts`,
-);
-let server: ViteDevServer | undefined;
+const sourceFile = fileURLToPath(import.meta.url);
 
-afterEach(async () => {
-  await server?.close();
-  server = undefined;
-  await rm(hmrFile, { force: true });
-});
+const requestGraph = async (
+  middleware: Connect.NextHandleFunction,
+  url: string,
+) => {
+  let contentType: string | undefined;
+  const { promise, resolve, reject } = Promise.withResolvers<string>();
+  const response = {
+    statusCode: 0,
+    setHeader(name, value) {
+      if (name.toLowerCase() === 'content-type') {
+        contentType = String(value);
+      }
+      return response;
+    },
+    end(body) {
+      resolve(String(body));
+      return response;
+    },
+  } as ServerResponse;
+  middleware({ url } as IncomingMessage, response, (error?: unknown) => {
+    reject(error ?? new Error('Graph middleware did not handle the request'));
+  });
+  const source = await promise;
+
+  return { status: response.statusCode, contentType, source };
+};
 
 describe('retryable settlements explorer dev plugin', () => {
   it('caches the graph across query URLs and rebuilds after source changes', async () => {
@@ -27,54 +44,45 @@ describe('retryable settlements explorer dev plugin', () => {
       buildCount += 1;
       return `export const build = ${String(buildCount)};`;
     };
-    const viteServer = await createServer({
-      appType: 'custom',
-      clearScreen: false,
-      configFile: false,
-      logLevel: 'silent',
-      plugins: [createRetryableExplorerDevPlugin(buildGraph)],
-      server: {
-        hmr: false,
-        host: '127.0.0.1',
-        port: 0,
-        strictPort: true,
+    let middleware: Connect.NextHandleFunction | undefined;
+    const watcher = new EventEmitter() as FSWatcher;
+    const middlewares = {
+      use(handler: Connect.NextHandleFunction) {
+        middleware = handler;
+        return middlewares;
       },
-    });
-    server = viteServer;
-    await viteServer.listen();
-
-    const address = viteServer.httpServer?.address();
-    if (!address || typeof address === 'string') {
-      throw new Error('Expected Vite test server to listen on a TCP port');
+    } as Connect.Server;
+    const plugin = createRetryableExplorerDevPlugin(buildGraph);
+    const configureServer = plugin.configureServer;
+    if (typeof configureServer !== 'function') {
+      throw new Error('Expected explorer plugin to configure the Vite server');
     }
-    const origin = `http://127.0.0.1:${String(address.port)}`;
-    const initialResponse = await fetch(`${origin}${graphPath}`);
-    const initialSource = await initialResponse.text();
-    const retryResponse = await fetch(`${origin}${graphPath}?explorer-retry=2`);
-    const retrySource = await retryResponse.text();
-    const hmrEvent = new Promise<void>((resolve) => {
-      const onAdd = (file: string): void => {
-        if (file !== hmrFile) return;
+    await (configureServer as OmitThisParameter<typeof configureServer>)({
+      watcher,
+      middlewares,
+    } as ViteDevServer);
+    if (!middleware) {
+      throw new Error('Expected explorer plugin to register middleware');
+    }
 
-        viteServer.watcher.off('add', onAdd);
-        resolve();
-      };
-      viteServer.watcher.on('add', onAdd);
-    });
-    await writeFile(hmrFile, 'export {};');
-    await hmrEvent;
-    const updatedResponse = await fetch(
-      `${origin}${graphPath}?explorer-retry=3`,
+    const initialResponse = await requestGraph(middleware, graphPath);
+    const retryResponse = await requestGraph(
+      middleware,
+      `${graphPath}?explorer-retry=2`,
     );
-    const updatedSource = await updatedResponse.text();
+    watcher.emit('all', 'change', sourceFile);
+    const updatedResponse = await requestGraph(
+      middleware,
+      `${graphPath}?explorer-retry=3`,
+    );
 
     expect({
       initialStatus: initialResponse.status,
       retryStatus: retryResponse.status,
-      contentType: retryResponse.headers.get('content-type'),
-      sameSource: retrySource === initialSource,
-      initialSource,
-      updatedSource,
+      contentType: retryResponse.contentType,
+      sameSource: retryResponse.source === initialResponse.source,
+      initialSource: initialResponse.source,
+      updatedSource: updatedResponse.source,
       buildCalls: buildCount,
     }).toMatchInlineSnapshot(`
       {
