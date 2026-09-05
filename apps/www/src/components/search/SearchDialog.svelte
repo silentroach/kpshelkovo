@@ -310,7 +310,7 @@
     dialogElement
       ? [
           ...dialogElement.querySelectorAll<HTMLElement>(
-            'a[href], button:not([disabled]), input:not([disabled])',
+            'a[href], button:not([disabled]):not([data-search-retry]), input:not([disabled])',
           ),
         ]
       : [];
@@ -574,6 +574,23 @@
       </button>
     </div>
 
+    <div
+      class="action-row search-load-error"
+      role="status"
+      aria-atomic="true"
+      hidden
+      data-search-load-error
+    >
+      <p class="action-message">Не удалось загрузить поиск</p>
+      <button
+        type="button"
+        class="ui-btn ui-btn-sm ui-btn-ghost retry-button"
+        data-search-retry
+      >
+        Повторить
+      </button>
+    </div>
+
     {#if viewState !== 'initial'}
       <div
         bind:this={resultsElement}
@@ -737,6 +754,14 @@
     justify-content: space-between;
     gap: 1rem;
     padding: 0.75rem 1rem;
+  }
+
+  .search-load-error {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .search-load-error[hidden] {
+    display: none;
   }
 
   .action-message {
