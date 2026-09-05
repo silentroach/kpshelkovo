@@ -11,6 +11,8 @@ import {
   reglamentAssetsPath,
   reglamentEstimateDetailsChecksMarkdownPath,
   reglamentEstimateDetails2026DataPath,
+  reglamentEstimateDetails2026OpenApiPath,
+  reglamentEstimateDetails2026SchemaPath,
   reglamentEstimateDetailsLaborMarkdownPath,
   reglamentEstimateDetailsMachinesMarkdownPath,
   reglamentEstimateDetailsMarkdownPath,
@@ -306,11 +308,25 @@ describe('reglament discovery route smoke', () => {
         marker: 'Estimate2026Payload',
       },
       {
+        name: 'estimate details json schema',
+        load: () =>
+          import('../../pages/815/regulation/schemas/estimate-details-2026.schema.json'),
+        contentType: 'application/schema+json',
+        marker: 'EstimateDetails2026Payload',
+      },
+      {
         name: 'openapi',
         load: () =>
           import('../../pages/815/regulation/openapi/estimate-2026.openapi.json'),
         contentType: 'application/vnd.oai.openapi+json',
         marker: 'getReglamentEstimate2026',
+      },
+      {
+        name: 'estimate details openapi',
+        load: () =>
+          import('../../pages/815/regulation/openapi/estimate-details-2026.openapi.json'),
+        contentType: 'application/vnd.oai.openapi+json',
+        marker: 'getReglamentEstimateDetails2026',
       },
       {
         name: 'api catalog',
@@ -418,6 +434,10 @@ describe('reglament discovery route smoke', () => {
       reglamentEstimateDetailsLaborMarkdownPath(),
       reglamentEstimateDetailsChecksMarkdownPath(),
     ] as const;
+    const detailContractPaths = [
+      reglamentEstimateDetails2026SchemaPath(),
+      reglamentEstimateDetails2026OpenApiPath(),
+    ] as const;
 
     const publicPathMatches = detailPaths.map((path) => ({
       path,
@@ -427,11 +447,28 @@ describe('reglament discovery route smoke', () => {
     }));
 
     expect({
+      contractDiscovery: detailContractPaths.map((path) => ({
+        path,
+        publicPath: REGLAMENT_PUBLIC_PATHS.some((item) => item === path),
+        catalog: apiCatalog.includes(`${root}${path}`),
+      })),
       publicPathMatches,
       shortSection: markdownSection(shortLlms, 'Что открыть для проверки'),
       fullSection: markdownSection(fullLlms, 'Как выбирать источник'),
     }).toMatchInlineSnapshot(`
       {
+        "contractDiscovery": [
+          {
+            "catalog": true,
+            "path": "/815/regulation/schemas/estimate-details-2026.schema.json",
+            "publicPath": true,
+          },
+          {
+            "catalog": true,
+            "path": "/815/regulation/openapi/estimate-details-2026.openapi.json",
+            "publicPath": true,
+          },
+        ],
         "fullSection": "## Как выбирать источник
 
       - Агрегированная смета: \`estimate-2026.json\` и \`index.md\` — официальная база по разделам и строкам, базовые частоты, годовые суммы, формулы и разбор суммы.

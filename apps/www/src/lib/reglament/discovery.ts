@@ -1,8 +1,18 @@
+import { estimateDetails2026 } from '@/data/reglament/estimate-details-2026';
+
 import { calculateEstimate } from './calculate';
+import { buildPublicEstimateDetails2026Json } from './detail-json';
+import {
+  buildPublicEstimateDetails2026JsonSchema,
+  ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_NAME,
+  publicEstimateDetailDatasetSchema,
+} from './detail-public-schema';
 import {
   reglamentApiCatalogPath,
   reglamentEstimateDetailsChecksMarkdownPath,
   reglamentEstimateDetails2026DataPath,
+  reglamentEstimateDetails2026OpenApiPath,
+  reglamentEstimateDetails2026SchemaPath,
   reglamentEstimateDetailsLaborMarkdownPath,
   reglamentEstimateDetailsMachinesMarkdownPath,
   reglamentEstimateDetailsMarkdownPath,
@@ -47,6 +57,11 @@ export const PROFILE = 'https://www.rfc-editor.org/info/rfc9727';
 export const OAS = 'application/vnd.oai.openapi+json';
 
 const ESTIMATE_PAYLOAD_SCHEMA = 'Estimate2026Payload';
+const ESTIMATE_DETAILS_2026_SOURCE_IDS: readonly string[] = Object.keys(
+  publicEstimateDetailDatasetSchema.parse(
+    JSON.parse(buildPublicEstimateDetails2026Json(estimateDetails2026)),
+  ).sources,
+);
 
 const ROW_BREAKDOWN_FORMULAS = {
   fot: 'primary_salary + machinist_salary',
@@ -624,6 +639,67 @@ export function openapi(root: string): Record<string, unknown> {
   };
 }
 
+export const detailSchema = (root: string): Record<string, unknown> =>
+  buildPublicEstimateDetails2026JsonSchema(
+    abs(root, reglamentEstimateDetails2026SchemaPath()),
+    ESTIMATE_DETAILS_2026_SOURCE_IDS,
+  );
+
+export function detailOpenapi(root: string): Record<string, unknown> {
+  const schemaRef = `#/components/schemas/${ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_NAME}`;
+  const body = Object.fromEntries(
+    Object.entries(detailSchema(root)).filter(
+      ([key]) => key !== '$schema' && key !== '$id',
+    ),
+  );
+
+  return {
+    openapi: '3.1.0',
+    jsonSchemaDialect: 'https://json-schema.org/draft/2020-12/schema',
+    info: {
+      title: 'Шелково Reglament Estimate Details 2026 JSON',
+      version: '2.0.0',
+      description:
+        'OpenAPI-описание детальной сметы регламента 2026: работ, ресурсов, контрольных итогов и ссылок на фрагменты исходных PDF.',
+    },
+    servers: [
+      {
+        url: server(root),
+      },
+    ],
+    paths: {
+      [reglamentEstimateDetails2026DataPath()]: {
+        get: {
+          operationId: 'getReglamentEstimateDetails2026',
+          summary: 'Read reglament estimate details 2026 JSON',
+          description:
+            'Возвращает детальные работы, ресурсы, контрольные итоги и нормализованный реестр ссылок на фрагменты исходных PDF.',
+          responses: {
+            200: {
+              description: 'Детальный JSON сметы регламента 2026',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: schemaRef,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    components: {
+      schemas: {
+        [ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_NAME]: rewriteSchemaRefs(
+          body,
+          schemaRef,
+        ),
+      },
+    },
+  };
+}
+
 export function catalog(root: string): Record<string, unknown> {
   return {
     linkset: [
@@ -764,18 +840,46 @@ export function catalog(root: string): Record<string, unknown> {
             type: OAS,
             'title*': star('OpenAPI для данных сметы регламента 2026'),
           },
+          {
+            href: abs(root, reglamentEstimateDetails2026SchemaPath()),
+            type: 'application/schema+json',
+            'title*': star('JSON Schema детальной сметы регламента 2026'),
+          },
+          {
+            href: abs(root, reglamentEstimateDetails2026OpenApiPath()),
+            type: OAS,
+            'title*': star('OpenAPI детальной сметы регламента 2026'),
+          },
         ],
       },
     ],
   };
 }
 
-export const links = (root: string): string =>
+const discoveryLinks = (
+  root: string,
+  schemaPath: string,
+  openApiPath: string,
+): string =>
   [
-    `<${abs(root, reglamentEstimate2026SchemaPath())}>; rel="service-desc"; type="application/schema+json"`,
-    `<${abs(root, reglamentEstimate2026OpenApiPath())}>; rel="service-desc"; type="${OAS}"`,
+    `<${abs(root, schemaPath)}>; rel="service-desc"; type="application/schema+json"`,
+    `<${abs(root, openApiPath)}>; rel="service-desc"; type="${OAS}"`,
     `<${abs(root, reglamentApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`,
   ].join(', ');
+
+export const links = (root: string): string =>
+  discoveryLinks(
+    root,
+    reglamentEstimate2026SchemaPath(),
+    reglamentEstimate2026OpenApiPath(),
+  );
+
+export const detailLinks = (root: string): string =>
+  discoveryLinks(
+    root,
+    reglamentEstimateDetails2026SchemaPath(),
+    reglamentEstimateDetails2026OpenApiPath(),
+  );
 
 export const self = (root: string): string =>
   `<${abs(root, reglamentApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`;
