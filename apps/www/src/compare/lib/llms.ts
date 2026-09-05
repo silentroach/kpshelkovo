@@ -8,6 +8,15 @@ import {
 } from '@/lib/markdown/llms-document';
 
 import { loadAllData } from './data';
+import {
+  compareExplorerDataPath,
+  compareLlmsFullPath,
+  compareLlmsPath,
+  comparePath,
+  compareRatingPath,
+  compareSettlementsDataPath,
+  compareSkillsPath,
+} from './public-surface';
 import { canon } from './site';
 import type { Settlement } from './settlement/types';
 import { withBase } from './url';
@@ -36,15 +45,15 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
     })
     .slice(0, 2);
   const list = [baseline, ...top];
-  const home = abs('/');
-  const rating = abs('/rating/');
-  const feed = abs('/data/settlements.json');
-  const explorer = abs('/data/explorer.json');
-  const short = abs('/llms.txt');
-  const full = abs('/llms-full.txt');
-  const skills = abs('/.well-known/agent-skills/index.json');
-  const feedPath = withBase('/data/settlements.json');
-  const explorerPath = withBase('/data/explorer.json');
+  const feedPath = compareSettlementsDataPath();
+  const explorerPath = compareExplorerDataPath();
+  const home = canon(comparePath());
+  const rating = canon(compareRatingPath());
+  const feed = canon(feedPath);
+  const explorer = canon(explorerPath);
+  const short = canon(compareLlmsPath());
+  const full = canon(compareLlmsFullPath());
+  const skills = canon(compareSkillsPath());
   const settlementPath = withBase('/settlements/[slug]/');
 
   return kind === 'short'
