@@ -1,14 +1,11 @@
 import {
-  apiCatalogPath,
-  articlesDataPath,
-  articlesOpenApiPath,
-  articlesSchemaPath,
-  feedPath,
-  llmsFullPath,
-  llmsPath,
-  newsMarkdownPath,
-  newsPath,
-} from './routes';
+  surfaceHref,
+  type PublicSurface,
+  type PublicSurfaceCatalogRole,
+} from '@/lib/public-surface';
+
+import { newsPublicSurfaceSlice } from './public-surface';
+import { articlesDataPath, articlesSchemaPath } from './routes';
 import { NEWS_AREAS, NEWS_AUTHOR_KINDS } from './schema';
 import type { RequiredProperties } from './discovery.types';
 import type { NewsDataset } from './types';
@@ -60,6 +57,48 @@ const star = (
 ): readonly { readonly value: string; readonly language: 'ru' }[] => [
   { value, language: 'ru' },
 ];
+
+const CATALOG_TITLE_OVERRIDES: Readonly<Partial<Record<string, string>>> = {
+  'news:data':
+    'Основная машиночитаемая лента новостей, включая необязательные события',
+  'news:llms': 'Короткий обзор llms.txt',
+  'news:llms-full': 'Подробный обзор llms-full.txt',
+};
+
+const sectionCatalogRole = (
+  surface: PublicSurface,
+): PublicSurfaceCatalogRole | false | undefined =>
+  surface.sectionCatalogRole ?? surface.catalogRole;
+
+const catalogEntry = (root: string, surface: PublicSurface) => ({
+  href: surfaceHref(root, surface),
+  type: surface.mediaType,
+  'title*': star(CATALOG_TITLE_OVERRIDES[surface.id] ?? surface.label),
+});
+
+const catalogEntries = (root: string, role: PublicSurfaceCatalogRole) =>
+  newsPublicSurfaceSlice.surfaces
+    .filter((surface) => sectionCatalogRole(surface) === role)
+    .map((surface) => catalogEntry(root, surface));
+
+const linkRelation = (surface: PublicSurface) => {
+  if (surface.discoveryRoles.includes('api-catalog')) {
+    return 'api-catalog';
+  }
+
+  if (sectionCatalogRole(surface) === 'service-desc') {
+    return 'service-desc';
+  }
+
+  return;
+};
+
+const formatLink = (
+  root: string,
+  surface: PublicSurface,
+  relation: 'api-catalog' | 'service-desc',
+): string =>
+  `<${surfaceHref(root, surface)}>; rel="${relation}"; type="${surface.mediaType}"${relation === 'api-catalog' ? `; profile="${PROFILE}"` : ''}`;
 
 const text = (minLength = 0): Record<string, unknown> => ({
   type: 'string',
@@ -451,62 +490,46 @@ export function openapi(root: string): Record<string, unknown> {
 }
 
 export function catalog(root: string): Record<string, unknown> {
+  const anchor = newsPublicSurfaceSlice.surfaces.find(
+    (surface) => sectionCatalogRole(surface) === 'anchor',
+  );
+  if (!anchor) {
+    throw new Error('news public surface registry has no catalog anchor');
+  }
+
   return {
     linkset: [
       {
-        anchor: abs(root, newsPath()),
-        item: [
-          {
-            href: abs(root, newsMarkdownPath()),
-            type: 'text/markdown',
-            'title*': star('Markdown-версия новостей'),
-          },
-          {
-            href: abs(root, articlesDataPath()),
-            type: 'application/json',
-            'title*': star(
-              'Основная машиночитаемая лента новостей, включая необязательные события',
-            ),
-          },
-          {
-            href: abs(root, feedPath()),
-            type: 'application/rss+xml',
-            'title*': star('RSS-лента новостей'),
-          },
-          {
-            href: abs(root, llmsPath()),
-            type: 'text/plain',
-            'title*': star('Короткий обзор llms.txt'),
-          },
-          {
-            href: abs(root, llmsFullPath()),
-            type: 'text/plain',
-            'title*': star('Подробный обзор llms-full.txt'),
-          },
-        ],
-        'service-desc': [
-          {
-            href: abs(root, articlesSchemaPath()),
-            type: 'application/schema+json',
-            'title*': star('JSON Schema ленты новостей'),
-          },
-          {
-            href: abs(root, articlesOpenApiPath()),
-            type: OAS,
-            'title*': star('OpenAPI ленты новостей'),
-          },
-        ],
+        anchor: surfaceHref(root, anchor),
+        item: catalogEntries(root, 'item'),
+        'service-desc': catalogEntries(root, 'service-desc'),
       },
     ],
   };
 }
 
 export const links = (root: string): string =>
-  [
-    `<${abs(root, articlesSchemaPath())}>; rel="service-desc"; type="application/schema+json"`,
-    `<${abs(root, articlesOpenApiPath())}>; rel="service-desc"; type="${OAS}"`,
-    `<${abs(root, apiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`,
-  ].join(', ');
+  newsPublicSurfaceSlice.surfaces
+    .flatMap((surface) => {
+      const relation = linkRelation(surface);
 
-export const self = (root: string): string =>
-  `<${abs(root, apiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`;
+      return relation ? [formatLink(root, surface, relation)] : [];
+    })
+    .join(', ');
+
+export const self = (root: string): string => {
+  const surface = newsPublicSurfaceSlice.surfaces.find(
+    (candidate: PublicSurface) =>
+      candidate.discoveryRoles.includes('api-catalog'),
+  );
+  if (!surface) {
+    throw new Error('news public surface registry has no API catalog');
+  }
+
+  const relation = linkRelation(surface);
+  if (!relation) {
+    throw new Error('news API catalog has no Link relation');
+  }
+
+  return formatLink(root, surface, relation);
+};

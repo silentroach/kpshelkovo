@@ -9,6 +9,7 @@ import {
 
 type CatalogEntry = {
   readonly href?: string;
+  readonly type?: string;
 };
 
 type CatalogLinkset = {
@@ -20,6 +21,7 @@ type CatalogLinkset = {
 type AssertSectionCatalogInput = {
   readonly catalog: (root: string) => Record<string, unknown>;
   readonly catalogRoot?: string;
+  readonly exact?: boolean;
   readonly siteRoot: string;
   readonly slice: PublicSurfaceSlice;
 };
@@ -29,19 +31,27 @@ const linksets = (
 ): readonly CatalogLinkset[] =>
   Array.isArray(catalog.linkset) ? (catalog.linkset as CatalogLinkset[]) : [];
 
-const hrefs = (
-  catalog: Record<string, unknown>,
+const contractEntry = (
   role: PublicSurfaceCatalogRole,
-): readonly string[] =>
-  linksets(catalog).flatMap((linkset) => {
-    if (role === 'anchor') {
-      return linkset.anchor ? [linkset.anchor] : [];
-    }
+  href?: string,
+  type?: string,
+): string => `${role}\t${href ?? '<missing href>'}\t${type ?? '<no type>'}`;
 
-    return (linkset[role] ?? []).flatMap((entry) =>
-      entry.href ? [entry.href] : [],
-    );
-  });
+const contractEntries = (catalog: Record<string, unknown>): readonly string[] =>
+  linksets(catalog).flatMap((linkset) =>
+    (['anchor', 'item', 'service-desc'] as const).flatMap((role) => {
+      if (role === 'anchor') {
+        return linkset.anchor ? [contractEntry(role, linkset.anchor)] : [];
+      }
+
+      return (linkset[role] ?? []).map((entry) =>
+        contractEntry(role, entry.href, entry.type),
+      );
+    }),
+  );
+
+const sorted = (entries: readonly string[]): readonly string[] =>
+  [...entries].sort();
 
 const sectionCatalogRole = (
   surface: PublicSurface,
@@ -51,19 +61,37 @@ const sectionCatalogRole = (
 export const expectSectionCatalogMatchesRegistry = ({
   catalog,
   catalogRoot,
+  exact = false,
   siteRoot,
   slice,
 }: AssertSectionCatalogInput): void => {
   const body = catalog(catalogRoot ?? siteRoot);
+  const actual = sorted(contractEntries(body));
+  const expected = sorted(
+    slice.surfaces.flatMap((surface) => {
+      const role = sectionCatalogRole(surface);
+      if (!role) {
+        return [];
+      }
 
-  for (const role of ['anchor', 'item', 'service-desc'] as const) {
-    const actual = hrefs(body, role);
-    const expected = slice.surfaces
-      .filter((surface) => sectionCatalogRole(surface) === role)
-      .map((surface) => surfaceHref(siteRoot, surface));
+      return [
+        contractEntry(
+          role,
+          surfaceHref(siteRoot, surface),
+          role === 'anchor' ? undefined : surface.mediaType,
+        ),
+      ];
+    }),
+  );
 
-    expect(actual, `${slice.owner.id} catalog ${role} hrefs`).toEqual(
-      expect.arrayContaining(expected),
-    );
+  const expectation = expect(
+    actual,
+    `${slice.owner.id} catalog role/URL/MIME contract`,
+  );
+  if (exact) {
+    expectation.toEqual(expected);
+    return;
   }
+
+  expectation.toEqual(expect.arrayContaining([...expected]));
 };

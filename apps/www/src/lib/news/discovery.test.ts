@@ -3,17 +3,23 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import type { NewsArticle, NewsDataset } from './types';
 import type {
   newsPublicSurfaceSlice as newsPublicSurfaceSliceType,
+  PublicSurface,
   PublicSurfaceSlice,
+  surfaceHref as surfaceHrefType,
 } from '@/lib/public-surface';
 import type { expectSectionCatalogMatchesRegistry as expectSectionCatalogMatchesRegistryType } from '@/lib/public-surface/catalog-contract.test-helper';
 
 let buildNewsPayload: typeof import('./discovery').buildNewsPayload;
 let catalog: typeof import('./discovery').catalog;
 let expectSectionCatalogMatchesRegistry: typeof expectSectionCatalogMatchesRegistryType;
+let links: typeof import('./discovery').links;
 let newsPublicSurfaceSlice: typeof newsPublicSurfaceSliceType &
   PublicSurfaceSlice;
 let openapi: typeof import('./discovery').openapi;
+let PROFILE: typeof import('./discovery').PROFILE;
 let schema: typeof import('./discovery').schema;
+let self: typeof import('./discovery').self;
+let surfaceHref: typeof surfaceHrefType;
 
 const articleWithEvent = (): NewsArticle => ({
   id: '2026/05/event',
@@ -95,20 +101,106 @@ beforeAll(async () => {
     BASE_URL: '/',
   });
 
-  ({ buildNewsPayload, catalog, openapi, schema } =
+  ({ buildNewsPayload, catalog, links, openapi, PROFILE, schema, self } =
     await import('./discovery'));
   ({ expectSectionCatalogMatchesRegistry } =
     await import('@/lib/public-surface/catalog-contract.test-helper'));
-  ({ newsPublicSurfaceSlice } = await import('@/lib/public-surface'));
+  ({ newsPublicSurfaceSlice, surfaceHref } =
+    await import('@/lib/public-surface'));
 });
 
 describe('news discovery payload', () => {
   it('keeps the section API catalog aligned with registry catalog surfaces', () => {
     expectSectionCatalogMatchesRegistry({
       catalog,
+      exact: true,
       siteRoot: 'https://example.com',
       slice: newsPublicSurfaceSlice,
     });
+  });
+
+  it('builds Link headers from registered relations, URLs, and MIME types', () => {
+    const root = 'https://example.com';
+    const serviceDescriptions = newsPublicSurfaceSlice.surfaces.filter(
+      (surface: PublicSurface) =>
+        (surface.sectionCatalogRole ?? surface.catalogRole) === 'service-desc',
+    );
+    const apiCatalog = newsPublicSurfaceSlice.surfaces.find(
+      (surface: PublicSurface) =>
+        surface.discoveryRoles.includes('api-catalog'),
+    );
+    if (!apiCatalog) {
+      throw new Error('news API catalog surface is missing from the registry');
+    }
+
+    const apiCatalogLink = `<${surfaceHref(root, apiCatalog)}>; rel="api-catalog"; type="${apiCatalog.mediaType}"; profile="${PROFILE}"`;
+    const expected = [
+      ...serviceDescriptions.map(
+        (surface) =>
+          `<${surfaceHref(root, surface)}>; rel="service-desc"; type="${surface.mediaType}"`,
+      ),
+      apiCatalogLink,
+    ];
+
+    expect(links(root).split(', ')).toEqual(expected);
+    expect(self(root)).toBe(apiCatalogLink);
+  });
+
+  it('keeps the API catalog self-link intentionally absent', () => {
+    const root = 'https://example.com';
+    const apiCatalog = newsPublicSurfaceSlice.surfaces.find(
+      (surface: PublicSurface) =>
+        surface.discoveryRoles.includes('api-catalog'),
+    );
+    if (!apiCatalog) {
+      throw new Error('news API catalog surface is missing from the registry');
+    }
+
+    expect(JSON.stringify(catalog(root))).not.toContain(
+      surfaceHref(root, apiCatalog),
+    );
+  });
+
+  it('preserves editorial catalog titles that differ from registry labels', () => {
+    const root = 'https://example.com';
+    const [linkset] = catalog(root).linkset as readonly {
+      readonly item: readonly {
+        readonly href: string;
+        readonly 'title*': readonly { readonly value: string }[];
+      }[];
+    }[];
+    const titlesByHref = new Map(
+      linkset?.item.map((entry) => [entry.href, entry['title*'][0]?.value]) ??
+        [],
+    );
+
+    expect(
+      ['news:data', 'news:llms', 'news:llms-full'].map((id) => {
+        const surface = newsPublicSurfaceSlice.surfaces.find(
+          (candidate: PublicSurface) => candidate.id === id,
+        );
+        if (!surface) {
+          throw new Error(`news public surface ${id} is missing`);
+        }
+
+        return { id, title: titlesByHref.get(surfaceHref(root, surface)) };
+      }),
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "id": "news:data",
+          "title": "Основная машиночитаемая лента новостей, включая необязательные события",
+        },
+        {
+          "id": "news:llms",
+          "title": "Короткий обзор llms.txt",
+        },
+        {
+          "id": "news:llms-full",
+          "title": "Подробный обзор llms-full.txt",
+        },
+      ]
+    `);
   });
 
   it('publishes feed-level metadata for consumers', () => {
