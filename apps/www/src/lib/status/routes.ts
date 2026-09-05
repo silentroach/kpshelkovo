@@ -114,6 +114,28 @@ export const statusCalendarMonthPattern = (): string =>
 export const statusCalendarMonthMarkdownPattern = (): string =>
   '/status/calendar/:year/:month/index.md';
 
+export const statusCalendarDayPattern = (): string =>
+  `${statusCalendarMonthPattern()}#:day`;
+
+const statusCalendarAgentPattern = (pattern: string): string =>
+  pattern
+    .replace(':year', 'YYYY')
+    .replace(':month', 'MM')
+    .replace(':day', 'YYYY-MM-DD');
+
+export const statusCalendarAgentPatterns = () =>
+  ({
+    year: statusCalendarAgentPattern(statusCalendarYearPattern()),
+    yearMarkdown: statusCalendarAgentPattern(
+      statusCalendarYearMarkdownPattern(),
+    ),
+    month: statusCalendarAgentPattern(statusCalendarMonthPattern()),
+    monthMarkdown: statusCalendarAgentPattern(
+      statusCalendarMonthMarkdownPattern(),
+    ),
+    day: statusCalendarAgentPattern(statusCalendarDayPattern()),
+  }) as const;
+
 export const statusIncidentPattern = (): string =>
   '/status/incidents/:year/:month/:entry/';
 
