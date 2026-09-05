@@ -1,75 +1,18 @@
 import { calculateDistance } from '@shelkovo/geo';
+import { toPublicComparisons, toPublicStats } from './public-dto';
 import {
-  toPublicComparisons,
-  toPublicStats,
-  type PublicComparison,
-  type PublicComparisons,
-  type PublicStats,
-} from './public-dto';
+  ComparePublicPayloadSchema,
+  type ComparePublicPayload,
+  type ComparePublicSettlement,
+} from './public-schema';
 import { getKm, getRing, type Rating } from './rating';
-import type { Settlement } from './settlement/types';
-
-export interface FullDistance {
-  moscow_km: number;
-  mkad_km: number;
-  shelkovo_km: number;
-}
-
-export interface FullSettlement {
-  name: string;
-  short_name: string;
-  slug: string;
-  website: string;
-  telegram?: string;
-  management_company?: string | { title: string; url: string };
-  is_baseline: boolean;
-  location: {
-    address_text: string;
-    lat: number;
-    lng: number;
-    map_url?: string;
-    district: string;
-  };
-  tariff: {
-    value: number;
-    unit: string;
-    period: string;
-    normalized_per_sotka_month: number;
-    normalized_is_estimate: boolean;
-    note?: string;
-    parts?: readonly {
-      value: number;
-      unit: string;
-      period: string;
-      note?: string;
-    }[];
-  };
-  lots?: {
-    count?: number;
-    area_ha?: number;
-    average_sotka?: number;
-    average_note?: string;
-  };
-  water_in_tariff?: boolean;
-  rabstvo?: boolean;
-  infrastructure: Record<string, string | undefined>;
-  common_spaces: Record<string, string | undefined>;
-  service_model: Record<string, string | undefined>;
-  rating: number;
-  distance: FullDistance;
-}
-
-export interface FullPayload {
-  settlements: FullSettlement[];
-  comparisons: PublicComparisons;
-  stats: PublicStats;
-}
+import type { ComparisonResult, Settlement, Stats } from './settlement/types';
 
 export interface FullPayloadInput {
   readonly settlements: readonly Settlement[];
   readonly baseline: Settlement;
-  readonly stats: PublicStats;
-  readonly comparisons: ReadonlyMap<string, PublicComparison>;
+  readonly stats: Stats;
+  readonly comparisons: ReadonlyMap<string, ComparisonResult>;
   readonly ratings: ReadonlyMap<string, Rating>;
 }
 
@@ -77,7 +20,9 @@ function round(value: number): number {
   return Math.round(value * 10) / 10;
 }
 
-const tariffUnit = (unit: Settlement['tariff']['unit']): string => {
+const tariffUnit = (
+  unit: Settlement['tariff']['unit'],
+): ComparePublicSettlement['tariff']['unit'] => {
   if (unit === 'perSotka') return 'rub_per_sotka';
   if (unit === 'perLot') return 'rub_per_lot';
   return 'rub_fixed';
@@ -85,14 +30,14 @@ const tariffUnit = (unit: Settlement['tariff']['unit']): string => {
 
 const road = (
   value: Settlement['infrastructure']['roads'],
-): string | undefined => {
+): ComparePublicSettlement['infrastructure']['roads'] => {
   if (value === 'partlyAsphalt') return 'partial_asphalt';
   return value;
 };
 
 const video = (
   value: Settlement['infrastructure']['videoSurveillance'],
-): string | undefined => {
+): ComparePublicSettlement['infrastructure']['video_surveillance'] => {
   if (value === 'checkpointOnly') return 'checkpoint_only';
   return value;
 };
@@ -101,7 +46,7 @@ export function toFull(
   settlements: readonly Settlement[],
   ratings: ReadonlyMap<string, Rating>,
   baseline: Settlement,
-): FullSettlement[] {
+): ComparePublicSettlement[] {
   return settlements.map((item) => {
     const company = item.managementCompany;
     const rating = ratings.get(item.slug);
@@ -220,8 +165,9 @@ export const toFullPayload = ({
   stats,
   comparisons,
   ratings,
-}: FullPayloadInput): FullPayload => ({
-  settlements: toFull(settlements, ratings, baseline),
-  stats: toPublicStats(stats),
-  comparisons: toPublicComparisons(comparisons),
-});
+}: FullPayloadInput): ComparePublicPayload =>
+  ComparePublicPayloadSchema.parse({
+    settlements: toFull(settlements, ratings, baseline),
+    stats: toPublicStats(stats),
+    comparisons: toPublicComparisons(comparisons),
+  });

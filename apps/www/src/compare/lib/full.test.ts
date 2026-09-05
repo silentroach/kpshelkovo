@@ -130,7 +130,7 @@ describe('toFull', () => {
   });
 
   it('builds the full public payload through explicit DTO adapters', () => {
-    const payload = toFullPayload({
+    const input = {
       settlements: [base, row],
       baseline: base,
       ratings,
@@ -159,7 +159,8 @@ describe('toFull', () => {
           },
         ],
       ]),
-    });
+    };
+    const payload = toFullPayload(input);
 
     expect(payload.stats).toEqual({
       shelkovoTariff: 100,
@@ -186,5 +187,11 @@ describe('toFull', () => {
     expect(payload.settlements[0]?.location.address_text).toBe(
       'МО, округ Истра, д. Шелково',
     );
+
+    const invalidRatings = new Map(ratings);
+    invalidRatings.set('test', { score: 101, km: 62.1, ring: 43.9 });
+    expect(() =>
+      toFullPayload({ ...input, ratings: invalidRatings }),
+    ).toThrow();
   });
 });

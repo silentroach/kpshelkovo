@@ -1,22 +1,13 @@
-// Stats
+import type { PublicComparisons, PublicStats } from './public-schema';
+import type { ComparisonResult, Stats } from './settlement/types';
 
-export interface PublicStats {
-  readonly shelkovoTariff: number;
-  readonly medianTariff: number;
-  readonly peerMedianTariff: number;
-  readonly meanTariff: number;
-  readonly minTariff: number;
-  readonly maxTariff: number;
-  readonly shelkovoRank: number;
-  readonly totalSettlements: number;
-  readonly cheaperCount: number;
-  readonly moreExpensiveCount: number;
-  readonly shelkovoVsMedianPercent: number;
-  readonly shelkovoVsPeerMedianPercent: number;
-  readonly shelkovoVsMeanPercent: number;
-}
+export type {
+  PublicComparison,
+  PublicComparisons,
+  PublicStats,
+} from './public-schema';
 
-export const toPublicStats = (stats: PublicStats): PublicStats => ({
+export const toPublicStats = (stats: Stats): PublicStats => ({
   shelkovoTariff: stats.shelkovoTariff,
   medianTariff: stats.medianTariff,
   peerMedianTariff: stats.peerMedianTariff,
@@ -32,18 +23,8 @@ export const toPublicStats = (stats: PublicStats): PublicStats => ({
   shelkovoVsMeanPercent: stats.shelkovoVsMeanPercent,
 });
 
-// Comparisons
-
-export interface PublicComparison {
-  readonly tariffDelta: number;
-  readonly tariffDeltaPercent: number;
-  readonly isCheaper: boolean;
-}
-
-export type PublicComparisons = Record<string, PublicComparison>;
-
 export const toPublicComparisons = (
-  comparisons: ReadonlyMap<string, PublicComparison>,
+  comparisons: ReadonlyMap<string, ComparisonResult>,
 ): PublicComparisons =>
   Object.fromEntries(
     Array.from(comparisons.entries()).map(([slug, comparison]) => [
