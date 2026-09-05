@@ -183,6 +183,7 @@ describe('contact view helpers', () => {
   it('preserves international and unsafe phone text without guessing digits', () => {
     const phones = [
       '+49 (30) 1234‑5678',
+      '+49 (0)30 1234-5678',
       '+7 900 000-00',
       '+7 900 ***-**-00',
       '+7 900 000-00-00 доб. 123',
@@ -196,6 +197,12 @@ describe('contact view helpers', () => {
           "label": "Телефон",
           "type": "phone",
           "value": "+49 (30) 1234‑5678",
+        },
+        {
+          "href": undefined,
+          "label": "Телефон",
+          "type": "phone",
+          "value": "+49 (0)30 1234-5678",
         },
         {
           "href": undefined,

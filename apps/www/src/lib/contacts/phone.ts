@@ -1,6 +1,7 @@
 const RUSSIAN_PHONE_INPUT = /^(?:\+7|8)[\d\s().\p{Dash_Punctuation}]*$/u;
 const INTERNATIONAL_PHONE_INPUT = /^\+[1-9][\d\s().\p{Dash_Punctuation}]*$/u;
 const INTERNATIONAL_PHONE = /^\+[1-9]\d{7,14}$/u;
+const INTERNATIONAL_TRUNK_PREFIX = /\(\s*0\s*\)/u;
 
 const normalizeRussianContactPhone = (phone: string): string | undefined => {
   if (!RUSSIAN_PHONE_INPUT.test(phone)) {
@@ -20,7 +21,11 @@ export const normalizeContactPhone = (phone: string): string | undefined => {
     return russianPhone;
   }
 
-  if (value.startsWith('+7') || !INTERNATIONAL_PHONE_INPUT.test(value)) {
+  if (
+    value.startsWith('+7') ||
+    INTERNATIONAL_TRUNK_PREFIX.test(value) ||
+    !INTERNATIONAL_PHONE_INPUT.test(value)
+  ) {
     return;
   }
 
