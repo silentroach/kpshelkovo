@@ -116,6 +116,8 @@ describe('contact view helpers', () => {
       '+7 (962) 140-34-31',
       '+7(916) 116-09-36',
       '+7 977 482-05-86',
+      '+7 900 123‑45‑67',
+      '+7 900 123–45–67',
     ];
 
     expect(
@@ -155,13 +157,25 @@ describe('contact view helpers', () => {
           "href": "tel:+79774820586",
           "phone": "+7 977 482-05-86",
         },
+        {
+          "formatted": "+7 900 123-45-67",
+          "formattedAgain": "+7 900 123-45-67",
+          "href": "tel:+79001234567",
+          "phone": "+7 900 123‑45‑67",
+        },
+        {
+          "formatted": "+7 900 123-45-67",
+          "formattedAgain": "+7 900 123-45-67",
+          "href": "tel:+79001234567",
+          "phone": "+7 900 123–45–67",
+        },
       ]
     `);
   });
 
   it('preserves international and unsafe phone text without guessing digits', () => {
     const phones = [
-      '+49 (30) 1234-5678',
+      '+49 (30) 1234‑5678',
       '+7 900 000-00',
       '+7 900 ***-**-00',
       '+7 900 000-00-00 доб. 123',
@@ -174,7 +188,7 @@ describe('contact view helpers', () => {
           "href": "tel:+493012345678",
           "label": "Телефон",
           "type": "phone",
-          "value": "+49 (30) 1234-5678",
+          "value": "+49 (30) 1234‑5678",
         },
         {
           "href": undefined,

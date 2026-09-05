@@ -1,5 +1,5 @@
-const RUSSIAN_PHONE_INPUT = /^(?:\+7|8)[\d\s()-]*$/u;
-const INTERNATIONAL_PHONE_INPUT = /^\+[1-9][\d\s().-]*$/u;
+const RUSSIAN_PHONE_INPUT = /^(?:\+7|8)[\d\s()\p{Dash_Punctuation}]*$/u;
+const INTERNATIONAL_PHONE_INPUT = /^\+[1-9][\d\s().\p{Dash_Punctuation}]*$/u;
 const INTERNATIONAL_PHONE = /^\+[1-9]\d{7,14}$/u;
 
 const normalizeRussianContactPhone = (phone: string): string | undefined => {
