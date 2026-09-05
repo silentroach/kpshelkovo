@@ -7,6 +7,7 @@ import type {
 } from './detail-schema';
 import {
   ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_VERSION,
+  publicEstimateDetailDatasetSchema,
   type PublicEstimateDetailDataset,
   type PublicEstimateDetailMoneyValue,
   type PublicEstimateDetailNeedsCheck,
@@ -158,5 +159,9 @@ export const buildPublicEstimateDetails2026Json = (
     control_totals: controlTotals,
   };
 
-  return JSON.stringify(publicDataset);
+  const json = JSON.stringify(publicDataset);
+
+  publicEstimateDetailDatasetSchema.parse(JSON.parse(json));
+
+  return json;
 };

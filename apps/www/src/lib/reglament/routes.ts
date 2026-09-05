@@ -30,7 +30,11 @@ const REGLAMENT_LLMS = '/815/regulation/llms.txt';
 const REGLAMENT_LLMS_FULL = '/815/regulation/llms-full.txt';
 const REGLAMENT_API_CATALOG = '/815/regulation/.well-known/api-catalog';
 const REGLAMENT_SCHEMA = '/815/regulation/schemas/estimate-2026.schema.json';
+const REGLAMENT_ESTIMATE_DETAILS_SCHEMA =
+  '/815/regulation/schemas/estimate-details-2026.schema.json';
 const REGLAMENT_OPENAPI = '/815/regulation/openapi/estimate-2026.openapi.json';
+const REGLAMENT_ESTIMATE_DETAILS_OPENAPI =
+  '/815/regulation/openapi/estimate-details-2026.openapi.json';
 const REGLAMENT_SOURCE_PDF_ROOT =
   'https://media.kpshelkovo.online/815/regulation/';
 const REGLAMENT_FULL_SOURCE_PDF =
@@ -82,6 +86,8 @@ export const REGLAMENT_PUBLIC_PATHS = [
   REGLAMENT_LLMS_FULL,
   REGLAMENT_SCHEMA,
   REGLAMENT_OPENAPI,
+  REGLAMENT_ESTIMATE_DETAILS_SCHEMA,
+  REGLAMENT_ESTIMATE_DETAILS_OPENAPI,
   REGLAMENT_API_CATALOG,
 ] as const;
 
@@ -146,7 +152,13 @@ export const reglamentApiCatalogPath = (): string => REGLAMENT_API_CATALOG;
 
 export const reglamentEstimate2026SchemaPath = (): string => REGLAMENT_SCHEMA;
 
+export const reglamentEstimateDetails2026SchemaPath = (): string =>
+  REGLAMENT_ESTIMATE_DETAILS_SCHEMA;
+
 export const reglamentEstimate2026OpenApiPath = (): string => REGLAMENT_OPENAPI;
+
+export const reglamentEstimateDetails2026OpenApiPath = (): string =>
+  REGLAMENT_ESTIMATE_DETAILS_OPENAPI;
 
 export const reglamentUrl = (): string => withBase(REGLAMENT_ROOT);
 
@@ -211,7 +223,13 @@ export const reglamentApiCatalogUrl = (): string =>
 export const reglamentEstimate2026SchemaUrl = (): string =>
   withBase(REGLAMENT_SCHEMA);
 
+export const reglamentEstimateDetails2026SchemaUrl = (): string =>
+  withBase(REGLAMENT_ESTIMATE_DETAILS_SCHEMA);
+
 export const reglamentEstimate2026OpenApiUrl = (): string =>
   withBase(REGLAMENT_OPENAPI);
+
+export const reglamentEstimateDetails2026OpenApiUrl = (): string =>
+  withBase(REGLAMENT_ESTIMATE_DETAILS_OPENAPI);
 
 export const reglamentCanonical = (): string => canon(REGLAMENT_ROOT);
