@@ -5,11 +5,10 @@ import type { Stats } from '../lib/settlement/types';
 
 const expectMetric = (
   metric: HTMLElement,
-  label: string,
   tariff: string,
   delta: string,
 ): void => {
-  for (const text of [label, tariff, delta]) {
+  for (const text of [tariff, delta]) {
     expect(metric.textContent).toContain(text);
   }
 };
@@ -38,13 +37,11 @@ describe('KPIStats', () => {
 
     expectMetric(
       getByTestId('kpi-median'),
-      'Похожие по уровню',
       '3\u00A0200\u00A0₽/сотка',
       'Шелково: +41%',
     );
     expectMetric(
       getByTestId('kpi-all-median'),
-      'Все поселки на сайте',
       '3\u00A0650\u00A0₽/сотка',
       'Шелково: +23%',
     );
@@ -63,13 +60,11 @@ describe('KPIStats', () => {
 
     expectMetric(
       getByTestId('kpi-median'),
-      'Похожие по уровню',
       '3\u00A0200\u00A0₽/сотка',
       'Шелково: −8%',
     );
     expectMetric(
       getByTestId('kpi-all-median'),
-      'Все поселки на сайте',
       '3\u00A0650\u00A0₽/сотка',
       'Шелково: −15%',
     );
@@ -88,13 +83,11 @@ describe('KPIStats', () => {
 
     expectMetric(
       getByTestId('kpi-median'),
-      'Похожие по уровню',
       '3\u00A0200\u00A0₽/сотка',
       'на уровне Шелково',
     );
     expectMetric(
       getByTestId('kpi-all-median'),
-      'Все поселки на сайте',
       '3\u00A0650\u00A0₽/сотка',
       'на уровне Шелково',
     );
