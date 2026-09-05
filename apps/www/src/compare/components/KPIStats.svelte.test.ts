@@ -3,6 +3,17 @@ import { render } from '@testing-library/svelte';
 import KPIStats from './KPIStats.svelte';
 import type { Stats } from '../lib/settlement/types';
 
+const expectMetric = (
+  metric: HTMLElement,
+  label: string,
+  tariff: string,
+  delta: string,
+): void => {
+  for (const text of [label, tariff, delta]) {
+    expect(metric.textContent).toContain(text);
+  }
+};
+
 describe('KPIStats', () => {
   const mockStats: Stats = {
     shelkovoTariff: 4500,
@@ -21,14 +32,22 @@ describe('KPIStats', () => {
   };
 
   it('displays median comparison when more expensive', () => {
-    const { container } = render(KPIStats, {
+    const { getByTestId } = render(KPIStats, {
       props: { stats: mockStats },
     });
 
-    expect(container.textContent).toContain('3\u00A0200\u00A0₽/сотка');
-    expect(container.textContent).toContain('3\u00A0650\u00A0₽/сотка');
-    expect(container.textContent).toContain('Шелково: +41%');
-    expect(container.textContent).toContain('Шелково: +23%');
+    expectMetric(
+      getByTestId('kpi-median'),
+      'Похожие по уровню',
+      '3\u00A0200\u00A0₽/сотка',
+      'Шелково: +41%',
+    );
+    expectMetric(
+      getByTestId('kpi-all-median'),
+      'Все поселки на сайте',
+      '3\u00A0650\u00A0₽/сотка',
+      'Шелково: +23%',
+    );
   });
 
   it('displays median comparison when cheaper', () => {
@@ -38,12 +57,22 @@ describe('KPIStats', () => {
       shelkovoVsPeerMedianPercent: -8,
     };
 
-    const { container } = render(KPIStats, {
+    const { getByTestId } = render(KPIStats, {
       props: { stats: cheaperStats },
     });
 
-    expect(container.textContent).toContain('Шелково: −15%');
-    expect(container.textContent).toContain('Шелково: −8%');
+    expectMetric(
+      getByTestId('kpi-median'),
+      'Похожие по уровню',
+      '3\u00A0200\u00A0₽/сотка',
+      'Шелково: −8%',
+    );
+    expectMetric(
+      getByTestId('kpi-all-median'),
+      'Все поселки на сайте',
+      '3\u00A0650\u00A0₽/сотка',
+      'Шелково: −15%',
+    );
   });
 
   it('does not render positive or negative deltas for equal medians', () => {
@@ -53,12 +82,22 @@ describe('KPIStats', () => {
       shelkovoVsPeerMedianPercent: 0,
     };
 
-    const { container } = render(KPIStats, {
+    const { getByTestId } = render(KPIStats, {
       props: { stats: equalStats },
     });
 
-    expect(container.textContent).not.toContain('+0%');
-    expect(container.textContent).not.toContain('−0%');
+    expectMetric(
+      getByTestId('kpi-median'),
+      'Похожие по уровню',
+      '3\u00A0200\u00A0₽/сотка',
+      'на уровне Шелково',
+    );
+    expectMetric(
+      getByTestId('kpi-all-median'),
+      'Все поселки на сайте',
+      '3\u00A0650\u00A0₽/сотка',
+      'на уровне Шелково',
+    );
   });
 
   it('renders embedded metrics without a standalone title', () => {
