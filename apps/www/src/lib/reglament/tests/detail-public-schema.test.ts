@@ -115,6 +115,18 @@ const invalidPayloads = (
   ];
 };
 
+const contractResults = (
+  validators: readonly ValidateFunction[],
+  inputs: readonly unknown[],
+) => ({
+  zod: inputs.map(
+    (input) => publicEstimateDetailDatasetSchema.safeParse(input).success,
+  ),
+  generated: validators.map((validate) =>
+    inputs.map((input) => validate(input)),
+  ),
+});
+
 describe('estimate details public schema', () => {
   it('validates the serialized production response and generated contracts', async () => {
     Object.assign(import.meta.env, {
@@ -201,5 +213,127 @@ describe('estimate details public schema', () => {
     expect(
       publicEstimateDetailDatasetSchema.safeParse(unresolved).success,
     ).toBe(false);
+  });
+
+  it('rejects impossible public status combinations', () => {
+    const payload = productionPayload();
+    const verifiedWorkItem = payload.work_items.find(
+      (workItem) => workItem.status === undefined,
+    );
+
+    if (!verifiedWorkItem) {
+      throw new Error('Production detail payload must contain a verified item');
+    }
+
+    const invalidStatusInfo = [
+      { status: 'derived' },
+      {
+        status: 'needs_check',
+        status_label_ru: 'требует проверки',
+      },
+      {
+        status: 'needs_check',
+        needs_check: { reason: 'Не указана подпись статуса' },
+      },
+      { status_label_ru: 'проверено' },
+      {
+        needs_check: { reason: 'Неожиданные review details' },
+      },
+      {
+        status: 'derived',
+        status_label_ru: 'рассчитано',
+        needs_check: { reason: 'Review details у рассчитанного значения' },
+      },
+      {
+        status: 'verified',
+        status_label_ru: 'проверено',
+      },
+    ];
+    const invalid = invalidStatusInfo.map((statusInfo) => ({
+      ...payload,
+      work_items: payload.work_items.map((workItem) =>
+        workItem.id === verifiedWorkItem.id
+          ? { ...verifiedWorkItem, ...statusInfo }
+          : workItem,
+      ),
+    }));
+    const validators = compileValidators(
+      detailSchema('https://example.com'),
+      detailOpenapi('https://example.com') as DetailOpenApi,
+    );
+
+    expect(contractResults(validators, invalid)).toMatchInlineSnapshot(`
+      {
+        "generated": [
+          [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+          ],
+          [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+          ],
+        ],
+        "zod": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+        ],
+      }
+    `);
+  });
+
+  it('rejects a known quantity without a unit', () => {
+    const payload = productionPayload();
+    const resource = payload.resources.find((item) => item.quantity);
+
+    if (!resource) {
+      throw new Error(
+        'Production detail payload must contain a resource quantity',
+      );
+    }
+
+    const invalid = {
+      ...payload,
+      resources: payload.resources.map((item) =>
+        item.id === resource.id
+          ? { ...resource, quantity: { value: 10, unit: null } }
+          : item,
+      ),
+    };
+    const validators = compileValidators(
+      detailSchema('https://example.com'),
+      detailOpenapi('https://example.com') as DetailOpenApi,
+    );
+
+    expect(contractResults(validators, [invalid])).toMatchInlineSnapshot(`
+      {
+        "generated": [
+          [
+            false,
+          ],
+          [
+            false,
+          ],
+        ],
+        "zod": [
+          false,
+        ],
+      }
+    `);
   });
 });

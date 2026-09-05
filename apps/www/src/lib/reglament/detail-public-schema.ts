@@ -16,11 +16,18 @@ const sourceIdSchema = z.string().regex(/^s[1-9]\d*$/);
 const sourceRefsSchema = z.array(sourceIdSchema).min(1);
 
 export const quantityValueSchema = z
-  .strictObject({
-    value: z.number().nullable(),
-    unit: textSchema.nullable(),
-    note: textSchema.optional(),
-  })
+  .union([
+    z.strictObject({
+      value: z.number(),
+      unit: textSchema,
+      note: textSchema.optional(),
+    }),
+    z.strictObject({
+      value: z.null(),
+      unit: textSchema.nullable(),
+      note: textSchema.optional(),
+    }),
+  ])
   .meta({ id: 'quantityValue' });
 
 export const moneyValueSchema = z
@@ -59,58 +66,72 @@ export const needsCheckSchema = z
   })
   .meta({ id: 'needsCheck' });
 
-export const statusInfoSchema = z.strictObject({
-  status: z.enum(['derived', 'needs_check']).optional(),
-  status_label_ru: textSchema.optional(),
-  needs_check: needsCheckSchema.optional(),
-});
+const verifiedStatusInfoShape = {
+  status: z.never().optional(),
+  status_label_ru: z.never().optional(),
+  needs_check: z.never().optional(),
+};
+const derivedStatusInfoShape = {
+  status: z.literal('derived'),
+  status_label_ru: textSchema,
+  needs_check: z.never().optional(),
+};
+const needsCheckStatusInfoShape = {
+  status: z.literal('needs_check'),
+  status_label_ru: textSchema,
+  needs_check: needsCheckSchema,
+};
 
-export const workItemSchema = z
-  .strictObject({
-    id: textSchema,
-    title: textSchema,
-    estimate_row_id: textSchema,
-    service_ids: z.array(textSchema).min(1).optional(),
-    source_refs: sourceRefsSchema,
-    note: textSchema.optional(),
-    ...statusInfoSchema.shape,
-  })
-  .meta({ id: 'workItem' });
+export const statusInfoSchema = z.union([
+  z.strictObject(verifiedStatusInfoShape),
+  z.strictObject(derivedStatusInfoShape),
+  z.strictObject(needsCheckStatusInfoShape),
+]);
 
-export const resourceSchema = z
-  .strictObject({
-    id: textSchema,
-    work_item_id: textSchema,
-    estimate_row_id: textSchema,
-    kind: z.enum(ESTIMATE_DETAIL_RESOURCE_KINDS),
-    title: textSchema,
-    cost_bucket: z.enum(ESTIMATE_DETAIL_COST_BUCKETS),
-    quantity: quantityValueSchema.optional(),
-    unit_price_rub: moneyValueSchema.optional(),
-    total_rub: moneyValueSchema,
-    source_refs: sourceRefsSchema,
-    note: textSchema.optional(),
-    ...statusInfoSchema.shape,
-  })
-  .meta({ id: 'resource' });
+const withStatusInfo = <Shape extends z.ZodRawShape>(shape: Shape) =>
+  z.union([
+    z.strictObject({ ...shape, ...verifiedStatusInfoShape }),
+    z.strictObject({ ...shape, ...derivedStatusInfoShape }),
+    z.strictObject({ ...shape, ...needsCheckStatusInfoShape }),
+  ]);
 
-export const controlTotalSchema = z
-  .strictObject({
-    id: textSchema,
-    estimate_row_id: textSchema,
-    control_source: z.enum(ESTIMATE_DETAIL_CONTROL_SOURCES),
-    cost_bucket: z.enum(ESTIMATE_DETAIL_COST_BUCKETS),
-    source_total_rub: moneyValueSchema,
-    detail_total_rub: moneyValueSchema.optional(),
-    aggregate_total_rub: moneyValueSchema.optional(),
-    delta_rub: z.number().optional(),
-    tolerance_rub: z.number().min(0).optional(),
-    resource_ids: z.array(textSchema).min(1).optional(),
-    source_refs: sourceRefsSchema,
-    note: textSchema.optional(),
-    ...statusInfoSchema.shape,
-  })
-  .meta({ id: 'controlTotal' });
+export const workItemSchema = withStatusInfo({
+  id: textSchema,
+  title: textSchema,
+  estimate_row_id: textSchema,
+  service_ids: z.array(textSchema).min(1).optional(),
+  source_refs: sourceRefsSchema,
+  note: textSchema.optional(),
+}).meta({ id: 'workItem' });
+
+export const resourceSchema = withStatusInfo({
+  id: textSchema,
+  work_item_id: textSchema,
+  estimate_row_id: textSchema,
+  kind: z.enum(ESTIMATE_DETAIL_RESOURCE_KINDS),
+  title: textSchema,
+  cost_bucket: z.enum(ESTIMATE_DETAIL_COST_BUCKETS),
+  quantity: quantityValueSchema.optional(),
+  unit_price_rub: moneyValueSchema.optional(),
+  total_rub: moneyValueSchema,
+  source_refs: sourceRefsSchema,
+  note: textSchema.optional(),
+}).meta({ id: 'resource' });
+
+export const controlTotalSchema = withStatusInfo({
+  id: textSchema,
+  estimate_row_id: textSchema,
+  control_source: z.enum(ESTIMATE_DETAIL_CONTROL_SOURCES),
+  cost_bucket: z.enum(ESTIMATE_DETAIL_COST_BUCKETS),
+  source_total_rub: moneyValueSchema,
+  detail_total_rub: moneyValueSchema.optional(),
+  aggregate_total_rub: moneyValueSchema.optional(),
+  delta_rub: z.number().optional(),
+  tolerance_rub: z.number().min(0).optional(),
+  resource_ids: z.array(textSchema).min(1).optional(),
+  source_refs: sourceRefsSchema,
+  note: textSchema.optional(),
+}).meta({ id: 'controlTotal' });
 
 export const datasetSchema = z
   .strictObject({
