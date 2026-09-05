@@ -1,10 +1,10 @@
 import { calculateDistance } from '@shelkovo/geo';
 import { toPublicComparisons, toPublicStats } from './public-dto';
-import {
-  ComparePublicPayloadSchema,
-  type ComparePublicPayload,
-  type ComparePublicSettlement,
-} from './public-schema';
+import type {
+  ComparePublicPayload,
+  ComparePublicSettlement,
+} from './public-dto.types';
+import { ComparePublicPayloadSchema } from './public-schema';
 import { getKm, getRing, type Rating } from './rating';
 import type { ComparisonResult, Settlement, Stats } from './settlement/types';
 
