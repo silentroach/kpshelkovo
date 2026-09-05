@@ -1,16 +1,5 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
-import {
-  compareExplorerDataPath,
-  compareLlmsFullPath,
-  compareLlmsPath,
-  comparePath,
-  compareRatingPath,
-  compareSettlementPattern,
-  compareSettlementsDataPath,
-  compareSkillsPath,
-} from './public-surface';
-
 vi.mock('./data', () => ({
   loadAllData: async () => {
     const settlements = [
@@ -32,11 +21,12 @@ vi.mock('./data', () => ({
 }));
 
 let build: typeof import('./llms').build;
+let routes: typeof import('./public-surface');
 
 const SITE = 'https://example.com';
 const absolute = (path: string): string => new URL(path, SITE).toString();
 const settlementUrl = (slug: string): string =>
-  absolute(compareSettlementPattern().replace(':slug', slug));
+  absolute(routes.compareSettlementPattern().replace(':slug', slug));
 const extractAbsoluteUrls = (document: string): readonly string[] =>
   [...document.matchAll(/<https:\/\/[^>]+>/gu)].map((match) =>
     match[0].slice(1, -1),
@@ -48,25 +38,26 @@ beforeAll(async () => {
     BASE_URL: '/astro-base/',
   });
 
+  routes = await import('./public-surface');
   ({ build } = await import('./llms'));
 });
 
 describe('compare llms', () => {
   it('keeps Compare routes independent from a non-root Astro base', () => {
     expect(import.meta.env.BASE_URL).toBe('/astro-base/');
-    expect(comparePath()).toBe('/815/compare/');
+    expect(routes.comparePath()).toBe('/815/compare/');
   });
 
   it('emits the short document URL sequence from Compare route helpers', async () => {
     const document = await build('short');
 
     expect(extractAbsoluteUrls(document)).toEqual([
-      absolute(comparePath()),
-      absolute(compareRatingPath()),
-      absolute(compareSettlementsDataPath()),
-      absolute(compareExplorerDataPath()),
-      absolute(compareSkillsPath()),
-      absolute(compareLlmsFullPath()),
+      absolute(routes.comparePath()),
+      absolute(routes.compareRatingPath()),
+      absolute(routes.compareSettlementsDataPath()),
+      absolute(routes.compareExplorerDataPath()),
+      absolute(routes.compareSkillsPath()),
+      absolute(routes.compareLlmsFullPath()),
       settlementUrl('shelkovo'),
       settlementUrl('white-park'),
       settlementUrl('greenwood'),
@@ -77,17 +68,17 @@ describe('compare llms', () => {
     const document = await build('full');
 
     expect(extractAbsoluteUrls(document)).toEqual([
-      absolute(comparePath()),
-      absolute(compareLlmsPath()),
-      absolute(compareLlmsFullPath()),
-      absolute(compareRatingPath()),
-      absolute(compareSettlementsDataPath()),
-      absolute(compareExplorerDataPath()),
-      absolute(compareSkillsPath()),
+      absolute(routes.comparePath()),
+      absolute(routes.compareLlmsPath()),
+      absolute(routes.compareLlmsFullPath()),
+      absolute(routes.compareRatingPath()),
+      absolute(routes.compareSettlementsDataPath()),
+      absolute(routes.compareExplorerDataPath()),
+      absolute(routes.compareSkillsPath()),
       settlementUrl('shelkovo'),
       settlementUrl('white-park'),
       settlementUrl('greenwood'),
-      absolute(compareRatingPath()),
+      absolute(routes.compareRatingPath()),
     ]);
   });
 });
