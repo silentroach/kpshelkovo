@@ -8,14 +8,16 @@ import {
 import { createPlaceBacklinksFromGraph } from '../backlinks';
 import { PLACE_MENTION_SECTIONS } from '../schema';
 
-const refs: readonly EntityMentionSourceRef[] = [
-  ['news', 'article', 'news-item'],
-  ['status', 'incident', 'status-item'],
-  ['reviews', 'review', 'review-item'],
-  ['places', 'place', 'place-item'],
-  ['people', 'person', 'person-item'],
-  ['contacts', 'contact', 'contact-item'],
-].map(([section, kind, id]) => ({
+const refs: readonly EntityMentionSourceRef[] = (
+  [
+    ['news', 'article', 'news-item'],
+    ['status', 'incident', 'status-item'],
+    ['reviews', 'review', 'review-item'],
+    ['places', 'place', 'place-item'],
+    ['people', 'person', 'person-item'],
+    ['contacts', 'contact', 'contact-item'],
+  ] as const
+).map(([section, kind, id]): EntityMentionSourceRef => ({
   target: { type: 'place', slug: 'apple-garden' },
   source: { section, kind, id },
   title: id,

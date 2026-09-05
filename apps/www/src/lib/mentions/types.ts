@@ -59,8 +59,8 @@ export interface EntityMentionEntityRef {
 export type EntityMentionSourceEntity = EntityMentionEntityRef;
 
 export interface EntityMentionSourceUnit {
-  readonly section: string;
-  readonly kind: string;
+  readonly section: SiteMentionSection;
+  readonly kind: SiteBacklinkKind;
   readonly id: string;
 }
 
@@ -84,7 +84,10 @@ export type EntityMentionSourceRefSource = Omit<
 export interface EntityMentionGraphTarget {
   readonly type: EntityMentionType;
   readonly slug: string;
-  readonly sections: ReadonlyMap<string, readonly EntityMentionSourceRef[]>;
+  readonly sections: ReadonlyMap<
+    SiteMentionSection,
+    readonly EntityMentionSourceRef[]
+  >;
 }
 
 export interface EntityMentionGraph {
@@ -103,14 +106,9 @@ export interface SiteMentionRef {
   readonly sortKey?: number;
 }
 
-export interface SiteBacklinks {
-  readonly news: readonly SiteMentionRef[];
-  readonly status: readonly SiteMentionRef[];
-  readonly reviews: readonly SiteMentionRef[];
-  readonly places: readonly SiteMentionRef[];
-  readonly people: readonly SiteMentionRef[];
-  readonly contacts: readonly SiteMentionRef[];
-}
+export type SiteBacklinks = Readonly<
+  Record<SiteMentionSection, readonly SiteMentionRef[]>
+>;
 
 export type SiteMentionRegistry = ReadonlyMap<string, EntityMentionTarget>;
 

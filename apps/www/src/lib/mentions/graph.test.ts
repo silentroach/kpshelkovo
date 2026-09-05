@@ -1,6 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 
-import type { EntityMentionSourceRef } from './types';
+import type {
+  EntityMentionSourceRef,
+  SiteBacklinkKind,
+  SiteMentionSection,
+} from './types';
 
 import { createEntityMentionGraph, getEntityMentionGraphRefs } from './graph';
 
@@ -38,6 +42,15 @@ const ref = ({
 };
 
 describe('createEntityMentionGraph', () => {
+  it('accepts only source refs supported by public backlinks', () => {
+    expectTypeOf<
+      EntityMentionSourceRef['source']['section']
+    >().toEqualTypeOf<SiteMentionSection>();
+    expectTypeOf<
+      EntityMentionSourceRef['source']['kind']
+    >().toEqualTypeOf<SiteBacklinkKind>();
+  });
+
   it('groups refs by target entity and source section', () => {
     const graph = createEntityMentionGraph([
       ref({ source: { section: 'news', id: 'a' }, title: 'Новость' }),
