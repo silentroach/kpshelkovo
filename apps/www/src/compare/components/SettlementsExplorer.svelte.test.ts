@@ -171,24 +171,54 @@ describe('SettlementsExplorer', () => {
     });
   });
 
-  it('toggles map visibility by button', async () => {
+  it('keeps the map button label and disclosure state in sync', async () => {
     setScreen(true);
 
-    const { getByTestId, container } = render(SettlementsExplorer, {
-      props: { settlements, comparisons, stats },
-    });
+    const { getByRole, getByTestId, queryByTestId } = render(
+      SettlementsExplorer,
+      {
+        props: { settlements, comparisons, stats },
+      },
+    );
 
+    const button = getByRole('button', { name: 'Показать карту' });
     await waitFor(() => {
-      expect(getByTestId('map-toggle')).toBeTruthy();
+      expect(button.hasAttribute('disabled')).toBe(false);
     });
-    const btn = getByTestId('map-toggle');
-    await fireEvent.click(btn);
+    expect({
+      ariaControls: button.hasAttribute('aria-controls'),
+      ariaExpanded: button.getAttribute('aria-expanded'),
+      ariaLabel: button.hasAttribute('aria-label'),
+      mapRendered: Boolean(queryByTestId('filtered-map')),
+      visibleText: button.textContent?.trim(),
+    }).toMatchInlineSnapshot(`
+      {
+        "ariaControls": false,
+        "ariaExpanded": "false",
+        "ariaLabel": false,
+        "mapRendered": false,
+        "visibleText": "Показать карту",
+      }
+    `);
 
-    await waitFor(() => {
-      expect(
-        container.querySelector('[data-testid="filtered-map"]'),
-      ).toBeTruthy();
-    });
+    await fireEvent.click(button);
+
+    const expandedButton = getByRole('button', { name: 'Скрыть карту' });
+    const map = getByTestId('filtered-map');
+    expect({
+      ariaControlsExistingMap:
+        expandedButton.getAttribute('aria-controls') === map.id,
+      ariaExpanded: expandedButton.getAttribute('aria-expanded'),
+      ariaLabel: expandedButton.hasAttribute('aria-label'),
+      visibleText: expandedButton.textContent?.trim(),
+    }).toMatchInlineSnapshot(`
+      {
+        "ariaControlsExistingMap": true,
+        "ariaExpanded": "true",
+        "ariaLabel": false,
+        "visibleText": "Скрыть карту",
+      }
+    `);
   });
 
   it('autofits markers after the explorer data mounts', async () => {
