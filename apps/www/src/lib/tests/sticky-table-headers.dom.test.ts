@@ -77,6 +77,9 @@ describe('sticky table header lifecycle', () => {
 
     expect(swappedShell.hasAttribute('data-ui-sticky-table-stuck')).toBe(true);
     expect(requestAnimationFrame).not.toHaveBeenCalled();
+
+    document.dispatchEvent(new Event('astro:page-load'));
+    expect(swappedShell.hasAttribute('data-ui-sticky-table-stuck')).toBe(true);
   });
 
   it('does no scroll or resize work away from sticky tables and reactivates once', () => {

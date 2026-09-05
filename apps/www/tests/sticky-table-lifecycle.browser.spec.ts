@@ -51,6 +51,22 @@ const scrollIntoStickyState = async (shell: Locator): Promise<void> => {
   await expect(shell).toHaveAttribute('data-ui-sticky-table-stuck');
 };
 
+const navigateWithClientRouter = async (
+  page: Page,
+  pathname: string,
+): Promise<void> => {
+  await page.evaluate((href) => {
+    const link = document.createElement('a');
+
+    link.href = href;
+    link.textContent = 'Navigate';
+    link.setAttribute('data-sticky-lifecycle-navigation', '');
+    document.body.append(link);
+  }, pathname);
+  await page.locator('[data-sticky-lifecycle-navigation]').click();
+  await page.waitForURL(pathname);
+};
+
 const expectNoStickyWorkOnWindowEvents = async (page: Page): Promise<void> => {
   await resetStickyQueryCount(page);
   await page.evaluate(
@@ -94,4 +110,19 @@ test('scopes sticky table work to pages that contain sticky tables', async ({
   await page.waitForURL('/');
   await expect(page.locator(stickyTableSelector)).toHaveCount(0);
   await expectNoStickyWorkOnWindowEvents(page);
+});
+
+test('activates sticky behavior on a fresh client destination', async ({
+  page,
+}) => {
+  await installStickyQueryCounter(page);
+  await page.goto('/', { waitUntil: 'networkidle' });
+  const browserSession = await getBrowserSession(page);
+
+  await navigateWithClientRouter(page, '/815/regulation/');
+
+  const shell = page.locator(stickyTableSelector).first();
+  await expect(shell).toBeVisible();
+  expect(await getBrowserSession(page)).toBe(browserSession);
+  await scrollIntoStickyState(shell);
 });
