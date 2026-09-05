@@ -11,6 +11,11 @@ const breadcrumbViewports = [
   { name: 'mobile', viewport: { width: 640, height: 844 } },
   { name: 'desktop', viewport: desktopViewport },
 ] as const;
+const deferredSettlementTables = [
+  { section: 'infrastructure-section', name: 'Инфраструктура' },
+  { section: 'common-spaces-section', name: 'Общие пространства' },
+  { section: 'services-section', name: 'Модель обслуживания' },
+] as const;
 const explorerControlSelector =
   '[data-testid="explorer-controls"] input, [data-testid="explorer-controls"] button, [data-testid="sort-select"]';
 const explorerGraphPattern =
@@ -58,6 +63,65 @@ test.beforeEach(async ({ page }) => {
     });
   });
 });
+
+for (const { name, viewport } of breadcrumbViewports) {
+  test(`keeps settlement tables in SSR HTML and defers hydration on ${name}`, async ({
+    page,
+  }) => {
+    const requestedPaths = new Set<string>();
+    page.on('request', (request) => {
+      requestedPaths.add(new URL(request.url()).pathname);
+    });
+    await page.setViewportSize(viewport);
+    await page.goto('/815/compare/settlements/shelkovo/', {
+      waitUntil: 'networkidle',
+    });
+
+    const tables = [];
+    for (const { section, name: tableName } of deferredSettlementTables) {
+      const sectionRoot = page.getByTestId(section);
+      const table = sectionRoot
+        .getByRole('region', {
+          name: `${tableName}: таблица сравнения`,
+        })
+        .getByRole('table');
+      const island = sectionRoot.locator('astro-island');
+      const componentUrl = await island.getAttribute('component-url');
+      if (!componentUrl) {
+        throw new Error(`Missing component URL for ${tableName}`);
+      }
+
+      expect(await table.getByRole('row').count()).toBeGreaterThan(1);
+      await expect(island).toHaveAttribute('client', 'visible');
+      const startsOutsideViewport = await island.evaluate((element) => {
+        const { bottom, top } = element.getBoundingClientRect();
+
+        return bottom <= 0 || top >= window.innerHeight;
+      });
+      tables.push({
+        sectionRoot,
+        island,
+        componentPath: componentUrl,
+        startsOutsideViewport,
+      });
+    }
+
+    const deferredTables = tables.filter(
+      ({ componentPath }) => !requestedPaths.has(componentPath),
+    );
+    expect(deferredTables.length).toBeGreaterThan(0);
+    for (const { island, startsOutsideViewport } of deferredTables) {
+      expect(startsOutsideViewport).toBe(true);
+      expect(await island.getAttribute('ssr')).toBe('');
+    }
+
+    for (const { sectionRoot, island, componentPath } of tables) {
+      await sectionRoot.scrollIntoViewIfNeeded();
+      await expect.poll(() => requestedPaths.has(componentPath)).toBe(true);
+      await expect(island).not.toHaveAttribute('ssr');
+    }
+  });
+}
 
 test('aligns settlement breadcrumbs with the compare index', async ({
   page,
