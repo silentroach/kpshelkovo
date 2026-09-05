@@ -1,5 +1,5 @@
 import { z } from 'astro/zod';
-import { KB_PAGE_FLAGS } from './types';
+import { KB_PAGE_FLAGS } from './page-flags';
 
 const RawKbPageFlagsSchema = z
   .array(z.enum(KB_PAGE_FLAGS))

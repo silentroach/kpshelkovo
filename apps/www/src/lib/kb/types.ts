@@ -1,7 +1,6 @@
 import type { PreprocessedSiteMarkdownBody } from '@/lib/markdown/render';
 import type { EntityMentionTarget } from '@/lib/mentions';
-
-export const KB_PAGE_FLAGS = ['exclude-from-site-search', 'noindex'] as const;
+import type { KB_PAGE_FLAGS } from './page-flags';
 
 export type KbPageFlag = (typeof KB_PAGE_FLAGS)[number];
 

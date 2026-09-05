@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { KB_PAGE_FLAGS } from './page-flags';
 import { RawKbPageSchema } from './raw-schema';
-import { KB_PAGE_FLAGS } from './types';
 
 describe('RawKbPageSchema', () => {
   it('accepts supported page flags', () => {
