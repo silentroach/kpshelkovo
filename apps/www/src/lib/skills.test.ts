@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
 
 import { build, names } from './skills';
+import { statusCalendarAgentPatterns } from './status/routes';
 
 describe('agent skills index', () => {
   it('publishes all declared skills with digests', async () => {
@@ -37,14 +38,8 @@ describe('agent skills index', () => {
       'utf8',
     );
 
-    for (const route of [
-      '/status/calendar/YYYY/',
-      '/status/calendar/YYYY/index.md',
-      '/status/calendar/YYYY/MM/',
-      '/status/calendar/YYYY/MM/index.md',
-      '/status/calendar/YYYY/MM/#YYYY-MM-DD',
-    ]) {
-      expect(skill).toContain(route);
+    for (const route of Object.values(statusCalendarAgentPatterns())) {
+      expect(skill).toContain(`\`${route}\``);
     }
 
     expect(skill).toContain('отдельного календарного JSON нет');

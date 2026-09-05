@@ -34,6 +34,7 @@ vi.mock('./load', () => ({
 }));
 
 let build: typeof import('./llms').build;
+let statusCalendarAgentPatterns: typeof import('./routes').statusCalendarAgentPatterns;
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
@@ -42,6 +43,7 @@ beforeAll(async () => {
   });
 
   ({ build } = await import('./llms'));
+  ({ statusCalendarAgentPatterns } = await import('./routes'));
 });
 
 beforeEach(() => {
@@ -90,14 +92,8 @@ describe('status llms', () => {
     async (kind) => {
       const markdown = await build(kind);
 
-      for (const route of [
-        '/status/calendar/YYYY/',
-        '/status/calendar/YYYY/index.md',
-        '/status/calendar/YYYY/MM/',
-        '/status/calendar/YYYY/MM/index.md',
-        '/status/calendar/YYYY/MM/#YYYY-MM-DD',
-      ]) {
-        expect(markdown).toContain(route);
+      for (const route of Object.values(statusCalendarAgentPatterns())) {
+        expect(markdown).toContain(`\`${route}\``);
       }
 
       expect(markdown).toContain('отдельного календарного JSON нет');

@@ -9,6 +9,7 @@ import {
 } from '@/lib/markdown/llms-document';
 import {
   statusApiCatalogUrl,
+  statusCalendarAgentPatterns,
   statusDataUrl,
   statusFeedUrl,
   statusHistoryUrl,
@@ -45,6 +46,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
   const catalog = absoluteUrl(statusApiCatalogUrl());
   const schema = absoluteUrl(statusSchemaUrl());
   const openapi = absoluteUrl(statusOpenApiUrl());
+  const calendarRoutes = statusCalendarAgentPatterns();
   const serviceHtml = service
     ? absoluteUrl(statusServiceUrl(service.service))
     : '/status/[service]/';
@@ -94,9 +96,9 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Пример HTML-страницы сервиса (${serviceLabel}): ${serviceHtml}`,
               `Пример Markdown-версии сервиса: ${serviceMarkdown}`,
               ...incidentLinks,
-              'Годовой календарь: `/status/calendar/YYYY/`; Markdown: `/status/calendar/YYYY/index.md`.',
-              'Месячный журнал: `/status/calendar/YYYY/MM/`; Markdown: `/status/calendar/YYYY/MM/index.md`.',
-              'Ссылка на конкретный день использует ISO-якорь: `/status/calendar/YYYY/MM/#YYYY-MM-DD`.',
+              `Годовой календарь: \`${calendarRoutes.year}\`; Markdown: \`${calendarRoutes.yearMarkdown}\`.`,
+              `Месячный журнал: \`${calendarRoutes.month}\`; Markdown: \`${calendarRoutes.monthMarkdown}\`.`,
+              `Ссылка на конкретный день использует ISO-якорь: \`${calendarRoutes.day}\`.`,
               'Для календаря отдельного календарного JSON нет: исходные записи остаются в `/status/data/status.json`.',
               'В status.json сервисные сводки выводятся из массива incidents.',
               'Сервисы: `electricity`, `water`, `internet`, `dam`.',
@@ -153,9 +155,9 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'Markdown-версия `/status/index.md` дает текстовую версию сводки для терминалов и прямых ссылок.',
               'Страницы сервисов `/status/[service]/` и их Markdown-версии `/status/[service]/index.md` удобны для фокусного чтения одной линии: электричество, вода, интернет или дамба.',
               'Страницы инцидентов `/status/incidents/YYYY/MM/[entry]/` и их Markdown-версии `/status/incidents/.../index.md` публикуются только для записей с body и тогда же появляются в `html_url`/`markdown_url`.',
-              'Годовой календарь `/status/calendar/YYYY/` и его Markdown-версия `/status/calendar/YYYY/index.md` показывают все затронутые дни года.',
-              'Месячный журнал `/status/calendar/YYYY/MM/` и его Markdown-версия `/status/calendar/YYYY/MM/index.md` содержат записи по дням.',
-              'Ссылка `/status/calendar/YYYY/MM/#YYYY-MM-DD` ведет к дню по точному ISO-якорю.',
+              `Годовой календарь \`${calendarRoutes.year}\` и его Markdown-версия \`${calendarRoutes.yearMarkdown}\` показывают все затронутые дни года.`,
+              `Месячный журнал \`${calendarRoutes.month}\` и его Markdown-версия \`${calendarRoutes.monthMarkdown}\` содержат записи по дням.`,
+              `Ссылка \`${calendarRoutes.day}\` ведет к дню по точному ISO-якорю.`,
               'Для календаря отдельного календарного JSON нет: исходные записи остаются в `/status/data/status.json`.',
             ]),
           ]),
