@@ -1,7 +1,11 @@
+import { estimateDetails2026 } from '@/data/reglament/estimate-details-2026';
+
 import { calculateEstimate } from './calculate';
+import { buildPublicEstimateDetails2026Json } from './detail-json';
 import {
   buildPublicEstimateDetails2026JsonSchema,
   ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_NAME,
+  publicEstimateDetailDatasetSchema,
 } from './detail-public-schema';
 import {
   reglamentApiCatalogPath,
@@ -53,6 +57,11 @@ export const PROFILE = 'https://www.rfc-editor.org/info/rfc9727';
 export const OAS = 'application/vnd.oai.openapi+json';
 
 const ESTIMATE_PAYLOAD_SCHEMA = 'Estimate2026Payload';
+const ESTIMATE_DETAILS_2026_SOURCE_IDS: readonly string[] = Object.keys(
+  publicEstimateDetailDatasetSchema.parse(
+    JSON.parse(buildPublicEstimateDetails2026Json(estimateDetails2026)),
+  ).sources,
+);
 
 const ROW_BREAKDOWN_FORMULAS = {
   fot: 'primary_salary + machinist_salary',
@@ -633,6 +642,7 @@ export function openapi(root: string): Record<string, unknown> {
 export const detailSchema = (root: string): Record<string, unknown> =>
   buildPublicEstimateDetails2026JsonSchema(
     abs(root, reglamentEstimateDetails2026SchemaPath()),
+    ESTIMATE_DETAILS_2026_SOURCE_IDS,
   );
 
 export function detailOpenapi(root: string): Record<string, unknown> {

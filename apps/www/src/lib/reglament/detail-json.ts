@@ -51,23 +51,34 @@ const publicMoney = (
 
 const publicSource = (
   ref: EstimateDetailSourceRef,
-): PublicEstimateDetailSourceValue => ({
-  pdf: ref.pdf,
-  page: ref.page,
-  fragment: ref.fragment,
-  quote: ref.quote_items ? undefined : ref.quote,
-  quote_items: ref.quote_items?.map((item) => ({
-    label: item.label,
-    resource_ids: item.resource_ids,
-    quantity: item.quantity ? publicQuantity(item.quantity) : undefined,
-    unit_price_rub: item.unit_price_rub
-      ? publicMoney(item.unit_price_rub)
-      : undefined,
-    total_rub: item.total_rub ? publicMoney(item.total_rub) : undefined,
-    note: item.note,
-  })),
-  note: ref.note,
-});
+): PublicEstimateDetailSourceValue => {
+  if (ref.quote_items) {
+    return {
+      pdf: ref.pdf,
+      page: ref.page,
+      fragment: ref.fragment,
+      quote_items: ref.quote_items.map((item) => ({
+        label: item.label,
+        resource_ids: item.resource_ids,
+        quantity: item.quantity ? publicQuantity(item.quantity) : undefined,
+        unit_price_rub: item.unit_price_rub
+          ? publicMoney(item.unit_price_rub)
+          : undefined,
+        total_rub: item.total_rub ? publicMoney(item.total_rub) : undefined,
+        note: item.note,
+      })),
+      note: ref.note,
+    };
+  }
+
+  return {
+    pdf: ref.pdf,
+    page: ref.page,
+    fragment: ref.fragment,
+    quote: ref.quote,
+    note: ref.note,
+  };
+};
 
 export const buildPublicEstimateDetails2026Json = (
   dataset: EstimateDetailDataset,

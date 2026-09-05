@@ -5,7 +5,10 @@ import { describe, expect, it } from 'vitest';
 import { estimateDetails2026 } from '@/data/reglament/estimate-details-2026';
 import { buildPublicEstimateDetails2026Json } from '../detail-json';
 import type { PublicEstimateDetailDataset } from '../detail-public';
-import { publicEstimateDetailDatasetSchema } from '../detail-public-schema';
+import {
+  buildPublicEstimateDetails2026JsonSchema,
+  publicEstimateDetailDatasetSchema,
+} from '../detail-public-schema';
 import { detailOpenapi, detailSchema } from '../discovery';
 import {
   reglamentApiCatalogPath,
@@ -209,10 +212,128 @@ describe('estimate details public schema', () => {
         ...payload.work_items.slice(1),
       ],
     };
+    const validators = compileValidators(
+      detailSchema('https://example.com'),
+      detailOpenapi('https://example.com') as DetailOpenApi,
+    );
 
-    expect(
-      publicEstimateDetailDatasetSchema.safeParse(unresolved).success,
-    ).toBe(false);
+    expect(contractResults(validators, [unresolved])).toMatchInlineSnapshot(`
+      {
+        "generated": [
+          [
+            false,
+          ],
+          [
+            false,
+          ],
+        ],
+        "zod": [
+          false,
+        ],
+      }
+    `);
+  });
+
+  it('rejects simultaneous plain and structured source quotes', () => {
+    const payload = productionPayload();
+    const sourceEntry = Object.entries(payload.sources).find(
+      ([, source]) => source.quote_items,
+    );
+
+    if (!sourceEntry) {
+      throw new Error(
+        'Production detail payload must contain a structured source quote',
+      );
+    }
+
+    const [sourceId, source] = sourceEntry;
+    const invalid = {
+      ...payload,
+      sources: {
+        ...payload.sources,
+        [sourceId]: { ...source, quote: 'Неоднозначная plain quote' },
+      },
+    };
+    const validators = compileValidators(
+      detailSchema('https://example.com'),
+      detailOpenapi('https://example.com') as DetailOpenApi,
+    );
+
+    expect(contractResults(validators, [invalid])).toMatchInlineSnapshot(`
+      {
+        "generated": [
+          [
+            false,
+          ],
+          [
+            false,
+          ],
+        ],
+        "zod": [
+          false,
+        ],
+      }
+    `);
+  });
+
+  it('derives generated constraints from the explicit source ID set', () => {
+    const payload = productionPayload();
+    const workItem = payload.work_items[0];
+    const source = Object.values(payload.sources)[0];
+
+    if (!workItem || !source) {
+      throw new Error(
+        'Production detail payload must contain facts and sources',
+      );
+    }
+
+    const addedSourceId = 's999999';
+    const expanded = {
+      ...payload,
+      sources: { ...payload.sources, [addedSourceId]: source },
+      work_items: [
+        { ...workItem, source_refs: [addedSourceId] },
+        ...payload.work_items.slice(1),
+      ],
+    };
+    const currentValidators = compileValidators(
+      detailSchema('https://example.com'),
+      detailOpenapi('https://example.com') as DetailOpenApi,
+    );
+    const expandedValidator = new Ajv2020({ allErrors: true }).compile(
+      buildPublicEstimateDetails2026JsonSchema(
+        'https://example.com/estimate-details.schema.json',
+        Object.keys(expanded.sources),
+      ),
+    );
+
+    expect({
+      current: contractResults(currentValidators, [expanded]),
+      expanded: {
+        zod: publicEstimateDetailDatasetSchema.safeParse(expanded).success,
+        generated: expandedValidator(expanded),
+      },
+    }).toMatchInlineSnapshot(`
+      {
+        "current": {
+          "generated": [
+            [
+              false,
+            ],
+            [
+              false,
+            ],
+          ],
+          "zod": [
+            true,
+          ],
+        },
+        "expanded": {
+          "generated": true,
+          "zod": true,
+        },
+      }
+    `);
   });
 
   it('rejects impossible public status combinations', () => {

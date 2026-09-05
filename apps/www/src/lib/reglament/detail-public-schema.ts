@@ -14,6 +14,10 @@ export const ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_NAME =
 const textSchema = z.string().min(1);
 const sourceIdSchema = z.string().regex(/^s[1-9]\d*$/);
 const sourceRefsSchema = z.array(sourceIdSchema).min(1);
+const sourceIdsSchema = z
+  .array(sourceIdSchema)
+  .min(1)
+  .refine((sourceIds) => new Set(sourceIds).size === sourceIds.length);
 
 export const quantityValueSchema = z
   .union([
@@ -48,15 +52,26 @@ export const sourceQuoteItemSchema = z
   })
   .meta({ id: 'sourceQuoteItem' });
 
+const sourceValueShape = {
+  pdf: z.enum(ESTIMATE_DETAIL_SOURCE_PDFS),
+  page: z.number().int().positive(),
+  fragment: textSchema,
+  note: textSchema.optional(),
+};
+
 export const sourceValueSchema = z
-  .strictObject({
-    pdf: z.enum(ESTIMATE_DETAIL_SOURCE_PDFS),
-    page: z.number().int().positive(),
-    fragment: textSchema,
-    quote: textSchema.optional(),
-    quote_items: z.array(sourceQuoteItemSchema).min(1).optional(),
-    note: textSchema.optional(),
-  })
+  .union([
+    z.strictObject({
+      ...sourceValueShape,
+      quote: textSchema.optional(),
+      quote_items: z.never().optional(),
+    }),
+    z.strictObject({
+      ...sourceValueShape,
+      quote: z.never().optional(),
+      quote_items: z.array(sourceQuoteItemSchema).min(1),
+    }),
+  ])
   .meta({ id: 'sourceValue' });
 
 export const needsCheckSchema = z
@@ -187,12 +202,33 @@ export const publicEstimateDetailDatasetSchema = datasetSchema;
 
 export const buildPublicEstimateDetails2026JsonSchema = (
   id: string,
-): Record<string, unknown> =>
-  z.toJSONSchema(publicEstimateDetailDatasetSchema, {
+  inputSourceIds: readonly string[],
+): Record<string, unknown> => {
+  const sourceIds = sourceIdsSchema.parse(inputSourceIds);
+  const sourceProperties = Object.fromEntries(
+    sourceIds.map((sourceId) => [sourceId, { $ref: '#/$defs/sourceValue' }]),
+  );
+
+  return z.toJSONSchema(publicEstimateDetailDatasetSchema, {
     target: 'draft-2020-12',
     override: ({ zodSchema, jsonSchema }) => {
+      if (zodSchema === sourceIdSchema) {
+        jsonSchema.enum = sourceIds;
+      }
+
       if (zodSchema === publicEstimateDetailDatasetSchema) {
+        if (!jsonSchema.properties) {
+          throw new Error('Detail dataset JSON Schema has no properties');
+        }
+
         jsonSchema.$id = id;
+        jsonSchema.properties.sources = {
+          type: 'object',
+          properties: sourceProperties,
+          required: sourceIds,
+          additionalProperties: false,
+        };
       }
     },
   });
+};
