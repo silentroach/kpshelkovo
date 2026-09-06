@@ -110,22 +110,15 @@ export interface NewsListArticle {
   readonly author: NewsAuthor;
   readonly year: number;
   readonly month: number;
-  readonly day: number;
-  readonly entry: string;
   readonly url: string;
   readonly markdownUrl: string;
-  readonly canonical: string;
   readonly publishedAt: Date;
   readonly publishedIso: string;
   readonly time?: string;
-  readonly appliesToAllAreas: boolean;
-  readonly areas: readonly NewsArea[];
   readonly tags: readonly NewsTag[];
   readonly pinned: boolean;
-  readonly sourceUrl?: string;
   readonly cover?: NewsCover;
   readonly summary: string;
-  readonly events: readonly NewsEvent[];
 }
 
 export interface NewsArchiveSummary {
