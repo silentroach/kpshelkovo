@@ -13,9 +13,47 @@ export const toStatusIncidentWindowInput = (
   incident: Pick<StatusIncident, 'ended' | 'kind' | 'started'>,
 ): StatusIncidentWindowInput => ({
   kind: incident.kind,
-  startedAt: incident.started.at.valueOf(),
-  endedAt: incident.ended?.at.valueOf(),
+  start: incident.started.at.valueOf(),
+  end: incident.ended?.at.valueOf(),
 });
+
+const isStatusIncidentWindow = (
+  value: unknown,
+): value is StatusIncidentWindowInput => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
+
+  const candidate = value as Partial<StatusIncidentWindowInput>;
+
+  return (
+    (candidate.kind === 'incident' || candidate.kind === 'maintenance') &&
+    typeof candidate.start === 'number' &&
+    Number.isFinite(candidate.start) &&
+    (candidate.end === undefined ||
+      (typeof candidate.end === 'number' &&
+        Number.isFinite(candidate.end) &&
+        candidate.start <= candidate.end))
+  );
+};
+
+export const parseStatusIncidentWindows = (
+  value?: string,
+): readonly StatusIncidentWindowInput[] | undefined => {
+  if (!value) {
+    return undefined;
+  }
+
+  try {
+    const parsed: unknown = JSON.parse(value);
+
+    return Array.isArray(parsed) && parsed.every(isStatusIncidentWindow)
+      ? parsed
+      : undefined;
+  } catch {
+    return undefined;
+  }
+};
 
 export const getStatusIncidentState = (
   input: StatusIncidentPhaseInput,
@@ -54,13 +92,11 @@ export const resolveStatusIncidentPhase = (
   input: StatusIncidentWindowInput,
   nowMs: number,
 ): StatusIncidentPhase => {
-  if (nowMs < input.startedAt) {
+  if (nowMs < input.start) {
     return 'scheduled';
   }
 
-  return input.endedAt !== undefined && nowMs >= input.endedAt
-    ? 'resolved'
-    : 'active';
+  return input.end !== undefined && nowMs >= input.end ? 'resolved' : 'active';
 };
 
 export const resolveStatusIncidentState = (

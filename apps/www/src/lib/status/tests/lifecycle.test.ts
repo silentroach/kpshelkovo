@@ -2,7 +2,10 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 import { contentDateSchema } from '@/lib/content-date';
 import type { StatusIncidentEntry } from '../load';
-import { resolveStatusIncidentState } from '../lifecycle';
+import {
+  parseStatusIncidentWindows,
+  resolveStatusIncidentState,
+} from '../lifecycle';
 
 const START = '2026-08-26T10:00:00+03:00';
 const END = '2026-08-26T13:00:00+03:00';
@@ -127,12 +130,12 @@ describe('status lifecycle boundaries', () => {
     const input = {
       kind: 'incident' as const,
       service: 'water' as const,
-      startedAt: Date.parse(START),
+      start: Date.parse(START),
     };
 
     expect([
-      resolveStatusIncidentState(input, input.startedAt - 1),
-      resolveStatusIncidentState(input, input.startedAt),
+      resolveStatusIncidentState(input, input.start - 1),
+      resolveStatusIncidentState(input, input.start),
       resolveStatusIncidentState(input, Date.parse(END)),
     ]).toMatchInlineSnapshot(`
       [
@@ -156,5 +159,14 @@ describe('status lifecycle boundaries', () => {
         },
       ]
     `);
+  });
+
+  it('rejects the whole client payload when one window has an invalid range', () => {
+    const payload = JSON.stringify([
+      { kind: 'maintenance', start: Date.parse(START), end: Date.parse(END) },
+      { kind: 'incident', start: Date.parse(END), end: Date.parse(START) },
+    ]);
+
+    expect(parseStatusIncidentWindows(payload)).toBeUndefined();
   });
 });

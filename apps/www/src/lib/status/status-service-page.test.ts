@@ -95,8 +95,8 @@ describe('/status/[service]/', () => {
       state.getAttribute('data-status-service-incidents') ?? '[]',
     ) as readonly {
       readonly kind: string;
-      readonly startedAt: number;
-      readonly endedAt?: number;
+      readonly start: number;
+      readonly end?: number;
     }[];
 
     expect({
@@ -105,11 +105,9 @@ describe('/status/[service]/', () => {
       state: state.getAttribute('data-status-service-state'),
       windows: windows.map((item) => ({
         kind: item.kind,
-        startedAt: new Date(item.startedAt).toISOString(),
-        endedAt:
-          item.endedAt === undefined
-            ? undefined
-            : new Date(item.endedAt).toISOString(),
+        start: new Date(item.start).toISOString(),
+        end:
+          item.end === undefined ? undefined : new Date(item.end).toISOString(),
       })),
     }).toMatchInlineSnapshot(`
       {
@@ -118,9 +116,9 @@ describe('/status/[service]/', () => {
         "state": "green",
         "windows": [
           {
-            "endedAt": "2026-08-18T08:00:00.000Z",
+            "end": "2026-08-18T08:00:00.000Z",
             "kind": "incident",
-            "startedAt": "2026-08-18T07:00:00.000Z",
+            "start": "2026-08-18T07:00:00.000Z",
           },
         ],
       }
