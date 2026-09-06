@@ -1,8 +1,11 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { contentDateSchema } from '@/lib/content-date';
 import type { StatusIncidentEntry } from '../load';
-import { resolveStatusIncidentState } from '../lifecycle';
+import {
+  parseStatusIncidentWindows,
+  resolveStatusIncidentState,
+} from '../lifecycle';
 
 const START = '2026-08-26T10:00:00+03:00';
 const END = '2026-08-26T13:00:00+03:00';
@@ -22,6 +25,8 @@ const maintenanceEntry: StatusIncidentEntry = {
 };
 
 let buildStatusDataset: typeof import('../load').buildStatusDataset;
+let buildStatusHomeMarkdown: typeof import('../markdown').buildStatusHomeMarkdown;
+let buildStatusServiceMarkdown: typeof import('../markdown').buildStatusServiceMarkdown;
 let buildStatusPublicPayload: typeof import('../public-dto').buildStatusPublicPayload;
 
 beforeAll(async () => {
@@ -31,6 +36,8 @@ beforeAll(async () => {
   });
 
   ({ buildStatusDataset } = await import('../load'));
+  ({ buildStatusHomeMarkdown, buildStatusServiceMarkdown } =
+    await import('../markdown'));
   ({ buildStatusPublicPayload } = await import('../public-dto'));
 });
 
@@ -103,6 +110,29 @@ describe('status lifecycle boundaries', () => {
     `);
   });
 
+  it('keeps snapshot-scheduled maintenance in Markdown at the start boundary', () => {
+    const data = buildStatusDataset([maintenanceEntry], {
+      now: new Date(Date.parse(START) - 1),
+    });
+    const service = data.byService.get('dam');
+
+    if (!service) {
+      throw new Error('Expected dam status summary');
+    }
+
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(START));
+
+    try {
+      const expected = '## Плановые работы\n\n- Плановые работы на дамбе';
+
+      expect(buildStatusHomeMarkdown(data)).toContain(expected);
+      expect(buildStatusServiceMarkdown(service)).toContain(expected);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('publishes maintenance as resolved at the exact end boundary', () => {
     expect(statusSnapshot(END)).toMatchInlineSnapshot(`
       {
@@ -127,12 +157,12 @@ describe('status lifecycle boundaries', () => {
     const input = {
       kind: 'incident' as const,
       service: 'water' as const,
-      startedAt: Date.parse(START),
+      start: Date.parse(START),
     };
 
     expect([
-      resolveStatusIncidentState(input, input.startedAt - 1),
-      resolveStatusIncidentState(input, input.startedAt),
+      resolveStatusIncidentState(input, input.start - 1),
+      resolveStatusIncidentState(input, input.start),
       resolveStatusIncidentState(input, Date.parse(END)),
     ]).toMatchInlineSnapshot(`
       [
@@ -156,5 +186,14 @@ describe('status lifecycle boundaries', () => {
         },
       ]
     `);
+  });
+
+  it('rejects the whole client payload when one window has an invalid range', () => {
+    const payload = JSON.stringify([
+      { kind: 'maintenance', start: Date.parse(START), end: Date.parse(END) },
+      { kind: 'incident', start: Date.parse(END), end: Date.parse(START) },
+    ]);
+
+    expect(parseStatusIncidentWindows(payload)).toBeUndefined();
   });
 });

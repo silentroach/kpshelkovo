@@ -13,10 +13,18 @@ import type {
 } from './types';
 import { buildNewsEventMapUrl } from './view';
 
+export const NEWS_PUBLIC_AUTHOR_KINDS = [
+  'official',
+  'community',
+  'editorial',
+  'other',
+] as const;
+export type NewsPublicAuthorKind = (typeof NEWS_PUBLIC_AUTHOR_KINDS)[number];
+
 export interface NewsPublicAuthor {
   readonly id: string;
   readonly name: string;
-  readonly kind: NewsAuthor['kind'];
+  readonly kind: NewsPublicAuthorKind;
   readonly url?: string;
 }
 
@@ -131,6 +139,13 @@ export interface NewsPublicPayload {
 
 export const NEWS_PUBLIC_PAYLOAD_SCHEMA_VERSION = '1.0.0';
 
+const NEWS_PUBLIC_AUTHOR_KIND_BY_DOMAIN = {
+  official: 'official',
+  community: 'community',
+  editorial: 'editorial',
+  other: 'other',
+} as const satisfies Record<NewsAuthor['kind'], NewsPublicAuthorKind>;
+
 const fullUrl = (value: string): string => absoluteUrl(value);
 
 const discoveryUrl = (value: string): string =>
@@ -139,7 +154,7 @@ const discoveryUrl = (value: string): string =>
 const toPublicAuthor = (author: NewsAuthor): NewsPublicAuthor => ({
   id: author.id,
   name: author.name,
-  kind: author.kind,
+  kind: NEWS_PUBLIC_AUTHOR_KIND_BY_DOMAIN[author.kind],
   url: author.url ? fullUrl(author.url) : undefined,
 });
 

@@ -1,13 +1,13 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { contentDateSchema } from '../content-date';
 import { createPersonMentionTarget } from '../people/mentions';
-import type {
-  NewsArchiveSummaryEntry,
-  NewsArticleEntry,
-  NewsAuthorEntry,
-} from './load';
-import { RawNewsEventsSchema, type RawNewsEventInput } from './raw-schema';
+import type { NewsArticleEntry } from './load';
+import {
+  createTestNewsDatasetBuilder,
+  newsArchiveSummaryEntries,
+  newsArticleEntry as article,
+  newsAuthorEntry as author,
+} from './load.test-helper';
 
 type MutableMentionRegistry = Map<
   string,
@@ -17,12 +17,7 @@ type MutableMentionRegistry = Map<
 type BuildNewsDataset = typeof import('./load').buildNewsDataset;
 
 let buildNewsDatasetSource: BuildNewsDataset;
-const testDate = contentDateSchema('test date');
-
-type ArticleEventInput = RawNewsEventInput;
-type ArticlePhotoInput = NonNullable<
-  NewsArticleEntry['data']['photos']
->[number];
+let buildNewsDataset: ReturnType<typeof createTestNewsDatasetBuilder>;
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
@@ -31,77 +26,7 @@ beforeAll(async () => {
   });
 
   ({ buildNewsDataset: buildNewsDatasetSource } = await import('./load'));
-});
-
-const archiveSummaries = (
-  articles: readonly NewsArticleEntry[],
-): readonly NewsArchiveSummaryEntry[] => {
-  const ids = new Set<string>();
-
-  for (const item of articles) {
-    const [year, month] = item.id.split('/');
-
-    ids.add(year);
-    ids.add(`${year}/${month}`);
-  }
-
-  return [...ids].map((id) => ({ id, body: `Выжимка ${id}.` }));
-};
-
-const buildWithArchiveSummaries = (
-  builder: BuildNewsDataset,
-  authors: Parameters<BuildNewsDataset>[0],
-  articles: Parameters<BuildNewsDataset>[1],
-  opts?: Parameters<BuildNewsDataset>[3],
-): ReturnType<BuildNewsDataset> =>
-  builder(authors, articles, archiveSummaries(articles), opts);
-
-const buildNewsDataset = (
-  authors: Parameters<BuildNewsDataset>[0],
-  articles: Parameters<BuildNewsDataset>[1],
-  opts?: Parameters<BuildNewsDataset>[3],
-): ReturnType<BuildNewsDataset> =>
-  buildWithArchiveSummaries(buildNewsDatasetSource, authors, articles, opts);
-
-const author = (input: {
-  readonly id: string;
-  readonly name: string;
-  readonly kind?: 'official' | 'community' | 'editorial' | 'other';
-}): NewsAuthorEntry => ({
-  id: input.id,
-  data: {
-    name: input.name,
-    kind: input.kind ?? 'editorial',
-  },
-});
-
-const article = (input: {
-  readonly id: string;
-  readonly title: string;
-  readonly summary: string;
-  readonly date: string;
-  readonly body?: string;
-  readonly pinned?: boolean;
-  readonly pinned_until?: string;
-  readonly events?: readonly ArticleEventInput[];
-  readonly photos?: readonly ArticlePhotoInput[];
-  readonly searchAliases?: readonly string[];
-}): NewsArticleEntry => ({
-  id: input.id,
-  body: input.body ?? '',
-  data: {
-    title: input.title,
-    summary: input.summary,
-    date: testDate.parse(input.date),
-    author: { id: 'ig' } as NewsArticleEntry['data']['author'],
-    pinned: input.pinned,
-    pinned_until: input.pinned_until
-      ? testDate.parse(input.pinned_until)
-      : undefined,
-    events: input.events ? RawNewsEventsSchema.parse(input.events) : undefined,
-    photos: input.photos,
-    search_aliases: input.searchAliases,
-  },
+  buildNewsDataset = createTestNewsDatasetBuilder(buildNewsDatasetSource);
 });
 
 describe('buildNewsDataset', () => {
@@ -440,7 +365,7 @@ describe('buildNewsDataset', () => {
         [author({ id: 'ig', name: 'Редакция' })],
         [currentArticle],
         [
-          ...archiveSummaries([currentArticle]),
+          ...newsArchiveSummaryEntries([currentArticle]),
           { id: '2025', body: 'Лишняя выжимка.' },
         ],
       ),
@@ -822,9 +747,10 @@ describe('buildNewsDataset', () => {
     try {
       const { buildNewsDataset: buildWithMockedPreprocessor } =
         await import('./load');
+      const buildNewsDatasetWithMockedPreprocessor =
+        createTestNewsDatasetBuilder(buildWithMockedPreprocessor);
 
-      buildWithArchiveSummaries(
-        buildWithMockedPreprocessor,
+      buildNewsDatasetWithMockedPreprocessor(
         [author({ id: 'ig', name: 'Редакция' })],
         [
           article({
@@ -837,8 +763,7 @@ describe('buildNewsDataset', () => {
         ],
       );
 
-      const data = buildWithArchiveSummaries(
-        buildWithMockedPreprocessor,
+      const data = buildNewsDatasetWithMockedPreprocessor(
         [author({ id: 'ig', name: 'Редакция' })],
         [
           article({
@@ -892,9 +817,10 @@ describe('buildNewsDataset', () => {
     try {
       const { buildNewsDataset: buildWithMutablePreprocessor } =
         await import('./load');
+      const buildNewsDatasetWithMutablePreprocessor =
+        createTestNewsDatasetBuilder(buildWithMutablePreprocessor);
 
-      buildWithArchiveSummaries(
-        buildWithMutablePreprocessor,
+      buildNewsDatasetWithMutablePreprocessor(
         [author({ id: 'ig', name: 'Редакция' })],
         [
           article({
@@ -908,8 +834,7 @@ describe('buildNewsDataset', () => {
       );
 
       expect(() =>
-        buildWithArchiveSummaries(
-          buildWithMutablePreprocessor,
+        buildNewsDatasetWithMutablePreprocessor(
           [author({ id: 'ig', name: 'Редакция' })],
           [
             article({

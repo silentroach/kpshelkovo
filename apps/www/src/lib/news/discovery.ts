@@ -7,10 +7,11 @@ import { formatApiCatalogLink } from '@/lib/api-catalog-response';
 
 import { newsPublicSurfaceSlice } from './public-surface';
 import { articlesDataPath, articlesSchemaPath } from './routes';
-import { NEWS_AREAS, NEWS_AUTHOR_KINDS } from './schema';
+import { NEWS_AREAS } from './schema';
 import type { RequiredProperties } from './discovery.types';
 import type { NewsDataset } from './types';
 import {
+  NEWS_PUBLIC_AUTHOR_KINDS,
   NEWS_PUBLIC_PAYLOAD_SCHEMA_VERSION,
   toNewsPublicPayload,
   type NewsPublicArchiveMonth as NewsDiscoveryArchiveMonth,
@@ -277,7 +278,7 @@ export function schema(root: string): Record<string, unknown> {
           id: text(1),
           name: text(1),
           kind: {
-            enum: [...NEWS_AUTHOR_KINDS],
+            enum: [...NEWS_PUBLIC_AUTHOR_KINDS],
           },
           url: uri(),
         },

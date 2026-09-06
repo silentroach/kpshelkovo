@@ -5,7 +5,6 @@ import { contentDateSchema, contentDateTimeSchema } from '@/lib/content-date';
 
 import {
   NEWS_AREAS,
-  NEWS_AUTHOR_KINDS,
   isAbsoluteUrl,
   isAttachmentUrl,
   normalizeTagKey,
@@ -210,7 +209,7 @@ function validateTags(
 
 export const RawNewsAuthorSchema = z.object({
   name: visibleText('name'),
-  kind: z.enum(NEWS_AUTHOR_KINDS),
+  kind: z.enum(['official', 'community', 'editorial', 'other']),
   short_name: visibleText('short_name').optional(),
   url: absoluteUrl('url').optional(),
   role: text.optional(),

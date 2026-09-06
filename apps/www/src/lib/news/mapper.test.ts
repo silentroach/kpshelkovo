@@ -4,6 +4,17 @@ import { mapRawNewsAuthor } from './mapper';
 import type { RawNewsAuthor } from './raw-schema';
 
 describe('mapRawNewsAuthor', () => {
+  it.each([
+    ['official', 'official'],
+    ['community', 'community'],
+    ['editorial', 'editorial'],
+    ['other', 'other'],
+  ] as const)('maps raw kind %s to domain kind %s', (rawKind, domainKind) => {
+    expect(
+      mapRawNewsAuthor('source', { name: 'Источник', kind: rawKind }).kind,
+    ).toBe(domainKind);
+  });
+
   it('maps raw author short_name to domain shortName', () => {
     const raw: RawNewsAuthor = {
       name: 'ОК Комфорт',

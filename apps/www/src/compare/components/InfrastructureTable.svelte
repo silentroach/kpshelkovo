@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getAvailabilityDisplay } from './availability-status';
   import ComparisonTable from './ComparisonTable.svelte';
   import type {
     ComparisonStatus,
@@ -6,7 +7,6 @@
   } from './comparison-table.types';
   import type {
     Infrastructure,
-    AvailabilityStatus,
     RoadType,
     DrainageType,
     VideoSurveillance,
@@ -39,27 +39,6 @@
     undergroundElectricity: 'Подземная электросеть',
     adminBuilding: 'Административное здание',
     retailOrServices: 'Магазины',
-  };
-
-  // Иконки базовых статусов.
-  const icons: Record<AvailabilityStatus, string> = {
-    yes: '✓',
-    no: '✗',
-    partial: '◐',
-  };
-
-  // Цвета бейджей базовых статусов.
-  const tones: Record<AvailabilityStatus, string> = {
-    yes: 'ui-badge-success',
-    no: 'ui-badge-danger',
-    partial: 'ui-badge-warning',
-  };
-
-  // Текст базовых статусов.
-  const statusText: Record<AvailabilityStatus, string> = {
-    yes: 'Есть',
-    no: 'Нет',
-    partial: 'Частично',
   };
 
   // Отображение типов дорог.
@@ -109,17 +88,6 @@
     value: Value | undefined,
     config: Record<Value, ComparisonStatus>,
   ): ComparisonStatus => (value === undefined ? unknown : config[value]);
-
-  const getAvailabilityDisplay = (
-    value?: AvailabilityStatus,
-  ): ComparisonStatus =>
-    value === undefined
-      ? unknown
-      : {
-          icon: icons[value],
-          text: statusText[value],
-          tone: tones[value],
-        };
 
   // Подбираем отображение по конкретному ключу инфраструктуры.
   function getDisplayConfig(
