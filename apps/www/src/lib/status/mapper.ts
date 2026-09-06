@@ -140,8 +140,8 @@ export const mapRawStatusIncident = (
     {
       kind,
       service,
-      startedAt: started.at.valueOf(),
-      endedAt: ended?.at.valueOf(),
+      start: started.at.valueOf(),
+      end: ended?.at.valueOf(),
     },
     opts.now.valueOf(),
   );

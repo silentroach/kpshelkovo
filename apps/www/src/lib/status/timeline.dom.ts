@@ -403,8 +403,8 @@ const syncStatusTimelineProblemPhase = (
           {
             kind: item.kind,
             service: problemNode.service,
-            startedAt: Date.parse(item.startedIso),
-            endedAt: item.endedIso ? Date.parse(item.endedIso) : undefined,
+            start: Date.parse(item.startedIso),
+            end: item.endedIso ? Date.parse(item.endedIso) : undefined,
           },
           nowMs,
         ).phase,
@@ -416,8 +416,8 @@ const syncStatusTimelineProblemPhase = (
     {
       kind: problemNode.kind,
       service: problemNode.service,
-      startedAt: problemNode.startMs,
-      endedAt: problemNode.endMs,
+      start: problemNode.startMs,
+      end: problemNode.endMs,
     },
     nowMs,
   );
