@@ -11,6 +11,7 @@ import {
   SCHEMA,
   catalog,
   links,
+  openapi,
   schema,
 } from './discovery';
 
@@ -18,6 +19,39 @@ const root = 'https://example.com';
 let comparePublicSurfaceSlice: typeof comparePublicSurfaceSliceType &
   PublicSurfaceSlice;
 let expectSectionCatalogMatchesRegistry: typeof expectSectionCatalogMatchesRegistryType;
+
+const objectAt = (value: unknown): Record<string, unknown> => {
+  if (!value || typeof value !== 'object') {
+    throw new Error('Schema ref must point to an object');
+  }
+
+  return value as Record<string, unknown>;
+};
+
+const collectLocalRefs = (value: unknown): readonly string[] => {
+  if (Array.isArray(value)) {
+    return value.flatMap(collectLocalRefs);
+  }
+
+  if (!value || typeof value !== 'object') {
+    return [];
+  }
+
+  return Object.entries(value).flatMap(([key, entry]) =>
+    key === '$ref' && typeof entry === 'string' && entry.startsWith('#/')
+      ? [entry]
+      : collectLocalRefs(entry),
+  );
+};
+
+const resolveLocalRef = (document: unknown, ref: string): unknown =>
+  ref
+    .slice(2)
+    .split('/')
+    .reduce<unknown>((current, encoded) => {
+      const key = encoded.replace(/~1/g, '/').replace(/~0/g, '~');
+      return objectAt(current)[key];
+    }, document);
 
 beforeAll(async () => {
   ({ comparePublicSurfaceSlice } =
@@ -44,6 +78,18 @@ describe('schema', () => {
     expect(settlement).toHaveProperty('infrastructure');
     expect(settlement).toHaveProperty('distance');
     expect(settlement).toHaveProperty('rating');
+  });
+
+  it.each([
+    ['standalone schema', schema(root)],
+    ['OpenAPI document', openapi(root)],
+  ])('resolves every local ref in the %s', (_name, document) => {
+    const refs = collectLocalRefs(document);
+
+    expect(refs.length).toBeGreaterThan(0);
+    for (const ref of refs) {
+      expect(resolveLocalRef(document, ref), ref).toBeDefined();
+    }
   });
 });
 
