@@ -1,5 +1,7 @@
-import { resolveStatusServiceState } from './lifecycle';
-import type { StatusIncidentWindowInput } from './types';
+import {
+  parseStatusIncidentWindows,
+  resolveStatusServiceState,
+} from './lifecycle';
 import { formatStatusServiceState } from './service-state';
 
 declare global {
@@ -10,43 +12,6 @@ declare global {
 
 const STATUS_SERVICE_STATE_SELECTOR =
   '[data-status-service-state-label][data-status-service-incidents]';
-
-const isStatusIncidentWindow = (
-  value: unknown,
-): value is StatusIncidentWindowInput => {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    return false;
-  }
-
-  const candidate = value as Partial<StatusIncidentWindowInput>;
-
-  return (
-    (candidate.kind === 'incident' || candidate.kind === 'maintenance') &&
-    typeof candidate.startedAt === 'number' &&
-    Number.isFinite(candidate.startedAt) &&
-    (candidate.endedAt === undefined ||
-      (typeof candidate.endedAt === 'number' &&
-        Number.isFinite(candidate.endedAt)))
-  );
-};
-
-const parseStatusIncidentWindows = (
-  value?: string,
-): readonly StatusIncidentWindowInput[] | undefined => {
-  if (!value) {
-    return undefined;
-  }
-
-  try {
-    const parsed: unknown = JSON.parse(value);
-
-    return Array.isArray(parsed) && parsed.every(isStatusIncidentWindow)
-      ? parsed
-      : undefined;
-  } catch {
-    return undefined;
-  }
-};
 
 export const hydrateStatusServiceStates = (
   root: ParentNode = document,

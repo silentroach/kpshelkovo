@@ -36,8 +36,8 @@ export interface StatusIncidentPhaseInput {
 export interface StatusIncidentWindowInput {
   readonly kind: StatusKind;
   readonly service?: StatusService;
-  readonly startedAt: number;
-  readonly endedAt?: number;
+  readonly start: number;
+  readonly end?: number;
 }
 
 interface StatusIncidentBase {

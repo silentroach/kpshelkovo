@@ -165,10 +165,8 @@ const isCalendarIncidentChanging = (
   resolveStatusIncidentPhase(
     {
       kind: incident.kind,
-      startedAt: statusTimestampMs(incident.startedIso),
-      endedAt: incident.endedIso
-        ? statusTimestampMs(incident.endedIso)
-        : undefined,
+      start: statusTimestampMs(incident.startedIso),
+      end: incident.endedIso ? statusTimestampMs(incident.endedIso) : undefined,
     },
     buildNowMs,
   ) !== 'resolved';
