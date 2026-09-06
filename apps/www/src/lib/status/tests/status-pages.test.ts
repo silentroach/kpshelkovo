@@ -11,6 +11,8 @@ import { statusCalendarYearUrl, statusHistoryUrl } from '@/lib/status/routes';
 import StatusPage from '@/pages/status/index.astro';
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import StatusHistoryPage from '@/pages/status/history/index.astro';
+// @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
+import StatusIncidentPage from '@/pages/status/incidents/[year]/[month]/[entry]/index.astro';
 
 const fixtures = vi.hoisted(() => {
   const incidents = Array.from({ length: 12 }, (_, index) => {
@@ -101,6 +103,8 @@ const fixtures = vi.hoisted(() => {
 
 vi.mock('@/lib/status/load', () => ({
   loadStatusData: async () => fixtures.data,
+  loadStatusIncidentDetail: async (id: string) =>
+    fixtures.data.incidents.find((incident) => incident.id === id),
 }));
 
 const stripTags = (value: string): string => {
@@ -290,5 +294,36 @@ describe('/status/history/', () => {
         .querySelector('[data-status-history-calendar]')
         ?.getAttribute('href'),
     ).toBe(statusCalendarYearUrl({ year: data.calendar.buildYear }));
+  });
+});
+
+describe('/status/incidents/[year]/[month]/[entry]/', () => {
+  it('adds the incident date to the document title only', async () => {
+    const incident = fixtures.data.incidents.find((item) => item.hasPage);
+    if (!incident?.hasPage) {
+      throw new Error('status incident detail fixture is missing');
+    }
+
+    const container = await createAstroContainer();
+    const document = parseHtml(
+      await container.renderToString(StatusIncidentPage, {
+        params: {
+          year: String(incident.year),
+          month: String(incident.month).padStart(2, '0'),
+          entry: incident.slug,
+        },
+        request: new Request(incident.canonical),
+      }),
+    );
+
+    expect({
+      documentTitle: document.title,
+      heading: document.querySelector('h1')?.textContent.trim(),
+    }).toMatchInlineSnapshot(`
+      {
+        "documentTitle": "Тестовая запись 2, 2 августа 2026 — Шелково Онлайн",
+        "heading": "Тестовая запись 2",
+      }
+    `);
   });
 });
