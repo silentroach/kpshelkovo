@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
+import { formatPercentage, pluralize } from '@shelkovo/format';
 
 import { visibleWhitespace } from '@/lib/test/visible-whitespace';
+import { RATING_METHODOLOGY } from './rating';
 import { mapRawSettlement } from './settlement/mapper';
 import type { RawSettlement } from './settlement/schema';
 
@@ -194,57 +196,45 @@ describe('compare markdown navigation', () => {
     `);
   });
 
-  it('keeps discovery links on the markdown rating page', async () => {
+  it('uses calculation values on the markdown rating page', async () => {
     const { buildRatingMd } = await loadMarkdown();
+    const markdown = await buildRatingMd();
+    const { adjustments, availabilityScores, groupWeights, neutralBlockScore } =
+      RATING_METHODOLOGY;
+    const percent = (value: number): string =>
+      formatPercentage(value, { signed: false });
+    const distanceValues = RATING_METHODOLOGY.distancePoints.flatMap(
+      (point, index) => {
+        const previous = RATING_METHODOLOGY.distancePoints[index - 1];
 
-    await expect(buildRatingMd()).resolves.toMatchInlineSnapshot(`
-      "# Методика расчета условного рейтинга поселков
+        return previous
+          ? [
+              `\`${previous.ringKm}\` до \`${point.ringKm} км\``,
+              `\`${percent(previous.score)}\` до \`${percent(point.score)}\``,
+            ]
+          : [
+              `\`${point.ringKm} км\` за МКАД`,
+              `\`${percent(point.score)}\` своих баллов`,
+            ];
+      },
+    );
+    const lastDistancePoint = RATING_METHODOLOGY.distancePoints.at(-1)!;
+    const expected = [
+      'Главная в Markdown: <https://kpshelkovo.online/815/compare/index.md>',
+      `rating = ${RATING_METHODOLOGY.scoreRange.max} * (infra * ${groupWeights.infrastructure.toFixed(2)} + spaces * ${groupWeights.commonSpaces.toFixed(2)} + service * ${groupWeights.serviceModel.toFixed(2)} + distance * ${groupWeights.distance.toFixed(2)})`,
+      `Инфраструктура: ${percent(groupWeights.infrastructure)}`,
+      `Общественные пространства: ${percent(groupWeights.commonSpaces)}`,
+      `Сервисная модель: ${percent(groupWeights.serviceModel)}`,
+      `Близость к Москве: ${percent(groupWeights.distance)}`,
+      `\`yes = ${availabilityScores.yes}\`, \`partial = ${availabilityScores.partial}\`, \`no = ${availabilityScores.no}\``,
+      `нейтральной середине \`${neutralBlockScore}\``,
+      ...distanceValues,
+      `После \`${lastDistancePoint.ringKm} км\` блок сохраняет минимум \`${percent(lastDistancePoint.score)}\``,
+      `\`+${adjustments.waterInTariffBonus}\` к рейтингу`,
+      `\`${adjustments.rabstvoPenalty}\` ${pluralize(adjustments.rabstvoPenalty, ['пункт', 'пункта', 'пунктов'])}`,
+    ];
 
-      Текстовая версия страницы с публичным объяснением того, как считается условный уровень поселка.
-
-      ## Навигация
-
-      - Главная в Markdown: <https://kpshelkovo.online/815/compare/index.md>
-      - Полный JSON-файл: <https://kpshelkovo.online/815/compare/data/settlements.json>
-      - JSON для списка и карты: <https://kpshelkovo.online/815/compare/data/explorer.json>
-
-      ## Базовая формула
-
-      - \`rating = 100 * (infra * 0.50 + spaces * 0.25 + service * 0.10 + distance * 0.15)\`
-      - Тариф не влияет на рейтинг и исключен из формулы специально.
-
-      ## Блоки и веса
-
-      - Инфраструктура: 50%
-      - Общественные пространства: 25%
-      - Сервисная модель: 10%
-      - Близость к Москве: 15%
-
-      ## Как считаются признаки
-
-      - Для бинарных статусов используется шкала \`yes = 1\`, \`partial = 0.5\`, \`no = 0\`.
-      - Для упорядоченных признаков применяются отдельные шкалы: дороги, ливневка, видеонаблюдение и подземное электричество.
-      - Неизвестные поля не трактуются как \`no\`.
-      - Если данных мало, оценка блока тянется к нейтральной середине \`0.5\`, а не к верхней или нижней границе.
-
-      ## Дистанция
-
-      - Используется расстояние не от центра Москвы напрямую, а приблизительное расстояние за пределами МКАД.
-      - До 20 км за МКАД блок получает максимум.
-      - Дальше оценка плавно снижается по диапазонам \`20..40\`, \`40..60\`, \`60..80\`, \`80..100\`, затем фиксируется на минимуме.
-
-      ## Дополнительные корректировки
-
-      - Если центральная вода подтверждена и уже входит в тариф (\`water_in_tariff = true\`), поселок получает \`+4\` к рейтингу.
-      - Если поселок есть в канале «Коттеджное рабство» (\`rabstvo = true\`), рейтинг уменьшается на \`15\` пунктов.
-
-      ## Как читать результат
-
-      - Рейтинг — приблизительная сводная оценка подтвержденных признаков поселка, а не рыночная оценка недвижимости.
-      - Сначала смотрите на инфраструктуру, общественные пространства и сервисную модель, затем отдельно сравнивайте тариф.
-      - Полная визуальная версия с пояснениями и разделами доступна по HTML-ссылке выше.
-      "
-    `);
+    expect(expected.filter((value) => !markdown.includes(value))).toEqual([]);
   });
 
   it('keeps settlement facts and sources readable', async () => {

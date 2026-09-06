@@ -1,11 +1,6 @@
 import * as geo from '@shelkovo/geo';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import {
-  buildRatings,
-  MKAD_RADIUS,
-  RABSTVO_PENALTY,
-  WATER_BONUS,
-} from './rating';
+import { buildRatings, MKAD_RADIUS, RATING_METHODOLOGY } from './rating';
 import { mapRawSettlement } from './settlement/mapper';
 import type { RawSettlement } from './settlement/schema';
 import type { Settlement } from './settlement/types';
@@ -55,6 +50,55 @@ function mk(
 }
 
 describe('buildRatings', () => {
+  it('keeps the public numerical methodology explicit', () => {
+    expect(RATING_METHODOLOGY).toMatchInlineSnapshot(`
+      {
+        "adjustments": {
+          "rabstvoPenalty": 15,
+          "waterInTariffBonus": 4,
+        },
+        "availabilityScores": {
+          "no": 0,
+          "partial": 0.5,
+          "yes": 1,
+        },
+        "distancePoints": [
+          {
+            "ringKm": 20,
+            "score": 1,
+          },
+          {
+            "ringKm": 40,
+            "score": 0.82,
+          },
+          {
+            "ringKm": 60,
+            "score": 0.58,
+          },
+          {
+            "ringKm": 80,
+            "score": 0.32,
+          },
+          {
+            "ringKm": 100,
+            "score": 0.12,
+          },
+        ],
+        "groupWeights": {
+          "commonSpaces": 0.25,
+          "distance": 0.15,
+          "infrastructure": 0.5,
+          "serviceModel": 0.1,
+        },
+        "neutralBlockScore": 0.5,
+        "scoreRange": {
+          "max": 100,
+          "min": 0,
+        },
+      }
+    `);
+  });
+
   it('calculates distance to Moscow once per settlement', () => {
     const calculateDistance = vi.spyOn(geo, 'calculateDistance');
 
@@ -82,6 +126,39 @@ describe('buildRatings', () => {
     expect(MKAD_RADIUS).toBeLessThan(30);
     expect(near?.ring).toBeLessThan(far?.ring ?? 0);
     expect(near?.score).toBeGreaterThan(far?.score ?? 0);
+  });
+
+  it('uses every declared distance point in the calculation', () => {
+    const calculateDistance = vi.spyOn(geo, 'calculateDistance');
+
+    for (const point of RATING_METHODOLOGY.distancePoints) {
+      calculateDistance.mockReturnValueOnce(MKAD_RADIUS + point.ringKm);
+    }
+
+    const rows = buildRatings(
+      RATING_METHODOLOGY.distancePoints.map((point) =>
+        mk(`ring-${point.ringKm}`),
+      ),
+    );
+    const { groupWeights, neutralBlockScore, scoreRange } = RATING_METHODOLOGY;
+    const nonDistanceWeight =
+      groupWeights.infrastructure +
+      groupWeights.commonSpaces +
+      groupWeights.serviceModel;
+    const expected = RATING_METHODOLOGY.distancePoints.map(
+      (point) =>
+        Math.round(
+          scoreRange.max *
+            (neutralBlockScore * nonDistanceWeight +
+              point.score * groupWeights.distance) *
+            10,
+        ) / 10,
+    );
+    const actual = RATING_METHODOLOGY.distancePoints.map(
+      (point) => rows.get(`ring-${point.ringKm}`)?.score,
+    );
+
+    expect(actual).toEqual(expected);
   });
 
   it('keeps fully unknown rows between strong and weak rows', () => {
@@ -207,7 +284,10 @@ describe('buildRatings', () => {
     const base = rows.get('base')?.score ?? 0;
     const bonus = rows.get('bonus')?.score ?? 0;
 
-    expect(bonus - base).toBeCloseTo(WATER_BONUS, 6);
+    expect(bonus - base).toBeCloseTo(
+      RATING_METHODOLOGY.adjustments.waterInTariffBonus,
+      6,
+    );
   });
 
   it('applies a strong penalty for mentions in obmandachniki', () => {
@@ -232,6 +312,6 @@ describe('buildRatings', () => {
     const clean = rows.get('clean')?.score ?? 0;
     const flagged = rows.get('flagged')?.score ?? 0;
 
-    expect(clean - flagged).toBe(RABSTVO_PENALTY);
+    expect(clean - flagged).toBe(RATING_METHODOLOGY.adjustments.rabstvoPenalty);
   });
 });

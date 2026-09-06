@@ -2,9 +2,16 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import {
+  formatNumberRu,
+  formatNumberUnitRu,
+  formatPercentage,
+  pluralize,
+} from '@shelkovo/format';
+import {
   comparePageBreadcrumbs,
   compareBreadcrumbSchema,
 } from '@/compare/lib/breadcrumbs';
+import { RATING_METHODOLOGY } from '@/compare/lib/rating';
 import { compareRatingMeta } from '@/compare/lib/seo';
 import { canon } from '@/compare/lib/site';
 import { withBase } from '@/compare/lib/url';
@@ -36,11 +43,55 @@ const nav = [
 ];
 
 const weights = [
-  ['50%', 'Инфраструктура', 'Базовая инженерная и охранная среда'],
-  ['25%', 'Общественные пространства', 'Повседневный комфорт и досуг'],
-  ['10%', 'Сервисная модель', 'Насколько поселок поддерживается в порядке'],
-  ['15%', 'Близость к Москве', 'Приближенное расстояние за пределами МКАД'],
+  {
+    value: RATING_METHODOLOGY.groupWeights.infrastructure,
+    label: 'Инфраструктура',
+    formulaLabel: 'инфраструктура',
+    note: 'Базовая инженерная и охранная среда',
+  },
+  {
+    value: RATING_METHODOLOGY.groupWeights.commonSpaces,
+    label: 'Общественные пространства',
+    formulaLabel: 'общественные пространства',
+    note: 'Повседневный комфорт и досуг',
+  },
+  {
+    value: RATING_METHODOLOGY.groupWeights.serviceModel,
+    label: 'Сервисная модель',
+    formulaLabel: 'сервисная модель',
+    note: 'Насколько поселок поддерживается в порядке',
+  },
+  {
+    value: RATING_METHODOLOGY.groupWeights.distance,
+    label: 'Близость к Москве',
+    formulaLabel: 'близость к Москве',
+    note: 'Приближенное расстояние за пределами МКАД',
+  },
 ];
+
+const percentage = (value: number): string =>
+  formatPercentage(value, { signed: false });
+const points = (value: number): string =>
+  formatNumberUnitRu(value, pluralize(value, ['балл', 'балла', 'баллов']));
+const formula = `условный уровень =\n${weights
+  .map(
+    ({ value, formulaLabel }, index) =>
+      `  ${percentage(value)} ${formulaLabel}${index < weights.length - 1 ? ' +' : ''}`,
+  )
+  .join('\n')}`;
+const blockRange = `от ${RATING_METHODOLOGY.availabilityScores.no} до ${RATING_METHODOLOGY.availabilityScores.yes}`;
+const scoreRange = `от ${RATING_METHODOLOGY.scoreRange.min} до ${RATING_METHODOLOGY.scoreRange.max}`;
+const distanceRows = RATING_METHODOLOGY.distancePoints.map((point, index) => {
+  const previous = RATING_METHODOLOGY.distancePoints[index - 1];
+
+  if (!previous) {
+    return `До ${formatNumberUnitRu(point.ringKm, 'км')} за МКАД: ${percentage(point.score)} баллов блока.`;
+  }
+
+  return `От ${formatNumberRu(previous.ringKm)} до ${formatNumberUnitRu(point.ringKm, 'км')}: вклад плавно снижается с ${percentage(previous.score)} до ${percentage(point.score)}.`;
+});
+const lastDistancePoint = RATING_METHODOLOGY.distancePoints.at(-1)!;
+const distanceFloor = `После ${formatNumberUnitRu(lastDistancePoint.ringKm, 'км')}: ${percentage(lastDistancePoint.score)} баллов блока.`;
 ---
 
 <BaseLayout
@@ -95,11 +146,13 @@ const weights = [
               <p class="rating-eyebrow">Итоговая структура</p>
               <dl class="rating-weight-list">
                 {
-                  weights.map(([weight, label, note]) => (
+                  weights.map(({ value, label, note }) => (
                     <div class="rating-weight-row">
                       <dt class="rating-weight-heading">
                         <span class="rating-weight-label">{label}</span>
-                        <span class="ui-num rating-weight-value">{weight}</span>
+                        <span class="ui-num rating-weight-value">
+                          {percentage(value)}
+                        </span>
                       </dt>
                       <dd class="rating-weight-note">{note}</dd>
                     </div>
@@ -137,27 +190,25 @@ const weights = [
             <h2 class="ui-section-title">Из чего складывается цифра</h2>
             <div class="rating-formula">
               <pre
-                class="ui-num rating-formula-code"><code>условный уровень =
-  50% инфраструктура +
-  25% общественные пространства +
-  10% сервисная модель +
-  15% близость к Москве</code></pre>
+                class="ui-num rating-formula-code"><code>{formula}</code></pre>
             </div>
             <p class="ui-copy rating-copy">
-              Каждый блок переводится в шкалу от 0 до 1 и умножается на свой
-              вес. Итоговое число от 0 до 100 показывает силу поселка по текущей
-              модели оценки.
+              Каждый блок переводится в шкалу {blockRange} и умножается на свой вес.
+              Итоговое число {scoreRange} показывает силу поселка по текущей модели
+              оценки.
             </p>
             <div class="rating-grid rating-grid--weights">
               {
-                weights.map(([weight, label, note]) => (
+                weights.map(({ value, label, note }) => (
                   <div class="rating-panel rating-panel--compact">
                     <div class="rating-card-row">
                       <div>
                         <h3 class="rating-card-heading">{label}</h3>
                         <p class="rating-card-copy">{note}</p>
                       </div>
-                      <span class="ui-num rating-card-value">{weight}</span>
+                      <span class="ui-num rating-card-value">
+                        {percentage(value)}
+                      </span>
                     </div>
                   </div>
                 ))
@@ -179,7 +230,8 @@ const weights = [
               <div class="rating-callout rating-callout--success">
                 <p class="rating-eyebrow">Плюс к рейтингу</p>
                 <h3 class="rating-callout-title">
-                  +4 балла, если вода уже включена в тариф
+                  +{points(RATING_METHODOLOGY.adjustments.waterInTariffBonus)},
+                  если вода уже включена в тариф
                 </h3>
                 <p class="rating-note">
                   Бонус применяется, если подтверждено центральное
@@ -190,7 +242,8 @@ const weights = [
               <div class="rating-callout rating-callout--danger">
                 <p class="rating-eyebrow">Минус к рейтингу</p>
                 <h3 class="rating-callout-title">
-                  −15 баллов за упоминание в «Коттеджном рабстве»
+                  −{points(RATING_METHODOLOGY.adjustments.rabstvoPenalty)} за упоминание
+                  в «Коттеджном рабстве»
                 </h3>
                 <p class="rating-note">
                   Если поселок фигурирует в канале «Коттеджное рабство», модель
@@ -332,7 +385,9 @@ const weights = [
             <p class="ui-copy rating-copy">
               Для расчета берется расстояние по координатам до центра Москвы. Из
               него вычитается приблизительный радиус МКАД. Получается условное
-              расстояние «за МКАД» с весом 15%.
+              расстояние «за МКАД» с весом {
+                percentage(RATING_METHODOLOGY.groupWeights.distance)
+              }.
             </p>
             <div class="rating-panel rating-panel--roomy">
               <p class="rating-note">
@@ -340,6 +395,10 @@ const weights = [
                 итог. Влияние ограничено, чтобы дальний, но сильный поселок не
                 проигрывал только из-за расстояния.
               </p>
+              <ul class="rating-list">
+                {distanceRows.map((row) => <li>{row}</li>)}
+                <li>{distanceFloor}</li>
+              </ul>
             </div>
             <div class="rating-callout rating-callout--warning">
               <p class="rating-note">

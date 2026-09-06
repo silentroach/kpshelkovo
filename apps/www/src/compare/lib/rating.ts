@@ -44,15 +44,34 @@ export const MKAD_RADIUS = round(
   ) / MKAD.length,
 );
 
-export const WATER_BONUS = 4;
-export const RABSTVO_PENALTY = 15;
-const MID = 0.5;
+export const RATING_METHODOLOGY = {
+  scoreRange: { min: 0, max: 100 },
+  neutralBlockScore: 0.5,
+  groupWeights: {
+    infrastructure: 0.5,
+    commonSpaces: 0.25,
+    serviceModel: 0.1,
+    distance: 0.15,
+  },
+  availabilityScores: {
+    yes: 1,
+    partial: 0.5,
+    no: 0,
+  } satisfies Record<AvailabilityStatus, number>,
+  distancePoints: [
+    { ringKm: 20, score: 1 },
+    { ringKm: 40, score: 0.82 },
+    { ringKm: 60, score: 0.58 },
+    { ringKm: 80, score: 0.32 },
+    { ringKm: 100, score: 0.12 },
+  ],
+  adjustments: {
+    waterInTariffBonus: 4,
+    rabstvoPenalty: 15,
+  },
+} as const;
 
-const AVAIL = {
-  yes: 1,
-  partial: 0.5,
-  no: 0,
-} as const satisfies Record<AvailabilityStatus, number>;
+const AVAIL = RATING_METHODOLOGY.availabilityScores;
 
 const ROAD = {
   asphalt: 1,
@@ -88,9 +107,11 @@ export function getRing(lat: number, lng: number): number {
 }
 
 function tune(item: Settlement): number {
+  const { waterInTariffBonus, rabstvoPenalty } = RATING_METHODOLOGY.adjustments;
+
   return (
-    (item.waterInTariff ? WATER_BONUS : 0) -
-    (item.rabstvo ? RABSTVO_PENALTY : 0)
+    (item.waterInTariff ? waterInTariffBonus : 0) -
+    (item.rabstvo ? rabstvoPenalty : 0)
   );
 }
 
@@ -214,19 +235,31 @@ function service(item: Settlement): Group {
 }
 
 function mix(item: Group): number {
-  if (item.raw === undefined) return MID;
-  return item.raw * item.fill + MID * (1 - item.fill);
+  const neutral = RATING_METHODOLOGY.neutralBlockScore;
+  if (item.raw === undefined) return neutral;
+  return item.raw * item.fill + neutral * (1 - item.fill);
 }
 
-function near(km: number): number {
-  const ring = Math.max(km - MKAD_RADIUS, 0);
+function near(ring: number): number {
+  const points = RATING_METHODOLOGY.distancePoints;
+  let previous: (typeof points)[number] = points[0];
 
-  if (ring <= 20) return 1;
-  if (ring <= 40) return lerp(ring, 20, 40, 1, 0.82);
-  if (ring <= 60) return lerp(ring, 40, 60, 0.82, 0.58);
-  if (ring <= 80) return lerp(ring, 60, 80, 0.58, 0.32);
-  if (ring <= 100) return lerp(ring, 80, 100, 0.32, 0.12);
-  return 0.12;
+  if (ring <= previous.ringKm) return previous.score;
+
+  for (const point of points.slice(1)) {
+    if (ring <= point.ringKm) {
+      return lerp(
+        ring,
+        previous.ringKm,
+        point.ringKm,
+        previous.score,
+        point.score,
+      );
+    }
+    previous = point;
+  }
+
+  return previous.score;
 }
 
 /**
@@ -240,13 +273,17 @@ export function buildRatings(
     settlements.map((item) => {
       const km = getKm(item.location.lat, item.location.lng);
       const ring = Math.max(km - MKAD_RADIUS, 0);
+      const { groupWeights, scoreRange } = RATING_METHODOLOGY;
       const base =
-        100 *
-        (mix(infra(item)) * 0.5 +
-          mix(spaces(item)) * 0.25 +
-          mix(service(item)) * 0.1 +
-          near(km) * 0.15);
-      const score = Math.max(0, Math.min(base + tune(item), 100));
+        scoreRange.max *
+        (mix(infra(item)) * groupWeights.infrastructure +
+          mix(spaces(item)) * groupWeights.commonSpaces +
+          mix(service(item)) * groupWeights.serviceModel +
+          near(ring) * groupWeights.distance);
+      const score = Math.max(
+        scoreRange.min,
+        Math.min(base + tune(item), scoreRange.max),
+      );
 
       return [
         item.slug,
