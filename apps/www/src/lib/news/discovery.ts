@@ -3,6 +3,7 @@ import {
   type PublicSurface,
   type PublicSurfaceCatalogRole,
 } from '@/lib/public-surface';
+import { formatApiCatalogLink } from '@/lib/api-catalog-response';
 
 import { newsPublicSurfaceSlice } from './public-surface';
 import { articlesDataPath, articlesSchemaPath } from './routes';
@@ -26,7 +27,6 @@ import {
   type NewsPublicTagPage as NewsDiscoveryTagPage,
 } from './public-dto';
 
-export const PROFILE = 'https://www.rfc-editor.org/info/rfc9727';
 export const OAS = 'application/vnd.oai.openapi+json';
 
 export type {
@@ -98,7 +98,9 @@ const formatLink = (
   surface: PublicSurface,
   relation: 'api-catalog' | 'service-desc',
 ): string =>
-  `<${surfaceHref(root, surface)}>; rel="${relation}"; type="${surface.mediaType}"${relation === 'api-catalog' ? `; profile="${PROFILE}"` : ''}`;
+  relation === 'api-catalog'
+    ? formatApiCatalogLink(surfaceHref(root, surface))
+    : `<${surfaceHref(root, surface)}>; rel="service-desc"; type="${surface.mediaType}"`;
 
 const text = (minLength = 0): Record<string, unknown> => ({
   type: 'string',

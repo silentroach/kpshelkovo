@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
+import { formatApiCatalogLink } from '@/lib/api-catalog-response';
 import type { NewsArticle, NewsDataset } from './types';
 import type {
   newsPublicSurfaceSlice as newsPublicSurfaceSliceType,
@@ -16,7 +17,6 @@ let links: typeof import('./discovery').links;
 let newsPublicSurfaceSlice: typeof newsPublicSurfaceSliceType &
   PublicSurfaceSlice;
 let openapi: typeof import('./discovery').openapi;
-let PROFILE: typeof import('./discovery').PROFILE;
 let schema: typeof import('./discovery').schema;
 let self: typeof import('./discovery').self;
 let surfaceHref: typeof surfaceHrefType;
@@ -101,7 +101,7 @@ beforeAll(async () => {
     BASE_URL: '/',
   });
 
-  ({ buildNewsPayload, catalog, links, openapi, PROFILE, schema, self } =
+  ({ buildNewsPayload, catalog, links, openapi, schema, self } =
     await import('./discovery'));
   ({ expectSectionCatalogMatchesRegistry } =
     await import('@/lib/public-surface/catalog-contract.test-helper'));
@@ -133,7 +133,7 @@ describe('news discovery payload', () => {
       throw new Error('news API catalog surface is missing from the registry');
     }
 
-    const apiCatalogLink = `<${surfaceHref(root, apiCatalog)}>; rel="api-catalog"; type="${apiCatalog.mediaType}"; profile="${PROFILE}"`;
+    const apiCatalogLink = formatApiCatalogLink(surfaceHref(root, apiCatalog));
     const expected = [
       ...serviceDescriptions.map(
         (surface) =>

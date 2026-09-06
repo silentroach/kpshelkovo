@@ -1,4 +1,5 @@
 import { estimateDetails2026 } from '@/data/reglament/estimate-details-2026';
+import { formatApiCatalogLink } from '@/lib/api-catalog-response';
 
 import { calculateEstimate } from './calculate';
 import { buildPublicEstimateDetails2026Json } from './detail-json';
@@ -53,7 +54,6 @@ import {
   ESTIMATE_SOURCE_PDFS,
 } from './schema';
 
-export const PROFILE = 'https://www.rfc-editor.org/info/rfc9727';
 export const OAS = 'application/vnd.oai.openapi+json';
 
 const ESTIMATE_PAYLOAD_SCHEMA = 'Estimate2026Payload';
@@ -864,7 +864,7 @@ const discoveryLinks = (
   [
     `<${abs(root, schemaPath)}>; rel="service-desc"; type="application/schema+json"`,
     `<${abs(root, openApiPath)}>; rel="service-desc"; type="${OAS}"`,
-    `<${abs(root, reglamentApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`,
+    formatApiCatalogLink(abs(root, reglamentApiCatalogPath())),
   ].join(', ');
 
 export const links = (root: string): string =>
@@ -882,4 +882,4 @@ export const detailLinks = (root: string): string =>
   );
 
 export const self = (root: string): string =>
-  `<${abs(root, reglamentApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`;
+  formatApiCatalogLink(abs(root, reglamentApiCatalogPath()));

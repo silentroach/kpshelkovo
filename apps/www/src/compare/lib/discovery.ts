@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { formatApiCatalogLink } from '@/lib/api-catalog-response';
+
 import { ComparePublicPayloadSchema } from './public-schema';
 
 export const FEED = '/data/settlements.json';
@@ -7,7 +9,6 @@ export const EXPLORER = '/data/explorer.json';
 export const SCHEMA = '/schemas/settlements.schema.json';
 export const OPENAPI = '/openapi/settlements.openapi.json';
 export const CATALOG = '/.well-known/api-catalog';
-export const PROFILE = 'https://www.rfc-editor.org/info/rfc9727';
 export const OAS = 'application/vnd.oai.openapi+json';
 
 const PAYLOAD_COMPONENT = 'SettlementsPayload';
@@ -173,10 +174,10 @@ export function links(root: string): string {
   return [
     `<${abs(root, SCHEMA)}>; rel="service-desc"; type="application/schema+json"`,
     `<${abs(root, OPENAPI)}>; rel="service-desc"; type="${OAS}"`,
-    `<${abs(root, CATALOG)}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`,
+    formatApiCatalogLink(abs(root, CATALOG)),
   ].join(', ');
 }
 
 export function self(root: string): string {
-  return `<${abs(root, CATALOG)}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`;
+  return formatApiCatalogLink(abs(root, CATALOG));
 }

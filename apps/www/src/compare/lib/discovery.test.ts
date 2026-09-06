@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
+import { formatApiCatalogLink } from '@/lib/api-catalog-response';
 import type { comparePublicSurfaceSlice as comparePublicSurfaceSliceType } from '@/compare/lib/public-surface';
 import type { PublicSurfaceSlice } from '@/lib/public-surface';
 import type { expectSectionCatalogMatchesRegistry as expectSectionCatalogMatchesRegistryType } from '@/lib/public-surface/catalog-contract.test-helper';
@@ -130,8 +131,12 @@ describe('links', () => {
   it('emits discovery link headers for the full settlements feed', () => {
     const body = links(root);
 
-    expect(body).toMatchInlineSnapshot(
-      `"<https://example.com/schemas/settlements.schema.json>; rel="service-desc"; type="application/schema+json", <https://example.com/openapi/settlements.openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json", <https://example.com/.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"; profile="https://www.rfc-editor.org/info/rfc9727""`,
+    expect(body).toBe(
+      [
+        '<https://example.com/schemas/settlements.schema.json>; rel="service-desc"; type="application/schema+json"',
+        '<https://example.com/openapi/settlements.openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"',
+        formatApiCatalogLink('https://example.com/.well-known/api-catalog'),
+      ].join(', '),
     );
   });
 });
