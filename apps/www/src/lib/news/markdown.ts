@@ -9,6 +9,7 @@ import {
 
 import { absoluteUrl } from '../site';
 import { NEWS_LATEST_LIMIT } from './config';
+import { toNewsPublicAuthorKind } from './public-dto';
 import type {
   NewsArticle,
   NewsAttachment,
@@ -182,7 +183,7 @@ function articleFrontmatter(
     author: {
       id: article.author.id,
       name: formatNewsAuthor(article.author, { short: false }),
-      kind: article.author.kind,
+      kind: toNewsPublicAuthorKind(article.author.kind),
     },
     ...(areas.length > 0 ? { areas } : {}),
     ...(tags.length > 0 ? { tags } : {}),

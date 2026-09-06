@@ -146,6 +146,10 @@ const NEWS_PUBLIC_AUTHOR_KIND_BY_DOMAIN = {
   other: 'other',
 } as const satisfies Record<NewsAuthor['kind'], NewsPublicAuthorKind>;
 
+export const toNewsPublicAuthorKind = (
+  kind: NewsAuthor['kind'],
+): NewsPublicAuthorKind => NEWS_PUBLIC_AUTHOR_KIND_BY_DOMAIN[kind];
+
 const fullUrl = (value: string): string => absoluteUrl(value);
 
 const discoveryUrl = (value: string): string =>
@@ -154,7 +158,7 @@ const discoveryUrl = (value: string): string =>
 const toPublicAuthor = (author: NewsAuthor): NewsPublicAuthor => ({
   id: author.id,
   name: author.name,
-  kind: NEWS_PUBLIC_AUTHOR_KIND_BY_DOMAIN[author.kind],
+  kind: toNewsPublicAuthorKind(author.kind),
   url: author.url ? fullUrl(author.url) : undefined,
 });
 
