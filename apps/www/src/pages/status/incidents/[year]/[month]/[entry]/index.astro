@@ -1,6 +1,6 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import { padNumber } from '@shelkovo/format';
+import { formatDate, padNumber } from '@shelkovo/format';
 
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import StatusIncidentMeta from '@/components/status/StatusIncidentMeta.astro';
@@ -47,7 +47,7 @@ if (!incident) {
 }
 
 const bodyHtml = incident.body ? renderMarkdown(incident.body) : undefined;
-const title = `${incident.title} — Шелково Онлайн`;
+const title = `${incident.title}, ${formatDate(incident.started.iso)} — Шелково Онлайн`;
 const excerptSentence = incident.excerpt?.match(/^[^.!?]+[.!?]/u)?.[0];
 const fallbackDescription =
   (incident.excerpt && incident.excerpt.length <= 170
