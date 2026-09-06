@@ -52,7 +52,11 @@ const TariffPartSchema = z.object({
   value: z.number().nonnegative(),
   unit: TariffUnitEnum,
   period: TariffPeriodEnum,
-  note: z.string().optional(),
+  note: z
+    .string()
+    .min(1)
+    .refine((note) => note.trim().length > 0, 'note must not be blank')
+    .optional(),
 });
 
 export const TariffSchema = z
