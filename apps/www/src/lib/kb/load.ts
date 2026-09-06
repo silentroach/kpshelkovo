@@ -13,6 +13,7 @@ export type KbPageEntry = Pick<CollectionEntry<'kbPages'>, 'id' | 'body'> & {
     readonly seo?: {
       readonly description?: string;
     };
+    readonly sources?: CollectionEntry<'kbPages'>['data']['sources'];
   };
 };
 

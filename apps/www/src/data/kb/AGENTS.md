@@ -3,8 +3,11 @@
 Короткие правила для `apps/www/src/data/kb`. Подробное решение: `docs/decisions/015-markdown-first-knowledge-base.md`.
 
 - Markdown-файлы базы знаний лежат в этой папке; корень раздела — `index.md`.
-- В frontmatter разрешены `title`, опциональный `flags` и опциональный `seo.description`; поддержаны флаги `noindex` и `exclude-from-site-search`.
+- В frontmatter разрешены `title`, опциональные `flags`, `seo.description` и `sources`; поддержаны флаги `noindex` и `exclude-from-site-search`.
 - `seo.description` использовать только для HTML meta description, когда автоматическая выдержка из Markdown слишком общая, короткая или повторяется на похожих страницах.
+- `sources` - опциональный внутренний журнал фактических источников, который не публикуется в HTML, Markdown, поиске или SEO. Каждый элемент содержит публичный HTTP(S) `url` или внутренний путь сайта и `description` с кратким пояснением взятой информации.
+- Записывай все фактические источники, в том числе уже связанные в тексте, по одному объекту на URL; не добавляй ссылки для действий, навигации и связанные материалы. Порядок значения не имеет, старый корпус массово не мигрируй.
+- Не добавляй отдельные строки или абзацы вида `Источник: ...`; полезную читателю ссылку интегрируй в предложение.
 - `flags: [noindex]` не добавляет страницу в sitemap и ставит на HTML-страницу `robots: noindex, follow`.
 - `flags: [exclude-from-site-search]` исключает страницу только из внутрисайтового Pagefind-поиска; HTML остается в sitemap и доступен внешним поисковикам.
 - URL строится из пути: `index.md` дает `/kb/`, а `services/internet.md` и `services/internet/index.md` дают `/kb/services/internet/`.

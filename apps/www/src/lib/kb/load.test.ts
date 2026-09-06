@@ -21,17 +21,15 @@ const page = (input: {
   readonly title: string;
   readonly body?: string;
   readonly flags?: readonly KbPageFlag[];
+  readonly sources?: KbPageEntry['data']['sources'];
 }): KbPageEntry => ({
   id: input.id,
   body: input.body ?? '',
-  data: input.flags
-    ? {
-        title: input.title,
-        flags: input.flags,
-      }
-    : {
-        title: input.title,
-      },
+  data: {
+    title: input.title,
+    flags: input.flags,
+    sources: input.sources,
+  },
 });
 
 describe('buildKbPages', () => {
@@ -71,6 +69,23 @@ describe('buildKbPages', () => {
     expect(internetPage).not.toHaveProperty('sourceId');
     expect(internetPage).not.toHaveProperty('description');
     expect(internetPage).not.toHaveProperty('tags');
+  });
+
+  it('keeps editorial sources out of the domain page', () => {
+    const [kbPage] = buildKbPages([
+      page({
+        id: 'services/internet',
+        title: 'Интернет в поселке',
+        sources: [
+          {
+            url: 'https://example.com/internet',
+            description: 'Подтверждает доступность подключения',
+          },
+        ],
+      }),
+    ]);
+
+    expect(kbPage).not.toHaveProperty('sources');
   });
 
   it('rejects entries that resolve to the same public URL', () => {
