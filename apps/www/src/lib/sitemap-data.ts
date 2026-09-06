@@ -1,4 +1,4 @@
-import { statusIncidentUrl } from './status/routes';
+import { statusIncidentUrl } from '@/lib/status/routes';
 import {
   buildSitemapMetadataIndex,
   type SitemapMetadataIndex,
@@ -19,14 +19,16 @@ const buildSitemapMetadataIndexFromDomainData =
       kbPages,
       contacts,
     ] = await Promise.all([
-      import('./news/load').then(({ loadNewsArticles }) => loadNewsArticles()),
-      import('./status/load').then(({ loadStatusIncidents }) =>
+      import('@/lib/news/load').then(({ loadNewsArticles }) =>
+        loadNewsArticles(),
+      ),
+      import('@/lib/status/load').then(({ loadStatusIncidents }) =>
         loadStatusIncidents(),
       ),
-      import('../compare/lib/data').then(({ loadAllData }) => loadAllData()),
-      import('./meetings/load').then(({ loadMeetings }) => loadMeetings()),
-      import('./kb/load').then(({ loadKbPages }) => loadKbPages()),
-      import('./contacts/load').then(({ loadContacts }) => loadContacts()),
+      import('@/compare/lib/data').then(({ loadAllData }) => loadAllData()),
+      import('@/lib/meetings/load').then(({ loadMeetings }) => loadMeetings()),
+      import('@/lib/kb/load').then(({ loadKbPages }) => loadKbPages()),
+      import('@/lib/contacts/load').then(({ loadContacts }) => loadContacts()),
     ]);
 
     return buildSitemapMetadataIndex({

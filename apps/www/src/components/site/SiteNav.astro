@@ -1,12 +1,12 @@
 ---
 import SearchTrigger from '@/components/search/SearchTrigger.astro';
-import type { HomeStatusState } from '@/lib/home/status.types';
+import type { StatusServiceState } from '@/lib/status/schema';
 
 type SiteNavVariant = 'header' | 'mobile';
 
 interface Props {
   readonly variant?: SiteNavVariant;
-  readonly statusState: HomeStatusState;
+  readonly statusState: StatusServiceState;
   readonly statusAriaLabel: string;
   readonly ariaLabel?: string;
 }
