@@ -9,6 +9,8 @@ const snapshotDirectory = resolve(
   fileURLToPath(new URL('../../../../.cache/pagefind/', import.meta.url)),
 );
 const snapshotEntrypoint = resolve(snapshotDirectory, 'pagefind.js');
+export const PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE =
+  'import.meta.env.PAGEFIND_DEV_SNAPSHOT_AVAILABLE';
 const contentTypes: Readonly<Record<string, string>> = {
   '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -26,7 +28,7 @@ export const pagefindDevSnapshot = (): AstroIntegration => {
         updateConfig({
           vite: {
             define: {
-              'import.meta.env.PAGEFIND_DEV_SNAPSHOT_AVAILABLE': JSON.stringify(
+              [PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE]: JSON.stringify(
                 command === 'dev' && snapshotAvailable,
               ),
             },

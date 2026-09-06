@@ -14,3 +14,7 @@ interface Window {
 declare module 'virtual:settlements-explorer-assets' {
   export const explorerGraphUrl: string;
 }
+
+declare module 'virtual:search-dialog-assets' {
+  export const searchDialogGraphUrl: string;
+}

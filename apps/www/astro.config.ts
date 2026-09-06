@@ -14,6 +14,7 @@ import { loadSitemapMetadataIndex } from './src/lib/sitemap-data';
 import { createAstroMarkdownProcessor } from './src/lib/markdown/astro-processor';
 import { indexNowUrlManifest } from './src/integrations/indexnow-url-manifest';
 import { pagefindDevSnapshot } from './src/integrations/pagefind-dev-snapshot';
+import { retryableSearchDialog } from './src/integrations/retryable-search-dialog';
 import { retryableSettlementsExplorer } from './src/integrations/retryable-settlements-explorer';
 import { statusCalendarAlternateValidation } from './src/integrations/status-calendar-alternate-validation';
 
@@ -82,7 +83,7 @@ export default defineConfig({
     server: {
       strictPort: true,
     },
-    plugins: retryableSettlementsExplorer(),
+    plugins: [...retryableSearchDialog(), ...retryableSettlementsExplorer()],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),

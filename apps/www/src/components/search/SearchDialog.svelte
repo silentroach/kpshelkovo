@@ -310,7 +310,7 @@
     dialogElement
       ? [
           ...dialogElement.querySelectorAll<HTMLElement>(
-            'a[href], button:not([disabled]), input:not([disabled])',
+            'a[href], button:not([disabled]):not([data-search-retry]), input:not([disabled])',
           ),
         ]
       : [];
@@ -574,6 +574,19 @@
       </button>
     </div>
 
+    <div class="action-row search-load-status" hidden data-search-load-status>
+      <p class="action-message" data-search-load-message></p>
+      <button
+        type="button"
+        class="ui-btn ui-btn-sm ui-btn-ghost retry-button"
+        hidden
+        disabled
+        data-search-retry
+      >
+        Повторить
+      </button>
+    </div>
+
     {#if viewState !== 'initial'}
       <div
         bind:this={resultsElement}
@@ -689,7 +702,13 @@
     {/if}
   </div>
 
-  <p class="visually-hidden" aria-live="polite" aria-atomic="true">
+  <p
+    class="visually-hidden"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+    data-search-load-announcement
+  >
     {announcement}
   </p>
 </dialog>
@@ -737,6 +756,14 @@
     justify-content: space-between;
     gap: 1rem;
     padding: 0.75rem 1rem;
+  }
+
+  .search-load-status {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .search-load-status[hidden] {
+    display: none;
   }
 
   .action-message {
