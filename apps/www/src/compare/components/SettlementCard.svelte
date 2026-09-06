@@ -1,6 +1,5 @@
 <script lang="ts">
   import { formatCurrency, formatTariff } from '@shelkovo/format';
-  import Link from '@shelkovo/ui/Link.svelte';
   import type { ExplorerSettlement } from '../lib/explorer';
   import type { ComparisonResult } from '../lib/settlement/types';
   import { withBase } from '../lib/url';
@@ -31,12 +30,9 @@
   <div class="settlement-header">
     <div class="settlement-identity">
       <h3 class="settlement-title">
-        <Link
-          href={withBase(`settlements/${settlement.slug}/`)}
-          class="ui-link"
-        >
+        <a href={withBase(`settlements/${settlement.slug}/`)} class="ui-link">
           {settlement.shortName}
-        </Link>
+        </a>
       </h3>
       <p class="settlement-location">
         {settlement.location.district}

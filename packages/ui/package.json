@@ -4,8 +4,6 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest",
     "test:visual:icons": "playwright test -c playwright.icons-visual.local.config.ts",
     "test:visual:icons:update": "playwright test -c playwright.icons-visual.local.config.ts --update-snapshots",
     "test:visual:icons:serve": "astro build --root tests/icons-visual && ASTRO_PREVIEW_BACKGROUND=0 astro preview --root tests/icons-visual --host 127.0.0.1 --port 4328",
@@ -52,7 +50,6 @@
     "./markers/Foodtruck.png": "./src/markers/Foodtruck.png",
     "./markers/Kpp.png": "./src/markers/Kpp.png",
     "./markers/Titanic.png": "./src/markers/Titanic.png",
-    "./Link.svelte": "./src/Link.svelte",
     "./SiteFooter.astro": "./src/SiteFooter.astro",
     "./standalone-error.css": "./standalone-error.css",
     "./icons/system/Domyland.astro": "./src/icons/system/Domyland.astro",
