@@ -7,14 +7,6 @@ export { isAbsoluteUrl };
 export const NEWS_AREAS = AREAS;
 export type NewsArea = Area;
 
-export const NEWS_AUTHOR_KINDS = [
-  'official',
-  'community',
-  'editorial',
-  'other',
-] as const;
-export type NewsAuthorKind = (typeof NEWS_AUTHOR_KINDS)[number];
-
 const SPACE = /\s+/g;
 
 export const normalizeTagLabel = (tag: string): string =>
