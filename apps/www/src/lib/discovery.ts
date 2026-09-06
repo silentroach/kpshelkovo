@@ -1,11 +1,10 @@
 import { siteApiCatalogUrl } from './llms';
+import { formatApiCatalogLink } from './api-catalog-response';
 import {
   publicSurfaceRegistry,
   surfaceHref,
   type PublicSurface,
 } from './public-surface';
-
-export const PROFILE = 'https://www.rfc-editor.org/info/rfc9727';
 
 const full = (root: string, path: string): string =>
   new URL(path, `${root}/`).toString();
@@ -64,4 +63,4 @@ export function catalog(root: string): Record<string, unknown> {
 }
 
 export const self = (root: string): string =>
-  `<${full(root, siteApiCatalogUrl())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`;
+  formatApiCatalogLink(full(root, siteApiCatalogUrl()));

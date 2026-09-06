@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
+import { formatApiCatalogLink } from './api-catalog-response';
 import { publicSurfaceRegistry, surfaceHref } from './public-surface';
 
 vi.mock('./llms', () => ({
@@ -166,7 +167,7 @@ describe('root api catalog', () => {
     );
 
     expect(self(root)).toBe(
-      '<https://example.com/sub/.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"; profile="https://www.rfc-editor.org/info/rfc9727"',
+      formatApiCatalogLink('https://example.com/sub/.well-known/api-catalog'),
     );
   });
 });

@@ -1,4 +1,5 @@
 import { absoluteUrl } from '../site';
+import { formatApiCatalogLink } from '../api-catalog-response';
 import {
   statusApiCatalogPath,
   statusDataPath,
@@ -27,7 +28,6 @@ export type {
   StatusPublicServiceSummaryDto as StatusDiscoveryServiceSummary,
 } from './public-dto';
 
-export const PROFILE = 'https://www.rfc-editor.org/info/rfc9727';
 export const OAS = 'application/vnd.oai.openapi+json';
 
 const STATUS_PAYLOAD_SCHEMA = 'StatusPayload';
@@ -407,8 +407,8 @@ export const links = (root: string): string =>
   [
     `<${abs(root, statusSchemaPath())}>; rel="service-desc"; type="application/schema+json"`,
     `<${abs(root, statusOpenApiPath())}>; rel="service-desc"; type="${OAS}"`,
-    `<${abs(root, statusApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`,
+    formatApiCatalogLink(abs(root, statusApiCatalogPath())),
   ].join(', ');
 
 export const self = (root: string): string =>
-  `<${abs(root, statusApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`;
+  formatApiCatalogLink(abs(root, statusApiCatalogPath()));

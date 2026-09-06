@@ -7,6 +7,7 @@ export {
   type PeoplePublicPayloadDto as PeopleDiscoveryPayload,
   type PeoplePublicProfileDto as PeopleDiscoveryProfile,
 } from './public-dto';
+import { formatApiCatalogLink } from '@/lib/api-catalog-response';
 import { PERSON_BACKLINK_KINDS, PERSON_MENTION_SECTIONS } from './schema';
 import { ENTITY_MENTION_TYPES } from '@/lib/mentions';
 import {
@@ -19,7 +20,6 @@ import {
   peopleSchemaPath,
 } from './routes';
 
-export const PROFILE = 'https://www.rfc-editor.org/info/rfc9727';
 export const OAS = 'application/vnd.oai.openapi+json';
 
 const PEOPLE_PAYLOAD_SCHEMA = 'PeoplePayload';
@@ -355,8 +355,8 @@ export const links = (root: string): string =>
   [
     `<${abs(root, peopleSchemaPath())}>; rel="service-desc"; type="application/schema+json"`,
     `<${abs(root, peopleOpenApiPath())}>; rel="service-desc"; type="${OAS}"`,
-    `<${abs(root, peopleApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`,
+    formatApiCatalogLink(abs(root, peopleApiCatalogPath())),
   ].join(', ');
 
 export const self = (root: string): string =>
-  `<${abs(root, peopleApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"; profile="${PROFILE}"`;
+  formatApiCatalogLink(abs(root, peopleApiCatalogPath()));
