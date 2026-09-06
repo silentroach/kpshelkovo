@@ -8,6 +8,7 @@ import {
 import { formatDate } from '@shelkovo/format';
 
 import { absoluteUrl } from '../site';
+import { isActiveOrScheduledMaintenance } from './lifecycle';
 import type { StatusMonthJournal } from './journal.types';
 import type {
   StatusCalendarMonthGrid,
@@ -233,21 +234,11 @@ const serviceLine = (summary: StatusServiceSummary): MarkdownListItem => {
   ]);
 };
 
-export function buildStatusHomeMarkdown(
-  data: StatusDataset,
-  opts?: {
-    readonly now?: Date;
-  },
-): string {
-  const now = opts?.now ?? new Date();
+export function buildStatusHomeMarkdown(data: StatusDataset): string {
   const activeIncidents = data.active.filter(
     (item) => item.kind === 'incident',
   );
-  const plannedWorks = data.incidents.filter(
-    (item) =>
-      item.kind === 'maintenance' &&
-      (item.phase === 'active' || item.started.at.valueOf() > now.valueOf()),
-  );
+  const plannedWorks = data.incidents.filter(isActiveOrScheduledMaintenance);
 
   return serialize([
     md.heading(1, 'Статус КП Шелково'),
@@ -280,17 +271,9 @@ export function buildStatusHomeMarkdown(
 
 export function buildStatusServiceMarkdown(
   summary: StatusServiceSummary,
-  opts?: {
-    readonly now?: Date;
-  },
 ): string {
-  const now = opts?.now ?? new Date();
   const latest = summary.incidents[0];
-  const plannedWorks = summary.incidents.filter(
-    (item) =>
-      item.kind === 'maintenance' &&
-      (item.phase === 'active' || item.started.at.valueOf() > now.valueOf()),
-  );
+  const plannedWorks = summary.incidents.filter(isActiveOrScheduledMaintenance);
   const serviceLabel = formatStatusService(summary.service);
 
   return serialize([

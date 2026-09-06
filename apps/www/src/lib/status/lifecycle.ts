@@ -91,6 +91,10 @@ export const getStatusServiceState = (
     : 'green';
 };
 
+export const isActiveOrScheduledMaintenance = (
+  incident: StatusIncidentServiceStateInput,
+): boolean => incident.kind === 'maintenance' && incident.phase !== 'resolved';
+
 export const resolveStatusServiceState = (
   incidents: readonly StatusIncidentWindowInput[],
   nowMs: number,

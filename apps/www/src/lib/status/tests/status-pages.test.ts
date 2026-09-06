@@ -51,6 +51,30 @@ const fixtures = vi.hoisted(() => {
           canonical: `https://example.com/status/incidents/2026/08/${slug}/`,
         };
   });
+  const maintenanceStarted = new Date('2026-08-20T10:00:00+03:00');
+  const scheduledMaintenance = {
+    id: '2026/08/dam-maintenance',
+    title: 'Плановые работы на дамбе',
+    service: 'dam' as const,
+    kind: 'maintenance' as const,
+    year: 2026,
+    month: 8,
+    slug: 'dam-maintenance',
+    started: {
+      at: maintenanceStarted,
+      iso: '2026-08-20T10:00:00+03:00',
+      hasTime: true,
+    },
+    phase: 'scheduled' as const,
+    appliesToAllAreas: true,
+    areas: [],
+    body: '',
+    mentions: [],
+    sortStartedAt: maintenanceStarted.valueOf(),
+    sortLastChangeAt: maintenanceStarted.valueOf(),
+    hasPage: false as const,
+  };
+  const allIncidents = [scheduledMaintenance, ...incidents];
   const service = {
     service: 'electricity' as const,
     serviceStatus: 'green' as const,
@@ -62,7 +86,7 @@ const fixtures = vi.hoisted(() => {
 
   return {
     data: {
-      incidents,
+      incidents: allIncidents,
       active: [],
       services: [service],
       calendar: {
@@ -71,6 +95,7 @@ const fixtures = vi.hoisted(() => {
       byId: new Map(),
       byService: new Map([['electricity', service]]),
     },
+    scheduledMaintenance,
   };
 });
 
@@ -157,6 +182,25 @@ describe('/status/', () => {
       history?.querySelector(`a[href="${statusHistoryUrl()}"]`),
     ).not.toBeNull();
     expectItemListMatchesHistory(document);
+  });
+
+  it('keeps snapshot-scheduled maintenance at the start boundary', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(fixtures.scheduledMaintenance.started.at);
+
+    try {
+      const container = await createAstroContainer();
+      const document = parseHtml(await container.renderToString(StatusPage));
+      const heading = [...document.querySelectorAll('h2')].find(
+        (item) => item.textContent.trim() === 'Плановые работы',
+      );
+
+      expect(heading?.closest('section')?.textContent).toContain(
+        fixtures.scheduledMaintenance.title,
+      );
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('links the current Moscow year calendar from the page header', async () => {
