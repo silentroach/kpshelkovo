@@ -7,4 +7,6 @@ position: Руководитель
 contacts:
   - type: telegram
     value: 'Ykizilov'
+  - type: phone
+    value: '+7 (926) 769-85-91'
 ---
