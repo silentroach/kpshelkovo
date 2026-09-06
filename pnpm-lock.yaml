@@ -114,9 +114,6 @@ importers:
       '@yandex/ymaps3-clusterer':
         specifier: ^0.0.12
         version: 0.0.12
-      ajv-formats:
-        specifier: ^3.0.1
-        version: 3.0.1(ajv@8.20.0)
       astro:
         specifier: ^7.2.10
         version: 7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.4.0)(yaml@2.9.0)

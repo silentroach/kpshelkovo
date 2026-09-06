@@ -1,17 +1,7 @@
-import addFormats from 'ajv-formats';
 import { z } from 'zod';
 
 const NonEmptyTextSchema = z.string().min(1).meta({ id: 'text' });
-const uriFormat = addFormats.get('uri', 'full');
-
-if (typeof uriFormat !== 'function') {
-  throw new Error('ajv-formats did not provide the full URI validator');
-}
-
-const UriSchema = z
-  .string()
-  .refine(uriFormat, 'Invalid URI')
-  .meta({ id: 'uri', format: 'uri' });
+const UriSchema = z.url().meta({ id: 'uri' });
 
 const AvailabilitySchema = z
   .enum(['yes', 'no', 'partial'])
