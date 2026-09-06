@@ -1,5 +1,7 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
+import { RATING_METHODOLOGY } from './rating';
+
 vi.mock('./data', () => ({
   loadAllData: async () => {
     const settlements = [
@@ -80,5 +82,8 @@ describe('compare llms', () => {
       settlementUrl('greenwood'),
       absolute(routes.compareRatingPath()),
     ]);
+    expect(document).toContain(
+      `число \`${RATING_METHODOLOGY.scoreRange.min}..${RATING_METHODOLOGY.scoreRange.max}\``,
+    );
   });
 });

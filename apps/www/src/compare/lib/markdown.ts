@@ -15,6 +15,7 @@ import {
   formatNumberRu,
   formatPercentage,
   formatTariff,
+  pluralize,
 } from '@shelkovo/format';
 import { calculateDistance } from '@shelkovo/geo';
 
@@ -24,7 +25,7 @@ import {
   formatTariffOriginal,
   hasNonSotkaUnit,
 } from './format';
-import type { Rating } from './rating';
+import { RATING_METHODOLOGY, type Rating } from './rating';
 import type {
   AvailabilityStatus,
   ComparisonResult,
@@ -111,6 +112,9 @@ const num = (value: number): string =>
     minimumFractionDigits: Number.isInteger(value) ? 0 : 1,
     maximumFractionDigits: 1,
   });
+
+const formatRating = (value: number): string =>
+  `${num(value)}/${RATING_METHODOLOGY.scoreRange.max}`;
 
 function lots(item: Settlement): readonly MarkdownListItem[] {
   if (!item.lots) return [];
@@ -263,7 +267,7 @@ const settlementLine = (item: {
     md.paragraph([
       md.link(abs(`/settlements/${item.slug}/index.md`), item.name),
       md.text(
-        ` — тариф ${formatTariffAuto(item.tariff)}; рейтинг ${num(item.rating)}/100; ${item.location.district}`,
+        ` — тариф ${formatTariffAuto(item.tariff)}; рейтинг ${formatRating(item.rating)}; ${item.location.district}`,
       ),
     ]),
   ]);
@@ -283,6 +287,33 @@ function baselineRow(
 
 const codeListItem = (value: string): MarkdownListItem =>
   md.listItem(parseMarkdownFragment(value) as MarkdownListItemInput);
+
+const methodologyPercent = (value: number): string =>
+  formatPercentage(value, { signed: false });
+
+function ratingDistanceRows(): readonly MarkdownListItem[] {
+  const rows = RATING_METHODOLOGY.distancePoints.map((point, index) => {
+    const previous = RATING_METHODOLOGY.distancePoints[index - 1];
+
+    if (!previous) {
+      return codeListItem(
+        `До \`${point.ringKm} км\` за МКАД блок получает \`${methodologyPercent(point.score)}\` своих баллов.`,
+      );
+    }
+
+    return codeListItem(
+      `От \`${previous.ringKm}\` до \`${point.ringKm} км\` вклад блока плавно снижается с \`${methodologyPercent(previous.score)}\` до \`${methodologyPercent(point.score)}\`.`,
+    );
+  });
+  const lastPoint = RATING_METHODOLOGY.distancePoints.at(-1)!;
+
+  return [
+    ...rows,
+    codeListItem(
+      `После \`${lastPoint.ringKm} км\` блок сохраняет минимум \`${methodologyPercent(lastPoint.score)}\`.`,
+    ),
+  ];
+}
 
 export async function buildHomeMd(): Promise<string> {
   const { settlements, baseline, stats, ratings } = await loadAllData();
@@ -345,6 +376,15 @@ export async function buildHomeMd(): Promise<string> {
 }
 
 export async function buildRatingMd(): Promise<string> {
+  const {
+    adjustments,
+    availabilityScores,
+    groupWeights,
+    neutralBlockScore,
+    scoreRange,
+  } = RATING_METHODOLOGY;
+  const formula = `rating = ${scoreRange.max} * (infra * ${groupWeights.infrastructure} + spaces * ${groupWeights.commonSpaces} + service * ${groupWeights.serviceModel} + distance * ${groupWeights.distance})`;
+
   return serialize([
     md.heading(1, 'Методика расчета условного рейтинга поселков'),
     md.paragraph(
@@ -353,31 +393,37 @@ export async function buildRatingMd(): Promise<string> {
     ...nav('rating'),
     md.heading(2, 'Базовая формула'),
     md.list([
-      codeListItem(
-        '`rating = 100 * (infra * 0.50 + spaces * 0.25 + service * 0.10 + distance * 0.15)`',
-      ),
+      codeListItem(`\`${formula}\``),
       md.listItem(
         'Тариф не влияет на рейтинг и исключен из формулы специально.',
       ),
     ]),
     md.heading(2, 'Блоки и веса'),
     md.list([
-      md.listItem('Инфраструктура: 50%'),
-      md.listItem('Общественные пространства: 25%'),
-      md.listItem('Сервисная модель: 10%'),
-      md.listItem('Близость к Москве: 15%'),
+      md.listItem(
+        `Инфраструктура: ${methodologyPercent(groupWeights.infrastructure)}`,
+      ),
+      md.listItem(
+        `Общественные пространства: ${methodologyPercent(groupWeights.commonSpaces)}`,
+      ),
+      md.listItem(
+        `Сервисная модель: ${methodologyPercent(groupWeights.serviceModel)}`,
+      ),
+      md.listItem(
+        `Близость к Москве: ${methodologyPercent(groupWeights.distance)}`,
+      ),
     ]),
     md.heading(2, 'Как считаются признаки'),
     md.list([
       codeListItem(
-        'Для бинарных статусов используется шкала `yes = 1`, `partial = 0.5`, `no = 0`.',
+        `Для бинарных статусов используется шкала \`yes = ${availabilityScores.yes}\`, \`partial = ${availabilityScores.partial}\`, \`no = ${availabilityScores.no}\`.`,
       ),
       md.listItem(
         'Для упорядоченных признаков применяются отдельные шкалы: дороги, ливневка, видеонаблюдение и подземное электричество.',
       ),
       codeListItem('Неизвестные поля не трактуются как `no`.'),
       codeListItem(
-        'Если данных мало, оценка блока тянется к нейтральной середине `0.5`, а не к верхней или нижней границе.',
+        `Если данных мало, оценка блока тянется к нейтральной середине \`${neutralBlockScore}\`, а не к верхней или нижней границе.`,
       ),
     ]),
     md.heading(2, 'Дистанция'),
@@ -385,18 +431,15 @@ export async function buildRatingMd(): Promise<string> {
       md.listItem(
         'Используется расстояние не от центра Москвы напрямую, а приблизительное расстояние за пределами МКАД.',
       ),
-      md.listItem('До 20 км за МКАД блок получает максимум.'),
-      codeListItem(
-        'Дальше оценка плавно снижается по диапазонам `20..40`, `40..60`, `60..80`, `80..100`, затем фиксируется на минимуме.',
-      ),
+      ...ratingDistanceRows(),
     ]),
     md.heading(2, 'Дополнительные корректировки'),
     md.list([
       codeListItem(
-        'Если центральная вода подтверждена и уже входит в тариф (`water_in_tariff = true`), поселок получает `+4` к рейтингу.',
+        `Если центральная вода подтверждена и уже входит в тариф (\`water_in_tariff = true\`), поселок получает \`+${adjustments.waterInTariffBonus}\` к рейтингу.`,
       ),
       codeListItem(
-        'Если поселок есть в канале «Коттеджное рабство» (`rabstvo = true`), рейтинг уменьшается на `15` пунктов.',
+        `Если поселок есть в канале «Коттеджное рабство» (\`rabstvo = true\`), рейтинг уменьшается на \`${adjustments.rabstvoPenalty}\` ${pluralize(adjustments.rabstvoPenalty, ['пункт', 'пункта', 'пунктов'])}.`,
       ),
     ]),
     md.heading(2, 'Как читать результат'),
@@ -446,7 +489,7 @@ export function buildSettlementMd({
     company && company.url
       ? [md.text(`${company.title} — `), linkTo(company.url)]
       : company?.title;
-  const score = rating ? `${num(rating.score)}/100` : undefined;
+  const score = rating ? formatRating(rating.score) : undefined;
 
   return serialize([
     md.heading(1, settlement.name),

@@ -17,6 +17,7 @@ import {
   compareSettlementsDataPath,
   compareSkillsPath,
 } from './public-surface';
+import { RATING_METHODOLOGY } from './rating';
 import { canon } from './site';
 import type { Settlement } from './settlement/types';
 import { withBase } from './url';
@@ -125,7 +126,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
             markdownList([
               'Это основная структурированная лента для массового анализа поселков.',
               'Структура `settlements[]` включает подтвержденные поля карточки поселка: `name`, `short_name`, `slug`, `website`, `telegram`, `management_company`, полный `location`, полный `tariff`, необязательный блок `lots`, `water_in_tariff`, `rabstvo`, `infrastructure`, `common_spaces`, `service_model`, вычисленное поле `rating` и объект `distance` с `moscow_km`, `mkad_km`, `shelkovo_km`.',
-              'Поле `rating` сериализуется как число `0..100` и служит техническим прокси качества среды для сортировки и сравнения.',
+              `Поле \`rating\` сериализуется как число \`${RATING_METHODOLOGY.scoreRange.min}..${RATING_METHODOLOGY.scoreRange.max}\` и служит техническим прокси качества среды для сортировки и сравнения.`,
               'Объект `comparisons` индексируется по `slug` и содержит `tariffDelta`, `tariffDeltaPercent` и `isCheaper` относительно базового поселка Шелково.',
               'Объект `stats` содержит агрегированные показатели по тарифам, отдельную peer-медиану для рейтинговой группы Шелково и общее число поселков.',
               'Список первоисточников `sources` в общую ленту не включен; за ним нужно идти на детальную страницу поселка.',

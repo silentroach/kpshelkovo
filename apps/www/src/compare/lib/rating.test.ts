@@ -1,11 +1,6 @@
 import * as geo from '@shelkovo/geo';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import {
-  buildRatings,
-  MKAD_RADIUS,
-  RABSTVO_PENALTY,
-  WATER_BONUS,
-} from './rating';
+import { buildRatings, MKAD_RADIUS, RATING_METHODOLOGY } from './rating';
 import { mapRawSettlement } from './settlement/mapper';
 import type { RawSettlement } from './settlement/schema';
 import type { Settlement } from './settlement/types';
@@ -54,7 +49,72 @@ function mk(
   } satisfies RawSettlement);
 }
 
+function completeRatingFields(
+  level: 'high' | 'low',
+): Pick<RawSettlement, 'infrastructure' | 'common_spaces' | 'service_model'> {
+  const high = level === 'high';
+  const availability = high ? 'yes' : 'no';
+
+  return {
+    infrastructure: {
+      roads: high ? 'asphalt' : 'dirt',
+      sidewalks: availability,
+      lighting: availability,
+      gas: availability,
+      water: availability,
+      sewage: availability,
+      drainage: high ? 'closed' : 'none',
+      checkpoints: availability,
+      security: availability,
+      fencing: availability,
+      video_surveillance: high ? 'full' : 'none',
+      underground_electricity: high ? 'full' : 'none',
+      admin_building: availability,
+      retail_or_services: availability,
+    },
+    common_spaces: {
+      club_infrastructure: availability,
+      playgrounds: availability,
+      sports: availability,
+      walking_routes: availability,
+      water_access: availability,
+      beach_zones: availability,
+      bbq_zones: availability,
+      pool: availability,
+      fitness_club: availability,
+      restaurant: availability,
+      spa_center: availability,
+      kids_club: availability,
+      sports_camp: availability,
+      primary_school: availability,
+    },
+    service_model: {
+      garbage_collection: availability,
+      snow_removal: availability,
+      road_cleaning: availability,
+      landscaping: availability,
+      emergency_service: availability,
+      dispatcher: availability,
+    },
+  };
+}
+
 describe('buildRatings', () => {
+  it('keeps group weights normalized and distance points ordered', () => {
+    const groupWeightTotal = Object.values(
+      RATING_METHODOLOGY.groupWeights,
+    ).reduce((sum, weight) => sum + weight, 0);
+    const distancePointsAreOrdered = RATING_METHODOLOGY.distancePoints.every(
+      (point, index, points) => {
+        const previous = points[index - 1];
+        return !previous || point.ringKm > previous.ringKm;
+      },
+    );
+
+    expect(groupWeightTotal).toBe(1);
+    expect(distancePointsAreOrdered).toBe(true);
+  });
+
   it('calculates distance to Moscow once per settlement', () => {
     const calculateDistance = vi.spyOn(geo, 'calculateDistance');
 
@@ -82,6 +142,42 @@ describe('buildRatings', () => {
     expect(MKAD_RADIUS).toBeLessThan(30);
     expect(near?.ring).toBeLessThan(far?.ring ?? 0);
     expect(near?.score).toBeGreaterThan(far?.score ?? 0);
+  });
+
+  it('interpolates distance, keeps its floor, and clamps final scores', () => {
+    const calculateDistance = vi.spyOn(geo, 'calculateDistance');
+
+    calculateDistance
+      .mockReturnValueOnce(MKAD_RADIUS + 50)
+      .mockReturnValueOnce(MKAD_RADIUS + 140)
+      .mockReturnValueOnce(MKAD_RADIUS)
+      .mockReturnValueOnce(MKAD_RADIUS + 140);
+
+    const rows = buildRatings([
+      mk('interpolated'),
+      mk('floor'),
+      mk('maximum', {
+        ...completeRatingFields('high'),
+        water_in_tariff: true,
+      }),
+      mk('minimum', {
+        ...completeRatingFields('low'),
+        rabstvo: true,
+      }),
+    ]);
+
+    expect(
+      ['interpolated', 'floor', 'maximum', 'minimum'].map(
+        (slug) => rows.get(slug)?.score,
+      ),
+    ).toMatchInlineSnapshot(`
+      [
+        53,
+        44.3,
+        100,
+        0,
+      ]
+    `);
   });
 
   it('keeps fully unknown rows between strong and weak rows', () => {
@@ -207,7 +303,10 @@ describe('buildRatings', () => {
     const base = rows.get('base')?.score ?? 0;
     const bonus = rows.get('bonus')?.score ?? 0;
 
-    expect(bonus - base).toBeCloseTo(WATER_BONUS, 6);
+    expect(bonus - base).toBeCloseTo(
+      RATING_METHODOLOGY.adjustments.waterInTariffBonus,
+      6,
+    );
   });
 
   it('applies a strong penalty for mentions in obmandachniki', () => {
@@ -232,6 +331,6 @@ describe('buildRatings', () => {
     const clean = rows.get('clean')?.score ?? 0;
     const flagged = rows.get('flagged')?.score ?? 0;
 
-    expect(clean - flagged).toBe(RABSTVO_PENALTY);
+    expect(clean - flagged).toBe(RATING_METHODOLOGY.adjustments.rabstvoPenalty);
   });
 });

@@ -9,11 +9,23 @@ Internal note for the settlement rating in `/815/compare/` within `apps/www`. Th
 - Tariff is excluded on purpose.
 - Score is a quality proxy, not an absolute real-estate ranking.
 
+## Numerical Source Of Truth
+
+All exact weights, scales, distance thresholds, score limits, bonuses, and penalties live in `RATING_METHODOLOGY` and the calculation in `apps/www/src/compare/lib/rating.ts`.
+
+Public explanations consume those values at build time:
+
+- HTML: `apps/www/src/pages/815/compare/rating.astro`
+- generated Markdown: `apps/www/src/compare/lib/markdown.ts`
+- published methodology: <https://kpshelkovo.online/815/compare/rating/>
+
+Do not copy the current numerical values into this document. Change them in `rating.ts`; update this note only when the meaning, inputs, or maintenance rules change.
+
 ## Output
 
 - One computed number per settlement: `rating`.
 - Stored as `score` in `apps/www/src/compare/lib/rating.ts`, serialized as `rating` in explorer DTO.
-- Rounded to 0.1, range `0..100`.
+- Rounded to one decimal and clamped to the range declared by `RATING_METHODOLOGY`.
 
 ## Inputs
 
@@ -27,84 +39,35 @@ Do not add tariff into this formula.
 
 ## Distance Block
 
-- Moscow center is fixed at `55.7558, 37.6176`.
-- `MKAD_RADIUS` is an internal approximation from a small hardcoded set of MKAD sample points.
-- `km` = haversine distance from settlement to Moscow center.
-- `ring` = `max(km - MKAD_RADIUS, 0)`.
-- Distance score uses `ring`, not raw `km`, because the intent is “how far beyond MKAD”.
-
-Current piecewise function:
-
-- `0..20 km` beyond MKAD -> `1.00`
-- `20..40 km` -> linear `1.00..0.82`
-- `40..60 km` -> linear `0.82..0.58`
-- `60..80 km` -> linear `0.58..0.32`
-- `80..100 km` -> linear `0.32..0.12`
-- `100+ km` -> `0.12`
+- The calculation estimates the MKAD radius from a small fixed set of sample points.
+- `km` is the haversine distance from the settlement to the Moscow center.
+- `ring` is the distance beyond the estimated MKAD radius, never below zero.
+- The distance score uses `ring`, not raw `km`, because the intent is “how far beyond MKAD”.
+- Between the declared distance points, the score changes linearly and stays at the final floor beyond the last point.
 
 This is intentionally soft. Distance matters, but should not dominate basic settlement quality.
 
 ## Field Mapping
 
-Binary status:
+Binary statuses and ordered enums map confirmed field values to block scores. The exact mappings remain beside the calculation in `rating.ts`.
 
-- `yes = 1`
-- `partial = 0.5`
-- `no = 0`
+Ordered enums cover:
 
-Ordered enums:
-
-- `roads`: `asphalt = 1`, `partial_asphalt = 0.75`, `gravel = 0.35`, `dirt = 0`
-- `drainage`: `closed = 1`, `open = 0.6`, `none = 0`
-- `video_surveillance`: `full = 1`, `checkpoint_only = 0.55`, `none = 0`
-- `underground_electricity`: `full = 1`, `partial = 0.5`, `none = 0`
+- roads
+- drainage
+- video surveillance
+- underground electricity
 
 ## Group Scores
 
-Each group is a weighted mean over known fields only.
+The model has four weighted groups:
 
-### Infrastructure
+- infrastructure
+- common spaces
+- service model
+- distance from MKAD
 
-- `roads 1.00`
-- `sidewalks 0.35`
-- `lighting 0.50`
-- `gas 0.90`
-- `water 1.00`
-- `sewage 0.95`
-- `drainage 0.45`
-- `checkpoints 0.60`
-- `security 0.95`
-- `fencing 0.35`
-- `video_surveillance 0.75`
-- `underground_electricity 0.35`
-- `admin_building 0.25`
-- `retail_or_services 0.55`
-
-### Common Spaces
-
-- `club_infrastructure 0.60`
-- `playgrounds 0.90`
-- `sports 0.80`
-- `walking_routes 0.80`
-- `water_access 0.60`
-- `beach_zones 0.35`
-- `bbq_zones 0.25`
-- `pool 0.45`
-- `fitness_club 0.40`
-- `restaurant 0.35`
-- `spa_center 0.20`
-- `kids_club 0.30`
-- `sports_camp 0.15`
-- `primary_school 0.15`
-
-### Service Model
-
-- `garbage_collection 1.00`
-- `snow_removal 0.90`
-- `road_cleaning 0.80`
-- `landscaping 0.60`
-- `emergency_service 0.60`
-- `dispatcher 0.40`
+Infrastructure, common spaces, and service model are weighted means over known fields only. Their exact field weights and final group weights belong in `rating.ts`.
 
 ## Unknown Handling
 
@@ -112,19 +75,17 @@ Unknown is never interpreted as `no`.
 
 Algorithm per group:
 
-1. Compute weighted mean from known fields only.
-2. Compute group fill ratio: `known_weight / total_weight`.
-3. Shrink sparse rows towards a fixed neutral midpoint `0.5`:
-
-`mixed = raw * fill + 0.5 * (1 - fill)`
+1. Compute the weighted mean from known fields only.
+2. Compute the group fill ratio from known and total field weights.
+3. Pull sparse rows towards the neutral midpoint declared by `RATING_METHODOLOGY`.
 
 Effects:
 
-- fully filled row -> uses its own data
-- sparse row -> pulled towards the center of the scale
-- fully unknown row -> falls back to `0.5`
+- fully filled row uses its own data
+- sparse row is pulled towards the center of the scale
+- fully unknown row falls back to the neutral midpoint
 
-Why midpoint instead of dataset average:
+Why a fixed midpoint instead of the dataset average:
 
 - missing data in this project are not random
 - positive traits are more likely to be explicitly documented than absent ones
@@ -133,23 +94,22 @@ Why midpoint instead of dataset average:
 This avoids two bad outcomes:
 
 - treating unknown as zero
-- letting rows with 1-2 confirmed positives inherit an overly optimistic score from the rest of the dataset
+- letting rows with one or two confirmed positives inherit an overly optimistic score from the rest of the dataset
 
 ## Final Formula
 
-`rating = 100 * (infra * 0.50 + spaces * 0.25 + service * 0.10 + distance * 0.15)`
+The calculation multiplies each mixed group score by its declared group weight, scales the sum to the public score range, applies explicit adjustments, and clamps the result. Tariff remains outside the formula.
 
-Where `infra`, `spaces`, `service` are the mixed group scores after neutral shrinkage.
+For the current exact formula, use `RATING_METHODOLOGY` in `rating.ts` or the published methodology linked above.
 
 ## Extra Adjustments
 
-After the base formula, apply two explicit corrections and clamp the result to `0..100`.
+After the base formula, the calculation applies two explicit corrections:
 
-- `water_in_tariff = true` -> `+4`
-  - Use only when central water supply is confirmed (`infrastructure.water: yes`) and water is already included in the tariff without separate metering/payment.
-- `rabstvo = true` -> `-15`
-  - Strong negative signal.
-  - Use only for confirmed mentions in Telegram channel `@obmandachniki` / `Коттеджное рабство`.
+- `water_in_tariff = true` adds the declared bonus.
+- `rabstvo = true` subtracts the declared penalty.
+
+The exact values belong only in `RATING_METHODOLOGY`.
 
 ## Data Rules For Rating Fields
 
@@ -175,11 +135,12 @@ These rules belong here, not in generic YAML notes, because they exist specifica
 
 ## Files
 
-- formula: `apps/www/src/compare/lib/rating.ts`
+- formula and numerical methodology: `apps/www/src/compare/lib/rating.ts`
 - data wiring: `apps/www/src/compare/lib/data.ts`
 - explorer DTO: `apps/www/src/compare/lib/explorer.ts`
 - build JSON: `apps/www/src/pages/815/compare/data/explorer.json.ts`
 - public explanation page: `apps/www/src/pages/815/compare/rating.astro`
+- generated public Markdown: `apps/www/src/compare/lib/markdown.ts`
 - schema and template for extra flags: `apps/www/src/compare/lib/settlement/schema.ts`, `apps/www/src/data/compare/settlements/_template.yaml`
 - main page sort: `apps/www/src/pages/815/compare/index.astro`
 - explorer default sort: `apps/www/src/compare/components/SettlementsExplorer.svelte`
