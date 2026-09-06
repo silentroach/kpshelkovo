@@ -1,14 +1,13 @@
 import { fileURLToPath } from 'node:url';
 import { constants } from 'node:zlib';
 import type { SitemapItem } from '@astrojs/sitemap';
-import { defineConfig } from 'astro/config';
+import { defineConfig, type AstroIntegration } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import svelte from '@astrojs/svelte';
 import compressor from 'astro-compressor';
 import {
   applySitemapMetadata,
   shouldIncludeSitemapPage,
-  type SitemapMetadataIndex,
 } from './src/lib/sitemap';
 import { loadSitemapMetadataIndex } from './src/lib/sitemap-data';
 import { createAstroMarkdownProcessor } from './src/lib/markdown/astro-processor';
@@ -20,21 +19,31 @@ import { statusCalendarAlternateValidation } from './src/integrations/status-cal
 
 const devServerPort = 4321;
 const site = 'https://kpshelkovo.online';
-let sitemapMetadataIndex: Promise<SitemapMetadataIndex> | undefined;
 const indexNowUrls = new Set<string>();
 
-const loadSitemapMetadata = (): Promise<SitemapMetadataIndex> => {
-  sitemapMetadataIndex ??= loadSitemapMetadataIndex();
+const preloadSitemapMetadata = (): AstroIntegration => ({
+  name: 'sitemap-metadata',
+  hooks: {
+    'astro:config:setup': ({ command, injectScript }) => {
+      if (command !== 'build') {
+        return;
+      }
 
-  return sitemapMetadataIndex;
-};
+      injectScript(
+        'page-ssr',
+        `import { loadSitemapMetadataIndex } from '@/lib/sitemap-data';
+await loadSitemapMetadataIndex();`,
+      );
+    },
+  },
+});
 
 const serializeSitemapItem = async (
   item: SitemapItem,
 ): Promise<SitemapItem | undefined> => {
   const serializedItem = applySitemapMetadata(
     item,
-    await loadSitemapMetadata(),
+    await loadSitemapMetadataIndex(),
   );
 
   if (serializedItem) {
@@ -93,6 +102,7 @@ export default defineConfig({
   integrations: [
     pagefindDevSnapshot(),
     svelte(),
+    preloadSitemapMetadata(),
     sitemap({
       filter: shouldIncludeSitemapPage,
       serialize: serializeSitemapItem,

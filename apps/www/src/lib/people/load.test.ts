@@ -7,11 +7,11 @@ import {
   createEntityMentionGraph,
   type EntityMentionTarget,
 } from '../mentions';
-import type {
-  NewsArchiveSummaryEntry,
-  NewsArticleEntry,
-  NewsAuthorEntry,
-} from '../news/load';
+import {
+  createTestNewsDatasetBuilder,
+  newsArticleEntry as article,
+  newsAuthorEntry as author,
+} from '../news/load.test-helper';
 import type { StatusIncidentEntry } from '../status/load';
 import type { StatusArea, StatusKind, StatusService } from '../status/schema';
 import type { ContactEntry } from '../contacts/load';
@@ -21,9 +21,7 @@ import type { PersonProfileEntry } from './load';
 let buildPeopleDataset: typeof import('./load').buildPeopleDataset;
 let buildPeopleGraphDataset: typeof import('./load').buildPeopleGraphDataset;
 let buildContactsDataset: typeof import('../contacts/load').buildContactsDataset;
-type BuildNewsDataset = typeof import('../news/load').buildNewsDataset;
-
-let buildNewsDatasetSource: BuildNewsDataset;
+let buildNewsDataset: ReturnType<typeof createTestNewsDatasetBuilder>;
 let buildPlacesDataset: typeof import('../places/load').buildPlacesDataset;
 let buildStatusDataset: typeof import('../status/load').buildStatusDataset;
 let createContactMentionRefs: typeof import('../contacts/mentions').createContactMentionRefs;
@@ -42,7 +40,9 @@ beforeAll(async () => {
 
   ({ buildPeopleDataset, buildPeopleGraphDataset } = await import('./load'));
   ({ buildContactsDataset } = await import('../contacts/load'));
-  ({ buildNewsDataset: buildNewsDatasetSource } = await import('../news/load'));
+  buildNewsDataset = createTestNewsDatasetBuilder(
+    (await import('../news/load')).buildNewsDataset,
+  );
   ({ buildPlacesDataset } = await import('../places/load'));
   ({ buildStatusDataset } = await import('../status/load'));
   ({ createContactMentionRefs } = await import('../contacts/mentions'));
@@ -52,28 +52,6 @@ beforeAll(async () => {
   ({ createStatusIncidentMentionRefs } = await import('../status/mentions'));
   ({ createPersonProfileMentionRefs } = await import('./mention-refs'));
 });
-
-const archiveSummaries = (
-  articles: readonly NewsArticleEntry[],
-): readonly NewsArchiveSummaryEntry[] => {
-  const ids = new Set<string>();
-
-  for (const item of articles) {
-    const [year, month] = item.id.split('/');
-
-    ids.add(year);
-    ids.add(`${year}/${month}`);
-  }
-
-  return [...ids].map((id) => ({ id, body: `Выжимка ${id}.` }));
-};
-
-const buildNewsDataset = (
-  authors: Parameters<BuildNewsDataset>[0],
-  articles: Parameters<BuildNewsDataset>[1],
-  opts?: Parameters<BuildNewsDataset>[3],
-): ReturnType<BuildNewsDataset> =>
-  buildNewsDatasetSource(authors, articles, archiveSummaries(articles), opts);
 
 const sourceRefs = (input: {
   readonly people: ReturnType<typeof buildPeopleDataset>;
@@ -117,35 +95,6 @@ const entry = (input: {
     company: input.company,
     position: input.position,
     contacts: [...(input.contacts ?? [])],
-  },
-});
-
-const author = (input: {
-  readonly id: string;
-  readonly name: string;
-  readonly kind?: 'official' | 'community' | 'editorial' | 'other';
-}): NewsAuthorEntry => ({
-  id: input.id,
-  data: {
-    name: input.name,
-    kind: input.kind ?? 'editorial',
-  },
-});
-
-const article = (input: {
-  readonly id: string;
-  readonly title: string;
-  readonly summary: string;
-  readonly date: string;
-  readonly body?: string;
-}): NewsArticleEntry => ({
-  id: input.id,
-  body: input.body ?? '',
-  data: {
-    title: input.title,
-    summary: input.summary,
-    date: testDate.parse(input.date),
-    author: { id: 'ig' } as NewsArticleEntry['data']['author'],
   },
 });
 

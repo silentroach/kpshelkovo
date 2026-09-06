@@ -1,13 +1,8 @@
 <script lang="ts">
+  import { getAvailabilityDisplay } from './availability-status';
   import ComparisonTable from './ComparisonTable.svelte';
-  import type {
-    ComparisonStatus,
-    ComparisonTableRow,
-  } from './comparison-table.types';
-  import type {
-    CommonSpaces,
-    AvailabilityStatus,
-  } from '../lib/settlement/types';
+  import type { ComparisonTableRow } from './comparison-table.types';
+  import type { CommonSpaces } from '../lib/settlement/types';
 
   interface Props {
     title?: string;
@@ -36,40 +31,6 @@
     bbqZones: 'Зоны барбекю',
   };
 
-  const icons: Record<AvailabilityStatus, string> = {
-    yes: '✓',
-    no: '✗',
-    partial: '◐',
-  };
-
-  const tones: Record<AvailabilityStatus, string> = {
-    yes: 'ui-badge-success',
-    no: 'ui-badge-danger',
-    partial: 'ui-badge-warning',
-  };
-
-  const statusText: Record<AvailabilityStatus, string> = {
-    yes: 'Есть',
-    no: 'Нет',
-    partial: 'Частично',
-  };
-
-  const unknown: ComparisonStatus = {
-    icon: '?',
-    text: 'Неизвестно',
-    tone: 'ui-badge-muted',
-  };
-
-  function getDisplay(value?: AvailabilityStatus): ComparisonStatus {
-    if (value === undefined) return unknown;
-
-    return {
-      icon: icons[value],
-      text: statusText[value],
-      tone: tones[value],
-    };
-  }
-
   // Держим первым: это краткая сводка доступа ко многим пунктам ниже.
   const order = [
     'clubInfrastructure',
@@ -94,8 +55,8 @@
       label: labels[key],
       value: spaces[key],
       shelkovoValue: shelkovoSpaces?.[key],
-      status: getDisplay(spaces[key]),
-      shelkovoStatus: getDisplay(shelkovoSpaces?.[key]),
+      status: getAvailabilityDisplay(spaces[key]),
+      shelkovoStatus: getAvailabilityDisplay(shelkovoSpaces?.[key]),
     })),
   );
 </script>

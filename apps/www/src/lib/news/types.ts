@@ -1,6 +1,8 @@
 import type { PreprocessedSiteMarkdownBody } from '../markdown/render';
 import type { EntityMentionTarget } from '../mentions';
-import type { NewsArea, NewsAuthorKind } from './schema';
+import type { NewsArea } from './schema';
+
+export type NewsAuthorKind = 'official' | 'community' | 'editorial' | 'other';
 
 export interface NewsAuthor {
   readonly id: string;

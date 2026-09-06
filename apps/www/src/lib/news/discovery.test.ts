@@ -21,13 +21,15 @@ let schema: typeof import('./discovery').schema;
 let self: typeof import('./discovery').self;
 let surfaceHref: typeof surfaceHrefType;
 
-const articleWithEvent = (): NewsArticle => ({
+const articleWithEvent = (
+  authorKind: NewsArticle['author']['kind'] = 'editorial',
+): NewsArticle => ({
   id: '2026/05/event',
   title: 'Встреча по регламенту',
   author: {
     id: 'editor',
     name: 'Редакция',
-    kind: 'editorial',
+    kind: authorKind,
   },
   year: 2026,
   month: 5,
@@ -289,7 +291,7 @@ describe('news discovery payload', () => {
     `);
   });
 
-  it('keeps schema, openapi, and catalog aligned around article-local events', () => {
+  it('keeps schema, openapi, and payload contracts aligned', () => {
     const root = 'https://example.com';
     const jsonSchema = schema(root) as {
       readonly required?: readonly string[];
@@ -340,8 +342,15 @@ describe('news discovery payload', () => {
     const apiCatalog = catalog(root) as { readonly linkset: unknown };
     const openapiDefs =
       api.components?.schemas?.NewsArticlesPayload?.$defs ?? {};
-    const publicEvent = buildNewsPayload(dataset([articleWithEvent()]))
-      .articles[0]?.events?.[0];
+    const publicArticles = buildNewsPayload(
+      dataset(
+        (['official', 'community', 'editorial', 'other'] as const).map(
+          articleWithEvent,
+        ),
+      ),
+    ).articles;
+    const publicArticle = publicArticles[0];
+    const publicEvent = publicArticle?.events?.[0];
     const serializedEvent = JSON.parse(JSON.stringify(publicEvent)) as Record<
       string,
       unknown
@@ -438,6 +447,36 @@ describe('news discovery payload', () => {
       },
     });
     expect(openapiDefs.eventParticipant).toEqual(defs.eventParticipant);
+    expect({
+      payload: publicArticles.map((article) => article.author.kind),
+      jsonSchema: defs.author?.properties?.kind,
+      openapi: openapiDefs.author?.properties?.kind,
+    }).toMatchInlineSnapshot(`
+      {
+        "jsonSchema": {
+          "enum": [
+            "official",
+            "community",
+            "editorial",
+            "other",
+          ],
+        },
+        "openapi": {
+          "enum": [
+            "official",
+            "community",
+            "editorial",
+            "other",
+          ],
+        },
+        "payload": [
+          "official",
+          "community",
+          "editorial",
+          "other",
+        ],
+      }
+    `);
     expect(openapiDefs.article?.properties?.events).toMatchObject({
       type: 'array',
       items: {
