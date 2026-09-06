@@ -3,12 +3,11 @@ import {
   resolveStatusServiceState,
   toStatusIncidentWindowInput,
 } from '@/lib/status/lifecycle';
+import type { StatusServiceState } from '@/lib/status/schema';
 import type {
   StatusIncident,
   StatusIncidentWindowInput,
 } from '@/lib/status/types';
-
-import type { HomeStatusState } from './status.types';
 
 declare global {
   interface Window {
@@ -23,15 +22,15 @@ export const HOME_STATUS_LABELS = {
   green: 'всё работает',
   amber: 'плановые работы',
   red: 'есть проблемы',
-} as const satisfies Record<HomeStatusState, string>;
+} as const satisfies Record<StatusServiceState, string>;
 
-export const getHomeStatusAriaLabel = (state: HomeStatusState): string =>
+export const getHomeStatusAriaLabel = (state: StatusServiceState): string =>
   `Статус: ${HOME_STATUS_LABELS[state]}`;
 
 export const getHomeStatusState = (
   incidents: readonly StatusIncident[],
   now: number,
-): HomeStatusState =>
+): StatusServiceState =>
   resolveStatusServiceState(incidents.map(toStatusIncidentWindowInput), now);
 
 export const getHomeStatusWindows = (
@@ -45,7 +44,7 @@ export const getHomeStatusWindows = (
 
 const setHomeStatusState = (
   link: HTMLElement,
-  state: HomeStatusState,
+  state: StatusServiceState,
 ): void => {
   const label = getHomeStatusAriaLabel(state);
 
