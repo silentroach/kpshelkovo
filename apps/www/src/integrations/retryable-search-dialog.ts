@@ -4,6 +4,13 @@ import { fileURLToPath } from 'node:url';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { build, type Plugin } from 'vite';
 
+import { PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE } from './pagefind-dev-snapshot';
+import type {
+  SearchDialogGraphBuilder,
+  SearchDialogGraphEnvironment,
+  SearchDialogOuterConfig,
+} from './retryable-search-dialog.types';
+
 const assetsModuleId = 'virtual:search-dialog-assets';
 const resolvedAssetsModuleId = `\0${assetsModuleId}`;
 const appRoot = fileURLToPath(new URL('../..', import.meta.url));
@@ -20,7 +27,35 @@ const graphSourceRoots = [srcRoot, resolve(workspaceRoot, 'packages')].map(
 const isGraphSourceFile = (file: string): boolean =>
   graphSourceRoots.some((root) => resolve(file).startsWith(root));
 
-const buildSearchDialogGraph = async (): Promise<string> => {
+const resolveGraphEnvironment = (
+  config: SearchDialogOuterConfig,
+): SearchDialogGraphEnvironment | undefined => {
+  const pagefindDevSnapshotAvailable =
+    config.define?.[PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE];
+  if (typeof pagefindDevSnapshotAvailable !== 'string') {
+    return;
+  }
+
+  return {
+    command: config.command,
+    mode: config.mode,
+    pagefindDevSnapshotAvailable,
+  };
+};
+
+const requireGraphEnvironment = (
+  environment?: SearchDialogGraphEnvironment,
+): SearchDialogGraphEnvironment => {
+  if (!environment) {
+    throw new Error('Search dialog graph environment is not ready');
+  }
+
+  return environment;
+};
+
+const buildSearchDialogGraph: SearchDialogGraphBuilder = async (
+  environment,
+): Promise<string> => {
   const result = await build({
     root: appRoot,
     configFile: false,
@@ -28,6 +63,12 @@ const buildSearchDialogGraph = async (): Promise<string> => {
     envDir: workspaceRoot,
     envPrefix: 'PUBLIC_',
     logLevel: 'warn',
+    mode: environment.mode,
+    define: {
+      'import.meta.env.DEV': JSON.stringify(environment.command === 'serve'),
+      [PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE]:
+        environment.pagefindDevSnapshotAvailable,
+    },
     plugins: [svelte()],
     resolve: {
       alias: {
@@ -82,13 +123,19 @@ const buildSearchDialogGraph = async (): Promise<string> => {
 
 const retryableSearchDialogBuildPlugin = (): Plugin => {
   let graphReference: string | undefined;
+  let graphEnvironment: SearchDialogGraphEnvironment | undefined;
 
   return {
     name: 'retryable-search-dialog-build',
     apply: 'build',
     applyToEnvironment: (environment) => environment.name === 'client',
+    configResolved(config) {
+      graphEnvironment = resolveGraphEnvironment(config);
+    },
     buildStart: async function () {
-      const graphSource = await buildSearchDialogGraph();
+      const graphSource = await buildSearchDialogGraph(
+        requireGraphEnvironment(graphEnvironment),
+      );
       graphReference = this.emitFile({
         type: 'asset',
         name: 'SearchDialog.js',
@@ -111,13 +158,16 @@ const retryableSearchDialogBuildPlugin = (): Plugin => {
   };
 };
 
-const createRetryableSearchDialogDevPlugin = (
-  buildGraph: () => Promise<string> = buildSearchDialogGraph,
+export const createRetryableSearchDialogDevPlugin = (
+  buildGraph: SearchDialogGraphBuilder = buildSearchDialogGraph,
 ): Plugin => {
   let graphSourceRequest: Promise<string> | undefined;
+  let graphEnvironment: SearchDialogGraphEnvironment | undefined;
 
   const loadGraphSource = (): Promise<string> => {
-    graphSourceRequest ??= buildGraph().catch((error) => {
+    graphSourceRequest ??= buildGraph(
+      requireGraphEnvironment(graphEnvironment),
+    ).catch((error) => {
       graphSourceRequest = undefined;
       throw error;
     });
@@ -129,6 +179,9 @@ const createRetryableSearchDialogDevPlugin = (
     name: 'retryable-search-dialog-dev',
     apply: 'serve',
     applyToEnvironment: (environment) => environment.name === 'client',
+    configResolved(config) {
+      graphEnvironment = resolveGraphEnvironment(config);
+    },
     configureServer(server) {
       server.watcher.on('all', (event, file) => {
         if (
