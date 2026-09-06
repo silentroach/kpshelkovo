@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 
 import { fullReglamentDataset2026 } from '@/data/reglament/full-2026';
+import { createJsonResponse } from '@/lib/json-response';
 import { projectPublicFullReglamentDataset } from '@/lib/reglament/full-public-projector';
 import { validatePublicFullReglamentDataset } from '@/lib/reglament/full-public-validator';
 import { reglamentApiCatalogPath } from '@/lib/reglament/routes';
@@ -16,11 +17,8 @@ export const GET: APIRoute = async () => {
   const publicDataset = projectPublicFullReglamentDataset(
     fullReglamentDataset2026,
   );
-  const body = JSON.stringify(
-    validatePublicFullReglamentDataset(publicDataset),
-  );
 
-  return new Response(body, {
+  return createJsonResponse(validatePublicFullReglamentDataset(publicDataset), {
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
       Link: `<${abs(root, reglamentApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"`,

@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 
 import { PROFILE, catalog, self } from '@/compare/lib/discovery';
 import { canonRoot } from '@/compare/lib/site';
+import { createJsonResponse } from '@/lib/json-response';
 
 export const prerender = true;
 
@@ -14,9 +15,8 @@ function headers(root: string): HeadersInit {
 
 export const GET: APIRoute = async () => {
   const root = canonRoot();
-  const body = JSON.stringify(catalog(root));
 
-  return new Response(body, {
+  return createJsonResponse(catalog(root), {
     headers: headers(root),
   });
 };
