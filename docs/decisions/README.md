@@ -38,3 +38,4 @@
 - [ADR-032: Предзагрузка HTML по нажатию](032-tap-prefetch.md) - принят, 2026-08-28.
 - [ADR-033: Сравнение тарифов как часть единого сайта](033-integrated-tariff-comparison-section.md) - принят, 2026-08-30.
 - [ADR-034: Нативная CSS-архитектура после Tailwind](034-native-css-architecture.md) - принят, 2026-08-31.
+- [ADR-035: Внутренние редакционные источники базы знаний](035-internal-kb-editorial-sources.md) - принят, 2026-09-06.
