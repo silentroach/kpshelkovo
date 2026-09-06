@@ -574,17 +574,13 @@
       </button>
     </div>
 
-    <div
-      class="action-row search-load-error"
-      role="status"
-      aria-atomic="true"
-      hidden
-      data-search-load-error
-    >
-      <p class="action-message">Не удалось загрузить поиск</p>
+    <div class="action-row search-load-status" hidden data-search-load-status>
+      <p class="action-message" data-search-load-message></p>
       <button
         type="button"
         class="ui-btn ui-btn-sm ui-btn-ghost retry-button"
+        hidden
+        disabled
         data-search-retry
       >
         Повторить
@@ -706,7 +702,13 @@
     {/if}
   </div>
 
-  <p class="visually-hidden" aria-live="polite" aria-atomic="true">
+  <p
+    class="visually-hidden"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+    data-search-load-announcement
+  >
     {announcement}
   </p>
 </dialog>
@@ -756,11 +758,11 @@
     padding: 0.75rem 1rem;
   }
 
-  .search-load-error {
+  .search-load-status {
     border-top: 1px solid var(--color-border);
   }
 
-  .search-load-error[hidden] {
+  .search-load-status[hidden] {
     display: none;
   }
 

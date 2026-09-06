@@ -2,7 +2,10 @@ import { installHomeStatusHydration } from '@/lib/home/status';
 import { highlightSearchTerms } from '@/lib/search/highlight';
 import { installStatusServiceStateHydration } from '@/lib/status/lifecycle.dom';
 import { installStickyTableHeaders } from '@/lib/sticky-table-headers';
-import { loadSearchDialog } from '@/scripts/search-dialog-loader';
+import {
+  isSearchDialogLoadRetry,
+  loadSearchDialog,
+} from '@/scripts/search-dialog-loader';
 
 interface AstroBeforePreparationEvent extends Event {
   loader: () => Promise<void>;
@@ -36,7 +39,10 @@ const HOME_HERO_FALLBACK_SELECTOR = '[data-home-hero-fallback]';
 const NAVIGATION_PENDING_ATTR = 'data-site-navigation-pending';
 const NAVIGATION_DELAY_MS = 50;
 const SEARCH_DIALOG_HYDRATED_ATTR = 'data-search-dialog-hydrated';
-const SEARCH_DIALOG_LOAD_ERROR_SELECTOR = '[data-search-load-error]';
+const SEARCH_DIALOG_LOAD_ANNOUNCEMENT_SELECTOR =
+  '[data-search-load-announcement]';
+const SEARCH_DIALOG_LOAD_MESSAGE_SELECTOR = '[data-search-load-message]';
+const SEARCH_DIALOG_LOAD_STATUS_SELECTOR = '[data-search-load-status]';
 const SEARCH_DIALOG_ROOT_SELECTOR = '[data-search-dialog-root]';
 const SEARCH_DIALOG_SELECTOR = '[data-search-dialog]';
 const SEARCH_INPUT_SELECTOR = '[data-search-input]';
@@ -399,19 +405,34 @@ const bindSiteHeaderMenu = (): void => {
 let latestSearchDialogRequest = 0;
 let nativeSearchDialogOpener: HTMLElement | undefined;
 
-const setNativeSearchDialogLoadError = (
+const setNativeSearchDialogLoadStatus = (
   root: HTMLElement,
-  visible: boolean,
+  message: string,
+  retryVisible = false,
 ): void => {
-  const error = root.querySelector<HTMLElement>(
-    SEARCH_DIALOG_LOAD_ERROR_SELECTOR,
+  const status = root.querySelector<HTMLElement>(
+    SEARCH_DIALOG_LOAD_STATUS_SELECTOR,
+  );
+  const visibleMessage = root.querySelector<HTMLElement>(
+    SEARCH_DIALOG_LOAD_MESSAGE_SELECTOR,
+  );
+  const announcement = root.querySelector<HTMLElement>(
+    SEARCH_DIALOG_LOAD_ANNOUNCEMENT_SELECTOR,
   );
   const retry = root.querySelector<HTMLButtonElement>(SEARCH_RETRY_SELECTOR);
-  if (error) {
-    error.hidden = !visible;
+  const hasMessage = message.length > 0;
+  if (status) {
+    status.hidden = !hasMessage;
+  }
+  if (visibleMessage) {
+    visibleMessage.textContent = message;
+  }
+  if (announcement) {
+    announcement.textContent = message;
   }
   if (retry) {
-    retry.disabled = false;
+    retry.hidden = !retryVisible;
+    retry.disabled = !retryVisible;
   }
 };
 
@@ -432,7 +453,7 @@ const requestSearchDialog = async (
     return;
   }
 
-  setNativeSearchDialogLoadError(root, false);
+  setNativeSearchDialogLoadStatus(root, '');
   openSearchDialog(root, opener, input.value);
   nativeSearchDialogOpener = undefined;
 };
@@ -441,10 +462,12 @@ const loadNativeSearchDialog = (
   root: HTMLElement,
   opener: HTMLElement,
 ): void => {
-  const retry = root.querySelector<HTMLButtonElement>(SEARCH_RETRY_SELECTOR);
-  if (retry) {
-    retry.disabled = true;
-  }
+  setNativeSearchDialogLoadStatus(
+    root,
+    isSearchDialogLoadRetry()
+      ? 'Пробуем загрузить поиск ещё раз…'
+      : 'Загружаем поиск…',
+  );
 
   const requestId = ++latestSearchDialogRequest;
   void requestSearchDialog(root, opener, requestId).catch((error: unknown) => {
@@ -461,7 +484,7 @@ const loadNativeSearchDialog = (
     }
 
     console.error('Не удалось загрузить модуль поиска.', error);
-    setNativeSearchDialogLoadError(root, true);
+    setNativeSearchDialogLoadStatus(root, 'Не удалось загрузить поиск', true);
   });
 };
 
@@ -491,7 +514,7 @@ const finishNativeSearchDialogClose = (dialog: HTMLDialogElement): void => {
   }
 
   latestSearchDialogRequest += 1;
-  setNativeSearchDialogLoadError(root, false);
+  setNativeSearchDialogLoadStatus(root, '');
   const opener = nativeSearchDialogOpener;
   nativeSearchDialogOpener = undefined;
   const input = dialog.querySelector<HTMLInputElement>(SEARCH_INPUT_SELECTOR);
@@ -585,7 +608,7 @@ const bindSearchDialogLoader = (): void => {
 
     event.preventDefault();
     input.value = '';
-    setNativeSearchDialogLoadError(root, false);
+    setNativeSearchDialogLoadStatus(root, '');
     if (!root.hasAttribute(SEARCH_DIALOG_HYDRATED_ATTR)) {
       nativeSearchDialogOpener = trigger;
     }

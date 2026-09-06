@@ -15,10 +15,6 @@ declare module 'virtual:settlements-explorer-assets' {
   export const explorerGraphUrl: string;
 }
 
-declare module '@/components/search/lazy?search-load=initial' {
-  export const openSearchDialog: typeof import('@/components/search/lazy').openSearchDialog;
-}
-
-declare module '@/components/search/lazy?search-load=retry' {
-  export const openSearchDialog: typeof import('@/components/search/lazy').openSearchDialog;
+declare module 'virtual:search-dialog-assets' {
+  export const searchDialogGraphUrl: string;
 }

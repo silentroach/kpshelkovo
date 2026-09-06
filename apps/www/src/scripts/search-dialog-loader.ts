@@ -1,15 +1,28 @@
-let shouldUseRetryModule = false;
+import { searchDialogGraphUrl } from 'virtual:search-dialog-assets';
+import type {
+  SearchDialogImporter,
+  SearchDialogModule,
+} from '@/scripts/search-dialog-loader.types';
 
-export const loadSearchDialog = async (): Promise<
-  typeof import('@/components/search/lazy')
-> => {
+let graphRetry = 0;
+
+export const isSearchDialogLoadRetry = (): boolean => graphRetry > 0;
+
+const importSearchDialogGraph = (url: string): Promise<SearchDialogModule> =>
+  import(/* @vite-ignore */ url);
+
+export const loadSearchDialog = async (
+  importGraph: SearchDialogImporter = importSearchDialogGraph,
+): Promise<SearchDialogModule> => {
+  const graphUrl = new URL(searchDialogGraphUrl, location.origin);
+  if (graphRetry > 0) {
+    graphUrl.searchParams.set('search-retry', String(graphRetry));
+  }
+
   try {
-    // Browsers cache failed module URLs, so retry must use a distinct Vite module ID.
-    return await (shouldUseRetryModule
-      ? import('@/components/search/lazy?search-load=retry')
-      : import('@/components/search/lazy?search-load=initial'));
+    return await importGraph(graphUrl.href);
   } catch (error) {
-    shouldUseRetryModule = true;
+    graphRetry += 1;
     throw error;
   }
 };

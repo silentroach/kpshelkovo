@@ -1,20 +1,25 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const highlightSearchTerms = vi.hoisted(() => vi.fn(async () => {}));
-const { loadSearchDialog, openSearchDialog } = vi.hoisted(() => {
-  const openSearchDialog = vi.fn();
+const { isSearchDialogLoadRetry, loadSearchDialog, openSearchDialog } =
+  vi.hoisted(() => {
+    const openSearchDialog = vi.fn();
 
-  return {
-    loadSearchDialog: vi.fn(async () => ({ openSearchDialog })),
-    openSearchDialog,
-  };
-});
+    return {
+      isSearchDialogLoadRetry: vi.fn(() => false),
+      loadSearchDialog: vi.fn(async () => ({ openSearchDialog })),
+      openSearchDialog,
+    };
+  });
 
 vi.mock('@/lib/search/highlight', () => ({
   highlightSearchTerms,
   SEARCH_HIGHLIGHT_PARAM: 'h',
 }));
-vi.mock('@/scripts/search-dialog-loader', () => ({ loadSearchDialog }));
+vi.mock('@/scripts/search-dialog-loader', () => ({
+  isSearchDialogLoadRetry,
+  loadSearchDialog,
+}));
 
 import '../site-runtime';
 
@@ -25,10 +30,11 @@ const renderSearchShell = () => {
       <dialog data-search-dialog>
         <input type="search" data-search-input />
         <button type="button" data-search-close>Close</button>
-        <div role="status" data-search-load-error hidden>
-          <p>Не удалось загрузить поиск</p>
-          <button type="button" data-search-retry>Повторить</button>
+        <div data-search-load-status hidden>
+          <p data-search-load-message></p>
+          <button type="button" data-search-retry hidden disabled>Повторить</button>
         </div>
+        <p role="status" aria-live="polite" aria-atomic="true" data-search-load-announcement></p>
       </dialog>
     </div>
   `;
@@ -38,8 +44,14 @@ const renderSearchShell = () => {
   const dialog = root?.querySelector<HTMLDialogElement>('[data-search-dialog]');
   const input = root?.querySelector<HTMLInputElement>('[data-search-input]');
   const close = root?.querySelector<HTMLButtonElement>('[data-search-close]');
-  const loadErrorState = root?.querySelector<HTMLElement>(
-    '[data-search-load-error]',
+  const loadStatus = root?.querySelector<HTMLElement>(
+    '[data-search-load-status]',
+  );
+  const loadMessage = root?.querySelector<HTMLElement>(
+    '[data-search-load-message]',
+  );
+  const loadAnnouncement = root?.querySelector<HTMLElement>(
+    '[data-search-load-announcement]',
   );
   const retry = root?.querySelector<HTMLButtonElement>('[data-search-retry]');
   if (
@@ -48,13 +60,25 @@ const renderSearchShell = () => {
     !dialog ||
     !input ||
     !close ||
-    !loadErrorState ||
+    !loadStatus ||
+    !loadMessage ||
+    !loadAnnouncement ||
     !retry
   ) {
     throw new Error('Expected server-rendered search shell');
   }
 
-  return { close, dialog, input, loadErrorState, opener, retry, root } as const;
+  return {
+    close,
+    dialog,
+    input,
+    loadAnnouncement,
+    loadMessage,
+    loadStatus,
+    opener,
+    retry,
+    root,
+  } as const;
 };
 
 beforeEach(() => {
@@ -62,6 +86,8 @@ beforeEach(() => {
   openSearchDialog.mockClear();
   loadSearchDialog.mockReset();
   loadSearchDialog.mockResolvedValue({ openSearchDialog });
+  isSearchDialogLoadRetry.mockReset();
+  isSearchDialogLoadRetry.mockReturnValue(false);
 });
 
 afterEach(() => {
@@ -102,7 +128,8 @@ describe('home hero fallback', () => {
 
 describe('search dialog loader', () => {
   it('opens synchronously and forwards the exact pre-hydration query', async () => {
-    const { dialog, input, opener, root } = renderSearchShell();
+    const { dialog, input, loadAnnouncement, loadMessage, opener, root } =
+      renderSearchShell();
 
     const click = new MouseEvent('click', {
       bubbles: true,
@@ -113,6 +140,8 @@ describe('search dialog loader', () => {
     expect(dialog.open).toBe(true);
     expect(document.activeElement).toBe(input);
     expect(click.defaultPrevented).toBe(true);
+    expect(loadMessage.textContent).toBe('Загружаем поиск…');
+    expect(loadAnnouncement.textContent).toBe('Загружаем поиск…');
 
     input.value = 'вода';
 
@@ -127,38 +156,59 @@ describe('search dialog loader', () => {
     const consoleError = vi
       .spyOn(console, 'error')
       .mockImplementation(() => {});
-    const { dialog, input, loadErrorState, opener, retry, root } =
-      renderSearchShell();
+    const {
+      dialog,
+      input,
+      loadAnnouncement,
+      loadMessage,
+      loadStatus,
+      opener,
+      retry,
+      root,
+    } = renderSearchShell();
 
     opener.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     input.value = 'вода';
 
-    await vi.waitFor(() => expect(loadErrorState.hidden).toBe(false));
+    await vi.waitFor(() => expect(retry.disabled).toBe(false));
     expect({
+      announcement: loadAnnouncement.textContent,
+      action: retry.textContent,
       dialogOpen: dialog.open,
       inputFocused: document.activeElement === input,
       inputValue: input.value,
+      message: loadMessage.textContent,
       retryDisabled: retry.disabled,
+      retryHidden: retry.hidden,
     }).toMatchInlineSnapshot(`
       {
+        "action": "Повторить",
+        "announcement": "Не удалось загрузить поиск",
         "dialogOpen": true,
         "inputFocused": true,
         "inputValue": "вода",
+        "message": "Не удалось загрузить поиск",
         "retryDisabled": false,
+        "retryHidden": false,
       }
     `);
     expect(openSearchDialog).not.toHaveBeenCalled();
 
+    isSearchDialogLoadRetry.mockReturnValue(true);
     retry.dispatchEvent(
       new MouseEvent('click', { bubbles: true, cancelable: true }),
     );
 
     expect(document.activeElement).toBe(input);
+    expect(loadMessage.textContent).toBe('Пробуем загрузить поиск ещё раз…');
+    expect(loadAnnouncement.textContent).toBe(
+      'Пробуем загрузить поиск ещё раз…',
+    );
     await vi.waitFor(() => expect(openSearchDialog).toHaveBeenCalledOnce());
     expect(loadSearchDialog).toHaveBeenCalledTimes(2);
     expect(openSearchDialog).toHaveBeenCalledWith(root, opener, 'вода');
-    expect(loadErrorState.hidden).toBe(true);
-    expect(retry.disabled).toBe(false);
+    expect(loadStatus.hidden).toBe(true);
+    expect(retry.disabled).toBe(true);
     expect(input.value).toBe('вода');
     expect(consoleError).toHaveBeenCalledWith(
       'Не удалось загрузить модуль поиска.',
@@ -166,23 +216,67 @@ describe('search dialog loader', () => {
     );
   });
 
+  it('keeps repeated failures retryable and announced', async () => {
+    loadSearchDialog
+      .mockRejectedValueOnce(new Error('initial chunk unavailable'))
+      .mockRejectedValueOnce(new Error('retry chunk unavailable'))
+      .mockResolvedValueOnce({ openSearchDialog });
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { input, loadAnnouncement, loadMessage, loadStatus, opener, retry } =
+      renderSearchShell();
+
+    opener.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    input.value = 'вода';
+    await vi.waitFor(() => expect(retry.disabled).toBe(false));
+
+    isSearchDialogLoadRetry.mockReturnValue(true);
+    retry.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    await vi.waitFor(() => expect(retry.disabled).toBe(false));
+    expect({
+      announcement: loadAnnouncement.textContent,
+      action: retry.textContent,
+      inputFocused: document.activeElement === input,
+      inputValue: input.value,
+      message: loadMessage.textContent,
+      statusHidden: loadStatus.hidden,
+    }).toMatchInlineSnapshot(`
+      {
+        "action": "Повторить",
+        "announcement": "Не удалось загрузить поиск",
+        "inputFocused": true,
+        "inputValue": "вода",
+        "message": "Не удалось загрузить поиск",
+        "statusHidden": false,
+      }
+    `);
+
+    retry.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(loadAnnouncement.textContent).toBe(
+      'Пробуем загрузить поиск ещё раз…',
+    );
+    await vi.waitFor(() => expect(openSearchDialog).toHaveBeenCalledOnce());
+    expect(loadSearchDialog).toHaveBeenCalledTimes(3);
+  });
+
   it('restores the native lifecycle after a failure and opens again', async () => {
     loadSearchDialog.mockRejectedValueOnce(new Error('chunk unavailable'));
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    const { close, dialog, input, loadErrorState, opener, root } =
+    const { close, dialog, input, loadStatus, opener, retry, root } =
       renderSearchShell();
 
     opener.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     input.value = 'дороги';
-    await vi.waitFor(() => expect(loadErrorState.hidden).toBe(false));
+    await vi.waitFor(() => expect(retry.disabled).toBe(false));
 
     close.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     expect(dialog.open).toBe(false);
     expect(document.activeElement).toBe(opener);
     expect(input.value).toBe('');
-    expect(loadErrorState.hidden).toBe(true);
+    expect(loadStatus.hidden).toBe(true);
 
+    isSearchDialogLoadRetry.mockReturnValue(true);
     opener.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     expect(dialog.open).toBe(true);
