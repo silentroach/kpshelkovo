@@ -427,7 +427,17 @@ describe('SettlementsExplorer', () => {
       const link = container.querySelector(
         '[data-testid="rating-help-link"]',
       ) as HTMLAnchorElement | null;
-      expect(link?.getAttribute('href')).toBe('/815/compare/rating/');
+      expect({
+        ariaLabel: link?.getAttribute('aria-label'),
+        href: link?.getAttribute('href'),
+        title: link?.getAttribute('title'),
+      }).toMatchInlineSnapshot(`
+        {
+          "ariaLabel": "Как считается условный уровень",
+          "href": "/815/compare/rating/",
+          "title": "Как считается условный уровень",
+        }
+      `);
     });
 
     await fireEvent.change(getByLabelText('Сортировка:'), {

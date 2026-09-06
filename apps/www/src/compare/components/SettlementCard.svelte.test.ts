@@ -166,8 +166,8 @@ describe('SettlementCard', () => {
     expect(container.textContent).toContain('наш');
   });
 
-  it('renders title link to detail page', () => {
-    const { container } = render(SettlementCard, {
+  it('keeps the title link in sync with the settlement', async () => {
+    const { getByRole, rerender } = render(SettlementCard, {
       props: {
         settlement: mockSettlement,
         comparison: mockComparisonCheaper,
@@ -177,8 +177,25 @@ describe('SettlementCard', () => {
       },
     });
 
-    const link = container.querySelector('h3 a[href*="settlements/testovo/"]');
-    expect(link).toBeTruthy();
+    expect(getByRole('link', { name: 'Тестово' }).getAttribute('href')).toBe(
+      '/815/compare/settlements/testovo/',
+    );
+
+    await rerender({
+      settlement: {
+        ...mockSettlement,
+        shortName: 'Новое Тестово',
+        slug: 'novoe-testovo',
+      },
+      comparison: mockComparisonCheaper,
+      rank: 1,
+      total: 3,
+      isBaseline: false,
+    });
+
+    expect(
+      getByRole('link', { name: 'Новое Тестово' }).getAttribute('href'),
+    ).toBe('/815/compare/settlements/novoe-testovo/');
   });
 
   it('renders rabstvo badge link when settlement is flagged', () => {

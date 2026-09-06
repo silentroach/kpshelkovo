@@ -1,7 +1,6 @@
 <script lang="ts">
   import { compareRuText, formatTariff } from '@shelkovo/format';
   import { calculateDistance } from '@shelkovo/geo';
-  import Link from '@shelkovo/ui/Link.svelte';
   import { onMount } from 'svelte';
   import type { ExplorerPayload, ExplorerSettlement } from '../lib/explorer';
   import { getRing } from '../lib/rating';
@@ -387,7 +386,7 @@
 
         <span class="rating-help-slot">
           {#if help}
-            <Link
+            <a
               href={withBase('/rating/')}
               class="rating-help"
               aria-label="Как считается условный уровень"
@@ -416,7 +415,7 @@
                   stroke="none"
                 ></circle>
               </svg>
-            </Link>
+            </a>
           {/if}
         </span>
       </div>
