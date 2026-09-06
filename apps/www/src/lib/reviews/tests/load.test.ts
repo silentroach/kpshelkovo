@@ -1,11 +1,26 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import type { ReviewEntry } from '../load';
 
+const mocks = vi.hoisted(() => ({
+  getCollection: vi.fn(),
+  loadSiteMentionRegistry: vi.fn(),
+}));
+
+vi.mock('astro:content', () => ({
+  getCollection: mocks.getCollection,
+}));
+
+vi.mock('@/lib/mentions/registry', () => ({
+  loadSiteMentionRegistry: mocks.loadSiteMentionRegistry,
+}));
+
 let buildReviewsDataset: typeof import('../load').buildReviewsDataset;
+let loadReviewsData: typeof import('../load').loadReviewsData;
 let createSiteMentionRegistry: typeof import('@/lib/mentions').createSiteMentionRegistry;
 let createPersonMentionTarget: typeof import('@/lib/people/mentions').createPersonMentionTarget;
 let createPlaceMentionTarget: typeof import('@/lib/places/mentions').createPlaceMentionTarget;
+let createReviewMentionRefs: typeof import('../mentions').createReviewMentionRefs;
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
@@ -16,7 +31,8 @@ beforeAll(async () => {
   ({ createSiteMentionRegistry } = await import('@/lib/mentions'));
   ({ createPersonMentionTarget } = await import('@/lib/people/mentions'));
   ({ createPlaceMentionTarget } = await import('@/lib/places/mentions'));
-  ({ buildReviewsDataset } = await import('../load'));
+  ({ createReviewMentionRefs } = await import('../mentions'));
+  ({ buildReviewsDataset, loadReviewsData } = await import('../load'));
 });
 
 const entry = (input: {
@@ -29,7 +45,7 @@ const entry = (input: {
   data: input.data,
 });
 
-describe('buildReviewsDataset', () => {
+describe('reviews data', () => {
   it('accepts an empty launch dataset', () => {
     const data = buildReviewsDataset([]);
 
@@ -82,49 +98,52 @@ describe('buildReviewsDataset', () => {
     });
   });
 
-  it('preprocesses mentions in the review body and aspect bodies', () => {
+  it('loads normalized body mentions and deduplicated graph refs', async () => {
     const mentionRegistry = createSiteMentionRegistry([
       createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин'),
       createPlaceMentionTarget('apple-garden', 'Яблоневый сад'),
     ]);
-    const data = buildReviewsDataset(
-      [
-        entry({
-          id: '2026-06-25-with-mentions',
-          body: 'Основной текст отзыва с @kschemelinin.',
-          data: {
-            published_at: '2026-06-25',
-            slug: 'with-mentions',
-            area: 'forest',
-            aspects: [
-              {
-                type: 'place',
-                rating: 5,
-                body: 'Рядом [яблоневый сад](@apple-garden).',
-              },
-            ],
-          },
-        }),
-      ],
-      { mentionRegistry },
-    );
+    mocks.getCollection.mockResolvedValue([
+      entry({
+        id: '2026-06-25-with-mentions',
+        body: 'Основной текст отзыва с @kschemelinin.',
+        data: {
+          published_at: '2026-06-25',
+          slug: 'with-mentions',
+          area: 'forest',
+          aspects: [
+            {
+              type: 'place',
+              rating: 5,
+              body: 'Рядом [яблоневый сад](@apple-garden), его рекомендовал @kschemelinin.',
+            },
+          ],
+        },
+      }),
+    ]);
+    mocks.loadSiteMentionRegistry.mockResolvedValue(mentionRegistry);
+
+    const data = await loadReviewsData();
     const review = data.reviews[0];
 
+    expect(mocks.loadSiteMentionRegistry).toHaveBeenCalledOnce();
     expect({
       body: review?.body,
       aspects: review?.aspects,
-      mentions: review?.mentions.map(({ type, slug }) => ({ type, slug })),
+      refs: data.reviews
+        .flatMap(createReviewMentionRefs)
+        .map(({ target }) => target),
     }).toMatchInlineSnapshot(`
       {
         "aspects": [
           {
-            "body": "Рядом [яблоневый сад](/map/apple-garden/).",
+            "body": "Рядом [яблоневый сад](/map/apple-garden/), его рекомендовал [Кирилл Щемелинин](/people/kschemelinin/).",
             "rating": 5,
             "type": "place",
           },
         ],
         "body": "Основной текст отзыва с [Кирилл Щемелинин](/people/kschemelinin/).",
-        "mentions": [
+        "refs": [
           {
             "slug": "kschemelinin",
             "type": "person",
