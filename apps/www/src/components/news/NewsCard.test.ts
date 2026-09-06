@@ -18,19 +18,13 @@ const baseArticle: NewsListArticle = {
   },
   year: 2026,
   month: 5,
-  day: 14,
-  entry: 'pinned',
   url: '/news/2026/05/pinned/',
   markdownUrl: '/news/2026/05/pinned/index.md',
-  canonical: 'https://example.com/news/2026/05/pinned/',
   publishedAt: new Date('2026-05-14T09:00:00+03:00'),
   publishedIso: '2026-05-14T09:00:00+03:00',
-  appliesToAllAreas: true,
-  areas: [],
   tags: [],
   pinned: true,
   summary: 'Короткое описание новости.',
-  events: [],
 };
 
 describe('NewsCard', () => {

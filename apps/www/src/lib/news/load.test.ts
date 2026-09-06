@@ -572,7 +572,7 @@ describe('buildNewsDataset', () => {
     ).toThrow('has no "gen" label case');
   });
 
-  it('normalizes a valid event for article and list data', () => {
+  it('normalizes a valid event for article data', () => {
     const data = buildNewsDataset(
       [author({ id: 'ig', name: 'Редакция' })],
       [
@@ -615,12 +615,9 @@ describe('buildNewsDataset', () => {
     });
     expect(data.articles[0]?.events[0]?.startsAt).toBeInstanceOf(Date);
     expect(data.articles[0]?.events[0]?.endsAt).toBeInstanceOf(Date);
-    expect(data.home.latest[0]?.events[0]?.startsIso).toBe(
-      '2026-05-31T19:00:00+03:00',
-    );
   });
 
-  it('maps raw article fields into camelCase domain article and dataset fields', () => {
+  it('maps raw article fields into camelCase domain and list models', () => {
     const data = buildNewsDataset(
       [author({ id: 'ig', name: 'Редакция' })],
       [
@@ -668,6 +665,25 @@ describe('buildNewsDataset', () => {
     });
     expect(domainArticle?.publishedAt).toBeInstanceOf(Date);
     expect(data.byId.get('2026/05/article-domain')).toBe(domainArticle);
+    expect(Object.keys(data.home.latest[0] ?? {}).sort())
+      .toMatchInlineSnapshot(`
+      [
+        "author",
+        "cover",
+        "id",
+        "markdownUrl",
+        "month",
+        "pinned",
+        "publishedAt",
+        "publishedIso",
+        "summary",
+        "tags",
+        "time",
+        "title",
+        "url",
+        "year",
+      ]
+    `);
   });
 
   it('normalizes event organizer and performer', () => {
@@ -779,7 +795,6 @@ describe('buildNewsDataset', () => {
     );
 
     expect(data.articles[0]?.events).toEqual([]);
-    expect(data.home.latest[0]?.events).toEqual([]);
   });
 
   it('does not reuse the fallback mention registry between builds', async () => {
