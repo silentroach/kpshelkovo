@@ -9,6 +9,7 @@ import {
   withHomeSchemaBreadcrumbs,
 } from '@/lib/breadcrumbs';
 import { collectionPageSchema } from '@/lib/json-ld';
+import { isActiveOrScheduledMaintenance } from '@/lib/status/lifecycle';
 import { loadStatusData } from '@/lib/status/load';
 import {
   statusCalendarYearUrl,
@@ -18,18 +19,13 @@ import {
 } from '@/lib/status/routes';
 
 const data = await loadStatusData();
-const now = Date.now();
 const calendarYear = data.calendar.buildYear;
 const calendarHeading = `Проблемы и плановые работы за ${calendarYear} год`;
 const overviewTimelineDays = 30;
 const mobileOverviewTimelineDays = 7;
 const recentIncidents = data.incidents.slice(0, 10);
 const activeIncidents = data.active.filter((item) => item.kind === 'incident');
-const plannedWorks = data.incidents.filter(
-  (item) =>
-    item.kind === 'maintenance' &&
-    (item.phase === 'active' || item.started.at.valueOf() > now),
-);
+const plannedWorks = data.incidents.filter(isActiveOrScheduledMaintenance);
 const title = 'Статус поселка — Шелково Онлайн';
 const description =
   'Текущее состояние сервисов КП Шелково: отключения, ограничения интернета, плановые работы и история изменений.';
