@@ -12,7 +12,7 @@ sources:
   - url: https://lk.domyland.ru/services/112747
     description: Официальные каналы ОК Комфорт в Telegram и MAX.
   - url: https://domyland.app/news?targetId=107291&entityName=news&t=okkomfort
-    description: 'Объявление от 26 марта 2026 года: официальный адрес электронной почты.'
+    description: 'Новость от 26 марта 2026 года: официальный адрес электронной почты.'
   - url: https://ok-komfort.ru/company/
     description: Рабочие роли, обязанности и контакты сотрудников общих отделов, адрес электронной почты ОК.
 ---
@@ -28,7 +28,7 @@ sources:
 
 **В «Справочной информации» ОК добавочные отличаются:** 4 — газификация, 5 — охрана дома, 6 — консультация по пропускам. Если добавочный не приводит в нужный отдел, уточните направление у оператора единого номера.
 
-Написать в ОК можно на **[info@ok-komfort.ru](mailto:info@ok-komfort.ru)**. Адрес указан в [объявлении ОК](https://domyland.app/news?targetId=107291&entityName=news&t=okkomfort) и на [сайте компании](https://ok-komfort.ru/company/).
+Написать в ОК можно на **[info@ok-komfort.ru](mailto:info@ok-komfort.ru)**.
 
 ## Охрана и экстренные службы
 
