@@ -113,6 +113,9 @@ const num = (value: number): string =>
     maximumFractionDigits: 1,
   });
 
+const formatRating = (value: number): string =>
+  `${num(value)}/${RATING_METHODOLOGY.scoreRange.max}`;
+
 function lots(item: Settlement): readonly MarkdownListItem[] {
   if (!item.lots) return [];
 
@@ -264,7 +267,7 @@ const settlementLine = (item: {
     md.paragraph([
       md.link(abs(`/settlements/${item.slug}/index.md`), item.name),
       md.text(
-        ` — тариф ${formatTariffAuto(item.tariff)}; рейтинг ${num(item.rating)}/100; ${item.location.district}`,
+        ` — тариф ${formatTariffAuto(item.tariff)}; рейтинг ${formatRating(item.rating)}; ${item.location.district}`,
       ),
     ]),
   ]);
@@ -373,9 +376,14 @@ export async function buildHomeMd(): Promise<string> {
 }
 
 export async function buildRatingMd(): Promise<string> {
-  const { adjustments, availabilityScores, groupWeights, neutralBlockScore } =
-    RATING_METHODOLOGY;
-  const formula = `rating = ${RATING_METHODOLOGY.scoreRange.max} * (infra * ${groupWeights.infrastructure.toFixed(2)} + spaces * ${groupWeights.commonSpaces.toFixed(2)} + service * ${groupWeights.serviceModel.toFixed(2)} + distance * ${groupWeights.distance.toFixed(2)})`;
+  const {
+    adjustments,
+    availabilityScores,
+    groupWeights,
+    neutralBlockScore,
+    scoreRange,
+  } = RATING_METHODOLOGY;
+  const formula = `rating = ${scoreRange.max} * (infra * ${groupWeights.infrastructure} + spaces * ${groupWeights.commonSpaces} + service * ${groupWeights.serviceModel} + distance * ${groupWeights.distance})`;
 
   return serialize([
     md.heading(1, 'Методика расчета условного рейтинга поселков'),
@@ -481,7 +489,7 @@ export function buildSettlementMd({
     company && company.url
       ? [md.text(`${company.title} — `), linkTo(company.url)]
       : company?.title;
-  const score = rating ? `${num(rating.score)}/100` : undefined;
+  const score = rating ? formatRating(rating.score) : undefined;
 
   return serialize([
     md.heading(1, settlement.name),

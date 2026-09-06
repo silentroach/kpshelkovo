@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { calculateDistance } from '@shelkovo/geo';
 
 import { toFull, toFullPayload } from './full';
-import type { Rating } from './rating';
+import { RATING_METHODOLOGY, type Rating } from './rating';
 import { mapRawSettlement } from './settlement/mapper';
 import type { RawSettlement } from './settlement/schema';
 
@@ -189,7 +189,11 @@ describe('toFull', () => {
     );
 
     const invalidRatings = new Map(ratings);
-    invalidRatings.set('test', { score: 101, km: 62.1, ring: 43.9 });
+    invalidRatings.set('test', {
+      score: RATING_METHODOLOGY.scoreRange.max + 1,
+      km: 62.1,
+      ring: 43.9,
+    });
     expect(() =>
       toFullPayload({ ...input, ratings: invalidRatings }),
     ).toThrow();

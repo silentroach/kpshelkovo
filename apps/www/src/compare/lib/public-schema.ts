@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { RATING_METHODOLOGY } from './rating';
+
 const NonEmptyTextSchema = z.string().min(1).meta({ id: 'text' });
 const UriSchema = z.url().meta({ id: 'uri' });
 
@@ -169,7 +171,10 @@ const SettlementSchema = z
     infrastructure: InfrastructureSchema,
     common_spaces: CommonSpacesSchema,
     service_model: ServiceModelSchema,
-    rating: z.number().min(0).max(100),
+    rating: z
+      .number()
+      .min(RATING_METHODOLOGY.scoreRange.min)
+      .max(RATING_METHODOLOGY.scoreRange.max),
     distance: DistanceSchema,
   })
   .meta({ id: 'settlement' });

@@ -132,10 +132,9 @@ const distanceFloor = `После ${formatNumberUnitRu(lastDistancePoint.ringKm,
               <div class="rating-panel rating-panel--responsive">
                 <p class="rating-eyebrow">Коротко</p>
                 <p class="rating-note">
-                  Больше всего весят дороги, вода, газ, канализация, охрана,
-                  повседневная среда и близость к Москве. Премиальные опции
-                  учитываются, но не перекрывают слабую базу; неполные карточки
-                  тянутся к середине шкалы.
+                  Модель учитывает дороги, инженерные сети, охрану, повседневную
+                  среду, сервис и близость к Москве. Неполные карточки тянутся к
+                  середине шкалы.
                 </p>
               </div>
             </div>
@@ -264,37 +263,31 @@ const distanceFloor = `После ${formatNumberUnitRu(lastDistancePoint.ringKm,
               слабая, высокий уровень не получится даже при красивой концепции,
               воде рядом или премиальных объектах.
             </p>
-            <div class="rating-grid rating-grid--2">
-              <div class="rating-panel rating-panel--roomy">
-                <h3 class="rating-panel-title">Максимально влияют</h3>
-                <ul class="rating-list">
-                  <li>Дороги</li>
-                  <li>Вода</li>
-                  <li>Газ</li>
-                  <li>Канализация</li>
-                  <li>Охрана</li>
-                  <li>Видеонаблюдение</li>
-                  <li>КПП</li>
-                </ul>
-              </div>
-              <div class="rating-panel rating-panel--roomy">
-                <h3 class="rating-panel-title">Дополняют картину</h3>
-                <ul class="rating-list">
-                  <li>Освещение</li>
-                  <li>Тротуары</li>
-                  <li>Ливневка</li>
-                  <li>Ограждение</li>
-                  <li>Подземное электричество</li>
-                  <li>Административное здание</li>
-                  <li>Магазины и сервисы внутри поселка</li>
-                </ul>
-              </div>
+            <div class="rating-panel rating-panel--roomy">
+              <ul class="rating-list rating-list--columns">
+                <li>Дороги</li>
+                <li>Вода</li>
+                <li>Газ</li>
+                <li>Канализация</li>
+                <li>Охрана</li>
+                <li>Видеонаблюдение</li>
+                <li>КПП</li>
+                <li>Освещение</li>
+                <li>Тротуары</li>
+                <li>Ливневка</li>
+                <li>Ограждение</li>
+                <li>Подземное электричество</li>
+                <li>Административное здание</li>
+                <li>Магазины и сервисы внутри поселка</li>
+              </ul>
             </div>
             <div class="rating-explainer">
               <p>
                 Подтвержденный признак получает полный балл. Ограниченный или
                 компромиссный вариант получает часть баллов. Если признака нет,
-                начисляется ноль.
+                начисляется {
+                  formatNumberRu(RATING_METHODOLOGY.availabilityScores.no)
+                }.
               </p>
               <p>
                 Для некоторых признаков есть градация. Например, полностью
@@ -316,29 +309,21 @@ const distanceFloor = `После ${formatNumberUnitRu(lastDistancePoint.ringKm,
               спорт, доступ к воде и клубную среду. Премиальные признаки не
               должны перевешивать базовую функциональность поселка.
             </p>
-            <div class="rating-grid rating-grid--2">
-              <div class="rating-panel rating-panel--roomy">
-                <h3 class="rating-panel-title">Более значимые признаки</h3>
-                <ul class="rating-list">
-                  <li>Детские площадки</li>
-                  <li>Спортивные зоны</li>
-                  <li>Пешеходные маршруты</li>
-                  <li>Доступ к воде</li>
-                  <li>Клубная инфраструктура</li>
-                </ul>
-              </div>
-              <div class="rating-panel rating-panel--roomy">
-                <h3 class="rating-panel-title">Менее значимые признаки</h3>
-                <ul class="rating-list">
-                  <li>Пляжные зоны</li>
-                  <li>Зоны барбекю</li>
-                  <li>Бассейн</li>
-                  <li>Фитнес-клуб</li>
-                  <li>Ресторан</li>
-                  <li>Спа-центр</li>
-                  <li>Детский клуб, спортлагерь, школа</li>
-                </ul>
-              </div>
+            <div class="rating-panel rating-panel--roomy">
+              <ul class="rating-list rating-list--columns">
+                <li>Детские площадки</li>
+                <li>Спортивные зоны</li>
+                <li>Пешеходные маршруты</li>
+                <li>Доступ к воде</li>
+                <li>Клубная инфраструктура</li>
+                <li>Пляжные зоны</li>
+                <li>Зоны барбекю</li>
+                <li>Бассейн</li>
+                <li>Фитнес-клуб</li>
+                <li>Ресторан</li>
+                <li>Спа-центр</li>
+                <li>Детский клуб, спортлагерь, школа</li>
+              </ul>
             </div>
             <p class="ui-copy rating-copy">
               Поселок без SPA или ресторана не считается слабым сам по себе.

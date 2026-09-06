@@ -49,54 +49,70 @@ function mk(
   } satisfies RawSettlement);
 }
 
+function completeRatingFields(
+  level: 'high' | 'low',
+): Pick<RawSettlement, 'infrastructure' | 'common_spaces' | 'service_model'> {
+  const high = level === 'high';
+  const availability = high ? 'yes' : 'no';
+
+  return {
+    infrastructure: {
+      roads: high ? 'asphalt' : 'dirt',
+      sidewalks: availability,
+      lighting: availability,
+      gas: availability,
+      water: availability,
+      sewage: availability,
+      drainage: high ? 'closed' : 'none',
+      checkpoints: availability,
+      security: availability,
+      fencing: availability,
+      video_surveillance: high ? 'full' : 'none',
+      underground_electricity: high ? 'full' : 'none',
+      admin_building: availability,
+      retail_or_services: availability,
+    },
+    common_spaces: {
+      club_infrastructure: availability,
+      playgrounds: availability,
+      sports: availability,
+      walking_routes: availability,
+      water_access: availability,
+      beach_zones: availability,
+      bbq_zones: availability,
+      pool: availability,
+      fitness_club: availability,
+      restaurant: availability,
+      spa_center: availability,
+      kids_club: availability,
+      sports_camp: availability,
+      primary_school: availability,
+    },
+    service_model: {
+      garbage_collection: availability,
+      snow_removal: availability,
+      road_cleaning: availability,
+      landscaping: availability,
+      emergency_service: availability,
+      dispatcher: availability,
+    },
+  };
+}
+
 describe('buildRatings', () => {
-  it('keeps the public numerical methodology explicit', () => {
-    expect(RATING_METHODOLOGY).toMatchInlineSnapshot(`
-      {
-        "adjustments": {
-          "rabstvoPenalty": 15,
-          "waterInTariffBonus": 4,
-        },
-        "availabilityScores": {
-          "no": 0,
-          "partial": 0.5,
-          "yes": 1,
-        },
-        "distancePoints": [
-          {
-            "ringKm": 20,
-            "score": 1,
-          },
-          {
-            "ringKm": 40,
-            "score": 0.82,
-          },
-          {
-            "ringKm": 60,
-            "score": 0.58,
-          },
-          {
-            "ringKm": 80,
-            "score": 0.32,
-          },
-          {
-            "ringKm": 100,
-            "score": 0.12,
-          },
-        ],
-        "groupWeights": {
-          "commonSpaces": 0.25,
-          "distance": 0.15,
-          "infrastructure": 0.5,
-          "serviceModel": 0.1,
-        },
-        "neutralBlockScore": 0.5,
-        "scoreRange": {
-          "max": 100,
-          "min": 0,
-        },
-      }
-    `);
+  it('keeps group weights normalized and distance points ordered', () => {
+    const groupWeightTotal = Object.values(
+      RATING_METHODOLOGY.groupWeights,
+    ).reduce((sum, weight) => sum + weight, 0);
+    const distancePointsAreOrdered = RATING_METHODOLOGY.distancePoints.every(
+      (point, index, points) => {
+        const previous = points[index - 1];
+        return !previous || point.ringKm > previous.ringKm;
+      },
+    );
+
+    expect(groupWeightTotal).toBe(1);
+    expect(distancePointsAreOrdered).toBe(true);
   });
 
   it('calculates distance to Moscow once per settlement', () => {
@@ -128,37 +144,40 @@ describe('buildRatings', () => {
     expect(near?.score).toBeGreaterThan(far?.score ?? 0);
   });
 
-  it('uses every declared distance point in the calculation', () => {
+  it('interpolates distance, keeps its floor, and clamps final scores', () => {
     const calculateDistance = vi.spyOn(geo, 'calculateDistance');
 
-    for (const point of RATING_METHODOLOGY.distancePoints) {
-      calculateDistance.mockReturnValueOnce(MKAD_RADIUS + point.ringKm);
-    }
+    calculateDistance
+      .mockReturnValueOnce(MKAD_RADIUS + 50)
+      .mockReturnValueOnce(MKAD_RADIUS + 140)
+      .mockReturnValueOnce(MKAD_RADIUS)
+      .mockReturnValueOnce(MKAD_RADIUS + 140);
 
-    const rows = buildRatings(
-      RATING_METHODOLOGY.distancePoints.map((point) =>
-        mk(`ring-${point.ringKm}`),
+    const rows = buildRatings([
+      mk('interpolated'),
+      mk('floor'),
+      mk('maximum', {
+        ...completeRatingFields('high'),
+        water_in_tariff: true,
+      }),
+      mk('minimum', {
+        ...completeRatingFields('low'),
+        rabstvo: true,
+      }),
+    ]);
+
+    expect(
+      ['interpolated', 'floor', 'maximum', 'minimum'].map(
+        (slug) => rows.get(slug)?.score,
       ),
-    );
-    const { groupWeights, neutralBlockScore, scoreRange } = RATING_METHODOLOGY;
-    const nonDistanceWeight =
-      groupWeights.infrastructure +
-      groupWeights.commonSpaces +
-      groupWeights.serviceModel;
-    const expected = RATING_METHODOLOGY.distancePoints.map(
-      (point) =>
-        Math.round(
-          scoreRange.max *
-            (neutralBlockScore * nonDistanceWeight +
-              point.score * groupWeights.distance) *
-            10,
-        ) / 10,
-    );
-    const actual = RATING_METHODOLOGY.distancePoints.map(
-      (point) => rows.get(`ring-${point.ringKm}`)?.score,
-    );
-
-    expect(actual).toEqual(expected);
+    ).toMatchInlineSnapshot(`
+      [
+        53,
+        44.3,
+        100,
+        0,
+      ]
+    `);
   });
 
   it('keeps fully unknown rows between strong and weak rows', () => {

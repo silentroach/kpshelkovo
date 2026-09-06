@@ -221,7 +221,7 @@ describe('compare markdown navigation', () => {
     const lastDistancePoint = RATING_METHODOLOGY.distancePoints.at(-1)!;
     const expected = [
       'Главная в Markdown: <https://kpshelkovo.online/815/compare/index.md>',
-      `rating = ${RATING_METHODOLOGY.scoreRange.max} * (infra * ${groupWeights.infrastructure.toFixed(2)} + spaces * ${groupWeights.commonSpaces.toFixed(2)} + service * ${groupWeights.serviceModel.toFixed(2)} + distance * ${groupWeights.distance.toFixed(2)})`,
+      `rating = ${RATING_METHODOLOGY.scoreRange.max} * (infra * ${groupWeights.infrastructure} + spaces * ${groupWeights.commonSpaces} + service * ${groupWeights.serviceModel} + distance * ${groupWeights.distance})`,
       `Инфраструктура: ${percent(groupWeights.infrastructure)}`,
       `Общественные пространства: ${percent(groupWeights.commonSpaces)}`,
       `Сервисная модель: ${percent(groupWeights.serviceModel)}`,
