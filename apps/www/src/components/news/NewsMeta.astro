@@ -43,12 +43,7 @@ const visibleAreas = appliesToAllAreas ? [] : areas;
   {
     author &&
       (author.url ? (
-        <a
-          href={author.url}
-          target="_blank"
-          rel="noreferrer noopener"
-          class="ui-link news-meta-author"
-        >
+        <a href={author.url} class="ui-link news-meta-author">
           {formatNewsAuthor(author, { short: !fullAuthorName })}
         </a>
       ) : (
