@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { parse } from 'yaml';
 
 import {
   buildNewsArchiveMarkdown,
@@ -80,6 +81,31 @@ const yearArchive = (
 });
 
 describe('buildNewsArticleMarkdown', () => {
+  it.each([
+    ['official', 'official'],
+    ['community', 'community'],
+    ['editorial', 'editorial'],
+    ['other', 'other'],
+  ] as const)(
+    'publishes domain author kind %s as public kind %s',
+    (domainKind, publicKind) => {
+      const markdown = buildNewsArticleMarkdown(
+        article({
+          author: {
+            id: 'source',
+            name: 'Источник',
+            kind: domainKind,
+          },
+        }),
+      );
+      const frontmatter = parse(
+        markdown.slice(4, markdown.indexOf('\n---', 4)),
+      ) as { readonly author: { readonly kind: string } };
+
+      expect(frontmatter.author.kind).toBe(publicKind);
+    },
+  );
+
   it('puts article metadata into YAML frontmatter without officialness flags', () => {
     const markdown = buildNewsArticleMarkdown(
       article({ searchAliases: ['служебный поисковый алиас'] }),
