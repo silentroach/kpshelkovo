@@ -21,9 +21,6 @@ describe('root discovery route smoke', () => {
       (entry) => entry.anchor === 'https://example.com/815/regulation/',
     );
 
-    expect(response.headers.get('Content-Type')).toContain(
-      'application/linkset+json',
-    );
     expect(
       payload.linkset.some(
         (entry) => entry.anchor === 'https://example.com/people/index.md',

@@ -1,30 +1,22 @@
 import type { APIRoute } from 'astro';
 
-import { createJsonResponse } from '@/lib/json-response';
-import { PROFILE, catalog, self } from '@/lib/reglament/discovery';
+import {
+  createApiCatalogGetResponse,
+  createApiCatalogHeadResponse,
+} from '@/lib/api-catalog-response';
+import { catalog, self } from '@/lib/reglament/discovery';
 import { canonRoot } from '@/lib/site';
 
 export const prerender = true;
 
-function headers(root: string): HeadersInit {
-  return {
-    'Content-Type': `application/linkset+json; profile="${PROFILE}"`,
-    Link: self(root),
-  };
-}
-
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = () => {
   const root = canonRoot();
 
-  return createJsonResponse(catalog(root), {
-    headers: headers(root),
-  });
+  return createApiCatalogGetResponse(catalog(root), self(root));
 };
 
-export const HEAD: APIRoute = async () => {
+export const HEAD: APIRoute = () => {
   const root = canonRoot();
 
-  return new Response(null, {
-    headers: headers(root),
-  });
+  return createApiCatalogHeadResponse(self(root));
 };
