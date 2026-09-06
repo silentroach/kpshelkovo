@@ -3,6 +3,9 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import type { ReviewEntry } from '../load';
 
 let buildReviewsDataset: typeof import('../load').buildReviewsDataset;
+let createSiteMentionRegistry: typeof import('@/lib/mentions').createSiteMentionRegistry;
+let createPersonMentionTarget: typeof import('@/lib/people/mentions').createPersonMentionTarget;
+let createPlaceMentionTarget: typeof import('@/lib/places/mentions').createPlaceMentionTarget;
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
@@ -10,6 +13,9 @@ beforeAll(async () => {
     BASE_URL: '/',
   });
 
+  ({ createSiteMentionRegistry } = await import('@/lib/mentions'));
+  ({ createPersonMentionTarget } = await import('@/lib/people/mentions'));
+  ({ createPlaceMentionTarget } = await import('@/lib/places/mentions'));
   ({ buildReviewsDataset } = await import('../load'));
 });
 
@@ -43,7 +49,6 @@ describe('buildReviewsDataset', () => {
       }),
       entry({
         id: '2026-06-25-life-in-shelkovo-forest',
-        body: 'Основной текст отзыва с @kschemelinin.',
         data: {
           published_at: '2026-06-25',
           slug: 'life-in-shelkovo-forest',
@@ -75,6 +80,62 @@ describe('buildReviewsDataset', () => {
         { type: 'management', rating: 2 },
       ],
     });
+  });
+
+  it('preprocesses mentions in the review body and aspect bodies', () => {
+    const mentionRegistry = createSiteMentionRegistry([
+      createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин'),
+      createPlaceMentionTarget('apple-garden', 'Яблоневый сад'),
+    ]);
+    const data = buildReviewsDataset(
+      [
+        entry({
+          id: '2026-06-25-with-mentions',
+          body: 'Основной текст отзыва с @kschemelinin.',
+          data: {
+            published_at: '2026-06-25',
+            slug: 'with-mentions',
+            area: 'forest',
+            aspects: [
+              {
+                type: 'place',
+                rating: 5,
+                body: 'Рядом [яблоневый сад](@apple-garden).',
+              },
+            ],
+          },
+        }),
+      ],
+      { mentionRegistry },
+    );
+    const review = data.reviews[0];
+
+    expect({
+      body: review?.body,
+      aspects: review?.aspects,
+      mentions: review?.mentions.map(({ type, slug }) => ({ type, slug })),
+    }).toMatchInlineSnapshot(`
+      {
+        "aspects": [
+          {
+            "body": "Рядом [яблоневый сад](/map/apple-garden/).",
+            "rating": 5,
+            "type": "place",
+          },
+        ],
+        "body": "Основной текст отзыва с [Кирилл Щемелинин](/people/kschemelinin/).",
+        "mentions": [
+          {
+            "slug": "kschemelinin",
+            "type": "person",
+          },
+          {
+            "slug": "apple-garden",
+            "type": "place",
+          },
+        ],
+      }
+    `);
   });
 
   it('fails when entry id does not match published_at and slug', () => {
