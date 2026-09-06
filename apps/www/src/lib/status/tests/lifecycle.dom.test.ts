@@ -28,8 +28,8 @@ const renderServiceState = (
   label.dataset.statusServiceIncidents = JSON.stringify([
     {
       kind,
-      startedAt: START_MS,
-      endedAt: END_MS,
+      start: START_MS,
+      end: END_MS,
     },
   ]);
 

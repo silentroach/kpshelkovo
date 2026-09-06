@@ -1,13 +1,8 @@
 <script lang="ts">
+  import { getAvailabilityDisplay } from './availability-status';
   import ComparisonTable from './ComparisonTable.svelte';
-  import type {
-    ComparisonStatus,
-    ComparisonTableRow,
-  } from './comparison-table.types';
-  import type {
-    ServiceModel,
-    AvailabilityStatus,
-  } from '../lib/settlement/types';
+  import type { ComparisonTableRow } from './comparison-table.types';
+  import type { ServiceModel } from '../lib/settlement/types';
 
   interface Props {
     title?: string;
@@ -29,43 +24,6 @@
     dispatcher: 'Диспетчерская служба',
   };
 
-  // Иконки статусов.
-  const icons: Record<AvailabilityStatus, string> = {
-    yes: '✓',
-    no: '✗',
-    partial: '◐',
-  };
-
-  // Цвета бейджей статусов.
-  const tones: Record<AvailabilityStatus, string> = {
-    yes: 'ui-badge-success',
-    no: 'ui-badge-danger',
-    partial: 'ui-badge-warning',
-  };
-
-  // Текст статуса.
-  const statusText: Record<AvailabilityStatus, string> = {
-    yes: 'Есть',
-    no: 'Нет',
-    partial: 'Частично',
-  };
-
-  const unknown: ComparisonStatus = {
-    icon: '?',
-    text: 'Неизвестно',
-    tone: 'ui-badge-muted',
-  };
-
-  function getDisplay(value?: AvailabilityStatus): ComparisonStatus {
-    if (value === undefined) return unknown;
-
-    return {
-      icon: icons[value],
-      text: statusText[value],
-      tone: tones[value],
-    };
-  }
-
   // Порядок отображения услуг.
   const serviceOrder = [
     'garbageCollection',
@@ -82,8 +40,8 @@
       label: labels[key],
       value: services[key],
       shelkovoValue: shelkovoServices?.[key],
-      status: getDisplay(services[key]),
-      shelkovoStatus: getDisplay(shelkovoServices?.[key]),
+      status: getAvailabilityDisplay(services[key]),
+      shelkovoStatus: getAvailabilityDisplay(shelkovoServices?.[key]),
     })),
   );
 </script>
