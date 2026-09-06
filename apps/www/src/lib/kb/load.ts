@@ -3,7 +3,6 @@ import type { CollectionEntry } from 'astro:content';
 import { preprocessSiteMarkdownContent } from '@/lib/markdown/render';
 import type { SiteMentionRegistry } from '@/lib/mentions';
 import { loadSiteMentionRegistry } from '@/lib/mentions/registry';
-import type { RawKbPage } from './raw-schema';
 import { kbCanonical, kbDetailCanonical, kbDetailUrl, kbUrl } from './routes';
 import type { KbPage, KbPageFlag } from './types';
 
@@ -14,7 +13,7 @@ export type KbPageEntry = Pick<CollectionEntry<'kbPages'>, 'id' | 'body'> & {
     readonly seo?: {
       readonly description?: string;
     };
-    readonly sources?: Readonly<NonNullable<RawKbPage['sources']>>;
+    readonly sources?: CollectionEntry<'kbPages'>['data']['sources'];
   };
 };
 

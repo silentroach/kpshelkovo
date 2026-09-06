@@ -15,25 +15,15 @@ const RawKbPageSeoSchema = z
   .strict();
 
 const isKbSourceUrl = (value: string): boolean => {
-  if (
-    value.startsWith('/') &&
-    !value.startsWith('//') &&
-    !value.includes('\\')
-  ) {
-    return true;
-  }
+  const url = URL.parse(value);
 
-  try {
-    const url = new URL(value);
-
-    return (
+  return (
+    /^\/(?![\\/])/.test(value) ||
+    (!!url &&
       (url.protocol === 'http:' || url.protocol === 'https:') &&
       !url.username &&
-      !url.password
-    );
-  } catch {
-    return false;
-  }
+      !url.password)
+  );
 };
 
 const RawKbPageSourceSchema = z

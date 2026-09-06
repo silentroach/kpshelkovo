@@ -67,8 +67,6 @@ flags: [noindex]
 
 Другие поля frontmatter не вводим в MVP. В частности, не добавляем `published_at`, `updated_at`, `status`, `owner`, `source_urls`, `related`, `redirect_from`, `order`, top-level `description` и `tags`. Все Markdown-файлы, прошедшие сборочную валидацию, считаются опубликованными; `noindex` управляет внешней индексацией, а `exclude-from-site-search` - только внутрисайтовым поиском.
 
-После MVP внутренний редакционный журнал источников добавлен отдельным решением в ADR-035. Он не меняет публичные поверхности базы знаний.
-
 Тело страницы рендерится через общий app-level Markdown pipeline `@/lib/markdown/render`, чтобы база знаний получала те же правила типографики, безопасного Markdown и mentions, что и остальные редакционные Markdown-поверхности сайта. Frontmatter `title` остается plain text: он нужен для H1, breadcrumbs и page title, а не для Markdown-рендера.
 
 ## Публичные поверхности
