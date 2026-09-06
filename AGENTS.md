@@ -38,6 +38,7 @@ scripts/     # build/deploy helper scripts
 
 ## Skills
 
+- При любой разработке подключай скилл `ponytail`, при ревью - `ponytail-review`
 - Правишь что-то на фронте - подключай `frontend-ui-engineering`
 - При редактировании/создании любого видимого текста используй скилл `copy-editing` (ADR и техническая дока не в счет), а отображенную в вебе - еще и `web-typography`
 - Добавляешь или правишь новость сайта - подключай `news-maker`
