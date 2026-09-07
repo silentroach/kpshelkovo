@@ -17,7 +17,7 @@ interface AstroBeforeSwapEvent extends Event {
 }
 
 type YandexMetrika = ((...args: readonly unknown[]) => void) & {
-  a?: readonly (readonly unknown[])[];
+  a?: (readonly unknown[])[];
   l?: number;
 };
 
@@ -91,7 +91,7 @@ const installMetrikaStub = (): YandexMetrika => {
   }
 
   const ym: YandexMetrika = (...args) => {
-    ym.a = [...(ym.a ?? []), args];
+    (ym.a ??= []).push(args);
   };
 
   ym.l = Date.now();
@@ -140,6 +140,7 @@ const bindMetrikaLoader = (): void => {
   }
 
   window.__shelkovoYmDeferred = true;
+  installMetrikaStub();
   const scheduleAfterLoad = (): void => {
     window.setTimeout(() => loadMetrika(id), 1000);
   };

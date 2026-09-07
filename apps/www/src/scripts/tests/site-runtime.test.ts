@@ -107,7 +107,30 @@ afterEach(() => {
 });
 
 describe('Yandex Metrika', () => {
-  it('sends the active visit goal through the loaded counter', async () => {
+  it('queues goals before the delayed counter load', async () => {
+    vi.useFakeTimers();
+    document.documentElement.dataset.siteMetrikaId = '108975391';
+    const append = vi
+      .spyOn(document.head, 'append')
+      .mockImplementation(() => {});
+
+    vi.resetModules();
+    await import('../site-runtime');
+    window.ym?.(108975391, 'reachGoal', 'search_open');
+
+    expect(window.ym?.a).toMatchInlineSnapshot(`
+      [
+        [
+          108975391,
+          "reachGoal",
+          "search_open",
+        ],
+      ]
+    `);
+    expect(append).not.toHaveBeenCalled();
+  });
+
+  it('pushes the active visit goal through the instrumented queue', async () => {
     vi.useFakeTimers();
     document.documentElement.dataset.siteMetrikaId = '108975391';
     vi.spyOn(document.head, 'append').mockImplementation(() => {});
@@ -122,11 +145,16 @@ describe('Yandex Metrika', () => {
       throw new Error('Expected active visit tracker callback');
     }
 
-    const loadedYm = vi.fn();
-    window.ym = loadedYm;
+    const queue = window.ym?.a;
+    if (!queue) {
+      throw new Error('Expected Yandex Metrika command queue');
+    }
+
+    const push = vi.fn();
+    Object.defineProperty(queue, 'push', { value: push });
     onGoal();
 
-    expect(loadedYm).toHaveBeenCalledWith(108975391, 'reachGoal', '60_sec');
+    expect(push).toHaveBeenCalledWith([108975391, 'reachGoal', '60_sec']);
   });
 });
 

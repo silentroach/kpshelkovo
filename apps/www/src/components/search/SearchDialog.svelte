@@ -21,6 +21,8 @@
   } from './search-dialog.types';
 
   const SEARCH_DEBOUNCE_MS = 150;
+  const SEARCH_OPEN_GOAL = 'search_open';
+  const SEARCH_GOAL = 'search';
   const RESULT_FORMS = ['результат', 'результата', 'результатов'] as const;
   const FOUND_FORMS = ['Найден', 'Найдено', 'Найдено'] as const;
 
@@ -48,6 +50,23 @@
   let isSearching = $state(false);
   let isLoadingMore = $state(false);
   let loadMoreFailed = $state(false);
+
+  const reachMetrikaGoal = (
+    target: string,
+    params?: Readonly<Record<string, string | number>>,
+  ): void => {
+    const id = Number(document.documentElement.dataset.siteMetrikaId);
+    if (!Number.isFinite(id)) {
+      return;
+    }
+
+    if (params) {
+      window.ym?.(id, 'reachGoal', target, params);
+      return;
+    }
+
+    window.ym?.(id, 'reachGoal', target);
+  };
 
   const hasAnchor = (url: string): boolean => {
     const hashIndex = url.indexOf('#');
@@ -156,6 +175,7 @@
       dialogElement.showModal();
       inputElement?.focus();
     }
+    reachMetrikaGoal(SEARCH_OPEN_GOAL);
     void client.init?.().catch(() => {});
   };
 
@@ -213,6 +233,18 @@
       total = response.total;
       requestedLimit = limit;
       if (mode === 'initial') {
+        const goalParams =
+          response.searchQuery === response.query
+            ? {
+                query: response.query,
+                results_count: response.total,
+              }
+            : {
+                query: response.query,
+                normalized_query: response.searchQuery,
+                results_count: response.total,
+              };
+        reachMetrikaGoal(SEARCH_GOAL, goalParams);
         isSearching = false;
       } else {
         isLoadingMore = false;
