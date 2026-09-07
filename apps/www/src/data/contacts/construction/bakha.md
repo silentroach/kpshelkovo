@@ -8,15 +8,11 @@ contacts:
   phone: '+7 926 983-01-21'
 reviews:
   - sentiment: negative
-    summary: 'В отзыве о дорожке — жалоба на неровную укладку; Баха также просил оставить отзыв.'
+    summary: 'Дорожку уложили неровно.'
     published_at: 2026-09-06
     url: https://t.me/shelkovoecoclub/15263/54892
-  - sentiment: negative
-    summary: 'При обращениях за покосом и забором предложенные цены были, по сравнению жительницы, минимум на треть выше, чем у ОК.'
-    published_at: 2026-09-06
-    url: https://t.me/shelkovoecoclub/15263/54890
-  - sentiment: negative
-    summary: 'Покраска устроила по качеству и скорости, но, по словам жительницы, главным условием Бахи был положительный отзыв в чате.'
+  - sentiment: positive
+    summary: 'Покраска устроила по качеству и скорости.'
     published_at: 2026-09-06
     url: https://t.me/shelkovoecoclub/15263/54885
   - sentiment: positive
