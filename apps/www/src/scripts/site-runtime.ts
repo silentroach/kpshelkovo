@@ -2,6 +2,7 @@ import { installHomeStatusHydration } from '@/lib/home/status';
 import { highlightSearchTerms } from '@/lib/search/highlight';
 import { installStatusServiceStateHydration } from '@/lib/status/lifecycle.dom';
 import { installStickyTableHeaders } from '@/lib/sticky-table-headers';
+import { installActiveVisitTracker } from '@/scripts/active-visit';
 import {
   isSearchDialogLoadRetry,
   loadSearchDialog,
@@ -128,6 +129,7 @@ const loadMetrika = (id: number): void => {
     url: location.href,
     webvisor: false,
   });
+  installActiveVisitTracker(() => ym(id, 'reachGoal', '60_sec'));
 };
 
 const bindMetrikaLoader = (): void => {
