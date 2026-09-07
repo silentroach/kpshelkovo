@@ -129,7 +129,7 @@ const loadMetrika = (id: number): void => {
     url: location.href,
     webvisor: false,
   });
-  installActiveVisitTracker(() => ym(id, 'reachGoal', '60_sec'));
+  installActiveVisitTracker(() => window.ym?.(id, 'reachGoal', '60_sec'));
 };
 
 const bindMetrikaLoader = (): void => {

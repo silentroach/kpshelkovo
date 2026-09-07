@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const highlightSearchTerms = vi.hoisted(() => vi.fn(async () => {}));
+const installActiveVisitTracker = vi.hoisted(() => vi.fn());
 const { isSearchDialogLoadRetry, loadSearchDialog, openSearchDialog } =
   vi.hoisted(() => {
     const openSearchDialog = vi.fn();
@@ -16,6 +17,7 @@ vi.mock('@/lib/search/highlight', () => ({
   highlightSearchTerms,
   SEARCH_HIGHLIGHT_PARAM: 'h',
 }));
+vi.mock('@/scripts/active-visit', () => ({ installActiveVisitTracker }));
 vi.mock('@/scripts/search-dialog-loader', () => ({
   isSearchDialogLoadRetry,
   loadSearchDialog,
@@ -83,6 +85,7 @@ const renderSearchShell = () => {
 
 beforeEach(() => {
   highlightSearchTerms.mockClear();
+  installActiveVisitTracker.mockClear();
   openSearchDialog.mockClear();
   loadSearchDialog.mockReset();
   loadSearchDialog.mockResolvedValue({ openSearchDialog });
@@ -94,7 +97,37 @@ afterEach(() => {
   document.dispatchEvent(new Event('astro:before-swap'));
   document.body.innerHTML = '';
   history.replaceState({}, '', '/');
+  delete document.documentElement.dataset.siteMetrikaId;
+  delete window.__shelkovoYmDeferred;
+  delete window.__shelkovoYmLoaded;
+  delete window.__shelkovoYmTransitions;
+  delete window.ym;
+  vi.useRealTimers();
   vi.restoreAllMocks();
+});
+
+describe('Yandex Metrika', () => {
+  it('sends the active visit goal through the loaded counter', async () => {
+    vi.useFakeTimers();
+    document.documentElement.dataset.siteMetrikaId = '108975391';
+    vi.spyOn(document.head, 'append').mockImplementation(() => {});
+
+    vi.resetModules();
+    await import('../site-runtime');
+    window.dispatchEvent(new Event('load'));
+    await vi.advanceTimersByTimeAsync(1_000);
+
+    const onGoal = installActiveVisitTracker.mock.calls[0]?.[0];
+    if (!onGoal) {
+      throw new Error('Expected active visit tracker callback');
+    }
+
+    const loadedYm = vi.fn();
+    window.ym = loadedYm;
+    onGoal();
+
+    expect(loadedYm).toHaveBeenCalledWith(108975391, 'reachGoal', '60_sec');
+  });
 });
 
 describe('search highlights', () => {
