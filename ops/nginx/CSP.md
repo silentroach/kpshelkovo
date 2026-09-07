@@ -100,10 +100,11 @@
 
 ## Фреймы
 
-`frame-src 'self' https://yandex.ru`
+`frame-src 'self' https://yandex.ru https://mc.yandex.ru`
 
 - Same-origin фреймы разрешены для внутренних сценариев.
 - `https://yandex.ru` нужен для виджетов Яндекс Карт, встроенных через `<iframe>`.
+- `https://mc.yandex.ru` нужен для служебного скрытого фрейма Яндекс Метрики `/metrika/match.html`.
 
 JS API Яндекс Карт v3 не является iframe. Для него нужны `script-src`, `connect-src`, `img-src`, `style-src`, `font-src` и `worker-src`.
 
@@ -125,6 +126,7 @@ JS API Яндекс Карт v3 не является iframe. Для него н
 - Скрипты: `https://mc.yandex.ru`, `https://mc.yandex.com`.
 - Соединения: `https://mc.yandex.ru`, `https://mc.yandex.com` и соответствующие WebSocket-адреса.
 - Beacon-изображения: `https://mc.yandex.ru`, `https://mc.yandex.com`.
+- Служебный фрейм: `https://mc.yandex.ru/metrika/match.html`.
 - В текущей инициализации карта кликов и Вебвизор отключены.
 
 Яндекс Карты через iframe-виджеты:
