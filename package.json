@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@11.9.0",
+  "packageManager": "pnpm@11.11.0",
   "scripts": {
     "clean": "rm -rf dist apps/www/dist apps/www/.astro node_modules/.astro",
     "dev": "turbo run dev",
