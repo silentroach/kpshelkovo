@@ -1,5 +1,5 @@
 import { resolve } from 'node:path';
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, expect, it, vi } from 'vitest';
 
 import type { SearchResponse } from '@/lib/search/client.types';
 
@@ -21,7 +21,10 @@ vi.mock('@/lib/search/client', () => ({
   },
 }));
 
-const renderSearchDialog = async (): Promise<string> => {
+let searchDialogHtml: string;
+
+// Compile the SSR fixture before the hydration test's timeout starts.
+beforeAll(async () => {
   vi.stubGlobal('localStorage', {
     clear: vi.fn(),
     getItem: vi.fn(),
@@ -56,11 +59,11 @@ const renderSearchDialog = async (): Promise<string> => {
       '/src/components/search/tests/SearchDialog.ssr-fixture.ts',
     );
 
-    return module.renderSearchDialog();
+    searchDialogHtml = module.renderSearchDialog();
   } finally {
     await server.close();
   }
-};
+});
 
 afterEach(() => {
   document.dispatchEvent(new Event('astro:before-swap'));
@@ -72,7 +75,7 @@ afterEach(() => {
 it('hydrates the focused server input without losing its first query', async () => {
   document.body.innerHTML = `
     <button type="button">Search</button>
-    <div data-search-dialog-root>${await renderSearchDialog()}</div>
+    <div data-search-dialog-root>${searchDialogHtml}</div>
   `;
   const opener = document.querySelector<HTMLElement>('button');
   const root = document.querySelector<HTMLElement>('[data-search-dialog-root]');
