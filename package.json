@@ -1,9 +1,8 @@
 {
   "name": "shelkovo-workspace",
-  "type": "module",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@11.11.0",
+  "type": "module",
   "scripts": {
     "clean": "rm -rf dist apps/www/dist apps/www/.astro node_modules/.astro",
     "dev": "turbo run dev",
@@ -12,16 +11,14 @@
     "search:prepare": "pnpm --filter @shelkovo/www search:prepare",
     "preview": "turbo run preview",
     "typecheck": "turbo run typecheck",
-    "format": "prettier --write .",
+    "format": "oxfmt --write . && prettier --write \"**/*.astro\"",
+    "format:check": "oxfmt --check . && prettier --check \"**/*.astro\"",
     "format:changed": "lint-staged",
     "test": "turbo run test",
     "test:search-quality": "pnpm --filter @shelkovo/www test:search-quality",
     "test:search-quality:update": "pnpm --filter @shelkovo/www test:search-quality:update",
     "test:watch": "turbo run test:watch",
     "postinstall": "node scripts/hooks.mjs"
-  },
-  "lint-staged": {
-    "*.{astro,svelte,js,jsx,ts,tsx,mjs,cjs,mts,cts,json,md,yaml,yml,css,html}": "prettier --write"
   },
   "devDependencies": {
     "@lhci/cli": "^0.15.1",
@@ -31,13 +28,19 @@
     "astro-compressor": "^1.3.0",
     "happy-dom": "^20.12.0",
     "lint-staged": "^17.4.1",
+    "oxfmt": "^0.66.0",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-svelte": "^4.1.1",
     "skills": "^1.5.23",
+    "svelte": "^5.57.0",
     "turbo": "^2.10.12",
     "typescript": "^7.0.2",
     "vite": "^8.2.2",
     "vitest": "^4.1.11"
-  }
+  },
+  "lint-staged": {
+    "*.astro": "prettier --write",
+    "!(*.astro)": "oxfmt --write --no-error-on-unmatched-pattern"
+  },
+  "packageManager": "pnpm@11.11.0"
 }
