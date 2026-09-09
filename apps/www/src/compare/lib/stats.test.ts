@@ -1,14 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import {
-  calculateMedian,
-  calculatePercentile,
-  computeStats,
-  rankSettlements,
-} from './stats';
+
 import type { Rating } from './rating';
 import { mapRawSettlement } from './settlement/mapper';
 import type { RawSettlement } from './settlement/schema';
 import type { Settlement } from './settlement/types';
+import { calculateMedian, calculatePercentile, computeStats, rankSettlements } from './stats';
 
 const toDomain = (item: RawSettlement): Settlement => mapRawSettlement(item);
 
@@ -30,9 +26,7 @@ describe('Stats Module', () => {
     });
 
     it('should throw error for empty array', () => {
-      expect(() => calculateMedian([])).toThrow(
-        'Cannot calculate median of empty array',
-      );
+      expect(() => calculateMedian([])).toThrow('Cannot calculate median of empty array');
     });
 
     it('should handle unsorted arrays', () => {
@@ -59,12 +53,12 @@ describe('Stats Module', () => {
             address_text: 'МО',
             lat: 55,
             lng: 37,
-            district: 'Test',
+            district: 'Test'
           },
           tariff: {
             value: 200,
             unit: 'rub_per_sotka',
-            period: 'month',
+            period: 'month'
           },
           infrastructure: {},
           common_spaces: {},
@@ -75,9 +69,9 @@ describe('Stats Module', () => {
               url: 'https://test.com',
               type: 'official',
               date_checked: '2026-04-03',
-              comment: '',
-            },
-          ],
+              comment: ''
+            }
+          ]
         },
         {
           name: 'Alpha',
@@ -89,12 +83,12 @@ describe('Stats Module', () => {
             address_text: 'МО',
             lat: 55.1,
             lng: 37.1,
-            district: 'Test',
+            district: 'Test'
           },
           tariff: {
             value: 100,
             unit: 'rub_per_sotka',
-            period: 'month',
+            period: 'month'
           },
           infrastructure: {},
           common_spaces: {},
@@ -105,9 +99,9 @@ describe('Stats Module', () => {
               url: 'https://test.com',
               type: 'official',
               date_checked: '2026-04-03',
-              comment: '',
-            },
-          ],
+              comment: ''
+            }
+          ]
         },
         {
           name: 'Beta',
@@ -119,12 +113,12 @@ describe('Stats Module', () => {
             address_text: 'МО',
             lat: 55.2,
             lng: 37.2,
-            district: 'Test',
+            district: 'Test'
           },
           tariff: {
             value: 100,
             unit: 'rub_per_sotka',
-            period: 'month',
+            period: 'month'
           },
           infrastructure: {},
           common_spaces: {},
@@ -135,10 +129,10 @@ describe('Stats Module', () => {
               url: 'https://test.com',
               type: 'official',
               date_checked: '2026-04-03',
-              comment: '',
-            },
-          ],
-        },
+              comment: ''
+            }
+          ]
+        }
       ].map((item) => toDomain(item as RawSettlement));
 
       const ranks = rankSettlements(settlements);
@@ -183,13 +177,13 @@ describe('Stats Module', () => {
           address_text: 'МО, Шелково',
           lat: 55.0,
           lng: 37.0,
-          district: 'Test',
+          district: 'Test'
         },
         tariff: {
           value: 4500,
           unit: 'rub_per_sotka',
           period: 'month',
-          note: '',
+          note: ''
         },
         infrastructure: {
           roads: 'partial_asphalt',
@@ -205,7 +199,7 @@ describe('Stats Module', () => {
           video_surveillance: 'checkpoint_only',
           underground_electricity: 'partial',
           admin_building: 'no',
-          retail_or_services: 'no',
+          retail_or_services: 'no'
         },
         common_spaces: {
           club_infrastructure: 'yes',
@@ -221,7 +215,7 @@ describe('Stats Module', () => {
           kids_club: 'no',
           sports_camp: 'no',
           primary_school: 'no',
-          bbq_zones: 'no',
+          bbq_zones: 'no'
         },
         service_model: {
           garbage_collection: 'yes',
@@ -229,7 +223,7 @@ describe('Stats Module', () => {
           road_cleaning: 'yes',
           landscaping: 'yes',
           emergency_service: 'yes',
-          dispatcher: 'yes',
+          dispatcher: 'yes'
         },
         sources: [
           {
@@ -237,9 +231,9 @@ describe('Stats Module', () => {
             url: 'https://test.com',
             type: 'official',
             date_checked: '2026-04-03',
-            comment: '',
-          },
-        ],
+            comment: ''
+          }
+        ]
       },
       {
         name: 'Lesnoe',
@@ -252,13 +246,13 @@ describe('Stats Module', () => {
           address_text: 'МО, Лесное',
           lat: 55.1,
           lng: 37.1,
-          district: 'Test',
+          district: 'Test'
         },
         tariff: {
           value: 3500,
           unit: 'rub_per_sotka',
           period: 'month',
-          note: '',
+          note: ''
         },
         infrastructure: {
           roads: 'asphalt',
@@ -274,7 +268,7 @@ describe('Stats Module', () => {
           video_surveillance: 'full',
           underground_electricity: 'full',
           admin_building: 'yes',
-          retail_or_services: 'yes',
+          retail_or_services: 'yes'
         },
         common_spaces: {
           club_infrastructure: 'yes',
@@ -290,7 +284,7 @@ describe('Stats Module', () => {
           kids_club: 'no',
           sports_camp: 'no',
           primary_school: 'no',
-          bbq_zones: 'yes',
+          bbq_zones: 'yes'
         },
         service_model: {
           garbage_collection: 'yes',
@@ -298,7 +292,7 @@ describe('Stats Module', () => {
           road_cleaning: 'yes',
           landscaping: 'yes',
           emergency_service: 'yes',
-          dispatcher: 'yes',
+          dispatcher: 'yes'
         },
         sources: [
           {
@@ -306,9 +300,9 @@ describe('Stats Module', () => {
             url: 'https://test.com',
             type: 'official',
             date_checked: '2026-04-03',
-            comment: '',
-          },
-        ],
+            comment: ''
+          }
+        ]
       },
       {
         name: 'Usadby',
@@ -321,13 +315,13 @@ describe('Stats Module', () => {
           address_text: 'МО, Усадьбы',
           lat: 55.2,
           lng: 37.2,
-          district: 'Test',
+          district: 'Test'
         },
         tariff: {
           value: 5500,
           unit: 'rub_per_sotka',
           period: 'month',
-          note: '',
+          note: ''
         },
         infrastructure: {
           roads: 'asphalt',
@@ -343,7 +337,7 @@ describe('Stats Module', () => {
           video_surveillance: 'full',
           underground_electricity: 'full',
           admin_building: 'yes',
-          retail_or_services: 'yes',
+          retail_or_services: 'yes'
         },
         common_spaces: {
           club_infrastructure: 'yes',
@@ -359,7 +353,7 @@ describe('Stats Module', () => {
           kids_club: 'yes',
           sports_camp: 'yes',
           primary_school: 'yes',
-          bbq_zones: 'yes',
+          bbq_zones: 'yes'
         },
         service_model: {
           garbage_collection: 'yes',
@@ -367,7 +361,7 @@ describe('Stats Module', () => {
           road_cleaning: 'yes',
           landscaping: 'yes',
           emergency_service: 'yes',
-          dispatcher: 'yes',
+          dispatcher: 'yes'
         },
         sources: [
           {
@@ -375,16 +369,16 @@ describe('Stats Module', () => {
             url: 'https://test.com',
             type: 'official',
             date_checked: '2026-04-03',
-            comment: '',
-          },
-        ],
-      },
+            comment: ''
+          }
+        ]
+      }
     ].map((item) => toDomain(item as RawSettlement));
 
     const ratings = new Map<string, Rating>([
       ['shelkovo', { score: 62.6, km: 0, ring: 0 }],
       ['lesnoe', { score: 61.2, km: 0, ring: 0 }],
-      ['usadby', { score: 74.5, km: 0, ring: 0 }],
+      ['usadby', { score: 74.5, km: 0, ring: 0 }]
     ]);
 
     it('should compute correct stats for settlements', () => {
@@ -413,13 +407,13 @@ describe('Stats Module', () => {
           name: 'Lesnoe 2',
           short_name: 'Lesnoe 2',
           slug: 'lesnoe-2',
-          website: 'https://lesnoe-2.ru',
-        },
+          website: 'https://lesnoe-2.ru'
+        }
       ];
       const tiedRatings = new Map(ratings).set('lesnoe-2', {
         score: 61.5,
         km: 0,
-        ring: 0,
+        ring: 0
       });
 
       const stats = computeStats(tied, tiedRatings, mockSettlements[0]);
@@ -429,7 +423,7 @@ describe('Stats Module', () => {
 
     it('should throw error when settlements array is empty', () => {
       expect(() => computeStats([], ratings, mockSettlements[0])).toThrow(
-        'No settlements provided',
+        'No settlements provided'
       );
     });
 
@@ -444,8 +438,8 @@ describe('Stats Module', () => {
         tariff: {
           ...mockSettlements[1].tariff,
           value: 3000 + i * 100,
-          normalizedPerSotkaMonth: 3000 + i * 100,
-        },
+          normalizedPerSotkaMonth: 3000 + i * 100
+        }
       }));
       const settlements = [
         list[0],
@@ -456,15 +450,15 @@ describe('Stats Module', () => {
           tariff: {
             ...mockSettlements[0].tariff,
             value: 4500,
-            normalizedPerSotkaMonth: 4500,
-          },
+            normalizedPerSotkaMonth: 4500
+          }
         },
         list[3],
         list[4],
         list[5],
         list[6],
         list[7],
-        list[8],
+        list[8]
       ];
       const ratings = new Map<string, Rating>([
         ['row-1', { score: 50, km: 0, ring: 0 }],
@@ -476,7 +470,7 @@ describe('Stats Module', () => {
         ['row-6', { score: 72, km: 0, ring: 0 }],
         ['row-7', { score: 74, km: 0, ring: 0 }],
         ['row-8', { score: 76, km: 0, ring: 0 }],
-        ['row-9', { score: 78, km: 0, ring: 0 }],
+        ['row-9', { score: 78, km: 0, ring: 0 }]
       ]);
 
       const stats = computeStats(settlements, ratings, mockSettlements[0]);

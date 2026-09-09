@@ -8,11 +8,10 @@ let contactsCollectionPageSchema: typeof import('../seo').contactsCollectionPage
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
-  ({ contactPageSchema, contactsCollectionPageSchema } =
-    await import('../seo'));
+  ({ contactPageSchema, contactsCollectionPageSchema } = await import('../seo'));
 });
 
 const contact = {
@@ -23,14 +22,14 @@ const contact = {
   updatedIso: '2026-07-06',
   contacts: {
     phone: '8 (900) 000-00-00',
-    telegram: 'https://t.me/example',
+    telegram: 'https://t.me/example'
   },
   reviews: [],
   url: '/sarafan/fence/ivan-petrov-fence/',
   markdownUrl: '/sarafan/fence/ivan-petrov-fence/index.md',
   canonical: 'https://example.com/sarafan/fence/ivan-petrov-fence/',
   body: 'Работает с заборами и воротами.',
-  mentions: [],
+  mentions: []
 } satisfies Contact;
 
 describe('contactPageSchema', () => {
@@ -38,7 +37,7 @@ describe('contactPageSchema', () => {
     const schema = contactPageSchema({
       contact,
       description: 'Контакт из раздела «Сарафан»: Забор.',
-      breadcrumbs: [],
+      breadcrumbs: []
     });
 
     expect(schema).toMatchInlineSnapshot(`
@@ -78,17 +77,13 @@ describe('contactPageSchema', () => {
         },
       ]
     `);
-    expect(JSON.stringify(schema)).not.toMatch(
-      /Review|Rating|AggregateRating/u,
-    );
+    expect(JSON.stringify(schema)).not.toMatch(/Review|Rating|AggregateRating/u);
   });
 });
 
 describe('contactsCollectionPageSchema', () => {
   it('keeps URLs required for contact list entries', () => {
-    type ContactListEntry = Parameters<
-      typeof contactsCollectionPageSchema
-    >[0]['items'][number];
+    type ContactListEntry = Parameters<typeof contactsCollectionPageSchema>[0]['items'][number];
 
     expectTypeOf<ContactListEntry>().toEqualTypeOf<{
       readonly name: string;

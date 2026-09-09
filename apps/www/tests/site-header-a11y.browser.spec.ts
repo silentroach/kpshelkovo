@@ -11,25 +11,17 @@ const hasNonColorFocusIndicator = (locator: Locator): Promise<boolean> =>
     return hasOutline || style.boxShadow !== 'none';
   });
 
-const expectChevronExpanded = (
-  locator: Locator,
-  expanded: boolean,
-): Promise<void> =>
+const expectChevronExpanded = (locator: Locator, expanded: boolean): Promise<void> =>
   expect
     .poll(() =>
       locator.evaluate((element) => {
         const style = getComputedStyle(element);
-        return (
-          style.transform !== 'none' ||
-          (style.rotate !== 'none' && style.rotate !== '0deg')
-        );
-      }),
+        return style.transform !== 'none' || (style.rotate !== 'none' && style.rotate !== '0deg');
+      })
     )
     .toBe(expanded);
 
-test('removes the closed tariff submenu from desktop keyboard flow', async ({
-  page,
-}) => {
+test('removes the closed tariff submenu from desktop keyboard flow', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/reviews/rules/', { waitUntil: 'networkidle' });
 
@@ -60,14 +52,10 @@ test('removes the closed tariff submenu from desktop keyboard flow', async ({
   await expectChevronExpanded(icon, false);
 
   await page.keyboard.press('Tab');
-  await expect(
-    page.getByRole('link', { name: 'Карта', exact: true }),
-  ).toBeFocused();
+  await expect(page.getByRole('link', { name: 'Карта', exact: true })).toBeFocused();
 });
 
-test('toggles the hovered tariff submenu and closes it from outside', async ({
-  page,
-}) => {
+test('toggles the hovered tariff submenu and closes it from outside', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/reviews/', { waitUntil: 'networkidle' });
 
@@ -97,14 +85,11 @@ test('toggles the hovered tariff submenu and closes it from outside', async ({
   await expect(menu).toHaveAttribute('hidden', '');
 });
 
-test('toggles the tariff submenu with touch activation', async ({
-  baseURL,
-  browser,
-}) => {
+test('toggles the tariff submenu with touch activation', async ({ baseURL, browser }) => {
   const context = await browser.newContext({
     baseURL,
     hasTouch: true,
-    viewport: { width: 1024, height: 900 },
+    viewport: { width: 1024, height: 900 }
   });
   const page = await context.newPage();
 
@@ -123,9 +108,7 @@ test('toggles the tariff submenu with touch activation', async ({
   }
 });
 
-test('keeps non-hover pen and touch activation open through pointer leave', async ({
-  page,
-}) => {
+test('keeps non-hover pen and touch activation open through pointer leave', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/reviews/', { waitUntil: 'networkidle' });
 
@@ -133,12 +116,8 @@ test('keeps non-hover pen and touch activation open through pointer leave', asyn
 
   for (const pointerType of ['pen', 'touch'] as const) {
     const state = await dropdown.evaluate((element, currentPointerType) => {
-      const button = element.querySelector<HTMLButtonElement>(
-        '[data-site-nav-dropdown-button]',
-      );
-      const menu = element.querySelector<HTMLElement>(
-        '[data-site-nav-dropdown-menu]',
-      );
+      const button = element.querySelector<HTMLButtonElement>('[data-site-nav-dropdown-button]');
+      const menu = element.querySelector<HTMLElement>('[data-site-nav-dropdown-menu]');
       if (!button || !menu) {
         throw new Error('Expected hydrated tariff dropdown');
       }
@@ -146,52 +125,40 @@ test('keeps non-hover pen and touch activation open through pointer leave', asyn
       element.dispatchEvent(
         new PointerEvent('pointerenter', {
           pointerId: 7,
-          pointerType: currentPointerType,
-        }),
+          pointerType: currentPointerType
+        })
       );
       const hiddenAfterEnter = menu.hidden;
-      button.dispatchEvent(
-        new MouseEvent('click', { bubbles: true, detail: 1 }),
-      );
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
       const buttonFocused = document.activeElement === button;
       const hiddenAfterClick = menu.hidden;
       element.dispatchEvent(
         new PointerEvent('pointerleave', {
           pointerId: 7,
-          pointerType: currentPointerType,
-        }),
+          pointerType: currentPointerType
+        })
       );
       const hiddenAfterLeave = menu.hidden;
-      button.dispatchEvent(
-        new MouseEvent('click', { bubbles: true, detail: 1 }),
-      );
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
 
       return {
         buttonFocused,
-        hiddenStates: [
-          hiddenAfterEnter,
-          hiddenAfterClick,
-          hiddenAfterLeave,
-          menu.hidden,
-        ],
+        hiddenStates: [hiddenAfterEnter, hiddenAfterClick, hiddenAfterLeave, menu.hidden]
       };
     }, pointerType);
 
     expect(state).toEqual({
       buttonFocused: false,
-      hiddenStates: [true, false, false, true],
+      hiddenStates: [true, false, false, true]
     });
   }
 });
 
-test('keeps tariff links available without JavaScript', async ({
-  baseURL,
-  browser,
-}) => {
+test('keeps tariff links available without JavaScript', async ({ baseURL, browser }) => {
   const context = await browser.newContext({
     baseURL,
     javaScriptEnabled: false,
-    viewport: { width: 1440, height: 900 },
+    viewport: { width: 1440, height: 900 }
   });
   const page = await context.newPage();
 
@@ -228,11 +195,11 @@ test('keeps tariff links available without JavaScript', async ({
 });
 
 test('shows non-color keyboard focus on the brand at desktop and mobile sizes', async ({
-  page,
+  page
 }) => {
   for (const viewport of [
     { width: 1440, height: 900 },
-    { width: 390, height: 844 },
+    { width: 390, height: 844 }
   ]) {
     await page.setViewportSize(viewport);
     await page.goto('/reviews/', { waitUntil: 'networkidle' });
@@ -245,9 +212,7 @@ test('shows non-color keyboard focus on the brand at desktop and mobile sizes', 
   }
 });
 
-test('shows keyboard-only focus on the mobile menu button', async ({
-  page,
-}) => {
+test('shows keyboard-only focus on the mobile menu button', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/reviews/', { waitUntil: 'networkidle' });
 
@@ -262,28 +227,19 @@ test('shows keyboard-only focus on the mobile menu button', async ({
 
   await page.reload({ waitUntil: 'networkidle' });
   await menuButton.click();
-  await expect(page.locator('details.site-header-menu')).toHaveAttribute(
-    'open',
-    '',
-  );
+  await expect(page.locator('details.site-header-menu')).toHaveAttribute('open', '');
   expect(await hasNonColorFocusIndicator(menuButton)).toBe(false);
 });
 
-test('keeps the sticky desktop header visible while search is open', async ({
-  page,
-}) => {
+test('keeps the sticky desktop header visible while search is open', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/reviews/', { waitUntil: 'networkidle' });
 
   const header = page.locator('.site-header');
   await page.evaluate(() => window.scrollTo(0, 600));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
   await expect
-    .poll(() => page.evaluate(() => window.scrollY))
-    .toBeGreaterThan(0);
-  await expect
-    .poll(() =>
-      header.evaluate((element) => element.getBoundingClientRect().top),
-    )
+    .poll(() => header.evaluate((element) => element.getBoundingClientRect().top))
     .toBe(0);
   const scrollY = await page.evaluate(() => window.scrollY);
 
@@ -291,9 +247,7 @@ test('keeps the sticky desktop header visible while search is open', async ({
   await expect(page.locator('[data-search-dialog]')).toBeVisible();
 
   await expect
-    .poll(() =>
-      header.evaluate((element) => element.getBoundingClientRect().top),
-    )
+    .poll(() => header.evaluate((element) => element.getBoundingClientRect().top))
     .toBe(0);
   await page.mouse.wheel(0, 600);
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(scrollY);

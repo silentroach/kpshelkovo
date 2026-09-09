@@ -1,26 +1,25 @@
 import { padNumber } from '@shelkovo/format';
 
+import { monthMarkdownUrl, monthUrl, yearMarkdownUrl, yearUrl } from './routes';
+import { latestFirst } from './sort';
 import type {
   NewsArchiveSummary,
   NewsArchives,
   NewsListArticle,
   NewsMonthArchive,
-  NewsYearArchive,
+  NewsYearArchive
 } from './types';
-import { monthMarkdownUrl, monthUrl, yearMarkdownUrl, yearUrl } from './routes';
-import { latestFirst } from './sort';
 
 interface YearBucket {
   readonly months: Map<number, NewsListArticle[]>;
 }
 
-export const newsMonthKey = (year: number, month: number): string =>
-  `${year}/${padNumber(month)}`;
+export const newsMonthKey = (year: number, month: number): string => `${year}/${padNumber(month)}`;
 
 const takeSummary = (
   summaries: ReadonlyMap<string, NewsArchiveSummary>,
   used: Set<string>,
-  id: string,
+  id: string
 ): NewsArchiveSummary => {
   const summary = summaries.get(id);
 
@@ -34,14 +33,14 @@ const takeSummary = (
 
 export function buildArchives(
   items: readonly NewsListArticle[],
-  summaries: ReadonlyMap<string, NewsArchiveSummary>,
+  summaries: ReadonlyMap<string, NewsArchiveSummary>
 ): NewsArchives {
   const years = new Map<number, YearBucket>();
   const usedSummaries = new Set<string>();
 
   for (const item of items) {
     const year = years.get(item.year) ?? {
-      months: new Map<number, NewsListArticle[]>(),
+      months: new Map<number, NewsListArticle[]>()
     };
     const month = year.months.get(item.month) ?? [];
 
@@ -65,12 +64,8 @@ export function buildArchives(
             url: monthUrl(year, month),
             markdownUrl: monthMarkdownUrl(year, month),
             count: articles.length,
-            summary: takeSummary(
-              summaries,
-              usedSummaries,
-              newsMonthKey(year, month),
-            ),
-            articles: latestFirst(articles),
+            summary: takeSummary(summaries, usedSummaries, newsMonthKey(year, month)),
+            articles: latestFirst(articles)
           };
 
           byMonth.set(item.id, item);
@@ -82,25 +77,21 @@ export function buildArchives(
         markdownUrl: yearMarkdownUrl(year),
         count: months.reduce((sum, month) => sum + month.count, 0),
         summary: takeSummary(summaries, usedSummaries, String(year)),
-        months,
+        months
       };
 
       byYear.set(year, item);
       return item;
     });
-  const orphanSummaryId = [...summaries.keys()].find(
-    (id) => !usedSummaries.has(id),
-  );
+  const orphanSummaryId = [...summaries.keys()].find((id) => !usedSummaries.has(id));
 
   if (orphanSummaryId) {
-    throw new Error(
-      `news archive summary \"${orphanSummaryId}\" has no matching archive`,
-    );
+    throw new Error(`news archive summary \"${orphanSummaryId}\" has no matching archive`);
   }
 
   return {
     years: list,
     byYear,
-    byMonth,
+    byMonth
   };
 }

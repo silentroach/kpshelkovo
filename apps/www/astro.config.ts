@@ -1,21 +1,20 @@
 import { fileURLToPath } from 'node:url';
 import { constants } from 'node:zlib';
+
 import type { SitemapItem } from '@astrojs/sitemap';
-import { defineConfig, type AstroIntegration } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import svelte from '@astrojs/svelte';
 import compressor from 'astro-compressor';
-import {
-  applySitemapMetadata,
-  shouldIncludeSitemapPage,
-} from './src/lib/sitemap';
-import { loadSitemapMetadataIndex } from './src/lib/sitemap-data';
-import { createAstroMarkdownProcessor } from './src/lib/markdown/astro-processor';
+import { defineConfig, type AstroIntegration } from 'astro/config';
+
 import { indexNowUrlManifest } from './src/integrations/indexnow-url-manifest';
 import { pagefindDevSnapshot } from './src/integrations/pagefind-dev-snapshot';
 import { retryableSearchDialog } from './src/integrations/retryable-search-dialog';
 import { retryableSettlementsExplorer } from './src/integrations/retryable-settlements-explorer';
 import { statusCalendarAlternateValidation } from './src/integrations/status-calendar-alternate-validation';
+import { createAstroMarkdownProcessor } from './src/lib/markdown/astro-processor';
+import { applySitemapMetadata, shouldIncludeSitemapPage } from './src/lib/sitemap';
+import { loadSitemapMetadataIndex } from './src/lib/sitemap-data';
 
 const devServerPort = 4321;
 const site = 'https://kpshelkovo.online';
@@ -32,19 +31,14 @@ const preloadSitemapMetadata = (): AstroIntegration => ({
       injectScript(
         'page-ssr',
         `import { loadSitemapMetadataIndex } from '@/lib/sitemap-data';
-await loadSitemapMetadataIndex();`,
+await loadSitemapMetadataIndex();`
       );
-    },
-  },
+    }
+  }
 });
 
-const serializeSitemapItem = async (
-  item: SitemapItem,
-): Promise<SitemapItem | undefined> => {
-  const serializedItem = applySitemapMetadata(
-    item,
-    await loadSitemapMetadataIndex(),
-  );
+const serializeSitemapItem = async (item: SitemapItem): Promise<SitemapItem | undefined> => {
+  const serializedItem = applySitemapMetadata(item, await loadSitemapMetadataIndex());
 
   if (serializedItem) {
     indexNowUrls.add(serializedItem.url);
@@ -57,7 +51,7 @@ export default defineConfig({
   output: 'static',
   site,
   server: {
-    port: devServerPort,
+    port: devServerPort
   },
   cacheDir: '../../node_modules/.astro/www',
   image: {
@@ -65,20 +59,20 @@ export default defineConfig({
       {
         protocol: 'https',
         hostname: 'media.kpshelkovo.online',
-        pathname: '/news/**',
-      },
-    ],
+        pathname: '/news/**'
+      }
+    ]
   },
   markdown: {
     syntaxHighlight: {
       type: 'shiki',
-      excludeLangs: ['math', 'change', 'change-inline', 'change-block'],
+      excludeLangs: ['math', 'change', 'change-inline', 'change-block']
     },
-    processor: createAstroMarkdownProcessor(),
+    processor: createAstroMarkdownProcessor()
   },
   prefetch: {
     prefetchAll: true,
-    defaultStrategy: 'tap',
+    defaultStrategy: 'tap'
   },
   outDir: 'dist/site',
   srcDir: 'src',
@@ -87,17 +81,17 @@ export default defineConfig({
     envDir: '../..',
     build: {
       // Keep processed scripts external so CSP does not need broad inline JS.
-      assetsInlineLimit: 0,
+      assetsInlineLimit: 0
     },
     server: {
-      strictPort: true,
+      strictPort: true
     },
     plugins: [...retryableSearchDialog(), ...retryableSettlementsExplorer()],
     resolve: {
       alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url)),
-      },
-    },
+        '@': fileURLToPath(new URL('./src', import.meta.url))
+      }
+    }
   },
   integrations: [
     pagefindDevSnapshot(),
@@ -105,18 +99,18 @@ export default defineConfig({
     preloadSitemapMetadata(),
     sitemap({
       filter: shouldIncludeSitemapPage,
-      serialize: serializeSitemapItem,
+      serialize: serializeSitemapItem
     }),
     statusCalendarAlternateValidation(new URL(site)),
     indexNowUrlManifest(indexNowUrls),
     compressor({
       gzip: {
-        level: 9,
+        level: 9
       },
       brotli: {
         params: {
-          [constants.BROTLI_PARAM_QUALITY]: 11,
-        },
+          [constants.BROTLI_PARAM_QUALITY]: 11
+        }
       },
       zstd: false,
       fileExtensions: [
@@ -129,12 +123,12 @@ export default defineConfig({
         '.mjs',
         '.svg',
         '.txt',
-        '.json',
-      ],
-    }),
+        '.json'
+      ]
+    })
   ],
   build: {
     format: 'directory',
-    assets: 'static',
-  },
+    assets: 'static'
+  }
 });

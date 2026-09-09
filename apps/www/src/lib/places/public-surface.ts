@@ -5,14 +5,14 @@ import {
   placePattern,
   placesDataPath,
   placesMarkdownPath,
-  placesPath,
+  placesPath
 } from './routes';
 
 export const placesPublicSurfaceSlice = {
   owner: {
     id: 'places',
     label: 'Карта',
-    entryPath: placesPath(),
+    entryPath: placesPath()
   },
   surfaces: [
     {
@@ -22,7 +22,7 @@ export const placesPublicSurfaceSlice = {
       mediaType: 'text/html',
       cacheClass: 'html',
       discoveryRoles: ['section-entry'],
-      catalogRole: 'anchor',
+      catalogRole: 'anchor'
     },
     {
       id: 'places:index-markdown',
@@ -31,7 +31,7 @@ export const placesPublicSurfaceSlice = {
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
       discoveryRoles: ['markdown-companion'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'places:data',
@@ -40,7 +40,7 @@ export const placesPublicSurfaceSlice = {
       mediaType: 'application/json',
       cacheClass: 'data',
       discoveryRoles: ['data-feed'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'places:detail',
@@ -48,7 +48,7 @@ export const placesPublicSurfaceSlice = {
       routePattern: placePattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'places:detail-markdown',
@@ -56,7 +56,7 @@ export const placesPublicSurfaceSlice = {
       routePattern: placeMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
-    },
-  ],
+      discoveryRoles: ['markdown-companion']
+    }
+  ]
 } satisfies PublicSurfaceSlice;

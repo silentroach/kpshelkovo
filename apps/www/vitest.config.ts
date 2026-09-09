@@ -17,7 +17,7 @@ const domTests = [
   'src/lib/status/tests/**/*.dom.test.ts',
   'src/lib/reglament/calculator-controller.test.ts',
   'src/scripts/tests/active-visit.test.ts',
-  'src/scripts/tests/site-runtime.test.ts',
+  'src/scripts/tests/site-runtime.test.ts'
 ];
 
 export default getViteConfig({
@@ -29,22 +29,22 @@ export default getViteConfig({
           name: 'node',
           environment: 'node',
           include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
-          exclude: [...visualTests, ...searchQualityTests, ...domTests],
-        },
+          exclude: [...visualTests, ...searchQualityTests, ...domTests]
+        }
       },
       {
         extends: true,
         resolve: {
-          conditions: ['browser', 'default'],
+          conditions: ['browser', 'default']
         },
         test: {
           name: 'dom',
           environment: 'happy-dom',
           include: domTests,
           exclude: [...visualTests, ...searchQualityTests],
-          setupFiles: ['./vitest.dom.setup.ts'],
-        },
-      },
-    ],
-  },
+          setupFiles: ['./vitest.dom.setup.ts']
+        }
+      }
+    ]
+  }
 });

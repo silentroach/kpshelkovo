@@ -11,14 +11,7 @@ const review = (input?: {
   readonly mentions?: Review['mentions'];
 }): Pick<
   Review,
-  | 'id'
-  | 'title'
-  | 'url'
-  | 'markdownUrl'
-  | 'body'
-  | 'mentions'
-  | 'publishedIso'
-  | 'publishedAt'
+  'id' | 'title' | 'url' | 'markdownUrl' | 'body' | 'mentions' | 'publishedIso' | 'publishedAt'
 > => ({
   id: '2026-06-25-test',
   title: 'Отзыв о жизни в поселке',
@@ -27,7 +20,7 @@ const review = (input?: {
   body: 'Первый абзац с [Кирилл Щемелинин](/people/kschemelinin/).\n\nВторой абзац.',
   mentions: input?.mentions ?? [target],
   publishedIso: '2026-06-25',
-  publishedAt: new Date('2026-06-25T00:00:00.000Z'),
+  publishedAt: new Date('2026-06-25T00:00:00.000Z')
 });
 
 describe('createReviewMentionRefs', () => {
@@ -56,9 +49,7 @@ describe('createReviewMentionRefs', () => {
   });
 
   it('dedupes repeated targets inside one review', () => {
-    expect(
-      createReviewMentionRefs(review({ mentions: [target, target] })),
-    ).toHaveLength(1);
+    expect(createReviewMentionRefs(review({ mentions: [target, target] }))).toHaveLength(1);
   });
 
   it('does not read the body when the review has no mentions', () => {
@@ -67,8 +58,8 @@ describe('createReviewMentionRefs', () => {
         ...review({ mentions: [] }),
         get body(): string {
           throw new Error('body should not be read');
-        },
-      }),
+        }
+      })
     ).toEqual([]);
   });
 });

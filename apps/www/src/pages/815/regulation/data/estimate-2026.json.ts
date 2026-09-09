@@ -13,7 +13,7 @@ export const GET: APIRoute = async () => {
   return createJsonResponse(buildReglamentPayload(estimate2026), {
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
-      Link: links(root),
-    },
+      Link: links(root)
+    }
   });
 };

@@ -26,10 +26,7 @@ export type PublicSurfaceCacheClass =
   | 'static'
   | 'uncached';
 
-export type PublicSurfaceAcceptNegotiation =
-  | 'not-negotiated'
-  | 'optional'
-  | 'required';
+export type PublicSurfaceAcceptNegotiation = 'not-negotiated' | 'optional' | 'required';
 
 export interface PublicSurfaceOwner {
   readonly id: PublicSurfaceOwnerId;
@@ -76,12 +73,8 @@ export interface PublicSurfaceRegistry {
   readonly sections: readonly PublicSurfaceOwner[];
   readonly surfaces: readonly PublicSurface[];
   readonly slices: readonly PublicSurfaceSlice[];
-  readonly surfaceOwner: (
-    surfaceId: PublicSurfaceId,
-  ) => PublicSurfaceOwner | undefined;
-  readonly surfacesByOwner: (
-    ownerId: PublicSurfaceOwnerId,
-  ) => readonly PublicSurface[];
+  readonly surfaceOwner: (surfaceId: PublicSurfaceId) => PublicSurfaceOwner | undefined;
+  readonly surfacesByOwner: (ownerId: PublicSurfaceOwnerId) => readonly PublicSurface[];
 }
 
 export interface PublicSurfaceLinksetItem {

@@ -2,10 +2,7 @@ const tableShellSelector = '[data-ui-sticky-table-shell]';
 
 let uninstallStickyTableHeaders: (() => void) | undefined;
 
-const isTableHeaderStuck = (
-  shell: HTMLElement,
-  headerCell: HTMLElement,
-): boolean => {
+const isTableHeaderStuck = (shell: HTMLElement, headerCell: HTMLElement): boolean => {
   const top = Number.parseFloat(getComputedStyle(headerCell).top) || 0;
   const shellRect = shell.getBoundingClientRect();
   const headerHeight = headerCell.getBoundingClientRect().height;
@@ -22,10 +19,7 @@ const updateStickyTableHeaders = (shells: readonly HTMLElement[]): void => {
       return;
     }
 
-    shell.toggleAttribute(
-      'data-ui-sticky-table-stuck',
-      isTableHeaderStuck(shell, headerCell),
-    );
+    shell.toggleAttribute('data-ui-sticky-table-stuck', isTableHeaderStuck(shell, headerCell));
   });
 };
 
@@ -72,9 +66,7 @@ export const installStickyTableHeaders = (): (() => void) => {
   const hydrate = (): void => {
     cancelScheduledUpdate();
 
-    shells = Array.from(
-      document.querySelectorAll<HTMLElement>(tableShellSelector),
-    );
+    shells = Array.from(document.querySelectorAll<HTMLElement>(tableShellSelector));
     if (shells.length === 0) {
       deactivate();
       return;

@@ -11,7 +11,7 @@ export const GET: APIRoute = async () => {
 
   return createJsonResponse(schema(root), {
     headers: {
-      'Content-Type': 'application/schema+json; charset=utf-8',
-    },
+      'Content-Type': 'application/schema+json; charset=utf-8'
+    }
   });
 };

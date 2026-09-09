@@ -1,7 +1,4 @@
-import {
-  parseStatusIncidentWindows,
-  resolveStatusServiceState,
-} from './lifecycle';
+import { parseStatusIncidentWindows, resolveStatusServiceState } from './lifecycle';
 import { formatStatusServiceState } from './service-state';
 
 declare global {
@@ -15,16 +12,14 @@ const STATUS_SERVICE_STATE_SELECTOR =
 
 export const hydrateStatusServiceStates = (
   root: ParentNode = document,
-  nowMs: number = Date.now(),
+  nowMs: number = Date.now()
 ): void => {
   root.querySelectorAll(STATUS_SERVICE_STATE_SELECTOR).forEach((node) => {
     if (!(node instanceof HTMLElement)) {
       return;
     }
 
-    const incidents = parseStatusIncidentWindows(
-      node.dataset.statusServiceIncidents,
-    );
+    const incidents = parseStatusIncidentWindows(node.dataset.statusServiceIncidents);
     if (!incidents) {
       return;
     }
@@ -42,10 +37,9 @@ export const hydrateStatusServiceStates = (
 };
 
 export const installStatusServiceStateHydration = (
-  options: { readonly now?: () => number } = {},
+  options: { readonly now?: () => number } = {}
 ): void => {
-  const hydrate = (): void =>
-    hydrateStatusServiceStates(document, options.now?.() ?? Date.now());
+  const hydrate = (): void => hydrateStatusServiceStates(document, options.now?.() ?? Date.now());
 
   if (window.__shelkovoStatusServiceStateHydration) {
     hydrate();

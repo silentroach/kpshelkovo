@@ -7,7 +7,7 @@ let kbPageSchema: typeof import('../seo').kbPageSchema;
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ kbPageSchema } = await import('../seo'));
@@ -20,7 +20,7 @@ const rootPage: KbPage = {
   canonical: 'https://example.com/kb/',
   isSection: true,
   body: '',
-  mentions: [],
+  mentions: []
 };
 
 describe('kb schema', () => {
@@ -28,7 +28,7 @@ describe('kb schema', () => {
     const schema = kbPageSchema({
       page: rootPage,
       breadcrumbs: [{ label: 'Главная', href: '/' }, { label: 'База знаний' }],
-      description: 'Справочные материалы.',
+      description: 'Справочные материалы.'
     });
 
     expect(schema.map((document) => document['@type'])).toMatchInlineSnapshot(`

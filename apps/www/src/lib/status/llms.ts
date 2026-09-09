@@ -1,12 +1,9 @@
 import { count } from '@shelkovo/format';
 
+import { llmsSection, markdownList, serializeLlmsDocument } from '@/lib/markdown/llms-document';
+
 import { absoluteUrl } from '../site';
 import { loadStatusData } from './load';
-import {
-  llmsSection,
-  markdownList,
-  serializeLlmsDocument,
-} from '@/lib/markdown/llms-document';
 import {
   statusApiCatalogUrl,
   statusCalendarAgentPatterns,
@@ -20,19 +17,15 @@ import {
   statusSchemaUrl,
   statusServiceMarkdownUrl,
   statusServiceUrl,
-  statusUrl,
+  statusUrl
 } from './routes';
 import { STATUS_KINDS, STATUS_SERVICE_STATES, STATUS_SERVICES } from './schema';
 import { formatStatusService } from './view';
 
 export async function build(kind: 'short' | 'full'): Promise<string> {
   const data = await loadStatusData();
-  const activeIncidents = data.active.filter(
-    (item) => item.kind === 'incident',
-  );
-  const activeMaintenance = data.active.filter(
-    (item) => item.kind === 'maintenance',
-  );
+  const activeIncidents = data.active.filter((item) => item.kind === 'incident');
+  const activeMaintenance = data.active.filter((item) => item.kind === 'maintenance');
   const service = data.services[0];
   const incident = data.incidents.find((item) => item.hasPage);
 
@@ -53,13 +46,11 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
   const serviceMarkdown = service
     ? absoluteUrl(statusServiceMarkdownUrl(service.service))
     : '/status/[service]/index.md';
-  const serviceLabel = service
-    ? formatStatusService(service.service)
-    : 'Страница сервиса';
+  const serviceLabel = service ? formatStatusService(service.service) : 'Страница сервиса';
   const incidentLinks = incident
     ? [
         `Пример HTML-страницы инцидента: ${incident.canonical}`,
-        `Пример Markdown-версии инцидента: ${absoluteUrl(incident.markdownUrl)}`,
+        `Пример Markdown-версии инцидента: ${absoluteUrl(incident.markdownUrl)}`
       ]
     : [];
 
@@ -75,8 +66,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'Календарь группирует историю по затронутым дням и ведет к ISO-якорям месячных журналов.',
               `Сейчас в разделе ${count(data.incidents.length, ['запись', 'записи', 'записей'])}, ${count(activeIncidents.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])} и ${count(activeMaintenance.length, ['активная работа', 'активные работы', 'активных работ'])}.`,
               `Раздел покрывает ${count(data.services.length, ['сервис', 'сервиса', 'сервисов'])}: ${STATUS_SERVICES.join(', ')}.`,
-              'HTML-страницы удобны для чтения отдельных записей, а `/status/data/status.json` используйте для массового анализа.',
-            ]),
+              'HTML-страницы удобны для чтения отдельных записей, а `/status/data/status.json` используйте для массового анализа.'
+            ])
           ]),
           llmsSection('Главные URL', [
             markdownList([
@@ -87,8 +78,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Каталог API: ${catalog}`,
               `JSON Schema: ${schema}`,
               `OpenAPI: ${openapi}`,
-              `Расширенная версия этого текста: ${full}`,
-            ]),
+              `Расширенная версия этого текста: ${full}`
+            ])
           ]),
           llmsSection('Как читать раздел', [
             markdownList([
@@ -103,10 +94,10 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'В status.json сервисные сводки выводятся из массива incidents.',
               'Сервисы: `electricity`, `water`, `internet`, `dam`.',
               'Типы записей: `incident`, `maintenance`.',
-              'Текущий статус сервиса выводится как `red`, `amber` или `green`.',
-            ]),
-          ]),
-        ],
+              'Текущий статус сервиса выводится как `red`, `amber` или `green`.'
+            ])
+          ])
+        ]
       })
     : serializeLlmsDocument({
         title: 'Статус КП Шелково',
@@ -118,8 +109,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Полная история отключений и ограничений доступна в HTML-архиве: ${history}`,
               'Для массового чтения используйте JSON-ленту; HTML и Markdown удобнее для одной линии или одного события.',
               'Для чтения истории по дням используйте годовой календарь и месячные журналы.',
-              `Сейчас в разделе ${count(data.incidents.length, ['запись', 'записи', 'записей'])}, ${count(activeIncidents.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])} и ${count(activeMaintenance.length, ['активная работа', 'активные работы', 'активных работ'])}.`,
-            ]),
+              `Сейчас в разделе ${count(data.incidents.length, ['запись', 'записи', 'записей'])}, ${count(activeIncidents.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])} и ${count(activeMaintenance.length, ['активная работа', 'активные работы', 'активных работ'])}.`
+            ])
           ]),
           llmsSection('Канонические URL', [
             markdownList([
@@ -135,8 +126,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `OpenAPI: ${openapi}`,
               `Пример HTML-страницы сервиса (${serviceLabel}): ${serviceHtml}`,
               `Пример Markdown-версии сервиса: ${serviceMarkdown}`,
-              ...incidentLinks,
-            ]),
+              ...incidentLinks
+            ])
           ]),
           llmsSection('Описание status.json', [
             markdownList([
@@ -145,8 +136,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               '`incidents[]` включает `id`, `title`, `service`, `kind`, `year`, `month`, `slug`, необязательные `html_url` и `markdown_url` только для записей с опубликованной детальной страницей, `started_at`, необязательный `ended_at`, флаг `is_active`, фазы `phase`, затронутые `areas`, необязательный `source_url`, `excerpt`, полный `body_markdown` и необязательную `duration`.',
               '`active[]` содержит только активные на момент сборки инциденты и плановые работы в том же формате, что и `incidents[]`.',
               '`services[]` содержит производные сводки по сервисам с `service_status`, URL сервиса, массивами `incident_ids`, `active_incident_ids`, `active_maintenance_ids`, а также `days_without_incidents` и необязательной `latest_incident`.',
-              '`stats` дает агрегированные счетчики по сервисам, активным инцидентам и активным работам.',
-            ]),
+              '`stats` дает агрегированные счетчики по сервисам, активным инцидентам и активным работам.'
+            ])
           ]),
           llmsSection('HTML и Markdown', [
             markdownList([
@@ -158,15 +149,15 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Годовой календарь \`${calendarRoutes.year}\` и его Markdown-версия \`${calendarRoutes.yearMarkdown}\` показывают все затронутые дни года.`,
               `Месячный журнал \`${calendarRoutes.month}\` и его Markdown-версия \`${calendarRoutes.monthMarkdown}\` содержат записи по дням.`,
               `Ссылка \`${calendarRoutes.day}\` ведет к дню по точному ISO-якорю.`,
-              'Для календаря отдельного календарного JSON нет: исходные записи остаются в `/status/data/status.json`.',
-            ]),
+              'Для календаря отдельного календарного JSON нет: исходные записи остаются в `/status/data/status.json`.'
+            ])
           ]),
           llmsSection('RSS', [
             markdownList([
               '`/status/feed.xml` остается краткой RSS-лентой.',
               'В RSS description сериализуются текущий статус записи, период, зоны воздействия и короткая выдержка, если она есть.',
-              'Источником правды для полного машиночитаемого контента остается status.json.',
-            ]),
+              'Источником правды для полного машиночитаемого контента остается status.json.'
+            ])
           ]),
           llmsSection('Семантика полей', [
             markdownList([
@@ -175,16 +166,16 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Статусы сервисов сериализуются как: \`${STATUS_SERVICE_STATES.join('`, `')}\`.`,
               '`service_status` выводится из активных записей: активный инцидент дает `red`, только активные плановые работы дают `amber`, иначе `green`.',
               '`phase` для отдельной записи показывает ее жизненный цикл: `active`, `resolved` или `scheduled`.',
-              'Если `areas` не указаны в исходном файле, лента нормализует запись как `applies_to_all_areas: true` и подставляет все части поселка.',
-            ]),
+              'Если `areas` не указаны в исходном файле, лента нормализует запись как `applies_to_all_areas: true` и подставляет все части поселка.'
+            ])
           ]),
           llmsSection('Ограничения', [
             markdownList([
               'Все маршруты /status доступны только для чтения; ручек для изменения данных и авторизации здесь нет.',
               'Лента описывает состояние на момент сборки. Для чтения редакционного контекста или ссылок на первоисточник переходите на детальную страницу инцидента.',
-              'Markdown-версии и JSON-лента повторяют одно и то же содержание в разных формах; для массового анализа используйте JSON-ленту.',
-            ]),
-          ]),
-        ],
+              'Markdown-версии и JSON-лента повторяют одно и то же содержание в разных формах; для массового анализа используйте JSON-ленту.'
+            ])
+          ])
+        ]
       });
 }

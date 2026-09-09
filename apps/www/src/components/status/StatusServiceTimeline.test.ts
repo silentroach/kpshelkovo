@@ -2,12 +2,12 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { StatusArea } from '@/lib/status/schema';
+import type { StatusTimelineIncidentInput } from '@/lib/status/timeline';
 import { createAstroContainer } from '@/test/astro-container';
 
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import StatusServiceTimeline from './StatusServiceTimeline.astro';
-import type { StatusArea } from '@/lib/status/schema';
-import type { StatusTimelineIncidentInput } from '@/lib/status/timeline';
 
 const NBSP = '\u00A0';
 
@@ -39,12 +39,12 @@ const incident = (input: IncidentInput): StatusTimelineIncidentInput => ({
       : Date.parse(input.startedIso) > Date.now()
         ? 'scheduled'
         : 'resolved',
-  areas: input.areas,
+  areas: input.areas
 });
 
 const renderTimeline = async (
   incidents: readonly StatusTimelineIncidentInput[],
-  timelineDays = 10,
+  timelineDays = 10
 ): Promise<string> => {
   const container = await createAstroContainer();
 
@@ -52,8 +52,8 @@ const renderTimeline = async (
     props: {
       service: 'water',
       incidents,
-      timelineDays,
-    },
+      timelineDays
+    }
   });
 };
 
@@ -70,12 +70,8 @@ const normalizeHtml = (html: string): string =>
 
 const incidentSegmentTag = (html: string, id: string): string =>
   normalizeHtml(
-    html.match(
-      new RegExp(
-        `<(?:a|button|span)\\b[^>]*data-incident-id="${id}"[^>]*>`,
-        'u',
-      ),
-    )?.[0] ?? '',
+    html.match(new RegExp(`<(?:a|button|span)\\b[^>]*data-incident-id="${id}"[^>]*>`, 'u'))?.[0] ??
+      ''
   );
 
 beforeEach(() => {
@@ -95,27 +91,27 @@ describe('StatusServiceTimeline', () => {
         id: 'old-past',
         startedIso: '2026-04-20T00:00:00Z',
         endedIso: '2026-04-22T00:00:00Z',
-        isActive: false,
+        isActive: false
       }),
       incident({
         id: 'maintenance-visible',
         kind: 'maintenance',
         startedIso: '2026-05-02T00:00:00Z',
         endedIso: '2026-05-03T00:00:00Z',
-        isActive: false,
+        isActive: false
       }),
       incident({
         id: 'incident-active',
         startedIso: '2026-05-09T00:00:00Z',
-        isActive: true,
+        isActive: true
       }),
       incident({
         id: 'maintenance-future',
         kind: 'maintenance',
         startedIso: '2026-05-12T00:00:00Z',
         endedIso: '2026-05-13T00:00:00Z',
-        isActive: false,
-      }),
+        isActive: false
+      })
     ]);
 
     expect(html.match(/data-status-problem/g)?.length ?? 0).toBe(3);
@@ -124,7 +120,7 @@ describe('StatusServiceTimeline', () => {
     expect(html).toContain('data-incident-id="maintenance-visible"');
     expect(html).toContain('data-incident-id="incident-active"');
     expect(html).toMatch(
-      /data-incident-id="maintenance-future"[^>]*data-status-problem[^>]*hidden/,
+      /data-incident-id="maintenance-future"[^>]*data-status-problem[^>]*hidden/
     );
   });
 
@@ -135,36 +131,34 @@ describe('StatusServiceTimeline', () => {
         kind: 'maintenance',
         startedIso: '2026-05-02T00:00:00Z',
         endedIso: '2026-05-03T00:00:00Z',
-        isActive: false,
+        isActive: false
       }),
       incident({
         id: 'incident-active',
         startedIso: '2026-05-09T00:00:00Z',
-        isActive: true,
+        isActive: true
       }),
       incident({
         id: 'maintenance-future',
         kind: 'maintenance',
         startedIso: '2026-05-12T00:00:00Z',
         endedIso: '2026-05-13T00:00:00Z',
-        isActive: false,
-      }),
+        isActive: false
+      })
     ]);
 
     expect(html).toMatch(
-      /data-incident-id="maintenance-visible"[^>]*data-status-problem[^>]*data-start="2026-05-02T00:00:00Z"[^>]*data-end="2026-05-03T00:00:00Z"/,
+      /data-incident-id="maintenance-visible"[^>]*data-status-problem[^>]*data-start="2026-05-02T00:00:00Z"[^>]*data-end="2026-05-03T00:00:00Z"/
     );
     expect(html).toMatch(
-      /data-incident-id="maintenance-visible"[^>]*data-tooltip-service-label="Вода"[^>]*data-tooltip-kind-label="Плановые работы"[^>]*data-tooltip-phase-label="завершено"/,
+      /data-incident-id="maintenance-visible"[^>]*data-tooltip-service-label="Вода"[^>]*data-tooltip-kind-label="Плановые работы"[^>]*data-tooltip-phase-label="завершено"/
     );
     expect(html).toMatch(
-      /data-incident-id="incident-active"[^>]*data-status-problem[^>]*data-start="2026-05-09T00:00:00Z"[^>]*data-tooltip-phase-icon="alert"/,
+      /data-incident-id="incident-active"[^>]*data-status-problem[^>]*data-start="2026-05-09T00:00:00Z"[^>]*data-tooltip-phase-icon="alert"/
     );
-    expect(html).not.toMatch(
-      /data-incident-id="incident-active"[^>]*data-end=/,
-    );
+    expect(html).not.toMatch(/data-incident-id="incident-active"[^>]*data-end=/);
     expect(html).toMatch(
-      /data-incident-id="maintenance-future"[^>]*data-status-problem[^>]*data-start="2026-05-12T00:00:00Z"[^>]*data-end="2026-05-13T00:00:00Z"[^>]*data-tooltip-phase-label="запланировано"[^>]*hidden/,
+      /data-incident-id="maintenance-future"[^>]*data-status-problem[^>]*data-start="2026-05-12T00:00:00Z"[^>]*data-end="2026-05-13T00:00:00Z"[^>]*data-tooltip-phase-label="запланировано"[^>]*hidden/
     );
   });
 
@@ -174,25 +168,25 @@ describe('StatusServiceTimeline', () => {
         id: 'same-day-a',
         startedIso: '2026-05-09T03:00:00Z',
         endedIso: '2026-05-09T03:40:00Z',
-        isActive: false,
+        isActive: false
       }),
       incident({
         id: 'same-day-b',
         startedIso: '2026-05-09T08:10:00Z',
         endedIso: '2026-05-09T08:45:00Z',
-        isActive: false,
+        isActive: false
       }),
       incident({
         id: 'same-day-c',
         startedIso: '2026-05-09T19:20:00Z',
         endedIso: '2026-05-09T20:05:00Z',
-        isActive: false,
-      }),
+        isActive: false
+      })
     ]);
 
     expect({
       problemCount: html.match(/data-status-problem/g)?.length ?? 0,
-      segment: incidentSegmentTag(html, 'same-day-a'),
+      segment: incidentSegmentTag(html, 'same-day-a')
     }).toMatchSnapshot();
   });
 
@@ -201,15 +195,13 @@ describe('StatusServiceTimeline', () => {
       incident({
         id: 'incident-active',
         startedIso: '2026-05-09T00:00:00Z',
-        isActive: true,
-      }),
+        isActive: true
+      })
     ]);
 
+    expect(html).toContain(`data-tooltip-period-label="Начиная с${NBSP}9${NBSP}мая, 03:00"`);
     expect(html).toContain(
-      `data-tooltip-period-label="Начиная с${NBSP}9${NBSP}мая, 03:00"`,
-    );
-    expect(html).toContain(
-      `aria-label="Вода. Инцидент. Запись incident-active. Статус: идет. Начиная с${NBSP}9${NBSP}мая, 03:00"`,
+      `aria-label="Вода. Инцидент. Запись incident-active. Статус: идет. Начиная с${NBSP}9${NBSP}мая, 03:00"`
     );
   });
 
@@ -219,27 +211,23 @@ describe('StatusServiceTimeline', () => {
         id: 'park-outage',
         startedIso: '2026-05-09T00:00:00Z',
         isActive: true,
-        areas: ['park'],
+        areas: ['park']
       }),
       incident({
         id: 'all-village-outage',
         startedIso: '2026-05-08T00:00:00Z',
         endedIso: '2026-05-08T01:00:00Z',
-        isActive: false,
-      }),
+        isActive: false
+      })
     ]);
 
     expect(normalizeHtml(html)).toMatch(
-      /data-incident-id="park-outage"[^>]*data-tooltip-areas="\[&#34;park&#34;\]"/,
+      /data-incident-id="park-outage"[^>]*data-tooltip-areas="\[&#34;park&#34;\]"/
     );
     expect(html).toMatch(
-      new RegExp(
-        `data-incident-id="park-outage"[^>]*data-tooltip-area-label="Шелково${NBSP}Парк"`,
-      ),
+      new RegExp(`data-incident-id="park-outage"[^>]*data-tooltip-area-label="Шелково${NBSP}Парк"`)
     );
-    expect(html).not.toMatch(
-      /data-incident-id="all-village-outage"[^>]*data-tooltip-areas=/,
-    );
+    expect(html).not.toMatch(/data-incident-id="all-village-outage"[^>]*data-tooltip-areas=/);
   });
 
   it('applies typography to tooltip titles', async () => {
@@ -248,13 +236,11 @@ describe('StatusServiceTimeline', () => {
         id: 'park-outage',
         title: 'Нет воды в Шелково Парк',
         startedIso: '2026-05-09T00:00:00Z',
-        isActive: true,
-      }),
+        isActive: true
+      })
     ]);
 
-    expect(html).toContain(
-      `data-tooltip-title="Нет воды в${NBSP}Шелково${NBSP}Парк"`,
-    );
+    expect(html).toContain(`data-tooltip-title="Нет воды в${NBSP}Шелково${NBSP}Парк"`);
   });
 
   it('renders links and tooltip-only markers with semantic segment elements', async () => {
@@ -264,19 +250,19 @@ describe('StatusServiceTimeline', () => {
         hasPage: false,
         startedIso: '2026-05-08T00:00:00Z',
         endedIso: '2026-05-08T01:00:00Z',
-        isActive: false,
+        isActive: false
       }),
       incident({
         id: 'with-page',
         startedIso: '2026-05-09T00:00:00Z',
         endedIso: '2026-05-09T01:00:00Z',
-        isActive: false,
-      }),
+        isActive: false
+      })
     ]);
 
     expect([
       incidentSegmentTag(html, 'no-page'),
-      incidentSegmentTag(html, 'with-page'),
+      incidentSegmentTag(html, 'with-page')
     ]).toMatchSnapshot();
   });
 
@@ -286,25 +272,25 @@ describe('StatusServiceTimeline', () => {
         id: 'short-single-day',
         startedIso: '2026-05-07T00:00:00Z',
         endedIso: '2026-05-07T00:15:00Z',
-        isActive: false,
+        isActive: false
       }),
       incident({
         id: 'long-single-day',
         startedIso: '2026-05-08T00:00:00Z',
         endedIso: '2026-05-08T09:00:00Z',
-        isActive: false,
+        isActive: false
       }),
       incident({
         id: 'active-single-day',
         startedIso: '2026-05-09T21:00:00Z',
-        isActive: true,
-      }),
+        isActive: true
+      })
     ]);
 
     expect([
       incidentSegmentTag(html, 'short-single-day'),
       incidentSegmentTag(html, 'long-single-day'),
-      incidentSegmentTag(html, 'active-single-day'),
+      incidentSegmentTag(html, 'active-single-day')
     ]).toMatchSnapshot();
 
     const shorterRangeHtml = await renderTimeline(
@@ -313,15 +299,13 @@ describe('StatusServiceTimeline', () => {
           id: 'shorter-range-single-day',
           startedIso: '2026-05-09T00:00:00Z',
           endedIso: '2026-05-09T01:00:00Z',
-          isActive: false,
-        }),
+          isActive: false
+        })
       ],
-      5,
+      5
     );
 
-    expect(
-      incidentSegmentTag(shorterRangeHtml, 'shorter-range-single-day'),
-    ).toMatchSnapshot();
+    expect(incidentSegmentTag(shorterRangeHtml, 'shorter-range-single-day')).toMatchSnapshot();
   });
 
   it('marks every affected day for cross-day incidents', async () => {
@@ -330,13 +314,11 @@ describe('StatusServiceTimeline', () => {
         id: 'cross-day-short',
         startedIso: '2026-05-08T20:30:00Z',
         endedIso: '2026-05-08T22:00:00Z',
-        isActive: false,
-      }),
+        isActive: false
+      })
     ]);
 
-    expect(incidentSegmentTag(html, 'cross-day-short')).toContain(
-      '--segment-width: 20;',
-    );
+    expect(incidentSegmentTag(html, 'cross-day-short')).toContain('--segment-width: 20;');
   });
 
   it('keeps compact grouped markers tooltip-only', async () => {
@@ -345,14 +327,14 @@ describe('StatusServiceTimeline', () => {
         id: 'same-day-a',
         startedIso: '2026-05-09T03:00:00Z',
         endedIso: '2026-05-09T03:40:00Z',
-        isActive: false,
+        isActive: false
       }),
       incident({
         id: 'same-day-b',
         startedIso: '2026-05-09T08:10:00Z',
         endedIso: '2026-05-09T08:45:00Z',
-        isActive: false,
-      }),
+        isActive: false
+      })
     ]);
 
     expect(incidentSegmentTag(html, 'same-day-a')).toMatchSnapshot();
@@ -364,18 +346,18 @@ describe('StatusServiceTimeline', () => {
         id: 'dense-ended',
         startedIso: '2026-05-09T22:10:00Z',
         endedIso: '2026-05-09T22:30:00Z',
-        isActive: false,
+        isActive: false
       }),
       incident({
         id: 'dense-active',
         startedIso: '2026-05-09T23:40:00Z',
-        isActive: true,
-      }),
+        isActive: true
+      })
     ]);
 
     expect({
       problemCount: html.match(/data-status-problem/g)?.length ?? 0,
-      segment: incidentSegmentTag(html, 'dense-ended'),
+      segment: incidentSegmentTag(html, 'dense-ended')
     }).toMatchSnapshot();
   });
 
@@ -384,8 +366,8 @@ describe('StatusServiceTimeline', () => {
       incident({
         id: 'incident-active',
         startedIso: '2026-05-09T00:00:00Z',
-        isActive: true,
-      }),
+        isActive: true
+      })
     ]);
 
     expect(html).toContain('data-status-timeline-tooltip');
@@ -402,21 +384,21 @@ describe('StatusServiceTimeline', () => {
         kind: 'maintenance',
         startedIso: '2026-05-02T00:00:00Z',
         endedIso: '2026-05-03T00:00:00Z',
-        isActive: false,
+        isActive: false
       }),
       incident({
         id: 'incident-visible',
         startedIso: '2026-05-05T00:00:00Z',
         endedIso: '2026-05-06T00:00:00Z',
-        isActive: false,
-      }),
+        isActive: false
+      })
     ]);
 
     expect(html).toMatch(
-      /data-incident-id="maintenance-visible"[^>]*status-service-timeline__segment--amber/,
+      /data-incident-id="maintenance-visible"[^>]*status-service-timeline__segment--amber/
     );
     expect(html).toMatch(
-      /data-incident-id="incident-visible"[^>]*status-service-timeline__segment--red/,
+      /data-incident-id="incident-visible"[^>]*status-service-timeline__segment--red/
     );
   });
 
@@ -425,12 +407,12 @@ describe('StatusServiceTimeline', () => {
       incident({
         id: 'incident-active',
         startedIso: '2026-05-09T23:40:00Z',
-        isActive: true,
-      }),
+        isActive: true
+      })
     ]);
 
     expect(html).toMatch(
-      /data-incident-id="incident-active"[^>]*status-service-timeline__segment--problem-active-end/,
+      /data-incident-id="incident-active"[^>]*status-service-timeline__segment--problem-active-end/
     );
   });
 });

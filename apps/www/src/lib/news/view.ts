@@ -1,4 +1,5 @@
 import { dateTimeFromISO, formatDate, formatMonth } from '@shelkovo/format';
+
 import { formatArea } from '../areas';
 import type { NewsArea } from './schema';
 import type { NewsAuthor, NewsEvent } from './types';
@@ -31,15 +32,10 @@ const toMercatorY = (lat: number): number => {
   return 0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI);
 };
 
-const fromMercatorY = (y: number): number =>
-  toDeg(Math.atan(Math.sinh(Math.PI - 2 * Math.PI * y)));
+const fromMercatorY = (y: number): number => toDeg(Math.atan(Math.sinh(Math.PI - 2 * Math.PI * y)));
 
 // Yandex centers `ll` in Web Mercator pixels; offset it when CSS moves the iframe behind a fixed pin.
-const shiftMapLatByPixels = (
-  lat: number,
-  yOffsetPx: number,
-  zoom: number,
-): number => {
+const shiftMapLatByPixels = (lat: number, yOffsetPx: number, zoom: number): number => {
   const worldSize = MAP_TILE_SIZE * 2 ** zoom;
 
   return fromMercatorY(toMercatorY(lat) + yOffsetPx / worldSize);
@@ -48,8 +44,7 @@ const shiftMapLatByPixels = (
 const formatNewsCalendarDate = (iso: string): string =>
   dateTimeFromISO(iso).toFormat('d MMMM yyyy');
 
-const formatNewsTime = (iso: string): string =>
-  dateTimeFromISO(iso).toFormat('HH:mm');
+const formatNewsTime = (iso: string): string => dateTimeFromISO(iso).toFormat('HH:mm');
 
 const isSameNewsDay = (startIso: string, endIso: string): boolean =>
   dateTimeFromISO(startIso).hasSame(dateTimeFromISO(endIso), 'day');
@@ -62,10 +57,10 @@ export const formatNewsMonth = (
   opts?: {
     readonly capitalize?: boolean;
     readonly includeYear?: boolean;
-  },
+  }
 ): string => {
   const label = formatMonth(year, month, {
-    includeYear: opts?.includeYear,
+    includeYear: opts?.includeYear
   });
 
   return opts?.capitalize ? capitalize(label) : label;
@@ -77,18 +72,16 @@ export const formatNewsAuthor = (
   author: Pick<NewsAuthor, 'name' | 'shortName'>,
   opts?: {
     readonly short?: boolean;
-  },
-): string =>
-  opts?.short === false ? author.name : (author.shortName ?? author.name);
+  }
+): string => (opts?.short === false ? author.name : (author.shortName ?? author.name));
 
 export const formatNewsDateTime = (iso: string, time?: string): string =>
   `${formatNewsCalendarDate(iso)}, ${time ?? formatNewsTime(iso)}`;
 
-export const formatNewsEventMonth = (iso: string): string =>
-  dateTimeFromISO(iso).toFormat('MMMM');
+export const formatNewsEventMonth = (iso: string): string => dateTimeFromISO(iso).toFormat('MMMM');
 
 export const formatNewsEventRange = (
-  event: Pick<NewsEvent, 'startsIso' | 'startsTime' | 'endsIso' | 'endsTime'>,
+  event: Pick<NewsEvent, 'startsIso' | 'startsTime' | 'endsIso' | 'endsTime'>
 ): string => {
   if (!event.endsIso || !event.endsTime) {
     return formatNewsDateTime(event.startsIso, event.startsTime);
@@ -102,7 +95,7 @@ export const formatNewsEventRange = (
 };
 
 export const buildNewsEventMapUrl = (
-  event: Pick<NewsEvent, 'coordinates' | 'location'>,
+  event: Pick<NewsEvent, 'coordinates' | 'location'>
 ): string | undefined => {
   if (event.coordinates) {
     const point = `${event.coordinates.lng},${event.coordinates.lat}`;
@@ -123,7 +116,7 @@ export const buildNewsEventMapEmbedUrl = (
   event: Pick<NewsEvent, 'coordinates'>,
   opts?: {
     readonly centerOffsetYPx?: number;
-  },
+  }
 ): string | undefined => {
   if (!event.coordinates) {
     return undefined;
@@ -132,17 +125,13 @@ export const buildNewsEventMapEmbedUrl = (
   const centerOffsetYPx = opts?.centerOffsetYPx;
   const lat =
     centerOffsetYPx !== undefined
-      ? shiftMapLatByPixels(
-          event.coordinates.lat,
-          centerOffsetYPx,
-          MAP_WIDGET_ZOOM,
-        )
+      ? shiftMapLatByPixels(event.coordinates.lat, centerOffsetYPx, MAP_WIDGET_ZOOM)
       : event.coordinates.lat;
   const point = `${event.coordinates.lng},${lat}`;
   const params = new URLSearchParams({
     ll: point,
     z: String(MAP_WIDGET_ZOOM),
-    l: 'map',
+    l: 'map'
   });
 
   return `https://yandex.ru/map-widget/v1/?${params.toString()}`;

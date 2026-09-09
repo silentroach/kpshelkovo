@@ -6,14 +6,14 @@ import {
   reviewsMarkdownPath,
   reviewsPath,
   reviewsRulesMarkdownPath,
-  reviewsRulesPath,
+  reviewsRulesPath
 } from './routes';
 
 export const reviewsPublicSurfaceSlice = {
   owner: {
     id: 'reviews',
     label: 'Отзывы',
-    entryPath: reviewsPath(),
+    entryPath: reviewsPath()
   },
   surfaces: [
     {
@@ -23,7 +23,7 @@ export const reviewsPublicSurfaceSlice = {
       mediaType: 'text/html',
       cacheClass: 'html',
       discoveryRoles: ['section-entry'],
-      catalogRole: 'anchor',
+      catalogRole: 'anchor'
     },
     {
       id: 'reviews:index-markdown',
@@ -32,7 +32,7 @@ export const reviewsPublicSurfaceSlice = {
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
       discoveryRoles: ['markdown-companion'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'reviews:rules',
@@ -40,7 +40,7 @@ export const reviewsPublicSurfaceSlice = {
       path: reviewsRulesPath(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'reviews:rules-markdown',
@@ -48,7 +48,7 @@ export const reviewsPublicSurfaceSlice = {
       path: reviewsRulesMarkdownPath(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'reviews:review',
@@ -56,7 +56,7 @@ export const reviewsPublicSurfaceSlice = {
       routePattern: reviewPattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'reviews:review-markdown',
@@ -64,7 +64,7 @@ export const reviewsPublicSurfaceSlice = {
       routePattern: reviewMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
-    },
-  ],
+      discoveryRoles: ['markdown-companion']
+    }
+  ]
 } satisfies PublicSurfaceSlice;

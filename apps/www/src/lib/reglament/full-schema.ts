@@ -40,15 +40,9 @@ export type FullReglamentCommonAsset = {
     | 'security';
   readonly title: string;
   readonly unit: string | null;
-  readonly values_by_village: Readonly<
-    Record<FullReglamentVillageId, FullReglamentQuantityValue>
-  >;
+  readonly values_by_village: Readonly<Record<FullReglamentVillageId, FullReglamentQuantityValue>>;
   readonly total: FullReglamentQuantityValue;
-  readonly total_mode:
-    | 'sum_explicit_values'
-    | 'not_summed'
-    | 'empty'
-    | 'group_row';
+  readonly total_mode: 'sum_explicit_values' | 'not_summed' | 'empty' | 'group_row';
   readonly source_refs: readonly FullReglamentSourceRef[];
   readonly verification_note: string | null;
 };

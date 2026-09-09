@@ -21,18 +21,11 @@ export const names = [
   'explorer-data',
   'settlement-pages',
   'rating-method',
-  'corrections-and-sources',
+  'corrections-and-sources'
 ] as const;
 
 const schema = 'https://schemas.agentskills.io/discovery/0.2.0/schema.json';
-const root = join(
-  process.cwd(),
-  'public',
-  '815',
-  'compare',
-  '.well-known',
-  'agent-skills',
-);
+const root = join(process.cwd(), 'public', '815', 'compare', '.well-known', 'agent-skills');
 
 function pick(text: string, key: 'name' | 'description', id: string): string {
   const val = text.match(new RegExp(`^${key}:\\s*(.+)$`, 'm'))?.[1]?.trim();
@@ -78,13 +71,13 @@ export async function build(): Promise<SkillsIndex> {
         type: 'skill-md' as const,
         description: metaRow.description,
         url: `./${id}/SKILL.md`,
-        digest: digest(body),
+        digest: digest(body)
       };
-    }),
+    })
   );
 
   return {
     $schema: schema,
-    skills,
+    skills
   };
 }

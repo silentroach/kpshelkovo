@@ -3,28 +3,23 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { SEARCH_QUERY_MAX_LENGTH } from '../client.types';
-import {
-  highlightSearchTerms,
-  normalizeSearchHighlightQuery,
-} from '../highlight';
+import { highlightSearchTerms, normalizeSearchHighlightQuery } from '../highlight';
 import type { PagefindHighlightOptions } from '../highlight.types';
 
 describe('Pagefind result highlighting', () => {
   it('keeps only bounded, non-empty highlight parameters', () => {
     const excessiveTerms = new URLSearchParams(
-      Array.from({ length: 21 }, (_, index) => ['h', `x${String(index)}`]),
+      Array.from({ length: 21 }, (_, index) => ['h', `x${String(index)}`])
     );
 
     expect([
       normalizeSearchHighlightQuery(
-        '?source=search&h=%D1%8F&h=%D1%82%D0%B0%D1%80%D0%B8%D1%84&h=%D1%82%D0%B0%D1%80%D0%B8%D1%84&h=815',
+        '?source=search&h=%D1%8F&h=%D1%82%D0%B0%D1%80%D0%B8%D1%84&h=%D1%82%D0%B0%D1%80%D0%B8%D1%84&h=815'
       ),
       normalizeSearchHighlightQuery('?h=%D1%8F'),
       normalizeSearchHighlightQuery('?h='),
-      normalizeSearchHighlightQuery(
-        `?h=${'x'.repeat(SEARCH_QUERY_MAX_LENGTH + 1)}`,
-      ),
-      normalizeSearchHighlightQuery(`?${excessiveTerms.toString()}`),
+      normalizeSearchHighlightQuery(`?h=${'x'.repeat(SEARCH_QUERY_MAX_LENGTH + 1)}`),
+      normalizeSearchHighlightQuery(`?${excessiveTerms.toString()}`)
     ]).toMatchInlineSnapshot(`
       [
         "?h=%D1%82%D0%B0%D1%80%D0%B8%D1%84&h=815",
@@ -53,7 +48,7 @@ describe('Pagefind result highlighting', () => {
     await highlightSearchTerms(location.href, loadPagefindHighlight);
     expect({
       constructCalls: construct.mock.calls,
-      loadCalls: loadPagefindHighlight.mock.calls.length,
+      loadCalls: loadPagefindHighlight.mock.calls.length
     }).toMatchInlineSnapshot(`
       {
         "constructCalls": [
@@ -86,10 +81,7 @@ describe('Pagefind result highlighting', () => {
       });
     history.replaceState({}, '', '/first/?h=tariff');
 
-    const highlighting = highlightSearchTerms(
-      location.href,
-      loadPagefindHighlight,
-    );
+    const highlighting = highlightSearchTerms(location.href, loadPagefindHighlight);
     history.replaceState({}, '', '/second/?h=tariff');
     resolveLoader(PagefindHighlight);
     await highlighting;

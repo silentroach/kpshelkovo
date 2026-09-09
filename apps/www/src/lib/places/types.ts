@@ -7,16 +7,11 @@ import type {
   SiteBacklinkKind,
   SiteBacklinks,
   SiteMentionRef,
-  SiteMentionSection,
+  SiteMentionSection
 } from '@/lib/mentions';
 
 import type { RawPlace } from './raw-schema';
-import type {
-  PlaceCategory,
-  PlaceMarker,
-  PlaceStatus,
-  PlaceWeekday,
-} from './schema';
+import type { PlaceCategory, PlaceMarker, PlaceStatus, PlaceWeekday } from './schema';
 
 export type PlaceEntry = Pick<CollectionEntry<'places'>, 'id' | 'body'> & {
   readonly data: RawPlace;
@@ -28,8 +23,7 @@ export interface PlaceCoordinates {
 }
 
 export type PlaceGeometryPosition = readonly [lng: number, lat: number];
-export type PlacePolygonCoordinates =
-  readonly (readonly PlaceGeometryPosition[])[];
+export type PlacePolygonCoordinates = readonly (readonly PlaceGeometryPosition[])[];
 
 export type PlacePolygonGeometry =
   | {

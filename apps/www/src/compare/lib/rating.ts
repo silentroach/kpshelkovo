@@ -1,4 +1,5 @@
 import { calculateDistance } from '@shelkovo/geo';
+
 import type {
   AvailabilityStatus,
   CommonSpaces,
@@ -8,7 +9,7 @@ import type {
   ServiceModel,
   Settlement,
   UndergroundElectricity,
-  VideoSurveillance,
+  VideoSurveillance
 } from './settlement/types';
 
 export interface Rating {
@@ -24,7 +25,7 @@ interface Group {
 
 const MOSCOW = {
   lat: 55.7558,
-  lng: 37.6176,
+  lng: 37.6176
 };
 
 // Приближенные точки МКАД для внутренней оценки радиуса.
@@ -36,15 +37,14 @@ const MKAD = [
   { lat: 55.5737, lng: 37.6789 },
   { lat: 55.6041, lng: 37.4572 },
   { lat: 55.7062, lng: 37.3718 },
-  { lat: 55.8808, lng: 37.7531 },
+  { lat: 55.8808, lng: 37.7531 }
 ];
 
 export const MKAD_RADIUS = round(
   MKAD.reduce(
-    (sum, item) =>
-      sum + calculateDistance(MOSCOW.lat, MOSCOW.lng, item.lat, item.lng),
-    0,
-  ) / MKAD.length,
+    (sum, item) => sum + calculateDistance(MOSCOW.lat, MOSCOW.lng, item.lat, item.lng),
+    0
+  ) / MKAD.length
 );
 
 export const RATING_METHODOLOGY = {
@@ -54,35 +54,35 @@ export const RATING_METHODOLOGY = {
     infrastructure: 0.5,
     commonSpaces: 0.25,
     serviceModel: 0.1,
-    distance: 0.15,
+    distance: 0.15
   },
   availabilityScores: {
     yes: 1,
     partial: 0.5,
-    no: 0,
+    no: 0
   } satisfies Record<AvailabilityStatus, number>,
   orderedScores: {
     roads: {
       asphalt: 1,
       partlyAsphalt: 0.75,
       gravel: 0.35,
-      dirt: 0,
+      dirt: 0
     } satisfies Record<RoadType, number>,
     drainage: {
       closed: 1,
       open: 0.6,
-      none: 0,
+      none: 0
     } satisfies Record<DrainageType, number>,
     videoSurveillance: {
       full: 1,
       checkpointOnly: 0.55,
-      none: 0,
+      none: 0
     } satisfies Record<VideoSurveillance, number>,
     undergroundElectricity: {
       full: 1,
       partial: 0.5,
-      none: 0,
-    } satisfies Record<UndergroundElectricity, number>,
+      none: 0
+    } satisfies Record<UndergroundElectricity, number>
   },
   fieldWeights: {
     infrastructure: {
@@ -99,7 +99,7 @@ export const RATING_METHODOLOGY = {
       videoSurveillance: 0.75,
       undergroundElectricity: 0.35,
       adminBuilding: 0.25,
-      retailOrServices: 0.55,
+      retailOrServices: 0.55
     } satisfies Record<keyof Infrastructure, number>,
     commonSpaces: {
       clubInfrastructure: 0.6,
@@ -115,7 +115,7 @@ export const RATING_METHODOLOGY = {
       spaCenter: 0.2,
       kidsClub: 0.3,
       sportsCamp: 0.15,
-      primarySchool: 0.15,
+      primarySchool: 0.15
     } satisfies Record<keyof CommonSpaces, number>,
     serviceModel: {
       garbageCollection: 1,
@@ -123,20 +123,20 @@ export const RATING_METHODOLOGY = {
       roadCleaning: 0.8,
       landscaping: 0.6,
       emergencyService: 0.6,
-      dispatcher: 0.4,
-    } satisfies Record<keyof ServiceModel, number>,
+      dispatcher: 0.4
+    } satisfies Record<keyof ServiceModel, number>
   },
   distancePoints: [
     { ringKm: 20, score: 1 },
     { ringKm: 40, score: 0.82 },
     { ringKm: 60, score: 0.58 },
     { ringKm: 80, score: 0.32 },
-    { ringKm: 100, score: 0.12 },
+    { ringKm: 100, score: 0.12 }
   ],
   adjustments: {
     waterInTariffBonus: 4,
-    rabstvoPenalty: 15,
-  },
+    rabstvoPenalty: 15
+  }
 } as const;
 
 export function getKm(lat: number, lng: number): number {
@@ -150,23 +150,14 @@ export function getRing(lat: number, lng: number): number {
 function tune(item: Settlement): number {
   const { waterInTariffBonus, rabstvoPenalty } = RATING_METHODOLOGY.adjustments;
 
-  return (
-    (item.waterInTariff ? waterInTariffBonus : 0) -
-    (item.rabstvo ? rabstvoPenalty : 0)
-  );
+  return (item.waterInTariff ? waterInTariffBonus : 0) - (item.rabstvo ? rabstvoPenalty : 0);
 }
 
 function round(value: number): number {
   return Math.round(value * 10) / 10;
 }
 
-function lerp(
-  value: number,
-  start: number,
-  end: number,
-  first: number,
-  last: number,
-): number {
+function lerp(value: number, start: number, end: number, first: number, last: number): number {
   if (start === end) return last;
   const share = (value - start) / (end - start);
   return first + (last - first) * share;
@@ -199,24 +190,20 @@ function wire(value?: UndergroundElectricity): number | undefined {
 
 function mean(list: Array<{ value?: number; weight: number }>): Group {
   const total = list.reduce((sum, item) => sum + item.weight, 0);
-  const known = list.reduce(
-    (sum, item) => sum + (item.value === undefined ? 0 : item.weight),
-    0,
-  );
+  const known = list.reduce((sum, item) => sum + (item.value === undefined ? 0 : item.weight), 0);
 
   if (known === 0 || total === 0) {
     return { fill: 0 };
   }
 
   const sum = list.reduce(
-    (acc, item) =>
-      acc + (item.value === undefined ? 0 : item.value * item.weight),
-    0,
+    (acc, item) => acc + (item.value === undefined ? 0 : item.value * item.weight),
+    0
   );
 
   return {
     raw: sum / known,
-    fill: known / total,
+    fill: known / total
   };
 }
 
@@ -237,17 +224,17 @@ function infra(item: Settlement): Group {
     { value: avail(info.fencing), weight: weights.fencing },
     {
       value: video(info.videoSurveillance),
-      weight: weights.videoSurveillance,
+      weight: weights.videoSurveillance
     },
     {
       value: wire(info.undergroundElectricity),
-      weight: weights.undergroundElectricity,
+      weight: weights.undergroundElectricity
     },
     { value: avail(info.adminBuilding), weight: weights.adminBuilding },
     {
       value: avail(info.retailOrServices),
-      weight: weights.retailOrServices,
-    },
+      weight: weights.retailOrServices
+    }
   ]);
 }
 
@@ -258,7 +245,7 @@ function spaces(item: Settlement): Group {
   return mean([
     {
       value: avail(info.clubInfrastructure),
-      weight: weights.clubInfrastructure,
+      weight: weights.clubInfrastructure
     },
     { value: avail(info.playgrounds), weight: weights.playgrounds },
     { value: avail(info.sports), weight: weights.sports },
@@ -272,7 +259,7 @@ function spaces(item: Settlement): Group {
     { value: avail(info.spaCenter), weight: weights.spaCenter },
     { value: avail(info.kidsClub), weight: weights.kidsClub },
     { value: avail(info.sportsCamp), weight: weights.sportsCamp },
-    { value: avail(info.primarySchool), weight: weights.primarySchool },
+    { value: avail(info.primarySchool), weight: weights.primarySchool }
   ]);
 }
 
@@ -283,16 +270,16 @@ function service(item: Settlement): Group {
   return mean([
     {
       value: avail(info.garbageCollection),
-      weight: weights.garbageCollection,
+      weight: weights.garbageCollection
     },
     { value: avail(info.snowRemoval), weight: weights.snowRemoval },
     { value: avail(info.roadCleaning), weight: weights.roadCleaning },
     { value: avail(info.landscaping), weight: weights.landscaping },
     {
       value: avail(info.emergencyService),
-      weight: weights.emergencyService,
+      weight: weights.emergencyService
     },
-    { value: avail(info.dispatcher), weight: weights.dispatcher },
+    { value: avail(info.dispatcher), weight: weights.dispatcher }
   ]);
 }
 
@@ -310,13 +297,7 @@ function near(ring: number): number {
 
   for (const point of points.slice(1)) {
     if (ring <= point.ringKm) {
-      return lerp(
-        ring,
-        previous.ringKm,
-        point.ringKm,
-        previous.score,
-        point.score,
-      );
+      return lerp(ring, previous.ringKm, point.ringKm, previous.score, point.score);
     }
     previous = point;
   }
@@ -328,9 +309,7 @@ function near(ring: number): number {
  * Build a stable quality rating for each settlement.
  * Tariff is intentionally excluded from the score.
  */
-export function buildRatings(
-  settlements: readonly Settlement[],
-): ReadonlyMap<string, Rating> {
+export function buildRatings(settlements: readonly Settlement[]): ReadonlyMap<string, Rating> {
   return new Map(
     settlements.map((item) => {
       const km = getKm(item.location.lat, item.location.lng);
@@ -342,19 +321,16 @@ export function buildRatings(
           mix(spaces(item)) * groupWeights.commonSpaces +
           mix(service(item)) * groupWeights.serviceModel +
           near(ring) * groupWeights.distance);
-      const score = Math.max(
-        scoreRange.min,
-        Math.min(base + tune(item), scoreRange.max),
-      );
+      const score = Math.max(scoreRange.min, Math.min(base + tune(item), scoreRange.max));
 
       return [
         item.slug,
         {
           score: round(score),
           km: round(km),
-          ring: round(ring),
-        },
+          ring: round(ring)
+        }
       ];
-    }),
+    })
   );
 }

@@ -35,9 +35,9 @@ const runAstro = (args) => {
   const result = spawnSync('astro', args, {
     env: {
       ...process.env,
-      ASTRO_PREVIEW_BACKGROUND: '0',
+      ASTRO_PREVIEW_BACKGROUND: '0'
     },
-    stdio: 'inherit',
+    stdio: 'inherit'
   });
 
   if (result.error) {
@@ -53,20 +53,9 @@ const serveVisualFixture = () => {
   const { fixtureRoot, port } = parseVisualFixtureArgs(process.argv.slice(2));
 
   runAstro(['build', '--root', fixtureRoot]);
-  runAstro([
-    'preview',
-    '--root',
-    fixtureRoot,
-    '--host',
-    host,
-    '--port',
-    String(port),
-  ]);
+  runAstro(['preview', '--root', fixtureRoot, '--host', host, '--port', String(port)]);
 };
 
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
-) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   serveVisualFixture();
 }

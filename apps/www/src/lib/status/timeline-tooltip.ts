@@ -1,10 +1,10 @@
 import type {
   StatusTimelineTooltipItemDto,
-  StatusTimelineTooltipListItemData,
+  StatusTimelineTooltipListItemData
 } from './timeline-tooltip.types';
 
 const getStatusTimelineTooltipPhaseIcon = (
-  item: Pick<StatusTimelineTooltipItemDto, 'kind' | 'phase'>,
+  item: Pick<StatusTimelineTooltipItemDto, 'kind' | 'phase'>
 ): 'alert' | 'check' | undefined => {
   if (item.kind !== 'incident' || item.phase === 'scheduled') {
     return undefined;
@@ -14,16 +14,14 @@ const getStatusTimelineTooltipPhaseIcon = (
 };
 
 export const toStatusTimelineTooltipListItemData = (
-  item: StatusTimelineTooltipItemDto,
+  item: StatusTimelineTooltipItemDto
 ): StatusTimelineTooltipListItemData => ({
   title: item.title,
   periodLabel:
-    item.phase === 'active'
-      ? (item.activePeriodLabel ?? item.periodLabel)
-      : item.periodLabel,
+    item.phase === 'active' ? (item.activePeriodLabel ?? item.periodLabel) : item.periodLabel,
   areas: item.areas,
   areaLabel: item.areaLabel,
-  phaseIcon: getStatusTimelineTooltipPhaseIcon(item),
+  phaseIcon: getStatusTimelineTooltipPhaseIcon(item)
 });
 
 export const formatStatusTimelineTooltipGroupLabel = (input: {
@@ -38,7 +36,7 @@ export const formatStatusTimelineTooltipGroupLabel = (input: {
       [
         item.title,
         item.periodLabel,
-        ...(item.areaLabel ? [`Части поселка: ${item.areaLabel}`] : []),
-      ].join('. '),
-    ),
+        ...(item.areaLabel ? [`Части поселка: ${item.areaLabel}`] : [])
+      ].join('. ')
+    )
   ].join('. ');

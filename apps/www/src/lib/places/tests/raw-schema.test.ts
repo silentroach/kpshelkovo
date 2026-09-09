@@ -5,7 +5,7 @@ import { RawPlaceSchema } from '../raw-schema';
 const place = {
   title: 'Буржуйка',
   name_cases: {
-    gen: 'Буржуйки',
+    gen: 'Буржуйки'
   },
   category: 'food',
   marker: 'foodtruck',
@@ -15,7 +15,7 @@ const place = {
   location: {
     map_url: 'https://yandex.ru/navi/-/CTfgq-5r',
     address: 'Шелково Форест, Берёзовая улица, 21А',
-    coordinates: { lat: 55.060526, lng: 37.716242 },
+    coordinates: { lat: 55.060526, lng: 37.716242 }
   },
   opening_hours: {
     description: 'С 10:00 до 22:00, вторник — выходной',
@@ -23,11 +23,11 @@ const place = {
       {
         days: ['mon', 'wed', 'thu', 'fri', 'sat', 'sun'],
         opens_at: '10:00',
-        closes_at: '22:00',
-      },
-    ],
+        closes_at: '22:00'
+      }
+    ]
   },
-  contact: 'food/burzhuyka',
+  contact: 'food/burzhuyka'
 } as const;
 
 describe('RawPlaceSchema', () => {
@@ -79,8 +79,8 @@ describe('RawPlaceSchema', () => {
     expect(
       RawPlaceSchema.parse({
         ...place,
-        location: { coordinates: place.location.coordinates },
-      }).location,
+        location: { coordinates: place.location.coordinates }
+      }).location
     ).toMatchInlineSnapshot(`
       {
         "coordinates": {
@@ -97,8 +97,8 @@ describe('RawPlaceSchema', () => {
     expect(
       RawPlaceSchema.parse({
         ...place,
-        location: { ...place.location, map_url: mapUrl },
-      }).location.map_url,
+        location: { ...place.location, map_url: mapUrl }
+      }).location.map_url
     ).toBe(mapUrl);
   });
 
@@ -108,11 +108,11 @@ describe('RawPlaceSchema', () => {
     'https://yandex.ru/maps-and-more/',
     'https://yandex.ru@evil.example/maps/',
     'http://yandex.ru/maps/',
-    'https://yandex.com/maps/',
+    'https://yandex.com/maps/'
   ])('rejects a non-map URL: %s', (mapUrl) => {
     const result = RawPlaceSchema.safeParse({
       ...place,
-      location: { ...place.location, map_url: mapUrl },
+      location: { ...place.location, map_url: mapUrl }
     });
 
     expect(result.success).toBe(false);
@@ -120,10 +120,8 @@ describe('RawPlaceSchema', () => {
       throw new Error('non-map URL passed validation');
     }
 
-    expect(
-      result.error.issues.some(
-        (issue) => issue.path.join('.') === 'location.map_url',
-      ),
-    ).toBe(true);
+    expect(result.error.issues.some((issue) => issue.path.join('.') === 'location.map_url')).toBe(
+      true
+    );
   });
 });

@@ -8,7 +8,7 @@ let estimate2026: typeof import('@/data/reglament/estimate-2026').estimate2026;
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ buildReglamentMarkdown } = await import('./markdown'));

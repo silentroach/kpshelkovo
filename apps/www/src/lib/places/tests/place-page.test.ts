@@ -29,21 +29,21 @@ const fixture = vi.hoisted(() => ({
           htmlUrl: '/news/2026/05/apple-garden/',
           markdownUrl: '/news/2026/05/apple-garden/index.md',
           excerpt: 'Жители высадили первые яблони.',
-          mentionedAt: '2026-05-03T09:00:00.000+03:00',
-        },
+          mentionedAt: '2026-05-03T09:00:00.000+03:00'
+        }
       ],
       status: [],
       reviews: [],
       places: [],
       people: [],
-      contacts: [],
-    },
-  },
+      contacts: []
+    }
+  }
 }));
 
 vi.mock('@/lib/places/load', () => ({
   loadPlaces: async () => [fixture.place],
-  loadPlaceWithBacklinks: async () => fixture.place,
+  loadPlaceWithBacklinks: async () => fixture.place
 }));
 
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
@@ -54,24 +54,21 @@ describe('/map/[slug]/', () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(PlacePage, {
       params: { slug: 'apple-garden' },
-      request: new Request('https://example.com/map/apple-garden/'),
+      request: new Request('https://example.com/map/apple-garden/')
     });
-    const article = html.slice(
-      html.indexOf('<article'),
-      html.indexOf('</article>'),
-    );
+    const article = html.slice(html.indexOf('<article'), html.indexOf('</article>'));
     const positions = [
       article.indexOf(fixture.place.address),
       article.indexOf('aria-label="Действия с местом"'),
-      article.indexOf(fixture.place.body),
+      article.indexOf(fixture.place.body)
     ];
 
     expect({
       allRendered: positions.every((position) => position >= 0),
       inOrder: positions.every(
-        (position, index) => index === 0 || position > positions[index - 1]!,
+        (position, index) => index === 0 || position > positions[index - 1]!
       ),
-      summaryRendered: article.includes(fixture.place.summary),
+      summaryRendered: article.includes(fixture.place.summary)
     }).toMatchInlineSnapshot(`
       {
         "allRendered": true,
@@ -85,12 +82,12 @@ describe('/map/[slug]/', () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(PlacePage, {
       params: { slug: 'apple-garden' },
-      request: new Request('https://example.com/map/apple-garden/'),
+      request: new Request('https://example.com/map/apple-garden/')
     });
 
     expect({
       hasBacklink: html.includes('href="/news/2026/05/apple-garden/"'),
-      hasBacklinkHeading: html.includes('Где упоминается'),
+      hasBacklinkHeading: html.includes('Где упоминается')
     }).toMatchInlineSnapshot(`
       {
         "hasBacklink": false,

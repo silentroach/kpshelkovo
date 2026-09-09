@@ -14,9 +14,9 @@ const renderNav = async (pathname: string, variant: 'header' | 'mobile') => {
     props: {
       variant,
       statusState: 'green',
-      statusAriaLabel: 'Статус: всё работает',
+      statusAriaLabel: 'Статус: всё работает'
     },
-    request: new Request(`https://example.com${pathname}`),
+    request: new Request(`https://example.com${pathname}`)
   });
 };
 
@@ -25,14 +25,14 @@ describe('SiteNav', () => {
     ['header', '/news/', 'page'],
     ['header', '/news/2026/07/report/', 'location'],
     ['mobile', '/status/', 'page'],
-    ['mobile', '/status/water/', 'location'],
+    ['mobile', '/status/water/', 'location']
   ] as const)(
     'marks the current %s navigation destination on %s',
     async (variant, pathname, current) => {
       const html = await renderNav(pathname, variant);
 
       expect(html).toContain(`aria-current="${current}"`);
-    },
+    }
   );
 
   it.each(['header', 'mobile'] as const)(
@@ -41,7 +41,7 @@ describe('SiteNav', () => {
       const html = await renderNav('/map/', variant);
 
       expect(html).toContain('href="/map/" aria-current="page"');
-    },
+    }
   );
 
   it.each(['header', 'mobile'] as const)(
@@ -52,14 +52,11 @@ describe('SiteNav', () => {
       expect(html).toContain('data-current-section');
       expect(html).toContain('aria-current="page"');
       expect(html).toContain('текущий раздел');
-    },
+    }
   );
 
   it('marks the tariff child as a location on a nested compare page', async () => {
-    const html = await renderNav(
-      '/815/compare/settlements/shelkovo/',
-      'header',
-    );
+    const html = await renderNav('/815/compare/settlements/shelkovo/', 'header');
 
     expect(html).toContain('aria-current="location"');
   });

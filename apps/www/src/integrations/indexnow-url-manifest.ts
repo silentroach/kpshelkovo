@@ -2,9 +2,7 @@ import { access, writeFile } from 'node:fs/promises';
 
 import type { AstroIntegration } from 'astro';
 
-export const indexNowUrlManifest = (
-  urls: ReadonlySet<string>,
-): AstroIntegration => ({
+export const indexNowUrlManifest = (urls: ReadonlySet<string>): AstroIntegration => ({
   name: 'indexnow-url-manifest',
   hooks: {
     'astro:build:done': async ({ dir }) => {
@@ -18,8 +16,8 @@ export const indexNowUrlManifest = (
       await writeFile(
         new URL('../indexnow-urls.json', dir),
         JSON.stringify([...urls].sort()),
-        'utf8',
+        'utf8'
       );
-    },
-  },
+    }
+  }
 });

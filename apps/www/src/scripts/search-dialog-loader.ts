@@ -1,7 +1,8 @@
 import { searchDialogGraphUrl } from 'virtual:search-dialog-assets';
+
 import type {
   SearchDialogImporter,
-  SearchDialogModule,
+  SearchDialogModule
 } from '@/scripts/search-dialog-loader.types';
 
 let graphRetry = 0;
@@ -12,7 +13,7 @@ const importSearchDialogGraph = (url: string): Promise<SearchDialogModule> =>
   import(/* @vite-ignore */ url);
 
 export const loadSearchDialog = async (
-  importGraph: SearchDialogImporter = importSearchDialogGraph,
+  importGraph: SearchDialogImporter = importSearchDialogGraph
 ): Promise<SearchDialogModule> => {
   const graphUrl = new URL(searchDialogGraphUrl, location.origin);
   if (graphRetry > 0) {

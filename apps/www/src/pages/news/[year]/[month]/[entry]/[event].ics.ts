@@ -1,10 +1,10 @@
-import type { APIRoute, GetStaticPaths } from 'astro';
 import { padNumber } from '@shelkovo/format';
+import type { APIRoute, GetStaticPaths } from 'astro';
 
 import {
   articleEventIcsFilename,
   buildArticleEventIcs,
-  hasArticleEvents,
+  hasArticleEvents
 } from '@/lib/news/calendar';
 import { loadNewsArticle, loadNewsArticles } from '@/lib/news/load';
 
@@ -19,9 +19,9 @@ export const getStaticPaths = (async () => {
         year: String(item.year),
         month: padNumber(item.month),
         entry: item.entry,
-        event: event.slug,
-      },
-    })),
+        event: event.slug
+      }
+    }))
   );
 }) satisfies GetStaticPaths;
 
@@ -45,7 +45,7 @@ export const GET: APIRoute = async ({ params }) => {
   return new Response(buildArticleEventIcs(article, event), {
     headers: {
       'Content-Type': 'text/calendar; charset=utf-8',
-      'Content-Disposition': `attachment; filename="${articleEventIcsFilename(event)}"`,
-    },
+      'Content-Disposition': `attachment; filename="${articleEventIcsFilename(event)}"`
+    }
   });
 };

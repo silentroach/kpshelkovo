@@ -79,8 +79,7 @@
       var(--color-primary-hover),
       var(--color-primary)
     );
-    box-shadow: 0 0 1rem
-      color-mix(in oklab, var(--color-primary) 42%, transparent);
+    box-shadow: 0 0 1rem color-mix(in oklab, var(--color-primary) 42%, transparent);
     content: '';
     opacity: 0.9;
     transform: scaleX(0.04);

@@ -4,7 +4,7 @@ import sharp from 'sharp';
 const screenshot = {
   animations: 'disabled',
   caret: 'hide',
-  scale: 'device',
+  scale: 'device'
 } as const;
 
 export const waitForVisualPaint = async (page: Page): Promise<void> => {
@@ -26,10 +26,7 @@ export const expectPaintedContent = async (locator: Locator): Promise<void> => {
   let darkPixels = 0;
 
   for (let index = 0; index < data.length; index += info.channels) {
-    const luminance =
-      data[index] * 0.2126 +
-      data[index + 1] * 0.7152 +
-      data[index + 2] * 0.0722;
+    const luminance = data[index] * 0.2126 + data[index + 1] * 0.7152 + data[index + 2] * 0.0722;
 
     if (luminance < 100) {
       darkPixels += 1;

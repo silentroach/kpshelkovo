@@ -12,7 +12,7 @@ export const GET: APIRoute = async () => {
   return createJsonResponse(openapi(root), {
     headers: {
       'Content-Type': `${OAS}; charset=utf-8`,
-      Link: links(root),
-    },
+      Link: links(root)
+    }
   });
 };

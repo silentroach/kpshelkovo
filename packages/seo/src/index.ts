@@ -13,14 +13,14 @@ export const BRAND_KEYWORDS = [
   'Шелково Парк',
   'Shelkovo Park',
   'Шелково Вилладж',
-  'Shelkovo Village',
+  'Shelkovo Village'
 ] as const;
 
 export const SHELKOVO_SITE_ALTERNATE_NAMES = [
   'Шелково Онлайн',
   'КП Шелково',
   'Шелково Эко Клаб',
-  'Shelkovo Eco Club',
+  'Shelkovo Eco Club'
 ] as const;
 
 export type SchemaDoc = Record<string, unknown>;
@@ -37,8 +37,8 @@ export function collectKeywords(...groups: KeywordInput[]): string[] {
           return Array.isArray(group) ? group : [group];
         })
         .map((item) => item.trim())
-        .filter(Boolean),
-    ),
+        .filter(Boolean)
+    )
   );
 }
 

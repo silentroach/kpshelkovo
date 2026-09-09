@@ -12,7 +12,7 @@ export const GET: APIRoute = async () => {
   return createJsonResponse(detailSchema(root), {
     headers: {
       'Content-Type': 'application/schema+json; charset=utf-8',
-      Link: detailLinks(root),
-    },
+      Link: detailLinks(root)
+    }
   });
 };

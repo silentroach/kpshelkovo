@@ -10,5 +10,4 @@ export type ReglamentCalculatorDetailsModule = Pick<
 
 export type ReglamentCalculatorControllerLoader =
   () => Promise<ReglamentCalculatorControllerModule>;
-export type ReglamentCalculatorDetailsLoader =
-  () => Promise<ReglamentCalculatorDetailsModule>;
+export type ReglamentCalculatorDetailsLoader = () => Promise<ReglamentCalculatorDetailsModule>;

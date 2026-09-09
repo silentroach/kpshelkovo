@@ -7,12 +7,7 @@ export { isAbsoluteUrl };
 export const STATUS_AREAS = AREAS;
 export type StatusArea = Area;
 
-export const STATUS_SERVICES = [
-  'electricity',
-  'water',
-  'internet',
-  'dam',
-] as const;
+export const STATUS_SERVICES = ['electricity', 'water', 'internet', 'dam'] as const;
 export type StatusService = (typeof STATUS_SERVICES)[number];
 
 export const STATUS_KINDS = ['incident', 'maintenance'] as const;

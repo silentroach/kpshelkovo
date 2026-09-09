@@ -9,7 +9,7 @@ import {
   type EntityMentionSourceEntity,
   type EntityMentionTarget,
   type NormalizedEntityMentions,
-  type SiteMentionRegistry,
+  type SiteMentionRegistry
 } from './types';
 
 const parser = unified().use(remarkParse).use(remarkGfm);
@@ -28,7 +28,7 @@ const SKIPPED_NODE_TYPES = new Set([
   'inlineCode',
   'link',
   'linkReference',
-  'yaml',
+  'yaml'
 ]);
 
 interface MarkdownPositionPoint {
@@ -54,14 +54,11 @@ interface MentionReplacement {
   readonly target: EntityMentionTarget;
 }
 
-const escapeLinkText = (value: string): string =>
-  value.replace(/([\\\[\]])/gu, '\\$1');
+const escapeLinkText = (value: string): string => value.replace(/([\\\[\]])/gu, '\\$1');
 
-const escapeLinkTitle = (value: string): string =>
-  value.replace(/([\\"])/gu, '\\$1');
+const escapeLinkTitle = (value: string): string => value.replace(/([\\"])/gu, '\\$1');
 
-const entityKey = (target: EntityMentionTarget): string =>
-  `${target.type}:${target.slug}`;
+const entityKey = (target: EntityMentionTarget): string => `${target.type}:${target.slug}`;
 
 const sourceEntityKey = (source: EntityMentionSourceEntity): string =>
   `${source.type}:${source.slug}`;
@@ -83,7 +80,7 @@ const failMention = (context: string, message: string): never => {
 const validateNotSelfMention = (
   target: EntityMentionTarget,
   source: EntityMentionSourceEntity | undefined,
-  context: string,
+  context: string
 ): void => {
   if (source && entityKey(target) === sourceEntityKey(source)) {
     failMention(context, `contains self entity mention "${entityKey(target)}"`);
@@ -93,7 +90,7 @@ const validateNotSelfMention = (
 const mentionLabel = (
   target: EntityMentionTarget,
   labelCase: EntityMentionLabelCase,
-  context: string,
+  context: string
 ): string => {
   if (labelCase === ENTITY_MENTION_DEFAULT_LABEL_CASE) {
     return target.label;
@@ -105,7 +102,7 @@ const mentionLabel = (
     label ??
     failMention(
       context,
-      `contains entity mention "@${target.slug}:${labelCase}", but entity "${entityKey(target)}" has no "${labelCase}" label case`,
+      `contains entity mention "@${target.slug}:${labelCase}", but entity "${entityKey(target)}" has no "${labelCase}" label case`
     )
   );
 };
@@ -113,18 +110,16 @@ const mentionLabel = (
 const mentionLink = (
   target: EntityMentionTarget,
   labelCase: EntityMentionLabelCase,
-  context: string,
+  context: string
 ): string => {
-  const titlePart = target.linkTitle
-    ? ` "${escapeLinkTitle(target.linkTitle)}"`
-    : '';
+  const titlePart = target.linkTitle ? ` "${escapeLinkTitle(target.linkTitle)}"` : '';
 
   return `[${escapeLinkText(mentionLabel(target, labelCase, context))}](${target.htmlUrl}${titlePart})`;
 };
 
 const absoluteOffsets = (
   node: MarkdownNode,
-  context: string,
+  context: string
 ): {
   readonly start: number;
   readonly end: number;
@@ -141,7 +136,7 @@ const absoluteOffsets = (
 
 function collectTextNodes(
   node: MarkdownNode,
-  context: string,
+  context: string
 ): readonly {
   readonly node: MarkdownNode;
   readonly start: number;
@@ -157,15 +152,10 @@ function collectTextNodes(
     return [{ node, start, end }];
   }
 
-  return (node.children ?? []).flatMap((child) =>
-    collectTextNodes(child, context),
-  );
+  return (node.children ?? []).flatMap((child) => collectTextNodes(child, context));
 }
 
-const labelledMentionSlug = (
-  url: string,
-  context: string,
-): string | undefined => {
+const labelledMentionSlug = (url: string, context: string): string | undefined => {
   if (url[0] !== '@') {
     return undefined;
   }
@@ -173,21 +163,17 @@ const labelledMentionSlug = (
   if (url.includes('%')) {
     failMention(
       context,
-      `contains unsupported encoded labelled entity mention destination "${url}"`,
+      `contains unsupported encoded labelled entity mention destination "${url}"`
     );
   }
 
   const slug = url.slice(1);
 
   for (let index = 0; index < slug.length; index += 1) {
-    if (
-      slug[index] === ':' &&
-      index > 0 &&
-      CASE_CHAR.test(slug[index + 1] ?? '')
-    ) {
+    if (slug[index] === ':' && index > 0 && CASE_CHAR.test(slug[index + 1] ?? '')) {
       failMention(
         context,
-        `contains unsupported labelled entity mention "@${slug}"; write the needed grammar in the visible link text`,
+        `contains unsupported labelled entity mention "@${slug}"; write the needed grammar in the visible link text`
       );
     }
   }
@@ -207,10 +193,7 @@ const decodeUriComponentSafe = (value: string): string | undefined => {
   }
 };
 
-const rawUnwrappedLinkDestinationEnd = (
-  source: string,
-  destinationStart: number,
-): number => {
+const rawUnwrappedLinkDestinationEnd = (source: string, destinationStart: number): number => {
   let parenDepth = 0;
 
   for (let index = destinationStart; index < source.length; index += 1) {
@@ -247,7 +230,7 @@ const rawLinkDestinationEnd = (
   destinationStart: number,
   isAngleWrapped: boolean,
   url: string,
-  context: string,
+  context: string
 ): number => {
   if (source.startsWith(url, destinationStart)) {
     return destinationStart + url.length;
@@ -258,9 +241,7 @@ const rawLinkDestinationEnd = (
     : rawUnwrappedLinkDestinationEnd(source, destinationStart);
 
   if (rawEnd === -1) {
-    throw new Error(
-      `${context} contains a labelled entity mention with unsupported link syntax`,
-    );
+    throw new Error(`${context} contains a labelled entity mention with unsupported link syntax`);
   }
 
   const rawUrl = source.slice(destinationStart, rawEnd);
@@ -270,14 +251,14 @@ const rawLinkDestinationEnd = (
   }
 
   throw new Error(
-    `${context} contains a labelled entity mention with unsupported link destination boundaries`,
+    `${context} contains a labelled entity mention with unsupported link destination boundaries`
   );
 };
 
 const linkDestinationOffsets = (
   markdown: string,
   node: MarkdownNode,
-  context: string,
+  context: string
 ): {
   readonly start: number;
   readonly end: number;
@@ -287,9 +268,7 @@ const linkDestinationOffsets = (
   const destinationStartMarker = source.lastIndexOf('](');
 
   if (destinationStartMarker === -1) {
-    throw new Error(
-      `${context} contains a labelled entity mention with unsupported link syntax`,
-    );
+    throw new Error(`${context} contains a labelled entity mention with unsupported link syntax`);
   }
 
   const destinationStart = destinationStartMarker + 2;
@@ -300,15 +279,7 @@ const linkDestinationOffsets = (
 
   return {
     start: urlStart,
-    end:
-      start +
-      rawLinkDestinationEnd(
-        source,
-        sourceUrlStart,
-        isAngleWrapped,
-        url,
-        context,
-      ),
+    end: start + rawLinkDestinationEnd(source, sourceUrlStart, isAngleWrapped, url, context)
   };
 };
 
@@ -316,7 +287,7 @@ function collectLabelledMentionReplacements(
   node: MarkdownNode,
   markdown: string,
   context: string,
-  registry: SiteMentionRegistry,
+  registry: SiteMentionRegistry
 ): readonly MentionReplacement[] {
   if (SKIPPED_NODE_TYPES.has(node.type) && node.type !== 'link') {
     return [];
@@ -330,27 +301,23 @@ function collectLabelledMentionReplacements(
     }
 
     const target =
-      registry.get(slug) ??
-      failMention(context, `contains unknown entity mention "@${slug}"`);
+      registry.get(slug) ?? failMention(context, `contains unknown entity mention "@${slug}"`);
 
     return [
       {
         ...linkDestinationOffsets(markdown, node, context),
         markdown: target.htmlUrl,
-        target,
-      },
+        target
+      }
     ];
   }
 
   return (node.children ?? []).flatMap((child) =>
-    collectLabelledMentionReplacements(child, markdown, context, registry),
+    collectLabelledMentionReplacements(child, markdown, context, registry)
   );
 }
 
-const invalidMentionTail = (
-  tail: string | undefined,
-  next: string | undefined,
-) =>
+const invalidMentionTail = (tail: string | undefined, next: string | undefined) =>
   tail === '_' ||
   tail === '/' ||
   tail === '@' ||
@@ -364,7 +331,7 @@ const mentionCase = (
   segment: string,
   mentionStart: number,
   slugEnd: number,
-  context: string,
+  context: string
 ): {
   readonly labelCase: EntityMentionLabelCase;
   readonly end: number;
@@ -372,7 +339,7 @@ const mentionCase = (
   if (segment[slugEnd] !== ':' || !CASE_CHAR.test(segment[slugEnd + 1] ?? '')) {
     return {
       labelCase: ENTITY_MENTION_DEFAULT_LABEL_CASE,
-      end: slugEnd,
+      end: slugEnd
     };
   }
 
@@ -387,21 +354,18 @@ const mentionCase = (
   if (isEntityMentionLabelCase(labelCase)) {
     return {
       labelCase,
-      end,
+      end
     };
   }
 
-  return failMention(
-    context,
-    `contains invalid entity mention "${token(segment, mentionStart)}"`,
-  );
+  return failMention(context, `contains invalid entity mention "${token(segment, mentionStart)}"`);
 };
 
 function mentionReplacements(
   segment: string,
   absoluteStart: number,
   context: string,
-  registry: SiteMentionRegistry,
+  registry: SiteMentionRegistry
 ): readonly MentionReplacement[] {
   const replacements: MentionReplacement[] = [];
 
@@ -428,10 +392,7 @@ function mentionReplacements(
     }
 
     if (!SLUG_START.test(head)) {
-      failMention(
-        context,
-        `contains invalid entity mention "${token(segment, index)}"`,
-      );
+      failMention(context, `contains invalid entity mention "${token(segment, index)}"`);
     }
 
     let end = start;
@@ -446,21 +407,17 @@ function mentionReplacements(
     const next = segment[labelCase.end + 1];
 
     if (invalidMentionTail(tail, next)) {
-      failMention(
-        context,
-        `contains invalid entity mention "${token(segment, index)}"`,
-      );
+      failMention(context, `contains invalid entity mention "${token(segment, index)}"`);
     }
 
     const target =
-      registry.get(slug) ??
-      failMention(context, `contains unknown entity mention "@${slug}"`);
+      registry.get(slug) ?? failMention(context, `contains unknown entity mention "@${slug}"`);
 
     replacements.push({
       start: absoluteStart + index,
       end: absoluteStart + labelCase.end,
       markdown: mentionLink(target, labelCase.labelCase, context),
-      target,
+      target
     });
 
     index = labelCase.end - 1;
@@ -470,7 +427,7 @@ function mentionReplacements(
 }
 
 export const createSiteMentionRegistry = (
-  targets: readonly EntityMentionTarget[],
+  targets: readonly EntityMentionTarget[]
 ): SiteMentionRegistry => {
   const registry = new Map<string, EntityMentionTarget>();
 
@@ -494,32 +451,22 @@ export const normalizeEntityMentions = (input: {
   if (!input.markdown.includes('@')) {
     return {
       markdown: input.markdown,
-      mentions: [],
+      mentions: []
     };
   }
 
   const tree = parser.parse(input.markdown) as MarkdownNode;
   const replacements = [
     ...collectTextNodes(tree, input.context).flatMap(({ start, end }) =>
-      mentionReplacements(
-        input.markdown.slice(start, end),
-        start,
-        input.context,
-        input.registry,
-      ),
+      mentionReplacements(input.markdown.slice(start, end), start, input.context, input.registry)
     ),
-    ...collectLabelledMentionReplacements(
-      tree,
-      input.markdown,
-      input.context,
-      input.registry,
-    ),
+    ...collectLabelledMentionReplacements(tree, input.markdown, input.context, input.registry)
   ].sort((a, b) => a.start - b.start || a.end - b.end);
 
   if (replacements.length === 0) {
     return {
       markdown: input.markdown,
-      mentions: [],
+      mentions: []
     };
   }
 
@@ -528,11 +475,7 @@ export const normalizeEntityMentions = (input: {
   const mentions = new Map<string, EntityMentionTarget>();
 
   for (const replacement of replacements) {
-    validateNotSelfMention(
-      replacement.target,
-      input.sourceEntity,
-      input.context,
-    );
+    validateNotSelfMention(replacement.target, input.sourceEntity, input.context);
 
     markdown += `${input.markdown.slice(cursor, replacement.start)}${replacement.markdown}`;
     cursor = replacement.end;
@@ -546,6 +489,6 @@ export const normalizeEntityMentions = (input: {
 
   return {
     markdown,
-    mentions: [...mentions.values()],
+    mentions: [...mentions.values()]
   };
 };

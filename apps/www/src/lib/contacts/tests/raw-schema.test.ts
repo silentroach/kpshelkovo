@@ -11,9 +11,9 @@ describe('RawContactSchema', () => {
         category: 'fence',
         updated_at: '2026-07-06',
         contacts: {
-          phone: '+7 900 000-00-00',
-        },
-      }),
+          phone: '+7 900 000-00-00'
+        }
+      })
     ).toMatchInlineSnapshot(`
       {
         "category": "fence",
@@ -38,13 +38,12 @@ describe('RawContactSchema', () => {
           telegram: 'https://t.me/example',
           whatsapp: 'https://wa.me/79000000000',
           email: 'team@example.com',
-          website: 'https://example.com',
+          website: 'https://example.com'
         },
         seo: {
-          description:
-            'Контакт по заборам, который может быть полезен жителям Шелково.',
-        },
-      }).contacts,
+          description: 'Контакт по заборам, который может быть полезен жителям Шелково.'
+        }
+      }).contacts
     ).toMatchInlineSnapshot(`
       {
         "email": "team@example.com",
@@ -63,15 +62,15 @@ describe('RawContactSchema', () => {
         category: 'garden',
         updated_at: '2026-07-07',
         contacts: {
-          phone: '+7 900 000-00-00',
+          phone: '+7 900 000-00-00'
         },
         location: {
           title: 'Золото Сибири',
           url: 'https://yandex.ru/maps/-/CTq-BEOk',
           address: 'Пионерская ул., 21, пгт Малино',
-          coordinates: { lat: 55.116326, lng: 38.16951 },
-        },
-      }).location,
+          coordinates: { lat: 55.116326, lng: 38.16951 }
+        }
+      }).location
     ).toMatchInlineSnapshot(`
       {
         "address": "Пионерская ул., 21, пгт Малино",
@@ -93,17 +92,17 @@ describe('RawContactSchema', () => {
         category: 'electricity',
         updated_at: '2026-07-08',
         contacts: {
-          phone: '+7 900 000-00-00',
+          phone: '+7 900 000-00-00'
         },
         reviews: [
           {
             sentiment: 'positive',
             summary: 'Помог с электричеством.',
             published_at: '2026-04-07',
-            url: 'https://t.me/example/1',
-          },
-        ],
-      }).reviews,
+            url: 'https://t.me/example/1'
+          }
+        ]
+      }).reviews
     ).toMatchInlineSnapshot(`
       [
         {
@@ -124,18 +123,18 @@ describe('RawContactSchema', () => {
         category: 'electricity',
         updated_at: '2026-07-13',
         contacts: {
-          phone: '+7 985 414-57-87',
+          phone: '+7 985 414-57-87'
         },
         vcf: {
           enable: true,
           kind: 'person',
           name: {
             family: 'Ерёмин',
-            given: 'Александр',
+            given: 'Александр'
           },
-          note: 'Помогает по вопросам электричества.',
-        },
-      }).vcf,
+          note: 'Помогает по вопросам электричества.'
+        }
+      }).vcf
     ).toMatchInlineSnapshot(`
       {
         "enable": true,
@@ -155,7 +154,7 @@ describe('RawContactSchema', () => {
       slug: 'useful-contact',
       category: 'garden',
       updated_at: '2026-07-13',
-      contacts: { phone: '+7 900 000-00-00' },
+      contacts: { phone: '+7 900 000-00-00' }
     };
 
     expect(
@@ -164,15 +163,15 @@ describe('RawContactSchema', () => {
         vcf: {
           enable: true,
           kind: 'person',
-          name: { given: 'Иван' },
-        },
-      }).success,
+          name: { given: 'Иван' }
+        }
+      }).success
     ).toBe(false);
     expect(
       RawContactSchema.safeParse({
         ...base,
-        vcf: { enable: true, kind: 'organization' },
-      }).success,
+        vcf: { enable: true, kind: 'organization' }
+      }).success
     ).toBe(false);
   });
 
@@ -182,18 +181,12 @@ describe('RawContactSchema', () => {
       slug: 'ivan-petrov-fence',
       category: 'fence',
       updated_at: '2026-07-06',
-      contacts: { phone: '+7 900 000-00-00' },
+      contacts: { phone: '+7 900 000-00-00' }
     };
 
-    expect(
-      RawContactSchema.safeParse({ ...base, slug: 'Bad Slug' }).success,
-    ).toBe(false);
-    expect(
-      RawContactSchema.safeParse({ ...base, updated_at: '2026-02-30' }).success,
-    ).toBe(false);
-    expect(
-      RawContactSchema.safeParse({ ...base, category: 'gates' }).success,
-    ).toBe(false);
+    expect(RawContactSchema.safeParse({ ...base, slug: 'Bad Slug' }).success).toBe(false);
+    expect(RawContactSchema.safeParse({ ...base, updated_at: '2026-02-30' }).success).toBe(false);
+    expect(RawContactSchema.safeParse({ ...base, category: 'gates' }).success).toBe(false);
   });
 
   it('rejects blank and missing public contact methods', () => {
@@ -201,16 +194,11 @@ describe('RawContactSchema', () => {
       title: 'Иван Петров',
       slug: 'ivan-petrov-fence',
       category: 'fence',
-      updated_at: '2026-07-06',
+      updated_at: '2026-07-06'
     };
 
-    expect(RawContactSchema.safeParse({ ...base, contacts: {} }).success).toBe(
-      false,
-    );
-    expect(
-      RawContactSchema.safeParse({ ...base, contacts: { phone: '   ' } })
-        .success,
-    ).toBe(false);
+    expect(RawContactSchema.safeParse({ ...base, contacts: {} }).success).toBe(false);
+    expect(RawContactSchema.safeParse({ ...base, contacts: { phone: '   ' } }).success).toBe(false);
   });
 
   it('rejects non-HTTPS contact URLs', () => {
@@ -218,27 +206,27 @@ describe('RawContactSchema', () => {
       title: 'Иван Петров',
       slug: 'ivan-petrov-fence',
       category: 'fence',
-      updated_at: '2026-07-06',
+      updated_at: '2026-07-06'
     };
 
     expect(
       RawContactSchema.safeParse({
         ...base,
-        contacts: { website: 'http://example.com' },
-      }).success,
+        contacts: { website: 'http://example.com' }
+      }).success
     ).toBe(false);
     expect(
       RawContactSchema.safeParse({
         ...base,
-        contacts: { telegram: 'javascript:alert(1)' },
-      }).success,
+        contacts: { telegram: 'javascript:alert(1)' }
+      }).success
     ).toBe(false);
     expect(
       RawContactSchema.safeParse({
         ...base,
         contacts: { phone: '+7 900 000-00-00' },
-        location: { title: 'Карта', url: 'http://example.com' },
-      }).success,
+        location: { title: 'Карта', url: 'http://example.com' }
+      }).success
     ).toBe(false);
     expect(
       RawContactSchema.safeParse({
@@ -249,10 +237,10 @@ describe('RawContactSchema', () => {
             sentiment: 'positive',
             summary: 'Отзыв.',
             published_at: '2026-04-07',
-            url: 'http://example.com',
-          },
-        ],
-      }).success,
+            url: 'http://example.com'
+          }
+        ]
+      }).success
     ).toBe(false);
   });
 
@@ -265,7 +253,7 @@ describe('RawContactSchema', () => {
       contacts: { phone: '+7 900 000-00-00' },
       status: 'draft',
       reviews: [],
-      paid_placement: true,
+      paid_placement: true
     });
 
     expect(result.success).toBe(false);

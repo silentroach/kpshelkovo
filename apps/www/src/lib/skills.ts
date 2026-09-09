@@ -19,22 +19,13 @@ export interface SkillsIndex {
   readonly skills: readonly SkillEntry[];
 }
 
-export const names = [
-  'site-sections',
-  'news-feed',
-  'status-feed',
-  'people-profiles',
-] as const;
+export const names = ['site-sections', 'news-feed', 'status-feed', 'people-profiles'] as const;
 
 const schema = 'https://schemas.agentskills.io/discovery/0.2.0/schema.json';
 const root = join(process.cwd(), 'public', '.well-known', 'agent-skills');
 const SKILLS = '/.well-known/agent-skills/index.json';
 
-const pick = (
-  text: string,
-  key: 'name' | 'description',
-  id: string,
-): string => {
+const pick = (text: string, key: 'name' | 'description', id: string): string => {
   const value = text.match(new RegExp(`^${key}:\\s*(.+)$`, 'm'))?.[1]?.trim();
 
   if (!value) {
@@ -81,13 +72,13 @@ export async function build(): Promise<SkillsIndex> {
         type: 'skill-md' as const,
         description: metaRow.description,
         url: `./${id}/SKILL.md`,
-        digest: digest(body),
+        digest: digest(body)
       } satisfies SkillEntry;
-    }),
+    })
   );
 
   return {
     $schema: schema,
-    skills,
+    skills
   };
 }

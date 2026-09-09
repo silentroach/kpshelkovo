@@ -22,11 +22,11 @@ const place: Place = {
           [
             [37.74, 55.05],
             [37.75, 55.05],
-            [37.74, 55.05],
-          ],
-        ],
-      },
-    },
+            [37.74, 55.05]
+          ]
+        ]
+      }
+    }
   },
   mapUrl: 'https://yandex.ru/maps/example',
   openingHours: {
@@ -35,13 +35,13 @@ const place: Place = {
       {
         days: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
         opensAt: '10:00',
-        closesAt: '20:00',
-      },
-    ],
+        closesAt: '20:00'
+      }
+    ]
   },
   url: '/map/hunting-ponds/',
   markdownUrl: '/map/hunting-ponds/index.md',
-  canonical: 'https://kpshelkovo.online/map/hunting-ponds/',
+  canonical: 'https://kpshelkovo.online/map/hunting-ponds/'
 };
 
 describe('place map public DTO', () => {

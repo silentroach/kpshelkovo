@@ -3,7 +3,7 @@ import {
   dateTimeFromISO,
   dateTimeFromParts,
   formatMonth,
-  padNumber,
+  padNumber
 } from '@shelkovo/format';
 
 import type {
@@ -16,12 +16,11 @@ import type {
   StatusCalendarProjection,
   StatusCalendarRecordInput,
   StatusCalendarYear,
-  StatusCalendarYearGrid,
+  StatusCalendarYearGrid
 } from './calendar.types';
 import type { StatusIncident } from './types';
 
-const toMoscowDateTime = (timestamp: number) =>
-  dateTimeFromISO(new Date(timestamp).toISOString());
+const toMoscowDateTime = (timestamp: number) => dateTimeFromISO(new Date(timestamp).toISOString());
 
 const dayId = (year: number, month: number, day: number): string =>
   `${year}-${padNumber(month)}-${padNumber(day)}`;
@@ -32,34 +31,29 @@ const capitalize = (value: string): string =>
 const buildMonthGrid = (
   calendar: StatusCalendarProjection,
   year: number,
-  month: number,
+  month: number
 ): StatusCalendarMonthGrid => {
   const firstDay = dateTimeFromParts({ year, month, day: 1 });
   const gridStart = firstDay.minus({ days: firstDay.weekday - 1 });
-  const days: StatusCalendarGridDay[] = Array.from(
-    { length: 42 },
-    (_, index) => {
-      const date = gridStart.plus({ days: index });
-      const id = dayId(date.year, date.month, date.day);
-      const isInMonth = date.year === year && date.month === month;
+  const days: StatusCalendarGridDay[] = Array.from({ length: 42 }, (_, index) => {
+    const date = gridStart.plus({ days: index });
+    const id = dayId(date.year, date.month, date.day);
+    const isInMonth = date.year === year && date.month === month;
 
-      return {
-        id,
-        day: date.day,
-        isInMonth,
-        status: isInMonth ? calendar.byDay.get(id) : undefined,
-      };
-    },
-  );
-  const weeks = Array.from({ length: 6 }, (_, index) =>
-    days.slice(index * 7, (index + 1) * 7),
-  );
+    return {
+      id,
+      day: date.day,
+      isInMonth,
+      status: isInMonth ? calendar.byDay.get(id) : undefined
+    };
+  });
+  const weeks = Array.from({ length: 6 }, (_, index) => days.slice(index * 7, (index + 1) * 7));
 
   return {
     year,
     month,
     name: capitalize(formatMonth(year, month, { includeYear: false })),
-    weeks,
+    weeks
   };
 };
 
@@ -67,15 +61,15 @@ export const currentStatusCalendarYear = (now = new Date()): number =>
   toMoscowDateTime(now.valueOf()).year;
 
 export const availableStatusCalendarYears = (
-  calendar: StatusCalendarProjection,
+  calendar: StatusCalendarProjection
 ): readonly number[] =>
-  [
-    ...new Set([calendar.buildYear, ...calendar.years.map(({ year }) => year)]),
-  ].sort((first, second) => first - second);
+  [...new Set([calendar.buildYear, ...calendar.years.map(({ year }) => year)])].sort(
+    (first, second) => first - second
+  );
 
 export const buildStatusCalendarYearGrid = (
   calendar: StatusCalendarProjection,
-  year: number,
+  year: number
 ): StatusCalendarYearGrid => {
   if (!Number.isInteger(year)) {
     throw new Error('status calendar year must be an integer');
@@ -83,9 +77,7 @@ export const buildStatusCalendarYearGrid = (
 
   return {
     year,
-    months: Array.from({ length: 12 }, (_, index) =>
-      buildMonthGrid(calendar, year, index + 1),
-    ),
+    months: Array.from({ length: 12 }, (_, index) => buildMonthGrid(calendar, year, index + 1))
   };
 };
 
@@ -98,44 +90,31 @@ const assertFiniteTimestamp = (value: number, context: string): void => {
   }
 };
 
-const sameRecord = (
-  first: StatusCalendarRecordInput,
-  second: StatusCalendarRecordInput,
-): boolean =>
+const sameRecord = (first: StatusCalendarRecordInput, second: StatusCalendarRecordInput): boolean =>
   first.kind === second.kind &&
   first.startedAt === second.startedAt &&
   first.endedAt === second.endedAt;
 
 const uniqueRecords = (
-  records: readonly StatusCalendarRecordInput[],
+  records: readonly StatusCalendarRecordInput[]
 ): readonly StatusCalendarRecordInput[] => {
   const byId = new Map<string, StatusCalendarRecordInput>();
 
   for (const record of records) {
-    assertFiniteTimestamp(
-      record.startedAt,
-      `status calendar record "${record.id}" startedAt`,
-    );
+    assertFiniteTimestamp(record.startedAt, `status calendar record "${record.id}" startedAt`);
 
     if (record.endedAt !== undefined) {
-      assertFiniteTimestamp(
-        record.endedAt,
-        `status calendar record "${record.id}" endedAt`,
-      );
+      assertFiniteTimestamp(record.endedAt, `status calendar record "${record.id}" endedAt`);
 
       if (record.endedAt < record.startedAt) {
-        throw new Error(
-          `status calendar record "${record.id}" cannot end before it starts`,
-        );
+        throw new Error(`status calendar record "${record.id}" cannot end before it starts`);
       }
     }
 
     const existing = byId.get(record.id);
 
     if (existing && !sameRecord(existing, record)) {
-      throw new Error(
-        `status calendar record "${record.id}" has conflicting intervals`,
-      );
+      throw new Error(`status calendar record "${record.id}" has conflicting intervals`);
     }
 
     byId.set(record.id, record);
@@ -144,26 +123,20 @@ const uniqueRecords = (
   return [...byId.values()];
 };
 
-const effectiveEndMs = (
-  record: StatusCalendarRecordInput,
-  buildNowMs: number,
-): number => {
+const effectiveEndMs = (record: StatusCalendarRecordInput, buildNowMs: number): number => {
   if (record.endedAt !== undefined) {
     return record.endedAt;
   }
 
   const lastIncludedDay = Math.max(record.startedAt, buildNowMs);
 
-  return toMoscowDateTime(lastIncludedDay)
-    .startOf('day')
-    .plus({ days: 1 })
-    .toMillis();
+  return toMoscowDateTime(lastIncludedDay).startOf('day').plus({ days: 1 }).toMillis();
 };
 
 const addRecordDays = (
   buckets: Map<string, StatusCalendarDayBucket>,
   record: StatusCalendarRecordInput,
-  buildNowMs: number,
+  buildNowMs: number
 ): void => {
   const endMs = effectiveEndMs(record, buildNowMs);
 
@@ -186,7 +159,7 @@ const addRecordDays = (
         month: date.month,
         day: date.day,
         startMs,
-        records: new Map(),
+        records: new Map()
       };
 
       bucket.records.set(record.id, record);
@@ -197,10 +170,7 @@ const addRecordDays = (
   }
 };
 
-const dayKind = (
-  incidentCount: number,
-  maintenanceCount: number,
-): StatusCalendarDayKind => {
+const dayKind = (incidentCount: number, maintenanceCount: number): StatusCalendarDayKind => {
   if (incidentCount && maintenanceCount) {
     return 'mixed';
   }
@@ -219,9 +189,7 @@ const buildDay = (bucket: StatusCalendarDayBucket): StatusCalendarDay => {
       compareRuText(first.id, second.id)
     );
   });
-  const incidentCount = records.filter(
-    (record) => record.kind === 'incident',
-  ).length;
+  const incidentCount = records.filter((record) => record.kind === 'incident').length;
   const maintenanceCount = records.length - incidentCount;
 
   return {
@@ -232,13 +200,11 @@ const buildDay = (bucket: StatusCalendarDayBucket): StatusCalendarDay => {
     kind: dayKind(incidentCount, maintenanceCount),
     incidentCount,
     maintenanceCount,
-    recordIds: records.map((record) => record.id),
+    recordIds: records.map((record) => record.id)
   };
 };
 
-const buildMonths = (
-  days: readonly StatusCalendarDay[],
-): readonly StatusCalendarMonth[] => {
+const buildMonths = (days: readonly StatusCalendarDay[]): readonly StatusCalendarMonth[] => {
   const daysByMonth = new Map<string, StatusCalendarDay[]>();
 
   for (const day of days) {
@@ -260,14 +226,12 @@ const buildMonths = (
       id,
       year: firstDay.year,
       month: firstDay.month,
-      days: monthDays,
+      days: monthDays
     };
   });
 };
 
-const buildYears = (
-  months: readonly StatusCalendarMonth[],
-): readonly StatusCalendarYear[] => {
+const buildYears = (months: readonly StatusCalendarMonth[]): readonly StatusCalendarYear[] => {
   const monthsByYear = new Map<number, StatusCalendarMonth[]>();
 
   for (const month of months) {
@@ -279,22 +243,20 @@ const buildYears = (
 
   return [...monthsByYear.entries()].map(([year, yearMonths]) => ({
     year,
-    months: yearMonths,
+    months: yearMonths
   }));
 };
 
-export const toStatusCalendarRecord = (
-  incident: StatusIncident,
-): StatusCalendarRecordInput => ({
+export const toStatusCalendarRecord = (incident: StatusIncident): StatusCalendarRecordInput => ({
   id: incident.id,
   kind: incident.kind,
   startedAt: incident.started.at.valueOf(),
-  endedAt: incident.ended?.at.valueOf(),
+  endedAt: incident.ended?.at.valueOf()
 });
 
 export const buildStatusCalendarProjection = (
   records: readonly StatusCalendarRecordInput[],
-  buildNowMs: number,
+  buildNowMs: number
 ): StatusCalendarProjection => {
   assertFiniteTimestamp(buildNowMs, 'status calendar buildNowMs');
 
@@ -315,6 +277,6 @@ export const buildStatusCalendarProjection = (
     years,
     byYear: new Map(years.map((year) => [year.year, year])),
     byMonth: new Map(months.map((month) => [month.id, month])),
-    byDay: new Map(days.map((day) => [day.id, day])),
+    byDay: new Map(days.map((day) => [day.id, day]))
   };
 };

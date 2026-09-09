@@ -4,7 +4,7 @@ const exposeYandexMaps = (ready: Promise<void>): void => {
   Object.defineProperty(window, 'ymaps3', {
     value: { ready },
     writable: true,
-    configurable: true,
+    configurable: true
   });
 };
 
@@ -13,9 +13,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  document
-    .querySelectorAll('[data-yandex-maps-api="true"]')
-    .forEach((node) => node.remove());
+  document.querySelectorAll('[data-yandex-maps-api="true"]').forEach((node) => node.remove());
   delete (window as { ymaps3?: unknown }).ymaps3;
   vi.restoreAllMocks();
   vi.unstubAllEnvs();
@@ -59,9 +57,7 @@ it('reloads Yandex Maps when the loaded API rejects its ready promise', async ()
   });
   const { loadYandexMaps } = await import('../runtime');
 
-  await expect(loadYandexMaps()).rejects.toThrow(
-    'Yandex Maps initialization failed',
-  );
+  await expect(loadYandexMaps()).rejects.toThrow('Yandex Maps initialization failed');
   await expect(loadYandexMaps()).resolves.toBeUndefined();
 
   expect(requests).toBe(2);

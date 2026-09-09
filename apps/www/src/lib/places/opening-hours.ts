@@ -9,14 +9,14 @@ const WEEKDAY_BY_SHORT_NAME = new Map<string, PlaceWeekday>([
   ['Thu', 'thu'],
   ['Fri', 'fri'],
   ['Sat', 'sat'],
-  ['Sun', 'sun'],
+  ['Sun', 'sun']
 ]);
 const PLACE_DATE_TIME_FORMAT = new Intl.DateTimeFormat('en-GB', {
   timeZone: PLACE_TIME_ZONE,
   weekday: 'short',
   hour: '2-digit',
   minute: '2-digit',
-  hourCycle: 'h23',
+  hourCycle: 'h23'
 });
 
 const minutesFromTime = (time: string): number => {
@@ -26,13 +26,10 @@ const minutesFromTime = (time: string): number => {
 };
 
 const placeLocalTime = (
-  date: Date,
+  date: Date
 ): { readonly weekday: PlaceWeekday; readonly minutes: number } => {
   const parts = new Map(
-    PLACE_DATE_TIME_FORMAT.formatToParts(date).map((part) => [
-      part.type,
-      part.value,
-    ]),
+    PLACE_DATE_TIME_FORMAT.formatToParts(date).map((part) => [part.type, part.value])
   );
   const weekday = WEEKDAY_BY_SHORT_NAME.get(parts.get('weekday') ?? '');
 
@@ -42,15 +39,13 @@ const placeLocalTime = (
 
   return {
     weekday,
-    minutes:
-      Number(parts.get('hour') ?? '0') * 60 +
-      Number(parts.get('minute') ?? '0'),
+    minutes: Number(parts.get('hour') ?? '0') * 60 + Number(parts.get('minute') ?? '0')
   };
 };
 
 export const getPlaceClosingTime = (
   openingHours: PlaceOpeningHours,
-  date = new Date(),
+  date = new Date()
 ): string | undefined => {
   const localTime = placeLocalTime(date);
 
@@ -58,11 +53,9 @@ export const getPlaceClosingTime = (
     (period) =>
       period.days.includes(localTime.weekday) &&
       localTime.minutes >= minutesFromTime(period.opensAt) &&
-      localTime.minutes < minutesFromTime(period.closesAt),
+      localTime.minutes < minutesFromTime(period.closesAt)
   )?.closesAt;
 };
 
-export const isPlaceOpen = (
-  openingHours: PlaceOpeningHours,
-  date = new Date(),
-): boolean => Boolean(getPlaceClosingTime(openingHours, date));
+export const isPlaceOpen = (openingHours: PlaceOpeningHours, date = new Date()): boolean =>
+  Boolean(getPlaceClosingTime(openingHours, date));

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { formatCurrency, formatTariff } from '@shelkovo/format';
+
   import type { ExplorerSettlement } from '../lib/explorer';
   import type { ComparisonResult } from '../lib/settlement/types';
   import { withBase } from '../lib/url';
@@ -20,9 +21,7 @@
   });
 
   const tariffHint = $derived(
-    settlement.tariff.normalizedIsEstimate
-      ? 'Тариф приведен к сотке автоматически.'
-      : undefined,
+    settlement.tariff.normalizedIsEstimate ? 'Тариф приведен к сотке автоматически.' : undefined
   );
 </script>
 

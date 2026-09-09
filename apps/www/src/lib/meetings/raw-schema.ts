@@ -9,43 +9,40 @@ const TIME = /^\d{2}:[0-5]\d:[0-5]\d$/;
 const text = z.string().trim();
 
 const absoluteUrl = (name: string) =>
-  text.refine(
-    (value) => isAbsoluteUrl(value),
-    `${name} must be an absolute URL`,
-  );
+  text.refine((value) => isAbsoluteUrl(value), `${name} must be an absolute URL`);
 
 const speakerId = (name: string) =>
   text.refine(
     (value) => SPEAKER_ID.test(value),
-    `${name} must use lower-case Latin letters, digits, and hyphen`,
+    `${name} must use lower-case Latin letters, digits, and hyphen`
   );
 
 const time = (name: string) =>
   text.refine(
     (value) => TIME.test(value),
-    `${name} must use HH:MM:SS with minutes and seconds from 00 to 59`,
+    `${name} must use HH:MM:SS with minutes and seconds from 00 to 59`
   );
 
 const RawMeetingSpeakerSchema = z.union([
   z
     .object({
       person: speakerId('speakers[].person'),
-      description: text.optional(),
+      description: text.optional()
     })
     .strict(),
   z
     .object({
       name: text,
-      description: text.optional(),
+      description: text.optional()
     })
-    .strict(),
+    .strict()
 ]);
 
 const RawMeetingTranscriptSegmentSchema = z
   .object({
     start: time('segments[].start'),
     speaker: speakerId('segments[].speaker'),
-    text,
+    text
   })
   .strict();
 
@@ -61,7 +58,7 @@ const RawMeetingSpeakersSchema = z
     if (entries.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'speakers must have at least one speaker',
+        message: 'speakers must have at least one speaker'
       });
       return;
     }
@@ -71,8 +68,7 @@ const RawMeetingSpeakersSchema = z
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: [id],
-          message:
-            'speaker id must use lower-case Latin letters, digits, and hyphen',
+          message: 'speaker id must use lower-case Latin letters, digits, and hyphen'
         });
       }
     });
@@ -85,7 +81,7 @@ export const RawMeetingSchema = z
     context: text,
     speakers: RawMeetingSpeakersSchema,
     updated_at: contentDateSchema('updated_at').optional(),
-    source_urls: z.array(absoluteUrl('source_urls[]')).min(1).optional(),
+    source_urls: z.array(absoluteUrl('source_urls[]')).min(1).optional()
   })
   .strict();
 
@@ -93,11 +89,9 @@ export type RawMeeting = z.output<typeof RawMeetingSchema>;
 
 export const RawMeetingTranscriptSchema = z
   .object({
-    segments: RawMeetingTranscriptSegmentsSchema,
+    segments: RawMeetingTranscriptSegmentsSchema
   })
   .strict();
 
 export type RawMeetingTranscript = z.output<typeof RawMeetingTranscriptSchema>;
-export type RawMeetingTranscriptSegment = z.output<
-  typeof RawMeetingTranscriptSegmentSchema
->;
+export type RawMeetingTranscriptSegment = z.output<typeof RawMeetingTranscriptSegmentSchema>;

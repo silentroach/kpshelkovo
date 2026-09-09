@@ -8,21 +8,18 @@ import {
   formatMeetingSourceLabel,
   formatMeetingSpeakerAnchor,
   formatTranscriptPartLabel,
-  formatTranscriptTime,
+  formatTranscriptTime
 } from './view';
 
-const moment = (input: {
-  readonly iso: string;
-  readonly hasTime: boolean;
-}): MeetingMoment => ({
+const moment = (input: { readonly iso: string; readonly hasTime: boolean }): MeetingMoment => ({
   at: new Date(input.iso),
   iso: input.iso,
-  hasTime: input.hasTime,
+  hasTime: input.hasTime
 });
 
 const transcriptTime = (value: string): MeetingTranscriptTime => ({
   value,
-  totalSeconds: 0,
+  totalSeconds: 0
 });
 
 const meeting = (input?: {
@@ -37,7 +34,7 @@ const meeting = (input?: {
     input?.date ??
     moment({
       iso: '2026-06-13T16:00:00+03:00',
-      hasTime: true,
+      hasTime: true
     }),
   context:
     input?.context ??
@@ -48,8 +45,8 @@ const meeting = (input?: {
   transcript: {
     speakers: [],
     parts: [],
-    segments: [],
-  },
+    segments: []
+  }
 });
 
 describe('meeting view helpers', () => {
@@ -58,18 +55,18 @@ describe('meeting view helpers', () => {
       formatMeetingDate(
         moment({
           iso: '2026-06-13T16:00:00+03:00',
-          hasTime: true,
-        }),
-      ),
+          hasTime: true
+        })
+      )
     ).toBe('13 июня 2026, 16:00');
 
     expect(
       formatMeetingDate(
         moment({
           iso: '2026-06-13T00:00:00+03:00',
-          hasTime: false,
-        }),
-      ),
+          hasTime: false
+        })
+      )
     ).toBe('13 июня 2026');
   });
 
@@ -78,18 +75,18 @@ describe('meeting view helpers', () => {
       formatMeetingMetaDate(
         moment({
           iso: '2026-06-13T16:00:00+03:00',
-          hasTime: true,
-        }),
-      ),
+          hasTime: true
+        })
+      )
     ).toBe('2026-06-13T16:00:00+03:00');
 
     expect(
       formatMeetingMetaDate(
         moment({
           iso: '2026-06-13T00:00:00+03:00',
-          hasTime: false,
-        }),
-      ),
+          hasTime: false
+        })
+      )
     ).toBe('2026-06-13');
   });
 
@@ -101,9 +98,7 @@ describe('meeting view helpers', () => {
     expect(description.startsWith(context.slice(0, 40))).toBe(true);
     expect(description.length).toBeLessThanOrEqual(170);
 
-    expect(describeMeeting(meeting({ context: 'а'.repeat(200) })).length).toBe(
-      170,
-    );
+    expect(describeMeeting(meeting({ context: 'а'.repeat(200) })).length).toBe(170);
   });
 
   it('adds a factual transcript phrase when context is short', () => {
@@ -111,11 +106,11 @@ describe('meeting view helpers', () => {
       describeMeeting(
         meeting({
           context: 'Встреча с жителями.',
-          sourceUrls: ['https://example.com/source'],
-        }),
-      ),
+          sourceUrls: ['https://example.com/source']
+        })
+      )
     ).toBe(
-      'Встреча с жителями. Полная транскрипция встречи с временными отметками и ссылкой на источник записи.',
+      'Встреча с жителями. Полная транскрипция встречи с временными отметками и ссылкой на источник записи.'
     );
   });
 
@@ -128,8 +123,6 @@ describe('meeting view helpers', () => {
   it('formats transcript time and speaker anchors consistently', () => {
     expect(formatTranscriptTime(transcriptTime('00:12:34'))).toBe('00:12:34');
     expect(formatTranscriptPartLabel({ index: 2 })).toBe('Часть 2');
-    expect(formatMeetingSpeakerAnchor({ id: 'ykizilov' })).toBe(
-      'speaker-ykizilov',
-    );
+    expect(formatMeetingSpeakerAnchor({ id: 'ykizilov' })).toBe('speaker-ykizilov');
   });
 });

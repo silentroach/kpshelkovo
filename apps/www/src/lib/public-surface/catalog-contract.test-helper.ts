@@ -4,7 +4,7 @@ import {
   surfaceHref,
   type PublicSurface,
   type PublicSurfaceCatalogRole,
-  type PublicSurfaceSlice,
+  type PublicSurfaceSlice
 } from './index';
 
 type CatalogEntry = {
@@ -26,16 +26,11 @@ type AssertSectionCatalogInput = {
   readonly slice: PublicSurfaceSlice;
 };
 
-const linksets = (
-  catalog: Record<string, unknown>,
-): readonly CatalogLinkset[] =>
+const linksets = (catalog: Record<string, unknown>): readonly CatalogLinkset[] =>
   Array.isArray(catalog.linkset) ? (catalog.linkset as CatalogLinkset[]) : [];
 
-const contractEntry = (
-  role: PublicSurfaceCatalogRole,
-  href?: string,
-  type?: string,
-): string => `${role}\t${href ?? '<missing href>'}\t${type ?? '<no type>'}`;
+const contractEntry = (role: PublicSurfaceCatalogRole, href?: string, type?: string): string =>
+  `${role}\t${href ?? '<missing href>'}\t${type ?? '<no type>'}`;
 
 const contractEntries = (catalog: Record<string, unknown>): readonly string[] =>
   linksets(catalog).flatMap((linkset) =>
@@ -44,18 +39,13 @@ const contractEntries = (catalog: Record<string, unknown>): readonly string[] =>
         return linkset.anchor ? [contractEntry(role, linkset.anchor)] : [];
       }
 
-      return (linkset[role] ?? []).map((entry) =>
-        contractEntry(role, entry.href, entry.type),
-      );
-    }),
+      return (linkset[role] ?? []).map((entry) => contractEntry(role, entry.href, entry.type));
+    })
   );
 
-const sorted = (entries: readonly string[]): readonly string[] =>
-  [...entries].sort();
+const sorted = (entries: readonly string[]): readonly string[] => [...entries].sort();
 
-const sectionCatalogRole = (
-  surface: PublicSurface,
-): PublicSurfaceCatalogRole | false | undefined =>
+const sectionCatalogRole = (surface: PublicSurface): PublicSurfaceCatalogRole | false | undefined =>
   surface.sectionCatalogRole ?? surface.catalogRole;
 
 export const expectSectionCatalogMatchesRegistry = ({
@@ -63,7 +53,7 @@ export const expectSectionCatalogMatchesRegistry = ({
   catalogRoot,
   exact = false,
   siteRoot,
-  slice,
+  slice
 }: AssertSectionCatalogInput): void => {
   const body = catalog(catalogRoot ?? siteRoot);
   const actual = sorted(contractEntries(body));
@@ -78,16 +68,13 @@ export const expectSectionCatalogMatchesRegistry = ({
         contractEntry(
           role,
           surfaceHref(siteRoot, surface),
-          role === 'anchor' ? undefined : surface.mediaType,
-        ),
+          role === 'anchor' ? undefined : surface.mediaType
+        )
       ];
-    }),
+    })
   );
 
-  const expectation = expect(
-    actual,
-    `${slice.owner.id} catalog role/URL/MIME contract`,
-  );
+  const expectation = expect(actual, `${slice.owner.id} catalog role/URL/MIME contract`);
   if (exact) {
     expectation.toEqual(expected);
     return;

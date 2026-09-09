@@ -2,26 +2,26 @@
 
 import { describe, expect, it, vi } from 'vitest';
 
-import {
-  newsArticleStaticPaths,
-  newsMonthStaticPaths,
-  newsTagStaticPaths,
-  newsYearStaticPaths,
-} from '../static-paths';
-
+import * as NewsEventIcsRoute from '@/pages/news/[year]/[month]/[entry]/[event].ics';
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
-import * as NewsYearPage from '@/pages/news/[year]/index.astro';
-import * as NewsYearMarkdownRoute from '@/pages/news/[year]/index.md';
+import * as NewsArticlePage from '@/pages/news/[year]/[month]/[entry]/index.astro';
+import * as NewsArticleMarkdownRoute from '@/pages/news/[year]/[month]/[entry]/index.md';
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import * as NewsMonthPage from '@/pages/news/[year]/[month]/index.astro';
 import * as NewsMonthMarkdownRoute from '@/pages/news/[year]/[month]/index.md';
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
-import * as NewsArticlePage from '@/pages/news/[year]/[month]/[entry]/index.astro';
-import * as NewsArticleMarkdownRoute from '@/pages/news/[year]/[month]/[entry]/index.md';
-import * as NewsEventIcsRoute from '@/pages/news/[year]/[month]/[entry]/[event].ics';
+import * as NewsYearPage from '@/pages/news/[year]/index.astro';
+import * as NewsYearMarkdownRoute from '@/pages/news/[year]/index.md';
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import * as NewsTagPage from '@/pages/news/tags/[tag]/index.astro';
 import * as NewsTagMarkdownRoute from '@/pages/news/tags/[tag]/index.md';
+
+import {
+  newsArticleStaticPaths,
+  newsMonthStaticPaths,
+  newsTagStaticPaths,
+  newsYearStaticPaths
+} from '../static-paths';
 
 const fixtures = vi.hoisted(() => ({
   archives: {
@@ -30,11 +30,11 @@ const fixtures = vi.hoisted(() => ({
         year: 2026,
         months: [
           { year: 2026, month: 11 },
-          { year: 2026, month: 1 },
-        ],
+          { year: 2026, month: 1 }
+        ]
       },
-      { year: 2025, months: [] },
-    ],
+      { year: 2025, months: [] }
+    ]
   },
   articles: [
     { year: 2026, month: 1, entry: 'winter-update', events: [] },
@@ -42,43 +42,33 @@ const fixtures = vi.hoisted(() => ({
       year: 2025,
       month: 11,
       entry: 'general-meeting',
-      events: [{ slug: 'meeting' }],
-    },
+      events: [{ slug: 'meeting' }]
+    }
   ],
-  tags: [{ key: 'documents' }, { key: 'meetings' }],
+  tags: [{ key: 'documents' }, { key: 'meetings' }]
 }));
 
 vi.mock('@/lib/news/load', () => ({
   loadNewsArchives: async () => fixtures.archives,
   loadNewsArticles: async () => fixtures.articles,
-  loadNewsTags: async () => fixtures.tags,
+  loadNewsTags: async () => fixtures.tags
 }));
 
 const routePairs = [
-  [
-    'year',
-    NewsYearPage.getStaticPaths,
-    NewsYearMarkdownRoute.getStaticPaths,
-    newsYearStaticPaths,
-  ],
+  ['year', NewsYearPage.getStaticPaths, NewsYearMarkdownRoute.getStaticPaths, newsYearStaticPaths],
   [
     'month',
     NewsMonthPage.getStaticPaths,
     NewsMonthMarkdownRoute.getStaticPaths,
-    newsMonthStaticPaths,
+    newsMonthStaticPaths
   ],
   [
     'article',
     NewsArticlePage.getStaticPaths,
     NewsArticleMarkdownRoute.getStaticPaths,
-    newsArticleStaticPaths,
+    newsArticleStaticPaths
   ],
-  [
-    'tag',
-    NewsTagPage.getStaticPaths,
-    NewsTagMarkdownRoute.getStaticPaths,
-    newsTagStaticPaths,
-  ],
+  ['tag', NewsTagPage.getStaticPaths, NewsTagMarkdownRoute.getStaticPaths, newsTagStaticPaths]
 ] as const;
 
 describe('news static paths', () => {
@@ -87,22 +77,22 @@ describe('news static paths', () => {
     async (_kind, htmlStaticPaths, markdownStaticPaths, sharedStaticPaths) => {
       expect({
         htmlUsesShared: htmlStaticPaths === sharedStaticPaths,
-        markdownUsesShared: markdownStaticPaths === sharedStaticPaths,
+        markdownUsesShared: markdownStaticPaths === sharedStaticPaths
       }).toEqual({ htmlUsesShared: true, markdownUsesShared: true });
 
       const [htmlPaths, markdownPaths] = await Promise.all([
         htmlStaticPaths(),
-        markdownStaticPaths(),
+        markdownStaticPaths()
       ]);
 
       expect(markdownPaths).toEqual(htmlPaths);
-    },
+    }
   );
 
   it('keeps zero-padded months in shared archive and article params', async () => {
     const [monthPaths, articlePaths] = await Promise.all([
       newsMonthStaticPaths(),
-      newsArticleStaticPaths(),
+      newsArticleStaticPaths()
     ]);
 
     expect({ monthPaths, articlePaths }).toMatchInlineSnapshot(`
@@ -143,9 +133,8 @@ describe('news static paths', () => {
 
   it('keeps ICS paths separate and limited to article events', async () => {
     expect({
-      sharesArticlePaths:
-        NewsEventIcsRoute.getStaticPaths === newsArticleStaticPaths,
-      paths: await NewsEventIcsRoute.getStaticPaths(),
+      sharesArticlePaths: NewsEventIcsRoute.getStaticPaths === newsArticleStaticPaths,
+      paths: await NewsEventIcsRoute.getStaticPaths()
     }).toMatchInlineSnapshot(`
       {
         "paths": [

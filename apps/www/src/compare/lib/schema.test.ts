@@ -1,9 +1,10 @@
-import { describe, it, expect, expectTypeOf } from 'vitest';
 import type { CollectionEntry } from 'astro:content';
-import type { RawSettlement } from './settlement/schema';
-import { mapRawSettlement } from './settlement/mapper';
-import { getLotAverage } from './settlement/lots';
+import { describe, it, expect, expectTypeOf } from 'vitest';
+
 import { SettlementSchema } from '../lib/schema';
+import { getLotAverage } from './settlement/lots';
+import { mapRawSettlement } from './settlement/mapper';
+import type { RawSettlement } from './settlement/schema';
 
 describe('Schema Validation', () => {
   describe('Valid Settlement Parses', () => {
@@ -20,13 +21,13 @@ describe('Schema Validation', () => {
           address_text: 'Московская область, Тестовый район',
           lat: 55.7558,
           lng: 37.6173,
-          district: 'Тестовый район',
+          district: 'Тестовый район'
         },
         tariff: {
           value: 3000,
           unit: 'rub_per_sotka',
           period: 'month',
-          note: 'Тестовая заметка',
+          note: 'Тестовая заметка'
         },
         water_in_tariff: true,
         rabstvo: true,
@@ -44,7 +45,7 @@ describe('Schema Validation', () => {
           video_surveillance: 'full',
           underground_electricity: 'full',
           admin_building: 'yes',
-          retail_or_services: 'yes',
+          retail_or_services: 'yes'
         },
         common_spaces: {
           club_infrastructure: 'yes',
@@ -60,7 +61,7 @@ describe('Schema Validation', () => {
           kids_club: 'no',
           sports_camp: 'no',
           primary_school: 'no',
-          bbq_zones: 'yes',
+          bbq_zones: 'yes'
         },
         service_model: {
           garbage_collection: 'yes',
@@ -68,7 +69,7 @@ describe('Schema Validation', () => {
           road_cleaning: 'yes',
           landscaping: 'yes',
           emergency_service: 'yes',
-          dispatcher: 'yes',
+          dispatcher: 'yes'
         },
         sources: [
           {
@@ -76,9 +77,9 @@ describe('Schema Validation', () => {
             url: 'https://example.com/source',
             type: 'official',
             date_checked: '2026-04-03',
-            comment: '',
-          },
-        ],
+            comment: ''
+          }
+        ]
       };
 
       const result = SettlementSchema.safeParse(validSettlement);
@@ -107,16 +108,16 @@ describe('Schema Validation', () => {
           address_text: 'Московская область, Тестовый район',
           lat: 55.7558,
           lng: 37.6173,
-          district: 'Тестовый район',
+          district: 'Тестовый район'
         },
         tariff: {
           value: 3000,
           unit: 'rub_per_sotka',
-          period: 'month',
+          period: 'month'
         },
         water_in_tariff: true,
         infrastructure: {
-          water: 'partial',
+          water: 'partial'
         },
         sources: [
           {
@@ -124,17 +125,15 @@ describe('Schema Validation', () => {
             url: 'https://example.com/source',
             type: 'official',
             date_checked: '2026-04-03',
-            comment: '',
-          },
-        ],
+            comment: ''
+          }
+        ]
       };
 
       const result = SettlementSchema.safeParse(invalidSettlement);
       expect(result.success).toBe(false);
       if (!result.success) {
-        const issue = result.error.issues.find(
-          (item) => item.path[0] === 'water_in_tariff',
-        );
+        const issue = result.error.issues.find((item) => item.path[0] === 'water_in_tariff');
         expect(issue?.message).toContain('central water supply');
       }
     });
@@ -151,12 +150,12 @@ describe('Schema Validation', () => {
           address_text: 'Московская область, Тестовый район',
           lat: 55.7558,
           lng: 37.6173,
-          district: 'Тестовый район',
+          district: 'Тестовый район'
         },
         tariff: {
           value: 3000,
           unit: 'rub_per_sotka',
-          period: 'month',
+          period: 'month'
         },
         sources: [
           {
@@ -164,9 +163,9 @@ describe('Schema Validation', () => {
             url: 'https://example.com/source',
             type: 'official',
             date_checked: '2026-04-03',
-            comment: '',
-          },
-        ],
+            comment: ''
+          }
+        ]
       };
 
       const result = SettlementSchema.safeParse(validSettlement);
@@ -187,12 +186,12 @@ describe('Schema Validation', () => {
           address_text: 'Московская область, Тестовый район',
           lat: 55.7558,
           lng: 37.6173,
-          district: 'Тестовый район',
+          district: 'Тестовый район'
         },
         tariff: {
           value: 12000,
           unit: 'rub_per_lot',
-          period: 'month',
+          period: 'month'
         },
         sources: [
           {
@@ -200,9 +199,9 @@ describe('Schema Validation', () => {
             url: 'https://example.com/source',
             type: 'official',
             date_checked: '2026-04-03',
-            comment: '',
-          },
-        ],
+            comment: ''
+          }
+        ]
       };
 
       const result = SettlementSchema.safeParse(validSettlement);
@@ -225,17 +224,17 @@ describe('Schema Validation', () => {
           address_text: 'Московская область, Тестовый район',
           lat: 55.7558,
           lng: 37.6173,
-          district: 'Тестовый район',
+          district: 'Тестовый район'
         },
         tariff: {
           value: 12000,
           unit: 'rub_per_lot',
-          period: 'month',
+          period: 'month'
         },
         lots: {
           count: 150,
           area_ha: 32,
-          average_sotka: 20.4,
+          average_sotka: 20.4
         },
         sources: [
           {
@@ -243,9 +242,9 @@ describe('Schema Validation', () => {
             url: 'https://example.com/source',
             type: 'official',
             date_checked: '2026-04-03',
-            comment: '',
-          },
-        ],
+            comment: ''
+          }
+        ]
       };
 
       const result = SettlementSchema.safeParse(validSettlement);
@@ -253,10 +252,7 @@ describe('Schema Validation', () => {
       if (result.success) {
         const settlement = mapRawSettlement(result.data);
         expect(result.data.lots?.average_sotka).toBe(20.4);
-        expect(settlement.tariff.normalizedPerSotkaMonth).toBeCloseTo(
-          588.235294,
-          6,
-        );
+        expect(settlement.tariff.normalizedPerSotkaMonth).toBeCloseTo(588.235294, 6);
       }
     });
 
@@ -271,16 +267,16 @@ describe('Schema Validation', () => {
           address_text: 'Московская область, Тестовый район',
           lat: 55.7558,
           lng: 37.6173,
-          district: 'Тестовый район',
+          district: 'Тестовый район'
         },
         tariff: {
           value: 12100,
           unit: 'rub_per_lot',
-          period: 'month',
+          period: 'month'
         },
         lots: {
           count: 298,
-          area_ha: 100,
+          area_ha: 100
         },
         infrastructure: {
           roads: 'asphalt',
@@ -288,12 +284,12 @@ describe('Schema Validation', () => {
           drainage: 'open',
           checkpoints: 'yes',
           admin_building: 'yes',
-          retail_or_services: 'yes',
+          retail_or_services: 'yes'
         },
         common_spaces: {
           playgrounds: 'yes',
           sports: 'yes',
-          restaurant: 'yes',
+          restaurant: 'yes'
         },
         sources: [
           {
@@ -301,9 +297,9 @@ describe('Schema Validation', () => {
             url: 'https://example.com/source',
             type: 'official',
             date_checked: '2026-04-03',
-            comment: '',
-          },
-        ],
+            comment: ''
+          }
+        ]
       };
 
       const result = SettlementSchema.safeParse(validSettlement);
@@ -311,16 +307,9 @@ describe('Schema Validation', () => {
       if (result.success) {
         const settlement = mapRawSettlement(result.data);
         expect(
-          getLotAverage(
-            settlement.lots,
-            settlement.infrastructure,
-            settlement.commonSpaces,
-          ),
+          getLotAverage(settlement.lots, settlement.infrastructure, settlement.commonSpaces)
         ).toBeCloseTo(31.56, 2);
-        expect(settlement.tariff.normalizedPerSotkaMonth).toBeCloseTo(
-          383.43,
-          2,
-        );
+        expect(settlement.tariff.normalizedPerSotkaMonth).toBeCloseTo(383.43, 2);
       }
     });
 
@@ -335,20 +324,20 @@ describe('Schema Validation', () => {
           address_text: 'Московская область, Тестовый район',
           lat: 55.7558,
           lng: 37.6173,
-          district: 'Тестовый район',
+          district: 'Тестовый район'
         },
         tariff: [
           {
             value: 5813,
             unit: 'rub_per_lot',
             period: 'month',
-            note: '  тариф взят с сайта  ',
+            note: '  тариф взят с сайта  '
           },
           {
             value: 100,
             unit: 'rub_per_sotka',
-            period: 'month',
-          },
+            period: 'month'
+          }
         ],
         sources: [
           {
@@ -356,9 +345,9 @@ describe('Schema Validation', () => {
             url: 'https://example.com/source',
             type: 'official',
             date_checked: '2026-04-03',
-            comment: '',
-          },
-        ],
+            comment: ''
+          }
+        ]
       };
 
       const result = SettlementSchema.safeParse(validSettlement);
@@ -371,9 +360,7 @@ describe('Schema Validation', () => {
         expect('parts' in result.data.tariff).toBe(true);
         if ('parts' in result.data.tariff) {
           expect(result.data.tariff.parts).toHaveLength(2);
-          expect(result.data.tariff.parts[0]?.note).toBe(
-            '  тариф взят с сайта  ',
-          );
+          expect(result.data.tariff.parts[0]?.note).toBe('  тариф взят с сайта  ');
         }
       }
 
@@ -381,8 +368,8 @@ describe('Schema Validation', () => {
         const invalid = {
           ...validSettlement,
           tariff: validSettlement.tariff.map((part, index) =>
-            index === 0 ? { ...part, note } : part,
-          ),
+            index === 0 ? { ...part, note } : part
+          )
         };
 
         expect(SettlementSchema.safeParse(invalid).success).toBe(false);
@@ -397,20 +384,20 @@ describe('Schema Validation', () => {
         website: 'https://test.example.com',
         management_company: {
           title: 'УК Тест',
-          url: 'https://example.com/uk-test',
+          url: 'https://example.com/uk-test'
         },
         is_baseline: false,
         location: {
           address_text: 'Московская область, Тестовый район',
           lat: 55.7558,
           lng: 37.6173,
-          district: 'Тестовый район',
+          district: 'Тестовый район'
         },
         tariff: {
           value: 3000,
           unit: 'rub_per_sotka',
           period: 'month',
-          note: 'Тестовая заметка',
+          note: 'Тестовая заметка'
         },
         infrastructure: {},
         service_model: {},
@@ -420,9 +407,9 @@ describe('Schema Validation', () => {
             url: 'https://example.com/source',
             type: 'official',
             date_checked: '2026-04-03',
-            comment: '',
-          },
-        ],
+            comment: ''
+          }
+        ]
       };
 
       const result = SettlementSchema.safeParse(validSettlement);
@@ -443,13 +430,13 @@ describe('Schema Validation', () => {
           address_text: 'Московская область, Тестовый район',
           lat: 55.7558,
           lng: 37.6173,
-          district: 'Тестовый район',
+          district: 'Тестовый район'
         },
         tariff: {
           value: 3000,
           unit: 'rub_per_sotka',
           period: 'month',
-          note: 'Тестовая заметка',
+          note: 'Тестовая заметка'
         },
         infrastructure: {},
         service_model: {},
@@ -459,9 +446,9 @@ describe('Schema Validation', () => {
             url: 'https://example.com/source',
             type: 'official',
             date_checked: '2026-04-03',
-            comment: '',
-          },
-        ],
+            comment: ''
+          }
+        ]
       };
 
       const result = SettlementSchema.safeParse(validSettlement);

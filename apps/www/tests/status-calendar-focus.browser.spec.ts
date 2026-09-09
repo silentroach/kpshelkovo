@@ -22,9 +22,7 @@ const calendarListenerWork = (page: Page) =>
 
     const link = document.querySelector('[data-status-calendar-day-link]');
     const root = link?.closest('[data-status-calendar-tooltip-root]');
-    const tooltip = root?.querySelector<HTMLElement>(
-      '[data-status-calendar-tooltip]',
-    );
+    const tooltip = root?.querySelector<HTMLElement>('[data-status-calendar-tooltip]');
     if (!(link instanceof HTMLElement) || !root || !tooltip) {
       throw new Error('Expected an interactive year calendar day');
     }
@@ -38,14 +36,14 @@ const calendarListenerWork = (page: Page) =>
     link.dispatchEvent(
       new PointerEvent('pointerover', {
         bubbles: true,
-        pointerType: 'mouse',
-      }),
+        pointerType: 'mouse'
+      })
     );
 
     return {
       navigationQueries,
       opened: root.hasAttribute('data-status-calendar-tooltip-open'),
-      positionCalls,
+      positionCalls
     };
   });
 
@@ -80,28 +78,22 @@ const calendarWorkOutsideRoute = (page: Page) =>
       button.dispatchEvent(
         new PointerEvent('pointerover', {
           bubbles: true,
-          pointerType: 'mouse',
-        }),
+          pointerType: 'mouse'
+        })
       );
       button.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
-      const openedByPointerOrFocus = root.hasAttribute(
-        'data-status-calendar-tooltip-open',
-      );
+      const openedByPointerOrFocus = root.hasAttribute('data-status-calendar-tooltip-open');
 
       root.setAttribute('data-status-calendar-tooltip-open', '');
-      document.body.dispatchEvent(
-        new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }),
-      );
+      document.body.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
       document.dispatchEvent(new Event('astro:page-load'));
 
       return {
         navigationQueries,
         interactions: {
-          keptOpenAfterEscape: root.hasAttribute(
-            'data-status-calendar-tooltip-open',
-          ),
-          openedByPointerOrFocus,
-        },
+          keptOpenAfterEscape: root.hasAttribute('data-status-calendar-tooltip-open'),
+          openedByPointerOrFocus
+        }
       };
     } finally {
       document.querySelector = querySelector;
@@ -111,22 +103,20 @@ const calendarWorkOutsideRoute = (page: Page) =>
 const expectCalendarLifecycle = async (page: Page): Promise<void> => {
   await expect(page.locator('status-year-calendar-lifecycle')).toHaveCount(1);
   await expect(
-    page.locator('[data-status-calendar-year] [data-status-calendar-today]'),
+    page.locator('[data-status-calendar-year] [data-status-calendar-today]')
   ).toHaveCount(1);
   expect(await calendarListenerWork(page)).toEqual({
     navigationQueries: 0,
     opened: true,
-    positionCalls: 1,
+    positionCalls: 1
   });
 };
 
 for (const viewport of [
   { name: 'desktop', width: 1280, height: 800 },
-  { name: 'mobile', width: 390, height: 844 },
+  { name: 'mobile', width: 390, height: 844 }
 ] as const) {
-  test(`opens a calendar day and returns to status on ${viewport.name}`, async ({
-    page,
-  }) => {
+  test(`opens a calendar day and returns to status on ${viewport.name}`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.goto('/status/', { waitUntil: 'networkidle' });
 
@@ -136,7 +126,7 @@ for (const viewport of [
       throw new Error('Expected status calendar entry URL');
     }
     const calendarYear = new URL(entryHref, page.url()).pathname.match(
-      /^\/status\/calendar\/(\d{4})\/$/,
+      /^\/status\/calendar\/(\d{4})\/$/
     )?.[1];
     if (!calendarYear) {
       throw new Error('Expected a year status calendar entry URL');
@@ -180,20 +170,16 @@ for (const viewport of [
 
 for (const viewport of [
   { name: 'desktop', width: 1280, height: 800, visibleRange: '30' },
-  { name: 'mobile', width: 390, height: 844, visibleRange: '7' },
+  { name: 'mobile', width: 390, height: 844, visibleRange: '7' }
 ] as const) {
-  test(`shows the matching service timeline range on ${viewport.name}`, async ({
-    page,
-  }) => {
+  test(`shows the matching service timeline range on ${viewport.name}`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.goto('/status/', { waitUntil: 'networkidle' });
 
     const card = page.locator('[data-status-service-card]').first();
-    const visibleTimeline = card.locator(
-      `[data-range-days="${viewport.visibleRange}"]`,
-    );
+    const visibleTimeline = card.locator(`[data-range-days="${viewport.visibleRange}"]`);
     const hiddenTimeline = card.locator(
-      `[data-range-days="${viewport.visibleRange === '30' ? '7' : '30'}"]`,
+      `[data-range-days="${viewport.visibleRange === '30' ? '7' : '30'}"]`
     );
 
     await expect(visibleTimeline).toBeVisible();
@@ -207,8 +193,7 @@ const trackCalendarFocus = (page: Page): Promise<void> =>
 
     HTMLElement.prototype.focus = function (options?: FocusOptions): void {
       if (this.matches('[data-status-calendar-day] > h2')) {
-        document.documentElement.dataset.statusCalendarFocusOptions =
-          JSON.stringify(options ?? {});
+        document.documentElement.dataset.statusCalendarFocusOptions = JSON.stringify(options ?? {});
       }
 
       focus.call(this, options);
@@ -219,12 +204,12 @@ const expectFocusedDay = async (page: Page): Promise<void> => {
   await expect(page.locator(`[id="${dayId}"]`)).toBeFocused();
   await expect(page.locator('html')).toHaveAttribute(
     'data-status-calendar-focus-options',
-    '{"preventScroll":true}',
+    '{"preventScroll":true}'
   );
 };
 
 test('focuses an initial day deep link without hiding it under the sticky header', async ({
-  page,
+  page
 }) => {
   await trackCalendarFocus(page);
   await page.goto(dayPath, { waitUntil: 'networkidle' });
@@ -244,17 +229,11 @@ test('focuses an initial day deep link without hiding it under the sticky header
 
     const headingStyle = getComputedStyle(heading);
     const dayDividerWidths = [
-      ...document.querySelectorAll(
-        '[data-status-calendar-day]:not(:first-child)',
-      ),
-    ].map((element) =>
-      Number.parseFloat(getComputedStyle(element).borderTopWidth),
-    );
+      ...document.querySelectorAll('[data-status-calendar-day]:not(:first-child)')
+    ].map((element) => Number.parseFloat(getComputedStyle(element).borderTopWidth));
     const recordDividerWidths = [
-      ...document.querySelectorAll('.status-calendar-day-records > article'),
-    ].map((element) =>
-      Number.parseFloat(getComputedStyle(element).borderTopWidth),
-    );
+      ...document.querySelectorAll('.status-calendar-day-records > article')
+    ].map((element) => Number.parseFloat(getComputedStyle(element).borderTopWidth));
 
     return {
       headingTop: heading.getBoundingClientRect().top,
@@ -264,31 +243,23 @@ test('focuses an initial day deep link without hiding it under the sticky header
       sectionOutlineStyle: style.outlineStyle,
       headingOutlineStyle: headingStyle.outlineStyle,
       headingOutlineWidth: Number.parseFloat(headingStyle.outlineWidth),
-      firstDayBorderTopWidth: Number.parseFloat(
-        getComputedStyle(firstDay).borderTopWidth,
-      ),
+      firstDayBorderTopWidth: Number.parseFloat(getComputedStyle(firstDay).borderTopWidth),
       dayDividerWidths,
-      recordDividerWidths,
+      recordDividerWidths
     };
   });
 
-  expect(targetPresentation.headingTop).toBeGreaterThan(
-    targetPresentation.headerBottom,
-  );
+  expect(targetPresentation.headingTop).toBeGreaterThan(targetPresentation.headerBottom);
   expect(targetPresentation.sectionOutlineStyle).toBe('none');
   expect(targetPresentation.headingOutlineStyle).not.toBe('none');
   expect(targetPresentation.headingOutlineWidth).toBeGreaterThanOrEqual(2);
-  expect(targetPresentation.headingWidth).toBeLessThan(
-    targetPresentation.sectionWidth,
-  );
+  expect(targetPresentation.headingWidth).toBeLessThan(targetPresentation.sectionWidth);
   expect(targetPresentation.firstDayBorderTopWidth).toBe(0);
   expect(new Set(targetPresentation.dayDividerWidths)).toEqual(new Set([1]));
   expect(new Set(targetPresentation.recordDividerWidths)).toEqual(new Set([0]));
 });
 
-test('restores day focus after a client transition, Back, and Forward', async ({
-  page,
-}) => {
+test('restores day focus after a client transition, Back, and Forward', async ({ page }) => {
   await trackCalendarFocus(page);
   await page.goto(yearPath, { waitUntil: 'networkidle' });
   const initialHistoryLength = await page.evaluate(() => history.length);
@@ -299,9 +270,7 @@ test('restores day focus after a client transition, Back, and Forward', async ({
   await page.keyboard.press('Enter');
   await page.waitForURL(dayPath);
   await expectFocusedDay(page);
-  expect(await page.evaluate(() => history.length)).toBe(
-    initialHistoryLength + 1,
-  );
+  expect(await page.evaluate(() => history.length)).toBe(initialHistoryLength + 1);
 
   const scrollPosition = await page.evaluate((targetId) => {
     const brand = document.querySelector<HTMLElement>('.site-header-brand');
@@ -318,7 +287,7 @@ test('restores day focus after a client transition, Back, and Forward', async ({
     return {
       before,
       after: window.scrollY,
-      targetFocused: document.activeElement?.id === targetId,
+      targetFocused: document.activeElement?.id === targetId
     };
   }, dayId);
 
@@ -339,22 +308,16 @@ test('restores day focus after a client transition, Back, and Forward', async ({
   await expectFocusedDay(page);
 });
 
-test('scopes year calendar work to its custom element lifecycle', async ({
-  page,
-}) => {
+test('scopes year calendar work to its custom element lifecycle', async ({ page }) => {
   await page.goto('/status/', { waitUntil: 'networkidle' });
   const calendarEntry = page.locator('[data-status-calendar-entry]');
   const lifecycleYearPath = await calendarEntry.getAttribute('href');
-  const lifecycleYear = lifecycleYearPath?.match(
-    /^\/status\/calendar\/(\d{4})\/$/,
-  )?.[1];
+  const lifecycleYear = lifecycleYearPath?.match(/^\/status\/calendar\/(\d{4})\/$/)?.[1];
   if (!lifecycleYearPath || !lifecycleYear) {
     throw new Error('Expected a current year status calendar entry URL');
   }
 
-  await page.clock.setFixedTime(
-    new Date(`${lifecycleYear}-08-24T12:00:00.000Z`),
-  );
+  await page.clock.setFixedTime(new Date(`${lifecycleYear}-08-24T12:00:00.000Z`));
   await calendarEntry.click();
   await page.waitForURL(lifecycleYearPath);
 
@@ -367,8 +330,8 @@ test('scopes year calendar work to its custom element lifecycle', async ({
     navigationQueries: 0,
     interactions: {
       keptOpenAfterEscape: true,
-      openedByPointerOrFocus: false,
-    },
+      openedByPointerOrFocus: false
+    }
   });
 
   await page.goBack();
@@ -379,9 +342,7 @@ test('scopes year calendar work to its custom element lifecycle', async ({
   await expectCalendarLifecycle(page);
 });
 
-test('does not intercept focus for absent, malformed, or missing day hashes', async ({
-  page,
-}) => {
+test('does not intercept focus for absent, malformed, or missing day hashes', async ({ page }) => {
   await trackCalendarFocus(page);
 
   for (const hash of ['', '#not-a-day', '#2099-12-31']) {
@@ -394,7 +355,7 @@ test('does not intercept focus for absent, malformed, or missing day hashes', as
         link.textContent = 'Test link';
         document.body.append(link);
       },
-      { href: `${monthPath}${hash}`, marker: hash || 'absent' },
+      { href: `${monthPath}${hash}`, marker: hash || 'absent' }
     );
 
     await page.locator('[data-invalid-calendar-link]').click();
@@ -402,25 +363,21 @@ test('does not intercept focus for absent, malformed, or missing day hashes', as
 
     expect(
       await page.evaluate(
-        () =>
-          document.activeElement?.matches('[data-status-calendar-day] > h2') ??
-          false,
-      ),
+        () => document.activeElement?.matches('[data-status-calendar-day] > h2') ?? false
+      )
     ).toBe(false);
-    await expect(page.locator('html')).not.toHaveAttribute(
-      'data-status-calendar-focus-options',
-    );
+    await expect(page.locator('html')).not.toHaveAttribute('data-status-calendar-focus-options');
   }
 });
 
 test('keeps native anchor navigation and target presentation without JavaScript', async ({
   baseURL,
-  browser,
+  browser
 }) => {
   const context = await browser.newContext({
     baseURL,
     javaScriptEnabled: false,
-    viewport: { width: 1280, height: 800 },
+    viewport: { width: 1280, height: 800 }
   });
   const page = await context.newPage();
 
@@ -436,9 +393,7 @@ test('keeps native anchor navigation and target presentation without JavaScript'
 
     const position = await heading.evaluate((element) => ({
       top: element.getBoundingClientRect().top,
-      headerBottom:
-        document.querySelector('.site-header')?.getBoundingClientRect()
-          .bottom ?? 0,
+      headerBottom: document.querySelector('.site-header')?.getBoundingClientRect().bottom ?? 0
     }));
     const targetPresentation = await day.evaluate((element) => {
       const style = getComputedStyle(element);
@@ -446,17 +401,13 @@ test('keeps native anchor navigation and target presentation without JavaScript'
 
       return {
         background: style.backgroundColor,
-        nextDayBackground: nextDay
-          ? getComputedStyle(nextDay).backgroundColor
-          : undefined,
-        outlineStyle: style.outlineStyle,
+        nextDayBackground: nextDay ? getComputedStyle(nextDay).backgroundColor : undefined,
+        outlineStyle: style.outlineStyle
       };
     });
 
     expect(position.top).toBeGreaterThan(position.headerBottom);
-    expect(targetPresentation.background).not.toBe(
-      targetPresentation.nextDayBackground,
-    );
+    expect(targetPresentation.background).not.toBe(targetPresentation.nextDayBackground);
     expect(targetPresentation.outlineStyle).toBe('none');
   } finally {
     await context.close();

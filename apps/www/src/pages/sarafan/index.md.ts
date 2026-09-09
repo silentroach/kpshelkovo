@@ -1,8 +1,8 @@
 import type { APIRoute } from 'astro';
 
-import { createMarkdownResponse } from '@/lib/markdown/response';
 import { loadContactsData } from '@/lib/contacts/load';
 import { buildContactsHomeMarkdown } from '@/lib/contacts/markdown';
+import { createMarkdownResponse } from '@/lib/markdown/response';
 
 export const prerender = true;
 

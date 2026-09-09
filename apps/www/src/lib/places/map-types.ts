@@ -1,9 +1,5 @@
 import type { PlaceMarker, PlaceStatus } from './schema';
-import type {
-  PlaceCoordinates,
-  PlaceGeometry,
-  PlaceOpeningHours,
-} from './types';
+import type { PlaceCoordinates, PlaceGeometry, PlaceOpeningHours } from './types';
 
 export interface PlaceMapItem {
   readonly slug: string;

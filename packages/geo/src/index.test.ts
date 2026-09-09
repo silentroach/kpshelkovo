@@ -1,20 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  calculateDistance,
-  getCivilTwilight,
-  isCivilDaylight,
-  isSunlight,
-} from './index';
+import { calculateDistance, getCivilTwilight, isCivilDaylight, isSunlight } from './index';
 
 const shelkovo = {
   lat: 55.065422,
-  lng: 37.733096,
+  lng: 37.733096
 } as const;
 
 const longyearbyen = {
   lat: 78.2232,
-  lng: 15.6469,
+  lng: 15.6469
 } as const;
 
 describe('geo package', () => {
@@ -34,14 +29,11 @@ describe('geo package', () => {
   });
 
   it('calculates civil dawn and dusk for Shelkovo', () => {
-    const twilight = getCivilTwilight(
-      new Date('2026-05-11T12:00:00Z'),
-      shelkovo,
-    );
+    const twilight = getCivilTwilight(new Date('2026-05-11T12:00:00Z'), shelkovo);
 
     expect({
       dawn: twilight.dawn.toISOString(),
-      dusk: twilight.dusk.toISOString(),
+      dusk: twilight.dusk.toISOString()
     }).toMatchInlineSnapshot(`
       {
         "dawn": "2026-05-11T00:42:34.126Z",
@@ -51,18 +43,10 @@ describe('geo package', () => {
   });
 
   it('treats the civil twilight interval as daylight', () => {
-    expect(isCivilDaylight(new Date('2026-05-11T00:42:00Z'), shelkovo)).toBe(
-      false,
-    );
-    expect(isCivilDaylight(new Date('2026-05-11T00:45:00Z'), shelkovo)).toBe(
-      true,
-    );
-    expect(isCivilDaylight(new Date('2026-05-11T18:09:00Z'), shelkovo)).toBe(
-      true,
-    );
-    expect(isCivilDaylight(new Date('2026-05-11T18:10:00Z'), shelkovo)).toBe(
-      false,
-    );
+    expect(isCivilDaylight(new Date('2026-05-11T00:42:00Z'), shelkovo)).toBe(false);
+    expect(isCivilDaylight(new Date('2026-05-11T00:45:00Z'), shelkovo)).toBe(true);
+    expect(isCivilDaylight(new Date('2026-05-11T18:09:00Z'), shelkovo)).toBe(true);
+    expect(isCivilDaylight(new Date('2026-05-11T18:10:00Z'), shelkovo)).toBe(false);
   });
 
   it('treats the sunrise-to-sunset interval as sunlight', () => {
@@ -70,7 +54,7 @@ describe('geo package', () => {
       beforeSunrise: isSunlight(new Date('2026-05-11T01:28:00Z'), shelkovo),
       afterSunrise: isSunlight(new Date('2026-05-11T01:29:00Z'), shelkovo),
       beforeSunset: isSunlight(new Date('2026-05-11T17:23:00Z'), shelkovo),
-      afterSunset: isSunlight(new Date('2026-05-11T17:24:00Z'), shelkovo),
+      afterSunset: isSunlight(new Date('2026-05-11T17:24:00Z'), shelkovo)
     }).toMatchInlineSnapshot(`
       {
         "afterSunrise": true,
@@ -82,27 +66,16 @@ describe('geo package', () => {
   });
 
   it('follows seasonal civil twilight instead of fixed clock hours', () => {
-    expect(isCivilDaylight(new Date('2026-01-11T05:05:00Z'), shelkovo)).toBe(
-      false,
-    );
-    expect(isCivilDaylight(new Date('2026-01-11T05:07:00Z'), shelkovo)).toBe(
-      true,
-    );
-    expect(isCivilDaylight(new Date('2026-01-11T14:09:00Z'), shelkovo)).toBe(
-      true,
-    );
-    expect(isCivilDaylight(new Date('2026-01-11T14:10:00Z'), shelkovo)).toBe(
-      false,
-    );
+    expect(isCivilDaylight(new Date('2026-01-11T05:05:00Z'), shelkovo)).toBe(false);
+    expect(isCivilDaylight(new Date('2026-01-11T05:07:00Z'), shelkovo)).toBe(true);
+    expect(isCivilDaylight(new Date('2026-01-11T14:09:00Z'), shelkovo)).toBe(true);
+    expect(isCivilDaylight(new Date('2026-01-11T14:10:00Z'), shelkovo)).toBe(false);
   });
 
   it('handles dates without civil dawn or dusk', () => {
     expect({
       polarDay: isCivilDaylight(new Date('2026-06-21T12:00:00Z'), longyearbyen),
-      polarNight: isCivilDaylight(
-        new Date('2026-12-21T12:00:00Z'),
-        longyearbyen,
-      ),
+      polarNight: isCivilDaylight(new Date('2026-12-21T12:00:00Z'), longyearbyen)
     }).toMatchInlineSnapshot(`
       {
         "polarDay": true,

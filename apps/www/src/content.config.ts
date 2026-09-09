@@ -1,55 +1,42 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { defineCollection } from 'astro:content';
+
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { RawKbPageSchema } from '@/lib/kb/raw-schema';
+import { defineCollection } from 'astro:content';
+
 import { parseContentDate } from '@/lib/content-date';
+import { RawKbPageSchema } from '@/lib/kb/raw-schema';
+
+import { SettlementSchema } from './compare/lib/schema';
 import { RawContactSchema } from './lib/contacts/raw-schema';
 import { CONTACT_CATEGORIES, CONTACT_SLUG } from './lib/contacts/schema';
-import {
-  RawNewsAuthorSchema,
-  createRawNewsArticleSchema,
-} from './lib/news/raw-schema';
-import {
-  RawMeetingSchema,
-  RawMeetingTranscriptSchema,
-} from './lib/meetings/raw-schema';
+import { RawMeetingSchema, RawMeetingTranscriptSchema } from './lib/meetings/raw-schema';
+import { RawNewsAuthorSchema, createRawNewsArticleSchema } from './lib/news/raw-schema';
 import { RawPersonProfileSchema } from './lib/people/raw-schema';
 import { RawPlaceSchema } from './lib/places/raw-schema';
 import { PLACE_SLUG } from './lib/places/schema';
 import { RawReviewSchema } from './lib/reviews/raw-schema';
-import {
-  REVIEW_DATE,
-  REVIEW_SLUG,
-  reviewIdFromParts,
-} from './lib/reviews/schema';
+import { REVIEW_DATE, REVIEW_SLUG, reviewIdFromParts } from './lib/reviews/schema';
 import { RawStatusIncidentSchema } from './lib/status/raw-schema';
-import { SettlementSchema } from './compare/lib/schema';
 
 const YEAR = /^\d{4}$/;
 const MONTH = /^(0[1-9]|1[0-2])$/;
 const DAY_KEY = /^(?:0?[1-9]|[12]\d|3[01])$/;
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const MEETING_TRANSCRIPT_FILE =
-  /^transcript(?:-(?<part>[2-9]|[1-9]\d+))?\.yaml$/;
+const MEETING_TRANSCRIPT_FILE = /^transcript(?:-(?<part>[2-9]|[1-9]\d+))?\.yaml$/;
 const MARKDOWN_FRONTMATTER = /^---\r?\n[\s\S]*?\r?\n---(?:\r?\n)*/u;
-const STATUS_INCIDENTS_DIR = fileURLToPath(
-  new URL('./data/status/incidents/', import.meta.url),
-);
+const STATUS_INCIDENTS_DIR = fileURLToPath(new URL('./data/status/incidents/', import.meta.url));
 const REVIEWS_DIR = fileURLToPath(new URL('./data/reviews/', import.meta.url));
-const NEWS_SUMMARIES_DIR = fileURLToPath(
-  new URL('./data/news/summaries/', import.meta.url),
-);
+const NEWS_SUMMARIES_DIR = fileURLToPath(new URL('./data/news/summaries/', import.meta.url));
 
 const trimMarkdown = (entry: string): string => entry.replace(/\.md$/i, '');
 
 const rawMarkdownBody = (root: string, entry: string): string =>
   readFileSync(join(root, entry), 'utf8').replace(MARKDOWN_FRONTMATTER, '');
 
-const articleId = (entry: string): string =>
-  trimMarkdown(entry).replace(/\/index$/i, '');
+const articleId = (entry: string): string => trimMarkdown(entry).replace(/\/index$/i, '');
 
 const hasDate = (data: unknown): data is { readonly date: unknown } =>
   typeof data === 'object' && data !== null && 'date' in data;
@@ -91,7 +78,7 @@ function failContact(entry: string, reason: string): never {
 }
 
 const hasReviewIdentity = (
-  data: unknown,
+  data: unknown
 ): data is { readonly published_at: unknown; readonly slug: unknown } => {
   if (typeof data !== 'object' || !data) {
     return false;
@@ -108,7 +95,7 @@ const hasReviewIdentity = (
 const CONTACT_CATEGORY_VALUES = new Set<string>(CONTACT_CATEGORIES);
 
 const readContactIdentity = (
-  data: unknown,
+  data: unknown
 ): { readonly category?: string; readonly slug?: string } => {
   if (typeof data !== 'object' || !data || Array.isArray(data)) {
     return {};
@@ -121,7 +108,7 @@ const readContactIdentity = (
 
   return {
     category: input.category === undefined ? undefined : String(input.category),
-    slug: input.slug === undefined ? undefined : String(input.slug),
+    slug: input.slug === undefined ? undefined : String(input.slug)
   };
 };
 
@@ -141,10 +128,7 @@ function contactSourceId(entry: string, data: unknown): string {
   }
 
   if (!CONTACT_SLUG.test(slug)) {
-    failContact(
-      entry,
-      'slug must use lower-case Latin letters, digits, and hyphen',
-    );
+    failContact(entry, 'slug must use lower-case Latin letters, digits, and hyphen');
   }
 
   if (!CONTACT_CATEGORY_VALUES.has(category)) {
@@ -174,10 +158,7 @@ function reviewSourceId(entry: string, data: unknown): string {
   }
 
   if (!REVIEW_SLUG.test(slug)) {
-    failReview(
-      entry,
-      'slug must use lower-case Latin letters, digits, and hyphen',
-    );
+    failReview(entry, 'slug must use lower-case Latin letters, digits, and hyphen');
   }
 
   const body = rawMarkdownBody(REVIEWS_DIR, entry);
@@ -196,14 +177,13 @@ function validateKbPageSource(entry: string, sourceId: string): void {
     failKbPage(entry, 'must not contain empty path segments');
   }
 
-  const routeSegments =
-    parts[parts.length - 1] === 'index' ? parts.slice(0, -1) : parts;
+  const routeSegments = parts[parts.length - 1] === 'index' ? parts.slice(0, -1) : parts;
 
   for (const segment of routeSegments) {
     if (!SLUG.test(segment)) {
       failKbPage(
         entry,
-        `segment \"${segment}\" must use lower-case Latin letters, digits, and hyphen`,
+        `segment \"${segment}\" must use lower-case Latin letters, digits, and hyphen`
       );
     }
   }
@@ -217,10 +197,7 @@ function kbPageSourceId(entry: string): string {
   return sourceId;
 }
 
-function meetingYamlId(
-  entry: string,
-  fileName: 'index.yaml' | 'transcript.yaml',
-): string {
+function meetingYamlId(entry: string, fileName: 'index.yaml' | 'transcript.yaml'): string {
   const parts = entry.split('/');
 
   if (parts.length !== 2 || parts[1] !== fileName) {
@@ -230,10 +207,7 @@ function meetingYamlId(
   const [slug] = parts;
 
   if (!SLUG.test(slug)) {
-    failMeeting(
-      entry,
-      'slug must use lower-case Latin letters, digits, and hyphen',
-    );
+    failMeeting(entry, 'slug must use lower-case Latin letters, digits, and hyphen');
   }
 
   return slug;
@@ -243,27 +217,18 @@ function meetingTranscriptYamlId(entry: string): string {
   const parts = entry.split('/');
 
   if (parts.length !== 2) {
-    failMeeting(
-      entry,
-      'must be exactly [slug]/transcript.yaml or [slug]/transcript-N.yaml',
-    );
+    failMeeting(entry, 'must be exactly [slug]/transcript.yaml or [slug]/transcript-N.yaml');
   }
 
   const [slug, fileName] = parts;
   const match = fileName?.match(MEETING_TRANSCRIPT_FILE);
 
   if (!slug || !SLUG.test(slug)) {
-    failMeeting(
-      entry,
-      'slug must use lower-case Latin letters, digits, and hyphen',
-    );
+    failMeeting(entry, 'slug must use lower-case Latin letters, digits, and hyphen');
   }
 
   if (!match) {
-    failMeeting(
-      entry,
-      'must use transcript.yaml or transcript-N.yaml with N starting from 2',
-    );
+    failMeeting(entry, 'must use transcript.yaml or transcript-N.yaml with N starting from 2');
   }
 
   return `${slug}/${match.groups?.part ?? '1'}`;
@@ -280,11 +245,7 @@ function validateArticleEntry(entry: string, data: unknown): void {
   const [year, month, key] = parts;
 
   if (!YEAR.test(year) || !MONTH.test(month) || key.length === 0) {
-    fail(
-      'article',
-      entry,
-      'must use YYYY/MM/[entry] with numeric year and month',
-    );
+    fail('article', entry, 'must use YYYY/MM/[entry] with numeric year and month');
   }
 
   const date = hasDate(data) ? parseContentDate(data.date) : undefined;
@@ -302,11 +263,7 @@ function validateArticleEntry(entry: string, data: unknown): void {
   }
 
   if (date && Number(key) !== Number(date.day)) {
-    fail(
-      'article',
-      entry,
-      'numeric day keys must match the frontmatter date day',
-    );
+    fail('article', entry, 'numeric day keys must match the frontmatter date day');
   }
 }
 
@@ -317,11 +274,7 @@ function newsArchiveSummaryId(entry: string): string {
 
   const [year, period, ...rest] = trimMarkdown(entry).split('/');
 
-  if (
-    rest.length > 0 ||
-    !YEAR.test(year) ||
-    (period !== 'index' && !MONTH.test(period))
-  ) {
+  if (rest.length > 0 || !YEAR.test(year) || (period !== 'index' && !MONTH.test(period))) {
     failNewsSummary(entry, 'must use YYYY/index.md or YYYY/MM.md');
   }
 
@@ -332,9 +285,7 @@ function newsArchiveSummaryId(entry: string): string {
   return period === 'index' ? year : `${year}/${period}`;
 }
 
-const hasStartedAt = (
-  data: unknown,
-): data is { readonly started_at: unknown } =>
+const hasStartedAt = (data: unknown): data is { readonly started_at: unknown } =>
   typeof data === 'object' && data !== null && 'started_at' in data;
 
 function validateStatusEntry(entry: string, data: unknown): void {
@@ -352,15 +303,10 @@ function validateStatusEntry(entry: string, data: unknown): void {
   }
 
   if (!SLUG.test(slug)) {
-    failStatus(
-      entry,
-      'slug must use lower-case Latin letters, digits, and hyphen',
-    );
+    failStatus(entry, 'slug must use lower-case Latin letters, digits, and hyphen');
   }
 
-  const started = hasStartedAt(data)
-    ? parseContentDate(data.started_at)
-    : undefined;
+  const started = hasStartedAt(data) ? parseContentDate(data.started_at) : undefined;
 
   if (started && (started.year !== year || started.month !== month)) {
     failStatus(entry, 'must match the frontmatter started_at year and month');
@@ -381,10 +327,7 @@ function validatePersonEntry(entry: string): void {
   const slug = trimMarkdown(entry);
 
   if (!SLUG.test(slug)) {
-    failPerson(
-      entry,
-      'slug must use lower-case Latin letters, digits, and hyphen',
-    );
+    failPerson(entry, 'slug must use lower-case Latin letters, digits, and hyphen');
   }
 }
 
@@ -396,10 +339,7 @@ function placeSourceId(entry: string): string {
   const slug = trimMarkdown(entry);
 
   if (!PLACE_SLUG.test(slug)) {
-    failPlace(
-      entry,
-      'slug must use lower-case Latin letters, digits, and hyphen',
-    );
+    failPlace(entry, 'slug must use lower-case Latin letters, digits, and hyphen');
   }
 
   return slug;
@@ -408,9 +348,9 @@ function placeSourceId(entry: string): string {
 const newsAuthors = defineCollection({
   loader: glob({
     pattern: '**/*.yaml',
-    base: './src/data/news/authors',
+    base: './src/data/news/authors'
   }),
-  schema: RawNewsAuthorSchema,
+  schema: RawNewsAuthorSchema
 });
 
 const newsArticles = defineCollection({
@@ -420,18 +360,18 @@ const newsArticles = defineCollection({
     generateId: ({ entry, data }) => {
       validateArticleEntry(entry, data);
       return articleId(entry);
-    },
+    }
   }),
-  schema: ({ image }) => createRawNewsArticleSchema(image),
+  schema: ({ image }) => createRawNewsArticleSchema(image)
 });
 
 const newsArchiveSummaries = defineCollection({
   loader: glob({
     pattern: ['**/*.md', '!AGENTS.md', '!**/AGENTS.md'],
     base: './src/data/news/summaries',
-    generateId: ({ entry }) => newsArchiveSummaryId(entry),
+    generateId: ({ entry }) => newsArchiveSummaryId(entry)
   }),
-  schema: z.object({}).strict(),
+  schema: z.object({}).strict()
 });
 
 const statusIncidents = defineCollection({
@@ -441,9 +381,9 @@ const statusIncidents = defineCollection({
     generateId: ({ entry, data }) => {
       validateStatusEntry(entry, data);
       return trimMarkdown(entry);
-    },
+    }
   }),
-  schema: RawStatusIncidentSchema,
+  schema: RawStatusIncidentSchema
 });
 
 const peopleProfiles = defineCollection({
@@ -453,71 +393,71 @@ const peopleProfiles = defineCollection({
     generateId: ({ entry }) => {
       validatePersonEntry(entry);
       return trimMarkdown(entry);
-    },
+    }
   }),
-  schema: RawPersonProfileSchema,
+  schema: RawPersonProfileSchema
 });
 
 const places = defineCollection({
   loader: glob({
     pattern: ['*.md', '!AGENTS.md'],
     base: './src/data/places',
-    generateId: ({ entry }) => placeSourceId(entry),
+    generateId: ({ entry }) => placeSourceId(entry)
   }),
-  schema: RawPlaceSchema,
+  schema: RawPlaceSchema
 });
 
 const kbPages = defineCollection({
   loader: glob({
     pattern: ['**/*.md', '!AGENTS.md', '!**/AGENTS.md'],
     base: './src/data/kb',
-    generateId: ({ entry }) => kbPageSourceId(entry),
+    generateId: ({ entry }) => kbPageSourceId(entry)
   }),
-  schema: RawKbPageSchema,
+  schema: RawKbPageSchema
 });
 
 const meetingEntries = defineCollection({
   loader: glob({
     pattern: '*/index.yaml',
     base: './src/data/meetings',
-    generateId: ({ entry }) => meetingYamlId(entry, 'index.yaml'),
+    generateId: ({ entry }) => meetingYamlId(entry, 'index.yaml')
   }),
-  schema: RawMeetingSchema,
+  schema: RawMeetingSchema
 });
 
 const meetingTranscripts = defineCollection({
   loader: glob({
     pattern: '*/transcript*.yaml',
     base: './src/data/meetings',
-    generateId: ({ entry }) => meetingTranscriptYamlId(entry),
+    generateId: ({ entry }) => meetingTranscriptYamlId(entry)
   }),
-  schema: RawMeetingTranscriptSchema,
+  schema: RawMeetingTranscriptSchema
 });
 
 const reviews = defineCollection({
   loader: glob({
     pattern: ['**/*.md', '!AGENTS.md', '!**/AGENTS.md'],
     base: './src/data/reviews',
-    generateId: ({ entry, data }) => reviewSourceId(entry, data),
+    generateId: ({ entry, data }) => reviewSourceId(entry, data)
   }),
-  schema: RawReviewSchema,
+  schema: RawReviewSchema
 });
 
 const contacts = defineCollection({
   loader: glob({
     pattern: ['**/*.md', '!AGENTS.md', '!**/AGENTS.md'],
     base: './src/data/contacts',
-    generateId: ({ entry, data }) => contactSourceId(entry, data),
+    generateId: ({ entry, data }) => contactSourceId(entry, data)
   }),
-  schema: RawContactSchema,
+  schema: RawContactSchema
 });
 
 const settlements = defineCollection({
   loader: glob({
     pattern: '[!_]*.yaml',
-    base: './src/data/compare/settlements',
+    base: './src/data/compare/settlements'
   }),
-  schema: SettlementSchema,
+  schema: SettlementSchema
 });
 
 export const collections = {
@@ -532,5 +472,5 @@ export const collections = {
   meetingEntries,
   meetingTranscripts,
   reviews,
-  contacts,
+  contacts
 };

@@ -1,10 +1,5 @@
 export { ForestIcon, ParkIcon, RiverIcon, VillageIcon } from './areas/index.ts';
-export {
-  DamIcon,
-  FiberIcon,
-  LightningIcon,
-  WaterDropIcon,
-} from './services/index.ts';
+export { DamIcon, FiberIcon, LightningIcon, WaterDropIcon } from './services/index.ts';
 export {
   AlertCircleIcon,
   CalendarIcon,
@@ -20,5 +15,5 @@ export {
   SearchIcon,
   StarIcon,
   TelegramIcon,
-  WhatsAppIcon,
+  WhatsAppIcon
 } from './system/index.ts';

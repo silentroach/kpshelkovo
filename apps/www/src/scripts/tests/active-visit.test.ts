@@ -5,15 +5,13 @@ import { installActiveVisitTracker } from '../active-visit';
 const STORAGE_KEY = 'activity';
 const START = new Date('2026-09-07T12:00:00Z');
 const storage = new Map<string, string>();
-const requestLock = vi.fn(
-  async (_name: string, callback: () => void): Promise<void> => callback(),
-);
+const requestLock = vi.fn(async (_name: string, callback: () => void): Promise<void> => callback());
 let stops: Array<() => void> = [];
 
 const setVisibility = (visibilityState: DocumentVisibilityState): void => {
   Object.defineProperty(document, 'visibilityState', {
     configurable: true,
-    value: visibilityState,
+    value: visibilityState
   });
 };
 
@@ -34,7 +32,7 @@ beforeEach(() => {
   vi.stubGlobal('localStorage', {
     clear: () => storage.clear(),
     getItem: (key: string) => storage.get(key),
-    setItem: (key: string, value: string) => storage.set(key, value),
+    setItem: (key: string, value: string) => storage.set(key, value)
   });
   vi.stubGlobal('navigator', { locks: { request: requestLock } });
   vi.spyOn(document, 'hasFocus').mockReturnValue(true);

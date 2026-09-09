@@ -1,11 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import type {
-  EstimateDetailDataset,
-  EstimateDetailSourceRef,
-} from './detail-schema';
 import { buildPublicEstimateDetails2026Json } from './detail-json';
 import type { PublicEstimateDetailDataset } from './detail-public';
+import type { EstimateDetailDataset, EstimateDetailSourceRef } from './detail-schema';
 
 const structuredSource = {
   pdf: 'cleaning',
@@ -17,16 +14,16 @@ const structuredSource = {
       label: 'Мешки для мусора',
       resource_ids: ['resource-1'],
       quantity: { value: 10, unit: 'шт.' },
-      total_rub: { value: 500 },
-    },
-  ],
+      total_rub: { value: 500 }
+    }
+  ]
 } satisfies EstimateDetailSourceRef;
 
 const plainSource = {
   pdf: 'cleaning',
   page: 3,
   fragment: 'Итого',
-  quote: 'Итого 500 руб.',
+  quote: 'Итого 500 руб.'
 } satisfies EstimateDetailSourceRef;
 
 const fixture = {
@@ -43,8 +40,8 @@ const fixture = {
       estimate_row_id: 'row-1',
       source_refs: [structuredSource],
       status: 'verified',
-      status_label_ru: 'Проверено',
-    },
+      status_label_ru: 'Проверено'
+    }
   ],
   resources: [
     {
@@ -60,9 +57,9 @@ const fixture = {
       status_label_ru: 'Требует проверки',
       needs_check: {
         reason: 'Нужно сверить количество',
-        source_refs: [structuredSource],
-      },
-    },
+        source_refs: [structuredSource]
+      }
+    }
   ],
   control_totals: [
     {
@@ -73,17 +70,13 @@ const fixture = {
       source_total_rub: { value: 500 },
       source_refs: [plainSource],
       status: 'derived',
-      status_label_ru: 'Рассчитано',
-    },
-  ],
+      status_label_ru: 'Рассчитано'
+    }
+  ]
 } satisfies EstimateDetailDataset;
 
-const parseFixture = (
-  dataset: EstimateDetailDataset = fixture,
-): PublicEstimateDetailDataset =>
-  JSON.parse(
-    buildPublicEstimateDetails2026Json(dataset),
-  ) as PublicEstimateDetailDataset;
+const parseFixture = (dataset: EstimateDetailDataset = fixture): PublicEstimateDetailDataset =>
+  JSON.parse(buildPublicEstimateDetails2026Json(dataset)) as PublicEstimateDetailDataset;
 
 const hasOwn = (value: object, key: string): boolean =>
   Object.prototype.hasOwnProperty.call(value, key);
@@ -97,7 +90,7 @@ describe('estimate details public JSON', () => {
     expect({
       idsUseDocumentedFormat: sourceIds.every((id) => /^s[1-9]\d*$/.test(id)),
       sourceCount: sourceIds.length,
-      uniqueIdCount: uniqueIds.size,
+      uniqueIdCount: uniqueIds.size
     }).toMatchInlineSnapshot(`
       {
         "idsUseDocumentedFormat": true,
@@ -110,21 +103,15 @@ describe('estimate details public JSON', () => {
   it('resolves source references from facts and needs_check', () => {
     const payload = parseFixture();
     const sourceIds = new Set(Object.keys(payload.sources));
-    const facts = [
-      ...payload.work_items,
-      ...payload.resources,
-      ...payload.control_totals,
-    ];
+    const facts = [...payload.work_items, ...payload.resources, ...payload.control_totals];
     const factRefs = facts.flatMap((fact) => fact.source_refs);
-    const checkRefs = facts.flatMap(
-      (fact) => fact.needs_check?.source_refs ?? [],
-    );
+    const checkRefs = facts.flatMap((fact) => fact.needs_check?.source_refs ?? []);
 
     expect({
       factRefCount: factRefs.length,
       factRefsResolve: factRefs.every((id) => sourceIds.has(id)),
       needsCheckRefCount: checkRefs.length,
-      needsCheckRefsResolve: checkRefs.every((id) => sourceIds.has(id)),
+      needsCheckRefsResolve: checkRefs.every((id) => sourceIds.has(id))
     }).toMatchInlineSnapshot(`
       {
         "factRefCount": 4,
@@ -144,22 +131,19 @@ describe('estimate details public JSON', () => {
   it('omits redundant public fields without losing review statuses', () => {
     const payload = parseFixture();
     const structuredPublicSource = Object.values(payload.sources).find(
-      (source) => source.quote_items !== undefined,
+      (source) => source.quote_items !== undefined
     );
     const verifiedWorkItem = payload.work_items[0];
     const needsCheckResource = payload.resources[0];
 
     expect({
       structuredSourceHasRawQuote:
-        structuredPublicSource !== undefined &&
-        hasOwn(structuredPublicSource, 'quote'),
-      verifiedHasStatus:
-        verifiedWorkItem !== undefined && hasOwn(verifiedWorkItem, 'status'),
+        structuredPublicSource !== undefined && hasOwn(structuredPublicSource, 'quote'),
+      verifiedHasStatus: verifiedWorkItem !== undefined && hasOwn(verifiedWorkItem, 'status'),
       verifiedHasStatusLabel:
-        verifiedWorkItem !== undefined &&
-        hasOwn(verifiedWorkItem, 'status_label_ru'),
+        verifiedWorkItem !== undefined && hasOwn(verifiedWorkItem, 'status_label_ru'),
       reviewStatus: needsCheckResource?.status,
-      reviewStatusLabel: needsCheckResource?.status_label_ru,
+      reviewStatusLabel: needsCheckResource?.status_label_ru
     }).toMatchInlineSnapshot(`
       {
         "reviewStatus": "needs_check",

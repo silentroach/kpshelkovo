@@ -2,7 +2,7 @@ import type { Definition, Root, RootContent } from 'mdast';
 import { visit } from 'unist-util-visit';
 
 export const resolveMarkdownResourceReferences = (
-  children: readonly RootContent[],
+  children: readonly RootContent[]
 ): readonly RootContent[] => {
   const document: Root = { type: 'root', children: [...children] };
   const definitions = new Map<string, Definition>();
@@ -22,7 +22,7 @@ export const resolveMarkdownResourceReferences = (
       type: 'link',
       children: node.children,
       url: definition.url,
-      title: definition.title ?? undefined,
+      title: definition.title ?? undefined
     };
     return index;
   });
@@ -36,7 +36,7 @@ export const resolveMarkdownResourceReferences = (
       type: 'image',
       alt: node.alt ?? undefined,
       url: definition.url,
-      title: definition.title ?? undefined,
+      title: definition.title ?? undefined
     };
     return index;
   });

@@ -15,9 +15,7 @@ const RSYNC_NEW_FILE_CHANGE = '<f+++++++++';
 
 const validateIndexNowKey = (key: string): void => {
   if (!INDEXNOW_KEY_PATTERN.test(key)) {
-    throw new Error(
-      'INDEXNOW_KEY must contain 8-128 ASCII letters, numbers, or dashes',
-    );
+    throw new Error('INDEXNOW_KEY must contain 8-128 ASCII letters, numbers, or dashes');
   }
 
   if (INDEXNOW_RESERVED_KEYS.has(key)) {
@@ -35,12 +33,8 @@ const canonicalSiteUrl = (value: string): string => {
   return url.toString();
 };
 
-const readIndexNowUrls = async (
-  manifestPath: string,
-): Promise<ReadonlySet<string>> => {
-  const urls = INDEXNOW_URL_MANIFEST_SCHEMA.parse(
-    JSON.parse(await readFile(manifestPath, 'utf8')),
-  );
+const readIndexNowUrls = async (manifestPath: string): Promise<ReadonlySet<string>> => {
+  const urls = INDEXNOW_URL_MANIFEST_SCHEMA.parse(JSON.parse(await readFile(manifestPath, 'utf8')));
 
   return new Set(urls.map(canonicalSiteUrl));
 };
@@ -63,7 +57,7 @@ const htmlFileUrl = (file: string): string | undefined => {
 
 const newIndexableUrls = async (
   urlManifestPath: string,
-  changesPath: string,
+  changesPath: string
 ): Promise<readonly string[]> => {
   const indexNowUrls = await readIndexNowUrls(urlManifestPath);
   const changes = await readFile(changesPath, 'utf8');
@@ -79,11 +73,7 @@ const newIndexableUrls = async (
     const itemizedChange = line.slice(0, separator);
     const url = htmlFileUrl(line.slice(separator + 1));
 
-    if (
-      itemizedChange === RSYNC_NEW_FILE_CHANGE &&
-      url &&
-      indexNowUrls.has(url)
-    ) {
+    if (itemizedChange === RSYNC_NEW_FILE_CHANGE && url && indexNowUrls.has(url)) {
       urls.add(url);
     }
   }
@@ -94,14 +84,11 @@ const newIndexableUrls = async (
 const indexNowKeyLocation = (key: string): string =>
   new URL(`/${key}.txt`, INDEXNOW_SITE).toString();
 
-const verifyIndexNowKey = async (
-  key: string,
-  request: typeof fetch,
-): Promise<void> => {
+const verifyIndexNowKey = async (key: string, request: typeof fetch): Promise<void> => {
   const response = await request(indexNowKeyLocation(key), {
     cache: 'no-store',
     redirect: 'error',
-    signal: AbortSignal.timeout(INDEXNOW_TIMEOUT_MS),
+    signal: AbortSignal.timeout(INDEXNOW_TIMEOUT_MS)
   });
 
   if (!response.ok || (await response.text()) !== key) {
@@ -109,21 +96,18 @@ const verifyIndexNowKey = async (
   }
 };
 
-export const writeIndexNowKeyFile = async (
-  siteRoot: string,
-  key: string,
-): Promise<void> => {
+export const writeIndexNowKeyFile = async (siteRoot: string, key: string): Promise<void> => {
   validateIndexNowKey(key);
   await writeFile(join(siteRoot, `${key}.txt`), key, {
     encoding: 'utf8',
-    flag: 'wx',
+    flag: 'wx'
   });
 };
 
 export const submitIndexNowUrls = async (
   key: string,
   urls: readonly string[],
-  request: typeof fetch = fetch,
+  request: typeof fetch = fetch
 ): Promise<number> => {
   validateIndexNowKey(key);
 
@@ -135,22 +119,20 @@ export const submitIndexNowUrls = async (
     const response = await request(INDEXNOW_ENDPOINT, {
       method: 'POST',
       headers: {
-        'content-type': 'application/json; charset=utf-8',
+        'content-type': 'application/json; charset=utf-8'
       },
       body: JSON.stringify({
         host: INDEXNOW_SITE.hostname,
         key,
         keyLocation: indexNowKeyLocation(key),
-        urlList,
+        urlList
       }),
       redirect: 'error',
-      signal: AbortSignal.timeout(INDEXNOW_TIMEOUT_MS),
+      signal: AbortSignal.timeout(INDEXNOW_TIMEOUT_MS)
     });
 
     if (response.status !== 200 && response.status !== 202) {
-      throw new Error(
-        `IndexNow rejected URL submission with HTTP ${response.status}`,
-      );
+      throw new Error(`IndexNow rejected URL submission with HTTP ${response.status}`);
     }
 
     requestCount += 1;
@@ -163,10 +145,8 @@ export const submitNewIndexNowPages = async (
   urlManifestPath: string,
   changesPath: string,
   key: string,
-  request: typeof fetch = fetch,
-): Promise<
-  readonly [submittedUrls: readonly string[], requestCount: number]
-> => {
+  request: typeof fetch = fetch
+): Promise<readonly [submittedUrls: readonly string[], requestCount: number]> => {
   validateIndexNowKey(key);
   const urls = await newIndexableUrls(urlManifestPath, changesPath);
 

@@ -11,20 +11,20 @@ const personNameCases = () =>
       dat: nonBlankText.optional(),
       acc: nonBlankText.optional(),
       ins: nonBlankText.optional(),
-      prep: nonBlankText.optional(),
+      prep: nonBlankText.optional()
     })
     .strict();
 
 const personContact = () =>
   z.object({
     type: z.enum(PERSON_CONTACT_TYPES),
-    value: nonBlankText,
+    value: nonBlankText
   });
 
 const personSeo = () =>
   z
     .object({
-      description: nonBlankText.optional(),
+      description: nonBlankText.optional()
     })
     .strict();
 
@@ -34,7 +34,7 @@ export const RawPersonProfileSchema = z.object({
   name_cases: personNameCases().optional(),
   company: nonBlankText.optional(),
   position: nonBlankText.optional(),
-  contacts: z.array(personContact()),
+  contacts: z.array(personContact())
 });
 
 export type RawPersonProfile = z.output<typeof RawPersonProfileSchema>;

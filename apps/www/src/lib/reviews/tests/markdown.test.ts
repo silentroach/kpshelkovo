@@ -9,14 +9,11 @@ let buildReviewsRulesMarkdown: typeof import('../markdown').buildReviewsRulesMar
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
-  ({
-    buildReviewMarkdown,
-    buildReviewsHomeMarkdown,
-    buildReviewsRulesMarkdown,
-  } = await import('../markdown'));
+  ({ buildReviewMarkdown, buildReviewsHomeMarkdown, buildReviewsRulesMarkdown } =
+    await import('../markdown'));
 });
 
 const review = {
@@ -33,9 +30,9 @@ const review = {
   body: 'Основной текст отзыва.',
   aspects: [
     { type: 'management', body: 'Отвечают не всегда быстро.' },
-    { type: 'place', rating: 5, body: 'Лес, пруды и тишина.' },
+    { type: 'place', rating: 5, body: 'Лес, пруды и тишина.' }
   ],
-  mentions: [],
+  mentions: []
 } satisfies Review;
 
 describe('reviews markdown companions', () => {

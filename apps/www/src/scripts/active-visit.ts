@@ -3,18 +3,12 @@ const ACTIVITY_GRACE_MS = 10_000;
 const TICK_MS = 1_000;
 const VISIT_TIMEOUT_MS = 30 * 60_000;
 const STORAGE_KEY = 'activity';
-const ACTIVITY_EVENTS = [
-  'input',
-  'keydown',
-  'pointerdown',
-  'pointermove',
-  'wheel',
-] as const;
+const ACTIVITY_EVENTS = ['input', 'keydown', 'pointerdown', 'pointermove', 'wheel'] as const;
 
-const progress = (
-  lastActivityAt = 0,
-  activeMs = 0,
-): readonly [number, number] => [lastActivityAt, activeMs];
+const progress = (lastActivityAt = 0, activeMs = 0): readonly [number, number] => [
+  lastActivityAt,
+  activeMs
+];
 
 export const installActiveVisitTracker = (onGoal: () => void): (() => void) => {
   let memory = progress();
@@ -43,10 +37,7 @@ export const installActiveVisitTracker = (onGoal: () => void): (() => void) => {
       }
     }
 
-    if (
-      memory[0] > now ||
-      (memory[0] > 0 && now - memory[0] >= VISIT_TIMEOUT_MS)
-    ) {
+    if (memory[0] > now || (memory[0] > 0 && now - memory[0] >= VISIT_TIMEOUT_MS)) {
       memory = progress();
     }
 
@@ -67,8 +58,7 @@ export const installActiveVisitTracker = (onGoal: () => void): (() => void) => {
     }
   };
 
-  const isForeground = (): boolean =>
-    document.visibilityState === 'visible' && document.hasFocus();
+  const isForeground = (): boolean => document.visibilityState === 'visible' && document.hasFocus();
 
   const tick = (now = Date.now(), activityAt = 0): void => {
     const intervalStartedAt = lastTickAt;
@@ -90,7 +80,7 @@ export const installActiveVisitTracker = (onGoal: () => void): (() => void) => {
           ? Math.max(
               0,
               Math.min(now, lastActivityAt + ACTIVITY_GRACE_MS) -
-                Math.max(intervalStartedAt, lastActivityAt),
+                Math.max(intervalStartedAt, lastActivityAt)
             )
           : 0;
       const nextActiveMs = Math.min(ACTIVE_GOAL_MS, activeMs + creditedMs);
@@ -136,7 +126,7 @@ export const installActiveVisitTracker = (onGoal: () => void): (() => void) => {
   const listenerOptions = {
     capture: true,
     passive: true,
-    signal: abortController.signal,
+    signal: abortController.signal
   };
   for (const event of ACTIVITY_EVENTS) {
     document.addEventListener(event, recordActivity, listenerOptions);

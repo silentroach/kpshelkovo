@@ -21,4 +21,9 @@ export interface SearchDialogResultRow {
 export type SearchDialogRequestMode = 'initial' | 'more';
 
 export type SearchDialogState =
-  'initial' | 'loading' | 'results' | 'empty' | 'error' | 'dev-unavailable';
+  | 'initial'
+  | 'loading'
+  | 'results'
+  | 'empty'
+  | 'error'
+  | 'dev-unavailable';

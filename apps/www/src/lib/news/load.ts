@@ -9,14 +9,10 @@ import { validateArchiveSummaryMarkdown } from './archive-summary';
 import { buildArchives, newsMonthKey } from './archives';
 import { NEWS_LATEST_LIMIT } from './config';
 import { mapRawNewsAuthor } from './mapper';
-import {
-  articleCanonical,
-  articleEventIcsUrl,
-  articleMarkdownUrl,
-  articleUrl,
-} from './routes';
-import { compareArticlesPublishedDesc } from './sort';
+import { articleCanonical, articleEventIcsUrl, articleMarkdownUrl, articleUrl } from './routes';
 import { NEWS_AREAS, normalizeTagKey, type NewsArea } from './schema';
+import { compareArticlesPublishedDesc } from './sort';
+import { buildArticleTags, buildTagIndex } from './tags';
 import type {
   NewsArticle,
   NewsArchiveSummary,
@@ -32,22 +28,12 @@ import type {
   NewsMonthArchive,
   NewsPhoto,
   NewsTagPage,
-  NewsYearArchive,
+  NewsYearArchive
 } from './types';
-import { buildArticleTags, buildTagIndex } from './tags';
 
-export type NewsArticleEntry = Pick<
-  CollectionEntry<'newsArticles'>,
-  'id' | 'data' | 'body'
->;
-export type NewsAuthorEntry = Pick<
-  CollectionEntry<'newsAuthors'>,
-  'id' | 'data'
->;
-export type NewsArchiveSummaryEntry = Pick<
-  CollectionEntry<'newsArchiveSummaries'>,
-  'id' | 'body'
->;
+export type NewsArticleEntry = Pick<CollectionEntry<'newsArticles'>, 'id' | 'data' | 'body'>;
+export type NewsAuthorEntry = Pick<CollectionEntry<'newsAuthors'>, 'id' | 'data'>;
+export type NewsArchiveSummaryEntry = Pick<CollectionEntry<'newsArchiveSummaries'>, 'id' | 'body'>;
 type ArticleEntry = NewsArticleEntry;
 type AuthorEntry = NewsAuthorEntry;
 type ArchiveSummaryEntry = NewsArchiveSummaryEntry;
@@ -61,15 +47,13 @@ let cache: Promise<NewsDataset> | undefined;
 
 const isPinnedAtBuild = (
   input: Pick<ArticleData, 'pinned' | 'pinned_until'>,
-  now: Date,
+  now: Date
 ): boolean => {
   if (!input.pinned) {
     return false;
   }
 
-  return input.pinned_until
-    ? now.valueOf() < input.pinned_until.at.valueOf()
-    : true;
+  return input.pinned_until ? now.valueOf() < input.pinned_until.at.valueOf() : true;
 };
 
 const authorId = (ref: AuthorReference): string => ref.id;
@@ -78,15 +62,13 @@ function authorData(entry: AuthorEntry): NewsAuthor {
   return mapRawNewsAuthor(entry.id, entry.data);
 }
 
-const authorMap = (
-  entries: readonly AuthorEntry[],
-): ReadonlyMap<string, NewsAuthor> =>
+const authorMap = (entries: readonly AuthorEntry[]): ReadonlyMap<string, NewsAuthor> =>
   new Map(entries.map((entry) => [entry.id, authorData(entry)]));
 
 function needAuthor(
   authors: ReadonlyMap<string, NewsAuthor>,
   id: string,
-  context: string,
+  context: string
 ): NewsAuthor {
   const author = authors.get(id);
 
@@ -103,33 +85,32 @@ const assetUrl = (asset: CoverInput | undefined): string | undefined =>
 const cover = (
   asset: CoverInput | undefined,
   alt: string | undefined,
-  context: string,
+  context: string
 ): NewsCover | undefined => {
   const url = assetUrl(asset);
 
   if (!asset || !url) return undefined;
-  if (!alt)
-    throw new Error(`${context} cover_alt is required when cover is set`);
+  if (!alt) throw new Error(`${context} cover_alt is required when cover is set`);
 
   return {
     url,
     width: asset.width,
     height: asset.height,
-    alt,
+    alt
   };
 };
 
 const mapPhotos = (
   items: readonly PhotoInput[] | undefined,
   entryId: string,
-  mentionRegistry: SiteMentionRegistry,
+  mentionRegistry: SiteMentionRegistry
 ) =>
   items?.map((item, index) => {
     const caption = item.caption
       ? preprocessSiteMarkdownContent(
           item.caption,
           `news article "${entryId}" photos[${index}].caption`,
-          mentionRegistry,
+          mentionRegistry
         )
       : undefined;
 
@@ -139,25 +120,21 @@ const mapPhotos = (
         width: item.width,
         height: item.height,
         alt: item.alt,
-        caption: caption?.markdown,
+        caption: caption?.markdown
       } satisfies NewsPhoto,
-      mentions: caption?.mentions ?? [],
+      mentions: caption?.mentions ?? []
     };
   }) ?? [];
 
-const attachments = (
-  items: readonly AttachmentInput[] | undefined,
-): readonly NewsAttachment[] =>
+const attachments = (items: readonly AttachmentInput[] | undefined): readonly NewsAttachment[] =>
   items?.map((item) => ({
     title: item.title,
     url: item.url,
     type: item.type,
-    size: item.size,
+    size: item.size
   })) ?? [];
 
-const normalizeEventOrganizer = (
-  input: EventData['organizer'],
-): NewsEvent['organizer'] => {
+const normalizeEventOrganizer = (input: EventData['organizer']): NewsEvent['organizer'] => {
   if (!input) {
     return undefined;
   }
@@ -168,12 +145,12 @@ const normalizeEventOrganizer = (
 
   return {
     name: input.name,
-    type: input.type ?? 'organization',
+    type: input.type ?? 'organization'
   };
 };
 
 const normalizeEventPerformerItem = (
-  input: NonNullable<EventData['performer']>[number],
+  input: NonNullable<EventData['performer']>[number]
 ): NewsEventPerformer => {
   if (typeof input === 'string') {
     return { name: input, type: 'organization' };
@@ -181,13 +158,11 @@ const normalizeEventPerformerItem = (
 
   return {
     name: input.name,
-    type: input.type ?? 'organization',
+    type: input.type ?? 'organization'
   };
 };
 
-const normalizeEventPerformers = (
-  input: EventData['performer'],
-): NewsEvent['performer'] => {
+const normalizeEventPerformers = (input: EventData['performer']): NewsEvent['performer'] => {
   if (!input) {
     return undefined;
   }
@@ -201,7 +176,7 @@ function normalizeEvent(
     readonly year: string;
     readonly month: string;
     readonly entry: string;
-  },
+  }
 ): NewsEvent {
   const slug = input.slug ?? 'event';
   const starts = input.starts_at;
@@ -221,7 +196,7 @@ function normalizeEvent(
     location: input.location,
     coordinates: input.coordinates,
     organizer: normalizeEventOrganizer(input.organizer),
-    performer: normalizeEventPerformers(input.performer),
+    performer: normalizeEventPerformers(input.performer)
   };
 }
 
@@ -231,7 +206,7 @@ function normalizeEvents(
     readonly year: string;
     readonly month: string;
     readonly entry: string;
-  },
+  }
 ): readonly NewsEvent[] {
   if (!input) {
     return [];
@@ -254,12 +229,12 @@ function articleParts(entry: ArticleEntry): {
   return {
     year: parts[0],
     month: parts[1],
-    entry: parts[2],
+    entry: parts[2]
   };
 }
 
 const areas = (
-  values: readonly NewsArea[] | undefined,
+  values: readonly NewsArea[] | undefined
 ): {
   readonly appliesToAllAreas: boolean;
   readonly areas: readonly NewsArea[];
@@ -267,13 +242,13 @@ const areas = (
   if (!values?.length) {
     return {
       appliesToAllAreas: true,
-      areas: [...NEWS_AREAS],
+      areas: [...NEWS_AREAS]
     };
   }
 
   return {
     appliesToAllAreas: false,
-    areas: [...values],
+    areas: [...values]
   };
 };
 
@@ -281,33 +256,25 @@ function normalizeArticle(
   entry: ArticleEntry,
   authors: ReadonlyMap<string, NewsAuthor>,
   mentionRegistry: SiteMentionRegistry,
-  now: Date,
+  now: Date
 ): NewsArticle {
   const parts = articleParts(entry);
   const published = entry.data.date;
   if (published.year !== parts.year || published.month !== parts.month) {
     throw new Error(
-      `news article "${entry.id}" date ${published.iso} must match ${parts.year}/${parts.month}`,
+      `news article "${entry.id}" date ${published.iso} must match ${parts.year}/${parts.month}`
     );
   }
 
   const area = areas(entry.data.areas);
-  const author = needAuthor(
-    authors,
-    authorId(entry.data.author),
-    `news article "${entry.id}"`,
-  );
-  const articleCover = cover(
-    entry.data.cover,
-    entry.data.cover_alt,
-    `news article "${entry.id}"`,
-  );
+  const author = needAuthor(authors, authorId(entry.data.author), `news article "${entry.id}"`);
+  const articleCover = cover(entry.data.cover, entry.data.cover_alt, `news article "${entry.id}"`);
   const events = normalizeEvents(entry.data.events, parts);
   const mappedPhotos = mapPhotos(entry.data.photos, entry.id, mentionRegistry);
   const body = preprocessSiteMarkdownContent(
     entry.body ?? '',
     `news article "${entry.id}" body`,
-    mentionRegistry,
+    mentionRegistry
   );
   const article = {
     id: entry.id,
@@ -336,10 +303,7 @@ function normalizeArticle(
     events,
     summary: entry.data.summary,
     body: body.markdown,
-    mentions: [
-      ...body.mentions,
-      ...mappedPhotos.flatMap((item) => item.mentions),
-    ],
+    mentions: [...body.mentions, ...mappedPhotos.flatMap((item) => item.mentions)]
   } satisfies NewsArticle;
 
   return article;
@@ -359,13 +323,13 @@ const toListArticle = (article: NewsArticle): NewsListArticle => ({
   tags: article.tags,
   pinned: article.pinned,
   cover: article.cover,
-  summary: article.summary,
+  summary: article.summary
 });
 
 const archiveSummaryMap = (
   entries: readonly ArchiveSummaryEntry[],
   mentionRegistry: SiteMentionRegistry,
-  articleUrls: ReadonlySet<string>,
+  articleUrls: ReadonlySet<string>
 ): ReadonlyMap<string, NewsArchiveSummary> => {
   const summaries = new Map<string, NewsArchiveSummary>();
 
@@ -377,7 +341,7 @@ const archiveSummaryMap = (
     const body = preprocessSiteMarkdownContent(
       entry.body ?? '',
       `news archive summary \"${entry.id}\" body`,
-      mentionRegistry,
+      mentionRegistry
     );
 
     if (!body.markdown) {
@@ -386,18 +350,18 @@ const archiveSummaryMap = (
 
     if (body.mentions.length > 0) {
       throw new Error(
-        `news archive summary \"${entry.id}\" must link to the source article instead of mentioning people directly`,
+        `news archive summary \"${entry.id}\" must link to the source article instead of mentioning people directly`
       );
     }
 
     validateArchiveSummaryMarkdown(
       body.markdown,
       articleUrls,
-      `news archive summary \"${entry.id}\"`,
+      `news archive summary \"${entry.id}\"`
     );
 
     summaries.set(entry.id, {
-      body: body.markdown,
+      body: body.markdown
     });
   }
 
@@ -428,13 +392,11 @@ function validateDayKeyConflicts(items: readonly NewsArticle[]): void {
   }
 
   for (const [key, day] of days.entries()) {
-    const numeric = day.find(
-      (item) => /^\d+$/.test(item.entry) && Number(item.entry) === item.day,
-    );
+    const numeric = day.find((item) => /^\d+$/.test(item.entry) && Number(item.entry) === item.day);
 
     if (numeric && day.length > 1) {
       throw new Error(
-        `news article day-key "${numeric.id}" conflicts with another article on ${key}`,
+        `news article day-key "${numeric.id}" conflicts with another article on ${key}`
       );
     }
   }
@@ -447,16 +409,14 @@ export function buildNewsDataset(
   opts?: {
     readonly now?: Date;
     readonly mentionRegistry?: SiteMentionRegistry;
-  },
+  }
 ): NewsDataset {
   const now = opts?.now ?? new Date();
   const mentionRegistry = opts?.mentionRegistry ?? new Map();
   const authors = authorMap(authorsData);
 
   const articles: readonly NewsArticle[] = articlesData
-    .map((item: ArticleEntry) =>
-      normalizeArticle(item, authors, mentionRegistry, now),
-    )
+    .map((item: ArticleEntry) => normalizeArticle(item, authors, mentionRegistry, now))
     .sort(compareArticlesPublishedDesc);
 
   validateUniqueIds(articles);
@@ -466,11 +426,11 @@ export function buildNewsDataset(
   const archiveSummaries = archiveSummaryMap(
     archiveSummariesData,
     mentionRegistry,
-    new Set(articles.map((item) => item.url)),
+    new Set(articles.map((item) => item.url))
   );
   const home: NewsHomeData = {
     pinned: list.filter((item) => item.pinned),
-    latest: list.filter((item) => !item.pinned).slice(0, NEWS_LATEST_LIMIT),
+    latest: list.filter((item) => !item.pinned).slice(0, NEWS_LATEST_LIMIT)
   };
   const archives = buildArchives(list, archiveSummaries);
   const tags = buildTagIndex(list);
@@ -481,23 +441,20 @@ export function buildNewsDataset(
     archives,
     tags,
     byId: new Map(articles.map((item) => [item.id, item])),
-    byTag: new Map(tags.map((item) => [item.key, item])),
+    byTag: new Map(tags.map((item) => [item.key, item]))
   };
 }
 
 async function buildNewsData(): Promise<NewsDataset> {
-  const [authorsData, articlesData, archiveSummariesData, mentionRegistry] =
-    await Promise.all([
-      getCollection('newsAuthors') as Promise<readonly NewsAuthorEntry[]>,
-      getCollection('newsArticles') as Promise<readonly NewsArticleEntry[]>,
-      getCollection('newsArchiveSummaries') as Promise<
-        readonly NewsArchiveSummaryEntry[]
-      >,
-      loadSiteMentionRegistry(),
-    ]);
+  const [authorsData, articlesData, archiveSummariesData, mentionRegistry] = await Promise.all([
+    getCollection('newsAuthors') as Promise<readonly NewsAuthorEntry[]>,
+    getCollection('newsArticles') as Promise<readonly NewsArticleEntry[]>,
+    getCollection('newsArchiveSummaries') as Promise<readonly NewsArchiveSummaryEntry[]>,
+    loadSiteMentionRegistry()
+  ]);
 
   return buildNewsDataset(authorsData, articlesData, archiveSummariesData, {
-    mentionRegistry,
+    mentionRegistry
   });
 }
 
@@ -509,34 +466,26 @@ export const loadNewsData = (): Promise<NewsDataset> => {
 export const loadNewsArticles = async (): Promise<readonly NewsArticle[]> =>
   (await loadNewsData()).articles;
 
-export const loadNewsHome = async (): Promise<NewsHomeData> =>
-  (await loadNewsData()).home;
+export const loadNewsHome = async (): Promise<NewsHomeData> => (await loadNewsData()).home;
 
-export const loadNewsArchives = async (): Promise<NewsArchives> =>
-  (await loadNewsData()).archives;
+export const loadNewsArchives = async (): Promise<NewsArchives> => (await loadNewsData()).archives;
 
 export const loadNewsTags = async (): Promise<readonly NewsTagPage[]> =>
   (await loadNewsData()).tags;
 
-export const loadNewsArticle = async (
-  id: string,
-): Promise<NewsArticle | undefined> => (await loadNewsData()).byId.get(id);
+export const loadNewsArticle = async (id: string): Promise<NewsArticle | undefined> =>
+  (await loadNewsData()).byId.get(id);
 
-export const loadNewsTag = async (
-  key: string,
-): Promise<NewsTagPage | undefined> =>
+export const loadNewsTag = async (key: string): Promise<NewsTagPage | undefined> =>
   (await loadNewsData()).byTag.get(normalizeTagKey(key));
 
-export const loadNewsYear = async (
-  year: number,
-): Promise<NewsYearArchive | undefined> =>
+export const loadNewsYear = async (year: number): Promise<NewsYearArchive | undefined> =>
   (await loadNewsData()).archives.byYear.get(year);
 
 export const loadNewsMonth = async (
   year: number,
-  month: number,
+  month: number
 ): Promise<NewsMonthArchive | undefined> =>
   (await loadNewsData()).archives.byMonth.get(newsMonthKey(year, month));
 
-export const toNewsListArticle = (article: NewsArticle): NewsListArticle =>
-  toListArticle(article);
+export const toNewsListArticle = (article: NewsArticle): NewsListArticle => toListArticle(article);

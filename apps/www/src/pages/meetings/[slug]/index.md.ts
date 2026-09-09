@@ -11,8 +11,8 @@ export const getStaticPaths = (async () => {
 
   return meetings.map((meeting) => ({
     params: {
-      slug: meeting.slug,
-    },
+      slug: meeting.slug
+    }
   }));
 }) satisfies GetStaticPaths;
 

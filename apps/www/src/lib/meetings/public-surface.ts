@@ -4,14 +4,14 @@ import {
   meetingMarkdownPattern,
   meetingPattern,
   meetingsMarkdownPath,
-  meetingTranscriptPartMarkdownPattern,
+  meetingTranscriptPartMarkdownPattern
 } from './routes';
 
 export const meetingsPublicSurfaceSlice = {
   owner: {
     id: 'meetings',
     label: 'Архив встреч',
-    entryPath: meetingsMarkdownPath(),
+    entryPath: meetingsMarkdownPath()
   },
   surfaces: [
     {
@@ -21,7 +21,7 @@ export const meetingsPublicSurfaceSlice = {
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
       discoveryRoles: ['section-entry', 'markdown-companion'],
-      catalogRole: 'anchor',
+      catalogRole: 'anchor'
     },
     {
       id: 'meetings:detail',
@@ -29,7 +29,7 @@ export const meetingsPublicSurfaceSlice = {
       routePattern: meetingPattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'meetings:detail-markdown',
@@ -37,7 +37,7 @@ export const meetingsPublicSurfaceSlice = {
       routePattern: meetingMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'meetings:transcript-part-markdown',
@@ -45,7 +45,7 @@ export const meetingsPublicSurfaceSlice = {
       routePattern: meetingTranscriptPartMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
-    },
-  ],
+      discoveryRoles: ['markdown-companion']
+    }
+  ]
 } satisfies PublicSurfaceSlice;

@@ -3,42 +3,42 @@ import type { SearchSection } from './types';
 export const SEARCH_SECTIONS = {
   news: {
     id: 'news',
-    label: 'Новости',
+    label: 'Новости'
   },
   status: {
     id: 'status',
-    label: 'Статус',
+    label: 'Статус'
   },
   places: {
     id: 'places',
-    label: 'Карта',
+    label: 'Карта'
   },
   knowledgeBase: {
     id: 'knowledge-base',
-    label: 'База знаний',
+    label: 'База знаний'
   },
   meetings: {
     id: 'meetings',
-    label: 'Встречи',
+    label: 'Встречи'
   },
   people: {
     id: 'people',
-    label: 'Люди',
+    label: 'Люди'
   },
   reviews: {
     id: 'reviews',
-    label: 'Отзывы',
+    label: 'Отзывы'
   },
   sarafan: {
     id: 'sarafan',
-    label: 'Сарафан',
+    label: 'Сарафан'
   },
   compare: {
     id: 'compare',
-    label: 'Сравнение поселков',
+    label: 'Сравнение поселков'
   },
   regulation: {
     id: 'regulation',
-    label: 'Регламент',
-  },
+    label: 'Регламент'
+  }
 } as const satisfies Readonly<Record<string, SearchSection>>;

@@ -4,46 +4,35 @@ import { normalizeContactPhone } from './phone';
 import type { ContactVcfName, ContactWithVcf } from './types';
 import { contactExcerpt } from './view';
 
-const addPersonName = (
-  card: VCard,
-  fullName: string,
-  name: ContactVcfName,
-): void => {
+const addPersonName = (card: VCard, fullName: string, name: ContactVcfName): void => {
   card.addFullName(fullName).addName({
     familyName: name.family,
     givenName: name.given,
     additionalNames: name.additional,
     honorificPrefix: name.prefix,
-    honorificSuffix: name.suffix,
+    honorificSuffix: name.suffix
   });
 };
 
-const addLabeledUrl = (
-  card: VCard,
-  group: string,
-  label: string,
-  url: string,
-): void => {
+const addLabeledUrl = (card: VCard, group: string, label: string, url: string): void => {
   // A grouped URL stays visible in Apple Contacts and keeps its service label.
   card.addCustomProperty({
     name: 'URL',
     value: url,
-    group,
+    group
   });
   card.addCustomProperty({
     name: 'X-ABLabel',
     value: label,
     params: 'CHARSET=UTF-8',
-    group,
+    group
   });
 };
 
 export const buildContactVcard = (contact: ContactWithVcf): string => {
   const vcf = contact.vcf;
   const card = new VCard();
-  const fullName =
-    vcf.fullName ??
-    (vcf.kind === 'organization' ? vcf.organization : contact.title);
+  const fullName = vcf.fullName ?? (vcf.kind === 'organization' ? vcf.organization : contact.title);
   const rawPhone = vcf.phone ?? contact.contacts.phone;
   const phone = rawPhone ? normalizeContactPhone(rawPhone) : undefined;
   const telegram = vcf.telegram ?? contact.contacts.telegram;
@@ -113,7 +102,7 @@ export const buildContactVcard = (contact: ContactWithVcf): string => {
   if (contact.location?.coordinates) {
     card.addGeo({
       latitude: contact.location.coordinates.lat,
-      longitude: contact.location.coordinates.lng,
+      longitude: contact.location.coordinates.lng
     });
   }
 

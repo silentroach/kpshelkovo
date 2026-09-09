@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { getAvailabilityDisplay } from './availability-status';
-  import ComparisonTable from './ComparisonTable.svelte';
-  import type { ComparisonTableRow } from './comparison-table.types';
   import type { ServiceModel } from '../lib/settlement/types';
+  import { getAvailabilityDisplay } from './availability-status';
+  import type { ComparisonTableRow } from './comparison-table.types';
+  import ComparisonTable from './ComparisonTable.svelte';
 
   interface Props {
     title?: string;
@@ -21,7 +21,7 @@
     roadCleaning: 'Уборка дорог',
     landscaping: 'Благоустройство',
     emergencyService: 'Аварийная служба',
-    dispatcher: 'Диспетчерская служба',
+    dispatcher: 'Диспетчерская служба'
   };
 
   // Порядок отображения услуг.
@@ -31,7 +31,7 @@
     'roadCleaning',
     'landscaping',
     'emergencyService',
-    'dispatcher',
+    'dispatcher'
   ] as const satisfies readonly ServiceKey[];
 
   const rows = $derived(
@@ -41,8 +41,8 @@
       value: services[key],
       shelkovoValue: shelkovoServices?.[key],
       status: getAvailabilityDisplay(services[key]),
-      shelkovoStatus: getAvailabilityDisplay(shelkovoServices?.[key]),
-    })),
+      shelkovoStatus: getAvailabilityDisplay(shelkovoServices?.[key])
+    }))
   );
 </script>
 

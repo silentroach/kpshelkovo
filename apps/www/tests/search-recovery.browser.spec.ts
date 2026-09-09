@@ -46,9 +46,7 @@ test('loads an independent component chunk when retrying', async ({ page }) => {
   await expect(input).toHaveValue(QUERY);
 });
 
-test('uses a third fresh URL after two component graph failures', async ({
-  page,
-}) => {
+test('uses a third fresh URL after two component graph failures', async ({ page }) => {
   const requestedChunkUrls: string[] = [];
 
   await page.route(SEARCH_DIALOG_CHUNK_URL, async (route) => {
@@ -81,7 +79,7 @@ test('uses a third fresh URL after two component graph failures', async ({
   expect(new Set(requestedChunkUrls).size).toBe(3);
   await expect(page.locator('[data-search-dialog-root]')).toHaveAttribute(
     'data-search-dialog-hydrated',
-    '',
+    ''
   );
   await expect(input).toBeFocused();
   await expect(input).toHaveValue(QUERY);

@@ -5,12 +5,9 @@ import {
   buildStatusCalendarYearGrid,
   buildStatusCalendarProjection,
   currentStatusCalendarYear,
-  statusCalendarMonthId,
+  statusCalendarMonthId
 } from '../calendar';
-import type {
-  StatusCalendarProjection,
-  StatusCalendarRecordInput,
-} from '../calendar.types';
+import type { StatusCalendarProjection, StatusCalendarRecordInput } from '../calendar.types';
 
 const BUILD_NOW_MS = Date.parse('2026-08-27T12:00:00+03:00');
 
@@ -18,17 +15,17 @@ const record = (
   id: string,
   kind: StatusCalendarRecordInput['kind'],
   startedAt: string,
-  endedAt?: string,
+  endedAt?: string
 ): StatusCalendarRecordInput => ({
   id,
   kind,
   startedAt: Date.parse(startedAt),
-  endedAt: endedAt ? Date.parse(endedAt) : undefined,
+  endedAt: endedAt ? Date.parse(endedAt) : undefined
 });
 
 const datesForRecord = (
   projection: StatusCalendarProjection,
-  recordId: string,
+  recordId: string
 ): readonly string[] =>
   [...projection.byDay.values()]
     .filter((day) => day.recordIds.includes(recordId))
@@ -42,16 +39,16 @@ describe('buildStatusCalendarProjection', () => {
           '2026/03/dam-flood-closure',
           'incident',
           '2026-03-15T00:00:00+03:00',
-          '2026-04-24T00:00:00+03:00',
+          '2026-04-24T00:00:00+03:00'
         ),
         record(
           '2026/04/electricity-river-10kv-line-damage',
           'incident',
           '2026-04-22T11:30:00+03:00',
-          '2026-04-23T00:06:00+03:00',
-        ),
+          '2026-04-23T00:06:00+03:00'
+        )
       ],
-      BUILD_NOW_MS,
+      BUILD_NOW_MS
     );
 
     expect({
@@ -60,8 +57,8 @@ describe('buildStatusCalendarProjection', () => {
       april24: projection.byDay.get('2026-04-24'),
       years: projection.years.map((year) => ({
         year: year.year,
-        months: year.months.map((month) => month.id),
-      })),
+        months: year.months.map((month) => month.id)
+      }))
     }).toMatchInlineSnapshot(`
       {
         "april22": {
@@ -111,23 +108,23 @@ describe('buildStatusCalendarProjection', () => {
           '2023/12/new-year-outage',
           'incident',
           '2023-12-31T23:55:00+03:00',
-          '2024-01-01T00:06:00+03:00',
+          '2024-01-01T00:06:00+03:00'
         ),
         record(
           '2024/02/leap-maintenance',
           'maintenance',
           '2024-02-28T22:00:00+03:00',
-          '2024-03-01T00:00:00+03:00',
-        ),
+          '2024-03-01T00:00:00+03:00'
+        )
       ],
-      BUILD_NOW_MS,
+      BUILD_NOW_MS
     );
 
     expect({
       years: projection.years.map((year) => year.year),
       months: [...projection.byMonth.keys()],
       days: [...projection.byDay.keys()],
-      march1: projection.byDay.get('2024-03-01'),
+      march1: projection.byDay.get('2024-03-01')
     }).toMatchInlineSnapshot(`
       {
         "days": [
@@ -157,27 +154,19 @@ describe('buildStatusCalendarProjection', () => {
     const records = [
       record(activeId, 'incident', '2026-05-02T10:00:00+03:00'),
       record(futureOpenId, 'maintenance', '2026-05-10T10:00:00+03:00'),
-      record(
-        futureKnownId,
-        'maintenance',
-        '2026-05-12T10:00:00+03:00',
-        '2026-05-14T00:00:00+03:00',
-      ),
+      record(futureKnownId, 'maintenance', '2026-05-12T10:00:00+03:00', '2026-05-14T00:00:00+03:00')
     ];
-    const projection = buildStatusCalendarProjection(
-      records,
-      Date.parse('2026-05-03T21:30:00Z'),
-    );
+    const projection = buildStatusCalendarProjection(records, Date.parse('2026-05-03T21:30:00Z'));
     const nextDayProjection = buildStatusCalendarProjection(
       records,
-      Date.parse('2026-05-04T21:30:00Z'),
+      Date.parse('2026-05-04T21:30:00Z')
     );
 
     expect({
       active: datesForRecord(projection, activeId),
       activeAfterNextBuild: datesForRecord(nextDayProjection, activeId),
       futureOpen: datesForRecord(projection, futureOpenId),
-      futureKnown: datesForRecord(projection, futureKnownId),
+      futureKnown: datesForRecord(projection, futureKnownId)
     }).toMatchInlineSnapshot(`
       {
         "active": [
@@ -207,7 +196,7 @@ describe('buildStatusCalendarProjection', () => {
       '2026/06/electricity-outage-2026-06-24-0400',
       'incident',
       '2026-06-24T04:00:00+03:00',
-      '2026-06-24T08:58:00+03:00',
+      '2026-06-24T08:58:00+03:00'
     );
     const projection = buildStatusCalendarProjection(
       [
@@ -215,18 +204,18 @@ describe('buildStatusCalendarProjection', () => {
           '2026/06/electricity-outage-2026-06-24',
           'maintenance',
           '2026-06-24T09:00:00+03:00',
-          '2026-06-24T17:00:00+03:00',
+          '2026-06-24T17:00:00+03:00'
         ),
         firstIncident,
         record(
           '2026/06/electricity-outage-2026-06-24-0859',
           'incident',
           '2026-06-24T08:59:00+03:00',
-          '2026-06-24T11:23:00+03:00',
+          '2026-06-24T11:23:00+03:00'
         ),
-        firstIncident,
+        firstIncident
       ],
-      BUILD_NOW_MS,
+      BUILD_NOW_MS
     );
 
     expect(projection.byDay.get('2026-06-24')).toMatchInlineSnapshot(`
@@ -252,33 +241,33 @@ describe('buildStatusCalendarProjection', () => {
       '2026/06/water-forest-outage-2026-06-13',
       'incident',
       '2026-06-13T20:30:00+03:00',
-      '2026-06-19T00:00:00+03:00',
+      '2026-06-19T00:00:00+03:00'
     );
     const startsAtTen = record(
       '2026/06/water-forest-village-outage-2026-06-18',
       'incident',
       '2026-06-18T10:00:00+03:00',
-      '2026-06-18T14:00:00+03:00',
+      '2026-06-18T14:00:00+03:00'
     );
     const startsAtThirteen = record(
       '2026/06/electricity-river-outage-2026-06-18',
       'incident',
       '2026-06-18T13:10:00+03:00',
-      '2026-06-18T16:00:00+03:00',
+      '2026-06-18T16:00:00+03:00'
     );
     const expected = [carryOver.id, startsAtTen.id, startsAtThirteen.id];
     const first = buildStatusCalendarProjection(
       [startsAtThirteen, carryOver, startsAtTen],
-      BUILD_NOW_MS,
+      BUILD_NOW_MS
     );
     const second = buildStatusCalendarProjection(
       [startsAtTen, startsAtThirteen, carryOver],
-      BUILD_NOW_MS,
+      BUILD_NOW_MS
     );
 
     expect([
       first.byDay.get('2026-06-18')?.recordIds,
-      second.byDay.get('2026-06-18')?.recordIds,
+      second.byDay.get('2026-06-18')?.recordIds
     ]).toEqual([expected, expected]);
   });
 
@@ -289,17 +278,17 @@ describe('buildStatusCalendarProjection', () => {
           '2026/06/zero-length',
           'incident',
           '2026-06-24T09:00:00+03:00',
-          '2026-06-24T09:00:00+03:00',
-        ),
+          '2026-06-24T09:00:00+03:00'
+        )
       ],
-      BUILD_NOW_MS,
+      BUILD_NOW_MS
     );
 
     expect(projection).toMatchObject({
       years: [],
       byYear: new Map(),
       byMonth: new Map(),
-      byDay: new Map(),
+      byDay: new Map()
     });
     expect(statusCalendarMonthId(2026, 6)).toBe('2026/06');
   });
@@ -313,7 +302,7 @@ describe('buildStatusCalendarYearGrid', () => {
     expect({
       months: year.months.length,
       weeksPerMonth: year.months.map((month) => month.weeks.length),
-      januaryFirstWeek: year.months[0]?.weeks[0],
+      januaryFirstWeek: year.months[0]?.weeks[0]
     }).toMatchInlineSnapshot(`
       {
         "januaryFirstWeek": [
@@ -385,7 +374,7 @@ describe('buildStatusCalendarYearGrid', () => {
 
     expect([
       currentStatusCalendarYear(beforeMoscowMidnight),
-      currentStatusCalendarYear(afterMoscowMidnight),
+      currentStatusCalendarYear(afterMoscowMidnight)
     ]).toEqual([2026, 2027]);
   });
 });
@@ -396,8 +385,7 @@ describe('availableStatusCalendarYears', () => {
 
     expect({
       years: availableStatusCalendarYears(projection),
-      months: buildStatusCalendarYearGrid(projection, projection.buildYear)
-        .months.length,
+      months: buildStatusCalendarYearGrid(projection, projection.buildYear).months.length
     }).toMatchInlineSnapshot(`
       {
         "months": 12,
@@ -415,21 +403,19 @@ describe('availableStatusCalendarYears', () => {
           '2022/05/past-incident',
           'incident',
           '2022-05-01T10:00:00+03:00',
-          '2022-05-01T11:00:00+03:00',
+          '2022-05-01T11:00:00+03:00'
         ),
         record(
           '2028/09/future-maintenance',
           'maintenance',
           '2028-09-10T10:00:00+03:00',
-          '2028-09-10T11:00:00+03:00',
-        ),
+          '2028-09-10T11:00:00+03:00'
+        )
       ],
-      BUILD_NOW_MS,
+      BUILD_NOW_MS
     );
 
-    expect(availableStatusCalendarYears(projection)).toEqual([
-      2022, 2026, 2028,
-    ]);
+    expect(availableStatusCalendarYears(projection)).toEqual([2022, 2026, 2028]);
   });
 
   it('includes both years touched by an interval across New Year', () => {
@@ -439,14 +425,12 @@ describe('availableStatusCalendarYears', () => {
           '2024/12/new-year-outage',
           'incident',
           '2024-12-31T23:55:00+03:00',
-          '2025-01-01T00:06:00+03:00',
-        ),
+          '2025-01-01T00:06:00+03:00'
+        )
       ],
-      BUILD_NOW_MS,
+      BUILD_NOW_MS
     );
 
-    expect(availableStatusCalendarYears(projection)).toEqual([
-      2024, 2025, 2026,
-    ]);
+    expect(availableStatusCalendarYears(projection)).toEqual([2024, 2025, 2026]);
   });
 });

@@ -8,7 +8,7 @@ import { reviewsRulesUrl, reviewsUrl } from './routes';
 import {
   REVIEW_ASPECT_ORGANIZATIONS,
   REVIEW_AUTHOR_FALLBACK,
-  type ReviewOrganizationAspectType,
+  type ReviewOrganizationAspectType
 } from './schema';
 import type { Review } from './types';
 import {
@@ -16,7 +16,7 @@ import {
   formatReviewAspectLabel,
   formatReviewAspectType,
   formatReviewTitle,
-  sortReviewAspects,
+  sortReviewAspects
 } from './view';
 
 const CONTEXT = 'https://schema.org';
@@ -46,7 +46,7 @@ const organizationSchema = (): SchemaDoc => ({
   '@type': 'Organization',
   '@id': `${absoluteUrl('/')}#organization`,
   name: SITE_NAME,
-  url: absoluteUrl('/'),
+  url: absoluteUrl('/')
 });
 
 const websiteSchema = (): SchemaDoc => ({
@@ -54,11 +54,10 @@ const websiteSchema = (): SchemaDoc => ({
   '@id': `${absoluteUrl('/')}#website`,
   name: SITE_NAME,
   url: absoluteUrl('/'),
-  inLanguage: LANG,
+  inLanguage: LANG
 });
 
-const placeId = (): string =>
-  `${absoluteUrl('/815/compare/settlements/shelkovo/')}#place`;
+const placeId = (): string => `${absoluteUrl('/815/compare/settlements/shelkovo/')}#place`;
 
 const shelkovoPlaceSchema = (): SchemaDoc => ({
   '@type': 'Place',
@@ -66,19 +65,16 @@ const shelkovoPlaceSchema = (): SchemaDoc => ({
   name: 'КП Шелково',
   alternateName: ['Шелково', 'Шелково Эко Клаб'],
   url: 'https://kpshelkovo.ru/',
-  address: 'Московская область, городской округ Ступино',
+  address: 'Московская область, городской округ Ступино'
 });
 
 const reviewLocationSchema = (review: Review): SchemaDoc => ({
   '@type': 'Place',
   name: formatReviewArea(review.area),
-  containedInPlace: { '@id': placeId() },
+  containedInPlace: { '@id': placeId() }
 });
 
-const breadcrumbSchema = (
-  url: string,
-  items: readonly BreadcrumbLink[],
-): SchemaDoc => ({
+const breadcrumbSchema = (url: string, items: readonly BreadcrumbLink[]): SchemaDoc => ({
   '@context': CONTEXT,
   '@type': 'BreadcrumbList',
   '@id': `${url}#breadcrumb`,
@@ -86,34 +82,32 @@ const breadcrumbSchema = (
     '@type': 'ListItem',
     position: index + 1,
     name: item.name,
-    item: absoluteUrl(item.url),
-  })),
+    item: absoluteUrl(item.url)
+  }))
 });
 
 const reviewAuthorSchema = (review: Review): SchemaDoc => ({
   '@type': 'Person',
-  name: review.author ?? REVIEW_AUTHOR_FALLBACK,
+  name: review.author ?? REVIEW_AUTHOR_FALLBACK
 });
 
 const REVIEW_MENTION_SCHEMA_TYPES = {
   person: 'Person',
-  place: 'Place',
+  place: 'Place'
 } as const satisfies Readonly<Record<EntityMentionType, 'Person' | 'Place'>>;
 
 const reviewMentionsSchema = (review: Review): readonly SchemaDoc[] =>
   review.mentions.map((mention) => ({
     '@type': REVIEW_MENTION_SCHEMA_TYPES[mention.type],
     name: mention.label,
-    url: absoluteUrl(mention.htmlUrl),
+    url: absoluteUrl(mention.htmlUrl)
   }));
 
 const countWords = (text: string): number => text.split(/\s+/u).length;
 
-const reviewedOrganizationSchema = (
-  type: ReviewOrganizationAspectType,
-): SchemaDoc => ({
+const reviewedOrganizationSchema = (type: ReviewOrganizationAspectType): SchemaDoc => ({
   '@type': 'Organization',
-  name: REVIEW_ASPECT_ORGANIZATIONS[type].name,
+  name: REVIEW_ASPECT_ORGANIZATIONS[type].name
 });
 
 const reviewEntitySchemas = (review: Review): readonly SchemaDoc[] => {
@@ -121,9 +115,7 @@ const reviewEntitySchemas = (review: Review): readonly SchemaDoc[] => {
   return sortReviewAspects(review.aspects).flatMap((aspect) => {
     if (aspect.type === 'place' || !aspect.rating) return [];
 
-    const reviewBody = aspect.body
-      ? extractMarkdownText(aspect.body)
-      : undefined;
+    const reviewBody = aspect.body ? extractMarkdownText(aspect.body) : undefined;
 
     return [
       {
@@ -149,17 +141,14 @@ const reviewEntitySchemas = (review: Review): readonly SchemaDoc[] => {
           '@type': 'Rating',
           ratingValue: aspect.rating,
           bestRating: 5,
-          worstRating: 1,
-        },
-      },
+          worstRating: 1
+        }
+      }
     ];
   });
 };
 
-const itemListSchema = (
-  url: string,
-  reviews: readonly Review[],
-): SchemaDoc => ({
+const itemListSchema = (url: string, reviews: readonly Review[]): SchemaDoc => ({
   '@context': CONTEXT,
   '@type': 'ItemList',
   '@id': `${url}#items`,
@@ -175,19 +164,17 @@ const itemListSchema = (
       '@type': 'ItemPage',
       '@id': `${absoluteUrl(review.url)}#webpage`,
       name: formatReviewTitle(review),
-      url: absoluteUrl(review.url),
-    },
-  })),
+      url: absoluteUrl(review.url)
+    }
+  }))
 });
 
 export const reviewsCollectionPageSchema = (
-  input: ReviewsCollectionPageInput,
+  input: ReviewsCollectionPageInput
 ): readonly SchemaDoc[] => {
   const url = absoluteUrl(input.url);
   const pageId = `${url}#webpage`;
-  const list = input.items.length
-    ? itemListSchema(url, input.items)
-    : undefined;
+  const list = input.items.length ? itemListSchema(url, input.items) : undefined;
   const breadcrumb = input.breadcrumbs?.length
     ? breadcrumbSchema(url, input.breadcrumbs)
     : undefined;
@@ -212,12 +199,12 @@ export const reviewsCollectionPageSchema = (
         ? {
             mainEntity: { '@id': list['@id'] },
             hasPart: input.items.map((review) => ({
-              '@id': `${absoluteUrl(review.url)}#webpage`,
-            })),
+              '@id': `${absoluteUrl(review.url)}#webpage`
+            }))
           }
         : {}),
-      ...(breadcrumb ? { breadcrumb: { '@id': breadcrumb['@id'] } } : {}),
-    },
+      ...(breadcrumb ? { breadcrumb: { '@id': breadcrumb['@id'] } } : {})
+    }
   ];
 
   if (list) docs.push(list);
@@ -226,9 +213,7 @@ export const reviewsCollectionPageSchema = (
   return docs;
 };
 
-export const reviewPageSchema = (
-  input: ReviewPageInput,
-): readonly SchemaDoc[] => {
+export const reviewPageSchema = (input: ReviewPageInput): readonly SchemaDoc[] => {
   const { review } = input;
   const url = absoluteUrl(review.url);
   const pageId = `${url}#webpage`;
@@ -262,12 +247,12 @@ export const reviewPageSchema = (
         : undefined,
       mentions: mentions.length ? mentions : undefined,
       relatedLink: absoluteUrl(reviewsRulesUrl()),
-      ...(breadcrumb ? { breadcrumb: { '@id': breadcrumb['@id'] } } : {}),
+      ...(breadcrumb ? { breadcrumb: { '@id': breadcrumb['@id'] } } : {})
     },
     ...reviewEntities.map((entity) => ({
       '@context': CONTEXT,
-      ...entity,
-    })),
+      ...entity
+    }))
   ];
 
   if (breadcrumb) docs.push(breadcrumb);

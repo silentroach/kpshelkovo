@@ -9,9 +9,9 @@ const openingHours: PlaceOpeningHours = {
     {
       days: ['mon', 'wed', 'thu', 'fri', 'sat', 'sun'],
       opensAt: '10:00',
-      closesAt: '22:00',
-    },
-  ],
+      closesAt: '22:00'
+    }
+  ]
 };
 
 describe('place opening hours', () => {
@@ -21,14 +21,14 @@ describe('place opening hours', () => {
       '2026-08-17T07:00:00.000Z',
       '2026-08-17T18:59:00.000Z',
       '2026-08-17T19:00:00.000Z',
-      '2026-08-18T12:00:00.000Z',
+      '2026-08-18T12:00:00.000Z'
     ];
 
     expect(
       dates.map((date) => ({
         closingTime: getPlaceClosingTime(openingHours, new Date(date)),
-        open: isPlaceOpen(openingHours, new Date(date)),
-      })),
+        open: isPlaceOpen(openingHours, new Date(date))
+      }))
     ).toMatchInlineSnapshot(`
         [
           {

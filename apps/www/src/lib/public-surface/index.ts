@@ -1,12 +1,3 @@
-import type {
-  PublicSurface,
-  PublicSurfaceId,
-  PublicSurfaceLinksetItem,
-  PublicSurfaceOwner,
-  PublicSurfaceOwnerId,
-  PublicSurfaceRegistry,
-  PublicSurfaceSlice,
-} from './types';
 import { comparePublicSurfaceSlice } from '@/compare/lib/public-surface';
 import { contactsPublicSurfaceSlice } from '@/lib/contacts/public-surface';
 import { kbPublicSurfaceSlice } from '@/lib/kb/public-surface';
@@ -19,29 +10,33 @@ import { reviewsPublicSurfaceSlice } from '@/lib/reviews/public-surface';
 import { rootPublicSurfaceSlice } from '@/lib/root-public-surface';
 import { statusPublicSurfaceSlice } from '@/lib/status/public-surface';
 
+import type {
+  PublicSurface,
+  PublicSurfaceId,
+  PublicSurfaceLinksetItem,
+  PublicSurfaceOwner,
+  PublicSurfaceOwnerId,
+  PublicSurfaceRegistry,
+  PublicSurfaceSlice
+} from './types';
+
 const absoluteUrl = (root: string, path: string): string =>
   new URL(path.replace(/^\//, ''), `${root.replace(/\/$/, '')}/`).toString();
 
 export const surfaceHref = (root: string, surface: PublicSurface): string =>
-  surface.path === undefined
-    ? surface.routePattern
-    : absoluteUrl(root, surface.path);
+  surface.path === undefined ? surface.routePattern : absoluteUrl(root, surface.path);
 
 export const surfaceToLinksetItem = (
   root: string,
-  surface: PublicSurface,
+  surface: PublicSurface
 ): PublicSurfaceLinksetItem => ({
   href: surfaceHref(root, surface),
   type: surface.mediaType,
-  ...(surface.linkRelations?.length
-    ? { rel: surface.linkRelations.map((link) => link.rel) }
-    : {}),
-  ...(surface.label ? { title: surface.label } : {}),
+  ...(surface.linkRelations?.length ? { rel: surface.linkRelations.map((link) => link.rel) } : {}),
+  ...(surface.label ? { title: surface.label } : {})
 });
 
-const assertUniqueRegistryIds = (
-  slices: readonly PublicSurfaceSlice[],
-): void => {
+const assertUniqueRegistryIds = (slices: readonly PublicSurfaceSlice[]): void => {
   const ownerIds = new Set<PublicSurfaceOwnerId>();
 
   for (const slice of slices) {
@@ -64,28 +59,25 @@ const assertUniqueRegistryIds = (
 };
 
 export const createPublicSurfaceRegistry = (
-  slices: readonly PublicSurfaceSlice[],
+  slices: readonly PublicSurfaceSlice[]
 ): PublicSurfaceRegistry => {
   assertUniqueRegistryIds(slices);
 
   const sections = slices.map((slice) => slice.owner);
   const surfaces = slices.flatMap((slice) => slice.surfaces);
   const ownerBySurfaceId = new Map<PublicSurfaceId, PublicSurfaceOwner>(
-    slices.flatMap((slice) =>
-      slice.surfaces.map((surface) => [surface.id, slice.owner] as const),
-    ),
+    slices.flatMap((slice) => slice.surfaces.map((surface) => [surface.id, slice.owner] as const))
   );
-  const surfacesByOwnerId = new Map<
-    PublicSurfaceOwnerId,
-    readonly PublicSurface[]
-  >(slices.map((slice) => [slice.owner.id, slice.surfaces] as const));
+  const surfacesByOwnerId = new Map<PublicSurfaceOwnerId, readonly PublicSurface[]>(
+    slices.map((slice) => [slice.owner.id, slice.surfaces] as const)
+  );
 
   return {
     sections,
     surfaces,
     slices,
     surfaceOwner: (surfaceId) => ownerBySurfaceId.get(surfaceId),
-    surfacesByOwner: (ownerId) => surfacesByOwnerId.get(ownerId) ?? [],
+    surfacesByOwner: (ownerId) => surfacesByOwnerId.get(ownerId) ?? []
   };
 };
 
@@ -100,7 +92,7 @@ export const publicSurfaceRegistry = createPublicSurfaceRegistry([
   placesPublicSurfaceSlice,
   reviewsPublicSurfaceSlice,
   reglamentPublicSurfaceSlice,
-  comparePublicSurfaceSlice,
+  comparePublicSurfaceSlice
 ]);
 
 export { comparePublicSurfaceSlice } from '@/compare/lib/public-surface';
@@ -127,5 +119,5 @@ export type {
   PublicSurfaceOwner,
   PublicSurfaceOwnerId,
   PublicSurfaceRegistry,
-  PublicSurfaceSlice,
+  PublicSurfaceSlice
 } from './types';

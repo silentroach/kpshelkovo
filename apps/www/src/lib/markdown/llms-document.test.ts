@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  llmsSection,
-  markdownList,
-  serializeLlmsDocument,
-} from './llms-document';
+import { llmsSection, markdownList, serializeLlmsDocument } from './llms-document';
 
 describe('serializeLlmsDocument', () => {
   it('собирает llms-документы через mdast и сохраняет inline Markdown', () => {
@@ -16,11 +12,11 @@ describe('serializeLlmsDocument', () => {
           llmsSection('Главные URL', [
             markdownList([
               'Главная: https://example.test/',
-              'Фид: https://example.test/feed.json с `json`',
-            ]),
-          ]),
-        ],
-      }),
+              'Фид: https://example.test/feed.json с `json`'
+            ])
+          ])
+        ]
+      })
     ).toMatchInlineSnapshot(`
       "# Текстовая карта раздела
 

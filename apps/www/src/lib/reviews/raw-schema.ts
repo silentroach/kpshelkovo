@@ -22,8 +22,7 @@ const isReviewCalendarDate = (value: string): boolean => {
 
 const reviewDate = (name: string) =>
   z.union([text, z.date()]).transform((value, ctx) => {
-    const normalized =
-      value instanceof Date ? value.toISOString().slice(0, 10) : value;
+    const normalized = value instanceof Date ? value.toISOString().slice(0, 10) : value;
 
     if (isReviewCalendarDate(normalized)) {
       return normalized;
@@ -31,7 +30,7 @@ const reviewDate = (name: string) =>
 
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `${name} must use YYYY-MM-DD`,
+      message: `${name} must use YYYY-MM-DD`
     });
 
     return z.NEVER;
@@ -41,13 +40,13 @@ const aspect = z
   .object({
     type: z.enum(REVIEW_ASPECT_TYPES),
     rating: z.number().int().min(1).max(5).optional(),
-    body: text.optional(),
+    body: text.optional()
   })
   .strict();
 
 const seo = z
   .object({
-    description: text.optional(),
+    description: text.optional()
   })
   .strict();
 
@@ -55,7 +54,7 @@ type RawReviewAspectInput = z.infer<typeof aspect>;
 
 const validateUniqueAspectTypes = (
   aspects: readonly RawReviewAspectInput[] | undefined,
-  ctx: z.RefinementCtx,
+  ctx: z.RefinementCtx
 ): void => {
   if (!aspects?.length) {
     return;
@@ -68,7 +67,7 @@ const validateUniqueAspectTypes = (
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['aspects', index, 'type'],
-        message: `duplicate aspect type "${item.type}"`,
+        message: `duplicate aspect type "${item.type}"`
       });
       return;
     }
@@ -81,13 +80,13 @@ export const RawReviewSchema = z
   .object({
     published_at: reviewDate('published_at'),
     slug: text.refine((value) => REVIEW_SLUG.test(value), {
-      message: 'slug must use lower-case Latin letters, digits, and hyphen',
+      message: 'slug must use lower-case Latin letters, digits, and hyphen'
     }),
     area: z.enum(AREAS),
     title: text.optional(),
     seo: seo.optional(),
     author: text.optional(),
-    aspects: z.array(aspect).min(1).optional(),
+    aspects: z.array(aspect).min(1).optional()
   })
   .strict()
   .superRefine((data, ctx) => validateUniqueAspectTypes(data.aspects, ctx));

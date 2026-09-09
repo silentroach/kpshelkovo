@@ -5,22 +5,22 @@ vi.mock('./load', () => {
     articles: [
       {
         canonical: 'https://example.com/news/2026/05/event/',
-        markdownUrl: '/news/2026/05/event/index.md',
-      },
+        markdownUrl: '/news/2026/05/event/index.md'
+      }
     ],
     archives: {
       years: [
         {
           url: '/news/2026/',
-          months: [{ url: '/news/2026/05/' }],
-        },
-      ],
+          months: [{ url: '/news/2026/05/' }]
+        }
+      ]
     },
-    tags: [{ url: '/news/tags/electricity/' }],
+    tags: [{ url: '/news/tags/electricity/' }]
   };
 
   return {
-    loadNewsData: async () => news,
+    loadNewsData: async () => news
   };
 });
 
@@ -29,7 +29,7 @@ let build: typeof import('./llms').build;
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ build } = await import('./llms'));

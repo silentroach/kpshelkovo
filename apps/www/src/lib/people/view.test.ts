@@ -11,14 +11,14 @@ let mapRawPersonContact: typeof import('./mapper').mapRawPersonContact;
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({
     buildPersonMarkdown,
     describePersonProfile,
     formatPersonContactCompactDisplay,
-    formatPersonHeadline,
+    formatPersonHeadline
   } = await import('./view'));
   ({ mapRawPersonContact } = await import('./mapper'));
 });
@@ -29,26 +29,26 @@ describe('mapRawPersonContact', () => {
       mapRawPersonContact(
         {
           type: 'telegram',
-          value: 'Kirill_ZemlyaMO',
+          value: 'Kirill_ZemlyaMO'
         },
-        'people profile "kschemelinin" contact #1',
-      ),
+        'people profile "kschemelinin" contact #1'
+      )
     ).toMatchObject({
       display: '@Kirill_ZemlyaMO',
-      href: 'https://t.me/Kirill_ZemlyaMO',
+      href: 'https://t.me/Kirill_ZemlyaMO'
     });
 
     expect(
       mapRawPersonContact(
         {
           type: 'telegram',
-          value: '@Kirill_ZemlyaMO',
+          value: '@Kirill_ZemlyaMO'
         },
-        'people profile "kschemelinin" contact #1',
-      ),
+        'people profile "kschemelinin" contact #1'
+      )
     ).toMatchObject({
       display: '@Kirill_ZemlyaMO',
-      href: 'https://t.me/Kirill_ZemlyaMO',
+      href: 'https://t.me/Kirill_ZemlyaMO'
     });
   });
 
@@ -57,13 +57,13 @@ describe('mapRawPersonContact', () => {
       mapRawPersonContact(
         {
           type: 'phone',
-          value: '+7 (916) 555-12-34',
+          value: '+7 (916) 555-12-34'
         },
-        'people profile "kschemelinin" contact #1',
-      ),
+        'people profile "kschemelinin" contact #1'
+      )
     ).toMatchObject({
       display: '+7 (916) 555-12-34',
-      href: 'tel:+79165551234',
+      href: 'tel:+79165551234'
     });
   });
 });
@@ -73,8 +73,8 @@ describe('describePersonProfile', () => {
     expect(
       describePersonProfile({
         name: 'Кирилл Щемелинин',
-        body: 'Первый абзац с [ссылкой](https://example.com).\n\nВторой абзац.',
-      }),
+        body: 'Первый абзац с [ссылкой](https://example.com).\n\nВторой абзац.'
+      })
     ).toBe('Первый абзац с ссылкой.');
   });
 
@@ -82,8 +82,8 @@ describe('describePersonProfile', () => {
     expect(
       describePersonProfile({
         name: 'Андрей Петров',
-        body: 'Как отметил [Кирилл Щемелинин](/people/kschemelinin/), проблема редкая.',
-      }),
+        body: 'Как отметил [Кирилл Щемелинин](/people/kschemelinin/), проблема редкая.'
+      })
     ).toBe('Как отметил Кирилл Щемелинин, проблема редкая.');
   });
 
@@ -93,11 +93,9 @@ describe('describePersonProfile', () => {
         name: 'Кирилл Щемелинин',
         company: 'ОК "Комфорт"',
         position: 'Исполняющий обязанности директора по эксплуатации',
-        body: '',
-      }),
-    ).toBe(
-      'Кирилл Щемелинин — Исполняющий обязанности директора по эксплуатации, ОК "Комфорт".',
-    );
+        body: ''
+      })
+    ).toBe('Кирилл Щемелинин — Исполняющий обязанности директора по эксплуатации, ОК "Комфорт".');
   });
 });
 
@@ -106,8 +104,8 @@ describe('formatPersonHeadline', () => {
     expect(
       formatPersonHeadline({
         company: 'ОК "Комфорт"',
-        position: 'Исполняющий обязанности директора по эксплуатации',
-      }),
+        position: 'Исполняющий обязанности директора по эксплуатации'
+      })
     ).toBe('Исполняющий обязанности директора по эксплуатации, ОК "Комфорт"');
   });
 });
@@ -117,15 +115,15 @@ describe('formatPersonContactCompactDisplay', () => {
     expect(
       formatPersonContactCompactDisplay({
         type: 'telegram',
-        display: '@Kirill_ZemlyaMO',
-      }),
+        display: '@Kirill_ZemlyaMO'
+      })
     ).toBe('Kirill_ZemlyaMO');
 
     expect(
       formatPersonContactCompactDisplay({
         type: 'phone',
-        display: '+7 (916) 555-12-34',
-      }),
+        display: '+7 (916) 555-12-34'
+      })
     ).toBe('+7 (916) 555-12-34');
   });
 });
@@ -146,8 +144,8 @@ describe('buildPersonMarkdown', () => {
           type: 'telegram',
           value: '@Kirill_ZemlyaMO',
           display: '@Kirill_ZemlyaMO',
-          href: 'https://t.me/Kirill_ZemlyaMO',
-        },
+          href: 'https://t.me/Kirill_ZemlyaMO'
+        }
       ],
       body: 'Публичный профиль с контекстом.',
       mentions: [],
@@ -162,8 +160,8 @@ describe('buildPersonMarkdown', () => {
             markdownUrl: '/news/2026/05/electricity/index.md',
             excerpt: 'Основной текст про Кирилла Щемелинина.',
             mentionedAt: '2026-05-03T09:00:00+03:00',
-            sortKey: 1,
-          },
+            sortKey: 1
+          }
         ],
         status: [
           {
@@ -171,14 +169,12 @@ describe('buildPersonMarkdown', () => {
             kind: 'incident',
             sourceId: '2026/04/electricity-river-10kv-line-damage',
             title: 'Отключение электричества в Шелково Ривер',
-            htmlUrl:
-              '/status/incidents/2026/04/electricity-river-10kv-line-damage/',
-            markdownUrl:
-              '/status/incidents/2026/04/electricity-river-10kv-line-damage/index.md',
+            htmlUrl: '/status/incidents/2026/04/electricity-river-10kv-line-damage/',
+            markdownUrl: '/status/incidents/2026/04/electricity-river-10kv-line-damage/index.md',
             excerpt: 'Как отметил Кирилл Щемелинин, повреждение было редким.',
             mentionedAt: '2026-04-22T11:30:00+03:00',
-            sortKey: 2,
-          },
+            sortKey: 2
+          }
         ],
         reviews: [],
         places: [
@@ -191,12 +187,12 @@ describe('buildPersonMarkdown', () => {
             markdownUrl: '/map/titanic/index.md',
             excerpt: 'Площадку показал Кирилл Щемелинин.',
             mentionedAt: '2026-08-19T00:00:00.000Z',
-            sortKey: 3,
-          },
+            sortKey: 3
+          }
         ],
         people: [],
-        contacts: [],
-      },
+        contacts: []
+      }
     };
 
     const markdown = buildPersonMarkdown(profile);
@@ -255,7 +251,7 @@ describe('buildPersonMarkdown', () => {
         '',
         '### Роль',
         '',
-        'Помогает с [инцидентами](/status/index.md).',
+        'Помогает с [инцидентами](/status/index.md).'
       ].join('\n'),
       mentions: [],
       backlinks: {
@@ -264,8 +260,8 @@ describe('buildPersonMarkdown', () => {
         reviews: [],
         places: [],
         people: [],
-        contacts: [],
-      },
+        contacts: []
+      }
     };
 
     const markdown = buildPersonMarkdown(profile);
@@ -307,8 +303,8 @@ describe('buildPersonMarkdown', () => {
           type: 'phone',
           value: '+7 (967) 246-37-49',
           display: '+7 (967) 246-37-49',
-          href: 'tel:+79672463749',
-        },
+          href: 'tel:+79672463749'
+        }
       ],
       body: '',
       mentions: [],
@@ -318,8 +314,8 @@ describe('buildPersonMarkdown', () => {
         reviews: [],
         places: [],
         people: [],
-        contacts: [],
-      },
+        contacts: []
+      }
     };
 
     const markdown = buildPersonMarkdown(profile);

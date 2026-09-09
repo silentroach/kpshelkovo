@@ -6,14 +6,9 @@ import {
   buildNewsArticleMarkdown,
   buildNewsHomeMarkdown,
   buildNewsMonthMarkdown,
-  buildNewsYearMarkdown,
+  buildNewsYearMarkdown
 } from './markdown';
-import type {
-  NewsArticle,
-  NewsDataset,
-  NewsMonthArchive,
-  NewsYearArchive,
-} from './types';
+import type { NewsArticle, NewsDataset, NewsMonthArchive, NewsYearArchive } from './types';
 
 const article = (input?: Partial<NewsArticle>): NewsArticle => ({
   id: '2026/05/ktp-upgrade',
@@ -21,7 +16,7 @@ const article = (input?: Partial<NewsArticle>): NewsArticle => ({
   author: {
     id: 'ig',
     name: 'Инициативная группа',
-    kind: 'community',
+    kind: 'community'
   },
   year: 2026,
   month: 5,
@@ -39,8 +34,8 @@ const article = (input?: Partial<NewsArticle>): NewsArticle => ({
     {
       label: 'электричество',
       key: 'электричество',
-      url: '/news/tags/электричество/',
-    },
+      url: '/news/tags/электричество/'
+    }
   ],
   pinned: false,
   sourceUrl: 'https://example.com/source',
@@ -50,7 +45,7 @@ const article = (input?: Partial<NewsArticle>): NewsArticle => ({
   summary: 'Краткое описание новости.',
   body: 'Текст новости.',
   mentions: [],
-  ...input,
+  ...input
 });
 
 const monthArchive = (year: number, month: number): NewsMonthArchive => ({
@@ -61,23 +56,20 @@ const monthArchive = (year: number, month: number): NewsMonthArchive => ({
   markdownUrl: `/news/${year}/${String(month).padStart(2, '0')}/index.md`,
   count: 1,
   summary: {
-    body: 'Главное за месяц: [модернизация подстанций](/news/2026/05/ktp-upgrade/).',
+    body: 'Главное за месяц: [модернизация подстанций](/news/2026/05/ktp-upgrade/).'
   },
-  articles: [article({ year, month })],
+  articles: [article({ year, month })]
 });
 
-const yearArchive = (
-  year: number,
-  months: readonly NewsMonthArchive[],
-): NewsYearArchive => ({
+const yearArchive = (year: number, months: readonly NewsMonthArchive[]): NewsYearArchive => ({
   year,
   url: `/news/${year}/`,
   markdownUrl: `/news/${year}/index.md`,
   count: months.reduce((total, month) => total + month.count, 0),
   summary: {
-    body: 'Главное за год собрано из месячных выжимок.',
+    body: 'Главное за год собрано из месячных выжимок.'
   },
-  months,
+  months
 });
 
 describe('buildNewsArticleMarkdown', () => {
@@ -85,30 +77,27 @@ describe('buildNewsArticleMarkdown', () => {
     ['official', 'official'],
     ['community', 'community'],
     ['editorial', 'editorial'],
-    ['other', 'other'],
-  ] as const)(
-    'publishes domain author kind %s as public kind %s',
-    (domainKind, publicKind) => {
-      const markdown = buildNewsArticleMarkdown(
-        article({
-          author: {
-            id: 'source',
-            name: 'Источник',
-            kind: domainKind,
-          },
-        }),
-      );
-      const frontmatter = parse(
-        markdown.slice(4, markdown.indexOf('\n---', 4)),
-      ) as { readonly author: { readonly kind: string } };
+    ['other', 'other']
+  ] as const)('publishes domain author kind %s as public kind %s', (domainKind, publicKind) => {
+    const markdown = buildNewsArticleMarkdown(
+      article({
+        author: {
+          id: 'source',
+          name: 'Источник',
+          kind: domainKind
+        }
+      })
+    );
+    const frontmatter = parse(markdown.slice(4, markdown.indexOf('\n---', 4))) as {
+      readonly author: { readonly kind: string };
+    };
 
-      expect(frontmatter.author.kind).toBe(publicKind);
-    },
-  );
+    expect(frontmatter.author.kind).toBe(publicKind);
+  });
 
   it('puts article metadata into YAML frontmatter without officialness flags', () => {
     const markdown = buildNewsArticleMarkdown(
-      article({ searchAliases: ['служебный поисковый алиас'] }),
+      article({ searchAliases: ['служебный поисковый алиас'] })
     );
 
     expect(markdown).toMatchInlineSnapshot(`
@@ -140,8 +129,8 @@ describe('buildNewsArticleMarkdown', () => {
     const markdown = buildNewsArticleMarkdown(
       article({
         appliesToAllAreas: true,
-        areas: ['river', 'forest', 'park', 'village'],
-      }),
+        areas: ['river', 'forest', 'park', 'village']
+      })
     );
 
     expect(markdown).not.toContain('\nareas:\n');
@@ -156,8 +145,8 @@ ignored: true
 
 Текст с [важной ссылкой](https://example.com/body).
 
-- первый пункт`,
-      }),
+- первый пункт`
+      })
     );
 
     expect(markdown).toMatchInlineSnapshot(`
@@ -196,14 +185,13 @@ ignored: true
             height: 960,
             alt: 'Протокол проверки воды',
             caption:
-              'Протокол **проверил** [Кирилл Щемелинин](/people/kschemelinin/) и [уточнил ошибку](https://example.com/correction).\n\nФото предоставили жители.',
-          },
-        ],
-      }),
+              'Протокол **проверил** [Кирилл Щемелинин](/people/kschemelinin/) и [уточнил ошибку](https://example.com/correction).\n\nФото предоставили жители.'
+          }
+        ]
+      })
     );
 
-    expect(markdown.slice(markdown.indexOf('— подпись: ')))
-      .toMatchInlineSnapshot(`
+    expect(markdown.slice(markdown.indexOf('— подпись: '))).toMatchInlineSnapshot(`
       "— подпись: Протокол **проверил** [Кирилл Щемелинин](/people/kschemelinin/) и [уточнил ошибку](https://example.com/correction).
 
         Фото предоставили жители.
@@ -220,24 +208,19 @@ ignored: true
             width: 1280,
             height: 960,
             alt: 'Первый протокол',
-            caption:
-              '[Исправление][source]\n\n[source]: https://example.com/first',
+            caption: '[Исправление][source]\n\n[source]: https://example.com/first'
           },
           {
             url: 'https://media.kpshelkovo.online/news/2026/05/ktp-upgrade/second.jpeg',
             width: 1280,
             height: 960,
             alt: 'Второй протокол',
-            caption:
-              '[Уточнение][source]\n\n[source]: https://example.com/second',
-          },
-        ],
-      }),
+            caption: '[Уточнение][source]\n\n[source]: https://example.com/second'
+          }
+        ]
+      })
     );
-    const captions = Array.from(
-      markdown.matchAll(/— подпись: (.+)$/gmu),
-      (match) => match[1],
-    );
+    const captions = Array.from(markdown.matchAll(/— подпись: (.+)$/gmu), (match) => match[1]);
 
     expect(captions).toMatchInlineSnapshot(`
       [
@@ -258,11 +241,11 @@ ignored: true
           markdownUrl: '/news/2026/05/index.md',
           count: 1,
           summary: {
-            body: 'Главное за месяц: [модернизация подстанций](/news/2026/05/ktp-upgrade/).',
+            body: 'Главное за месяц: [модернизация подстанций](/news/2026/05/ktp-upgrade/).'
           },
-          articles: [article()],
-        },
-      }),
+          articles: [article()]
+        }
+      })
     ).toMatchInlineSnapshot(`
       "# Новости Шелково за май 2026 г.
 
@@ -276,12 +259,9 @@ ignored: true
   });
 
   it('keeps year archives as oldest-first month directories', () => {
-    const current = yearArchive(2026, [
-      monthArchive(2026, 5),
-      monthArchive(2026, 4),
-    ]);
+    const current = yearArchive(2026, [monthArchive(2026, 5), monthArchive(2026, 4)]);
     const markdown = buildNewsYearMarkdown({
-      archive: current,
+      archive: current
     });
 
     expect(markdown).toMatchInlineSnapshot(`
@@ -300,8 +280,7 @@ ignored: true
     const current = yearArchive(2026, [monthArchive(2026, 5)]);
     const previous = yearArchive(2025, [monthArchive(2025, 12)]);
 
-    expect(buildNewsArchiveMarkdown([current, previous]))
-      .toMatchInlineSnapshot(`
+    expect(buildNewsArchiveMarkdown([current, previous])).toMatchInlineSnapshot(`
       "# Архив новостей Шелково
 
       - [Новости за 2026 год](https://kpshelkovo.online/news/2026/index.md)
@@ -320,15 +299,15 @@ ignored: true
       archives: {
         years: [year],
         byYear: new Map([[year.year, year]]),
-        byMonth: new Map([[month.id, month]]),
+        byMonth: new Map([[month.id, month]])
       },
       tags: [],
       byId: new Map([[latestArticle.id, latestArticle]]),
-      byTag: new Map(),
+      byTag: new Map()
     };
 
     expect(buildNewsHomeMarkdown(data)).toContain(
-      '[Архив новостей](https://kpshelkovo.online/news/archive/index.md)',
+      '[Архив новостей](https://kpshelkovo.online/news/archive/index.md)'
     );
   });
 });

@@ -6,7 +6,7 @@ export const CONTACT_CATEGORIES = [
   'waste-removal',
   'education',
   'garden',
-  'food',
+  'food'
 ] as const;
 export type ContactCategory = (typeof CONTACT_CATEGORIES)[number];
 
@@ -16,8 +16,7 @@ export type ContactReviewSentiment = (typeof CONTACT_REVIEW_SENTIMENTS)[number];
 export const CONTACT_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export const CONTACT_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
-export const isContactSlug = (value: string): boolean =>
-  CONTACT_SLUG.test(value);
+export const isContactSlug = (value: string): boolean => CONTACT_SLUG.test(value);
 
 export const isContactCategory = (value: string): value is ContactCategory =>
   CONTACT_CATEGORIES.includes(value as ContactCategory);

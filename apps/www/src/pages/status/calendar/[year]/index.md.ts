@@ -9,16 +9,11 @@ import { statusCalendarYearStaticPaths } from '@/lib/status/routes';
 export const prerender = true;
 
 export const getStaticPaths = (async () =>
-  statusCalendarYearStaticPaths(
-    (await loadStatusData()).calendar,
-  )) satisfies GetStaticPaths;
+  statusCalendarYearStaticPaths((await loadStatusData()).calendar)) satisfies GetStaticPaths;
 
 export const GET: APIRoute = async ({ params }) => {
   const year = Number(params.year);
-  const calendar = buildStatusCalendarYearGrid(
-    (await loadStatusData()).calendar,
-    year,
-  );
+  const calendar = buildStatusCalendarYearGrid((await loadStatusData()).calendar, year);
 
   return createMarkdownResponse(buildStatusYearMarkdown(calendar));
 };

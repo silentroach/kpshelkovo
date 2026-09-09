@@ -1,15 +1,8 @@
 const STATUS_TIMELINE_SELECTOR = '[data-status-timeline]';
 const STATUS_TIMELINE_PROBLEM_SELECTOR = '[data-status-problem]';
-const STATUS_TIMELINE_INTENT_EVENTS = [
-  'pointerover',
-  'focusin',
-  'touchstart',
-] as const;
+const STATUS_TIMELINE_INTENT_EVENTS = ['pointerover', 'focusin', 'touchstart'] as const;
 
-type StatusTimelineDomModule = Pick<
-  typeof import('./timeline.dom'),
-  'hydrateStatusTimelines'
->;
+type StatusTimelineDomModule = Pick<typeof import('./timeline.dom'), 'hydrateStatusTimelines'>;
 
 type StatusTimelineDomLoader = () => Promise<StatusTimelineDomModule>;
 
@@ -18,9 +11,7 @@ const boundDocuments = new WeakSet<Document>();
 const hasStatusTimelines = (rootDocument: Document): boolean =>
   Boolean(rootDocument.querySelector(STATUS_TIMELINE_SELECTOR));
 
-const getStatusTimelineTrigger = (
-  target: EventTarget | undefined,
-): HTMLElement | undefined => {
+const getStatusTimelineTrigger = (target: EventTarget | undefined): HTMLElement | undefined => {
   if (!(target instanceof Element)) {
     return undefined;
   }
@@ -36,7 +27,7 @@ const getStatusTimelineTrigger = (
 
 const replayStatusTimelineIntent = (
   trigger: HTMLElement,
-  sourceEventType: string | undefined,
+  sourceEventType: string | undefined
 ): void => {
   if (!trigger.isConnected) {
     return;
@@ -57,8 +48,7 @@ const replayStatusTimelineIntent = (
 
 export const bindStatusTimelineLazyHydration = (
   rootDocument: Document = document,
-  loadStatusTimelineDom: StatusTimelineDomLoader = () =>
-    import('./timeline.dom'),
+  loadStatusTimelineDom: StatusTimelineDomLoader = () => import('./timeline.dom')
 ): void => {
   if (boundDocuments.has(rootDocument)) {
     return;
@@ -91,9 +81,7 @@ export const bindStatusTimelineLazyHydration = (
     hasIntentListeners = true;
   };
 
-  const loadDomModule = async (): Promise<
-    StatusTimelineDomModule | undefined
-  > => {
+  const loadDomModule = async (): Promise<StatusTimelineDomModule | undefined> => {
     try {
       domModulePromise ??= loadStatusTimelineDom();
 

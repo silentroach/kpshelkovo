@@ -6,14 +6,11 @@ const areaLabels = [
   ['river', 'Шелково Ривер'],
   ['forest', 'Шелково Форест'],
   ['park', 'Шелково Парк'],
-  ['village', 'Шелково Вилладж'],
+  ['village', 'Шелково Вилладж']
 ] as const;
 
 describe('formatArea', () => {
-  it.each(areaLabels)(
-    'formats %s as a stable public label from GLOSSARY.md',
-    (area, label) => {
-      expect(formatArea(area)).toBe(label);
-    },
-  );
+  it.each(areaLabels)('formats %s as a stable public label from GLOSSARY.md', (area, label) => {
+    expect(formatArea(area)).toBe(label);
+  });
 });

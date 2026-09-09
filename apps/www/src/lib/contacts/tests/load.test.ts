@@ -6,7 +6,7 @@ import { createPersonMentionTarget } from '@/lib/people/mentions';
 import type { ContactEntry } from '../load';
 
 const mocks = vi.hoisted(() => ({
-  renderMarkdown: vi.fn(),
+  renderMarkdown: vi.fn()
 }));
 
 vi.mock('@/lib/markdown/render', async (importOriginal) => {
@@ -14,7 +14,7 @@ vi.mock('@/lib/markdown/render', async (importOriginal) => {
 
   return {
     ...actual,
-    renderMarkdown: mocks.renderMarkdown,
+    renderMarkdown: mocks.renderMarkdown
   };
 });
 
@@ -23,7 +23,7 @@ let buildContactsDataset: typeof import('../load').buildContactsDataset;
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ buildContactsDataset } = await import('../load'));
@@ -46,10 +46,10 @@ const entry = (input: {
     category: 'fence',
     updated_at: '2026-07-06',
     contacts: {
-      phone: '+7 900 000-00-00',
+      phone: '+7 900 000-00-00'
     },
-    ...input.data,
-  },
+    ...input.data
+  }
 });
 
 describe('buildContactsDataset', () => {
@@ -70,30 +70,27 @@ describe('buildContactsDataset', () => {
         data: {
           title: 'Анна',
           seo: {
-            description: 'Контакт по заборам для жителей Шелково.',
+            description: 'Контакт по заборам для жителей Шелково.'
           },
-          search_aliases: ['где заказать забор'],
-        },
-      }),
+          search_aliases: ['где заказать забор']
+        }
+      })
     ]);
 
-    expect(data.contacts.map((item) => item.slug)).toEqual([
-      'first-fence',
-      'second-fence',
-    ]);
+    expect(data.contacts.map((item) => item.slug)).toEqual(['first-fence', 'second-fence']);
     expect(data.byRoute.get('fence/first-fence')).toMatchObject({
       canonical: 'https://kpshelkovo.online/sarafan/fence/first-fence/',
       markdownUrl: '/sarafan/fence/first-fence/index.md',
       url: '/sarafan/fence/first-fence/',
       title: 'Анна',
-      searchAliases: ['где заказать забор'],
+      searchAliases: ['где заказать забор']
     });
     expect(data.categories).toMatchObject([
       {
         category: 'fence',
         markdownUrl: '/sarafan/fence/index.md',
-        url: '/sarafan/fence/',
-      },
+        url: '/sarafan/fence/'
+      }
     ]);
   });
 
@@ -102,22 +99,22 @@ describe('buildContactsDataset', () => {
       entry({ id: 'fence/fence', data: { category: 'fence' } }),
       entry({
         id: 'education/education',
-        data: { category: 'education' },
+        data: { category: 'education' }
       }),
       entry({ id: 'garden/garden', data: { category: 'garden' } }),
       entry({
         id: 'waste-removal/waste-removal',
-        data: { category: 'waste-removal' },
+        data: { category: 'waste-removal' }
       }),
       entry({
         id: 'construction/construction',
-        data: { category: 'construction' },
+        data: { category: 'construction' }
       }),
       entry({ id: 'furniture/furniture', data: { category: 'furniture' } }),
       entry({
         id: 'electricity/electricity',
-        data: { category: 'electricity' },
-      }),
+        data: { category: 'electricity' }
+      })
     ]);
 
     expect(data.categories.map((item) => item.category)).toEqual([
@@ -127,21 +124,19 @@ describe('buildContactsDataset', () => {
       'fence',
       'waste-removal',
       'education',
-      'garden',
+      'garden'
     ]);
   });
 
   it('gives blank-body contacts reachable detail URLs', () => {
-    const data = buildContactsDataset([
-      entry({ id: 'fence/blank-body', body: '' }),
-    ]);
+    const data = buildContactsDataset([entry({ id: 'fence/blank-body', body: '' })]);
     const contact = data.byRoute.get('fence/blank-body');
 
     expect({
       body: contact?.body,
       canonical: contact?.canonical,
       markdownUrl: contact?.markdownUrl,
-      url: contact?.url,
+      url: contact?.url
     }).toMatchInlineSnapshot(`
       {
         "body": "",
@@ -154,21 +149,21 @@ describe('buildContactsDataset', () => {
 
   it('preprocesses body mentions with the app-level registry when provided', () => {
     const registry = createSiteMentionRegistry([
-      createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин'),
+      createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин')
     ]);
     const data = buildContactsDataset(
       [
         entry({
           id: 'fence/with-mention',
-          body: 'Работал у @kschemelinin на участке.',
-        }),
+          body: 'Работал у @kschemelinin на участке.'
+        })
       ],
-      { mentionRegistry: registry },
+      { mentionRegistry: registry }
     );
 
     expect(data.contacts[0]).toMatchObject({
       body: 'Работал у [Кирилл Щемелинин](/people/kschemelinin/) на участке.',
-      mentions: [expect.objectContaining({ slug: 'kschemelinin' })],
+      mentions: [expect.objectContaining({ slug: 'kschemelinin' })]
     });
   });
 
@@ -182,11 +177,11 @@ describe('buildContactsDataset', () => {
               sentiment: 'positive',
               summary: 'Помог с **электричеством**.',
               published_at: '2026-04-07',
-              url: 'https://t.me/example/1',
-            },
-          ],
-        },
-      }),
+              url: 'https://t.me/example/1'
+            }
+          ]
+        }
+      })
     ]);
 
     expect(data.contacts[0]?.reviews).toMatchInlineSnapshot(`
@@ -212,14 +207,14 @@ describe('buildContactsDataset', () => {
             enable: true,
             kind: 'person',
             name: { family: 'Петров', given: 'Иван' },
-            note: 'Устанавливает заборы.',
-          },
-        },
+            note: 'Устанавливает заборы.'
+          }
+        }
       }),
       entry({
         id: 'fence/without-vcard',
-        data: { vcf: { enable: false } },
-      }),
+        data: { vcf: { enable: false } }
+      })
     ]);
 
     expect(data.byRoute.get('fence/with-vcard')?.vcf).toMatchInlineSnapshot(`
@@ -249,20 +244,16 @@ describe('buildContactsDataset', () => {
 
   it('fails when entry id does not match frontmatter slug', () => {
     expect(() =>
-      buildContactsDataset([
-        entry({ id: 'fence/wrong-id', data: { slug: 'real-slug' } }),
-      ]),
-    ).toThrow(
-      'contact "fence/wrong-id" id must equal category and slug "fence/real-slug"',
-    );
+      buildContactsDataset([entry({ id: 'fence/wrong-id', data: { slug: 'real-slug' } })])
+    ).toThrow('contact "fence/wrong-id" id must equal category and slug "fence/real-slug"');
   });
 
   it('fails on duplicate routes', () => {
     expect(() =>
       buildContactsDataset([
         entry({ id: 'fence/same-slug' }),
-        entry({ id: 'fence/same-slug', data: { title: 'Другой контакт' } }),
-      ]),
+        entry({ id: 'fence/same-slug', data: { title: 'Другой контакт' } })
+      ])
     ).toThrow('duplicate contact route "fence/same-slug"');
   });
 });

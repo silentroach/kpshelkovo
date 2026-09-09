@@ -3,7 +3,7 @@ import {
   createMarkdownDocument,
   md,
   parseMarkdownFragment,
-  serializeMarkdownDocument,
+  serializeMarkdownDocument
 } from '@shelkovo/markdown';
 
 import { absoluteUrl } from '@/lib/site';
@@ -11,28 +11,25 @@ import { absoluteUrl } from '@/lib/site';
 import {
   meetingMarkdownPath,
   meetingTranscriptPartMarkdownPath,
-  meetingsMarkdownPath,
+  meetingsMarkdownPath
 } from './routes';
 import type {
   Meeting,
   MeetingSpeaker,
   MeetingTranscriptPart,
-  MeetingTranscriptSegment,
+  MeetingTranscriptSegment
 } from './types';
 import {
   formatMeetingDate,
   formatMeetingSourceLabel,
   formatTranscriptPartLabel,
-  formatTranscriptTime,
+  formatTranscriptTime
 } from './view';
 
 type MarkdownNode = ReturnType<typeof parseMarkdownFragment>[number];
 type MarkdownListItem = ReturnType<typeof md.listItem>;
 type MarkdownParagraph = ReturnType<typeof md.paragraph>;
-type MarkdownListItemChildren = Exclude<
-  Parameters<typeof md.listItem>[0],
-  string
->;
+type MarkdownListItemChildren = Exclude<Parameters<typeof md.listItem>[0], string>;
 type MarkdownBlockContent = MarkdownListItemChildren[number];
 
 const serialize = (children: readonly MarkdownNode[]): string =>
@@ -55,7 +52,7 @@ const segmentCount = (meeting: Meeting): string =>
   count(meeting.transcript.segments.length, [
     'фрагмент транскрипта',
     'фрагмента транскрипта',
-    'фрагментов транскрипта',
+    'фрагментов транскрипта'
   ]);
 
 const partsCount = (meeting: Meeting): string =>
@@ -78,62 +75,41 @@ const meetingLine = (meeting: Meeting): MarkdownListItem =>
     md.paragraph([
       md.link(abs(meetingMarkdownPath(meeting.slug)), meeting.title),
       md.text(
-        ` — ${formatMeetingDate(meeting.date)}; ${partsCount(meeting)}, ${segmentCount(meeting)}.`,
-      ),
+        ` — ${formatMeetingDate(meeting.date)}; ${partsCount(meeting)}, ${segmentCount(meeting)}.`
+      )
     ]),
-    md.paragraph(inline(meeting.context)),
+    md.paragraph(inline(meeting.context))
   ]);
 
 const speakerLine = (speaker: MeetingSpeaker): MarkdownListItem => {
-  const label = speaker.url
-    ? [md.link(abs(speaker.url), speaker.label)]
-    : [md.text(speaker.label)];
+  const label = speaker.url ? [md.link(abs(speaker.url), speaker.label)] : [md.text(speaker.label)];
 
   return md.listItem([
     md.paragraph([
       ...label,
-      ...(speaker.description
-        ? [md.text(` — ${inline(speaker.description)}`)]
-        : []),
-    ]),
+      ...(speaker.description ? [md.text(` — ${inline(speaker.description)}`)] : [])
+    ])
   ]);
 };
 
-const transcriptPartUrl = (
-  meeting: Meeting,
-  part: MeetingTranscriptPart,
-): string => abs(meetingTranscriptPartMarkdownPath(meeting.slug, part.index));
+const transcriptPartUrl = (meeting: Meeting, part: MeetingTranscriptPart): string =>
+  abs(meetingTranscriptPartMarkdownPath(meeting.slug, part.index));
 
-const transcriptPartLine = (
-  meeting: Meeting,
-  part: MeetingTranscriptPart,
-): MarkdownListItem =>
+const transcriptPartLine = (meeting: Meeting, part: MeetingTranscriptPart): MarkdownListItem =>
   md.listItem([
     md.paragraph([
-      md.link(
-        transcriptPartUrl(meeting, part),
-        formatTranscriptPartLabel(part),
-      ),
-      md.text(` — ${partSegmentCount(part)}; ${partRange(part)}.`),
-    ]),
+      md.link(transcriptPartUrl(meeting, part), formatTranscriptPartLabel(part)),
+      md.text(` — ${partSegmentCount(part)}; ${partRange(part)}.`)
+    ])
   ]);
 
-const segmentLead = (
-  meeting: Meeting,
-  segment: MeetingTranscriptSegment,
-): MarkdownParagraph =>
+const segmentLead = (meeting: Meeting, segment: MeetingTranscriptSegment): MarkdownParagraph =>
   md.paragraph([
-    md.link(
-      abs(`${meeting.url}#${segment.anchor}`),
-      formatTranscriptTime(segment.start),
-    ),
-    md.text(` — ${segment.speaker.label}: `),
+    md.link(abs(`${meeting.url}#${segment.anchor}`), formatTranscriptTime(segment.start)),
+    md.text(` — ${segment.speaker.label}: `)
   ]);
 
-const segmentLine = (
-  meeting: Meeting,
-  segment: MeetingTranscriptSegment,
-): MarkdownListItem => {
+const segmentLine = (meeting: Meeting, segment: MeetingTranscriptSegment): MarkdownListItem => {
   const lead = segmentLead(meeting, segment);
   const blocks = segmentTextBlocks(segment.textMarkdown);
   const [first, ...rest] = blocks;
@@ -143,11 +119,11 @@ const segmentLine = (
       [
         {
           ...lead,
-          children: [...lead.children, ...first.children],
+          children: [...lead.children, ...first.children]
         },
-        ...rest,
+        ...rest
       ],
-      { spread: blocks.length > 1 },
+      { spread: blocks.length > 1 }
     );
   }
 
@@ -156,14 +132,10 @@ const segmentLine = (
 
 const navigationItems = (
   meeting: Meeting,
-  part: MeetingTranscriptPart,
+  part: MeetingTranscriptPart
 ): readonly MarkdownListItem[] => {
-  const previous = meeting.transcript.parts.find(
-    (item) => item.index === part.index - 1,
-  );
-  const next = meeting.transcript.parts.find(
-    (item) => item.index === part.index + 1,
-  );
+  const previous = meeting.transcript.parts.find((item) => item.index === part.index - 1);
+  const next = meeting.transcript.parts.find((item) => item.index === part.index + 1);
 
   return [
     linkedItem('HTML-страница встречи', abs(meeting.url)),
@@ -172,44 +144,40 @@ const navigationItems = (
       ? [
           linkedItem(
             `Предыдущая часть: ${formatTranscriptPartLabel(previous)}`,
-            transcriptPartUrl(meeting, previous),
-          ),
+            transcriptPartUrl(meeting, previous)
+          )
         ]
       : []),
     ...(next
       ? [
           linkedItem(
             `Следующая часть: ${formatTranscriptPartLabel(next)}`,
-            transcriptPartUrl(meeting, next),
-          ),
+            transcriptPartUrl(meeting, next)
+          )
         ]
-      : []),
+      : [])
   ];
 };
 
-export const buildMeetingsIndexMarkdown = (
-  meetings: readonly Meeting[],
-): string => {
+export const buildMeetingsIndexMarkdown = (meetings: readonly Meeting[]): string => {
   const segments = meetings.reduce(
     (total, meeting) => total + meeting.transcript.segments.length,
-    0,
+    0
   );
 
   return serialize([
     md.heading(1, 'Архив встреч'),
     md.paragraph(
-      'Компактный Markdown-индекс встреч для автоматического чтения. Полные транскрипты не встраиваются в этот файл: открывайте описание нужной встречи и затем файлы транскрипта по частям.',
+      'Компактный Markdown-индекс встреч для автоматического чтения. Полные транскрипты не встраиваются в этот файл: открывайте описание нужной встречи и затем файлы транскрипта по частям.'
     ),
     md.paragraph(
-      'Публичного HTML-индекса `/meetings/` нет; канонические страницы встреч доступны по прямым ссылкам из новостей, документов и обсуждений.',
+      'Публичного HTML-индекса `/meetings/` нет; канонические страницы встреч доступны по прямым ссылкам из новостей, документов и обсуждений.'
     ),
     md.heading(2, 'Сводка'),
     md.list([
+      md.listItem(`Опубликовано ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}.`),
       md.listItem(
-        `Опубликовано ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}.`,
-      ),
-      md.listItem(
-        `В архиве сейчас ${count(segments, ['фрагмент транскрипта', 'фрагмента транскрипта', 'фрагментов транскрипта'])}.`,
+        `В архиве сейчас ${count(segments, ['фрагмент транскрипта', 'фрагмента транскрипта', 'фрагментов транскрипта'])}.`
       ),
       md.listItem([
         md.paragraph([
@@ -219,16 +187,16 @@ export const buildMeetingsIndexMarkdown = (
           md.inlineCode('/meetings/[slug]/index.md'),
           md.text('; полный текст: '),
           md.inlineCode('/meetings/[slug]/transcript/[part].md'),
-          md.text('.'),
-        ]),
-      ]),
+          md.text('.')
+        ])
+      ])
     ]),
     md.heading(2, 'Встречи'),
     md.list(
       meetings.length > 0
         ? meetings.map(meetingLine)
-        : [md.listItem('Встречи пока не опубликованы.')],
-    ),
+        : [md.listItem('Встречи пока не опубликованы.')]
+    )
   ]);
 };
 
@@ -241,48 +209,35 @@ export const buildMeetingMarkdown = (meeting: Meeting): string =>
       linkedItem('HTML-страница встречи', abs(meeting.url)),
       linkedItem('Индекс архива встреч', abs(meetingsMarkdownPath())),
       ...meeting.sourceUrls.map((sourceUrl, index) =>
-        linkedItem(
-          formatMeetingSourceLabel(meeting.sourceUrls.length, index),
-          sourceUrl,
-        ),
-      ),
+        linkedItem(formatMeetingSourceLabel(meeting.sourceUrls.length, index), sourceUrl)
+      )
     ]),
     md.heading(2, 'Метаданные'),
     md.list([
       md.listItem(`Дата: ${formatMeetingDate(meeting.date)}.`),
-      md.listItem([
-        md.paragraph([
-          md.text('Slug: '),
-          md.inlineCode(meeting.slug),
-          md.text('.'),
-        ]),
-      ]),
-      md.listItem(
-        `Транскрипт: ${partsCount(meeting)}, ${segmentCount(meeting)}.`,
-      ),
+      md.listItem([md.paragraph([md.text('Slug: '), md.inlineCode(meeting.slug), md.text('.')])]),
+      md.listItem(`Транскрипт: ${partsCount(meeting)}, ${segmentCount(meeting)}.`)
     ]),
     md.heading(2, 'Участники'),
     md.list(meeting.transcript.speakers.map(speakerLine)),
     md.heading(2, 'Файлы транскрипта'),
     md.paragraph(
-      'Описание встречи не дублирует полный текст. Для цитирования используйте ссылки на HTML-якоря внутри файлов транскрипта.',
+      'Описание встречи не дублирует полный текст. Для цитирования используйте ссылки на HTML-якоря внутри файлов транскрипта.'
     ),
-    md.list(
-      meeting.transcript.parts.map((part) => transcriptPartLine(meeting, part)),
-    ),
+    md.list(meeting.transcript.parts.map((part) => transcriptPartLine(meeting, part)))
   ]);
 
 export const buildMeetingTranscriptPartMarkdown = (
   meeting: Meeting,
-  part: MeetingTranscriptPart,
+  part: MeetingTranscriptPart
 ): string =>
   serialize([
     md.heading(1, `${meeting.title}: ${formatTranscriptPartLabel(part)}`),
     md.paragraph(
-      `Полный текст ${formatTranscriptPartLabel(part).toLowerCase()} транскрипта. Время начинается внутри этой части записи; ссылки ведут на соответствующие HTML-якоря страницы встречи.`,
+      `Полный текст ${formatTranscriptPartLabel(part).toLowerCase()} транскрипта. Время начинается внутри этой части записи; ссылки ведут на соответствующие HTML-якоря страницы встречи.`
     ),
     md.heading(2, 'Навигация'),
     md.list(navigationItems(meeting, part)),
     md.heading(2, 'Транскрипт'),
-    md.list(part.segments.map((segment) => segmentLine(meeting, segment))),
+    md.list(part.segments.map((segment) => segmentLine(meeting, segment)))
   ]);

@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { buildSiteMentionRegistry } from '../registry';
-import type {
-  SiteMentionPersonEntry,
-  SiteMentionPlaceEntry,
-} from '../registry.types';
+import type { SiteMentionPersonEntry, SiteMentionPlaceEntry } from '../registry.types';
 
 const person = (id = 'kschemelinin'): SiteMentionPersonEntry => ({
   id,
@@ -13,8 +10,8 @@ const person = (id = 'kschemelinin'): SiteMentionPersonEntry => ({
     name_cases: { gen: 'Кирилла Щемелинина' },
     company: 'КПРФ',
     position: 'депутат',
-    contacts: [],
-  },
+    contacts: []
+  }
 });
 
 const place = (id = 'apple-garden'): SiteMentionPlaceEntry => ({
@@ -26,15 +23,14 @@ const place = (id = 'apple-garden'): SiteMentionPlaceEntry => ({
     status: 'existing',
     summary: 'Сад рядом со спортивной площадкой',
     location: {
-      coordinates: { lat: 55.06371, lng: 37.724333 },
-    },
-  },
+      coordinates: { lat: 55.06371, lng: 37.724333 }
+    }
+  }
 });
 
 describe('buildSiteMentionRegistry', () => {
   it('combines people and places before body normalization', () => {
-    expect([...buildSiteMentionRegistry([person()], [place()]).values()])
-      .toMatchInlineSnapshot(`
+    expect([...buildSiteMentionRegistry([person()], [place()]).values()]).toMatchInlineSnapshot(`
         [
           {
             "company": "КПРФ",
@@ -73,9 +69,7 @@ describe('buildSiteMentionRegistry', () => {
 
   it('rejects a slug shared by a person and a place', () => {
     expect(() =>
-      buildSiteMentionRegistry([person()], [place('kschemelinin')]),
-    ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: duplicate entity mention slug "kschemelinin"]`,
-    );
+      buildSiteMentionRegistry([person()], [place('kschemelinin')])
+    ).toThrowErrorMatchingInlineSnapshot(`[Error: duplicate entity mention slug "kschemelinin"]`);
   });
 });

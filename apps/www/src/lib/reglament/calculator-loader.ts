@@ -2,12 +2,11 @@ import type {
   ReglamentCalculatorControllerLoader,
   ReglamentCalculatorControllerModule,
   ReglamentCalculatorDetailsLoader,
-  ReglamentCalculatorDetailsModule,
+  ReglamentCalculatorDetailsModule
 } from './calculator-loader.types';
 
 const CALCULATOR_SELECTOR = '[data-reglament-calculator]';
-const CALCULATOR_CONTROL_SELECTOR =
-  '[data-reglament-field],[data-reglament-reset]';
+const CALCULATOR_CONTROL_SELECTOR = '[data-reglament-field],[data-reglament-reset]';
 const EDITOR_DETAILS_SELECTOR = 'details[data-reglament-editor-row]';
 
 const completedHydrations = new WeakMap<HTMLElement, number>();
@@ -23,7 +22,7 @@ const loadDetailsModule = (): Promise<ReglamentCalculatorDetailsModule> =>
 export const bindReglamentCalculatorLazyHydration = (
   rootDocument: Document = document,
   loadController: ReglamentCalculatorControllerLoader = loadControllerModule,
-  loadDetails: ReglamentCalculatorDetailsLoader = loadDetailsModule,
+  loadDetails: ReglamentCalculatorDetailsLoader = loadDetailsModule
 ): (() => void) => {
   const hydrate = (root: HTMLElement, details: boolean): void => {
     const requestedState = details ? DETAILS_HYDRATION : BASIC_HYDRATION;
@@ -49,8 +48,7 @@ export const bindReglamentCalculatorLazyHydration = (
       })
       .catch(() => undefined)
       .finally(() => {
-        const remainingState =
-          (pendingHydrations.get(root) ?? 0) & ~claimedState;
+        const remainingState = (pendingHydrations.get(root) ?? 0) & ~claimedState;
 
         if (remainingState) {
           pendingHydrations.set(root, remainingState);
@@ -61,15 +59,13 @@ export const bindReglamentCalculatorLazyHydration = (
   };
 
   const hydrateOpenDetails = (): void => {
-    rootDocument
-      .querySelectorAll(`${EDITOR_DETAILS_SELECTOR}[open]`)
-      .forEach((details) => {
-        const root = details.closest(CALCULATOR_SELECTOR);
+    rootDocument.querySelectorAll(`${EDITOR_DETAILS_SELECTOR}[open]`).forEach((details) => {
+      const root = details.closest(CALCULATOR_SELECTOR);
 
-        if (root instanceof HTMLElement) {
-          hydrate(root, true);
-        }
-      });
+      if (root instanceof HTMLElement) {
+        hydrate(root, true);
+      }
+    });
   };
   const handleIntent = (event: Event): void => {
     if (!(event.target instanceof Element)) {
@@ -82,8 +78,7 @@ export const bindReglamentCalculatorLazyHydration = (
 
     if (
       root instanceof HTMLElement &&
-      (event.type !== 'toggle' ||
-        (details instanceof HTMLDetailsElement && details.open))
+      (event.type !== 'toggle' || (details instanceof HTMLDetailsElement && details.open))
     ) {
       hydrate(root, Boolean(details));
     }

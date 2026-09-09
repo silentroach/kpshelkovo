@@ -14,7 +14,7 @@ export default defineConfig({
   reporter: 'list',
   timeout: 60_000,
   expect: {
-    timeout: 10_000,
+    timeout: 10_000
   },
   use: {
     baseURL,
@@ -22,16 +22,16 @@ export default defineConfig({
     headless: true,
     viewport: {
       width: 1440,
-      height: 960,
+      height: 960
     },
     deviceScaleFactor: 2,
-    colorScheme: 'light',
+    colorScheme: 'light'
   },
   webServer: {
     command: 'pnpm run test:visual:breadcrumbs:serve',
     cwd,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+    timeout: 120_000
+  }
 });

@@ -31,11 +31,9 @@ interface ContactPageInput {
 }
 
 const externalContactUrls = (contact: Contact): readonly string[] =>
-  [
-    contact.contacts.telegram,
-    contact.contacts.whatsapp,
-    contact.contacts.website,
-  ].filter((url): url is string => Boolean(url));
+  [contact.contacts.telegram, contact.contacts.whatsapp, contact.contacts.website].filter(
+    (url): url is string => Boolean(url)
+  );
 
 const contactPointSchema = (contact: Contact, url: string): SchemaDoc => {
   const sameAs = externalContactUrls(contact);
@@ -49,15 +47,13 @@ const contactPointSchema = (contact: Contact, url: string): SchemaDoc => {
     contactType: formatContactCategory(contact.category),
     areaServed: {
       '@type': 'Place',
-      name: 'Шелково',
+      name: 'Шелково'
     },
     availableLanguage: LANG,
-    url,
+    url
   };
 
-  const phone = contact.contacts.phone
-    ? normalizeContactPhone(contact.contacts.phone)
-    : undefined;
+  const phone = contact.contacts.phone ? normalizeContactPhone(contact.contacts.phone) : undefined;
 
   if (phone) {
     schema.telephone = phone;
@@ -75,12 +71,10 @@ const contactPointSchema = (contact: Contact, url: string): SchemaDoc => {
 };
 
 export const contactsCollectionPageSchema = (
-  input: ContactsCollectionPageInput,
+  input: ContactsCollectionPageInput
 ): readonly SchemaDoc[] => collectionPageSchema(input);
 
-export const contactPageSchema = (
-  input: ContactPageInput,
-): readonly SchemaDoc[] => {
+export const contactPageSchema = (input: ContactPageInput): readonly SchemaDoc[] => {
   const { contact } = input;
   const url = absoluteUrl(contact.url);
   const contactPoint = contactPointSchema(contact, url);
@@ -93,14 +87,14 @@ export const contactPageSchema = (
       url,
       inLanguage: LANG,
       mainEntity: {
-        '@id': contactPoint['@id'],
+        '@id': contactPoint['@id']
       },
       about: {
-        '@id': contactPoint['@id'],
+        '@id': contactPoint['@id']
       },
-      dateModified: contact.updatedIso,
+      dateModified: contact.updatedIso
     },
-    contactPoint,
+    contactPoint
   ];
 
   if (input.breadcrumbs?.length) {

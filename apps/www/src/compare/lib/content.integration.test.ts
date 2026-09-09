@@ -1,28 +1,26 @@
-import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { describe, expect, it } from 'vitest';
 import { parse as parseYaml } from 'yaml';
 
 import { SettlementSchema } from './schema';
-import { mapRawSettlement } from './settlement/mapper';
 import { DEFAULT_LOT_SOTKA, getLotAverage } from './settlement/lots';
+import { mapRawSettlement } from './settlement/mapper';
 
-const dir = fileURLToPath(
-  new URL('../../data/compare/settlements/', import.meta.url),
-);
+const dir = fileURLToPath(new URL('../../data/compare/settlements/', import.meta.url));
 
 function list() {
   return readdirSync(dir)
     .filter((name) => name.endsWith('.yaml') && !name.startsWith('_'))
     .map((name) => ({
       name,
-      code: readFileSync(join(dir, name), 'utf-8'),
+      code: readFileSync(join(dir, name), 'utf-8')
     }));
 }
 
-const parseSlug = (code: string): string =>
-  SettlementSchema.parse(parseYaml(code)).slug;
+const parseSlug = (code: string): string => SettlementSchema.parse(parseYaml(code)).slug;
 
 function findDuplicateSlugs(files: ReturnType<typeof list>) {
   const filesBySlug = new Map<string, string[]>();
@@ -77,10 +75,10 @@ describe('settlements content collection', () => {
     const files = [
       { name: 'comment.yaml', code: 'slug: semantic-duplicate # comment' },
       { name: 'spaces.yaml', code: 'slug: semantic-duplicate  ' },
-      { name: 'quoted.yaml', code: 'slug: "semantic-duplicate"' },
+      { name: 'quoted.yaml', code: 'slug: "semantic-duplicate"' }
     ].map(({ name, code }) => ({
       name,
-      code: source.code.replace(/^slug:.*$/m, code),
+      code: source.code.replace(/^slug:.*$/m, code)
     }));
 
     expect(findDuplicateSlugs(files)).toMatchInlineSnapshot(`
@@ -100,15 +98,11 @@ describe('settlements content collection', () => {
   it('has exactly one baseline settlement', () => {
     const rows = list().map((file) => ({
       name: file.name,
-      base: parseBase(file.code),
+      base: parseBase(file.code)
     }));
 
-    const miss = rows
-      .filter((row) => row.base === undefined)
-      .map((row) => row.name);
-    expect(miss, `Missing is_baseline in files: ${miss.join(', ')}`).toEqual(
-      [],
-    );
+    const miss = rows.filter((row) => row.base === undefined).map((row) => row.name);
+    expect(miss, `Missing is_baseline in files: ${miss.join(', ')}`).toEqual([]);
 
     const base = rows.filter((row) => row.base).map((row) => row.name);
     expect(base, `Baseline files: ${base.join(', ')}`).toHaveLength(1);
@@ -122,23 +116,17 @@ describe('settlements content collection', () => {
       const raw = SettlementSchema.parse(parseYaml(file.code));
       const settlement = mapRawSettlement(raw);
       const lot =
-        getLotAverage(
-          settlement.lots,
-          settlement.infrastructure,
-          settlement.commonSpaces,
-        ) ?? DEFAULT_LOT_SOTKA;
+        getLotAverage(settlement.lots, settlement.infrastructure, settlement.commonSpaces) ??
+        DEFAULT_LOT_SOTKA;
       const parts = settlement.tariff.parts ?? [settlement.tariff];
       const expected = parts.reduce((sum, part) => {
-        const months =
-          part.period === 'month' ? 1 : part.period === 'quarter' ? 3 : 12;
+        const months = part.period === 'month' ? 1 : part.period === 'quarter' ? 3 : 12;
         const monthly = part.value / months;
         return sum + (part.unit === 'perSotka' ? monthly : monthly / lot);
       }, 0);
 
       expect(raw.tariff).not.toHaveProperty('normalized_per_sotka_month');
-      expect(settlement.tariff.normalizedPerSotkaMonth, file.name).toBe(
-        expected,
-      );
+      expect(settlement.tariff.normalizedPerSotkaMonth, file.name).toBe(expected);
     }
   });
 });

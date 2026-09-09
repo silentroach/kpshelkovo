@@ -18,9 +18,7 @@ export const GET: APIRoute = async ({ params }) => {
   const page = pages.find((item) => item.routeSlug === routeSlug);
 
   if (!page) {
-    throw new Error(
-      routeSlug ? `kb page "${routeSlug}" not found` : 'kb root page not found',
-    );
+    throw new Error(routeSlug ? `kb page "${routeSlug}" not found` : 'kb root page not found');
   }
 
   return createMarkdownResponse(buildKbPageMarkdown(page));

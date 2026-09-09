@@ -2,11 +2,13 @@
   import { formatTariff } from '@shelkovo/format';
   import { onMount, onDestroy, tick } from 'svelte';
   import type { Attachment } from 'svelte/attachments';
+
   import {
     installYandexMapsRuntimeHeadPersistence,
     loadYandexMaps,
-    waitForStableLayout,
+    waitForStableLayout
   } from '@/lib/yandex-maps/runtime';
+
   import { withBase } from '../lib/url';
 
   interface SettlementMapData {
@@ -54,7 +56,7 @@
     height = 375,
     focusX = 0.5,
     startFromMoscow = false,
-    fitRevision,
+    fitRevision
   }: Props = $props();
 
   let mapContainer: HTMLDivElement | undefined;
@@ -98,18 +100,12 @@
   }
 
   function getRange(list: readonly SettlementMapData[]): Range | undefined {
-    const vals = list
-      .filter((item) => !item.isBaseline)
-      .map((item) => item.normalizedTariff);
+    const vals = list.filter((item) => !item.isBaseline).map((item) => item.normalizedTariff);
     if (vals.length === 0) return;
     return { min: Math.min(...vals), max: Math.max(...vals) };
   }
 
-  function getTariffColor(
-    tariff: number,
-    isBaseline: boolean,
-    range: Range | undefined,
-  ): string {
+  function getTariffColor(tariff: number, isBaseline: boolean, range: Range | undefined): string {
     if (isBaseline) {
       return '#064b08';
     }
@@ -118,10 +114,7 @@
       return '#6a502e';
     }
 
-    const normalized = Math.max(
-      0,
-      Math.min(1, (tariff - range.min) / (range.max - range.min)),
-    );
+    const normalized = Math.max(0, Math.min(1, (tariff - range.min) / (range.max - range.min)));
     const red = Math.round(180 + 50 * normalized);
     const green = Math.round(130 + 70 * (1 - normalized));
     const blue = Math.round(86 + 30 * (1 - normalized));
@@ -135,7 +128,7 @@
     if (settlements.length === 0) {
       return {
         location: { center: [37.6173, 55.7558], zoom: 9 },
-        margin: [0, 0, 0, 0],
+        margin: [0, 0, 0, 0]
       };
     }
 
@@ -144,7 +137,7 @@
       const zoom = 12;
       return {
         location: { center: [shift(item.lng, zoom), item.lat], zoom },
-        margin: [0, 0, 0, 0],
+        margin: [0, 0, 0, 0]
       };
     }
 
@@ -158,17 +151,15 @@
       location: {
         bounds: [
           [minLng, minLat],
-          [maxLng, maxLat],
-        ],
+          [maxLng, maxLat]
+        ]
       },
-      margin: [PAD, PAD, PAD, PAD],
+      margin: [PAD, PAD, PAD, PAD]
     };
   }
 
   const getInitialMapView = (): ReturnType<typeof getMapView> =>
-    startFromMoscow
-      ? { location: MOSCOW_LOCATION, margin: [0, 0, 0, 0] }
-      : getMapView();
+    startFromMoscow ? { location: MOSCOW_LOCATION, margin: [0, 0, 0, 0] } : getMapView();
 
   function clearMarkers(): void {
     if (!map) return;
@@ -199,18 +190,14 @@
     const bySlug = new Map(marks.map((m) => [m.slug, m]));
 
     for (const settlement of settlements) {
-      const color = getTariffColor(
-        settlement.normalizedTariff,
-        settlement.isBaseline,
-        range,
-      );
+      const color = getTariffColor(settlement.normalizedTariff, settlement.isBaseline, range);
 
       const existing = bySlug.get(settlement.slug);
       if (existing) {
         existing.el.style.background = color;
         existing.el.style.cursor = canOpenPopup ? 'pointer' : 'default';
         existing.marker.update?.({
-          coordinates: [settlement.lng, settlement.lat],
+          coordinates: [settlement.lng, settlement.lat]
         });
         continue;
       }
@@ -224,10 +211,7 @@
       el.setAttribute('title', settlement.name);
       if (canOpenPopup) {
         el.setAttribute('type', 'button');
-        el.setAttribute(
-          'aria-label',
-          `Показать данные о поселке «${settlement.name}»`,
-        );
+        el.setAttribute('aria-label', `Показать данные о поселке «${settlement.name}»`);
         el.setAttribute('aria-expanded', 'false');
         el.addEventListener('click', (evt) => {
           evt.stopPropagation();
@@ -238,10 +222,7 @@
         el.setAttribute('aria-hidden', 'true');
       }
 
-      const marker = new YMapMarker(
-        { coordinates: [settlement.lng, settlement.lat] },
-        el,
-      );
+      const marker = new YMapMarker({ coordinates: [settlement.lng, settlement.lat] }, el);
 
       map.addChild(marker);
       marks.push({ slug: settlement.slug, marker, el });
@@ -273,9 +254,9 @@
       map = new YMap(
         mapContainer,
         {
-          location: view.location,
+          location: view.location
         },
-        [new YMapDefaultSchemeLayer(), new YMapDefaultFeaturesLayer()],
+        [new YMapDefaultSchemeLayer(), new YMapDefaultFeaturesLayer()]
       );
 
       syncMarkers(ymaps3);
@@ -287,7 +268,7 @@
       if (view.location.bounds) {
         map.update?.({
           location: { ...view.location, duration: 0 },
-          margin: view.margin,
+          margin: view.margin
         });
       }
     } catch (err) {
@@ -345,9 +326,9 @@
       map.update({
         location: {
           ...view.location,
-          duration: 250,
+          duration: 250
         },
-        margin: view.margin,
+        margin: view.margin
       });
       hasAutofitted = true;
       return true;
@@ -368,11 +349,7 @@
     if (restoreFocus && marker?.isConnected) marker.focus();
   }
 
-  async function open(
-    item: SettlementMapData,
-    el: HTMLElement,
-    moveFocus: boolean,
-  ): Promise<void> {
+  async function open(item: SettlementMapData, el: HTMLElement, moveFocus: boolean): Promise<void> {
     activeMarker?.setAttribute('aria-expanded', 'false');
     activeMarker = el;
     el.setAttribute('aria-expanded', 'true');
@@ -413,8 +390,7 @@
       if (destroyed || request !== mapLoadRequest) return;
 
       console.error('Map setup error:', loadError);
-      error =
-        loadError instanceof Error ? loadError.message : 'Карта недоступна';
+      error = loadError instanceof Error ? loadError.message : 'Карта недоступна';
       isLoading = false;
     }
   };
@@ -494,9 +470,7 @@
   });
 
   let settlementSignature = $derived(
-    settlements
-      .map((s) => `${s.slug}:${s.lat}:${s.lng}:${s.normalizedTariff}`)
-      .join('|'),
+    settlements.map((s) => `${s.slug}:${s.lat}:${s.lng}:${s.normalizedTariff}`).join('|')
   );
   let previousSettlementSignature = '';
   let previousFitRevision: number | undefined;
@@ -529,7 +503,7 @@
   const synchronizeMap = (
     signature: string,
     currentFitRevision: number | undefined,
-    shouldSync: boolean,
+    shouldSync: boolean
   ): Attachment<HTMLDivElement> => {
     if (!signatureReady) {
       previousSettlementSignature = signature;
@@ -582,11 +556,7 @@
       <div class="map-message map-error">
         <div class="map-error-icon">🗺️</div>
         <p class="map-error-title">{error}</p>
-        <button
-          type="button"
-          class="ui-btn ui-btn-sm ui-btn-ghost map-retry"
-          onclick={retryMap}
-        >
+        <button type="button" class="ui-btn ui-btn-sm ui-btn-ghost map-retry" onclick={retryMap}>
           Попробовать снова
         </button>
       </div>
@@ -600,11 +570,7 @@
       data-testid="map-popup"
     >
       <div class="map-popup-anchor">
-        <div
-          {@attach capturePopup}
-          class="map-popup-panel"
-          data-testid="map-popup-panel"
-        >
+        <div {@attach capturePopup} class="map-popup-panel" data-testid="map-popup-panel">
           <div class="map-popup-header">
             <a
               {@attach capturePopupLink}
@@ -641,10 +607,7 @@
             </p>
           {/if}
           <p class="map-popup-tariff" title={tip.item.tariffHint}>
-            <strong
-              >{tip.item.tariffText ??
-                formatTariff(tip.item.normalizedTariff)}</strong
-            >
+            <strong>{tip.item.tariffText ?? formatTariff(tip.item.normalizedTariff)}</strong>
           </p>
         </div>
         <div
@@ -660,11 +623,7 @@
 
   <div
     {@attach captureMapContainer}
-    {@attach synchronizeMap(
-      settlementSignature,
-      fitRevision,
-      ymapsLoaded && !error,
-    )}
+    {@attach synchronizeMap(settlementSignature, fitRevision, ymapsLoaded && !error)}
     class="map-canvas"
     class:map-canvas--static={!interactive}
     class:map-muted={muted}

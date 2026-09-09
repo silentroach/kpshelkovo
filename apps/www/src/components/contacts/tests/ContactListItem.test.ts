@@ -2,8 +2,8 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { createAstroContainer } from '@/test/astro-container';
 import type { Contact, ContactReview } from '@/lib/contacts/types';
+import { createAstroContainer } from '@/test/astro-container';
 
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import ContactListItem from '../ContactListItem.astro';
@@ -13,7 +13,7 @@ const positiveReview = {
   summary: 'Работу оценили положительно.',
   publishedAt: new Date('2026-08-01T00:00:00.000Z'),
   publishedIso: '2026-08-01',
-  url: 'https://t.me/example/1',
+  url: 'https://t.me/example/1'
 } satisfies ContactReview;
 
 const contact = {
@@ -25,27 +25,21 @@ const contact = {
   contacts: { phone: '+7 900 000-00-00' },
   location: {
     title: 'Пример места',
-    url: 'https://yandex.ru/maps/example',
+    url: 'https://yandex.ru/maps/example'
   },
-  reviews: [
-    positiveReview,
-    positiveReview,
-    positiveReview,
-    positiveReview,
-    positiveReview,
-  ],
+  reviews: [positiveReview, positiveReview, positiveReview, positiveReview, positiveReview],
   url: '/sarafan/construction/example/',
   markdownUrl: '/sarafan/construction/example/index.md',
   canonical: 'https://example.com/sarafan/construction/example/',
   body: '',
-  mentions: [],
+  mentions: []
 } satisfies Contact;
 
 describe('ContactListItem', () => {
   it('does not expose contact details in a list item', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(ContactListItem, {
-      props: { contact },
+      props: { contact }
     });
 
     expect(html).toContain('href="/sarafan/construction/example/"');
@@ -55,11 +49,11 @@ describe('ContactListItem', () => {
   it('describes the review highlight with a native title', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(ContactListItem, {
-      props: { contact },
+      props: { contact }
     });
 
     expect(html).toContain(
-      'role="img" aria-label="Много положительных отзывов" title="Много положительных отзывов"',
+      'role="img" aria-label="Много положительных отзывов" title="Много положительных отзывов"'
     );
     expect(html).not.toContain('role="tooltip"');
     expect(html).toMatch(/<svg[^>]+aria-hidden="true"/u);

@@ -1,9 +1,7 @@
 import { calculateDistance } from '@shelkovo/geo';
+
 import { toPublicComparisons, toPublicStats } from './public-dto';
-import type {
-  ComparePublicPayload,
-  ComparePublicSettlement,
-} from './public-dto.types';
+import type { ComparePublicPayload, ComparePublicSettlement } from './public-dto.types';
 import { ComparePublicPayloadSchema } from './public-schema';
 import { getKm, getRing, type Rating } from './rating';
 import type { ComparisonResult, Settlement, Stats } from './settlement/types';
@@ -21,7 +19,7 @@ function round(value: number): number {
 }
 
 const tariffUnit = (
-  unit: Settlement['tariff']['unit'],
+  unit: Settlement['tariff']['unit']
 ): ComparePublicSettlement['tariff']['unit'] => {
   if (unit === 'perSotka') return 'rub_per_sotka';
   if (unit === 'perLot') return 'rub_per_lot';
@@ -29,14 +27,14 @@ const tariffUnit = (
 };
 
 const road = (
-  value: Settlement['infrastructure']['roads'],
+  value: Settlement['infrastructure']['roads']
 ): ComparePublicSettlement['infrastructure']['roads'] => {
   if (value === 'partlyAsphalt') return 'partial_asphalt';
   return value;
 };
 
 const video = (
-  value: Settlement['infrastructure']['videoSurveillance'],
+  value: Settlement['infrastructure']['videoSurveillance']
 ): ComparePublicSettlement['infrastructure']['video_surveillance'] => {
   if (value === 'checkpointOnly') return 'checkpoint_only';
   return value;
@@ -45,7 +43,7 @@ const video = (
 export function toFull(
   settlements: readonly Settlement[],
   ratings: ReadonlyMap<string, Rating>,
-  baseline: Settlement,
+  baseline: Settlement
 ): ComparePublicSettlement[] {
   return settlements.map((item) => {
     const company = item.managementCompany;
@@ -62,7 +60,7 @@ export function toFull(
         ? company.url
           ? {
               title: company.title,
-              url: company.url,
+              url: company.url
             }
           : company.title
         : undefined,
@@ -72,7 +70,7 @@ export function toFull(
         lat: item.location.lat,
         lng: item.location.lng,
         map_url: item.location.mapUrl,
-        district: item.location.district,
+        district: item.location.district
       },
       tariff: {
         value: item.tariff.value,
@@ -85,15 +83,15 @@ export function toFull(
           value: part.value,
           unit: tariffUnit(part.unit),
           period: part.period,
-          note: part.note,
-        })),
+          note: part.note
+        }))
       },
       lots: item.lots
         ? {
             count: item.lots.count,
             area_ha: item.lots.areaHa,
             average_sotka: item.lots.averageSotka,
-            average_note: item.lots.averageNote,
+            average_note: item.lots.averageNote
           }
         : undefined,
       water_in_tariff: item.waterInTariff,
@@ -112,7 +110,7 @@ export function toFull(
         video_surveillance: video(item.infrastructure.videoSurveillance),
         underground_electricity: item.infrastructure.undergroundElectricity,
         admin_building: item.infrastructure.adminBuilding,
-        retail_or_services: item.infrastructure.retailOrServices,
+        retail_or_services: item.infrastructure.retailOrServices
       },
       common_spaces: {
         playgrounds: item.commonSpaces.playgrounds,
@@ -128,7 +126,7 @@ export function toFull(
         sports_camp: item.commonSpaces.sportsCamp,
         primary_school: item.commonSpaces.primarySchool,
         club_infrastructure: item.commonSpaces.clubInfrastructure,
-        bbq_zones: item.commonSpaces.bbqZones,
+        bbq_zones: item.commonSpaces.bbqZones
       },
       service_model: {
         garbage_collection: item.serviceModel.garbageCollection,
@@ -136,14 +134,12 @@ export function toFull(
         road_cleaning: item.serviceModel.roadCleaning,
         landscaping: item.serviceModel.landscaping,
         emergency_service: item.serviceModel.emergencyService,
-        dispatcher: item.serviceModel.dispatcher,
+        dispatcher: item.serviceModel.dispatcher
       },
       rating: rating?.score ?? 0,
       distance: {
-        moscow_km:
-          rating?.km ?? round(getKm(item.location.lat, item.location.lng)),
-        mkad_km:
-          rating?.ring ?? round(getRing(item.location.lat, item.location.lng)),
+        moscow_km: rating?.km ?? round(getKm(item.location.lat, item.location.lng)),
+        mkad_km: rating?.ring ?? round(getRing(item.location.lat, item.location.lng)),
         shelkovo_km: isBaseline
           ? 0
           : round(
@@ -151,10 +147,10 @@ export function toFull(
                 baseline.location.lat,
                 baseline.location.lng,
                 item.location.lat,
-                item.location.lng,
-              ),
-            ),
-      },
+                item.location.lng
+              )
+            )
+      }
     };
   });
 }
@@ -164,10 +160,10 @@ export const toFullPayload = ({
   baseline,
   stats,
   comparisons,
-  ratings,
+  ratings
 }: FullPayloadInput): ComparePublicPayload =>
   ComparePublicPayloadSchema.parse({
     settlements: toFull(settlements, ratings, baseline),
     stats: toPublicStats(stats),
-    comparisons: toPublicComparisons(comparisons),
+    comparisons: toPublicComparisons(comparisons)
   });

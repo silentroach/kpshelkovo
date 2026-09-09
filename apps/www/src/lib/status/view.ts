@@ -1,52 +1,43 @@
-import {
-  count,
-  dateTimeFromISO,
-  formatDate,
-  formatMonth,
-  pluralize,
-} from '@shelkovo/format';
-import {
-  extractFirstMarkdownText,
-  formatDynamicHtml,
-} from '@shelkovo/markdown';
+import { count, dateTimeFromISO, formatDate, formatMonth, pluralize } from '@shelkovo/format';
+import { extractFirstMarkdownText, formatDynamicHtml } from '@shelkovo/markdown';
 
 import { formatArea } from '../areas';
 import type { StatusCalendarDay } from './calendar.types';
 import { getStatusIncidentState } from './lifecycle';
 import type { StatusArea, StatusKind, StatusService } from './schema';
+import type { StatusTimelineTooltipListItemData } from './timeline-tooltip.types';
 import type {
   StatusDaysWithoutIncidents,
   StatusDuration,
   StatusIncidentPhase,
   StatusIncidentPhaseInput,
-  StatusIncidentState,
+  StatusIncidentState
 } from './types';
-import type { StatusTimelineTooltipListItemData } from './timeline-tooltip.types';
 
 const SERVICE_LABELS: Record<StatusService, string> = {
   electricity: 'Электричество',
   water: 'Вода',
   internet: 'Интернет',
-  dam: 'Дамба',
+  dam: 'Дамба'
 };
 
 const KIND_LABELS: Record<StatusKind, string> = {
   incident: 'Инцидент',
-  maintenance: 'Плановые работы',
+  maintenance: 'Плановые работы'
 };
 
 const INCIDENT_TITLE_LABELS: Record<StatusService, string> = {
   electricity: 'Нет электричества',
   water: 'Нет воды',
   internet: 'Нет интернета',
-  dam: 'Проезд через дамбу закрыт',
+  dam: 'Проезд через дамбу закрыт'
 };
 
 const MAINTENANCE_TITLE_LABELS: Record<StatusService, string> = {
   electricity: 'Плановые работы: электричество',
   water: 'Плановые работы: вода',
   internet: 'Плановые работы: интернет',
-  dam: 'Плановые работы: дамба',
+  dam: 'Плановые работы: дамба'
 };
 
 interface StatusIncidentPeriodPart {
@@ -109,48 +100,41 @@ const CURRENT_STATUS_YEAR = dateTimeFromISO(new Date().toISOString()).year;
 
 const formatStatusNbsp = (value: string): string => value.replaceAll(' ', NBSP);
 
-const formatStatusTooltipText = (value: string): string =>
-  formatDynamicHtml(value);
+const formatStatusTooltipText = (value: string): string => formatDynamicHtml(value);
 
 const joinStatusValueAndUnit = (
   value: number,
   unit: string,
-  opts?: StatusTypographyOptions,
+  opts?: StatusTypographyOptions
 ): string => `${value}${opts?.nonBreaking ? NBSP : ' '}${unit}`;
 
-const formatStatusCalendarDate = (
-  iso: string,
-  opts?: StatusTypographyOptions,
-): string => {
+const formatStatusCalendarDate = (iso: string, opts?: StatusTypographyOptions): string => {
   const value = dateTimeFromISO(iso);
-  const text = value.toFormat(
-    value.year === CURRENT_STATUS_YEAR ? 'd MMMM' : 'd MMMM yyyy',
-  );
+  const text = value.toFormat(value.year === CURRENT_STATUS_YEAR ? 'd MMMM' : 'd MMMM yyyy');
 
   return opts?.nonBreaking ? formatStatusNbsp(text) : text;
 };
 
-const formatStatusTime = (iso: string): string =>
-  dateTimeFromISO(iso).toFormat('HH:mm');
+const formatStatusTime = (iso: string): string => dateTimeFromISO(iso).toFormat('HH:mm');
 
 const isSameStatusDay = (startIso: string, endIso: string): boolean =>
   dateTimeFromISO(startIso).hasSame(dateTimeFromISO(endIso), 'day');
 
 const toStatusIncidentPeriodInput = (
-  incident: StatusTimelineTooltipIncident,
+  incident: StatusTimelineTooltipIncident
 ): StatusIncidentPeriodInput => ({
   phase: incident.phase,
   started: {
     iso: incident.startedIso,
-    hasTime: incident.startedHasTime,
+    hasTime: incident.startedHasTime
   },
   ended: incident.endedIso
     ? {
         iso: incident.endedIso,
-        hasTime: incident.endedHasTime,
+        hasTime: incident.endedHasTime
       }
     : undefined,
-  duration: incident.duration,
+  duration: incident.duration
 });
 
 export const extractStatusExcerpt = (markdown: string): string | undefined => {
@@ -159,10 +143,7 @@ export const extractStatusExcerpt = (markdown: string): string | undefined => {
   return first ? first.replace(SPACE, ' ') : undefined;
 };
 
-export const formatStatusDate = (
-  iso: string,
-  opts?: StatusDateFormatOptions,
-): string => {
+export const formatStatusDate = (iso: string, opts?: StatusDateFormatOptions): string => {
   const date = formatStatusCalendarDate(iso, opts);
 
   return opts?.hasTime ? `${date}, ${formatStatusTime(iso)}` : date;
@@ -173,13 +154,11 @@ export const formatStatusMonth = (
   month: number,
   opts?: {
     readonly capitalize?: boolean;
-  },
+  }
 ): string => {
   const label = `${formatMonth(year, month, { includeYear: false })} ${year}`;
 
-  return opts?.capitalize
-    ? `${label.charAt(0).toLocaleUpperCase('ru')}${label.slice(1)}`
-    : label;
+  return opts?.capitalize ? `${label.charAt(0).toLocaleUpperCase('ru')}${label.slice(1)}` : label;
 };
 
 const formatStatusCalendarIncidentCount = (value: number): string =>
@@ -189,34 +168,27 @@ const formatStatusCalendarMaintenanceCount = (value: number): string =>
   count(value, ['плановая работа', 'плановые работы', 'плановых работ']);
 
 export const formatStatusCalendarDayCountLines = (
-  day: Pick<StatusCalendarDay, 'incidentCount' | 'maintenanceCount'>,
+  day: Pick<StatusCalendarDay, 'incidentCount' | 'maintenanceCount'>
 ): readonly string[] =>
   [
-    day.incidentCount
-      ? formatStatusCalendarIncidentCount(day.incidentCount)
-      : undefined,
-    day.maintenanceCount
-      ? formatStatusCalendarMaintenanceCount(day.maintenanceCount)
-      : undefined,
+    day.incidentCount ? formatStatusCalendarIncidentCount(day.incidentCount) : undefined,
+    day.maintenanceCount ? formatStatusCalendarMaintenanceCount(day.maintenanceCount) : undefined
   ].filter((part): part is string => Boolean(part));
 
-export const formatStatusCalendarDayDate = (
-  day: Pick<StatusCalendarDay, 'id'>,
-): string => formatDate(day.id);
+export const formatStatusCalendarDayDate = (day: Pick<StatusCalendarDay, 'id'>): string =>
+  formatDate(day.id);
 
 export const formatStatusCalendarDayLabel = (day: StatusCalendarDay): string =>
   `${formatStatusCalendarDayDate(day)}: ${formatStatusCalendarIncidentCount(day.incidentCount)}, ${formatStatusCalendarMaintenanceCount(day.maintenanceCount)}`;
 
-export const formatStatusCalendarDayTooltipSummary = (
-  day: StatusCalendarDay,
-): string =>
+export const formatStatusCalendarDayTooltipSummary = (day: StatusCalendarDay): string =>
   [formatStatusCalendarDayDate(day), ...formatStatusCalendarDayCountLines(day)]
     .map(formatStatusNbsp)
     .join('\n');
 
 export const formatStatusDuration = (
   duration: StatusDuration,
-  opts?: StatusTypographyOptions,
+  opts?: StatusTypographyOptions
 ): string => {
   const total = Math.max(0, duration.totalMinutes);
   const days = Math.floor(total / (24 * 60));
@@ -241,42 +213,38 @@ export const formatStatusDuration = (
 
 export const getStatusIncidentPeriod = (
   incident: StatusIncidentPeriodInput,
-  opts?: StatusTypographyOptions,
+  opts?: StatusTypographyOptions
 ): StatusIncidentPeriod => {
   const start = {
     iso: incident.started.iso,
     text: formatStatusDate(incident.started.iso, {
       hasTime: incident.started.hasTime,
-      nonBreaking: opts?.nonBreaking,
-    }),
+      nonBreaking: opts?.nonBreaking
+    })
   };
   const ended = incident.ended;
 
   if (!ended) {
     return {
       prefix: incident.phase === 'active' ? 'Начиная с' : 'Начало',
-      start,
+      start
     };
   }
 
   const hasSameDayDateRange =
-    !incident.started.hasTime &&
-    !ended.hasTime &&
-    isSameStatusDay(incident.started.iso, ended.iso);
+    !incident.started.hasTime && !ended.hasTime && isSameStatusDay(incident.started.iso, ended.iso);
 
   if (hasSameDayDateRange) {
     return {
       start: {
         iso: incident.started.iso,
-        text: formatStatusCalendarDate(incident.started.iso, opts),
-      },
+        text: formatStatusCalendarDate(incident.started.iso, opts)
+      }
     };
   }
 
   const hasSameDayTimeRange =
-    incident.started.hasTime &&
-    ended.hasTime &&
-    isSameStatusDay(incident.started.iso, ended.iso);
+    incident.started.hasTime && ended.hasTime && isSameStatusDay(incident.started.iso, ended.iso);
 
   return {
     start: hasSameDayTimeRange
@@ -284,8 +252,8 @@ export const getStatusIncidentPeriod = (
           iso: incident.started.iso,
           text: formatStatusDate(incident.started.iso, {
             hasTime: true,
-            nonBreaking: opts?.nonBreaking,
-          }),
+            nonBreaking: opts?.nonBreaking
+          })
         }
       : start,
     end: {
@@ -294,18 +262,16 @@ export const getStatusIncidentPeriod = (
         ? formatStatusTime(ended.iso)
         : formatStatusDate(ended.iso, {
             hasTime: ended.hasTime,
-            nonBreaking: opts?.nonBreaking,
-          }),
+            nonBreaking: opts?.nonBreaking
+          })
     },
-    ...(incident.duration
-      ? { duration: formatStatusDuration(incident.duration, opts) }
-      : {}),
+    ...(incident.duration ? { duration: formatStatusDuration(incident.duration, opts) } : {})
   };
 };
 
 export const formatStatusIncidentPeriodText = (
   incident: StatusIncidentPeriodInput,
-  opts?: StatusTypographyOptions,
+  opts?: StatusTypographyOptions
 ): string => {
   const period = getStatusIncidentPeriod(incident, opts);
   let text = period.prefix
@@ -313,9 +279,7 @@ export const formatStatusIncidentPeriodText = (
     : period.start.text;
 
   if (period.end) {
-    text += opts?.nonBreaking
-      ? ` -${NBSP}${period.end.text}`
-      : ` - ${period.end.text}`;
+    text += opts?.nonBreaking ? ` -${NBSP}${period.end.text}` : ` - ${period.end.text}`;
   }
 
   if (period.duration) {
@@ -325,13 +289,9 @@ export const formatStatusIncidentPeriodText = (
   return text;
 };
 
-const formatStatusAreaList = (
-  areas: readonly StatusArea[] | undefined,
-): string | undefined =>
+const formatStatusAreaList = (areas: readonly StatusArea[] | undefined): string | undefined =>
   areas && areas.length > 0
-    ? areas
-        .map((area) => formatStatusTooltipText(formatStatusArea(area)))
-        .join(', ')
+    ? areas.map((area) => formatStatusTooltipText(formatStatusArea(area))).join(', ')
     : undefined;
 
 export const buildStatusTimelineTooltipData = (input: {
@@ -356,14 +316,14 @@ export const buildStatusTimelineTooltipData = (input: {
       getStatusIncidentPhase({
         kind: input.incident.kind,
         service: input.service,
-        phase: input.incident.phase,
-      }).label,
+        phase: input.incident.phase
+      }).label
     ),
     periodLabel: formatStatusTooltipText(
       formatStatusIncidentPeriodText(periodIncident, {
-        nonBreaking: input.nonBreaking,
-      }),
-    ),
+        nonBreaking: input.nonBreaking
+      })
+    )
   };
 
   if (areaLabel) {
@@ -373,23 +333,19 @@ export const buildStatusTimelineTooltipData = (input: {
   return tooltip;
 };
 
-export const formatStatusTimelineTooltipLabel = (
-  tooltip: StatusTimelineTooltipData,
-): string =>
+export const formatStatusTimelineTooltipLabel = (tooltip: StatusTimelineTooltipData): string =>
   [
     tooltip.serviceLabel,
     tooltip.kindLabel,
     tooltip.title,
     formatStatusTooltipText(`Статус: ${tooltip.phaseLabel}`),
     tooltip.periodLabel,
-    ...(tooltip.areaLabel
-      ? [formatStatusTooltipText(`Части поселка: ${tooltip.areaLabel}`)]
-      : []),
+    ...(tooltip.areaLabel ? [formatStatusTooltipText(`Части поселка: ${tooltip.areaLabel}`)] : [])
   ].join('. ');
 
 export const buildStatusTimelineTooltipListItemData = (
   incident: StatusTimelineTooltipIncident,
-  opts?: StatusTypographyOptions,
+  opts?: StatusTypographyOptions
 ): StatusTimelineTooltipListItemData => {
   const areaLabel = formatStatusAreaList(incident.areas);
   const phaseIcon =
@@ -409,11 +365,8 @@ export const buildStatusTimelineTooltipListItemData = (
   } = {
     title: formatStatusTooltipText(incident.title),
     periodLabel: formatStatusTooltipText(
-      formatStatusIncidentPeriodText(
-        toStatusIncidentPeriodInput(incident),
-        opts,
-      ),
-    ),
+      formatStatusIncidentPeriodText(toStatusIncidentPeriodInput(incident), opts)
+    )
   };
 
   if (incident.areas?.length) {
@@ -439,13 +392,11 @@ export const formatStatusTimelineGroupTitle = (input: {
   const spacer = input.nonBreaking ? NBSP : ' ';
 
   return formatStatusTooltipText(
-    `${input.count}${spacer}${pluralize(input.count, ['событие', 'события', 'событий'])} за${spacer}${formatStatusCalendarDate(input.startedIso, { nonBreaking: input.nonBreaking })}`,
+    `${input.count}${spacer}${pluralize(input.count, ['событие', 'события', 'событий'])} за${spacer}${formatStatusCalendarDate(input.startedIso, { nonBreaking: input.nonBreaking })}`
   );
 };
 
-export const formatStatusDaysWithoutIncidents = (
-  value: StatusDaysWithoutIncidents,
-): string => {
+export const formatStatusDaysWithoutIncidents = (value: StatusDaysWithoutIncidents): string => {
   switch (value.mode) {
     case 'activeIncident':
       return 'идет инцидент';
@@ -459,9 +410,8 @@ export const formatStatusDaysWithoutIncidents = (
   }
 };
 
-export const getStatusIncidentPhase = (
-  incident: StatusIncidentPhaseInput,
-): StatusIncidentState => getStatusIncidentState(incident);
+export const getStatusIncidentPhase = (incident: StatusIncidentPhaseInput): StatusIncidentState =>
+  getStatusIncidentState(incident);
 
 export const formatStatusArea = (area: StatusArea): string => formatArea(area);
 
@@ -473,8 +423,7 @@ export const deriveStatusIncidentTitle = (input: {
     ? MAINTENANCE_TITLE_LABELS[input.service]
     : INCIDENT_TITLE_LABELS[input.service];
 
-export const formatStatusService = (service: StatusService): string =>
-  SERVICE_LABELS[service];
+export const formatStatusService = (service: StatusService): string => SERVICE_LABELS[service];
 
 export const formatStatusKind = (kind: StatusKind): string => KIND_LABELS[kind];
 

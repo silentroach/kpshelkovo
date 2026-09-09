@@ -14,14 +14,12 @@ const abs = (root: string, path: string): string =>
 
 export const GET: APIRoute = async () => {
   const root = canonRoot();
-  const publicDataset = projectPublicFullReglamentDataset(
-    fullReglamentDataset2026,
-  );
+  const publicDataset = projectPublicFullReglamentDataset(fullReglamentDataset2026);
 
   return createJsonResponse(validatePublicFullReglamentDataset(publicDataset), {
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
-      Link: `<${abs(root, reglamentApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"`,
-    },
+      Link: `<${abs(root, reglamentApiCatalogPath())}>; rel="api-catalog"; type="application/linkset+json"`
+    }
   });
 };

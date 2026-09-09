@@ -16,7 +16,7 @@ const SPACE = /\s+/gu;
 export const createPlaceMentionTarget = (
   slug: string,
   name: string,
-  nameCases?: PlaceNameCaseForms,
+  nameCases?: PlaceNameCaseForms
 ): PlaceMentionTarget => ({
   type: 'place',
   slug,
@@ -25,7 +25,7 @@ export const createPlaceMentionTarget = (
   labelCases: nameCases,
   nameCases,
   htmlUrl: placeUrl(slug),
-  markdownUrl: placeMarkdownUrl(slug),
+  markdownUrl: placeMarkdownUrl(slug)
 });
 
 const excerpt = (markdown: string): string | undefined => {
@@ -35,7 +35,7 @@ const excerpt = (markdown: string): string | undefined => {
 };
 
 export const createPlaceMentionRefs = (
-  place: PlaceMentionRefSource,
+  place: PlaceMentionRefSource
 ): readonly EntityMentionSourceRef[] => {
   if (!place.mentions.length) {
     return [];
@@ -45,12 +45,12 @@ export const createPlaceMentionRefs = (
     source: {
       section: 'places',
       kind: 'place',
-      id: place.slug,
+      id: place.slug
     },
     title: place.name,
     htmlUrl: place.url,
     markdownUrl: place.markdownUrl,
     excerpt: excerpt(place.body),
-    sourceEntity: { type: 'place', slug: place.slug },
+    sourceEntity: { type: 'place', slug: place.slug }
   });
 };

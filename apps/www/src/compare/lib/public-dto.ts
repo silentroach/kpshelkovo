@@ -1,11 +1,7 @@
 import type { PublicComparisons, PublicStats } from './public-dto.types';
 import type { ComparisonResult, Stats } from './settlement/types';
 
-export type {
-  PublicComparison,
-  PublicComparisons,
-  PublicStats,
-} from './public-dto.types';
+export type { PublicComparison, PublicComparisons, PublicStats } from './public-dto.types';
 
 export const toPublicStats = (stats: Stats): PublicStats => ({
   shelkovoTariff: stats.shelkovoTariff,
@@ -20,11 +16,11 @@ export const toPublicStats = (stats: Stats): PublicStats => ({
   moreExpensiveCount: stats.moreExpensiveCount,
   shelkovoVsMedianPercent: stats.shelkovoVsMedianPercent,
   shelkovoVsPeerMedianPercent: stats.shelkovoVsPeerMedianPercent,
-  shelkovoVsMeanPercent: stats.shelkovoVsMeanPercent,
+  shelkovoVsMeanPercent: stats.shelkovoVsMeanPercent
 });
 
 export const toPublicComparisons = (
-  comparisons: ReadonlyMap<string, ComparisonResult>,
+  comparisons: ReadonlyMap<string, ComparisonResult>
 ): PublicComparisons =>
   Object.fromEntries(
     Array.from(comparisons.entries()).map(([slug, comparison]) => [
@@ -32,7 +28,7 @@ export const toPublicComparisons = (
       {
         tariffDelta: comparison.tariffDelta,
         tariffDeltaPercent: comparison.tariffDeltaPercent,
-        isCheaper: comparison.isCheaper,
-      },
-    ]),
+        isCheaper: comparison.isCheaper
+      }
+    ])
   );

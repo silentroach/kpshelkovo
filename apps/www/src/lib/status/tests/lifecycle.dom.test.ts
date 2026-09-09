@@ -5,10 +5,7 @@ import { hydrateStatusServiceStates } from '../lifecycle.dom';
 const START_MS = Date.parse('2026-08-18T10:00:00+03:00');
 const END_MS = Date.parse('2026-08-18T11:00:00+03:00');
 
-const renderServiceState = (
-  kind: 'incident' | 'maintenance',
-  overview = false,
-): HTMLElement => {
+const renderServiceState = (kind: 'incident' | 'maintenance', overview = false): HTMLElement => {
   const state = `
     <p
       data-status-service-state-label
@@ -29,8 +26,8 @@ const renderServiceState = (
     {
       kind,
       start: START_MS,
-      end: END_MS,
-    },
+      end: END_MS
+    }
   ]);
 
   return label;
@@ -39,7 +36,7 @@ const renderServiceState = (
 const currentServiceState = (label: HTMLElement) => ({
   state: label.dataset.statusServiceState,
   label: label.textContent,
-  role: label.getAttribute('role'),
+  role: label.getAttribute('role')
 });
 
 afterEach(() => {
@@ -96,7 +93,7 @@ describe('hydrateStatusServiceStates', () => {
     expect({
       active,
       cardFound: card instanceof HTMLElement,
-      ended: currentServiceState(label),
+      ended: currentServiceState(label)
     }).toMatchInlineSnapshot(`
       {
         "active": {

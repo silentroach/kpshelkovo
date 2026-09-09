@@ -6,9 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 const appSrcRoot = fileURLToPath(new URL('../../', import.meta.url));
 const appTestsRoot = fileURLToPath(new URL('../../../tests/', import.meta.url));
-const workspaceRoot = fileURLToPath(
-  new URL('../../../../../', import.meta.url),
-);
+const workspaceRoot = fileURLToPath(new URL('../../../../../', import.meta.url));
 const uiRoot = join(workspaceRoot, 'packages/ui');
 const sourceExtensions = new Set(['.astro', '.css', '.svelte']);
 const ignoredSourceDirectories = new Set(['.astro', 'dist', 'node_modules']);
@@ -23,9 +21,7 @@ const collectSourceFiles = (directory: string): readonly string[] =>
     const entryPath = join(directory, entry.name);
 
     if (entry.isDirectory()) {
-      return ignoredSourceDirectories.has(entry.name)
-        ? []
-        : collectSourceFiles(entryPath);
+      return ignoredSourceDirectories.has(entry.name) ? [] : collectSourceFiles(entryPath);
     }
 
     return sourceExtensions.has(extname(entry.name)) ? [entryPath] : [];
@@ -34,8 +30,7 @@ const collectSourceFiles = (directory: string): readonly string[] =>
 const workspaceRelativePath = (filePath: string): string =>
   relativePath(workspaceRoot, filePath).split(sep).join('/');
 
-const lineAt = (source: string, index: number): number =>
-  source.slice(0, index).split('\n').length;
+const lineAt = (source: string, index: number): number => source.slice(0, index).split('\n').length;
 
 const extractFontFaces = (source: string): readonly string[] =>
   [...source.matchAll(/@font-face\s*\{([\s\S]*?)\}/gu)].map(([, block]) => {
@@ -61,9 +56,7 @@ const findWeightViolations = (filePath: string): readonly string[] => {
     const weight = match[1]?.trim();
 
     if (weight && !allowedCssWeights.has(weight)) {
-      violations.push(
-        `${relative}:${lineAt(source, match.index)} font-weight: ${weight}`,
-      );
+      violations.push(`${relative}:${lineAt(source, match.index)} font-weight: ${weight}`);
     }
   }
 
@@ -79,21 +72,17 @@ describe('font budget', () => {
       ...collectSourceFiles(appSrcRoot),
       ...collectSourceFiles(appTestsRoot),
       ...collectSourceFiles(join(uiRoot, 'src')),
-      standaloneStylesPath,
+      standaloneStylesPath
     ];
     const preloads = [
-      ...readFileSync(preloadsPath, 'utf8').matchAll(
-        /files\/([^']+\.woff2)'/gu,
-      ),
+      ...readFileSync(preloadsPath, 'utf8').matchAll(/files\/([^']+\.woff2)'/gu)
     ].map(([, file]) => file);
 
     expect({
       fontFaces: extractFontFaces(readFileSync(stylesPath, 'utf8')),
       preloads,
-      standaloneFontFaces: extractFontFaces(
-        readFileSync(standaloneStylesPath, 'utf8'),
-      ),
-      violations: sourceFiles.flatMap(findWeightViolations),
+      standaloneFontFaces: extractFontFaces(readFileSync(standaloneStylesPath, 'utf8')),
+      violations: sourceFiles.flatMap(findWeightViolations)
     }).toMatchInlineSnapshot(`
       {
         "fontFaces": [

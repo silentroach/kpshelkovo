@@ -2,7 +2,7 @@ import { SEARCH_QUERY_MAX_LENGTH } from './client.types';
 import type {
   PagefindHighlightConstructor,
   PagefindHighlightLoader,
-  PagefindHighlightModule,
+  PagefindHighlightModule
 } from './highlight.types';
 
 export const SEARCH_HIGHLIGHT_PARAM = 'h';
@@ -13,9 +13,7 @@ const searchHighlightMaxTerms = 20;
 
 export const normalizeSearchHighlightQuery = (search: string): string => {
   const rawValues = new URLSearchParams(search).getAll(SEARCH_HIGHLIGHT_PARAM);
-  const values = [
-    ...new Set(rawValues.filter((value) => Array.from(value).length > 1)),
-  ];
+  const values = [...new Set(rawValues.filter((value) => Array.from(value).length > 1))];
   const combinedLength = Array.from(values.join(' ')).length;
   if (
     !values.length ||
@@ -32,18 +30,17 @@ export const normalizeSearchHighlightQuery = (search: string): string => {
   return `?${params.toString()}`;
 };
 
-const loadGeneratedPagefindHighlight =
-  async (): Promise<PagefindHighlightConstructor> => {
-    const pagefindHighlight: PagefindHighlightModule = await import(
-      /* @vite-ignore */ pagefindHighlightEntrypoint
-    );
+const loadGeneratedPagefindHighlight = async (): Promise<PagefindHighlightConstructor> => {
+  const pagefindHighlight: PagefindHighlightModule = await import(
+    /* @vite-ignore */ pagefindHighlightEntrypoint
+  );
 
-    return pagefindHighlight.default;
-  };
+  return pagefindHighlight.default;
+};
 
 export const highlightSearchTerms = async (
   href: string,
-  loadPagefindHighlight: PagefindHighlightLoader = loadGeneratedPagefindHighlight,
+  loadPagefindHighlight: PagefindHighlightLoader = loadGeneratedPagefindHighlight
 ): Promise<void> => {
   if (!normalizeSearchHighlightQuery(new URL(href).search)) {
     return;
@@ -58,7 +55,7 @@ export const highlightSearchTerms = async (
     addStyles: false,
     highlightParam: SEARCH_HIGHLIGHT_PARAM,
     markOptions: {
-      className: SEARCH_HIGHLIGHT_CLASS,
-    },
+      className: SEARCH_HIGHLIGHT_CLASS
+    }
   });
 };

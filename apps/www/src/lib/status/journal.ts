@@ -4,7 +4,7 @@ import type { StatusDataset, StatusIncident } from './types';
 
 const resolveIncident = (
   incidentsById: ReadonlyMap<string, StatusIncident>,
-  recordId: string,
+  recordId: string
 ): StatusIncident => {
   const incident = incidentsById.get(recordId);
 
@@ -18,11 +18,9 @@ const resolveIncident = (
 export const getStatusMonthJournal = (
   data: Pick<StatusDataset, 'calendar' | 'byId'>,
   year: number,
-  month: number,
+  month: number
 ): StatusMonthJournal | undefined => {
-  const calendarMonth = data.calendar.byMonth.get(
-    statusCalendarMonthId(year, month),
-  );
+  const calendarMonth = data.calendar.byMonth.get(statusCalendarMonthId(year, month));
 
   if (!calendarMonth) {
     return;
@@ -34,9 +32,7 @@ export const getStatusMonthJournal = (
     month: calendarMonth.month,
     days: calendarMonth.days.map((day) => ({
       day,
-      incidents: day.recordIds.map((recordId) =>
-        resolveIncident(data.byId, recordId),
-      ),
-    })),
+      incidents: day.recordIds.map((recordId) => resolveIncident(data.byId, recordId))
+    }))
   };
 };

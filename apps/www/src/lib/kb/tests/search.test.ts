@@ -8,27 +8,27 @@ describe('isKbPageSearchable', () => {
       {
         label: 'article',
         flags: [] as const,
-        isSection: false,
+        isSection: false
       },
       { label: 'root', flags: [] as const, isSection: true },
       {
         label: 'section',
         flags: [] as const,
-        isSection: true,
+        isSection: true
       },
       {
         label: 'noindex',
         flags: ['noindex'] as const,
-        isSection: false,
+        isSection: false
       },
       {
         label: 'excluded',
         flags: ['exclude-from-site-search'] as const,
-        isSection: false,
-      },
+        isSection: false
+      }
     ].map((page) => ({
       label: page.label,
-      searchable: isKbPageSearchable(page),
+      searchable: isKbPageSearchable(page)
     }));
 
     expect(cases).toMatchInlineSnapshot(`

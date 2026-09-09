@@ -3,10 +3,7 @@ import { highlightSearchTerms } from '@/lib/search/highlight';
 import { installStatusServiceStateHydration } from '@/lib/status/lifecycle.dom';
 import { installStickyTableHeaders } from '@/lib/sticky-table-headers';
 import { installActiveVisitTracker } from '@/scripts/active-visit';
-import {
-  isSearchDialogLoadRetry,
-  loadSearchDialog,
-} from '@/scripts/search-dialog-loader';
+import { isSearchDialogLoadRetry, loadSearchDialog } from '@/scripts/search-dialog-loader';
 
 interface AstroBeforePreparationEvent extends Event {
   loader: () => Promise<void>;
@@ -40,8 +37,7 @@ const HOME_HERO_FALLBACK_SELECTOR = '[data-home-hero-fallback]';
 const NAVIGATION_PENDING_ATTR = 'data-site-navigation-pending';
 const NAVIGATION_DELAY_MS = 50;
 const SEARCH_DIALOG_HYDRATED_ATTR = 'data-search-dialog-hydrated';
-const SEARCH_DIALOG_LOAD_ANNOUNCEMENT_SELECTOR =
-  '[data-search-load-announcement]';
+const SEARCH_DIALOG_LOAD_ANNOUNCEMENT_SELECTOR = '[data-search-load-announcement]';
 const SEARCH_DIALOG_LOAD_MESSAGE_SELECTOR = '[data-search-load-message]';
 const SEARCH_DIALOG_LOAD_STATUS_SELECTOR = '[data-search-load-status]';
 const SEARCH_DIALOG_ROOT_SELECTOR = '[data-search-dialog-root]';
@@ -65,14 +61,10 @@ const runWhenDocumentReady = (callback: () => void): void => {
 };
 
 const removeIncomingHomeHeroFallback = (event: Event): void => {
-  (event as AstroBeforeSwapEvent).newDocument
-    ?.querySelector(HOME_HERO_FALLBACK_SELECTOR)
-    ?.remove();
+  (event as AstroBeforeSwapEvent).newDocument?.querySelector(HOME_HERO_FALLBACK_SELECTOR)?.remove();
 };
 
-const isAstroBeforePreparationEvent = (
-  event: Event,
-): event is AstroBeforePreparationEvent => {
+const isAstroBeforePreparationEvent = (event: Event): event is AstroBeforePreparationEvent => {
   const value = event as Partial<AstroBeforePreparationEvent>;
 
   return typeof value.loader === 'function';
@@ -108,9 +100,7 @@ const loadMetrika = (id: number): void => {
   window.__shelkovoYmLoaded = true;
   const ym = installMetrikaStub();
   const scriptSrc = `${METRIKA_SCRIPT_SRC}?id=${id}`;
-  const hasScript = Array.from(document.scripts).some(
-    (script) => script.src === scriptSrc,
-  );
+  const hasScript = Array.from(document.scripts).some((script) => script.src === scriptSrc);
 
   if (!hasScript) {
     const script = document.createElement('script');
@@ -127,7 +117,7 @@ const loadMetrika = (id: number): void => {
     ssr: true,
     trackLinks: true,
     url: location.href,
-    webvisor: false,
+    webvisor: false
   });
   installActiveVisitTracker(() => window.ym?.(id, 'reachGoal', '60_sec'));
 };
@@ -222,10 +212,7 @@ const bindSiteNavDropdown = (dropdown: HTMLElement): void => {
 
   const button = dropdown.querySelector(SITE_NAV_DROPDOWN_BUTTON_SELECTOR);
   const menu = dropdown.querySelector(SITE_NAV_DROPDOWN_MENU_SELECTOR);
-  if (
-    !(button instanceof HTMLButtonElement) ||
-    !(menu instanceof HTMLElement)
-  ) {
+  if (!(button instanceof HTMLButtonElement) || !(menu instanceof HTMLElement)) {
     return;
   }
 
@@ -241,11 +228,7 @@ const bindSiteNavDropdown = (dropdown: HTMLElement): void => {
 
   setOpen(false);
 
-  button.addEventListener(
-    'click',
-    () => setOpen(!dropdown.hasAttribute('data-open')),
-    { signal },
-  );
+  button.addEventListener('click', () => setOpen(!dropdown.hasAttribute('data-open')), { signal });
 
   dropdown.addEventListener(
     'pointerenter',
@@ -256,7 +239,7 @@ const bindSiteNavDropdown = (dropdown: HTMLElement): void => {
 
       setOpen(true);
     },
-    { signal },
+    { signal }
   );
 
   dropdown.addEventListener(
@@ -270,22 +253,19 @@ const bindSiteNavDropdown = (dropdown: HTMLElement): void => {
         setOpen(false);
       }
     },
-    { signal },
+    { signal }
   );
 
   dropdown.addEventListener(
     'focusout',
     (event) => {
-      if (
-        event.relatedTarget instanceof Node &&
-        dropdown.contains(event.relatedTarget)
-      ) {
+      if (event.relatedTarget instanceof Node && dropdown.contains(event.relatedTarget)) {
         return;
       }
 
       setOpen(false);
     },
-    { signal },
+    { signal }
   );
 
   document.addEventListener(
@@ -301,7 +281,7 @@ const bindSiteNavDropdown = (dropdown: HTMLElement): void => {
 
       setOpen(false);
     },
-    { signal },
+    { signal }
   );
 
   document.addEventListener(
@@ -314,12 +294,12 @@ const bindSiteNavDropdown = (dropdown: HTMLElement): void => {
       setOpen(false);
       button.focus();
     },
-    { signal },
+    { signal }
   );
 
   document.addEventListener('astro:before-swap', () => controller.abort(), {
     once: true,
-    signal,
+    signal
   });
 };
 
@@ -357,28 +337,21 @@ const bindSiteHeaderMenu = (): void => {
       return;
     }
 
-    document
-      .querySelectorAll<HTMLDetailsElement>(SITE_HEADER_MENU_SELECTOR)
-      .forEach((menu) => {
-        if (!menu.contains(target)) {
-          menu.open = false;
-        }
-      });
+    document.querySelectorAll<HTMLDetailsElement>(SITE_HEADER_MENU_SELECTOR).forEach((menu) => {
+      if (!menu.contains(target)) {
+        menu.open = false;
+      }
+    });
   });
 
   document.addEventListener('click', (event) => {
-    if (
-      !(event.target instanceof Element) ||
-      !event.target.closest(SEARCH_TRIGGER_SELECTOR)
-    ) {
+    if (!(event.target instanceof Element) || !event.target.closest(SEARCH_TRIGGER_SELECTOR)) {
       return;
     }
 
-    document
-      .querySelectorAll<HTMLDetailsElement>(SITE_HEADER_MENU_SELECTOR)
-      .forEach((menu) => {
-        menu.open = false;
-      });
+    document.querySelectorAll<HTMLDetailsElement>(SITE_HEADER_MENU_SELECTOR).forEach((menu) => {
+      menu.open = false;
+    });
   });
 
   document.addEventListener('keydown', (event) => {
@@ -386,15 +359,12 @@ const bindSiteHeaderMenu = (): void => {
       return;
     }
 
-    const menu = document.querySelector<HTMLDetailsElement>(
-      SITE_HEADER_MENU_SELECTOR,
-    );
+    const menu = document.querySelector<HTMLDetailsElement>(SITE_HEADER_MENU_SELECTOR);
     if (!menu?.open) {
       return;
     }
 
-    const eventTargetIsInsideMenu =
-      event.target instanceof Node && menu.contains(event.target);
+    const eventTargetIsInsideMenu = event.target instanceof Node && menu.contains(event.target);
     const focusIsInsideMenu = menu.contains(document.activeElement);
     if (!eventTargetIsInsideMenu && !focusIsInsideMenu) {
       return;
@@ -411,17 +381,11 @@ let nativeSearchDialogOpener: HTMLElement | undefined;
 const setNativeSearchDialogLoadStatus = (
   root: HTMLElement,
   message: string,
-  retryVisible = false,
+  retryVisible = false
 ): void => {
-  const status = root.querySelector<HTMLElement>(
-    SEARCH_DIALOG_LOAD_STATUS_SELECTOR,
-  );
-  const visibleMessage = root.querySelector<HTMLElement>(
-    SEARCH_DIALOG_LOAD_MESSAGE_SELECTOR,
-  );
-  const announcement = root.querySelector<HTMLElement>(
-    SEARCH_DIALOG_LOAD_ANNOUNCEMENT_SELECTOR,
-  );
+  const status = root.querySelector<HTMLElement>(SEARCH_DIALOG_LOAD_STATUS_SELECTOR);
+  const visibleMessage = root.querySelector<HTMLElement>(SEARCH_DIALOG_LOAD_MESSAGE_SELECTOR);
+  const announcement = root.querySelector<HTMLElement>(SEARCH_DIALOG_LOAD_ANNOUNCEMENT_SELECTOR);
   const retry = root.querySelector<HTMLButtonElement>(SEARCH_RETRY_SELECTOR);
   const hasMessage = message.length > 0;
   if (status) {
@@ -442,17 +406,12 @@ const setNativeSearchDialogLoadStatus = (
 const requestSearchDialog = async (
   root: HTMLElement,
   opener: HTMLElement,
-  requestId: number,
+  requestId: number
 ): Promise<void> => {
   const { openSearchDialog } = await loadSearchDialog();
   const dialog = root.querySelector<HTMLDialogElement>(SEARCH_DIALOG_SELECTOR);
   const input = root.querySelector<HTMLInputElement>(SEARCH_INPUT_SELECTOR);
-  if (
-    requestId !== latestSearchDialogRequest ||
-    !root.isConnected ||
-    !dialog?.open ||
-    !input
-  ) {
+  if (requestId !== latestSearchDialogRequest || !root.isConnected || !dialog?.open || !input) {
     return;
   }
 
@@ -461,22 +420,15 @@ const requestSearchDialog = async (
   nativeSearchDialogOpener = undefined;
 };
 
-const loadNativeSearchDialog = (
-  root: HTMLElement,
-  opener: HTMLElement,
-): void => {
+const loadNativeSearchDialog = (root: HTMLElement, opener: HTMLElement): void => {
   setNativeSearchDialogLoadStatus(
     root,
-    isSearchDialogLoadRetry()
-      ? 'Пробуем загрузить поиск ещё раз…'
-      : 'Загружаем поиск…',
+    isSearchDialogLoadRetry() ? 'Пробуем загрузить поиск ещё раз…' : 'Загружаем поиск…'
   );
 
   const requestId = ++latestSearchDialogRequest;
   void requestSearchDialog(root, opener, requestId).catch((error: unknown) => {
-    const dialog = root.querySelector<HTMLDialogElement>(
-      SEARCH_DIALOG_SELECTOR,
-    );
+    const dialog = root.querySelector<HTMLDialogElement>(SEARCH_DIALOG_SELECTOR);
     if (
       requestId !== latestSearchDialogRequest ||
       !root.isConnected ||
@@ -494,16 +446,11 @@ const loadNativeSearchDialog = (
 const closeNativeSearchDialog = (target: Element): void => {
   const closeButton = target.closest(SEARCH_CLOSE_SELECTOR);
   const dialog =
-    target instanceof HTMLDialogElement &&
-    target.matches(SEARCH_DIALOG_SELECTOR)
+    target instanceof HTMLDialogElement && target.matches(SEARCH_DIALOG_SELECTOR)
       ? target
       : closeButton?.closest<HTMLDialogElement>(SEARCH_DIALOG_SELECTOR);
   const root = dialog?.closest<HTMLElement>(SEARCH_DIALOG_ROOT_SELECTOR);
-  if (
-    !dialog?.open ||
-    !root ||
-    root.hasAttribute(SEARCH_DIALOG_HYDRATED_ATTR)
-  ) {
+  if (!dialog?.open || !root || root.hasAttribute(SEARCH_DIALOG_HYDRATED_ATTR)) {
     return;
   }
 
@@ -538,16 +485,12 @@ const bindSearchDialogLoader = (): void => {
   document.addEventListener('astro:before-swap', () => {
     latestSearchDialogRequest += 1;
     nativeSearchDialogOpener = undefined;
-    const root = document.querySelector<HTMLElement>(
-      SEARCH_DIALOG_ROOT_SELECTOR,
-    );
+    const root = document.querySelector<HTMLElement>(SEARCH_DIALOG_ROOT_SELECTOR);
     if (!root || root.hasAttribute(SEARCH_DIALOG_HYDRATED_ATTR)) {
       return;
     }
 
-    const dialog = root.querySelector<HTMLDialogElement>(
-      SEARCH_DIALOG_SELECTOR,
-    );
+    const dialog = root.querySelector<HTMLDialogElement>(SEARCH_DIALOG_SELECTOR);
     if (dialog?.open) {
       dialog.close();
     }
@@ -559,7 +502,7 @@ const bindSearchDialogLoader = (): void => {
         finishNativeSearchDialogClose(event.target);
       }
     },
-    true,
+    true
   );
   document.addEventListener('click', (event) => {
     if (!(event.target instanceof Element)) {
@@ -569,12 +512,8 @@ const bindSearchDialogLoader = (): void => {
     const retry = event.target.closest(SEARCH_RETRY_SELECTOR);
     if (retry instanceof HTMLButtonElement) {
       const root = retry.closest<HTMLElement>(SEARCH_DIALOG_ROOT_SELECTOR);
-      const dialog = root?.querySelector<HTMLDialogElement>(
-        SEARCH_DIALOG_SELECTOR,
-      );
-      const input = root?.querySelector<HTMLInputElement>(
-        SEARCH_INPUT_SELECTOR,
-      );
+      const dialog = root?.querySelector<HTMLDialogElement>(SEARCH_DIALOG_SELECTOR);
+      const input = root?.querySelector<HTMLInputElement>(SEARCH_INPUT_SELECTOR);
       const opener = nativeSearchDialogOpener;
       if (
         !root ||
@@ -598,12 +537,8 @@ const bindSearchDialogLoader = (): void => {
       return;
     }
 
-    const root = document.querySelector<HTMLElement>(
-      SEARCH_DIALOG_ROOT_SELECTOR,
-    );
-    const dialog = root?.querySelector<HTMLDialogElement>(
-      SEARCH_DIALOG_SELECTOR,
-    );
+    const root = document.querySelector<HTMLElement>(SEARCH_DIALOG_ROOT_SELECTOR);
+    const dialog = root?.querySelector<HTMLDialogElement>(SEARCH_DIALOG_SELECTOR);
     const input = root?.querySelector<HTMLInputElement>(SEARCH_INPUT_SELECTOR);
     if (!root || !dialog || !input) {
       return;

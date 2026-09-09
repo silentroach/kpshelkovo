@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import type { ExplorerPayload } from '../../lib/explorer';
 import { startSettlementsExplorer } from '../explorer';
 import type {
   ExplorerBootstrapDependencies,
   ExplorerBootstrapElements,
-  ExplorerClientModule,
+  ExplorerClientModule
 } from '../explorer.types';
-import type { ExplorerPayload } from '../../lib/explorer';
 
 const payload = {
   settlements: [],
@@ -24,8 +24,8 @@ const payload = {
     moreExpensiveCount: 0,
     shelkovoVsMedianPercent: 0,
     shelkovoVsPeerMedianPercent: 0,
-    shelkovoVsMeanPercent: 0,
-  },
+    shelkovoVsMeanPercent: 0
+  }
 } satisfies ExplorerPayload;
 
 const payloadUrl = '/static/settlements-explorer/payload-digest.json';
@@ -42,9 +42,7 @@ const renderBootstrap = (): ExplorerBootstrapElements => {
   `;
   const root = document.querySelector<HTMLElement>('[data-explorer-root]');
   const error = document.querySelector<HTMLElement>('[data-explorer-error]');
-  const retry = document.querySelector<HTMLButtonElement>(
-    '[data-explorer-retry]',
-  );
+  const retry = document.querySelector<HTMLButtonElement>('[data-explorer-retry]');
 
   if (!root || !error || !retry) throw new Error('Expected bootstrap fixture');
 
@@ -57,15 +55,15 @@ const createRuntime = (): {
 } => {
   const client: ExplorerClientModule = {
     hydrate: vi.fn(() => ({})),
-    unmount: vi.fn(),
+    unmount: vi.fn()
   };
 
   return {
     client,
     runtime: {
       loadClient: vi.fn(async () => client),
-      loadPayload: vi.fn(async () => payload),
-    },
+      loadPayload: vi.fn(async () => payload)
+    }
   };
 };
 
@@ -101,8 +99,7 @@ describe('settlements explorer bootstrap', () => {
     async (failure) => {
       const elements = renderBootstrap();
       const { client, runtime } = createRuntime();
-      const failedLoader =
-        failure === 'component' ? runtime.loadClient : runtime.loadPayload;
+      const failedLoader = failure === 'component' ? runtime.loadClient : runtime.loadPayload;
       vi.mocked(failedLoader).mockRejectedValueOnce(new Error('Network error'));
       vi.spyOn(console, 'error').mockImplementation(() => {});
 
@@ -118,6 +115,6 @@ describe('settlements explorer bootstrap', () => {
       expect(runtime.loadClient).toHaveBeenCalledTimes(2);
       expect(runtime.loadPayload).toHaveBeenCalledTimes(2);
       expect(elements.error.hidden).toBe(true);
-    },
+    }
   );
 });

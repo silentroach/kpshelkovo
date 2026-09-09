@@ -7,7 +7,7 @@ const BLOCK_JOIN_TYPES = new Set([
   'listItem',
   'table',
   'tableCell',
-  'tableRow',
+  'tableRow'
 ]);
 const SKIPPED_NODE_TYPES = new Set(['code', 'definition', 'html']);
 
@@ -37,14 +37,10 @@ function text(node: MarkdownNode): string {
     return ' ';
   }
 
-  return (node.children ?? [])
-    .map(text)
-    .join(BLOCK_JOIN_TYPES.has(node.type) ? ' ' : '');
+  return (node.children ?? []).map(text).join(BLOCK_JOIN_TYPES.has(node.type) ? ' ' : '');
 }
 
-export const extractFirstMarkdownText = (
-  markdown: string,
-): string | undefined => {
+export const extractFirstMarkdownText = (markdown: string): string | undefined => {
   for (const child of parseMarkdownFragment(markdown)) {
     const value = inline(text(child));
 
@@ -57,9 +53,7 @@ export const extractFirstMarkdownText = (
 };
 
 export const extractMarkdownText = (markdown: string): string | undefined => {
-  const value = inline(
-    parseMarkdownFragment(markdown).map(text).filter(Boolean).join(' '),
-  );
+  const value = inline(parseMarkdownFragment(markdown).map(text).filter(Boolean).join(' '));
 
   return value || undefined;
 };

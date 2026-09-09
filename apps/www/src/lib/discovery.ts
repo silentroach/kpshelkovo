@@ -1,23 +1,16 @@
-import { siteApiCatalogUrl } from './llms';
 import { formatApiCatalogLink } from './api-catalog-response';
-import {
-  publicSurfaceRegistry,
-  surfaceHref,
-  type PublicSurface,
-} from './public-surface';
+import { siteApiCatalogUrl } from './llms';
+import { publicSurfaceRegistry, surfaceHref, type PublicSurface } from './public-surface';
 
-const full = (root: string, path: string): string =>
-  new URL(path, `${root}/`).toString();
+const full = (root: string, path: string): string => new URL(path, `${root}/`).toString();
 
-const star = (
-  value: string,
-): readonly { readonly value: string; readonly language: 'ru' }[] => [
-  { value, language: 'ru' },
+const star = (value: string): readonly { readonly value: string; readonly language: 'ru' }[] => [
+  { value, language: 'ru' }
 ];
 
 const item = (
   root: string,
-  surface: PublicSurface,
+  surface: PublicSurface
 ): {
   readonly href: string;
   readonly type: string;
@@ -28,23 +21,20 @@ const item = (
 } => ({
   href: surfaceHref(root, surface),
   type: surface.mediaType,
-  'title*': star(surface.label),
+  'title*': star(surface.label)
 });
 
 const hasCatalogLinks = (entry: {
   readonly anchor?: string;
   readonly item?: readonly unknown[];
   readonly 'service-desc'?: readonly unknown[];
-}): boolean =>
-  Boolean(entry.anchor || entry.item?.length || entry['service-desc']?.length);
+}): boolean => Boolean(entry.anchor || entry.item?.length || entry['service-desc']?.length);
 
 export function catalog(root: string): Record<string, unknown> {
   return {
     linkset: publicSurfaceRegistry.slices
       .map((slice) => {
-        const anchor = slice.surfaces.find(
-          (surface) => surface.catalogRole === 'anchor',
-        );
+        const anchor = slice.surfaces.find((surface) => surface.catalogRole === 'anchor');
         const items = slice.surfaces
           .filter((surface) => surface.catalogRole === 'item')
           .map((surface) => item(root, surface));
@@ -55,12 +45,11 @@ export function catalog(root: string): Record<string, unknown> {
         return {
           ...(anchor ? { anchor: surfaceHref(root, anchor) } : {}),
           ...(items.length ? { item: items } : {}),
-          ...(serviceDesc.length ? { 'service-desc': serviceDesc } : {}),
+          ...(serviceDesc.length ? { 'service-desc': serviceDesc } : {})
         };
       })
-      .filter(hasCatalogLinks),
+      .filter(hasCatalogLinks)
   };
 }
 
-export const self = (root: string): string =>
-  formatApiCatalogLink(full(root, siteApiCatalogUrl()));
+export const self = (root: string): string => formatApiCatalogLink(full(root, siteApiCatalogUrl()));

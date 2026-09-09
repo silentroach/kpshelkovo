@@ -16,32 +16,32 @@ const buildSiteMentionGraph = async (): Promise<EntityMentionGraph> => {
     { loadStatusData },
     { loadReviewsData },
     { loadPlacesData },
-    people,
+    people
   ] = await Promise.all([
     import('./contacts/load'),
     import('./news/load'),
     import('./status/load'),
     import('./reviews/load'),
     import('./places/load'),
-    loadPeopleData(),
+    loadPeopleData()
   ]);
   const [contacts, news, status, reviews, places] = await Promise.all([
     loadContactsData(),
     loadNewsData(),
     loadStatusData(),
     loadReviewsData(),
-    loadPlacesData(),
+    loadPlacesData()
   ]);
 
   return createEntityMentionGraph([
     ...contacts.contacts.flatMap(createContactMentionRefs),
     ...news.articles.flatMap(createNewsArticleMentionRefs),
     ...status.incidents.flatMap((incident) =>
-      incident.hasPage ? createStatusIncidentMentionRefs(incident) : [],
+      incident.hasPage ? createStatusIncidentMentionRefs(incident) : []
     ),
     ...reviews.reviews.flatMap(createReviewMentionRefs),
     ...places.places.flatMap(createPlaceMentionRefs),
-    ...people.profiles.flatMap(createPersonProfileMentionRefs),
+    ...people.profiles.flatMap(createPersonProfileMentionRefs)
   ]);
 };
 

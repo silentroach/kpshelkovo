@@ -2,17 +2,18 @@
   import { compareRuText, formatTariff } from '@shelkovo/format';
   import { calculateDistance } from '@shelkovo/geo';
   import { onMount } from 'svelte';
+
   import type { ExplorerPayload, ExplorerSettlement } from '../lib/explorer';
   import { getRing } from '../lib/rating';
   import {
     buildExplorerUrl,
     DEFAULT_EXPLORER_QUERY,
     readExplorerQuery,
-    withBase,
+    withBase
   } from '../lib/url';
   import type { ExplorerPriceFilter, ExplorerSort } from '../lib/url.types';
-  import SettlementMap from './SettlementMap.svelte';
   import SettlementCard from './SettlementCard.svelte';
+  import SettlementMap from './SettlementMap.svelte';
 
   interface Props {
     readonly settlements: readonly ExplorerSettlement[];
@@ -41,7 +42,7 @@
       baseline.location.lat,
       baseline.location.lng,
       settlement.location.lat,
-      settlement.location.lng,
+      settlement.location.lng
     );
   }
 
@@ -59,17 +60,14 @@
     return 'Тариф приведен к сотке автоматически.';
   }
 
-  function rankExplorer(
-    list: readonly ExplorerSettlement[],
-  ): Readonly<Record<string, number>> {
+  function rankExplorer(list: readonly ExplorerSettlement[]): Readonly<Record<string, number>> {
     let prev: number | undefined;
     let rank = 0;
     const ranks: Record<string, number> = {};
 
     [...list]
       .sort((a, b) => {
-        const diff =
-          a.tariff.normalizedPerSotkaMonth - b.tariff.normalizedPerSotkaMonth;
+        const diff = a.tariff.normalizedPerSotkaMonth - b.tariff.normalizedPerSotkaMonth;
         if (diff !== 0) return diff;
         return compareRuText(a.shortName, b.shortName);
       })
@@ -87,9 +85,7 @@
 
   // Состояние фильтров и сортировки.
   let sortBy = $state<ExplorerSort>(DEFAULT_EXPLORER_QUERY.sortBy);
-  let priceFilter = $state<ExplorerPriceFilter>(
-    DEFAULT_EXPLORER_QUERY.priceFilter,
-  );
+  let priceFilter = $state<ExplorerPriceFilter>(DEFAULT_EXPLORER_QUERY.priceFilter);
   let showMap = $state(false);
   let mobile = $state(false);
   let controlsReady = $state(false);
@@ -98,7 +94,7 @@
   const syncExplorerUrl = (): void => {
     const nextUrl = buildExplorerUrl(window.location.href, {
       sortBy,
-      priceFilter,
+      priceFilter
     });
     const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
     if (nextUrl === currentUrl) return;
@@ -125,11 +121,7 @@
         if (!comparison) return true;
         if (priceFilter === 'cheaper') return comparison.isCheaper;
         if (priceFilter === 'more_expensive')
-          return (
-            !comparison.isCheaper &&
-            comparison.tariffDelta !== 0 &&
-            !s.isBaseline
-          );
+          return !comparison.isCheaper && comparison.tariffDelta !== 0 && !s.isBaseline;
         return true;
       });
     }
@@ -148,13 +140,9 @@
           return compareRuText(a.shortName, b.shortName);
         }
         case 'tariff_asc':
-          return (
-            a.tariff.normalizedPerSotkaMonth - b.tariff.normalizedPerSotkaMonth
-          );
+          return a.tariff.normalizedPerSotkaMonth - b.tariff.normalizedPerSotkaMonth;
         case 'tariff_desc':
-          return (
-            b.tariff.normalizedPerSotkaMonth - a.tariff.normalizedPerSotkaMonth
-          );
+          return b.tariff.normalizedPerSotkaMonth - a.tariff.normalizedPerSotkaMonth;
         case 'mkad':
           return getDistanceFromMkad(a) - getDistanceFromMkad(b);
         case 'distance':
@@ -188,9 +176,9 @@
         isBaseline: s.isBaseline,
         tariffText: tariffText(s),
         tariffHint: tariffHint(s),
-        companyText: typeof company === 'string' ? company : company?.title,
+        companyText: typeof company === 'string' ? company : company?.title
       };
-    }),
+    })
   );
   let ranks = $derived(rankExplorer(settlements));
   let levels = $derived(Math.max(new Set(Object.values(ranks)).size, 1));
@@ -288,8 +276,7 @@
             />
             <label
               for={moreid}
-              class="ui-btn ui-btn-sm filter-label {priceFilter ===
-              'more_expensive'
+              class="ui-btn ui-btn-sm filter-label {priceFilter === 'more_expensive'
                 ? 'ui-btn-primary ui-btn-soft'
                 : 'ui-btn-ghost'}"
             >
@@ -308,9 +295,7 @@
       <button
         type="button"
         disabled={!controlsReady}
-        class="ui-btn ui-btn-sm map-toggle {showMap
-          ? 'ui-btn-outline'
-          : 'ui-btn-ghost'}"
+        class="ui-btn ui-btn-sm map-toggle {showMap ? 'ui-btn-outline' : 'ui-btn-ghost'}"
         onclick={() => {
           showMap = !showMap;
         }}
@@ -318,12 +303,7 @@
         aria-controls={showMap ? mapid : undefined}
         data-testid="map-toggle"
       >
-        <svg
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          class="map-toggle-icon"
-          aria-hidden="true"
-        >
+        <svg viewBox="0 0 20 20" fill="currentColor" class="map-toggle-icon" aria-hidden="true">
           <path
             d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm5.8 7h-2.3A12 12 0 0 0 12.6 4a6.5 6.5 0 0 1 3.2 5Zm-5.8 7.4A10.5 10.5 0 0 1 8.6 11h2.8A10.5 10.5 0 0 1 10 16.4Zm-1.7 0A8.9 8.9 0 0 1 7 11h2.1a8.9 8.9 0 0 0 1.2 5.4 6.2 6.2 0 0 1-2 0Zm-3-7.4A6.5 6.5 0 0 1 8.5 4 12 12 0 0 0 7.6 9H5.3Zm0 2h2.3a12 12 0 0 0 .9 5 6.5 6.5 0 0 1-3.2-5Zm4.7-2A10.5 10.5 0 0 1 10 3.6 10.5 10.5 0 0 1 11.4 9H8.6Zm2.9 2H15a6.5 6.5 0 0 1-3.2 5 12 12 0 0 0 .9-5Z"
           />
@@ -368,8 +348,7 @@
           disabled={!controlsReady}
           aria-label="Сортировка поселков"
           onchange={(e) => {
-            sortBy = (e.currentTarget as HTMLSelectElement)
-              .value as typeof sortBy;
+            sortBy = (e.currentTarget as HTMLSelectElement).value as typeof sortBy;
             syncExplorerUrl();
           }}
           class="sort-select"
@@ -407,13 +386,7 @@
                   stroke-linejoin="round"
                   d="M8.7 7.6A1.8 1.8 0 0 1 10.2 7c1 0 1.8.7 1.8 1.7 0 .8-.4 1.2-1.1 1.7-.7.4-1 .8-1 1.6"
                 ></path>
-                <circle
-                  cx="10"
-                  cy="13.9"
-                  r="0.7"
-                  fill="currentColor"
-                  stroke="none"
-                ></circle>
+                <circle cx="10" cy="13.9" r="0.7" fill="currentColor" stroke="none"></circle>
               </svg>
             </a>
           {/if}

@@ -1,13 +1,8 @@
-import { absoluteUrl } from '../site';
 import type { EntityMentionTarget } from '../mentions';
+import { absoluteUrl } from '../site';
 import type { PersonNameCaseForms } from './name-cases';
-import type {
-  PersonBacklinks,
-  PersonContact,
-  PersonMentionRef,
-  PersonProfile,
-} from './types';
 import { PERSON_MENTION_SECTIONS } from './schema';
+import type { PersonBacklinks, PersonContact, PersonMentionRef, PersonProfile } from './types';
 
 export interface PeoplePublicContactDto {
   readonly type: PersonContact['type'];
@@ -75,16 +70,13 @@ export interface PeoplePublicPayloadDto {
 const fullUrl = (value: string): string => absoluteUrl(value);
 
 const backlinksCount = (backlinks: PersonBacklinks): number =>
-  PERSON_MENTION_SECTIONS.reduce(
-    (total, section) => total + backlinks[section].length,
-    0,
-  );
+  PERSON_MENTION_SECTIONS.reduce((total, section) => total + backlinks[section].length, 0);
 
 const contactDto = (item: PersonContact): PeoplePublicContactDto => ({
   type: item.type,
   value: item.value,
   display: item.display,
-  href: item.href,
+  href: item.href
 });
 
 const mentionDto = (item: EntityMentionTarget): PeoplePublicMentionDto => {
@@ -98,7 +90,7 @@ const mentionDto = (item: EntityMentionTarget): PeoplePublicMentionDto => {
     ...(typeof company === 'string' ? { company } : {}),
     ...(typeof position === 'string' ? { position } : {}),
     html_url: fullUrl(item.htmlUrl),
-    markdown_url: fullUrl(item.markdownUrl),
+    markdown_url: fullUrl(item.markdownUrl)
   };
 };
 
@@ -110,7 +102,7 @@ const backlinkDto = (item: PersonMentionRef): PeoplePublicBacklinkDto => ({
   html_url: fullUrl(item.htmlUrl),
   markdown_url: fullUrl(item.markdownUrl),
   ...(item.excerpt ? { excerpt: item.excerpt } : {}),
-  ...(item.mentionedAt ? { mentioned_at: item.mentionedAt } : {}),
+  ...(item.mentionedAt ? { mentioned_at: item.mentionedAt } : {})
 });
 
 const backlinksDto = (value: PersonBacklinks): PeoplePublicBacklinksDto => ({
@@ -119,7 +111,7 @@ const backlinksDto = (value: PersonBacklinks): PeoplePublicBacklinksDto => ({
   reviews: value.reviews.map(backlinkDto),
   places: value.places.map(backlinkDto),
   people: value.people.map(backlinkDto),
-  contacts: value.contacts.map(backlinkDto),
+  contacts: value.contacts.map(backlinkDto)
 });
 
 const profileDto = (item: PersonProfile): PeoplePublicProfileDto => ({
@@ -136,7 +128,7 @@ const profileDto = (item: PersonProfile): PeoplePublicProfileDto => ({
   mentions: item.mentions.map(mentionDto),
   mention_count: item.mentions.length,
   backlinks: backlinksDto(item.backlinks),
-  backlink_count: backlinksCount(item.backlinks),
+  backlink_count: backlinksCount(item.backlinks)
 });
 
 export const buildPeoplePublicPayload = (data: {
@@ -147,15 +139,9 @@ export const buildPeoplePublicPayload = (data: {
   return {
     stats: {
       profile_count: profiles.length,
-      mention_count: profiles.reduce(
-        (total, item) => total + item.mention_count,
-        0,
-      ),
-      backlink_count: profiles.reduce(
-        (total, item) => total + item.backlink_count,
-        0,
-      ),
+      mention_count: profiles.reduce((total, item) => total + item.mention_count, 0),
+      backlink_count: profiles.reduce((total, item) => total + item.backlink_count, 0)
     },
-    profiles,
+    profiles
   };
 };

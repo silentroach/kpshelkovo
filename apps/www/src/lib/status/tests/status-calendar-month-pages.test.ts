@@ -3,17 +3,16 @@
 import { Window } from 'happy-dom';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createAstroContainer } from '@/test/astro-container';
 import type {
   StatusCalendarDay,
   StatusCalendarMonth,
-  StatusCalendarYear,
+  StatusCalendarYear
 } from '@/lib/status/calendar.types';
 import type { StatusIncident } from '@/lib/status/types';
-
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import * as StatusCalendarMonthPage from '@/pages/status/calendar/[year]/[month]/index.astro';
 import * as StatusCalendarMonthMarkdownRoute from '@/pages/status/calendar/[year]/[month]/index.md';
+import { createAstroContainer } from '@/test/astro-container';
 
 const fixtures = vi.hoisted(() => {
   const carryover = {
@@ -27,12 +26,12 @@ const fixtures = vi.hoisted(() => {
     started: {
       at: new Date('2026-08-23T20:00:00.000Z'),
       iso: '2026-08-23T23:00:00+03:00',
-      hasTime: true,
+      hasTime: true
     },
     ended: {
       at: new Date('2026-08-23T23:00:00.000Z'),
       iso: '2026-08-24T02:00:00+03:00',
-      hasTime: true,
+      hasTime: true
     },
     phase: 'resolved' as const,
     appliesToAllAreas: true,
@@ -45,7 +44,7 @@ const fixtures = vi.hoisted(() => {
     mentions: [],
     sortStartedAt: new Date('2026-08-23T20:00:00.000Z').valueOf(),
     sortLastChangeAt: new Date('2026-08-23T23:00:00.000Z').valueOf(),
-    duration: { totalMinutes: 180 },
+    duration: { totalMinutes: 180 }
   };
   const listOnly = {
     id: '2026/08/list-only-maintenance',
@@ -58,12 +57,12 @@ const fixtures = vi.hoisted(() => {
     started: {
       at: new Date('2026-08-24T05:00:00.000Z'),
       iso: '2026-08-24T08:00:00+03:00',
-      hasTime: true,
+      hasTime: true
     },
     ended: {
       at: new Date('2026-08-24T07:00:00.000Z'),
       iso: '2026-08-24T10:00:00+03:00',
-      hasTime: true,
+      hasTime: true
     },
     phase: 'resolved' as const,
     appliesToAllAreas: true,
@@ -74,7 +73,7 @@ const fixtures = vi.hoisted(() => {
     mentions: [],
     sortStartedAt: new Date('2026-08-24T05:00:00.000Z').valueOf(),
     sortLastChangeAt: new Date('2026-08-24T07:00:00.000Z').valueOf(),
-    duration: { totalMinutes: 120 },
+    duration: { totalMinutes: 120 }
   };
   const older = {
     id: '2026/08/older',
@@ -87,12 +86,12 @@ const fixtures = vi.hoisted(() => {
     started: {
       at: new Date('2026-08-23T09:00:00.000Z'),
       iso: '2026-08-23T12:00:00+03:00',
-      hasTime: true,
+      hasTime: true
     },
     ended: {
       at: new Date('2026-08-23T10:00:00.000Z'),
       iso: '2026-08-23T13:00:00+03:00',
-      hasTime: true,
+      hasTime: true
     },
     phase: 'resolved' as const,
     appliesToAllAreas: true,
@@ -105,7 +104,7 @@ const fixtures = vi.hoisted(() => {
     mentions: [],
     sortStartedAt: new Date('2026-08-23T09:00:00.000Z').valueOf(),
     sortLastChangeAt: new Date('2026-08-23T10:00:00.000Z').valueOf(),
-    duration: { totalMinutes: 60 },
+    duration: { totalMinutes: 60 }
   };
   const julyMaintenance = {
     ...listOnly,
@@ -117,15 +116,15 @@ const fixtures = vi.hoisted(() => {
     started: {
       at: new Date('2026-07-01T05:00:00.000Z'),
       iso: '2026-07-01T08:00:00+03:00',
-      hasTime: true,
+      hasTime: true
     },
     ended: {
       at: new Date('2026-07-01T07:00:00.000Z'),
       iso: '2026-07-01T10:00:00+03:00',
-      hasTime: true,
+      hasTime: true
     },
     sortStartedAt: new Date('2026-07-01T05:00:00.000Z').valueOf(),
-    sortLastChangeAt: new Date('2026-07-01T07:00:00.000Z').valueOf(),
+    sortLastChangeAt: new Date('2026-07-01T07:00:00.000Z').valueOf()
   };
   const augustDays: readonly StatusCalendarDay[] = [
     {
@@ -136,7 +135,7 @@ const fixtures = vi.hoisted(() => {
       kind: 'mixed' as const,
       incidentCount: 1,
       maintenanceCount: 1,
-      recordIds: [carryover.id, listOnly.id],
+      recordIds: [carryover.id, listOnly.id]
     },
     {
       id: '2026-08-23',
@@ -146,14 +145,14 @@ const fixtures = vi.hoisted(() => {
       kind: 'incident' as const,
       incidentCount: 2,
       maintenanceCount: 0,
-      recordIds: [older.id, carryover.id],
-    },
+      recordIds: [older.id, carryover.id]
+    }
   ];
   const august: StatusCalendarMonth = {
     id: '2026/08',
     year: 2026,
     month: 8,
-    days: augustDays,
+    days: augustDays
   };
   const julyDay: StatusCalendarDay = {
     id: '2026-07-01',
@@ -163,13 +162,13 @@ const fixtures = vi.hoisted(() => {
     kind: 'maintenance',
     incidentCount: 0,
     maintenanceCount: 1,
-    recordIds: [julyMaintenance.id],
+    recordIds: [julyMaintenance.id]
   };
   const july: StatusCalendarMonth = {
     id: '2026/07',
     year: 2026,
     month: 7,
-    days: [julyDay],
+    days: [julyDay]
   };
 
   return {
@@ -181,30 +180,30 @@ const fixtures = vi.hoisted(() => {
         buildYear: 2026,
         years: [{ year: 2026, months: [august, july] }],
         byYear: new Map<number, StatusCalendarYear>([
-          [2026, { year: 2026, months: [august, july] }],
+          [2026, { year: 2026, months: [august, july] }]
         ]),
         byMonth: new Map<string, StatusCalendarMonth>([
           [august.id, august],
-          [july.id, july],
+          [july.id, july]
         ]),
         byDay: new Map<string, StatusCalendarDay>([
           ...augustDays.map((day) => [day.id, day] as const),
-          [julyDay.id, julyDay],
-        ]),
+          [julyDay.id, julyDay]
+        ])
       },
       byId: new Map<string, StatusIncident>([
         [carryover.id, carryover],
         [listOnly.id, listOnly],
         [older.id, older],
-        [julyMaintenance.id, julyMaintenance],
+        [julyMaintenance.id, julyMaintenance]
       ]),
-      byService: new Map(),
-    },
+      byService: new Map()
+    }
   };
 });
 
 vi.mock('@/lib/status/load', () => ({
-  loadStatusData: async () => fixtures.data,
+  loadStatusData: async () => fixtures.data
 }));
 
 const parseHtml = (html: string) => {
@@ -217,26 +216,24 @@ const parseHtml = (html: string) => {
 const cleanText = (value: string): string => value.replace(/\s+/gu, ' ').trim();
 
 const htmlJournal = (document: ReturnType<typeof parseHtml>) =>
-  [...document.querySelectorAll('[data-status-calendar-day]')].map(
-    (section) => {
-      const heading = section.querySelector('h2');
-      const marker = heading?.querySelector('[data-status-calendar-marker]');
+  [...document.querySelectorAll('[data-status-calendar-day]')].map((section) => {
+    const heading = section.querySelector('h2');
+    const marker = heading?.querySelector('[data-status-calendar-marker]');
 
-      return {
-        id: heading?.id,
-        tabindex: heading?.getAttribute('tabindex'),
-        heading: cleanText(heading?.textContent ?? ''),
-        marker: marker?.getAttribute('data-status-calendar-marker'),
-        markerRole: marker?.getAttribute('role'),
-        markerLabel: marker?.getAttribute('aria-label'),
-        date: cleanText(heading?.querySelector('time')?.textContent ?? ''),
-        records: [...section.querySelectorAll('article h3')].map((record) => ({
-          title: cleanText(record.textContent),
-          href: record.querySelector('a')?.getAttribute('href'),
-        })),
-      };
-    },
-  );
+    return {
+      id: heading?.id,
+      tabindex: heading?.getAttribute('tabindex'),
+      heading: cleanText(heading?.textContent ?? ''),
+      marker: marker?.getAttribute('data-status-calendar-marker'),
+      markerRole: marker?.getAttribute('role'),
+      markerLabel: marker?.getAttribute('aria-label'),
+      date: cleanText(heading?.querySelector('time')?.textContent ?? ''),
+      records: [...section.querySelectorAll('article h3')].map((record) => ({
+        title: cleanText(record.textContent),
+        href: record.querySelector('a')?.getAttribute('href')
+      }))
+    };
+  });
 
 const markdownJournal = (markdown: string) =>
   markdown
@@ -244,17 +241,15 @@ const markdownJournal = (markdown: string) =>
     .slice(1)
     .map((section) => {
       const [date = ''] = section.split('\n');
-      const records = [
-        ...section.matchAll(/^- (?:\[([^\]]+)\]\([^)]+\)|([^—\n]+?)) —/gmu),
-      ].map(([, linkedTitle, plainTitle]) =>
-        cleanText(linkedTitle ?? plainTitle ?? ''),
+      const records = [...section.matchAll(/^- (?:\[([^\]]+)\]\([^)]+\)|([^—\n]+?)) —/gmu)].map(
+        ([, linkedTitle, plainTitle]) => cleanText(linkedTitle ?? plainTitle ?? '')
       );
 
       return { date: cleanText(date), records };
     });
 
 const renderMarkdownRoute = (
-  params: Readonly<Record<string, string | undefined>>,
+  params: Readonly<Record<string, string | undefined>>
 ): Response | Promise<Response> =>
   (
     StatusCalendarMonthMarkdownRoute.GET as (context: {
@@ -266,7 +261,7 @@ describe('/status/calendar/YYYY/MM/', () => {
   it('creates matching HTML and Markdown paths only for affected months', async () => {
     const [htmlPaths, markdownPaths] = await Promise.all([
       StatusCalendarMonthPage.getStaticPaths(),
-      StatusCalendarMonthMarkdownRoute.getStaticPaths(),
+      StatusCalendarMonthMarkdownRoute.getStaticPaths()
     ]);
 
     expect({ htmlPaths, markdownPaths }).toMatchInlineSnapshot(`
@@ -305,42 +300,31 @@ describe('/status/calendar/YYYY/MM/', () => {
 
   it('renders descending ISO day anchors and list-only records without a detail link', async () => {
     const container = await createAstroContainer();
-    const html = await container.renderToString(
-      StatusCalendarMonthPage.default,
-      {
-        params: { year: '2026', month: '08' },
-        request: new Request(
-          'https://example.com/status/calendar/2026/08/#2026-08-24',
-        ),
-        partial: false,
-      },
-    );
+    const html = await container.renderToString(StatusCalendarMonthPage.default, {
+      params: { year: '2026', month: '08' },
+      request: new Request('https://example.com/status/calendar/2026/08/#2026-08-24'),
+      partial: false
+    });
     const document = parseHtml(html);
 
     expect({
       days: htmlJournal(document),
       metadata: {
-        historyLinkCount: document.querySelectorAll(
-          'main a[href="/status/history/"]',
-        ).length,
+        historyLinkCount: document.querySelectorAll('main a[href="/status/history/"]').length,
         statusBreadcrumbHref: document
           .querySelector('nav[aria-label="Хлебные крошки"] a[href="/status/"]')
           ?.getAttribute('href'),
         yearBreadcrumbHref: [
-          ...document.querySelectorAll(
-            'nav[aria-label="Хлебные крошки"] a[href]',
-          ),
+          ...document.querySelectorAll('nav[aria-label="Хлебные крошки"] a[href]')
         ]
           .at(-1)
           ?.getAttribute('href'),
-        robots: document
-          .querySelector('meta[name="robots"]')
-          ?.getAttribute('content'),
+        robots: document.querySelector('meta[name="robots"]')?.getAttribute('content'),
         markdownAlternate: document
           .querySelector('link[rel="alternate"][type="text/markdown"]')
           ?.getAttribute('href'),
-        pagefindRoot: document.querySelector('[data-pagefind-root]')?.tagName,
-      },
+        pagefindRoot: document.querySelector('[data-pagefind-root]')?.tagName
+      }
     }).toMatchInlineSnapshot(`
       {
         "days": [
@@ -403,13 +387,13 @@ describe('/status/calendar/YYYY/MM/', () => {
       container.renderToString(StatusCalendarMonthPage.default, {
         params,
         request,
-        partial: false,
+        partial: false
       }),
-      renderMarkdownRoute(params),
+      renderMarkdownRoute(params)
     ]);
     const htmlDays = htmlJournal(parseHtml(html)).map((day) => ({
       date: day.date,
-      records: day.records.map((record) => record.title),
+      records: day.records.map((record) => record.title)
     }));
     const markdown = await markdownResponse.text();
     const markdownDays = markdownJournal(markdown);
@@ -419,9 +403,7 @@ describe('/status/calendar/YYYY/MM/', () => {
       days: markdownDays,
       contentType: markdownResponse.headers.get('Content-Type'),
       robots: markdownResponse.headers.get('X-Robots-Tag'),
-      listOnlyTitleIsLinked: markdown.includes(
-        '[Плановые работы без страницы]',
-      ),
+      listOnlyTitleIsLinked: markdown.includes('[Плановые работы без страницы]')
     }).toMatchInlineSnapshot(`
       {
         "contentType": "text/markdown; charset=utf-8",

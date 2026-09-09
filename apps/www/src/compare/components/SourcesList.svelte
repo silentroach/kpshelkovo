@@ -13,14 +13,14 @@
     official: 'Официальный',
     community: 'Сообщество',
     media: 'СМИ',
-    personal: 'Личное',
+    personal: 'Личное'
   };
 
   const typeColors: Record<SourceType, string> = {
     official: 'ui-badge ui-badge-success',
     community: 'ui-badge ui-badge-info',
     media: 'ui-badge ui-badge-warning',
-    personal: 'ui-badge ui-badge-muted',
+    personal: 'ui-badge ui-badge-muted'
   };
 </script>
 

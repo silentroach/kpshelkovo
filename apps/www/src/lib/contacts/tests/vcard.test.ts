@@ -9,19 +9,18 @@ const contact = {
   category: 'electricity',
   updatedAt: new Date('2026-07-13T00:00:00.000Z'),
   updatedIso: '2026-07-13',
-  summary:
-    'Консультации по электричеству и помощь с взаимодействием с Россетями и Мосэнергосбытом',
+  summary: 'Консультации по электричеству и помощь с взаимодействием с Россетями и Мосэнергосбытом',
   contacts: {
     phone: '+7 (985) 414-57-87',
     telegram: 'https://t.me/Alexeremin2006',
     email: 'alexander@example.com',
-    website: 'https://example-electrician.ru',
+    website: 'https://example-electrician.ru'
   },
   location: {
     title: 'Шелково',
     url: 'https://example.com/map',
     address: 'КП Шелково, ул. Лесная, 1',
-    coordinates: { lat: 55.123456, lng: 38.654321 },
+    coordinates: { lat: 55.123456, lng: 38.654321 }
   },
   reviews: [],
   url: '/sarafan/electricity/alexander-eremin/',
@@ -35,19 +34,18 @@ const contact = {
     filename: 'alexander-eremin.vcf',
     name: {
       family: 'Ерёмин',
-      given: 'Александр',
+      given: 'Александр'
     },
     phone: '8 (900) 000-00-00',
     organization: 'Электрика; Шелково',
     jobTitle: 'Электрик',
-    note: 'Помогает с электричеством, Россетями\nи Мосэнергосбытом.',
-  },
+    note: 'Помогает с электричеством, Россетями\nи Мосэнергосбытом.'
+  }
 } satisfies ContactWithVcf;
 
 describe('contact vCard', () => {
   it('combines card defaults with explicit vCard overrides', () => {
-    expect(buildContactVcard(contact).replaceAll('\r\n', '\n'))
-      .toMatchInlineSnapshot(`
+    expect(buildContactVcard(contact).replaceAll('\r\n', '\n')).toMatchInlineSnapshot(`
         "BEGIN:VCARD
         VERSION:3.0
         PRODID:-//vcard-creator//vcard-creator 1.0.0//EN
@@ -88,19 +86,18 @@ describe('contact vCard', () => {
         title: 'Золото Сибири',
         url: 'https://yandex.ru/maps/-/CTq-BEOk',
         address: 'Пионерская ул., 21, пгт Малино',
-        coordinates: { lat: 55.116326, lng: 38.16951 },
+        coordinates: { lat: 55.116326, lng: 38.16951 }
       },
       canonical: 'https://kpshelkovo.online/sarafan/garden/zoloto-sibiri-kora/',
       vcf: {
         kind: 'organization',
         downloadUrl: '/sarafan/garden/zoloto-sibiri-kora/contact.vcf',
         filename: 'zoloto-sibiri-kora.vcf',
-        organization: 'Золото Сибири',
-      },
+        organization: 'Золото Сибири'
+      }
     } satisfies ContactWithVcf;
 
-    expect(buildContactVcard(organization).replaceAll('\r\n', '\n'))
-      .toMatchInlineSnapshot(`
+    expect(buildContactVcard(organization).replaceAll('\r\n', '\n')).toMatchInlineSnapshot(`
         "BEGIN:VCARD
         VERSION:3.0
         PRODID:-//vcard-creator//vcard-creator 1.0.0//EN
@@ -125,9 +122,7 @@ describe('contact vCard', () => {
   it('folds every physical line to 75 UTF-8 bytes', () => {
     const lines = buildContactVcard(contact).split('\r\n');
 
-    expect(
-      lines.every((line) => new TextEncoder().encode(line).length <= 75),
-    ).toBe(true);
+    expect(lines.every((line) => new TextEncoder().encode(line).length <= 75)).toBe(true);
   });
 
   it('only includes unambiguous international and full phone numbers', () => {
@@ -138,18 +133,18 @@ describe('contact vCard', () => {
       '+7.900.123.45.67',
       '+7 900 000-00',
       '+7 900 ***-**-00',
-      '+7 900 000-00-00 доб. 123',
+      '+7 900 000-00-00 доб. 123'
     ];
 
     expect(
       phones.map((phone) =>
         buildContactVcard({
           ...contact,
-          vcf: { ...contact.vcf, phone },
+          vcf: { ...contact.vcf, phone }
         })
           .split('\r\n')
-          .find((line) => line.startsWith('TEL;')),
-      ),
+          .find((line) => line.startsWith('TEL;'))
+      )
     ).toMatchInlineSnapshot(`
       [
         "TEL;TYPE=CELL,VOICE:+493012345678",

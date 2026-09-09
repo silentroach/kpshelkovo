@@ -1,39 +1,39 @@
-import type { EstimateDetailDataset } from '@/lib/reglament/detail-schema';
 import {
   cleaningControlTotals,
   cleaningResources,
-  cleaningWorkItems,
+  cleaningWorkItems
 } from '@/data/reglament/estimate-details-2026/cleaning';
 import { finalControlTotals } from '@/data/reglament/estimate-details-2026/final';
 import {
   improvementControlTotals,
   improvementResources,
-  improvementWorkItems,
+  improvementWorkItems
 } from '@/data/reglament/estimate-details-2026/improvement';
 import {
   landscapingControlTotals,
   landscapingResources,
-  landscapingWorkItems,
+  landscapingWorkItems
 } from '@/data/reglament/estimate-details-2026/landscaping';
 import {
   lightingControlTotals,
   lightingResources,
-  lightingWorkItems,
+  lightingWorkItems
 } from '@/data/reglament/estimate-details-2026/lighting';
 import {
   securityControlTotals,
   securityResources,
-  securityWorkItems,
+  securityWorkItems
 } from '@/data/reglament/estimate-details-2026/security';
 import {
   estimateDetailSourcePdfs,
-  resolveSectionControlTotals,
+  resolveSectionControlTotals
 } from '@/data/reglament/estimate-details-2026/shared';
 import {
   wasteControlTotals,
   wasteResources,
-  wasteWorkItems,
+  wasteWorkItems
 } from '@/data/reglament/estimate-details-2026/waste';
+import type { EstimateDetailDataset } from '@/lib/reglament/detail-schema';
 
 const resources = [
   ...cleaningResources,
@@ -41,7 +41,7 @@ const resources = [
   ...securityResources,
   ...lightingResources,
   ...landscapingResources,
-  ...improvementResources,
+  ...improvementResources
 ];
 
 const sectionControlTotals = resolveSectionControlTotals(
@@ -51,9 +51,9 @@ const sectionControlTotals = resolveSectionControlTotals(
     ...securityControlTotals,
     ...lightingControlTotals,
     ...landscapingControlTotals,
-    ...improvementControlTotals,
+    ...improvementControlTotals
   ],
-  resources,
+  resources
 );
 
 export const estimateDetails2026 = {
@@ -67,7 +67,7 @@ export const estimateDetails2026 = {
     'PDF не парсятся во время runtime или build страницы: этот файл является curated dataset для ручного пополнения.',
     'Каждый будущий work item, resource и control total должен иметь source_refs с PDF, страницей и фрагментом; неоднозначные строки помечаются needs_check.',
     'Итоги с control_source=final_pdf сверяют строки и разделы final.pdf с estimate-2026; control_source=section_pdf сверяет ресурсы и итоги секционных PDF.',
-    'В секционных итогах detail_total_rub равен сумме ресурсов, aggregate_total_rub берется из estimate-2026; во всех итогах delta_rub равен разнице между детализацией и агрегированной сметой.',
+    'В секционных итогах detail_total_rub равен сумме ресурсов, aggregate_total_rub берется из estimate-2026; во всех итогах delta_rub равен разнице между детализацией и агрегированной сметой.'
   ],
   work_items: [
     ...cleaningWorkItems,
@@ -75,8 +75,8 @@ export const estimateDetails2026 = {
     ...securityWorkItems,
     ...lightingWorkItems,
     ...landscapingWorkItems,
-    ...improvementWorkItems,
+    ...improvementWorkItems
   ],
   resources,
-  control_totals: [...finalControlTotals, ...sectionControlTotals],
+  control_totals: [...finalControlTotals, ...sectionControlTotals]
 } satisfies EstimateDetailDataset;

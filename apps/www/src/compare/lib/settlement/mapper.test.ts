@@ -1,7 +1,8 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
+
+import { mapRawSettlement } from './mapper';
 import type { RawSettlement } from './schema';
 import type { Settlement } from './types';
-import { mapRawSettlement } from './mapper';
 
 const rawSettlement: RawSettlement = {
   name: 'Коттеджный поселок Тестовый',
@@ -11,7 +12,7 @@ const rawSettlement: RawSettlement = {
   telegram: 'test_settlement',
   management_company: {
     title: 'УК Тест',
-    url: 'https://example.com/uk-test',
+    url: 'https://example.com/uk-test'
   },
   is_baseline: true,
   location: {
@@ -19,7 +20,7 @@ const rawSettlement: RawSettlement = {
     lat: 55.7558,
     lng: 37.6173,
     map_url: 'https://example.com/map',
-    district: 'Тестовый район',
+    district: 'Тестовый район'
   },
   tariff: {
     value: 12000,
@@ -31,20 +32,20 @@ const rawSettlement: RawSettlement = {
         value: 12000,
         unit: 'rub_per_lot',
         period: 'month',
-        note: 'тариф взят с сайта',
+        note: 'тариф взят с сайта'
       },
       {
         value: 100,
         unit: 'rub_per_sotka',
-        period: 'month',
-      },
-    ],
+        period: 'month'
+      }
+    ]
   },
   lots: {
     count: 150,
     area_ha: 32,
     average_sotka: 20.4,
-    average_note: 'средний размер из генплана',
+    average_note: 'средний размер из генплана'
   },
   water_in_tariff: true,
   rabstvo: true,
@@ -62,7 +63,7 @@ const rawSettlement: RawSettlement = {
     video_surveillance: 'checkpoint_only',
     underground_electricity: 'partial',
     admin_building: 'no',
-    retail_or_services: 'yes',
+    retail_or_services: 'yes'
   },
   common_spaces: {
     club_infrastructure: 'yes',
@@ -78,7 +79,7 @@ const rawSettlement: RawSettlement = {
     kids_club: 'partial',
     sports_camp: 'no',
     primary_school: 'no',
-    bbq_zones: 'yes',
+    bbq_zones: 'yes'
   },
   service_model: {
     garbage_collection: 'yes',
@@ -86,7 +87,7 @@ const rawSettlement: RawSettlement = {
     road_cleaning: 'yes',
     landscaping: 'partial',
     emergency_service: 'no',
-    dispatcher: 'yes',
+    dispatcher: 'yes'
   },
   sources: [
     {
@@ -94,9 +95,9 @@ const rawSettlement: RawSettlement = {
       url: 'https://example.com/source',
       type: 'official',
       date_checked: '2026-04-03',
-      comment: '',
-    },
-  ],
+      comment: ''
+    }
+  ]
 };
 
 describe('mapRawSettlement', () => {
@@ -213,7 +214,7 @@ describe('mapRawSettlement', () => {
   it('maps management company string into a domain object', () => {
     const settlement = mapRawSettlement({
       ...rawSettlement,
-      management_company: 'УК Тест',
+      management_company: 'УК Тест'
     });
 
     expect(settlement.managementCompany).toEqual({ title: 'УК Тест' });
@@ -224,8 +225,8 @@ describe('mapRawSettlement', () => {
       ...rawSettlement,
       tariff: {
         ...rawSettlement.tariff,
-        unit: 'rub_fixed',
-      },
+        unit: 'rub_fixed'
+      }
     });
 
     expect(settlement.tariff.unit).toBe('fixed');
@@ -237,9 +238,9 @@ describe('mapRawSettlement', () => {
         ...rawSettlement,
         tariff: {
           ...rawSettlement.tariff,
-          unit: 'rub_unknown' as RawSettlement['tariff']['unit'],
-        },
-      }),
+          unit: 'rub_unknown' as RawSettlement['tariff']['unit']
+        }
+      })
     ).toThrow('Unsupported raw tariff unit: rub_unknown');
   });
 });

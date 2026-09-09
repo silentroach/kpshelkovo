@@ -2,9 +2,9 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { createAstroContainer } from '@/test/astro-container';
 import type { Review } from '@/lib/reviews/types';
 import { visibleWhitespace } from '@/lib/test/visible-whitespace';
+import { createAstroContainer } from '@/test/astro-container';
 
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import ReviewCard from './ReviewCard.astro';
@@ -22,9 +22,9 @@ const review = {
   aspects: [
     { type: 'management', rating: 2 },
     { type: 'place', rating: 5 },
-    { type: 'developer', rating: 3 },
+    { type: 'developer', rating: 3 }
   ],
-  mentions: [],
+  mentions: []
 } satisfies Review;
 
 const visibleText = (html: string): string =>
@@ -41,15 +41,13 @@ describe('ReviewCard', () => {
   it('renders generated title, anonymous author, area, and aspect rating', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(ReviewCard, {
-      props: { review },
+      props: { review }
     });
 
     expect({
       text: visibleWhitespace(visibleText(html)),
       ariaLabels: ariaLabels(html),
-      titles: [...html.matchAll(/ title="([^"]+)"/gu)].map(
-        (match) => match[1] ?? '',
-      ),
+      titles: [...html.matchAll(/ title="([^"]+)"/gu)].map((match) => match[1] ?? '')
     }).toMatchInlineSnapshot(`
       {
         "ariaLabels": [

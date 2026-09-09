@@ -1,7 +1,7 @@
 import {
   createMarkdownDocument,
   parseMarkdownFragment,
-  serializeMarkdownDocument,
+  serializeMarkdownDocument
 } from '@shelkovo/markdown';
 
 import reviewRulesSource from '@/data/review-rules.md?raw';
@@ -32,27 +32,21 @@ if (titleNode?.type !== 'heading' || titleNode.depth !== 1) {
 }
 
 const disclaimerStart = nodes.findIndex(
-  (node) =>
-    node.type === 'heading' &&
-    node.depth === 2 &&
-    headingText(node) === DISCLAIMER_HEADING,
+  (node) => node.type === 'heading' && node.depth === 2 && headingText(node) === DISCLAIMER_HEADING
 );
 if (disclaimerStart < 0) {
   throw new Error(`review rules must contain "${DISCLAIMER_HEADING}" section`);
 }
 
 const disclaimerEnd = nodes.findIndex(
-  (node, index) =>
-    index > disclaimerStart && node.type === 'heading' && node.depth <= 2,
+  (node, index) => index > disclaimerStart && node.type === 'heading' && node.depth <= 2
 );
 const disclaimerNodes = nodes.slice(
   disclaimerStart + 1,
-  disclaimerEnd < 0 ? nodes.length : disclaimerEnd,
+  disclaimerEnd < 0 ? nodes.length : disclaimerEnd
 );
 if (disclaimerNodes.length === 0) {
-  throw new Error(
-    `review rules "${DISCLAIMER_HEADING}" section must not be empty`,
-  );
+  throw new Error(`review rules "${DISCLAIMER_HEADING}" section must not be empty`);
 }
 
 export const REVIEW_RULES = {
@@ -61,6 +55,6 @@ export const REVIEW_RULES = {
   bodyMarkdown: serialize(nodes.slice(1)),
   disclaimer: {
     heading: DISCLAIMER_HEADING,
-    bodyMarkdown: serialize(disclaimerNodes),
-  },
+    bodyMarkdown: serialize(disclaimerNodes)
+  }
 } as const;

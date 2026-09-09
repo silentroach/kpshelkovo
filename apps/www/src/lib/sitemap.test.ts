@@ -4,24 +4,18 @@ import { describe, expect, it } from 'vitest';
 import {
   applySitemapMetadata,
   buildSitemapMetadataIndex,
-  shouldIncludeSitemapPage,
+  shouldIncludeSitemapPage
 } from './sitemap';
 
 describe('shouldIncludeSitemapPage', () => {
   it('keeps error pages out and publishes status calendars', () => {
     expect({
-      rootErrorPage: shouldIncludeSitemapPage(
-        'https://kpshelkovo.online/404/index.html',
-      ),
-      statusMonth: shouldIncludeSitemapPage(
-        'https://kpshelkovo.online/status/calendar/2026/08/',
-      ),
-      statusYear: shouldIncludeSitemapPage(
-        'https://kpshelkovo.online/status/calendar/2026/',
-      ),
+      rootErrorPage: shouldIncludeSitemapPage('https://kpshelkovo.online/404/index.html'),
+      statusMonth: shouldIncludeSitemapPage('https://kpshelkovo.online/status/calendar/2026/08/'),
+      statusYear: shouldIncludeSitemapPage('https://kpshelkovo.online/status/calendar/2026/'),
       statusIncident: shouldIncludeSitemapPage(
-        'https://kpshelkovo.online/status/incidents/2026/08/outage/',
-      ),
+        'https://kpshelkovo.online/status/incidents/2026/08/outage/'
+      )
     }).toMatchInlineSnapshot(`
       {
         "rootErrorPage": false,
@@ -43,21 +37,21 @@ describe('buildSitemapMetadataIndex', () => {
           updatedIso: '2026-05-04T12:30:00+03:00',
           year: 2026,
           month: 5,
-          tags: [{ url: '/news/tags/дороги/' }],
+          tags: [{ url: '/news/tags/дороги/' }]
         },
         {
           url: '/news/2026/04/older/',
           publishedIso: '2026-04-20T09:00:00+03:00',
           year: 2026,
           month: 4,
-          tags: [{ url: '/news/tags/дороги/' }],
-        },
+          tags: [{ url: '/news/tags/дороги/' }]
+        }
       ],
       statusIncidents: [],
       settlements: [],
       meetings: [],
       kbPages: [],
-      contacts: [],
+      contacts: []
     });
 
     expect({
@@ -66,7 +60,7 @@ describe('buildSitemapMetadataIndex', () => {
       firstArticle: index.get('/news/2026/05/first/'),
       olderArticle: index.get('/news/2026/04/older/'),
       monthArchive: index.get('/news/2026/05/'),
-      tag: index.get('/news/tags/дороги/'),
+      tag: index.get('/news/tags/дороги/')
     }).toMatchInlineSnapshot(`
       {
         "firstArticle": {
@@ -108,34 +102,31 @@ describe('buildSitemapMetadataIndex', () => {
             kind: 'incident',
             startedIso: '2026-05-01T08:00:00+03:00',
             endedIso: '2026-05-01T09:00:00+03:00',
-            hasPage: true,
+            hasPage: true
           },
           {
             url: '/status/incidents/2026/05/water/',
             service: 'water',
             kind: 'incident',
             startedIso: '2026-05-03T14:00:00+03:00',
-            hasPage: false,
-          },
+            hasPage: false
+          }
         ],
         settlements: [
           {
             slug: 'river',
-            sources: [
-              { dateChecked: '2026-04-03' },
-              { dateChecked: '2026-04-12' },
-            ],
+            sources: [{ dateChecked: '2026-04-03' }, { dateChecked: '2026-04-12' }]
           },
           {
             slug: 'forest',
-            sources: [{ dateChecked: '2026-03-10' }],
-          },
+            sources: [{ dateChecked: '2026-03-10' }]
+          }
         ],
         meetings: [],
         kbPages: [],
-        contacts: [],
+        contacts: []
       },
-      Date.parse('2026-06-02T12:00:00+03:00'),
+      Date.parse('2026-06-02T12:00:00+03:00')
     );
 
     expect({
@@ -148,7 +139,7 @@ describe('buildSitemapMetadataIndex', () => {
       electricityIncident: index.get('/status/incidents/2026/05/electricity/'),
       compareHome: index.get('/815/compare/'),
       compareRating: index.get('/815/compare/rating/'),
-      riverSettlement: index.get('/815/compare/settlements/river/'),
+      riverSettlement: index.get('/815/compare/settlements/river/')
     }).toMatchInlineSnapshot(`
       {
         "compareHome": {
@@ -205,23 +196,21 @@ describe('buildSitemapMetadataIndex', () => {
           kind: 'maintenance' as const,
           startedIso: '2026-06-10T08:00:00+03:00',
           endedIso: '2026-06-10T12:00:00+03:00',
-          hasPage: true,
-        },
+          hasPage: true
+        }
       ],
       settlements: [],
       meetings: [],
       kbPages: [],
-      contacts: [],
+      contacts: []
     };
     const monthMetadataAt = (nowIso: string) =>
-      buildSitemapMetadataIndex(data, Date.parse(nowIso)).get(
-        '/status/calendar/2026/06/',
-      );
+      buildSitemapMetadataIndex(data, Date.parse(nowIso)).get('/status/calendar/2026/06/');
 
     expect([
       monthMetadataAt('2026-06-09T12:00:00+03:00'),
       monthMetadataAt('2026-06-10T10:00:00+03:00'),
-      monthMetadataAt('2026-06-10T12:00:00+03:00'),
+      monthMetadataAt('2026-06-10T12:00:00+03:00')
     ]).toMatchInlineSnapshot(`
       [
         {
@@ -251,20 +240,20 @@ describe('buildSitemapMetadataIndex', () => {
             kind: 'maintenance',
             startedIso: '2026-04-30',
             endedIso: '2026-05-01',
-            hasPage: true,
-          },
+            hasPage: true
+          }
         ],
         settlements: [],
         meetings: [],
         kbPages: [],
-        contacts: [],
+        contacts: []
       },
-      Date.parse('2026-05-01T00:30:00+03:00'),
+      Date.parse('2026-05-01T00:30:00+03:00')
     );
 
     expect({
       april: index.get('/status/calendar/2026/04/'),
-      may: index.get('/status/calendar/2026/05/'),
+      may: index.get('/status/calendar/2026/05/')
     }).toMatchInlineSnapshot(`
       {
         "april": {
@@ -287,21 +276,21 @@ describe('buildSitemapMetadataIndex', () => {
             kind: 'incident',
             startedIso: '2026-12-30T08:00:00+03:00',
             endedIso: '2026-12-30T09:00:00+03:00',
-            hasPage: true,
-          },
+            hasPage: true
+          }
         ],
         settlements: [],
         meetings: [],
         kbPages: [],
-        contacts: [],
+        contacts: []
       },
-      Date.parse('2027-01-01T00:30:00+03:00'),
+      Date.parse('2027-01-01T00:30:00+03:00')
     );
 
     expect({
       currentYear: index.get('/status/calendar/2027/'),
       history: index.get('/status/history/'),
-      status: index.get('/status/'),
+      status: index.get('/status/')
     }).toMatchInlineSnapshot(`
       {
         "currentYear": {
@@ -328,22 +317,22 @@ describe('buildSitemapMetadataIndex', () => {
         {
           url: '/meetings/updated/',
           dateIso: '2026-06-13T16:00:00+03:00',
-          updatedIso: '2026-06-14T10:30:00+03:00',
+          updatedIso: '2026-06-14T10:30:00+03:00'
         },
         {
           url: '/meetings/original/',
-          dateIso: '2026-05-20',
-        },
+          dateIso: '2026-05-20'
+        }
       ],
       kbPages: [],
-      contacts: [],
+      contacts: []
     });
 
     expect({
       updated: index.get('/meetings/updated/'),
       original: index.get('/meetings/original/'),
       section: index.get('/meetings/'),
-      home: index.get('/'),
+      home: index.get('/')
     }).toMatchInlineSnapshot(`
       {
         "home": undefined,
@@ -369,28 +358,22 @@ describe('buildSitemapMetadataIndex', () => {
       kbPages: [
         {
           url: '/kb/public/',
-          excludeFromSitemap: false,
+          excludeFromSitemap: false
         },
         {
           url: '/kb/court/01/documents/',
-          excludeFromSitemap: true,
-        },
+          excludeFromSitemap: true
+        }
       ],
-      contacts: [],
+      contacts: []
     });
 
     expect(
-      applySitemapMetadata(
-        { url: 'https://kpshelkovo.online/kb/court/01/documents/' },
-        index,
-      ),
+      applySitemapMetadata({ url: 'https://kpshelkovo.online/kb/court/01/documents/' }, index)
     ).toBeUndefined();
-    expect(
-      applySitemapMetadata(
-        { url: 'https://kpshelkovo.online/kb/public/' },
-        index,
-      ),
-    ).toEqual({ url: 'https://kpshelkovo.online/kb/public/' });
+    expect(applySitemapMetadata({ url: 'https://kpshelkovo.online/kb/public/' }, index)).toEqual({
+      url: 'https://kpshelkovo.online/kb/public/'
+    });
   });
 
   it('uses the latest contact updated_at regardless of input order', () => {
@@ -398,33 +381,31 @@ describe('buildSitemapMetadataIndex', () => {
       {
         category: 'fence',
         url: '/sarafan/fence/ivan-petrov-fence/',
-        updatedIso: '2026-07-07',
+        updatedIso: '2026-07-07'
       },
       {
         category: 'fence',
         url: '/sarafan/fence/sergey/',
-        updatedIso: '2026-07-06',
-      },
+        updatedIso: '2026-07-06'
+      }
     ];
-    const metadataByOrder = [contacts, contacts.toReversed()].map(
-      (orderedContacts) => {
-        const index = buildSitemapMetadataIndex({
-          newsArticles: [],
-          statusIncidents: [],
-          settlements: [],
-          meetings: [],
-          kbPages: [],
-          contacts: orderedContacts,
-        });
+    const metadataByOrder = [contacts, contacts.toReversed()].map((orderedContacts) => {
+      const index = buildSitemapMetadataIndex({
+        newsArticles: [],
+        statusIncidents: [],
+        settlements: [],
+        meetings: [],
+        kbPages: [],
+        contacts: orderedContacts
+      });
 
-        return {
-          section: index.get('/sarafan/'),
-          category: index.get('/sarafan/fence/'),
-          contact: index.get('/sarafan/fence/ivan-petrov-fence/'),
-          olderContact: index.get('/sarafan/fence/sergey/'),
-        };
-      },
-    );
+      return {
+        section: index.get('/sarafan/'),
+        category: index.get('/sarafan/fence/'),
+        contact: index.get('/sarafan/fence/ivan-petrov-fence/'),
+        olderContact: index.get('/sarafan/fence/sergey/')
+      };
+    });
     const [newestFirst, newestLast] = metadataByOrder;
 
     expect(newestFirst).toEqual(newestLast);
@@ -458,20 +439,18 @@ describe('applySitemapMetadata', () => {
         '/news/',
         {
           lastmod: '2026-05-04T12:30:00+03:00',
-          changefreq: ChangeFreqEnum.DAILY,
-        },
-      ],
+          changefreq: ChangeFreqEnum.DAILY
+        }
+      ]
     ]);
 
-    expect(
-      applySitemapMetadata({ url: 'https://kpshelkovo.online/news/' }, index),
-    ).toEqual({
+    expect(applySitemapMetadata({ url: 'https://kpshelkovo.online/news/' }, index)).toEqual({
       url: 'https://kpshelkovo.online/news/',
       lastmod: '2026-05-04T12:30:00+03:00',
-      changefreq: 'daily',
+      changefreq: 'daily'
     });
-    expect(
-      applySitemapMetadata({ url: 'https://kpshelkovo.online/people/' }, index),
-    ).toEqual({ url: 'https://kpshelkovo.online/people/' });
+    expect(applySitemapMetadata({ url: 'https://kpshelkovo.online/people/' }, index)).toEqual({
+      url: 'https://kpshelkovo.online/people/'
+    });
   });
 });

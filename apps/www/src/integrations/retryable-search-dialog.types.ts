@@ -1,8 +1,6 @@
 import type { ResolvedConfig } from 'vite';
 
-export type SearchDialogOuterConfig = Readonly<
-  Pick<ResolvedConfig, 'command' | 'define' | 'mode'>
->;
+export type SearchDialogOuterConfig = Readonly<Pick<ResolvedConfig, 'command' | 'define' | 'mode'>>;
 
 export type SearchDialogGraphEnvironment = {
   readonly command: ResolvedConfig['command'];
@@ -11,5 +9,5 @@ export type SearchDialogGraphEnvironment = {
 };
 
 export type SearchDialogGraphBuilder = (
-  environment: SearchDialogGraphEnvironment,
+  environment: SearchDialogGraphEnvironment
 ) => Promise<string>;

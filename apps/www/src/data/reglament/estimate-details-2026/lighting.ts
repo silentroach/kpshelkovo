@@ -1,7 +1,7 @@
 import type {
   EstimateDetailControlTotalInput,
   EstimateDetailResource,
-  EstimateDetailWorkItem,
+  EstimateDetailWorkItem
 } from '@/lib/reglament/detail-schema';
 
 import {
@@ -15,13 +15,12 @@ import {
   detailSourceQuoteItems,
   detailSourceRefs,
   detailStatus,
-  detailWorkItem,
+  detailWorkItem
 } from './shared';
 
 const lightingStreetFixtureLaborResourceId = 'lighting-street-fixture-labor';
 const lightingStreetCableLaborResourceId = 'lighting-street-cable-labor';
-const lightingStreetFixtureMaterialResourceId =
-  'lighting-street-fixture-material';
+const lightingStreetFixtureMaterialResourceId = 'lighting-street-fixture-material';
 const lightingStreetInsuranceResourceId = 'lighting-street-insurance';
 const lightingStreetOverheadResourceId = 'lighting-street-overhead';
 const lightingStreetProfitResourceId = 'lighting-street-profit';
@@ -37,12 +36,9 @@ const lightingPolesOverheadResourceId = 'lighting-poles-overhead';
 const lightingPolesProfitResourceId = 'lighting-poles-profit';
 const lightingPolesUsnResourceId = 'lighting-poles-usn-derived';
 const lightingPolesVatResourceId = 'lighting-poles-vat-derived';
-const lightingPowerSystemKtpKrnLaborResourceId =
-  'lighting-power-system-ktp-krn-labor';
-const lightingPowerSystemTransformerLaborResourceId =
-  'lighting-power-system-transformer-labor';
-const lightingPowerSystemInsuranceResourceId =
-  'lighting-power-system-insurance';
+const lightingPowerSystemKtpKrnLaborResourceId = 'lighting-power-system-ktp-krn-labor';
+const lightingPowerSystemTransformerLaborResourceId = 'lighting-power-system-transformer-labor';
+const lightingPowerSystemInsuranceResourceId = 'lighting-power-system-insurance';
 const lightingPowerSystemOverheadResourceId = 'lighting-power-system-overhead';
 const lightingPowerSystemProfitResourceId = 'lighting-power-system-profit';
 const lightingPowerSystemUsnResourceId = 'lighting-power-system-usn-derived';
@@ -57,8 +53,8 @@ const lightingProductionStreetSource = detailSource(
   'производственная программа / техническое обслуживание уличного освещения',
   {
     quote:
-      'Техническое обслуживание уличного освещения 3 839,4; обслуживание светильников ... 3776,8; уличный светильник ЖКУ 16-100-001 ... 146,0; обслуживание кабельных сетей ... 62,6',
-  },
+      'Техническое обслуживание уличного освещения 3 839,4; обслуживание светильников ... 3776,8; уличный светильник ЖКУ 16-100-001 ... 146,0; обслуживание кабельных сетей ... 62,6'
+  }
 );
 
 const lightingProductionPolesSource = detailSource(
@@ -67,8 +63,8 @@ const lightingProductionPolesSource = detailSource(
   'производственная программа / текущий ремонт опор уличного освещения',
   {
     quote:
-      'Текущий ремонт опор уличного освещения (1 раз в 5 лет); окраска металлических поверхностей в 2 слоя; 0,20; 2 833,60; 334,4; краска ... 453,4',
-  },
+      'Текущий ремонт опор уличного освещения (1 раз в 5 лет); окраска металлических поверхностей в 2 слоя; 0,20; 2 833,60; 334,4; краска ... 453,4'
+  }
 );
 
 const lightingProductionPowerKtpSource = detailSource(
@@ -77,8 +73,8 @@ const lightingProductionPowerKtpSource = detailSource(
   'производственная программа / техническое обслуживание КТП и КРН',
   {
     quote:
-      'Техническое обслуживание КТП, КРН; шт.; 3; 1 466,6; осмотр и уборка помещения ТП; очистка от снега КТП',
-  },
+      'Техническое обслуживание КТП, КРН; шт.; 3; 1 466,6; осмотр и уборка помещения ТП; очистка от снега КТП'
+  }
 );
 
 const lightingProductionPowerTransformerSource = detailSource(
@@ -87,8 +83,8 @@ const lightingProductionPowerTransformerSource = detailSource(
   'производственная программа / техническое обслуживание трансформаторов 10кВ',
   {
     quote:
-      'Техническое обслуживание трансформаторов 10кВ; 2; 126,8; замер нагрузок; осмотр трансформатора; очистка трансформатора',
-  },
+      'Техническое обслуживание трансформаторов 10кВ; 2; 126,8; замер нагрузок; осмотр трансформатора; очистка трансформатора'
+  }
 );
 
 const lightingNormativeElectricitySource = detailSource(
@@ -97,8 +93,8 @@ const lightingNormativeElectricitySource = detailSource(
   'нормативный расчет электроэнергии для уличного освещения',
   {
     quote:
-      'Уличный светильник ЖКУ 16-100-001; 506; 0,10; 218 457; продолжительность работы освещения 4 317,3 часов в год',
-  },
+      'Уличный светильник ЖКУ 16-100-001; 506; 0,10; 218 457; продолжительность работы освещения 4 317,3 часов в год'
+  }
 );
 
 const lightingNormativeMaterialsSource = detailSource(
@@ -107,8 +103,8 @@ const lightingNormativeMaterialsSource = detailSource(
   'нормативный расчет материалов для уличного освещения',
   {
     quote:
-      'Уличный светильник ЖКУ 16-100-001; срок службы 15 000; время работы за 1 год 4 317; износ за год 28,8%; кол-во ламп для замены 146',
-  },
+      'Уличный светильник ЖКУ 16-100-001; срок службы 15 000; время работы за 1 год 4 317; износ за год 28,8%; кол-во ламп для замены 146'
+  }
 );
 
 const lightingStreetFixturePositionSource = detailSource(
@@ -117,8 +113,8 @@ const lightingStreetFixturePositionSource = detailSource(
   'позиция 1.1 / обслуживание светильников наружного освещения',
   {
     quote:
-      'Затраты труда Электромонтажник ... 3776,8; 664,15; 2 508 335,23; ИТОГО ПО ПОЗИЦИИ 6 122 841,22',
-  },
+      'Затраты труда Электромонтажник ... 3776,8; 664,15; 2 508 335,23; ИТОГО ПО ПОЗИЦИИ 6 122 841,22'
+  }
 );
 
 const lightingStreetFixtureMaterialSource = detailSource(
@@ -127,8 +123,8 @@ const lightingStreetFixtureMaterialSource = detailSource(
   'позиция 1.1 / материал и начисления по обслуживанию светильников',
   {
     quote:
-      'Уличный светильник ЖКУ 16-100-001; шт; 146,0; 670,00; 97 820,00; страховые взносы 757 517,24; общеэксплуатационные расходы 1 755 834,66; прибыль 1 003 334,09',
-  },
+      'Уличный светильник ЖКУ 16-100-001; шт; 146,0; 670,00; 97 820,00; страховые взносы 757 517,24; общеэксплуатационные расходы 1 755 834,66; прибыль 1 003 334,09'
+  }
 );
 
 const lightingStreetCablePositionSource = detailSource(
@@ -137,8 +133,8 @@ const lightingStreetCablePositionSource = detailSource(
   'позиция 1.2 / обслуживание кабельных сетей',
   {
     quote:
-      'Обслуживание кабельных сетей ... 62,6; 664,15; 41 578,18; страховые взносы 12 556,61; общеэксплуатационные расходы 29 104,73; прибыль 16 631,27; ИТОГО ПО ПОЗИЦИИ 99 870,79',
-  },
+      'Обслуживание кабельных сетей ... 62,6; 664,15; 41 578,18; страховые взносы 12 556,61; общеэксплуатационные расходы 29 104,73; прибыль 16 631,27; ИТОГО ПО ПОЗИЦИИ 99 870,79'
+  }
 );
 
 const lightingElectricityPositionSource = detailSource(
@@ -146,9 +142,8 @@ const lightingElectricityPositionSource = detailSource(
   9,
   'позиция 2.1 / электроэнергия на уличное освещение',
   {
-    quote:
-      'Электроэнергия; кВт*час; 218457,5; 6,29; 1 374 097,60; ИТОГО ПО ПОЗИЦИИ 1 374 097,60',
-  },
+    quote: 'Электроэнергия; кВт*час; 218457,5; 6,29; 1 374 097,60; ИТОГО ПО ПОЗИЦИИ 1 374 097,60'
+  }
 );
 
 const lightingPolesPositionSource = detailSource(
@@ -157,8 +152,8 @@ const lightingPolesPositionSource = detailSource(
   'позиция 3.1 / окраска металлических поверхностей опор',
   {
     quote:
-      'Затраты труда Электромонтажник ... 334,4; 664,15; 222 066,98; краска по металлу ... 453,4; 612,50; 277 692,80',
-  },
+      'Затраты труда Электромонтажник ... 334,4; 664,15; 222 066,98; краска по металлу ... 453,4; 612,50; 277 692,80'
+  }
 );
 
 const lightingPolesTotalsSource = detailSource(
@@ -167,8 +162,8 @@ const lightingPolesTotalsSource = detailSource(
   'позиция 3.1 / начисления и итог ремонта опор',
   {
     quote:
-      'Расходы на страховые взносы 67 064,23; общеэксплуатационные расходы 155 446,88; прибыль 88 826,79; ИТОГО ПО ПОЗИЦИИ 811 097,69',
-  },
+      'Расходы на страховые взносы 67 064,23; общеэксплуатационные расходы 155 446,88; прибыль 88 826,79; ИТОГО ПО ПОЗИЦИИ 811 097,69'
+  }
 );
 
 const lightingPowerKtpPositionSource = detailSource(
@@ -177,8 +172,8 @@ const lightingPowerKtpPositionSource = detailSource(
   'позиция 4.1 / техническое обслуживание КТП и КРН',
   {
     quote:
-      'Техническое обслуживание КТП, КРН; 3,00; затраты труда 1466,6; 664,15; 974 022,95; страховые взносы 294 154,93; общеэксплуатационные расходы 681 816,06; прибыль 389 609,18; ИТОГО ПО ПОЗИЦИИ 2 339 603,12',
-  },
+      'Техническое обслуживание КТП, КРН; 3,00; затраты труда 1466,6; 664,15; 974 022,95; страховые взносы 294 154,93; общеэксплуатационные расходы 681 816,06; прибыль 389 609,18; ИТОГО ПО ПОЗИЦИИ 2 339 603,12'
+  }
 );
 
 const lightingPowerTransformerPositionSource = detailSource(
@@ -187,8 +182,8 @@ const lightingPowerTransformerPositionSource = detailSource(
   'позиция 4.2 / техническое обслуживание трансформаторов 10кВ',
   {
     quote:
-      'Техническое обслуживание трансформаторов 10кВ; 2,00; затраты труда 126,8; 664,15; 84 213,69; страховые взносы 25 432,53; общеэксплуатационные расходы 58 949,58; прибыль 33 685,47; ИТОГО ПО ПОЗИЦИИ 202 281,28',
-  },
+      'Техническое обслуживание трансформаторов 10кВ; 2,00; затраты труда 126,8; 664,15; 84 213,69; страховые взносы 25 432,53; общеэксплуатационные расходы 58 949,58; прибыль 33 685,47; ИТОГО ПО ПОЗИЦИИ 202 281,28'
+  }
 );
 
 const lightingDocumentTotalsSource = detailSource(
@@ -197,8 +192,8 @@ const lightingDocumentTotalsSource = detailSource(
   'итоги локального ресурсного сметного расчета по освещению',
   {
     quote:
-      'Итого по разделу ... 10 949 791,70; основная зарплата 3 830 217,03; материальные затраты 1 749 610,40; страховые взносы 1 156 725,54; общеэксплуатационные расходы 2 681 151,92; прибыль 1 532 086,81',
-  },
+      'Итого по разделу ... 10 949 791,70; основная зарплата 3 830 217,03; материальные затраты 1 749 610,40; страховые взносы 1 156 725,54; общеэксплуатационные расходы 2 681 151,92; прибыль 1 532 086,81'
+  }
 );
 
 const lightingDocumentVatSource = detailSource(
@@ -206,8 +201,8 @@ const lightingDocumentVatSource = detailSource(
   12,
   'НДС в локальном ресурсном сметном расчете по освещению',
   {
-    quote: 'ВСЕГО по документу 10 949 791,70; НДС 5% 547 489,58',
-  },
+    quote: 'ВСЕГО по документу 10 949 791,70; НДС 5% 547 489,58'
+  }
 );
 
 const lightingResourceStatementSource = detailSource(
@@ -225,41 +220,41 @@ const lightingResourceStatementSource = detailSource(
           lightingStreetCableLaborResourceId,
           lightingPolesPaintLaborResourceId,
           lightingPowerSystemKtpKrnLaborResourceId,
-          lightingPowerSystemTransformerLaborResourceId,
+          lightingPowerSystemTransformerLaborResourceId
         ],
         quantity: detailQuantity(5_767.1, 'чел-час', {
-          note: lightingResourceStatementRoundedQuantityNote,
+          note: lightingResourceStatementRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(664.15),
-        total_rub: detailMoney(3_830_217.03),
+        total_rub: detailMoney(3_830_217.03)
       }),
       detailSourceQuoteItem({
         label: 'Уличный светильник ЖКУ 16-100-001',
         resource_ids: [lightingStreetFixtureMaterialResourceId],
         quantity: detailQuantity(146, 'шт.'),
         unit_price_rub: detailMoney(670),
-        total_rub: detailMoney(97_820),
+        total_rub: detailMoney(97_820)
       }),
       detailSourceQuoteItem({
         label: 'Краска по металлу',
         resource_ids: [lightingPolesPaintMaterialResourceId],
         quantity: detailQuantity(453, 'кг.', {
-          note: lightingResourceStatementRoundedQuantityNote,
+          note: lightingResourceStatementRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(612.5),
-        total_rub: detailMoney(277_692.8),
+        total_rub: detailMoney(277_692.8)
       }),
       detailSourceQuoteItem({
         label: 'Электроэнергия',
         resource_ids: [lightingElectricityMaterialResourceId],
         quantity: detailQuantity(218_457, 'кВт*час', {
-          note: lightingResourceStatementRoundedQuantityNote,
+          note: lightingResourceStatementRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(6.29),
-        total_rub: detailMoney(1_374_097.6),
-      }),
-    ),
-  },
+        total_rub: detailMoney(1_374_097.6)
+      })
+    )
+  }
 );
 
 const lightingCalculationSource = detailSource(
@@ -268,8 +263,8 @@ const lightingCalculationSource = detailSource(
   'калькуляция себестоимости услуг по освещению и электроснабжению',
   {
     quote:
-      'ИТОГО расходов 9 417 705; налог по УСН 229 813; прибыль ... 1 532 087; Доходов - всего 11 179 605',
-  },
+      'ИТОГО расходов 9 417 705; налог по УСН 229 813; прибыль ... 1 532 087; Доходов - всего 11 179 605'
+  }
 );
 
 const lightingDerivedAllocationNeedsCheckReason =
@@ -277,18 +272,16 @@ const lightingDerivedAllocationNeedsCheckReason =
 const lightingDerivedAllocationRefs = detailSourceRefs(
   lightingDocumentTotalsSource,
   lightingDocumentVatSource,
-  lightingCalculationSource,
+  lightingCalculationSource
 );
 const lightingVatNeedsCheckNote =
   'Прямой НДС 547 489,58 в локальном расчете равен 5% от 10 949 791,70 до УСН; агрегированная смета 11 738 585 сходится с НДС 5% от доходов 11 179 605 из калькуляции.';
 
 const lightingStreetPrimarySalaryResourceIds = [
   lightingStreetFixtureLaborResourceId,
-  lightingStreetCableLaborResourceId,
+  lightingStreetCableLaborResourceId
 ] as const;
-const lightingStreetMaterialResourceIds = [
-  lightingStreetFixtureMaterialResourceId,
-] as const;
+const lightingStreetMaterialResourceIds = [lightingStreetFixtureMaterialResourceId] as const;
 const lightingStreetGrossResourceIds = [
   ...lightingStreetPrimarySalaryResourceIds,
   lightingStreetFixtureMaterialResourceId,
@@ -296,12 +289,12 @@ const lightingStreetGrossResourceIds = [
   lightingStreetOverheadResourceId,
   lightingStreetProfitResourceId,
   lightingStreetUsnResourceId,
-  lightingStreetVatResourceId,
+  lightingStreetVatResourceId
 ] as const;
 const lightingElectricityGrossResourceIds = [
   lightingElectricityMaterialResourceId,
   lightingElectricityUsnResourceId,
-  lightingElectricityVatResourceId,
+  lightingElectricityVatResourceId
 ] as const;
 const lightingPolesGrossResourceIds = [
   lightingPolesPaintLaborResourceId,
@@ -310,11 +303,11 @@ const lightingPolesGrossResourceIds = [
   lightingPolesOverheadResourceId,
   lightingPolesProfitResourceId,
   lightingPolesUsnResourceId,
-  lightingPolesVatResourceId,
+  lightingPolesVatResourceId
 ] as const;
 const lightingPowerSystemPrimarySalaryResourceIds = [
   lightingPowerSystemKtpKrnLaborResourceId,
-  lightingPowerSystemTransformerLaborResourceId,
+  lightingPowerSystemTransformerLaborResourceId
 ] as const;
 const lightingPowerSystemGrossResourceIds = [
   ...lightingPowerSystemPrimarySalaryResourceIds,
@@ -322,7 +315,7 @@ const lightingPowerSystemGrossResourceIds = [
   lightingPowerSystemOverheadResourceId,
   lightingPowerSystemProfitResourceId,
   lightingPowerSystemUsnResourceId,
-  lightingPowerSystemVatResourceId,
+  lightingPowerSystemVatResourceId
 ] as const;
 
 export const lightingWorkItems = [
@@ -334,9 +327,9 @@ export const lightingWorkItems = [
     source_refs: detailSourceRefs(
       lightingProductionStreetSource,
       lightingStreetFixturePositionSource,
-      lightingStreetCablePositionSource,
+      lightingStreetCablePositionSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailWorkItem({
     id: 'lighting-electricity',
@@ -344,9 +337,9 @@ export const lightingWorkItems = [
     estimate_row_id: 'lighting-electricity',
     source_refs: detailSourceRefs(
       lightingNormativeElectricitySource,
-      lightingElectricityPositionSource,
+      lightingElectricityPositionSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailWorkItem({
     id: 'lighting-poles-repair',
@@ -355,9 +348,9 @@ export const lightingWorkItems = [
     source_refs: detailSourceRefs(
       lightingProductionPolesSource,
       lightingPolesPositionSource,
-      lightingPolesTotalsSource,
+      lightingPolesTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailWorkItem({
     id: 'lighting-power-system-repair',
@@ -368,10 +361,10 @@ export const lightingWorkItems = [
       lightingProductionPowerKtpSource,
       lightingProductionPowerTransformerSource,
       lightingPowerKtpPositionSource,
-      lightingPowerTransformerPositionSource,
+      lightingPowerTransformerPositionSource
     ),
-    ...detailStatus('verified'),
-  }),
+    ...detailStatus('verified')
+  })
 ] satisfies readonly EstimateDetailWorkItem[];
 
 export const lightingResources = [
@@ -388,9 +381,9 @@ export const lightingResources = [
     source_refs: detailSourceRefs(
       lightingProductionStreetSource,
       lightingStreetFixturePositionSource,
-      lightingResourceStatementSource,
+      lightingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingStreetCableLaborResourceId,
@@ -404,9 +397,9 @@ export const lightingResources = [
     total_rub: detailMoney(41_578.18),
     source_refs: detailSourceRefs(
       lightingProductionStreetSource,
-      lightingStreetCablePositionSource,
+      lightingStreetCablePositionSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingStreetFixtureMaterialResourceId,
@@ -422,9 +415,9 @@ export const lightingResources = [
       lightingProductionStreetSource,
       lightingNormativeMaterialsSource,
       lightingStreetFixtureMaterialSource,
-      lightingResourceStatementSource,
+      lightingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingStreetInsuranceResourceId,
@@ -437,25 +430,24 @@ export const lightingResources = [
     source_refs: detailSourceRefs(
       lightingStreetFixtureMaterialSource,
       lightingStreetCablePositionSource,
-      lightingDocumentTotalsSource,
+      lightingDocumentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingStreetOverheadResourceId,
     work_item_id: 'lighting-street-maintenance',
     estimate_row_id: 'lighting-street-maintenance',
     kind: 'other_cost',
-    title:
-      'Общеэксплуатационные расходы по обслуживанию светильников и кабельных сетей',
+    title: 'Общеэксплуатационные расходы по обслуживанию светильников и кабельных сетей',
     cost_bucket: 'overhead',
     total_rub: detailMoney(1_784_939.39),
     source_refs: detailSourceRefs(
       lightingStreetFixtureMaterialSource,
       lightingStreetCablePositionSource,
-      lightingDocumentTotalsSource,
+      lightingDocumentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingStreetProfitResourceId,
@@ -468,9 +460,9 @@ export const lightingResources = [
     source_refs: detailSourceRefs(
       lightingStreetFixtureMaterialSource,
       lightingStreetCablePositionSource,
-      lightingDocumentTotalsSource,
+      lightingDocumentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingStreetUsnResourceId,
@@ -480,15 +472,15 @@ export const lightingResources = [
     title: 'Расчетная доля УСН по обслуживанию уличного освещения',
     cost_bucket: 'usn',
     total_rub: detailMoney(130_601.32, {
-      note: 'выведено из строки estimate-2026',
+      note: 'выведено из строки estimate-2026'
     }),
     source_refs: detailSourceRefs(
       lightingStreetFixturePositionSource,
       lightingStreetCablePositionSource,
-      lightingCalculationSource,
+      lightingCalculationSource
     ),
     note: 'В lighting.pdf УСН показан только общей суммой по услуге, без распределения по строкам.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: lightingStreetVatResourceId,
@@ -498,17 +490,14 @@ export const lightingResources = [
     title: 'Расчетный НДС 5% по обслуживанию уличного освещения',
     cost_bucket: 'vat',
     total_rub: detailMoney(317_665.67, {
-      note: 'выведено из строки estimate-2026',
+      note: 'выведено из строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      lightingDocumentVatSource,
-      lightingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(lightingDocumentVatSource, lightingCalculationSource),
     note: lightingVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       lightingDerivedAllocationNeedsCheckReason,
-      lightingDerivedAllocationRefs,
-    ),
+      lightingDerivedAllocationRefs
+    )
   }),
   detailResource({
     id: lightingElectricityMaterialResourceId,
@@ -523,9 +512,9 @@ export const lightingResources = [
     source_refs: detailSourceRefs(
       lightingNormativeElectricitySource,
       lightingElectricityPositionSource,
-      lightingResourceStatementSource,
+      lightingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingElectricityUsnResourceId,
@@ -535,14 +524,11 @@ export const lightingResources = [
     title: 'Расчетная доля УСН по электроэнергии уличного освещения',
     cost_bucket: 'usn',
     total_rub: detailMoney(28_839.54, {
-      note: 'выведено из строки estimate-2026',
+      note: 'выведено из строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      lightingElectricityPositionSource,
-      lightingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(lightingElectricityPositionSource, lightingCalculationSource),
     note: 'В lighting.pdf УСН показан только общей суммой по услуге, без распределения по строкам.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: lightingElectricityVatResourceId,
@@ -552,17 +538,14 @@ export const lightingResources = [
     title: 'Расчетный НДС 5% по электроэнергии уличного освещения',
     cost_bucket: 'vat',
     total_rub: detailMoney(70_146.86, {
-      note: 'выведено из строки estimate-2026',
+      note: 'выведено из строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      lightingDocumentVatSource,
-      lightingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(lightingDocumentVatSource, lightingCalculationSource),
     note: lightingVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       lightingDerivedAllocationNeedsCheckReason,
-      lightingDerivedAllocationRefs,
-    ),
+      lightingDerivedAllocationRefs
+    )
   }),
   detailResource({
     id: lightingPolesPaintLaborResourceId,
@@ -577,9 +560,9 @@ export const lightingResources = [
     source_refs: detailSourceRefs(
       lightingProductionPolesSource,
       lightingPolesPositionSource,
-      lightingResourceStatementSource,
+      lightingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingPolesPaintMaterialResourceId,
@@ -589,16 +572,16 @@ export const lightingResources = [
     title: 'Краска по металлу кузнечная «Церта» черная матовая',
     cost_bucket: 'materials',
     quantity: detailQuantity(453.4, 'кг.', {
-      note: 'количество показано с одним десятичным знаком; сумма соответствует скрытой точности около 453,376 кг',
+      note: 'количество показано с одним десятичным знаком; сумма соответствует скрытой точности около 453,376 кг'
     }),
     unit_price_rub: detailMoney(612.5),
     total_rub: detailMoney(277_692.8),
     source_refs: detailSourceRefs(
       lightingProductionPolesSource,
       lightingPolesPositionSource,
-      lightingResourceStatementSource,
+      lightingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingPolesInsuranceResourceId,
@@ -609,7 +592,7 @@ export const lightingResources = [
     cost_bucket: 'insurance',
     total_rub: detailMoney(67_064.23),
     source_refs: detailSourceRefs(lightingPolesTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingPolesOverheadResourceId,
@@ -620,7 +603,7 @@ export const lightingResources = [
     cost_bucket: 'overhead',
     total_rub: detailMoney(155_446.88),
     source_refs: detailSourceRefs(lightingPolesTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingPolesProfitResourceId,
@@ -631,7 +614,7 @@ export const lightingResources = [
     cost_bucket: 'profit',
     total_rub: detailMoney(88_826.79),
     source_refs: detailSourceRefs(lightingPolesTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingPolesUsnResourceId,
@@ -641,14 +624,11 @@ export const lightingResources = [
     title: 'Расчетная доля УСН по ремонту опор уличного освещения',
     cost_bucket: 'usn',
     total_rub: detailMoney(17_023.27, {
-      note: 'выведено из строки estimate-2026',
+      note: 'выведено из строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      lightingPolesTotalsSource,
-      lightingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(lightingPolesTotalsSource, lightingCalculationSource),
     note: 'В lighting.pdf УСН показан только общей суммой по услуге, без распределения по строкам.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: lightingPolesVatResourceId,
@@ -658,17 +638,14 @@ export const lightingResources = [
     title: 'Расчетный НДС 5% по ремонту опор уличного освещения',
     cost_bucket: 'vat',
     total_rub: detailMoney(41_406.05, {
-      note: 'выведено из строки estimate-2026',
+      note: 'выведено из строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      lightingDocumentVatSource,
-      lightingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(lightingDocumentVatSource, lightingCalculationSource),
     note: lightingVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       lightingDerivedAllocationNeedsCheckReason,
-      lightingDerivedAllocationRefs,
-    ),
+      lightingDerivedAllocationRefs
+    )
   }),
   detailResource({
     id: lightingPowerSystemKtpKrnLaborResourceId,
@@ -680,11 +657,8 @@ export const lightingResources = [
     quantity: detailQuantity(1_466.6, 'чел-час'),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(974_022.95),
-    source_refs: detailSourceRefs(
-      lightingProductionPowerKtpSource,
-      lightingPowerKtpPositionSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(lightingProductionPowerKtpSource, lightingPowerKtpPositionSource),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingPowerSystemTransformerLaborResourceId,
@@ -698,9 +672,9 @@ export const lightingResources = [
     total_rub: detailMoney(84_213.69),
     source_refs: detailSourceRefs(
       lightingProductionPowerTransformerSource,
-      lightingPowerTransformerPositionSource,
+      lightingPowerTransformerPositionSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingPowerSystemInsuranceResourceId,
@@ -713,9 +687,9 @@ export const lightingResources = [
     source_refs: detailSourceRefs(
       lightingPowerKtpPositionSource,
       lightingPowerTransformerPositionSource,
-      lightingDocumentTotalsSource,
+      lightingDocumentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingPowerSystemOverheadResourceId,
@@ -728,9 +702,9 @@ export const lightingResources = [
     source_refs: detailSourceRefs(
       lightingPowerKtpPositionSource,
       lightingPowerTransformerPositionSource,
-      lightingDocumentTotalsSource,
+      lightingDocumentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingPowerSystemProfitResourceId,
@@ -743,9 +717,9 @@ export const lightingResources = [
     source_refs: detailSourceRefs(
       lightingPowerKtpPositionSource,
       lightingPowerTransformerPositionSource,
-      lightingDocumentTotalsSource,
+      lightingDocumentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: lightingPowerSystemUsnResourceId,
@@ -755,15 +729,15 @@ export const lightingResources = [
     title: 'Расчетная доля УСН по ремонту системы электроснабжения',
     cost_bucket: 'usn',
     total_rub: detailMoney(53_348.94, {
-      note: 'выведено из строки estimate-2026',
+      note: 'выведено из строки estimate-2026'
     }),
     source_refs: detailSourceRefs(
       lightingPowerKtpPositionSource,
       lightingPowerTransformerPositionSource,
-      lightingCalculationSource,
+      lightingCalculationSource
     ),
     note: 'В lighting.pdf УСН показан только общей суммой по услуге, без распределения по строкам.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: lightingPowerSystemVatResourceId,
@@ -773,18 +747,15 @@ export const lightingResources = [
     title: 'Расчетный НДС 5% по ремонту системы электроснабжения',
     cost_bucket: 'vat',
     total_rub: detailMoney(129_761.67, {
-      note: 'выведено из строки estimate-2026',
+      note: 'выведено из строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      lightingDocumentVatSource,
-      lightingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(lightingDocumentVatSource, lightingCalculationSource),
     note: lightingVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       lightingDerivedAllocationNeedsCheckReason,
-      lightingDerivedAllocationRefs,
-    ),
-  }),
+      lightingDerivedAllocationRefs
+    )
+  })
 ] satisfies readonly EstimateDetailResource[];
 
 export const lightingControlTotals = [
@@ -798,9 +769,9 @@ export const lightingControlTotals = [
     source_refs: detailSourceRefs(
       lightingStreetFixturePositionSource,
       lightingStreetCablePositionSource,
-      lightingDocumentTotalsSource,
+      lightingDocumentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'lighting-street-materials',
@@ -811,9 +782,9 @@ export const lightingControlTotals = [
     resource_ids: lightingStreetMaterialResourceIds,
     source_refs: detailSourceRefs(
       lightingStreetFixtureMaterialSource,
-      lightingResourceStatementSource,
+      lightingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'lighting-street-insurance',
@@ -825,9 +796,9 @@ export const lightingControlTotals = [
     source_refs: detailSourceRefs(
       lightingStreetFixtureMaterialSource,
       lightingStreetCablePositionSource,
-      lightingDocumentTotalsSource,
+      lightingDocumentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'lighting-street-overhead',
@@ -839,9 +810,9 @@ export const lightingControlTotals = [
     source_refs: detailSourceRefs(
       lightingStreetFixtureMaterialSource,
       lightingStreetCablePositionSource,
-      lightingDocumentTotalsSource,
+      lightingDocumentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'lighting-street-profit',
@@ -853,9 +824,9 @@ export const lightingControlTotals = [
     source_refs: detailSourceRefs(
       lightingStreetFixtureMaterialSource,
       lightingStreetCablePositionSource,
-      lightingDocumentTotalsSource,
+      lightingDocumentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'lighting-street-usn',
@@ -864,11 +835,8 @@ export const lightingControlTotals = [
     source_total_rub: detailMoney(130_601.32),
     tolerance_rub: 0.01,
     resource_ids: [lightingStreetUsnResourceId],
-    source_refs: detailSourceRefs(
-      lightingDocumentTotalsSource,
-      lightingCalculationSource,
-    ),
-    ...detailStatus('derived'),
+    source_refs: detailSourceRefs(lightingDocumentTotalsSource, lightingCalculationSource),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'lighting-street-vat',
@@ -877,15 +845,12 @@ export const lightingControlTotals = [
     source_total_rub: detailMoney(317_665.67),
     tolerance_rub: 0.01,
     resource_ids: [lightingStreetVatResourceId],
-    source_refs: detailSourceRefs(
-      lightingDocumentVatSource,
-      lightingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(lightingDocumentVatSource, lightingCalculationSource),
     note: lightingVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       lightingDerivedAllocationNeedsCheckReason,
-      lightingDerivedAllocationRefs,
-    ),
+      lightingDerivedAllocationRefs
+    )
   }),
   detailControlTotal({
     id: 'lighting-street-gross',
@@ -897,13 +862,13 @@ export const lightingControlTotals = [
     source_refs: detailSourceRefs(
       lightingDocumentTotalsSource,
       lightingDocumentVatSource,
-      lightingCalculationSource,
+      lightingCalculationSource
     ),
     note: lightingVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       lightingDerivedAllocationNeedsCheckReason,
-      lightingDerivedAllocationRefs,
-    ),
+      lightingDerivedAllocationRefs
+    )
   }),
   detailControlTotal({
     id: 'lighting-electricity-materials',
@@ -914,9 +879,9 @@ export const lightingControlTotals = [
     resource_ids: [lightingElectricityMaterialResourceId],
     source_refs: detailSourceRefs(
       lightingElectricityPositionSource,
-      lightingResourceStatementSource,
+      lightingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'lighting-electricity-usn',
@@ -925,11 +890,8 @@ export const lightingControlTotals = [
     source_total_rub: detailMoney(28_839.54),
     tolerance_rub: 0.01,
     resource_ids: [lightingElectricityUsnResourceId],
-    source_refs: detailSourceRefs(
-      lightingElectricityPositionSource,
-      lightingCalculationSource,
-    ),
-    ...detailStatus('derived'),
+    source_refs: detailSourceRefs(lightingElectricityPositionSource, lightingCalculationSource),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'lighting-electricity-vat',
@@ -938,15 +900,12 @@ export const lightingControlTotals = [
     source_total_rub: detailMoney(70_146.86),
     tolerance_rub: 0.01,
     resource_ids: [lightingElectricityVatResourceId],
-    source_refs: detailSourceRefs(
-      lightingDocumentVatSource,
-      lightingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(lightingDocumentVatSource, lightingCalculationSource),
     note: lightingVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       lightingDerivedAllocationNeedsCheckReason,
-      lightingDerivedAllocationRefs,
-    ),
+      lightingDerivedAllocationRefs
+    )
   }),
   detailControlTotal({
     id: 'lighting-electricity-gross',
@@ -958,13 +917,13 @@ export const lightingControlTotals = [
     source_refs: detailSourceRefs(
       lightingElectricityPositionSource,
       lightingDocumentVatSource,
-      lightingCalculationSource,
+      lightingCalculationSource
     ),
     note: lightingVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       lightingDerivedAllocationNeedsCheckReason,
-      lightingDerivedAllocationRefs,
-    ),
+      lightingDerivedAllocationRefs
+    )
   }),
   detailControlTotal({
     id: 'lighting-poles-primary-salary',
@@ -973,11 +932,8 @@ export const lightingControlTotals = [
     source_total_rub: detailMoney(222_066.98),
     tolerance_rub: 0.01,
     resource_ids: [lightingPolesPaintLaborResourceId],
-    source_refs: detailSourceRefs(
-      lightingPolesPositionSource,
-      lightingResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(lightingPolesPositionSource, lightingResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'lighting-poles-materials',
@@ -986,11 +942,8 @@ export const lightingControlTotals = [
     source_total_rub: detailMoney(277_692.8),
     tolerance_rub: 0.01,
     resource_ids: [lightingPolesPaintMaterialResourceId],
-    source_refs: detailSourceRefs(
-      lightingPolesPositionSource,
-      lightingResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(lightingPolesPositionSource, lightingResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'lighting-poles-insurance',
@@ -1000,7 +953,7 @@ export const lightingControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [lightingPolesInsuranceResourceId],
     source_refs: detailSourceRefs(lightingPolesTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'lighting-poles-overhead',
@@ -1010,7 +963,7 @@ export const lightingControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [lightingPolesOverheadResourceId],
     source_refs: detailSourceRefs(lightingPolesTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'lighting-poles-profit',
@@ -1020,7 +973,7 @@ export const lightingControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [lightingPolesProfitResourceId],
     source_refs: detailSourceRefs(lightingPolesTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'lighting-poles-usn',
@@ -1029,11 +982,8 @@ export const lightingControlTotals = [
     source_total_rub: detailMoney(17_023.27),
     tolerance_rub: 0.01,
     resource_ids: [lightingPolesUsnResourceId],
-    source_refs: detailSourceRefs(
-      lightingPolesTotalsSource,
-      lightingCalculationSource,
-    ),
-    ...detailStatus('derived'),
+    source_refs: detailSourceRefs(lightingPolesTotalsSource, lightingCalculationSource),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'lighting-poles-vat',
@@ -1042,15 +992,12 @@ export const lightingControlTotals = [
     source_total_rub: detailMoney(41_406.05),
     tolerance_rub: 0.01,
     resource_ids: [lightingPolesVatResourceId],
-    source_refs: detailSourceRefs(
-      lightingDocumentVatSource,
-      lightingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(lightingDocumentVatSource, lightingCalculationSource),
     note: lightingVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       lightingDerivedAllocationNeedsCheckReason,
-      lightingDerivedAllocationRefs,
-    ),
+      lightingDerivedAllocationRefs
+    )
   }),
   detailControlTotal({
     id: 'lighting-poles-gross',
@@ -1062,13 +1009,13 @@ export const lightingControlTotals = [
     source_refs: detailSourceRefs(
       lightingPolesTotalsSource,
       lightingDocumentVatSource,
-      lightingCalculationSource,
+      lightingCalculationSource
     ),
     note: lightingVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       lightingDerivedAllocationNeedsCheckReason,
-      lightingDerivedAllocationRefs,
-    ),
+      lightingDerivedAllocationRefs
+    )
   }),
   detailControlTotal({
     id: 'lighting-power-system-primary-salary',
@@ -1080,9 +1027,9 @@ export const lightingControlTotals = [
     source_refs: detailSourceRefs(
       lightingPowerKtpPositionSource,
       lightingPowerTransformerPositionSource,
-      lightingDocumentTotalsSource,
+      lightingDocumentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'lighting-power-system-insurance',
@@ -1094,9 +1041,9 @@ export const lightingControlTotals = [
     source_refs: detailSourceRefs(
       lightingPowerKtpPositionSource,
       lightingPowerTransformerPositionSource,
-      lightingDocumentTotalsSource,
+      lightingDocumentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'lighting-power-system-overhead',
@@ -1108,9 +1055,9 @@ export const lightingControlTotals = [
     source_refs: detailSourceRefs(
       lightingPowerKtpPositionSource,
       lightingPowerTransformerPositionSource,
-      lightingDocumentTotalsSource,
+      lightingDocumentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'lighting-power-system-profit',
@@ -1122,9 +1069,9 @@ export const lightingControlTotals = [
     source_refs: detailSourceRefs(
       lightingPowerKtpPositionSource,
       lightingPowerTransformerPositionSource,
-      lightingDocumentTotalsSource,
+      lightingDocumentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'lighting-power-system-usn',
@@ -1136,9 +1083,9 @@ export const lightingControlTotals = [
     source_refs: detailSourceRefs(
       lightingPowerKtpPositionSource,
       lightingPowerTransformerPositionSource,
-      lightingCalculationSource,
+      lightingCalculationSource
     ),
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'lighting-power-system-vat',
@@ -1147,15 +1094,12 @@ export const lightingControlTotals = [
     source_total_rub: detailMoney(129_761.67),
     tolerance_rub: 0.01,
     resource_ids: [lightingPowerSystemVatResourceId],
-    source_refs: detailSourceRefs(
-      lightingDocumentVatSource,
-      lightingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(lightingDocumentVatSource, lightingCalculationSource),
     note: lightingVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       lightingDerivedAllocationNeedsCheckReason,
-      lightingDerivedAllocationRefs,
-    ),
+      lightingDerivedAllocationRefs
+    )
   }),
   detailControlTotal({
     id: 'lighting-power-system-gross',
@@ -1168,12 +1112,12 @@ export const lightingControlTotals = [
       lightingPowerKtpPositionSource,
       lightingPowerTransformerPositionSource,
       lightingDocumentVatSource,
-      lightingCalculationSource,
+      lightingCalculationSource
     ),
     note: lightingVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       lightingDerivedAllocationNeedsCheckReason,
-      lightingDerivedAllocationRefs,
-    ),
-  }),
+      lightingDerivedAllocationRefs
+    )
+  })
 ] satisfies readonly EstimateDetailControlTotalInput[];

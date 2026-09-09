@@ -1,14 +1,7 @@
+import { preprocessSiteMarkdownContent, renderMarkdown } from '@/lib/markdown/render';
 import type { SiteMentionRegistry } from '@/lib/mentions';
-import {
-  preprocessSiteMarkdownContent,
-  renderMarkdown,
-} from '@/lib/markdown/render';
 
-import type {
-  RawMeeting,
-  RawMeetingTranscript,
-  RawMeetingTranscriptSegment,
-} from './raw-schema';
+import type { RawMeeting, RawMeetingTranscript, RawMeetingTranscriptSegment } from './raw-schema';
 import { meetingCanonical, meetingUrl } from './routes';
 import type {
   Meeting,
@@ -16,7 +9,7 @@ import type {
   MeetingSpeaker,
   MeetingTranscriptPart,
   MeetingTranscriptSegment,
-  MeetingTranscriptTime,
+  MeetingTranscriptTime
 } from './types';
 
 export interface RawMeetingEntryInput {
@@ -34,18 +27,17 @@ interface MapRawMeetingOptions {
   readonly mentionRegistry: SiteMentionRegistry;
 }
 
-const TRANSCRIPT_TIME =
-  /^(?<hours>\d{2}):(?<minutes>[0-5]\d):(?<seconds>[0-5]\d)$/;
+const TRANSCRIPT_TIME = /^(?<hours>\d{2}):(?<minutes>[0-5]\d):(?<seconds>[0-5]\d)$/;
 
 const mapMeetingMoment = (date: RawMeeting['date']): MeetingMoment => ({
   at: date.at,
   iso: date.iso,
-  hasTime: date.hasTime,
+  hasTime: date.hasTime
 });
 
 export const parseMeetingTranscriptTime = (
   value: string,
-  context: string,
+  context: string
 ): MeetingTranscriptTime => {
   const match = value.match(TRANSCRIPT_TIME);
 
@@ -59,20 +51,18 @@ export const parseMeetingTranscriptTime = (
 
   return {
     value,
-    totalSeconds: hours * 3600 + minutes * 60 + seconds,
+    totalSeconds: hours * 3600 + minutes * 60 + seconds
   };
 };
 
-const withSpeakerDescription = (
-  speaker: MeetingSpeaker,
-  description?: string,
-): MeetingSpeaker => (description ? { ...speaker, description } : speaker);
+const withSpeakerDescription = (speaker: MeetingSpeaker, description?: string): MeetingSpeaker =>
+  description ? { ...speaker, description } : speaker;
 
 const mapSpeaker = (
   id: string,
   raw: RawMeeting['speakers'][string],
   context: string,
-  mentionRegistry: SiteMentionRegistry,
+  mentionRegistry: SiteMentionRegistry
 ): MeetingSpeaker => {
   if ('person' in raw) {
     const target = mentionRegistry.get(raw.person);
@@ -86,7 +76,7 @@ const mapSpeaker = (
       kind: 'person',
       label: target.label,
       personSlug: target.slug,
-      url: target.htmlUrl,
+      url: target.htmlUrl
     };
     const description = raw.description ?? target.linkTitle;
 
@@ -96,16 +86,13 @@ const mapSpeaker = (
   const speaker: MeetingSpeaker = {
     id,
     kind: 'local',
-    label: raw.name,
+    label: raw.name
   };
 
   return withSpeakerDescription(speaker, raw.description);
 };
 
-const segmentAnchor = (
-  start: MeetingTranscriptTime,
-  anchorCounts: Map<string, number>,
-): string => {
+const segmentAnchor = (start: MeetingTranscriptTime, anchorCounts: Map<string, number>): string => {
   const base = `t-${start.value.replaceAll(':', '-')}`;
   const count = (anchorCounts.get(base) ?? 0) + 1;
 
@@ -120,7 +107,7 @@ const mapSegment = (
   mentionRegistry: SiteMentionRegistry,
   speakers: ReadonlyMap<string, MeetingSpeaker>,
   anchorCounts: Map<string, number>,
-  previousStart?: MeetingTranscriptTime,
+  previousStart?: MeetingTranscriptTime
 ): MeetingTranscriptSegment => {
   const speaker = speakers.get(raw.speaker);
 
@@ -137,7 +124,7 @@ const mapSegment = (
   const textMarkdown = preprocessSiteMarkdownContent(
     raw.text,
     `${context} text`,
-    mentionRegistry,
+    mentionRegistry
   ).markdown;
 
   return {
@@ -147,7 +134,7 @@ const mapSegment = (
     speaker,
     text: raw.text,
     textMarkdown,
-    textHtml: renderMarkdown(textMarkdown),
+    textHtml: renderMarkdown(textMarkdown)
   };
 };
 
@@ -157,20 +144,20 @@ const mapPart = (
   hasMultipleParts: boolean,
   mentionRegistry: SiteMentionRegistry,
   speakers: ReadonlyMap<string, MeetingSpeaker>,
-  anchorCounts: Map<string, number>,
+  anchorCounts: Map<string, number>
 ): MeetingTranscriptPart => {
   const firstStart = parseMeetingTranscriptTime(
     rawSegments[0]?.start ?? '',
     hasMultipleParts
       ? `meeting transcript part ${index} first segment start`
-      : 'meeting transcript first segment start',
+      : 'meeting transcript first segment start'
   );
 
   if (firstStart.totalSeconds !== 0) {
     throw new Error(
       hasMultipleParts
         ? `meeting transcript part ${index} must start at 00:00:00`
-        : 'meeting transcript must start at 00:00:00',
+        : 'meeting transcript must start at 00:00:00'
     );
   }
 
@@ -185,7 +172,7 @@ const mapPart = (
       mentionRegistry,
       speakers,
       anchorCounts,
-      previousStart,
+      previousStart
     );
 
     previousStart = segment.start;
@@ -194,35 +181,31 @@ const mapPart = (
 
   return {
     index,
-    segments,
+    segments
   };
 };
 
 const sortTranscriptParts = (
   entry: RawMeetingEntryInput,
-  transcriptEntries: readonly RawMeetingTranscriptEntryInput[],
+  transcriptEntries: readonly RawMeetingTranscriptEntryInput[]
 ): readonly RawMeetingTranscriptEntryInput[] => {
   const sorted = [...transcriptEntries].sort((a, b) => a.part - b.part);
   const seen = new Set<number>();
 
   sorted.forEach((transcript, index) => {
     if (entry.id !== transcript.id) {
-      throw new Error(
-        `meeting "${entry.id}" transcript id must match entry id "${transcript.id}"`,
-      );
+      throw new Error(`meeting "${entry.id}" transcript id must match entry id "${transcript.id}"`);
     }
 
     if (seen.has(transcript.part)) {
-      throw new Error(
-        `meeting "${entry.id}" has duplicate transcript part ${transcript.part}`,
-      );
+      throw new Error(`meeting "${entry.id}" has duplicate transcript part ${transcript.part}`);
     }
 
     seen.add(transcript.part);
 
     if (transcript.part !== index + 1) {
       throw new Error(
-        `meeting "${entry.id}" transcript files must be consecutive from transcript.yaml`,
+        `meeting "${entry.id}" transcript files must be consecutive from transcript.yaml`
       );
     }
   });
@@ -233,7 +216,7 @@ const sortTranscriptParts = (
 export const mapRawMeeting = (
   entry: RawMeetingEntryInput,
   transcriptEntries: readonly RawMeetingTranscriptEntryInput[],
-  opts: MapRawMeetingOptions,
+  opts: MapRawMeetingOptions
 ): Meeting => {
   const transcriptParts = sortTranscriptParts(entry, transcriptEntries);
 
@@ -242,23 +225,14 @@ export const mapRawMeeting = (
   }
 
   const date = mapMeetingMoment(entry.data.date);
-  const updatedAt = entry.data.updated_at
-    ? mapMeetingMoment(entry.data.updated_at)
-    : undefined;
+  const updatedAt = entry.data.updated_at ? mapMeetingMoment(entry.data.updated_at) : undefined;
 
   if (updatedAt && updatedAt.at.valueOf() < date.at.valueOf()) {
-    throw new Error(
-      `meeting "${entry.id}" updated_at cannot be earlier than date`,
-    );
+    throw new Error(`meeting "${entry.id}" updated_at cannot be earlier than date`);
   }
 
   const speakerList = Object.entries(entry.data.speakers).map(([id, raw]) =>
-    mapSpeaker(
-      id,
-      raw,
-      `meeting "${entry.id}" speaker "${id}"`,
-      opts.mentionRegistry,
-    ),
+    mapSpeaker(id, raw, `meeting "${entry.id}" speaker "${id}"`, opts.mentionRegistry)
   );
   const speakers = new Map(speakerList.map((speaker) => [speaker.id, speaker]));
   const anchorCounts = new Map<string, number>();
@@ -270,8 +244,8 @@ export const mapRawMeeting = (
       hasMultipleParts,
       opts.mentionRegistry,
       speakers,
-      anchorCounts,
-    ),
+      anchorCounts
+    )
   );
   const segments = parts.flatMap((part) => part.segments);
 
@@ -288,7 +262,7 @@ export const mapRawMeeting = (
     transcript: {
       speakers: speakerList,
       parts,
-      segments,
-    },
+      segments
+    }
   } satisfies Meeting;
 };

@@ -46,7 +46,7 @@ export interface NewsArticleInput extends Omit<ArticleInput, 'type'> {
 export interface TechArticleInput extends Omit<ArticleInput, 'type'> {}
 
 const imageValue = (
-  image: string | readonly string[] | undefined,
+  image: string | readonly string[] | undefined
 ): string | readonly string[] | undefined => {
   if (!image) return undefined;
   if (typeof image !== 'string') {
@@ -72,8 +72,8 @@ const articleSchema = (input: ArticleInput): readonly SchemaDoc[] => {
       ...(input.datePublished ? { datePublished: input.datePublished } : {}),
       ...(input.dateModified ? { dateModified: input.dateModified } : {}),
       ...(image ? { image } : {}),
-      ...(input.author ? { author: input.author } : {}),
-    },
+      ...(input.author ? { author: input.author } : {})
+    }
   ];
 
   if (input.breadcrumbs?.length) {
@@ -83,9 +83,7 @@ const articleSchema = (input: ArticleInput): readonly SchemaDoc[] => {
   return docs;
 };
 
-const eventLocationSchema = (
-  event: NewsArticleEventInput,
-): SchemaDoc | undefined => {
+const eventLocationSchema = (event: NewsArticleEventInput): SchemaDoc | undefined => {
   if (!event.location && !event.coordinates) {
     return undefined;
   }
@@ -95,7 +93,7 @@ const eventLocationSchema = (
     ...(event.location
       ? {
           name: event.location,
-          address: event.location,
+          address: event.location
         }
       : {}),
     ...(event.coordinates
@@ -103,10 +101,10 @@ const eventLocationSchema = (
           geo: {
             '@type': 'GeoCoordinates',
             latitude: event.coordinates.lat,
-            longitude: event.coordinates.lng,
-          },
+            longitude: event.coordinates.lng
+          }
         }
-      : {}),
+      : {})
   };
 };
 
@@ -114,7 +112,7 @@ const schemaType = (type: 'organization' | 'person'): string =>
   type === 'person' ? 'Person' : 'Organization';
 
 const performerSchema = (
-  items: NewsEvent['performer'],
+  items: NewsEvent['performer']
 ): SchemaDoc | readonly SchemaDoc[] | undefined => {
   if (!items?.length) {
     return undefined;
@@ -122,7 +120,7 @@ const performerSchema = (
 
   const docs = items.map((item) => ({
     '@type': schemaType(item.type),
-    name: item.name,
+    name: item.name
   }));
 
   return docs.length === 1 ? docs[0] : docs;
@@ -155,23 +153,20 @@ const newsEventSchema = (input: NewsArticleInput): readonly SchemaDoc[] => {
         ? {
             organizer: {
               '@type': schemaType(event.organizer.type),
-              name: event.organizer.name,
-            },
+              name: event.organizer.name
+            }
           }
         : {}),
-      ...(performer ? { performer } : {}),
+      ...(performer ? { performer } : {})
     };
   });
 };
 
-export const newsArticleSchema = (
-  input: NewsArticleInput,
-): readonly SchemaDoc[] => {
+export const newsArticleSchema = (input: NewsArticleInput): readonly SchemaDoc[] => {
   const events = newsEventSchema(input);
 
   return [...articleSchema({ ...input, type: 'NewsArticle' }), ...events];
 };
 
-export const techArticleSchema = (
-  input: TechArticleInput,
-): readonly SchemaDoc[] => articleSchema({ ...input, type: 'TechArticle' });
+export const techArticleSchema = (input: TechArticleInput): readonly SchemaDoc[] =>
+  articleSchema({ ...input, type: 'TechArticle' });

@@ -9,7 +9,7 @@ import {
   placesDataUrl,
   placesMarkdownUrl,
   placesUrl,
-  placeUrl,
+  placeUrl
 } from '../routes';
 
 describe('place routes', () => {
@@ -20,9 +20,7 @@ describe('place routes', () => {
     expect(placesMarkdownUrl()).toBe('/map/index.md');
     expect(placeUrl('burzhuyka')).toBe('/map/burzhuyka/');
     expect(placeMarkdownUrl('burzhuyka')).toBe('/map/burzhuyka/index.md');
-    expect(placeCanonical('burzhuyka')).toBe(
-      'https://kpshelkovo.online/map/burzhuyka/',
-    );
+    expect(placeCanonical('burzhuyka')).toBe('https://kpshelkovo.online/map/burzhuyka/');
   });
 
   it('rejects malformed slugs', () => {

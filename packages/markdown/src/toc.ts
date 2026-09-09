@@ -10,7 +10,7 @@ import type {
   RootContent,
   Strong,
   Text,
-  ThematicBreak,
+  ThematicBreak
 } from 'mdast';
 
 import { uniqueHeadingSlug } from './heading-slugs';
@@ -36,15 +36,15 @@ const tocTitle = (): Paragraph => ({
   type: 'paragraph',
   data: {
     hProperties: {
-      className: ['ui-markdown-toc__title'],
-    },
+      className: ['ui-markdown-toc__title']
+    }
   },
   children: [
     {
       type: 'strong',
-      children: [text(TOC_TITLE)],
-    } satisfies Strong,
-  ],
+      children: [text(TOC_TITLE)]
+    } satisfies Strong
+  ]
 });
 
 const tocLink = (entry: TocEntry): Link => ({
@@ -52,43 +52,40 @@ const tocLink = (entry: TocEntry): Link => ({
   url: `#${entry.slug}`,
   data: {
     hProperties: {
-      href: `#${entry.slug}`,
-    },
+      href: `#${entry.slug}`
+    }
   },
-  children: [text(entry.title)],
+  children: [text(entry.title)]
 });
 
 const tocList = (children: readonly ListItem[]): List => ({
   type: 'list',
   ordered: false,
   spread: false,
-  children: [...children],
+  children: [...children]
 });
 
 const tocRootList = (children: readonly ListItem[]): List => ({
   ...tocList(children),
   data: {
     hProperties: {
-      className: ['ui-markdown-toc__list'],
-    },
-  },
+      className: ['ui-markdown-toc__list']
+    }
+  }
 });
 
 const tocSeparator = (): ThematicBreak => ({ type: 'thematicBreak' });
 
-const tocListItem = (
-  entry: TocEntry,
-  childLists: readonly List[] = [],
-): ListItem => ({
+const tocListItem = (entry: TocEntry, childLists: readonly List[] = []): ListItem => ({
   type: 'listItem',
   spread: false,
   children: [
     {
       type: 'paragraph',
-      children: [tocLink(entry)],
+      children: [tocLink(entry)]
     },
-    ...childLists,
-  ],
+    ...childLists
+  ]
 });
 
 const phrasingText = (node: PhrasingContent): string => {
@@ -107,8 +104,7 @@ const headingText = (heading: Heading): string =>
   heading.children.map(phrasingText).join('').trim();
 
 const isTocLinkReference = (child: PhrasingContent): child is LinkReference =>
-  child.type === 'linkReference' &&
-  child.identifier.toLowerCase() === TOC_REFERENCE_IDENTIFIER;
+  child.type === 'linkReference' && child.identifier.toLowerCase() === TOC_REFERENCE_IDENTIFIER;
 
 const isTocPlaceholder = (node: RootContent): boolean => {
   if (node.type !== 'paragraph' || node.children.length !== 1) {
@@ -118,8 +114,7 @@ const isTocPlaceholder = (node: RootContent): boolean => {
   const [child] = node.children;
 
   return (
-    (child.type === 'text' && child.value.trim() === TOC_PLACEHOLDER) ||
-    isTocLinkReference(child)
+    (child.type === 'text' && child.value.trim() === TOC_PLACEHOLDER) || isTocLinkReference(child)
   );
 };
 
@@ -151,7 +146,7 @@ const collectTocEntries = (document: Root): readonly TocEntry[] => {
 const buildTocItems = (
   entries: readonly TocEntry[],
   startIndex: number,
-  parentDepth: number,
+  parentDepth: number
 ): TocBuildResult => {
   const items: ListItem[] = [];
   let index = startIndex;
@@ -178,18 +173,12 @@ const buildTocItems = (
   return { items, nextIndex: index };
 };
 
-const buildTocNodes = (
-  entries: readonly TocEntry[],
-): readonly RootContent[] => {
+const buildTocNodes = (entries: readonly TocEntry[]): readonly RootContent[] => {
   if (entries.length === 0) {
     return [];
   }
 
-  return [
-    tocTitle(),
-    tocRootList(buildTocItems(entries, 0, 1).items),
-    tocSeparator(),
-  ];
+  return [tocTitle(), tocRootList(buildTocItems(entries, 0, 1).items), tocSeparator()];
 };
 
 export const expandTableOfContents = (document: Root): Root => {
@@ -202,7 +191,7 @@ export const expandTableOfContents = (document: Root): Root => {
   return {
     ...document,
     children: document.children.flatMap((node) =>
-      isTocPlaceholder(node) ? buildTocNodes(entries) : [node],
-    ),
+      isTocPlaceholder(node) ? buildTocNodes(entries) : [node]
+    )
   };
 };

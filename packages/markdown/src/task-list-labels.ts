@@ -17,7 +17,7 @@ const PHRASING_TAG_NAMES: ReadonlySet<string> = new Set([
   'del',
   'em',
   'img',
-  'strong',
+  'strong'
 ]);
 
 const isTaskListItemCheckbox = (node: HastNode): boolean =>
@@ -35,9 +35,7 @@ const isTaskListItem = (node: HastNode): boolean =>
   node.type === 'element' &&
   node.tagName === 'li' &&
   Array.isArray(node.properties?.className) &&
-  (node.properties.className as readonly string[]).includes(
-    TASK_LIST_ITEM_CLASS,
-  );
+  (node.properties.className as readonly string[]).includes(TASK_LIST_ITEM_CLASS);
 
 const findLabelContainer = (item: HastNode): HastNode | undefined => {
   if (item.children?.some(isTaskListItemCheckbox)) {
@@ -48,7 +46,7 @@ const findLabelContainer = (item: HastNode): HastNode | undefined => {
     (child) =>
       child.type === 'element' &&
       child.tagName === 'p' &&
-      child.children?.some(isTaskListItemCheckbox),
+      child.children?.some(isTaskListItemCheckbox)
   );
 };
 
@@ -85,9 +83,7 @@ const splitLeadingWhitespace = (nodes: HastNode[]): SplitNodes => {
   const leading = leadingMatch[0];
   const remaining = first.value.slice(leading.length);
   const before: HastNode[] = [{ type: 'text', value: leading }];
-  const label: HastNode[] = remaining
-    ? [{ type: 'text', value: remaining }, ...rest]
-    : rest;
+  const label: HastNode[] = remaining ? [{ type: 'text', value: remaining }, ...rest] : rest;
 
   return { before, label };
 };
@@ -133,11 +129,8 @@ const labelTaskListItem = (item: HastNode, usedIds: Set<string>): void => {
 
   const checkbox = children[checkboxIndex];
   const followingNodes = children.slice(checkboxIndex + 1);
-  const firstBlockIndex = followingNodes.findIndex(
-    (node) => !isPhrasingContent(node),
-  );
-  const labelEnd =
-    firstBlockIndex === -1 ? followingNodes.length : firstBlockIndex;
+  const firstBlockIndex = followingNodes.findIndex((node) => !isPhrasingContent(node));
+  const labelEnd = firstBlockIndex === -1 ? followingNodes.length : firstBlockIndex;
   const labelNodes = followingNodes.slice(0, labelEnd);
   const remainingNodes = followingNodes.slice(labelEnd);
   const { before, label } = splitLeadingWhitespace(labelNodes);
@@ -156,14 +149,14 @@ const labelTaskListItem = (item: HastNode, usedIds: Set<string>): void => {
     type: 'element',
     tagName: 'span',
     properties: { id: labelId },
-    children: label,
+    children: label
   };
 
   container.children = [
     ...children.slice(0, checkboxIndex + 1),
     ...before,
     labelSpan,
-    ...remainingNodes,
+    ...remainingNodes
   ];
 };
 

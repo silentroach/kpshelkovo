@@ -18,7 +18,7 @@ const excerpt = (markdown: string): string | undefined => {
 };
 
 export const createPersonProfileMentionRefs = (
-  profile: PersonProfileMentionRefSource,
+  profile: PersonProfileMentionRefSource
 ): readonly EntityMentionSourceRef[] => {
   if (!profile.mentions.length) {
     return [];
@@ -30,12 +30,12 @@ export const createPersonProfileMentionRefs = (
     source: {
       section: 'people',
       kind: 'person',
-      id: profile.id,
+      id: profile.id
     },
     sourceEntity: { type: 'person', slug: profile.slug },
     title: profile.name,
     htmlUrl: profile.url,
     markdownUrl: profile.markdownUrl,
-    excerpt: summary,
+    excerpt: summary
   });
 };

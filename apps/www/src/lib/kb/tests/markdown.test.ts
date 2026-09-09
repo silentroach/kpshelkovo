@@ -7,7 +7,7 @@ let buildKbPageMarkdown: typeof import('../markdown').buildKbPageMarkdown;
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ buildKbPageMarkdown } = await import('../markdown'));
@@ -29,7 +29,7 @@ const page = (input: {
   routeSlug: input.routeSlug,
   isSection: !input.routeSlug,
   body: input.body ?? '',
-  mentions: [],
+  mentions: []
 });
 
 describe('kb markdown companions', () => {
@@ -38,8 +38,8 @@ describe('kb markdown companions', () => {
       page({
         title: 'Интернет',
         routeSlug: 'services/internet',
-        body: '- [База знаний](/kb/)\n- [Оптоволоконный интернет](/kb/services/internet/fiber/)\n- [Новости](/news/)\n',
-      }),
+        body: '- [База знаний](/kb/)\n- [Оптоволоконный интернет](/kb/services/internet/fiber/)\n- [Новости](/news/)\n'
+      })
     );
 
     expect(markdown).toMatchInlineSnapshot(`
@@ -69,8 +69,8 @@ describe('kb markdown companions', () => {
 
 \`\`\`md
 [Пример](/kb/services/gas/)
-\`\`\``,
-      }),
+\`\`\``
+      })
     );
 
     expect(markdown).toMatchInlineSnapshot(`
@@ -98,8 +98,8 @@ describe('kb markdown companions', () => {
       page({
         title: 'Документы',
         flags: ['noindex'],
-        routeSlug: 'court/documents',
-      }),
+        routeSlug: 'court/documents'
+      })
     );
 
     expect(markdown).toMatchInlineSnapshot(`

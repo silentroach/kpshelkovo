@@ -5,29 +5,23 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { estimate2026 } from '@/data/reglament/estimate-2026';
 import { projectEstimateCalculationInput } from '@/lib/reglament/calculation-projection';
 
+import type { CalculatedEstimate, CalculatedEstimateRow } from './calculate.types';
 import {
   buildReglamentCalculatorChanges,
   calculateReglamentCalculatorState,
-  hydrateReglamentCalculator,
+  hydrateReglamentCalculator
 } from './calculator-controller';
 import { bindReglamentCalculatorLazyHydration } from './calculator-loader';
-import type {
-  CalculatedEstimate,
-  CalculatedEstimateRow,
-} from './calculate.types';
 import {
   formatReglamentInputNumber,
   formatReglamentAnnualMoney,
   formatReglamentMoney,
-  formatReglamentTariffValue,
+  formatReglamentTariffValue
 } from './format';
 
 const calculationInput = projectEstimateCalculationInput(estimate2026);
 
-const findCalculatedRow = (
-  result: CalculatedEstimate,
-  rowId: string,
-): CalculatedEstimateRow => {
+const findCalculatedRow = (result: CalculatedEstimate, rowId: string): CalculatedEstimateRow => {
   const rows = result.sections.flatMap((section) => section.rows);
   const row = rows.find((item) => item.id === rowId);
 
@@ -50,15 +44,15 @@ describe('buildReglamentCalculatorChanges', () => {
           rowId: 'lighting-electricity',
           key: 'enabled',
           baseline: true,
-          value: true,
+          value: true
         },
         {
           rowId: 'lighting-electricity',
           key: 'frequency',
           baseline: 12,
-          value: '12',
-        },
-      ]),
+          value: '12'
+        }
+      ])
     ).toEqual({});
   });
 
@@ -69,38 +63,38 @@ describe('buildReglamentCalculatorChanges', () => {
           rowId: 'lighting-electricity',
           key: 'enabled',
           baseline: true,
-          value: false,
+          value: false
         },
         {
           rowId: 'lighting-electricity',
           key: 'volume',
           baseline: 218_457.5,
-          value: '200000',
+          value: '200000'
         },
         {
           rowId: 'lighting-electricity',
           key: 'rate',
           baseline: 6.29,
-          value: '7.1',
+          value: '7.1'
         },
         {
           rowId: 'security-access-control',
           key: 'fixed_price',
           baseline: 10_199_356,
-          value: '9000000',
-        },
-      ]),
+          value: '9000000'
+        }
+      ])
     ).toEqual({
       rows: {
         'lighting-electricity': {
           enabled: false,
           volume: 200_000,
-          rate: 7.1,
+          rate: 7.1
         },
         'security-access-control': {
-          fixed_price: 9_000_000,
-        },
-      },
+          fixed_price: 9_000_000
+        }
+      }
     });
   });
 
@@ -111,21 +105,21 @@ describe('buildReglamentCalculatorChanges', () => {
           rowId: 'lighting-electricity',
           key: 'frequency',
           baseline: 12,
-          value: '0',
+          value: '0'
         },
         {
           rowId: 'lighting-electricity',
           key: 'fixed_price',
           baseline: 1_473_084,
-          value: '',
-        },
-      ]),
+          value: ''
+        }
+      ])
     ).toEqual({
       rows: {
         'lighting-electricity': {
-          frequency: 0,
-        },
-      },
+          frequency: 0
+        }
+      }
     });
   });
 
@@ -136,27 +130,27 @@ describe('buildReglamentCalculatorChanges', () => {
           rowId: 'cleaning-winter-mechanized',
           key: 'volume',
           baseline: 81_778,
-          value: '-100',
+          value: '-100'
         },
         {
           rowId: 'cleaning-winter-mechanized',
           key: 'frequency',
           baseline: 116,
-          value: '−1',
+          value: '−1'
         },
         {
           rowId: 'cleaning-winter-mechanized',
           key: 'rate',
           baseline: 2.26,
-          value: '-0,5',
+          value: '-0,5'
         },
         {
           rowId: 'cleaning-winter-mechanized',
           key: 'primary_salary',
           baseline: 1_000,
-          value: -1,
-        },
-      ]),
+          value: -1
+        }
+      ])
     ).toEqual({});
   });
 
@@ -185,10 +179,7 @@ describe('buildReglamentCalculatorChanges', () => {
     const root = document.querySelector('[data-reglament-calculator]');
     const input = document.querySelector('input');
 
-    if (
-      !(root instanceof HTMLElement) ||
-      !(input instanceof HTMLInputElement)
-    ) {
+    if (!(root instanceof HTMLElement) || !(input instanceof HTMLInputElement)) {
       throw new Error('Missing calculator fixture nodes');
     }
 
@@ -202,24 +193,21 @@ describe('buildReglamentCalculatorChanges', () => {
           rowId,
           key: 'primary_salary',
           baseline: 3_418_555.1,
-          value: '3000000',
-        },
+          value: '3000000'
+        }
       ]),
-      rowId,
+      rowId
     );
 
+    expect(document.querySelector('[data-reglament-row-annual]')?.textContent).toBe(
+      formatReglamentAnnualMoney(expectedRow.annual_gross)
+    );
     expect(
-      document.querySelector('[data-reglament-row-annual]')?.textContent,
-    ).toBe(formatReglamentAnnualMoney(expectedRow.annual_gross));
-    expect(
-      document.querySelector(
-        '[data-reglament-breakdown-field="primary_salary"]',
-      )?.textContent,
+      document.querySelector('[data-reglament-breakdown-field="primary_salary"]')?.textContent
     ).toBe(formatReglamentMoney(expectedRow.breakdown.primary_salary));
-    expect(
-      document.querySelector('[data-reglament-breakdown-field="gross"]')
-        ?.textContent,
-    ).toBe(formatReglamentMoney(expectedRow.breakdown.gross));
+    expect(document.querySelector('[data-reglament-breakdown-field="gross"]')?.textContent).toBe(
+      formatReglamentMoney(expectedRow.breakdown.gross)
+    );
   });
 
   it('syncs editable breakdown inputs after basic multiplier changes', () => {
@@ -251,15 +239,9 @@ describe('buildReglamentCalculatorChanges', () => {
       </div>
     `;
     const root = document.querySelector('[data-reglament-calculator]');
-    const volumeInput = document.querySelector(
-      '[data-reglament-field="volume"]',
-    );
-    const frequencyInput = document.querySelector(
-      '[data-reglament-field="frequency"]',
-    );
-    const primarySalaryInput = document.querySelector(
-      '[data-reglament-field="primary_salary"]',
-    );
+    const volumeInput = document.querySelector('[data-reglament-field="volume"]');
+    const frequencyInput = document.querySelector('[data-reglament-field="frequency"]');
+    const primarySalaryInput = document.querySelector('[data-reglament-field="primary_salary"]');
     const rowAnnual = document.querySelector('[data-reglament-row-annual]');
 
     if (
@@ -283,14 +265,14 @@ describe('buildReglamentCalculatorChanges', () => {
           rowId,
           key: 'volume',
           baseline: 6_201.6,
-          value: '3100.8',
-        },
+          value: '3100.8'
+        }
       ]),
-      rowId,
+      rowId
     );
 
     expect(primarySalaryInput.value).toBe(
-      formatReglamentInputNumber(volumeResultRow.breakdown.primary_salary),
+      formatReglamentInputNumber(volumeResultRow.breakdown.primary_salary)
     );
 
     frequencyInput.value = '182.5';
@@ -302,25 +284,23 @@ describe('buildReglamentCalculatorChanges', () => {
           rowId,
           key: 'volume',
           baseline: 6_201.6,
-          value: '3100.8',
+          value: '3100.8'
         },
         {
           rowId,
           key: 'frequency',
           baseline: 365,
-          value: '182.5',
-        },
+          value: '182.5'
+        }
       ]),
-      rowId,
+      rowId
     );
 
     expect(primarySalaryInput.value).toBe(
-      formatReglamentInputNumber(
-        volumeAndFrequencyResultRow.breakdown.primary_salary,
-      ),
+      formatReglamentInputNumber(volumeAndFrequencyResultRow.breakdown.primary_salary)
     );
     expect(rowAnnual.textContent).toBe(
-      formatReglamentAnnualMoney(volumeAndFrequencyResultRow.annual_gross),
+      formatReglamentAnnualMoney(volumeAndFrequencyResultRow.annual_gross)
     );
   });
 
@@ -351,10 +331,10 @@ describe('buildReglamentCalculatorChanges', () => {
     hydrateReglamentCalculator(root);
 
     expect(
-      document.querySelector('[data-reglament-current-tariff]')?.textContent,
+      document.querySelector('[data-reglament-current-tariff]')?.textContent
     ).toMatchInlineSnapshot(`"902,48 ₽/сотка"`);
     expect(
-      document.querySelector('[data-reglament-section-tariff]')?.textContent,
+      document.querySelector('[data-reglament-section-tariff]')?.textContent
     ).toMatchInlineSnapshot(`"48,27 ₽/сотка"`);
   });
 
@@ -363,24 +343,22 @@ describe('buildReglamentCalculatorChanges', () => {
     document.body.innerHTML = `
       <div data-reglament-calculator>
         <script type="application/json" data-reglament-calculation-input>${JSON.stringify(calculationInput)}</script>
-        <script type="application/json" data-reglament-editor-config>${JSON.stringify(
-          {
-            rows: [
-              {
-                id: rowId,
-                breakdown: [],
-                expert: [
-                  {
-                    key: 'fixed_price',
-                    label: 'Годовая стоимость',
-                    value: 1_473_084,
-                    unit: '₽/год',
-                  },
-                ],
-              },
-            ],
-          },
-        )}</script>
+        <script type="application/json" data-reglament-editor-config>${JSON.stringify({
+          rows: [
+            {
+              id: rowId,
+              breakdown: [],
+              expert: [
+                {
+                  key: 'fixed_price',
+                  label: 'Годовая стоимость',
+                  value: 1_473_084,
+                  unit: '₽/год'
+                }
+              ]
+            }
+          ]
+        })}</script>
         <h4 id="reglament-row-title-${rowId}">Электроэнергия для освещения</h4>
         <details
           data-reglament-editor-row="${rowId}"
@@ -416,10 +394,7 @@ describe('buildReglamentCalculatorChanges', () => {
     const root = document.querySelector('[data-reglament-calculator]');
     const details = document.querySelector('details');
 
-    if (
-      !(root instanceof HTMLElement) ||
-      !(details instanceof HTMLDetailsElement)
-    ) {
+    if (!(root instanceof HTMLElement) || !(details instanceof HTMLDetailsElement)) {
       throw new Error('Missing lazy editor calculator fixture nodes');
     }
 
@@ -428,7 +403,7 @@ describe('buildReglamentCalculatorChanges', () => {
     expect({
       explanation: document.querySelector('[data-explanation]')?.textContent,
       source: document.querySelector('[data-source]')?.getAttribute('href'),
-      fields: document.querySelectorAll('[data-reglament-field]').length,
+      fields: document.querySelectorAll('[data-reglament-field]').length
     }).toMatchInlineSnapshot(`
       {
         "explanation": "Расчет по показаниям счетчика.",
@@ -441,17 +416,13 @@ describe('buildReglamentCalculatorChanges', () => {
     details.dispatchEvent(new Event('toggle'));
 
     await vi.waitFor(() => {
-      expect(
-        document.querySelector('[data-reglament-field="fixed_price"]'),
-      ).toBeInstanceOf(HTMLInputElement);
+      expect(document.querySelector('[data-reglament-field="fixed_price"]')).toBeInstanceOf(
+        HTMLInputElement
+      );
     });
 
-    const fixedPrice = document.querySelector(
-      '[data-reglament-field="fixed_price"]',
-    );
-    const gross = document.querySelector(
-      '[data-reglament-breakdown-field="gross"]',
-    );
+    const fixedPrice = document.querySelector('[data-reglament-field="fixed_price"]');
+    const gross = document.querySelector('[data-reglament-breakdown-field="gross"]');
     const reset = document.querySelector('[data-reglament-reset]');
 
     if (
@@ -466,9 +437,8 @@ describe('buildReglamentCalculatorChanges', () => {
       ariaLabel: fixedPrice.getAttribute('aria-label'),
       fields: document.querySelectorAll('[data-reglament-field]').length,
       gross: gross.textContent,
-      unit: document.querySelector('[data-reglament-control-unit]')
-        ?.textContent,
-      value: fixedPrice.value,
+      unit: document.querySelector('[data-reglament-control-unit]')?.textContent,
+      value: fixedPrice.value
     }).toMatchInlineSnapshot(`
       {
         "ariaLabel": "Электроэнергия для освещения: Годовая стоимость",
@@ -485,8 +455,7 @@ describe('buildReglamentCalculatorChanges', () => {
     expect({
       gross: gross.textContent,
       resetHidden: reset.hidden,
-      tariff: document.querySelector('[data-reglament-current-tariff]')
-        ?.textContent,
+      tariff: document.querySelector('[data-reglament-current-tariff]')?.textContent
     }).toMatchInlineSnapshot(`
       {
         "gross": "1 573 084 ₽",
@@ -503,7 +472,7 @@ describe('buildReglamentCalculatorChanges', () => {
     expect({
       fields: document.querySelectorAll('[data-reglament-field]').length,
       resetHidden: reset.hidden,
-      value: fixedPrice.value,
+      value: fixedPrice.value
     }).toMatchInlineSnapshot(`
       {
         "fields": 1,
@@ -535,15 +504,9 @@ describe('buildReglamentCalculatorChanges', () => {
     const root = document.querySelector('[data-reglament-calculator]');
     const input = document.querySelector('input');
     const reset = document.querySelector('[data-reglament-reset]');
-    const originalTariff = document.querySelector(
-      '[data-reglament-current-original-tariff]',
-    );
-    const arrow = document.querySelector(
-      '[data-reglament-current-tariff-arrow]',
-    );
-    const stickyTariff = document.querySelector(
-      '[data-reglament-current-tariff]',
-    );
+    const originalTariff = document.querySelector('[data-reglament-current-original-tariff]');
+    const arrow = document.querySelector('[data-reglament-current-tariff-arrow]');
+    const stickyTariff = document.querySelector('[data-reglament-current-tariff]');
 
     if (
       !(root instanceof HTMLElement) ||
@@ -608,9 +571,7 @@ describe('buildReglamentCalculatorChanges', () => {
     const root = document.querySelector('[data-reglament-calculator]');
     const input = document.querySelector('input');
     const reset = document.querySelector('[data-reglament-reset]');
-    const stickyTariff = document.querySelector(
-      '[data-reglament-current-tariff]',
-    );
+    const stickyTariff = document.querySelector('[data-reglament-current-tariff]');
 
     if (
       !(root instanceof HTMLElement) ||
@@ -657,12 +618,8 @@ describe('buildReglamentCalculatorChanges', () => {
       </div>
     `;
     const root = document.querySelector('[data-reglament-calculator]');
-    const frequencyInput = document.querySelector(
-      '[data-reglament-field="frequency"]',
-    );
-    const primarySalaryInput = document.querySelector(
-      '[data-reglament-field="primary_salary"]',
-    );
+    const frequencyInput = document.querySelector('[data-reglament-field="frequency"]');
+    const primarySalaryInput = document.querySelector('[data-reglament-field="primary_salary"]');
     const rowAnnual = document.querySelector('[data-reglament-row-annual]');
 
     if (
@@ -683,7 +640,7 @@ describe('buildReglamentCalculatorChanges', () => {
     expect({
       frequencyValidation: frequencyInput.validationMessage,
       primarySalaryValidation: primarySalaryInput.validationMessage,
-      rowAnnual: rowAnnual.textContent,
+      rowAnnual: rowAnnual.textContent
     }).toMatchInlineSnapshot(`
       {
         "frequencyValidation": "",
@@ -722,14 +679,14 @@ describe('buildReglamentCalculatorChanges', () => {
           rowId,
           key: 'frequency',
           baseline: 116,
-          value: '100',
-        },
+          value: '100'
+        }
       ]),
-      rowId,
+      rowId
     );
 
     expect(rowTariff.textContent).toBe(
-      formatReglamentTariffValue(expectedRow.tariff_per_sotka_month),
+      formatReglamentTariffValue(expectedRow.tariff_per_sotka_month)
     );
     expect(rowTariff.dataset.reglamentDeltaTone).toBe('negative');
   });
@@ -758,9 +715,7 @@ describe('buildReglamentCalculatorChanges', () => {
     const root = document.querySelector('[data-reglament-calculator]');
     const checkbox = document.querySelector('[type="checkbox"]');
     const fixedPrice = document.querySelector('[type="number"]');
-    const currentTariff = document.querySelector(
-      '[data-reglament-current-tariff]',
-    );
+    const currentTariff = document.querySelector('[data-reglament-current-tariff]');
 
     if (
       !(root instanceof HTMLElement) ||
@@ -782,7 +737,7 @@ describe('buildReglamentCalculatorChanges', () => {
     expect({
       checked: checkbox.checked,
       tariffChanged: currentTariff.textContent !== baselineTariff,
-      validationPasses: validationPass.mock.calls.length,
+      validationPasses: validationPass.mock.calls.length
     }).toMatchInlineSnapshot(`
       {
         "checked": false,
@@ -796,7 +751,7 @@ describe('buildReglamentCalculatorChanges', () => {
 
     expect({
       tariffRestored: currentTariff.textContent === baselineTariff,
-      validationPasses: validationPass.mock.calls.length,
+      validationPasses: validationPass.mock.calls.length
     }).toMatchInlineSnapshot(`
       {
         "tariffRestored": true,
@@ -836,7 +791,7 @@ describe('buildReglamentCalculatorChanges', () => {
     expect({
       describedBy: checkbox.getAttribute('aria-describedby'),
       titleHidden: title.hidden,
-      titleText: title.textContent,
+      titleText: title.textContent
     }).toMatchInlineSnapshot(`
       {
         "describedBy": "reglament-row-title-lighting",
@@ -853,7 +808,7 @@ describe('buildReglamentCalculatorChanges', () => {
         ${[
           ['volume', '81778'],
           ['frequency', '116'],
-          ['rate', '2.26'],
+          ['rate', '2.26']
         ]
           .map(
             ([key, baseline]) => `
@@ -874,7 +829,7 @@ describe('buildReglamentCalculatorChanges', () => {
                   hidden
                 ></span>
               </label>
-            `,
+            `
           )
           .join('')}
         <strong data-reglament-current-tariff></strong>
@@ -884,12 +839,7 @@ describe('buildReglamentCalculatorChanges', () => {
     const inputs = Array.from(document.querySelectorAll('input'));
     const [volumeInput, frequencyInput, rateInput] = inputs;
 
-    if (
-      !(root instanceof HTMLElement) ||
-      !volumeInput ||
-      !frequencyInput ||
-      !rateInput
-    ) {
+    if (!(root instanceof HTMLElement) || !volumeInput || !frequencyInput || !rateInput) {
       throw new Error('Missing invalid calculator fixture nodes');
     }
 
@@ -901,28 +851,25 @@ describe('buildReglamentCalculatorChanges', () => {
     rateInput.value = 'Infinity';
     rateInput.dispatchEvent(new Event('input', { bubbles: true }));
 
-    const expectedMessage =
-      'Введите 0 или положительное число. Расчет не учитывает это значение.';
+    const expectedMessage = 'Введите 0 или положительное число. Расчет не учитывает это значение.';
 
     inputs.forEach((input) => {
-      const error = document.getElementById(
-        input.getAttribute('aria-describedby') ?? '',
-      );
+      const error = document.getElementById(input.getAttribute('aria-describedby') ?? '');
 
       expect({
         ariaInvalid: input.getAttribute('aria-invalid'),
         validationMessage: input.validationMessage,
         errorHidden: error?.hidden,
-        errorText: error?.textContent,
+        errorText: error?.textContent
       }).toEqual({
         ariaInvalid: 'true',
         validationMessage: expectedMessage,
         errorHidden: false,
-        errorText: expectedMessage,
+        errorText: expectedMessage
       });
     });
     expect(
-      document.querySelector('[data-reglament-current-tariff]')?.textContent,
+      document.querySelector('[data-reglament-current-tariff]')?.textContent
     ).toMatchInlineSnapshot(`"902,07 ₽/сотка"`);
 
     volumeInput.value = '81 000,5';
@@ -930,9 +877,9 @@ describe('buildReglamentCalculatorChanges', () => {
 
     expect(volumeInput.getAttribute('aria-invalid')).toBeNull();
     expect(volumeInput.validationMessage).toBe('');
-    expect(
-      document.querySelector('[data-reglament-current-tariff]')?.textContent,
-    ).not.toBe('902,07 ₽/сотка');
+    expect(document.querySelector('[data-reglament-current-tariff]')?.textContent).not.toBe(
+      '902,07 ₽/сотка'
+    );
   });
 
   it('keeps a cleared volume invalid after keyboard blur without hiding the baseline calculation', () => {
@@ -964,9 +911,7 @@ describe('buildReglamentCalculatorChanges', () => {
     const nextField = document.querySelector('button');
     const error = document.getElementById(`reglament-error-${rowId}-volume`);
     const rowTariff = document.querySelector('[data-reglament-row-tariff]');
-    const currentTariff = document.querySelector(
-      '[data-reglament-current-tariff]',
-    );
+    const currentTariff = document.querySelector('[data-reglament-current-tariff]');
 
     if (
       !(root instanceof HTMLElement) ||
@@ -993,7 +938,7 @@ describe('buildReglamentCalculatorChanges', () => {
       errorHidden: error.hidden,
       errorText: error.textContent,
       rowTariff: rowTariff.textContent,
-      currentTariff: currentTariff.textContent,
+      currentTariff: currentTariff.textContent
     }).toMatchInlineSnapshot(`
       {
         "activeElement": "BUTTON",
@@ -1035,9 +980,7 @@ describe('buildReglamentCalculatorChanges', () => {
 
     const root = document.querySelector('[data-reglament-calculator]');
     const input = document.querySelector('input');
-    const currentTariff = document.querySelector(
-      '[data-reglament-current-tariff]',
-    );
+    const currentTariff = document.querySelector('[data-reglament-current-tariff]');
 
     if (
       !(root instanceof HTMLElement) ||
@@ -1055,7 +998,7 @@ describe('buildReglamentCalculatorChanges', () => {
 
     expect({
       fullDomSearches: querySelectorAll.mock.calls.length,
-      tariff: currentTariff.textContent,
+      tariff: currentTariff.textContent
     }).toMatchInlineSnapshot(`
       {
         "fullDomSearches": 0,

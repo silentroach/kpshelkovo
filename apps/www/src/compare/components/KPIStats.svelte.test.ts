@@ -1,13 +1,10 @@
-import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/svelte';
-import KPIStats from './KPIStats.svelte';
-import type { Stats } from '../lib/settlement/types';
+import { describe, it, expect } from 'vitest';
 
-const expectMetric = (
-  metric: HTMLElement,
-  tariff: string,
-  delta: string,
-): void => {
+import type { Stats } from '../lib/settlement/types';
+import KPIStats from './KPIStats.svelte';
+
+const expectMetric = (metric: HTMLElement, tariff: string, delta: string): void => {
   for (const text of [tariff, delta]) {
     expect(metric.textContent).toContain(text);
   }
@@ -27,93 +24,65 @@ describe('KPIStats', () => {
     moreExpensiveCount: 1,
     shelkovoVsMedianPercent: 23,
     shelkovoVsPeerMedianPercent: 41,
-    shelkovoVsMeanPercent: 18,
+    shelkovoVsMeanPercent: 18
   };
 
   it('displays median comparison when more expensive', () => {
     const { getByTestId } = render(KPIStats, {
-      props: { stats: mockStats },
+      props: { stats: mockStats }
     });
 
-    expectMetric(
-      getByTestId('kpi-median'),
-      '3\u00A0200\u00A0₽/сотка',
-      'Шелково: +41%',
-    );
-    expectMetric(
-      getByTestId('kpi-all-median'),
-      '3\u00A0650\u00A0₽/сотка',
-      'Шелково: +23%',
-    );
+    expectMetric(getByTestId('kpi-median'), '3\u00A0200\u00A0₽/сотка', 'Шелково: +41%');
+    expectMetric(getByTestId('kpi-all-median'), '3\u00A0650\u00A0₽/сотка', 'Шелково: +23%');
   });
 
   it('displays median comparison when cheaper', () => {
     const cheaperStats: Stats = {
       ...mockStats,
       shelkovoVsMedianPercent: -15,
-      shelkovoVsPeerMedianPercent: -8,
+      shelkovoVsPeerMedianPercent: -8
     };
 
     const { getByTestId } = render(KPIStats, {
-      props: { stats: cheaperStats },
+      props: { stats: cheaperStats }
     });
 
-    expectMetric(
-      getByTestId('kpi-median'),
-      '3\u00A0200\u00A0₽/сотка',
-      'Шелково: −8%',
-    );
-    expectMetric(
-      getByTestId('kpi-all-median'),
-      '3\u00A0650\u00A0₽/сотка',
-      'Шелково: −15%',
-    );
+    expectMetric(getByTestId('kpi-median'), '3\u00A0200\u00A0₽/сотка', 'Шелково: −8%');
+    expectMetric(getByTestId('kpi-all-median'), '3\u00A0650\u00A0₽/сотка', 'Шелково: −15%');
   });
 
   it('does not render positive or negative deltas for equal medians', () => {
     const equalStats: Stats = {
       ...mockStats,
       shelkovoVsMedianPercent: 0,
-      shelkovoVsPeerMedianPercent: 0,
+      shelkovoVsPeerMedianPercent: 0
     };
 
     const { container, getByTestId } = render(KPIStats, {
-      props: { stats: equalStats },
+      props: { stats: equalStats }
     });
 
-    expectMetric(
-      getByTestId('kpi-median'),
-      '3\u00A0200\u00A0₽/сотка',
-      'на уровне Шелково',
-    );
-    expectMetric(
-      getByTestId('kpi-all-median'),
-      '3\u00A0650\u00A0₽/сотка',
-      'на уровне Шелково',
-    );
+    expectMetric(getByTestId('kpi-median'), '3\u00A0200\u00A0₽/сотка', 'на уровне Шелково');
+    expectMetric(getByTestId('kpi-all-median'), '3\u00A0650\u00A0₽/сотка', 'на уровне Шелково');
     expect(container.textContent).not.toContain('+0%');
     expect(container.textContent).not.toContain('−0%');
   });
 
   it('renders embedded metrics without a standalone title', () => {
     const { container } = render(KPIStats, {
-      props: { stats: mockStats, embed: true },
+      props: { stats: mockStats, embed: true }
     });
 
     expect(container.querySelector('[data-testid="kpi-stats"]')).toBeTruthy();
-    expect(
-      container.querySelector('[data-testid="kpi-stats-title"]'),
-    ).toBeNull();
+    expect(container.querySelector('[data-testid="kpi-stats-title"]')).toBeNull();
   });
 
   it('renders a standalone metrics title', () => {
     const { container } = render(KPIStats, {
-      props: { stats: mockStats },
+      props: { stats: mockStats }
     });
 
     expect(container.querySelector('[data-testid="kpi-stats"]')).toBeTruthy();
-    expect(
-      container.querySelector('[data-testid="kpi-stats-title"]'),
-    ).toBeTruthy();
+    expect(container.querySelector('[data-testid="kpi-stats-title"]')).toBeTruthy();
   });
 });

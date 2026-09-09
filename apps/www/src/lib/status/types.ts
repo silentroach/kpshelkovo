@@ -1,12 +1,7 @@
 import type { PreprocessedSiteMarkdownBody } from '../markdown/render';
 import type { EntityMentionTarget } from '../mentions';
 import type { StatusCalendarProjection } from './calendar.types';
-import type {
-  StatusArea,
-  StatusKind,
-  StatusService,
-  StatusServiceState,
-} from './schema';
+import type { StatusArea, StatusKind, StatusService, StatusServiceState } from './schema';
 
 export interface StatusDuration {
   readonly totalMinutes: number;

@@ -10,16 +10,15 @@ export const GET: APIRoute = async (context) => {
 
   return rss({
     title: 'Новости Шелково',
-    description:
-      'Новости КП Шелково для собственников: объявления и важные обновления.',
+    description: 'Новости КП Шелково для собственников: объявления и важные обновления.',
     site: context.site ?? 'https://kpshelkovo.online',
     items: data.articles.map((item) => ({
       title: item.title,
       description: item.summary,
       link: item.url,
       pubDate: item.publishedAt,
-      categories: item.tags.map((entry) => entry.label),
+      categories: item.tags.map((entry) => entry.label)
     })),
-    customData: '<language>ru-RU</language>',
+    customData: '<language>ru-RU</language>'
   });
 };

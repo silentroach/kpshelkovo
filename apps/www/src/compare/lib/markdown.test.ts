@@ -1,7 +1,8 @@
-import { describe, expect, it, vi } from 'vitest';
 import { formatPercentage, pluralize } from '@shelkovo/format';
+import { describe, expect, it, vi } from 'vitest';
 
 import { visibleWhitespace } from '@/lib/test/visible-whitespace';
+
 import { RATING_METHODOLOGY } from './rating';
 import { mapRawSettlement } from './settlement/mapper';
 import type { RawSettlement } from './settlement/schema';
@@ -19,12 +20,12 @@ vi.mock('./data', () => ({
         location: {
           lat: 55.7,
           lng: 37,
-          district: 'Истринский район',
+          district: 'Истринский район'
         },
         tariff: {
           value: 100,
           unit: 'rub_per_sotka',
-          period: 'month',
+          period: 'month'
         },
         website: 'https://example.com/shelkovo',
         infrastructure: {},
@@ -36,9 +37,9 @@ vi.mock('./data', () => ({
             url: 'https://example.com/shelkovo/source',
             type: 'official',
             date_checked: '2026-05-01',
-            comment: '',
-          },
-        ],
+            comment: ''
+          }
+        ]
       },
       {
         name: 'КП Тестовый',
@@ -48,12 +49,12 @@ vi.mock('./data', () => ({
         location: {
           lat: 55.8,
           lng: 37.1,
-          district: 'Истринский район',
+          district: 'Истринский район'
         },
         tariff: {
           value: 90,
           unit: 'rub_per_sotka',
-          period: 'month',
+          period: 'month'
         },
         website: 'https://example.com/test',
         infrastructure: {},
@@ -65,10 +66,10 @@ vi.mock('./data', () => ({
             url: 'https://example.com/test/source',
             type: 'official',
             date_checked: '2026-05-01',
-            comment: '',
-          },
-        ],
-      },
+            comment: ''
+          }
+        ]
+      }
     ].map((item) => toDomain(item as RawSettlement));
 
     return {
@@ -77,22 +78,19 @@ vi.mock('./data', () => ({
       stats: {
         totalSettlements: 2,
         cheaperCount: 1,
-        moreExpensiveCount: 0,
+        moreExpensiveCount: 0
       },
       ratings: new Map([
         ['shelkovo', { score: 81.2 }],
-        ['test', { score: 74.3 }],
-      ]),
+        ['test', { score: 74.3 }]
+      ])
     };
-  },
+  }
 }));
 
 vi.mock('./site', () => ({
   canon: (path: string) =>
-    new URL(
-      path.replace(/^\//, ''),
-      'https://kpshelkovo.online/815/compare/',
-    ).toString(),
+    new URL(path.replace(/^\//, ''), 'https://kpshelkovo.online/815/compare/').toString()
 }));
 
 const loadMarkdown = () => import('./markdown');
@@ -109,38 +107,38 @@ const settlement = toDomain({
     lat: 55.8,
     lng: 37.1,
     map_url: 'https://maps.example.com/test',
-    district: 'Истринский район',
+    district: 'Истринский район'
   },
   tariff: {
     value: 900,
     unit: 'rub_per_sotka',
     period: 'month',
-    note: 'по данным УК',
+    note: 'по данным УК'
   },
   lots: {
     count: 120,
     area_ha: 18,
     average_sotka: 12,
-    average_note: 'публичная презентация',
+    average_note: 'публичная презентация'
   },
   infrastructure: {
     roads: 'asphalt',
     sidewalks: 'partial',
     lighting: 'yes',
     water: 'yes',
-    checkpoints: 'yes',
+    checkpoints: 'yes'
   },
   common_spaces: {
     playgrounds: 'yes',
-    sports: 'partial',
+    sports: 'partial'
   },
   service_model: {
     garbage_collection: 'yes',
-    snow_removal: 'partial',
+    snow_removal: 'partial'
   },
   management_company: {
     title: 'УК Тест',
-    url: 'https://example.com/uk',
+    url: 'https://example.com/uk'
   },
   sources: [
     {
@@ -148,9 +146,9 @@ const settlement = toDomain({
       url: 'https://example.com/source',
       type: 'official',
       date_checked: '2026-05-01',
-      comment: 'тариф и инфраструктура',
-    },
-  ],
+      comment: 'тариф и инфраструктура'
+    }
+  ]
 } satisfies RawSettlement);
 
 describe('compare markdown navigation', () => {
@@ -199,25 +197,18 @@ describe('compare markdown navigation', () => {
   it('uses calculation values on the markdown rating page', async () => {
     const { buildRatingMd } = await loadMarkdown();
     const markdown = await buildRatingMd();
-    const { adjustments, availabilityScores, groupWeights, neutralBlockScore } =
-      RATING_METHODOLOGY;
-    const percent = (value: number): string =>
-      formatPercentage(value, { signed: false });
-    const distanceValues = RATING_METHODOLOGY.distancePoints.flatMap(
-      (point, index) => {
-        const previous = RATING_METHODOLOGY.distancePoints[index - 1];
+    const { adjustments, availabilityScores, groupWeights, neutralBlockScore } = RATING_METHODOLOGY;
+    const percent = (value: number): string => formatPercentage(value, { signed: false });
+    const distanceValues = RATING_METHODOLOGY.distancePoints.flatMap((point, index) => {
+      const previous = RATING_METHODOLOGY.distancePoints[index - 1];
 
-        return previous
-          ? [
-              `\`${previous.ringKm}\` до \`${point.ringKm} км\``,
-              `\`${percent(previous.score)}\` до \`${percent(point.score)}\``,
-            ]
-          : [
-              `\`${point.ringKm} км\` за МКАД`,
-              `\`${percent(point.score)}\` своих баллов`,
-            ];
-      },
-    );
+      return previous
+        ? [
+            `\`${previous.ringKm}\` до \`${point.ringKm} км\``,
+            `\`${percent(previous.score)}\` до \`${percent(point.score)}\``
+          ]
+        : [`\`${point.ringKm} км\` за МКАД`, `\`${percent(point.score)}\` своих баллов`];
+    });
     const lastDistancePoint = RATING_METHODOLOGY.distancePoints.at(-1)!;
     const expected = [
       'Главная в Markdown: <https://kpshelkovo.online/815/compare/index.md>',
@@ -231,7 +222,7 @@ describe('compare markdown navigation', () => {
       ...distanceValues,
       `После \`${lastDistancePoint.ringKm} км\` блок сохраняет минимум \`${percent(lastDistancePoint.score)}\``,
       `\`+${adjustments.waterInTariffBonus}\` к рейтингу`,
-      `\`${adjustments.rabstvoPenalty}\` ${pluralize(adjustments.rabstvoPenalty, ['пункт', 'пункта', 'пунктов'])}`,
+      `\`${adjustments.rabstvoPenalty}\` ${pluralize(adjustments.rabstvoPenalty, ['пункт', 'пункта', 'пунктов'])}`
     ];
 
     expect(expected.filter((value) => !markdown.includes(value))).toEqual([]);
@@ -247,7 +238,7 @@ describe('compare markdown navigation', () => {
           comparison: {
             tariffDelta: -100,
             tariffDeltaPercent: -10,
-            isCheaper: true,
+            isCheaper: true
           },
           baseline: {
             ...settlement,
@@ -258,16 +249,16 @@ describe('compare markdown navigation', () => {
             location: {
               ...settlement.location,
               lat: 55.7,
-              lng: 37,
-            },
+              lng: 37
+            }
           },
           rating: {
             score: 74.3,
             km: 25.4,
-            ring: 12.1,
-          },
-        }),
-      ),
+            ring: 12.1
+          }
+        })
+      )
     ).toMatchInlineSnapshot(`
       "# КП Тестовый
 

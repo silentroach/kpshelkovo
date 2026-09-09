@@ -11,9 +11,8 @@ type NewsArticleWithEvent = NewsArticle & {
   readonly events: readonly [NewsEvent, ...NewsEvent[]];
 };
 
-export const hasArticleEvents = (
-  article: NewsArticle,
-): article is NewsArticleWithEvent => article.events.length > 0;
+export const hasArticleEvents = (article: NewsArticle): article is NewsArticleWithEvent =>
+  article.events.length > 0;
 
 const escapeText = (value: string): string =>
   value.replace(TEXT_ESCAPE, (match) => {
@@ -55,13 +54,10 @@ const foldLine = (line: string): string => {
 
   parts.push(part);
 
-  return parts
-    .map((item, index) => (index === 0 ? item : ` ${item}`))
-    .join(CRLF);
+  return parts.map((item, index) => (index === 0 ? item : ` ${item}`)).join(CRLF);
 };
 
-const textLine = (name: string, value: string): string =>
-  foldLine(`${name}:${escapeText(value)}`);
+const textLine = (name: string, value: string): string => foldLine(`${name}:${escapeText(value)}`);
 
 const rawLine = (value: string): string => foldLine(value);
 
@@ -85,9 +81,7 @@ const formatUtcDateTime = (value: Date): string => {
 
   const iso = value.toISOString();
 
-  return `${iso.slice(0, 10).replaceAll('-', '')}T${iso
-    .slice(11, 19)
-    .replaceAll(':', '')}Z`;
+  return `${iso.slice(0, 10).replaceAll('-', '')}T${iso.slice(11, 19).replaceAll(':', '')}Z`;
 };
 
 const safeToken = (value: string): string => {
@@ -99,19 +93,16 @@ const safeToken = (value: string): string => {
   return token || 'event';
 };
 
-const articleHost = (article: NewsArticle): string =>
-  new URL(article.canonical).host;
+const articleHost = (article: NewsArticle): string => new URL(article.canonical).host;
 
-export const articleEventIcsFilename = (
-  event: Pick<NewsEvent, 'slug'>,
-): string => `${safeToken(event.slug)}.ics`;
+export const articleEventIcsFilename = (event: Pick<NewsEvent, 'slug'>): string =>
+  `${safeToken(event.slug)}.ics`;
 
 const articleEventUid = (article: NewsArticle, event: NewsEvent): string =>
   `${safeToken(`news-event-${article.id}-${event.slug}`)}@${articleHost(article)}`;
 
 const articleEventEnd = (event: NewsEvent): Date =>
-  event.endsAt ??
-  new Date(event.startsAt.valueOf() + DEFAULT_EVENT_DURATION_MS);
+  event.endsAt ?? new Date(event.startsAt.valueOf() + DEFAULT_EVENT_DURATION_MS);
 
 const structuredLocation = (event: NewsEvent): string | undefined => {
   if (!event.coordinates) {
@@ -123,10 +114,7 @@ const structuredLocation = (event: NewsEvent): string | undefined => {
   return `X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE=${title}:geo:${event.coordinates.lat},${event.coordinates.lng}`;
 };
 
-export function buildArticleEventIcs(
-  article: NewsArticle,
-  event: NewsEvent,
-): string {
+export function buildArticleEventIcs(article: NewsArticle, event: NewsEvent): string {
   const host = articleHost(article);
   const appleLocation = structuredLocation(event);
   const lines = [
@@ -150,7 +138,7 @@ export function buildArticleEventIcs(
     ...(appleLocation ? [rawLine(appleLocation)] : []),
     'END:VEVENT',
     'END:VCALENDAR',
-    '',
+    ''
   ];
 
   return lines.join(CRLF);

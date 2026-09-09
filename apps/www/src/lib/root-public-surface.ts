@@ -4,7 +4,7 @@ import {
   siteApiCatalogPath,
   siteLlmsFullPath,
   siteLlmsPath,
-  siteMarkdownPath,
+  siteMarkdownPath
 } from './root-routes';
 import { siteSkillsPath } from './skills';
 
@@ -12,7 +12,7 @@ export const rootPublicSurfaceSlice = {
   owner: {
     id: 'root',
     label: 'Корневой сайт',
-    entryPath: '/',
+    entryPath: '/'
   },
   surfaces: [
     {
@@ -22,7 +22,7 @@ export const rootPublicSurfaceSlice = {
       mediaType: 'text/html',
       cacheClass: 'html',
       discoveryRoles: ['section-entry'],
-      catalogRole: 'anchor',
+      catalogRole: 'anchor'
     },
     {
       id: 'root:index-markdown',
@@ -31,7 +31,7 @@ export const rootPublicSurfaceSlice = {
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
       discoveryRoles: ['markdown-companion'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'root:llms',
@@ -40,7 +40,7 @@ export const rootPublicSurfaceSlice = {
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'root:llms-full',
@@ -49,7 +49,7 @@ export const rootPublicSurfaceSlice = {
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'root:api-catalog',
@@ -59,7 +59,7 @@ export const rootPublicSurfaceSlice = {
       cacheClass: 'catalog',
       discoveryRoles: ['api-catalog', 'root-catalog'],
       catalogRole: 'service-desc',
-      sectionCatalogRole: false,
+      sectionCatalogRole: false
     },
     {
       id: 'root:skills',
@@ -68,7 +68,7 @@ export const rootPublicSurfaceSlice = {
       mediaType: 'application/json',
       cacheClass: 'data',
       discoveryRoles: ['skill-index'],
-      catalogRole: 'item',
-    },
-  ],
+      catalogRole: 'item'
+    }
+  ]
 } satisfies PublicSurfaceSlice;

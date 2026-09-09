@@ -4,7 +4,7 @@ type HeroMode = 'day' | 'night';
 
 const fixedTimeByMode = {
   day: new Date('2026-05-11T12:00:00Z'),
-  night: new Date('2026-05-11T17:30:00Z'),
+  night: new Date('2026-05-11T17:30:00Z')
 } satisfies Readonly<Record<HeroMode, Date>>;
 
 const getBuildMode = async (page: Page): Promise<HeroMode> => {
@@ -18,8 +18,7 @@ const getBuildMode = async (page: Page): Promise<HeroMode> => {
   return mode;
 };
 
-const getOppositeMode = (mode: HeroMode): HeroMode =>
-  mode === 'day' ? 'night' : 'day';
+const getOppositeMode = (mode: HeroMode): HeroMode => (mode === 'day' ? 'night' : 'day');
 
 const getHeroAssetMode = (url: string): HeroMode | undefined => {
   if (url.includes('home-hero-day')) return 'day';
@@ -40,9 +39,7 @@ const collectHeroRequests = (page: Page): HeroMode[] => {
   return modes;
 };
 
-test('loads only the runtime panorama on a JavaScript full load', async ({
-  page,
-}) => {
+test('loads only the runtime panorama on a JavaScript full load', async ({ page }) => {
   const buildMode = await getBuildMode(page);
   const runtimeMode = getOppositeMode(buildMode);
   await page.clock.setFixedTime(fixedTimeByMode[runtimeMode]);
@@ -58,9 +55,7 @@ test('loads only the runtime panorama on a JavaScript full load', async ({
   expect(heroRequests).toEqual([runtimeMode]);
 });
 
-test('loads only the runtime panorama after an Astro navigation', async ({
-  page,
-}) => {
+test('loads only the runtime panorama after an Astro navigation', async ({ page }) => {
   const buildMode = await getBuildMode(page);
   const runtimeMode = getOppositeMode(buildMode);
   await page.clock.setFixedTime(fixedTimeByMode[runtimeMode]);
@@ -76,22 +71,16 @@ test('loads only the runtime panorama after an Astro navigation', async ({
   await page.waitForLoadState('networkidle');
 
   expect(
-    await page.evaluate(
-      () =>
-        Reflect.get(window, Symbol.for('home-hero-transition-test')) === true,
-    ),
+    await page.evaluate(() => Reflect.get(window, Symbol.for('home-hero-transition-test')) === true)
   ).toBe(true);
   expect(heroRequests).toEqual([runtimeMode]);
 });
 
-test('loads the built panorama on a direct no-JavaScript visit', async ({
-  baseURL,
-  browser,
-}) => {
+test('loads the built panorama on a direct no-JavaScript visit', async ({ baseURL, browser }) => {
   const context = await browser.newContext({
     baseURL,
     javaScriptEnabled: false,
-    viewport: { width: 1440, height: 900 },
+    viewport: { width: 1440, height: 900 }
   });
   const page = await context.newPage();
 
@@ -119,7 +108,7 @@ test('loads the built panorama on a direct no-JavaScript visit', async ({
         srcsetWidths: element.srcset
           .split(',')
           .map((candidate) => candidate.trim().split(' ').at(-1)),
-        width: element.getAttribute('width'),
+        width: element.getAttribute('width')
       };
     });
 
@@ -131,7 +120,7 @@ test('loads the built panorama on a direct no-JavaScript visit', async ({
       loading: 'eager',
       sizes: '100vw',
       srcsetWidths: ['960w', '1280w', '1536w', '1916w', '2172w'],
-      width: '2172',
+      width: '2172'
     });
     expect(getHeroAssetMode(resourceContract.currentSrc)).toBe(buildMode);
     expect(heroRequests).toEqual([buildMode]);

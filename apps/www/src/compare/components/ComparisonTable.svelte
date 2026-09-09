@@ -1,21 +1,13 @@
 <script lang="ts">
-  import type {
-    ComparisonStatus,
-    ComparisonTableProps,
-  } from './comparison-table.types';
+  import type { ComparisonStatus, ComparisonTableProps } from './comparison-table.types';
 
-  let {
-    title = '',
-    itemHeading,
-    rows,
-    showShelkovo,
-  }: ComparisonTableProps = $props();
+  let { title = '', itemHeading, rows, showShelkovo }: ComparisonTableProps = $props();
   let showOnlyDifferences = $state(false);
 
   const visibleRows = $derived(
     showOnlyDifferences && showShelkovo
       ? rows.filter((row) => row.value !== row.shelkovoValue)
-      : rows,
+      : rows
   );
 </script>
 
@@ -83,10 +75,7 @@
       <tbody>
         {#if visibleRows.length === 0}
           <tr class="ui-table-row">
-            <td
-              class="ui-table-cell empty-state"
-              colspan={showShelkovo ? 3 : 2}
-            >
+            <td class="ui-table-cell empty-state" colspan={showShelkovo ? 3 : 2}>
               Отличий с Шелково не найдено
             </td>
           </tr>

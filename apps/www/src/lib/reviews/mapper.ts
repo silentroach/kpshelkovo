@@ -1,6 +1,6 @@
 import {
   preprocessSiteMarkdownContent,
-  type PreprocessedSiteMarkdown,
+  type PreprocessedSiteMarkdown
 } from '@/lib/markdown/render';
 import type { EntityMentionTarget, SiteMentionRegistry } from '@/lib/mentions';
 
@@ -14,9 +14,7 @@ interface MappedReviewAspect {
   readonly mentions: readonly EntityMentionTarget[];
 }
 
-const normalizeOptionalText = (
-  value: string | undefined,
-): string | undefined => {
+const normalizeOptionalText = (value: string | undefined): string | undefined => {
   const text = value?.trim();
 
   return text ? text : undefined;
@@ -35,7 +33,7 @@ const requireBody = (entry: ReviewEntry): string => {
 const preprocessReviewContent = (
   markdown: string,
   context: string,
-  mentionRegistry?: SiteMentionRegistry,
+  mentionRegistry?: SiteMentionRegistry
 ): PreprocessedSiteMarkdown => {
   if (mentionRegistry) {
     return preprocessSiteMarkdownContent(markdown, context, mentionRegistry);
@@ -45,7 +43,7 @@ const preprocessReviewContent = (
 
   return {
     markdown: body.trim() ? body : '',
-    mentions: [],
+    mentions: []
   };
 };
 
@@ -53,13 +51,13 @@ const mapAspect = (
   entry: ReviewEntry,
   aspect: NonNullable<ReviewEntry['data']['aspects']>[number],
   index: number,
-  mentionRegistry?: SiteMentionRegistry,
+  mentionRegistry?: SiteMentionRegistry
 ): MappedReviewAspect => {
   const body = aspect.body
     ? preprocessReviewContent(
         aspect.body,
         `review "${entry.id}" aspects[${index}].body`,
-        mentionRegistry,
+        mentionRegistry
       )
     : undefined;
 
@@ -67,19 +65,16 @@ const mapAspect = (
     aspect: {
       type: aspect.type,
       rating: aspect.rating,
-      body: body?.markdown,
+      body: body?.markdown
     },
-    mentions: body?.mentions ?? [],
+    mentions: body?.mentions ?? []
   };
 };
 
-export const mapRawReview = (
-  entry: ReviewEntry,
-  mentionRegistry?: SiteMentionRegistry,
-): Review => {
+export const mapRawReview = (entry: ReviewEntry, mentionRegistry?: SiteMentionRegistry): Review => {
   const expectedId = reviewIdFromParts({
     publishedIso: entry.data.published_at,
-    slug: entry.data.slug,
+    slug: entry.data.slug
   });
 
   if (entry.id !== expectedId) {
@@ -89,12 +84,11 @@ export const mapRawReview = (
   const body = preprocessReviewContent(
     requireBody(entry),
     `review "${entry.id}" body`,
-    mentionRegistry,
+    mentionRegistry
   );
   const mappedAspects =
-    entry.data.aspects?.map((aspect, index) =>
-      mapAspect(entry, aspect, index, mentionRegistry),
-    ) ?? [];
+    entry.data.aspects?.map((aspect, index) => mapAspect(entry, aspect, index, mentionRegistry)) ??
+    [];
 
   return {
     id: entry.id,
@@ -110,9 +104,6 @@ export const mapRawReview = (
     canonical: reviewCanonical({ id: entry.id }),
     body: body.markdown,
     aspects: mappedAspects.map((item) => item.aspect),
-    mentions: [
-      ...body.mentions,
-      ...mappedAspects.flatMap((item) => item.mentions),
-    ],
+    mentions: [...body.mentions, ...mappedAspects.flatMap((item) => item.mentions)]
   };
 };

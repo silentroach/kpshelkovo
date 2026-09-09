@@ -1,11 +1,7 @@
 import { compareRuText } from '@shelkovo/format';
 
 import type { StatusArea, StatusKind } from './schema';
-import type {
-  StatusDuration,
-  StatusIncident,
-  StatusIncidentPhase,
-} from './types';
+import type { StatusDuration, StatusIncident, StatusIncidentPhase } from './types';
 
 export const STATUS_TIMELINE_DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -56,7 +52,7 @@ export interface StatusTimelineSegmentGeometry {
 }
 
 export const toStatusTimelineIncidentInput = (
-  incident: StatusIncident,
+  incident: StatusIncident
 ): StatusTimelineIncidentInput => ({
   id: incident.id,
   href: incident.url,
@@ -68,7 +64,7 @@ export const toStatusTimelineIncidentInput = (
   endedHasTime: incident.ended?.hasTime ?? false,
   phase: incident.phase,
   areas: incident.appliesToAllAreas ? undefined : incident.areas,
-  duration: incident.duration,
+  duration: incident.duration
 });
 
 interface BuildStatusTimelineProblemSegmentsInput {
@@ -87,37 +83,32 @@ const hasValidRange = (range: StatusTimelineRange): boolean =>
   range.spanMs > 0 &&
   range.endMs > range.startMs;
 
-const toStatusTimelinePercent = (
-  valueMs: number,
-  range: StatusTimelineRange,
-): number => ((valueMs - range.startMs) / range.spanMs) * 100;
+const toStatusTimelinePercent = (valueMs: number, range: StatusTimelineRange): number =>
+  ((valueMs - range.startMs) / range.spanMs) * 100;
 
 export const getStatusTimelineSegmentGeometry = (
   span: StatusTimelineSpan,
-  range: StatusTimelineRange,
+  range: StatusTimelineRange
 ): StatusTimelineSegmentGeometry => ({
   leftPercent: toStatusTimelinePercent(span.startMs, range),
-  widthPercent: ((span.endMs - span.startMs) / range.spanMs) * 100,
+  widthPercent: ((span.endMs - span.startMs) / range.spanMs) * 100
 });
 
 const toStatusTimelineSegment = <T extends StatusTimelineSpan>(
   span: T,
-  range: StatusTimelineRange,
+  range: StatusTimelineRange
 ): T & StatusTimelineSegmentGeometry => ({
   ...span,
-  ...getStatusTimelineSegmentGeometry(span, range),
+  ...getStatusTimelineSegmentGeometry(span, range)
 });
 
-export const getStatusTimelineRange = (
-  nowMs: number,
-  days: number,
-): StatusTimelineRange => {
+export const getStatusTimelineRange = (nowMs: number, days: number): StatusTimelineRange => {
   if (!Number.isFinite(nowMs) || !Number.isFinite(days) || days <= 0) {
     return {
       startMs: 0,
       endMs: 0,
       days: 0,
-      spanMs: 0,
+      spanMs: 0
     };
   }
 
@@ -127,13 +118,13 @@ export const getStatusTimelineRange = (
     startMs: nowMs - spanMs,
     endMs: nowMs,
     days,
-    spanMs,
+    spanMs
   };
 };
 
 export const clipStatusTimelineSpan = (
   input: ClipStatusTimelineSpanInput,
-  range: StatusTimelineRange,
+  range: StatusTimelineRange
 ): StatusTimelineSpan | undefined => {
   if (!hasValidRange(range) || !Number.isFinite(input.startMs)) {
     return undefined;
@@ -158,13 +149,13 @@ export const clipStatusTimelineSpan = (
 
   return {
     startMs,
-    endMs: clippedEndMs,
+    endMs: clippedEndMs
   };
 };
 
 export const buildStatusTimelineProblemSegments = ({
   incidents,
-  range,
+  range
 }: BuildStatusTimelineProblemSegmentsInput): readonly StatusTimelineProblemSegment[] => {
   if (!hasValidRange(range)) {
     return [];
@@ -173,15 +164,13 @@ export const buildStatusTimelineProblemSegments = ({
   return incidents
     .map((incident) => {
       const startMs = Date.parse(incident.startedIso);
-      const endMs = incident.endedIso
-        ? Date.parse(incident.endedIso)
-        : undefined;
+      const endMs = incident.endedIso ? Date.parse(incident.endedIso) : undefined;
       const span = clipStatusTimelineSpan(
         {
           startMs,
-          endMs,
+          endMs
         },
-        range,
+        range
       );
 
       if (!span) {
@@ -195,27 +184,22 @@ export const buildStatusTimelineProblemSegments = ({
           tone: incident.kind === 'maintenance' ? 'amber' : 'red',
           startedIso: incident.startedIso,
           endedIso: incident.endedIso,
-          ...span,
+          ...span
         },
-        range,
+        range
       ) satisfies StatusTimelineProblemSegment;
     })
     .filter((segment) => segment !== undefined)
-    .sort(
-      (a, b) =>
-        a.startMs - b.startMs || a.endMs - b.endMs || compareRuText(a.id, b.id),
-    );
+    .sort((a, b) => a.startMs - b.startMs || a.endMs - b.endMs || compareRuText(a.id, b.id));
 };
 
 export const mergeStatusTimelineSpans = (
-  spans: readonly StatusTimelineSpan[],
+  spans: readonly StatusTimelineSpan[]
 ): readonly StatusTimelineSpan[] => {
   const sorted = spans
     .filter(
       (span) =>
-        Number.isFinite(span.startMs) &&
-        Number.isFinite(span.endMs) &&
-        span.endMs > span.startMs,
+        Number.isFinite(span.startMs) && Number.isFinite(span.endMs) && span.endMs > span.startMs
     )
     .toSorted((a, b) => a.startMs - b.startMs || a.endMs - b.endMs);
 
@@ -233,7 +217,7 @@ export const mergeStatusTimelineSpans = (
 
     merged[merged.length - 1] = {
       startMs: last.startMs,
-      endMs: Math.max(last.endMs, span.endMs),
+      endMs: Math.max(last.endMs, span.endMs)
     };
 
     return merged;
@@ -242,7 +226,7 @@ export const mergeStatusTimelineSpans = (
 
 export const buildStatusTimelineStableSegments = (
   problemSegments: readonly StatusTimelineSpan[],
-  range: StatusTimelineRange,
+  range: StatusTimelineRange
 ): readonly StatusTimelineStableSegment[] => {
   if (!hasValidRange(range)) {
     return [];
@@ -255,10 +239,10 @@ export const buildStatusTimelineStableSegments = (
       toStatusTimelineSegment(
         {
           startMs: range.startMs,
-          endMs: range.endMs,
+          endMs: range.endMs
         },
-        range,
-      ),
+        range
+      )
     ];
   }
 
@@ -271,10 +255,10 @@ export const buildStatusTimelineStableSegments = (
         toStatusTimelineSegment(
           {
             startMs: cursor,
-            endMs: span.startMs,
+            endMs: span.startMs
           },
-          range,
-        ),
+          range
+        )
       );
     }
 
@@ -286,10 +270,10 @@ export const buildStatusTimelineStableSegments = (
       toStatusTimelineSegment(
         {
           startMs: cursor,
-          endMs: range.endMs,
+          endMs: range.endMs
         },
-        range,
-      ),
+        range
+      )
     );
   }
 

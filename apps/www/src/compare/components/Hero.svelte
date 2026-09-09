@@ -14,7 +14,7 @@
     subtitle = 'Сравнивайте стоимость обслуживания и качество инфраструктуры по одинаковой шкале, чтобы принимать решения на данных, а не на обещаниях.',
     subtitleLinkHref,
     subtitleLinkText,
-    children,
+    children
   }: Props = $props();
 </script>
 

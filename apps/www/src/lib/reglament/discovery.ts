@@ -6,7 +6,7 @@ import { buildPublicEstimateDetails2026Json } from './detail-json';
 import {
   buildPublicEstimateDetails2026JsonSchema,
   ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_NAME,
-  publicEstimateDetailDatasetSchema,
+  publicEstimateDetailDatasetSchema
 } from './detail-public-schema';
 import {
   reglamentApiCatalogPath,
@@ -36,7 +36,7 @@ import {
   reglamentPath,
   reglamentServicesMarkdownPath,
   reglamentServicesPath,
-  reglamentSourcePdfUrl,
+  reglamentSourcePdfUrl
 } from './routes';
 import type {
   CostBreakdown,
@@ -44,14 +44,14 @@ import type {
   Estimate,
   EstimateRow,
   EstimateSourcePdf,
-  EstimateSourceRef,
+  EstimateSourceRef
 } from './schema';
 import {
   EDITABLE_FIELD_KEYS,
   EDITABLE_FIELD_LEVELS,
   ESTIMATE_COEFFICIENT_POLICIES,
   ESTIMATE_ROW_KINDS,
-  ESTIMATE_SOURCE_PDFS,
+  ESTIMATE_SOURCE_PDFS
 } from './schema';
 
 export const OAS = 'application/vnd.oai.openapi+json';
@@ -59,8 +59,8 @@ export const OAS = 'application/vnd.oai.openapi+json';
 const ESTIMATE_PAYLOAD_SCHEMA = 'Estimate2026Payload';
 const ESTIMATE_DETAILS_2026_SOURCE_IDS: readonly string[] = Object.keys(
   publicEstimateDetailDatasetSchema.parse(
-    JSON.parse(buildPublicEstimateDetails2026Json(estimateDetails2026)),
-  ).sources,
+    JSON.parse(buildPublicEstimateDetails2026Json(estimateDetails2026))
+  ).sources
 );
 
 const ROW_BREAKDOWN_FORMULAS = {
@@ -72,18 +72,18 @@ const ROW_BREAKDOWN_FORMULAS = {
   usn: 'coefficient_policy == "fot" ? profit * usn_rate : 0',
   income: 'direct + insurance + overhead + profit + usn',
   gross: 'income * (1 + vat_rate)',
-  tariff_per_sotka_month: 'gross / tariff_area_sotki / 12',
+  tariff_per_sotka_month: 'gross / tariff_area_sotki / 12'
 } as const;
 
 export const REGLAMENT_FORMULAS = {
   tariff_per_sotka_month: 'annual_gross / tariff_area_sotki / 12',
-  row_breakdown: ROW_BREAKDOWN_FORMULAS,
+  row_breakdown: ROW_BREAKDOWN_FORMULAS
 } as const;
 
 export const REGLAMENT_CAVEATS = [
   'PDF-таблицы нормализованы вручную; исходные PDF опубликованы в публичном хранилище по адресам https://media.kpshelkovo.online/815/regulation/*.pdf.',
   'final.pdf сходится с полной строкой «Доходов всего» из калькуляции, умноженной на НДС 5%, а не только с локальной строкой «Сметная стоимость».',
-  'Строки с тегом «требует проверки» стоит перепроверить по исходным PDF перед юридическими или финансовыми выводами.',
+  'Строки с тегом «требует проверки» стоит перепроверить по исходным PDF перед юридическими или финансовыми выводами.'
 ] as const;
 
 export interface ReglamentDiscoverySourceRef extends EstimateSourceRef {
@@ -150,46 +150,44 @@ const abs = (root: string, path: string): string =>
 
 const server = (root: string): string => root.replace(/\/$/, '');
 
-const star = (
-  value: string,
-): readonly { readonly value: string; readonly language: 'ru' }[] => [
-  { value, language: 'ru' },
+const star = (value: string): readonly { readonly value: string; readonly language: 'ru' }[] => [
+  { value, language: 'ru' }
 ];
 
 const text = (minLength = 0): Record<string, unknown> => ({
   type: 'string',
-  ...(minLength > 0 ? { minLength } : {}),
+  ...(minLength > 0 ? { minLength } : {})
 });
 
 const integer = (minimum = 0): Record<string, unknown> => ({
   type: 'integer',
-  minimum,
+  minimum
 });
 
 const number = (minimum?: number): Record<string, unknown> => ({
   type: 'number',
-  ...(minimum === undefined ? {} : { minimum }),
+  ...(minimum === undefined ? {} : { minimum })
 });
 
 const flag = (): Record<string, unknown> => ({ type: 'boolean' });
 
 const list = (
   items: Record<string, unknown>,
-  extra?: Record<string, unknown>,
+  extra?: Record<string, unknown>
 ): Record<string, unknown> => ({
   type: 'array',
   items,
-  ...(extra ?? {}),
+  ...(extra ?? {})
 });
 
 const obj = (
   properties: Record<string, unknown>,
-  required: readonly string[],
+  required: readonly string[]
 ): Record<string, unknown> => ({
   type: 'object',
   additionalProperties: false,
   properties,
-  required,
+  required
 });
 
 function rewriteSchemaRefs(value: unknown, schemaRef: string): unknown {
@@ -203,42 +201,37 @@ function rewriteSchemaRefs(value: unknown, schemaRef: string): unknown {
 
   return Object.fromEntries(
     Object.entries(value).map(([key, entry]) => {
-      if (
-        key === '$ref' &&
-        typeof entry === 'string' &&
-        entry.startsWith('#/')
-      ) {
+      if (key === '$ref' && typeof entry === 'string' && entry.startsWith('#/')) {
         return [key, `${schemaRef}${entry.slice(1)}`];
       }
 
       return [key, rewriteSchemaRefs(entry, schemaRef)];
-    }),
+    })
   );
 }
 
-export const estimateSourcePdfKey = (pdf: EstimateSourcePdf): string =>
-  `815/regulation/${pdf}.pdf`;
+export const estimateSourcePdfKey = (pdf: EstimateSourcePdf): string => `815/regulation/${pdf}.pdf`;
 
 const sourceRef = (ref: EstimateSourceRef): ReglamentDiscoverySourceRef => ({
   ...ref,
   pdf_key: estimateSourcePdfKey(ref.pdf),
-  pdf_url: reglamentSourcePdfUrl(ref.pdf),
+  pdf_url: reglamentSourcePdfUrl(ref.pdf)
 });
 
 const sources = (): ReglamentDiscoveryPayload['sources'] =>
   ESTIMATE_SOURCE_PDFS.map((pdf) => ({
     pdf,
     pdf_key: estimateSourcePdfKey(pdf),
-    pdf_url: reglamentSourcePdfUrl(pdf),
+    pdf_url: reglamentSourcePdfUrl(pdf)
   }));
 
 const computedTotals = (
-  item: ReglamentDiscoveryComputedTotals,
+  item: ReglamentDiscoveryComputedTotals
 ): ReglamentDiscoveryComputedTotals => ({
   annual_gross: item.annual_gross,
   tariff_per_sotka_month: item.tariff_per_sotka_month,
   delta_annual_gross: item.delta_annual_gross,
-  delta_tariff_per_sotka_month: item.delta_tariff_per_sotka_month,
+  delta_tariff_per_sotka_month: item.delta_tariff_per_sotka_month
 });
 
 const expectItem = <T>(value: T | undefined, message: string): T => {
@@ -251,21 +244,14 @@ const expectItem = <T>(value: T | undefined, message: string): T => {
 
 const rowPayload = (
   row: EstimateRow,
-  calculated: ReturnType<
-    typeof calculateEstimate
-  >['sections'][number]['rows'][number],
+  calculated: ReturnType<typeof calculateEstimate>['sections'][number]['rows'][number]
 ): ReglamentDiscoveryRow => {
-  const calculatedChildren = new Map(
-    calculated.children?.map((child) => [child.id, child]) ?? [],
-  );
+  const calculatedChildren = new Map(calculated.children?.map((child) => [child.id, child]) ?? []);
   const children = row.children?.map((child) =>
     rowPayload(
       child,
-      expectItem(
-        calculatedChildren.get(child.id),
-        `Missing calculated child row ${child.id}`,
-      ),
-    ),
+      expectItem(calculatedChildren.get(child.id), `Missing calculated child row ${child.id}`)
+    )
   );
 
   return {
@@ -277,26 +263,22 @@ const rowPayload = (
     ...(row.tags ? { tags: [...row.tags] } : {}),
     baseline: {
       ...row.baseline,
-      breakdown: { ...row.baseline.breakdown },
+      breakdown: { ...row.baseline.breakdown }
     },
     computed: {
       ...computedTotals(calculated),
       is_enabled: calculated.is_enabled,
-      breakdown: { ...calculated.breakdown },
+      breakdown: { ...calculated.breakdown }
     },
     source_refs: row.source_refs.map(sourceRef),
     editable_fields: row.editable_fields.map((field) => ({ ...field })),
-    ...(children && children.length > 0 ? { children } : {}),
+    ...(children && children.length > 0 ? { children } : {})
   };
 };
 
-export const buildReglamentPayload = (
-  estimate: Estimate,
-): ReglamentDiscoveryPayload => {
+export const buildReglamentPayload = (estimate: Estimate): ReglamentDiscoveryPayload => {
   const calculated = calculateEstimate(estimate);
-  const calculatedSections = new Map(
-    calculated.sections.map((section) => [section.id, section]),
-  );
+  const calculatedSections = new Map(calculated.sections.map((section) => [section.id, section]));
 
   return {
     id: estimate.id,
@@ -313,11 +295,9 @@ export const buildReglamentPayload = (
     sections: estimate.sections.map((section) => {
       const calculatedSection = expectItem(
         calculatedSections.get(section.id),
-        `Missing calculated section ${section.id}`,
+        `Missing calculated section ${section.id}`
       );
-      const calculatedRows = new Map(
-        calculatedSection.rows.map((row) => [row.id, row]),
-      );
+      const calculatedRows = new Map(calculatedSection.rows.map((row) => [row.id, row]));
 
       return {
         id: section.id,
@@ -328,14 +308,11 @@ export const buildReglamentPayload = (
         rows: section.rows.map((row) =>
           rowPayload(
             row,
-            expectItem(
-              calculatedRows.get(row.id),
-              `Missing calculated row ${row.id}`,
-            ),
-          ),
-        ),
+            expectItem(calculatedRows.get(row.id), `Missing calculated row ${row.id}`)
+          )
+        )
       };
-    }),
+    })
   };
 };
 
@@ -363,7 +340,7 @@ export function schema(root: string): Record<string, unknown> {
       'source_refs',
       'sources',
       'caveats',
-      'sections',
+      'sections'
     ],
     properties: {
       id: text(1),
@@ -377,31 +354,31 @@ export function schema(root: string): Record<string, unknown> {
       source_refs: list(sourceRefSchema, { minItems: 1 }),
       sources: list({ $ref: '#/$defs/sourcePdf' }, { minItems: 1 }),
       caveats: list(text(1), { minItems: 1 }),
-      sections: list({ $ref: '#/$defs/section' }, { minItems: 1 }),
+      sections: list({ $ref: '#/$defs/section' }, { minItems: 1 })
     },
     $defs: {
       sourcePdfKey: {
-        enum: [...ESTIMATE_SOURCE_PDFS],
+        enum: [...ESTIMATE_SOURCE_PDFS]
       },
       rowKind: {
-        enum: [...ESTIMATE_ROW_KINDS],
+        enum: [...ESTIMATE_ROW_KINDS]
       },
       coefficientPolicy: {
-        enum: [...ESTIMATE_COEFFICIENT_POLICIES],
+        enum: [...ESTIMATE_COEFFICIENT_POLICIES]
       },
       editableFieldKey: {
-        enum: [...EDITABLE_FIELD_KEYS],
+        enum: [...EDITABLE_FIELD_KEYS]
       },
       editableFieldLevel: {
-        enum: [...EDITABLE_FIELD_LEVELS],
+        enum: [...EDITABLE_FIELD_LEVELS]
       },
       sourcePdf: obj(
         {
           pdf: { $ref: '#/$defs/sourcePdfKey' },
           pdf_key: text(1),
-          pdf_url: text(1),
+          pdf_url: text(1)
         },
-        ['pdf', 'pdf_key', 'pdf_url'],
+        ['pdf', 'pdf_key', 'pdf_url']
       ),
       sourceRef: obj(
         {
@@ -410,17 +387,17 @@ export function schema(root: string): Record<string, unknown> {
           pdf_url: text(1),
           page: integer(1),
           fragment: text(1),
-          note: text(1),
+          note: text(1)
         },
-        ['pdf', 'pdf_key', 'pdf_url', 'page'],
+        ['pdf', 'pdf_key', 'pdf_url', 'page']
       ),
       displayValue: obj(
         {
           value: number(),
           unit: text(1),
-          label: text(1),
+          label: text(1)
         },
-        ['value', 'unit'],
+        ['value', 'unit']
       ),
       editableField: obj(
         {
@@ -430,9 +407,9 @@ export function schema(root: string): Record<string, unknown> {
           unit: text(1),
           min: number(),
           max: number(),
-          step: number(),
+          step: number()
         },
-        ['key', 'label', 'level'],
+        ['key', 'label', 'level']
       ),
       coefficients: obj(
         {
@@ -440,15 +417,9 @@ export function schema(root: string): Record<string, unknown> {
           overhead_rate: number(0),
           profit_rate: number(0),
           usn_rate: number(0),
-          vat_rate: number(0),
+          vat_rate: number(0)
         },
-        [
-          'insurance_rate',
-          'overhead_rate',
-          'profit_rate',
-          'usn_rate',
-          'vat_rate',
-        ],
+        ['insurance_rate', 'overhead_rate', 'profit_rate', 'usn_rate', 'vat_rate']
       ),
       costBreakdown: obj(
         {
@@ -464,7 +435,7 @@ export function schema(root: string): Record<string, unknown> {
           usn: number(0),
           income: number(0),
           vat: number(0),
-          gross: number(0),
+          gross: number(0)
         },
         [
           'primary_salary',
@@ -479,29 +450,29 @@ export function schema(root: string): Record<string, unknown> {
           'usn',
           'income',
           'vat',
-          'gross',
-        ],
+          'gross'
+        ]
       ),
       officialTotals: obj(
         {
           annual_gross: number(0),
-          tariff_per_sotka_month: number(0),
+          tariff_per_sotka_month: number(0)
         },
-        ['annual_gross', 'tariff_per_sotka_month'],
+        ['annual_gross', 'tariff_per_sotka_month']
       ),
       computedTotals: obj(
         {
           annual_gross: number(0),
           tariff_per_sotka_month: number(0),
           delta_annual_gross: number(),
-          delta_tariff_per_sotka_month: number(),
+          delta_tariff_per_sotka_month: number()
         },
         [
           'annual_gross',
           'tariff_per_sotka_month',
           'delta_annual_gross',
-          'delta_tariff_per_sotka_month',
-        ],
+          'delta_tariff_per_sotka_month'
+        ]
       ),
       rowBaseline: obj(
         {
@@ -511,9 +482,9 @@ export function schema(root: string): Record<string, unknown> {
           price: displayValueSchema,
           annual_gross: number(0),
           tariff_per_sotka_month: number(0),
-          breakdown: { $ref: '#/$defs/costBreakdown' },
+          breakdown: { $ref: '#/$defs/costBreakdown' }
         },
-        ['is_enabled', 'annual_gross', 'tariff_per_sotka_month', 'breakdown'],
+        ['is_enabled', 'annual_gross', 'tariff_per_sotka_month', 'breakdown']
       ),
       rowComputed: obj(
         {
@@ -522,7 +493,7 @@ export function schema(root: string): Record<string, unknown> {
           tariff_per_sotka_month: number(0),
           delta_annual_gross: number(),
           delta_tariff_per_sotka_month: number(),
-          breakdown: { $ref: '#/$defs/costBreakdown' },
+          breakdown: { $ref: '#/$defs/costBreakdown' }
         },
         [
           'is_enabled',
@@ -530,21 +501,19 @@ export function schema(root: string): Record<string, unknown> {
           'tariff_per_sotka_month',
           'delta_annual_gross',
           'delta_tariff_per_sotka_month',
-          'breakdown',
-        ],
+          'breakdown'
+        ]
       ),
       rowBreakdownFormulas: obj(
-        Object.fromEntries(
-          Object.keys(ROW_BREAKDOWN_FORMULAS).map((key) => [key, text(1)]),
-        ),
-        Object.keys(ROW_BREAKDOWN_FORMULAS),
+        Object.fromEntries(Object.keys(ROW_BREAKDOWN_FORMULAS).map((key) => [key, text(1)])),
+        Object.keys(ROW_BREAKDOWN_FORMULAS)
       ),
       formulas: obj(
         {
           tariff_per_sotka_month: text(1),
-          row_breakdown: { $ref: '#/$defs/rowBreakdownFormulas' },
+          row_breakdown: { $ref: '#/$defs/rowBreakdownFormulas' }
         },
-        ['tariff_per_sotka_month', 'row_breakdown'],
+        ['tariff_per_sotka_month', 'row_breakdown']
       ),
       row: obj(
         {
@@ -558,7 +527,7 @@ export function schema(root: string): Record<string, unknown> {
           computed: { $ref: '#/$defs/rowComputed' },
           source_refs: list(sourceRefSchema, { minItems: 1 }),
           editable_fields: list({ $ref: '#/$defs/editableField' }),
-          children: list({ $ref: '#/$defs/row' }),
+          children: list({ $ref: '#/$defs/row' })
         },
         [
           'id',
@@ -568,8 +537,8 @@ export function schema(root: string): Record<string, unknown> {
           'baseline',
           'computed',
           'source_refs',
-          'editable_fields',
-        ],
+          'editable_fields'
+        ]
       ),
       section: obj(
         {
@@ -578,20 +547,18 @@ export function schema(root: string): Record<string, unknown> {
           official: { $ref: '#/$defs/officialTotals' },
           computed: { $ref: '#/$defs/computedTotals' },
           source_refs: list(sourceRefSchema, { minItems: 1 }),
-          rows: list({ $ref: '#/$defs/row' }, { minItems: 1 }),
+          rows: list({ $ref: '#/$defs/row' }, { minItems: 1 })
         },
-        ['id', 'title', 'official', 'computed', 'source_refs', 'rows'],
-      ),
-    },
+        ['id', 'title', 'official', 'computed', 'source_refs', 'rows']
+      )
+    }
   };
 }
 
 export function openapi(root: string): Record<string, unknown> {
   const schemaRef = `#/components/schemas/${ESTIMATE_PAYLOAD_SCHEMA}`;
   const body = Object.fromEntries(
-    Object.entries(schema(root)).filter(
-      ([key]) => key !== '$schema' && key !== '$id',
-    ),
+    Object.entries(schema(root)).filter(([key]) => key !== '$schema' && key !== '$id')
   );
   const componentBody = rewriteSchemaRefs(body, schemaRef);
 
@@ -602,12 +569,12 @@ export function openapi(root: string): Record<string, unknown> {
       title: 'Шелково Reglament Estimate 2026 JSON',
       version: '1.0.0',
       description:
-        'OpenAPI-описание JSON /815/regulation/data/estimate-2026.json только для чтения: базовая смета, формулы, ссылки на источники и расчетные значения.',
+        'OpenAPI-описание JSON /815/regulation/data/estimate-2026.json только для чтения: базовая смета, формулы, ссылки на источники и расчетные значения.'
     },
     servers: [
       {
-        url: server(root),
-      },
+        url: server(root)
+      }
     ],
     paths: {
       [reglamentEstimate2026DataPath()]: {
@@ -622,35 +589,33 @@ export function openapi(root: string): Record<string, unknown> {
               content: {
                 'application/json': {
                   schema: {
-                    $ref: schemaRef,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
+                    $ref: schemaRef
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     },
     components: {
       schemas: {
-        [ESTIMATE_PAYLOAD_SCHEMA]: componentBody,
-      },
-    },
+        [ESTIMATE_PAYLOAD_SCHEMA]: componentBody
+      }
+    }
   };
 }
 
 export const detailSchema = (root: string): Record<string, unknown> =>
   buildPublicEstimateDetails2026JsonSchema(
     abs(root, reglamentEstimateDetails2026SchemaPath()),
-    ESTIMATE_DETAILS_2026_SOURCE_IDS,
+    ESTIMATE_DETAILS_2026_SOURCE_IDS
   );
 
 export function detailOpenapi(root: string): Record<string, unknown> {
   const schemaRef = `#/components/schemas/${ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_NAME}`;
   const body = Object.fromEntries(
-    Object.entries(detailSchema(root)).filter(
-      ([key]) => key !== '$schema' && key !== '$id',
-    ),
+    Object.entries(detailSchema(root)).filter(([key]) => key !== '$schema' && key !== '$id')
   );
 
   return {
@@ -660,12 +625,12 @@ export function detailOpenapi(root: string): Record<string, unknown> {
       title: 'Шелково Reglament Estimate Details 2026 JSON',
       version: '2.0.0',
       description:
-        'OpenAPI-описание детальной сметы регламента 2026: работ, ресурсов, контрольных итогов и ссылок на фрагменты исходных PDF.',
+        'OpenAPI-описание детальной сметы регламента 2026: работ, ресурсов, контрольных итогов и ссылок на фрагменты исходных PDF.'
     },
     servers: [
       {
-        url: server(root),
-      },
+        url: server(root)
+      }
     ],
     paths: {
       [reglamentEstimateDetails2026DataPath()]: {
@@ -680,23 +645,20 @@ export function detailOpenapi(root: string): Record<string, unknown> {
               content: {
                 'application/json': {
                   schema: {
-                    $ref: schemaRef,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
+                    $ref: schemaRef
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     },
     components: {
       schemas: {
-        [ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_NAME]: rewriteSchemaRefs(
-          body,
-          schemaRef,
-        ),
-      },
-    },
+        [ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_NAME]: rewriteSchemaRefs(body, schemaRef)
+      }
+    }
   };
 }
 
@@ -709,176 +671,158 @@ export function catalog(root: string): Record<string, unknown> {
           {
             href: abs(root, reglamentMarkdownPath()),
             type: 'text/markdown',
-            'title*': star('Markdown-версия калькулятора тарифа по смете 2026'),
+            'title*': star('Markdown-версия калькулятора тарифа по смете 2026')
           },
           {
             href: abs(root, reglamentFullMarkdownPath()),
             type: 'text/markdown',
-            'title*': star(
-              'Индекс Markdown-версий полного регламента содержания Шелково',
-            ),
+            'title*': star('Индекс Markdown-версий полного регламента содержания Шелково')
           },
           {
             href: abs(root, reglamentFullAssetsMarkdownPath()),
             type: 'text/markdown',
-            'title*': star('Markdown полного регламента: общее имущество'),
+            'title*': star('Markdown полного регламента: общее имущество')
           },
           {
             href: abs(root, reglamentFullServicesMarkdownPath()),
             type: 'text/markdown',
-            'title*': star('Markdown полного регламента: услуги'),
+            'title*': star('Markdown полного регламента: услуги')
           },
           {
             href: abs(root, reglamentFullServiceMapMarkdownPath()),
             type: 'text/markdown',
-            'title*': star(
-              'Markdown полного регламента: сопоставление услуг со сметой',
-            ),
+            'title*': star('Markdown полного регламента: сопоставление услуг со сметой')
           },
           {
             href: abs(root, reglamentFullChecksMarkdownPath()),
             type: 'text/markdown',
-            'title*': star('Markdown полного регламента: проверки и допущения'),
+            'title*': star('Markdown полного регламента: проверки и допущения')
           },
           {
             href: abs(root, reglamentEstimateDetailsMarkdownPath()),
             type: 'text/markdown',
-            'title*': star('Markdown детальной сметы: индекс'),
+            'title*': star('Markdown детальной сметы: индекс')
           },
           {
             href: abs(root, reglamentEstimateDetailsMaterialsMarkdownPath()),
             type: 'text/markdown',
-            'title*': star('Markdown детальной сметы: материалы'),
+            'title*': star('Markdown детальной сметы: материалы')
           },
           {
             href: abs(root, reglamentEstimateDetailsMachinesMarkdownPath()),
             type: 'text/markdown',
-            'title*': star('Markdown детальной сметы: машины'),
+            'title*': star('Markdown детальной сметы: машины')
           },
           {
             href: abs(root, reglamentEstimateDetailsLaborMarkdownPath()),
             type: 'text/markdown',
-            'title*': star('Markdown детальной сметы: труд'),
+            'title*': star('Markdown детальной сметы: труд')
           },
           {
             href: abs(root, reglamentEstimateDetailsChecksMarkdownPath()),
             type: 'text/markdown',
-            'title*': star('Markdown детальной сметы: проверки'),
+            'title*': star('Markdown детальной сметы: проверки')
           },
           {
             href: abs(root, reglamentEstimate2026DataPath()),
             type: 'application/json',
-            'title*': star(
-              'Основной машиночитаемый JSON сметы регламента 2026',
-            ),
+            'title*': star('Основной машиночитаемый JSON сметы регламента 2026')
           },
           {
             href: abs(root, reglamentEstimateDetails2026DataPath()),
             type: 'application/json',
-            'title*': star(
-              'Детальный машиночитаемый JSON сметы регламента 2026',
-            ),
+            'title*': star('Детальный машиночитаемый JSON сметы регламента 2026')
           },
           {
             href: abs(root, reglamentFull2026DataPath()),
             type: 'application/json',
             'title*': star(
-              'Набор данных полного регламента: имущество, услуги, сопоставления и заметки аудита',
-            ),
+              'Набор данных полного регламента: имущество, услуги, сопоставления и заметки аудита'
+            )
           },
           {
             href: abs(root, reglamentAssetsPath()),
             type: 'text/html',
-            'title*': star('Страница общего имущества из полного регламента'),
+            'title*': star('Страница общего имущества из полного регламента')
           },
           {
             href: abs(root, reglamentAssetsMarkdownPath()),
             type: 'text/markdown',
-            'title*': star(
-              'Markdown-версия общего имущества из полного регламента',
-            ),
+            'title*': star('Markdown-версия общего имущества из полного регламента')
           },
           {
             href: abs(root, reglamentServicesPath()),
             type: 'text/html',
-            'title*': star('Страница услуг и сопоставления со сметой'),
+            'title*': star('Страница услуг и сопоставления со сметой')
           },
           {
             href: abs(root, reglamentServicesMarkdownPath()),
             type: 'text/markdown',
-            'title*': star('Markdown-версия услуг и сопоставления со сметой'),
+            'title*': star('Markdown-версия услуг и сопоставления со сметой')
           },
           {
             href: reglamentFullSourcePdfUrl(),
             type: 'application/pdf',
-            'title*': star('Исходный PDF полного регламента'),
+            'title*': star('Исходный PDF полного регламента')
           },
           {
             href: abs(root, reglamentLlmsPath()),
             type: 'text/plain',
-            'title*': star('Короткий обзор llms.txt'),
+            'title*': star('Короткий обзор llms.txt')
           },
           {
             href: abs(root, reglamentLlmsFullPath()),
             type: 'text/plain',
-            'title*': star('Подробный обзор llms-full.txt'),
+            'title*': star('Подробный обзор llms-full.txt')
           },
           ...ESTIMATE_SOURCE_PDFS.map((pdf) => ({
             href: reglamentSourcePdfUrl(pdf),
             type: 'application/pdf',
-            'title*': star(`Исходный PDF сметы регламента: ${pdf}.pdf`),
-          })),
+            'title*': star(`Исходный PDF сметы регламента: ${pdf}.pdf`)
+          }))
         ],
         'service-desc': [
           {
             href: abs(root, reglamentEstimate2026SchemaPath()),
             type: 'application/schema+json',
-            'title*': star('JSON Schema для данных сметы регламента 2026'),
+            'title*': star('JSON Schema для данных сметы регламента 2026')
           },
           {
             href: abs(root, reglamentEstimate2026OpenApiPath()),
             type: OAS,
-            'title*': star('OpenAPI для данных сметы регламента 2026'),
+            'title*': star('OpenAPI для данных сметы регламента 2026')
           },
           {
             href: abs(root, reglamentEstimateDetails2026SchemaPath()),
             type: 'application/schema+json',
-            'title*': star('JSON Schema детальной сметы регламента 2026'),
+            'title*': star('JSON Schema детальной сметы регламента 2026')
           },
           {
             href: abs(root, reglamentEstimateDetails2026OpenApiPath()),
             type: OAS,
-            'title*': star('OpenAPI детальной сметы регламента 2026'),
-          },
-        ],
-      },
-    ],
+            'title*': star('OpenAPI детальной сметы регламента 2026')
+          }
+        ]
+      }
+    ]
   };
 }
 
-const discoveryLinks = (
-  root: string,
-  schemaPath: string,
-  openApiPath: string,
-): string =>
+const discoveryLinks = (root: string, schemaPath: string, openApiPath: string): string =>
   [
     `<${abs(root, schemaPath)}>; rel="service-desc"; type="application/schema+json"`,
     `<${abs(root, openApiPath)}>; rel="service-desc"; type="${OAS}"`,
-    formatApiCatalogLink(abs(root, reglamentApiCatalogPath())),
+    formatApiCatalogLink(abs(root, reglamentApiCatalogPath()))
   ].join(', ');
 
 export const links = (root: string): string =>
-  discoveryLinks(
-    root,
-    reglamentEstimate2026SchemaPath(),
-    reglamentEstimate2026OpenApiPath(),
-  );
+  discoveryLinks(root, reglamentEstimate2026SchemaPath(), reglamentEstimate2026OpenApiPath());
 
 export const detailLinks = (root: string): string =>
   discoveryLinks(
     root,
     reglamentEstimateDetails2026SchemaPath(),
-    reglamentEstimateDetails2026OpenApiPath(),
+    reglamentEstimateDetails2026OpenApiPath()
   );
 
 export const self = (root: string): string =>

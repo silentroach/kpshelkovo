@@ -20,9 +20,7 @@ export const GET: APIRoute = async ({ params }) => {
   const journal = getStatusMonthJournal(await loadStatusData(), year, month);
 
   if (!journal) {
-    throw new Error(
-      `status calendar month "${params.year}/${params.month}" not found`,
-    );
+    throw new Error(`status calendar month "${params.year}/${params.month}" not found`);
   }
 
   return createMarkdownResponse(buildStatusMonthMarkdown(journal));

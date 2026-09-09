@@ -1,22 +1,17 @@
-export const REVIEW_ASPECT_TYPES = [
-  'place',
-  'developer',
-  'management',
-] as const;
+export const REVIEW_ASPECT_TYPES = ['place', 'developer', 'management'] as const;
 export type ReviewAspectType = (typeof REVIEW_ASPECT_TYPES)[number];
 
 export const REVIEW_ASPECT_ORGANIZATIONS = {
   developer: {
     name: 'Земля МО',
-    role: 'застройщик',
+    role: 'застройщик'
   },
   management: {
     name: 'ОК Комфорт',
-    role: 'обслуживание',
-  },
+    role: 'обслуживание'
+  }
 } as const;
-export type ReviewOrganizationAspectType =
-  keyof typeof REVIEW_ASPECT_ORGANIZATIONS;
+export type ReviewOrganizationAspectType = keyof typeof REVIEW_ASPECT_ORGANIZATIONS;
 
 export const REVIEW_AUTHOR_FALLBACK = 'Анонимный собственник';
 export const REVIEW_ID = /^\d{4}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*$/;

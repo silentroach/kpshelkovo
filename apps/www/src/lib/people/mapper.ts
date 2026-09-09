@@ -26,7 +26,7 @@ const phoneHref = (value: string, context: string): string => {
 
 const telegramParts = (
   value: string,
-  context: string,
+  context: string
 ): {
   readonly display: string;
   readonly href: string;
@@ -34,22 +34,18 @@ const telegramParts = (
   const match = value.trim().match(TELEGRAM_HANDLE);
 
   if (!match) {
-    throw new Error(
-      `${context} telegram must use a handle like @username or username`,
-    );
+    throw new Error(`${context} telegram must use a handle like @username or username`);
   }
 
   const handle = match[1];
 
   return {
     display: `@${handle}`,
-    href: `https://t.me/${handle}`,
+    href: `https://t.me/${handle}`
   };
 };
 
-export const mapRawPersonContactType = (
-  value: RawPersonContact['type'],
-): PersonContactType => {
+export const mapRawPersonContactType = (value: RawPersonContact['type']): PersonContactType => {
   switch (value) {
     case 'phone':
       return 'phone';
@@ -58,10 +54,7 @@ export const mapRawPersonContactType = (
   }
 };
 
-export const mapRawPersonContact = (
-  input: RawPersonContact,
-  context: string,
-): PersonContact => {
+export const mapRawPersonContact = (input: RawPersonContact, context: string): PersonContact => {
   const value = input.value.trim();
   const type = mapRawPersonContactType(input.type);
 
@@ -74,7 +67,7 @@ export const mapRawPersonContact = (
       type,
       value,
       display: value,
-      href: phoneHref(value, context),
+      href: phoneHref(value, context)
     };
   }
 
@@ -84,19 +77,19 @@ export const mapRawPersonContact = (
     type,
     value,
     display: telegram.display,
-    href: telegram.href,
+    href: telegram.href
   };
 };
 
 export const mapRawPersonProfile = (
   entry: RawPersonProfileInput,
-  registry: SiteMentionRegistry,
+  registry: SiteMentionRegistry
 ): PersonProfile => {
   const body = preprocessSiteMarkdownContent(
     entry.body ?? '',
     `people profile "${entry.id}" body`,
     registry,
-    { type: 'person', slug: entry.id },
+    { type: 'person', slug: entry.id }
   );
 
   return {
@@ -111,13 +104,10 @@ export const mapRawPersonProfile = (
     markdownUrl: personMarkdownUrl(entry.id),
     canonical: personCanonical(entry.id),
     contacts: entry.data.contacts.map((contact, index) =>
-      mapRawPersonContact(
-        contact,
-        `people profile "${entry.id}" contact #${index + 1}`,
-      ),
+      mapRawPersonContact(contact, `people profile "${entry.id}" contact #${index + 1}`)
     ),
     body: body.markdown,
     mentions: body.mentions,
-    backlinks: EMPTY_PERSON_BACKLINKS,
+    backlinks: EMPTY_PERSON_BACKLINKS
   };
 };

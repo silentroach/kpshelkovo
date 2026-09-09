@@ -7,20 +7,17 @@ const TOOLTIP_OPEN_ATTRIBUTE = 'data-status-calendar-tooltip-open';
 const TOOLTIP_HOVER_ATTRIBUTE = 'data-status-calendar-tooltip-hovered';
 const TOOLTIP_FOCUS_ATTRIBUTE = 'data-status-calendar-tooltip-focused';
 const TOOLTIP_DISMISSED_ATTRIBUTE = 'data-tooltip-dismissed';
-const TODAY_SELECTOR =
-  '[data-status-calendar-today], .status-calendar-date--today';
+const TODAY_SELECTOR = '[data-status-calendar-today], .status-calendar-date--today';
 const TOOLTIP_SHIFT_PROPERTY = '--status-calendar-tooltip-shift-x';
 const TOOLTIP_VIEWPORT_MARGIN = 16;
 const MOSCOW_DATE_FORMAT = new Intl.DateTimeFormat('en-US', {
   timeZone: 'Europe/Moscow',
   year: 'numeric',
   month: '2-digit',
-  day: '2-digit',
+  day: '2-digit'
 });
 
-const tooltipRoot = (
-  target: EventTarget | undefined,
-): HTMLElement | undefined => {
+const tooltipRoot = (target: EventTarget | undefined): HTMLElement | undefined => {
   if (!(target instanceof Element)) {
     return;
   }
@@ -38,7 +35,7 @@ const movedOutside = (root: HTMLElement, target: EventTarget | undefined) =>
 
 const tooltipHorizontalShift = (
   bounds: Pick<DOMRect, 'left' | 'right'>,
-  viewportWidth: number,
+  viewportWidth: number
 ): number => {
   if (bounds.left < TOOLTIP_VIEWPORT_MARGIN) {
     return TOOLTIP_VIEWPORT_MARGIN - bounds.left;
@@ -51,10 +48,7 @@ const tooltipHorizontalShift = (
 
 const moscowDateId = (now: Date): string => {
   const parts = new Map(
-    MOSCOW_DATE_FORMAT.formatToParts(now).map((part) => [
-      part.type,
-      part.value,
-    ]),
+    MOSCOW_DATE_FORMAT.formatToParts(now).map((part) => [part.type, part.value])
   );
   const year = parts.get('year');
   const month = parts.get('month');
@@ -75,9 +69,7 @@ const refreshStatusCalendarTodayIn = (root: ParentNode, now: Date): void => {
   });
 
   const todayId = moscowDateId(now);
-  const today = root.querySelector<HTMLElement>(
-    `[data-status-calendar-date="${todayId}"]`,
-  );
+  const today = root.querySelector<HTMLElement>(`[data-status-calendar-date="${todayId}"]`);
 
   if (!today) {
     return;
@@ -93,7 +85,7 @@ export const refreshStatusCalendarToday = (now = new Date()): void =>
 
 export const positionStatusCalendarTooltip = (
   root: HTMLElement,
-  viewportWidth = window.innerWidth,
+  viewportWidth = window.innerWidth
 ): void => {
   const tooltip = root.querySelector<HTMLElement>(TOOLTIP_SELECTOR);
 
@@ -111,9 +103,7 @@ export const positionStatusCalendarTooltip = (
 
 const closeStatusCalendarTooltip = (root: HTMLElement): void => {
   root.removeAttribute(TOOLTIP_OPEN_ATTRIBUTE);
-  root
-    .querySelector<HTMLElement>(TOOLTIP_SELECTOR)
-    ?.setAttribute('aria-hidden', 'true');
+  root.querySelector<HTMLElement>(TOOLTIP_SELECTOR)?.setAttribute('aria-hidden', 'true');
 };
 
 const openStatusCalendarTooltip = (root: HTMLElement): void => {
@@ -122,9 +112,7 @@ const openStatusCalendarTooltip = (root: HTMLElement): void => {
   }
 
   const tooltip = root.querySelector<HTMLElement>(TOOLTIP_SELECTOR);
-  const tooltipText = tooltip?.querySelector<HTMLElement>(
-    TOOLTIP_TEXT_SELECTOR,
-  );
+  const tooltipText = tooltip?.querySelector<HTMLElement>(TOOLTIP_TEXT_SELECTOR);
   const summary = root.dataset.statusCalendarTooltipSummary;
 
   if (!tooltip || !tooltipText || !summary) {
@@ -138,10 +126,7 @@ const openStatusCalendarTooltip = (root: HTMLElement): void => {
 };
 
 const settleStatusCalendarTooltip = (root: HTMLElement): void => {
-  if (
-    root.hasAttribute(TOOLTIP_HOVER_ATTRIBUTE) ||
-    root.hasAttribute(TOOLTIP_FOCUS_ATTRIBUTE)
-  ) {
+  if (root.hasAttribute(TOOLTIP_HOVER_ATTRIBUTE) || root.hasAttribute(TOOLTIP_FOCUS_ATTRIBUTE)) {
     return;
   }
 
@@ -158,10 +143,7 @@ class StatusCalendarYearLifecycleElement extends HTMLElement {
     }
 
     const calendar = this.previousElementSibling;
-    if (
-      !(calendar instanceof HTMLElement) ||
-      !calendar.matches(YEAR_CALENDAR_SELECTOR)
-    ) {
+    if (!(calendar instanceof HTMLElement) || !calendar.matches(YEAR_CALENDAR_SELECTOR)) {
       return;
     }
 
@@ -180,7 +162,7 @@ class StatusCalendarYearLifecycleElement extends HTMLElement {
           openStatusCalendarTooltip(root);
         }
       },
-      listenerOptions,
+      listenerOptions
     );
     calendar.addEventListener(
       'pointerover',
@@ -196,7 +178,7 @@ class StatusCalendarYearLifecycleElement extends HTMLElement {
           openStatusCalendarTooltip(root);
         }
       },
-      listenerOptions,
+      listenerOptions
     );
     document.addEventListener(
       'keydown',
@@ -206,15 +188,13 @@ class StatusCalendarYearLifecycleElement extends HTMLElement {
         }
 
         calendar
-          .querySelectorAll<HTMLElement>(
-            `${TOOLTIP_ROOT_SELECTOR}[${TOOLTIP_OPEN_ATTRIBUTE}]`,
-          )
+          .querySelectorAll<HTMLElement>(`${TOOLTIP_ROOT_SELECTOR}[${TOOLTIP_OPEN_ATTRIBUTE}]`)
           .forEach((root) => {
             root.setAttribute(TOOLTIP_DISMISSED_ATTRIBUTE, '');
             closeStatusCalendarTooltip(root);
           });
       },
-      listenerOptions,
+      listenerOptions
     );
     calendar.addEventListener(
       'focusout',
@@ -226,7 +206,7 @@ class StatusCalendarYearLifecycleElement extends HTMLElement {
           settleStatusCalendarTooltip(root);
         }
       },
-      listenerOptions,
+      listenerOptions
     );
     calendar.addEventListener(
       'pointerout',
@@ -242,7 +222,7 @@ class StatusCalendarYearLifecycleElement extends HTMLElement {
           settleStatusCalendarTooltip(root);
         }
       },
-      listenerOptions,
+      listenerOptions
     );
   }
 
@@ -257,8 +237,5 @@ export const registerStatusCalendarYearInteractions = (): void => {
     return;
   }
 
-  customElements.define(
-    YEAR_CALENDAR_LIFECYCLE_ELEMENT,
-    StatusCalendarYearLifecycleElement,
-  );
+  customElements.define(YEAR_CALENDAR_LIFECYCLE_ELEMENT, StatusCalendarYearLifecycleElement);
 };

@@ -5,7 +5,7 @@ import { RawKbPageSchema } from './raw-schema';
 
 const source = (url: string, description = 'Подтверждает факт') => ({
   url,
-  description,
+  description
 });
 
 describe('RawKbPageSchema', () => {
@@ -13,11 +13,11 @@ describe('RawKbPageSchema', () => {
     expect(
       RawKbPageSchema.parse({
         title: 'Служебная статья',
-        flags: KB_PAGE_FLAGS,
-      }),
+        flags: KB_PAGE_FLAGS
+      })
     ).toEqual({
       title: 'Служебная статья',
-      flags: KB_PAGE_FLAGS,
+      flags: KB_PAGE_FLAGS
     });
   });
 
@@ -28,14 +28,14 @@ describe('RawKbPageSchema', () => {
         sources: [
           {
             url: ' https://example.com/tariff ',
-            description: ' Подтверждает размер тарифа ',
+            description: ' Подтверждает размер тарифа '
           },
           {
             url: '/news/tariff-update/',
-            description: 'Подтверждает дату введения тарифа',
-          },
-        ],
-      }).sources,
+            description: 'Подтверждает дату введения тарифа'
+          }
+        ]
+      }).sources
     ).toMatchInlineSnapshot(`
       [
         {
@@ -52,28 +52,21 @@ describe('RawKbPageSchema', () => {
 
   it.each([
     [[]],
-    [
-      [
-        source('https://example.com/source'),
-        source('https://example.com/source'),
-      ],
-    ],
+    [[source('https://example.com/source'), source('https://example.com/source')]],
     [[source('mailto:editor@example.com')]],
     [[source('news/tariff-update/')]],
     [[source('/\\example.com/source')]],
-    [[source('https://example.com/source', '  ')]],
+    [[source('https://example.com/source', '  ')]]
   ])('rejects invalid editorial sources %#', (sources) => {
-    expect(() =>
-      RawKbPageSchema.parse({ title: 'Служебная статья', sources }),
-    ).toThrow();
+    expect(() => RawKbPageSchema.parse({ title: 'Служебная статья', sources })).toThrow();
   });
 
   it('rejects unknown page flags', () => {
     expect(() =>
       RawKbPageSchema.parse({
         title: 'Служебная статья',
-        flags: ['draft'],
-      }),
+        flags: ['draft']
+      })
     ).toThrow();
   });
 });

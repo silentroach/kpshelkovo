@@ -5,5 +5,4 @@ import { buildEstimateDetailLaborMarkdown } from '@/lib/reglament/detail-markdow
 
 export const prerender = true;
 
-export const GET: APIRoute = async () =>
-  createMarkdownResponse(buildEstimateDetailLaborMarkdown());
+export const GET: APIRoute = async () => createMarkdownResponse(buildEstimateDetailLaborMarkdown());

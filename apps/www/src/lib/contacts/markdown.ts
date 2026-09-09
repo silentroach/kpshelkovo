@@ -1,10 +1,10 @@
+import { count } from '@shelkovo/format';
 import {
   createMarkdownDocument,
   md,
   parseMarkdownFragment,
-  serializeMarkdownDocument,
+  serializeMarkdownDocument
 } from '@shelkovo/markdown';
-import { count } from '@shelkovo/format';
 
 import { absoluteUrl } from '@/lib/site';
 
@@ -21,7 +21,7 @@ import {
   CONTACTS_NEIGHBOR_TABLE_SUFFIX,
   CONTACTS_NEIGHBOR_TABLE_URL,
   contactExcerpt,
-  formatContactCategory,
+  formatContactCategory
 } from './view';
 
 type MarkdownNode = ReturnType<typeof parseMarkdownFragment>[number];
@@ -75,7 +75,7 @@ const CONTACT_FRONTMATTER_CONTACT_KEYS = [
   'telegram',
   'whatsapp',
   'email',
-  'website',
+  'website'
 ] as const satisfies readonly (keyof Contact['contacts'])[];
 
 const serialize = (children: readonly MarkdownNode[]): string =>
@@ -85,8 +85,7 @@ const abs = (path: string): string => absoluteUrl(path);
 
 const chatLink = () => md.link(CONTACTS_CHAT_URL, CONTACTS_CHAT_LABEL);
 
-const neighborTableLink = () =>
-  md.link(CONTACTS_NEIGHBOR_TABLE_URL, CONTACTS_NEIGHBOR_TABLE_LABEL);
+const neighborTableLink = () => md.link(CONTACTS_NEIGHBOR_TABLE_URL, CONTACTS_NEIGHBOR_TABLE_LABEL);
 
 const contactsIntro = (): MarkdownNode =>
   md.paragraph([
@@ -95,7 +94,7 @@ const contactsIntro = (): MarkdownNode =>
     md.text(CONTACTS_INTRO_SUFFIX),
     md.text(CONTACTS_NEIGHBOR_TABLE_PREFIX),
     neighborTableLink(),
-    md.text(CONTACTS_NEIGHBOR_TABLE_SUFFIX),
+    md.text(CONTACTS_NEIGHBOR_TABLE_SUFFIX)
   ]);
 
 const contactsEmpty = (): MarkdownNode => md.paragraph(CONTACTS_EMPTY_MESSAGE);
@@ -106,22 +105,17 @@ const contactLine = (contact: Contact) => {
   return md.listItem([
     md.paragraph([
       md.link(abs(contact.markdownUrl), contact.title),
-      ...(excerpt ? [md.text(` — ${excerpt}`)] : []),
-    ]),
+      ...(excerpt ? [md.text(` — ${excerpt}`)] : [])
+    ])
   ]);
 };
 
 const categoryLine = (category: ContactCategoryPage) =>
   md.listItem([
     md.paragraph([
-      md.link(
-        abs(category.markdownUrl),
-        formatContactCategory(category.category),
-      ),
-      md.text(
-        ` — ${count(category.contacts.length, ['контакт', 'контакта', 'контактов'])}`,
-      ),
-    ]),
+      md.link(abs(category.markdownUrl), formatContactCategory(category.category)),
+      md.text(` — ${count(category.contacts.length, ['контакт', 'контакта', 'контактов'])}`)
+    ])
   ]);
 
 const contactFrontmatter = (contact: Contact): ContactFrontmatter => {
@@ -130,7 +124,7 @@ const contactFrontmatter = (contact: Contact): ContactFrontmatter => {
     slug: contact.slug,
     category: formatContactCategory(contact.category),
     updated_at: contact.updatedIso,
-    contacts: contactContactsFrontmatter(contact.contacts),
+    contacts: contactContactsFrontmatter(contact.contacts)
   };
 
   if (contact.summary) {
@@ -154,9 +148,7 @@ const contactFrontmatter = (contact: Contact): ContactFrontmatter => {
   return frontmatter;
 };
 
-const contactContactsFrontmatter = (
-  contacts: Contact['contacts'],
-): Contact['contacts'] => {
+const contactContactsFrontmatter = (contacts: Contact['contacts']): Contact['contacts'] => {
   const frontmatter: MutableContactFrontmatterContacts = {};
 
   for (const key of CONTACT_FRONTMATTER_CONTACT_KEYS) {
@@ -171,7 +163,7 @@ const contactContactsFrontmatter = (
 };
 
 const contactLocationFrontmatter = (
-  location: Contact['location'],
+  location: Contact['location']
 ): ContactFrontmatterLocation | undefined => {
   if (!location) {
     return;
@@ -179,7 +171,7 @@ const contactLocationFrontmatter = (
 
   const frontmatter: MutableContactFrontmatterLocation = {
     title: location.title,
-    url: location.url,
+    url: location.url
   };
 
   if (location.address) {
@@ -194,12 +186,12 @@ const contactLocationFrontmatter = (
 };
 
 const contactReviewFrontmatter = (
-  review: Contact['reviews'][number],
+  review: Contact['reviews'][number]
 ): ContactFrontmatterReview => ({
   sentiment: review.sentiment,
   summary: review.summary,
   published_at: review.publishedIso,
-  url: review.url,
+  url: review.url
 });
 
 export const buildContactsHomeMarkdown = (data: ContactsDataset): string =>
@@ -207,31 +199,24 @@ export const buildContactsHomeMarkdown = (data: ContactsDataset): string =>
     md.heading(1, 'Сарафан'),
     contactsIntro(),
     md.heading(2, 'Категории'),
-    data.categories.length > 0
-      ? md.list(data.categories.map(categoryLine))
-      : contactsEmpty(),
+    data.categories.length > 0 ? md.list(data.categories.map(categoryLine)) : contactsEmpty(),
     ...data.categories.flatMap((category) => [
       md.heading(2, formatContactCategory(category.category)),
-      md.list(category.contacts.map(contactLine)),
-    ]),
+      md.list(category.contacts.map(contactLine))
+    ])
   ]);
 
-export const buildContactsCategoryMarkdown = (
-  category: ContactCategoryPage,
-): string =>
+export const buildContactsCategoryMarkdown = (category: ContactCategoryPage): string =>
   serialize([
     md.heading(1, formatContactCategory(category.category)),
     md.heading(2, 'Контакты'),
-    md.list(category.contacts.map(contactLine)),
+    md.list(category.contacts.map(contactLine))
   ]);
 
 export const buildContactMarkdown = (contact: Contact): string =>
   serializeMarkdownDocument(
     createMarkdownDocument({
       frontmatter: contactFrontmatter(contact),
-      children: [
-        md.heading(1, contact.title),
-        ...parseMarkdownFragment(contact.body.trim()),
-      ],
-    }),
+      children: [md.heading(1, contact.title), ...parseMarkdownFragment(contact.body.trim())]
+    })
   );

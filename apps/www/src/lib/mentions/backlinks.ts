@@ -5,7 +5,7 @@ import {
   type EntityMentionSourceRef,
   type SiteBacklinks,
   type SiteMentionRef,
-  type SiteMentionSection,
+  type SiteMentionSection
 } from './types';
 
 const toSiteBacklink = (ref: EntityMentionSourceRef): SiteMentionRef => ({
@@ -17,26 +17,24 @@ const toSiteBacklink = (ref: EntityMentionSourceRef): SiteMentionRef => ({
   markdownUrl: ref.markdownUrl,
   excerpt: ref.excerpt,
   mentionedAt: ref.mentionedAt,
-  sortKey: ref.sortKey,
+  sortKey: ref.sortKey
 });
 
 const sectionBacklinks = (
   graph: EntityMentionGraph,
   target: EntityMentionEntityRef,
-  section: SiteMentionSection,
+  section: SiteMentionSection
 ): readonly SiteMentionRef[] =>
-  getEntityMentionGraphRefs(graph, target.type, target.slug, section).map(
-    toSiteBacklink,
-  );
+  getEntityMentionGraphRefs(graph, target.type, target.slug, section).map(toSiteBacklink);
 
 export const createSiteBacklinksFromGraph = (
   graph: EntityMentionGraph,
-  target: EntityMentionEntityRef,
+  target: EntityMentionEntityRef
 ): SiteBacklinks => ({
   news: sectionBacklinks(graph, target, 'news'),
   status: sectionBacklinks(graph, target, 'status'),
   reviews: sectionBacklinks(graph, target, 'reviews'),
   places: sectionBacklinks(graph, target, 'places'),
   people: sectionBacklinks(graph, target, 'people'),
-  contacts: sectionBacklinks(graph, target, 'contacts'),
+  contacts: sectionBacklinks(graph, target, 'contacts')
 });

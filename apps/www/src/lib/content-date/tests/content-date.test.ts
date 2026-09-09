@@ -8,7 +8,7 @@ describe('parseContentDate', () => {
       '30.04.2026',
       '01.05.2026 07:32',
       '2026-05-01',
-      new Date('2026-05-01T00:00:00.000Z'),
+      new Date('2026-05-01T00:00:00.000Z')
     ].map((input) => {
       const date = parseContentDate(input);
       return date
@@ -19,7 +19,7 @@ describe('parseContentDate', () => {
             at: date.at.toISOString(),
             iso: date.iso,
             hasTime: date.hasTime,
-            time: date.time,
+            time: date.time
           }
         : date;
     });
@@ -70,14 +70,14 @@ describe('parseContentDate', () => {
     'rejects unsupported value %s',
     (input) => {
       expect(parseContentDate(input)).toBeUndefined();
-    },
+    }
   );
 });
 
 describe('content date schemas', () => {
   it('returns the parsed content date', () => {
     expect(contentDateSchema('date').parse(' 01.05.2026 07:32 ').iso).toBe(
-      '2026-05-01T07:32:00+03:00',
+      '2026-05-01T07:32:00+03:00'
     );
   });
 
@@ -85,13 +85,13 @@ describe('content date schemas', () => {
     {
       schema: contentDateSchema('date'),
       input: '31.04.2026',
-      message: 'date must use dd.mm.yyyy, dd.mm.yyyy hh:mm, or YYYY-MM-DD',
+      message: 'date must use dd.mm.yyyy, dd.mm.yyyy hh:mm, or YYYY-MM-DD'
     },
     {
       schema: contentDateTimeSchema('starts_at'),
       input: '01.05.2026',
-      message: 'starts_at must use dd.mm.yyyy hh:mm and include time',
-    },
+      message: 'starts_at must use dd.mm.yyyy hh:mm and include time'
+    }
   ])('reports a clear error for $input', ({ schema, input, message }) => {
     expect(schema.safeParse(input).error?.issues[0]?.message).toBe(message);
   });

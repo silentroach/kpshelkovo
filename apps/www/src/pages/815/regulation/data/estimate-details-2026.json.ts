@@ -14,7 +14,7 @@ export const GET: APIRoute = async () => {
   return new Response(body, {
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
-      Link: detailLinks(root),
-    },
+      Link: detailLinks(root)
+    }
   });
 };

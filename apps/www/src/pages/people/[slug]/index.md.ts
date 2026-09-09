@@ -1,11 +1,8 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
 import { createMarkdownResponse } from '@/lib/markdown/response';
+import { loadPeopleProfiles, loadPersonProfileWithBacklinks } from '@/lib/people/load';
 import { buildPersonMarkdown } from '@/lib/people/markdown';
-import {
-  loadPeopleProfiles,
-  loadPersonProfileWithBacklinks,
-} from '@/lib/people/load';
 
 export const prerender = true;
 
@@ -14,8 +11,8 @@ export const getStaticPaths = (async () => {
 
   return profiles.map((profile) => ({
     params: {
-      slug: profile.slug,
-    },
+      slug: profile.slug
+    }
   }));
 }) satisfies GetStaticPaths;
 

@@ -9,7 +9,7 @@ import {
   PLACE_MARKERS,
   PLACE_STATUSES,
   PLACE_TIME,
-  PLACE_WEEKDAYS,
+  PLACE_WEEKDAYS
 } from './schema';
 
 const nonBlankText = z.string().trim().min(1);
@@ -20,7 +20,7 @@ const nameCases = z
     dat: nonBlankText.optional(),
     acc: nonBlankText.optional(),
     ins: nonBlankText.optional(),
-    prep: nonBlankText.optional(),
+    prep: nonBlankText.optional()
   })
   .strict();
 
@@ -33,7 +33,7 @@ const isHttpsUrl = (value: string): boolean => {
 };
 
 const httpsUrl = nonBlankText.url().refine(isHttpsUrl, {
-  message: 'url must use https://',
+  message: 'url must use https://'
 });
 
 const YANDEX_MAP_ORIGIN = 'https://yandex.ru';
@@ -54,7 +54,7 @@ const isYandexMapUrl = (value: string): boolean => {
 };
 
 const yandexMapUrl = httpsUrl.refine(isYandexMapUrl, {
-  message: 'map_url must point to Yandex Maps',
+  message: 'map_url must point to Yandex Maps'
 });
 
 const contactCategories = new Set<string>(CONTACT_CATEGORIES);
@@ -71,7 +71,7 @@ const isContactReference = (value: string): boolean => {
 const coordinates = z
   .object({
     lat: z.number().min(-90).max(90),
-    lng: z.number().min(-180).max(180),
+    lng: z.number().min(-180).max(180)
   })
   .strict()
   .refine(
@@ -80,37 +80,37 @@ const coordinates = z
       lat <= PLACE_MAP_BOUNDS.maxLat &&
       lng >= PLACE_MAP_BOUNDS.minLng &&
       lng <= PLACE_MAP_BOUNDS.maxLng,
-    { message: 'coordinates must be inside the supported Шелково map bounds' },
+    { message: 'coordinates must be inside the supported Шелково map bounds' }
   );
 
 const location = z
   .object({
     map_url: yandexMapUrl.optional(),
     address: nonBlankText.optional(),
-    coordinates,
+    coordinates
   })
   .strict();
 
 const placeTime = nonBlankText.regex(PLACE_TIME, {
-  message: 'time must use HH:mm',
+  message: 'time must use HH:mm'
 });
 
 const openingHoursPeriod = z
   .object({
     days: z.array(z.enum(PLACE_WEEKDAYS)).min(1),
     opens_at: placeTime,
-    closes_at: placeTime,
+    closes_at: placeTime
   })
   .strict()
   .refine(({ opens_at, closes_at }) => opens_at < closes_at, {
     path: ['closes_at'],
-    message: 'opening-hours periods must start before they end',
+    message: 'opening-hours periods must start before they end'
   });
 
 const openingHours = z
   .object({
     description: nonBlankText,
-    periods: z.array(openingHoursPeriod).min(1),
+    periods: z.array(openingHoursPeriod).min(1)
   })
   .strict();
 
@@ -127,9 +127,9 @@ export const RawPlaceSchema = z
     opening_hours: openingHours.optional(),
     contact: nonBlankText
       .refine(isContactReference, {
-        message: 'contact must use a known category and slug: category/slug',
+        message: 'contact must use a known category and slug: category/slug'
       })
-      .optional(),
+      .optional()
   })
   .strict();
 

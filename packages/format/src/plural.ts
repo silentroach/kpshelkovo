@@ -3,7 +3,7 @@
  */
 export function pluralize(
   value: number,
-  forms: readonly [one: string, few: string, many: string],
+  forms: readonly [one: string, few: string, many: string]
 ): string {
   const normalized = Math.abs(Math.trunc(value));
   const mod10 = normalized % 10;
@@ -22,5 +22,5 @@ export function pluralize(
 
 export const count = (
   value: number,
-  forms: readonly [one: string, few: string, many: string],
+  forms: readonly [one: string, few: string, many: string]
 ): string => `${value} ${pluralize(value, forms)}`;

@@ -6,15 +6,13 @@ import {
   contactPlace,
   formatContactCategory,
   formatContactReviewDate,
-  hasManyPositiveContactReviews,
+  hasManyPositiveContactReviews
 } from '../view';
 
 describe('contact view helpers', () => {
   it('formats category labels', () => {
     expect(formatContactCategory('fence')).toBe('Забор');
-    expect(formatContactCategory('construction')).toBe(
-      'Строительство и ремонт',
-    );
+    expect(formatContactCategory('construction')).toBe('Строительство и ремонт');
     expect(formatContactCategory('furniture')).toBe('Мебель');
     expect(formatContactCategory('waste-removal')).toBe('Вывоз мусора');
     expect(formatContactCategory('garden')).toBe('Сад и участок');
@@ -30,8 +28,8 @@ describe('contact view helpers', () => {
         summary: 'Помогли с электричеством.',
         publishedAt: new Date('2026-04-07T00:00:00.000Z'),
         publishedIso: '2026-04-07',
-        url: 'https://t.me/example/1',
-      }),
+        url: 'https://t.me/example/1'
+      })
     ).toBe('7 апреля 2026');
   });
 
@@ -42,16 +40,16 @@ describe('contact view helpers', () => {
         { sentiment: 'positive' },
         { sentiment: 'positive' },
         { sentiment: 'positive' },
-        { sentiment: 'positive' },
-      ]),
+        { sentiment: 'positive' }
+      ])
     ).toBe(true);
     expect(
       hasManyPositiveContactReviews([
         { sentiment: 'positive' },
         { sentiment: 'positive' },
         { sentiment: 'positive' },
-        { sentiment: 'positive' },
-      ]),
+        { sentiment: 'positive' }
+      ])
     ).toBe(false);
     expect(
       hasManyPositiveContactReviews([
@@ -60,8 +58,8 @@ describe('contact view helpers', () => {
         { sentiment: 'positive' },
         { sentiment: 'positive' },
         { sentiment: 'positive' },
-        { sentiment: 'negative' },
-      ]),
+        { sentiment: 'negative' }
+      ])
     ).toBe(false);
   });
 
@@ -72,8 +70,8 @@ describe('contact view helpers', () => {
         telegram: 'https://t.me/example',
         whatsapp: 'https://wa.me/79000000000',
         email: 'team@example.com',
-        website: 'https://example.com',
-      }),
+        website: 'https://example.com'
+      })
     ).toMatchInlineSnapshot(`
       [
         {
@@ -118,7 +116,7 @@ describe('contact view helpers', () => {
       '+7 977 482-05-86',
       '+7 900 123‑45‑67',
       '+7 900 123–45–67',
-      '+7.900.123.45.67',
+      '+7.900.123.45.67'
     ];
 
     expect(
@@ -129,9 +127,9 @@ describe('contact view helpers', () => {
           phone,
           formatted,
           formattedAgain: formatContactPhone(formatted),
-          href: contactMethods({ phone })[0]?.href,
+          href: contactMethods({ phone })[0]?.href
         };
-      }),
+      })
     ).toMatchInlineSnapshot(`
       [
         {
@@ -187,11 +185,10 @@ describe('contact view helpers', () => {
       '+49 (0)30 1234-5678',
       '+7 900 000-00',
       '+7 900 ***-**-00',
-      '+7 900 000-00-00 доб. 123',
+      '+7 900 000-00-00 доб. 123'
     ];
 
-    expect(phones.map((phone) => contactMethods({ phone })[0]))
-      .toMatchInlineSnapshot(`
+    expect(phones.map((phone) => contactMethods({ phone })[0])).toMatchInlineSnapshot(`
       [
         {
           "href": "tel:+493012345678",
@@ -238,8 +235,8 @@ describe('contact view helpers', () => {
       contactPlace({
         title: 'Золото Сибири',
         url: 'https://yandex.ru/maps/-/CTq-BEOk',
-        address: 'Пионерская ул., 21, пгт Малино',
-      }),
+        address: 'Пионерская ул., 21, пгт Малино'
+      })
     ).toMatchInlineSnapshot(`
       {
         "address": "Пионерская ул., 21, пгт Малино",

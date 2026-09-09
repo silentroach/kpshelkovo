@@ -13,8 +13,7 @@ const need = (value: string, name: string): string => {
   return text;
 };
 
-export const meetingPath = (slug: string): string =>
-  `${MEETINGS_ROOT}${need(slug, 'slug')}/`;
+export const meetingPath = (slug: string): string => `${MEETINGS_ROOT}${need(slug, 'slug')}/`;
 
 const needPart = (value: number | string): string => {
   const text = String(value).trim();
@@ -28,13 +27,10 @@ const needPart = (value: number | string): string => {
 
 export const meetingsMarkdownPath = (): string => MEETINGS_MARKDOWN;
 
-export const meetingMarkdownPath = (slug: string): string =>
-  `${meetingPath(slug)}index.md`;
+export const meetingMarkdownPath = (slug: string): string => `${meetingPath(slug)}index.md`;
 
-export const meetingTranscriptPartMarkdownPath = (
-  slug: string,
-  part: number | string,
-): string => `${meetingPath(slug)}transcript/${needPart(part)}.md`;
+export const meetingTranscriptPartMarkdownPath = (slug: string, part: number | string): string =>
+  `${meetingPath(slug)}transcript/${needPart(part)}.md`;
 
 export const meetingPattern = (): string => '/meetings/:slug/';
 
@@ -49,13 +45,9 @@ export const meetingUrl = (slug: string): string => withBase(meetingPath(slug));
 
 export const meetingsMarkdownUrl = (): string => withBase(MEETINGS_MARKDOWN);
 
-export const meetingMarkdownUrl = (slug: string): string =>
-  withBase(meetingMarkdownPath(slug));
+export const meetingMarkdownUrl = (slug: string): string => withBase(meetingMarkdownPath(slug));
 
-export const meetingTranscriptPartMarkdownUrl = (
-  slug: string,
-  part: number | string,
-): string => withBase(meetingTranscriptPartMarkdownPath(slug, part));
+export const meetingTranscriptPartMarkdownUrl = (slug: string, part: number | string): string =>
+  withBase(meetingTranscriptPartMarkdownPath(slug, part));
 
-export const meetingCanonical = (slug: string): string =>
-  canon(meetingPath(slug));
+export const meetingCanonical = (slug: string): string => canon(meetingPath(slug));

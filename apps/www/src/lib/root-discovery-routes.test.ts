@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 beforeAll(() => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 });
 
@@ -18,20 +18,18 @@ describe('root discovery route smoke', () => {
       }[];
     };
     const reglament = payload.linkset.find(
-      (entry) => entry.anchor === 'https://example.com/815/regulation/',
+      (entry) => entry.anchor === 'https://example.com/815/regulation/'
     );
 
     expect(
-      payload.linkset.some(
-        (entry) => entry.anchor === 'https://example.com/people/index.md',
-      ),
+      payload.linkset.some((entry) => entry.anchor === 'https://example.com/people/index.md')
     ).toBe(true);
     expect(reglament?.item).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          href: 'https://example.com/815/regulation/data/estimate-2026.json',
-        }),
-      ]),
+          href: 'https://example.com/815/regulation/data/estimate-2026.json'
+        })
+      ])
     );
   });
 
@@ -45,16 +43,14 @@ describe('root discovery route smoke', () => {
       }[];
     };
 
-    expect(response.headers.get('Content-Type')).toBe(
-      'application/json; charset=utf-8',
-    );
+    expect(response.headers.get('Content-Type')).toBe('application/json; charset=utf-8');
     expect(payload.skills).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           name: 'people-profiles',
-          url: './people-profiles/SKILL.md',
-        }),
-      ]),
+          url: './people-profiles/SKILL.md'
+        })
+      ])
     );
   });
 });

@@ -7,14 +7,14 @@ import {
   contactPattern,
   contactVcfPattern,
   contactsMarkdownPath,
-  contactsPath,
+  contactsPath
 } from './routes';
 
 export const contactsPublicSurfaceSlice = {
   owner: {
     id: 'contacts',
     label: 'Сарафан',
-    entryPath: contactsPath(),
+    entryPath: contactsPath()
   },
   surfaces: [
     {
@@ -24,7 +24,7 @@ export const contactsPublicSurfaceSlice = {
       mediaType: 'text/html',
       cacheClass: 'html',
       discoveryRoles: ['section-entry'],
-      catalogRole: 'anchor',
+      catalogRole: 'anchor'
     },
     {
       id: 'contacts:index-markdown',
@@ -33,7 +33,7 @@ export const contactsPublicSurfaceSlice = {
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
       discoveryRoles: ['markdown-companion'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'contacts:category',
@@ -41,7 +41,7 @@ export const contactsPublicSurfaceSlice = {
       routePattern: contactCategoryPattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'contacts:category-markdown',
@@ -49,7 +49,7 @@ export const contactsPublicSurfaceSlice = {
       routePattern: contactCategoryMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'contacts:contact',
@@ -57,7 +57,7 @@ export const contactsPublicSurfaceSlice = {
       routePattern: contactPattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'contacts:contact-markdown',
@@ -65,7 +65,7 @@ export const contactsPublicSurfaceSlice = {
       routePattern: contactMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'contacts:contact-vcard',
@@ -73,7 +73,7 @@ export const contactsPublicSurfaceSlice = {
       routePattern: contactVcfPattern(),
       mediaType: 'text/vcard',
       cacheClass: 'static',
-      discoveryRoles: ['download'],
-    },
-  ],
+      discoveryRoles: ['download']
+    }
+  ]
 } satisfies PublicSurfaceSlice;

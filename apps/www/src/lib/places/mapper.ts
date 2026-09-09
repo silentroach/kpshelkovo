@@ -1,17 +1,8 @@
-import {
-  preprocessSiteMarkdown,
-  preprocessSiteMarkdownContent,
-} from '@/lib/markdown/render';
+import { preprocessSiteMarkdown, preprocessSiteMarkdownContent } from '@/lib/markdown/render';
 import type { SiteMentionRegistry } from '@/lib/mentions';
 
 import { placeCanonical, placeMarkdownUrl, placeUrl } from './routes';
-import type {
-  Place,
-  PlaceContact,
-  PlaceCoordinates,
-  PlaceEntry,
-  PlaceGeometry,
-} from './types';
+import type { Place, PlaceContact, PlaceCoordinates, PlaceEntry, PlaceGeometry } from './types';
 
 const buildYandexMapUrl = (coordinates: PlaceCoordinates): string =>
   `https://yandex.ru/maps/?pt=${coordinates.lng},${coordinates.lat}&z=18&l=map`;
@@ -22,17 +13,15 @@ export const mapRawPlace = (
     readonly contact?: PlaceContact;
     readonly geometry?: PlaceGeometry;
     readonly mentionRegistry?: SiteMentionRegistry;
-  },
+  }
 ): Place => {
   const markdown = entry.body?.trim() ?? '';
   const coordinates = entry.data.location.coordinates;
   const body = opts?.mentionRegistry
-    ? preprocessSiteMarkdownContent(
-        markdown,
-        `place "${entry.id}" body`,
-        opts.mentionRegistry,
-        { type: 'place', slug: entry.id },
-      )
+    ? preprocessSiteMarkdownContent(markdown, `place "${entry.id}" body`, opts.mentionRegistry, {
+        type: 'place',
+        slug: entry.id
+      })
     : preprocessSiteMarkdown(markdown);
 
   return {
@@ -56,13 +45,13 @@ export const mapRawPlace = (
           periods: entry.data.opening_hours.periods.map((period) => ({
             days: period.days,
             opensAt: period.opens_at,
-            closesAt: period.closes_at,
-          })),
+            closesAt: period.closes_at
+          }))
         }
       : undefined,
     contact: opts?.contact,
     url: placeUrl(entry.id),
     markdownUrl: placeMarkdownUrl(entry.id),
-    canonical: placeCanonical(entry.id),
+    canonical: placeCanonical(entry.id)
   };
 };

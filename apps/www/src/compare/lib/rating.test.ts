@@ -1,5 +1,6 @@
 import * as geo from '@shelkovo/geo';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
 import { buildRatings, MKAD_RADIUS, RATING_METHODOLOGY } from './rating';
 import { mapRawSettlement } from './settlement/mapper';
 import type { RawSettlement } from './settlement/schema';
@@ -14,7 +15,7 @@ function mk(
   opts?: Partial<RawSettlement> & {
     lat?: number;
     lng?: number;
-  },
+  }
 ): Settlement {
   return mapRawSettlement({
     name: slug,
@@ -26,12 +27,12 @@ function mk(
       address_text: 'МО, округ Истра',
       lat: opts?.lat ?? 55.7558,
       lng: opts?.lng ?? 37.6176,
-      district: 'Истринский район',
+      district: 'Истринский район'
     },
     tariff: {
       value: 100,
       unit: 'rub_per_sotka',
-      period: 'month',
+      period: 'month'
     },
     infrastructure: {},
     common_spaces: {},
@@ -42,15 +43,15 @@ function mk(
         url: `https://example.com/${slug}/source`,
         type: 'official',
         date_checked: '2026-04-14',
-        comment: '',
-      },
+        comment: ''
+      }
     ],
-    ...opts,
+    ...opts
   } satisfies RawSettlement);
 }
 
 function completeRatingFields(
-  level: 'high' | 'low',
+  level: 'high' | 'low'
 ): Pick<RawSettlement, 'infrastructure' | 'common_spaces' | 'service_model'> {
   const high = level === 'high';
   const availability = high ? 'yes' : 'no';
@@ -70,7 +71,7 @@ function completeRatingFields(
       video_surveillance: high ? 'full' : 'none',
       underground_electricity: high ? 'full' : 'none',
       admin_building: availability,
-      retail_or_services: availability,
+      retail_or_services: availability
     },
     common_spaces: {
       club_infrastructure: availability,
@@ -86,7 +87,7 @@ function completeRatingFields(
       spa_center: availability,
       kids_club: availability,
       sports_camp: availability,
-      primary_school: availability,
+      primary_school: availability
     },
     service_model: {
       garbage_collection: availability,
@@ -94,21 +95,22 @@ function completeRatingFields(
       road_cleaning: availability,
       landscaping: availability,
       emergency_service: availability,
-      dispatcher: availability,
-    },
+      dispatcher: availability
+    }
   };
 }
 
 describe('buildRatings', () => {
   it('keeps group weights normalized and distance points ordered', () => {
-    const groupWeightTotal = Object.values(
-      RATING_METHODOLOGY.groupWeights,
-    ).reduce((sum, weight) => sum + weight, 0);
+    const groupWeightTotal = Object.values(RATING_METHODOLOGY.groupWeights).reduce(
+      (sum, weight) => sum + weight,
+      0
+    );
     const distancePointsAreOrdered = RATING_METHODOLOGY.distancePoints.every(
       (point, index, points) => {
         const previous = points[index - 1];
         return !previous || point.ringKm > previous.ringKm;
-      },
+      }
     );
 
     expect(groupWeightTotal).toBe(1);
@@ -127,12 +129,12 @@ describe('buildRatings', () => {
     const rows = buildRatings([
       mk('near', {
         lat: 55.78,
-        lng: 37.8,
+        lng: 37.8
       }),
       mk('far', {
         lat: 55.1,
-        lng: 39.0,
-      }),
+        lng: 39.0
+      })
     ]);
 
     const near = rows.get('near');
@@ -158,19 +160,16 @@ describe('buildRatings', () => {
       mk('floor'),
       mk('maximum', {
         ...completeRatingFields('high'),
-        water_in_tariff: true,
+        water_in_tariff: true
       }),
       mk('minimum', {
         ...completeRatingFields('low'),
-        rabstvo: true,
-      }),
+        rabstvo: true
+      })
     ]);
 
-    expect(
-      ['interpolated', 'floor', 'maximum', 'minimum'].map(
-        (slug) => rows.get(slug)?.score,
-      ),
-    ).toMatchInlineSnapshot(`
+    expect(['interpolated', 'floor', 'maximum', 'minimum'].map((slug) => rows.get(slug)?.score))
+      .toMatchInlineSnapshot(`
       [
         53,
         44.3,
@@ -193,20 +192,20 @@ describe('buildRatings', () => {
           security: 'yes',
           fencing: 'yes',
           video_surveillance: 'full',
-          retail_or_services: 'yes',
+          retail_or_services: 'yes'
         },
         common_spaces: {
           playgrounds: 'yes',
           sports: 'yes',
           walking_routes: 'yes',
           water_access: 'yes',
-          club_infrastructure: 'yes',
+          club_infrastructure: 'yes'
         },
         service_model: {
           garbage_collection: 'yes',
           snow_removal: 'yes',
-          road_cleaning: 'yes',
-        },
+          road_cleaning: 'yes'
+        }
       }),
       mk('bad', {
         infrastructure: {
@@ -219,22 +218,22 @@ describe('buildRatings', () => {
           security: 'no',
           fencing: 'no',
           video_surveillance: 'none',
-          retail_or_services: 'no',
+          retail_or_services: 'no'
         },
         common_spaces: {
           playgrounds: 'no',
           sports: 'no',
           walking_routes: 'no',
           water_access: 'no',
-          club_infrastructure: 'no',
+          club_infrastructure: 'no'
         },
         service_model: {
           garbage_collection: 'no',
           snow_removal: 'no',
-          road_cleaning: 'no',
-        },
+          road_cleaning: 'no'
+        }
       }),
-      mk('mid'),
+      mk('mid')
     ]);
 
     const good = rows.get('good')?.score ?? 0;
@@ -258,22 +257,22 @@ describe('buildRatings', () => {
           security: 'yes',
           fencing: 'yes',
           video_surveillance: 'full',
-          retail_or_services: 'yes',
+          retail_or_services: 'yes'
         },
         common_spaces: {
           playgrounds: 'yes',
           sports: 'yes',
           walking_routes: 'yes',
           water_access: 'yes',
-          club_infrastructure: 'yes',
+          club_infrastructure: 'yes'
         },
         service_model: {
           garbage_collection: 'yes',
           snow_removal: 'yes',
-          road_cleaning: 'yes',
-        },
+          road_cleaning: 'yes'
+        }
       }),
-      mk('mid'),
+      mk('mid')
     ]);
 
     const good = rows.get('good')?.score ?? 0;
@@ -288,25 +287,22 @@ describe('buildRatings', () => {
       mk('base', {
         infrastructure: {
           water: 'yes',
-          roads: 'asphalt',
-        },
+          roads: 'asphalt'
+        }
       }),
       mk('bonus', {
         water_in_tariff: true,
         infrastructure: {
           water: 'yes',
-          roads: 'asphalt',
-        },
-      }),
+          roads: 'asphalt'
+        }
+      })
     ]);
 
     const base = rows.get('base')?.score ?? 0;
     const bonus = rows.get('bonus')?.score ?? 0;
 
-    expect(bonus - base).toBeCloseTo(
-      RATING_METHODOLOGY.adjustments.waterInTariffBonus,
-      6,
-    );
+    expect(bonus - base).toBeCloseTo(RATING_METHODOLOGY.adjustments.waterInTariffBonus, 6);
   });
 
   it('applies a strong penalty for mentions in obmandachniki', () => {
@@ -315,17 +311,17 @@ describe('buildRatings', () => {
         infrastructure: {
           water: 'yes',
           roads: 'asphalt',
-          security: 'yes',
-        },
+          security: 'yes'
+        }
       }),
       mk('flagged', {
         rabstvo: true,
         infrastructure: {
           water: 'yes',
           roads: 'asphalt',
-          security: 'yes',
-        },
-      }),
+          security: 'yes'
+        }
+      })
     ]);
 
     const clean = rows.get('clean')?.score ?? 0;

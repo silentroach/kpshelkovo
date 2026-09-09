@@ -4,10 +4,10 @@ import type {
   SiteBacklinkKind,
   SiteBacklinks,
   SiteMentionRef,
-  SiteMentionSection,
+  SiteMentionSection
 } from '../mentions';
-import type { PersonNameCaseForms } from './name-cases';
 import type { PeopleMentionRegistry } from './mentions';
+import type { PersonNameCaseForms } from './name-cases';
 
 export type PersonContactType = 'phone' | 'telegram';
 
@@ -54,5 +54,5 @@ export const EMPTY_PERSON_BACKLINKS: PersonBacklinks = {
   reviews: [],
   places: [],
   people: [],
-  contacts: [],
+  contacts: []
 };

@@ -9,14 +9,11 @@ let buildContactsHomeMarkdown: typeof import('../markdown').buildContactsHomeMar
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
-  ({
-    buildContactMarkdown,
-    buildContactsCategoryMarkdown,
-    buildContactsHomeMarkdown,
-  } = await import('../markdown'));
+  ({ buildContactMarkdown, buildContactsCategoryMarkdown, buildContactsHomeMarkdown } =
+    await import('../markdown'));
 });
 
 const contact = {
@@ -29,7 +26,7 @@ const contact = {
   contacts: {
     phone: '8 (900) 000-00-00',
     telegram: 'https://t.me/example',
-    email: 'team@example.com',
+    email: 'team@example.com'
   },
   reviews: [
     {
@@ -37,14 +34,14 @@ const contact = {
       summary: 'Помог с **электричеством**.',
       publishedAt: new Date('2026-04-07T00:00:00.000Z'),
       publishedIso: '2026-04-07',
-      url: 'https://t.me/example/1',
-    },
+      url: 'https://t.me/example/1'
+    }
   ],
   location: {
     title: 'Золото Сибири',
     url: 'https://yandex.ru/maps/-/CTq-BEOk',
     address: 'Пионерская ул., 21, пгт Малино',
-    coordinates: { lat: 55.116326, lng: 38.16951 },
+    coordinates: { lat: 55.116326, lng: 38.16951 }
   },
   url: '/sarafan/fence/ivan-petrov-fence/',
   markdownUrl: '/sarafan/fence/ivan-petrov-fence/index.md',
@@ -53,10 +50,10 @@ const contact = {
     kind: 'person',
     downloadUrl: '/sarafan/fence/ivan-petrov-fence/contact.vcf',
     filename: 'ivan-petrov-fence.vcf',
-    name: { family: 'Петров', given: 'Иван' },
+    name: { family: 'Петров', given: 'Иван' }
   },
   body: 'Работает с заборами и воротами. Перед началом работ стоит отдельно согласовать сроки, материалы и гарантию.\n\n## Что уточнить\n\nПеред оплатой уточняйте цену.',
-  mentions: [],
+  mentions: []
 } satisfies Contact;
 
 const blankBodyContact = {
@@ -66,21 +63,21 @@ const blankBodyContact = {
   updatedAt: new Date('2026-07-06T00:00:00.000Z'),
   updatedIso: '2026-07-06',
   contacts: {
-    phone: '+7(985) 774-75-04',
+    phone: '+7(985) 774-75-04'
   },
   reviews: [],
   url: '/sarafan/fence/sergey/',
   markdownUrl: '/sarafan/fence/sergey/index.md',
   canonical: 'https://example.com/sarafan/fence/sergey/',
   body: '',
-  mentions: [],
+  mentions: []
 } satisfies Contact;
 
 const category = {
   category: 'fence',
   contacts: [contact, blankBodyContact],
   url: '/sarafan/fence/',
-  markdownUrl: '/sarafan/fence/index.md',
+  markdownUrl: '/sarafan/fence/index.md'
 } satisfies ContactCategoryPage;
 
 describe('contacts markdown companions', () => {
@@ -89,7 +86,7 @@ describe('contacts markdown companions', () => {
       contacts: [],
       categories: [],
       byRoute: new Map(),
-      byCategory: new Map(),
+      byCategory: new Map()
     });
 
     expect(markdown).toMatchInlineSnapshot(`
@@ -111,22 +108,18 @@ describe('contacts markdown companions', () => {
       categories: [category],
       byRoute: new Map<string, Contact>([
         ['fence/ivan-petrov-fence', contact],
-        ['fence/sergey', blankBodyContact],
+        ['fence/sergey', blankBodyContact]
       ]),
-      byCategory: new Map([['fence', category]]),
+      byCategory: new Map([['fence', category]])
     });
     const listPages = [homeMarkdown, buildContactsCategoryMarkdown(category)];
 
-    expect(homeMarkdown).toContain(
-      '[Забор](https://example.com/sarafan/fence/index.md)',
-    );
+    expect(homeMarkdown).toContain('[Забор](https://example.com/sarafan/fence/index.md)');
 
     for (const markdown of listPages) {
-      expect(markdown).toContain(
-        '[Сергей](https://example.com/sarafan/fence/sergey/index.md)',
-      );
+      expect(markdown).toContain('[Сергей](https://example.com/sarafan/fence/sergey/index.md)');
       expect(markdown).not.toMatch(
-        /\+7 900 000-00-00|t\.me\/example|yandex\.ru\/maps|contact\.vcf/u,
+        /\+7 900 000-00-00|t\.me\/example|yandex\.ru\/maps|contact\.vcf/u
       );
     }
   });

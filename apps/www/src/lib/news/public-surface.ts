@@ -22,14 +22,14 @@ import {
   tagsMarkdownPath,
   tagsPath,
   yearMarkdownPattern,
-  yearPattern,
+  yearPattern
 } from './routes';
 
 export const newsPublicSurfaceSlice = {
   owner: {
     id: 'news',
     label: 'Новости',
-    entryPath: newsPath(),
+    entryPath: newsPath()
   },
   surfaces: [
     {
@@ -39,7 +39,7 @@ export const newsPublicSurfaceSlice = {
       mediaType: 'text/html',
       cacheClass: 'html',
       discoveryRoles: ['section-entry'],
-      catalogRole: 'anchor',
+      catalogRole: 'anchor'
     },
     {
       id: 'news:index-markdown',
@@ -48,7 +48,7 @@ export const newsPublicSurfaceSlice = {
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
       discoveryRoles: ['markdown-companion'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'news:archive',
@@ -56,7 +56,7 @@ export const newsPublicSurfaceSlice = {
       path: newsArchivePath(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'news:archive-markdown',
@@ -64,7 +64,7 @@ export const newsPublicSurfaceSlice = {
       path: newsArchiveMarkdownPath(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'news:year',
@@ -72,7 +72,7 @@ export const newsPublicSurfaceSlice = {
       routePattern: yearPattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'news:year-markdown',
@@ -80,7 +80,7 @@ export const newsPublicSurfaceSlice = {
       routePattern: yearMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'news:month',
@@ -88,7 +88,7 @@ export const newsPublicSurfaceSlice = {
       routePattern: monthPattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'news:month-markdown',
@@ -96,7 +96,7 @@ export const newsPublicSurfaceSlice = {
       routePattern: monthMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'news:article',
@@ -104,7 +104,7 @@ export const newsPublicSurfaceSlice = {
       routePattern: articlePattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'news:article-markdown',
@@ -112,7 +112,7 @@ export const newsPublicSurfaceSlice = {
       routePattern: articleMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'news:article-event-ics',
@@ -120,7 +120,7 @@ export const newsPublicSurfaceSlice = {
       routePattern: articleEventIcsPattern(),
       mediaType: 'text/calendar',
       cacheClass: 'static',
-      discoveryRoles: ['download'],
+      discoveryRoles: ['download']
     },
     {
       id: 'news:tags',
@@ -128,7 +128,7 @@ export const newsPublicSurfaceSlice = {
       path: tagsPath(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'news:tags-markdown',
@@ -136,7 +136,7 @@ export const newsPublicSurfaceSlice = {
       path: tagsMarkdownPath(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'news:tag',
@@ -144,7 +144,7 @@ export const newsPublicSurfaceSlice = {
       routePattern: tagPattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'news:tag-markdown',
@@ -152,7 +152,7 @@ export const newsPublicSurfaceSlice = {
       routePattern: tagMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'news:data',
@@ -161,7 +161,7 @@ export const newsPublicSurfaceSlice = {
       mediaType: 'application/json',
       cacheClass: 'data',
       discoveryRoles: ['data-feed', 'root-catalog'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'news:rss',
@@ -170,7 +170,7 @@ export const newsPublicSurfaceSlice = {
       mediaType: 'application/rss+xml',
       cacheClass: 'feed',
       discoveryRoles: ['data-feed'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'news:schema',
@@ -179,7 +179,7 @@ export const newsPublicSurfaceSlice = {
       mediaType: 'application/schema+json',
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
-      catalogRole: 'service-desc',
+      catalogRole: 'service-desc'
     },
     {
       id: 'news:openapi',
@@ -188,7 +188,7 @@ export const newsPublicSurfaceSlice = {
       mediaType: 'application/vnd.oai.openapi+json',
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
-      catalogRole: 'service-desc',
+      catalogRole: 'service-desc'
     },
     {
       id: 'news:api-catalog',
@@ -198,7 +198,7 @@ export const newsPublicSurfaceSlice = {
       cacheClass: 'catalog',
       discoveryRoles: ['api-catalog', 'root-catalog'],
       catalogRole: 'service-desc',
-      sectionCatalogRole: false,
+      sectionCatalogRole: false
     },
     {
       id: 'news:llms',
@@ -207,7 +207,7 @@ export const newsPublicSurfaceSlice = {
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms', 'root-catalog'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'news:llms-full',
@@ -216,7 +216,7 @@ export const newsPublicSurfaceSlice = {
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms'],
-      catalogRole: 'item',
-    },
-  ],
+      catalogRole: 'item'
+    }
+  ]
 } satisfies PublicSurfaceSlice;

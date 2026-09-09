@@ -3,6 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import { preprocessSiteMarkdownContent } from '@/lib/markdown/render';
 import type { SiteMentionRegistry } from '@/lib/mentions';
 import { loadSiteMentionRegistry } from '@/lib/mentions/registry';
+
 import { kbCanonical, kbDetailCanonical, kbDetailUrl, kbUrl } from './routes';
 import type { KbPage, KbPageFlag } from './types';
 
@@ -30,7 +31,7 @@ const validateSegment = (entryId: string, segment: string): void => {
   if (!KB_ROUTE_SEGMENT.test(segment)) {
     failEntryId(
       entryId,
-      `has invalid segment "${segment}"; segments must use lower-case Latin letters, digits, and hyphen`,
+      `has invalid segment "${segment}"; segments must use lower-case Latin letters, digits, and hyphen`
     );
   }
 };
@@ -48,8 +49,7 @@ const entryRouteSlug = (entryId: string): string | undefined => {
     }
   }
 
-  const routeSegments =
-    parts[parts.length - 1] === 'index' ? parts.slice(0, -1) : parts;
+  const routeSegments = parts[parts.length - 1] === 'index' ? parts.slice(0, -1) : parts;
 
   for (const segment of routeSegments) {
     validateSegment(entryId, segment);
@@ -66,13 +66,13 @@ const mapEntry = (
   entry: KbPageEntry,
   mentionRegistry: SiteMentionRegistry,
   routeSlug: string | undefined,
-  isSection: boolean,
+  isSection: boolean
 ): KbPage => {
   const flags = entry.data.flags ?? [];
   const body = preprocessSiteMarkdownContent(
     entry.body ?? '',
     `kb page "${entry.id}" body`,
-    mentionRegistry,
+    mentionRegistry
   );
 
   return {
@@ -85,24 +85,21 @@ const mapEntry = (
     routeSlug,
     isSection,
     body: body.markdown,
-    mentions: body.mentions,
+    mentions: body.mentions
   } satisfies KbPage;
 };
 
 const isSectionRoute = (
   routeSlug: string | undefined,
-  routeSlugs: readonly (string | undefined)[],
+  routeSlugs: readonly (string | undefined)[]
 ): boolean =>
-  !routeSlug ||
-  routeSlugs.some(
-    (candidate) => candidate?.startsWith(`${routeSlug}/`) ?? false,
-  );
+  !routeSlug || routeSlugs.some((candidate) => candidate?.startsWith(`${routeSlug}/`) ?? false);
 
 export const buildKbPages = (
   entries: readonly KbPageEntry[],
   opts?: {
     readonly mentionRegistry?: SiteMentionRegistry;
-  },
+  }
 ): readonly KbPage[] => {
   const mentionRegistry = opts?.mentionRegistry ?? new Map();
   const routeSlugs = entries.map((entry) => entryRouteSlug(entry.id));
@@ -111,17 +108,12 @@ export const buildKbPages = (
   return entries.map((entry, index) => {
     const entryId = entry.id;
     const routeSlug = routeSlugs[index];
-    const page = mapEntry(
-      entry,
-      mentionRegistry,
-      routeSlug,
-      isSectionRoute(routeSlug, routeSlugs),
-    );
+    const page = mapEntry(entry, mentionRegistry, routeSlug, isSectionRoute(routeSlug, routeSlugs));
     const conflictingEntryId = entryIdByPublicUrl.get(page.url);
 
     if (conflictingEntryId) {
       throw new Error(
-        `kb page "${entryId}" conflicts with "${conflictingEntryId}" for public URL "${page.url}"`,
+        `kb page "${entryId}" conflicts with "${conflictingEntryId}" for public URL "${page.url}"`
       );
     }
 
@@ -134,13 +126,10 @@ export const buildKbPages = (
 export const loadKbPages = (): Promise<readonly KbPage[]> => {
   cache ??= Promise.all([
     import('astro:content').then(
-      ({ getCollection }) =>
-        getCollection('kbPages') as Promise<readonly KbPageEntry[]>,
+      ({ getCollection }) => getCollection('kbPages') as Promise<readonly KbPageEntry[]>
     ),
-    loadSiteMentionRegistry(),
-  ]).then(([entries, mentionRegistry]) =>
-    buildKbPages(entries, { mentionRegistry }),
-  );
+    loadSiteMentionRegistry()
+  ]).then(([entries, mentionRegistry]) => buildKbPages(entries, { mentionRegistry }));
 
   return cache;
 };

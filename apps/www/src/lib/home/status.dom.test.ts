@@ -2,11 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import type { StatusIncident } from '@/lib/status/types';
 
-import {
-  getHomeStatusWindows,
-  hydrateHomeStatus,
-  installHomeStatusHydration,
-} from './status';
+import { getHomeStatusWindows, hydrateHomeStatus, installHomeStatusHydration } from './status';
 
 const WINDOW_START = 1779094800000;
 const WINDOW_END = 1779105600000;
@@ -16,26 +12,26 @@ const GREEN_ARIA_LABEL = 'Статус: всё работает';
 const STATUS_LABELS = {
   green: 'всё работает',
   amber: 'плановые работы',
-  red: 'есть проблемы',
+  red: 'есть проблемы'
 } as const;
 const MAINTENANCE_WINDOW = {
   kind: 'maintenance',
   started: {
     at: new Date(WINDOW_START),
     iso: new Date(WINDOW_START).toISOString(),
-    hasTime: true,
+    hasTime: true
   },
   ended: {
     at: new Date(WINDOW_END),
     iso: new Date(WINDOW_END).toISOString(),
-    hasTime: true,
-  },
+    hasTime: true
+  }
 } as const satisfies Pick<StatusIncident, 'kind' | 'started' | 'ended'>;
 
 const renderHomeStatus = ({
   state = 'green',
   includePayload = true,
-  payload = DEFAULT_WINDOWS_PAYLOAD,
+  payload = DEFAULT_WINDOWS_PAYLOAD
 }: {
   readonly state?: 'green' | 'amber' | 'red';
   readonly includePayload?: boolean;
@@ -66,7 +62,7 @@ const getStatusLink = (): HTMLElement =>
 
 const getStatusLinks = (): readonly HTMLElement[] =>
   Array.from(document.querySelectorAll('[data-home-status-link]')).filter(
-    (link): link is HTMLElement => link instanceof HTMLElement,
+    (link): link is HTMLElement => link instanceof HTMLElement
   );
 
 afterEach(() => {
@@ -79,7 +75,7 @@ describe('getHomeStatusWindows', () => {
     const buildNow = WINDOW_START + 1;
 
     expect(getHomeStatusWindows([MAINTENANCE_WINDOW], buildNow)).toEqual([
-      { kind: 'maintenance', start: WINDOW_START, end: WINDOW_END },
+      { kind: 'maintenance', start: WINDOW_START, end: WINDOW_END }
     ]);
   });
 });
@@ -129,7 +125,7 @@ describe('hydrateHomeStatus', () => {
   it('prefers an active incident over maintenance', () => {
     renderHomeStatus({
       state: 'red',
-      payload: `[{"kind":"maintenance","start":${WINDOW_START},"end":${WINDOW_END}},{"kind":"incident","start":${WINDOW_START}}]`,
+      payload: `[{"kind":"maintenance","start":${WINDOW_START},"end":${WINDOW_END}},{"kind":"incident","start":${WINDOW_START}}]`
     });
 
     hydrateHomeStatus(document, WINDOW_START + 1);
@@ -139,7 +135,7 @@ describe('hydrateHomeStatus', () => {
 
   it('turns red when an incident without an end reaches its start', () => {
     renderHomeStatus({
-      payload: `[{"kind":"incident","start":${WINDOW_START}}]`,
+      payload: `[{"kind":"incident","start":${WINDOW_START}}]`
     });
 
     hydrateHomeStatus(document, WINDOW_START);
@@ -150,7 +146,7 @@ describe('hydrateHomeStatus', () => {
   it('clears build-time red when the incident window has ended', () => {
     renderHomeStatus({
       state: 'red',
-      payload: `[{"kind":"incident","start":${WINDOW_START},"end":${WINDOW_END}}]`,
+      payload: `[{"kind":"incident","start":${WINDOW_START},"end":${WINDOW_END}}]`
     });
 
     hydrateHomeStatus(document, WINDOW_END);
@@ -171,7 +167,7 @@ describe('hydrateHomeStatus', () => {
     renderHomeStatus();
     getStatusLink().insertAdjacentHTML(
       'afterend',
-      `<a href="/status/" aria-label="${GREEN_ARIA_LABEL}" data-home-status-link data-home-status-state="green">Статус</a>`,
+      `<a href="/status/" aria-label="${GREEN_ARIA_LABEL}" data-home-status-link data-home-status-state="green">Статус</a>`
     );
 
     hydrateHomeStatus(document, WINDOW_START + 1);
@@ -179,8 +175,8 @@ describe('hydrateHomeStatus', () => {
     expect(
       getStatusLinks().map((link) => ({
         state: link.dataset.homeStatusState,
-        label: link.getAttribute('aria-label'),
-      })),
+        label: link.getAttribute('aria-label')
+      }))
     ).toMatchInlineSnapshot(`
       [
         {

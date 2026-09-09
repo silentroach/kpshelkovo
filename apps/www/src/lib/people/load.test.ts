@@ -2,20 +2,17 @@ import { readFile } from 'node:fs/promises';
 
 import { beforeAll, describe, expect, it } from 'vitest';
 
+import type { ContactEntry } from '../contacts/load';
 import { contentDateSchema } from '../content-date';
-import {
-  createEntityMentionGraph,
-  type EntityMentionTarget,
-} from '../mentions';
+import { createEntityMentionGraph, type EntityMentionTarget } from '../mentions';
 import {
   createTestNewsDatasetBuilder,
   newsArticleEntry as article,
-  newsAuthorEntry as author,
+  newsAuthorEntry as author
 } from '../news/load.test-helper';
+import type { PlaceEntry } from '../places/types';
 import type { StatusIncidentEntry } from '../status/load';
 import type { StatusArea, StatusKind, StatusService } from '../status/schema';
-import type { ContactEntry } from '../contacts/load';
-import type { PlaceEntry } from '../places/types';
 import type { PersonProfileEntry } from './load';
 
 let buildPeopleDataset: typeof import('./load').buildPeopleDataset;
@@ -35,20 +32,17 @@ const testDate = contentDateSchema('test date');
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ buildPeopleDataset, buildPeopleGraphDataset } = await import('./load'));
   ({ buildContactsDataset } = await import('../contacts/load'));
-  buildNewsDataset = createTestNewsDatasetBuilder(
-    (await import('../news/load')).buildNewsDataset,
-  );
+  buildNewsDataset = createTestNewsDatasetBuilder((await import('../news/load')).buildNewsDataset);
   ({ buildPlacesDataset } = await import('../places/load'));
   ({ buildStatusDataset } = await import('../status/load'));
   ({ createContactMentionRefs } = await import('../contacts/mentions'));
   ({ createNewsArticleMentionRefs } = await import('../news/mentions'));
-  ({ createPlaceMentionRefs, createPlaceMentionTarget } =
-    await import('../places/mentions'));
+  ({ createPlaceMentionRefs, createPlaceMentionTarget } = await import('../places/mentions'));
   ({ createStatusIncidentMentionRefs } = await import('../status/mentions'));
   ({ createPersonProfileMentionRefs } = await import('./mention-refs'));
 });
@@ -64,9 +58,9 @@ const sourceRefs = (input: {
   ...input.news.articles.flatMap(createNewsArticleMentionRefs),
   ...(input.places?.places.flatMap(createPlaceMentionRefs) ?? []),
   ...input.status.incidents.flatMap((incident) =>
-    incident.hasPage ? createStatusIncidentMentionRefs(incident) : [],
+    incident.hasPage ? createStatusIncidentMentionRefs(incident) : []
   ),
-  ...input.people.profiles.flatMap(createPersonProfileMentionRefs),
+  ...input.people.profiles.flatMap(createPersonProfileMentionRefs)
 ];
 
 const entry = (input: {
@@ -94,8 +88,8 @@ const entry = (input: {
     name_cases: input.name_cases,
     company: input.company,
     position: input.position,
-    contacts: [...(input.contacts ?? [])],
-  },
+    contacts: [...(input.contacts ?? [])]
+  }
 });
 
 const incident = (input: {
@@ -117,8 +111,8 @@ const incident = (input: {
     started_at: testDate.parse(input.started_at),
     ended_at: input.ended_at ? testDate.parse(input.ended_at) : undefined,
     areas: input.areas ? [...input.areas] : undefined,
-    source_url: `https://example.com/${input.id}`,
-  },
+    source_url: `https://example.com/${input.id}`
+  }
 });
 
 const contact = (input: {
@@ -134,9 +128,9 @@ const contact = (input: {
     category: 'fence',
     updated_at: '2026-07-06',
     contacts: {
-      phone: '+7 900 000-00-00',
-    },
-  },
+      phone: '+7 900 000-00-00'
+    }
+  }
 });
 
 const place = (input: {
@@ -154,9 +148,9 @@ const place = (input: {
     location: {
       map_url: 'https://yandex.ru/maps/?ll=37.746894%2C55.060703&z=18',
       address: 'ТСН «Шелково», Центральная улица',
-      coordinates: { lat: 55.060703, lng: 37.746894 },
-    },
-  },
+      coordinates: { lat: 55.060703, lng: 37.746894 }
+    }
+  }
 });
 
 describe('buildPeopleDataset', () => {
@@ -165,7 +159,7 @@ describe('buildPeopleDataset', () => {
       readFile(new URL('./load.ts', import.meta.url), 'utf8'),
       readFile(new URL('../news/load.ts', import.meta.url), 'utf8'),
       readFile(new URL('../places/load.ts', import.meta.url), 'utf8'),
-      readFile(new URL('../status/load.ts', import.meta.url), 'utf8'),
+      readFile(new URL('../status/load.ts', import.meta.url), 'utf8')
     ]);
 
     expect(peopleLoad).not.toContain("from './public-dto'");
@@ -180,26 +174,22 @@ describe('buildPeopleDataset', () => {
       entry({
         id: 'apetrov',
         name: 'Андрей Петров',
-        body: 'Гуляет у @apple-garden:gen.',
-      }),
+        body: 'Гуляет у @apple-garden:gen.'
+      })
     ];
-    const people = buildPeopleDataset([
-      entry({ id: 'apetrov', name: 'Андрей Петров' }),
-    ]);
-    const mentionRegistry = new Map<string, EntityMentionTarget>(
-      people.mentionRegistry,
-    );
+    const people = buildPeopleDataset([entry({ id: 'apetrov', name: 'Андрей Петров' })]);
+    const mentionRegistry = new Map<string, EntityMentionTarget>(people.mentionRegistry);
 
     mentionRegistry.set(
       'apple-garden',
       createPlaceMentionTarget('apple-garden', 'Яблоневый сад', {
-        gen: 'Яблоневого сада',
-      }),
+        gen: 'Яблоневого сада'
+      })
     );
 
-    expect(
-      buildPeopleDataset(entries, { mentionRegistry }).profiles[0]?.body,
-    ).toBe('Гуляет у [Яблоневого сада](/map/apple-garden/).');
+    expect(buildPeopleDataset(entries, { mentionRegistry }).profiles[0]?.body).toBe(
+      'Гуляет у [Яблоневого сада](/map/apple-garden/).'
+    );
   });
 
   it('accepts a valid person entry with normalized contacts and body mentions', () => {
@@ -208,7 +198,7 @@ describe('buildPeopleDataset', () => {
         id: 'kschemelinin',
         name: 'Кирилл Щемелинин',
         name_cases: {
-          gen: 'Кирилла Щемелинина',
+          gen: 'Кирилла Щемелинина'
         },
         company: 'ОК "Комфорт"',
         position: 'Исполняющий обязанности директора по эксплуатации',
@@ -216,47 +206,45 @@ describe('buildPeopleDataset', () => {
         contacts: [
           {
             type: 'telegram',
-            value: 'Kirill_ZemlyaMO',
+            value: 'Kirill_ZemlyaMO'
           },
           {
             type: 'phone',
-            value: '+7 (916) 555-12-34',
-          },
-        ],
+            value: '+7 (916) 555-12-34'
+          }
+        ]
       }),
       entry({
         id: 'apetrov',
         name: 'Андрей Петров',
-        body: 'Работал вместе с @kschemelinin над разбором аварии.',
-      }),
+        body: 'Работал вместе с @kschemelinin над разбором аварии.'
+      })
     ]);
 
     expect(data.bySlug.get('apetrov')?.body).toMatchInlineSnapshot(
-      `"Работал вместе с [Кирилл Щемелинин](/people/kschemelinin/ \"Исполняющий обязанности директора по эксплуатации, ОК \\\"Комфорт\\\"\") над разбором аварии."`,
+      `"Работал вместе с [Кирилл Щемелинин](/people/kschemelinin/ \"Исполняющий обязанности директора по эксплуатации, ОК \\\"Комфорт\\\"\") над разбором аварии."`
     );
-    expect(
-      data.bySlug.get('apetrov')?.mentions.map((item) => item.slug),
-    ).toEqual(['kschemelinin']);
+    expect(data.bySlug.get('apetrov')?.mentions.map((item) => item.slug)).toEqual(['kschemelinin']);
     expect(data.bySlug.get('kschemelinin')?.contacts).toEqual([
       {
         type: 'telegram',
         value: 'Kirill_ZemlyaMO',
         display: '@Kirill_ZemlyaMO',
-        href: 'https://t.me/Kirill_ZemlyaMO',
+        href: 'https://t.me/Kirill_ZemlyaMO'
       },
       {
         type: 'phone',
         value: '+7 (916) 555-12-34',
         display: '+7 (916) 555-12-34',
-        href: 'tel:+79165551234',
-      },
+        href: 'tel:+79165551234'
+      }
     ]);
     expect(data.bySlug.get('kschemelinin')?.nameCases).toEqual({
-      gen: 'Кирилла Щемелинина',
+      gen: 'Кирилла Щемелинина'
     });
     expect(data.bySlug.get('kschemelinin')?.company).toBe('ОК "Комфорт"');
     expect(data.bySlug.get('kschemelinin')?.position).toBe(
-      'Исполняющий обязанности директора по эксплуатации',
+      'Исполняющий обязанности директора по эксплуатации'
     );
   });
 
@@ -265,21 +253,19 @@ describe('buildPeopleDataset', () => {
       entry({
         id: 'kschemelinin',
         name: 'Кирилл Щемелинин',
-        body: 'Публичный профиль Кирилла.',
+        body: 'Публичный профиль Кирилла.'
       }),
       entry({
         id: 'apetrov',
         name: 'Андрей Петров',
-        body: 'Работал вместе с [главным инженером](@kschemelinin) над разбором аварии.',
-      }),
+        body: 'Работал вместе с [главным инженером](@kschemelinin) над разбором аварии.'
+      })
     ]);
 
     expect(data.bySlug.get('apetrov')?.body).toBe(
-      'Работал вместе с [главным инженером](/people/kschemelinin/) над разбором аварии.',
+      'Работал вместе с [главным инженером](/people/kschemelinin/) над разбором аварии.'
     );
-    expect(
-      data.bySlug.get('apetrov')?.mentions.map((item) => item.slug),
-    ).toEqual(['kschemelinin']);
+    expect(data.bySlug.get('apetrov')?.mentions.map((item) => item.slug)).toEqual(['kschemelinin']);
   });
 
   it('supports profiles without markdown body when frontmatter already carries context', () => {
@@ -292,16 +278,16 @@ describe('buildPeopleDataset', () => {
         contacts: [
           {
             type: 'phone',
-            value: '+7 (967) 246-37-49',
-          },
-        ],
-      }),
+            value: '+7 (967) 246-37-49'
+          }
+        ]
+      })
     ]);
 
     expect(data.bySlug.get('kschemelinin')).toMatchObject({
       body: '',
       company: 'ОК "Комфорт"',
-      position: 'Исполняющий обязанности директора по эксплуатации',
+      position: 'Исполняющий обязанности директора по эксплуатации'
     });
   });
 
@@ -310,13 +296,13 @@ describe('buildPeopleDataset', () => {
       buildPeopleDataset([
         entry({
           id: 'kschemelinin',
-          name: 'Кирилл Щемелинин',
+          name: 'Кирилл Щемелинин'
         }),
         entry({
           id: 'kschemelinin',
-          name: 'Другой Кирилл',
-        }),
-      ]),
+          name: 'Другой Кирилл'
+        })
+      ])
     ).toThrow('duplicate person profile slug in mention registry');
   });
 
@@ -325,13 +311,13 @@ describe('buildPeopleDataset', () => {
       entry({
         id: 'kschemelinin',
         name: 'Кирилл Щемелинин',
-        body: 'Публичный профиль Кирилла.',
+        body: 'Публичный профиль Кирилла.'
       }),
       entry({
         id: 'apetrov',
         name: 'Андрей Петров',
-        body: 'Работал вместе с @kschemelinin над разбором аварии.',
-      }),
+        body: 'Работал вместе с @kschemelinin над разбором аварии.'
+      })
     ]);
     const news = buildNewsDataset(
       [author({ id: 'ig', name: 'Редакция' })],
@@ -341,12 +327,12 @@ describe('buildPeopleDataset', () => {
           title: 'Авария на линии',
           summary: 'Краткая сводка',
           date: '03.05.2026 09:00',
-          body: 'Основной текст про @kschemelinin. Позже добавили уточнение после комментария специалиста.',
-        }),
+          body: 'Основной текст про @kschemelinin. Позже добавили уточнение после комментария специалиста.'
+        })
       ],
       {
-        mentionRegistry: people.mentionRegistry,
-      },
+        mentionRegistry: people.mentionRegistry
+      }
     );
     const status = buildStatusDataset(
       [
@@ -358,42 +344,40 @@ describe('buildPeopleDataset', () => {
           started_at: '22.04.2026 11:30',
           ended_at: '23.04.2026 00:06',
           areas: ['river'],
-          body: 'Как отметил @kschemelinin, повреждение было редким.',
-        }),
+          body: 'Как отметил @kschemelinin, повреждение было редким.'
+        })
       ],
       {
-        mentionRegistry: people.mentionRegistry,
-      },
+        mentionRegistry: people.mentionRegistry
+      }
     );
     const contacts = buildContactsDataset(
       [
         contact({
           id: 'fence/ivan-petrov-fence',
           title: 'Иван Петров',
-          body: 'Перед началом работ стоит согласовать сроки с @kschemelinin.',
-        }),
+          body: 'Перед началом работ стоит согласовать сроки с @kschemelinin.'
+        })
       ],
       {
-        mentionRegistry: people.mentionRegistry,
-      },
+        mentionRegistry: people.mentionRegistry
+      }
     );
     const places = buildPlacesDataset(
       [
         place({
           id: 'titanic',
           title: 'Детская площадка «Титаник»',
-          body: 'Площадку показал @kschemelinin.',
-        }),
+          body: 'Площадку показал @kschemelinin.'
+        })
       ],
       {
-        mentionRegistry: people.mentionRegistry,
-      },
+        mentionRegistry: people.mentionRegistry
+      }
     );
     const graph = buildPeopleGraphDataset(
       people,
-      createEntityMentionGraph(
-        sourceRefs({ people, contacts, news, places, status }),
-      ),
+      createEntityMentionGraph(sourceRefs({ people, contacts, news, places, status }))
     );
 
     expect(graph.bySlug.get('kschemelinin')?.backlinks).toMatchObject({
@@ -401,34 +385,32 @@ describe('buildPeopleDataset', () => {
         {
           kind: 'article',
           sourceId: '2026/05/electricity',
-          title: 'Авария на линии',
-        },
+          title: 'Авария на линии'
+        }
       ],
       status: [
         {
           kind: 'incident',
           sourceId: '2026/04/electricity-river-10kv-line-damage',
           title: 'Отключение электричества в Шелково Ривер',
-          markdownUrl:
-            '/status/incidents/2026/04/electricity-river-10kv-line-damage/index.md',
-          excerpt: 'Как отметил Кирилл Щемелинин, повреждение было редким.',
-        },
+          markdownUrl: '/status/incidents/2026/04/electricity-river-10kv-line-damage/index.md',
+          excerpt: 'Как отметил Кирилл Щемелинин, повреждение было редким.'
+        }
       ],
       people: [
         {
           kind: 'person',
           sourceId: 'apetrov',
-          title: 'Андрей Петров',
-        },
+          title: 'Андрей Петров'
+        }
       ],
       contacts: [
         {
           kind: 'contact',
           sourceId: 'fence/ivan-petrov-fence',
           title: 'Иван Петров',
-          excerpt:
-            'Перед началом работ стоит согласовать сроки с Кирилл Щемелинин.',
-        },
+          excerpt: 'Перед началом работ стоит согласовать сроки с Кирилл Щемелинин.'
+        }
       ],
       places: [
         {
@@ -437,9 +419,9 @@ describe('buildPeopleDataset', () => {
           title: 'Детская площадка «Титаник»',
           htmlUrl: '/map/titanic/',
           markdownUrl: '/map/titanic/index.md',
-          excerpt: 'Площадку показал Кирилл Щемелинин.',
-        },
-      ],
+          excerpt: 'Площадку показал Кирилл Щемелинин.'
+        }
+      ]
     });
   });
 
@@ -448,13 +430,13 @@ describe('buildPeopleDataset', () => {
       entry({
         id: 'kschemelinin',
         name: 'Кирилл Щемелинин',
-        body: 'Публичный профиль Кирилла.',
+        body: 'Публичный профиль Кирилла.'
       }),
       entry({
         id: 'apetrov',
         name: 'Андрей Петров',
-        body: 'Работал вместе с [главным инженером](@kschemelinin) над разбором аварии.',
-      }),
+        body: 'Работал вместе с [главным инженером](@kschemelinin) над разбором аварии.'
+      })
     ]);
     const news = buildNewsDataset(
       [author({ id: 'ig', name: 'Редакция' })],
@@ -464,12 +446,12 @@ describe('buildPeopleDataset', () => {
           title: 'Авария на линии',
           summary: 'Краткая сводка',
           date: '03.05.2026 09:00',
-          body: 'Основной текст после [комментария специалиста](@kschemelinin). Позже добавили уточнение от дежурного инженера.',
-        }),
+          body: 'Основной текст после [комментария специалиста](@kschemelinin). Позже добавили уточнение от дежурного инженера.'
+        })
       ],
       {
-        mentionRegistry: people.mentionRegistry,
-      },
+        mentionRegistry: people.mentionRegistry
+      }
     );
     const status = buildStatusDataset(
       [
@@ -481,16 +463,16 @@ describe('buildPeopleDataset', () => {
           started_at: '22.04.2026 11:30',
           ended_at: '23.04.2026 00:06',
           areas: ['river'],
-          body: 'После [осмотра линии](@kschemelinin) повреждение признали редким.',
-        }),
+          body: 'После [осмотра линии](@kschemelinin) повреждение признали редким.'
+        })
       ],
       {
-        mentionRegistry: people.mentionRegistry,
-      },
+        mentionRegistry: people.mentionRegistry
+      }
     );
     const graph = buildPeopleGraphDataset(
       people,
-      createEntityMentionGraph(sourceRefs({ people, news, status })),
+      createEntityMentionGraph(sourceRefs({ people, news, status }))
     );
     const backlinks = graph.bySlug.get('kschemelinin')?.backlinks;
 
@@ -500,23 +482,23 @@ describe('buildPeopleDataset', () => {
           kind: 'article',
           sourceId: '2026/05/electricity',
           excerpt:
-            'Основной текст после комментария специалиста. Позже добавили уточнение от дежурного инженера.',
-        },
+            'Основной текст после комментария специалиста. Позже добавили уточнение от дежурного инженера.'
+        }
       ],
       status: [
         {
           kind: 'incident',
           sourceId: '2026/04/electricity-river-10kv-line-damage',
-          excerpt: 'После осмотра линии повреждение признали редким.',
-        },
+          excerpt: 'После осмотра линии повреждение признали редким.'
+        }
       ],
       people: [
         {
           kind: 'person',
           sourceId: 'apetrov',
-          excerpt: 'Работал вместе с главным инженером над разбором аварии.',
-        },
-      ],
+          excerpt: 'Работал вместе с главным инженером над разбором аварии.'
+        }
+      ]
     });
     expect(JSON.stringify(backlinks)).not.toContain('@kschemelinin');
   });

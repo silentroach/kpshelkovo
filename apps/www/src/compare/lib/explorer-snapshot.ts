@@ -12,15 +12,13 @@ const createExplorerSnapshot = async () => {
     body,
     payload,
     url: `/static/settlements-explorer/${version}.json`,
-    version,
+    version
   });
 };
 
 let explorerSnapshot: ReturnType<typeof createExplorerSnapshot> | undefined;
 
-export const loadExplorerSnapshot = (): ReturnType<
-  typeof createExplorerSnapshot
-> => {
+export const loadExplorerSnapshot = (): ReturnType<typeof createExplorerSnapshot> => {
   explorerSnapshot ??= createExplorerSnapshot();
   return explorerSnapshot;
 };

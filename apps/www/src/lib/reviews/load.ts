@@ -32,7 +32,7 @@ export const buildReviewsDataset = (
   entries: readonly ReviewEntry[],
   opts?: {
     readonly mentionRegistry?: SiteMentionRegistry;
-  },
+  }
 ): ReviewsDataset => {
   const mentionRegistry = opts?.mentionRegistry;
   const reviews = entries
@@ -43,13 +43,13 @@ export const buildReviewsDataset = (
 
   return {
     reviews,
-    byId: new Map(reviews.map((review) => [review.id, review] as const)),
+    byId: new Map(reviews.map((review) => [review.id, review] as const))
   };
 };
 
 const buildReviewsData = async (): Promise<ReviewsDataset> =>
   buildReviewsDataset(await getCollection('reviews'), {
-    mentionRegistry: await loadSiteMentionRegistry(),
+    mentionRegistry: await loadSiteMentionRegistry()
   });
 
 export const loadReviewsData = (): Promise<ReviewsDataset> => {

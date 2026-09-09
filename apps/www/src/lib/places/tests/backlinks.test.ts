@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  createEntityMentionGraph,
-  type EntityMentionSourceRef,
-} from '@/lib/mentions';
+import { createEntityMentionGraph, type EntityMentionSourceRef } from '@/lib/mentions';
 
 import { createPlaceBacklinksFromGraph } from '../backlinks';
 import { PLACE_MENTION_SECTIONS } from '../schema';
@@ -15,14 +12,14 @@ const refs: readonly EntityMentionSourceRef[] = (
     ['reviews', 'review', 'review-item'],
     ['places', 'place', 'place-item'],
     ['people', 'person', 'person-item'],
-    ['contacts', 'contact', 'contact-item'],
+    ['contacts', 'contact', 'contact-item']
   ] as const
 ).map(([section, kind, id]): EntityMentionSourceRef => ({
   target: { type: 'place', slug: 'apple-garden' },
   source: { section, kind, id },
   title: id,
   htmlUrl: `/${section}/${id}/`,
-  markdownUrl: `/${section}/${id}/index.md`,
+  markdownUrl: `/${section}/${id}/index.md`
 }));
 
 describe('createPlaceBacklinksFromGraph', () => {
@@ -32,8 +29,8 @@ describe('createPlaceBacklinksFromGraph', () => {
       {
         ...refs[0]!,
         target: { type: 'person', slug: 'apple-garden' },
-        source: { section: 'news', kind: 'article', id: 'person-news' },
-      },
+        source: { section: 'news', kind: 'article', id: 'person-news' }
+      }
     ]);
     const backlinks = createPlaceBacklinksFromGraph(graph, 'apple-garden');
 
@@ -41,9 +38,9 @@ describe('createPlaceBacklinksFromGraph', () => {
       Object.fromEntries(
         PLACE_MENTION_SECTIONS.map((section) => [
           section,
-          backlinks[section].map((item) => item.sourceId),
-        ]),
-      ),
+          backlinks[section].map((item) => item.sourceId)
+        ])
+      )
     ).toMatchInlineSnapshot(`
       {
         "contacts": [

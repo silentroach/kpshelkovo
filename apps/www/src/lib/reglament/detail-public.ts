@@ -10,7 +10,7 @@ import type {
   sourceQuoteItemSchema,
   sourceValueSchema,
   statusInfoSchema,
-  workItemSchema,
+  workItemSchema
 } from './detail-public-schema';
 
 export type PublicEstimateDetailSourceId = `s${number}`;
@@ -23,38 +23,20 @@ type DeepReadonly<T> = T extends readonly unknown[]
 
 type PublicEstimateDetailDto<T extends z.ZodType> = DeepReadonly<z.infer<T>>;
 
-export type PublicEstimateDetailQuantityValue = PublicEstimateDetailDto<
-  typeof quantityValueSchema
->;
-export type PublicEstimateDetailMoneyValue = PublicEstimateDetailDto<
-  typeof moneyValueSchema
->;
+export type PublicEstimateDetailQuantityValue = PublicEstimateDetailDto<typeof quantityValueSchema>;
+export type PublicEstimateDetailMoneyValue = PublicEstimateDetailDto<typeof moneyValueSchema>;
 export type PublicEstimateDetailSourceQuoteItem = PublicEstimateDetailDto<
   typeof sourceQuoteItemSchema
 >;
-export type PublicEstimateDetailSourceValue = PublicEstimateDetailDto<
-  typeof sourceValueSchema
->;
-export type PublicEstimateDetailNeedsCheck = PublicEstimateDetailDto<
-  typeof needsCheckSchema
->;
-export type PublicEstimateDetailStatusInfo = PublicEstimateDetailDto<
-  typeof statusInfoSchema
->;
-export type PublicEstimateDetailWorkItem = PublicEstimateDetailDto<
-  typeof workItemSchema
->;
-export type PublicEstimateDetailResource = PublicEstimateDetailDto<
-  typeof resourceSchema
->;
-export type PublicEstimateDetailControlTotal = PublicEstimateDetailDto<
-  typeof controlTotalSchema
->;
+export type PublicEstimateDetailSourceValue = PublicEstimateDetailDto<typeof sourceValueSchema>;
+export type PublicEstimateDetailNeedsCheck = PublicEstimateDetailDto<typeof needsCheckSchema>;
+export type PublicEstimateDetailStatusInfo = PublicEstimateDetailDto<typeof statusInfoSchema>;
+export type PublicEstimateDetailWorkItem = PublicEstimateDetailDto<typeof workItemSchema>;
+export type PublicEstimateDetailResource = PublicEstimateDetailDto<typeof resourceSchema>;
+export type PublicEstimateDetailControlTotal = PublicEstimateDetailDto<typeof controlTotalSchema>;
 export type PublicEstimateDetailDataset = Omit<
   PublicEstimateDetailDto<typeof datasetSchema>,
   'sources'
 > & {
-  readonly sources: Readonly<
-    Record<PublicEstimateDetailSourceId, PublicEstimateDetailSourceValue>
-  >;
+  readonly sources: Readonly<Record<PublicEstimateDetailSourceId, PublicEstimateDetailSourceValue>>;
 };

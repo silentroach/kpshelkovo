@@ -1,11 +1,8 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
-import { createMarkdownResponse } from '@/lib/markdown/response';
-import {
-  loadContactCategories,
-  loadContactCategory,
-} from '@/lib/contacts/load';
+import { loadContactCategories, loadContactCategory } from '@/lib/contacts/load';
 import { buildContactsCategoryMarkdown } from '@/lib/contacts/markdown';
+import { createMarkdownResponse } from '@/lib/markdown/response';
 
 export const prerender = true;
 
@@ -13,7 +10,7 @@ export const getStaticPaths = (async () => {
   const categories = await loadContactCategories();
 
   return categories.map((category) => ({
-    params: { category: category.category },
+    params: { category: category.category }
   }));
 }) satisfies GetStaticPaths;
 

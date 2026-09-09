@@ -8,17 +8,16 @@ describe('createJsonResponse', () => {
       { version: 1, items: ['first', 'second'] },
       {
         headers: {
-          'Content-Type':
-            'application/linkset+json; profile="https://example.com/profile"',
-          Link: '<https://example.com/catalog>; rel="self"',
-        },
-      },
+          'Content-Type': 'application/linkset+json; profile="https://example.com/profile"',
+          Link: '<https://example.com/catalog>; rel="self"'
+        }
+      }
     );
 
     expect({
       body: await response.text(),
       headers: Object.fromEntries(response.headers),
-      status: response.status,
+      status: response.status
     }).toMatchInlineSnapshot(`
       {
         "body": "{\"version\":1,\"items\":[\"first\",\"second\"]}",

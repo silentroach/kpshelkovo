@@ -1,8 +1,8 @@
 {
   "name": "@shelkovo/media",
-  "type": "module",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build && rm -rf ../../dist/media && mkdir -p ../../dist && cp -R dist/site ../../dist/media",

@@ -15,11 +15,9 @@ export type PeopleMentionRegistry = ReadonlyMap<string, PersonMentionTarget>;
 
 const mentionTitle = (
   company: string | undefined,
-  position: string | undefined,
+  position: string | undefined
 ): string | undefined => {
-  const parts = [position, company].filter(
-    (item): item is string => item !== undefined,
-  );
+  const parts = [position, company].filter((item): item is string => item !== undefined);
 
   return parts.length > 0 ? parts.join(', ') : undefined;
 };
@@ -29,7 +27,7 @@ export const createPersonMentionTarget = (
   name: string,
   nameCases?: PersonNameCaseForms,
   company?: string,
-  position?: string,
+  position?: string
 ): PersonMentionTarget => {
   const linkTitle = mentionTitle(company, position);
 
@@ -44,7 +42,7 @@ export const createPersonMentionTarget = (
     position,
     linkTitle,
     htmlUrl: personUrl(slug),
-    markdownUrl: personMarkdownUrl(slug),
+    markdownUrl: personMarkdownUrl(slug)
   };
 };
 
@@ -57,5 +55,5 @@ export const mapRawPersonMentionTarget = (entry: {
     entry.data.name,
     entry.data.name_cases,
     entry.data.company,
-    entry.data.position,
+    entry.data.position
   );

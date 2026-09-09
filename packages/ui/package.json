@@ -1,16 +1,8 @@
 {
   "name": "@shelkovo/ui",
   "version": "0.1.0",
-  "type": "module",
   "private": true,
-  "scripts": {
-    "test:visual:icons": "playwright test -c playwright.icons-visual.local.config.ts",
-    "test:visual:icons:update": "playwright test -c playwright.icons-visual.local.config.ts --update-snapshots",
-    "test:visual:icons:serve": "astro build --root tests/icons-visual && ASTRO_PREVIEW_BACKGROUND=0 astro preview --root tests/icons-visual --host 127.0.0.1 --port 4328",
-    "test:visual:breadcrumbs": "playwright test -c playwright.breadcrumbs-visual.local.config.ts",
-    "test:visual:breadcrumbs:update": "playwright test -c playwright.breadcrumbs-visual.local.config.ts --update-snapshots",
-    "test:visual:breadcrumbs:serve": "astro build --root tests/breadcrumbs-visual && ASTRO_PREVIEW_BACKGROUND=0 astro preview --root tests/breadcrumbs-visual --host 127.0.0.1 --port 4325"
-  },
+  "type": "module",
   "exports": {
     "./Breadcrumbs.astro": "./src/Breadcrumbs.astro",
     "./FontPreloads.astro": "./src/FontPreloads.astro",
@@ -56,6 +48,14 @@
     "./LinkWithIcon.astro": "./src/LinkWithIcon.astro",
     "./ResourceLink.astro": "./src/ResourceLink.astro",
     "./file-icons": "./src/icons/system/file-icons.ts"
+  },
+  "scripts": {
+    "test:visual:icons": "playwright test -c playwright.icons-visual.local.config.ts",
+    "test:visual:icons:update": "playwright test -c playwright.icons-visual.local.config.ts --update-snapshots",
+    "test:visual:icons:serve": "astro build --root tests/icons-visual && ASTRO_PREVIEW_BACKGROUND=0 astro preview --root tests/icons-visual --host 127.0.0.1 --port 4328",
+    "test:visual:breadcrumbs": "playwright test -c playwright.breadcrumbs-visual.local.config.ts",
+    "test:visual:breadcrumbs:update": "playwright test -c playwright.breadcrumbs-visual.local.config.ts --update-snapshots",
+    "test:visual:breadcrumbs:serve": "astro build --root tests/breadcrumbs-visual && ASTRO_PREVIEW_BACKGROUND=0 astro preview --root tests/breadcrumbs-visual --host 127.0.0.1 --port 4325"
   },
   "dependencies": {
     "@fontsource/fira-sans": "^5.3.0",

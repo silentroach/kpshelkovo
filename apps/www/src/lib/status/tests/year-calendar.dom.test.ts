@@ -5,7 +5,7 @@ import { visibleWhitespace } from '@/lib/test/visible-whitespace';
 import {
   positionStatusCalendarTooltip,
   refreshStatusCalendarToday,
-  registerStatusCalendarYearInteractions,
+  registerStatusCalendarYearInteractions
 } from '../year-calendar.dom';
 
 const calendarDate = (id: string): string => `
@@ -21,7 +21,7 @@ describe('refreshStatusCalendarToday', () => {
       ${calendarDate('2026-08-28')}
     `;
     const staleToday = document.querySelector<HTMLElement>(
-      '[data-status-calendar-date="2026-08-27"]',
+      '[data-status-calendar-date="2026-08-27"]'
     );
     if (!staleToday) {
       throw new Error('status calendar today fixture is incomplete');
@@ -33,13 +33,11 @@ describe('refreshStatusCalendarToday', () => {
     refreshStatusCalendarToday(new Date('2026-08-27T21:00:00.000Z'));
 
     expect(
-      [...document.querySelectorAll('[data-status-calendar-date]')].map(
-        (date) => ({
-          id: date.getAttribute('data-status-calendar-date'),
-          today: date.getAttribute('data-status-calendar-today'),
-          current: date.querySelector('time')?.getAttribute('aria-current'),
-        }),
-      ),
+      [...document.querySelectorAll('[data-status-calendar-date]')].map((date) => ({
+        id: date.getAttribute('data-status-calendar-date'),
+        today: date.getAttribute('data-status-calendar-today'),
+        current: date.querySelector('time')?.getAttribute('aria-current')
+      }))
     ).toMatchInlineSnapshot(`
       [
         {
@@ -64,33 +62,23 @@ describe('positionStatusCalendarTooltip', () => {
         <span data-status-calendar-tooltip>Tooltip</span>
       </span>
     `;
-    const root = document.querySelector<HTMLElement>(
-      '[data-status-calendar-tooltip-root]',
-    );
-    const tooltip = root?.querySelector<HTMLElement>(
-      '[data-status-calendar-tooltip]',
-    );
+    const root = document.querySelector<HTMLElement>('[data-status-calendar-tooltip-root]');
+    const tooltip = root?.querySelector<HTMLElement>('[data-status-calendar-tooltip]');
 
     if (!root || !tooltip) {
       throw new Error('status calendar positioning fixture is incomplete');
     }
 
-    tooltip.getBoundingClientRect = () =>
-      ({ left: -40, right: 200 }) as DOMRect;
+    tooltip.getBoundingClientRect = () => ({ left: -40, right: 200 }) as DOMRect;
     positionStatusCalendarTooltip(root, 320);
-    const leftShift = tooltip.style.getPropertyValue(
-      '--status-calendar-tooltip-shift-x',
-    );
+    const leftShift = tooltip.style.getPropertyValue('--status-calendar-tooltip-shift-x');
 
-    tooltip.getBoundingClientRect = () =>
-      ({ left: 100, right: 340 }) as DOMRect;
+    tooltip.getBoundingClientRect = () => ({ left: 100, right: 340 }) as DOMRect;
     positionStatusCalendarTooltip(root, 320);
 
     expect({
       leftShift,
-      rightShift: tooltip.style.getPropertyValue(
-        '--status-calendar-tooltip-shift-x',
-      ),
+      rightShift: tooltip.style.getPropertyValue('--status-calendar-tooltip-shift-x')
     }).toMatchInlineSnapshot(`
       {
         "leftShift": "56px",
@@ -129,18 +117,12 @@ describe('registerStatusCalendarYearInteractions', () => {
       <status-year-calendar-lifecycle hidden></status-year-calendar-lifecycle>
       <button type="button">После календаря</button>
     `;
-    const root = document.querySelector<HTMLElement>(
-      '[data-status-calendar-tooltip-root]',
-    );
+    const root = document.querySelector<HTMLElement>('[data-status-calendar-tooltip-root]');
     const link = root?.querySelector<HTMLAnchorElement>('a');
     const tooltip = root?.querySelector<HTMLElement>('[role="tooltip"]');
     const button = document.querySelector<HTMLButtonElement>('button');
-    const lifecycle = document.querySelector<HTMLElement>(
-      'status-year-calendar-lifecycle',
-    );
-    const calendar = document.querySelector<HTMLElement>(
-      '[data-status-calendar-year]',
-    );
+    const lifecycle = document.querySelector<HTMLElement>('status-year-calendar-lifecycle');
+    const calendar = document.querySelector<HTMLElement>('[data-status-calendar-year]');
 
     if (!root || !link || !tooltip || !button || !lifecycle || !calendar) {
       throw new Error('status calendar tooltip fixture is incomplete');
@@ -162,38 +144,32 @@ describe('registerStatusCalendarYearInteractions', () => {
     link.dispatchEvent(
       new PointerEvent('pointerover', {
         bubbles: true,
-        pointerType: 'mouse',
-      }),
+        pointerType: 'mouse'
+      })
     );
     const opened = root.hasAttribute('data-status-calendar-tooltip-open');
     link.dispatchEvent(
       new PointerEvent('pointerout', {
         bubbles: true,
         pointerType: 'mouse',
-        relatedTarget: tooltip,
-      }),
+        relatedTarget: tooltip
+      })
     );
-    const openOverTooltip = root.hasAttribute(
-      'data-status-calendar-tooltip-open',
-    );
-    document.body.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
-    );
-    const closedOnEscape = !root.hasAttribute(
-      'data-status-calendar-tooltip-open',
-    );
+    const openOverTooltip = root.hasAttribute('data-status-calendar-tooltip-open');
+    document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    const closedOnEscape = !root.hasAttribute('data-status-calendar-tooltip-open');
     tooltip.dispatchEvent(
       new PointerEvent('pointerout', {
         bubbles: true,
         pointerType: 'mouse',
-        relatedTarget: button,
-      }),
+        relatedTarget: button
+      })
     );
     link.dispatchEvent(
       new PointerEvent('pointerover', {
         bubbles: true,
-        pointerType: 'mouse',
-      }),
+        pointerType: 'mouse'
+      })
     );
 
     expect({
@@ -202,7 +178,7 @@ describe('registerStatusCalendarYearInteractions', () => {
       closedOnEscape,
       reopened: root.hasAttribute('data-status-calendar-tooltip-open'),
       summary: visibleWhitespace(tooltip.textContent),
-      ariaHidden: tooltip.getAttribute('aria-hidden'),
+      ariaHidden: tooltip.getAttribute('aria-hidden')
     }).toMatchInlineSnapshot(`
       {
         "ariaHidden": "false",
@@ -222,21 +198,21 @@ describe('registerStatusCalendarYearInteractions', () => {
     link.dispatchEvent(
       new PointerEvent('pointerover', {
         bubbles: true,
-        pointerType: 'pen',
-      }),
+        pointerType: 'pen'
+      })
     );
     const opened = root.hasAttribute('data-status-calendar-tooltip-open');
     link.dispatchEvent(
       new PointerEvent('pointerout', {
         bubbles: true,
         pointerType: 'pen',
-        relatedTarget: button,
-      }),
+        relatedTarget: button
+      })
     );
 
     expect({
       opened,
-      closed: !root.hasAttribute('data-status-calendar-tooltip-open'),
+      closed: !root.hasAttribute('data-status-calendar-tooltip-open')
     }).toMatchInlineSnapshot(`
       {
         "closed": true,
@@ -251,12 +227,8 @@ describe('registerStatusCalendarYearInteractions', () => {
     registerStatusCalendarYearInteractions();
     link.focus();
     const opened = root.hasAttribute('data-status-calendar-tooltip-open');
-    link.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
-    );
-    const closedOnEscape = !root.hasAttribute(
-      'data-status-calendar-tooltip-open',
-    );
+    link.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    const closedOnEscape = !root.hasAttribute('data-status-calendar-tooltip-open');
     button.focus();
     link.focus();
 
@@ -265,7 +237,7 @@ describe('registerStatusCalendarYearInteractions', () => {
       closedOnEscape,
       reopened: root.hasAttribute('data-status-calendar-tooltip-open'),
       ariaHidden: tooltip.getAttribute('aria-hidden'),
-      describedBy: link.getAttribute('aria-describedby'),
+      describedBy: link.getAttribute('aria-describedby')
     }).toMatchInlineSnapshot(`
       {
         "ariaHidden": "false",
@@ -286,23 +258,21 @@ describe('registerStatusCalendarYearInteractions', () => {
     link.dispatchEvent(
       new PointerEvent('pointerover', {
         bubbles: true,
-        pointerType: 'touch',
-      }),
+        pointerType: 'touch'
+      })
     );
-    const openAfterTouch = root.hasAttribute(
-      'data-status-calendar-tooltip-open',
-    );
+    const openAfterTouch = root.hasAttribute('data-status-calendar-tooltip-open');
     const click = new MouseEvent('click', {
       bubbles: true,
-      cancelable: true,
+      cancelable: true
     });
     const clickAllowed = link.dispatchEvent(click);
 
     link.dispatchEvent(
       new PointerEvent('pointerover', {
         bubbles: true,
-        pointerType: 'mouse',
-      }),
+        pointerType: 'mouse'
+      })
     );
 
     expect({
@@ -310,9 +280,8 @@ describe('registerStatusCalendarYearInteractions', () => {
       clickAllowed,
       clickPrevented: click.defaultPrevented,
       text: tooltip.textContent,
-      html: tooltip.querySelector('[data-status-calendar-tooltip-text]')
-        ?.innerHTML,
-      injectedImage: Boolean(tooltip.querySelector('img')),
+      html: tooltip.querySelector('[data-status-calendar-tooltip-text]')?.innerHTML,
+      injectedImage: Boolean(tooltip.querySelector('img'))
     }).toMatchInlineSnapshot(`
       {
         "clickAllowed": true,
@@ -327,8 +296,7 @@ describe('registerStatusCalendarYearInteractions', () => {
 
   it('restores handlers when the same lifecycle element reconnects', () => {
     registerStatusCalendarYearInteractions();
-    const { root, link, tooltip, button, lifecycle, calendar } =
-      renderTooltip();
+    const { root, link, tooltip, button, lifecycle, calendar } = renderTooltip();
     const tooltipBounds = vi
       .spyOn(tooltip, 'getBoundingClientRect')
       .mockReturnValue({ left: 20, right: 200 } as DOMRect);
@@ -336,26 +304,22 @@ describe('registerStatusCalendarYearInteractions', () => {
       link.dispatchEvent(
         new PointerEvent('pointerover', {
           bubbles: true,
-          pointerType: 'mouse',
-        }),
+          pointerType: 'mouse'
+        })
       );
 
     hover();
-    const openedInitially = root.hasAttribute(
-      'data-status-calendar-tooltip-open',
-    );
+    const openedInitially = root.hasAttribute('data-status-calendar-tooltip-open');
     link.dispatchEvent(
       new PointerEvent('pointerout', {
         bubbles: true,
         pointerType: 'mouse',
-        relatedTarget: button,
-      }),
+        relatedTarget: button
+      })
     );
     lifecycle.remove();
     hover();
-    const openedWhileDisconnected = root.hasAttribute(
-      'data-status-calendar-tooltip-open',
-    );
+    const openedWhileDisconnected = root.hasAttribute('data-status-calendar-tooltip-open');
 
     calendar.after(lifecycle);
     hover();
@@ -365,10 +329,8 @@ describe('registerStatusCalendarYearInteractions', () => {
       openedWhileDisconnected,
       reconnectedSameInstance:
         document.querySelector('status-year-calendar-lifecycle') === lifecycle,
-      openedAfterReconnect: root.hasAttribute(
-        'data-status-calendar-tooltip-open',
-      ),
-      positionCalls: tooltipBounds.mock.calls.length,
+      openedAfterReconnect: root.hasAttribute('data-status-calendar-tooltip-open'),
+      positionCalls: tooltipBounds.mock.calls.length
     }).toMatchInlineSnapshot(`
       {
         "openedAfterReconnect": true,
@@ -390,13 +352,11 @@ describe('registerStatusCalendarYearInteractions', () => {
     firstCalendar.link.dispatchEvent(
       new PointerEvent('pointerover', {
         bubbles: true,
-        pointerType: 'mouse',
-      }),
+        pointerType: 'mouse'
+      })
     );
     const firstTodayInitializations = querySelectorAll.mock.calls.filter(
-      ([selector]) =>
-        selector ===
-        '[data-status-calendar-today], .status-calendar-date--today',
+      ([selector]) => selector === '[data-status-calendar-today], .status-calendar-date--today'
     ).length;
 
     document.body.innerHTML = `
@@ -413,9 +373,7 @@ describe('registerStatusCalendarYearInteractions', () => {
       </main>
     `;
     querySelectorAll.mockClear();
-    const outsideRoot = document.querySelector<HTMLElement>(
-      '[data-status-calendar-tooltip-root]',
-    );
+    const outsideRoot = document.querySelector<HTMLElement>('[data-status-calendar-tooltip-root]');
     const outsideButton = outsideRoot?.querySelector('button');
     if (!outsideRoot || !outsideButton) {
       throw new Error('non-calendar fixture is incomplete');
@@ -424,24 +382,17 @@ describe('registerStatusCalendarYearInteractions', () => {
     outsideButton.dispatchEvent(
       new PointerEvent('pointerover', {
         bubbles: true,
-        pointerType: 'mouse',
-      }),
+        pointerType: 'mouse'
+      })
     );
     outsideButton.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
-    const openedOutsideCalendar = outsideRoot.hasAttribute(
-      'data-status-calendar-tooltip-open',
-    );
+    const openedOutsideCalendar = outsideRoot.hasAttribute('data-status-calendar-tooltip-open');
     outsideRoot.setAttribute('data-status-calendar-tooltip-open', '');
-    document.body.dispatchEvent(
-      new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }),
-    );
+    document.body.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
     document.dispatchEvent(new Event('astro:page-load'));
-    const todayInitializationsOutsideCalendar =
-      querySelectorAll.mock.calls.filter(
-        ([selector]) =>
-          selector ===
-          '[data-status-calendar-today], .status-calendar-date--today',
-      ).length;
+    const todayInitializationsOutsideCalendar = querySelectorAll.mock.calls.filter(
+      ([selector]) => selector === '[data-status-calendar-today], .status-calendar-date--today'
+    ).length;
 
     querySelectorAll.mockClear();
     vi.setSystemTime(new Date('2027-08-24T12:00:00.000Z'));
@@ -456,31 +407,23 @@ describe('registerStatusCalendarYearInteractions', () => {
     returnedCalendar.link.dispatchEvent(
       new PointerEvent('pointerover', {
         bubbles: true,
-        pointerType: 'mouse',
-      }),
+        pointerType: 'mouse'
+      })
     );
     const returnedTodayInitializations = querySelectorAll.mock.calls.filter(
-      ([selector]) =>
-        selector ===
-        '[data-status-calendar-today], .status-calendar-date--today',
+      ([selector]) => selector === '[data-status-calendar-today], .status-calendar-date--today'
     ).length;
 
     expect({
       firstTodayInitializations,
-      openedInitially: firstCalendar.root.hasAttribute(
-        'data-status-calendar-tooltip-open',
-      ),
+      openedInitially: firstCalendar.root.hasAttribute('data-status-calendar-tooltip-open'),
       openedOutsideCalendar,
-      keptOpenAfterOutsideEscape: outsideRoot.hasAttribute(
-        'data-status-calendar-tooltip-open',
-      ),
+      keptOpenAfterOutsideEscape: outsideRoot.hasAttribute('data-status-calendar-tooltip-open'),
       todayInitializationsOutsideCalendar,
       returnedTodayInitializations,
       listenerCallsAfterReturn: tooltipBounds.mock.calls.length,
-      openedAfterReturn: returnedCalendar.root.hasAttribute(
-        'data-status-calendar-tooltip-open',
-      ),
-      todayAfterReturn: returnedCalendar.root.dataset.statusCalendarToday,
+      openedAfterReturn: returnedCalendar.root.hasAttribute('data-status-calendar-tooltip-open'),
+      todayAfterReturn: returnedCalendar.root.dataset.statusCalendarToday
     }).toMatchInlineSnapshot(`
       {
         "firstTodayInitializations": 1,

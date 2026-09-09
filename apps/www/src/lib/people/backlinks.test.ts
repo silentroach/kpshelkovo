@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  createEntityMentionGraph,
-  type EntityMentionSourceRef,
-} from '../mentions';
+import { createEntityMentionGraph, type EntityMentionSourceRef } from '../mentions';
 import { createPeopleBacklinksFromGraph } from './backlinks';
 
 const refs: readonly EntityMentionSourceRef[] = [
@@ -14,7 +11,7 @@ const refs: readonly EntityMentionSourceRef[] = [
     htmlUrl: '/news/2026/05/power-outage/',
     markdownUrl: '/news/2026/05/power-outage/index.md',
     mentionedAt: '2026-05-03T08:00:00.000+03:00',
-    sortKey: 1777770000000,
+    sortKey: 1777770000000
   },
   {
     target: { type: 'person', slug: 'kschemelinin' },
@@ -23,7 +20,7 @@ const refs: readonly EntityMentionSourceRef[] = [
     htmlUrl: '/reviews/2026-06-25-test/',
     markdownUrl: '/reviews/2026-06-25-test/index.md',
     mentionedAt: '2026-06-25T00:00:00.000Z',
-    sortKey: 1782345600000,
+    sortKey: 1782345600000
   },
   {
     target: { type: 'person', slug: 'kschemelinin' },
@@ -32,7 +29,7 @@ const refs: readonly EntityMentionSourceRef[] = [
     htmlUrl: '/sarafan/fence/ivan/',
     markdownUrl: '/sarafan/fence/ivan/index.md',
     mentionedAt: '2026-07-06T00:00:00.000Z',
-    sortKey: 1783296000000,
+    sortKey: 1783296000000
   },
   {
     target: { type: 'person', slug: 'kschemelinin' },
@@ -41,16 +38,16 @@ const refs: readonly EntityMentionSourceRef[] = [
     htmlUrl: '/map/titanic/',
     markdownUrl: '/map/titanic/index.md',
     mentionedAt: '2026-08-19T00:00:00.000Z',
-    sortKey: 1787097600000,
-  },
+    sortKey: 1787097600000
+  }
 ];
 
 describe('createPeopleBacklinksFromGraph', () => {
   it('adapts domain mention graph refs into domain people backlinks', () => {
     expect(
       createPeopleBacklinksFromGraph(createEntityMentionGraph(refs), {
-        slug: 'kschemelinin',
-      }),
+        slug: 'kschemelinin'
+      })
     ).toMatchInlineSnapshot(`
       {
         "contacts": [

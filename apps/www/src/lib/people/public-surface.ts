@@ -9,14 +9,14 @@ import {
   peopleOpenApiPath,
   peopleSchemaPath,
   personMarkdownPattern,
-  personPattern,
+  personPattern
 } from './routes';
 
 export const peoplePublicSurfaceSlice = {
   owner: {
     id: 'people',
     label: 'Люди',
-    entryPath: peopleMarkdownPath(),
+    entryPath: peopleMarkdownPath()
   },
   surfaces: [
     {
@@ -26,7 +26,7 @@ export const peoplePublicSurfaceSlice = {
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
       discoveryRoles: ['section-entry', 'markdown-companion'],
-      catalogRole: 'anchor',
+      catalogRole: 'anchor'
     },
     {
       id: 'people:profile',
@@ -34,7 +34,7 @@ export const peoplePublicSurfaceSlice = {
       routePattern: personPattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'people:profile-markdown',
@@ -42,7 +42,7 @@ export const peoplePublicSurfaceSlice = {
       routePattern: personMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'people:data',
@@ -51,7 +51,7 @@ export const peoplePublicSurfaceSlice = {
       mediaType: 'application/json',
       cacheClass: 'data',
       discoveryRoles: ['data-feed', 'root-catalog'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'people:schema',
@@ -60,7 +60,7 @@ export const peoplePublicSurfaceSlice = {
       mediaType: 'application/schema+json',
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
-      catalogRole: 'service-desc',
+      catalogRole: 'service-desc'
     },
     {
       id: 'people:openapi',
@@ -69,7 +69,7 @@ export const peoplePublicSurfaceSlice = {
       mediaType: 'application/vnd.oai.openapi+json',
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
-      catalogRole: 'service-desc',
+      catalogRole: 'service-desc'
     },
     {
       id: 'people:api-catalog',
@@ -79,7 +79,7 @@ export const peoplePublicSurfaceSlice = {
       cacheClass: 'catalog',
       discoveryRoles: ['api-catalog', 'root-catalog'],
       catalogRole: 'service-desc',
-      sectionCatalogRole: false,
+      sectionCatalogRole: false
     },
     {
       id: 'people:llms',
@@ -88,7 +88,7 @@ export const peoplePublicSurfaceSlice = {
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms', 'root-catalog'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'people:llms-full',
@@ -97,7 +97,7 @@ export const peoplePublicSurfaceSlice = {
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms'],
-      catalogRole: 'item',
-    },
-  ],
+      catalogRole: 'item'
+    }
+  ]
 } satisfies PublicSurfaceSlice;

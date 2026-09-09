@@ -1,9 +1,11 @@
 import { join } from 'node:path';
+
 import { describe, expect, it } from 'vitest';
+
 import {
   auditNonHtmlAnchorPrefetch,
   findNonHtmlAnchorPrefetchViolations,
-  formatNonHtmlAnchorPrefetchViolation,
+  formatNonHtmlAnchorPrefetchViolation
 } from '@/lib/non-html-link-prefetch';
 
 describe('non-HTML link prefetch guard', () => {
@@ -20,11 +22,10 @@ describe('non-HTML link prefetch guard', () => {
 
     const violations = findNonHtmlAnchorPrefetchViolations({
       code,
-      filePath: 'Fixture.astro',
+      filePath: 'Fixture.astro'
     });
 
-    expect(violations.map(formatNonHtmlAnchorPrefetchViolation))
-      .toMatchInlineSnapshot(`
+    expect(violations.map(formatNonHtmlAnchorPrefetchViolation)).toMatchInlineSnapshot(`
         [
           "Fixture.astro:2:7 links to /files/rules.pdf without data-astro-prefetch=\"false\". Preferred fix: use ResourceLink, or add the attribute explicitly.",
           "Fixture.astro:3:7 links to /data/feed.json without data-astro-prefetch=\"false\". Preferred fix: use ResourceLink, or add the attribute explicitly.",
@@ -36,7 +37,7 @@ describe('non-HTML link prefetch guard', () => {
 
   it('keeps current source anchors guarded', () => {
     const violations = auditNonHtmlAnchorPrefetch({
-      rootDir: join(process.cwd(), 'src'),
+      rootDir: join(process.cwd(), 'src')
     });
 
     expect(violations.map(formatNonHtmlAnchorPrefetchViolation)).toEqual([]);

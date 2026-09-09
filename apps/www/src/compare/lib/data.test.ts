@@ -14,22 +14,22 @@ const rawSettlement: RawSettlement = {
     address_text: 'Московская область',
     lat: 55.1,
     lng: 37.1,
-    district: 'Тестовый район',
+    district: 'Тестовый район'
   },
   tariff: {
     value: 12_000,
     unit: 'rub_per_lot',
-    period: 'month',
+    period: 'month'
   },
   infrastructure: {
     roads: 'partial_asphalt',
-    video_surveillance: 'checkpoint_only',
+    video_surveillance: 'checkpoint_only'
   },
   common_spaces: {
-    walking_routes: 'yes',
+    walking_routes: 'yes'
   },
   service_model: {
-    garbage_collection: 'yes',
+    garbage_collection: 'yes'
   },
   sources: [
     {
@@ -37,15 +37,15 @@ const rawSettlement: RawSettlement = {
       url: 'https://example.com/source',
       type: 'official',
       date_checked: '2026-04-03',
-      comment: '',
-    },
-  ],
+      comment: ''
+    }
+  ]
 };
 
 let rawSettlements = [rawSettlement];
 
 vi.mock('astro:content', () => ({
-  getCollection: vi.fn(async () => rawSettlements.map((data) => ({ data }))),
+  getCollection: vi.fn(async () => rawSettlements.map((data) => ({ data })))
 }));
 
 afterEach(() => {
@@ -66,23 +66,23 @@ describe('loadSettlements', () => {
       shortName: 'Тестовый',
       isBaseline: true,
       location: {
-        addressText: 'Московская область',
+        addressText: 'Московская область'
       },
       tariff: {
         unit: 'perLot',
         normalizedPerSotkaMonth: 1_200,
-        normalizedIsEstimate: true,
+        normalizedIsEstimate: true
       },
       infrastructure: {
         roads: 'partlyAsphalt',
-        videoSurveillance: 'checkpointOnly',
+        videoSurveillance: 'checkpointOnly'
       },
       commonSpaces: {
-        walkingRoutes: 'yes',
+        walkingRoutes: 'yes'
       },
       serviceModel: {
-        garbageCollection: 'yes',
-      },
+        garbageCollection: 'yes'
+      }
     });
     expect('short_name' in settlements[0]).toBe(false);
     expect('common_spaces' in settlements[0]).toBe(false);
@@ -93,7 +93,7 @@ describe('loadSettlements', () => {
     rawSettlements = [{ ...rawSettlement, is_baseline: false }];
 
     await expect(loadSettlements()).rejects.toThrowErrorMatchingInlineSnapshot(
-      `[Error: Settlements collection must contain exactly one baseline settlement; found 0]`,
+      `[Error: Settlements collection must contain exactly one baseline settlement; found 0]`
     );
   });
 
@@ -105,12 +105,12 @@ describe('loadSettlements', () => {
         name: 'Другая база',
         short_name: 'Другая',
         slug: 'duplicate-baseline',
-        website: 'https://example.com/duplicate',
-      },
+        website: 'https://example.com/duplicate'
+      }
     ];
 
     await expect(loadSettlements()).rejects.toThrowErrorMatchingInlineSnapshot(
-      `[Error: Settlements collection must contain exactly one baseline settlement; found 2 (duplicate-baseline, test)]`,
+      `[Error: Settlements collection must contain exactly one baseline settlement; found 2 (duplicate-baseline, test)]`
     );
   });
 
@@ -119,10 +119,7 @@ describe('loadSettlements', () => {
     vi.resetModules();
     const { loadAllData: loadBuildData } = await import('./data');
 
-    const [first, second] = await Promise.all([
-      loadBuildData(),
-      loadBuildData(),
-    ]);
+    const [first, second] = await Promise.all([loadBuildData(), loadBuildData()]);
     const third = await loadBuildData();
 
     expect(getCollection).toHaveBeenCalledOnce();

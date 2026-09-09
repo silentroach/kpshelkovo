@@ -16,18 +16,14 @@ const INLINE_NODE_TYPES = new Set([
   'inlineCode',
   'link',
   'strong',
-  'text',
+  'text'
 ]);
 
 const fail = (context: string, message: string): never => {
   throw new Error(`${context} ${message}`);
 };
 
-const validateLink = (
-  url: string,
-  articleUrls: ReadonlySet<string>,
-  context: string,
-): void => {
+const validateLink = (url: string, articleUrls: ReadonlySet<string>, context: string): void => {
   const path = url.split('#', 1)[0] ?? '';
 
   if (
@@ -38,7 +34,7 @@ const validateLink = (
   ) {
     fail(
       context,
-      `contains invalid link "${url}"; link to an existing news article with a root-relative URL`,
+      `contains invalid link "${url}"; link to an existing news article with a root-relative URL`
     );
   }
 };
@@ -46,7 +42,7 @@ const validateLink = (
 function validateInlineNode(
   node: MarkdownNode,
   articleUrls: ReadonlySet<string>,
-  context: string,
+  context: string
 ): void {
   if (!INLINE_NODE_TYPES.has(node.type)) {
     fail(context, 'may contain only paragraphs with inline formatting');
@@ -64,7 +60,7 @@ function validateInlineNode(
 export const validateArchiveSummaryMarkdown = (
   markdown: string,
   articleUrls: ReadonlySet<string>,
-  context: string,
+  context: string
 ): void => {
   const tree = parser.parse(markdown) as MarkdownNode;
 

@@ -19,11 +19,9 @@ const need = (value: string, name: string): string => {
   return text;
 };
 
-export const personPath = (slug: string): string =>
-  `${PEOPLE_ROOT}${need(slug, 'slug')}/`;
+export const personPath = (slug: string): string => `${PEOPLE_ROOT}${need(slug, 'slug')}/`;
 
-export const personMarkdownPath = (slug: string): string =>
-  `${personPath(slug)}index.md`;
+export const personMarkdownPath = (slug: string): string => `${personPath(slug)}index.md`;
 
 export const personPattern = (): string => '/people/:slug/';
 
@@ -61,8 +59,6 @@ export const peopleOpenApiUrl = (): string => withBase(PEOPLE_OPENAPI);
 
 export const personUrl = (slug: string): string => withBase(personPath(slug));
 
-export const personMarkdownUrl = (slug: string): string =>
-  withBase(personMarkdownPath(slug));
+export const personMarkdownUrl = (slug: string): string => withBase(personMarkdownPath(slug));
 
-export const personCanonical = (slug: string): string =>
-  canon(personPath(slug));
+export const personCanonical = (slug: string): string => canon(personPath(slug));

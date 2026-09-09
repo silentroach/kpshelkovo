@@ -45,8 +45,5 @@ export interface SearchClient {
   readonly init?: () => Promise<void>;
   readonly preload?: (query: string) => Promise<void>;
   /** A stale request resolves to undefined so callers can leave newer state intact. */
-  readonly search: (
-    query: string,
-    limit?: number,
-  ) => Promise<SearchResponse | undefined>;
+  readonly search: (query: string, limit?: number) => Promise<SearchResponse | undefined>;
 }

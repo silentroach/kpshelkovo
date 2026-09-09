@@ -1,15 +1,11 @@
+import { formatApiCatalogLink } from '@/lib/api-catalog-response';
 import {
   surfaceHref,
   type PublicSurface,
-  type PublicSurfaceCatalogRole,
+  type PublicSurfaceCatalogRole
 } from '@/lib/public-surface';
-import { formatApiCatalogLink } from '@/lib/api-catalog-response';
 
-import { newsPublicSurfaceSlice } from './public-surface';
-import { articlesDataPath, articlesSchemaPath } from './routes';
-import { NEWS_AREAS } from './schema';
 import type { RequiredProperties } from './discovery.types';
-import type { NewsDataset } from './types';
 import {
   NEWS_PUBLIC_AUTHOR_KINDS,
   NEWS_PUBLIC_PAYLOAD_SCHEMA_VERSION,
@@ -25,8 +21,12 @@ import {
   type NewsPublicPayload as NewsDiscoveryPayload,
   type NewsPublicPhoto as NewsDiscoveryPhoto,
   type NewsPublicTag as NewsDiscoveryTag,
-  type NewsPublicTagPage as NewsDiscoveryTagPage,
+  type NewsPublicTagPage as NewsDiscoveryTagPage
 } from './public-dto';
+import { newsPublicSurfaceSlice } from './public-surface';
+import { articlesDataPath, articlesSchemaPath } from './routes';
+import { NEWS_AREAS } from './schema';
+import type { NewsDataset } from './types';
 
 export const OAS = 'application/vnd.oai.openapi+json';
 
@@ -42,7 +42,7 @@ export type {
   NewsDiscoveryPayload,
   NewsDiscoveryPhoto,
   NewsDiscoveryTag,
-  NewsDiscoveryTagPage,
+  NewsDiscoveryTagPage
 };
 
 const NEWS_ARTICLES_PAYLOAD_SCHEMA = 'NewsArticlesPayload';
@@ -53,28 +53,23 @@ const abs = (root: string, path: string): string =>
 
 const server = (root: string): string => root.replace(/\/$/, '');
 
-const star = (
-  value: string,
-): readonly { readonly value: string; readonly language: 'ru' }[] => [
-  { value, language: 'ru' },
+const star = (value: string): readonly { readonly value: string; readonly language: 'ru' }[] => [
+  { value, language: 'ru' }
 ];
 
 const CATALOG_TITLE_OVERRIDES: Readonly<Partial<Record<string, string>>> = {
-  'news:data':
-    'Основная машиночитаемая лента новостей, включая необязательные события',
+  'news:data': 'Основная машиночитаемая лента новостей, включая необязательные события',
   'news:llms': 'Короткий обзор llms.txt',
-  'news:llms-full': 'Подробный обзор llms-full.txt',
+  'news:llms-full': 'Подробный обзор llms-full.txt'
 };
 
-const sectionCatalogRole = (
-  surface: PublicSurface,
-): PublicSurfaceCatalogRole | false | undefined =>
+const sectionCatalogRole = (surface: PublicSurface): PublicSurfaceCatalogRole | false | undefined =>
   surface.sectionCatalogRole ?? surface.catalogRole;
 
 const catalogEntry = (root: string, surface: PublicSurface) => ({
   href: surfaceHref(root, surface),
   type: surface.mediaType,
-  'title*': star(CATALOG_TITLE_OVERRIDES[surface.id] ?? surface.label),
+  'title*': star(CATALOG_TITLE_OVERRIDES[surface.id] ?? surface.label)
 });
 
 const catalogEntries = (root: string, role: PublicSurfaceCatalogRole) =>
@@ -97,7 +92,7 @@ const linkRelation = (surface: PublicSurface) => {
 const formatLink = (
   root: string,
   surface: PublicSurface,
-  relation: 'api-catalog' | 'service-desc',
+  relation: 'api-catalog' | 'service-desc'
 ): string =>
   relation === 'api-catalog'
     ? formatApiCatalogLink(surfaceHref(root, surface))
@@ -105,74 +100,67 @@ const formatLink = (
 
 const text = (minLength = 0): Record<string, unknown> => ({
   type: 'string',
-  ...(minLength > 0 ? { minLength } : {}),
+  ...(minLength > 0 ? { minLength } : {})
 });
 
 const uri = (): Record<string, unknown> => ({
   type: 'string',
-  format: 'uri',
+  format: 'uri'
 });
 
 const dateTime = (): Record<string, unknown> => ({
   type: 'string',
-  format: 'date-time',
+  format: 'date-time'
 });
 
 const flag = (): Record<string, unknown> => ({
-  type: 'boolean',
+  type: 'boolean'
 });
 
-const integer = (
-  minimum?: number,
-  maximum?: number,
-): Record<string, unknown> => ({
+const integer = (minimum?: number, maximum?: number): Record<string, unknown> => ({
   type: 'integer',
   ...(minimum !== undefined ? { minimum } : {}),
-  ...(maximum !== undefined ? { maximum } : {}),
+  ...(maximum !== undefined ? { maximum } : {})
 });
 
-const numeric = (
-  minimum?: number,
-  maximum?: number,
-): Record<string, unknown> => ({
+const numeric = (minimum?: number, maximum?: number): Record<string, unknown> => ({
   type: 'number',
   ...(minimum !== undefined ? { minimum } : {}),
-  ...(maximum !== undefined ? { maximum } : {}),
+  ...(maximum !== undefined ? { maximum } : {})
 });
 
 const list = (
   items: Record<string, unknown>,
-  extra?: Record<string, unknown>,
+  extra?: Record<string, unknown>
 ): Record<string, unknown> => ({
   type: 'array',
   items,
-  ...(extra ?? {}),
+  ...(extra ?? {})
 });
 
 const obj = (
   properties: Record<string, unknown>,
-  required: readonly string[],
+  required: readonly string[]
 ): Record<string, unknown> => ({
   type: 'object',
   additionalProperties: false,
   properties,
-  required,
+  required
 });
 
-const requiredKeys = <T extends object>(
-  properties: RequiredProperties<T>,
-): readonly string[] => Object.keys(properties);
+const requiredKeys = <T extends object>(properties: RequiredProperties<T>): readonly string[] =>
+  Object.keys(properties);
 
 const eventParticipantProperties = {
   name: text(1),
   type: {
-    enum: ['organization', 'person'],
-  },
+    enum: ['organization', 'person']
+  }
 } satisfies Record<keyof NewsDiscoveryEventOrganizer, Record<string, unknown>>;
 
 const eventParticipantRequired = requiredKeys<NewsDiscoveryEventOrganizer>({
   name: true,
-  type: true,
+  type: true
 });
 
 const eventProperties = {
@@ -183,23 +171,23 @@ const eventProperties = {
   ends_at: dateTime(),
   location: text(1),
   coordinates: {
-    $ref: '#/$defs/coordinates',
+    $ref: '#/$defs/coordinates'
   },
   map_url: uri(),
   ics_url: uri(),
   organizer: {
-    $ref: '#/$defs/eventParticipant',
+    $ref: '#/$defs/eventParticipant'
   },
   performer: list({
-    $ref: '#/$defs/eventParticipant',
-  }),
+    $ref: '#/$defs/eventParticipant'
+  })
 } satisfies Record<keyof NewsDiscoveryEvent, Record<string, unknown>>;
 
 const eventRequired = requiredKeys<NewsDiscoveryEvent>({
   slug: true,
   title: true,
   starts_at: true,
-  ics_url: true,
+  ics_url: true
 });
 
 function rewriteSchemaRefs(value: unknown, schemaRef: string): unknown {
@@ -213,24 +201,19 @@ function rewriteSchemaRefs(value: unknown, schemaRef: string): unknown {
 
   return Object.fromEntries(
     Object.entries(value).map(([key, entry]) => {
-      if (
-        key === '$ref' &&
-        typeof entry === 'string' &&
-        entry.startsWith('#/')
-      ) {
+      if (key === '$ref' && typeof entry === 'string' && entry.startsWith('#/')) {
         return [key, `${schemaRef}${entry.slice(1)}`];
       }
 
       return [key, rewriteSchemaRefs(entry, schemaRef)];
-    }),
+    })
   );
 }
 
 export const buildNewsPayload = (
   data: NewsDataset,
-  opts?: { readonly generated_at?: Date },
-): NewsDiscoveryPayload =>
-  toNewsPublicPayload(data, { generatedAt: opts?.generated_at });
+  opts?: { readonly generated_at?: Date }
+): NewsDiscoveryPayload => toNewsPublicPayload(data, { generatedAt: opts?.generated_at });
 
 export function schema(root: string): Record<string, unknown> {
   return {
@@ -248,29 +231,29 @@ export function schema(root: string): Record<string, unknown> {
       'total_count',
       'articles',
       'archives',
-      'tags',
+      'tags'
     ],
     properties: {
       schema_version: {
-        const: NEWS_PAYLOAD_SCHEMA_VERSION,
+        const: NEWS_PAYLOAD_SCHEMA_VERSION
       },
       generated_at: dateTime(),
       updated_at: dateTime(),
       total_count: integer(0),
       articles: list({
-        $ref: '#/$defs/article',
+        $ref: '#/$defs/article'
       }),
       archives: obj(
         {
           years: list({
-            $ref: '#/$defs/archiveYear',
-          }),
+            $ref: '#/$defs/archiveYear'
+          })
         },
-        ['years'],
+        ['years']
       ),
       tags: list({
-        $ref: '#/$defs/tagPage',
-      }),
+        $ref: '#/$defs/tagPage'
+      })
     },
     $defs: {
       author: obj(
@@ -278,19 +261,19 @@ export function schema(root: string): Record<string, unknown> {
           id: text(1),
           name: text(1),
           kind: {
-            enum: [...NEWS_PUBLIC_AUTHOR_KINDS],
+            enum: [...NEWS_PUBLIC_AUTHOR_KINDS]
           },
-          url: uri(),
+          url: uri()
         },
-        ['id', 'name', 'kind'],
+        ['id', 'name', 'kind']
       ),
       tag: obj(
         {
           label: text(1),
           key: text(1),
-          url: uri(),
+          url: uri()
         },
-        ['label', 'key', 'url'],
+        ['label', 'key', 'url']
       ),
       tagPage: obj(
         {
@@ -298,9 +281,9 @@ export function schema(root: string): Record<string, unknown> {
           key: text(1),
           count: integer(0),
           url: uri(),
-          markdown_url: uri(),
+          markdown_url: uri()
         },
-        ['label', 'key', 'count', 'url', 'markdown_url'],
+        ['label', 'key', 'count', 'url', 'markdown_url']
       ),
       photo: obj(
         {
@@ -308,45 +291,42 @@ export function schema(root: string): Record<string, unknown> {
           width: integer(1),
           height: integer(1),
           alt: text(1),
-          caption: text(1),
+          caption: text(1)
         },
-        ['url', 'width', 'height', 'alt'],
+        ['url', 'width', 'height', 'alt']
       ),
       attachment: obj(
         {
           title: text(1),
           url: uri(),
           type: text(1),
-          size: text(1),
+          size: text(1)
         },
-        ['title', 'url'],
+        ['title', 'url']
       ),
       cover: obj(
         {
           url: uri(),
           alt: text(1),
           width: integer(1),
-          height: integer(1),
+          height: integer(1)
         },
-        ['url', 'alt', 'width', 'height'],
+        ['url', 'alt', 'width', 'height']
       ),
       coordinates: obj(
         {
           lat: numeric(-90, 90),
-          lng: numeric(-180, 180),
+          lng: numeric(-180, 180)
         },
-        ['lat', 'lng'],
+        ['lat', 'lng']
       ),
-      eventParticipant: obj(
-        eventParticipantProperties,
-        eventParticipantRequired,
-      ),
+      eventParticipant: obj(eventParticipantProperties, eventParticipantRequired),
       event: obj(eventProperties, eventRequired),
       article: obj(
         {
           id: {
             type: 'string',
-            pattern: '^\\d{4}/\\d{2}/[^/]+$',
+            pattern: '^\\d{4}/\\d{2}/[^/]+$'
           },
           title: text(1),
           summary: text(1),
@@ -360,38 +340,38 @@ export function schema(root: string): Record<string, unknown> {
           source_url: uri(),
           pinned: flag(),
           author: {
-            $ref: '#/$defs/author',
+            $ref: '#/$defs/author'
           },
           areas: list(
             {
-              enum: [...NEWS_AREAS],
+              enum: [...NEWS_AREAS]
             },
             {
               minItems: 1,
-              uniqueItems: true,
-            },
+              uniqueItems: true
+            }
           ),
           tags: list({
-            $ref: '#/$defs/tag',
+            $ref: '#/$defs/tag'
           }),
           cover: {
-            $ref: '#/$defs/cover',
+            $ref: '#/$defs/cover'
           },
           events: list(
             {
-              $ref: '#/$defs/event',
+              $ref: '#/$defs/event'
             },
             {
-              minItems: 1,
-            },
+              minItems: 1
+            }
           ),
           photos: list({
-            $ref: '#/$defs/photo',
+            $ref: '#/$defs/photo'
           }),
           attachments: list({
-            $ref: '#/$defs/attachment',
+            $ref: '#/$defs/attachment'
           }),
-          body_markdown: text(),
+          body_markdown: text()
         },
         [
           'id',
@@ -410,8 +390,8 @@ export function schema(root: string): Record<string, unknown> {
           'tags',
           'photos',
           'attachments',
-          'body_markdown',
-        ],
+          'body_markdown'
+        ]
       ),
       archiveMonth: obj(
         {
@@ -419,9 +399,9 @@ export function schema(root: string): Record<string, unknown> {
           month: integer(1, 12),
           count: integer(0),
           url: uri(),
-          markdown_url: uri(),
+          markdown_url: uri()
         },
-        ['year', 'month', 'count', 'url', 'markdown_url'],
+        ['year', 'month', 'count', 'url', 'markdown_url']
       ),
       archiveYear: obj(
         {
@@ -430,21 +410,19 @@ export function schema(root: string): Record<string, unknown> {
           url: uri(),
           markdown_url: uri(),
           months: list({
-            $ref: '#/$defs/archiveMonth',
-          }),
+            $ref: '#/$defs/archiveMonth'
+          })
         },
-        ['year', 'count', 'url', 'markdown_url', 'months'],
-      ),
-    },
+        ['year', 'count', 'url', 'markdown_url', 'months']
+      )
+    }
   };
 }
 
 export function openapi(root: string): Record<string, unknown> {
   const schemaRef = `#/components/schemas/${NEWS_ARTICLES_PAYLOAD_SCHEMA}`;
   const body = Object.fromEntries(
-    Object.entries(schema(root)).filter(
-      ([key]) => key !== '$schema' && key !== '$id',
-    ),
+    Object.entries(schema(root)).filter(([key]) => key !== '$schema' && key !== '$id')
   );
   const componentBody = rewriteSchemaRefs(body, schemaRef);
 
@@ -455,12 +433,12 @@ export function openapi(root: string): Record<string, unknown> {
       title: 'Шелково News Feed',
       version: '1.0.0',
       description:
-        'OpenAPI-описание /news/data/articles.json только для чтения: метаданные ленты, полный body_markdown, необязательные события статей, архивы и теги.',
+        'OpenAPI-описание /news/data/articles.json только для чтения: метаданные ленты, полный body_markdown, необязательные события статей, архивы и теги.'
     },
     servers: [
       {
-        url: server(root),
-      },
+        url: server(root)
+      }
     ],
     paths: {
       [articlesDataPath()]: {
@@ -475,26 +453,26 @@ export function openapi(root: string): Record<string, unknown> {
               content: {
                 'application/json': {
                   schema: {
-                    $ref: schemaRef,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
+                    $ref: schemaRef
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     },
     components: {
       schemas: {
-        [NEWS_ARTICLES_PAYLOAD_SCHEMA]: componentBody,
-      },
-    },
+        [NEWS_ARTICLES_PAYLOAD_SCHEMA]: componentBody
+      }
+    }
   };
 }
 
 export function catalog(root: string): Record<string, unknown> {
   const anchor = newsPublicSurfaceSlice.surfaces.find(
-    (surface) => sectionCatalogRole(surface) === 'anchor',
+    (surface) => sectionCatalogRole(surface) === 'anchor'
   );
   if (!anchor) {
     throw new Error('news public surface registry has no catalog anchor');
@@ -505,9 +483,9 @@ export function catalog(root: string): Record<string, unknown> {
       {
         anchor: surfaceHref(root, anchor),
         item: catalogEntries(root, 'item'),
-        'service-desc': catalogEntries(root, 'service-desc'),
-      },
-    ],
+        'service-desc': catalogEntries(root, 'service-desc')
+      }
+    ]
   };
 }
 
@@ -521,9 +499,8 @@ export const links = (root: string): string =>
     .join(', ');
 
 export const self = (root: string): string => {
-  const surface = newsPublicSurfaceSlice.surfaces.find(
-    (candidate: PublicSurface) =>
-      candidate.discoveryRoles.includes('api-catalog'),
+  const surface = newsPublicSurfaceSlice.surfaces.find((candidate: PublicSurface) =>
+    candidate.discoveryRoles.includes('api-catalog')
   );
   if (!surface) {
     throw new Error('news public surface registry has no API catalog');

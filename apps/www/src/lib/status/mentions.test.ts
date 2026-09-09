@@ -15,28 +15,20 @@ const incident = (input?: {
   readonly mentions?: StatusIncidentWithDetail['mentions'];
 }): Pick<
   StatusIncidentWithDetail,
-  | 'id'
-  | 'title'
-  | 'url'
-  | 'markdownUrl'
-  | 'excerpt'
-  | 'mentions'
-  | 'started'
-  | 'sortLastChangeAt'
+  'id' | 'title' | 'url' | 'markdownUrl' | 'excerpt' | 'mentions' | 'started' | 'sortLastChangeAt'
 > => ({
   id: '2026/04/electricity-river-10kv-line-damage',
   title: 'Отключение электричества в Шелково Ривер',
   url: '/status/incidents/2026/04/electricity-river-10kv-line-damage/',
-  markdownUrl:
-    '/status/incidents/2026/04/electricity-river-10kv-line-damage/index.md',
+  markdownUrl: '/status/incidents/2026/04/electricity-river-10kv-line-damage/index.md',
   excerpt: 'Как отметил Кирилл Щемелинин, повреждение было редким.',
   mentions: input?.mentions ?? [target],
   started: {
     at: new Date('2026-04-22T11:30:00+03:00'),
     iso: '2026-04-22T11:30:00+03:00',
-    hasTime: true,
+    hasTime: true
   },
-  sortLastChangeAt: 1770000000000,
+  sortLastChangeAt: 1770000000000
 });
 
 describe('createStatusIncidentMentionRefs', () => {
@@ -47,23 +39,21 @@ describe('createStatusIncidentMentionRefs', () => {
         source: {
           section: 'status',
           kind: 'incident',
-          id: '2026/04/electricity-river-10kv-line-damage',
+          id: '2026/04/electricity-river-10kv-line-damage'
         },
         title: 'Отключение электричества в Шелково Ривер',
-        htmlUrl:
-          '/status/incidents/2026/04/electricity-river-10kv-line-damage/',
-        markdownUrl:
-          '/status/incidents/2026/04/electricity-river-10kv-line-damage/index.md',
+        htmlUrl: '/status/incidents/2026/04/electricity-river-10kv-line-damage/',
+        markdownUrl: '/status/incidents/2026/04/electricity-river-10kv-line-damage/index.md',
         excerpt: 'Как отметил Кирилл Щемелинин, повреждение было редким.',
         mentionedAt: '2026-04-22T11:30:00+03:00',
-        sortKey: 1770000000000,
-      },
+        sortKey: 1770000000000
+      }
     ]);
   });
 
   it('dedupes repeated targets inside one incident', () => {
-    expect(
-      createStatusIncidentMentionRefs(incident({ mentions: [target, target] })),
-    ).toHaveLength(1);
+    expect(createStatusIncidentMentionRefs(incident({ mentions: [target, target] }))).toHaveLength(
+      1
+    );
   });
 });

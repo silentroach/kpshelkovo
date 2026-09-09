@@ -1,17 +1,11 @@
 import { ChangeFreqEnum, type SitemapItem } from '@astrojs/sitemap';
 import { compareRuText, dateTimeFromISO, padNumber } from '@shelkovo/format';
 
-import {
-  availableStatusCalendarYears,
-  buildStatusCalendarProjection,
-} from './status/calendar';
+import { parseContentDate } from './content-date';
+import { availableStatusCalendarYears, buildStatusCalendarProjection } from './status/calendar';
 import type { StatusCalendarDay } from './status/calendar.types';
 import { resolveStatusIncidentPhase } from './status/lifecycle';
-import {
-  statusCalendarMonthPath,
-  statusCalendarYearPath,
-} from './status/routes';
-import { parseContentDate } from './content-date';
+import { statusCalendarMonthPath, statusCalendarYearPath } from './status/routes';
 import type { StatusKind } from './status/schema';
 
 export interface SitemapMetadata {
@@ -81,7 +75,7 @@ const CHANGEFREQ = {
   daily: ChangeFreqEnum.DAILY,
   hourly: ChangeFreqEnum.HOURLY,
   monthly: ChangeFreqEnum.MONTHLY,
-  yearly: ChangeFreqEnum.YEARLY,
+  yearly: ChangeFreqEnum.YEARLY
 } as const;
 
 const decodePathname = (value: string): string => {
@@ -93,9 +87,7 @@ const decodePathname = (value: string): string => {
 };
 
 export const sitemapPathKey = (url: string): string => {
-  const pathname = decodePathname(
-    new URL(url, 'https://local.invalid').pathname,
-  )
+  const pathname = decodePathname(new URL(url, 'https://local.invalid').pathname)
     .replace(/\/index\.html$/iu, '/')
     .replace(/\/index$/iu, '/');
   const normalized = pathname.startsWith('/') ? pathname : `/${pathname}`;
@@ -104,9 +96,7 @@ export const sitemapPathKey = (url: string): string => {
     return normalized;
   }
 
-  return normalized.endsWith('/') || EXTENSION.test(normalized)
-    ? normalized
-    : `${normalized}/`;
+  return normalized.endsWith('/') || EXTENSION.test(normalized) ? normalized : `${normalized}/`;
 };
 
 export const shouldIncludeSitemapPage = (url: string): boolean => {
@@ -128,10 +118,7 @@ const timestampMs = (value: string): number => {
 const statusTimestampMs = (value: string): number =>
   parseContentDate(value)?.at.valueOf() ?? timestampMs(value);
 
-const laterLastmod = (
-  a: string | undefined,
-  b: string | undefined,
-): string | undefined => {
+const laterLastmod = (a: string | undefined, b: string | undefined): string | undefined => {
   if (!a) {
     return b;
   }
@@ -144,45 +131,37 @@ const laterLastmod = (
 };
 
 const maxLastmod = (values: readonly string[]): string | undefined =>
-  values.reduce<string | undefined>(
-    (latest, value) => laterLastmod(latest, value),
-    undefined,
-  );
+  values.reduce<string | undefined>((latest, value) => laterLastmod(latest, value), undefined);
 
 const incidentLastmod = (incident: SitemapStatusIncidentInput): string =>
   incident.endedIso ?? incident.startedIso;
 
 const moscowYearStartIso = (buildNowMs: number): string =>
-  dateTimeFromISO(new Date(buildNowMs).toISOString())
-    .startOf('year')
-    .toJSDate()
-    .toISOString();
+  dateTimeFromISO(new Date(buildNowMs).toISOString()).startOf('year').toJSDate().toISOString();
 
 const isCalendarIncidentChanging = (
   incident: SitemapStatusIncidentInput,
-  buildNowMs: number,
+  buildNowMs: number
 ): boolean =>
   resolveStatusIncidentPhase(
     {
       kind: incident.kind,
       start: statusTimestampMs(incident.startedIso),
-      end: incident.endedIso ? statusTimestampMs(incident.endedIso) : undefined,
+      end: incident.endedIso ? statusTimestampMs(incident.endedIso) : undefined
     },
-    buildNowMs,
+    buildNowMs
   ) !== 'resolved';
 
 const calendarIncidentLastmod = (
   incident: SitemapStatusIncidentInput,
   buildNowMs: number,
-  buildNowIso: string,
+  buildNowIso: string
 ): string =>
-  isCalendarIncidentChanging(incident, buildNowMs)
-    ? buildNowIso
-    : incidentLastmod(incident);
+  isCalendarIncidentChanging(incident, buildNowMs) ? buildNowIso : incidentLastmod(incident);
 
 const calendarIncidents = (
   days: readonly StatusCalendarDay[],
-  incidentsById: ReadonlyMap<string, SitemapStatusIncidentInput>,
+  incidentsById: ReadonlyMap<string, SitemapStatusIncidentInput>
 ): readonly SitemapStatusIncidentInput[] =>
   [...new Set(days.flatMap((day) => day.recordIds))].flatMap((id) => {
     const incident = incidentsById.get(id);
@@ -193,21 +172,17 @@ const calendarIncidents = (
 const addStatusCalendarMetadata = (
   index: Map<string, SitemapMetadata>,
   incidents: readonly SitemapStatusIncidentInput[],
-  buildNowMs: number,
+  buildNowMs: number
 ): void => {
-  const incidentsById = new Map(
-    incidents.map((incident) => [incident.url, incident]),
-  );
+  const incidentsById = new Map(incidents.map((incident) => [incident.url, incident]));
   const calendar = buildStatusCalendarProjection(
     incidents.map((incident) => ({
       id: incident.url,
       kind: incident.kind,
       startedAt: statusTimestampMs(incident.startedIso),
-      endedAt: incident.endedIso
-        ? statusTimestampMs(incident.endedIso)
-        : undefined,
+      endedAt: incident.endedIso ? statusTimestampMs(incident.endedIso) : undefined
     })),
-    buildNowMs,
+    buildNowMs
   );
   const buildNowIso = new Date(buildNowMs).toISOString();
 
@@ -215,22 +190,18 @@ const addStatusCalendarMetadata = (
     const months = calendar.byYear.get(year)?.months ?? [];
     const yearIncidents = calendarIncidents(
       months.flatMap((month) => month.days),
-      incidentsById,
+      incidentsById
     );
 
     setMetadata(index, statusCalendarYearPath({ year }), {
       lastmod: maxLastmod(
-        yearIncidents.map((incident) =>
-          calendarIncidentLastmod(incident, buildNowMs, buildNowIso),
-        ),
+        yearIncidents.map((incident) => calendarIncidentLastmod(incident, buildNowMs, buildNowIso))
       ),
       changefreq:
         year === calendar.buildYear ||
-        yearIncidents.some((incident) =>
-          isCalendarIncidentChanging(incident, buildNowMs),
-        )
+        yearIncidents.some((incident) => isCalendarIncidentChanging(incident, buildNowMs))
           ? CHANGEFREQ.hourly
-          : CHANGEFREQ.yearly,
+          : CHANGEFREQ.yearly
     });
 
     for (const month of months) {
@@ -239,14 +210,14 @@ const addStatusCalendarMetadata = (
       setMetadata(index, statusCalendarMonthPath(month), {
         lastmod: maxLastmod(
           monthIncidents.map((incident) =>
-            calendarIncidentLastmod(incident, buildNowMs, buildNowIso),
-          ),
+            calendarIncidentLastmod(incident, buildNowMs, buildNowIso)
+          )
         ),
         changefreq: monthIncidents.some((incident) =>
-          isCalendarIncidentChanging(incident, buildNowMs),
+          isCalendarIncidentChanging(incident, buildNowMs)
         )
           ? CHANGEFREQ.hourly
-          : CHANGEFREQ.yearly,
+          : CHANGEFREQ.yearly
       });
     }
   }
@@ -255,7 +226,7 @@ const addStatusCalendarMetadata = (
 const setMetadata = (
   index: Map<string, SitemapMetadata>,
   url: string,
-  metadata: SitemapMetadata,
+  metadata: SitemapMetadata
 ): void => {
   const key = sitemapPathKey(url);
   const current = index.get(key);
@@ -264,7 +235,7 @@ const setMetadata = (
   const next = {
     ...(lastmod ? { lastmod } : {}),
     ...(changefreq ? { changefreq } : {}),
-    ...(current?.excludeFromSitemap ? { excludeFromSitemap: true } : {}),
+    ...(current?.excludeFromSitemap ? { excludeFromSitemap: true } : {})
   } satisfies SitemapMetadata;
 
   if (next.lastmod || next.changefreq || next.excludeFromSitemap) {
@@ -272,17 +243,14 @@ const setMetadata = (
   }
 };
 
-const excludeFromSitemap = (
-  index: Map<string, SitemapMetadata>,
-  url: string,
-): void => {
+const excludeFromSitemap = (index: Map<string, SitemapMetadata>, url: string): void => {
   const key = sitemapPathKey(url);
   const current = index.get(key);
 
   index.set(key, {
     lastmod: current?.lastmod,
     changefreq: current?.changefreq,
-    excludeFromSitemap: true,
+    excludeFromSitemap: true
   });
 };
 
@@ -291,7 +259,7 @@ const articleLastmod = (article: SitemapNewsArticleInput): string =>
 
 const addNewsMetadata = (
   index: Map<string, SitemapMetadata>,
-  articles: readonly SitemapNewsArticleInput[],
+  articles: readonly SitemapNewsArticleInput[]
 ): void => {
   for (const article of articles) {
     const lastmod = articleLastmod(article);
@@ -305,14 +273,14 @@ const addNewsMetadata = (
       '/news/archive/',
       `/news/${year}/`,
       `/news/${year}/${month}/`,
-      '/news/tags/',
+      '/news/tags/'
     ]) {
       setMetadata(index, path, daily);
     }
 
     setMetadata(index, article.url, {
       lastmod,
-      changefreq: CHANGEFREQ.monthly,
+      changefreq: CHANGEFREQ.monthly
     });
 
     for (const tag of article.tags) {
@@ -324,11 +292,11 @@ const addNewsMetadata = (
 const addStatusMetadata = (
   index: Map<string, SitemapMetadata>,
   incidents: readonly SitemapStatusIncidentInput[],
-  buildNowMs: number,
+  buildNowMs: number
 ): void => {
   const calendarNavigationMetadata = {
     lastmod: moscowYearStartIso(buildNowMs),
-    changefreq: CHANGEFREQ.hourly,
+    changefreq: CHANGEFREQ.hourly
   };
 
   setMetadata(index, '/status/', calendarNavigationMetadata);
@@ -346,7 +314,7 @@ const addStatusMetadata = (
     if (incident.hasPage) {
       setMetadata(index, incident.url, {
         lastmod,
-        changefreq: incident.endedIso ? CHANGEFREQ.yearly : CHANGEFREQ.hourly,
+        changefreq: incident.endedIso ? CHANGEFREQ.yearly : CHANGEFREQ.hourly
       });
     }
   }
@@ -354,20 +322,18 @@ const addStatusMetadata = (
 
 const addCompareMetadata = (
   index: Map<string, SitemapMetadata>,
-  settlements: readonly SitemapSettlementInput[],
+  settlements: readonly SitemapSettlementInput[]
 ): void => {
   if (settlements.length === 0) {
     return;
   }
 
   setMetadata(index, '/815/compare/rating/', {
-    changefreq: CHANGEFREQ.yearly,
+    changefreq: CHANGEFREQ.yearly
   });
 
   for (const settlement of settlements) {
-    const lastmod = maxLastmod(
-      settlement.sources.map((source) => source.dateChecked),
-    );
+    const lastmod = maxLastmod(settlement.sources.map((source) => source.dateChecked));
 
     if (!lastmod) {
       continue;
@@ -385,19 +351,19 @@ const meetingLastmod = (meeting: SitemapMeetingInput): string =>
 
 const addMeetingsMetadata = (
   index: Map<string, SitemapMetadata>,
-  meetings: readonly SitemapMeetingInput[],
+  meetings: readonly SitemapMeetingInput[]
 ): void => {
   for (const meeting of meetings) {
     setMetadata(index, meeting.url, {
       lastmod: meetingLastmod(meeting),
-      changefreq: CHANGEFREQ.yearly,
+      changefreq: CHANGEFREQ.yearly
     });
   }
 };
 
 const addKbMetadata = (
   index: Map<string, SitemapMetadata>,
-  pages: readonly SitemapKbPageInput[],
+  pages: readonly SitemapKbPageInput[]
 ): void => {
   for (const page of pages) {
     if (page.excludeFromSitemap) {
@@ -408,33 +374,33 @@ const addKbMetadata = (
 
 const addContactsMetadata = (
   index: Map<string, SitemapMetadata>,
-  contacts: readonly SitemapContactInput[],
+  contacts: readonly SitemapContactInput[]
 ): void => {
   const latest = maxLastmod(contacts.map((contact) => contact.updatedIso));
 
   if (latest) {
     setMetadata(index, '/sarafan/', {
       lastmod: latest,
-      changefreq: CHANGEFREQ.monthly,
+      changefreq: CHANGEFREQ.monthly
     });
   }
 
   for (const contact of contacts) {
     setMetadata(index, `/sarafan/${contact.category}/`, {
       lastmod: contact.updatedIso,
-      changefreq: CHANGEFREQ.monthly,
+      changefreq: CHANGEFREQ.monthly
     });
 
     setMetadata(index, contact.url, {
       lastmod: contact.updatedIso,
-      changefreq: CHANGEFREQ.monthly,
+      changefreq: CHANGEFREQ.monthly
     });
   }
 };
 
 export const buildSitemapMetadataIndex = (
   data: SitemapMetadataSourceData,
-  buildNowMs = Date.now(),
+  buildNowMs = Date.now()
 ): SitemapMetadataIndex => {
   const index = new Map<string, SitemapMetadata>();
 
@@ -451,7 +417,7 @@ export const buildSitemapMetadataIndex = (
 
 export const applySitemapMetadata = (
   item: SitemapItem,
-  index: SitemapMetadataIndex,
+  index: SitemapMetadataIndex
 ): SitemapItem | undefined => {
   const metadata = index.get(sitemapPathKey(item.url));
 

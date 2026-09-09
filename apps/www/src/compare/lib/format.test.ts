@@ -1,13 +1,15 @@
 import { describe, it, expect } from 'vitest';
+
+import { visibleWhitespace } from '@/lib/test/visible-whitespace';
+
 import {
   formatTariffAuto,
   formatTariffBase,
   formatTariffSummary,
   getLotCalc,
   getTariffHint,
-  getTariffCalc,
+  getTariffCalc
 } from './format';
-import { visibleWhitespace } from '@/lib/test/visible-whitespace';
 
 describe('Format Module', () => {
   describe('formatTariffAuto', () => {
@@ -18,8 +20,8 @@ describe('Format Module', () => {
           unit: 'perSotka',
           period: 'month',
           normalizedPerSotkaMonth: 1000,
-          normalizedIsEstimate: false,
-        }),
+          normalizedIsEstimate: false
+        })
       ).toBe('1\u00A0000\u00A0₽/сотка');
     });
 
@@ -30,8 +32,8 @@ describe('Format Module', () => {
           unit: 'perLot',
           period: 'month',
           normalizedPerSotkaMonth: 1200,
-          normalizedIsEstimate: true,
-        }),
+          normalizedIsEstimate: true
+        })
       ).toBe('~1\u00A0200\u00A0₽/сотка');
     });
   });
@@ -44,8 +46,8 @@ describe('Format Module', () => {
           unit: 'perSotka',
           period: 'month',
           normalizedPerSotkaMonth: 500,
-          normalizedIsEstimate: false,
-        }),
+          normalizedIsEstimate: false
+        })
       ).toBe('500\u00A0₽/сотка');
     });
 
@@ -56,8 +58,8 @@ describe('Format Module', () => {
           unit: 'perLot',
           period: 'month',
           normalizedPerSotkaMonth: 400,
-          normalizedIsEstimate: true,
-        }),
+          normalizedIsEstimate: true
+        })
       ).toBe('4\u00A0000\u00A0₽/участок');
     });
 
@@ -68,8 +70,8 @@ describe('Format Module', () => {
           unit: 'fixed',
           period: 'year',
           normalizedPerSotkaMonth: 100,
-          normalizedIsEstimate: true,
-        }),
+          normalizedIsEstimate: true
+        })
       ).toBe('12\u00A0000\u00A0₽/участок');
     });
 
@@ -85,15 +87,15 @@ describe('Format Module', () => {
             {
               value: 5813,
               unit: 'perLot',
-              period: 'month',
+              period: 'month'
             },
             {
               value: 100,
               unit: 'perSotka',
-              period: 'month',
-            },
-          ],
-        }),
+              period: 'month'
+            }
+          ]
+        })
       ).toBe('5\u00A0813\u00A0₽/участок + 100\u00A0₽/сотка');
     });
   });
@@ -107,7 +109,7 @@ describe('Format Module', () => {
             unit: 'perSotka',
             period: 'month',
             normalizedPerSotkaMonth: 815,
-            normalizedIsEstimate: false,
+            normalizedIsEstimate: false
           }),
           formatTariffSummary({
             value: 5813,
@@ -117,17 +119,17 @@ describe('Format Module', () => {
             normalizedIsEstimate: true,
             parts: [
               { value: 5813, unit: 'perLot', period: 'month' },
-              { value: 100, unit: 'perSotka', period: 'month' },
-            ],
+              { value: 100, unit: 'perSotka', period: 'month' }
+            ]
           }),
           formatTariffSummary({
             value: 9780,
             unit: 'perSotka',
             period: 'year',
             normalizedPerSotkaMonth: 815,
-            normalizedIsEstimate: false,
-          }),
-        ]),
+            normalizedIsEstimate: false
+          })
+        ])
       ).toMatchInlineSnapshot(`
         [
           "815·₽/сотка в месяц",
@@ -146,8 +148,8 @@ describe('Format Module', () => {
           unit: 'perSotka',
           period: 'month',
           normalizedPerSotkaMonth: 1000,
-          normalizedIsEstimate: false,
-        }),
+          normalizedIsEstimate: false
+        })
       ).toBe(undefined);
     });
 
@@ -162,14 +164,14 @@ describe('Format Module', () => {
           {
             value: 5813,
             unit: 'perLot',
-            period: 'month',
+            period: 'month'
           },
           {
             value: 100,
             unit: 'perSotka',
-            period: 'month',
-          },
-        ],
+            period: 'month'
+          }
+        ]
       });
 
       expect(hint).toBe('Тариф приведен к сотке автоматически.');
@@ -184,8 +186,8 @@ describe('Format Module', () => {
           unit: 'perSotka',
           period: 'month',
           normalizedPerSotkaMonth: 1000,
-          normalizedIsEstimate: false,
-        }),
+          normalizedIsEstimate: false
+        })
       ).toBe(undefined);
     });
 
@@ -195,7 +197,7 @@ describe('Format Module', () => {
         unit: 'perLot',
         period: 'quarter',
         normalizedPerSotkaMonth: 300,
-        normalizedIsEstimate: true,
+        normalizedIsEstimate: true
       });
 
       expect(visibleWhitespace(calc)).toMatchInlineSnapshot(`
@@ -221,13 +223,12 @@ describe('Format Module', () => {
           unit: 'perLot',
           period: 'month',
           normalizedPerSotkaMonth: 100,
-          normalizedIsEstimate: true,
+          normalizedIsEstimate: true
         },
         {
           averageSotka: 17.8,
-          averageNote:
-            'Средняя площадь рассчитана по опубликованным площадям лотов.',
-        },
+          averageNote: 'Средняя площадь рассчитана по опубликованным площадям лотов.'
+        }
       );
 
       expect(visibleWhitespace(calc)).toMatchInlineSnapshot(`
@@ -253,22 +254,22 @@ describe('Format Module', () => {
           unit: 'perLot',
           period: 'month',
           normalizedPerSotkaMonth: 360.58,
-          normalizedIsEstimate: true,
+          normalizedIsEstimate: true
         },
         {
           count: 298,
-          areaHa: 100,
+          areaHa: 100
         },
         {
           roads: 'asphalt',
           sidewalks: 'partial',
           drainage: 'open',
-          checkpoints: 'yes',
+          checkpoints: 'yes'
         },
         {
           playgrounds: 'yes',
-          sports: 'yes',
-        },
+          sports: 'yes'
+        }
       );
 
       expect(calc?.assumption).toContain('Площадь участка оценочная.');
@@ -285,14 +286,14 @@ describe('Format Module', () => {
           {
             value: 5813,
             unit: 'perLot',
-            period: 'month',
+            period: 'month'
           },
           {
             value: 100,
             unit: 'perSotka',
-            period: 'month',
-          },
-        ],
+            period: 'month'
+          }
+        ]
       });
 
       expect(visibleWhitespace(calc)).toMatchInlineSnapshot(`
@@ -322,18 +323,18 @@ describe('Format Module', () => {
       const calc = getLotCalc(
         {
           count: 298,
-          areaHa: 100,
+          areaHa: 100
         },
         {
           roads: 'asphalt',
           sidewalks: 'partial',
           drainage: 'open',
-          checkpoints: 'yes',
+          checkpoints: 'yes'
         },
         {
           playgrounds: 'yes',
-          sports: 'yes',
-        },
+          sports: 'yes'
+        }
       );
 
       expect(calc).toMatchInlineSnapshot(`
@@ -350,8 +351,7 @@ describe('Format Module', () => {
         count: 150,
         areaHa: 32,
         averageSotka: 20.4,
-        averageNote:
-          'Средняя площадь рассчитана по опубликованным площадям лотов.',
+        averageNote: 'Средняя площадь рассчитана по опубликованным площадям лотов.'
       });
 
       expect(calc).toMatchInlineSnapshot(`

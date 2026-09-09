@@ -4,9 +4,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { visibleWhitespace } from '../test/visible-whitespace';
 import { STATUS_AREAS, type StatusService } from './schema';
+import type { StatusTimelineTooltipItemDto } from './timeline-tooltip.types';
 import { hydrateStatusTimeline, hydrateStatusTimelines } from './timeline.dom';
 import { bindStatusTimelineLazyHydration } from './timeline.lazy';
-import type { StatusTimelineTooltipItemDto } from './timeline-tooltip.types';
 
 interface TooltipInput {
   readonly serviceLabel: string;
@@ -21,7 +21,7 @@ const AREA_TEMPLATES = `
   <div data-status-tooltip-area-templates hidden>
     ${STATUS_AREAS.map(
       (area) =>
-        `<span data-status-tooltip-area-template="${area}"><span role="img" data-area="${area}"></span></span>`,
+        `<span data-status-tooltip-area-template="${area}"><span role="img" data-area="${area}"></span></span>`
     ).join('')}
   </div>
 `;
@@ -56,17 +56,14 @@ const escapeAttribute = (value: string): string =>
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;');
 
-const buildTooltip = (
-  id: string,
-  tooltip?: Partial<TooltipInput>,
-): TooltipInput => ({
+const buildTooltip = (id: string, tooltip?: Partial<TooltipInput>): TooltipInput => ({
   serviceLabel: 'Вода',
   kindLabel: 'Инцидент',
   title: `Запись ${id}`,
   phaseLabel: 'идет',
   phaseIcon: 'alert',
   periodLabel: 'Начиная с 8 мая, 07:32',
-  ...tooltip,
+  ...tooltip
 });
 
 const buildTooltipLabel = (tooltip: TooltipInput): string =>
@@ -75,13 +72,10 @@ const buildTooltipLabel = (tooltip: TooltipInput): string =>
     tooltip.kindLabel,
     tooltip.title,
     `Статус: ${tooltip.phaseLabel}`,
-    tooltip.periodLabel,
+    tooltip.periodLabel
   ].join('. ');
 
-const renderTimeline = (
-  nodes: readonly ProblemNodeInput[],
-  rangeDays = 10,
-): HTMLElement => {
+const renderTimeline = (nodes: readonly ProblemNodeInput[], rangeDays = 10): HTMLElement => {
   document.body.innerHTML = `
     <div data-status-timeline data-range-days="${String(rangeDays)}">
       <div data-status-timeline-track>
@@ -97,7 +91,7 @@ const renderTimeline = (
               start,
               tag = 'a',
               tone = 'red',
-              tooltip: rawTooltip,
+              tooltip: rawTooltip
             }) => {
               const tooltip = buildTooltip(id, rawTooltip);
               const segmentAttributes = `
@@ -123,7 +117,7 @@ const renderTimeline = (
               return `
               <${tag}${segmentAttributes}></${tag}>
             `;
-            },
+            }
           )
           .join('')}
       </div>
@@ -165,7 +159,7 @@ const renderGroupedTimeline = ({
   groupTitle,
   start,
   end,
-  items,
+  items
 }: GroupedTimelineInput): HTMLElement => {
   const initialLabel = `${serviceLabel}. ${groupTitle}`;
 
@@ -220,9 +214,7 @@ const renderGroupedTimeline = ({
 };
 
 const getGreenSegments = (): HTMLElement[] =>
-  Array.from(
-    document.querySelectorAll('[data-status-segment="green"]'),
-  ) as HTMLElement[];
+  Array.from(document.querySelectorAll('[data-status-segment="green"]')) as HTMLElement[];
 
 const getProblemNode = (id: string): HTMLElement =>
   document.querySelector(`[data-incident-id="${id}"]`) as HTMLElement;
@@ -240,7 +232,7 @@ const flushPromises = async (): Promise<void> => {
 
 const readSegmentMetric = (
   element: HTMLElement,
-  name: '--segment-left' | '--segment-width',
+  name: '--segment-left' | '--segment-width'
 ): number => Number(element.style.getPropertyValue(name));
 
 const mockRect = (
@@ -250,7 +242,7 @@ const mockRect = (
     readonly top: number;
     readonly width: number;
     readonly height: number;
-  },
+  }
 ): void => {
   const value = {
     x: rect.left,
@@ -261,26 +253,26 @@ const mockRect = (
     height: rect.height,
     right: rect.left + rect.width,
     bottom: rect.top + rect.height,
-    toJSON: () => '',
+    toJSON: () => ''
   } satisfies DOMRect;
 
   Object.defineProperty(element, 'getBoundingClientRect', {
     configurable: true,
-    value: () => value,
+    value: () => value
   });
 };
 
 const mockSize = (
   element: HTMLElement,
-  size: { readonly width: number; readonly height: number },
+  size: { readonly width: number; readonly height: number }
 ): void => {
   Object.defineProperty(element, 'offsetWidth', {
     configurable: true,
-    get: () => size.width,
+    get: () => size.width
   });
   Object.defineProperty(element, 'offsetHeight', {
     configurable: true,
-    get: () => size.height,
+    get: () => size.height
   });
 };
 
@@ -295,34 +287,30 @@ describe('hydrateStatusTimeline', () => {
       {
         id: 'expired',
         start: '2026-05-01T00:00:00Z',
-        end: '2026-05-02T00:00:00Z',
-      },
+        end: '2026-05-02T00:00:00Z'
+      }
     ]);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-15T00:00:00Z'),
+      nowMs: Date.parse('2026-05-15T00:00:00Z')
     });
 
     expect(getProblemNode('expired').hidden).toBe(true);
     expect(getGreenSegments()).toHaveLength(1);
-    expect(
-      readSegmentMetric(getGreenSegments()[0]!, '--segment-left'),
-    ).toBeCloseTo(0);
-    expect(
-      readSegmentMetric(getGreenSegments()[0]!, '--segment-width'),
-    ).toBeCloseTo(100);
+    expect(readSegmentMetric(getGreenSegments()[0]!, '--segment-left')).toBeCloseTo(0);
+    expect(readSegmentMetric(getGreenSegments()[0]!, '--segment-width')).toBeCloseTo(100);
   });
 
   it('clips an active problem without end date to the client-side now', () => {
     const root = renderTimeline([
       {
         id: 'active',
-        start: '2026-05-08T00:00:00Z',
-      },
+        start: '2026-05-08T00:00:00Z'
+      }
     ]);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
 
     const node = getProblemNode('active');
@@ -343,15 +331,15 @@ describe('hydrateStatusTimeline', () => {
         hidden: true,
         tooltip: {
           kindLabel: 'Плановые работы',
-          phaseLabel: 'запланировано',
-        },
-      },
+          phaseLabel: 'запланировано'
+        }
+      }
     ]);
 
     expect(getProblemNode('future').hidden).toBe(true);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-15T00:00:00Z'),
+      nowMs: Date.parse('2026-05-15T00:00:00Z')
     });
 
     const node = getProblemNode('future');
@@ -368,17 +356,17 @@ describe('hydrateStatusTimeline', () => {
       {
         id: 'first',
         start: '2026-05-02T00:00:00Z',
-        end: '2026-05-03T00:00:00Z',
+        end: '2026-05-03T00:00:00Z'
       },
       {
         id: 'second',
         start: '2026-05-05T00:00:00Z',
-        end: '2026-05-07T00:00:00Z',
-      },
+        end: '2026-05-07T00:00:00Z'
+      }
     ]);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
 
     const green = getGreenSegments();
@@ -397,17 +385,17 @@ describe('hydrateStatusTimeline', () => {
       {
         id: 'overlap-a',
         start: '2026-05-02T00:00:00Z',
-        end: '2026-05-05T00:00:00Z',
+        end: '2026-05-05T00:00:00Z'
       },
       {
         id: 'overlap-b',
         start: '2026-05-04T00:00:00Z',
-        end: '2026-05-06T00:00:00Z',
-      },
+        end: '2026-05-06T00:00:00Z'
+      }
     ]);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
 
     const green = getGreenSegments();
@@ -423,15 +411,15 @@ describe('hydrateStatusTimeline', () => {
       {
         id: 'single',
         start: '2026-05-02T00:00:00Z',
-        end: '2026-05-03T00:00:00Z',
-      },
+        end: '2026-05-03T00:00:00Z'
+      }
     ]);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
 
     expect(getGreenSegments()).toHaveLength(2);
@@ -449,13 +437,13 @@ describe('hydrateStatusTimeline', () => {
           title: 'Отключение электричества',
           phaseLabel: 'восстановлено',
           phaseIcon: 'check',
-          periodLabel: '22 апреля, 19:30 - 23 апреля, 00:00 (4 ч. 30 мин.)',
-        },
-      },
+          periodLabel: '22 апреля, 19:30 - 23 апреля, 00:00 (4 ч. 30 мин.)'
+        }
+      }
     ]);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
 
     const node = getProblemNode('hover');
@@ -467,11 +455,9 @@ describe('hydrateStatusTimeline', () => {
     expect(root.dataset.statusTooltipOpen).toBe('true');
     expect(node.getAttribute('aria-describedby')).toBe(tooltip.id);
     expect(getTooltipField('[data-status-tooltip-title]').textContent).toBe(
-      'Отключение электричества',
+      'Отключение электричества'
     );
-    expect(
-      getTooltipField('[data-status-tooltip-phase-icon-check]').hidden,
-    ).toBe(false);
+    expect(getTooltipField('[data-status-tooltip-phase-icon-check]').hidden).toBe(false);
 
     node.dispatchEvent(new Event('mouseleave'));
 
@@ -492,13 +478,13 @@ describe('hydrateStatusTimeline', () => {
           title: 'Проезд через дамбу закрыт',
           phaseLabel: 'проезд открыт',
           phaseIcon: 'check',
-          periodLabel: '1 мая - 2 мая',
-        },
-      },
+          periodLabel: '1 мая - 2 мая'
+        }
+      }
     ]);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
 
     const node = getProblemNode('dam');
@@ -512,12 +498,12 @@ describe('hydrateStatusTimeline', () => {
       {
         id: 'focus',
         tag: 'button',
-        start: '2026-05-08T00:00:00Z',
-      },
+        start: '2026-05-08T00:00:00Z'
+      }
     ]);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
 
     const node = getProblemNode('focus');
@@ -539,12 +525,12 @@ describe('hydrateStatusTimeline', () => {
       {
         id: 'touch',
         tag: 'button',
-        start: '2026-05-08T00:00:00Z',
-      },
+        start: '2026-05-08T00:00:00Z'
+      }
     ]);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
 
     const node = getProblemNode('touch');
@@ -560,12 +546,12 @@ describe('hydrateStatusTimeline', () => {
     const root = renderTimeline([
       {
         id: 'title',
-        start: '2026-05-08T00:00:00Z',
-      },
+        start: '2026-05-08T00:00:00Z'
+      }
     ]);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
 
     expect(getProblemNode('title').getAttribute('title')).toBeNull();
@@ -577,22 +563,22 @@ describe('hydrateStatusTimeline', () => {
         id: 'safe',
         start: '2026-05-08T00:00:00Z',
         tooltip: {
-          title: '<strong>Опасно</strong>',
-        },
-      },
+          title: '<strong>Опасно</strong>'
+        }
+      }
     ]);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
 
     getProblemNode('safe').dispatchEvent(new Event('mouseenter'));
 
     expect(getTooltipField('[data-status-tooltip-title]').textContent).toBe(
-      '<strong>Опасно</strong>',
+      '<strong>Опасно</strong>'
     );
     expect(getTooltipField('[data-status-tooltip-title]').innerHTML).toBe(
-      '&lt;strong&gt;Опасно&lt;/strong&gt;',
+      '&lt;strong&gt;Опасно&lt;/strong&gt;'
     );
   });
 
@@ -601,25 +587,21 @@ describe('hydrateStatusTimeline', () => {
       {
         id: 'all-canonical-areas',
         areas: STATUS_AREAS,
-        start: '2026-05-08T00:00:00Z',
-      },
+        start: '2026-05-08T00:00:00Z'
+      }
     ]);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
 
-    getProblemNode('all-canonical-areas').dispatchEvent(
-      new Event('mouseenter'),
-    );
+    getProblemNode('all-canonical-areas').dispatchEvent(new Event('mouseenter'));
 
     expect(
       Array.from(
-        getTooltipField('[data-status-tooltip-title-areas]').querySelectorAll(
-          '[role="img"]',
-        ),
-        (icon) => icon.getAttribute('data-area'),
-      ),
+        getTooltipField('[data-status-tooltip-title-areas]').querySelectorAll('[role="img"]'),
+        (icon) => icon.getAttribute('data-area')
+      )
     ).toEqual(STATUS_AREAS);
   });
 
@@ -628,12 +610,12 @@ describe('hydrateStatusTimeline', () => {
       {
         id: 'unknown-area',
         areas: ['outside'],
-        start: '2026-05-08T00:00:00Z',
-      },
+        start: '2026-05-08T00:00:00Z'
+      }
     ]);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
 
     getProblemNode('unknown-area').dispatchEvent(new Event('mouseenter'));
@@ -660,7 +642,7 @@ describe('hydrateStatusTimeline', () => {
           areas: STATUS_AREAS,
           areaLabel:
             'Шелково\u00A0Ривер, Шелково\u00A0Форест, Шелково\u00A0Парк, Шелково\u00A0Вилладж',
-          periodLabel: '9\u00A0мая, 06:00\u00A0—\u00A006:40 (40\u00A0мин.)',
+          periodLabel: '9\u00A0мая, 06:00\u00A0—\u00A006:40 (40\u00A0мин.)'
         },
         {
           kind: 'incident',
@@ -668,7 +650,7 @@ describe('hydrateStatusTimeline', () => {
           phase: 'resolved',
           startedIso: '2026-05-09T08:10:00Z',
           endedIso: '2026-05-09T08:45:00Z',
-          periodLabel: '9\u00A0мая, 11:10\u00A0—\u00A011:45 (35\u00A0мин.)',
+          periodLabel: '9\u00A0мая, 11:10\u00A0—\u00A011:45 (35\u00A0мин.)'
         },
         {
           kind: 'incident',
@@ -676,13 +658,13 @@ describe('hydrateStatusTimeline', () => {
           phase: 'active',
           startedIso: '2026-05-09T19:20:00Z',
           periodLabel: 'Начало\u00A09\u00A0мая, 22:20',
-          activePeriodLabel: 'Начиная с\u00A09\u00A0мая, 22:20',
-        },
-      ],
+          activePeriodLabel: 'Начиная с\u00A09\u00A0мая, 22:20'
+        }
+      ]
     });
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
 
     getProblemNode('grouped').dispatchEvent(new Event('mouseenter'));
@@ -690,15 +672,11 @@ describe('hydrateStatusTimeline', () => {
     expect(getTooltipField('[data-status-tooltip-title]').hidden).toBe(true);
     expect(getTooltipField('[data-status-tooltip-period]').hidden).toBe(true);
     expect(
-      String(
-        visibleWhitespace(
-          getTooltipField('[data-status-tooltip-list]').textContent,
-        ),
-      )
+      String(visibleWhitespace(getTooltipField('[data-status-tooltip-list]').textContent))
         .split('\n')
         .map((line) => line.trim())
         .filter(Boolean)
-        .join('\n'),
+        .join('\n')
     ).toMatchInlineSnapshot(`
       "Отключение·1
       9·мая, 06:00·—·06:40 (40·мин.)
@@ -707,35 +685,31 @@ describe('hydrateStatusTimeline', () => {
       Отключение·3
       Начиная с·9·мая, 22:20"
     `);
-    const firstTitleText = getTooltipField('[data-status-tooltip-list]')
-      .firstElementChild?.firstElementChild as HTMLElement | undefined;
+    const firstTitleText = getTooltipField('[data-status-tooltip-list]').firstElementChild
+      ?.firstElementChild as HTMLElement | undefined;
 
-    expect(String(visibleWhitespace(firstTitleText?.textContent)).trim()).toBe(
-      'Отключение·1',
-    );
+    expect(String(visibleWhitespace(firstTitleText?.textContent)).trim()).toBe('Отключение·1');
     expect(firstTitleText?.hidden).toBe(false);
     expect(
       getTooltipField('[data-status-tooltip-list]').querySelectorAll(
-        '.status-service-timeline__tooltip-phase-icon--check:not([hidden])',
-      ),
+        '.status-service-timeline__tooltip-phase-icon--check:not([hidden])'
+      )
     ).toHaveLength(2);
     expect(
       getTooltipField('[data-status-tooltip-list]').querySelectorAll(
-        '.status-service-timeline__tooltip-phase-icon--alert:not([hidden])',
-      ),
+        '.status-service-timeline__tooltip-phase-icon--alert:not([hidden])'
+      )
     ).toHaveLength(1);
     expect(
       Array.from(
-        getTooltipField('[data-status-tooltip-list]').querySelectorAll(
-          '[role="img"]',
-        ),
-        (icon) => icon.getAttribute('data-area'),
-      ),
+        getTooltipField('[data-status-tooltip-list]').querySelectorAll('[role="img"]'),
+        (icon) => icon.getAttribute('data-area')
+      )
     ).toEqual(STATUS_AREAS);
     expect(
-      visibleWhitespace(getProblemNode('grouped').getAttribute('aria-label')),
+      visibleWhitespace(getProblemNode('grouped').getAttribute('aria-label'))
     ).toMatchInlineSnapshot(
-      `"Электричество. 3·события за·9·мая. Отключение·1. 9·мая, 06:00·—·06:40 (40·мин.). Части поселка: Шелково·Ривер, Шелково·Форест, Шелково·Парк, Шелково·Вилладж. Отключение·2. 9·мая, 11:10·—·11:45 (35·мин.). Отключение·3. Начиная с·9·мая, 22:20"`,
+      `"Электричество. 3·события за·9·мая. Отключение·1. 9·мая, 06:00·—·06:40 (40·мин.). Части поселка: Шелково·Ривер, Шелково·Форест, Шелково·Парк, Шелково·Вилладж. Отключение·2. 9·мая, 11:10·—·11:45 (35·мин.). Отключение·3. Начиная с·9·мая, 22:20"`
     );
   });
 
@@ -743,12 +717,12 @@ describe('hydrateStatusTimeline', () => {
     const root = renderTimeline([
       {
         id: 'clamp',
-        start: '2026-05-08T00:00:00Z',
-      },
+        start: '2026-05-08T00:00:00Z'
+      }
     ]);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
 
     const node = getProblemNode('clamp');
@@ -759,7 +733,7 @@ describe('hydrateStatusTimeline', () => {
     mockSize(tooltip, { width: 180, height: 120 });
     Object.defineProperty(window, 'innerHeight', {
       configurable: true,
-      value: 900,
+      value: 900
     });
 
     node.dispatchEvent(new Event('mouseenter'));
@@ -772,12 +746,12 @@ describe('hydrateStatusTimeline', () => {
     const root = renderTimeline([
       {
         id: 'above',
-        start: '2026-05-08T00:00:00Z',
-      },
+        start: '2026-05-08T00:00:00Z'
+      }
     ]);
 
     hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z'),
+      nowMs: Date.parse('2026-05-10T00:00:00Z')
     });
 
     const node = getProblemNode('above');
@@ -788,7 +762,7 @@ describe('hydrateStatusTimeline', () => {
     mockSize(tooltip, { width: 220, height: 140 });
     Object.defineProperty(window, 'innerHeight', {
       configurable: true,
-      value: 220,
+      value: 220
     });
 
     node.dispatchEvent(new Event('mouseenter'));
@@ -856,7 +830,7 @@ describe('hydrateStatusTimeline', () => {
     expect(readSegmentMetric(scoped, '--segment-width')).toBeCloseTo(20);
 
     hydrateStatusTimelines(document, {
-      nowMs: Date.parse('2026-05-09T00:00:00Z'),
+      nowMs: Date.parse('2026-05-09T00:00:00Z')
     });
 
     expect(readSegmentMetric(scoped, '--segment-left')).toBeCloseTo(90);
@@ -897,9 +871,9 @@ describe('bindStatusTimelineLazyHydration', () => {
           phase: 'scheduled',
           startedIso: '2026-05-09T03:00:00Z',
           endedIso: '2026-05-09T03:40:00Z',
-          periodLabel: '9\u00A0мая, 06:00\u00A0—\u00A006:40',
-        },
-      ],
+          periodLabel: '9\u00A0мая, 06:00\u00A0—\u00A006:40'
+        }
+      ]
     });
     const trigger = getProblemNode('phase-transition');
     const tooltip = getTooltip();
@@ -909,16 +883,13 @@ describe('bindStatusTimelineLazyHydration', () => {
       describedBy: trigger.getAttribute('aria-describedby'),
       tooltipAriaHidden: tooltip.getAttribute('aria-hidden'),
       alertIconCount: root.querySelectorAll(
-        '.status-service-timeline__tooltip-phase-icon--alert:not([hidden])',
+        '.status-service-timeline__tooltip-phase-icon--alert:not([hidden])'
       ).length,
       checkIconCount: root.querySelectorAll(
-        '.status-service-timeline__tooltip-phase-icon--check:not([hidden])',
-      ).length,
+        '.status-service-timeline__tooltip-phase-icon--check:not([hidden])'
+      ).length
     });
-    const setNowAndHydrate = async (
-      nowIso: string,
-      expectedPhaseLabel: string,
-    ): Promise<void> => {
+    const setNowAndHydrate = async (nowIso: string, expectedPhaseLabel: string): Promise<void> => {
       window.__STATUS_TIMELINE_NOW__ = Date.parse(nowIso);
       document.dispatchEvent(new Event('astro:page-load'));
       await vi.waitFor(() => {
@@ -974,7 +945,7 @@ describe('bindStatusTimelineLazyHydration', () => {
     const rootDocument = renderLazyTimelineDocument();
     const hydrateStatusTimelines = vi.fn();
     const loadStatusTimelineDom = vi.fn(async () => ({
-      hydrateStatusTimelines,
+      hydrateStatusTimelines
     }));
 
     bindStatusTimelineLazyHydration(rootDocument, loadStatusTimelineDom);
@@ -986,9 +957,7 @@ describe('bindStatusTimelineLazyHydration', () => {
 
     expect(loadStatusTimelineDom).not.toHaveBeenCalled();
 
-    getLazyProblemNode(rootDocument).dispatchEvent(
-      new Event('pointerover', { bubbles: true }),
-    );
+    getLazyProblemNode(rootDocument).dispatchEvent(new Event('pointerover', { bubbles: true }));
     await flushPromises();
 
     expect(loadStatusTimelineDom).toHaveBeenCalledTimes(1);
@@ -998,7 +967,7 @@ describe('bindStatusTimelineLazyHydration', () => {
   it.each([
     ['pointerover', 'mouseenter'],
     ['focusin', 'focusin'],
-    ['touchstart', 'touchstart'],
+    ['touchstart', 'touchstart']
   ] as const)(
     'replays the first %s intent after lazy hydration',
     async (sourceEvent, replayedEvent) => {
@@ -1016,7 +985,7 @@ describe('bindStatusTimelineLazyHydration', () => {
         });
       });
       const loadStatusTimelineDom = vi.fn(async () => ({
-        hydrateStatusTimelines,
+        hydrateStatusTimelines
       }));
 
       bindStatusTimelineLazyHydration(rootDocument, loadStatusTimelineDom);
@@ -1024,6 +993,6 @@ describe('bindStatusTimelineLazyHydration', () => {
       await flushPromises();
 
       expect(trigger.dataset.replayedEvent).toBe(replayedEvent);
-    },
+    }
   );
 });

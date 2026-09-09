@@ -5,21 +5,21 @@ import { RawPersonProfileSchema } from '../raw-schema';
 const profile = {
   name: '  Кирилл Щемелинин  ',
   seo: {
-    description: '  Исполняющий обязанности директора по эксплуатации.  ',
+    description: '  Исполняющий обязанности директора по эксплуатации.  '
   },
   name_cases: {
     gen: '  Кирилла Щемелинина  ',
     dat: '  Кириллу Щемелинину  ',
     acc: '  Кирилла Щемелинина  ',
     ins: '  Кириллом Щемелининым  ',
-    prep: '  Кирилле Щемелинине  ',
+    prep: '  Кирилле Щемелинине  '
   },
   company: '  ОК «Комфорт»  ',
   position: '  Исполняющий обязанности директора по эксплуатации  ',
   contacts: [
     { type: 'telegram', value: '  Kirill_ZemlyaMO  ' },
-    { type: 'phone', value: '  +7 (967) 246-37-49  ' },
-  ],
+    { type: 'phone', value: '  +7 (967) 246-37-49  ' }
+  ]
 } as const;
 
 const validationIssues = (input: unknown) => {
@@ -31,7 +31,7 @@ const validationIssues = (input: unknown) => {
 
   return result.error.issues.map((issue) => ({
     path: issue.path,
-    message: issue.message,
+    message: issue.message
   }));
 };
 
@@ -70,45 +70,45 @@ describe('RawPersonProfileSchema', () => {
     {
       field: 'name',
       input: { ...profile, name: ' \t ' },
-      path: ['name'],
+      path: ['name']
     },
     {
       field: 'seo.description',
       input: { ...profile, seo: { description: ' \t ' } },
-      path: ['seo', 'description'],
+      path: ['seo', 'description']
     },
     ...(['gen', 'dat', 'acc', 'ins', 'prep'] as const).map((nameCase) => ({
       field: `name_cases.${nameCase}`,
       input: {
         ...profile,
-        name_cases: { ...profile.name_cases, [nameCase]: ' \t ' },
+        name_cases: { ...profile.name_cases, [nameCase]: ' \t ' }
       },
-      path: ['name_cases', nameCase],
+      path: ['name_cases', nameCase]
     })),
     {
       field: 'company',
       input: { ...profile, company: ' \t ' },
-      path: ['company'],
+      path: ['company']
     },
     {
       field: 'position',
       input: { ...profile, position: ' \t ' },
-      path: ['position'],
+      path: ['position']
     },
     {
       field: 'contacts[].value',
       input: {
         ...profile,
-        contacts: [{ type: 'telegram', value: ' \t ' }],
+        contacts: [{ type: 'telegram', value: ' \t ' }]
       },
-      path: ['contacts', 0, 'value'],
-    },
+      path: ['contacts', 0, 'value']
+    }
   ])('rejects whitespace-only $field', ({ input, path }) => {
     expect(validationIssues(input)).toEqual([
       {
         path,
-        message: 'must not be blank',
-      },
+        message: 'must not be blank'
+      }
     ]);
   });
 });

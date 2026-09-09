@@ -1,13 +1,4 @@
 import {
-  createMarkdownDocument,
-  md,
-  parseMarkdownFragment,
-  serializeMarkdownDocument,
-  type MarkdownListItemInput,
-  type MarkdownPhrasingInput,
-} from '@shelkovo/markdown';
-
-import {
   compareRuText,
   formatCurrency,
   formatDate,
@@ -15,17 +6,22 @@ import {
   formatNumberRu,
   formatPercentage,
   formatTariff,
-  pluralize,
+  pluralize
 } from '@shelkovo/format';
 import { calculateDistance } from '@shelkovo/geo';
+import {
+  createMarkdownDocument,
+  md,
+  parseMarkdownFragment,
+  serializeMarkdownDocument,
+  type MarkdownListItemInput,
+  type MarkdownPhrasingInput
+} from '@shelkovo/markdown';
 
 import { loadAllData } from './data';
-import {
-  formatTariffAuto,
-  formatTariffOriginal,
-  hasNonSotkaUnit,
-} from './format';
+import { formatTariffAuto, formatTariffOriginal, hasNonSotkaUnit } from './format';
 import { RATING_METHODOLOGY, type Rating } from './rating';
+import { getLotAverage } from './settlement/lots';
 import type {
   AvailabilityStatus,
   ComparisonResult,
@@ -34,9 +30,8 @@ import type {
   Settlement,
   SourceType,
   UndergroundElectricity,
-  VideoSurveillance,
+  VideoSurveillance
 } from './settlement/types';
-import { getLotAverage } from './settlement/lots';
 import { canon } from './site';
 import { telegram, withBase } from './url';
 
@@ -44,32 +39,32 @@ const src = {
   official: 'официальный источник',
   community: 'сообщество',
   media: 'медиа',
-  personal: 'личная коммуникация',
+  personal: 'личная коммуникация'
 } as const satisfies Record<SourceType, string>;
 
 const road = {
   asphalt: 'асфальт',
   partlyAsphalt: 'частично асфальт',
   gravel: 'гравий',
-  dirt: 'грунт',
+  dirt: 'грунт'
 } as const satisfies Record<RoadType, string>;
 
 const drain = {
   closed: 'закрытый',
   open: 'открытый',
-  none: 'нет',
+  none: 'нет'
 } as const satisfies Record<DrainageType, string>;
 
 const video = {
   full: 'полное',
   checkpointOnly: 'только на КПП',
-  none: 'нет',
+  none: 'нет'
 } as const satisfies Record<VideoSurveillance, string>;
 
 const wire = {
   full: 'полностью подземное',
   partial: 'частично подземное',
-  none: 'нет',
+  none: 'нет'
 } as const satisfies Record<UndergroundElectricity, string>;
 
 type MarkdownNode = ReturnType<typeof parseMarkdownFragment>[number];
@@ -89,28 +84,22 @@ const phrase = (value: MarkdownPhrasingInput): MarkdownPhrasingNodes =>
 
 const linkTo = (url: string): ReturnType<typeof md.link> => md.link(url, url);
 
-function row(
-  label: string,
-  value?: MarkdownPhrasingInput,
-): MarkdownListItem | undefined {
+function row(label: string, value?: MarkdownPhrasingInput): MarkdownListItem | undefined {
   if (!value) return;
   return md.listItem([md.paragraph([md.text(`${label}: `), ...phrase(value)])]);
 }
 
-function part(
-  title: string,
-  rows: readonly MarkdownListItem[],
-): readonly MarkdownNode[] {
+function part(title: string, rows: readonly MarkdownListItem[]): readonly MarkdownNode[] {
   return [
     md.heading(2, title),
-    md.list(rows.length ? rows : [md.listItem('Нет подтвержденных данных.')]),
+    md.list(rows.length ? rows : [md.listItem('Нет подтвержденных данных.')])
   ];
 }
 
 const num = (value: number): string =>
   formatNumberRu(value, {
     minimumFractionDigits: Number.isInteger(value) ? 0 : 1,
-    maximumFractionDigits: 1,
+    maximumFractionDigits: 1
   });
 
 const formatRating = (value: number): string =>
@@ -123,25 +112,19 @@ function lots(item: Settlement): readonly MarkdownListItem[] {
 
   return [
     ...(item.lots.count
-      ? [
-          md.listItem(
-            `Количество участков/домовладений: ${num(item.lots.count)}`,
-          ),
-        ]
+      ? [md.listItem(`Количество участков/домовладений: ${num(item.lots.count)}`)]
       : []),
-    ...(item.lots.areaHa
-      ? [md.listItem(`Площадь поселка: ${num(item.lots.areaHa)} га`)]
-      : []),
+    ...(item.lots.areaHa ? [md.listItem(`Площадь поселка: ${num(item.lots.areaHa)} га`)] : []),
     ...(avg
       ? [
           md.listItem(
-            `Средняя площадь участка: ${num(avg)} сот.${item.lots.averageSotka ? '' : ' (оценка с вычетом дорог, тротуаров, ливневок и общих зон)'}`,
-          ),
+            `Средняя площадь участка: ${num(avg)} сот.${item.lots.averageSotka ? '' : ' (оценка с вычетом дорог, тротуаров, ливневок и общих зон)'}`
+          )
         ]
       : []),
     ...(item.lots.averageNote
       ? [md.listItem(`Основание для средней площади: ${item.lots.averageNote}`)]
-      : []),
+      : [])
   ];
 }
 
@@ -160,25 +143,20 @@ function infoRows(item: Settlement): readonly MarkdownListItem[] {
     row('Газ', avail(item.infrastructure.gas)),
     row('Центральная вода', avail(item.infrastructure.water)),
     row('Центральная канализация', avail(item.infrastructure.sewage)),
-    row(
-      'Ливневка',
-      item.infrastructure.drainage && drain[item.infrastructure.drainage],
-    ),
+    row('Ливневка', item.infrastructure.drainage && drain[item.infrastructure.drainage]),
     row('КПП', avail(item.infrastructure.checkpoints)),
     row('Охрана', avail(item.infrastructure.security)),
     row('Ограждение', avail(item.infrastructure.fencing)),
     row(
       'Видеонаблюдение',
-      item.infrastructure.videoSurveillance &&
-        video[item.infrastructure.videoSurveillance],
+      item.infrastructure.videoSurveillance && video[item.infrastructure.videoSurveillance]
     ),
     row(
       'Подземное электричество',
-      item.infrastructure.undergroundElectricity &&
-        wire[item.infrastructure.undergroundElectricity],
+      item.infrastructure.undergroundElectricity && wire[item.infrastructure.undergroundElectricity]
     ),
     row('Административное здание', avail(item.infrastructure.adminBuilding)),
-    row('Магазины и сервисы', avail(item.infrastructure.retailOrServices)),
+    row('Магазины и сервисы', avail(item.infrastructure.retailOrServices))
   ].filter((item): item is MarkdownListItem => Boolean(item));
 }
 
@@ -197,7 +175,7 @@ function spaceRows(item: Settlement): readonly MarkdownListItem[] {
     row('SPA-центр', avail(item.commonSpaces.spaCenter)),
     row('Детский клуб', avail(item.commonSpaces.kidsClub)),
     row('Спортивный лагерь', avail(item.commonSpaces.sportsCamp)),
-    row('Начальная школа', avail(item.commonSpaces.primarySchool)),
+    row('Начальная школа', avail(item.commonSpaces.primarySchool))
   ].filter((item): item is MarkdownListItem => Boolean(item));
 }
 
@@ -208,7 +186,7 @@ function serviceRows(item: Settlement): readonly MarkdownListItem[] {
     row('Уборка дорог', avail(item.serviceModel.roadCleaning)),
     row('Благоустройство', avail(item.serviceModel.landscaping)),
     row('Аварийная служба', avail(item.serviceModel.emergencyService)),
-    row('Диспетчер', avail(item.serviceModel.dispatcher)),
+    row('Диспетчер', avail(item.serviceModel.dispatcher))
   ].filter((item): item is MarkdownListItem => Boolean(item));
 }
 
@@ -244,9 +222,9 @@ function nav(page: 'home' | 'rating'): readonly MarkdownNode[] {
           ? row('Методика рейтинга', [linkTo(abs('/rating/index.md'))])
           : row('Главная в Markdown', [linkTo(abs('/index.md'))]),
         row('Полный JSON-файл', [linkTo(abs('/data/settlements.json'))]),
-        row('JSON для списка и карты', [linkTo(abs('/data/explorer.json'))]),
-      ].filter((item): item is MarkdownListItem => item !== undefined),
-    ),
+        row('JSON для списка и карты', [linkTo(abs('/data/explorer.json'))])
+      ].filter((item): item is MarkdownListItem => item !== undefined)
+    )
   ];
 }
 
@@ -256,10 +234,7 @@ const linkRow = (label: string, url: string): MarkdownListItem =>
 const settlementLine = (item: {
   readonly name: string;
   readonly slug: string;
-  readonly tariff: Pick<
-    Settlement['tariff'],
-    'normalizedPerSotkaMonth' | 'normalizedIsEstimate'
-  >;
+  readonly tariff: Pick<Settlement['tariff'], 'normalizedPerSotkaMonth' | 'normalizedIsEstimate'>;
   readonly rating: number;
   readonly location: Pick<Settlement['location'], 'district'>;
 }): MarkdownListItem =>
@@ -267,29 +242,22 @@ const settlementLine = (item: {
     md.paragraph([
       md.link(abs(`/settlements/${item.slug}/index.md`), item.name),
       md.text(
-        ` — тариф ${formatTariffAuto(item.tariff)}; рейтинг ${formatRating(item.rating)}; ${item.location.district}`,
-      ),
-    ]),
+        ` — тариф ${formatTariffAuto(item.tariff)}; рейтинг ${formatRating(item.rating)}; ${item.location.district}`
+      )
+    ])
   ]);
 
-function baselineRow(
-  base: Pick<Settlement, 'name' | 'slug'>,
-): MarkdownListItem {
+function baselineRow(base: Pick<Settlement, 'name' | 'slug'>): MarkdownListItem {
   const url = abs(`/settlements/${base.slug}/`);
   return md.listItem([
-    md.paragraph([
-      md.text(`Базовый поселок: ${base.name} (`),
-      linkTo(url),
-      md.text(')'),
-    ]),
+    md.paragraph([md.text(`Базовый поселок: ${base.name} (`), linkTo(url), md.text(')')])
   ]);
 }
 
 const codeListItem = (value: string): MarkdownListItem =>
   md.listItem(parseMarkdownFragment(value) as MarkdownListItemInput);
 
-const methodologyPercent = (value: number): string =>
-  formatPercentage(value, { signed: false });
+const methodologyPercent = (value: number): string => formatPercentage(value, { signed: false });
 
 function ratingDistanceRows(): readonly MarkdownListItem[] {
   const rows = RATING_METHODOLOGY.distancePoints.map((point, index) => {
@@ -297,12 +265,12 @@ function ratingDistanceRows(): readonly MarkdownListItem[] {
 
     if (!previous) {
       return codeListItem(
-        `До \`${point.ringKm} км\` за МКАД блок получает \`${methodologyPercent(point.score)}\` своих баллов.`,
+        `До \`${point.ringKm} км\` за МКАД блок получает \`${methodologyPercent(point.score)}\` своих баллов.`
       );
     }
 
     return codeListItem(
-      `От \`${previous.ringKm}\` до \`${point.ringKm} км\` вклад блока плавно снижается с \`${methodologyPercent(previous.score)}\` до \`${methodologyPercent(point.score)}\`.`,
+      `От \`${previous.ringKm}\` до \`${point.ringKm} км\` вклад блока плавно снижается с \`${methodologyPercent(previous.score)}\` до \`${methodologyPercent(point.score)}\`.`
     );
   });
   const lastPoint = RATING_METHODOLOGY.distancePoints.at(-1)!;
@@ -310,8 +278,8 @@ function ratingDistanceRows(): readonly MarkdownListItem[] {
   return [
     ...rows,
     codeListItem(
-      `После \`${lastPoint.ringKm} км\` блок сохраняет минимум \`${methodologyPercent(lastPoint.score)}\`.`,
-    ),
+      `После \`${lastPoint.ringKm} км\` блок сохраняет минимум \`${methodologyPercent(lastPoint.score)}\`.`
+    )
   ];
 }
 
@@ -324,7 +292,7 @@ export async function buildHomeMd(): Promise<string> {
       shortName: item.shortName,
       tariff: item.tariff,
       rating: ratings.get(item.slug)?.score ?? 0,
-      location: { district: item.location.district },
+      location: { district: item.location.district }
     }))
     .sort((a, b) => {
       const d = b.rating - a.rating;
@@ -333,13 +301,13 @@ export async function buildHomeMd(): Promise<string> {
     });
   const picks = [
     ...list.filter((item) => item.slug === baseline.slug),
-    ...list.filter((item) => item.slug !== baseline.slug).slice(0, 5),
+    ...list.filter((item) => item.slug !== baseline.slug).slice(0, 5)
   ];
 
   return serialize([
     md.heading(1, 'Сравнение тарифов поселков'),
     md.paragraph(
-      'Структурированное сравнение тарифа КП Шелково с другими коттеджными поселками по тарифам, инфраструктуре, общественным пространствам, сервисной модели и условному рейтингу качества среды.',
+      'Структурированное сравнение тарифа КП Шелково с другими коттеджными поселками по тарифам, инфраструктуре, общественным пространствам, сервисной модели и условному рейтингу качества среды.'
     ),
     ...nav('home'),
     md.heading(2, 'Что здесь сравнивается'),
@@ -347,113 +315,98 @@ export async function buildHomeMd(): Promise<string> {
       md.listItem(`Поселков в базе: ${stats.totalSettlements}`),
       baselineRow(baseline),
       md.listItem(`Поселков дешевле Шелково: ${stats.cheaperCount}`),
-      md.listItem(`Поселков дороже Шелково: ${stats.moreExpensiveCount}`),
+      md.listItem(`Поселков дороже Шелково: ${stats.moreExpensiveCount}`)
     ]),
     md.heading(2, 'Подборка поселков'),
     md.list(picks.map(settlementLine)),
     md.heading(2, 'Markdown-доступ'),
     md.list([
       md.listItem(
-        `HTML-маршруты ${withBase('/')}, ${withBase('/rating/')} и страницы поселков ${withBase('/settlements/SLUG/')} поддерживают заголовок Accept: text/markdown.`,
+        `HTML-маршруты ${withBase('/')}, ${withBase('/rating/')} и страницы поселков ${withBase('/settlements/SLUG/')} поддерживают заголовок Accept: text/markdown.`
       ),
       md.listItem(
-        `Прямые Markdown-адреса: ${withBase('/index.md')}, ${withBase('/rating/index.md')}, ${withBase('/settlements/SLUG/index.md')}.`,
-      ),
+        `Прямые Markdown-адреса: ${withBase('/index.md')}, ${withBase('/rating/index.md')}, ${withBase('/settlements/SLUG/index.md')}.`
+      )
     ]),
     md.heading(2, 'Ограничения данных'),
     md.list([
       md.listItem('Если факт не подтвержден источником, поле опускается.'),
       md.listItem('Отсутствие поля означает «неизвестно», а не «точно нет».'),
       codeListItem(
-        `\`${withBase('/data/settlements.json')}\` является основным полным JSON-файлом поселков.`,
+        `\`${withBase('/data/settlements.json')}\` является основным полным JSON-файлом поселков.`
       ),
       codeListItem(
-        `\`${withBase('/data/explorer.json')}\` сокращен для списка, карты и массового сравнения.`,
+        `\`${withBase('/data/explorer.json')}\` сокращен для списка, карты и массового сравнения.`
       ),
-      md.listItem('Тариф намеренно не входит в формулу условного рейтинга.'),
-    ]),
+      md.listItem('Тариф намеренно не входит в формулу условного рейтинга.')
+    ])
   ]);
 }
 
 export async function buildRatingMd(): Promise<string> {
-  const {
-    adjustments,
-    availabilityScores,
-    groupWeights,
-    neutralBlockScore,
-    scoreRange,
-  } = RATING_METHODOLOGY;
+  const { adjustments, availabilityScores, groupWeights, neutralBlockScore, scoreRange } =
+    RATING_METHODOLOGY;
   const formula = `rating = ${scoreRange.max} * (infra * ${groupWeights.infrastructure} + spaces * ${groupWeights.commonSpaces} + service * ${groupWeights.serviceModel} + distance * ${groupWeights.distance})`;
 
   return serialize([
     md.heading(1, 'Методика расчета условного рейтинга поселков'),
     md.paragraph(
-      'Текстовая версия страницы с публичным объяснением того, как считается условный уровень поселка.',
+      'Текстовая версия страницы с публичным объяснением того, как считается условный уровень поселка.'
     ),
     ...nav('rating'),
     md.heading(2, 'Базовая формула'),
     md.list([
       codeListItem(`\`${formula}\``),
-      md.listItem(
-        'Тариф не влияет на рейтинг и исключен из формулы специально.',
-      ),
+      md.listItem('Тариф не влияет на рейтинг и исключен из формулы специально.')
     ]),
     md.heading(2, 'Блоки и веса'),
     md.list([
-      md.listItem(
-        `Инфраструктура: ${methodologyPercent(groupWeights.infrastructure)}`,
-      ),
-      md.listItem(
-        `Общественные пространства: ${methodologyPercent(groupWeights.commonSpaces)}`,
-      ),
-      md.listItem(
-        `Сервисная модель: ${methodologyPercent(groupWeights.serviceModel)}`,
-      ),
-      md.listItem(
-        `Близость к Москве: ${methodologyPercent(groupWeights.distance)}`,
-      ),
+      md.listItem(`Инфраструктура: ${methodologyPercent(groupWeights.infrastructure)}`),
+      md.listItem(`Общественные пространства: ${methodologyPercent(groupWeights.commonSpaces)}`),
+      md.listItem(`Сервисная модель: ${methodologyPercent(groupWeights.serviceModel)}`),
+      md.listItem(`Близость к Москве: ${methodologyPercent(groupWeights.distance)}`)
     ]),
     md.heading(2, 'Как считаются признаки'),
     md.list([
       codeListItem(
-        `Для бинарных статусов используется шкала \`yes = ${availabilityScores.yes}\`, \`partial = ${availabilityScores.partial}\`, \`no = ${availabilityScores.no}\`.`,
+        `Для бинарных статусов используется шкала \`yes = ${availabilityScores.yes}\`, \`partial = ${availabilityScores.partial}\`, \`no = ${availabilityScores.no}\`.`
       ),
       md.listItem(
-        'Для упорядоченных признаков применяются отдельные шкалы: дороги, ливневка, видеонаблюдение и подземное электричество.',
+        'Для упорядоченных признаков применяются отдельные шкалы: дороги, ливневка, видеонаблюдение и подземное электричество.'
       ),
       codeListItem('Неизвестные поля не трактуются как `no`.'),
       codeListItem(
-        `Если данных мало, оценка блока тянется к нейтральной середине \`${neutralBlockScore}\`, а не к верхней или нижней границе.`,
-      ),
+        `Если данных мало, оценка блока тянется к нейтральной середине \`${neutralBlockScore}\`, а не к верхней или нижней границе.`
+      )
     ]),
     md.heading(2, 'Дистанция'),
     md.list([
       md.listItem(
-        'Используется расстояние не от центра Москвы напрямую, а приблизительное расстояние за пределами МКАД.',
+        'Используется расстояние не от центра Москвы напрямую, а приблизительное расстояние за пределами МКАД.'
       ),
-      ...ratingDistanceRows(),
+      ...ratingDistanceRows()
     ]),
     md.heading(2, 'Дополнительные корректировки'),
     md.list([
       codeListItem(
-        `Если центральная вода подтверждена и уже входит в тариф (\`water_in_tariff = true\`), поселок получает \`+${adjustments.waterInTariffBonus}\` к рейтингу.`,
+        `Если центральная вода подтверждена и уже входит в тариф (\`water_in_tariff = true\`), поселок получает \`+${adjustments.waterInTariffBonus}\` к рейтингу.`
       ),
       codeListItem(
-        `Если поселок есть в канале «Коттеджное рабство» (\`rabstvo = true\`), рейтинг уменьшается на \`${adjustments.rabstvoPenalty}\` ${pluralize(adjustments.rabstvoPenalty, ['пункт', 'пункта', 'пунктов'])}.`,
-      ),
+        `Если поселок есть в канале «Коттеджное рабство» (\`rabstvo = true\`), рейтинг уменьшается на \`${adjustments.rabstvoPenalty}\` ${pluralize(adjustments.rabstvoPenalty, ['пункт', 'пункта', 'пунктов'])}.`
+      )
     ]),
     md.heading(2, 'Как читать результат'),
     md.list([
       md.listItem(
-        'Рейтинг — приблизительная сводная оценка подтвержденных признаков поселка, а не рыночная оценка недвижимости.',
+        'Рейтинг — приблизительная сводная оценка подтвержденных признаков поселка, а не рыночная оценка недвижимости.'
       ),
       md.listItem(
-        'Сначала смотрите на инфраструктуру, общественные пространства и сервисную модель, затем отдельно сравнивайте тариф.',
+        'Сначала смотрите на инфраструктуру, общественные пространства и сервисную модель, затем отдельно сравнивайте тариф.'
       ),
       md.listItem(
-        'Полная визуальная версия с пояснениями и разделами доступна по HTML-ссылке выше.',
-      ),
-    ]),
+        'Полная визуальная версия с пояснениями и разделами доступна по HTML-ссылке выше.'
+      )
+    ])
   ]);
 }
 
@@ -464,12 +417,7 @@ interface Page {
   rating?: Rating;
 }
 
-export function buildSettlementMd({
-  settlement,
-  comparison,
-  baseline,
-  rating,
-}: Page): string {
+export function buildSettlementMd({ settlement, comparison, baseline, rating }: Page): string {
   const html = abs(`/settlements/${settlement.slug}/`);
   const markdownUrl = abs(`/settlements/${settlement.slug}/index.md`);
   const tg = settlement.telegram ? telegram(settlement.telegram) : undefined;
@@ -480,15 +428,13 @@ export function buildSettlementMd({
           baseline.location.lat,
           baseline.location.lng,
           settlement.location.lat,
-          settlement.location.lng,
-        ),
+          settlement.location.lng
+        )
       )
     : undefined;
   const company = settlement.managementCompany;
   const companyLine: MarkdownPhrasingInput | undefined =
-    company && company.url
-      ? [md.text(`${company.title} — `), linkTo(company.url)]
-      : company?.title;
+    company && company.url ? [md.text(`${company.title} — `), linkTo(company.url)] : company?.title;
   const score = rating ? formatRating(rating.score) : undefined;
 
   return serialize([
@@ -503,8 +449,8 @@ export function buildSettlementMd({
         ...(hasNonSotkaUnit(settlement.tariff)
           ? [
               md.listItem(
-                `Средняя за сотку: ${settlement.tariff.normalizedIsEstimate ? '~' : ''}${formatTariff(settlement.tariff.normalizedPerSotkaMonth)} в месяц`,
-              ),
+                `Средняя за сотку: ${settlement.tariff.normalizedIsEstimate ? '~' : ''}${formatTariff(settlement.tariff.normalizedPerSotkaMonth)} в месяц`
+              )
             ]
           : []),
         ...(settlement.tariff.note
@@ -513,40 +459,26 @@ export function buildSettlementMd({
         ...lots(settlement),
         ...(score ? [md.listItem(`Условный рейтинг: ${score}`)] : []),
         ...(rating
-          ? [
-              md.listItem(
-                `Примерное расстояние от Москвы: ${formatDistance(rating.km)}`,
-              ),
-            ]
+          ? [md.listItem(`Примерное расстояние от Москвы: ${formatDistance(rating.km)}`)]
           : []),
         ...(rating
-          ? [
-              md.listItem(
-                `Примерное расстояние за МКАД: ${formatDistance(rating.ring)}`,
-              ),
-            ]
+          ? [md.listItem(`Примерное расстояние за МКАД: ${formatDistance(rating.ring)}`)]
           : []),
         ...(dist ? [md.listItem(`Расстояние от Шелково: ${dist}`)] : []),
         md.listItem(`Сравнение с Шелково: ${delta(isBaseline, comparison)}`),
         ...(isBaseline ? [md.listItem('Базовый поселок: да')] : []),
-        ...(settlement.waterInTariff
-          ? [md.listItem('Вода уже включена в тариф: да')]
-          : []),
+        ...(settlement.waterInTariff ? [md.listItem('Вода уже включена в тариф: да')] : []),
         ...(settlement.rabstvo
-          ? [
-              md.listItem(
-                'Есть подтвержденное упоминание в «Коттеджном рабстве»: да',
-              ),
-            ]
+          ? [md.listItem('Есть подтвержденное упоминание в «Коттеджном рабстве»: да')]
           : []),
         ...(companyLine ? [row('Управляющая компания', companyLine)] : []),
         linkRow('Сайт', settlement.website),
         ...(tg ? [linkRow('Telegram', tg)] : []),
-        linkRow('Карта', map(settlement)),
-      ]),
+        linkRow('Карта', map(settlement))
+      ])
     ),
     md.paragraph(
-      'Отсутствующие признаки в разделах ниже означают, что данные не подтверждены источниками.',
+      'Отсутствующие признаки в разделах ниже означают, что данные не подтверждены источниками.'
     ),
     ...part('Инфраструктура', infoRows(settlement)),
     ...part('Общественные пространства', spaceRows(settlement)),
@@ -554,24 +486,14 @@ export function buildSettlementMd({
     md.heading(2, 'Источники'),
     md.list(
       settlement.sources.map((item) => {
-        const info = [
-          formatDate(item.dateChecked),
-          src[item.type],
-          item.title,
-        ].join(' — ');
+        const info = [formatDate(item.dateChecked), src[item.type], item.title].join(' — ');
         if (item.comment) {
           return md.listItem([
-            md.paragraph([
-              md.text(`${info}: `),
-              linkTo(item.url),
-              md.text(` (${item.comment})`),
-            ]),
+            md.paragraph([md.text(`${info}: `), linkTo(item.url), md.text(` (${item.comment})`)])
           ]);
         }
-        return md.listItem([
-          md.paragraph([md.text(`${info}: `), linkTo(item.url)]),
-        ]);
-      }),
-    ),
+        return md.listItem([md.paragraph([md.text(`${info}: `), linkTo(item.url)])]);
+      })
+    )
   ]);
 }

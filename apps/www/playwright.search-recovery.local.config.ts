@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'node:url';
+
 import { defineConfig } from '@playwright/test';
 
 const port = 14334;
@@ -13,20 +14,20 @@ export default defineConfig({
   reporter: 'list',
   timeout: 120_000,
   expect: {
-    timeout: 10_000,
+    timeout: 10_000
   },
   use: {
     baseURL,
     browserName: 'chromium',
     headless: true,
     colorScheme: 'light',
-    viewport: { width: 1440, height: 900 },
+    viewport: { width: 1440, height: 900 }
   },
   webServer: {
     command: 'pnpm run test:browser:search-recovery:serve',
     cwd,
     url: baseURL,
     reuseExistingServer: false,
-    timeout: 180_000,
-  },
+    timeout: 180_000
+  }
 });

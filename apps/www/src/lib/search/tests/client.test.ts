@@ -1,20 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import type {
-  PagefindRuntime,
-  PagefindSearchResponse,
-} from '../client.internal.types';
 import { createPagefindSearchClient } from '../client';
-import {
-  SEARCH_QUERY_MAX_LENGTH,
-  SEARCH_RESULT_DEFAULT_LIMIT,
-} from '../client.types';
+import type { PagefindRuntime, PagefindSearchResponse } from '../client.internal.types';
+import { SEARCH_QUERY_MAX_LENGTH, SEARCH_RESULT_DEFAULT_LIMIT } from '../client.types';
 
 const responseWith = (...data: readonly unknown[]): PagefindSearchResponse => ({
   results: data.map((value, index) => ({
     id: `result-${index + 1}`,
-    data: async () => value,
-  })),
+    data: async () => value
+  }))
 });
 
 const trackedResponseWith = (...values: readonly unknown[]) => {
@@ -22,8 +16,8 @@ const trackedResponseWith = (...values: readonly unknown[]) => {
   const response: PagefindSearchResponse = {
     results: data.map((load, index) => ({
       id: `result-${index + 1}`,
-      data: load,
-    })),
+      data: load
+    }))
   };
 
   return { data, response };
@@ -35,13 +29,11 @@ const validResult = (index: number) => ({
   meta: {
     title: `Результат ${index}`,
     sectionId: 'news',
-    sectionLabel: 'Новости',
-  },
+    sectionLabel: 'Новости'
+  }
 });
 
-const dataCallCount = (
-  loaders: ReturnType<typeof trackedResponseWith>['data'],
-): number =>
+const dataCallCount = (loaders: ReturnType<typeof trackedResponseWith>['data']): number =>
   loaders.reduce((total, loader) => total + loader.mock.calls.length, 0);
 
 const runtimeWith = (response: PagefindSearchResponse) => {
@@ -60,7 +52,7 @@ describe('Pagefind search client', () => {
     const loadPagefind = vi.fn(async () => runtime);
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind,
+      loadPagefind
     });
 
     expect(loadPagefind).not.toHaveBeenCalled();
@@ -119,23 +111,21 @@ describe('Pagefind search client', () => {
 
   it('retries runtime loading and configuration after failures', async () => {
     const { options, runtime } = runtimeWith(responseWith());
-    options
-      .mockRejectedValueOnce(new Error('options failed'))
-      .mockResolvedValue(undefined);
+    options.mockRejectedValueOnce(new Error('options failed')).mockResolvedValue(undefined);
     const loadPagefind = vi
       .fn<() => Promise<PagefindRuntime>>()
       .mockRejectedValueOnce(new Error('load failed'))
       .mockResolvedValue(runtime);
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind,
+      loadPagefind
     });
 
     await expect(client.search('первый')).rejects.toThrow('load failed');
     await expect(client.search('второй')).rejects.toThrow('options failed');
     await expect(client.search('третий')).resolves.toMatchObject({
       state: 'ready',
-      query: 'третий',
+      query: 'третий'
     });
     expect(loadPagefind).toHaveBeenCalledTimes(3);
     expect(options).toHaveBeenCalledTimes(2);
@@ -143,12 +133,12 @@ describe('Pagefind search client', () => {
 
   it('reuses result IDs and only loads additions for a larger batch', async () => {
     const tracked = trackedResponseWith(
-      ...Array.from({ length: 16 }, (_, index) => validResult(index + 1)),
+      ...Array.from({ length: 16 }, (_, index) => validResult(index + 1))
     );
     const { runtime, search } = runtimeWith(tracked.response);
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind: async () => runtime,
+      loadPagefind: async () => runtime
     });
 
     const initial = await client.search('  тарифы  ');
@@ -156,13 +146,11 @@ describe('Pagefind search client', () => {
     expect(initial).toMatchObject({
       state: 'ready',
       total: 16,
-      results: { length: SEARCH_RESULT_DEFAULT_LIMIT },
+      results: { length: SEARCH_RESULT_DEFAULT_LIMIT }
     });
     expect(dataCallCount(tracked.data)).toBe(SEARCH_RESULT_DEFAULT_LIMIT);
     expect(
-      tracked.data
-        .slice(SEARCH_RESULT_DEFAULT_LIMIT)
-        .every((load) => load.mock.calls.length === 0),
+      tracked.data.slice(SEARCH_RESULT_DEFAULT_LIMIT).every((load) => load.mock.calls.length === 0)
     ).toBe(true);
 
     const repeated = await client.search('тарифы');
@@ -170,7 +158,7 @@ describe('Pagefind search client', () => {
     expect(repeated).toMatchObject({
       state: 'ready',
       total: 16,
-      results: { length: SEARCH_RESULT_DEFAULT_LIMIT },
+      results: { length: SEARCH_RESULT_DEFAULT_LIMIT }
     });
     expect(dataCallCount(tracked.data)).toBe(SEARCH_RESULT_DEFAULT_LIMIT);
 
@@ -179,13 +167,11 @@ describe('Pagefind search client', () => {
     expect(expanded).toMatchObject({
       state: 'ready',
       total: 16,
-      results: { length: 16 },
+      results: { length: 16 }
     });
     expect(search).toHaveBeenCalledTimes(4);
     expect(dataCallCount(tracked.data)).toBe(16);
-    expect(tracked.data.every((load) => load.mock.calls.length === 1)).toBe(
-      true,
-    );
+    expect(tracked.data.every((load) => load.mock.calls.length === 1)).toBe(true);
   });
 
   it('does not load Pagefind when the dev snapshot is unavailable', async () => {
@@ -193,7 +179,7 @@ describe('Pagefind search client', () => {
     const loadPagefind = vi.fn(async () => runtime);
     const client = createPagefindSearchClient({
       available: false,
-      loadPagefind,
+      loadPagefind
     });
 
     await expect(client.search('  тариф  ')).resolves.toMatchInlineSnapshot(`
@@ -212,8 +198,7 @@ describe('Pagefind search client', () => {
       responseWith(
         {
           url: 'https://kpshelkovo.online/news/item/index.html?source=test&h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#old',
-          excerpt:
-            'Текст с <mark>совпадением</mark> и &lt;script&gt;alert(1)&lt;/script&gt;',
+          excerpt: 'Текст с <mark>совпадением</mark> и &lt;script&gt;alert(1)&lt;/script&gt;',
           content: '<script>alert(1)</script>',
           meta: {
             title: '  Заголовок\n новости  ',
@@ -221,46 +206,46 @@ describe('Pagefind search client', () => {
             sectionId: ' news ',
             sectionLabel: ' Новости ',
             publishedAt: '2026-08-14',
-            unchecked: '<img src=x onerror=alert(1)>',
+            unchecked: '<img src=x onerror=alert(1)>'
           },
           sub_results: [
             {
               url: '/news/item/?h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5',
               title: 'Страница целиком',
-              excerpt: 'Без якоря',
+              excerpt: 'Без якоря'
             },
             {
               url: '/news/item/?h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#overview',
               title: 'Обзор',
               excerpt: 'Общий фрагмент',
-              weighted_locations: [{ balanced_score: 1 }],
+              weighted_locations: [{ balanced_score: 1 }]
             },
             {
               url: '/news/item/?h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#details',
               title: '  Подробности  ',
               excerpt: 'Еще <mark>текст</mark>',
-              weighted_locations: [{ balanced_score: 10 }],
+              weighted_locations: [{ balanced_score: 10 }]
             },
             {
               url: '/news/other/#details',
               title: 'Другой документ',
-              excerpt: 'Не должен попасть в результат',
-            },
-          ],
+              excerpt: 'Не должен попасть в результат'
+            }
+          ]
         },
         {
           url: '/815/compare/settlements/shelkovo/',
           meta: {
             title: 'Шелково',
             sectionId: 'compare',
-            sectionLabel: 'Сравнение поселков',
-          },
-        },
-      ),
+            sectionLabel: 'Сравнение поселков'
+          }
+        }
+      )
     );
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind: async () => runtime,
+      loadPagefind: async () => runtime
     });
 
     await expect(client.search('текст')).resolves.toMatchInlineSnapshot(`
@@ -328,25 +313,25 @@ describe('Pagefind search client', () => {
               description: 'Описание новости',
               sectionId: 'news',
               sectionLabel: 'Новости',
-              tags: 'благоустройство, дороги',
-            },
-          }),
-        },
-      ],
+              tags: 'благоустройство, дороги'
+            }
+          })
+        }
+      ]
     };
     const { runtime } = runtimeWith(response);
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind: async () => runtime,
+      loadPagefind: async () => runtime
     });
 
     await expect(client.search('благоустройство')).resolves.toMatchObject({
       results: [
         {
           excerptHtml: undefined,
-          matchContext: 'Темы новости: благоустройство, дороги.',
-        },
-      ],
+          matchContext: 'Темы новости: благоустройство, дороги.'
+        }
+      ]
     });
   });
 
@@ -356,7 +341,7 @@ describe('Pagefind search client', () => {
       score: number,
       title: string,
       sectionId: 'meetings' | 'news' | 'status',
-      publishedAt: string,
+      publishedAt: string
     ) => ({
       id,
       score,
@@ -366,44 +351,31 @@ describe('Pagefind search client', () => {
           title,
           sectionId,
           sectionLabel: sectionId,
-          publishedAt,
-        },
-      }),
+          publishedAt
+        }
+      })
     });
     const response: PagefindSearchResponse = {
       results: [
-        result(
-          'old-exact-news',
-          12,
-          'Старая точная новость',
-          'news',
-          '2025-08-15',
-        ),
-        result(
-          'old-close-news',
-          11.4,
-          'Старая близкая новость',
-          'news',
-          '2025-08-15',
-        ),
+        result('old-exact-news', 12, 'Старая точная новость', 'news', '2025-08-15'),
+        result('old-close-news', 11.4, 'Старая близкая новость', 'news', '2025-08-15'),
         result('fresh-news', 10, 'Свежая новость', 'news', '2026-08-01'),
         result('old-incident', 10, 'Старый инцидент', 'status', '2025-08-15'),
         result('fresh-incident', 4, 'Свежий инцидент', 'status', '2026-08-01'),
         result('old-meeting', 10, 'Старая встреча', 'meetings', '2022-08-14'),
-        result('fresh-meeting', 6, 'Свежая встреча', 'meetings', '2026-02-21'),
-      ],
+        result('fresh-meeting', 6, 'Свежая встреча', 'meetings', '2026-02-21')
+      ]
     };
     const { runtime } = runtimeWith(response);
     const client = createPagefindSearchClient({
       available: true,
       loadPagefind: async () => runtime,
-      now: () => new Date('2026-08-15T12:00:00Z'),
+      now: () => new Date('2026-08-15T12:00:00Z')
     });
     const search = await client.search('общий запрос');
 
-    expect(
-      search?.state === 'ready' ? search.results.map(({ title }) => title) : [],
-    ).toMatchInlineSnapshot(`
+    expect(search?.state === 'ready' ? search.results.map(({ title }) => title) : [])
+      .toMatchInlineSnapshot(`
       [
         "Старая точная новость",
         "Свежая новость",
@@ -418,14 +390,14 @@ describe('Pagefind search client', () => {
 
   it('normalizes result limits without imposing a product cap', async () => {
     const tracked = trackedResponseWith(
-      ...Array.from({ length: 12 }, (_, index) => validResult(index + 1)),
+      ...Array.from({ length: 12 }, (_, index) => validResult(index + 1))
     );
     const { runtime } = runtimeWith(tracked.response);
     const searchWithLimit = async (limit: number) => {
       tracked.data.forEach((load) => load.mockClear());
       const client = createPagefindSearchClient({
         available: true,
-        loadPagefind: async () => runtime,
+        loadPagefind: async () => runtime
       });
 
       return client.search('limit', limit);
@@ -445,38 +417,36 @@ describe('Pagefind search client', () => {
     expect(allAvailable).toMatchObject({
       state: 'ready',
       total: 12,
-      results: { length: 12 },
+      results: { length: 12 }
     });
   });
 
   it('uses separate cached data for the same ID under different queries', async () => {
     const firstData = vi.fn(async () => ({
       ...validResult(1),
-      excerpt: 'Совпадение <mark>первого</mark> запроса',
+      excerpt: 'Совпадение <mark>первого</mark> запроса'
     }));
     const secondData = vi.fn(async () => ({
       ...validResult(1),
-      excerpt: 'Совпадение <mark>второго</mark> запроса',
+      excerpt: 'Совпадение <mark>второго</mark> запроса'
     }));
-    const search = vi.fn(
-      async (query: string): Promise<PagefindSearchResponse> => ({
-        results: [
-          {
-            id: 'shared-result',
-            data: query.includes('первый') ? firstData : secondData,
-          },
-        ],
-      }),
-    );
+    const search = vi.fn(async (query: string): Promise<PagefindSearchResponse> => ({
+      results: [
+        {
+          id: 'shared-result',
+          data: query.includes('первый') ? firstData : secondData
+        }
+      ]
+    }));
     const runtime: PagefindRuntime = {
       init: vi.fn(async () => {}),
       options: vi.fn(async () => {}),
       preload: vi.fn(async () => {}),
-      search,
+      search
     };
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind: async () => runtime,
+      loadPagefind: async () => runtime
     });
 
     const first = await client.search('первый', 1);
@@ -484,11 +454,11 @@ describe('Pagefind search client', () => {
 
     expect([first, second]).toMatchObject([
       {
-        results: [{ excerptHtml: 'Совпадение <mark>первого</mark> запроса' }],
+        results: [{ excerptHtml: 'Совпадение <mark>первого</mark> запроса' }]
       },
       {
-        results: [{ excerptHtml: 'Совпадение <mark>второго</mark> запроса' }],
-      },
+        results: [{ excerptHtml: 'Совпадение <mark>второго</mark> запроса' }]
+      }
     ]);
     expect(firstData).toHaveBeenCalledOnce();
     expect(secondData).toHaveBeenCalledOnce();
@@ -500,18 +470,18 @@ describe('Pagefind search client', () => {
       .mockRejectedValueOnce(new Error('fragment failed'))
       .mockResolvedValue(validResult(1));
     const response: PagefindSearchResponse = {
-      results: [{ id: 'retry-result', data }],
+      results: [{ id: 'retry-result', data }]
     };
     const { runtime } = runtimeWith(response);
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind: async () => runtime,
+      loadPagefind: async () => runtime
     });
 
     await expect(client.search('ошибка', 1)).rejects.toThrow('fragment failed');
     await expect(client.search('ошибка', 1)).resolves.toMatchObject({
       state: 'ready',
-      results: { length: 1 },
+      results: { length: 1 }
     });
     expect(data).toHaveBeenCalledTimes(2);
   });
@@ -523,25 +493,23 @@ describe('Pagefind search client', () => {
     });
     const olderData = vi.fn(() => olderDataPromise);
     const newerData = vi.fn(async () => validResult(2));
-    const search = vi.fn(
-      async (query: string): Promise<PagefindSearchResponse> => ({
-        results: [
-          {
-            id: 'shared-result',
-            data: query.includes('старый') ? olderData : newerData,
-          },
-        ],
-      }),
-    );
+    const search = vi.fn(async (query: string): Promise<PagefindSearchResponse> => ({
+      results: [
+        {
+          id: 'shared-result',
+          data: query.includes('старый') ? olderData : newerData
+        }
+      ]
+    }));
     const runtime: PagefindRuntime = {
       init: vi.fn(async () => {}),
       options: vi.fn(async () => {}),
       preload: vi.fn(async () => {}),
-      search,
+      search
     };
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind: async () => runtime,
+      loadPagefind: async () => runtime
     });
 
     const olderRequest = client.search('старый', 1);
@@ -572,11 +540,11 @@ describe('Pagefind search client', () => {
       init: vi.fn(async () => {}),
       options: vi.fn(async () => {}),
       preload: vi.fn(async () => {}),
-      search,
+      search
     };
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind: async () => runtime,
+      loadPagefind: async () => runtime
     });
 
     const first = await client.search('первый', 1);
@@ -586,7 +554,7 @@ describe('Pagefind search client', () => {
 
     expect([first, second]).toMatchObject([
       { state: 'ready', results: [{ title: 'Результат 1' }] },
-      { state: 'ready', results: [{ title: 'Результат 2' }] },
+      { state: 'ready', results: [{ title: 'Результат 2' }] }
     ]);
     expect(firstData).toHaveBeenCalledOnce();
     expect(secondData).toHaveBeenCalledOnce();
@@ -597,7 +565,7 @@ describe('Pagefind search client', () => {
     const { preload, runtime, search } = runtimeWith(responseWith());
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind: async () => runtime,
+      loadPagefind: async () => runtime
     });
     const limitedQuery = `  ${'я'.repeat(SEARCH_QUERY_MAX_LENGTH + 10)}  `;
 
@@ -616,7 +584,7 @@ describe('Pagefind search client', () => {
     const loadPagefind = vi.fn(async () => runtime);
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind,
+      loadPagefind
     });
 
     await client.preload?.('  подать в суд и тариф м  ');
@@ -630,7 +598,7 @@ describe('Pagefind search client', () => {
       loadCalls: loadPagefind.mock.calls.length,
       preloadCalls: preload.mock.calls,
       result,
-      searchCalls: search.mock.calls,
+      searchCalls: search.mock.calls
     }).toMatchInlineSnapshot(`
       {
         "ignoredLetter": {
@@ -672,22 +640,22 @@ describe('Pagefind search client', () => {
   it('rejects Pagefind inverse-prefix fallback for a missing long token', async () => {
     const broadResponse = responseWith(validResult(1));
     const search = vi.fn(async (query: string) =>
-      query === '"медицина"' ? responseWith() : broadResponse,
+      query === '"медицина"' ? responseWith() : broadResponse
     );
     const runtime: PagefindRuntime = {
       init: vi.fn(async () => {}),
       options: vi.fn(async () => {}),
       preload: vi.fn(async () => {}),
-      search,
+      search
     };
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind: async () => runtime,
+      loadPagefind: async () => runtime
     });
 
     expect({
       result: await client.search('медицина'),
-      searchCalls: search.mock.calls,
+      searchCalls: search.mock.calls
     }).toMatchInlineSnapshot(`
       {
         "result": {
@@ -713,31 +681,31 @@ describe('Pagefind search client', () => {
     const firstData = vi.fn(async () => ({
       ...validResult(1),
       content: 'Калькулятор тарифа',
-      locations: [0],
+      locations: [0]
     }));
     const secondData = vi.fn(async () => ({
       ...validResult(2),
       content: 'Возьмите калькулятор',
-      locations: [1],
+      locations: [1]
     }));
     const broadResponse: PagefindSearchResponse = {
       results: [
         { id: 'calculator', score: 10, words: [0], data: firstData },
-        { id: 'meeting', score: 1, words: [1], data: secondData },
-      ],
+        { id: 'meeting', score: 1, words: [1], data: secondData }
+      ]
     };
     const search = vi.fn(async (query: string) =>
-      query === '"калькуля"' ? responseWith() : broadResponse,
+      query === '"калькуля"' ? responseWith() : broadResponse
     );
     const runtime: PagefindRuntime = {
       init: vi.fn(async () => {}),
       options: vi.fn(async () => {}),
       preload: vi.fn(async () => {}),
-      search,
+      search
     };
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind: async () => runtime,
+      loadPagefind: async () => runtime
     });
 
     const result = await client.search('калькуля');
@@ -745,7 +713,7 @@ describe('Pagefind search client', () => {
     expect({
       dataCalls: [firstData.mock.calls.length, secondData.mock.calls.length],
       result,
-      searchCalls: search.mock.calls,
+      searchCalls: search.mock.calls
     }).toMatchInlineSnapshot(`
       {
         "dataCalls": [
@@ -802,47 +770,47 @@ describe('Pagefind search client', () => {
     const data = {
       broadFood: vi.fn(async () => ({
         ...validResult(1),
-        excerpt: 'Широкое совпадение 1',
+        excerpt: 'Широкое совпадение 1'
       })),
       broadMeeting: vi.fn(async () => ({
         ...validResult(3),
-        excerpt: 'Широкое совпадение 3',
+        excerpt: 'Широкое совпадение 3'
       })),
       broadNoise: vi.fn(async () => validResult(2)),
       exactFood: vi.fn(async () => ({
         ...validResult(1),
-        excerpt: 'Точное совпадение 1',
+        excerpt: 'Точное совпадение 1'
       })),
       exactMeeting: vi.fn(async () => ({
         ...validResult(3),
-        excerpt: 'Точное совпадение 3',
-      })),
+        excerpt: 'Точное совпадение 3'
+      }))
     };
     const broadResponse: PagefindSearchResponse = {
       results: [
         { id: 'food', score: 12, data: data.broadFood },
         { id: 'noise', score: 8, data: data.broadNoise },
-        { id: 'meeting', score: 1, data: data.broadMeeting },
-      ],
+        { id: 'meeting', score: 1, data: data.broadMeeting }
+      ]
     };
     const exactResponse: PagefindSearchResponse = {
       results: [
         { id: 'food', data: data.exactFood },
-        { id: 'meeting', data: data.exactMeeting },
-      ],
+        { id: 'meeting', data: data.exactMeeting }
+      ]
     };
     const search = vi.fn(async (query: string) =>
-      query === '"еда"' ? exactResponse : broadResponse,
+      query === '"еда"' ? exactResponse : broadResponse
     );
     const runtime: PagefindRuntime = {
       init: vi.fn(async () => {}),
       options: vi.fn(async () => {}),
       preload: vi.fn(async () => {}),
-      search,
+      search
     };
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind: async () => runtime,
+      loadPagefind: async () => runtime
     });
 
     const result = await client.search('еда');
@@ -853,10 +821,10 @@ describe('Pagefind search client', () => {
         broadMeeting: data.broadMeeting.mock.calls.length,
         broadNoise: data.broadNoise.mock.calls.length,
         exactFood: data.exactFood.mock.calls.length,
-        exactMeeting: data.exactMeeting.mock.calls.length,
+        exactMeeting: data.exactMeeting.mock.calls.length
       },
       result,
-      searchCalls: search.mock.calls,
+      searchCalls: search.mock.calls
     }).toMatchInlineSnapshot(`
       {
         "dataCalls": {
@@ -915,22 +883,22 @@ describe('Pagefind search client', () => {
   it('keeps prefix search for an unfinished short word without exact matches', async () => {
     const broadResponse = responseWith(validResult(1));
     const search = vi.fn(async (query: string) =>
-      query === '"тар"' ? responseWith() : broadResponse,
+      query === '"тар"' ? responseWith() : broadResponse
     );
     const runtime: PagefindRuntime = {
       init: vi.fn(async () => {}),
       options: vi.fn(async () => {}),
       preload: vi.fn(async () => {}),
-      search,
+      search
     };
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind: async () => runtime,
+      loadPagefind: async () => runtime
     });
 
     await expect(client.search('тар')).resolves.toMatchObject({
       results: [{ title: 'Результат 1' }],
-      total: 1,
+      total: 1
     });
   });
 
@@ -950,20 +918,20 @@ describe('Pagefind search client', () => {
               meta: {
                 title: 'Новый',
                 sectionId: 'news',
-                sectionLabel: 'Новости',
-              },
-            }),
-          ),
+                sectionLabel: 'Новости'
+              }
+            })
+          )
     );
     const runtime: PagefindRuntime = {
       init: vi.fn(async () => {}),
       options,
       preload: vi.fn(async () => {}),
-      search,
+      search
     };
     const client = createPagefindSearchClient({
       available: true,
-      loadPagefind: async () => runtime,
+      loadPagefind: async () => runtime
     });
 
     const olderRequest = client.search('старый');
@@ -976,9 +944,9 @@ describe('Pagefind search client', () => {
         meta: {
           title: 'Старый',
           sectionId: 'news',
-          sectionLabel: 'Новости',
-        },
-      }),
+          sectionLabel: 'Новости'
+        }
+      })
     );
 
     expect(newerResult?.query).toBe('новый');

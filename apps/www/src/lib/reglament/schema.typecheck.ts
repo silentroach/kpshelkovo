@@ -22,11 +22,11 @@ export const validEstimateRow = {
       usn: 0.6,
       income: 74.62,
       vat: 3.731,
-      gross: 78.351,
-    },
+      gross: 78.351
+    }
   },
   source_refs: [{ pdf: 'final', page: 1 }],
-  editable_fields: [],
+  editable_fields: []
 } satisfies EstimateRow;
 
 export const estimateRowWithoutId = {
@@ -35,7 +35,7 @@ export const estimateRowWithoutId = {
   coefficient_policy: 'fot',
   baseline: validEstimateRow.baseline,
   source_refs: validEstimateRow.source_refs,
-  editable_fields: [],
+  editable_fields: []
   // @ts-expect-error id is required for stable row-level edits and deltas.
 } satisfies EstimateRow;
 
@@ -45,7 +45,7 @@ export const estimateRowWithoutTitle = {
   coefficient_policy: 'fot',
   baseline: validEstimateRow.baseline,
   source_refs: validEstimateRow.source_refs,
-  editable_fields: [],
+  editable_fields: []
   // @ts-expect-error title is required for human-readable UI and data payloads.
 } satisfies EstimateRow;
 
@@ -55,7 +55,7 @@ export const estimateRowWithoutSourceRefs = {
   kind: 'work',
   coefficient_policy: 'fot',
   baseline: validEstimateRow.baseline,
-  editable_fields: [],
+  editable_fields: []
   // @ts-expect-error source_refs are required for PDF traceability.
 } satisfies EstimateRow;
 
@@ -67,7 +67,7 @@ export const estimateRowWithEmptySourceRefs = {
   baseline: validEstimateRow.baseline,
   // @ts-expect-error source_refs must include at least one PDF reference.
   source_refs: [],
-  editable_fields: [],
+  editable_fields: []
 } satisfies EstimateRow;
 
 export const estimateRowWithoutBaseline = {
@@ -76,6 +76,6 @@ export const estimateRowWithoutBaseline = {
   kind: 'work',
   coefficient_policy: 'fot',
   source_refs: validEstimateRow.source_refs,
-  editable_fields: [],
+  editable_fields: []
   // @ts-expect-error baseline is required for official comparisons.
 } satisfies EstimateRow;

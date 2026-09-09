@@ -8,11 +8,9 @@ describe('mapRawNewsAuthor', () => {
     ['official', 'official'],
     ['community', 'community'],
     ['editorial', 'editorial'],
-    ['other', 'other'],
+    ['other', 'other']
   ] as const)('maps raw kind %s to domain kind %s', (rawKind, domainKind) => {
-    expect(
-      mapRawNewsAuthor('source', { name: 'Источник', kind: rawKind }).kind,
-    ).toBe(domainKind);
+    expect(mapRawNewsAuthor('source', { name: 'Источник', kind: rawKind }).kind).toBe(domainKind);
   });
 
   it('maps raw author short_name to domain shortName', () => {
@@ -21,7 +19,7 @@ describe('mapRawNewsAuthor', () => {
       kind: 'official',
       short_name: 'ОКК',
       url: 'https://example.com/news',
-      role: 'Официальный источник',
+      role: 'Официальный источник'
     };
 
     expect(mapRawNewsAuthor('ok-comfort', raw)).toEqual({
@@ -30,7 +28,7 @@ describe('mapRawNewsAuthor', () => {
       kind: 'official',
       shortName: 'ОКК',
       url: 'https://example.com/news',
-      role: 'Официальный источник',
+      role: 'Официальный источник'
     });
   });
 });

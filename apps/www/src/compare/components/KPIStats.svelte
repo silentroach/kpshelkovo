@@ -31,9 +31,7 @@
 >
   {#if !embed}
     <div class="stats-header">
-      <h2 class="stats-title" data-testid="kpi-stats-title">
-        Ключевые показатели
-      </h2>
+      <h2 class="stats-title" data-testid="kpi-stats-title">Ключевые показатели</h2>
       <p class="stats-context">по текущему набору поселков</p>
     </div>
   {/if}
@@ -48,9 +46,7 @@
         <div class="ui-num metric-value" data-testid="kpi-peer-median">
           {formatTariff(stats.peerMedianTariff)}
         </div>
-        <div
-          class={`ui-num metric-delta ${getMedianTone(stats.shelkovoVsPeerMedianPercent)}`}
-        >
+        <div class={`ui-num metric-delta ${getMedianTone(stats.shelkovoVsPeerMedianPercent)}`}>
           {getDeltaText(stats.shelkovoVsPeerMedianPercent)}
         </div>
       </div>
@@ -65,9 +61,7 @@
         <div class="ui-num metric-value">
           {formatTariff(stats.medianTariff)}
         </div>
-        <div
-          class={`ui-num metric-delta ${getMedianTone(stats.shelkovoVsMedianPercent)}`}
-        >
+        <div class={`ui-num metric-delta ${getMedianTone(stats.shelkovoVsMedianPercent)}`}>
           {getDeltaText(stats.shelkovoVsMedianPercent)}
         </div>
       </div>

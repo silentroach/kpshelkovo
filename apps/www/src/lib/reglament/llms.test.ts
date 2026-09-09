@@ -5,7 +5,7 @@ let build: typeof import('./llms').build;
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ build } = await import('./llms'));
@@ -13,8 +13,7 @@ beforeAll(async () => {
 
 describe('reglament llms', () => {
   it('serializes the short agent overview as Markdown AST output', () => {
-    expect(build('short').split('\n').slice(0, 18).join('\n'))
-      .toMatchInlineSnapshot(`
+    expect(build('short').split('\n').slice(0, 18).join('\n')).toMatchInlineSnapshot(`
         "# Калькулятор тарифа по смете 2026
 
         Файл: llms.txt

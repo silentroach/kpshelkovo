@@ -1,13 +1,10 @@
 import { fireEvent, render, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type {
-  SearchClient,
-  SearchResponse,
-  SearchResult,
-} from '@/lib/search/client.types';
-import SearchDialog from '../SearchDialog.svelte';
+import type { SearchClient, SearchResponse, SearchResult } from '@/lib/search/client.types';
+
 import { SEARCH_DIALOG_OPEN_EVENT } from '../search-dialog.events';
+import SearchDialog from '../SearchDialog.svelte';
 
 interface Deferred<T> {
   readonly promise: Promise<T>;
@@ -33,27 +30,25 @@ const resultAt = (index: number): SearchResult => ({
   title: `Результат ${index}`,
   section: {
     id: 'news',
-    label: 'Новости',
+    label: 'Новости'
   },
   publishedAt: index === 1 ? '2026-08-14' : undefined,
   excerptHtml:
-    index === 1
-      ? 'Совпало <mark>слово</mark> и &lt;script&gt;alert(1)&lt;/script&gt;'
-      : undefined,
-  subResults: [],
+    index === 1 ? 'Совпало <mark>слово</mark> и &lt;script&gt;alert(1)&lt;/script&gt;' : undefined,
+  subResults: []
 });
 
 const readyResponse = (
   query: string,
   results: readonly SearchResult[],
   total = results.length,
-  searchQuery = query,
+  searchQuery = query
 ): SearchResponse => ({
   state: 'ready',
   query,
   searchQuery,
   results,
-  total,
+  total
 });
 
 const addOpener = (label: string): HTMLButtonElement => {
@@ -68,10 +63,7 @@ const addOpener = (label: string): HTMLButtonElement => {
 };
 
 const requestOpen = async (opener: HTMLElement): Promise<void> => {
-  await fireEvent(
-    document,
-    new CustomEvent(SEARCH_DIALOG_OPEN_EVENT, { detail: opener }),
-  );
+  await fireEvent(document, new CustomEvent(SEARCH_DIALOG_OPEN_EVENT, { detail: opener }));
 };
 
 const dialogFrom = (container: HTMLElement): HTMLDialogElement => {
@@ -83,10 +75,7 @@ const dialogFrom = (container: HTMLElement): HTMLDialogElement => {
   return dialog;
 };
 
-const enterDebouncedQuery = async (
-  input: HTMLElement,
-  value: string,
-): Promise<void> => {
+const enterDebouncedQuery = async (input: HTMLElement, value: string): Promise<void> => {
   vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
   await fireEvent.input(input, { target: { value } });
   vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS);
@@ -98,9 +87,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
   delete document.documentElement.dataset.siteMetrikaId;
   delete window.ym;
-  document
-    .querySelectorAll('[data-search-test-opener]')
-    .forEach((element) => element.remove());
+  document.querySelectorAll('[data-search-test-opener]').forEach((element) => element.remove());
 });
 
 describe('SearchDialog', () => {
@@ -178,9 +165,7 @@ describe('SearchDialog', () => {
     const preload = vi.fn(async () => {
       throw new Error('Pagefind preload failed');
     });
-    const search = vi.fn(async (query: string) =>
-      readyResponse(query, [resultAt(1)]),
-    );
+    const search = vi.fn(async (query: string) => readyResponse(query, [resultAt(1)]));
     const client: SearchClient = { init, preload, search };
     const opener = addOpener('Поиск');
     const view = render(SearchDialog, { props: { client } });
@@ -231,18 +216,12 @@ describe('SearchDialog', () => {
     await waitFor(() => expect(document.activeElement).toBe(input));
     expect(dialog.open).toBe(true);
     expect(input.getAttribute('placeholder')).toBe('Что найти?');
+    expect(view.queryByRole('region', { name: 'Результаты поиска' })).toBeNull();
     expect(
-      view.queryByRole('region', { name: 'Результаты поиска' }),
-    ).toBeNull();
-    expect(
-      view.queryByText(
-        'Введите запрос, чтобы найти новости, статусы и справочные материалы.',
-      ),
+      view.queryByText('Введите запрос, чтобы найти новости, статусы и справочные материалы.')
     ).toBeNull();
     expect(dialog.getAttribute('aria-labelledby')).toBeTruthy();
-    expect(
-      dialog.querySelector('[aria-live="polite"][aria-atomic="true"]'),
-    ).toBeTruthy();
+    expect(dialog.querySelector('[aria-live="polite"][aria-atomic="true"]')).toBeTruthy();
 
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     await fireEvent.input(input, { target: { value: 'отмена' } });
@@ -268,9 +247,7 @@ describe('SearchDialog', () => {
   });
 
   it('keeps Tab navigation inside the dialog with and without results', async () => {
-    const search = vi.fn(async (query: string) =>
-      readyResponse(query, [resultAt(1)]),
-    );
+    const search = vi.fn(async (query: string) => readyResponse(query, [resultAt(1)]));
     const opener = addOpener('Поиск');
     const view = render(SearchDialog, { props: { client: { search } } });
 
@@ -298,27 +275,25 @@ describe('SearchDialog', () => {
       ...resultAt(1),
       section: { id: 'compare', label: 'Сравнение поселков' },
       excerptHtml:
-        '5 813 ₽/участок в месяц, это ~581 ₽/сотка в месяц. Дешевле Шелково на 234 ₽/сотка.',
+        '5 813 ₽/участок в месяц, это ~581 ₽/сотка в месяц. Дешевле Шелково на 234 ₽/сотка.'
     };
-    const search = vi.fn(async (query: string) =>
-      readyResponse(query, [result]),
-    );
+    const search = vi.fn(async (query: string) => readyResponse(query, [result]));
     const opener = addOpener('Поиск');
     const view = render(SearchDialog, { props: { client: { search } } });
 
     await requestOpen(opener);
     await enterDebouncedQuery(
       view.getByRole('searchbox', { name: 'Что найти на сайте' }),
-      'ивушкино',
+      'ивушкино'
     );
     await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(1));
 
     expect(
       view.container
         .querySelector('.site-search-result-excerpt')
-        ?.innerHTML.replaceAll('<!---->', ''),
+        ?.innerHTML.replaceAll('<!---->', '')
     ).toMatchInlineSnapshot(
-      `"5 813 ₽/участок в месяц, это ~581 ₽/сотка в месяц. <br>Дешевле Шелково на 234 ₽/сотка."`,
+      `"5 813 ₽/участок в месяц, это ~581 ₽/сотка в месяц. <br>Дешевле Шелково на 234 ₽/сотка."`
     );
   });
 
@@ -336,10 +311,7 @@ describe('SearchDialog', () => {
 
         constructor(callback: IntersectionObserverCallback) {
           intersections.push(() =>
-            callback(
-              [{ isIntersecting: true } as IntersectionObserverEntry],
-              this,
-            ),
+            callback([{ isIntersecting: true } as IntersectionObserverEntry], this)
           );
         }
 
@@ -347,30 +319,28 @@ describe('SearchDialog', () => {
         readonly observe = observe;
         readonly takeRecords = (): IntersectionObserverEntry[] => [];
         readonly unobserve = vi.fn();
-      },
+      }
     );
     const initialPending = deferred<SearchResponse | undefined>();
     const firstExpansion = deferred<SearchResponse | undefined>();
     const failedSecondExpansion = deferred<SearchResponse | undefined>();
     const retriedSecondExpansion = deferred<SearchResponse | undefined>();
     let secondExpansionRequests = 0;
-    const search = vi.fn(
-      (_query: string, limit?: number): Promise<SearchResponse | undefined> => {
-        switch (limit) {
-          case 8:
-            return initialPending.promise;
-          case 16:
-            return firstExpansion.promise;
-          case 24:
-            secondExpansionRequests += 1;
-            return secondExpansionRequests === 1
-              ? failedSecondExpansion.promise
-              : retriedSecondExpansion.promise;
-          default:
-            return Promise.reject(new Error(`Unexpected limit: ${limit}`));
-        }
-      },
-    );
+    const search = vi.fn((_query: string, limit?: number): Promise<SearchResponse | undefined> => {
+      switch (limit) {
+        case 8:
+          return initialPending.promise;
+        case 16:
+          return firstExpansion.promise;
+        case 24:
+          secondExpansionRequests += 1;
+          return secondExpansionRequests === 1
+            ? failedSecondExpansion.promise
+            : retriedSecondExpansion.promise;
+        default:
+          return Promise.reject(new Error(`Unexpected limit: ${limit}`));
+      }
+    });
     const client: SearchClient = { search };
     const opener = addOpener('Поиск');
     const view = render(SearchDialog, { props: { client } });
@@ -384,11 +354,9 @@ describe('SearchDialog', () => {
 
     expect(search).not.toHaveBeenCalled();
     expect(dialog.dataset.searchState).toBe('loading');
-    expect(
-      view
-        .getByRole('region', { name: 'Результаты поиска' })
-        .getAttribute('aria-busy'),
-    ).toBe('true');
+    expect(view.getByRole('region', { name: 'Результаты поиска' }).getAttribute('aria-busy')).toBe(
+      'true'
+    );
 
     vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS - 1);
     expect(search).not.toHaveBeenCalled();
@@ -401,8 +369,8 @@ describe('SearchDialog', () => {
       readyResponse(
         'вода',
         Array.from({ length: 8 }, (_, index) => resultAt(index + 1)),
-        18,
-      ),
+        18
+      )
     );
 
     await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(8));
@@ -413,14 +381,14 @@ describe('SearchDialog', () => {
     expect(firstResult?.querySelector('script')).toBeNull();
     expect(firstResult?.tabIndex).toBe(0);
     expect(dialog.dataset.searchState).toBe('results');
-    expect(
-      dialog.querySelector('[aria-live="polite"]')?.textContent?.trim(),
-    ).toBe('Найдено 18 результатов');
+    expect(dialog.querySelector('[aria-live="polite"]')?.textContent?.trim()).toBe(
+      'Найдено 18 результатов'
+    );
 
     const tabEvent = new KeyboardEvent('keydown', {
       bubbles: true,
       cancelable: true,
-      key: 'Tab',
+      key: 'Tab'
     });
     input.dispatchEvent(tabEvent);
     expect(tabEvent.defaultPrevented).toBe(false);
@@ -437,8 +405,8 @@ describe('SearchDialog', () => {
       readyResponse(
         'вода',
         Array.from({ length: 14 }, (_, index) => resultAt(index + 1)),
-        18,
-      ),
+        18
+      )
     );
     await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(14));
 
@@ -449,9 +417,7 @@ describe('SearchDialog', () => {
     expect(view.getAllByRole('link')).toHaveLength(14);
 
     failedSecondExpansion.reject(new Error('Pagefind fragment failed'));
-    const retryButton = await waitFor(() =>
-      view.getByRole('button', { name: 'Повторить' }),
-    );
+    const retryButton = await waitFor(() => view.getByRole('button', { name: 'Повторить' }));
     expect(view.getAllByRole('link')).toHaveLength(14);
 
     await fireEvent.click(retryButton);
@@ -460,8 +426,8 @@ describe('SearchDialog', () => {
       readyResponse(
         'вода',
         Array.from({ length: 16 }, (_, index) => resultAt(index + 1)),
-        18,
-      ),
+        18
+      )
     );
     await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(16));
     expect(observe).toHaveBeenCalledTimes(3);
@@ -470,11 +436,11 @@ describe('SearchDialog', () => {
     await fireEvent.keyDown(input, { key: 'ArrowDown' });
     expect(document.activeElement).toBe(view.getAllByRole('link')[0]);
     await fireEvent.keyDown(document.activeElement as HTMLElement, {
-      key: 'ArrowDown',
+      key: 'ArrowDown'
     });
     expect(document.activeElement).toBe(view.getAllByRole('link')[1]);
     await fireEvent.keyDown(document.activeElement as HTMLElement, {
-      key: 'ArrowUp',
+      key: 'ArrowUp'
     });
     expect(document.activeElement).toBe(view.getAllByRole('link')[0]);
 
@@ -491,11 +457,10 @@ describe('SearchDialog', () => {
 
   it('keeps current results visible without activating them during a refined search', async () => {
     const refinedSearch = deferred<SearchResponse | undefined>();
-    const search = vi.fn(
-      (query: string): Promise<SearchResponse | undefined> =>
-        query === 'вода горячая'
-          ? refinedSearch.promise
-          : Promise.resolve(readyResponse(query, [resultAt(1)])),
+    const search = vi.fn((query: string): Promise<SearchResponse | undefined> =>
+      query === 'вода горячая'
+        ? refinedSearch.promise
+        : Promise.resolve(readyResponse(query, [resultAt(1)]))
     );
     const client: SearchClient = { search };
     const opener = addOpener('Поиск');
@@ -506,7 +471,7 @@ describe('SearchDialog', () => {
     const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
     await enterDebouncedQuery(input, 'вода');
     const resultsRegion = view.getByRole('region', {
-      name: 'Результаты поиска',
+      name: 'Результаты поиска'
     });
     await waitFor(() => expect(view.getByRole('link')).toBeTruthy());
 
@@ -518,9 +483,7 @@ describe('SearchDialog', () => {
     expect(view.getByRole('link').getAttribute('href')).toBe('/news/result-1/');
     expect(view.queryByText('Ищем…')).toBeNull();
 
-    const staleResultActivation = vi.fn((event: Event) =>
-      event.preventDefault(),
-    );
+    const staleResultActivation = vi.fn((event: Event) => event.preventDefault());
     view.getByRole('link').addEventListener('click', staleResultActivation);
     await fireEvent.keyDown(input, { key: 'Enter' });
     expect(staleResultActivation).not.toHaveBeenCalled();
@@ -533,17 +496,13 @@ describe('SearchDialog', () => {
 
     refinedSearch.resolve(readyResponse('вода горячая', [resultAt(2)]));
     await waitFor(() =>
-      expect(view.getByRole('link').getAttribute('href')).toBe(
-        '/news/result-2/',
-      ),
+      expect(view.getByRole('link').getAttribute('href')).toBe('/news/result-2/')
     );
     expect(resultsRegion.getAttribute('aria-busy')).toBe('false');
   });
 
   it('leaves focused result navigation native and only closes for the current tab', async () => {
-    const search = vi.fn(async (query: string) =>
-      readyResponse(query, [resultAt(1)]),
-    );
+    const search = vi.fn(async (query: string) => readyResponse(query, [resultAt(1)]));
     const client: SearchClient = { search };
     const opener = addOpener('Поиск');
     const view = render(SearchDialog, { props: { client } });
@@ -558,7 +517,7 @@ describe('SearchDialog', () => {
     const enterEvent = new KeyboardEvent('keydown', {
       bubbles: true,
       cancelable: true,
-      key: 'Enter',
+      key: 'Enter'
     });
     await fireEvent(resultLink, enterEvent);
 
@@ -580,9 +539,7 @@ describe('SearchDialog', () => {
   });
 
   it('leaves search keyboard handling inactive during IME composition', async () => {
-    const search = vi.fn(async (query: string) =>
-      readyResponse(query, [resultAt(1)]),
-    );
+    const search = vi.fn(async (query: string) => readyResponse(query, [resultAt(1)]));
     const client: SearchClient = { search };
     const opener = addOpener('Поиск');
     const view = render(SearchDialog, { props: { client } });
@@ -615,21 +572,21 @@ describe('SearchDialog', () => {
         {
           url: '/news/long-page/#',
           title: 'Пустой якорь',
-          excerptHtml: 'Этот фрагмент не подходит',
+          excerptHtml: 'Этот фрагмент не подходит'
         },
         {
           url: '/news/long-page/#details',
           title: 'Юрий Кизилов в 00:26:20',
-          excerptHtml: 'Якорный <mark>фрагмент</mark>',
-        },
-      ],
+          excerptHtml: 'Якорный <mark>фрагмент</mark>'
+        }
+      ]
     };
     const describedResult: SearchResult = {
       url: '/status/water/',
       title: 'Статус воды',
       description: 'Описание <strong>остается текстом</strong>',
       section: { id: 'status', label: 'Статус' },
-      subResults: [],
+      subResults: []
     };
     const taggedResult: SearchResult = {
       url: '/news/tagged/',
@@ -637,10 +594,10 @@ describe('SearchDialog', () => {
       description: 'Это описание не должно заменить контекст тегов',
       matchContext: 'Темы новости: благоустройство, дороги.',
       section: { id: 'news', label: 'Новости' },
-      subResults: [],
+      subResults: []
     };
     const search = vi.fn(async (query: string) =>
-      readyResponse(query, [anchoredResult, taggedResult, describedResult]),
+      readyResponse(query, [anchoredResult, taggedResult, describedResult])
     );
     const client: SearchClient = { search };
     const opener = addOpener('Поиск');
@@ -654,45 +611,33 @@ describe('SearchDialog', () => {
     const [anchoredLink, taggedLink, describedLink] = view.getAllByRole('link');
     expect(anchoredLink?.getAttribute('href')).toBe('/news/long-page/#details');
     expect(anchoredLink?.getAttribute('data-astro-prefetch')).toBe('false');
-    expect(anchoredLink?.querySelector('h3')?.textContent?.trim()).toBe(
-      'Основная страница',
-    );
-    expect(anchoredLink?.textContent).toContain(
-      'Юрий Кизилов в 00:26:20:\u00a0Якорный фрагмент',
-    );
+    expect(anchoredLink?.querySelector('h3')?.textContent?.trim()).toBe('Основная страница');
+    expect(anchoredLink?.textContent).toContain('Юрий Кизилов в 00:26:20:\u00a0Якорный фрагмент');
     expect(anchoredLink?.querySelector('mark')?.textContent).toBe('фрагмент');
-    expect(taggedLink?.textContent).toContain(
-      'Темы новости: благоустройство, дороги.',
-    );
-    expect(taggedLink?.textContent).not.toContain(
-      'Это описание не должно заменить контекст тегов',
-    );
-    expect(describedLink?.textContent).toContain(
-      'Описание <strong>остается текстом</strong>',
-    );
+    expect(taggedLink?.textContent).toContain('Темы новости: благоустройство, дороги.');
+    expect(taggedLink?.textContent).not.toContain('Это описание не должно заменить контекст тегов');
+    expect(describedLink?.textContent).toContain('Описание <strong>остается текстом</strong>');
     expect(describedLink?.querySelector('strong')).toBeNull();
   });
 
   it('handles empty, unavailable, current errors, and stale thrown errors', async () => {
     const staleRequest = deferred<SearchResponse | undefined>();
-    const search = vi.fn(
-      (query: string): Promise<SearchResponse | undefined> => {
-        switch (query) {
-          case 'пусто':
-            return Promise.resolve(readyResponse(query, []));
-          case 'разработка':
-            return Promise.resolve({ state: 'devUnavailable', query });
-          case 'ошибка':
-            return Promise.reject(new Error('Pagefind failed'));
-          case 'старый':
-            return staleRequest.promise;
-          case 'новый':
-            return Promise.resolve(readyResponse(query, [resultAt(20)]));
-          default:
-            return Promise.resolve(readyResponse(query, []));
-        }
-      },
-    );
+    const search = vi.fn((query: string): Promise<SearchResponse | undefined> => {
+      switch (query) {
+        case 'пусто':
+          return Promise.resolve(readyResponse(query, []));
+        case 'разработка':
+          return Promise.resolve({ state: 'devUnavailable', query });
+        case 'ошибка':
+          return Promise.reject(new Error('Pagefind failed'));
+        case 'старый':
+          return staleRequest.promise;
+        case 'новый':
+          return Promise.resolve(readyResponse(query, [resultAt(20)]));
+        default:
+          return Promise.resolve(readyResponse(query, []));
+      }
+    });
     const client: SearchClient = { search };
     const opener = addOpener('Поиск');
     const view = render(SearchDialog, { props: { client } });
@@ -705,14 +650,10 @@ describe('SearchDialog', () => {
     await waitFor(() => expect(dialog.dataset.searchState).toBe('empty'));
 
     await enterDebouncedQuery(input, 'разработка');
-    await waitFor(() =>
-      expect(dialog.dataset.searchState).toBe('dev-unavailable'),
+    await waitFor(() => expect(dialog.dataset.searchState).toBe('dev-unavailable'));
+    expect(view.getByRole('region', { name: 'Результаты поиска' }).getAttribute('aria-busy')).toBe(
+      'false'
     );
-    expect(
-      view
-        .getByRole('region', { name: 'Результаты поиска' })
-        .getAttribute('aria-busy'),
-    ).toBe('false');
 
     await enterDebouncedQuery(input, 'ошибка');
     await waitFor(() => expect(dialog.dataset.searchState).toBe('error'));
@@ -720,15 +661,11 @@ describe('SearchDialog', () => {
     await enterDebouncedQuery(input, 'старый');
     await enterDebouncedQuery(input, 'новый');
     await waitFor(() => expect(dialog.dataset.searchState).toBe('results'));
-    expect(view.getByRole('link').getAttribute('href')).toBe(
-      '/news/result-20/',
-    );
+    expect(view.getByRole('link').getAttribute('href')).toBe('/news/result-20/');
 
     staleRequest.reject(new Error('Old Pagefind failure'));
     await waitFor(() => expect(dialog.dataset.searchState).toBe('results'));
-    expect(view.getByRole('link').getAttribute('href')).toBe(
-      '/news/result-20/',
-    );
+    expect(view.getByRole('link').getAttribute('href')).toBe('/news/result-20/');
   });
 
   it('cleans up a pending search without focusing the opener on unmount', async () => {

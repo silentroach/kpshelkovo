@@ -1,24 +1,14 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { formatApiCatalogLink } from '@/lib/api-catalog-response';
 import type { comparePublicSurfaceSlice as comparePublicSurfaceSliceType } from '@/compare/lib/public-surface';
+import { formatApiCatalogLink } from '@/lib/api-catalog-response';
 import type { PublicSurfaceSlice } from '@/lib/public-surface';
 import type { expectSectionCatalogMatchesRegistry as expectSectionCatalogMatchesRegistryType } from '@/lib/public-surface/catalog-contract.test-helper';
 
-import {
-  EXPLORER,
-  FEED,
-  OPENAPI,
-  SCHEMA,
-  catalog,
-  links,
-  openapi,
-  schema,
-} from './discovery';
+import { EXPLORER, FEED, OPENAPI, SCHEMA, catalog, links, openapi, schema } from './discovery';
 
 const root = 'https://example.com';
-let comparePublicSurfaceSlice: typeof comparePublicSurfaceSliceType &
-  PublicSurfaceSlice;
+let comparePublicSurfaceSlice: typeof comparePublicSurfaceSliceType & PublicSurfaceSlice;
 let expectSectionCatalogMatchesRegistry: typeof expectSectionCatalogMatchesRegistryType;
 
 const objectAt = (value: unknown): Record<string, unknown> => {
@@ -41,7 +31,7 @@ const collectLocalRefs = (value: unknown): readonly string[] => {
   return Object.entries(value).flatMap(([key, entry]) =>
     key === '$ref' && typeof entry === 'string' && entry.startsWith('#/')
       ? [entry]
-      : collectLocalRefs(entry),
+      : collectLocalRefs(entry)
   );
 };
 
@@ -55,8 +45,7 @@ const resolveLocalRef = (document: unknown, ref: string): unknown =>
     }, document);
 
 beforeAll(async () => {
-  ({ comparePublicSurfaceSlice } =
-    await import('@/compare/lib/public-surface'));
+  ({ comparePublicSurfaceSlice } = await import('@/compare/lib/public-surface'));
   ({ expectSectionCatalogMatchesRegistry } =
     await import('@/lib/public-surface/catalog-contract.test-helper'));
 });
@@ -83,7 +72,7 @@ describe('schema', () => {
 
   it.each([
     ['standalone schema', schema(root)],
-    ['OpenAPI document', openapi(root)],
+    ['OpenAPI document', openapi(root)]
   ])('resolves every local ref in the %s', (_name, document) => {
     const refs = collectLocalRefs(document);
 
@@ -100,7 +89,7 @@ describe('catalog', () => {
       catalog,
       catalogRoot: `${root}/815/compare`,
       siteRoot: root,
-      slice: comparePublicSurfaceSlice,
+      slice: comparePublicSurfaceSlice
     });
   });
 
@@ -118,12 +107,9 @@ describe('catalog', () => {
       `${root}${EXPLORER}`,
       `${root}/llms.txt`,
       `${root}/llms-full.txt`,
-      `${root}/.well-known/agent-skills/index.json`,
+      `${root}/.well-known/agent-skills/index.json`
     ]);
-    expect(desc.map((row) => row.href)).toEqual([
-      `${root}${SCHEMA}`,
-      `${root}${OPENAPI}`,
-    ]);
+    expect(desc.map((row) => row.href)).toEqual([`${root}${SCHEMA}`, `${root}${OPENAPI}`]);
   });
 });
 
@@ -135,8 +121,8 @@ describe('links', () => {
       [
         '<https://example.com/schemas/settlements.schema.json>; rel="service-desc"; type="application/schema+json"',
         '<https://example.com/openapi/settlements.openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"',
-        formatApiCatalogLink('https://example.com/.well-known/api-catalog'),
-      ].join(', '),
+        formatApiCatalogLink('https://example.com/.well-known/api-catalog')
+      ].join(', ')
     );
   });
 });

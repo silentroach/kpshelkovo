@@ -1,5 +1,5 @@
 const VISIBLE_WHITESPACE = {
-  nbsp: '·',
+  nbsp: '·'
 } as const;
 
 export const visibleWhitespace = (value: unknown): unknown => {
@@ -13,10 +13,7 @@ export const visibleWhitespace = (value: unknown): unknown => {
 
   if (value && typeof value === 'object') {
     return Object.fromEntries(
-      Object.entries(value).map(([key, entry]) => [
-        key,
-        visibleWhitespace(entry),
-      ]),
+      Object.entries(value).map(([key, entry]) => [key, visibleWhitespace(entry)])
     );
   }
 

@@ -8,7 +8,7 @@ import { PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE } from './pagefind-dev-snapshot'
 import type {
   SearchDialogGraphBuilder,
   SearchDialogGraphEnvironment,
-  SearchDialogOuterConfig,
+  SearchDialogOuterConfig
 } from './retryable-search-dialog.types';
 
 const assetsModuleId = 'virtual:search-dialog-assets';
@@ -16,22 +16,19 @@ const resolvedAssetsModuleId = `\0${assetsModuleId}`;
 const appRoot = fileURLToPath(new URL('../..', import.meta.url));
 const workspaceRoot = fileURLToPath(new URL('../../../..', import.meta.url));
 const srcRoot = fileURLToPath(new URL('..', import.meta.url));
-const graphEntry = fileURLToPath(
-  new URL('../components/search/lazy.ts', import.meta.url),
-);
+const graphEntry = fileURLToPath(new URL('../components/search/lazy.ts', import.meta.url));
 const graphDevUrl = '/__search-dialog/graph.js';
 const graphSourceRoots = [srcRoot, resolve(workspaceRoot, 'packages')].map(
-  (root) => `${resolve(root)}${sep}`,
+  (root) => `${resolve(root)}${sep}`
 );
 
 const isGraphSourceFile = (file: string): boolean =>
   graphSourceRoots.some((root) => resolve(file).startsWith(root));
 
 const resolveGraphEnvironment = (
-  config: SearchDialogOuterConfig,
+  config: SearchDialogOuterConfig
 ): SearchDialogGraphEnvironment | undefined => {
-  const pagefindDevSnapshotAvailable =
-    config.define?.[PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE];
+  const pagefindDevSnapshotAvailable = config.define?.[PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE];
   if (typeof pagefindDevSnapshotAvailable !== 'string') {
     return;
   }
@@ -39,12 +36,12 @@ const resolveGraphEnvironment = (
   return {
     command: config.command,
     mode: config.mode,
-    pagefindDevSnapshotAvailable,
+    pagefindDevSnapshotAvailable
   };
 };
 
 const requireGraphEnvironment = (
-  environment?: SearchDialogGraphEnvironment,
+  environment?: SearchDialogGraphEnvironment
 ): SearchDialogGraphEnvironment => {
   if (!environment) {
     throw new Error('Search dialog graph environment is not ready');
@@ -53,9 +50,7 @@ const requireGraphEnvironment = (
   return environment;
 };
 
-const buildSearchDialogGraph: SearchDialogGraphBuilder = async (
-  environment,
-): Promise<string> => {
+const buildSearchDialogGraph: SearchDialogGraphBuilder = async (environment): Promise<string> => {
   const result = await build({
     root: appRoot,
     configFile: false,
@@ -66,14 +61,13 @@ const buildSearchDialogGraph: SearchDialogGraphBuilder = async (
     mode: environment.mode,
     define: {
       'import.meta.env.DEV': JSON.stringify(environment.command === 'serve'),
-      [PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE]:
-        environment.pagefindDevSnapshotAvailable,
+      [PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE]: environment.pagefindDevSnapshotAvailable
     },
     plugins: [svelte()],
     resolve: {
       alias: {
-        '@': srcRoot,
-      },
+        '@': srcRoot
+      }
     },
     build: {
       write: false,
@@ -82,14 +76,14 @@ const buildSearchDialogGraph: SearchDialogGraphBuilder = async (
       lib: {
         entry: graphEntry,
         formats: ['es'],
-        fileName: 'module',
+        fileName: 'module'
       },
       rollupOptions: {
         output: {
-          codeSplitting: false,
-        },
-      },
-    },
+          codeSplitting: false
+        }
+      }
+    }
   });
 
   const outputs = Array.isArray(result) ? result : [result];
@@ -105,7 +99,7 @@ const buildSearchDialogGraph: SearchDialogGraphBuilder = async (
   const chunks = output.output.filter((item) => item.type === 'chunk');
   if (chunks.length !== 1) {
     throw new Error(
-      `Expected one standalone search dialog chunk, received ${String(chunks.length)}`,
+      `Expected one standalone search dialog chunk, received ${String(chunks.length)}`
     );
   }
 
@@ -133,13 +127,11 @@ const retryableSearchDialogBuildPlugin = (): Plugin => {
       graphEnvironment = resolveGraphEnvironment(config);
     },
     buildStart: async function () {
-      const graphSource = await buildSearchDialogGraph(
-        requireGraphEnvironment(graphEnvironment),
-      );
+      const graphSource = await buildSearchDialogGraph(requireGraphEnvironment(graphEnvironment));
       graphReference = this.emitFile({
         type: 'asset',
         name: 'SearchDialog.js',
-        source: graphSource,
+        source: graphSource
       });
     },
     resolveId(id) {
@@ -154,20 +146,18 @@ const retryableSearchDialogBuildPlugin = (): Plugin => {
       return `
         export const searchDialogGraphUrl = import.meta.ROLLUP_FILE_URL_${graphReference};
       `;
-    },
+    }
   };
 };
 
 export const createRetryableSearchDialogDevPlugin = (
-  buildGraph: SearchDialogGraphBuilder = buildSearchDialogGraph,
+  buildGraph: SearchDialogGraphBuilder = buildSearchDialogGraph
 ): Plugin => {
   let graphSourceRequest: Promise<string> | undefined;
   let graphEnvironment: SearchDialogGraphEnvironment | undefined;
 
   const loadGraphSource = (): Promise<string> => {
-    graphSourceRequest ??= buildGraph(
-      requireGraphEnvironment(graphEnvironment),
-    ).catch((error) => {
+    graphSourceRequest ??= buildGraph(requireGraphEnvironment(graphEnvironment)).catch((error) => {
       graphSourceRequest = undefined;
       throw error;
     });
@@ -197,9 +187,7 @@ export const createRetryableSearchDialogDevPlugin = (
           return;
         }
 
-        if (
-          new URL(request.url, 'http://vite.local').pathname !== graphDevUrl
-        ) {
+        if (new URL(request.url, 'http://vite.local').pathname !== graphDevUrl) {
           next();
           return;
         }
@@ -223,11 +211,11 @@ export const createRetryableSearchDialogDevPlugin = (
       return `
         export const searchDialogGraphUrl = ${JSON.stringify(graphDevUrl)};
       `;
-    },
+    }
   };
 };
 
 export const retryableSearchDialog = (): readonly Plugin[] => [
   retryableSearchDialogBuildPlugin(),
-  createRetryableSearchDialogDevPlugin(),
+  createRetryableSearchDialogDevPlugin()
 ];

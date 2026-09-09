@@ -6,18 +6,15 @@ let buildMeetingMarkdown: typeof import('./markdown').buildMeetingMarkdown;
 let buildMeetingsIndexMarkdown: typeof import('./markdown').buildMeetingsIndexMarkdown;
 let buildMeetingTranscriptPartMarkdown: typeof import('./markdown').buildMeetingTranscriptPartMarkdown;
 
-const moment = (input: {
-  readonly iso: string;
-  readonly hasTime: boolean;
-}): MeetingMoment => ({
+const moment = (input: { readonly iso: string; readonly hasTime: boolean }): MeetingMoment => ({
   at: new Date(input.iso),
   iso: input.iso,
-  hasTime: input.hasTime,
+  hasTime: input.hasTime
 });
 
 const time = (value: string, totalSeconds: number): MeetingTranscriptTime => ({
   value,
-  totalSeconds,
+  totalSeconds
 });
 
 const meeting = (): Meeting => {
@@ -25,7 +22,7 @@ const meeting = (): Meeting => {
     id: 'moderator',
     kind: 'local' as const,
     label: 'Модератор',
-    description: 'участник встречи',
+    description: 'участник встречи'
   };
   const first = {
     anchor: 't-00-00-00',
@@ -34,7 +31,7 @@ const meeting = (): Meeting => {
     speaker,
     text: 'Добрый день. Начинаем встречу.',
     textMarkdown: 'Добрый день. Начинаем встречу.',
-    textHtml: '<p>Добрый день. Начинаем встречу.</p>',
+    textHtml: '<p>Добрый день. Начинаем встречу.</p>'
   };
   const second = {
     anchor: 't-00-00-15',
@@ -43,8 +40,7 @@ const meeting = (): Meeting => {
     speaker,
     text: 'Полный текст второй реплики хранится только в файле части.',
     textMarkdown: 'Полный текст второй реплики хранится только в файле части.',
-    textHtml:
-      '<p>Полный текст второй реплики хранится только в файле части.</p>',
+    textHtml: '<p>Полный текст второй реплики хранится только в файле части.</p>'
   };
   const third = {
     anchor: 't-00-00-00-2',
@@ -53,7 +49,7 @@ const meeting = (): Meeting => {
     speaker,
     text: 'Вторая часть начинается заново с нуля.',
     textMarkdown: 'Вторая часть начинается заново с нуля.',
-    textHtml: '<p>Вторая часть начинается заново с нуля.</p>',
+    textHtml: '<p>Вторая часть начинается заново с нуля.</p>'
   };
 
   return {
@@ -63,20 +59,17 @@ const meeting = (): Meeting => {
     date: moment({ iso: '2026-06-13T16:00:00+03:00', hasTime: true }),
     context:
       'Встреча управляющей компании с жителями о сезонных работах, тарифе и финансовых вопросах.',
-    sourceUrls: [
-      'https://example.com/source-1',
-      'https://example.com/source-2',
-    ],
+    sourceUrls: ['https://example.com/source-1', 'https://example.com/source-2'],
     url: '/meetings/2026-06-13-ok-comfort/',
     canonical: 'https://example.com/meetings/2026-06-13-ok-comfort/',
     transcript: {
       speakers: [speaker],
       parts: [
         { index: 1, segments: [first, second] },
-        { index: 2, segments: [third] },
+        { index: 2, segments: [third] }
       ],
-      segments: [first, second, third],
-    },
+      segments: [first, second, third]
+    }
   };
 };
 
@@ -84,14 +77,11 @@ describe('meetings markdown', () => {
   beforeAll(async () => {
     Object.assign(import.meta.env, {
       SITE: 'https://example.com',
-      BASE_URL: '/',
+      BASE_URL: '/'
     });
 
-    ({
-      buildMeetingMarkdown,
-      buildMeetingsIndexMarkdown,
-      buildMeetingTranscriptPartMarkdown,
-    } = await import('./markdown'));
+    ({ buildMeetingMarkdown, buildMeetingsIndexMarkdown, buildMeetingTranscriptPartMarkdown } =
+      await import('./markdown'));
   });
 
   it('builds a compact section index without transcript text', () => {
@@ -157,10 +147,7 @@ describe('meetings markdown', () => {
 
   it('builds one transcript part with html anchors and adjacent navigation', () => {
     const item = meeting();
-    const markdown = buildMeetingTranscriptPartMarkdown(
-      item,
-      item.transcript.parts[0]!,
-    );
+    const markdown = buildMeetingTranscriptPartMarkdown(item, item.transcript.parts[0]!);
 
     expect(markdown).toMatchInlineSnapshot(`
       "# Встреча ОК Комфорт с жителями КП Шелково: Часть 1
@@ -190,13 +177,13 @@ describe('meetings markdown', () => {
         {
           ...segment,
           text: 'Категории:\n\n- Первая.\n- Вторая.\n- Третья.',
-          textMarkdown: 'Категории:\n\n- Первая.\n- Вторая.\n- Третья.',
-        },
-      ],
+          textMarkdown: 'Категории:\n\n- Первая.\n- Вторая.\n- Третья.'
+        }
+      ]
     };
 
     expect(buildMeetingTranscriptPartMarkdown(item, part)).toMatch(
-      /Категории:\n\n\s+- Первая\.\n\s+- Вторая\.\n\s+- Третья\./u,
+      /Категории:\n\n\s+- Первая\.\n\s+- Вторая\.\n\s+- Третья\./u
     );
   });
 });

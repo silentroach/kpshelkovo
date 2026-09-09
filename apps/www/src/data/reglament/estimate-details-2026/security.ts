@@ -1,7 +1,7 @@
 import type {
   EstimateDetailControlTotalInput,
   EstimateDetailResource,
-  EstimateDetailWorkItem,
+  EstimateDetailWorkItem
 } from '@/lib/reglament/detail-schema';
 
 import {
@@ -15,28 +15,20 @@ import {
   detailSourceQuoteItems,
   detailSourceRefs,
   detailStatus,
-  detailWorkItem,
+  detailWorkItem
 } from './shared';
 
-const securityAccessControlChopResourceId =
-  'security-access-control-chop-service';
-const securityAccessControlKppMaterialsResourceId =
-  'security-access-control-kpp-materials';
+const securityAccessControlChopResourceId = 'security-access-control-chop-service';
+const securityAccessControlKppMaterialsResourceId = 'security-access-control-kpp-materials';
 const securityAccessControlUsnResourceId = 'security-access-control-usn';
-const securityAccessControlVatResourceId =
-  'security-access-control-vat-derived';
+const securityAccessControlVatResourceId = 'security-access-control-vat-derived';
 const securityEquipmentVideoLaborResourceId = 'security-equipment-video-labor';
-const securityEquipmentVideoCamerasResourceId =
-  'security-equipment-video-cameras';
-const securityEquipmentMonitorLaborResourceId =
-  'security-equipment-monitor-labor';
-const securityEquipmentServerPowerLaborResourceId =
-  'security-equipment-server-power-labor';
+const securityEquipmentVideoCamerasResourceId = 'security-equipment-video-cameras';
+const securityEquipmentMonitorLaborResourceId = 'security-equipment-monitor-labor';
+const securityEquipmentServerPowerLaborResourceId = 'security-equipment-server-power-labor';
 const securityEquipmentSkudLaborResourceId = 'security-equipment-skud-labor';
-const securityEquipmentBarrierContractorResourceId =
-  'security-equipment-barrier-contractor';
-const securityEquipmentDomilendContractorResourceId =
-  'security-equipment-domilend-contractor';
+const securityEquipmentBarrierContractorResourceId = 'security-equipment-barrier-contractor';
+const securityEquipmentDomilendContractorResourceId = 'security-equipment-domilend-contractor';
 const securityEquipmentInsuranceResourceId = 'security-equipment-insurance';
 const securityEquipmentOverheadResourceId = 'security-equipment-overhead';
 const securityEquipmentProfitResourceId = 'security-equipment-profit';
@@ -55,8 +47,8 @@ const securityProductionAccessSource = detailSource(
   'производственная программа / круглосуточный пропускной режим',
   {
     quote:
-      'Услуги по круглосуточной охране поселка стационарными постами ... периодический обход/объезд территории поселка - 4 стационарных круглосуточных поста; пост; I-XII; 365; 4,0',
-  },
+      'Услуги по круглосуточной охране поселка стационарными постами ... периодический обход/объезд территории поселка - 4 стационарных круглосуточных поста; пост; I-XII; 365; 4,0'
+  }
 );
 
 const securityProductionEquipmentSource = detailSource(
@@ -65,8 +57,8 @@ const securityProductionEquipmentSource = detailSource(
   'производственная программа / техническое обслуживание средств охраны',
   {
     quote:
-      'видеокамеры 34,0; трудозатраты 584,1; мониторы 3,0; блок питания сервера 3,0; СКУД TRASSIR 5,0; шлагбаум 3,0',
-  },
+      'видеокамеры 34,0; трудозатраты 584,1; мониторы 3,0; блок питания сервера 3,0; СКУД TRASSIR 5,0; шлагбаум 3,0'
+  }
 );
 
 const securityProductionDomilendDispatchSource = detailSource(
@@ -75,8 +67,8 @@ const securityProductionDomilendDispatchSource = detailSource(
   'производственная программа / Домиленд и диспетчерское обслуживание',
   {
     quote:
-      'Обслуживание СРМ "Домиленд" ... 1,0 ... 11215; Оказание круглосуточных услуг по приему заявок ... 365; 1,4; 2826,5',
-  },
+      'Обслуживание СРМ "Домиленд" ... 1,0 ... 11215; Оказание круглосуточных услуг по приему заявок ... 365; 1,4; 2826,5'
+  }
 );
 
 const securityStaffSource = detailSource(
@@ -85,8 +77,8 @@ const securityStaffSource = detailSource(
   'нормативное штатное расписание по охране',
   {
     quote:
-      'Техник по обслуживанию слаботочных систем ... 3,2 ... 749,01; Диспетчер ... 1,4 ... 559,81',
-  },
+      'Техник по обслуживанию слаботочных систем ... 3,2 ... 749,01; Диспетчер ... 1,4 ... 559,81'
+  }
 );
 
 const securityAccessChopSource = detailSource(
@@ -94,8 +86,8 @@ const securityAccessChopSource = detailSource(
   5,
   'позиция 1.1 / услуги сторонней организации по охране',
   {
-    quote: 'Договорная цена; плата в месяц; 12,0; 720000,00; 8 640 000,00',
-  },
+    quote: 'Договорная цена; плата в месяц; 12,0; 720000,00; 8 640 000,00'
+  }
 );
 
 const securityAccessMaterialsSource = detailSource(
@@ -103,9 +95,8 @@ const securityAccessMaterialsSource = detailSource(
   6,
   'позиция 1.1 / материальные затраты на содержание КПП',
   {
-    quote:
-      'Материальные затраты на содержание КПП ... пост; 4,0; 252000,00; 1 008 000,00',
-  },
+    quote: 'Материальные затраты на содержание КПП ... пост; 4,0; 252000,00; 1 008 000,00'
+  }
 );
 
 const securityAccessTotalsSource = detailSource(
@@ -113,9 +104,8 @@ const securityAccessTotalsSource = detailSource(
   6,
   'итого по разделу круглосуточного пропускного режима',
   {
-    quote:
-      'Итого по разделу ... 9 648 000,00; 0,00; 0,00; 0,00; 8 640 000,00; 1 008 000,00',
-  },
+    quote: 'Итого по разделу ... 9 648 000,00; 0,00; 0,00; 0,00; 8 640 000,00; 1 008 000,00'
+  }
 );
 
 const securityEquipmentVideoSource = detailSource(
@@ -131,17 +121,17 @@ const securityEquipmentVideoSource = detailSource(
         resource_ids: [securityEquipmentVideoLaborResourceId],
         quantity: detailQuantity(584.1, 'чел-час'),
         unit_price_rub: detailMoney(749.01),
-        total_rub: detailMoney(437_513.59),
+        total_rub: detailMoney(437_513.59)
       }),
       detailSourceQuoteItem({
         label: 'Видеокамера',
         resource_ids: [securityEquipmentVideoCamerasResourceId],
         quantity: detailQuantity(2, 'шт.'),
         unit_price_rub: detailMoney(5_000),
-        total_rub: detailMoney(10_000),
-      }),
-    ),
-  },
+        total_rub: detailMoney(10_000)
+      })
+    )
+  }
 );
 
 const securityEquipmentMonitorSource = detailSource(
@@ -149,18 +139,17 @@ const securityEquipmentMonitorSource = detailSource(
   8,
   'позиция 2.2 / обслуживание монитора',
   {
-    quote:
-      'Затраты труда ... 38,6; 749,01; 28 919,40; ИТОГО ПО ПОЗИЦИИ 69 464,40',
+    quote: 'Затраты труда ... 38,6; 749,01; 28 919,40; ИТОГО ПО ПОЗИЦИИ 69 464,40',
     quote_items: detailSourceQuoteItems(
       detailSourceQuoteItem({
         label: 'Труд по обслуживанию монитора',
         resource_ids: [securityEquipmentMonitorLaborResourceId],
         quantity: detailQuantity(38.6, 'чел-час'),
         unit_price_rub: detailMoney(749.01),
-        total_rub: detailMoney(28_919.4),
-      }),
-    ),
-  },
+        total_rub: detailMoney(28_919.4)
+      })
+    )
+  }
 );
 
 const securityEquipmentServerPowerSource = detailSource(
@@ -168,18 +157,17 @@ const securityEquipmentServerPowerSource = detailSource(
   8,
   'позиция 2.3 / обслуживание блока питания сервера',
   {
-    quote:
-      'Затраты труда ... 14,0; 749,01; 10 516,15; ИТОГО ПО ПОЗИЦИИ 25 259,79',
+    quote: 'Затраты труда ... 14,0; 749,01; 10 516,15; ИТОГО ПО ПОЗИЦИИ 25 259,79',
     quote_items: detailSourceQuoteItems(
       detailSourceQuoteItem({
         label: 'Труд по обслуживанию блока питания сервера',
         resource_ids: [securityEquipmentServerPowerLaborResourceId],
         quantity: detailQuantity(14, 'чел-час'),
         unit_price_rub: detailMoney(749.01),
-        total_rub: detailMoney(10_516.15),
-      }),
-    ),
-  },
+        total_rub: detailMoney(10_516.15)
+      })
+    )
+  }
 );
 
 const securityEquipmentSkudSource = detailSource(
@@ -187,18 +175,17 @@ const securityEquipmentSkudSource = detailSource(
   9,
   'позиция 3.1 / обслуживание системы СКУД TRASSIR',
   {
-    quote:
-      'Затраты труда ... 35,1; 749,01; 26 252,91; ИТОГО ПО ПОЗИЦИИ 63 059,49',
+    quote: 'Затраты труда ... 35,1; 749,01; 26 252,91; ИТОГО ПО ПОЗИЦИИ 63 059,49',
     quote_items: detailSourceQuoteItems(
       detailSourceQuoteItem({
         label: 'Труд по обслуживанию системы СКУД TRASSIR',
         resource_ids: [securityEquipmentSkudLaborResourceId],
         quantity: detailQuantity(35.1, 'чел-час'),
         unit_price_rub: detailMoney(749.01),
-        total_rub: detailMoney(26_252.91),
-      }),
-    ),
-  },
+        total_rub: detailMoney(26_252.91)
+      })
+    )
+  }
 );
 
 const securityEquipmentBarrierSource = detailSource(
@@ -213,10 +200,10 @@ const securityEquipmentBarrierSource = detailSource(
         resource_ids: [securityEquipmentBarrierContractorResourceId],
         quantity: detailQuantity(12, 'мес'),
         unit_price_rub: detailMoney(30_000),
-        total_rub: detailMoney(360_000),
-      }),
-    ),
-  },
+        total_rub: detailMoney(360_000)
+      })
+    )
+  }
 );
 
 const securityEquipmentDomilendSource = detailSource(
@@ -231,10 +218,10 @@ const securityEquipmentDomilendSource = detailSource(
         resource_ids: [securityEquipmentDomilendContractorResourceId],
         quantity: detailQuantity(12, 'мес'),
         unit_price_rub: detailMoney(11_215.38),
-        total_rub: detailMoney(134_584.56),
-      }),
-    ),
-  },
+        total_rub: detailMoney(134_584.56)
+      })
+    )
+  }
 );
 
 const securityEquipmentTotalsSource = detailSource(
@@ -242,9 +229,8 @@ const securityEquipmentTotalsSource = detailSource(
   10,
   'итого по разделу технического обслуживания средств охраны',
   {
-    quote:
-      'Итого по разделу ... 1 713 275,88; 503 202,05; 0,00; 0,00; 494 584,56; 10 000,00',
-  },
+    quote: 'Итого по разделу ... 1 713 275,88; 503 202,05; 0,00; 0,00; 494 584,56; 10 000,00'
+  }
 );
 
 const securityDispatchPositionSource = detailSource(
@@ -253,8 +239,8 @@ const securityDispatchPositionSource = detailSource(
   'позиция 6.1 / диспетчерское обслуживание',
   {
     quote:
-      'Затраты труда Диспетчер ... 2826,5; 382,09; 1 080 000,00; Итого по разделу ... 2 594 160,00',
-  },
+      'Затраты труда Диспетчер ... 2826,5; 382,09; 1 080 000,00; Итого по разделу ... 2 594 160,00'
+  }
 );
 
 const securityDocumentTotalsSource = detailSource(
@@ -263,8 +249,8 @@ const securityDocumentTotalsSource = detailSource(
   'итого по услуге охраны в локальном ресурсном сметном расчете',
   {
     quote:
-      'Итого по услуге ... 13 955 435,88; Основная зарплата 1 583 202,05; Услуги сторонних организаций 9 134 584,56; Материальные затраты 1 018 000,00; НДС 5% 697 771,79',
-  },
+      'Итого по услуге ... 13 955 435,88; Основная зарплата 1 583 202,05; Услуги сторонних организаций 9 134 584,56; Материальные затраты 1 018 000,00; НДС 5% 697 771,79'
+  }
 );
 
 const securityCalculationSource = detailSource(
@@ -273,41 +259,37 @@ const securityCalculationSource = detailSource(
   'калькуляция себестоимости услуг по охране',
   {
     quote:
-      'ИТОГО расходов 13 322 155; налог по УСН 94 992; прибыль ... 633 281; Доходов - всего 14 050 428',
-  },
+      'ИТОГО расходов 13 322 155; налог по УСН 94 992; прибыль ... 633 281; Доходов - всего 14 050 428'
+  }
 );
 
 const securityDerivedAllocationNeedsCheckReason =
   'security.pdf не показывает распределение УСН и НДС по трем строкам охраны; значения выведены из gross-строк estimate-2026 и общей калькуляции доходов.';
 const securityDerivedAllocationRefs = detailSourceRefs(
   securityDocumentTotalsSource,
-  securityCalculationSource,
+  securityCalculationSource
 );
 
-const securityAccessControlContractorResourceIds = [
-  securityAccessControlChopResourceId,
-] as const;
+const securityAccessControlContractorResourceIds = [securityAccessControlChopResourceId] as const;
 const securityAccessControlMaterialResourceIds = [
-  securityAccessControlKppMaterialsResourceId,
+  securityAccessControlKppMaterialsResourceId
 ] as const;
 const securityAccessControlGrossResourceIds = [
   securityAccessControlChopResourceId,
   securityAccessControlKppMaterialsResourceId,
   securityAccessControlUsnResourceId,
-  securityAccessControlVatResourceId,
+  securityAccessControlVatResourceId
 ] as const;
 const securityEquipmentPrimarySalaryResourceIds = [
   securityEquipmentVideoLaborResourceId,
   securityEquipmentMonitorLaborResourceId,
   securityEquipmentServerPowerLaborResourceId,
-  securityEquipmentSkudLaborResourceId,
+  securityEquipmentSkudLaborResourceId
 ] as const;
-const securityEquipmentMaterialResourceIds = [
-  securityEquipmentVideoCamerasResourceId,
-] as const;
+const securityEquipmentMaterialResourceIds = [securityEquipmentVideoCamerasResourceId] as const;
 const securityEquipmentContractorResourceIds = [
   securityEquipmentBarrierContractorResourceId,
-  securityEquipmentDomilendContractorResourceId,
+  securityEquipmentDomilendContractorResourceId
 ] as const;
 const securityEquipmentGrossResourceIds = [
   ...securityEquipmentPrimarySalaryResourceIds,
@@ -317,7 +299,7 @@ const securityEquipmentGrossResourceIds = [
   securityEquipmentOverheadResourceId,
   securityEquipmentProfitResourceId,
   securityEquipmentUsnResourceId,
-  securityEquipmentVatResourceId,
+  securityEquipmentVatResourceId
 ] as const;
 const securityDispatchGrossResourceIds = [
   securityDispatchLaborResourceId,
@@ -325,22 +307,18 @@ const securityDispatchGrossResourceIds = [
   securityDispatchOverheadResourceId,
   securityDispatchProfitResourceId,
   securityDispatchUsnResourceId,
-  securityDispatchVatResourceId,
+  securityDispatchVatResourceId
 ] as const;
 
 export const securityWorkItems = [
   detailWorkItem({
     id: 'security-access-control',
-    title:
-      'Круглосуточный пропускной режим и поддержание внутриобъектного порядка',
+    title: 'Круглосуточный пропускной режим и поддержание внутриобъектного порядка',
     estimate_row_id: 'security-access-control',
     service_ids: ['year-round-access-control'],
-    source_refs: detailSourceRefs(
-      securityProductionAccessSource,
-      securityAccessTotalsSource,
-    ),
+    source_refs: detailSourceRefs(securityProductionAccessSource, securityAccessTotalsSource),
     note: 'security.pdf подтверждает периодический обход/объезд как часть услуги ЧОП, но не содержит километраж маршрута или кратность обходов в сутки. Эти показатели есть в слое полного регламента по имуществу, но они не перенесены в детальный слой, потому что их источник: full.pdf.',
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailWorkItem({
     id: 'security-equipment-maintenance',
@@ -349,9 +327,9 @@ export const securityWorkItems = [
     source_refs: detailSourceRefs(
       securityProductionEquipmentSource,
       securityProductionDomilendDispatchSource,
-      securityEquipmentTotalsSource,
+      securityEquipmentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailWorkItem({
     id: 'security-dispatch',
@@ -359,10 +337,10 @@ export const securityWorkItems = [
     estimate_row_id: 'security-dispatch',
     source_refs: detailSourceRefs(
       securityProductionDomilendDispatchSource,
-      securityDispatchPositionSource,
+      securityDispatchPositionSource
     ),
-    ...detailStatus('verified'),
-  }),
+    ...detailStatus('verified')
+  })
 ] satisfies readonly EstimateDetailWorkItem[];
 
 export const securityResources = [
@@ -371,8 +349,7 @@ export const securityResources = [
     work_item_id: 'security-access-control',
     estimate_row_id: 'security-access-control',
     kind: 'contractor',
-    title:
-      'Услуги ЧОП: четыре круглосуточных стационарных поста с периодическим обходом/объездом',
+    title: 'Услуги ЧОП: четыре круглосуточных стационарных поста с периодическим обходом/объездом',
     cost_bucket: 'contractors',
     quantity: detailQuantity(12, 'мес'),
     unit_price_rub: detailMoney(720_000),
@@ -380,9 +357,9 @@ export const securityResources = [
     source_refs: detailSourceRefs(
       securityProductionAccessSource,
       securityAccessChopSource,
-      securityAccessTotalsSource,
+      securityAccessTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityAccessControlKppMaterialsResourceId,
@@ -397,9 +374,9 @@ export const securityResources = [
     source_refs: detailSourceRefs(
       securityProductionAccessSource,
       securityAccessMaterialsSource,
-      securityAccessTotalsSource,
+      securityAccessTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityAccessControlUsnResourceId,
@@ -409,17 +386,14 @@ export const securityResources = [
     title: 'Расчетная доля УСН по пропускному режиму',
     cost_bucket: 'usn',
     total_rub: detailMoney(65_672.38, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      securityAccessTotalsSource,
-      securityCalculationSource,
-    ),
+    source_refs: detailSourceRefs(securityAccessTotalsSource, securityCalculationSource),
     note: 'В security.pdf УСН показан только общей суммой по услуге, без распределения по строкам.',
     ...detailNeedsCheckStatus(
       securityDerivedAllocationNeedsCheckReason,
-      securityDerivedAllocationRefs,
-    ),
+      securityDerivedAllocationRefs
+    )
   }),
   detailResource({
     id: securityAccessControlVatResourceId,
@@ -429,17 +403,14 @@ export const securityResources = [
     title: 'Расчетный НДС 5% по пропускному режиму',
     cost_bucket: 'vat',
     total_rub: detailMoney(485_683.62, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      securityDocumentTotalsSource,
-      securityCalculationSource,
-    ),
+    source_refs: detailSourceRefs(securityDocumentTotalsSource, securityCalculationSource),
     note: 'Прямой НДС в security.pdf дан только по всему локальному расчету; агрегированная смета сходится с НДС от калькуляционных доходов.',
     ...detailNeedsCheckStatus(
       securityDerivedAllocationNeedsCheckReason,
-      securityDerivedAllocationRefs,
-    ),
+      securityDerivedAllocationRefs
+    )
   }),
   detailResource({
     id: securityEquipmentVideoLaborResourceId,
@@ -454,9 +425,9 @@ export const securityResources = [
     source_refs: detailSourceRefs(
       securityProductionEquipmentSource,
       securityStaffSource,
-      securityEquipmentVideoSource,
+      securityEquipmentVideoSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityEquipmentVideoCamerasResourceId,
@@ -468,11 +439,8 @@ export const securityResources = [
     quantity: detailQuantity(2, 'шт.'),
     unit_price_rub: detailMoney(5_000),
     total_rub: detailMoney(10_000),
-    source_refs: detailSourceRefs(
-      securityProductionEquipmentSource,
-      securityEquipmentVideoSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(securityProductionEquipmentSource, securityEquipmentVideoSource),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityEquipmentMonitorLaborResourceId,
@@ -485,7 +453,7 @@ export const securityResources = [
     unit_price_rub: detailMoney(749.01),
     total_rub: detailMoney(28_919.4),
     source_refs: detailSourceRefs(securityEquipmentMonitorSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityEquipmentServerPowerLaborResourceId,
@@ -498,7 +466,7 @@ export const securityResources = [
     unit_price_rub: detailMoney(749.01),
     total_rub: detailMoney(10_516.15),
     source_refs: detailSourceRefs(securityEquipmentServerPowerSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityEquipmentSkudLaborResourceId,
@@ -511,7 +479,7 @@ export const securityResources = [
     unit_price_rub: detailMoney(749.01),
     total_rub: detailMoney(26_252.91),
     source_refs: detailSourceRefs(securityEquipmentSkudSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityEquipmentBarrierContractorResourceId,
@@ -525,9 +493,9 @@ export const securityResources = [
     total_rub: detailMoney(360_000),
     source_refs: detailSourceRefs(
       securityProductionEquipmentSource,
-      securityEquipmentBarrierSource,
+      securityEquipmentBarrierSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityEquipmentDomilendContractorResourceId,
@@ -541,9 +509,9 @@ export const securityResources = [
     total_rub: detailMoney(134_584.56),
     source_refs: detailSourceRefs(
       securityProductionDomilendDispatchSource,
-      securityEquipmentDomilendSource,
+      securityEquipmentDomilendSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityEquipmentInsuranceResourceId,
@@ -554,19 +522,18 @@ export const securityResources = [
     cost_bucket: 'insurance',
     total_rub: detailMoney(151_967.02),
     source_refs: detailSourceRefs(securityEquipmentTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityEquipmentOverheadResourceId,
     work_item_id: 'security-equipment-maintenance',
     estimate_row_id: 'security-equipment-maintenance',
     kind: 'other_cost',
-    title:
-      'Общеэксплуатационные расходы по техническому обслуживанию средств охраны',
+    title: 'Общеэксплуатационные расходы по техническому обслуживанию средств охраны',
     cost_bucket: 'overhead',
     total_rub: detailMoney(352_241.43),
     source_refs: detailSourceRefs(securityEquipmentTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityEquipmentProfitResourceId,
@@ -577,7 +544,7 @@ export const securityResources = [
     cost_bucket: 'profit',
     total_rub: detailMoney(201_280.82),
     source_refs: detailSourceRefs(securityEquipmentTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityEquipmentUsnResourceId,
@@ -587,17 +554,14 @@ export const securityResources = [
     title: 'Расчетная доля УСН по техническому обслуживанию средств охраны',
     cost_bucket: 'usn',
     total_rub: detailMoney(11_662.22, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      securityEquipmentTotalsSource,
-      securityCalculationSource,
-    ),
+    source_refs: detailSourceRefs(securityEquipmentTotalsSource, securityCalculationSource),
     note: 'В security.pdf УСН показан только общей суммой по услуге, без распределения по строкам.',
     ...detailNeedsCheckStatus(
       securityDerivedAllocationNeedsCheckReason,
-      securityDerivedAllocationRefs,
-    ),
+      securityDerivedAllocationRefs
+    )
   }),
   detailResource({
     id: securityEquipmentVatResourceId,
@@ -607,17 +571,14 @@ export const securityResources = [
     title: 'Расчетный НДС 5% по техническому обслуживанию средств охраны',
     cost_bucket: 'vat',
     total_rub: detailMoney(86_246.9, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      securityDocumentTotalsSource,
-      securityCalculationSource,
-    ),
+    source_refs: detailSourceRefs(securityDocumentTotalsSource, securityCalculationSource),
     note: 'Прямой НДС в security.pdf дан только по всему локальному расчету; агрегированная смета сходится с НДС от калькуляционных доходов.',
     ...detailNeedsCheckStatus(
       securityDerivedAllocationNeedsCheckReason,
-      securityDerivedAllocationRefs,
-    ),
+      securityDerivedAllocationRefs
+    )
   }),
   detailResource({
     id: securityDispatchLaborResourceId,
@@ -632,9 +593,9 @@ export const securityResources = [
     source_refs: detailSourceRefs(
       securityProductionDomilendDispatchSource,
       securityStaffSource,
-      securityDispatchPositionSource,
+      securityDispatchPositionSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityDispatchInsuranceResourceId,
@@ -645,7 +606,7 @@ export const securityResources = [
     cost_bucket: 'insurance',
     total_rub: detailMoney(326_160),
     source_refs: detailSourceRefs(securityDispatchPositionSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityDispatchOverheadResourceId,
@@ -656,7 +617,7 @@ export const securityResources = [
     cost_bucket: 'overhead',
     total_rub: detailMoney(756_000),
     source_refs: detailSourceRefs(securityDispatchPositionSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityDispatchProfitResourceId,
@@ -667,7 +628,7 @@ export const securityResources = [
     cost_bucket: 'profit',
     total_rub: detailMoney(432_000),
     source_refs: detailSourceRefs(securityDispatchPositionSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: securityDispatchUsnResourceId,
@@ -677,17 +638,14 @@ export const securityResources = [
     title: 'Расчетная доля УСН по диспетчерскому обслуживанию',
     cost_bucket: 'usn',
     total_rub: detailMoney(17_658.1, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      securityDispatchPositionSource,
-      securityCalculationSource,
-    ),
+    source_refs: detailSourceRefs(securityDispatchPositionSource, securityCalculationSource),
     note: 'В security.pdf УСН показан только общей суммой по услуге, без распределения по строкам.',
     ...detailNeedsCheckStatus(
       securityDerivedAllocationNeedsCheckReason,
-      securityDerivedAllocationRefs,
-    ),
+      securityDerivedAllocationRefs
+    )
   }),
   detailResource({
     id: securityDispatchVatResourceId,
@@ -697,18 +655,15 @@ export const securityResources = [
     title: 'Расчетный НДС 5% по диспетчерскому обслуживанию',
     cost_bucket: 'vat',
     total_rub: detailMoney(130_590.9, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      securityDocumentTotalsSource,
-      securityCalculationSource,
-    ),
+    source_refs: detailSourceRefs(securityDocumentTotalsSource, securityCalculationSource),
     note: 'Прямой НДС в security.pdf дан только по всему локальному расчету; агрегированная смета сходится с НДС от калькуляционных доходов.',
     ...detailNeedsCheckStatus(
       securityDerivedAllocationNeedsCheckReason,
-      securityDerivedAllocationRefs,
-    ),
-  }),
+      securityDerivedAllocationRefs
+    )
+  })
 ] satisfies readonly EstimateDetailResource[];
 
 export const securityControlTotals = [
@@ -719,11 +674,8 @@ export const securityControlTotals = [
     source_total_rub: detailMoney(8_640_000),
     tolerance_rub: 0.01,
     resource_ids: securityAccessControlContractorResourceIds,
-    source_refs: detailSourceRefs(
-      securityAccessChopSource,
-      securityAccessTotalsSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(securityAccessChopSource, securityAccessTotalsSource),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'security-access-control-materials',
@@ -732,11 +684,8 @@ export const securityControlTotals = [
     source_total_rub: detailMoney(1_008_000),
     tolerance_rub: 0.01,
     resource_ids: securityAccessControlMaterialResourceIds,
-    source_refs: detailSourceRefs(
-      securityAccessMaterialsSource,
-      securityAccessTotalsSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(securityAccessMaterialsSource, securityAccessTotalsSource),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'security-access-control-usn',
@@ -745,14 +694,11 @@ export const securityControlTotals = [
     source_total_rub: detailMoney(65_672.38),
     tolerance_rub: 0.01,
     resource_ids: [securityAccessControlUsnResourceId],
-    source_refs: detailSourceRefs(
-      securityAccessTotalsSource,
-      securityCalculationSource,
-    ),
+    source_refs: detailSourceRefs(securityAccessTotalsSource, securityCalculationSource),
     ...detailNeedsCheckStatus(
       securityDerivedAllocationNeedsCheckReason,
-      securityDerivedAllocationRefs,
-    ),
+      securityDerivedAllocationRefs
+    )
   }),
   detailControlTotal({
     id: 'security-access-control-vat',
@@ -761,14 +707,11 @@ export const securityControlTotals = [
     source_total_rub: detailMoney(485_683.62),
     tolerance_rub: 0.01,
     resource_ids: [securityAccessControlVatResourceId],
-    source_refs: detailSourceRefs(
-      securityDocumentTotalsSource,
-      securityCalculationSource,
-    ),
+    source_refs: detailSourceRefs(securityDocumentTotalsSource, securityCalculationSource),
     ...detailNeedsCheckStatus(
       securityDerivedAllocationNeedsCheckReason,
-      securityDerivedAllocationRefs,
-    ),
+      securityDerivedAllocationRefs
+    )
   }),
   detailControlTotal({
     id: 'security-access-control-gross',
@@ -780,12 +723,12 @@ export const securityControlTotals = [
     source_refs: detailSourceRefs(
       securityAccessTotalsSource,
       securityDocumentTotalsSource,
-      securityCalculationSource,
+      securityCalculationSource
     ),
     ...detailNeedsCheckStatus(
       securityDerivedAllocationNeedsCheckReason,
-      securityDerivedAllocationRefs,
-    ),
+      securityDerivedAllocationRefs
+    )
   }),
   detailControlTotal({
     id: 'security-equipment-primary-salary',
@@ -799,9 +742,9 @@ export const securityControlTotals = [
       securityEquipmentMonitorSource,
       securityEquipmentServerPowerSource,
       securityEquipmentSkudSource,
-      securityEquipmentTotalsSource,
+      securityEquipmentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'security-equipment-materials',
@@ -810,11 +753,8 @@ export const securityControlTotals = [
     source_total_rub: detailMoney(10_000),
     tolerance_rub: 0.01,
     resource_ids: securityEquipmentMaterialResourceIds,
-    source_refs: detailSourceRefs(
-      securityEquipmentVideoSource,
-      securityEquipmentTotalsSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(securityEquipmentVideoSource, securityEquipmentTotalsSource),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'security-equipment-contractors',
@@ -826,9 +766,9 @@ export const securityControlTotals = [
     source_refs: detailSourceRefs(
       securityEquipmentBarrierSource,
       securityEquipmentDomilendSource,
-      securityEquipmentTotalsSource,
+      securityEquipmentTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'security-equipment-insurance',
@@ -838,7 +778,7 @@ export const securityControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [securityEquipmentInsuranceResourceId],
     source_refs: detailSourceRefs(securityEquipmentTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'security-equipment-overhead',
@@ -848,7 +788,7 @@ export const securityControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [securityEquipmentOverheadResourceId],
     source_refs: detailSourceRefs(securityEquipmentTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'security-equipment-profit',
@@ -858,7 +798,7 @@ export const securityControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [securityEquipmentProfitResourceId],
     source_refs: detailSourceRefs(securityEquipmentTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'security-equipment-usn',
@@ -867,14 +807,11 @@ export const securityControlTotals = [
     source_total_rub: detailMoney(11_662.22),
     tolerance_rub: 0.01,
     resource_ids: [securityEquipmentUsnResourceId],
-    source_refs: detailSourceRefs(
-      securityEquipmentTotalsSource,
-      securityCalculationSource,
-    ),
+    source_refs: detailSourceRefs(securityEquipmentTotalsSource, securityCalculationSource),
     ...detailNeedsCheckStatus(
       securityDerivedAllocationNeedsCheckReason,
-      securityDerivedAllocationRefs,
-    ),
+      securityDerivedAllocationRefs
+    )
   }),
   detailControlTotal({
     id: 'security-equipment-vat',
@@ -883,14 +820,11 @@ export const securityControlTotals = [
     source_total_rub: detailMoney(86_246.9),
     tolerance_rub: 0.01,
     resource_ids: [securityEquipmentVatResourceId],
-    source_refs: detailSourceRefs(
-      securityDocumentTotalsSource,
-      securityCalculationSource,
-    ),
+    source_refs: detailSourceRefs(securityDocumentTotalsSource, securityCalculationSource),
     ...detailNeedsCheckStatus(
       securityDerivedAllocationNeedsCheckReason,
-      securityDerivedAllocationRefs,
-    ),
+      securityDerivedAllocationRefs
+    )
   }),
   detailControlTotal({
     id: 'security-equipment-gross',
@@ -902,12 +836,12 @@ export const securityControlTotals = [
     source_refs: detailSourceRefs(
       securityEquipmentTotalsSource,
       securityDocumentTotalsSource,
-      securityCalculationSource,
+      securityCalculationSource
     ),
     ...detailNeedsCheckStatus(
       securityDerivedAllocationNeedsCheckReason,
-      securityDerivedAllocationRefs,
-    ),
+      securityDerivedAllocationRefs
+    )
   }),
   detailControlTotal({
     id: 'security-dispatch-primary-salary',
@@ -917,7 +851,7 @@ export const securityControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [securityDispatchLaborResourceId],
     source_refs: detailSourceRefs(securityDispatchPositionSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'security-dispatch-insurance',
@@ -927,7 +861,7 @@ export const securityControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [securityDispatchInsuranceResourceId],
     source_refs: detailSourceRefs(securityDispatchPositionSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'security-dispatch-overhead',
@@ -937,7 +871,7 @@ export const securityControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [securityDispatchOverheadResourceId],
     source_refs: detailSourceRefs(securityDispatchPositionSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'security-dispatch-profit',
@@ -947,7 +881,7 @@ export const securityControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [securityDispatchProfitResourceId],
     source_refs: detailSourceRefs(securityDispatchPositionSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'security-dispatch-usn',
@@ -956,14 +890,11 @@ export const securityControlTotals = [
     source_total_rub: detailMoney(17_658.1),
     tolerance_rub: 0.01,
     resource_ids: [securityDispatchUsnResourceId],
-    source_refs: detailSourceRefs(
-      securityDispatchPositionSource,
-      securityCalculationSource,
-    ),
+    source_refs: detailSourceRefs(securityDispatchPositionSource, securityCalculationSource),
     ...detailNeedsCheckStatus(
       securityDerivedAllocationNeedsCheckReason,
-      securityDerivedAllocationRefs,
-    ),
+      securityDerivedAllocationRefs
+    )
   }),
   detailControlTotal({
     id: 'security-dispatch-vat',
@@ -972,14 +903,11 @@ export const securityControlTotals = [
     source_total_rub: detailMoney(130_590.9),
     tolerance_rub: 0.01,
     resource_ids: [securityDispatchVatResourceId],
-    source_refs: detailSourceRefs(
-      securityDocumentTotalsSource,
-      securityCalculationSource,
-    ),
+    source_refs: detailSourceRefs(securityDocumentTotalsSource, securityCalculationSource),
     ...detailNeedsCheckStatus(
       securityDerivedAllocationNeedsCheckReason,
-      securityDerivedAllocationRefs,
-    ),
+      securityDerivedAllocationRefs
+    )
   }),
   detailControlTotal({
     id: 'security-dispatch-gross',
@@ -991,11 +919,11 @@ export const securityControlTotals = [
     source_refs: detailSourceRefs(
       securityDispatchPositionSource,
       securityDocumentTotalsSource,
-      securityCalculationSource,
+      securityCalculationSource
     ),
     ...detailNeedsCheckStatus(
       securityDerivedAllocationNeedsCheckReason,
-      securityDerivedAllocationRefs,
-    ),
-  }),
+      securityDerivedAllocationRefs
+    )
+  })
 ] satisfies readonly EstimateDetailControlTotalInput[];

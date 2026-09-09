@@ -1,4 +1,5 @@
 import { estimateDetails2026 } from '@/data/reglament/estimate-details-2026';
+import { serializeMarkdownLineDocument } from '@/lib/markdown/llms-document';
 import type {
   EstimateDetailControlTotal,
   EstimateDetailDataset,
@@ -8,14 +9,13 @@ import type {
   EstimateDetailResourceKind,
   EstimateDetailSourceQuoteItem,
   EstimateDetailSourceRef,
-  EstimateDetailWorkItem,
+  EstimateDetailWorkItem
 } from '@/lib/reglament/detail-schema';
 import { ESTIMATE_DETAIL_RESOURCE_KINDS } from '@/lib/reglament/detail-schema';
-import { serializeMarkdownLineDocument } from '@/lib/markdown/llms-document';
 
 import { absoluteUrl } from '../site';
-import { formatReglamentMoney, formatReglamentNumber } from './format';
 import { ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_VERSION } from './detail-public-schema';
+import { formatReglamentMoney, formatReglamentNumber } from './format';
 import {
   reglamentEstimateDetailsChecksMarkdownUrl,
   reglamentEstimateDetails2026DataUrl,
@@ -27,7 +27,7 @@ import {
   reglamentFull2026DataUrl,
   reglamentFullServiceMapMarkdownUrl,
   reglamentFullServicesMarkdownUrl,
-  reglamentSourcePdfUrl,
+  reglamentSourcePdfUrl
 } from './routes';
 
 const RESOURCE_KIND_LABELS = {
@@ -36,16 +36,13 @@ const RESOURCE_KIND_LABELS = {
   machine: 'машины',
   material: 'материалы',
   contractor: 'подрядчики',
-  other_cost: 'прочие затраты',
+  other_cost: 'прочие затраты'
 } as const satisfies Record<EstimateDetailResourceKind, string>;
 
 const CONTROL_SOURCE_LABELS = {
   section_pdf: 'секционный PDF',
-  final_pdf: 'итоговый PDF',
-} as const satisfies Record<
-  EstimateDetailControlTotal['control_source'],
-  string
->;
+  final_pdf: 'итоговый PDF'
+} as const satisfies Record<EstimateDetailControlTotal['control_source'], string>;
 
 const EMPTY_LIST_LINE = '- Нет данных в текущей версии набора.';
 
@@ -54,19 +51,12 @@ const code = (value: string): string => `\`${value}\``;
 const serializeLines = (lines: readonly string[]): string =>
   serializeMarkdownLineDocument(lines, new Set());
 
-const sourceQuoteItem = (
-  item: EstimateDetailSourceQuoteItem,
-  index: number,
-): string => {
+const sourceQuoteItem = (item: EstimateDetailSourceQuoteItem, index: number): string => {
   const resourceIds = item.resource_ids?.length
     ? `; ресурсы: ${item.resource_ids.map(code).join(', ')}`
     : '';
-  const quantity = item.quantity
-    ? `; кол-во: ${formatQuantity(item.quantity)}`
-    : '';
-  const unitPrice = item.unit_price_rub
-    ? `; цена: ${formatMoney(item.unit_price_rub)}`
-    : '';
+  const quantity = item.quantity ? `; кол-во: ${formatQuantity(item.quantity)}` : '';
+  const unitPrice = item.unit_price_rub ? `; цена: ${formatMoney(item.unit_price_rub)}` : '';
   const total = item.total_rub ? `; итог: ${formatMoney(item.total_rub)}` : '';
   const note = item.note ? `; примечание: ${item.note}` : '';
 
@@ -84,22 +74,18 @@ const source = (ref: EstimateDetailSourceRef): string => {
   return `[${ref.pdf}.pdf стр. ${ref.page}${fragment}](${absoluteUrl(reglamentSourcePdfUrl(ref.pdf))})${quote}${quoteItems}${note}`;
 };
 
-const sources = (refs: readonly EstimateDetailSourceRef[]): string =>
-  refs.map(source).join('; ');
+const sources = (refs: readonly EstimateDetailSourceRef[]): string => refs.map(source).join('; ');
 
 const formatMoney = (money: EstimateDetailMoneyValue | undefined): string => {
   if (!money) return '-';
 
-  const value =
-    money.value === null ? 'нет данных' : formatReglamentMoney(money.value);
+  const value = money.value === null ? 'нет данных' : formatReglamentMoney(money.value);
   const note = money.note ? ` (${money.note})` : '';
 
   return `${value}${note}`;
 };
 
-const formatQuantity = (
-  quantity: EstimateDetailQuantityValue | undefined,
-): string => {
+const formatQuantity = (quantity: EstimateDetailQuantityValue | undefined): string => {
   if (!quantity) return '-';
 
   const value =
@@ -119,24 +105,17 @@ const formatDelta = (value: number | undefined): string => {
   return `${sign}${formatReglamentNumber(value)} ₽`;
 };
 
-const linesOrEmpty = <T>(
-  items: readonly T[],
-  line: (item: T) => string,
-): readonly string[] =>
+const linesOrEmpty = <T>(items: readonly T[], line: (item: T) => string): readonly string[] =>
   items.length > 0 ? items.map(line) : [EMPTY_LIST_LINE];
 
-const needsCheckWorkItems = (
-  dataset: EstimateDetailDataset,
-): readonly EstimateDetailWorkItem[] =>
+const needsCheckWorkItems = (dataset: EstimateDetailDataset): readonly EstimateDetailWorkItem[] =>
   dataset.work_items.filter((item) => item.status === 'needs_check');
 
-const needsCheckResources = (
-  dataset: EstimateDetailDataset,
-): readonly EstimateDetailResource[] =>
+const needsCheckResources = (dataset: EstimateDetailDataset): readonly EstimateDetailResource[] =>
   dataset.resources.filter((item) => item.status === 'needs_check');
 
 const needsCheckControlTotals = (
-  dataset: EstimateDetailDataset,
+  dataset: EstimateDetailDataset
 ): readonly EstimateDetailControlTotal[] =>
   dataset.control_totals.filter((item) => item.status === 'needs_check');
 
@@ -147,17 +126,14 @@ const needsCheckCount = (dataset: EstimateDetailDataset): number =>
 
 const resourcesByKind = (
   dataset: EstimateDetailDataset,
-  kinds: readonly EstimateDetailResourceKind[],
+  kinds: readonly EstimateDetailResourceKind[]
 ): readonly EstimateDetailResource[] =>
   dataset.resources.filter((resource) => kinds.includes(resource.kind));
 
-const moneyValue = (
-  money: EstimateDetailMoneyValue | undefined,
-): number | undefined => money?.value ?? undefined;
+const moneyValue = (money: EstimateDetailMoneyValue | undefined): number | undefined =>
+  money?.value ?? undefined;
 
-const resourceTotalSummary = (
-  resources: readonly EstimateDetailResource[],
-): string => {
+const resourceTotalSummary = (resources: readonly EstimateDetailResource[]): string => {
   let total = 0;
   let withoutTotal = 0;
 
@@ -178,7 +154,7 @@ const resourceTotalSummary = (
 };
 
 const resourceGroupsByEstimateRow = (
-  resources: readonly EstimateDetailResource[],
+  resources: readonly EstimateDetailResource[]
 ): readonly {
   readonly estimateRowId: string;
   readonly resources: readonly EstimateDetailResource[];
@@ -202,7 +178,7 @@ const resourceGroupsByEstimateRow = (
     groupByEstimateRowId.set(estimateRowId, groupResources);
     groups.push({
       estimateRowId,
-      resources: groupResources,
+      resources: groupResources
     });
   }
 
@@ -210,7 +186,7 @@ const resourceGroupsByEstimateRow = (
 };
 
 const sourceLabelsByRenderedSource = (
-  resources: readonly EstimateDetailResource[],
+  resources: readonly EstimateDetailResource[]
 ): ReadonlyMap<string, string> => {
   const labels = new Map<string, string>();
 
@@ -229,26 +205,19 @@ const sourceLabelsByRenderedSource = (
 
 const sourceLabelsForResource = (
   resource: EstimateDetailResource,
-  sourceLabels: ReadonlyMap<string, string>,
-): string =>
-  resource.source_refs
-    .map((ref) => sourceLabels.get(source(ref)) ?? '?')
-    .join(', ');
+  sourceLabels: ReadonlyMap<string, string>
+): string => resource.source_refs.map((ref) => sourceLabels.get(source(ref)) ?? '?').join(', ');
 
-const sourceLinesForLabels = (
-  sourceLabels: ReadonlyMap<string, string>,
-): readonly string[] =>
+const sourceLinesForLabels = (sourceLabels: ReadonlyMap<string, string>): readonly string[] =>
   Array.from(sourceLabels.entries()).map(
-    ([renderedSource, label]) => `- \`${label}\`: ${renderedSource}`,
+    ([renderedSource, label]) => `- \`${label}\`: ${renderedSource}`
   );
 
 const resourceWorkItemsLine = (
   resources: readonly EstimateDetailResource[],
-  workItemsById: ReadonlyMap<string, EstimateDetailWorkItem>,
+  workItemsById: ReadonlyMap<string, EstimateDetailWorkItem>
 ): string => {
-  const workItemIds = Array.from(
-    new Set(resources.map((resource) => resource.work_item_id)),
-  );
+  const workItemIds = Array.from(new Set(resources.map((resource) => resource.work_item_id)));
 
   return workItemIds
     .map((id) => {
@@ -259,18 +228,15 @@ const resourceWorkItemsLine = (
     .join('; ');
 };
 
-const resourceIndexLine = (
-  group: ReturnType<typeof resourceGroupsByEstimateRow>[number],
-): string =>
+const resourceIndexLine = (group: ReturnType<typeof resourceGroupsByEstimateRow>[number]): string =>
   `- ${code(group.estimateRowId)}: ресурсов: ${group.resources.length}; итог: ${resourceTotalSummary(group.resources)}`;
 
-const resourceFieldLine = (label: string, value: string): string =>
-  `  - ${label}: ${value}`;
+const resourceFieldLine = (label: string, value: string): string => `  - ${label}: ${value}`;
 
 const resourceLines = (
   resources: readonly EstimateDetailResource[],
   sourceLabels: ReadonlyMap<string, string>,
-  options: ResourceMarkdownOptions,
+  options: ResourceMarkdownOptions
 ): readonly string[] => {
   const showKind = options.kinds.length > 1;
   const priceLabel = options.priceLabel === 'ставка' ? 'Ставка' : 'Цена';
@@ -289,10 +255,7 @@ const resourceLines = (
       resourceFieldLine('Кол-во', formatQuantity(resource.quantity)),
       resourceFieldLine(priceLabel, formatMoney(resource.unit_price_rub)),
       resourceFieldLine('Итог', formatMoney(resource.total_rub)),
-      resourceFieldLine(
-        'Источники',
-        sourceLabelsForResource(resource, sourceLabels),
-      ),
+      resourceFieldLine('Источники', sourceLabelsForResource(resource, sourceLabels))
     );
 
     if (resource.note) {
@@ -306,7 +269,7 @@ const resourceLines = (
 const resourceGroupLines = (
   group: ReturnType<typeof resourceGroupsByEstimateRow>[number],
   workItemsById: ReadonlyMap<string, EstimateDetailWorkItem>,
-  options: ResourceMarkdownOptions,
+  options: ResourceMarkdownOptions
 ): readonly string[] => {
   const sourceLabels = sourceLabelsByRenderedSource(group.resources);
 
@@ -322,16 +285,14 @@ const resourceGroupLines = (
     '',
     '#### Источники группы',
     ...sourceLinesForLabels(sourceLabels),
-    '',
+    ''
   ];
 };
 
 const topicLine = (title: string, path: string, description: string): string =>
   `- [${title}](${absoluteUrl(path)}): ${description}`;
 
-const sourcePdfLine = (
-  pdf: EstimateDetailDataset['source_pdfs'][number],
-): string => {
+const sourcePdfLine = (pdf: EstimateDetailDataset['source_pdfs'][number]): string => {
   const pages = pdf.pages_total ? `; страниц: ${pdf.pages_total}` : '';
 
   return `- ${pdf.pdf}.pdf: ${pdf.title}${pages}; ссылка: ${absoluteUrl(reglamentSourcePdfUrl(pdf.pdf))}`;
@@ -347,13 +308,11 @@ type ResourceMarkdownOptions = {
 
 const buildEstimateDetailResourcesMarkdown = (
   dataset: EstimateDetailDataset,
-  options: ResourceMarkdownOptions,
+  options: ResourceMarkdownOptions
 ): string => {
   const resources = resourcesByKind(dataset, options.kinds);
   const groups = resourceGroupsByEstimateRow(resources);
-  const workItemsById = new Map(
-    dataset.work_items.map((workItem) => [workItem.id, workItem]),
-  );
+  const workItemsById = new Map(dataset.work_items.map((workItem) => [workItem.id, workItem]));
 
   return serializeLines([
     options.title,
@@ -376,10 +335,8 @@ const buildEstimateDetailResourcesMarkdown = (
     '',
     `## ${options.sectionTitle} по строкам сметы`,
     ...(groups.length > 0
-      ? groups.flatMap((group) =>
-          resourceGroupLines(group, workItemsById, options),
-        )
-      : [EMPTY_LIST_LINE]),
+      ? groups.flatMap((group) => resourceGroupLines(group, workItemsById, options))
+      : [EMPTY_LIST_LINE])
   ]);
 };
 
@@ -387,9 +344,7 @@ const controlTotalLine = (control: EstimateDetailControlTotal): string => {
   const detail = `детальная сумма: ${formatMoney(control.detail_total_rub)}`;
   const aggregate = `агрегированная сумма: ${formatMoney(control.aggregate_total_rub)}`;
   const tolerance =
-    control.tolerance_rub === undefined
-      ? '-'
-      : `${formatReglamentNumber(control.tolerance_rub)} ₽`;
+    control.tolerance_rub === undefined ? '-' : `${formatReglamentNumber(control.tolerance_rub)} ₽`;
   const resources = control.resource_ids?.map(code).join(', ') ?? '-';
   const note = control.note ? `; примечание: ${control.note}` : '';
 
@@ -421,7 +376,7 @@ const controlNeedsCheckLine = (item: EstimateDetailControlTotal): string => {
 };
 
 export const buildEstimateDetailMarkdown = (
-  dataset: EstimateDetailDataset = estimateDetails2026,
+  dataset: EstimateDetailDataset = estimateDetails2026
 ): string =>
   serializeLines([
     '# Детальная смета 2026',
@@ -452,22 +407,22 @@ export const buildEstimateDetailMarkdown = (
     topicLine(
       'Материалы',
       reglamentEstimateDetailsMaterialsMarkdownUrl(),
-      'ресурсы с `kind=material`: количество, цена и итог',
+      'ресурсы с `kind=material`: количество, цена и итог'
     ),
     topicLine(
       'Машины',
       reglamentEstimateDetailsMachinesMarkdownUrl(),
-      'ресурсы с `kind=machine` и машинные затраты',
+      'ресурсы с `kind=machine` и машинные затраты'
     ),
     topicLine(
       'Труд',
       reglamentEstimateDetailsLaborMarkdownUrl(),
-      'ресурсы с `kind=labor` и `kind=machinist_labor`: ставки и итоги',
+      'ресурсы с `kind=labor` и `kind=machinist_labor`: ставки и итоги'
     ),
     topicLine(
       'Проверки',
       reglamentEstimateDetailsChecksMarkdownUrl(),
-      'контрольные итоги, дельты и все позиции со статусом `needs_check`',
+      'контрольные итоги, дельты и все позиции со статусом `needs_check`'
     ),
     '',
     '## Сводка',
@@ -481,55 +436,54 @@ export const buildEstimateDetailMarkdown = (
     '## Ресурсы по видам',
     ...ESTIMATE_DETAIL_RESOURCE_KINDS.map(
       (kind) =>
-        `- ${code(kind)}: ${resourcesByKind(dataset, [kind]).length} (${RESOURCE_KIND_LABELS[kind]})`,
+        `- ${code(kind)}: ${resourcesByKind(dataset, [kind]).length} (${RESOURCE_KIND_LABELS[kind]})`
     ),
     '',
     '## PDF-источники',
     ...linesOrEmpty(dataset.source_pdfs, sourcePdfLine),
     '',
     '## Кураторские заметки',
-    ...linesOrEmpty(dataset.curation_notes, (note) => `- ${note}`),
+    ...linesOrEmpty(dataset.curation_notes, (note) => `- ${note}`)
   ]);
 
 export const buildEstimateDetailMaterialsMarkdown = (
-  dataset: EstimateDetailDataset = estimateDetails2026,
+  dataset: EstimateDetailDataset = estimateDetails2026
 ): string =>
   buildEstimateDetailResourcesMarkdown(dataset, {
     title: '# Детальная смета 2026: материалы',
     summaryLabel: 'Материальных ресурсов',
     sectionTitle: 'Материалы',
-    kinds: ['material'],
+    kinds: ['material']
   });
 
 export const buildEstimateDetailMachinesMarkdown = (
-  dataset: EstimateDetailDataset = estimateDetails2026,
+  dataset: EstimateDetailDataset = estimateDetails2026
 ): string =>
   buildEstimateDetailResourcesMarkdown(dataset, {
     title: '# Детальная смета 2026: машины',
     summaryLabel: 'Машинных ресурсов',
     sectionTitle: 'Машины',
-    kinds: ['machine'],
+    kinds: ['machine']
   });
 
 export const buildEstimateDetailLaborMarkdown = (
-  dataset: EstimateDetailDataset = estimateDetails2026,
+  dataset: EstimateDetailDataset = estimateDetails2026
 ): string =>
   buildEstimateDetailResourcesMarkdown(dataset, {
     title: '# Детальная смета 2026: труд',
     summaryLabel: 'Трудовых ресурсов',
     sectionTitle: 'Труд и ставки',
     kinds: ['labor', 'machinist_labor'],
-    priceLabel: 'ставка',
+    priceLabel: 'ставка'
   });
 
 export const buildEstimateDetailChecksMarkdown = (
-  dataset: EstimateDetailDataset = estimateDetails2026,
+  dataset: EstimateDetailDataset = estimateDetails2026
 ): string => {
   const workItems = needsCheckWorkItems(dataset);
   const resources = needsCheckResources(dataset);
   const controlTotals = needsCheckControlTotals(dataset);
-  const needsCheckTotal =
-    workItems.length + resources.length + controlTotals.length;
+  const needsCheckTotal = workItems.length + resources.length + controlTotals.length;
 
   return serializeLines([
     '# Детальная смета 2026: проверки',
@@ -556,6 +510,6 @@ export const buildEstimateDetailChecksMarkdown = (
     ...linesOrEmpty(resources, resourceNeedsCheckLine),
     '',
     '### Контрольные итоги',
-    ...linesOrEmpty(controlTotals, controlNeedsCheckLine),
+    ...linesOrEmpty(controlTotals, controlNeedsCheckLine)
   ]);
 };

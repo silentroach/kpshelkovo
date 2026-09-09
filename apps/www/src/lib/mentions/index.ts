@@ -1,7 +1,4 @@
-export {
-  createSiteMentionRegistry,
-  normalizeEntityMentions,
-} from './normalize';
+export { createSiteMentionRegistry, normalizeEntityMentions } from './normalize';
 export { createEntityMentionSourceRefs } from './source-refs';
 export { createEntityMentionGraph, getEntityMentionGraphRefs } from './graph';
 export { createSiteBacklinksFromGraph } from './backlinks';
@@ -30,5 +27,5 @@ export {
   type SiteBacklinks,
   type SiteMentionRef,
   type SiteMentionRegistry,
-  type SiteMentionSection,
+  type SiteMentionSection
 } from './types';

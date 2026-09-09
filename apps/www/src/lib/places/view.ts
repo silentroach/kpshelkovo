@@ -8,7 +8,7 @@ import type {
   PlaceBacklinkKind,
   PlaceBacklinks,
   PlaceMentionRef,
-  PlaceMentionSection,
+  PlaceMentionSection
 } from './types';
 
 const PLACE_CATEGORY_LABELS = {
@@ -20,7 +20,7 @@ const PLACE_CATEGORY_LABELS = {
   services: 'Услуги',
   nature: 'Природа',
   water: 'Вода',
-  infrastructure: 'Инфраструктура',
+  infrastructure: 'Инфраструктура'
 } as const satisfies Readonly<Record<PlaceCategory, string>>;
 
 export const formatPlaceCategory = (category: PlaceCategory): string =>
@@ -29,11 +29,10 @@ export const formatPlaceCategory = (category: PlaceCategory): string =>
 const PLACE_STATUS_LABELS = {
   existing: 'Существует',
   planned: 'Планируется',
-  underConstruction: 'Строится',
+  underConstruction: 'Строится'
 } as const satisfies Readonly<Record<PlaceStatus, string>>;
 
-export const formatPlaceStatus = (status: PlaceStatus): string =>
-  PLACE_STATUS_LABELS[status];
+export const formatPlaceStatus = (status: PlaceStatus): string => PLACE_STATUS_LABELS[status];
 
 const PLACE_BACKLINK_SECTION_LABELS = {
   news: 'Новости',
@@ -41,7 +40,7 @@ const PLACE_BACKLINK_SECTION_LABELS = {
   reviews: 'Отзывы',
   places: 'Карта',
   people: 'Люди',
-  contacts: 'Сарафан',
+  contacts: 'Сарафан'
 } as const satisfies Readonly<Record<PlaceMentionSection, string>>;
 
 const PLACE_BACKLINK_KIND_LABELS = {
@@ -50,19 +49,16 @@ const PLACE_BACKLINK_KIND_LABELS = {
   review: 'Отзыв',
   place: 'Место',
   person: 'Профиль',
-  contact: 'Контакт',
+  contact: 'Контакт'
 } as const satisfies Readonly<Record<PlaceBacklinkKind, string>>;
 
-export const formatPlaceBacklinkSection = (
-  section: PlaceMentionSection,
-): string => PLACE_BACKLINK_SECTION_LABELS[section];
+export const formatPlaceBacklinkSection = (section: PlaceMentionSection): string =>
+  PLACE_BACKLINK_SECTION_LABELS[section];
 
 export const formatPlaceBacklinkKind = (kind: PlaceBacklinkKind): string =>
   PLACE_BACKLINK_KIND_LABELS[kind];
 
-export const formatPlaceBacklinkDate = (
-  backlink: PlaceMentionRef,
-): string | undefined => {
+export const formatPlaceBacklinkDate = (backlink: PlaceMentionRef): string | undefined => {
   if (!backlink.mentionedAt) {
     return undefined;
   }
@@ -79,7 +75,7 @@ export const formatPlaceBacklinkDate = (
 };
 
 export const placeBacklinkGroups = (
-  backlinks: PlaceBacklinks,
+  backlinks: PlaceBacklinks
 ): readonly {
   readonly section: PlaceMentionSection;
   readonly label: string;
@@ -88,5 +84,5 @@ export const placeBacklinkGroups = (
   PLACE_MENTION_SECTIONS.map((section) => ({
     section,
     label: formatPlaceBacklinkSection(section),
-    items: backlinks[section],
+    items: backlinks[section]
   })).filter((group) => group.items.length > 0);

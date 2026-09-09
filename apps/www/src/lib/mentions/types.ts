@@ -1,15 +1,6 @@
-export const ENTITY_MENTION_ALTERNATE_LABEL_CASES = [
-  'gen',
-  'dat',
-  'acc',
-  'ins',
-  'prep',
-] as const;
+export const ENTITY_MENTION_ALTERNATE_LABEL_CASES = ['gen', 'dat', 'acc', 'ins', 'prep'] as const;
 
-export const ENTITY_MENTION_LABEL_CASES = [
-  'nom',
-  ...ENTITY_MENTION_ALTERNATE_LABEL_CASES,
-] as const;
+export const ENTITY_MENTION_LABEL_CASES = ['nom', ...ENTITY_MENTION_ALTERNATE_LABEL_CASES] as const;
 
 export const ENTITY_MENTION_TYPES = ['person', 'place'] as const;
 export const SITE_MENTION_SECTIONS = [
@@ -18,7 +9,7 @@ export const SITE_MENTION_SECTIONS = [
   'reviews',
   'places',
   'people',
-  'contacts',
+  'contacts'
 ] as const;
 export const SITE_BACKLINK_KINDS = [
   'article',
@@ -26,16 +17,14 @@ export const SITE_BACKLINK_KINDS = [
   'review',
   'place',
   'person',
-  'contact',
+  'contact'
 ] as const;
 
 export type EntityMentionType = (typeof ENTITY_MENTION_TYPES)[number];
 export type SiteMentionSection = (typeof SITE_MENTION_SECTIONS)[number];
 export type SiteBacklinkKind = (typeof SITE_BACKLINK_KINDS)[number];
-export type EntityMentionAlternateLabelCase =
-  (typeof ENTITY_MENTION_ALTERNATE_LABEL_CASES)[number];
-export type EntityMentionLabelCase =
-  (typeof ENTITY_MENTION_LABEL_CASES)[number];
+export type EntityMentionAlternateLabelCase = (typeof ENTITY_MENTION_ALTERNATE_LABEL_CASES)[number];
+export type EntityMentionLabelCase = (typeof ENTITY_MENTION_LABEL_CASES)[number];
 export type EntityMentionLabelCaseForms = Readonly<
   Partial<Record<EntityMentionAlternateLabelCase, string>>
 >;
@@ -76,18 +65,12 @@ export interface EntityMentionSourceRef {
   readonly sourceEntity?: EntityMentionSourceEntity;
 }
 
-export type EntityMentionSourceRefSource = Omit<
-  EntityMentionSourceRef,
-  'target'
->;
+export type EntityMentionSourceRefSource = Omit<EntityMentionSourceRef, 'target'>;
 
 export interface EntityMentionGraphTarget {
   readonly type: EntityMentionType;
   readonly slug: string;
-  readonly sections: ReadonlyMap<
-    SiteMentionSection,
-    readonly EntityMentionSourceRef[]
-  >;
+  readonly sections: ReadonlyMap<SiteMentionSection, readonly EntityMentionSourceRef[]>;
 }
 
 export interface EntityMentionGraph {
@@ -106,9 +89,7 @@ export interface SiteMentionRef {
   readonly sortKey?: number;
 }
 
-export type SiteBacklinks = Readonly<
-  Record<SiteMentionSection, readonly SiteMentionRef[]>
->;
+export type SiteBacklinks = Readonly<Record<SiteMentionSection, readonly SiteMentionRef[]>>;
 
 export type SiteMentionRegistry = ReadonlyMap<string, EntityMentionTarget>;
 
@@ -117,12 +98,9 @@ export interface NormalizedEntityMentions {
   readonly mentions: readonly EntityMentionTarget[];
 }
 
-const ENTITY_MENTION_LABEL_CASE_SET = new Set<string>(
-  ENTITY_MENTION_LABEL_CASES,
-);
+const ENTITY_MENTION_LABEL_CASE_SET = new Set<string>(ENTITY_MENTION_LABEL_CASES);
 
 export const ENTITY_MENTION_DEFAULT_LABEL_CASE = 'nom';
 
-export const isEntityMentionLabelCase = (
-  value: string,
-): value is EntityMentionLabelCase => ENTITY_MENTION_LABEL_CASE_SET.has(value);
+export const isEntityMentionLabelCase = (value: string): value is EntityMentionLabelCase =>
+  ENTITY_MENTION_LABEL_CASE_SET.has(value);

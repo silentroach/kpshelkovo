@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'node:url';
+
 import { defineConfig } from '@playwright/test';
 
 const port = 14333;
@@ -13,19 +14,19 @@ export default defineConfig({
   reporter: 'list',
   timeout: 120_000,
   expect: {
-    timeout: 10_000,
+    timeout: 10_000
   },
   use: {
     baseURL,
     browserName: 'chromium',
     headless: true,
-    colorScheme: 'light',
+    colorScheme: 'light'
   },
   webServer: {
     command: 'pnpm run test:browser:home-hero:serve',
     cwd,
     url: baseURL,
     reuseExistingServer: false,
-    timeout: 180_000,
-  },
+    timeout: 180_000
+  }
 });

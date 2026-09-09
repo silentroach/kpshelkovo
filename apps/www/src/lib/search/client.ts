@@ -1,25 +1,14 @@
 import type {
-  SearchClient,
-  SearchResponse,
-  SearchResult,
-  SearchSubResult,
-} from './client.types';
-import {
-  SEARCH_QUERY_MAX_LENGTH,
-  SEARCH_RESULT_DEFAULT_LIMIT,
-} from './client.types';
-import type {
   PagefindClientDependencies,
   LoadedPagefindResult,
   PagefindOptions,
   PagefindResultReference,
   PagefindRuntime,
-  PagefindSearchResponse,
+  PagefindSearchResponse
 } from './client.internal.types';
-import {
-  normalizeSearchHighlightQuery,
-  SEARCH_HIGHLIGHT_PARAM,
-} from './highlight';
+import type { SearchClient, SearchResponse, SearchResult, SearchSubResult } from './client.types';
+import { SEARCH_QUERY_MAX_LENGTH, SEARCH_RESULT_DEFAULT_LIMIT } from './client.types';
+import { normalizeSearchHighlightQuery, SEARCH_HIGHLIGHT_PARAM } from './highlight';
 
 const pagefindEntrypoint = '/search/pagefind.js';
 const canonicalUrlBase = 'https://kpshelkovo.online';
@@ -32,9 +21,9 @@ const pagefindOptions = {
       sectionLabel: 0,
       publishedAt: 0,
       tags: 1.75,
-      aliases: 3,
-    },
-  },
+      aliases: 3
+    }
+  }
 } as const satisfies PagefindOptions;
 
 const cleanText = (value: unknown): string | undefined => {
@@ -50,12 +39,9 @@ const cleanText = (value: unknown): string | undefined => {
  * escaped before it adds highlight <mark> elements. Raw content and arbitrary
  * metadata never pass through this helper.
  */
-const trustedPagefindExcerpt = (value: unknown): string | undefined =>
-  cleanText(value);
+const trustedPagefindExcerpt = (value: unknown): string | undefined => cleanText(value);
 
-const asRecord = (
-  value: unknown,
-): Readonly<Record<string, unknown>> | undefined => {
+const asRecord = (value: unknown): Readonly<Record<string, unknown>> | undefined => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return;
   }
@@ -67,9 +53,7 @@ const pagefindScore = (value: unknown): number =>
   typeof value === 'number' && Number.isFinite(value) ? Math.max(value, 0) : 0;
 
 const asStringList = (value: unknown): readonly string[] =>
-  Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === 'string')
-    : [];
+  Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
 
 const subResultScore = (value: unknown): number =>
   Array.isArray(value)
@@ -92,10 +76,7 @@ const newsTagContext = (value: unknown): string | undefined => {
   return `${prefix}: ${labels.join(', ')}.`;
 };
 
-const normalizeUrl = (
-  value: unknown,
-  requireAnchor = false,
-): string | undefined => {
+const normalizeUrl = (value: unknown, requireAnchor = false): string | undefined => {
   const rawUrl = cleanText(value);
   if (!rawUrl) {
     return;
@@ -120,10 +101,7 @@ const normalizeUrl = (
   }
 };
 
-const normalizeSubResults = (
-  value: unknown,
-  pageUrl: string,
-): readonly SearchSubResult[] => {
+const normalizeSubResults = (value: unknown, pageUrl: string): readonly SearchSubResult[] => {
   if (!Array.isArray(value)) {
     return [];
   }
@@ -144,9 +122,9 @@ const normalizeSubResults = (
           result: {
             url,
             title,
-            excerptHtml: trustedPagefindExcerpt(rawSubResult?.excerpt),
-          } satisfies SearchSubResult,
-        },
+            excerptHtml: trustedPagefindExcerpt(rawSubResult?.excerpt)
+          } satisfies SearchSubResult
+        }
       ];
     })
     .sort((left, right) => right.score - left.score || left.index - right.index)
@@ -155,7 +133,7 @@ const normalizeSubResults = (
 
 const normalizeResult = (
   value: unknown,
-  reference: PagefindResultReference,
+  reference: PagefindResultReference
 ): SearchResult | undefined => {
   const rawResult = asRecord(value);
   const meta = asRecord(rawResult?.meta);
@@ -180,14 +158,12 @@ const normalizeResult = (
     description: cleanText(meta?.description),
     section: {
       id: sectionId,
-      label: sectionLabel,
+      label: sectionLabel
     },
     publishedAt: cleanText(meta?.publishedAt),
     matchContext,
-    excerptHtml: matchContext
-      ? undefined
-      : trustedPagefindExcerpt(rawResult?.excerpt),
-    subResults: normalizeSubResults(rawResult?.sub_results, url),
+    excerptHtml: matchContext ? undefined : trustedPagefindExcerpt(rawResult?.excerpt),
+    subResults: normalizeSubResults(rawResult?.sub_results, url)
   };
 };
 
@@ -199,21 +175,15 @@ const publishedDate = (value: string): Date | undefined => {
 const elapsedCalendarMonths = (date: Date, now: Date): number =>
   Math.max(
     0,
-    (now.getUTCFullYear() - date.getUTCFullYear()) * 12 +
-      now.getUTCMonth() -
-      date.getUTCMonth(),
+    (now.getUTCFullYear() - date.getUTCFullYear()) * 12 + now.getUTCMonth() - date.getUTCMonth()
   );
 
 const elapsedFullYears = (date: Date, now: Date): number => {
   const beforeAnniversary =
     now.getUTCMonth() < date.getUTCMonth() ||
-    (now.getUTCMonth() === date.getUTCMonth() &&
-      now.getUTCDate() < date.getUTCDate());
+    (now.getUTCMonth() === date.getUTCMonth() && now.getUTCDate() < date.getUTCDate());
 
-  return Math.max(
-    0,
-    now.getUTCFullYear() - date.getUTCFullYear() - (beforeAnniversary ? 1 : 0),
-  );
+  return Math.max(0, now.getUTCFullYear() - date.getUTCFullYear() - (beforeAnniversary ? 1 : 0));
 };
 
 const newsRecencyFactor = (months: number): number => {
@@ -243,23 +213,18 @@ const recencyFactor = (result: SearchResult, now: Date): number => {
   }
 };
 
-const rankResults = (
-  loaded: readonly LoadedPagefindResult[],
-  now: Date,
-): readonly SearchResult[] =>
+const rankResults = (loaded: readonly LoadedPagefindResult[], now: Date): readonly SearchResult[] =>
   loaded
     .map((item, index) => ({
       index,
       result: item.result,
-      score: item.score * recencyFactor(item.result, now),
+      score: item.score * recencyFactor(item.result, now)
     }))
     .sort((left, right) => right.score - left.score || left.index - right.index)
     .map((item) => item.result);
 
 const normalizeQuery = (query: string): string =>
-  Array.from(query.replace(/\s+/gu, ' ').trim())
-    .slice(0, SEARCH_QUERY_MAX_LENGTH)
-    .join('');
+  Array.from(query.replace(/\s+/gu, ' ').trim()).slice(0, SEARCH_QUERY_MAX_LENGTH).join('');
 
 const tokenLength = (token: string): number => Array.from(token).length;
 
@@ -268,52 +233,41 @@ const comparableWord = (word: string): string =>
 
 const textHasForwardPrefix = (value: unknown, token: string): boolean =>
   typeof value === 'string' &&
-  (value.match(/[\p{L}\p{N}]+/gu) ?? []).some((word) =>
-    comparableWord(word).startsWith(token),
-  );
+  (value.match(/[\p{L}\p{N}]+/gu) ?? []).some((word) => comparableWord(word).startsWith(token));
 
 const asPagefindLocations = (value: unknown): readonly number[] =>
   Array.isArray(value)
     ? value.filter(
         (item): item is number =>
-          typeof item === 'number' && Number.isSafeInteger(item) && item >= 0,
+          typeof item === 'number' && Number.isSafeInteger(item) && item >= 0
       )
     : [];
 
 const hasForwardPrefixMatch = (
   value: unknown,
   reference: PagefindResultReference,
-  token: string,
+  token: string
 ): boolean => {
   const rawResult = asRecord(value);
   const content = cleanText(rawResult?.content)?.split(' ') ?? [];
   const resultLocations = asPagefindLocations(rawResult?.locations);
-  const locations = resultLocations.length
-    ? resultLocations
-    : asPagefindLocations(reference.words);
+  const locations = resultLocations.length ? resultLocations : asPagefindLocations(reference.words);
   const comparableToken = comparableWord(token);
 
-  if (
-    locations.some((location) =>
-      textHasForwardPrefix(content[location], comparableToken),
-    )
-  ) {
+  if (locations.some((location) => textHasForwardPrefix(content[location], comparableToken))) {
     return true;
   }
 
   const meta = asRecord(rawResult?.meta);
   return asStringList(reference.matchedMetaFields).some((field) =>
-    textHasForwardPrefix(meta?.[field], comparableToken),
+    textHasForwardPrefix(meta?.[field], comparableToken)
   );
 };
 
 const pagefindTokens = (query: string): readonly string[] =>
-  query
-    .split(' ')
-    .filter((token) => (token.match(/[\p{L}\p{N}]/gu)?.length ?? 0) > 1);
+  query.split(' ').filter((token) => (token.match(/[\p{L}\p{N}]/gu)?.length ?? 0) > 1);
 
-const pagefindQuery = (query: string): string =>
-  pagefindTokens(query).join(' ');
+const pagefindQuery = (query: string): string => pagefindTokens(query).join(' ');
 
 const exactSingleToken = (query: string): string | undefined => {
   const words = query.match(/[\p{L}\p{N}]+/gu);
@@ -339,7 +293,7 @@ const cacheableResultId = (value: unknown): string | undefined => {
 const searchPagefind = async (
   pagefind: PagefindRuntime,
   query: string,
-  searchExactToken: (token: string) => Promise<PagefindSearchResponse>,
+  searchExactToken: (token: string) => Promise<PagefindSearchResponse>
 ): Promise<readonly PagefindResultReference[]> => {
   const broadSearch = pagefind.search(query);
   const token = exactSingleToken(query);
@@ -347,10 +301,7 @@ const searchPagefind = async (
     return (await broadSearch).results;
   }
 
-  const [broadResponse, exactResponse] = await Promise.all([
-    broadSearch,
-    searchExactToken(token),
-  ]);
+  const [broadResponse, exactResponse] = await Promise.all([broadSearch, searchExactToken(token)]);
   if (tokenLength(token) > prefixFallbackMaxLength) {
     if (exactResponse.results.length) {
       return broadResponse.results;
@@ -376,7 +327,7 @@ const searchPagefind = async (
     exactResponse.results.flatMap((reference) => {
       const id = cacheableResultId(reference.id);
       return id ? [[id, reference] as const] : [];
-    }),
+    })
   );
   const exactResults = broadResponse.results.flatMap((reference) => {
     const id = cacheableResultId(reference.id);
@@ -388,8 +339,8 @@ const searchPagefind = async (
             matchedMetaFields: exactReference.matchedMetaFields,
             score: reference.score,
             words: exactReference.words,
-            data: exactReference.data,
-          } satisfies PagefindResultReference,
+            data: exactReference.data
+          } satisfies PagefindResultReference
         ]
       : [];
   });
@@ -398,30 +349,24 @@ const searchPagefind = async (
 };
 
 const loadGeneratedPagefind = async (): Promise<PagefindRuntime> => {
-  const pagefind: PagefindRuntime = await import(
-    /* @vite-ignore */ pagefindEntrypoint
-  );
+  const pagefind: PagefindRuntime = await import(/* @vite-ignore */ pagefindEntrypoint);
 
   return pagefind;
 };
 
 const defaultDependencies: PagefindClientDependencies = {
-  available:
-    !import.meta.env.DEV || import.meta.env.PAGEFIND_DEV_SNAPSHOT_AVAILABLE,
-  loadPagefind: loadGeneratedPagefind,
+  available: !import.meta.env.DEV || import.meta.env.PAGEFIND_DEV_SNAPSHOT_AVAILABLE,
+  loadPagefind: loadGeneratedPagefind
 };
 
 export const createPagefindSearchClient = (
-  dependencies: PagefindClientDependencies = defaultDependencies,
+  dependencies: PagefindClientDependencies = defaultDependencies
 ): SearchClient => {
   let pagefindPromise: Promise<PagefindRuntime> | undefined;
   let latestRequestId = 0;
   let cachedQuery: string | undefined;
   const exactSearchCache = new Map<string, Promise<PagefindSearchResponse>>();
-  let resultCache = new Map<
-    string,
-    Promise<LoadedPagefindResult | undefined>
-  >();
+  let resultCache = new Map<string, Promise<LoadedPagefindResult | undefined>>();
 
   const loadPagefind = (): Promise<PagefindRuntime> => {
     if (pagefindPromise) {
@@ -453,7 +398,7 @@ export const createPagefindSearchClient = (
 
   const searchExactToken = (
     pagefind: PagefindRuntime,
-    token: string,
+    token: string
   ): Promise<PagefindSearchResponse> => {
     const cached = exactSearchCache.get(token);
     if (cached) {
@@ -482,17 +427,15 @@ export const createPagefindSearchClient = (
   };
 
   const loadResult = async (
-    reference: PagefindResultReference,
+    reference: PagefindResultReference
   ): Promise<LoadedPagefindResult | undefined> => {
     const result = normalizeResult(await reference.data(), reference);
-    return result
-      ? { result, score: pagefindScore(reference.score) }
-      : undefined;
+    return result ? { result, score: pagefindScore(reference.score) } : undefined;
   };
 
   const loadCachedResult = (
     reference: PagefindResultReference,
-    cache: Map<string, Promise<LoadedPagefindResult | undefined>>,
+    cache: Map<string, Promise<LoadedPagefindResult | undefined>>
   ): Promise<LoadedPagefindResult | undefined> => {
     const id = cacheableResultId(reference.id);
     if (!id) {
@@ -516,7 +459,7 @@ export const createPagefindSearchClient = (
   };
 
   const resultCacheFor = (
-    query: string,
+    query: string
   ): Map<string, Promise<LoadedPagefindResult | undefined>> => {
     if (query !== cachedQuery) {
       cachedQuery = query;
@@ -528,7 +471,7 @@ export const createPagefindSearchClient = (
 
   const search = async (
     rawQuery: string,
-    rawLimit?: number,
+    rawLimit?: number
   ): Promise<SearchResponse | undefined> => {
     const requestId = ++latestRequestId;
     const query = normalizeQuery(rawQuery);
@@ -546,7 +489,7 @@ export const createPagefindSearchClient = (
         query,
         searchQuery: effectiveQuery,
         results: [],
-        total: 0,
+        total: 0
       };
     }
 
@@ -558,16 +501,14 @@ export const createPagefindSearchClient = (
     }
 
     const results = await searchPagefind(pagefind, effectiveQuery, (token) =>
-      searchExactToken(pagefind, token),
+      searchExactToken(pagefind, token)
     );
     if (requestId !== latestRequestId) {
       return;
     }
 
     const loaded = await Promise.all(
-      results
-        .slice(0, limit)
-        .map((result) => loadCachedResult(result, queryCache)),
+      results.slice(0, limit).map((result) => loadCachedResult(result, queryCache))
     );
     if (requestId !== latestRequestId) {
       return;
@@ -579,11 +520,9 @@ export const createPagefindSearchClient = (
       searchQuery: effectiveQuery,
       total: results.length,
       results: rankResults(
-        loaded.filter((result): result is LoadedPagefindResult =>
-          Boolean(result),
-        ),
-        dependencies.now?.() ?? new Date(),
-      ),
+        loaded.filter((result): result is LoadedPagefindResult => Boolean(result)),
+        dependencies.now?.() ?? new Date()
+      )
     };
   };
 

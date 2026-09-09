@@ -12,19 +12,17 @@ const renderStickyTable = (getShellTop: () => number): HTMLElement => {
       <table><thead><tr><th style="top: 0">Heading</th></tr></thead></table>
     </div>
   `;
-  const shell = document.querySelector<HTMLElement>(
-    '[data-ui-sticky-table-shell]',
-  );
+  const shell = document.querySelector<HTMLElement>('[data-ui-sticky-table-shell]');
   const header = shell?.querySelector<HTMLElement>('thead th');
   if (!shell || !header) {
     throw new Error('Expected sticky table fixture');
   }
 
   vi.spyOn(shell, 'getBoundingClientRect').mockImplementation(() =>
-    DOMRect.fromRect({ x: 0, y: getShellTop(), width: 320, height: 400 }),
+    DOMRect.fromRect({ x: 0, y: getShellTop(), width: 320, height: 400 })
   );
   vi.spyOn(header, 'getBoundingClientRect').mockReturnValue(
-    DOMRect.fromRect({ x: 0, y: 0, width: 320, height: 40 }),
+    DOMRect.fromRect({ x: 0, y: 0, width: 320, height: 40 })
   );
 
   return shell;
@@ -47,11 +45,11 @@ beforeEach(() => {
 
       animationFrames.set(id, callback);
       return id;
-    }),
+    })
   );
   vi.stubGlobal(
     'cancelAnimationFrame',
-    vi.fn((id: number) => animationFrames.delete(id)),
+    vi.fn((id: number) => animationFrames.delete(id))
   );
 });
 
@@ -105,12 +103,8 @@ describe('sticky table header lifecycle', () => {
     document.body.innerHTML = '';
     document.dispatchEvent(new Event('astro:after-swap'));
     expect(cancelAnimationFrame).toHaveBeenCalledOnce();
-    const scrollListener = addEventListener.mock.calls.find(
-      ([type]) => type === 'scroll',
-    )?.[1];
-    const resizeListener = addEventListener.mock.calls.find(
-      ([type]) => type === 'resize',
-    )?.[1];
+    const scrollListener = addEventListener.mock.calls.find(([type]) => type === 'scroll')?.[1];
+    const resizeListener = addEventListener.mock.calls.find(([type]) => type === 'resize')?.[1];
     if (!scrollListener || !resizeListener) {
       throw new Error('Expected sticky table window listeners');
     }
@@ -125,9 +119,7 @@ describe('sticky table header lifecycle', () => {
     let returnedShellTop = 20;
     const returnedShell = renderStickyTable(() => returnedShellTop);
     document.dispatchEvent(new Event('astro:after-swap'));
-    expect(returnedShell.hasAttribute('data-ui-sticky-table-stuck')).toBe(
-      false,
-    );
+    expect(returnedShell.hasAttribute('data-ui-sticky-table-stuck')).toBe(false);
 
     installStickyTableHeaders();
     returnedShellTop = -30;
@@ -140,7 +132,7 @@ describe('sticky table header lifecycle', () => {
     expect(
       addEventListener.mock.calls
         .filter(([type]) => type === 'scroll' || type === 'resize')
-        .map(([type]) => type),
+        .map(([type]) => type)
     ).toMatchInlineSnapshot(`
       [
         "scroll",

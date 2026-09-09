@@ -5,5 +5,4 @@ import { buildEstimateDetailMarkdown } from '@/lib/reglament/detail-markdown';
 
 export const prerender = true;
 
-export const GET: APIRoute = async () =>
-  createMarkdownResponse(buildEstimateDetailMarkdown());
+export const GET: APIRoute = async () => createMarkdownResponse(buildEstimateDetailMarkdown());

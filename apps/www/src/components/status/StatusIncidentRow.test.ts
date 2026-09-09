@@ -2,8 +2,8 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { createAstroContainer } from '@/test/astro-container';
 import type { StatusIncident } from '@/lib/status/types';
+import { createAstroContainer } from '@/test/astro-container';
 
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import StatusIncidentRow from './StatusIncidentRow.astro';
@@ -22,12 +22,12 @@ const incident = {
   started: {
     at: new Date('2026-05-01T07:32:00+03:00'),
     iso: '2026-05-01T07:32:00+03:00',
-    hasTime: true,
+    hasTime: true
   },
   ended: {
     at: new Date('2026-05-01T16:38:00+03:00'),
     iso: '2026-05-01T16:38:00+03:00',
-    hasTime: true,
+    hasTime: true
   },
   phase: 'resolved',
   appliesToAllAreas: true,
@@ -37,21 +37,19 @@ const incident = {
   mentions: [],
   sortStartedAt: new Date('2026-05-01T07:32:00+03:00').valueOf(),
   sortLastChangeAt: new Date('2026-05-01T16:38:00+03:00').valueOf(),
-  duration: { totalMinutes: 9 * 60 + 6 },
+  duration: { totalMinutes: 9 * 60 + 6 }
 } satisfies StatusIncident;
 
 describe('StatusIncidentRow', () => {
   it('renders incident title links without leading whitespace', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(StatusIncidentRow, {
-      props: { incident },
+      props: { incident }
     });
 
     expect(html).toMatch(
-      /<a(?=[^>]*href="\/status\/incidents\/2026\/05\/outage\/")(?=[^>]*class="[^"]*\bui-link\b[^"]*")[^>]*>Отключение электричества<\/a>/u,
+      /<a(?=[^>]*href="\/status\/incidents\/2026\/05\/outage\/")(?=[^>]*class="[^"]*\bui-link\b[^"]*")[^>]*>Отключение электричества<\/a>/u
     );
-    expect(html).not.toMatch(
-      /<a(?=[^>]*class="[^"]*\bui-link\b[^"]*")[^>]*>\s+Отключение/u,
-    );
+    expect(html).not.toMatch(/<a(?=[^>]*class="[^"]*\bui-link\b[^"]*")[^>]*>\s+Отключение/u);
   });
 });

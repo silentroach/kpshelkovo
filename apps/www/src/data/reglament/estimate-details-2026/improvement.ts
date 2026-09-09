@@ -1,7 +1,7 @@
 import type {
   EstimateDetailControlTotalInput,
   EstimateDetailResource,
-  EstimateDetailWorkItem,
+  EstimateDetailWorkItem
 } from '@/lib/reglament/detail-schema';
 
 import {
@@ -15,7 +15,7 @@ import {
   detailSourceQuoteItems,
   detailSourceRefs,
   detailStatus,
-  detailWorkItem,
+  detailWorkItem
 } from './shared';
 
 const improvementPlaygroundElementsWipeLaborResourceId =
@@ -27,27 +27,19 @@ const improvementPlaygroundElementsSnowLaborResourceId =
 const improvementSandboxCareLaborResourceId = 'improvement-sandbox-care-labor';
 const improvementPlaygroundGroundSweepFirstLaborResourceId =
   'improvement-playground-ground-sweep-first-labor';
-const improvementSportsElementsWipeLaborResourceId =
-  'improvement-sports-elements-wipe-labor';
-const improvementSportsElementsWashLaborResourceId =
-  'improvement-sports-elements-wash-labor';
-const improvementWaterSurfaceTrashLaborResourceId =
-  'improvement-water-surface-trash-labor';
-const improvementWaterVegetationLaborResourceId =
-  'improvement-water-vegetation-labor';
+const improvementSportsElementsWipeLaborResourceId = 'improvement-sports-elements-wipe-labor';
+const improvementSportsElementsWashLaborResourceId = 'improvement-sports-elements-wash-labor';
+const improvementWaterSurfaceTrashLaborResourceId = 'improvement-water-surface-trash-labor';
+const improvementWaterVegetationLaborResourceId = 'improvement-water-vegetation-labor';
 const improvementPlaygroundGroundSweepSecondLaborResourceId =
   'improvement-playground-ground-sweep-second-labor';
-const improvementCurbstonePaintLaborResourceId =
-  'improvement-curbstone-paint-labor';
+const improvementCurbstonePaintLaborResourceId = 'improvement-curbstone-paint-labor';
 const improvementPpeCottonSuitResourceId = 'improvement-ppe-cotton-suit';
-const improvementPpeInsulatedJacketResourceId =
-  'improvement-ppe-insulated-jacket';
+const improvementPpeInsulatedJacketResourceId = 'improvement-ppe-insulated-jacket';
 const improvementPpeSignalVestResourceId = 'improvement-ppe-signal-vest';
-const improvementPpeInsulatedBootsResourceId =
-  'improvement-ppe-insulated-boots';
+const improvementPpeInsulatedBootsResourceId = 'improvement-ppe-insulated-boots';
 const improvementPpePolymerGlovesResourceId = 'improvement-ppe-polymer-gloves';
-const improvementPpeInsulatedMittensResourceId =
-  'improvement-ppe-insulated-mittens';
+const improvementPpeInsulatedMittensResourceId = 'improvement-ppe-insulated-mittens';
 const improvementPpeRubberBootsResourceId = 'improvement-ppe-rubber-boots';
 const improvementPpeSoapResourceId = 'improvement-ppe-soap';
 const improvementSandboxSandResourceId = 'improvement-sandbox-sand';
@@ -63,33 +55,20 @@ const improvementObjectsOverheadResourceId = 'improvement-objects-overhead';
 const improvementObjectsProfitResourceId = 'improvement-objects-profit';
 const improvementObjectsUsnResourceId = 'improvement-objects-usn-derived';
 const improvementObjectsVatResourceId = 'improvement-objects-vat-derived';
-const improvementFenceProfileSheetResourceId =
-  'improvement-fence-profile-sheet-repair';
+const improvementFenceProfileSheetResourceId = 'improvement-fence-profile-sheet-repair';
 const improvementFenceUsnResourceId = 'improvement-fence-repair-usn-derived';
 const improvementFenceVatResourceId = 'improvement-fence-repair-vat-derived';
 
 const improvementRoundedQuantityNote =
   'количество в PDF округлено; итог сохранен по исходной строке';
 
-const improvementFinalObjectsSource = detailSource(
-  'final',
-  2,
-  'итоговая смета / строка 4.1',
-  {
-    quote:
-      '4.1 Содержание объектов благоустройства; периодичность 300; стоимость 4 366 756',
-  },
-);
+const improvementFinalObjectsSource = detailSource('final', 2, 'итоговая смета / строка 4.1', {
+  quote: '4.1 Содержание объектов благоустройства; периодичность 300; стоимость 4 366 756'
+});
 
-const improvementFinalRoadSurfaceSource = detailSource(
-  'final',
-  2,
-  'итоговая смета / строка 4.2',
-  {
-    quote:
-      '4.2 Текущий ремонт покрытия дорог, площадок; периодичность 1; стоимость 320 424',
-  },
-);
+const improvementFinalRoadSurfaceSource = detailSource('final', 2, 'итоговая смета / строка 4.2', {
+  quote: '4.2 Текущий ремонт покрытия дорог, площадок; периодичность 1; стоимость 320 424'
+});
 
 const improvementProductionObjectsSource = detailSource(
   'improvement',
@@ -97,8 +76,8 @@ const improvementProductionObjectsSource = detailSource(
   'производственная программа / содержание и текущий ремонт объектов благоустройства',
   {
     quote:
-      'Содержание и текущий ремонт объектов благоустройства; трудозатраты 2 513,1; материалы: песок, мешки для мусора',
-  },
+      'Содержание и текущий ремонт объектов благоустройства; трудозатраты 2 513,1; материалы: песок, мешки для мусора'
+  }
 );
 
 const improvementProductionFenceSource = detailSource(
@@ -107,8 +86,8 @@ const improvementProductionFenceSource = detailSource(
   'производственная программа / ремонт периметрального ограждения',
   {
     quote:
-      'Ремонт периметрального ограждения; п.м.; 12430; Замена поврежденных элементов (2% от общего объема); 249; Профнастил оцинкованный ... 248,6 м²',
-  },
+      'Ремонт периметрального ограждения; п.м.; 12430; Замена поврежденных элементов (2% от общего объема); 249; Профнастил оцинкованный ... 248,6 м²'
+  }
 );
 
 const improvementProductionCurbstonePpeToolsSource = detailSource(
@@ -117,8 +96,8 @@ const improvementProductionCurbstonePpeToolsSource = detailSource(
   'производственная программа / бордюры, СИЗ и инструмент',
   {
     quote:
-      'Окраска бетонных дорожных бордюров; 83 м²; краска 33,0 кг; средства охраны труда; износ оборудования, инструментов',
-  },
+      'Окраска бетонных дорожных бордюров; 83 м²; краска 33,0 кг; средства охраны труда; износ оборудования, инструментов'
+  }
 );
 
 const improvementStaffSource = detailSource(
@@ -127,8 +106,8 @@ const improvementStaffSource = detailSource(
   'нормативное штатное расписание по благоустройству',
   {
     quote:
-      'Рабочий по уборке территории (средний разряд 3.0); 1,3; тарифная ставка 664,15; всего 863,39',
-  },
+      'Рабочий по уборке территории (средний разряд 3.0); 1,3; тарифная ставка 664,15; всего 863,39'
+  }
 );
 
 const improvementDocumentHeaderSource = detailSource(
@@ -137,8 +116,8 @@ const improvementDocumentHeaderSource = detailSource(
   'локальный ресурсный сметный расчет по благоустройству / шапка',
   {
     quote:
-      'Сметная стоимость 4 363 835,75; Средства на оплату труда 1 669 095,98; Трудозатраты рабочих 2 513,15',
-  },
+      'Сметная стоимость 4 363 835,75; Средства на оплату труда 1 669 095,98; Трудозатраты рабочих 2 513,15'
+  }
 );
 
 const improvementPlaygroundElementsWipeSource = detailSource(
@@ -147,8 +126,8 @@ const improvementPlaygroundElementsWipeSource = detailSource(
   'позиция 1.1 / протирка поверхностей элементов детского игрового комплекса',
   {
     quote:
-      'Протирка поверхностей; 10 шт.; 7,92; 26 826,18; Затраты труда Рабочий ... 40; 664,15; 26 826,18',
-  },
+      'Протирка поверхностей; 10 шт.; 7,92; 26 826,18; Затраты труда Рабочий ... 40; 664,15; 26 826,18'
+  }
 );
 
 const improvementPlaygroundElementsWashSource = detailSource(
@@ -157,8 +136,8 @@ const improvementPlaygroundElementsWashSource = detailSource(
   'позиция 1.2 / мытье поверхностей элементов детского игрового комплекса',
   {
     quote:
-      'Мытье поверхностей; 10 шт.; 0,99; 3 675,45; Затраты труда Рабочий ... 6; 664,15; 3 675,45',
-  },
+      'Мытье поверхностей; 10 шт.; 0,99; 3 675,45; Затраты труда Рабочий ... 6; 664,15; 3 675,45'
+  }
 );
 
 const improvementPlaygroundElementsSnowSource = detailSource(
@@ -167,8 +146,8 @@ const improvementPlaygroundElementsSnowSource = detailSource(
   'позиция 1.3 / сметание снега с поверхностей',
   {
     quote:
-      'Сметание снега с поверхностей и откидывание его в сторону; 100 м2; 33,00; 89 858,93; Затраты труда Рабочий ... 135; 664,15; 89 858,93',
-  },
+      'Сметание снега с поверхностей и откидывание его в сторону; 100 м2; 33,00; 89 858,93; Затраты труда Рабочий ... 135; 664,15; 89 858,93'
+  }
 );
 
 const improvementSandboxCareSource = detailSource(
@@ -177,8 +156,8 @@ const improvementSandboxCareSource = detailSource(
   'позиция 1.4 / уход за детскими песочницами',
   {
     quote:
-      'Уход за детскими песочницами; 10 м2; 0,40; 53 010,45; Затраты труда 52 135,45; Песок мытый 1 категории 875,00',
-  },
+      'Уход за детскими песочницами; 10 м2; 0,40; 53 010,45; Затраты труда 52 135,45; Песок мытый 1 категории 875,00'
+  }
 );
 
 const improvementPlaygroundGroundSweepFirstSource = detailSource(
@@ -187,8 +166,8 @@ const improvementPlaygroundGroundSweepFirstSource = detailSource(
   'позиция 2.1 / подметание детских площадок со сбором и удалением мусора',
   {
     quote:
-      'Подметание детских площадок со сбором и удалением мусора; 100 м2; 18,00; 549 912,72; Затраты труда Рабочий ... 828; 664,15; 549 912,72',
-  },
+      'Подметание детских площадок со сбором и удалением мусора; 100 м2; 18,00; 549 912,72; Затраты труда Рабочий ... 828; 664,15; 549 912,72'
+  }
 );
 
 const improvementSportsElementsWipeSource = detailSource(
@@ -197,8 +176,8 @@ const improvementSportsElementsWipeSource = detailSource(
   'позиция 3.1 / протирка поверхностей элементов спортивного комплекса',
   {
     quote:
-      'Протирка поверхностей; 10 шт.; 6,72; 22 761,60; Затраты труда Рабочий ... 34; 664,15; 22 761,60',
-  },
+      'Протирка поверхностей; 10 шт.; 6,72; 22 761,60; Затраты труда Рабочий ... 34; 664,15; 22 761,60'
+  }
 );
 
 const improvementSportsElementsWashSource = detailSource(
@@ -207,8 +186,8 @@ const improvementSportsElementsWashSource = detailSource(
   'позиция 3.2 / мытье поверхностей элементов спортивного комплекса',
   {
     quote:
-      'Мытье поверхностей; 10 шт.; 0,84; 3 118,56; Затраты труда Рабочий ... 5; 664,15; 3 118,56',
-  },
+      'Мытье поверхностей; 10 шт.; 0,84; 3 118,56; Затраты труда Рабочий ... 5; 664,15; 3 118,56'
+  }
 );
 
 const improvementWaterSurfaceTrashSource = detailSource(
@@ -217,8 +196,8 @@ const improvementWaterSurfaceTrashSource = detailSource(
   'позиция 4.1 / сбор наплавного мусора с поверхности воды',
   {
     quote:
-      'Сбор наплавного мусора с поверхности воды лодкой; 100 м2; 6,39; 365 743,67; Затраты труда 364 888,17; мешки для мусора 855,50',
-  },
+      'Сбор наплавного мусора с поверхности воды лодкой; 100 м2; 6,39; 365 743,67; Затраты труда 364 888,17; мешки для мусора 855,50'
+  }
 );
 
 const improvementWaterVegetationSource = detailSource(
@@ -227,8 +206,8 @@ const improvementWaterVegetationSource = detailSource(
   'позиция 4.2 / удаление водной растительности',
   {
     quote:
-      'Удаление водной растительности (водоросли) лодкой с последующим сбором/вывозом; 1 м2; 212,90; 10 679,90; Затраты труда 4 241,90; мешки 6 438,00',
-  },
+      'Удаление водной растительности (водоросли) лодкой с последующим сбором/вывозом; 1 м2; 212,90; 10 679,90; Затраты труда 4 241,90; мешки 6 438,00'
+  }
 );
 
 const improvementFencePositionSource = detailSource(
@@ -237,8 +216,8 @@ const improvementFencePositionSource = detailSource(
   'позиция 5.1 / замена поврежденных элементов периметрального ограждения',
   {
     quote:
-      'Ремонт периметрального ограждения; Замена поврежденных элементов (2% от общего объема); п.м.; 248,60; 298 320,00',
-  },
+      'Ремонт периметрального ограждения; Замена поврежденных элементов (2% от общего объема); п.м.; 248,60; 298 320,00'
+  }
 );
 
 const improvementFenceMaterialSource = detailSource(
@@ -247,8 +226,8 @@ const improvementFenceMaterialSource = detailSource(
   'позиция 5.1 / материал профнастила',
   {
     quote:
-      'Профнастил оцинкованный (с учетом стоимости монтажа); м²; 248,60; 1200,00; 298 320,00; ИТОГО ПО ПОЗИЦИИ 298 320,00',
-  },
+      'Профнастил оцинкованный (с учетом стоимости монтажа); м²; 248,60; 1200,00; 298 320,00; ИТОГО ПО ПОЗИЦИИ 298 320,00'
+  }
 );
 
 const improvementPlaygroundGroundSweepSecondSource = detailSource(
@@ -257,8 +236,8 @@ const improvementPlaygroundGroundSweepSecondSource = detailSource(
   'позиция 6.1 / повторное подметание детских площадок со сбором и удалением мусора',
   {
     quote:
-      'Подметание детских площадок со сбором и удалением мусора; 100 м2; 18,00; 549 912,72; Затраты труда Рабочий ... 828; 664,15; 549 912,72',
-  },
+      'Подметание детских площадок со сбором и удалением мусора; 100 м2; 18,00; 549 912,72; Затраты труда Рабочий ... 828; 664,15; 549 912,72'
+  }
 );
 
 const improvementCurbstonePaintSource = detailSource(
@@ -267,8 +246,8 @@ const improvementCurbstonePaintSource = detailSource(
   'позиция 7.1 / окраска бетонных дорожных бордюров',
   {
     quote:
-      'Окраска бетонных дорожных бордюров; 100 м2; 0,83; 19 914,30; Затраты труда 1 764,30; Краска для бордюров влагостойкая 18 150,00',
-  },
+      'Окраска бетонных дорожных бордюров; 100 м2; 0,83; 19 914,30; Затраты труда 1 764,30; Краска для бордюров влагостойкая 18 150,00'
+  }
 );
 
 const improvementPpeSource = detailSource(
@@ -284,63 +263,63 @@ const improvementPpeSource = detailSource(
         resource_ids: [improvementPpeCottonSuitResourceId],
         quantity: detailQuantity(1.3, 'шт.'),
         unit_price_rub: detailMoney(5_500),
-        total_rub: detailMoney(7_150),
+        total_rub: detailMoney(7_150)
       }),
       detailSourceQuoteItem({
         label: 'Куртка на утепляющей прокладке',
         resource_ids: [improvementPpeInsulatedJacketResourceId],
         quantity: detailQuantity(0.5, 'шт.', {
-          note: improvementRoundedQuantityNote,
+          note: improvementRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(6_000),
-        total_rub: detailMoney(3_120),
+        total_rub: detailMoney(3_120)
       }),
       detailSourceQuoteItem({
         label: 'Жилет сигнальный',
         resource_ids: [improvementPpeSignalVestResourceId],
         quantity: detailQuantity(1.3, 'шт.'),
         unit_price_rub: detailMoney(1_200),
-        total_rub: detailMoney(1_560),
+        total_rub: detailMoney(1_560)
       }),
       detailSourceQuoteItem({
         label: 'Сапоги утепленные',
         resource_ids: [improvementPpeInsulatedBootsResourceId],
         quantity: detailQuantity(0.5, 'шт.', {
-          note: improvementRoundedQuantityNote,
+          note: improvementRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(3_500),
-        total_rub: detailMoney(1_820),
+        total_rub: detailMoney(1_820)
       }),
       detailSourceQuoteItem({
         label: 'Перчатки с полимерным покрытием',
         resource_ids: [improvementPpePolymerGlovesResourceId],
         quantity: detailQuantity(5.2, 'шт.'),
         unit_price_rub: detailMoney(350),
-        total_rub: detailMoney(1_820),
+        total_rub: detailMoney(1_820)
       }),
       detailSourceQuoteItem({
         label: 'Рукавицы утепленные',
         resource_ids: [improvementPpeInsulatedMittensResourceId],
         quantity: detailQuantity(5.2, 'шт.'),
         unit_price_rub: detailMoney(700),
-        total_rub: detailMoney(3_640),
+        total_rub: detailMoney(3_640)
       }),
       detailSourceQuoteItem({
         label: 'Сапоги резиновые',
         resource_ids: [improvementPpeRubberBootsResourceId],
         quantity: detailQuantity(1.3, 'шт.'),
         unit_price_rub: detailMoney(2_000),
-        total_rub: detailMoney(2_600),
+        total_rub: detailMoney(2_600)
       }),
       detailSourceQuoteItem({
         label: 'Мыло туалетное',
         resource_ids: [improvementPpeSoapResourceId],
         quantity: detailQuantity(15.6, 'шт.'),
         unit_price_rub: detailMoney(116),
-        total_rub: detailMoney(1_809.6),
-      }),
-    ),
-  },
+        total_rub: detailMoney(1_809.6)
+      })
+    )
+  }
 );
 
 const improvementToolsSource = detailSource(
@@ -356,38 +335,38 @@ const improvementToolsSource = detailSource(
         resource_ids: [improvementIceAxeResourceId],
         quantity: detailQuantity(0.3, 'шт.'),
         unit_price_rub: detailMoney(700),
-        total_rub: detailMoney(182),
+        total_rub: detailMoney(182)
       }),
       detailSourceQuoteItem({
         label: 'Метла полипропиленовая с черенком',
         resource_ids: [improvementBroomResourceId],
         quantity: detailQuantity(6.5, 'шт.'),
         unit_price_rub: detailMoney(370),
-        total_rub: detailMoney(2_405),
+        total_rub: detailMoney(2_405)
       }),
       detailSourceQuoteItem({
         label: 'Лопата снегоуборочная оцинкованная',
         resource_ids: [improvementSnowShovelResourceId],
         quantity: detailQuantity(0.7, 'шт.'),
         unit_price_rub: detailMoney(2_500),
-        total_rub: detailMoney(1_625),
+        total_rub: detailMoney(1_625)
       }),
       detailSourceQuoteItem({
         label: 'Лопата совковая',
         resource_ids: [improvementScoopShovelResourceId],
         quantity: detailQuantity(0.7, 'шт.'),
         unit_price_rub: detailMoney(1_034),
-        total_rub: detailMoney(672.1),
+        total_rub: detailMoney(672.1)
       }),
       detailSourceQuoteItem({
         label: 'Тачка садовая',
         resource_ids: [improvementGardenWheelbarrowResourceId],
         quantity: detailQuantity(0.7, 'шт.'),
         unit_price_rub: detailMoney(2_500),
-        total_rub: detailMoney(1_625),
-      }),
-    ),
-  },
+        total_rub: detailMoney(1_625)
+      })
+    )
+  }
 );
 
 const improvementDocumentTotalsSource = detailSource(
@@ -396,8 +375,8 @@ const improvementDocumentTotalsSource = detailSource(
   'итоги локального ресурсного сметного расчета по благоустройству',
   {
     quote:
-      'Итого по разделу ... 4 363 835,75; Основная зарплата 1 669 095,98; Материальные затраты 354 667,20; страховые взносы 504 066,99; общеэксплуатационные расходы 1 168 367,19; прибыль 667 638,39',
-  },
+      'Итого по разделу ... 4 363 835,75; Основная зарплата 1 669 095,98; Материальные затраты 354 667,20; страховые взносы 504 066,99; общеэксплуатационные расходы 1 168 367,19; прибыль 667 638,39'
+  }
 );
 
 const improvementDocumentVatSource = detailSource(
@@ -405,8 +384,8 @@ const improvementDocumentVatSource = detailSource(
   16,
   'НДС в локальном ресурсном сметном расчете по благоустройству',
   {
-    quote: 'ВСЕГО по документу 4 363 835,75; НДС 5% 218 191,79',
-  },
+    quote: 'ВСЕГО по документу 4 363 835,75; НДС 5% 218 191,79'
+  }
 );
 
 const improvementResourceStatementSource = detailSource(
@@ -415,8 +394,8 @@ const improvementResourceStatementSource = detailSource(
   'ресурсная ведомость по локальному ресурсному сметному расчету',
   {
     quote:
-      'Рабочий по уборке территории 2513,1 664,15 1 669 095,98; Профнастил 248,6 1200,00 298 320,00; материалы всего по строкам ресурсной ведомости',
-  },
+      'Рабочий по уборке территории 2513,1 664,15 1 669 095,98; Профнастил 248,6 1200,00 298 320,00; материалы всего по строкам ресурсной ведомости'
+  }
 );
 
 const improvementCalculationSource = detailSource(
@@ -425,8 +404,8 @@ const improvementCalculationSource = detailSource(
   'калькуляция себестоимости услуг по благоустройству',
   {
     quote:
-      'ИТОГО расходов 3 696 197; налог по УСН 100 146; прибыль 667 638; Доходов - всего 4 463 981',
-  },
+      'ИТОГО расходов 3 696 197; налог по УСН 100 146; прибыль 667 638; Доходов - всего 4 463 981'
+  }
 );
 
 const improvementVatReconciliationNote =
@@ -437,7 +416,7 @@ const improvementFenceMismatchRefs = detailSourceRefs(
   improvementFinalRoadSurfaceSource,
   improvementProductionFenceSource,
   improvementFencePositionSource,
-  improvementFenceMaterialSource,
+  improvementFenceMaterialSource
 );
 
 const improvementObjectLaborResourceIds = [
@@ -451,7 +430,7 @@ const improvementObjectLaborResourceIds = [
   improvementWaterSurfaceTrashLaborResourceId,
   improvementWaterVegetationLaborResourceId,
   improvementPlaygroundGroundSweepSecondLaborResourceId,
-  improvementCurbstonePaintLaborResourceId,
+  improvementCurbstonePaintLaborResourceId
 ] as const;
 const improvementObjectMaterialResourceIds = [
   improvementPpeCottonSuitResourceId,
@@ -469,7 +448,7 @@ const improvementObjectMaterialResourceIds = [
   improvementBroomResourceId,
   improvementSnowShovelResourceId,
   improvementScoopShovelResourceId,
-  improvementGardenWheelbarrowResourceId,
+  improvementGardenWheelbarrowResourceId
 ] as const;
 const improvementObjectsGrossResourceIds = [
   ...improvementObjectLaborResourceIds,
@@ -478,12 +457,12 @@ const improvementObjectsGrossResourceIds = [
   improvementObjectsOverheadResourceId,
   improvementObjectsProfitResourceId,
   improvementObjectsUsnResourceId,
-  improvementObjectsVatResourceId,
+  improvementObjectsVatResourceId
 ] as const;
 const improvementFenceGrossResourceIds = [
   improvementFenceProfileSheetResourceId,
   improvementFenceUsnResourceId,
-  improvementFenceVatResourceId,
+  improvementFenceVatResourceId
 ] as const;
 
 export const improvementWorkItems = [
@@ -494,15 +473,15 @@ export const improvementWorkItems = [
     service_ids: [
       'year-round-common-area-repair',
       'summer-waterbody-cleaning',
-      'summer-curbstone-painting',
+      'summer-curbstone-painting'
     ],
     source_refs: detailSourceRefs(
       improvementFinalObjectsSource,
       improvementProductionObjectsSource,
-      improvementDocumentTotalsSource,
+      improvementDocumentTotalsSource
     ),
     note: 'В локальном расчете improvement.pdf строка ремонта периметрального ограждения входит в общий раздел благоустройства; для сверки с estimate-2026 ее материалы вынесены в отдельную work item строку 4.2.',
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailWorkItem({
     id: 'improvement-road-surface-repair',
@@ -511,11 +490,8 @@ export const improvementWorkItems = [
     service_ids: ['year-round-perimeter-fence-repair'],
     source_refs: improvementFenceMismatchRefs,
     note: 'Название сохранено по агрегированной смете, но detail-источник описывает ремонт периметрального ограждения.',
-    ...detailNeedsCheckStatus(
-      improvementFenceMismatchReason,
-      improvementFenceMismatchRefs,
-    ),
-  }),
+    ...detailNeedsCheckStatus(improvementFenceMismatchReason, improvementFenceMismatchRefs)
+  })
 ] satisfies readonly EstimateDetailWorkItem[];
 
 export const improvementResources = [
@@ -524,60 +500,57 @@ export const improvementResources = [
     work_item_id: 'improvement-objects-maintenance',
     estimate_row_id: 'improvement-objects-maintenance',
     kind: 'labor',
-    title:
-      'Рабочий по уборке территории: протирка элементов детского игрового комплекса',
+    title: 'Рабочий по уборке территории: протирка элементов детского игрового комплекса',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(40.4, 'чел-час', {
-      note: improvementRoundedQuantityNote,
+      note: improvementRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(26_826.18),
     source_refs: detailSourceRefs(
       improvementProductionObjectsSource,
       improvementStaffSource,
-      improvementPlaygroundElementsWipeSource,
+      improvementPlaygroundElementsWipeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementPlaygroundElementsWashLaborResourceId,
     work_item_id: 'improvement-objects-maintenance',
     estimate_row_id: 'improvement-objects-maintenance',
     kind: 'labor',
-    title:
-      'Рабочий по уборке территории: мытье элементов детского игрового комплекса',
+    title: 'Рабочий по уборке территории: мытье элементов детского игрового комплекса',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(5.5, 'чел-час', {
-      note: improvementRoundedQuantityNote,
+      note: improvementRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(3_675.45),
     source_refs: detailSourceRefs(
       improvementProductionObjectsSource,
       improvementStaffSource,
-      improvementPlaygroundElementsWashSource,
+      improvementPlaygroundElementsWashSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementPlaygroundElementsSnowLaborResourceId,
     work_item_id: 'improvement-objects-maintenance',
     estimate_row_id: 'improvement-objects-maintenance',
     kind: 'labor',
-    title:
-      'Рабочий по уборке территории: сметание снега с элементов детского игрового комплекса',
+    title: 'Рабочий по уборке территории: сметание снега с элементов детского игрового комплекса',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(135.3, 'чел-час', {
-      note: improvementRoundedQuantityNote,
+      note: improvementRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(89_858.93),
     source_refs: detailSourceRefs(
       improvementProductionObjectsSource,
       improvementStaffSource,
-      improvementPlaygroundElementsSnowSource,
+      improvementPlaygroundElementsSnowSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementSandboxCareLaborResourceId,
@@ -587,16 +560,16 @@ export const improvementResources = [
     title: 'Рабочий по уборке территории: уход за детскими песочницами',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(78.5, 'чел-час', {
-      note: improvementRoundedQuantityNote,
+      note: improvementRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(52_135.45),
     source_refs: detailSourceRefs(
       improvementProductionObjectsSource,
       improvementStaffSource,
-      improvementSandboxCareSource,
+      improvementSandboxCareSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementPlaygroundGroundSweepFirstLaborResourceId,
@@ -612,69 +585,66 @@ export const improvementResources = [
     source_refs: detailSourceRefs(
       improvementProductionObjectsSource,
       improvementStaffSource,
-      improvementPlaygroundGroundSweepFirstSource,
+      improvementPlaygroundGroundSweepFirstSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementSportsElementsWipeLaborResourceId,
     work_item_id: 'improvement-objects-maintenance',
     estimate_row_id: 'improvement-objects-maintenance',
     kind: 'labor',
-    title:
-      'Рабочий по уборке территории: протирка элементов спортивного комплекса',
+    title: 'Рабочий по уборке территории: протирка элементов спортивного комплекса',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(34.3, 'чел-час', {
-      note: improvementRoundedQuantityNote,
+      note: improvementRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(22_761.6),
     source_refs: detailSourceRefs(
       improvementProductionObjectsSource,
       improvementStaffSource,
-      improvementSportsElementsWipeSource,
+      improvementSportsElementsWipeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementSportsElementsWashLaborResourceId,
     work_item_id: 'improvement-objects-maintenance',
     estimate_row_id: 'improvement-objects-maintenance',
     kind: 'labor',
-    title:
-      'Рабочий по уборке территории: мытье элементов спортивного комплекса',
+    title: 'Рабочий по уборке территории: мытье элементов спортивного комплекса',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(4.7, 'чел-час', {
-      note: improvementRoundedQuantityNote,
+      note: improvementRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(3_118.56),
     source_refs: detailSourceRefs(
       improvementProductionObjectsSource,
       improvementStaffSource,
-      improvementSportsElementsWashSource,
+      improvementSportsElementsWashSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementWaterSurfaceTrashLaborResourceId,
     work_item_id: 'improvement-objects-maintenance',
     estimate_row_id: 'improvement-objects-maintenance',
     kind: 'labor',
-    title:
-      'Рабочий по уборке территории: сбор наплавного мусора с поверхности воды',
+    title: 'Рабочий по уборке территории: сбор наплавного мусора с поверхности воды',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(549.4, 'чел-час', {
-      note: improvementRoundedQuantityNote,
+      note: improvementRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(364_888.17),
     source_refs: detailSourceRefs(
       improvementProductionObjectsSource,
       improvementStaffSource,
-      improvementWaterSurfaceTrashSource,
+      improvementWaterSurfaceTrashSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementWaterVegetationLaborResourceId,
@@ -684,16 +654,16 @@ export const improvementResources = [
     title: 'Рабочий по уборке территории: удаление водной растительности',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(6.4, 'чел-час', {
-      note: improvementRoundedQuantityNote,
+      note: improvementRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(4_241.9),
     source_refs: detailSourceRefs(
       improvementProductionObjectsSource,
       improvementStaffSource,
-      improvementWaterVegetationSource,
+      improvementWaterVegetationSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementPlaygroundGroundSweepSecondLaborResourceId,
@@ -709,9 +679,9 @@ export const improvementResources = [
     source_refs: detailSourceRefs(
       improvementProductionObjectsSource,
       improvementStaffSource,
-      improvementPlaygroundGroundSweepSecondSource,
+      improvementPlaygroundGroundSweepSecondSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementCurbstonePaintLaborResourceId,
@@ -721,16 +691,16 @@ export const improvementResources = [
     title: 'Рабочий по уборке территории: окраска бетонных дорожных бордюров',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(2.7, 'чел-час', {
-      note: improvementRoundedQuantityNote,
+      note: improvementRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(1_764.3),
     source_refs: detailSourceRefs(
       improvementProductionCurbstonePpeToolsSource,
       improvementStaffSource,
-      improvementCurbstonePaintSource,
+      improvementCurbstonePaintSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementPpeCottonSuitResourceId,
@@ -745,9 +715,9 @@ export const improvementResources = [
     source_refs: detailSourceRefs(
       improvementProductionCurbstonePpeToolsSource,
       improvementPpeSource,
-      improvementResourceStatementSource,
+      improvementResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementPpeInsulatedJacketResourceId,
@@ -757,15 +727,12 @@ export const improvementResources = [
     title: 'Куртка на утепляющей прокладке для работ по благоустройству',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.5, 'шт.', {
-      note: improvementRoundedQuantityNote,
+      note: improvementRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(6_000),
     total_rub: detailMoney(3_120),
-    source_refs: detailSourceRefs(
-      improvementPpeSource,
-      improvementResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(improvementPpeSource, improvementResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementPpeSignalVestResourceId,
@@ -777,11 +744,8 @@ export const improvementResources = [
     quantity: detailQuantity(1.3, 'шт.'),
     unit_price_rub: detailMoney(1_200),
     total_rub: detailMoney(1_560),
-    source_refs: detailSourceRefs(
-      improvementPpeSource,
-      improvementResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(improvementPpeSource, improvementResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementPpeInsulatedBootsResourceId,
@@ -791,15 +755,12 @@ export const improvementResources = [
     title: 'Сапоги утепленные для работ по благоустройству',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.5, 'шт.', {
-      note: improvementRoundedQuantityNote,
+      note: improvementRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(3_500),
     total_rub: detailMoney(1_820),
-    source_refs: detailSourceRefs(
-      improvementPpeSource,
-      improvementResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(improvementPpeSource, improvementResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementPpePolymerGlovesResourceId,
@@ -811,11 +772,8 @@ export const improvementResources = [
     quantity: detailQuantity(5.2, 'шт.'),
     unit_price_rub: detailMoney(350),
     total_rub: detailMoney(1_820),
-    source_refs: detailSourceRefs(
-      improvementPpeSource,
-      improvementResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(improvementPpeSource, improvementResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementPpeInsulatedMittensResourceId,
@@ -827,11 +785,8 @@ export const improvementResources = [
     quantity: detailQuantity(5.2, 'шт.'),
     unit_price_rub: detailMoney(700),
     total_rub: detailMoney(3_640),
-    source_refs: detailSourceRefs(
-      improvementPpeSource,
-      improvementResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(improvementPpeSource, improvementResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementPpeRubberBootsResourceId,
@@ -843,11 +798,8 @@ export const improvementResources = [
     quantity: detailQuantity(1.3, 'шт.'),
     unit_price_rub: detailMoney(2_000),
     total_rub: detailMoney(2_600),
-    source_refs: detailSourceRefs(
-      improvementPpeSource,
-      improvementResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(improvementPpeSource, improvementResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementPpeSoapResourceId,
@@ -859,11 +811,8 @@ export const improvementResources = [
     quantity: detailQuantity(15.6, 'шт.'),
     unit_price_rub: detailMoney(116),
     total_rub: detailMoney(1_809.6),
-    source_refs: detailSourceRefs(
-      improvementPpeSource,
-      improvementResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(improvementPpeSource, improvementResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementSandboxSandResourceId,
@@ -878,9 +827,9 @@ export const improvementResources = [
     source_refs: detailSourceRefs(
       improvementProductionObjectsSource,
       improvementSandboxCareSource,
-      improvementResourceStatementSource,
+      improvementResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementTrashBagsResourceId,
@@ -895,9 +844,9 @@ export const improvementResources = [
     source_refs: detailSourceRefs(
       improvementWaterSurfaceTrashSource,
       improvementWaterVegetationSource,
-      improvementResourceStatementSource,
+      improvementResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementCurbstonePaintResourceId,
@@ -912,9 +861,9 @@ export const improvementResources = [
     source_refs: detailSourceRefs(
       improvementProductionCurbstonePpeToolsSource,
       improvementCurbstonePaintSource,
-      improvementResourceStatementSource,
+      improvementResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementIceAxeResourceId,
@@ -924,15 +873,12 @@ export const improvementResources = [
     title: 'Ледоруб-топор с металлической ручкой',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.3, 'шт.', {
-      note: improvementRoundedQuantityNote,
+      note: improvementRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(700),
     total_rub: detailMoney(182),
-    source_refs: detailSourceRefs(
-      improvementToolsSource,
-      improvementResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(improvementToolsSource, improvementResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementBroomResourceId,
@@ -944,11 +890,8 @@ export const improvementResources = [
     quantity: detailQuantity(6.5, 'шт.'),
     unit_price_rub: detailMoney(370),
     total_rub: detailMoney(2_405),
-    source_refs: detailSourceRefs(
-      improvementToolsSource,
-      improvementResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(improvementToolsSource, improvementResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementSnowShovelResourceId,
@@ -958,15 +901,12 @@ export const improvementResources = [
     title: 'Лопата снегоуборочная оцинкованная',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.7, 'шт.', {
-      note: improvementRoundedQuantityNote,
+      note: improvementRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(2_500),
     total_rub: detailMoney(1_625),
-    source_refs: detailSourceRefs(
-      improvementToolsSource,
-      improvementResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(improvementToolsSource, improvementResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementScoopShovelResourceId,
@@ -976,15 +916,12 @@ export const improvementResources = [
     title: 'Лопата совковая',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.7, 'шт.', {
-      note: improvementRoundedQuantityNote,
+      note: improvementRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(1_034),
     total_rub: detailMoney(672.1),
-    source_refs: detailSourceRefs(
-      improvementToolsSource,
-      improvementResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(improvementToolsSource, improvementResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementGardenWheelbarrowResourceId,
@@ -994,15 +931,12 @@ export const improvementResources = [
     title: 'Тачка садовая',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.7, 'шт.', {
-      note: improvementRoundedQuantityNote,
+      note: improvementRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(2_500),
     total_rub: detailMoney(1_625),
-    source_refs: detailSourceRefs(
-      improvementToolsSource,
-      improvementResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(improvementToolsSource, improvementResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementObjectsInsuranceResourceId,
@@ -1013,19 +947,18 @@ export const improvementResources = [
     cost_bucket: 'insurance',
     total_rub: detailMoney(504_066.99),
     source_refs: detailSourceRefs(improvementDocumentTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementObjectsOverheadResourceId,
     work_item_id: 'improvement-objects-maintenance',
     estimate_row_id: 'improvement-objects-maintenance',
     kind: 'other_cost',
-    title:
-      'Общеэксплуатационные расходы по содержанию объектов благоустройства',
+    title: 'Общеэксплуатационные расходы по содержанию объектов благоустройства',
     cost_bucket: 'overhead',
     total_rub: detailMoney(1_168_367.19),
     source_refs: detailSourceRefs(improvementDocumentTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementObjectsProfitResourceId,
@@ -1036,7 +969,7 @@ export const improvementResources = [
     cost_bucket: 'profit',
     total_rub: detailMoney(667_638.39),
     source_refs: detailSourceRefs(improvementDocumentTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: improvementObjectsUsnResourceId,
@@ -1046,14 +979,11 @@ export const improvementResources = [
     title: 'Расчетная доля УСН по содержанию объектов благоустройства',
     cost_bucket: 'usn',
     total_rub: detailMoney(93_299.49, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      improvementDocumentTotalsSource,
-      improvementCalculationSource,
-    ),
+    source_refs: detailSourceRefs(improvementDocumentTotalsSource, improvementCalculationSource),
     note: 'В improvement.pdf УСН показан только общей суммой по услуге, без распределения между строками 4.1 и 4.2.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: improvementObjectsVatResourceId,
@@ -1063,32 +993,25 @@ export const improvementResources = [
     title: 'Расчетный НДС 5% по содержанию объектов благоустройства',
     cost_bucket: 'vat',
     total_rub: detailMoney(207_940.76, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      improvementDocumentVatSource,
-      improvementCalculationSource,
-    ),
+    source_refs: detailSourceRefs(improvementDocumentVatSource, improvementCalculationSource),
     note: improvementVatReconciliationNote,
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: improvementFenceProfileSheetResourceId,
     work_item_id: 'improvement-road-surface-repair',
     estimate_row_id: 'improvement-road-surface-repair',
     kind: 'material',
-    title:
-      'Профнастил оцинкованный для замены элементов периметрального ограждения',
+    title: 'Профнастил оцинкованный для замены элементов периметрального ограждения',
     cost_bucket: 'materials',
     quantity: detailQuantity(248.6, 'м²'),
     unit_price_rub: detailMoney(1_200),
     total_rub: detailMoney(298_320),
     source_refs: improvementFenceMismatchRefs,
     note: 'Ресурс прямо указывает на ограждение и профнастил с монтажом; в improvement.pdf нет материала для ремонта дорожного покрытия или площадок в этой сумме.',
-    ...detailNeedsCheckStatus(
-      improvementFenceMismatchReason,
-      improvementFenceMismatchRefs,
-    ),
+    ...detailNeedsCheckStatus(improvementFenceMismatchReason, improvementFenceMismatchRefs)
   }),
   detailResource({
     id: improvementFenceUsnResourceId,
@@ -1098,18 +1021,15 @@ export const improvementResources = [
     title: 'Расчетная доля УСН по спорной строке ремонта',
     cost_bucket: 'usn',
     total_rub: detailMoney(6_845.71, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
     source_refs: detailSourceRefs(
       improvementFinalRoadSurfaceSource,
       improvementFenceMaterialSource,
-      improvementCalculationSource,
+      improvementCalculationSource
     ),
     note: 'Начисление рассчитано для сверки с агрегированной сметой; detail-источник строки описывает ограждение, а не дорожное покрытие.',
-    ...detailNeedsCheckStatus(
-      improvementFenceMismatchReason,
-      improvementFenceMismatchRefs,
-    ),
+    ...detailNeedsCheckStatus(improvementFenceMismatchReason, improvementFenceMismatchRefs)
   }),
   detailResource({
     id: improvementFenceVatResourceId,
@@ -1119,19 +1039,16 @@ export const improvementResources = [
     title: 'Расчетный НДС 5% по спорной строке ремонта',
     cost_bucket: 'vat',
     total_rub: detailMoney(15_258.29, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
     source_refs: detailSourceRefs(
       improvementFinalRoadSurfaceSource,
       improvementDocumentVatSource,
-      improvementCalculationSource,
+      improvementCalculationSource
     ),
     note: improvementVatReconciliationNote,
-    ...detailNeedsCheckStatus(
-      improvementFenceMismatchReason,
-      improvementFenceMismatchRefs,
-    ),
-  }),
+    ...detailNeedsCheckStatus(improvementFenceMismatchReason, improvementFenceMismatchRefs)
+  })
 ] satisfies readonly EstimateDetailResource[];
 
 export const improvementControlTotals = [
@@ -1145,24 +1062,24 @@ export const improvementControlTotals = [
     source_refs: detailSourceRefs(
       improvementDocumentHeaderSource,
       improvementDocumentTotalsSource,
-      improvementResourceStatementSource,
+      improvementResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'improvement-objects-materials',
     estimate_row_id: 'improvement-objects-maintenance',
     cost_bucket: 'materials',
     source_total_rub: detailMoney(56_347.2, {
-      note: 'материалы локального расчета без спорной строки ограждения',
+      note: 'материалы локального расчета без спорной строки ограждения'
     }),
     tolerance_rub: 0.01,
     resource_ids: improvementObjectMaterialResourceIds,
     source_refs: detailSourceRefs(
       improvementDocumentTotalsSource,
-      improvementResourceStatementSource,
+      improvementResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'improvement-objects-insurance',
@@ -1172,7 +1089,7 @@ export const improvementControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [improvementObjectsInsuranceResourceId],
     source_refs: detailSourceRefs(improvementDocumentTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'improvement-objects-overhead',
@@ -1182,7 +1099,7 @@ export const improvementControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [improvementObjectsOverheadResourceId],
     source_refs: detailSourceRefs(improvementDocumentTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'improvement-objects-profit',
@@ -1192,7 +1109,7 @@ export const improvementControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [improvementObjectsProfitResourceId],
     source_refs: detailSourceRefs(improvementDocumentTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'improvement-objects-usn',
@@ -1201,12 +1118,9 @@ export const improvementControlTotals = [
     source_total_rub: detailMoney(93_299.49),
     tolerance_rub: 0.01,
     resource_ids: [improvementObjectsUsnResourceId],
-    source_refs: detailSourceRefs(
-      improvementDocumentTotalsSource,
-      improvementCalculationSource,
-    ),
+    source_refs: detailSourceRefs(improvementDocumentTotalsSource, improvementCalculationSource),
     note: 'УСН распределен расчетно, потому что improvement.pdf показывает налог только общей суммой 100 146.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'improvement-objects-vat',
@@ -1215,12 +1129,9 @@ export const improvementControlTotals = [
     source_total_rub: detailMoney(207_940.76),
     tolerance_rub: 0.01,
     resource_ids: [improvementObjectsVatResourceId],
-    source_refs: detailSourceRefs(
-      improvementDocumentVatSource,
-      improvementCalculationSource,
-    ),
+    source_refs: detailSourceRefs(improvementDocumentVatSource, improvementCalculationSource),
     note: improvementVatReconciliationNote,
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'improvement-objects-gross',
@@ -1233,10 +1144,10 @@ export const improvementControlTotals = [
       improvementFinalObjectsSource,
       improvementDocumentTotalsSource,
       improvementDocumentVatSource,
-      improvementCalculationSource,
+      improvementCalculationSource
     ),
     note: improvementVatReconciliationNote,
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'improvement-fence-repair-materials',
@@ -1247,10 +1158,7 @@ export const improvementControlTotals = [
     resource_ids: [improvementFenceProfileSheetResourceId],
     source_refs: improvementFenceMismatchRefs,
     note: 'Сумма сходится с материалами строки 4.2 estimate-2026, но предмет работ в detail-источнике другой.',
-    ...detailNeedsCheckStatus(
-      improvementFenceMismatchReason,
-      improvementFenceMismatchRefs,
-    ),
+    ...detailNeedsCheckStatus(improvementFenceMismatchReason, improvementFenceMismatchRefs)
   }),
   detailControlTotal({
     id: 'improvement-fence-repair-usn',
@@ -1262,13 +1170,10 @@ export const improvementControlTotals = [
     source_refs: detailSourceRefs(
       improvementFinalRoadSurfaceSource,
       improvementFenceMaterialSource,
-      improvementCalculationSource,
+      improvementCalculationSource
     ),
     note: 'УСН расчетный: improvement.pdf не распределяет общий налог 100 146 между строками.',
-    ...detailNeedsCheckStatus(
-      improvementFenceMismatchReason,
-      improvementFenceMismatchRefs,
-    ),
+    ...detailNeedsCheckStatus(improvementFenceMismatchReason, improvementFenceMismatchRefs)
   }),
   detailControlTotal({
     id: 'improvement-fence-repair-vat',
@@ -1280,13 +1185,10 @@ export const improvementControlTotals = [
     source_refs: detailSourceRefs(
       improvementFinalRoadSurfaceSource,
       improvementDocumentVatSource,
-      improvementCalculationSource,
+      improvementCalculationSource
     ),
     note: improvementVatReconciliationNote,
-    ...detailNeedsCheckStatus(
-      improvementFenceMismatchReason,
-      improvementFenceMismatchRefs,
-    ),
+    ...detailNeedsCheckStatus(improvementFenceMismatchReason, improvementFenceMismatchRefs)
   }),
   detailControlTotal({
     id: 'improvement-fence-repair-gross',
@@ -1297,9 +1199,6 @@ export const improvementControlTotals = [
     resource_ids: improvementFenceGrossResourceIds,
     source_refs: improvementFenceMismatchRefs,
     note: 'Gross сходится с итоговой сметой, но detail-ресурс указывает на периметральное ограждение, а не на покрытие дорог или площадок.',
-    ...detailNeedsCheckStatus(
-      improvementFenceMismatchReason,
-      improvementFenceMismatchRefs,
-    ),
-  }),
+    ...detailNeedsCheckStatus(improvementFenceMismatchReason, improvementFenceMismatchRefs)
+  })
 ] satisfies readonly EstimateDetailControlTotalInput[];

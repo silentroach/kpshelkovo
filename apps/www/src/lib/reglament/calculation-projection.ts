@@ -1,18 +1,18 @@
 import type {
   EstimateCalculationDisplayValue,
   EstimateCalculationInput,
-  EstimateCalculationRow,
+  EstimateCalculationRow
 } from './calculate.types';
 import type {
   CostBreakdown,
   Estimate,
   EstimateCoefficients,
   EstimateDisplayValue,
-  EstimateRow,
+  EstimateRow
 } from './schema';
 
 const projectDisplayValue = (
-  displayValue?: EstimateDisplayValue,
+  displayValue?: EstimateDisplayValue
 ): EstimateCalculationDisplayValue | undefined =>
   displayValue ? { value: displayValue.value } : undefined;
 
@@ -29,17 +29,15 @@ const projectBreakdown = (breakdown: CostBreakdown): CostBreakdown => ({
   usn: breakdown.usn,
   income: breakdown.income,
   vat: breakdown.vat,
-  gross: breakdown.gross,
+  gross: breakdown.gross
 });
 
-const projectCoefficients = (
-  coefficients: EstimateCoefficients,
-): EstimateCoefficients => ({
+const projectCoefficients = (coefficients: EstimateCoefficients): EstimateCoefficients => ({
   insurance_rate: coefficients.insurance_rate,
   overhead_rate: coefficients.overhead_rate,
   profit_rate: coefficients.profit_rate,
   usn_rate: coefficients.usn_rate,
-  vat_rate: coefficients.vat_rate,
+  vat_rate: coefficients.vat_rate
 });
 
 const projectRow = (row: EstimateRow): EstimateCalculationRow => ({
@@ -52,26 +50,24 @@ const projectRow = (row: EstimateRow): EstimateCalculationRow => ({
     price: projectDisplayValue(row.baseline.price),
     annual_gross: row.baseline.annual_gross,
     tariff_per_sotka_month: row.baseline.tariff_per_sotka_month,
-    breakdown: projectBreakdown(row.baseline.breakdown),
+    breakdown: projectBreakdown(row.baseline.breakdown)
   },
-  children: row.children?.map(projectRow),
+  children: row.children?.map(projectRow)
 });
 
-export const projectEstimateCalculationInput = (
-  estimate: Estimate,
-): EstimateCalculationInput => ({
+export const projectEstimateCalculationInput = (estimate: Estimate): EstimateCalculationInput => ({
   tariff_area_sotki: estimate.tariff_area_sotki,
   coefficients: projectCoefficients(estimate.coefficients),
   baseline: {
     annual_gross: estimate.baseline.annual_gross,
-    tariff_per_sotka_month: estimate.baseline.tariff_per_sotka_month,
+    tariff_per_sotka_month: estimate.baseline.tariff_per_sotka_month
   },
   sections: estimate.sections.map((section) => ({
     id: section.id,
     baseline: {
       annual_gross: section.baseline.annual_gross,
-      tariff_per_sotka_month: section.baseline.tariff_per_sotka_month,
+      tariff_per_sotka_month: section.baseline.tariff_per_sotka_month
     },
-    rows: section.rows.map(projectRow),
-  })),
+    rows: section.rows.map(projectRow)
+  }))
 });

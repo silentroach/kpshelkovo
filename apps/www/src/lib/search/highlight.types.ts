@@ -6,13 +6,10 @@ export interface PagefindHighlightOptions {
   };
 }
 
-export type PagefindHighlightConstructor = new (
-  options: PagefindHighlightOptions,
-) => unknown;
+export type PagefindHighlightConstructor = new (options: PagefindHighlightOptions) => unknown;
 
 export interface PagefindHighlightModule {
   readonly default: PagefindHighlightConstructor;
 }
 
-export type PagefindHighlightLoader =
-  () => Promise<PagefindHighlightConstructor>;
+export type PagefindHighlightLoader = () => Promise<PagefindHighlightConstructor>;

@@ -8,15 +8,13 @@ import {
   formatStatusIncidentPeriodText,
   formatStatusKind,
   formatStatusService,
-  getStatusIncidentPhase,
+  getStatusIncidentPhase
 } from '../../lib/status/view';
 
 export const prerender = true;
 
 const impact = (item: StatusIncident): string =>
-  item.appliesToAllAreas
-    ? 'весь поселок'
-    : item.areas.map(formatStatusArea).join(', ');
+  item.appliesToAllAreas ? 'весь поселок' : item.areas.map(formatStatusArea).join(', ');
 
 const description = (item: StatusIncident): string =>
   [
@@ -24,7 +22,7 @@ const description = (item: StatusIncident): string =>
     `Статус: ${getStatusIncidentPhase(item).label}.`,
     `Период: ${formatStatusIncidentPeriodText(item)}.`,
     `Затронуто: ${impact(item)}.`,
-    item.excerpt,
+    item.excerpt
   ]
     .filter((part) => Boolean(part))
     .join(' ');
@@ -32,7 +30,7 @@ const description = (item: StatusIncident): string =>
 const categories = (item: StatusIncident): string[] => [
   formatStatusService(item.service),
   formatStatusKind(item.kind),
-  ...(item.appliesToAllAreas ? [] : item.areas.map(formatStatusArea)),
+  ...(item.appliesToAllAreas ? [] : item.areas.map(formatStatusArea))
 ];
 
 export const GET: APIRoute = async (context) => {
@@ -48,8 +46,8 @@ export const GET: APIRoute = async (context) => {
       description: description(item),
       ...(item.hasPage ? { link: item.url } : {}),
       pubDate: item.ended?.at ?? item.started.at,
-      categories: categories(item),
+      categories: categories(item)
     })),
-    customData: '<language>ru-RU</language>',
+    customData: '<language>ru-RU</language>'
   });
 };

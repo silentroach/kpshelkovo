@@ -1,7 +1,7 @@
 import type {
   EstimateDetailControlTotalInput,
   EstimateDetailResource,
-  EstimateDetailWorkItem,
+  EstimateDetailWorkItem
 } from '@/lib/reglament/detail-schema';
 
 import {
@@ -14,74 +14,48 @@ import {
   detailSourceQuoteItems,
   detailSourceRefs,
   detailStatus,
-  detailWorkItem,
+  detailWorkItem
 } from './shared';
 
 const landscapingMowingLaborResourceId = 'landscaping-mowing-trimmer-labor';
-const landscapingMowingTrimmerMachineResourceId =
-  'landscaping-mowing-trimmer-machine';
-const landscapingMowingPpeCottonSuitResourceId =
-  'landscaping-mowing-ppe-cotton-suit';
-const landscapingMowingPpeInsulatedJacketResourceId =
-  'landscaping-mowing-ppe-insulated-jacket';
-const landscapingMowingPpeSignalVestResourceId =
-  'landscaping-mowing-ppe-signal-vest';
-const landscapingMowingPpeInsulatedBootsResourceId =
-  'landscaping-mowing-ppe-insulated-boots';
-const landscapingMowingPpePolymerGlovesResourceId =
-  'landscaping-mowing-ppe-polymer-gloves';
-const landscapingMowingPpeInsulatedMittensResourceId =
-  'landscaping-mowing-ppe-insulated-mittens';
-const landscapingMowingPpeRubberBootsResourceId =
-  'landscaping-mowing-ppe-rubber-boots';
+const landscapingMowingTrimmerMachineResourceId = 'landscaping-mowing-trimmer-machine';
+const landscapingMowingPpeCottonSuitResourceId = 'landscaping-mowing-ppe-cotton-suit';
+const landscapingMowingPpeInsulatedJacketResourceId = 'landscaping-mowing-ppe-insulated-jacket';
+const landscapingMowingPpeSignalVestResourceId = 'landscaping-mowing-ppe-signal-vest';
+const landscapingMowingPpeInsulatedBootsResourceId = 'landscaping-mowing-ppe-insulated-boots';
+const landscapingMowingPpePolymerGlovesResourceId = 'landscaping-mowing-ppe-polymer-gloves';
+const landscapingMowingPpeInsulatedMittensResourceId = 'landscaping-mowing-ppe-insulated-mittens';
+const landscapingMowingPpeRubberBootsResourceId = 'landscaping-mowing-ppe-rubber-boots';
 const landscapingMowingPpeSoapResourceId = 'landscaping-mowing-ppe-soap';
 const landscapingMowingInsuranceResourceId = 'landscaping-mowing-insurance';
 const landscapingMowingOverheadResourceId = 'landscaping-mowing-overhead';
 const landscapingMowingProfitResourceId = 'landscaping-mowing-profit';
 const landscapingMowingUsnResourceId = 'landscaping-mowing-usn-derived';
 const landscapingMowingVatResourceId = 'landscaping-mowing-vat-derived';
-const landscapingTreesFertilizerLaborResourceId =
-  'landscaping-trees-fertilizer-labor';
-const landscapingTreesWaterMachinistResourceId =
-  'landscaping-trees-water-machinist-labor';
-const landscapingTreesWaterTractorResourceId =
-  'landscaping-trees-water-tractor-machine';
-const landscapingTreesWaterTankResourceId =
-  'landscaping-trees-water-tank-machine';
-const landscapingTreesLooseningLaborResourceId =
-  'landscaping-trees-loosening-labor';
-const landscapingTreesConiferPruningLaborResourceId =
-  'landscaping-trees-conifer-pruning-labor';
-const landscapingTreesBranchCollectionLaborResourceId =
-  'landscaping-trees-branch-collection-labor';
+const landscapingTreesFertilizerLaborResourceId = 'landscaping-trees-fertilizer-labor';
+const landscapingTreesWaterMachinistResourceId = 'landscaping-trees-water-machinist-labor';
+const landscapingTreesWaterTractorResourceId = 'landscaping-trees-water-tractor-machine';
+const landscapingTreesWaterTankResourceId = 'landscaping-trees-water-tank-machine';
+const landscapingTreesLooseningLaborResourceId = 'landscaping-trees-loosening-labor';
+const landscapingTreesConiferPruningLaborResourceId = 'landscaping-trees-conifer-pruning-labor';
+const landscapingTreesBranchCollectionLaborResourceId = 'landscaping-trees-branch-collection-labor';
 const landscapingTreesPlantWasteLoadingLaborResourceId =
   'landscaping-trees-plant-waste-loading-labor';
-const landscapingTreesWeedingLaborResourceId =
-  'landscaping-trees-weeding-labor';
-const landscapingTreesSnowLoadLaborResourceId =
-  'landscaping-trees-snow-load-labor';
-const landscapingTreesOmuFertilizerResourceId =
-  'landscaping-trees-omu-fertilizer';
+const landscapingTreesWeedingLaborResourceId = 'landscaping-trees-weeding-labor';
+const landscapingTreesSnowLoadLaborResourceId = 'landscaping-trees-snow-load-labor';
+const landscapingTreesOmuFertilizerResourceId = 'landscaping-trees-omu-fertilizer';
 const landscapingTreesAzofoskaResourceId = 'landscaping-trees-azofoska';
 const landscapingTreesWaterResourceId = 'landscaping-trees-water';
-const landscapingTreesPpeCottonSuitResourceId =
-  'landscaping-trees-ppe-cotton-suit';
-const landscapingTreesPpeInsulatedJacketResourceId =
-  'landscaping-trees-ppe-insulated-jacket';
-const landscapingTreesPpeSignalVestResourceId =
-  'landscaping-trees-ppe-signal-vest';
-const landscapingTreesPpeInsulatedBootsResourceId =
-  'landscaping-trees-ppe-insulated-boots';
-const landscapingTreesPpePolymerGlovesResourceId =
-  'landscaping-trees-ppe-polymer-gloves';
-const landscapingTreesPpeInsulatedMittensResourceId =
-  'landscaping-trees-ppe-insulated-mittens';
-const landscapingTreesPpeRubberBootsResourceId =
-  'landscaping-trees-ppe-rubber-boots';
+const landscapingTreesPpeCottonSuitResourceId = 'landscaping-trees-ppe-cotton-suit';
+const landscapingTreesPpeInsulatedJacketResourceId = 'landscaping-trees-ppe-insulated-jacket';
+const landscapingTreesPpeSignalVestResourceId = 'landscaping-trees-ppe-signal-vest';
+const landscapingTreesPpeInsulatedBootsResourceId = 'landscaping-trees-ppe-insulated-boots';
+const landscapingTreesPpePolymerGlovesResourceId = 'landscaping-trees-ppe-polymer-gloves';
+const landscapingTreesPpeInsulatedMittensResourceId = 'landscaping-trees-ppe-insulated-mittens';
+const landscapingTreesPpeRubberBootsResourceId = 'landscaping-trees-ppe-rubber-boots';
 const landscapingTreesPpeSoapResourceId = 'landscaping-trees-ppe-soap';
 const landscapingTreesToolSetResourceId = 'landscaping-trees-tool-set';
-const landscapingTreesBatteryPrunerResourceId =
-  'landscaping-trees-battery-pruner';
+const landscapingTreesBatteryPrunerResourceId = 'landscaping-trees-battery-pruner';
 const landscapingTreesGardenSawResourceId = 'landscaping-trees-garden-saw';
 const landscapingTreesPolePrunerResourceId = 'landscaping-trees-pole-pruner';
 const landscapingTreesLopperResourceId = 'landscaping-trees-lopper';
@@ -91,13 +65,10 @@ const landscapingTreesOverheadResourceId = 'landscaping-trees-overhead';
 const landscapingTreesProfitResourceId = 'landscaping-trees-profit';
 const landscapingTreesUsnResourceId = 'landscaping-trees-usn-derived';
 const landscapingTreesVatResourceId = 'landscaping-trees-vat-derived';
-const landscapingTicksTreatmentContractorResourceId =
-  'landscaping-ticks-treatment-contractor';
+const landscapingTicksTreatmentContractorResourceId = 'landscaping-ticks-treatment-contractor';
 const landscapingHogweedContractorResourceId = 'landscaping-hogweed-contractor';
-const landscapingTicksHogweedUsnResourceId =
-  'landscaping-ticks-hogweed-usn-derived';
-const landscapingTicksHogweedVatResourceId =
-  'landscaping-ticks-hogweed-vat-derived';
+const landscapingTicksHogweedUsnResourceId = 'landscaping-ticks-hogweed-usn-derived';
+const landscapingTicksHogweedVatResourceId = 'landscaping-ticks-hogweed-vat-derived';
 const landscapingForestLaborResourceId = 'landscaping-forest-care-labor';
 const landscapingForestInsuranceResourceId = 'landscaping-forest-insurance';
 const landscapingForestOverheadResourceId = 'landscaping-forest-overhead';
@@ -114,8 +85,8 @@ const landscapingProductionMowingSource = detailSource(
   'производственная программа / кошение травостоя вдоль открытых ливневых траншей',
   {
     quote:
-      'Кошение травостоя вдоль открытых ливневых траншей; м²; 98136; V-X; кратность 15; объем работ 14 720,40; трудозатраты 1030,4; Триммер бензиновый 1030',
-  },
+      'Кошение травостоя вдоль открытых ливневых траншей; м²; 98136; V-X; кратность 15; объем работ 14 720,40; трудозатраты 1030,4; Триммер бензиновый 1030'
+  }
 );
 
 const landscapingProductionTreesFertilizerSource = detailSource(
@@ -124,8 +95,8 @@ const landscapingProductionTreesFertilizerSource = detailSource(
   'производственная программа / внесение органических удобрений',
   {
     quote:
-      'Хвойные деревья 485; Внесение органических удобрений ... IV; кратность 1; объем 0,10; трудозатраты 0,04; ОМУ ... 38,8 кг; Азофоска ... 38,8 кг',
-  },
+      'Хвойные деревья 485; Внесение органических удобрений ... IV; кратность 1; объем 0,10; трудозатраты 0,04; ОМУ ... 38,8 кг; Азофоска ... 38,8 кг'
+  }
 );
 
 const landscapingProductionTreesWaterSource = detailSource(
@@ -134,8 +105,8 @@ const landscapingProductionTreesWaterSource = detailSource(
   'производственная программа / полив деревьев водой',
   {
     quote:
-      'Полив деревьев водой в приствольные лунки механизированным способом; V-VIII; кратность 20; объем 4,9; Трактор МТЗ 80 ... 163,9; Вода 291,00 м³',
-  },
+      'Полив деревьев водой в приствольные лунки механизированным способом; V-VIII; кратность 20; объем 4,9; Трактор МТЗ 80 ... 163,9; Вода 291,00 м³'
+  }
 );
 
 const landscapingProductionTreesWaterEquipmentSource = detailSource(
@@ -143,8 +114,8 @@ const landscapingProductionTreesWaterEquipmentSource = detailSource(
   2,
   'производственная программа / поливомоечное оборудование',
   {
-    quote: 'Оборудование поливомоечное ОПМ-5,0 (бочка); 163,9 маш-час',
-  },
+    quote: 'Оборудование поливомоечное ОПМ-5,0 (бочка); 163,9 маш-час'
+  }
 );
 
 const landscapingProductionTreesLooseningSource = detailSource(
@@ -153,8 +124,8 @@ const landscapingProductionTreesLooseningSource = detailSource(
   'производственная программа / рыхление приствольных лунок',
   {
     quote:
-      'Рыхление приствольных лунок лиственных деревьев и удаление сорной растительности; шт; IV-VIII; кратность 2; объем 970,00; трудозатраты 455,9',
-  },
+      'Рыхление приствольных лунок лиственных деревьев и удаление сорной растительности; шт; IV-VIII; кратность 2; объем 970,00; трудозатраты 455,9'
+  }
 );
 
 const landscapingProductionTreesConiferSource = detailSource(
@@ -163,8 +134,8 @@ const landscapingProductionTreesConiferSource = detailSource(
   'производственная программа / удаление старой хвои',
   {
     quote:
-      'Вырезка сухих ветвей и мелкой суши; 72,75; трудозатраты 5,8; Сбор срезанных ветвей; 2,43; трудозатраты 1,0; Погрузка ... 1,94; трудозатраты 1,3',
-  },
+      'Вырезка сухих ветвей и мелкой суши; 72,75; трудозатраты 5,8; Сбор срезанных ветвей; 2,43; трудозатраты 1,0; Погрузка ... 1,94; трудозатраты 1,3'
+  }
 );
 
 const landscapingProductionTreesWeedingSnowSource = detailSource(
@@ -173,8 +144,8 @@ const landscapingProductionTreesWeedingSnowSource = detailSource(
   'производственная программа / прополка и снижение снеговой нагрузки',
   {
     quote:
-      'Прополка приствольных лунок ... V-X; кратность 5; объем 4,85; трудозатраты 137,5; Стряхивание снега ... I-II; кратность 3; объем 4,9; трудозатраты 24,7',
-  },
+      'Прополка приствольных лунок ... V-X; кратность 5; объем 4,85; трудозатраты 137,5; Стряхивание снега ... I-II; кратность 3; объем 4,9; трудозатраты 24,7'
+  }
 );
 
 const landscapingProductionTreesPpeSource = detailSource(
@@ -188,45 +159,45 @@ const landscapingProductionTreesPpeSource = detailSource(
       detailSourceQuoteItem({
         label: 'Костюм хлопчатобумажный',
         resource_ids: [landscapingTreesPpeCottonSuitResourceId],
-        quantity: detailQuantity(0.5, 'шт.'),
+        quantity: detailQuantity(0.5, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Куртка на утепляющей прокладке',
         resource_ids: [landscapingTreesPpeInsulatedJacketResourceId],
-        quantity: detailQuantity(0.21, 'шт.'),
+        quantity: detailQuantity(0.21, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Жилет сигнальный',
         resource_ids: [landscapingTreesPpeSignalVestResourceId],
-        quantity: detailQuantity(0.5, 'шт.'),
+        quantity: detailQuantity(0.5, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Сапоги утепленные',
         resource_ids: [landscapingTreesPpeInsulatedBootsResourceId],
-        quantity: detailQuantity(0.21, 'шт.'),
+        quantity: detailQuantity(0.21, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Перчатки с полимерным покрытием',
         resource_ids: [landscapingTreesPpePolymerGlovesResourceId],
-        quantity: detailQuantity(2.1, 'шт.'),
+        quantity: detailQuantity(2.1, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Рукавицы утепленные',
         resource_ids: [landscapingTreesPpeInsulatedMittensResourceId],
-        quantity: detailQuantity(2.1, 'шт.'),
+        quantity: detailQuantity(2.1, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Сапоги резиновые',
         resource_ids: [landscapingTreesPpeRubberBootsResourceId],
-        quantity: detailQuantity(0.5, 'шт.'),
+        quantity: detailQuantity(0.5, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Мыло туалетное',
         resource_ids: [landscapingTreesPpeSoapResourceId],
-        quantity: detailQuantity(6.4, 'шт.'),
-      }),
-    ),
-  },
+        quantity: detailQuantity(6.4, 'шт.')
+      })
+    )
+  }
 );
 
 const landscapingProductionTreesInventorySource = detailSource(
@@ -235,8 +206,8 @@ const landscapingProductionTreesInventorySource = detailSource(
   'производственная программа / износ оборудования и инструментов',
   {
     quote:
-      'Износ оборудования, инструментов; Набор садовых инструментов; Секатор-кусторез аккумуляторный; Садовая ножовка; Высоторез; Сучкорез; Стремянка трансформер',
-  },
+      'Износ оборудования, инструментов; Набор садовых инструментов; Секатор-кусторез аккумуляторный; Садовая ножовка; Высоторез; Сучкорез; Стремянка трансформер'
+  }
 );
 
 const landscapingProductionTicksHogweedSource = detailSource(
@@ -252,17 +223,17 @@ const landscapingProductionTicksHogweedSource = detailSource(
         resource_ids: [landscapingTicksTreatmentContractorResourceId],
         quantity: detailQuantity(1, 'обработка'),
         unit_price_rub: detailMoney(34_200),
-        total_rub: detailMoney(34_200),
+        total_rub: detailMoney(34_200)
       }),
       detailSourceQuoteItem({
         label: 'Услуги сторонней организации: борьба с борщевиком',
         resource_ids: [landscapingHogweedContractorResourceId],
         quantity: detailQuantity(1, 'обработка'),
         unit_price_rub: detailMoney(5_826_000),
-        total_rub: detailMoney(5_826_000),
-      }),
-    ),
-  },
+        total_rub: detailMoney(5_826_000)
+      })
+    )
+  }
 );
 
 const landscapingProductionForestSource = detailSource(
@@ -271,8 +242,8 @@ const landscapingProductionForestSource = detailSource(
   'производственная программа / уход за лесом',
   {
     quote:
-      'Уход за лесом; м²; 129606; Сбор валежника; 10000 м²; V-X; кратность 1; объем 13,0; трудозатраты 259,2',
-  },
+      'Уход за лесом; м²; 129606; Сбор валежника; 10000 м²; V-X; кратность 1; объем 13,0; трудозатраты 259,2'
+  }
 );
 
 const landscapingStaffSource = detailSource(
@@ -280,21 +251,20 @@ const landscapingStaffSource = detailSource(
   7,
   'нормативное штатное расписание по озеленению',
   {
-    quote:
-      'Рабочий по уборке территории ... 0,95 ... 664,15; Машинист 0,08 ... 934,32',
+    quote: 'Рабочий по уборке территории ... 0,95 ... 664,15; Машинист 0,08 ... 934,32',
     quote_items: detailSourceQuoteItems(
       detailSourceQuoteItem({
         label: 'Рабочий по уборке территории',
         quantity: detailQuantity(0.95, 'чел.'),
-        unit_price_rub: detailMoney(664.15),
+        unit_price_rub: detailMoney(664.15)
       }),
       detailSourceQuoteItem({
         label: 'Машинист',
         quantity: detailQuantity(0.08, 'чел.'),
-        unit_price_rub: detailMoney(934.32),
-      }),
-    ),
-  },
+        unit_price_rub: detailMoney(934.32)
+      })
+    )
+  }
 );
 
 const landscapingMowingLaborSource = detailSource(
@@ -303,8 +273,8 @@ const landscapingMowingLaborSource = detailSource(
   'позиция 1.1 / кошение травостоя при помощи бензиновых триммеров',
   {
     quote:
-      'Кошение травостоя при помощи бензиновых триммеров; 100 м2; 14720,40; 746 147,26; Затраты труда Рабочий ... 1030; 664,15; 684 354,43',
-  },
+      'Кошение травостоя при помощи бензиновых триммеров; 100 м2; 14720,40; 746 147,26; Затраты труда Рабочий ... 1030; 664,15; 684 354,43'
+  }
 );
 
 const landscapingMowingMachinePpeSource = detailSource(
@@ -313,8 +283,8 @@ const landscapingMowingMachinePpeSource = detailSource(
   'позиция 1.1-2.1 / триммер и средства охраны труда',
   {
     quote:
-      'Триммер бензиновый; маш-час; 1030; 59,97; 61 792,83; ИТОГО ПО ПОЗИЦИИ 1 705 612,17; Средства охраны труда ... 9 046,00',
-  },
+      'Триммер бензиновый; маш-час; 1030; 59,97; 61 792,83; ИТОГО ПО ПОЗИЦИИ 1 705 612,17; Средства охраны труда ... 9 046,00'
+  }
 );
 
 const landscapingMowingTotalsSource = detailSource(
@@ -323,8 +293,8 @@ const landscapingMowingTotalsSource = detailSource(
   'итого по разделу кошения травостоя',
   {
     quote:
-      'Итого по разделу ... 1 714 658,17; Машины 61 792,83; Зарплата машинистов 684 354,43; Материальные затраты 9 046,00',
-  },
+      'Итого по разделу ... 1 714 658,17; Машины 61 792,83; Зарплата машинистов 684 354,43; Материальные затраты 9 046,00'
+  }
 );
 
 const landscapingTreesFertilizerSource = detailSource(
@@ -333,8 +303,8 @@ const landscapingTreesFertilizerSource = detailSource(
   'позиция 3.1 / внесение органических удобрений',
   {
     quote:
-      'Внесение органических удобрений ... 0,10; 11 277,77; Затраты труда Рабочий ... 0,039; 664,15; 25,77',
-  },
+      'Внесение органических удобрений ... 0,10; 11 277,77; Затраты труда Рабочий ... 0,039; 664,15; 25,77'
+  }
 );
 
 const landscapingTreesFertilizerMaterialsSource = detailSource(
@@ -343,8 +313,8 @@ const landscapingTreesFertilizerMaterialsSource = detailSource(
   'позиция 3.1 / материалы удобрений',
   {
     quote:
-      'ОМУ "Универсал" ... кг. 39; 170,00; 6 596,00; Азофоска ... кг. 39; 120,00; 4 656,00; ИТОГО ПО ПОЗИЦИИ 11 313,90',
-  },
+      'ОМУ "Универсал" ... кг. 39; 170,00; 6 596,00; Азофоска ... кг. 39; 120,00; 4 656,00; ИТОГО ПО ПОЗИЦИИ 11 313,90'
+  }
 );
 
 const landscapingTreesWaterSource = detailSource(
@@ -359,31 +329,31 @@ const landscapingTreesWaterSource = detailSource(
         label: 'Машинист',
         resource_ids: [landscapingTreesWaterMachinistResourceId],
         quantity: detailQuantity(164, 'чел-час', {
-          note: landscapingRoundedQuantityNote,
+          note: landscapingRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(934.32),
-        total_rub: detailMoney(153_163.08),
+        total_rub: detailMoney(153_163.08)
       }),
       detailSourceQuoteItem({
         label: 'Трактор МТЗ 80',
         resource_ids: [landscapingTreesWaterTractorResourceId],
         quantity: detailQuantity(164, 'маш-час', {
-          note: landscapingRoundedQuantityNote,
+          note: landscapingRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(1_476.02),
-        total_rub: detailMoney(241_964.04),
+        total_rub: detailMoney(241_964.04)
       }),
       detailSourceQuoteItem({
         label: 'ОПМ-5,0',
         resource_ids: [landscapingTreesWaterTankResourceId],
         quantity: detailQuantity(164, 'маш-час', {
-          note: landscapingRoundedQuantityNote,
+          note: landscapingRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(108.4),
-        total_rub: detailMoney(17_769.76),
-      }),
-    ),
-  },
+        total_rub: detailMoney(17_769.76)
+      })
+    )
+  }
 );
 
 const landscapingTreesWaterTotalsSource = detailSource(
@@ -391,8 +361,8 @@ const landscapingTreesWaterTotalsSource = detailSource(
   12,
   'позиция 4.1 / вода и итог полива',
   {
-    quote: 'Вода; м³; 291; 13,56; 3 945,96; ИТОГО ПО ПОЗИЦИИ 631 577,48',
-  },
+    quote: 'Вода; м³; 291; 13,56; 3 945,96; ИТОГО ПО ПОЗИЦИИ 631 577,48'
+  }
 );
 
 const landscapingTreesLooseningSource = detailSource(
@@ -401,8 +371,8 @@ const landscapingTreesLooseningSource = detailSource(
   'позиция 5.1 / рыхление приствольных лунок',
   {
     quote:
-      'Рыхление приствольных лунок лиственных деревьев ... 970,00; 302 784,07; Затраты труда Рабочий ... 456; 664,15; 302 784,07; ИТОГО ПО ПОЗИЦИИ 727 287,34',
-  },
+      'Рыхление приствольных лунок лиственных деревьев ... 970,00; 302 784,07; Затраты труда Рабочий ... 456; 664,15; 302 784,07; ИТОГО ПО ПОЗИЦИИ 727 287,34'
+  }
 );
 
 const landscapingTreesConiferPruningSource = detailSource(
@@ -411,8 +381,8 @@ const landscapingTreesConiferPruningSource = detailSource(
   'позиция 6.1 / вырезка сухих ветвей и мелкой суши',
   {
     quote:
-      'Вырезка сухих ветвей и мелкой суши; 72,75; 3 865,33; Затраты труда Рабочий ... 6; 664,15; 3 865,33; ИТОГО ПО ПОЗИЦИИ 9 284,52',
-  },
+      'Вырезка сухих ветвей и мелкой суши; 72,75; 3 865,33; Затраты труда Рабочий ... 6; 664,15; 3 865,33; ИТОГО ПО ПОЗИЦИИ 9 284,52'
+  }
 );
 
 const landscapingTreesBranchCollectionSource = detailSource(
@@ -421,8 +391,8 @@ const landscapingTreesBranchCollectionSource = detailSource(
   'позиция 6.2 / сбор срезанных ветвей',
   {
     quote:
-      'Сбор срезанных ветвей; 100 м2; 2,43; 644,22; Затраты труда Рабочий ... 1; 664,15; 644,22; ИТОГО ПО ПОЗИЦИИ 1 547,41',
-  },
+      'Сбор срезанных ветвей; 100 м2; 2,43; 644,22; Затраты труда Рабочий ... 1; 664,15; 644,22; ИТОГО ПО ПОЗИЦИИ 1 547,41'
+  }
 );
 
 const landscapingTreesPlantWasteLoadingSource = detailSource(
@@ -431,8 +401,8 @@ const landscapingTreesPlantWasteLoadingSource = detailSource(
   'позиция 6.3 / погрузка растительных остатков',
   {
     quote:
-      'Погрузка и разгрузка растительных остатков ... м3; 1,94; 837,49; Затраты труда Рабочий ... 1; 664,15; 837,49; ИТОГО ПО ПОЗИЦИИ 2 011,65',
-  },
+      'Погрузка и разгрузка растительных остатков ... м3; 1,94; 837,49; Затраты труда Рабочий ... 1; 664,15; 837,49; ИТОГО ПО ПОЗИЦИИ 2 011,65'
+  }
 );
 
 const landscapingTreesWeedingSource = detailSource(
@@ -441,8 +411,8 @@ const landscapingTreesWeedingSource = detailSource(
   'позиция 7.1 / прополка приствольных кругов',
   {
     quote:
-      'Прополка приствольных лунок ... 100 м2; 4,85; 91 318,39; Затраты труда Рабочий ... 137; 664,15; 91 318,39; ИТОГО ПО ПОЗИЦИИ 219 346,77',
-  },
+      'Прополка приствольных лунок ... 100 м2; 4,85; 91 318,39; Затраты труда Рабочий ... 137; 664,15; 91 318,39; ИТОГО ПО ПОЗИЦИИ 219 346,77'
+  }
 );
 
 const landscapingTreesSnowLoadSource = detailSource(
@@ -451,8 +421,8 @@ const landscapingTreesSnowLoadSource = detailSource(
   'позиция 8.1 / снижение снеговой нагрузки',
   {
     quote:
-      'Стряхивание снега с ветвей ... 4,85; 16 427,65; Затраты труда Рабочий ... 25; 664,15; 16 427,65; ИТОГО ПО ПОЗИЦИИ 39 459,21',
-  },
+      'Стряхивание снега с ветвей ... 4,85; 16 427,65; Затраты труда Рабочий ... 25; 664,15; 16 427,65; ИТОГО ПО ПОЗИЦИИ 39 459,21'
+  }
 );
 
 const landscapingTreesPpeStartSource = detailSource(
@@ -467,40 +437,40 @@ const landscapingTreesPpeStartSource = detailSource(
         label: 'Костюм хлопчатобумажный',
         resource_ids: [landscapingTreesPpeCottonSuitResourceId],
         quantity: detailQuantity(0.5, 'шт.', {
-          note: landscapingRoundedQuantityNote,
+          note: landscapingRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(5_500),
-        total_rub: detailMoney(2_915),
+        total_rub: detailMoney(2_915)
       }),
       detailSourceQuoteItem({
         label: 'Куртка на утепляющей прокладке',
         resource_ids: [landscapingTreesPpeInsulatedJacketResourceId],
         quantity: detailQuantity(0.21, 'шт.', {
-          note: landscapingRoundedQuantityNote,
+          note: landscapingRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(6_000),
-        total_rub: detailMoney(1_272),
+        total_rub: detailMoney(1_272)
       }),
       detailSourceQuoteItem({
         label: 'Жилет сигнальный',
         resource_ids: [landscapingTreesPpeSignalVestResourceId],
         quantity: detailQuantity(0.5, 'шт.', {
-          note: landscapingRoundedQuantityNote,
+          note: landscapingRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(1_200),
-        total_rub: detailMoney(636),
+        total_rub: detailMoney(636)
       }),
       detailSourceQuoteItem({
         label: 'Сапоги утепленные',
         resource_ids: [landscapingTreesPpeInsulatedBootsResourceId],
         quantity: detailQuantity(0.2, 'шт.', {
-          note: landscapingRoundedQuantityNote,
+          note: landscapingRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(3_500),
-        total_rub: detailMoney(742),
-      }),
-    ),
-  },
+        total_rub: detailMoney(742)
+      })
+    )
+  }
 );
 
 const landscapingTreesPpeSource = detailSource(
@@ -515,40 +485,40 @@ const landscapingTreesPpeSource = detailSource(
         label: 'Перчатки с полимерным покрытием',
         resource_ids: [landscapingTreesPpePolymerGlovesResourceId],
         quantity: detailQuantity(2.1, 'шт.', {
-          note: landscapingRoundedQuantityNote,
+          note: landscapingRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(350),
-        total_rub: detailMoney(742),
+        total_rub: detailMoney(742)
       }),
       detailSourceQuoteItem({
         label: 'Рукавицы утепленные',
         resource_ids: [landscapingTreesPpeInsulatedMittensResourceId],
         quantity: detailQuantity(2.1, 'шт.', {
-          note: landscapingRoundedQuantityNote,
+          note: landscapingRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(700),
-        total_rub: detailMoney(1_484),
+        total_rub: detailMoney(1_484)
       }),
       detailSourceQuoteItem({
         label: 'Сапоги резиновые',
         resource_ids: [landscapingTreesPpeRubberBootsResourceId],
         quantity: detailQuantity(0.5, 'шт.', {
-          note: landscapingRoundedQuantityNote,
+          note: landscapingRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(2_000),
-        total_rub: detailMoney(1_060),
+        total_rub: detailMoney(1_060)
       }),
       detailSourceQuoteItem({
         label: 'Мыло туалетное',
         resource_ids: [landscapingTreesPpeSoapResourceId],
         quantity: detailQuantity(6.4, 'шт.', {
-          note: landscapingRoundedQuantityNote,
+          note: landscapingRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(116),
-        total_rub: detailMoney(737.76),
-      }),
-    ),
-  },
+        total_rub: detailMoney(737.76)
+      })
+    )
+  }
 );
 
 const landscapingTreesInventorySource = detailSource(
@@ -557,8 +527,8 @@ const landscapingTreesInventorySource = detailSource(
   'позиция 10.1 / износ оборудования и инструментов',
   {
     quote:
-      'Износ оборудования, инструментов ... 6 178,95; Набор садовых инструментов 222,75; Секатор-кусторез аккумуляторный 1 620,00; Садовая ножовка 178,20; Высоторез 1 782,00; Сучкорез 891,00',
-  },
+      'Износ оборудования, инструментов ... 6 178,95; Набор садовых инструментов 222,75; Секатор-кусторез аккумуляторный 1 620,00; Садовая ножовка 178,20; Высоторез 1 782,00; Сучкорез 891,00'
+  }
 );
 
 const landscapingTreesInventoryLadderSource = detailSource(
@@ -566,9 +536,8 @@ const landscapingTreesInventoryLadderSource = detailSource(
   17,
   'позиция 10.1 / стремянка и итог износа оборудования',
   {
-    quote:
-      'Стремянка трансформер; шт.; 0,1; 10000,00; 1 485,00; ИТОГО ПО ПОЗИЦИИ 6 178,95',
-  },
+    quote: 'Стремянка трансформер; шт.; 0,1; 10000,00; 1 485,00; ИТОГО ПО ПОЗИЦИИ 6 178,95'
+  }
 );
 
 const landscapingTreesTotalsSource = detailSource(
@@ -577,8 +546,8 @@ const landscapingTreesTotalsSource = detailSource(
   'итого по разделу ухода за деревьями и кустарниками',
   {
     quote:
-      'Итого по разделу ... 1 657 595,98; Основная зарплата 415 902,91; Машины 259 733,80; Зарплата машинистов 153 163,08; Материальные затраты 30 965,67',
-  },
+      'Итого по разделу ... 1 657 595,98; Основная зарплата 415 902,91; Машины 259 733,80; Зарплата машинистов 153 163,08; Материальные затраты 30 965,67'
+  }
 );
 
 const landscapingTicksTreatmentSource = detailSource(
@@ -587,8 +556,8 @@ const landscapingTicksTreatmentSource = detailSource(
   'позиция 11.1 / акарицидная обработка',
   {
     quote:
-      'Обработка от клещей; услуга; 1,00; 34 200,00; Договорная цена; кол-во обработок 1,0; 34200,00',
-  },
+      'Обработка от клещей; услуга; 1,00; 34 200,00; Договорная цена; кол-во обработок 1,0; 34200,00'
+  }
 );
 
 const landscapingHogweedSource = detailSource(
@@ -597,8 +566,8 @@ const landscapingHogweedSource = detailSource(
   'позиция 12.1 / борьба с борщевиком',
   {
     quote:
-      'Борьба с борщевиком; услуга; 1,00; 5 826 000,00; Договорная цена; кол-во обработок 1,0; 5826000,00; ИТОГО ПО ПОЗИЦИИ 5 826 000,00',
-  },
+      'Борьба с борщевиком; услуга; 1,00; 5 826 000,00; Договорная цена; кол-во обработок 1,0; 5826000,00; ИТОГО ПО ПОЗИЦИИ 5 826 000,00'
+  }
 );
 
 const landscapingTicksHogweedTotalsSource = detailSource(
@@ -607,8 +576,8 @@ const landscapingTicksHogweedTotalsSource = detailSource(
   'итого по услуге обработки территорий от клещей и борьбы с борщевиком',
   {
     quote:
-      'Итого по услуге ... 5 860 200,00; Основная зарплата 0,00; Машины 0,00; Сторонние организации 5 860 200,00; Материальные затраты 0,00',
-  },
+      'Итого по услуге ... 5 860 200,00; Основная зарплата 0,00; Машины 0,00; Сторонние организации 5 860 200,00; Материальные затраты 0,00'
+  }
 );
 
 const landscapingForestSource = detailSource(
@@ -617,8 +586,8 @@ const landscapingForestSource = detailSource(
   'позиция 13.1 / очистка леса от захламленности',
   {
     quote:
-      'Сбор валежника; 10000 м²; 12,96; 172 154,56; Затраты труда Рабочий ... 259,212; 664,15; 172 154,56; ИТОГО ПО ПОЗИЦИИ 413 515,26',
-  },
+      'Сбор валежника; 10000 м²; 12,96; 172 154,56; Затраты труда Рабочий ... 259,212; 664,15; 172 154,56; ИТОГО ПО ПОЗИЦИИ 413 515,26'
+  }
 );
 
 const landscapingDocumentTotalsSource = detailSource(
@@ -627,8 +596,8 @@ const landscapingDocumentTotalsSource = detailSource(
   'итоги локального ресурсного сметного расчета по озеленению',
   {
     quote:
-      'Итого по услуге «Озеленение территории» 9 645 969,41; Основная зарплата 588 057,47; Машины 321 526,62; Зарплата машинистов 837 517,51; Сторонние организации 5 860 200,00; Материальные затраты 40 011,67; НДС 5% 482 298,47',
-  },
+      'Итого по услуге «Озеленение территории» 9 645 969,41; Основная зарплата 588 057,47; Машины 321 526,62; Зарплата машинистов 837 517,51; Сторонние организации 5 860 200,00; Материальные затраты 40 011,67; НДС 5% 482 298,47'
+  }
 );
 
 const landscapingResourceStatementSource = detailSource(
@@ -643,45 +612,45 @@ const landscapingResourceStatementSource = detailSource(
         label: 'Рабочий',
         quantity: detailQuantity(1_915.9, 'чел-час'),
         unit_price_rub: detailMoney(664.15),
-        total_rub: detailMoney(1_272_411.9),
+        total_rub: detailMoney(1_272_411.9)
       }),
       detailSourceQuoteItem({
         label: 'Машинист',
         resource_ids: [landscapingTreesWaterMachinistResourceId],
         quantity: detailQuantity(163.9, 'чел-час'),
         unit_price_rub: detailMoney(934.32),
-        total_rub: detailMoney(153_163.08),
+        total_rub: detailMoney(153_163.08)
       }),
       detailSourceQuoteItem({
         label: 'Трактор МТЗ 80',
         resource_ids: [landscapingTreesWaterTractorResourceId],
         quantity: detailQuantity(163.9, 'маш.-час'),
         unit_price_rub: detailMoney(1_476.02),
-        total_rub: detailMoney(241_964.04),
+        total_rub: detailMoney(241_964.04)
       }),
       detailSourceQuoteItem({
         label: 'ОПМ-5,0',
         resource_ids: [landscapingTreesWaterTankResourceId],
         quantity: detailQuantity(163.9, 'маш.-час'),
         unit_price_rub: detailMoney(108.4),
-        total_rub: detailMoney(17_769.76),
+        total_rub: detailMoney(17_769.76)
       }),
       detailSourceQuoteItem({
         label: 'Триммер бензиновый',
         resource_ids: [landscapingMowingTrimmerMachineResourceId],
         quantity: detailQuantity(1_030.4, 'маш.-час'),
         unit_price_rub: detailMoney(59.97),
-        total_rub: detailMoney(61_792.83),
+        total_rub: detailMoney(61_792.83)
       }),
       detailSourceQuoteItem({
         label: 'Вода',
         resource_ids: [landscapingTreesWaterResourceId],
         quantity: detailQuantity(291, 'м³'),
         unit_price_rub: detailMoney(13.56),
-        total_rub: detailMoney(3_945.96),
-      }),
-    ),
-  },
+        total_rub: detailMoney(3_945.96)
+      })
+    )
+  }
 );
 
 const landscapingCalculationSource = detailSource(
@@ -690,8 +659,8 @@ const landscapingCalculationSource = detailSource(
   'калькуляция себестоимости услуг по озеленению',
   {
     quote:
-      'ИТОГО расходов 9 075 740; налог по УСН 85 534; прибыль ... 570 230; Доходов - всего 9 731 505',
-  },
+      'ИТОГО расходов 9 075 740; налог по УСН 85 534; прибыль ... 570 230; Доходов - всего 9 731 505'
+  }
 );
 
 const landscapingVatReconciliationNote =
@@ -705,7 +674,7 @@ const landscapingMowingMaterialResourceIds = [
   landscapingMowingPpePolymerGlovesResourceId,
   landscapingMowingPpeInsulatedMittensResourceId,
   landscapingMowingPpeRubberBootsResourceId,
-  landscapingMowingPpeSoapResourceId,
+  landscapingMowingPpeSoapResourceId
 ] as const;
 const landscapingMowingGrossResourceIds = [
   landscapingMowingLaborResourceId,
@@ -715,7 +684,7 @@ const landscapingMowingGrossResourceIds = [
   landscapingMowingOverheadResourceId,
   landscapingMowingProfitResourceId,
   landscapingMowingUsnResourceId,
-  landscapingMowingVatResourceId,
+  landscapingMowingVatResourceId
 ] as const;
 const landscapingTreesPrimarySalaryResourceIds = [
   landscapingTreesFertilizerLaborResourceId,
@@ -724,11 +693,11 @@ const landscapingTreesPrimarySalaryResourceIds = [
   landscapingTreesBranchCollectionLaborResourceId,
   landscapingTreesPlantWasteLoadingLaborResourceId,
   landscapingTreesWeedingLaborResourceId,
-  landscapingTreesSnowLoadLaborResourceId,
+  landscapingTreesSnowLoadLaborResourceId
 ] as const;
 const landscapingTreesMachineResourceIds = [
   landscapingTreesWaterTractorResourceId,
-  landscapingTreesWaterTankResourceId,
+  landscapingTreesWaterTankResourceId
 ] as const;
 const landscapingTreesMaterialResourceIds = [
   landscapingTreesOmuFertilizerResourceId,
@@ -747,7 +716,7 @@ const landscapingTreesMaterialResourceIds = [
   landscapingTreesGardenSawResourceId,
   landscapingTreesPolePrunerResourceId,
   landscapingTreesLopperResourceId,
-  landscapingTreesLadderResourceId,
+  landscapingTreesLadderResourceId
 ] as const;
 const landscapingTreesGrossResourceIds = [
   ...landscapingTreesPrimarySalaryResourceIds,
@@ -758,16 +727,16 @@ const landscapingTreesGrossResourceIds = [
   landscapingTreesOverheadResourceId,
   landscapingTreesProfitResourceId,
   landscapingTreesUsnResourceId,
-  landscapingTreesVatResourceId,
+  landscapingTreesVatResourceId
 ] as const;
 const landscapingTicksHogweedContractorResourceIds = [
   landscapingTicksTreatmentContractorResourceId,
-  landscapingHogweedContractorResourceId,
+  landscapingHogweedContractorResourceId
 ] as const;
 const landscapingTicksHogweedGrossResourceIds = [
   ...landscapingTicksHogweedContractorResourceIds,
   landscapingTicksHogweedUsnResourceId,
-  landscapingTicksHogweedVatResourceId,
+  landscapingTicksHogweedVatResourceId
 ] as const;
 const landscapingForestGrossResourceIds = [
   landscapingForestLaborResourceId,
@@ -775,7 +744,7 @@ const landscapingForestGrossResourceIds = [
   landscapingForestOverheadResourceId,
   landscapingForestProfitResourceId,
   landscapingForestUsnResourceId,
-  landscapingForestVatResourceId,
+  landscapingForestVatResourceId
 ] as const;
 
 export const landscapingWorkItems = [
@@ -784,12 +753,9 @@ export const landscapingWorkItems = [
     title: 'Кошение травостоя вдоль открытых ливневых траншей',
     estimate_row_id: 'landscaping-mowing-ditches',
     service_ids: ['summer-lawn-mowing'],
-    source_refs: detailSourceRefs(
-      landscapingProductionMowingSource,
-      landscapingMowingTotalsSource,
-    ),
+    source_refs: detailSourceRefs(landscapingProductionMowingSource, landscapingMowingTotalsSource),
     note: 'PDF-база: 98 136 м²; кратность кошения: 15 раз за период V-X; объем с учетом кратности: 14 720,40 × 100 м².',
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailWorkItem({
     id: 'landscaping-trees-shrubs',
@@ -802,10 +768,10 @@ export const landscapingWorkItems = [
       landscapingProductionTreesLooseningSource,
       landscapingProductionTreesConiferSource,
       landscapingProductionTreesWeedingSnowSource,
-      landscapingTreesTotalsSource,
+      landscapingTreesTotalsSource
     ),
     note: 'PDF-базы и кратности внутри строки разные: 485 хвойных деревьев для удобрений и части работ; 970 лиственных деревьев для рыхления; полив 20 раз; рыхление 2 раза; прополка 5 раз; снижение снеговой нагрузки 3 раза.',
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailWorkItem({
     id: 'landscaping-ticks-hogweed',
@@ -813,22 +779,19 @@ export const landscapingWorkItems = [
     estimate_row_id: 'landscaping-ticks-hogweed',
     source_refs: detailSourceRefs(
       landscapingProductionTicksHogweedSource,
-      landscapingTicksHogweedTotalsSource,
+      landscapingTicksHogweedTotalsSource
     ),
     note: 'PDF показывает акарицидную обработку как 1 услугу и борьбу с борщевиком как 1 услугу при кратности 3 в производственной программе.',
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailWorkItem({
     id: 'landscaping-forest-care',
     title: 'Уход за лесом',
     estimate_row_id: 'landscaping-forest-care',
-    source_refs: detailSourceRefs(
-      landscapingProductionForestSource,
-      landscapingForestSource,
-    ),
+    source_refs: detailSourceRefs(landscapingProductionForestSource, landscapingForestSource),
     note: 'PDF-база: 129 606 м² леса; расчетный объем: 12,96 × 10 000 м²; кратность сбора валежника: 1 раз в период V-X.',
-    ...detailStatus('verified'),
-  }),
+    ...detailStatus('verified')
+  })
 ] satisfies readonly EstimateDetailWorkItem[];
 
 export const landscapingResources = [
@@ -845,10 +808,10 @@ export const landscapingResources = [
     source_refs: detailSourceRefs(
       landscapingProductionMowingSource,
       landscapingMowingLaborSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
     note: 'PDF называет ресурс рабочим, но сумма стоит в колонке зарплаты машинистов и так же классифицирована в estimate-2026.',
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingMowingTrimmerMachineResourceId,
@@ -863,9 +826,9 @@ export const landscapingResources = [
     source_refs: detailSourceRefs(
       landscapingProductionMowingSource,
       landscapingMowingMachinePpeSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingMowingPpeCottonSuitResourceId,
@@ -879,9 +842,9 @@ export const landscapingResources = [
     total_rub: detailMoney(2_750),
     source_refs: detailSourceRefs(
       landscapingMowingMachinePpeSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingMowingPpeInsulatedJacketResourceId,
@@ -895,9 +858,9 @@ export const landscapingResources = [
     total_rub: detailMoney(1_200),
     source_refs: detailSourceRefs(
       landscapingMowingMachinePpeSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingMowingPpeSignalVestResourceId,
@@ -911,9 +874,9 @@ export const landscapingResources = [
     total_rub: detailMoney(600),
     source_refs: detailSourceRefs(
       landscapingMowingMachinePpeSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingMowingPpeInsulatedBootsResourceId,
@@ -927,9 +890,9 @@ export const landscapingResources = [
     total_rub: detailMoney(700),
     source_refs: detailSourceRefs(
       landscapingMowingMachinePpeSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingMowingPpePolymerGlovesResourceId,
@@ -943,9 +906,9 @@ export const landscapingResources = [
     total_rub: detailMoney(700),
     source_refs: detailSourceRefs(
       landscapingMowingMachinePpeSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingMowingPpeInsulatedMittensResourceId,
@@ -959,9 +922,9 @@ export const landscapingResources = [
     total_rub: detailMoney(1_400),
     source_refs: detailSourceRefs(
       landscapingMowingMachinePpeSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingMowingPpeRubberBootsResourceId,
@@ -975,9 +938,9 @@ export const landscapingResources = [
     total_rub: detailMoney(1_000),
     source_refs: detailSourceRefs(
       landscapingMowingMachinePpeSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingMowingPpeSoapResourceId,
@@ -991,9 +954,9 @@ export const landscapingResources = [
     total_rub: detailMoney(696),
     source_refs: detailSourceRefs(
       landscapingMowingMachinePpeSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingMowingInsuranceResourceId,
@@ -1004,7 +967,7 @@ export const landscapingResources = [
     cost_bucket: 'insurance',
     total_rub: detailMoney(206_675.04),
     source_refs: detailSourceRefs(landscapingMowingMachinePpeSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingMowingOverheadResourceId,
@@ -1015,7 +978,7 @@ export const landscapingResources = [
     cost_bucket: 'overhead',
     total_rub: detailMoney(479_048.1),
     source_refs: detailSourceRefs(landscapingMowingMachinePpeSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingMowingProfitResourceId,
@@ -1026,7 +989,7 @@ export const landscapingResources = [
     cost_bucket: 'profit',
     total_rub: detailMoney(273_741.77),
     source_refs: detailSourceRefs(landscapingMowingMachinePpeSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingMowingUsnResourceId,
@@ -1036,14 +999,11 @@ export const landscapingResources = [
     title: 'Расчетная доля УСН по кошению травостоя',
     cost_bucket: 'usn',
     total_rub: detailMoney(15_204.69, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      landscapingMowingTotalsSource,
-      landscapingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(landscapingMowingTotalsSource, landscapingCalculationSource),
     note: 'В landscaping.pdf УСН показан только общей суммой по услуге, без распределения по строкам.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: landscapingMowingVatResourceId,
@@ -1053,14 +1013,11 @@ export const landscapingResources = [
     title: 'Расчетный НДС 5% по кошению травостоя',
     cost_bucket: 'vat',
     total_rub: detailMoney(86_493.14, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      landscapingDocumentTotalsSource,
-      landscapingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(landscapingDocumentTotalsSource, landscapingCalculationSource),
     note: landscapingVatReconciliationNote,
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: landscapingTreesFertilizerLaborResourceId,
@@ -1074,9 +1031,9 @@ export const landscapingResources = [
     total_rub: detailMoney(25.77),
     source_refs: detailSourceRefs(
       landscapingProductionTreesFertilizerSource,
-      landscapingTreesFertilizerSource,
+      landscapingTreesFertilizerSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesWaterMachinistResourceId,
@@ -1091,9 +1048,9 @@ export const landscapingResources = [
     source_refs: detailSourceRefs(
       landscapingStaffSource,
       landscapingTreesWaterSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesWaterTractorResourceId,
@@ -1108,9 +1065,9 @@ export const landscapingResources = [
     source_refs: detailSourceRefs(
       landscapingProductionTreesWaterSource,
       landscapingTreesWaterSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesWaterTankResourceId,
@@ -1125,9 +1082,9 @@ export const landscapingResources = [
     source_refs: detailSourceRefs(
       landscapingProductionTreesWaterEquipmentSource,
       landscapingTreesWaterSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesLooseningLaborResourceId,
@@ -1141,9 +1098,9 @@ export const landscapingResources = [
     total_rub: detailMoney(302_784.07),
     source_refs: detailSourceRefs(
       landscapingProductionTreesLooseningSource,
-      landscapingTreesLooseningSource,
+      landscapingTreesLooseningSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesConiferPruningLaborResourceId,
@@ -1157,9 +1114,9 @@ export const landscapingResources = [
     total_rub: detailMoney(3_865.33),
     source_refs: detailSourceRefs(
       landscapingProductionTreesConiferSource,
-      landscapingTreesConiferPruningSource,
+      landscapingTreesConiferPruningSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesBranchCollectionLaborResourceId,
@@ -1173,9 +1130,9 @@ export const landscapingResources = [
     total_rub: detailMoney(644.22),
     source_refs: detailSourceRefs(
       landscapingProductionTreesConiferSource,
-      landscapingTreesBranchCollectionSource,
+      landscapingTreesBranchCollectionSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesPlantWasteLoadingLaborResourceId,
@@ -1189,9 +1146,9 @@ export const landscapingResources = [
     total_rub: detailMoney(837.49),
     source_refs: detailSourceRefs(
       landscapingProductionTreesConiferSource,
-      landscapingTreesPlantWasteLoadingSource,
+      landscapingTreesPlantWasteLoadingSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesWeedingLaborResourceId,
@@ -1205,9 +1162,9 @@ export const landscapingResources = [
     total_rub: detailMoney(91_318.39),
     source_refs: detailSourceRefs(
       landscapingProductionTreesWeedingSnowSource,
-      landscapingTreesWeedingSource,
+      landscapingTreesWeedingSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesSnowLoadLaborResourceId,
@@ -1221,9 +1178,9 @@ export const landscapingResources = [
     total_rub: detailMoney(16_427.65),
     source_refs: detailSourceRefs(
       landscapingProductionTreesWeedingSnowSource,
-      landscapingTreesSnowLoadSource,
+      landscapingTreesSnowLoadSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesOmuFertilizerResourceId,
@@ -1238,9 +1195,9 @@ export const landscapingResources = [
     source_refs: detailSourceRefs(
       landscapingProductionTreesFertilizerSource,
       landscapingTreesFertilizerMaterialsSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesAzofoskaResourceId,
@@ -1255,9 +1212,9 @@ export const landscapingResources = [
     source_refs: detailSourceRefs(
       landscapingProductionTreesFertilizerSource,
       landscapingTreesFertilizerMaterialsSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesWaterResourceId,
@@ -1272,9 +1229,9 @@ export const landscapingResources = [
     source_refs: detailSourceRefs(
       landscapingProductionTreesWaterSource,
       landscapingTreesWaterTotalsSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesPpeCottonSuitResourceId,
@@ -1284,16 +1241,16 @@ export const landscapingResources = [
     title: 'Костюм хлопчатобумажный для ухода за деревьями',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.5, 'шт.', {
-      note: landscapingRoundedQuantityNote,
+      note: landscapingRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(5_500),
     total_rub: detailMoney(2_915),
     source_refs: detailSourceRefs(
       landscapingProductionTreesPpeSource,
       landscapingTreesPpeStartSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesPpeInsulatedJacketResourceId,
@@ -1303,16 +1260,16 @@ export const landscapingResources = [
     title: 'Куртка на утепляющей прокладке для ухода за деревьями',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.21, 'шт.', {
-      note: landscapingRoundedQuantityNote,
+      note: landscapingRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(6_000),
     total_rub: detailMoney(1_272),
     source_refs: detailSourceRefs(
       landscapingProductionTreesPpeSource,
       landscapingTreesPpeStartSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesPpeSignalVestResourceId,
@@ -1322,16 +1279,16 @@ export const landscapingResources = [
     title: 'Жилет сигнальный для ухода за деревьями',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.5, 'шт.', {
-      note: landscapingRoundedQuantityNote,
+      note: landscapingRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(1_200),
     total_rub: detailMoney(636),
     source_refs: detailSourceRefs(
       landscapingProductionTreesPpeSource,
       landscapingTreesPpeStartSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesPpeInsulatedBootsResourceId,
@@ -1341,16 +1298,16 @@ export const landscapingResources = [
     title: 'Сапоги утепленные для ухода за деревьями',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.21, 'шт.', {
-      note: landscapingRoundedQuantityNote,
+      note: landscapingRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(3_500),
     total_rub: detailMoney(742),
     source_refs: detailSourceRefs(
       landscapingProductionTreesPpeSource,
       landscapingTreesPpeStartSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesPpePolymerGlovesResourceId,
@@ -1360,16 +1317,16 @@ export const landscapingResources = [
     title: 'Перчатки с полимерным покрытием для ухода за деревьями',
     cost_bucket: 'materials',
     quantity: detailQuantity(2.1, 'шт.', {
-      note: landscapingRoundedQuantityNote,
+      note: landscapingRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(350),
     total_rub: detailMoney(742),
     source_refs: detailSourceRefs(
       landscapingProductionTreesPpeSource,
       landscapingTreesPpeSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesPpeInsulatedMittensResourceId,
@@ -1379,16 +1336,16 @@ export const landscapingResources = [
     title: 'Рукавицы утепленные для ухода за деревьями',
     cost_bucket: 'materials',
     quantity: detailQuantity(2.1, 'шт.', {
-      note: landscapingRoundedQuantityNote,
+      note: landscapingRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(700),
     total_rub: detailMoney(1_484),
     source_refs: detailSourceRefs(
       landscapingProductionTreesPpeSource,
       landscapingTreesPpeSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesPpeRubberBootsResourceId,
@@ -1398,16 +1355,16 @@ export const landscapingResources = [
     title: 'Сапоги резиновые для ухода за деревьями',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.5, 'шт.', {
-      note: landscapingRoundedQuantityNote,
+      note: landscapingRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(2_000),
     total_rub: detailMoney(1_060),
     source_refs: detailSourceRefs(
       landscapingProductionTreesPpeSource,
       landscapingTreesPpeSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesPpeSoapResourceId,
@@ -1417,16 +1374,16 @@ export const landscapingResources = [
     title: 'Мыло туалетное для ухода за деревьями',
     cost_bucket: 'materials',
     quantity: detailQuantity(6.4, 'шт.', {
-      note: landscapingRoundedQuantityNote,
+      note: landscapingRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(116),
     total_rub: detailMoney(737.76),
     source_refs: detailSourceRefs(
       landscapingProductionTreesPpeSource,
       landscapingTreesPpeSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesToolSetResourceId,
@@ -1436,16 +1393,16 @@ export const landscapingResources = [
     title: 'Набор садовых инструментов в футляре',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.15, 'шт.', {
-      note: landscapingRoundedQuantityNote,
+      note: landscapingRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(1_500),
     total_rub: detailMoney(222.75),
     source_refs: detailSourceRefs(
       landscapingProductionTreesInventorySource,
       landscapingTreesInventoryLadderSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesBatteryPrunerResourceId,
@@ -1455,16 +1412,16 @@ export const landscapingResources = [
     title: 'Секатор-кусторез аккумуляторный',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.14, 'шт.', {
-      note: landscapingRoundedQuantityNote,
+      note: landscapingRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(12_000),
     total_rub: detailMoney(1_620),
     source_refs: detailSourceRefs(
       landscapingProductionTreesInventorySource,
       landscapingTreesInventorySource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesGardenSawResourceId,
@@ -1474,16 +1431,16 @@ export const landscapingResources = [
     title: 'Садовая ножовка',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.15, 'шт.', {
-      note: landscapingRoundedQuantityNote,
+      note: landscapingRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(1_200),
     total_rub: detailMoney(178.2),
     source_refs: detailSourceRefs(
       landscapingProductionTreesInventorySource,
       landscapingTreesInventorySource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesPolePrunerResourceId,
@@ -1493,16 +1450,16 @@ export const landscapingResources = [
     title: 'Высоторез',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.15, 'шт.', {
-      note: landscapingRoundedQuantityNote,
+      note: landscapingRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(12_000),
     total_rub: detailMoney(1_782),
     source_refs: detailSourceRefs(
       landscapingProductionTreesInventorySource,
       landscapingTreesInventorySource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesLopperResourceId,
@@ -1512,16 +1469,16 @@ export const landscapingResources = [
     title: 'Сучкорез',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.15, 'шт.', {
-      note: landscapingRoundedQuantityNote,
+      note: landscapingRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(6_000),
     total_rub: detailMoney(891),
     source_refs: detailSourceRefs(
       landscapingProductionTreesInventorySource,
       landscapingTreesInventorySource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesLadderResourceId,
@@ -1531,16 +1488,16 @@ export const landscapingResources = [
     title: 'Стремянка трансформер',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.15, 'шт.', {
-      note: landscapingRoundedQuantityNote,
+      note: landscapingRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(10_000),
     total_rub: detailMoney(1_485),
     source_refs: detailSourceRefs(
       landscapingProductionTreesInventorySource,
       landscapingTreesInventorySource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesInsuranceResourceId,
@@ -1551,7 +1508,7 @@ export const landscapingResources = [
     cost_bucket: 'insurance',
     total_rub: detailMoney(171_857.92),
     source_refs: detailSourceRefs(landscapingTreesTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesOverheadResourceId,
@@ -1562,7 +1519,7 @@ export const landscapingResources = [
     cost_bucket: 'overhead',
     total_rub: detailMoney(398_346.19),
     source_refs: detailSourceRefs(landscapingTreesTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesProfitResourceId,
@@ -1573,7 +1530,7 @@ export const landscapingResources = [
     cost_bucket: 'profit',
     total_rub: detailMoney(227_626.4),
     source_refs: detailSourceRefs(landscapingTreesTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTreesUsnResourceId,
@@ -1583,14 +1540,11 @@ export const landscapingResources = [
     title: 'Расчетная доля УСН по уходу за деревьями и кустарниками',
     cost_bucket: 'usn',
     total_rub: detailMoney(14_698.31, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      landscapingTreesTotalsSource,
-      landscapingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(landscapingTreesTotalsSource, landscapingCalculationSource),
     note: 'В landscaping.pdf УСН показан только общей суммой по услуге, без распределения по строкам.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: landscapingTreesVatResourceId,
@@ -1600,14 +1554,11 @@ export const landscapingResources = [
     title: 'Расчетный НДС 5% по уходу за деревьями и кустарниками',
     cost_bucket: 'vat',
     total_rub: detailMoney(83_614.71, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      landscapingDocumentTotalsSource,
-      landscapingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(landscapingDocumentTotalsSource, landscapingCalculationSource),
     note: landscapingVatReconciliationNote,
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: landscapingTicksTreatmentContractorResourceId,
@@ -1621,9 +1572,9 @@ export const landscapingResources = [
     total_rub: detailMoney(34_200),
     source_refs: detailSourceRefs(
       landscapingProductionTicksHogweedSource,
-      landscapingTicksTreatmentSource,
+      landscapingTicksTreatmentSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingHogweedContractorResourceId,
@@ -1637,9 +1588,9 @@ export const landscapingResources = [
     total_rub: detailMoney(5_826_000),
     source_refs: detailSourceRefs(
       landscapingProductionTicksHogweedSource,
-      landscapingHogweedSource,
+      landscapingHogweedSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingTicksHogweedUsnResourceId,
@@ -1649,14 +1600,14 @@ export const landscapingResources = [
     title: 'Расчетная доля УСН по обработке от клещей и борьбе с борщевиком',
     cost_bucket: 'usn',
     total_rub: detailMoney(51_964.76, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
     source_refs: detailSourceRefs(
       landscapingTicksHogweedTotalsSource,
-      landscapingCalculationSource,
+      landscapingCalculationSource
     ),
     note: 'В landscaping.pdf УСН показан только общей суммой по услуге, без распределения по строкам.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: landscapingTicksHogweedVatResourceId,
@@ -1666,14 +1617,11 @@ export const landscapingResources = [
     title: 'Расчетный НДС 5% по обработке от клещей и борьбе с борщевиком',
     cost_bucket: 'vat',
     total_rub: detailMoney(295_608.24, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      landscapingDocumentTotalsSource,
-      landscapingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(landscapingDocumentTotalsSource, landscapingCalculationSource),
     note: landscapingVatReconciliationNote,
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: landscapingForestLaborResourceId,
@@ -1688,9 +1636,9 @@ export const landscapingResources = [
     source_refs: detailSourceRefs(
       landscapingProductionForestSource,
       landscapingForestSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingForestInsuranceResourceId,
@@ -1701,7 +1649,7 @@ export const landscapingResources = [
     cost_bucket: 'insurance',
     total_rub: detailMoney(51_990.68),
     source_refs: detailSourceRefs(landscapingForestSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingForestOverheadResourceId,
@@ -1712,7 +1660,7 @@ export const landscapingResources = [
     cost_bucket: 'overhead',
     total_rub: detailMoney(120_508.19),
     source_refs: detailSourceRefs(landscapingForestSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingForestProfitResourceId,
@@ -1723,7 +1671,7 @@ export const landscapingResources = [
     cost_bucket: 'profit',
     total_rub: detailMoney(68_861.82),
     source_refs: detailSourceRefs(landscapingForestSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: landscapingForestUsnResourceId,
@@ -1733,14 +1681,11 @@ export const landscapingResources = [
     title: 'Расчетная доля УСН по уходу за лесом',
     cost_bucket: 'usn',
     total_rub: detailMoney(3_666.64, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      landscapingForestSource,
-      landscapingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(landscapingForestSource, landscapingCalculationSource),
     note: 'В landscaping.pdf УСН показан только общей суммой по услуге, без распределения по строкам.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: landscapingForestVatResourceId,
@@ -1750,15 +1695,12 @@ export const landscapingResources = [
     title: 'Расчетный НДС 5% по уходу за лесом',
     cost_bucket: 'vat',
     total_rub: detailMoney(20_859.1, {
-      note: 'выведено из gross строки estimate-2026',
+      note: 'выведено из gross строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      landscapingDocumentTotalsSource,
-      landscapingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(landscapingDocumentTotalsSource, landscapingCalculationSource),
     note: landscapingVatReconciliationNote,
-    ...detailStatus('derived'),
-  }),
+    ...detailStatus('derived')
+  })
 ] satisfies readonly EstimateDetailResource[];
 
 export const landscapingControlTotals = [
@@ -1772,9 +1714,9 @@ export const landscapingControlTotals = [
     source_refs: detailSourceRefs(
       landscapingMowingLaborSource,
       landscapingMowingTotalsSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-mowing-machines',
@@ -1786,9 +1728,9 @@ export const landscapingControlTotals = [
     source_refs: detailSourceRefs(
       landscapingMowingMachinePpeSource,
       landscapingMowingTotalsSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-mowing-materials',
@@ -1800,9 +1742,9 @@ export const landscapingControlTotals = [
     source_refs: detailSourceRefs(
       landscapingMowingMachinePpeSource,
       landscapingMowingTotalsSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-mowing-insurance',
@@ -1812,7 +1754,7 @@ export const landscapingControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [landscapingMowingInsuranceResourceId],
     source_refs: detailSourceRefs(landscapingMowingMachinePpeSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-mowing-overhead',
@@ -1822,7 +1764,7 @@ export const landscapingControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [landscapingMowingOverheadResourceId],
     source_refs: detailSourceRefs(landscapingMowingMachinePpeSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-mowing-profit',
@@ -1832,7 +1774,7 @@ export const landscapingControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [landscapingMowingProfitResourceId],
     source_refs: detailSourceRefs(landscapingMowingMachinePpeSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-mowing-usn',
@@ -1841,11 +1783,8 @@ export const landscapingControlTotals = [
     source_total_rub: detailMoney(15_204.69),
     tolerance_rub: 0.01,
     resource_ids: [landscapingMowingUsnResourceId],
-    source_refs: detailSourceRefs(
-      landscapingMowingTotalsSource,
-      landscapingCalculationSource,
-    ),
-    ...detailStatus('derived'),
+    source_refs: detailSourceRefs(landscapingMowingTotalsSource, landscapingCalculationSource),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'landscaping-mowing-vat',
@@ -1854,12 +1793,9 @@ export const landscapingControlTotals = [
     source_total_rub: detailMoney(86_493.14),
     tolerance_rub: 0.01,
     resource_ids: [landscapingMowingVatResourceId],
-    source_refs: detailSourceRefs(
-      landscapingDocumentTotalsSource,
-      landscapingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(landscapingDocumentTotalsSource, landscapingCalculationSource),
     note: landscapingVatReconciliationNote,
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'landscaping-mowing-gross',
@@ -1871,10 +1807,10 @@ export const landscapingControlTotals = [
     source_refs: detailSourceRefs(
       landscapingMowingTotalsSource,
       landscapingDocumentTotalsSource,
-      landscapingCalculationSource,
+      landscapingCalculationSource
     ),
     note: landscapingVatReconciliationNote,
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'landscaping-trees-primary-salary',
@@ -1884,12 +1820,9 @@ export const landscapingControlTotals = [
     detail_total_note: 'Построчные округления дают +0,01 к итогу раздела.',
     tolerance_rub: 0.02,
     resource_ids: landscapingTreesPrimarySalaryResourceIds,
-    source_refs: detailSourceRefs(
-      landscapingTreesTotalsSource,
-      landscapingResourceStatementSource,
-    ),
+    source_refs: detailSourceRefs(landscapingTreesTotalsSource, landscapingResourceStatementSource),
     note: 'Сумма построчных трудовых ресурсов на 0,01 руб. больше итоговой строки раздела.',
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-trees-machinist-salary',
@@ -1901,9 +1834,9 @@ export const landscapingControlTotals = [
     source_refs: detailSourceRefs(
       landscapingTreesWaterSource,
       landscapingTreesTotalsSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-trees-machines',
@@ -1915,9 +1848,9 @@ export const landscapingControlTotals = [
     source_refs: detailSourceRefs(
       landscapingTreesWaterSource,
       landscapingTreesTotalsSource,
-      landscapingResourceStatementSource,
+      landscapingResourceStatementSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-trees-materials',
@@ -1926,11 +1859,8 @@ export const landscapingControlTotals = [
     source_total_rub: detailMoney(30_965.67),
     tolerance_rub: 0.01,
     resource_ids: landscapingTreesMaterialResourceIds,
-    source_refs: detailSourceRefs(
-      landscapingTreesTotalsSource,
-      landscapingResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(landscapingTreesTotalsSource, landscapingResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-trees-insurance',
@@ -1940,7 +1870,7 @@ export const landscapingControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [landscapingTreesInsuranceResourceId],
     source_refs: detailSourceRefs(landscapingTreesTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-trees-overhead',
@@ -1950,7 +1880,7 @@ export const landscapingControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [landscapingTreesOverheadResourceId],
     source_refs: detailSourceRefs(landscapingTreesTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-trees-profit',
@@ -1960,7 +1890,7 @@ export const landscapingControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [landscapingTreesProfitResourceId],
     source_refs: detailSourceRefs(landscapingTreesTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-trees-usn',
@@ -1969,11 +1899,8 @@ export const landscapingControlTotals = [
     source_total_rub: detailMoney(14_698.31),
     tolerance_rub: 0.01,
     resource_ids: [landscapingTreesUsnResourceId],
-    source_refs: detailSourceRefs(
-      landscapingTreesTotalsSource,
-      landscapingCalculationSource,
-    ),
-    ...detailStatus('derived'),
+    source_refs: detailSourceRefs(landscapingTreesTotalsSource, landscapingCalculationSource),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'landscaping-trees-vat',
@@ -1982,12 +1909,9 @@ export const landscapingControlTotals = [
     source_total_rub: detailMoney(83_614.71),
     tolerance_rub: 0.01,
     resource_ids: [landscapingTreesVatResourceId],
-    source_refs: detailSourceRefs(
-      landscapingDocumentTotalsSource,
-      landscapingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(landscapingDocumentTotalsSource, landscapingCalculationSource),
     note: landscapingVatReconciliationNote,
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'landscaping-trees-gross',
@@ -1999,10 +1923,10 @@ export const landscapingControlTotals = [
     source_refs: detailSourceRefs(
       landscapingTreesTotalsSource,
       landscapingDocumentTotalsSource,
-      landscapingCalculationSource,
+      landscapingCalculationSource
     ),
     note: landscapingVatReconciliationNote,
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'landscaping-ticks-hogweed-contractors',
@@ -2014,9 +1938,9 @@ export const landscapingControlTotals = [
     source_refs: detailSourceRefs(
       landscapingTicksTreatmentSource,
       landscapingHogweedSource,
-      landscapingTicksHogweedTotalsSource,
+      landscapingTicksHogweedTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-ticks-hogweed-usn',
@@ -2027,9 +1951,9 @@ export const landscapingControlTotals = [
     resource_ids: [landscapingTicksHogweedUsnResourceId],
     source_refs: detailSourceRefs(
       landscapingTicksHogweedTotalsSource,
-      landscapingCalculationSource,
+      landscapingCalculationSource
     ),
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'landscaping-ticks-hogweed-vat',
@@ -2038,12 +1962,9 @@ export const landscapingControlTotals = [
     source_total_rub: detailMoney(295_608.24),
     tolerance_rub: 0.01,
     resource_ids: [landscapingTicksHogweedVatResourceId],
-    source_refs: detailSourceRefs(
-      landscapingDocumentTotalsSource,
-      landscapingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(landscapingDocumentTotalsSource, landscapingCalculationSource),
     note: landscapingVatReconciliationNote,
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'landscaping-ticks-hogweed-gross',
@@ -2055,10 +1976,10 @@ export const landscapingControlTotals = [
     source_refs: detailSourceRefs(
       landscapingTicksHogweedTotalsSource,
       landscapingDocumentTotalsSource,
-      landscapingCalculationSource,
+      landscapingCalculationSource
     ),
     note: landscapingVatReconciliationNote,
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'landscaping-forest-primary-salary',
@@ -2067,11 +1988,8 @@ export const landscapingControlTotals = [
     source_total_rub: detailMoney(172_154.56),
     tolerance_rub: 0.01,
     resource_ids: [landscapingForestLaborResourceId],
-    source_refs: detailSourceRefs(
-      landscapingForestSource,
-      landscapingResourceStatementSource,
-    ),
-    ...detailStatus('verified'),
+    source_refs: detailSourceRefs(landscapingForestSource, landscapingResourceStatementSource),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-forest-insurance',
@@ -2081,7 +1999,7 @@ export const landscapingControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [landscapingForestInsuranceResourceId],
     source_refs: detailSourceRefs(landscapingForestSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-forest-overhead',
@@ -2091,7 +2009,7 @@ export const landscapingControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [landscapingForestOverheadResourceId],
     source_refs: detailSourceRefs(landscapingForestSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-forest-profit',
@@ -2101,7 +2019,7 @@ export const landscapingControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [landscapingForestProfitResourceId],
     source_refs: detailSourceRefs(landscapingForestSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'landscaping-forest-usn',
@@ -2110,11 +2028,8 @@ export const landscapingControlTotals = [
     source_total_rub: detailMoney(3_666.64),
     tolerance_rub: 0.01,
     resource_ids: [landscapingForestUsnResourceId],
-    source_refs: detailSourceRefs(
-      landscapingForestSource,
-      landscapingCalculationSource,
-    ),
-    ...detailStatus('derived'),
+    source_refs: detailSourceRefs(landscapingForestSource, landscapingCalculationSource),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'landscaping-forest-vat',
@@ -2123,12 +2038,9 @@ export const landscapingControlTotals = [
     source_total_rub: detailMoney(20_859.1),
     tolerance_rub: 0.01,
     resource_ids: [landscapingForestVatResourceId],
-    source_refs: detailSourceRefs(
-      landscapingDocumentTotalsSource,
-      landscapingCalculationSource,
-    ),
+    source_refs: detailSourceRefs(landscapingDocumentTotalsSource, landscapingCalculationSource),
     note: landscapingVatReconciliationNote,
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'landscaping-forest-gross',
@@ -2140,9 +2052,9 @@ export const landscapingControlTotals = [
     source_refs: detailSourceRefs(
       landscapingForestSource,
       landscapingDocumentTotalsSource,
-      landscapingCalculationSource,
+      landscapingCalculationSource
     ),
     note: landscapingVatReconciliationNote,
-    ...detailStatus('derived'),
-  }),
+    ...detailStatus('derived')
+  })
 ] satisfies readonly EstimateDetailControlTotalInput[];

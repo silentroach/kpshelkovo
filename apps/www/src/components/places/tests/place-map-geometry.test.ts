@@ -7,7 +7,7 @@ import {
   getMarkerScale,
   getPaddedBounds,
   getPlaceBounds,
-  toMapGeometry,
+  toMapGeometry
 } from '../place-map-geometry';
 
 const place = (slug: string, lng: number, lat: number): PlaceMapItem => ({
@@ -15,13 +15,12 @@ const place = (slug: string, lng: number, lat: number): PlaceMapItem => ({
   name: slug,
   status: 'existing',
   coordinates: { lng, lat },
-  url: `/map/${slug}/`,
+  url: `/map/${slug}/`
 });
 
 describe('place map geometry', () => {
   it('uses settlement bounds until multiple places define a useful extent', () => {
-    expect(getPlaceBounds([place('burzhuyka', 37.716242, 55.060526)]))
-      .toMatchInlineSnapshot(`
+    expect(getPlaceBounds([place('burzhuyka', 37.716242, 55.060526)])).toMatchInlineSnapshot(`
         [
           [
             37.708,
@@ -39,8 +38,8 @@ describe('place map geometry', () => {
     expect(
       getPaddedBounds([
         [37.716242, 55.060526],
-        [37.746894, 55.060703],
-      ]),
+        [37.746894, 55.060703]
+      ])
     ).toMatchInlineSnapshot(`
       [
         [
@@ -56,9 +55,8 @@ describe('place map geometry', () => {
   });
 
   it('scales marker graphics across overview and close-up zoom levels', () => {
-    expect(
-      [13.5, 15, 16, 17, 18, 19].map((zoom) => getMarkerScale(zoom).toFixed(3)),
-    ).toMatchInlineSnapshot(`
+    expect([13.5, 15, 16, 17, 18, 19].map((zoom) => getMarkerScale(zoom).toFixed(3)))
+      .toMatchInlineSnapshot(`
       [
         "0.625",
         "0.850",
@@ -73,7 +71,7 @@ describe('place map geometry', () => {
   it('adapts place geometry and coordinates to Yandex Maps features', () => {
     const places = [
       place('burzhuyka', 37.716242, 55.060526),
-      place('titanic', 37.746894, 55.060703),
+      place('titanic', 37.746894, 55.060703)
     ];
 
     expect({
@@ -84,10 +82,10 @@ describe('place map geometry', () => {
             [
               [37.74, 55.05],
               [37.75, 55.05],
-              [37.74, 55.05],
-            ],
-          ],
-        ],
+              [37.74, 55.05]
+            ]
+          ]
+        ]
       }),
       polygon: toMapGeometry({
         type: 'Polygon',
@@ -95,11 +93,11 @@ describe('place map geometry', () => {
           [
             [37.71, 55.06],
             [37.72, 55.06],
-            [37.71, 55.06],
-          ],
-        ],
+            [37.71, 55.06]
+          ]
+        ]
       }),
-      features: createMapFeatures(places),
+      features: createMapFeatures(places)
     }).toMatchInlineSnapshot(`
       {
         "features": [

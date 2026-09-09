@@ -15,8 +15,8 @@ export async function getStaticPaths() {
       settlement,
       comparison: comparisons.get(settlement.slug),
       baseline,
-      rating: ratings.get(settlement.slug),
-    },
+      rating: ratings.get(settlement.slug)
+    }
   }));
 }
 
@@ -38,6 +38,6 @@ interface Props {
 export const GET: APIRoute<Props> = async ({ props }) =>
   new Response(buildSettlementMd(props), {
     headers: {
-      'Content-Type': 'text/markdown; charset=utf-8',
-    },
+      'Content-Type': 'text/markdown; charset=utf-8'
+    }
   });

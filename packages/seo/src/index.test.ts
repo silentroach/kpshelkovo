@@ -4,14 +4,13 @@ import {
   collectKeywords,
   imageMimeType,
   SHELKOVO_SITE_ALTERNATE_NAMES,
-  serializeSchema,
+  serializeSchema
 } from './index';
 
 describe('seo package', () => {
   it('collects unique non-empty keywords while preserving order', () => {
-    expect(
-      collectKeywords(' alpha ', ['beta', 'alpha', ''], undefined, 'gamma'),
-    ).toMatchInlineSnapshot(`
+    expect(collectKeywords(' alpha ', ['beta', 'alpha', ''], undefined, 'gamma'))
+      .toMatchInlineSnapshot(`
       [
         "alpha",
         "beta",
@@ -36,7 +35,7 @@ describe('seo package', () => {
       imageMimeType('/cover.svg?cache=1'),
       imageMimeType('/cover.jpeg'),
       imageMimeType('/cover.webp'),
-      imageMimeType('/cover.txt'),
+      imageMimeType('/cover.txt')
     ]).toMatchInlineSnapshot(`
       [
         "image/svg+xml",
@@ -48,8 +47,7 @@ describe('seo package', () => {
   });
 
   it('serializes schema docs and escapes html-breaking less-than signs', () => {
-    expect(serializeSchema([{ name: '<script>' }, { name: 'safe' }]))
-      .toMatchInlineSnapshot(`
+    expect(serializeSchema([{ name: '<script>' }, { name: 'safe' }])).toMatchInlineSnapshot(`
         [
           "{\"name\":\"\\u003cscript>\"}",
           "{\"name\":\"safe\"}",

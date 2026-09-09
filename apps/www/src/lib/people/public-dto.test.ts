@@ -7,7 +7,7 @@ let buildPeoplePublicPayload: typeof import('./public-dto').buildPeoplePublicPay
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ buildPeoplePublicPayload } = await import('./public-dto'));
@@ -18,7 +18,7 @@ const profile = (): PersonProfile => ({
   slug: 'kschemelinin',
   name: 'Кирилл Щемелинин',
   nameCases: {
-    gen: 'Кирилла Щемелинина',
+    gen: 'Кирилла Щемелинина'
   },
   company: 'ОК "Комфорт"',
   position: 'Исполняющий обязанности директора по эксплуатации',
@@ -30,8 +30,8 @@ const profile = (): PersonProfile => ({
       type: 'telegram',
       value: '@Kirill_ZemlyaMO',
       display: '@Kirill_ZemlyaMO',
-      href: 'https://t.me/Kirill_ZemlyaMO',
-    },
+      href: 'https://t.me/Kirill_ZemlyaMO'
+    }
   ],
   body: 'Публичный профиль.',
   mentions: [
@@ -40,8 +40,8 @@ const profile = (): PersonProfile => ({
       slug: 'apple-garden',
       label: 'Яблоневый сад',
       htmlUrl: '/map/apple-garden/',
-      markdownUrl: '/map/apple-garden/index.md',
-    },
+      markdownUrl: '/map/apple-garden/index.md'
+    }
   ],
   backlinks: {
     news: [
@@ -52,8 +52,8 @@ const profile = (): PersonProfile => ({
         title: 'Повреждение линии 10 кВ',
         htmlUrl: '/news/2026/05/power-outage/',
         markdownUrl: '/news/2026/05/power-outage/index.md',
-        mentionedAt: '2026-05-03T08:00:00.000+03:00',
-      },
+        mentionedAt: '2026-05-03T08:00:00.000+03:00'
+      }
     ],
     status: [],
     reviews: [],
@@ -65,12 +65,12 @@ const profile = (): PersonProfile => ({
         title: 'Детская площадка «Титаник»',
         htmlUrl: '/map/titanic/',
         markdownUrl: '/map/titanic/index.md',
-        mentionedAt: '2026-08-19T00:00:00.000Z',
-      },
+        mentionedAt: '2026-08-19T00:00:00.000Z'
+      }
     ],
     people: [],
-    contacts: [],
-  },
+    contacts: []
+  }
 });
 
 describe('people public DTO adapters', () => {

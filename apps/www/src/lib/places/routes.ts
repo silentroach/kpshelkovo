@@ -22,11 +22,9 @@ export const placesMarkdownPath = (): string => MAP_MARKDOWN;
 
 export const placesDataPath = (): string => MAP_DATA;
 
-export const placePath = (slug: string): string =>
-  `${MAP_ROOT}${requireSlug(slug)}/`;
+export const placePath = (slug: string): string => `${MAP_ROOT}${requireSlug(slug)}/`;
 
-export const placeMarkdownPath = (slug: string): string =>
-  `${placePath(slug)}index.md`;
+export const placeMarkdownPath = (slug: string): string => `${placePath(slug)}index.md`;
 
 export const placePattern = (): string => '/map/:slug/';
 
@@ -43,7 +41,6 @@ export const placesDataUrl = (): string => withBase(placesDataPath());
 
 export const placeUrl = (slug: string): string => withBase(placePath(slug));
 
-export const placeMarkdownUrl = (slug: string): string =>
-  withBase(placeMarkdownPath(slug));
+export const placeMarkdownUrl = (slug: string): string => withBase(placeMarkdownPath(slug));
 
 export const placeCanonical = (slug: string): string => canon(placePath(slug));

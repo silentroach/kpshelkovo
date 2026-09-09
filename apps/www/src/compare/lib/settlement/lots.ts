@@ -4,7 +4,7 @@ import type {
   DrainageType,
   Infrastructure,
   Lots,
-  RoadType,
+  RoadType
 } from './types';
 
 const SOTKA = 100;
@@ -37,11 +37,7 @@ export interface LotEstimate {
 
 export type LotBreakdown = LotExact | LotEstimate;
 
-const share = (
-  value: AvailabilityStatus | undefined,
-  yes: number,
-  part = yes / 2,
-): number => {
+const share = (value: AvailabilityStatus | undefined, yes: number, part = yes / 2): number => {
   if (value === 'yes') return yes;
   if (value === 'partial') return part;
   return 0;
@@ -81,12 +77,7 @@ const drainNote = (value?: DrainageType): string | undefined => {
   return;
 };
 
-const add = (
-  rows: LotPart[],
-  title: string,
-  value: number,
-  item?: string,
-): void => {
+const add = (rows: LotPart[], title: string, value: number, item?: string): void => {
   if (!value) return;
   rows.push({ title, value, note: item });
 };
@@ -94,7 +85,7 @@ const add = (
 export function getLotBreakdown(
   lots?: Lots,
   infra?: Infrastructure,
-  common?: CommonSpaces,
+  common?: CommonSpaces
 ): LotBreakdown | undefined {
   if (lots?.averageSotka) {
     return {
@@ -102,7 +93,7 @@ export function getLotBreakdown(
       exact: true,
       count: lots.count,
       areaHa: lots.areaHa,
-      note: lots.averageNote,
+      note: lots.averageNote
     };
   }
 
@@ -110,99 +101,34 @@ export function getLotBreakdown(
 
   const rows: LotPart[] = [];
   add(rows, 'Дороги', road(infra?.roads), roadNote(infra?.roads));
-  add(
-    rows,
-    'Тротуары',
-    share(infra?.sidewalks, 0.2, 0.1),
-    note(infra?.sidewalks),
-  );
+  add(rows, 'Тротуары', share(infra?.sidewalks, 0.2, 0.1), note(infra?.sidewalks));
   add(rows, 'Ливневки', drain(infra?.drainage), drainNote(infra?.drainage));
-  add(
-    rows,
-    'КПП',
-    share(infra?.checkpoints, 0.1, 0.05),
-    note(infra?.checkpoints),
-  );
-  add(
-    rows,
-    'Админка',
-    share(infra?.adminBuilding, 0.1, 0.05),
-    note(infra?.adminBuilding),
-  );
+  add(rows, 'КПП', share(infra?.checkpoints, 0.1, 0.05), note(infra?.checkpoints));
+  add(rows, 'Админка', share(infra?.adminBuilding, 0.1, 0.05), note(infra?.adminBuilding));
   add(
     rows,
     'Сервисы на территории',
     share(infra?.retailOrServices, 0.15, 0.08),
-    note(infra?.retailOrServices),
+    note(infra?.retailOrServices)
   );
-  add(
-    rows,
-    'Детские площадки',
-    share(common?.playgrounds, 0.15, 0.08),
-    note(common?.playgrounds),
-  );
+  add(rows, 'Детские площадки', share(common?.playgrounds, 0.15, 0.08), note(common?.playgrounds));
   add(rows, 'Спорт', share(common?.sports, 0.15, 0.08), note(common?.sports));
   add(
     rows,
     'Маршруты для прогулок',
     share(common?.walkingRoutes, 0.15, 0.08),
-    note(common?.walkingRoutes),
+    note(common?.walkingRoutes)
   );
-  add(
-    rows,
-    'Доступ к воде',
-    share(common?.waterAccess, 0.1, 0.05),
-    note(common?.waterAccess),
-  );
-  add(
-    rows,
-    'Пляжные зоны',
-    share(common?.beachZones, 0.15, 0.08),
-    note(common?.beachZones),
-  );
-  add(
-    rows,
-    'Детский клуб',
-    share(common?.kidsClub, 0.15, 0.08),
-    note(common?.kidsClub),
-  );
-  add(
-    rows,
-    'BBQ-зоны',
-    share(common?.bbqZones, 0.1, 0.05),
-    note(common?.bbqZones),
-  );
+  add(rows, 'Доступ к воде', share(common?.waterAccess, 0.1, 0.05), note(common?.waterAccess));
+  add(rows, 'Пляжные зоны', share(common?.beachZones, 0.15, 0.08), note(common?.beachZones));
+  add(rows, 'Детский клуб', share(common?.kidsClub, 0.15, 0.08), note(common?.kidsClub));
+  add(rows, 'BBQ-зоны', share(common?.bbqZones, 0.1, 0.05), note(common?.bbqZones));
   add(rows, 'Бассейн', share(common?.pool, 0.2, 0.1), note(common?.pool));
-  add(
-    rows,
-    'Фитнес',
-    share(common?.fitnessClub, 0.2, 0.1),
-    note(common?.fitnessClub),
-  );
-  add(
-    rows,
-    'Ресторан',
-    share(common?.restaurant, 0.2, 0.1),
-    note(common?.restaurant),
-  );
-  add(
-    rows,
-    'SPA',
-    share(common?.spaCenter, 0.25, 0.12),
-    note(common?.spaCenter),
-  );
-  add(
-    rows,
-    'Спортивный лагерь',
-    share(common?.sportsCamp, 0.25, 0.12),
-    note(common?.sportsCamp),
-  );
-  add(
-    rows,
-    'Школа',
-    share(common?.primarySchool, 0.3, 0.15),
-    note(common?.primarySchool),
-  );
+  add(rows, 'Фитнес', share(common?.fitnessClub, 0.2, 0.1), note(common?.fitnessClub));
+  add(rows, 'Ресторан', share(common?.restaurant, 0.2, 0.1), note(common?.restaurant));
+  add(rows, 'SPA', share(common?.spaCenter, 0.25, 0.12), note(common?.spaCenter));
+  add(rows, 'Спортивный лагерь', share(common?.sportsCamp, 0.25, 0.12), note(common?.sportsCamp));
+  add(rows, 'Школа', share(common?.primarySchool, 0.3, 0.15), note(common?.primarySchool));
 
   const gross = (lots.areaHa * SOTKA) / lots.count;
   const raw = rows.reduce((sum, item) => sum + item.value, 0);
@@ -217,12 +143,12 @@ export function getLotBreakdown(
     gross,
     shared,
     cap,
-    rows,
+    rows
   };
 }
 
 export const getLotAverage = (
   lots?: Lots,
   infra?: Infrastructure,
-  common?: CommonSpaces,
+  common?: CommonSpaces
 ): number | undefined => getLotBreakdown(lots, infra, common)?.size;

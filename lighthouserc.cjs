@@ -16,19 +16,17 @@ const paths = [
   '/status/',
   '/815/compare/',
   '/815/compare/rating/',
-  '/815/regulation/',
+  '/815/regulation/'
 ];
 
 const urls = paths.map((path) =>
-  target === 'static'
-    ? `http://localhost${path}`
-    : `${productionOrigin}${path}`,
+  target === 'static' ? `http://localhost${path}` : `${productionOrigin}${path}`
 );
 
 const collect = {
   ...(target === 'static' ? { staticDistDir: './dist/www' } : {}),
   url: urls,
-  numberOfRuns: 2,
+  numberOfRuns: 2
 };
 
 module.exports = {
@@ -38,16 +36,13 @@ module.exports = {
       assertions: {
         'categories:performance': ['warn', { minScore: 0.85 }],
         'categories:accessibility': ['warn', { minScore: 0.95 }],
-        'categories:best-practices': [
-          'warn',
-          { minScore: bestPracticesMinScore },
-        ],
-        'categories:seo': ['warn', { minScore: 0.9 }],
-      },
+        'categories:best-practices': ['warn', { minScore: bestPracticesMinScore }],
+        'categories:seo': ['warn', { minScore: 0.9 }]
+      }
     },
     upload: {
       target: 'filesystem',
-      outputDir: './.lighthouseci',
-    },
-  },
+      outputDir: './.lighthouseci'
+    }
+  }
 };

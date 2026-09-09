@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'node:url';
+
 import { defineConfig } from 'astro/config';
 
 const appSource = fileURLToPath(new URL('../../src', import.meta.url));
@@ -13,17 +14,17 @@ export const createVisualFixtureAstroConfig = () =>
     vite: {
       resolve: {
         alias: {
-          '@': appSource,
-        },
+          '@': appSource
+        }
       },
       server: {
         fs: {
-          allow: [appRoot, workspaceRoot],
-        },
-      },
+          allow: [appRoot, workspaceRoot]
+        }
+      }
     },
     build: {
       format: 'directory',
-      assets: 'static',
-    },
+      assets: 'static'
+    }
   });

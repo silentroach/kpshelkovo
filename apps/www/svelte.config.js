@@ -7,8 +7,8 @@ export default {
   preprocess: vitePreprocess(),
   compilerOptions: {
     experimental: {
-      async: true,
-    },
+      async: true
+    }
   },
   vitePlugin: {
     dynamicCompileOptions: ({ filename }) => {
@@ -17,6 +17,6 @@ export default {
       }
 
       return { runes: true };
-    },
-  },
+    }
+  }
 };

@@ -7,11 +7,9 @@ const SKILLS = '/.well-known/agent-skills/index.json';
 
 export const comparePath = (): string => withBase('/');
 export const compareRatingPath = (): string => withBase('/rating/');
-export const compareSettlementPattern = (): string =>
-  withBase('/settlements/:slug/');
+export const compareSettlementPattern = (): string => withBase('/settlements/:slug/');
 export const compareMarkdownPath = (): string => withBase('/index.md');
-export const compareRatingMarkdownPath = (): string =>
-  withBase('/rating/index.md');
+export const compareRatingMarkdownPath = (): string => withBase('/rating/index.md');
 export const compareSettlementMarkdownPattern = (): string =>
   withBase('/settlements/:slug/index.md');
 export const compareSettlementsDataPath = (): string => withBase(FEED);
@@ -27,7 +25,7 @@ export const comparePublicSurfaceSlice = {
   owner: {
     id: 'compare',
     label: 'Сравнение поселков',
-    entryPath: comparePath(),
+    entryPath: comparePath()
   },
   surfaces: [
     {
@@ -37,7 +35,7 @@ export const comparePublicSurfaceSlice = {
       mediaType: 'text/html',
       cacheClass: 'html',
       discoveryRoles: ['section-entry'],
-      catalogRole: 'anchor',
+      catalogRole: 'anchor'
     },
     {
       id: 'compare:rating',
@@ -45,7 +43,7 @@ export const comparePublicSurfaceSlice = {
       path: compareRatingPath(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'compare:settlement',
@@ -53,7 +51,7 @@ export const comparePublicSurfaceSlice = {
       routePattern: compareSettlementPattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'compare:index-markdown',
@@ -62,7 +60,7 @@ export const comparePublicSurfaceSlice = {
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
       discoveryRoles: ['markdown-companion'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'compare:rating-markdown',
@@ -71,7 +69,7 @@ export const comparePublicSurfaceSlice = {
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
       discoveryRoles: ['markdown-companion'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'compare:settlement-markdown',
@@ -79,7 +77,7 @@ export const comparePublicSurfaceSlice = {
       routePattern: compareSettlementMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'compare:data-settlements',
@@ -88,7 +86,7 @@ export const comparePublicSurfaceSlice = {
       mediaType: 'application/json',
       cacheClass: 'data',
       discoveryRoles: ['data-feed', 'root-catalog'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'compare:data-explorer',
@@ -97,7 +95,7 @@ export const comparePublicSurfaceSlice = {
       mediaType: 'application/json',
       cacheClass: 'data',
       discoveryRoles: ['data-feed'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'compare:schema',
@@ -106,7 +104,7 @@ export const comparePublicSurfaceSlice = {
       mediaType: 'application/schema+json',
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
-      catalogRole: 'service-desc',
+      catalogRole: 'service-desc'
     },
     {
       id: 'compare:openapi',
@@ -115,7 +113,7 @@ export const comparePublicSurfaceSlice = {
       mediaType: OAS,
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
-      catalogRole: 'service-desc',
+      catalogRole: 'service-desc'
     },
     {
       id: 'compare:api-catalog',
@@ -125,7 +123,7 @@ export const comparePublicSurfaceSlice = {
       cacheClass: 'catalog',
       discoveryRoles: ['api-catalog', 'root-catalog'],
       catalogRole: 'service-desc',
-      sectionCatalogRole: false,
+      sectionCatalogRole: false
     },
     {
       id: 'compare:llms',
@@ -134,7 +132,7 @@ export const comparePublicSurfaceSlice = {
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms', 'root-catalog'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'compare:llms-full',
@@ -143,7 +141,7 @@ export const comparePublicSurfaceSlice = {
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'compare:skills',
@@ -152,7 +150,7 @@ export const comparePublicSurfaceSlice = {
       mediaType: 'application/json',
       cacheClass: 'data',
       discoveryRoles: ['skill-index'],
-      catalogRole: 'item',
-    },
-  ],
+      catalogRole: 'item'
+    }
+  ]
 } satisfies PublicSurfaceSlice;

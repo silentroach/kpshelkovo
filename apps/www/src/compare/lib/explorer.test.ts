@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { toExplorer, toExplorerPayload } from './explorer';
 import type { Rating } from './rating';
 import { mapRawSettlement } from './settlement/mapper';
@@ -12,7 +13,7 @@ const settlement = mapRawSettlement({
   telegram: 'testchat',
   management_company: {
     title: 'УК Тест',
-    url: 'https://example.com/company',
+    url: 'https://example.com/company'
   },
   is_baseline: false,
   location: {
@@ -20,13 +21,13 @@ const settlement = mapRawSettlement({
     lat: 55.8,
     lng: 37.1,
     map_url: 'https://example.com/map',
-    district: 'Истринский район',
+    district: 'Истринский район'
   },
   tariff: {
     value: 120,
     unit: 'rub_per_sotka',
     period: 'month',
-    note: 'Тестовое примечание',
+    note: 'Тестовое примечание'
   },
   rabstvo: true,
   infrastructure: { gas: 'yes', roads: 'asphalt' },
@@ -38,9 +39,9 @@ const settlement = mapRawSettlement({
       url: 'https://example.com/source',
       type: 'official',
       date_checked: '2026-04-09',
-      comment: 'ok',
-    },
-  ],
+      comment: 'ok'
+    }
+  ]
 } satisfies RawSettlement);
 
 const baseline = {
@@ -48,7 +49,7 @@ const baseline = {
   name: 'КП Шелково',
   shortName: 'Шелково',
   slug: 'shelkovo',
-  isBaseline: true,
+  isBaseline: true
 };
 
 const ratings = new Map<string, Rating>([
@@ -57,9 +58,9 @@ const ratings = new Map<string, Rating>([
     {
       score: 72.4,
       km: 62.1,
-      ring: 43.9,
-    },
-  ],
+      ring: 43.9
+    }
+  ]
 ]);
 
 describe('toExplorer', () => {
@@ -77,12 +78,12 @@ describe('toExplorer', () => {
       location: {
         lat: 55.8,
         lng: 37.1,
-        district: 'Истринский район',
+        district: 'Истринский район'
       },
       tariff: {
         normalizedPerSotkaMonth: 120,
-        normalizedIsEstimate: false,
-      },
+        normalizedIsEstimate: false
+      }
     });
 
     expect('website' in item).toBe(false);
@@ -94,9 +95,7 @@ describe('toExplorer', () => {
     expect('period' in item.tariff).toBe(false);
     expect('note' in item.tariff).toBe(false);
     expect('url' in (item.managementCompany as { title: string })).toBe(false);
-    expect(JSON.stringify([item]).length).toBeLessThan(
-      JSON.stringify([settlement]).length,
-    );
+    expect(JSON.stringify([item]).length).toBeLessThan(JSON.stringify([settlement]).length);
   });
 
   it('builds the explorer public payload through explicit DTO adapters', () => {
@@ -117,7 +116,7 @@ describe('toExplorer', () => {
         moreExpensiveCount: 1,
         shelkovoVsMedianPercent: -9.1,
         shelkovoVsPeerMedianPercent: -16.7,
-        shelkovoVsMeanPercent: -13,
+        shelkovoVsMeanPercent: -13
       },
       comparisons: new Map([
         [
@@ -125,10 +124,10 @@ describe('toExplorer', () => {
           {
             tariffDelta: 20,
             tariffDeltaPercent: 20,
-            isCheaper: false,
-          },
-        ],
-      ]),
+            isCheaper: false
+          }
+        ]
+      ])
     });
 
     expect(payload.settlements[0]?.tariff.normalizedPerSotkaMonth).toBe(120);
@@ -136,7 +135,7 @@ describe('toExplorer', () => {
     expect(payload.comparisons.test).toEqual({
       tariffDelta: 20,
       tariffDeltaPercent: 20,
-      isCheaper: false,
+      isCheaper: false
     });
   });
 });

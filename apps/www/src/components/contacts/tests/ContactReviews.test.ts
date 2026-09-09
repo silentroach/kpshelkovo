@@ -12,11 +12,10 @@ import ContactReviews from '../ContactReviews.astro';
 
 const review = {
   sentiment: 'positive',
-  summary:
-    'Помог с **электричеством** в "Шелково Парк".\n\n<script>alert(1)</script>',
+  summary: 'Помог с **электричеством** в "Шелково Парк".\n\n<script>alert(1)</script>',
   publishedAt: new Date('2026-04-07T00:00:00.000Z'),
   publishedIso: '2026-04-07',
-  url: 'https://www.t.me/example/1',
+  url: 'https://www.t.me/example/1'
 } satisfies ContactReview;
 
 const parseComponent = (html: string): HTMLElement => {
@@ -31,8 +30,8 @@ describe('ContactReviews', () => {
     const container = await createAstroContainer();
     const component = parseComponent(
       await container.renderToString(ContactReviews, {
-        props: { reviews: [review] },
-      }),
+        props: { reviews: [review] }
+      })
     );
     const summary = component.querySelector('[data-pagefind-body]');
     if (!summary) {
@@ -43,8 +42,8 @@ describe('ContactReviews', () => {
       visibleWhitespace({
         html: summary.innerHTML,
         scripts: summary.querySelectorAll('script').length,
-        text: summary.textContent,
-      }),
+        text: summary.textContent
+      })
     ).toMatchInlineSnapshot(`
       {
         "html": "<p>Помог с <strong>электричеством</strong> в&nbsp;«Шелково&nbsp;Парк».</p>",
@@ -58,13 +57,13 @@ describe('ContactReviews', () => {
     const container = await createAstroContainer();
     const component = parseComponent(
       await container.renderToString(ContactReviews, {
-        props: { reviews: [review] },
-      }),
+        props: { reviews: [review] }
+      })
     );
 
     expect({
       icons: component.querySelectorAll('svg').length,
-      sourceUrl: component.querySelector('a')?.getAttribute('href'),
+      sourceUrl: component.querySelector('a')?.getAttribute('href')
     }).toMatchInlineSnapshot(`
       {
         "icons": 1,

@@ -8,12 +8,12 @@ describe('RawReviewSchema', () => {
       RawReviewSchema.parse({
         published_at: '2026-06-25',
         slug: 'life-in-shelkovo-forest',
-        area: 'forest',
-      }),
+        area: 'forest'
+      })
     ).toEqual({
       published_at: '2026-06-25',
       slug: 'life-in-shelkovo-forest',
-      area: 'forest',
+      area: 'forest'
     });
   });
 
@@ -27,12 +27,12 @@ describe('RawReviewSchema', () => {
         title: 'Год жизни в Шелково',
         aspects: [
           { type: 'place', rating: 5, body: 'Лес и пруды рядом.' },
-          { type: 'management', body: 'По обслуживанию есть вопросы.' },
-        ],
-      }).aspects,
+          { type: 'management', body: 'По обслуживанию есть вопросы.' }
+        ]
+      }).aspects
     ).toEqual([
       { type: 'place', rating: 5, body: 'Лес и пруды рядом.' },
-      { type: 'management', body: 'По обслуживанию есть вопросы.' },
+      { type: 'management', body: 'По обслуживанию есть вопросы.' }
     ]);
   });
 
@@ -41,7 +41,7 @@ describe('RawReviewSchema', () => {
       published_at: '2026-06-25',
       slug: 'bad-contract',
       area: 'forest',
-      overall_rating: 5,
+      overall_rating: 5
     });
 
     expect(result.success).toBe(false);
@@ -51,7 +51,7 @@ describe('RawReviewSchema', () => {
     const result = RawReviewSchema.safeParse({
       published_at: '2026-13-40',
       slug: 'bad-date',
-      area: 'forest',
+      area: 'forest'
     });
 
     expect(result.success).toBe(false);
@@ -62,7 +62,7 @@ describe('RawReviewSchema', () => {
       published_at: '2026-06-25',
       slug: 'bad-aspect-field',
       area: 'forest',
-      aspects: [{ type: 'place', rtaing: 5 }],
+      aspects: [{ type: 'place', rtaing: 5 }]
     });
 
     expect(result.success).toBe(false);
@@ -74,8 +74,8 @@ describe('RawReviewSchema', () => {
         published_at: '2026-06-25',
         slug: 'bad-rating',
         area: 'forest',
-        aspects: [{ type: 'place', rating: 6 }],
-      }).success,
+        aspects: [{ type: 'place', rating: 6 }]
+      }).success
     ).toBe(false);
 
     expect(
@@ -83,8 +83,8 @@ describe('RawReviewSchema', () => {
         published_at: '2026-06-25',
         slug: 'duplicate-aspects',
         area: 'forest',
-        aspects: [{ type: 'place' }, { type: 'place', rating: 4 }],
-      }).success,
+        aspects: [{ type: 'place' }, { type: 'place', rating: 4 }]
+      }).success
     ).toBe(false);
   });
 });

@@ -1,11 +1,8 @@
-import type { APIRoute, GetStaticPaths } from 'astro';
 import { padNumber } from '@shelkovo/format';
+import type { APIRoute, GetStaticPaths } from 'astro';
 
 import { createMarkdownResponse } from '@/lib/markdown/response';
-import {
-  loadStatusIncidentDetail,
-  loadStatusIncidentDetails,
-} from '@/lib/status/load';
+import { loadStatusIncidentDetail, loadStatusIncidentDetails } from '@/lib/status/load';
 import { buildStatusIncidentMarkdown } from '@/lib/status/markdown';
 
 export const prerender = true;
@@ -17,8 +14,8 @@ export const getStaticPaths = (async () => {
     params: {
       year: String(item.year),
       month: padNumber(item.month),
-      entry: item.slug,
-    },
+      entry: item.slug
+    }
   }));
 }) satisfies GetStaticPaths;
 

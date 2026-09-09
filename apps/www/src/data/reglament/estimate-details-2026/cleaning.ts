@@ -1,7 +1,7 @@
 import type {
   EstimateDetailControlTotalInput,
   EstimateDetailResource,
-  EstimateDetailWorkItem,
+  EstimateDetailWorkItem
 } from '@/lib/reglament/detail-schema';
 
 import {
@@ -15,11 +15,10 @@ import {
   detailSourceQuoteItems,
   detailSourceRefs,
   detailStatus,
-  detailWorkItem,
+  detailWorkItem
 } from './shared';
 
-const cleaningRoundedQuantityNote =
-  'количество в PDF округлено; итог сохранен по исходной строке';
+const cleaningRoundedQuantityNote = 'количество в PDF округлено; итог сохранен по исходной строке';
 const cleaningResourceStatementSandUnitNeedsCheckReason =
   'В ресурсной ведомости единица песка извлекается как «кг.», но производственная программа и локальные позиции показывают песок в тоннах при цене 1800 руб.; рублевый итог сходится, единицу нужно проверить глазами в PDF.';
 
@@ -37,8 +36,7 @@ const cleaningWinterMechanizedSandTractorResourceId =
   'cleaning-winter-mechanized-sand-tractor-machine';
 const cleaningWinterMechanizedSandSpreaderResourceId =
   'cleaning-winter-mechanized-sand-spreader-machine';
-const cleaningWinterMechanizedSandResourceId =
-  'cleaning-winter-mechanized-sand';
+const cleaningWinterMechanizedSandResourceId = 'cleaning-winter-mechanized-sand';
 const cleaningWinterMechanizedPpeCottonSuitResourceId =
   'cleaning-winter-mechanized-ppe-cotton-suit';
 const cleaningWinterMechanizedPpeInsulatedJacketResourceId =
@@ -53,61 +51,45 @@ const cleaningWinterMechanizedPpeInsulatedMittensResourceId =
   'cleaning-winter-mechanized-ppe-insulated-mittens';
 const cleaningWinterMechanizedPpeRubberBootsResourceId =
   'cleaning-winter-mechanized-ppe-rubber-boots';
-const cleaningWinterMechanizedPpeSoapResourceId =
-  'cleaning-winter-mechanized-ppe-soap';
-const cleaningWinterMechanizedInsuranceResourceId =
-  'cleaning-winter-mechanized-insurance';
-const cleaningWinterMechanizedOverheadResourceId =
-  'cleaning-winter-mechanized-overhead';
-const cleaningWinterMechanizedProfitResourceId =
-  'cleaning-winter-mechanized-profit';
-const cleaningWinterMechanizedUsnResourceId =
-  'cleaning-winter-mechanized-usn-derived';
-const cleaningWinterMechanizedVatResourceId =
-  'cleaning-winter-mechanized-vat-derived';
+const cleaningWinterMechanizedPpeSoapResourceId = 'cleaning-winter-mechanized-ppe-soap';
+const cleaningWinterMechanizedInsuranceResourceId = 'cleaning-winter-mechanized-insurance';
+const cleaningWinterMechanizedOverheadResourceId = 'cleaning-winter-mechanized-overhead';
+const cleaningWinterMechanizedProfitResourceId = 'cleaning-winter-mechanized-profit';
+const cleaningWinterMechanizedUsnResourceId = 'cleaning-winter-mechanized-usn-derived';
+const cleaningWinterMechanizedVatResourceId = 'cleaning-winter-mechanized-vat-derived';
 
 const cleaningWinterManualSnowSweepingWorkerResourceId =
   'cleaning-winter-manual-snow-sweeping-worker-labor';
-const cleaningWinterManualAntiIceWorkerResourceId =
-  'cleaning-winter-manual-anti-ice-worker-labor';
+const cleaningWinterManualAntiIceWorkerResourceId = 'cleaning-winter-manual-anti-ice-worker-labor';
 const cleaningWinterManualRoadSnowIceWorkerResourceId =
   'cleaning-winter-manual-road-snow-ice-worker-labor';
 const cleaningWinterManualContainerSiteWorkerResourceId =
   'cleaning-winter-manual-container-site-worker-labor';
 const cleaningWinterManualSandResourceId = 'cleaning-winter-manual-sand';
-const cleaningWinterManualPpeCottonSuitResourceId =
-  'cleaning-winter-manual-ppe-cotton-suit';
+const cleaningWinterManualPpeCottonSuitResourceId = 'cleaning-winter-manual-ppe-cotton-suit';
 const cleaningWinterManualPpeInsulatedJacketResourceId =
   'cleaning-winter-manual-ppe-insulated-jacket';
-const cleaningWinterManualPpeSignalVestResourceId =
-  'cleaning-winter-manual-ppe-signal-vest';
+const cleaningWinterManualPpeSignalVestResourceId = 'cleaning-winter-manual-ppe-signal-vest';
 const cleaningWinterManualPpeInsulatedBootsResourceId =
   'cleaning-winter-manual-ppe-insulated-boots';
-const cleaningWinterManualPpePolymerGlovesResourceId =
-  'cleaning-winter-manual-ppe-polymer-gloves';
+const cleaningWinterManualPpePolymerGlovesResourceId = 'cleaning-winter-manual-ppe-polymer-gloves';
 const cleaningWinterManualPpeInsulatedMittensResourceId =
   'cleaning-winter-manual-ppe-insulated-mittens';
-const cleaningWinterManualPpeRubberBootsResourceId =
-  'cleaning-winter-manual-ppe-rubber-boots';
+const cleaningWinterManualPpeRubberBootsResourceId = 'cleaning-winter-manual-ppe-rubber-boots';
 const cleaningWinterManualPpeSoapResourceId = 'cleaning-winter-manual-ppe-soap';
-const cleaningWinterManualInventoryIceAxeResourceId =
-  'cleaning-winter-manual-inventory-ice-axe';
+const cleaningWinterManualInventoryIceAxeResourceId = 'cleaning-winter-manual-inventory-ice-axe';
 const cleaningWinterManualInventoryPolypropyleneBroomResourceId =
   'cleaning-winter-manual-inventory-polypropylene-broom';
-const cleaningWinterManualInventoryRakeResourceId =
-  'cleaning-winter-manual-inventory-rake';
+const cleaningWinterManualInventoryRakeResourceId = 'cleaning-winter-manual-inventory-rake';
 const cleaningWinterManualInventorySnowShovelResourceId =
   'cleaning-winter-manual-inventory-snow-shovel';
 const cleaningWinterManualInventoryScoopShovelResourceId =
   'cleaning-winter-manual-inventory-scoop-shovel';
 const cleaningWinterManualInventoryWheelbarrowResourceId =
   'cleaning-winter-manual-inventory-wheelbarrow';
-const cleaningWinterManualInventoryBucketResourceId =
-  'cleaning-winter-manual-inventory-bucket-12l';
-const cleaningWinterManualInsuranceResourceId =
-  'cleaning-winter-manual-insurance';
-const cleaningWinterManualOverheadResourceId =
-  'cleaning-winter-manual-overhead';
+const cleaningWinterManualInventoryBucketResourceId = 'cleaning-winter-manual-inventory-bucket-12l';
+const cleaningWinterManualInsuranceResourceId = 'cleaning-winter-manual-insurance';
+const cleaningWinterManualOverheadResourceId = 'cleaning-winter-manual-overhead';
 const cleaningWinterManualProfitResourceId = 'cleaning-winter-manual-profit';
 const cleaningWinterManualUsnResourceId = 'cleaning-winter-manual-usn-derived';
 const cleaningWinterManualVatResourceId = 'cleaning-winter-manual-vat-derived';
@@ -118,8 +100,7 @@ const cleaningSummerMechanizedWateringTractorResourceId =
   'cleaning-summer-mechanized-watering-tractor-machine';
 const cleaningSummerMechanizedWateringOpm5ResourceId =
   'cleaning-summer-mechanized-watering-opm5-machine';
-const cleaningSummerMechanizedWaterResourceId =
-  'cleaning-summer-mechanized-water';
+const cleaningSummerMechanizedWaterResourceId = 'cleaning-summer-mechanized-water';
 const cleaningSummerMechanizedPpeCottonSuitResourceId =
   'cleaning-summer-mechanized-ppe-cotton-suit';
 const cleaningSummerMechanizedPpeInsulatedJacketResourceId =
@@ -134,18 +115,12 @@ const cleaningSummerMechanizedPpeInsulatedMittensResourceId =
   'cleaning-summer-mechanized-ppe-insulated-mittens';
 const cleaningSummerMechanizedPpeRubberBootsResourceId =
   'cleaning-summer-mechanized-ppe-rubber-boots';
-const cleaningSummerMechanizedPpeSoapResourceId =
-  'cleaning-summer-mechanized-ppe-soap';
-const cleaningSummerMechanizedInsuranceResourceId =
-  'cleaning-summer-mechanized-insurance';
-const cleaningSummerMechanizedOverheadResourceId =
-  'cleaning-summer-mechanized-overhead';
-const cleaningSummerMechanizedProfitResourceId =
-  'cleaning-summer-mechanized-profit';
-const cleaningSummerMechanizedUsnResourceId =
-  'cleaning-summer-mechanized-usn-derived';
-const cleaningSummerMechanizedVatResourceId =
-  'cleaning-summer-mechanized-vat-derived';
+const cleaningSummerMechanizedPpeSoapResourceId = 'cleaning-summer-mechanized-ppe-soap';
+const cleaningSummerMechanizedInsuranceResourceId = 'cleaning-summer-mechanized-insurance';
+const cleaningSummerMechanizedOverheadResourceId = 'cleaning-summer-mechanized-overhead';
+const cleaningSummerMechanizedProfitResourceId = 'cleaning-summer-mechanized-profit';
+const cleaningSummerMechanizedUsnResourceId = 'cleaning-summer-mechanized-usn-derived';
+const cleaningSummerMechanizedVatResourceId = 'cleaning-summer-mechanized-vat-derived';
 
 const cleaningSummerManualCurbCleaningWorkerResourceId =
   'cleaning-summer-manual-curb-cleaning-worker-labor';
@@ -157,35 +132,27 @@ const cleaningSummerManualContainerSiteWorkerResourceId =
   'cleaning-summer-manual-container-site-worker-labor';
 const cleaningSummerManualDitchCleaningWorkerResourceId =
   'cleaning-summer-manual-ditch-cleaning-worker-labor';
-const cleaningSummerManualPpeCottonSuitResourceId =
-  'cleaning-summer-manual-ppe-cotton-suit';
+const cleaningSummerManualPpeCottonSuitResourceId = 'cleaning-summer-manual-ppe-cotton-suit';
 const cleaningSummerManualPpeInsulatedJacketResourceId =
   'cleaning-summer-manual-ppe-insulated-jacket';
-const cleaningSummerManualPpeSignalVestResourceId =
-  'cleaning-summer-manual-ppe-signal-vest';
+const cleaningSummerManualPpeSignalVestResourceId = 'cleaning-summer-manual-ppe-signal-vest';
 const cleaningSummerManualPpeInsulatedBootsResourceId =
   'cleaning-summer-manual-ppe-insulated-boots';
-const cleaningSummerManualPpePolymerGlovesResourceId =
-  'cleaning-summer-manual-ppe-polymer-gloves';
+const cleaningSummerManualPpePolymerGlovesResourceId = 'cleaning-summer-manual-ppe-polymer-gloves';
 const cleaningSummerManualPpeInsulatedMittensResourceId =
   'cleaning-summer-manual-ppe-insulated-mittens';
-const cleaningSummerManualPpeRubberBootsResourceId =
-  'cleaning-summer-manual-ppe-rubber-boots';
+const cleaningSummerManualPpeRubberBootsResourceId = 'cleaning-summer-manual-ppe-rubber-boots';
 const cleaningSummerManualPpeSoapResourceId = 'cleaning-summer-manual-ppe-soap';
 const cleaningSummerManualInventoryPolypropyleneBroomResourceId =
   'cleaning-summer-manual-inventory-polypropylene-broom';
-const cleaningSummerManualInventoryRakeResourceId =
-  'cleaning-summer-manual-inventory-rake';
+const cleaningSummerManualInventoryRakeResourceId = 'cleaning-summer-manual-inventory-rake';
 const cleaningSummerManualInventoryScoopShovelResourceId =
   'cleaning-summer-manual-inventory-scoop-shovel';
 const cleaningSummerManualInventoryWheelbarrowResourceId =
   'cleaning-summer-manual-inventory-wheelbarrow';
-const cleaningSummerManualInventoryBucketResourceId =
-  'cleaning-summer-manual-inventory-bucket-12l';
-const cleaningSummerManualInsuranceResourceId =
-  'cleaning-summer-manual-insurance';
-const cleaningSummerManualOverheadResourceId =
-  'cleaning-summer-manual-overhead';
+const cleaningSummerManualInventoryBucketResourceId = 'cleaning-summer-manual-inventory-bucket-12l';
+const cleaningSummerManualInsuranceResourceId = 'cleaning-summer-manual-insurance';
+const cleaningSummerManualOverheadResourceId = 'cleaning-summer-manual-overhead';
 const cleaningSummerManualProfitResourceId = 'cleaning-summer-manual-profit';
 const cleaningSummerManualUsnResourceId = 'cleaning-summer-manual-usn-derived';
 const cleaningSummerManualVatResourceId = 'cleaning-summer-manual-vat-derived';
@@ -196,8 +163,8 @@ const cleaningWinterMechanizedProductionSnowSource = detailSource(
   'производственная программа / зимняя механизированная уборка / подметание снега',
   {
     quote:
-      'Подметание свежевыпавшего снега толщиной слоя 2 см; кратность 70; объем 81 778; Трактор МТЗ 80 ... 2160; Подметание ... свыше 2 см; кратность 92; Трактор МТЗ 80 ... 2980',
-  },
+      'Подметание свежевыпавшего снега толщиной слоя 2 см; кратность 70; объем 81 778; Трактор МТЗ 80 ... 2160; Подметание ... свыше 2 см; кратность 92; Трактор МТЗ 80 ... 2980'
+  }
 );
 
 const cleaningWinterMechanizedProductionSandSource = detailSource(
@@ -206,8 +173,8 @@ const cleaningWinterMechanizedProductionSandSource = detailSource(
   'производственная программа / зимняя механизированная уборка / посыпка песком и СИЗ',
   {
     quote:
-      'Посыпка дорог песком - в дни с гололедом и гололедицей; кратность 30; Трактор МТЗ 80 ... 210; Навесной разбрасыватель песка РПМ-01 210; Песок для посыпки дорог 73,6 т.; СИЗ 2,7 чел.',
-  },
+      'Посыпка дорог песком - в дни с гололедом и гололедицей; кратность 30; Трактор МТЗ 80 ... 210; Навесной разбрасыватель песка РПМ-01 210; Песок для посыпки дорог 73,6 т.; СИЗ 2,7 чел.'
+  }
 );
 
 const cleaningStaffSource = detailSource(
@@ -222,16 +189,16 @@ const cleaningStaffSource = detailSource(
         label: 'Рабочий по уборке территории (средний разряд 3.0)',
         quantity: detailQuantity(13.4, 'чел.'),
         unit_price_rub: detailMoney(664.15),
-        total_rub: detailMoney(8_899.55),
+        total_rub: detailMoney(8_899.55)
       }),
       detailSourceQuoteItem({
         label: 'Машинист',
         quantity: detailQuantity(14.1, 'чел.'),
         unit_price_rub: detailMoney(934.32),
-        total_rub: detailMoney(13_173.91),
-      }),
-    ),
-  },
+        total_rub: detailMoney(13_173.91)
+      })
+    )
+  }
 );
 
 const cleaningWinterMechanizedSnow2cmSource = detailSource(
@@ -240,8 +207,8 @@ const cleaningWinterMechanizedSnow2cmSource = detailSource(
   'позиция 1.1 / подметание снега толщиной 2 см',
   {
     quote:
-      'Подметание свежевыпавшего снега толщиной слоя 2 см ... 5 206 753,87; Машинист 2160 934,32 2 018 293,38; Трактор МТЗ 80 ... 3 188 460,49; ИТОГО ПО ПОЗИЦИИ 8 036 401,19',
-  },
+      'Подметание свежевыпавшего снега толщиной слоя 2 см ... 5 206 753,87; Машинист 2160 934,32 2 018 293,38; Трактор МТЗ 80 ... 3 188 460,49; ИТОГО ПО ПОЗИЦИИ 8 036 401,19'
+  }
 );
 
 const cleaningWinterMechanizedHeavySnowSource = detailSource(
@@ -250,8 +217,8 @@ const cleaningWinterMechanizedHeavySnowSource = detailSource(
   'позиция 1.2 / подметание снега толщиной свыше 2 см',
   {
     quote:
-      'Подметание свежевыпавшего снега толщиной слоя свыше 2 см ... 7 181 932,63; Машинист 2980 934,32 2 783 931,69; Трактор МТЗ 80 ... 4 398 000,94',
-  },
+      'Подметание свежевыпавшего снега толщиной слоя свыше 2 см ... 7 181 932,63; Машинист 2980 934,32 2 783 931,69; Трактор МТЗ 80 ... 4 398 000,94'
+  }
 );
 
 const cleaningWinterMechanizedHeavySnowTotalSource = detailSource(
@@ -260,8 +227,8 @@ const cleaningWinterMechanizedHeavySnowTotalSource = detailSource(
   'позиция 1.2 / начисления и итог подметания снега свыше 2 см',
   {
     quote:
-      'Расходы на страховые взносы 840 747,37; общеэксплуатационные расходы 1 948 752,19; прибыль 1 113 572,68; ИТОГО ПО ПОЗИЦИИ 11 085 004,86',
-  },
+      'Расходы на страховые взносы 840 747,37; общеэксплуатационные расходы 1 948 752,19; прибыль 1 113 572,68; ИТОГО ПО ПОЗИЦИИ 11 085 004,86'
+  }
 );
 
 const cleaningWinterMechanizedSandSource = detailSource(
@@ -270,8 +237,8 @@ const cleaningWinterMechanizedSandSource = detailSource(
   'позиция 1.3 / посыпка дорог песком',
   {
     quote:
-      'Посыпка дорог песком ... 648 097,51; Машинист 210 934,32 196 544,88; Трактор МТЗ 80 ... 310 497,76; Навесной разбрасыватель песка РПМ-01 8 574,51; Песок 74 т. 1800,00 132 480,36',
-  },
+      'Посыпка дорог песком ... 648 097,51; Машинист 210 934,32 196 544,88; Трактор МТЗ 80 ... 310 497,76; Навесной разбрасыватель песка РПМ-01 8 574,51; Песок 74 т. 1800,00 132 480,36'
+  }
 );
 
 const cleaningWinterMechanizedSandTotalSource = detailSource(
@@ -280,8 +247,8 @@ const cleaningWinterMechanizedSandTotalSource = detailSource(
   'позиция 1.3 / начисления и итог посыпки песком',
   {
     quote:
-      'Расходы на страховые взносы 59 356,55; общеэксплуатационные расходы 137 581,41; прибыль 78 617,95; ИТОГО ПО ПОЗИЦИИ 923 653,42',
-  },
+      'Расходы на страховые взносы 59 356,55; общеэксплуатационные расходы 137 581,41; прибыль 78 617,95; ИТОГО ПО ПОЗИЦИИ 923 653,42'
+  }
 );
 
 const cleaningWinterMechanizedPpeSource = detailSource(
@@ -297,63 +264,63 @@ const cleaningWinterMechanizedPpeSource = detailSource(
         resource_ids: [cleaningWinterMechanizedPpeCottonSuitResourceId],
         quantity: detailQuantity(2.7, 'шт.'),
         unit_price_rub: detailMoney(5_500),
-        total_rub: detailMoney(14_850),
+        total_rub: detailMoney(14_850)
       }),
       detailSourceQuoteItem({
         label: 'Куртка на утепляющей прокладке',
         resource_ids: [cleaningWinterMechanizedPpeInsulatedJacketResourceId],
         quantity: detailQuantity(1.1, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(6_000),
-        total_rub: detailMoney(6_480),
+        total_rub: detailMoney(6_480)
       }),
       detailSourceQuoteItem({
         label: 'Жилет сигнальный',
         resource_ids: [cleaningWinterMechanizedPpeSignalVestResourceId],
         quantity: detailQuantity(2.7, 'шт.'),
         unit_price_rub: detailMoney(1_200),
-        total_rub: detailMoney(3_240),
+        total_rub: detailMoney(3_240)
       }),
       detailSourceQuoteItem({
         label: 'Сапоги утепленные',
         resource_ids: [cleaningWinterMechanizedPpeInsulatedBootsResourceId],
         quantity: detailQuantity(1.1, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(3_500),
-        total_rub: detailMoney(3_780),
+        total_rub: detailMoney(3_780)
       }),
       detailSourceQuoteItem({
         label: 'Перчатки с полимерным покрытием',
         resource_ids: [cleaningWinterMechanizedPpePolymerGlovesResourceId],
         quantity: detailQuantity(10.8, 'шт.'),
         unit_price_rub: detailMoney(350),
-        total_rub: detailMoney(3_780),
+        total_rub: detailMoney(3_780)
       }),
       detailSourceQuoteItem({
         label: 'Рукавицы утепленные',
         resource_ids: [cleaningWinterMechanizedPpeInsulatedMittensResourceId],
         quantity: detailQuantity(10.8, 'шт.'),
         unit_price_rub: detailMoney(700),
-        total_rub: detailMoney(7_560),
+        total_rub: detailMoney(7_560)
       }),
       detailSourceQuoteItem({
         label: 'Сапоги резиновые',
         resource_ids: [cleaningWinterMechanizedPpeRubberBootsResourceId],
         quantity: detailQuantity(2.7, 'шт.'),
         unit_price_rub: detailMoney(2_000),
-        total_rub: detailMoney(5_400),
+        total_rub: detailMoney(5_400)
       }),
       detailSourceQuoteItem({
         label: 'Мыло туалетное',
         resource_ids: [cleaningWinterMechanizedPpeSoapResourceId],
         quantity: detailQuantity(32.4, 'шт.'),
         unit_price_rub: detailMoney(116),
-        total_rub: detailMoney(3_758.4),
-      }),
-    ),
-  },
+        total_rub: detailMoney(3_758.4)
+      })
+    )
+  }
 );
 
 const cleaningWinterMechanizedTotalsSource = detailSource(
@@ -362,8 +329,8 @@ const cleaningWinterMechanizedTotalsSource = detailSource(
   'итого по разделу зимней механизированной уборки территории',
   {
     quote:
-      'Прямые затраты 13 085 632,41; страховые взносы 1 509 628,52; общеэксплуатационные расходы 3 499 138,97; прибыль 1 999 507,98; Итого 20 093 907,88; Машины 7 905 533,70; Зарплата машинистов 4 998 769,96; Материальные затраты 181 328,76',
-  },
+      'Прямые затраты 13 085 632,41; страховые взносы 1 509 628,52; общеэксплуатационные расходы 3 499 138,97; прибыль 1 999 507,98; Итого 20 093 907,88; Машины 7 905 533,70; Зарплата машинистов 4 998 769,96; Материальные затраты 181 328,76'
+  }
 );
 
 const cleaningWinterManualProductionSnowSource = detailSource(
@@ -372,8 +339,8 @@ const cleaningWinterManualProductionSnowSource = detailSource(
   'производственная программа / зимняя ручная уборка / подметание снега',
   {
     quote:
-      'Зимняя ручная уборка территории; трудозатраты 1 825,3; Подметание свежевыпавшего снега ... кратность 70; объем 449; трудозатраты 73,3',
-  },
+      'Зимняя ручная уборка территории; трудозатраты 1 825,3; Подметание свежевыпавшего снега ... кратность 70; объем 449; трудозатраты 73,3'
+  }
 );
 
 const cleaningWinterManualProductionWorksSource = detailSource(
@@ -382,8 +349,8 @@ const cleaningWinterManualProductionWorksSource = detailSource(
   'производственная программа / зимняя ручная уборка / подсыпка, дороги и контейнерная площадка',
   {
     quote:
-      'Подсыпка территории противогололедным материалом ... кратность 30; объем 449; трудозатраты 29,2; Песок 2,7 т.; Очистка участков территорий от снега и наледи ... кратность 116; объем 8 178; трудозатраты 1264,8; Очистка контейнерной площадки ... кратность 212; объем 36,0; трудозатраты 457,9',
-  },
+      'Подсыпка территории противогололедным материалом ... кратность 30; объем 449; трудозатраты 29,2; Песок 2,7 т.; Очистка участков территорий от снега и наледи ... кратность 116; объем 8 178; трудозатраты 1264,8; Очистка контейнерной площадки ... кратность 212; объем 36,0; трудозатраты 457,9'
+  }
 );
 
 const cleaningWinterManualProductionInventorySource = detailSource(
@@ -397,52 +364,50 @@ const cleaningWinterManualProductionInventorySource = detailSource(
       detailSourceQuoteItem({
         label: 'Сапоги резиновые',
         resource_ids: [cleaningWinterManualPpeRubberBootsResourceId],
-        quantity: detailQuantity(0.9, 'шт.'),
+        quantity: detailQuantity(0.9, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Мыло туалетное',
         resource_ids: [cleaningWinterManualPpeSoapResourceId],
-        quantity: detailQuantity(10.8, 'шт.'),
+        quantity: detailQuantity(10.8, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Ледоруб-топор',
         resource_ids: [cleaningWinterManualInventoryIceAxeResourceId],
-        quantity: detailQuantity(0.2, 'шт.'),
+        quantity: detailQuantity(0.2, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Метла',
-        resource_ids: [
-          cleaningWinterManualInventoryPolypropyleneBroomResourceId,
-        ],
-        quantity: detailQuantity(4.5, 'шт.'),
+        resource_ids: [cleaningWinterManualInventoryPolypropyleneBroomResourceId],
+        quantity: detailQuantity(4.5, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Грабли',
         resource_ids: [cleaningWinterManualInventoryRakeResourceId],
-        quantity: detailQuantity(0.3, 'шт.'),
+        quantity: detailQuantity(0.3, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Лопата снегоуборочная',
         resource_ids: [cleaningWinterManualInventorySnowShovelResourceId],
-        quantity: detailQuantity(0.5, 'шт.'),
+        quantity: detailQuantity(0.5, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Лопата совковая',
         resource_ids: [cleaningWinterManualInventoryScoopShovelResourceId],
-        quantity: detailQuantity(0.5, 'шт.'),
+        quantity: detailQuantity(0.5, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Тачка садовая',
         resource_ids: [cleaningWinterManualInventoryWheelbarrowResourceId],
-        quantity: detailQuantity(0.5, 'шт.'),
+        quantity: detailQuantity(0.5, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Ведро п\\э 12л',
         resource_ids: [cleaningWinterManualInventoryBucketResourceId],
-        quantity: detailQuantity(0.3, 'шт.'),
-      }),
-    ),
-  },
+        quantity: detailQuantity(0.3, 'шт.')
+      })
+    )
+  }
 );
 
 const cleaningWinterManualSnowSweepingSource = detailSource(
@@ -451,8 +416,8 @@ const cleaningWinterManualSnowSweepingSource = detailSource(
   'позиция 2.1 / подметание свежевыпавшего снега вручную',
   {
     quote:
-      'Подметание свежевыпавшего снега ... 48 706,24; Затраты труда Рабочий по уборке территории 73 664,15 48 706,24',
-  },
+      'Подметание свежевыпавшего снега ... 48 706,24; Затраты труда Рабочий по уборке территории 73 664,15 48 706,24'
+  }
 );
 
 const cleaningWinterManualAntiIceSource = detailSource(
@@ -461,8 +426,8 @@ const cleaningWinterManualAntiIceSource = detailSource(
   'позиция 2.2 / подсыпка противогололедным материалом',
   {
     quote:
-      'Подсыпка территории противогололедным материалом ... 24 232,30; Рабочий по уборке территории 29 664,15 19 383,10; Песок для посыпки дорог 3 т. 1800,00 4 849,20; ИТОГО ПО ПОЗИЦИИ 51 407,39',
-  },
+      'Подсыпка территории противогололедным материалом ... 24 232,30; Рабочий по уборке территории 29 664,15 19 383,10; Песок для посыпки дорог 3 т. 1800,00 4 849,20; ИТОГО ПО ПОЗИЦИИ 51 407,39'
+  }
 );
 
 const cleaningWinterManualRoadSnowIceSource = detailSource(
@@ -471,8 +436,8 @@ const cleaningWinterManualRoadSnowIceSource = detailSource(
   'позиция 2.3 / очистка участков территорий от снега и наледи',
   {
     quote:
-      'Рабочий по уборке территории 1265 664,15 840 033,57; страховые взносы 253 690,14; общеэксплуатационные расходы 588 023,50; прибыль 336 013,43; ИТОГО ПО ПОЗИЦИИ 2 017 760,64',
-  },
+      'Рабочий по уборке территории 1265 664,15 840 033,57; страховые взносы 253 690,14; общеэксплуатационные расходы 588 023,50; прибыль 336 013,43; ИТОГО ПО ПОЗИЦИИ 2 017 760,64'
+  }
 );
 
 const cleaningWinterManualContainerSiteSource = detailSource(
@@ -481,8 +446,8 @@ const cleaningWinterManualContainerSiteSource = detailSource(
   'позиция 2.4 / очистка контейнерной площадки в холодный период',
   {
     quote:
-      'Очистка контейнерной площадки в холодный период - ежедневно ... 304 125,64; Рабочий по уборке территории 458 664,15 304 125,64; ИТОГО ПО ПОЗИЦИИ 730 509,79',
-  },
+      'Очистка контейнерной площадки в холодный период - ежедневно ... 304 125,64; Рабочий по уборке территории 458 664,15 304 125,64; ИТОГО ПО ПОЗИЦИИ 730 509,79'
+  }
 );
 
 const cleaningWinterManualPpeSource = detailSource(
@@ -498,63 +463,63 @@ const cleaningWinterManualPpeSource = detailSource(
         resource_ids: [cleaningWinterManualPpeCottonSuitResourceId],
         quantity: detailQuantity(0.9, 'шт.'),
         unit_price_rub: detailMoney(5_500),
-        total_rub: detailMoney(4_950),
+        total_rub: detailMoney(4_950)
       }),
       detailSourceQuoteItem({
         label: 'Куртка на утепляющей прокладке',
         resource_ids: [cleaningWinterManualPpeInsulatedJacketResourceId],
         quantity: detailQuantity(0.4, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(6_000),
-        total_rub: detailMoney(2_160),
+        total_rub: detailMoney(2_160)
       }),
       detailSourceQuoteItem({
         label: 'Жилет сигнальный',
         resource_ids: [cleaningWinterManualPpeSignalVestResourceId],
         quantity: detailQuantity(0.9, 'шт.'),
         unit_price_rub: detailMoney(1_200),
-        total_rub: detailMoney(1_080),
+        total_rub: detailMoney(1_080)
       }),
       detailSourceQuoteItem({
         label: 'Сапоги утепленные',
         resource_ids: [cleaningWinterManualPpeInsulatedBootsResourceId],
         quantity: detailQuantity(0.4, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(3_500),
-        total_rub: detailMoney(1_260),
+        total_rub: detailMoney(1_260)
       }),
       detailSourceQuoteItem({
         label: 'Перчатки с полимерным покрытием',
         resource_ids: [cleaningWinterManualPpePolymerGlovesResourceId],
         quantity: detailQuantity(3.6, 'шт.'),
         unit_price_rub: detailMoney(350),
-        total_rub: detailMoney(1_260),
+        total_rub: detailMoney(1_260)
       }),
       detailSourceQuoteItem({
         label: 'Рукавицы утепленные',
         resource_ids: [cleaningWinterManualPpeInsulatedMittensResourceId],
         quantity: detailQuantity(3.6, 'шт.'),
         unit_price_rub: detailMoney(700),
-        total_rub: detailMoney(2_520),
+        total_rub: detailMoney(2_520)
       }),
       detailSourceQuoteItem({
         label: 'Сапоги резиновые',
         resource_ids: [cleaningWinterManualPpeRubberBootsResourceId],
         quantity: detailQuantity(0.9, 'шт.'),
         unit_price_rub: detailMoney(2_000),
-        total_rub: detailMoney(1_800),
+        total_rub: detailMoney(1_800)
       }),
       detailSourceQuoteItem({
         label: 'Мыло туалетное',
         resource_ids: [cleaningWinterManualPpeSoapResourceId],
         quantity: detailQuantity(10.8, 'шт.'),
         unit_price_rub: detailMoney(116),
-        total_rub: detailMoney(1_252.8),
-      }),
-    ),
-  },
+        total_rub: detailMoney(1_252.8)
+      })
+    )
+  }
 );
 
 const cleaningWinterManualInventorySource = detailSource(
@@ -569,67 +534,65 @@ const cleaningWinterManualInventorySource = detailSource(
         label: 'Ледоруб-топор',
         resource_ids: [cleaningWinterManualInventoryIceAxeResourceId],
         quantity: detailQuantity(0.2, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(700),
-        total_rub: detailMoney(126),
+        total_rub: detailMoney(126)
       }),
       detailSourceQuoteItem({
         label: 'Метла полипропиленовая',
-        resource_ids: [
-          cleaningWinterManualInventoryPolypropyleneBroomResourceId,
-        ],
+        resource_ids: [cleaningWinterManualInventoryPolypropyleneBroomResourceId],
         quantity: detailQuantity(4.5, 'шт.'),
         unit_price_rub: detailMoney(370),
-        total_rub: detailMoney(1_665),
+        total_rub: detailMoney(1_665)
       }),
       detailSourceQuoteItem({
         label: 'Грабли',
         resource_ids: [cleaningWinterManualInventoryRakeResourceId],
         quantity: detailQuantity(0.3, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(500),
-        total_rub: detailMoney(148.5),
+        total_rub: detailMoney(148.5)
       }),
       detailSourceQuoteItem({
         label: 'Лопата снегоуборочная',
         resource_ids: [cleaningWinterManualInventorySnowShovelResourceId],
         quantity: detailQuantity(0.5, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(2_500),
-        total_rub: detailMoney(1_125),
+        total_rub: detailMoney(1_125)
       }),
       detailSourceQuoteItem({
         label: 'Лопата совковая',
         resource_ids: [cleaningWinterManualInventoryScoopShovelResourceId],
         quantity: detailQuantity(0.5, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(1_034),
-        total_rub: detailMoney(465.3),
+        total_rub: detailMoney(465.3)
       }),
       detailSourceQuoteItem({
         label: 'Тачка садовая',
         resource_ids: [cleaningWinterManualInventoryWheelbarrowResourceId],
         quantity: detailQuantity(0.5, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(2_500),
-        total_rub: detailMoney(1_125),
+        total_rub: detailMoney(1_125)
       }),
       detailSourceQuoteItem({
         label: 'Ведро п\\э 12л',
         resource_ids: [cleaningWinterManualInventoryBucketResourceId],
         quantity: detailQuantity(0.3, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(200),
-        total_rub: detailMoney(59.4),
-      }),
-    ),
-  },
+        total_rub: detailMoney(59.4)
+      })
+    )
+  }
 );
 
 const cleaningWinterManualTotalsSource = detailSource(
@@ -638,8 +601,8 @@ const cleaningWinterManualTotalsSource = detailSource(
   'итого по разделу зимней ручной уборки территории',
   {
     quote:
-      'Прямые затраты 1 238 094,75; страховые взносы 366 099,05; общеэксплуатационные расходы 848 573,98; прибыль 484 899,42; Итого 2 937 667,20; Основная зарплата 1 212 248,55; Материальные затраты 25 846,20',
-  },
+      'Прямые затраты 1 238 094,75; страховые взносы 366 099,05; общеэксплуатационные расходы 848 573,98; прибыль 484 899,42; Итого 2 937 667,20; Основная зарплата 1 212 248,55; Материальные затраты 25 846,20'
+  }
 );
 
 const cleaningSummerMechanizedProductionWateringSource = detailSource(
@@ -653,21 +616,21 @@ const cleaningSummerMechanizedProductionWateringSource = detailSource(
       detailSourceQuoteItem({
         label: 'Трактор МТЗ 80',
         resource_ids: [cleaningSummerMechanizedWateringTractorResourceId],
-        quantity: detailQuantity(22_389, 'маш.-час'),
+        quantity: detailQuantity(22_389, 'маш.-час')
       }),
       detailSourceQuoteItem({
         label: 'Оборудование поливомоечное ОПМ-5,0 (бочка)',
         resource_ids: [cleaningSummerMechanizedWateringOpm5ResourceId],
-        quantity: detailQuantity(22_389, 'маш.-час'),
+        quantity: detailQuantity(22_389, 'маш.-час')
       }),
       detailSourceQuoteItem({
         label: 'Вода',
         resource_ids: [cleaningSummerMechanizedWaterResourceId],
-        quantity: detailQuantity(9_568, 'м³'),
-      }),
+        quantity: detailQuantity(9_568, 'м³')
+      })
     ),
-    note: 'Кратность 234 относится именно к поливу. В агрегированной строке estimate-2026 частота 153 раз/год относится к летней уборке территории в целом; почему расчетный полив чаще и почему эти частоты отличаются, в cleaning.pdf не поясняется.',
-  },
+    note: 'Кратность 234 относится именно к поливу. В агрегированной строке estimate-2026 частота 153 раз/год относится к летней уборке территории в целом; почему расчетный полив чаще и почему эти частоты отличаются, в cleaning.pdf не поясняется.'
+  }
 );
 
 const cleaningSummerMechanizedProductionPpeSource = detailSource(
@@ -681,45 +644,45 @@ const cleaningSummerMechanizedProductionPpeSource = detailSource(
       detailSourceQuoteItem({
         label: 'Костюм хлопчатобумажный',
         resource_ids: [cleaningSummerMechanizedPpeCottonSuitResourceId],
-        quantity: detailQuantity(11.4, 'шт.'),
+        quantity: detailQuantity(11.4, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Куртка на утепляющей прокладке',
         resource_ids: [cleaningSummerMechanizedPpeInsulatedJacketResourceId],
-        quantity: detailQuantity(4.6, 'шт.'),
+        quantity: detailQuantity(4.6, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Жилет сигнальный',
         resource_ids: [cleaningSummerMechanizedPpeSignalVestResourceId],
-        quantity: detailQuantity(11.4, 'шт.'),
+        quantity: detailQuantity(11.4, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Сапоги утепленные',
         resource_ids: [cleaningSummerMechanizedPpeInsulatedBootsResourceId],
-        quantity: detailQuantity(4.6, 'шт.'),
+        quantity: detailQuantity(4.6, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Перчатки с полимерным покрытием',
         resource_ids: [cleaningSummerMechanizedPpePolymerGlovesResourceId],
-        quantity: detailQuantity(45.6, 'шт.'),
+        quantity: detailQuantity(45.6, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Рукавицы утепленные',
         resource_ids: [cleaningSummerMechanizedPpeInsulatedMittensResourceId],
-        quantity: detailQuantity(45.6, 'шт.'),
+        quantity: detailQuantity(45.6, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Сапоги резиновые',
         resource_ids: [cleaningSummerMechanizedPpeRubberBootsResourceId],
-        quantity: detailQuantity(11.4, 'шт.'),
+        quantity: detailQuantity(11.4, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Мыло туалетное',
         resource_ids: [cleaningSummerMechanizedPpeSoapResourceId],
-        quantity: detailQuantity(136.8, 'шт.'),
-      }),
-    ),
-  },
+        quantity: detailQuantity(136.8, 'шт.')
+      })
+    )
+  }
 );
 
 const cleaningSummerMechanizedWateringSource = detailSource(
@@ -735,31 +698,31 @@ const cleaningSummerMechanizedWateringSource = detailSource(
         resource_ids: [cleaningSummerMechanizedWateringMachinistResourceId],
         quantity: detailQuantity(22_389, 'чел-час'),
         unit_price_rub: detailMoney(934.32),
-        total_rub: detailMoney(20_918_659.44),
+        total_rub: detailMoney(20_918_659.44)
       }),
       detailSourceQuoteItem({
         label: 'Трактор МТЗ 80',
         resource_ids: [cleaningSummerMechanizedWateringTractorResourceId],
         quantity: detailQuantity(22_389, 'маш-час'),
         unit_price_rub: detailMoney(1_476.02),
-        total_rub: detailMoney(33_046_889.8),
+        total_rub: detailMoney(33_046_889.8)
       }),
       detailSourceQuoteItem({
         label: 'ОПМ-5,0 (бочка)',
         resource_ids: [cleaningSummerMechanizedWateringOpm5ResourceId],
         quantity: detailQuantity(22_389, 'маш-час'),
         unit_price_rub: detailMoney(108.4),
-        total_rub: detailMoney(2_426_952.22),
+        total_rub: detailMoney(2_426_952.22)
       }),
       detailSourceQuoteItem({
         label: 'Вода',
         resource_ids: [cleaningSummerMechanizedWaterResourceId],
         quantity: detailQuantity(9_568, 'м³'),
         unit_price_rub: detailMoney(13.56),
-        total_rub: detailMoney(129_742.08),
-      }),
-    ),
-  },
+        total_rub: detailMoney(129_742.08)
+      })
+    )
+  }
 );
 
 const cleaningSummerMechanizedPpeHeaderSource = detailSource(
@@ -768,8 +731,8 @@ const cleaningSummerMechanizedPpeHeaderSource = detailSource(
   'позиция 3.2 / средства охраны труда для летней механизированной уборки',
   {
     quote:
-      'Средства охраны труда (спецодежда, смывающие средства); 11,40 чел.; 18 092,00; 206 248,80',
-  },
+      'Средства охраны труда (спецодежда, смывающие средства); 11,40 чел.; 18 092,00; 206 248,80'
+  }
 );
 
 const cleaningSummerMechanizedPpeMaterialsSource = detailSource(
@@ -785,63 +748,63 @@ const cleaningSummerMechanizedPpeMaterialsSource = detailSource(
         resource_ids: [cleaningSummerMechanizedPpeCottonSuitResourceId],
         quantity: detailQuantity(11.4, 'шт.'),
         unit_price_rub: detailMoney(5_500),
-        total_rub: detailMoney(62_700),
+        total_rub: detailMoney(62_700)
       }),
       detailSourceQuoteItem({
         label: 'Куртка на утепляющей прокладке',
         resource_ids: [cleaningSummerMechanizedPpeInsulatedJacketResourceId],
         quantity: detailQuantity(4.6, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(6_000),
-        total_rub: detailMoney(27_360),
+        total_rub: detailMoney(27_360)
       }),
       detailSourceQuoteItem({
         label: 'Жилет сигнальный',
         resource_ids: [cleaningSummerMechanizedPpeSignalVestResourceId],
         quantity: detailQuantity(11.4, 'шт.'),
         unit_price_rub: detailMoney(1_200),
-        total_rub: detailMoney(13_680),
+        total_rub: detailMoney(13_680)
       }),
       detailSourceQuoteItem({
         label: 'Сапоги утепленные',
         resource_ids: [cleaningSummerMechanizedPpeInsulatedBootsResourceId],
         quantity: detailQuantity(4.6, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(3_500),
-        total_rub: detailMoney(15_960),
+        total_rub: detailMoney(15_960)
       }),
       detailSourceQuoteItem({
         label: 'Перчатки с полимерным покрытием',
         resource_ids: [cleaningSummerMechanizedPpePolymerGlovesResourceId],
         quantity: detailQuantity(45.6, 'шт.'),
         unit_price_rub: detailMoney(350),
-        total_rub: detailMoney(15_960),
+        total_rub: detailMoney(15_960)
       }),
       detailSourceQuoteItem({
         label: 'Рукавицы утепленные',
         resource_ids: [cleaningSummerMechanizedPpeInsulatedMittensResourceId],
         quantity: detailQuantity(45.6, 'шт.'),
         unit_price_rub: detailMoney(700),
-        total_rub: detailMoney(31_920),
+        total_rub: detailMoney(31_920)
       }),
       detailSourceQuoteItem({
         label: 'Сапоги резиновые',
         resource_ids: [cleaningSummerMechanizedPpeRubberBootsResourceId],
         quantity: detailQuantity(11.4, 'шт.'),
         unit_price_rub: detailMoney(2_000),
-        total_rub: detailMoney(22_800),
+        total_rub: detailMoney(22_800)
       }),
       detailSourceQuoteItem({
         label: 'Мыло туалетное',
         resource_ids: [cleaningSummerMechanizedPpeSoapResourceId],
         quantity: detailQuantity(136.8, 'шт.'),
         unit_price_rub: detailMoney(116),
-        total_rub: detailMoney(15_868.8),
-      }),
-    ),
-  },
+        total_rub: detailMoney(15_868.8)
+      })
+    )
+  }
 );
 
 const cleaningSummerMechanizedTotalsSource = detailSource(
@@ -850,8 +813,8 @@ const cleaningSummerMechanizedTotalsSource = detailSource(
   'итого по разделу летней механизированной уборки',
   {
     quote:
-      'Прямые затраты 56 728 492,34; страховые взносы 6 317 435,15; общеэксплуатационные расходы 14 643 061,61; прибыль 8 367 463,78; Итого 86 056 452,88; Машины 35 473 842,02; Зарплата машинистов 20 918 659,44; Материальные затраты 335 990,88',
-  },
+      'Прямые затраты 56 728 492,34; страховые взносы 6 317 435,15; общеэксплуатационные расходы 14 643 061,61; прибыль 8 367 463,78; Итого 86 056 452,88; Машины 35 473 842,02; Зарплата машинистов 20 918 659,44; Материальные затраты 335 990,88'
+  }
 );
 
 const cleaningSummerManualProductionWorksSource = detailSource(
@@ -860,8 +823,8 @@ const cleaningSummerManualProductionWorksSource = detailSource(
   'производственная программа / летняя ручная уборка / кромка, парковки и контейнерная площадка',
   {
     quote:
-      'Летняя ручная уборка территории; трудозатраты 24738,0; Бордюрный камень ... кратность 153; объем 0,055; трудозатраты 164,9; Парковочные/иные площадки. Уборка территории от случайного мусора ... кратность 153; объем 449; трудозатраты 88,2; Подметание территории ... кратность 22; трудозатраты 13,2; Контейнерная площадка ... кратность 153; объем 36; трудозатраты 134,0',
-  },
+      'Летняя ручная уборка территории; трудозатраты 24738,0; Бордюрный камень ... кратность 153; объем 0,055; трудозатраты 164,9; Парковочные/иные площадки. Уборка территории от случайного мусора ... кратность 153; объем 449; трудозатраты 88,2; Подметание территории ... кратность 22; трудозатраты 13,2; Контейнерная площадка ... кратность 153; объем 36; трудозатраты 134,0'
+  }
 );
 
 const cleaningSummerManualProductionDitchSource = detailSource(
@@ -870,8 +833,8 @@ const cleaningSummerManualProductionDitchSource = detailSource(
   'производственная программа / летняя ручная уборка / открытые ливневые траншеи',
   {
     quote:
-      'Очистка открытых ливневых траншей вдоль дорог вручную (15 раз в летний период); V-X; кратность 15; объем 327,1; трудозатраты 24337,7',
-  },
+      'Очистка открытых ливневых траншей вдоль дорог вручную (15 раз в летний период); V-X; кратность 15; объем 327,1; трудозатраты 24337,7'
+  }
 );
 
 const cleaningSummerManualProductionPpeInventorySource = detailSource(
@@ -885,72 +848,70 @@ const cleaningSummerManualProductionPpeInventorySource = detailSource(
       detailSourceQuoteItem({
         label: 'Костюм хлопчатобумажный',
         resource_ids: [cleaningSummerManualPpeCottonSuitResourceId],
-        quantity: detailQuantity(12.5, 'шт.'),
+        quantity: detailQuantity(12.5, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Куртка на утепляющей прокладке',
         resource_ids: [cleaningSummerManualPpeInsulatedJacketResourceId],
-        quantity: detailQuantity(5, 'шт.'),
+        quantity: detailQuantity(5, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Жилет сигнальный',
         resource_ids: [cleaningSummerManualPpeSignalVestResourceId],
-        quantity: detailQuantity(12.5, 'шт.'),
+        quantity: detailQuantity(12.5, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Сапоги утепленные',
         resource_ids: [cleaningSummerManualPpeInsulatedBootsResourceId],
-        quantity: detailQuantity(5, 'шт.'),
+        quantity: detailQuantity(5, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Перчатки с полимерным покрытием',
         resource_ids: [cleaningSummerManualPpePolymerGlovesResourceId],
-        quantity: detailQuantity(50, 'шт.'),
+        quantity: detailQuantity(50, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Рукавицы утепленные',
         resource_ids: [cleaningSummerManualPpeInsulatedMittensResourceId],
-        quantity: detailQuantity(50, 'шт.'),
+        quantity: detailQuantity(50, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Сапоги резиновые',
         resource_ids: [cleaningSummerManualPpeRubberBootsResourceId],
-        quantity: detailQuantity(12.5, 'шт.'),
+        quantity: detailQuantity(12.5, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Мыло туалетное',
         resource_ids: [cleaningSummerManualPpeSoapResourceId],
-        quantity: detailQuantity(150, 'шт.'),
+        quantity: detailQuantity(150, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Метла полипропиленовая',
-        resource_ids: [
-          cleaningSummerManualInventoryPolypropyleneBroomResourceId,
-        ],
-        quantity: detailQuantity(62.5, 'шт.'),
+        resource_ids: [cleaningSummerManualInventoryPolypropyleneBroomResourceId],
+        quantity: detailQuantity(62.5, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Грабли',
         resource_ids: [cleaningSummerManualInventoryRakeResourceId],
-        quantity: detailQuantity(4.1, 'шт.'),
+        quantity: detailQuantity(4.1, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Лопата совковая',
         resource_ids: [cleaningSummerManualInventoryScoopShovelResourceId],
-        quantity: detailQuantity(6.3, 'шт.'),
+        quantity: detailQuantity(6.3, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Тачка садовая',
         resource_ids: [cleaningSummerManualInventoryWheelbarrowResourceId],
-        quantity: detailQuantity(6.3, 'шт.'),
+        quantity: detailQuantity(6.3, 'шт.')
       }),
       detailSourceQuoteItem({
         label: 'Ведро п\\э 12л',
         resource_ids: [cleaningSummerManualInventoryBucketResourceId],
-        quantity: detailQuantity(4.1, 'шт.'),
-      }),
-    ),
-  },
+        quantity: detailQuantity(4.1, 'шт.')
+      })
+    )
+  }
 );
 
 const cleaningSummerManualCurbCleaningSource = detailSource(
@@ -959,8 +920,8 @@ const cleaningSummerManualCurbCleaningSource = detailSource(
   'позиция 4.1 / очистка кромки вдоль бортового камня',
   {
     quote:
-      'Бордюрный камень. Очистка кромки проезжей части вдоль бортового камня от грязи и мусора вручную - ежедневно; Рабочий по уборке территории 165 664,15 109 540,22; страховые взносы 33 081,15; общеэксплуатационные расходы 76 678,16; прибыль 43 816,09; ИТОГО ПО ПОЗИЦИИ 263 115,62',
-  },
+      'Бордюрный камень. Очистка кромки проезжей части вдоль бортового камня от грязи и мусора вручную - ежедневно; Рабочий по уборке территории 165 664,15 109 540,22; страховые взносы 33 081,15; общеэксплуатационные расходы 76 678,16; прибыль 43 816,09; ИТОГО ПО ПОЗИЦИИ 263 115,62'
+  }
 );
 
 const cleaningSummerManualParkingTrashSource = detailSource(
@@ -969,8 +930,8 @@ const cleaningSummerManualParkingTrashSource = detailSource(
   'позиция 4.2 / уборка парковочных и иных площадок от случайного мусора',
   {
     quote:
-      'Парковочные/иные площадки. Уборка территории от случайного мусора - 1 раз в день; Рабочий по уборке территории 88 664,15 58 551,86',
-  },
+      'Парковочные/иные площадки. Уборка территории от случайного мусора - 1 раз в день; Рабочий по уборке территории 88 664,15 58 551,86'
+  }
 );
 
 const cleaningSummerManualParkingSweepingSource = detailSource(
@@ -979,8 +940,8 @@ const cleaningSummerManualParkingSweepingSource = detailSource(
   'позиция 4.3 / подметание парковочных и иных площадок',
   {
     quote:
-      'Парковочные/иные площадки. Подметание территории - 1 раз в неделю; Рабочий по уборке территории 13 664,15 8 747,24; ИТОГО ПО ПОЗИЦИИ 21 010,88',
-  },
+      'Парковочные/иные площадки. Подметание территории - 1 раз в неделю; Рабочий по уборке территории 13 664,15 8 747,24; ИТОГО ПО ПОЗИЦИИ 21 010,88'
+  }
 );
 
 const cleaningSummerManualContainerSiteSource = detailSource(
@@ -989,8 +950,8 @@ const cleaningSummerManualContainerSiteSource = detailSource(
   'позиция 4.4 / очистка контейнерной площадки в теплый период',
   {
     quote:
-      'Контейнерная площадка. Очистка контейнерной площадки в теплый период - 1 раз в день; Рабочий по уборке территории 134 664,15 89 014,13; ИТОГО ПО ПОЗИЦИИ 213 811,95',
-  },
+      'Контейнерная площадка. Очистка контейнерной площадки в теплый период - 1 раз в день; Рабочий по уборке территории 134 664,15 89 014,13; ИТОГО ПО ПОЗИЦИИ 213 811,95'
+  }
 );
 
 const cleaningSummerManualDitchCleaningSource = detailSource(
@@ -999,8 +960,8 @@ const cleaningSummerManualDitchCleaningSource = detailSource(
   'позиция 4.5 / очистка открытых ливневых траншей вдоль дорог',
   {
     quote:
-      'Очистка открытых ливневых траншей вдоль дорог вручную (15 раз в летний период); Рабочий по уборке территории 24338 664,15 16 163 799,83; ИТОГО ПО ПОЗИЦИИ 38 825 447,20',
-  },
+      'Очистка открытых ливневых траншей вдоль дорог вручную (15 раз в летний период); Рабочий по уборке территории 24338 664,15 16 163 799,83; ИТОГО ПО ПОЗИЦИИ 38 825 447,20'
+  }
 );
 
 const cleaningSummerManualPpeSource = detailSource(
@@ -1016,59 +977,59 @@ const cleaningSummerManualPpeSource = detailSource(
         resource_ids: [cleaningSummerManualPpeCottonSuitResourceId],
         quantity: detailQuantity(12.5, 'шт.'),
         unit_price_rub: detailMoney(5_500),
-        total_rub: detailMoney(68_750),
+        total_rub: detailMoney(68_750)
       }),
       detailSourceQuoteItem({
         label: 'Куртка на утепляющей прокладке',
         resource_ids: [cleaningSummerManualPpeInsulatedJacketResourceId],
         quantity: detailQuantity(5, 'шт.'),
         unit_price_rub: detailMoney(6_000),
-        total_rub: detailMoney(30_000),
+        total_rub: detailMoney(30_000)
       }),
       detailSourceQuoteItem({
         label: 'Жилет сигнальный',
         resource_ids: [cleaningSummerManualPpeSignalVestResourceId],
         quantity: detailQuantity(12.5, 'шт.'),
         unit_price_rub: detailMoney(1_200),
-        total_rub: detailMoney(15_000),
+        total_rub: detailMoney(15_000)
       }),
       detailSourceQuoteItem({
         label: 'Сапоги утепленные',
         resource_ids: [cleaningSummerManualPpeInsulatedBootsResourceId],
         quantity: detailQuantity(5, 'шт.'),
         unit_price_rub: detailMoney(3_500),
-        total_rub: detailMoney(17_500),
+        total_rub: detailMoney(17_500)
       }),
       detailSourceQuoteItem({
         label: 'Перчатки с полимерным покрытием',
         resource_ids: [cleaningSummerManualPpePolymerGlovesResourceId],
         quantity: detailQuantity(50, 'шт.'),
         unit_price_rub: detailMoney(350),
-        total_rub: detailMoney(17_500),
+        total_rub: detailMoney(17_500)
       }),
       detailSourceQuoteItem({
         label: 'Рукавицы утепленные',
         resource_ids: [cleaningSummerManualPpeInsulatedMittensResourceId],
         quantity: detailQuantity(50, 'шт.'),
         unit_price_rub: detailMoney(700),
-        total_rub: detailMoney(35_000),
+        total_rub: detailMoney(35_000)
       }),
       detailSourceQuoteItem({
         label: 'Сапоги резиновые',
         resource_ids: [cleaningSummerManualPpeRubberBootsResourceId],
         quantity: detailQuantity(12.5, 'шт.'),
         unit_price_rub: detailMoney(2_000),
-        total_rub: detailMoney(25_000),
+        total_rub: detailMoney(25_000)
       }),
       detailSourceQuoteItem({
         label: 'Мыло туалетное',
         resource_ids: [cleaningSummerManualPpeSoapResourceId],
         quantity: detailQuantity(150, 'шт.'),
         unit_price_rub: detailMoney(116),
-        total_rub: detailMoney(17_400),
-      }),
-    ),
-  },
+        total_rub: detailMoney(17_400)
+      })
+    )
+  }
 );
 
 const cleaningSummerManualInventorySource = detailSource(
@@ -1081,51 +1042,49 @@ const cleaningSummerManualInventorySource = detailSource(
     quote_items: detailSourceQuoteItems(
       detailSourceQuoteItem({
         label: 'Метла полипропиленовая',
-        resource_ids: [
-          cleaningSummerManualInventoryPolypropyleneBroomResourceId,
-        ],
+        resource_ids: [cleaningSummerManualInventoryPolypropyleneBroomResourceId],
         quantity: detailQuantity(62.5, 'шт.'),
         unit_price_rub: detailMoney(370),
-        total_rub: detailMoney(23_125),
+        total_rub: detailMoney(23_125)
       }),
       detailSourceQuoteItem({
         label: 'Грабли с черенком',
         resource_ids: [cleaningSummerManualInventoryRakeResourceId],
         quantity: detailQuantity(4.1, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(500),
-        total_rub: detailMoney(2_062.5),
+        total_rub: detailMoney(2_062.5)
       }),
       detailSourceQuoteItem({
         label: 'Лопата совковая',
         resource_ids: [cleaningSummerManualInventoryScoopShovelResourceId],
         quantity: detailQuantity(6.3, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(1_034),
-        total_rub: detailMoney(6_462.5),
+        total_rub: detailMoney(6_462.5)
       }),
       detailSourceQuoteItem({
         label: 'Тачка садовая',
         resource_ids: [cleaningSummerManualInventoryWheelbarrowResourceId],
         quantity: detailQuantity(6.3, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(2_500),
-        total_rub: detailMoney(15_625),
+        total_rub: detailMoney(15_625)
       }),
       detailSourceQuoteItem({
         label: 'Ведро п\\э 12л',
         resource_ids: [cleaningSummerManualInventoryBucketResourceId],
         quantity: detailQuantity(4.1, 'шт.', {
-          note: cleaningRoundedQuantityNote,
+          note: cleaningRoundedQuantityNote
         }),
         unit_price_rub: detailMoney(200),
-        total_rub: detailMoney(825),
-      }),
-    ),
-  },
+        total_rub: detailMoney(825)
+      })
+    )
+  }
 );
 
 const cleaningSummerManualTotalsSource = detailSource(
@@ -1134,8 +1093,8 @@ const cleaningSummerManualTotalsSource = detailSource(
   'итого по разделу летней ручной уборки территории',
   {
     quote:
-      'Прямые затраты 16 703 903,28; страховые взносы 4 961 755,30; общеэксплуатационные расходы 11 500 757,30; прибыль 6 571 861,32; Итого 39 738 277,20; Основная зарплата 16 429 653,29; Материальные затраты 274 250,00',
-  },
+      'Прямые затраты 16 703 903,28; страховые взносы 4 961 755,30; общеэксплуатационные расходы 11 500 757,30; прибыль 6 571 861,32; Итого 39 738 277,20; Основная зарплата 16 429 653,29; Материальные затраты 274 250,00'
+  }
 );
 
 const cleaningDocumentVatSource = detailSource(
@@ -1143,8 +1102,8 @@ const cleaningDocumentVatSource = detailSource(
   25,
   'итоги локального ресурсного сметного расчета по уборке территории',
   {
-    quote: 'ВСЕГО по документу 148 826 305,16; НДС 5% 7 441 315,26',
-  },
+    quote: 'ВСЕГО по документу 148 826 305,16; НДС 5% 7 441 315,26'
+  }
 );
 
 const cleaningResourceStatementLaborSource = detailSource(
@@ -1159,16 +1118,16 @@ const cleaningResourceStatementLaborSource = detailSource(
         label: 'Рабочий по уборке территории',
         quantity: detailQuantity(26_563.3, 'чел-час'),
         unit_price_rub: detailMoney(664.15),
-        total_rub: detailMoney(17_641_901.84),
+        total_rub: detailMoney(17_641_901.84)
       }),
       detailSourceQuoteItem({
         label: 'Машинист',
         quantity: detailQuantity(27_739.3, 'чел-час'),
         unit_price_rub: detailMoney(934.32),
-        total_rub: detailMoney(25_917_429.4),
-      }),
-    ),
-  },
+        total_rub: detailMoney(25_917_429.4)
+      })
+    )
+  }
 );
 
 const cleaningResourceStatementMachinesSource = detailSource(
@@ -1185,28 +1144,28 @@ const cleaningResourceStatementMachinesSource = detailSource(
           cleaningWinterMechanizedSnow2cmTractorResourceId,
           cleaningWinterMechanizedHeavySnowTractorResourceId,
           cleaningWinterMechanizedSandTractorResourceId,
-          cleaningSummerMechanizedWateringTractorResourceId,
+          cleaningSummerMechanizedWateringTractorResourceId
         ],
         quantity: detailQuantity(27_739.3, 'маш.-час'),
         unit_price_rub: detailMoney(1_476.02),
-        total_rub: detailMoney(40_943_848.99),
+        total_rub: detailMoney(40_943_848.99)
       }),
       detailSourceQuoteItem({
         label: 'Навесной разбрасыватель песка РПМ-01',
         resource_ids: [cleaningWinterMechanizedSandSpreaderResourceId],
         quantity: detailQuantity(210.4, 'маш.-час'),
         unit_price_rub: detailMoney(40.8),
-        total_rub: detailMoney(8_574.51),
+        total_rub: detailMoney(8_574.51)
       }),
       detailSourceQuoteItem({
         label: 'ОПМ-5,0 (бочка)',
         resource_ids: [cleaningSummerMechanizedWateringOpm5ResourceId],
         quantity: detailQuantity(22_389.2, 'маш.-час'),
         unit_price_rub: detailMoney(108.4),
-        total_rub: detailMoney(2_426_952.22),
-      }),
-    ),
-  },
+        total_rub: detailMoney(2_426_952.22)
+      })
+    )
+  }
 );
 
 const cleaningResourceStatementMaterialsSource = detailSource(
@@ -1221,76 +1180,73 @@ const cleaningResourceStatementMaterialsSource = detailSource(
         label: 'Костюм',
         quantity: detailQuantity(27.5, 'шт.'),
         unit_price_rub: detailMoney(5_500),
-        total_rub: detailMoney(151_250),
+        total_rub: detailMoney(151_250)
       }),
       detailSourceQuoteItem({
         label: 'Куртка',
         quantity: detailQuantity(11, 'шт.'),
         unit_price_rub: detailMoney(6_000),
-        total_rub: detailMoney(66_000),
+        total_rub: detailMoney(66_000)
       }),
       detailSourceQuoteItem({
         label: 'Жилет',
         quantity: detailQuantity(27.5, 'шт.'),
         unit_price_rub: detailMoney(1_200),
-        total_rub: detailMoney(33_000),
+        total_rub: detailMoney(33_000)
       }),
       detailSourceQuoteItem({
         label: 'Сапоги утепленные',
         quantity: detailQuantity(11, 'шт.'),
         unit_price_rub: detailMoney(3_500),
-        total_rub: detailMoney(38_500),
+        total_rub: detailMoney(38_500)
       }),
       detailSourceQuoteItem({
         label: 'Перчатки',
         quantity: detailQuantity(110, 'шт.'),
         unit_price_rub: detailMoney(350),
-        total_rub: detailMoney(38_500),
+        total_rub: detailMoney(38_500)
       }),
       detailSourceQuoteItem({
         label: 'Рукавицы',
         quantity: detailQuantity(110, 'шт.'),
         unit_price_rub: detailMoney(700),
-        total_rub: detailMoney(77_000),
+        total_rub: detailMoney(77_000)
       }),
       detailSourceQuoteItem({
         label: 'Сапоги резиновые',
         quantity: detailQuantity(27.5, 'шт.'),
         unit_price_rub: detailMoney(2_000),
-        total_rub: detailMoney(55_000),
+        total_rub: detailMoney(55_000)
       }),
       detailSourceQuoteItem({
         label: 'Мыло',
         quantity: detailQuantity(330, 'шт.'),
         unit_price_rub: detailMoney(116),
-        total_rub: detailMoney(38_280),
+        total_rub: detailMoney(38_280)
       }),
       detailSourceQuoteItem({
         label: 'Инвентарь',
         total_rub: detailMoney(52_194.2),
-        note: 'Это сводная строка legacy quote для инвентаря; в PDF инвентарь раскрыт строками 9-15, поэтому единой единицы, количества и цены нет.',
+        note: 'Это сводная строка legacy quote для инвентаря; в PDF инвентарь раскрыт строками 9-15, поэтому единой единицы, количества и цены нет.'
       }),
       detailSourceQuoteItem({
         label: 'Песок для посыпки дорог',
-        resource_ids: [
-          cleaningWinterMechanizedSandResourceId,
-          cleaningWinterManualSandResourceId,
-        ],
+        resource_ids: [cleaningWinterMechanizedSandResourceId, cleaningWinterManualSandResourceId],
         quantity: detailQuantity(76.3, 'кг.', {
-          note: cleaningResourceStatementSandUnitNeedsCheckReason,
+          note: cleaningResourceStatementSandUnitNeedsCheckReason
         }),
         unit_price_rub: detailMoney(1_800),
-        total_rub: detailMoney(137_329.56),
+        total_rub: detailMoney(137_329.56)
       }),
       detailSourceQuoteItem({
         label: 'Вода',
         resource_ids: [cleaningSummerMechanizedWaterResourceId],
         quantity: detailQuantity(9_568, 'м³'),
         unit_price_rub: detailMoney(13.56),
-        total_rub: detailMoney(129_742.08),
-      }),
-    ),
-  },
+        total_rub: detailMoney(129_742.08)
+      })
+    )
+  }
 );
 
 const cleaningCalculationSource = detailSource(
@@ -1299,8 +1255,8 @@ const cleaningCalculationSource = detailSource(
   'калькуляция себестоимости услуг по уборке территории',
   {
     quote:
-      'ИТОГО расходов 131 402 572; налог по УСН 2 613 560; прибыль 17 423 732; Доходов - всего 151 439 865',
-  },
+      'ИТОГО расходов 131 402 572; налог по УСН 2 613 560; прибыль 17 423 732; Доходов - всего 151 439 865'
+  }
 );
 
 const cleaningResourceStatementRoundingNote =
@@ -1312,34 +1268,34 @@ const cleaningDerivedVatNeedsCheckReason =
 const cleaningDerivedVatNeedsCheckRefs = detailSourceRefs(
   cleaningWinterMechanizedTotalsSource,
   cleaningDocumentVatSource,
-  cleaningCalculationSource,
+  cleaningCalculationSource
 );
 const cleaningWinterManualDerivedVatNeedsCheckRefs = detailSourceRefs(
   cleaningWinterManualTotalsSource,
   cleaningDocumentVatSource,
-  cleaningCalculationSource,
+  cleaningCalculationSource
 );
 const cleaningSummerMechanizedDerivedVatNeedsCheckRefs = detailSourceRefs(
   cleaningSummerMechanizedTotalsSource,
   cleaningDocumentVatSource,
-  cleaningCalculationSource,
+  cleaningCalculationSource
 );
 const cleaningSummerManualDerivedVatNeedsCheckRefs = detailSourceRefs(
   cleaningSummerManualTotalsSource,
   cleaningDocumentVatSource,
-  cleaningCalculationSource,
+  cleaningCalculationSource
 );
 
 const cleaningWinterMechanizedMachinistResourceIds = [
   cleaningWinterMechanizedSnow2cmMachinistResourceId,
   cleaningWinterMechanizedHeavySnowMachinistResourceId,
-  cleaningWinterMechanizedSandMachinistResourceId,
+  cleaningWinterMechanizedSandMachinistResourceId
 ] as const;
 const cleaningWinterMechanizedMachineResourceIds = [
   cleaningWinterMechanizedSnow2cmTractorResourceId,
   cleaningWinterMechanizedHeavySnowTractorResourceId,
   cleaningWinterMechanizedSandTractorResourceId,
-  cleaningWinterMechanizedSandSpreaderResourceId,
+  cleaningWinterMechanizedSandSpreaderResourceId
 ] as const;
 const cleaningWinterMechanizedMaterialResourceIds = [
   cleaningWinterMechanizedSandResourceId,
@@ -1350,7 +1306,7 @@ const cleaningWinterMechanizedMaterialResourceIds = [
   cleaningWinterMechanizedPpePolymerGlovesResourceId,
   cleaningWinterMechanizedPpeInsulatedMittensResourceId,
   cleaningWinterMechanizedPpeRubberBootsResourceId,
-  cleaningWinterMechanizedPpeSoapResourceId,
+  cleaningWinterMechanizedPpeSoapResourceId
 ] as const;
 const cleaningWinterMechanizedGrossResourceIds = [
   ...cleaningWinterMechanizedMachinistResourceIds,
@@ -1360,14 +1316,14 @@ const cleaningWinterMechanizedGrossResourceIds = [
   cleaningWinterMechanizedOverheadResourceId,
   cleaningWinterMechanizedProfitResourceId,
   cleaningWinterMechanizedUsnResourceId,
-  cleaningWinterMechanizedVatResourceId,
+  cleaningWinterMechanizedVatResourceId
 ] as const;
 
 const cleaningWinterManualLaborResourceIds = [
   cleaningWinterManualSnowSweepingWorkerResourceId,
   cleaningWinterManualAntiIceWorkerResourceId,
   cleaningWinterManualRoadSnowIceWorkerResourceId,
-  cleaningWinterManualContainerSiteWorkerResourceId,
+  cleaningWinterManualContainerSiteWorkerResourceId
 ] as const;
 const cleaningWinterManualPpeResourceIds = [
   cleaningWinterManualPpeCottonSuitResourceId,
@@ -1377,7 +1333,7 @@ const cleaningWinterManualPpeResourceIds = [
   cleaningWinterManualPpePolymerGlovesResourceId,
   cleaningWinterManualPpeInsulatedMittensResourceId,
   cleaningWinterManualPpeRubberBootsResourceId,
-  cleaningWinterManualPpeSoapResourceId,
+  cleaningWinterManualPpeSoapResourceId
 ] as const;
 const cleaningWinterManualInventoryResourceIds = [
   cleaningWinterManualInventoryIceAxeResourceId,
@@ -1386,12 +1342,12 @@ const cleaningWinterManualInventoryResourceIds = [
   cleaningWinterManualInventorySnowShovelResourceId,
   cleaningWinterManualInventoryScoopShovelResourceId,
   cleaningWinterManualInventoryWheelbarrowResourceId,
-  cleaningWinterManualInventoryBucketResourceId,
+  cleaningWinterManualInventoryBucketResourceId
 ] as const;
 const cleaningWinterManualMaterialResourceIds = [
   cleaningWinterManualSandResourceId,
   ...cleaningWinterManualPpeResourceIds,
-  ...cleaningWinterManualInventoryResourceIds,
+  ...cleaningWinterManualInventoryResourceIds
 ] as const;
 const cleaningWinterManualGrossResourceIds = [
   ...cleaningWinterManualLaborResourceIds,
@@ -1400,15 +1356,15 @@ const cleaningWinterManualGrossResourceIds = [
   cleaningWinterManualOverheadResourceId,
   cleaningWinterManualProfitResourceId,
   cleaningWinterManualUsnResourceId,
-  cleaningWinterManualVatResourceId,
+  cleaningWinterManualVatResourceId
 ] as const;
 
 const cleaningSummerMechanizedMachinistResourceIds = [
-  cleaningSummerMechanizedWateringMachinistResourceId,
+  cleaningSummerMechanizedWateringMachinistResourceId
 ] as const;
 const cleaningSummerMechanizedMachineResourceIds = [
   cleaningSummerMechanizedWateringTractorResourceId,
-  cleaningSummerMechanizedWateringOpm5ResourceId,
+  cleaningSummerMechanizedWateringOpm5ResourceId
 ] as const;
 const cleaningSummerMechanizedPpeResourceIds = [
   cleaningSummerMechanizedPpeCottonSuitResourceId,
@@ -1418,11 +1374,11 @@ const cleaningSummerMechanizedPpeResourceIds = [
   cleaningSummerMechanizedPpePolymerGlovesResourceId,
   cleaningSummerMechanizedPpeInsulatedMittensResourceId,
   cleaningSummerMechanizedPpeRubberBootsResourceId,
-  cleaningSummerMechanizedPpeSoapResourceId,
+  cleaningSummerMechanizedPpeSoapResourceId
 ] as const;
 const cleaningSummerMechanizedMaterialResourceIds = [
   cleaningSummerMechanizedWaterResourceId,
-  ...cleaningSummerMechanizedPpeResourceIds,
+  ...cleaningSummerMechanizedPpeResourceIds
 ] as const;
 const cleaningSummerMechanizedGrossResourceIds = [
   ...cleaningSummerMechanizedMachinistResourceIds,
@@ -1432,7 +1388,7 @@ const cleaningSummerMechanizedGrossResourceIds = [
   cleaningSummerMechanizedOverheadResourceId,
   cleaningSummerMechanizedProfitResourceId,
   cleaningSummerMechanizedUsnResourceId,
-  cleaningSummerMechanizedVatResourceId,
+  cleaningSummerMechanizedVatResourceId
 ] as const;
 
 const cleaningSummerManualLaborResourceIds = [
@@ -1440,7 +1396,7 @@ const cleaningSummerManualLaborResourceIds = [
   cleaningSummerManualParkingTrashWorkerResourceId,
   cleaningSummerManualParkingSweepingWorkerResourceId,
   cleaningSummerManualContainerSiteWorkerResourceId,
-  cleaningSummerManualDitchCleaningWorkerResourceId,
+  cleaningSummerManualDitchCleaningWorkerResourceId
 ] as const;
 const cleaningSummerManualPpeResourceIds = [
   cleaningSummerManualPpeCottonSuitResourceId,
@@ -1450,18 +1406,18 @@ const cleaningSummerManualPpeResourceIds = [
   cleaningSummerManualPpePolymerGlovesResourceId,
   cleaningSummerManualPpeInsulatedMittensResourceId,
   cleaningSummerManualPpeRubberBootsResourceId,
-  cleaningSummerManualPpeSoapResourceId,
+  cleaningSummerManualPpeSoapResourceId
 ] as const;
 const cleaningSummerManualInventoryResourceIds = [
   cleaningSummerManualInventoryPolypropyleneBroomResourceId,
   cleaningSummerManualInventoryRakeResourceId,
   cleaningSummerManualInventoryScoopShovelResourceId,
   cleaningSummerManualInventoryWheelbarrowResourceId,
-  cleaningSummerManualInventoryBucketResourceId,
+  cleaningSummerManualInventoryBucketResourceId
 ] as const;
 const cleaningSummerManualMaterialResourceIds = [
   ...cleaningSummerManualPpeResourceIds,
-  ...cleaningSummerManualInventoryResourceIds,
+  ...cleaningSummerManualInventoryResourceIds
 ] as const;
 const cleaningSummerManualGrossResourceIds = [
   ...cleaningSummerManualLaborResourceIds,
@@ -1470,26 +1426,26 @@ const cleaningSummerManualGrossResourceIds = [
   cleaningSummerManualOverheadResourceId,
   cleaningSummerManualProfitResourceId,
   cleaningSummerManualUsnResourceId,
-  cleaningSummerManualVatResourceId,
+  cleaningSummerManualVatResourceId
 ] as const;
 
 const cleaningResourceStatementPrimarySalaryResourceIds = [
   ...cleaningWinterManualLaborResourceIds,
-  ...cleaningSummerManualLaborResourceIds,
+  ...cleaningSummerManualLaborResourceIds
 ] as const;
 const cleaningResourceStatementMachinistSalaryResourceIds = [
   ...cleaningWinterMechanizedMachinistResourceIds,
-  ...cleaningSummerMechanizedMachinistResourceIds,
+  ...cleaningSummerMechanizedMachinistResourceIds
 ] as const;
 const cleaningResourceStatementMachineResourceIds = [
   ...cleaningWinterMechanizedMachineResourceIds,
-  ...cleaningSummerMechanizedMachineResourceIds,
+  ...cleaningSummerMechanizedMachineResourceIds
 ] as const;
 const cleaningResourceStatementMaterialResourceIds = [
   ...cleaningWinterMechanizedMaterialResourceIds,
   ...cleaningWinterManualMaterialResourceIds,
   ...cleaningSummerMechanizedMaterialResourceIds,
-  ...cleaningSummerManualMaterialResourceIds,
+  ...cleaningSummerManualMaterialResourceIds
 ] as const;
 
 export const cleaningWorkItems = [
@@ -1500,32 +1456,29 @@ export const cleaningWorkItems = [
     service_ids: [
       'winter-road-snow-ice-clearing',
       'winter-heavy-snowfall-road-clearing',
-      'winter-anti-ice-spreading',
+      'winter-anti-ice-spreading'
     ],
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSnowSource,
       cleaningWinterMechanizedProductionSandSource,
-      cleaningWinterMechanizedTotalsSource,
+      cleaningWinterMechanizedTotalsSource
     ),
     note: 'Внутри агрегированной строки сохранены позиции 1.1-1.4: обычное подметание снега, подметание при обильном снегопаде, посыпка песком и СИЗ.',
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailWorkItem({
     id: 'cleaning-winter-manual',
     title: 'Зимняя ручная уборка территории',
     estimate_row_id: 'cleaning-winter-manual',
-    service_ids: [
-      'winter-paths-playgrounds-clearing',
-      'winter-anti-ice-spreading',
-    ],
+    service_ids: ['winter-paths-playgrounds-clearing', 'winter-anti-ice-spreading'],
     source_refs: detailSourceRefs(
       cleaningWinterManualProductionSnowSource,
       cleaningWinterManualProductionWorksSource,
       cleaningWinterManualProductionInventorySource,
-      cleaningWinterManualTotalsSource,
+      cleaningWinterManualTotalsSource
     ),
     note: 'Внутри агрегированной строки сохранены позиции 2.1-2.7: ручное подметание снега, подсыпка песком, очистка участков дорог от снега и наледи, контейнерная площадка, СИЗ и инвентарь. В PDF нет позиции 2.6.',
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailWorkItem({
     id: 'cleaning-summer-mechanized',
@@ -1536,28 +1489,25 @@ export const cleaningWorkItems = [
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedProductionWateringSource,
       cleaningSummerMechanizedProductionPpeSource,
-      cleaningSummerMechanizedTotalsSource,
+      cleaningSummerMechanizedTotalsSource
     ),
     note: 'Внутри агрегированной строки сохранены позиции 3.1-3.2: полив водой (обеспыливание) 3 раза в день без дождя, вода, поливомоечная техника и СИЗ. Производственная программа показывает кратность 234 именно для полива. В агрегированной строке estimate-2026 частота 153 раз/год относится к летней уборке территории в целом; почему расчетный полив чаще и почему эти частоты отличаются, в cleaning.pdf не поясняется.',
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailWorkItem({
     id: 'cleaning-summer-manual',
     title: 'Летняя ручная уборка территории',
     estimate_row_id: 'cleaning-summer-manual',
-    service_ids: [
-      'summer-road-manual-cleaning',
-      'summer-road-gutters-cleaning',
-    ],
+    service_ids: ['summer-road-manual-cleaning', 'summer-road-gutters-cleaning'],
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionWorksSource,
       cleaningSummerManualProductionDitchSource,
       cleaningSummerManualProductionPpeInventorySource,
-      cleaningSummerManualTotalsSource,
+      cleaningSummerManualTotalsSource
     ),
     note: 'Внутри агрегированной строки сохранены позиции 4.1-4.7: очистка кромки вдоль бортового камня 153 раза, уборка случайного мусора на парковочных и иных площадках 153 раза, подметание парковочных и иных площадок 22 раза, очистка контейнерной площадки 153 раза, очистка открытых ливневых траншей 15 раз в летний период, СИЗ и инвентарь.',
-    ...detailStatus('verified'),
-  }),
+    ...detailStatus('verified')
+  })
 ] satisfies readonly EstimateDetailWorkItem[];
 
 export const cleaningResources = [
@@ -1569,16 +1519,16 @@ export const cleaningResources = [
     title: 'Машинист: подметание свежевыпавшего снега толщиной 2 см',
     cost_bucket: 'machinist_salary',
     quantity: detailQuantity(2_160, 'чел-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(934.32),
     total_rub: detailMoney(2_018_293.38),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSnowSource,
       cleaningStaffSource,
-      cleaningWinterMechanizedSnow2cmSource,
+      cleaningWinterMechanizedSnow2cmSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedHeavySnowMachinistResourceId,
@@ -1588,16 +1538,16 @@ export const cleaningResources = [
     title: 'Машинист: подметание снега толщиной свыше 2 см',
     cost_bucket: 'machinist_salary',
     quantity: detailQuantity(2_980, 'чел-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(934.32),
     total_rub: detailMoney(2_783_931.69),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSnowSource,
       cleaningStaffSource,
-      cleaningWinterMechanizedHeavySnowSource,
+      cleaningWinterMechanizedHeavySnowSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedSandMachinistResourceId,
@@ -1607,16 +1557,16 @@ export const cleaningResources = [
     title: 'Машинист: посыпка дорог песком',
     cost_bucket: 'machinist_salary',
     quantity: detailQuantity(210, 'чел-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(934.32),
     total_rub: detailMoney(196_544.88),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSandSource,
       cleaningStaffSource,
-      cleaningWinterMechanizedSandSource,
+      cleaningWinterMechanizedSandSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedSnow2cmTractorResourceId,
@@ -1626,34 +1576,33 @@ export const cleaningResources = [
     title: 'Трактор МТЗ 80 с навесным оборудованием: подметание снега 2 см',
     cost_bucket: 'machines',
     quantity: detailQuantity(2_160, 'маш-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(1_476.02),
     total_rub: detailMoney(3_188_460.49),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSnowSource,
-      cleaningWinterMechanizedSnow2cmSource,
+      cleaningWinterMechanizedSnow2cmSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedHeavySnowTractorResourceId,
     work_item_id: 'cleaning-winter-mechanized',
     estimate_row_id: 'cleaning-winter-mechanized',
     kind: 'machine',
-    title:
-      'Трактор МТЗ 80 с навесным оборудованием: подметание снега свыше 2 см',
+    title: 'Трактор МТЗ 80 с навесным оборудованием: подметание снега свыше 2 см',
     cost_bucket: 'machines',
     quantity: detailQuantity(2_980, 'маш-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(1_476.02),
     total_rub: detailMoney(4_398_000.94),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSnowSource,
-      cleaningWinterMechanizedHeavySnowSource,
+      cleaningWinterMechanizedHeavySnowSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedSandTractorResourceId,
@@ -1663,15 +1612,15 @@ export const cleaningResources = [
     title: 'Трактор МТЗ 80 с навесным оборудованием: посыпка дорог песком',
     cost_bucket: 'machines',
     quantity: detailQuantity(210, 'маш-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(1_476.02),
     total_rub: detailMoney(310_497.76),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSandSource,
-      cleaningWinterMechanizedSandSource,
+      cleaningWinterMechanizedSandSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedSandSpreaderResourceId,
@@ -1681,15 +1630,15 @@ export const cleaningResources = [
     title: 'Навесной разбрасыватель песка РПМ-01',
     cost_bucket: 'machines',
     quantity: detailQuantity(210, 'маш-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(40.76),
     total_rub: detailMoney(8_574.51),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSandSource,
-      cleaningWinterMechanizedSandSource,
+      cleaningWinterMechanizedSandSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedSandResourceId,
@@ -1699,15 +1648,15 @@ export const cleaningResources = [
     title: 'Песок для посыпки дорог',
     cost_bucket: 'materials',
     quantity: detailQuantity(73.6, 'т.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(1_800),
     total_rub: detailMoney(132_480.36),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSandSource,
-      cleaningWinterMechanizedSandSource,
+      cleaningWinterMechanizedSandSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedPpeCottonSuitResourceId,
@@ -1721,9 +1670,9 @@ export const cleaningResources = [
     total_rub: detailMoney(14_850),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSandSource,
-      cleaningWinterMechanizedPpeSource,
+      cleaningWinterMechanizedPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedPpeInsulatedJacketResourceId,
@@ -1733,15 +1682,15 @@ export const cleaningResources = [
     title: 'Куртка на утепляющей прокладке',
     cost_bucket: 'materials',
     quantity: detailQuantity(1.1, 'шт.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(6_000),
     total_rub: detailMoney(6_480),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSandSource,
-      cleaningWinterMechanizedPpeSource,
+      cleaningWinterMechanizedPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedPpeSignalVestResourceId,
@@ -1755,9 +1704,9 @@ export const cleaningResources = [
     total_rub: detailMoney(3_240),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSandSource,
-      cleaningWinterMechanizedPpeSource,
+      cleaningWinterMechanizedPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedPpeInsulatedBootsResourceId,
@@ -1767,15 +1716,15 @@ export const cleaningResources = [
     title: 'Сапоги утепленные',
     cost_bucket: 'materials',
     quantity: detailQuantity(1.1, 'шт.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(3_500),
     total_rub: detailMoney(3_780),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSandSource,
-      cleaningWinterMechanizedPpeSource,
+      cleaningWinterMechanizedPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedPpePolymerGlovesResourceId,
@@ -1789,9 +1738,9 @@ export const cleaningResources = [
     total_rub: detailMoney(3_780),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSandSource,
-      cleaningWinterMechanizedPpeSource,
+      cleaningWinterMechanizedPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedPpeInsulatedMittensResourceId,
@@ -1805,9 +1754,9 @@ export const cleaningResources = [
     total_rub: detailMoney(7_560),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSandSource,
-      cleaningWinterMechanizedPpeSource,
+      cleaningWinterMechanizedPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedPpeRubberBootsResourceId,
@@ -1821,9 +1770,9 @@ export const cleaningResources = [
     total_rub: detailMoney(5_400),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSandSource,
-      cleaningWinterMechanizedPpeSource,
+      cleaningWinterMechanizedPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedPpeSoapResourceId,
@@ -1837,9 +1786,9 @@ export const cleaningResources = [
     total_rub: detailMoney(3_758.4),
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedProductionSandSource,
-      cleaningWinterMechanizedPpeSource,
+      cleaningWinterMechanizedPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedInsuranceResourceId,
@@ -1850,7 +1799,7 @@ export const cleaningResources = [
     cost_bucket: 'insurance',
     total_rub: detailMoney(1_509_628.52),
     source_refs: detailSourceRefs(cleaningWinterMechanizedTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedOverheadResourceId,
@@ -1861,7 +1810,7 @@ export const cleaningResources = [
     cost_bucket: 'overhead',
     total_rub: detailMoney(3_499_138.97),
     source_refs: detailSourceRefs(cleaningWinterMechanizedTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedProfitResourceId,
@@ -1872,7 +1821,7 @@ export const cleaningResources = [
     cost_bucket: 'profit',
     total_rub: detailMoney(1_999_507.98),
     source_refs: detailSourceRefs(cleaningWinterMechanizedTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterMechanizedUsnResourceId,
@@ -1882,14 +1831,11 @@ export const cleaningResources = [
     title: 'Расчетная доля УСН по зимней механизированной уборке',
     cost_bucket: 'usn',
     total_rub: detailMoney(352_872.12, {
-      note: 'выведено из строки estimate-2026 и итога раздела cleaning.pdf',
+      note: 'выведено из строки estimate-2026 и итога раздела cleaning.pdf'
     }),
-    source_refs: detailSourceRefs(
-      cleaningWinterMechanizedTotalsSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningWinterMechanizedTotalsSource, cleaningCalculationSource),
     note: 'В cleaning.pdf УСН показан только общей суммой по услуге, без распределения по строкам.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: cleaningWinterMechanizedVatResourceId,
@@ -1899,57 +1845,49 @@ export const cleaningResources = [
     title: 'Расчетный НДС 5% по зимней механизированной уборке',
     cost_bucket: 'vat',
     total_rub: detailMoney(1_022_339, {
-      note: 'выведено из строки estimate-2026',
+      note: 'выведено из строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      cleaningDocumentVatSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningDocumentVatSource, cleaningCalculationSource),
     note: cleaningVatNeedsCheckNote,
-    ...detailNeedsCheckStatus(
-      cleaningDerivedVatNeedsCheckReason,
-      cleaningDerivedVatNeedsCheckRefs,
-    ),
+    ...detailNeedsCheckStatus(cleaningDerivedVatNeedsCheckReason, cleaningDerivedVatNeedsCheckRefs)
   }),
   detailResource({
     id: cleaningWinterManualSnowSweepingWorkerResourceId,
     work_item_id: 'cleaning-winter-manual',
     estimate_row_id: 'cleaning-winter-manual',
     kind: 'labor',
-    title:
-      'Рабочий по уборке территории: подметание свежевыпавшего снега вручную',
+    title: 'Рабочий по уборке территории: подметание свежевыпавшего снега вручную',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(73.3, 'чел-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(48_706.24),
     source_refs: detailSourceRefs(
       cleaningWinterManualProductionSnowSource,
       cleaningStaffSource,
-      cleaningWinterManualSnowSweepingSource,
+      cleaningWinterManualSnowSweepingSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualAntiIceWorkerResourceId,
     work_item_id: 'cleaning-winter-manual',
     estimate_row_id: 'cleaning-winter-manual',
     kind: 'labor',
-    title:
-      'Рабочий по уборке территории: подсыпка противогололедным материалом',
+    title: 'Рабочий по уборке территории: подсыпка противогололедным материалом',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(29.2, 'чел-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(19_383.1),
     source_refs: detailSourceRefs(
       cleaningWinterManualProductionWorksSource,
       cleaningStaffSource,
-      cleaningWinterManualAntiIceSource,
+      cleaningWinterManualAntiIceSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualRoadSnowIceWorkerResourceId,
@@ -1960,36 +1898,35 @@ export const cleaningResources = [
       'Рабочий по уборке территории: очистка участков от снега и наледи при механизированной уборке',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(1_264.8, 'чел-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(840_033.57),
     source_refs: detailSourceRefs(
       cleaningWinterManualProductionWorksSource,
       cleaningStaffSource,
-      cleaningWinterManualRoadSnowIceSource,
+      cleaningWinterManualRoadSnowIceSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualContainerSiteWorkerResourceId,
     work_item_id: 'cleaning-winter-manual',
     estimate_row_id: 'cleaning-winter-manual',
     kind: 'labor',
-    title:
-      'Рабочий по уборке территории: очистка контейнерной площадки в холодный период',
+    title: 'Рабочий по уборке территории: очистка контейнерной площадки в холодный период',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(457.9, 'чел-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(304_125.64),
     source_refs: detailSourceRefs(
       cleaningWinterManualProductionWorksSource,
       cleaningStaffSource,
-      cleaningWinterManualContainerSiteSource,
+      cleaningWinterManualContainerSiteSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualSandResourceId,
@@ -1999,15 +1936,15 @@ export const cleaningResources = [
     title: 'Песок для посыпки дорог',
     cost_bucket: 'materials',
     quantity: detailQuantity(2.7, 'т.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(1_800),
     total_rub: detailMoney(4_849.2),
     source_refs: detailSourceRefs(
       cleaningWinterManualProductionWorksSource,
-      cleaningWinterManualAntiIceSource,
+      cleaningWinterManualAntiIceSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualPpeCottonSuitResourceId,
@@ -2020,7 +1957,7 @@ export const cleaningResources = [
     unit_price_rub: detailMoney(5_500),
     total_rub: detailMoney(4_950),
     source_refs: detailSourceRefs(cleaningWinterManualPpeSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualPpeInsulatedJacketResourceId,
@@ -2030,12 +1967,12 @@ export const cleaningResources = [
     title: 'Куртка на утепляющей прокладке',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.4, 'шт.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(6_000),
     total_rub: detailMoney(2_160),
     source_refs: detailSourceRefs(cleaningWinterManualPpeSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualPpeSignalVestResourceId,
@@ -2048,7 +1985,7 @@ export const cleaningResources = [
     unit_price_rub: detailMoney(1_200),
     total_rub: detailMoney(1_080),
     source_refs: detailSourceRefs(cleaningWinterManualPpeSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualPpeInsulatedBootsResourceId,
@@ -2058,12 +1995,12 @@ export const cleaningResources = [
     title: 'Сапоги утепленные',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.4, 'шт.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(3_500),
     total_rub: detailMoney(1_260),
     source_refs: detailSourceRefs(cleaningWinterManualPpeSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualPpePolymerGlovesResourceId,
@@ -2076,7 +2013,7 @@ export const cleaningResources = [
     unit_price_rub: detailMoney(350),
     total_rub: detailMoney(1_260),
     source_refs: detailSourceRefs(cleaningWinterManualPpeSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualPpeInsulatedMittensResourceId,
@@ -2089,7 +2026,7 @@ export const cleaningResources = [
     unit_price_rub: detailMoney(700),
     total_rub: detailMoney(2_520),
     source_refs: detailSourceRefs(cleaningWinterManualPpeSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualPpeRubberBootsResourceId,
@@ -2103,9 +2040,9 @@ export const cleaningResources = [
     total_rub: detailMoney(1_800),
     source_refs: detailSourceRefs(
       cleaningWinterManualProductionInventorySource,
-      cleaningWinterManualPpeSource,
+      cleaningWinterManualPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualPpeSoapResourceId,
@@ -2119,9 +2056,9 @@ export const cleaningResources = [
     total_rub: detailMoney(1_252.8),
     source_refs: detailSourceRefs(
       cleaningWinterManualProductionInventorySource,
-      cleaningWinterManualPpeSource,
+      cleaningWinterManualPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualInventoryIceAxeResourceId,
@@ -2131,15 +2068,15 @@ export const cleaningResources = [
     title: 'Ледоруб-топор с металлической ручкой',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.2, 'шт.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(700),
     total_rub: detailMoney(126),
     source_refs: detailSourceRefs(
       cleaningWinterManualProductionInventorySource,
-      cleaningWinterManualInventorySource,
+      cleaningWinterManualInventorySource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualInventoryPolypropyleneBroomResourceId,
@@ -2153,9 +2090,9 @@ export const cleaningResources = [
     total_rub: detailMoney(1_665),
     source_refs: detailSourceRefs(
       cleaningWinterManualProductionInventorySource,
-      cleaningWinterManualInventorySource,
+      cleaningWinterManualInventorySource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualInventoryRakeResourceId,
@@ -2165,15 +2102,15 @@ export const cleaningResources = [
     title: 'Грабли с черенком',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.3, 'шт.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(500),
     total_rub: detailMoney(148.5),
     source_refs: detailSourceRefs(
       cleaningWinterManualProductionInventorySource,
-      cleaningWinterManualInventorySource,
+      cleaningWinterManualInventorySource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualInventorySnowShovelResourceId,
@@ -2183,15 +2120,15 @@ export const cleaningResources = [
     title: 'Лопата снегоуборочная оцинкованная',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.5, 'шт.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(2_500),
     total_rub: detailMoney(1_125),
     source_refs: detailSourceRefs(
       cleaningWinterManualProductionInventorySource,
-      cleaningWinterManualInventorySource,
+      cleaningWinterManualInventorySource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualInventoryScoopShovelResourceId,
@@ -2201,15 +2138,15 @@ export const cleaningResources = [
     title: 'Лопата совковая',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.5, 'шт.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(1_034),
     total_rub: detailMoney(465.3),
     source_refs: detailSourceRefs(
       cleaningWinterManualProductionInventorySource,
-      cleaningWinterManualInventorySource,
+      cleaningWinterManualInventorySource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualInventoryWheelbarrowResourceId,
@@ -2219,15 +2156,15 @@ export const cleaningResources = [
     title: 'Тачка садовая',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.5, 'шт.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(2_500),
     total_rub: detailMoney(1_125),
     source_refs: detailSourceRefs(
       cleaningWinterManualProductionInventorySource,
-      cleaningWinterManualInventorySource,
+      cleaningWinterManualInventorySource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualInventoryBucketResourceId,
@@ -2237,15 +2174,15 @@ export const cleaningResources = [
     title: 'Ведро п\\э 12 л',
     cost_bucket: 'materials',
     quantity: detailQuantity(0.3, 'шт.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(200),
     total_rub: detailMoney(59.4),
     source_refs: detailSourceRefs(
       cleaningWinterManualProductionInventorySource,
-      cleaningWinterManualInventorySource,
+      cleaningWinterManualInventorySource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualInsuranceResourceId,
@@ -2256,7 +2193,7 @@ export const cleaningResources = [
     cost_bucket: 'insurance',
     total_rub: detailMoney(366_099.05),
     source_refs: detailSourceRefs(cleaningWinterManualTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualOverheadResourceId,
@@ -2267,7 +2204,7 @@ export const cleaningResources = [
     cost_bucket: 'overhead',
     total_rub: detailMoney(848_573.98),
     source_refs: detailSourceRefs(cleaningWinterManualTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualProfitResourceId,
@@ -2278,7 +2215,7 @@ export const cleaningResources = [
     cost_bucket: 'profit',
     total_rub: detailMoney(484_899.42),
     source_refs: detailSourceRefs(cleaningWinterManualTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningWinterManualUsnResourceId,
@@ -2288,14 +2225,11 @@ export const cleaningResources = [
     title: 'Расчетная доля УСН по зимней ручной уборке',
     cost_bucket: 'usn',
     total_rub: detailMoney(51_588.99, {
-      note: 'выведено из строки estimate-2026 и итога раздела cleaning.pdf',
+      note: 'выведено из строки estimate-2026 и итога раздела cleaning.pdf'
     }),
-    source_refs: detailSourceRefs(
-      cleaningWinterManualTotalsSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningWinterManualTotalsSource, cleaningCalculationSource),
     note: 'В cleaning.pdf УСН показан только общей суммой по услуге, без распределения по строкам.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: cleaningWinterManualVatResourceId,
@@ -2305,17 +2239,14 @@ export const cleaningResources = [
     title: 'Расчетный НДС 5% по зимней ручной уборке',
     cost_bucket: 'vat',
     total_rub: detailMoney(149_462.81, {
-      note: 'выведено из строки estimate-2026',
+      note: 'выведено из строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      cleaningDocumentVatSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningDocumentVatSource, cleaningCalculationSource),
     note: cleaningVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       cleaningDerivedVatNeedsCheckReason,
-      cleaningWinterManualDerivedVatNeedsCheckRefs,
-    ),
+      cleaningWinterManualDerivedVatNeedsCheckRefs
+    )
   }),
   detailResource({
     id: cleaningSummerMechanizedWateringMachinistResourceId,
@@ -2330,9 +2261,9 @@ export const cleaningResources = [
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedProductionWateringSource,
       cleaningStaffSource,
-      cleaningSummerMechanizedWateringSource,
+      cleaningSummerMechanizedWateringSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerMechanizedWateringTractorResourceId,
@@ -2346,9 +2277,9 @@ export const cleaningResources = [
     total_rub: detailMoney(33_046_889.8),
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedProductionWateringSource,
-      cleaningSummerMechanizedWateringSource,
+      cleaningSummerMechanizedWateringSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerMechanizedWateringOpm5ResourceId,
@@ -2362,9 +2293,9 @@ export const cleaningResources = [
     total_rub: detailMoney(2_426_952.22),
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedProductionWateringSource,
-      cleaningSummerMechanizedWateringSource,
+      cleaningSummerMechanizedWateringSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerMechanizedWaterResourceId,
@@ -2378,9 +2309,9 @@ export const cleaningResources = [
     total_rub: detailMoney(129_742.08),
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedProductionWateringSource,
-      cleaningSummerMechanizedWateringSource,
+      cleaningSummerMechanizedWateringSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerMechanizedPpeCottonSuitResourceId,
@@ -2395,9 +2326,9 @@ export const cleaningResources = [
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedProductionPpeSource,
       cleaningSummerMechanizedPpeHeaderSource,
-      cleaningSummerMechanizedPpeMaterialsSource,
+      cleaningSummerMechanizedPpeMaterialsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerMechanizedPpeInsulatedJacketResourceId,
@@ -2412,9 +2343,9 @@ export const cleaningResources = [
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedProductionPpeSource,
       cleaningSummerMechanizedPpeHeaderSource,
-      cleaningSummerMechanizedPpeMaterialsSource,
+      cleaningSummerMechanizedPpeMaterialsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerMechanizedPpeSignalVestResourceId,
@@ -2429,9 +2360,9 @@ export const cleaningResources = [
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedProductionPpeSource,
       cleaningSummerMechanizedPpeHeaderSource,
-      cleaningSummerMechanizedPpeMaterialsSource,
+      cleaningSummerMechanizedPpeMaterialsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerMechanizedPpeInsulatedBootsResourceId,
@@ -2446,9 +2377,9 @@ export const cleaningResources = [
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedProductionPpeSource,
       cleaningSummerMechanizedPpeHeaderSource,
-      cleaningSummerMechanizedPpeMaterialsSource,
+      cleaningSummerMechanizedPpeMaterialsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerMechanizedPpePolymerGlovesResourceId,
@@ -2463,9 +2394,9 @@ export const cleaningResources = [
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedProductionPpeSource,
       cleaningSummerMechanizedPpeHeaderSource,
-      cleaningSummerMechanizedPpeMaterialsSource,
+      cleaningSummerMechanizedPpeMaterialsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerMechanizedPpeInsulatedMittensResourceId,
@@ -2480,9 +2411,9 @@ export const cleaningResources = [
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedProductionPpeSource,
       cleaningSummerMechanizedPpeHeaderSource,
-      cleaningSummerMechanizedPpeMaterialsSource,
+      cleaningSummerMechanizedPpeMaterialsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerMechanizedPpeRubberBootsResourceId,
@@ -2497,9 +2428,9 @@ export const cleaningResources = [
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedProductionPpeSource,
       cleaningSummerMechanizedPpeHeaderSource,
-      cleaningSummerMechanizedPpeMaterialsSource,
+      cleaningSummerMechanizedPpeMaterialsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerMechanizedPpeSoapResourceId,
@@ -2514,9 +2445,9 @@ export const cleaningResources = [
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedProductionPpeSource,
       cleaningSummerMechanizedPpeHeaderSource,
-      cleaningSummerMechanizedPpeMaterialsSource,
+      cleaningSummerMechanizedPpeMaterialsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerMechanizedInsuranceResourceId,
@@ -2527,7 +2458,7 @@ export const cleaningResources = [
     cost_bucket: 'insurance',
     total_rub: detailMoney(6_317_435.15),
     source_refs: detailSourceRefs(cleaningSummerMechanizedTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerMechanizedOverheadResourceId,
@@ -2538,7 +2469,7 @@ export const cleaningResources = [
     cost_bucket: 'overhead',
     total_rub: detailMoney(14_643_061.61),
     source_refs: detailSourceRefs(cleaningSummerMechanizedTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerMechanizedProfitResourceId,
@@ -2549,7 +2480,7 @@ export const cleaningResources = [
     cost_bucket: 'profit',
     total_rub: detailMoney(8_367_463.78),
     source_refs: detailSourceRefs(cleaningSummerMechanizedTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerMechanizedUsnResourceId,
@@ -2559,14 +2490,11 @@ export const cleaningResources = [
     title: 'Расчетная доля УСН по летней механизированной уборке',
     cost_bucket: 'usn',
     total_rub: detailMoney(1_511_249.98, {
-      note: 'выведено из строки estimate-2026 и итога раздела cleaning.pdf',
+      note: 'выведено из строки estimate-2026 и итога раздела cleaning.pdf'
     }),
-    source_refs: detailSourceRefs(
-      cleaningSummerMechanizedTotalsSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningSummerMechanizedTotalsSource, cleaningCalculationSource),
     note: 'В cleaning.pdf УСН показан только общей суммой по услуге, без распределения по строкам.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: cleaningSummerMechanizedVatResourceId,
@@ -2576,17 +2504,14 @@ export const cleaningResources = [
     title: 'Расчетный НДС 5% по летней механизированной уборке',
     cost_bucket: 'vat',
     total_rub: detailMoney(4_378_385.14, {
-      note: 'выведено из строки estimate-2026',
+      note: 'выведено из строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      cleaningDocumentVatSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningDocumentVatSource, cleaningCalculationSource),
     note: cleaningVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       cleaningDerivedVatNeedsCheckReason,
-      cleaningSummerMechanizedDerivedVatNeedsCheckRefs,
-    ),
+      cleaningSummerMechanizedDerivedVatNeedsCheckRefs
+    )
   }),
   detailResource({
     id: cleaningSummerManualCurbCleaningWorkerResourceId,
@@ -2596,96 +2521,92 @@ export const cleaningResources = [
     title: 'Рабочий по уборке территории: очистка кромки вдоль бортового камня',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(164.9, 'чел-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(109_540.22),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionWorksSource,
       cleaningStaffSource,
-      cleaningSummerManualCurbCleaningSource,
+      cleaningSummerManualCurbCleaningSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualParkingTrashWorkerResourceId,
     work_item_id: 'cleaning-summer-manual',
     estimate_row_id: 'cleaning-summer-manual',
     kind: 'labor',
-    title:
-      'Рабочий по уборке территории: уборка парковочных и иных площадок от случайного мусора',
+    title: 'Рабочий по уборке территории: уборка парковочных и иных площадок от случайного мусора',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(88.2, 'чел-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(58_551.86),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionWorksSource,
       cleaningStaffSource,
-      cleaningSummerManualParkingTrashSource,
+      cleaningSummerManualParkingTrashSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualParkingSweepingWorkerResourceId,
     work_item_id: 'cleaning-summer-manual',
     estimate_row_id: 'cleaning-summer-manual',
     kind: 'labor',
-    title:
-      'Рабочий по уборке территории: подметание парковочных и иных площадок',
+    title: 'Рабочий по уборке территории: подметание парковочных и иных площадок',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(13.2, 'чел-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(8_747.24),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionWorksSource,
       cleaningStaffSource,
-      cleaningSummerManualParkingSweepingSource,
+      cleaningSummerManualParkingSweepingSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualContainerSiteWorkerResourceId,
     work_item_id: 'cleaning-summer-manual',
     estimate_row_id: 'cleaning-summer-manual',
     kind: 'labor',
-    title:
-      'Рабочий по уборке территории: очистка контейнерной площадки в теплый период',
+    title: 'Рабочий по уборке территории: очистка контейнерной площадки в теплый период',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(134, 'чел-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(89_014.13),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionWorksSource,
       cleaningStaffSource,
-      cleaningSummerManualContainerSiteSource,
+      cleaningSummerManualContainerSiteSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualDitchCleaningWorkerResourceId,
     work_item_id: 'cleaning-summer-manual',
     estimate_row_id: 'cleaning-summer-manual',
     kind: 'labor',
-    title:
-      'Рабочий по уборке территории: очистка открытых ливневых траншей вдоль дорог вручную',
+    title: 'Рабочий по уборке территории: очистка открытых ливневых траншей вдоль дорог вручную',
     cost_bucket: 'primary_salary',
     quantity: detailQuantity(24_337.7, 'чел-час', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(664.15),
     total_rub: detailMoney(16_163_799.83),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionDitchSource,
       cleaningStaffSource,
-      cleaningSummerManualDitchCleaningSource,
+      cleaningSummerManualDitchCleaningSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualPpeCottonSuitResourceId,
@@ -2699,9 +2620,9 @@ export const cleaningResources = [
     total_rub: detailMoney(68_750),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionPpeInventorySource,
-      cleaningSummerManualPpeSource,
+      cleaningSummerManualPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualPpeInsulatedJacketResourceId,
@@ -2715,9 +2636,9 @@ export const cleaningResources = [
     total_rub: detailMoney(30_000),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionPpeInventorySource,
-      cleaningSummerManualPpeSource,
+      cleaningSummerManualPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualPpeSignalVestResourceId,
@@ -2731,9 +2652,9 @@ export const cleaningResources = [
     total_rub: detailMoney(15_000),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionPpeInventorySource,
-      cleaningSummerManualPpeSource,
+      cleaningSummerManualPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualPpeInsulatedBootsResourceId,
@@ -2747,9 +2668,9 @@ export const cleaningResources = [
     total_rub: detailMoney(17_500),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionPpeInventorySource,
-      cleaningSummerManualPpeSource,
+      cleaningSummerManualPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualPpePolymerGlovesResourceId,
@@ -2763,9 +2684,9 @@ export const cleaningResources = [
     total_rub: detailMoney(17_500),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionPpeInventorySource,
-      cleaningSummerManualPpeSource,
+      cleaningSummerManualPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualPpeInsulatedMittensResourceId,
@@ -2779,9 +2700,9 @@ export const cleaningResources = [
     total_rub: detailMoney(35_000),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionPpeInventorySource,
-      cleaningSummerManualPpeSource,
+      cleaningSummerManualPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualPpeRubberBootsResourceId,
@@ -2795,9 +2716,9 @@ export const cleaningResources = [
     total_rub: detailMoney(25_000),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionPpeInventorySource,
-      cleaningSummerManualPpeSource,
+      cleaningSummerManualPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualPpeSoapResourceId,
@@ -2811,9 +2732,9 @@ export const cleaningResources = [
     total_rub: detailMoney(17_400),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionPpeInventorySource,
-      cleaningSummerManualPpeSource,
+      cleaningSummerManualPpeSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualInventoryPolypropyleneBroomResourceId,
@@ -2827,9 +2748,9 @@ export const cleaningResources = [
     total_rub: detailMoney(23_125),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionPpeInventorySource,
-      cleaningSummerManualInventorySource,
+      cleaningSummerManualInventorySource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualInventoryRakeResourceId,
@@ -2839,15 +2760,15 @@ export const cleaningResources = [
     title: 'Грабли с черенком',
     cost_bucket: 'materials',
     quantity: detailQuantity(4.1, 'шт.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(500),
     total_rub: detailMoney(2_062.5),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionPpeInventorySource,
-      cleaningSummerManualInventorySource,
+      cleaningSummerManualInventorySource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualInventoryScoopShovelResourceId,
@@ -2857,15 +2778,15 @@ export const cleaningResources = [
     title: 'Лопата совковая',
     cost_bucket: 'materials',
     quantity: detailQuantity(6.3, 'шт.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(1_034),
     total_rub: detailMoney(6_462.5),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionPpeInventorySource,
-      cleaningSummerManualInventorySource,
+      cleaningSummerManualInventorySource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualInventoryWheelbarrowResourceId,
@@ -2875,15 +2796,15 @@ export const cleaningResources = [
     title: 'Тачка садовая',
     cost_bucket: 'materials',
     quantity: detailQuantity(6.3, 'шт.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(2_500),
     total_rub: detailMoney(15_625),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionPpeInventorySource,
-      cleaningSummerManualInventorySource,
+      cleaningSummerManualInventorySource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualInventoryBucketResourceId,
@@ -2893,15 +2814,15 @@ export const cleaningResources = [
     title: 'Ведро п\\э 12 л',
     cost_bucket: 'materials',
     quantity: detailQuantity(4.1, 'шт.', {
-      note: cleaningRoundedQuantityNote,
+      note: cleaningRoundedQuantityNote
     }),
     unit_price_rub: detailMoney(200),
     total_rub: detailMoney(825),
     source_refs: detailSourceRefs(
       cleaningSummerManualProductionPpeInventorySource,
-      cleaningSummerManualInventorySource,
+      cleaningSummerManualInventorySource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualInsuranceResourceId,
@@ -2912,7 +2833,7 @@ export const cleaningResources = [
     cost_bucket: 'insurance',
     total_rub: detailMoney(4_961_755.3),
     source_refs: detailSourceRefs(cleaningSummerManualTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualOverheadResourceId,
@@ -2923,7 +2844,7 @@ export const cleaningResources = [
     cost_bucket: 'overhead',
     total_rub: detailMoney(11_500_757.3),
     source_refs: detailSourceRefs(cleaningSummerManualTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualProfitResourceId,
@@ -2934,7 +2855,7 @@ export const cleaningResources = [
     cost_bucket: 'profit',
     total_rub: detailMoney(6_571_861.32),
     source_refs: detailSourceRefs(cleaningSummerManualTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailResource({
     id: cleaningSummerManualUsnResourceId,
@@ -2944,14 +2865,11 @@ export const cleaningResources = [
     title: 'Расчетная доля УСН по летней ручной уборке',
     cost_bucket: 'usn',
     total_rub: detailMoney(697_849.46, {
-      note: 'выведено из строки estimate-2026 и сумм bucket-ов; итог раздела cleaning.pdf 39 738 277,20 отличается на 0,01 из-за округления',
+      note: 'выведено из строки estimate-2026 и сумм bucket-ов; итог раздела cleaning.pdf 39 738 277,20 отличается на 0,01 из-за округления'
     }),
-    source_refs: detailSourceRefs(
-      cleaningSummerManualTotalsSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningSummerManualTotalsSource, cleaningCalculationSource),
     note: 'В cleaning.pdf УСН показан только общей суммой по услуге, без распределения по строкам.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailResource({
     id: cleaningSummerManualVatResourceId,
@@ -2961,18 +2879,15 @@ export const cleaningResources = [
     title: 'Расчетный НДС 5% по летней ручной уборке',
     cost_bucket: 'vat',
     total_rub: detailMoney(2_021_806.33, {
-      note: 'выведено из строки estimate-2026',
+      note: 'выведено из строки estimate-2026'
     }),
-    source_refs: detailSourceRefs(
-      cleaningDocumentVatSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningDocumentVatSource, cleaningCalculationSource),
     note: cleaningVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       cleaningDerivedVatNeedsCheckReason,
-      cleaningSummerManualDerivedVatNeedsCheckRefs,
-    ),
-  }),
+      cleaningSummerManualDerivedVatNeedsCheckRefs
+    )
+  })
 ] satisfies readonly EstimateDetailResource[];
 
 export const cleaningControlTotals = [
@@ -2981,26 +2896,24 @@ export const cleaningControlTotals = [
     estimate_row_id: 'cleaning',
     cost_bucket: 'primary_salary',
     source_total_rub: detailMoney(17_641_901.84),
-    detail_total_note:
-      'Сумма округленных строковых ресурсов; ведомость дает 17 641 901,84.',
+    detail_total_note: 'Сумма округленных строковых ресурсов; ведомость дает 17 641 901,84.',
     tolerance_rub: 0.02,
     resource_ids: cleaningResourceStatementPrimarySalaryResourceIds,
     source_refs: detailSourceRefs(cleaningResourceStatementLaborSource),
     note: `${cleaningResourceStatementRoundingNote} Контроль по всей уборке: 26 563,3 чел-час рабочих.`,
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-resource-statement-machinist-salary',
     estimate_row_id: 'cleaning',
     cost_bucket: 'machinist_salary',
     source_total_rub: detailMoney(25_917_429.4),
-    detail_total_note:
-      'Сумма округленных строковых ресурсов; ведомость дает 25 917 429,40.',
+    detail_total_note: 'Сумма округленных строковых ресурсов; ведомость дает 25 917 429,40.',
     tolerance_rub: 0.02,
     resource_ids: cleaningResourceStatementMachinistSalaryResourceIds,
     source_refs: detailSourceRefs(cleaningResourceStatementLaborSource),
     note: `${cleaningResourceStatementRoundingNote} Контроль по всей уборке: 27 739,3 чел-час машинистов.`,
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-resource-statement-machines',
@@ -3011,7 +2924,7 @@ export const cleaningControlTotals = [
     resource_ids: cleaningResourceStatementMachineResourceIds,
     source_refs: detailSourceRefs(cleaningResourceStatementMachinesSource),
     note: `${cleaningResourceStatementRoundingNote} Контроль по всей уборке: трактор 27 739,3 маш.-час, разбрасыватель 210,4 маш.-час, ОПМ-5,0 22 389,2 маш.-час.`,
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-resource-statement-materials',
@@ -3024,16 +2937,15 @@ export const cleaningControlTotals = [
     note: `${cleaningResourceStatementRoundingNote} Рублевые итоги материалов сходятся с ведомостью; единица песка в ведомости требует визуальной проверки.`,
     ...detailNeedsCheckStatus(
       cleaningResourceStatementSandUnitNeedsCheckReason,
-      detailSourceRefs(cleaningResourceStatementMaterialsSource),
-    ),
+      detailSourceRefs(cleaningResourceStatementMaterialsSource)
+    )
   }),
   detailControlTotal({
     id: 'cleaning-winter-mechanized-machinist-salary',
     estimate_row_id: 'cleaning-winter-mechanized',
     cost_bucket: 'machinist_salary',
     source_total_rub: detailMoney(4_998_769.96),
-    detail_total_note:
-      'Сумма округленных позиций; итог раздела в PDF: 4 998 769,96.',
+    detail_total_note: 'Сумма округленных позиций; итог раздела в PDF: 4 998 769,96.',
     tolerance_rub: 0.02,
     resource_ids: cleaningWinterMechanizedMachinistResourceIds,
     source_refs: detailSourceRefs(
@@ -3042,9 +2954,9 @@ export const cleaningControlTotals = [
       cleaningWinterMechanizedHeavySnowTotalSource,
       cleaningWinterMechanizedSandSource,
       cleaningWinterMechanizedSandTotalSource,
-      cleaningWinterMechanizedTotalsSource,
+      cleaningWinterMechanizedTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-winter-mechanized-machines',
@@ -3059,9 +2971,9 @@ export const cleaningControlTotals = [
       cleaningWinterMechanizedHeavySnowTotalSource,
       cleaningWinterMechanizedSandSource,
       cleaningWinterMechanizedSandTotalSource,
-      cleaningWinterMechanizedTotalsSource,
+      cleaningWinterMechanizedTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-winter-mechanized-materials',
@@ -3074,9 +2986,9 @@ export const cleaningControlTotals = [
       cleaningWinterMechanizedSandSource,
       cleaningWinterMechanizedSandTotalSource,
       cleaningWinterMechanizedPpeSource,
-      cleaningWinterMechanizedTotalsSource,
+      cleaningWinterMechanizedTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-winter-mechanized-insurance',
@@ -3086,7 +2998,7 @@ export const cleaningControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [cleaningWinterMechanizedInsuranceResourceId],
     source_refs: detailSourceRefs(cleaningWinterMechanizedTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-winter-mechanized-overhead',
@@ -3096,7 +3008,7 @@ export const cleaningControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [cleaningWinterMechanizedOverheadResourceId],
     source_refs: detailSourceRefs(cleaningWinterMechanizedTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-winter-mechanized-profit',
@@ -3106,7 +3018,7 @@ export const cleaningControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [cleaningWinterMechanizedProfitResourceId],
     source_refs: detailSourceRefs(cleaningWinterMechanizedTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-winter-mechanized-usn',
@@ -3115,12 +3027,9 @@ export const cleaningControlTotals = [
     source_total_rub: detailMoney(352_872.12),
     tolerance_rub: 0.01,
     resource_ids: [cleaningWinterMechanizedUsnResourceId],
-    source_refs: detailSourceRefs(
-      cleaningWinterMechanizedTotalsSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningWinterMechanizedTotalsSource, cleaningCalculationSource),
     note: 'УСН выведен для строки, потому что cleaning.pdf показывает УСН только общей суммой по услуге.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'cleaning-winter-mechanized-vat',
@@ -3129,15 +3038,9 @@ export const cleaningControlTotals = [
     source_total_rub: detailMoney(1_022_339),
     tolerance_rub: 0.01,
     resource_ids: [cleaningWinterMechanizedVatResourceId],
-    source_refs: detailSourceRefs(
-      cleaningDocumentVatSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningDocumentVatSource, cleaningCalculationSource),
     note: cleaningVatNeedsCheckNote,
-    ...detailNeedsCheckStatus(
-      cleaningDerivedVatNeedsCheckReason,
-      cleaningDerivedVatNeedsCheckRefs,
-    ),
+    ...detailNeedsCheckStatus(cleaningDerivedVatNeedsCheckReason, cleaningDerivedVatNeedsCheckRefs)
   }),
   detailControlTotal({
     id: 'cleaning-winter-mechanized-gross',
@@ -3149,13 +3052,10 @@ export const cleaningControlTotals = [
     source_refs: detailSourceRefs(
       cleaningWinterMechanizedTotalsSource,
       cleaningDocumentVatSource,
-      cleaningCalculationSource,
+      cleaningCalculationSource
     ),
     note: cleaningVatNeedsCheckNote,
-    ...detailNeedsCheckStatus(
-      cleaningDerivedVatNeedsCheckReason,
-      cleaningDerivedVatNeedsCheckRefs,
-    ),
+    ...detailNeedsCheckStatus(cleaningDerivedVatNeedsCheckReason, cleaningDerivedVatNeedsCheckRefs)
   }),
   detailControlTotal({
     id: 'cleaning-winter-manual-primary-salary',
@@ -3169,9 +3069,9 @@ export const cleaningControlTotals = [
       cleaningWinterManualAntiIceSource,
       cleaningWinterManualRoadSnowIceSource,
       cleaningWinterManualContainerSiteSource,
-      cleaningWinterManualTotalsSource,
+      cleaningWinterManualTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-winter-manual-materials',
@@ -3184,9 +3084,9 @@ export const cleaningControlTotals = [
       cleaningWinterManualAntiIceSource,
       cleaningWinterManualPpeSource,
       cleaningWinterManualInventorySource,
-      cleaningWinterManualTotalsSource,
+      cleaningWinterManualTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-winter-manual-insurance',
@@ -3196,7 +3096,7 @@ export const cleaningControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [cleaningWinterManualInsuranceResourceId],
     source_refs: detailSourceRefs(cleaningWinterManualTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-winter-manual-overhead',
@@ -3206,7 +3106,7 @@ export const cleaningControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [cleaningWinterManualOverheadResourceId],
     source_refs: detailSourceRefs(cleaningWinterManualTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-winter-manual-profit',
@@ -3216,7 +3116,7 @@ export const cleaningControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [cleaningWinterManualProfitResourceId],
     source_refs: detailSourceRefs(cleaningWinterManualTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-winter-manual-usn',
@@ -3225,12 +3125,9 @@ export const cleaningControlTotals = [
     source_total_rub: detailMoney(51_588.99),
     tolerance_rub: 0.01,
     resource_ids: [cleaningWinterManualUsnResourceId],
-    source_refs: detailSourceRefs(
-      cleaningWinterManualTotalsSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningWinterManualTotalsSource, cleaningCalculationSource),
     note: 'УСН выведен для строки, потому что cleaning.pdf показывает УСН только общей суммой по услуге.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'cleaning-winter-manual-vat',
@@ -3239,15 +3136,12 @@ export const cleaningControlTotals = [
     source_total_rub: detailMoney(149_462.81),
     tolerance_rub: 0.01,
     resource_ids: [cleaningWinterManualVatResourceId],
-    source_refs: detailSourceRefs(
-      cleaningDocumentVatSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningDocumentVatSource, cleaningCalculationSource),
     note: cleaningVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       cleaningDerivedVatNeedsCheckReason,
-      cleaningWinterManualDerivedVatNeedsCheckRefs,
-    ),
+      cleaningWinterManualDerivedVatNeedsCheckRefs
+    )
   }),
   detailControlTotal({
     id: 'cleaning-winter-manual-gross',
@@ -3259,13 +3153,13 @@ export const cleaningControlTotals = [
     source_refs: detailSourceRefs(
       cleaningWinterManualTotalsSource,
       cleaningDocumentVatSource,
-      cleaningCalculationSource,
+      cleaningCalculationSource
     ),
     note: cleaningVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       cleaningDerivedVatNeedsCheckReason,
-      cleaningWinterManualDerivedVatNeedsCheckRefs,
-    ),
+      cleaningWinterManualDerivedVatNeedsCheckRefs
+    )
   }),
   detailControlTotal({
     id: 'cleaning-summer-mechanized-machinist-salary',
@@ -3276,9 +3170,9 @@ export const cleaningControlTotals = [
     resource_ids: cleaningSummerMechanizedMachinistResourceIds,
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedWateringSource,
-      cleaningSummerMechanizedTotalsSource,
+      cleaningSummerMechanizedTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-summer-mechanized-machines',
@@ -3289,9 +3183,9 @@ export const cleaningControlTotals = [
     resource_ids: cleaningSummerMechanizedMachineResourceIds,
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedWateringSource,
-      cleaningSummerMechanizedTotalsSource,
+      cleaningSummerMechanizedTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-summer-mechanized-materials',
@@ -3303,9 +3197,9 @@ export const cleaningControlTotals = [
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedWateringSource,
       cleaningSummerMechanizedPpeMaterialsSource,
-      cleaningSummerMechanizedTotalsSource,
+      cleaningSummerMechanizedTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-summer-mechanized-insurance',
@@ -3315,7 +3209,7 @@ export const cleaningControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [cleaningSummerMechanizedInsuranceResourceId],
     source_refs: detailSourceRefs(cleaningSummerMechanizedTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-summer-mechanized-overhead',
@@ -3325,7 +3219,7 @@ export const cleaningControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [cleaningSummerMechanizedOverheadResourceId],
     source_refs: detailSourceRefs(cleaningSummerMechanizedTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-summer-mechanized-profit',
@@ -3335,7 +3229,7 @@ export const cleaningControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [cleaningSummerMechanizedProfitResourceId],
     source_refs: detailSourceRefs(cleaningSummerMechanizedTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-summer-mechanized-usn',
@@ -3344,12 +3238,9 @@ export const cleaningControlTotals = [
     source_total_rub: detailMoney(1_511_249.98),
     tolerance_rub: 0.01,
     resource_ids: [cleaningSummerMechanizedUsnResourceId],
-    source_refs: detailSourceRefs(
-      cleaningSummerMechanizedTotalsSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningSummerMechanizedTotalsSource, cleaningCalculationSource),
     note: 'УСН выведен для строки, потому что cleaning.pdf показывает УСН только общей суммой по услуге.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'cleaning-summer-mechanized-vat',
@@ -3358,15 +3249,12 @@ export const cleaningControlTotals = [
     source_total_rub: detailMoney(4_378_385.14),
     tolerance_rub: 0.01,
     resource_ids: [cleaningSummerMechanizedVatResourceId],
-    source_refs: detailSourceRefs(
-      cleaningDocumentVatSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningDocumentVatSource, cleaningCalculationSource),
     note: cleaningVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       cleaningDerivedVatNeedsCheckReason,
-      cleaningSummerMechanizedDerivedVatNeedsCheckRefs,
-    ),
+      cleaningSummerMechanizedDerivedVatNeedsCheckRefs
+    )
   }),
   detailControlTotal({
     id: 'cleaning-summer-mechanized-gross',
@@ -3378,21 +3266,20 @@ export const cleaningControlTotals = [
     source_refs: detailSourceRefs(
       cleaningSummerMechanizedTotalsSource,
       cleaningDocumentVatSource,
-      cleaningCalculationSource,
+      cleaningCalculationSource
     ),
     note: cleaningVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       cleaningDerivedVatNeedsCheckReason,
-      cleaningSummerMechanizedDerivedVatNeedsCheckRefs,
-    ),
+      cleaningSummerMechanizedDerivedVatNeedsCheckRefs
+    )
   }),
   detailControlTotal({
     id: 'cleaning-summer-manual-primary-salary',
     estimate_row_id: 'cleaning-summer-manual',
     cost_bucket: 'primary_salary',
     source_total_rub: detailMoney(16_429_653.29),
-    detail_total_note:
-      'Сумма округленных позиций; итог раздела в PDF: 16 429 653,29.',
+    detail_total_note: 'Сумма округленных позиций; итог раздела в PDF: 16 429 653,29.',
     tolerance_rub: 0.02,
     resource_ids: cleaningSummerManualLaborResourceIds,
     source_refs: detailSourceRefs(
@@ -3401,9 +3288,9 @@ export const cleaningControlTotals = [
       cleaningSummerManualParkingSweepingSource,
       cleaningSummerManualContainerSiteSource,
       cleaningSummerManualDitchCleaningSource,
-      cleaningSummerManualTotalsSource,
+      cleaningSummerManualTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-summer-manual-materials',
@@ -3415,9 +3302,9 @@ export const cleaningControlTotals = [
     source_refs: detailSourceRefs(
       cleaningSummerManualPpeSource,
       cleaningSummerManualInventorySource,
-      cleaningSummerManualTotalsSource,
+      cleaningSummerManualTotalsSource
     ),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-summer-manual-insurance',
@@ -3427,7 +3314,7 @@ export const cleaningControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [cleaningSummerManualInsuranceResourceId],
     source_refs: detailSourceRefs(cleaningSummerManualTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-summer-manual-overhead',
@@ -3437,7 +3324,7 @@ export const cleaningControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [cleaningSummerManualOverheadResourceId],
     source_refs: detailSourceRefs(cleaningSummerManualTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-summer-manual-profit',
@@ -3447,23 +3334,20 @@ export const cleaningControlTotals = [
     tolerance_rub: 0.01,
     resource_ids: [cleaningSummerManualProfitResourceId],
     source_refs: detailSourceRefs(cleaningSummerManualTotalsSource),
-    ...detailStatus('verified'),
+    ...detailStatus('verified')
   }),
   detailControlTotal({
     id: 'cleaning-summer-manual-usn',
     estimate_row_id: 'cleaning-summer-manual',
     cost_bucket: 'usn',
     source_total_rub: detailMoney(697_849.46, {
-      note: 'выведено из строки estimate-2026 и сумм bucket-ов; итог раздела cleaning.pdf 39 738 277,20 отличается на 0,01 из-за округления',
+      note: 'выведено из строки estimate-2026 и сумм bucket-ов; итог раздела cleaning.pdf 39 738 277,20 отличается на 0,01 из-за округления'
     }),
     tolerance_rub: 0.01,
     resource_ids: [cleaningSummerManualUsnResourceId],
-    source_refs: detailSourceRefs(
-      cleaningSummerManualTotalsSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningSummerManualTotalsSource, cleaningCalculationSource),
     note: 'УСН выведен для строки, потому что cleaning.pdf показывает УСН только общей суммой по услуге.',
-    ...detailStatus('derived'),
+    ...detailStatus('derived')
   }),
   detailControlTotal({
     id: 'cleaning-summer-manual-vat',
@@ -3472,34 +3356,30 @@ export const cleaningControlTotals = [
     source_total_rub: detailMoney(2_021_806.33),
     tolerance_rub: 0.01,
     resource_ids: [cleaningSummerManualVatResourceId],
-    source_refs: detailSourceRefs(
-      cleaningDocumentVatSource,
-      cleaningCalculationSource,
-    ),
+    source_refs: detailSourceRefs(cleaningDocumentVatSource, cleaningCalculationSource),
     note: cleaningVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       cleaningDerivedVatNeedsCheckReason,
-      cleaningSummerManualDerivedVatNeedsCheckRefs,
-    ),
+      cleaningSummerManualDerivedVatNeedsCheckRefs
+    )
   }),
   detailControlTotal({
     id: 'cleaning-summer-manual-gross',
     estimate_row_id: 'cleaning-summer-manual',
     cost_bucket: 'gross',
     source_total_rub: detailMoney(42_457_933),
-    detail_total_note:
-      'Сумма ресурсов дает 42 457 932,99 из-за построчных округлений.',
+    detail_total_note: 'Сумма ресурсов дает 42 457 932,99 из-за построчных округлений.',
     tolerance_rub: 0.02,
     resource_ids: cleaningSummerManualGrossResourceIds,
     source_refs: detailSourceRefs(
       cleaningSummerManualTotalsSource,
       cleaningDocumentVatSource,
-      cleaningCalculationSource,
+      cleaningCalculationSource
     ),
     note: cleaningVatNeedsCheckNote,
     ...detailNeedsCheckStatus(
       cleaningDerivedVatNeedsCheckReason,
-      cleaningSummerManualDerivedVatNeedsCheckRefs,
-    ),
-  }),
+      cleaningSummerManualDerivedVatNeedsCheckRefs
+    )
+  })
 ] satisfies readonly EstimateDetailControlTotalInput[];

@@ -1,19 +1,10 @@
 import { render } from '@shelkovo/markdown';
 
 import { normalizeEntityMentions } from '../mentions';
-import type {
-  EntityMentionSourceEntity,
-  SiteMentionRegistry,
-} from '../mentions';
-import type {
-  PreprocessedSiteMarkdown,
-  RenderSiteMarkdownOptions,
-} from './render.types';
-import {
-  normalizeContentDiffMarkdown,
-  renderContentDiffBlocks,
-} from './content-diff';
+import type { EntityMentionSourceEntity, SiteMentionRegistry } from '../mentions';
+import { normalizeContentDiffMarkdown, renderContentDiffBlocks } from './content-diff';
 import { renderFileLinks } from './file-links';
+import type { PreprocessedSiteMarkdown, RenderSiteMarkdownOptions } from './render.types';
 
 const FENCED_CODE_BLOCK_LINE = /^[ \t]{0,3}(`{3,}|~{3,})/;
 const HYPHENATED_ORDERED_LIST_ITEM_LINE = /^([ \t]*)-\s+(\d+)([.)])(\s+)/;
@@ -22,10 +13,7 @@ const TOP_LEVEL_ORDERED_LIST_ITEM_LINE = /^([ \t]{0,3})(\d+)\.(\s+)/;
 const LEGAL_OUTLINE_LINE = /^([ \t]{0,3})(\d+(?:\.\d+)+)\.\s+/;
 const UNORDERED_LIST_ITEM_LINE = /^[ \t]{0,3}[-+*]\s+/;
 
-const continuesLegalOutline = (
-  previous: string,
-  candidate: string,
-): boolean => {
+const continuesLegalOutline = (previous: string, candidate: string): boolean => {
   const previousSeparator = previous.lastIndexOf('.');
   const candidateSeparator = candidate.lastIndexOf('.');
   const previousParent = previous.slice(0, previousSeparator);
@@ -34,8 +22,7 @@ const continuesLegalOutline = (
   const candidateIndex = Number(candidate.slice(candidateSeparator + 1));
 
   return (
-    (candidateParent === previousParent &&
-      candidateIndex === previousIndex + 1) ||
+    (candidateParent === previousParent && candidateIndex === previousIndex + 1) ||
     (candidateParent === previous && candidateIndex === 1)
   );
 };
@@ -144,9 +131,7 @@ const normalizeHyphenatedOrderedListMarkdown = (markdown: string): string => {
         return line;
       }
 
-      return fenceMarker
-        ? line
-        : line.replace(HYPHENATED_ORDERED_LIST_ITEM_LINE, '$1$2$3$4');
+      return fenceMarker ? line : line.replace(HYPHENATED_ORDERED_LIST_ITEM_LINE, '$1$2$3$4');
     })
     .join('\n');
 };
@@ -154,15 +139,12 @@ const normalizeHyphenatedOrderedListMarkdown = (markdown: string): string => {
 const hasMatchingLegalSubclause = (
   lines: readonly string[],
   startIndex: number,
-  prefix: string,
+  prefix: string
 ): boolean => {
   for (let index = startIndex; index < lines.length; index += 1) {
     const line = lines[index] ?? '';
 
-    if (
-      FENCED_CODE_BLOCK_LINE.test(line) ||
-      MARKDOWN_SECTION_BOUNDARY_LINE.test(line)
-    ) {
+    if (FENCED_CODE_BLOCK_LINE.test(line) || MARKDOWN_SECTION_BOUNDARY_LINE.test(line)) {
       return false;
     }
 
@@ -211,8 +193,7 @@ const escapeLegalOutlineTopLevelMarkers = (markdown: string): string => {
 
       const topLevelMarker = TOP_LEVEL_ORDERED_LIST_ITEM_LINE.exec(line);
 
-      return topLevelMarker &&
-        hasMatchingLegalSubclause(lines, index + 1, topLevelMarker[2] ?? '')
+      return topLevelMarker && hasMatchingLegalSubclause(lines, index + 1, topLevelMarker[2] ?? '')
         ? line.replace(TOP_LEVEL_ORDERED_LIST_ITEM_LINE, '$1$2\\.$3')
         : line;
     })
@@ -223,23 +204,21 @@ export type {
   PreprocessedSiteMarkdown,
   PreprocessedSiteMarkdownBody,
   RenderEntityMentionsOptions,
-  RenderSiteMarkdownOptions,
+  RenderSiteMarkdownOptions
 } from './render.types';
 
 export const preprocessSiteMarkdown = (
   markdown: string,
-  options?: RenderSiteMarkdownOptions,
+  options?: RenderSiteMarkdownOptions
 ): PreprocessedSiteMarkdown => {
   const normalizedMarkdown = escapeLegalOutlineTopLevelMarkers(
-    normalizeHyphenatedOrderedListMarkdown(
-      restoreLegalOutlineListBoundaries(markdown),
-    ),
+    normalizeHyphenatedOrderedListMarkdown(restoreLegalOutlineListBoundaries(markdown))
   );
 
   if (!options?.mentions) {
     return {
       markdown: normalizedMarkdown,
-      mentions: [],
+      mentions: []
     };
   }
 
@@ -247,7 +226,7 @@ export const preprocessSiteMarkdown = (
     markdown: normalizedMarkdown,
     context: options.mentions.context,
     registry: options.mentions.registry,
-    sourceEntity: options.mentions.sourceEntity,
+    sourceEntity: options.mentions.sourceEntity
   });
 };
 
@@ -255,7 +234,7 @@ export const preprocessSiteMarkdownContent = (
   markdown: string,
   context: string,
   registry: SiteMentionRegistry,
-  sourceEntity?: EntityMentionSourceEntity,
+  sourceEntity?: EntityMentionSourceEntity
 ): PreprocessedSiteMarkdown => {
   const body = markdown.trimEnd();
 
@@ -264,22 +243,19 @@ export const preprocessSiteMarkdownContent = (
         mentions: {
           context,
           registry,
-          sourceEntity,
-        },
+          sourceEntity
+        }
       })
     : {
         markdown: '',
-        mentions: [],
+        mentions: []
       };
 };
 
-export const renderMarkdown = (
-  markdown: string,
-  options?: RenderSiteMarkdownOptions,
-): string => {
+export const renderMarkdown = (markdown: string, options?: RenderSiteMarkdownOptions): string => {
   const preprocessed = preprocessSiteMarkdown(markdown, options).markdown;
 
   return renderFileLinks(
-    renderContentDiffBlocks(render(normalizeContentDiffMarkdown(preprocessed))),
+    renderContentDiffBlocks(render(normalizeContentDiffMarkdown(preprocessed)))
   );
 };

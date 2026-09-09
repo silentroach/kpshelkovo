@@ -3,10 +3,7 @@ import type { ExplorerPayload } from '../lib/explorer';
 export type ExplorerInstance = Record<string, unknown>;
 
 export interface ExplorerClientModule {
-  readonly hydrate: (
-    target: HTMLElement,
-    payload: ExplorerPayload,
-  ) => ExplorerInstance;
+  readonly hydrate: (target: HTMLElement, payload: ExplorerPayload) => ExplorerInstance;
   readonly unmount: (instance: ExplorerInstance) => void;
 }
 

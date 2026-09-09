@@ -2,7 +2,7 @@ export {
   createMarkdownDocument,
   md,
   parseMarkdownFragment,
-  serializeMarkdownDocument,
+  serializeMarkdownDocument
 } from './generate';
 export type {
   MarkdownDocumentInput,
@@ -10,17 +10,9 @@ export type {
   MarkdownListItemInput,
   MarkdownListItemOptions,
   MarkdownListOptions,
-  MarkdownPhrasingInput,
+  MarkdownPhrasingInput
 } from './generate-types';
 export { resolveMarkdownResourceReferences } from './references';
 export { extractFirstMarkdownText, extractMarkdownText } from './plain-text';
-export {
-  render,
-  type MarkdownPreprocessor,
-  type RenderOptions,
-} from './render';
-export {
-  formatDynamicHtml,
-  rehypeTypograf,
-  satteriTypograf,
-} from './typography';
+export { render, type MarkdownPreprocessor, type RenderOptions } from './render';
+export { formatDynamicHtml, rehypeTypograf, satteriTypograf } from './typography';

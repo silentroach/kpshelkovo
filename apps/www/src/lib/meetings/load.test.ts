@@ -1,26 +1,26 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
-import type { SiteMentionRegistry } from '@/lib/mentions';
 import { contentDateSchema } from '@/lib/content-date';
+import type { SiteMentionRegistry } from '@/lib/mentions';
 
 import type {
   buildMeetingsDataset as buildMeetingsDatasetType,
   loadMeeting as loadMeetingType,
   MeetingEntry,
-  MeetingTranscriptEntry,
+  MeetingTranscriptEntry
 } from './load';
 
 const mocks = vi.hoisted(() => ({
   getCollection: vi.fn(),
-  loadSiteMentionRegistry: vi.fn(),
+  loadSiteMentionRegistry: vi.fn()
 }));
 
 vi.mock('astro:content', () => ({
-  getCollection: mocks.getCollection,
+  getCollection: mocks.getCollection
 }));
 
 vi.mock('@/lib/mentions/registry', () => ({
-  loadSiteMentionRegistry: mocks.loadSiteMentionRegistry,
+  loadSiteMentionRegistry: mocks.loadSiteMentionRegistry
 }));
 
 let buildMeetingsDataset: typeof buildMeetingsDatasetType;
@@ -30,7 +30,7 @@ const testDate = contentDateSchema('test date');
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ buildMeetingsDataset, loadMeeting } = await import('./load'));
@@ -48,10 +48,10 @@ const entry = (input: {
     context: 'Контекст встречи.',
     speakers: {
       moderator: {
-        name: 'Модератор',
-      },
-    },
-  },
+        name: 'Модератор'
+      }
+    }
+  }
 });
 
 const transcript = (input: {
@@ -65,23 +65,23 @@ const transcript = (input: {
       {
         start: '00:00:00',
         speaker: 'moderator',
-        text: input.text ?? 'Добрый день.',
-      },
-    ],
-  },
+        text: input.text ?? 'Добрый день.'
+      }
+    ]
+  }
 });
 
 const build = (
   entries: readonly MeetingEntry[],
   transcripts: readonly MeetingTranscriptEntry[],
-  mentionRegistry?: SiteMentionRegistry,
+  mentionRegistry?: SiteMentionRegistry
 ) => buildMeetingsDataset(entries, transcripts, { mentionRegistry });
 
 describe('buildMeetingsDataset', () => {
   it('joins meeting entries and transcripts by id', () => {
     const data = build(
       [entry({ id: '2026-06-13-ok-comfort' })],
-      [transcript({ id: '2026-06-13-ok-comfort' })],
+      [transcript({ id: '2026-06-13-ok-comfort' })]
     );
 
     expect(data.meetings).toHaveLength(1);
@@ -90,10 +90,10 @@ describe('buildMeetingsDataset', () => {
       transcript: {
         segments: [
           {
-            text: 'Добрый день.',
-          },
-        ],
-      },
+            text: 'Добрый день.'
+          }
+        ]
+      }
     });
   });
 
@@ -105,26 +105,27 @@ describe('buildMeetingsDataset', () => {
         transcript({
           id: '2026-06-13-ok-comfort',
           part: 2,
-          text: 'Вторая часть.',
-        }),
-      ],
+          text: 'Вторая часть.'
+        })
+      ]
     );
 
     expect(data.meetings[0]?.transcript.parts).toHaveLength(2);
-    expect(
-      data.meetings[0]?.transcript.segments.map((segment) => segment.anchor),
-    ).toEqual(['t-00-00-00', 't-00-00-00-2']);
+    expect(data.meetings[0]?.transcript.segments.map((segment) => segment.anchor)).toEqual([
+      't-00-00-00',
+      't-00-00-00-2'
+    ]);
   });
 
   it('rejects a meeting entry without a matching transcript', () => {
     expect(() => build([entry({ id: 'missing-transcript' })], [])).toThrow(
-      'meeting "missing-transcript" has no matching transcript',
+      'meeting "missing-transcript" has no matching transcript'
     );
   });
 
   it('rejects an orphan transcript without a matching meeting entry', () => {
     expect(() => build([], [transcript({ id: 'orphan-transcript' })])).toThrow(
-      'meeting transcript "orphan-transcript" has no matching entry',
+      'meeting transcript "orphan-transcript" has no matching entry'
     );
   });
 
@@ -134,30 +135,30 @@ describe('buildMeetingsDataset', () => {
         entry({
           id: 'same-date-beta',
           title: 'Бета',
-          date: '13.06.2026 16:00',
+          date: '13.06.2026 16:00'
         }),
         entry({
           id: 'newest',
           title: 'Новая',
-          date: '14.06.2026',
+          date: '14.06.2026'
         }),
         entry({
           id: 'same-date-alpha',
           title: 'Альфа',
-          date: '13.06.2026 16:00',
-        }),
+          date: '13.06.2026 16:00'
+        })
       ],
       [
         transcript({ id: 'same-date-beta' }),
         transcript({ id: 'newest' }),
-        transcript({ id: 'same-date-alpha' }),
-      ],
+        transcript({ id: 'same-date-alpha' })
+      ]
     );
 
     expect(data.meetings.map((meeting) => meeting.slug)).toEqual([
       'newest',
       'same-date-alpha',
-      'same-date-beta',
+      'same-date-beta'
     ]);
   });
 });
@@ -179,7 +180,7 @@ describe('loadMeeting', () => {
 
     await expect(loadMeeting('   ')).resolves.toBeUndefined();
     await expect(loadMeeting(' trimmed ')).resolves.toMatchObject({
-      slug: 'trimmed',
+      slug: 'trimmed'
     });
   });
 });

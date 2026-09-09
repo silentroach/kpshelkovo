@@ -7,7 +7,7 @@ import {
   getStatusTimelineRange,
   mergeStatusTimelineSpans,
   STATUS_TIMELINE_DAY_MS,
-  type StatusTimelineIncidentInput,
+  type StatusTimelineIncidentInput
 } from './timeline';
 
 const NOW_MS = Date.parse('2026-05-10T00:00:00Z');
@@ -28,10 +28,7 @@ interface IncidentInput {
 
 const incident = (input: IncidentInput): StatusTimelineIncidentInput => ({
   id: input.id,
-  href:
-    input.hasPage === false
-      ? undefined
-      : (input.href ?? `/status/incidents/${input.id}`),
+  href: input.hasPage === false ? undefined : (input.href ?? `/status/incidents/${input.id}`),
   title: input.title ?? `Incident ${input.id}`,
   kind: input.kind ?? 'incident',
   startedIso: input.startedIso,
@@ -43,7 +40,7 @@ const incident = (input: IncidentInput): StatusTimelineIncidentInput => ({
       ? 'active'
       : Date.parse(input.startedIso) > NOW_MS
         ? 'scheduled'
-        : 'resolved',
+        : 'resolved'
 });
 
 describe('getStatusTimelineRange', () => {
@@ -54,7 +51,7 @@ describe('getStatusTimelineRange', () => {
       startMs: NOW_MS - 10 * STATUS_TIMELINE_DAY_MS,
       endMs: NOW_MS,
       days: 10,
-      spanMs: 10 * STATUS_TIMELINE_DAY_MS,
+      spanMs: 10 * STATUS_TIMELINE_DAY_MS
     });
   });
 });
@@ -65,13 +62,13 @@ describe('clipStatusTimelineSpan', () => {
       clipStatusTimelineSpan(
         {
           startMs: Date.parse('2026-04-25T00:00:00Z'),
-          endMs: Date.parse('2026-05-02T00:00:00Z'),
+          endMs: Date.parse('2026-05-02T00:00:00Z')
         },
-        RANGE,
-      ),
+        RANGE
+      )
     ).toEqual({
       startMs: Date.parse('2026-04-30T00:00:00Z'),
-      endMs: Date.parse('2026-05-02T00:00:00Z'),
+      endMs: Date.parse('2026-05-02T00:00:00Z')
     });
   });
 });
@@ -83,17 +80,17 @@ describe('buildStatusTimelineProblemSegments', () => {
         incident({
           id: 'inside',
           startedIso: '2026-05-02T00:00:00Z',
-          endedIso: '2026-05-04T00:00:00Z',
-        }),
+          endedIso: '2026-05-04T00:00:00Z'
+        })
       ],
-      range: RANGE,
+      range: RANGE
     });
 
     expect(segment).toMatchObject({
       id: 'inside',
       tone: 'red',
       startMs: Date.parse('2026-05-02T00:00:00Z'),
-      endMs: Date.parse('2026-05-04T00:00:00Z'),
+      endMs: Date.parse('2026-05-04T00:00:00Z')
     });
     expect(segment.leftPercent).toBeCloseTo(20);
     expect(segment.widthPercent).toBeCloseTo(20);
@@ -106,10 +103,10 @@ describe('buildStatusTimelineProblemSegments', () => {
           id: 'no-page',
           hasPage: false,
           startedIso: '2026-05-02T00:00:00Z',
-          endedIso: '2026-05-04T00:00:00Z',
-        }),
+          endedIso: '2026-05-04T00:00:00Z'
+        })
       ],
-      range: RANGE,
+      range: RANGE
     });
 
     expect(segment.href).toBeUndefined();
@@ -121,15 +118,15 @@ describe('buildStatusTimelineProblemSegments', () => {
         incident({
           id: 'right-clipped',
           startedIso: '2026-05-08T00:00:00Z',
-          endedIso: '2026-05-12T00:00:00Z',
-        }),
+          endedIso: '2026-05-12T00:00:00Z'
+        })
       ],
-      range: RANGE,
+      range: RANGE
     });
 
     expect(segment).toMatchObject({
       startMs: Date.parse('2026-05-08T00:00:00Z'),
-      endMs: NOW_MS,
+      endMs: NOW_MS
     });
     expect(segment.leftPercent).toBeCloseTo(80);
     expect(segment.widthPercent).toBeCloseTo(20);
@@ -140,15 +137,15 @@ describe('buildStatusTimelineProblemSegments', () => {
       incidents: [
         incident({
           id: 'active',
-          startedIso: '2026-05-09T00:00:00Z',
-        }),
+          startedIso: '2026-05-09T00:00:00Z'
+        })
       ],
-      range: RANGE,
+      range: RANGE
     });
 
     expect(segment).toMatchObject({
       startMs: Date.parse('2026-05-09T00:00:00Z'),
-      endMs: NOW_MS,
+      endMs: NOW_MS
     });
     expect(segment.endedIso).toBeUndefined();
     expect(segment.leftPercent).toBeCloseTo(90);
@@ -162,11 +159,11 @@ describe('buildStatusTimelineProblemSegments', () => {
           incident({
             id: 'past',
             startedIso: '2026-04-20T00:00:00Z',
-            endedIso: '2026-04-22T00:00:00Z',
-          }),
+            endedIso: '2026-04-22T00:00:00Z'
+          })
         ],
-        range: RANGE,
-      }),
+        range: RANGE
+      })
     ).toEqual([]);
   });
 
@@ -178,11 +175,11 @@ describe('buildStatusTimelineProblemSegments', () => {
             id: 'future-maintenance',
             kind: 'maintenance',
             startedIso: '2026-05-12T00:00:00Z',
-            endedIso: '2026-05-13T00:00:00Z',
-          }),
+            endedIso: '2026-05-13T00:00:00Z'
+          })
         ],
-        range: RANGE,
-      }),
+        range: RANGE
+      })
     ).toEqual([]);
   });
 
@@ -193,11 +190,11 @@ describe('buildStatusTimelineProblemSegments', () => {
           incident({
             id: 'invalid-range',
             startedIso: '2026-05-02T00:00:00Z',
-            endedIso: '2026-05-04T00:00:00Z',
-          }),
+            endedIso: '2026-05-04T00:00:00Z'
+          })
         ],
-        range: getStatusTimelineRange(NOW_MS, 0),
-      }),
+        range: getStatusTimelineRange(NOW_MS, 0)
+      })
     ).toEqual([]);
   });
 });
@@ -208,18 +205,18 @@ describe('mergeStatusTimelineSpans', () => {
       mergeStatusTimelineSpans([
         {
           startMs: Date.parse('2026-05-02T00:00:00Z'),
-          endMs: Date.parse('2026-05-05T00:00:00Z'),
+          endMs: Date.parse('2026-05-05T00:00:00Z')
         },
         {
           startMs: Date.parse('2026-05-04T00:00:00Z'),
-          endMs: Date.parse('2026-05-06T00:00:00Z'),
-        },
-      ]),
+          endMs: Date.parse('2026-05-06T00:00:00Z')
+        }
+      ])
     ).toEqual([
       {
         startMs: Date.parse('2026-05-02T00:00:00Z'),
-        endMs: Date.parse('2026-05-06T00:00:00Z'),
-      },
+        endMs: Date.parse('2026-05-06T00:00:00Z')
+      }
     ]);
   });
 });
@@ -232,17 +229,17 @@ describe('buildStatusTimelineStableSegments', () => {
           incident({
             id: 'first',
             startedIso: '2026-05-02T00:00:00Z',
-            endedIso: '2026-05-03T00:00:00Z',
+            endedIso: '2026-05-03T00:00:00Z'
           }),
           incident({
             id: 'second',
             startedIso: '2026-05-05T00:00:00Z',
-            endedIso: '2026-05-07T00:00:00Z',
-          }),
+            endedIso: '2026-05-07T00:00:00Z'
+          })
         ],
-        range: RANGE,
+        range: RANGE
       }),
-      RANGE,
+      RANGE
     );
 
     expect(stable).toHaveLength(3);
@@ -261,17 +258,17 @@ describe('buildStatusTimelineStableSegments', () => {
           incident({
             id: 'overlap-a',
             startedIso: '2026-05-02T00:00:00Z',
-            endedIso: '2026-05-05T00:00:00Z',
+            endedIso: '2026-05-05T00:00:00Z'
           }),
           incident({
             id: 'overlap-b',
             startedIso: '2026-05-04T00:00:00Z',
-            endedIso: '2026-05-06T00:00:00Z',
-          }),
+            endedIso: '2026-05-06T00:00:00Z'
+          })
         ],
-        range: RANGE,
+        range: RANGE
       }),
-      RANGE,
+      RANGE
     );
 
     expect(stable).toHaveLength(2);
@@ -286,14 +283,12 @@ describe('buildStatusTimelineStableSegments', () => {
         startMs: RANGE.startMs,
         endMs: RANGE.endMs,
         leftPercent: 0,
-        widthPercent: 100,
-      },
+        widthPercent: 100
+      }
     ]);
   });
 
   it('returns an empty list for invalid ranges', () => {
-    expect(
-      buildStatusTimelineStableSegments([], getStatusTimelineRange(NOW_MS, -1)),
-    ).toEqual([]);
+    expect(buildStatusTimelineStableSegments([], getStatusTimelineRange(NOW_MS, -1))).toEqual([]);
   });
 });

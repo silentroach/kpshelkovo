@@ -1,27 +1,20 @@
 import type {
   ReglamentEditorConfig,
   ReglamentEditorControl,
-  ReglamentEditorRowConfig,
+  ReglamentEditorRowConfig
 } from './calculator-editor.types';
 import { formatReglamentInputNumber } from './format';
 
 const CONFIG_SELECTOR = '[data-reglament-editor-config]';
 const DETAILS_SELECTOR = 'details[data-reglament-editor-row]';
 const EDITOR_TEMPLATE_SELECTOR = '[data-reglament-editor-template]';
-const INLINE_CONTROL_TEMPLATE_SELECTOR =
-  '[data-reglament-inline-control-template]';
-const EXPERT_CONTROL_TEMPLATE_SELECTOR =
-  '[data-reglament-expert-control-template]';
+const INLINE_CONTROL_TEMPLATE_SELECTOR = '[data-reglament-inline-control-template]';
+const EXPERT_CONTROL_TEMPLATE_SELECTOR = '[data-reglament-expert-control-template]';
 
-const inputErrorId = (rowId: string, key: string): string =>
-  `reglament-error-${rowId}-${key}`;
-const formatInputUnit = (unit: string): string =>
-  unit === '₽/год' ? '₽' : unit;
+const inputErrorId = (rowId: string, key: string): string => `reglament-error-${rowId}-${key}`;
+const formatInputUnit = (unit: string): string => (unit === '₽/год' ? '₽' : unit);
 
-const cloneTemplateElement = (
-  root: ParentNode,
-  selector: string,
-): HTMLElement => {
+const cloneTemplateElement = (root: ParentNode, selector: string): HTMLElement => {
   const template = root.querySelector(selector);
 
   if (!(template instanceof HTMLTemplateElement)) {
@@ -41,16 +34,12 @@ const configureControl = (
   controlElement: HTMLElement,
   rowId: string,
   rowTitle: string,
-  control: ReglamentEditorControl,
+  control: ReglamentEditorControl
 ): void => {
   const input = controlElement.querySelector('input');
   const error = controlElement.querySelector('[data-reglament-control-error]');
-  const accessibleLabel = controlElement.querySelector(
-    '[data-reglament-control-label]',
-  );
-  const visibleLabel = controlElement.querySelector(
-    '[data-reglament-control-visible-label]',
-  );
+  const accessibleLabel = controlElement.querySelector('[data-reglament-control-label]');
+  const visibleLabel = controlElement.querySelector('[data-reglament-control-visible-label]');
   const unit = controlElement.querySelector('[data-reglament-control-unit]');
 
   if (!(input instanceof HTMLInputElement) || !(error instanceof HTMLElement)) {
@@ -90,7 +79,7 @@ const createControl = (
   templateSelector: string,
   rowId: string,
   rowTitle: string,
-  control: ReglamentEditorControl,
+  control: ReglamentEditorControl
 ): HTMLElement => {
   const controlElement = cloneTemplateElement(root, templateSelector);
   configureControl(controlElement, rowId, rowTitle, control);
@@ -103,16 +92,10 @@ const createBreakdownValue = (
   rowId: string,
   rowTitle: string,
   field: string,
-  control?: ReglamentEditorControl,
+  control?: ReglamentEditorControl
 ): HTMLElement => {
   if (control) {
-    return createControl(
-      root,
-      INLINE_CONTROL_TEMPLATE_SELECTOR,
-      rowId,
-      rowTitle,
-      control,
-    );
+    return createControl(root, INLINE_CONTROL_TEMPLATE_SELECTOR, rowId, rowTitle, control);
   }
 
   const value = document.createElement('span');
@@ -125,11 +108,11 @@ const createBreakdownValue = (
 const createEditor = (
   root: ParentNode,
   rowTitle: string,
-  config: ReglamentEditorRowConfig,
+  config: ReglamentEditorRowConfig
 ): HTMLElement => {
   const editor = cloneTemplateElement(root, EDITOR_TEMPLATE_SELECTOR);
   const controlsByKey = new Map<string, ReglamentEditorControl>(
-    config.breakdown.map((control) => [control.key, control]),
+    config.breakdown.map((control) => [control.key, control])
   );
 
   editor.querySelectorAll('[data-reglament-breakdown-row]').forEach((row) => {
@@ -144,26 +127,13 @@ const createEditor = (
       return;
     }
 
-    value.append(
-      createBreakdownValue(
-        root,
-        config.id,
-        rowTitle,
-        field,
-        controlsByKey.get(field),
-      ),
-    );
+    value.append(createBreakdownValue(root, config.id, rowTitle, field, controlsByKey.get(field)));
   });
 
   const expertFields = editor.querySelector('[data-reglament-expert-fields]');
-  const expertList = editor.querySelector(
-    '[data-reglament-expert-fields-list]',
-  );
+  const expertList = editor.querySelector('[data-reglament-expert-fields-list]');
 
-  if (
-    !(expertFields instanceof HTMLElement) ||
-    !(expertList instanceof HTMLElement)
-  ) {
+  if (!(expertFields instanceof HTMLElement) || !(expertList instanceof HTMLElement)) {
     throw new Error('Invalid reglament editor template');
   }
 
@@ -172,13 +142,7 @@ const createEditor = (
   } else {
     config.expert.forEach((control) => {
       expertList.append(
-        createControl(
-          root,
-          EXPERT_CONTROL_TEMPLATE_SELECTOR,
-          config.id,
-          rowTitle,
-          control,
-        ),
+        createControl(root, EXPERT_CONTROL_TEMPLATE_SELECTOR, config.id, rowTitle, control)
       );
     });
   }
@@ -186,9 +150,7 @@ const createEditor = (
   return editor;
 };
 
-const readEditorConfig = (
-  root: ParentNode,
-): ReglamentEditorConfig | undefined => {
+const readEditorConfig = (root: ParentNode): ReglamentEditorConfig | undefined => {
   const data = root.querySelector(CONFIG_SELECTOR);
 
   if (!(data instanceof HTMLScriptElement) || !data.textContent) {
@@ -200,7 +162,7 @@ const readEditorConfig = (
 
 export const hydrateReglamentEditors = (
   root: HTMLElement,
-  onEditorCreated: (editor: HTMLElement) => void,
+  onEditorCreated: (editor: HTMLElement) => void
 ): void => {
   const config = readEditorConfig(root);
 
@@ -211,10 +173,7 @@ export const hydrateReglamentEditors = (
   const rows = new Map(config.rows.map((row) => [row.id, row]));
 
   root.querySelectorAll(DETAILS_SELECTOR).forEach((node) => {
-    if (
-      !(node instanceof HTMLDetailsElement) ||
-      node.dataset.reglamentEditorHydrated === 'true'
-    ) {
+    if (!(node instanceof HTMLDetailsElement) || node.dataset.reglamentEditorHydrated === 'true') {
       return;
     }
 

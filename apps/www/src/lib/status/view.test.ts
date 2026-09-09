@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import { dateTimeFromISO } from '@shelkovo/format';
+import { describe, expect, it } from 'vitest';
 
 import { visibleWhitespace } from '../test/visible-whitespace';
-
+import { formatStatusTimelineTooltipGroupLabel } from './timeline-tooltip';
 import {
   buildStatusTimelineTooltipData,
   buildStatusTimelineTooltipListItemData,
@@ -10,9 +10,8 @@ import {
   formatStatusIncidentPeriodText,
   formatStatusTimelineGroupTitle,
   formatStatusTimelineTooltipLabel,
-  getStatusIncidentPeriod,
+  getStatusIncidentPeriod
 } from './view';
-import { formatStatusTimelineTooltipGroupLabel } from './timeline-tooltip';
 
 const NBSP = '\u00A0';
 const currentYear = dateTimeFromISO(new Date().toISOString()).year;
@@ -29,15 +28,15 @@ const period = (input: {
   phase: input.isActive ? ('active' as const) : ('resolved' as const),
   started: {
     iso: input.startedIso,
-    hasTime: input.startedHasTime,
+    hasTime: input.startedHasTime
   },
   ended: input.endedIso
     ? {
         iso: input.endedIso,
-        hasTime: input.endedHasTime,
+        hasTime: input.endedHasTime
       }
     : undefined,
-  duration: input.duration,
+  duration: input.duration
 });
 
 describe('getStatusIncidentPeriod', () => {
@@ -48,15 +47,15 @@ describe('getStatusIncidentPeriod', () => {
           isActive: false,
           startedIso: `${currentYear}-05-01T07:32:00+03:00`,
           startedHasTime: true,
-          endedHasTime: false,
-        }),
-      ),
+          endedHasTime: false
+        })
+      )
     ).toEqual({
       prefix: 'Начало',
       start: {
         iso: `${currentYear}-05-01T07:32:00+03:00`,
-        text: '1 мая, 07:32',
-      },
+        text: '1 мая, 07:32'
+      }
     });
   });
 
@@ -67,15 +66,15 @@ describe('getStatusIncidentPeriod', () => {
           isActive: true,
           startedIso: `${currentYear}-05-01T07:32:00+03:00`,
           startedHasTime: true,
-          endedHasTime: false,
-        }),
-      ),
+          endedHasTime: false
+        })
+      )
     ).toEqual({
       prefix: 'Начиная с',
       start: {
         iso: `${currentYear}-05-01T07:32:00+03:00`,
-        text: '1 мая, 07:32',
-      },
+        text: '1 мая, 07:32'
+      }
     });
   });
 
@@ -88,19 +87,19 @@ describe('getStatusIncidentPeriod', () => {
           startedHasTime: false,
           endedIso: `${currentYear}-05-02T00:00:00+03:00`,
           endedHasTime: false,
-          duration: { totalMinutes: 24 * 60 },
-        }),
-      ),
+          duration: { totalMinutes: 24 * 60 }
+        })
+      )
     ).toEqual({
       start: {
         iso: `${currentYear}-05-01T00:00:00+03:00`,
-        text: '1 мая',
+        text: '1 мая'
       },
       end: {
         iso: `${currentYear}-05-02T00:00:00+03:00`,
-        text: '2 мая',
+        text: '2 мая'
       },
-      duration: '1 дн.',
+      duration: '1 дн.'
     });
   });
 
@@ -113,19 +112,19 @@ describe('getStatusIncidentPeriod', () => {
           startedHasTime: true,
           endedIso: `${currentYear}-05-01T16:38:00+03:00`,
           endedHasTime: true,
-          duration: { totalMinutes: 9 * 60 + 6 },
-        }),
-      ),
+          duration: { totalMinutes: 9 * 60 + 6 }
+        })
+      )
     ).toEqual({
       start: {
         iso: `${currentYear}-05-01T07:32:00+03:00`,
-        text: '1 мая, 07:32',
+        text: '1 мая, 07:32'
       },
       end: {
         iso: `${currentYear}-05-01T16:38:00+03:00`,
-        text: '16:38',
+        text: '16:38'
       },
-      duration: '9 ч. 6 мин.',
+      duration: '9 ч. 6 мин.'
     });
   });
 
@@ -138,14 +137,14 @@ describe('getStatusIncidentPeriod', () => {
           startedHasTime: false,
           endedIso: `${currentYear}-05-01T00:00:00+03:00`,
           endedHasTime: false,
-          duration: { totalMinutes: 0 },
-        }),
-      ),
+          duration: { totalMinutes: 0 }
+        })
+      )
     ).toEqual({
       start: {
         iso: `${currentYear}-05-01T00:00:00+03:00`,
-        text: '1 мая',
-      },
+        text: '1 мая'
+      }
     });
   });
 
@@ -158,19 +157,19 @@ describe('getStatusIncidentPeriod', () => {
           startedHasTime: false,
           endedIso: `${currentYear}-05-01T16:38:00+03:00`,
           endedHasTime: true,
-          duration: { totalMinutes: 16 * 60 + 38 },
-        }),
-      ),
+          duration: { totalMinutes: 16 * 60 + 38 }
+        })
+      )
     ).toEqual({
       start: {
         iso: `${currentYear}-05-01T00:00:00+03:00`,
-        text: '1 мая',
+        text: '1 мая'
       },
       end: {
         iso: `${currentYear}-05-01T16:38:00+03:00`,
-        text: '1 мая, 16:38',
+        text: '1 мая, 16:38'
       },
-      duration: '16 ч. 38 мин.',
+      duration: '16 ч. 38 мин.'
     });
   });
 });
@@ -179,8 +178,8 @@ describe('formatStatusDate', () => {
   it('keeps year for non-current years', () => {
     expect(
       formatStatusDate(`${nextYear}-05-01T07:32:00+03:00`, {
-        hasTime: true,
-      }),
+        hasTime: true
+      })
     ).toBe(`1 мая ${nextYear}, 07:32`);
   });
 
@@ -188,8 +187,8 @@ describe('formatStatusDate', () => {
     expect(
       formatStatusDate(`${nextYear}-05-01T07:32:00+03:00`, {
         hasTime: true,
-        nonBreaking: true,
-      }),
+        nonBreaking: true
+      })
     ).toBe(`1${NBSP}мая${NBSP}${nextYear}, 07:32`);
   });
 });
@@ -202,9 +201,9 @@ describe('formatStatusIncidentPeriodText', () => {
           isActive: true,
           startedIso: `${currentYear}-05-01T07:32:00+03:00`,
           startedHasTime: true,
-          endedHasTime: false,
-        }),
-      ),
+          endedHasTime: false
+        })
+      )
     ).toBe('Начиная с 1 мая, 07:32');
   });
 
@@ -217,10 +216,10 @@ describe('formatStatusIncidentPeriodText', () => {
           startedHasTime: true,
           endedIso: `${currentYear}-05-01T16:38:00+03:00`,
           endedHasTime: true,
-          duration: { totalMinutes: 9 * 60 + 6 },
+          duration: { totalMinutes: 9 * 60 + 6 }
         }),
-        { nonBreaking: true },
-      ),
+        { nonBreaking: true }
+      )
     ).toBe(`1${NBSP}мая, 07:32 -${NBSP}16:38 (9${NBSP}ч. 6${NBSP}мин.)`);
   });
 });
@@ -235,8 +234,8 @@ describe('buildStatusTimelineTooltipData', () => {
         phase: 'active',
         startedIso: `${currentYear}-05-01T07:32:00+03:00`,
         startedHasTime: true,
-        endedHasTime: false,
-      },
+        endedHasTime: false
+      }
     });
 
     expect(visibleWhitespace(tooltip)).toMatchInlineSnapshot(`
@@ -248,10 +247,8 @@ describe('buildStatusTimelineTooltipData', () => {
         "title": "Нет воды на·Центральной",
       }
     `);
-    expect(
-      visibleWhitespace(formatStatusTimelineTooltipLabel(tooltip)),
-    ).toMatchInlineSnapshot(
-      `"Вода. Инцидент. Нет воды на·Центральной. Статус: идет. Начиная с·1·мая, 07:32"`,
+    expect(visibleWhitespace(formatStatusTimelineTooltipLabel(tooltip))).toMatchInlineSnapshot(
+      `"Вода. Инцидент. Нет воды на·Центральной. Статус: идет. Начиная с·1·мая, 07:32"`
     );
   });
 
@@ -266,10 +263,10 @@ describe('buildStatusTimelineTooltipData', () => {
             phase: 'scheduled',
             startedIso: `${currentYear}-05-03T00:00:00+03:00`,
             startedHasTime: false,
-            endedHasTime: false,
-          },
-        }),
-      ),
+            endedHasTime: false
+          }
+        })
+      )
     ).toMatchInlineSnapshot(`
       {
         "kindLabel": "Плановые работы",
@@ -292,15 +289,15 @@ describe('buildStatusTimelineTooltipData', () => {
           startedIso: `${nextYear}-05-03T00:00:00+03:00`,
           startedHasTime: false,
           endedIso: `${nextYear}-05-04T00:00:00+03:00`,
-          endedHasTime: false,
-        },
-      }),
+          endedHasTime: false
+        }
+      })
     ).toEqual({
       serviceLabel: 'Электричество',
       kindLabel: 'Плановые работы',
       title: 'Плановая профилактика сети',
       phaseLabel: 'запланировано',
-      periodLabel: `3${NBSP}мая ${nextYear}${NBSP}— 4${NBSP}мая ${nextYear}`,
+      periodLabel: `3${NBSP}мая ${nextYear}${NBSP}— 4${NBSP}мая ${nextYear}`
     });
   });
 
@@ -313,16 +310,14 @@ describe('buildStatusTimelineTooltipData', () => {
         phase: 'active',
         startedIso: `${currentYear}-05-01T07:32:00+03:00`,
         startedHasTime: true,
-        endedHasTime: false,
+        endedHasTime: false
       },
-      nonBreaking: true,
+      nonBreaking: true
     });
 
     expect(tooltip.periodLabel).toBe(`Начиная с${NBSP}1${NBSP}мая, 07:32`);
-    expect(
-      visibleWhitespace(formatStatusTimelineTooltipLabel(tooltip)),
-    ).toMatchInlineSnapshot(
-      `"Вода. Инцидент. Нет воды на·Центральной. Статус: идет. Начиная с·1·мая, 07:32"`,
+    expect(visibleWhitespace(formatStatusTimelineTooltipLabel(tooltip))).toMatchInlineSnapshot(
+      `"Вода. Инцидент. Нет воды на·Центральной. Статус: идет. Начиная с·1·мая, 07:32"`
     );
   });
 });
@@ -333,9 +328,9 @@ describe('grouped timeline tooltip text', () => {
       visibleWhitespace(
         formatStatusTimelineGroupTitle({
           count: 3,
-          startedIso: `${currentYear}-05-09T07:32:00+03:00`,
-        }),
-      ),
+          startedIso: `${currentYear}-05-09T07:32:00+03:00`
+        })
+      )
     ).toMatchInlineSnapshot(`"3 события за·9·мая"`);
   });
 
@@ -350,8 +345,8 @@ describe('grouped timeline tooltip text', () => {
         endedIso: `${currentYear}-05-09T08:10:00+03:00`,
         endedHasTime: true,
         duration: {
-          totalMinutes: 38,
-        },
+          totalMinutes: 38
+        }
       }),
       buildStatusTimelineTooltipListItemData({
         kind: 'incident',
@@ -359,8 +354,8 @@ describe('grouped timeline tooltip text', () => {
         phase: 'active',
         startedIso: `${currentYear}-05-09T12:15:00+03:00`,
         startedHasTime: true,
-        endedHasTime: false,
-      }),
+        endedHasTime: false
+      })
     ];
 
     expect(visibleWhitespace(items[0])).toMatchInlineSnapshot(`
@@ -375,11 +370,11 @@ describe('grouped timeline tooltip text', () => {
         formatStatusTimelineTooltipGroupLabel({
           serviceLabel: 'Электричество',
           title: '2 события за 9 мая',
-          items,
-        }),
-      ),
+          items
+        })
+      )
     ).toMatchInlineSnapshot(
-      `"Электричество. 2 события за 9 мая. Отключение·1. 9·мая, 07:32·— 08:10 (38 мин.). Отключение·2. Начиная с·9·мая, 12:15"`,
+      `"Электричество. 2 события за 9 мая. Отключение·1. 9·мая, 07:32·— 08:10 (38 мин.). Отключение·2. Начиная с·9·мая, 12:15"`
     );
   });
 });

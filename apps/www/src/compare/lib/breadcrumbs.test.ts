@@ -14,20 +14,14 @@ let settlementBreadcrumbs: typeof import('./breadcrumbs').settlementBreadcrumbs;
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE,
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
-  ({
-    compareBreadcrumbs,
-    compareBreadcrumbSchema,
-    comparePageBreadcrumbs,
-    settlementBreadcrumbs,
-  } = await import('./breadcrumbs'));
+  ({ compareBreadcrumbs, compareBreadcrumbSchema, comparePageBreadcrumbs, settlementBreadcrumbs } =
+    await import('./breadcrumbs'));
 });
 
-const assertPageContract = (
-  breadcrumbs: readonly Required<BreadcrumbItem>[],
-) => {
+const assertPageContract = (breadcrumbs: readonly Required<BreadcrumbItem>[]) => {
   const schema = compareBreadcrumbSchema(breadcrumbs);
   const [serialized] = serializeSchema(schema);
 
@@ -45,7 +39,7 @@ const assertPageContract = (
   expect(serialized).toBe(JSON.stringify(parsed));
   expect(parsed).toMatchObject({
     '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
+    '@type': 'BreadcrumbList'
   });
   expect(items).toHaveLength(breadcrumbs.length);
 
@@ -59,7 +53,7 @@ const assertPageContract = (
     expect(item).toMatchObject({
       name: breadcrumb.label,
       item: new URL(breadcrumb.href, SITE).toString(),
-      position: index + 1,
+      position: index + 1
     });
   });
 };
@@ -72,14 +66,8 @@ describe('compare breadcrumbs', () => {
   it.each([
     ['index', () => compareBreadcrumbs()],
     ['rating', () => comparePageBreadcrumbs(FIXTURE_LABEL, '/fixture-rating/')],
-    [
-      'settlement',
-      () => settlementBreadcrumbs(FIXTURE_LABEL, 'fixture-settlement'),
-    ],
-  ])(
-    'keeps visible and serialized breadcrumbs aligned on the %s route',
-    (_, breadcrumbs) => {
-      assertPageContract(breadcrumbs());
-    },
-  );
+    ['settlement', () => settlementBreadcrumbs(FIXTURE_LABEL, 'fixture-settlement')]
+  ])('keeps visible and serialized breadcrumbs aligned on the %s route', (_, breadcrumbs) => {
+    assertPageContract(breadcrumbs());
+  });
 });

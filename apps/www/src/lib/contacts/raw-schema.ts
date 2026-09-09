@@ -1,12 +1,13 @@
 import { z } from 'astro/zod';
 
+import { RawSearchAliasesSchema } from '@/lib/search/raw-schema';
+
 import {
   CONTACT_CATEGORIES,
   CONTACT_REVIEW_SENTIMENTS,
   CONTACT_SLUG,
-  isContactCalendarDate,
+  isContactCalendarDate
 } from './schema';
-import { RawSearchAliasesSchema } from '@/lib/search/raw-schema';
 
 const nonBlankText = z.string().trim().min(1);
 
@@ -19,13 +20,12 @@ const isHttpsUrl = (value: string): boolean => {
 };
 
 const contactUrl = nonBlankText.url().refine(isHttpsUrl, {
-  message: 'url must use https://',
+  message: 'url must use https://'
 });
 
 const contactDate = (name: string) =>
   z.union([nonBlankText, z.date()]).transform((value, ctx) => {
-    const normalized =
-      value instanceof Date ? value.toISOString().slice(0, 10) : value;
+    const normalized = value instanceof Date ? value.toISOString().slice(0, 10) : value;
 
     if (isContactCalendarDate(normalized)) {
       return normalized;
@@ -33,7 +33,7 @@ const contactDate = (name: string) =>
 
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `${name} must use YYYY-MM-DD`,
+      message: `${name} must use YYYY-MM-DD`
     });
 
     return z.NEVER;
@@ -45,23 +45,17 @@ const contacts = z
     telegram: contactUrl.optional(),
     whatsapp: contactUrl.optional(),
     email: nonBlankText.email().optional(),
-    website: contactUrl.optional(),
+    website: contactUrl.optional()
   })
   .strict()
   .superRefine((value, ctx) => {
-    if (
-      value.phone ||
-      value.telegram ||
-      value.whatsapp ||
-      value.email ||
-      value.website
-    ) {
+    if (value.phone || value.telegram || value.whatsapp || value.email || value.website) {
       return;
     }
 
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: 'contacts must include at least one public contact method',
+      message: 'contacts must include at least one public contact method'
     });
   });
 
@@ -73,16 +67,16 @@ const location = z
     coordinates: z
       .object({
         lat: z.number().min(-90).max(90),
-        lng: z.number().min(-180).max(180),
+        lng: z.number().min(-180).max(180)
       })
       .strict()
-      .optional(),
+      .optional()
   })
   .strict();
 
 const seo = z
   .object({
-    description: nonBlankText.optional(),
+    description: nonBlankText.optional()
   })
   .strict();
 
@@ -91,7 +85,7 @@ const review = z
     sentiment: z.enum(CONTACT_REVIEW_SENTIMENTS),
     summary: nonBlankText,
     published_at: contactDate('reviews.published_at'),
-    url: contactUrl,
+    url: contactUrl
   })
   .strict();
 
@@ -101,7 +95,7 @@ const vcfName = z
     given: nonBlankText,
     additional: nonBlankText.optional(),
     prefix: nonBlankText.optional(),
-    suffix: nonBlankText.optional(),
+    suffix: nonBlankText.optional()
   })
   .strict();
 
@@ -114,7 +108,7 @@ const vcfContactFields = {
   address: nonBlankText.optional(),
   job_title: nonBlankText.optional(),
   role: nonBlankText.optional(),
-  note: nonBlankText.optional(),
+  note: nonBlankText.optional()
 } as const;
 
 const disabledVcf = z.object({ enable: z.literal(false) }).strict();
@@ -126,7 +120,7 @@ const personVcf = z
     full_name: nonBlankText.optional(),
     name: vcfName,
     organization: nonBlankText.optional(),
-    ...vcfContactFields,
+    ...vcfContactFields
   })
   .strict();
 
@@ -136,7 +130,7 @@ const organizationVcf = z
     kind: z.literal('organization'),
     full_name: nonBlankText.optional(),
     organization: nonBlankText,
-    ...vcfContactFields,
+    ...vcfContactFields
   })
   .strict();
 
@@ -146,7 +140,7 @@ export const RawContactSchema = z
   .object({
     title: nonBlankText,
     slug: nonBlankText.refine((value) => CONTACT_SLUG.test(value), {
-      message: 'slug must use lower-case Latin letters, digits, and hyphen',
+      message: 'slug must use lower-case Latin letters, digits, and hyphen'
     }),
     category: z.enum(CONTACT_CATEGORIES),
     updated_at: contactDate('updated_at'),
@@ -156,7 +150,7 @@ export const RawContactSchema = z
     location: location.optional(),
     reviews: z.array(review).optional(),
     seo: seo.optional(),
-    vcf: vcf.optional(),
+    vcf: vcf.optional()
   })
   .strict();
 

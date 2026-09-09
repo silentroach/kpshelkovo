@@ -1,29 +1,22 @@
 import { dateTimeFromISO } from '@shelkovo/format';
-import type { CollectionEntry } from 'astro:content';
-
 import { compareRuText } from '@shelkovo/format';
+import type { CollectionEntry } from 'astro:content';
 
 import type { SiteMentionRegistry } from '../mentions';
 import { loadSiteMentionRegistry } from '../mentions/registry';
-import {
-  buildStatusCalendarProjection,
-  toStatusCalendarRecord,
-} from './calendar';
-import { mapRawStatusIncident } from './mapper';
+import { buildStatusCalendarProjection, toStatusCalendarRecord } from './calendar';
 import { getStatusServiceState } from './lifecycle';
+import { mapRawStatusIncident } from './mapper';
 import { STATUS_SERVICES, type StatusService } from './schema';
 import type {
   StatusDataset,
   StatusDaysWithoutIncidents,
   StatusIncident,
   StatusIncidentWithDetail,
-  StatusServiceSummary,
+  StatusServiceSummary
 } from './types';
 
-export type StatusIncidentEntry = Pick<
-  CollectionEntry<'statusIncidents'>,
-  'id' | 'data' | 'body'
->;
+export type StatusIncidentEntry = Pick<CollectionEntry<'statusIncidents'>, 'id' | 'data' | 'body'>;
 
 let cache: Promise<StatusDataset> | undefined;
 
@@ -45,19 +38,17 @@ function compareIncidentsDesc(a: StatusIncident, b: StatusIncident): number {
 
 function daysWithoutIncidents(
   incidents: readonly StatusIncident[],
-  now: Date,
+  now: Date
 ): StatusDaysWithoutIncidents {
   const activeIncident = incidents.find(
-    (item) => item.kind === 'incident' && item.phase === 'active',
+    (item) => item.kind === 'incident' && item.phase === 'active'
   );
 
   if (activeIncident) {
     return { mode: 'activeIncident' };
   }
 
-  const latest = incidents.find(
-    (item) => item.kind === 'incident' && item.ended,
-  );
+  const latest = incidents.find((item) => item.kind === 'incident' && item.ended);
 
   if (!latest?.ended) {
     return { mode: 'noIncidents' };
@@ -69,21 +60,21 @@ function daysWithoutIncidents(
   return {
     mode: 'count',
     days: Math.max(0, Math.floor(today.diff(last, 'days').days)),
-    lastEndedIso: latest.ended.iso,
+    lastEndedIso: latest.ended.iso
   };
 }
 
 function serviceSummary(
   service: StatusService,
   incidents: readonly StatusIncident[],
-  now: Date,
+  now: Date
 ): StatusServiceSummary {
   const list = incidents.filter((item) => item.service === service);
   const activeIncidents = list.filter(
-    (item) => item.kind === 'incident' && item.phase === 'active',
+    (item) => item.kind === 'incident' && item.phase === 'active'
   );
   const activeMaintenance = list.filter(
-    (item) => item.kind === 'maintenance' && item.phase === 'active',
+    (item) => item.kind === 'maintenance' && item.phase === 'active'
   );
 
   return {
@@ -92,7 +83,7 @@ function serviceSummary(
     incidents: list,
     activeIncidents,
     activeMaintenance,
-    daysWithoutIncidents: daysWithoutIncidents(list, now),
+    daysWithoutIncidents: daysWithoutIncidents(list, now)
   };
 }
 
@@ -101,27 +92,22 @@ export const buildStatusDataset = (
   opts?: {
     readonly now?: Date;
     readonly mentionRegistry?: SiteMentionRegistry;
-  },
+  }
 ): StatusDataset => {
   const now = opts?.now ?? new Date();
   const mentionRegistry = opts?.mentionRegistry ?? new Map();
   const incidents = entries
     .map((entry) => mapRawStatusIncident(entry, { now, mentionRegistry }))
     .sort(compareIncidentsDesc);
-  const services = STATUS_SERVICES.map((service) =>
-    serviceSummary(service, incidents, now),
-  );
+  const services = STATUS_SERVICES.map((service) => serviceSummary(service, incidents, now));
 
   return {
     incidents,
     active: incidents.filter((item) => item.phase === 'active'),
     services,
-    calendar: buildStatusCalendarProjection(
-      incidents.map(toStatusCalendarRecord),
-      now.valueOf(),
-    ),
+    calendar: buildStatusCalendarProjection(incidents.map(toStatusCalendarRecord), now.valueOf()),
     byId: new Map(incidents.map((item) => [item.id, item])),
-    byService: new Map(services.map((item) => [item.service, item])),
+    byService: new Map(services.map((item) => [item.service, item]))
   };
 };
 
@@ -129,44 +115,35 @@ export const loadStatusData = (): Promise<StatusDataset> => {
   cache ??= Promise.all([
     import('astro:content').then(
       ({ getCollection }) =>
-        getCollection('statusIncidents') as Promise<
-          readonly StatusIncidentEntry[]
-        >,
+        getCollection('statusIncidents') as Promise<readonly StatusIncidentEntry[]>
     ),
-    loadSiteMentionRegistry(),
-  ]).then(([entries, mentionRegistry]) =>
-    buildStatusDataset(entries, { mentionRegistry }),
-  );
+    loadSiteMentionRegistry()
+  ]).then(([entries, mentionRegistry]) => buildStatusDataset(entries, { mentionRegistry }));
 
   return cache;
 };
 
-export const loadStatusIncidents = async (): Promise<
-  readonly StatusIncident[]
-> => (await loadStatusData()).incidents;
+export const loadStatusIncidents = async (): Promise<readonly StatusIncident[]> =>
+  (await loadStatusData()).incidents;
 
 export const hasStatusIncidentDetail = (
-  incident: StatusIncident,
+  incident: StatusIncident
 ): incident is StatusIncidentWithDetail => incident.hasPage;
 
-export const loadStatusIncidentDetails = async (): Promise<
-  readonly StatusIncidentWithDetail[]
-> => (await loadStatusIncidents()).filter(hasStatusIncidentDetail);
+export const loadStatusIncidentDetails = async (): Promise<readonly StatusIncidentWithDetail[]> =>
+  (await loadStatusIncidents()).filter(hasStatusIncidentDetail);
 
-export const loadActiveStatusIncidents = async (): Promise<
-  readonly StatusIncident[]
-> => (await loadStatusData()).active;
+export const loadActiveStatusIncidents = async (): Promise<readonly StatusIncident[]> =>
+  (await loadStatusData()).active;
 
-export const loadStatusServices = async (): Promise<
-  readonly StatusServiceSummary[]
-> => (await loadStatusData()).services;
+export const loadStatusServices = async (): Promise<readonly StatusServiceSummary[]> =>
+  (await loadStatusData()).services;
 
-export const loadStatusIncident = async (
-  id: string,
-): Promise<StatusIncident | undefined> => (await loadStatusData()).byId.get(id);
+export const loadStatusIncident = async (id: string): Promise<StatusIncident | undefined> =>
+  (await loadStatusData()).byId.get(id);
 
 export const loadStatusIncidentDetail = async (
-  id: string,
+  id: string
 ): Promise<StatusIncidentWithDetail | undefined> => {
   const incident = await loadStatusIncident(id);
 
@@ -174,6 +151,5 @@ export const loadStatusIncidentDetail = async (
 };
 
 export const loadStatusService = async (
-  service: StatusService,
-): Promise<StatusServiceSummary | undefined> =>
-  (await loadStatusData()).byService.get(service);
+  service: StatusService
+): Promise<StatusServiceSummary | undefined> => (await loadStatusData()).byService.get(service);

@@ -1,11 +1,11 @@
 import type { StatusTimelineIncidentInput } from './timeline';
+import type { StatusTimelineTooltipItemDto } from './timeline-tooltip.types';
 import type { StatusIncidentPhase } from './types';
 import { buildStatusTimelineTooltipListItemData } from './view';
-import type { StatusTimelineTooltipItemDto } from './timeline-tooltip.types';
 
 const buildTooltipListItemForPhase = (
   item: StatusTimelineIncidentInput,
-  phase: StatusIncidentPhase,
+  phase: StatusIncidentPhase
 ) =>
   buildStatusTimelineTooltipListItemData(
     {
@@ -17,13 +17,13 @@ const buildTooltipListItemForPhase = (
       endedIso: item.endedIso,
       endedHasTime: item.endedHasTime,
       duration: item.duration,
-      areas: item.areas,
+      areas: item.areas
     },
-    { nonBreaking: true },
+    { nonBreaking: true }
   );
 
 export const toStatusTimelineTooltipItemDto = (
-  item: StatusTimelineIncidentInput,
+  item: StatusTimelineIncidentInput
 ): StatusTimelineTooltipItemDto => {
   const scheduled = buildTooltipListItemForPhase(item, 'scheduled');
   const active = buildTooltipListItemForPhase(item, 'active');
@@ -37,9 +37,6 @@ export const toStatusTimelineTooltipItemDto = (
     areas: scheduled.areas,
     areaLabel: scheduled.areaLabel,
     periodLabel: scheduled.periodLabel,
-    activePeriodLabel:
-      active.periodLabel === scheduled.periodLabel
-        ? undefined
-        : active.periodLabel,
+    activePeriodLabel: active.periodLabel === scheduled.periodLabel ? undefined : active.periodLabel
   };
 };

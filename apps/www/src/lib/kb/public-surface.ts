@@ -1,17 +1,12 @@
 import type { PublicSurfaceSlice } from '@/lib/public-surface/types';
 
-import {
-  kbDetailMarkdownPattern,
-  kbDetailPattern,
-  kbMarkdownPath,
-  kbPath,
-} from './routes';
+import { kbDetailMarkdownPattern, kbDetailPattern, kbMarkdownPath, kbPath } from './routes';
 
 export const kbPublicSurfaceSlice = {
   owner: {
     id: 'kb',
     label: 'База знаний',
-    entryPath: kbPath(),
+    entryPath: kbPath()
   },
   surfaces: [
     {
@@ -21,7 +16,7 @@ export const kbPublicSurfaceSlice = {
       mediaType: 'text/html',
       cacheClass: 'html',
       discoveryRoles: ['section-entry'],
-      catalogRole: 'anchor',
+      catalogRole: 'anchor'
     },
     {
       id: 'kb:index-markdown',
@@ -30,7 +25,7 @@ export const kbPublicSurfaceSlice = {
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
       discoveryRoles: ['markdown-companion'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'kb:page',
@@ -38,7 +33,7 @@ export const kbPublicSurfaceSlice = {
       routePattern: kbDetailPattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'kb:page-markdown',
@@ -46,7 +41,7 @@ export const kbPublicSurfaceSlice = {
       routePattern: kbDetailMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
-    },
-  ],
+      discoveryRoles: ['markdown-companion']
+    }
+  ]
 } satisfies PublicSurfaceSlice;

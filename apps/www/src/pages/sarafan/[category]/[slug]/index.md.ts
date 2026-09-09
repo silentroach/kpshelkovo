@@ -1,8 +1,8 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 
-import { createMarkdownResponse } from '@/lib/markdown/response';
 import { loadContact, loadContacts } from '@/lib/contacts/load';
 import { buildContactMarkdown } from '@/lib/contacts/markdown';
+import { createMarkdownResponse } from '@/lib/markdown/response';
 
 export const prerender = true;
 
@@ -10,7 +10,7 @@ export const getStaticPaths = (async () => {
   const contacts = await loadContacts();
 
   return contacts.map((contact) => ({
-    params: { category: contact.category, slug: contact.slug },
+    params: { category: contact.category, slug: contact.slug }
   }));
 }) satisfies GetStaticPaths;
 

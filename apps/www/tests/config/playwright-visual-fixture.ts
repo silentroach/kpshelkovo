@@ -1,12 +1,12 @@
 import { fileURLToPath } from 'node:url';
+
 import { defineConfig } from '@playwright/test';
+
 import type { VisualFixturePlaywrightOptions } from './visual-fixture.types';
 
 const cwd = fileURLToPath(new URL('../..', import.meta.url));
 
-export const createVisualFixturePlaywrightConfig = (
-  options: VisualFixturePlaywrightOptions,
-) => {
+export const createVisualFixturePlaywrightConfig = (options: VisualFixturePlaywrightOptions) => {
   const baseURL = `http://127.0.0.1:${String(options.port)}`;
 
   return defineConfig({
@@ -17,7 +17,7 @@ export const createVisualFixturePlaywrightConfig = (
     reporter: 'list',
     timeout: options.testTimeout,
     expect: {
-      timeout: 10_000,
+      timeout: 10_000
     },
     use: {
       baseURL,
@@ -25,17 +25,17 @@ export const createVisualFixturePlaywrightConfig = (
       headless: true,
       viewport: options.viewport,
       deviceScaleFactor: 2,
-      colorScheme: 'light',
+      colorScheme: 'light'
     },
     webServer: {
       command: options.command,
       cwd,
       env: {
-        ASTRO_PREVIEW_BACKGROUND: '0',
+        ASTRO_PREVIEW_BACKGROUND: '0'
       },
       url: baseURL,
       reuseExistingServer: !process.env.CI,
-      timeout: options.serverTimeout,
-    },
+      timeout: options.serverTimeout
+    }
   });
 };

@@ -11,60 +11,60 @@ const fixtures = vi.hoisted(() => ({
       slug: '2026-06-13-ok-comfort',
       url: '/meetings/2026-06-13-ok-comfort/',
       transcript: {
-        parts: [{ index: 1 }],
-      },
-    },
+        parts: [{ index: 1 }]
+      }
+    }
   ],
   news: {
-    articles: [{ id: 'news-1' }, { id: 'news-2' }, { id: 'news-3' }],
+    articles: [{ id: 'news-1' }, { id: 'news-2' }, { id: 'news-3' }]
   },
   reviews: {
-    reviews: [{ id: 'review-1' }, { id: 'review-2' }],
+    reviews: [{ id: 'review-1' }, { id: 'review-2' }]
   },
   contacts: {
-    contacts: [{ slug: 'contact-1' }],
+    contacts: [{ slug: 'contact-1' }]
   },
   people: {
     profiles: [
       {
         canonical: 'https://example.com/people/kschemelinin/',
-        markdownUrl: '/people/kschemelinin/index.md',
-      },
-    ],
+        markdownUrl: '/people/kschemelinin/index.md'
+      }
+    ]
   },
   places: [{ slug: 'burzhuyka' }],
   status: {
     incidents: [{ id: 'status-1' }, { id: 'status-2' }],
-    active: [{ kind: 'incident' }, { kind: 'maintenance' }],
-  },
+    active: [{ kind: 'incident' }, { kind: 'maintenance' }]
+  }
 }));
 
 vi.mock('./meetings/load', () => ({
-  loadMeetings: async () => fixtures.meetings,
+  loadMeetings: async () => fixtures.meetings
 }));
 
 vi.mock('./news/load', () => ({
-  loadNewsData: async () => fixtures.news,
+  loadNewsData: async () => fixtures.news
 }));
 
 vi.mock('./reviews/load', () => ({
-  loadReviewsData: async () => fixtures.reviews,
+  loadReviewsData: async () => fixtures.reviews
 }));
 
 vi.mock('./contacts/load', () => ({
-  loadContactsData: async () => fixtures.contacts,
+  loadContactsData: async () => fixtures.contacts
 }));
 
 vi.mock('./people/load', () => ({
-  loadPeopleDataWithBacklinks: async () => fixtures.people,
+  loadPeopleDataWithBacklinks: async () => fixtures.people
 }));
 
 vi.mock('./places/load', () => ({
-  loadPlaces: async () => fixtures.places,
+  loadPlaces: async () => fixtures.places
 }));
 
 vi.mock('./status/load', () => ({
-  loadStatusData: async () => fixtures.status,
+  loadStatusData: async () => fixtures.status
 }));
 
 let build: typeof import('./llms').build;
@@ -75,7 +75,7 @@ let surfaceHref: typeof import('./public-surface').surfaceHref;
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ build, buildHomeMarkdown } = await import('./llms'));
@@ -85,20 +85,14 @@ beforeAll(async () => {
 describe('root llms', () => {
   it('publishes registered knowledge base entries in every root map', async () => {
     const root = 'https://example.com';
-    const maps = [
-      await build('short'),
-      await build('full'),
-      await buildHomeMarkdown(),
-    ];
+    const maps = [await build('short'), await build('full'), await buildHomeMarkdown()];
     const knowledgeBaseSurfaceIds = [
       'kb:index',
-      'kb:index-markdown',
+      'kb:index-markdown'
     ] satisfies readonly PublicSurfaceId[];
 
     for (const surfaceId of knowledgeBaseSurfaceIds) {
-      const surface = publicSurfaceRegistry.surfaces.find(
-        (item) => item.id === surfaceId,
-      );
+      const surface = publicSurfaceRegistry.surfaces.find((item) => item.id === surfaceId);
 
       expect(surface, surfaceId).toBeDefined();
       if (!surface) {
@@ -144,7 +138,7 @@ describe('root llms', () => {
       'https://example.com/people/kschemelinin/',
       'https://example.com/people/kschemelinin/index.md',
       'https://example.com/815/compare/llms.txt',
-      'https://example.com/815/compare/data/settlements.json',
+      'https://example.com/815/compare/data/settlements.json'
     ]) {
       expect(combined).toContain(url);
     }
@@ -156,11 +150,9 @@ describe('root llms', () => {
 
   it('uses registered public surfaces for the root URL map', async () => {
     const root = 'https://example.com';
-    const combined = [
-      await build('short'),
-      await build('full'),
-      await buildHomeMarkdown(),
-    ].join('\n');
+    const combined = [await build('short'), await build('full'), await buildHomeMarkdown()].join(
+      '\n'
+    );
 
     const registeredUrls = [
       'root:api-catalog',
@@ -195,13 +187,11 @@ describe('root llms', () => {
       'compare:llms',
       'compare:data-settlements',
       'compare:api-catalog',
-      'compare:skills',
+      'compare:skills'
     ] satisfies readonly PublicSurfaceId[];
 
     for (const surfaceId of registeredUrls) {
-      const surface = publicSurfaceRegistry.surfaces.find(
-        (item) => item.id === surfaceId,
-      );
+      const surface = publicSurfaceRegistry.surfaces.find((item) => item.id === surfaceId);
 
       expect(surface, surfaceId).toBeDefined();
       if (!surface) {

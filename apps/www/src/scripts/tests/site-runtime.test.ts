@@ -2,25 +2,24 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const highlightSearchTerms = vi.hoisted(() => vi.fn(async () => {}));
 const installActiveVisitTracker = vi.hoisted(() => vi.fn());
-const { isSearchDialogLoadRetry, loadSearchDialog, openSearchDialog } =
-  vi.hoisted(() => {
-    const openSearchDialog = vi.fn();
+const { isSearchDialogLoadRetry, loadSearchDialog, openSearchDialog } = vi.hoisted(() => {
+  const openSearchDialog = vi.fn();
 
-    return {
-      isSearchDialogLoadRetry: vi.fn(() => false),
-      loadSearchDialog: vi.fn(async () => ({ openSearchDialog })),
-      openSearchDialog,
-    };
-  });
+  return {
+    isSearchDialogLoadRetry: vi.fn(() => false),
+    loadSearchDialog: vi.fn(async () => ({ openSearchDialog })),
+    openSearchDialog
+  };
+});
 
 vi.mock('@/lib/search/highlight', () => ({
   highlightSearchTerms,
-  SEARCH_HIGHLIGHT_PARAM: 'h',
+  SEARCH_HIGHLIGHT_PARAM: 'h'
 }));
 vi.mock('@/scripts/active-visit', () => ({ installActiveVisitTracker }));
 vi.mock('@/scripts/search-dialog-loader', () => ({
   isSearchDialogLoadRetry,
-  loadSearchDialog,
+  loadSearchDialog
 }));
 
 import '../site-runtime';
@@ -46,15 +45,9 @@ const renderSearchShell = () => {
   const dialog = root?.querySelector<HTMLDialogElement>('[data-search-dialog]');
   const input = root?.querySelector<HTMLInputElement>('[data-search-input]');
   const close = root?.querySelector<HTMLButtonElement>('[data-search-close]');
-  const loadStatus = root?.querySelector<HTMLElement>(
-    '[data-search-load-status]',
-  );
-  const loadMessage = root?.querySelector<HTMLElement>(
-    '[data-search-load-message]',
-  );
-  const loadAnnouncement = root?.querySelector<HTMLElement>(
-    '[data-search-load-announcement]',
-  );
+  const loadStatus = root?.querySelector<HTMLElement>('[data-search-load-status]');
+  const loadMessage = root?.querySelector<HTMLElement>('[data-search-load-message]');
+  const loadAnnouncement = root?.querySelector<HTMLElement>('[data-search-load-announcement]');
   const retry = root?.querySelector<HTMLButtonElement>('[data-search-retry]');
   if (
     !opener ||
@@ -79,7 +72,7 @@ const renderSearchShell = () => {
     loadStatus,
     opener,
     retry,
-    root,
+    root
   } as const;
 };
 
@@ -110,9 +103,7 @@ describe('Yandex Metrika', () => {
   it('queues goals before the delayed counter load', async () => {
     vi.useFakeTimers();
     document.documentElement.dataset.siteMetrikaId = '108975391';
-    const append = vi
-      .spyOn(document.head, 'append')
-      .mockImplementation(() => {});
+    const append = vi.spyOn(document.head, 'append').mockImplementation(() => {});
 
     vi.resetModules();
     await import('../site-runtime');
@@ -176,25 +167,22 @@ describe('home hero fallback', () => {
     fallback.setAttribute('data-home-hero-fallback', '');
     newDocument.body.append(fallback);
     const event = Object.assign(new Event('astro:before-swap'), {
-      newDocument,
+      newDocument
     });
 
     document.dispatchEvent(event);
 
-    expect(
-      newDocument.querySelectorAll('[data-home-hero-fallback]'),
-    ).toHaveLength(0);
+    expect(newDocument.querySelectorAll('[data-home-hero-fallback]')).toHaveLength(0);
   });
 });
 
 describe('search dialog loader', () => {
   it('opens synchronously and forwards the exact pre-hydration query', async () => {
-    const { dialog, input, loadAnnouncement, loadMessage, opener, root } =
-      renderSearchShell();
+    const { dialog, input, loadAnnouncement, loadMessage, opener, root } = renderSearchShell();
 
     const click = new MouseEvent('click', {
       bubbles: true,
-      cancelable: true,
+      cancelable: true
     });
     opener.dispatchEvent(click);
 
@@ -214,19 +202,9 @@ describe('search dialog loader', () => {
   it('shows a failed import and retries with the exact pre-hydration query', async () => {
     const loadError = new Error('chunk unavailable');
     loadSearchDialog.mockRejectedValueOnce(loadError);
-    const consoleError = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
-    const {
-      dialog,
-      input,
-      loadAnnouncement,
-      loadMessage,
-      loadStatus,
-      opener,
-      retry,
-      root,
-    } = renderSearchShell();
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { dialog, input, loadAnnouncement, loadMessage, loadStatus, opener, retry, root } =
+      renderSearchShell();
 
     opener.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     input.value = 'вода';
@@ -240,7 +218,7 @@ describe('search dialog loader', () => {
       inputValue: input.value,
       message: loadMessage.textContent,
       retryDisabled: retry.disabled,
-      retryHidden: retry.hidden,
+      retryHidden: retry.hidden
     }).toMatchInlineSnapshot(`
       {
         "action": "Повторить",
@@ -256,25 +234,18 @@ describe('search dialog loader', () => {
     expect(openSearchDialog).not.toHaveBeenCalled();
 
     isSearchDialogLoadRetry.mockReturnValue(true);
-    retry.dispatchEvent(
-      new MouseEvent('click', { bubbles: true, cancelable: true }),
-    );
+    retry.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
 
     expect(document.activeElement).toBe(input);
     expect(loadMessage.textContent).toBe('Пробуем загрузить поиск ещё раз…');
-    expect(loadAnnouncement.textContent).toBe(
-      'Пробуем загрузить поиск ещё раз…',
-    );
+    expect(loadAnnouncement.textContent).toBe('Пробуем загрузить поиск ещё раз…');
     await vi.waitFor(() => expect(openSearchDialog).toHaveBeenCalledOnce());
     expect(loadSearchDialog).toHaveBeenCalledTimes(2);
     expect(openSearchDialog).toHaveBeenCalledWith(root, opener, 'вода');
     expect(loadStatus.hidden).toBe(true);
     expect(retry.disabled).toBe(true);
     expect(input.value).toBe('вода');
-    expect(consoleError).toHaveBeenCalledWith(
-      'Не удалось загрузить модуль поиска.',
-      loadError,
-    );
+    expect(consoleError).toHaveBeenCalledWith('Не удалось загрузить модуль поиска.', loadError);
   });
 
   it('keeps repeated failures retryable and announced', async () => {
@@ -283,8 +254,7 @@ describe('search dialog loader', () => {
       .mockRejectedValueOnce(new Error('retry chunk unavailable'))
       .mockResolvedValueOnce({ openSearchDialog });
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    const { input, loadAnnouncement, loadMessage, loadStatus, opener, retry } =
-      renderSearchShell();
+    const { input, loadAnnouncement, loadMessage, loadStatus, opener, retry } = renderSearchShell();
 
     opener.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     input.value = 'вода';
@@ -300,7 +270,7 @@ describe('search dialog loader', () => {
       inputFocused: document.activeElement === input,
       inputValue: input.value,
       message: loadMessage.textContent,
-      statusHidden: loadStatus.hidden,
+      statusHidden: loadStatus.hidden
     }).toMatchInlineSnapshot(`
       {
         "action": "Повторить",
@@ -313,9 +283,7 @@ describe('search dialog loader', () => {
     `);
 
     retry.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(loadAnnouncement.textContent).toBe(
-      'Пробуем загрузить поиск ещё раз…',
-    );
+    expect(loadAnnouncement.textContent).toBe('Пробуем загрузить поиск ещё раз…');
     await vi.waitFor(() => expect(openSearchDialog).toHaveBeenCalledOnce());
     expect(loadSearchDialog).toHaveBeenCalledTimes(3);
   });
@@ -323,8 +291,7 @@ describe('search dialog loader', () => {
   it('restores the native lifecycle after a failure and opens again', async () => {
     loadSearchDialog.mockRejectedValueOnce(new Error('chunk unavailable'));
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    const { close, dialog, input, loadStatus, opener, retry, root } =
-      renderSearchShell();
+    const { close, dialog, input, loadStatus, opener, retry, root } = renderSearchShell();
 
     opener.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     input.value = 'дороги';
@@ -388,7 +355,7 @@ describe('search dialog loader', () => {
       dialog: nextDialog,
       input: nextInput,
       opener: nextOpener,
-      root: nextRoot,
+      root: nextRoot
     } = renderSearchShell();
 
     nextOpener.dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -410,9 +377,7 @@ describe('site header menu', () => {
     `;
 
     const outside = document.querySelector<HTMLElement>('button');
-    const menu = document.querySelector<HTMLDetailsElement>(
-      'details.site-header-menu',
-    );
+    const menu = document.querySelector<HTMLDetailsElement>('details.site-header-menu');
     if (!outside || !menu) {
       throw new Error('Expected open site header menu fixture');
     }
@@ -430,9 +395,7 @@ describe('site header menu', () => {
       </details>
     `;
 
-    const menu = document.querySelector<HTMLDetailsElement>(
-      'details.site-header-menu',
-    );
+    const menu = document.querySelector<HTMLDetailsElement>('details.site-header-menu');
     const link = menu?.querySelector<HTMLAnchorElement>('a');
     if (!menu || !link) {
       throw new Error('Expected open site header menu fixture');
@@ -451,12 +414,8 @@ describe('site header menu', () => {
       </details>
     `;
 
-    const searchTrigger = document.querySelector<HTMLButtonElement>(
-      '[data-search-trigger]',
-    );
-    const menu = document.querySelector<HTMLDetailsElement>(
-      'details.site-header-menu',
-    );
+    const searchTrigger = document.querySelector<HTMLButtonElement>('[data-search-trigger]');
+    const menu = document.querySelector<HTMLDetailsElement>('details.site-header-menu');
     if (!searchTrigger || !menu) {
       throw new Error('Expected search trigger and open site header menu');
     }
@@ -474,9 +433,7 @@ describe('site header menu', () => {
       </details>
     `;
 
-    const menu = document.querySelector<HTMLDetailsElement>(
-      'details.site-header-menu',
-    );
+    const menu = document.querySelector<HTMLDetailsElement>('details.site-header-menu');
     const summary = menu?.querySelector<HTMLElement>('summary');
     const link = menu?.querySelector<HTMLAnchorElement>('a');
     if (!menu || !summary || !link) {
@@ -484,9 +441,7 @@ describe('site header menu', () => {
     }
 
     link.focus();
-    link.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
-    );
+    link.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 
     expect(menu.open).toBe(false);
     expect(document.activeElement).toBe(summary);
@@ -501,17 +456,13 @@ describe('site header menu', () => {
     `;
 
     const outside = document.querySelector<HTMLElement>('button');
-    const menu = document.querySelector<HTMLDetailsElement>(
-      'details.site-header-menu',
-    );
+    const menu = document.querySelector<HTMLDetailsElement>('details.site-header-menu');
     if (!outside || !menu) {
       throw new Error('Expected closed site header menu fixture');
     }
 
     outside.focus();
-    outside.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
-    );
+    outside.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 
     expect(menu.open).toBe(false);
     expect(document.activeElement).toBe(outside);
@@ -526,17 +477,13 @@ describe('site header menu', () => {
     `;
 
     const outside = document.querySelector<HTMLElement>('button');
-    const menu = document.querySelector<HTMLDetailsElement>(
-      'details.site-header-menu',
-    );
+    const menu = document.querySelector<HTMLDetailsElement>('details.site-header-menu');
     if (!outside || !menu) {
       throw new Error('Expected open site header menu fixture');
     }
 
     outside.focus();
-    outside.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
-    );
+    outside.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 
     expect(menu.open).toBe(true);
     expect(document.activeElement).toBe(outside);
@@ -565,15 +512,9 @@ describe('desktop site navigation dropdown', () => {
     `;
     document.dispatchEvent(new Event('astro:page-load'));
 
-    const dropdown = document.querySelector<HTMLElement>(
-      '[data-site-nav-dropdown]',
-    );
-    const button = dropdown?.querySelector<HTMLButtonElement>(
-      '[data-site-nav-dropdown-button]',
-    );
-    const menu = dropdown?.querySelector<HTMLElement>(
-      '[data-site-nav-dropdown-menu]',
-    );
+    const dropdown = document.querySelector<HTMLElement>('[data-site-nav-dropdown]');
+    const button = dropdown?.querySelector<HTMLButtonElement>('[data-site-nav-dropdown-button]');
+    const menu = dropdown?.querySelector<HTMLElement>('[data-site-nav-dropdown-menu]');
     const submenuLink = menu?.querySelector<HTMLAnchorElement>('a');
     if (!dropdown || !button || !menu || !submenuLink) {
       throw new Error('Expected desktop navigation dropdown fixture');
@@ -592,14 +533,12 @@ describe('desktop site navigation dropdown', () => {
     expect(button.getAttribute('aria-expanded')).toBe('true');
 
     submenuLink.focus();
-    submenuLink.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
-    );
+    submenuLink.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 
     expect({
       expanded: button.getAttribute('aria-expanded'),
       focusRestored: document.activeElement === button,
-      menuHidden: menu.hidden,
+      menuHidden: menu.hidden
     }).toMatchInlineSnapshot(`
       {
         "expanded": "false",
@@ -612,9 +551,7 @@ describe('desktop site navigation dropdown', () => {
   it('toggles after hover and still closes after an outside pointer press', () => {
     const { button, dropdown, menu } = renderDropdown();
 
-    dropdown.dispatchEvent(
-      new PointerEvent('pointerenter', { pointerType: 'mouse' }),
-    );
+    dropdown.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
     const hiddenStates = [menu.hidden];
 
     button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
@@ -624,9 +561,7 @@ describe('desktop site navigation dropdown', () => {
     button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
     hiddenStates.push(menu.hidden);
 
-    dropdown.dispatchEvent(
-      new PointerEvent('pointerenter', { pointerType: 'mouse' }),
-    );
+    dropdown.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
     hiddenStates.push(menu.hidden);
 
     document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
@@ -650,26 +585,18 @@ describe('desktop site navigation dropdown', () => {
       const { button, dropdown, menu } = renderDropdown();
       const hiddenStates = [menu.hidden];
 
-      dropdown.dispatchEvent(
-        new PointerEvent('pointerenter', { pointerId: 7, pointerType }),
-      );
+      dropdown.dispatchEvent(new PointerEvent('pointerenter', { pointerId: 7, pointerType }));
       hiddenStates.push(menu.hidden);
-      button.dispatchEvent(
-        new MouseEvent('click', { bubbles: true, detail: 1 }),
-      );
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
       hiddenStates.push(menu.hidden);
-      dropdown.dispatchEvent(
-        new PointerEvent('pointerleave', { pointerId: 7, pointerType }),
-      );
+      dropdown.dispatchEvent(new PointerEvent('pointerleave', { pointerId: 7, pointerType }));
       hiddenStates.push(menu.hidden);
-      button.dispatchEvent(
-        new MouseEvent('click', { bubbles: true, detail: 1 }),
-      );
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
       hiddenStates.push(menu.hidden);
 
       expect({
         buttonFocused: document.activeElement === button,
-        hiddenStates,
+        hiddenStates
       }).toMatchInlineSnapshot(`
         {
           "buttonFocused": false,
@@ -682,6 +609,6 @@ describe('desktop site navigation dropdown', () => {
           ],
         }
       `);
-    },
+    }
   );
 });

@@ -4,14 +4,14 @@ import { estimate2026 } from '@/data/reglament/estimate-2026';
 import { estimateDetails2026 } from '@/data/reglament/estimate-details-2026';
 import {
   lightingControlTotals,
-  lightingResources,
+  lightingResources
 } from '@/data/reglament/estimate-details-2026/lighting';
 import { resolveSectionControlTotals } from '@/data/reglament/estimate-details-2026/shared';
 import { fullReglamentDataset2026 } from '@/data/reglament/full-2026';
 import type {
   EstimateDetailControlTotal,
   EstimateDetailResource,
-  EstimateDetailSourceRef,
+  EstimateDetailSourceRef
 } from '@/lib/reglament/detail-schema';
 import type { EstimateRow } from '@/lib/reglament/schema';
 
@@ -38,32 +38,24 @@ const round2 = (value: number): number => Math.round(value * 100) / 100;
 const flattenRows = (rows: readonly EstimateRow[]): readonly EstimateRow[] =>
   rows.flatMap((row) => [row, ...flattenRows(row.children ?? [])]);
 
-const estimateRows = flattenRows(
-  estimate2026.sections.flatMap((section) => section.rows),
-);
+const estimateRows = flattenRows(estimate2026.sections.flatMap((section) => section.rows));
 
 const estimateItemIds = new Set([
   estimate2026.id,
   ...estimate2026.sections.map((section) => section.id),
-  ...estimateRows.map((row) => row.id),
+  ...estimateRows.map((row) => row.id)
 ]);
 
 const estimateRowsById = new Map(estimateRows.map((row) => [row.id, row]));
 
-const estimateSectionsById = new Map(
-  estimate2026.sections.map((section) => [section.id, section]),
-);
+const estimateSectionsById = new Map(estimate2026.sections.map((section) => [section.id, section]));
 
-const sourcePdfIds = new Set(
-  estimateDetails2026.source_pdfs.map((sourcePdf) => sourcePdf.pdf),
-);
+const sourcePdfIds = new Set(estimateDetails2026.source_pdfs.map((sourcePdf) => sourcePdf.pdf));
 
-const serviceIds = new Set(
-  fullReglamentDataset2026.services.map((service) => service.id),
-);
+const serviceIds = new Set(fullReglamentDataset2026.services.map((service) => service.id));
 
 const resourcesById = new Map(
-  estimateDetails2026.resources.map((resource) => [resource.id, resource]),
+  estimateDetails2026.resources.map((resource) => [resource.id, resource])
 );
 
 const obviousMultiPositionQuotePatterns = [
@@ -72,35 +64,33 @@ const obviousMultiPositionQuotePatterns = [
   /Метла .*; Грабли/,
   /Рабочий.*; Машинист/,
   /Трактор .*; ОПМ/,
-  /Видеокамера/,
+  /Видеокамера/
 ] as const;
 
 const hasOwnPropertyDeep = (value: unknown, key: string): boolean => {
   if (typeof value !== 'object' || value === null) return false;
   if (Object.prototype.hasOwnProperty.call(value, key)) return true;
 
-  return Object.values(value).some((nestedValue) =>
-    hasOwnPropertyDeep(nestedValue, key),
-  );
+  return Object.values(value).some((nestedValue) => hasOwnPropertyDeep(nestedValue, key));
 };
 
 const detailFactsWithSourceRefs = (): readonly DetailFactWithSourceRefs[] => [
   ...estimateDetails2026.work_items.map((item) => ({
     fact_id: `work_items:${item.id}`,
-    source_refs: item.source_refs,
+    source_refs: item.source_refs
   })),
   ...estimateDetails2026.resources.map((resource) => ({
     fact_id: `resources:${resource.id}`,
-    source_refs: resource.source_refs,
+    source_refs: resource.source_refs
   })),
   ...estimateDetails2026.control_totals.map((controlTotal) => ({
     fact_id: `control_totals:${controlTotal.id}`,
-    source_refs: controlTotal.source_refs,
-  })),
+    source_refs: controlTotal.source_refs
+  }))
 ];
 
 const resourcesForControlTotal = (
-  controlTotal: EstimateDetailControlTotal,
+  controlTotal: EstimateDetailControlTotal
 ): readonly EstimateDetailResource[] => {
   if (controlTotal.resource_ids) {
     return controlTotal.resource_ids.flatMap((id) => {
@@ -113,13 +103,11 @@ const resourcesForControlTotal = (
   return estimateDetails2026.resources.filter(
     (resource) =>
       resource.estimate_row_id === controlTotal.estimate_row_id &&
-      resource.cost_bucket === controlTotal.cost_bucket,
+      resource.cost_bucket === controlTotal.cost_bucket
   );
 };
 
-const aggregateTotalForControl = (
-  controlTotal: EstimateDetailControlTotal,
-): number | undefined => {
+const aggregateTotalForControl = (controlTotal: EstimateDetailControlTotal): number | undefined => {
   if (controlTotal.cost_bucket === 'other_cost') return;
 
   const costBucket = controlTotal.cost_bucket;
@@ -131,19 +119,13 @@ const aggregateTotalForControl = (
 
   if (!section) return;
 
-  return round2(
-    sum(
-      section.rows.map(
-        (sectionRow) => sectionRow.baseline.breakdown[costBucket],
-      ),
-    ),
-  );
+  return round2(sum(section.rows.map((sectionRow) => sectionRow.baseline.breakdown[costBucket])));
 };
 
 describe('estimate details 2026 dataset', () => {
   it('marks a section control for review when a resource changes', () => {
     const controlInput = lightingControlTotals.find(
-      (controlTotal) => controlTotal.id === 'lighting-street-materials',
+      (controlTotal) => controlTotal.id === 'lighting-street-materials'
     );
 
     if (!controlInput) throw new Error('lighting materials control is missing');
@@ -152,21 +134,18 @@ describe('estimate details 2026 dataset', () => {
       resource.id === controlInput.resource_ids[0]
         ? {
             ...resource,
-            total_rub: { ...resource.total_rub, value: 97_000 },
+            total_rub: { ...resource.total_rub, value: 97_000 }
           }
-        : resource,
+        : resource
     );
-    const [controlTotal] = resolveSectionControlTotals(
-      [controlInput],
-      resources,
-    );
+    const [controlTotal] = resolveSectionControlTotals([controlInput], resources);
 
     expect({
       detail_total_rub: controlTotal?.detail_total_rub?.value,
       aggregate_total_rub: controlTotal?.aggregate_total_rub?.value,
       delta_rub: controlTotal?.delta_rub,
       status: controlTotal?.status,
-      reason: controlTotal?.needs_check?.reason,
+      reason: controlTotal?.needs_check?.reason
     }).toMatchInlineSnapshot(`
       {
         "aggregate_total_rub": 97820,
@@ -189,24 +168,21 @@ describe('estimate details 2026 dataset', () => {
         aggregate_total_rub: controlTotal.aggregate_total_rub?.value ?? null,
         delta_rub: controlTotal.delta_rub ?? null,
         status: controlTotal.status,
-        source_ref: controlTotal.source_refs[0],
+        source_ref: controlTotal.source_refs[0]
       }));
 
     expect(finalControls).toMatchSnapshot();
   });
 
   it('captures waste details from waste.pdf', () => {
-    const wasteRowIds = new Set([
-      'waste-operator-service',
-      'waste-transfer-from-homes',
-    ]);
+    const wasteRowIds = new Set(['waste-operator-service', 'waste-transfer-from-homes']);
     const workItems = estimateDetails2026.work_items
       .filter((item) => wasteRowIds.has(item.estimate_row_id))
       .map((item) => ({
         id: item.id,
         estimate_row_id: item.estimate_row_id,
         service_ids: item.service_ids ?? [],
-        status: item.status,
+        status: item.status
       }));
     const resources = estimateDetails2026.resources
       .filter((resource) => wasteRowIds.has(resource.estimate_row_id))
@@ -215,20 +191,20 @@ describe('estimate details 2026 dataset', () => {
         kind: resource.kind,
         cost_bucket: resource.cost_bucket,
         total_rub: resource.total_rub.value,
-        status: resource.status,
+        status: resource.status
       }));
     const controlTotals = estimateDetails2026.control_totals
       .filter(
         (controlTotal) =>
           controlTotal.control_source === 'section_pdf' &&
-          wasteRowIds.has(controlTotal.estimate_row_id),
+          wasteRowIds.has(controlTotal.estimate_row_id)
       )
       .map((controlTotal) => ({
         id: controlTotal.id,
         cost_bucket: controlTotal.cost_bucket,
         source_total_rub: controlTotal.source_total_rub.value,
         aggregate_total_rub: controlTotal.aggregate_total_rub?.value ?? null,
-        status: controlTotal.status,
+        status: controlTotal.status
       }));
 
     expect({ workItems, resources, controlTotals }).toMatchInlineSnapshot(`
@@ -456,12 +432,11 @@ describe('estimate details 2026 dataset', () => {
         (ref) =>
           ref.pdf === 'waste' &&
           ref.page === 12 &&
-          ref.fragment ===
-            'ресурсная ведомость по локальному ресурсному сметному расчету',
+          ref.fragment === 'ресурсная ведомость по локальному ресурсному сметному расчету'
       );
 
     expect(sourceRef?.quote).toBe(
-      'Рабочий ... 5147,3 664,15 3 418 555,10; Машинист 1460,0 934,32 1 364 107,20; Газель (GAZ 330232) 1460,0 318,02 464 303,42',
+      'Рабочий ... 5147,3 664,15 3 418 555,10; Машинист 1460,0 934,32 1 364 107,20; Газель (GAZ 330232) 1460,0 318,02 464 303,42'
     );
     expect(sourceRef?.quote_items).toMatchInlineSnapshot(`
       [
@@ -524,25 +499,21 @@ describe('estimate details 2026 dataset', () => {
         (ref) =>
           ref.pdf === 'cleaning' &&
           ref.page === 12 &&
-          ref.fragment ===
-            'позиция 1.4 / средства охраны труда для зимней механизированной уборки',
+          ref.fragment === 'позиция 1.4 / средства охраны труда для зимней механизированной уборки'
       );
     const resourceStatementMaterialsSource = estimateDetails2026.control_totals
-      .find(
-        (controlTotal) =>
-          controlTotal.id === 'cleaning-resource-statement-materials',
-      )
+      .find((controlTotal) => controlTotal.id === 'cleaning-resource-statement-materials')
       ?.source_refs.find(
         (ref) =>
           ref.pdf === 'cleaning' &&
           ref.page === 26 &&
           ref.fragment ===
-            'ресурсная ведомость по локальному ресурсному сметному расчету / материалы',
+            'ресурсная ведомость по локальному ресурсному сметному расчету / материалы'
       );
 
     expect({
       ppe: winterMechanizedPpeSource?.quote_items?.[0],
-      resourceStatement: resourceStatementMaterialsSource?.quote_items?.[0],
+      resourceStatement: resourceStatementMaterialsSource?.quote_items?.[0]
     }).toMatchInlineSnapshot(`
       {
         "ppe": {
@@ -585,8 +556,7 @@ describe('estimate details 2026 dataset', () => {
         (ref) =>
           ref.pdf === 'landscaping' &&
           ref.page === 15 &&
-          ref.fragment ===
-            'позиция 9.1 / средства охраны труда для ухода за деревьями, начало',
+          ref.fragment === 'позиция 9.1 / средства охраны труда для ухода за деревьями, начало'
       );
     const resourceStatementSource = resourcesById
       .get('landscaping-mowing-trimmer-machine')
@@ -594,17 +564,15 @@ describe('estimate details 2026 dataset', () => {
         (ref) =>
           ref.pdf === 'landscaping' &&
           ref.page === 21 &&
-          ref.fragment ===
-            'ресурсная ведомость по локальному ресурсному сметному расчету',
+          ref.fragment === 'ресурсная ведомость по локальному ресурсному сметному расчету'
       );
-    const trimmerResourceStatementItem =
-      resourceStatementSource?.quote_items?.find(
-        (item) => item.label === 'Триммер бензиновый',
-      );
+    const trimmerResourceStatementItem = resourceStatementSource?.quote_items?.find(
+      (item) => item.label === 'Триммер бензиновый'
+    );
 
     expect({
       ppe: treePpeSource?.quote_items?.[0],
-      resourceStatement: trimmerResourceStatementItem,
+      resourceStatement: trimmerResourceStatementItem
     }).toMatchInlineSnapshot(`
       {
         "ppe": {
@@ -651,7 +619,7 @@ describe('estimate details 2026 dataset', () => {
         (ref) =>
           ref.pdf === 'improvement' &&
           ref.page === 14 &&
-          ref.fragment === 'позиция 8.1 / средства охраны труда',
+          ref.fragment === 'позиция 8.1 / средства охраны труда'
       );
     const toolsSource = resourcesById
       .get('improvement-scoop-shovel')
@@ -659,15 +627,15 @@ describe('estimate details 2026 dataset', () => {
         (ref) =>
           ref.pdf === 'improvement' &&
           ref.page === 14 &&
-          ref.fragment === 'позиция 9.1 / износ оборудования и инструментов',
+          ref.fragment === 'позиция 9.1 / износ оборудования и инструментов'
       );
     const scoopShovelItem = toolsSource?.quote_items?.find(
-      (item) => item.label === 'Лопата совковая',
+      (item) => item.label === 'Лопата совковая'
     );
 
     expect({
       ppe: ppeSource?.quote_items?.[0],
-      tool: scoopShovelItem,
+      tool: scoopShovelItem
     }).toMatchInlineSnapshot(`
       {
         "ppe": {
@@ -713,11 +681,10 @@ describe('estimate details 2026 dataset', () => {
         (ref) =>
           ref.pdf === 'lighting' &&
           ref.page === 13 &&
-          ref.fragment ===
-            'ресурсная ведомость по локальному ресурсному сметному расчету',
+          ref.fragment === 'ресурсная ведомость по локальному ресурсному сметному расчету'
       );
     const paintItem = resourceStatementSource?.quote_items?.find(
-      (item) => item.label === 'Краска по металлу',
+      (item) => item.label === 'Краска по металлу'
     );
 
     expect(paintItem).toMatchInlineSnapshot(`
@@ -748,10 +715,10 @@ describe('estimate details 2026 dataset', () => {
         (ref) =>
           ref.pdf === 'security' &&
           ref.page === 9 &&
-          ref.fragment === 'позиция 3.1 / обслуживание системы СКУД TRASSIR',
+          ref.fragment === 'позиция 3.1 / обслуживание системы СКУД TRASSIR'
       );
     const skudItem = skudSource?.quote_items?.find(
-      (item) => item.label === 'Труд по обслуживанию системы СКУД TRASSIR',
+      (item) => item.label === 'Труд по обслуживанию системы СКУД TRASSIR'
     );
 
     expect(skudItem).toMatchInlineSnapshot(`
@@ -781,8 +748,7 @@ describe('estimate details 2026 dataset', () => {
         (ref) =>
           ref.pdf === 'waste' &&
           ref.page === 8 &&
-          ref.fragment ===
-            'нормативное штатное расписание для перемещения мусора',
+          ref.fragment === 'нормативное штатное расписание для перемещения мусора'
       );
     const resourceStatementSource = resourcesById
       .get('waste-transfer-gazel-machine')
@@ -790,13 +756,12 @@ describe('estimate details 2026 dataset', () => {
         (ref) =>
           ref.pdf === 'waste' &&
           ref.page === 12 &&
-          ref.fragment ===
-            'ресурсная ведомость по локальному ресурсному сметному расчету',
+          ref.fragment === 'ресурсная ведомость по локальному ресурсному сметному расчету'
       );
 
     expect({
       staff: staffSource?.quote_items?.[0],
-      resourceStatement: resourceStatementSource?.quote_items?.[2],
+      resourceStatement: resourceStatementSource?.quote_items?.[2]
     }).toMatchInlineSnapshot(`
       {
         "resourceStatement": {
@@ -843,20 +808,18 @@ describe('estimate details 2026 dataset', () => {
       'landscaping',
       'lighting',
       'security',
-      'waste',
+      'waste'
     ] as const;
     const refsWithItems = detailFactsWithSourceRefs()
       .flatMap((fact) => fact.source_refs)
       .filter((ref) => ref.quote_items !== undefined);
-    const migratedPdfs = [
-      ...new Set(refsWithItems.map((ref) => ref.pdf)),
-    ].sort();
+    const migratedPdfs = [...new Set(refsWithItems.map((ref) => ref.pdf))].sort();
     const invalidItems = refsWithItems.flatMap((ref) =>
       (ref.quote_items ?? []).flatMap((item, itemIndex) => {
         const errors = [
           item.label.trim() ? null : 'пустое название позиции',
           ref.quote?.trim() ? null : 'нет общей цитаты source_refs[].quote',
-          item.resource_ids?.length === 0 ? 'пустой список ID ресурсов' : null,
+          item.resource_ids?.length === 0 ? 'пустой список ID ресурсов' : null
         ].filter((error): error is string => error !== null);
 
         return errors.length > 0
@@ -866,11 +829,11 @@ describe('estimate details 2026 dataset', () => {
                 page: ref.page,
                 fragment: ref.fragment,
                 item_index: itemIndex,
-                errors,
-              },
+                errors
+              }
             ]
           : [];
-      }),
+      })
     );
 
     expect(migratedPdfs).toEqual([...sectionPdfs].sort());
@@ -879,16 +842,12 @@ describe('estimate details 2026 dataset', () => {
 
   it('keeps public contract free of curation fragments', () => {
     const quoteItemLeaks = detailFactsWithSourceRefs()
-      .flatMap((fact) =>
-        fact.source_refs.map((ref) => ({ fact_id: fact.fact_id, ref })),
-      )
+      .flatMap((fact) => fact.source_refs.map((ref) => ({ fact_id: fact.fact_id, ref })))
       .flatMap(({ fact_id, ref }) =>
         (ref.quote_items ?? []).flatMap((item, itemIndex) => {
           const errors = [
-            Object.prototype.hasOwnProperty.call(item, 'quote')
-              ? 'лишнее поле quote'
-              : null,
-            hasOwnPropertyDeep(item, 'raw') ? 'лишнее поле raw' : null,
+            Object.prototype.hasOwnProperty.call(item, 'quote') ? 'лишнее поле quote' : null,
+            hasOwnPropertyDeep(item, 'raw') ? 'лишнее поле raw' : null
           ].filter((error): error is string => error !== null);
 
           return errors.length > 0
@@ -899,11 +858,11 @@ describe('estimate details 2026 dataset', () => {
                   page: ref.page,
                   fragment: ref.fragment,
                   item_index: itemIndex,
-                  errors,
-                },
+                  errors
+                }
               ]
             : [];
-        }),
+        })
       );
 
     expect(quoteItemLeaks).toEqual([]);
@@ -912,13 +871,9 @@ describe('estimate details 2026 dataset', () => {
 
   it('keeps obvious multi-position resource quotes structured', () => {
     const missingStructuredItems = detailFactsWithSourceRefs()
-      .flatMap((fact) =>
-        fact.source_refs.map((ref) => ({ fact_id: fact.fact_id, ref })),
-      )
+      .flatMap((fact) => fact.source_refs.map((ref) => ({ fact_id: fact.fact_id, ref })))
       .filter(({ ref }) =>
-        obviousMultiPositionQuotePatterns.some((pattern) =>
-          pattern.test(ref.quote ?? ''),
-        ),
+        obviousMultiPositionQuotePatterns.some((pattern) => pattern.test(ref.quote ?? ''))
       )
       .filter(({ ref }) => ref.quote_items === undefined)
       .map(({ fact_id, ref }) => ({
@@ -926,7 +881,7 @@ describe('estimate details 2026 dataset', () => {
         pdf: ref.pdf,
         page: ref.page,
         fragment: ref.fragment,
-        quote: ref.quote,
+        quote: ref.quote
       }));
 
     expect(missingStructuredItems).toEqual([]);
@@ -936,7 +891,7 @@ describe('estimate details 2026 dataset', () => {
     const securityRowIds = new Set([
       'security-access-control',
       'security-equipment-maintenance',
-      'security-dispatch',
+      'security-dispatch'
     ]);
     const workItems = estimateDetails2026.work_items
       .filter((item) => securityRowIds.has(item.estimate_row_id))
@@ -944,7 +899,7 @@ describe('estimate details 2026 dataset', () => {
         id: item.id,
         estimate_row_id: item.estimate_row_id,
         service_ids: item.service_ids ?? [],
-        status: item.status,
+        status: item.status
       }));
     const resources = estimateDetails2026.resources
       .filter((resource) => securityRowIds.has(resource.estimate_row_id))
@@ -953,20 +908,20 @@ describe('estimate details 2026 dataset', () => {
         kind: resource.kind,
         cost_bucket: resource.cost_bucket,
         total_rub: resource.total_rub.value,
-        status: resource.status,
+        status: resource.status
       }));
     const controlTotals = estimateDetails2026.control_totals
       .filter(
         (controlTotal) =>
           controlTotal.control_source === 'section_pdf' &&
-          securityRowIds.has(controlTotal.estimate_row_id),
+          securityRowIds.has(controlTotal.estimate_row_id)
       )
       .map((controlTotal) => ({
         id: controlTotal.id,
         cost_bucket: controlTotal.cost_bucket,
         source_total_rub: controlTotal.source_total_rub.value,
         aggregate_total_rub: controlTotal.aggregate_total_rub?.value ?? null,
-        status: controlTotal.status,
+        status: controlTotal.status
       }));
 
     expect({ workItems, resources, controlTotals }).toMatchInlineSnapshot(`
@@ -1307,7 +1262,7 @@ describe('estimate details 2026 dataset', () => {
       'lighting-street-maintenance',
       'lighting-electricity',
       'lighting-poles-repair',
-      'lighting-power-system-repair',
+      'lighting-power-system-repair'
     ]);
     const workItems = estimateDetails2026.work_items
       .filter((item) => lightingRowIds.has(item.estimate_row_id))
@@ -1315,7 +1270,7 @@ describe('estimate details 2026 dataset', () => {
         id: item.id,
         estimate_row_id: item.estimate_row_id,
         service_ids: item.service_ids ?? [],
-        status: item.status,
+        status: item.status
       }));
     const resources = estimateDetails2026.resources
       .filter((resource) => lightingRowIds.has(resource.estimate_row_id))
@@ -1324,20 +1279,20 @@ describe('estimate details 2026 dataset', () => {
         kind: resource.kind,
         cost_bucket: resource.cost_bucket,
         total_rub: resource.total_rub.value,
-        status: resource.status,
+        status: resource.status
       }));
     const controlTotals = estimateDetails2026.control_totals
       .filter(
         (controlTotal) =>
           controlTotal.control_source === 'section_pdf' &&
-          lightingRowIds.has(controlTotal.estimate_row_id),
+          lightingRowIds.has(controlTotal.estimate_row_id)
       )
       .map((controlTotal) => ({
         id: controlTotal.id,
         cost_bucket: controlTotal.cost_bucket,
         source_total_rub: controlTotal.source_total_rub.value,
         aggregate_total_rub: controlTotal.aggregate_total_rub?.value ?? null,
-        status: controlTotal.status,
+        status: controlTotal.status
       }));
 
     expect({ workItems, resources, controlTotals }).toMatchInlineSnapshot(`
@@ -1749,25 +1704,25 @@ describe('estimate details 2026 dataset', () => {
       'landscaping-mowing-ditches',
       'landscaping-trees-shrubs',
       'landscaping-ticks-hogweed',
-      'landscaping-forest-care',
+      'landscaping-forest-care'
     ]);
     const workItems = estimateDetails2026.work_items.filter((item) =>
-      landscapingRowIds.has(item.estimate_row_id),
+      landscapingRowIds.has(item.estimate_row_id)
     );
     const resources = estimateDetails2026.resources.filter((resource) =>
-      landscapingRowIds.has(resource.estimate_row_id),
+      landscapingRowIds.has(resource.estimate_row_id)
     );
     const grossControlTotals = estimateDetails2026.control_totals
       .filter(
         (controlTotal) =>
           landscapingRowIds.has(controlTotal.estimate_row_id) &&
           controlTotal.control_source === 'section_pdf' &&
-          controlTotal.cost_bucket === 'gross',
+          controlTotal.cost_bucket === 'gross'
       )
       .map((controlTotal) => ({
         id: controlTotal.id,
         aggregate_total_rub: controlTotal.aggregate_total_rub?.value ?? null,
-        status: controlTotal.status,
+        status: controlTotal.status
       }));
     const resourceKinds = new Set(resources.map((resource) => resource.kind));
 
@@ -1775,14 +1730,7 @@ describe('estimate details 2026 dataset', () => {
     expect(resources).toHaveLength(57);
     expect(grossControlTotals).toHaveLength(4);
     expect(resourceKinds).toEqual(
-      new Set([
-        'labor',
-        'machinist_labor',
-        'machine',
-        'material',
-        'contractor',
-        'other_cost',
-      ]),
+      new Set(['labor', 'machinist_labor', 'machine', 'material', 'contractor', 'other_cost'])
     );
     expect(grossControlTotals).toMatchInlineSnapshot(`
       [
@@ -1813,7 +1761,7 @@ describe('estimate details 2026 dataset', () => {
   it('captures improvement details and the road/fence mismatch', () => {
     const improvementRowIds = new Set([
       'improvement-objects-maintenance',
-      'improvement-road-surface-repair',
+      'improvement-road-surface-repair'
     ]);
     const workItems = estimateDetails2026.work_items
       .filter((item) => improvementRowIds.has(item.estimate_row_id))
@@ -1821,34 +1769,33 @@ describe('estimate details 2026 dataset', () => {
         id: item.id,
         estimate_row_id: item.estimate_row_id,
         service_ids: item.service_ids ?? [],
-        status: item.status,
+        status: item.status
       }));
     const resources = estimateDetails2026.resources.filter((resource) =>
-      improvementRowIds.has(resource.estimate_row_id),
+      improvementRowIds.has(resource.estimate_row_id)
     );
     const grossControlTotals = estimateDetails2026.control_totals
       .filter(
         (controlTotal) =>
           improvementRowIds.has(controlTotal.estimate_row_id) &&
           controlTotal.control_source === 'section_pdf' &&
-          controlTotal.cost_bucket === 'gross',
+          controlTotal.cost_bucket === 'gross'
       )
       .map((controlTotal) => ({
         id: controlTotal.id,
         aggregate_total_rub: controlTotal.aggregate_total_rub?.value ?? null,
-        status: controlTotal.status,
+        status: controlTotal.status
       }));
     const needsCheckIds = [
       ...estimateDetails2026.work_items,
       ...estimateDetails2026.resources,
-      ...estimateDetails2026.control_totals,
+      ...estimateDetails2026.control_totals
     ]
       .filter(
         (item) =>
           improvementRowIds.has(item.estimate_row_id) &&
-          (!('control_source' in item) ||
-            item.control_source === 'section_pdf') &&
-          item.status === 'needs_check',
+          (!('control_source' in item) || item.control_source === 'section_pdf') &&
+          item.status === 'needs_check'
       )
       .map((item) => item.id);
 
@@ -1897,7 +1844,7 @@ describe('estimate details 2026 dataset', () => {
       'improvement-fence-repair-materials',
       'improvement-fence-repair-usn',
       'improvement-fence-repair-vat',
-      'improvement-fence-repair-gross',
+      'improvement-fence-repair-gross'
     ]);
   });
 
@@ -1909,7 +1856,7 @@ describe('estimate details 2026 dataset', () => {
         id: item.id,
         estimate_row_id: item.estimate_row_id,
         service_ids: item.service_ids ?? [],
-        status: item.status,
+        status: item.status
       }));
     const resources = estimateDetails2026.resources
       .filter((resource) => cleaningRowIds.has(resource.estimate_row_id))
@@ -1918,20 +1865,20 @@ describe('estimate details 2026 dataset', () => {
         kind: resource.kind,
         cost_bucket: resource.cost_bucket,
         total_rub: resource.total_rub.value,
-        status: resource.status,
+        status: resource.status
       }));
     const controlTotals = estimateDetails2026.control_totals
       .filter(
         (controlTotal) =>
           controlTotal.control_source === 'section_pdf' &&
-          cleaningRowIds.has(controlTotal.estimate_row_id),
+          cleaningRowIds.has(controlTotal.estimate_row_id)
       )
       .map((controlTotal) => ({
         id: controlTotal.id,
         cost_bucket: controlTotal.cost_bucket,
         source_total_rub: controlTotal.source_total_rub.value,
         aggregate_total_rub: controlTotal.aggregate_total_rub?.value ?? null,
-        status: controlTotal.status,
+        status: controlTotal.status
       }));
 
     expect({ workItems, resources, controlTotals }).toMatchInlineSnapshot(`
@@ -2174,7 +2121,7 @@ describe('estimate details 2026 dataset', () => {
         id: item.id,
         estimate_row_id: item.estimate_row_id,
         service_ids: item.service_ids ?? [],
-        status: item.status,
+        status: item.status
       }));
     const resources = estimateDetails2026.resources
       .filter((resource) => cleaningRowIds.has(resource.estimate_row_id))
@@ -2183,20 +2130,20 @@ describe('estimate details 2026 dataset', () => {
         kind: resource.kind,
         cost_bucket: resource.cost_bucket,
         total_rub: resource.total_rub.value,
-        status: resource.status,
+        status: resource.status
       }));
     const controlTotals = estimateDetails2026.control_totals
       .filter(
         (controlTotal) =>
           controlTotal.control_source === 'section_pdf' &&
-          cleaningRowIds.has(controlTotal.estimate_row_id),
+          cleaningRowIds.has(controlTotal.estimate_row_id)
       )
       .map((controlTotal) => ({
         id: controlTotal.id,
         cost_bucket: controlTotal.cost_bucket,
         source_total_rub: controlTotal.source_total_rub.value,
         aggregate_total_rub: controlTotal.aggregate_total_rub?.value ?? null,
-        status: controlTotal.status,
+        status: controlTotal.status
       }));
 
     expect({ workItems, resources, controlTotals }).toMatchInlineSnapshot(`
@@ -2410,7 +2357,7 @@ describe('estimate details 2026 dataset', () => {
         id: item.id,
         estimate_row_id: item.estimate_row_id,
         service_ids: item.service_ids ?? [],
-        status: item.status,
+        status: item.status
       }));
     const resources = estimateDetails2026.resources
       .filter((resource) => cleaningRowIds.has(resource.estimate_row_id))
@@ -2419,33 +2366,30 @@ describe('estimate details 2026 dataset', () => {
         kind: resource.kind,
         cost_bucket: resource.cost_bucket,
         total_rub: resource.total_rub.value,
-        status: resource.status,
+        status: resource.status
       }));
     const controlTotals = estimateDetails2026.control_totals
       .filter(
         (controlTotal) =>
           controlTotal.control_source === 'section_pdf' &&
-          cleaningRowIds.has(controlTotal.estimate_row_id),
+          cleaningRowIds.has(controlTotal.estimate_row_id)
       )
       .map((controlTotal) => ({
         id: controlTotal.id,
         cost_bucket: controlTotal.cost_bucket,
         source_total_rub: controlTotal.source_total_rub.value,
         aggregate_total_rub: controlTotal.aggregate_total_rub?.value ?? null,
-        status: controlTotal.status,
+        status: controlTotal.status
       }));
     const ditchCleaningResource = estimateDetails2026.resources.find(
-      (resource) =>
-        resource.id === 'cleaning-summer-manual-ditch-cleaning-worker-labor',
+      (resource) => resource.id === 'cleaning-summer-manual-ditch-cleaning-worker-labor'
     );
 
     expect(ditchCleaningResource).toMatchObject({
-      quantity: { value: 24_337.7, unit: 'чел-час' },
+      quantity: { value: 24_337.7, unit: 'чел-час' }
     });
     expect(
-      ditchCleaningResource?.source_refs
-        .map((sourceRef) => sourceRef.quote ?? '')
-        .join('\n'),
+      ditchCleaningResource?.source_refs.map((sourceRef) => sourceRef.quote ?? '').join('\n')
     ).toContain('15 раз в летний период');
     expect({ workItems, resources, controlTotals }).toMatchInlineSnapshot(`
       {
@@ -2693,7 +2637,7 @@ describe('estimate details 2026 dataset', () => {
         id: item.id,
         estimate_row_id: item.estimate_row_id,
         service_ids: item.service_ids ?? [],
-        status: item.status,
+        status: item.status
       }));
     const resources = estimateDetails2026.resources
       .filter((resource) => cleaningRowIds.has(resource.estimate_row_id))
@@ -2702,20 +2646,20 @@ describe('estimate details 2026 dataset', () => {
         kind: resource.kind,
         cost_bucket: resource.cost_bucket,
         total_rub: resource.total_rub.value,
-        status: resource.status,
+        status: resource.status
       }));
     const controlTotals = estimateDetails2026.control_totals
       .filter(
         (controlTotal) =>
           controlTotal.control_source === 'section_pdf' &&
-          cleaningRowIds.has(controlTotal.estimate_row_id),
+          cleaningRowIds.has(controlTotal.estimate_row_id)
       )
       .map((controlTotal) => ({
         id: controlTotal.id,
         cost_bucket: controlTotal.cost_bucket,
         source_total_rub: controlTotal.source_total_rub.value,
         aggregate_total_rub: controlTotal.aggregate_total_rub?.value ?? null,
-        status: controlTotal.status,
+        status: controlTotal.status
       }));
 
     expect({ workItems, resources, controlTotals }).toMatchInlineSnapshot(`
@@ -2972,16 +2916,14 @@ describe('estimate details 2026 dataset', () => {
 
   it('reconciles cleaning resources against the resource statement', () => {
     const controlTotals = estimateDetails2026.control_totals
-      .filter((controlTotal) =>
-        controlTotal.id.startsWith('cleaning-resource-statement-'),
-      )
+      .filter((controlTotal) => controlTotal.id.startsWith('cleaning-resource-statement-'))
       .map((controlTotal) => ({
         id: controlTotal.id,
         estimate_row_id: controlTotal.estimate_row_id,
         cost_bucket: controlTotal.cost_bucket,
         source_total_rub: controlTotal.source_total_rub.value,
         detail_total_rub: controlTotal.detail_total_rub?.value ?? null,
-        status: controlTotal.status,
+        status: controlTotal.status
       }));
 
     expect(controlTotals).toMatchInlineSnapshot(`
@@ -3032,7 +2974,7 @@ describe('estimate details 2026 dataset', () => {
         const errors = [
           sourcePdfIds.has(ref.pdf) ? null : 'unknown pdf',
           Number.isInteger(ref.page) && ref.page > 0 ? null : 'invalid page',
-          ref.fragment.trim() ? null : 'empty fragment',
+          ref.fragment.trim() ? null : 'empty fragment'
         ].filter((error): error is string => error !== null);
 
         return errors.length > 0
@@ -3040,16 +2982,16 @@ describe('estimate details 2026 dataset', () => {
               {
                 fact_id: fact.fact_id,
                 source_ref_index: sourceRefIndex,
-                errors,
-              },
+                errors
+              }
             ]
           : [];
-      }),
+      })
     );
 
     expect({ missingRefs, invalidRefs }).toEqual({
       missingRefs: [],
-      invalidRefs: [],
+      invalidRefs: []
     });
   });
 
@@ -3057,16 +2999,16 @@ describe('estimate details 2026 dataset', () => {
     const invalidNeedsCheck = [
       ...estimateDetails2026.work_items.map((item) => ({
         fact_id: `work_items:${item.id}`,
-        item,
+        item
       })),
       ...estimateDetails2026.resources.map((item) => ({
         fact_id: `resources:${item.id}`,
-        item,
+        item
       })),
       ...estimateDetails2026.control_totals.map((item) => ({
         fact_id: `control_totals:${item.id}`,
-        item,
-      })),
+        item
+      }))
     ].flatMap(({ fact_id, item }) => {
       if (item.status !== 'needs_check') return [];
 
@@ -3079,10 +3021,10 @@ describe('estimate details 2026 dataset', () => {
             sourcePdfIds.has(ref.pdf) &&
             Number.isInteger(ref.page) &&
             ref.page > 0 &&
-            ref.fragment.trim().length > 0,
+            ref.fragment.trim().length > 0
         )
           ? null
-          : 'invalid check source ref',
+          : 'invalid check source ref'
       ].filter((error): error is string => error !== null);
 
       return errors.length > 0 ? [{ fact_id, errors }] : [];
@@ -3095,16 +3037,16 @@ describe('estimate details 2026 dataset', () => {
     const missingRows = [
       ...estimateDetails2026.work_items.map((item) => ({
         fact_id: `work_items:${item.id}`,
-        estimate_row_id: item.estimate_row_id,
+        estimate_row_id: item.estimate_row_id
       })),
       ...estimateDetails2026.resources.map((resource) => ({
         fact_id: `resources:${resource.id}`,
-        estimate_row_id: resource.estimate_row_id,
+        estimate_row_id: resource.estimate_row_id
       })),
       ...estimateDetails2026.control_totals.map((controlTotal) => ({
         fact_id: `control_totals:${controlTotal.id}`,
-        estimate_row_id: controlTotal.estimate_row_id,
-      })),
+        estimate_row_id: controlTotal.estimate_row_id
+      }))
     ].filter((item) => !estimateItemIds.has(item.estimate_row_id));
 
     expect(missingRows).toEqual([]);
@@ -3116,8 +3058,8 @@ describe('estimate details 2026 dataset', () => {
         .filter((serviceId) => !serviceIds.has(serviceId))
         .map((serviceId) => ({
           work_item_id: item.id,
-          service_id: serviceId,
-        })),
+          service_id: serviceId
+        }))
     );
 
     expect(missingServices).toEqual([]);
@@ -3129,17 +3071,16 @@ describe('estimate details 2026 dataset', () => {
         (controlTotal) =>
           controlTotal.tolerance_rub === undefined ||
           !Number.isFinite(controlTotal.tolerance_rub) ||
-          controlTotal.tolerance_rub < 0,
+          controlTotal.tolerance_rub < 0
       )
       .map((controlTotal) => controlTotal.id);
-    const missingResourceIds = estimateDetails2026.control_totals.flatMap(
-      (controlTotal) =>
-        (controlTotal.resource_ids ?? [])
-          .filter((id) => !resourcesById.has(id))
-          .map((resourceId) => ({
-            control_total_id: controlTotal.id,
-            resource_id: resourceId,
-          })),
+    const missingResourceIds = estimateDetails2026.control_totals.flatMap((controlTotal) =>
+      (controlTotal.resource_ids ?? [])
+        .filter((id) => !resourcesById.has(id))
+        .map((resourceId) => ({
+          control_total_id: controlTotal.id,
+          resource_id: resourceId
+        }))
     );
     const sumMismatches: readonly ControlTotalSumMismatch[] =
       estimateDetails2026.control_totals.flatMap(
@@ -3153,8 +3094,7 @@ describe('estimate details 2026 dataset', () => {
           }
 
           const declaredTotal =
-            controlTotal.detail_total_rub?.value ??
-            controlTotal.source_total_rub.value;
+            controlTotal.detail_total_rub?.value ?? controlTotal.source_total_rub.value;
           const resources = resourcesForControlTotal(controlTotal);
           const resourcesWithoutTotal = resources
             .filter((resource) => resource.total_rub.value === null)
@@ -3166,13 +3106,13 @@ describe('estimate details 2026 dataset', () => {
                 control_total_id: controlTotal.id,
                 issue: 'missing comparable totals',
                 declared_total_rub: declaredTotal,
-                resources_without_total: resourcesWithoutTotal,
-              },
+                resources_without_total: resourcesWithoutTotal
+              }
             ];
           }
 
           const resourceTotal = round2(
-            sum(resources.map((resource) => resource.total_rub.value ?? 0)),
+            sum(resources.map((resource) => resource.total_rub.value ?? 0))
           );
           const delta = round2(resourceTotal - declaredTotal);
 
@@ -3185,95 +3125,81 @@ describe('estimate details 2026 dataset', () => {
                   declared_total_rub: declaredTotal,
                   resource_total_rub: resourceTotal,
                   delta_rub: delta,
-                  tolerance_rub: controlTotal.tolerance_rub,
-                },
+                  tolerance_rub: controlTotal.tolerance_rub
+                }
               ];
-        },
+        }
       );
-    const derivedValueMismatches = estimateDetails2026.control_totals.flatMap(
-      (controlTotal) => {
-        if (controlTotal.control_source === 'final_pdf') return [];
+    const derivedValueMismatches = estimateDetails2026.control_totals.flatMap((controlTotal) => {
+      if (controlTotal.control_source === 'final_pdf') return [];
 
-        const detailTotal = controlTotal.detail_total_rub?.value;
-        const aggregateTotal = controlTotal.aggregate_total_rub?.value;
-        const expectedAggregateTotal = aggregateTotalForControl(controlTotal);
+      const detailTotal = controlTotal.detail_total_rub?.value;
+      const aggregateTotal = controlTotal.aggregate_total_rub?.value;
+      const expectedAggregateTotal = aggregateTotalForControl(controlTotal);
 
-        if (
-          detailTotal === null ||
-          detailTotal === undefined ||
-          aggregateTotal === null ||
-          expectedAggregateTotal === undefined
-        ) {
-          return [];
-        }
+      if (
+        detailTotal === null ||
+        detailTotal === undefined ||
+        aggregateTotal === null ||
+        expectedAggregateTotal === undefined
+      ) {
+        return [];
+      }
 
-        const expectedDelta = round2(detailTotal - expectedAggregateTotal);
+      const expectedDelta = round2(detailTotal - expectedAggregateTotal);
 
-        return aggregateTotal === expectedAggregateTotal &&
-          controlTotal.delta_rub === expectedDelta
-          ? []
-          : [
-              {
-                control_total_id: controlTotal.id,
-                aggregate_total_rub: aggregateTotal,
-                expected_aggregate_total_rub: expectedAggregateTotal,
-                delta_rub: controlTotal.delta_rub,
-                expected_delta_rub: expectedDelta,
-              },
-            ];
-      },
-    );
-    const uncheckedMismatches = estimateDetails2026.control_totals.flatMap(
-      (controlTotal) => {
-        const tolerance = controlTotal.tolerance_rub;
+      return aggregateTotal === expectedAggregateTotal && controlTotal.delta_rub === expectedDelta
+        ? []
+        : [
+            {
+              control_total_id: controlTotal.id,
+              aggregate_total_rub: aggregateTotal,
+              expected_aggregate_total_rub: expectedAggregateTotal,
+              delta_rub: controlTotal.delta_rub,
+              expected_delta_rub: expectedDelta
+            }
+          ];
+    });
+    const uncheckedMismatches = estimateDetails2026.control_totals.flatMap((controlTotal) => {
+      const tolerance = controlTotal.tolerance_rub;
 
-        if (
-          controlTotal.control_source === 'final_pdf' ||
-          controlTotal.status === 'needs_check' ||
-          tolerance === undefined
-        ) {
-          return [];
-        }
+      if (
+        controlTotal.control_source === 'final_pdf' ||
+        controlTotal.status === 'needs_check' ||
+        tolerance === undefined
+      ) {
+        return [];
+      }
 
-        const sourceTotal = controlTotal.source_total_rub.value;
-        const detailTotal = controlTotal.detail_total_rub?.value;
-        const aggregateTotal = controlTotal.aggregate_total_rub?.value;
+      const sourceTotal = controlTotal.source_total_rub.value;
+      const detailTotal = controlTotal.detail_total_rub?.value;
+      const aggregateTotal = controlTotal.aggregate_total_rub?.value;
 
-        if (
-          sourceTotal === null ||
-          detailTotal === null ||
-          detailTotal === undefined
-        ) {
-          return [controlTotal.id];
-        }
+      if (sourceTotal === null || detailTotal === null || detailTotal === undefined) {
+        return [controlTotal.id];
+      }
 
-        const deltas = [round2(detailTotal - sourceTotal)];
+      const deltas = [round2(detailTotal - sourceTotal)];
 
-        if (aggregateTotal !== null && aggregateTotal !== undefined) {
-          deltas.push(
-            round2(aggregateTotal - sourceTotal),
-            round2(detailTotal - aggregateTotal),
-          );
-        }
+      if (aggregateTotal !== null && aggregateTotal !== undefined) {
+        deltas.push(round2(aggregateTotal - sourceTotal), round2(detailTotal - aggregateTotal));
+      }
 
-        return deltas.some((delta) => Math.abs(delta) > tolerance)
-          ? [controlTotal.id]
-          : [];
-      },
-    );
+      return deltas.some((delta) => Math.abs(delta) > tolerance) ? [controlTotal.id] : [];
+    });
 
     expect({
       missingTolerance,
       missingResourceIds,
       sumMismatches,
       derivedValueMismatches,
-      uncheckedMismatches,
+      uncheckedMismatches
     }).toEqual({
       missingTolerance: [],
       missingResourceIds: [],
       sumMismatches: [],
       derivedValueMismatches: [],
-      uncheckedMismatches: [],
+      uncheckedMismatches: []
     });
   });
 });

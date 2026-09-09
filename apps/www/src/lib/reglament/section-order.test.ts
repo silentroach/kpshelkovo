@@ -21,8 +21,7 @@ describe('reglamentSectionsByOfficialTariff', () => {
         "improvement",
       ]
     `);
-    expect(payload.sections.map((section) => section.id))
-      .toMatchInlineSnapshot(`
+    expect(payload.sections.map((section) => section.id)).toMatchInlineSnapshot(`
       [
         "waste-transfer",
         "cleaning",

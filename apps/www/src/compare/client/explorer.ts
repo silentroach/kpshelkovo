@@ -5,7 +5,7 @@ import type {
   ExplorerBootstrapDependencies,
   ExplorerBootstrapElements,
   ExplorerClientModule,
-  ExplorerInstance,
+  ExplorerInstance
 } from './explorer.types';
 
 const ROOT_SELECTOR = '[data-explorer-root]';
@@ -22,13 +22,13 @@ const loadClient = (): Promise<ExplorerClientModule> => {
     graphUrl.searchParams.set('explorer-retry', String(graphRetry));
   }
 
-  graphRequest = (
-    import(/* @vite-ignore */ graphUrl.href) as Promise<ExplorerClientModule>
-  ).catch((error) => {
-    graphRequest = undefined;
-    graphRetry += 1;
-    throw error;
-  });
+  graphRequest = (import(/* @vite-ignore */ graphUrl.href) as Promise<ExplorerClientModule>).catch(
+    (error) => {
+      graphRequest = undefined;
+      graphRetry += 1;
+      throw error;
+    }
+  );
 
   return graphRequest;
 };
@@ -45,12 +45,12 @@ const loadPayload = async (url: string): Promise<ExplorerPayload> => {
 
 const dependencies: ExplorerBootstrapDependencies = {
   loadClient,
-  loadPayload,
+  loadPayload
 };
 
 export const startSettlementsExplorer = (
   { root, error, retry, payloadUrl }: ExplorerBootstrapElements,
-  runtime: ExplorerBootstrapDependencies = dependencies,
+  runtime: ExplorerBootstrapDependencies = dependencies
 ): (() => void) => {
   let state: 'idle' | 'loading' | 'error' | 'hydrated' = 'idle';
   let disposed = false;
@@ -66,7 +66,7 @@ export const startSettlementsExplorer = (
     try {
       const [loadedClient, payload] = await Promise.all([
         runtime.loadClient(),
-        runtime.loadPayload(payloadUrl),
+        runtime.loadPayload(payloadUrl)
       ]);
 
       if (disposed || !root.isConnected) return;

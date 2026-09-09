@@ -1,10 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import {
-  getHomeHeroMode,
-  hydrateHomeHero,
-  installHomeHeroHydration,
-} from './hero';
+import { getHomeHeroMode, hydrateHomeHero, installHomeHeroHydration } from './hero';
 
 const renderHomeHero = (): void => {
   document.body.innerHTML = `
@@ -21,8 +17,7 @@ const renderHomeHero = (): void => {
   `;
 };
 
-const getShell = (): HTMLElement =>
-  document.querySelector('[data-home-hero-mode]') as HTMLElement;
+const getShell = (): HTMLElement => document.querySelector('[data-home-hero-mode]') as HTMLElement;
 
 const getImage = (): HTMLImageElement =>
   document.querySelector('[data-home-hero-image]') as HTMLImageElement;
@@ -47,9 +42,7 @@ describe('hydrateHomeHero', () => {
 
     expect(getShell().dataset.homeHeroMode).toBe('night');
     expect(getImage().getAttribute('src')).toBe('/night.webp');
-    expect(getImage().getAttribute('srcset')).toBe(
-      '/night-960.webp 960w, /night-1280.webp 1280w',
-    );
+    expect(getImage().getAttribute('srcset')).toBe('/night-960.webp 960w, /night-1280.webp 1280w');
     expect(getImage().hidden).toBe(false);
   });
 
@@ -63,7 +56,7 @@ describe('hydrateHomeHero', () => {
     });
     observer.observe(getImage(), {
       attributes: true,
-      attributeFilter: ['src', 'srcset'],
+      attributeFilter: ['src', 'srcset']
     });
 
     hydrateHomeHero(document, new Date('2026-05-11T17:30:00Z'));

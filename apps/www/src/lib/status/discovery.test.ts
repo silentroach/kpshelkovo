@@ -1,13 +1,14 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { contentDateSchema } from '@/lib/content-date';
-import type { StatusIncidentEntry } from './load';
-import type { StatusArea, StatusKind, StatusService } from './schema';
 import type {
   PublicSurfaceSlice,
-  statusPublicSurfaceSlice as statusPublicSurfaceSliceType,
+  statusPublicSurfaceSlice as statusPublicSurfaceSliceType
 } from '@/lib/public-surface';
 import type { expectSectionCatalogMatchesRegistry as expectSectionCatalogMatchesRegistryType } from '@/lib/public-surface/catalog-contract.test-helper';
+
+import type { StatusIncidentEntry } from './load';
+import type { StatusArea, StatusKind, StatusService } from './schema';
 
 interface EntryInput {
   readonly id: string;
@@ -33,8 +34,8 @@ const entry = (input: EntryInput): StatusIncidentEntry => ({
     started_at: testDate.parse(input.started_at),
     ended_at: input.ended_at ? testDate.parse(input.ended_at) : undefined,
     areas: input.areas ? [...input.areas] : undefined,
-    source_url: input.source_url ?? `https://example.com/${input.id}`,
-  },
+    source_url: input.source_url ?? `https://example.com/${input.id}`
+  }
 });
 
 let buildStatusDataset: typeof import('./load').buildStatusDataset;
@@ -42,13 +43,12 @@ let buildStatusPublicPayload: typeof import('./public-dto').buildStatusPublicPay
 let catalog: typeof import('./discovery').catalog;
 let expectSectionCatalogMatchesRegistry: typeof expectSectionCatalogMatchesRegistryType;
 let statusSchema: typeof import('./discovery').schema;
-let statusPublicSurfaceSlice: typeof statusPublicSurfaceSliceType &
-  PublicSurfaceSlice;
+let statusPublicSurfaceSlice: typeof statusPublicSurfaceSliceType & PublicSurfaceSlice;
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ buildStatusDataset } = await import('./load'));
@@ -64,7 +64,7 @@ describe('status API catalog', () => {
     expectSectionCatalogMatchesRegistry({
       catalog,
       siteRoot: 'https://example.com',
-      slice: statusPublicSurfaceSlice,
+      slice: statusPublicSurfaceSlice
     });
   });
 });
@@ -78,7 +78,7 @@ describe('buildStatusPublicPayload', () => {
           title: 'Краткая запись без body',
           service: 'water',
           kind: 'incident',
-          started_at: '03.05.2026 10:00',
+          started_at: '03.05.2026 10:00'
         }),
         entry({
           id: '2026/05/water-with-page',
@@ -86,21 +86,17 @@ describe('buildStatusPublicPayload', () => {
           service: 'water',
           kind: 'maintenance',
           started_at: '01.05.2026 10:00',
-          body: 'Первый абзац.',
-        }),
+          body: 'Первый абзац.'
+        })
       ],
       {
-        now: new Date('2026-05-03T12:00:00+03:00'),
-      },
+        now: new Date('2026-05-03T12:00:00+03:00')
+      }
     );
 
     const payload = buildStatusPublicPayload(data);
-    const noPage = payload.incidents.find(
-      (item) => item.id === '2026/05/water-no-page',
-    );
-    const withPage = payload.incidents.find(
-      (item) => item.id === '2026/05/water-with-page',
-    );
+    const noPage = payload.incidents.find((item) => item.id === '2026/05/water-no-page');
+    const withPage = payload.incidents.find((item) => item.id === '2026/05/water-with-page');
     const water = payload.services.find((item) => item.service === 'water');
 
     expect(noPage).toBeDefined();
@@ -109,13 +105,12 @@ describe('buildStatusPublicPayload', () => {
 
     expect(withPage).toMatchObject({
       html_url: 'https://example.com/status/incidents/2026/05/water-with-page/',
-      markdown_url:
-        'https://example.com/status/incidents/2026/05/water-with-page/index.md',
+      markdown_url: 'https://example.com/status/incidents/2026/05/water-with-page/index.md'
     });
 
     expect(water?.latest_incident).toMatchObject({
       id: '2026/05/water-no-page',
-      title: 'Краткая запись без body',
+      title: 'Краткая запись без body'
     });
     expect(water?.latest_incident?.html_url).toBeUndefined();
     expect(water?.latest_incident?.markdown_url).toBeUndefined();

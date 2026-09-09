@@ -3,17 +3,16 @@
 import { Window } from 'happy-dom';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { createAstroContainer } from '@/test/astro-container';
-import { visibleWhitespace } from '@/lib/test/visible-whitespace';
 import type {
   StatusCalendarDay,
   StatusCalendarMonth,
-  StatusCalendarYear,
+  StatusCalendarYear
 } from '@/lib/status/calendar.types';
-
+import { visibleWhitespace } from '@/lib/test/visible-whitespace';
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import * as StatusCalendarYearPage from '@/pages/status/calendar/[year]/index.astro';
 import * as StatusCalendarYearMarkdownRoute from '@/pages/status/calendar/[year]/index.md';
+import { createAstroContainer } from '@/test/astro-container';
 
 const fixtures = vi.hoisted(() => {
   const januaryDay: StatusCalendarDay = {
@@ -24,7 +23,7 @@ const fixtures = vi.hoisted(() => {
     kind: 'maintenance',
     incidentCount: 0,
     maintenanceCount: 1,
-    recordIds: ['2026/01/maintenance'],
+    recordIds: ['2026/01/maintenance']
   };
   const augustDays: readonly StatusCalendarDay[] = [
     {
@@ -35,11 +34,7 @@ const fixtures = vi.hoisted(() => {
       kind: 'mixed',
       incidentCount: 2,
       maintenanceCount: 1,
-      recordIds: [
-        '2026/08/incident-one',
-        '2026/08/incident-two',
-        '2026/08/maintenance',
-      ],
+      recordIds: ['2026/08/incident-one', '2026/08/incident-two', '2026/08/maintenance']
     },
     {
       id: '2026-08-23',
@@ -49,24 +44,24 @@ const fixtures = vi.hoisted(() => {
       kind: 'incident',
       incidentCount: 1,
       maintenanceCount: 0,
-      recordIds: ['2026/08/incident-one'],
-    },
+      recordIds: ['2026/08/incident-one']
+    }
   ];
   const january: StatusCalendarMonth = {
     id: '2026/01',
     year: 2026,
     month: 1,
-    days: [januaryDay],
+    days: [januaryDay]
   };
   const august: StatusCalendarMonth = {
     id: '2026/08',
     year: 2026,
     month: 8,
-    days: augustDays,
+    days: augustDays
   };
   const year: StatusCalendarYear = {
     year: 2026,
-    months: [august, january],
+    months: [august, january]
   };
   const allDays = [januaryDay, ...augustDays];
 
@@ -81,18 +76,18 @@ const fixtures = vi.hoisted(() => {
         byYear: new Map([[year.year, year]]),
         byMonth: new Map([
           [august.id, august],
-          [january.id, january],
+          [january.id, january]
         ]),
-        byDay: new Map(allDays.map((day) => [day.id, day])),
+        byDay: new Map(allDays.map((day) => [day.id, day]))
       },
       byId: new Map(),
-      byService: new Map(),
-    },
+      byService: new Map()
+    }
   };
 });
 
 vi.mock('@/lib/status/load', () => ({
-  loadStatusData: async () => fixtures.data,
+  loadStatusData: async () => fixtures.data
 }));
 
 const parseHtml = (html: string) => {
@@ -112,7 +107,7 @@ const renderPage = async (year = 2026) => {
   return container.renderToString(StatusCalendarYearPage.default, {
     params: { year: String(year) },
     request: new Request(`https://example.com/status/calendar/${year}/`),
-    partial: false,
+    partial: false
   });
 };
 
@@ -124,37 +119,31 @@ const renderMarkdownRoute = (year = 2026): Response | Promise<Response> =>
   )({ params: { year: String(year) } });
 
 const affectedLinks = (document: ReturnType<typeof parseHtml>) =>
-  [...document.querySelectorAll('[data-status-calendar-day-link]')].map(
-    (link) => {
-      const describedBy = link.getAttribute('aria-describedby') ?? undefined;
+  [...document.querySelectorAll('[data-status-calendar-day-link]')].map((link) => {
+    const describedBy = link.getAttribute('aria-describedby') ?? undefined;
 
-      return {
-        id: link.getAttribute('data-status-calendar-day-link') ?? undefined,
-        href: link.getAttribute('href'),
-        marker: link.getAttribute('data-status-calendar-marker') ?? undefined,
-        label: link.getAttribute('aria-label'),
-        describedBy,
-        description: describedBy
-          ? document.getElementById(describedBy)?.getAttribute('aria-label')
-          : undefined,
-        descriptionExists: describedBy
-          ? Boolean(document.getElementById(describedBy))
-          : false,
-      };
-    },
-  );
+    return {
+      id: link.getAttribute('data-status-calendar-day-link') ?? undefined,
+      href: link.getAttribute('href'),
+      marker: link.getAttribute('data-status-calendar-marker') ?? undefined,
+      label: link.getAttribute('aria-label'),
+      describedBy,
+      description: describedBy
+        ? document.getElementById(describedBy)?.getAttribute('aria-label')
+        : undefined,
+      descriptionExists: describedBy ? Boolean(document.getElementById(describedBy)) : false
+    };
+  });
 
 const staticPathYears = (
   paths: readonly {
     readonly params: Readonly<Record<string, string | undefined>>;
-  }[],
+  }[]
 ): readonly (string | undefined)[] => paths.map((path) => path.params.year);
 
 const yearNavigation = (document: ReturnType<typeof parseHtml>) =>
   ['previous', 'next'].map((direction) => {
-    const control = document.querySelector(
-      `[data-status-calendar-${direction}]`,
-    );
+    const control = document.querySelector(`[data-status-calendar-${direction}]`);
 
     return {
       direction,
@@ -162,7 +151,7 @@ const yearNavigation = (document: ReturnType<typeof parseHtml>) =>
       href: control?.getAttribute('href') ?? undefined,
       disabled: control?.hasAttribute('disabled'),
       label: control?.getAttribute('aria-label'),
-      text: cleanText(control?.textContent ?? ''),
+      text: cleanText(control?.textContent ?? '')
     };
   });
 
@@ -186,19 +175,16 @@ describe('/status/calendar/YYYY/', () => {
       const [htmlPaths, markdownPaths, html] = await Promise.all([
         StatusCalendarYearPage.getStaticPaths(),
         StatusCalendarYearMarkdownRoute.getStaticPaths(),
-        renderPage(),
+        renderPage()
       ]);
       const document = parseHtml(html);
 
       expect({
         htmlYears: staticPathYears(htmlPaths),
         markdownYears: staticPathYears(markdownPaths),
-        monthCount: document.querySelectorAll('[data-status-calendar-month]')
-          .length,
-        hasEmptyState: cleanText(document.body.textContent).includes(
-          'Нет записей',
-        ),
-        navigation: yearNavigation(document),
+        monthCount: document.querySelectorAll('[data-status-calendar-month]').length,
+        hasEmptyState: cleanText(document.body.textContent).includes('Нет записей'),
+        navigation: yearNavigation(document)
       }).toMatchInlineSnapshot(`
         {
           "hasEmptyState": false,
@@ -240,25 +226,22 @@ describe('/status/calendar/YYYY/', () => {
     fixtures.data.calendar.years = [
       { year: 2028, months: [] },
       ...originalYears,
-      { year: 2022, months: [] },
+      { year: 2022, months: [] }
     ];
 
     try {
-      const [htmlPaths, markdownPaths, currentHtml, firstHtml, lastHtml] =
-        await Promise.all([
-          StatusCalendarYearPage.getStaticPaths(),
-          StatusCalendarYearMarkdownRoute.getStaticPaths(),
-          renderPage(2026),
-          renderPage(2022),
-          renderPage(2028),
-        ]);
+      const [htmlPaths, markdownPaths, currentHtml, firstHtml, lastHtml] = await Promise.all([
+        StatusCalendarYearPage.getStaticPaths(),
+        StatusCalendarYearMarkdownRoute.getStaticPaths(),
+        renderPage(2026),
+        renderPage(2022),
+        renderPage(2028)
+      ]);
       const htmlYears = staticPathYears(htmlPaths);
       const markdownYears = staticPathYears(markdownPaths);
       const currentDocument = parseHtml(currentHtml);
       const linkedYears = [
-        ...currentDocument.querySelectorAll(
-          '[data-status-calendar-year-navigation] a[href]',
-        ),
+        ...currentDocument.querySelectorAll('[data-status-calendar-year-navigation] a[href]')
       ].map((link) => link.getAttribute('href')?.match(/\/(\d{4})\/$/u)?.[1]);
 
       expect({
@@ -270,8 +253,8 @@ describe('/status/calendar/YYYY/', () => {
         linkedTargetsExist: linkedYears.map((year) => ({
           year,
           html: htmlYears.includes(year),
-          markdown: markdownYears.includes(year),
-        })),
+          markdown: markdownYears.includes(year)
+        }))
       }).toMatchInlineSnapshot(`
         {
           "current": [
@@ -359,45 +342,34 @@ describe('/status/calendar/YYYY/', () => {
 
   it('renders a Monday-first 12-month matrix with decorative adjacent dates', async () => {
     const document = parseHtml(await renderPage());
-    const months = [
-      ...document.querySelectorAll('[data-status-calendar-month]'),
-    ];
+    const months = [...document.querySelectorAll('[data-status-calendar-month]')];
     const january = months[0];
-    const adjacent = january?.querySelector(
-      '[data-status-calendar-adjacent="2025-12-29"]',
-    );
+    const adjacent = january?.querySelector('[data-status-calendar-adjacent="2025-12-29"]');
 
     expect({
       monthCount: months.length,
       cellsPerMonth: months.map(
-        (month) => month.querySelectorAll('[data-status-calendar-cell]').length,
+        (month) => month.querySelectorAll('[data-status-calendar-cell]').length
       ),
-      januaryWeekdays: [...(january?.querySelectorAll('th') ?? [])].map(
-        (heading) => ({
-          label: heading.getAttribute('aria-label'),
-          text: cleanText(heading.textContent),
-        }),
-      ),
+      januaryWeekdays: [...(january?.querySelectorAll('th') ?? [])].map((heading) => ({
+        label: heading.getAttribute('aria-label'),
+        text: cleanText(heading.textContent)
+      })),
       adjacent: {
         text: cleanText(adjacent?.textContent ?? ''),
         ariaHidden: adjacent?.getAttribute('aria-hidden'),
         hasLink: Boolean(adjacent?.querySelector('a')),
-        hasMarker: Boolean(
-          adjacent?.querySelector('[data-status-calendar-marker]'),
-        ),
+        hasMarker: Boolean(adjacent?.querySelector('[data-status-calendar-marker]')),
         hasTooltip: Boolean(adjacent?.querySelector('[role="tooltip"]')),
-        hasTitle: Boolean(adjacent?.querySelector('[title]')),
+        hasTitle: Boolean(adjacent?.querySelector('[title]'))
       },
       unaffectedDayHasLink: Boolean(
-        january?.querySelector('[data-status-calendar-cell="2026-01-02"] a'),
+        january?.querySelector('[data-status-calendar-cell="2026-01-02"] a')
       ),
-      clientDateCount: document.querySelectorAll('[data-status-calendar-date]')
-        .length,
+      clientDateCount: document.querySelectorAll('[data-status-calendar-date]').length,
       hasBuildTimeToday: Boolean(
-        document.querySelector(
-          '[data-status-calendar-today], [aria-current="date"]',
-        ),
-      ),
+        document.querySelector('[data-status-calendar-today], [aria-current="date"]')
+      )
     }).toMatchInlineSnapshot(`
       {
         "adjacent": {
@@ -466,38 +438,30 @@ describe('/status/calendar/YYYY/', () => {
     const targetsExist = links.map((link) => {
       const target = new URL(link.href ?? '', 'https://example.com');
       const monthMatch = target.pathname.match(/\/(\d{4})\/(\d{2})\/$/u);
-      const monthId = monthMatch
-        ? `${monthMatch[1]}/${monthMatch[2]}`
-        : undefined;
+      const monthId = monthMatch ? `${monthMatch[1]}/${monthMatch[2]}` : undefined;
 
       return {
         id: link.id,
-        monthExists: monthId
-          ? fixtures.data.calendar.byMonth.has(monthId)
-          : false,
-        anchorExists: fixtures.data.calendar.byDay.has(target.hash.slice(1)),
+        monthExists: monthId ? fixtures.data.calendar.byMonth.has(monthId) : false,
+        anchorExists: fixtures.data.calendar.byDay.has(target.hash.slice(1))
       };
     });
 
     expect({
       links,
       targetsExist,
-      tooltips: [
-        ...document.querySelectorAll('[data-status-calendar-tooltip]'),
-      ].map((tooltip) => ({
+      tooltips: [...document.querySelectorAll('[data-status-calendar-tooltip]')].map((tooltip) => ({
         id: tooltip.id,
         role: tooltip.getAttribute('role'),
         label: tooltip.getAttribute('aria-label'),
         ariaHidden: tooltip.getAttribute('aria-hidden'),
         text: visibleWhitespace(
-          tooltip
-            .querySelector('[data-status-calendar-tooltip-text]')
-            ?.textContent.trim() ?? '',
+          tooltip.querySelector('[data-status-calendar-tooltip-text]')?.textContent.trim() ?? ''
         ),
         interactiveElements: tooltip.querySelectorAll(
-          'a, button, input, select, textarea, [tabindex]',
-        ).length,
-      })),
+          'a, button, input, select, textarea, [tabindex]'
+        ).length
+      }))
     }).toMatchInlineSnapshot(`
       {
         "links": [
@@ -586,27 +550,21 @@ describe('/status/calendar/YYYY/', () => {
 
     expect({
       legendItemCount: legend?.querySelectorAll('li').length,
-      legendMarkers: [
-        ...(legend?.querySelectorAll('[data-status-calendar-marker]') ?? []),
-      ].map((marker) => marker.getAttribute('data-status-calendar-marker')),
-      todayLegend: Boolean(
-        legend?.querySelector('[data-status-calendar-today-legend]'),
+      legendMarkers: [...(legend?.querySelectorAll('[data-status-calendar-marker]') ?? [])].map(
+        (marker) => marker.getAttribute('data-status-calendar-marker')
       ),
+      todayLegend: Boolean(legend?.querySelector('[data-status-calendar-today-legend]')),
       metadata: {
-        historyLinkCount: document.querySelectorAll(
-          'main a[href="/status/history/"]',
-        ).length,
+        historyLinkCount: document.querySelectorAll('main a[href="/status/history/"]').length,
         statusBreadcrumbHref: document
           .querySelector('nav[aria-label="Хлебные крошки"] a[href="/status/"]')
           ?.getAttribute('href'),
-        robots: document
-          .querySelector('meta[name="robots"]')
-          ?.getAttribute('content'),
+        robots: document.querySelector('meta[name="robots"]')?.getAttribute('content'),
         markdownAlternate: document
           .querySelector('link[rel="alternate"][type="text/markdown"]')
           ?.getAttribute('href'),
-        pagefindRoot: document.querySelector('[data-pagefind-root]')?.tagName,
-      },
+        pagefindRoot: document.querySelector('[data-pagefind-root]')?.tagName
+      }
     }).toMatchInlineSnapshot(`
       {
         "legendItemCount": 2,
@@ -627,18 +585,15 @@ describe('/status/calendar/YYYY/', () => {
   });
 
   it('keeps affected dates and targets aligned in HTML and Markdown', async () => {
-    const [html, markdownResponse] = await Promise.all([
-      renderPage(),
-      renderMarkdownRoute(),
-    ]);
+    const [html, markdownResponse] = await Promise.all([renderPage(), renderMarkdownRoute()]);
     const htmlLinks = affectedLinks(parseHtml(html)).map((link) => ({
       href: new URL(link.href ?? '', 'https://kpshelkovo.online').toString(),
-      label: link.label,
+      label: link.label
     }));
     const markdown = await markdownResponse.text();
-    const markdownLinks = [
-      ...markdown.matchAll(/^- \[([^\]]+)\]\(([^)]+)\)$/gmu),
-    ].map(([, label, href]) => ({ href, label }));
+    const markdownLinks = [...markdown.matchAll(/^- \[([^\]]+)\]\(([^)]+)\)$/gmu)].map(
+      ([, label, href]) => ({ href, label })
+    );
     const headingCount = [...markdown.matchAll(/^## .+$/gmu)].length;
 
     expect(markdownLinks).toEqual(htmlLinks);
@@ -646,7 +601,7 @@ describe('/status/calendar/YYYY/', () => {
       headingCount,
       contentType: markdownResponse.headers.get('Content-Type'),
       robots: markdownResponse.headers.get('X-Robots-Tag'),
-      hasMarkdownTable: /^\|/mu.test(markdown),
+      hasMarkdownTable: /^\|/mu.test(markdown)
     }).toMatchInlineSnapshot(`
       {
         "contentType": "text/markdown; charset=utf-8",

@@ -1,9 +1,9 @@
 import { EventEmitter } from 'node:events';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
-import { expect, it } from 'vitest';
 import { resolveConfig } from 'vite';
 import type { Connect, FSWatcher, ViteDevServer } from 'vite';
+import { expect, it } from 'vitest';
 
 import { PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE } from '../pagefind-dev-snapshot';
 import { createRetryableSearchDialogDevPlugin } from '../retryable-search-dialog';
@@ -24,12 +24,11 @@ const loadDevGraph = async (snapshotAvailable: boolean) => {
     {
       configFile: false,
       define: {
-        [PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE]:
-          JSON.stringify(snapshotAvailable),
+        [PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE]: JSON.stringify(snapshotAvailable)
       },
-      mode: 'development',
+      mode: 'development'
     },
-    'serve',
+    'serve'
   );
   await (configResolved as OmitThisParameter<typeof configResolved>)(config);
 
@@ -38,7 +37,7 @@ const loadDevGraph = async (snapshotAvailable: boolean) => {
     use(handler: Connect.NextHandleFunction) {
       middleware = handler;
       return middlewares;
-    },
+    }
   } as Connect.Server;
   const configureServer = plugin.configureServer;
   if (typeof configureServer !== 'function') {
@@ -46,7 +45,7 @@ const loadDevGraph = async (snapshotAvailable: boolean) => {
   }
   await (configureServer as OmitThisParameter<typeof configureServer>)({
     watcher: new EventEmitter() as FSWatcher,
-    middlewares,
+    middlewares
   } as ViteDevServer);
   if (!middleware) {
     throw new Error('Expected search plugin to register middleware');
@@ -63,13 +62,10 @@ const loadDevGraph = async (snapshotAvailable: boolean) => {
     end(body) {
       resolve(String(body));
       return response;
-    },
+    }
   } as ServerResponse;
-  middleware(
-    { url: graphPath } as IncomingMessage,
-    response,
-    (error?: unknown) =>
-      reject(error ?? new Error('Graph middleware did not handle the request')),
+  middleware({ url: graphPath } as IncomingMessage, response, (error?: unknown) =>
+    reject(error ?? new Error('Graph middleware did not handle the request'))
   );
 
   return { graphEnvironment, source: await promise };

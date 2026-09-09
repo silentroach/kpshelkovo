@@ -2,18 +2,15 @@ import { EventEmitter } from 'node:events';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { fileURLToPath } from 'node:url';
 
-import { describe, expect, it } from 'vitest';
 import type { Connect, FSWatcher, ViteDevServer } from 'vite';
+import { describe, expect, it } from 'vitest';
 
 import { createRetryableExplorerDevPlugin } from '../retryable-settlements-explorer';
 
 const graphPath = '/__settlements-explorer/graph.js';
 const sourceFile = fileURLToPath(import.meta.url);
 
-const requestGraph = async (
-  middleware: Connect.NextHandleFunction,
-  url: string,
-) => {
+const requestGraph = async (middleware: Connect.NextHandleFunction, url: string) => {
   let contentType: string | undefined;
   const { promise, resolve, reject } = Promise.withResolvers<string>();
   const response = {
@@ -27,7 +24,7 @@ const requestGraph = async (
     end(body) {
       resolve(String(body));
       return response;
-    },
+    }
   } as ServerResponse;
   middleware({ url } as IncomingMessage, response, (error?: unknown) => {
     reject(error ?? new Error('Graph middleware did not handle the request'));
@@ -50,7 +47,7 @@ describe('retryable settlements explorer dev plugin', () => {
       use(handler: Connect.NextHandleFunction) {
         middleware = handler;
         return middlewares;
-      },
+      }
     } as Connect.Server;
     const plugin = createRetryableExplorerDevPlugin(buildGraph);
     const configureServer = plugin.configureServer;
@@ -59,22 +56,16 @@ describe('retryable settlements explorer dev plugin', () => {
     }
     await (configureServer as OmitThisParameter<typeof configureServer>)({
       watcher,
-      middlewares,
+      middlewares
     } as ViteDevServer);
     if (!middleware) {
       throw new Error('Expected explorer plugin to register middleware');
     }
 
     const initialResponse = await requestGraph(middleware, graphPath);
-    const retryResponse = await requestGraph(
-      middleware,
-      `${graphPath}?explorer-retry=2`,
-    );
+    const retryResponse = await requestGraph(middleware, `${graphPath}?explorer-retry=2`);
     watcher.emit('all', 'change', sourceFile);
-    const updatedResponse = await requestGraph(
-      middleware,
-      `${graphPath}?explorer-retry=3`,
-    );
+    const updatedResponse = await requestGraph(middleware, `${graphPath}?explorer-retry=3`);
 
     expect({
       initialStatus: initialResponse.status,
@@ -83,7 +74,7 @@ describe('retryable settlements explorer dev plugin', () => {
       sameSource: retryResponse.source === initialResponse.source,
       initialSource: initialResponse.source,
       updatedSource: updatedResponse.source,
-      buildCalls: buildCount,
+      buildCalls: buildCount
     }).toMatchInlineSnapshot(`
       {
         "buildCalls": 2,

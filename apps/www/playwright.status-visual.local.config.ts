@@ -5,9 +5,9 @@ export default createVisualFixturePlaywrightConfig({
   port: 4324,
   viewport: {
     width: 1440,
-    height: 1200,
+    height: 1200
   },
   command: 'pnpm run test:visual:status:serve',
   testTimeout: 60_000,
-  serverTimeout: 120_000,
+  serverTimeout: 120_000
 });

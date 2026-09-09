@@ -1,5 +1,5 @@
-import { afterEach, beforeAll, beforeEach } from 'vitest';
 import { cleanup } from '@testing-library/svelte';
+import { afterEach, beforeAll, beforeEach } from 'vitest';
 
 const createYmapsMock = (): unknown => ({
   ready: Promise.resolve(),
@@ -13,27 +13,22 @@ const createYmapsMock = (): unknown => ({
   YMapDefaultFeaturesLayer: class {},
   YMapMarker: class {
     update(): void {}
-  },
+  }
 });
 
 const ensureYmapsMock = (): void => {
   Object.defineProperty(window, 'ymaps3', {
     value: createYmapsMock(),
     writable: true,
-    configurable: true,
+    configurable: true
   });
 };
 
 beforeAll(() => {
   const appendChild = HTMLHeadElement.prototype.appendChild;
 
-  HTMLHeadElement.prototype.appendChild = function appendChildForTests<
-    T extends Node,
-  >(node: T): T {
-    if (
-      node instanceof HTMLScriptElement &&
-      node.src.includes('api-maps.yandex.ru')
-    ) {
+  HTMLHeadElement.prototype.appendChild = function appendChildForTests<T extends Node>(node: T): T {
+    if (node instanceof HTMLScriptElement && node.src.includes('api-maps.yandex.ru')) {
       ensureYmapsMock();
       window.setTimeout(() => {
         node.dataset.loaded = 'true';

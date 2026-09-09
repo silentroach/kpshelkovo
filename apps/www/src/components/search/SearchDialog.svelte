@@ -7,17 +7,15 @@
 
   import { pagefindSearchClient } from '@/lib/search/client';
   import type { SearchResult } from '@/lib/search/client.types';
-  import {
-    SEARCH_QUERY_MAX_LENGTH,
-    SEARCH_RESULT_DEFAULT_LIMIT,
-  } from '@/lib/search/client.types';
+  import { SEARCH_QUERY_MAX_LENGTH, SEARCH_RESULT_DEFAULT_LIMIT } from '@/lib/search/client.types';
+
   import { SEARCH_DIALOG_OPEN_EVENT } from './search-dialog.events';
   import type {
     SearchDialogProps,
     SearchDialogRequestMode,
     SearchDialogResultRow,
     SearchDialogState,
-    SearchExcerptSegment,
+    SearchExcerptSegment
   } from './search-dialog.types';
 
   const SEARCH_DEBOUNCE_MS = 150;
@@ -26,8 +24,7 @@
   const RESULT_FORMS = ['результат', 'результата', 'результатов'] as const;
   const FOUND_FORMS = ['Найден', 'Найдено', 'Найдено'] as const;
 
-  let { client = pagefindSearchClient, initialQuery = '' }: SearchDialogProps =
-    $props();
+  let { client = pagefindSearchClient, initialQuery = '' }: SearchDialogProps = $props();
 
   const id = $props.id();
   const dialogId = `${id}-dialog`;
@@ -53,7 +50,7 @@
 
   const reachMetrikaGoal = (
     target: string,
-    params?: Readonly<Record<string, string | number>>,
+    params?: Readonly<Record<string, string | number>>
   ): void => {
     const id = Number(document.documentElement.dataset.siteMetrikaId);
     if (!Number.isFinite(id)) {
@@ -74,15 +71,13 @@
   };
 
   const resultRow = (result: SearchResult): SearchDialogResultRow => {
-    const anchoredResult = result.subResults.find((item) =>
-      hasAnchor(item.url),
-    );
+    const anchoredResult = result.subResults.find((item) => hasAnchor(item.url));
 
     return {
       contextTitle: anchoredResult?.title,
       result,
       url: anchoredResult?.url ?? result.url,
-      excerptHtml: anchoredResult?.excerptHtml ?? result.excerptHtml,
+      excerptHtml: anchoredResult?.excerptHtml ?? result.excerptHtml
     };
   };
 
@@ -191,17 +186,13 @@
     }
   };
 
-  const isCurrentRequest = (
-    requestedQuery: string,
-    mode: SearchDialogRequestMode,
-  ): boolean =>
-    isCurrentVisibleQuery(requestedQuery) &&
-    (mode === 'initial' ? isSearching : isLoadingMore);
+  const isCurrentRequest = (requestedQuery: string, mode: SearchDialogRequestMode): boolean =>
+    isCurrentVisibleQuery(requestedQuery) && (mode === 'initial' ? isSearching : isLoadingMore);
 
   const runSearch = async (
     requestedQuery: string,
     limit: number,
-    mode: SearchDialogRequestMode,
+    mode: SearchDialogRequestMode
   ): Promise<void> => {
     if (!dialogElement?.open || !requestedQuery.trim()) {
       return;
@@ -237,12 +228,12 @@
           response.searchQuery === response.query
             ? {
                 query: response.query,
-                results_count: response.total,
+                results_count: response.total
               }
             : {
                 query: response.query,
                 normalized_query: response.searchQuery,
-                results_count: response.total,
+                results_count: response.total
               };
         reachMetrikaGoal(SEARCH_GOAL, goalParams);
         isSearching = false;
@@ -302,7 +293,7 @@
           loadMore();
         }
       },
-      { root: resultsElement, rootMargin: '0px 0px 25%' },
+      { root: resultsElement, rootMargin: '0px 0px 25%' }
     );
     observer.observe(element);
 
@@ -310,10 +301,7 @@
   };
 
   const handleInput = (event: Event): void => {
-    if (
-      !dialogElement?.open ||
-      !(event.currentTarget instanceof HTMLInputElement)
-    ) {
+    if (!dialogElement?.open || !(event.currentTarget instanceof HTMLInputElement)) {
       return;
     }
 
@@ -331,19 +319,15 @@
 
   const resultLinks = (): readonly HTMLAnchorElement[] =>
     dialogElement
-      ? [
-          ...dialogElement.querySelectorAll<HTMLAnchorElement>(
-            '[data-search-result]',
-          ),
-        ]
+      ? [...dialogElement.querySelectorAll<HTMLAnchorElement>('[data-search-result]')]
       : [];
 
   const tabStops = (): readonly HTMLElement[] =>
     dialogElement
       ? [
           ...dialogElement.querySelectorAll<HTMLElement>(
-            'a[href], button:not([disabled]):not([data-search-retry]), input:not([disabled])',
-          ),
+            'a[href], button:not([disabled]):not([data-search-retry]), input:not([disabled])'
+          )
         ]
       : [];
 
@@ -358,20 +342,13 @@
       return;
     }
 
-    if (
-      event.key === 'Tab' &&
-      !event.altKey &&
-      !event.ctrlKey &&
-      !event.metaKey
-    ) {
+    if (event.key === 'Tab' && !event.altKey && !event.ctrlKey && !event.metaKey) {
       const stops = tabStops();
       if (stops.length === 0) {
         return;
       }
 
-      const focusedIndex = stops.findIndex(
-        (element) => element === document.activeElement,
-      );
+      const focusedIndex = stops.findIndex((element) => element === document.activeElement);
       const movesPastStart = event.shiftKey && focusedIndex <= 0;
       const movesPastEnd = !event.shiftKey && focusedIndex === stops.length - 1;
 
@@ -389,9 +366,7 @@
       return;
     }
 
-    const focusedIndex = links.findIndex(
-      (link) => link === document.activeElement,
-    );
+    const focusedIndex = links.findIndex((link) => link === document.activeElement);
 
     if (event.key === 'ArrowDown') {
       event.preventDefault();
@@ -422,10 +397,7 @@
   };
 
   const handleOpenRequest = (event: Event): void => {
-    if (
-      !(event instanceof CustomEvent) ||
-      !(event.detail instanceof HTMLElement)
-    ) {
+    if (!(event instanceof CustomEvent) || !(event.detail instanceof HTMLElement)) {
       return;
     }
 
@@ -439,13 +411,7 @@
   };
 
   const handleResultClick = (event: MouseEvent): void => {
-    if (
-      event.button !== 0 ||
-      event.altKey ||
-      event.ctrlKey ||
-      event.metaKey ||
-      event.shiftKey
-    ) {
+    if (event.button !== 0 || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
       return;
     }
 
@@ -454,7 +420,7 @@
 
   const excerptStartsWithTitle = (
     segments: readonly SearchExcerptSegment[],
-    title: string,
+    title: string
   ): boolean => {
     const excerpt = segments
       .map((segment) => segment.text)
@@ -473,7 +439,7 @@
   const excerptSegments = (
     excerptHtml: string,
     contextTitle?: string,
-    breakBeforeComparison = false,
+    breakBeforeComparison = false
   ): readonly SearchExcerptSegment[] => {
     const decoder = document.createElement('textarea');
     const segments: SearchExcerptSegment[] = [];
@@ -499,7 +465,7 @@
     if (contextTitle && !excerptStartsWithTitle(segments, contextTitle)) {
       segments.unshift({
         highlighted: false,
-        text: `${contextTitle}:\u00a0`,
+        text: `${contextTitle}:\u00a0`
       });
     }
 
@@ -528,18 +494,14 @@
         {
           ...segment,
           breakBefore: true,
-          text: segment.text.slice(index),
-        },
+          text: segment.text.slice(index)
+        }
       ];
     });
   };
 
   onMount(() => {
-    const removeOpenListener = on(
-      document,
-      SEARCH_DIALOG_OPEN_EVENT,
-      handleOpenRequest,
-    );
+    const removeOpenListener = on(document, SEARCH_DIALOG_OPEN_EVENT, handleOpenRequest);
 
     return () => {
       removeOpenListener();
@@ -658,9 +620,7 @@
                   onclick={handleResultClick}
                 >
                   <span class="result-meta">
-                    <span class="result-section"
-                      >{row.result.section.label}</span
-                    >
+                    <span class="result-section">{row.result.section.label}</span>
                     {#if row.result.publishedAt}
                       <time datetime={row.result.publishedAt}>
                         {formatDate(row.result.publishedAt)}
@@ -674,19 +634,16 @@
                     {@const segments = excerptSegments(
                       row.excerptHtml,
                       row.contextTitle,
-                      row.result.section.id === 'compare',
+                      row.result.section.id === 'compare'
                     )}
                     <p
                       class={[
                         'site-search-result-excerpt result-excerpt',
-                        row.result.section.id === 'compare'
-                          ? 'result-excerpt--compare'
-                          : undefined,
+                        row.result.section.id === 'compare' ? 'result-excerpt--compare' : undefined
                       ]}
                     >
                       {#each segments as segment, segmentIndex (segmentIndex)}
-                        {#if segment.breakBefore}<br
-                          />{/if}{#if segment.highlighted}<mark
+                        {#if segment.breakBefore}<br />{/if}{#if segment.highlighted}<mark
                             >{segment.text}</mark
                           >{:else}{segment.text}{/if}
                       {/each}
@@ -708,9 +665,7 @@
           {#if hasMoreResults}
             {#if loadMoreFailed}
               <div class="action-row" role="status">
-                <p class="action-message">
-                  Не удалось загрузить остальные результаты
-                </p>
+                <p class="action-message">Не удалось загрузить остальные результаты</p>
                 <button
                   type="button"
                   class="ui-btn ui-btn-sm ui-btn-ghost retry-button"

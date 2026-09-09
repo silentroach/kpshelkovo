@@ -18,14 +18,14 @@ import {
   statusPath,
   statusSchemaPath,
   statusServiceMarkdownPattern,
-  statusServicePattern,
+  statusServicePattern
 } from './routes';
 
 export const statusPublicSurfaceSlice = {
   owner: {
     id: 'status',
     label: 'Статус сервисов',
-    entryPath: statusPath(),
+    entryPath: statusPath()
   },
   surfaces: [
     {
@@ -35,7 +35,7 @@ export const statusPublicSurfaceSlice = {
       mediaType: 'text/html',
       cacheClass: 'html',
       discoveryRoles: ['section-entry'],
-      catalogRole: 'anchor',
+      catalogRole: 'anchor'
     },
     {
       id: 'status:index-markdown',
@@ -44,7 +44,7 @@ export const statusPublicSurfaceSlice = {
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
       discoveryRoles: ['markdown-companion'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'status:history',
@@ -57,10 +57,10 @@ export const statusPublicSurfaceSlice = {
         {
           rel: 'alternate',
           href: statusMarkdownPath(),
-          mediaType: 'text/markdown',
-        },
+          mediaType: 'text/markdown'
+        }
       ],
-      acceptsNegotiation: 'required',
+      acceptsNegotiation: 'required'
     },
     {
       id: 'status:calendar-year',
@@ -73,10 +73,10 @@ export const statusPublicSurfaceSlice = {
         {
           rel: 'alternate',
           href: statusCalendarYearMarkdownPattern(),
-          mediaType: 'text/markdown',
-        },
+          mediaType: 'text/markdown'
+        }
       ],
-      acceptsNegotiation: 'required',
+      acceptsNegotiation: 'required'
     },
     {
       id: 'status:calendar-year-markdown',
@@ -84,7 +84,7 @@ export const statusPublicSurfaceSlice = {
       routePattern: statusCalendarYearMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'status:calendar-month',
@@ -97,10 +97,10 @@ export const statusPublicSurfaceSlice = {
         {
           rel: 'alternate',
           href: statusCalendarMonthMarkdownPattern(),
-          mediaType: 'text/markdown',
-        },
+          mediaType: 'text/markdown'
+        }
       ],
-      acceptsNegotiation: 'required',
+      acceptsNegotiation: 'required'
     },
     {
       id: 'status:calendar-month-markdown',
@@ -108,7 +108,7 @@ export const statusPublicSurfaceSlice = {
       routePattern: statusCalendarMonthMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'status:service',
@@ -116,7 +116,7 @@ export const statusPublicSurfaceSlice = {
       routePattern: statusServicePattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'status:service-markdown',
@@ -124,7 +124,7 @@ export const statusPublicSurfaceSlice = {
       routePattern: statusServiceMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'status:incident',
@@ -132,7 +132,7 @@ export const statusPublicSurfaceSlice = {
       routePattern: statusIncidentPattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     },
     {
       id: 'status:incident-markdown',
@@ -140,7 +140,7 @@ export const statusPublicSurfaceSlice = {
       routePattern: statusIncidentMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     },
     {
       id: 'status:data',
@@ -149,7 +149,7 @@ export const statusPublicSurfaceSlice = {
       mediaType: 'application/json',
       cacheClass: 'data',
       discoveryRoles: ['data-feed', 'root-catalog'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'status:rss',
@@ -158,7 +158,7 @@ export const statusPublicSurfaceSlice = {
       mediaType: 'application/rss+xml',
       cacheClass: 'feed',
       discoveryRoles: ['data-feed'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'status:schema',
@@ -167,7 +167,7 @@ export const statusPublicSurfaceSlice = {
       mediaType: 'application/schema+json',
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
-      catalogRole: 'service-desc',
+      catalogRole: 'service-desc'
     },
     {
       id: 'status:openapi',
@@ -176,7 +176,7 @@ export const statusPublicSurfaceSlice = {
       mediaType: 'application/vnd.oai.openapi+json',
       cacheClass: 'schema',
       discoveryRoles: ['schema'],
-      catalogRole: 'service-desc',
+      catalogRole: 'service-desc'
     },
     {
       id: 'status:api-catalog',
@@ -186,7 +186,7 @@ export const statusPublicSurfaceSlice = {
       cacheClass: 'catalog',
       discoveryRoles: ['api-catalog', 'root-catalog'],
       catalogRole: 'service-desc',
-      sectionCatalogRole: false,
+      sectionCatalogRole: false
     },
     {
       id: 'status:llms',
@@ -195,7 +195,7 @@ export const statusPublicSurfaceSlice = {
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms', 'root-catalog'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     },
     {
       id: 'status:llms-full',
@@ -204,7 +204,7 @@ export const statusPublicSurfaceSlice = {
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms'],
-      catalogRole: 'item',
-    },
-  ],
+      catalogRole: 'item'
+    }
+  ]
 } satisfies PublicSurfaceSlice;

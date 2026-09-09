@@ -12,9 +12,9 @@ describe('mapRawPersonMentionTarget', () => {
           name_cases: { gen: 'Кирилла Щемелинина' },
           company: 'КПРФ',
           position: 'депутат',
-          contacts: [],
-        },
-      }),
+          contacts: []
+        }
+      })
     ).toMatchInlineSnapshot(`
       {
         "company": "КПРФ",

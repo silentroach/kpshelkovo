@@ -1,5 +1,8 @@
 export type PublicFullReglamentVillageId =
-  'shelkovo-village' | 'shelkovo-forest' | 'shelkovo-park' | 'shelkovo-river';
+  | 'shelkovo-village'
+  | 'shelkovo-forest'
+  | 'shelkovo-park'
+  | 'shelkovo-river';
 
 export type PublicFullReglamentQuantityStatus =
   | 'present'
@@ -50,8 +53,7 @@ export interface PublicFullReglamentCommonAsset {
     Record<PublicFullReglamentVillageId, PublicFullReglamentQuantityValue>
   >;
   readonly total: PublicFullReglamentQuantityValue;
-  readonly total_mode:
-    'sum_explicit_values' | 'not_summed' | 'empty' | 'group_row';
+  readonly total_mode: 'sum_explicit_values' | 'not_summed' | 'empty' | 'group_row';
   readonly source_refs: readonly PublicFullReglamentSourceRef[];
   readonly verification_note: string | null;
 }

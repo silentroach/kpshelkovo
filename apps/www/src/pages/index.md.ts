@@ -5,5 +5,4 @@ import { createMarkdownResponse } from '@/lib/markdown/response';
 
 export const prerender = true;
 
-export const GET: APIRoute = async () =>
-  createMarkdownResponse(await buildHomeMarkdown());
+export const GET: APIRoute = async () => createMarkdownResponse(await buildHomeMarkdown());

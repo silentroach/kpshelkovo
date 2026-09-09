@@ -8,7 +8,7 @@ let reviewsCollectionPageSchema: typeof import('../seo').reviewsCollectionPageSc
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ reviewPageSchema, reviewsCollectionPageSchema } = await import('../seo'));
@@ -29,9 +29,9 @@ const review = {
   aspects: [
     { type: 'management', rating: 2 },
     { type: 'place', rating: 5 },
-    { type: 'developer', rating: 3, body: 'Дороги еще строят.' },
+    { type: 'developer', rating: 3, body: 'Дороги еще строят.' }
   ],
-  mentions: [],
+  mentions: []
 } satisfies Review;
 
 describe('reviews schema', () => {
@@ -43,8 +43,8 @@ describe('reviews schema', () => {
       items: [review],
       breadcrumbs: [
         { name: 'Главная', url: '/' },
-        { name: 'Отзывы', url: '/reviews/' },
-      ],
+        { name: 'Отзывы', url: '/reviews/' }
+      ]
     });
 
     expect(schema).toMatchSnapshot();
@@ -57,8 +57,8 @@ describe('reviews schema', () => {
       breadcrumbs: [
         { name: 'Главная', url: '/' },
         { name: 'Отзывы', url: '/reviews/' },
-        { name: 'Год жизни в Шелково', url: review.url },
-      ],
+        { name: 'Год жизни в Шелково', url: review.url }
+      ]
     });
 
     expect(schema).toMatchSnapshot();
@@ -74,18 +74,18 @@ describe('reviews schema', () => {
             slug: 'kschemelinin',
             label: 'Кирилл Щемелинин',
             htmlUrl: '/people/kschemelinin/',
-            markdownUrl: '/people/kschemelinin/index.md',
+            markdownUrl: '/people/kschemelinin/index.md'
           },
           {
             type: 'place',
             slug: 'apple-garden',
             label: 'Яблоневый сад',
             htmlUrl: '/map/apple-garden/',
-            markdownUrl: '/map/apple-garden/index.md',
-          },
-        ],
+            markdownUrl: '/map/apple-garden/index.md'
+          }
+        ]
       },
-      description: 'Отзыв Алексея о жизни в Шелково.',
+      description: 'Отзыв Алексея о жизни в Шелково.'
     });
 
     expect(schema[0]?.mentions).toMatchInlineSnapshot(`
@@ -107,7 +107,7 @@ describe('reviews schema', () => {
   it('publishes one supported organization and rating per review aspect', () => {
     const schema = reviewPageSchema({
       review,
-      description: 'Отзыв Алексея о жизни в Шелково.',
+      description: 'Отзыв Алексея о жизни в Шелково.'
     });
     const reviews = schema.filter((item) => item['@type'] === 'Review');
 
@@ -115,8 +115,8 @@ describe('reviews schema', () => {
       reviews.map((item) => ({
         id: item['@id'],
         itemReviewed: item.itemReviewed,
-        reviewRating: item.reviewRating,
-      })),
+        reviewRating: item.reviewRating
+      }))
     ).toMatchInlineSnapshot(`
       [
         {
@@ -155,17 +155,14 @@ describe('reviews schema', () => {
         ...review,
         aspects: [
           { type: 'developer', body: 'Дороги еще строят.' },
-          { type: 'management', rating: 2 },
-        ],
+          { type: 'management', rating: 2 }
+        ]
       },
-      description: 'Отзыв Алексея о жизни в Шелково.',
+      description: 'Отзыв Алексея о жизни в Шелково.'
     });
 
-    expect(
-      schema
-        .filter((item) => item['@type'] === 'Review')
-        .map((item) => item['@id']),
-    ).toMatchInlineSnapshot(`
+    expect(schema.filter((item) => item['@type'] === 'Review').map((item) => item['@id']))
+      .toMatchInlineSnapshot(`
       [
         "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/#review-management",
       ]

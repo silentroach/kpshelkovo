@@ -4,12 +4,13 @@ import {
   md,
   parseMarkdownFragment,
   resolveMarkdownResourceReferences,
-  serializeMarkdownDocument,
+  serializeMarkdownDocument
 } from '@shelkovo/markdown';
 
 import { absoluteUrl } from '../site';
 import { NEWS_LATEST_LIMIT } from './config';
 import { toNewsPublicAuthorKind } from './public-dto';
+import { newsArchiveMarkdownUrl } from './routes';
 import type {
   NewsArticle,
   NewsAttachment,
@@ -18,24 +19,15 @@ import type {
   NewsMonthArchive,
   NewsPhoto,
   NewsTagPage,
-  NewsYearArchive,
+  NewsYearArchive
 } from './types';
-import { newsArchiveMarkdownUrl } from './routes';
-import {
-  formatNewsArea,
-  formatNewsAuthor,
-  formatNewsDate,
-  formatNewsMonth,
-} from './view';
+import { formatNewsArea, formatNewsAuthor, formatNewsDate, formatNewsMonth } from './view';
 
 const abs = (value: string): string => absoluteUrl(value);
 
 type MarkdownNode = ReturnType<typeof parseMarkdownFragment>[number];
 type MarkdownListItem = ReturnType<typeof md.listItem>;
-type MarkdownListItemChildren = Exclude<
-  Parameters<typeof md.listItem>[0],
-  string
->;
+type MarkdownListItemChildren = Exclude<Parameters<typeof md.listItem>[0], string>;
 type MarkdownBlockContent = MarkdownListItemChildren[number];
 
 const serialize = (children: readonly MarkdownNode[]): string =>
@@ -44,12 +36,9 @@ const serialize = (children: readonly MarkdownNode[]): string =>
 const pick = <T>(items: readonly (T | undefined)[]): readonly T[] =>
   items.filter((item): item is T => item !== undefined);
 
-const section = (
-  title: string,
-  rows: readonly MarkdownListItem[],
-): readonly MarkdownNode[] => [
+const section = (title: string, rows: readonly MarkdownListItem[]): readonly MarkdownNode[] => [
   md.heading(2, title),
-  md.list(rows.length > 0 ? rows : [md.listItem('Нет данных.')]),
+  md.list(rows.length > 0 ? rows : [md.listItem('Нет данных.')])
 ];
 
 const inline = (value: string): string => value.replace(/\s+/g, ' ').trim();
@@ -57,9 +46,7 @@ const inline = (value: string): string => value.replace(/\s+/g, ' ').trim();
 const isBlockContent = (node: MarkdownNode): node is MarkdownBlockContent =>
   node.type !== 'definition' && node.type !== 'footnoteDefinition';
 
-function areaLabels(
-  item: Pick<NewsArticle, 'appliesToAllAreas' | 'areas'>,
-): readonly string[] {
+function areaLabels(item: Pick<NewsArticle, 'appliesToAllAreas' | 'areas'>): readonly string[] {
   if (item.appliesToAllAreas) {
     return [];
   }
@@ -68,8 +55,7 @@ function areaLabels(
 }
 
 function tagLabels(
-  items:
-    Pick<NewsListArticle, 'tags'>['tags'] | Pick<NewsArticle, 'tags'>['tags'],
+  items: Pick<NewsListArticle, 'tags'>['tags'] | Pick<NewsArticle, 'tags'>['tags']
 ): readonly string[] {
   return items.map((item) => item.label);
 }
@@ -77,21 +63,20 @@ function tagLabels(
 const when = (iso: string, time?: string): string =>
   time ? `${formatNewsDate(iso)}, ${time}` : formatNewsDate(iso);
 
-const machineDate = (iso: string, time?: string): string =>
-  time ? iso : iso.slice(0, 10);
+const machineDate = (iso: string, time?: string): string => (time ? iso : iso.slice(0, 10));
 
 const photoLine = (label: string, photo: NewsPhoto): MarkdownListItem => {
   const lead = md.paragraph(
     `${label}: ${pick([
       abs(photo.url),
       `alt: ${inline(photo.alt)}`,
-      photo.caption ? 'подпись: ' : undefined,
-    ]).join(' — ')}`,
+      photo.caption ? 'подпись: ' : undefined
+    ]).join(' — ')}`
   );
   const blocks = photo.caption
-    ? resolveMarkdownResourceReferences(
-        parseMarkdownFragment(photo.caption.trim()),
-      ).filter(isBlockContent)
+    ? resolveMarkdownResourceReferences(parseMarkdownFragment(photo.caption.trim())).filter(
+        isBlockContent
+      )
     : [];
   const [first, ...rest] = blocks;
 
@@ -100,11 +85,11 @@ const photoLine = (label: string, photo: NewsPhoto): MarkdownListItem => {
       [
         {
           ...lead,
-          children: [...lead.children, ...first.children],
+          children: [...lead.children, ...first.children]
         },
-        ...rest,
+        ...rest
       ],
-      { spread: blocks.length > 1 },
+      { spread: blocks.length > 1 }
     );
   }
 
@@ -115,28 +100,21 @@ function photoSection(article: NewsArticle): readonly MarkdownNode[] {
   const rows = pick<MarkdownListItem>([
     article.cover
       ? md.listItem(
-          `Обложка: ${pick([
-            abs(article.cover.url),
-            `alt: ${inline(article.cover.alt)}`,
-          ]).join(' — ')}`,
+          `Обложка: ${pick([abs(article.cover.url), `alt: ${inline(article.cover.alt)}`]).join(
+            ' — '
+          )}`
         )
       : undefined,
-    ...article.photos.map((photo, index) =>
-      photoLine(`Фото ${index + 1}`, photo),
-    ),
+    ...article.photos.map((photo, index) => photoLine(`Фото ${index + 1}`, photo))
   ]);
 
   return rows.length > 0 ? section('Фото', rows) : [];
 }
 
 const attachmentLine = (item: NewsAttachment): MarkdownListItem =>
-  md.listItem(
-    `${item.title}: ${pick([abs(item.url), item.type, item.size]).join(' — ')}`,
-  );
+  md.listItem(`${item.title}: ${pick([abs(item.url), item.type, item.size]).join(' — ')}`);
 
-function attachmentSection(
-  items: readonly NewsAttachment[],
-): readonly MarkdownNode[] {
+function attachmentSection(items: readonly NewsAttachment[]): readonly MarkdownNode[] {
   return items.length > 0 ? section('Вложения', items.map(attachmentLine)) : [];
 }
 
@@ -145,13 +123,10 @@ function articleLine(article: NewsListArticle): MarkdownListItem {
   const summary = inline(article.summary);
   const titleLine = [
     md.link(abs(article.markdownUrl), article.title),
-    ...(meta.length > 0 ? [md.text(` — ${meta.join('; ')}`)] : []),
+    ...(meta.length > 0 ? [md.text(` — ${meta.join('; ')}`)] : [])
   ];
 
-  return md.listItem([
-    md.paragraph(titleLine),
-    ...(summary ? [md.paragraph(summary)] : []),
-  ]);
+  return md.listItem([md.paragraph(titleLine), ...(summary ? [md.paragraph(summary)] : [])]);
 }
 
 function articleBlock(input: {
@@ -166,13 +141,11 @@ function articleBlock(input: {
   return [
     ...(title ? [md.heading(headingLevel, title)] : []),
     ...(intro ? [md.paragraph(intro)] : []),
-    md.list(items.length > 0 ? items.map(articleLine) : [md.listItem(empty)]),
+    md.list(items.length > 0 ? items.map(articleLine) : [md.listItem(empty)])
   ];
 }
 
-function articleFrontmatter(
-  article: NewsArticle,
-): Readonly<Record<string, unknown>> {
+function articleFrontmatter(article: NewsArticle): Readonly<Record<string, unknown>> {
   const areas = areaLabels(article);
   const tags = tagLabels(article.tags);
 
@@ -183,42 +156,31 @@ function articleFrontmatter(
     author: {
       id: article.author.id,
       name: formatNewsAuthor(article.author, { short: false }),
-      kind: toNewsPublicAuthorKind(article.author.kind),
+      kind: toNewsPublicAuthorKind(article.author.kind)
     },
     ...(areas.length > 0 ? { areas } : {}),
     ...(tags.length > 0 ? { tags } : {}),
-    ...(article.sourceUrl ? { source_url: abs(article.sourceUrl) } : {}),
+    ...(article.sourceUrl ? { source_url: abs(article.sourceUrl) } : {})
   };
 }
 
 const monthLine = (item: NewsMonthArchive): MarkdownListItem =>
   md.listItem([
     md.paragraph([
-      md.link(
-        abs(item.markdownUrl),
-        formatNewsMonth(item.year, item.month, { capitalize: true }),
-      ),
-      md.text(
-        ` — ${count(item.count, ['публикация', 'публикации', 'публикаций'])}`,
-      ),
-    ]),
+      md.link(abs(item.markdownUrl), formatNewsMonth(item.year, item.month, { capitalize: true })),
+      md.text(` — ${count(item.count, ['публикация', 'публикации', 'публикаций'])}`)
+    ])
   ]);
 
 const yearLine = (item: NewsYearArchive): MarkdownListItem =>
-  md.listItem([
-    md.paragraph([
-      md.link(abs(item.markdownUrl), `Новости за ${item.year} год`),
-    ]),
-  ]);
+  md.listItem([md.paragraph([md.link(abs(item.markdownUrl), `Новости за ${item.year} год`)])]);
 
 const tagLine = (item: NewsTagPage): MarkdownListItem =>
   md.listItem([
     md.paragraph([
       md.link(abs(item.markdownUrl), item.label),
-      md.text(
-        ` — ${count(item.count, ['публикация', 'публикации', 'публикаций'])}`,
-      ),
-    ]),
+      md.text(` — ${count(item.count, ['публикация', 'публикации', 'публикаций'])}`)
+    ])
   ]);
 
 export function buildNewsHomeMarkdown(data: NewsDataset): string {
@@ -227,9 +189,7 @@ export function buildNewsHomeMarkdown(data: NewsDataset): string {
 
   return serialize([
     md.heading(1, 'Новости Шелково'),
-    md.paragraph(
-      'Свежие новости поселков Шелково и сервисов ОК Комфорт в текстовом формате.',
-    ),
+    md.paragraph('Свежие новости поселков Шелково и сервисов ОК Комфорт в текстовом формате.'),
     ...articleBlock({
       title: 'Новости',
       items: latest,
@@ -237,33 +197,21 @@ export function buildNewsHomeMarkdown(data: NewsDataset): string {
       intro:
         normalCount > data.home.latest.length
           ? `Закрепленные публикации показаны первыми. Для обычных новостей на главной Markdown-странице показываем не больше ${NEWS_LATEST_LIMIT}; более ранние публикации сгруппированы по годам и месяцам.`
-          : undefined,
+          : undefined
     }),
     ...(data.archives.years.length > 0
-      ? [
-          md.paragraph([
-            md.link(abs(newsArchiveMarkdownUrl()), 'Архив новостей'),
-          ]),
-        ]
-      : []),
+      ? [md.paragraph([md.link(abs(newsArchiveMarkdownUrl()), 'Архив новостей')])]
+      : [])
   ]);
 }
 
-export const buildNewsArchiveMarkdown = (
-  years: readonly NewsYearArchive[],
-): string =>
+export const buildNewsArchiveMarkdown = (years: readonly NewsYearArchive[]): string =>
   serialize([
     md.heading(1, 'Архив новостей Шелково'),
-    md.list(
-      years.length > 0
-        ? years.map(yearLine)
-        : [md.listItem('Публикаций пока нет.')],
-    ),
+    md.list(years.length > 0 ? years.map(yearLine) : [md.listItem('Публикаций пока нет.')])
   ]);
 
-export function buildNewsYearMarkdown(input: {
-  readonly archive: NewsYearArchive;
-}): string {
+export function buildNewsYearMarkdown(input: { readonly archive: NewsYearArchive }): string {
   const { archive } = input;
   const months = [...archive.months].sort((a, b) => a.month - b.month);
 
@@ -271,16 +219,12 @@ export function buildNewsYearMarkdown(input: {
     md.heading(1, `Новости Шелково за ${archive.year} год`),
     ...parseMarkdownFragment(archive.summary.body),
     md.list(
-      months.length > 0
-        ? months.map(monthLine)
-        : [md.listItem('В этом году пока нет публикаций.')],
-    ),
+      months.length > 0 ? months.map(monthLine) : [md.listItem('В этом году пока нет публикаций.')]
+    )
   ]);
 }
 
-export function buildNewsMonthMarkdown(input: {
-  readonly archive: NewsMonthArchive;
-}): string {
+export function buildNewsMonthMarkdown(input: { readonly archive: NewsMonthArchive }): string {
   const { archive } = input;
   const monthLabel = formatNewsMonth(archive.year, archive.month);
 
@@ -289,8 +233,8 @@ export function buildNewsMonthMarkdown(input: {
     ...parseMarkdownFragment(archive.summary.body),
     ...articleBlock({
       items: archive.articles,
-      empty: 'В этом месяце пока нет публикаций.',
-    }),
+      empty: 'В этом месяце пока нет публикаций.'
+    })
   ]);
 }
 
@@ -302,27 +246,21 @@ export function buildNewsArticleMarkdown(article: NewsArticle): string {
         md.heading(1, article.title),
         ...(article.body ? parseMarkdownFragment(article.body.trim()) : []),
         ...photoSection(article),
-        ...attachmentSection(article.attachments),
-      ],
-    }),
+        ...attachmentSection(article.attachments)
+      ]
+    })
   );
 }
 
-export function buildNewsTagsMarkdown(
-  tagsPage: readonly NewsTagPage[],
-): string {
+export function buildNewsTagsMarkdown(tagsPage: readonly NewsTagPage[]): string {
   return serialize([
     md.heading(1, 'Теги новостей Шелково'),
     ...section(
       'Теги',
       tagsPage.length > 0
         ? tagsPage.map(tagLine)
-        : [
-            md.listItem(
-              'Индекс появится автоматически после первых новостей с тегами.',
-            ),
-          ],
-    ),
+        : [md.listItem('Индекс появится автоматически после первых новостей с тегами.')]
+    )
   ]);
 }
 
@@ -330,7 +268,7 @@ export function buildNewsTagMarkdown(tag: NewsTagPage): string {
   const latestPublicationsLabel = count(NEWS_LATEST_LIMIT, [
     'публикация',
     'публикации',
-    'публикаций',
+    'публикаций'
   ]);
 
   return serialize([
@@ -342,7 +280,7 @@ export function buildNewsTagMarkdown(tag: NewsTagPage): string {
       intro:
         tag.count > tag.latest.length
           ? `На странице показаны последние ${latestPublicationsLabel} по тегу; более ранние материалы доступны через месячные и годовые архивы.`
-          : undefined,
-    }),
+          : undefined
+    })
   ]);
 }

@@ -1,15 +1,10 @@
-import { reference, type SchemaContext } from 'astro:content';
 import { z } from 'astro/zod';
+import { reference, type SchemaContext } from 'astro:content';
 
 import { contentDateSchema, contentDateTimeSchema } from '@/lib/content-date';
 
-import {
-  NEWS_AREAS,
-  isAbsoluteUrl,
-  isAttachmentUrl,
-  normalizeTagKey,
-} from './schema';
 import { RawSearchAliasesSchema } from '../search/raw-schema';
+import { NEWS_AREAS, isAbsoluteUrl, isAttachmentUrl, normalizeTagKey } from './schema';
 
 const TAG = /^[а-яё0-9 -]+$/u;
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -18,32 +13,23 @@ const text = z.string().trim();
 const visibleText = (name: string) => text.min(1, `${name} must not be blank`);
 
 const absoluteUrl = (name: string) =>
-  text.refine(
-    (value) => isAbsoluteUrl(value),
-    `${name} must be an absolute URL`,
-  );
+  text.refine((value) => isAbsoluteUrl(value), `${name} must be an absolute URL`);
 
 const attachmentUrl = (name: string) =>
   text.refine(
     (value) => isAttachmentUrl(value),
-    `${name} must be an absolute URL or a root-relative path`,
+    `${name} must be an absolute URL or a root-relative path`
   );
 
 const forbiddenTime = (name: string) =>
-  text.refine(
-    () => false,
-    `${name} is not supported; include time in date as dd.mm.yyyy hh:mm`,
-  );
+  text.refine(() => false, `${name} is not supported; include time in date as dd.mm.yyyy hh:mm`);
 
 const tag = () =>
   text
-    .refine(
-      (value) => value === value.toLowerCase(),
-      'tags[] must be lower-case',
-    )
+    .refine((value) => value === value.toLowerCase(), 'tags[] must be lower-case')
     .refine(
       (value) => TAG.test(value),
-      'tags[] may contain only Cyrillic, digits, spaces, and hyphen',
+      'tags[] may contain only Cyrillic, digits, spaces, and hyphen'
     );
 
 const attachment = () =>
@@ -51,7 +37,7 @@ const attachment = () =>
     title: visibleText('attachments[].title'),
     url: attachmentUrl('attachments[].url'),
     type: visibleText('attachments[].type').optional(),
-    size: visibleText('attachments[].size').optional(),
+    size: visibleText('attachments[].size').optional()
   });
 
 const newsPhotoUrl = (name: string) =>
@@ -76,12 +62,12 @@ const photo = () =>
     width: z.number().int().positive(),
     height: z.number().int().positive(),
     alt: visibleText('photos[].alt'),
-    caption: visibleText('photos[].caption').optional(),
+    caption: visibleText('photos[].caption').optional()
   });
 
 const media = () => ({
   photos: z.array(photo()).min(1).optional(),
-  attachments: z.array(attachment()).min(1).optional(),
+  attachments: z.array(attachment()).min(1).optional()
 });
 
 const eventParticipant = (name: string) =>
@@ -89,15 +75,13 @@ const eventParticipant = (name: string) =>
     visibleText(name),
     z.object({
       name: visibleText(`${name}.name`),
-      type: z.enum(['organization', 'person']).optional(),
-    }),
+      type: z.enum(['organization', 'person']).optional()
+    })
   ]);
 
 const RawNewsEventSchema = z
   .object({
-    slug: text
-      .refine((value) => SLUG.test(value), 'events[].slug must be a slug')
-      .optional(),
+    slug: text.refine((value) => SLUG.test(value), 'events[].slug must be a slug').optional(),
     title: visibleText('events[].title'),
     description: visibleText('events[].description').optional(),
     starts_at: contentDateTimeSchema('events[].starts_at'),
@@ -112,14 +96,11 @@ const RawNewsEventSchema = z
         lng: z
           .number()
           .min(-180, 'events[].coordinates.lng must be between -180 and 180')
-          .max(180, 'events[].coordinates.lng must be between -180 and 180'),
+          .max(180, 'events[].coordinates.lng must be between -180 and 180')
       })
       .optional(),
     organizer: eventParticipant('events[].organizer').optional(),
-    performer: z
-      .array(eventParticipant('events[].performer[]'))
-      .min(1)
-      .optional(),
+    performer: z.array(eventParticipant('events[].performer[]')).min(1).optional()
   })
   .superRefine((data, ctx) => {
     const starts = data.starts_at;
@@ -129,7 +110,7 @@ const RawNewsEventSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['ends_at'],
-        message: 'events[].ends_at must be later than events[].starts_at',
+        message: 'events[].ends_at must be later than events[].starts_at'
       });
     }
   });
@@ -138,10 +119,7 @@ export type RawNewsEventInput = z.input<typeof RawNewsEventSchema>;
 
 type NewsEventInput = z.output<typeof RawNewsEventSchema>;
 
-function validateEventSlugs(
-  events: readonly NewsEventInput[],
-  ctx: z.RefinementCtx,
-): void {
+function validateEventSlugs(events: readonly NewsEventInput[], ctx: z.RefinementCtx): void {
   const seen = new Set<string>();
   const requiresExplicitSlug = events.length > 1;
 
@@ -150,7 +128,7 @@ function validateEventSlugs(
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: [index, 'slug'],
-        message: 'events[].slug is required when article has multiple events',
+        message: 'events[].slug is required when article has multiple events'
       });
       return;
     }
@@ -163,7 +141,7 @@ function validateEventSlugs(
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: [index, 'slug'],
-        message: `duplicate event slug "${item.slug}"`,
+        message: `duplicate event slug "${item.slug}"`
       });
       return;
     }
@@ -177,10 +155,7 @@ export const RawNewsEventsSchema = z
   .min(1)
   .superRefine(validateEventSlugs);
 
-function validateTags(
-  tags: readonly string[] | undefined,
-  ctx: z.RefinementCtx,
-): void {
+function validateTags(tags: readonly string[] | undefined, ctx: z.RefinementCtx): void {
   if (!tags) {
     return;
   }
@@ -198,7 +173,7 @@ function validateTags(
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['tags', index],
-        message: `duplicate tag key "${key}" after normalization`,
+        message: `duplicate tag key "${key}" after normalization`
       });
       return;
     }
@@ -212,7 +187,7 @@ export const RawNewsAuthorSchema = z.object({
   kind: z.enum(['official', 'community', 'editorial', 'other']),
   short_name: visibleText('short_name').optional(),
   url: absoluteUrl('url').optional(),
-  role: text.optional(),
+  role: text.optional()
 });
 
 export type RawNewsAuthor = z.output<typeof RawNewsAuthorSchema>;
@@ -238,22 +213,20 @@ export const createRawNewsArticleSchema = (image: SchemaContext['image']) =>
       seo: z
         .object({
           title: visibleText('seo.title').optional(),
-          description: visibleText('seo.description').optional(),
+          description: visibleText('seo.description').optional()
         })
-        .optional(),
+        .optional()
     })
     .superRefine((data, ctx) => {
       if (data.cover && !data.cover_alt) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['cover_alt'],
-          message: 'cover_alt is required when cover is set',
+          message: 'cover_alt is required when cover is set'
         });
       }
 
       validateTags(data.tags, ctx);
     });
 
-export type RawNewsArticle = z.output<
-  ReturnType<typeof createRawNewsArticleSchema>
->;
+export type RawNewsArticle = z.output<ReturnType<typeof createRawNewsArticleSchema>>;

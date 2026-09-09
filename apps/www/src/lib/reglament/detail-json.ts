@@ -1,33 +1,31 @@
 import type {
-  EstimateDetailDataset,
-  EstimateDetailMoneyValue,
-  EstimateDetailNeedsCheck,
-  EstimateDetailQuantityValue,
-  EstimateDetailSourceRef,
-  EstimateDetailStatusInfo,
-} from './detail-schema';
-import {
-  ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_VERSION,
-  publicEstimateDetailDatasetSchema,
-} from './detail-public-schema';
-import type {
   PublicEstimateDetailDataset,
   PublicEstimateDetailMoneyValue,
   PublicEstimateDetailNeedsCheck,
   PublicEstimateDetailQuantityValue,
   PublicEstimateDetailSourceId,
   PublicEstimateDetailSourceValue,
-  PublicEstimateDetailStatusInfo,
+  PublicEstimateDetailStatusInfo
 } from './detail-public';
+import {
+  ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_VERSION,
+  publicEstimateDetailDatasetSchema
+} from './detail-public-schema';
+import type {
+  EstimateDetailDataset,
+  EstimateDetailMoneyValue,
+  EstimateDetailNeedsCheck,
+  EstimateDetailQuantityValue,
+  EstimateDetailSourceRef,
+  EstimateDetailStatusInfo
+} from './detail-schema';
 
-const publicQuantity = (
-  value: EstimateDetailQuantityValue,
-): PublicEstimateDetailQuantityValue => {
+const publicQuantity = (value: EstimateDetailQuantityValue): PublicEstimateDetailQuantityValue => {
   if (value.value === null) {
     return {
       value: value.value,
       unit: value.unit,
-      note: value.note,
+      note: value.note
     };
   }
 
@@ -38,20 +36,16 @@ const publicQuantity = (
   return {
     value: value.value,
     unit: value.unit,
-    note: value.note,
+    note: value.note
   };
 };
 
-const publicMoney = (
-  value: EstimateDetailMoneyValue,
-): PublicEstimateDetailMoneyValue => ({
+const publicMoney = (value: EstimateDetailMoneyValue): PublicEstimateDetailMoneyValue => ({
   value: value.value,
-  note: value.note,
+  note: value.note
 });
 
-const publicSource = (
-  ref: EstimateDetailSourceRef,
-): PublicEstimateDetailSourceValue => {
+const publicSource = (ref: EstimateDetailSourceRef): PublicEstimateDetailSourceValue => {
   if (ref.quote_items) {
     return {
       pdf: ref.pdf,
@@ -61,13 +55,11 @@ const publicSource = (
         label: item.label,
         resource_ids: item.resource_ids,
         quantity: item.quantity ? publicQuantity(item.quantity) : undefined,
-        unit_price_rub: item.unit_price_rub
-          ? publicMoney(item.unit_price_rub)
-          : undefined,
+        unit_price_rub: item.unit_price_rub ? publicMoney(item.unit_price_rub) : undefined,
         total_rub: item.total_rub ? publicMoney(item.total_rub) : undefined,
-        note: item.note,
+        note: item.note
       })),
-      note: ref.note,
+      note: ref.note
     };
   }
 
@@ -76,20 +68,15 @@ const publicSource = (
     page: ref.page,
     fragment: ref.fragment,
     quote: ref.quote,
-    note: ref.note,
+    note: ref.note
   };
 };
 
-export const buildPublicEstimateDetails2026Json = (
-  dataset: EstimateDetailDataset,
-): string => {
+export const buildPublicEstimateDetails2026Json = (dataset: EstimateDetailDataset): string => {
   const sourceIdsByKey = new Map<string, PublicEstimateDetailSourceId>();
-  const sourcesById = new Map<
-    PublicEstimateDetailSourceId,
-    PublicEstimateDetailSourceValue
-  >();
+  const sourcesById = new Map<PublicEstimateDetailSourceId, PublicEstimateDetailSourceValue>();
   const sourceIds = (
-    refs: readonly EstimateDetailSourceRef[],
+    refs: readonly EstimateDetailSourceRef[]
   ): readonly PublicEstimateDetailSourceId[] =>
     refs.map((ref) => {
       const source = publicSource(ref);
@@ -105,28 +92,24 @@ export const buildPublicEstimateDetails2026Json = (
 
       return id;
     });
-  const publicNeedsCheck = (
-    value: EstimateDetailNeedsCheck,
-  ): PublicEstimateDetailNeedsCheck => ({
+  const publicNeedsCheck = (value: EstimateDetailNeedsCheck): PublicEstimateDetailNeedsCheck => ({
     reason: value.reason,
-    source_refs: value.source_refs ? sourceIds(value.source_refs) : undefined,
+    source_refs: value.source_refs ? sourceIds(value.source_refs) : undefined
   });
-  const publicStatus = (
-    value: EstimateDetailStatusInfo,
-  ): PublicEstimateDetailStatusInfo => {
+  const publicStatus = (value: EstimateDetailStatusInfo): PublicEstimateDetailStatusInfo => {
     switch (value.status) {
       case 'verified':
         return {};
       case 'derived':
         return {
           status: value.status,
-          status_label_ru: value.status_label_ru,
+          status_label_ru: value.status_label_ru
         };
       case 'needs_check':
         return {
           status: value.status,
           status_label_ru: value.status_label_ru,
-          needs_check: publicNeedsCheck(value.needs_check),
+          needs_check: publicNeedsCheck(value.needs_check)
         };
       default: {
         const exhaustive: never = value;
@@ -142,7 +125,7 @@ export const buildPublicEstimateDetails2026Json = (
     service_ids: item.service_ids,
     source_refs: sourceIds(item.source_refs),
     note: item.note,
-    ...publicStatus(item),
+    ...publicStatus(item)
   }));
   const resources = dataset.resources.map((resource) => ({
     id: resource.id,
@@ -152,13 +135,11 @@ export const buildPublicEstimateDetails2026Json = (
     title: resource.title,
     cost_bucket: resource.cost_bucket,
     quantity: resource.quantity ? publicQuantity(resource.quantity) : undefined,
-    unit_price_rub: resource.unit_price_rub
-      ? publicMoney(resource.unit_price_rub)
-      : undefined,
+    unit_price_rub: resource.unit_price_rub ? publicMoney(resource.unit_price_rub) : undefined,
     total_rub: publicMoney(resource.total_rub),
     source_refs: sourceIds(resource.source_refs),
     note: resource.note,
-    ...publicStatus(resource),
+    ...publicStatus(resource)
   }));
   const controlTotals = dataset.control_totals.map((controlTotal) => ({
     id: controlTotal.id,
@@ -177,7 +158,7 @@ export const buildPublicEstimateDetails2026Json = (
     resource_ids: controlTotal.resource_ids,
     source_refs: sourceIds(controlTotal.source_refs),
     note: controlTotal.note,
-    ...publicStatus(controlTotal),
+    ...publicStatus(controlTotal)
   }));
   const publicDataset: PublicEstimateDetailDataset = {
     schema_version: ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_VERSION,
@@ -187,13 +168,13 @@ export const buildPublicEstimateDetails2026Json = (
     source_pdfs: dataset.source_pdfs.map((sourcePdf) => ({
       pdf: sourcePdf.pdf,
       title: sourcePdf.title,
-      pages_total: sourcePdf.pages_total,
+      pages_total: sourcePdf.pages_total
     })),
     sources: Object.fromEntries(sourcesById),
     curation_notes: dataset.curation_notes,
     work_items: workItems,
     resources,
-    control_totals: controlTotals,
+    control_totals: controlTotals
   };
 
   const json = JSON.stringify(publicDataset);

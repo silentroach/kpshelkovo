@@ -1,5 +1,5 @@
-import { absoluteUrl } from '../site';
 import { formatApiCatalogLink } from '../api-catalog-response';
+import { absoluteUrl } from '../site';
 import {
   statusApiCatalogPath,
   statusDataPath,
@@ -9,14 +9,9 @@ import {
   statusMarkdownUrl,
   statusOpenApiPath,
   statusPath,
-  statusSchemaPath,
+  statusSchemaPath
 } from './routes';
-import {
-  STATUS_AREAS,
-  STATUS_KINDS,
-  STATUS_SERVICE_STATES,
-  STATUS_SERVICES,
-} from './schema';
+import { STATUS_AREAS, STATUS_KINDS, STATUS_SERVICE_STATES, STATUS_SERVICES } from './schema';
 export { buildStatusPublicPayload as buildStatusPayload } from './public-dto';
 export type {
   StatusPublicDaysWithoutIncidentsDto as StatusDiscoveryDaysWithoutIncidents,
@@ -25,7 +20,7 @@ export type {
   StatusPublicIncidentPhase as StatusDiscoveryIncidentPhase,
   StatusPublicIncidentRefDto as StatusDiscoveryIncidentRef,
   StatusPublicPayloadDto as StatusDiscoveryPayload,
-  StatusPublicServiceSummaryDto as StatusDiscoveryServiceSummary,
+  StatusPublicServiceSummaryDto as StatusDiscoveryServiceSummary
 } from './public-dto';
 
 export const OAS = 'application/vnd.oai.openapi+json';
@@ -39,53 +34,51 @@ const fullUrl = (value: string): string => absoluteUrl(value);
 
 const server = (root: string): string => root.replace(/\/$/, '');
 
-const star = (
-  value: string,
-): readonly { readonly value: string; readonly language: 'ru' }[] => [
-  { value, language: 'ru' },
+const star = (value: string): readonly { readonly value: string; readonly language: 'ru' }[] => [
+  { value, language: 'ru' }
 ];
 
 const text = (minLength = 0): Record<string, unknown> => ({
   type: 'string',
-  ...(minLength > 0 ? { minLength } : {}),
+  ...(minLength > 0 ? { minLength } : {})
 });
 
 const uri = (): Record<string, unknown> => ({
   type: 'string',
-  format: 'uri',
+  format: 'uri'
 });
 
 const dateTime = (): Record<string, unknown> => ({
   type: 'string',
-  format: 'date-time',
+  format: 'date-time'
 });
 
 const flag = (): Record<string, unknown> => ({
-  type: 'boolean',
+  type: 'boolean'
 });
 
 const integer = (minimum = 0): Record<string, unknown> => ({
   type: 'integer',
-  minimum,
+  minimum
 });
 
 const list = (
   items: Record<string, unknown>,
-  extra?: Record<string, unknown>,
+  extra?: Record<string, unknown>
 ): Record<string, unknown> => ({
   type: 'array',
   items,
-  ...(extra ?? {}),
+  ...(extra ?? {})
 });
 
 const obj = (
   properties: Record<string, unknown>,
-  required: readonly string[],
+  required: readonly string[]
 ): Record<string, unknown> => ({
   type: 'object',
   additionalProperties: false,
   properties,
-  required,
+  required
 });
 
 function rewriteSchemaRefs(value: unknown, schemaRef: string): unknown {
@@ -99,16 +92,12 @@ function rewriteSchemaRefs(value: unknown, schemaRef: string): unknown {
 
   return Object.fromEntries(
     Object.entries(value).map(([key, entry]) => {
-      if (
-        key === '$ref' &&
-        typeof entry === 'string' &&
-        entry.startsWith('#/')
-      ) {
+      if (key === '$ref' && typeof entry === 'string' && entry.startsWith('#/')) {
         return [key, `${schemaRef}${entry.slice(1)}`];
       }
 
       return [key, rewriteSchemaRefs(entry, schemaRef)];
-    }),
+    })
   );
 }
 
@@ -124,51 +113,51 @@ export function schema(root: string): Record<string, unknown> {
     required: ['stats', 'active', 'incidents', 'services'],
     properties: {
       stats: {
-        $ref: '#/$defs/stats',
+        $ref: '#/$defs/stats'
       },
       active: list({
-        $ref: '#/$defs/incident',
+        $ref: '#/$defs/incident'
       }),
       incidents: list({
-        $ref: '#/$defs/incident',
+        $ref: '#/$defs/incident'
       }),
       services: list({
-        $ref: '#/$defs/serviceSummary',
-      }),
+        $ref: '#/$defs/serviceSummary'
+      })
     },
     $defs: {
       area: {
-        enum: [...STATUS_AREAS],
+        enum: [...STATUS_AREAS]
       },
       service: {
-        enum: [...STATUS_SERVICES],
+        enum: [...STATUS_SERVICES]
       },
       kind: {
-        enum: [...STATUS_KINDS],
+        enum: [...STATUS_KINDS]
       },
       serviceStatus: {
-        enum: [...STATUS_SERVICE_STATES],
+        enum: [...STATUS_SERVICE_STATES]
       },
       phase: {
-        enum: ['active', 'resolved', 'scheduled'],
+        enum: ['active', 'resolved', 'scheduled']
       },
       duration: obj(
         {
           total_minutes: integer(0),
-          human: text(1),
+          human: text(1)
         },
-        ['total_minutes', 'human'],
+        ['total_minutes', 'human']
       ),
       daysWithoutIncidents: obj(
         {
           mode: {
-            enum: ['count', 'active_incident', 'no_incidents'],
+            enum: ['count', 'active_incident', 'no_incidents']
           },
           label: text(1),
           days: integer(0),
-          last_ended_iso: dateTime(),
+          last_ended_iso: dateTime()
         },
-        ['mode', 'label'],
+        ['mode', 'label']
       ),
       incidentRef: obj(
         {
@@ -177,29 +166,29 @@ export function schema(root: string): Record<string, unknown> {
           html_url: uri(),
           markdown_url: uri(),
           phase: {
-            $ref: '#/$defs/phase',
+            $ref: '#/$defs/phase'
           },
-          phase_label: text(1),
+          phase_label: text(1)
         },
-        ['id', 'title', 'phase', 'phase_label'],
+        ['id', 'title', 'phase', 'phase_label']
       ),
       incident: obj(
         {
           id: text(1),
           title: text(1),
           service: {
-            $ref: '#/$defs/service',
+            $ref: '#/$defs/service'
           },
           service_label: text(1),
           kind: {
-            $ref: '#/$defs/kind',
+            $ref: '#/$defs/kind'
           },
           kind_label: text(1),
           year: integer(2000),
           month: {
             type: 'integer',
             minimum: 1,
-            maximum: 12,
+            maximum: 12
           },
           slug: text(1),
           html_url: uri(),
@@ -210,19 +199,19 @@ export function schema(root: string): Record<string, unknown> {
           ended_has_time: flag(),
           is_active: flag(),
           phase: {
-            $ref: '#/$defs/phase',
+            $ref: '#/$defs/phase'
           },
           phase_label: text(1),
           applies_to_all_areas: flag(),
           areas: list({
-            $ref: '#/$defs/area',
+            $ref: '#/$defs/area'
           }),
           source_url: uri(),
           excerpt: text(1),
           body_markdown: text(),
           duration: {
-            $ref: '#/$defs/duration',
-          },
+            $ref: '#/$defs/duration'
+          }
         },
         [
           'id',
@@ -242,17 +231,17 @@ export function schema(root: string): Record<string, unknown> {
           'phase_label',
           'applies_to_all_areas',
           'areas',
-          'body_markdown',
-        ],
+          'body_markdown'
+        ]
       ),
       serviceSummary: obj(
         {
           service: {
-            $ref: '#/$defs/service',
+            $ref: '#/$defs/service'
           },
           service_label: text(1),
           service_status: {
-            $ref: '#/$defs/serviceStatus',
+            $ref: '#/$defs/serviceStatus'
           },
           service_status_label: text(1),
           html_url: uri(),
@@ -261,11 +250,11 @@ export function schema(root: string): Record<string, unknown> {
           active_incident_ids: list(text(1)),
           active_maintenance_ids: list(text(1)),
           days_without_incidents: {
-            $ref: '#/$defs/daysWithoutIncidents',
+            $ref: '#/$defs/daysWithoutIncidents'
           },
           latest_incident: {
-            $ref: '#/$defs/incidentRef',
-          },
+            $ref: '#/$defs/incidentRef'
+          }
         },
         [
           'service',
@@ -277,8 +266,8 @@ export function schema(root: string): Record<string, unknown> {
           'incident_ids',
           'active_incident_ids',
           'active_maintenance_ids',
-          'days_without_incidents',
-        ],
+          'days_without_incidents'
+        ]
       ),
       stats: obj(
         {
@@ -287,26 +276,24 @@ export function schema(root: string): Record<string, unknown> {
           active_incident_count: integer(0),
           active_maintenance_count: integer(0),
           service_count: integer(0),
-          updated_at: dateTime(),
+          updated_at: dateTime()
         },
         [
           'incident_count',
           'active_count',
           'active_incident_count',
           'active_maintenance_count',
-          'service_count',
-        ],
-      ),
-    },
+          'service_count'
+        ]
+      )
+    }
   };
 }
 
 export function openapi(root: string): Record<string, unknown> {
   const schemaRef = `#/components/schemas/${STATUS_PAYLOAD_SCHEMA}`;
   const body = Object.fromEntries(
-    Object.entries(schema(root)).filter(
-      ([key]) => key !== '$schema' && key !== '$id',
-    ),
+    Object.entries(schema(root)).filter(([key]) => key !== '$schema' && key !== '$id')
   );
   const componentBody = rewriteSchemaRefs(body, schemaRef);
 
@@ -317,12 +304,12 @@ export function openapi(root: string): Record<string, unknown> {
       title: 'Шелково Status Feed',
       version: '1.0.0',
       description:
-        'OpenAPI-описание /status/data/status.json только для чтения с историей инцидентов и производными сводками сервисов.',
+        'OpenAPI-описание /status/data/status.json только для чтения с историей инцидентов и производными сводками сервисов.'
     },
     servers: [
       {
-        url: server(root),
-      },
+        url: server(root)
+      }
     ],
     paths: {
       [statusDataPath()]: {
@@ -337,20 +324,20 @@ export function openapi(root: string): Record<string, unknown> {
               content: {
                 'application/json': {
                   schema: {
-                    $ref: schemaRef,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
+                    $ref: schemaRef
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     },
     components: {
       schemas: {
-        [STATUS_PAYLOAD_SCHEMA]: componentBody,
-      },
-    },
+        [STATUS_PAYLOAD_SCHEMA]: componentBody
+      }
+    }
   };
 }
 
@@ -363,43 +350,43 @@ export function catalog(root: string): Record<string, unknown> {
           {
             href: abs(root, statusDataPath()),
             type: 'application/json',
-            'title*': star('Основная машиночитаемая лента раздела /status'),
+            'title*': star('Основная машиночитаемая лента раздела /status')
           },
           {
             href: abs(root, statusFeedPath()),
             type: 'application/rss+xml',
-            'title*': star('RSS-лента статуса'),
+            'title*': star('RSS-лента статуса')
           },
           {
             href: fullUrl(statusMarkdownUrl()),
             type: 'text/markdown',
-            'title*': star('Markdown-версия раздела /status'),
+            'title*': star('Markdown-версия раздела /status')
           },
           {
             href: abs(root, statusLlmsPath()),
             type: 'text/plain',
-            'title*': star('Короткий обзор llms.txt'),
+            'title*': star('Короткий обзор llms.txt')
           },
           {
             href: abs(root, statusLlmsFullPath()),
             type: 'text/plain',
-            'title*': star('Подробный обзор llms-full.txt'),
-          },
+            'title*': star('Подробный обзор llms-full.txt')
+          }
         ],
         'service-desc': [
           {
             href: abs(root, statusSchemaPath()),
             type: 'application/schema+json',
-            'title*': star('JSON Schema ленты статуса'),
+            'title*': star('JSON Schema ленты статуса')
           },
           {
             href: abs(root, statusOpenApiPath()),
             type: OAS,
-            'title*': star('OpenAPI ленты статуса'),
-          },
-        ],
-      },
-    ],
+            'title*': star('OpenAPI ленты статуса')
+          }
+        ]
+      }
+    ]
   };
 }
 
@@ -407,7 +394,7 @@ export const links = (root: string): string =>
   [
     `<${abs(root, statusSchemaPath())}>; rel="service-desc"; type="application/schema+json"`,
     `<${abs(root, statusOpenApiPath())}>; rel="service-desc"; type="${OAS}"`,
-    formatApiCatalogLink(abs(root, statusApiCatalogPath())),
+    formatApiCatalogLink(abs(root, statusApiCatalogPath()))
   ].join(', ');
 
 export const self = (root: string): string =>

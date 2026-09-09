@@ -12,7 +12,7 @@ const COMPARE_NAME_KEYWORDS = [
   'КП Шелково',
   'коттеджный поселок Шелково',
   'Шелково Эко Клаб',
-  'Shelkovo Eco Club',
+  'Shelkovo Eco Club'
 ];
 
 const COMPARISON_KEYWORDS = [
@@ -20,7 +20,7 @@ const COMPARISON_KEYWORDS = [
   'рейтинг коттеджных поселков Подмосковья',
   'коттеджные поселки Ступинский район',
   'коттеджные поселки Симферопольское шоссе',
-  'тарифы обслуживания коттеджных поселков',
+  'тарифы обслуживания коттеджных поселков'
 ];
 
 export const COMPARE_KEYWORDS = collectKeywords(
@@ -30,7 +30,7 @@ export const COMPARE_KEYWORDS = collectKeywords(
   'сравнение поселков',
   'сравнение тарифов поселков',
   'тарифы на обслуживание поселков',
-  'коттеджные поселки Московская область',
+  'коттеджные поселки Московская область'
 );
 
 const compareTitle = (title: string): string => `${title} — ${SITE_NAME}`;
@@ -63,7 +63,7 @@ const companyDescription = (settlement: Settlement): string | undefined => {
 
 const deltaDescription = (
   settlement: Settlement,
-  comparison: ComparisonResult | undefined,
+  comparison: ComparisonResult | undefined
 ): string | undefined => {
   if (settlement.isBaseline) return 'Базовый поселок для сравнения.';
   if (!comparison) return;
@@ -74,19 +74,16 @@ const deltaDescription = (
 
 export const settlementSearchDescription = (
   settlement: Settlement,
-  comparison: ComparisonResult | undefined,
+  comparison: ComparisonResult | undefined
 ): string =>
-  [
-    `${formatTariffSummary(settlement.tariff)}.`,
-    deltaDescription(settlement, comparison),
-  ]
+  [`${formatTariffSummary(settlement.tariff)}.`, deltaDescription(settlement, comparison)]
     .filter((item): item is string => Boolean(item))
     .join(' ');
 
 export const compareHomeMeta = (totalSettlements: number) => ({
   title: compareTitle('Сравнение тарифов поселков'),
   description: `Сравните ${totalSettlements} поселков по тарифам, инфраструктуре и сервисам: карточки, карта и разница с Шелково в одном месте.`,
-  keywords: collectKeywords(COMPARE_KEYWORDS),
+  keywords: collectKeywords(COMPARE_KEYWORDS)
 });
 
 export const compareRatingMeta = () => ({
@@ -97,13 +94,13 @@ export const compareRatingMeta = () => ({
     COMPARE_KEYWORDS,
     'рейтинг поселков',
     'уровень поселка',
-    'методика рейтинга поселков',
-  ),
+    'методика рейтинга поселков'
+  )
 });
 
 export const settlementPageMeta = (
   settlement: Settlement,
-  comparison: ComparisonResult | undefined,
+  comparison: ComparisonResult | undefined
 ) => {
   const title = companyTitle(settlement);
   const name = companyName(settlement);
@@ -111,7 +108,7 @@ export const settlementPageMeta = (
     `Сколько стоит жить в ${settlement.shortName}? Тариф на обслуживание — ${formatTariffAuto(settlement.tariff)} в месяц.`,
     `${settlement.location.district}.`,
     companyDescription(settlement),
-    deltaDescription(settlement, comparison),
+    deltaDescription(settlement, comparison)
   ]
     .filter((item): item is string => Boolean(item))
     .join(' ');
@@ -126,7 +123,7 @@ export const settlementPageMeta = (
       `коттеджный поселок ${settlement.shortName}`,
       settlement.location.district,
       title,
-      name,
-    ),
+      name
+    )
   };
 };

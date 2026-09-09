@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/svelte';
+import { describe, it, expect } from 'vitest';
+
 import Hero from './Hero.svelte';
 
 describe('Hero', () => {
@@ -7,8 +8,8 @@ describe('Hero', () => {
     const { container } = render(Hero, {
       props: {
         title: 'Test Title',
-        subtitle: 'Test Subtitle',
-      },
+        subtitle: 'Test Subtitle'
+      }
     });
 
     expect(container.textContent).toContain('Test Title');
@@ -19,8 +20,8 @@ describe('Hero', () => {
     const { container } = render(Hero, {
       props: {
         title: 'Test Title',
-        subtitle: 'Test Subtitle',
-      },
+        subtitle: 'Test Subtitle'
+      }
     });
 
     const h1 = container.querySelector('h1');
@@ -32,8 +33,8 @@ describe('Hero', () => {
     const { container } = render(Hero, {
       props: {
         title: 'Test Title',
-        subtitle: 'Test Subtitle',
-      },
+        subtitle: 'Test Subtitle'
+      }
     });
 
     expect(container.querySelector('section')).toBeNull();
@@ -47,8 +48,8 @@ describe('Hero', () => {
         title: 'Test Title',
         subtitle: 'Сравнение по цене и',
         subtitleLinkHref: '/815/compare/rating/',
-        subtitleLinkText: 'рейтингу',
-      },
+        subtitleLinkText: 'рейтингу'
+      }
     });
 
     const link = container.querySelector('a[href="/815/compare/rating/"]');

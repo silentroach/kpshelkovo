@@ -1,7 +1,7 @@
 import type {
   EntityMentionSourceEntity,
   EntityMentionTarget,
-  SiteMentionRegistry,
+  SiteMentionRegistry
 } from '../mentions';
 
 export type PreprocessedSiteMarkdownBody = string;

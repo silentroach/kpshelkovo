@@ -1,4 +1,5 @@
 import type { z } from 'zod';
+
 import {
   AvailabilityStatusEnum as RawAvailabilityStatusSchema,
   CommonSpacesSchema as RawCommonSpacesSchema,
@@ -17,7 +18,7 @@ import {
   TariffUnitEnum as RawTariffUnitSchema,
   TelegramSchema as RawTelegramSchema,
   UndergroundElectricityEnum as RawUndergroundElectricitySchema,
-  VideoSurveillanceEnum as RawVideoSurveillanceSchema,
+  VideoSurveillanceEnum as RawVideoSurveillanceSchema
 } from '../schema';
 
 export {
@@ -38,12 +39,10 @@ export {
   RawTariffUnitSchema,
   RawTelegramSchema,
   RawUndergroundElectricitySchema,
-  RawVideoSurveillanceSchema,
+  RawVideoSurveillanceSchema
 };
 
-export type RawAvailabilityStatus = z.output<
-  typeof RawAvailabilityStatusSchema
->;
+export type RawAvailabilityStatus = z.output<typeof RawAvailabilityStatusSchema>;
 export type RawCommonSpaces = z.output<typeof RawCommonSpacesSchema>;
 export type RawDrainageType = z.output<typeof RawDrainageTypeSchema>;
 export type RawInfrastructure = z.output<typeof RawInfrastructureSchema>;
@@ -59,7 +58,5 @@ export type RawTariff = z.output<typeof RawTariffSchema>;
 export type RawTariffPeriod = z.output<typeof RawTariffPeriodSchema>;
 export type RawTariffUnit = z.output<typeof RawTariffUnitSchema>;
 export type RawTelegram = z.output<typeof RawTelegramSchema>;
-export type RawUndergroundElectricity = z.output<
-  typeof RawUndergroundElectricitySchema
->;
+export type RawUndergroundElectricity = z.output<typeof RawUndergroundElectricitySchema>;
 export type RawVideoSurveillance = z.output<typeof RawVideoSurveillanceSchema>;

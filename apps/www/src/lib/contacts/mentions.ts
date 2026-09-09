@@ -28,7 +28,7 @@ const excerpt = (markdown: string): string | undefined => {
 };
 
 export const createContactMentionRefs = (
-  contact: ContactMentionRefSource,
+  contact: ContactMentionRefSource
 ): readonly EntityMentionSourceRef[] => {
   if (!contact.mentions.length) {
     return [];
@@ -38,13 +38,13 @@ export const createContactMentionRefs = (
     source: {
       section: 'contacts',
       kind: 'contact',
-      id: contactRouteKey(contact),
+      id: contactRouteKey(contact)
     },
     title: contact.title,
     htmlUrl: contact.url,
     markdownUrl: contact.markdownUrl,
     excerpt: excerpt(contact.body),
     mentionedAt: `${contact.updatedIso}T00:00:00.000Z`,
-    sortKey: contact.updatedAt.valueOf(),
+    sortKey: contact.updatedAt.valueOf()
   });
 };

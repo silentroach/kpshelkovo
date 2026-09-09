@@ -41,8 +41,8 @@ const personEntity = (input: PersonProfilePageInput): SchemaDoc => {
       ? {
           worksFor: {
             '@type': 'Organization',
-            name: input.company,
-          },
+            name: input.company
+          }
         }
       : {}),
     ...(telephones.length === 1
@@ -50,13 +50,11 @@ const personEntity = (input: PersonProfilePageInput): SchemaDoc => {
       : telephones.length > 1
         ? { telephone: telephones }
         : {}),
-    ...(sameAs.length > 0 ? { sameAs } : {}),
+    ...(sameAs.length > 0 ? { sameAs } : {})
   };
 };
 
-export const personProfilePageSchema = (
-  input: PersonProfilePageInput,
-): readonly SchemaDoc[] => {
+export const personProfilePageSchema = (input: PersonProfilePageInput): readonly SchemaDoc[] => {
   const url = absoluteUrl(input.url);
 
   const docs: SchemaDoc[] = [
@@ -68,10 +66,10 @@ export const personProfilePageSchema = (
       url,
       inLanguage: LANG,
       mainEntity: {
-        '@id': `${url}#person`,
-      },
+        '@id': `${url}#person`
+      }
     },
-    personEntity(input),
+    personEntity(input)
   ];
 
   if (input.breadcrumbs?.length) {

@@ -1,29 +1,27 @@
 import { count } from '@shelkovo/format';
 import { md } from '@shelkovo/markdown';
 
+import { estimate2026 } from '@/data/reglament/estimate-2026';
 import {
   llmsSection,
   markdownBlocks,
   markdownList,
   serializeLlmsDocument,
-  serializeMarkdownNodes,
+  serializeMarkdownNodes
 } from '@/lib/markdown/llms-document';
+
 import { loadContactsData } from './contacts/load';
 import { loadMeetings } from './meetings/load';
-import {
-  meetingMarkdownPath,
-  meetingTranscriptPartMarkdownPath,
-} from './meetings/routes';
+import { meetingMarkdownPath, meetingTranscriptPartMarkdownPath } from './meetings/routes';
 import { loadNewsData } from './news/load';
 import { loadPeopleDataWithBacklinks } from './people/load';
 import { loadPlaces } from './places/load';
-import { loadReviewsData } from './reviews/load';
-import { absoluteUrl } from './site';
-import { estimate2026 } from '@/data/reglament/estimate-2026';
-import { formatReglamentTariff } from './reglament/format';
-import { loadStatusData } from './status/load';
 import { publicSurfaceRegistry } from './public-surface';
 import type { PublicSurfaceId } from './public-surface';
+import { formatReglamentTariff } from './reglament/format';
+import { loadReviewsData } from './reviews/load';
+import { absoluteUrl } from './site';
+import { loadStatusData } from './status/load';
 
 export {
   siteApiCatalogPath,
@@ -33,13 +31,11 @@ export {
   siteLlmsPath,
   siteLlmsUrl,
   siteMarkdownPath,
-  siteMarkdownUrl,
+  siteMarkdownUrl
 } from './root-routes';
 
 const registeredSurfacePath = (surfaceId: PublicSurfaceId): string => {
-  const surface = publicSurfaceRegistry.surfaces.find(
-    (item) => item.id === surfaceId,
-  );
+  const surface = publicSurfaceRegistry.surfaces.find((item) => item.id === surfaceId);
 
   if (surface?.path === undefined) {
     throw new Error(`Public surface ${surfaceId} must provide a stable path`);
@@ -52,16 +48,15 @@ const registeredSurfaceUrl = (surfaceId: PublicSurfaceId): string =>
   absoluteUrl(registeredSurfacePath(surfaceId));
 
 async function snapshot() {
-  const [contacts, news, people, places, reviews, status, meetings] =
-    await Promise.all([
-      loadContactsData(),
-      loadNewsData(),
-      loadPeopleDataWithBacklinks(),
-      loadPlaces(),
-      loadReviewsData(),
-      loadStatusData(),
-      loadMeetings(),
-    ]);
+  const [contacts, news, people, places, reviews, status, meetings] = await Promise.all([
+    loadContactsData(),
+    loadNewsData(),
+    loadPeopleDataWithBacklinks(),
+    loadPlaces(),
+    loadReviewsData(),
+    loadStatusData(),
+    loadMeetings()
+  ]);
 
   return {
     contacts,
@@ -70,13 +65,12 @@ async function snapshot() {
     people,
     places,
     reviews,
-    status,
+    status
   };
 }
 
 export async function build(kind: 'short' | 'full'): Promise<string> {
-  const { contacts, meetings, news, people, places, reviews, status } =
-    await snapshot();
+  const { contacts, meetings, news, people, places, reviews, status } = await snapshot();
   const activeStatus = status.active.filter((item) => item.kind === 'incident');
   const meeting = meetings[0];
   const person = people.profiles[0];
@@ -106,36 +100,25 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
   const contactsHome = registeredSurfaceUrl('contacts:index');
   const contactsMarkdown = registeredSurfaceUrl('contacts:index-markdown');
   const meetingsMarkdown = registeredSurfaceUrl('meetings:index-markdown');
-  const meetingHtml = meeting?.url
-    ? absoluteUrl(meeting.url)
-    : '/meetings/[slug]/';
+  const meetingHtml = meeting?.url ? absoluteUrl(meeting.url) : '/meetings/[slug]/';
   const meetingMarkdown = meeting
     ? absoluteUrl(meetingMarkdownPath(meeting.slug))
     : '/meetings/[slug]/index.md';
   const meetingTranscript = meeting?.transcript.parts[0]
     ? absoluteUrl(
-        meetingTranscriptPartMarkdownPath(
-          meeting.slug,
-          meeting.transcript.parts[0].index,
-        ),
+        meetingTranscriptPartMarkdownPath(meeting.slug, meeting.transcript.parts[0].index)
       )
     : '/meetings/[slug]/transcript/[part].md';
   const reglamentHome = registeredSurfaceUrl('reglament:index');
   const reglamentMarkdown = registeredSurfaceUrl('reglament:index-markdown');
   const reglamentFeed = registeredSurfaceUrl('reglament:data-estimate-2026');
   const reglamentFullMarkdown = registeredSurfaceUrl('reglament:full-markdown');
-  const reglamentFullAssetsMarkdown = registeredSurfaceUrl(
-    'reglament:full-assets-markdown',
-  );
-  const reglamentFullServicesMarkdown = registeredSurfaceUrl(
-    'reglament:full-services-markdown',
-  );
+  const reglamentFullAssetsMarkdown = registeredSurfaceUrl('reglament:full-assets-markdown');
+  const reglamentFullServicesMarkdown = registeredSurfaceUrl('reglament:full-services-markdown');
   const reglamentFullServiceMapMarkdown = registeredSurfaceUrl(
-    'reglament:full-service-map-markdown',
+    'reglament:full-service-map-markdown'
   );
-  const reglamentFullChecksMarkdown = registeredSurfaceUrl(
-    'reglament:full-checks-markdown',
-  );
+  const reglamentFullChecksMarkdown = registeredSurfaceUrl('reglament:full-checks-markdown');
   const reglamentFullDataset = registeredSurfaceUrl('reglament:data-full-2026');
   const reglamentAssets = registeredSurfaceUrl('reglament:assets');
   const reglamentServices = registeredSurfaceUrl('reglament:services');
@@ -149,9 +132,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
   const peopleShort = registeredSurfaceUrl('people:llms');
   const peopleFull = registeredSurfaceUrl('people:llms-full');
   const personHtml = person?.canonical ?? '/people/[slug]/';
-  const personMarkdown = person
-    ? absoluteUrl(person.markdownUrl)
-    : '/people/[slug]/index.md';
+  const personMarkdown = person ? absoluteUrl(person.markdownUrl) : '/people/[slug]/index.md';
   const placesHome = registeredSurfaceUrl('places:index');
   const placesMarkdown = registeredSurfaceUrl('places:index-markdown');
   const placesFeed = registeredSurfaceUrl('places:data');
@@ -173,8 +154,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'Это карта публичных данных и точек входа kpshelkovo.online.',
               'Основные разделы: новости, статус сервисов, карта мест, отзывы собственников, сарафан, база знаний, архив встреч, регламент и смета тарифа 815, профили людей и сравнение тарифов поселков.',
               `Сейчас в новостях ${count(news.articles.length, ['статья', 'статьи', 'статей'])}, в статусе ${count(status.incidents.length, ['запись', 'записи', 'записей'])} и ${count(activeStatus.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])}, на карте ${count(places.length, ['место', 'места', 'мест'])}, в сарафане ${count(contacts.contacts.length, ['контакт', 'контакта', 'контактов'])}, в отзывах ${count(reviews.reviews.length, ['отзыв', 'отзыва', 'отзывов'])}, в архиве встреч ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}, в людях ${count(people.profiles.length, ['профиль', 'профиля', 'профилей'])}.`,
-              'Для массового чтения используйте JSON-ленты там, где они есть; HTML и Markdown удобнее для ссылок и точечного чтения.',
-            ]),
+              'Для массового чтения используйте JSON-ленты там, где они есть; HTML и Markdown удобнее для ссылок и точечного чтения.'
+            ])
           ]),
           llmsSection('Главные URL', [
             markdownList([
@@ -192,8 +173,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Регламент: ${reglamentHome}`,
               `Люди в Markdown: ${peopleMarkdown}`,
               `Сравнение тарифов: ${compareHome}`,
-              `Расширенная версия этого текста: ${full}`,
-            ]),
+              `Расширенная версия этого текста: ${full}`
+            ])
           ]),
           llmsSection('Как ориентироваться', [
             markdownList([
@@ -207,10 +188,10 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Регламент и смета: ${reglamentLlms}; смета: ${reglamentFeed}; полный регламент: ${reglamentFullMarkdown}; набор данных: ${reglamentFullDataset}.`,
               `Люди: ${peopleShort}; основная лента: ${peopleFeed}; одна персона: ${personHtml} или ${personMarkdown}.`,
               `Сравнение тарифов поселков: ${compareLlms}; основная лента: ${compareFeed}.`,
-              'Публичные инструкции помогают с типовыми задачами; у сравнения тарифов есть отдельный индекс.',
-            ]),
-          ]),
-        ],
+              'Публичные инструкции помогают с типовыми задачами; у сравнения тарифов есть отдельный индекс.'
+            ])
+          ])
+        ]
       })
     : serializeLlmsDocument({
         title: 'Шелково Онлайн',
@@ -222,8 +203,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Разделы сайта: \`${registeredSurfacePath('news:index')}\`, \`${registeredSurfacePath('status:index')}\`, \`${registeredSurfacePath('places:index')}\`, \`${registeredSurfacePath('reviews:index')}\`, \`${registeredSurfacePath('contacts:index')}\`, \`${registeredSurfacePath('kb:index')}\`, \`${registeredSurfacePath('meetings:index-markdown')}\`, \`${registeredSurfacePath('reglament:index')}\`, \`${registeredSurfacePath('people:index-markdown')}\` и \`${registeredSurfacePath('compare:index')}\`.`,
               'Все JSON-ленты доступны только для чтения и отражают состояние на момент сборки сайта.',
               'У раздела людей нет публичной HTML-страницы индекса `/people/`; используйте `/people/index.md` и `/people/data/people.json`.',
-              'У архива встреч нет публичной HTML-страницы индекса `/meetings/`; используйте `/meetings/index.md`, описание одной встречи и файлы транскрипта по частям.',
-            ]),
+              'У архива встреч нет публичной HTML-страницы индекса `/meetings/`; используйте `/meetings/index.md`, описание одной встречи и файлы транскрипта по частям.'
+            ])
           ]),
           llmsSection('Канонические URL', [
             markdownList([
@@ -232,8 +213,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Короткий обзор llms.txt: ${short}`,
               `Подробный обзор llms-full.txt: ${full}`,
               `Каталог API сайта: ${catalog}`,
-              `Инструкции для автоматического чтения сайта: ${skills}`,
-            ]),
+              `Инструкции для автоматического чтения сайта: ${skills}`
+            ])
           ]),
           llmsSection('Новости', [
             markdownList([
@@ -244,8 +225,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `RSS: ${newsRss}`,
               `Каталог API: ${newsCatalog}`,
               'События новостей представлены как необязательный `articles[].events[]`; `.ics` доступен по `/news/YYYY/MM/[entry]/[event-slug].ics`, глобальной ленты событий нет.',
-              `Сейчас в разделе ${count(news.articles.length, ['статья', 'статьи', 'статей'])}.`,
-            ]),
+              `Сейчас в разделе ${count(news.articles.length, ['статья', 'статьи', 'статей'])}.`
+            ])
           ]),
           llmsSection('Статус сервисов', [
             markdownList([
@@ -255,8 +236,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `JSON-лента: ${statusFeed}`,
               `RSS: ${statusRss}`,
               `Каталог API: ${statusCatalog}`,
-              `Сейчас в разделе ${count(status.incidents.length, ['запись', 'записи', 'записей'])} и ${count(activeStatus.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])}.`,
-            ]),
+              `Сейчас в разделе ${count(status.incidents.length, ['запись', 'записи', 'записей'])} и ${count(activeStatus.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])}.`
+            ])
           ]),
           llmsSection('Карта мест', [
             markdownList([
@@ -265,8 +246,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `JSON для маркеров и геометрии карты: ${placesFeed}`,
               'Карточки мест используют `/map/[slug]/` и `/map/[slug]/index.md` и показывают входящие ссылки на материалы, где упомянуто место.',
               `Сейчас на карте ${count(places.length, ['место', 'места', 'мест'])}.`,
-              'JSON оптимизирован для интерактивной карты; описания мест и входящие ссылки читайте в Markdown-страницах.',
-            ]),
+              'JSON оптимизирован для интерактивной карты; описания мест и входящие ссылки читайте в Markdown-страницах.'
+            ])
           ]),
           llmsSection('Отзывы собственников', [
             markdownList([
@@ -276,8 +257,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Markdown-версия правил публикации: ${reviewsRulesMarkdown}`,
               'Детальные страницы отзывов используют `/reviews/[id]/` и `/reviews/[id]/index.md`.',
               `Сейчас в разделе ${count(reviews.reviews.length, ['отзыв', 'отзыва', 'отзывов'])}.`,
-              'Структурированной JSON-ленты отзывов нет; для машинного чтения используйте Markdown-страницы.',
-            ]),
+              'Структурированной JSON-ленты отзывов нет; для машинного чтения используйте Markdown-страницы.'
+            ])
           ]),
           llmsSection('Сарафан', [
             markdownList([
@@ -286,14 +267,14 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'Разделы сарафана используют `/sarafan/[category]/` и `/sarafan/[category]/index.md`; карточки контактов используют `/sarafan/[category]/[slug]/` и `/sarafan/[category]/[slug]/index.md`.',
               `Сейчас в разделе ${count(contacts.contacts.length, ['контакт', 'контакта', 'контактов'])}.`,
               'Структурированной JSON-ленты сарафана в MVP нет; для машинного чтения используйте Markdown-страницы.',
-              'Сайт публикует редакционный контекст и способы связи, но не гарантирует качество услуги.',
-            ]),
+              'Сайт публикует редакционный контекст и способы связи, но не гарантирует качество услуги.'
+            ])
           ]),
           llmsSection('База знаний', [
             markdownList([
               `HTML-страница раздела: ${kbHome}`,
-              `Markdown-версия раздела: ${kbMarkdown}`,
-            ]),
+              `Markdown-версия раздела: ${kbMarkdown}`
+            ])
           ]),
           llmsSection('Архив встреч', [
             markdownList([
@@ -302,8 +283,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Пример Markdown-описания встречи: ${meetingMarkdown}`,
               `Пример файла транскрипта: ${meetingTranscript}`,
               `Сейчас в архиве ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}.`,
-              'Индекс и описание встречи не дублируют полный текст; полный транскрипт читается по `/meetings/[slug]/transcript/[part].md`.',
-            ]),
+              'Индекс и описание встречи не дублируют полный текст; полный транскрипт читается по `/meetings/[slug]/transcript/[part].md`.'
+            ])
           ]),
           llmsSection('Регламент и смета тарифа 815', [
             markdownList([
@@ -320,8 +301,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Общее имущество: ${reglamentAssets}`,
               `Услуги регламента: ${reglamentServices}`,
               `Каталог API: ${reglamentCatalog}`,
-              `В ленте ${estimate2026.sections.length} секций сметы; официальный месячный тариф ${formatReglamentTariff(estimate2026.baseline.tariff_per_sotka_month)}.`,
-            ]),
+              `В ленте ${estimate2026.sections.length} секций сметы; официальный месячный тариф ${formatReglamentTariff(estimate2026.baseline.tariff_per_sotka_month)}.`
+            ])
           ]),
           llmsSection('Люди', [
             markdownList([
@@ -334,8 +315,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `OpenAPI: ${peopleOpenApi}`,
               `Пример HTML-страницы профиля: ${personHtml}`,
               `Пример Markdown-версии профиля: ${personMarkdown}`,
-              `Сейчас в разделе ${count(people.profiles.length, ['профиль', 'профиля', 'профилей'])}.`,
-            ]),
+              `Сейчас в разделе ${count(people.profiles.length, ['профиль', 'профиля', 'профилей'])}.`
+            ])
           ]),
           llmsSection('Сравнение тарифов поселков', [
             markdownList([
@@ -344,8 +325,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `llms.txt: ${compareLlms}`,
               `Основная JSON-лента: ${compareFeed}`,
               `Каталог API: ${compareCatalog}`,
-              `Инструкции для автоматического чтения: ${compareSkills}`,
-            ]),
+              `Инструкции для автоматического чтения: ${compareSkills}`
+            ])
           ]),
           llmsSection('Как выбирать источник', [
             markdownList([
@@ -359,23 +340,22 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'Для встреч начинайте с `/meetings/index.md`; для одной встречи откройте `/meetings/[slug]/index.md`, а полный текст берите из `/meetings/[slug]/transcript/[part].md`.',
               'Для регламента при массовом чтении используйте `/815/regulation/data/estimate-2026.json` для расчетной сметы и `/815/regulation/data/full-2026.json` для полного структурированного набора данных; для текстового чтения начинайте с `/815/regulation/full.md`, затем переходите в тематические файлы `/815/regulation/full/*.md`.',
               'Для людей при массовом чтении используйте `/people/data/people.json`, а `/people/[slug]/` и `/people/[slug]/index.md` оставляйте для чтения одного профиля.',
-              `Для сравнения тарифов используйте \`${registeredSurfacePath('compare:data-settlements')}\` как основную структурированную ленту, а HTML/Markdown-страницы - для чтения по одному поселку.`,
-            ]),
+              `Для сравнения тарифов используйте \`${registeredSurfacePath('compare:data-settlements')}\` как основную структурированную ленту, а HTML/Markdown-страницы - для чтения по одному поселку.`
+            ])
           ]),
           llmsSection('Навыки и обнаружение', [
             markdownList([
               '`llms.txt` дает карту маршрутов, `api-catalog` и OpenAPI/Schema описывают контракты, публичные инструкции закрывают типовые задачи.',
               'Корневой индекс навыков покрывает навигацию, новости, статус, архив встреч и профили людей.',
-              'У раздела «Сравнение поселков» свой индекс навыков для ленты, страниц поселков, рейтинга и уточнений по источникам.',
-            ]),
-          ]),
-        ],
+              'У раздела «Сравнение поселков» свой индекс навыков для ленты, страниц поселков, рейтинга и уточнений по источникам.'
+            ])
+          ])
+        ]
       });
 }
 
 export async function buildHomeMarkdown(): Promise<string> {
-  const { contacts, meetings, news, people, places, reviews, status } =
-    await snapshot();
+  const { contacts, meetings, news, people, places, reviews, status } = await snapshot();
   const activeStatus = status.active.filter((item) => item.kind === 'incident');
   const newsHome = registeredSurfaceUrl('news:index');
   const newsFeed = registeredSurfaceUrl('news:data');
@@ -421,7 +401,7 @@ export async function buildHomeMarkdown(): Promise<string> {
   return serializeMarkdownNodes([
     md.heading(1, 'Шелково Онлайн'),
     ...markdownBlocks(
-      'Текстовое представление корневого сайта и его основных разделов для терминалов и автоматического чтения.',
+      'Текстовое представление корневого сайта и его основных разделов для терминалов и автоматического чтения.'
     ),
     md.heading(2, 'Разделы'),
     markdownList([
@@ -434,14 +414,14 @@ export async function buildHomeMarkdown(): Promise<string> {
       `Архив встреч — ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}; Markdown-индекс без HTML-аналога: ${meetingsMarkdown}; полные транскрипты: \`/meetings/[slug]/transcript/[part].md\``,
       `[Регламент](${reglamentHome}) — смета тарифа 2026; структурированная лента: ${reglamentFeed}; полный индекс: ${reglamentFullMarkdown}; полный набор данных: ${reglamentFullDataset}; Markdown-обзор: ${reglamentMarkdown}`,
       `Люди — ${count(people.profiles.length, ['профиль', 'профиля', 'профилей'])}; Markdown-обзор: ${peopleMarkdown}; структурированная лента: ${peopleFeed}; публичного HTML-индекса нет`,
-      `[Сравнение поселков](${compareHome}) — тарифы поселков и рейтинг; структурированная лента: ${compareFeed}`,
+      `[Сравнение поселков](${compareHome}) — тарифы поселков и рейтинг; структурированная лента: ${compareFeed}`
     ]),
     md.heading(2, 'Обнаружение для агентов'),
     markdownList([
       `Каталог API сайта: ${catalog}`,
       `llms.txt: ${short}`,
       `llms-full.txt: ${full}`,
-      `Инструкции для автоматического чтения: ${skills}`,
+      `Инструкции для автоматического чтения: ${skills}`
     ]),
     md.heading(2, 'Обнаружение разделов'),
     markdownList([
@@ -453,7 +433,7 @@ export async function buildHomeMarkdown(): Promise<string> {
       `Архив встреч: ${meetingsMarkdown}`,
       `Регламент: ${reglamentLlms}, ${reglamentCatalog}`,
       `Люди: ${peopleLlms}, ${peopleCatalog}`,
-      `Сравнение поселков: ${compareLlms}, ${compareCatalog}`,
-    ]),
+      `Сравнение поселков: ${compareLlms}, ${compareCatalog}`
+    ])
   ]);
 }

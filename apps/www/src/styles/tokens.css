@@ -48,21 +48,9 @@
     --color-danger-border: oklch(81% 0.08 25);
     --color-danger-text: oklch(52% 0.145 28);
 
-    --color-info-soft: color-mix(
-      in oklab,
-      var(--color-earth) 10%,
-      var(--color-surface-raised) 90%
-    );
-    --color-info-border: color-mix(
-      in oklab,
-      var(--color-earth) 24%,
-      var(--color-border) 76%
-    );
-    --color-info-text: color-mix(
-      in oklab,
-      var(--color-earth) 78%,
-      var(--color-text) 22%
-    );
+    --color-info-soft: color-mix(in oklab, var(--color-earth) 10%, var(--color-surface-raised) 90%);
+    --color-info-border: color-mix(in oklab, var(--color-earth) 24%, var(--color-border) 76%);
+    --color-info-text: color-mix(in oklab, var(--color-earth) 78%, var(--color-text) 22%);
 
     --color-water: oklch(46% 0.09 235);
     --color-water-soft: oklch(95.6% 0.022 230);

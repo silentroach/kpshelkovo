@@ -1,26 +1,23 @@
+import { formatDate } from '@shelkovo/format';
 import {
   createMarkdownDocument,
   md,
   parseMarkdownFragment,
   serializeMarkdownDocument,
-  type MarkdownPhrasingInput,
+  type MarkdownPhrasingInput
 } from '@shelkovo/markdown';
-import { formatDate } from '@shelkovo/format';
 
 import { absoluteUrl } from '../site';
-import { isActiveOrScheduledMaintenance } from './lifecycle';
+import type { StatusCalendarMonthGrid, StatusCalendarYearGrid } from './calendar.types';
 import type { StatusMonthJournal } from './journal.types';
-import type {
-  StatusCalendarMonthGrid,
-  StatusCalendarYearGrid,
-} from './calendar.types';
+import { isActiveOrScheduledMaintenance } from './lifecycle';
+import { statusCalendarDayUrl, statusServiceMarkdownUrl } from './routes';
 import type {
   StatusDataset,
   StatusIncident,
   StatusIncidentWithDetail,
-  StatusServiceSummary,
+  StatusServiceSummary
 } from './types';
-import { statusCalendarDayUrl, statusServiceMarkdownUrl } from './routes';
 import {
   formatStatusArea,
   formatStatusCalendarDayLabel,
@@ -29,7 +26,7 @@ import {
   formatStatusMonth,
   formatStatusService,
   formatStatusServiceState,
-  getStatusIncidentPhase,
+  getStatusIncidentPhase
 } from './view';
 
 const abs = (value: string): string => absoluteUrl(value);
@@ -48,10 +45,7 @@ const pick = <T>(items: readonly (T | undefined)[]): readonly T[] =>
 const phrase = (value: MarkdownPhrasingInput): MarkdownPhrasingNodes =>
   typeof value === 'string' ? [md.text(value)] : value;
 
-function row(
-  label: string,
-  value?: MarkdownPhrasingInput,
-): MarkdownListItem | undefined {
+function row(label: string, value?: MarkdownPhrasingInput): MarkdownListItem | undefined {
   if (!value) {
     return undefined;
   }
@@ -59,50 +53,40 @@ function row(
   return md.listItem([md.paragraph([md.text(`${label}: `), ...phrase(value)])]);
 }
 
-const section = (
-  title: string,
-  rows: readonly MarkdownListItem[],
-): readonly MarkdownNode[] => [
+const section = (title: string, rows: readonly MarkdownListItem[]): readonly MarkdownNode[] => [
   md.heading(2, title),
-  md.list(rows.length > 0 ? rows : [md.listItem('Нет данных.')]),
+  md.list(rows.length > 0 ? rows : [md.listItem('Нет данных.')])
 ];
 
 const inline = (value: string): string => value.replace(/\s+/gu, ' ').trim();
 
-const statusDate = (iso: string, hasTime: boolean): string =>
-  hasTime ? iso : iso.slice(0, 10);
+const statusDate = (iso: string, hasTime: boolean): string => (hasTime ? iso : iso.slice(0, 10));
 
 const sourceMarkdownLink = (url: string): ReturnType<typeof md.link> =>
   md.link(abs(url), 'источник');
 
-const incidentMarkdownLabel = (
-  incident: StatusIncident,
-): MarkdownPhrasingNodes =>
+const incidentMarkdownLabel = (incident: StatusIncident): MarkdownPhrasingNodes =>
   incident.hasPage
     ? [md.link(abs(incident.markdownUrl), incident.title)]
     : [md.text(incident.title)];
 
 const areaLabels = (
-  incident: Pick<StatusIncident, 'appliesToAllAreas' | 'areas'>,
+  incident: Pick<StatusIncident, 'appliesToAllAreas' | 'areas'>
 ): readonly string[] =>
-  incident.appliesToAllAreas
-    ? []
-    : incident.areas.map((area) => formatStatusArea(area));
+  incident.appliesToAllAreas ? [] : incident.areas.map((area) => formatStatusArea(area));
 
-const incidentFrontmatter = (
-  incident: StatusIncident,
-): Readonly<Record<string, unknown>> => {
+const incidentFrontmatter = (incident: StatusIncident): Readonly<Record<string, unknown>> => {
   const areas = areaLabels(incident);
 
   return {
     title: incident.title,
     service: {
       id: incident.service,
-      name: formatStatusService(incident.service),
+      name: formatStatusService(incident.service)
     },
     kind: {
       id: incident.kind,
-      name: formatStatusKind(incident.kind),
+      name: formatStatusKind(incident.kind)
     },
     phase: getStatusIncidentPhase(incident).label,
     startedAt: statusDate(incident.started.iso, incident.started.hasTime),
@@ -110,11 +94,11 @@ const incidentFrontmatter = (
     ...(incident.ended
       ? {
           endedAt: statusDate(incident.ended.iso, incident.ended.hasTime),
-          endedHasTime: incident.ended.hasTime,
+          endedHasTime: incident.ended.hasTime
         }
       : {}),
     ...(areas.length > 0 ? { areas } : {}),
-    ...(incident.sourceUrl ? { sourceUrl: abs(incident.sourceUrl) } : {}),
+    ...(incident.sourceUrl ? { sourceUrl: abs(incident.sourceUrl) } : {})
   };
 };
 
@@ -122,15 +106,13 @@ function incidentLine(
   incident: StatusIncident,
   opts?: {
     readonly hideIncidentPhase?: boolean;
-  },
+  }
 ): MarkdownListItem {
   const meta = pick([
     formatStatusService(incident.service),
     formatStatusKind(incident.kind),
-    opts?.hideIncidentPhase
-      ? undefined
-      : getStatusIncidentPhase(incident).label,
-    formatStatusIncidentPeriodText(incident),
+    opts?.hideIncidentPhase ? undefined : getStatusIncidentPhase(incident).label,
+    formatStatusIncidentPeriodText(incident)
   ]);
   const excerpt = incident.excerpt ? inline(incident.excerpt) : undefined;
   const children: MarkdownPhrasingNode[] = [...incidentMarkdownLabel(incident)];
@@ -139,17 +121,11 @@ function incidentLine(
     children.push(md.text(` — ${meta.join('; ')}`));
 
     if (!incident.hasPage && incident.sourceUrl) {
-      children.push(
-        md.text(meta.length > 0 ? '; ' : ''),
-        sourceMarkdownLink(incident.sourceUrl),
-      );
+      children.push(md.text(meta.length > 0 ? '; ' : ''), sourceMarkdownLink(incident.sourceUrl));
     }
   }
 
-  return md.listItem([
-    md.paragraph(children),
-    ...(excerpt ? [md.paragraph(excerpt)] : []),
-  ]);
+  return md.listItem([md.paragraph(children), ...(excerpt ? [md.paragraph(excerpt)] : [])]);
 }
 
 function incidentSection(input: {
@@ -167,24 +143,18 @@ function incidentSection(input: {
     md.list(
       items.length > 0
         ? items.map((incident) => incidentLine(incident, { hideIncidentPhase }))
-        : [md.listItem(empty)],
-    ),
+        : [md.listItem(empty)]
+    )
   ];
 }
 
-const monthDaySection = (
-  item: StatusMonthJournal['days'][number],
-): readonly MarkdownNode[] => [
+const monthDaySection = (item: StatusMonthJournal['days'][number]): readonly MarkdownNode[] => [
   md.heading(2, formatDate(item.day.id)),
-  md.list(item.incidents.map((incident) => incidentLine(incident))),
+  md.list(item.incidents.map((incident) => incidentLine(incident)))
 ];
 
-const yearMonthSection = (
-  month: StatusCalendarMonthGrid,
-): readonly MarkdownNode[] => {
-  const affectedDays = month.weeks
-    .flat()
-    .filter((day) => day.status !== undefined);
+const yearMonthSection = (month: StatusCalendarMonthGrid): readonly MarkdownNode[] => {
+  const affectedDays = month.weeks.flat().filter((day) => day.status !== undefined);
 
   return [
     md.heading(2, month.name),
@@ -202,16 +172,16 @@ const yearMonthSection = (
                     statusCalendarDayUrl({
                       year: month.year,
                       month: month.month,
-                      id: day.id,
-                    }),
+                      id: day.id
+                    })
                   ),
-                  formatStatusCalendarDayLabel(day.status),
-                ),
-              ]),
+                  formatStatusCalendarDayLabel(day.status)
+                )
+              ])
             ]);
           })
-        : [md.listItem('Нет записей.')],
-    ),
+        : [md.listItem('Нет записей.')]
+    )
   ];
 };
 
@@ -220,30 +190,21 @@ const serviceLine = (summary: StatusServiceSummary): MarkdownListItem => {
 
   return md.listItem([
     md.paragraph([
-      md.link(
-        abs(statusServiceMarkdownUrl(summary.service)),
-        formatStatusService(summary.service),
-      ),
-      md.text(
-        ` — ${formatStatusServiceState(summary.serviceStatus)}; последняя запись: `,
-      ),
-      ...(latest
-        ? incidentMarkdownLabel(latest)
-        : [md.text('пока без записей')]),
-    ]),
+      md.link(abs(statusServiceMarkdownUrl(summary.service)), formatStatusService(summary.service)),
+      md.text(` — ${formatStatusServiceState(summary.serviceStatus)}; последняя запись: `),
+      ...(latest ? incidentMarkdownLabel(latest) : [md.text('пока без записей')])
+    ])
   ]);
 };
 
 export function buildStatusHomeMarkdown(data: StatusDataset): string {
-  const activeIncidents = data.active.filter(
-    (item) => item.kind === 'incident',
-  );
+  const activeIncidents = data.active.filter((item) => item.kind === 'incident');
   const plannedWorks = data.incidents.filter(isActiveOrScheduledMaintenance);
 
   return serialize([
     md.heading(1, 'Статус КП Шелково'),
     md.paragraph(
-      'Текстовая сводка состояния сервисов КП Шелково: активные инциденты, плановые работы и история отключений.',
+      'Текстовая сводка состояния сервисов КП Шелково: активные инциденты, плановые работы и история отключений.'
     ),
     ...section('Сервисы', data.services.map(serviceLine)),
     ...(activeIncidents.length > 0
@@ -251,27 +212,25 @@ export function buildStatusHomeMarkdown(data: StatusDataset): string {
           title: 'Активные инциденты',
           items: activeIncidents,
           empty: 'Сейчас нет активных инцидентов.',
-          hideIncidentPhase: true,
+          hideIncidentPhase: true
         })
       : []),
     ...(plannedWorks.length > 0
       ? incidentSection({
           title: 'Плановые работы',
           items: plannedWorks,
-          empty: 'Сейчас нет активных или запланированных работ.',
+          empty: 'Сейчас нет активных или запланированных работ.'
         })
       : []),
     ...incidentSection({
       title: 'История',
       items: data.incidents,
-      empty: 'История пока пуста.',
-    }),
+      empty: 'История пока пуста.'
+    })
   ]);
 }
 
-export function buildStatusServiceMarkdown(
-  summary: StatusServiceSummary,
-): string {
+export function buildStatusServiceMarkdown(summary: StatusServiceSummary): string {
   const latest = summary.incidents[0];
   const plannedWorks = summary.incidents.filter(isActiveOrScheduledMaintenance);
   const serviceLabel = formatStatusService(summary.service);
@@ -283,26 +242,22 @@ export function buildStatusServiceMarkdown(
       pick([
         row('Сервис', serviceLabel),
         row('Текущий статус', formatStatusServiceState(summary.serviceStatus)),
-        row(
-          'Последняя запись',
-          latest ? incidentMarkdownLabel(latest) : [md.text('нет записей')],
-        ),
-      ]),
+        row('Последняя запись', latest ? incidentMarkdownLabel(latest) : [md.text('нет записей')])
+      ])
     ),
     ...(summary.activeIncidents.length > 0
       ? incidentSection({
           title: 'Активные инциденты',
           items: summary.activeIncidents,
           empty: 'Сейчас нет активных инцидентов по этому сервису.',
-          hideIncidentPhase: true,
+          hideIncidentPhase: true
         })
       : []),
     ...(plannedWorks.length > 0
       ? incidentSection({
           title: 'Плановые работы',
           items: plannedWorks,
-          empty:
-            'Сейчас нет активных или запланированных работ по этому сервису.',
+          empty: 'Сейчас нет активных или запланированных работ по этому сервису.'
         })
       : []),
     ...incidentSection({
@@ -312,41 +267,34 @@ export function buildStatusServiceMarkdown(
       intro:
         summary.incidents.length > 10
           ? 'В Markdown-файле показаны 10 последних записей сервиса.'
-          : undefined,
-    }),
+          : undefined
+    })
   ]);
 }
 
-export function buildStatusIncidentMarkdown(
-  incident: StatusIncidentWithDetail,
-): string {
+export function buildStatusIncidentMarkdown(incident: StatusIncidentWithDetail): string {
   return serializeMarkdownDocument(
     createMarkdownDocument({
       frontmatter: incidentFrontmatter(incident),
       children: [
         md.heading(1, incident.title),
-        ...(incident.body ? parseMarkdownFragment(incident.body.trim()) : []),
-      ],
-    }),
+        ...(incident.body ? parseMarkdownFragment(incident.body.trim()) : [])
+      ]
+    })
   );
 }
 
 export const buildStatusMonthMarkdown = (journal: StatusMonthJournal): string =>
   serialize([
-    md.heading(
-      1,
-      `Статусы за ${formatStatusMonth(journal.year, journal.month)} года`,
-    ),
-    ...journal.days.flatMap(monthDaySection),
+    md.heading(1, `Статусы за ${formatStatusMonth(journal.year, journal.month)} года`),
+    ...journal.days.flatMap(monthDaySection)
   ]);
 
-export const buildStatusYearMarkdown = (
-  calendar: StatusCalendarYearGrid,
-): string =>
+export const buildStatusYearMarkdown = (calendar: StatusCalendarYearGrid): string =>
   serialize([
     md.heading(1, `Проблемы и плановые работы за ${calendar.year} год`),
     md.paragraph(
-      'Проблемы и плановые работы по дням. Отмеченные даты ведут к записям месячного журнала.',
+      'Проблемы и плановые работы по дням. Отмеченные даты ведут к записям месячного журнала.'
     ),
-    ...calendar.months.flatMap(yearMonthSection),
+    ...calendar.months.flatMap(yearMonthSection)
   ]);

@@ -1,17 +1,14 @@
 <script lang="ts">
-  import { getAvailabilityDisplay } from './availability-status';
-  import ComparisonTable from './ComparisonTable.svelte';
-  import type {
-    ComparisonStatus,
-    ComparisonTableRow,
-  } from './comparison-table.types';
   import type {
     Infrastructure,
     RoadType,
     DrainageType,
     VideoSurveillance,
-    UndergroundElectricity,
+    UndergroundElectricity
   } from '../lib/settlement/types';
+  import { getAvailabilityDisplay } from './availability-status';
+  import type { ComparisonStatus, ComparisonTableRow } from './comparison-table.types';
+  import ComparisonTable from './ComparisonTable.svelte';
 
   interface Props {
     title?: string;
@@ -38,7 +35,7 @@
     videoSurveillance: 'Видеонаблюдение',
     undergroundElectricity: 'Подземная электросеть',
     adminBuilding: 'Административное здание',
-    retailOrServices: 'Магазины',
+    retailOrServices: 'Магазины'
   };
 
   // Отображение типов дорог.
@@ -47,17 +44,17 @@
     partlyAsphalt: {
       icon: '◐',
       text: 'Частично асфальт',
-      tone: 'ui-badge-warning',
+      tone: 'ui-badge-warning'
     },
     gravel: { icon: '○', text: 'Крошка', tone: 'ui-badge-warning' },
-    dirt: { icon: '✗', text: 'Грунт', tone: 'ui-badge-danger' },
+    dirt: { icon: '✗', text: 'Грунт', tone: 'ui-badge-danger' }
   };
 
   // Отображение типов ливневки.
   const drainageConfig: Record<DrainageType, ComparisonStatus> = {
     closed: { icon: '✓', text: 'Закрытая', tone: 'ui-badge-success' },
     open: { icon: '◐', text: 'Открытая', tone: 'ui-badge-warning' },
-    none: { icon: '✗', text: 'Отсутствует', tone: 'ui-badge-danger' },
+    none: { icon: '✗', text: 'Отсутствует', tone: 'ui-badge-danger' }
   };
 
   // Отображение типов видеонаблюдения.
@@ -66,34 +63,31 @@
     checkpointOnly: {
       icon: '◐',
       text: 'Только на КПП',
-      tone: 'ui-badge-warning',
+      tone: 'ui-badge-warning'
     },
-    none: { icon: '✗', text: 'Нет', tone: 'ui-badge-danger' },
+    none: { icon: '✗', text: 'Нет', tone: 'ui-badge-danger' }
   };
 
   // Отображение типов подземной электросети.
   const electricityConfig: Record<UndergroundElectricity, ComparisonStatus> = {
     full: { icon: '✓', text: 'Полностью', tone: 'ui-badge-success' },
     partial: { icon: '◐', text: 'Частично', tone: 'ui-badge-warning' },
-    none: { icon: '✗', text: 'По столбам', tone: 'ui-badge-danger' },
+    none: { icon: '✗', text: 'По столбам', tone: 'ui-badge-danger' }
   };
 
   const unknown: ComparisonStatus = {
     icon: '?',
     text: 'Неизвестно',
-    tone: 'ui-badge-muted',
+    tone: 'ui-badge-muted'
   };
 
   const getFromConfig = <Value extends string>(
     value: Value | undefined,
-    config: Record<Value, ComparisonStatus>,
+    config: Record<Value, ComparisonStatus>
   ): ComparisonStatus => (value === undefined ? unknown : config[value]);
 
   // Подбираем отображение по конкретному ключу инфраструктуры.
-  function getDisplayConfig(
-    key: InfrastructureKey,
-    source: Infrastructure,
-  ): ComparisonStatus {
+  function getDisplayConfig(key: InfrastructureKey, source: Infrastructure): ComparisonStatus {
     switch (key) {
       case 'roads':
         return getFromConfig(source.roads, roadConfig);
@@ -123,7 +117,7 @@
     'videoSurveillance',
     'undergroundElectricity',
     'adminBuilding',
-    'retailOrServices',
+    'retailOrServices'
   ] as const satisfies readonly InfrastructureKey[];
 
   const rows = $derived(
@@ -133,8 +127,8 @@
       value: infra[key],
       shelkovoValue: shelkovoInfra?.[key],
       status: getDisplayConfig(key, infra),
-      shelkovoStatus: getDisplayConfig(key, shelkovoInfra ?? {}),
-    })),
+      shelkovoStatus: getDisplayConfig(key, shelkovoInfra ?? {})
+    }))
   );
 </script>
 

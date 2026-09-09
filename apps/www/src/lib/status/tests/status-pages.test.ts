@@ -3,16 +3,15 @@
 import { Window } from 'happy-dom';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createAstroContainer } from '@/test/astro-container';
 import { loadStatusData } from '@/lib/status/load';
 import { statusCalendarYearUrl, statusHistoryUrl } from '@/lib/status/routes';
-
-// @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
-import StatusPage from '@/pages/status/index.astro';
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import StatusHistoryPage from '@/pages/status/history/index.astro';
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import StatusIncidentPage from '@/pages/status/incidents/[year]/[month]/[entry]/index.astro';
+// @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
+import StatusPage from '@/pages/status/index.astro';
+import { createAstroContainer } from '@/test/astro-container';
 
 const fixtures = vi.hoisted(() => {
   const incidents = Array.from({ length: 12 }, (_, index) => {
@@ -29,7 +28,7 @@ const fixtures = vi.hoisted(() => {
       started: {
         at: new Date(`2026-08-${String(number).padStart(2, '0')}T09:00:00Z`),
         iso: `2026-08-${String(number).padStart(2, '0')}T12:00:00+03:00`,
-        hasTime: true,
+        hasTime: true
       },
       phase: 'resolved',
       appliesToAllAreas: true,
@@ -37,20 +36,20 @@ const fixtures = vi.hoisted(() => {
       body: '',
       mentions: [],
       sortStartedAt: number,
-      sortLastChangeAt: number,
+      sortLastChangeAt: number
     };
 
     return index % 2 === 0
       ? {
           ...base,
-          hasPage: false as const,
+          hasPage: false as const
         }
       : {
           ...base,
           hasPage: true as const,
           url: `/status/incidents/2026/08/${slug}/`,
           markdownUrl: `/status/incidents/2026/08/${slug}/index.md`,
-          canonical: `https://example.com/status/incidents/2026/08/${slug}/`,
+          canonical: `https://example.com/status/incidents/2026/08/${slug}/`
         };
   });
   const maintenanceStarted = new Date('2026-08-20T10:00:00+03:00');
@@ -65,7 +64,7 @@ const fixtures = vi.hoisted(() => {
     started: {
       at: maintenanceStarted,
       iso: '2026-08-20T10:00:00+03:00',
-      hasTime: true,
+      hasTime: true
     },
     phase: 'scheduled' as const,
     appliesToAllAreas: true,
@@ -74,7 +73,7 @@ const fixtures = vi.hoisted(() => {
     mentions: [],
     sortStartedAt: maintenanceStarted.valueOf(),
     sortLastChangeAt: maintenanceStarted.valueOf(),
-    hasPage: false as const,
+    hasPage: false as const
   };
   const allIncidents = [scheduledMaintenance, ...incidents];
   const service = {
@@ -83,7 +82,7 @@ const fixtures = vi.hoisted(() => {
     incidents,
     activeIncidents: [],
     activeMaintenance: [],
-    daysWithoutIncidents: { mode: 'noIncidents' as const },
+    daysWithoutIncidents: { mode: 'noIncidents' as const }
   };
 
   return {
@@ -92,19 +91,19 @@ const fixtures = vi.hoisted(() => {
       active: [],
       services: [service],
       calendar: {
-        buildYear: 2026,
+        buildYear: 2026
       },
       byId: new Map(),
-      byService: new Map([['electricity', service]]),
+      byService: new Map([['electricity', service]])
     },
-    scheduledMaintenance,
+    scheduledMaintenance
   };
 });
 
 vi.mock('@/lib/status/load', () => ({
   loadStatusData: async () => fixtures.data,
   loadStatusIncidentDetail: async (id: string) =>
-    fixtures.data.incidents.find((incident) => incident.id === id),
+    fixtures.data.incidents.find((incident) => incident.id === id)
 }));
 
 const stripTags = (value: string): string => {
@@ -121,7 +120,7 @@ const stripTags = (value: string): string => {
 
 const headingOutline = (html: string): readonly string[] =>
   [...html.matchAll(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gu)].map(
-    ([, level, content]) => `h${level}: ${stripTags(content)}`,
+    ([, level, content]) => `h${level}: ${stripTags(content)}`
   );
 
 const parseHtml = (html: string) => {
@@ -132,14 +131,14 @@ const parseHtml = (html: string) => {
 };
 
 const expectItemListMatchesHistory = (
-  document: ReturnType<typeof parseHtml>,
+  document: ReturnType<typeof parseHtml>
 ): readonly Record<string, unknown>[] => {
-  const titles = [
-    ...document.querySelectorAll('[data-status-history] article h3'),
-  ].map((heading) => heading.textContent.replace(/\s+/gu, ' ').trim());
-  const schemas = [
-    ...document.querySelectorAll('script[type="application/ld+json"]'),
-  ].map((script) => JSON.parse(script.textContent) as Record<string, unknown>);
+  const titles = [...document.querySelectorAll('[data-status-history] article h3')].map((heading) =>
+    heading.textContent.replace(/\s+/gu, ' ').trim()
+  );
+  const schemas = [...document.querySelectorAll('script[type="application/ld+json"]')].map(
+    (script) => JSON.parse(script.textContent) as Record<string, unknown>
+  );
   const itemList = schemas.find((schema) => schema['@type'] === 'ItemList');
 
   if (!itemList || !Array.isArray(itemList.itemListElement)) {
@@ -151,9 +150,7 @@ const expectItemListMatchesHistory = (
   expect(itemList.numberOfItems).toBe(titles.length);
   expect(items).toHaveLength(titles.length);
   expect(items.map((item) => item.name)).toEqual(titles);
-  expect(items.map((item) => item.position)).toEqual(
-    titles.map((_, index) => index + 1),
-  );
+  expect(items.map((item) => item.position)).toEqual(titles.map((_, index) => index + 1));
 
   return items;
 };
@@ -179,12 +176,8 @@ describe('/status/', () => {
     const document = parseHtml(html);
     const history = document.querySelector('[data-status-history]');
 
-    expect(history?.querySelectorAll('article')).toHaveLength(
-      Math.min(10, data.incidents.length),
-    );
-    expect(
-      history?.querySelector(`a[href="${statusHistoryUrl()}"]`),
-    ).not.toBeNull();
+    expect(history?.querySelectorAll('article')).toHaveLength(Math.min(10, data.incidents.length));
+    expect(history?.querySelector(`a[href="${statusHistoryUrl()}"]`)).not.toBeNull();
     expectItemListMatchesHistory(document);
   });
 
@@ -196,11 +189,11 @@ describe('/status/', () => {
       const container = await createAstroContainer();
       const document = parseHtml(await container.renderToString(StatusPage));
       const heading = [...document.querySelectorAll('h2')].find(
-        (item) => item.textContent.trim() === 'Плановые работы',
+        (item) => item.textContent.trim() === 'Плановые работы'
       );
 
       expect(heading?.closest('section')?.textContent).toContain(
-        fixtures.scheduledMaintenance.title,
+        fixtures.scheduledMaintenance.title
       );
     } finally {
       vi.useRealTimers();
@@ -217,7 +210,7 @@ describe('/status/', () => {
       accessibleName: link?.getAttribute('aria-label'),
       href: link?.getAttribute('href'),
       decorativeIcon: link?.querySelector('svg')?.getAttribute('aria-hidden'),
-      title: link?.getAttribute('title'),
+      title: link?.getAttribute('title')
     }).toMatchInlineSnapshot(`
       {
         "accessibleName": "Проблемы и плановые работы за 2026 год",
@@ -227,7 +220,7 @@ describe('/status/', () => {
       }
     `);
     expect(link?.getAttribute('href')).toBe(
-      statusCalendarYearUrl({ year: data.calendar.buildYear }),
+      statusCalendarYearUrl({ year: data.calendar.buildYear })
     );
   });
 
@@ -236,20 +229,20 @@ describe('/status/', () => {
     const html = await container.renderToString(StatusPage);
     const document = parseHtml(html);
     const state = document.querySelector(
-      '[data-status-service-card] [data-status-service-state-label]',
+      '[data-status-service-card] [data-status-service-state-label]'
     );
     if (!state) {
       throw new Error('Overview service state is missing');
     }
 
     const windows = JSON.parse(
-      state.getAttribute('data-status-service-incidents') ?? '[]',
+      state.getAttribute('data-status-service-incidents') ?? '[]'
     ) as readonly unknown[];
 
     expect({
       hasLifecyclePayload: windows.length > 0,
       role: state.getAttribute('role'),
-      state: state.getAttribute('data-status-service-state'),
+      state: state.getAttribute('data-status-service-state')
     }).toMatchInlineSnapshot(`
       {
         "hasLifecyclePayload": true,
@@ -267,13 +260,13 @@ describe('/status/history/', () => {
     const html = await container.renderToString(StatusHistoryPage);
     const document = parseHtml(html);
 
-    expect(
-      document.querySelectorAll('[data-status-history] article'),
-    ).toHaveLength(data.incidents.length);
+    expect(document.querySelectorAll('[data-status-history] article')).toHaveLength(
+      data.incidents.length
+    );
 
     const schemaItems = expectItemListMatchesHistory(document);
     const listOnlyIndexes = data.incidents.flatMap((incident, index) =>
-      incident.hasPage ? [] : [index],
+      incident.hasPage ? [] : [index]
     );
 
     expect(listOnlyIndexes.length).toBeGreaterThan(0);
@@ -285,15 +278,11 @@ describe('/status/history/', () => {
   it('links the calendar view for the current Moscow year', async () => {
     const data = await loadStatusData();
     const container = await createAstroContainer();
-    const document = parseHtml(
-      await container.renderToString(StatusHistoryPage),
-    );
+    const document = parseHtml(await container.renderToString(StatusHistoryPage));
 
-    expect(
-      document
-        .querySelector('[data-status-history-calendar]')
-        ?.getAttribute('href'),
-    ).toBe(statusCalendarYearUrl({ year: data.calendar.buildYear }));
+    expect(document.querySelector('[data-status-history-calendar]')?.getAttribute('href')).toBe(
+      statusCalendarYearUrl({ year: data.calendar.buildYear })
+    );
   });
 });
 
@@ -310,15 +299,15 @@ describe('/status/incidents/[year]/[month]/[entry]/', () => {
         params: {
           year: String(incident.year),
           month: String(incident.month).padStart(2, '0'),
-          entry: incident.slug,
+          entry: incident.slug
         },
-        request: new Request(incident.canonical),
-      }),
+        request: new Request(incident.canonical)
+      })
     );
 
     expect({
       documentTitle: document.title,
-      heading: document.querySelector('h1')?.textContent.trim(),
+      heading: document.querySelector('h1')?.textContent.trim()
     }).toMatchInlineSnapshot(`
       {
         "documentTitle": "Тестовая запись 2, 2 августа 2026 — Шелково Онлайн",

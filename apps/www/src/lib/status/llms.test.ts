@@ -5,7 +5,7 @@ const fixtures = vi.hoisted(() => {
     hasPage: false,
     year: 2026,
     month: 6,
-    slug: 'water-no-page',
+    slug: 'water-no-page'
   };
   const withDetail = {
     hasPage: true,
@@ -14,8 +14,7 @@ const fixtures = vi.hoisted(() => {
     slug: 'electricity-river-outage',
     url: '/status/incidents/2026/05/electricity-river-outage/',
     markdownUrl: '/status/incidents/2026/05/electricity-river-outage/index.md',
-    canonical:
-      'https://example.com/status/incidents/2026/05/electricity-river-outage/',
+    canonical: 'https://example.com/status/incidents/2026/05/electricity-river-outage/'
   };
 
   return {
@@ -24,13 +23,13 @@ const fixtures = vi.hoisted(() => {
     status: {
       active: [{ kind: 'incident' }, { kind: 'maintenance' }],
       services: [{ service: 'electricity' }],
-      incidents: [listOnly, withDetail],
-    },
+      incidents: [listOnly, withDetail]
+    }
   };
 });
 
 vi.mock('./load', () => ({
-  loadStatusData: async () => fixtures.status,
+  loadStatusData: async () => fixtures.status
 }));
 
 let build: typeof import('./llms').build;
@@ -39,7 +38,7 @@ let statusCalendarAgentPatterns: typeof import('./routes').statusCalendarAgentPa
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ build } = await import('./llms'));
@@ -57,11 +56,9 @@ describe('status llms', () => {
       const markdown = await build(kind);
 
       expect(markdown).toContain(fixtures.withDetail.canonical);
-      expect(markdown).toContain(
-        `https://example.com${fixtures.withDetail.markdownUrl}`,
-      );
+      expect(markdown).toContain(`https://example.com${fixtures.withDetail.markdownUrl}`);
       expect(markdown).not.toContain(fixtures.listOnly.slug);
-    },
+    }
   );
 
   it.each(['short', 'full'] as const)(
@@ -74,7 +71,7 @@ describe('status llms', () => {
       expect(markdown).not.toContain('https://example.com/status/incidents/');
       expect(markdown).not.toContain('Пример HTML-страницы инцидента');
       expect(markdown).not.toContain('Пример Markdown-версии инцидента');
-    },
+    }
   );
 
   it.each(['short', 'full'] as const)(
@@ -84,7 +81,7 @@ describe('status llms', () => {
 
       expect(markdown).toContain('https://example.com/status/history/');
       expect(markdown).toContain('https://example.com/status/data/status.json');
-    },
+    }
   );
 
   it.each(['short', 'full'] as const)(
@@ -98,6 +95,6 @@ describe('status llms', () => {
 
       expect(markdown).toContain('отдельного календарного JSON нет');
       expect(markdown).not.toMatch(/\/status\/calendar(?:\/data)?\.json/u);
-    },
+    }
   );
 });

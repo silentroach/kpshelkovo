@@ -13,8 +13,7 @@ type Rated = Ranked & {
 
 function sort<T extends Ranked>(settlements: readonly T[]): T[] {
   return [...settlements].sort((a, b) => {
-    const diff =
-      a.tariff.normalizedPerSotkaMonth - b.tariff.normalizedPerSotkaMonth;
+    const diff = a.tariff.normalizedPerSotkaMonth - b.tariff.normalizedPerSotkaMonth;
     if (diff !== 0) return diff;
     return compareRuText(a.shortName, b.shortName);
   });
@@ -44,9 +43,7 @@ export function calculateMedian(values: readonly number[]): number {
  * Calculate stable tariff rank for every settlement.
  * Rank 1 = lowest tariff, equal tariffs share the same rank.
  */
-export function rankSettlements(
-  settlements: readonly Ranked[],
-): Map<string, number> {
+export function rankSettlements(settlements: readonly Ranked[]): Map<string, number> {
   let prev: number | undefined;
   let rank = 0;
   const ranks = new Map<string, number>();
@@ -81,22 +78,22 @@ function bands(list: Rated[]): Rated[][] {
   const count = Math.min(4, Math.max(1, Math.ceil(list.length / 8)));
   const size = Math.ceil(list.length / count);
 
-  return Array.from({ length: count }, (_, i) =>
-    list.slice(i * size, (i + 1) * size),
-  ).filter((item) => item.length > 0);
+  return Array.from({ length: count }, (_, i) => list.slice(i * size, (i + 1) * size)).filter(
+    (item) => item.length > 0
+  );
 }
 
 function peers(
   settlements: readonly Settlement[],
   ratings: ReadonlyMap<string, Rating>,
-  base: Settlement,
+  base: Settlement
 ) {
   const list = settlements
     .map((item) => ({
       slug: item.slug,
       shortName: item.shortName,
       tariff: item.tariff,
-      score: ratings.get(item.slug)?.score ?? 0,
+      score: ratings.get(item.slug)?.score ?? 0
     }))
     .sort((a, b) => {
       const diff = a.score - b.score;
@@ -104,9 +101,7 @@ function peers(
       return compareRuText(a.shortName, b.shortName);
     });
 
-  const band =
-    bands(list).find((item) => item.some((row) => row.slug === base.slug)) ??
-    list;
+  const band = bands(list).find((item) => item.some((row) => row.slug === base.slug)) ?? list;
   const first = band[0];
 
   if (!first) {
@@ -114,9 +109,7 @@ function peers(
   }
 
   return {
-    peerMedianTariff: calculateMedian(
-      band.map((item) => item.tariff.normalizedPerSotkaMonth),
-    ),
+    peerMedianTariff: calculateMedian(band.map((item) => item.tariff.normalizedPerSotkaMonth))
   };
 }
 
@@ -127,7 +120,7 @@ function peers(
 export function computeStats(
   settlements: readonly Settlement[],
   ratings: ReadonlyMap<string, Rating>,
-  baseline: Settlement,
+  baseline: Settlement
 ): Stats {
   if (settlements.length === 0) {
     throw new Error('No settlements provided');
@@ -145,19 +138,13 @@ export function computeStats(
   const shelkovoRank = ranks.get(baseline.slug) ?? settlements.length;
   const totalSettlements = settlements.length;
   const cheaperCount = settlements.filter(
-    (s) => s.tariff.normalizedPerSotkaMonth < shelkovoTariff,
+    (s) => s.tariff.normalizedPerSotkaMonth < shelkovoTariff
   ).length;
   const moreExpensiveCount = settlements.filter(
-    (s) => s.tariff.normalizedPerSotkaMonth > shelkovoTariff,
+    (s) => s.tariff.normalizedPerSotkaMonth > shelkovoTariff
   ).length;
-  const shelkovoVsMedianPercent = calculatePercentile(
-    shelkovoTariff,
-    medianTariff,
-  );
-  const shelkovoVsPeerMedianPercent = calculatePercentile(
-    shelkovoTariff,
-    peer.peerMedianTariff,
-  );
+  const shelkovoVsMedianPercent = calculatePercentile(shelkovoTariff, medianTariff);
+  const shelkovoVsPeerMedianPercent = calculatePercentile(shelkovoTariff, peer.peerMedianTariff);
   const shelkovoVsMeanPercent = calculatePercentile(shelkovoTariff, meanTariff);
 
   return {
@@ -173,6 +160,6 @@ export function computeStats(
     moreExpensiveCount,
     shelkovoVsMedianPercent,
     shelkovoVsPeerMedianPercent,
-    shelkovoVsMeanPercent,
+    shelkovoVsMeanPercent
   };
 }

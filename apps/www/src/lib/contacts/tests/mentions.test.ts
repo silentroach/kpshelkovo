@@ -10,7 +10,7 @@ const contact = {
   updatedAt: new Date('2026-07-06T00:00:00.000Z'),
   updatedIso: '2026-07-06',
   contacts: {
-    phone: '+7 900 000-00-00',
+    phone: '+7 900 000-00-00'
   },
   reviews: [],
   url: '/sarafan/fence/ivan-petrov-fence/',
@@ -23,9 +23,9 @@ const contact = {
       slug: 'kschemelinin',
       label: 'Кирилл Щемелинин',
       htmlUrl: '/people/kschemelinin/',
-      markdownUrl: '/people/kschemelinin/index.md',
-    },
-  ],
+      markdownUrl: '/people/kschemelinin/index.md'
+    }
+  ]
 } satisfies Contact;
 
 describe('createContactMentionRefs', () => {
@@ -60,8 +60,8 @@ describe('createContactMentionRefs', () => {
         get body(): string {
           throw new Error('body should not be read');
         },
-        mentions: [],
-      }),
+        mentions: []
+      })
     ).toEqual([]);
   });
 });

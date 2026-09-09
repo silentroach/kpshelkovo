@@ -11,7 +11,7 @@ export const GET: APIRoute = async () => {
 
   return createJsonResponse(openapi(root), {
     headers: {
-      'Content-Type': `${OAS}; charset=utf-8`,
-    },
+      'Content-Type': `${OAS}; charset=utf-8`
+    }
   });
 };

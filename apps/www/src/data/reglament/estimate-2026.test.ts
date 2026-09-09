@@ -12,9 +12,9 @@ const flattenRows = (rows: readonly EstimateRow[]): readonly EstimateRow[] =>
   rows.flatMap((row) => [row, ...flattenRows(row.children ?? [])]);
 
 const findRow = (id: string): EstimateRow => {
-  const row = flattenRows(
-    estimate2026.sections.flatMap((section) => section.rows),
-  ).find((item) => item.id === id);
+  const row = flattenRows(estimate2026.sections.flatMap((section) => section.rows)).find(
+    (item) => item.id === id
+  );
 
   if (!row) {
     throw new Error(`Estimate row not found: ${id}`);
@@ -27,7 +27,7 @@ describe('estimate2026 baseline data', () => {
   it('keeps the official total and tariff from final.pdf', () => {
     expect(estimate2026.baseline).toEqual({
       annual_gross: 221_264_198,
-      tariff_per_sotka_month: 902.07,
+      tariff_per_sotka_month: 902.07
     });
   });
 
@@ -36,17 +36,17 @@ describe('estimate2026 baseline data', () => {
       id: section.id,
       title: section.title,
       annual_gross: section.baseline.annual_gross,
-      tariff_per_sotka_month: section.baseline.tariff_per_sotka_month,
+      tariff_per_sotka_month: section.baseline.tariff_per_sotka_month
     }));
 
     expect(sections).toMatchSnapshot();
 
     expect(sum(sections.map((section) => section.annual_gross))).toBe(
-      estimate2026.baseline.annual_gross,
+      estimate2026.baseline.annual_gross
     );
-    expect(
-      round2(sum(sections.map((section) => section.tariff_per_sotka_month))),
-    ).toBe(estimate2026.baseline.tariff_per_sotka_month);
+    expect(round2(sum(sections.map((section) => section.tariff_per_sotka_month)))).toBe(
+      estimate2026.baseline.tariff_per_sotka_month
+    );
   });
 
   it('keeps all official row totals and source refs explicit', () => {
@@ -61,9 +61,9 @@ describe('estimate2026 baseline data', () => {
           pdf: ref.pdf,
           page: ref.page,
           fragment: ref.fragment,
-          ...(ref.note ? { note: ref.note } : {}),
-        })),
-      })),
+          ...(ref.note ? { note: ref.note } : {})
+        }))
+      }))
     );
 
     expect(rows).toHaveLength(19);
@@ -72,35 +72,23 @@ describe('estimate2026 baseline data', () => {
 
   it('keeps row sums aligned with section totals within final.pdf rounding', () => {
     const sectionSums = estimate2026.sections.map((section) => {
-      const rowAnnualGross = sum(
-        flattenRows(section.rows).map((row) => row.baseline.annual_gross),
-      );
+      const rowAnnualGross = sum(flattenRows(section.rows).map((row) => row.baseline.annual_gross));
       const rowTariff = round2(
-        sum(
-          flattenRows(section.rows).map(
-            (row) => row.baseline.tariff_per_sotka_month,
-          ),
-        ),
+        sum(flattenRows(section.rows).map((row) => row.baseline.tariff_per_sotka_month))
       );
 
       return {
         id: section.id,
         section_annual_gross: section.baseline.annual_gross,
         row_annual_gross: rowAnnualGross,
-        annual_gross_diff: round2(
-          rowAnnualGross - section.baseline.annual_gross,
-        ),
+        annual_gross_diff: round2(rowAnnualGross - section.baseline.annual_gross),
         section_tariff_per_sotka_month: section.baseline.tariff_per_sotka_month,
         row_tariff_per_sotka_month: rowTariff,
-        tariff_diff: round2(
-          rowTariff - section.baseline.tariff_per_sotka_month,
-        ),
+        tariff_diff: round2(rowTariff - section.baseline.tariff_per_sotka_month)
       };
     });
 
-    expect(
-      sectionSums.every((section) => Math.abs(section.annual_gross_diff) <= 1),
-    ).toBe(true);
+    expect(sectionSums.every((section) => Math.abs(section.annual_gross_diff) <= 1)).toBe(true);
     expect(sectionSums).toMatchSnapshot();
   });
 
@@ -109,8 +97,8 @@ describe('estimate2026 baseline data', () => {
       flattenRows(section.rows).map((row) => ({
         section_id: section.id,
         id: row.id,
-        ...row.baseline.breakdown,
-      })),
+        ...row.baseline.breakdown
+      }))
     );
 
     expect(breakdowns).toHaveLength(19);
@@ -126,9 +114,7 @@ describe('estimate2026 baseline data', () => {
       for (const row of flattenRows(section.rows)) {
         expect(row.source_refs.length).toBeGreaterThan(0);
         expect(row.baseline.annual_gross).toBeGreaterThanOrEqual(0);
-        expect(
-          row.source_refs.every((source) => sourcePdfs.has(source.pdf)),
-        ).toBe(true);
+        expect(row.source_refs.every((source) => sourcePdfs.has(source.pdf))).toBe(true);
       }
     }
   });
@@ -140,24 +126,20 @@ describe('estimate2026 baseline data', () => {
 
         return {
           id,
-          base: row.baseline.base,
+          base: row.baseline.base
         };
-      }),
+      })
     ).toMatchSnapshot();
   });
 
   it('keeps fixed annual price outside basic main-table controls', () => {
-    const rows = flattenRows(
-      estimate2026.sections.flatMap((section) => section.rows),
-    );
+    const rows = flattenRows(estimate2026.sections.flatMap((section) => section.rows));
     const fixedPriceFields = rows.flatMap((row) =>
-      row.editable_fields.filter((field) => field.key === 'fixed_price'),
+      row.editable_fields.filter((field) => field.key === 'fixed_price')
     );
 
     expect(fixedPriceFields.length).toBeGreaterThan(0);
-    expect(fixedPriceFields.every((field) => field.level === 'expert')).toBe(
-      true,
-    );
+    expect(fixedPriceFields.every((field) => field.level === 'expert')).toBe(true);
   });
 
   it('keeps the disputed improvement repair source caveat explicit', () => {
@@ -173,8 +155,8 @@ describe('estimate2026 baseline data', () => {
         pdf: ref.pdf,
         page: ref.page,
         fragment: ref.fragment,
-        ...(ref.note ? { note: ref.note } : {}),
-      })),
+        ...(ref.note ? { note: ref.note } : {})
+      }))
     }).toMatchSnapshot();
   });
 });

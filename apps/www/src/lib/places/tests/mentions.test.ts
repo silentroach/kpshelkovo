@@ -14,15 +14,15 @@ const place = (mentions: Place['mentions'] = [target]) => ({
   body: 'Первый абзац с [Кирилл Щемелинин](/people/kschemelinin/).\n\nВторой абзац.',
   mentions,
   url: '/map/burzhuyka/',
-  markdownUrl: '/map/burzhuyka/index.md',
+  markdownUrl: '/map/burzhuyka/index.md'
 });
 
 describe('createPlaceMentionRefs', () => {
   it('maps a place to a mention target with HTML and Markdown URLs', () => {
     expect(
       createPlaceMentionTarget('apple-garden', 'Яблоневый сад', {
-        gen: 'Яблоневого сада',
-      }),
+        gen: 'Яблоневого сада'
+      })
     ).toMatchInlineSnapshot(`
       {
         "htmlUrl": "/map/apple-garden/",
@@ -74,7 +74,7 @@ describe('createPlaceMentionRefs', () => {
   it('preserves a place target in a place source ref', () => {
     expect(createPlaceMentionRefs(place([placeTarget]))[0]?.target).toEqual({
       type: 'place',
-      slug: 'apple-garden',
+      slug: 'apple-garden'
     });
   });
 
@@ -84,8 +84,8 @@ describe('createPlaceMentionRefs', () => {
         ...place([]),
         get body(): string {
           throw new Error('body should not be read');
-        },
-      }),
+        }
+      })
     ).toEqual([]);
   });
 });

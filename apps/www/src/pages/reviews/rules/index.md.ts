@@ -5,5 +5,4 @@ import { buildReviewsRulesMarkdown } from '@/lib/reviews/markdown';
 
 export const prerender = true;
 
-export const GET: APIRoute = () =>
-  createMarkdownResponse(buildReviewsRulesMarkdown());
+export const GET: APIRoute = () => createMarkdownResponse(buildReviewsRulesMarkdown());

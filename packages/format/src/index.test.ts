@@ -12,7 +12,7 @@ import {
   formatPercentage,
   formatTariff,
   parseNumberInputRu,
-  pluralize,
+  pluralize
 } from './index';
 
 afterEach(() => vi.restoreAllMocks());
@@ -39,8 +39,8 @@ describe('format package', () => {
       expect(
         formatNumberRu(3_418_555.1, {
           maximumFractionDigits: 2,
-          minimumFractionDigits: 0,
-        }),
+          minimumFractionDigits: 0
+        })
       ).toBe('3\u00A0418\u00A0555,1');
     });
 
@@ -49,8 +49,8 @@ describe('format package', () => {
         formatNumberRu(40.87, {
           maximumFractionDigits: 2,
           minimumFractionDigits: 0,
-          signDisplay: 'exceptZero',
-        }),
+          signDisplay: 'exceptZero'
+        })
       ).toBe('+40,87');
     });
 
@@ -63,12 +63,11 @@ describe('format package', () => {
         });
       const format = createNumberFormatterRu({
         maximumFractionDigits: 2,
-        minimumFractionDigits: 0,
+        minimumFractionDigits: 0
       });
 
-      expect(
-        [format(3_418_555.1), format(40.87), format(-40.87)].map(visibleNbsp),
-      ).toMatchInlineSnapshot(`
+      expect([format(3_418_555.1), format(40.87), format(-40.87)].map(visibleNbsp))
+        .toMatchInlineSnapshot(`
           [
             "3·418·555,1",
             "40,87",
@@ -84,8 +83,8 @@ describe('format package', () => {
       expect(
         formatNumberUnitRu(52.39, '₽', {
           maximumFractionDigits: 2,
-          minimumFractionDigits: 0,
-        }),
+          minimumFractionDigits: 0
+        })
       ).toBe('52,39\u00A0₽');
     });
   });

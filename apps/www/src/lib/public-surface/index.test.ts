@@ -1,13 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  createPublicSurfaceRegistry,
-  kbPublicSurfaceSlice,
-  publicSurfaceRegistry,
-  surfaceHref,
-  surfaceToLinksetItem,
-} from './index';
-import {
   compareApiCatalogPath,
   compareExplorerDataPath,
   compareLlmsFullPath,
@@ -22,7 +15,7 @@ import {
   compareSettlementMarkdownPattern,
   compareSettlementPattern,
   compareSettlementsDataPath,
-  compareSkillsPath,
+  compareSkillsPath
 } from '@/compare/lib/public-surface';
 import {
   contactCategoryMarkdownPattern,
@@ -31,15 +24,17 @@ import {
   contactPattern,
   contactVcfPattern,
   contactsMarkdownPath,
-  contactsPath,
+  contactsPath
 } from '@/lib/contacts/routes';
 import { catalog } from '@/lib/discovery';
+import { kbDetailMarkdownPattern, kbDetailPattern, kbMarkdownPath, kbPath } from '@/lib/kb/routes';
+import { siteApiCatalogPath, siteLlmsFullPath, siteLlmsPath, siteMarkdownPath } from '@/lib/llms';
 import {
-  kbDetailMarkdownPattern,
-  kbDetailPattern,
-  kbMarkdownPath,
-  kbPath,
-} from '@/lib/kb/routes';
+  meetingMarkdownPattern,
+  meetingPattern,
+  meetingsMarkdownPath,
+  meetingTranscriptPartMarkdownPattern
+} from '@/lib/meetings/routes';
 import {
   apiCatalogPath as newsApiCatalogPath,
   articleMarkdownPattern,
@@ -53,14 +48,8 @@ import {
   newsArchiveMarkdownPath,
   newsArchivePath,
   newsMarkdownPath,
-  newsPath,
+  newsPath
 } from '@/lib/news/routes';
-import {
-  meetingMarkdownPattern,
-  meetingPattern,
-  meetingsMarkdownPath,
-  meetingTranscriptPartMarkdownPattern,
-} from '@/lib/meetings/routes';
 import {
   peopleApiCatalogPath,
   peopleDataPath,
@@ -70,29 +59,30 @@ import {
   peopleOpenApiPath,
   peopleSchemaPath,
   personMarkdownPattern,
-  personPattern,
+  personPattern
 } from '@/lib/people/routes';
 import {
   placeMarkdownPattern,
   placePattern,
   placesDataPath,
   placesMarkdownPath,
-  placesPath,
+  placesPath
 } from '@/lib/places/routes';
+import { reglamentPublicSurfaceSlice } from '@/lib/reglament/public-surface';
+import {
+  REGLAMENT_PUBLIC_PATHS,
+  REGLAMENT_SOURCE_PDF_URLS,
+  reglamentFullSourcePdfUrl
+} from '@/lib/reglament/routes';
 import {
   reviewMarkdownPattern,
   reviewPattern,
   reviewsMarkdownPath,
   reviewsPath,
   reviewsRulesMarkdownPath,
-  reviewsRulesPath,
+  reviewsRulesPath
 } from '@/lib/reviews/routes';
-import { reglamentPublicSurfaceSlice } from '@/lib/reglament/public-surface';
-import {
-  REGLAMENT_PUBLIC_PATHS,
-  REGLAMENT_SOURCE_PDF_URLS,
-  reglamentFullSourcePdfUrl,
-} from '@/lib/reglament/routes';
+import { siteSkillsPath } from '@/lib/skills';
 import {
   statusApiCatalogPath,
   statusCalendarMonthMarkdownPattern,
@@ -111,22 +101,23 @@ import {
   statusPath,
   statusSchemaPath,
   statusServiceMarkdownPattern,
-  statusServicePattern,
+  statusServicePattern
 } from '@/lib/status/routes';
+
 import {
-  siteApiCatalogPath,
-  siteLlmsFullPath,
-  siteLlmsPath,
-  siteMarkdownPath,
-} from '@/lib/llms';
-import { siteSkillsPath } from '@/lib/skills';
+  createPublicSurfaceRegistry,
+  kbPublicSurfaceSlice,
+  publicSurfaceRegistry,
+  surfaceHref,
+  surfaceToLinksetItem
+} from './index';
 import type { PublicSurfaceSlice } from './types';
 
 const newsSlice: PublicSurfaceSlice = {
   owner: {
     id: 'news',
     label: 'Новости',
-    entryPath: '/news/',
+    entryPath: '/news/'
   },
   surfaces: [
     {
@@ -136,7 +127,7 @@ const newsSlice: PublicSurfaceSlice = {
       mediaType: 'text/html',
       cacheClass: 'html',
       discoveryRoles: ['section-entry'],
-      catalogRole: 'anchor',
+      catalogRole: 'anchor'
     },
     {
       id: 'news:article',
@@ -150,19 +141,19 @@ const newsSlice: PublicSurfaceSlice = {
         {
           rel: 'alternate',
           href: '/news/:year/:month/:entry/index.md',
-          mediaType: 'text/markdown',
-        },
+          mediaType: 'text/markdown'
+        }
       ],
-      acceptsNegotiation: 'not-negotiated',
-    },
-  ],
+      acceptsNegotiation: 'not-negotiated'
+    }
+  ]
 };
 
 const compareSlice: PublicSurfaceSlice = {
   owner: {
     id: 'compare',
     label: 'Сравнение поселков',
-    entryPath: '/815/compare/',
+    entryPath: '/815/compare/'
   },
   surfaces: [
     {
@@ -173,12 +164,10 @@ const compareSlice: PublicSurfaceSlice = {
       cacheClass: 'data',
       discoveryRoles: ['data-feed', 'root-catalog'],
       catalogRole: 'item',
-      linkRelations: [
-        { rel: 'api-catalog', href: '/815/compare/.well-known/api-catalog' },
-      ],
-      acceptsNegotiation: 'not-negotiated',
-    },
-  ],
+      linkRelations: [{ rel: 'api-catalog', href: '/815/compare/.well-known/api-catalog' }],
+      acceptsNegotiation: 'not-negotiated'
+    }
+  ]
 };
 
 describe('public surface registry', () => {
@@ -189,10 +178,8 @@ describe('public surface registry', () => {
       slices: registry.slices.map((slice) => slice.owner.id),
       sections: registry.sections.map((owner) => owner.id),
       surfaces: registry.surfaces.map((surface) => surface.id),
-      newsSurfaces: registry
-        .surfacesByOwner('news')
-        .map((surface) => surface.id),
-      compareDataOwner: registry.surfaceOwner('compare:data')?.id,
+      newsSurfaces: registry.surfacesByOwner('news').map((surface) => surface.id),
+      compareDataOwner: registry.surfaceOwner('compare:data')?.id
     }).toMatchInlineSnapshot(`
       {
         "compareDataOwner": "compare",
@@ -221,58 +208,49 @@ describe('public surface registry', () => {
     const conflictingOwnerSlice: PublicSurfaceSlice = {
       owner: {
         id: 'news',
-        label: 'Другой раздел',
+        label: 'Другой раздел'
       },
-      surfaces: compareSlice.surfaces,
+      surfaces: compareSlice.surfaces
     };
 
     expect(() =>
-      createPublicSurfaceRegistry([newsSlice, conflictingOwnerSlice]),
-    ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: duplicate public surface owner id "news"]`,
-    );
+      createPublicSurfaceRegistry([newsSlice, conflictingOwnerSlice])
+    ).toThrowErrorMatchingInlineSnapshot(`[Error: duplicate public surface owner id "news"]`);
   });
 
   it('rejects duplicate surface ids across owners', () => {
     const conflictingSurfaceSlice: PublicSurfaceSlice = {
       owner: compareSlice.owner,
-      surfaces: newsSlice.surfaces,
+      surfaces: newsSlice.surfaces
     };
 
     expect(() =>
-      createPublicSurfaceRegistry([newsSlice, conflictingSurfaceSlice]),
-    ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: duplicate public surface id "news:index"]`,
-    );
+      createPublicSurfaceRegistry([newsSlice, conflictingSurfaceSlice])
+    ).toThrowErrorMatchingInlineSnapshot(`[Error: duplicate public surface id "news:index"]`);
   });
 
   it('keeps path and route-pattern surfaces linkset-friendly', () => {
     const registry = createPublicSurfaceRegistry([newsSlice, compareSlice]);
     const [indexSurface, articleSurface, dataSurface] = registry.surfaces;
 
-    expect(
-      indexSurface && surfaceHref('https://example.com/base', indexSurface),
-    ).toBe('https://example.com/base/news/');
-    expect(
-      articleSurface && surfaceHref('https://example.com/base', articleSurface),
-    ).toBe('/news/:year/:month/:entry/');
-    expect(
-      dataSurface &&
-        surfaceToLinksetItem('https://example.com/base', dataSurface),
-    ).toEqual({
+    expect(indexSurface && surfaceHref('https://example.com/base', indexSurface)).toBe(
+      'https://example.com/base/news/'
+    );
+    expect(articleSurface && surfaceHref('https://example.com/base', articleSurface)).toBe(
+      '/news/:year/:month/:entry/'
+    );
+    expect(dataSurface && surfaceToLinksetItem('https://example.com/base', dataSurface)).toEqual({
       href: 'https://example.com/base/815/compare/data/settlements.json',
       type: 'application/json',
       rel: ['api-catalog'],
-      title: 'Dataset сравнения',
+      title: 'Dataset сравнения'
     });
   });
 
   it('registers root public surfaces', () => {
     const rootPaths = publicSurfaceRegistry
       .surfacesByOwner('root')
-      .map((surface) =>
-        'path' in surface ? surface.path : surface.routePattern,
-      );
+      .map((surface) => ('path' in surface ? surface.path : surface.routePattern));
 
     expect(rootPaths).toEqual([
       '/',
@@ -280,7 +258,7 @@ describe('public surface registry', () => {
       siteLlmsPath(),
       siteLlmsFullPath(),
       siteApiCatalogPath(),
-      siteSkillsPath(),
+      siteSkillsPath()
     ]);
   });
 
@@ -288,13 +266,7 @@ describe('public surface registry', () => {
     const surfaces = publicSurfaceRegistry.surfacesByOwner('kb');
     const byId = new Map(surfaces.map((surface) => [surface.id, surface]));
     const surfaceIds = surfaces.map((surface) => surface.id);
-    const forbiddenIds = [
-      'kb:data',
-      'kb:schema',
-      'kb:openapi',
-      'kb:llms',
-      'kb:llms-full',
-    ];
+    const forbiddenIds = ['kb:data', 'kb:schema', 'kb:openapi', 'kb:llms', 'kb:llms-full'];
     const rootCatalog = catalog('https://example.com/sub') as {
       readonly linkset: readonly { readonly anchor?: string }[];
     };
@@ -302,50 +274,41 @@ describe('public surface registry', () => {
     expect(kbPublicSurfaceSlice.owner).toEqual({
       id: 'kb',
       label: 'База знаний',
-      entryPath: kbPath(),
+      entryPath: kbPath()
     });
-    expect(publicSurfaceRegistry.surfaceOwner('kb:index')).toEqual(
-      kbPublicSurfaceSlice.owner,
-    );
-    expect(surfaceIds).toEqual([
-      'kb:index',
-      'kb:index-markdown',
-      'kb:page',
-      'kb:page-markdown',
-    ]);
+    expect(publicSurfaceRegistry.surfaceOwner('kb:index')).toEqual(kbPublicSurfaceSlice.owner);
+    expect(surfaceIds).toEqual(['kb:index', 'kb:index-markdown', 'kb:page', 'kb:page-markdown']);
     expect(byId.get('kb:index')).toMatchObject({
       path: kbPath(),
       mediaType: 'text/html',
       cacheClass: 'html',
       discoveryRoles: ['section-entry'],
-      catalogRole: 'anchor',
+      catalogRole: 'anchor'
     });
     expect(byId.get('kb:index-markdown')).toMatchObject({
       path: kbMarkdownPath(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
       discoveryRoles: ['markdown-companion'],
-      catalogRole: 'item',
+      catalogRole: 'item'
     });
     expect(byId.get('kb:page')).toMatchObject({
       routePattern: kbDetailPattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     });
     expect(byId.get('kb:page')).not.toHaveProperty('catalogRole');
     expect(byId.get('kb:page-markdown')).toMatchObject({
       routePattern: kbDetailMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     });
     expect(byId.get('kb:page-markdown')).not.toHaveProperty('catalogRole');
     expect(surfaceIds).not.toEqual(expect.arrayContaining(forbiddenIds));
     expect(rootCatalog.linkset).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ anchor: 'https://example.com/sub/kb/' }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ anchor: 'https://example.com/sub/kb/' })])
     );
   });
 
@@ -355,34 +318,34 @@ describe('public surface registry', () => {
 
     expect(byId.get('news:index')).toMatchObject({ path: newsPath() });
     expect(byId.get('news:index-markdown')).toMatchObject({
-      path: newsMarkdownPath(),
+      path: newsMarkdownPath()
     });
     expect(byId.get('news:archive')).toMatchObject({
-      path: newsArchivePath(),
+      path: newsArchivePath()
     });
     expect(byId.get('news:archive-markdown')).toMatchObject({
-      path: newsArchiveMarkdownPath(),
+      path: newsArchiveMarkdownPath()
     });
     expect(byId.get('news:article')).toMatchObject({
-      routePattern: articlePattern(),
+      routePattern: articlePattern()
     });
     expect(byId.get('news:article-markdown')).toMatchObject({
-      routePattern: articleMarkdownPattern(),
+      routePattern: articleMarkdownPattern()
     });
     expect(byId.get('news:data')).toMatchObject({ path: articlesDataPath() });
     expect(byId.get('news:rss')).toMatchObject({ path: newsFeedPath() });
     expect(byId.get('news:schema')).toMatchObject({
-      path: articlesSchemaPath(),
+      path: articlesSchemaPath()
     });
     expect(byId.get('news:openapi')).toMatchObject({
-      path: articlesOpenApiPath(),
+      path: articlesOpenApiPath()
     });
     expect(byId.get('news:api-catalog')).toMatchObject({
-      path: newsApiCatalogPath(),
+      path: newsApiCatalogPath()
     });
     expect(byId.get('news:llms')).toMatchObject({ path: newsLlmsPath() });
     expect(byId.get('news:llms-full')).toMatchObject({
-      path: newsLlmsFullPath(),
+      path: newsLlmsFullPath()
     });
   });
 
@@ -392,7 +355,7 @@ describe('public surface registry', () => {
 
     expect(byId.get('status:index')).toMatchObject({ path: statusPath() });
     expect(byId.get('status:index-markdown')).toMatchObject({
-      path: statusMarkdownPath(),
+      path: statusMarkdownPath()
     });
     expect(byId.get('status:history')).toMatchObject({
       path: statusHistoryPath(),
@@ -400,10 +363,10 @@ describe('public surface registry', () => {
         {
           rel: 'alternate',
           href: statusMarkdownPath(),
-          mediaType: 'text/markdown',
-        },
+          mediaType: 'text/markdown'
+        }
       ],
-      acceptsNegotiation: 'required',
+      acceptsNegotiation: 'required'
     });
     expect(byId.get('status:calendar-year')).toMatchObject({
       routePattern: statusCalendarYearPattern(),
@@ -414,16 +377,16 @@ describe('public surface registry', () => {
         {
           rel: 'alternate',
           href: statusCalendarYearMarkdownPattern(),
-          mediaType: 'text/markdown',
-        },
+          mediaType: 'text/markdown'
+        }
       ],
-      acceptsNegotiation: 'required',
+      acceptsNegotiation: 'required'
     });
     expect(byId.get('status:calendar-year-markdown')).toMatchObject({
       routePattern: statusCalendarYearMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     });
     expect(byId.get('status:calendar-month')).toMatchObject({
       routePattern: statusCalendarMonthPattern(),
@@ -434,49 +397,49 @@ describe('public surface registry', () => {
         {
           rel: 'alternate',
           href: statusCalendarMonthMarkdownPattern(),
-          mediaType: 'text/markdown',
-        },
+          mediaType: 'text/markdown'
+        }
       ],
-      acceptsNegotiation: 'required',
+      acceptsNegotiation: 'required'
     });
     expect(byId.get('status:calendar-month-markdown')).toMatchObject({
       routePattern: statusCalendarMonthMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     });
     expect(byId.get('status:service')).toMatchObject({
-      routePattern: statusServicePattern(),
+      routePattern: statusServicePattern()
     });
     expect(byId.get('status:service-markdown')).toMatchObject({
-      routePattern: statusServiceMarkdownPattern(),
+      routePattern: statusServiceMarkdownPattern()
     });
     expect(byId.get('status:incident')).toMatchObject({
-      routePattern: statusIncidentPattern(),
+      routePattern: statusIncidentPattern()
     });
     expect(byId.get('status:incident')).toMatchObject({
-      routePattern: '/status/incidents/:year/:month/:entry/',
+      routePattern: '/status/incidents/:year/:month/:entry/'
     });
     expect(byId.get('status:incident-markdown')).toMatchObject({
-      routePattern: statusIncidentMarkdownPattern(),
+      routePattern: statusIncidentMarkdownPattern()
     });
     expect(byId.get('status:incident-markdown')).toMatchObject({
-      routePattern: '/status/incidents/:year/:month/:entry/index.md',
+      routePattern: '/status/incidents/:year/:month/:entry/index.md'
     });
     expect(byId.get('status:data')).toMatchObject({ path: statusDataPath() });
     expect(byId.get('status:rss')).toMatchObject({ path: statusFeedPath() });
     expect(byId.get('status:schema')).toMatchObject({
-      path: statusSchemaPath(),
+      path: statusSchemaPath()
     });
     expect(byId.get('status:openapi')).toMatchObject({
-      path: statusOpenApiPath(),
+      path: statusOpenApiPath()
     });
     expect(byId.get('status:api-catalog')).toMatchObject({
-      path: statusApiCatalogPath(),
+      path: statusApiCatalogPath()
     });
     expect(byId.get('status:llms')).toMatchObject({ path: statusLlmsPath() });
     expect(byId.get('status:llms-full')).toMatchObject({
-      path: statusLlmsFullPath(),
+      path: statusLlmsFullPath()
     });
   });
 
@@ -491,20 +454,18 @@ describe('public surface registry', () => {
     expect(owner).toEqual({
       id: 'meetings',
       label: 'Архив встреч',
-      entryPath: meetingsMarkdownPath(),
+      entryPath: meetingsMarkdownPath()
     });
-    expect(
-      surfaces.some(
-        (surface) => 'path' in surface && surface.path === '/meetings/',
-      ),
-    ).toBe(false);
+    expect(surfaces.some((surface) => 'path' in surface && surface.path === '/meetings/')).toBe(
+      false
+    );
     expect(index).toMatchObject({
       id: 'meetings:index-markdown',
       path: meetingsMarkdownPath(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
       discoveryRoles: ['section-entry', 'markdown-companion'],
-      catalogRole: 'anchor',
+      catalogRole: 'anchor'
     });
     expect(detail).toMatchObject({
       id: 'meetings:detail',
@@ -512,23 +473,23 @@ describe('public surface registry', () => {
       routePattern: meetingPattern(),
       mediaType: 'text/html',
       cacheClass: 'html',
-      discoveryRoles: ['detail-page'],
+      discoveryRoles: ['detail-page']
     });
     expect(byId.get('meetings:detail-markdown')).toMatchObject({
       routePattern: meetingMarkdownPattern(),
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     });
     expect(byId.get('meetings:transcript-part-markdown')).toMatchObject({
       routePattern: meetingTranscriptPartMarkdownPattern(),
-      discoveryRoles: ['markdown-companion'],
+      discoveryRoles: ['markdown-companion']
     });
     expect(detail).not.toHaveProperty('catalogRole');
     expect(detail).not.toHaveProperty('linkRelations');
     expect(detail).not.toHaveProperty('acceptsNegotiation');
     expect(
       publicSurfaceRegistry.surfaces.some(
-        (surface) => 'path' in surface && surface.path === '/meetings/',
-      ),
+        (surface) => 'path' in surface && surface.path === '/meetings/'
+      )
     ).toBe(false);
   });
 
@@ -536,34 +497,32 @@ describe('public surface registry', () => {
     const surfaces = publicSurfaceRegistry.surfacesByOwner('people');
     const byId = new Map(surfaces.map((surface) => [surface.id, surface]));
 
-    expect(
-      surfaces.some(
-        (surface) => 'path' in surface && surface.path === '/people/',
-      ),
-    ).toBe(false);
+    expect(surfaces.some((surface) => 'path' in surface && surface.path === '/people/')).toBe(
+      false
+    );
     expect(byId.get('people:index-markdown')).toMatchObject({
       path: peopleMarkdownPath(),
-      discoveryRoles: ['section-entry', 'markdown-companion'],
+      discoveryRoles: ['section-entry', 'markdown-companion']
     });
     expect(byId.get('people:profile')).toMatchObject({
-      routePattern: personPattern(),
+      routePattern: personPattern()
     });
     expect(byId.get('people:profile-markdown')).toMatchObject({
-      routePattern: personMarkdownPattern(),
+      routePattern: personMarkdownPattern()
     });
     expect(byId.get('people:data')).toMatchObject({ path: peopleDataPath() });
     expect(byId.get('people:schema')).toMatchObject({
-      path: peopleSchemaPath(),
+      path: peopleSchemaPath()
     });
     expect(byId.get('people:openapi')).toMatchObject({
-      path: peopleOpenApiPath(),
+      path: peopleOpenApiPath()
     });
     expect(byId.get('people:api-catalog')).toMatchObject({
-      path: peopleApiCatalogPath(),
+      path: peopleApiCatalogPath()
     });
     expect(byId.get('people:llms')).toMatchObject({ path: peopleLlmsPath() });
     expect(byId.get('people:llms-full')).toMatchObject({
-      path: peopleLlmsFullPath(),
+      path: peopleLlmsFullPath()
     });
   });
 
@@ -576,29 +535,21 @@ describe('public surface registry', () => {
       'reviews:rules',
       'reviews:rules-markdown',
       'reviews:review',
-      'reviews:review-markdown',
+      'reviews:review-markdown'
     ]);
     expect(
-      reviews.map((surface) =>
-        'path' in surface ? surface.path : surface.routePattern,
-      ),
+      reviews.map((surface) => ('path' in surface ? surface.path : surface.routePattern))
     ).toEqual([
       reviewsPath(),
       reviewsMarkdownPath(),
       reviewsRulesPath(),
       reviewsRulesMarkdownPath(),
       reviewPattern(),
-      reviewMarkdownPattern(),
+      reviewMarkdownPattern()
     ]);
-    expect(
-      reviews.some((surface) => surface.discoveryRoles.includes('data-feed')),
-    ).toBe(false);
-    expect(
-      reviews.some((surface) => surface.discoveryRoles.includes('schema')),
-    ).toBe(false);
-    expect(
-      reviews.some((surface) => surface.discoveryRoles.includes('llms')),
-    ).toBe(false);
+    expect(reviews.some((surface) => surface.discoveryRoles.includes('data-feed'))).toBe(false);
+    expect(reviews.some((surface) => surface.discoveryRoles.includes('schema'))).toBe(false);
+    expect(reviews.some((surface) => surface.discoveryRoles.includes('llms'))).toBe(false);
   });
 
   it('registers contacts HTML, Markdown and vCard surfaces without feeds or APIs', () => {
@@ -610,7 +561,7 @@ describe('public surface registry', () => {
       }[];
     };
     const contactsEntry = rootCatalog.linkset.find(
-      (entry) => entry.anchor === 'https://example.com/sub/sarafan/',
+      (entry) => entry.anchor === 'https://example.com/sub/sarafan/'
     );
 
     expect(contacts.map((surface) => surface.id)).toEqual([
@@ -620,12 +571,10 @@ describe('public surface registry', () => {
       'contacts:category-markdown',
       'contacts:contact',
       'contacts:contact-markdown',
-      'contacts:contact-vcard',
+      'contacts:contact-vcard'
     ]);
     expect(
-      contacts.map((surface) =>
-        'path' in surface ? surface.path : surface.routePattern,
-      ),
+      contacts.map((surface) => ('path' in surface ? surface.path : surface.routePattern))
     ).toEqual([
       contactsPath(),
       contactsMarkdownPath(),
@@ -633,25 +582,19 @@ describe('public surface registry', () => {
       contactCategoryMarkdownPattern(),
       contactPattern(),
       contactMarkdownPattern(),
-      contactVcfPattern(),
+      contactVcfPattern()
     ]);
     expect(contactsEntry?.item).toEqual([
       expect.objectContaining({
-        href: 'https://example.com/sub/sarafan/index.md',
-      }),
+        href: 'https://example.com/sub/sarafan/index.md'
+      })
     ]);
-    expect(
-      contacts.some((surface) => surface.discoveryRoles.includes('data-feed')),
-    ).toBe(false);
-    expect(
-      contacts.some((surface) => surface.discoveryRoles.includes('schema')),
-    ).toBe(false);
+    expect(contacts.some((surface) => surface.discoveryRoles.includes('data-feed'))).toBe(false);
+    expect(contacts.some((surface) => surface.discoveryRoles.includes('schema'))).toBe(false);
     expect(contacts.map((surface) => surface.id)).not.toEqual(
-      expect.arrayContaining(['contacts:openapi', 'contacts:rss']),
+      expect.arrayContaining(['contacts:openapi', 'contacts:rss'])
     );
-    expect(
-      contacts.some((surface) => surface.discoveryRoles.includes('llms')),
-    ).toBe(false);
+    expect(contacts.some((surface) => surface.discoveryRoles.includes('llms'))).toBe(false);
   });
 
   it('registers places HTML, Markdown, and map data surfaces', () => {
@@ -662,87 +605,81 @@ describe('public surface registry', () => {
       'places:index-markdown',
       'places:data',
       'places:detail',
-      'places:detail-markdown',
+      'places:detail-markdown'
     ]);
     expect(
-      places.map((surface) =>
-        'path' in surface ? surface.path : surface.routePattern,
-      ),
+      places.map((surface) => ('path' in surface ? surface.path : surface.routePattern))
     ).toEqual([
       placesPath(),
       placesMarkdownPath(),
       placesDataPath(),
       placePattern(),
-      placeMarkdownPattern(),
+      placeMarkdownPattern()
     ]);
-    expect(
-      places.some((surface) => surface.discoveryRoles.includes('data-feed')),
-    ).toBe(true);
+    expect(places.some((surface) => surface.discoveryRoles.includes('data-feed'))).toBe(true);
   });
 
   it('registers every reglament public path from the reglament-owned slice', () => {
     const surfaces = publicSurfaceRegistry.surfacesByOwner('reglament');
 
-    expect(
-      surfaces.map((surface) => ('path' in surface ? surface.path : '')),
-    ).toEqual([
+    expect(surfaces.map((surface) => ('path' in surface ? surface.path : ''))).toEqual([
       ...REGLAMENT_PUBLIC_PATHS,
       reglamentFullSourcePdfUrl(),
-      ...REGLAMENT_SOURCE_PDF_URLS,
+      ...REGLAMENT_SOURCE_PDF_URLS
     ]);
-    expect(
-      publicSurfaceRegistry.surfaceOwner('reglament:data-estimate-2026'),
-    ).toEqual(reglamentPublicSurfaceSlice.owner);
+    expect(publicSurfaceRegistry.surfaceOwner('reglament:data-estimate-2026')).toEqual(
+      reglamentPublicSurfaceSlice.owner
+    );
   });
 
   it('registers compare surfaces from the compare-owned slice', () => {
     const surfaces = publicSurfaceRegistry.surfacesByOwner('compare');
     const byId = new Map(surfaces.map((surface) => [surface.id, surface]));
 
-    expect(
-      publicSurfaceRegistry.surfaceOwner('compare:data-settlements'),
-    ).toEqual(comparePublicSurfaceSlice.owner);
+    expect(publicSurfaceRegistry.surfaceOwner('compare:data-settlements')).toEqual(
+      comparePublicSurfaceSlice.owner
+    );
     expect(byId.get('compare:index')).toMatchObject({
-      path: comparePath(),
+      path: comparePath()
     });
     expect(byId.get('compare:rating')).toMatchObject({
-      path: compareRatingPath(),
+      path: compareRatingPath()
     });
     expect(byId.get('compare:settlement')).toMatchObject({
-      routePattern: compareSettlementPattern(),
+      routePattern: compareSettlementPattern()
     });
     expect(byId.get('compare:index-markdown')).toMatchObject({
-      path: compareMarkdownPath(),
+      path: compareMarkdownPath()
     });
     expect(byId.get('compare:rating-markdown')).toMatchObject({
-      path: compareRatingMarkdownPath(),
+      path: compareRatingMarkdownPath()
     });
     expect(byId.get('compare:settlement-markdown')).toMatchObject({
-      routePattern: compareSettlementMarkdownPattern(),
+      routePattern: compareSettlementMarkdownPattern()
     });
     expect(byId.get('compare:data-settlements')).toMatchObject({
-      path: compareSettlementsDataPath(),
+      path: compareSettlementsDataPath()
     });
     expect(byId.get('compare:data-explorer')).toMatchObject({
-      path: compareExplorerDataPath(),
+      path: compareExplorerDataPath()
     });
     expect(byId.get('compare:schema')).toMatchObject({
-      path: compareSchemaPath(),
+      path: compareSchemaPath()
     });
     expect(byId.get('compare:openapi')).toMatchObject({
-      path: compareOpenApiPath(),
+      path: compareOpenApiPath()
     });
     expect(byId.get('compare:api-catalog')).toMatchObject({
-      path: compareApiCatalogPath(),
+      path: compareApiCatalogPath()
     });
     expect(byId.get('compare:llms')).toMatchObject({
-      path: compareLlmsPath(),
+      path: compareLlmsPath()
     });
     expect(byId.get('compare:llms-full')).toMatchObject({
-      path: compareLlmsFullPath(),
+      path: compareLlmsFullPath()
     });
     expect(byId.get('compare:skills')).toMatchObject({
-      path: compareSkillsPath(),
+      path: compareSkillsPath()
     });
   });
 });

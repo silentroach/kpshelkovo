@@ -12,7 +12,7 @@ const COMPARE_LABEL = 'Сравнение тарифов';
 export const compareBreadcrumbs = () =>
   [
     { label: HOME_LABEL, href: '/' },
-    { label: COMPARE_LABEL, href: withBase('/') },
+    { label: COMPARE_LABEL, href: withBase('/') }
   ] as const;
 
 export const comparePageBreadcrumbs = (label: string, path: string) =>
@@ -23,9 +23,8 @@ export const settlementBreadcrumbs = (name: string, slug: string) =>
 
 const schemaBreadcrumb = (item: Required<BreadcrumbItem>): BreadcrumbLink => ({
   name: item.label,
-  url: item.href,
+  url: item.href
 });
 
-export const compareBreadcrumbSchema = (
-  items: readonly Required<BreadcrumbItem>[],
-): SchemaDoc => breadcrumbListSchema(items.map(schemaBreadcrumb));
+export const compareBreadcrumbSchema = (items: readonly Required<BreadcrumbItem>[]): SchemaDoc =>
+  breadcrumbListSchema(items.map(schemaBreadcrumb));

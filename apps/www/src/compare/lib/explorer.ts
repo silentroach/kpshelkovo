@@ -3,15 +3,12 @@ import {
   toPublicStats,
   type PublicComparison,
   type PublicComparisons,
-  type PublicStats,
+  type PublicStats
 } from './public-dto';
 import type { Rating } from './rating';
 import type { Settlement } from './settlement/types';
 
-export type ExplorerLocation = Pick<
-  Settlement['location'],
-  'lat' | 'lng' | 'district'
->;
+export type ExplorerLocation = Pick<Settlement['location'], 'lat' | 'lng' | 'district'>;
 
 export interface ExplorerTariff {
   normalizedPerSotkaMonth: Settlement['tariff']['normalizedPerSotkaMonth'];
@@ -49,7 +46,7 @@ export interface ExplorerPayloadInput {
 export function toExplorer(
   settlements: readonly Settlement[],
   ratings: ReadonlyMap<string, Rating>,
-  baseline: Settlement,
+  baseline: Settlement
 ): ExplorerSettlement[] {
   return settlements.map((item) => {
     const company = item.managementCompany;
@@ -62,21 +59,19 @@ export function toExplorer(
       ...(item.rabstvo ? { rabstvo: true } : {}),
       ...(company
         ? {
-            managementCompany: company.url
-              ? { title: company.title }
-              : company.title,
+            managementCompany: company.url ? { title: company.title } : company.title
           }
         : {}),
       isBaseline: item.slug === baseline.slug,
       location: {
         lat: item.location.lat,
         lng: item.location.lng,
-        district: item.location.district,
+        district: item.location.district
       },
       tariff: {
         normalizedPerSotkaMonth: item.tariff.normalizedPerSotkaMonth,
-        normalizedIsEstimate: item.tariff.normalizedIsEstimate,
-      },
+        normalizedIsEstimate: item.tariff.normalizedIsEstimate
+      }
     };
   });
 }
@@ -86,9 +81,9 @@ export const toExplorerPayload = ({
   baseline,
   stats,
   comparisons,
-  ratings,
+  ratings
 }: ExplorerPayloadInput): ExplorerPayload => ({
   settlements: toExplorer(settlements, ratings, baseline),
   stats: toPublicStats(stats),
-  comparisons: toPublicComparisons(comparisons),
+  comparisons: toPublicComparisons(comparisons)
 });

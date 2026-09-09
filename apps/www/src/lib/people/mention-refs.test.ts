@@ -12,7 +12,7 @@ const profile = {
   url: '/people/apetrov/',
   markdownUrl: '/people/apetrov/index.md',
   body: 'Работал вместе с [Кирилл Щемелинин](/people/kschemelinin/).\n\nВторой абзац.',
-  mentions: [target],
+  mentions: [target]
 } satisfies Parameters<typeof createPersonProfileMentionRefs>[0];
 
 describe('createPersonProfileMentionRefs', () => {
@@ -25,8 +25,8 @@ describe('createPersonProfileMentionRefs', () => {
         title: 'Андрей Петров',
         htmlUrl: '/people/apetrov/',
         markdownUrl: '/people/apetrov/index.md',
-        excerpt: 'Работал вместе с Кирилл Щемелинин.',
-      },
+        excerpt: 'Работал вместе с Кирилл Щемелинин.'
+      }
     ]);
   });
 
@@ -34,8 +34,8 @@ describe('createPersonProfileMentionRefs', () => {
     expect(
       createPersonProfileMentionRefs({
         ...profile,
-        mentions: [target, target],
-      }),
+        mentions: [target, target]
+      })
     ).toHaveLength(1);
   });
 
@@ -46,8 +46,8 @@ describe('createPersonProfileMentionRefs', () => {
         get body(): string {
           throw new Error('body should not be read');
         },
-        mentions: [],
-      }),
+        mentions: []
+      })
     ).toEqual([]);
   });
 });

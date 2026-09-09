@@ -7,11 +7,10 @@ const SOURCE_PDF_LABELS = {
   improvement: 'Детализация благоустройства',
   lighting: 'Детализация освещения',
   security: 'Детализация охраны',
-  waste: 'Детализация вывоза мусора',
+  waste: 'Детализация вывоза мусора'
 } as const satisfies Record<EstimateSourcePdf, string>;
 
-export const estimateSourcePdfLabel = (pdf: EstimateSourcePdf): string =>
-  SOURCE_PDF_LABELS[pdf];
+export const estimateSourcePdfLabel = (pdf: EstimateSourcePdf): string => SOURCE_PDF_LABELS[pdf];
 
 export const formatEstimateSourceRefLabel = (ref: EstimateSourceRef): string =>
   `${estimateSourcePdfLabel(ref.pdf)}, стр. ${ref.page}${ref.fragment ? `, ${ref.fragment}` : ''}`;

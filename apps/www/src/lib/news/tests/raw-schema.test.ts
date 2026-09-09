@@ -1,11 +1,11 @@
-import { describe, expect, it } from 'vitest';
-import type { SchemaContext } from 'astro:content';
 import { z } from 'astro/zod';
+import type { SchemaContext } from 'astro:content';
+import { describe, expect, it } from 'vitest';
 
 import {
   createRawNewsArticleSchema,
   RawNewsAuthorSchema,
-  RawNewsEventsSchema,
+  RawNewsEventsSchema
 } from '../raw-schema';
 
 const image: SchemaContext['image'] = () =>
@@ -22,8 +22,8 @@ const image: SchemaContext['image'] = () =>
       z.literal('gif'),
       z.literal('svg'),
       z.literal('avif'),
-      z.literal('apng'),
-    ]),
+      z.literal('apng')
+    ])
   });
 const articleSchema = createRawNewsArticleSchema(image);
 
@@ -31,39 +31,36 @@ const article = {
   title: 'Заголовок новости',
   summary: 'Краткое описание новости.',
   date: '05.05.2026',
-  author: 'editorial',
+  author: 'editorial'
 };
 
 const photo = {
   url: 'https://media.kpshelkovo.online/news/2026/05/article/photo.jpeg',
   width: 1280,
   height: 960,
-  alt: 'Фото с места',
+  alt: 'Фото с места'
 };
 
 const cover = {
   src: '/src/data/news/articles/2026/05/article/cover.jpeg',
   width: 1200,
   height: 675,
-  format: 'jpeg' as const,
+  format: 'jpeg' as const
 };
 
 const event = {
   title: 'Встреча по регламенту',
-  starts_at: '31.05.2026 19:00',
+  starts_at: '31.05.2026 19:00'
 };
 
-const validationIssues = <Output>(
-  result: z.ZodSafeParseResult<Output>,
-  subject: string,
-) => {
+const validationIssues = <Output>(result: z.ZodSafeParseResult<Output>, subject: string) => {
   if (result.success) {
     throw new Error(`Expected ${subject} validation to fail`);
   }
 
   return result.error.issues.map((issue) => ({
     path: issue.path,
-    message: issue.message,
+    message: issue.message
   }));
 };
 
@@ -89,20 +86,20 @@ describe('news article raw schema', () => {
           title: '  Публичный договор  ',
           url: '/documents/contract.pdf',
           type: '  PDF  ',
-          size: '  1 МБ  ',
-        },
+          size: '  1 МБ  '
+        }
       ],
       photos: [
         {
           ...photo,
           alt: '  Фото с места  ',
-          caption: '  Подпись к фотографии.  ',
-        },
+          caption: '  Подпись к фотографии.  '
+        }
       ],
       seo: {
         title: '  Короткий заголовок  ',
-        description: '  Описание для поисковой выдачи.  ',
-      },
+        description: '  Описание для поисковой выдачи.  '
+      }
     });
 
     expect({
@@ -111,7 +108,7 @@ describe('news article raw schema', () => {
       cover_alt: parsed.cover_alt,
       attachments: parsed.attachments,
       photos: parsed.photos,
-      seo: parsed.seo,
+      seo: parsed.seo
     }).toMatchInlineSnapshot(`
       {
         "attachments": [
@@ -146,20 +143,20 @@ describe('news article raw schema', () => {
     {
       field: 'title',
       input: { ...article, title: ' \t ' },
-      path: ['title'],
+      path: ['title']
     },
     {
       field: 'summary',
       input: { ...article, summary: ' \t ' },
-      path: ['summary'],
+      path: ['summary']
     },
     {
       field: 'attachments[].title',
       input: {
         ...article,
-        attachments: [{ title: ' \t ', url: '/documents/contract.pdf' }],
+        attachments: [{ title: ' \t ', url: '/documents/contract.pdf' }]
       },
-      path: ['attachments', 0, 'title'],
+      path: ['attachments', 0, 'title']
     },
     {
       field: 'attachments[].type',
@@ -169,11 +166,11 @@ describe('news article raw schema', () => {
           {
             title: 'Публичный договор',
             url: '/documents/contract.pdf',
-            type: ' \t ',
-          },
-        ],
+            type: ' \t '
+          }
+        ]
       },
-      path: ['attachments', 0, 'type'],
+      path: ['attachments', 0, 'type']
     },
     {
       field: 'attachments[].size',
@@ -183,47 +180,47 @@ describe('news article raw schema', () => {
           {
             title: 'Публичный договор',
             url: '/documents/contract.pdf',
-            size: ' \t ',
-          },
-        ],
+            size: ' \t '
+          }
+        ]
       },
-      path: ['attachments', 0, 'size'],
+      path: ['attachments', 0, 'size']
     },
     {
       field: 'photos[].alt',
       input: { ...article, photos: [{ ...photo, alt: ' \t ' }] },
-      path: ['photos', 0, 'alt'],
+      path: ['photos', 0, 'alt']
     },
     {
       field: 'photos[].caption',
       input: { ...article, photos: [{ ...photo, caption: ' \t ' }] },
-      path: ['photos', 0, 'caption'],
+      path: ['photos', 0, 'caption']
     },
     {
       field: 'seo.title',
       input: { ...article, seo: { title: ' \t ' } },
-      path: ['seo', 'title'],
+      path: ['seo', 'title']
     },
     {
       field: 'seo.description',
       input: { ...article, seo: { description: ' \t ' } },
-      path: ['seo', 'description'],
-    },
+      path: ['seo', 'description']
+    }
   ])('rejects whitespace-only $field at its path', ({ field, input, path }) => {
     expect(articleValidationIssues(input)).toEqual([
-      { path, message: `${field} must not be blank` },
+      { path, message: `${field} must not be blank` }
     ]);
   });
 
   it.each([
     { case: 'omitted', input: { ...article, cover } },
-    { case: 'blank', input: { ...article, cover, cover_alt: ' \t ' } },
+    { case: 'blank', input: { ...article, cover, cover_alt: ' \t ' } }
   ])('requires a non-blank cover_alt when it is $case', ({ input }) => {
     expect(articleValidationIssues(input)).toEqual([
       {
         path: ['cover_alt'],
-        message: 'cover_alt is required when cover is set',
-      },
+        message: 'cover_alt is required when cover is set'
+      }
     ]);
   });
 });
@@ -234,8 +231,8 @@ describe('RawNewsAuthorSchema', () => {
       RawNewsAuthorSchema.parse({
         name: '  Редакция  ',
         kind: 'editorial',
-        short_name: '  Редакция  ',
-      }),
+        short_name: '  Редакция  '
+      })
     ).toMatchInlineSnapshot(`
       {
         "kind": "editorial",
@@ -249,11 +246,11 @@ describe('RawNewsAuthorSchema', () => {
     { field: 'name', input: { name: ' \t ', kind: 'editorial' } },
     {
       field: 'short_name',
-      input: { name: 'Редакция', kind: 'editorial', short_name: ' \t ' },
-    },
+      input: { name: 'Редакция', kind: 'editorial', short_name: ' \t ' }
+    }
   ])('rejects whitespace-only $field at its path', ({ field, input }) => {
     expect(authorValidationIssues(input)).toEqual([
-      { path: [field], message: `${field} must not be blank` },
+      { path: [field], message: `${field} must not be blank` }
     ]);
   });
 });
@@ -268,8 +265,8 @@ describe('RawNewsEventsSchema', () => {
         ends_at: '31.05.2026 21:00',
         location: '  Эко-клуб  ',
         organizer: '  ОК Комфорт  ',
-        performer: ['  Ведущий  '],
-      },
+        performer: ['  Ведущий  ']
+      }
     ]);
     if (!parsed) {
       throw new Error('Expected a parsed news event');
@@ -280,7 +277,7 @@ describe('RawNewsEventsSchema', () => {
       description: parsed.description,
       location: parsed.location,
       organizer: parsed.organizer,
-      performer: parsed.performer,
+      performer: parsed.performer
     }).toMatchInlineSnapshot(`
       {
         "description": "Обсудим новый регламент.",
@@ -298,27 +295,25 @@ describe('RawNewsEventsSchema', () => {
     {
       name: 'start without time',
       input: [{ ...event, starts_at: '31.05.2026' }],
-      message: 'events[].starts_at must use dd.mm.yyyy hh:mm and include time',
+      message: 'events[].starts_at must use dd.mm.yyyy hh:mm and include time'
     },
     {
       name: 'end without time',
       input: [{ ...event, ends_at: '31.05.2026' }],
-      message: 'events[].ends_at must use dd.mm.yyyy hh:mm and include time',
+      message: 'events[].ends_at must use dd.mm.yyyy hh:mm and include time'
     },
     {
       name: 'invalid coordinates',
       input: [{ ...event, coordinates: { lat: 91, lng: 38 } }],
-      message: 'events[].coordinates.lat must be between -90 and 90',
+      message: 'events[].coordinates.lat must be between -90 and 90'
     },
     {
       name: 'blank performer',
       input: [{ ...event, performer: ['   '] }],
-      message: 'events[].performer[] must not be blank',
-    },
+      message: 'events[].performer[] must not be blank'
+    }
   ])('rejects $name', ({ input, message }) => {
-    expect(eventValidationIssues(input).map((issue) => issue.message)).toEqual([
-      message,
-    ]);
+    expect(eventValidationIssues(input).map((issue) => issue.message)).toEqual([message]);
   });
 
   it('rejects an event that does not end after it starts', () => {
@@ -326,9 +321,9 @@ describe('RawNewsEventsSchema', () => {
       eventValidationIssues([
         {
           ...event,
-          ends_at: '31.05.2026 19:00',
-        },
-      ]),
+          ends_at: '31.05.2026 19:00'
+        }
+      ])
     ).toMatchInlineSnapshot(`
       [
         {
@@ -344,11 +339,7 @@ describe('RawNewsEventsSchema', () => {
 
   it('requires unique explicit slugs for multiple events', () => {
     expect(
-      eventValidationIssues([
-        event,
-        { ...event, slug: 'meeting' },
-        { ...event, slug: 'meeting' },
-      ]),
+      eventValidationIssues([event, { ...event, slug: 'meeting' }, { ...event, slug: 'meeting' }])
     ).toMatchInlineSnapshot(`
       [
         {

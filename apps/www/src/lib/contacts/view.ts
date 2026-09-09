@@ -1,14 +1,9 @@
-import { extractFirstMarkdownText } from '@shelkovo/markdown';
 import { formatDate } from '@shelkovo/format';
+import { extractFirstMarkdownText } from '@shelkovo/markdown';
 
-import type { ContactCategory } from './schema';
 import { formatContactPhone, normalizeContactPhone } from './phone';
-import type {
-  Contact,
-  ContactContacts,
-  ContactLocation,
-  ContactReview,
-} from './types';
+import type { ContactCategory } from './schema';
+import type { Contact, ContactContacts, ContactLocation, ContactReview } from './types';
 
 export interface ContactMethod {
   readonly type: keyof ContactContacts;
@@ -32,7 +27,7 @@ const CONTACT_CATEGORY_LABELS: Record<ContactCategory, string> = {
   garden: 'Сад и участок',
   food: 'Еда и продукты',
   electricity: 'Электричество',
-  education: 'Дети и обучение',
+  education: 'Дети и обучение'
 };
 
 const CONTACT_CATEGORY_EMOJI: Record<ContactCategory, string> = {
@@ -43,15 +38,12 @@ const CONTACT_CATEGORY_EMOJI: Record<ContactCategory, string> = {
   garden: '🌿',
   food: '🍕',
   electricity: '⚡',
-  education: '📚',
+  education: '📚'
 };
 
-const CONTACT_REVIEW_SENTIMENT_LABELS: Record<
-  ContactReview['sentiment'],
-  string
-> = {
+const CONTACT_REVIEW_SENTIMENT_LABELS: Record<ContactReview['sentiment'], string> = {
   positive: 'Плюс',
-  negative: 'Минус',
+  negative: 'Минус'
 };
 
 const MANY_POSITIVE_CONTACT_REVIEWS_THRESHOLD = 5;
@@ -65,8 +57,7 @@ export const CONTACTS_INTRO_PREFIX = 'Сарафан собирается из �
 export const CONTACTS_INTRO_SUFFIX =
   ': кого позвали, как прошла работа, к кому готовы обратиться снова. Лучше меньше контактов, зато с понятным живым контекстом.';
 export const CONTACTS_NEIGHBOR_TABLE_PREFIX = ' Также есть ';
-export const CONTACTS_NEIGHBOR_TABLE_LABEL =
-  'табличка из соседнего чата Гринвуда';
+export const CONTACTS_NEIGHBOR_TABLE_LABEL = 'табличка из соседнего чата Гринвуда';
 export const CONTACTS_NEIGHBOR_TABLE_URL =
   'https://docs.google.com/spreadsheets/d/1ckmDY1B54Mx9UB1chbybwdbPTF87R--uv2li7VhCfg8/edit?usp=drivesdk';
 export const CONTACTS_NEIGHBOR_TABLE_SUFFIX = '.';
@@ -84,14 +75,14 @@ const method = (
   type: keyof ContactContacts,
   label: string,
   value: string | undefined,
-  href?: string,
+  href?: string
 ): ContactMethod | undefined =>
   value
     ? {
         type,
         label,
         value,
-        href,
+        href
       }
     : undefined;
 
@@ -115,23 +106,20 @@ export const formatContactCategory = (category: ContactCategory): string =>
 export const formatContactCategoryEmoji = (category: ContactCategory): string =>
   CONTACT_CATEGORY_EMOJI[category];
 
-export const formatContactReviewSentiment = (
-  sentiment: ContactReview['sentiment'],
-): string => CONTACT_REVIEW_SENTIMENT_LABELS[sentiment];
+export const formatContactReviewSentiment = (sentiment: ContactReview['sentiment']): string =>
+  CONTACT_REVIEW_SENTIMENT_LABELS[sentiment];
 
 export const formatContactReviewDate = (review: ContactReview): string =>
   formatDate(review.publishedIso);
 
 export const hasManyPositiveContactReviews = (
-  reviews: readonly Pick<ContactReview, 'sentiment'>[],
+  reviews: readonly Pick<ContactReview, 'sentiment'>[]
 ): boolean =>
   !reviews.some(({ sentiment }) => sentiment === 'negative') &&
   reviews.filter(({ sentiment }) => sentiment === 'positive').length >=
     MANY_POSITIVE_CONTACT_REVIEWS_THRESHOLD;
 
-export const contactExcerpt = (
-  contact: Pick<Contact, 'body' | 'summary'>,
-): string => {
+export const contactExcerpt = (contact: Pick<Contact, 'body' | 'summary'>): string => {
   if (contact.summary) {
     return contact.summary;
   }
@@ -140,50 +128,34 @@ export const contactExcerpt = (
     return '';
   }
 
-  const text = (extractFirstMarkdownText(contact.body) ?? '')
-    .replace(/\s+/gu, ' ')
-    .trim();
+  const text = (extractFirstMarkdownText(contact.body) ?? '').replace(/\s+/gu, ' ').trim();
 
   return text;
 };
 
-export const contactMethods = (
-  contacts: ContactContacts,
-): readonly ContactMethod[] => {
+export const contactMethods = (contacts: ContactContacts): readonly ContactMethod[] => {
   const phone = contacts.phone ? formatContactPhone(contacts.phone) : undefined;
 
   return [
-    method(
-      'phone',
-      'Телефон',
-      phone,
-      contacts.phone ? phoneHref(contacts.phone) : undefined,
-    ),
-    method(
-      'telegram',
-      'Telegram',
-      telegramValue(contacts.telegram),
-      contacts.telegram,
-    ),
+    method('phone', 'Телефон', phone, contacts.phone ? phoneHref(contacts.phone) : undefined),
+    method('telegram', 'Telegram', telegramValue(contacts.telegram), contacts.telegram),
     method('whatsapp', 'WhatsApp', contacts.whatsapp, contacts.whatsapp),
     method(
       'email',
       'Email',
       contacts.email,
-      contacts.email ? `mailto:${contacts.email}` : undefined,
+      contacts.email ? `mailto:${contacts.email}` : undefined
     ),
-    method('website', 'Сайт', contacts.website, contacts.website),
+    method('website', 'Сайт', contacts.website, contacts.website)
   ].filter((item): item is ContactMethod => Boolean(item));
 };
 
-export const contactPlace = (
-  location?: ContactLocation,
-): ContactPlace | undefined =>
+export const contactPlace = (location?: ContactLocation): ContactPlace | undefined =>
   location
     ? {
         label: 'Адрес',
         title: location.title,
         href: location.url,
-        address: location.address,
+        address: location.address
       }
     : undefined;

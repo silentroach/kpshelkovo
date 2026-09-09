@@ -1,12 +1,13 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/svelte';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import SettlementMap from './SettlementMap.svelte';
 
 const mockMap = {
   addChild: vi.fn(),
   removeChild: vi.fn(),
   update: vi.fn(),
-  destroy: vi.fn(),
+  destroy: vi.fn()
 };
 
 const markers: HTMLElement[] = [];
@@ -39,7 +40,7 @@ const mockYandexMaps = {
   YMapMarker: vi.fn(function YMapMarker(_: unknown, el: HTMLElement) {
     markers.push(el);
     return { el, update: vi.fn() };
-  }),
+  })
 };
 
 // Мок данных поселков.
@@ -52,7 +53,7 @@ const mockSettlements = [
     lng: 37.1456,
     normalizedTariff: 120,
     isBaseline: true,
-    companyText: 'ОК "Комфорт"',
+    companyText: 'ОК "Комфорт"'
   },
   {
     slug: 'lesnoe',
@@ -62,7 +63,7 @@ const mockSettlements = [
     lng: 37.2,
     normalizedTariff: 80,
     isBaseline: false,
-    companyText: 'УК Лесное',
+    companyText: 'УК Лесное'
   },
   {
     slug: 'usadby',
@@ -72,8 +73,8 @@ const mockSettlements = [
     lng: 37.1,
     normalizedTariff: 150,
     isBaseline: false,
-    companyText: 'УК Усадьбы',
-  },
+    companyText: 'УК Усадьбы'
+  }
 ];
 
 describe('SettlementMap', () => {
@@ -84,18 +85,16 @@ describe('SettlementMap', () => {
     Object.defineProperty(mockYandexMaps, 'ready', {
       value: Promise.resolve(),
       writable: true,
-      configurable: true,
+      configurable: true
     });
     document.head
-      .querySelectorAll(
-        '[data-yandex-maps-api="true"], [data-yandex-maps-test="true"]',
-      )
+      .querySelectorAll('[data-yandex-maps-api="true"], [data-yandex-maps-test="true"]')
       .forEach((node) => node.remove());
 
     Object.defineProperty(window, 'ymaps3', {
       value: mockYandexMaps,
       writable: true,
-      configurable: true,
+      configurable: true
     });
   });
 
@@ -105,27 +104,23 @@ describe('SettlementMap', () => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
     document.head
-      .querySelectorAll(
-        '[data-yandex-maps-api="true"], [data-yandex-maps-test="true"]',
-      )
+      .querySelectorAll('[data-yandex-maps-api="true"], [data-yandex-maps-test="true"]')
       .forEach((node) => node.remove());
     delete (window as { ymaps3?: unknown }).ymaps3;
   });
 
   it('renders map container', () => {
     const { container } = render(SettlementMap, {
-      props: { settlements: mockSettlements },
+      props: { settlements: mockSettlements }
     });
 
-    const mapContainer = container.querySelector(
-      '[data-testid="settlement-map"]',
-    );
+    const mapContainer = container.querySelector('[data-testid="settlement-map"]');
     expect(mapContainer).toBeTruthy();
   });
 
   it('displays loading state initially', () => {
     const { container } = render(SettlementMap, {
-      props: { settlements: mockSettlements },
+      props: { settlements: mockSettlements }
     });
 
     expect(container.textContent).toContain('Загрузка карты');
@@ -133,7 +128,7 @@ describe('SettlementMap', () => {
 
   it('creates markers for all settlements when ymaps3 is available', async () => {
     render(SettlementMap, {
-      props: { settlements: mockSettlements },
+      props: { settlements: mockSettlements }
     });
 
     await waitFor(() => {
@@ -143,7 +138,7 @@ describe('SettlementMap', () => {
 
   it('starts the explorer map over Moscow without an initial autofit', async () => {
     render(SettlementMap, {
-      props: { settlements: mockSettlements, startFromMoscow: true },
+      props: { settlements: mockSettlements, startFromMoscow: true }
     });
 
     await waitFor(() => expect(mockYandexMaps.YMap).toHaveBeenCalledOnce());
@@ -167,8 +162,8 @@ describe('SettlementMap', () => {
       props: {
         settlements: mockSettlements,
         startFromMoscow: true,
-        fitRevision: 0,
-      },
+        fitRevision: 0
+      }
     });
 
     await waitFor(() => expect(mockYandexMaps.YMap).toHaveBeenCalledOnce());
@@ -177,7 +172,7 @@ describe('SettlementMap', () => {
     await rerender({
       settlements: [mockSettlements[1]],
       startFromMoscow: true,
-      fitRevision: 1,
+      fitRevision: 1
     });
 
     await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
@@ -206,8 +201,8 @@ describe('SettlementMap', () => {
       props: {
         settlements: [mockSettlements[1]],
         startFromMoscow: true,
-        fitRevision: 1,
-      },
+        fitRevision: 1
+      }
     });
 
     await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
@@ -240,13 +235,11 @@ describe('SettlementMap', () => {
       props: {
         settlements: [mockSettlements[1]],
         startFromMoscow: true,
-        fitRevision: 1,
-      },
+        fitRevision: 1
+      }
     });
 
-    const retry = await waitFor(() =>
-      getByRole('button', { name: 'Попробовать снова' }),
-    );
+    const retry = await waitFor(() => getByRole('button', { name: 'Попробовать снова' }));
     expect(mockMap.update).not.toHaveBeenCalled();
 
     await fireEvent.click(retry);
@@ -270,14 +263,14 @@ describe('SettlementMap', () => {
       get: () => {
         readyReads += 1;
         return readyReads === 1 ? Promise.resolve() : initializationReady;
-      },
+      }
     });
     const { queryByRole } = render(SettlementMap, {
       props: {
         settlements: mockSettlements,
         startFromMoscow: true,
-        fitRevision: 1,
-      },
+        fitRevision: 1
+      }
     });
     await waitFor(() => expect(readyReads).toBe(2));
     if (!resizeMap) throw new Error('Expected map resize observer');
@@ -298,8 +291,8 @@ describe('SettlementMap', () => {
       props: {
         settlements: mockSettlements,
         startFromMoscow: true,
-        fitRevision: 1,
-      },
+        fitRevision: 1
+      }
     });
     await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
     mockMap.update.mockClear();
@@ -309,9 +302,7 @@ describe('SettlementMap', () => {
     if (!resizeMap) throw new Error('Expected map resize observer');
 
     resizeMap();
-    const retry = await waitFor(() =>
-      getByRole('button', { name: 'Попробовать снова' }),
-    );
+    const retry = await waitFor(() => getByRole('button', { name: 'Попробовать снова' }));
 
     await fireEvent.click(retry);
 
@@ -325,8 +316,8 @@ describe('SettlementMap', () => {
       props: {
         settlements: mockSettlements,
         startFromMoscow: true,
-        fitRevision: 1,
-      },
+        fitRevision: 1
+      }
     });
 
     await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
@@ -349,7 +340,7 @@ describe('SettlementMap', () => {
             lat: 55.8,
             lng: 37.1,
             normalizedTariff: 640,
-            isBaseline: true,
+            isBaseline: true
           },
           {
             slug: 'low',
@@ -358,7 +349,7 @@ describe('SettlementMap', () => {
             lat: 55.81,
             lng: 37.11,
             normalizedTariff: 495,
-            isBaseline: false,
+            isBaseline: false
           },
           {
             slug: 'high',
@@ -367,10 +358,10 @@ describe('SettlementMap', () => {
             lat: 55.82,
             lng: 37.12,
             normalizedTariff: 815,
-            isBaseline: false,
-          },
-        ],
-      },
+            isBaseline: false
+          }
+        ]
+      }
     });
 
     await waitFor(() => {
@@ -392,7 +383,7 @@ describe('SettlementMap', () => {
             lat: 55.8,
             lng: 37.1,
             normalizedTariff: 700,
-            isBaseline: true,
+            isBaseline: true
           },
           {
             slug: 'same-1',
@@ -401,7 +392,7 @@ describe('SettlementMap', () => {
             lat: 55.81,
             lng: 37.11,
             normalizedTariff: 700,
-            isBaseline: false,
+            isBaseline: false
           },
           {
             slug: 'same-2',
@@ -410,10 +401,10 @@ describe('SettlementMap', () => {
             lat: 55.82,
             lng: 37.12,
             normalizedTariff: 700,
-            isBaseline: false,
-          },
-        ],
-      },
+            isBaseline: false
+          }
+        ]
+      }
     });
 
     await waitFor(() => {
@@ -427,7 +418,7 @@ describe('SettlementMap', () => {
 
   it('updates markers and recenters on settlements change', async () => {
     const { rerender } = render(SettlementMap, {
-      props: { settlements: mockSettlements },
+      props: { settlements: mockSettlements }
     });
 
     await waitFor(() => {
@@ -445,7 +436,7 @@ describe('SettlementMap', () => {
 
   it('resyncs after Astro client navigation finishes', async () => {
     render(SettlementMap, {
-      props: { settlements: mockSettlements },
+      props: { settlements: mockSettlements }
     });
 
     await waitFor(() => {
@@ -462,7 +453,7 @@ describe('SettlementMap', () => {
 
   it('preserves Yandex Maps styles without copying executed scripts', () => {
     render(SettlementMap, {
-      props: { settlements: mockSettlements },
+      props: { settlements: mockSettlements }
     });
 
     const script = document.createElement('script');
@@ -476,30 +467,26 @@ describe('SettlementMap', () => {
 
     const newDocument = document.implementation.createHTMLDocument();
     const event = Object.assign(new Event('astro:before-swap'), {
-      newDocument,
+      newDocument
     });
     document.dispatchEvent(event);
 
     expect(newDocument.head.querySelector('script')).toBeNull();
-    expect(newDocument.head.querySelector('style')?.textContent).toContain(
-      'ymaps3--map',
-    );
+    expect(newDocument.head.querySelector('style')?.textContent).toContain('ymaps3--map');
   });
 
   it('handles empty settlements array gracefully', () => {
     const { container } = render(SettlementMap, {
-      props: { settlements: [] },
+      props: { settlements: [] }
     });
 
     // Контейнер должен рендериться без падения.
-    expect(
-      container.querySelector('[data-testid="settlement-map"]'),
-    ).toBeTruthy();
+    expect(container.querySelector('[data-testid="settlement-map"]')).toBeTruthy();
   });
 
   it('moves focus into a keyboard-opened popup and restores it on close', async () => {
     const { container } = render(SettlementMap, {
-      props: { settlements: mockSettlements },
+      props: { settlements: mockSettlements }
     });
 
     await waitFor(() => {
@@ -514,7 +501,7 @@ describe('SettlementMap', () => {
       ariaLabel: marker?.getAttribute('aria-label'),
       tabIndex: marker?.tabIndex,
       tagName: marker?.tagName,
-      type: marker?.getAttribute('type'),
+      type: marker?.getAttribute('type')
     }).toMatchInlineSnapshot(`
       {
         "ariaExpanded": "false",
@@ -525,9 +512,7 @@ describe('SettlementMap', () => {
       }
     `);
 
-    marker?.dispatchEvent(
-      new MouseEvent('click', { bubbles: true, detail: 0 }),
-    );
+    marker?.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }));
 
     await waitFor(() => {
       expect(container.querySelector('[data-testid="map-popup"]')).toBeTruthy();
@@ -535,18 +520,14 @@ describe('SettlementMap', () => {
       expect(container.textContent).toContain('УК Лесное');
     });
 
-    const link = container.querySelector<HTMLAnchorElement>(
-      '[data-testid="map-popup-link"]',
-    );
+    const link = container.querySelector<HTMLAnchorElement>('[data-testid="map-popup-link"]');
     expect(link?.getAttribute('href')).toContain('/settlements/lesnoe/');
     await waitFor(() => {
       expect(document.activeElement).toBe(link);
       expect(marker?.getAttribute('aria-expanded')).toBe('true');
     });
 
-    container
-      .querySelector<HTMLButtonElement>('button[aria-label="Закрыть попап"]')
-      ?.click();
+    container.querySelector<HTMLButtonElement>('button[aria-label="Закрыть попап"]')?.click();
 
     await waitFor(() => {
       expect(document.activeElement).toBe(marker);
@@ -559,8 +540,8 @@ describe('SettlementMap', () => {
       props: {
         settlements: [mockSettlements[0]],
         interactive: false,
-        popup: false,
-      },
+        popup: false
+      }
     });
 
     await waitFor(() => {
@@ -573,7 +554,7 @@ describe('SettlementMap', () => {
       ariaHidden: marker?.getAttribute('aria-hidden'),
       ariaLabel: marker?.getAttribute('aria-label') ?? undefined,
       tabIndex: marker?.tabIndex,
-      tagName: marker?.tagName,
+      tagName: marker?.tagName
     }).toMatchInlineSnapshot(`
       {
         "ariaHidden": "true",
@@ -592,29 +573,27 @@ describe('SettlementMap', () => {
     document.head.appendChild(loadedScript);
 
     const { container, getByRole, queryByRole } = render(SettlementMap, {
-      props: { settlements: mockSettlements },
+      props: { settlements: mockSettlements }
     });
 
     await waitFor(
       () => {
         expect(container.textContent).toMatch(
-          /API ключ не настроен|Не удалось загрузить карту|Yandex Maps API не доступен/,
+          /API ключ не настроен|Не удалось загрузить карту|Yandex Maps API не доступен/
         );
       },
-      { timeout: 2000 },
+      { timeout: 2000 }
     );
 
     Object.defineProperty(window, 'ymaps3', {
       value: mockYandexMaps,
       writable: true,
-      configurable: true,
+      configurable: true
     });
     await fireEvent.click(getByRole('button', { name: 'Попробовать снова' }));
 
     await waitFor(() => {
-      expect(mockYandexMaps.YMapMarker).toHaveBeenCalledTimes(
-        mockSettlements.length,
-      );
+      expect(mockYandexMaps.YMapMarker).toHaveBeenCalledTimes(mockSettlements.length);
       expect(queryByRole('button', { name: 'Попробовать снова' })).toBeNull();
     });
   });

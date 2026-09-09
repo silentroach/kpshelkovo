@@ -1,4 +1,5 @@
 import { resolve } from 'node:path';
+
 import { afterEach, beforeAll, expect, it, vi } from 'vitest';
 
 import type { SearchResponse } from '@/lib/search/client.types';
@@ -9,16 +10,16 @@ const search = vi.hoisted(() =>
     query,
     searchQuery: query,
     results: [],
-    total: 0,
-  })),
+    total: 0
+  }))
 );
 
 vi.mock('@/lib/search/client', () => ({
   pagefindSearchClient: {
     init: vi.fn(async () => {}),
     preload: vi.fn(async () => {}),
-    search,
-  },
+    search
+  }
 }));
 
 let searchDialogHtml: string;
@@ -31,32 +32,29 @@ beforeAll(async () => {
     key: vi.fn(),
     length: 0,
     removeItem: vi.fn(),
-    setItem: vi.fn(),
+    setItem: vi.fn()
   });
   const [{ svelte }, { createServer }] = await Promise.all([
     import('@sveltejs/vite-plugin-svelte'),
-    import('vite'),
+    import('vite')
   ]);
   const server = await createServer({
     appType: 'custom',
-    cacheDir: resolve(
-      process.cwd(),
-      'node_modules/.vite/search-dialog-ssr-test',
-    ),
+    cacheDir: resolve(process.cwd(), 'node_modules/.vite/search-dialog-ssr-test'),
     configFile: false,
     plugins: [svelte()],
     resolve: {
       alias: {
-        '@': resolve(process.cwd(), 'src'),
-      },
+        '@': resolve(process.cwd(), 'src')
+      }
     },
     root: process.cwd(),
-    server: { middlewareMode: true },
+    server: { middlewareMode: true }
   });
 
   try {
     const module = await server.ssrLoadModule(
-      '/src/components/search/tests/SearchDialog.ssr-fixture.ts',
+      '/src/components/search/tests/SearchDialog.ssr-fixture.ts'
     );
 
     searchDialogHtml = module.renderSearchDialog();
@@ -96,9 +94,7 @@ it('hydrates the focused server input without losing its first query', async () 
   expect(document.activeElement).toBe(input);
   await vi.waitFor(() => expect(search).toHaveBeenCalledWith('вода', 8));
 
-  input.dispatchEvent(
-    new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }),
-  );
+  input.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
   expect(dialog.open).toBe(false);
   expect(document.activeElement).toBe(opener);
 });

@@ -8,7 +8,7 @@ const sourceRefSchema = z
     page: z.number().int().positive(),
     fragment: z.string(),
     quote: z.string().optional(),
-    note: z.string().optional(),
+    note: z.string().optional()
   })
   .strict();
 
@@ -22,26 +22,21 @@ const quantitySchema = z
       'sum_explicit_values',
       'not_summed',
       'group_row',
-      'requires_visual_check',
-    ]),
+      'requires_visual_check'
+    ])
   })
   .strict();
 
 const villageSchema = z
   .object({
-    id: z.enum([
-      'shelkovo-village',
-      'shelkovo-forest',
-      'shelkovo-park',
-      'shelkovo-river',
-    ]),
+    id: z.enum(['shelkovo-village', 'shelkovo-forest', 'shelkovo-park', 'shelkovo-river']),
     title: z.string(),
     households_count: z.number().int(),
     land_area_sotka: z.number(),
     land_area_share_percent: z.number(),
     land_area_share_kind: z.literal('calculated_from_pdf'),
     source_refs: z.array(sourceRefSchema),
-    verification_note: z.string().nullable(),
+    verification_note: z.string().nullable()
   })
   .strict();
 
@@ -55,7 +50,7 @@ const commonAssetSchema = z
       'forest',
       'improvement',
       'electricity',
-      'security',
+      'security'
     ]),
     title: z.string(),
     unit: z.string().nullable(),
@@ -64,18 +59,13 @@ const commonAssetSchema = z
         'shelkovo-village': quantitySchema,
         'shelkovo-forest': quantitySchema,
         'shelkovo-park': quantitySchema,
-        'shelkovo-river': quantitySchema,
+        'shelkovo-river': quantitySchema
       })
       .strict(),
     total: quantitySchema,
-    total_mode: z.enum([
-      'sum_explicit_values',
-      'not_summed',
-      'empty',
-      'group_row',
-    ]),
+    total_mode: z.enum(['sum_explicit_values', 'not_summed', 'empty', 'group_row']),
     source_refs: z.array(sourceRefSchema),
-    verification_note: z.string().nullable(),
+    verification_note: z.string().nullable()
   })
   .strict();
 
@@ -87,7 +77,7 @@ const serviceSchema = z
     frequency_raw: z.string(),
     frequency_note: z.string().nullable(),
     source_refs: z.array(sourceRefSchema),
-    quote: z.string().optional(),
+    quote: z.string().optional()
   })
   .strict();
 
@@ -101,7 +91,7 @@ const serviceToEstimateMapItemSchema = z
     source_refs: z.array(sourceRefSchema),
     estimate_source_refs: z.array(sourceRefSchema),
     explanation: z.string(),
-    verification_note: z.string().nullable(),
+    verification_note: z.string().nullable()
   })
   .strict();
 
@@ -115,7 +105,7 @@ const calculationAssumptionSchema = z
     how_to_verify: z.string(),
     related_fact_ids: z.array(z.string()),
     source_refs: z.array(sourceRefSchema),
-    quotes: z.array(z.string()),
+    quotes: z.array(z.string())
   })
   .strict();
 
@@ -126,7 +116,7 @@ const auditNoteSchema = z
       'data_quality',
       'estimate_mapping',
       'calculation_check',
-      'source_verification',
+      'source_verification'
     ]),
     title: z.string(),
     summary: z.string(),
@@ -134,7 +124,7 @@ const auditNoteSchema = z
     severity: z.enum(['info', 'watch', 'needs_check']),
     related_fact_ids: z.array(z.string()),
     source_refs: z.array(sourceRefSchema),
-    next_step: z.string(),
+    next_step: z.string()
   })
   .strict();
 
@@ -147,7 +137,7 @@ const publicFullReglamentDatasetSchema = z
       .object({
         pdf: z.literal('full'),
         title: z.string(),
-        pages_total: z.number().int().positive(),
+        pages_total: z.number().int().positive()
       })
       .strict(),
     curation_sources: z.array(z.string()),
@@ -156,7 +146,7 @@ const publicFullReglamentDatasetSchema = z
         tariff_area_sotka: z.number(),
         total_annual_cost_rub: z.number(),
         tariff_rub_per_sotka_month: z.number(),
-        source_refs: z.array(sourceRefSchema),
+        source_refs: z.array(sourceRefSchema)
       })
       .strict(),
     villages: z.array(villageSchema),
@@ -164,10 +154,9 @@ const publicFullReglamentDatasetSchema = z
     services: z.array(serviceSchema),
     service_to_estimate_map: z.array(serviceToEstimateMapItemSchema),
     calculation_assumptions: z.array(calculationAssumptionSchema),
-    audit_notes: z.array(auditNoteSchema),
+    audit_notes: z.array(auditNoteSchema)
   })
   .strict();
 
-export const validatePublicFullReglamentDataset = (
-  input: unknown,
-): PublicFullReglamentDataset => publicFullReglamentDatasetSchema.parse(input);
+export const validatePublicFullReglamentDataset = (input: unknown): PublicFullReglamentDataset =>
+  publicFullReglamentDatasetSchema.parse(input);

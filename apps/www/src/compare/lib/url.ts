@@ -1,15 +1,12 @@
 import { telegram, withBase as join } from '@shelkovo/url';
-import type {
-  ExplorerPriceFilter,
-  ExplorerQueryState,
-  ExplorerSort,
-} from './url.types';
+
+import type { ExplorerPriceFilter, ExplorerQueryState, ExplorerSort } from './url.types';
 
 export const COMPARE_BASE = '/815/compare';
 
 export const DEFAULT_EXPLORER_QUERY: ExplorerQueryState = {
   sortBy: 'rating_desc',
-  priceFilter: 'all',
+  priceFilter: 'all'
 };
 
 const SORT_VALUES: readonly ExplorerSort[] = [
@@ -19,26 +16,22 @@ const SORT_VALUES: readonly ExplorerSort[] = [
   'rating_asc',
   'mkad',
   'distance',
-  'name',
+  'name'
 ];
 
-const PRICE_FILTER_VALUES: readonly ExplorerPriceFilter[] = [
-  'all',
-  'cheaper',
-  'more_expensive',
-];
+const PRICE_FILTER_VALUES: readonly ExplorerPriceFilter[] = ['all', 'cheaper', 'more_expensive'];
 
 const readQueryValue = <T extends string>(
   value: string | undefined,
   options: readonly T[],
-  fallback: T,
+  fallback: T
 ): T => options.find((option) => option === value) ?? fallback;
 
 const setQueryValue = <T extends string>(
   params: URLSearchParams,
   key: string,
   value: T,
-  fallback: T,
+  fallback: T
 ): void => {
   if (value === fallback) {
     params.delete(key);
@@ -55,33 +48,20 @@ export const readExplorerQuery = (search: string): ExplorerQueryState => {
     sortBy: readQueryValue(
       params.get('sort') ?? undefined,
       SORT_VALUES,
-      DEFAULT_EXPLORER_QUERY.sortBy,
+      DEFAULT_EXPLORER_QUERY.sortBy
     ),
     priceFilter: readQueryValue(
       params.get('price') ?? undefined,
       PRICE_FILTER_VALUES,
-      DEFAULT_EXPLORER_QUERY.priceFilter,
-    ),
+      DEFAULT_EXPLORER_QUERY.priceFilter
+    )
   };
 };
 
-export const buildExplorerUrl = (
-  currentUrl: string,
-  state: ExplorerQueryState,
-): string => {
+export const buildExplorerUrl = (currentUrl: string, state: ExplorerQueryState): string => {
   const url = new URL(currentUrl);
-  setQueryValue(
-    url.searchParams,
-    'sort',
-    state.sortBy,
-    DEFAULT_EXPLORER_QUERY.sortBy,
-  );
-  setQueryValue(
-    url.searchParams,
-    'price',
-    state.priceFilter,
-    DEFAULT_EXPLORER_QUERY.priceFilter,
-  );
+  setQueryValue(url.searchParams, 'sort', state.sortBy, DEFAULT_EXPLORER_QUERY.sortBy);
+  setQueryValue(url.searchParams, 'price', state.priceFilter, DEFAULT_EXPLORER_QUERY.priceFilter);
 
   return `${url.pathname}${url.search}${url.hash}`;
 };

@@ -50,7 +50,7 @@ const preserveYandexRuntimeHead = (event: Event): void => {
   const existing = new Set(
     [...next.head.children]
       .map((node) => yandexHeadKey(node))
-      .filter((key): key is string => key !== undefined),
+      .filter((key): key is string => key !== undefined)
   );
 
   for (const node of document.head.children) {

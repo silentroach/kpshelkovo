@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { buildExplorerUrl, readExplorerQuery, telegram, withBase } from './url';
 
 describe('withBase', () => {
@@ -10,15 +11,11 @@ describe('withBase', () => {
   });
 
   it('prepends base to relative paths', () => {
-    expect(withBase('settlements/lesnoe/')).toBe(
-      '/815/compare/settlements/lesnoe/',
-    );
+    expect(withBase('settlements/lesnoe/')).toBe('/815/compare/settlements/lesnoe/');
   });
 
   it('prepends base to absolute internal paths', () => {
-    expect(withBase('/settlements/usadby/')).toBe(
-      '/815/compare/settlements/usadby/',
-    );
+    expect(withBase('/settlements/usadby/')).toBe('/815/compare/settlements/usadby/');
   });
 });
 
@@ -28,23 +25,19 @@ describe('telegram', () => {
   });
 
   it('strips @ prefix and spaces', () => {
-    expect(telegram('  @shelkovoecoclub  ')).toBe(
-      'https://t.me/shelkovoecoclub',
-    );
+    expect(telegram('  @shelkovoecoclub  ')).toBe('https://t.me/shelkovoecoclub');
   });
 });
 
 describe('explorer query', () => {
   it('reads supported filters and falls back from unknown values', () => {
-    expect(readExplorerQuery('?sort=tariff_asc&price=cheaper'))
-      .toMatchInlineSnapshot(`
+    expect(readExplorerQuery('?sort=tariff_asc&price=cheaper')).toMatchInlineSnapshot(`
       {
         "priceFilter": "cheaper",
         "sortBy": "tariff_asc",
       }
     `);
-    expect(readExplorerQuery('?sort=unknown&price=unknown'))
-      .toMatchInlineSnapshot(`
+    expect(readExplorerQuery('?sort=unknown&price=unknown')).toMatchInlineSnapshot(`
       {
         "priceFilter": "all",
         "sortBy": "rating_desc",
@@ -56,11 +49,9 @@ describe('explorer query', () => {
     expect(
       buildExplorerUrl('https://example.com/815/compare/?from=chat#results', {
         sortBy: 'tariff_asc',
-        priceFilter: 'more_expensive',
-      }),
-    ).toBe(
-      '/815/compare/?from=chat&sort=tariff_asc&price=more_expensive#results',
-    );
+        priceFilter: 'more_expensive'
+      })
+    ).toBe('/815/compare/?from=chat&sort=tariff_asc&price=more_expensive#results');
   });
 
   it('removes default values from the URL', () => {
@@ -69,9 +60,9 @@ describe('explorer query', () => {
         'https://example.com/815/compare/?sort=name&price=cheaper&from=chat#results',
         {
           sortBy: 'rating_desc',
-          priceFilter: 'all',
-        },
-      ),
+          priceFilter: 'all'
+        }
+      )
     ).toBe('/815/compare/?from=chat#results');
   });
 });

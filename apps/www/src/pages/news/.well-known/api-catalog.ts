@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 
 import {
   createApiCatalogGetResponse,
-  createApiCatalogHeadResponse,
+  createApiCatalogHeadResponse
 } from '@/lib/api-catalog-response';
 import { catalog, self } from '@/lib/news/discovery';
 import { canonRoot } from '@/lib/site';

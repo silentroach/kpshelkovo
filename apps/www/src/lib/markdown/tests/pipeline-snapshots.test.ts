@@ -7,7 +7,7 @@ const visibleHtml = (html: string): string => html.replaceAll('\u00A0', '·');
 const pipelineSnapshot = (input: string) => ({
   input,
   preprocessed: preprocessSiteMarkdown(input).markdown,
-  html: visibleHtml(renderMarkdown(input)),
+  html: visibleHtml(renderMarkdown(input))
 });
 
 describe('markdown pipeline snapshots', () => {
@@ -21,7 +21,7 @@ describe('markdown pipeline snapshots', () => {
 
     expect(html).not.toMatch(/<li>[\s\S]*1\.2\.[\s\S]*<\/li>/);
     expect(html).toContain(
-      '</ul>\n<p>1.2. Следующий пункт должен вернуться на\u00A0основной отступ.</p>',
+      '</ul>\n<p>1.2. Следующий пункт должен вернуться на\u00A0основной отступ.</p>'
     );
   });
 
@@ -34,7 +34,7 @@ describe('markdown pipeline snapshots', () => {
       pipelineSnapshot(`\`\`\`txt
 - 1. Это пример, а не список.
   1.2. Это пример, а не пункт договора.
-\`\`\``),
+\`\`\``)
     ]).toMatchInlineSnapshot(`
       [
         {

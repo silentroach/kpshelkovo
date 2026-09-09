@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { getAvailabilityDisplay } from './availability-status';
-  import ComparisonTable from './ComparisonTable.svelte';
-  import type { ComparisonTableRow } from './comparison-table.types';
   import type { CommonSpaces } from '../lib/settlement/types';
+  import { getAvailabilityDisplay } from './availability-status';
+  import type { ComparisonTableRow } from './comparison-table.types';
+  import ComparisonTable from './ComparisonTable.svelte';
 
   interface Props {
     title?: string;
@@ -28,7 +28,7 @@
     kidsClub: 'Детский клуб',
     sportsCamp: 'Спортивный лагерь',
     primarySchool: 'Начальная школа',
-    bbqZones: 'Зоны барбекю',
+    bbqZones: 'Зоны барбекю'
   };
 
   // Держим первым: это краткая сводка доступа ко многим пунктам ниже.
@@ -46,7 +46,7 @@
     'kidsClub',
     'sportsCamp',
     'primarySchool',
-    'bbqZones',
+    'bbqZones'
   ] as const satisfies readonly CommonSpaceKey[];
 
   const rows = $derived(
@@ -56,8 +56,8 @@
       value: spaces[key],
       shelkovoValue: shelkovoSpaces?.[key],
       status: getAvailabilityDisplay(spaces[key]),
-      shelkovoStatus: getAvailabilityDisplay(shelkovoSpaces?.[key]),
-    })),
+      shelkovoStatus: getAvailabilityDisplay(shelkovoSpaces?.[key])
+    }))
   );
 </script>
 

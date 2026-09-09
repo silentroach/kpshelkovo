@@ -1,7 +1,8 @@
-import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/svelte';
-import SourcesList from './SourcesList.svelte';
+import { describe, it, expect } from 'vitest';
+
 import type { Source } from '../lib/settlement/types';
+import SourcesList from './SourcesList.svelte';
 
 describe('SourcesList', () => {
   const mockSources: Source[] = [
@@ -10,27 +11,27 @@ describe('SourcesList', () => {
       url: 'https://shelkovo-kp.ru',
       type: 'official',
       dateChecked: '2026-03-10',
-      comment: 'Официальный сайт управляющей компании',
+      comment: 'Официальный сайт управляющей компании'
     },
     {
       title: 'Чат жителей (Telegram)',
       url: 'https://t.me/shelkovo_chat',
       type: 'community',
       dateChecked: '2026-03-15',
-      comment: '',
+      comment: ''
     },
     {
       title: 'Статья в газете',
       url: 'https://example.com/article',
       type: 'media',
       dateChecked: '2026-02-20',
-      comment: 'Публикация о тарифах',
-    },
+      comment: 'Публикация о тарифах'
+    }
   ];
 
   it('renders all sources with correct data', () => {
     const { container } = render(SourcesList, {
-      props: { sources: mockSources },
+      props: { sources: mockSources }
     });
 
     expect(container.textContent).toContain('Сайт УК КП Шелково');
@@ -45,7 +46,7 @@ describe('SourcesList', () => {
 
   it('renders source type badges with correct labels', () => {
     const { container } = render(SourcesList, {
-      props: { sources: mockSources },
+      props: { sources: mockSources }
     });
 
     expect(container.textContent).toContain('Официальный');
@@ -55,7 +56,7 @@ describe('SourcesList', () => {
 
   it('renders clickable links with correct URLs', () => {
     const { container } = render(SourcesList, {
-      props: { sources: mockSources },
+      props: { sources: mockSources }
     });
 
     const links = container.querySelectorAll('[data-testid="source-link"]');
@@ -71,18 +72,16 @@ describe('SourcesList', () => {
 
   it('renders comments when provided', () => {
     const { container } = render(SourcesList, {
-      props: { sources: mockSources },
+      props: { sources: mockSources }
     });
 
-    expect(container.textContent).toContain(
-      'Официальный сайт управляющей компании',
-    );
+    expect(container.textContent).toContain('Официальный сайт управляющей компании');
     expect(container.textContent).toContain('Публикация о тарифах');
   });
 
   it('renders empty list without errors', () => {
     const { container } = render(SourcesList, {
-      props: { sources: [] },
+      props: { sources: [] }
     });
 
     const list = container.querySelector('[data-testid="sources-list"]');
@@ -97,12 +96,12 @@ describe('SourcesList', () => {
         url: 'https://example.com',
         type: 'personal',
         dateChecked: '2026-03-01',
-        comment: '',
-      },
+        comment: ''
+      }
     ];
 
     const { container } = render(SourcesList, {
-      props: { sources: personalSource },
+      props: { sources: personalSource }
     });
 
     expect(container.textContent).toContain('Личное');

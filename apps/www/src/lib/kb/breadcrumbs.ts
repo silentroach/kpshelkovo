@@ -5,9 +5,7 @@ import type { KbPage } from './types';
 
 const KB_TITLE = 'База знаний';
 
-const pagesByRouteSlug = (
-  pages: readonly KbPage[],
-): ReadonlyMap<string, KbPage> => {
+const pagesByRouteSlug = (pages: readonly KbPage[]): ReadonlyMap<string, KbPage> => {
   const result = new Map<string, KbPage>();
 
   for (const page of pages) {
@@ -22,14 +20,12 @@ const pagesByRouteSlug = (
 const parentRouteSlugs = (routeSlug: string): readonly string[] => {
   const segments = routeSlug.split('/');
 
-  return segments
-    .slice(0, -1)
-    .map((_, index) => segments.slice(0, index + 1).join('/'));
+  return segments.slice(0, -1).map((_, index) => segments.slice(0, index + 1).join('/'));
 };
 
 export const kbBreadcrumbs = (
   page: KbPage,
-  pages: readonly KbPage[],
+  pages: readonly KbPage[]
 ): readonly BreadcrumbItem[] => {
   if (!page.routeSlug) {
     return withHomeBreadcrumbs([{ label: KB_TITLE }]);

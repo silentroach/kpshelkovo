@@ -1,7 +1,5 @@
 <script lang="ts">
   import { pluralize } from '@shelkovo/format';
-  import type { Feature } from '@yandex/ymaps3-clusterer';
-  import type { DrawingStyle } from '@yandex/ymaps3-types';
   import {
     APPLE_MARKER,
     ANIMALS_MARKER,
@@ -9,42 +7,41 @@
     FISH_MARKER,
     FOODTRUCK_MARKER,
     KPP_MARKER,
-    TITANIC_MARKER,
+    TITANIC_MARKER
   } from '@shelkovo/ui/markers';
+  import type { Feature } from '@yandex/ymaps3-clusterer';
+  import type { DrawingStyle } from '@yandex/ymaps3-types';
   import { onMount } from 'svelte';
   import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
-  import {
-    installYandexMapsRuntimeHeadPersistence,
-    loadYandexMaps,
-    waitForStableLayout,
-  } from '@/lib/yandex-maps/runtime';
-  import { getPlaceClosingTime } from '@/lib/places/opening-hours';
   import type {
     PlaceMapPublicItemDto,
-    PlaceMapPublicPayloadDto,
+    PlaceMapPublicPayloadDto
   } from '@/lib/places/map-public-dto';
   import type { PlaceMapItem, PlaceMapProps } from '@/lib/places/map-types';
+  import { getPlaceClosingTime } from '@/lib/places/opening-hours';
   import { placeUrl } from '@/lib/places/routes';
   import type { PlaceMarker } from '@/lib/places/schema';
   import { formatPlaceStatus } from '@/lib/places/view';
+  import {
+    installYandexMapsRuntimeHeadPersistence,
+    loadYandexMaps,
+    waitForStableLayout
+  } from '@/lib/yandex-maps/runtime';
 
   import {
     createMapFeatures,
     getMarkerScale,
     getPaddedBounds,
     getPlaceBounds,
-    toMapGeometry,
+    toMapGeometry
   } from './place-map-geometry';
-  import {
-    getUrlWithoutPlaceHighlight,
-    PLACE_HIGHLIGHT_QUERY_PARAM,
-  } from './place-map-url';
+  import { getUrlWithoutPlaceHighlight, PLACE_HIGHLIGHT_QUERY_PARAM } from './place-map-url';
 
   let {
     dataUrl = '',
     fallbackPlace,
-    places = [] as readonly PlaceMapItem[],
+    places = [] as readonly PlaceMapItem[]
   }: PlaceMapProps = $props();
 
   const VIEW_MARGIN: ymaps3.Margin = [112, 80, 32, 80];
@@ -68,11 +65,11 @@
           periods: place.opening_hours.periods.map((period) => ({
             days: period.days,
             opensAt: period.opens_at,
-            closesAt: period.closes_at,
-          })),
+            closesAt: period.closes_at
+          }))
         }
       : undefined,
-    url: placeUrl(place.slug),
+    url: placeUrl(place.slug)
   });
   const fetchPlaces = async (url: string): Promise<readonly PlaceMapItem[]> => {
     if (!url) throw new Error('Не указан источник данных карты');
@@ -84,10 +81,7 @@
     return payload.places.map(toPlaceMapItem);
   };
   const CUSTOM_MARKER_IMAGES: Readonly<
-    Record<
-      PlaceMarker,
-      { readonly src: string; readonly width: number; readonly height: number }
-    >
+    Record<PlaceMarker, { readonly src: string; readonly width: number; readonly height: number }>
   > = {
     apple: APPLE_MARKER,
     animals: ANIMALS_MARKER,
@@ -95,18 +89,13 @@
     titanic: TITANIC_MARKER,
     construction: CONSTRUCTION_MARKER,
     fish: FISH_MARKER,
-    kpp: KPP_MARKER,
+    kpp: KPP_MARKER
   };
-  const getCurrentPlaceBounds = (): ymaps3.LngLatBounds =>
-    getPlaceBounds(places);
+  const getCurrentPlaceBounds = (): ymaps3.LngLatBounds => getPlaceBounds(places);
   const getMapZoomDuration = (): number =>
-    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-      ? 0
-      : CLUSTER_ZOOM_DURATION_MS;
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : CLUSTER_ZOOM_DURATION_MS;
   const getViewMargin = (): ymaps3.Margin =>
-    window.matchMedia?.('(max-width: 40rem)').matches
-      ? MOBILE_VIEW_MARGIN
-      : VIEW_MARGIN;
+    window.matchMedia?.('(max-width: 40rem)').matches ? MOBILE_VIEW_MARGIN : VIEW_MARGIN;
   const removeHighlightQuery = (expectedSlug?: string): void => {
     const url = getUrlWithoutPlaceHighlight(window.location.href, expectedSlug);
 
@@ -137,7 +126,7 @@
     'scrollZoom',
     'pinchZoom',
     'dblClick',
-    'oneFingerZoom',
+    'oneFingerZoom'
   ];
 
   const supportsAreaHover = (): boolean =>
@@ -147,24 +136,20 @@
     const inheritedValue = mapContainer
       ? getComputedStyle(mapContainer).getPropertyValue(name).trim()
       : '';
-    const value =
-      inheritedValue ||
-      document.documentElement.style.getPropertyValue(name).trim();
+    const value = inheritedValue || document.documentElement.style.getPropertyValue(name).trim();
 
     if (!value) throw new Error(`Не найден цвет карты ${name}`);
 
     return value;
   };
 
-  const createAreaStyle = (
-    state: 'hidden' | 'preview' | 'highlighted',
-  ): DrawingStyle => {
+  const createAreaStyle = (state: 'hidden' | 'preview' | 'highlighted'): DrawingStyle => {
     if (state === 'hidden') {
       return {
         zIndex: 0,
         fillOpacity: 0,
         interactive: false,
-        stroke: [],
+        stroke: []
       };
     }
 
@@ -183,15 +168,15 @@
           color: water,
           dash,
           opacity: 0.42,
-          width: highlighted ? 5 : 4,
+          width: highlighted ? 5 : 4
         },
         {
           color: water,
           dash,
           opacity: 1,
-          width: highlighted ? 2.5 : 2,
-        },
-      ],
+          width: highlighted ? 2.5 : 2
+        }
+      ]
     };
   };
 
@@ -207,17 +192,11 @@
       focusedAreas.has(place.slug);
 
     feature.update({
-      style: createAreaStyle(
-        highlighted ? 'highlighted' : previewed ? 'preview' : 'hidden',
-      ),
+      style: createAreaStyle(highlighted ? 'highlighted' : previewed ? 'preview' : 'hidden')
     });
   };
 
-  const setAreaState = (
-    place: PlaceMapItem,
-    states: Set<string>,
-    active: boolean,
-  ): void => {
+  const setAreaState = (place: PlaceMapItem, states: Set<string>, active: boolean): void => {
     if (!place.geometry) return;
 
     if (active) {
@@ -244,13 +223,13 @@
       window.setTimeout(() => {
         areaHoverLeaveTimers.delete(place.slug);
         setAreaState(place, markerHoveredAreas, false);
-      }, AREA_HOVER_LEAVE_DELAY_MS),
+      }, AREA_HOVER_LEAVE_DELAY_MS)
     );
   };
 
   const createAreaFeature = (
     place: PlaceMapItem,
-    YMapFeature: typeof ymaps3.YMapFeature,
+    YMapFeature: typeof ymaps3.YMapFeature
   ): ymaps3.YMapFeature | undefined => {
     const area = place.geometry?.area;
 
@@ -267,17 +246,12 @@
         setAreaState(place, featureHoveredAreas, true);
         setAreaState(place, markerHoveredAreas, false);
       },
-      onMouseLeave: () => setAreaState(place, featureHoveredAreas, false),
+      onMouseLeave: () => setAreaState(place, featureHoveredAreas, false)
     });
   };
 
-  const updateMarkerContent = (
-    place: PlaceMapItem,
-    link: HTMLAnchorElement,
-  ): void => {
-    const closingTime = place.openingHours
-      ? getPlaceClosingTime(place.openingHours)
-      : undefined;
+  const updateMarkerContent = (place: PlaceMapItem, link: HTMLAnchorElement): void => {
+    const closingTime = place.openingHours ? getPlaceClosingTime(place.openingHours) : undefined;
 
     if (!place.openingHours) {
       delete link.dataset.open;
@@ -285,19 +259,16 @@
       link.dataset.open = String(Boolean(closingTime));
     }
 
-    const status =
-      place.status === 'existing' ? '' : `, ${formatPlaceStatus(place.status)}`;
+    const status = place.status === 'existing' ? '' : `, ${formatPlaceStatus(place.status)}`;
     let openingStatus = '';
 
     if (place.openingHours) {
-      openingStatus = closingTime
-        ? `открыто до ${closingTime}`
-        : 'сейчас закрыто';
+      openingStatus = closingTime ? `открыто до ${closingTime}` : 'сейчас закрыто';
     }
 
     link.setAttribute(
       'aria-label',
-      `Открыть место «${place.name}»${status}${openingStatus ? `, ${openingStatus}` : ''}`,
+      `Открыть место «${place.name}»${status}${openingStatus ? `, ${openingStatus}` : ''}`
     );
     link.title =
       place.status === 'underConstruction'
@@ -327,12 +298,8 @@
       setAreaState(place, markerHoveredAreas, true);
     });
     link.addEventListener('mouseleave', () => scheduleAreaHoverLeave(place));
-    link.addEventListener('focus', () =>
-      setAreaState(place, focusedAreas, true),
-    );
-    link.addEventListener('blur', () =>
-      setAreaState(place, focusedAreas, false),
-    );
+    link.addEventListener('focus', () => setAreaState(place, focusedAreas, true));
+    link.addEventListener('blur', () => setAreaState(place, focusedAreas, false));
     link.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
         setAreaState(place, focusedAreas, false);
@@ -379,22 +346,17 @@
   };
 
   const updateMarkerScale = (zoom: number): void => {
-    mapContainer?.style.setProperty(
-      '--place-map-marker-scale',
-      getMarkerScale(zoom).toFixed(3),
-    );
+    mapContainer?.style.setProperty('--place-map-marker-scale', getMarkerScale(zoom).toFixed(3));
   };
 
   const zoomToCluster = (features: readonly Feature[]): void => {
     map?.update({
       location: {
-        bounds: getPaddedBounds(
-          features.map((feature) => feature.geometry.coordinates),
-        ),
+        bounds: getPaddedBounds(features.map((feature) => feature.geometry.coordinates)),
         duration: getMapZoomDuration(),
-        easing: 'ease-in-out',
+        easing: 'ease-in-out'
       },
-      margin: getViewMargin(),
+      margin: getViewMargin()
     });
   };
 
@@ -404,8 +366,8 @@
         center: [place.coordinates.lng, place.coordinates.lat],
         zoom: PLACE_FOCUS_ZOOM,
         duration,
-        easing: 'ease-in-out',
-      },
+        easing: 'ease-in-out'
+      }
     });
   };
 
@@ -426,20 +388,16 @@
       }
 
       const clusters =
-        mapContainer?.querySelectorAll<HTMLButtonElement>(
-          '.place-map-cluster',
-        ) ?? [];
+        mapContainer?.querySelectorAll<HTMLButtonElement>('.place-map-cluster') ?? [];
       const cluster = Array.from(clusters).find((candidate) =>
-        candidate.dataset.placeIds?.split(' ').includes(id),
+        candidate.dataset.placeIds?.split(' ').includes(id)
       );
 
       cluster?.focus();
     });
   };
 
-  const createClusterContent = (
-    features: readonly Feature[],
-  ): HTMLButtonElement => {
+  const createClusterContent = (features: readonly Feature[]): HTMLButtonElement => {
     const button = document.createElement('button');
     const label = `${features.length} ${pluralize(features.length, ['место', 'места', 'мест'])} рядом`;
 
@@ -461,7 +419,7 @@
   const fitPlaces = (): void => {
     map?.update?.({
       location: { bounds: getCurrentPlaceBounds(), duration: 0 },
-      margin: getViewMargin(),
+      margin: getViewMargin()
     });
   };
 
@@ -501,14 +459,11 @@
     let markerUpdateTimer: number | undefined;
     let resizeObserver: ResizeObserver | undefined;
     const highlightUrl = new URL(window.location.href);
-    const requestedSlug =
-      highlightUrl.searchParams.get(PLACE_HIGHLIGHT_QUERY_PARAM) || undefined;
+    const requestedSlug = highlightUrl.searchParams.get(PLACE_HIGHLIGHT_QUERY_PARAM) || undefined;
     let highlightedPlace: PlaceMapItem | undefined;
 
     const startPlaceHighlight = (place: PlaceMapItem): void => {
-      const marker = markerContents.find(
-        ([candidate]) => candidate.slug === place.slug,
-      )?.[1];
+      const marker = markerContents.find(([candidate]) => candidate.slug === place.slug)?.[1];
 
       if (!marker) {
         highlightedPlace = undefined;
@@ -554,13 +509,8 @@
 
     void (async () => {
       try {
-        const placesRequest = places.length
-          ? Promise.resolve(places)
-          : fetchPlaces(dataUrl);
-        const [loadedPlaces] = await Promise.all([
-          placesRequest,
-          loadYandexMaps(),
-        ]);
+        const placesRequest = places.length ? Promise.resolve(places) : fetchPlaces(dataUrl);
+        const [loadedPlaces] = await Promise.all([placesRequest, loadYandexMaps()]);
 
         if (destroyed || !mapContainer) return;
 
@@ -569,10 +519,7 @@
           ? places.find((place) => place.slug === requestedSlug)
           : undefined;
 
-        if (
-          highlightUrl.searchParams.has(PLACE_HIGHLIGHT_QUERY_PARAM) &&
-          !highlightedPlace
-        ) {
+        if (highlightUrl.searchParams.has(PLACE_HIGHLIGHT_QUERY_PARAM) && !highlightedPlace) {
           removeHighlightQuery(requestedSlug);
         }
 
@@ -587,8 +534,7 @@
         }
 
         await ymaps3.ready;
-        const { YMapClusterer, clusterByGrid } =
-          await import('@yandex/ymaps3-clusterer');
+        const { YMapClusterer, clusterByGrid } = await import('@yandex/ymaps3-clusterer');
         await waitForStableLayout();
 
         if (destroyed || !mapContainer) return;
@@ -599,7 +545,7 @@
           YMapDefaultSchemeLayer,
           YMapFeature,
           YMapListener,
-          YMapMarker,
+          YMapMarker
         } = ymaps3;
 
         map = new YMap(
@@ -607,7 +553,7 @@
           {
             location: { bounds: getCurrentPlaceBounds() },
             behaviors: mapBehaviors(),
-            mode: 'vector',
+            mode: 'vector'
           },
           [
             new YMapDefaultSchemeLayer({
@@ -615,16 +561,14 @@
                 ground: { zIndex: 0 },
                 buildings: { zIndex: 1 },
                 icons: { visible: false, zIndex: 2 },
-                labels: { zIndex: 3 },
-              },
+                labels: { zIndex: 3 }
+              }
             }),
-            new YMapDefaultFeaturesLayer(),
-          ],
+            new YMapDefaultFeaturesLayer()
+          ]
         );
 
-        markerContents = places.map(
-          (place) => [place, createMarkerContent(place)] as const,
-        );
+        markerContents = places.map((place) => [place, createMarkerContent(place)] as const);
         for (const place of places) {
           const feature = createAreaFeature(place, YMapFeature);
 
@@ -637,27 +581,21 @@
           onUpdate: ({ location, mapInAction }) => {
             updateMarkerScale(location.zoom);
             if (!mapInAction) restoreClusterFocus();
-          },
+          }
         });
         mapClusterer = new YMapClusterer({
           method: clusterByGrid({ gridSize: CLUSTER_GRID_SIZE }),
           features: createMapFeatures(places),
           maxZoom: PLACE_FOCUS_ZOOM - 1,
           marker: (feature) => {
-            const content = markerContents.find(
-              ([place]) => place.slug === feature.id,
-            )?.[1];
+            const content = markerContents.find(([place]) => place.slug === feature.id)?.[1];
 
-            if (!content)
-              throw new Error(`Не найден маркер места ${feature.id}`);
+            if (!content) throw new Error(`Не найден маркер места ${feature.id}`);
 
-            return new YMapMarker(
-              { coordinates: feature.geometry.coordinates },
-              content,
-            );
+            return new YMapMarker({ coordinates: feature.geometry.coordinates }, content);
           },
           cluster: (coordinates, features) =>
-            new YMapMarker({ coordinates }, createClusterContent(features)),
+            new YMapMarker({ coordinates }, createClusterContent(features))
         });
         map.addChild(mapListener);
         map.addChild(mapClusterer);
@@ -882,9 +820,7 @@
     width: 1.75rem;
   }
 
-  :global(
-    .place-map-marker[data-marker='construction'] .place-map-marker-graphic
-  ) {
+  :global(.place-map-marker[data-marker='construction'] .place-map-marker-graphic) {
     width: 1.3333rem;
   }
 
@@ -894,8 +830,7 @@
     display: block;
     width: 100%;
     height: auto;
-    filter: var(--place-map-marker-state-filter)
-      drop-shadow(0 0 0.1rem oklch(100% 0 0 / 0.96))
+    filter: var(--place-map-marker-state-filter) drop-shadow(0 0 0.1rem oklch(100% 0 0 / 0.96))
       drop-shadow(0 0.25rem 0.35rem oklch(24% 0.04 145 / 0.4));
     transition: filter 0.15s ease;
     user-select: none;
@@ -906,9 +841,7 @@
   }
 
   :global(.place-map-marker:is(:hover, :focus-visible) .place-map-marker-point),
-  :global(
-    .place-map-marker:is(:hover, :focus-visible) .place-map-marker-graphic
-  ) {
+  :global(.place-map-marker:is(:hover, :focus-visible) .place-map-marker-graphic) {
     transform: scale(1.16);
   }
 
@@ -916,9 +849,7 @@
     box-shadow: 0 0 0 0.1875rem var(--color-focus);
   }
 
-  :global(
-    .place-map-marker[data-open='false'] .place-map-marker-point-surface
-  ) {
+  :global(.place-map-marker[data-open='false'] .place-map-marker-point-surface) {
     filter: grayscale(1);
   }
 
@@ -967,9 +898,7 @@
     transform: rotate(30deg);
   }
 
-  :global(
-    .place-map-marker[data-open='false'] .place-map-marker-closed-indicator
-  ) {
+  :global(.place-map-marker[data-open='false'] .place-map-marker-closed-indicator) {
     display: block;
   }
 
@@ -982,9 +911,7 @@
     opacity: 0.76;
   }
 
-  :global(
-    .place-map-marker[data-status='underConstruction'] .place-map-marker-point
-  ) {
+  :global(.place-map-marker[data-status='underConstruction'] .place-map-marker-point) {
     border-radius: 0.25rem;
   }
 

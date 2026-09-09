@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createSiteMentionRegistry,
   normalizeEntityMentions,
-  type SiteMentionRegistry,
+  type SiteMentionRegistry
 } from './index';
 
 const targets = [
@@ -12,36 +12,36 @@ const targets = [
     slug: 'kschemelinin',
     label: 'Кирилл Щемелинин',
     labelCases: {
-      gen: 'Кирилла Щемелинина',
+      gen: 'Кирилла Щемелинина'
     },
     htmlUrl: '/people/kschemelinin/',
     markdownUrl: '/people/kschemelinin/index.md',
-    linkTitle: 'депутат, КПРФ',
+    linkTitle: 'депутат, КПРФ'
   },
   {
     type: 'person',
     slug: 'apetrov',
     label: 'Андрей Петров',
     htmlUrl: '/people/apetrov/',
-    markdownUrl: '/people/apetrov/index.md',
+    markdownUrl: '/people/apetrov/index.md'
   },
   {
     type: 'person',
     slug: 'encoded-url',
     label: 'Адрес с пробелом',
     htmlUrl: '/people/иван%20петров/',
-    markdownUrl: '/people/иван%20петров/index.md',
+    markdownUrl: '/people/иван%20петров/index.md'
   },
   {
     type: 'place',
     slug: 'apple-garden',
     label: 'Яблоневый сад',
     labelCases: {
-      gen: 'Яблоневого сада',
+      gen: 'Яблоневого сада'
     },
     htmlUrl: '/map/apple-garden/',
-    markdownUrl: '/map/apple-garden/index.md',
-  },
+    markdownUrl: '/map/apple-garden/index.md'
+  }
 ] as const;
 
 const registry = createSiteMentionRegistry(targets);
@@ -56,9 +56,9 @@ describe('createSiteMentionRegistry', () => {
           slug: 'kschemelinin',
           label: 'Одноимённое место',
           htmlUrl: '/map/kschemelinin/',
-          markdownUrl: '/map/kschemelinin/index.md',
-        },
-      ]),
+          markdownUrl: '/map/kschemelinin/index.md'
+        }
+      ])
     ).toThrow('duplicate entity mention slug "kschemelinin"');
   });
 });
@@ -67,41 +67,37 @@ describe('normalizeEntityMentions', () => {
   it('replaces canonical mentions with entity labels and stable links', () => {
     expect(
       normalizeEntityMentions({
-        markdown:
-          'Как отметил @kschemelinin:gen, а позже @apetrov подтвердил вывод.',
+        markdown: 'Как отметил @kschemelinin:gen, а позже @apetrov подтвердил вывод.',
         context: 'status incident "2026/04/test" body',
-        registry,
-      }),
+        registry
+      })
     ).toEqual({
       markdown:
         'Как отметил [Кирилла Щемелинина](/people/kschemelinin/ "депутат, КПРФ"), а позже [Андрей Петров](/people/apetrov/) подтвердил вывод.',
-      mentions: [targets[0], targets[1]],
+      mentions: [targets[0], targets[1]]
     });
   });
 
   it('replaces labelled mention destinations while preserving visible text', () => {
     expect(
       normalizeEntityMentions({
-        markdown:
-          'По словам [главного по электричеству](@kschemelinin), работы идут.',
+        markdown: 'По словам [главного по электричеству](@kschemelinin), работы идут.',
         context: 'news article "2026/05/test" body',
-        registry,
-      }),
+        registry
+      })
     ).toEqual({
-      markdown:
-        'По словам [главного по электричеству](/people/kschemelinin/), работы идут.',
-      mentions: [targets[0]],
+      markdown: 'По словам [главного по электричеству](/people/kschemelinin/), работы идут.',
+      mentions: [targets[0]]
     });
   });
 
   it('resolves canonical and labelled place mentions to the place page', () => {
     expect(
       normalizeEntityMentions({
-        markdown:
-          'Гуляли у @apple-garden:gen и вернулись к [саду](@apple-garden).',
+        markdown: 'Гуляли у @apple-garden:gen и вернулись к [саду](@apple-garden).',
         context: 'news article "2026/08/test" body',
-        registry,
-      }),
+        registry
+      })
     ).toMatchInlineSnapshot(`
       {
         "markdown": "Гуляли у [Яблоневого сада](/map/apple-garden/) и вернулись к [саду](/map/apple-garden/).",
@@ -127,40 +123,37 @@ describe('normalizeEntityMentions', () => {
         markdown:
           'По словам [главного по электричеству](@kschemelinin "%D1%82%D0%B8%D1%82%D1%83%D0%BB"), работы идут.',
         context: 'news article "2026/05/test" body',
-        registry,
-      }),
+        registry
+      })
     ).toEqual({
       markdown:
         'По словам [главного по электричеству](/people/kschemelinin/ "%D1%82%D0%B8%D1%82%D1%83%D0%BB"), работы идут.',
-      mentions: [targets[0]],
+      mentions: [targets[0]]
     });
   });
 
   it('replaces labelled mentions with encoded target URLs without trimming adjacent text', () => {
     expect(
       normalizeEntityMentions({
-        markdown:
-          'Перед [видимым текстом](@encoded-url), после ссылки остается текст.',
+        markdown: 'Перед [видимым текстом](@encoded-url), после ссылки остается текст.',
         context: 'news article "2026/05/test" body',
-        registry,
-      }),
+        registry
+      })
     ).toEqual({
-      markdown:
-        'Перед [видимым текстом](/people/иван%20петров/), после ссылки остается текст.',
-      mentions: [targets[2]],
+      markdown: 'Перед [видимым текстом](/people/иван%20петров/), после ссылки остается текст.',
+      mentions: [targets[2]]
     });
   });
 
   it('fails clearly on encoded labelled mention destinations', () => {
     expect(() =>
       normalizeEntityMentions({
-        markdown:
-          'По словам [главного по электричеству](@kschemelinin%20), работы идут.',
+        markdown: 'По словам [главного по электричеству](@kschemelinin%20), работы идут.',
         context: 'news article "2026/05/test" body',
-        registry,
-      }),
+        registry
+      })
     ).toThrow(
-      'news article "2026/05/test" body contains unsupported encoded labelled entity mention destination "@kschemelinin%20"',
+      'news article "2026/05/test" body contains unsupported encoded labelled entity mention destination "@kschemelinin%20"'
     );
   });
 
@@ -169,10 +162,10 @@ describe('normalizeEntityMentions', () => {
       normalizeEntityMentions({
         markdown: 'По словам @apetrov:gen, работы идут.',
         context: 'news article "2026/05/test" body',
-        registry,
-      }),
+        registry
+      })
     ).toThrow(
-      'news article "2026/05/test" body contains entity mention "@apetrov:gen", but entity "person:apetrov" has no "gen" label case',
+      'news article "2026/05/test" body contains entity mention "@apetrov:gen", but entity "person:apetrov" has no "gen" label case'
     );
   });
 
@@ -181,10 +174,10 @@ describe('normalizeEntityMentions', () => {
       normalizeEntityMentions({
         markdown: 'Встретимся у @apple-garden:dat.',
         context: 'review "test" body',
-        registry,
-      }),
+        registry
+      })
     ).toThrow(
-      'review "test" body contains entity mention "@apple-garden:dat", but entity "place:apple-garden" has no "dat" label case',
+      'review "test" body contains entity mention "@apple-garden:dat", but entity "place:apple-garden" has no "dat" label case'
     );
   });
 
@@ -193,11 +186,9 @@ describe('normalizeEntityMentions', () => {
       normalizeEntityMentions({
         markdown: 'Текст с @unknown внутри.',
         context: 'people profile "test" body',
-        registry,
-      }),
-    ).toThrow(
-      'people profile "test" body contains unknown entity mention "@unknown"',
-    );
+        registry
+      })
+    ).toThrow('people profile "test" body contains unknown entity mention "@unknown"');
   });
 
   it('fails on empty canonical mentions', () => {
@@ -205,11 +196,9 @@ describe('normalizeEntityMentions', () => {
       normalizeEntityMentions({
         markdown: 'Текст @.',
         context: 'news article "2026/05/test" body',
-        registry,
-      }),
-    ).toThrow(
-      'news article "2026/05/test" body contains invalid entity mention "@."',
-    );
+        registry
+      })
+    ).toThrow('news article "2026/05/test" body contains invalid entity mention "@."');
   });
 
   it('keeps labelled mention case modifiers unsupported', () => {
@@ -217,10 +206,10 @@ describe('normalizeEntityMentions', () => {
       normalizeEntityMentions({
         markdown: '[главного по электричеству](@kschemelinin:gen)',
         context: 'news article "2026/05/test" body',
-        registry,
-      }),
+        registry
+      })
     ).toThrow(
-      'news article "2026/05/test" body contains unsupported labelled entity mention "@kschemelinin:gen"; write the needed grammar in the visible link text',
+      'news article "2026/05/test" body contains unsupported labelled entity mention "@kschemelinin:gen"; write the needed grammar in the visible link text'
     );
   });
 
@@ -230,10 +219,10 @@ describe('normalizeEntityMentions', () => {
         markdown: 'Профиль ведет на @kschemelinin.',
         context: 'people profile "kschemelinin" body',
         registry,
-        sourceEntity: { type: 'person', slug: 'kschemelinin' },
-      }),
+        sourceEntity: { type: 'person', slug: 'kschemelinin' }
+      })
     ).toThrow(
-      'people profile "kschemelinin" body contains self entity mention "person:kschemelinin"',
+      'people profile "kschemelinin" body contains self entity mention "person:kschemelinin"'
     );
   });
 
@@ -243,10 +232,10 @@ describe('normalizeEntityMentions', () => {
         markdown: 'Профиль ведет на [свой профиль](@kschemelinin).',
         context: 'people profile "kschemelinin" body',
         registry,
-        sourceEntity: { type: 'person', slug: 'kschemelinin' },
-      }),
+        sourceEntity: { type: 'person', slug: 'kschemelinin' }
+      })
     ).toThrow(
-      'people profile "kschemelinin" body contains self entity mention "person:kschemelinin"',
+      'people profile "kschemelinin" body contains self entity mention "person:kschemelinin"'
     );
   });
 
@@ -256,11 +245,9 @@ describe('normalizeEntityMentions', () => {
         markdown: 'Описание @apple-garden.',
         context: 'place "apple-garden" body',
         registry,
-        sourceEntity: { type: 'place', slug: 'apple-garden' },
-      }),
-    ).toThrow(
-      'place "apple-garden" body contains self entity mention "place:apple-garden"',
-    );
+        sourceEntity: { type: 'place', slug: 'apple-garden' }
+      })
+    ).toThrow('place "apple-garden" body contains self entity mention "place:apple-garden"');
   });
 
   it('dedupes mentions by target type and slug in first appearance order', () => {
@@ -269,12 +256,12 @@ describe('normalizeEntityMentions', () => {
         markdown:
           '@kschemelinin согласовал работы, [подрядчик](@apetrov) подтвердил, а @kschemelinin проверил сеть.',
         context: 'news article "2026/05/test" body',
-        registry,
-      }),
+        registry
+      })
     ).toEqual({
       markdown:
         '[Кирилл Щемелинин](/people/kschemelinin/ "депутат, КПРФ") согласовал работы, [подрядчик](/people/apetrov/) подтвердил, а [Кирилл Щемелинин](/people/kschemelinin/ "депутат, КПРФ") проверил сеть.',
-      mentions: [targets[0], targets[1]],
+      mentions: [targets[0], targets[1]]
     });
   });
 
@@ -286,8 +273,8 @@ describe('normalizeEntityMentions', () => {
       normalizeEntityMentions({
         markdown,
         context: 'news article "2026/05/test" body',
-        registry: emptyRegistry,
-      }),
+        registry: emptyRegistry
+      })
     ).toEqual({ markdown, mentions: [] });
   });
 });

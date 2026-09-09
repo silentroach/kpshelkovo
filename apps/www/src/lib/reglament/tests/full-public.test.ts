@@ -7,21 +7,18 @@ const keys = (value: object): readonly string[] => Object.keys(value).sort();
 
 const shape = (value: object): string => keys(value).join(',');
 
-const unique = (values: readonly string[]): readonly string[] =>
-  [...new Set(values)].sort();
+const unique = (values: readonly string[]): readonly string[] => [...new Set(values)].sort();
 
-const keyVariants = (
-  values: readonly PublicFullReglamentSourceRef[],
-): readonly string[] => unique(values.map((value) => keys(value).join(',')));
+const keyVariants = (values: readonly PublicFullReglamentSourceRef[]): readonly string[] =>
+  unique(values.map((value) => keys(value).join(',')));
 
 describe('full reglament public contract', () => {
   it('keeps the meaningful full-2026.json shape and values stable', async () => {
     Object.assign(import.meta.env, {
       SITE: 'https://example.com',
-      BASE_URL: '/',
+      BASE_URL: '/'
     });
-    const { GET } =
-      await import('../../../pages/815/regulation/data/full-2026.json');
+    const { GET } = await import('../../../pages/815/regulation/data/full-2026.json');
     const response = await GET({} as never);
     const body = await response.text();
     const payload = validatePublicFullReglamentDataset(JSON.parse(body));
@@ -32,14 +29,7 @@ describe('full reglament public contract', () => {
     const assumption = payload.calculation_assumptions[0];
     const auditNote = payload.audit_notes[0];
 
-    if (
-      !village ||
-      !asset ||
-      !service ||
-      !mapping ||
-      !assumption ||
-      !auditNote
-    ) {
+    if (!village || !asset || !service || !mapping || !assumption || !auditNote) {
       throw new Error('Full reglament public collections must not be empty');
     }
 
@@ -50,14 +40,14 @@ describe('full reglament public contract', () => {
       ...payload.services.flatMap((item) => item.source_refs),
       ...payload.service_to_estimate_map.flatMap((item) => [
         ...item.source_refs,
-        ...item.estimate_source_refs,
+        ...item.estimate_source_refs
       ]),
       ...payload.calculation_assumptions.flatMap((item) => item.source_refs),
-      ...payload.audit_notes.flatMap((item) => item.source_refs),
+      ...payload.audit_notes.flatMap((item) => item.source_refs)
     ];
     const quantities = payload.common_assets.flatMap((item) => [
       item.total,
-      ...Object.values(item.values_by_village),
+      ...Object.values(item.values_by_village)
     ]);
 
     expect({
@@ -73,7 +63,7 @@ describe('full reglament public contract', () => {
         serviceToEstimateMapItem: shape(mapping),
         calculationAssumption: shape(assumption),
         auditNote: shape(auditNote),
-        sourceRefVariants: keyVariants(sourceRefs),
+        sourceRefVariants: keyVariants(sourceRefs)
       },
       values: {
         schemaVersion: payload.schema_version,
@@ -82,8 +72,7 @@ describe('full reglament public contract', () => {
         tariffSummary: {
           tariffAreaSotka: payload.tariff_summary.tariff_area_sotka,
           totalAnnualCostRub: payload.tariff_summary.total_annual_cost_rub,
-          tariffRubPerSotkaMonth:
-            payload.tariff_summary.tariff_rub_per_sotka_month,
+          tariffRubPerSotkaMonth: payload.tariff_summary.tariff_rub_per_sotka_month
         },
         collectionSizes: {
           villages: payload.villages.length,
@@ -91,22 +80,18 @@ describe('full reglament public contract', () => {
           services: payload.services.length,
           serviceMappings: payload.service_to_estimate_map.length,
           calculationAssumptions: payload.calculation_assumptions.length,
-          auditNotes: payload.audit_notes.length,
+          auditNotes: payload.audit_notes.length
         },
         villageIds: payload.villages.map((item) => item.id),
         quantityStatuses: unique(quantities.map((item) => item.status)),
         serviceGroups: unique(payload.services.map((item) => item.group)),
-        mappingStatuses: unique(
-          payload.service_to_estimate_map.map((item) => item.status),
-        ),
-        auditSeverities: unique(
-          payload.audit_notes.map((item) => item.severity),
-        ),
+        mappingStatuses: unique(payload.service_to_estimate_map.map((item) => item.status)),
+        auditSeverities: unique(payload.audit_notes.map((item) => item.severity)),
         keepsNullForEmptyCell: payload.common_assets.find(
-          (item) => item.id === 'roads-parking-sites',
+          (item) => item.id === 'roads-parking-sites'
         )?.values_by_village['shelkovo-park'],
-        compactJson: body === JSON.stringify(payload),
-      },
+        compactJson: body === JSON.stringify(payload)
+      }
     }).toMatchInlineSnapshot(`
       {
         "keys": {

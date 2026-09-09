@@ -1,19 +1,10 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/svelte';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import type { YMapClustererProps } from '@yandex/ymaps3-clusterer';
-import type {
-  MapEventUpdateHandler,
-  YMapFeatureProps,
-} from '@yandex/ymaps3-types';
+import type { MapEventUpdateHandler, YMapFeatureProps } from '@yandex/ymaps3-types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { PlaceMapItem } from '@/lib/places/map-types';
 import type { PlaceMapPublicItemDto } from '@/lib/places/map-public-dto';
+import type { PlaceMapItem } from '@/lib/places/map-types';
 
 import PlaceMap from '../PlaceMap.svelte';
 
@@ -25,7 +16,7 @@ vi.mock('@yandex/ymaps3-clusterer', () => ({
     for (const feature of props.features) props.marker(feature);
     return {};
   }),
-  clusterByGrid: vi.fn(() => ({ render: vi.fn() })),
+  clusterByGrid: vi.fn(() => ({ render: vi.fn() }))
 }));
 
 const map = {
@@ -33,7 +24,7 @@ const map = {
   removeChild: vi.fn(),
   update: vi.fn(),
   destroy: vi.fn(),
-  zoom: 15,
+  zoom: 15
 };
 const markerElements: HTMLElement[] = [];
 const mapElements: HTMLElement[] = [];
@@ -61,11 +52,11 @@ const place: PlaceMapItem = {
       {
         days: ['mon', 'wed', 'thu', 'fri', 'sat', 'sun'],
         opensAt: '10:00',
-        closesAt: '22:00',
-      },
-    ],
+        closesAt: '22:00'
+      }
+    ]
   },
-  url: '/map/burzhuyka/',
+  url: '/map/burzhuyka/'
 };
 const publicPlace: PlaceMapPublicItemDto = {
   slug: 'burzhuyka',
@@ -78,11 +69,11 @@ const publicPlace: PlaceMapPublicItemDto = {
       {
         days: ['mon', 'wed', 'thu', 'fri', 'sat', 'sun'],
         opens_at: '10:00',
-        closes_at: '22:00',
-      },
-    ],
+        closes_at: '22:00'
+      }
+    ]
   },
-  html_url: 'https://kpshelkovo.online/map/burzhuyka/',
+  html_url: 'https://kpshelkovo.online/map/burzhuyka/'
 };
 const titanicPlace: PlaceMapItem = {
   ...place,
@@ -90,7 +81,7 @@ const titanicPlace: PlaceMapItem = {
   name: 'Детская площадка «Титаник»',
   marker: 'titanic',
   coordinates: { lat: 55.060703, lng: 37.746894 },
-  url: '/map/titanic/',
+  url: '/map/titanic/'
 };
 const pondsPlace: PlaceMapItem = {
   ...titanicPlace,
@@ -109,14 +100,14 @@ const pondsPlace: PlaceMapItem = {
               [37.74, 55.05],
               [37.75, 55.05],
               [37.75, 55.06],
-              [37.74, 55.05],
-            ],
-          ],
-        ],
-      },
-    },
+              [37.74, 55.05]
+            ]
+          ]
+        ]
+      }
+    }
   },
-  url: '/map/hunting-ponds/',
+  url: '/map/hunting-ponds/'
 };
 
 const installYandexMaps = (): void => {
@@ -125,17 +116,12 @@ const installYandexMaps = (): void => {
     writable: true,
     value: {
       ready: Promise.resolve(),
-      YMap: vi.fn(function YMap(
-        element: HTMLElement,
-        props: (typeof mapProps)[number],
-      ) {
+      YMap: vi.fn(function YMap(element: HTMLElement, props: (typeof mapProps)[number]) {
         mapElements.push(element);
         mapProps.push(props);
         return map;
       }),
-      YMapDefaultSchemeLayer: vi.fn(function YMapDefaultSchemeLayer(
-        props: unknown,
-      ) {
+      YMapDefaultSchemeLayer: vi.fn(function YMapDefaultSchemeLayer(props: unknown) {
         schemeLayerProps.push(props);
         return {};
       }),
@@ -157,8 +143,8 @@ const installYandexMaps = (): void => {
       YMapMarker: vi.fn(function YMapMarker(_: unknown, element: HTMLElement) {
         markerElements.push(element);
         return {};
-      }),
-    },
+      })
+    }
   });
 };
 
@@ -218,28 +204,22 @@ describe('PlaceMap', () => {
       </a>
     `);
     expect(mapProps[0]).toMatchObject({
-      behaviors: [
-        'drag',
-        'scrollZoom',
-        'pinchZoom',
-        'dblClick',
-        'oneFingerZoom',
-      ],
+      behaviors: ['drag', 'scrollZoom', 'pinchZoom', 'dblClick', 'oneFingerZoom'],
       mode: 'vector',
       location: {
         bounds: [
           [37.708, 55.049],
-          [37.764, 55.081],
-        ],
-      },
+          [37.764, 55.081]
+        ]
+      }
     });
     expect(schemeLayerProps[0]).toEqual({
       layers: {
         ground: { zIndex: 0 },
         buildings: { zIndex: 1 },
         icons: { visible: false, zIndex: 2 },
-        labels: { zIndex: 3 },
-      },
+        labels: { zIndex: 3 }
+      }
     });
 
     const marker = markerElements[0] as HTMLAnchorElement;
@@ -254,15 +234,15 @@ describe('PlaceMap', () => {
     window.history.replaceState({}, '', '/map/?h=burzhuyka');
     const fetch = vi.fn(async () =>
       Response.json({
-        places: [publicPlace],
-      }),
+        places: [publicPlace]
+      })
     );
     vi.stubGlobal('fetch', fetch);
 
     render(PlaceMap, {
       props: {
-        dataUrl: '/map/data/places.json',
-      },
+        dataUrl: '/map/data/places.json'
+      }
     });
 
     await waitFor(() => expect(markerElements).toHaveLength(1));
@@ -277,7 +257,7 @@ describe('PlaceMap', () => {
     window.history.replaceState({}, '', '/map/?h=burzhuyka&from=issue');
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => new Response(undefined, { status: 503 })),
+      vi.fn(async () => new Response(undefined, { status: 503 }))
     );
     vi.spyOn(console, 'error').mockImplementation(() => {});
 
@@ -286,16 +266,16 @@ describe('PlaceMap', () => {
         dataUrl: '/map/data/places.json',
         fallbackPlace: {
           name: place.name,
-          url: place.url,
-        },
-      },
+          url: place.url
+        }
+      }
     });
 
     await screen.findByRole('status');
 
     expect({
       href: screen.getByRole('link').getAttribute('href'),
-      url: `${window.location.pathname}${window.location.search}`,
+      url: `${window.location.pathname}${window.location.search}`
     }).toMatchInlineSnapshot(`
       {
         "href": "/map/burzhuyka/",
@@ -316,7 +296,7 @@ describe('PlaceMap', () => {
       'scrollZoom',
       'pinchZoom',
       'dblClick',
-      'oneFingerZoom',
+      'oneFingerZoom'
     ]);
     expect(map.update.mock.lastCall?.[0].margin).toEqual([112, 32, 32, 32]);
   });
@@ -331,7 +311,7 @@ describe('PlaceMap', () => {
             ...titanicPlace,
             slug: 'apple-garden',
             name: 'Яблоневый сад',
-            marker: 'apple',
+            marker: 'apple'
           },
           { ...place, marker: 'foodtruck' },
           titanicPlace,
@@ -340,28 +320,28 @@ describe('PlaceMap', () => {
             slug: 'construction',
             name: 'Строительство',
             marker: 'construction',
-            status: 'underConstruction',
+            status: 'underConstruction'
           },
           {
             ...titanicPlace,
             slug: 'hunting-ponds',
             name: 'Охотничьи пруды',
-            marker: 'fish',
+            marker: 'fish'
           },
           {
             ...titanicPlace,
             slug: 'forest-checkpoint',
             name: 'КПП Фореста',
-            marker: 'kpp',
+            marker: 'kpp'
           },
           {
             ...titanicPlace,
             slug: 'animals-wehome',
             name: 'Животные в Зеркальных домах',
-            marker: 'animals',
-          },
-        ],
-      },
+            marker: 'animals'
+          }
+        ]
+      }
     });
 
     await waitFor(() => expect(markerElements).toHaveLength(7));
@@ -372,13 +352,11 @@ describe('PlaceMap', () => {
       return {
         marker: marker.dataset.marker,
         graphicClass: marker.querySelector('[aria-hidden="true"]')?.className,
-        hasClosedIndicator: Boolean(
-          marker.querySelector('.place-map-marker-closed-indicator'),
-        ),
+        hasClosedIndicator: Boolean(marker.querySelector('.place-map-marker-closed-indicator')),
         imageClass: image?.className,
         imageDimensions: [image?.width, image?.height],
         imageFile: image?.src.split('/').at(-1),
-        usesDefaultPoint: Boolean(marker.querySelector('.ui-map-marker')),
+        usesDefaultPoint: Boolean(marker.querySelector('.ui-map-marker'))
       };
     });
 
@@ -472,7 +450,7 @@ describe('PlaceMap', () => {
     `);
     expect({
       ariaLabel: markerElements[3]?.getAttribute('aria-label'),
-      title: markerElements[3]?.title,
+      title: markerElements[3]?.title
     }).toMatchInlineSnapshot(`
       {
         "ariaLabel": "Открыть место «Строительство», Строится, сейчас закрыто",
@@ -484,11 +462,7 @@ describe('PlaceMap', () => {
   it('focuses and highlights the requested place for five seconds', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: false }));
     const historyState = { navigation: 'map' };
-    window.history.replaceState(
-      historyState,
-      '',
-      '/map/?q=a%20b&flag&h=titanic#map',
-    );
+    window.history.replaceState(historyState, '', '/map/?q=a%20b&flag&h=titanic#map');
     const replaceState = vi.spyOn(window.history, 'replaceState');
     const setTimeout = vi.spyOn(window, 'setTimeout');
 
@@ -500,20 +474,18 @@ describe('PlaceMap', () => {
     const focusUpdate = map.update.mock.calls
       .map(([update]) => update)
       .find((update) => update.location?.center);
-    const timerIndex = setTimeout.mock.calls.findIndex(
-      ([, delay]) => delay === 5_000,
-    );
+    const timerIndex = setTimeout.mock.calls.findIndex(([, delay]) => delay === 5_000);
     const expireHighlight = setTimeout.mock.calls[timerIndex]?.[0];
     const timer = setTimeout.mock.results[timerIndex]?.value;
 
     expect({
       marker: {
         current: marker?.getAttribute('aria-current'),
-        highlighted: marker?.dataset.highlighted,
+        highlighted: marker?.dataset.highlighted
       },
       focusUpdate,
       clusterMaxZoom: clustererProps[0]?.maxZoom,
-      url: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+      url: `${window.location.pathname}${window.location.search}${window.location.hash}`
     }).toMatchInlineSnapshot(`
       {
         "clusterMaxZoom": 15,
@@ -546,10 +518,10 @@ describe('PlaceMap', () => {
     expect({
       marker: {
         current: marker?.getAttribute('aria-current'),
-        highlighted: marker?.dataset.highlighted,
+        highlighted: marker?.dataset.highlighted
       },
       replaceState: replaceState.mock.lastCall,
-      url: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+      url: `${window.location.pathname}${window.location.search}${window.location.hash}`
     }).toMatchInlineSnapshot(`
       {
         "marker": {
@@ -570,7 +542,7 @@ describe('PlaceMap', () => {
 
   it('previews an area on fine-pointer hover and keyboard focus', async () => {
     vi.stubGlobal('matchMedia', (query: string) => ({
-      matches: query.includes('(hover: hover)'),
+      matches: query.includes('(hover: hover)')
     }));
 
     render(PlaceMap, { props: { places: [pondsPlace] } });
@@ -580,13 +552,12 @@ describe('PlaceMap', () => {
     const feature = areaFeatures[0];
     const marker = markerElements[0];
 
-    if (!feature || !marker)
-      throw new Error('area preview fixtures are missing');
+    if (!feature || !marker) throw new Error('area preview fixtures are missing');
 
     expect({
       id: feature.props.id,
       geometryType: feature.props.geometry.type,
-      initialStyle: feature.props.style,
+      initialStyle: feature.props.style
     }).toMatchInlineSnapshot(`
       {
         "geometryType": "MultiPolygon",
@@ -646,14 +617,14 @@ describe('PlaceMap', () => {
         type: 'mouseenter',
         shiftKey: false,
         altKey: false,
-        metaKey: false,
+        metaKey: false
       },
-      stopPropagation: vi.fn(),
+      stopPropagation: vi.fn()
     });
     await new Promise((resolve) => window.setTimeout(resolve, 100));
     expect(feature.update.mock.lastCall?.[0].style).toMatchObject({
       fillOpacity: 0,
-      interactive: true,
+      interactive: true
     });
 
     featureMouseLeave(new MouseEvent('mouseleave'), {
@@ -663,21 +634,21 @@ describe('PlaceMap', () => {
         type: 'mouseleave',
         shiftKey: false,
         altKey: false,
-        metaKey: false,
+        metaKey: false
       },
-      stopPropagation: vi.fn(),
+      stopPropagation: vi.fn()
     });
     expect(feature.update.mock.lastCall?.[0].style).toEqual({
       zIndex: 0,
       fillOpacity: 0,
       interactive: false,
-      stroke: [],
+      stroke: []
     });
 
     await fireEvent.focus(marker);
     expect(feature.update.mock.lastCall?.[0].style).toMatchObject({
       fillOpacity: 0,
-      interactive: true,
+      interactive: true
     });
 
     await fireEvent.keyDown(marker, { key: 'Escape' });
@@ -685,7 +656,7 @@ describe('PlaceMap', () => {
       zIndex: 0,
       fillOpacity: 0,
       interactive: false,
-      stroke: [],
+      stroke: []
     });
   });
 
@@ -700,11 +671,9 @@ describe('PlaceMap', () => {
         style: expect.objectContaining({
           fillOpacity: 0,
           interactive: false,
-          stroke: expect.arrayContaining([
-            expect.objectContaining({ dash: [6, 3], width: 2.5 }),
-          ]),
-        }),
-      }),
+          stroke: expect.arrayContaining([expect.objectContaining({ dash: [6, 3], width: 2.5 })])
+        })
+      })
     );
   });
 
@@ -719,12 +688,10 @@ describe('PlaceMap', () => {
     await waitFor(() => expect(markerElements).toHaveLength(2));
 
     expect({
-      focused: map.update.mock.calls.some(([update]) =>
-        Boolean(update.location?.center),
-      ),
+      focused: map.update.mock.calls.some(([update]) => Boolean(update.location?.center)),
       highlights: markerElements.map((marker) => marker.dataset.highlighted),
       replaceState: replaceState.mock.lastCall,
-      url: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+      url: `${window.location.pathname}${window.location.search}${window.location.hash}`
     }).toMatchInlineSnapshot(`
       {
         "focused": false,
@@ -752,14 +719,10 @@ describe('PlaceMap', () => {
     const view = render(PlaceMap, { props: { places: [place] } });
 
     await waitFor(() =>
-      expect(setTimeout.mock.calls.some(([, delay]) => delay === 5_000)).toBe(
-        true,
-      ),
+      expect(setTimeout.mock.calls.some(([, delay]) => delay === 5_000)).toBe(true)
     );
 
-    const timerIndex = setTimeout.mock.calls.findIndex(
-      ([, delay]) => delay === 5_000,
-    );
+    const timerIndex = setTimeout.mock.calls.findIndex(([, delay]) => delay === 5_000);
     const timer = setTimeout.mock.results[timerIndex]?.value;
 
     view.unmount();
@@ -780,7 +743,7 @@ describe('PlaceMap', () => {
     expect({
       open: marker?.dataset.open,
       title: marker?.title,
-      ariaLabel: marker?.getAttribute('aria-label'),
+      ariaLabel: marker?.getAttribute('aria-label')
     }).toMatchInlineSnapshot(`
       {
         "ariaLabel": "Открыть место «Буржуйка», сейчас закрыто",
@@ -790,9 +753,7 @@ describe('PlaceMap', () => {
       }
     `);
 
-    const timerIndex = setInterval.mock.calls.findIndex(
-      ([, delay]) => delay === 60_000,
-    );
+    const timerIndex = setInterval.mock.calls.findIndex(([, delay]) => delay === 60_000);
     const update = setInterval.mock.calls[timerIndex]?.[0];
     const timer = setInterval.mock.results[timerIndex]?.value;
 
@@ -807,7 +768,7 @@ describe('PlaceMap', () => {
     expect({
       open: marker?.dataset.open,
       title: marker?.title,
-      ariaLabel: marker?.getAttribute('aria-label'),
+      ariaLabel: marker?.getAttribute('aria-label')
     }).toMatchInlineSnapshot(`
       {
         "ariaLabel": "Открыть место «Буржуйка», открыто до 22:00",
@@ -831,8 +792,7 @@ describe('PlaceMap', () => {
     const mapElement = mapElements[0];
     const update = mapUpdateHandlers[0];
 
-    if (!mapElement || !update)
-      throw new Error('map update listener is missing');
+    if (!mapElement || !update) throw new Error('map update listener is missing');
 
     update({
       type: 'update',
@@ -841,16 +801,14 @@ describe('PlaceMap', () => {
         zoom: 17,
         bounds: [
           [37.7, 55.04],
-          [37.77, 55.08],
-        ],
+          [37.77, 55.08]
+        ]
       },
       camera: {},
-      mapInAction: false,
+      mapInAction: false
     });
 
-    expect(mapElement.style.getPropertyValue('--place-map-marker-scale')).toBe(
-      '1.150',
-    );
+    expect(mapElement.style.getPropertyValue('--place-map-marker-scale')).toBe('1.150');
   });
 
   it('renders an accessible cluster that zooms to its places', async () => {
@@ -895,12 +853,12 @@ describe('PlaceMap', () => {
       location: {
         bounds: [
           [37.707046, 55.060473],
-          [37.75609, 55.060756],
+          [37.75609, 55.060756]
         ],
         duration: 220,
-        easing: 'ease-in-out',
+        easing: 'ease-in-out'
       },
-      margin: [112, 80, 32, 80],
+      margin: [112, 80, 32, 80]
     });
 
     vi.stubGlobal('matchMedia', () => ({ matches: true }));
@@ -918,11 +876,11 @@ describe('PlaceMap', () => {
         zoom: 16,
         bounds: [
           [37.7, 55.04],
-          [37.77, 55.08],
-        ],
+          [37.77, 55.08]
+        ]
       },
       camera: {},
-      mapInAction: false,
+      mapInAction: false
     });
 
     await waitFor(() => expect(document.activeElement).toBe(marker));
@@ -934,7 +892,7 @@ describe('PlaceMap', () => {
 
     Object.defineProperty(window, 'ymaps3', {
       configurable: true,
-      get: () => (++reads === 1 ? api : undefined),
+      get: () => (++reads === 1 ? api : undefined)
     });
 
     render(PlaceMap, { props: { places: [place] } });

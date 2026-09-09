@@ -1,11 +1,9 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { contentDateSchema } from '@/lib/content-date';
+
+import { parseStatusIncidentWindows, resolveStatusIncidentState } from '../lifecycle';
 import type { StatusIncidentEntry } from '../load';
-import {
-  parseStatusIncidentWindows,
-  resolveStatusIncidentState,
-} from '../lifecycle';
 
 const START = '2026-08-26T10:00:00+03:00';
 const END = '2026-08-26T13:00:00+03:00';
@@ -20,8 +18,8 @@ const maintenanceEntry: StatusIncidentEntry = {
     kind: 'maintenance',
     started_at: testDate.parse('26.08.2026 10:00'),
     ended_at: testDate.parse('26.08.2026 13:00'),
-    source_url: 'https://example.com/dam-maintenance',
-  },
+    source_url: 'https://example.com/dam-maintenance'
+  }
 };
 
 let buildStatusDataset: typeof import('../load').buildStatusDataset;
@@ -32,18 +30,17 @@ let buildStatusPublicPayload: typeof import('../public-dto').buildStatusPublicPa
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ buildStatusDataset } = await import('../load'));
-  ({ buildStatusHomeMarkdown, buildStatusServiceMarkdown } =
-    await import('../markdown'));
+  ({ buildStatusHomeMarkdown, buildStatusServiceMarkdown } = await import('../markdown'));
   ({ buildStatusPublicPayload } = await import('../public-dto'));
 });
 
 const statusSnapshot = (now: string) => {
   const data = buildStatusDataset([maintenanceEntry], {
-    now: new Date(now),
+    now: new Date(now)
   });
   const payload = buildStatusPublicPayload(data);
   const incident = payload.incidents[0];
@@ -53,21 +50,20 @@ const statusSnapshot = (now: string) => {
     incident: {
       phase: incident?.phase,
       phaseLabel: incident?.phase_label,
-      isActive: incident?.is_active,
+      isActive: incident?.is_active
     },
     activeIds: payload.active.map((item) => item.id),
     service: {
       state: service?.service_status,
       activeMaintenanceIds: service?.active_maintenance_ids,
-      incidentIds: service?.incident_ids,
-    },
+      incidentIds: service?.incident_ids
+    }
   };
 };
 
 describe('status lifecycle boundaries', () => {
   it('publishes a future maintenance window as scheduled', () => {
-    expect(statusSnapshot('2026-08-26T09:59:59.999+03:00'))
-      .toMatchInlineSnapshot(`
+    expect(statusSnapshot('2026-08-26T09:59:59.999+03:00')).toMatchInlineSnapshot(`
         {
           "activeIds": [],
           "incident": {
@@ -112,7 +108,7 @@ describe('status lifecycle boundaries', () => {
 
   it('keeps snapshot-scheduled maintenance in Markdown at the start boundary', () => {
     const data = buildStatusDataset([maintenanceEntry], {
-      now: new Date(Date.parse(START) - 1),
+      now: new Date(Date.parse(START) - 1)
     });
     const service = data.byService.get('dam');
 
@@ -157,13 +153,13 @@ describe('status lifecycle boundaries', () => {
     const input = {
       kind: 'incident' as const,
       service: 'water' as const,
-      start: Date.parse(START),
+      start: Date.parse(START)
     };
 
     expect([
       resolveStatusIncidentState(input, input.start - 1),
       resolveStatusIncidentState(input, input.start),
-      resolveStatusIncidentState(input, Date.parse(END)),
+      resolveStatusIncidentState(input, Date.parse(END))
     ]).toMatchInlineSnapshot(`
       [
         {
@@ -191,7 +187,7 @@ describe('status lifecycle boundaries', () => {
   it('rejects the whole client payload when one window has an invalid range', () => {
     const payload = JSON.stringify([
       { kind: 'maintenance', start: Date.parse(START), end: Date.parse(END) },
-      { kind: 'incident', start: Date.parse(END), end: Date.parse(START) },
+      { kind: 'incident', start: Date.parse(END), end: Date.parse(START) }
     ]);
 
     expect(parseStatusIncidentWindows(payload)).toBeUndefined();

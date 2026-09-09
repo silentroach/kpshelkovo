@@ -1,12 +1,12 @@
 import type {
   EntityMentionSourceRef,
   EntityMentionSourceRefSource,
-  EntityMentionTarget,
+  EntityMentionTarget
 } from './types';
 
 export const createEntityMentionSourceRefs = (
   mentions: readonly EntityMentionTarget[],
-  source: EntityMentionSourceRefSource,
+  source: EntityMentionSourceRefSource
 ): readonly EntityMentionSourceRef[] => {
   const seen = new Set<string>();
   const refs: EntityMentionSourceRef[] = [];
@@ -21,7 +21,7 @@ export const createEntityMentionSourceRefs = (
     seen.add(key);
     refs.push({
       target: { type: mention.type, slug: mention.slug },
-      ...source,
+      ...source
     });
   }
 

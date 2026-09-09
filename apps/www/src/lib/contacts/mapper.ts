@@ -1,28 +1,17 @@
 import {
   preprocessSiteMarkdownContent,
-  type PreprocessedSiteMarkdown,
+  type PreprocessedSiteMarkdown
 } from '@/lib/markdown/render';
 import type { SiteMentionRegistry } from '@/lib/mentions';
 
 import type { ContactEntry } from './load';
-import {
-  contactCanonical,
-  contactMarkdownUrl,
-  contactUrl,
-  contactVcfUrl,
-} from './routes';
-import type {
-  Contact,
-  ContactContacts,
-  ContactLocation,
-  ContactReview,
-  ContactVcf,
-} from './types';
+import { contactCanonical, contactMarkdownUrl, contactUrl, contactVcfUrl } from './routes';
+import type { Contact, ContactContacts, ContactLocation, ContactReview, ContactVcf } from './types';
 
 const preprocessContactContent = (
   markdown: string,
   context: string,
-  mentionRegistry?: SiteMentionRegistry,
+  mentionRegistry?: SiteMentionRegistry
 ): PreprocessedSiteMarkdown => {
   if (mentionRegistry) {
     return preprocessSiteMarkdownContent(markdown, context, mentionRegistry);
@@ -32,47 +21,41 @@ const preprocessContactContent = (
 
   return {
     markdown: body.trim() ? body : '',
-    mentions: [],
+    mentions: []
   };
 };
 
-const mapContacts = (
-  contacts: ContactEntry['data']['contacts'],
-): ContactContacts => ({
+const mapContacts = (contacts: ContactEntry['data']['contacts']): ContactContacts => ({
   phone: contacts.phone,
   telegram: contacts.telegram,
   whatsapp: contacts.whatsapp,
   email: contacts.email,
-  website: contacts.website,
+  website: contacts.website
 });
 
-const mapLocation = (
-  location: ContactEntry['data']['location'],
-): ContactLocation | undefined =>
+const mapLocation = (location: ContactEntry['data']['location']): ContactLocation | undefined =>
   location
     ? {
         title: location.title,
         url: location.url,
         address: location.address,
-        coordinates: location.coordinates,
+        coordinates: location.coordinates
       }
     : undefined;
 
-const mapReviews = (
-  reviews: ContactEntry['data']['reviews'],
-): readonly ContactReview[] =>
+const mapReviews = (reviews: ContactEntry['data']['reviews']): readonly ContactReview[] =>
   reviews?.map((review) => ({
     sentiment: review.sentiment,
     summary: review.summary,
     publishedAt: new Date(`${review.published_at}T00:00:00.000Z`),
     publishedIso: review.published_at,
-    url: review.url,
+    url: review.url
   })) ?? [];
 
 const mapVcf = (
   vcf: ContactEntry['data']['vcf'],
   category: string,
-  slug: string,
+  slug: string
 ): ContactVcf | undefined => {
   if (!vcf?.enable) {
     return;
@@ -90,14 +73,14 @@ const mapVcf = (
     address: vcf.address,
     jobTitle: vcf.job_title,
     role: vcf.role,
-    note: vcf.note,
+    note: vcf.note
   };
 
   if (vcf.kind === 'organization') {
     return {
       ...mapped,
       kind: vcf.kind,
-      organization: vcf.organization,
+      organization: vcf.organization
     };
   }
 
@@ -105,28 +88,26 @@ const mapVcf = (
     ...mapped,
     kind: vcf.kind,
     name: vcf.name,
-    organization: vcf.organization,
+    organization: vcf.organization
   };
 };
 
 export const mapRawContact = (
   entry: ContactEntry,
-  mentionRegistry?: SiteMentionRegistry,
+  mentionRegistry?: SiteMentionRegistry
 ): Contact => {
   const slug = entry.data.slug;
   const category = entry.data.category;
   const expectedId = `${category}/${slug}`;
 
   if (entry.id !== expectedId) {
-    throw new Error(
-      `contact "${entry.id}" id must equal category and slug "${expectedId}"`,
-    );
+    throw new Error(`contact "${entry.id}" id must equal category and slug "${expectedId}"`);
   }
 
   const body = preprocessContactContent(
     entry.body?.trim() ?? '',
     `contact "${entry.id}" body`,
-    mentionRegistry,
+    mentionRegistry
   );
   return {
     slug,
@@ -145,6 +126,6 @@ export const mapRawContact = (
     mentions: body.mentions,
     url: contactUrl({ category, slug }),
     markdownUrl: contactMarkdownUrl({ category, slug }),
-    canonical: contactCanonical({ category, slug }),
+    canonical: contactCanonical({ category, slug })
   };
 };

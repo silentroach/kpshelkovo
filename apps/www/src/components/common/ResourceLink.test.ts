@@ -1,11 +1,10 @@
 /// <reference types="astro/client" />
 
+// @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
+import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 import { describe, expect, it } from 'vitest';
 
 import { createAstroContainer } from '@/test/astro-container';
-
-// @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
-import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 
 describe('ResourceLink', () => {
   it('renders PDF links with prefetch opt-out and full reload', async () => {
@@ -16,11 +15,11 @@ describe('ResourceLink', () => {
         class: 'ui-link',
         type: 'application/pdf',
         reload: true,
-        'aria-label': 'Открыть полный регламент',
+        'aria-label': 'Открыть полный регламент'
       },
       slots: {
-        default: 'полный регламент',
-      },
+        default: 'полный регламент'
+      }
     });
 
     expect(html).toContain('href="/815/regulation/full.pdf"');
@@ -38,11 +37,11 @@ describe('ResourceLink', () => {
       props: {
         href: '/news/events/community-day.ics',
         download: 'community-day.ics',
-        title: 'Добавить в календарь',
+        title: 'Добавить в календарь'
       },
       slots: {
-        default: 'Добавить в календарь',
-      },
+        default: 'Добавить в календарь'
+      }
     });
 
     expect(html).toContain('href="/news/events/community-day.ics"');

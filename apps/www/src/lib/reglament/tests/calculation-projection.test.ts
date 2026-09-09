@@ -10,8 +10,8 @@ const scenarios = [
   {
     name: 'basic enabled field',
     changes: {
-      rows: { 'lighting-electricity': { enabled: false } },
-    },
+      rows: { 'lighting-electricity': { enabled: false } }
+    }
   },
   {
     name: 'quantity fields',
@@ -20,16 +20,16 @@ const scenarios = [
         'lighting-electricity': {
           volume: 200_000,
           frequency: 10,
-          rate: 7.1,
-        },
-      },
-    },
+          rate: 7.1
+        }
+      }
+    }
   },
   {
     name: 'fixed annual price',
     changes: {
-      rows: { 'security-access-control': { fixed_price: 9_000_000 } },
-    },
+      rows: { 'security-access-control': { fixed_price: 9_000_000 } }
+    }
   },
   {
     name: 'expert cost and coefficient fields',
@@ -45,11 +45,11 @@ const scenarios = [
           overhead_rate: 0.65,
           profit_rate: 0.35,
           usn_rate: 0.1,
-          vat_rate: 0.07,
-        },
-      },
-    },
-  },
+          vat_rate: 0.07
+        }
+      }
+    }
+  }
 ] as const satisfies readonly {
   readonly name: string;
   readonly changes: EstimateCalculationChanges;
@@ -57,21 +57,16 @@ const scenarios = [
 
 describe('projectEstimateCalculationInput', () => {
   it('keeps only fields used by the calculation', () => {
-    expect(
-      JSON.stringify(projectEstimateCalculationInput(estimate2026)),
-    ).not.toMatch(
-      /"(?:source_refs|editable_fields|description|tags|title|kind|unit|label)"/,
+    expect(JSON.stringify(projectEstimateCalculationInput(estimate2026))).not.toMatch(
+      /"(?:source_refs|editable_fields|description|tags|title|kind|unit|label)"/
     );
   });
 
-  it.each(scenarios)(
-    'matches the canonical estimate for $name',
-    ({ changes }) => {
-      const projection = projectEstimateCalculationInput(estimate2026);
+  it.each(scenarios)('matches the canonical estimate for $name', ({ changes }) => {
+    const projection = projectEstimateCalculationInput(estimate2026);
 
-      expect(calculateEstimate(projection, changes)).toEqual(
-        calculateEstimate(estimate2026, changes),
-      );
-    },
-  );
+    expect(calculateEstimate(projection, changes)).toEqual(
+      calculateEstimate(estimate2026, changes)
+    );
+  });
 });

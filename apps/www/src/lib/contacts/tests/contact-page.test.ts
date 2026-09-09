@@ -3,8 +3,8 @@
 import { type HTMLElement, Window } from 'happy-dom';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createAstroContainer } from '@/test/astro-container';
 import { visibleWhitespace } from '@/lib/test/visible-whitespace';
+import { createAstroContainer } from '@/test/astro-container';
 
 import type { Contact } from '../types';
 
@@ -22,13 +22,13 @@ const fixture = vi.hoisted(() => ({
     mentions: [],
     url: '/sarafan/construction/sergey/',
     markdownUrl: '/sarafan/construction/sergey/index.md',
-    canonical: 'https://example.com/sarafan/construction/sergey/',
-  } satisfies Contact,
+    canonical: 'https://example.com/sarafan/construction/sergey/'
+  } satisfies Contact
 }));
 
 vi.mock('@/lib/contacts/load', () => ({
   loadContacts: async () => [fixture.contact],
-  loadContact: async () => fixture.contact,
+  loadContact: async () => fixture.contact
 }));
 
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
@@ -48,10 +48,10 @@ describe('/sarafan/[category]/[slug]/', () => {
       await container.renderToString(ContactPage, {
         params: {
           category: fixture.contact.category,
-          slug: fixture.contact.slug,
+          slug: fixture.contact.slug
         },
-        request: new Request(fixture.contact.canonical),
-      }),
+        request: new Request(fixture.contact.canonical)
+      })
     );
     const searchBodies = page.querySelectorAll('[data-pagefind-body]');
     if (searchBodies.length === 0) {
@@ -59,10 +59,7 @@ describe('/sarafan/[category]/[slug]/', () => {
     }
 
     const phoneLink = page.querySelector('a[href^="tel:"]');
-    const searchText = Array.from(
-      searchBodies,
-      ({ textContent }) => textContent,
-    )
+    const searchText = Array.from(searchBodies, ({ textContent }) => textContent)
       .join(' ')
       .trim();
 
@@ -70,7 +67,7 @@ describe('/sarafan/[category]/[slug]/', () => {
       phoneInPage: page.textContent.includes('+7 996 967-00-18'),
       phoneHref: phoneLink?.getAttribute('href'),
       phoneInSearch: searchText.includes('+7 996 967-00-18'),
-      searchText: visibleWhitespace(searchText),
+      searchText: visibleWhitespace(searchText)
     }).toMatchInlineSnapshot(`
       {
         "phoneHref": "tel:+79969670018",

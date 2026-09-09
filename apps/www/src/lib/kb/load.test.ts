@@ -9,7 +9,7 @@ let createPersonMentionTarget: typeof import('@/lib/people/mentions').createPers
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ createPersonMentionTarget } = await import('@/lib/people/mentions'));
@@ -28,8 +28,8 @@ const page = (input: {
   data: {
     title: input.title,
     flags: input.flags,
-    sources: input.sources,
-  },
+    sources: input.sources
+  }
 });
 
 describe('buildKbPages', () => {
@@ -37,16 +37,16 @@ describe('buildKbPages', () => {
     const pages = buildKbPages([
       page({
         id: 'index',
-        title: 'База знаний',
+        title: 'База знаний'
       }),
       page({
         id: 'services/internet',
-        title: 'Интернет в поселке',
+        title: 'Интернет в поселке'
       }),
       page({
         id: 'services/internet/fiber',
-        title: 'Оптоволокно',
-      }),
+        title: 'Оптоволокно'
+      })
     ]);
 
     expect(pages).toHaveLength(3);
@@ -54,7 +54,7 @@ describe('buildKbPages', () => {
       url: '/kb/',
       canonical: 'https://example.com/kb/',
       routeSlug: undefined,
-      isSection: true,
+      isSection: true
     });
     const internetPage = pages[1];
 
@@ -62,7 +62,7 @@ describe('buildKbPages', () => {
       url: '/kb/services/internet/',
       canonical: 'https://example.com/kb/services/internet/',
       routeSlug: 'services/internet',
-      isSection: true,
+      isSection: true
     });
     expect(pages[2]?.isSection).toBe(false);
     expect(internetPage).not.toHaveProperty('id');
@@ -79,10 +79,10 @@ describe('buildKbPages', () => {
         sources: [
           {
             url: 'https://example.com/internet',
-            description: 'Подтверждает доступность подключения',
-          },
-        ],
-      }),
+            description: 'Подтверждает доступность подключения'
+          }
+        ]
+      })
     ]);
 
     expect(kbPage).not.toHaveProperty('sources');
@@ -93,24 +93,22 @@ describe('buildKbPages', () => {
       buildKbPages([
         page({
           id: 'foo',
-          title: 'Foo',
+          title: 'Foo'
         }),
         page({
           id: 'foo/index',
-          title: 'Foo index',
-        }),
-      ]),
-    ).toThrow(
-      'kb page "foo/index" conflicts with "foo" for public URL "/kb/foo/"',
-    );
+          title: 'Foo index'
+        })
+      ])
+    ).toThrow('kb page "foo/index" conflicts with "foo" for public URL "/kb/foo/"');
   });
 
   it('does not infer section role from an index source name', () => {
     const pages = buildKbPages([
       page({
         id: 'sos/index',
-        title: 'Что делать, если…',
-      }),
+        title: 'Что делать, если…'
+      })
     ]);
 
     expect(pages[0]?.isSection).toBe(false);
@@ -121,12 +119,10 @@ describe('buildKbPages', () => {
       buildKbPages([
         page({
           id: 'services/Internet',
-          title: 'Интернет в поселке',
-        }),
-      ]),
-    ).toThrow(
-      'kb page source id "services/Internet" has invalid segment "Internet"',
-    );
+          title: 'Интернет в поселке'
+        })
+      ])
+    ).toThrow('kb page source id "services/Internet" has invalid segment "Internet"');
   });
 
   it('stores preprocessed Markdown body without rendering HTML', () => {
@@ -134,13 +130,11 @@ describe('buildKbPages', () => {
       page({
         id: 'services/internet/index',
         title: 'Интернет в поселке',
-        body: '# Подключение\n\nТекст с **жирным** Markdown.\n',
-      }),
+        body: '# Подключение\n\nТекст с **жирным** Markdown.\n'
+      })
     ]);
 
-    expect(pages[0]?.body).toBe(
-      '# Подключение\n\nТекст с **жирным** Markdown.',
-    );
+    expect(pages[0]?.body).toBe('# Подключение\n\nТекст с **жирным** Markdown.');
     expect(pages[0]?.body).not.toContain('<strong>');
   });
 
@@ -148,8 +142,8 @@ describe('buildKbPages', () => {
     const pages = buildKbPages([
       page({
         id: 'services/internet/index',
-        title: 'Интернет в поселке',
-      }),
+        title: 'Интернет в поселке'
+      })
     ]);
 
     expect(pages[0]?.flags).toEqual([]);
@@ -161,8 +155,8 @@ describe('buildKbPages', () => {
       page({
         id: 'court/01/documents',
         title: 'Документы по делу',
-        flags: ['noindex'],
-      }),
+        flags: ['noindex']
+      })
     ]);
 
     expect(pages[0]?.flags).toEqual(['noindex']);
@@ -174,8 +168,8 @@ describe('buildKbPages', () => {
       page({
         id: 'before-you-buy/how-to-choose-plot',
         title: 'Как выбрать участок',
-        flags: ['exclude-from-site-search'],
-      }),
+        flags: ['exclude-from-site-search']
+      })
     ]);
 
     expect(pages[0]?.flags).toEqual(['exclude-from-site-search']);
@@ -188,25 +182,18 @@ describe('buildKbPages', () => {
         page({
           id: 'services/internet/index',
           title: 'Интернет в поселке',
-          body: 'Статус подтвердил @kschemelinin.',
-        }),
+          body: 'Статус подтвердил @kschemelinin.'
+        })
       ],
       {
         mentionRegistry: new Map([
-          [
-            'kschemelinin',
-            createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин'),
-          ],
-        ]),
-      },
+          ['kschemelinin', createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин')]
+        ])
+      }
     );
 
-    expect(pages[0]?.body).toBe(
-      'Статус подтвердил [Кирилл Щемелинин](/people/kschemelinin/).',
-    );
-    expect(pages[0]?.mentions.map((item) => item.slug)).toEqual([
-      'kschemelinin',
-    ]);
+    expect(pages[0]?.body).toBe('Статус подтвердил [Кирилл Щемелинин](/people/kschemelinin/).');
+    expect(pages[0]?.mentions.map((item) => item.slug)).toEqual(['kschemelinin']);
   });
 
   it('fails clearly for unknown body mentions', () => {
@@ -215,11 +202,9 @@ describe('buildKbPages', () => {
         page({
           id: 'services/internet/index',
           title: 'Интернет в поселке',
-          body: 'Статус подтвердил @unknown.',
-        }),
-      ]),
-    ).toThrow(
-      'kb page "services/internet/index" body contains unknown entity mention "@unknown"',
-    );
+          body: 'Статус подтвердил @unknown.'
+        })
+      ])
+    ).toThrow('kb page "services/internet/index" body contains unknown entity mention "@unknown"');
   });
 });

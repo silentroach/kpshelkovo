@@ -9,10 +9,7 @@ export const headingSlug = (text: string): string => {
   return slug || 'section';
 };
 
-export const uniqueHeadingSlug = (
-  text: string,
-  seenSlugs: Map<string, number>,
-): string => {
+export const uniqueHeadingSlug = (text: string, seenSlugs: Map<string, number>): string => {
   const slug = headingSlug(text);
   const count = seenSlugs.get(slug) ?? 0;
   seenSlugs.set(slug, count + 1);

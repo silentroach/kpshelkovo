@@ -1,8 +1,4 @@
-import type {
-  CostBreakdown,
-  EstimateCoefficientPolicy,
-  EstimateCoefficients,
-} from './schema';
+import type { CostBreakdown, EstimateCoefficientPolicy, EstimateCoefficients } from './schema';
 
 export interface EstimateRowChange {
   readonly enabled?: boolean;

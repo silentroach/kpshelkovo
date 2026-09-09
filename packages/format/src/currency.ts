@@ -2,7 +2,7 @@ import { formatNumberUnitRu } from './number';
 
 const rub = (value: number, suffix: string): string =>
   formatNumberUnitRu(Math.round(value), `₽${suffix}`, {
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 0
   });
 
 /**
@@ -27,16 +27,11 @@ export function formatDistance(value: number): string {
 /**
  * Formats a decimal as a percentage.
  */
-export function formatPercentage(
-  value: number,
-  opts?: { signed?: boolean },
-): string {
+export function formatPercentage(value: number, opts?: { signed?: boolean }): string {
   const pct = value * 100;
   const factor = 10;
   const rounded =
-    pct >= 0
-      ? Math.floor(pct * factor + 0.5) / factor
-      : Math.ceil(pct * factor - 0.5) / factor;
+    pct >= 0 ? Math.floor(pct * factor + 0.5) / factor : Math.ceil(pct * factor - 0.5) / factor;
 
   if (rounded === 0) {
     return '0%';

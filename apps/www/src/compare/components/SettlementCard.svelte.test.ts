@@ -1,8 +1,9 @@
-import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/svelte';
-import SettlementCard from './SettlementCard.svelte';
+import { describe, it, expect } from 'vitest';
+
 import type { ExplorerSettlement } from '../lib/explorer';
 import type { ComparisonResult } from '../lib/settlement/types';
+import SettlementCard from './SettlementCard.svelte';
 
 const mockSettlement: ExplorerSettlement = {
   name: 'Тестовый поселок',
@@ -14,24 +15,24 @@ const mockSettlement: ExplorerSettlement = {
   location: {
     lat: 55.5,
     lng: 37.5,
-    district: 'Тестовский район',
+    district: 'Тестовский район'
   },
   tariff: {
     normalizedPerSotkaMonth: 100,
-    normalizedIsEstimate: false,
-  },
+    normalizedIsEstimate: false
+  }
 };
 
 const mockComparisonCheaper: ComparisonResult = {
   tariffDelta: 50,
   tariffDeltaPercent: 33,
-  isCheaper: true,
+  isCheaper: true
 };
 
 const mockComparisonExpensive: ComparisonResult = {
   tariffDelta: 50,
   tariffDeltaPercent: 33,
-  isCheaper: false,
+  isCheaper: false
 };
 
 describe('SettlementCard', () => {
@@ -42,8 +43,8 @@ describe('SettlementCard', () => {
         comparison: mockComparisonCheaper,
         rank: 1,
         total: 3,
-        isBaseline: false,
-      },
+        isBaseline: false
+      }
     });
 
     expect(container.textContent).toContain('Тестово');
@@ -57,8 +58,8 @@ describe('SettlementCard', () => {
         comparison: mockComparisonCheaper,
         rank: 1,
         total: 3,
-        isBaseline: false,
-      },
+        isBaseline: false
+      }
     });
 
     const card = container.querySelector('[data-testid="settlement-card"]');
@@ -72,8 +73,8 @@ describe('SettlementCard', () => {
         comparison: mockComparisonCheaper,
         rank: 1,
         total: 3,
-        isBaseline: false,
-      },
+        isBaseline: false
+      }
     });
 
     expect(container.textContent).toContain('100\u00A0₽/сотка');
@@ -86,13 +87,13 @@ describe('SettlementCard', () => {
         comparison: mockComparisonCheaper,
         rank: 1,
         total: 3,
-        isBaseline: false,
-      },
+        isBaseline: false
+      }
     });
 
-    expect(
-      container.querySelector('[data-testid="tariff-rank-label"]')?.textContent,
-    ).toContain('1 / 3');
+    expect(container.querySelector('[data-testid="tariff-rank-label"]')?.textContent).toContain(
+      '1 / 3'
+    );
   });
 
   it('renders estimated tariff with tilde and hint', () => {
@@ -100,8 +101,8 @@ describe('SettlementCard', () => {
       ...mockSettlement,
       tariff: {
         normalizedPerSotkaMonth: 1200,
-        normalizedIsEstimate: true,
-      },
+        normalizedIsEstimate: true
+      }
     };
 
     const { container } = render(SettlementCard, {
@@ -110,17 +111,13 @@ describe('SettlementCard', () => {
         comparison: mockComparisonCheaper,
         rank: 1,
         total: 3,
-        isBaseline: false,
-      },
+        isBaseline: false
+      }
     });
 
     expect(container.textContent).toContain('~1');
     expect(container.textContent).toContain('₽/сотка');
-    expect(
-      container.querySelector(
-        '[title="Тариф приведен к сотке автоматически."]',
-      ),
-    ).toBeTruthy();
+    expect(container.querySelector('[title="Тариф приведен к сотке автоматически."]')).toBeTruthy();
   });
 
   it('renders "дешевле на" for cheaper settlement', () => {
@@ -130,8 +127,8 @@ describe('SettlementCard', () => {
         comparison: mockComparisonCheaper,
         rank: 1,
         total: 3,
-        isBaseline: false,
-      },
+        isBaseline: false
+      }
     });
 
     expect(container.textContent).toContain('дешевле на 50\u00A0₽');
@@ -144,8 +141,8 @@ describe('SettlementCard', () => {
         comparison: mockComparisonExpensive,
         rank: 3,
         total: 3,
-        isBaseline: false,
-      },
+        isBaseline: false
+      }
     });
 
     expect(container.textContent).toContain('дороже на 50\u00A0₽');
@@ -158,8 +155,8 @@ describe('SettlementCard', () => {
         settlement: baselineSettlement,
         rank: 2,
         total: 3,
-        isBaseline: true,
-      },
+        isBaseline: true
+      }
     });
 
     expect(container.textContent).toContain('базовый тариф');
@@ -173,29 +170,29 @@ describe('SettlementCard', () => {
         comparison: mockComparisonCheaper,
         rank: 1,
         total: 3,
-        isBaseline: false,
-      },
+        isBaseline: false
+      }
     });
 
     expect(getByRole('link', { name: 'Тестово' }).getAttribute('href')).toBe(
-      '/815/compare/settlements/testovo/',
+      '/815/compare/settlements/testovo/'
     );
 
     await rerender({
       settlement: {
         ...mockSettlement,
         shortName: 'Новое Тестово',
-        slug: 'novoe-testovo',
+        slug: 'novoe-testovo'
       },
       comparison: mockComparisonCheaper,
       rank: 1,
       total: 3,
-      isBaseline: false,
+      isBaseline: false
     });
 
-    expect(
-      getByRole('link', { name: 'Новое Тестово' }).getAttribute('href'),
-    ).toBe('/815/compare/settlements/novoe-testovo/');
+    expect(getByRole('link', { name: 'Новое Тестово' }).getAttribute('href')).toBe(
+      '/815/compare/settlements/novoe-testovo/'
+    );
   });
 
   it('renders rabstvo badge link when settlement is flagged', () => {
@@ -207,12 +204,12 @@ describe('SettlementCard', () => {
         comparison: mockComparisonCheaper,
         rank: 1,
         total: 3,
-        isBaseline: false,
-      },
+        isBaseline: false
+      }
     });
 
     const badge = container.querySelector(
-      '[data-testid="rabstvo-badge"]',
+      '[data-testid="rabstvo-badge"]'
     ) as HTMLAnchorElement | null;
 
     expect(badge?.textContent).toContain('рабство');
@@ -226,14 +223,12 @@ describe('SettlementCard', () => {
         settlement: mockSettlement,
         rank: 1,
         total: 3,
-        isBaseline: false,
-      },
+        isBaseline: false
+      }
     });
 
     // Должна рендериться без ошибок.
-    expect(
-      container.querySelector('[data-testid="settlement-card"]'),
-    ).toBeTruthy();
+    expect(container.querySelector('[data-testid="settlement-card"]')).toBeTruthy();
     // Должен рендериться тариф, но не текст сравнения.
     expect(container.textContent).toContain('100\u00A0₽/сотка');
     expect(container.textContent).not.toContain('дешевле на');
@@ -244,7 +239,7 @@ describe('SettlementCard', () => {
     const zeroComparison: ComparisonResult = {
       tariffDelta: 0,
       tariffDeltaPercent: 0,
-      isCheaper: false,
+      isCheaper: false
     };
 
     const { container } = render(SettlementCard, {
@@ -253,8 +248,8 @@ describe('SettlementCard', () => {
         comparison: zeroComparison,
         rank: 2,
         total: 3,
-        isBaseline: false,
-      },
+        isBaseline: false
+      }
     });
 
     expect(container.textContent).toContain('100\u00A0₽/сотка');

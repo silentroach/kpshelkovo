@@ -8,7 +8,7 @@ let collectionPageSchema: typeof import('../json-ld').collectionPageSchema;
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ collectionPageSchema } = await import('../json-ld'));
@@ -23,8 +23,8 @@ describe('shared JSON-LD schemas', () => {
       items: [{ name: 'Первый', url: '/section/first/' }, { name: 'Второй' }],
       breadcrumbs: [
         { name: 'Главная', url: '/' },
-        { name: 'Раздел', url: '/section/' },
-      ],
+        { name: 'Раздел', url: '/section/' }
+      ]
     });
 
     expect(serializeSchema(schema)).toMatchInlineSnapshot(`
@@ -46,9 +46,9 @@ describe('shared JSON-LD schemas', () => {
           description: 'Пока без элементов.',
           url: '/empty/',
           items: [],
-          breadcrumbs: [],
-        }),
-      ),
+          breadcrumbs: []
+        })
+      )
     ).toMatchInlineSnapshot(`
       [
         "{\"@context\":\"https://schema.org\",\"@type\":\"CollectionPage\",\"name\":\"Пустой раздел\",\"description\":\"Пока без элементов.\",\"url\":\"https://example.com/empty/\",\"inLanguage\":\"ru-RU\"}",

@@ -3,5 +3,5 @@ import { satteriTypograf } from '@shelkovo/markdown';
 
 export const createAstroMarkdownProcessor = () =>
   satteri({
-    hastPlugins: [satteriTypograf()],
+    hastPlugins: [satteriTypograf()]
   });

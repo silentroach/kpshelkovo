@@ -10,11 +10,11 @@ const appRoot = fileURLToPath(new URL('../..', import.meta.url));
 const workspaceRoot = fileURLToPath(new URL('../../../..', import.meta.url));
 const srcRoot = fileURLToPath(new URL('..', import.meta.url));
 const graphEntry = fileURLToPath(
-  new URL('../compare/client/explorer-component.ts', import.meta.url),
+  new URL('../compare/client/explorer-component.ts', import.meta.url)
 );
 const graphDevUrl = '/__settlements-explorer/graph.js';
 const graphSourceRoots = [srcRoot, resolve(workspaceRoot, 'packages')].map(
-  (root) => `${resolve(root)}${sep}`,
+  (root) => `${resolve(root)}${sep}`
 );
 
 const isGraphSourceFile = (file: string): boolean =>
@@ -32,8 +32,8 @@ const buildExplorerGraph = async (): Promise<string> => {
     plugins: [svelte()],
     resolve: {
       alias: {
-        '@': srcRoot,
-      },
+        '@': srcRoot
+      }
     },
     build: {
       write: false,
@@ -42,14 +42,14 @@ const buildExplorerGraph = async (): Promise<string> => {
       lib: {
         entry: graphEntry,
         formats: ['es'],
-        fileName: 'module',
+        fileName: 'module'
       },
       rollupOptions: {
         output: {
-          codeSplitting: false,
-        },
-      },
-    },
+          codeSplitting: false
+        }
+      }
+    }
   });
 
   const outputs = Array.isArray(result) ? result : [result];
@@ -65,7 +65,7 @@ const buildExplorerGraph = async (): Promise<string> => {
   const chunks = output.output.filter((item) => item.type === 'chunk');
   if (chunks.length !== 1) {
     throw new Error(
-      `Expected one standalone explorer graph chunk, received ${String(chunks.length)}`,
+      `Expected one standalone explorer graph chunk, received ${String(chunks.length)}`
     );
   }
 
@@ -93,7 +93,7 @@ const retryableExplorerBuildPlugin = (): Plugin => {
       graphReference = this.emitFile({
         type: 'asset',
         name: 'SettlementsExplorerClient.js',
-        source: graphSource,
+        source: graphSource
       });
     },
     resolveId(id) {
@@ -108,12 +108,12 @@ const retryableExplorerBuildPlugin = (): Plugin => {
       return `
         export const explorerGraphUrl = import.meta.ROLLUP_FILE_URL_${graphReference};
       `;
-    },
+    }
   };
 };
 
 export const createRetryableExplorerDevPlugin = (
-  buildGraph: () => Promise<string> = buildExplorerGraph,
+  buildGraph: () => Promise<string> = buildExplorerGraph
 ): Plugin => {
   let graphSourceRequest: Promise<string> | undefined;
 
@@ -140,10 +140,7 @@ export const createRetryableExplorerDevPlugin = (
         }
       });
       server.middlewares.use(async (request, response, next) => {
-        if (
-          !request.url ||
-          new URL(request.url, 'http://vite.local').pathname !== graphDevUrl
-        ) {
+        if (!request.url || new URL(request.url, 'http://vite.local').pathname !== graphDevUrl) {
           next();
           return;
         }
@@ -167,11 +164,11 @@ export const createRetryableExplorerDevPlugin = (
       return `
         export const explorerGraphUrl = ${JSON.stringify(graphDevUrl)};
       `;
-    },
+    }
   };
 };
 
 export const retryableSettlementsExplorer = (): readonly Plugin[] => [
   retryableExplorerBuildPlugin(),
-  createRetryableExplorerDevPlugin(),
+  createRetryableExplorerDevPlugin()
 ];

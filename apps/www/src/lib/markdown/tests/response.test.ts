@@ -9,7 +9,7 @@ describe('createMarkdownResponse', () => {
     expect({
       body: await response.text(),
       headers: Object.fromEntries(response.headers),
-      status: response.status,
+      status: response.status
     }).toMatchInlineSnapshot(`
       {
         "body": "# Markdown",

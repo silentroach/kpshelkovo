@@ -10,7 +10,7 @@ const position = z
       lng <= PLACE_MAP_BOUNDS.maxLng &&
       lat >= PLACE_MAP_BOUNDS.minLat &&
       lat <= PLACE_MAP_BOUNDS.maxLat,
-    { message: 'coordinates must be inside the supported Шелково map bounds' },
+    { message: 'coordinates must be inside the supported Шелково map bounds' }
   );
 
 const polygonRing = z
@@ -21,17 +21,13 @@ const polygonRing = z
       const first = ring[0];
       const last = ring.at(-1);
 
-      return Boolean(
-        first && last && first[0] === last[0] && first[1] === last[1],
-      );
+      return Boolean(first && last && first[0] === last[0] && first[1] === last[1]);
     },
-    { message: 'polygon rings must be closed' },
+    { message: 'polygon rings must be closed' }
   )
-  .refine(
-    (ring) =>
-      new Set(ring.slice(0, -1).map(([lng, lat]) => `${lng},${lat}`)).size >= 3,
-    { message: 'polygon rings must contain three distinct positions' },
-  )
+  .refine((ring) => new Set(ring.slice(0, -1).map(([lng, lat]) => `${lng},${lat}`)).size >= 3, {
+    message: 'polygon rings must contain three distinct positions'
+  })
   .refine(
     (ring) =>
       Math.abs(
@@ -39,9 +35,9 @@ const polygonRing = z
           const next = ring[index + 1];
 
           return next ? area + lng * next[1] - next[0] * lat : area;
-        }, 0),
+        }, 0)
       ) > 1e-12,
-    { message: 'polygon rings must enclose an area' },
+    { message: 'polygon rings must enclose an area' }
   );
 
 const polygonCoordinates = z.array(polygonRing).min(1);
@@ -49,15 +45,15 @@ const polygonGeometry = z.discriminatedUnion('type', [
   z
     .object({
       type: z.literal('Polygon'),
-      coordinates: polygonCoordinates,
+      coordinates: polygonCoordinates
     })
     .strict(),
   z
     .object({
       type: z.literal('MultiPolygon'),
-      coordinates: z.array(polygonCoordinates).min(1),
+      coordinates: z.array(polygonCoordinates).min(1)
     })
-    .strict(),
+    .strict()
 ]);
 
 const areaFeature = z
@@ -68,17 +64,17 @@ const areaFeature = z
       .object({
         kind: z.literal('area'),
         precision: z.literal('approximate'),
-        outline_expansion_meters: z.number().positive().max(25).optional(),
+        outline_expansion_meters: z.number().positive().max(25).optional()
       })
       .strict(),
-    geometry: polygonGeometry,
+    geometry: polygonGeometry
   })
   .strict();
 
 export const RawPlaceGeometrySchema = z
   .object({
     type: z.literal('FeatureCollection'),
-    features: z.tuple([areaFeature]),
+    features: z.tuple([areaFeature])
   })
   .strict();
 

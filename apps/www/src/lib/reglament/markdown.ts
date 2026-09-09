@@ -2,17 +2,12 @@ import {
   createMarkdownDocument,
   md,
   serializeMarkdownDocument,
-  type MarkdownPhrasingInput,
+  type MarkdownPhrasingInput
 } from '@shelkovo/markdown';
 
-import type { Estimate } from './schema';
 import { absoluteUrl } from '../site';
 import { buildReglamentPayload } from './discovery';
-import {
-  formatReglamentAnnualMoney,
-  formatReglamentNumber,
-  formatReglamentTariff,
-} from './format';
+import { formatReglamentAnnualMoney, formatReglamentNumber, formatReglamentTariff } from './format';
 import {
   reglamentApiCatalogUrl,
   reglamentEstimate2026DataUrl,
@@ -20,12 +15,11 @@ import {
   reglamentEstimate2026SchemaUrl,
   reglamentLlmsFullUrl,
   reglamentLlmsUrl,
-  reglamentUrl,
+  reglamentUrl
 } from './routes';
+import type { Estimate } from './schema';
 
-type MarkdownNode = Parameters<
-  typeof createMarkdownDocument
->[0]['children'][number];
+type MarkdownNode = Parameters<typeof createMarkdownDocument>[0]['children'][number];
 type MarkdownListItem = ReturnType<typeof md.listItem>;
 type MarkdownPhrasingNodes = Exclude<MarkdownPhrasingInput, string>;
 
@@ -45,38 +39,27 @@ const linkedUrlRow = (label: string, url: string): MarkdownListItem => {
 };
 
 const source = (
-  ref: ReturnType<typeof buildReglamentPayload>['source_refs'][number],
+  ref: ReturnType<typeof buildReglamentPayload>['source_refs'][number]
 ): ReturnType<typeof md.link> => {
   const fragment = ref.fragment ? `, ${ref.fragment}` : '';
 
-  return md.link(
-    absoluteUrl(ref.pdf_url),
-    `${ref.pdf}.pdf, стр. ${ref.page}${fragment}`,
-    ref.note,
-  );
+  return md.link(absoluteUrl(ref.pdf_url), `${ref.pdf}.pdf, стр. ${ref.page}${fragment}`, ref.note);
 };
 
 const sourcePhrasing = (
-  refs: readonly ReturnType<
-    typeof buildReglamentPayload
-  >['source_refs'][number][],
+  refs: readonly ReturnType<typeof buildReglamentPayload>['source_refs'][number][]
 ): MarkdownPhrasingNodes =>
-  refs.flatMap((ref, index) => [
-    ...(index > 0 ? [md.text('; ')] : []),
-    source(ref),
-  ]);
+  refs.flatMap((ref, index) => [...(index > 0 ? [md.text('; ')] : []), source(ref)]);
 
 const reglamentRow = (
-  row: ReturnType<
-    typeof buildReglamentPayload
-  >['sections'][number]['rows'][number],
+  row: ReturnType<typeof buildReglamentPayload>['sections'][number]['rows'][number]
 ): MarkdownListItem =>
   md.listItem([
     md.paragraph([
       md.text(
-        `${row.title} — ${formatReglamentTariff(row.baseline.tariff_per_sotka_month)}; ${formatReglamentAnnualMoney(row.baseline.annual_gross)}; источник: `,
+        `${row.title} — ${formatReglamentTariff(row.baseline.tariff_per_sotka_month)}; ${formatReglamentAnnualMoney(row.baseline.annual_gross)}; источник: `
       ),
-      ...sourcePhrasing(row.source_refs),
+      ...sourcePhrasing(row.source_refs)
     ]),
     ...(row.description ? [md.paragraph(row.description)] : []),
     ...(row.tags && row.tags.length > 0
@@ -84,11 +67,11 @@ const reglamentRow = (
           md.paragraph(
             row.tags.flatMap((tag, index) => [
               md.text(index === 0 ? 'Теги: ' : ', '),
-              md.inlineCode(tag),
-            ]),
-          ),
+              md.inlineCode(tag)
+            ])
+          )
         ]
-      : []),
+      : [])
   ]);
 
 export function buildReglamentMarkdown(estimate: Estimate): string {
@@ -100,7 +83,7 @@ export function buildReglamentMarkdown(estimate: Estimate): string {
     md.paragraph([
       md.text('В интерфейсе тариф показывается как ₽/сотка; машинное поле '),
       md.inlineCode('tariff_per_sotka_month'),
-      md.text(' остается месячным тарифом.'),
+      md.text(' остается месячным тарифом.')
     ]),
     md.heading(2, 'Главные URL'),
     md.list([
@@ -111,37 +94,24 @@ export function buildReglamentMarkdown(estimate: Estimate): string {
       linkedUrlRow('Каталог API', reglamentApiCatalogUrl()),
       linkedUrlRow('llms.txt', reglamentLlmsUrl()),
       linkedUrlRow('llms-full.txt', reglamentLlmsFullUrl()),
-      ...payload.sources.map((item) =>
-        linkedUrlRow(`Исходный PDF ${item.pdf}.pdf`, item.pdf_url),
-      ),
+      ...payload.sources.map((item) => linkedUrlRow(`Исходный PDF ${item.pdf}.pdf`, item.pdf_url))
     ]),
     md.heading(2, 'Итог'),
     md.list([
-      row(
-        'Официальный годовой итог',
-        formatReglamentAnnualMoney(payload.official.annual_gross),
-      ),
-      row(
-        'Официальный тариф',
-        formatReglamentTariff(payload.official.tariff_per_sotka_month),
-      ),
+      row('Официальный годовой итог', formatReglamentAnnualMoney(payload.official.annual_gross)),
+      row('Официальный тариф', formatReglamentTariff(payload.official.tariff_per_sotka_month)),
       row(
         'Расчетная база в JSON',
-        `${formatReglamentAnnualMoney(payload.computed.annual_gross)}; ${formatReglamentTariff(payload.computed.tariff_per_sotka_month)}`,
+        `${formatReglamentAnnualMoney(payload.computed.annual_gross)}; ${formatReglamentTariff(payload.computed.tariff_per_sotka_month)}`
       ),
-      row(
-        'Тарифицируемая площадь',
-        `${formatReglamentNumber(payload.tariff_area_sotki)} сотки`,
-      ),
+      row('Тарифицируемая площадь', `${formatReglamentNumber(payload.tariff_area_sotki)} сотки`)
     ]),
     md.heading(2, 'Формулы'),
     md.list([
       row('Тариф', [md.inlineCode(payload.formulas.tariff_per_sotka_month)]),
       row('ФОТ', [md.inlineCode(payload.formulas.row_breakdown.fot)]),
-      row('Доходы всего', [
-        md.inlineCode(payload.formulas.row_breakdown.income),
-      ]),
-      row('Сумма с НДС', [md.inlineCode(payload.formulas.row_breakdown.gross)]),
+      row('Доходы всего', [md.inlineCode(payload.formulas.row_breakdown.income)]),
+      row('Сумма с НДС', [md.inlineCode(payload.formulas.row_breakdown.gross)])
     ]),
     md.heading(2, 'Ограничения'),
     md.list(payload.caveats.map((item) => md.listItem(item))),
@@ -150,10 +120,10 @@ export function buildReglamentMarkdown(estimate: Estimate): string {
       md.list([
         row(
           'Итог раздела',
-          `${formatReglamentAnnualMoney(section.official.annual_gross)}; ${formatReglamentTariff(section.official.tariff_per_sotka_month)}`,
+          `${formatReglamentAnnualMoney(section.official.annual_gross)}; ${formatReglamentTariff(section.official.tariff_per_sotka_month)}`
         ),
-        ...section.rows.map(reglamentRow),
-      ]),
-    ]),
+        ...section.rows.map(reglamentRow)
+      ])
+    ])
   ]);
 }

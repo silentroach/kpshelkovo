@@ -15,9 +15,7 @@ export const GET: APIRoute = async ({ params }) => {
   const archive = await loadNewsMonth(year, month);
 
   if (!archive) {
-    throw new Error(
-      `news month archive "${params.year}/${params.month}" not found`,
-    );
+    throw new Error(`news month archive "${params.year}/${params.month}" not found`);
   }
 
   return createMarkdownResponse(buildNewsMonthMarkdown({ archive }));

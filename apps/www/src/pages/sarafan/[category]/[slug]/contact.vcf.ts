@@ -9,7 +9,7 @@ export const getStaticPaths = (async () => {
   const contacts = await loadContactsWithVcf();
 
   return contacts.map((contact) => ({
-    params: { category: contact.category, slug: contact.slug },
+    params: { category: contact.category, slug: contact.slug }
   }));
 }) satisfies GetStaticPaths;
 
@@ -30,7 +30,7 @@ export const GET: APIRoute = async ({ params }) => {
   return new Response(buildContactVcard(contact), {
     headers: {
       'Content-Type': 'text/vcard; charset=utf-8',
-      'Content-Disposition': `attachment; filename="${contact.vcf.filename}"`,
-    },
+      'Content-Disposition': `attachment; filename="${contact.vcf.filename}"`
+    }
   });
 };

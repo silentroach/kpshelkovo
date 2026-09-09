@@ -2,11 +2,11 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { StatusIncident, StatusServiceSummary } from '@/lib/status/types';
 import { createAstroContainer } from '@/test/astro-container';
 
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import StatusServiceCard from './StatusServiceCard.astro';
-import type { StatusIncident, StatusServiceSummary } from '@/lib/status/types';
 
 const incident = (): StatusIncident => ({
   id: 'overview-tooltip',
@@ -22,12 +22,12 @@ const incident = (): StatusIncident => ({
   started: {
     at: new Date('2026-05-09T00:00:00Z'),
     iso: '2026-05-09T00:00:00Z',
-    hasTime: true,
+    hasTime: true
   },
   ended: {
     at: new Date('2026-05-09T01:00:00Z'),
     iso: '2026-05-09T01:00:00Z',
-    hasTime: true,
+    hasTime: true
   },
   phase: 'resolved',
   appliesToAllAreas: true,
@@ -37,7 +37,7 @@ const incident = (): StatusIncident => ({
   mentions: [],
   sortStartedAt: Date.parse('2026-05-09T00:00:00Z'),
   sortLastChangeAt: Date.parse('2026-05-09T01:00:00Z'),
-  duration: { totalMinutes: 60 },
+  duration: { totalMinutes: 60 }
 });
 
 const summary = (): StatusServiceSummary => ({
@@ -46,7 +46,7 @@ const summary = (): StatusServiceSummary => ({
   incidents: [incident()],
   activeIncidents: [],
   activeMaintenance: [],
-  daysWithoutIncidents: { mode: 'count', days: 1 },
+  daysWithoutIncidents: { mode: 'count', days: 1 }
 });
 
 beforeEach(() => {
@@ -65,8 +65,8 @@ describe('StatusServiceCard', () => {
     const html = await container.renderToString(StatusServiceCard, {
       props: {
         summary: summary(),
-        serviceHref: '/status/water/',
-      },
+        serviceHref: '/status/water/'
+      }
     });
 
     expect(html).toContain('data-status-timeline-tooltip');
@@ -81,8 +81,8 @@ describe('StatusServiceCard', () => {
         summary: summary(),
         serviceHref: '/status/water/',
         timelineDays: 30,
-        mobileTimelineDays: 7,
-      },
+        mobileTimelineDays: 7
+      }
     });
 
     expect(html.match(/data-range-days="7"/gu)?.length ?? 0).toBe(1);

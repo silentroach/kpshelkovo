@@ -1,20 +1,11 @@
 import { preprocessSiteMarkdownContent } from '../markdown/render';
 import type { SiteMentionRegistry } from '../mentions';
-import {
-  statusIncidentCanonical,
-  statusIncidentMarkdownUrl,
-  statusIncidentUrl,
-} from './routes';
-import {
-  STATUS_AREAS,
-  type StatusArea,
-  type StatusKind,
-  type StatusService,
-} from './schema';
+import { resolveStatusIncidentState } from './lifecycle';
 import type { RawStatusIncident } from './raw-schema';
+import { statusIncidentCanonical, statusIncidentMarkdownUrl, statusIncidentUrl } from './routes';
+import { STATUS_AREAS, type StatusArea, type StatusKind, type StatusService } from './schema';
 import type { StatusDuration, StatusIncident } from './types';
 import { deriveStatusIncidentTitle, extractStatusExcerpt } from './view';
-import { resolveStatusIncidentState } from './lifecycle';
 
 interface EntryParts {
   readonly year: string;
@@ -43,12 +34,12 @@ const incidentParts = (entry: RawStatusIncidentInput): EntryParts => {
   return {
     year: parts[0],
     month: parts[1],
-    slug: parts[2],
+    slug: parts[2]
   };
 };
 
 const mapRawStatusAreas = (
-  values: readonly StatusArea[] | undefined,
+  values: readonly StatusArea[] | undefined
 ): {
   readonly appliesToAllAreas: boolean;
   readonly areas: readonly StatusArea[];
@@ -56,21 +47,18 @@ const mapRawStatusAreas = (
   if (!values?.length) {
     return {
       appliesToAllAreas: true,
-      areas: STATUS_AREAS.map(mapRawStatusArea),
+      areas: STATUS_AREAS.map(mapRawStatusArea)
     };
   }
 
   return {
     appliesToAllAreas: false,
-    areas: values.map(mapRawStatusArea),
+    areas: values.map(mapRawStatusArea)
   };
 };
 
 const duration = (start: Date, end: Date): StatusDuration => ({
-  totalMinutes: Math.max(
-    0,
-    Math.round((end.valueOf() - start.valueOf()) / 60000),
-  ),
+  totalMinutes: Math.max(0, Math.round((end.valueOf() - start.valueOf()) / 60000))
 });
 
 export const mapRawStatusService = (value: StatusService): StatusService => {
@@ -110,7 +98,7 @@ export const mapRawStatusArea = (value: StatusArea): StatusArea => {
 
 export const mapRawStatusIncident = (
   entry: RawStatusIncidentInput,
-  opts: MapRawStatusIncidentOptions,
+  opts: MapRawStatusIncidentOptions
 ): StatusIncident => {
   const parts = incidentParts(entry);
   const started = entry.data.started_at;
@@ -118,14 +106,12 @@ export const mapRawStatusIncident = (
 
   if (started.year !== parts.year || started.month !== parts.month) {
     throw new Error(
-      `status incident "${entry.id}" started_at ${started.iso} must match ${parts.year}/${parts.month}`,
+      `status incident "${entry.id}" started_at ${started.iso} must match ${parts.year}/${parts.month}`
     );
   }
 
   if (ended && ended.at.valueOf() < started.at.valueOf()) {
-    throw new Error(
-      `status incident "${entry.id}" ended_at cannot be earlier than started_at`,
-    );
+    throw new Error(`status incident "${entry.id}" ended_at cannot be earlier than started_at`);
   }
 
   const service = mapRawStatusService(entry.data.service);
@@ -134,16 +120,16 @@ export const mapRawStatusIncident = (
   const body = preprocessSiteMarkdownContent(
     entry.body ?? '',
     `status incident "${entry.id}" body`,
-    opts.mentionRegistry,
+    opts.mentionRegistry
   );
   const state = resolveStatusIncidentState(
     {
       kind,
       service,
       start: started.at.valueOf(),
-      end: ended?.at.valueOf(),
+      end: ended?.at.valueOf()
     },
-    opts.now.valueOf(),
+    opts.now.valueOf()
   );
   const changeAt = ended?.at ?? started.at;
   const incident = {
@@ -158,15 +144,15 @@ export const mapRawStatusIncident = (
     started: {
       at: started.at,
       iso: started.iso,
-      hasTime: started.hasTime,
+      hasTime: started.hasTime
     },
     ...(ended
       ? {
           ended: {
             at: ended.at,
             iso: ended.iso,
-            hasTime: ended.hasTime,
-          },
+            hasTime: ended.hasTime
+          }
         }
       : {}),
     phase: state.phase,
@@ -178,13 +164,13 @@ export const mapRawStatusIncident = (
     mentions: body.mentions,
     sortStartedAt: started.at.valueOf(),
     sortLastChangeAt: changeAt.valueOf(),
-    duration: ended ? duration(started.at, ended.at) : undefined,
+    duration: ended ? duration(started.at, ended.at) : undefined
   };
 
   if (!body.markdown) {
     return {
       ...incident,
-      hasPage: false,
+      hasPage: false
     };
   }
 
@@ -193,6 +179,6 @@ export const mapRawStatusIncident = (
     hasPage: true,
     url: statusIncidentUrl(parts),
     markdownUrl: statusIncidentMarkdownUrl(parts),
-    canonical: statusIncidentCanonical(parts),
+    canonical: statusIncidentCanonical(parts)
   };
 };

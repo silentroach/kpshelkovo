@@ -13,9 +13,9 @@ export const getStaticPaths = (async () => {
     meeting.transcript.parts.map((part) => ({
       params: {
         slug: meeting.slug,
-        part: String(part.index),
-      },
-    })),
+        part: String(part.index)
+      }
+    }))
   );
 }) satisfies GetStaticPaths;
 
@@ -37,7 +37,5 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error(`meeting transcript "${slug}/${partParam}" not found`);
   }
 
-  return createMarkdownResponse(
-    buildMeetingTranscriptPartMarkdown(meeting, part),
-  );
+  return createMarkdownResponse(buildMeetingTranscriptPartMarkdown(meeting, part));
 };

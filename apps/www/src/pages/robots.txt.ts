@@ -6,12 +6,12 @@ const body = [
   'User-agent: *',
   'Allow: /',
   'Content-Signal: ai-train=yes, search=yes, ai-input=yes',
-  `Sitemap: ${sitemap}`,
+  `Sitemap: ${sitemap}`
 ].join('\n');
 
 export const GET: APIRoute = () =>
   new Response(`${body}\n`, {
     headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-    },
+      'Content-Type': 'text/plain; charset=utf-8'
+    }
   });

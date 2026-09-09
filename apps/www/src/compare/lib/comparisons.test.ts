@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { compareSettlements, calculateTariffDelta } from './comparisons';
 import { mapRawSettlement } from './settlement/mapper';
 import type { RawSettlement } from './settlement/schema';
@@ -15,13 +16,13 @@ describe('Comparisons Module', () => {
       address_text: 'МО, Шелково',
       lat: 55.0,
       lng: 37.0,
-      district: 'Test',
+      district: 'Test'
     },
     tariff: {
       value: 120,
       unit: 'rub_per_sotka',
       period: 'month',
-      note: '',
+      note: ''
     },
     infrastructure: {
       roads: 'partial_asphalt',
@@ -37,7 +38,7 @@ describe('Comparisons Module', () => {
       video_surveillance: 'checkpoint_only',
       underground_electricity: 'partial',
       admin_building: 'no',
-      retail_or_services: 'no',
+      retail_or_services: 'no'
     },
     common_spaces: {
       club_infrastructure: 'yes',
@@ -53,7 +54,7 @@ describe('Comparisons Module', () => {
       kids_club: 'no',
       sports_camp: 'no',
       primary_school: 'no',
-      bbq_zones: 'no',
+      bbq_zones: 'no'
     },
     service_model: {
       garbage_collection: 'yes',
@@ -61,7 +62,7 @@ describe('Comparisons Module', () => {
       road_cleaning: 'yes',
       landscaping: 'yes',
       emergency_service: 'yes',
-      dispatcher: 'yes',
+      dispatcher: 'yes'
     },
     sources: [
       {
@@ -69,9 +70,9 @@ describe('Comparisons Module', () => {
         url: 'https://test.com',
         type: 'official',
         date_checked: '2026-04-03',
-        comment: '',
-      },
-    ],
+        comment: ''
+      }
+    ]
   } satisfies RawSettlement);
 
   describe('calculateTariffDelta', () => {
@@ -113,8 +114,8 @@ describe('Comparisons Module', () => {
           period: 'month' as const,
           normalizedPerSotkaMonth: 80,
           normalizedIsEstimate: false,
-          note: '',
-        },
+          note: ''
+        }
       };
 
       const result = compareSettlements(mockShelkovo, otherSettlement);

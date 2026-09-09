@@ -1,9 +1,10 @@
 // @vitest-environment happy-dom
 
 import { getAllByRole, getByRole } from '@testing-library/dom';
-import { describe, expect, it } from 'vitest';
 import { markdownToHtml } from 'satteri';
+import { describe, expect, it } from 'vitest';
 
+import { headingSlug } from './heading-slugs';
 import {
   createMarkdownDocument,
   extractFirstMarkdownText,
@@ -15,9 +16,8 @@ import {
   render,
   resolveMarkdownResourceReferences,
   satteriTypograf,
-  serializeMarkdownDocument,
+  serializeMarkdownDocument
 } from './index';
-import { headingSlug } from './heading-slugs';
 
 const showNbsp = (value: string): string =>
   value.replaceAll('\u00A0', '·').replaceAll('\u202F', '·');
@@ -48,9 +48,9 @@ describe('@shelkovo/markdown', () => {
       frontmatter: {
         title: 'Новости Шелково',
         draft: false,
-        tags: ['новости', 'город'],
+        tags: ['новости', 'город']
       },
-      children: [md.heading(1, 'Заголовок')],
+      children: [md.heading(1, 'Заголовок')]
     });
 
     expect(serializeMarkdownDocument(document)).toMatchInlineSnapshot(`
@@ -75,17 +75,16 @@ describe('@shelkovo/markdown', () => {
             md.list([
               md.listItem([
                 md.paragraph('Первый'),
-                md.list([md.listItem('Вложенный'), md.listItem('Еще один')]),
+                md.list([md.listItem('Вложенный'), md.listItem('Еще один')])
               ]),
-              md.listItem('Второй'),
+              md.listItem('Второй')
             ]),
-            md.list(
-              [md.listItem('Один'), md.listItem('Два'), md.listItem('Три')],
-              { ordered: true },
-            ),
-          ],
-        }),
-      ),
+            md.list([md.listItem('Один'), md.listItem('Два'), md.listItem('Три')], {
+              ordered: true
+            })
+          ]
+        })
+      )
     ).toMatchInlineSnapshot(`
       "- Первый
         - Вложенный
@@ -103,23 +102,21 @@ describe('@shelkovo/markdown', () => {
     expect(() =>
       serializeMarkdownDocument(
         createMarkdownDocument({
-          children: [{ type: 'table', children: [] }],
-        }),
-      ),
+          children: [{ type: 'table', children: [] }]
+        })
+      )
     ).toThrow('Markdown tables are not supported; use lists.');
   });
 
   it('parses Markdown fragments for insertion into generated documents', () => {
-    const fragment = parseMarkdownFragment(
-      'Авторский **текст** с [ссылкой](https://example.com).',
-    );
+    const fragment = parseMarkdownFragment('Авторский **текст** с [ссылкой](https://example.com).');
 
     expect(
       serializeMarkdownDocument(
         createMarkdownDocument({
-          children: [md.heading(2, 'Фрагмент'), ...fragment],
-        }),
-      ),
+          children: [md.heading(2, 'Фрагмент'), ...fragment]
+        })
+      )
     ).toMatchInlineSnapshot(`
       "## Фрагмент
 
@@ -131,20 +128,15 @@ describe('@shelkovo/markdown', () => {
   it('resolves local resource references before combining fragments', () => {
     const first = resolveMarkdownResourceReferences(
       parseMarkdownFragment(
-        '[Исправление][source]\n\n![Схема][image]\n\n[source]: https://example.com/first\n[image]: https://example.com/image.png "Протокол"',
-      ),
+        '[Исправление][source]\n\n![Схема][image]\n\n[source]: https://example.com/first\n[image]: https://example.com/image.png "Протокол"'
+      )
     );
     const second = resolveMarkdownResourceReferences(
-      parseMarkdownFragment(
-        '[Уточнение][source]\n\n[source]: https://example.com/second',
-      ),
+      parseMarkdownFragment('[Уточнение][source]\n\n[source]: https://example.com/second')
     );
 
-    expect(
-      serializeMarkdownDocument(
-        createMarkdownDocument({ children: [...first, ...second] }),
-      ),
-    ).toMatchInlineSnapshot(`
+    expect(serializeMarkdownDocument(createMarkdownDocument({ children: [...first, ...second] })))
+      .toMatchInlineSnapshot(`
       "[Исправление](https://example.com/first)
 
       ![Схема](https://example.com/image.png "Протокол")
@@ -164,10 +156,10 @@ describe('@shelkovo/markdown', () => {
             md.heading(2, 'Что сделать сразу'),
             md.heading(3, 'Документы и ссылки'),
             md.heading(2, 'Что сделать сразу'),
-            md.heading(3, [md.inlineCode('index.md')]),
-          ],
-        }),
-      ),
+            md.heading(3, [md.inlineCode('index.md')])
+          ]
+        })
+      )
     ).toMatchInlineSnapshot(`
       "# Главная страница
 
@@ -195,9 +187,9 @@ describe('@shelkovo/markdown', () => {
     expect(
       serializeMarkdownDocument(
         createMarkdownDocument({
-          children: [md.paragraph('- пункт\n![alt](bad)')],
-        }),
-      ),
+          children: [md.paragraph('- пункт\n![alt](bad)')]
+        })
+      )
     ).toMatchInlineSnapshot(`
       "\\- пункт
       !\\[alt]\\(bad)
@@ -207,24 +199,20 @@ describe('@shelkovo/markdown', () => {
 
   it('formats dynamic HTML with project typography rules', () => {
     expect(formatDynamicHtml('Шелково Ривер')).toBe('Шелково\u00A0Ривер');
-    expect(formatDynamicHtml('<p>Шелково Парк</p>')).toBe(
-      '<p>Шелково\u00A0Парк</p>',
-    );
+    expect(formatDynamicHtml('<p>Шелково Парк</p>')).toBe('<p>Шелково\u00A0Парк</p>');
     expect(formatDynamicHtml('Новости Шелково')).toBe('Новости Шелково');
   });
 
   it('keeps a word before a number sign and its number on the same line', () => {
-    expect(
-      showNbsp(formatDynamicHtml('в Приложении №1')),
-    ).toMatchInlineSnapshot(`"в·Приложении·№·1"`);
-    expect(showNbsp(formatDynamicHtml('п. № 1'))).toMatchInlineSnapshot(
-      `"п.·№·1"`,
+    expect(showNbsp(formatDynamicHtml('в Приложении №1'))).toMatchInlineSnapshot(
+      `"в·Приложении·№·1"`
     );
+    expect(showNbsp(formatDynamicHtml('п. № 1'))).toMatchInlineSnapshot(`"п.·№·1"`);
   });
 
   it('formats Satteri HTML text with project typography rules', async () => {
     const result = await markdownToHtml('Шелково Ривер и `Шелково Парк`', {
-      hastPlugins: [satteriTypograf()],
+      hastPlugins: [satteriTypograf()]
     });
 
     expect(showNbsp(result.html)).toMatchInlineSnapshot(`
@@ -243,8 +231,7 @@ describe('@shelkovo/markdown', () => {
   });
 
   it('renders markdown and drops raw HTML', () => {
-    expect(render('Текст **важный**\n\n<script>alert(1)</script>'))
-      .toMatchInlineSnapshot(`
+    expect(render('Текст **важный**\n\n<script>alert(1)</script>')).toMatchInlineSnapshot(`
         "<p>Текст <strong>важный</strong></p>"
       `);
   });
@@ -256,8 +243,8 @@ describe('@shelkovo/markdown', () => {
 
 Текст с ![иконкой](https://example.com/icon.png "Подсказка").
 
-![Изображение без подписи](https://example.com/photo.png)`),
-      ),
+![Изображение без подписи](https://example.com/photo.png)`)
+      )
     ).toMatchInlineSnapshot(`
       "<figure class="ui-markdown-figure"><img src="https://example.com/map.png" alt="Карта" loading="lazy" decoding="async"><figcaption class="ui-media-caption">Скриншот от·14·августа 2026 года.</figcaption></figure>
       <p>Текст с <img src="https://example.com/icon.png" alt="иконкой" title="Подсказка" loading="lazy" decoding="async">.</p>
@@ -269,17 +256,16 @@ describe('@shelkovo/markdown', () => {
     expect(
       showNbsp(
         render(
-          '[![Карта](https://example.com/map.png "Схема поселка.")](https://example.com/map.png)',
-        ),
-      ),
+          '[![Карта](https://example.com/map.png "Схема поселка.")](https://example.com/map.png)'
+        )
+      )
     ).toMatchInlineSnapshot(`
       "<figure class="ui-markdown-figure"><a href="https://example.com/map.png"><img src="https://example.com/map.png" alt="Карта" loading="lazy" decoding="async"></a><figcaption class="ui-media-caption">Схема поселка.</figcaption></figure>"
     `);
   });
 
   it('adds stable heading ids for in-page links', () => {
-    expect(render('## Что сделать сразу\n\nТекст\n\n## Что сделать сразу'))
-      .toMatchInlineSnapshot(`
+    expect(render('## Что сделать сразу\n\nТекст\n\n## Что сделать сразу')).toMatchInlineSnapshot(`
         "<h2 id="что-сделать-сразу" aria-label="Что сделать сразу">Что сделать сразу<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" data-pagefind-ignore="all" href="#что-сделать-сразу" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>
         <p>Текст</p>
         <h2 id="что-сделать-сразу-2" aria-label="Что сделать сразу">Что сделать сразу<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" data-pagefind-ignore="all" href="#что-сделать-сразу-2" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>"
@@ -291,8 +277,7 @@ describe('@shelkovo/markdown', () => {
   });
 
   it('expands [TOC] before rendering Markdown to HTML', () => {
-    expect(render('[TOC]\n\n## Раздел\n\n### Детали\n\n## Раздел'))
-      .toMatchInlineSnapshot(`
+    expect(render('[TOC]\n\n## Раздел\n\n### Детали\n\n## Раздел')).toMatchInlineSnapshot(`
         "<p class="ui-markdown-toc__title"><strong>Содержание</strong></p>
         <ul class="ui-markdown-toc__list">
         <li><a href="#раздел">Раздел</a>
@@ -310,28 +295,27 @@ describe('@shelkovo/markdown', () => {
   });
 
   it('rejects tables when rendering Markdown strings', () => {
-    expect(() =>
-      render('| Ключ | Значение |\n| --- | --- |\n| A | B |'),
-    ).toThrow('Markdown tables are not supported; use lists.');
+    expect(() => render('| Ключ | Значение |\n| --- | --- |\n| A | B |')).toThrow(
+      'Markdown tables are not supported; use lists.'
+    );
   });
 
   it('links task list checkboxes to their item text via aria-labelledby', () => {
     const document = renderDom('- [x] First task\n- [ ] Second task');
     const checkboxes = getAllByRole(document.body, 'checkbox');
     const first = getByRole(document.body, 'checkbox', {
-      name: 'First task',
+      name: 'First task'
     }) as HTMLInputElement;
     const second = getByRole(document.body, 'checkbox', {
-      name: 'Second task',
+      name: 'Second task'
     }) as HTMLInputElement;
 
     expect({
       count: checkboxes.length,
       distinctLabels:
-        first.getAttribute('aria-labelledby') !==
-        second.getAttribute('aria-labelledby'),
+        first.getAttribute('aria-labelledby') !== second.getAttribute('aria-labelledby'),
       first: { checked: first.checked, disabled: first.disabled },
-      second: { checked: second.checked, disabled: second.disabled },
+      second: { checked: second.checked, disabled: second.disabled }
     }).toMatchInlineSnapshot(`
       {
         "count": 2,
@@ -353,19 +337,11 @@ describe('@shelkovo/markdown', () => {
   - [x] Child task
     1. [ ] Grandchild task`);
     const checkboxes = getAllByRole(document.body, 'checkbox');
-    const labels = Array.from(
-      document.querySelectorAll('li.task-list-item > span[id]'),
-    );
+    const labels = Array.from(document.querySelectorAll('li.task-list-item > span[id]'));
 
-    expect(getByRole(document.body, 'checkbox', { name: 'Parent task' })).toBe(
-      checkboxes[0],
-    );
-    expect(getByRole(document.body, 'checkbox', { name: 'Child task' })).toBe(
-      checkboxes[1],
-    );
-    expect(
-      getByRole(document.body, 'checkbox', { name: 'Grandchild task' }),
-    ).toBe(checkboxes[2]);
+    expect(getByRole(document.body, 'checkbox', { name: 'Parent task' })).toBe(checkboxes[0]);
+    expect(getByRole(document.body, 'checkbox', { name: 'Child task' })).toBe(checkboxes[1]);
+    expect(getByRole(document.body, 'checkbox', { name: 'Grandchild task' })).toBe(checkboxes[2]);
     expect(labels).toHaveLength(3);
     expect(labels.every((label) => !label.querySelector('ul, ol'))).toBe(true);
     expect(labels.slice(0, 2).map((label) => label.nextElementSibling?.tagName))
@@ -384,21 +360,19 @@ describe('@shelkovo/markdown', () => {
 
   - [x] Loose child`);
     const parentCheckbox = getByRole(document.body, 'checkbox', {
-      name: 'Loose parent',
+      name: 'Loose parent'
     });
     const childCheckbox = getByRole(document.body, 'checkbox', {
-      name: 'Loose child',
+      name: 'Loose child'
     });
     const parentLabel = checkboxLabel(parentCheckbox);
 
     expect({
       checkboxCount: getAllByRole(document.body, 'checkbox').length,
       labelContainer: parentLabel.parentElement?.tagName,
-      labelHasBlockContent: Boolean(
-        parentLabel.querySelector('blockquote, ol, p, pre, ul'),
-      ),
+      labelHasBlockContent: Boolean(parentLabel.querySelector('blockquote, ol, p, pre, ul')),
       parentContainer: parentCheckbox.parentElement?.tagName,
-      childChecked: (childCheckbox as HTMLInputElement).checked,
+      childChecked: (childCheckbox as HTMLInputElement).checked
     }).toMatchInlineSnapshot(`
       {
         "checkboxCount": 2,
@@ -414,16 +388,14 @@ describe('@shelkovo/markdown', () => {
     const document = renderDom(`- [ ] Parent task
   > - [x] Quoted child`);
     const parentCheckbox = getByRole(document.body, 'checkbox', {
-      name: 'Parent task',
+      name: 'Parent task'
     });
     const childCheckbox = getByRole(document.body, 'checkbox', {
-      name: 'Quoted child',
+      name: 'Quoted child'
     });
     const parentLabel = checkboxLabel(parentCheckbox);
     const childLabel = checkboxLabel(childCheckbox);
-    const blockquote = parentCheckbox
-      .closest('li')
-      ?.querySelector('blockquote');
+    const blockquote = parentCheckbox.closest('li')?.querySelector('blockquote');
 
     if (!blockquote) {
       throw new Error('nested task blockquote not found');
@@ -432,9 +404,9 @@ describe('@shelkovo/markdown', () => {
     expect({
       blockquoteIsLabelSibling: parentLabel.nextElementSibling === blockquote,
       labelsHaveBlockContent: [parentLabel, childLabel].some((label) =>
-        Boolean(label.querySelector('blockquote, ol, p, pre, ul')),
+        Boolean(label.querySelector('blockquote, ol, p, pre, ul'))
       ),
-      parentLabelContainsBlockquote: parentLabel.contains(blockquote),
+      parentLabelContainsBlockquote: parentLabel.contains(blockquote)
     }).toMatchInlineSnapshot(`
       {
         "blockquoteIsLabelSibling": true,
@@ -445,14 +417,13 @@ describe('@shelkovo/markdown', () => {
   });
 
   it('preserves links and formatting in nested task labels', () => {
-    const document =
-      renderDom(`- [ ] **Parent** with [guide](https://example.com/guide)
+    const document = renderDom(`- [ ] **Parent** with [guide](https://example.com/guide)
   - [x] _Child_ with \`code\``);
     const parentCheckbox = getByRole(document.body, 'checkbox', {
-      name: 'Parent with guide',
+      name: 'Parent with guide'
     });
     const childCheckbox = getByRole(document.body, 'checkbox', {
-      name: 'Child with code',
+      name: 'Child with code'
     });
     const parentLabel = checkboxLabel(parentCheckbox);
     const childLabel = checkboxLabel(childCheckbox);
@@ -461,7 +432,7 @@ describe('@shelkovo/markdown', () => {
       childCode: childLabel.querySelector('code')?.textContent,
       childEmphasis: childLabel.querySelector('em')?.textContent,
       parentLink: parentLabel.querySelector('a')?.getAttribute('href'),
-      parentStrong: parentLabel.querySelector('strong')?.textContent,
+      parentStrong: parentLabel.querySelector('strong')?.textContent
     }).toMatchInlineSnapshot(`
       {
         "childCode": "code",
@@ -475,9 +446,8 @@ describe('@shelkovo/markdown', () => {
   it('preprocesses markdown before rendering', () => {
     expect(
       render('Привет, @person', {
-        preprocess: (markdown) =>
-          markdown.replace('@person', '[Анна](/people/anna/)'),
-      }),
+        preprocess: (markdown) => markdown.replace('@person', '[Анна](/people/anna/)')
+      })
     ).toBe('<p>Привет, <a href="/people/anna/">Анна</a></p>');
   });
 
@@ -491,12 +461,10 @@ const value = 1
 ![Река](river.jpg)
 
 Первый **абзац** с [ссылкой](https://example.com).
-`),
+`)
     ).toBe('Река');
 
-    expect(
-      extractFirstMarkdownText('```ts\nconst value = 1\n```'),
-    ).toBeUndefined();
+    expect(extractFirstMarkdownText('```ts\nconst value = 1\n```')).toBeUndefined();
   });
 
   it('extracts all readable markdown text', () => {
@@ -514,10 +482,8 @@ const value = 1
 \`\`\`ts
 const value = 1
 \`\`\`
-`),
-    ).toMatchInlineSnapshot(
-      `"Заголовок Первый абзац с ссылкой. Река Первый пункт Второй пункт"`,
-    );
+`)
+    ).toMatchInlineSnapshot(`"Заголовок Первый абзац с ссылкой. Река Первый пункт Второй пункт"`);
   });
 
   it('excludes YAML frontmatter from extracted text', () => {
@@ -540,12 +506,10 @@ description: Служебное описание
       allFromFrontmatterOnly: extractMarkdownText(frontmatterOnly),
       firstFromDocument: extractFirstMarkdownText(document),
       firstFromEmptyFrontmatter: extractFirstMarkdownText(
-        '---\n---\n\nТекст после пустых настроек.',
+        '---\n---\n\nТекст после пустых настроек.'
       ),
       firstFromFrontmatterOnly: extractFirstMarkdownText(frontmatterOnly),
-      firstFromUnclosedDelimiter: extractFirstMarkdownText(
-        '---\n\n# Это обычный Markdown',
-      ),
+      firstFromUnclosedDelimiter: extractFirstMarkdownText('---\n\n# Это обычный Markdown')
     }).toMatchInlineSnapshot(`
       {
         "allFromDocument": "Заголовок Первый абзац. Первый пункт Река",

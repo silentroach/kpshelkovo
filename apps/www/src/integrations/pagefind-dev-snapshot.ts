@@ -2,11 +2,12 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
 import type { AstroIntegration } from 'astro';
 
 const searchPathPrefix = '/search/';
 const snapshotDirectory = resolve(
-  fileURLToPath(new URL('../../../../.cache/pagefind/', import.meta.url)),
+  fileURLToPath(new URL('../../../../.cache/pagefind/', import.meta.url))
 );
 const snapshotEntrypoint = resolve(snapshotDirectory, 'pagefind.js');
 export const PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE =
@@ -15,7 +16,7 @@ const contentTypes: Readonly<Record<string, string>> = {
   '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
-  '.wasm': 'application/wasm',
+  '.wasm': 'application/wasm'
 };
 
 export const pagefindDevSnapshot = (): AstroIntegration => {
@@ -29,10 +30,10 @@ export const pagefindDevSnapshot = (): AstroIntegration => {
           vite: {
             define: {
               [PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE]: JSON.stringify(
-                command === 'dev' && snapshotAvailable,
-              ),
-            },
-          },
+                command === 'dev' && snapshotAvailable
+              )
+            }
+          }
         });
       },
       'astro:server:setup': ({ server }) => {
@@ -48,9 +49,7 @@ export const pagefindDevSnapshot = (): AstroIntegration => {
 
           let pathname: string;
           try {
-            pathname = decodeURIComponent(
-              new URL(requestUrl, 'http://localhost').pathname,
-            );
+            pathname = decodeURIComponent(new URL(requestUrl, 'http://localhost').pathname);
           } catch {
             return next();
           }
@@ -59,10 +58,7 @@ export const pagefindDevSnapshot = (): AstroIntegration => {
             return next();
           }
 
-          const filePath = resolve(
-            snapshotDirectory,
-            pathname.slice(searchPathPrefix.length),
-          );
+          const filePath = resolve(snapshotDirectory, pathname.slice(searchPathPrefix.length));
           if (!filePath.startsWith(`${snapshotDirectory}${sep}`)) {
             return next();
           }
@@ -73,13 +69,13 @@ export const pagefindDevSnapshot = (): AstroIntegration => {
               response.setHeader('Cache-Control', 'no-store');
               response.setHeader(
                 'Content-Type',
-                contentTypes[extname(filePath)] ?? 'application/octet-stream',
+                contentTypes[extname(filePath)] ?? 'application/octet-stream'
               );
               response.end(contents);
             })
             .catch(() => next());
         });
-      },
-    },
+      }
+    }
   };
 };

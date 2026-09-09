@@ -5,6 +5,6 @@ export default defineConfig({
     environment: 'node',
     include: ['tests/search-quality.test.ts'],
     hookTimeout: 30_000,
-    testTimeout: 120_000,
-  },
+    testTimeout: 120_000
+  }
 });

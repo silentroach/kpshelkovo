@@ -2,16 +2,14 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { createAstroContainer } from '@/test/astro-container';
 import { visibleWhitespace } from '@/lib/test/visible-whitespace';
+import { createAstroContainer } from '@/test/astro-container';
 
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import NewsPhotos from './NewsPhotos.astro';
 
 const getSrcsetWidths = (imageHtml?: string): readonly number[] =>
-  [...(imageHtml?.matchAll(/\s(\d+)w(?:,|")/gu) ?? [])].map((match) =>
-    Number(match[1]),
-  );
+  [...(imageHtml?.matchAll(/\s(\d+)w(?:,|")/gu) ?? [])].map((match) => Number(match[1]));
 
 describe('NewsPhotos', () => {
   it('renders photo captions through markdown and typograf', async () => {
@@ -24,15 +22,15 @@ describe('NewsPhotos', () => {
             width: 960,
             height: 1280,
             alt: 'Протокол проверки воды',
-            caption: 'Ошибка описана [в Шелково Парк](/news/correction/).',
-          },
-        ],
-      },
+            caption: 'Ошибка описана [в Шелково Парк](/news/correction/).'
+          }
+        ]
+      }
     });
     const caption = html.match(/<figcaption[\s\S]*?<\/figcaption>/u)?.[0];
 
     expect(visibleWhitespace(caption)).toContain(
-      '<p>Ошибка описана <a href="/news/correction/">в·Шелково·Парк</a>.</p>',
+      '<p>Ошибка описана <a href="/news/correction/">в·Шелково·Парк</a>.</p>'
     );
   });
 
@@ -42,28 +40,26 @@ describe('NewsPhotos', () => {
       url: 'https://media.kpshelkovo.online/news/2026/08/retina-test/original.jpeg',
       width: 2560,
       height: 1920,
-      alt: 'Полноширинная фотография',
+      alt: 'Полноширинная фотография'
     };
     const halfWidthPhoto = {
       url: 'https://media.kpshelkovo.online/news/2026/08/retina-test/half-width.jpeg',
       width: 2560,
       height: 1920,
-      alt: 'Двухколоночная фотография',
+      alt: 'Двухколоночная фотография'
     };
     const smallPhoto = {
       url: 'https://media.kpshelkovo.online/news/2026/08/retina-test/small.jpeg',
       width: 960,
       height: 1280,
-      alt: 'Небольшая фотография',
+      alt: 'Небольшая фотография'
     };
     const html = await container.renderToString(NewsPhotos, {
       props: {
-        photos: [fullWidthPhoto, halfWidthPhoto, smallPhoto],
-      },
+        photos: [fullWidthPhoto, halfWidthPhoto, smallPhoto]
+      }
     });
-    const linkedImages = [...html.matchAll(/<a[\s\S]*?<\/a>/gu)].map(
-      (match) => match[0],
-    );
+    const linkedImages = [...html.matchAll(/<a[\s\S]*?<\/a>/gu)].map((match) => match[0]);
     const fullWidthImage = linkedImages[0];
     const halfWidthImage = linkedImages[1];
     const smallImage = linkedImages[2];
@@ -76,7 +72,7 @@ describe('NewsPhotos', () => {
       halfWidthIntrinsicWidth: halfWidthImage?.match(/\swidth="(\d+)"/u)?.[1],
       halfWidthSrcsetWidths: getSrcsetWidths(halfWidthImage),
       smallIntrinsicWidth: smallImage?.match(/\swidth="(\d+)"/u)?.[1],
-      smallSrcsetWidths: getSrcsetWidths(smallImage),
+      smallSrcsetWidths: getSrcsetWidths(smallImage)
     }).toMatchInlineSnapshot(`
       {
         "fullWidthHref": "https://media.kpshelkovo.online/news/2026/08/retina-test/original.jpeg",

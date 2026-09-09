@@ -1,5 +1,5 @@
-import { getCollection } from 'astro:content';
 import { compareRuText } from '@shelkovo/format';
+import { getCollection } from 'astro:content';
 
 import { loadContacts } from '@/lib/contacts/load';
 import type { EntityMentionGraph, SiteMentionRegistry } from '@/lib/mentions';
@@ -15,13 +15,14 @@ import type {
   PlaceGeometry,
   PlacesDataset,
   PlacesWithBacklinksDataset,
-  PlaceWithBacklinks,
+  PlaceWithBacklinks
 } from './types';
 
-const rawPlaceGeometryFiles = import.meta.glob<string>(
-  '../../data/places/*.geojson',
-  { eager: true, import: 'default', query: '?raw' },
-);
+const rawPlaceGeometryFiles = import.meta.glob<string>('../../data/places/*.geojson', {
+  eager: true,
+  import: 'default',
+  query: '?raw'
+});
 const placeGeometries = parsePlaceGeometryFiles(rawPlaceGeometryFiles);
 
 let cache: Promise<PlacesDataset> | undefined;
@@ -33,7 +34,7 @@ export const buildPlacesDataset = (
     readonly contactUrls?: ReadonlyMap<string, string>;
     readonly geometries?: ReadonlyMap<string, PlaceGeometry>;
     readonly mentionRegistry?: SiteMentionRegistry;
-  },
+  }
 ): PlacesDataset => {
   const contactUrls = opts?.contactUrls ?? new Map<string, string>();
   const geometries = opts?.geometries ?? new Map();
@@ -41,9 +42,7 @@ export const buildPlacesDataset = (
 
   for (const slug of geometries.keys()) {
     if (!placeSlugs.has(slug)) {
-      throw new Error(
-        `place geometry "${slug}.geojson" has no matching Markdown place`,
-      );
+      throw new Error(`place geometry "${slug}.geojson" has no matching Markdown place`);
     }
   }
 
@@ -53,27 +52,20 @@ export const buildPlacesDataset = (
       const contactUrl = contactId ? contactUrls.get(contactId) : undefined;
 
       if (contactId && !contactUrl) {
-        throw new Error(
-          `place "${entry.id}" references missing contact "${contactId}"`,
-        );
+        throw new Error(`place "${entry.id}" references missing contact "${contactId}"`);
       }
 
       return mapRawPlace(entry, {
-        contact:
-          contactId && contactUrl
-            ? { id: contactId, url: contactUrl }
-            : undefined,
+        contact: contactId && contactUrl ? { id: contactId, url: contactUrl } : undefined,
         geometry: geometries.get(entry.id),
-        mentionRegistry: opts?.mentionRegistry,
+        mentionRegistry: opts?.mentionRegistry
       });
     })
-    .sort(
-      (a, b) => compareRuText(a.name, b.name) || compareRuText(a.slug, b.slug),
-    );
+    .sort((a, b) => compareRuText(a.name, b.name) || compareRuText(a.slug, b.slug));
 
   return {
     places,
-    bySlug: new Map(places.map((place) => [place.slug, place] as const)),
+    bySlug: new Map(places.map((place) => [place.slug, place] as const))
   };
 };
 
@@ -81,19 +73,16 @@ const buildPlacesData = async (): Promise<PlacesDataset> => {
   const [entries, contacts, mentionRegistry] = await Promise.all([
     getCollection('places'),
     loadContacts(),
-    loadSiteMentionRegistry(),
+    loadSiteMentionRegistry()
   ]);
   const contactUrls = new Map(
-    contacts.map((contact) => [
-      `${contact.category}/${contact.slug}`,
-      contact.url,
-    ]),
+    contacts.map((contact) => [`${contact.category}/${contact.slug}`, contact.url])
   );
 
   return buildPlacesDataset(entries, {
     contactUrls,
     geometries: placeGeometries,
-    mentionRegistry,
+    mentionRegistry
   });
 };
 
@@ -105,43 +94,37 @@ export const loadPlacesData = (): Promise<PlacesDataset> => {
 
 export const buildPlacesGraphDataset = (
   places: PlacesDataset,
-  graph: EntityMentionGraph,
+  graph: EntityMentionGraph
 ): PlacesWithBacklinksDataset => {
   const enriched = places.places.map((place) => ({
     ...place,
-    backlinks: createPlaceBacklinksFromGraph(graph, place.slug),
+    backlinks: createPlaceBacklinksFromGraph(graph, place.slug)
   }));
 
   return {
     places: enriched,
-    bySlug: new Map(enriched.map((place) => [place.slug, place] as const)),
+    bySlug: new Map(enriched.map((place) => [place.slug, place] as const))
   };
 };
 
-const buildPlacesDataWithBacklinks =
-  async (): Promise<PlacesWithBacklinksDataset> => {
-    const [places, graph] = await Promise.all([
-      loadPlacesData(),
-      loadSiteMentionGraph(),
-    ]);
+const buildPlacesDataWithBacklinks = async (): Promise<PlacesWithBacklinksDataset> => {
+  const [places, graph] = await Promise.all([loadPlacesData(), loadSiteMentionGraph()]);
 
-    return buildPlacesGraphDataset(places, graph);
-  };
+  return buildPlacesGraphDataset(places, graph);
+};
 
-export const loadPlacesDataWithBacklinks =
-  (): Promise<PlacesWithBacklinksDataset> => {
-    graphCache ??= buildPlacesDataWithBacklinks();
+export const loadPlacesDataWithBacklinks = (): Promise<PlacesWithBacklinksDataset> => {
+  graphCache ??= buildPlacesDataWithBacklinks();
 
-    return graphCache;
-  };
+  return graphCache;
+};
 
-export const loadPlaces = async (): Promise<readonly Place[]> =>
-  (await loadPlacesData()).places;
+export const loadPlaces = async (): Promise<readonly Place[]> => (await loadPlacesData()).places;
 
 export const loadPlace = async (slug: string): Promise<Place | undefined> =>
   (await loadPlacesData()).bySlug.get(slug.trim());
 
 export const loadPlaceWithBacklinks = async (
-  slug: string,
+  slug: string
 ): Promise<PlaceWithBacklinks | undefined> =>
   (await loadPlacesDataWithBacklinks()).bySlug.get(slug.trim());

@@ -1,8 +1,4 @@
-import {
-  ESTIMATE_SOURCE_PDFS,
-  type EstimateSourcePdf,
-  type NonEmptyReadonlyArray,
-} from './schema';
+import { ESTIMATE_SOURCE_PDFS, type EstimateSourcePdf, type NonEmptyReadonlyArray } from './schema';
 
 export const ESTIMATE_DETAIL_SOURCE_PDFS = ESTIMATE_SOURCE_PDFS;
 
@@ -20,11 +16,10 @@ export const ESTIMATE_DETAIL_RESOURCE_KINDS = [
   'machine',
   'material',
   'contractor',
-  'other_cost',
+  'other_cost'
 ] as const;
 
-export type EstimateDetailResourceKind =
-  (typeof ESTIMATE_DETAIL_RESOURCE_KINDS)[number];
+export type EstimateDetailResourceKind = (typeof ESTIMATE_DETAIL_RESOURCE_KINDS)[number];
 
 export const ESTIMATE_DETAIL_COST_BUCKETS = [
   'primary_salary',
@@ -40,27 +35,18 @@ export const ESTIMATE_DETAIL_COST_BUCKETS = [
   'income',
   'vat',
   'gross',
-  'other_cost',
+  'other_cost'
 ] as const;
 
-export type EstimateDetailCostBucket =
-  (typeof ESTIMATE_DETAIL_COST_BUCKETS)[number];
+export type EstimateDetailCostBucket = (typeof ESTIMATE_DETAIL_COST_BUCKETS)[number];
 
-export const ESTIMATE_DETAIL_STATUSES = [
-  'verified',
-  'derived',
-  'needs_check',
-] as const;
+export const ESTIMATE_DETAIL_STATUSES = ['verified', 'derived', 'needs_check'] as const;
 
 export type EstimateDetailStatus = (typeof ESTIMATE_DETAIL_STATUSES)[number];
 
-export const ESTIMATE_DETAIL_CONTROL_SOURCES = [
-  'section_pdf',
-  'final_pdf',
-] as const;
+export const ESTIMATE_DETAIL_CONTROL_SOURCES = ['section_pdf', 'final_pdf'] as const;
 
-export type EstimateDetailControlSource =
-  (typeof ESTIMATE_DETAIL_CONTROL_SOURCES)[number];
+export type EstimateDetailControlSource = (typeof ESTIMATE_DETAIL_CONTROL_SOURCES)[number];
 
 export interface EstimateDetailSourceQuoteItem {
   readonly label: string;
@@ -97,10 +83,7 @@ export interface EstimateDetailMoneyValue {
   readonly note?: string;
 }
 
-export type EstimateDetailUnknownMoneyValue = Omit<
-  EstimateDetailMoneyValue,
-  'value'
-> & {
+export type EstimateDetailUnknownMoneyValue = Omit<EstimateDetailMoneyValue, 'value'> & {
   readonly value: null;
 };
 
@@ -175,8 +158,7 @@ export type EstimateDetailControlTotalInput = Omit<
   readonly resource_ids: NonEmptyReadonlyArray<EstimateDetailResourceId>;
 } & EstimateDetailStatusInfo;
 
-export type EstimateDetailControlTotal = EstimateDetailControlTotalBase &
-  EstimateDetailStatusInfo;
+export type EstimateDetailControlTotal = EstimateDetailControlTotalBase & EstimateDetailStatusInfo;
 
 export interface EstimateDetailDataset {
   readonly schema_version: string;

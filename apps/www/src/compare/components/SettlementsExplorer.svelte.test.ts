@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, waitFor, fireEvent } from '@testing-library/svelte';
-import SettlementsExplorer from './SettlementsExplorer.svelte';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import type { ExplorerSettlement } from '../lib/explorer';
 import type { ComparisonResult, Stats } from '../lib/settlement/types';
+import SettlementsExplorer from './SettlementsExplorer.svelte';
 
 type Row = ExplorerSettlement;
 
@@ -10,7 +11,7 @@ const mockMap = {
   addChild: vi.fn(),
   removeChild: vi.fn(),
   update: vi.fn(),
-  destroy: vi.fn(),
+  destroy: vi.fn()
 };
 
 const mockYandexMaps = {
@@ -26,7 +27,7 @@ const mockYandexMaps = {
   }),
   YMapMarker: vi.fn(function YMapMarker() {
     return { update: vi.fn() };
-  }),
+  })
 };
 
 const stats: Stats = {
@@ -42,7 +43,7 @@ const stats: Stats = {
   moreExpensiveCount: 0,
   shelkovoVsMedianPercent: 20,
   shelkovoVsPeerMedianPercent: 26,
-  shelkovoVsMeanPercent: 10,
+  shelkovoVsMeanPercent: 10
 };
 
 const settlements: Row[] = [
@@ -56,12 +57,12 @@ const settlements: Row[] = [
     location: {
       lat: 55.82,
       lng: 37.14,
-      district: 'Истринский район',
+      district: 'Истринский район'
     },
     tariff: {
       normalizedPerSotkaMonth: 120,
-      normalizedIsEstimate: false,
-    },
+      normalizedIsEstimate: false
+    }
   },
   {
     name: 'КП Лесное',
@@ -73,12 +74,12 @@ const settlements: Row[] = [
     location: {
       lat: 55.85,
       lng: 37.2,
-      district: 'Истринский район',
+      district: 'Истринский район'
     },
     tariff: {
       normalizedPerSotkaMonth: 90,
-      normalizedIsEstimate: false,
-    },
+      normalizedIsEstimate: false
+    }
   },
   {
     name: 'КП Усадьбы',
@@ -90,37 +91,37 @@ const settlements: Row[] = [
     location: {
       lat: 55.83,
       lng: 37.16,
-      district: 'Истринский район',
+      district: 'Истринский район'
     },
     tariff: {
       normalizedPerSotkaMonth: 150,
-      normalizedIsEstimate: false,
-    },
-  },
+      normalizedIsEstimate: false
+    }
+  }
 ];
 
 const comparisons: Record<string, ComparisonResult> = {
   shelkovo: {
     tariffDelta: 0,
     tariffDeltaPercent: 0,
-    isCheaper: false,
+    isCheaper: false
   },
   lesnoe: {
     tariffDelta: -30,
     tariffDeltaPercent: -25,
-    isCheaper: true,
+    isCheaper: true
   },
   usadby: {
     tariffDelta: 30,
     tariffDeltaPercent: 25,
-    isCheaper: false,
-  },
+    isCheaper: false
+  }
 };
 
 function cardNames(container: HTMLElement): string[] {
-  return [
-    ...container.querySelectorAll('[data-testid="settlement-card"] h3'),
-  ].map((el) => el.textContent?.trim() ?? '');
+  return [...container.querySelectorAll('[data-testid="settlement-card"] h3')].map(
+    (el) => el.textContent?.trim() ?? ''
+  );
 }
 
 const currentPath = (): string =>
@@ -136,8 +137,8 @@ function setScreen(mobile: boolean): void {
       removeListener: vi.fn(),
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })),
+      dispatchEvent: vi.fn()
+    }))
   });
 }
 
@@ -148,7 +149,7 @@ describe('SettlementsExplorer', () => {
     Object.defineProperty(window, 'ymaps3', {
       value: mockYandexMaps,
       writable: true,
-      configurable: true,
+      configurable: true
     });
   });
 
@@ -161,25 +162,20 @@ describe('SettlementsExplorer', () => {
     setScreen(true);
 
     const { container } = render(SettlementsExplorer, {
-      props: { settlements, comparisons, stats },
+      props: { settlements, comparisons, stats }
     });
 
     await waitFor(() => {
-      expect(
-        container.querySelector('[data-testid="filtered-map"]'),
-      ).toBeNull();
+      expect(container.querySelector('[data-testid="filtered-map"]')).toBeNull();
     });
   });
 
   it('keeps the map button label and disclosure state in sync', async () => {
     setScreen(true);
 
-    const { getByRole, getByTestId, queryByTestId } = render(
-      SettlementsExplorer,
-      {
-        props: { settlements, comparisons, stats },
-      },
-    );
+    const { getByRole, getByTestId, queryByTestId } = render(SettlementsExplorer, {
+      props: { settlements, comparisons, stats }
+    });
 
     const button = getByRole('button', { name: 'Показать карту' });
     await waitFor(() => {
@@ -190,7 +186,7 @@ describe('SettlementsExplorer', () => {
       ariaExpanded: button.getAttribute('aria-expanded'),
       ariaLabel: button.hasAttribute('aria-label'),
       mapRendered: Boolean(queryByTestId('filtered-map')),
-      visibleText: button.textContent?.trim(),
+      visibleText: button.textContent?.trim()
     }).toMatchInlineSnapshot(`
       {
         "ariaControls": false,
@@ -206,11 +202,10 @@ describe('SettlementsExplorer', () => {
     const expandedButton = getByRole('button', { name: 'Скрыть карту' });
     const map = getByTestId('filtered-map');
     expect({
-      ariaControlsExistingMap:
-        expandedButton.getAttribute('aria-controls') === map.id,
+      ariaControlsExistingMap: expandedButton.getAttribute('aria-controls') === map.id,
       ariaExpanded: expandedButton.getAttribute('aria-expanded'),
       ariaLabel: expandedButton.hasAttribute('aria-label'),
-      visibleText: expandedButton.textContent?.trim(),
+      visibleText: expandedButton.textContent?.trim()
     }).toMatchInlineSnapshot(`
       {
         "ariaControlsExistingMap": true,
@@ -225,7 +220,7 @@ describe('SettlementsExplorer', () => {
     setScreen(false);
 
     render(SettlementsExplorer, {
-      props: { settlements, comparisons, stats },
+      props: { settlements, comparisons, stats }
     });
 
     await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
@@ -258,7 +253,7 @@ describe('SettlementsExplorer', () => {
     setScreen(false);
 
     const { getByLabelText } = render(SettlementsExplorer, {
-      props: { settlements, comparisons, stats },
+      props: { settlements, comparisons, stats }
     });
 
     await waitFor(() => {
@@ -277,7 +272,7 @@ describe('SettlementsExplorer', () => {
     setScreen(false);
 
     const { container } = render(SettlementsExplorer, {
-      props: { settlements, comparisons, stats },
+      props: { settlements, comparisons, stats }
     });
 
     await waitFor(() => {
@@ -287,14 +282,10 @@ describe('SettlementsExplorer', () => {
 
   it('restores sorting and filtering from a shared URL', async () => {
     setScreen(false);
-    window.history.replaceState(
-      {},
-      '',
-      '/815/compare/?sort=tariff_asc&price=more_expensive',
-    );
+    window.history.replaceState({}, '', '/815/compare/?sort=tariff_asc&price=more_expensive');
 
     const { container, getByTestId } = render(SettlementsExplorer, {
-      props: { settlements, comparisons, stats },
+      props: { settlements, comparisons, stats }
     });
 
     await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
@@ -302,7 +293,7 @@ describe('SettlementsExplorer', () => {
       cards: cardNames(container),
       mapUpdate: mockMap.update.mock.calls[0]?.[0],
       price: (getByTestId('price-more') as HTMLInputElement).checked,
-      sort: (getByTestId('sort-select') as HTMLSelectElement).value,
+      sort: (getByTestId('sort-select') as HTMLSelectElement).value
     }).toMatchInlineSnapshot(`
       {
         "cards": [
@@ -332,32 +323,26 @@ describe('SettlementsExplorer', () => {
 
   it('replaces the current URL when controls change', async () => {
     setScreen(false);
-    window.history.replaceState(
-      { astro: 'preserved' },
-      '',
-      '/815/compare/?from=chat#results',
-    );
+    window.history.replaceState({ astro: 'preserved' }, '', '/815/compare/?from=chat#results');
     const replaceState = vi.spyOn(window.history, 'replaceState');
     const pushState = vi.spyOn(window.history, 'pushState');
 
     const { getByTestId } = render(SettlementsExplorer, {
-      props: { settlements, comparisons, stats },
+      props: { settlements, comparisons, stats }
     });
 
     await fireEvent.change(getByTestId('sort-select'), {
-      target: { value: 'tariff_asc' },
+      target: { value: 'tariff_asc' }
     });
     await fireEvent.click(getByTestId('price-cheaper'));
 
     await waitFor(() => {
-      expect(currentPath()).toBe(
-        '/815/compare/?from=chat&sort=tariff_asc&price=cheaper#results',
-      );
+      expect(currentPath()).toBe('/815/compare/?from=chat&sort=tariff_asc&price=cheaper#results');
     });
     expect(replaceState).toHaveBeenLastCalledWith(
       { astro: 'preserved' },
       '',
-      '/815/compare/?from=chat&sort=tariff_asc&price=cheaper#results',
+      '/815/compare/?from=chat&sort=tariff_asc&price=cheaper#results'
     );
     expect(pushState).not.toHaveBeenCalled();
   });
@@ -367,11 +352,11 @@ describe('SettlementsExplorer', () => {
     window.history.replaceState(
       {},
       '',
-      '/815/compare/?sort=unknown&price=unknown&from=chat#results',
+      '/815/compare/?sort=unknown&price=unknown&from=chat#results'
     );
 
     const { container, getByTestId } = render(SettlementsExplorer, {
-      props: { settlements, comparisons, stats },
+      props: { settlements, comparisons, stats }
     });
 
     await waitFor(() => {
@@ -385,7 +370,7 @@ describe('SettlementsExplorer', () => {
     setScreen(false);
 
     const { container, getByLabelText } = render(SettlementsExplorer, {
-      props: { settlements, comparisons, stats },
+      props: { settlements, comparisons, stats }
     });
 
     await waitFor(() => {
@@ -393,7 +378,7 @@ describe('SettlementsExplorer', () => {
     });
 
     await fireEvent.change(getByLabelText('Сортировка:'), {
-      target: { value: 'rating_desc' },
+      target: { value: 'rating_desc' }
     });
 
     await waitFor(() => {
@@ -401,7 +386,7 @@ describe('SettlementsExplorer', () => {
     });
 
     await fireEvent.change(getByLabelText('Сортировка:'), {
-      target: { value: 'rating_asc' },
+      target: { value: 'rating_asc' }
     });
 
     await waitFor(() => {
@@ -412,12 +397,9 @@ describe('SettlementsExplorer', () => {
   it('shows help link for conditional level sorting', async () => {
     setScreen(false);
 
-    const { container, getByLabelText, queryByTestId } = render(
-      SettlementsExplorer,
-      {
-        props: { settlements, comparisons, stats },
-      },
-    );
+    const { container, getByLabelText, queryByTestId } = render(SettlementsExplorer, {
+      props: { settlements, comparisons, stats }
+    });
 
     await waitFor(() => {
       expect(getByLabelText('Сортировка:')).toBeTruthy();
@@ -425,12 +407,12 @@ describe('SettlementsExplorer', () => {
 
     await waitFor(() => {
       const link = container.querySelector(
-        '[data-testid="rating-help-link"]',
+        '[data-testid="rating-help-link"]'
       ) as HTMLAnchorElement | null;
       expect({
         ariaLabel: link?.getAttribute('aria-label'),
         href: link?.getAttribute('href'),
-        title: link?.getAttribute('title'),
+        title: link?.getAttribute('title')
       }).toMatchInlineSnapshot(`
         {
           "ariaLabel": "Как считается условный уровень",
@@ -441,7 +423,7 @@ describe('SettlementsExplorer', () => {
     });
 
     await fireEvent.change(getByLabelText('Сортировка:'), {
-      target: { value: 'tariff_asc' },
+      target: { value: 'tariff_asc' }
     });
 
     await waitFor(() => {
@@ -453,7 +435,7 @@ describe('SettlementsExplorer', () => {
     setScreen(false);
 
     const { container, getByLabelText } = render(SettlementsExplorer, {
-      props: { settlements, comparisons, stats },
+      props: { settlements, comparisons, stats }
     });
 
     await waitFor(() => {
@@ -461,7 +443,7 @@ describe('SettlementsExplorer', () => {
     });
 
     await fireEvent.change(getByLabelText('Сортировка:'), {
-      target: { value: 'mkad' },
+      target: { value: 'mkad' }
     });
 
     await waitFor(() => {
@@ -473,7 +455,7 @@ describe('SettlementsExplorer', () => {
     setScreen(false);
 
     const { container, getByLabelText } = render(SettlementsExplorer, {
-      props: { settlements, comparisons, stats },
+      props: { settlements, comparisons, stats }
     });
 
     await waitFor(() => {
@@ -494,14 +476,14 @@ describe('SettlementsExplorer', () => {
     setScreen(false);
 
     const { container, getByLabelText } = render(SettlementsExplorer, {
-      props: { settlements, comparisons, stats },
+      props: { settlements, comparisons, stats }
     });
 
     await waitFor(() => {
       expect(getByLabelText('Сортировка:')).toBeTruthy();
     });
     await fireEvent.change(getByLabelText('Сортировка:'), {
-      target: { value: 'name' },
+      target: { value: 'name' }
     });
 
     await waitFor(() => {
@@ -512,12 +494,9 @@ describe('SettlementsExplorer', () => {
   it('keeps explicit control links for accessibility', async () => {
     setScreen(false);
 
-    const { getByTestId, getByLabelText, container } = render(
-      SettlementsExplorer,
-      {
-        props: { settlements, comparisons, stats },
-      },
-    );
+    const { getByTestId, getByLabelText, container } = render(SettlementsExplorer, {
+      props: { settlements, comparisons, stats }
+    });
 
     await waitFor(() => {
       expect(getByTestId('sort-select')).toBeTruthy();
@@ -542,7 +521,7 @@ describe('SettlementsExplorer', () => {
     setScreen(false);
 
     const { container, getByTestId } = render(SettlementsExplorer, {
-      props: { settlements, comparisons, stats },
+      props: { settlements, comparisons, stats }
     });
 
     await waitFor(() => {
@@ -564,23 +543,21 @@ describe('SettlementsExplorer', () => {
         ...settlements[2],
         name: 'КП Усадьбы 2',
         shortName: 'Усадьбы 2',
-        slug: 'usadby-2',
-      },
+        slug: 'usadby-2'
+      }
     ];
 
     const { container } = render(SettlementsExplorer, {
-      props: { settlements: tied, comparisons, stats },
+      props: { settlements: tied, comparisons, stats }
     });
 
     await waitFor(() => {
-      expect(
-        container.querySelectorAll('[data-testid="settlement-card"]'),
-      ).toHaveLength(4);
+      expect(container.querySelectorAll('[data-testid="settlement-card"]')).toHaveLength(4);
     });
 
-    const labels = [
-      ...container.querySelectorAll('[data-testid="tariff-rank-label"]'),
-    ].map((item) => item.textContent?.trim() ?? '');
+    const labels = [...container.querySelectorAll('[data-testid="tariff-rank-label"]')].map(
+      (item) => item.textContent?.trim() ?? ''
+    );
 
     expect(labels).toContain('3 / 3');
     expect(labels.filter((item) => item === '3 / 3')).toHaveLength(2);

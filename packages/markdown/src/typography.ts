@@ -1,5 +1,5 @@
-import Typograf from 'typograf';
 import type { HastPluginDefinition } from 'satteri';
+import Typograf from 'typograf';
 
 interface HastNode {
   readonly type: string;
@@ -16,7 +16,7 @@ const TYPOGRAPHY_SKIP_TAGS = new Set([
   'samp',
   'script',
   'style',
-  'textarea',
+  'textarea'
 ]);
 
 const BRAND_PART_RULE = 'ru/nbsp/shelkovoPartName';
@@ -25,7 +25,7 @@ if (!Typograf.getRule(BRAND_PART_RULE)) {
   Typograf.addRule({
     name: BRAND_PART_RULE,
     // Keep brand compounds like "Шелково Ривер" on one line.
-    handler: (text) => text.replace(/Шелково (?=[A-ZА-ЯЁ])/gu, 'Шелково\u00A0'),
+    handler: (text) => text.replace(/Шелково (?=[A-ZА-ЯЁ])/gu, 'Шелково\u00A0')
   });
 }
 
@@ -40,14 +40,13 @@ if (!Typograf.getRule(BEFORE_NUMBER_SIGN_RULE)) {
     index: 505,
     // Keep a word before a number sign and its number on the same line,
     // e.g. "Приложение №1" or "п. № 1".
-    handler: (text) =>
-      text.replace(/(?<=[\p{L}.,;:!?)])\s+(?=№\s*\d)/gu, '\u00A0'),
+    handler: (text) => text.replace(/(?<=[\p{L}.,;:!?)])\s+(?=№\s*\d)/gu, '\u00A0')
   });
 }
 
 const typograf = new Typograf({
   locale: ['ru', 'en-US'],
-  processingSeparateParts: true,
+  processingSeparateParts: true
 });
 
 function safeTagPattern(tag: string): RegExp {
@@ -71,10 +70,7 @@ function formatTextNode(value: string): string {
 
 function visitText(node: HastNode, readonlyParents: readonly string[]): void {
   if (node.type === 'text' && typeof node.value === 'string') {
-    if (
-      readonlyParents.some((tag) => TYPOGRAPHY_SKIP_TAGS.has(tag)) ||
-      !hasText(node.value)
-    ) {
+    if (readonlyParents.some((tag) => TYPOGRAPHY_SKIP_TAGS.has(tag)) || !hasText(node.value)) {
       return;
     }
 
@@ -132,8 +128,7 @@ export const satteriTypograf = (): HastPluginDefinition => ({
     }
 
     ctx.setProperty(node, 'value', formatTextNode(node.value));
-  },
+  }
 });
 
-export const formatDynamicHtml = (html: string): string =>
-  typograf.execute(html);
+export const formatDynamicHtml = (html: string): string => typograf.execute(html);

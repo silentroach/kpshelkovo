@@ -1,5 +1,7 @@
 import { count } from '@shelkovo/format';
 
+import { llmsSection, markdownList, serializeLlmsDocument } from '@/lib/markdown/llms-document';
+
 import { absoluteUrl } from '../site';
 import { loadNewsData } from './load';
 import {
@@ -15,13 +17,8 @@ import {
   newsMarkdownUrl,
   newsUrl,
   tagsMarkdownUrl,
-  tagsUrl,
+  tagsUrl
 } from './routes';
-import {
-  llmsSection,
-  markdownList,
-  serializeLlmsDocument,
-} from '@/lib/markdown/llms-document';
 
 export async function build(kind: 'short' | 'full'): Promise<string> {
   const data = await loadNewsData();
@@ -62,8 +59,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'Раздел `/news/` публикует новости и объявления по КП Шелково.',
               `Сейчас в разделе ${counts}.`,
               'HTML-страницы новостей остаются каноническим представлением для людей, а `articles.json` служит основным структурированным файлом данных.',
-              'Если новость объявляет календарные события, в `articles[].events[]` есть метаданные событий и ссылки на локальные для статьи `.ics`-файлы.',
-            ]),
+              'Если новость объявляет календарные события, в `articles[].events[]` есть метаданные событий и ссылки на локальные для статьи `.ics`-файлы.'
+            ])
           ]),
           llmsSection('Главные URL', [
             markdownList([
@@ -73,8 +70,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Каталог API: ${catalog}`,
               `JSON Schema: ${schema}`,
               `OpenAPI: ${openapi}`,
-              `Расширенная версия этого текста: ${full}`,
-            ]),
+              `Расширенная версия этого текста: ${full}`
+            ])
           ]),
           llmsSection('Как читать раздел', [
             markdownList([
@@ -88,10 +85,10 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'В корне `articles.json` есть `schema_version`, `generated_at`, `updated_at`, `total_count`, а также массивы `articles`, `archives.years` и `tags`.',
               'В `articles.json` каждая статья содержит `summary`, полный `body_markdown` и необязательный массив `events`.',
               'Тип источника определяется по `author.kind`; официальные источники используют `kind: official`.',
-              'Для календаря события используйте `/news/YYYY/MM/[entry]/[event-slug].ics`; глобального календаря событий нет.',
-            ]),
-          ]),
-        ],
+              'Для календаря события используйте `/news/YYYY/MM/[entry]/[event-slug].ics`; глобального календаря событий нет.'
+            ])
+          ])
+        ]
       })
     : serializeLlmsDocument({
         title: 'Новости Шелково',
@@ -101,8 +98,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
             markdownList([
               'Раздел `/news/` публикует новости и объявления по КП Шелково.',
               'Для массового чтения используйте JSON-файл; HTML и Markdown удобнее для одной новости, архива или тега.',
-              `Сейчас в разделе ${counts}.`,
-            ]),
+              `Сейчас в разделе ${counts}.`
+            ])
           ]),
           llmsSection('Канонические URL', [
             markdownList([
@@ -123,8 +120,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Пример Markdown-страницы новости: ${articleMarkdown}`,
               `Пример годового архива: ${yearUrl}`,
               `Пример месячного архива: ${monthUrl}`,
-              `Пример страницы тега: ${tagUrl}`,
-            ]),
+              `Пример страницы тега: ${tagUrl}`
+            ])
           ]),
           llmsSection('Описание articles.json', [
             markdownList([
@@ -133,45 +130,45 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               '`articles[]` включает `id`, `title`, `summary`, `published_at`, дату по частям (`year`, `month`, `day`), `entry`, `html_url`, `markdown_url`, `source_url`, `pinned`, `author`, `areas`, `tags`, опциональные `cover` и `events`, массивы `photos`, `attachments` и полный `body_markdown`.',
               '`articles[].events[]` существует только у новостей, которые объявляют календарные события; каждый объект содержит `slug`, `title`, `starts_at`, необязательные `description`, `ends_at`, `location`, `coordinates`, `map_url`, `organizer`, `performer` и обязательный `ics_url`.',
               '`archives.years[]` описывают годовые и месячные архивы с количеством публикаций и URL на HTML/Markdown-страницы.',
-              '`tags[]` содержат редакционный `label`, нормализованный `key`, количество публикаций и URL на HTML/Markdown-страницы тегов.',
-            ]),
+              '`tags[]` содержат редакционный `label`, нормализованный `key`, количество публикаций и URL на HTML/Markdown-страницы тегов.'
+            ])
           ]),
           llmsSection('События и календарь', [
             markdownList([
               'Файлы календаря событий живут рядом со статьей: `/news/YYYY/MM/[entry]/[event-slug].ics`.',
               'Для машинного обхода берите прямые ссылки из `articles[].events[].ics_url`; в JSON-файле они абсолютные.',
-              'Глобального календарного файла событий в этой реализации нет.',
-            ]),
+              'Глобального календарного файла событий в этой реализации нет.'
+            ])
           ]),
           llmsSection('HTML и Markdown', [
             markdownList([
               'HTML-страницы `/news/YYYY/MM/[entry]/` остаются каноническим человекочитаемым представлением новости.',
               'Markdown-файлы `/news/.../index.md` дают текстовую версию для терминалов и прямых ссылок на чистый текст.',
               'Годовые архивы перечисляют месяцы с отдельными HTML- и Markdown-страницами; месячные архивы и страницы тегов показывают `summary` публикаций.',
-              'Полный `body` раскрывается только на странице новости и в основном JSON-файле.',
-            ]),
+              'Полный `body` раскрывается только на странице новости и в основном JSON-файле.'
+            ])
           ]),
           llmsSection('RSS', [
             markdownList([
               '`/news/feed.xml` остается RSS с краткими описаниями.',
               'В RSS `description` используется краткое `summary` статьи, а не полный `body`.',
-              'Источником правды для полного машиночитаемого контента остается `articles.json`.',
-            ]),
+              'Источником правды для полного машиночитаемого контента остается `articles.json`.'
+            ])
           ]),
           llmsSection('Источники', [
             markdownList([
               'Тип источника определяется по `author.kind`: официальные источники используют `kind: official`.',
-              'Если в тексте есть внешняя атрибуция или дополнительный источник, ссылка остается в `body_markdown` самой статьи.',
-            ]),
+              'Если в тексте есть внешняя атрибуция или дополнительный источник, ссылка остается в `body_markdown` самой статьи.'
+            ])
           ]),
           llmsSection('Ограничения', [
             markdownList([
               'Все маршруты раздела доступны только на чтение; ручек для изменения данных и авторизации здесь нет.',
               'Если исходная статья не указывает `areas`, итоговое поле `areas` в JSON-файле покрывает все части поселка: `river`, `forest`, `park`, `village`.',
               'Теги хранятся как русские `label`, а для URL и JSON-файла получают нормализованный `key` с дефисами.',
-              'Локальные картинки внутри исходного markdown-текста не переписываются автоматически; гарантированно машиночитаемыми считаются `cover`, `photos`, `attachments` и `events`.',
-            ]),
-          ]),
-        ],
+              'Локальные картинки внутри исходного markdown-текста не переписываются автоматически; гарантированно машиночитаемыми считаются `cover`, `photos`, `attachments` и `events`.'
+            ])
+          ])
+        ]
       });
 }

@@ -9,9 +9,7 @@ const toImageFigure = (node: HtmlTreeNode): HtmlTreeNode => {
   }
 
   const image =
-    content.tagName === 'a' && content.children?.length === 1
-      ? content.children[0]
-      : content;
+    content.tagName === 'a' && content.children?.length === 1 ? content.children[0] : content;
   if (!image || image.tagName !== 'img') {
     return node;
   }
@@ -29,7 +27,7 @@ const toImageFigure = (node: HtmlTreeNode): HtmlTreeNode => {
     type: 'element',
     tagName: 'figure',
     properties: {
-      className: ['ui-markdown-figure'],
+      className: ['ui-markdown-figure']
     },
     children: [
       content,
@@ -37,16 +35,16 @@ const toImageFigure = (node: HtmlTreeNode): HtmlTreeNode => {
         type: 'element',
         tagName: 'figcaption',
         properties: {
-          className: ['ui-media-caption'],
+          className: ['ui-media-caption']
         },
         children: [
           {
             type: 'text',
-            value: title.trim(),
-          },
-        ],
-      },
-    ],
+            value: title.trim()
+          }
+        ]
+      }
+    ]
   };
 };
 

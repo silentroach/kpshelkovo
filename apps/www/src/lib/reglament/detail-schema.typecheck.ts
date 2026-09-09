@@ -2,7 +2,7 @@ import type {
   EstimateDetailControlTotal,
   EstimateDetailDataset,
   EstimateDetailResource,
-  EstimateDetailResourceKind,
+  EstimateDetailResourceKind
 } from './detail-schema';
 
 export const allDetailResourceKinds = [
@@ -11,7 +11,7 @@ export const allDetailResourceKinds = [
   'machine',
   'material',
   'contractor',
-  'other_cost',
+  'other_cost'
 ] as const satisfies readonly EstimateDetailResourceKind[];
 
 export const validEstimateDetailDataset = {
@@ -23,8 +23,8 @@ export const validEstimateDetailDataset = {
     {
       pdf: 'cleaning',
       title: 'Детальная смета: уборка',
-      pages_total: 12,
-    },
+      pages_total: 12
+    }
   ],
   curation_notes: ['Проверочный dataset для typecheck контракта.'],
   work_items: [
@@ -40,10 +40,10 @@ export const validEstimateDetailDataset = {
           pdf: 'cleaning',
           page: 2,
           fragment: 'Раздел 1 / строка 1',
-          quote: 'Механизированная уборка снега',
-        },
-      ],
-    },
+          quote: 'Механизированная уборка снега'
+        }
+      ]
+    }
   ],
   resources: [
     {
@@ -55,13 +55,13 @@ export const validEstimateDetailDataset = {
       cost_bucket: 'machines',
       quantity: {
         value: 10,
-        unit: 'маш.-ч',
+        unit: 'маш.-ч'
       },
       unit_price_rub: {
-        value: 1_000,
+        value: 1_000
       },
       total_rub: {
-        value: 10_000,
+        value: 10_000
       },
       status: 'verified',
       status_label_ru: 'проверено',
@@ -69,10 +69,10 @@ export const validEstimateDetailDataset = {
         {
           pdf: 'cleaning',
           page: 3,
-          fragment: 'Ведомость ресурсов / машины / строка 2',
-        },
-      ],
-    },
+          fragment: 'Ведомость ресурсов / машины / строка 2'
+        }
+      ]
+    }
   ],
   control_totals: [
     {
@@ -81,13 +81,13 @@ export const validEstimateDetailDataset = {
       control_source: 'section_pdf',
       cost_bucket: 'machines',
       source_total_rub: {
-        value: 10_000,
+        value: 10_000
       },
       detail_total_rub: {
-        value: 10_000,
+        value: 10_000
       },
       aggregate_total_rub: {
-        value: 10_000,
+        value: 10_000
       },
       delta_rub: 0,
       tolerance_rub: 0.01,
@@ -97,11 +97,11 @@ export const validEstimateDetailDataset = {
         {
           pdf: 'cleaning',
           page: 4,
-          fragment: 'Итого по строке / машины',
-        },
-      ],
-    },
-  ],
+          fragment: 'Итого по строке / машины'
+        }
+      ]
+    }
+  ]
 } satisfies EstimateDetailDataset;
 
 export const detailResourceWithoutId = {
@@ -111,11 +111,11 @@ export const detailResourceWithoutId = {
   title: 'Missing stable id',
   cost_bucket: 'machines',
   total_rub: {
-    value: 10_000,
+    value: 10_000
   },
   status: 'verified',
   status_label_ru: 'проверено',
-  source_refs: validEstimateDetailDataset.resources[0].source_refs,
+  source_refs: validEstimateDetailDataset.resources[0].source_refs
   // @ts-expect-error id is required for stable resource references.
 } satisfies EstimateDetailResource;
 
@@ -123,14 +123,14 @@ export const detailControlWithoutEstimateRow = {
   id: 'without-estimate-row',
   cost_bucket: 'machines',
   source_total_rub: {
-    value: 10_000,
+    value: 10_000
   },
   detail_total_rub: {
-    value: 10_000,
+    value: 10_000
   },
   status: 'verified',
   status_label_ru: 'сходится',
-  source_refs: validEstimateDetailDataset.control_totals[0].source_refs,
+  source_refs: validEstimateDetailDataset.control_totals[0].source_refs
   // @ts-expect-error estimate_row_id is required for row-level controls.
 } satisfies EstimateDetailControlTotal;
 
@@ -141,13 +141,13 @@ export const detailResourceWithFullPdfSource = {
       // @ts-expect-error detail sources must reference small estimate PDFs, not full.pdf.
       pdf: 'full',
       page: 127,
-      fragment: 'Приложение №2',
-    },
-  ],
+      fragment: 'Приложение №2'
+    }
+  ]
 } satisfies EstimateDetailResource;
 
 export const detailResourceWithEmptySourceRefs = {
   ...validEstimateDetailDataset.resources[0],
   // @ts-expect-error source_refs must include at least one PDF reference.
-  source_refs: [],
+  source_refs: []
 } satisfies EstimateDetailResource;

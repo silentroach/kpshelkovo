@@ -6,14 +6,7 @@ import type { NewsArticle } from './types';
 
 type NewsArticleMentionRefSource = Pick<
   NewsArticle,
-  | 'id'
-  | 'title'
-  | 'url'
-  | 'markdownUrl'
-  | 'body'
-  | 'mentions'
-  | 'publishedIso'
-  | 'publishedAt'
+  'id' | 'title' | 'url' | 'markdownUrl' | 'body' | 'mentions' | 'publishedIso' | 'publishedAt'
 >;
 
 const SPACE = /\s+/gu;
@@ -25,7 +18,7 @@ const excerpt = (markdown: string): string | undefined => {
 };
 
 export const createNewsArticleMentionRefs = (
-  article: NewsArticleMentionRefSource,
+  article: NewsArticleMentionRefSource
 ): readonly EntityMentionSourceRef[] => {
   if (!article.mentions.length) {
     return [];
@@ -37,13 +30,13 @@ export const createNewsArticleMentionRefs = (
     source: {
       section: 'news',
       kind: 'article',
-      id: article.id,
+      id: article.id
     },
     title: article.title,
     htmlUrl: article.url,
     markdownUrl: article.markdownUrl,
     excerpt: summary,
     mentionedAt: article.publishedIso,
-    sortKey: article.publishedAt.valueOf(),
+    sortKey: article.publishedAt.valueOf()
   });
 };

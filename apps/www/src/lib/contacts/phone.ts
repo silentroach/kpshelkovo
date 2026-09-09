@@ -31,9 +31,7 @@ export const normalizeContactPhone = (phone: string): string | undefined => {
 
   const internationalPhone = `+${value.replace(/\D/gu, '')}`;
 
-  return INTERNATIONAL_PHONE.test(internationalPhone)
-    ? internationalPhone
-    : undefined;
+  return INTERNATIONAL_PHONE.test(internationalPhone) ? internationalPhone : undefined;
 };
 
 export const formatContactPhone = (phone: string): string => {

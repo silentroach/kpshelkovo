@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import { calculateDistance } from '@shelkovo/geo';
+import { describe, expect, it } from 'vitest';
 
 import { toFull, toFullPayload } from './full';
 import { RATING_METHODOLOGY, type Rating } from './rating';
@@ -17,12 +17,12 @@ const base = mapRawSettlement({
     lat: 55.7,
     lng: 37,
     map_url: 'https://example.com/shelkovo-map',
-    district: 'Истринский район',
+    district: 'Истринский район'
   },
   tariff: {
     value: 100,
     unit: 'rub_per_sotka',
-    period: 'month',
+    period: 'month'
   },
   infrastructure: {},
   common_spaces: {},
@@ -33,9 +33,9 @@ const base = mapRawSettlement({
       url: 'https://example.com/base-source',
       type: 'official',
       date_checked: '2026-04-09',
-      comment: '',
-    },
-  ],
+      comment: ''
+    }
+  ]
 } satisfies RawSettlement);
 
 const row = mapRawSettlement({
@@ -46,7 +46,7 @@ const row = mapRawSettlement({
   telegram: 'testchat',
   management_company: {
     title: 'УК Тест',
-    url: 'https://example.com/company',
+    url: 'https://example.com/company'
   },
   is_baseline: false,
   location: {
@@ -54,13 +54,13 @@ const row = mapRawSettlement({
     lat: 55.8,
     lng: 37.1,
     map_url: 'https://example.com/map',
-    district: 'Истринский район',
+    district: 'Истринский район'
   },
   tariff: {
     value: 120,
     unit: 'rub_per_sotka',
     period: 'month',
-    note: 'Тестовое примечание',
+    note: 'Тестовое примечание'
   },
   water_in_tariff: true,
   rabstvo: true,
@@ -73,9 +73,9 @@ const row = mapRawSettlement({
       url: 'https://example.com/source',
       type: 'official',
       date_checked: '2026-04-09',
-      comment: '',
-    },
-  ],
+      comment: ''
+    }
+  ]
 } satisfies RawSettlement);
 
 const ratings = new Map<string, Rating>([
@@ -84,17 +84,17 @@ const ratings = new Map<string, Rating>([
     {
       score: 55,
       km: 48,
-      ring: 29.8,
-    },
+      ring: 29.8
+    }
   ],
   [
     'test',
     {
       score: 72.4,
       km: 62.1,
-      ring: 43.9,
-    },
-  ],
+      ring: 43.9
+    }
+  ]
 ]);
 
 describe('toFull', () => {
@@ -106,7 +106,7 @@ describe('toFull', () => {
     expect(home?.distance).toEqual({
       moscow_km: 48,
       mkad_km: 29.8,
-      shelkovo_km: 0,
+      shelkovo_km: 0
     });
 
     expect(item?.rating).toBe(72.4);
@@ -119,9 +119,9 @@ describe('toFull', () => {
             base.location.lat,
             base.location.lng,
             row.location.lat,
-            row.location.lng,
-          ) * 10,
-        ) / 10,
+            row.location.lng
+          ) * 10
+        ) / 10
     });
 
     expect(item?.website).toBe('https://example.com');
@@ -147,7 +147,7 @@ describe('toFull', () => {
         moreExpensiveCount: 1,
         shelkovoVsMedianPercent: -9.1,
         shelkovoVsPeerMedianPercent: -16.7,
-        shelkovoVsMeanPercent: -13,
+        shelkovoVsMeanPercent: -13
       },
       comparisons: new Map([
         [
@@ -155,10 +155,10 @@ describe('toFull', () => {
           {
             tariffDelta: 20,
             tariffDeltaPercent: 20,
-            isCheaper: false,
-          },
-        ],
-      ]),
+            isCheaper: false
+          }
+        ]
+      ])
     };
     const payload = toFullPayload(input);
 
@@ -175,27 +175,23 @@ describe('toFull', () => {
       moreExpensiveCount: 1,
       shelkovoVsMedianPercent: -9.1,
       shelkovoVsPeerMedianPercent: -16.7,
-      shelkovoVsMeanPercent: -13,
+      shelkovoVsMeanPercent: -13
     });
     expect(payload.comparisons).toEqual({
       test: {
         tariffDelta: 20,
         tariffDeltaPercent: 20,
-        isCheaper: false,
-      },
+        isCheaper: false
+      }
     });
-    expect(payload.settlements[0]?.location.address_text).toBe(
-      'МО, округ Истра, д. Шелково',
-    );
+    expect(payload.settlements[0]?.location.address_text).toBe('МО, округ Истра, д. Шелково');
 
     const invalidRatings = new Map(ratings);
     invalidRatings.set('test', {
       score: RATING_METHODOLOGY.scoreRange.max + 1,
       km: 62.1,
-      ring: 43.9,
+      ring: 43.9
     });
-    expect(() =>
-      toFullPayload({ ...input, ratings: invalidRatings }),
-    ).toThrow();
+    expect(() => toFullPayload({ ...input, ratings: invalidRatings })).toThrow();
   });
 });

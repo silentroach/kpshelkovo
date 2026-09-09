@@ -13,23 +13,23 @@ describe('mapRawPersonProfile', () => {
         data: {
           name: 'Кирилл Щемелинин',
           name_cases: {
-            gen: 'Кирилла Щемелинина',
+            gen: 'Кирилла Щемелинина'
           },
           contacts: [
             {
               type: 'telegram',
-              value: 'Kirill_ZemlyaMO',
-            },
-          ],
-        },
+              value: 'Kirill_ZemlyaMO'
+            }
+          ]
+        }
       },
-      new Map(),
+      new Map()
     );
 
     expect(profile).toMatchObject({
       slug: 'kschemelinin',
       nameCases: {
-        gen: 'Кирилла Щемелинина',
+        gen: 'Кирилла Щемелинина'
       },
       markdownUrl: '/people/kschemelinin/index.md',
       contacts: [
@@ -37,9 +37,9 @@ describe('mapRawPersonProfile', () => {
           type: 'telegram',
           value: 'Kirill_ZemlyaMO',
           display: '@Kirill_ZemlyaMO',
-          href: 'https://t.me/Kirill_ZemlyaMO',
-        },
-      ],
+          href: 'https://t.me/Kirill_ZemlyaMO'
+        }
+      ]
     });
     expect(JSON.stringify(profile)).not.toContain('name_cases');
     expect(JSON.stringify(profile)).not.toContain('markdown_url');
@@ -53,7 +53,7 @@ describe('people raw/domain architecture', () => {
       './registry.ts',
       './view.ts',
       './mention-refs.ts',
-      '../../pages/people/[slug]/index.astro',
+      '../../pages/people/[slug]/index.astro'
     ];
     const rawPeopleTokens = [
       'by_slug',
@@ -63,7 +63,7 @@ describe('people raw/domain architecture', () => {
       'source_id',
       'mentioned_at',
       'sort_key',
-      'name_cases',
+      'name_cases'
     ];
 
     const offenders = files.flatMap((file) => {

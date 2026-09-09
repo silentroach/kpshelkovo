@@ -5,27 +5,20 @@ export const ESTIMATE_SOURCE_PDFS = [
   'improvement',
   'lighting',
   'security',
-  'waste',
+  'waste'
 ] as const;
 
 export type EstimateSourcePdf = (typeof ESTIMATE_SOURCE_PDFS)[number];
 
 export type NonEmptyReadonlyArray<T> = readonly [T, ...T[]];
 
-export const ESTIMATE_ROW_KINDS = [
-  'work',
-  'group',
-  'resource',
-  'material',
-  'contractor',
-] as const;
+export const ESTIMATE_ROW_KINDS = ['work', 'group', 'resource', 'material', 'contractor'] as const;
 
 export type EstimateRowKind = (typeof ESTIMATE_ROW_KINDS)[number];
 
 export const ESTIMATE_COEFFICIENT_POLICIES = ['fot', 'none'] as const;
 
-export type EstimateCoefficientPolicy =
-  (typeof ESTIMATE_COEFFICIENT_POLICIES)[number];
+export type EstimateCoefficientPolicy = (typeof ESTIMATE_COEFFICIENT_POLICIES)[number];
 
 export const EDITABLE_FIELD_KEYS = [
   'enabled',
@@ -42,7 +35,7 @@ export const EDITABLE_FIELD_KEYS = [
   'overhead_rate',
   'profit_rate',
   'usn_rate',
-  'vat_rate',
+  'vat_rate'
 ] as const;
 
 export type EditableFieldKey = (typeof EDITABLE_FIELD_KEYS)[number];

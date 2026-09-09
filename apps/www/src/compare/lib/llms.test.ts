@@ -7,19 +7,19 @@ vi.mock('./data', () => ({
     const settlements = [
       { isBaseline: true, shortName: 'Шелково', slug: 'shelkovo' },
       { isBaseline: false, shortName: 'Гринвуд', slug: 'greenwood' },
-      { isBaseline: false, shortName: 'Белый парк', slug: 'white-park' },
+      { isBaseline: false, shortName: 'Белый парк', slug: 'white-park' }
     ];
 
     return {
       ratings: new Map([
         ['greenwood', { score: 71 }],
-        ['white-park', { score: 84 }],
+        ['white-park', { score: 84 }]
       ]),
       settlements,
       baseline: settlements[0],
-      stats: { totalSettlements: 3 },
+      stats: { totalSettlements: 3 }
     };
-  },
+  }
 }));
 
 let build: typeof import('./llms').build;
@@ -30,14 +30,12 @@ const absolute = (path: string): string => new URL(path, SITE).toString();
 const settlementUrl = (slug: string): string =>
   absolute(routes.compareSettlementPattern().replace(':slug', slug));
 const extractAbsoluteUrls = (document: string): readonly string[] =>
-  [...document.matchAll(/<https:\/\/[^>]+>/gu)].map((match) =>
-    match[0].slice(1, -1),
-  );
+  [...document.matchAll(/<https:\/\/[^>]+>/gu)].map((match) => match[0].slice(1, -1));
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE,
-    BASE_URL: '/astro-base/',
+    BASE_URL: '/astro-base/'
   });
 
   routes = await import('./public-surface');
@@ -62,7 +60,7 @@ describe('compare llms', () => {
       absolute(routes.compareLlmsFullPath()),
       settlementUrl('shelkovo'),
       settlementUrl('white-park'),
-      settlementUrl('greenwood'),
+      settlementUrl('greenwood')
     ]);
   });
 
@@ -80,10 +78,10 @@ describe('compare llms', () => {
       settlementUrl('shelkovo'),
       settlementUrl('white-park'),
       settlementUrl('greenwood'),
-      absolute(routes.compareRatingPath()),
+      absolute(routes.compareRatingPath())
     ]);
     expect(document).toContain(
-      `число \`${RATING_METHODOLOGY.scoreRange.min}..${RATING_METHODOLOGY.scoreRange.max}\``,
+      `число \`${RATING_METHODOLOGY.scoreRange.min}..${RATING_METHODOLOGY.scoreRange.max}\``
     );
   });
 });

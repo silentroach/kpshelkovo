@@ -1,9 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import {
-  buildStatusCalendarProjection,
-  toStatusCalendarRecord,
-} from './calendar';
+import { buildStatusCalendarProjection, toStatusCalendarRecord } from './calendar';
 import { getStatusMonthJournal } from './journal';
 import type { StatusIncidentWithDetail, StatusServiceSummary } from './types';
 
@@ -14,19 +11,14 @@ let buildStatusMonthMarkdown: typeof import('./markdown').buildStatusMonthMarkdo
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
-  ({
-    buildStatusHomeMarkdown,
-    buildStatusIncidentMarkdown,
-    buildStatusMonthMarkdown,
-  } = await import('./markdown'));
+  ({ buildStatusHomeMarkdown, buildStatusIncidentMarkdown, buildStatusMonthMarkdown } =
+    await import('./markdown'));
 });
 
-const incident = (
-  input?: Partial<StatusIncidentWithDetail>,
-): StatusIncidentWithDetail => ({
+const incident = (input?: Partial<StatusIncidentWithDetail>): StatusIncidentWithDetail => ({
   id: '2026/05/electricity-river-outage',
   title: 'Отключение электричества в Шелково Ривер',
   service: 'electricity',
@@ -36,17 +28,16 @@ const incident = (
   slug: 'electricity-river-outage',
   url: '/status/incidents/2026/05/electricity-river-outage/',
   markdownUrl: '/status/incidents/2026/05/electricity-river-outage/index.md',
-  canonical:
-    'https://example.com/status/incidents/2026/05/electricity-river-outage/',
+  canonical: 'https://example.com/status/incidents/2026/05/electricity-river-outage/',
   started: {
     at: new Date('2026-05-01T04:32:00.000Z'),
     iso: '2026-05-01T07:32:00+03:00',
-    hasTime: true,
+    hasTime: true
   },
   ended: {
     at: new Date('2026-05-01T13:38:00.000Z'),
     iso: '2026-05-01T16:38:00+03:00',
-    hasTime: true,
+    hasTime: true
   },
   phase: 'resolved',
   appliesToAllAreas: false,
@@ -58,19 +49,17 @@ const incident = (
   sortStartedAt: new Date('2026-05-01T04:32:00.000Z').valueOf(),
   sortLastChangeAt: new Date('2026-05-01T13:38:00.000Z').valueOf(),
   duration: { totalMinutes: 546 },
-  ...input,
+  ...input
 });
 
-const summary = (
-  input?: Partial<StatusServiceSummary>,
-): StatusServiceSummary => ({
+const summary = (input?: Partial<StatusServiceSummary>): StatusServiceSummary => ({
   service: 'electricity',
   serviceStatus: 'green',
   incidents: [incident()],
   activeIncidents: [],
   activeMaintenance: [],
   daysWithoutIncidents: { mode: 'count', days: 3 },
-  ...input,
+  ...input
 });
 
 describe('buildStatusHomeMarkdown', () => {
@@ -83,10 +72,10 @@ describe('buildStatusHomeMarkdown', () => {
       services: [testSummary],
       calendar: buildStatusCalendarProjection(
         [toStatusCalendarRecord(testIncident)],
-        new Date('2026-05-04T09:00:00+03:00').valueOf(),
+        new Date('2026-05-04T09:00:00+03:00').valueOf()
       ),
       byId: new Map([[testIncident.id, testIncident]]),
-      byService: new Map([['electricity', testSummary]]),
+      byService: new Map([['electricity', testSummary]])
     });
 
     expect(markdown).toMatchInlineSnapshot(`
@@ -138,8 +127,8 @@ describe('buildStatusIncidentMarkdown', () => {
     const markdown = buildStatusIncidentMarkdown(
       incident({
         appliesToAllAreas: true,
-        areas: ['river', 'forest', 'park', 'village'],
-      }),
+        areas: ['river', 'forest', 'park', 'village']
+      })
     );
 
     expect(markdown).not.toContain('\nareas:\n');
@@ -158,10 +147,10 @@ describe('buildStatusIncidentMarkdown', () => {
             '',
             'Тело с [ссылкой](https://example.com/body).',
             '',
-            '- пункт 1',
-          ].join('\n'),
-        }),
-      ),
+            '- пункт 1'
+          ].join('\n')
+        })
+      )
     ).toMatchInlineSnapshot(`
       "---
       title: Отключение электричества в Шелково Ривер
@@ -203,16 +192,16 @@ describe('buildStatusMonthMarkdown', () => {
       started: {
         at: new Date('2026-05-01T20:00:00.000Z'),
         iso: '2026-05-01T23:00:00+03:00',
-        hasTime: true,
+        hasTime: true
       },
       ended: {
         at: new Date('2026-05-01T23:30:00.000Z'),
         iso: '2026-05-02T02:30:00+03:00',
-        hasTime: true,
+        hasTime: true
       },
       sortStartedAt: new Date('2026-05-01T20:00:00.000Z').valueOf(),
       sortLastChangeAt: new Date('2026-05-01T23:30:00.000Z').valueOf(),
-      duration: { totalMinutes: 210 },
+      duration: { totalMinutes: 210 }
     });
     const newIncident = incident({
       id: '2026/05/new-incident',
@@ -224,31 +213,31 @@ describe('buildStatusMonthMarkdown', () => {
       started: {
         at: new Date('2026-05-01T22:00:00.000Z'),
         iso: '2026-05-02T01:00:00+03:00',
-        hasTime: true,
+        hasTime: true
       },
       ended: {
         at: new Date('2026-05-01T23:00:00.000Z'),
         iso: '2026-05-02T02:00:00+03:00',
-        hasTime: true,
+        hasTime: true
       },
       sortStartedAt: new Date('2026-05-01T22:00:00.000Z').valueOf(),
       sortLastChangeAt: new Date('2026-05-01T23:00:00.000Z').valueOf(),
-      duration: { totalMinutes: 60 },
+      duration: { totalMinutes: 60 }
     });
     const calendar = buildStatusCalendarProjection(
       [carryover, newIncident].map(toStatusCalendarRecord),
-      new Date('2026-05-03T09:00:00+03:00').valueOf(),
+      new Date('2026-05-03T09:00:00+03:00').valueOf()
     );
     const journal = getStatusMonthJournal(
       {
         calendar,
         byId: new Map([
           [carryover.id, carryover],
-          [newIncident.id, newIncident],
-        ]),
+          [newIncident.id, newIncident]
+        ])
       },
       2026,
-      5,
+      5
     );
 
     if (!journal) {

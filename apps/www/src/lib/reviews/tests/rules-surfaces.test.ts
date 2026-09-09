@@ -1,7 +1,7 @@
 /// <reference types="astro/client" />
 
-import { describe, expect, it, vi } from 'vitest';
 import { type Element, type HTMLElement, Window } from 'happy-dom';
+import { describe, expect, it, vi } from 'vitest';
 
 import { renderMarkdown } from '@/lib/markdown/render';
 import { createAstroContainer } from '@/test/astro-container';
@@ -23,13 +23,13 @@ const fixture = vi.hoisted(() => ({
     canonical: 'https://example.com/reviews/2026-08-25-review-rules-contract/',
     body: 'Основной текст отзыва.',
     aspects: [],
-    mentions: [],
-  } satisfies Review,
+    mentions: []
+  } satisfies Review
 }));
 
 vi.mock('@/lib/reviews/load', () => ({
   loadReviews: async () => [fixture.review],
-  loadReview: async () => fixture.review,
+  loadReview: async () => fixture.review
 }));
 
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
@@ -68,7 +68,7 @@ describe('review rules public surfaces', () => {
   it('renders the shared contract in HTML and Markdown', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(ReviewRulesPage, {
-      request: new Request('https://example.com/reviews/rules/'),
+      request: new Request('https://example.com/reviews/rules/')
     });
     const main = parseMain(html);
     const markdown = buildReviewsRulesMarkdown();
@@ -79,12 +79,8 @@ describe('review rules public surfaces', () => {
     }
 
     expect({
-      htmlMatchesMarkdown:
-        `${elementText(title)} ${elementText(rules)}` ===
-        markdownText(markdown),
-      telegramHref: rules
-        .querySelector('a[href="https://t.me/silentroach"]')
-        ?.getAttribute('href'),
+      htmlMatchesMarkdown: `${elementText(title)} ${elementText(rules)}` === markdownText(markdown),
+      telegramHref: rules.querySelector('a[href="https://t.me/silentroach"]')?.getAttribute('href')
     }).toMatchInlineSnapshot(`
       {
         "htmlMatchesMarkdown": true,
@@ -98,12 +94,10 @@ describe('review rules public surfaces', () => {
     const main = parseMain(
       await container.renderToString(ReviewPage, {
         params: { id: fixture.review.id },
-        request: new Request(fixture.review.canonical),
-      }),
+        request: new Request(fixture.review.canonical)
+      })
     );
-    const disclaimer = main.querySelector(
-      '[aria-labelledby="review-disclaimer"]',
-    );
+    const disclaimer = main.querySelector('[aria-labelledby="review-disclaimer"]');
     if (!disclaimer) {
       throw new Error('review disclaimer not found');
     }
@@ -118,9 +112,8 @@ describe('review rules public surfaces', () => {
 
     expect({
       htmlBodyMatchesSource: elementText(disclaimerBody) === expectedBody,
-      htmlHeadingMatchesSource:
-        elementText(disclaimerHeading) === REVIEW_RULES.disclaimer.heading,
-      markdownEndsWithSource: markdown.endsWith(expectedDisclaimerMarkdown),
+      htmlHeadingMatchesSource: elementText(disclaimerHeading) === REVIEW_RULES.disclaimer.heading,
+      markdownEndsWithSource: markdown.endsWith(expectedDisclaimerMarkdown)
     }).toMatchInlineSnapshot(`
       {
         "htmlBodyMatchesSource": true,

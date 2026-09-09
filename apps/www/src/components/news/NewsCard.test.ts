@@ -3,8 +3,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { createAstroContainer } from '@/test/astro-container';
-import type { NewsListArticle } from '../../lib/news/types';
 
+import type { NewsListArticle } from '../../lib/news/types';
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import NewsCard from './NewsCard.astro';
 
@@ -14,7 +14,7 @@ const baseArticle: NewsListArticle = {
   author: {
     id: 'editorial',
     name: 'Редакция',
-    kind: 'editorial',
+    kind: 'editorial'
   },
   year: 2026,
   month: 5,
@@ -24,27 +24,25 @@ const baseArticle: NewsListArticle = {
   publishedIso: '2026-05-14T09:00:00+03:00',
   tags: [],
   pinned: true,
-  summary: 'Короткое описание новости.',
+  summary: 'Короткое описание новости.'
 };
 
 describe('NewsCard', () => {
   it('announces pinned state without prohibited aria-label on a plain span', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(NewsCard, {
-      props: { article: baseArticle },
+      props: { article: baseArticle }
     });
 
     const heading = html.match(/<h3[\s\S]*?<\/h3>/u)?.[0] ?? '';
 
     expect({
-      hasAccessiblePinnedLabel:
-        /<span(?![^>]*aria-hidden)[^>]*>Закреплено сверху<\/span>/u.test(
-          heading,
-        ),
+      hasAccessiblePinnedLabel: /<span(?![^>]*aria-hidden)[^>]*>Закреплено сверху<\/span>/u.test(
+        heading
+      ),
       href: heading.match(/<a href="([^"]+)"/u)?.[1],
-      hasDecorativePinnedIcon:
-        /title="закреплено сверху" aria-hidden="true"/u.test(heading),
-      hasProhibitedAriaLabel: /aria-label=/u.test(heading),
+      hasDecorativePinnedIcon: /title="закреплено сверху" aria-hidden="true"/u.test(heading),
+      hasProhibitedAriaLabel: /aria-label=/u.test(heading)
     }).toMatchInlineSnapshot(`
       {
         "hasAccessiblePinnedLabel": true,

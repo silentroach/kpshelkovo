@@ -6,21 +6,15 @@ const REGLAMENT_MARKDOWN = '/815/regulation/index.md';
 const REGLAMENT_FULL_MARKDOWN = '/815/regulation/full.md';
 const REGLAMENT_FULL_ASSETS_MARKDOWN = '/815/regulation/full/assets.md';
 const REGLAMENT_FULL_SERVICES_MARKDOWN = '/815/regulation/full/services.md';
-const REGLAMENT_FULL_SERVICE_MAP_MARKDOWN =
-  '/815/regulation/full/service-map.md';
+const REGLAMENT_FULL_SERVICE_MAP_MARKDOWN = '/815/regulation/full/service-map.md';
 const REGLAMENT_FULL_CHECKS_MARKDOWN = '/815/regulation/full/checks.md';
 const REGLAMENT_ESTIMATE_DETAILS_MARKDOWN = '/815/regulation/details.md';
-const REGLAMENT_ESTIMATE_DETAILS_MATERIALS_MARKDOWN =
-  '/815/regulation/details/materials.md';
-const REGLAMENT_ESTIMATE_DETAILS_MACHINES_MARKDOWN =
-  '/815/regulation/details/machines.md';
-const REGLAMENT_ESTIMATE_DETAILS_LABOR_MARKDOWN =
-  '/815/regulation/details/labor.md';
-const REGLAMENT_ESTIMATE_DETAILS_CHECKS_MARKDOWN =
-  '/815/regulation/details/checks.md';
+const REGLAMENT_ESTIMATE_DETAILS_MATERIALS_MARKDOWN = '/815/regulation/details/materials.md';
+const REGLAMENT_ESTIMATE_DETAILS_MACHINES_MARKDOWN = '/815/regulation/details/machines.md';
+const REGLAMENT_ESTIMATE_DETAILS_LABOR_MARKDOWN = '/815/regulation/details/labor.md';
+const REGLAMENT_ESTIMATE_DETAILS_CHECKS_MARKDOWN = '/815/regulation/details/checks.md';
 const REGLAMENT_DATA_ESTIMATE_2026 = '/815/regulation/data/estimate-2026.json';
-const REGLAMENT_DATA_ESTIMATE_DETAILS_2026 =
-  '/815/regulation/data/estimate-details-2026.json';
+const REGLAMENT_DATA_ESTIMATE_DETAILS_2026 = '/815/regulation/data/estimate-details-2026.json';
 const REGLAMENT_DATA_FULL_2026 = '/815/regulation/data/full-2026.json';
 const REGLAMENT_ASSETS = '/815/regulation/assets/';
 const REGLAMENT_ASSETS_MARKDOWN = '/815/regulation/assets/index.md';
@@ -35,36 +29,30 @@ const REGLAMENT_ESTIMATE_DETAILS_SCHEMA =
 const REGLAMENT_OPENAPI = '/815/regulation/openapi/estimate-2026.openapi.json';
 const REGLAMENT_ESTIMATE_DETAILS_OPENAPI =
   '/815/regulation/openapi/estimate-details-2026.openapi.json';
-const REGLAMENT_SOURCE_PDF_ROOT =
-  'https://media.kpshelkovo.online/815/regulation/';
-const REGLAMENT_FULL_SOURCE_PDF =
-  'https://media.kpshelkovo.online/815/regulation/full.pdf';
+const REGLAMENT_SOURCE_PDF_ROOT = 'https://media.kpshelkovo.online/815/regulation/';
+const REGLAMENT_FULL_SOURCE_PDF = 'https://media.kpshelkovo.online/815/regulation/full.pdf';
 
 export type ReglamentSourcePdfUrl =
   `https://media.kpshelkovo.online/815/regulation/${EstimateSourcePdf}.pdf`;
 export type ReglamentFullSourcePdfUrl = typeof REGLAMENT_FULL_SOURCE_PDF;
 
-export const reglamentSourcePdfUrl = (
-  pdf: EstimateSourcePdf,
-): ReglamentSourcePdfUrl => `${REGLAMENT_SOURCE_PDF_ROOT}${pdf}.pdf`;
+export const reglamentSourcePdfUrl = (pdf: EstimateSourcePdf): ReglamentSourcePdfUrl =>
+  `${REGLAMENT_SOURCE_PDF_ROOT}${pdf}.pdf`;
 
-export const REGLAMENT_SOURCE_PDF_URLS = ESTIMATE_SOURCE_PDFS.map(
-  reglamentSourcePdfUrl,
-);
+export const REGLAMENT_SOURCE_PDF_URLS = ESTIMATE_SOURCE_PDFS.map(reglamentSourcePdfUrl);
 
 export const REGLAMENT_ESTIMATE_DETAILS_MARKDOWN_PATHS = [
   REGLAMENT_ESTIMATE_DETAILS_MARKDOWN,
   REGLAMENT_ESTIMATE_DETAILS_MATERIALS_MARKDOWN,
   REGLAMENT_ESTIMATE_DETAILS_MACHINES_MARKDOWN,
   REGLAMENT_ESTIMATE_DETAILS_LABOR_MARKDOWN,
-  REGLAMENT_ESTIMATE_DETAILS_CHECKS_MARKDOWN,
+  REGLAMENT_ESTIMATE_DETAILS_CHECKS_MARKDOWN
 ] as const;
 
 export type ReglamentEstimateDetailsMarkdownPath =
   (typeof REGLAMENT_ESTIMATE_DETAILS_MARKDOWN_PATHS)[number];
 
-export const reglamentFullSourcePdfUrl = (): ReglamentFullSourcePdfUrl =>
-  REGLAMENT_FULL_SOURCE_PDF;
+export const reglamentFullSourcePdfUrl = (): ReglamentFullSourcePdfUrl => REGLAMENT_FULL_SOURCE_PDF;
 
 export const REGLAMENT_PUBLIC_PATHS = [
   REGLAMENT_ROOT,
@@ -88,7 +76,7 @@ export const REGLAMENT_PUBLIC_PATHS = [
   REGLAMENT_OPENAPI,
   REGLAMENT_ESTIMATE_DETAILS_SCHEMA,
   REGLAMENT_ESTIMATE_DETAILS_OPENAPI,
-  REGLAMENT_API_CATALOG,
+  REGLAMENT_API_CATALOG
 ] as const;
 
 export type ReglamentPublicPath = (typeof REGLAMENT_PUBLIC_PATHS)[number];
@@ -99,17 +87,14 @@ export const reglamentMarkdownPath = (): string => REGLAMENT_MARKDOWN;
 
 export const reglamentFullMarkdownPath = (): string => REGLAMENT_FULL_MARKDOWN;
 
-export const reglamentFullAssetsMarkdownPath = (): string =>
-  REGLAMENT_FULL_ASSETS_MARKDOWN;
+export const reglamentFullAssetsMarkdownPath = (): string => REGLAMENT_FULL_ASSETS_MARKDOWN;
 
-export const reglamentFullServicesMarkdownPath = (): string =>
-  REGLAMENT_FULL_SERVICES_MARKDOWN;
+export const reglamentFullServicesMarkdownPath = (): string => REGLAMENT_FULL_SERVICES_MARKDOWN;
 
 export const reglamentFullServiceMapMarkdownPath = (): string =>
   REGLAMENT_FULL_SERVICE_MAP_MARKDOWN;
 
-export const reglamentFullChecksMarkdownPath = (): string =>
-  REGLAMENT_FULL_CHECKS_MARKDOWN;
+export const reglamentFullChecksMarkdownPath = (): string => REGLAMENT_FULL_CHECKS_MARKDOWN;
 
 export const reglamentEstimateDetailsMarkdownPath = (): string =>
   REGLAMENT_ESTIMATE_DETAILS_MARKDOWN;
@@ -126,8 +111,7 @@ export const reglamentEstimateDetailsLaborMarkdownPath = (): string =>
 export const reglamentEstimateDetailsChecksMarkdownPath = (): string =>
   REGLAMENT_ESTIMATE_DETAILS_CHECKS_MARKDOWN;
 
-export const reglamentEstimate2026DataPath = (): string =>
-  REGLAMENT_DATA_ESTIMATE_2026;
+export const reglamentEstimate2026DataPath = (): string => REGLAMENT_DATA_ESTIMATE_2026;
 
 export const reglamentEstimateDetails2026DataPath = (): string =>
   REGLAMENT_DATA_ESTIMATE_DETAILS_2026;
@@ -136,13 +120,11 @@ export const reglamentFull2026DataPath = (): string => REGLAMENT_DATA_FULL_2026;
 
 export const reglamentAssetsPath = (): string => REGLAMENT_ASSETS;
 
-export const reglamentAssetsMarkdownPath = (): string =>
-  REGLAMENT_ASSETS_MARKDOWN;
+export const reglamentAssetsMarkdownPath = (): string => REGLAMENT_ASSETS_MARKDOWN;
 
 export const reglamentServicesPath = (): string => REGLAMENT_SERVICES;
 
-export const reglamentServicesMarkdownPath = (): string =>
-  REGLAMENT_SERVICES_MARKDOWN;
+export const reglamentServicesMarkdownPath = (): string => REGLAMENT_SERVICES_MARKDOWN;
 
 export const reglamentLlmsPath = (): string => REGLAMENT_LLMS;
 
@@ -164,8 +146,7 @@ export const reglamentUrl = (): string => withBase(REGLAMENT_ROOT);
 
 export const reglamentMarkdownUrl = (): string => withBase(REGLAMENT_MARKDOWN);
 
-export const reglamentFullMarkdownUrl = (): string =>
-  withBase(REGLAMENT_FULL_MARKDOWN);
+export const reglamentFullMarkdownUrl = (): string => withBase(REGLAMENT_FULL_MARKDOWN);
 
 export const reglamentFullAssetsMarkdownUrl = (): string =>
   withBase(REGLAMENT_FULL_ASSETS_MARKDOWN);
@@ -194,40 +175,33 @@ export const reglamentEstimateDetailsLaborMarkdownUrl = (): string =>
 export const reglamentEstimateDetailsChecksMarkdownUrl = (): string =>
   withBase(REGLAMENT_ESTIMATE_DETAILS_CHECKS_MARKDOWN);
 
-export const reglamentEstimate2026DataUrl = (): string =>
-  withBase(REGLAMENT_DATA_ESTIMATE_2026);
+export const reglamentEstimate2026DataUrl = (): string => withBase(REGLAMENT_DATA_ESTIMATE_2026);
 
 export const reglamentEstimateDetails2026DataUrl = (): string =>
   withBase(REGLAMENT_DATA_ESTIMATE_DETAILS_2026);
 
-export const reglamentFull2026DataUrl = (): string =>
-  withBase(REGLAMENT_DATA_FULL_2026);
+export const reglamentFull2026DataUrl = (): string => withBase(REGLAMENT_DATA_FULL_2026);
 
 export const reglamentAssetsUrl = (): string => withBase(REGLAMENT_ASSETS);
 
-export const reglamentAssetsMarkdownUrl = (): string =>
-  withBase(REGLAMENT_ASSETS_MARKDOWN);
+export const reglamentAssetsMarkdownUrl = (): string => withBase(REGLAMENT_ASSETS_MARKDOWN);
 
 export const reglamentServicesUrl = (): string => withBase(REGLAMENT_SERVICES);
 
-export const reglamentServicesMarkdownUrl = (): string =>
-  withBase(REGLAMENT_SERVICES_MARKDOWN);
+export const reglamentServicesMarkdownUrl = (): string => withBase(REGLAMENT_SERVICES_MARKDOWN);
 
 export const reglamentLlmsUrl = (): string => withBase(REGLAMENT_LLMS);
 
 export const reglamentLlmsFullUrl = (): string => withBase(REGLAMENT_LLMS_FULL);
 
-export const reglamentApiCatalogUrl = (): string =>
-  withBase(REGLAMENT_API_CATALOG);
+export const reglamentApiCatalogUrl = (): string => withBase(REGLAMENT_API_CATALOG);
 
-export const reglamentEstimate2026SchemaUrl = (): string =>
-  withBase(REGLAMENT_SCHEMA);
+export const reglamentEstimate2026SchemaUrl = (): string => withBase(REGLAMENT_SCHEMA);
 
 export const reglamentEstimateDetails2026SchemaUrl = (): string =>
   withBase(REGLAMENT_ESTIMATE_DETAILS_SCHEMA);
 
-export const reglamentEstimate2026OpenApiUrl = (): string =>
-  withBase(REGLAMENT_OPENAPI);
+export const reglamentEstimate2026OpenApiUrl = (): string => withBase(REGLAMENT_OPENAPI);
 
 export const reglamentEstimateDetails2026OpenApiUrl = (): string =>
   withBase(REGLAMENT_ESTIMATE_DETAILS_OPENAPI);

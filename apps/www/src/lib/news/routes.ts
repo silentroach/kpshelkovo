@@ -73,8 +73,7 @@ const tagKey = (value: string): string => {
   return key;
 };
 
-const yearPath = (year: number | string): string =>
-  `/news/${padNumber(year, 4)}/`;
+const yearPath = (year: number | string): string => `/news/${padNumber(year, 4)}/`;
 
 const monthPath = (year: number | string, month: number | string): string =>
   `/news/${padNumber(year, 4)}/${padNumber(month, 2)}/`;
@@ -94,11 +93,9 @@ export const monthMarkdownPattern = (): string => '/news/:year/:month/index.md';
 
 export const articlePattern = (): string => '/news/:year/:month/:entry/';
 
-export const articleMarkdownPattern = (): string =>
-  '/news/:year/:month/:entry/index.md';
+export const articleMarkdownPattern = (): string => '/news/:year/:month/:entry/index.md';
 
-export const articleEventIcsPattern = (): string =>
-  '/news/:year/:month/:entry/:event.ics';
+export const articleEventIcsPattern = (): string => '/news/:year/:month/:entry/:event.ics';
 
 export const tagPattern = (): string => '/news/tags/:tag/';
 
@@ -110,29 +107,22 @@ export const newsMarkdownUrl = (): string => withBase(NEWS_MARKDOWN);
 
 export const newsArchiveUrl = (): string => withBase(NEWS_ARCHIVE_ROOT);
 
-export const newsArchiveMarkdownUrl = (): string =>
-  withBase(NEWS_ARCHIVE_MARKDOWN);
+export const newsArchiveMarkdownUrl = (): string => withBase(NEWS_ARCHIVE_MARKDOWN);
 
 export const newsCanonical = (): string => canon(NEWS_ROOT);
 
-export const yearUrl = (year: number | string): string =>
-  withBase(yearPath(year));
+export const yearUrl = (year: number | string): string => withBase(yearPath(year));
 
 export const yearMarkdownUrl = (year: number | string): string =>
   withBase(`${yearPath(year)}index.md`);
 
-export const monthUrl = (
-  year: number | string,
-  month: number | string,
-): string => withBase(monthPath(year, month));
+export const monthUrl = (year: number | string, month: number | string): string =>
+  withBase(monthPath(year, month));
 
-export const monthMarkdownUrl = (
-  year: number | string,
-  month: number | string,
-): string => withBase(`${monthPath(year, month)}index.md`);
+export const monthMarkdownUrl = (year: number | string, month: number | string): string =>
+  withBase(`${monthPath(year, month)}index.md`);
 
-export const articleUrl = (input: NewsArticleRouteInput): string =>
-  withBase(articlePath(input));
+export const articleUrl = (input: NewsArticleRouteInput): string => withBase(articlePath(input));
 
 export const articleMarkdownUrl = (input: NewsArticleRouteInput): string =>
   withBase(`${articlePath(input)}index.md`);
@@ -140,8 +130,7 @@ export const articleMarkdownUrl = (input: NewsArticleRouteInput): string =>
 export const articleEventIcsUrl = (input: NewsArticleEventRouteInput): string =>
   withBase(`${articlePath(input)}${need(input.event, 'event')}.ics`);
 
-export const articleCanonical = (input: NewsArticleRouteInput): string =>
-  canon(articlePath(input));
+export const articleCanonical = (input: NewsArticleRouteInput): string => canon(articlePath(input));
 
 export const tagsUrl = (): string => withBase(TAGS_ROOT);
 
@@ -149,8 +138,7 @@ export const tagsMarkdownUrl = (): string => withBase(TAGS_MARKDOWN);
 
 export const tagUrl = (value: string): string => withBase(tagPath(value));
 
-export const tagMarkdownUrl = (value: string): string =>
-  withBase(`${tagPath(value)}index.md`);
+export const tagMarkdownUrl = (value: string): string => withBase(`${tagPath(value)}index.md`);
 
 export const articlesDataUrl = (): string => withBase(DATA_ARTICLES);
 

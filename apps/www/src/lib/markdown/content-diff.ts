@@ -4,7 +4,7 @@ import {
   diffWords,
   type Change,
   type DiffLinesOptionsNonabortable,
-  type DiffWordsOptionsNonabortable,
+  type DiffWordsOptionsNonabortable
 } from 'diff';
 
 interface ContentDiffSource {
@@ -37,12 +37,12 @@ const HTML_ENTITIES: Readonly<Record<string, string>> = {
   gt: '>',
   lt: '<',
   quot: '"',
-  apos: "'",
+  apos: "'"
 };
 
 type SegmenterConstructor = new (
   locale: string,
-  options: { readonly granularity: 'word' },
+  options: { readonly granularity: 'word' }
 ) => unknown;
 
 type IntlWithSegmenter = typeof Intl & {
@@ -50,20 +50,17 @@ type IntlWithSegmenter = typeof Intl & {
 };
 
 const Segmenter = (Intl as IntlWithSegmenter).Segmenter;
-const RUSSIAN_WORD_SEGMENTER = Segmenter
-  ? new Segmenter('ru', { granularity: 'word' })
-  : undefined;
+const RUSSIAN_WORD_SEGMENTER = Segmenter ? new Segmenter('ru', { granularity: 'word' }) : undefined;
 
 const WORD_DIFF_OPTIONS: DiffWordsOptionsNonabortable = {
   ignoreCase: true,
-  intlSegmenter: RUSSIAN_WORD_SEGMENTER,
+  intlSegmenter: RUSSIAN_WORD_SEGMENTER
 };
 
 const LINE_DIFF_OPTIONS: DiffLinesOptionsNonabortable = {
-  ignoreWhitespace: true,
+  ignoreWhitespace: true
 };
-const MONEY_COMMON_SUFFIX =
-  /^((?:[^\S\n]+\d{3})*[^\S\n]*(?:руб\.?|₽)(?![\p{Letter}\p{Number}]))/iu;
+const MONEY_COMMON_SUFFIX = /^((?:[^\S\n]+\d{3})*[^\S\n]*(?:руб\.?|₽)(?![\p{Letter}\p{Number}]))/iu;
 const MONEY_TRAILING_PUNCTUATION = /^[.!?]/u;
 const TRAILING_NUMBER = /\d\s*$/u;
 
@@ -73,27 +70,21 @@ const entityCodePoint = (entity: string): number | undefined => {
       ? Number.parseInt(entity.slice(2), 16)
       : Number.parseInt(entity.slice(1), 10);
 
-  return Number.isFinite(value) && value >= 0 && value <= 0x10ffff
-    ? value
-    : undefined;
+  return Number.isFinite(value) && value >= 0 && value <= 0x10ffff ? value : undefined;
 };
 
 const decodeEntity = (entity: string): string => {
   if (entity.startsWith('#')) {
     const codePoint = entityCodePoint(entity);
 
-    return codePoint !== undefined
-      ? String.fromCodePoint(codePoint)
-      : `&${entity};`;
+    return codePoint !== undefined ? String.fromCodePoint(codePoint) : `&${entity};`;
   }
 
   return HTML_ENTITIES[entity] ?? `&${entity};`;
 };
 
 const decodeHtml = (value: string): string =>
-  value.replace(/&(#x[\da-f]+|#\d+|[a-z]+);/giu, (_, entity: string) =>
-    decodeEntity(entity),
-  );
+  value.replace(/&(#x[\da-f]+|#\d+|[a-z]+);/giu, (_, entity: string) => decodeEntity(entity));
 
 const escapeHtml = (value: string): string =>
   value.replace(/[&<>"']/gu, (char) => {
@@ -111,31 +102,22 @@ const escapeHtml = (value: string): string =>
     }
   });
 
-const normalizeBlockText = (value: string): string =>
-  value.replace(/\r\n?/gu, '\n').trim();
+const normalizeBlockText = (value: string): string => value.replace(/\r\n?/gu, '\n').trim();
 
-const typographText = (value: string): string =>
-  decodeHtml(formatDynamicHtml(escapeHtml(value)));
+const typographText = (value: string): string => decodeHtml(formatDynamicHtml(escapeHtml(value)));
 
-const textWeight = (value: string): number =>
-  value.replace(/[^\p{Letter}\p{Number}]/gu, '').length;
+const textWeight = (value: string): number => value.replace(/[^\p{Letter}\p{Number}]/gu, '').length;
 
-const isHighlightableChange = (value: string): boolean =>
-  /[\p{Letter}\p{Number}]/u.test(value);
+const isHighlightableChange = (value: string): boolean => /[\p{Letter}\p{Number}]/u.test(value);
 
-const hasTrailingNumber = (value: string): boolean =>
-  TRAILING_NUMBER.test(value);
+const hasTrailingNumber = (value: string): boolean => TRAILING_NUMBER.test(value);
 
-const typographContentDiffSource = (
-  source: ContentDiffSource,
-): ContentDiffSource => ({
+const typographContentDiffSource = (source: ContentDiffSource): ContentDiffSource => ({
   removed: typographText(source.removed),
-  added: typographText(source.added),
+  added: typographText(source.added)
 });
 
-const mergeMoneySuffixChanges = (
-  changes: readonly Change[],
-): readonly Change[] => {
+const mergeMoneySuffixChanges = (changes: readonly Change[]): readonly Change[] => {
   const merged: Change[] = [];
 
   for (let index = 0; index < changes.length; index += 1) {
@@ -162,11 +144,11 @@ const mergeMoneySuffixChanges = (
 
         merged.push({
           ...removed,
-          value: removed.value + suffix,
+          value: removed.value + suffix
         });
         merged.push({
           ...added,
-          value: added.value + suffix + addedPunctuation,
+          value: added.value + suffix + addedPunctuation
         });
 
         const remainingCommon = common.value.slice(suffix.length);
@@ -174,7 +156,7 @@ const mergeMoneySuffixChanges = (
         if (remainingCommon) {
           merged.push({
             ...common,
-            value: remainingCommon,
+            value: remainingCommon
           });
         }
 
@@ -184,7 +166,7 @@ const mergeMoneySuffixChanges = (
           if (remainingNext) {
             merged.push({
               ...next,
-              value: remainingNext,
+              value: remainingNext
             });
           }
 
@@ -223,10 +205,7 @@ const lineAnchorTokens = (line: string): readonly string[] =>
     .split(' ')
     .filter((token) => token.length > 1);
 
-const lineAnchorSimilarity = (
-  left: readonly string[],
-  right: readonly string[],
-): number => {
+const lineAnchorSimilarity = (left: readonly string[], right: readonly string[]): number => {
   if (!left.length || !right.length) {
     return 0;
   }
@@ -241,33 +220,21 @@ const hasStableLineAnchors = (source: ContentDiffSource): boolean => {
   const removed = textLines(source.removed).map(lineAnchorTokens);
   const added = textLines(source.added).map(lineAnchorTokens);
 
-  if (
-    removed.length < LINE_ANCHOR_MIN_COUNT ||
-    added.length < LINE_ANCHOR_MIN_COUNT
-  ) {
+  if (removed.length < LINE_ANCHOR_MIN_COUNT || added.length < LINE_ANCHOR_MIN_COUNT) {
     return false;
   }
 
   const matched = removed.filter((line) =>
-    added.some(
-      (candidate) =>
-        lineAnchorSimilarity(line, candidate) >= LINE_ANCHOR_SIMILARITY,
-    ),
+    added.some((candidate) => lineAnchorSimilarity(line, candidate) >= LINE_ANCHOR_SIMILARITY)
   ).length;
 
-  return (
-    matched >= LINE_ANCHOR_MIN_COUNT &&
-    matched / removed.length >= LINE_ANCHOR_RATIO
-  );
+  return matched >= LINE_ANCHOR_MIN_COUNT && matched / removed.length >= LINE_ANCHOR_RATIO;
 };
 
 const isContentDiffMode = (value?: string): value is ContentDiffMode =>
   value === 'inline' || value === 'block';
 
-const contentDiffMode = (
-  classMode?: string,
-  meta?: string,
-): ContentDiffModePreference => {
+const contentDiffMode = (classMode?: string, meta?: string): ContentDiffModePreference => {
   if (isContentDiffMode(classMode)) {
     return classMode;
   }
@@ -275,9 +242,7 @@ const contentDiffMode = (
   return meta?.split(/\s+/u).find(isContentDiffMode) ?? 'auto';
 };
 
-const stripDiffMarker = (
-  line: string,
-): readonly [ContentDiffSide, string] | undefined => {
+const stripDiffMarker = (line: string): readonly [ContentDiffSide, string] | undefined => {
   const sign = line[0];
 
   if (sign !== '-' && sign !== '+') {
@@ -289,13 +254,8 @@ const stripDiffMarker = (
   return sign === '-' ? ['removed', text] : ['added', text];
 };
 
-const parseContentDiffSource = (
-  source: string,
-): ContentDiffSource | undefined => {
-  const lines = decodeHtml(source)
-    .replace(/\r\n?/gu, '\n')
-    .trimEnd()
-    .split('\n');
+const parseContentDiffSource = (source: string): ContentDiffSource | undefined => {
+  const lines = decodeHtml(source).replace(/\r\n?/gu, '\n').trimEnd().split('\n');
   const removed: string[] = [];
   const added: string[] = [];
   let side: ContentDiffSide | undefined;
@@ -330,7 +290,7 @@ const parseContentDiffSource = (
 
   return {
     removed: removedText,
-    added: addedText,
+    added: addedText
   };
 };
 
@@ -340,10 +300,7 @@ const renderTextSegment = (value: string, side: ContentDiffSide): string => {
   return `<${tag} class="ui-content-diff__change ui-content-diff__change--${side}">${escapeHtml(value)}</${tag}>`;
 };
 
-const renderSegment = (
-  segment: ContentDiffSegment,
-  side: ContentDiffSide,
-): string =>
+const renderSegment = (segment: ContentDiffSegment, side: ContentDiffSide): string =>
   segment.changed && isHighlightableChange(segment.value)
     ? renderTextSegment(segment.value, side)
     : escapeHtml(segment.value);
@@ -351,13 +308,10 @@ const renderSegment = (
 const isBridgeSpace = (
   segment: ContentDiffSegment,
   previous?: ContentDiffSegment,
-  next?: ContentDiffSegment,
-): boolean =>
-  /^\s+$/u.test(segment.value) && Boolean(previous?.changed && next?.changed);
+  next?: ContentDiffSegment
+): boolean => /^\s+$/u.test(segment.value) && Boolean(previous?.changed && next?.changed);
 
-const mergeSegments = (
-  segments: readonly ContentDiffSegment[],
-): readonly ContentDiffSegment[] => {
+const mergeSegments = (segments: readonly ContentDiffSegment[]): readonly ContentDiffSegment[] => {
   const merged: ContentDiffSegment[] = [];
 
   for (const segment of segments) {
@@ -366,7 +320,7 @@ const mergeSegments = (
     if (previous && previous.changed === segment.changed) {
       merged[merged.length - 1] = {
         value: previous.value + segment.value,
-        changed: previous.changed,
+        changed: previous.changed
       };
       continue;
     }
@@ -383,11 +337,7 @@ const sameFoldedText = (left: string, right: string): boolean =>
 const comparableText = (value: string): string =>
   value.toLocaleLowerCase('ru').replace(/\s+/gu, ' ').trim();
 
-const sourceSegmentValue = (
-  sourceText: string,
-  cursor: number,
-  target: string,
-): string => {
+const sourceSegmentValue = (sourceText: string, cursor: number, target: string): string => {
   const candidate = sourceText.slice(cursor, cursor + target.length);
 
   if (sameFoldedText(candidate, target)) {
@@ -414,7 +364,7 @@ const sourceSegmentValue = (
 const sideSegments = (
   changes: readonly Change[],
   sourceText: string,
-  side: ContentDiffSide,
+  side: ContentDiffSide
 ): readonly ContentDiffSegment[] => {
   let cursor = 0;
   const segments = changes.flatMap((change) => {
@@ -426,34 +376,30 @@ const sideSegments = (
       return [];
     }
 
-    const changed =
-      (side === 'removed' && change.removed) ||
-      (side === 'added' && change.added);
+    const changed = (side === 'removed' && change.removed) || (side === 'added' && change.added);
     const value = sourceSegmentValue(sourceText, cursor, change.value);
     cursor += value.length;
 
     return [
       {
         value,
-        changed,
-      },
+        changed
+      }
     ];
   });
 
   return mergeSegments(
     segments.map((segment, index) => ({
       value: segment.value,
-      changed:
-        segment.changed ||
-        isBridgeSpace(segment, segments[index - 1], segments[index + 1]),
-    })),
+      changed: segment.changed || isBridgeSpace(segment, segments[index - 1], segments[index + 1])
+    }))
   );
 };
 
 const renderSideText = (
   changes: readonly Change[],
   sourceText: string,
-  side: ContentDiffSide,
+  side: ContentDiffSide
 ): string =>
   sideSegments(changes, sourceText, side)
     .map((segment) => renderSegment(segment, side))
@@ -461,27 +407,24 @@ const renderSideText = (
 
 const changedTextWeight = (changes: readonly Change[]): number =>
   changes.reduce(
-    (sum, change) =>
-      change.added || change.removed ? sum + textWeight(change.value) : sum,
-    0,
+    (sum, change) => (change.added || change.removed ? sum + textWeight(change.value) : sum),
+    0
   );
 
 const commonTextWeight = (changes: readonly Change[]): number =>
   changes.reduce(
-    (sum, change) =>
-      change.added || change.removed ? sum : sum + textWeight(change.value),
-    0,
+    (sum, change) => (change.added || change.removed ? sum : sum + textWeight(change.value)),
+    0
   );
 
 const changedRuns = (changes: readonly Change[]): number =>
   changes.filter(
-    (change) =>
-      (change.added || change.removed) && isHighlightableChange(change.value),
+    (change) => (change.added || change.removed) && isHighlightableChange(change.value)
   ).length;
 
 const hasUnevenLineReplacement = (
   source: ContentDiffSource,
-  lineChanges: readonly Change[],
+  lineChanges: readonly Change[]
 ): boolean => {
   const removedLineCount = textLines(source.removed).length;
   const addedLineCount = textLines(source.added).length;
@@ -491,11 +434,8 @@ const hasUnevenLineReplacement = (
   }
 
   const changedLineCount = lineChanges.reduce(
-    (sum, change) =>
-      change.added || change.removed
-        ? sum + textLines(change.value).length
-        : sum,
-    0,
+    (sum, change) => (change.added || change.removed ? sum + textLines(change.value).length : sum),
+    0
   );
 
   return changedLineCount > 1;
@@ -504,12 +444,9 @@ const hasUnevenLineReplacement = (
 const autoContentDiffMode = (
   source: ContentDiffSource,
   changes: readonly Change[],
-  lineChanges: readonly Change[],
+  lineChanges: readonly Change[]
 ): ContentDiffMode => {
-  const maxTextWeight = Math.max(
-    textWeight(source.removed),
-    textWeight(source.added),
-  );
+  const maxTextWeight = Math.max(textWeight(source.removed), textWeight(source.added));
 
   if (hasStableLineAnchors(source)) {
     return 'inline';
@@ -525,10 +462,7 @@ const autoContentDiffMode = (
   const changedRatio = totalWeight > 0 ? changedWeight / totalWeight : 0;
   const commonRatio = totalWeight > 0 ? commonWeight / totalWeight : 0;
 
-  if (
-    changedRatio >= BLOCK_CHANGED_RATIO ||
-    commonRatio <= BLOCK_LOW_COMMON_RATIO
-  ) {
+  if (changedRatio >= BLOCK_CHANGED_RATIO || commonRatio <= BLOCK_LOW_COMMON_RATIO) {
     return 'block';
   }
 
@@ -543,11 +477,9 @@ const resolvedContentDiffMode = (
   preference: ContentDiffModePreference,
   source: ContentDiffSource,
   changes: readonly Change[],
-  lineChanges: readonly Change[],
+  lineChanges: readonly Change[]
 ): ContentDiffMode =>
-  preference === 'auto'
-    ? autoContentDiffMode(source, changes, lineChanges)
-    : preference;
+  preference === 'auto' ? autoContentDiffMode(source, changes, lineChanges) : preference;
 
 const renderFullSideText = (value: string): string => escapeHtml(value);
 
@@ -556,23 +488,14 @@ export const normalizeContentDiffMarkdown = (markdown: string): string =>
 
 const renderContentDiff = (
   source: ContentDiffSource,
-  preference: ContentDiffModePreference,
+  preference: ContentDiffModePreference
 ): string => {
   const visibleSource = typographContentDiffSource(source);
   const changes = mergeMoneySuffixChanges(
-    diffWords(visibleSource.removed, visibleSource.added, WORD_DIFF_OPTIONS),
+    diffWords(visibleSource.removed, visibleSource.added, WORD_DIFF_OPTIONS)
   );
-  const lineChanges = diffLines(
-    visibleSource.removed,
-    visibleSource.added,
-    LINE_DIFF_OPTIONS,
-  );
-  const mode = resolvedContentDiffMode(
-    preference,
-    visibleSource,
-    changes,
-    lineChanges,
-  );
+  const lineChanges = diffLines(visibleSource.removed, visibleSource.added, LINE_DIFF_OPTIONS);
+  const mode = resolvedContentDiffMode(preference, visibleSource, changes, lineChanges);
   const removedHtml =
     mode === 'inline'
       ? renderSideText(changes, visibleSource.removed, 'removed')
@@ -602,12 +525,10 @@ export const renderContentDiffBlocks = (html: string): string =>
       _language: string,
       classMode: string | undefined,
       meta: string | undefined,
-      source: string,
+      source: string
     ) => {
       const parsed = parseContentDiffSource(source);
 
-      return parsed
-        ? renderContentDiff(parsed, contentDiffMode(classMode, meta))
-        : block;
-    },
+      return parsed ? renderContentDiff(parsed, contentDiffMode(classMode, meta)) : block;
+    }
   );

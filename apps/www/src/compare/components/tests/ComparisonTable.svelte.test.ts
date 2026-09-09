@@ -1,21 +1,19 @@
 import { fireEvent, render } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
+
+import type { ComparisonStatus, ComparisonTableRow } from '../comparison-table.types';
 import ComparisonTable from '../ComparisonTable.svelte';
-import type {
-  ComparisonStatus,
-  ComparisonTableRow,
-} from '../comparison-table.types';
 
 const available: ComparisonStatus = {
   icon: '✓',
   text: 'Есть',
-  tone: 'ui-badge-success',
+  tone: 'ui-badge-success'
 };
 
 const unavailable: ComparisonStatus = {
   icon: '✗',
   text: 'Нет',
-  tone: 'ui-badge-danger',
+  tone: 'ui-badge-danger'
 };
 
 const rows: readonly ComparisonTableRow[] = [
@@ -25,7 +23,7 @@ const rows: readonly ComparisonTableRow[] = [
     value: 'yes',
     shelkovoValue: 'yes',
     status: available,
-    shelkovoStatus: available,
+    shelkovoStatus: available
   },
   {
     key: 'different',
@@ -33,8 +31,8 @@ const rows: readonly ComparisonTableRow[] = [
     value: 'no',
     shelkovoValue: 'yes',
     status: unavailable,
-    shelkovoStatus: available,
-  },
+    shelkovoStatus: available
+  }
 ];
 
 describe('ComparisonTable', () => {
@@ -44,17 +42,15 @@ describe('ComparisonTable', () => {
         title: 'Модель обслуживания',
         itemHeading: 'Услуга',
         rows,
-        showShelkovo: true,
-      },
+        showShelkovo: true
+      }
     });
 
-    expect(
-      getByLabelText('Модель обслуживания: таблица сравнения'),
-    ).toBeTruthy();
+    expect(getByLabelText('Модель обслуживания: таблица сравнения')).toBeTruthy();
     expect(getByRole('columnheader', { name: 'Шелково' })).toBeTruthy();
 
     const toggle = getByRole('button', {
-      name: 'Показать только отличающиеся свойства',
+      name: 'Показать только отличающиеся свойства'
     });
     expect(toggle.getAttribute('aria-pressed')).toBe('false');
 
@@ -72,14 +68,14 @@ describe('ComparisonTable', () => {
         title: 'Общие пространства',
         itemHeading: 'Общие пространства',
         rows: [rows[0]],
-        showShelkovo: true,
-      },
+        showShelkovo: true
+      }
     });
 
     await fireEvent.click(
       getByRole('button', {
-        name: 'Показать только отличающиеся свойства',
-      }),
+        name: 'Показать только отличающиеся свойства'
+      })
     );
 
     expect(getByText('Отличий с Шелково не найдено')).toBeTruthy();
@@ -90,8 +86,8 @@ describe('ComparisonTable', () => {
       props: {
         itemHeading: 'Услуга',
         rows,
-        showShelkovo: false,
-      },
+        showShelkovo: false
+      }
     });
 
     expect(queryByRole('button')).toBeNull();

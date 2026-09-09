@@ -1,18 +1,17 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import type { PersonProfile } from './types';
 import type {
   peoplePublicSurfaceSlice as peoplePublicSurfaceSliceType,
-  PublicSurfaceSlice,
+  PublicSurfaceSlice
 } from '@/lib/public-surface';
 import type { expectSectionCatalogMatchesRegistry as expectSectionCatalogMatchesRegistryType } from '@/lib/public-surface/catalog-contract.test-helper';
+
+import type { PersonProfile } from './types';
 
 interface SchemaDefinition {
   readonly required?: readonly string[];
   readonly enum?: readonly string[];
-  readonly properties?: Readonly<
-    Record<string, { readonly enum?: readonly string[] }>
-  >;
+  readonly properties?: Readonly<Record<string, { readonly enum?: readonly string[] }>>;
 }
 
 let buildPeoplePayload: typeof import('./discovery').buildPeoplePayload;
@@ -20,8 +19,7 @@ let catalog: typeof import('./discovery').catalog;
 let expectSectionCatalogMatchesRegistry: typeof expectSectionCatalogMatchesRegistryType;
 let links: typeof import('./discovery').links;
 let openapi: typeof import('./discovery').openapi;
-let peoplePublicSurfaceSlice: typeof peoplePublicSurfaceSliceType &
-  PublicSurfaceSlice;
+let peoplePublicSurfaceSlice: typeof peoplePublicSurfaceSliceType & PublicSurfaceSlice;
 let schema: typeof import('./discovery').schema;
 
 const profile = (): PersonProfile => ({
@@ -38,8 +36,8 @@ const profile = (): PersonProfile => ({
       type: 'telegram',
       value: '@Kirill_ZemlyaMO',
       display: '@Kirill_ZemlyaMO',
-      href: 'https://t.me/Kirill_ZemlyaMO',
-    },
+      href: 'https://t.me/Kirill_ZemlyaMO'
+    }
   ],
   body: 'Как отметил [Кирилл Щемелинин](/people/kschemelinin/), проблема редкая.',
   mentions: [
@@ -48,8 +46,8 @@ const profile = (): PersonProfile => ({
       slug: 'apple-garden',
       label: 'Яблоневый сад',
       htmlUrl: '/map/apple-garden/',
-      markdownUrl: '/map/apple-garden/index.md',
-    },
+      markdownUrl: '/map/apple-garden/index.md'
+    }
   ],
   backlinks: {
     news: [
@@ -61,8 +59,8 @@ const profile = (): PersonProfile => ({
         htmlUrl: '/news/2026/05/power-outage/',
         markdownUrl: '/news/2026/05/power-outage/index.md',
         excerpt: 'Разбор причин аварии.',
-        mentionedAt: '2026-05-03T08:00:00.000+03:00',
-      },
+        mentionedAt: '2026-05-03T08:00:00.000+03:00'
+      }
     ],
     status: [
       {
@@ -70,29 +68,26 @@ const profile = (): PersonProfile => ({
         kind: 'incident',
         sourceId: '2026/04/electricity-river-10kv-line-damage',
         title: 'Отключение электричества в Шелково Ривер',
-        htmlUrl:
-          '/status/incidents/2026/04/electricity-river-10kv-line-damage/',
-        markdownUrl:
-          '/status/incidents/2026/04/electricity-river-10kv-line-damage/index.md',
+        htmlUrl: '/status/incidents/2026/04/electricity-river-10kv-line-damage/',
+        markdownUrl: '/status/incidents/2026/04/electricity-river-10kv-line-damage/index.md',
         excerpt: 'Как отметил Кирилл Щемелинин, повреждение было редким.',
-        mentionedAt: '2026-04-22T11:30:00.000+03:00',
-      },
+        mentionedAt: '2026-04-22T11:30:00.000+03:00'
+      }
     ],
     reviews: [],
     places: [],
     people: [],
-    contacts: [],
-  },
+    contacts: []
+  }
 });
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
-  ({ buildPeoplePayload, catalog, links, openapi, schema } =
-    await import('./discovery'));
+  ({ buildPeoplePayload, catalog, links, openapi, schema } = await import('./discovery'));
   ({ expectSectionCatalogMatchesRegistry } =
     await import('@/lib/public-surface/catalog-contract.test-helper'));
   ({ peoplePublicSurfaceSlice } = await import('@/lib/public-surface'));
@@ -103,7 +98,7 @@ describe('people discovery payload', () => {
     expectSectionCatalogMatchesRegistry({
       catalog,
       siteRoot: 'https://example.com',
-      slice: peoplePublicSurfaceSlice,
+      slice: peoplePublicSurfaceSlice
     });
   });
 
@@ -113,7 +108,7 @@ describe('people discovery payload', () => {
     expect(payload.stats).toEqual({
       profile_count: 1,
       mention_count: 1,
-      backlink_count: 2,
+      backlink_count: 2
     });
     expect(payload.profiles[0]).toMatchObject({
       id: 'kschemelinin',
@@ -127,25 +122,24 @@ describe('people discovery payload', () => {
       contacts: [
         {
           type: 'telegram',
-          href: 'https://t.me/Kirill_ZemlyaMO',
-        },
+          href: 'https://t.me/Kirill_ZemlyaMO'
+        }
       ],
       mentions: [
         {
           type: 'place',
           slug: 'apple-garden',
           html_url: 'https://example.com/map/apple-garden/',
-          markdown_url: 'https://example.com/map/apple-garden/index.md',
-        },
+          markdown_url: 'https://example.com/map/apple-garden/index.md'
+        }
       ],
       backlinks: {
         news: [
           {
             source_id: '2026/05/power-outage',
             html_url: 'https://example.com/news/2026/05/power-outage/',
-            markdown_url:
-              'https://example.com/news/2026/05/power-outage/index.md',
-          },
+            markdown_url: 'https://example.com/news/2026/05/power-outage/index.md'
+          }
         ],
         status: [
           {
@@ -153,10 +147,10 @@ describe('people discovery payload', () => {
             html_url:
               'https://example.com/status/incidents/2026/04/electricity-river-10kv-line-damage/',
             markdown_url:
-              'https://example.com/status/incidents/2026/04/electricity-river-10kv-line-damage/index.md',
-          },
-        ],
-      },
+              'https://example.com/status/incidents/2026/04/electricity-river-10kv-line-damage/index.md'
+          }
+        ]
+      }
     });
   });
 
@@ -201,7 +195,7 @@ describe('people discovery payload', () => {
           readonly anchor: string;
           readonly item: readonly { readonly href: string }[];
           readonly 'service-desc'?: readonly { readonly href: string }[];
-        },
+        }
       ];
     };
     const openapiDefs = api.components?.schemas?.PeoplePayload?.$defs ?? {};
@@ -209,50 +203,46 @@ describe('people discovery payload', () => {
     expect(jsonSchema.description).toContain('`@slug`, `@slug:case`');
     expect(jsonSchema.description).toContain('`[текст](@slug)`');
     expect(api.info?.description).toContain('`[текст](@slug)`');
-    expect(api.paths?.['/people/data/people.json']?.get?.description).toContain(
-      '`[текст](@slug)`',
-    );
+    expect(api.paths?.['/people/data/people.json']?.get?.description).toContain('`[текст](@slug)`');
     expect(defs.profile?.required).toEqual(
       expect.arrayContaining([
         'contacts',
         'mentions',
         'mention_count',
         'backlinks',
-        'backlink_count',
-      ]),
+        'backlink_count'
+      ])
     );
-    expect(payload.linkset[0]?.anchor).toBe(
-      'https://example.com/people/index.md',
-    );
+    expect(payload.linkset[0]?.anchor).toBe('https://example.com/people/index.md');
     expect(payload.linkset[0]?.item).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          href: 'https://example.com/people/index.md',
+          href: 'https://example.com/people/index.md'
         }),
         expect.objectContaining({
-          href: 'https://example.com/people/data/people.json',
+          href: 'https://example.com/people/data/people.json'
         }),
         expect.objectContaining({
-          href: 'https://example.com/people/llms.txt',
-        }),
-      ]),
+          href: 'https://example.com/people/llms.txt'
+        })
+      ])
     );
     expect(payload.linkset[0]?.['service-desc']).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          href: 'https://example.com/people/schemas/people.schema.json',
+          href: 'https://example.com/people/schemas/people.schema.json'
         }),
         expect.objectContaining({
-          href: 'https://example.com/people/openapi/people.openapi.json',
-        }),
-      ]),
+          href: 'https://example.com/people/openapi/people.openapi.json'
+        })
+      ])
     );
     expect(openapiDefs.contactType?.enum).toEqual(['phone', 'telegram']);
     expect(defs.mention).toMatchObject({
       required: ['type', 'slug', 'name', 'html_url', 'markdown_url'],
       properties: {
-        type: { enum: ['person', 'place'] },
-      },
+        type: { enum: ['person', 'place'] }
+      }
     });
     expect(openapiDefs.mention).toMatchObject(defs.mention ?? {});
     expect(openapiDefs.section?.enum).toEqual([
@@ -261,7 +251,7 @@ describe('people discovery payload', () => {
       'reviews',
       'places',
       'people',
-      'contacts',
+      'contacts'
     ]);
     expect(openapiDefs.kind?.enum).toEqual([
       'article',
@@ -269,7 +259,7 @@ describe('people discovery payload', () => {
       'review',
       'place',
       'person',
-      'contact',
+      'contact'
     ]);
     expect(defs.backlinks?.required).toEqual([
       'news',
@@ -277,16 +267,15 @@ describe('people discovery payload', () => {
       'reviews',
       'places',
       'people',
-      'contacts',
+      'contacts'
     ]);
     expect(openapiDefs.profile?.required).toEqual(defs.profile?.required);
     expect(
-      api.paths?.['/people/data/people.json']?.get?.responses?.[200]?.content?.[
-        'application/json'
-      ]?.schema?.$ref,
+      api.paths?.['/people/data/people.json']?.get?.responses?.[200]?.content?.['application/json']
+        ?.schema?.$ref
     ).toBe('#/components/schemas/PeoplePayload');
     expect(links(root)).toContain(
-      '<https://example.com/people/.well-known/api-catalog>; rel="api-catalog"',
+      '<https://example.com/people/.well-known/api-catalog>; rel="api-catalog"'
     );
   });
 });

@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { estimate2026 } from '@/data/reglament/estimate-2026';
-import type { expectSectionCatalogMatchesRegistry as expectSectionCatalogMatchesRegistryType } from '@/lib/public-surface/catalog-contract.test-helper';
 import type { PublicSurfaceSlice } from '@/lib/public-surface';
+import type { expectSectionCatalogMatchesRegistry as expectSectionCatalogMatchesRegistryType } from '@/lib/public-surface/catalog-contract.test-helper';
 import type { reglamentPublicSurfaceSlice as reglamentPublicSurfaceSliceType } from '@/lib/reglament/public-surface';
 
 import {
@@ -25,23 +25,21 @@ import {
   reglamentFullServicesMarkdownPath,
   reglamentFullSourcePdfUrl,
   reglamentServicesPath,
-  reglamentSourcePdfUrl,
+  reglamentSourcePdfUrl
 } from './routes';
 
 let buildReglamentPayload: typeof import('./discovery').buildReglamentPayload;
 let catalog: typeof import('./discovery').catalog;
 let expectSectionCatalogMatchesRegistry: typeof expectSectionCatalogMatchesRegistryType;
 let openapi: typeof import('./discovery').openapi;
-let reglamentPublicSurfaceSlice: typeof reglamentPublicSurfaceSliceType &
-  PublicSurfaceSlice;
+let reglamentPublicSurfaceSlice: typeof reglamentPublicSurfaceSliceType & PublicSurfaceSlice;
 let schema: typeof import('./discovery').schema;
 let self: typeof import('./discovery').self;
 
 type CatalogEntry = {
   readonly href?: string;
   readonly type?: string;
-  readonly 'title*'?:
-    string | readonly { readonly language?: string; readonly value?: string }[];
+  readonly 'title*'?: string | readonly { readonly language?: string; readonly value?: string }[];
 };
 
 type CatalogLinkset = {
@@ -52,15 +50,13 @@ type CatalogLinkset = {
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
-  ({ buildReglamentPayload, catalog, openapi, schema, self } =
-    await import('./discovery'));
+  ({ buildReglamentPayload, catalog, openapi, schema, self } = await import('./discovery'));
   ({ expectSectionCatalogMatchesRegistry } =
     await import('@/lib/public-surface/catalog-contract.test-helper'));
-  ({ reglamentPublicSurfaceSlice } =
-    await import('@/lib/reglament/public-surface'));
+  ({ reglamentPublicSurfaceSlice } = await import('@/lib/reglament/public-surface'));
 });
 
 const catalogEntries = (root: string): readonly CatalogEntry[] => {
@@ -70,7 +66,7 @@ const catalogEntries = (root: string): readonly CatalogEntry[] => {
 
   return (body.linkset ?? []).flatMap((entry) => [
     ...(entry.item ?? []),
-    ...(entry['service-desc'] ?? []),
+    ...(entry['service-desc'] ?? [])
   ]);
 };
 
@@ -85,7 +81,7 @@ const catalogTitle = (entry: CatalogEntry): string => {
 };
 
 const publicCatalogSnapshot = (
-  root: string,
+  root: string
 ): readonly {
   readonly href: string;
   readonly type: string;
@@ -94,7 +90,7 @@ const publicCatalogSnapshot = (
   catalogEntries(root).map((entry) => ({
     href: entry.href ?? '',
     type: entry.type ?? '',
-    title: catalogTitle(entry),
+    title: catalogTitle(entry)
   }));
 
 const markdownSection = (markdown: string, title: string): string => {
@@ -105,9 +101,7 @@ const markdownSection = (markdown: string, title: string): string => {
     return '';
   }
 
-  const next = lines.findIndex(
-    (line, index) => index > start && line.startsWith('## '),
-  );
+  const next = lines.findIndex((line, index) => index > start && line.startsWith('## '));
 
   return lines.slice(start, next === -1 ? undefined : next).join('\n');
 };
@@ -117,7 +111,7 @@ describe('reglament discovery payload', () => {
     expectSectionCatalogMatchesRegistry({
       catalog,
       siteRoot: 'https://example.com',
-      slice: reglamentPublicSurfaceSlice,
+      slice: reglamentPublicSurfaceSlice
     });
   });
 
@@ -131,46 +125,43 @@ describe('reglament discovery payload', () => {
       tariff_area_sotki: 20_440.54,
       official: {
         annual_gross: 221_264_198,
-        tariff_per_sotka_month: 902.07,
+        tariff_per_sotka_month: 902.07
       },
       computed: {
         annual_gross: 221_264_198,
         tariff_per_sotka_month: 902.07,
         delta_annual_gross: 0,
-        delta_tariff_per_sotka_month: 0,
-      },
+        delta_tariff_per_sotka_month: 0
+      }
     });
     expect(payload.formulas.tariff_per_sotka_month).toContain('annual_gross');
     expect(payload.formulas.row_breakdown).toMatchObject({
       fot: 'primary_salary + machinist_salary',
-      gross: 'income * (1 + vat_rate)',
+      gross: 'income * (1 + vat_rate)'
     });
-    expect(payload.caveats).toEqual(
-      expect.arrayContaining([expect.stringContaining('PDF')]),
-    );
+    expect(payload.caveats).toEqual(expect.arrayContaining([expect.stringContaining('PDF')]));
     expect(payload.sections).toHaveLength(7);
     expect(rows.length).toBeGreaterThan(10);
     expect(
       rows.every(
         (row) =>
-          row.source_refs.length > 0 &&
-          row.computed.annual_gross === row.baseline.annual_gross,
-      ),
+          row.source_refs.length > 0 && row.computed.annual_gross === row.baseline.annual_gross
+      )
     ).toBe(true);
     expect(payload.sections[0]?.rows[0]?.source_refs[0]).toMatchObject({
       pdf: 'final',
       pdf_key: '815/regulation/final.pdf',
       pdf_url: reglamentSourcePdfUrl('final'),
-      page: 1,
+      page: 1
     });
     expect(payload.sources).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           pdf: 'final',
           pdf_key: '815/regulation/final.pdf',
-          pdf_url: reglamentSourcePdfUrl('final'),
-        }),
-      ]),
+          pdf_url: reglamentSourcePdfUrl('final')
+        })
+      ])
     );
   });
 
@@ -179,10 +170,7 @@ describe('reglament discovery payload', () => {
     const apiCatalog = JSON.stringify(catalog(root));
     const jsonSchema = schema(root) as {
       readonly additionalProperties?: boolean;
-      readonly $defs?: Record<
-        string,
-        { readonly additionalProperties?: boolean }
-      >;
+      readonly $defs?: Record<string, { readonly additionalProperties?: boolean }>;
     };
     const api = openapi(root) as {
       readonly paths?: Record<string, unknown>;
@@ -190,10 +178,7 @@ describe('reglament discovery payload', () => {
         readonly schemas?: Record<
           string,
           {
-            readonly $defs?: Record<
-              string,
-              { readonly additionalProperties?: boolean }
-            >;
+            readonly $defs?: Record<string, { readonly additionalProperties?: boolean }>;
           }
         >;
       };
@@ -201,14 +186,12 @@ describe('reglament discovery payload', () => {
     const apiSchema = api.components?.schemas?.Estimate2026Payload;
 
     for (const path of REGLAMENT_PUBLIC_PATHS.filter(
-      (item) => item !== reglamentApiCatalogPath(),
+      (item) => item !== reglamentApiCatalogPath()
     )) {
       expect(apiCatalog).toContain(`https://example.com${path}`);
     }
 
-    expect(self(root)).toContain(
-      `https://example.com${reglamentApiCatalogPath()}`,
-    );
+    expect(self(root)).toContain(`https://example.com${reglamentApiCatalogPath()}`);
     expect(apiCatalog).toContain(reglamentSourcePdfUrl('final'));
     expect(jsonSchema.additionalProperties).toBe(false);
     expect(jsonSchema.$defs?.row?.additionalProperties).toBe(false);
@@ -224,117 +207,110 @@ describe('reglament discovery route smoke', () => {
         name: 'markdown companion',
         load: () => import('../../pages/815/regulation/index.md'),
         contentType: 'text/markdown',
-        marker: '# Калькулятор тарифа по смете 2026',
+        marker: '# Калькулятор тарифа по смете 2026'
       },
       {
         name: 'json feed',
-        load: () =>
-          import('../../pages/815/regulation/data/estimate-2026.json'),
+        load: () => import('../../pages/815/regulation/data/estimate-2026.json'),
         contentType: 'application/json',
-        marker: '"id":"estimate-2026"',
+        marker: '"id":"estimate-2026"'
       },
       {
         name: 'estimate details json feed',
-        load: () =>
-          import('../../pages/815/regulation/data/estimate-details-2026.json'),
+        load: () => import('../../pages/815/regulation/data/estimate-details-2026.json'),
         contentType: 'application/json',
-        marker: '"dataset_id":"estimate-details-2026"',
+        marker: '"dataset_id":"estimate-details-2026"'
       },
       {
         name: 'full reglament markdown companion',
         load: () => import('../../pages/815/regulation/full.md'),
         contentType: 'text/markdown',
-        marker: '# Полный регламент содержания Шелково',
+        marker: '# Полный регламент содержания Шелково'
       },
       {
         name: 'full reglament assets markdown companion',
         load: () => import('../../pages/815/regulation/full/assets.md'),
         contentType: 'text/markdown',
-        marker: '# Полный регламент: общее имущество',
+        marker: '# Полный регламент: общее имущество'
       },
       {
         name: 'reglament assets page markdown companion',
         load: () => import('../../pages/815/regulation/assets/index.md'),
         contentType: 'text/markdown',
-        marker: '# Полный регламент: общее имущество',
+        marker: '# Полный регламент: общее имущество'
       },
       {
         name: 'full reglament services markdown companion',
         load: () => import('../../pages/815/regulation/full/services.md'),
         contentType: 'text/markdown',
-        marker: '# Полный регламент: услуги',
+        marker: '# Полный регламент: услуги'
       },
       {
         name: 'reglament services page markdown companion',
         load: () => import('../../pages/815/regulation/services/index.md'),
         contentType: 'text/markdown',
-        marker: '# Полный регламент: услуги',
+        marker: '# Полный регламент: услуги'
       },
       {
         name: 'full reglament service map markdown companion',
         load: () => import('../../pages/815/regulation/full/service-map.md'),
         contentType: 'text/markdown',
-        marker: '# Полный регламент: сопоставление услуг со сметой',
+        marker: '# Полный регламент: сопоставление услуг со сметой'
       },
       {
         name: 'full reglament checks markdown companion',
         load: () => import('../../pages/815/regulation/full/checks.md'),
         contentType: 'text/markdown',
-        marker: '# Полный регламент: проверки и допущения',
+        marker: '# Полный регламент: проверки и допущения'
       },
       {
         name: 'full reglament json feed',
         load: () => import('../../pages/815/regulation/data/full-2026.json'),
         contentType: 'application/json',
-        marker: '"dataset_id":"full-reglament-2026"',
+        marker: '"dataset_id":"full-reglament-2026"'
       },
       {
         name: 'short llms',
         load: () => import('../../pages/815/regulation/llms.txt'),
         contentType: 'text/plain',
-        marker: '/815/regulation/data/full-2026.json',
+        marker: '/815/regulation/data/full-2026.json'
       },
       {
         name: 'full llms',
         load: () => import('../../pages/815/regulation/llms-full.txt'),
         contentType: 'text/plain',
-        marker: '/815/regulation/full.md',
+        marker: '/815/regulation/full.md'
       },
       {
         name: 'json schema',
-        load: () =>
-          import('../../pages/815/regulation/schemas/estimate-2026.schema.json'),
+        load: () => import('../../pages/815/regulation/schemas/estimate-2026.schema.json'),
         contentType: 'application/schema+json',
-        marker: 'Estimate2026Payload',
+        marker: 'Estimate2026Payload'
       },
       {
         name: 'estimate details json schema',
-        load: () =>
-          import('../../pages/815/regulation/schemas/estimate-details-2026.schema.json'),
+        load: () => import('../../pages/815/regulation/schemas/estimate-details-2026.schema.json'),
         contentType: 'application/schema+json',
-        marker: 'EstimateDetails2026Payload',
+        marker: 'EstimateDetails2026Payload'
       },
       {
         name: 'openapi',
-        load: () =>
-          import('../../pages/815/regulation/openapi/estimate-2026.openapi.json'),
+        load: () => import('../../pages/815/regulation/openapi/estimate-2026.openapi.json'),
         contentType: 'application/vnd.oai.openapi+json',
-        marker: 'getReglamentEstimate2026',
+        marker: 'getReglamentEstimate2026'
       },
       {
         name: 'estimate details openapi',
-        load: () =>
-          import('../../pages/815/regulation/openapi/estimate-details-2026.openapi.json'),
+        load: () => import('../../pages/815/regulation/openapi/estimate-details-2026.openapi.json'),
         contentType: 'application/vnd.oai.openapi+json',
-        marker: 'getReglamentEstimateDetails2026',
+        marker: 'getReglamentEstimateDetails2026'
       },
       {
         name: 'api catalog',
-        load: () =>
-          import('../../pages/815/regulation/.well-known/api-catalog'),
+        load: () => import('../../pages/815/regulation/.well-known/api-catalog'),
         contentType: 'application/linkset+json',
-        marker: '/815/regulation/data/full-2026.json',
-      },
+        marker: '/815/regulation/data/full-2026.json'
+      }
     ];
 
     for (const item of cases) {
@@ -342,9 +318,7 @@ describe('reglament discovery route smoke', () => {
       const response = await route.GET({} as never);
       const body = await response.text();
 
-      expect(response.headers.get('Content-Type'), item.name).toContain(
-        item.contentType,
-      );
+      expect(response.headers.get('Content-Type'), item.name).toContain(item.contentType);
       expect(body, item.name).toContain(item.marker);
     }
   });
@@ -360,13 +334,13 @@ describe('reglament discovery route smoke', () => {
       reglamentFullChecksMarkdownPath(),
       reglamentAssetsPath(),
       reglamentServicesPath(),
-      new URL(reglamentFullSourcePdfUrl()).pathname,
+      new URL(reglamentFullSourcePdfUrl()).pathname
     ]);
 
     expect(
       publicCatalogSnapshot(root).filter((entry) =>
-        interestingPaths.has(new URL(entry.href).pathname),
-      ),
+        interestingPaths.has(new URL(entry.href).pathname)
+      )
     ).toMatchInlineSnapshot(`
       [
         {
@@ -422,8 +396,7 @@ describe('reglament discovery route smoke', () => {
     const root = 'https://example.com';
     const apiCatalog = JSON.stringify(catalog(root));
     const shortLlmsRoute = await import('../../pages/815/regulation/llms.txt');
-    const fullLlmsRoute =
-      await import('../../pages/815/regulation/llms-full.txt');
+    const fullLlmsRoute = await import('../../pages/815/regulation/llms-full.txt');
     const shortLlms = await (await shortLlmsRoute.GET({} as never)).text();
     const fullLlms = await (await fullLlmsRoute.GET({} as never)).text();
     const detailPaths = [
@@ -432,29 +405,29 @@ describe('reglament discovery route smoke', () => {
       reglamentEstimateDetailsMaterialsMarkdownPath(),
       reglamentEstimateDetailsMachinesMarkdownPath(),
       reglamentEstimateDetailsLaborMarkdownPath(),
-      reglamentEstimateDetailsChecksMarkdownPath(),
+      reglamentEstimateDetailsChecksMarkdownPath()
     ] as const;
     const detailContractPaths = [
       reglamentEstimateDetails2026SchemaPath(),
-      reglamentEstimateDetails2026OpenApiPath(),
+      reglamentEstimateDetails2026OpenApiPath()
     ] as const;
 
     const publicPathMatches = detailPaths.map((path) => ({
       path,
       publicPath: REGLAMENT_PUBLIC_PATHS.some((item) => item === path),
       catalog: apiCatalog.includes(`${root}${path}`),
-      fullLlms: fullLlms.includes(path),
+      fullLlms: fullLlms.includes(path)
     }));
 
     expect({
       contractDiscovery: detailContractPaths.map((path) => ({
         path,
         publicPath: REGLAMENT_PUBLIC_PATHS.some((item) => item === path),
-        catalog: apiCatalog.includes(`${root}${path}`),
+        catalog: apiCatalog.includes(`${root}${path}`)
       })),
       publicPathMatches,
       shortSection: markdownSection(shortLlms, 'Что открыть для проверки'),
-      fullSection: markdownSection(fullLlms, 'Как выбирать источник'),
+      fullSection: markdownSection(fullLlms, 'Как выбирать источник')
     }).toMatchInlineSnapshot(`
       {
         "contractDiscovery": [
@@ -527,10 +500,7 @@ describe('reglament discovery route smoke', () => {
   });
 
   it('keeps source PDF URLs on the canonical media origin', () => {
-    const pdfUrls = [
-      reglamentFullSourcePdfUrl(),
-      reglamentSourcePdfUrl('final'),
-    ];
+    const pdfUrls = [reglamentFullSourcePdfUrl(), reglamentSourcePdfUrl('final')];
 
     expect(pdfUrls).toMatchInlineSnapshot(`
       [
@@ -544,10 +514,8 @@ describe('reglament discovery route smoke', () => {
   it('explains the short UI tariff unit without renaming machine fields', async () => {
     const markdownRoute = await import('../../pages/815/regulation/index.md');
     const shortLlmsRoute = await import('../../pages/815/regulation/llms.txt');
-    const fullLlmsRoute =
-      await import('../../pages/815/regulation/llms-full.txt');
-    const jsonRoute =
-      await import('../../pages/815/regulation/data/estimate-2026.json');
+    const fullLlmsRoute = await import('../../pages/815/regulation/llms-full.txt');
+    const jsonRoute = await import('../../pages/815/regulation/data/estimate-2026.json');
     const markdown = await (await markdownRoute.GET({} as never)).text();
     const shortLlms = await (await shortLlmsRoute.GET({} as never)).text();
     const fullLlms = await (await fullLlmsRoute.GET({} as never)).text();
@@ -556,25 +524,19 @@ describe('reglament discovery route smoke', () => {
     expect(markdown).toContain('В интерфейсе тариф показывается как ₽/сотка');
     expect(shortLlms).toContain('В интерфейсе тариф показывается как ₽/сотка');
     expect(fullLlms).toContain('В интерфейсе тариф показывается как ₽/сотка');
-    expect(`${markdown}\n${shortLlms}\n${fullLlms}`).not.toContain(
-      '₽/сотка/мес',
-    );
+    expect(`${markdown}\n${shortLlms}\n${fullLlms}`).not.toContain('₽/сотка/мес');
     expect(json).toContain('tariff_per_sotka_month');
   });
 
   it('keeps public PDF URLs and S3 keys in public surfaces', async () => {
     const markdownRoute = await import('../../pages/815/regulation/index.md');
     const shortLlmsRoute = await import('../../pages/815/regulation/llms.txt');
-    const fullLlmsRoute =
-      await import('../../pages/815/regulation/llms-full.txt');
-    const jsonRoute =
-      await import('../../pages/815/regulation/data/estimate-2026.json');
+    const fullLlmsRoute = await import('../../pages/815/regulation/llms-full.txt');
+    const jsonRoute = await import('../../pages/815/regulation/data/estimate-2026.json');
     const markdown = await (await markdownRoute.GET({} as never)).text();
     const shortLlms = await (await shortLlmsRoute.GET({} as never)).text();
     const fullLlms = await (await fullLlmsRoute.GET({} as never)).text();
-    const json = JSON.parse(
-      await (await jsonRoute.GET({} as never)).text(),
-    ) as {
+    const json = JSON.parse(await (await jsonRoute.GET({} as never)).text()) as {
       readonly source_refs: readonly {
         readonly pdf: string;
         readonly pdf_key: string;
@@ -583,12 +545,12 @@ describe('reglament discovery route smoke', () => {
     };
 
     expect(`${markdown}\n${shortLlms}\n${fullLlms}`).toContain(
-      'https://media.kpshelkovo.online/815/regulation/final.pdf',
+      'https://media.kpshelkovo.online/815/regulation/final.pdf'
     );
     expect(json.source_refs[0]).toMatchObject({
       pdf: 'final',
       pdf_key: '815/regulation/final.pdf',
-      pdf_url: 'https://media.kpshelkovo.online/815/regulation/final.pdf',
+      pdf_url: 'https://media.kpshelkovo.online/815/regulation/final.pdf'
     });
   });
 });

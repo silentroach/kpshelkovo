@@ -36,7 +36,7 @@ const buildContentDate = (input: {
     month: Number(input.month),
     day: Number(input.day),
     hour: input.hour,
-    minute: input.minute,
+    minute: input.minute
   });
 
   if (!zoned.isValid) {
@@ -55,7 +55,7 @@ const buildContentDate = (input: {
     at: zoned.toJSDate(),
     iso,
     hasTime: input.hasTime,
-    time: input.hasTime ? timeLabel(input.hour, input.minute) : undefined,
+    time: input.hasTime ? timeLabel(input.hour, input.minute) : undefined
   };
 };
 
@@ -73,7 +73,7 @@ export const parseContentDate = (value: unknown): ContentDate | undefined => {
       day: local.groups.day,
       hour: Number(local.groups.hour ?? '0'),
       minute: Number(local.groups.minute ?? '0'),
-      hasTime: !!local.groups.hour,
+      hasTime: !!local.groups.hour
     });
   }
 
@@ -88,7 +88,7 @@ export const parseContentDate = (value: unknown): ContentDate | undefined => {
     day: iso.groups.day,
     hour: 0,
     minute: 0,
-    hasTime: false,
+    hasTime: false
   });
 };
 
@@ -101,7 +101,7 @@ export const contentDateSchema = (name: string) =>
 
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `${name} must use dd.mm.yyyy, dd.mm.yyyy hh:mm, or YYYY-MM-DD`,
+      message: `${name} must use dd.mm.yyyy, dd.mm.yyyy hh:mm, or YYYY-MM-DD`
     });
 
     return z.NEVER;
@@ -118,13 +118,13 @@ export const contentDateTimeSchema = (name: string) =>
         at: parsed.at,
         iso: parsed.iso,
         hasTime: true,
-        time: parsed.time,
+        time: parsed.time
       };
     }
 
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `${name} must use dd.mm.yyyy hh:mm and include time`,
+      message: `${name} must use dd.mm.yyyy hh:mm and include time`
     });
 
     return z.NEVER;

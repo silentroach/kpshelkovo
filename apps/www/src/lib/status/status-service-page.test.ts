@@ -19,12 +19,12 @@ const fixtures = vi.hoisted(() => {
     started: {
       at: started,
       iso: '2026-08-18T10:00:00+03:00',
-      hasTime: true,
+      hasTime: true
     },
     ended: {
       at: ended,
       iso: '2026-08-18T11:00:00+03:00',
-      hasTime: true,
+      hasTime: true
     },
     phase: 'scheduled' as const,
     appliesToAllAreas: true,
@@ -33,7 +33,7 @@ const fixtures = vi.hoisted(() => {
     body: '',
     mentions: [],
     sortStartedAt: started.valueOf(),
-    sortLastChangeAt: started.valueOf(),
+    sortLastChangeAt: started.valueOf()
   };
 
   return {
@@ -43,14 +43,14 @@ const fixtures = vi.hoisted(() => {
       incidents: [incident],
       activeIncidents: [],
       activeMaintenance: [],
-      daysWithoutIncidents: { mode: 'noIncidents' as const },
-    },
+      daysWithoutIncidents: { mode: 'noIncidents' as const }
+    }
   };
 });
 
 vi.mock('@/lib/status/load', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/status/load')>()),
-  loadStatusService: async () => fixtures.summary,
+  loadStatusService: async () => fixtures.summary
 }));
 
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
@@ -61,7 +61,7 @@ const renderPage = async (): Promise<string> => {
 
   return container.renderToString(StatusServicePage, {
     params: { service: 'electricity' },
-    request: new Request('https://example.com/status/electricity/'),
+    request: new Request('https://example.com/status/electricity/')
   });
 };
 
@@ -92,7 +92,7 @@ describe('/status/[service]/', () => {
     }
 
     const windows = JSON.parse(
-      state.getAttribute('data-status-service-incidents') ?? '[]',
+      state.getAttribute('data-status-service-incidents') ?? '[]'
     ) as readonly {
       readonly kind: string;
       readonly start: number;
@@ -106,9 +106,8 @@ describe('/status/[service]/', () => {
       windows: windows.map((item) => ({
         kind: item.kind,
         start: new Date(item.start).toISOString(),
-        end:
-          item.end === undefined ? undefined : new Date(item.end).toISOString(),
-      })),
+        end: item.end === undefined ? undefined : new Date(item.end).toISOString()
+      }))
     }).toMatchInlineSnapshot(`
       {
         "label": "В норме",

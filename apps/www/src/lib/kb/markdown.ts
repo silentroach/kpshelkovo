@@ -2,7 +2,7 @@ import {
   createMarkdownDocument,
   md,
   parseMarkdownFragment,
-  serializeMarkdownDocument,
+  serializeMarkdownDocument
 } from '@shelkovo/markdown';
 
 import { absoluteUrl } from '@/lib/site';
@@ -21,9 +21,7 @@ const KB_HTML_LINK_PATH = /^\/kb(?:\/[a-z0-9][a-z0-9/-]*)?\/?(?=[?#]|$)/u;
 const kbMarkdownHref = (path: string): string => {
   const routeSlug = path.slice('/kb'.length).replace(/^\/+|\/+$/gu, '');
 
-  return absoluteUrl(
-    routeSlug ? kbDetailMarkdownUrl(routeSlug) : kbMarkdownUrl(),
-  );
+  return absoluteUrl(routeSlug ? kbDetailMarkdownUrl(routeSlug) : kbMarkdownUrl());
 };
 
 const rewriteKbLinkUrl = (url: string): string => {
@@ -52,11 +50,9 @@ const kbMarkdownBody = (markdown: string) => {
   return nodes;
 };
 
-const kbFrontmatter = (
-  page: KbPage,
-): { readonly title: string; flags?: readonly KbPageFlag[] } => {
+const kbFrontmatter = (page: KbPage): { readonly title: string; flags?: readonly KbPageFlag[] } => {
   const frontmatter: { title: string; flags?: readonly KbPageFlag[] } = {
-    title: page.title,
+    title: page.title
   };
 
   if (page.flags.length > 0) {
@@ -70,9 +66,6 @@ export const buildKbPageMarkdown = (page: KbPage): string =>
   serializeMarkdownDocument(
     createMarkdownDocument({
       frontmatter: kbFrontmatter(page),
-      children: [
-        md.heading(1, page.title),
-        ...kbMarkdownBody(page.body.trim()),
-      ],
-    }),
+      children: [md.heading(1, page.title), ...kbMarkdownBody(page.body.trim())]
+    })
   );

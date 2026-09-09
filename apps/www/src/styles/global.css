@@ -9,8 +9,7 @@
   font-style: normal;
   font-display: swap;
   font-weight: 700;
-  src: url('@fontsource/pt-serif/files/pt-serif-cyrillic-700-normal.woff2')
-    format('woff2');
+  src: url('@fontsource/pt-serif/files/pt-serif-cyrillic-700-normal.woff2') format('woff2');
   unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 
@@ -19,12 +18,11 @@
   font-style: normal;
   font-display: swap;
   font-weight: 700;
-  src: url('@fontsource/pt-serif/files/pt-serif-latin-ext-700-normal.woff2')
-    format('woff2');
+  src: url('@fontsource/pt-serif/files/pt-serif-latin-ext-700-normal.woff2') format('woff2');
   unicode-range:
-    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
-    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
-    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
 }
 
 @font-face {
@@ -32,12 +30,10 @@
   font-style: normal;
   font-display: swap;
   font-weight: 700;
-  src: url('@fontsource/pt-serif/files/pt-serif-latin-700-normal.woff2')
-    format('woff2');
+  src: url('@fontsource/pt-serif/files/pt-serif-latin-700-normal.woff2') format('woff2');
   unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
-    U+2215, U+FEFF, U+FFFD;
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -45,8 +41,7 @@
   font-style: normal;
   font-display: swap;
   font-weight: 400;
-  src: url('@fontsource/fira-sans/files/fira-sans-cyrillic-400-normal.woff2')
-    format('woff2');
+  src: url('@fontsource/fira-sans/files/fira-sans-cyrillic-400-normal.woff2') format('woff2');
   unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 
@@ -55,12 +50,11 @@
   font-style: normal;
   font-display: swap;
   font-weight: 400;
-  src: url('@fontsource/fira-sans/files/fira-sans-latin-ext-400-normal.woff2')
-    format('woff2');
+  src: url('@fontsource/fira-sans/files/fira-sans-latin-ext-400-normal.woff2') format('woff2');
   unicode-range:
-    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
-    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
-    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
 }
 
 @font-face {
@@ -68,12 +62,10 @@
   font-style: normal;
   font-display: swap;
   font-weight: 400;
-  src: url('@fontsource/fira-sans/files/fira-sans-latin-400-normal.woff2')
-    format('woff2');
+  src: url('@fontsource/fira-sans/files/fira-sans-latin-400-normal.woff2') format('woff2');
   unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
-    U+2215, U+FEFF, U+FFFD;
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -81,8 +73,7 @@
   font-style: normal;
   font-display: swap;
   font-weight: 600;
-  src: url('@fontsource/fira-sans/files/fira-sans-cyrillic-600-normal.woff2')
-    format('woff2');
+  src: url('@fontsource/fira-sans/files/fira-sans-cyrillic-600-normal.woff2') format('woff2');
   unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 
@@ -91,12 +82,11 @@
   font-style: normal;
   font-display: swap;
   font-weight: 600;
-  src: url('@fontsource/fira-sans/files/fira-sans-latin-ext-600-normal.woff2')
-    format('woff2');
+  src: url('@fontsource/fira-sans/files/fira-sans-latin-ext-600-normal.woff2') format('woff2');
   unicode-range:
-    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
-    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
-    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
 }
 
 @font-face {
@@ -104,12 +94,10 @@
   font-style: normal;
   font-display: swap;
   font-weight: 600;
-  src: url('@fontsource/fira-sans/files/fira-sans-latin-600-normal.woff2')
-    format('woff2');
+  src: url('@fontsource/fira-sans/files/fira-sans-latin-600-normal.woff2') format('woff2');
   unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
-    U+2215, U+FEFF, U+FFFD;
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @layer base {
@@ -167,11 +155,7 @@
   }
 
   ::selection {
-    background-color: color-mix(
-      in oklab,
-      var(--color-primary) 24%,
-      transparent
-    );
+    background-color: color-mix(in oklab, var(--color-primary) 24%, transparent);
     color: inherit;
   }
 
@@ -187,8 +171,7 @@
 
 @layer primitives {
   .ui-shell {
-    border-top: 1px solid
-      color-mix(in oklab, var(--color-border) 92%, transparent);
+    border-top: 1px solid color-mix(in oklab, var(--color-border) 92%, transparent);
     border-inline: 0;
     border-bottom: 0;
     border-radius: 0;
@@ -329,11 +312,7 @@
   .ui-media-caption a {
     color: var(--color-primary);
     font-weight: 600;
-    text-decoration-color: color-mix(
-      in oklab,
-      var(--color-primary) 40%,
-      transparent
-    );
+    text-decoration-color: color-mix(in oklab, var(--color-primary) 40%, transparent);
     text-decoration-line: underline;
     text-underline-offset: 0.1875rem;
   }
@@ -464,21 +443,13 @@
   }
 
   .ui-prose .ui-content-diff__side--removed {
-    background: color-mix(
-      in oklab,
-      var(--color-danger-soft) 62%,
-      var(--color-surface) 38%
-    );
+    background: color-mix(in oklab, var(--color-danger-soft) 62%, var(--color-surface) 38%);
     box-shadow: inset 0.25rem 0 0 var(--color-danger-border);
   }
 
   .ui-prose .ui-content-diff__side--added {
     border-top: 1px solid var(--color-border);
-    background: color-mix(
-      in oklab,
-      var(--color-success-soft) 64%,
-      var(--color-surface) 36%
-    );
+    background: color-mix(in oklab, var(--color-success-soft) 64%, var(--color-surface) 36%);
     box-shadow: inset 0.25rem 0 0 var(--color-success-border);
   }
 
@@ -525,11 +496,7 @@
   }
 
   .ui-prose .ui-content-diff__change--removed {
-    background: color-mix(
-      in oklab,
-      var(--color-danger-soft) 78%,
-      var(--color-danger-border) 22%
-    );
+    background: color-mix(in oklab, var(--color-danger-soft) 78%, var(--color-danger-border) 22%);
     color: var(--color-danger-text);
     text-decoration-color: color-mix(in oklab, currentColor 58%, transparent);
     text-decoration-line: line-through;
@@ -537,11 +504,7 @@
   }
 
   .ui-prose .ui-content-diff__change--added {
-    background: color-mix(
-      in oklab,
-      var(--color-success-soft) 80%,
-      var(--color-success-border) 20%
-    );
+    background: color-mix(in oklab, var(--color-success-soft) 80%, var(--color-success-border) 20%);
     color: var(--color-success-text);
     text-decoration: none;
   }
@@ -638,9 +601,7 @@
         opacity 0.2s ease;
     }
 
-    .ui-prose
-      :is(h1, h2, h3, h4, h5, h6)[id]:is(:hover, :focus-within)
-      > .ui-heading-anchor {
+    .ui-prose :is(h1, h2, h3, h4, h5, h6)[id]:is(:hover, :focus-within) > .ui-heading-anchor {
       opacity: 1;
     }
   }
@@ -662,22 +623,14 @@
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
     background:
-      linear-gradient(to right, var(--ui-sticky-table-bg) 35%, transparent) left
-        center / var(--ui-sticky-table-edge) 100% no-repeat local,
-      linear-gradient(to left, var(--ui-sticky-table-bg) 35%, transparent) right
-        center / var(--ui-sticky-table-edge) 100% no-repeat local,
-      radial-gradient(
-          farthest-side at 0 50%,
-          var(--ui-sticky-table-shadow),
-          transparent
-        )
-        left center / 1rem 100% no-repeat scroll,
-      radial-gradient(
-          farthest-side at 100% 50%,
-          var(--ui-sticky-table-shadow),
-          transparent
-        )
-        right center / 1rem 100% no-repeat scroll;
+      linear-gradient(to right, var(--ui-sticky-table-bg) 35%, transparent) left center /
+        var(--ui-sticky-table-edge) 100% no-repeat local,
+      linear-gradient(to left, var(--ui-sticky-table-bg) 35%, transparent) right center /
+        var(--ui-sticky-table-edge) 100% no-repeat local,
+      radial-gradient(farthest-side at 0 50%, var(--ui-sticky-table-shadow), transparent) left
+        center / 1rem 100% no-repeat scroll,
+      radial-gradient(farthest-side at 100% 50%, var(--ui-sticky-table-shadow), transparent) right
+        center / 1rem 100% no-repeat scroll;
     background-color: var(--ui-sticky-table-bg);
   }
 
@@ -742,18 +695,14 @@
     -webkit-overflow-scrolling: touch;
     border-collapse: collapse;
     background:
-      linear-gradient(to right, var(--color-surface) 35%, transparent) left
-        center / 2rem 100% no-repeat local,
-      linear-gradient(to left, var(--color-surface) 35%, transparent) right
-        center / 2rem 100% no-repeat local,
-      radial-gradient(farthest-side at 0 50%, var(--color-shadow), transparent)
-        left center / 1rem 100% no-repeat scroll,
-      radial-gradient(
-          farthest-side at 100% 50%,
-          var(--color-shadow),
-          transparent
-        )
-        right center / 1rem 100% no-repeat scroll;
+      linear-gradient(to right, var(--color-surface) 35%, transparent) left center / 2rem 100%
+        no-repeat local,
+      linear-gradient(to left, var(--color-surface) 35%, transparent) right center / 2rem 100%
+        no-repeat local,
+      radial-gradient(farthest-side at 0 50%, var(--color-shadow), transparent) left center / 1rem
+        100% no-repeat scroll,
+      radial-gradient(farthest-side at 100% 50%, var(--color-shadow), transparent) right center /
+        1rem 100% no-repeat scroll;
     background-color: var(--color-surface);
   }
 
@@ -824,16 +773,9 @@
     border-radius: 999px;
     background: var(
       --ui-map-marker-color,
-      linear-gradient(
-        145deg,
-        var(--color-yandex-maps-light),
-        var(--color-yandex-maps)
-      )
+      linear-gradient(145deg, var(--color-yandex-maps-light), var(--color-yandex-maps))
     );
-    box-shadow: var(
-      --ui-map-marker-shadow,
-      0 2px 6px oklch(24% 0.04 145 / 0.35)
-    );
+    box-shadow: var(--ui-map-marker-shadow, 0 2px 6px oklch(24% 0.04 145 / 0.35));
   }
 
   .ui-page {
@@ -981,17 +923,9 @@
   }
 
   .ui-btn-outline {
-    border-color: color-mix(
-      in oklab,
-      var(--color-border) 86%,
-      var(--color-text) 14%
-    );
+    border-color: color-mix(in oklab, var(--color-border) 86%, var(--color-text) 14%);
     background: var(--color-surface-raised);
-    color: color-mix(
-      in oklab,
-      var(--color-text) 88%,
-      var(--color-text-muted) 12%
-    );
+    color: color-mix(in oklab, var(--color-text) 88%, var(--color-text-muted) 12%);
   }
 
   .ui-btn-outline:hover {
@@ -1008,11 +942,7 @@
 
   .ui-btn-ghost:hover {
     border-color: color-mix(in oklab, var(--color-border) 70%, transparent);
-    background: color-mix(
-      in oklab,
-      var(--color-surface-muted) 42%,
-      transparent
-    );
+    background: color-mix(in oklab, var(--color-surface-muted) 42%, transparent);
     color: var(--color-text);
   }
 
@@ -1035,16 +965,8 @@
   }
 
   .ui-btn-warning.ui-btn-solid:hover {
-    border-color: color-mix(
-      in oklab,
-      var(--color-warning-border) 82%,
-      var(--color-text) 18%
-    );
-    background: color-mix(
-      in oklab,
-      var(--color-warning-soft) 88%,
-      var(--color-warning-border) 12%
-    );
+    border-color: color-mix(in oklab, var(--color-warning-border) 82%, var(--color-text) 18%);
+    background: color-mix(in oklab, var(--color-warning-soft) 88%, var(--color-warning-border) 12%);
   }
 
   .ui-btn-soft {
@@ -1053,26 +975,14 @@
   }
 
   .ui-btn-primary.ui-btn-soft {
-    border-color: color-mix(
-      in oklab,
-      var(--color-primary) 24%,
-      var(--color-border) 76%
-    );
+    border-color: color-mix(in oklab, var(--color-primary) 24%, var(--color-border) 76%);
     background: var(--color-primary-soft);
     color: var(--color-primary);
   }
 
   .ui-btn-primary.ui-btn-soft:hover {
-    border-color: color-mix(
-      in oklab,
-      var(--color-primary) 32%,
-      var(--color-border) 68%
-    );
-    background: color-mix(
-      in oklab,
-      var(--color-primary-soft) 86%,
-      var(--color-primary) 14%
-    );
+    border-color: color-mix(in oklab, var(--color-primary) 32%, var(--color-border) 68%);
+    background: color-mix(in oklab, var(--color-primary-soft) 86%, var(--color-primary) 14%);
   }
 
   .ui-btn-success.ui-btn-soft {
@@ -1081,11 +991,7 @@
   }
 
   .ui-btn-success.ui-btn-soft:hover {
-    background: color-mix(
-      in oklab,
-      var(--color-success-soft) 88%,
-      var(--color-success-border) 12%
-    );
+    background: color-mix(in oklab, var(--color-success-soft) 88%, var(--color-success-border) 12%);
   }
 
   .ui-btn-warning.ui-btn-soft {
@@ -1094,11 +1000,7 @@
   }
 
   .ui-btn-warning.ui-btn-soft:hover {
-    background: color-mix(
-      in oklab,
-      var(--color-warning-soft) 88%,
-      var(--color-warning-border) 12%
-    );
+    background: color-mix(in oklab, var(--color-warning-soft) 88%, var(--color-warning-border) 12%);
   }
 
   .ui-btn-danger.ui-btn-solid {
@@ -1116,11 +1018,7 @@
     border: 1px solid transparent;
     border-radius: 0.5rem;
     background: transparent;
-    color: color-mix(
-      in oklab,
-      var(--color-text-muted) 86%,
-      var(--color-text) 14%
-    );
+    color: color-mix(in oklab, var(--color-text-muted) 86%, var(--color-text) 14%);
     transition:
       border-color 0.2s ease,
       background-color 0.2s ease,
@@ -1128,16 +1026,8 @@
   }
 
   .ui-icon-btn:hover {
-    border-color: color-mix(
-      in oklab,
-      var(--color-border) 72%,
-      var(--color-text) 28%
-    );
-    background: color-mix(
-      in oklab,
-      var(--color-surface) 86%,
-      var(--color-surface-muted) 14%
-    );
+    border-color: color-mix(in oklab, var(--color-border) 72%, var(--color-text) 28%);
+    background: color-mix(in oklab, var(--color-surface) 86%, var(--color-surface-muted) 14%);
     color: var(--color-text);
   }
 
@@ -1146,11 +1036,7 @@
     height: 2.5rem;
     flex: none;
     border-radius: 999px;
-    border-color: color-mix(
-      in oklch,
-      var(--color-accent-text) 18%,
-      transparent
-    );
+    border-color: color-mix(in oklch, var(--color-accent-text) 18%, transparent);
     background: color-mix(in oklch, var(--color-accent-soft) 48%, transparent);
     color: var(--color-accent-text);
     box-shadow: none;
@@ -1308,10 +1194,6 @@
   .ui-delta-note {
     font-size: 0.75rem;
     font-weight: 600;
-    color: color-mix(
-      in oklab,
-      var(--color-text-muted) 90%,
-      var(--color-text) 10%
-    );
+    color: color-mix(in oklab, var(--color-text-muted) 90%, var(--color-text) 10%);
   }
 }

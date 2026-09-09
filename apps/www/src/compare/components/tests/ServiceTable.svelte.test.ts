@@ -1,5 +1,6 @@
 import { render } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
+
 import type { ServiceModel } from '../../lib/settlement/types';
 import ServiceTable from '../ServiceTable.svelte';
 
@@ -8,17 +9,17 @@ const services: ServiceModel = {
   snowRemoval: 'partial',
   roadCleaning: 'yes',
   landscaping: 'yes',
-  emergencyService: 'no',
+  emergencyService: 'no'
 };
 
 describe('ServiceTable', () => {
   it('keeps service order and status display rules explicit', () => {
     const { container } = render(ServiceTable, {
-      props: { services },
+      props: { services }
     });
 
-    const renderedRows = Array.from(container.querySelectorAll('tbody tr')).map(
-      (row) => row.textContent?.replace(/\s+/g, ' ').trim(),
+    const renderedRows = Array.from(container.querySelectorAll('tbody tr')).map((row) =>
+      row.textContent?.replace(/\s+/g, ' ').trim()
     );
 
     expect(renderedRows).toMatchInlineSnapshot(`

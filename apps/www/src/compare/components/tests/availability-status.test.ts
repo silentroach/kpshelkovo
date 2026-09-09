@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { getAvailabilityDisplay } from '../availability-status';
 
 describe('getAvailabilityDisplay', () => {
@@ -7,7 +8,7 @@ describe('getAvailabilityDisplay', () => {
       yes: getAvailabilityDisplay('yes'),
       no: getAvailabilityDisplay('no'),
       partial: getAvailabilityDisplay('partial'),
-      unknown: getAvailabilityDisplay(),
+      unknown: getAvailabilityDisplay()
     }).toMatchInlineSnapshot(`
       {
         "no": {

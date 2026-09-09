@@ -4,12 +4,11 @@ import {
   ESTIMATE_DETAIL_CONTROL_SOURCES,
   ESTIMATE_DETAIL_COST_BUCKETS,
   ESTIMATE_DETAIL_RESOURCE_KINDS,
-  ESTIMATE_DETAIL_SOURCE_PDFS,
+  ESTIMATE_DETAIL_SOURCE_PDFS
 } from './detail-schema';
 
 export const ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_VERSION = '2' as const;
-export const ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_NAME =
-  'EstimateDetails2026Payload';
+export const ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_NAME = 'EstimateDetails2026Payload';
 
 const textSchema = z.string().min(1);
 const sourceIdSchema = z.string().regex(/^s[1-9]\d*$/);
@@ -24,20 +23,20 @@ export const quantityValueSchema = z
     z.strictObject({
       value: z.number(),
       unit: textSchema,
-      note: textSchema.optional(),
+      note: textSchema.optional()
     }),
     z.strictObject({
       value: z.null(),
       unit: textSchema.nullable(),
-      note: textSchema.optional(),
-    }),
+      note: textSchema.optional()
+    })
   ])
   .meta({ id: 'quantityValue' });
 
 export const moneyValueSchema = z
   .strictObject({
     value: z.number().nullable(),
-    note: textSchema.optional(),
+    note: textSchema.optional()
   })
   .meta({ id: 'moneyValue' });
 
@@ -48,7 +47,7 @@ export const sourceQuoteItemSchema = z
     quantity: quantityValueSchema.optional(),
     unit_price_rub: moneyValueSchema.optional(),
     total_rub: moneyValueSchema.optional(),
-    note: textSchema.optional(),
+    note: textSchema.optional()
   })
   .meta({ id: 'sourceQuoteItem' });
 
@@ -56,7 +55,7 @@ const sourceValueShape = {
   pdf: z.enum(ESTIMATE_DETAIL_SOURCE_PDFS),
   page: z.number().int().positive(),
   fragment: textSchema,
-  note: textSchema.optional(),
+  note: textSchema.optional()
 };
 
 export const sourceValueSchema = z
@@ -64,50 +63,50 @@ export const sourceValueSchema = z
     z.strictObject({
       ...sourceValueShape,
       quote: textSchema.optional(),
-      quote_items: z.never().optional(),
+      quote_items: z.never().optional()
     }),
     z.strictObject({
       ...sourceValueShape,
       quote: z.never().optional(),
-      quote_items: z.array(sourceQuoteItemSchema).min(1),
-    }),
+      quote_items: z.array(sourceQuoteItemSchema).min(1)
+    })
   ])
   .meta({ id: 'sourceValue' });
 
 export const needsCheckSchema = z
   .strictObject({
     reason: textSchema,
-    source_refs: sourceRefsSchema.optional(),
+    source_refs: sourceRefsSchema.optional()
   })
   .meta({ id: 'needsCheck' });
 
 const verifiedStatusInfoShape = {
   status: z.never().optional(),
   status_label_ru: z.never().optional(),
-  needs_check: z.never().optional(),
+  needs_check: z.never().optional()
 };
 const derivedStatusInfoShape = {
   status: z.literal('derived'),
   status_label_ru: textSchema,
-  needs_check: z.never().optional(),
+  needs_check: z.never().optional()
 };
 const needsCheckStatusInfoShape = {
   status: z.literal('needs_check'),
   status_label_ru: textSchema,
-  needs_check: needsCheckSchema,
+  needs_check: needsCheckSchema
 };
 
 export const statusInfoSchema = z.union([
   z.strictObject(verifiedStatusInfoShape),
   z.strictObject(derivedStatusInfoShape),
-  z.strictObject(needsCheckStatusInfoShape),
+  z.strictObject(needsCheckStatusInfoShape)
 ]);
 
 const withStatusInfo = <Shape extends z.ZodRawShape>(shape: Shape) =>
   z.union([
     z.strictObject({ ...shape, ...verifiedStatusInfoShape }),
     z.strictObject({ ...shape, ...derivedStatusInfoShape }),
-    z.strictObject({ ...shape, ...needsCheckStatusInfoShape }),
+    z.strictObject({ ...shape, ...needsCheckStatusInfoShape })
   ]);
 
 export const workItemSchema = withStatusInfo({
@@ -116,7 +115,7 @@ export const workItemSchema = withStatusInfo({
   estimate_row_id: textSchema,
   service_ids: z.array(textSchema).min(1).optional(),
   source_refs: sourceRefsSchema,
-  note: textSchema.optional(),
+  note: textSchema.optional()
 }).meta({ id: 'workItem' });
 
 export const resourceSchema = withStatusInfo({
@@ -130,7 +129,7 @@ export const resourceSchema = withStatusInfo({
   unit_price_rub: moneyValueSchema.optional(),
   total_rub: moneyValueSchema,
   source_refs: sourceRefsSchema,
-  note: textSchema.optional(),
+  note: textSchema.optional()
 }).meta({ id: 'resource' });
 
 export const controlTotalSchema = withStatusInfo({
@@ -145,7 +144,7 @@ export const controlTotalSchema = withStatusInfo({
   tolerance_rub: z.number().min(0).optional(),
   resource_ids: z.array(textSchema).min(1).optional(),
   source_refs: sourceRefsSchema,
-  note: textSchema.optional(),
+  note: textSchema.optional()
 }).meta({ id: 'controlTotal' });
 
 export const datasetSchema = z
@@ -160,26 +159,22 @@ export const datasetSchema = z
           .strictObject({
             pdf: z.enum(ESTIMATE_DETAIL_SOURCE_PDFS),
             title: textSchema,
-            pages_total: z.number().int().positive().optional(),
+            pages_total: z.number().int().positive().optional()
           })
-          .meta({ id: 'sourcePdf' }),
+          .meta({ id: 'sourcePdf' })
       )
       .min(1),
     sources: z.record(sourceIdSchema, sourceValueSchema),
     curation_notes: z.array(textSchema),
     work_items: z.array(workItemSchema),
     resources: z.array(resourceSchema),
-    control_totals: z.array(controlTotalSchema),
+    control_totals: z.array(controlTotalSchema)
   })
   .superRefine((dataset, context) => {
-    const facts = [
-      ...dataset.work_items,
-      ...dataset.resources,
-      ...dataset.control_totals,
-    ];
+    const facts = [...dataset.work_items, ...dataset.resources, ...dataset.control_totals];
     const sourceRefs = facts.flatMap((fact) => [
       ...fact.source_refs,
-      ...(fact.needs_check?.source_refs ?? []),
+      ...(fact.needs_check?.source_refs ?? [])
     ]);
 
     for (const sourceId of sourceRefs) {
@@ -187,7 +182,7 @@ export const datasetSchema = z
         context.addIssue({
           code: 'custom',
           message: `Unknown source reference: ${sourceId}`,
-          path: ['sources'],
+          path: ['sources']
         });
       }
     }
@@ -195,18 +190,18 @@ export const datasetSchema = z
   .meta({
     title: ESTIMATE_DETAILS_2026_PUBLIC_SCHEMA_NAME,
     description:
-      'Детальная смета регламента 2026: работы, ресурсы, контрольные итоги и ссылки на фрагменты исходных PDF.',
+      'Детальная смета регламента 2026: работы, ресурсы, контрольные итоги и ссылки на фрагменты исходных PDF.'
   });
 
 export const publicEstimateDetailDatasetSchema = datasetSchema;
 
 export const buildPublicEstimateDetails2026JsonSchema = (
   id: string,
-  inputSourceIds: readonly string[],
+  inputSourceIds: readonly string[]
 ): Record<string, unknown> => {
   const sourceIds = sourceIdsSchema.parse(inputSourceIds);
   const sourceProperties = Object.fromEntries(
-    sourceIds.map((sourceId) => [sourceId, { $ref: '#/$defs/sourceValue' }]),
+    sourceIds.map((sourceId) => [sourceId, { $ref: '#/$defs/sourceValue' }])
   );
 
   return z.toJSONSchema(publicEstimateDetailDatasetSchema, {
@@ -226,9 +221,9 @@ export const buildPublicEstimateDetails2026JsonSchema = (
           type: 'object',
           properties: sourceProperties,
           required: sourceIds,
-          additionalProperties: false,
+          additionalProperties: false
         };
       }
-    },
+    }
   });
 };

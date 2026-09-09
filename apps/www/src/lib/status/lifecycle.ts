@@ -4,22 +4,20 @@ import type {
   StatusIncidentPhase,
   StatusIncidentPhaseInput,
   StatusIncidentState,
-  StatusIncidentWindowInput,
+  StatusIncidentWindowInput
 } from './types';
 
 type StatusIncidentServiceStateInput = Pick<StatusIncident, 'kind' | 'phase'>;
 
 export const toStatusIncidentWindowInput = (
-  incident: Pick<StatusIncident, 'ended' | 'kind' | 'started'>,
+  incident: Pick<StatusIncident, 'ended' | 'kind' | 'started'>
 ): StatusIncidentWindowInput => ({
   kind: incident.kind,
   start: incident.started.at.valueOf(),
-  end: incident.ended?.at.valueOf(),
+  end: incident.ended?.at.valueOf()
 });
 
-const isStatusIncidentWindow = (
-  value: unknown,
-): value is StatusIncidentWindowInput => {
+const isStatusIncidentWindow = (value: unknown): value is StatusIncidentWindowInput => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return false;
   }
@@ -38,7 +36,7 @@ const isStatusIncidentWindow = (
 };
 
 export const parseStatusIncidentWindows = (
-  value?: string,
+  value?: string
 ): readonly StatusIncidentWindowInput[] | undefined => {
   if (!value) {
     return undefined;
@@ -47,31 +45,27 @@ export const parseStatusIncidentWindows = (
   try {
     const parsed: unknown = JSON.parse(value);
 
-    return Array.isArray(parsed) && parsed.every(isStatusIncidentWindow)
-      ? parsed
-      : undefined;
+    return Array.isArray(parsed) && parsed.every(isStatusIncidentWindow) ? parsed : undefined;
   } catch {
     return undefined;
   }
 };
 
-export const getStatusIncidentState = (
-  input: StatusIncidentPhaseInput,
-): StatusIncidentState => {
+export const getStatusIncidentState = (input: StatusIncidentPhaseInput): StatusIncidentState => {
   switch (input.phase) {
     case 'active':
       return {
         phase: input.phase,
         label: 'идет',
         tone: input.kind === 'maintenance' ? 'warning' : 'danger',
-        isActive: true,
+        isActive: true
       };
     case 'scheduled':
       return {
         phase: input.phase,
         label: input.kind === 'maintenance' ? 'запланировано' : 'ожидается',
         tone: input.kind === 'maintenance' ? 'warning' : 'info',
-        isActive: false,
+        isActive: false
       };
     case 'resolved':
       return {
@@ -83,14 +77,14 @@ export const getStatusIncidentState = (
               ? 'проезд открыт'
               : 'восстановлено',
         tone: input.kind === 'maintenance' ? 'muted' : 'success',
-        isActive: false,
+        isActive: false
       };
   }
 };
 
 export const resolveStatusIncidentPhase = (
   input: StatusIncidentWindowInput,
-  nowMs: number,
+  nowMs: number
 ): StatusIncidentPhase => {
   if (nowMs < input.start) {
     return 'scheduled';
@@ -101,43 +95,37 @@ export const resolveStatusIncidentPhase = (
 
 export const resolveStatusIncidentState = (
   input: StatusIncidentWindowInput,
-  nowMs: number,
+  nowMs: number
 ): StatusIncidentState =>
   getStatusIncidentState({
     kind: input.kind,
     service: input.service,
-    phase: resolveStatusIncidentPhase(input, nowMs),
+    phase: resolveStatusIncidentPhase(input, nowMs)
   });
 
 export const getStatusServiceState = (
-  incidents: readonly StatusIncidentServiceStateInput[],
+  incidents: readonly StatusIncidentServiceStateInput[]
 ): StatusServiceState => {
-  if (
-    incidents.some(
-      (item) => item.kind === 'incident' && item.phase === 'active',
-    )
-  ) {
+  if (incidents.some((item) => item.kind === 'incident' && item.phase === 'active')) {
     return 'red';
   }
 
-  return incidents.some(
-    (item) => item.kind === 'maintenance' && item.phase === 'active',
-  )
+  return incidents.some((item) => item.kind === 'maintenance' && item.phase === 'active')
     ? 'amber'
     : 'green';
 };
 
 export const isActiveOrScheduledMaintenance = (
-  incident: StatusIncidentServiceStateInput,
+  incident: StatusIncidentServiceStateInput
 ): boolean => incident.kind === 'maintenance' && incident.phase !== 'resolved';
 
 export const resolveStatusServiceState = (
   incidents: readonly StatusIncidentWindowInput[],
-  nowMs: number,
+  nowMs: number
 ): StatusServiceState =>
   getStatusServiceState(
     incidents.map((item) => ({
       kind: item.kind,
-      phase: resolveStatusIncidentPhase(item, nowMs),
-    })),
+      phase: resolveStatusIncidentPhase(item, nowMs)
+    }))
   );

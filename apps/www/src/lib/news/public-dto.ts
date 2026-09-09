@@ -9,16 +9,11 @@ import type {
   NewsPhoto,
   NewsTag,
   NewsTagPage,
-  NewsYearArchive,
+  NewsYearArchive
 } from './types';
 import { buildNewsEventMapUrl } from './view';
 
-export const NEWS_PUBLIC_AUTHOR_KINDS = [
-  'official',
-  'community',
-  'editorial',
-  'other',
-] as const;
+export const NEWS_PUBLIC_AUTHOR_KINDS = ['official', 'community', 'editorial', 'other'] as const;
 export type NewsPublicAuthorKind = (typeof NEWS_PUBLIC_AUTHOR_KINDS)[number];
 
 export interface NewsPublicAuthor {
@@ -143,29 +138,27 @@ const NEWS_PUBLIC_AUTHOR_KIND_BY_DOMAIN = {
   official: 'official',
   community: 'community',
   editorial: 'editorial',
-  other: 'other',
+  other: 'other'
 } as const satisfies Record<NewsAuthor['kind'], NewsPublicAuthorKind>;
 
-export const toNewsPublicAuthorKind = (
-  kind: NewsAuthor['kind'],
-): NewsPublicAuthorKind => NEWS_PUBLIC_AUTHOR_KIND_BY_DOMAIN[kind];
+export const toNewsPublicAuthorKind = (kind: NewsAuthor['kind']): NewsPublicAuthorKind =>
+  NEWS_PUBLIC_AUTHOR_KIND_BY_DOMAIN[kind];
 
 const fullUrl = (value: string): string => absoluteUrl(value);
 
-const discoveryUrl = (value: string): string =>
-  value.startsWith('/') ? fullUrl(value) : value;
+const discoveryUrl = (value: string): string => (value.startsWith('/') ? fullUrl(value) : value);
 
 const toPublicAuthor = (author: NewsAuthor): NewsPublicAuthor => ({
   id: author.id,
   name: author.name,
   kind: toNewsPublicAuthorKind(author.kind),
-  url: author.url ? fullUrl(author.url) : undefined,
+  url: author.url ? fullUrl(author.url) : undefined
 });
 
 const toPublicTag = (tag: NewsTag): NewsPublicTag => ({
   label: tag.label,
   key: tag.key,
-  url: fullUrl(tag.url),
+  url: fullUrl(tag.url)
 });
 
 const toPublicPhoto = (item: NewsPhoto): NewsPublicPhoto => ({
@@ -173,14 +166,14 @@ const toPublicPhoto = (item: NewsPhoto): NewsPublicPhoto => ({
   width: item.width,
   height: item.height,
   alt: item.alt,
-  caption: item.caption,
+  caption: item.caption
 });
 
 const toPublicAttachment = (item: NewsAttachment): NewsPublicAttachment => ({
   title: item.title,
   url: fullUrl(item.url),
   type: item.type,
-  size: item.size,
+  size: item.size
 });
 
 function toPublicCover(article: NewsArticle): NewsPublicCover | undefined {
@@ -192,7 +185,7 @@ function toPublicCover(article: NewsArticle): NewsPublicCover | undefined {
     url: fullUrl(cover.url),
     alt: cover.alt,
     width: cover.width,
-    height: cover.height,
+    height: cover.height
   };
 }
 
@@ -210,7 +203,7 @@ function toPublicEvent(item: NewsEvent): NewsPublicEvent {
     map_url: mapUrl ? discoveryUrl(mapUrl) : undefined,
     ics_url: fullUrl(item.icsUrl),
     organizer: item.organizer,
-    performer: item.performer,
+    performer: item.performer
   };
 }
 
@@ -235,18 +228,16 @@ function toPublicArticle(item: NewsArticle): NewsPublicArticle {
     events: item.events.length > 0 ? item.events.map(toPublicEvent) : undefined,
     photos: item.photos.map(toPublicPhoto),
     attachments: item.attachments.map(toPublicAttachment),
-    body_markdown: item.body,
+    body_markdown: item.body
   };
 }
 
-const toPublicArchiveMonth = (
-  item: NewsMonthArchive,
-): NewsPublicArchiveMonth => ({
+const toPublicArchiveMonth = (item: NewsMonthArchive): NewsPublicArchiveMonth => ({
   year: item.year,
   month: item.month,
   count: item.count,
   url: fullUrl(item.url),
-  markdown_url: fullUrl(item.markdownUrl),
+  markdown_url: fullUrl(item.markdownUrl)
 });
 
 const toPublicArchiveYear = (item: NewsYearArchive): NewsPublicArchiveYear => ({
@@ -254,7 +245,7 @@ const toPublicArchiveYear = (item: NewsYearArchive): NewsPublicArchiveYear => ({
   count: item.count,
   url: fullUrl(item.url),
   markdown_url: fullUrl(item.markdownUrl),
-  months: item.months.map(toPublicArchiveMonth),
+  months: item.months.map(toPublicArchiveMonth)
 });
 
 const toPublicTagPage = (item: NewsTagPage): NewsPublicTagPage => ({
@@ -262,7 +253,7 @@ const toPublicTagPage = (item: NewsTagPage): NewsPublicTagPage => ({
   key: item.key,
   count: item.count,
   url: fullUrl(item.url),
-  markdown_url: fullUrl(item.markdownUrl),
+  markdown_url: fullUrl(item.markdownUrl)
 });
 
 function latestUpdate(data: NewsDataset): string | undefined {
@@ -276,7 +267,7 @@ function latestUpdate(data: NewsDataset): string | undefined {
   for (const item of data.articles) {
     const current = {
       at: item.publishedAt,
-      iso: item.publishedIso,
+      iso: item.publishedIso
     };
 
     if (!latest || current.at.valueOf() > latest.at.valueOf()) {
@@ -289,7 +280,7 @@ function latestUpdate(data: NewsDataset): string | undefined {
 
 export const toNewsPublicPayload = (
   data: NewsDataset,
-  opts?: { readonly generatedAt?: Date },
+  opts?: { readonly generatedAt?: Date }
 ): NewsPublicPayload => {
   const generatedAt = (opts?.generatedAt ?? new Date()).toISOString();
 
@@ -300,8 +291,8 @@ export const toNewsPublicPayload = (
     total_count: data.articles.length,
     articles: data.articles.map(toPublicArticle),
     archives: {
-      years: data.archives.years.map(toPublicArchiveYear),
+      years: data.archives.years.map(toPublicArchiveYear)
     },
-    tags: data.tags.map(toPublicTagPage),
+    tags: data.tags.map(toPublicTagPage)
   };
 };

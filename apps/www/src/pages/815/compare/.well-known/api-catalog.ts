@@ -4,7 +4,7 @@ import { catalog, self } from '@/compare/lib/discovery';
 import { canonRoot } from '@/compare/lib/site';
 import {
   createApiCatalogGetResponse,
-  createApiCatalogHeadResponse,
+  createApiCatalogHeadResponse
 } from '@/lib/api-catalog-response';
 
 export const prerender = true;

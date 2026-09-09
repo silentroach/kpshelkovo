@@ -8,14 +8,12 @@ export const formatApiCatalogLink = (url: string): string =>
 const responseInit = (selfLink: string): ResponseInit => ({
   headers: {
     'Content-Type': `application/linkset+json; profile="${API_CATALOG_PROFILE}"`,
-    Link: selfLink,
-  },
+    Link: selfLink
+  }
 });
 
-export const createApiCatalogGetResponse = (
-  body: unknown,
-  selfLink: string,
-): Response => createJsonResponse(body, responseInit(selfLink));
+export const createApiCatalogGetResponse = (body: unknown, selfLink: string): Response =>
+  createJsonResponse(body, responseInit(selfLink));
 
 export const createApiCatalogHeadResponse = (selfLink: string): Response =>
   new Response(undefined, responseInit(selfLink));

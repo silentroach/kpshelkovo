@@ -4,28 +4,25 @@ import { expect, test, type Page } from '@playwright/test';
 
 const mobileViewports = [
   { width: 320, height: 760 },
-  { width: 390, height: 844 },
+  { width: 390, height: 844 }
 ] as const;
 const desktopViewport = { width: 1440, height: 900 } as const;
 const breadcrumbViewports = [
   { name: 'mobile', viewport: { width: 640, height: 844 } },
-  { name: 'desktop', viewport: desktopViewport },
+  { name: 'desktop', viewport: desktopViewport }
 ] as const;
 const deferredSettlementTables = [
   { section: 'infrastructure-section', name: 'Инфраструктура' },
   { section: 'common-spaces-section', name: 'Общие пространства' },
-  { section: 'services-section', name: 'Модель обслуживания' },
+  { section: 'services-section', name: 'Модель обслуживания' }
 ] as const;
 const explorerControlSelector =
   '[data-testid="explorer-controls"] input, [data-testid="explorer-controls"] button, [data-testid="sort-select"]';
-const explorerGraphPattern =
-  /\/static\/SettlementsExplorerClient\.[^/]+\.js(?:\?.*)?$/u;
-const explorerDataPattern =
-  /\/static\/settlements-explorer\/([a-f0-9]{64})\.json(?:\?.*)?$/u;
+const explorerGraphPattern = /\/static\/SettlementsExplorerClient\.[^/]+\.js(?:\?.*)?$/u;
+const explorerDataPattern = /\/static\/settlements-explorer\/([a-f0-9]{64})\.json(?:\?.*)?$/u;
 const getExplorerDataVersion = (url: string): string | undefined =>
   explorerDataPattern.exec(url)?.[1];
-const isExplorerDataUrl = (url: string): boolean =>
-  getExplorerDataVersion(url) !== undefined;
+const isExplorerDataUrl = (url: string): boolean => getExplorerDataVersion(url) !== undefined;
 const yandexMapsReadyScript = `
   window.__yandexMapUpdates = [];
   class YMap {
@@ -59,22 +56,20 @@ test.beforeEach(async ({ page }) => {
   await page.route('https://api-maps.yandex.ru/**', async (route) => {
     await route.fulfill({
       contentType: 'application/javascript',
-      body: yandexMapsReadyScript,
+      body: yandexMapsReadyScript
     });
   });
 });
 
 for (const { name, viewport } of breadcrumbViewports) {
-  test(`keeps settlement tables in SSR HTML and defers hydration on ${name}`, async ({
-    page,
-  }) => {
+  test(`keeps settlement tables in SSR HTML and defers hydration on ${name}`, async ({ page }) => {
     const requestedPaths = new Set<string>();
     page.on('request', (request) => {
       requestedPaths.add(new URL(request.url()).pathname);
     });
     await page.setViewportSize(viewport);
     await page.goto('/815/compare/settlements/shelkovo/', {
-      waitUntil: 'networkidle',
+      waitUntil: 'networkidle'
     });
 
     const tables = [];
@@ -82,7 +77,7 @@ for (const { name, viewport } of breadcrumbViewports) {
       const sectionRoot = page.getByTestId(section);
       const table = sectionRoot
         .getByRole('region', {
-          name: `${tableName}: таблица сравнения`,
+          name: `${tableName}: таблица сравнения`
         })
         .getByRole('table');
       const island = sectionRoot.locator('astro-island');
@@ -102,13 +97,11 @@ for (const { name, viewport } of breadcrumbViewports) {
         sectionRoot,
         island,
         componentPath: componentUrl,
-        startsOutsideViewport,
+        startsOutsideViewport
       });
     }
 
-    const deferredTables = tables.filter(
-      ({ componentPath }) => !requestedPaths.has(componentPath),
-    );
+    const deferredTables = tables.filter(({ componentPath }) => !requestedPaths.has(componentPath));
     expect(deferredTables.length).toBeGreaterThan(0);
     for (const { island, startsOutsideViewport } of deferredTables) {
       expect(startsOutsideViewport).toBe(true);
@@ -123,32 +116,30 @@ for (const { name, viewport } of breadcrumbViewports) {
   });
 }
 
-test('aligns settlement breadcrumbs with the compare index', async ({
-  page,
-}) => {
+test('aligns settlement breadcrumbs with the compare index', async ({ page }) => {
   for (const { name, viewport } of breadcrumbViewports) {
     await test.step(name, async () => {
       await page.setViewportSize(viewport);
       await page.goto('/815/compare/', { waitUntil: 'domcontentloaded' });
 
       const indexBreadcrumbs = page.getByRole('navigation', {
-        name: 'Хлебные крошки',
+        name: 'Хлебные крошки'
       });
       await expect(indexBreadcrumbs).toBeVisible();
       const indexTop = await indexBreadcrumbs.evaluate(
-        (element) => element.getBoundingClientRect().top,
+        (element) => element.getBoundingClientRect().top
       );
 
       await page.goto('/815/compare/settlements/shelkovo/', {
-        waitUntil: 'domcontentloaded',
+        waitUntil: 'domcontentloaded'
       });
 
       const settlementBreadcrumbs = page.getByRole('navigation', {
-        name: 'Хлебные крошки',
+        name: 'Хлебные крошки'
       });
       await expect(settlementBreadcrumbs).toBeVisible();
       const settlementTop = await settlementBreadcrumbs.evaluate(
-        (element) => element.getBoundingClientRect().top,
+        (element) => element.getBoundingClientRect().top
       );
 
       expect(settlementTop).toBeCloseTo(indexTop, 0);
@@ -160,7 +151,7 @@ test('keeps one settlement list before and after hydration', async ({
   baseURL,
   browser,
   page,
-  request,
+  request
 }) => {
   const noJavaScriptDataRequests: string[] = [];
   const explorerDataRequests: string[] = [];
@@ -177,7 +168,7 @@ test('keeps one settlement list before and after hydration', async ({
   const noJavaScriptContext = await browser.newContext({
     baseURL,
     javaScriptEnabled: false,
-    viewport: mobileViewports[1],
+    viewport: mobileViewports[1]
   });
   const noJavaScriptPage = await noJavaScriptContext.newPage();
   noJavaScriptPage.on('request', (pageRequest) => {
@@ -188,15 +179,11 @@ test('keeps one settlement list before and after hydration', async ({
 
   try {
     await noJavaScriptPage.goto('/815/compare/', {
-      waitUntil: 'networkidle',
+      waitUntil: 'networkidle'
     });
 
-    await expect(noJavaScriptPage.getByTestId('settlement-card')).toHaveCount(
-      expectedCount,
-    );
-    await expect(noJavaScriptPage.locator('#settlements-static')).toHaveCount(
-      0,
-    );
+    await expect(noJavaScriptPage.getByTestId('settlement-card')).toHaveCount(expectedCount);
+    await expect(noJavaScriptPage.locator('#settlements-static')).toHaveCount(0);
 
     const controls = noJavaScriptPage.getByTestId('explorer-controls');
     await expect(controls).toBeVisible();
@@ -238,23 +225,19 @@ test('keeps one settlement list before and after hydration', async ({
   }
   expect(explorerDataRequests).toHaveLength(1);
   expect(getExplorerDataVersion(explorerDataRequests[0] ?? '')).toBe(
-    createHash('sha256').update(dataBody).digest('hex'),
+    createHash('sha256').update(dataBody).digest('hex')
   );
   expect(explorerGraphRequests).toHaveLength(1);
   expect(yandexMapRequests).toHaveLength(0);
   expect(hydrationMessages).toHaveLength(0);
-  await expect(
-    page.locator('link[rel="preconnect"][href*="api-maps.yandex.ru"]'),
-  ).toHaveCount(0);
+  await expect(page.locator('link[rel="preconnect"][href*="api-maps.yandex.ru"]')).toHaveCount(0);
 
   await page.getByTestId('map-toggle').click();
   await expect(page.getByTestId('settlement-map')).toBeVisible();
   await expect.poll(() => yandexMapRequests.length).toBe(1);
 });
 
-test('keeps SSR cards and retries explorer hydration after a data failure', async ({
-  page,
-}) => {
+test('keeps SSR cards and retries explorer hydration after a data failure', async ({ page }) => {
   let dataRequests = 0;
   const graphRequests: string[] = [];
   await page.setViewportSize(mobileViewports[1]);
@@ -292,9 +275,7 @@ test('keeps SSR cards and retries explorer hydration after a data failure', asyn
   expect(graphRequests).toHaveLength(1);
 });
 
-test('retries repeated production component graph failures with fresh URLs', async ({
-  page,
-}) => {
+test('retries repeated production component graph failures with fresh URLs', async ({ page }) => {
   const graphRequests: string[] = [];
   const explorerDataRequests: string[] = [];
   await page.setViewportSize(mobileViewports[1]);
@@ -333,9 +314,7 @@ test('retries repeated production component graph failures with fresh URLs', asy
   await expect.poll(() => graphRequests.length).toBe(3);
   expect(new Set(graphRequests).size).toBe(3);
   expect(
-    graphRequests.map(
-      (url) => new URL(url).searchParams.get('explorer-retry') ?? 'initial',
-    ),
+    graphRequests.map((url) => new URL(url).searchParams.get('explorer-retry') ?? 'initial')
   ).toEqual(['initial', '1', '2']);
   for (const control of await page.locator(explorerControlSelector).all()) {
     await expect(control).toBeEnabled();
@@ -343,9 +322,7 @@ test('retries repeated production component graph failures with fresh URLs', asy
   await expect(page.getByRole('alert')).toBeHidden();
 });
 
-test('reloads Yandex Maps after its ready promise rejects', async ({
-  page,
-}) => {
+test('reloads Yandex Maps after its ready promise rejects', async ({ page }) => {
   const componentRequests: string[] = [];
   const explorerDataRequests: string[] = [];
   const yandexMapRequests: string[] = [];
@@ -361,7 +338,7 @@ test('reloads Yandex Maps after its ready promise rejects', async ({
               ready.catch(() => {});
               window.ymaps3 = { ready };
             `
-          : yandexMapsReadyScript,
+          : yandexMapsReadyScript
     });
   });
   page.on('request', (request) => {
@@ -383,9 +360,7 @@ test('reloads Yandex Maps after its ready promise rejects', async ({
 
   await page.getByTestId('map-toggle').click();
 
-  await expect(
-    page.getByRole('button', { name: 'Попробовать снова' }),
-  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Попробовать снова' })).toBeVisible();
   expect(yandexMapRequests).toHaveLength(1);
   expect(componentRequests).toHaveLength(1);
   expect(explorerDataRequests).toHaveLength(1);
@@ -393,18 +368,13 @@ test('reloads Yandex Maps after its ready promise rejects', async ({
   await page.getByRole('button', { name: 'Попробовать снова' }).click();
 
   await expect.poll(() => yandexMapRequests.length).toBe(2);
-  await expect(
-    page.getByRole('button', { name: 'Попробовать снова' }),
-  ).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Попробовать снова' })).toHaveCount(0);
   await expect(page.getByText('Загрузка карты...')).toHaveCount(0);
   expect(componentRequests).toHaveLength(1);
   expect(explorerDataRequests).toHaveLength(1);
 });
 
-test('hydrates filters and sorting from the shared URL', async ({
-  page,
-  request,
-}) => {
+test('hydrates filters and sorting from the shared URL', async ({ page, request }) => {
   const dataResponse = await request.get('/815/compare/data/explorer.json');
   const payload = (await dataResponse.json()) as {
     readonly stats: { readonly cheaperCount: number };
@@ -412,34 +382,28 @@ test('hydrates filters and sorting from the shared URL', async ({
 
   await page.setViewportSize(desktopViewport);
   await page.goto('/815/compare/?sort=tariff_asc&price=cheaper', {
-    waitUntil: 'networkidle',
+    waitUntil: 'networkidle'
   });
 
   await expect(page.getByTestId('filtered-map')).toBeVisible();
   await expect(page.getByTestId('price-cheaper')).toBeChecked();
   await expect(page.getByTestId('sort-select')).toHaveValue('tariff_asc');
-  await expect(page.getByTestId('settlement-card')).toHaveCount(
-    payload.stats.cheaperCount,
-  );
+  await expect(page.getByTestId('settlement-card')).toHaveCount(payload.stats.cheaperCount);
   await expect.poll(() => getYandexMapUpdateCount(page)).toBe(1);
 });
 
-test('keeps the desktop list position through hydration', async ({
-  baseURL,
-  browser,
-  page,
-}) => {
+test('keeps the desktop list position through hydration', async ({ baseURL, browser, page }) => {
   const noJavaScriptContext = await browser.newContext({
     baseURL,
     javaScriptEnabled: false,
-    viewport: desktopViewport,
+    viewport: desktopViewport
   });
   const noJavaScriptPage = await noJavaScriptContext.newPage();
   let serverListTop: number;
 
   try {
     await noJavaScriptPage.goto('/815/compare/', {
-      waitUntil: 'networkidle',
+      waitUntil: 'networkidle'
     });
     serverListTop = await noJavaScriptPage
       .getByTestId('explorer-summary-row')
@@ -458,9 +422,7 @@ test('keeps the desktop list position through hydration', async ({
   expect(hydratedListTop).toBeCloseTo(serverListTop, 0);
 });
 
-test('keeps every tariff filter usable beside the map button on mobile', async ({
-  page,
-}) => {
+test('keeps every tariff filter usable beside the map button on mobile', async ({ page }) => {
   for (const viewport of mobileViewports) {
     await test.step(`${viewport.width}px`, async () => {
       await page.setViewportSize(viewport);
@@ -471,19 +433,19 @@ test('keeps every tariff filter usable beside the map button on mobile', async (
       const radioControls = [
         [
           controls.getByRole('radio', { name: 'Все', exact: true }),
-          controls.locator('[data-testid="price-all"] + label'),
+          controls.locator('[data-testid="price-all"] + label')
         ],
         [
           controls.getByRole('radio', { name: /^Дешевле/ }),
-          controls.locator('[data-testid="price-cheaper"] + label'),
+          controls.locator('[data-testid="price-cheaper"] + label')
         ],
         [
           controls.getByRole('radio', { name: /^Дороже/ }),
-          controls.locator('[data-testid="price-more"] + label'),
-        ],
+          controls.locator('[data-testid="price-more"] + label')
+        ]
       ] as const;
       const mapButton = controls.getByRole('button', {
-        name: 'Показать карту',
+        name: 'Показать карту'
       });
 
       await expect(controls).toBeVisible();
@@ -494,9 +456,7 @@ test('keeps every tariff filter usable beside the map button on mobile', async (
         await expect
           .poll(() =>
             label.evaluate((element) => {
-              const scroller = element.closest<HTMLElement>(
-                '[data-testid="price-filter-group"]',
-              );
+              const scroller = element.closest<HTMLElement>('[data-testid="price-filter-group"]');
 
               if (!scroller) return false;
 
@@ -508,7 +468,7 @@ test('keeps every tariff filter usable beside the map button on mobile', async (
                 labelRect.left >= scrollerRect.left - tolerance &&
                 labelRect.right <= scrollerRect.right + tolerance
               );
-            }),
+            })
           )
           .toBe(true);
         await label.click();
@@ -518,9 +478,7 @@ test('keeps every tariff filter usable beside the map button on mobile', async (
       await expect(mapButton).toBeEnabled();
 
       const geometry = await controls.evaluate((root) => {
-        const tariffFilters = root.querySelector(
-          '[data-testid="price-filter-group"]',
-        );
+        const tariffFilters = root.querySelector('[data-testid="price-filter-group"]');
         const mapToggle = root.querySelector('[data-testid="map-toggle"]');
 
         if (!tariffFilters || !mapToggle) {
@@ -528,8 +486,8 @@ test('keeps every tariff filter usable beside the map button on mobile', async (
         }
 
         const filterGroupRect = tariffFilters.getBoundingClientRect();
-        const filterRects = [...tariffFilters.querySelectorAll('label')].map(
-          (label) => label.getBoundingClientRect(),
+        const filterRects = [...tariffFilters.querySelectorAll('label')].map((label) =>
+          label.getBoundingClientRect()
         );
         const firstFilterRect = filterRects[0];
 
@@ -546,18 +504,14 @@ test('keeps every tariff filter usable beside the map button on mobile', async (
             filterStyle.overflowX === 'auto' &&
             tariffFilters.scrollWidth > tariffFilters.clientWidth,
           filtersStayOnOneRow: filterRects.every(
-            (rect) => Math.abs(rect.top - firstFilterRect.top) <= tolerance,
+            (rect) => Math.abs(rect.top - firstFilterRect.top) <= tolerance
           ),
-          controlsStayOnOneRow:
-            Math.abs(filterGroupRect.top - mapRect.top) <= tolerance,
-          filterViewportOverlapsMap:
-            filterGroupRect.right > mapRect.left + tolerance,
+          controlsStayOnOneRow: Math.abs(filterGroupRect.top - mapRect.top) <= tolerance,
+          filterViewportOverlapsMap: filterGroupRect.right > mapRect.left + tolerance,
           mapOutsideViewport:
-            mapRect.left < -tolerance ||
-            mapRect.right > window.innerWidth + tolerance,
+            mapRect.left < -tolerance || mapRect.right > window.innerWidth + tolerance,
           pageHasHorizontalOverflow:
-            document.documentElement.scrollWidth >
-            document.documentElement.clientWidth + tolerance,
+            document.documentElement.scrollWidth > document.documentElement.clientWidth + tolerance
         };
       });
 
@@ -567,7 +521,7 @@ test('keeps every tariff filter usable beside the map button on mobile', async (
         controlsStayOnOneRow: true,
         filterViewportOverlapsMap: false,
         mapOutsideViewport: false,
-        pageHasHorizontalOverflow: false,
+        pageHasHorizontalOverflow: false
       });
 
       await mapButton.click();

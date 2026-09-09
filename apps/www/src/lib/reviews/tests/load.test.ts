@@ -4,15 +4,15 @@ import type { ReviewEntry } from '../load';
 
 const mocks = vi.hoisted(() => ({
   getCollection: vi.fn(),
-  loadSiteMentionRegistry: vi.fn(),
+  loadSiteMentionRegistry: vi.fn()
 }));
 
 vi.mock('astro:content', () => ({
-  getCollection: mocks.getCollection,
+  getCollection: mocks.getCollection
 }));
 
 vi.mock('@/lib/mentions/registry', () => ({
-  loadSiteMentionRegistry: mocks.loadSiteMentionRegistry,
+  loadSiteMentionRegistry: mocks.loadSiteMentionRegistry
 }));
 
 let buildReviewsDataset: typeof import('../load').buildReviewsDataset;
@@ -25,7 +25,7 @@ let createReviewMentionRefs: typeof import('../mentions').createReviewMentionRef
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ createSiteMentionRegistry } = await import('@/lib/mentions'));
@@ -42,7 +42,7 @@ const entry = (input: {
 }): ReviewEntry => ({
   id: input.id,
   body: input.body ?? 'Основной текст отзыва.',
-  data: input.data,
+  data: input.data
 });
 
 describe('reviews data', () => {
@@ -60,8 +60,8 @@ describe('reviews data', () => {
         data: {
           published_at: '2026-06-24',
           slug: 'older-review',
-          area: 'river',
-        },
+          area: 'river'
+        }
       }),
       entry({
         id: '2026-06-25-life-in-shelkovo-forest',
@@ -72,15 +72,15 @@ describe('reviews data', () => {
           title: 'Год жизни в Шелково',
           aspects: [
             { type: 'place', rating: 5, body: 'Лес, пруды и тишина.' },
-            { type: 'management', rating: 2 },
-          ],
-        },
-      }),
+            { type: 'management', rating: 2 }
+          ]
+        }
+      })
     ]);
 
     expect(data.reviews.map((item) => item.id)).toEqual([
       '2026-06-25-life-in-shelkovo-forest',
-      '2026-06-24-older-review',
+      '2026-06-24-older-review'
     ]);
     expect(data.byId.get('2026-06-25-life-in-shelkovo-forest')).toMatchObject({
       slug: 'life-in-shelkovo-forest',
@@ -89,19 +89,18 @@ describe('reviews data', () => {
       publishedIso: '2026-06-25',
       url: '/reviews/2026-06-25-life-in-shelkovo-forest/',
       markdownUrl: '/reviews/2026-06-25-life-in-shelkovo-forest/index.md',
-      canonical:
-        'https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/',
+      canonical: 'https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/',
       aspects: [
         { type: 'place', rating: 5, body: 'Лес, пруды и тишина.' },
-        { type: 'management', rating: 2 },
-      ],
+        { type: 'management', rating: 2 }
+      ]
     });
   });
 
   it('loads normalized body mentions and deduplicated graph refs', async () => {
     const mentionRegistry = createSiteMentionRegistry([
       createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин'),
-      createPlaceMentionTarget('apple-garden', 'Яблоневый сад'),
+      createPlaceMentionTarget('apple-garden', 'Яблоневый сад')
     ]);
     mocks.getCollection.mockResolvedValue([
       entry({
@@ -115,11 +114,11 @@ describe('reviews data', () => {
             {
               type: 'place',
               rating: 5,
-              body: 'Рядом [яблоневый сад](@apple-garden), его рекомендовал @kschemelinin.',
-            },
-          ],
-        },
-      }),
+              body: 'Рядом [яблоневый сад](@apple-garden), его рекомендовал @kschemelinin.'
+            }
+          ]
+        }
+      })
     ]);
     mocks.loadSiteMentionRegistry.mockResolvedValue(mentionRegistry);
 
@@ -130,9 +129,7 @@ describe('reviews data', () => {
     expect({
       body: review?.body,
       aspects: review?.aspects,
-      refs: data.reviews
-        .flatMap(createReviewMentionRefs)
-        .map(({ target }) => target),
+      refs: data.reviews.flatMap(createReviewMentionRefs).map(({ target }) => target)
     }).toMatchInlineSnapshot(`
       {
         "aspects": [
@@ -165,13 +162,11 @@ describe('reviews data', () => {
           data: {
             published_at: '2026-06-25',
             slug: 'real-slug',
-            area: 'forest',
-          },
-        }),
-      ]),
-    ).toThrow(
-      'review "2026-06-25-wrong-id" id must equal "2026-06-25-real-slug"',
-    );
+            area: 'forest'
+          }
+        })
+      ])
+    ).toThrow('review "2026-06-25-wrong-id" id must equal "2026-06-25-real-slug"');
   });
 
   it('fails on blank markdown body', () => {
@@ -183,10 +178,10 @@ describe('reviews data', () => {
           data: {
             published_at: '2026-06-25',
             slug: 'blank-body',
-            area: 'park',
-          },
-        }),
-      ]),
+            area: 'park'
+          }
+        })
+      ])
     ).toThrow('review "2026-06-25-blank-body" body is required');
   });
 });

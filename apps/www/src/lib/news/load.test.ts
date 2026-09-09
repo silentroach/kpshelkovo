@@ -6,13 +6,10 @@ import {
   createTestNewsDatasetBuilder,
   newsArchiveSummaryEntries,
   newsArticleEntry as article,
-  newsAuthorEntry as author,
+  newsAuthorEntry as author
 } from './load.test-helper';
 
-type MutableMentionRegistry = Map<
-  string,
-  ReturnType<typeof createPersonMentionTarget>
->;
+type MutableMentionRegistry = Map<string, ReturnType<typeof createPersonMentionTarget>>;
 
 type BuildNewsDataset = typeof import('./load').buildNewsDataset;
 
@@ -22,7 +19,7 @@ let buildNewsDataset: ReturnType<typeof createTestNewsDatasetBuilder>;
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ buildNewsDataset: buildNewsDatasetSource } = await import('./load'));
@@ -45,11 +42,11 @@ describe('buildNewsDataset', () => {
               width: 1280,
               height: 960,
               alt: 'Дорожка через поле',
-              caption: 'Фото с места.',
-            },
-          ],
-        }),
-      ],
+              caption: 'Фото с места.'
+            }
+          ]
+        })
+      ]
     );
 
     expect(data.articles[0]?.photos).toMatchInlineSnapshot(`
@@ -75,7 +72,7 @@ describe('buildNewsDataset', () => {
           summary: 'До срока',
           date: '04.05.2026',
           pinned: true,
-          pinned_until: '2026-05-07',
+          pinned_until: '2026-05-07'
         }),
         article({
           id: '2026/05/pinned-expired',
@@ -83,17 +80,15 @@ describe('buildNewsDataset', () => {
           summary: 'После срока',
           date: '03.05.2026',
           pinned: true,
-          pinned_until: '2026-05-06',
-        }),
+          pinned_until: '2026-05-06'
+        })
       ],
       {
-        now: new Date('2026-05-06T00:00:00+03:00'),
-      },
+        now: new Date('2026-05-06T00:00:00+03:00')
+      }
     );
 
-    expect(data.home.pinned.map((item) => item.id)).toEqual([
-      '2026/05/pinned-active',
-    ]);
+    expect(data.home.pinned.map((item) => item.id)).toEqual(['2026/05/pinned-active']);
   });
 
   it('shows multiple pinned news on top in publication-date order', () => {
@@ -105,31 +100,29 @@ describe('buildNewsDataset', () => {
           title: 'Новый пин',
           summary: 'Новый',
           date: '05.05.2026 10:00',
-          pinned: true,
+          pinned: true
         }),
         article({
           id: '2026/05/pinned-old',
           title: 'Старый пин',
           summary: 'Старый',
           date: '04.05.2026 10:00',
-          pinned: true,
+          pinned: true
         }),
         article({
           id: '2026/05/regular',
           title: 'Обычная новость',
           summary: 'Без пина',
-          date: '06.05.2026 10:00',
-        }),
-      ],
+          date: '06.05.2026 10:00'
+        })
+      ]
     );
 
     expect(data.home.pinned.map((item) => item.id)).toEqual([
       '2026/05/pinned-new',
-      '2026/05/pinned-old',
+      '2026/05/pinned-old'
     ]);
-    expect(data.home.latest.map((item) => item.id)).toEqual([
-      '2026/05/regular',
-    ]);
+    expect(data.home.latest.map((item) => item.id)).toEqual(['2026/05/regular']);
   });
 
   it('sorts same-day news with publish time above date-only news', () => {
@@ -140,34 +133,34 @@ describe('buildNewsDataset', () => {
           id: '2026/05/no-time',
           title: 'Новость без времени',
           summary: 'Только дата',
-          date: '14.05.2026',
+          date: '14.05.2026'
         }),
         article({
           id: '2026/05/early',
           title: 'Утренняя новость',
           summary: 'С ранним временем',
-          date: '14.05.2026 09:00',
+          date: '14.05.2026 09:00'
         }),
         article({
           id: '2026/05/late',
           title: 'Вечерняя новость',
           summary: 'С поздним временем',
-          date: '14.05.2026 20:30',
+          date: '14.05.2026 20:30'
         }),
         article({
           id: '2026/05/older',
           title: 'Вчерашняя новость',
           summary: 'Предыдущий день',
-          date: '13.05.2026 23:00',
-        }),
-      ],
+          date: '13.05.2026 23:00'
+        })
+      ]
     );
 
     expect(data.articles.map((item) => item.id)).toEqual([
       '2026/05/late',
       '2026/05/early',
       '2026/05/no-time',
-      '2026/05/older',
+      '2026/05/older'
     ]);
   });
 
@@ -180,21 +173,18 @@ describe('buildNewsDataset', () => {
           title: 'Авария на линии',
           summary: 'Краткая сводка',
           date: '03.05.2026 09:00',
-          body: 'Основной текст про @kschemelinin.',
-        }),
+          body: 'Основной текст про @kschemelinin.'
+        })
       ],
       {
         mentionRegistry: new Map([
-          [
-            'kschemelinin',
-            createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин'),
-          ],
-        ]),
-      },
+          ['kschemelinin', createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин')]
+        ])
+      }
     );
 
     expect(data.articles[0]?.body).toBe(
-      'Основной текст про [Кирилл Щемелинин](/people/kschemelinin/).',
+      'Основной текст про [Кирилл Щемелинин](/people/kschemelinin/).'
     );
   });
 
@@ -207,25 +197,20 @@ describe('buildNewsDataset', () => {
           title: 'Авария на линии',
           summary: 'Краткая сводка',
           date: '03.05.2026 09:00',
-          body: 'Основной текст после [комментария специалиста](@kschemelinin).',
-        }),
+          body: 'Основной текст после [комментария специалиста](@kschemelinin).'
+        })
       ],
       {
         mentionRegistry: new Map([
-          [
-            'kschemelinin',
-            createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин'),
-          ],
-        ]),
-      },
+          ['kschemelinin', createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин')]
+        ])
+      }
     );
 
     expect(data.articles[0]?.body).toBe(
-      'Основной текст после [комментария специалиста](/people/kschemelinin/).',
+      'Основной текст после [комментария специалиста](/people/kschemelinin/).'
     );
-    expect(data.articles[0]?.mentions.map((item) => item.slug)).toEqual([
-      'kschemelinin',
-    ]);
+    expect(data.articles[0]?.mentions.map((item) => item.slug)).toEqual(['kschemelinin']);
   });
 
   it('attaches summaries to their year and month archives', () => {
@@ -236,18 +221,18 @@ describe('buildNewsDataset', () => {
           id: '2026/05/electricity',
           title: 'Авария на линии',
           summary: 'Краткая сводка',
-          date: '03.05.2026 09:00',
-        }),
+          date: '03.05.2026 09:00'
+        })
       ],
       [
         { id: '2026', body: 'Главное за год.' },
-        { id: '2026/05', body: 'Главное за месяц.' },
-      ],
+        { id: '2026/05', body: 'Главное за месяц.' }
+      ]
     );
 
     expect({
       year: data.archives.byYear.get(2026)?.summary.body,
-      month: data.archives.byMonth.get('2026/05')?.summary.body,
+      month: data.archives.byMonth.get('2026/05')?.summary.body
     }).toMatchInlineSnapshot(`
       {
         "month": "Главное за месяц.",
@@ -265,24 +250,21 @@ describe('buildNewsDataset', () => {
             id: '2026/05/electricity',
             title: 'Авария на линии',
             summary: 'Краткая сводка',
-            date: '03.05.2026 09:00',
-          }),
+            date: '03.05.2026 09:00'
+          })
         ],
         [
           { id: '2026', body: 'Главное за год.' },
-          { id: '2026/05', body: 'Месяц про @kschemelinin.' },
+          { id: '2026/05', body: 'Месяц про @kschemelinin.' }
         ],
         {
           mentionRegistry: new Map([
-            [
-              'kschemelinin',
-              createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин'),
-            ],
-          ]),
-        },
-      ),
+            ['kschemelinin', createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин')]
+          ])
+        }
+      )
     ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: news archive summary "2026/05" must link to the source article instead of mentioning people directly]`,
+      `[Error: news archive summary "2026/05" must link to the source article instead of mentioning people directly]`
     );
   });
 
@@ -295,19 +277,19 @@ describe('buildNewsDataset', () => {
             id: '2026/05/electricity',
             title: 'Авария на линии',
             summary: 'Краткая сводка',
-            date: '03.05.2026 09:00',
-          }),
+            date: '03.05.2026 09:00'
+          })
         ],
         [
           { id: '2026', body: 'Главное за год.' },
           {
             id: '2026/05',
-            body: '[Главное за месяц](/news/2026/05/missing/).',
-          },
-        ],
-      ),
+            body: '[Главное за месяц](/news/2026/05/missing/).'
+          }
+        ]
+      )
     ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: news archive summary "2026/05" contains invalid link "/news/2026/05/missing/"; link to an existing news article with a root-relative URL]`,
+      `[Error: news archive summary "2026/05" contains invalid link "/news/2026/05/missing/"; link to an existing news article with a root-relative URL]`
     );
   });
 
@@ -320,16 +302,16 @@ describe('buildNewsDataset', () => {
             id: '2026/05/electricity',
             title: 'Авария на линии',
             summary: 'Краткая сводка',
-            date: '03.05.2026 09:00',
-          }),
+            date: '03.05.2026 09:00'
+          })
         ],
         [
           { id: '2026', body: 'Главное за год.' },
-          { id: '2026/05', body: '## Главное за месяц' },
-        ],
-      ),
+          { id: '2026/05', body: '## Главное за месяц' }
+        ]
+      )
     ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: news archive summary "2026/05" may contain only paragraphs with inline formatting]`,
+      `[Error: news archive summary "2026/05" may contain only paragraphs with inline formatting]`
     );
   });
 
@@ -342,14 +324,12 @@ describe('buildNewsDataset', () => {
             id: '2026/05/electricity',
             title: 'Авария на линии',
             summary: 'Краткая сводка',
-            date: '03.05.2026 09:00',
-          }),
+            date: '03.05.2026 09:00'
+          })
         ],
-        [{ id: '2026', body: 'Выжимка за год.' }],
-      ),
-    ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: news archive "2026/05" is missing its summary]`,
-    );
+        [{ id: '2026', body: 'Выжимка за год.' }]
+      )
+    ).toThrowErrorMatchingInlineSnapshot(`[Error: news archive "2026/05" is missing its summary]`);
   });
 
   it('rejects a summary without a matching archive', () => {
@@ -357,20 +337,17 @@ describe('buildNewsDataset', () => {
       id: '2026/05/electricity',
       title: 'Авария на линии',
       summary: 'Краткая сводка',
-      date: '03.05.2026 09:00',
+      date: '03.05.2026 09:00'
     });
 
     expect(() =>
       buildNewsDatasetSource(
         [author({ id: 'ig', name: 'Редакция' })],
         [currentArticle],
-        [
-          ...newsArchiveSummaryEntries([currentArticle]),
-          { id: '2025', body: 'Лишняя выжимка.' },
-        ],
-      ),
+        [...newsArchiveSummaryEntries([currentArticle]), { id: '2025', body: 'Лишняя выжимка.' }]
+      )
     ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: news archive summary "2025" has no matching archive]`,
+      `[Error: news archive summary "2025" has no matching archive]`
     );
   });
 
@@ -383,16 +360,16 @@ describe('buildNewsDataset', () => {
             id: '2026/05/electricity',
             title: 'Авария на линии',
             summary: 'Краткая сводка',
-            date: '03.05.2026 09:00',
-          }),
+            date: '03.05.2026 09:00'
+          })
         ],
         [
           { id: '2026', body: 'Выжимка за год.' },
-          { id: '2026/05', body: '   ' },
-        ],
-      ),
+          { id: '2026/05', body: '   ' }
+        ]
+      )
     ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: news archive summary "2026/05" body is required]`,
+      `[Error: news archive summary "2026/05" body is required]`
     );
   });
 
@@ -411,24 +388,21 @@ describe('buildNewsDataset', () => {
               width: 1280,
               height: 960,
               alt: 'Фото с места',
-              caption: 'Фото предоставил @kschemelinin.',
-            },
-          ],
-        }),
+              caption: 'Фото предоставил @kschemelinin.'
+            }
+          ]
+        })
       ],
       {
         mentionRegistry: new Map([
-          [
-            'kschemelinin',
-            createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин'),
-          ],
-        ]),
-      },
+          ['kschemelinin', createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин')]
+        ])
+      }
     );
 
     expect({
       caption: data.articles[0]?.photos[0]?.caption,
-      mentions: data.articles[0]?.mentions.map((item) => item.slug),
+      mentions: data.articles[0]?.mentions.map((item) => item.slug)
     }).toMatchInlineSnapshot(`
       {
         "caption": "Фото предоставил [Кирилл Щемелинин](/people/kschemelinin/).",
@@ -448,8 +422,8 @@ describe('buildNewsDataset', () => {
           title: 'Авария на линии',
           summary: 'Краткая сводка',
           date: '03.05.2026 09:00',
-          body: 'По словам @kschemelinin:gen, повреждение было редким.',
-        }),
+          body: 'По словам @kschemelinin:gen, повреждение было редким.'
+        })
       ],
       {
         mentionRegistry: new Map([
@@ -460,15 +434,15 @@ describe('buildNewsDataset', () => {
               'Кирилл Щемелинин',
               { gen: 'Кирилла Щемелинина' },
               'ОК "Комфорт"',
-              'Исполняющий обязанности директора по эксплуатации',
-            ),
-          ],
-        ]),
-      },
+              'Исполняющий обязанности директора по эксплуатации'
+            )
+          ]
+        ])
+      }
     );
 
     expect(data.articles[0]?.body).toBe(
-      'По словам [Кирилла Щемелинина](/people/kschemelinin/ "Исполняющий обязанности директора по эксплуатации, ОК \\"Комфорт\\""), повреждение было редким.',
+      'По словам [Кирилла Щемелинина](/people/kschemelinin/ "Исполняющий обязанности директора по эксплуатации, ОК \\"Комфорт\\""), повреждение было редким.'
     );
   });
 
@@ -482,18 +456,15 @@ describe('buildNewsDataset', () => {
             title: 'Авария на линии',
             summary: 'Краткая сводка',
             date: '03.05.2026 09:00',
-            body: 'По словам @kschemelinin:gen, повреждение было редким.',
-          }),
+            body: 'По словам @kschemelinin:gen, повреждение было редким.'
+          })
         ],
         {
           mentionRegistry: new Map([
-            [
-              'kschemelinin',
-              createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин'),
-            ],
-          ]),
-        },
-      ),
+            ['kschemelinin', createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин')]
+          ])
+        }
+      )
     ).toThrow('has no "gen" label case');
   });
 
@@ -515,12 +486,12 @@ describe('buildNewsDataset', () => {
               location: 'КП Шелково, эко-клуб',
               coordinates: {
                 lat: 55,
-                lng: 38,
-              },
-            },
-          ],
-        }),
-      ],
+                lng: 38
+              }
+            }
+          ]
+        })
+      ]
     );
 
     expect(data.articles[0]?.events[0]).toMatchObject({
@@ -535,8 +506,8 @@ describe('buildNewsDataset', () => {
       location: 'КП Шелково, эко-клуб',
       coordinates: {
         lat: 55,
-        lng: 38,
-      },
+        lng: 38
+      }
     });
     expect(data.articles[0]?.events[0]?.startsAt).toBeInstanceOf(Date);
     expect(data.articles[0]?.events[0]?.endsAt).toBeInstanceOf(Date);
@@ -552,7 +523,7 @@ describe('buildNewsDataset', () => {
             title: 'Доменная новость',
             summary: 'Проверка доменной формы',
             date: '04.05.2026 10:00',
-            searchAliases: ['как найти новость'],
+            searchAliases: ['как найти новость']
           }),
           data: {
             ...article({
@@ -560,18 +531,18 @@ describe('buildNewsDataset', () => {
               title: 'Доменная новость',
               summary: 'Проверка доменной формы',
               date: '04.05.2026 10:00',
-              searchAliases: ['как найти новость'],
+              searchAliases: ['как найти новость']
             }).data,
             source_url: 'https://example.com/source',
             cover: {
               src: '/cover.jpg',
               width: 1200,
-              height: 675,
+              height: 675
             } as NewsArticleEntry['data']['cover'],
-            cover_alt: 'Обложка новости',
-          },
-        },
-      ],
+            cover_alt: 'Обложка новости'
+          }
+        }
+      ]
     );
     const domainArticle = data.articles[0];
 
@@ -585,13 +556,12 @@ describe('buildNewsDataset', () => {
         url: '/cover.jpg',
         width: 1200,
         height: 675,
-        alt: 'Обложка новости',
-      },
+        alt: 'Обложка новости'
+      }
     });
     expect(domainArticle?.publishedAt).toBeInstanceOf(Date);
     expect(data.byId.get('2026/05/article-domain')).toBe(domainArticle);
-    expect(Object.keys(data.home.latest[0] ?? {}).sort())
-      .toMatchInlineSnapshot(`
+    expect(Object.keys(data.home.latest[0] ?? {}).sort()).toMatchInlineSnapshot(`
       [
         "author",
         "cover",
@@ -625,11 +595,11 @@ describe('buildNewsDataset', () => {
               title: 'Праздник',
               starts_at: '31.05.2026 19:00',
               organizer: 'ОК Комфорт',
-              performer: ['Хор "Лейся, песня!"', 'Ансамбль "Ромашкино"'],
-            },
-          ],
-        }),
-      ],
+              performer: ['Хор "Лейся, песня!"', 'Ансамбль "Ромашкино"']
+            }
+          ]
+        })
+      ]
     );
 
     expect(data.articles[0]?.events[0]).toMatchObject({
@@ -638,8 +608,8 @@ describe('buildNewsDataset', () => {
       organizer: { name: 'ОК Комфорт', type: 'organization' },
       performer: [
         { name: 'Хор "Лейся, песня!"', type: 'organization' },
-        { name: 'Ансамбль "Ромашкино"', type: 'organization' },
-      ],
+        { name: 'Ансамбль "Ромашкино"', type: 'organization' }
+      ]
     });
   });
 
@@ -655,16 +625,16 @@ describe('buildNewsDataset', () => {
           events: [
             {
               title: 'Встреча по регламенту',
-              starts_at: '31.05.2026 19:00',
-            },
-          ],
-        }),
-      ],
+              starts_at: '31.05.2026 19:00'
+            }
+          ]
+        })
+      ]
     );
 
     expect(data.articles[0]?.events[0]).toMatchObject({
       startsIso: '2026-05-31T19:00:00+03:00',
-      startsTime: '19:00',
+      startsTime: '19:00'
     });
     expect(data.articles[0]?.events[0]?.endsAt).toBeUndefined();
     expect(data.articles[0]?.events[0]?.endsIso).toBeUndefined();
@@ -687,12 +657,12 @@ describe('buildNewsDataset', () => {
               organizer: { name: 'Инициативная группа', type: 'person' },
               performer: [
                 { name: 'Иван Иванов', type: 'person' },
-                { name: 'Ансамбль', type: 'organization' },
-              ],
-            },
-          ],
-        }),
-      ],
+                { name: 'Ансамбль', type: 'organization' }
+              ]
+            }
+          ]
+        })
+      ]
     );
 
     expect(data.articles[0]?.events[0]).toMatchObject({
@@ -701,8 +671,8 @@ describe('buildNewsDataset', () => {
       organizer: { name: 'Инициативная группа', type: 'person' },
       performer: [
         { name: 'Иван Иванов', type: 'person' },
-        { name: 'Ансамбль', type: 'organization' },
-      ],
+        { name: 'Ансамбль', type: 'organization' }
+      ]
     });
   });
 
@@ -714,9 +684,9 @@ describe('buildNewsDataset', () => {
           id: '2026/05/plain',
           title: 'Обычная новость',
           summary: 'Без события',
-          date: '04.05.2026 10:00',
-        }),
-      ],
+          date: '04.05.2026 10:00'
+        })
+      ]
     );
 
     expect(data.articles[0]?.events).toEqual([]);
@@ -728,27 +698,24 @@ describe('buildNewsDataset', () => {
       preprocessSiteMarkdownContent: (
         markdown: string,
         _context: string,
-        registry: Map<string, unknown>,
+        registry: Map<string, unknown>
       ) => {
         const alreadyMutated = registry.has('leaked');
 
-        registry.set(
-          'leaked',
-          createPersonMentionTarget('leaked', 'Утекшее упоминание'),
-        );
+        registry.set('leaked', createPersonMentionTarget('leaked', 'Утекшее упоминание'));
 
         return {
           markdown: alreadyMutated ? 'fallback registry leaked' : markdown,
-          mentions: [],
+          mentions: []
         };
-      },
+      }
     }));
 
     try {
-      const { buildNewsDataset: buildWithMockedPreprocessor } =
-        await import('./load');
-      const buildNewsDatasetWithMockedPreprocessor =
-        createTestNewsDatasetBuilder(buildWithMockedPreprocessor);
+      const { buildNewsDataset: buildWithMockedPreprocessor } = await import('./load');
+      const buildNewsDatasetWithMockedPreprocessor = createTestNewsDatasetBuilder(
+        buildWithMockedPreprocessor
+      );
 
       buildNewsDatasetWithMockedPreprocessor(
         [author({ id: 'ig', name: 'Редакция' })],
@@ -758,9 +725,9 @@ describe('buildNewsDataset', () => {
             title: 'Первая новость',
             summary: 'Проверка',
             date: '01.05.2026',
-            body: 'Первый body.',
-          }),
-        ],
+            body: 'Первый body.'
+          })
+        ]
       );
 
       const data = buildNewsDatasetWithMockedPreprocessor(
@@ -771,9 +738,9 @@ describe('buildNewsDataset', () => {
             title: 'Вторая новость',
             summary: 'Проверка',
             date: '02.05.2026',
-            body: 'Второй body.',
-          }),
-        ],
+            body: 'Второй body.'
+          })
+        ]
       );
 
       expect(data.articles[0]?.body).toBe('Второй body.');
@@ -787,38 +754,29 @@ describe('buildNewsDataset', () => {
     vi.resetModules();
     vi.doMock('../markdown/render', async () => {
       const actual =
-        await vi.importActual<typeof import('../markdown/render')>(
-          '../markdown/render',
-        );
+        await vi.importActual<typeof import('../markdown/render')>('../markdown/render');
 
       return {
         ...actual,
         preprocessSiteMarkdownContent: (
           markdown: string,
           context: string,
-          registry: MutableMentionRegistry,
+          registry: MutableMentionRegistry
         ) => {
-          const body = actual.preprocessSiteMarkdownContent(
-            markdown,
-            context,
-            registry,
-          );
+          const body = actual.preprocessSiteMarkdownContent(markdown, context, registry);
 
-          registry.set(
-            'leaked',
-            createPersonMentionTarget('leaked', 'Утекшее упоминание'),
-          );
+          registry.set('leaked', createPersonMentionTarget('leaked', 'Утекшее упоминание'));
 
           return body;
-        },
+        }
       };
     });
 
     try {
-      const { buildNewsDataset: buildWithMutablePreprocessor } =
-        await import('./load');
-      const buildNewsDatasetWithMutablePreprocessor =
-        createTestNewsDatasetBuilder(buildWithMutablePreprocessor);
+      const { buildNewsDataset: buildWithMutablePreprocessor } = await import('./load');
+      const buildNewsDatasetWithMutablePreprocessor = createTestNewsDatasetBuilder(
+        buildWithMutablePreprocessor
+      );
 
       buildNewsDatasetWithMutablePreprocessor(
         [author({ id: 'ig', name: 'Редакция' })],
@@ -828,9 +786,9 @@ describe('buildNewsDataset', () => {
             title: 'Первая новость',
             summary: 'Проверка',
             date: '01.05.2026',
-            body: 'Первый body.',
-          }),
-        ],
+            body: 'Первый body.'
+          })
+        ]
       );
 
       expect(() =>
@@ -842,10 +800,10 @@ describe('buildNewsDataset', () => {
               title: 'Вторая новость',
               summary: 'Проверка',
               date: '02.05.2026',
-              body: 'Упоминание @leaked.',
-            }),
-          ],
-        ),
+              body: 'Упоминание @leaked.'
+            })
+          ]
+        )
       ).toThrow('unknown entity mention "@leaked"');
     } finally {
       vi.doUnmock('../markdown/render');

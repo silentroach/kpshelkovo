@@ -4,7 +4,7 @@ import {
   md,
   parseMarkdownFragment,
   serializeMarkdownDocument,
-  type MarkdownPhrasingInput,
+  type MarkdownPhrasingInput
 } from '@shelkovo/markdown';
 
 import { formatNewsDate, NEWS_PROSE } from '../news/view';
@@ -19,12 +19,12 @@ import type {
   PersonContactType,
   PersonMentionRef,
   PersonMentionSection,
-  PersonProfile,
+  PersonProfile
 } from './types';
 
 const CONTACT_LABELS: Record<PersonContactType, string> = {
   phone: 'Телефон',
-  telegram: 'Telegram',
+  telegram: 'Telegram'
 };
 
 const BACKLINK_SECTION_LABELS: Record<PersonMentionSection, string> = {
@@ -33,7 +33,7 @@ const BACKLINK_SECTION_LABELS: Record<PersonMentionSection, string> = {
   reviews: 'Отзывы',
   places: 'Карта',
   people: 'Люди',
-  contacts: 'Сарафан',
+  contacts: 'Сарафан'
 };
 
 const BACKLINK_KIND_LABELS: Record<PersonBacklinkKind, string> = {
@@ -42,7 +42,7 @@ const BACKLINK_KIND_LABELS: Record<PersonBacklinkKind, string> = {
   review: 'Отзыв',
   place: 'Место',
   person: 'Профиль',
-  contact: 'Контакт',
+  contact: 'Контакт'
 };
 
 export const PEOPLE_PROSE = NEWS_PROSE;
@@ -57,20 +57,17 @@ const serialize = (children: readonly MarkdownNode[]): string =>
 
 const inline = (value: string): string => value.replace(/\s+/gu, ' ').trim();
 
-const section = (
-  title: string,
-  rows: readonly MarkdownListItem[],
-): readonly MarkdownNode[] => [
+const section = (title: string, rows: readonly MarkdownListItem[]): readonly MarkdownNode[] => [
   md.heading(2, title),
-  md.list(rows.length > 0 ? rows : [md.listItem('Нет данных.')]),
+  md.list(rows.length > 0 ? rows : [md.listItem('Нет данных.')])
 ];
 
 const contactLine = (contact: PersonContact): MarkdownListItem =>
   md.listItem([
     md.paragraph([
       md.text(`${formatPersonContactType(contact.type)}: `),
-      md.link(contact.href, contact.display),
-    ]),
+      md.link(contact.href, contact.display)
+    ])
   ]);
 
 const backlinkDate = (backlink: PersonMentionRef): string | undefined => {
@@ -90,32 +87,24 @@ const backlinkDate = (backlink: PersonMentionRef): string | undefined => {
 };
 
 const backlinkLine = (backlink: PersonMentionRef): MarkdownListItem => {
-  const meta = [
-    formatPersonBacklinkKind(backlink.kind),
-    backlinkDate(backlink),
-  ].filter(Boolean);
+  const meta = [formatPersonBacklinkKind(backlink.kind), backlinkDate(backlink)].filter(Boolean);
   const details = meta.length > 0 ? ` — ${meta.join('; ')}` : '';
   const summary = backlink.excerpt ? inline(backlink.excerpt) : undefined;
   const titleLine: MarkdownPhrasingNode[] = [
     md.link(absoluteUrl(backlink.markdownUrl), backlink.title),
-    ...(details ? [md.text(details)] : []),
+    ...(details ? [md.text(details)] : [])
   ];
 
-  return md.listItem([
-    md.paragraph(titleLine),
-    ...(summary ? [md.paragraph(summary)] : []),
-  ]);
+  return md.listItem([md.paragraph(titleLine), ...(summary ? [md.paragraph(summary)] : [])]);
 };
 
-const backlinksSection = (
-  backlinks: PersonBacklinks,
-): readonly MarkdownNode[] => {
+const backlinksSection = (backlinks: PersonBacklinks): readonly MarkdownNode[] => {
   const groups = personBacklinkGroups(backlinks);
 
   if (groups.length === 0) {
     return [
       md.heading(2, 'Где упоминается'),
-      md.list([md.listItem('Пока публичных упоминаний не найдено.')]),
+      md.list([md.listItem('Пока публичных упоминаний не найдено.')])
     ];
   }
 
@@ -123,40 +112,35 @@ const backlinksSection = (
     md.heading(2, 'Где упоминается'),
     ...groups.flatMap((group) => [
       md.heading(3, group.label),
-      md.list(group.items.map(backlinkLine)),
-    ]),
+      md.list(group.items.map(backlinkLine))
+    ])
   ];
 };
 
-export const formatPersonContactType = (type: PersonContactType): string =>
-  CONTACT_LABELS[type];
+export const formatPersonContactType = (type: PersonContactType): string => CONTACT_LABELS[type];
 
 export const formatPersonContactCompactDisplay = (
-  contact: Pick<PersonContact, 'type' | 'display'>,
-): string =>
-  contact.type === 'telegram'
-    ? contact.display.replace(/^@/u, '')
-    : contact.display;
+  contact: Pick<PersonContact, 'type' | 'display'>
+): string => (contact.type === 'telegram' ? contact.display.replace(/^@/u, '') : contact.display);
 
 export const formatPersonHeadline = (
-  profile: Pick<PersonProfile, 'company' | 'position'>,
+  profile: Pick<PersonProfile, 'company' | 'position'>
 ): string | undefined => {
-  const parts = [profile.position, profile.company].filter(
-    (value): value is string => Boolean(value),
+  const parts = [profile.position, profile.company].filter((value): value is string =>
+    Boolean(value)
   );
 
   return parts.length > 0 ? parts.join(', ') : undefined;
 };
 
-export const formatPersonBacklinkSection = (
-  section: PersonMentionSection,
-): string => BACKLINK_SECTION_LABELS[section];
+export const formatPersonBacklinkSection = (section: PersonMentionSection): string =>
+  BACKLINK_SECTION_LABELS[section];
 
 export const formatPersonBacklinkKind = (kind: PersonBacklinkKind): string =>
   BACKLINK_KIND_LABELS[kind];
 
 export const personBacklinkGroups = (
-  backlinks: PersonBacklinks,
+  backlinks: PersonBacklinks
 ): readonly {
   readonly section: PersonMentionSection;
   readonly label: string;
@@ -165,15 +149,14 @@ export const personBacklinkGroups = (
   PERSON_MENTION_SECTIONS.map((section) => ({
     section,
     label: formatPersonBacklinkSection(section),
-    items: backlinks[section],
+    items: backlinks[section]
   })).filter((group) => group.items.length > 0);
 
-export const formatPersonBacklinkDate = (
-  backlink: PersonMentionRef,
-): string | undefined => backlinkDate(backlink);
+export const formatPersonBacklinkDate = (backlink: PersonMentionRef): string | undefined =>
+  backlinkDate(backlink);
 
 export const describePersonProfile = (
-  profile: Pick<PersonProfile, 'body' | 'company' | 'name' | 'position'>,
+  profile: Pick<PersonProfile, 'body' | 'company' | 'name' | 'position'>
 ): string => {
   const first = extractFirstMarkdownText(profile.body);
   const headline = formatPersonHeadline(profile);
@@ -195,14 +178,11 @@ export const buildPersonMarkdown = (profile: PersonProfile): string => {
       'Контакты',
       profile.contacts.length > 0
         ? profile.contacts.map(contactLine)
-        : [md.listItem('Контакты пока не опубликованы.')],
+        : [md.listItem('Контакты пока не опубликованы.')]
     ),
     ...(profile.body
-      ? [
-          md.heading(2, 'Профиль'),
-          ...parseMarkdownFragment(profile.body.trim()),
-        ]
+      ? [md.heading(2, 'Профиль'), ...parseMarkdownFragment(profile.body.trim())]
       : []),
-    ...backlinksSection(profile.backlinks),
+    ...backlinksSection(profile.backlinks)
   ]);
 };

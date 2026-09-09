@@ -8,41 +8,26 @@ const stickyRoutes = [
   '/815/regulation/',
   '/815/regulation/services/',
   '/815/regulation/assets/',
-  '/815/compare/settlements/shelkovo/',
+  '/815/compare/settlements/shelkovo/'
 ] as const;
 
 const installWindowListenerTracker = (page: Page): Promise<void> =>
   page.addInitScript(
     ({ resizeCountKey, scrollCountKey, sessionKey }) => {
-      const trackedListeners = new Map<
-        string,
-        Set<EventListenerOrEventListenerObject>
-      >([
+      const trackedListeners = new Map<string, Set<EventListenerOrEventListenerObject>>([
         ['scroll', new Set()],
-        ['resize', new Set()],
+        ['resize', new Set()]
       ]);
       const addEventListener = EventTarget.prototype.addEventListener;
       const removeEventListener = EventTarget.prototype.removeEventListener;
       const publishCounts = (): void => {
-        Reflect.set(
-          window,
-          scrollCountKey,
-          trackedListeners.get('scroll')?.size ?? 0,
-        );
-        Reflect.set(
-          window,
-          resizeCountKey,
-          trackedListeners.get('resize')?.size ?? 0,
-        );
+        Reflect.set(window, scrollCountKey, trackedListeners.get('scroll')?.size ?? 0);
+        Reflect.set(window, resizeCountKey, trackedListeners.get('resize')?.size ?? 0);
       };
 
       Reflect.set(window, sessionKey, Math.random().toString(36));
       publishCounts();
-      EventTarget.prototype.addEventListener = function (
-        type,
-        listener,
-        options,
-      ): void {
+      EventTarget.prototype.addEventListener = function (type, listener, options): void {
         if (this === window && listener) {
           trackedListeners.get(type)?.add(listener);
           publishCounts();
@@ -50,11 +35,7 @@ const installWindowListenerTracker = (page: Page): Promise<void> =>
 
         addEventListener.call(this, type, listener, options);
       };
-      EventTarget.prototype.removeEventListener = function (
-        type,
-        listener,
-        options,
-      ): void {
+      EventTarget.prototype.removeEventListener = function (type, listener, options): void {
         removeEventListener.call(this, type, listener, options);
         if (this === window && listener) {
           trackedListeners.get(type)?.delete(listener);
@@ -65,8 +46,8 @@ const installWindowListenerTracker = (page: Page): Promise<void> =>
     {
       resizeCountKey: resizeListenerCountKey,
       scrollCountKey: scrollListenerCountKey,
-      sessionKey: browserSessionKey,
-    },
+      sessionKey: browserSessionKey
+    }
   );
 
 const getBrowserSession = (page: Page): Promise<string> =>
@@ -76,12 +57,12 @@ const getWindowListenerCounts = (page: Page) =>
   page.evaluate(
     ({ resizeCountKey, scrollCountKey }) => ({
       resize: Number(Reflect.get(window, resizeCountKey)),
-      scroll: Number(Reflect.get(window, scrollCountKey)),
+      scroll: Number(Reflect.get(window, scrollCountKey))
     }),
     {
       resizeCountKey: resizeListenerCountKey,
-      scrollCountKey: scrollListenerCountKey,
-    },
+      scrollCountKey: scrollListenerCountKey
+    }
   );
 
 const scrollIntoStickyState = async (shell: Locator): Promise<void> => {
@@ -90,7 +71,7 @@ const scrollIntoStickyState = async (shell: Locator): Promise<void> => {
 
     window.scrollTo({
       top: window.scrollY + rect.top + 180,
-      behavior: 'instant',
+      behavior: 'instant'
     });
   });
   await expect(shell).toHaveAttribute('data-ui-sticky-table-stuck');
@@ -110,10 +91,7 @@ const countStickyUpdatesOnPageLoad = (shell: Locator): Promise<number> =>
     return updates;
   });
 
-const navigateWithClientRouter = async (
-  page: Page,
-  pathname: string,
-): Promise<void> => {
+const navigateWithClientRouter = async (page: Page, pathname: string): Promise<void> => {
   await page.evaluate((href) => {
     const link = document.createElement('a');
 
@@ -127,7 +105,7 @@ const navigateWithClientRouter = async (
 };
 
 test('keeps one sticky lifecycle across every sticky route and releases it after leaving', async ({
-  page,
+  page
 }) => {
   await installWindowListenerTracker(page);
   await page.goto('/', { waitUntil: 'networkidle' });
@@ -135,7 +113,7 @@ test('keeps one sticky lifecycle across every sticky route and releases it after
   const baseline = await getWindowListenerCounts(page);
   const active = {
     resize: baseline.resize + 1,
-    scroll: baseline.scroll + 1,
+    scroll: baseline.scroll + 1
   };
 
   for (const pathname of [...stickyRoutes, ...stickyRoutes]) {
@@ -146,11 +124,7 @@ test('keeps one sticky lifecycle across every sticky route and releases it after
     expect(await getBrowserSession(page)).toBe(browserSession);
   }
 
-  expect(
-    await countStickyUpdatesOnPageLoad(
-      page.locator(stickyTableSelector).first(),
-    ),
-  ).toBe(1);
+  expect(await countStickyUpdatesOnPageLoad(page.locator(stickyTableSelector).first())).toBe(1);
 
   await navigateWithClientRouter(page, '/');
   await expect(page.locator(stickyTableSelector)).toHaveCount(0);
@@ -158,9 +132,7 @@ test('keeps one sticky lifecycle across every sticky route and releases it after
   expect(await getBrowserSession(page)).toBe(browserSession);
 });
 
-test('updates sticky state on direct load and a fresh client destination', async ({
-  page,
-}) => {
+test('updates sticky state on direct load and a fresh client destination', async ({ page }) => {
   await installWindowListenerTracker(page);
   await page.goto('/815/regulation/services/', { waitUntil: 'networkidle' });
   const browserSession = await getBrowserSession(page);
@@ -175,7 +147,7 @@ test('updates sticky state on direct load and a fresh client destination', async
   await expect(shell).toBeVisible();
   expect(await getWindowListenerCounts(page)).toEqual({
     resize: baseline.resize + 1,
-    scroll: baseline.scroll + 1,
+    scroll: baseline.scroll + 1
   });
   expect(await getBrowserSession(page)).toBe(browserSession);
   await scrollIntoStickyState(shell);

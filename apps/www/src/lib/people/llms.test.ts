@@ -13,15 +13,15 @@ const fixtures = vi.hoisted(() => ({
           reviews: [],
           places: [{ sourceId: 'titanic' }],
           people: [],
-          contacts: [],
-        },
-      },
-    ],
-  },
+          contacts: []
+        }
+      }
+    ]
+  }
 }));
 
 vi.mock('./load', () => ({
-  loadPeopleDataWithBacklinks: async () => fixtures.people,
+  loadPeopleDataWithBacklinks: async () => fixtures.people
 }));
 
 let build: typeof import('./llms').build;
@@ -29,7 +29,7 @@ let build: typeof import('./llms').build;
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ build } = await import('./llms'));
@@ -72,7 +72,7 @@ describe('people llms', () => {
 
   it('documents the mention target discriminator in the full overview', async () => {
     await expect(build('full')).resolves.toContain(
-      'обязательное поле `type` со значением `person` или `place`',
+      'обязательное поле `type` со значением `person` или `place`'
     );
   });
 });

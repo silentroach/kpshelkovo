@@ -9,7 +9,7 @@ export const prerender = true;
 
 export const getStaticPaths = (async () =>
   STATUS_SERVICES.map((service) => ({
-    params: { service },
+    params: { service }
   }))) satisfies GetStaticPaths;
 
 export const GET: APIRoute = async ({ params }) => {
@@ -20,7 +20,8 @@ export const GET: APIRoute = async ({ params }) => {
   }
 
   const service = STATUS_SERVICES.find((item) => item === serviceParam) as
-    StatusService | undefined;
+    | StatusService
+    | undefined;
 
   if (!service) {
     throw new Error(`status service "${serviceParam}" not found`);

@@ -11,7 +11,7 @@ const normalizeIcs = (ics: string): string => ics.replaceAll('\r\n', '\n');
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ articleEventIcsUrl } = await import('./routes'));
@@ -38,10 +38,10 @@ const event = (input?: {
     : {
         endsAt: new Date('2026-05-31T18:00:00.000Z'),
         endsIso: '2026-05-31T21:00:00+03:00',
-        endsTime: '21:00',
+        endsTime: '21:00'
       }),
   location: input?.location,
-  coordinates: input?.coordinates,
+  coordinates: input?.coordinates
 });
 
 const article = (input?: {
@@ -53,7 +53,7 @@ const article = (input?: {
   author: {
     id: 'ig',
     name: 'Редакция',
-    kind: 'editorial',
+    kind: 'editorial'
   },
   year: 2026,
   month: 4,
@@ -73,7 +73,7 @@ const article = (input?: {
   events: input?.events ?? [],
   summary: input?.summary ?? 'Коротко о встрече',
   body: '',
-  mentions: [],
+  mentions: []
 });
 
 describe('buildArticleEventIcs', () => {
@@ -153,14 +153,14 @@ describe('buildArticleEventIcs', () => {
 
   it('escapes text values', () => {
     const item = event({
-      title: 'Comma, semi; slash \\ and\nbreak',
+      title: 'Comma, semi; slash \\ and\nbreak'
     });
     const ics = buildArticleEventIcs(
       article({
         summary: 'Comma, semi; slash \\ and\nbreak',
-        events: [item],
+        events: [item]
       }),
-      item,
+      item
     );
 
     expect(normalizeIcs(ics)).toMatchInlineSnapshot(`
@@ -188,9 +188,9 @@ describe('buildArticleEventIcs', () => {
     const ics = buildArticleEventIcs(
       article({
         summary: 'Короткое содержание новости',
-        events: [item],
+        events: [item]
       }),
-      item,
+      item
     );
 
     expect(ics).toContain('DESCRIPTION:Описание календарного события\r\n');
@@ -201,9 +201,9 @@ describe('buildArticleEventIcs', () => {
     const ics = buildArticleEventIcs(
       article({
         summary: 'Короткое содержание новости',
-        events: [item],
+        events: [item]
       }),
-      item,
+      item
     );
 
     expect(ics).toContain('DESCRIPTION:Короткое содержание новости\r\n');
@@ -214,14 +214,14 @@ describe('buildArticleEventIcs', () => {
       location: 'КП Шелково, эко-клуб',
       coordinates: {
         lat: 55,
-        lng: 38,
-      },
+        lng: 38
+      }
     });
     const ics = buildArticleEventIcs(
       article({
-        events: [item],
+        events: [item]
       }),
-      item,
+      item
     );
     const unfolded = ics.replaceAll('\r\n ', '');
 
@@ -256,8 +256,8 @@ describe('article event route helpers', () => {
         year: 2026,
         month: 4,
         entry: 'ok-meeting-regulation',
-        event: 'greenwood',
-      }),
+        event: 'greenwood'
+      })
     ).toBe('/news/2026/04/ok-meeting-regulation/greenwood.ics');
   });
 

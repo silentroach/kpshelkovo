@@ -1,9 +1,8 @@
 import type { APIRoute } from 'astro';
 
-import { buildFullReglamentChecksMarkdown } from '@/lib/reglament/full-markdown';
 import { createMarkdownResponse } from '@/lib/markdown/response';
+import { buildFullReglamentChecksMarkdown } from '@/lib/reglament/full-markdown';
 
 export const prerender = true;
 
-export const GET: APIRoute = async () =>
-  createMarkdownResponse(buildFullReglamentChecksMarkdown());
+export const GET: APIRoute = async () => createMarkdownResponse(buildFullReglamentChecksMarkdown());

@@ -12,7 +12,7 @@ export const GET: APIRoute = async () => {
   return createJsonResponse(detailOpenapi(root), {
     headers: {
       'Content-Type': `${OAS}; charset=utf-8`,
-      Link: detailLinks(root),
-    },
+      Link: detailLinks(root)
+    }
   });
 };

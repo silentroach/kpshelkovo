@@ -1,11 +1,7 @@
 import { count } from '@shelkovo/format';
-
 import { compareRuText } from '@shelkovo/format';
-import {
-  llmsSection,
-  markdownList,
-  serializeLlmsDocument,
-} from '@/lib/markdown/llms-document';
+
+import { llmsSection, markdownList, serializeLlmsDocument } from '@/lib/markdown/llms-document';
 
 import { loadAllData } from './data';
 import {
@@ -15,23 +11,19 @@ import {
   comparePath,
   compareRatingPath,
   compareSettlementsDataPath,
-  compareSkillsPath,
+  compareSkillsPath
 } from './public-surface';
 import { RATING_METHODOLOGY } from './rating';
-import { canon } from './site';
 import type { Settlement } from './settlement/types';
+import { canon } from './site';
 import { withBase } from './url';
 
 function abs(path: string): string {
   return canon(path);
 }
 
-function refs(
-  list: readonly Pick<Settlement, 'shortName' | 'slug'>[],
-): string[] {
-  return list.map(
-    (item) => `${item.shortName}: ${abs(`/settlements/${item.slug}/`)}`,
-  );
+function refs(list: readonly Pick<Settlement, 'shortName' | 'slug'>[]): string[] {
+  return list.map((item) => `${item.shortName}: ${abs(`/settlements/${item.slug}/`)}`);
 }
 
 export async function build(kind: 'short' | 'full'): Promise<string> {
@@ -39,8 +31,7 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
   const top = settlements
     .filter((item) => item.slug !== baseline.slug)
     .sort((a, b) => {
-      const d =
-        (ratings.get(b.slug)?.score ?? 0) - (ratings.get(a.slug)?.score ?? 0);
+      const d = (ratings.get(b.slug)?.score ?? 0) - (ratings.get(a.slug)?.score ?? 0);
       if (d !== 0) return d;
       return compareRuText(a.shortName, b.shortName);
     })
@@ -66,8 +57,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
             markdownList([
               'Раздел `/815/compare/` сравнивает тарифы на содержание коттеджных поселков с тарифом КП Шелково.',
               'В данных есть тарифы, базовая инфраструктура, общественные пространства, сервисная модель и условный рейтинг качества среды.',
-              `Сейчас в базе ${count(stats.totalSettlements, ['поселок', 'поселка', 'поселков'])}.`,
-            ]),
+              `Сейчас в базе ${count(stats.totalSettlements, ['поселок', 'поселка', 'поселков'])}.`
+            ])
           ]),
           llmsSection('Главные URL', [
             markdownList([
@@ -78,25 +69,25 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Индекс инструкций для автоматического чтения: ${skills}`,
               `Расширенная версия этого текста: ${full}`,
               'Примеры детальных страниц:',
-              ...refs(list),
-            ]),
+              ...refs(list)
+            ])
           ]),
           llmsSection('Что открывать первым', [
             markdownList([
               `Для анализа всех поселков используйте \`${feedPath}\`.`,
               `\`${explorerPath}\` нужен только для облегченного списка, карты и минимального набора данных.`,
               'Список `sources` остается на детальных страницах и не входит в общую ленту.',
-              `Если нужен первоисточник или человекочитаемый контекст, переходите на \`${settlementPath}\`.`,
-            ]),
+              `Если нужен первоисточник или человекочитаемый контекст, переходите на \`${settlementPath}\`.`
+            ])
           ]),
           llmsSection('Ограничения данных', [
             markdownList([
               'Если факт не подтвержден источником, поле может быть опущено.',
               'Отсутствие поля означает «неизвестно», а не «точно нет».',
-              'Тариф не входит в формулу условного рейтинга.',
-            ]),
-          ]),
-        ],
+              'Тариф не входит в формулу условного рейтинга.'
+            ])
+          ])
+        ]
       })
     : serializeLlmsDocument({
         title: 'Сравнение тарифов поселков',
@@ -106,8 +97,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
             markdownList([
               'Это публичный раздел для сравнения тарифов на содержание коттеджных поселков с тарифом КП Шелково.',
               'Раздел помогает сопоставить цену и подтвержденные признаки среды: инженерную инфраструктуру, общественные пространства, сервисную модель и условный рейтинг.',
-              `Сейчас в базе ${count(stats.totalSettlements, ['поселок', 'поселка', 'поселков'])}.`,
-            ]),
+              `Сейчас в базе ${count(stats.totalSettlements, ['поселок', 'поселка', 'поселков'])}.`
+            ])
           ]),
           llmsSection('Канонические URL', [
             markdownList([
@@ -119,8 +110,8 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Облегченная лента explorer: ${explorer}`,
               `Индекс инструкций для автоматического чтения: ${skills}`,
               'Примеры детальных страниц поселков:',
-              ...refs(list),
-            ]),
+              ...refs(list)
+            ])
           ]),
           llmsSection(`Описание ${feedPath}`, [
             markdownList([
@@ -129,22 +120,22 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               `Поле \`rating\` сериализуется как число \`${RATING_METHODOLOGY.scoreRange.min}..${RATING_METHODOLOGY.scoreRange.max}\` и служит техническим прокси качества среды для сортировки и сравнения.`,
               'Объект `comparisons` индексируется по `slug` и содержит `tariffDelta`, `tariffDeltaPercent` и `isCheaper` относительно базового поселка Шелково.',
               'Объект `stats` содержит агрегированные показатели по тарифам, отдельную peer-медиану для рейтинговой группы Шелково и общее число поселков.',
-              'Список первоисточников `sources` в общую ленту не включен; за ним нужно идти на детальную страницу поселка.',
-            ]),
+              'Список первоисточников `sources` в общую ленту не включен; за ним нужно идти на детальную страницу поселка.'
+            ])
           ]),
           llmsSection(`Описание ${explorerPath}`, [
             markdownList([
               'Это отдельная облегченная лента для главного списка и карты, а не основной источник для анализа.',
               'Его `settlements[]` включает только `name`, `shortName`, `slug`, `rating`, `isBaseline`, `location.lat`, `location.lng`, `location.district`, `tariff.normalizedPerSotkaMonth`, `tariff.normalizedIsEstimate`, а также необязательные `rabstvo` и сокращенный `managementCompany`.',
-              'Используйте его только когда нужен минимальный набор данных для массовой первичной выборки или повторения логики главной страницы.',
-            ]),
+              'Используйте его только когда нужен минимальный набор данных для массовой первичной выборки или повторения логики главной страницы.'
+            ])
           ]),
           llmsSection('Детальные страницы поселков', [
             markdownList([
               `Страницы вида \`${settlementPath}\` остаются каноническим человекочитаемым представлением по одному поселку.`,
               'Они удобны, когда нужно дать ссылку на HTML или Markdown-страницу, а не только забрать структурированные данные.',
-              `Если нужна максимально полная структурированная картина, сначала используйте \`${feedPath}\`, а затем переходите на детальную страницу по \`slug\`.`,
-            ]),
+              `Если нужна максимально полная структурированная картина, сначала используйте \`${feedPath}\`, а затем переходите на детальную страницу по \`slug\`.`
+            ])
           ]),
           llmsSection('Рейтинг', [
             markdownList([
@@ -152,17 +143,17 @@ export async function build(kind: 'short' | 'full'): Promise<string> {
               'Тариф намеренно исключен из формулы.',
               'Базовые блоки рейтинга: инфраструктура, общественные пространства, сервисная модель и удаленность от Москвы.',
               'Если данных мало, карточка тянется к нейтральной середине шкалы, а не трактуется автоматически как слабая или сильная.',
-              `Публичное объяснение методики: ${rating}`,
-            ]),
+              `Публичное объяснение методики: ${rating}`
+            ])
           ]),
           llmsSection('Ограничения данных', [
             markdownList([
               'Если факт не подтвержден источником, поле может быть опущено.',
               'Отсутствие поля означает «неизвестно», а не «точно нет».',
               'Основной язык сайта русский; названия поселков, разделов и часть полей заданы по-русски.',
-              `\`${explorerPath}\` оптимизирован для списка и карты и не заменяет полную ленту \`${feedPath}\`.`,
-            ]),
-          ]),
-        ],
+              `\`${explorerPath}\` оптимизирован для списка и карты и не заменяет полную ленту \`${feedPath}\`.`
+            ])
+          ])
+        ]
       });
 }

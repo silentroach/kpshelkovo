@@ -1,13 +1,10 @@
 import { appendFile } from 'node:fs/promises';
 
-import {
-  submitNewIndexNowPages,
-  writeIndexNowKeyFile,
-} from '../apps/www/src/lib/indexnow.ts';
+import { submitNewIndexNowPages, writeIndexNowKeyFile } from '../apps/www/src/lib/indexnow.ts';
 
 const appendIndexNowSummary = async (
   urls: readonly string[],
-  requestCount: number,
+  requestCount: number
 ): Promise<void> => {
   const summaryPath = process.env.GITHUB_STEP_SUMMARY;
 
@@ -19,16 +16,11 @@ const appendIndexNowSummary = async (
     '## IndexNow new-page submission',
     '',
     `- New URLs submitted: **${urls.length}**`,
-    `- Requests accepted: **${requestCount}**`,
+    `- Requests accepted: **${requestCount}**`
   ];
 
   if (urls.length > 0) {
-    lines.push(
-      '',
-      '### Submitted URLs',
-      '',
-      ...urls.map((url) => `- <${url}>`),
-    );
+    lines.push('', '### Submitted URLs', '', ...urls.map((url) => `- <${url}>`));
   }
 
   await appendFile(summaryPath, `${lines.join('\n')}\n`, 'utf8');
@@ -57,16 +49,12 @@ switch (command) {
       throw new Error('usage: indexnow submit <url-manifest> <rsync-changes>');
     }
 
-    const [urls, requestCount] = await submitNewIndexNowPages(
-      targetPath,
-      changesPath,
-      key,
-    );
+    const [urls, requestCount] = await submitNewIndexNowPages(targetPath, changesPath, key);
 
     console.log(
       urls.length === 0
         ? 'IndexNow ownership file verified; no new URLs to submit.'
-        : `IndexNow submitted ${urls.length} new URLs in ${requestCount} request(s).`,
+        : `IndexNow submitted ${urls.length} new URLs in ${requestCount} request(s).`
     );
     await appendIndexNowSummary(urls, requestCount);
     break;

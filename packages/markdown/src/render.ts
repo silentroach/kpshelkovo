@@ -1,5 +1,5 @@
-import rehypeStringify from 'rehype-stringify';
 import type { Root } from 'mdast';
+import rehypeStringify from 'rehype-stringify';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
@@ -43,29 +43,26 @@ const headingAnchor = (slug: string): HtmlTreeNode => ({
     // Keep the visible "#" permalink marker out of the Pagefind index.
     dataPagefindIgnore: 'all',
     href: `#${slug}`,
-    title: HEADING_ANCHOR_LABEL,
+    title: HEADING_ANCHOR_LABEL
   },
   children: [
     {
       type: 'element',
       tagName: 'span',
       properties: {
-        ariaHidden: 'true',
+        ariaHidden: 'true'
       },
       children: [
         {
           type: 'text',
-          value: '#',
-        },
-      ],
-    },
-  ],
+          value: '#'
+        }
+      ]
+    }
+  ]
 });
 
-const addHeadingIds = (
-  node: HtmlTreeNode,
-  seenSlugs: Map<string, number>,
-): void => {
+const addHeadingIds = (node: HtmlTreeNode, seenSlugs: Map<string, number>): void => {
   if (node.tagName && HEADING_TAGS.has(node.tagName)) {
     const headingText = nodeText(node);
     const slug = uniqueHeadingSlug(headingText, seenSlugs);
@@ -87,8 +84,7 @@ const rehypeHeadingIds: Plugin<[], HtmlTreeNode> = () => (tree) => {
   addHeadingIds(tree, new Map());
 };
 
-const remarkTableOfContents: Plugin<[], Root> = () => (tree) =>
-  expandTableOfContents(tree);
+const remarkTableOfContents: Plugin<[], Root> = () => (tree) => expandTableOfContents(tree);
 
 const processor = unified()
   .use(remarkParse)
@@ -103,10 +99,7 @@ const processor = unified()
   .use(rehypeTypograf)
   .use(rehypeStringify);
 
-const preprocessMarkdown = (
-  markdown: string,
-  preprocess: RenderOptions['preprocess'],
-): string => {
+const preprocessMarkdown = (markdown: string, preprocess: RenderOptions['preprocess']): string => {
   if (!preprocess) {
     return markdown;
   }

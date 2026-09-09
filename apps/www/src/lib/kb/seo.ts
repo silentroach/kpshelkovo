@@ -53,11 +53,11 @@ export const kbPageDescription = (page: KbPage): string => {
 
 const breadcrumbLinks = (
   items: readonly BreadcrumbItem[],
-  currentUrl: string,
+  currentUrl: string
 ): readonly BreadcrumbLink[] =>
   items.map((item) => ({
     name: item.label,
-    url: item.href ?? currentUrl,
+    url: item.href ?? currentUrl
   }));
 
 export const kbPageSchema = (input: {
@@ -72,7 +72,7 @@ export const kbPageSchema = (input: {
       name: input.page.title,
       description: input.description,
       url: input.page.url,
-      breadcrumbs,
+      breadcrumbs
     });
   }
 
@@ -80,6 +80,6 @@ export const kbPageSchema = (input: {
     name: input.page.title,
     description: input.description,
     url: input.page.url,
-    breadcrumbs,
+    breadcrumbs
   });
 };

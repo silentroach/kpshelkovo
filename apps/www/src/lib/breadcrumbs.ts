@@ -12,18 +12,18 @@ const HOME_URL = withBase('/');
 
 const HOME_BREADCRUMB: BreadcrumbItem = {
   label: HOME_LABEL,
-  href: HOME_URL,
+  href: HOME_URL
 };
 
 const HOME_SCHEMA_BREADCRUMB: BreadcrumbLink = {
   name: HOME_LABEL,
-  url: HOME_URL,
+  url: HOME_URL
 };
 
 export const withHomeBreadcrumbs = (
-  items: readonly BreadcrumbItem[],
+  items: readonly BreadcrumbItem[]
 ): readonly BreadcrumbItem[] => [HOME_BREADCRUMB, ...items];
 
 export const withHomeSchemaBreadcrumbs = (
-  items: readonly BreadcrumbLink[],
+  items: readonly BreadcrumbLink[]
 ): readonly BreadcrumbLink[] => [HOME_SCHEMA_BREADCRUMB, ...items];

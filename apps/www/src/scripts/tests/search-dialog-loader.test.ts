@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const openSearchDialog = vi.hoisted(() => vi.fn());
 
 vi.mock('virtual:search-dialog-assets', () => ({
-  searchDialogGraphUrl: '/SearchDialog.js',
+  searchDialogGraphUrl: '/SearchDialog.js'
 }));
 
 beforeEach(() => {
@@ -21,16 +21,15 @@ describe('search dialog loader', () => {
       .fn()
       .mockRejectedValueOnce(new Error('chunk unavailable'))
       .mockResolvedValueOnce({ openSearchDialog });
-    const { isSearchDialogLoadRetry, loadSearchDialog } =
-      await import('../search-dialog-loader');
+    const { isSearchDialogLoadRetry, loadSearchDialog } = await import('../search-dialog-loader');
 
     await expect(loadSearchDialog(importGraph)).rejects.toThrow();
     await expect(loadSearchDialog(importGraph)).resolves.toEqual({
-      openSearchDialog,
+      openSearchDialog
     });
     expect({
       calls: importGraph.mock.calls,
-      retry: isSearchDialogLoadRetry(),
+      retry: isSearchDialogLoadRetry()
     }).toMatchInlineSnapshot(`
       {
         "calls": [
@@ -57,7 +56,7 @@ describe('search dialog loader', () => {
     await expect(loadSearchDialog(importGraph)).rejects.toThrow();
     await expect(loadSearchDialog(importGraph)).rejects.toThrow();
     await expect(loadSearchDialog(importGraph)).resolves.toEqual({
-      openSearchDialog,
+      openSearchDialog
     });
     expect(importGraph.mock.calls).toMatchInlineSnapshot(`
       [

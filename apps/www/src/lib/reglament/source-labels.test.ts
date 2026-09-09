@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  estimateSourcePdfLabel,
-  formatEstimateSourceRefLabel,
-} from './source-labels';
+import { estimateSourcePdfLabel, formatEstimateSourceRefLabel } from './source-labels';
 
 describe('reglament source labels', () => {
   it('uses human-readable labels for PDF source refs', () => {
@@ -17,10 +14,8 @@ describe('reglament source labels', () => {
       formatEstimateSourceRefLabel({
         pdf: 'lighting',
         page: 3,
-        fragment: 'таблица освещения',
-      }),
-    ).toMatchInlineSnapshot(
-      `"Детализация освещения, стр. 3, таблица освещения"`,
-    );
+        fragment: 'таблица освещения'
+      })
+    ).toMatchInlineSnapshot(`"Детализация освещения, стр. 3, таблица освещения"`);
   });
 });

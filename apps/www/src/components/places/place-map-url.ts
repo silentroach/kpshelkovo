@@ -2,14 +2,13 @@ export const PLACE_HIGHLIGHT_QUERY_PARAM = 'h';
 
 export const getUrlWithoutPlaceHighlight = (
   href: string,
-  expectedSlug?: string,
+  expectedSlug?: string
 ): string | undefined => {
   const url = new URL(href);
 
   if (!url.searchParams.has(PLACE_HIGHLIGHT_QUERY_PARAM)) return;
 
-  const currentSlug =
-    url.searchParams.get(PLACE_HIGHLIGHT_QUERY_PARAM) || undefined;
+  const currentSlug = url.searchParams.get(PLACE_HIGHLIGHT_QUERY_PARAM) || undefined;
 
   if (currentSlug !== expectedSlug) return;
 
@@ -21,10 +20,7 @@ export const getUrlWithoutPlaceHighlight = (
       const encodedName = separator === -1 ? part : part.slice(0, separator);
 
       try {
-        return (
-          decodeURIComponent(encodedName.replaceAll('+', ' ')) !==
-          PLACE_HIGHLIGHT_QUERY_PARAM
-        );
+        return decodeURIComponent(encodedName.replaceAll('+', ' ')) !== PLACE_HIGHLIGHT_QUERY_PARAM;
       } catch {
         return true;
       }

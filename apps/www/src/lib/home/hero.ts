@@ -8,16 +8,13 @@ declare global {
 
 const SHELKOVO_COORDINATES = {
   lat: 55.065422,
-  lng: 37.733096,
+  lng: 37.733096
 } satisfies Coordinates;
 
 export const getHomeHeroMode = (date = new Date()): 'day' | 'night' =>
   isSunlight(date, SHELKOVO_COORDINATES) ? 'day' : 'night';
 
-export const hydrateHomeHero = (
-  root: ParentNode = document,
-  date = new Date(),
-): void => {
+export const hydrateHomeHero = (root: ParentNode = document, date = new Date()): void => {
   const shell = root.querySelector('[data-home-hero-mode]');
   const image = root.querySelector('[data-home-hero-image]');
   if (!(image instanceof HTMLImageElement)) return;
@@ -37,11 +34,8 @@ export const hydrateHomeHero = (
   }
 };
 
-export const installHomeHeroHydration = (
-  options: { readonly now?: () => Date } = {},
-): void => {
-  const hydrate = (): void =>
-    hydrateHomeHero(document, options.now?.() ?? new Date());
+export const installHomeHeroHydration = (options: { readonly now?: () => Date } = {}): void => {
+  const hydrate = (): void => hydrateHomeHero(document, options.now?.() ?? new Date());
 
   if (window.__shelkovoHomeHeroHydration) {
     hydrate();

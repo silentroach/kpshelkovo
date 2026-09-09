@@ -2,8 +2,7 @@ import type { PlaceMarker, PlaceStatus, PlaceWeekday } from './schema';
 
 export type PlaceMapPublicPositionDto = readonly [lng: number, lat: number];
 
-export type PlaceMapPublicPolygonCoordinatesDto =
-  readonly (readonly PlaceMapPublicPositionDto[])[];
+export type PlaceMapPublicPolygonCoordinatesDto = readonly (readonly PlaceMapPublicPositionDto[])[];
 
 export type PlaceMapPublicPolygonGeometryDto =
   | {

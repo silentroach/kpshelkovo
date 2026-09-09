@@ -7,16 +7,13 @@ let kbBreadcrumbs: typeof import('./breadcrumbs').kbBreadcrumbs;
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ kbBreadcrumbs } = await import('./breadcrumbs'));
 });
 
-const page = (input: {
-  readonly title: string;
-  readonly routeSlug?: string;
-}): KbPage => ({
+const page = (input: { readonly title: string; readonly routeSlug?: string }): KbPage => ({
   title: input.title,
   flags: [],
   url: input.routeSlug ? `/kb/${input.routeSlug}/` : '/kb/',
@@ -26,7 +23,7 @@ const page = (input: {
   routeSlug: input.routeSlug,
   isSection: !input.routeSlug,
   body: '',
-  mentions: [],
+  mentions: []
 });
 
 describe('kbBreadcrumbs', () => {
@@ -35,7 +32,7 @@ describe('kbBreadcrumbs', () => {
 
     expect(kbBreadcrumbs(root, [root])).toEqual([
       { label: 'Главная', href: '/' },
-      { label: 'База знаний' },
+      { label: 'База знаний' }
     ]);
   });
 
@@ -43,18 +40,18 @@ describe('kbBreadcrumbs', () => {
     const root = page({ title: 'База знаний' });
     const internet = page({
       title: 'Интернет',
-      routeSlug: 'services/internet',
+      routeSlug: 'services/internet'
     });
     const fiber = page({
       title: 'Оптоволокно',
-      routeSlug: 'services/internet/fiber',
+      routeSlug: 'services/internet/fiber'
     });
 
     expect(kbBreadcrumbs(fiber, [root, internet, fiber])).toEqual([
       { label: 'Главная', href: '/' },
       { label: 'База знаний', href: '/kb/' },
       { label: 'Интернет', href: '/kb/services/internet/' },
-      { label: 'Оптоволокно' },
+      { label: 'Оптоволокно' }
     ]);
   });
 
@@ -62,13 +59,13 @@ describe('kbBreadcrumbs', () => {
     const root = page({ title: 'База знаний' });
     const fiber = page({
       title: 'Оптоволокно',
-      routeSlug: 'services/internet/fiber',
+      routeSlug: 'services/internet/fiber'
     });
 
     expect(kbBreadcrumbs(fiber, [root, fiber])).toEqual([
       { label: 'Главная', href: '/' },
       { label: 'База знаний', href: '/kb/' },
-      { label: 'Оптоволокно' },
+      { label: 'Оптоволокно' }
     ]);
   });
 });
