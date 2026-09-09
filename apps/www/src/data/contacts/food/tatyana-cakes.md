@@ -17,5 +17,7 @@ reviews:
     published_at: '2026-08-01'
     url: 'https://t.me/shelkovoecoclub/15261/51277'
 vcf:
-  enable: false
+  enable: true
+  kind: organization
+  organization: 'Торты Гринвуд'
 ---

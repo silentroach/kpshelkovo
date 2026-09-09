@@ -8,7 +8,7 @@ contacts:
 updated_at: '2026-09-05'
 reviews:
   - sentiment: 'positive'
-    summary: 'Сергея с мини-экскаватором советуют соседям.'
+    summary: 'Выкопал траншеи под воду, электричество и интернет.'
     published_at: '2026-07-01'
     url: 'https://t.me/shelkovoecoclub/15262/49074'
   - sentiment: 'positive'
