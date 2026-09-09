@@ -109,6 +109,12 @@
       "skillPath": "skills/productivity/handoff/SKILL.md",
       "computedHash": "20e5f4afdef502637510bc5c64d27645d3c85c88df9cb006824bbb0980166319"
     },
+    "humanizer-ru": {
+      "source": "ilyautov/humanizer-ru",
+      "sourceType": "github",
+      "skillPath": "skills/humanizer-ru/SKILL.md",
+      "computedHash": "a8827a616f068269d7c21d55ecb7dd0fdf25e41277263a7dac738ad5f920bb21"
+    },
     "idea-refine": {
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
