@@ -12,7 +12,7 @@ reviews:
     published_at: '2026-08-08'
     url: 'https://t.me/shelkovoecoclub/1/51775'
   - sentiment: 'positive'
-    summary: 'Мёд понравился — его рекомендуют и благодарят продавцов.'
+    summary: 'Мёд понравился, его советуют попробовать.'
     published_at: '2026-08-08'
     url: 'https://t.me/shelkovoecoclub/1/51780'
 vcf:

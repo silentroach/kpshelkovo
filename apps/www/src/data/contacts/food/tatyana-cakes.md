@@ -1,5 +1,5 @@
 ---
-title: 'Татьяна — «Торты Гринвуд»'
+title: 'Татьяна, «Торты Гринвуд»'
 slug: 'tatyana-cakes'
 category: 'food'
 summary: 'Классические торты на заказ и готовые торты в Гринвуде'
@@ -9,7 +9,7 @@ contacts:
 updated_at: '2026-09-05'
 reviews:
   - sentiment: 'positive'
-    summary: 'Торт на день рождения дочери понравился оформлением и вкусом без лишней сладости. Общение с Татьяной тоже оставило приятное впечатление.'
+    summary: 'Торт на день рождения дочери понравился и оформлением, и вкусом: не слишком сладкий. С Татьяной было приятно общаться.'
     published_at: '2026-07-19'
     url: 'https://t.me/shelkovoecoclub/15263/50374'
   - sentiment: 'positive'
@@ -17,5 +17,7 @@ reviews:
     published_at: '2026-08-01'
     url: 'https://t.me/shelkovoecoclub/15261/51277'
 vcf:
-  enable: false
+  enable: true
+  kind: organization
+  organization: 'Торты Гринвуд'
 ---
