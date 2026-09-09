@@ -18,7 +18,7 @@ const fixture = vi.hoisted(() => ({
     summary: 'Строительство домов под ключ.',
     contacts: { phone: '89969670018' },
     reviews: [],
-    body: '',
+    body: 'Работает в Шелково и соседних посёлках.',
     mentions: [],
     url: '/sarafan/construction/sergey/',
     markdownUrl: '/sarafan/construction/sergey/index.md',
@@ -42,7 +42,7 @@ const parsePage = (html: string): HTMLElement => {
 };
 
 describe('/sarafan/[category]/[slug]/', () => {
-  it('keeps a blank-body contact searchable without indexing its methods', async () => {
+  it('indexes the summary and body without indexing contact methods', async () => {
     const container = await createAstroContainer();
     const page = parsePage(
       await container.renderToString(ContactPage, {
@@ -53,24 +53,30 @@ describe('/sarafan/[category]/[slug]/', () => {
         request: new Request(fixture.contact.canonical),
       }),
     );
-    const searchBody = page.querySelector('[data-pagefind-body]');
-    if (!searchBody) {
-      throw new Error('contact Pagefind body not found');
+    const searchBodies = page.querySelectorAll('[data-pagefind-body]');
+    if (searchBodies.length === 0) {
+      throw new Error('contact Pagefind bodies not found');
     }
 
     const phoneLink = page.querySelector('a[href^="tel:"]');
+    const searchText = Array.from(
+      searchBodies,
+      ({ textContent }) => textContent,
+    )
+      .join(' ')
+      .trim();
 
     expect({
       phoneInPage: page.textContent.includes('+7 996 967-00-18'),
       phoneHref: phoneLink?.getAttribute('href'),
-      phoneInSearch: searchBody.textContent.includes('+7 996 967-00-18'),
-      searchText: visibleWhitespace(searchBody.textContent.trim()),
+      phoneInSearch: searchText.includes('+7 996 967-00-18'),
+      searchText: visibleWhitespace(searchText),
     }).toMatchInlineSnapshot(`
       {
         "phoneHref": "tel:+79969670018",
         "phoneInPage": true,
         "phoneInSearch": false,
-        "searchText": "Строительство домов под·ключ.",
+        "searchText": "Строительство домов под·ключ. Работает в·Шелково и·соседних посёлках.",
       }
     `);
   });

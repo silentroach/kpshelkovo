@@ -1,5 +1,6 @@
 ---
 import type { GetStaticPaths } from 'astro';
+import { formatDynamicHtml } from '@shelkovo/markdown';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 
 import ContactMethods from '@/components/contacts/ContactMethods.astro';
@@ -51,7 +52,10 @@ const search = {
   section: SEARCH_SECTIONS.sarafan,
   aliases: contact.searchAliases,
 } satisfies SearchDocument;
-const bodyHtml = renderMarkdown(contact.body || contact.summary || description);
+const summaryHtml = contact.summary
+  ? formatDynamicHtml(contact.summary)
+  : undefined;
+const bodyHtml = renderMarkdown(contact.body || description);
 const categoryUrl = contactCategoryUrl({ category: contact.category });
 const reviewsHeadingId = 'contact-reviews';
 const breadcrumbs = withHomeBreadcrumbs([
@@ -95,6 +99,15 @@ const schema = contactPageSchema({
             ) : null
           }
         </div>
+        {
+          summaryHtml ? (
+            <p
+              class="sarafan-contact-summary"
+              data-pagefind-body
+              set:html={summaryHtml}
+            />
+          ) : null
+        }
       </div>
     </header>
 
@@ -147,6 +160,14 @@ const schema = contactPageSchema({
     transform: translateY(0.25rem);
   }
 
+  .sarafan-contact-summary {
+    max-width: 65ch;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+    text-wrap: pretty;
+  }
+
   .sarafan-contact-content {
     padding-inline: 1.25rem;
   }
@@ -175,6 +196,10 @@ const schema = contactPageSchema({
 
     .sarafan-contact-vcf {
       transform: translateY(0.375rem);
+    }
+
+    .sarafan-contact-summary {
+      font-size: 1rem;
     }
 
     .sarafan-contact-content {

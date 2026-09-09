@@ -126,6 +126,10 @@ const queryGroups = [
     name: '#372 KB section role',
     queries: ['интернет', 'оптоволоконный интернет'],
   },
+  {
+    name: 'contact summaries',
+    queries: ['экскаватор'],
+  },
 ] as const;
 
 const rankExpectations: ReadonlyMap<
@@ -187,6 +191,7 @@ const rankExpectations: ReadonlyMap<
   ['буржуйка на карте', { url: '/map/burzhuyka/', maxRank: 2 }],
   ['телефон буржуйки', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
   ['меню буржуйки', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
+  ['экскаватор', { url: '/sarafan/garden/sergey-mini-excavator/', maxRank: 1 }],
   [
     'петровское парк',
     { url: '/815/compare/settlements/petrovskoe-park/', maxRank: 1 },
