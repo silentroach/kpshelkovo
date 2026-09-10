@@ -1,6 +1,9 @@
 ---
 service: electricity
 kind: maintenance
+areas:
+  - park
+  - river
 started_at: 11.09.2026 10:00
 ended_at: 11.09.2026 18:00
 source_url: https://domyland.app/news?targetId=118980&entityName=news&t=okkomfort
