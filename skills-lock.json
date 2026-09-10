@@ -65,7 +65,7 @@
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/documentation-and-adrs/SKILL.md",
-      "computedHash": "1c1b33b3c8ff1d5f9fdcf9d8a7a67f82384b3224e88af567fd4688f3f2d9e85b"
+      "computedHash": "f13054e8bd32a432df3e0e68240758cf61a9e8817aa8540f9d9831f427c47e0e"
     },
     "domain-modeling": {
       "source": "mattpocock/skills",
@@ -77,7 +77,7 @@
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/frontend-ui-engineering/SKILL.md",
-      "computedHash": "917f6cf8c3d694c2b145463799ee492a2b88d7bf22ff479e08111d3ea5501e65"
+      "computedHash": "cb4e981ecb5f701b451fc4e937a38049b49fd4523f213e06cffbd00b007060dc"
     },
     "github-actions-docs": {
       "source": "xixu-me/skills",
@@ -113,7 +113,7 @@
       "source": "ilyautov/humanizer-ru",
       "sourceType": "github",
       "skillPath": "skills/humanizer-ru/SKILL.md",
-      "computedHash": "a8827a616f068269d7c21d55ecb7dd0fdf25e41277263a7dac738ad5f920bb21"
+      "computedHash": "923bae7f9773b1a91846538fe9c86d4c18855b56533c611a42be72795f09abc1"
     },
     "idea-refine": {
       "source": "addyosmani/agent-skills",
@@ -137,13 +137,13 @@
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/incremental-implementation/SKILL.md",
-      "computedHash": "7dbcae84e7a212fc32f7f2de2292967388b6cfa0583d202d5dc081cdd6325caa"
+      "computedHash": "bb1198705f46dc9ff75fb5685a7a872de5924d743b44eb202135f5046750ab7e"
     },
     "nginx-expert": {
       "source": "personamanagmentlayer/pcl",
       "sourceType": "github",
       "skillPath": "stdlib/devops/nginx-expert/SKILL.md",
-      "computedHash": "713e364472c038e3d27dca897d494922c8a9a127b253be068a88d9243ed6cfe1"
+      "computedHash": "2ce6b0ac9230af23ceebcd243ad3bc943ac7d03510b915816e580bc1f0b0235f"
     },
     "performance": {
       "source": "addyosmani/web-quality-skills",
@@ -155,13 +155,13 @@
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/performance-optimization/SKILL.md",
-      "computedHash": "087baf94f788bd6a70ba8ec0aa0246f93808251fe2d24e1fd7a3df81896d2367"
+      "computedHash": "f0a8e3bdb9b7d199434c2a5dd7cbb7d3cf69d802029cde1ef5daa07bffa27efc"
     },
     "planning-and-task-breakdown": {
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/planning-and-task-breakdown/SKILL.md",
-      "computedHash": "b97a434530690e216438fd34361fbdeaff7540bfffd3b0cf89c8247e268e03e1"
+      "computedHash": "0dc14a1402cdabd376f2d81d2225fcb4a18ee63d58b945ff83affeb024285b8f"
     },
     "ponytail": {
       "source": "dietrichgebert/ponytail",
@@ -221,7 +221,7 @@
       "source": "addyosmani/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/security-and-hardening/SKILL.md",
-      "computedHash": "911bd75218fcde93e50586fe5449c370370f5e983ec0ba2181c30b3056cafac3"
+      "computedHash": "c2556c7890d2509981d6613c8f51a9371d1415b805d802912339e0b4e530fe3c"
     },
     "seo": {
       "source": "addyosmani/web-quality-skills",
@@ -239,7 +239,7 @@
       "source": "sveltejs/ai-tools",
       "sourceType": "github",
       "skillPath": "plugins/claude/svelte/skills/svelte-code-writer/SKILL.md",
-      "computedHash": "c0e2cce9855f8e312cbb0a05aef164b4659c672d7723e4e598ffa6bc94890542"
+      "computedHash": "6f78193a79906175595ce8e4ca8d726da350eb99035a9544b6553620df5673a1"
     },
     "tdd": {
       "source": "mattpocock/skills",
@@ -281,7 +281,7 @@
       "source": "vercel/turborepo",
       "sourceType": "github",
       "skillPath": "skills/turborepo/SKILL.md",
-      "computedHash": "b7c3165ae67a2892d6195a5b2cba15c8d96341f5c64ddd0d3ce4225c94a2ae83"
+      "computedHash": "3242b13be3801d1149d9de32cf99852d9673de5678a23acc89a3b6a6e444dda8"
     },
     "wait-what": {
       "source": "mattpocock/skills",
@@ -305,7 +305,7 @@
       "source": "wondelai/skills",
       "sourceType": "github",
       "skillPath": "web-typography/SKILL.md",
-      "computedHash": "d2506ee77b7cf3ed5a048af45f153c249d9146481d6c571ab629689249923549"
+      "computedHash": "c17dc754c870e6de1bed62c972291f56c5b7752b921c2273886a6f6380d16596"
     },
     "wizard": {
       "source": "mattpocock/skills",
