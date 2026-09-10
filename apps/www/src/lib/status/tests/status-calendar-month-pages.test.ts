@@ -371,7 +371,7 @@ describe('/status/calendar/YYYY/MM/', () => {
           "historyLinkCount": 0,
           "markdownAlternate": "https://kpshelkovo.online/status/calendar/2026/08/index.md",
           "pagefindRoot": undefined,
-          "robots": undefined,
+          "robots": "noindex, follow",
           "statusBreadcrumbHref": "/status/",
           "yearBreadcrumbHref": "/status/calendar/2026/",
         },

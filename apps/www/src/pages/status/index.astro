@@ -9,6 +9,7 @@ import {
   withHomeSchemaBreadcrumbs,
 } from '@/lib/breadcrumbs';
 import { collectionPageSchema } from '@/lib/json-ld';
+import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import { isActiveOrScheduledMaintenance } from '@/lib/status/lifecycle';
 import { loadStatusData } from '@/lib/status/load';
 import {
@@ -58,6 +59,12 @@ const schema = collectionPageSchema({
   canonical={statusUrl()}
   keywords={keywords}
   schema={schema}
+  search={{
+    scope: 'manual',
+    title: 'Статус сервисов',
+    description,
+    section: SEARCH_SECTIONS.status,
+  }}
 >
   <main class="ui-page status-page">
     <section class="ui-page-header">
@@ -66,7 +73,7 @@ const schema = collectionPageSchema({
 
         <div class="status-header__copy" data-status-page-header-copy>
           <div class="status-title-row">
-            <h1 class="ui-page-title">Статус КП Шелково</h1>
+            <h1 class="ui-page-title" data-pagefind-body>Статус КП Шелково</h1>
 
             <span class="status-calendar-entry">
               <a
@@ -81,7 +88,7 @@ const schema = collectionPageSchema({
             </span>
           </div>
 
-          <p class="status-intro">
+          <p class="status-intro" data-pagefind-body>
             Журнал отключений и ограничений в КП Шелково: электричество, вода,
             интернет и проезд через дамбу. Фиксируем время, зону, источник и ход
             восстановления.
