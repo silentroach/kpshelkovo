@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+
 import { chromium, expect as expectPage, type Browser, type Locator } from '@playwright/test';
 import { preview, type PreviewServer } from 'vite';
 import { afterAll, beforeAll, expect, test } from 'vitest';
@@ -540,4 +542,3 @@ for (const group of queryGroups) {
     expect(matrix).toMatchSnapshot();
   });
 }
-import { readFile } from 'node:fs/promises';
