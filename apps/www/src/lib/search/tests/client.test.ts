@@ -335,7 +335,7 @@ describe('Pagefind search client', () => {
     });
   });
 
-  it('softly reranks loaded news, incidents, and meetings by age', async () => {
+  it('reranks news and meetings by age without penalizing long-running status events', async () => {
     const result = (
       id: string,
       score: number,
@@ -360,7 +360,7 @@ describe('Pagefind search client', () => {
         result('old-exact-news', 12, 'Старая точная новость', 'news', '2025-08-15'),
         result('old-close-news', 11.4, 'Старая близкая новость', 'news', '2025-08-15'),
         result('fresh-news', 10, 'Свежая новость', 'news', '2026-08-01'),
-        result('old-incident', 10, 'Старый инцидент', 'status', '2025-08-15'),
+        result('long-running-incident', 10, 'Длительный инцидент', 'status', '2025-08-15'),
         result('fresh-incident', 4, 'Свежий инцидент', 'status', '2026-08-01'),
         result('old-meeting', 10, 'Старая встреча', 'meetings', '2022-08-14'),
         result('fresh-meeting', 6, 'Свежая встреча', 'meetings', '2026-02-21')
@@ -380,10 +380,10 @@ describe('Pagefind search client', () => {
         "Старая точная новость",
         "Свежая новость",
         "Старая близкая новость",
+        "Длительный инцидент",
         "Свежая встреча",
         "Старая встреча",
         "Свежий инцидент",
-        "Старый инцидент",
       ]
     `);
   });

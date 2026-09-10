@@ -1,8 +1,11 @@
+import { readFile } from 'node:fs/promises';
+
 import { chromium, expect as expectPage, type Browser, type Locator } from '@playwright/test';
 import { preview, type PreviewServer } from 'vite';
 import { afterAll, beforeAll, expect, test } from 'vitest';
 
 import { SEARCH_HIGHLIGHT_CLASS, SEARCH_HIGHLIGHT_PARAM } from '../src/lib/search/highlight';
+import type { StatusPublicPayloadDto } from '../src/lib/status/public-dto';
 
 const port = 4330;
 const baseURL = `http://127.0.0.1:${String(port)}`;
@@ -118,6 +121,26 @@ const queryGroups = [
   {
     name: 'contact summaries',
     queries: ['экскаватор']
+  },
+  {
+    name: 'status services and recent events',
+    queries: [
+      'статус',
+      'электричество',
+      'нет света',
+      'отключение электричества',
+      'вода',
+      'нет воды',
+      'интернет',
+      'не работает интернет',
+      'дамба',
+      'проезд через дамбу',
+      'плановые работы',
+      'линия 10 кВ',
+      'слабый напор воды',
+      'оптоволоконный интернет',
+      'анализ воды форест'
+    ]
   }
 ] as const;
 
@@ -141,7 +164,7 @@ const rankExpectations: ReadonlyMap<string, { readonly url: string; readonly max
     ['тсн', { url: '/kb/tsn/manipulations/', maxRank: 1 }],
     ['суд', { url: '/kb/court/order-debt/', maxRank: 1 }],
     ['газ', { url: '/kb/services/gas/', maxRank: 1 }],
-    ['интернет', { url: '/kb/services/internet/fiber/', maxRank: 4 }],
+    ['интернет', { url: '/status/internet/', maxRank: 1 }],
     ['оптоволоконный интернет', { url: '/kb/services/internet/fiber/', maxRank: 1 }],
     ['титаник', { url: '/map/titanic/', maxRank: 1 }],
     ['детская площадка титаник', { url: '/map/titanic/', maxRank: 1 }],
@@ -166,6 +189,20 @@ const rankExpectations: ReadonlyMap<string, { readonly url: string; readonly max
   ]);
 
 const emptyQueryExpectations = new Set(['медицина', 'м', 'в']);
+
+const statusTargets: ReadonlyMap<string, string> = new Map([
+  ['статус', '/status/'],
+  ['электричество', '/status/electricity/'],
+  ['нет света', '/status/electricity/'],
+  ['отключение электричества', '/status/electricity/'],
+  ['вода', '/status/water/'],
+  ['нет воды', '/status/water/'],
+  ['слабый напор воды', '/status/water/'],
+  ['интернет', '/status/internet/'],
+  ['не работает интернет', '/status/internet/'],
+  ['дамба', '/status/dam/'],
+  ['проезд через дамбу', '/status/dam/']
+]);
 
 let browser: Browser;
 let dialog: Locator;
@@ -343,7 +380,7 @@ test('#154 search result highlighting', async () => {
   await page.close();
 });
 
-test('#321 status calendars and #372 KB sections stay outside Pagefind', async () => {
+test('status indexing policy and #372 KB sections in the production corpus', async () => {
   const page = await browser.newPage({
     viewport: { width: 1280, height: 800 }
   });
@@ -370,6 +407,34 @@ test('#321 status calendars and #372 KB sections stay outside Pagefind', async (
 
     expect(urls.length).toBeGreaterThan(0);
     expect(urls.filter((url) => url.startsWith('/status/calendar/'))).toEqual([]);
+    expect(urls).not.toContain('/status/history/');
+    expect(urls).toEqual(expect.arrayContaining([...new Set(statusTargets.values())]));
+
+    const data = (await (
+      await page.request.get(`${baseURL}/status/data/status.json`)
+    ).json()) as StatusPublicPayloadDto;
+    const sitemap = await (await page.request.get(`${baseURL}/sitemap-0.xml`)).text();
+    const indexNowUrls = JSON.parse(
+      await readFile(new URL('../dist/indexnow-urls.json', import.meta.url), 'utf8')
+    ) as readonly string[];
+    const indexNowStatusPaths = indexNowUrls
+      .map((url) => new URL(url).pathname)
+      .filter((path) => path.startsWith('/status/'));
+
+    expect(indexNowStatusPaths.sort()).toEqual([...new Set(statusTargets.values())].sort());
+    expect(sitemap).not.toMatch(/\/status\/(?:incidents|calendar|history)\//u);
+
+    for (const event of data.incidents) {
+      if (!event.html_url) continue;
+      const path = new URL(event.html_url).pathname;
+      const html = await (await page.request.get(`${baseURL}${path}`)).text();
+
+      expect(html, path).toContain('<meta name="robots" content="noindex, follow">');
+      expect(
+        urls.includes(path),
+        `${path}: Pagefind must honor build opt-in even with noindex`
+      ).toBe(html.includes('data-pagefind-root'));
+    }
     expect(urls).toContain('/kb/services/internet/fiber/');
     expect(urls).not.toContain('/kb/services/internet/');
     expect(urls).not.toContain('/kb/sos/');
@@ -406,14 +471,25 @@ for (const group of queryGroups) {
         ).not.toEqual(expect.arrayContaining([expect.stringMatching(/^(?:едва|един)/iu)]));
       }
 
+      const statusTarget = statusTargets.get(query);
+      if (statusTarget) {
+        const rank = snapshot.results.findIndex((result) => result.url === statusTarget);
+        // The broad dam query also covers construction news; access intent is checked separately.
+        const maxRank = query === 'дамба' ? 4 : 3;
+        expect.soft(rank, `${query}: expected ${statusTarget}`).toBeGreaterThanOrEqual(0);
+        expect
+          .soft(rank + 1, `${query}: service page must be near the top`)
+          .toBeLessThanOrEqual(maxRank);
+      }
+
       const expectation = rankExpectations.get(query);
       if (expectation) {
         const rank = snapshot.results.findIndex(
           (result) => result.url === expectation.url || result.url.startsWith(`${expectation.url}#`)
         );
 
-        expect(rank, `${query}: expected ${expectation.url}`).toBeGreaterThanOrEqual(0);
-        expect(rank + 1, `${query}: expected rank`).toBeLessThanOrEqual(expectation.maxRank);
+        expect.soft(rank, `${query}: expected ${expectation.url}`).toBeGreaterThanOrEqual(0);
+        expect.soft(rank + 1, `${query}: expected rank`).toBeLessThanOrEqual(expectation.maxRank);
       }
 
       if (query === 'буржуйка' || query === 'адрес буржуйки' || query === 'время работы буржуйки') {

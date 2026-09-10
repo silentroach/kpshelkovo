@@ -6,6 +6,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { loadStatusData } from '@/lib/status/load';
 import { statusCalendarYearUrl, statusHistoryUrl } from '@/lib/status/routes';
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
+import StatusServicePage from '@/pages/status/[service]/index.astro';
+// @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import StatusHistoryPage from '@/pages/status/history/index.astro';
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import StatusIncidentPage from '@/pages/status/incidents/[year]/[month]/[entry]/index.astro';
@@ -28,6 +30,11 @@ const fixtures = vi.hoisted(() => {
       started: {
         at: new Date(`2026-08-${String(number).padStart(2, '0')}T09:00:00Z`),
         iso: `2026-08-${String(number).padStart(2, '0')}T12:00:00+03:00`,
+        hasTime: true
+      },
+      ended: {
+        at: new Date(`2026-08-${String(number).padStart(2, '0')}T10:00:00Z`),
+        iso: `2026-08-${String(number).padStart(2, '0')}T13:00:00+03:00`,
         hasTime: true
       },
       phase: 'resolved',
@@ -102,6 +109,7 @@ const fixtures = vi.hoisted(() => {
 
 vi.mock('@/lib/status/load', () => ({
   loadStatusData: async () => fixtures.data,
+  loadStatusService: async () => fixtures.data.services[0],
   loadStatusIncidentDetail: async (id: string) =>
     fixtures.data.incidents.find((incident) => incident.id === id)
 }));
@@ -156,6 +164,28 @@ const expectItemListMatchesHistory = (
 };
 
 describe('/status/', () => {
+  it.each([
+    { page: StatusPage, path: '/status/', params: {} },
+    { page: StatusServicePage, path: '/status/electricity/', params: { service: 'electricity' } }
+  ])('indexes $path without its visible history', async ({ page, path, params }) => {
+    const container = await createAstroContainer();
+    const document = parseHtml(
+      await container.renderToString(page, {
+        params,
+        request: new Request(`https://kpshelkovo.online${path}`)
+      })
+    );
+    const indexedText = [...document.querySelectorAll('[data-pagefind-body]')]
+      .map((element) => element.textContent)
+      .join(' ');
+
+    expect(Boolean(document.querySelector('[data-pagefind-root]'))).toBe(true);
+    expect(document.querySelector('meta[name="robots"]')?.getAttribute('content')).toBeUndefined();
+    expect(indexedText).toContain('Шелково');
+    expect(indexedText).not.toContain('Тестовая запись');
+    expect(document.querySelector('main')?.textContent).toContain('Тестовая запись');
+  });
+
   it('keeps the service overview heading outline sequential', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(StatusPage);
@@ -260,6 +290,10 @@ describe('/status/history/', () => {
     const html = await container.renderToString(StatusHistoryPage);
     const document = parseHtml(html);
 
+    expect(document.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe(
+      'noindex, follow'
+    );
+    expect(Boolean(document.querySelector('[data-pagefind-root]'))).toBe(false);
     expect(document.querySelectorAll('[data-status-history] article')).toHaveLength(
       data.incidents.length
     );
@@ -287,6 +321,40 @@ describe('/status/history/', () => {
 });
 
 describe('/status/incidents/[year]/[month]/[entry]/', () => {
+  it.each([
+    ['2026-07-01T00:00:00Z', true],
+    ['2026-08-02T09:30:00Z', true],
+    ['2026-09-01T10:00:00Z', true],
+    ['2026-09-01T10:00:00.001Z', false]
+  ] as const)(
+    'keeps external noindex while choosing the internal corpus at %s',
+    async (now, included) => {
+      vi.useFakeTimers();
+      vi.setSystemTime(now);
+
+      try {
+        const container = await createAstroContainer();
+        const path = '/status/incidents/2026/08/incident-2/';
+        const document = parseHtml(
+          await container.renderToString(StatusIncidentPage, {
+            params: { year: '2026', month: '08', entry: 'incident-2' },
+            request: new Request(`https://kpshelkovo.online${path}`)
+          })
+        );
+
+        expect(document.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe(
+          'noindex, follow'
+        );
+        expect(document.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(
+          `https://kpshelkovo.online${path}`
+        );
+        expect(Boolean(document.querySelector('[data-pagefind-root]'))).toBe(included);
+      } finally {
+        vi.useRealTimers();
+      }
+    }
+  );
+
   it('adds the incident date to the document title only', async () => {
     const incident = fixtures.data.incidents.find((item) => item.hasPage);
     if (!incident?.hasPage) {

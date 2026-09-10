@@ -15,6 +15,7 @@ import {
   loadStatusIncidentDetails,
 } from '@/lib/status/load';
 import { statusUrl } from '@/lib/status/routes';
+import { isStatusIncidentSearchable } from '@/lib/status/search';
 import { techArticleSchema } from '@/lib/news/seo';
 import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
@@ -57,7 +58,7 @@ const fallbackDescription =
 const description = incident.seo?.description ?? fallbackDescription;
 const search = {
   scope: 'page',
-  title: incident.title,
+  title: `${incident.title}, ${formatDate(incident.started.iso)}`,
   description,
   section: SEARCH_SECTIONS.status,
   publishedAt: incident.started.iso.slice(0, 10),
@@ -83,10 +84,11 @@ const schema = techArticleSchema({
   title={title}
   description={description}
   canonical={incident.url}
+  robots="noindex, follow"
   type="article"
   keywords={['статус Шелково', incident.title, 'инцидент Шелково']}
   schema={schema}
-  search={search}
+  search={isStatusIncidentSearchable(incident) ? search : undefined}
 >
   <main class="ui-page status-incident-page">
     <header class="ui-page-header">

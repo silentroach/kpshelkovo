@@ -1,5 +1,3 @@
-import { statusIncidentUrl } from '@/lib/status/routes';
-
 import { buildSitemapMetadataIndex, type SitemapMetadataIndex } from './sitemap';
 
 const SITEMAP_METADATA = Symbol.for('kpshelkovo.sitemap-metadata');
@@ -26,14 +24,11 @@ const buildSitemapMetadataIndexFromDomainData = async (): Promise<SitemapMetadat
       tags: article.tags
     })),
     statusIncidents: statusIncidents.map((incident) => ({
-      url: statusIncidentUrl(incident),
       service: incident.service,
-      kind: incident.kind,
       startedIso: sitemapDateIso(incident.started.iso, incident.started.hasTime),
       endedIso: incident.ended
         ? sitemapDateIso(incident.ended.iso, incident.ended.hasTime)
-        : undefined,
-      hasPage: incident.hasPage
+        : undefined
     })),
     settlements: compare.settlements,
     meetings: meetings.map((meeting) => ({

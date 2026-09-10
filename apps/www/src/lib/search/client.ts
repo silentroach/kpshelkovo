@@ -204,8 +204,6 @@ const recencyFactor = (result: SearchResult, now: Date): number => {
   switch (result.section.id) {
     case 'news':
       return newsRecencyFactor(elapsedCalendarMonths(date, now));
-    case 'status':
-      return Math.max(0.35, 0.9 ** elapsedCalendarMonths(date, now));
     case 'meetings':
       return Math.max(0.5, 0.8 ** elapsedFullYears(date, now));
     default:
