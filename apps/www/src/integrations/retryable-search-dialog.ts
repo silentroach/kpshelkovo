@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { build, type Plugin } from 'vite';
 
+import { minifyStandaloneGraph } from './minify-standalone-graph';
 import { PAGEFIND_DEV_SNAPSHOT_AVAILABLE_DEFINE } from './pagefind-dev-snapshot';
 import type {
   SearchDialogGraphBuilder,
@@ -112,7 +113,7 @@ const buildSearchDialogGraph: SearchDialogGraphBuilder = async (environment): Pr
   }
 
   // SearchDialog's scoped CSS is already emitted from its SSR shell.
-  return chunk.code;
+  return minifyStandaloneGraph(chunk.fileName, chunk.code);
 };
 
 const retryableSearchDialogBuildPlugin = (): Plugin => {

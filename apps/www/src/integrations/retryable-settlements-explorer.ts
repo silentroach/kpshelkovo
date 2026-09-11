@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { build, type Plugin } from 'vite';
 
+import { minifyStandaloneGraph } from './minify-standalone-graph';
+
 const assetsModuleId = 'virtual:settlements-explorer-assets';
 const resolvedAssetsModuleId = `\0${assetsModuleId}`;
 const appRoot = fileURLToPath(new URL('../..', import.meta.url));
@@ -78,7 +80,7 @@ const buildExplorerGraph = async (): Promise<string> => {
   }
 
   // Astro emits the same component tree's scoped CSS from the SSR page build.
-  return chunk.code;
+  return minifyStandaloneGraph(chunk.fileName, chunk.code);
 };
 
 const retryableExplorerBuildPlugin = (): Plugin => {
