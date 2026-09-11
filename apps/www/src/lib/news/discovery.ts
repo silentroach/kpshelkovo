@@ -138,56 +138,15 @@ const list = (
   ...(extra ?? {})
 });
 
-const obj = (
-  properties: Record<string, unknown>,
-  required: readonly string[]
+// Check every DTO key (including optional ones) and its required/optional status.
+const obj = <T extends object>(
+  properties: Record<keyof T, Record<string, unknown>>,
+  required: RequiredProperties<T>
 ): Record<string, unknown> => ({
   type: 'object',
   additionalProperties: false,
   properties,
-  required
-});
-
-const requiredKeys = <T extends object>(properties: RequiredProperties<T>): readonly string[] =>
-  Object.keys(properties);
-
-const eventParticipantProperties = {
-  name: text(1),
-  type: {
-    enum: ['organization', 'person']
-  }
-} satisfies Record<keyof NewsDiscoveryEventOrganizer, Record<string, unknown>>;
-
-const eventParticipantRequired = requiredKeys<NewsDiscoveryEventOrganizer>({
-  name: true,
-  type: true
-});
-
-const eventProperties = {
-  slug: text(1),
-  title: text(1),
-  description: text(1),
-  starts_at: dateTime(),
-  ends_at: dateTime(),
-  location: text(1),
-  coordinates: {
-    $ref: '#/$defs/coordinates'
-  },
-  map_url: uri(),
-  ics_url: uri(),
-  organizer: {
-    $ref: '#/$defs/eventParticipant'
-  },
-  performer: list({
-    $ref: '#/$defs/eventParticipant'
-  })
-} satisfies Record<keyof NewsDiscoveryEvent, Record<string, unknown>>;
-
-const eventRequired = requiredKeys<NewsDiscoveryEvent>({
-  slug: true,
-  title: true,
-  starts_at: true,
-  ics_url: true
+  required: Object.keys(required)
 });
 
 function rewriteSchemaRefs(value: unknown, schemaRef: string): unknown {
@@ -222,41 +181,41 @@ export function schema(root: string): Record<string, unknown> {
     title: 'NewsArticlesPayload',
     description:
       'Полная лента новостей только для чтения: метаданные ленты, канонический HTML URL, Markdown-версии, полный body_markdown и необязательные метаданные событий с ics_url внутри статьи.',
-    type: 'object',
-    additionalProperties: false,
-    required: [
-      'schema_version',
-      'generated_at',
-      'updated_at',
-      'total_count',
-      'articles',
-      'archives',
-      'tags'
-    ],
-    properties: {
-      schema_version: {
-        const: NEWS_PAYLOAD_SCHEMA_VERSION
-      },
-      generated_at: dateTime(),
-      updated_at: dateTime(),
-      total_count: integer(0),
-      articles: list({
-        $ref: '#/$defs/article'
-      }),
-      archives: obj(
-        {
-          years: list({
-            $ref: '#/$defs/archiveYear'
-          })
+    ...obj<NewsDiscoveryPayload>(
+      {
+        schema_version: {
+          const: NEWS_PAYLOAD_SCHEMA_VERSION
         },
-        ['years']
-      ),
-      tags: list({
-        $ref: '#/$defs/tagPage'
-      })
-    },
+        generated_at: dateTime(),
+        updated_at: dateTime(),
+        total_count: integer(0),
+        articles: list({
+          $ref: '#/$defs/article'
+        }),
+        archives: obj<NewsDiscoveryPayload['archives']>(
+          {
+            years: list({
+              $ref: '#/$defs/archiveYear'
+            })
+          },
+          { years: true }
+        ),
+        tags: list({
+          $ref: '#/$defs/tagPage'
+        })
+      },
+      {
+        schema_version: true,
+        generated_at: true,
+        updated_at: true,
+        total_count: true,
+        articles: true,
+        archives: true,
+        tags: true
+      }
+    ),
     $defs: {
-      author: obj(
+      author: obj<NewsDiscoveryAuthor>(
         {
           id: text(1),
           name: text(1),
@@ -265,17 +224,17 @@ export function schema(root: string): Record<string, unknown> {
           },
           url: uri()
         },
-        ['id', 'name', 'kind']
+        { id: true, name: true, kind: true }
       ),
-      tag: obj(
+      tag: obj<NewsDiscoveryTag>(
         {
           label: text(1),
           key: text(1),
           url: uri()
         },
-        ['label', 'key', 'url']
+        { label: true, key: true, url: true }
       ),
-      tagPage: obj(
+      tagPage: obj<NewsDiscoveryTagPage>(
         {
           label: text(1),
           key: text(1),
@@ -283,9 +242,9 @@ export function schema(root: string): Record<string, unknown> {
           url: uri(),
           markdown_url: uri()
         },
-        ['label', 'key', 'count', 'url', 'markdown_url']
+        { label: true, key: true, count: true, url: true, markdown_url: true }
       ),
-      photo: obj(
+      photo: obj<NewsDiscoveryPhoto>(
         {
           url: uri(),
           width: integer(1),
@@ -293,36 +252,65 @@ export function schema(root: string): Record<string, unknown> {
           alt: text(1),
           caption: text(1)
         },
-        ['url', 'width', 'height', 'alt']
+        { url: true, width: true, height: true, alt: true }
       ),
-      attachment: obj(
+      attachment: obj<NewsDiscoveryAttachment>(
         {
           title: text(1),
           url: uri(),
           type: text(1),
           size: text(1)
         },
-        ['title', 'url']
+        { title: true, url: true }
       ),
-      cover: obj(
+      cover: obj<NewsDiscoveryCover>(
         {
           url: uri(),
           alt: text(1),
           width: integer(1),
           height: integer(1)
         },
-        ['url', 'alt', 'width', 'height']
+        { url: true, alt: true, width: true, height: true }
       ),
-      coordinates: obj(
+      coordinates: obj<NonNullable<NewsDiscoveryEvent['coordinates']>>(
         {
           lat: numeric(-90, 90),
           lng: numeric(-180, 180)
         },
-        ['lat', 'lng']
+        { lat: true, lng: true }
       ),
-      eventParticipant: obj(eventParticipantProperties, eventParticipantRequired),
-      event: obj(eventProperties, eventRequired),
-      article: obj(
+      eventParticipant: obj<NewsDiscoveryEventOrganizer>(
+        {
+          name: text(1),
+          type: {
+            enum: ['organization', 'person']
+          }
+        },
+        { name: true, type: true }
+      ),
+      event: obj<NewsDiscoveryEvent>(
+        {
+          slug: text(1),
+          title: text(1),
+          description: text(1),
+          starts_at: dateTime(),
+          ends_at: dateTime(),
+          location: text(1),
+          coordinates: {
+            $ref: '#/$defs/coordinates'
+          },
+          map_url: uri(),
+          ics_url: uri(),
+          organizer: {
+            $ref: '#/$defs/eventParticipant'
+          },
+          performer: list({
+            $ref: '#/$defs/eventParticipant'
+          })
+        },
+        { slug: true, title: true, starts_at: true, ics_url: true }
+      ),
+      article: obj<NewsDiscoveryArticle>(
         {
           id: {
             type: 'string',
@@ -373,27 +361,27 @@ export function schema(root: string): Record<string, unknown> {
           }),
           body_markdown: text()
         },
-        [
-          'id',
-          'title',
-          'summary',
-          'published_at',
-          'year',
-          'month',
-          'day',
-          'entry',
-          'html_url',
-          'markdown_url',
-          'pinned',
-          'author',
-          'areas',
-          'tags',
-          'photos',
-          'attachments',
-          'body_markdown'
-        ]
+        {
+          id: true,
+          title: true,
+          summary: true,
+          published_at: true,
+          year: true,
+          month: true,
+          day: true,
+          entry: true,
+          html_url: true,
+          markdown_url: true,
+          pinned: true,
+          author: true,
+          areas: true,
+          tags: true,
+          photos: true,
+          attachments: true,
+          body_markdown: true
+        }
       ),
-      archiveMonth: obj(
+      archiveMonth: obj<NewsDiscoveryArchiveMonth>(
         {
           year: integer(2000, 2999),
           month: integer(1, 12),
@@ -401,9 +389,9 @@ export function schema(root: string): Record<string, unknown> {
           url: uri(),
           markdown_url: uri()
         },
-        ['year', 'month', 'count', 'url', 'markdown_url']
+        { year: true, month: true, count: true, url: true, markdown_url: true }
       ),
-      archiveYear: obj(
+      archiveYear: obj<NewsDiscoveryArchiveYear>(
         {
           year: integer(2000, 2999),
           count: integer(0),
@@ -413,7 +401,7 @@ export function schema(root: string): Record<string, unknown> {
             $ref: '#/$defs/archiveMonth'
           })
         },
-        ['year', 'count', 'url', 'markdown_url', 'months']
+        { year: true, count: true, url: true, markdown_url: true, months: true }
       )
     }
   };
