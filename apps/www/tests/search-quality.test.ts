@@ -7,7 +7,7 @@ import { afterAll, beforeAll, expect, test } from 'vitest';
 import { SEARCH_HIGHLIGHT_CLASS, SEARCH_HIGHLIGHT_PARAM } from '../src/lib/search/highlight';
 import type { StatusPublicPayloadDto } from '../src/lib/status/public-dto';
 
-const port = 4330;
+const port = Number(process.env.SEARCH_QUALITY_PORT ?? 4330);
 const baseURL = `http://127.0.0.1:${String(port)}`;
 const queryGroups = [
   {
@@ -378,6 +378,56 @@ test('#154 search result highlighting', async () => {
   await expectPage(page).toHaveURL(target.href);
   await expectPage(page.locator(`mark.${SEARCH_HIGHLIGHT_CLASS}`).first()).toBeVisible();
   await page.close();
+});
+
+test('#355 preserves results and pagination across ClientRouter navigations', async () => {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  try {
+    await page.clock.setFixedTime('2026-08-16T12:00:00Z');
+    await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => {
+      let swaps = 0;
+      document.addEventListener('astro:after-swap', () => {
+        document.documentElement.dataset.searchSwaps = String(++swaps);
+      });
+    });
+    const searchDialog = page.locator('[data-search-dialog]');
+    const searchInput = searchDialog.getByRole('searchbox');
+    const links = searchDialog.locator('[data-search-result]');
+    const initial = new Map<string, Awaited<ReturnType<typeof resultSnapshot>>>();
+
+    for (const [index, query] of ['тариф', 'тариф', 'суд', 'газ', 'тариф'].entries()) {
+      await page.locator('[data-search-trigger]').first().click();
+      await searchInput.fill(query);
+      await expectPage(searchDialog).toHaveAttribute('data-search-state', 'results');
+      await expectPage(links).toHaveCount(8);
+      const results = await resultSnapshot(searchDialog);
+      if (initial.has(query)) expect(results).toEqual(initial.get(query));
+      else initial.set(query, results);
+
+      if (query === 'тариф') {
+        await links.last().scrollIntoViewIfNeeded();
+        await expectPage(links).toHaveCount(16);
+        const urls = await links.evaluateAll((elements) =>
+          elements.map((element) => element.getAttribute('href'))
+        );
+        expect(new Set(urls).size).toBe(16);
+      }
+
+      await searchInput.press('Escape');
+      await page
+        .locator(index % 2 === 0 ? 'header a[href="/news/"]' : 'header a[href="/"]')
+        .first()
+        .click();
+      await expectPage(page.locator('html')).toHaveAttribute(
+        'data-search-swaps',
+        String(index + 1)
+      );
+      await expectPage(searchDialog).not.toBeVisible();
+    }
+  } finally {
+    await page.close();
+  }
 });
 
 test('status indexing policy and #372 KB sections in the production corpus', async () => {

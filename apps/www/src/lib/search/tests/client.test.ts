@@ -40,7 +40,7 @@ const runtimeWith = (response: PagefindSearchResponse) => {
   const init = vi.fn(async () => {});
   const options = vi.fn(async () => {});
   const preload = vi.fn(async () => {});
-  const search = vi.fn(async () => response);
+  const search = vi.fn<PagefindRuntime['search']>(async () => response);
   const runtime: PagefindRuntime = { init, options, preload, search };
 
   return { init, options, preload, runtime, search };
@@ -191,6 +191,128 @@ describe('Pagefind search client', () => {
     await client.init?.();
     await client.preload?.('тариф');
     expect(loadPagefind).not.toHaveBeenCalled();
+  });
+
+  it('retains only the latest exact query through a series of successful searches', async () => {
+    const { runtime, search } = runtimeWith(responseWith(validResult(1)));
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => runtime
+    });
+    const queries = Array.from({ length: 32 }, (_, index) => `запрос${index}`);
+
+    for (const query of queries) {
+      await client.search(query);
+    }
+    await client.search('запрос31', 16);
+    expect(search.mock.calls.filter(([query]) => query === '"запрос31"')).toHaveLength(1);
+
+    for (const query of queries.slice(0, -1)) {
+      await client.search(query);
+      expect(search.mock.calls.filter(([value]) => value === `"${query}"`)).toHaveLength(2);
+    }
+  });
+
+  it.each(['другой', 'два слова', '', 'м'])(
+    'drops the previous exact response when the effective query changes to %j',
+    async (nextQuery) => {
+      const { runtime, search } = runtimeWith(responseWith(validResult(1)));
+      const client = createPagefindSearchClient({
+        available: true,
+        loadPagefind: async () => runtime
+      });
+
+      await client.search('еда');
+      await client.search(nextQuery);
+      await client.search('еда');
+
+      expect(search.mock.calls.filter(([query]) => query === '"еда"')).toHaveLength(2);
+    }
+  );
+
+  it('shares an in-flight exact response with a larger request for the same query', async () => {
+    const pending = Promise.withResolvers<PagefindSearchResponse>();
+    const tracked = trackedResponseWith(validResult(1), validResult(2));
+    const { runtime, search } = runtimeWith(tracked.response);
+    search
+      .mockImplementationOnce(async () => tracked.response)
+      .mockImplementationOnce(() => pending.promise);
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => runtime
+    });
+
+    const initial = client.search('еда', 1);
+    await vi.waitFor(() => expect(search).toHaveBeenCalledTimes(2));
+    const expanded = client.search('  еда  ', 2);
+    await vi.waitFor(() => expect(search).toHaveBeenCalledTimes(3));
+    pending.resolve(tracked.response);
+
+    await expect(initial).resolves.toBeUndefined();
+    await expect(expanded).resolves.toMatchObject({ state: 'ready', results: { length: 2 } });
+    expect(dataCallCount(tracked.data)).toBe(2);
+  });
+
+  it('retries a rejected exact search without reinitializing the runtime', async () => {
+    const { runtime, search, init } = runtimeWith(responseWith(validResult(1)));
+    search.mockResolvedValueOnce(responseWith()).mockRejectedValueOnce(new Error('exact failed'));
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => runtime
+    });
+
+    await expect(client.search('еда')).rejects.toThrow('exact failed');
+    await expect(client.search('еда')).resolves.toMatchObject({ state: 'ready', total: 1 });
+    expect(search.mock.calls.filter(([query]) => query === '"еда"')).toHaveLength(2);
+    expect(init).toHaveBeenCalledOnce();
+  });
+
+  it.each(['resolve', 'reject'] as const)(
+    'does not let an old exact %s overwrite or evict a new response for the same token',
+    async (settlement) => {
+      const pending = Promise.withResolvers<PagefindSearchResponse>();
+      const response = responseWith(validResult(1));
+      const { runtime, search } = runtimeWith(response);
+      search.mockResolvedValueOnce(response).mockImplementationOnce(() => pending.promise);
+      const client = createPagefindSearchClient({
+        available: true,
+        loadPagefind: async () => runtime
+      });
+
+      const older = client.search('еда');
+      await vi.waitFor(() => expect(search).toHaveBeenCalledTimes(2));
+      await client.search('вода');
+      await expect(client.search('еда')).resolves.toMatchObject({ state: 'ready', total: 1 });
+      if (settlement === 'resolve') {
+        pending.resolve(responseWith());
+        await expect(older).resolves.toBeUndefined();
+      } else {
+        pending.reject(new Error('stale exact failed'));
+        await expect(older).rejects.toThrow('stale exact failed');
+      }
+      await client.search('еда', 16);
+
+      expect(search.mock.calls.filter(([query]) => query === '"еда"')).toHaveLength(2);
+    }
+  );
+
+  it('discards a pending exact response after clearing the query', async () => {
+    const pending = Promise.withResolvers<PagefindSearchResponse>();
+    const { runtime, search } = runtimeWith(responseWith(validResult(1)));
+    search.mockResolvedValueOnce(responseWith()).mockImplementationOnce(() => pending.promise);
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => runtime
+    });
+
+    const older = client.search('еда');
+    await vi.waitFor(() => expect(search).toHaveBeenCalledTimes(2));
+    await client.search('');
+    pending.resolve(responseWith(validResult(1)));
+    await expect(older).resolves.toBeUndefined();
+    await client.search('еда');
+
+    expect(search.mock.calls.filter(([query]) => query === '"еда"')).toHaveLength(2);
   });
 
   it('normalizes allowlisted result fields and anchored sub-results', async () => {

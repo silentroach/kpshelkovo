@@ -1,6 +1,8 @@
 import { fireEvent, render, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { createPagefindSearchClient } from '@/lib/search/client';
+import type { PagefindRuntime, PagefindSearchResponse } from '@/lib/search/client.internal.types';
 import type { SearchClient, SearchResponse, SearchResult } from '@/lib/search/client.types';
 
 import { SEARCH_DIALOG_OPEN_EVENT } from '../search-dialog.events';
@@ -91,6 +93,65 @@ afterEach(() => {
 });
 
 describe('SearchDialog', () => {
+  it.each(['resolve', 'reject'] as const)(
+    'reuses only the latest exact query across remounts despite an old %s',
+    async (settlement) => {
+      const pending = Promise.withResolvers<PagefindSearchResponse>();
+      const response: PagefindSearchResponse = {
+        results: [
+          {
+            id: 'shared',
+            data: async () => ({
+              url: '/news/result-1/',
+              meta: { title: 'Результат', sectionId: 'news', sectionLabel: 'Новости' }
+            })
+          }
+        ]
+      };
+      const search = vi
+        .fn<PagefindRuntime['search']>(async () => response)
+        .mockResolvedValueOnce(response)
+        .mockImplementationOnce(() => pending.promise);
+      const init = vi.fn(async () => {});
+      const client = createPagefindSearchClient({
+        available: true,
+        loadPagefind: async () => ({
+          init,
+          options: async () => {},
+          preload: async () => {},
+          search
+        })
+      });
+      const opener = addOpener('Поиск');
+      let view = render(SearchDialog, { props: { client } });
+      await requestOpen(opener);
+      await enterDebouncedQuery(view.getByRole('searchbox'), 'еда');
+      await waitFor(() => expect(search).toHaveBeenCalledWith('"еда"'));
+      view.unmount();
+
+      view = render(SearchDialog, { props: { client } });
+      await requestOpen(opener);
+      await enterDebouncedQuery(view.getByRole('searchbox'), 'вода');
+      await waitFor(() => expect(dialogFrom(view.container).dataset.searchState).toBe('results'));
+      if (settlement === 'resolve') pending.resolve(response);
+      else pending.reject(new Error('old page exact failure'));
+      await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(1));
+      view.unmount();
+
+      view = render(SearchDialog, { props: { client } });
+      await requestOpen(opener);
+      await enterDebouncedQuery(view.getByRole('searchbox'), 'вода');
+      await waitFor(() => expect(dialogFrom(view.container).dataset.searchState).toBe('results'));
+      expect(search.mock.calls.filter(([query]) => query === '"вода"')).toHaveLength(1);
+      await enterDebouncedQuery(view.getByRole('searchbox'), 'еда');
+      await waitFor(() =>
+        expect(search.mock.calls.filter(([query]) => query === '"еда"')).toHaveLength(2)
+      );
+      expect(dialogFrom(view.container).dataset.searchState).toBe('results');
+      expect(init).toHaveBeenCalledOnce();
+    }
+  );
+
   it('reports opening and completed searches to Yandex Metrica', async () => {
     const search = vi.fn(async (query: string) => {
       if (query === 'подать в суд тариф') {

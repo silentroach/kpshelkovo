@@ -363,7 +363,7 @@ export const createPagefindSearchClient = (
   let pagefindPromise: Promise<PagefindRuntime> | undefined;
   let latestRequestId = 0;
   let cachedQuery: string | undefined;
-  const exactSearchCache = new Map<string, Promise<PagefindSearchResponse>>();
+  let exactSearchPromise: Promise<PagefindSearchResponse> | undefined;
   let resultCache = new Map<string, Promise<LoadedPagefindResult | undefined>>();
 
   const loadPagefind = (): Promise<PagefindRuntime> => {
@@ -398,16 +398,15 @@ export const createPagefindSearchClient = (
     pagefind: PagefindRuntime,
     token: string
   ): Promise<PagefindSearchResponse> => {
-    const cached = exactSearchCache.get(token);
-    if (cached) {
-      return cached;
+    if (exactSearchPromise) {
+      return exactSearchPromise;
     }
 
     const response = pagefind.search(`"${token}"`);
-    exactSearchCache.set(token, response);
+    exactSearchPromise = response;
     void response.catch(() => {
-      if (exactSearchCache.get(token) === response) {
-        exactSearchCache.delete(token);
+      if (exactSearchPromise === response) {
+        exactSearchPromise = undefined;
       }
     });
 
@@ -461,6 +460,8 @@ export const createPagefindSearchClient = (
   ): Map<string, Promise<LoadedPagefindResult | undefined>> => {
     if (query !== cachedQuery) {
       cachedQuery = query;
+      // The singleton keeps only the current query, including across Astro navigations.
+      exactSearchPromise = undefined;
       resultCache = new Map();
     }
 
@@ -481,6 +482,7 @@ export const createPagefindSearchClient = (
 
     if (!effectiveQuery) {
       cachedQuery = undefined;
+      exactSearchPromise = undefined;
       resultCache = new Map();
       return {
         state: 'ready',
