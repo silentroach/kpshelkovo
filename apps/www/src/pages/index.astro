@@ -4,6 +4,7 @@ import type { ImageMetadata } from 'astro';
 import { SHELKOVO_SITE_ALTERNATE_NAMES, type SchemaDoc } from '@shelkovo/seo';
 import dayHero from '@/assets/home/home-hero-day.png';
 import nightHero from '@/assets/home/home-hero-night.png';
+import socialCover from '@/assets/home/home-social.jpg';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getHomeHeroMode } from '@/lib/home/hero';
 import { loadNewsArticles } from '@/lib/news/load';
@@ -80,6 +81,10 @@ const heroImage = heroMode === 'day' ? dayHeroImage : nightHeroImage;
   description={description}
   keywords={keywords}
   schema={schema}
+  image={socialCover.src}
+  imageAlt="Иллюстрация Шелково: дорога к домам среди зелёных холмов и деревьев"
+  imageWidth={socialCover.width}
+  imageHeight={socialCover.height}
   overlaySiteHeader
 >
   <main class="home-main">
