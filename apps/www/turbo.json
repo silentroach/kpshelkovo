@@ -13,6 +13,7 @@
       "persistent": true
     },
     "test": {
+      "inputs": ["$TURBO_EXTENDS$", "$TURBO_ROOT$/scripts/compress-pagefind.mjs"],
       "outputs": []
     },
     "test:watch": {

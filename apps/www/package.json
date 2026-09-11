@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && pagefind && rm -rf ../../dist/www && mkdir -p ../../dist && cp -R dist/site ../../dist/www",
+    "build": "astro build && pagefind && node ../../scripts/compress-pagefind.mjs dist/site/search && rm -rf ../../dist/www && mkdir -p ../../dist && cp -R dist/site ../../dist/www",
     "search:prepare": "rm -rf ../../.cache/pagefind && astro build && pagefind --output-path ../../.cache/pagefind",
     "preview": "astro preview",
     "typecheck": "astro sync && tsc --noEmit",
