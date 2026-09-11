@@ -81,7 +81,9 @@ check_asset() {
   relative=$1
   expected_type=$2
   expected_cache=$3
+  encoding=${4:-identity}
   headers="$tmp/headers"
+  body="$tmp/body"
   url="$base_url/search/$relative"
 
   [ -f "$search_dir/$relative" ] || fail "artifact is missing search/$relative"
@@ -95,8 +97,9 @@ check_asset() {
     --retry-connrefused \
     --connect-timeout 10 \
     --max-time 30 \
+    --header "Accept-Encoding: $encoding" \
     --dump-header "$headers" \
-    --output /dev/null \
+    --output "$body" \
     --write-out '%{http_code}' \
     "$url")
 
@@ -110,7 +113,27 @@ check_asset() {
   assert_header "$headers" Cache-Control "$expected_cache" "$relative"
   assert_content_type "$headers" "$expected_type" "$relative"
 
-  printf 'Verified /search/%s\n' "$relative"
+  case "$relative" in
+    *.js|*.css|*.json)
+      case "$encoding" in
+        br) suffix=.br; content_encoding=br ;;
+        gzip) suffix=.gz; content_encoding=gzip ;;
+        identity) suffix=; content_encoding= ;;
+      esac
+      assert_header "$headers" Content-Encoding "$content_encoding" "$relative ($encoding)"
+      assert_header "$headers" Vary Accept-Encoding "$relative ($encoding)"
+      # curl must keep the encoded bytes: --compressed would hide dynamic fallback compression.
+      cmp -s "$body" "$search_dir/$relative$suffix" || fail "$relative ($encoding): response differs from build artifact"
+      ;;
+  esac
+
+  printf 'Verified /search/%s (%s)\n' "$relative" "$encoding"
+}
+
+check_text_asset() {
+  for encoding in br gzip identity; do
+    check_asset "$1" "$2" "$stable_cache" "$encoding"
+  done
 }
 
 trap cleanup EXIT
@@ -128,11 +151,11 @@ index_chunk=$(pick_file "$search_dir"/index/*_*.pf_index)
 filter_chunk=$(pick_file "$search_dir"/filter/*_*.pf_filter)
 fragment=$(pick_file "$search_dir"/fragment/*_*.pf_fragment)
 
-check_asset pagefind.js application/javascript "$stable_cache"
-check_asset pagefind-highlight.js application/javascript "$stable_cache"
-check_asset pagefind-worker.js application/javascript "$stable_cache"
-check_asset pagefind-entry.json application/json "$stable_cache"
-check_asset pagefind-ui.css text/css "$stable_cache"
+check_text_asset pagefind.js application/javascript
+check_text_asset pagefind-highlight.js application/javascript
+check_text_asset pagefind-worker.js application/javascript
+check_text_asset pagefind-entry.json application/json
+check_text_asset pagefind-ui.css text/css
 check_asset "$wasm" application/octet-stream "$stable_cache"
 check_asset "$metadata" application/octet-stream "$immutable_cache"
 check_asset "$index_chunk" application/octet-stream "$immutable_cache"

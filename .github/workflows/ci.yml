@@ -285,6 +285,7 @@ jobs:
           " < "$static_manifest"
 
           # Active clients may still request files from earlier search and static generations.
+          # Sync Pagefind text assets together with their post-build .br/.gz variants.
           rsync $rsync_opts \
             "${rsync_filters[@]}" \
             -e "ssh $ssh_opts" \
@@ -314,7 +315,7 @@ jobs:
             -e "ssh $ssh_opts" \
             dist/media/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_MEDIA_PATH/"
 
-      - name: Smoke Pagefind production delivery
+      - name: Smoke Pagefind production delivery and precompressed bodies
         run: sh scripts/smoke-pagefind-delivery.sh https://kpshelkovo.online dist/www
 
       - name: Submit new URLs to IndexNow
