@@ -47,7 +47,7 @@
     "@shelkovo/ui": "workspace:*",
     "@shelkovo/url": "workspace:*",
     "@yandex/ymaps3-clusterer": "^0.0.12",
-    "astro": "^7.2.10",
+    "astro": "^7.3.1",
     "diff": "^9.0.0",
     "svelte": "^5.57.0",
     "vcard-creator": "^1.0.0",

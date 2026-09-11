@@ -12,6 +12,6 @@
   },
   "dependencies": {
     "@turf/distance": "^7.4.0",
-    "suncalc": "^2.0.1"
+    "suncalc": "^2.0.2"
   }
 }
