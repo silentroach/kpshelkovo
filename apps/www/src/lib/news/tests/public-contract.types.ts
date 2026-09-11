@@ -6,6 +6,7 @@ export interface ContractSchema {
   readonly items?: ContractSchema;
   readonly $defs?: Readonly<Record<string, ContractSchema>>;
   readonly additionalProperties?: boolean;
+  readonly uniqueItems?: boolean;
 }
 
 export interface NewsOpenApi {
@@ -26,7 +27,9 @@ export interface NewsOpenApi {
       }
     >
   >;
-  readonly components: Readonly<Record<string, unknown>>;
+  readonly components: {
+    readonly schemas: Readonly<Record<string, ContractSchema>>;
+  };
 }
 
 export interface ContractObject {

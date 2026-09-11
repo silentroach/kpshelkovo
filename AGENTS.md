@@ -118,6 +118,7 @@ pnpm build          # dist/www
 
 ## Правила workspace
 
+- Для всех валидаций данных, включая тесты публичных контрактов, использовать Zod. Ajv не устанавливать и не использовать.
 - Стили и UI-компоненты, которые реально делят несколько приложений, выносить в `packages/ui`; app-owned tokens, reset и site-level `ui-*` для `apps/www` держать по [ADR-034](docs/decisions/034-native-css-architecture.md).
 - Общие URL/build helper-утилиты выносить в `packages/url` или `scripts/`.
 - При изменениях deploy-потока синхронно обновлять `.github/workflows/*` и `ops/nginx/*`.

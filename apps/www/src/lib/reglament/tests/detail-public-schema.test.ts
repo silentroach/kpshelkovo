@@ -1,6 +1,5 @@
-import type { ValidateFunction } from 'ajv';
-import Ajv2020 from 'ajv/dist/2020';
 import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
 
 import { estimateDetails2026 } from '@/data/reglament/estimate-details-2026';
 
@@ -17,30 +16,7 @@ import {
   reglamentEstimateDetails2026OpenApiPath,
   reglamentEstimateDetails2026SchemaPath
 } from '../routes';
-
-type DetailOpenApi = {
-  readonly jsonSchemaDialect?: string;
-  readonly paths?: Readonly<
-    Record<
-      string,
-      {
-        readonly get?: {
-          readonly responses?: Readonly<
-            Record<
-              string,
-              {
-                readonly content?: Readonly<
-                  Record<string, { readonly schema?: Readonly<Record<string, unknown>> }>
-                >;
-              }
-            >
-          >;
-        };
-      }
-    >
-  >;
-  readonly components?: Readonly<Record<string, unknown>>;
-};
+import type { DetailOpenApi } from './detail-public-schema.types';
 
 const productionPayload = (): PublicEstimateDetailDataset =>
   publicEstimateDetailDatasetSchema.parse(
@@ -50,24 +26,32 @@ const productionPayload = (): PublicEstimateDetailDataset =>
 const compileValidators = (
   standalone: Record<string, unknown>,
   api: DetailOpenApi
-): readonly ValidateFunction[] => {
+): readonly z.ZodType[] => {
   const responseSchema =
     api.paths?.[reglamentEstimateDetails2026DataPath()]?.get?.responses?.['200']?.content?.[
       'application/json'
     ]?.schema;
 
-  if (!api.jsonSchemaDialect || !responseSchema || !api.components) {
+  const schemaRef = responseSchema?.$ref;
+  if (
+    !api.jsonSchemaDialect ||
+    typeof schemaRef !== 'string' ||
+    !schemaRef.startsWith('#/components/schemas/')
+  ) {
     throw new Error('Detail OpenAPI response schema is incomplete');
   }
 
-  return [
-    new Ajv2020({ allErrors: true }).compile(standalone),
-    new Ajv2020({ allErrors: true, strict: false }).compile({
-      $schema: api.jsonSchemaDialect,
-      ...responseSchema,
-      components: api.components
-    })
-  ];
+  const component = api.components?.schemas[schemaRef.slice('#/components/schemas/'.length)];
+  if (!component) throw new Error(`Missing OpenAPI component: ${schemaRef}`);
+
+  // Zod resolves local $defs, so restore the component's standalone reference scope.
+  const standaloneComponent = JSON.parse(
+    JSON.stringify(component, (key, value) =>
+      key === '$ref' && typeof value === 'string' ? value.replace(`${schemaRef}/`, '#/') : value
+    )
+  );
+
+  return [z.fromJSONSchema(standalone), z.fromJSONSchema(standaloneComponent)];
 };
 
 const invalidPayloads = (payload: PublicEstimateDetailDataset): readonly unknown[] => {
@@ -106,9 +90,9 @@ const invalidPayloads = (payload: PublicEstimateDetailDataset): readonly unknown
   ];
 };
 
-const contractResults = (validators: readonly ValidateFunction[], inputs: readonly unknown[]) => ({
+const contractResults = (validators: readonly z.ZodType[], inputs: readonly unknown[]) => ({
   zod: inputs.map((input) => publicEstimateDetailDatasetSchema.safeParse(input).success),
-  generated: validators.map((validate) => inputs.map((input) => validate(input)))
+  generated: validators.map((schema) => inputs.map((input) => schema.safeParse(input).success))
 });
 
 describe('estimate details public schema', () => {
@@ -129,7 +113,7 @@ describe('estimate details public schema', () => {
 
     expect({
       zod: publicEstimateDetailDatasetSchema.safeParse(payload).success,
-      jsonSchema: validators.map((validate) => validate(payload)),
+      jsonSchema: validators.map((schema) => schema.safeParse(payload).success),
       metadata: {
         schema: standalone.$schema,
         id: standalone.$id,
@@ -171,9 +155,9 @@ describe('estimate details public schema', () => {
       detailOpenapi('https://example.com') as DetailOpenApi
     );
 
-    expect(validators.map((validate) => invalid.map((input) => validate(input)))).toEqual(
-      validators.map(() => invalid.map(() => false))
-    );
+    expect(
+      validators.map((schema) => invalid.map((input) => schema.safeParse(input).success))
+    ).toEqual(validators.map(() => invalid.map(() => false)));
   });
 
   it('rejects unresolved source refs before publication', () => {
@@ -267,7 +251,7 @@ describe('estimate details public schema', () => {
       detailSchema('https://example.com'),
       detailOpenapi('https://example.com') as DetailOpenApi
     );
-    const expandedValidator = new Ajv2020({ allErrors: true }).compile(
+    const expandedValidator = z.fromJSONSchema(
       buildPublicEstimateDetails2026JsonSchema(
         'https://example.com/estimate-details.schema.json',
         Object.keys(expanded.sources)
@@ -278,7 +262,7 @@ describe('estimate details public schema', () => {
       current: contractResults(currentValidators, [expanded]),
       expanded: {
         zod: publicEstimateDetailDatasetSchema.safeParse(expanded).success,
-        generated: expandedValidator(expanded)
+        generated: expandedValidator.safeParse(expanded).success
       }
     }).toMatchInlineSnapshot(`
       {

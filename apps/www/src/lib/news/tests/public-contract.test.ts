@@ -1,7 +1,4 @@
-import type { ValidateFunction } from 'ajv';
-import Ajv2020 from 'ajv/dist/2020';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { z } from 'zod';
 
 import { newsArticleEntry, newsArchiveSummaryEntries } from '../load.test-helper';
 import type { NewsPublicPayload } from '../public-dto';
@@ -10,34 +7,19 @@ import type { ContractObject, ContractSchema, NewsOpenApi } from './public-contr
 
 let getArticles: typeof import('@/pages/news/data/articles.json').GET;
 let standalone: ContractSchema;
-let validators: readonly ValidateFunction[];
+let api: NewsOpenApi;
+let newsPublicPayloadSchema: typeof import('../public-schema').newsPublicPayloadSchema;
 let news: typeof import('../load');
 
 beforeAll(async () => {
   Object.assign(import.meta.env, { SITE: 'https://example.com', BASE_URL: '/' });
   ({ GET: getArticles } = await import('@/pages/news/data/articles.json'));
   news = await import('../load');
+  ({ newsPublicPayloadSchema } = await import('../public-schema'));
   const schemaRoute = await import('@/pages/news/schemas/articles.schema.json');
   const openapiRoute = await import('@/pages/news/openapi/articles.openapi.json');
   standalone = await (await schemaRoute.GET({} as never)).json();
-  const api: NewsOpenApi = await (await openapiRoute.GET({} as never)).json();
-  const responseSchema =
-    api.paths['/news/data/articles.json'].get.responses[200].content['application/json'].schema;
-  const uri = z.url();
-  const dateTime = z.iso.datetime({ offset: true });
-  validators = [
-    standalone,
-    {
-      $schema: api.jsonSchemaDialect,
-      ...responseSchema,
-      components: api.components
-    }
-  ].map((schema) =>
-    new Ajv2020({ allErrors: true, strict: false })
-      .addFormat('uri', (value: string) => uri.safeParse(value).success)
-      .addFormat('date-time', (value: string) => dateTime.safeParse(value).success)
-      .compile(schema)
-  );
+  api = await (await openapiRoute.GET({} as never)).json();
 });
 
 afterEach(() => vi.restoreAllMocks());
@@ -147,12 +129,31 @@ const contractObjects = (
 };
 
 const expectValid = (payload: unknown, expected = true, context = 'feed') => {
-  for (const validate of validators) {
-    expect(validate(payload), `${context}: ${JSON.stringify(validate.errors)}`).toBe(expected);
-  }
+  const result = newsPublicPayloadSchema.safeParse(payload);
+  expect(result.success, `${context}: ${JSON.stringify(result.error?.issues)}`).toBe(expected);
 };
 
 describe('serialized news contracts', () => {
+  it('publishes the same generated contract in JSON Schema and OpenAPI', () => {
+    const responseSchema =
+      api.paths['/news/data/articles.json'].get.responses[200].content['application/json'].schema;
+    const schemaRef = '#/components/schemas/NewsArticlesPayload';
+    expect(responseSchema).toEqual({ $ref: schemaRef });
+    const component = api.components.schemas.NewsArticlesPayload;
+    const standaloneComponent = JSON.parse(
+      JSON.stringify(component, (key, value) =>
+        key === '$ref' && typeof value === 'string' ? value.replace(`${schemaRef}/`, '#/') : value
+      )
+    );
+    expect(standaloneComponent).toEqual(
+      Object.fromEntries(
+        Object.entries(standalone).filter(([key]) => key !== '$schema' && key !== '$id')
+      )
+    );
+    // Custom Zod refinements need explicit JSON Schema metadata.
+    expect(standalone.$defs?.article.properties?.areas.uniqueItems).toBe(true);
+  });
+
   it('validates a fully populated article through the real feed, schema and OpenAPI routes', async () => {
     const payload = await serializedFeed(dataset());
     expect(payload.total_count).toBe(1);
