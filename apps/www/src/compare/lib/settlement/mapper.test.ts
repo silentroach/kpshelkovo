@@ -1,5 +1,9 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
+import { getTariffCalc } from '@/compare/lib/format';
+import { TariffSchema } from '@/compare/lib/schema';
+import { visibleWhitespace } from '@/lib/test/visible-whitespace';
+
 import { mapRawSettlement } from './mapper';
 import type { RawSettlement } from './schema';
 import type { Settlement } from './types';
@@ -101,6 +105,69 @@ const rawSettlement: RawSettlement = {
 };
 
 describe('mapRawSettlement', () => {
+  it.each([
+    { unit: 'rub_per_sotka', period: 'month', value: 300 },
+    { unit: 'rub_per_sotka', period: 'quarter', value: 900 },
+    { unit: 'rub_per_sotka', period: 'year', value: 3600 },
+    { unit: 'rub_per_lot', period: 'month', value: 6000 },
+    { unit: 'rub_per_lot', period: 'quarter', value: 18000 },
+    { unit: 'rub_per_lot', period: 'year', value: 72000 },
+    { unit: 'rub_fixed', period: 'month', value: 6000 },
+    { unit: 'rub_fixed', period: 'quarter', value: 18000 },
+    { unit: 'rub_fixed', period: 'year', value: 72000 }
+  ])('keeps the total and explained parts consistent for $unit/$period', (part) => {
+    const settlement = mapRawSettlement({
+      ...rawSettlement,
+      lots: { average_sotka: 20 },
+      tariff: TariffSchema.parse([part, { value: 100, unit: 'rub_per_sotka', period: 'month' }])
+    });
+    const calc = getTariffCalc(settlement.tariff, settlement.lots);
+
+    expect(
+      visibleWhitespace({
+        normalized: settlement.tariff.normalizedPerSotkaMonth,
+        parts: calc?.rows.map((row) => row.formula.split(' = ')[1]),
+        total: calc?.total
+      })
+    ).toMatchInlineSnapshot(`
+      {
+        "normalized": 400,
+        "parts": [
+          "300·₽/сотка в месяц",
+          "100·₽/сотка в месяц",
+        ],
+        "total": "400·₽/сотка в месяц",
+      }
+    `);
+  });
+
+  it('sums unrounded parts before formatting the total', () => {
+    const settlement = mapRawSettlement({
+      ...rawSettlement,
+      tariff: TariffSchema.parse([
+        { value: 1, unit: 'rub_per_sotka', period: 'year' },
+        { value: 1, unit: 'rub_per_sotka', period: 'year' }
+      ])
+    });
+    const calc = getTariffCalc(settlement.tariff, settlement.lots);
+
+    expect(settlement.tariff.normalizedPerSotkaMonth).toBeCloseTo(0.166666666667, 12);
+    expect(
+      visibleWhitespace({
+        formulas: calc?.rows.map((row) => row.formula),
+        total: calc?.total
+      })
+    ).toMatchInlineSnapshot(`
+      {
+        "formulas": [
+          "1·₽ / 12 месяцев = 0,08·₽/сотка в месяц",
+          "1·₽ / 12 месяцев = 0,08·₽/сотка в месяц",
+        ],
+        "total": "0,17·₽/сотка в месяц",
+      }
+    `);
+  });
+
   it('maps raw snake_case fields into a readonly camelCase domain settlement', () => {
     const settlement = mapRawSettlement(rawSettlement);
 

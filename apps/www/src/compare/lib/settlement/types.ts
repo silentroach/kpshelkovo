@@ -23,12 +23,29 @@ export interface TariffPart {
   readonly note?: string;
 }
 
-export interface Tariff extends TariffPart {
+export interface TariffSource extends TariffPart {
+  readonly parts?: readonly TariffPart[];
+}
+
+export interface Tariff extends TariffSource {
   /** Месячная стоимость, нормализованная на одну сотку для сравнения поселков. */
   readonly normalizedPerSotkaMonth: number;
   /** Значение true, если нормализация использовала допущения по участку или фиксированному тарифу. */
   readonly normalizedIsEstimate: boolean;
-  readonly parts?: readonly TariffPart[];
+}
+
+export interface TariffPartCalculation {
+  readonly source: TariffPart;
+  readonly months: number;
+  readonly normalizedPerSotkaMonth: number;
+}
+
+/** Промежуточный расчет для mapper-а и пояснения; не входит в данные поселка. */
+export interface TariffCalculation {
+  readonly lotSotka: number;
+  readonly parts: readonly TariffPartCalculation[];
+  readonly normalizedPerSotkaMonth: number;
+  readonly normalizedIsEstimate: boolean;
 }
 
 export interface Lots {

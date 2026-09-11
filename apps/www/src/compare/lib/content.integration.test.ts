@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { parse as parseYaml } from 'yaml';
 
+import { getTariffCalc } from './format';
 import { SettlementSchema } from './schema';
-import { DEFAULT_LOT_SOTKA, getLotAverage } from './settlement/lots';
 import { mapRawSettlement } from './settlement/mapper';
 
 const dir = fileURLToPath(new URL('../../data/compare/settlements/', import.meta.url));
@@ -21,6 +21,14 @@ function list() {
 }
 
 const parseSlug = (code: string): string => SettlementSchema.parse(parseYaml(code)).slug;
+
+const explainedAmount = (text: string): number =>
+  Number(
+    text
+      .match(/([\d\s,]+)₽\/сотка в месяц$/)?.[1]
+      .replace(/\s/g, '')
+      .replace(',', '.')
+  );
 
 function findDuplicateSlugs(files: ReturnType<typeof list>) {
   const filesBySlug = new Map<string, string[]>();
@@ -108,25 +116,35 @@ describe('settlements content collection', () => {
     expect(base, `Baseline files: ${base.join(', ')}`).toHaveLength(1);
   });
 
-  it('normalizes every tariff from the shared domain lot estimate', () => {
+  it('agrees with the displayed parts and total for every tariff explanation', () => {
     const files = list();
     expect(files.length).toBeGreaterThan(0);
 
     for (const file of files) {
       const raw = SettlementSchema.parse(parseYaml(file.code));
       const settlement = mapRawSettlement(raw);
-      const lot =
-        getLotAverage(settlement.lots, settlement.infrastructure, settlement.commonSpaces) ??
-        DEFAULT_LOT_SOTKA;
-      const parts = settlement.tariff.parts ?? [settlement.tariff];
-      const expected = parts.reduce((sum, part) => {
-        const months = part.period === 'month' ? 1 : part.period === 'quarter' ? 3 : 12;
-        const monthly = part.value / months;
-        return sum + (part.unit === 'perSotka' ? monthly : monthly / lot);
-      }, 0);
+      const calc = getTariffCalc(
+        settlement.tariff,
+        settlement.lots,
+        settlement.infrastructure,
+        settlement.commonSpaces
+      );
 
       expect(raw.tariff).not.toHaveProperty('normalized_per_sotka_month');
-      expect(settlement.tariff.normalizedPerSotkaMonth, file.name).toBe(expected);
+      if (!calc) {
+        expect(settlement.tariff.normalizedIsEstimate, file.name).toBe(false);
+        expect(settlement.tariff.parts, file.name).toBeUndefined();
+        continue;
+      }
+
+      const total = explainedAmount(calc.total);
+      const partsTotal = calc.rows.reduce((sum, row) => sum + explainedAmount(row.formula), 0);
+
+      expect(total, file.name).toBeCloseTo(settlement.tariff.normalizedPerSotkaMonth, 2);
+      // Each displayed amount is rounded to two decimals; the domain sum is not.
+      expect(Math.abs(partsTotal - total), file.name).toBeLessThanOrEqual(
+        (calc.rows.length + 1) * 0.005 + Number.EPSILON
+      );
     }
   });
 });

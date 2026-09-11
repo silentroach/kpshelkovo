@@ -1,4 +1,4 @@
-import { DEFAULT_LOT_SOTKA, getLotAverage } from './lots';
+import { getLotAverage } from './lots';
 import type {
   RawCommonSpaces,
   RawInfrastructure,
@@ -10,6 +10,7 @@ import type {
   RawTariffUnit,
   RawVideoSurveillance
 } from './schema';
+import { calculateTariff } from './tariff';
 import type {
   CommonSpaces,
   Infrastructure,
@@ -52,30 +53,18 @@ const mapTariffPart = (tariff: {
   note: tariff.note
 });
 
-const months = (period: TariffPart['period']): number => {
-  if (period === 'month') return 1;
-  if (period === 'quarter') return 3;
-  return 12;
-};
-
-const normalizeTariffPart = (part: TariffPart, lot: number): number => {
-  const monthly = part.value / months(part.period);
-  return part.unit === 'perSotka' ? monthly : monthly / lot;
-};
-
 const mapTariff = (tariff: RawTariff, averageLot?: number): Tariff => {
   const first = mapTariffPart(tariff);
   const parts = 'parts' in tariff ? tariff.parts.map(mapTariffPart) : undefined;
-  const list = parts ?? [first];
-  const lot = averageLot ?? DEFAULT_LOT_SOTKA;
+  const calculation = calculateTariff(parts ?? [first], averageLot);
 
   return {
     value: first.value,
     unit: first.unit,
     period: first.period,
     note: first.note,
-    normalizedPerSotkaMonth: list.reduce((sum, part) => sum + normalizeTariffPart(part, lot), 0),
-    normalizedIsEstimate: list.some((part) => part.unit !== 'perSotka'),
+    normalizedPerSotkaMonth: calculation.normalizedPerSotkaMonth,
+    normalizedIsEstimate: calculation.normalizedIsEstimate,
     parts
   };
 };
