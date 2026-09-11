@@ -69,11 +69,7 @@ import {
   placesPath
 } from '@/lib/places/routes';
 import { reglamentPublicSurfaceSlice } from '@/lib/reglament/public-surface';
-import {
-  REGLAMENT_PUBLIC_PATHS,
-  REGLAMENT_SOURCE_PDF_URLS,
-  reglamentFullSourcePdfUrl
-} from '@/lib/reglament/routes';
+import { REGLAMENT_SOURCE_PDF_URLS, reglamentFullSourcePdfUrl } from '@/lib/reglament/routes';
 import {
   reviewMarkdownPattern,
   reviewPattern,
@@ -619,14 +615,25 @@ describe('public surface registry', () => {
     expect(places.some((surface) => surface.discoveryRoles.includes('data-feed'))).toBe(true);
   });
 
-  it('registers every reglament public path from the reglament-owned slice', () => {
+  it('registers local reglament paths and external source PDF downloads', () => {
     const surfaces = publicSurfaceRegistry.surfacesByOwner('reglament');
+    const localSurfaces = surfaces.filter((surface) => surface.mediaType !== 'application/pdf');
+    const pdfSurfaces = surfaces.filter((surface) => surface.mediaType === 'application/pdf');
 
-    expect(surfaces.map((surface) => ('path' in surface ? surface.path : ''))).toEqual([
-      ...REGLAMENT_PUBLIC_PATHS,
-      reglamentFullSourcePdfUrl(),
-      ...REGLAMENT_SOURCE_PDF_URLS
-    ]);
+    expect(localSurfaces.length).toBeGreaterThan(0);
+    for (const surface of localSurfaces) {
+      expect(surface.path, surface.id).toMatch(/^\/815\/regulation\//);
+    }
+    expect(pdfSurfaces).toEqual(
+      [reglamentFullSourcePdfUrl(), ...REGLAMENT_SOURCE_PDF_URLS].map((path) =>
+        expect.objectContaining({
+          path,
+          cacheClass: 'static',
+          discoveryRoles: ['download'],
+          catalogRole: 'item'
+        })
+      )
+    );
     expect(publicSurfaceRegistry.surfaceOwner('reglament:data-estimate-2026')).toEqual(
       reglamentPublicSurfaceSlice.owner
     );

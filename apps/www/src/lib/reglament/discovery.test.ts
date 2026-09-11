@@ -6,7 +6,6 @@ import type { expectSectionCatalogMatchesRegistry as expectSectionCatalogMatches
 import type { reglamentPublicSurfaceSlice as reglamentPublicSurfaceSliceType } from '@/lib/reglament/public-surface';
 
 import {
-  REGLAMENT_PUBLIC_PATHS,
   reglamentApiCatalogPath,
   reglamentAssetsPath,
   reglamentEstimateDetailsChecksMarkdownPath,
@@ -107,13 +106,17 @@ const markdownSection = (markdown: string, title: string): string => {
 };
 
 describe('reglament discovery payload', () => {
-  it('keeps the section API catalog aligned with registry catalog surfaces', () => {
-    expectSectionCatalogMatchesRegistry({
-      catalog,
-      siteRoot: 'https://example.com',
-      slice: reglamentPublicSurfaceSlice
-    });
-  });
+  it.each(['https://example.com', 'https://example.com/sub'])(
+    'keeps the section API catalog aligned with registry catalog surfaces at %s',
+    (siteRoot) => {
+      expectSectionCatalogMatchesRegistry({
+        catalog,
+        siteRoot,
+        slice: reglamentPublicSurfaceSlice,
+        exact: true
+      });
+    }
+  );
 
   it('publishes baseline formulas, source refs and computed values', () => {
     const payload = buildReglamentPayload(estimate2026);
@@ -184,12 +187,6 @@ describe('reglament discovery payload', () => {
       };
     };
     const apiSchema = api.components?.schemas?.Estimate2026Payload;
-
-    for (const path of REGLAMENT_PUBLIC_PATHS.filter(
-      (item) => item !== reglamentApiCatalogPath()
-    )) {
-      expect(apiCatalog).toContain(`https://example.com${path}`);
-    }
 
     expect(self(root)).toContain(`https://example.com${reglamentApiCatalogPath()}`);
     expect(apiCatalog).toContain(reglamentSourcePdfUrl('final'));
@@ -414,7 +411,7 @@ describe('reglament discovery route smoke', () => {
 
     const publicPathMatches = detailPaths.map((path) => ({
       path,
-      publicPath: REGLAMENT_PUBLIC_PATHS.some((item) => item === path),
+      publicPath: reglamentPublicSurfaceSlice.surfaces.some((surface) => surface.path === path),
       catalog: apiCatalog.includes(`${root}${path}`),
       fullLlms: fullLlms.includes(path)
     }));
@@ -422,7 +419,7 @@ describe('reglament discovery route smoke', () => {
     expect({
       contractDiscovery: detailContractPaths.map((path) => ({
         path,
-        publicPath: REGLAMENT_PUBLIC_PATHS.some((item) => item === path),
+        publicPath: reglamentPublicSurfaceSlice.surfaces.some((surface) => surface.path === path),
         catalog: apiCatalog.includes(`${root}${path}`)
       })),
       publicPathMatches,
@@ -508,7 +505,6 @@ describe('reglament discovery route smoke', () => {
         "https://media.kpshelkovo.online/815/regulation/final.pdf",
       ]
     `);
-    expect(REGLAMENT_PUBLIC_PATHS).not.toEqual(expect.arrayContaining(pdfUrls));
   });
 
   it('explains the short UI tariff unit without renaming machine fields', async () => {
