@@ -6,8 +6,16 @@ import {
   pluralize
 } from '@shelkovo/format';
 
-import { DEFAULT_LOT_SOTKA, getLotBreakdown, getLotAverage } from './settlement/lots';
-import type { CommonSpaces, Infrastructure, Lots, Tariff, TariffPart } from './settlement/types';
+import { getLotBreakdown, getLotAverage } from './settlement/lots';
+import { calculateTariff } from './settlement/tariff';
+import type {
+  CommonSpaces,
+  Infrastructure,
+  Lots,
+  Tariff,
+  TariffPart,
+  TariffSource
+} from './settlement/types';
 
 type TariffView = Pick<Tariff, 'normalizedPerSotkaMonth' | 'normalizedIsEstimate'>;
 type TariffLike = Tariff | TariffView;
@@ -17,12 +25,6 @@ const NUMBER_OPTIONS = {
   minimumFractionDigits: 0,
   maximumFractionDigits: 2
 } as const satisfies Intl.NumberFormatOptions;
-
-function months(period: Tariff['period']): number {
-  if (period === 'month') return 1;
-  if (period === 'quarter') return 3;
-  return 12;
-}
 
 const num = (value: number): string => formatNumberRu(value, NUMBER_OPTIONS);
 const money = (value: number, suffix = ''): string =>
@@ -60,7 +62,7 @@ const unit = (value: unknown): Tariff['unit'] => {
   return 'fixed';
 };
 
-const tariffParts = (tariff: Tariff): readonly TariffPart[] => tariff.parts ?? [tariff];
+const tariffParts = (tariff: TariffSource): readonly TariffPart[] => tariff.parts ?? [tariff];
 
 /**
  * Format normalized tariff and add '~' for estimated values.
@@ -201,24 +203,24 @@ export function getLotCalc(
  * Detailed normalization breakdown for settlement page.
  */
 export function getTariffCalc(
-  tariff: Tariff,
+  tariff: TariffSource,
   lots?: Lots,
   infra?: Infrastructure,
   common?: CommonSpaces
 ): TariffCalc | undefined {
-  const size = getLotAverage(lots, infra, common) ?? DEFAULT_LOT_SOTKA;
-  const list = tariffParts(tariff);
-  const multi = list.length > 1;
-  const lot = list.some((item) => unit(item.unit) !== 'perSotka');
+  const calculation = calculateTariff(tariffParts(tariff), getLotAverage(lots, infra, common));
+  const size = calculation.lotSotka;
+  const multi = calculation.parts.length > 1;
+  const lot = calculation.normalizedIsEstimate;
 
   if (!multi && !lot) return;
 
-  const rows = list.map((item, i) => {
-    const m = months(item.period);
+  const rows = calculation.parts.map((part, i) => {
+    const item = part.source;
+    const m = part.months;
     const mons = pluralize(m, ['месяц', 'месяца', 'месяцев']);
     const value = item.value;
-    const monthly = value / m;
-    const normalized = unit(item.unit) === 'perSotka' ? monthly : monthly / size;
+    const normalized = part.normalizedPerSotkaMonth;
     const title = multi ? `Часть ${i + 1}` : 'Тариф';
     const source =
       unit(item.unit) === 'perSotka'
@@ -244,6 +246,6 @@ export function getTariffCalc(
         }
       : {}),
     rows,
-    total: `${money(tariff.normalizedPerSotkaMonth, '/сотка')} в месяц`
+    total: `${money(calculation.normalizedPerSotkaMonth, '/сотка')} в месяц`
   };
 }

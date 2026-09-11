@@ -10,6 +10,7 @@ import {
   getTariffHint,
   getTariffCalc
 } from './format';
+import type { Tariff } from './settlement/types';
 
 describe('Format Module', () => {
   describe('formatTariffAuto', () => {
@@ -179,14 +180,30 @@ describe('Format Module', () => {
   });
 
   describe('getTariffCalc', () => {
+    it('derives the explanation total from its parts even if a stored total is stale', () => {
+      const stale: Tariff = {
+        value: 9000,
+        unit: 'fixed',
+        period: 'quarter',
+        normalizedPerSotkaMonth: 999,
+        normalizedIsEstimate: true
+      };
+      const calc = getTariffCalc(stale);
+
+      expect(visibleWhitespace([calc?.rows[0]?.formula, calc?.total])).toMatchInlineSnapshot(`
+        [
+          "(9·000·₽ / 3 месяца) / 10 соток = 300·₽/сотка в месяц",
+          "300·₽/сотка в месяц",
+        ]
+      `);
+    });
+
     it('should return undefined for exact single tariff', () => {
       expect(
         getTariffCalc({
           value: 1000,
           unit: 'perSotka',
-          period: 'month',
-          normalizedPerSotkaMonth: 1000,
-          normalizedIsEstimate: false
+          period: 'month'
         })
       ).toBe(undefined);
     });
@@ -195,9 +212,7 @@ describe('Format Module', () => {
       const calc = getTariffCalc({
         value: 9000,
         unit: 'perLot',
-        period: 'quarter',
-        normalizedPerSotkaMonth: 300,
-        normalizedIsEstimate: true
+        period: 'quarter'
       });
 
       expect(visibleWhitespace(calc)).toMatchInlineSnapshot(`
@@ -221,9 +236,7 @@ describe('Format Module', () => {
         {
           value: 1780,
           unit: 'perLot',
-          period: 'month',
-          normalizedPerSotkaMonth: 100,
-          normalizedIsEstimate: true
+          period: 'month'
         },
         {
           averageSotka: 17.8,
@@ -252,9 +265,7 @@ describe('Format Module', () => {
         {
           value: 12100,
           unit: 'perLot',
-          period: 'month',
-          normalizedPerSotkaMonth: 360.58,
-          normalizedIsEstimate: true
+          period: 'month'
         },
         {
           count: 298,
@@ -273,6 +284,12 @@ describe('Format Module', () => {
       );
 
       expect(calc?.assumption).toContain('Площадь участка оценочная.');
+      expect(visibleWhitespace([calc?.rows[0]?.formula, calc?.total])).toMatchInlineSnapshot(`
+        [
+          "(12·100·₽ / 1 месяц) / 32,01 сот. = 378,04·₽/сотка в месяц",
+          "378,04·₽/сотка в месяц",
+        ]
+      `);
     });
 
     it('should build detailed calc for multi-part tariff', () => {
@@ -280,8 +297,6 @@ describe('Format Module', () => {
         value: 5813,
         unit: 'perLot',
         period: 'month',
-        normalizedPerSotkaMonth: 681.3,
-        normalizedIsEstimate: true,
         parts: [
           {
             value: 5813,
