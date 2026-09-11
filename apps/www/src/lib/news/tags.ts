@@ -41,6 +41,12 @@ export function buildTagIndex(items: readonly NewsListArticle[]): readonly NewsT
       const current = tags.get(tag.key);
 
       if (current) {
+        if (current.label !== tag.label) {
+          throw new Error(
+            `news tag key "${tag.key}" has conflicting labels: "${current.label}" in article "${current.articles[0].id}" and "${tag.label}" in article "${item.id}"`
+          );
+        }
+
         current.articles.push(item);
         continue;
       }

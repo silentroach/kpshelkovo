@@ -51,6 +51,7 @@ export const newsArticleEntry = (input: {
   readonly events?: readonly RawNewsEventInput[];
   readonly photos?: ReadonlyArray<NonNullable<NewsArticleEntry['data']['photos']>[number]>;
   readonly searchAliases?: readonly string[];
+  readonly tags?: readonly string[];
 }): NewsArticleEntry => ({
   id: input.id,
   body: input.body ?? '',
@@ -63,6 +64,7 @@ export const newsArticleEntry = (input: {
     pinned_until: input.pinned_until ? testDate.parse(input.pinned_until) : undefined,
     events: input.events ? RawNewsEventsSchema.parse(input.events) : undefined,
     photos: input.photos,
-    search_aliases: input.searchAliases
+    search_aliases: input.searchAliases,
+    tags: input.tags?.slice()
   }
 });
