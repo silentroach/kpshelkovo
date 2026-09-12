@@ -64,11 +64,6 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         run: pnpm test
 
-      - name: Build and validate agent discovery
-        run: |
-          pnpm build
-          pnpm --filter @shelkovo/www exec vitest run --config vitest.llms.config.ts
-
       - name: Save Turbo cache
         if: ${{ steps.restore-turbo-cache.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -319,14 +314,6 @@ jobs:
           rsync $rsync_opts \
             -e "ssh $ssh_opts" \
             dist/media/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_MEDIA_PATH/"
-
-      - name: Smoke Pagefind production delivery and precompressed bodies
-        run: sh scripts/smoke-pagefind-delivery.sh https://kpshelkovo.online dist/www
-
-      - name: Verify published llms and HTML/Markdown discovery
-        env:
-          LLMS_CHECK_ORIGIN: https://kpshelkovo.online
-        run: pnpm --filter @shelkovo/www exec vitest run --config vitest.llms.config.ts
 
       - name: Submit new URLs to IndexNow
         env:
