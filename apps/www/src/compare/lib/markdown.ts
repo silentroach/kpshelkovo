@@ -12,9 +12,7 @@ import { calculateDistance } from '@shelkovo/geo';
 import {
   createMarkdownDocument,
   md,
-  parseMarkdownFragment,
   serializeMarkdownDocument,
-  type MarkdownListItemInput,
   type MarkdownPhrasingInput
 } from '@shelkovo/markdown';
 
@@ -67,7 +65,7 @@ const wire = {
   none: 'нет'
 } as const satisfies Record<UndergroundElectricity, string>;
 
-type MarkdownNode = ReturnType<typeof parseMarkdownFragment>[number];
+type MarkdownNode = Parameters<typeof createMarkdownDocument>[0]['children'][number];
 type MarkdownListItem = ReturnType<typeof md.listItem>;
 type MarkdownPhrasingNodes = Exclude<MarkdownPhrasingInput, string>;
 
@@ -254,9 +252,6 @@ function baselineRow(base: Pick<Settlement, 'name' | 'slug'>): MarkdownListItem 
   ]);
 }
 
-const codeListItem = (value: string): MarkdownListItem =>
-  md.listItem(parseMarkdownFragment(value) as MarkdownListItemInput);
-
 const methodologyPercent = (value: number): string => formatPercentage(value, { signed: false });
 
 function ratingDistanceRows(): readonly MarkdownListItem[] {
@@ -264,22 +259,44 @@ function ratingDistanceRows(): readonly MarkdownListItem[] {
     const previous = RATING_METHODOLOGY.distancePoints[index - 1];
 
     if (!previous) {
-      return codeListItem(
-        `До \`${point.ringKm} км\` за МКАД блок получает \`${methodologyPercent(point.score)}\` своих баллов.`
-      );
+      return md.listItem([
+        md.paragraph([
+          md.text('До '),
+          md.inlineCode(`${point.ringKm} км`),
+          md.text(' за МКАД блок получает '),
+          md.inlineCode(methodologyPercent(point.score)),
+          md.text(' своих баллов.')
+        ])
+      ]);
     }
 
-    return codeListItem(
-      `От \`${previous.ringKm}\` до \`${point.ringKm} км\` вклад блока плавно снижается с \`${methodologyPercent(previous.score)}\` до \`${methodologyPercent(point.score)}\`.`
-    );
+    return md.listItem([
+      md.paragraph([
+        md.text('От '),
+        md.inlineCode(String(previous.ringKm)),
+        md.text(' до '),
+        md.inlineCode(`${point.ringKm} км`),
+        md.text(' вклад блока плавно снижается с '),
+        md.inlineCode(methodologyPercent(previous.score)),
+        md.text(' до '),
+        md.inlineCode(methodologyPercent(point.score)),
+        md.text('.')
+      ])
+    ]);
   });
   const lastPoint = RATING_METHODOLOGY.distancePoints.at(-1)!;
 
   return [
     ...rows,
-    codeListItem(
-      `После \`${lastPoint.ringKm} км\` блок сохраняет минимум \`${methodologyPercent(lastPoint.score)}\`.`
-    )
+    md.listItem([
+      md.paragraph([
+        md.text('После '),
+        md.inlineCode(`${lastPoint.ringKm} км`),
+        md.text(' блок сохраняет минимум '),
+        md.inlineCode(methodologyPercent(lastPoint.score)),
+        md.text('.')
+      ])
+    ])
   ];
 }
 
@@ -332,12 +349,18 @@ export async function buildHomeMd(): Promise<string> {
     md.list([
       md.listItem('Если факт не подтвержден источником, поле опускается.'),
       md.listItem('Отсутствие поля означает «неизвестно», а не «точно нет».'),
-      codeListItem(
-        `[Полная лента поселков](${abs('/data/settlements.json')}) содержит весь набор; индекс выше показывает подборку.`
-      ),
-      codeListItem(
-        `[Облегченная лента](${abs('/data/explorer.json')}) нужна для списка и карты; исходные платежи и условия читайте в полной ленте.`
-      ),
+      md.listItem([
+        md.paragraph([
+          md.link(abs('/data/settlements.json'), 'Полная лента поселков'),
+          md.text(' содержит весь набор; индекс выше показывает подборку.')
+        ])
+      ]),
+      md.listItem([
+        md.paragraph([
+          md.link(abs('/data/explorer.json'), 'Облегченная лента'),
+          md.text(' нужна для списка и карты; исходные платежи и условия читайте в полной ленте.')
+        ])
+      ]),
       md.listItem('Тариф намеренно не входит в формулу условного рейтинга.')
     ])
   ]);
@@ -356,7 +379,7 @@ export async function buildRatingMd(): Promise<string> {
     ...nav('rating'),
     md.heading(2, 'Базовая формула'),
     md.list([
-      codeListItem(`\`${formula}\``),
+      md.listItem([md.paragraph([md.inlineCode(formula)])]),
       md.listItem('Тариф не влияет на рейтинг и исключен из формулы специально.')
     ]),
     md.heading(2, 'Блоки и веса'),
@@ -368,16 +391,34 @@ export async function buildRatingMd(): Promise<string> {
     ]),
     md.heading(2, 'Как считаются признаки'),
     md.list([
-      codeListItem(
-        `Для бинарных статусов используется шкала \`yes = ${availabilityScores.yes}\`, \`partial = ${availabilityScores.partial}\`, \`no = ${availabilityScores.no}\`.`
-      ),
+      md.listItem([
+        md.paragraph([
+          md.text('Для бинарных статусов используется шкала '),
+          md.inlineCode(`yes = ${availabilityScores.yes}`),
+          md.text(', '),
+          md.inlineCode(`partial = ${availabilityScores.partial}`),
+          md.text(', '),
+          md.inlineCode(`no = ${availabilityScores.no}`),
+          md.text('.')
+        ])
+      ]),
       md.listItem(
         'Для упорядоченных признаков применяются отдельные шкалы: дороги, ливневка, видеонаблюдение и подземное электричество.'
       ),
-      codeListItem('Неизвестные поля не трактуются как `no`.'),
-      codeListItem(
-        `Если данных мало, оценка блока тянется к нейтральной середине \`${neutralBlockScore}\`, а не к верхней или нижней границе.`
-      )
+      md.listItem([
+        md.paragraph([
+          md.text('Неизвестные поля не трактуются как '),
+          md.inlineCode('no'),
+          md.text('.')
+        ])
+      ]),
+      md.listItem([
+        md.paragraph([
+          md.text('Если данных мало, оценка блока тянется к нейтральной середине '),
+          md.inlineCode(String(neutralBlockScore)),
+          md.text(', а не к верхней или нижней границе.')
+        ])
+      ])
     ]),
     md.heading(2, 'Дистанция'),
     md.list([
@@ -388,12 +429,24 @@ export async function buildRatingMd(): Promise<string> {
     ]),
     md.heading(2, 'Дополнительные корректировки'),
     md.list([
-      codeListItem(
-        `Если центральная вода подтверждена и уже входит в тариф (\`water_in_tariff = true\`), поселок получает \`+${adjustments.waterInTariffBonus}\` к рейтингу.`
-      ),
-      codeListItem(
-        `Если поселок есть в канале «Коттеджное рабство» (\`rabstvo = true\`), рейтинг уменьшается на \`${adjustments.rabstvoPenalty}\` ${pluralize(adjustments.rabstvoPenalty, ['пункт', 'пункта', 'пунктов'])}.`
-      )
+      md.listItem([
+        md.paragraph([
+          md.text('Если центральная вода подтверждена и уже входит в тариф ('),
+          md.inlineCode('water_in_tariff = true'),
+          md.text('), поселок получает '),
+          md.inlineCode(`+${adjustments.waterInTariffBonus}`),
+          md.text(' к рейтингу.')
+        ])
+      ]),
+      md.listItem([
+        md.paragraph([
+          md.text('Если поселок есть в канале «Коттеджное рабство» ('),
+          md.inlineCode('rabstvo = true'),
+          md.text('), рейтинг уменьшается на '),
+          md.inlineCode(String(adjustments.rabstvoPenalty)),
+          md.text(` ${pluralize(adjustments.rabstvoPenalty, ['пункт', 'пункта', 'пунктов'])}.`)
+        ])
+      ])
     ]),
     md.heading(2, 'Как читать результат'),
     md.list([
