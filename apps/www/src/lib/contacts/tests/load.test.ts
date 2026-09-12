@@ -198,6 +198,48 @@ describe('buildContactsDataset', () => {
     expect(mocks.renderMarkdown).not.toHaveBeenCalled();
   });
 
+  it('sorts reviews newest first, preserving ties and source order', () => {
+    const input = entry({
+      id: 'fence/with-reviews',
+      data: {
+        reviews: (
+          [
+            { sentiment: 'positive', published_at: '2026-04-07' },
+            { sentiment: 'neutral', published_at: '2026-09-11' },
+            { sentiment: 'negative', published_at: '2025-12-31' },
+            { sentiment: 'positive', published_at: '2026-09-11' }
+          ] as const
+        ).map((review, index) => ({
+          sentiment: review.sentiment,
+          published_at: review.published_at,
+          summary: 'Опыт работы с мастером.',
+          url: `https://t.me/example/${index + 1}`
+        }))
+      }
+    });
+    const data = buildContactsDataset([input]);
+
+    expect({
+      sorted: data.contacts[0]?.reviews.map(({ url }) => url),
+      source: input.data.reviews?.map(({ url }) => url)
+    }).toMatchInlineSnapshot(`
+      {
+        "sorted": [
+          "https://t.me/example/2",
+          "https://t.me/example/4",
+          "https://t.me/example/1",
+          "https://t.me/example/3",
+        ],
+        "source": [
+          "https://t.me/example/1",
+          "https://t.me/example/2",
+          "https://t.me/example/3",
+          "https://t.me/example/4",
+        ],
+      }
+    `);
+  });
+
   it('maps enabled vCard options and ignores disabled ones', () => {
     const data = buildContactsDataset([
       entry({
