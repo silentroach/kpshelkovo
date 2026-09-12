@@ -17,6 +17,7 @@ interface Props {
 const { reviews, labelledBy } = Astro.props;
 const sentimentEmoji = {
   positive: '👍',
+  neutral: '😐',
   negative: '👎',
 } as const satisfies Record<ContactReview['sentiment'], string>;
 ---
@@ -87,6 +88,10 @@ const sentimentEmoji = {
 
   .contact-review--positive:hover {
     background: var(--color-primary-soft-2);
+  }
+
+  .contact-review--neutral {
+    background: var(--color-neutral-soft);
   }
 
   .contact-review--negative {

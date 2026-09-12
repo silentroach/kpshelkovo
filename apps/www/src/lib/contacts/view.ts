@@ -43,6 +43,7 @@ const CONTACT_CATEGORY_EMOJI: Record<ContactCategory, string> = {
 
 const CONTACT_REVIEW_SENTIMENT_LABELS: Record<ContactReview['sentiment'], string> = {
   positive: 'Плюс',
+  neutral: 'Нейтральный',
   negative: 'Минус'
 };
 
