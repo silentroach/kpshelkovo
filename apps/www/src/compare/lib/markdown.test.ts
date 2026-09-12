@@ -152,6 +152,41 @@ const settlement = toDomain({
 } satisfies RawSettlement);
 
 describe('compare markdown navigation', () => {
+  it('preserves the compound payment and its fallback lot-area assumption', async () => {
+    const { buildSettlementMd } = await loadMarkdown();
+    const estimated = {
+      ...settlement,
+      lots: undefined,
+      tariff: {
+        value: 6000,
+        unit: 'perLot' as const,
+        period: 'month' as const,
+        parts: [
+          { value: 6000, unit: 'perLot' as const, period: 'month' as const },
+          { value: 100, unit: 'perSotka' as const, period: 'month' as const }
+        ],
+        normalizedPerSotkaMonth: 700,
+        normalizedIsEstimate: true
+      }
+    };
+    const markdown = buildSettlementMd({ settlement: estimated, baseline: settlement });
+    expect(
+      visibleWhitespace(
+        markdown
+          .split('\n')
+          .filter((line) => /^(?:- Тариф:|Допущение:|- Часть |Итого для сравнения:)/u.test(line))
+      )
+    ).toMatchInlineSnapshot(`
+      [
+        "- Тариф: 6·000·₽/участок в месяц + 100·₽/сотка в месяц",
+        "Допущение: 1 участок = 10 соток. Среднюю площадь участка по подтвержденным данным не нашли.",
+        "- Часть 1. Указан за участок. (6·000·₽ / 1 месяц) / 10 соток = 600·₽/сотка в месяц",
+        "- Часть 2. Указан за сотку. 100·₽ / 1 месяц = 100·₽/сотка в месяц",
+        "Итого для сравнения: 700·₽/сотка в месяц.",
+      ]
+    `);
+  });
+
   it('keeps discovery links on the markdown home page', async () => {
     const { buildHomeMd } = await loadMarkdown();
 
@@ -187,8 +222,8 @@ describe('compare markdown navigation', () => {
 
       - Если факт не подтвержден источником, поле опускается.
       - Отсутствие поля означает «неизвестно», а не «точно нет».
-      - \`/815/compare/data/settlements.json\` является основным полным JSON-файлом поселков.
-      - \`/815/compare/data/explorer.json\` сокращен для списка, карты и массового сравнения.
+      - [Полная лента поселков](https://kpshelkovo.online/815/compare/data/settlements.json) содержит весь набор; индекс выше показывает подборку.
+      - [Облегченная лента](https://kpshelkovo.online/815/compare/data/explorer.json) нужна для списка и карты; исходные платежи и условия читайте в полной ленте.
       - Тариф намеренно не входит в формулу условного рейтинга.
       "
     `);

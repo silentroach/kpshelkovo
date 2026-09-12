@@ -34,7 +34,7 @@ const row = (label: string, value: MarkdownPhrasingInput): MarkdownListItem =>
 const linkedUrlRow = (label: string, url: string): MarkdownListItem => {
   const href = absoluteUrl(url);
 
-  return row(label, [md.link(href, href)]);
+  return md.listItem([md.paragraph([md.link(href, label)])]);
 };
 
 const source = (
@@ -95,6 +95,17 @@ export function buildReglamentMarkdown(estimate: Estimate): string {
       ...payload.sources.map((item) => linkedUrlRow(`Исходный PDF ${item.pdf}.pdf`, item.pdf_url))
     ]),
     md.heading(2, 'Итог'),
+    md.paragraph([
+      md.inlineCode('official'),
+      md.text(' хранит значения исходной сметы, '),
+      md.inlineCode('computed'),
+      md.text(
+        ' — результат расчетного сценария. Опубликованный JSON показывает сценарий без изменений: движок сохраняет исходные суммы и округленный тариф, а не пересчитывает каждую составляющую заново по формуле.'
+      )
+    ]),
+    md.paragraph(
+      'При изменении объема, частоты или цены движок масштабирует исходную разбивку. При изменении отдельных затрат или коэффициентов он считает строку по формулам. Изменение годовых затрат переводится в месячную разницу за сотку и прибавляется к исходному тарифу; поэтому прямое деление годового итога может отличаться от сохраненного тарифа на величину округления.'
+    ),
     md.list([
       row('Официальный годовой итог', formatReglamentAnnualMoney(payload.official.annual_gross)),
       row('Официальный тариф', formatReglamentTariff(payload.official.tariff_per_sotka_month)),

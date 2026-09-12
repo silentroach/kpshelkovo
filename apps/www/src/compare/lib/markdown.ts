@@ -19,7 +19,7 @@ import {
 } from '@shelkovo/markdown';
 
 import { loadAllData } from './data';
-import { formatTariffAuto, formatTariffOriginal, hasNonSotkaUnit } from './format';
+import { formatTariffAuto, formatTariffOriginal, getTariffCalc, hasNonSotkaUnit } from './format';
 import { RATING_METHODOLOGY, type Rating } from './rating';
 import { getLotAverage } from './settlement/lots';
 import type {
@@ -333,10 +333,10 @@ export async function buildHomeMd(): Promise<string> {
       md.listItem('Если факт не подтвержден источником, поле опускается.'),
       md.listItem('Отсутствие поля означает «неизвестно», а не «точно нет».'),
       codeListItem(
-        `\`${withBase('/data/settlements.json')}\` является основным полным JSON-файлом поселков.`
+        `[Полная лента поселков](${abs('/data/settlements.json')}) содержит весь набор; индекс выше показывает подборку.`
       ),
       codeListItem(
-        `\`${withBase('/data/explorer.json')}\` сокращен для списка, карты и массового сравнения.`
+        `[Облегченная лента](${abs('/data/explorer.json')}) нужна для списка и карты; исходные платежи и условия читайте в полной ленте.`
       ),
       md.listItem('Тариф намеренно не входит в формулу условного рейтинга.')
     ])
@@ -436,6 +436,12 @@ export function buildSettlementMd({ settlement, comparison, baseline, rating }: 
   const companyLine: MarkdownPhrasingInput | undefined =
     company && company.url ? [md.text(`${company.title} — `), linkTo(company.url)] : company?.title;
   const score = rating ? formatRating(rating.score) : undefined;
+  const tariffCalculation = getTariffCalc(
+    settlement.tariff,
+    settlement.lots,
+    settlement.infrastructure,
+    settlement.commonSpaces
+  );
 
   return serialize([
     md.heading(1, settlement.name),
@@ -449,7 +455,7 @@ export function buildSettlementMd({ settlement, comparison, baseline, rating }: 
         ...(hasNonSotkaUnit(settlement.tariff)
           ? [
               md.listItem(
-                `Средняя за сотку: ${settlement.tariff.normalizedIsEstimate ? '~' : ''}${formatTariff(settlement.tariff.normalizedPerSotkaMonth)} в месяц`
+                `Для сравнения за сотку: ${settlement.tariff.normalizedIsEstimate ? '~' : ''}${formatTariff(settlement.tariff.normalizedPerSotkaMonth)} в месяц`
               )
             ]
           : []),
@@ -477,6 +483,19 @@ export function buildSettlementMd({ settlement, comparison, baseline, rating }: 
         linkRow('Карта', map(settlement))
       ])
     ),
+    ...(tariffCalculation
+      ? [
+          md.heading(2, 'Пересчет тарифа'),
+          md.paragraph(tariffCalculation.intro),
+          ...(tariffCalculation.assumption ? [md.paragraph(tariffCalculation.assumption)] : []),
+          md.list(
+            tariffCalculation.rows.map((item) =>
+              md.listItem(`${item.title}. ${item.source} ${item.formula}`)
+            )
+          ),
+          md.paragraph(`Итого для сравнения: ${tariffCalculation.total}.`)
+        ]
+      : []),
     md.paragraph(
       'Отсутствующие признаки в разделах ниже означают, что данные не подтверждены источниками.'
     ),
