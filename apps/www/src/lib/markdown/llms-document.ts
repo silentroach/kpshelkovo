@@ -3,7 +3,7 @@ import {
   md,
   parseMarkdownFragment,
   serializeMarkdownDocument,
-  type MarkdownListItemInput
+  type MarkdownPhrasingInput
 } from '@shelkovo/markdown';
 
 import type {
@@ -16,14 +16,22 @@ import type {
 export const serializeMarkdownNodes = (children: readonly MarkdownNode[]): string =>
   serializeMarkdownDocument(createMarkdownDocument({ children }));
 
-export const markdownBlocks = (markdown: string): readonly MarkdownNode[] =>
-  parseMarkdownFragment(markdown);
-
-export const markdownListItem = (value: string): MarkdownListItem =>
-  md.listItem(parseMarkdownFragment(value) as MarkdownListItemInput);
-
-export const markdownList = (items: readonly (MarkdownListItem | string)[]): MarkdownNode =>
-  md.list(items.map((item) => (typeof item === 'string' ? markdownListItem(item) : item)));
+export const markdownLinkItem = (
+  label: string,
+  url: string,
+  description?: MarkdownPhrasingInput
+): MarkdownListItem =>
+  md.listItem([
+    md.paragraph([
+      md.link(url, label),
+      ...(description
+        ? [
+            md.text(': '),
+            ...(typeof description === 'string' ? [md.text(description)] : description)
+          ]
+        : [])
+    ])
+  ]);
 
 export const llmsSection = (title: string, children: readonly MarkdownNode[]): LlmsSection => ({
   title,

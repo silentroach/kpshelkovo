@@ -1,6 +1,7 @@
+import { md } from '@shelkovo/markdown';
 import { describe, expect, it } from 'vitest';
 
-import { llmsSection, markdownList, serializeLlmsDocument } from './llms-document';
+import { llmsSection, markdownLinkItem, serializeLlmsDocument } from './llms-document';
 
 describe('serializeLlmsDocument', () => {
   it('собирает llms-документы через mdast и сохраняет inline Markdown', () => {
@@ -10,9 +11,12 @@ describe('serializeLlmsDocument', () => {
         summary: 'Путеводитель по данным раздела.',
         sections: [
           llmsSection('Главные URL', [
-            markdownList([
-              '[Главная](https://example.test/)',
-              '[Лента](https://example.test/feed.json): данные в `json`'
+            md.list([
+              markdownLinkItem('Главная', 'https://example.test/'),
+              markdownLinkItem('Лента', 'https://example.test/feed.json', [
+                md.text('данные в '),
+                md.inlineCode('json')
+              ])
             ])
           ])
         ]

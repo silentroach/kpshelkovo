@@ -3,8 +3,7 @@ import { md } from '@shelkovo/markdown';
 
 import {
   llmsSection,
-  markdownBlocks,
-  markdownList,
+  markdownLinkItem,
   serializeLlmsDocument,
   serializeMarkdownNodes
 } from '@/lib/markdown/llms-document';
@@ -38,17 +37,57 @@ const registeredSurfaceUrl = (surfaceId: PublicSurfaceId): string => {
 };
 
 const sectionLinks = () =>
-  markdownList([
-    `[Новости](${registeredSurfaceUrl('news:llms')}): публикации, полный архив и календарные события с готовыми ICS-ссылками.`,
-    `[Статус сервисов](${registeredSurfaceUrl('status:llms')}): опубликованное состояние электричества, воды, интернета и дамбы, история перебоев и окна работ.`,
-    `[Люди](${registeredSurfaceUrl('people:llms')}): профили, публичные контакты и материалы, в которых упоминается человек; HTML-индекса нет.`,
-    `[Сравнение тарифов](${registeredSurfaceUrl('compare:llms')}): платежи и условия в поселках относительно Шелково; полный набор данных и подтверждения тарифов.`,
-    `[Регламент и смета](${registeredSurfaceUrl('reglament:llms')}): расчет тарифа, услуги, имущество и ресурсы с источниками.`,
-    `[База знаний](${registeredSurfaceUrl('kb:index-markdown')}): тематические документы и их части в Markdown, ссылки на исходные документы.`,
-    `[Карта мест](${registeredSurfaceUrl('places:index-markdown')}): индекс всех мест со ссылками на подробные карточки. JSON карты содержит маркеры и геометрию, а описания читайте в карточках.`,
-    `[Отзывы](${registeredSurfaceUrl('reviews:index-markdown')}): отзывы собственников и ссылки на полный текст и правила публикации.`,
-    `[Сарафан](${registeredSurfaceUrl('contacts:index-markdown')}): категории и карточки контактов, которыми поделились жители; vCard доступна только там, где опубликована ссылка.`,
-    `[Архив встреч](${registeredSurfaceUrl('meetings:index-markdown')}): все встречи, описания и ссылки на части транскриптов; HTML-индекса нет.`
+  md.list([
+    markdownLinkItem(
+      'Новости',
+      registeredSurfaceUrl('news:llms'),
+      'публикации, полный архив и календарные события с готовыми ICS-ссылками.'
+    ),
+    markdownLinkItem(
+      'Статус сервисов',
+      registeredSurfaceUrl('status:llms'),
+      'опубликованное состояние электричества, воды, интернета и дамбы, история перебоев и окна работ.'
+    ),
+    markdownLinkItem(
+      'Люди',
+      registeredSurfaceUrl('people:llms'),
+      'профили, публичные контакты и материалы, в которых упоминается человек; HTML-индекса нет.'
+    ),
+    markdownLinkItem(
+      'Сравнение тарифов',
+      registeredSurfaceUrl('compare:llms'),
+      'платежи и условия в поселках относительно Шелково; полный набор данных и подтверждения тарифов.'
+    ),
+    markdownLinkItem(
+      'Регламент и смета',
+      registeredSurfaceUrl('reglament:llms'),
+      'расчет тарифа, услуги, имущество и ресурсы с источниками.'
+    ),
+    markdownLinkItem(
+      'База знаний',
+      registeredSurfaceUrl('kb:index-markdown'),
+      'тематические документы и их части в Markdown, ссылки на исходные документы.'
+    ),
+    markdownLinkItem(
+      'Карта мест',
+      registeredSurfaceUrl('places:index-markdown'),
+      'индекс всех мест со ссылками на подробные карточки. JSON карты содержит маркеры и геометрию, а описания читайте в карточках.'
+    ),
+    markdownLinkItem(
+      'Отзывы',
+      registeredSurfaceUrl('reviews:index-markdown'),
+      'отзывы собственников и ссылки на полный текст и правила публикации.'
+    ),
+    markdownLinkItem(
+      'Сарафан',
+      registeredSurfaceUrl('contacts:index-markdown'),
+      'категории и карточки контактов, которыми поделились жители; vCard доступна только там, где опубликована ссылка.'
+    ),
+    markdownLinkItem(
+      'Архив встреч',
+      registeredSurfaceUrl('meetings:index-markdown'),
+      'все встречи, описания и ссылки на части транскриптов; HTML-индекса нет.'
+    )
   ]);
 
 export const build = (): string =>
@@ -56,16 +95,30 @@ export const build = (): string =>
     title: 'Шелково Онлайн',
     summary:
       'Сайт жителей КП Шелково: новости, доступность сервисов, документы и сведения о жизни поселка.',
-    introduction: markdownBlocks(
-      'Начните с путеводителя нужного раздела или его Markdown-индекса. Отдельные материалы удобнее читать в Markdown, наборы данных обрабатывать через JSON, а с интерфейсом работать в HTML. Опубликованные данные отражают состояние на момент сборки сайта.'
-    ),
+    introduction: [
+      md.paragraph(
+        'Начните с путеводителя нужного раздела или его Markdown-индекса. Отдельные материалы удобнее читать в Markdown, наборы данных обрабатывать через JSON, а с интерфейсом работать в HTML. Опубликованные данные отражают состояние на момент сборки сайта.'
+      )
+    ],
     sections: [
       llmsSection('Найти материал', [sectionLinks()]),
       llmsSection('Выбрать источник', [
-        markdownList([
-          `[Инструкция по разделам](${absoluteUrl('/.well-known/agent-skills/site-sections/SKILL.md')}): как выбрать формат, найти полный текст и учесть ограничения источника.`,
-          `[Каталог API сайта](${registeredSurfaceUrl('root:api-catalog')}): ленты данных, схемы, каталоги и текстовые документы всех разделов.`,
-          `[Главная в браузере](${registeredSurfaceUrl('root:index')}): навигация и интерфейс сайта.`
+        md.list([
+          markdownLinkItem(
+            'Инструкция по разделам',
+            absoluteUrl('/.well-known/agent-skills/site-sections/SKILL.md'),
+            'как выбрать формат, найти полный текст и учесть ограничения источника.'
+          ),
+          markdownLinkItem(
+            'Каталог API сайта',
+            registeredSurfaceUrl('root:api-catalog'),
+            'ленты данных, схемы, каталоги и текстовые документы всех разделов.'
+          ),
+          markdownLinkItem(
+            'Главная в браузере',
+            registeredSurfaceUrl('root:index'),
+            'навигация и интерфейс сайта.'
+          )
         ])
       ])
     ]
@@ -85,26 +138,30 @@ export async function buildHomeMarkdown(): Promise<string> {
 
   return serializeMarkdownNodes([
     md.heading(1, 'Шелково Онлайн'),
-    ...markdownBlocks(
+    md.paragraph(
       'Текстовое представление корневого сайта и его основных разделов для терминалов и автоматического чтения.'
     ),
     md.heading(2, 'Разделы'),
     sectionLinks(),
     md.heading(2, 'Сейчас на сайте'),
-    markdownList([
-      `Новости: ${count(news.articles.length, ['статья', 'статьи', 'статей'])}.`,
-      `Статус: ${count(status.incidents.length, ['запись', 'записи', 'записей'])}, ${count(activeStatus.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])}.`,
-      `Карта: ${count(places.length, ['место', 'места', 'мест'])}.`,
-      `Отзывы: ${count(reviews.reviews.length, ['отзыв', 'отзыва', 'отзывов'])}.`,
-      `Сарафан: ${count(contacts.contacts.length, ['контакт', 'контакта', 'контактов'])}.`,
-      `Архив встреч: ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}.`,
-      `Люди: ${count(people.profiles.length, ['профиль', 'профиля', 'профилей'])}.`
+    md.list([
+      md.listItem(`Новости: ${count(news.articles.length, ['статья', 'статьи', 'статей'])}.`),
+      md.listItem(
+        `Статус: ${count(status.incidents.length, ['запись', 'записи', 'записей'])}, ${count(activeStatus.length, ['активный инцидент', 'активных инцидента', 'активных инцидентов'])}.`
+      ),
+      md.listItem(`Карта: ${count(places.length, ['место', 'места', 'мест'])}.`),
+      md.listItem(`Отзывы: ${count(reviews.reviews.length, ['отзыв', 'отзыва', 'отзывов'])}.`),
+      md.listItem(
+        `Сарафан: ${count(contacts.contacts.length, ['контакт', 'контакта', 'контактов'])}.`
+      ),
+      md.listItem(`Архив встреч: ${count(meetings.length, ['встреча', 'встречи', 'встреч'])}.`),
+      md.listItem(`Люди: ${count(people.profiles.length, ['профиль', 'профиля', 'профилей'])}.`)
     ]),
     md.heading(2, 'Обнаружение для агентов'),
-    markdownList([
-      `[Путеводитель по сайту](${registeredSurfaceUrl('root:llms')})`,
-      `[Каталог API сайта](${registeredSurfaceUrl('root:api-catalog')})`,
-      `[Инструкции для автоматического чтения](${registeredSurfaceUrl('root:skills')})`
+    md.list([
+      markdownLinkItem('Путеводитель по сайту', registeredSurfaceUrl('root:llms')),
+      markdownLinkItem('Каталог API сайта', registeredSurfaceUrl('root:api-catalog')),
+      markdownLinkItem('Инструкции для автоматического чтения', registeredSurfaceUrl('root:skills'))
     ])
   ]);
 }
