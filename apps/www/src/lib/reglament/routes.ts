@@ -21,7 +21,6 @@ const REGLAMENT_ASSETS_MARKDOWN = '/815/regulation/assets/index.md';
 const REGLAMENT_SERVICES = '/815/regulation/services/';
 const REGLAMENT_SERVICES_MARKDOWN = '/815/regulation/services/index.md';
 const REGLAMENT_LLMS = '/815/regulation/llms.txt';
-const REGLAMENT_LLMS_FULL = '/815/regulation/llms-full.txt';
 const REGLAMENT_API_CATALOG = '/815/regulation/.well-known/api-catalog';
 const REGLAMENT_SCHEMA = '/815/regulation/schemas/estimate-2026.schema.json';
 const REGLAMENT_ESTIMATE_DETAILS_SCHEMA =
@@ -101,8 +100,6 @@ export const reglamentServicesMarkdownPath = (): string => REGLAMENT_SERVICES_MA
 
 export const reglamentLlmsPath = (): string => REGLAMENT_LLMS;
 
-export const reglamentLlmsFullPath = (): string => REGLAMENT_LLMS_FULL;
-
 export const reglamentApiCatalogPath = (): string => REGLAMENT_API_CATALOG;
 
 export const reglamentEstimate2026SchemaPath = (): string => REGLAMENT_SCHEMA;
@@ -164,8 +161,6 @@ export const reglamentServicesUrl = (): string => withBase(REGLAMENT_SERVICES);
 export const reglamentServicesMarkdownUrl = (): string => withBase(REGLAMENT_SERVICES_MARKDOWN);
 
 export const reglamentLlmsUrl = (): string => withBase(REGLAMENT_LLMS);
-
-export const reglamentLlmsFullUrl = (): string => withBase(REGLAMENT_LLMS_FULL);
 
 export const reglamentApiCatalogUrl = (): string => withBase(REGLAMENT_API_CATALOG);
 

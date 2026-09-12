@@ -4,7 +4,6 @@ const PEOPLE_ROOT = '/people/';
 const PEOPLE_MARKDOWN = '/people/index.md';
 const PEOPLE_DATA = '/people/data/people.json';
 const PEOPLE_LLMS = '/people/llms.txt';
-const PEOPLE_LLMS_FULL = '/people/llms-full.txt';
 const PEOPLE_API_CATALOG = '/people/.well-known/api-catalog';
 const PEOPLE_SCHEMA = '/people/schemas/people.schema.json';
 const PEOPLE_OPENAPI = '/people/openapi/people.openapi.json';
@@ -35,8 +34,6 @@ export const peopleDataPath = (): string => PEOPLE_DATA;
 
 export const peopleLlmsPath = (): string => PEOPLE_LLMS;
 
-export const peopleLlmsFullPath = (): string => PEOPLE_LLMS_FULL;
-
 export const peopleApiCatalogPath = (): string => PEOPLE_API_CATALOG;
 
 export const peopleSchemaPath = (): string => PEOPLE_SCHEMA;
@@ -48,8 +45,6 @@ export const peopleMarkdownUrl = (): string => withBase(PEOPLE_MARKDOWN);
 export const peopleDataUrl = (): string => withBase(PEOPLE_DATA);
 
 export const peopleLlmsUrl = (): string => withBase(PEOPLE_LLMS);
-
-export const peopleLlmsFullUrl = (): string => withBase(PEOPLE_LLMS_FULL);
 
 export const peopleApiCatalogUrl = (): string => withBase(PEOPLE_API_CATALOG);
 

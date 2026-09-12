@@ -92,19 +92,6 @@ const publicCatalogSnapshot = (
     title: catalogTitle(entry)
   }));
 
-const markdownSection = (markdown: string, title: string): string => {
-  const lines = markdown.trimEnd().split('\n');
-  const start = lines.findIndex((line) => line === `## ${title}`);
-
-  if (start === -1) {
-    return '';
-  }
-
-  const next = lines.findIndex((line, index) => index > start && line.startsWith('## '));
-
-  return lines.slice(start, next === -1 ? undefined : next).join('\n');
-};
-
 describe('reglament discovery payload', () => {
   it.each(['https://example.com', 'https://example.com/sub'])(
     'keeps the section API catalog aligned with registry catalog surfaces at %s',
@@ -273,12 +260,6 @@ describe('reglament discovery route smoke', () => {
         marker: '/815/regulation/data/full-2026.json'
       },
       {
-        name: 'full llms',
-        load: () => import('../../pages/815/regulation/llms-full.txt'),
-        contentType: 'text/plain',
-        marker: '/815/regulation/full.md'
-      },
-      {
         name: 'json schema',
         load: () => import('../../pages/815/regulation/schemas/estimate-2026.schema.json'),
         contentType: 'application/schema+json',
@@ -393,9 +374,9 @@ describe('reglament discovery route smoke', () => {
     const root = 'https://example.com';
     const apiCatalog = JSON.stringify(catalog(root));
     const shortLlmsRoute = await import('../../pages/815/regulation/llms.txt');
-    const fullLlmsRoute = await import('../../pages/815/regulation/llms-full.txt');
+    const detailsRoute = await import('../../pages/815/regulation/details.md');
     const shortLlms = await (await shortLlmsRoute.GET({} as never)).text();
-    const fullLlms = await (await fullLlmsRoute.GET({} as never)).text();
+    const details = await (await detailsRoute.GET({} as never)).text();
     const detailPaths = [
       reglamentEstimateDetails2026DataPath(),
       reglamentEstimateDetailsMarkdownPath(),
@@ -409,91 +390,16 @@ describe('reglament discovery route smoke', () => {
       reglamentEstimateDetails2026OpenApiPath()
     ] as const;
 
-    const publicPathMatches = detailPaths.map((path) => ({
-      path,
-      publicPath: reglamentPublicSurfaceSlice.surfaces.some((surface) => surface.path === path),
-      catalog: apiCatalog.includes(`${root}${path}`),
-      fullLlms: fullLlms.includes(path)
-    }));
-
-    expect({
-      contractDiscovery: detailContractPaths.map((path) => ({
-        path,
-        publicPath: reglamentPublicSurfaceSlice.surfaces.some((surface) => surface.path === path),
-        catalog: apiCatalog.includes(`${root}${path}`)
-      })),
-      publicPathMatches,
-      shortSection: markdownSection(shortLlms, 'Что открыть для проверки'),
-      fullSection: markdownSection(fullLlms, 'Как выбирать источник')
-    }).toMatchInlineSnapshot(`
-      {
-        "contractDiscovery": [
-          {
-            "catalog": true,
-            "path": "/815/regulation/schemas/estimate-details-2026.schema.json",
-            "publicPath": true,
-          },
-          {
-            "catalog": true,
-            "path": "/815/regulation/openapi/estimate-details-2026.openapi.json",
-            "publicPath": true,
-          },
-        ],
-        "fullSection": "## Как выбирать источник
-
-      - Агрегированная смета: \`estimate-2026.json\` и \`index.md\` — официальная база по разделам и строкам, базовые частоты, годовые суммы, формулы и разбор суммы.
-      - Услуги полного регламента: \`full-2026.json\`, \`full/services.md\` и \`full/service-map.md\` — перечень услуг, периодичность, исходные формулировки и сопоставление с \`estimate_row_id\`.
-      - Детальные ресурсы: \`estimate-details-2026.json\` и \`details/*.md\` — работы, ресурсы, контрольные итоги, ссылки на источники и причины \`needs_check\` из маленьких PDF.
-      - Практический порядок ответа: услуга и периодичность из полного слоя, строка и сумма из агрегированной сметы, состав ресурсов и проверки из детального слоя.
-      - Пример вопроса: для полива дорог сравните \`summer-road-dust-suppression\`, \`summer-road-watering\`, строку \`cleaning-summer-mechanized\` и детальные ресурсы воды/поливомоечной техники.
-      ",
-        "publicPathMatches": [
-          {
-            "catalog": true,
-            "fullLlms": true,
-            "path": "/815/regulation/data/estimate-details-2026.json",
-            "publicPath": true,
-          },
-          {
-            "catalog": true,
-            "fullLlms": true,
-            "path": "/815/regulation/details.md",
-            "publicPath": true,
-          },
-          {
-            "catalog": true,
-            "fullLlms": true,
-            "path": "/815/regulation/details/materials.md",
-            "publicPath": true,
-          },
-          {
-            "catalog": true,
-            "fullLlms": true,
-            "path": "/815/regulation/details/machines.md",
-            "publicPath": true,
-          },
-          {
-            "catalog": true,
-            "fullLlms": true,
-            "path": "/815/regulation/details/labor.md",
-            "publicPath": true,
-          },
-          {
-            "catalog": true,
-            "fullLlms": true,
-            "path": "/815/regulation/details/checks.md",
-            "publicPath": true,
-          },
-        ],
-        "shortSection": "## Что открыть для проверки
-
-      - Агрегированная смета: \`estimate-2026.json\` и \`index.md\` — разделы, строки, итоговые суммы, базовые частоты и разбор суммы.
-      - Услуги полного регламента: \`full-2026.json\`, \`full/services.md\` и \`full/service-map.md\` — формулировки услуг, периодичность и связь со строками сметы.
-      - Детальные ресурсы: \`estimate-details-2026.json\` и \`details/*.md\` — работы, материалы, машины, труд, подрядчики, контрольные итоги и \`needs_check\` из маленьких PDF.
-      - Связки: \`estimate_row_id\` соединяет детальные факты с агрегированной сметой; \`service_ids\` соединяют работы с услугами полного регламента.
-      - Пример проверки: для полива дорог сопоставьте услуги \`summer-road-dust-suppression\` и \`summer-road-watering\`, строку \`cleaning-summer-mechanized\` и детальные ресурсы полива.",
-      }
-    `);
+    expect(shortLlms).toContain(reglamentEstimateDetailsMarkdownPath());
+    for (const path of [...detailPaths, ...detailContractPaths]) {
+      expect(reglamentPublicSurfaceSlice.surfaces.some((surface) => surface.path === path)).toBe(
+        true
+      );
+      expect(apiCatalog).toContain(`${root}${path}`);
+    }
+    for (const path of detailPaths) {
+      expect(`${shortLlms}\n${details}`).toContain(path);
+    }
   });
 
   it('keeps source PDF URLs on the canonical media origin', () => {
@@ -509,29 +415,19 @@ describe('reglament discovery route smoke', () => {
 
   it('explains the short UI tariff unit without renaming machine fields', async () => {
     const markdownRoute = await import('../../pages/815/regulation/index.md');
-    const shortLlmsRoute = await import('../../pages/815/regulation/llms.txt');
-    const fullLlmsRoute = await import('../../pages/815/regulation/llms-full.txt');
     const jsonRoute = await import('../../pages/815/regulation/data/estimate-2026.json');
     const markdown = await (await markdownRoute.GET({} as never)).text();
-    const shortLlms = await (await shortLlmsRoute.GET({} as never)).text();
-    const fullLlms = await (await fullLlmsRoute.GET({} as never)).text();
     const json = await (await jsonRoute.GET({} as never)).text();
 
     expect(markdown).toContain('В интерфейсе тариф показывается как ₽/сотка');
-    expect(shortLlms).toContain('В интерфейсе тариф показывается как ₽/сотка');
-    expect(fullLlms).toContain('В интерфейсе тариф показывается как ₽/сотка');
-    expect(`${markdown}\n${shortLlms}\n${fullLlms}`).not.toContain('₽/сотка/мес');
+    expect(markdown).not.toContain('₽/сотка/мес');
     expect(json).toContain('tariff_per_sotka_month');
   });
 
   it('keeps public PDF URLs and S3 keys in public surfaces', async () => {
     const markdownRoute = await import('../../pages/815/regulation/index.md');
-    const shortLlmsRoute = await import('../../pages/815/regulation/llms.txt');
-    const fullLlmsRoute = await import('../../pages/815/regulation/llms-full.txt');
     const jsonRoute = await import('../../pages/815/regulation/data/estimate-2026.json');
     const markdown = await (await markdownRoute.GET({} as never)).text();
-    const shortLlms = await (await shortLlmsRoute.GET({} as never)).text();
-    const fullLlms = await (await fullLlmsRoute.GET({} as never)).text();
     const json = JSON.parse(await (await jsonRoute.GET({} as never)).text()) as {
       readonly source_refs: readonly {
         readonly pdf: string;
@@ -540,9 +436,7 @@ describe('reglament discovery route smoke', () => {
       }[];
     };
 
-    expect(`${markdown}\n${shortLlms}\n${fullLlms}`).toContain(
-      'https://media.kpshelkovo.online/815/regulation/final.pdf'
-    );
+    expect(markdown).toContain('https://media.kpshelkovo.online/815/regulation/final.pdf');
     expect(json.source_refs[0]).toMatchObject({
       pdf: 'final',
       pdf_key: '815/regulation/final.pdf',

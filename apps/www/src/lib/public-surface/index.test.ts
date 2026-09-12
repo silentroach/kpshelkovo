@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import {
   compareApiCatalogPath,
   compareExplorerDataPath,
-  compareLlmsFullPath,
   compareLlmsPath,
   compareMarkdownPath,
   compareOpenApiPath,
@@ -28,7 +27,7 @@ import {
 } from '@/lib/contacts/routes';
 import { catalog } from '@/lib/discovery';
 import { kbDetailMarkdownPattern, kbDetailPattern, kbMarkdownPath, kbPath } from '@/lib/kb/routes';
-import { siteApiCatalogPath, siteLlmsFullPath, siteLlmsPath, siteMarkdownPath } from '@/lib/llms';
+import { siteApiCatalogPath, siteLlmsPath, siteMarkdownPath } from '@/lib/llms';
 import {
   meetingMarkdownPattern,
   meetingPattern,
@@ -43,7 +42,6 @@ import {
   articlesOpenApiPath,
   articlesSchemaPath,
   feedPath as newsFeedPath,
-  llmsFullPath as newsLlmsFullPath,
   llmsPath as newsLlmsPath,
   newsArchiveMarkdownPath,
   newsArchivePath,
@@ -53,7 +51,6 @@ import {
 import {
   peopleApiCatalogPath,
   peopleDataPath,
-  peopleLlmsFullPath,
   peopleLlmsPath,
   peopleMarkdownPath,
   peopleOpenApiPath,
@@ -90,7 +87,6 @@ import {
   statusHistoryPath,
   statusIncidentMarkdownPattern,
   statusIncidentPattern,
-  statusLlmsFullPath,
   statusLlmsPath,
   statusMarkdownPath,
   statusOpenApiPath,
@@ -252,7 +248,6 @@ describe('public surface registry', () => {
       '/',
       siteMarkdownPath(),
       siteLlmsPath(),
-      siteLlmsFullPath(),
       siteApiCatalogPath(),
       siteSkillsPath()
     ]);
@@ -340,9 +335,6 @@ describe('public surface registry', () => {
       path: newsApiCatalogPath()
     });
     expect(byId.get('news:llms')).toMatchObject({ path: newsLlmsPath() });
-    expect(byId.get('news:llms-full')).toMatchObject({
-      path: newsLlmsFullPath()
-    });
   });
 
   it('registers status surfaces from status route helpers', () => {
@@ -434,9 +426,6 @@ describe('public surface registry', () => {
       path: statusApiCatalogPath()
     });
     expect(byId.get('status:llms')).toMatchObject({ path: statusLlmsPath() });
-    expect(byId.get('status:llms-full')).toMatchObject({
-      path: statusLlmsFullPath()
-    });
   });
 
   it('registers meetings Markdown entry without a public HTML index', () => {
@@ -517,9 +506,6 @@ describe('public surface registry', () => {
       path: peopleApiCatalogPath()
     });
     expect(byId.get('people:llms')).toMatchObject({ path: peopleLlmsPath() });
-    expect(byId.get('people:llms-full')).toMatchObject({
-      path: peopleLlmsFullPath()
-    });
   });
 
   it('registers reviews HTML and Markdown surfaces without feeds or schemas', () => {
@@ -681,9 +667,6 @@ describe('public surface registry', () => {
     });
     expect(byId.get('compare:llms')).toMatchObject({
       path: compareLlmsPath()
-    });
-    expect(byId.get('compare:llms-full')).toMatchObject({
-      path: compareLlmsFullPath()
     });
     expect(byId.get('compare:skills')).toMatchObject({
       path: compareSkillsPath()

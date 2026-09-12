@@ -21,7 +21,18 @@ describe('reglament markdown companions', () => {
   it('keeps overview URLs, source refs and formulas machine-readable', () => {
     const markdown = buildReglamentMarkdown(estimate2026);
 
-    expect(markdown).toMatchSnapshot();
+    for (const path of [
+      '/815/regulation/data/estimate-2026.json',
+      '/815/regulation/schemas/estimate-2026.schema.json',
+      '/815/regulation/openapi/estimate-2026.openapi.json',
+      '/815/regulation/llms.txt'
+    ])
+      expect(markdown).toContain(`https://example.com${path}`);
+    expect(markdown).toContain(
+      '[Исходный PDF final.pdf](https://media.kpshelkovo.online/815/regulation/final.pdf)'
+    );
+    expect(markdown).toContain('`annual_gross / tariff_area_sotki / 12`');
+    expect(markdown).not.toMatch(/llms-full|apps\/www|repo:/u);
   });
 
   it('keeps full-reglament thematic files as markdown links', () => {

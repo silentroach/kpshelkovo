@@ -1,11 +1,6 @@
 import type { PublicSurfaceSlice } from '@/lib/public-surface/types';
 
-import {
-  siteApiCatalogPath,
-  siteLlmsFullPath,
-  siteLlmsPath,
-  siteMarkdownPath
-} from './root-routes';
+import { siteApiCatalogPath, siteLlmsPath, siteMarkdownPath } from './root-routes';
 import { siteSkillsPath } from './skills';
 
 export const rootPublicSurfaceSlice = {
@@ -37,15 +32,6 @@ export const rootPublicSurfaceSlice = {
       id: 'root:llms',
       label: 'Короткий обзор корневого сайта',
       path: siteLlmsPath(),
-      mediaType: 'text/plain',
-      cacheClass: 'static',
-      discoveryRoles: ['llms'],
-      catalogRole: 'item'
-    },
-    {
-      id: 'root:llms-full',
-      label: 'Подробный обзор корневого сайта',
-      path: siteLlmsFullPath(),
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms'],

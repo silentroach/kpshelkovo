@@ -18,7 +18,6 @@ export const compareSchemaPath = (): string => withBase(SCHEMA);
 export const compareOpenApiPath = (): string => withBase(OPENAPI);
 export const compareApiCatalogPath = (): string => withBase(CATALOG);
 export const compareLlmsPath = (): string => withBase('/llms.txt');
-export const compareLlmsFullPath = (): string => withBase('/llms-full.txt');
 export const compareSkillsPath = (): string => withBase(SKILLS);
 
 export const comparePublicSurfaceSlice = {
@@ -132,15 +131,6 @@ export const comparePublicSurfaceSlice = {
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms', 'root-catalog'],
-      catalogRole: 'item'
-    },
-    {
-      id: 'compare:llms-full',
-      label: 'Подробный обзор сравнения поселков',
-      path: compareLlmsFullPath(),
-      mediaType: 'text/plain',
-      cacheClass: 'static',
-      discoveryRoles: ['llms'],
       catalogRole: 'item'
     },
     {

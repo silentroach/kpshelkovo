@@ -12,7 +12,6 @@ const TAGS_MARKDOWN = '/news/tags/index.md';
 const DATA_ARTICLES = '/news/data/articles.json';
 const FEED = '/news/feed.xml';
 const LLMS = '/news/llms.txt';
-const LLMS_FULL = '/news/llms-full.txt';
 const API_CATALOG = '/news/.well-known/api-catalog';
 const ARTICLES_SCHEMA = '/news/schemas/articles.schema.json';
 const ARTICLES_OPENAPI = '/news/openapi/articles.openapi.json';
@@ -30,8 +29,6 @@ export const articlesDataPath = (): string => DATA_ARTICLES;
 export const feedPath = (): string => FEED;
 
 export const llmsPath = (): string => LLMS;
-
-export const llmsFullPath = (): string => LLMS_FULL;
 
 export const apiCatalogPath = (): string => API_CATALOG;
 
@@ -145,8 +142,6 @@ export const articlesDataUrl = (): string => withBase(DATA_ARTICLES);
 export const feedUrl = (): string => withBase(FEED);
 
 export const llmsUrl = (): string => withBase(LLMS);
-
-export const llmsFullUrl = (): string => withBase(LLMS_FULL);
 
 export const apiCatalogUrl = (): string => withBase(API_CATALOG);
 

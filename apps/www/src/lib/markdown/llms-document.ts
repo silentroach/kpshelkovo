@@ -3,28 +3,35 @@ import {
   md,
   parseMarkdownFragment,
   serializeMarkdownDocument,
-  type MarkdownListItemInput
+  type MarkdownPhrasingInput
 } from '@shelkovo/markdown';
 
-type MarkdownNode = ReturnType<typeof parseMarkdownFragment>[number];
-type MarkdownListItem = ReturnType<typeof md.listItem>;
-
-export type LlmsSection = {
-  readonly title: string;
-  readonly children: readonly MarkdownNode[];
-};
+import type {
+  LlmsDocument,
+  LlmsSection,
+  MarkdownListItem,
+  MarkdownNode
+} from './llms-document.types';
 
 export const serializeMarkdownNodes = (children: readonly MarkdownNode[]): string =>
   serializeMarkdownDocument(createMarkdownDocument({ children }));
 
-export const markdownBlocks = (markdown: string): readonly MarkdownNode[] =>
-  parseMarkdownFragment(markdown);
-
-export const markdownListItem = (value: string): MarkdownListItem =>
-  md.listItem(parseMarkdownFragment(value) as MarkdownListItemInput);
-
-export const markdownList = (items: readonly (MarkdownListItem | string)[]): MarkdownNode =>
-  md.list(items.map((item) => (typeof item === 'string' ? markdownListItem(item) : item)));
+export const markdownLinkItem = (
+  label: string,
+  url: string,
+  description?: MarkdownPhrasingInput
+): MarkdownListItem =>
+  md.listItem([
+    md.paragraph([
+      md.link(url, label),
+      ...(description
+        ? [
+            md.text(': '),
+            ...(typeof description === 'string' ? [md.text(description)] : description)
+          ]
+        : [])
+    ])
+  ]);
 
 export const llmsSection = (title: string, children: readonly MarkdownNode[]): LlmsSection => ({
   title,
@@ -33,16 +40,14 @@ export const llmsSection = (title: string, children: readonly MarkdownNode[]): L
 
 export const serializeLlmsDocument = ({
   title,
-  file,
+  summary,
+  introduction = [],
   sections
-}: {
-  readonly title: string;
-  readonly file: 'llms-full.txt' | 'llms.txt';
-  readonly sections: readonly LlmsSection[];
-}): string =>
+}: LlmsDocument): string =>
   serializeMarkdownNodes([
     md.heading(1, title),
-    ...markdownBlocks(`Файл: ${file}\nЯзык: русский`),
+    md.blockquote([md.paragraph(summary)]),
+    ...introduction,
     ...sections.flatMap((section) => [md.heading(2, section.title), ...section.children])
   ]);
 

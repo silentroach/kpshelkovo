@@ -13,7 +13,7 @@ description: Используй для перепроверки спорных �
 
 ## Как перепроверять
 
-- Сначала найди `slug` поселка в `/815/compare/data/settlements.json`, затем открой детальную страницу: `/815/compare/settlements/[slug]/`.
+- Найдите карточку через [полную ленту поселков](https://kpshelkovo.online/815/compare/data/settlements.json) и [инструкцию по карточкам](https://kpshelkovo.online/815/compare/.well-known/agent-skills/settlement-pages/SKILL.md). Если ссылка на карточку уже известна, сразу читайте ее Markdown-версию.
 - Проверь блок `sources` на детальной странице и переходи к исходным ссылкам.
 - Для спорных фактов не полагайся только на рейтинг или сокращенный `data/explorer.json`.
 
@@ -25,4 +25,4 @@ description: Используй для перепроверки спорных �
 
 ## Контакт для правок
 
-- Уточнения и исправления: `https://t.me/silentroach`
+- [Уточнения и исправления](https://t.me/silentroach)

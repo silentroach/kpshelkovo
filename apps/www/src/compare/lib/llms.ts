@@ -1,159 +1,87 @@
-import { count } from '@shelkovo/format';
-import { compareRuText } from '@shelkovo/format';
+import { md } from '@shelkovo/markdown';
 
-import { llmsSection, markdownList, serializeLlmsDocument } from '@/lib/markdown/llms-document';
+import { llmsSection, markdownLinkItem, serializeLlmsDocument } from '@/lib/markdown/llms-document';
+import { reglamentLlmsUrl } from '@/lib/reglament/routes';
+import { absoluteUrl } from '@/lib/site';
 
-import { loadAllData } from './data';
 import {
+  compareApiCatalogPath,
   compareExplorerDataPath,
-  compareLlmsFullPath,
-  compareLlmsPath,
+  compareMarkdownPath,
   comparePath,
-  compareRatingPath,
-  compareSettlementsDataPath,
-  compareSkillsPath
+  compareRatingMarkdownPath,
+  compareSettlementsDataPath
 } from './public-surface';
-import { RATING_METHODOLOGY } from './rating';
-import type { Settlement } from './settlement/types';
 import { canon } from './site';
-import { withBase } from './url';
 
-function abs(path: string): string {
-  return canon(path);
-}
-
-function refs(list: readonly Pick<Settlement, 'shortName' | 'slug'>[]): string[] {
-  return list.map((item) => `${item.shortName}: ${abs(`/settlements/${item.slug}/`)}`);
-}
-
-export async function build(kind: 'short' | 'full'): Promise<string> {
-  const { settlements, baseline, stats, ratings } = await loadAllData();
-  const top = settlements
-    .filter((item) => item.slug !== baseline.slug)
-    .sort((a, b) => {
-      const d = (ratings.get(b.slug)?.score ?? 0) - (ratings.get(a.slug)?.score ?? 0);
-      if (d !== 0) return d;
-      return compareRuText(a.shortName, b.shortName);
-    })
-    .slice(0, 2);
-  const list = [baseline, ...top];
-  const feedPath = compareSettlementsDataPath();
-  const explorerPath = compareExplorerDataPath();
-  const home = canon(comparePath());
-  const rating = canon(compareRatingPath());
-  const feed = canon(feedPath);
-  const explorer = canon(explorerPath);
-  const short = canon(compareLlmsPath());
-  const full = canon(compareLlmsFullPath());
-  const skills = canon(compareSkillsPath());
-  const settlementPath = withBase('/settlements/[slug]/');
-
-  return kind === 'short'
-    ? serializeLlmsDocument({
-        title: 'Сравнение тарифов поселков',
-        file: 'llms.txt',
-        sections: [
-          llmsSection('Описание', [
-            markdownList([
-              'Раздел `/815/compare/` сравнивает тарифы на содержание коттеджных поселков с тарифом КП Шелково.',
-              'В данных есть тарифы, базовая инфраструктура, общественные пространства, сервисная модель и условный рейтинг качества среды.',
-              `Сейчас в базе ${count(stats.totalSettlements, ['поселок', 'поселка', 'поселков'])}.`
-            ])
+export const build = (): string =>
+  serializeLlmsDocument({
+    title: 'Сравнение тарифов поселков',
+    summary: 'Платежи за содержание поселков, инфраструктура и условия относительно КП Шелково.',
+    introduction: [
+      md.paragraph(
+        'Индекс показывает подборку. Любой поселок из базы можно найти в полной JSON-ленте и открыть его карточку. Отсутствующий необязательный признак означает «неизвестно», а не «нет». Исходный платеж за участок и нормализованная цена за сотку — разные величины; приблизительный пересчет обозначайте как оценку.'
+      )
+    ],
+    sections: [
+      llmsSection('Найти и сравнить поселки', [
+        md.list([
+          markdownLinkItem('Полная лента поселков', canon(compareSettlementsDataPath()), [
+            md.text(
+              'все поселки, исходные и нормализованные тарифы, признаки среды и сравнения с Шелково. Подтверждения тарифа находятся в карточках, список '
+            ),
+            md.inlineCode('sources'),
+            md.text(' не входит в ленту.')
           ]),
-          llmsSection('Главные URL', [
-            markdownList([
-              `Главная: ${home}`,
-              `Методика рейтинга: ${rating}`,
-              `Основная JSON-лента: ${feed}`,
-              `Облегченная лента explorer: ${explorer}`,
-              `Индекс инструкций для автоматического чтения: ${skills}`,
-              `Расширенная версия этого текста: ${full}`,
-              'Примеры детальных страниц:',
-              ...refs(list)
-            ])
-          ]),
-          llmsSection('Что открывать первым', [
-            markdownList([
-              `Для анализа всех поселков используйте \`${feedPath}\`.`,
-              `\`${explorerPath}\` нужен только для облегченного списка, карты и минимального набора данных.`,
-              'Список `sources` остается на детальных страницах и не входит в общую ленту.',
-              `Если нужен первоисточник или человекочитаемый контекст, переходите на \`${settlementPath}\`.`
-            ])
-          ]),
-          llmsSection('Ограничения данных', [
-            markdownList([
-              'Если факт не подтвержден источником, поле может быть опущено.',
-              'Отсутствие поля означает «неизвестно», а не «точно нет».',
-              'Тариф не входит в формулу условного рейтинга.'
-            ])
-          ])
-        ]
-      })
-    : serializeLlmsDocument({
-        title: 'Сравнение тарифов поселков',
-        file: 'llms-full.txt',
-        sections: [
-          llmsSection('Проект', [
-            markdownList([
-              'Это публичный раздел для сравнения тарифов на содержание коттеджных поселков с тарифом КП Шелково.',
-              'Раздел помогает сопоставить цену и подтвержденные признаки среды: инженерную инфраструктуру, общественные пространства, сервисную модель и условный рейтинг.',
-              `Сейчас в базе ${count(stats.totalSettlements, ['поселок', 'поселка', 'поселков'])}.`
-            ])
-          ]),
-          llmsSection('Канонические URL', [
-            markdownList([
-              `Главная: ${home}`,
-              `Короткий обзор llms.txt: ${short}`,
-              `Подробный обзор llms-full.txt: ${full}`,
-              `Методика рейтинга: ${rating}`,
-              `Основная JSON-лента: ${feed}`,
-              `Облегченная лента explorer: ${explorer}`,
-              `Индекс инструкций для автоматического чтения: ${skills}`,
-              'Примеры детальных страниц поселков:',
-              ...refs(list)
-            ])
-          ]),
-          llmsSection(`Описание ${feedPath}`, [
-            markdownList([
-              'Это основная структурированная лента для массового анализа поселков.',
-              'Структура `settlements[]` включает подтвержденные поля карточки поселка: `name`, `short_name`, `slug`, `website`, `telegram`, `management_company`, полный `location`, полный `tariff`, необязательный блок `lots`, `water_in_tariff`, `rabstvo`, `infrastructure`, `common_spaces`, `service_model`, вычисленное поле `rating` и объект `distance` с `moscow_km`, `mkad_km`, `shelkovo_km`.',
-              `Поле \`rating\` сериализуется как число \`${RATING_METHODOLOGY.scoreRange.min}..${RATING_METHODOLOGY.scoreRange.max}\` и служит техническим прокси качества среды для сортировки и сравнения.`,
-              'Объект `comparisons` индексируется по `slug` и содержит `tariffDelta`, `tariffDeltaPercent` и `isCheaper` относительно базового поселка Шелково.',
-              'Объект `stats` содержит агрегированные показатели по тарифам, отдельную peer-медиану для рейтинговой группы Шелково и общее число поселков.',
-              'Список первоисточников `sources` в общую ленту не включен; за ним нужно идти на детальную страницу поселка.'
-            ])
-          ]),
-          llmsSection(`Описание ${explorerPath}`, [
-            markdownList([
-              'Это отдельная облегченная лента для главного списка и карты, а не основной источник для анализа.',
-              'Его `settlements[]` включает только `name`, `shortName`, `slug`, `rating`, `isBaseline`, `location.lat`, `location.lng`, `location.district`, `tariff.normalizedPerSotkaMonth`, `tariff.normalizedIsEstimate`, а также необязательные `rabstvo` и сокращенный `managementCompany`.',
-              'Используйте его только когда нужен минимальный набор данных для массовой первичной выборки или повторения логики главной страницы.'
-            ])
-          ]),
-          llmsSection('Детальные страницы поселков', [
-            markdownList([
-              `Страницы вида \`${settlementPath}\` остаются каноническим человекочитаемым представлением по одному поселку.`,
-              'Они удобны, когда нужно дать ссылку на HTML или Markdown-страницу, а не только забрать структурированные данные.',
-              `Если нужна максимально полная структурированная картина, сначала используйте \`${feedPath}\`, а затем переходите на детальную страницу по \`slug\`.`
-            ])
-          ]),
-          llmsSection('Рейтинг', [
-            markdownList([
-              'Условный рейтинг считается на этапе сборки и не является интегральной ценой жизни или рыночной оценкой недвижимости.',
-              'Тариф намеренно исключен из формулы.',
-              'Базовые блоки рейтинга: инфраструктура, общественные пространства, сервисная модель и удаленность от Москвы.',
-              'Если данных мало, карточка тянется к нейтральной середине шкалы, а не трактуется автоматически как слабая или сильная.',
-              `Публичное объяснение методики: ${rating}`
-            ])
-          ]),
-          llmsSection('Ограничения данных', [
-            markdownList([
-              'Если факт не подтвержден источником, поле может быть опущено.',
-              'Отсутствие поля означает «неизвестно», а не «точно нет».',
-              'Основной язык сайта русский; названия поселков, разделов и часть полей заданы по-русски.',
-              `\`${explorerPath}\` оптимизирован для списка и карты и не заменяет полную ленту \`${feedPath}\`.`
-            ])
-          ])
-        ]
-      });
-}
+          markdownLinkItem(
+            'Как читать тарифы и признаки',
+            canon('/.well-known/agent-skills/explorer-data/SKILL.md'),
+            'единицы, оценки, неизвестные значения и переход от найденного slug к карточке. Прочитайте перед сравнением платежей.'
+          ),
+          markdownLinkItem(
+            'Карточки и подтверждения',
+            canon('/.well-known/agent-skills/settlement-pages/SKILL.md'),
+            'адреса Markdown- и HTML-страниц по slug из ленты, источники и даты проверки.'
+          ),
+          markdownLinkItem(
+            'Обзор сравнения в Markdown',
+            canon(compareMarkdownPath()),
+            'сводка и подборка поселков, не полный каталог.'
+          ),
+          markdownLinkItem(
+            'Сравнение в браузере',
+            canon(comparePath()),
+            'интерактивный список, фильтры и карта.'
+          )
+        ])
+      ]),
+      llmsSection('Понять методику и назначение данных', [
+        md.list([
+          markdownLinkItem(
+            'Методика рейтинга',
+            canon(compareRatingMarkdownPath()),
+            'условная оценка среды; тариф в формулу рейтинга не входит.'
+          ),
+          markdownLinkItem(
+            'Каталог API сравнения',
+            canon(compareApiCatalogPath()),
+            'ленты, JSON Schema и OpenAPI с контрактами.'
+          ),
+          markdownLinkItem(
+            'Регламент и смета Шелково',
+            absoluteUrl(reglamentLlmsUrl()),
+            'расчет затрат на услуги и ресурсы. Это другой набор данных, чем сравнение поселковых платежей; число из сметы само по себе не подтверждает начисление собственнику.'
+          )
+        ])
+      ]),
+      llmsSection('Optional', [
+        md.list([
+          markdownLinkItem(
+            'Облегченная лента списка и карты',
+            canon(compareExplorerDataPath()),
+            'минимальные данные для интерфейса; для анализа исходного платежа нужна полная лента.'
+          )
+        ])
+      ])
+    ]
+  });

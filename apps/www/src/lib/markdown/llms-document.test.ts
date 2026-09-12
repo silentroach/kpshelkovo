@@ -1,18 +1,22 @@
+import { md } from '@shelkovo/markdown';
 import { describe, expect, it } from 'vitest';
 
-import { llmsSection, markdownList, serializeLlmsDocument } from './llms-document';
+import { llmsSection, markdownLinkItem, serializeLlmsDocument } from './llms-document';
 
 describe('serializeLlmsDocument', () => {
   it('собирает llms-документы через mdast и сохраняет inline Markdown', () => {
     expect(
       serializeLlmsDocument({
         title: 'Текстовая карта раздела',
-        file: 'llms.txt',
+        summary: 'Путеводитель по данным раздела.',
         sections: [
           llmsSection('Главные URL', [
-            markdownList([
-              'Главная: https://example.test/',
-              'Фид: https://example.test/feed.json с `json`'
+            md.list([
+              markdownLinkItem('Главная', 'https://example.test/'),
+              markdownLinkItem('Лента', 'https://example.test/feed.json', [
+                md.text('данные в '),
+                md.inlineCode('json')
+              ])
             ])
           ])
         ]
@@ -20,13 +24,12 @@ describe('serializeLlmsDocument', () => {
     ).toMatchInlineSnapshot(`
       "# Текстовая карта раздела
 
-      Файл: llms.txt
-      Язык: русский
+      > Путеводитель по данным раздела.
 
       ## Главные URL
 
-      - Главная: <https://example.test/>
-      - Фид: <https://example.test/feed.json> с \`json\`
+      - [Главная](https://example.test/)
+      - [Лента](https://example.test/feed.json): данные в \`json\`
       "
     `);
   });

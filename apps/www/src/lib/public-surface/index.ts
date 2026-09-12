@@ -8,6 +8,7 @@ import { placesPublicSurfaceSlice } from '@/lib/places/public-surface';
 import { reglamentPublicSurfaceSlice } from '@/lib/reglament/public-surface';
 import { reviewsPublicSurfaceSlice } from '@/lib/reviews/public-surface';
 import { rootPublicSurfaceSlice } from '@/lib/root-public-surface';
+import { siteLlmsPath } from '@/lib/root-routes';
 import { statusPublicSurfaceSlice } from '@/lib/status/public-surface';
 
 import type {
@@ -94,6 +95,16 @@ export const publicSurfaceRegistry = createPublicSurfaceRegistry([
   reglamentPublicSurfaceSlice,
   comparePublicSurfaceSlice
 ]);
+
+const llmsPaths = publicSurfaceRegistry.surfaces
+  .flatMap((surface) =>
+    surface.discoveryRoles.includes('llms') && surface.path ? [surface.path] : []
+  )
+  .sort((a, b) => b.length - a.length);
+
+export const llmsPathForPage = (pathname: string): string =>
+  llmsPaths.find((path) => pathname.startsWith(path.slice(0, -'llms.txt'.length))) ??
+  siteLlmsPath();
 
 export { comparePublicSurfaceSlice } from '@/compare/lib/public-surface';
 export { contactsPublicSurfaceSlice } from '@/lib/contacts/public-surface';

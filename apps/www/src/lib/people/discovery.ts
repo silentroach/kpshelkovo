@@ -13,7 +13,6 @@ import { ENTITY_MENTION_TYPES } from '@/lib/mentions';
 import {
   peopleApiCatalogPath,
   peopleDataPath,
-  peopleLlmsFullPath,
   peopleLlmsPath,
   peopleMarkdownPath,
   peopleOpenApiPath,
@@ -318,11 +317,6 @@ export function catalog(root: string): Record<string, unknown> {
             href: abs(root, peopleLlmsPath()),
             type: 'text/plain',
             'title*': star('Короткий обзор llms.txt')
-          },
-          {
-            href: abs(root, peopleLlmsFullPath()),
-            type: 'text/plain',
-            'title*': star('Подробный обзор llms-full.txt')
           }
         ],
         'service-desc': [
