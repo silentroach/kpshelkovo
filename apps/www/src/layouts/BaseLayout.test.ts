@@ -43,6 +43,29 @@ describe('BaseLayout site header', () => {
 });
 
 describe('BaseLayout markdown discovery', () => {
+  it.each([
+    ['/news/', '/news/llms.txt'],
+    ['/news/2026/05/example/', '/news/llms.txt'],
+    ['/status/history/', '/status/llms.txt'],
+    ['/status/electricity/', '/status/llms.txt'],
+    ['/status/incidents/2026/05/example/', '/status/llms.txt'],
+    ['/people/example/', '/people/llms.txt'],
+    ['/815/compare/settlements/example/', '/815/compare/llms.txt'],
+    ['/815/regulation/services/', '/815/regulation/llms.txt'],
+    ['/kb/example/', '/llms.txt'],
+    ['/map/example/', '/llms.txt'],
+    ['/meetings/example/', '/llms.txt'],
+    ['/reviews/example/', '/llms.txt'],
+    ['/sarafan/construction/example/', '/llms.txt'],
+    ['/newsletter/', '/llms.txt']
+  ])('advertises the most specific guide for %s', async (pathname, guide) => {
+    const html = await renderLayout(pathname);
+    expect(html).toContain(
+      `<link rel="describedby" type="text/plain" href="https://kpshelkovo.online${guide}">`
+    );
+    expect(html).not.toContain('llms-full.txt');
+  });
+
   it('advertises the markdown companion in HTML', async () => {
     const html = await renderLayout('/815/compare/');
 

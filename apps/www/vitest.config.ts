@@ -4,6 +4,7 @@ import { getViteConfig } from 'astro/config';
 
 const visualTests = ['tests/**/*.visual.local.spec.ts'];
 const searchQualityTests = ['tests/search-quality.test.ts'];
+const deliveryTests = ['tests/llms-delivery.test.ts'];
 const domTests = [
   'src/compare/client/tests/**/*.test.ts',
   'src/compare/components/**/*.test.ts',
@@ -29,7 +30,7 @@ export default getViteConfig({
           name: 'node',
           environment: 'node',
           include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
-          exclude: [...visualTests, ...searchQualityTests, ...domTests]
+          exclude: [...visualTests, ...searchQualityTests, ...deliveryTests, ...domTests]
         }
       },
       {
