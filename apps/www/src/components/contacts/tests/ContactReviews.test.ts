@@ -3,6 +3,9 @@
 import { type HTMLElement, Window } from 'happy-dom';
 import { describe, expect, it } from 'vitest';
 
+import { mapRawContact } from '@/lib/contacts/mapper';
+import { buildContactMarkdown } from '@/lib/contacts/markdown';
+import { RawContactSchema } from '@/lib/contacts/raw-schema';
 import type { ContactReview } from '@/lib/contacts/types';
 import { visibleWhitespace } from '@/lib/test/visible-whitespace';
 import { createAstroContainer } from '@/test/astro-container';
@@ -26,6 +29,38 @@ const parseComponent = (html: string): HTMLElement => {
 };
 
 describe('ContactReviews', () => {
+  it('preserves a neutral review from raw data through HTML and Markdown', async () => {
+    const contact = mapRawContact({
+      id: 'construction/example',
+      body: '',
+      data: RawContactSchema.parse({
+        title: 'Мастер',
+        slug: 'example',
+        category: 'construction',
+        updated_at: review.publishedIso,
+        contacts: { phone: '+7 900 000-00-00' },
+        reviews: [
+          {
+            sentiment: 'neutral',
+            summary: review.summary,
+            published_at: review.publishedIso,
+            url: review.url
+          }
+        ]
+      })
+    });
+    const container = await createAstroContainer();
+    const component = parseComponent(
+      await container.renderToString(ContactReviews, {
+        props: { reviews: contact.reviews }
+      })
+    );
+
+    expect(component.querySelector('li')?.textContent).toContain('Нейтральный:');
+    expect(component.querySelector('a')?.getAttribute('href')).toBe(review.url);
+    expect(buildContactMarkdown(contact)).toContain('sentiment: neutral');
+  });
+
   it('renders safe review markdown with site typography', async () => {
     const container = await createAstroContainer();
     const component = parseComponent(

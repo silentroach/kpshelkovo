@@ -33,35 +33,27 @@ describe('contact view helpers', () => {
     ).toBe('7 апреля 2026');
   });
 
-  it('marks contacts with at least five positive and no negative reviews', () => {
-    expect(
-      hasManyPositiveContactReviews([
-        { sentiment: 'positive' },
-        { sentiment: 'positive' },
-        { sentiment: 'positive' },
-        { sentiment: 'positive' },
-        { sentiment: 'positive' }
-      ])
-    ).toBe(true);
-    expect(
-      hasManyPositiveContactReviews([
-        { sentiment: 'positive' },
-        { sentiment: 'positive' },
-        { sentiment: 'positive' },
-        { sentiment: 'positive' }
-      ])
-    ).toBe(false);
-    expect(
-      hasManyPositiveContactReviews([
-        { sentiment: 'positive' },
-        { sentiment: 'positive' },
-        { sentiment: 'positive' },
-        { sentiment: 'positive' },
-        { sentiment: 'positive' },
-        { sentiment: 'negative' }
-      ])
-    ).toBe(false);
-  });
+  it.each([
+    { positive: 0, neutral: 0, negative: 0, highlighted: false },
+    { positive: 4, neutral: 0, negative: 0, highlighted: false },
+    { positive: 5, neutral: 0, negative: 0, highlighted: true },
+    { positive: 5, neutral: 0, negative: 1, highlighted: false },
+    { positive: 0, neutral: 5, negative: 0, highlighted: false },
+    { positive: 4, neutral: 1, negative: 0, highlighted: false },
+    { positive: 5, neutral: 1, negative: 0, highlighted: true },
+    { positive: 5, neutral: 1, negative: 1, highlighted: false }
+  ])(
+    'highlights $positive positive, $neutral neutral, $negative negative reviews: $highlighted',
+    ({ positive, neutral, negative, highlighted }) => {
+      expect(
+        hasManyPositiveContactReviews([
+          ...Array.from({ length: positive }, () => ({ sentiment: 'positive' as const })),
+          ...Array.from({ length: neutral }, () => ({ sentiment: 'neutral' as const })),
+          ...Array.from({ length: negative }, () => ({ sentiment: 'negative' as const }))
+        ])
+      ).toBe(highlighted);
+    }
+  );
 
   it('builds display methods in stable order with safe hrefs', () => {
     expect(
