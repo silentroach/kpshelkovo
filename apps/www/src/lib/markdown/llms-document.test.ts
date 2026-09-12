@@ -7,12 +7,12 @@ describe('serializeLlmsDocument', () => {
     expect(
       serializeLlmsDocument({
         title: 'Текстовая карта раздела',
-        file: 'llms.txt',
+        summary: 'Путеводитель по данным раздела.',
         sections: [
           llmsSection('Главные URL', [
             markdownList([
-              'Главная: https://example.test/',
-              'Фид: https://example.test/feed.json с `json`'
+              '[Главная](https://example.test/)',
+              '[Лента](https://example.test/feed.json): данные в `json`'
             ])
           ])
         ]
@@ -20,13 +20,12 @@ describe('serializeLlmsDocument', () => {
     ).toMatchInlineSnapshot(`
       "# Текстовая карта раздела
 
-      Файл: llms.txt
-      Язык: русский
+      > Путеводитель по данным раздела.
 
       ## Главные URL
 
-      - Главная: <https://example.test/>
-      - Фид: <https://example.test/feed.json> с \`json\`
+      - [Главная](https://example.test/)
+      - [Лента](https://example.test/feed.json): данные в \`json\`
       "
     `);
   });

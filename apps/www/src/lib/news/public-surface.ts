@@ -9,7 +9,6 @@ import {
   articlesOpenApiPath,
   articlesSchemaPath,
   feedPath,
-  llmsFullPath,
   llmsPath,
   monthMarkdownPattern,
   monthPattern,
@@ -207,15 +206,6 @@ export const newsPublicSurfaceSlice = {
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms', 'root-catalog'],
-      catalogRole: 'item'
-    },
-    {
-      id: 'news:llms-full',
-      label: 'Подробный обзор новостей',
-      path: llmsFullPath(),
-      mediaType: 'text/plain',
-      cacheClass: 'static',
-      discoveryRoles: ['llms'],
       catalogRole: 'item'
     }
   ]

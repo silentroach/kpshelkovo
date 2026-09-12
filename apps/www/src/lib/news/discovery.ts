@@ -55,8 +55,7 @@ const star = (value: string): readonly { readonly value: string; readonly langua
 
 const CATALOG_TITLE_OVERRIDES: Readonly<Partial<Record<string, string>>> = {
   'news:data': 'Основная машиночитаемая лента новостей, включая необязательные события',
-  'news:llms': 'Короткий обзор llms.txt',
-  'news:llms-full': 'Подробный обзор llms-full.txt'
+  'news:llms': 'Короткий обзор llms.txt'
 };
 
 const sectionCatalogRole = (surface: PublicSurface): PublicSurfaceCatalogRole | false | undefined =>

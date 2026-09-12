@@ -133,11 +133,6 @@ export function catalog(root: string): Record<string, unknown> {
             'title*': star('Короткий обзор llms.txt')
           },
           {
-            href: abs(root, '/llms-full.txt'),
-            type: 'text/plain',
-            'title*': star('Подробный обзор llms-full.txt')
-          },
-          {
             href: abs(root, '/.well-known/agent-skills/index.json'),
             type: 'application/json',
             'title*': star('Индекс инструкций для автоматического чтения сравнения поселков')

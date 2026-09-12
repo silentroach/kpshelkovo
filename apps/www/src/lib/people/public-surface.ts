@@ -3,7 +3,6 @@ import type { PublicSurfaceSlice } from '@/lib/public-surface/types';
 import {
   peopleApiCatalogPath,
   peopleDataPath,
-  peopleLlmsFullPath,
   peopleLlmsPath,
   peopleMarkdownPath,
   peopleOpenApiPath,
@@ -88,15 +87,6 @@ export const peoplePublicSurfaceSlice = {
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms', 'root-catalog'],
-      catalogRole: 'item'
-    },
-    {
-      id: 'people:llms-full',
-      label: 'Подробный обзор профилей людей',
-      path: peopleLlmsFullPath(),
-      mediaType: 'text/plain',
-      cacheClass: 'static',
-      discoveryRoles: ['llms'],
       catalogRole: 'item'
     }
   ]

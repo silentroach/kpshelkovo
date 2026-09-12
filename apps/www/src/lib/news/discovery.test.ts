@@ -170,7 +170,7 @@ describe('news discovery payload', () => {
     );
 
     expect(
-      ['news:data', 'news:llms', 'news:llms-full'].map((id) => {
+      ['news:data', 'news:llms'].map((id) => {
         const surface = newsPublicSurfaceSlice.surfaces.find(
           (candidate: PublicSurface) => candidate.id === id
         );
@@ -189,10 +189,6 @@ describe('news discovery payload', () => {
         {
           "id": "news:llms",
           "title": "Короткий обзор llms.txt",
-        },
-        {
-          "id": "news:llms-full",
-          "title": "Подробный обзор llms-full.txt",
         },
       ]
     `);

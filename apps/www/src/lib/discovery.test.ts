@@ -6,8 +6,6 @@ import { publicSurfaceRegistry, surfaceHref } from './public-surface';
 vi.mock('./llms', () => ({
   siteApiCatalogPath: () => '/.well-known/api-catalog',
   siteApiCatalogUrl: () => '/sub/.well-known/api-catalog',
-  siteLlmsFullPath: () => '/llms-full.txt',
-  siteLlmsFullUrl: () => '/sub/llms-full.txt',
   siteLlmsPath: () => '/llms.txt',
   siteLlmsUrl: () => '/sub/llms.txt',
   siteMarkdownPath: () => '/index.md',
@@ -100,9 +98,6 @@ describe('root api catalog', () => {
       expect.arrayContaining([
         expect.objectContaining({ href: 'https://example.com/sub/index.md' }),
         expect.objectContaining({ href: 'https://example.com/sub/llms.txt' }),
-        expect.objectContaining({
-          href: 'https://example.com/sub/llms-full.txt'
-        }),
         expect.objectContaining({
           href: 'https://example.com/sub/.well-known/agent-skills/index.json'
         })

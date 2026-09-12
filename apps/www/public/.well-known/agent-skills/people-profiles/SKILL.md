@@ -13,22 +13,23 @@ description: Используй для чтения профилей людей 
 
 ## Что открыть
 
-- Основная JSON-лента: `/people/data/people.json`.
-- Markdown-обзор: `/people/index.md`.
-- Короткий обзор: `/people/llms.txt`.
-- Расширенный обзор: `/people/llms-full.txt`.
-- Каталог API: `/people/.well-known/api-catalog`.
+- [Полная JSON-лента](https://kpshelkovo.online/people/data/people.json): профили, контакты и связи.
+- [Markdown-индекс](https://kpshelkovo.online/people/index.md): все профили с адресами карточек.
+- [Путеводитель](https://kpshelkovo.online/people/llms.txt): входные документы раздела.
+- [Каталог API](https://kpshelkovo.online/people/.well-known/api-catalog): JSON Schema и OpenAPI.
 
 ## Практический паттерн
 
-- Сначала читай `/people/data/people.json`.
-- Для одного профиля переходи на `/people/[slug]/` или `/people/[slug]/index.md`.
+- Для одного профиля найди ссылку в Markdown-индексе и открой Markdown-карточку; HTML нужен для работы с интерфейсом.
+- Для массовой обработки профилей и связей читай полную JSON-ленту.
 - Для графовых сценариев используй `mentions` как исходящие связи из тела профиля, если оно заполнено, и `backlinks` как входящие ссылки из других разделов.
 - В каждом элементе `mentions` обязательное поле `type` различает человека (`person`) и место (`place`); не определяй тип по URL.
 
 ## Что важно помнить
 
-- Публичного HTML-индекса `/people/` нет и в MVP не будет.
+- Публичного HTML-индекса `/people/` нет.
+- `profiles[]` содержит необязательные `company`, `position` и `name_cases`; `body_markdown` может быть пустым, если сведения уже есть в остальных полях профиля.
+- `backlinks` группирует входящие ссылки по `news`, `status`, `reviews`, `places`, `people` и `contacts`. `stats` содержит счетчики профилей и связей.
 - Контакты публикуются открыто, как есть в публичных данных.
 - Для упоминаний людей и мест используются `@slug`, `@slug:case` и `[видимый текст](@slug)`.
 - `@slug` раскрывается в каноническое имя, `@slug:case` - в форму из `name_cases`, а `[видимый текст](@slug)` сохраняет авторский видимый текст и все равно попадает в `mentions`/`backlinks`.

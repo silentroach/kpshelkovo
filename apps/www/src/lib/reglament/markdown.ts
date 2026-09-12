@@ -13,7 +13,6 @@ import {
   reglamentEstimate2026DataUrl,
   reglamentEstimate2026OpenApiUrl,
   reglamentEstimate2026SchemaUrl,
-  reglamentLlmsFullUrl,
   reglamentLlmsUrl,
   reglamentUrl
 } from './routes';
@@ -93,7 +92,6 @@ export function buildReglamentMarkdown(estimate: Estimate): string {
       linkedUrlRow('OpenAPI', reglamentEstimate2026OpenApiUrl()),
       linkedUrlRow('Каталог API', reglamentApiCatalogUrl()),
       linkedUrlRow('llms.txt', reglamentLlmsUrl()),
-      linkedUrlRow('llms-full.txt', reglamentLlmsFullUrl()),
       ...payload.sources.map((item) => linkedUrlRow(`Исходный PDF ${item.pdf}.pdf`, item.pdf_url))
     ]),
     md.heading(2, 'Итог'),

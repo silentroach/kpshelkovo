@@ -18,7 +18,6 @@ import {
   reglamentFullServiceMapMarkdownPath,
   reglamentFullServicesMarkdownPath,
   reglamentFullSourcePdfUrl,
-  reglamentLlmsFullPath,
   reglamentLlmsPath,
   reglamentMarkdownPath,
   reglamentPath,
@@ -184,15 +183,6 @@ export const reglamentPublicSurfaceSlice = {
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms', 'root-catalog'],
-      catalogRole: 'item'
-    },
-    {
-      id: 'reglament:llms-full',
-      label: 'Подробный обзор регламента',
-      path: reglamentLlmsFullPath(),
-      mediaType: 'text/plain',
-      cacheClass: 'static',
-      discoveryRoles: ['llms'],
       catalogRole: 'item'
     },
     {

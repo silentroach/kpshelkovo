@@ -13,7 +13,6 @@ const STATUS_INCIDENTS_ROOT = '/status/incidents/';
 const STATUS_DATA = '/status/data/status.json';
 const STATUS_FEED = '/status/feed.xml';
 const STATUS_LLMS = '/status/llms.txt';
-const STATUS_LLMS_FULL = '/status/llms-full.txt';
 const STATUS_API_CATALOG = '/status/.well-known/api-catalog';
 const STATUS_SCHEMA = '/status/schemas/status.schema.json';
 const STATUS_OPENAPI = '/status/openapi/status.openapi.json';
@@ -54,8 +53,6 @@ export const statusDataPath = (): string => STATUS_DATA;
 export const statusFeedPath = (): string => STATUS_FEED;
 
 export const statusLlmsPath = (): string => STATUS_LLMS;
-
-export const statusLlmsFullPath = (): string => STATUS_LLMS_FULL;
 
 export const statusApiCatalogPath = (): string => STATUS_API_CATALOG;
 
@@ -132,8 +129,6 @@ export const statusDataUrl = (): string => withBase(STATUS_DATA);
 export const statusFeedUrl = (): string => withBase(STATUS_FEED);
 
 export const statusLlmsUrl = (): string => withBase(STATUS_LLMS);
-
-export const statusLlmsFullUrl = (): string => withBase(STATUS_LLMS_FULL);
 
 export const statusApiCatalogUrl = (): string => withBase(STATUS_API_CATALOG);
 

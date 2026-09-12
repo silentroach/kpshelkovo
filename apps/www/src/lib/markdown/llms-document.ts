@@ -6,13 +6,12 @@ import {
   type MarkdownListItemInput
 } from '@shelkovo/markdown';
 
-type MarkdownNode = ReturnType<typeof parseMarkdownFragment>[number];
-type MarkdownListItem = ReturnType<typeof md.listItem>;
-
-export type LlmsSection = {
-  readonly title: string;
-  readonly children: readonly MarkdownNode[];
-};
+import type {
+  LlmsDocument,
+  LlmsSection,
+  MarkdownListItem,
+  MarkdownNode
+} from './llms-document.types';
 
 export const serializeMarkdownNodes = (children: readonly MarkdownNode[]): string =>
   serializeMarkdownDocument(createMarkdownDocument({ children }));
@@ -33,16 +32,14 @@ export const llmsSection = (title: string, children: readonly MarkdownNode[]): L
 
 export const serializeLlmsDocument = ({
   title,
-  file,
+  summary,
+  introduction = [],
   sections
-}: {
-  readonly title: string;
-  readonly file: 'llms-full.txt' | 'llms.txt';
-  readonly sections: readonly LlmsSection[];
-}): string =>
+}: LlmsDocument): string =>
   serializeMarkdownNodes([
     md.heading(1, title),
-    ...markdownBlocks(`Файл: ${file}\nЯзык: русский`),
+    md.blockquote([md.paragraph(summary)]),
+    ...introduction,
     ...sections.flatMap((section) => [md.heading(2, section.title), ...section.children])
   ]);
 

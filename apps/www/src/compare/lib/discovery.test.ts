@@ -106,7 +106,6 @@ describe('catalog', () => {
       `${root}${FEED}`,
       `${root}${EXPLORER}`,
       `${root}/llms.txt`,
-      `${root}/llms-full.txt`,
       `${root}/.well-known/agent-skills/index.json`
     ]);
     expect(desc.map((row) => row.href)).toEqual([`${root}${SCHEMA}`, `${root}${OPENAPI}`]);

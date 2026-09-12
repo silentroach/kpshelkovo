@@ -39,3 +39,4 @@
 - [ADR-033: Сравнение тарифов как часть единого сайта](033-integrated-tariff-comparison-section.md) - принят, 2026-08-30.
 - [ADR-034: Нативная CSS-архитектура после Tailwind](034-native-css-architecture.md) - принят, 2026-08-31.
 - [ADR-035: Страницы сервисов и свежие события в поиске](035-status-search-indexing.md) - принят, 2026-09-10.
+- [ADR-036: Короткие путеводители llms.txt v2](036-llms-v2-guides.md) - принят, 2026-09-12.

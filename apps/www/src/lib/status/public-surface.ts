@@ -11,7 +11,6 @@ import {
   statusHistoryPath,
   statusIncidentMarkdownPattern,
   statusIncidentPattern,
-  statusLlmsFullPath,
   statusLlmsPath,
   statusMarkdownPath,
   statusOpenApiPath,
@@ -195,15 +194,6 @@ export const statusPublicSurfaceSlice = {
       mediaType: 'text/plain',
       cacheClass: 'static',
       discoveryRoles: ['llms', 'root-catalog'],
-      catalogRole: 'item'
-    },
-    {
-      id: 'status:llms-full',
-      label: 'Подробный обзор статуса',
-      path: statusLlmsFullPath(),
-      mediaType: 'text/plain',
-      cacheClass: 'static',
-      discoveryRoles: ['llms'],
       catalogRole: 'item'
     }
   ]

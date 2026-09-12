@@ -34,11 +34,9 @@ describe('agent skills index', () => {
       'utf8'
     );
 
-    for (const route of Object.values(statusCalendarAgentPatterns())) {
-      expect(skill).toContain(`\`${route}\``);
-    }
-
-    expect(skill).toContain('отдельного календарного JSON нет');
+    expect(skill).toContain('https://kpshelkovo.online/status/history/');
+    expect(skill).toContain('https://kpshelkovo.online/status/index.md');
+    expect(skill).toContain(`\`${statusCalendarAgentPatterns().day}\``);
     expect(skill).not.toMatch(/\/status\/calendar(?:\/data)?\.json/u);
   });
 });
