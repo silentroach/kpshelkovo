@@ -17,6 +17,7 @@ export type MarkdownPreprocessor = (markdown: string) => string;
 
 export interface RenderOptions {
   readonly preprocess?: MarkdownPreprocessor | readonly MarkdownPreprocessor[];
+  readonly eagerImages?: boolean;
 }
 
 const remarkNoMarkdownTables: Plugin<[], Root> = () => (tree) => {
@@ -114,5 +115,7 @@ const preprocessMarkdown = (markdown: string, preprocess: RenderOptions['preproc
 export const render = (markdown: string, options?: RenderOptions): string => {
   const processed = preprocessMarkdown(markdown, options?.preprocess);
 
-  return String(processor.processSync(processed));
+  return String(
+    processor.processSync({ value: processed, data: { eagerImages: options?.eagerImages } })
+  );
 };

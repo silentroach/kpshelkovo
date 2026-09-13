@@ -40,7 +40,9 @@ if (!article || !source) {
   throw new Error(`news article "${id}" not found`);
 }
 
-const bodyHtml = article.body ? renderMarkdown(article.body) : undefined;
+const bodyHtml = article.body
+  ? renderMarkdown(article.body, { eagerImages: true })
+  : undefined;
 const monthName = formatNewsMonth(article.year, article.month, {
   capitalize: true,
 });

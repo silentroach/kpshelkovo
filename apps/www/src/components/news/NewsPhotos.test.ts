@@ -34,7 +34,7 @@ describe('NewsPhotos', () => {
     );
   });
 
-  it('scopes Retina variants to full-width photos without upscaling', async () => {
+  it('renders eager images with Retina variants scoped to full-width photos without upscaling', async () => {
     const container = await createAstroContainer();
     const fullWidthPhoto = {
       url: 'https://media.kpshelkovo.online/news/2026/08/retina-test/original.jpeg',
@@ -63,6 +63,15 @@ describe('NewsPhotos', () => {
     const fullWidthImage = linkedImages[0];
     const halfWidthImage = linkedImages[1];
     const smallImage = linkedImages[2];
+
+    expect(linkedImages.map((html) => html.match(/<img\b[^>]* loading="([^"]+)"/u)?.[1]))
+      .toMatchInlineSnapshot(`
+      [
+        "eager",
+        "eager",
+        "eager",
+      ]
+    `);
 
     expect({
       fullWidthHref: fullWidthImage?.match(/\shref="([^"]+)"/u)?.[1],
