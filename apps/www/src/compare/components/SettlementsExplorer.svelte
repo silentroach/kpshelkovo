@@ -1,7 +1,9 @@
 <script lang="ts">
-  import { compareRuText, formatTariff } from '@shelkovo/format';
+  import { compareRuText } from '@shelkovo/format';
   import { calculateDistance } from '@shelkovo/geo';
   import { onMount } from 'svelte';
+
+  import { formatTariffAuto, getTariffHint } from '@/compare/lib/format';
 
   import type { ExplorerPayload, ExplorerSettlement } from '../lib/explorer';
   import { getRing } from '../lib/rating';
@@ -48,16 +50,6 @@
 
   function getDistanceFromMkad(settlement: ExplorerSettlement): number {
     return getRing(settlement.location.lat, settlement.location.lng);
-  }
-
-  function tariffText(settlement: ExplorerSettlement): string {
-    const text = formatTariff(settlement.tariff.normalizedPerSotkaMonth);
-    return settlement.tariff.normalizedIsEstimate ? `~${text}` : text;
-  }
-
-  function tariffHint(settlement: ExplorerSettlement): string | undefined {
-    if (!settlement.tariff.normalizedIsEstimate) return;
-    return 'Тариф приведен к сотке автоматически.';
   }
 
   function rankExplorer(list: readonly ExplorerSettlement[]): Readonly<Record<string, number>> {
@@ -174,8 +166,8 @@
         lng: s.location.lng,
         normalizedTariff: s.tariff.normalizedPerSotkaMonth,
         isBaseline: s.isBaseline,
-        tariffText: tariffText(s),
-        tariffHint: tariffHint(s),
+        tariffText: formatTariffAuto(s.tariff),
+        tariffHint: getTariffHint(s.tariff),
         companyText: typeof company === 'string' ? company : company?.title
       };
     })

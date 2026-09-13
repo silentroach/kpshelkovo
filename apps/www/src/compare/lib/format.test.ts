@@ -13,30 +13,31 @@ import {
 import type { Tariff } from './settlement/types';
 
 describe('Format Module', () => {
-  describe('formatTariffAuto', () => {
-    it('should keep exact tariffs without tilde', () => {
-      expect(
-        formatTariffAuto({
-          value: 1000,
-          unit: 'perSotka',
-          period: 'month',
-          normalizedPerSotkaMonth: 1000,
-          normalizedIsEstimate: false
-        })
-      ).toBe('1\u00A0000\u00A0₽/сотка');
-    });
+  it('formats compact tariffs with NBSP, rounding and an estimate-only hint', () => {
+    const tariffs = [
+      { normalizedPerSotkaMonth: 1000, normalizedIsEstimate: false },
+      { normalizedPerSotkaMonth: 1200.5, normalizedIsEstimate: true }
+    ] as const;
 
-    it('should add tilde for estimated tariffs', () => {
-      expect(
-        formatTariffAuto({
-          value: 12000,
-          unit: 'perLot',
-          period: 'month',
-          normalizedPerSotkaMonth: 1200,
-          normalizedIsEstimate: true
-        })
-      ).toBe('~1\u00A0200\u00A0₽/сотка');
-    });
+    expect(
+      visibleWhitespace(
+        tariffs.map((tariff) => ({
+          text: formatTariffAuto(tariff),
+          hint: getTariffHint(tariff)
+        }))
+      )
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "hint": undefined,
+          "text": "1·000·₽/сотка",
+        },
+        {
+          "hint": "Тариф приведен к сотке автоматически.",
+          "text": "~1·201·₽/сотка",
+        },
+      ]
+    `);
   });
 
   describe('formatTariffBase', () => {
@@ -138,44 +139,6 @@ describe('Format Module', () => {
           "9·780·₽/сотка в год, это 815·₽/сотка в месяц",
         ]
       `);
-    });
-  });
-
-  describe('getTariffHint', () => {
-    it('should return undefined for exact tariffs', () => {
-      expect(
-        getTariffHint({
-          value: 1000,
-          unit: 'perSotka',
-          period: 'month',
-          normalizedPerSotkaMonth: 1000,
-          normalizedIsEstimate: false
-        })
-      ).toBe(undefined);
-    });
-
-    it('should return generic hint for estimated tariffs', () => {
-      const hint = getTariffHint({
-        value: 5813,
-        unit: 'perLot',
-        period: 'month',
-        normalizedPerSotkaMonth: 681.3,
-        normalizedIsEstimate: true,
-        parts: [
-          {
-            value: 5813,
-            unit: 'perLot',
-            period: 'month'
-          },
-          {
-            value: 100,
-            unit: 'perSotka',
-            period: 'month'
-          }
-        ]
-      });
-
-      expect(hint).toBe('Тариф приведен к сотке автоматически.');
     });
   });
 

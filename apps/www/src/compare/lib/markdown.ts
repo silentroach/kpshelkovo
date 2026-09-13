@@ -5,7 +5,6 @@ import {
   formatDistance,
   formatNumberRu,
   formatPercentage,
-  formatTariff,
   pluralize
 } from '@shelkovo/format';
 import { calculateDistance } from '@shelkovo/geo';
@@ -506,11 +505,7 @@ export function buildSettlementMd({ settlement, comparison, baseline, rating }: 
         md.listItem(`Адрес: ${settlement.location.addressText}`),
         md.listItem(`Тариф: ${formatTariffOriginal(settlement.tariff)}`),
         ...(hasNonSotkaUnit(settlement.tariff)
-          ? [
-              md.listItem(
-                `Для сравнения за сотку: ${settlement.tariff.normalizedIsEstimate ? '~' : ''}${formatTariff(settlement.tariff.normalizedPerSotkaMonth)} в месяц`
-              )
-            ]
+          ? [md.listItem(`Для сравнения за сотку: ${formatTariffAuto(settlement.tariff)} в месяц`)]
           : []),
         ...(settlement.tariff.note
           ? [md.listItem(`Примечание к тарифу: ${settlement.tariff.note}`)]
