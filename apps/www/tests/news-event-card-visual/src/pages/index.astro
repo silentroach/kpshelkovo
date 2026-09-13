@@ -3,7 +3,7 @@ import '../../../config/visual-foundation.css';
 import '@/styles/site.css';
 
 import NewsEventCard from '@/components/news/NewsEventCard.astro';
-import type { NewsEvent } from '@/lib/news/schema';
+import type { NewsEvent } from '@/lib/news/types';
 
 const eventWithCoordinates = {
   slug: 'reglament',
@@ -51,7 +51,7 @@ const eventWithoutCoordinates = {
           class="news-event-visual-target"
           data-testid="news-event-card-coordinates"
         >
-          <NewsEventCard event={eventWithCoordinates} />
+          <NewsEventCard event={eventWithCoordinates} variant="compact" />
         </div>
       </section>
 
@@ -61,7 +61,7 @@ const eventWithoutCoordinates = {
           class="news-event-visual-target"
           data-testid="news-event-card-location-only"
         >
-          <NewsEventCard event={eventWithoutCoordinates} />
+          <NewsEventCard event={eventWithoutCoordinates} variant="compact" />
         </div>
       </section>
     </main>
@@ -80,6 +80,7 @@ const eventWithoutCoordinates = {
 
   .news-event-visual-shell {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
     width: min(100%, 68rem);
     margin: 0 auto;
@@ -101,26 +102,22 @@ const eventWithoutCoordinates = {
   }
 
   .news-event-visual-target {
-    width: 56rem;
-    max-width: 100%;
+    /* Production desktop sidebar: 17.5rem plus screenshot padding. */
+    width: min(100%, 19rem);
     padding: 0.75rem;
     border-radius: 1.75rem;
     background: color-mix(in oklab, white 74%, var(--color-bg) 26%);
   }
 
-  /* Keep Chromium element screenshots out of the backdrop compositing path. */
-  .news-event-visual-target :global(.news-event-panel) {
-    backdrop-filter: none;
-  }
-
   @media (max-width: 47.999rem) {
     .news-event-visual-shell {
       gap: 1rem;
-      padding: 1rem;
+      /* With target padding, match the production 1.25rem mobile gutter. */
+      padding: 0.5rem;
     }
 
     .news-event-visual-target {
-      padding: 0.5rem;
+      width: 100%;
     }
   }
 </style>
