@@ -9,22 +9,12 @@ type PersonProfileMentionRefSource = Pick<
   'id' | 'slug' | 'name' | 'url' | 'markdownUrl' | 'body' | 'mentions'
 >;
 
-const SPACE = /\s+/gu;
-
-const excerpt = (markdown: string): string | undefined => {
-  const first = extractFirstMarkdownText(markdown);
-
-  return first ? first.replace(SPACE, ' ').trim() : undefined;
-};
-
 export const createPersonProfileMentionRefs = (
   profile: PersonProfileMentionRefSource
 ): readonly EntityMentionSourceRef[] => {
   if (!profile.mentions.length) {
     return [];
   }
-
-  const summary = excerpt(profile.body);
 
   return createEntityMentionSourceRefs(profile.mentions, {
     source: {
@@ -36,6 +26,6 @@ export const createPersonProfileMentionRefs = (
     title: profile.name,
     htmlUrl: profile.url,
     markdownUrl: profile.markdownUrl,
-    excerpt: summary
+    excerpt: extractFirstMarkdownText(profile.body)
   });
 };

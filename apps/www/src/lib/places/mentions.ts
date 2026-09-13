@@ -11,8 +11,6 @@ type PlaceMentionRefSource = Pick<
   'body' | 'markdownUrl' | 'mentions' | 'name' | 'slug' | 'url'
 >;
 
-const SPACE = /\s+/gu;
-
 export const createPlaceMentionTarget = (
   slug: string,
   name: string,
@@ -27,12 +25,6 @@ export const createPlaceMentionTarget = (
   htmlUrl: placeUrl(slug),
   markdownUrl: placeMarkdownUrl(slug)
 });
-
-const excerpt = (markdown: string): string | undefined => {
-  const first = extractFirstMarkdownText(markdown);
-
-  return first ? first.replace(SPACE, ' ').trim() : undefined;
-};
 
 export const createPlaceMentionRefs = (
   place: PlaceMentionRefSource
@@ -50,7 +42,7 @@ export const createPlaceMentionRefs = (
     title: place.name,
     htmlUrl: place.url,
     markdownUrl: place.markdownUrl,
-    excerpt: excerpt(place.body),
+    excerpt: extractFirstMarkdownText(place.body),
     sourceEntity: { type: 'place', slug: place.slug }
   });
 };

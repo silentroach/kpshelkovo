@@ -19,14 +19,6 @@ type ContactMentionRefSource = Pick<
   | 'url'
 >;
 
-const SPACE = /\s+/gu;
-
-const excerpt = (markdown: string): string | undefined => {
-  const first = extractFirstMarkdownText(markdown);
-
-  return first ? first.replace(SPACE, ' ').trim() : undefined;
-};
-
 export const createContactMentionRefs = (
   contact: ContactMentionRefSource
 ): readonly EntityMentionSourceRef[] => {
@@ -43,7 +35,7 @@ export const createContactMentionRefs = (
     title: contact.title,
     htmlUrl: contact.url,
     markdownUrl: contact.markdownUrl,
-    excerpt: excerpt(contact.body),
+    excerpt: extractFirstMarkdownText(contact.body),
     mentionedAt: `${contact.updatedIso}T00:00:00.000Z`,
     sortKey: contact.updatedAt.valueOf()
   });

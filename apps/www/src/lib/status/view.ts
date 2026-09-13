@@ -1,5 +1,5 @@
 import { count, dateTimeFromISO, formatDate, formatMonth, pluralize } from '@shelkovo/format';
-import { extractFirstMarkdownText, formatDynamicHtml } from '@shelkovo/markdown';
+import { formatDynamicHtml } from '@shelkovo/markdown';
 
 import { formatArea } from '../areas';
 import type { StatusCalendarDay } from './calendar.types';
@@ -94,7 +94,6 @@ interface StatusDateFormatOptions extends StatusTypographyOptions {
   readonly hasTime?: boolean;
 }
 
-const SPACE = /\s+/gu;
 const NBSP = '\u00A0';
 const CURRENT_STATUS_YEAR = dateTimeFromISO(new Date().toISOString()).year;
 
@@ -136,12 +135,6 @@ const toStatusIncidentPeriodInput = (
     : undefined,
   duration: incident.duration
 });
-
-export const extractStatusExcerpt = (markdown: string): string | undefined => {
-  const first = extractFirstMarkdownText(markdown);
-
-  return first ? first.replace(SPACE, ' ') : undefined;
-};
 
 export const formatStatusDate = (iso: string, opts?: StatusDateFormatOptions): string => {
   const date = formatStatusCalendarDate(iso, opts);

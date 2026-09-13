@@ -55,8 +55,6 @@ type MarkdownPhrasingNode = MarkdownPhrasingNodes[number];
 const serialize = (children: readonly MarkdownNode[]): string =>
   serializeMarkdownDocument(createMarkdownDocument({ children }));
 
-const inline = (value: string): string => value.replace(/\s+/gu, ' ').trim();
-
 const section = (title: string, rows: readonly MarkdownListItem[]): readonly MarkdownNode[] => [
   md.heading(2, title),
   md.list(rows.length > 0 ? rows : [md.listItem('Нет данных.')])
@@ -89,13 +87,15 @@ const backlinkDate = (backlink: PersonMentionRef): string | undefined => {
 const backlinkLine = (backlink: PersonMentionRef): MarkdownListItem => {
   const meta = [formatPersonBacklinkKind(backlink.kind), backlinkDate(backlink)].filter(Boolean);
   const details = meta.length > 0 ? ` — ${meta.join('; ')}` : '';
-  const summary = backlink.excerpt ? inline(backlink.excerpt) : undefined;
   const titleLine: MarkdownPhrasingNode[] = [
     md.link(absoluteUrl(backlink.markdownUrl), backlink.title),
     ...(details ? [md.text(details)] : [])
   ];
 
-  return md.listItem([md.paragraph(titleLine), ...(summary ? [md.paragraph(summary)] : [])]);
+  return md.listItem([
+    md.paragraph(titleLine),
+    ...(backlink.excerpt ? [md.paragraph(backlink.excerpt)] : [])
+  ]);
 };
 
 const backlinksSection = (backlinks: PersonBacklinks): readonly MarkdownNode[] => {

@@ -9,22 +9,12 @@ type NewsArticleMentionRefSource = Pick<
   'id' | 'title' | 'url' | 'markdownUrl' | 'body' | 'mentions' | 'publishedIso' | 'publishedAt'
 >;
 
-const SPACE = /\s+/gu;
-
-const excerpt = (markdown: string): string | undefined => {
-  const first = extractFirstMarkdownText(markdown);
-
-  return first ? first.replace(SPACE, ' ').trim() : undefined;
-};
-
 export const createNewsArticleMentionRefs = (
   article: NewsArticleMentionRefSource
 ): readonly EntityMentionSourceRef[] => {
   if (!article.mentions.length) {
     return [];
   }
-
-  const summary = excerpt(article.body);
 
   return createEntityMentionSourceRefs(article.mentions, {
     source: {
@@ -35,7 +25,7 @@ export const createNewsArticleMentionRefs = (
     title: article.title,
     htmlUrl: article.url,
     markdownUrl: article.markdownUrl,
-    excerpt: summary,
+    excerpt: extractFirstMarkdownText(article.body),
     mentionedAt: article.publishedIso,
     sortKey: article.publishedAt.valueOf()
   });

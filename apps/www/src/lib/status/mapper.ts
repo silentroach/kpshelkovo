@@ -1,3 +1,5 @@
+import { extractFirstMarkdownText } from '@shelkovo/markdown';
+
 import { preprocessSiteMarkdownContent } from '../markdown/render';
 import type { SiteMentionRegistry } from '../mentions';
 import { resolveStatusIncidentState } from './lifecycle';
@@ -5,7 +7,7 @@ import type { RawStatusIncident } from './raw-schema';
 import { statusIncidentCanonical, statusIncidentMarkdownUrl, statusIncidentUrl } from './routes';
 import { STATUS_AREAS, type StatusArea, type StatusKind, type StatusService } from './schema';
 import type { StatusDuration, StatusIncident } from './types';
-import { deriveStatusIncidentTitle, extractStatusExcerpt } from './view';
+import { deriveStatusIncidentTitle } from './view';
 
 interface EntryParts {
   readonly year: string;
@@ -159,7 +161,7 @@ export const mapRawStatusIncident = (
     appliesToAllAreas: area.appliesToAllAreas,
     areas: area.areas,
     sourceUrl: entry.data.source_url,
-    excerpt: body.markdown ? extractStatusExcerpt(body.markdown) : undefined,
+    excerpt: extractFirstMarkdownText(body.markdown),
     body: body.markdown,
     mentions: body.mentions,
     sortStartedAt: started.at.valueOf(),
