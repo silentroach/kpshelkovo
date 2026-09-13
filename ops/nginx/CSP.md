@@ -1,8 +1,14 @@
 # CSP для kpshelkovo.online
 
-Источник истины: `ops/nginx/kpshelkovo-online.conf`, заголовок `Content-Security-Policy`.
+Источник истины: `ops/nginx/security.conf`, заголовок `Content-Security-Policy`.
 
 Этот документ объясняет текущую политику и причины исключений. Процессные правила изменения CSP лежат в `ops/nginx/AGENTS.md`.
+
+## Подключение заголовков
+
+`kpshelkovo-online.conf` подключает файл через `include /etc/nginx/kps/security.conf` на уровне `server` и в каждом `location` со своим `add_header`. Nginx читает include при загрузке конфигурации; заголовки заданы строками, без присваивания переменных на каждом запросе. Повторный include нужен из-за правил наследования `add_header`. Параметр `always` сохраняет заголовки и на ответах с ошибками.
+
+Workflow доставляет include рядом с site-файлом в `/tmp` с суффиксом `.conf.new`. `deploy-nginx-site` устанавливает его в `/etc/nginx/kps` до `nginx -t`; при ошибке проверки восстанавливает оба файла. Назначение каждого заголовка описано в комментариях include-файла.
 
 ## Принципы политики
 

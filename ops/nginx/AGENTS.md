@@ -2,7 +2,7 @@
 
 Локальные правила для `ops/nginx`.
 
-- Перед изменением `Content-Security-Policy` в `kpshelkovo-online.conf` читать `CSP.md`.
+- Перед изменением `Content-Security-Policy` в `security.conf` читать `CSP.md`.
 - Если меняется CSP, синхронно обновлять `CSP.md`: источник, директиву и причину исключения.
 - Для новых внешних ресурсов определять заблокированную директиву по сообщению в консоли браузера.
 - Проверять тип запроса в DevTools Network: script, fetch/xhr, image, style, font, frame или worker.
@@ -11,6 +11,6 @@
 - Оставлять wildcard только там, где провайдер использует много служебных поддоменов.
 - Не добавлять `unsafe-eval`, `*` или широкий `https:` без задокументированной причины в `CSP.md`.
 - Не использовать `more_set_headers`, `more_clear_headers` и другие директивы `headers_more`: модуль не входит во все nginx-сборки и может ломать `nginx -t`.
-- Если в `location` есть свой `add_header`, стандартный nginx не наследует `add_header` из `server`; явно добавлять базовые security headers в такой `location` или проверять это тестом.
+- Если в `location` есть свой `add_header`, стандартный nginx не наследует `add_header` из `server`; явно повторять базовые security headers. Для основного сайта подключать `security.conf` также в таком `location`.
 - После изменения nginx-конфигов проверять `nginx -t` в окружении деплоя перед reload.
 - После изменения CSP перепроверять затронутую страницу в консоли браузера и панели Network.

@@ -9,6 +9,9 @@ link="/etc/nginx/sites-enabled/$name"
 dir=$(mktemp -d)
 bak="$dir/$name.conf.bak"
 old="$dir/$name.enabled.bak"
+headers_src="$(dirname "$src")/security.conf.new"
+headers_dst=/etc/nginx/kps/security.conf
+headers_bak="$dir/security-headers.conf.bak"
 target="$dst"
 had_dst=false
 state=missing
@@ -18,6 +21,15 @@ clean() {
 }
 
 undo() {
+  # Restore the include together with its site config if nginx -t fails.
+  if [ "$name" = kpshelkovo-online ]; then
+    if [ -f "$headers_bak" ]; then
+      install -m 644 "$headers_bak" "$headers_dst"
+    else
+      rm -f "$headers_dst"
+    fi
+  fi
+
   if [ "$had_dst" = true ]; then
     install -m 644 "$bak" "$dst"
   else
@@ -57,6 +69,16 @@ if [ -L "$link" ]; then
 elif [ -f "$link" ]; then
   state=file
   cp "$link" "$old"
+fi
+
+# Only the main site uses this snippet; install it before validating the config.
+if [ "$name" = kpshelkovo-online ]; then
+  test -f "$headers_src"
+  if [ -f "$headers_dst" ]; then
+    cp "$headers_dst" "$headers_bak"
+  fi
+  install -d -m 755 /etc/nginx/kps
+  install -m 644 "$headers_src" "$headers_dst"
 fi
 
 install -m 644 "$src" "$dst"
