@@ -27,6 +27,7 @@
 
 - `extractFirstMarkdownText(markdown)`
   Достает excerpt или summary из Markdown source. Не рендерит HTML. Пропускает code, raw HTML, YAML и definitions; использует image alt text.
+  Возвращает первый непустой читаемый блок: схлопывает пробельные символы (включая NBSP) в обычный пробел и обрезает края. Если читаемого текста нет, возвращает `undefined`. Потребителям не нужны повторные `replace`, `trim` или проверка на пустую строку.
 
 - `formatDynamicHtml(html)`
   Типографирует короткую готовую HTML/text-строку. Использовать для заголовков, labels и tooltip text, которые не нужно парсить как Markdown или оборачивать в `<p>`.

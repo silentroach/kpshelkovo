@@ -28,8 +28,6 @@ const placeLine = (place: Place) =>
     ])
   ]);
 
-const inline = (value: string): string => value.replace(/\s+/gu, ' ').trim();
-
 const backlinkLine = (backlink: PlaceMentionRef) => {
   const meta = [formatPlaceBacklinkKind(backlink.kind), formatPlaceBacklinkDate(backlink)].filter(
     (value): value is string => Boolean(value)
@@ -41,7 +39,7 @@ const backlinkLine = (backlink: PlaceMentionRef) => {
       md.link(absoluteUrl(backlink.markdownUrl), backlink.title),
       ...(details ? [md.text(details)] : [])
     ]),
-    ...(backlink.excerpt ? [md.paragraph(inline(backlink.excerpt))] : [])
+    ...(backlink.excerpt ? [md.paragraph(backlink.excerpt)] : [])
   ]);
 };
 

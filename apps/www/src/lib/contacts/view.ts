@@ -120,19 +120,8 @@ export const hasManyPositiveContactReviews = (
   reviews.filter(({ sentiment }) => sentiment === 'positive').length >=
     MANY_POSITIVE_CONTACT_REVIEWS_THRESHOLD;
 
-export const contactExcerpt = (contact: Pick<Contact, 'body' | 'summary'>): string => {
-  if (contact.summary) {
-    return contact.summary;
-  }
-
-  if (!contact.body.trim()) {
-    return '';
-  }
-
-  const text = (extractFirstMarkdownText(contact.body) ?? '').replace(/\s+/gu, ' ').trim();
-
-  return text;
-};
+export const contactExcerpt = (contact: Pick<Contact, 'body' | 'summary'>): string =>
+  contact.summary || (extractFirstMarkdownText(contact.body) ?? '');
 
 export const contactMethods = (contacts: ContactContacts): readonly ContactMethod[] => {
   const phone = contacts.phone ? formatContactPhone(contacts.phone) : undefined;

@@ -467,6 +467,35 @@ const value = 1
     expect(extractFirstMarkdownText('```ts\nconst value = 1\n```')).toBeUndefined();
   });
 
+  it.each([
+    ['paragraph', '  First  paragraph. \t\n\nIgnored paragraph.'],
+    ['soft break', 'First\nparagraph.'],
+    ['CRLF and tabs', 'First\t\r\nparagraph.'],
+    ['hard break', 'First  \nparagraph.'],
+    ['backslash break', 'First\\\nparagraph.'],
+    ['inline markup', '**First** [*paragraph*](https://example.com).'],
+    ['inline code', 'First `paragraph.`'],
+    ['non-breaking spaces', '\u00A0First\u00A0\u202Fparagraph.\u00A0'],
+    ['space entities', '&nbsp;First&nbsp;&#160;paragraph.&#x202f;'],
+    ['empty first block', '&nbsp;\n\nFirst paragraph.']
+  ])('returns normalized first text for %s', (_name, markdown) => {
+    expect(showNbsp(extractFirstMarkdownText(markdown) ?? '')).toMatchInlineSnapshot(
+      `"First paragraph."`
+    );
+  });
+
+  it.each([
+    '',
+    ' \t\r\n\u00A0\u202F',
+    '&nbsp;\n\n&#160;',
+    '<!-- hidden -->',
+    '[reference]: https://example.com',
+    '![](image.jpg)',
+    '---\n\n```ts\nconst value = 1\n```'
+  ])('returns undefined when markdown has no readable text: %j', (markdown) => {
+    expect(extractFirstMarkdownText(markdown)).toBeUndefined();
+  });
+
   it('extracts all readable markdown text', () => {
     expect(
       extractMarkdownText(`

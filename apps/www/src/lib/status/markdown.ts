@@ -58,8 +58,6 @@ const section = (title: string, rows: readonly MarkdownListItem[]): readonly Mar
   md.list(rows.length > 0 ? rows : [md.listItem('Нет данных.')])
 ];
 
-const inline = (value: string): string => value.replace(/\s+/gu, ' ').trim();
-
 const statusDate = (iso: string, hasTime: boolean): string => (hasTime ? iso : iso.slice(0, 10));
 
 const sourceMarkdownLink = (url: string): ReturnType<typeof md.link> =>
@@ -114,7 +112,6 @@ function incidentLine(
     opts?.hideIncidentPhase ? undefined : getStatusIncidentPhase(incident).label,
     formatStatusIncidentPeriodText(incident)
   ]);
-  const excerpt = incident.excerpt ? inline(incident.excerpt) : undefined;
   const children: MarkdownPhrasingNode[] = [...incidentMarkdownLabel(incident)];
 
   if (meta.length > 0 || (!incident.hasPage && incident.sourceUrl)) {
@@ -125,7 +122,10 @@ function incidentLine(
     }
   }
 
-  return md.listItem([md.paragraph(children), ...(excerpt ? [md.paragraph(excerpt)] : [])]);
+  return md.listItem([
+    md.paragraph(children),
+    ...(incident.excerpt ? [md.paragraph(incident.excerpt)] : [])
+  ]);
 }
 
 function incidentSection(input: {
