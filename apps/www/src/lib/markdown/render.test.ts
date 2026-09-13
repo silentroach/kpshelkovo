@@ -4,6 +4,35 @@ import { createPersonMentionTarget } from '../people/mentions';
 import { preprocessSiteMarkdown, preprocessSiteMarkdownContent, renderMarkdown } from './render';
 
 describe('renderMarkdown', () => {
+  it('loads printable images eagerly without changing the default for other renders', () => {
+    const markdown = `![Карта](/map.png "Схема.")
+
+[![Фото](/photo.png "Подпись.")](/photo.png)
+
+Текст с ![иконкой](/icon.png).`;
+
+    expect(
+      [true, undefined].map((eagerImages) =>
+        [
+          ...renderMarkdown(markdown, { eagerImages }).matchAll(/<img\b[^>]* loading="([^"]+)"/gu)
+        ].map((match) => match[1])
+      )
+    ).toMatchInlineSnapshot(`
+      [
+        [
+          "eager",
+          "eager",
+          "eager",
+        ],
+        [
+          "lazy",
+          "lazy",
+          "lazy",
+        ],
+      ]
+    `);
+  });
+
   it('preprocesses loader body content through the shared app pipeline', () => {
     const registry = new Map([
       ['kschemelinin', createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин')]

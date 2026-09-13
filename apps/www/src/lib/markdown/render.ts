@@ -256,6 +256,8 @@ export const renderMarkdown = (markdown: string, options?: RenderSiteMarkdownOpt
   const preprocessed = preprocessSiteMarkdown(markdown, options).markdown;
 
   return renderFileLinks(
-    renderContentDiffBlocks(render(normalizeContentDiffMarkdown(preprocessed)))
+    renderContentDiffBlocks(
+      render(normalizeContentDiffMarkdown(preprocessed), { eagerImages: options?.eagerImages })
+    )
   );
 };

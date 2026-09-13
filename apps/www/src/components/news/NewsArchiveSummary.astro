@@ -9,7 +9,7 @@ interface Props {
 }
 
 const { summary, label } = Astro.props;
-const html = renderMarkdown(summary.body);
+const html = renderMarkdown(summary.body, { eagerImages: true });
 ---
 
 <section

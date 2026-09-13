@@ -1,6 +1,7 @@
 ---
 import '@/styles/global.css';
 import '../styles/site.css';
+import '@/styles/print.css';
 import { ClientRouter } from 'astro:transitions';
 import {
   BRAND_KEYWORDS,
@@ -81,6 +82,7 @@ const enableMetrika = prod && !disableAnalytics;
 const ymId = 108975391;
 const bodyClasses = [
   'ui-root-site',
+  /^\/(kb|news)(\/|$)/u.test(Astro.url.pathname) && 'site-print-content',
   showSiteHeader && 'site-has-header',
   bodyClass,
 ]

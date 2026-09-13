@@ -33,7 +33,9 @@ const galleryPhotos = photos.map((photo, index) => {
   return {
     url: photo.url,
     alt: photo.alt,
-    captionHtml: photo.caption ? renderMarkdown(photo.caption) : undefined,
+    captionHtml: photo.caption
+      ? renderMarkdown(photo.caption, { eagerImages: true })
+      : undefined,
     fullWidth,
     renderedWidth: width,
     renderedHeight: Math.round((photo.height * width) / photo.width),
@@ -86,7 +88,7 @@ const galleryPhotos = photos.map((photo, index) => {
                   format="webp"
                   quality={82}
                   alt={photo.alt}
-                  loading="lazy"
+                  loading="eager"
                   decoding="async"
                   class:list={[
                     'news-photos__image',

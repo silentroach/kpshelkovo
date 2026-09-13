@@ -57,7 +57,9 @@ const schema = kbPageSchema({
   breadcrumbs,
   description,
 });
-const bodyHtml = page.body ? renderMarkdown(page.body) : undefined;
+const bodyHtml = page.body
+  ? renderMarkdown(page.body, { eagerImages: true })
+  : undefined;
 ---
 
 <BaseLayout

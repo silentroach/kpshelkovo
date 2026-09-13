@@ -23,7 +23,7 @@
   Тип для Markdown preprocessors приложения. Preprocessors выполняются до Markdown parsing, например для упоминаний вида `@person:case`.
 
 - `RenderOptions`
-  Позволяет передать в `render` один preprocessor или pipeline preprocessors. Options пакета должны оставаться универсальными; доменная логика живет в приложении.
+  Позволяет передать в `render` один preprocessor или pipeline preprocessors. `eagerImages: true` рендерит изображения с `loading="eager"`, чтобы их загрузка не зависела от прокрутки, например для печатаемых материалов. По умолчанию используется `loading="lazy"`. Options пакета должны оставаться универсальными; доменная логика живет в приложении.
 
 - `extractFirstMarkdownText(markdown)`
   Достает excerpt или summary из Markdown source. Не рендерит HTML. Пропускает code, raw HTML, YAML и definitions; использует image alt text.
