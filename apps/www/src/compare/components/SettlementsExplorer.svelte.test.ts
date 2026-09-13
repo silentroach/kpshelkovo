@@ -1,6 +1,8 @@
 import { render, waitFor, fireEvent } from '@testing-library/svelte';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+import { formatTariffAuto, getTariffHint } from '@/compare/lib/format';
+
 import type { ExplorerSettlement } from '../lib/explorer';
 import type { ComparisonResult, Stats } from '../lib/settlement/types';
 import SettlementsExplorer from './SettlementsExplorer.svelte';
@@ -25,7 +27,7 @@ const mockYandexMaps = {
   YMapDefaultFeaturesLayer: vi.fn(function YMapDefaultFeaturesLayer() {
     return {};
   }),
-  YMapMarker: vi.fn(function YMapMarker() {
+  YMapMarker: vi.fn(function YMapMarker(_options: unknown, _element: HTMLElement) {
     return { update: vi.fn() };
   })
 };
@@ -267,6 +269,32 @@ describe('SettlementsExplorer', () => {
       expect(mockMap.removeChild).toHaveBeenCalledTimes(2);
     });
   });
+
+  it.each([false, true])(
+    'passes the tariff and hint to the map popup (estimate: %s)',
+    async (normalizedIsEstimate) => {
+      setScreen(false);
+      const settlement = {
+        ...settlements[1],
+        tariff: { normalizedPerSotkaMonth: 1200.5, normalizedIsEstimate }
+      };
+      const { getByTestId } = render(SettlementsExplorer, {
+        props: { settlements: [settlement], comparisons, stats }
+      });
+
+      await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
+      const marker = mockYandexMaps.YMapMarker.mock.calls[0]?.[1];
+      if (!marker) throw new Error('Missing settlement marker');
+      await fireEvent.click(marker);
+
+      const popup = await waitFor(() => getByTestId('map-popup'));
+      const value = popup.querySelector('strong');
+      expect(value?.textContent).toBe(formatTariffAuto(settlement.tariff));
+      expect(value?.parentElement?.getAttribute('title') ?? undefined).toBe(
+        getTariffHint(settlement.tariff)
+      );
+    }
+  );
 
   it('uses rating order by default', async () => {
     setScreen(false);

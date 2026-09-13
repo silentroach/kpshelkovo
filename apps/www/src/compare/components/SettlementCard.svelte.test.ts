@@ -1,6 +1,8 @@
 import { render } from '@testing-library/svelte';
 import { describe, it, expect } from 'vitest';
 
+import { formatTariffAuto, getTariffHint } from '@/compare/lib/format';
+
 import type { ExplorerSettlement } from '../lib/explorer';
 import type { ComparisonResult } from '../lib/settlement/types';
 import SettlementCard from './SettlementCard.svelte';
@@ -66,20 +68,6 @@ describe('SettlementCard', () => {
     expect(card?.className).toContain('ui-shell');
   });
 
-  it('renders tariff formatted correctly', () => {
-    const { container } = render(SettlementCard, {
-      props: {
-        settlement: mockSettlement,
-        comparison: mockComparisonCheaper,
-        rank: 1,
-        total: 3,
-        isBaseline: false
-      }
-    });
-
-    expect(container.textContent).toContain('100\u00A0₽/сотка');
-  });
-
   it('renders rank as plain text in header', () => {
     const { container } = render(SettlementCard, {
       props: {
@@ -96,18 +84,10 @@ describe('SettlementCard', () => {
     );
   });
 
-  it('renders estimated tariff with tilde and hint', () => {
-    const settlement = {
-      ...mockSettlement,
-      tariff: {
-        normalizedPerSotkaMonth: 1200,
-        normalizedIsEstimate: true
-      }
-    };
-
-    const { container } = render(SettlementCard, {
+  it('updates tariff text and adds or removes the hint when the tariff changes', async () => {
+    const { container, rerender } = render(SettlementCard, {
       props: {
-        settlement,
+        settlement: mockSettlement,
         comparison: mockComparisonCheaper,
         rank: 1,
         total: 3,
@@ -115,9 +95,17 @@ describe('SettlementCard', () => {
       }
     });
 
-    expect(container.textContent).toContain('~1');
-    expect(container.textContent).toContain('₽/сотка');
-    expect(container.querySelector('[title="Тариф приведен к сотке автоматически."]')).toBeTruthy();
+    for (const tariff of [
+      mockSettlement.tariff,
+      { normalizedPerSotkaMonth: 1200.5, normalizedIsEstimate: true },
+      mockSettlement.tariff
+    ]) {
+      await rerender({ settlement: { ...mockSettlement, tariff } });
+
+      const value = container.querySelector('.tariff');
+      expect(value?.textContent?.trim()).toBe(formatTariffAuto(tariff));
+      expect(value?.getAttribute('title') ?? undefined).toBe(getTariffHint(tariff));
+    }
   });
 
   it('renders "дешевле на" for cheaper settlement', () => {
@@ -230,7 +218,7 @@ describe('SettlementCard', () => {
     // Должна рендериться без ошибок.
     expect(container.querySelector('[data-testid="settlement-card"]')).toBeTruthy();
     // Должен рендериться тариф, но не текст сравнения.
-    expect(container.textContent).toContain('100\u00A0₽/сотка');
+    expect(container.textContent).toContain(formatTariffAuto(mockSettlement.tariff));
     expect(container.textContent).not.toContain('дешевле на');
     expect(container.textContent).not.toContain('дороже на');
   });
@@ -252,7 +240,7 @@ describe('SettlementCard', () => {
       }
     });
 
-    expect(container.textContent).toContain('100\u00A0₽/сотка');
+    expect(container.textContent).toContain(formatTariffAuto(mockSettlement.tariff));
     expect(container.textContent).not.toContain('дешевле на 0');
     expect(container.textContent).not.toContain('дороже на 0');
     expect(container.textContent).not.toContain('базовый тариф');

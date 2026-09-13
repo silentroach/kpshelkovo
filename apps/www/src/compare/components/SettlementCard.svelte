@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { formatCurrency, formatTariff } from '@shelkovo/format';
+  import { formatCurrency } from '@shelkovo/format';
+
+  import { formatTariffAuto, getTariffHint } from '@/compare/lib/format';
 
   import type { ExplorerSettlement } from '../lib/explorer';
   import type { ComparisonResult } from '../lib/settlement/types';
@@ -15,14 +17,8 @@
 
   let { settlement, comparison, rank, total, isBaseline }: Props = $props();
 
-  const tariffText = $derived.by(() => {
-    const text = formatTariff(settlement.tariff.normalizedPerSotkaMonth);
-    return settlement.tariff.normalizedIsEstimate ? `~${text}` : text;
-  });
-
-  const tariffHint = $derived(
-    settlement.tariff.normalizedIsEstimate ? 'Тариф приведен к сотке автоматически.' : undefined
-  );
+  const tariffText = $derived(formatTariffAuto(settlement.tariff));
+  const tariffHint = $derived(getTariffHint(settlement.tariff));
 </script>
 
 <article data-testid="settlement-card" class="ui-shell compare-settlement-card">

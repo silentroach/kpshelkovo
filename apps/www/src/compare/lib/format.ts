@@ -52,10 +52,6 @@ function join(value: string): string {
   return value.endsWith('.') ? ' ' : '. ';
 }
 
-const numeric = (item: TariffLike): number => item.normalizedPerSotkaMonth;
-
-const estimated = (item: TariffLike): boolean => item.normalizedIsEstimate;
-
 const unit = (value: unknown): Tariff['unit'] => {
   if (value === 'perSotka') return 'perSotka';
   if (value === 'perLot') return 'perLot';
@@ -68,8 +64,8 @@ const tariffParts = (tariff: TariffSource): readonly TariffPart[] => tariff.part
  * Format normalized tariff and add '~' for estimated values.
  */
 export function formatTariffAuto(tariff: TariffLike): string {
-  const text = formatTariff(numeric(tariff));
-  if (!estimated(tariff)) return text;
+  const text = formatTariff(tariff.normalizedPerSotkaMonth);
+  if (!tariff.normalizedIsEstimate) return text;
   return `~${text}`;
 }
 
@@ -157,7 +153,7 @@ export interface LotCalc {
  * Generic tooltip for compact cards.
  */
 export function getTariffHint(tariff: TariffLike): string | undefined {
-  if (!estimated(tariff)) return;
+  if (!tariff.normalizedIsEstimate) return;
   return 'Тариф приведен к сотке автоматически.';
 }
 
