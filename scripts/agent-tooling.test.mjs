@@ -5,12 +5,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 
 import { checkGenerated, generateOpenSpec } from './openspec.mjs';
-import {
-  applySkillPatches,
-  hashSkill,
-  verifyOpenCodeSkills,
-  verifySkillHashes
-} from './skills.mjs';
+import { hashSkill, verifyOpenCodeSkills, verifySkillHashes } from './skills.mjs';
 
 test('generation ignores the caller profile and detects modified, missing and extra instructions', () => {
   const temp = mkdtempSync(join(tmpdir(), 'openspec-test-'));
@@ -41,25 +36,25 @@ test('generation ignores the caller profile and detects modified, missing and ex
   }
 });
 
-test('skill verification catches incomplete installs and incompatible patches, and verifies restored upstream bytes', () => {
+test('skill verification detects altered, missing and unexpected skills alongside project-owned skills', () => {
   const temp = mkdtempSync(join(tmpdir(), 'skills-test-'));
   try {
     const directory = join(temp, '.agents/skills/example');
     mkdirSync(directory, { recursive: true });
     writeFileSync(join(directory, 'SKILL.md'), 'Upstream\n');
     const skills = { example: { computedHash: hashSkill(directory) } };
-    const check = () => verifySkillHashes(join(temp, '.agents/skills'), skills);
+    mkdirSync(join(temp, '.agents/skills/project-owned'));
+    writeFileSync(join(temp, '.agents/skills/project-owned/SKILL.md'), 'Project-owned\n');
+    const check = () =>
+      verifySkillHashes(join(temp, '.agents/skills'), skills, new Set(['project-owned']));
     check();
-    const patch = join(temp, 'example.patch');
-    writeFileSync(
-      patch,
-      '--- a/.agents/skills/example/SKILL.md\n+++ b/.agents/skills/example/SKILL.md\n@@ -1 +1 @@\n-Upstream\n+Project\n'
-    );
-    applySkillPatches(temp, [patch]);
+    writeFileSync(join(directory, 'SKILL.md'), 'Altered\n');
     assert.throws(check, /content differs/);
-    assert.throws(() => applySkillPatches(temp, [patch]), /Command failed/);
-    applySkillPatches(temp, [patch], true);
+    writeFileSync(join(directory, 'SKILL.md'), 'Upstream\n');
     check();
+    mkdirSync(join(temp, '.agents/skills/unexpected'));
+    assert.throws(check, /Unexpected skills: unexpected/);
+    rmSync(join(temp, '.agents/skills/unexpected'), { recursive: true });
     rmSync(join(directory, 'SKILL.md'));
     assert.throws(check, /Missing skill: example/);
     const stale = join(temp, '.opencode/skills/ask-matt');

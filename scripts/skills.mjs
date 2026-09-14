@@ -54,7 +54,7 @@ export function hashSkill(directory) {
   return hash.digest('hex');
 }
 
-export function verifySkillHashes(directory, skills) {
+export function verifySkillHashes(directory, skills, owned = new Set()) {
   for (const [name, entry] of Object.entries(skills)) {
     const installed = join(directory, name);
     if (!existsSync(join(installed, 'SKILL.md'))) throw new Error(`Missing skill: ${name}`);
@@ -62,21 +62,10 @@ export function verifySkillHashes(directory, skills) {
       throw new Error(`Skill content differs from skills-lock.json: ${name}`);
     }
   }
-  const extras = readdirSync(directory).filter((name) => !Object.keys(skills).includes(name));
+  const extras = readdirSync(directory).filter(
+    (name) => !owned.has(name) && !Object.keys(skills).includes(name)
+  );
   if (extras.length) throw new Error(`Unexpected skills: ${extras.join(', ')}`);
-}
-
-export function applySkillPatches(directory, patches, reverse = false) {
-  for (const patch of reverse ? [...patches].reverse() : patches) {
-    execFileSync(
-      'git',
-      ['apply', ...(reverse ? ['--reverse'] : []), '--whitespace=nowarn', patch],
-      {
-        cwd: directory,
-        stdio: 'pipe'
-      }
-    );
-  }
 }
 
 export function verifyOpenCodeSkills(directory, projectSkills) {
@@ -115,13 +104,10 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   if (extras.length)
     throw new Error(`Remove unconfigured project skills first: ${extras.join(', ')}`);
   verifyOpenCodeSkills(root, new Set([...owned, ...names]));
-  const patches = globSync('.agents/skill-patches/*.patch', { cwd: root })
-    .sort()
-    .map((path) => join(root, path));
-  const temp = mkdtempSync(join(tmpdir(), 'shelkovo-skills-'));
-  try {
-    const staged = join(temp, '.agents/skills');
-    if (mode === 'install') {
+  if (mode === 'install') {
+    const temp = mkdtempSync(join(tmpdir(), 'shelkovo-skills-'));
+    try {
+      const staged = join(temp, '.agents/skills');
       const groups = Map.groupBy(
         Object.entries(lock.skills),
         ([, entry]) => `${entry.source}#${entry.ref}`
@@ -158,7 +144,6 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
         );
       }
       verifySkillHashes(staged, lock.skills);
-      applySkillPatches(temp, patches);
       for (const name of names) {
         const destination = join(local, name);
         if (existsSync(destination) && lstatSync(destination).isSymbolicLink())
@@ -166,21 +151,12 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
         rmSync(destination, { recursive: true, force: true });
         cpSync(join(staged, name), destination, { recursive: true });
       }
-    } else {
-      for (const name of names) {
-        const installed = join(local, name);
-        if (!existsSync(installed)) throw new Error(`Missing skill: ${name}`);
-        if (lstatSync(installed).isSymbolicLink())
-          throw new Error(`Unexpected skill symlink: ${installed}`);
-        cpSync(installed, join(staged, name), { recursive: true });
-      }
+    } finally {
+      rmSync(temp, { recursive: true, force: true });
     }
-    applySkillPatches(temp, patches, true);
-    verifySkillHashes(staged, lock.skills);
-    console.log(
-      `Skills ${mode}: ${names.length} pinned external skills and ${owned.size} project-owned skills verified.`
-    );
-  } finally {
-    rmSync(temp, { recursive: true, force: true });
   }
+  verifySkillHashes(local, lock.skills, owned);
+  console.log(
+    `Skills ${mode}: ${names.length} pinned external skills and ${owned.size} project-owned skills verified.`
+  );
 }

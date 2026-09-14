@@ -29,33 +29,12 @@
       "skillPath": "skills/best-practices/SKILL.md",
       "computedHash": "ca00ef2671d65a7442bc796e8744cd3d759f92c01640f2fbcab638889c494424"
     },
-    "codebase-design": {
-      "source": "mattpocock/skills",
-      "ref": "3cca18b368ae95cdbdebbff572ccafa662551015",
-      "sourceType": "github",
-      "skillPath": "skills/engineering/codebase-design/SKILL.md",
-      "computedHash": "5a17552cc1482f1a40124bf4e6c9dbd90ac0dbb47e71c07d47369f9e5f2ae3b5"
-    },
-    "copy-editing": {
-      "source": "coreyhaines31/marketingskills",
-      "ref": "5b2c0007766c6a1cf1d53fd8fc73e979e0821022",
-      "sourceType": "github",
-      "skillPath": "skills/copy-editing/SKILL.md",
-      "computedHash": "ba4e44a8470b3ae2add3e0ffa74c85d8b0357db4ca2cf8cfa7b4abc9d94fc602"
-    },
     "core-web-vitals": {
       "source": "addyosmani/web-quality-skills",
       "ref": "afa8da942115f2961fdbfa80807ea0b232ff6c00",
       "sourceType": "github",
       "skillPath": "skills/core-web-vitals/SKILL.md",
       "computedHash": "601b2cbb920fb0ea9814a3f11232d7883e1eb0923865218502ab1d73e9fc5172"
-    },
-    "diagnosing-bugs": {
-      "source": "mattpocock/skills",
-      "ref": "3cca18b368ae95cdbdebbff572ccafa662551015",
-      "sourceType": "github",
-      "skillPath": "skills/engineering/diagnosing-bugs/SKILL.md",
-      "computedHash": "37b5e9c624513551da790b52864dc8c84bff996a6d03a380cc6facdcc0a88354"
     },
     "documentation-and-adrs": {
       "source": "addyosmani/agent-skills",
@@ -64,26 +43,12 @@
       "skillPath": "skills/documentation-and-adrs/SKILL.md",
       "computedHash": "f13054e8bd32a432df3e0e68240758cf61a9e8817aa8540f9d9831f427c47e0e"
     },
-    "frontend-ui-engineering": {
-      "source": "addyosmani/agent-skills",
-      "ref": "be4e44a9fbc5e8df0beaefadbb28bd22ee61cc39",
-      "sourceType": "github",
-      "skillPath": "skills/frontend-ui-engineering/SKILL.md",
-      "computedHash": "cb4e981ecb5f701b451fc4e937a38049b49fd4523f213e06cffbd00b007060dc"
-    },
     "grill-me": {
       "source": "mattpocock/skills",
       "ref": "3cca18b368ae95cdbdebbff572ccafa662551015",
       "sourceType": "github",
       "skillPath": "skills/productivity/grill-me/SKILL.md",
       "computedHash": "9cdbb4b8f7a3aeaef82e6230c9e823500d4a8a1214c726cf342cf9829d34fc7d"
-    },
-    "grill-with-docs": {
-      "source": "mattpocock/skills",
-      "ref": "3cca18b368ae95cdbdebbff572ccafa662551015",
-      "sourceType": "github",
-      "skillPath": "skills/engineering/grill-with-docs/SKILL.md",
-      "computedHash": "35e62aa423aaeab6a414bcac273f56dfb17802ef2334b41b6a3b00f28196c8cf"
     },
     "grilling": {
       "source": "mattpocock/skills",
@@ -106,13 +71,6 @@
       "skillPath": "skills/humanizer-ru/SKILL.md",
       "computedHash": "923bae7f9773b1a91846538fe9c86d4c18855b56533c611a42be72795f09abc1"
     },
-    "improve-codebase-architecture": {
-      "source": "mattpocock/skills",
-      "ref": "3cca18b368ae95cdbdebbff572ccafa662551015",
-      "sourceType": "github",
-      "skillPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
-      "computedHash": "2449db6ab1ded9581f69fcc56c1f64818112d05e271fd4c5da23c6523f9d3d9d"
-    },
     "nginx-expert": {
       "source": "personamanagmentlayer/pcl",
       "ref": "79ccaa9820486121fa33aaa696ec16fa1607bf02",
@@ -126,13 +84,6 @@
       "sourceType": "github",
       "skillPath": "skills/performance/SKILL.md",
       "computedHash": "ce9d36f139a1b2a6a8ac2cb222698963b8076d2dd8b41685e8e8ae589cdcf1e4"
-    },
-    "performance-optimization": {
-      "source": "addyosmani/agent-skills",
-      "ref": "be4e44a9fbc5e8df0beaefadbb28bd22ee61cc39",
-      "sourceType": "github",
-      "skillPath": "skills/performance-optimization/SKILL.md",
-      "computedHash": "f0a8e3bdb9b7d199434c2a5dd7cbb7d3cf69d802029cde1ef5daa07bffa27efc"
     },
     "ponytail": {
       "source": "dietrichgebert/ponytail",
@@ -197,13 +148,6 @@
       "skillPath": "skills/engineering/resolving-merge-conflicts/SKILL.md",
       "computedHash": "63b2dcadbe9124caeb3448f1378286fe18dcefb2494f60e136831b8b4986ca27"
     },
-    "security-and-hardening": {
-      "source": "addyosmani/agent-skills",
-      "ref": "be4e44a9fbc5e8df0beaefadbb28bd22ee61cc39",
-      "sourceType": "github",
-      "skillPath": "skills/security-and-hardening/SKILL.md",
-      "computedHash": "c2556c7890d2509981d6613c8f51a9371d1415b805d802912339e0b4e530fe3c"
-    },
     "seo": {
       "source": "addyosmani/web-quality-skills",
       "ref": "afa8da942115f2961fdbfa80807ea0b232ff6c00",
@@ -217,13 +161,6 @@
       "sourceType": "github",
       "skillPath": "plugins/claude/svelte/skills/svelte-code-writer/SKILL.md",
       "computedHash": "6f78193a79906175595ce8e4ca8d726da350eb99035a9544b6553620df5673a1"
-    },
-    "tdd": {
-      "source": "mattpocock/skills",
-      "ref": "3cca18b368ae95cdbdebbff572ccafa662551015",
-      "sourceType": "github",
-      "skillPath": "skills/engineering/tdd/SKILL.md",
-      "computedHash": "e753a5da75292bbe59d302d89566bc2c53d0e73944da2f0e944a7578883c07d0"
     },
     "teach": {
       "source": "mattpocock/skills",
@@ -239,33 +176,12 @@
       "skillPath": "skills/productivity/to-questionnaire/SKILL.md",
       "computedHash": "befbec7005695163741a57bc94810dc5048fb766baaa485d5160b1d7f86335c1"
     },
-    "turborepo": {
-      "source": "vercel/turborepo",
-      "ref": "4508113cbcdc53a4afcbc34a20ba028546b98711",
-      "sourceType": "github",
-      "skillPath": "skills/turborepo/SKILL.md",
-      "computedHash": "78f067bd13a400943a38240c63d37bc4c2133da492bad09ab52cf8d848c86c78"
-    },
-    "wait-what": {
-      "source": "mattpocock/skills",
-      "ref": "3cca18b368ae95cdbdebbff572ccafa662551015",
-      "sourceType": "github",
-      "skillPath": "skills/productivity/wait-what/SKILL.md",
-      "computedHash": "71a9a1f1773d4b1ff70a9d496db63855ef83a7fe906c72b70cdebf4815a2c4c1"
-    },
     "web-quality-audit": {
       "source": "addyosmani/web-quality-skills",
       "ref": "afa8da942115f2961fdbfa80807ea0b232ff6c00",
       "sourceType": "github",
       "skillPath": "skills/web-quality-audit/SKILL.md",
       "computedHash": "9be796fc70ff05cf9842327d234b019376dc1abad8d7e3c4e3ea2dab8d8d3deb"
-    },
-    "web-typography": {
-      "source": "wondelai/skills",
-      "ref": "c172996495bed0fcd26896a9416b2093fd7073f0",
-      "sourceType": "github",
-      "skillPath": "web-typography/SKILL.md",
-      "computedHash": "c17dc754c870e6de1bed62c972291f56c5b7752b921c2273886a6f6380d16596"
     },
     "wizard": {
       "source": "mattpocock/skills",
