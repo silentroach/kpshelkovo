@@ -1,76 +1,7 @@
-diff --git a/.agents/skills/code-review/SKILL.md b/.agents/skills/code-review/SKILL.md
-index e28d7acb..5984fcf6 100644
---- a/.agents/skills/code-review/SKILL.md
-+++ b/.agents/skills/code-review/SKILL.md
-@@ -3,33 +3,32 @@ name: code-review
- description: "Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes: Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/spec asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\"."
- ---
- 
--Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
-+Two-axis review of the complete current diff from a fixed base, including committed, staged, unstaged, and untracked changes:
- 
- - **Standards**: does the code conform to this repo's documented coding standards?
- - **Spec**: does the code faithfully implement the originating issue / spec?
- 
- Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
- 
--The issue tracker should have been provided to you. If `docs/agents/issue-tracker.md` is missing, tell the user to run `/setup-matt-pocock-skills`.
-+Read the "Жизненный цикл изменений" section in the root `AGENTS.md`. Use `project-issues` for GitHub access and issue/change/PR links. This review is the agent's own check before the owner's PR review.
- 
- ## Process
- 
- ### 1. Pin the fixed point
- 
--Whatever the user said is the fixed point (a commit SHA, branch name, tag, `main`, `HEAD~5`, etc.). If they didn't specify one, ask for it.
-+Use the user's fixed point when provided. Otherwise use the branch's merge-base with `origin/master`; ask only when the intended base cannot be established.
- 
--Capture the diff command once: `git diff <fixed-point>...HEAD` (three-dot, so the comparison is against the merge-base). Also note the list of commits via `git log <fixed-point>..HEAD --oneline`.
-+Resolve `base=$(git merge-base <fixed-point> HEAD)`. Review `git diff "$base"` for tracked working-tree changes, `git diff --cached "$base"` for staged content, and every file from `git ls-files --others --exclude-standard`. Also capture `git status --short` and `git log "$base"..HEAD --oneline`. Pass this complete scope to both reviewers; reviewing only committed changes misses work in progress.
- 
--Before going further, confirm the fixed point resolves (`git rev-parse <fixed-point>`) and the diff is non-empty. A bad ref or empty diff should fail here, not inside two parallel sub-agents.
-+Confirm the base resolves and at least one tracked or untracked change exists. Untracked-only work is a valid review scope.
- 
- ### 2. Identify the spec source
- 
- Look for the originating spec, in this order:
- 
--1. Issue references in the commit messages (`#123`, `Closes #45`, GitLab `!67`, etc.), fetched via the workflow in `docs/agents/issue-tracker.md`.
--2. A path the user passed as an argument.
--3. A spec file under `docs/`, `specs/`, or `.scratch/` matching the branch name or feature.
--4. If nothing is found, ask the user where the spec is. If they say there isn't one, the **Spec** sub-agent will skip and report "no spec available".
-+1. The current OpenSpec change (proposal, delta specs, design, tasks) and all affected main specs in `openspec/specs/`. For a completed change, follow its archive path. Use issue references and branch context to locate it.
-+2. For the short route, the user's request or originating issue fetched with `project-issues`.
-+3. If neither source can be established, ask; report an unavailable spec explicitly rather than inventing requirements from the implementation.
- 
- ### 3. Identify the standards sources
- 
-diff --git a/.agents/skills/code-simplification/SKILL.md b/.agents/skills/code-simplification/SKILL.md
-index 239b2848..01e8e6eb 100644
---- a/.agents/skills/code-simplification/SKILL.md
-+++ b/.agents/skills/code-simplification/SKILL.md
-@@ -156,7 +156,7 @@ Scan for these patterns — each one is a concrete signal, not a vague smell:
- 
- ### Step 3: Apply Changes Incrementally
- 
--Make one simplification at a time. Run tests after each change. **Submit refactoring changes separately from feature or bug fix changes.** A PR that refactors and adds a feature is two PRs — split them.
-+Follow the "Жизненный цикл изменений" section of root `AGENTS.md`. Simplification of the current implementation belongs to the same change and PR; rerun affected checks. Independent refactors outside the agreed scope are separate changes.
- 
- ```
- FOR EACH SIMPLIFICATION:
-@@ -304,7 +304,7 @@ function UserBadge({ user }: Props) {
- | "The types make it self-documenting" | Types document structure, not intent. A well-named function explains *why* better than a type signature explains *what*. |
- | "This abstraction might be useful later" | Don't preserve speculative abstractions. If it's not used now, it's complexity without value. Remove it and re-add when needed. |
- | "The original author must have had a reason" | Maybe. Check git blame — apply Chesterton's Fence. But accumulated complexity often has no reason; it's just the residue of iteration under pressure. |
--| "I'll refactor while adding this feature" | Separate refactoring from feature work. Mixed changes are harder to review, revert, and understand in history. |
-+| "I'll refactor while adding this feature" | Keep fixes and simplification of this implementation in its change; scope independent refactors separately under root AGENTS.md. |
- 
- ## Red Flags
- 
 diff --git a/.agents/skills/codebase-design/DESIGN-IT-TWICE.md b/.agents/skills/codebase-design/DESIGN-IT-TWICE.md
-index 7edc861a..3e762f15 100644
 --- a/.agents/skills/codebase-design/DESIGN-IT-TWICE.md
 +++ b/.agents/skills/codebase-design/DESIGN-IT-TWICE.md
-@@ -27,7 +27,7 @@ Prompt each sub-agent with a separate technical brief (file paths, coupling deta
+@@ -27,7 +27,7 @@
  - Agent 3: "Optimise for the most common caller: make the default case trivial."
  - Agent 4 (if applicable): "Design around ports & adapters for cross-seam dependencies."
  
@@ -80,10 +11,9 @@ index 7edc861a..3e762f15 100644
  Each sub-agent outputs:
  
 diff --git a/.agents/skills/diagnosing-bugs/SKILL.md b/.agents/skills/diagnosing-bugs/SKILL.md
-index 061c25a5..ce56e117 100644
 --- a/.agents/skills/diagnosing-bugs/SKILL.md
 +++ b/.agents/skills/diagnosing-bugs/SKILL.md
-@@ -7,7 +7,7 @@ description: Diagnosis loop for hard bugs and performance regressions. Use when
+@@ -7,7 +7,7 @@
  
  A discipline for hard bugs. Skip phases only when explicitly justified.
  
@@ -92,222 +22,19 @@ index 061c25a5..ce56e117 100644
  
  ## Redact
  
-diff --git a/.agents/skills/domain-modeling/ADR-FORMAT.md b/.agents/skills/domain-modeling/ADR-FORMAT.md
-deleted file mode 100644
-index d7e61f30..00000000
---- a/.agents/skills/domain-modeling/ADR-FORMAT.md
-+++ /dev/null
-@@ -1,47 +0,0 @@
--# ADR Format
--
--ADRs live in `docs/adr/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`, etc.
--
--Create the `docs/adr/` directory lazily: only when the first ADR is needed.
--
--## Template
--
--```md
--# {Short title of the decision}
--
--{1-3 sentences: what's the context, what did we decide, and why.}
--```
--
--That's it. An ADR can be a single paragraph. The value is in recording *that* a decision was made and *why*, not in filling out sections.
--
--## Optional sections
--
--Only include these when they add genuine value. Most ADRs won't need them.
--
--- **Status** frontmatter (`proposed | accepted | deprecated | superseded by ADR-NNNN`): useful when decisions are revisited
--- **Considered Options**: only when the rejected alternatives are worth remembering
--- **Consequences**: only when non-obvious downstream effects need to be called out
--
--## Numbering
--
--Scan `docs/adr/` for the highest existing number and increment by one.
--
--## When to offer an ADR
--
--All three of these must be true:
--
--1. **Hard to reverse**: the cost of changing your mind later is meaningful
--2. **Surprising without context**: a future reader will look at the code and wonder "why on earth did they do it this way?"
--3. **The result of a real trade-off**: there were genuine alternatives and you picked one for specific reasons
--
--If a decision is easy to reverse, skip it: you'll just reverse it. If it's not surprising, nobody will wonder why. If there was no real alternative, there's nothing to record beyond "we did the obvious thing."
--
--### What qualifies
--
--- **Architectural shape.** "We're using a monorepo." "The write model is event-sourced, the read model is projected into Postgres."
--- **Integration patterns between contexts.** "Ordering and Billing communicate via domain events, not synchronous HTTP."
--- **Technology choices that carry lock-in.** Database, message bus, auth provider, deployment target. Not every library: just the ones that would take a quarter to swap out.
--- **Boundary and scope decisions.** "Customer data is owned by the Customer context; other contexts reference it by ID only." The explicit no-s are as valuable as the yes-s.
--- **Deliberate deviations from the obvious path.** "We're using manual SQL instead of an ORM because X." Anything where a reasonable reader would assume the opposite. These stop the next engineer from "fixing" something that was deliberate.
--- **Constraints not visible in the code.** "We can't use AWS because of compliance requirements." "Response times must be under 200ms because of the partner API contract."
--- **Rejected alternatives when the rejection is non-obvious.** If you considered GraphQL and picked REST for subtle reasons, record it; otherwise someone will suggest GraphQL again in six months.
-diff --git a/.agents/skills/domain-modeling/CONTEXT-FORMAT.md b/.agents/skills/domain-modeling/CONTEXT-FORMAT.md
-deleted file mode 100644
-index 79bbb32f..00000000
---- a/.agents/skills/domain-modeling/CONTEXT-FORMAT.md
-+++ /dev/null
-@@ -1,60 +0,0 @@
--# CONTEXT.md Format
--
--## Structure
--
--```md
--# {Context Name}
--
--{One or two sentence description of what this context is and why it exists.}
--
--## Language
--
--**Order**:
--{A one or two sentence description of the term}
--_Avoid_: Purchase, transaction
--
--**Invoice**:
--A request for payment sent to a customer after delivery.
--_Avoid_: Bill, payment request
--
--**Customer**:
--A person or organization that places orders.
--_Avoid_: Client, buyer, account
--```
--
--## Rules
--
--- **Be opinionated.** When multiple words exist for the same concept, pick the best one and list the others under `_Avoid_`.
--- **Keep definitions tight.** One or two sentences max. Define what it IS, not what it does.
--- **Only include terms specific to this project's context.** General programming concepts (timeouts, error types, utility patterns) don't belong even if the project uses them extensively. Before adding a term, ask: is this a concept unique to this context, or a general programming concept? Only the former belongs.
--- **Group terms under subheadings** when natural clusters emerge. If all terms belong to a single cohesive area, a flat list is fine.
--
--## Single vs multi-context repos
--
--**Single context (most repos):** One `CONTEXT.md` at the repo root.
--
--**Multiple contexts:** A `CONTEXT-MAP.md` at the repo root lists the contexts, where they live, and how they relate to each other:
--
--```md
--# Context Map
--
--## Contexts
--
--- [Ordering](./src/ordering/CONTEXT.md): receives and tracks customer orders
--- [Billing](./src/billing/CONTEXT.md): generates invoices and processes payments
--- [Fulfillment](./src/fulfillment/CONTEXT.md): manages warehouse picking and shipping
--
--## Relationships
--
--- **Ordering → Fulfillment**: Ordering emits `OrderPlaced` events; Fulfillment consumes them to start picking
--- **Fulfillment → Billing**: Fulfillment emits `ShipmentDispatched` events; Billing consumes them to generate invoices
--- **Ordering ↔ Billing**: Shared types for `CustomerId` and `Money`
--```
--
--The skill infers which structure applies:
--
--- If `CONTEXT-MAP.md` exists, read it to find contexts
--- If only a root `CONTEXT.md` exists, single context
--- If neither exists, create a root `CONTEXT.md` lazily when the first term is resolved
--
--When multiple contexts exist, infer which one the current topic relates to. If unclear, ask.
-diff --git a/.agents/skills/domain-modeling/SKILL.md b/.agents/skills/domain-modeling/SKILL.md
-index 9b97707e..a9ee7c3b 100644
---- a/.agents/skills/domain-modeling/SKILL.md
-+++ b/.agents/skills/domain-modeling/SKILL.md
-@@ -1,49 +1,25 @@
- ---
- name: domain-modeling
--description: Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a CONTEXT.md, or recording or editing an ADR.
-+description: Build and sharpen the project's domain model. Use when discussing terminology, editing GLOSSARY.md, or recording a durable decision in docs/decisions/.
- ---
- 
- # Domain Modeling
- 
--Actively build and sharpen the project's domain model as you design. This is the *active* discipline: challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill: that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
-+Actively build and sharpen the project's domain model as you design: challenge terms, discuss concrete edge cases, and record resolved terminology and durable decisions. Read the "Жизненный цикл изменений" section in root `AGENTS.md` for approval and ownership rules.
- 
- ## File structure
- 
--Most repos have a single context:
-+- `GLOSSARY.md`: shared terms and established spellings; preserve its existing structure.
-+- `docs/decisions/`: durable architectural choices and their rationale; continue the existing series and index.
-+- `openspec/changes/<change>/`: the current change's requirements, approach, and tasks.
- 
--```
--/
--├── CONTEXT.md
--├── docs/
--│   └── adr/
--│       ├── 0001-event-sourced-orders.md
--│       └── 0002-postgres-for-write-model.md
--└── src/
--```
--
--If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
--
--```
--/
--├── CONTEXT-MAP.md
--├── docs/
--│   └── adr/                          ← system-wide decisions
--├── src/
--│   ├── ordering/
--│   │   ├── CONTEXT.md
--│   │   └── docs/adr/                 ← context-specific decisions
--│   └── billing/
--│       ├── CONTEXT.md
--│       └── docs/adr/
--```
--
--Create files lazily: only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
-+Extend these existing sources instead of creating parallel context maps, glossaries, or ADR directories.
- 
- ## During the session
- 
- ### Challenge against the glossary
- 
--When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y. Which is it?"
-+When the user uses a term that conflicts with `GLOSSARY.md`, call it out immediately and resolve the ambiguity before updating its definition.
- 
- ### Sharpen fuzzy language
- 
-@@ -57,11 +33,11 @@ When domain relationships are being discussed, stress-test them with specific sc
- 
- When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible. Which is right?"
- 
--### Update CONTEXT.md inline
-+### Update GLOSSARY.md inline
- 
--When a term is resolved, update `CONTEXT.md` right there. Don't batch these up: capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
-+When a shared term is resolved, update `GLOSSARY.md` right there, preserving its format. A new contractor, channel, or place card alone does not require a glossary entry.
- 
--`CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
-+Keep the glossary focused on terminology. Put change-specific implementation decisions in its `design.md`.
- 
- ### Offer ADRs sparingly
- 
-@@ -71,4 +47,4 @@ Only offer to create an ADR when all three are true:
- 2. **Surprising without context**: a future reader will wonder "why did they do it this way?"
- 3. **The result of a real trade-off**: there were genuine alternatives and you picked one for specific reasons
- 
--If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
-+If any of the three is missing, skip the ADR. Otherwise follow the established format in `docs/decisions/` and add the record to its `README.md` index.
 diff --git a/.agents/skills/grill-with-docs/SKILL.md b/.agents/skills/grill-with-docs/SKILL.md
-index 62b9efb6..61e3d8de 100644
 --- a/.agents/skills/grill-with-docs/SKILL.md
 +++ b/.agents/skills/grill-with-docs/SKILL.md
-@@ -4,4 +4,4 @@ description: A relentless interview to sharpen a plan or design, which also crea
+@@ -4,4 +4,4 @@
  disable-model-invocation: true
  ---
  
 -Call the Skill tool twice, for "grilling" and "domain-modeling".
-+Read the "Жизненный цикл изменений" section in the root `AGENTS.md`, then call the Skill tool for "grilling" and "domain-modeling". Record the current change's requirements and approach in OpenSpec, shared terms in `GLOSSARY.md`, and durable decisions in `docs/decisions/`.
++Read the "Жизненный цикл изменений" section in the root `AGENTS.md`, then call the Skill tool for "grilling". Record the current change's requirements and approach in OpenSpec, shared terms in `GLOSSARY.md`, and durable decisions in `docs/decisions/`.
 diff --git a/.agents/skills/improve-codebase-architecture/SKILL.md b/.agents/skills/improve-codebase-architecture/SKILL.md
-index a578dd0a..7c3896bf 100644
 --- a/.agents/skills/improve-codebase-architecture/SKILL.md
 +++ b/.agents/skills/improve-codebase-architecture/SKILL.md
-@@ -11,7 +11,7 @@ Surface architectural friction and propose **deepening opportunities**: refactor
+@@ -11,7 +11,7 @@
  This command is _informed_ by the project's domain model and built on a shared design vocabulary:
  
  - Call the Skill tool with "codebase-design" for the architecture vocabulary (**module**, **interface**, **depth**, **seam**, **adapter**, **leverage**, **locality**) and its principles (the deletion test, "the interface is the test surface", "one adapter = hypothetical seam, two = real"). Use these terms exactly in every suggestion, and don't drift into "component," "service," "API," or "boundary."
@@ -316,7 +43,7 @@ index a578dd0a..7c3896bf 100644
  
  ## Process
  
-@@ -22,7 +22,7 @@ This command is _informed_ by the project's domain model and built on a shared d
+@@ -22,7 +22,7 @@
  - If the user named a direction (a module, a subsystem, a pain point), take it, and skip the inference below.
  - Otherwise, walk back a good stretch of the commit history (`git log --oneline`) to find the codebase's hot spots, the files and areas that keep coming up, and let those paths pull your attention first. If the changes are scattered with no clear hot spot, widen the net.
  
@@ -325,7 +52,7 @@ index a578dd0a..7c3896bf 100644
  
  Then spawn a sub-agent to walk the codebase. Don't follow rigid heuristics; explore organically and note where you experience friction:
  
-@@ -51,7 +51,7 @@ For each candidate, render a card with:
+@@ -51,7 +51,7 @@
  
  End the report with a **Top recommendation** section: which candidate you'd tackle first and why.
  
@@ -334,9 +61,10 @@ index a578dd0a..7c3896bf 100644
  
  **ADR conflicts**: if a candidate contradicts an existing ADR, only surface it when the friction is real enough to warrant revisiting the ADR. Mark it clearly in the card (e.g. a warning callout: _"contradicts ADR-0007, but worth reopening because…"_). Don't list every theoretical refactor an ADR forbids.
  
-@@ -65,7 +65,7 @@ Once the user picks a candidate, call the Skill tool with "grilling" to walk the
+@@ -65,7 +65,7 @@
  
- Side effects happen inline as decisions crystallize; call the Skill tool with "domain-modeling" to keep the domain model current as you go:
+-Side effects happen inline as decisions crystallize; call the Skill tool with "domain-modeling" to keep the domain model current as you go:
++Record resolved terms and durable decisions in the existing project sources, following `AGENTS.md`:
  
 -- **Naming a deepened module after a concept not in `CONTEXT.md`?** Add the term to `CONTEXT.md`. Create the file lazily if it doesn't exist.
 -- **Sharpening a fuzzy term during the conversation?** Update `CONTEXT.md` right there.
@@ -345,10 +73,9 @@ index a578dd0a..7c3896bf 100644
  - **User rejects the candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing; skip ephemeral reasons ("not worth it right now") and self-evident ones.
  - **Want to explore alternative interfaces for the deepened module?** Call the Skill tool with "codebase-design" and use its design-it-twice parallel sub-agent pattern.
 diff --git a/.agents/skills/tdd/SKILL.md b/.agents/skills/tdd/SKILL.md
-index 8fc08671..124ef182 100644
 --- a/.agents/skills/tdd/SKILL.md
 +++ b/.agents/skills/tdd/SKILL.md
-@@ -7,7 +7,7 @@ description: Test-driven development. Use when the user wants to build features
+@@ -7,7 +7,7 @@
  
  TDD is the red → green loop. This skill is the reference that makes that loop produce tests worth keeping: what a good test is, where tests go, the anti-patterns, and the rules of the loop. Every section applies on every cycle: consult them before and during the loop, not after.
  
@@ -357,7 +84,7 @@ index 8fc08671..124ef182 100644
  
  ## What a good test is
  
-@@ -19,9 +19,7 @@ See [tests.md](tests.md) for examples and [mocking.md](mocking.md) for mocking g
+@@ -19,9 +19,7 @@
  
  A **seam** is the public boundary you test at: the interface where you observe behavior without reaching inside. Tests live at seams, never against internals.
  
@@ -368,17 +95,16 @@ index 8fc08671..124ef182 100644
  
  When the shape of that interface is itself in question (how deep the module is, where the seam belongs, what the interface should expose), call the Skill tool with "codebase-design" for the vocabulary. It is the shared source of the module, interface, depth, seam, adapter, leverage and locality terms, and it is a reference to consult, not a session to run.
  
-@@ -35,4 +33,4 @@ When the shape of that interface is itself in question (how deep the module is,
+@@ -35,4 +33,4 @@
  
  - **Red before green.** Write the failing test first, then only enough code to pass it. Don't anticipate future tests or add speculative features.
  - **One slice at a time.** One seam, one test, one minimal implementation per cycle.
 -- **Refactoring is not part of the loop.** It belongs to the review stage (see the `code-review` skill), not the red → green implementation cycle.
-+- **Keep the current change coherent.** Simplify its own implementation as needed and rerun affected checks; use `code-review` before PR. Independent refactors outside the agreed scope are separate changes.
++- **Keep the current change coherent.** Simplify its own implementation as needed and rerun affected checks; review the full current diff before PR under `AGENTS.md`. Independent refactors outside the agreed scope are separate changes.
 diff --git a/.agents/skills/turborepo/references/cli/commands.md b/.agents/skills/turborepo/references/cli/commands.md
-index 5f393762..25d70b1c 100644
 --- a/.agents/skills/turborepo/references/cli/commands.md
 +++ b/.agents/skills/turborepo/references/cli/commands.md
-@@ -332,13 +332,13 @@ turbo docs "prune" --docs-version=2.7.5  # override docs version (minimum: 2.7.5
+@@ -332,13 +332,13 @@
  
  ## turbo ls
  
@@ -394,7 +120,7 @@ index 5f393762..25d70b1c 100644
  ```
  
  ## turbo query
-@@ -349,6 +349,10 @@ Query the monorepo using GraphQL.
+@@ -349,6 +349,10 @@
  turbo query                                          # spins up GraphiQL server
  turbo query "query { packages { items { name } } }"  # run a query string
  turbo query ./query.gql                              # run a query from a file
@@ -406,10 +132,9 @@ index 5f393762..25d70b1c 100644
  
  ## More
 diff --git a/.agents/skills/turborepo/references/filtering/RULE.md b/.agents/skills/turborepo/references/filtering/RULE.md
-index 1ef55f6d..31f30ff1 100644
 --- a/.agents/skills/turborepo/references/filtering/RULE.md
 +++ b/.agents/skills/turborepo/references/filtering/RULE.md
-@@ -108,7 +108,7 @@ Multiple filters combine as a union (packages matching ANY filter run).
+@@ -108,7 +108,7 @@
  | `pkg...`    | Package AND all its dependencies       |
  | `...pkg`    | Package AND all its dependents         |
  | `...pkg...` | Dependencies, package, AND dependents  |
@@ -419,10 +144,9 @@ index 1ef55f6d..31f30ff1 100644
  
  ### Negation
 diff --git a/.agents/skills/wait-what/SKILL.md b/.agents/skills/wait-what/SKILL.md
-index f8854f1b..69204da7 100644
 --- a/.agents/skills/wait-what/SKILL.md
 +++ b/.agents/skills/wait-what/SKILL.md
-@@ -4,4 +4,4 @@ description: "Stop. That last message did not land: re-pitch it."
+@@ -4,4 +4,4 @@
  disable-model-invocation: true
  ---
  
