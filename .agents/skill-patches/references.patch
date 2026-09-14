@@ -1,0 +1,110 @@
+diff --git a/.agents/skills/frontend-ui-engineering/SKILL.md b/.agents/skills/frontend-ui-engineering/SKILL.md
+--- a/.agents/skills/frontend-ui-engineering/SKILL.md
++++ b/.agents/skills/frontend-ui-engineering/SKILL.md
+@@ -296,3 +296,3 @@
+ 
+-For detailed accessibility requirements and testing tools, see `../../references/accessibility-checklist.md`.
++For detailed accessibility requirements and testing tools, use the installed `accessibility` skill and its references.
+ 
+diff --git a/.agents/skills/performance-optimization/SKILL.md b/.agents/skills/performance-optimization/SKILL.md
+--- a/.agents/skills/performance-optimization/SKILL.md
++++ b/.agents/skills/performance-optimization/SKILL.md
+@@ -365,3 +365,3 @@
+ 
+-**Do not cache:** anything whose staleness is a correctness bug (balances, permissions, inventory at checkout), or per-user data under a key that does not identify the user. See `../../references/performance-checklist.md` for request coalescing, write strategies, negative caching, and the cache checklist.
++**Do not cache:** anything whose staleness is a correctness bug (balances, permissions, inventory at checkout), or per-user data under a key that does not identify the user.
+ 
+@@ -442,3 +442,3 @@
+ 
+-For detailed performance checklists, optimization commands, and anti-pattern reference, see `../../references/performance-checklist.md`.
++For browser performance measurement, use the installed `performance` skill and `../performance/references/MEASUREMENT.md`.
+ 
+diff --git a/.agents/skills/security-and-hardening/SKILL.md b/.agents/skills/security-and-hardening/SKILL.md
+--- a/.agents/skills/security-and-hardening/SKILL.md
++++ b/.agents/skills/security-and-hardening/SKILL.md
+@@ -76,3 +76,3 @@
+ 
+-These are prevention patterns, not a ranking. For the 2021 ordering, see the quick-reference table in `../../references/security-checklist.md`.
++These are prevention patterns, not a ranking. Apply the relevant patterns to the current threat model.
+ 
+@@ -275,3 +275,3 @@
+ 
+-Before a destructive call, require all three: the resolved target sits under an **allowlisted root** (compare after resolving symlinks, never on the raw string); it is at least one level **below** that root, so a root is never itself the target; and it carries **evidence that it is yours**, read *before* the operation and before any teardown that removes it — otherwise "absent" and "not mine" are indistinguishable. On refusal, log the rejected target and stop: a cleanup that falls back to a broader default path is the failure this guards against. Worked example in `../../references/security-checklist.md`.
++Before a destructive call, require all three: the resolved target sits under an **allowlisted root** (compare after resolving symlinks, never on the raw string); it is at least one level **below** that root, so a root is never itself the target; and it carries **evidence that it is yours**, read *before* the operation and before any teardown that removes it — otherwise "absent" and "not mine" are indistinguishable. On refusal, log the rejected target and stop: a cleanup that falls back to a broader default path is the failure this guards against.
+ 
+@@ -310,3 +310,3 @@
+ 
+-1. **Find the installation boundary and manager.** Use the workspace root that owns the lockfile, or an independent nested project only when it is outside that workspace. There, corroborate `packageManager` (when present), the lockfile, and CI; stop on disagreement or competing lockfiles. Pin the manager version and use the matrix in `../../references/security-checklist.md`.
++1. **Find the installation boundary and manager.** Use the workspace root that owns the lockfile, or an independent nested project only when it is outside that workspace. There, corroborate `packageManager`, the lockfile, and CI; stop on disagreement or competing lockfiles. Use the pinned pnpm version and frozen installation documented in `docs/development.md`.
+ 2. **Block dependency scripts before first execution.** Bootstrap with scripts disabled or a documented fail-closed policy, inspect the pending script source, approve only the minimum required packages, commit the policy, then verify with a clean frozen/immutable install. Never blanket-approve scripts.
+@@ -396,3 +396,3 @@
+ 
+-When data crosses a trust boundary, validate it as untrusted (see Input Validation above); when a privacy incident exposes personal data, the breach-notification clock is part of the postmortem — follow the `debugging-and-error-recovery` skill.
++When data crosses a trust boundary, validate it as untrusted (see Input Validation above). Use the installed `diagnosing-bugs` skill for investigation; when a privacy incident exposes personal data, retain the applicable breach-notification timeline as a separate requirement.
+ 
+@@ -473,3 +473,3 @@
+ 
+-For detailed security checklists and pre-commit verification steps, see `../../references/security-checklist.md`.
++Apply the relevant checks above and the verification requirements in the root `AGENTS.md` to the current change before PR.
+ 
+diff --git a/.agents/skills/web-typography/SKILL.md b/.agents/skills/web-typography/SKILL.md
+--- a/.agents/skills/web-typography/SKILL.md
++++ b/.agents/skills/web-typography/SKILL.md
+@@ -1,5 +1,5 @@
+ ---
+ name: web-typography
+-description: 'Select, pair, and implement typefaces for web projects. Use when the user mentions "font pairing", "which typeface", "line height", "responsive typography", "web font loading", "type hierarchy", "variable fonts", "FOUT/FOIT", "typographic scale", or "the text is hard to read". Also trigger when choosing between system fonts and web fonts, optimizing font-loading performance, or designing readable long-form content. Covers readability evaluation, CSS implementation, and performance optimization. For overall UI design systems, see refactoring-ui. For dramatic typographic experiences, see top-design.'
++description: 'Select, pair, and implement typefaces for web projects. Use when the user mentions "font pairing", "which typeface", "line height", "responsive typography", "web font loading", "type hierarchy", "variable fonts", "FOUT/FOIT", "typographic scale", or "the text is hard to read". Also trigger when choosing between system fonts and web fonts, optimizing font-loading performance, or designing readable long-form content. Covers readability evaluation, CSS implementation, and performance optimization. For overall UI design, use frontend-ui-engineering and the project design guide.'
+ license: MIT
+ metadata:
+diff --git a/.agents/skills/copy-editing/SKILL.md b/.agents/skills/copy-editing/SKILL.md
+--- a/.agents/skills/copy-editing/SKILL.md
++++ b/.agents/skills/copy-editing/SKILL.md
+@@ -1,5 +1,5 @@
+ ---
+ name: copy-editing
+-description: "When the user wants to edit, review, or improve existing marketing copy, or refresh outdated content. Also use when the user mentions 'edit this copy,' 'review my copy,' 'copy feedback,' 'proofread,' 'polish this,' 'make this better,' 'copy sweep,' 'tighten this up,' 'this reads awkwardly,' 'clean up this text,' 'too wordy,' 'sharpen the messaging,' 'refresh this content,' 'update this page,' 'this content is outdated,' or 'content audit.' Use this when the user already has copy and wants it improved or refreshed rather than rewritten from scratch. For writing new copy, see copywriting."
++description: "When the user wants to edit, review, or improve existing marketing copy, or refresh outdated content. Also use when the user mentions 'edit this copy,' 'review my copy,' 'copy feedback,' 'proofread,' 'polish this,' 'make this better,' 'copy sweep,' 'tighten this up,' 'this reads awkwardly,' 'clean up this text,' 'too wordy,' 'sharpen the messaging,' 'refresh this content,' 'update this page,' 'this content is outdated,' or 'content audit.' Use this when the user already has copy and wants it improved or refreshed rather than rewritten from scratch. For Russian site copy, also apply humanizer-ru under the project rules."
+ metadata:
+   version: 2.0.0
+@@ -441,17 +441,5 @@
+ ## Related Skills
+ 
+-- **copywriting**: For writing new copy from scratch (use this skill to edit after your first draft is complete)
+-- **cro**: For broader page optimization beyond copy
+-- **marketing-psychology**: For understanding why certain edits improve conversion
+-- **ab-testing**: For testing copy variations
+-
+----
+-
+-## When to Use Each Skill
+-
+-| Task | Skill to Use |
+-|------|--------------|
+-| Writing new page copy from scratch | copywriting |
+-| Reviewing and improving existing copy | copy-editing (this skill) |
+-| Editing copy you just wrote | copy-editing (this skill) |
+-| Structural or strategic page changes | cro |
++- **humanizer-ru**: Edit Russian site copy after drafting, preserving genre and facts.
++- **frontend-ui-engineering**: Improve page structure under the project design guide.
++- **seo**: Review search discoverability and metadata.
+diff --git a/.agents/skills/copy-editing/references/content-refresh.md b/.agents/skills/copy-editing/references/content-refresh.md
+--- a/.agents/skills/copy-editing/references/content-refresh.md
++++ b/.agents/skills/copy-editing/references/content-refresh.md
+@@ -9,5 +9,5 @@
+ - **Product has changed** — features, pricing, or positioning no longer match
+ - **Competitors updated** their version of the same content
+-- **AI search visibility** matters — outdated content gets cited less (see ai-seo skill)
++- **Search visibility** needs review — verify freshness and use the installed `seo` skill where relevant.
+ 
+ ## Content Refresh Checklist
+diff --git a/.agents/skills/turborepo/SKILL.md b/.agents/skills/turborepo/SKILL.md
+--- a/.agents/skills/turborepo/SKILL.md
++++ b/.agents/skills/turborepo/SKILL.md
+@@ -189,5 +189,5 @@
+ ├─ Dependency management → references/best-practices/dependencies.md
+ ├─ Best practices overview → references/best-practices/RULE.md
+-├─ JIT vs Compiled packages → references/best-practices/packages.md#compilation-strategies
++├─ JIT vs Compiled packages → references/best-practices/packages.md#package-compilation-strategies
+ └─ Sharing code between apps → references/best-practices/RULE.md#package-types
+ ```

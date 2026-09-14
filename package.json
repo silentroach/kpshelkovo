@@ -18,9 +18,17 @@
     "test:search-quality": "pnpm --filter @shelkovo/www test:search-quality",
     "test:search-quality:update": "pnpm --filter @shelkovo/www test:search-quality:update",
     "test:watch": "turbo run test:watch",
+    "agents:setup": "pnpm install --frozen-lockfile && pnpm skills:install && pnpm openspec:generate && pnpm openspec:check",
+    "skills:install": "node scripts/skills.mjs install",
+    "skills:check": "node scripts/skills.mjs check",
+    "openspec:generate": "node scripts/openspec.mjs generate",
+    "openspec:check": "node scripts/openspec.mjs check",
+    "openspec:validate": "pnpm exec openspec validate --all --strict --no-interactive && pnpm exec openspec validate --archived --strict --no-interactive",
+    "test:agent-tooling": "node --test scripts/agent-tooling.test.mjs",
     "postinstall": "node scripts/hooks.mjs"
   },
   "devDependencies": {
+    "@fission-ai/openspec": "1.13.0",
     "@lhci/cli": "^0.15.1",
     "@sveltejs/vite-plugin-svelte": "^7.3.0",
     "@testing-library/svelte": "^5.4.2",
@@ -31,12 +39,13 @@
     "oxfmt": "^0.67.0",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
-    "skills": "^1.5.24",
+    "skills": "1.5.24",
     "svelte": "^5.57.0",
     "turbo": "^2.10.12",
     "typescript": "^7.0.2",
     "vite": "^8.2.2",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.0",
+    "zod": "^4.5.4"
   },
   "lint-staged": {
     "*.astro": "prettier --write",

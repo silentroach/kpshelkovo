@@ -5,5 +5,13 @@ export default defineConfig({
   svelte: true,
   trailingComma: 'none',
   sortImports: true,
-  ignorePatterns: ['node_modules', 'dist', '.astro', 'pnpm-lock.yaml', '*.astro']
+  ignorePatterns: [
+    'node_modules',
+    'dist',
+    '.astro',
+    'pnpm-lock.yaml',
+    '*.astro',
+    '.opencode/skills/openspec-*/**',
+    '.opencode/commands/opsx-*.md'
+  ]
 });
