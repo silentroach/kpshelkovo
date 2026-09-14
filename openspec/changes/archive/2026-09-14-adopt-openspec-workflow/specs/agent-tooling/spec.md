@@ -49,6 +49,8 @@
 
 По последующему решению владельца установка SHALL исключать и остальные патченные методы: `codebase-design`, `diagnosing-bugs`, `grill-with-docs`, `improve-codebase-architecture`, `tdd`, `turborepo`, `wait-what`, `frontend-ui-engineering`, `performance-optimization`, `security-and-hardening`, `web-typography`, `copy-editing`. Каталог patches и механизм их применения SHALL отсутствовать.
 
+По итогам ревью оставшегося набора установка SHALL исключать `grill-me`, `teach`, `resolving-merge-conflicts`, `prototype`, `ponytail-help`, `ponytail-gain`, `ponytail-debt`, `research`, `handoff`, `documentation-and-adrs`, `wizard` и `to-questionnaire`.
+
 #### Scenario: Повторная установка
 
 - **WHEN** внешний набор переустановлен по зафиксированным источникам
