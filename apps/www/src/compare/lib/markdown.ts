@@ -482,7 +482,7 @@ export function buildSettlementMd({ settlement, comparison, baseline, rating }: 
           settlement.location.lat,
           settlement.location.lng
         )
-      )
+      ).replace(/^~?/, '~')
     : undefined;
   const company = settlement.managementCompany;
   const companyLine: MarkdownPhrasingInput | undefined =

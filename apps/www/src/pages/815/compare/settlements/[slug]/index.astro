@@ -24,6 +24,7 @@ import {
   formatTariffBase,
   getTariffCalc,
 } from '@/compare/lib/format';
+import { getRing } from '@/compare/lib/rating';
 import type { Settlement } from '@/compare/lib/settlement/types';
 import {
   settlementPageMeta,
@@ -72,6 +73,15 @@ const distanceFromShelkovo = !isBaseline
       settlement.location.lng,
     )
   : 0;
+const distanceFromShelkovoText = formatDistance(distanceFromShelkovo).replace(
+  /^~?/,
+  '~',
+);
+
+const distanceFromMkad = getRing(
+  settlement.location.lat,
+  settlement.location.lng,
+);
 
 const hasPoint =
   Number.isFinite(settlement.location.lat) &&
@@ -442,10 +452,16 @@ const heroMap = hasPoint
               {
                 distanceFromShelkovo > 0 && (
                   <p class="settlement-fact-detail">
-                    {formatDistance(distanceFromShelkovo)} от Шелково
+                    {distanceFromShelkovoText} от Шелково
                   </p>
                 )
               }
+              <p
+                class="settlement-fact-detail"
+                title="Примерная оценка по координатам, без учёта дорог"
+              >
+                {formatDistance(distanceFromMkad)} от МКАД
+              </p>
             </div>
           </div>
         </div>
@@ -672,9 +688,12 @@ const heroMap = hasPoint
           {settlement.location.addressText}
           {
             distanceFromShelkovo > 0 && (
-              <span>, {formatDistance(distanceFromShelkovo)} от Шелково</span>
+              <span>, {distanceFromShelkovoText} от Шелково</span>
             )
           }
+          <span title="Примерная оценка по координатам, без учёта дорог">
+            , {formatDistance(distanceFromMkad)} от МКАД
+          </span>
         </p>
       </div>
     </section>
