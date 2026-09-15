@@ -73,10 +73,6 @@ const distanceFromShelkovo = !isBaseline
       settlement.location.lng,
     )
   : 0;
-const distanceFromShelkovoText = formatDistance(distanceFromShelkovo).replace(
-  /^~?/,
-  '~',
-);
 
 const distanceFromMkad = getRing(
   settlement.location.lat,
@@ -449,19 +445,19 @@ const heroMap = hasPoint
               <p class="settlement-location-address">
                 {settlement.location.addressText}
               </p>
-              {
-                distanceFromShelkovo > 0 && (
-                  <p class="settlement-fact-detail">
-                    {distanceFromShelkovoText} от Шелково
-                  </p>
-                )
-              }
               <p
                 class="settlement-fact-detail"
                 title="Примерная оценка по координатам, без учёта дорог"
               >
                 {formatDistance(distanceFromMkad)} от МКАД
               </p>
+              {
+                distanceFromShelkovo > 0 && (
+                  <p class="settlement-fact-detail">
+                    {formatDistance(distanceFromShelkovo)} от Шелково
+                  </p>
+                )
+              }
             </div>
           </div>
         </div>
@@ -686,14 +682,14 @@ const heroMap = hasPoint
         <p class="settlement-passport-location">
           <span class="settlement-passport-key">Расположение: </span>
           {settlement.location.addressText}
-          {
-            distanceFromShelkovo > 0 && (
-              <span>, {distanceFromShelkovoText} от Шелково</span>
-            )
-          }
           <span title="Примерная оценка по координатам, без учёта дорог">
             , {formatDistance(distanceFromMkad)} от МКАД
           </span>
+          {
+            distanceFromShelkovo > 0 && (
+              <span>, {formatDistance(distanceFromShelkovo)} от Шелково</span>
+            )
+          }
         </p>
       </div>
     </section>
