@@ -24,7 +24,6 @@ import {
   formatTariffBase,
   getTariffCalc,
 } from '@/compare/lib/format';
-import { getRing } from '@/compare/lib/rating';
 import type { Settlement } from '@/compare/lib/settlement/types';
 import {
   settlementPageMeta,
@@ -37,16 +36,24 @@ import type { SearchDocument } from '@/lib/search/types';
 
 // Generate static paths for all settlements
 export async function getStaticPaths() {
-  const { settlements, baseline, comparisons } = await loadAllData();
+  const { settlements, baseline, comparisons, ratings } = await loadAllData();
 
-  return settlements.map((settlement) => ({
-    params: { slug: settlement.slug },
-    props: {
-      settlement,
-      comparison: comparisons.get(settlement.slug),
-      baseline,
-    },
-  }));
+  return settlements.map((settlement) => {
+    const rating = ratings.get(settlement.slug);
+    if (!rating) {
+      throw new Error(`Missing rating for settlement: ${settlement.slug}`);
+    }
+
+    return {
+      params: { slug: settlement.slug },
+      props: {
+        settlement,
+        comparison: comparisons.get(settlement.slug),
+        baseline,
+        distanceFromMkad: rating.ring,
+      },
+    };
+  });
 }
 
 interface Props {
@@ -59,9 +66,10 @@ interface Props {
       }
     | undefined;
   baseline: Settlement;
+  readonly distanceFromMkad: number;
 }
 
-const { settlement, comparison, baseline } = Astro.props;
+const { settlement, comparison, baseline, distanceFromMkad } = Astro.props;
 const isBaseline = settlement.slug === baseline.slug;
 
 // Calculate distance from Shelkovo
@@ -73,11 +81,6 @@ const distanceFromShelkovo = !isBaseline
       settlement.location.lng,
     )
   : 0;
-
-const distanceFromMkad = getRing(
-  settlement.location.lat,
-  settlement.location.lng,
-);
 
 const hasPoint =
   Number.isFinite(settlement.location.lat) &&

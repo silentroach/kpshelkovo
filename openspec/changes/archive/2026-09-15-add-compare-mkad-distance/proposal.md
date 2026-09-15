@@ -24,6 +24,6 @@
 ## Impact
 
 - Основной файл: `apps/www/src/pages/815/compare/settlements/[slug]/index.astro`.
-- Существующие зависимости: `getRing()` из `src/compare/lib/rating.ts` и `formatDistance()` из `@shelkovo/format`.
+- Существующие зависимости: готовое расстояние `rating.ring` из общего набора данных сравнения и `formatDistance()` из `@shelkovo/format`.
 - Markdown страницы уже содержит расстояние за МКАД, а JSON содержит `distance.mkad_km`; при проверке сверить смысл нового отображения с ними.
 - Новые данные, зависимости, внешние запросы и изменения публичных URL не требуются.
