@@ -7,7 +7,7 @@ import {
 } from '../sitemap';
 
 describe('event sitemap routes', () => {
-  it.each(['/events/', '/events/2026/09/', '/events/2026/09/19/'])(
+  it.each(['/events/', '/events/2026/09/', '/events/2026/09/19/', '/events/2026/09/movie-quiz/'])(
     'includes canonical %s without manufacturing lastmod',
     (path) => {
       const url = `https://kpshelkovo.online${path}`;

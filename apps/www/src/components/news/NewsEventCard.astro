@@ -2,11 +2,12 @@
 import { CalendarPlusIcon, MapPinIcon } from '@shelkovo/ui/icons';
 import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 import { formatDynamicHtml } from '@shelkovo/markdown';
-import MapPreview from '@/components/maps/MapPreview.astro';
+import MapCardShell from '@/components/MapCardShell.astro';
 import { renderMarkdown } from '@/lib/markdown/render';
 import { EVENT_CATEGORY_LABELS, EVENT_STATUS_LABELS } from '@/lib/events/view';
 import type { NewsEvent } from '@/lib/news/types';
 import {
+  buildNewsEventMapEmbedUrl,
   buildNewsEventMapUrl,
   formatNewsEventMonth,
   formatNewsEventRange,
@@ -14,756 +15,128 @@ import {
 
 interface Props {
   readonly event: NewsEvent;
-  readonly variant?: 'wide' | 'compact';
 }
-
-const { event, variant = 'wide' } = Astro.props;
-const isCompact = variant === 'compact';
-const eventRange = formatNewsEventRange(event);
+const { event } = Astro.props;
 const mapUrl = buildNewsEventMapUrl(event);
-const hasCoordinates = event.coordinates !== undefined;
-const eventDateParts = event.startsIso.slice(0, 10).split('-');
-const eventDay = String(Number(eventDateParts[2] ?? ''));
+const eventDay = String(Number(event.startsDate.slice(8, 10)));
 const eventMonth = formatNewsEventMonth(event.startsIso);
 const eventTime = event.endsTime
-  ? `${event.startsTime}-${event.endsTime}`
+  ? `${event.startsTime}–${event.endsTime}`
   : (event.startsTime ?? 'Время уточняется');
-const canDownload = event.icsUrl && event.status !== 'cancelled';
-const state =
-  event.status === 'announced' ? undefined : EVENT_STATUS_LABELS[event.status];
-const bodyHtml = renderMarkdown(event.body);
-const calendarFilename = `${event.slug}.ics`;
+const eventRange =
+  event.through ||
+  (event.endsIso && event.endsIso.slice(0, 10) !== event.startsIso.slice(0, 10))
+    ? formatNewsEventRange(event)
+    : eventTime;
 const titleId = `news-event-title-${event.slug}`;
 ---
 
-{
-  isCompact ? (
-    <aside
-      class:list={[
-        'news-event-compact-card',
-        hasCoordinates ? 'news-event-compact-card--mapped' : undefined,
-      ]}
-      aria-labelledby={titleId}
-      data-pagefind-body
-    >
-      {event.coordinates && mapUrl && (
-        <div class="news-event-compact-map">
-          <MapPreview
-            preview={{
-              coordinates: event.coordinates,
-              zoom: 16,
-              anchor: [0.75, 0.45],
-              muted: true,
-              mutedOpacity: 0.4,
-            }}
-            label={`Место события: ${event.location ?? event.title}`}
-            mapUrl={mapUrl}
+<aside aria-labelledby={titleId} data-pagefind-body>
+  <MapCardShell embedUrl={buildNewsEventMapEmbedUrl(event)}>
+    <div class="news-event-content">
+      <time class="news-event-date" datetime={event.startsIso}>
+        <span class="news-event-day">{eventDay}</span>
+        <span class="news-event-month">{eventMonth}</span>
+      </time>
+      <h2 id={titleId} class="news-event-title">
+        <a href={event.url} set:html={formatDynamicHtml(event.title)} />
+      </h2>
+      <p>{EVENT_CATEGORY_LABELS[event.category]}</p>
+      <ul class="news-event-meta">
+        <li>
+          <svg
+            viewBox="0 0 24 24"
+            class="news-event-icon"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            aria-hidden="true"
+            ><circle cx="12" cy="12" r="8.25"></circle><path
+              d="M12 7.75v4.75l3 1.75"></path></svg
           >
-            <span
-              class="ui-map-marker news-event-compact-map-pin"
-              aria-hidden="true"
-            />
-            <a
-              slot="fallback"
-              data-fallback
-              href={mapUrl}
-              target="_blank"
-              rel="noreferrer noopener"
-              class="news-event-map-fallback"
-            >
-              Открыть Яндекс Карты
-            </a>
-          </MapPreview>
-        </div>
-      )}
-
-      <div class="news-event-compact-content">
-        <time class="news-event-compact-date-card" datetime={event.startsIso}>
-          <span class="news-event-compact-day">{eventDay}</span>
-          <span class="news-event-compact-month">{eventMonth}</span>
-        </time>
-
-        <h2 id={titleId} class="news-event-compact-title">
-          <Fragment set:html={formatDynamicHtml(event.title)} />
-        </h2>
-
-        <p>{EVENT_CATEGORY_LABELS[event.category]}</p>
-
-        <ul class="news-event-compact-meta">
-          <li>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              class="news-event-compact-icon"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="8.25" />
-              <path d="M12 7.75v4.75l3 1.75" />
-            </svg>
-            <span>
-              {event.through ||
-              (event.endsIso &&
-                event.endsIso.slice(0, 10) !== event.startsIso.slice(0, 10))
-                ? eventRange
-                : eventTime}
-            </span>
-          </li>
-
-          <li>
-            <MapPinIcon class="news-event-compact-icon" />
-            <span
-              set:html={formatDynamicHtml(event.location ?? 'Место уточняется')}
-            />
-          </li>
-        </ul>
-
-        {state && (
+          <span>{formatDynamicHtml(eventRange)}</span>
+        </li>
+        <li>
+          <MapPinIcon class="news-event-icon" /><span
+            set:html={formatDynamicHtml(
+              event.location ??
+                (event.coordinates ? 'Место на карте' : 'Место уточняется'),
+            )}
+          />
+        </li>
+      </ul>
+      {
+        event.status !== 'announced' && (
           <p>
-            <strong>{state}</strong>
+            <strong data-status={event.status}>
+              {EVENT_STATUS_LABELS[event.status]}
+            </strong>
           </p>
-        )}
-        {event.price && (
+        )
+      }
+      {
+        event.price && (
           <p>
             Стоимость: <span set:html={formatDynamicHtml(event.price)} />
           </p>
-        )}
-        {event.audience && (
+        )
+      }
+      {
+        event.audience && (
           <p>
             Участники: <span set:html={formatDynamicHtml(event.audience)} />
           </p>
-        )}
-        <div class="ui-prose" set:html={bodyHtml} />
-        <p>
-          <a href={event.sourceUrl}>Источник</a> ·{' '}
-          <a href={event.url}>В календаре событий</a>
-        </p>
-
-        <div class="news-event-compact-actions" data-pagefind-ignore>
-          {canDownload && (
+        )
+      }
+      <div class="ui-prose" set:html={renderMarkdown(event.body)} />
+      <p class="news-event-links">
+        <a href={event.sourceUrl}>Источник</a> · <a href={event.url}
+          >Подробнее</a
+        >
+      </p>
+      <div class="news-event-actions" data-pagefind-ignore>
+        {
+          event.icsUrl && event.status !== 'cancelled' && (
             <ResourceLink
               href={event.icsUrl}
-              download={calendarFilename}
-              class="news-event-compact-action news-event-compact-action--primary"
+              download={`${event.slug}.ics`}
+              class="news-event-action news-event-action--calendar"
               aria-label="Добавить в календарь"
               title="Добавить в календарь"
             >
-              <CalendarPlusIcon class="news-event-calendar-icon news-event-compact-icon news-event-compact-icon--calendar" />
+              <CalendarPlusIcon class="news-event-icon" />
             </ResourceLink>
-          )}
-
-          {mapUrl && !hasCoordinates && (
+          )
+        }
+        {
+          mapUrl && (
             <a
               href={mapUrl}
               target="_blank"
               rel="noreferrer noopener"
-              class="news-event-compact-action"
+              class="news-event-action"
               aria-label="Открыть на Яндекс Картах"
               title="Открыть на Яндекс Картах"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                class="news-event-compact-icon"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M19 10.2c0 5.1-7 10.05-7 10.05s-7-4.95-7-10.05a7 7 0 1 1 14 0Z" />
-                <circle cx="12" cy="10.2" r="2.35" />
-              </svg>
+              <MapPinIcon class="news-event-icon" />
             </a>
-          )}
-        </div>
+          )
+        }
       </div>
-    </aside>
-  ) : (
-    <section
-      class="news-event-card"
-      aria-labelledby={titleId}
-      data-pagefind-body
-    >
-      <div
-        class:list={[
-          'news-event-map-layer',
-          hasCoordinates
-            ? 'news-event-map-layer--located'
-            : 'news-event-map-layer--placeholder',
-        ]}
-        aria-hidden="true"
-      />
-      {hasCoordinates && <span class="news-event-map-pin" aria-hidden="true" />}
-
-      <div class="news-event-panel">
-        <time class="news-event-date-card" datetime={event.startsIso}>
-          <span class="news-event-date-day">{eventDay}</span>
-          <span class="news-event-date-month">{eventMonth}</span>
-          <span class="news-event-date-time">{eventTime}</span>
-        </time>
-
-        <div class="news-event-main">
-          <h2 id={titleId} class="news-event-title">
-            <Fragment set:html={formatDynamicHtml(event.title)} />
-          </h2>
-          <p>{EVENT_CATEGORY_LABELS[event.category]}</p>
-          <p class="news-event-details">
-            <time datetime={event.startsIso}>{eventRange}</time>
-            {event.location && (
-              <>
-                <span class="news-event-details-divider" aria-hidden="true">
-                  ·
-                </span>
-                <span set:html={formatDynamicHtml(event.location)} />
-              </>
-            )}
-          </p>
-
-          {!event.location && <p>Место уточняется</p>}
-          {state && (
-            <p>
-              <strong>{state}</strong>
-            </p>
-          )}
-          {event.price && (
-            <p>
-              Стоимость: <span set:html={formatDynamicHtml(event.price)} />
-            </p>
-          )}
-          {event.audience && (
-            <p>
-              Участники: <span set:html={formatDynamicHtml(event.audience)} />
-            </p>
-          )}
-          <div class="ui-prose" set:html={bodyHtml} />
-          <p>
-            <a href={event.sourceUrl}>Источник</a> ·{' '}
-            <a href={event.url}>В календаре событий</a>
-          </p>
-
-          <div class="news-event-actions" data-pagefind-ignore>
-            {canDownload && (
-              <ResourceLink
-                href={event.icsUrl}
-                download={calendarFilename}
-                class="ui-btn ui-btn-md news-event-action news-event-action--calendar"
-              >
-                <CalendarPlusIcon class="news-event-calendar-icon" />
-                <span>Добавить в календарь</span>
-              </ResourceLink>
-            )}
-
-            {mapUrl && (
-              <a
-                href={mapUrl}
-                target="_blank"
-                rel="noreferrer noopener"
-                class="ui-btn ui-btn-md ui-btn-outline news-event-action news-event-action--map"
-              >
-                Открыть на Яндекс Картах
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
+    </div>
+  </MapCardShell>
+</aside>
 
 <style>
-  .news-event-card,
-  .news-event-compact-card {
-    --news-event-wash-strong: color-mix(
-      in oklab,
-      var(--color-surface-raised) 96%,
-      transparent
-    );
-    --news-event-wash-base: color-mix(
-      in oklab,
-      var(--color-surface-raised) 92%,
-      transparent
-    );
-    --news-event-wash-mid: color-mix(
-      in oklab,
-      var(--color-surface-raised) 56%,
-      transparent
-    );
-    --news-event-wash-soft: color-mix(
-      in oklab,
-      var(--color-surface-raised) 28%,
-      transparent
-    );
-    --news-event-map-line: color-mix(
-      in oklab,
-      var(--color-border) 58%,
-      transparent
-    );
-    --news-event-map-road-strong: color-mix(
-      in oklab,
-      var(--color-surface-raised) 88%,
-      transparent
-    );
-    --news-event-map-road: color-mix(
-      in oklab,
-      var(--color-surface-raised) 70%,
-      transparent
-    );
-    --news-event-panel-border: color-mix(
-      in oklab,
-      var(--color-surface-raised) 72%,
-      transparent
-    );
-    --news-event-panel-bg: color-mix(
-      in oklab,
-      var(--color-surface-raised) 88%,
-      transparent
-    );
-  }
-
-  .news-event-card {
-    position: relative;
-    isolation: isolate;
-    display: grid;
-    align-items: center;
-    min-height: 17rem;
-    overflow: hidden;
-    padding: clamp(0.85rem, 2vw, 1.25rem);
-    border: 1px solid
-      color-mix(
-        in oklab,
-        var(--color-border-strong) 74%,
-        var(--color-primary) 26%
-      );
-    border-radius: 1.35rem;
-    background: var(--color-primary-soft-2);
-    box-shadow: var(--shadow-2);
-  }
-
-  .news-event-card::before {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background:
-      linear-gradient(
-        90deg,
-        var(--news-event-wash-strong) 0%,
-        var(--news-event-wash-base) 43%,
-        var(--news-event-wash-mid) 70%,
-        var(--news-event-wash-soft) 100%
-      ),
-      radial-gradient(
-        circle at 22% 18%,
-        color-mix(in oklab, var(--color-accent) 18%, transparent),
-        transparent 15rem
-      );
-    content: '';
-  }
-
-  .news-event-card::after {
-    position: absolute;
-    inset: 0 0 auto;
-    height: 0.22rem;
-    background: linear-gradient(
-      90deg,
-      var(--color-primary),
-      var(--color-accent) 42%,
-      transparent 82%
-    );
-    content: '';
-  }
-
-  .news-event-map-layer {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-    background:
-      radial-gradient(
-        circle at 73% 34%,
-        color-mix(in oklab, var(--color-accent) 24%, transparent),
-        transparent 10rem
-      ),
-      radial-gradient(
-        circle at 24% 78%,
-        color-mix(in oklab, var(--color-primary) 14%, transparent),
-        transparent 10rem
-      ),
-      linear-gradient(
-        34deg,
-        transparent 45%,
-        var(--news-event-map-road-strong) 46%,
-        var(--news-event-map-road-strong) 49%,
-        transparent 50%
-      ),
-      linear-gradient(
-        118deg,
-        transparent 48%,
-        var(--news-event-map-road) 49%,
-        var(--news-event-map-road) 51%,
-        transparent 52%
-      ),
-      linear-gradient(var(--news-event-map-line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--news-event-map-line) 1px, transparent 1px),
-      linear-gradient(
-        135deg,
-        var(--color-primary-soft-2),
-        var(--color-surface-muted)
-      );
-    background-size:
-      auto,
-      auto,
-      8rem 8rem,
-      9rem 9rem,
-      1.75rem 1.75rem,
-      1.75rem 1.75rem,
-      auto;
-    filter: saturate(1.04);
-  }
-
-  .news-event-map-layer--placeholder {
-    filter: saturate(0.82);
-    opacity: 0.72;
-  }
-
-  .news-event-map-pin {
-    position: absolute;
-    z-index: 0;
-    top: 38%;
-    left: 86%;
-    width: 1rem;
-    height: 1rem;
-    border: 2px solid var(--color-surface-raised);
-    border-radius: 999px;
-    background: var(--color-accent);
-    box-shadow:
-      0 0 0 0.5rem color-mix(in oklab, var(--color-accent) 22%, transparent),
-      0 0.75rem 1.5rem var(--color-shadow);
-  }
-
-  .news-event-map-pin::after {
-    position: absolute;
-    top: calc(100% - 0.08rem);
-    left: 50%;
-    width: 0.52rem;
-    height: 0.52rem;
-    background: var(--color-accent);
-    transform: translateX(-50%) rotate(45deg);
-    content: '';
-  }
-
-  .news-event-panel {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: minmax(5.75rem, 6.5rem) minmax(0, 1fr);
-    gap: clamp(0.9rem, 2vw, 1.25rem);
-    width: min(100%, 43rem);
-    padding: clamp(0.9rem, 2vw, 1.2rem);
-    border: 1px solid var(--news-event-panel-border);
-    border-radius: 1.1rem;
-    background: var(--news-event-panel-bg);
-    box-shadow: 0 1rem 2.2rem var(--color-shadow);
-    backdrop-filter: blur(2px);
-  }
-
-  .news-event-date-card {
-    display: grid;
-    align-content: center;
-    justify-items: start;
-    min-height: 7.5rem;
-    padding: 0.8rem;
-    border: 1px solid
-      color-mix(in oklab, var(--color-accent) 40%, var(--color-border) 60%);
-    border-radius: 0.9rem;
-    background:
-      radial-gradient(
-        circle at 85% 18%,
-        color-mix(in oklab, var(--color-accent) 22%, transparent),
-        transparent 4rem
-      ),
-      color-mix(
-        in oklab,
-        var(--color-surface-raised) 82%,
-        var(--color-accent-soft) 18%
-      );
-    color: var(--color-text);
-    text-decoration: none;
-  }
-
-  .news-event-date-day {
-    display: block;
-    font-family: var(--font-heading);
-    font-size: clamp(2.65rem, 5vw, 3.5rem);
-    font-weight: 700;
-    letter-spacing: -0.075em;
-    line-height: 0.88;
-  }
-
-  .news-event-date-month {
-    display: block;
-    margin-top: 0.28rem;
-    color: color-mix(in oklab, var(--color-earth) 76%, var(--color-text) 24%);
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    line-height: 1;
-    text-transform: uppercase;
-  }
-
-  .news-event-date-time {
-    display: inline-flex;
-    margin-top: 0.85rem;
-    color: var(--color-text-muted);
-    font-size: 0.78rem;
-    font-weight: 600;
-    line-height: 1;
-    overflow-wrap: anywhere;
-  }
-
-  .news-event-main {
-    display: grid;
-    align-content: center;
-    gap: 0.8rem;
+  aside {
     min-width: 0;
   }
-
-  .news-event-title {
-    max-width: 16ch;
-    margin: 0;
-    color: var(--color-text);
-    font-size: clamp(1.35rem, 3vw, 2rem);
-    font-weight: 700;
-    letter-spacing: -0.018em;
-    line-height: 1.08;
-  }
-
-  .news-event-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.15rem 0.45rem;
-    max-width: 34rem;
-    margin: 0;
-    color: var(--color-text-muted);
-    font-size: 0.98rem;
-    font-weight: 600;
-    line-height: 1.45;
-  }
-
-  .news-event-details-divider {
-    color: var(--color-accent-text);
-    font-weight: 600;
-  }
-
-  .news-event-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.55rem;
-    padding-top: 0.1rem;
-  }
-
-  .news-event-action {
-    min-height: 2.45rem;
-    border-radius: 999px;
-    padding-inline: 0.95rem;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-
-  .news-event-action--calendar {
-    border-color: var(--color-accent);
-    background: var(--color-accent);
-    color: color-mix(in oklab, var(--color-text) 78%, var(--color-earth) 22%);
-    box-shadow: 0 0.55rem 1.2rem
-      color-mix(in oklab, var(--color-accent) 18%, transparent);
-  }
-
-  .news-event-action--calendar:hover {
-    border-color: var(--color-accent-hover);
-    background: var(--color-accent-hover);
-    color: var(--color-text);
-  }
-
-  .news-event-action--map {
-    background: color-mix(
-      in oklab,
-      var(--color-surface-raised) 82%,
-      transparent
-    );
-  }
-
-  :global(.news-event-calendar-icon) {
-    width: 1rem;
-    height: 1rem;
-    flex: none;
-  }
-
-  @media (max-width: 47.999rem) {
-    .news-event-card {
-      align-items: stretch;
-      min-height: 0;
-      padding: 0.7rem;
-      border-radius: 1.15rem;
-    }
-
-    .news-event-card::before {
-      background:
-        linear-gradient(
-          180deg,
-          var(--news-event-wash-strong) 0%,
-          var(--news-event-wash-base) 58%,
-          var(--news-event-wash-mid) 100%
-        ),
-        radial-gradient(
-          circle at 18% 14%,
-          color-mix(in oklab, var(--color-accent) 18%, transparent),
-          transparent 12rem
-        );
-    }
-
-    .news-event-panel {
-      grid-template-columns: 1fr;
-      gap: 0.9rem;
-      padding: 0.85rem;
-      border-radius: 0.95rem;
-      background: var(--news-event-panel-bg);
-    }
-
-    .news-event-date-card {
-      grid-template-columns: auto auto 1fr;
-      align-items: end;
-      gap: 0.45rem 0.55rem;
-      min-height: 0;
-      padding: 0.75rem;
-    }
-
-    .news-event-date-day {
-      font-size: 2.6rem;
-    }
-
-    .news-event-date-month {
-      margin: 0 0 0.22rem;
-    }
-
-    .news-event-date-time {
-      justify-self: end;
-      margin: 0 0 0.28rem;
-    }
-
-    .news-event-title {
-      max-width: none;
-      font-size: clamp(1.3rem, 7vw, 1.7rem);
-    }
-
-    .news-event-actions {
-      display: grid;
-      grid-template-columns: 1fr;
-    }
-
-    .news-event-action {
-      width: 100%;
-      min-height: 2.65rem;
-      white-space: normal;
-    }
-
-    .news-event-map-pin {
-      top: 76%;
-      left: 86%;
-    }
-  }
-
-  .news-event-compact-card {
-    position: relative;
-    isolation: isolate;
-    display: grid;
-    overflow: hidden;
-    padding: 1rem;
-    border: 1px solid
-      color-mix(
-        in oklab,
-        var(--color-border-strong) 76%,
-        var(--color-primary) 24%
-      );
-    border-radius: 1rem;
-    background: var(--color-surface-raised);
-    box-shadow: 0 0.65rem 1.55rem var(--color-shadow);
-  }
-
-  .news-event-compact-card--mapped {
-    padding-bottom: 2.75rem;
-    background:
-      linear-gradient(
-        110deg,
-        var(--news-event-wash-strong) 0%,
-        var(--news-event-wash-base) 52%,
-        var(--news-event-map-road) 100%
-      ),
-      var(--color-surface-raised);
-  }
-
-  .news-event-compact-map {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-  }
-
-  .news-event-compact-map :global(.ymaps3--map-copyrights) {
-    opacity: 0.4;
-  }
-
-  .news-event-compact-map
-    :global(.ymaps3--map-copyrights:is(:hover, :focus-within)) {
-    opacity: 1;
-  }
-
-  .news-event-map-fallback {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.25rem;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    background: var(--color-surface-raised);
-    color: var(--color-text);
-    font-size: 0.75rem;
-    text-decoration: none;
-    box-shadow: var(--shadow-1);
-  }
-
-  .news-event-map-fallback[hidden] {
-    display: none;
-  }
-
-  .news-event-compact-map-pin {
-    --ui-map-marker-size: 18px;
-    display: block;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-  }
-
-  .news-event-compact-content {
+  .news-event-content {
     display: grid;
     gap: 0.85rem;
-    pointer-events: none;
   }
-
-  .news-event-compact-content a {
-    pointer-events: auto;
-  }
-
-  .news-event-compact-card--mapped .news-event-compact-date-card {
-    /* The SDK uses a text button here, not just an icon. */
-    padding-right: 10.25rem;
-    flex-wrap: wrap;
-  }
-
-  .news-event-compact-date-card {
+  .news-event-date {
     display: flex;
     align-items: baseline;
     gap: 0.45rem;
@@ -771,24 +144,20 @@ const titleId = `news-event-title-${event.slug}`;
       color-mix(in oklab, var(--color-border) 78%, var(--color-accent) 22%);
     padding-bottom: 0.75rem;
     color: var(--color-primary);
-    text-decoration: none;
   }
-
-  .news-event-compact-day {
+  .news-event-day {
     font-family: var(--font-heading);
     font-size: 2.25rem;
     font-weight: 700;
     letter-spacing: -0.08em;
     line-height: 0.9;
   }
-
-  .news-event-compact-month {
+  .news-event-month {
     font-size: 1rem;
     font-weight: 600;
     line-height: 1;
   }
-
-  .news-event-compact-title {
+  .news-event-title {
     margin: 0;
     color: var(--color-text);
     font-family: var(--font-heading);
@@ -798,16 +167,22 @@ const titleId = `news-event-title-${event.slug}`;
     line-height: 1.05;
     text-wrap: balance;
   }
-
-  .news-event-compact-meta {
+  .news-event-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .news-event-title a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+  .news-event-meta {
     display: grid;
     gap: 0.55rem;
     margin: 0;
     padding: 0;
     list-style: none;
   }
-
-  .news-event-compact-meta li {
+  .news-event-meta li {
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
@@ -816,15 +191,24 @@ const titleId = `news-event-title-${event.slug}`;
     font-weight: 600;
     line-height: 1.35;
   }
-
-  .news-event-compact-actions {
+  .news-event-links a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  [data-status='cancelled'] {
+    color: var(--color-danger-text);
+  }
+  [data-status='conditional'] {
+    color: var(--color-warning-text);
+  }
+  .news-event-actions {
     display: flex;
     justify-content: flex-end;
     gap: 0.55rem;
     padding-top: 0.15rem;
   }
-
-  .news-event-compact-action {
+  .news-event-actions :global(.news-event-action) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -832,25 +216,11 @@ const titleId = `news-event-title-${event.slug}`;
     height: 2.45rem;
     border: 1px solid var(--color-border-strong);
     border-radius: 0.62rem;
-    background: color-mix(
-      in oklab,
-      var(--color-surface-raised) 82%,
-      transparent
-    );
+    background: var(--color-surface-raised);
     color: var(--color-text);
     text-decoration: none;
-    transition:
-      border-color 0.2s ease,
-      background 0.2s ease,
-      color 0.2s ease;
   }
-
-  .news-event-compact-action:hover {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-  }
-
-  .news-event-compact-action--primary {
+  .news-event-actions :global(.news-event-action--calendar) {
     border-color: color-mix(
       in oklab,
       var(--color-accent) 62%,
@@ -858,20 +228,18 @@ const titleId = `news-event-title-${event.slug}`;
     );
     color: var(--color-accent-text);
   }
-
-  .news-event-compact-icon {
+  .news-event-actions :global(a:hover) {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  aside :global(a:focus-visible) {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 2px;
+  }
+  .news-event-icon,
+  aside :global(.news-event-icon) {
     width: 1.05rem;
     height: 1.05rem;
     flex: none;
-  }
-
-  :global(.news-event-compact-icon) {
-    width: 1.05rem;
-    height: 1.05rem;
-    flex: none;
-  }
-
-  :global(.news-event-compact-icon--calendar) {
-    transform: translateY(-0.04rem);
   }
 </style>

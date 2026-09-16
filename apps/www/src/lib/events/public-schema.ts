@@ -8,7 +8,7 @@ const participant = z.strictObject({ name: text, type: z.enum(['organization', '
 
 const fields = {
   id: text,
-  url,
+  url: url.describe('Canonical detail page: /events/YYYY/MM/slug/, using the start month.'),
   title: text,
   category: z.enum([
     'sport',

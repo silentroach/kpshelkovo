@@ -12,7 +12,7 @@ import type {
 import { eventMonthUrl } from '@/lib/events/urls';
 import { eventPageDescription, formatEventMonth } from '@/lib/events/view';
 import EventMonthCalendar from './EventMonthCalendar.astro';
-import EventMonthList from './EventMonthList.astro';
+import EventList from './EventList.astro';
 
 interface Props {
   readonly calendar: EventCalendarProjection;
@@ -110,7 +110,7 @@ const breadcrumbs = withHomeBreadcrumbs(
             {view === 'calendar' ? (
               <EventMonthCalendar month={month} />
             ) : (
-              <EventMonthList month={month} />
+              <EventList events={month.events} />
             )}
           </>
         ) : (

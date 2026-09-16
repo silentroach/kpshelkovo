@@ -35,7 +35,7 @@ const dataset = (full = true): NewsDataset => {
     events: [
       {
         slug: 'meeting',
-        event: 'meeting'
+        event: '2026/05/meeting'
       }
     ]
   });

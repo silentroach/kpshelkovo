@@ -71,7 +71,7 @@ const linkedDataset = (record: EventRecord) => {
     title: 'Новость',
     summary: 'Описание',
     date: '01.05.2026',
-    events: [{ event: record.id }]
+    events: [{ event: record.referenceKey }]
   });
   return newsLoad.buildNewsDataset(authors, [entry], newsArchiveSummaryEntries([entry]), {
     eventsById: new Map([[record.id, record]])
@@ -84,9 +84,41 @@ beforeAll(() =>
 afterEach(() => vi.restoreAllMocks());
 
 describe('shared events in news', () => {
+  it('requires updated news references after a month or slug change even when an alias exists', () => {
+    const original = migrated.find((event) => event.id === 'ok-meeting-june-2026')!;
+    for (const extra of [
+      { starts_at: '13.07.2026 16:00', slug: original.eventSlug },
+      { starts_at: '13.06.2026 16:00', slug: 'renamed-meeting' }
+    ]) {
+      const moved = mapRawEvent({
+        id: original.id,
+        body: original.body,
+        data: RawEventSchema.parse({
+          ...extra,
+          title: original.title,
+          category: original.category,
+          source_url: original.sourceUrl,
+          legacy_uid: original.calendarUid,
+          aliases: [original.url]
+        })
+      });
+      expect(() =>
+        dataset(migrated.map((event) => (event.id === moved.id ? moved : event)))
+      ).toThrow('references missing event "2026/06/ok-meeting-june"');
+      const linked = linkedDataset(moved).articles[0].events[0];
+      expect([linked.id, linked.calendarUid, linked.url, linked.eventSlug, linked.slug]).toEqual([
+        original.id,
+        original.calendarUid,
+        moved.url,
+        moved.eventSlug,
+        'event'
+      ]);
+    }
+  });
+
   it('rejects unresolved references instead of silently dropping a card', () => {
     expect(() => dataset([])).toThrow(
-      'references missing event "victory-day-greenwood-march-2026"'
+      'references missing event "2026/05/immortal-regiment-greenwood"'
     );
   });
 
@@ -133,47 +165,39 @@ describe('shared events in news', () => {
     expect(evidence).toMatchSnapshot();
   });
 
-  it.each(['compact', 'wide'])(
-    'reflects cancellation in %s HTML, legacy JSON, shared JSON-LD and old ICS',
-    async (variant) => {
-      const data = dataset();
-      const article = data.byId.get('2026/05/ok-meeting-june')!;
-      const event = article.events[0];
-      const container = await createAstroContainer();
-      const html = await container.renderToString(NewsEventCard, {
-        props: { event, variant }
-      });
-      expect(html).toContain('Отменено');
-      expect(html).not.toContain('download=');
-      expect(
-        toNewsPublicPayload(data).articles.find((item) => item.id === article.id)?.events?.[0]
-          .description
-      ).toContain('Отменено.');
-      const jsonLd = newsArticleSchema({
-        name: article.title,
-        description: article.summary,
-        url: article.url,
-        events: article.events
-      });
-      expect(jsonLd.find((item) => item['@type'] === 'Event')?.eventStatus).toBe(
-        'https://schema.org/EventCancelled'
-      );
-      expect(buildEventIcs(event, article.canonical, article.publishedAt)).toContain(
-        'STATUS:CANCELLED'
-      );
-      expect(event.endsIso).toBeUndefined();
-      expect(jsonLd.find((item) => item['@type'] === 'Event')?.endDate).toBeUndefined();
-    }
-  );
+  it('reflects cancellation in HTML, legacy JSON, shared JSON-LD and old ICS', async () => {
+    const data = dataset();
+    const article = data.byId.get('2026/05/ok-meeting-june')!;
+    const event = article.events[0];
+    const container = await createAstroContainer();
+    const html = await container.renderToString(NewsEventCard, {
+      props: { event }
+    });
+    expect(html).toContain('Отменено');
+    expect(html).not.toContain('download=');
+    expect(
+      toNewsPublicPayload(data).articles.find((item) => item.id === article.id)?.events?.[0]
+        .description
+    ).toContain('Отменено.');
+    const jsonLd = newsArticleSchema({
+      name: article.title,
+      description: article.summary,
+      url: article.url,
+      events: article.events
+    });
+    expect(jsonLd.find((item) => item['@type'] === 'Event')?.eventStatus).toBe(
+      'https://schema.org/EventCancelled'
+    );
+    expect(buildEventIcs(event, article.canonical, article.publishedAt)).toContain(
+      'STATUS:CANCELLED'
+    );
+    expect(event.endsIso).toBeUndefined();
+    expect(jsonLd.find((item) => item['@type'] === 'Event')?.endDate).toBeUndefined();
+  });
 
-  it.each([
-    { variant: 'compact', through: undefined },
-    { variant: 'compact', through: '03.06.2026' },
-    { variant: 'wide', through: undefined },
-    { variant: 'wide', through: '03.06.2026' }
-  ])(
-    'renders rich date-only $variant cards completely, through=$through',
-    async ({ variant, through }) => {
+  it.each([undefined, '03.06.2026'])(
+    'renders rich date-only cards completely, through=%s',
+    async (through) => {
       const record = newsEventRecord(
         {
           starts_at: '01.06.2026',
@@ -188,7 +212,7 @@ describe('shared events in news', () => {
       expect(toNewsPublicPayload(data).articles[0].events).toBeUndefined();
       const container = await createAstroContainer();
       const html = await container.renderToString(NewsEventCard, {
-        props: { event: data.articles[0].events[0], variant }
+        props: { event: data.articles[0].events[0] }
       });
       const window = new Window();
       window.document.body.innerHTML = html;

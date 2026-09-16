@@ -9,6 +9,7 @@ export const newsEventRecord = (
   mapRawEvent({
     id: 'meeting',
     data: RawEventSchema.parse({
+      slug: 'meeting',
       title: 'Встреча по регламенту',
       category: 'meetings',
       starts_at: '31.05.2026 19:00',

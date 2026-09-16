@@ -9,6 +9,7 @@ const event = (input: Partial<RawEventInput> = {}, body = 'Описание') =>
   mapRawEvent({
     id: 'meeting',
     data: RawEventSchema.parse({
+      slug: 'meeting',
       title: 'Встреча',
       category: 'meetings',
       source_url: 'https://example.com/source',

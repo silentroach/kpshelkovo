@@ -1,4 +1,5 @@
 ---
+slug: ok-meeting-june
 title: Встреча с ОК Комфорт в Green Dreams
 category: meetings
 starts_at: 13.06.2026 16:00

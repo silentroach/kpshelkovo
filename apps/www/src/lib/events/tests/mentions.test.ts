@@ -34,6 +34,7 @@ const dataset = (body: string) =>
       {
         id: 'exhibition',
         data: RawEventSchema.parse({
+          slug: 'winter-exhibition',
           title: 'Exhibition',
           category: 'exhibitions',
           starts_at: '2026-12-30',
@@ -47,7 +48,7 @@ const dataset = (body: string) =>
   );
 
 describe('event mentions', () => {
-  it('resolves canonical, case and labelled mentions and links each target once to the starting day', () => {
+  it('resolves canonical, case and labelled mentions and links each target once to the event detail', () => {
     const data = dataset('@host, @host:gen and [the host](@host) at @venue.');
     const refs = data.events.flatMap(createEventMentionRefs);
     const graph = createEntityMentionGraph(refs);
@@ -66,8 +67,8 @@ describe('event mentions', () => {
     ).toMatchInlineSnapshot(`
       [
         {
-          "htmlUrl": "/events/2026/12/30/#exhibition",
-          "markdownUrl": "/events/2026/12/30/index.md",
+          "htmlUrl": "/events/2026/12/winter-exhibition/",
+          "markdownUrl": "/events/2026/12/winter-exhibition/index.md",
           "source": {
             "id": "exhibition",
             "kind": "event",
@@ -79,8 +80,8 @@ describe('event mentions', () => {
           },
         },
         {
-          "htmlUrl": "/events/2026/12/30/#exhibition",
-          "markdownUrl": "/events/2026/12/30/index.md",
+          "htmlUrl": "/events/2026/12/winter-exhibition/",
+          "markdownUrl": "/events/2026/12/winter-exhibition/index.md",
           "source": {
             "id": "exhibition",
             "kind": "event",

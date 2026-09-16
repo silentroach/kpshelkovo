@@ -21,7 +21,7 @@ export const buildEventJsonLd = (event: EventRecord, siteUrl: string): SchemaDoc
     '@type': 'Event',
     '@id': url,
     url,
-    mainEntityOfPage: url.split('#')[0],
+    mainEntityOfPage: url,
     name: event.title,
     description: [
       `${state}${extractMarkdownText(event.body) ?? ''}`,

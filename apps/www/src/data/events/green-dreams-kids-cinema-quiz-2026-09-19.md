@@ -1,4 +1,5 @@
 ---
+slug: kids-cinema-quiz
 title: Детский киноквиз
 category: games
 starts_at: 19.09.2026 17:00

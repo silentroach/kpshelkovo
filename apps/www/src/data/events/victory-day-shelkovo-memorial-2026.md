@@ -1,4 +1,5 @@
 ---
+slug: victory-day-shelkovo-memorial
 title: Митинг ко Дню Победы в деревне Шелково
 category: celebrations
 starts_at: 09.05.2026 15:00

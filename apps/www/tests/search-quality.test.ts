@@ -179,15 +179,24 @@ const queryGroups = [
 
 const rankExpectations: ReadonlyMap<string, { readonly url: string; readonly maxRank: number }> =
   new Map([
-    ['бессмертный полк в гринвуде', { url: '/events/2026/05/09/', maxRank: 8 }],
-    ['день победы в гринвуде', { url: '/events/2026/05/09/', maxRank: 8 }],
-    ['митинг ко дню победы в деревне шелково', { url: '/events/2026/05/09/', maxRank: 8 }],
-    ['посадка яблоневого сада в вилладже', { url: '/events/2026/05/16/', maxRank: 8 }],
-    ['встреча с ок комфорт в green dreams', { url: '/events/2026/06/13/', maxRank: 8 }],
-    ['встреча 13 июня', { url: '/events/2026/06/13/', maxRank: 8 }],
-    ['киноквиз', { url: '/events/2026/09/19/', maxRank: 8 }],
-    ['детский киноквиз', { url: '/events/2026/09/19/', maxRank: 8 }],
-    ['взрослый киноквиз', { url: '/events/2026/09/19/', maxRank: 8 }],
+    [
+      'бессмертный полк в гринвуде',
+      { url: '/events/2026/05/immortal-regiment-greenwood/', maxRank: 8 }
+    ],
+    ['день победы в гринвуде', { url: '/events/2026/05/victory-day-greenwood/', maxRank: 8 }],
+    [
+      'митинг ко дню победы в деревне шелково',
+      { url: '/events/2026/05/victory-day-shelkovo-memorial/', maxRank: 8 }
+    ],
+    ['посадка яблоневого сада в вилладже', { url: '/events/2026/05/apple-garden/', maxRank: 8 }],
+    [
+      'встреча с ок комфорт в green dreams',
+      { url: '/events/2026/06/ok-meeting-june/', maxRank: 8 }
+    ],
+    ['встреча 13 июня', { url: '/events/2026/06/ok-meeting-june/', maxRank: 8 }],
+    ['киноквиз', { url: '/events/2026/09/kids-cinema-quiz/', maxRank: 8 }],
+    ['детский киноквиз', { url: '/events/2026/09/kids-cinema-quiz/', maxRank: 8 }],
+    ['взрослый киноквиз', { url: '/events/2026/09/adult-cinema-quiz/', maxRank: 8 }],
     ['где поесть', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
     ['еда', { url: '/map/burzhuyka/', maxRank: 2 }],
     ['как въехать грузовику', { url: '/news/2026/05/truck-entry-open/', maxRank: 1 }],
@@ -505,15 +514,23 @@ test('status, #224 events and #372 KB indexing policy in the production corpus',
 
     expect(urls.length).toBeGreaterThan(0);
     const eventUrls = urls.filter((url) => url.startsWith('/events/'));
-    expect(eventUrls).toEqual(
-      expect.arrayContaining([
-        '/events/2026/05/09/',
-        '/events/2026/05/16/',
-        '/events/2026/06/13/',
-        '/events/2026/09/19/'
-      ])
-    );
-    expect(eventUrls.filter((url) => !/^\/events\/\d{4}\/\d{2}\/\d{2}\/$/u.test(url))).toEqual([]);
+    // Compare the full corpus, without deduplicating: one document per event,
+    // never one per day or monthly view (including for a multi-day event).
+    expect(eventUrls.sort()).toMatchInlineSnapshot(`
+      [
+        "/events/2026/05/apple-garden/",
+        "/events/2026/05/immortal-regiment-greenwood/",
+        "/events/2026/05/victory-day-greenwood/",
+        "/events/2026/05/victory-day-shelkovo-memorial/",
+        "/events/2026/06/ok-meeting-june/",
+        "/events/2026/09/adult-cinema-quiz/",
+        "/events/2026/09/kids-cinema-quiz/",
+      ]
+    `);
+    expect(eventUrls).toHaveLength(7);
+    expect(
+      eventUrls.filter((url) => /^\/events\/(?:$|\d{4}\/\d{2}\/(?:$|\d{2}\/|list\/))/u.test(url))
+    ).toEqual([]);
     expect(urls.filter((url) => url.startsWith('/status/calendar/'))).toEqual([]);
     expect(urls).not.toContain('/status/history/');
     expect(urls).toEqual(expect.arrayContaining([...new Set(statusTargets.values())]));
@@ -598,6 +615,38 @@ for (const group of queryGroups) {
 
         expect.soft(rank, `${query}: expected ${expectation.url}`).toBeGreaterThanOrEqual(0);
         expect.soft(rank + 1, `${query}: expected rank`).toBeLessThanOrEqual(expectation.maxRank);
+      }
+
+      if (query === 'события' || query === 'календарь мероприятий') {
+        expect
+          .soft(snapshot.results[0]?.url, `${query}: lead with an event detail`)
+          .toMatch(/^\/events\/\d{4}\/\d{2}\/[a-z][a-z0-9-]*\//u);
+        expect
+          .soft(
+            snapshot.results.filter((result) => result.section === 'События').length,
+            `${query}: discover multiple events in the first result batch`
+          )
+          .toBeGreaterThanOrEqual(4);
+      }
+
+      if (query === 'киноквиз') {
+        expect
+          .soft(snapshot.results.map((result) => result.url.split('#')[0]))
+          .toEqual(
+            expect.arrayContaining([
+              '/events/2026/09/kids-cinema-quiz/',
+              '/events/2026/09/adult-cinema-quiz/'
+            ])
+          );
+      }
+
+      if (query === 'встреча с ок комфорт в green dreams' || query === 'встреча 13 июня') {
+        const meeting = snapshot.results.find((result) =>
+          result.url.startsWith('/events/2026/06/ok-meeting-june/')
+        );
+        expect
+          .soft(meeting?.excerpt, `${query}: cancellation must remain visible`)
+          .toMatch(/отменено/iu);
       }
 
       if (query === 'буржуйка' || query === 'адрес буржуйки' || query === 'время работы буржуйки') {

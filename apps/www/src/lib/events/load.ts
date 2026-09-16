@@ -5,6 +5,7 @@ import { loadSiteMentionRegistry } from '@/lib/mentions/registry';
 
 import { buildEventCalendar } from './calendar-projection';
 import { mapRawEvent } from './mapper';
+import { EventRoutesSchema } from './raw-schema';
 import type { EventEntry, EventRecord, EventsDataset } from './types';
 
 export const buildEventsDataset = (
@@ -14,11 +15,8 @@ export const buildEventsDataset = (
   const events = entries
     .map((entry) => mapRawEvent(entry, registry))
     .sort((a, b) => a.startsIso.localeCompare(b.startsIso) || a.id.localeCompare(b.id, 'en'));
-  const byId = new Map<string, EventRecord>();
-  for (const event of events) {
-    if (byId.has(event.id)) throw new Error(`duplicate event ID "${event.id}"`);
-    byId.set(event.id, event);
-  }
+  EventRoutesSchema.parse(events);
+  const byId = new Map(events.map((event) => [event.id, event]));
   return { events, byId, calendar: buildEventCalendar(events) };
 };
 

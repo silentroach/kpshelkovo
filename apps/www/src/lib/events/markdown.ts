@@ -6,7 +6,7 @@ import {
 } from '@shelkovo/markdown';
 
 import type { EventDay, EventMonth, EventRecord } from './types';
-import { eventMonthUrl, eventUrl } from './urls';
+import { eventDayUrl, eventMonthUrl } from './urls';
 import { EVENT_CATEGORY_LABELS, EVENT_STATUS_LABELS } from './view';
 
 const serialize = (children: Parameters<typeof createMarkdownDocument>[0]['children']): string =>
@@ -43,15 +43,16 @@ export const buildEventsMonthMarkdown = (month: EventMonth, siteUrl: string): st
     md.list(month.days.map((day) => linkRow(`${day.url}index.md`, day.date, siteUrl))),
     md.heading(2, 'События месяца'),
     md.list(
-      month.events.map((event) => {
-        const date = event.startsDate < `${month.id}-01` ? `${month.id}-01` : event.startsDate;
-        return md.listItem([
+      month.events.map((event) =>
+        md.listItem([
           md.paragraph([
-            md.link(new URL(eventUrl(date, event.id), siteUrl).href, event.title),
-            md.text(`: ${period(event)}; ${EVENT_STATUS_LABELS[event.status]}.`)
+            md.link(new URL(`${event.url}index.md`, siteUrl).href, event.title),
+            md.text(
+              `: ${period(event)}${event.status !== 'announced' ? `; ${EVENT_STATUS_LABELS[event.status]}` : ''}.`
+            )
           ])
-        ]);
-      })
+        ])
+      )
     ),
     discovery(siteUrl)
   ]);
@@ -72,30 +73,53 @@ export const buildEventsDayMarkdown = (day: EventDay, siteUrl: string): string =
       linkRow(`${eventMonthUrl(day.date.slice(0, 7))}index.md`, 'Все дни месяца', siteUrl),
       linkRow(day.url, 'Страница дня', siteUrl)
     ]),
-    ...day.events.flatMap((event) => [
-      md.heading(2, event.title),
-      md.list([
-        md.listItem([md.paragraph([md.text('ID: '), md.inlineCode(event.id)])]),
-        linkRow(event.url, 'Основная карточка', siteUrl),
-        md.listItem(`Когда: ${period(event)}`),
-        md.listItem(`Категория: ${EVENT_CATEGORY_LABELS[event.category]}`),
-        md.listItem(`Состояние: ${EVENT_STATUS_LABELS[event.status]}`),
-        md.listItem(`Место: ${event.location ?? 'уточняется'}`),
-        ...(event.price ? [md.listItem(`Цена: ${event.price}`)] : []),
-        ...(event.audience ? [md.listItem(`Участники: ${event.audience}`)] : []),
-        ...(event.coordinates
-          ? [md.listItem(`Координаты: ${event.coordinates.lat}, ${event.coordinates.lng}`)]
-          : []),
-        ...(event.organizer ? [md.listItem(`Организатор: ${event.organizer.name}`)] : []),
-        ...(event.performer?.length
-          ? [md.listItem(`Исполнители: ${event.performer.map((person) => person.name).join(', ')}`)]
-          : []),
-        linkRow(event.sourceUrl, 'Источник', siteUrl),
-        ...(event.icsUrl && event.status !== 'cancelled'
-          ? [linkRow(event.icsUrl, 'Скачать ICS', siteUrl)]
-          : [])
-      ]),
-      ...parseMarkdownFragment(event.body)
+    md.list(
+      day.events.map((event) =>
+        md.listItem([
+          md.paragraph([
+            md.link(new URL(`${event.url}index.md`, siteUrl).href, event.title),
+            md.text(
+              `: ${period(event)}. Место: ${event.location ?? (event.coordinates ? 'указано на карте' : 'уточняется')}.${event.price ? ` Цена: ${event.price}.` : ''}${event.audience ? ` Участники: ${event.audience}.` : ''}${event.status !== 'announced' ? ` ${EVENT_STATUS_LABELS[event.status]}.` : ''}`
+            )
+          ])
+        ])
+      )
+    ),
+    discovery(siteUrl)
+  ]);
+
+export const buildEventMarkdown = (event: EventRecord, siteUrl: string): string =>
+  serialize([
+    md.heading(1, event.title),
+    md.list([
+      md.listItem([md.paragraph([md.text('ID: '), md.inlineCode(event.id)])]),
+      linkRow(event.url, 'Страница мероприятия', siteUrl),
+      linkRow(`${eventDayUrl(event.startsDate)}index.md`, 'Все события дня начала', siteUrl),
+      linkRow(
+        `${eventMonthUrl(event.startsDate.slice(0, 7))}index.md`,
+        'Все события месяца начала',
+        siteUrl
+      ),
+      md.listItem(`Когда: ${period(event)}`),
+      md.listItem(`Категория: ${EVENT_CATEGORY_LABELS[event.category]}`),
+      md.listItem(`Состояние: ${EVENT_STATUS_LABELS[event.status]}`),
+      md.listItem(
+        `Место: ${event.location ?? (event.coordinates ? 'указано на карте' : 'уточняется')}`
+      ),
+      ...(event.price ? [md.listItem(`Цена: ${event.price}`)] : []),
+      ...(event.audience ? [md.listItem(`Участники: ${event.audience}`)] : []),
+      ...(event.coordinates
+        ? [md.listItem(`Координаты: ${event.coordinates.lat}, ${event.coordinates.lng}`)]
+        : []),
+      ...(event.organizer ? [md.listItem(`Организатор: ${event.organizer.name}`)] : []),
+      ...(event.performer?.length
+        ? [md.listItem(`Исполнители: ${event.performer.map((person) => person.name).join(', ')}`)]
+        : []),
+      linkRow(event.sourceUrl, 'Источник', siteUrl),
+      ...(event.icsUrl && event.status !== 'cancelled'
+        ? [linkRow(event.icsUrl, 'Скачать ICS', siteUrl)]
+        : [])
     ]),
+    ...parseMarkdownFragment(event.body),
     discovery(siteUrl)
   ]);

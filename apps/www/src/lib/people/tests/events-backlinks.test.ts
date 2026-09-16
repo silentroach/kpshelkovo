@@ -26,6 +26,7 @@ describe('event backlink consumers', () => {
           {
             id: 'exhibition',
             data: RawEventSchema.parse({
+              slug: 'winter-exhibition',
               title: 'Exhibition',
               category: 'exhibitions',
               starts_at: starts,
@@ -47,9 +48,11 @@ describe('event backlink consumers', () => {
       expect(z.fromJSONSchema(schema('https://example.com')).safeParse(payload).success).toBe(true);
       expect(backlink.mentioned_at).toBe(events.events[0]!.startsIso);
       expect(new URL(backlink.html_url).pathname + new URL(backlink.html_url).hash).toBe(
-        '/events/2026/12/30/#exhibition'
+        '/events/2026/12/winter-exhibition/'
       );
-      expect(new URL(backlink.markdown_url).pathname).toBe('/events/2026/12/30/index.md');
+      expect(new URL(backlink.markdown_url).pathname).toBe(
+        '/events/2026/12/winter-exhibition/index.md'
+      );
       expect(payload.stats.backlink_count).toBe(1);
       expect(payload.profiles[0]!.backlink_count).toBe(1);
       expect(personBacklinkGroups(profile.backlinks).map((group) => group.section)).toEqual([

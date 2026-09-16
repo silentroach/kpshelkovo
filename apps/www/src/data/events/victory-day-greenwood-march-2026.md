@@ -1,4 +1,5 @@
 ---
+slug: immortal-regiment-greenwood
 title: Бессмертный полк в Гринвуде
 category: celebrations
 starts_at: 09.05.2026 13:00

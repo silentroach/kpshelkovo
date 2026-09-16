@@ -2,6 +2,7 @@
 
 import { Window } from 'happy-dom';
 import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
 
 import { buildEventCalendar } from '@/lib/events/calendar-projection';
 import { mapRawEvent } from '@/lib/events/mapper';
@@ -9,7 +10,7 @@ import { RawEventSchema } from '@/lib/events/raw-schema';
 import type { RawEventInput } from '@/lib/events/raw-schema';
 import { buildEventMonthCells, formatEventRange } from '@/lib/events/view';
 // @ts-expect-error Astro components are resolved by Astro/Vitest.
-import EventDayPage from '@/pages/events/[year]/[month]/[day].astro';
+import EventEntryPage from '@/pages/events/[year]/[month]/[entry].astro';
 import { createAstroContainer } from '@/test/astro-container';
 
 // @ts-expect-error Astro components are resolved by Astro/Vitest.
@@ -23,6 +24,7 @@ const event = (id: string, starts: string, extra: Partial<RawEventInput> = {}) =
     body: '[Записаться](https://example.com/register). Примерная длительность: четыре часа.',
     data: RawEventSchema.parse({
       title: id,
+      slug: `${id}-detail`,
       category: 'workshops',
       starts_at: starts,
       source_url: 'https://example.com/source',
@@ -49,19 +51,15 @@ describe('event cards', () => {
     );
     const text = document.body.textContent.replaceAll('\u00a0', ' ');
     expect(text).toContain('время не указано');
-    expect(text).toContain('Место не указано');
+    expect(text).toContain('Место уточняется');
     expect(text).toContain(record.price);
     expect(text).toContain(record.audience);
     expect(document.querySelector('[data-status="conditional"]')).toBeTruthy();
-    expect(document.querySelector('.event-labels')?.textContent).toMatch(
-      /Мастер-классы\s+При наборе группы/
+    const facts = [...document.querySelectorAll('dd')].map((item) =>
+      item.textContent.replaceAll('\u00a0', ' ')
     );
-    expect(document.querySelector('dl')?.textContent.replaceAll('\u00a0', ' ')).toMatch(
-      /Стоимость\s+600/
-    );
-    expect(document.querySelector('dl')?.textContent.replaceAll('\u00a0', ' ')).toMatch(
-      /Для кого\s+От 6 лет/
-    );
+    expect(facts).toContain(record.price);
+    expect(facts).toContain(record.audience);
     expect(document.querySelectorAll('a[href="https://example.com/source"]')).toHaveLength(1);
     expect(document.querySelector('a[href="https://example.com/register"]')).toBeTruthy();
     expect(document.querySelector('iframe, a[download]')).toBeFalsy();
@@ -76,11 +74,20 @@ describe('event cards', () => {
       coordinates: { lat: 54.8, lng: 37.9 }
     });
     const document = documentFor(
-      await container.renderToString(EventCard, { props: { event: record } })
+      await container.renderToString(EventEntryPage, {
+        props: { event: record, month: buildEventCalendar([record]).months[0]! },
+        request: new Request(`https://kpshelkovo.online${record.url}`)
+      })
     );
     expect(document.querySelector('article#cancelled [data-status="cancelled"]')).toBeTruthy();
-    expect(document.querySelector('h2')?.textContent).toMatch(/Отменено:\s+cancelled/);
-    expect(document.querySelector('dl')?.textContent).toMatch(/Место\s+Внешняя площадка/);
+    expect(document.querySelector('h1')?.textContent.replaceAll('\u00a0', ' ')).toBe(
+      `Отменено: ${record.title}`
+    );
+    expect(document.querySelectorAll('[data-status="cancelled"]')).toHaveLength(1);
+    expect(document.querySelector('[data-search-title]')?.getAttribute('data-search-title')).toBe(
+      `Отменено: ${record.title} — События`
+    );
+    expect(document.querySelector('aside h2')?.textContent).toBe(record.location);
     expect(document.querySelector('a[download]')).toBeFalsy();
     expect(document.querySelector('iframe[loading="lazy"]')).toBeTruthy();
     expect(document.querySelector('a[href*="pt=37.9,54.8"]')).toBeTruthy();
@@ -94,7 +101,115 @@ describe('event cards', () => {
       await container.renderToString(EventCard, { props: { event: record } })
     );
     expect(document.querySelector('a[download]')?.getAttribute('href')).toBe(record.icsUrl);
+    expect(
+      document
+        .querySelector('a[download]')
+        ?.parentElement?.querySelector('time')
+        ?.getAttribute('datetime')
+    ).toBe(record.startsIso);
     expect(document.body.textContent).not.toContain('19:00');
+  });
+
+  it('renders one location card only when a name or coordinates exist, keeping maps decorative', async () => {
+    const container = await createAstroContainer();
+    const locations = [
+      { name: 'unknown', fields: {} },
+      { name: 'name-only', fields: { location: 'Площадка у реки' } },
+      { name: 'coordinates-only', fields: { coordinates: { lat: 54.8, lng: 37.9 } } },
+      {
+        name: 'both',
+        fields: { location: 'Площадка у реки', coordinates: { lat: 54.8, lng: 37.9 } }
+      }
+    ];
+    const evidence = [];
+    for (const { name, fields } of locations) {
+      const record = event(name, '19.09.2026 17:00', fields);
+      const document = documentFor(
+        await container.renderToString(EventCard, { props: { event: record } })
+      );
+      const card = document.querySelector('article');
+      const aside = card?.querySelector('aside');
+      const frame = aside?.querySelector('iframe');
+      const mapLink = aside?.querySelector('a');
+      const mapUrl = mapLink ? new URL(mapLink.href) : undefined;
+      evidence.push({
+        name,
+        cards: document.querySelectorAll('aside').length,
+        maps: document.querySelectorAll('iframe').length,
+        mapLinks: document.querySelectorAll('a[href*="yandex.ru/maps/"]').length,
+        point: mapUrl?.searchParams.get('pt') ?? undefined,
+        query: mapUrl?.searchParams.get('text') ?? undefined,
+        decorativeMap: frame
+          ? frame.tabIndex === -1 &&
+            !!frame.closest('[aria-hidden="true"][inert]') &&
+            frame.getAttribute('loading') === 'lazy'
+          : undefined,
+        locationBetweenHeaderAndBody: aside
+          ? aside.previousElementSibling?.tagName === 'HEADER' &&
+            !!aside.nextElementSibling?.querySelector('a[href="https://example.com/register"]')
+          : undefined
+      });
+      if (record.location) {
+        expect(document.querySelectorAll('aside h2')).toHaveLength(1);
+        expect(aside?.querySelector('h2')?.textContent.replaceAll('\u00a0', ' ')).toBe(
+          record.location
+        );
+        expect(card?.querySelector('header')?.textContent.replaceAll('\u00a0', ' ')).not.toContain(
+          record.location
+        );
+        expect(aside?.nextElementSibling?.textContent.replaceAll('\u00a0', ' ')).not.toContain(
+          record.location
+        );
+      }
+      if (aside) {
+        expect(aside.querySelector('time, a[download]')).toBeFalsy();
+        expect(aside.querySelector('h2')?.textContent.trim()).not.toBe('');
+      }
+    }
+    expect(evidence).toMatchInlineSnapshot(`
+      [
+        {
+          "cards": 0,
+          "decorativeMap": undefined,
+          "locationBetweenHeaderAndBody": undefined,
+          "mapLinks": 0,
+          "maps": 0,
+          "name": "unknown",
+          "point": undefined,
+          "query": undefined,
+        },
+        {
+          "cards": 1,
+          "decorativeMap": undefined,
+          "locationBetweenHeaderAndBody": true,
+          "mapLinks": 1,
+          "maps": 0,
+          "name": "name-only",
+          "point": undefined,
+          "query": "Площадка у реки",
+        },
+        {
+          "cards": 1,
+          "decorativeMap": true,
+          "locationBetweenHeaderAndBody": true,
+          "mapLinks": 1,
+          "maps": 1,
+          "name": "coordinates-only",
+          "point": "37.9,54.8",
+          "query": undefined,
+        },
+        {
+          "cards": 1,
+          "decorativeMap": true,
+          "locationBetweenHeaderAndBody": true,
+          "mapLinks": 1,
+          "maps": 1,
+          "name": "both",
+          "point": "37.9,54.8",
+          "query": undefined,
+        },
+      ]
+    `);
   });
 
   it('shows full cross-year periods and explicitly dated overnight endings', () => {
@@ -224,7 +339,7 @@ describe('event calendar pages', () => {
     expect(document.querySelector('[data-pagefind-root], meta[name="robots"]')).toBeFalsy();
   });
 
-  it('deduplicates a period in the list, links within the selected month and canonicalizes to its calendar', async () => {
+  it('deduplicates a period in the month list, links to its start-month detail and canonicalizes to the calendar', async () => {
     const container = await createAstroContainer();
     const document = documentFor(
       await container.renderToString(EventMonthPage, {
@@ -235,8 +350,8 @@ describe('event calendar pages', () => {
     expect([...document.querySelectorAll('main h2 a')].map((link) => link.getAttribute('href')))
       .toMatchInlineSnapshot(`
       [
-        "/events/2026/09/01/#period",
-        "/events/2026/09/19/#september",
+        "/events/2026/08/period-detail/",
+        "/events/2026/09/september-detail/",
       ]
     `);
     expect(document.querySelector('a[rel="prev"]')?.getAttribute('href')).toBe(
@@ -266,21 +381,50 @@ describe('event calendar pages', () => {
     );
   });
 
-  it('opts days into Pagefind and emits self-canonical metadata and the shared Event identity', async () => {
+  it('preserves day anchors and compact conditions, then opens full indexed details with return links', async () => {
     const container = await createAstroContainer();
-    const day = calendar.byDay.get('2026-09-02')!;
+    const evening = event('evening', '02.09.2026 17:00', {
+      status: 'conditional',
+      price: '600 или 800 рублей',
+      audience: 'От 8 лет',
+      location: 'Площадка у реки'
+    });
+    const projection = buildEventCalendar([...records, evening]);
+    const day = projection.byDay.get('2026-09-02')!;
     const document = documentFor(
-      await container.renderToString(EventDayPage, {
+      await container.renderToString(EventEntryPage, {
         props: { day, month },
         request: new Request(`https://kpshelkovo.online${day.url}`)
       })
     );
     expect(
-      document.querySelector('[data-pagefind-root][data-search-section-id="events"]')
-    ).toBeTruthy();
+      document.querySelector(
+        '[data-pagefind-root], [data-pagefind-body], iframe, a[download], a[href="https://example.com/register"]'
+      )
+    ).toBeFalsy();
+    expect(document.querySelector('script[type="application/ld+json"]')).toBeFalsy();
+    const links = [...document.querySelectorAll('main h2 a')];
     expect(
-      document.querySelector('[data-pagefind-body] article, article[data-pagefind-body]')
-    ).toBeTruthy();
+      links.map((link) => ({ anchor: link.closest('li')?.id, href: link.getAttribute('href') }))
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "anchor": "period",
+          "href": "/events/2026/08/period-detail/",
+        },
+        {
+          "anchor": "evening",
+          "href": "/events/2026/09/evening-detail/",
+        },
+      ]
+    `);
+    const row = document.getElementById(evening.id);
+    expect(row?.textContent.replaceAll('\u00a0', ' ')).toContain(evening.price);
+    expect(row?.textContent.replaceAll('\u00a0', ' ')).toContain(evening.audience);
+    expect(row?.querySelector('[data-status="conditional"]')).toBeTruthy();
+    expect(
+      document.getElementById('period')?.querySelector('[data-status="announced"]')
+    ).toBeFalsy();
     expect(document.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(
       `https://kpshelkovo.online${day.url}`
     );
@@ -290,10 +434,51 @@ describe('event calendar pages', () => {
     expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toBe(
       document.querySelector('meta[property="og:description"]')?.getAttribute('content')
     );
-    expect(document.querySelector('script[type="application/ld+json"]')?.textContent).toContain(
-      'https://kpshelkovo.online/events/2026/08/31/#period'
-    );
     expect(document.querySelector('main a[href="/events/2026/09/"]')).toBeTruthy();
     expect(document.querySelector('meta[name="robots"]')).toBeFalsy();
+
+    for (const link of links) {
+      const record = day.events.find((item) => item.url === link.getAttribute('href'))!;
+      const detail = documentFor(
+        await container.renderToString(EventEntryPage, {
+          props: { event: record, month: projection.byMonth.get(record.startsDate.slice(0, 7))! },
+          request: new Request(`https://kpshelkovo.online${record.url}`)
+        })
+      );
+      expect(
+        detail.querySelector(
+          '[data-pagefind-root][data-search-section-id="events"] article[data-pagefind-body]'
+        )
+      ).toBeTruthy();
+      expect(detail.querySelectorAll('h1')).toHaveLength(1);
+      expect(detail.querySelector('h1')?.textContent).toBe(record.title);
+      expect(detail.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(
+        `https://kpshelkovo.online${record.url}`
+      );
+      expect(detail.querySelector('a[href="https://example.com/register"]')).toBeTruthy();
+      expect(detail.querySelectorAll('a[href="https://example.com/source"]')).toHaveLength(1);
+      expect(detail.querySelector('a[download]')?.getAttribute('href')).toBe(record.icsUrl);
+      expect(
+        detail.querySelector(`nav a[href="/events/${record.startsDate.replaceAll('-', '/')}/"]`)
+      ).toBeTruthy();
+      expect(
+        detail.querySelector(
+          `nav a[data-pagefind-body][href="/events/${record.startsDate.slice(0, 7).replace('-', '/')}/"]`
+        )
+      ).toBeTruthy();
+      const schema = z
+        .object({
+          '@type': z.literal('Event'),
+          '@id': z.url(),
+          startDate: z.string(),
+          endDate: z.string().optional(),
+          eventStatus: z.string().optional()
+        })
+        .parse(JSON.parse(detail.querySelector('script[type="application/ld+json"]')!.textContent));
+      expect(schema['@id']).toBe(`https://kpshelkovo.online${record.url}`);
+      expect(schema.startDate).toBe(record.startsIso);
+      expect(schema.endDate).toBe(record.through);
+      if (record.status === 'conditional') expect(schema.eventStatus).toBeUndefined();
+    }
   });
 });

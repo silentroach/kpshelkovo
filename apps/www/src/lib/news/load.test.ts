@@ -480,7 +480,7 @@ describe('buildNewsDataset', () => {
           date: '04.05.2026 10:00',
           events: [
             {
-              event: 'meeting'
+              event: '2026/05/meeting'
             }
           ]
         })
@@ -597,7 +597,7 @@ describe('buildNewsDataset', () => {
           date: '04.05.2026 10:00',
           events: [
             {
-              event: 'meeting'
+              event: '2026/05/meeting'
             }
           ]
         })
@@ -638,7 +638,7 @@ describe('buildNewsDataset', () => {
           date: '04.05.2026 10:00',
           events: [
             {
-              event: 'meeting'
+              event: '2026/05/meeting'
             }
           ]
         })
@@ -666,7 +666,7 @@ describe('buildNewsDataset', () => {
           date: '04.05.2026 10:00',
           events: [
             {
-              event: 'meeting'
+              event: '2026/05/meeting'
             }
           ]
         })

@@ -144,13 +144,13 @@ function normalizeEvent(
     readonly month: string;
     readonly entry: string;
   },
-  eventsById: ReadonlyMap<string, EventRecord>
+  eventsByReferenceKey: ReadonlyMap<string, EventRecord>
 ): NewsEvent {
   const slug = input.slug ?? 'event';
-  const event = eventsById.get(input.event.id);
+  const event = eventsByReferenceKey.get(input.event);
   if (!event) {
     throw new Error(
-      `news article "${route.year}/${route.month}/${route.entry}" references missing event "${input.event.id}"`
+      `news article "${route.year}/${route.month}/${route.entry}" references missing event "${input.event}"`
     );
   }
 
@@ -204,7 +204,7 @@ function normalizeArticle(
   authors: ReadonlyMap<string, NewsAuthor>,
   mentionRegistry: SiteMentionRegistry,
   now: Date,
-  eventsById: ReadonlyMap<string, EventRecord>
+  eventsByReferenceKey: ReadonlyMap<string, EventRecord>
 ): NewsArticle {
   const parts = articleParts(entry);
   const published = entry.data.date;
@@ -218,7 +218,7 @@ function normalizeArticle(
   const author = needAuthor(authors, authorId(entry.data.author), `news article "${entry.id}"`);
   const articleCover = cover(entry.data.cover, entry.data.cover_alt, `news article "${entry.id}"`);
   const events = (entry.data.events ?? []).map((event: EventData) =>
-    normalizeEvent(event, parts, eventsById)
+    normalizeEvent(event, parts, eventsByReferenceKey)
   );
   const mappedPhotos = mapPhotos(entry.data.photos, entry.id, mentionRegistry);
   const body = preprocessSiteMarkdownContent(
@@ -364,11 +364,15 @@ export function buildNewsDataset(
 ): NewsDataset {
   const now = opts?.now ?? new Date();
   const mentionRegistry = opts?.mentionRegistry ?? new Map();
-  const eventsById = opts?.eventsById ?? new Map();
+  const eventsByReferenceKey = new Map(
+    [...(opts?.eventsById?.values() ?? [])].map((event) => [event.referenceKey, event])
+  );
   const authors = authorMap(authorsData);
 
   const articles: readonly NewsArticle[] = articlesData
-    .map((item: ArticleEntry) => normalizeArticle(item, authors, mentionRegistry, now, eventsById))
+    .map((item: ArticleEntry) =>
+      normalizeArticle(item, authors, mentionRegistry, now, eventsByReferenceKey)
+    )
     .sort(compareArticlesPublishedDesc);
 
   validateUniqueIds(articles);

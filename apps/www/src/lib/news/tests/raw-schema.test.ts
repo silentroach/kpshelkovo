@@ -49,7 +49,7 @@ const cover = {
 };
 
 const event = {
-  event: 'meeting'
+  event: '2026/05/meeting'
 };
 
 const validationIssues = <Output>(result: z.ZodSafeParseResult<Output>, subject: string) => {
@@ -255,10 +255,23 @@ describe('RawNewsAuthorSchema', () => {
 });
 
 describe('RawNewsEventsSchema', () => {
+  it.each([
+    'meeting',
+    'ok-meeting-june-2026',
+    '/events/2026/06/meeting/',
+    '2026/06/meeting/',
+    '2026/13/meeting',
+    '2026/6/meeting',
+    '2026/06/13',
+    '2026/06/list',
+    { collection: 'events', id: 'meeting' }
+  ])('rejects noncanonical reference syntax %j', (event) => {
+    expect(RawNewsEventsSchema.safeParse([{ event }]).success).toBe(false);
+  });
   it('resolves event references and preserves local slugs', () => {
     const [parsed] = RawNewsEventsSchema.parse([
       {
-        event: 'meeting',
+        event: '2026/05/meeting',
         slug: '  old-slug  '
       }
     ]);
@@ -268,10 +281,7 @@ describe('RawNewsEventsSchema', () => {
 
     expect(parsed).toMatchInlineSnapshot(`
       {
-        "event": {
-          "collection": "events",
-          "id": "meeting",
-        },
+        "event": "2026/05/meeting",
         "slug": "old-slug",
       }
     `);

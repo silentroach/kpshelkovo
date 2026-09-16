@@ -1,4 +1,5 @@
 ---
+slug: victory-day-greenwood
 title: День Победы в Гринвуде
 category: celebrations
 starts_at: 09.05.2026 14:00

@@ -1,4 +1,5 @@
 ---
+slug: apple-garden
 title: Посадка яблоневого сада в Вилладже
 category: community
 starts_at: 16.05.2026 15:00

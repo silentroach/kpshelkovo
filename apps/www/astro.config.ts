@@ -7,6 +7,7 @@ import svelte from '@astrojs/svelte';
 import compressor from 'astro-compressor';
 import { defineConfig, type AstroIntegration } from 'astro/config';
 
+import { eventRedirects } from './src/integrations/event-redirects';
 import { indexNowUrlManifest } from './src/integrations/indexnow-url-manifest';
 import { pagefindDevSnapshot } from './src/integrations/pagefind-dev-snapshot';
 import { retryableSearchDialog } from './src/integrations/retryable-search-dialog';
@@ -97,6 +98,7 @@ export default defineConfig({
     pagefindDevSnapshot(),
     svelte(),
     preloadSitemapMetadata(),
+    eventRedirects(),
     sitemap({
       filter: shouldIncludeSitemapPage,
       serialize: serializeSitemapItem

@@ -9,6 +9,9 @@ import MapBackground from '../../map-background.svg';
 
 const eventWithCoordinates = {
   id: 'reglament',
+  eventSlug: 'reglament-meeting',
+  referenceKey: '2026/05/reglament-meeting',
+  aliases: [],
   category: 'meetings',
   status: 'announced',
   startsDate: '2026-05-31',
@@ -17,7 +20,7 @@ const eventWithCoordinates = {
   body: 'На встрече обсудим регламент обслуживания поселка.',
   mentions: [],
   calendarUid: 'event-reglament@kpshelkovo.online',
-  url: '/events/2026/05/31/#reglament',
+  url: '/events/2026/05/reglament-meeting/',
   slug: 'reglament',
   title: 'Встреча по регламенту',
   startsAt: new Date('2026-09-30T19:00:00+03:00'),
@@ -33,6 +36,9 @@ const eventWithCoordinates = {
 
 const eventWithoutPlace = {
   id: 'entrance',
+  eventSlug: 'entrance-meeting',
+  referenceKey: '2026/06/entrance-meeting',
+  aliases: [],
   category: 'community',
   status: 'announced',
   startsDate: '2026-06-03',
@@ -41,7 +47,7 @@ const eventWithoutPlace = {
   body: 'Обсудим благоустройство главного въезда и предложения жителей.',
   mentions: [],
   calendarUid: 'event-entrance@kpshelkovo.online',
-  url: '/events/2026/06/03/#entrance',
+  url: '/events/2026/06/entrance-meeting/',
   slug: 'entrance',
   title: 'Обсуждение благоустройства въезда',
   startsAt: new Date('2026-06-03T10:30:00+03:00'),
@@ -69,7 +75,7 @@ const eventWithoutPlace = {
           class="news-event-visual-target"
           data-testid="news-event-card-coordinates"
         >
-          <NewsEventCard event={eventWithCoordinates} variant="compact" />
+          <NewsEventCard event={eventWithCoordinates} />
         </div>
       </section>
 
@@ -79,7 +85,7 @@ const eventWithoutPlace = {
           class="news-event-visual-target"
           data-testid="news-event-card-no-place"
         >
-          <NewsEventCard event={eventWithoutPlace} variant="compact" />
+          <NewsEventCard event={eventWithoutPlace} />
         </div>
       </section>
     </main>

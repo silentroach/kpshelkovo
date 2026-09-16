@@ -11,11 +11,11 @@ tags:
 source_url: https://okkomfort.domyland.app/news?targetId=111551&entityName=news&t=okkomfort
 events:
   - slug: shelkovo
-    event: victory-day-greenwood-march-2026
+    event: 2026/05/immortal-regiment-greenwood
   - slug: greenwood
-    event: victory-day-greenwood-2026
+    event: 2026/05/victory-day-greenwood
   - slug: shelkovo-memorial
-    event: victory-day-shelkovo-memorial-2026
+    event: 2026/05/victory-day-shelkovo-memorial
 ---
 
 9 мая в 13:00 соседи из Гринвуда приглашают жителей присоединиться к [«Бессмертному полку»](https://ru.wikipedia.org/wiki/%D0%91%D0%B5%D1%81%D1%81%D0%BC%D0%B5%D1%80%D1%82%D0%BD%D1%8B%D0%B9_%D0%BF%D0%BE%D0%BB%D0%BA). Место встречи — у КПП Гринвуд 2, рядом с детской площадкой.

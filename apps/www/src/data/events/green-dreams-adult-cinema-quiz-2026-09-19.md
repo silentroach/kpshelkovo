@@ -1,4 +1,5 @@
 ---
+slug: adult-cinema-quiz
 title: Взрослый киноквиз
 category: games
 starts_at: 19.09.2026 19:00

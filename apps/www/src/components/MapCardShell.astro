@@ -1,0 +1,96 @@
+---
+interface Props {
+  readonly embedUrl?: string;
+}
+const { embedUrl } = Astro.props;
+---
+
+<div class="map-card-shell">
+  {
+    embedUrl && (
+      <div class="map-background" aria-hidden="true" inert>
+        <div class="map-layer">
+          <iframe
+            src={embedUrl}
+            title="Карта места"
+            loading="lazy"
+            tabindex="-1"
+          />
+          <span class="ui-map-marker" />
+        </div>
+        <div class="map-wash" />
+      </div>
+    )
+  }
+  <div class="map-content"><slot /></div>
+</div>
+
+<style>
+  .map-card-shell {
+    position: relative;
+    isolation: isolate;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid
+      color-mix(
+        in oklab,
+        var(--color-border-strong) 76%,
+        var(--color-primary) 24%
+      );
+    border-radius: 1rem;
+    background: var(--color-surface-raised);
+    box-shadow: var(--shadow-1);
+    overflow-wrap: anywhere;
+  }
+  .map-background {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .map-layer {
+    position: absolute;
+    top: -6rem;
+    left: 0;
+    width: var(--map-layer-width, 150%);
+    height: 20rem;
+  }
+  iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    opacity: var(--map-opacity, 0.36);
+    filter: grayscale(0.18) saturate(0.78) contrast(0.92);
+  }
+  .ui-map-marker {
+    --ui-map-marker-size: 18px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .map-wash {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        180deg,
+        transparent var(--map-clear-height, 2rem),
+        var(--color-surface-raised) var(--map-solid-height, 5rem)
+      ),
+      var(
+        --map-side-wash,
+        linear-gradient(
+          90deg,
+          var(--color-surface-raised),
+          color-mix(in oklab, var(--color-surface-raised) 94%, transparent) 48%,
+          transparent 100%
+        )
+      );
+  }
+  .map-content {
+    padding: 1rem;
+  }
+</style>

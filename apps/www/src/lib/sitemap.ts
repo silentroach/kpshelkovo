@@ -93,7 +93,7 @@ export const shouldIncludeSitemapPage = (url: string): boolean => {
   const path = sitemapPathKey(url);
 
   if (path.startsWith('/events/')) {
-    return /^\/events\/(?:\d{4}\/\d{2}\/(?:\d{2}\/)?)?$/u.test(path);
+    return /^\/events\/(?:\d{4}\/\d{2}\/(?:(?!list\/)[a-z0-9]+(?:-[a-z0-9]+)*\/)?)?$/u.test(path);
   }
 
   return !ERROR_PAGE.test(path) && !/^\/status\/(?:incidents|history|calendar)\//u.test(path);

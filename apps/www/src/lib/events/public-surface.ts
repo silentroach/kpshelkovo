@@ -32,7 +32,12 @@ export const eventsPublicSurfaceSlice = {
     ...[
       { id: 'month', label: 'Календарь месяца', path: eventMonthUrl(':year-:month') },
       { id: 'month-list', label: 'Список месяца', path: eventMonthUrl(':year-:month', 'list') },
-      { id: 'day', label: 'Карточки мероприятий дня', path: eventDayUrl(':year-:month-:day') }
+      {
+        id: 'day',
+        label: 'Краткий список мероприятий дня',
+        path: eventDayUrl(':year-:month-:day')
+      },
+      { id: 'detail', label: 'Подробное мероприятие', path: '/events/:year/:month/:slug/' }
     ].flatMap(({ id, label, path }) => [
       {
         id: `events:${id}`,

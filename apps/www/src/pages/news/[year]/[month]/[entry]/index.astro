@@ -261,7 +261,7 @@ const schema = newsArticleSchema({
               {hasEvents && (
                 <div class="news-article-event-aside">
                   {article.events.map((event) => (
-                    <NewsEventCard event={event} variant="compact" />
+                    <NewsEventCard event={event} />
                   ))}
                 </div>
               )}
@@ -282,7 +282,7 @@ const schema = newsArticleSchema({
           >
             <div class="news-article-event-only">
               {article.events.map((event) => (
-                <NewsEventCard event={event} variant="compact" />
+                <NewsEventCard event={event} />
               ))}
             </div>
           </section>

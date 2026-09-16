@@ -4,7 +4,7 @@ import type { SiteMentionRegistry } from '@/lib/mentions';
 import { EventBodySchema, EventIdSchema } from './raw-schema';
 import type { RawEvent } from './raw-schema';
 import type { EventEntry, EventParticipant, EventRecord } from './types';
-import { eventCalendarUrl, eventUrl } from './urls';
+import { eventCalendarUrl, eventDetailUrl, eventReferenceKey } from './urls';
 
 const mapParticipant = (value: NonNullable<RawEvent['organizer']>): EventParticipant =>
   typeof value === 'string'
@@ -26,6 +26,9 @@ export const mapRawEvent = (entry: EventEntry, registry?: SiteMentionRegistry): 
 
   return {
     id,
+    eventSlug: data.slug,
+    referenceKey: eventReferenceKey(startsDate, data.slug),
+    aliases: data.aliases ?? [],
     title: data.title,
     category: data.category,
     status: data.status,
@@ -50,7 +53,7 @@ export const mapRawEvent = (entry: EventEntry, registry?: SiteMentionRegistry): 
     organizer: data.organizer ? mapParticipant(data.organizer) : undefined,
     performer: data.performer?.map(mapParticipant),
     calendarUid: data.legacy_uid ?? `event-${id}@kpshelkovo.online`,
-    url: eventUrl(startsDate, id),
+    url: eventDetailUrl(startsDate, data.slug),
     icsUrl: start.hasTime || through ? eventCalendarUrl(id) : undefined
   };
 };

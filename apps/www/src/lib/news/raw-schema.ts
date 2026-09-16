@@ -2,6 +2,7 @@ import { z } from 'astro/zod';
 import { reference, type SchemaContext } from 'astro:content';
 
 import { contentDateSchema } from '@/lib/content-date';
+import { EventReferenceKeySchema } from '@/lib/events/raw-schema';
 
 import { RawSearchAliasesSchema } from '../search/raw-schema';
 import { NEWS_AREAS, isAbsoluteUrl, isAttachmentUrl, normalizeTagKey } from './schema';
@@ -73,7 +74,7 @@ const media = () => ({
 const RawNewsEventSchema = z
   .object({
     slug: text.refine((value) => SLUG.test(value), 'events[].slug must be a slug').optional(),
-    event: reference('events')
+    event: EventReferenceKeySchema
   })
   .strict();
 

@@ -5,6 +5,7 @@ import { preprocessSiteMarkdown } from '@/lib/markdown/render';
 import { buildEventCalendar } from '../calendar-projection';
 import { mapRawEvent } from '../mapper';
 import {
+  buildEventMarkdown,
   buildEventsDayMarkdown,
   buildEventsMonthMarkdown,
   buildEventsRootMarkdown
@@ -22,6 +23,7 @@ const event = (id: string, starts: string, extra: Partial<RawEventInput> = {}) =
     body: 'Полное описание. [Запись](https://example.com/register).\n\nНужна группа от пяти человек.',
     data: RawEventSchema.parse({
       title: id,
+      slug: id,
       category: 'workshops',
       starts_at: starts,
       source_url: 'https://example.com/source',
@@ -165,7 +167,7 @@ describe('event public representations', () => {
       `);
   });
 
-  it('links month and root readers to full day Markdown and preserves the selected month', () => {
+  it('links month and root readers to day Markdown and preserves the selected month', () => {
     const calendar = buildEventCalendar([event('period', '30.12.2026', { through: '03.01.2027' })]);
     const month = calendar.months[1]!;
     const markdown = buildEventsMonthMarkdown(month, site);
@@ -182,37 +184,42 @@ describe('event public representations', () => {
     expect(markdown).not.toMatch(/src\/|\.\.\//);
   });
 
-  it('links monthly event titles to the first visible day anchor, retaining the primary URL in full cards', () => {
+  it('links every projected month and day to one detail Markdown in the start month', () => {
     const period = event('period', '30.12.2026', { through: '03.01.2027' });
     const calendar = buildEventCalendar([period]);
-    for (const [index, path] of ['2026/12/30/', '2027/01/01/'].entries()) {
-      const month = calendar.months[index]!;
+    for (const month of calendar.months) {
       const markdown = buildEventsMonthMarkdown(month, site);
-      expect(markdown).toContain(`[period](${site}/events/${path}#period)`);
-      expect(buildEventsDayMarkdown(month.days[0]!, site)).toContain(`${site}${period.url}`);
+      expect(markdown).toContain(`[period](${site}/events/2026/12/period/index.md)`);
+      expect(buildEventsDayMarkdown(month.days[0]!, site)).toContain(
+        `${site}${period.url}index.md`
+      );
     }
-    expect(buildEventsMonthMarkdown(calendar.months[1]!, site)).not.toContain(
-      '/events/2026/12/30/'
-    );
+    expect(toEventPublic(period, site).url).toBe(`${site}/events/2026/12/period/`);
   });
 
-  it('keeps full body, period, state and source on each projected day without offering cancelled ICS', () => {
+  it('keeps days brief and moves full body, period, state and source to detail without cancelled ICS', () => {
     const period = event('period', '30.12.2026', { through: '03.01.2027', status: 'cancelled' });
     const calendar = buildEventCalendar([period]);
+    const markdown = buildEventMarkdown(period, site);
+    for (const value of [
+      '2026-12-30',
+      '2027-01-03',
+      'Отменено',
+      period.sourceUrl,
+      'https://example.com/register',
+      'Нужна группа от пяти человек.',
+      `${site}${period.url}`
+    ]) {
+      expect(markdown).toContain(value);
+    }
+    expect(markdown).not.toContain('.ics');
     for (const day of calendar.days) {
-      const markdown = buildEventsDayMarkdown(day, site);
-      for (const value of [
-        '2026-12-30',
-        '2027-01-03',
-        'Отменено',
-        period.sourceUrl,
-        'https://example.com/register',
-        'Нужна группа от пяти человек.',
-        `${site}${period.url}`
-      ]) {
-        expect(markdown).toContain(value);
-      }
-      expect(markdown).not.toContain('.ics');
+      const summary = buildEventsDayMarkdown(day, site);
+      expect(summary).toContain(`${site}${period.url}index.md`);
+      expect(summary).toContain('Отменено');
+      expect(summary).not.toContain('Нужна группа');
+      expect(summary).not.toContain(period.sourceUrl);
+      expect(summary).not.toContain('.ics');
     }
   });
 
@@ -221,7 +228,7 @@ describe('event public representations', () => {
       event('date', '01.01.2027'),
       event('timed', '01.01.2027 18:00', { status: 'conditional' })
     ];
-    const markdown = buildEventsDayMarkdown(buildEventCalendar(records).days[0]!, site);
+    const markdown = records.map((record) => buildEventMarkdown(record, site)).join('\n');
     for (const value of ['время уточняется', 'При наборе группы', '/events/calendar/timed.ics'])
       expect(markdown).toContain(value);
     expect(markdown).not.toContain('/events/calendar/date.ics');
@@ -299,7 +306,7 @@ describe('shared Event JSON-LD', () => {
     }).toMatchInlineSnapshot(`
       {
         "end": "2027-01-03",
-        "id": "https://kpshelkovo.online/events/2026/12/30/#period",
+        "id": "https://kpshelkovo.online/events/2026/12/period/",
         "start": "2026-12-30",
         "status": "https://schema.org/EventCancelled",
       }

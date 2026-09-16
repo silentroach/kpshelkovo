@@ -2,9 +2,9 @@ import type { APIContext } from 'astro';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
-  GET as dayGet,
-  getStaticPaths as dayPaths
-} from '@/pages/events/[year]/[month]/[day]/index.md';
+  GET as entryGet,
+  getStaticPaths as entryPaths
+} from '@/pages/events/[year]/[month]/[entry]/index.md';
 import {
   GET as monthGet,
   getStaticPaths as monthPaths
@@ -36,6 +36,7 @@ const record = mapRawEvent({
   body: 'Описание.',
   data: RawEventSchema.parse({
     title: 'Период',
+    slug: 'period',
     category: 'other',
     starts_at: '30.12.2026',
     through: '03.01.2027',
@@ -52,8 +53,12 @@ vi.mocked(loadEventsData).mockResolvedValue(data);
 const context = (params: Record<string, string> = {}): APIContext => ({ params }) as APIContext;
 
 describe('event public routes', () => {
-  it('generates only projected months/days and shares month/list content and root selection', async () => {
-    expect(await dayPaths()).toHaveLength(5);
+  it('generates projected days and one detail, sharing month/list content and root selection', async () => {
+    const paths = await entryPaths();
+    expect(paths).toHaveLength(6);
+    expect(paths.filter(({ params }) => params.entry === 'period')).toEqual([
+      { params: { year: '2026', month: '12', entry: 'period' } }
+    ]);
     expect(await monthPaths()).toMatchInlineSnapshot(`
       [
         {
@@ -76,10 +81,16 @@ describe('event public routes', () => {
     const firstBuild = await loadEventsBuildData();
     expect(await loadEventsBuildData()).toBe(firstBuild);
     expect(await (await rootGet(context())).text()).toContain(firstBuild.startMonth!.id);
-    const day = await dayGet(context({ year: '2027', month: '01', day: '03' }));
+    const day = await entryGet(context({ year: '2027', month: '01', entry: '03' }));
     expect(day.headers.get('content-type')).toBe('text/markdown; charset=utf-8');
-    expect(await day.text()).toContain(record.sourceUrl);
-    await expect(dayGet(context({ year: '2027', month: '01', day: '04' }))).rejects.toThrow(
+    expect(await day.text()).toContain(`${record.url}index.md`);
+    const detail = await entryGet(context({ year: '2026', month: '12', entry: 'period' }));
+    expect(detail.headers.get('content-type')).toBe('text/markdown; charset=utf-8');
+    expect(await detail.text()).toContain(record.sourceUrl);
+    await expect(entryGet(context({ year: '2027', month: '01', entry: '04' }))).rejects.toThrow(
+      'not found'
+    );
+    await expect(entryGet(context({ year: '2027', month: '01', entry: 'period' }))).rejects.toThrow(
       'not found'
     );
   });

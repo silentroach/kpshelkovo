@@ -12,12 +12,13 @@ import { buildEventsDataset } from '../load';
 import { mapRawEvent } from '../mapper';
 import { RawEventSchema } from '../raw-schema';
 import type { RawEventInput } from '../raw-schema';
-import { eventUrl } from '../urls';
+import { eventDetailUrl, eventReferenceKey, eventUrl } from '../urls';
 
 const entry = (id: string, starts: string, extra: Partial<RawEventInput> = {}) => ({
   id,
   body: 'Registration details and approximate duration.',
   data: RawEventSchema.parse({
+    slug: id,
     title: id,
     category: 'other',
     starts_at: starts,
@@ -29,6 +30,93 @@ const event = (id: string, starts: string, extra: Partial<RawEventInput> = {}) =
   mapRawEvent(entry(id, starts, extra));
 
 describe('event publication boundary', () => {
+  it.each([undefined, '123', '09', 'list', 'Uppercase', '../escape', 'two--words', 'slug\n'])(
+    'rejects invalid detail slug %s',
+    (slug) => {
+      expect(() => entry('stable-id', '01.01.2026', { slug })).toThrow();
+    }
+  );
+
+  it.each([
+    '/events/2026/01/01/',
+    '/events/2026/01/list/',
+    '/events/2026/13/old/',
+    '/events/2026/01/',
+    '/news/2026/01/old/',
+    'https://kpshelkovo.online/events/2026/01/old/',
+    'events/2026/01/old/',
+    '/events/2026/01/old',
+    '/events/2026/01/old/?query',
+    '/events/2026/01/old/#anchor',
+    '/events/2026/01/../old/'
+  ])('rejects aliases outside the absolute detail-path contract: %s', (alias) => {
+    expect(() => entry('stable-id', '01.01.2026', { aliases: [alias] })).toThrow();
+  });
+
+  it('rejects canonical collisions, duplicate aliases, self aliases and alias chains in either order', () => {
+    const first = entry('first', '01.01.2026', { slug: 'same' });
+    const second = entry('second', '02.01.2026', { slug: 'same' });
+    const alias = '/events/2025/12/old/';
+    const cases = [
+      [first, second],
+      [entry('self', '01.01.2026', { aliases: ['/events/2026/01/self/'] })],
+      [entry('duplicate', '01.01.2026', { aliases: [alias, alias] })],
+      [
+        entry('one', '01.01.2026', { aliases: [alias] }),
+        entry('two', '01.01.2026', { aliases: [alias] })
+      ],
+      [first, entry('moved', '01.02.2026', { aliases: ['/events/2026/01/same/'] })]
+    ];
+    for (const entries of cases) {
+      expect(() => buildEventsDataset(entries)).toThrow('event URL collision');
+      expect(() => buildEventsDataset(entries.toReversed())).toThrow('event URL collision');
+    }
+  });
+
+  it('uses the Moscow start month and an independent slug while keeping identity on moves', () => {
+    const original = event('stable-id', '01.01.2026 00:30', { slug: 'detail' });
+    const moved = buildEventsDataset([
+      entry('stable-id', '01.02.2026 00:30', {
+        slug: 'renamed',
+        aliases: [original.url, '/events/2025/12/earlier/']
+      })
+    ]).events[0];
+    expect({
+      original: original.url,
+      reference: original.referenceKey,
+      slug: original.eventSlug,
+      legacyAnchor: eventUrl(original.startsDate, original.id),
+      moved: moved.url,
+      movedReference: moved.referenceKey,
+      aliases: moved.aliases
+    }).toMatchInlineSnapshot(`
+      {
+        "aliases": [
+          "/events/2026/01/detail/",
+          "/events/2025/12/earlier/",
+        ],
+        "legacyAnchor": "/events/2026/01/01/#stable-id",
+        "moved": "/events/2026/02/renamed/",
+        "movedReference": "2026/02/renamed",
+        "original": "/events/2026/01/detail/",
+        "reference": "2026/01/detail",
+        "slug": "detail",
+      }
+    `);
+    expect([moved.id, moved.calendarUid, moved.icsUrl]).toEqual([
+      original.id,
+      original.calendarUid,
+      original.icsUrl
+    ]);
+    expect(eventReferenceKey(original.startsDate, original.eventSlug)).toBe(original.referenceKey);
+    expect(
+      buildEventsDataset([
+        entry('first', '01.01.2026', { slug: 'same' }),
+        entry('second', '01.02.2026', { slug: 'same' })
+      ]).events
+    ).toHaveLength(2);
+  });
+
   it('prepares body and mention targets through the shared pipeline while retaining the source', () => {
     const registry = createSiteMentionRegistry([
       createPersonMentionTarget('organizer', 'Organizer')
@@ -219,7 +307,14 @@ describe('event calendar projection', () => {
     expect(
       calendar.months.map((month) => month.events.filter((item) => item.id === 'period'))
     ).toEqual([[period], [period]]);
-    expect(period.url).toBe(eventUrl('2026-12-30', 'period'));
+    expect(period.url).toBe(eventDetailUrl('2026-12-30', 'period'));
+    expect(
+      new Set(
+        calendar.days.flatMap((day) =>
+          day.events.filter((item) => item.id === period.id).map((item) => item.url)
+        )
+      )
+    ).toEqual(new Set([period.url]));
   });
 
   it('keeps overnight events on the start day and does not bridge separate dates', () => {

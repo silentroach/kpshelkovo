@@ -64,6 +64,8 @@ it('registers all event route families with Markdown negotiation and the root gu
       "/events/:year/:month/list/index.md",
       "/events/:year/:month/:day/",
       "/events/:year/:month/:day/index.md",
+      "/events/:year/:month/:slug/",
+      "/events/:year/:month/:slug/index.md",
       "/events/events.json",
       "/events/schemas/events.schema.json",
       "/events/calendar/:id.ics",
