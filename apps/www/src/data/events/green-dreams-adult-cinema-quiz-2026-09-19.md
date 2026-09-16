@@ -4,7 +4,7 @@ category: games
 starts_at: 19.09.2026 19:00
 status: announced
 source_url: https://t.me/green_events/290
-price: 1200 руб.
+price: 1200 ₽
 audience: Для взрослых
 location: Большая беседка ресторана Green Dreams
 ---

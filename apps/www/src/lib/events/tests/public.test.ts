@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { preprocessSiteMarkdown } from '@/lib/markdown/render';
+
 import { buildEventCalendar } from '../calendar-projection';
 import { mapRawEvent } from '../mapper';
 import {
@@ -228,6 +230,61 @@ describe('event public representations', () => {
 });
 
 describe('shared Event JSON-LD', () => {
+  it('preserves supplied location text and coordinates without inventing unknown place fields', () => {
+    const locations = [
+      { location: 'Площадка, д. Дубечино' },
+      { location: 'Площадка, д. Дубечино', coordinates: { lat: 55, lng: 37 } },
+      { coordinates: { lat: 55, lng: 37 } }
+    ].map(
+      (fields) =>
+        JSON.parse(JSON.stringify(buildEventJsonLd(event('place', '01.01.2027', fields), site)))
+          .location
+    );
+    expect(locations).toMatchInlineSnapshot(`
+      [
+        {
+          "@type": "Place",
+          "address": "Площадка, д. Дубечино",
+          "name": "Площадка, д. Дубечино",
+        },
+        {
+          "@type": "Place",
+          "address": "Площадка, д. Дубечино",
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 55,
+            "longitude": 37,
+          },
+          "name": "Площадка, д. Дубечино",
+        },
+        {
+          "@type": "Place",
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 55,
+            "longitude": 37,
+          },
+        },
+      ]
+    `);
+  });
+
+  it('extracts the whole formatted body as plain text while retaining state and participation terms', () => {
+    const record = event('formatted', '01.01.2027', {
+      status: 'conditional',
+      price: '600 ₽',
+      audience: '12+'
+    });
+    const body = preprocessSiteMarkdown(
+      '**Мастер-класс** с [организатором](/people/organizer/).\n\n' +
+        'Запись: [+7 999 123-45-67](tel:+79991234567).\n\n' +
+        '- Нужна группа от *пяти* человек.\n- Принесите `фартук`.'
+    ).markdown;
+    expect(buildEventJsonLd({ ...record, body }, site).description).toMatchInlineSnapshot(
+      `"При наборе группы. Мастер-класс с организатором. Запись: +7 999 123-45-67. Нужна группа от пяти человек. Принесите фартук. Цена: 600 ₽. Участники: 12+."`
+    );
+  });
+
   it('keeps canonical identity across projected days and inclusive date-only end', () => {
     const period = event('period', '30.12.2026', { through: '03.01.2027', status: 'cancelled' });
     const docs = buildEventCalendar([period]).days.map((day) =>

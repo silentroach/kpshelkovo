@@ -1,3 +1,4 @@
+import { extractMarkdownText } from '@shelkovo/markdown';
 import type { SchemaDoc } from '@shelkovo/seo';
 
 import type { EventParticipant, EventRecord } from './types';
@@ -23,7 +24,7 @@ export const buildEventJsonLd = (event: EventRecord, siteUrl: string): SchemaDoc
     mainEntityOfPage: url.split('#')[0],
     name: event.title,
     description: [
-      `${state}${event.body}`,
+      `${state}${extractMarkdownText(event.body) ?? ''}`,
       event.price ? `Цена: ${event.price}.` : undefined,
       event.audience ? `Участники: ${event.audience}.` : undefined
     ]
@@ -42,6 +43,7 @@ export const buildEventJsonLd = (event: EventRecord, siteUrl: string): SchemaDoc
         ? {
             '@type': 'Place',
             name: event.location,
+            address: event.location,
             geo: event.coordinates
               ? {
                   '@type': 'GeoCoordinates',
