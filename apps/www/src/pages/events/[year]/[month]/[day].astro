@@ -59,7 +59,6 @@ const schema = day.events.map((event) =>
       </div>
     </header>
     <div class="day-content">
-      <p class="day-note">Время московское.</p>
       {day.events.map((event) => <EventCard event={event} />)}
       <p class="back-link">
         <a href={monthUrl}>← Календарь: {formatEventMonth(month)}</a>
@@ -72,11 +71,6 @@ const schema = day.events.map((event) =>
   .day-content {
     max-width: 56rem;
     padding: 0 1.25rem 3rem;
-  }
-  .day-note {
-    margin-bottom: 1rem;
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
   }
   .back-link {
     margin-top: 1rem;

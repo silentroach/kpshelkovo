@@ -120,22 +120,36 @@ describe('event calendar pages', () => {
   const month = calendar.byMonth.get('2026-09')!;
 
   it.each([
-    ['2026-08-31T21:00:00Z', 'calendar', '/events/2026/09/'],
-    ['2026-08-31T21:00:00Z', 'list', '/events/2026/09/list/'],
-    ['2026-06-15T12:00:00Z', 'list', undefined]
-  ])('uses the actual Moscow month at %s for the %s shortcut', async (now, view, expected) => {
-    const container = await createAstroContainer();
-    const document = documentFor(
-      await container.renderToString(EventMonthPage, {
-        props: { calendar, month: calendar.months[0], now: new Date(now), view },
-        request: new Request('https://kpshelkovo.online/events/2026/05/')
-      })
-    );
-    const shortcut = [...document.querySelectorAll('main a')].find(
-      (link) => link.textContent.trim() === 'Текущий месяц'
-    );
-    expect(shortcut?.getAttribute('href')).toBe(expected);
-  });
+    ['2026-08-31T21:00:00Z', 'calendar', '2026-08', '/events/2026/09/'],
+    ['2026-08-31T21:00:00Z', 'list', '2026-08', '/events/2026/09/list/'],
+    ['2026-06-15T12:00:00Z', 'list', '2026-08', undefined],
+    ['2026-09-16T12:00:00Z', 'calendar', '2026-09', undefined],
+    ['2026-09-16T12:00:00Z', 'list', '2026-09', undefined]
+  ])(
+    'uses the actual Moscow month at %s for the %s shortcut from %s',
+    async (now, view, selectedMonth, expected) => {
+      const container = await createAstroContainer();
+      const document = documentFor(
+        await container.renderToString(EventMonthPage, {
+          props: { calendar, month: calendar.byMonth.get(selectedMonth), now: new Date(now), view },
+          request: new Request(
+            `https://kpshelkovo.online/events/${selectedMonth.replace('-', '/')}/`
+          )
+        })
+      );
+      const shortcut = [...document.querySelectorAll('main a')].find(
+        (link) => link.textContent.trim() === 'Текущий месяц'
+      );
+      expect(shortcut?.getAttribute('href')).toBe(expected);
+      if (expected) {
+        expect(
+          [...document.querySelectorAll('.month-navigation a')].map(
+            (link) => link.getAttribute('rel') ?? 'current'
+          )
+        ).toEqual(['prev', 'current', 'next']);
+      }
+    }
+  );
 
   it('links only occupied dates in a Monday-first grid and preserves the view through navigation', async () => {
     const container = await createAstroContainer();
@@ -158,6 +172,10 @@ describe('event calendar pages', () => {
     expect(grid?.querySelector('a')?.getAttribute('aria-label')).toContain(
       '1 сентября 2026: 1 событие'
     );
+    expect(grid?.querySelector('a[href="/events/2026/09/19/"]')?.getAttribute('title')).toContain(
+      'все отменены'
+    );
+    expect(grid?.querySelector('[aria-current]')).toBeFalsy();
     expect(document.querySelector('a[rel="prev"]')?.getAttribute('href')).toBe('/events/2026/08/');
     expect(
       document.querySelector('nav[aria-label="Вид месяца"] a:last-child')?.getAttribute('href')

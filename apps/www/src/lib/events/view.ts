@@ -26,7 +26,7 @@ export const formatEventCount = (count: number): string => {
 };
 
 export const formatEventMonth = (month: EventMonth): string => {
-  const label = formatMonth(month.year, month.month);
+  const label = `${formatMonth(month.year, month.month, { includeYear: false })} ${month.year} года`;
   return label.charAt(0).toUpperCase() + label.slice(1);
 };
 

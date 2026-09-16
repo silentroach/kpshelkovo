@@ -12,9 +12,6 @@ interface Props {
 }
 const { month } = Astro.props;
 const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-const hasCancelledDay = month.days.some((day) =>
-  day.events.every((event) => event.status === 'cancelled'),
-);
 ---
 
 <section
@@ -30,17 +27,20 @@ const hasCancelledDay = month.days.some((day) =>
         const cancelled = day?.events.every(
           (event) => event.status === 'cancelled',
         );
+        const label = day
+          ? `${formatDate(date)}: ${formatEventCount(day.events.length)}${cancelled ? ', все отменены' : ''}`
+          : undefined;
         return (
           <li style={column ? `grid-column-start: ${column}` : undefined}>
             {day ? (
               <a
                 href={day.url}
-                aria-label={`${formatDate(date)}: ${formatEventCount(day.events.length)}${cancelled ? ', все отменены' : ''}`}
+                aria-label={label}
+                title={label}
+                data-cancelled={cancelled || undefined}
               >
-                <span class="ui-num">{number}</span>
-                <span class="event-count ui-num" aria-hidden="true">
-                  {cancelled ? '×' : ''}
-                  {day.events.length}
+                <span class="ui-num" aria-hidden="true">
+                  {number}
                 </span>
               </a>
             ) : (
@@ -56,32 +56,25 @@ const hasCancelledDay = month.days.some((day) =>
       })
     }
   </ol>
-  <p class="calendar-note">
-    Маленькое число показывает количество опубликованных событий. Выберите день,
-    чтобы прочитать карточки.
-  </p>
-  {
-    hasCancelledDay && (
-      <p class="calendar-note">× перед числом: все события дня отменены.</p>
-    )
-  }
 </section>
 
 <style>
   .event-calendar {
-    max-width: 40rem;
+    max-width: 22rem;
   }
   .weekdays,
   .days {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 0.25rem;
+    column-gap: 0.125rem;
   }
   .weekdays {
-    margin-bottom: 0.5rem;
+    align-items: center;
+    height: 2rem;
     text-align: center;
     color: var(--color-text-muted);
-    font-size: 0.875rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
   }
   .days {
     padding: 0;
@@ -90,34 +83,43 @@ const hasCancelledDay = month.days.some((day) =>
   }
   .days a,
   .empty-day {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 3.25rem;
-    gap: 0.2rem;
+    width: min(100%, 2.5rem);
+    height: 2.5rem;
+    margin: 0.125rem auto;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
   }
   .days a {
-    border: 1px solid var(--color-primary);
-    background: var(--color-primary-soft);
     color: var(--color-primary);
     font-weight: 600;
     text-decoration: none;
   }
-  .days a:hover {
-    background: var(--color-primary-soft-2);
-    text-decoration: underline;
+  .days a::after {
+    position: absolute;
+    bottom: 0.25rem;
+    width: 0.25rem;
+    height: 0.25rem;
+    border-radius: var(--radius-full);
+    background: currentColor;
+    content: '';
+  }
+  .days a:is(:hover, :focus-visible) {
+    background: var(--color-primary-soft);
+  }
+  .days a:focus-visible {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 2px;
+  }
+  .days a[data-cancelled] {
+    color: var(--color-text-muted);
+    text-decoration: line-through;
   }
   .empty-day {
-    color: var(--color-text-muted);
-  }
-  .event-count {
-    align-self: flex-start;
-    margin-top: 0.3rem;
-    font-size: 0.75rem;
-  }
-  .calendar-note {
-    margin-top: 1rem;
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
+    color: var(--color-text);
   }
 </style>

@@ -10,11 +10,7 @@ import type {
   EventMonthView,
 } from '@/lib/events/types';
 import { eventMonthUrl } from '@/lib/events/urls';
-import {
-  eventPageDescription,
-  formatEventCount,
-  formatEventMonth,
-} from '@/lib/events/view';
+import { eventPageDescription, formatEventMonth } from '@/lib/events/view';
 import EventMonthCalendar from './EventMonthCalendar.astro';
 import EventMonthList from './EventMonthList.astro';
 
@@ -57,18 +53,7 @@ const breadcrumbs = withHomeBreadcrumbs(
         <Breadcrumbs items={breadcrumbs} />
         <div>
           <h1 class="ui-page-title">{root ? 'События' : period}</h1>
-          {
-            month && (
-              <p class="month-summary">
-                {root && (
-                  <>
-                    <strong>{period}</strong> ·{' '}
-                  </>
-                )}
-                {formatEventCount(month.events.length)}
-              </p>
-            )
-          }
+          {root && month && <p class="month-summary">{period}</p>}
         </div>
       </div>
     </header>
@@ -79,14 +64,12 @@ const breadcrumbs = withHomeBreadcrumbs(
             <div class="month-controls">
               <nav aria-label="Вид месяца" class="view-switch">
                 <a
-                  class="ui-btn ui-btn-md ui-btn-outline"
                   href={eventMonthUrl(month.id)}
                   aria-current={view === 'calendar' ? 'page' : undefined}
                 >
                   Календарь
                 </a>
                 <a
-                  class="ui-btn ui-btn-md ui-btn-outline"
                   href={eventMonthUrl(month.id, 'list')}
                   aria-current={view === 'list' ? 'page' : undefined}
                 >
@@ -94,24 +77,32 @@ const breadcrumbs = withHomeBreadcrumbs(
                 </a>
               </nav>
               <nav aria-label="Месяцы с событиями" class="month-navigation">
-                {currentMonth && (
+                {navigation?.previous && (
                   <a
+                    href={navigation.previous}
+                    rel="prev"
+                    aria-label="Предыдущий месяц с событиями"
+                    title="Предыдущий месяц с событиями"
+                  >
+                    <span aria-hidden="true">←</span>
+                  </a>
+                )}
+                {currentMonth && month.id !== currentMonth.id && (
+                  <a
+                    class="current-month"
                     href={eventMonthUrl(currentMonth.id, view)}
-                    aria-current={
-                      month.id === currentMonth.id ? 'page' : undefined
-                    }
                   >
                     Текущий месяц
                   </a>
                 )}
-                {navigation?.previous && (
-                  <a href={navigation.previous} rel="prev">
-                    ← Предыдущий месяц с событиями
-                  </a>
-                )}
                 {navigation?.next && (
-                  <a href={navigation.next} rel="next">
-                    Следующий месяц с событиями →
+                  <a
+                    href={navigation.next}
+                    rel="next"
+                    aria-label="Следующий месяц с событиями"
+                    title="Следующий месяц с событиями"
+                  >
+                    <span aria-hidden="true">→</span>
                   </a>
                 )}
               </nav>
@@ -140,28 +131,71 @@ const breadcrumbs = withHomeBreadcrumbs(
   }
   .month-controls {
     display: grid;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    max-width: 22rem;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
   }
-  .view-switch,
-  .month-navigation {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem 1.25rem;
+  .view-switch {
+    display: inline-flex;
+    justify-self: start;
+    padding: 0.1875rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-muted);
+  }
+  .view-switch a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.25rem;
+    padding-inline: 1rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-full);
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
   }
   .view-switch a[aria-current] {
-    border-color: var(--color-primary);
-    background: var(--color-primary-soft);
-    text-decoration: underline;
-    text-underline-offset: 0.25em;
+    border-color: var(--color-border);
+    background: var(--color-surface-raised);
+    color: var(--color-primary);
+  }
+  .month-navigation {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem;
+    align-items: center;
+    gap: 0.5rem;
   }
   .month-navigation a {
     display: inline-flex;
     align-items: center;
-    min-height: 2.75rem;
+    justify-content: center;
+    min-height: 2.5rem;
+    border-radius: var(--radius-full);
     color: var(--color-primary);
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+  .month-navigation a[rel='prev'] {
+    grid-column: 1;
+  }
+  .month-navigation .current-month {
+    grid-column: 2;
     text-decoration: underline;
     text-underline-offset: 0.2em;
+  }
+  .month-navigation a[rel='next'] {
+    grid-column: 3;
+  }
+  .view-switch a:hover,
+  .month-navigation a:hover {
+    background: var(--color-primary-soft);
+  }
+  .view-switch a:focus-visible,
+  .month-navigation a:focus-visible {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 2px;
   }
   @media (min-width: 48rem) {
     .events-content {
