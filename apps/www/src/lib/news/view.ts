@@ -54,8 +54,12 @@ export const formatNewsDateTime = (iso: string, time?: string): string =>
 export const formatNewsEventMonth = (iso: string): string => dateTimeFromISO(iso).toFormat('MMMM');
 
 export const formatNewsEventRange = (
-  event: Pick<NewsEvent, 'startsIso' | 'startsTime' | 'endsIso' | 'endsTime'>
+  event: Pick<NewsEvent, 'startsIso' | 'startsTime' | 'endsIso' | 'endsTime' | 'through'>
 ): string => {
+  if (event.through) {
+    return `${formatNewsCalendarDate(event.startsIso)} – ${formatNewsCalendarDate(event.through)}`;
+  }
+  if (!event.startsTime) return `${formatNewsCalendarDate(event.startsIso)}, время уточняется`;
   if (!event.endsIso || !event.endsTime) {
     return formatNewsDateTime(event.startsIso, event.startsTime);
   }

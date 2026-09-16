@@ -123,6 +123,36 @@ const queryGroups = [
     queries: ['экскаватор']
   },
   {
+    name: '#224 events calendar targets',
+    queries: [
+      'события',
+      'календарь мероприятий',
+      'мероприятия',
+      'бессмертный полк в гринвуде',
+      'день победы в гринвуде',
+      'митинг ко дню победы в деревне шелково',
+      'посадка яблоневого сада в вилладже',
+      'встреча с ок комфорт в green dreams',
+      'встреча 13 июня',
+      'киноквиз',
+      'детский киноквиз',
+      'взрослый киноквиз'
+    ]
+  },
+  {
+    name: '#224 events calendar adjacent controls',
+    queries: [
+      'гринвуд',
+      'яблоневый сад',
+      'озеленение',
+      'детская площадка',
+      'собрание запись запрещена',
+      'запрет записи',
+      'тариф 815',
+      'плановые работы'
+    ]
+  },
+  {
     name: 'status services and recent events',
     queries: [
       'статус',
@@ -149,6 +179,15 @@ const queryGroups = [
 
 const rankExpectations: ReadonlyMap<string, { readonly url: string; readonly maxRank: number }> =
   new Map([
+    ['бессмертный полк в гринвуде', { url: '/events/2026/05/09/', maxRank: 8 }],
+    ['день победы в гринвуде', { url: '/events/2026/05/09/', maxRank: 8 }],
+    ['митинг ко дню победы в деревне шелково', { url: '/events/2026/05/09/', maxRank: 8 }],
+    ['посадка яблоневого сада в вилладже', { url: '/events/2026/05/16/', maxRank: 8 }],
+    ['встреча с ок комфорт в green dreams', { url: '/events/2026/06/13/', maxRank: 8 }],
+    ['встреча 13 июня', { url: '/events/2026/06/13/', maxRank: 8 }],
+    ['киноквиз', { url: '/events/2026/09/19/', maxRank: 8 }],
+    ['детский киноквиз', { url: '/events/2026/09/19/', maxRank: 8 }],
+    ['взрослый киноквиз', { url: '/events/2026/09/19/', maxRank: 8 }],
     ['где поесть', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
     ['еда', { url: '/map/burzhuyka/', maxRank: 2 }],
     ['как въехать грузовику', { url: '/news/2026/05/truck-entry-open/', maxRank: 1 }],
@@ -439,7 +478,7 @@ test('#355 preserves results and pagination across ClientRouter navigations', as
   }
 });
 
-test('status indexing policy and #372 KB sections in the production corpus', async () => {
+test('status, #224 events and #372 KB indexing policy in the production corpus', async () => {
   const page = await browser.newPage({
     viewport: { width: 1280, height: 800 }
   });
@@ -465,6 +504,16 @@ test('status indexing policy and #372 KB sections in the production corpus', asy
     ) as readonly string[];
 
     expect(urls.length).toBeGreaterThan(0);
+    const eventUrls = urls.filter((url) => url.startsWith('/events/'));
+    expect(eventUrls).toEqual(
+      expect.arrayContaining([
+        '/events/2026/05/09/',
+        '/events/2026/05/16/',
+        '/events/2026/06/13/',
+        '/events/2026/09/19/'
+      ])
+    );
+    expect(eventUrls.filter((url) => !/^\/events\/\d{4}\/\d{2}\/\d{2}\/$/u.test(url))).toEqual([]);
     expect(urls.filter((url) => url.startsWith('/status/calendar/'))).toEqual([]);
     expect(urls).not.toContain('/status/history/');
     expect(urls).toEqual(expect.arrayContaining([...new Set(statusTargets.values())]));

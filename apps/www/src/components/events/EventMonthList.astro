@@ -1,0 +1,64 @@
+---
+import { formatDynamicHtml } from '@shelkovo/markdown';
+import type { EventMonth } from '@/lib/events/types';
+import { eventUrl } from '@/lib/events/urls';
+import {
+  EVENT_CATEGORY_LABELS,
+  EVENT_STATUS_LABELS,
+  formatEventRange,
+} from '@/lib/events/view';
+
+interface Props {
+  readonly month: EventMonth;
+}
+const { month } = Astro.props;
+---
+
+<ol class="event-list" role="list">
+  {
+    month.events.map((event) => {
+      const date =
+        event.startsDate < `${month.id}-01`
+          ? `${month.id}-01`
+          : event.startsDate;
+      return (
+        <li>
+          <p class="event-meta">
+            {EVENT_CATEGORY_LABELS[event.category]} ·{' '}
+            <strong>{EVENT_STATUS_LABELS[event.status]}</strong>
+          </p>
+          <h2 class="ui-entry-title">
+            <a href={eventUrl(date, event.id)}>
+              {formatDynamicHtml(event.title)}
+            </a>
+          </h2>
+          <p class="ui-num">{formatDynamicHtml(formatEventRange(event))}</p>
+          <p>{formatDynamicHtml(event.location ?? 'Место не указано')}</p>
+        </li>
+      );
+    })
+  }
+</ol>
+
+<style>
+  .event-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  li {
+    padding-block: 1.25rem;
+    border-top: 1px solid var(--color-border);
+    overflow-wrap: anywhere;
+  }
+  li > * + * {
+    margin-top: 0.5rem;
+  }
+  .event-meta {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+  a {
+    color: var(--color-primary);
+  }
+</style>

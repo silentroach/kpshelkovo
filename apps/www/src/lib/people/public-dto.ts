@@ -34,6 +34,7 @@ export interface PeoplePublicBacklinkDto {
 
 export interface PeoplePublicBacklinksDto {
   readonly news: readonly PeoplePublicBacklinkDto[];
+  readonly events: readonly PeoplePublicBacklinkDto[];
   readonly status: readonly PeoplePublicBacklinkDto[];
   readonly reviews: readonly PeoplePublicBacklinkDto[];
   readonly places: readonly PeoplePublicBacklinkDto[];
@@ -107,6 +108,7 @@ const backlinkDto = (item: PersonMentionRef): PeoplePublicBacklinkDto => ({
 
 const backlinksDto = (value: PersonBacklinks): PeoplePublicBacklinksDto => ({
   news: value.news.map(backlinkDto),
+  events: value.events.map(backlinkDto),
   status: value.status.map(backlinkDto),
   reviews: value.reviews.map(backlinkDto),
   places: value.places.map(backlinkDto),

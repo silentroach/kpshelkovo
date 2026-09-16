@@ -1,0 +1,171 @@
+---
+import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import { dateTimeFromISO } from '@shelkovo/format';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
+import { eventMonthNavigation } from '@/lib/events/calendar-projection';
+import type {
+  EventCalendarProjection,
+  EventMonth,
+  EventMonthView,
+} from '@/lib/events/types';
+import { eventMonthUrl } from '@/lib/events/urls';
+import {
+  eventPageDescription,
+  formatEventCount,
+  formatEventMonth,
+} from '@/lib/events/view';
+import EventMonthCalendar from './EventMonthCalendar.astro';
+import EventMonthList from './EventMonthList.astro';
+
+interface Props {
+  readonly calendar: EventCalendarProjection;
+  readonly now: Date;
+  readonly month?: EventMonth;
+  readonly view?: EventMonthView;
+  readonly root?: boolean;
+}
+const { calendar, now, month, view = 'calendar', root = false } = Astro.props;
+const currentMonth = calendar.byMonth.get(
+  dateTimeFromISO(now.toISOString()).toFormat('yyyy-MM'),
+);
+const period = month ? formatEventMonth(month) : undefined;
+const title = root
+  ? 'События — Шелково Онлайн'
+  : `${period} — События — Шелково Онлайн`;
+const description = month
+  ? eventPageDescription(formatEventMonth(month), month.events)
+  : 'Календарь мероприятий для жителей Шелково и соседних посёлков. Опубликованных событий пока нет.';
+const navigation = month
+  ? eventMonthNavigation(calendar, month.id, view)
+  : undefined;
+const canonical = root || !month ? '/events/' : eventMonthUrl(month.id);
+const breadcrumbs = withHomeBreadcrumbs(
+  root
+    ? [{ label: 'События' }]
+    : [
+        { label: 'События', href: '/events/' },
+        { label: period ?? 'Календарь' },
+      ],
+);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <main class="ui-page">
+    <header class="ui-page-header">
+      <div class="ui-page-header-stack">
+        <Breadcrumbs items={breadcrumbs} />
+        <div>
+          <h1 class="ui-page-title">{root ? 'События' : period}</h1>
+          {
+            month && (
+              <p class="month-summary">
+                {root && (
+                  <>
+                    <strong>{period}</strong> ·{' '}
+                  </>
+                )}
+                {formatEventCount(month.events.length)}
+              </p>
+            )
+          }
+        </div>
+      </div>
+    </header>
+    <div class="events-content">
+      {
+        month ? (
+          <>
+            <div class="month-controls">
+              <nav aria-label="Вид месяца" class="view-switch">
+                <a
+                  class="ui-btn ui-btn-md ui-btn-outline"
+                  href={eventMonthUrl(month.id)}
+                  aria-current={view === 'calendar' ? 'page' : undefined}
+                >
+                  Календарь
+                </a>
+                <a
+                  class="ui-btn ui-btn-md ui-btn-outline"
+                  href={eventMonthUrl(month.id, 'list')}
+                  aria-current={view === 'list' ? 'page' : undefined}
+                >
+                  Список
+                </a>
+              </nav>
+              <nav aria-label="Месяцы с событиями" class="month-navigation">
+                {currentMonth && (
+                  <a
+                    href={eventMonthUrl(currentMonth.id, view)}
+                    aria-current={
+                      month.id === currentMonth.id ? 'page' : undefined
+                    }
+                  >
+                    Текущий месяц
+                  </a>
+                )}
+                {navigation?.previous && (
+                  <a href={navigation.previous} rel="prev">
+                    ← Предыдущий месяц с событиями
+                  </a>
+                )}
+                {navigation?.next && (
+                  <a href={navigation.next} rel="next">
+                    Следующий месяц с событиями →
+                  </a>
+                )}
+              </nav>
+            </div>
+            {view === 'calendar' ? (
+              <EventMonthCalendar month={month} />
+            ) : (
+              <EventMonthList month={month} />
+            )}
+          </>
+        ) : (
+          <p>Опубликованных событий пока нет.</p>
+        )
+      }
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .month-summary {
+    margin-top: 0.75rem;
+    color: var(--color-text-muted);
+  }
+  .events-content {
+    padding: 0 1.25rem 3rem;
+  }
+  .month-controls {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .view-switch,
+  .month-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+  }
+  .view-switch a[aria-current] {
+    border-color: var(--color-primary);
+    background: var(--color-primary-soft);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+  .month-navigation a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  @media (min-width: 48rem) {
+    .events-content {
+      padding-inline: 1.5rem;
+    }
+  }
+</style>

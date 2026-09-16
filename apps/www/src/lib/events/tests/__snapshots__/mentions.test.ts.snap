@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`event mentions > rejects invalid mention @host:dat at the event boundary 1`] = `[Error: event "exhibition" body contains entity mention "@host:dat", but entity "person:host" has no "dat" label case]`;
+
+exports[`event mentions > rejects invalid mention @host:unknown at the event boundary 1`] = `[Error: event "exhibition" body contains invalid entity mention "@host:unknown"]`;
+
+exports[`event mentions > rejects invalid mention @missing at the event boundary 1`] = `[Error: event "exhibition" body contains unknown entity mention "@missing"]`;
+
+exports[`event mentions > rejects invalid mention [host](@host:gen) at the event boundary 1`] = `[Error: event "exhibition" body contains unsupported labelled entity mention "@host:gen"; write the needed grammar in the visible link text]`;

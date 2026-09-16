@@ -50,6 +50,7 @@ export interface PeopleDataset {
 
 export const EMPTY_PERSON_BACKLINKS: PersonBacklinks = {
   news: [],
+  events: [],
   status: [],
   reviews: [],
   places: [],

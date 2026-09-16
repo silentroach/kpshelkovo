@@ -3,6 +3,8 @@ import { CalendarPlusIcon, MapPinIcon } from '@shelkovo/ui/icons';
 import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 import { formatDynamicHtml } from '@shelkovo/markdown';
 import MapPreview from '@/components/maps/MapPreview.astro';
+import { renderMarkdown } from '@/lib/markdown/render';
+import { EVENT_CATEGORY_LABELS, EVENT_STATUS_LABELS } from '@/lib/events/view';
 import type { NewsEvent } from '@/lib/news/types';
 import {
   buildNewsEventMapUrl,
@@ -19,13 +21,17 @@ const { event, variant = 'wide' } = Astro.props;
 const isCompact = variant === 'compact';
 const eventRange = formatNewsEventRange(event);
 const mapUrl = buildNewsEventMapUrl(event);
-const hasCoordinates = event.place !== undefined;
+const hasCoordinates = event.coordinates !== undefined;
 const eventDateParts = event.startsIso.slice(0, 10).split('-');
 const eventDay = String(Number(eventDateParts[2] ?? ''));
 const eventMonth = formatNewsEventMonth(event.startsIso);
 const eventTime = event.endsTime
   ? `${event.startsTime}-${event.endsTime}`
-  : event.startsTime;
+  : (event.startsTime ?? 'Время уточняется');
+const canDownload = event.icsUrl && event.status !== 'cancelled';
+const state =
+  event.status === 'announced' ? undefined : EVENT_STATUS_LABELS[event.status];
+const bodyHtml = renderMarkdown(event.body);
 const calendarFilename = `${event.slug}.ics`;
 const titleId = `news-event-title-${event.slug}`;
 ---
@@ -40,18 +46,18 @@ const titleId = `news-event-title-${event.slug}`;
       aria-labelledby={titleId}
       data-pagefind-body
     >
-      {event.place && (
+      {event.coordinates && mapUrl && (
         <div class="news-event-compact-map">
           <MapPreview
             preview={{
-              coordinates: event.place.coordinates,
+              coordinates: event.coordinates,
               zoom: 16,
               anchor: [0.75, 0.45],
               muted: true,
               mutedOpacity: 0.4,
             }}
-            label={`Место события: ${event.place.name}`}
-            mapUrl={event.place.mapUrl}
+            label={`Место события: ${event.location ?? event.title}`}
+            mapUrl={mapUrl}
           >
             <span
               class="ui-map-marker news-event-compact-map-pin"
@@ -60,7 +66,7 @@ const titleId = `news-event-title-${event.slug}`;
             <a
               slot="fallback"
               data-fallback
-              href={event.place.mapUrl}
+              href={mapUrl}
               target="_blank"
               rel="noreferrer noopener"
               class="news-event-map-fallback"
@@ -78,8 +84,10 @@ const titleId = `news-event-title-${event.slug}`;
         </time>
 
         <h2 id={titleId} class="news-event-compact-title">
-          {event.title}
+          <Fragment set:html={formatDynamicHtml(event.title)} />
         </h2>
+
+        <p>{EVENT_CATEGORY_LABELS[event.category]}</p>
 
         <ul class="news-event-compact-meta">
           <li>
@@ -97,38 +105,82 @@ const titleId = `news-event-title-${event.slug}`;
               <circle cx="12" cy="12" r="8.25" />
               <path d="M12 7.75v4.75l3 1.75" />
             </svg>
-            <span>{eventTime}</span>
+            <span>
+              {event.through ||
+              (event.endsIso &&
+                event.endsIso.slice(0, 10) !== event.startsIso.slice(0, 10))
+                ? eventRange
+                : eventTime}
+            </span>
           </li>
 
-          {event.place && (
-            <li>
-              <MapPinIcon class="news-event-compact-icon" />
-              <span>
-                <a
-                  href={event.place.url}
-                  class="site-text-link"
-                  set:html={formatDynamicHtml(event.place.name)}
-                />
-                {event.locationDetails && (
-                  <span
-                    set:html={formatDynamicHtml(`, ${event.locationDetails}`)}
-                  />
-                )}
-              </span>
-            </li>
-          )}
+          <li>
+            <MapPinIcon class="news-event-compact-icon" />
+            <span
+              set:html={formatDynamicHtml(event.location ?? 'Место уточняется')}
+            />
+          </li>
         </ul>
 
+        {state && (
+          <p>
+            <strong>{state}</strong>
+          </p>
+        )}
+        {event.price && (
+          <p>
+            Стоимость: <span set:html={formatDynamicHtml(event.price)} />
+          </p>
+        )}
+        {event.audience && (
+          <p>
+            Участники: <span set:html={formatDynamicHtml(event.audience)} />
+          </p>
+        )}
+        <div class="ui-prose" set:html={bodyHtml} />
+        <p>
+          <a href={event.sourceUrl}>Источник</a> ·{' '}
+          <a href={event.url}>В календаре событий</a>
+        </p>
+
         <div class="news-event-compact-actions" data-pagefind-ignore>
-          <ResourceLink
-            href={event.icsUrl}
-            download={calendarFilename}
-            class="news-event-compact-action news-event-compact-action--primary"
-            aria-label="Добавить в календарь"
-            title="Добавить в календарь"
-          >
-            <CalendarPlusIcon class="news-event-calendar-icon news-event-compact-icon news-event-compact-icon--calendar" />
-          </ResourceLink>
+          {canDownload && (
+            <ResourceLink
+              href={event.icsUrl}
+              download={calendarFilename}
+              class="news-event-compact-action news-event-compact-action--primary"
+              aria-label="Добавить в календарь"
+              title="Добавить в календарь"
+            >
+              <CalendarPlusIcon class="news-event-calendar-icon news-event-compact-icon news-event-compact-icon--calendar" />
+            </ResourceLink>
+          )}
+
+          {mapUrl && !hasCoordinates && (
+            <a
+              href={mapUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+              class="news-event-compact-action"
+              aria-label="Открыть на Яндекс Картах"
+              title="Открыть на Яндекс Картах"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                class="news-event-compact-icon"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M19 10.2c0 5.1-7 10.05-7 10.05s-7-4.95-7-10.05a7 7 0 1 1 14 0Z" />
+                <circle cx="12" cy="10.2" r="2.35" />
+              </svg>
+            </a>
+          )}
         </div>
       </div>
     </aside>
@@ -158,40 +210,54 @@ const titleId = `news-event-title-${event.slug}`;
 
         <div class="news-event-main">
           <h2 id={titleId} class="news-event-title">
-            {event.title}
+            <Fragment set:html={formatDynamicHtml(event.title)} />
           </h2>
+          <p>{EVENT_CATEGORY_LABELS[event.category]}</p>
           <p class="news-event-details">
             <time datetime={event.startsIso}>{eventRange}</time>
-            {event.place && (
+            {event.location && (
               <>
                 <span class="news-event-details-divider" aria-hidden="true">
                   ·
                 </span>
-                <span>
-                  <a
-                    href={event.place.url}
-                    class="site-text-link"
-                    set:html={formatDynamicHtml(event.place.name)}
-                  />
-                  {event.locationDetails && (
-                    <span
-                      set:html={formatDynamicHtml(`, ${event.locationDetails}`)}
-                    />
-                  )}
-                </span>
+                <span set:html={formatDynamicHtml(event.location)} />
               </>
             )}
           </p>
 
+          {!event.location && <p>Место уточняется</p>}
+          {state && (
+            <p>
+              <strong>{state}</strong>
+            </p>
+          )}
+          {event.price && (
+            <p>
+              Стоимость: <span set:html={formatDynamicHtml(event.price)} />
+            </p>
+          )}
+          {event.audience && (
+            <p>
+              Участники: <span set:html={formatDynamicHtml(event.audience)} />
+            </p>
+          )}
+          <div class="ui-prose" set:html={bodyHtml} />
+          <p>
+            <a href={event.sourceUrl}>Источник</a> ·{' '}
+            <a href={event.url}>В календаре событий</a>
+          </p>
+
           <div class="news-event-actions" data-pagefind-ignore>
-            <ResourceLink
-              href={event.icsUrl}
-              download={calendarFilename}
-              class="ui-btn ui-btn-md news-event-action news-event-action--calendar"
-            >
-              <CalendarPlusIcon class="news-event-calendar-icon" />
-              <span>Добавить в календарь</span>
-            </ResourceLink>
+            {canDownload && (
+              <ResourceLink
+                href={event.icsUrl}
+                download={calendarFilename}
+                class="ui-btn ui-btn-md news-event-action news-event-action--calendar"
+              >
+                <CalendarPlusIcon class="news-event-calendar-icon" />
+                <span>Добавить в календарь</span>
+              </ResourceLink>
+            )}
 
             {mapUrl && (
               <a
@@ -456,7 +522,7 @@ const titleId = `news-event-title-${event.slug}`;
     font-size: 0.78rem;
     font-weight: 600;
     line-height: 1;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
   }
 
   .news-event-main {

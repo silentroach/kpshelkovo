@@ -5,6 +5,7 @@ export const ENTITY_MENTION_LABEL_CASES = ['nom', ...ENTITY_MENTION_ALTERNATE_LA
 export const ENTITY_MENTION_TYPES = ['person', 'place'] as const;
 export const SITE_MENTION_SECTIONS = [
   'news',
+  'events',
   'status',
   'reviews',
   'places',
@@ -13,6 +14,7 @@ export const SITE_MENTION_SECTIONS = [
 ] as const;
 export const SITE_BACKLINK_KINDS = [
   'article',
+  'event',
   'incident',
   'review',
   'place',

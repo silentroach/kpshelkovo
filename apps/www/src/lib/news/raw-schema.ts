@@ -1,7 +1,7 @@
 import { z } from 'astro/zod';
 import { reference, type SchemaContext } from 'astro:content';
 
-import { contentDateSchema, contentDateTimeSchema } from '@/lib/content-date';
+import { contentDateSchema } from '@/lib/content-date';
 
 import { RawSearchAliasesSchema } from '../search/raw-schema';
 import { NEWS_AREAS, isAbsoluteUrl, isAttachmentUrl, normalizeTagKey } from './schema';
@@ -70,47 +70,12 @@ const media = () => ({
   attachments: z.array(attachment()).min(1).optional()
 });
 
-const eventParticipant = (name: string) =>
-  z.union([
-    visibleText(name),
-    z.object({
-      name: visibleText(`${name}.name`),
-      type: z.enum(['organization', 'person']).optional()
-    })
-  ]);
-
 const RawNewsEventSchema = z
   .object({
     slug: text.refine((value) => SLUG.test(value), 'events[].slug must be a slug').optional(),
-    title: visibleText('events[].title'),
-    description: visibleText('events[].description').optional(),
-    starts_at: contentDateTimeSchema('events[].starts_at'),
-    ends_at: contentDateTimeSchema('events[].ends_at').optional(),
-    place: text.regex(SLUG, 'events[].place must be a place slug').optional(),
-    location_details: visibleText('events[].location_details').optional(),
-    organizer: eventParticipant('events[].organizer').optional(),
-    performer: z.array(eventParticipant('events[].performer[]')).min(1).optional()
+    event: reference('events')
   })
-  .strict()
-  .superRefine((data, ctx) => {
-    if (data.location_details && !data.place) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['location_details'],
-        message: 'events[].location_details requires place'
-      });
-    }
-    const starts = data.starts_at;
-    const ends = data.ends_at;
-
-    if (ends && ends.at.valueOf() <= starts.at.valueOf()) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['ends_at'],
-        message: 'events[].ends_at must be later than events[].starts_at'
-      });
-    }
-  });
+  .strict();
 
 export type RawNewsEventInput = z.input<typeof RawNewsEventSchema>;
 

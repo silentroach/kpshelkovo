@@ -11,6 +11,7 @@ import type {
   NewsTagPage,
   NewsYearArchive
 } from './types';
+import { buildNewsEventMapUrl } from './view';
 
 export const NEWS_PUBLIC_AUTHOR_KINDS = ['official', 'community', 'editorial', 'other'] as const;
 export type NewsPublicAuthorKind = (typeof NEWS_PUBLIC_AUTHOR_KINDS)[number];
@@ -62,9 +63,6 @@ export interface NewsPublicEvent {
   readonly starts_at: string;
   readonly ends_at?: string;
   readonly location?: string;
-  readonly place_id?: string;
-  readonly place_url?: string;
-  readonly location_details?: string;
   readonly coordinates?: {
     readonly lat: number;
     readonly lng: number;
@@ -148,6 +146,8 @@ export const toNewsPublicAuthorKind = (kind: NewsAuthor['kind']): NewsPublicAuth
 
 const fullUrl = (value: string): string => absoluteUrl(value);
 
+const discoveryUrl = (value: string): string => (value.startsWith('/') ? fullUrl(value) : value);
+
 const toPublicAuthor = (author: NewsAuthor): NewsPublicAuthor => ({
   id: author.id,
   name: author.name,
@@ -189,19 +189,29 @@ function toPublicCover(article: NewsArticle): NewsPublicCover | undefined {
   };
 }
 
-function toPublicEvent(item: NewsEvent): NewsPublicEvent {
+function toPublicEvent(item: NewsEvent): NewsPublicEvent | undefined {
+  if (item.timePrecision !== 'datetime' || !item.icsUrl) return;
+  const mapUrl = buildNewsEventMapUrl(item);
+
   return {
     slug: item.slug,
     title: item.title,
-    description: item.description,
+    description:
+      [
+        item.status === 'cancelled'
+          ? 'Отменено.'
+          : item.status === 'conditional'
+            ? 'При наборе группы.'
+            : '',
+        item.description
+      ]
+        .filter(Boolean)
+        .join(' ') || undefined,
     starts_at: item.startsIso,
     ends_at: item.endsIso,
-    location: item.place?.name,
-    place_id: item.place?.slug,
-    place_url: item.place?.canonical,
-    location_details: item.locationDetails,
-    coordinates: item.place?.coordinates,
-    map_url: item.place?.mapUrl,
+    location: item.location,
+    coordinates: item.coordinates,
+    map_url: mapUrl ? discoveryUrl(mapUrl) : undefined,
     ics_url: fullUrl(item.icsUrl),
     organizer: item.organizer,
     performer: item.performer
@@ -209,6 +219,7 @@ function toPublicEvent(item: NewsEvent): NewsPublicEvent {
 }
 
 function toPublicArticle(item: NewsArticle): NewsPublicArticle {
+  const events = item.events.map(toPublicEvent).filter((event) => event !== undefined);
   return {
     id: item.id,
     title: item.title,
@@ -226,7 +237,7 @@ function toPublicArticle(item: NewsArticle): NewsPublicArticle {
     areas: [...item.areas],
     tags: item.tags.map(toPublicTag),
     cover: toPublicCover(item),
-    events: item.events.length > 0 ? item.events.map(toPublicEvent) : undefined,
+    events: events.length > 0 ? events : undefined,
     photos: item.photos.map(toPublicPhoto),
     attachments: item.attachments.map(toPublicAttachment),
     body_markdown: item.body

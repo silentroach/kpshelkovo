@@ -31,6 +31,7 @@ const getCurrent = (href: string): 'page' | 'location' | undefined => {
   return currentPathname.startsWith(href) ? 'location' : undefined;
 };
 const newsCurrent = getCurrent('/news/');
+const eventsCurrent = getCurrent('/events/');
 const placesCurrent = getCurrent('/map/');
 const compareCurrent = getCurrent('/815/compare/');
 const regulationCurrent = getCurrent('/815/regulation/');
@@ -46,6 +47,13 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
     <nav aria-label={ariaLabel} class="site-nav site-nav-mobile">
       <a href="/news/" aria-current={newsCurrent} class="site-nav-mobile-link">
         Новости
+      </a>
+      <a
+        href="/events/"
+        aria-current={eventsCurrent}
+        class="site-nav-mobile-link"
+      >
+        События
       </a>
       <div
         class="site-nav-mobile-group"
@@ -114,6 +122,9 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
     <nav aria-label={ariaLabel} class="site-nav site-nav-header">
       <a href="/news/" aria-current={newsCurrent} class="site-nav-link">
         Новости
+      </a>
+      <a href="/events/" aria-current={eventsCurrent} class="site-nav-link">
+        События
       </a>
       <div
         class="site-nav-dropdown"

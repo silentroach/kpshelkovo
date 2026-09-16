@@ -1,0 +1,240 @@
+---
+import { formatDynamicHtml } from '@shelkovo/markdown';
+import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
+import type { EventRecord } from '@/lib/events/types';
+import {
+  EVENT_CATEGORY_LABELS,
+  EVENT_STATUS_LABELS,
+  formatEventRange,
+} from '@/lib/events/view';
+import { renderMarkdown } from '@/lib/markdown/render';
+import {
+  buildNewsEventMapEmbedUrl,
+  buildNewsEventMapUrl,
+} from '@/lib/news/view';
+
+interface Props {
+  readonly event: EventRecord;
+}
+const { event } = Astro.props;
+const titleId = `event-title-${event.id}`;
+const mapUrl = buildNewsEventMapUrl(event);
+const mapEmbedUrl = buildNewsEventMapEmbedUrl(event);
+const bodyHtml = renderMarkdown(event.body);
+---
+
+<article
+  id={event.id}
+  class="event-card"
+  aria-labelledby={titleId}
+  data-pagefind-body
+>
+  <header>
+    <div class="event-labels">
+      <span>{EVENT_CATEGORY_LABELS[event.category]}</span>
+      {' '}
+      {
+        event.status !== 'cancelled' && (
+          <strong class="event-status" data-status={event.status}>
+            {EVENT_STATUS_LABELS[event.status]}
+          </strong>
+        )
+      }
+    </div>
+    <h2 id={titleId} class="ui-entry-title">
+      {
+        event.status === 'cancelled' && (
+          <>
+            <span class="event-status" data-status="cancelled">
+              Отменено:
+            </span>{' '}
+          </>
+        )
+      }
+      {formatDynamicHtml(event.title)}
+    </h2>
+    <p class="event-date ui-num">
+      <time datetime={event.startsIso}
+        >{formatDynamicHtml(formatEventRange(event))}</time
+      >
+    </p>
+  </header>
+
+  <dl class="event-facts">
+    <div>
+      <dt>Место</dt>{' '}<dd>
+        {formatDynamicHtml(event.location ?? 'Место не указано')}
+      </dd>
+    </div>
+    {
+      event.price && (
+        <div>
+          <>
+            <dt>Стоимость</dt> <dd>{formatDynamicHtml(event.price)}</dd>
+          </>
+        </div>
+      )
+    }
+    {
+      event.audience && (
+        <div>
+          <>
+            <dt>Для кого</dt> <dd>{formatDynamicHtml(event.audience)}</dd>
+          </>
+        </div>
+      )
+    }
+    {
+      event.organizer && (
+        <div>
+          <>
+            <dt>Организатор</dt>{' '}
+            <dd>{formatDynamicHtml(event.organizer.name)}</dd>
+          </>
+        </div>
+      )
+    }
+    {
+      event.performer && event.performer.length > 0 && (
+        <div>
+          <>
+            <dt>Участники программы</dt>{' '}
+            <dd>
+              {formatDynamicHtml(
+                event.performer.map((person) => person.name).join(', '),
+              )}
+            </dd>
+          </>
+        </div>
+      )
+    }
+  </dl>
+
+  <div class="ui-prose event-body" set:html={bodyHtml} />
+  <p class="event-source ui-prose">
+    <a href={event.sourceUrl} target="_blank" rel="noreferrer noopener"
+      >Источник</a
+    >
+  </p>
+
+  {
+    (mapUrl || (event.icsUrl && event.status !== 'cancelled')) && (
+      <div class="event-actions" data-pagefind-ignore>
+        {event.icsUrl && event.status !== 'cancelled' && (
+          <ResourceLink
+            href={event.icsUrl}
+            download={`${event.id}.ics`}
+            class="ui-btn ui-btn-md ui-btn-outline"
+          >
+            Добавить в календарь
+          </ResourceLink>
+        )}
+        {mapUrl && (
+          <a
+            href={mapUrl}
+            target="_blank"
+            rel="noreferrer noopener"
+            class="ui-btn ui-btn-md ui-btn-outline"
+          >
+            Открыть на Яндекс Картах
+          </a>
+        )}
+      </div>
+    )
+  }
+  {
+    mapEmbedUrl && (
+      <div class="event-map" aria-hidden="true">
+        <iframe
+          src={mapEmbedUrl}
+          title={`Карта места события: ${event.location ?? event.title}`}
+          loading="lazy"
+          tabindex="-1"
+        />
+        <span class="ui-map-marker" />
+      </div>
+    )
+  }
+</article>
+
+<style>
+  .event-card {
+    padding-block: 1.5rem;
+    border-top: 1px solid var(--color-border);
+    scroll-margin-top: 6rem;
+    overflow-wrap: anywhere;
+  }
+  .event-labels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin-bottom: 0.65rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+  .event-status[data-status='conditional'] {
+    color: var(--color-warning-text);
+  }
+  .event-status[data-status='cancelled'] {
+    color: var(--color-danger-text);
+  }
+  .event-date {
+    margin-top: 0.65rem;
+  }
+  .event-facts {
+    display: grid;
+    gap: 0.5rem;
+    margin-block: 1rem;
+  }
+  .event-facts > div {
+    display: grid;
+    gap: 0.15rem;
+  }
+  dt {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+  dd {
+    margin: 0;
+  }
+  .event-body {
+    max-width: 72ch;
+  }
+  .event-source {
+    margin-block: 1rem;
+  }
+  .event-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .event-actions :global(a) {
+    white-space: normal;
+  }
+  .event-map {
+    position: relative;
+    height: 14rem;
+    margin-top: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+  }
+  iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    pointer-events: none;
+  }
+  .event-map .ui-map-marker {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  @media (min-width: 40rem) {
+    .event-facts > div {
+      grid-template-columns: 10rem minmax(0, 1fr);
+      gap: 1rem;
+    }
+  }
+</style>

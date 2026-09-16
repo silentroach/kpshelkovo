@@ -32,6 +32,7 @@ export const createSiteBacklinksFromGraph = (
   target: EntityMentionEntityRef
 ): SiteBacklinks => ({
   news: sectionBacklinks(graph, target, 'news'),
+  events: sectionBacklinks(graph, target, 'events'),
   status: sectionBacklinks(graph, target, 'status'),
   reviews: sectionBacklinks(graph, target, 'reviews'),
   places: sectionBacklinks(graph, target, 'places'),

@@ -8,6 +8,16 @@ import { testPlace } from '@/lib/places/tests/place.test-helper';
 import MapBackground from '../../map-background.svg';
 
 const eventWithCoordinates = {
+  id: 'reglament',
+  category: 'meetings',
+  status: 'announced',
+  startsDate: '2026-05-31',
+  timePrecision: 'datetime',
+  sourceUrl: 'https://example.com/reglament',
+  body: 'На встрече обсудим регламент обслуживания поселка.',
+  mentions: [],
+  calendarUid: 'event-reglament@kpshelkovo.online',
+  url: '/events/2026/05/31/#reglament',
   slug: 'reglament',
   title: 'Встреча по регламенту',
   startsAt: new Date('2026-09-30T19:00:00+03:00'),
@@ -22,6 +32,16 @@ const eventWithCoordinates = {
 } satisfies NewsEvent;
 
 const eventWithoutPlace = {
+  id: 'entrance',
+  category: 'community',
+  status: 'announced',
+  startsDate: '2026-06-03',
+  timePrecision: 'datetime',
+  sourceUrl: 'https://example.com/entrance',
+  body: 'Обсудим благоустройство главного въезда и предложения жителей.',
+  mentions: [],
+  calendarUid: 'event-entrance@kpshelkovo.online',
+  url: '/events/2026/06/03/#entrance',
   slug: 'entrance',
   title: 'Обсуждение благоустройства въезда',
   startsAt: new Date('2026-06-03T10:30:00+03:00'),

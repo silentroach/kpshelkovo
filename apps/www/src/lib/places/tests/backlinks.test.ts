@@ -8,6 +8,7 @@ import { PLACE_MENTION_SECTIONS } from '../schema';
 const refs: readonly EntityMentionSourceRef[] = (
   [
     ['news', 'article', 'news-item'],
+    ['events', 'event', 'event-item'],
     ['status', 'incident', 'status-item'],
     ['reviews', 'review', 'review-item'],
     ['places', 'place', 'place-item'],
@@ -45,6 +46,9 @@ describe('createPlaceBacklinksFromGraph', () => {
       {
         "contacts": [
           "contact-item",
+        ],
+        "events": [
+          "event-item",
         ],
         "news": [
           "news-item",

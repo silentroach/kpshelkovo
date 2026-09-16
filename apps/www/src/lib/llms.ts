@@ -41,7 +41,12 @@ const sectionLinks = () =>
     markdownLinkItem(
       'Новости',
       registeredSurfaceUrl('news:llms'),
-      'публикации, полный архив и календарные события с готовыми ICS-ссылками.'
+      'публикации, полный архив и связанные мероприятия.'
+    ),
+    markdownLinkItem(
+      'События',
+      registeredSurfaceUrl('events:index-markdown'),
+      'выбранный месяц и ссылки на дни. Markdown дня содержит полные карточки, условия участия, состояние и основной источник.'
     ),
     markdownLinkItem(
       'Статус сервисов',
@@ -102,6 +107,24 @@ export const build = (): string =>
     ],
     sections: [
       llmsSection('Найти материал', [sectionLinks()]),
+      llmsSection('Мероприятия по датам', [
+        md.list([
+          markdownLinkItem(
+            'Календарь событий в браузере',
+            registeredSurfaceUrl('events:index'),
+            'месячный календарь, отдельный список месяца и страницы дней.'
+          ),
+          markdownLinkItem(
+            'Все опубликованные мероприятия в JSON',
+            registeredSurfaceUrl('events:data'),
+            'для выборки по датам: одна запись на мероприятие, включая многодневные, с точностью времени, состоянием, источником, связями с новостями и доступным ICS.'
+          ),
+          markdownLinkItem('JSON Schema мероприятий', registeredSurfaceUrl('events:schema'))
+        ]),
+        md.paragraph(
+          'Каталог содержит все редакторские записи раздела, а не весь архив Telegram или все мероприятия поблизости. Отмена сохраняется в истории; прошедшая дата не подтверждает проведение. Для многодневных записей through включает последний день. Готовые ссылки на дни и ICS берите из данных; одна дата без часов не имеет ICS.'
+        )
+      ]),
       llmsSection('Выбрать источник', [
         md.list([
           markdownLinkItem(

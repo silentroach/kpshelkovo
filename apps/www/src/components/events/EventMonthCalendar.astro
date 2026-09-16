@@ -1,0 +1,123 @@
+---
+import { formatDate } from '@shelkovo/format';
+import type { EventMonth } from '@/lib/events/types';
+import {
+  buildEventMonthCells,
+  formatEventCount,
+  formatEventMonth,
+} from '@/lib/events/view';
+
+interface Props {
+  readonly month: EventMonth;
+}
+const { month } = Astro.props;
+const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+const hasCancelledDay = month.days.some((day) =>
+  day.events.every((event) => event.status === 'cancelled'),
+);
+---
+
+<section
+  aria-label={`Календарь: ${formatEventMonth(month)}`}
+  class="event-calendar"
+>
+  <div class="weekdays" aria-hidden="true">
+    {weekdays.map((day) => <span>{day}</span>)}
+  </div>
+  <ol class="days" role="list">
+    {
+      buildEventMonthCells(month).map(({ number, date, column, day }) => {
+        const cancelled = day?.events.every(
+          (event) => event.status === 'cancelled',
+        );
+        return (
+          <li style={column ? `grid-column-start: ${column}` : undefined}>
+            {day ? (
+              <a
+                href={day.url}
+                aria-label={`${formatDate(date)}: ${formatEventCount(day.events.length)}${cancelled ? ', все отменены' : ''}`}
+              >
+                <span class="ui-num">{number}</span>
+                <span class="event-count ui-num" aria-hidden="true">
+                  {cancelled ? '×' : ''}
+                  {day.events.length}
+                </span>
+              </a>
+            ) : (
+              <span class="empty-day ui-num">
+                <span aria-hidden="true">{number}</span>
+                <span class="ui-visually-hidden">
+                  {formatDate(date)}: нет опубликованных событий
+                </span>
+              </span>
+            )}
+          </li>
+        );
+      })
+    }
+  </ol>
+  <p class="calendar-note">
+    Маленькое число показывает количество опубликованных событий. Выберите день,
+    чтобы прочитать карточки.
+  </p>
+  {
+    hasCancelledDay && (
+      <p class="calendar-note">× перед числом: все события дня отменены.</p>
+    )
+  }
+</section>
+
+<style>
+  .event-calendar {
+    max-width: 40rem;
+  }
+  .weekdays,
+  .days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.25rem;
+  }
+  .weekdays {
+    margin-bottom: 0.5rem;
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+  .days {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  .days a,
+  .empty-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.25rem;
+    gap: 0.2rem;
+  }
+  .days a {
+    border: 1px solid var(--color-primary);
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .days a:hover {
+    background: var(--color-primary-soft-2);
+    text-decoration: underline;
+  }
+  .empty-day {
+    color: var(--color-text-muted);
+  }
+  .event-count {
+    align-self: flex-start;
+    margin-top: 0.3rem;
+    font-size: 0.75rem;
+  }
+  .calendar-note {
+    margin-top: 1rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+</style>

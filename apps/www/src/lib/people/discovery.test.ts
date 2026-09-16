@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest';
+import { z } from 'zod';
 
 import type {
   peoplePublicSurfaceSlice as peoplePublicSurfaceSliceType,
@@ -50,6 +51,7 @@ const profile = (): PersonProfile => ({
     }
   ],
   backlinks: {
+    events: [],
     news: [
       {
         section: 'news',
@@ -105,6 +107,7 @@ describe('people discovery payload', () => {
   it('serializes profiles with mentions, backlinks, and aggregate stats', () => {
     const payload = buildPeoplePayload({ profiles: [profile()] });
 
+    expect(z.fromJSONSchema(schema('https://example.com')).safeParse(payload).success).toBe(true);
     expect(payload.stats).toEqual({
       profile_count: 1,
       mention_count: 1,
@@ -247,6 +250,7 @@ describe('people discovery payload', () => {
     expect(openapiDefs.mention).toMatchObject(defs.mention ?? {});
     expect(openapiDefs.section?.enum).toEqual([
       'news',
+      'events',
       'status',
       'reviews',
       'places',
@@ -255,6 +259,7 @@ describe('people discovery payload', () => {
     ]);
     expect(openapiDefs.kind?.enum).toEqual([
       'article',
+      'event',
       'incident',
       'review',
       'place',
@@ -263,6 +268,7 @@ describe('people discovery payload', () => {
     ]);
     expect(defs.backlinks?.required).toEqual([
       'news',
+      'events',
       'status',
       'reviews',
       'places',

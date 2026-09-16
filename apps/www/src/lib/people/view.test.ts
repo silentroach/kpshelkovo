@@ -150,6 +150,7 @@ describe('buildPersonMarkdown', () => {
       body: 'Публичный профиль с контекстом.',
       mentions: [],
       backlinks: {
+        events: [],
         news: [
           {
             section: 'news',
@@ -255,6 +256,7 @@ describe('buildPersonMarkdown', () => {
       ].join('\n'),
       mentions: [],
       backlinks: {
+        events: [],
         news: [],
         status: [],
         reviews: [],
@@ -309,6 +311,7 @@ describe('buildPersonMarkdown', () => {
       body: '',
       mentions: [],
       backlinks: {
+        events: [],
         news: [],
         status: [],
         reviews: [],

@@ -42,7 +42,7 @@ const fixtures = vi.hoisted(() => ({
       year: 2025,
       month: 11,
       entry: 'general-meeting',
-      events: [{ slug: 'meeting' }]
+      events: [{ slug: 'meeting', icsUrl: '/news/2025/11/general-meeting/meeting.ics' }]
     }
   ],
   tags: [{ key: 'documents' }, { key: 'meetings' }]

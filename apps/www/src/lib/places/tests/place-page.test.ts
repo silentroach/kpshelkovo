@@ -25,6 +25,7 @@ const fixture = vi.hoisted(() => ({
     markdownUrl: '/map/apple-garden/index.md',
     canonical: 'https://example.com/map/apple-garden/',
     backlinks: {
+      events: [],
       news: [
         {
           section: 'news' as const,

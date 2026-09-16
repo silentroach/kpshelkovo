@@ -9,6 +9,7 @@ import type {
 } from '@/lib/public-surface';
 import type { expectSectionCatalogMatchesRegistry as expectSectionCatalogMatchesRegistryType } from '@/lib/public-surface/catalog-contract.test-helper';
 
+import { newsEventRecord } from './tests/event.test-helper';
 import type { NewsArticle, NewsDataset } from './types';
 
 let buildNewsPayload: typeof import('./discovery').buildNewsPayload;
@@ -50,6 +51,7 @@ const articleWithEvent = (
   attachments: [],
   events: [
     {
+      ...newsEventRecord(),
       slug: 'event',
       title: 'Встреча по регламенту',
       description: 'Описание календарного события.',
