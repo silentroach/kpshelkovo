@@ -23,7 +23,7 @@ const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   </div>
   <ol class="days" role="list">
     {
-      buildEventMonthCells(month).map(({ number, date, column, day }) => {
+      buildEventMonthCells(month).map(({ number, date, inMonth, day }) => {
         const cancelled = day?.events.every(
           (event) => event.status === 'cancelled',
         );
@@ -31,8 +31,10 @@ const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
           ? `${formatDate(date)}: ${formatEventCount(day.events.length)}${cancelled ? ', все отменены' : ''}`
           : undefined;
         return (
-          <li style={column ? `grid-column-start: ${column}` : undefined}>
-            {day ? (
+          <li aria-hidden={!inMonth ? 'true' : undefined}>
+            {!inMonth ? (
+              <span class="adjacent-day ui-num">{number}</span>
+            ) : day ? (
               <a
                 href={day.url}
                 aria-label={label}
@@ -82,6 +84,7 @@ const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
     list-style: none;
   }
   .days a,
+  .adjacent-day,
   .empty-day {
     position: relative;
     display: flex;
@@ -121,5 +124,8 @@ const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   }
   .empty-day {
     color: var(--color-text);
+  }
+  .adjacent-day {
+    color: color-mix(in oklab, var(--color-text-muted) 40%, transparent);
   }
 </style>

@@ -43,11 +43,13 @@ export const formatEventRange = (event: EventRecord): string => {
 
 export const buildEventMonthCells = (month: EventMonth) => {
   const first = dateTimeFromISO(`${month.id}-01`);
+  const gridStart = first.minus({ days: first.weekday - 1 });
   const days = new Map(month.days.map((day) => [day.date, day]));
-  return Array.from({ length: first.daysInMonth ?? 0 }, (_, index) => {
-    const number = index + 1;
-    const date = `${month.id}-${String(number).padStart(2, '0')}`;
-    return { number, date, column: index === 0 ? first.weekday : undefined, day: days.get(date) };
+  return Array.from({ length: 42 }, (_, index) => {
+    const value = gridStart.plus({ days: index });
+    const date = value.toFormat('yyyy-MM-dd');
+    const inMonth = value.year === month.year && value.month === month.month;
+    return { number: value.day, date, inMonth, day: inMonth ? days.get(date) : undefined };
   });
 };
 

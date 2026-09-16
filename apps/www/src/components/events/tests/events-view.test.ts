@@ -7,7 +7,7 @@ import { buildEventCalendar } from '@/lib/events/calendar-projection';
 import { mapRawEvent } from '@/lib/events/mapper';
 import { RawEventSchema } from '@/lib/events/raw-schema';
 import type { RawEventInput } from '@/lib/events/raw-schema';
-import { formatEventRange } from '@/lib/events/view';
+import { buildEventMonthCells, formatEventRange } from '@/lib/events/view';
 // @ts-expect-error Astro components are resolved by Astro/Vitest.
 import EventDayPage from '@/pages/events/[year]/[month]/[day].astro';
 import { createAstroContainer } from '@/test/astro-container';
@@ -111,6 +111,42 @@ describe('event cards', () => {
 });
 
 describe('event calendar pages', () => {
+  it('pads six complete weeks with actual dates across both year boundaries and short months', () => {
+    const ranges = ['2027-01-01', '2026-12-01', '2021-02-01'].map((date) => {
+      const month = buildEventCalendar([event('sample', date)]).months[0]!;
+      const cells = buildEventMonthCells(month);
+      expect(cells).toHaveLength(42);
+      expect(cells.filter((cell) => !cell.inMonth).every((cell) => !cell.day)).toBe(true);
+      return {
+        month: month.id,
+        first: cells[0]?.date,
+        last: cells.at(-1)?.date,
+        inMonth: cells.filter((cell) => cell.inMonth).length
+      };
+    });
+    expect(ranges).toMatchInlineSnapshot(`
+      [
+        {
+          "first": "2026-12-28",
+          "inMonth": 31,
+          "last": "2027-02-07",
+          "month": "2027-01",
+        },
+        {
+          "first": "2026-11-30",
+          "inMonth": 31,
+          "last": "2027-01-10",
+          "month": "2026-12",
+        },
+        {
+          "first": "2021-02-01",
+          "inMonth": 28,
+          "last": "2021-03-14",
+          "month": "2021-02",
+        },
+      ]
+    `);
+  });
   const records = [
     event('may', '2026-05-01'),
     event('period', '2026-08-31', { through: '2026-09-02' }),
@@ -168,7 +204,12 @@ describe('event calendar pages', () => {
         "/events/2026/09/19/",
       ]
     `);
-    expect(grid?.querySelector('li')?.getAttribute('style')).toContain('grid-column-start: 2');
+    expect(grid?.querySelectorAll('li')).toHaveLength(42);
+    expect(grid?.querySelector('li[aria-hidden="true"]')?.textContent.trim()).toBe('31');
+    expect(grid?.querySelectorAll('li[aria-hidden="true"]')).toHaveLength(12);
+    expect(
+      grid?.querySelector('li[aria-hidden="true"] a, li[aria-hidden="true"] [data-cancelled]')
+    ).toBeFalsy();
     expect(grid?.querySelector('a')?.getAttribute('aria-label')).toContain(
       '1 сентября 2026: 1 событие'
     );
