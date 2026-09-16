@@ -6,6 +6,7 @@ import { createAstroContainer } from '@/test/astro-container';
 
 const fixture = vi.hoisted(() => ({
   place: {
+    showOnMap: true,
     slug: 'apple-garden',
     name: 'Яблоневый сад',
     category: 'nature' as const,
@@ -50,6 +51,21 @@ vi.mock('@/lib/places/load', () => ({
 import PlacePage from '@/pages/map/[slug]/index.astro';
 
 describe('/map/[slug]/', () => {
+  it.each([true, false])('offers general-map focus only when showOnMap is %s', async (visible) => {
+    fixture.place.showOnMap = visible;
+    try {
+      const container = await createAstroContainer();
+      const html = await container.renderToString(PlacePage, {
+        params: { slug: 'apple-garden' },
+        request: new Request('https://example.com/map/apple-garden/')
+      });
+      expect(html.includes('href="/map/?h=apple-garden"')).toBe(visible);
+      expect(html).toContain('href="https://yandex.ru/maps/?pt=37.724333,55.06371"');
+      expect(html).not.toContain('noindex');
+    } finally {
+      fixture.place.showOnMap = true;
+    }
+  });
   it('renders practical information before the detailed description', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(PlacePage, {

@@ -1,6 +1,7 @@
 ---
 import { CalendarPlusIcon, MapPinIcon } from '@shelkovo/ui/icons';
 import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
+import { formatDynamicHtml } from '@shelkovo/markdown';
 import type { NewsEvent } from '@/lib/news/types';
 import {
   buildNewsEventMapEmbedUrl,
@@ -21,7 +22,7 @@ const mapUrl = buildNewsEventMapUrl(event);
 const mapEmbedUrl = isCompact
   ? buildNewsEventMapEmbedUrl(event, { centerOffsetYPx: 50 })
   : undefined;
-const hasCoordinates = event.coordinates !== undefined;
+const hasCoordinates = event.place !== undefined;
 const eventDateParts = event.startsIso.slice(0, 10).split('-');
 const eventDay = String(Number(eventDateParts[2] ?? ''));
 const eventMonth = formatNewsEventMonth(event.startsIso);
@@ -47,7 +48,7 @@ const titleId = `news-event-title-${event.slug}`;
           <div class="news-event-compact-map-layer">
             <iframe
               src={mapEmbedUrl}
-              title={`Фоновая карта места события: ${event.location ?? event.title}`}
+              title={`Фоновая карта места события: ${event.place?.name ?? event.title}`}
               loading="lazy"
               tabindex="-1"
               class="news-event-compact-map-frame"
@@ -86,10 +87,21 @@ const titleId = `news-event-title-${event.slug}`;
             <span>{eventTime}</span>
           </li>
 
-          {event.location && (
+          {event.place && (
             <li>
               <MapPinIcon class="news-event-compact-icon" />
-              <span>{event.location}</span>
+              <span>
+                <a
+                  href={event.place.url}
+                  class="site-text-link"
+                  set:html={formatDynamicHtml(event.place.name)}
+                />
+                {event.locationDetails && (
+                  <span
+                    set:html={formatDynamicHtml(`, ${event.locationDetails}`)}
+                  />
+                )}
+              </span>
             </li>
           )}
         </ul>
@@ -163,12 +175,23 @@ const titleId = `news-event-title-${event.slug}`;
           </h2>
           <p class="news-event-details">
             <time datetime={event.startsIso}>{eventRange}</time>
-            {event.location && (
+            {event.place && (
               <>
                 <span class="news-event-details-divider" aria-hidden="true">
                   ·
                 </span>
-                <span>{event.location}</span>
+                <span>
+                  <a
+                    href={event.place.url}
+                    class="site-text-link"
+                    set:html={formatDynamicHtml(event.place.name)}
+                  />
+                  {event.locationDetails && (
+                    <span
+                      set:html={formatDynamicHtml(`, ${event.locationDetails}`)}
+                    />
+                  )}
+                </span>
               </>
             )}
           </p>

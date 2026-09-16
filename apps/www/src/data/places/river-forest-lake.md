@@ -3,6 +3,7 @@ title: Лесное озеро в Ривере
 category: water
 marker: construction
 status: underConstruction
+show_on_map: true
 summary: Рядом с Ривером обустраивают лесное озеро
 search_aliases:
   - лесной пруд в Ривере

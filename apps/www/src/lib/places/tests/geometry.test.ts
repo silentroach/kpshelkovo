@@ -23,6 +23,27 @@ const geometrySource = (
   });
 
 describe('parsePlaceGeometryFiles', () => {
+  it('accepts a contour outside the settlement while rejecting coordinates outside world ranges', () => {
+    const remote = [
+      [2, 48],
+      [3, 48],
+      [3, 49],
+      [2, 48]
+    ] as const;
+    expect(
+      parsePlaceGeometryFiles({ 'remote.geojson': geometrySource(remote) }).has('remote')
+    ).toBe(true);
+    expect(() =>
+      parsePlaceGeometryFiles({
+        'invalid.geojson': geometrySource([
+          [181, 48],
+          [182, 48],
+          [182, 49],
+          [181, 48]
+        ])
+      })
+    ).toThrow('invalid');
+  });
   it('maps a strict GeoJSON area to the place domain model', () => {
     const geometries = parsePlaceGeometryFiles({
       '../../data/places/pond.geojson': geometrySource([

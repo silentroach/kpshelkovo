@@ -3,6 +3,7 @@ title: КПП Парка
 category: entrance
 marker: construction
 status: planned
+show_on_map: true
 summary: КПП пока нет — сейчас на его месте стоят ворота
 location:
   coordinates:

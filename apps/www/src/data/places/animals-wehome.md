@@ -3,6 +3,7 @@ title: Животные в Зеркальных домах
 category: nature
 marker: animals
 status: existing
+show_on_map: true
 summary: Кролики и пятнистые олени на территории базы отдыха в Шелково Форест
 location:
   address: Шелково Форест, Берёзовая улица, 14

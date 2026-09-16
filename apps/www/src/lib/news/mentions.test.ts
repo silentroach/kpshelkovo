@@ -15,7 +15,15 @@ const article = (input?: {
   readonly mentions?: NewsArticle['mentions'];
 }): Pick<
   NewsArticle,
-  'id' | 'title' | 'url' | 'markdownUrl' | 'body' | 'mentions' | 'publishedIso' | 'publishedAt'
+  | 'id'
+  | 'title'
+  | 'url'
+  | 'markdownUrl'
+  | 'body'
+  | 'mentions'
+  | 'publishedIso'
+  | 'publishedAt'
+  | 'events'
 > => ({
   id: '2026/05/electricity',
   title: 'Авария на линии',
@@ -23,6 +31,7 @@ const article = (input?: {
   markdownUrl: '/news/2026/05/electricity/index.md',
   body: 'Первый абзац про [Кирилл Щемелинин](/people/kschemelinin/).\n\nВторой абзац.',
   mentions: input?.mentions ?? [target],
+  events: [],
   publishedIso: '2026-05-03T09:00:00+03:00',
   publishedAt: new Date('2026-05-03T06:00:00.000Z')
 });

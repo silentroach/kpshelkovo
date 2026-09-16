@@ -6,6 +6,7 @@ let buildPlaceMarkdown: typeof import('../markdown').buildPlaceMarkdown;
 let buildPlacesMarkdown: typeof import('../markdown').buildPlacesMarkdown;
 
 const place: PlaceWithBacklinks = {
+  showOnMap: true,
   slug: 'burzhuyka',
   name: 'Буржуйка',
   category: 'food',

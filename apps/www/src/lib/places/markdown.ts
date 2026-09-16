@@ -7,6 +7,7 @@ import {
 
 import { absoluteUrl } from '@/lib/site';
 
+import { selectMapPlaces } from './map-selection';
 import { placesDataUrl, placesMarkdownUrl, placesUrl } from './routes';
 import type { Place, PlaceMentionRef, PlaceWithBacklinks } from './types';
 import {
@@ -57,8 +58,9 @@ const backlinksSection = (place: PlaceWithBacklinks) => {
   ];
 };
 
-export const buildPlacesMarkdown = (places: readonly Place[]): string =>
-  serialize([
+export const buildPlacesMarkdown = (places: readonly Place[]): string => {
+  const visiblePlaces = selectMapPlaces(places);
+  return serialize([
     md.heading(1, 'Карта Шелково'),
     md.paragraph('Текстовый список мест и объектов, отмеченных на общей карте Шелково.'),
     md.paragraph([
@@ -71,9 +73,12 @@ export const buildPlacesMarkdown = (places: readonly Place[]): string =>
     ]),
     md.heading(2, 'Места'),
     md.list(
-      places.length > 0 ? places.map(placeLine) : [md.listItem('Места пока не опубликованы.')]
+      visiblePlaces.length > 0
+        ? visiblePlaces.map(placeLine)
+        : [md.listItem('Места пока не опубликованы.')]
     )
   ]);
+};
 
 export const buildPlaceMarkdown = (place: PlaceWithBacklinks): string =>
   serialize([

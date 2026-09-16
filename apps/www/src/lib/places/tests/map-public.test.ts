@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import { buildPlaceMapPublicPayload } from '../map-public';
+import { selectMapPlaces } from '../map-selection';
+import { buildPlacesMarkdown } from '../markdown';
 import type { Place } from '../types';
 
 const place: Place = {
+  showOnMap: true,
   slug: 'hunting-ponds',
   name: 'Охотничьи пруды',
   category: 'water',
@@ -45,6 +48,16 @@ const place: Place = {
 };
 
 describe('place map public DTO', () => {
+  it('uses the same visible selection for JSON and Markdown, including an empty map', () => {
+    const hidden = { ...place, slug: 'hidden', name: 'Hidden place', showOnMap: false };
+    expect(selectMapPlaces([hidden, place])).toEqual([place]);
+    expect(buildPlaceMapPublicPayload([hidden, place])).toEqual(
+      buildPlaceMapPublicPayload([place])
+    );
+    expect(buildPlacesMarkdown([hidden, place])).toBe(buildPlacesMarkdown([place]));
+    expect(buildPlaceMapPublicPayload([hidden])).toEqual({ places: [] });
+    expect(buildPlacesMarkdown([hidden])).toBe(buildPlacesMarkdown([]));
+  });
   it('keeps the public map feed independent from the full place model', () => {
     expect(buildPlaceMapPublicPayload([place])).toMatchInlineSnapshot(`
       {

@@ -25,6 +25,7 @@ export const mapRawPlace = (
     : preprocessSiteMarkdown(markdown);
 
   return {
+    showOnMap: entry.data.show_on_map === true,
     slug: entry.id,
     name: entry.data.title,
     nameCases: entry.data.name_cases,

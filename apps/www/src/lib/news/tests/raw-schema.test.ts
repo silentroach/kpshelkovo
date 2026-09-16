@@ -256,6 +256,16 @@ describe('RawNewsAuthorSchema', () => {
 });
 
 describe('RawNewsEventsSchema', () => {
+  it.each([
+    { location: 'Old inline location' },
+    { coordinates: { lat: 55, lng: 38 } },
+    { place: 'club', location: 'Old inline location' },
+    { place: 'club', coordinates: { lat: 55, lng: 38 } },
+    { place: 'club', location_details: '  ' },
+    { place: '@club' }
+  ])('rejects obsolete or invalid location data: %j', (fields) => {
+    expect(RawNewsEventsSchema.safeParse([{ ...event, ...fields }]).success).toBe(false);
+  });
   it('trims valid event text at the raw boundary', () => {
     const [parsed] = RawNewsEventsSchema.parse([
       {
@@ -263,7 +273,8 @@ describe('RawNewsEventsSchema', () => {
         description: '  Обсудим новый регламент.  ',
         starts_at: '31.05.2026 19:00',
         ends_at: '31.05.2026 21:00',
-        location: '  Эко-клуб  ',
+        place: '  club  ',
+        location_details: '  В беседке  ',
         organizer: '  ОК Комфорт  ',
         performer: ['  Ведущий  ']
       }
@@ -275,17 +286,19 @@ describe('RawNewsEventsSchema', () => {
     expect({
       title: parsed.title,
       description: parsed.description,
-      location: parsed.location,
+      place: parsed.place,
+      locationDetails: parsed.location_details,
       organizer: parsed.organizer,
       performer: parsed.performer
     }).toMatchInlineSnapshot(`
       {
         "description": "Обсудим новый регламент.",
-        "location": "Эко-клуб",
+        "locationDetails": "В беседке",
         "organizer": "ОК Комфорт",
         "performer": [
           "Ведущий",
         ],
+        "place": "club",
         "title": "Встреча по регламенту",
       }
     `);
@@ -303,9 +316,9 @@ describe('RawNewsEventsSchema', () => {
       message: 'events[].ends_at must use dd.mm.yyyy hh:mm and include time'
     },
     {
-      name: 'invalid coordinates',
-      input: [{ ...event, coordinates: { lat: 91, lng: 38 } }],
-      message: 'events[].coordinates.lat must be between -90 and 90'
+      name: 'details without a place',
+      input: [{ ...event, location_details: 'В беседке' }],
+      message: 'events[].location_details requires place'
     },
     {
       name: 'blank performer',

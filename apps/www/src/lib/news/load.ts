@@ -1,6 +1,9 @@
 import { padNumber } from '@shelkovo/format';
 import { getCollection, type CollectionEntry } from 'astro:content';
 
+import { loadPlacesData } from '@/lib/places/load';
+import type { Place } from '@/lib/places/types';
+
 import { preprocessSiteMarkdownContent } from '../markdown/render';
 import type { SiteMentionRegistry } from '../mentions';
 import { loadSiteMentionRegistry } from '../mentions/registry';
@@ -176,11 +179,18 @@ function normalizeEvent(
     readonly year: string;
     readonly month: string;
     readonly entry: string;
-  }
+  },
+  places: ReadonlyMap<string, Place>
 ): NewsEvent {
   const slug = input.slug ?? 'event';
   const starts = input.starts_at;
   const ends = input.ends_at;
+  const place = input.place ? places.get(input.place) : undefined;
+  if (input.place && !place) {
+    throw new Error(
+      `news article "${route.year}/${route.month}/${route.entry}" event "${slug}" references missing place "${input.place}"`
+    );
+  }
 
   return {
     slug,
@@ -193,8 +203,8 @@ function normalizeEvent(
     endsAt: ends?.at,
     endsIso: ends?.iso,
     endsTime: ends?.time,
-    location: input.location,
-    coordinates: input.coordinates,
+    place,
+    locationDetails: input.location_details,
     organizer: normalizeEventOrganizer(input.organizer),
     performer: normalizeEventPerformers(input.performer)
   };
@@ -206,13 +216,14 @@ function normalizeEvents(
     readonly year: string;
     readonly month: string;
     readonly entry: string;
-  }
+  },
+  places: ReadonlyMap<string, Place>
 ): readonly NewsEvent[] {
   if (!input) {
     return [];
   }
 
-  return input.map((item) => normalizeEvent(item, route));
+  return input.map((item) => normalizeEvent(item, route, places));
 }
 
 function articleParts(entry: ArticleEntry): {
@@ -256,6 +267,7 @@ function normalizeArticle(
   entry: ArticleEntry,
   authors: ReadonlyMap<string, NewsAuthor>,
   mentionRegistry: SiteMentionRegistry,
+  places: ReadonlyMap<string, Place>,
   now: Date
 ): NewsArticle {
   const parts = articleParts(entry);
@@ -269,7 +281,7 @@ function normalizeArticle(
   const area = areas(entry.data.areas);
   const author = needAuthor(authors, authorId(entry.data.author), `news article "${entry.id}"`);
   const articleCover = cover(entry.data.cover, entry.data.cover_alt, `news article "${entry.id}"`);
-  const events = normalizeEvents(entry.data.events, parts);
+  const events = normalizeEvents(entry.data.events, parts, places);
   const mappedPhotos = mapPhotos(entry.data.photos, entry.id, mentionRegistry);
   const body = preprocessSiteMarkdownContent(
     entry.body ?? '',
@@ -409,14 +421,16 @@ export function buildNewsDataset(
   opts?: {
     readonly now?: Date;
     readonly mentionRegistry?: SiteMentionRegistry;
+    readonly places?: ReadonlyMap<string, Place>;
   }
 ): NewsDataset {
   const now = opts?.now ?? new Date();
   const mentionRegistry = opts?.mentionRegistry ?? new Map();
   const authors = authorMap(authorsData);
+  const places = opts?.places ?? new Map<string, Place>();
 
   const articles: readonly NewsArticle[] = articlesData
-    .map((item: ArticleEntry) => normalizeArticle(item, authors, mentionRegistry, now))
+    .map((item: ArticleEntry) => normalizeArticle(item, authors, mentionRegistry, places, now))
     .sort(compareArticlesPublishedDesc);
 
   validateUniqueIds(articles);
@@ -446,15 +460,18 @@ export function buildNewsDataset(
 }
 
 async function buildNewsData(): Promise<NewsDataset> {
-  const [authorsData, articlesData, archiveSummariesData, mentionRegistry] = await Promise.all([
-    getCollection('newsAuthors') as Promise<readonly NewsAuthorEntry[]>,
-    getCollection('newsArticles') as Promise<readonly NewsArticleEntry[]>,
-    getCollection('newsArchiveSummaries') as Promise<readonly NewsArchiveSummaryEntry[]>,
-    loadSiteMentionRegistry()
-  ]);
+  const [authorsData, articlesData, archiveSummariesData, mentionRegistry, places] =
+    await Promise.all([
+      getCollection('newsAuthors') as Promise<readonly NewsAuthorEntry[]>,
+      getCollection('newsArticles') as Promise<readonly NewsArticleEntry[]>,
+      getCollection('newsArchiveSummaries') as Promise<readonly NewsArchiveSummaryEntry[]>,
+      loadSiteMentionRegistry(),
+      loadPlacesData()
+    ]);
 
   return buildNewsDataset(authorsData, articlesData, archiveSummariesData, {
-    mentionRegistry
+    mentionRegistry,
+    places: places.bySlug
   });
 }
 

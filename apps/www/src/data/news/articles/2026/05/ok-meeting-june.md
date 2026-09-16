@@ -13,10 +13,8 @@ events:
   - title: Встреча с ОК Комфорт в Green Dreams
     description: Жителей КП Шелково приглашают обсудить сезонные работы, строительные планы, применение тарифа, качество обслуживания и финансовую деятельность ОК.
     starts_at: 13.06.2026 16:00
-    location: ресторан Green Dreams, КП Гринвуд 2
-    coordinates:
-      lat: 55.074958
-      lng: 37.755599
+    place: green-dreams
+    location_details: в беседке
     organizer:
       name: ОК Комфорт
       type: organization

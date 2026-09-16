@@ -3,6 +3,7 @@ title: Пляж
 category: water
 marker: construction
 status: underConstruction
+show_on_map: true
 summary: Пляж пока строят
 location:
   coordinates:

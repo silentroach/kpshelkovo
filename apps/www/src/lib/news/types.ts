@@ -1,3 +1,5 @@
+import type { Place } from '@/lib/places/types';
+
 import type { PreprocessedSiteMarkdownBody } from '../markdown/render';
 import type { EntityMentionTarget } from '../mentions';
 import type { NewsArea } from './schema';
@@ -41,11 +43,6 @@ export interface NewsCover {
   readonly alt: string;
 }
 
-export interface NewsEventCoordinates {
-  readonly lat: number;
-  readonly lng: number;
-}
-
 export interface NewsEventOrganizer {
   readonly name: string;
   readonly type: 'organization' | 'person';
@@ -67,8 +64,8 @@ export interface NewsEvent {
   readonly endsIso?: string;
   readonly endsTime?: string;
   readonly icsUrl: string;
-  readonly location?: string;
-  readonly coordinates?: NewsEventCoordinates;
+  readonly place?: Place;
+  readonly locationDetails?: string;
   readonly organizer?: NewsEventOrganizer;
   readonly performer?: readonly NewsEventPerformer[];
 }

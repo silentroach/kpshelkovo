@@ -105,18 +105,22 @@ const articleEventEnd = (event: NewsEvent): Date =>
   event.endsAt ?? new Date(event.startsAt.valueOf() + DEFAULT_EVENT_DURATION_MS);
 
 const structuredLocation = (event: NewsEvent): string | undefined => {
-  if (!event.coordinates) {
-    return undefined;
+  if (!event.place) {
+    return;
   }
 
-  const title = parameterValue(event.location ?? event.title);
+  const title = parameterValue(event.place.name);
 
-  return `X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE=${title}:geo:${event.coordinates.lat},${event.coordinates.lng}`;
+  return `X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE=${title}:geo:${event.place.coordinates.lat},${event.place.coordinates.lng}`;
 };
 
 export function buildArticleEventIcs(article: NewsArticle, event: NewsEvent): string {
   const host = articleHost(article);
   const appleLocation = structuredLocation(event);
+  const place = event.place;
+  const description = [event.description ?? article.summary, event.locationDetails]
+    .filter(Boolean)
+    .join('\n\n');
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
@@ -129,12 +133,12 @@ export function buildArticleEventIcs(article: NewsArticle, event: NewsEvent): st
     rawLine(`DTSTART:${formatUtcDateTime(event.startsAt)}`),
     rawLine(`DTEND:${formatUtcDateTime(articleEventEnd(event))}`),
     textLine('SUMMARY', event.title),
-    textLine('DESCRIPTION', event.description ?? article.summary),
+    textLine('DESCRIPTION', description),
     rawLine(`URL:${article.canonical}`),
-    ...(event.location ? [textLine('LOCATION', event.location)] : []),
-    ...(event.coordinates
-      ? [rawLine(`GEO:${event.coordinates.lat};${event.coordinates.lng}`)]
+    ...(place
+      ? [textLine('LOCATION', [place.name, place.address].filter(Boolean).join(', '))]
       : []),
+    ...(place ? [rawLine(`GEO:${place.coordinates.lat};${place.coordinates.lng}`)] : []),
     ...(appleLocation ? [rawLine(appleLocation)] : []),
     'END:VEVENT',
     'END:VCALENDAR',

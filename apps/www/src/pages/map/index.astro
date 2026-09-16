@@ -2,9 +2,10 @@
 import PlaceMap from '@/components/places/PlaceMap.svelte';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { loadPlaces } from '@/lib/places/load';
+import { selectMapPlaces } from '@/lib/places/map-selection';
 import { placesDataUrl, placesUrl } from '@/lib/places/routes';
 
-const places = await loadPlaces();
+const places = selectMapPlaces(await loadPlaces());
 const firstPlace = places[0];
 const fallbackPlace = firstPlace
   ? { name: firstPlace.name, url: firstPlace.url }

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { testPlace } from '@/lib/places/tests/place.test-helper';
+
 import {
   buildNewsEventMapEmbedUrl,
   buildNewsEventMapUrl,
@@ -48,20 +50,12 @@ describe('formatNewsEventMonth', () => {
 });
 
 describe('buildNewsEventMapUrl', () => {
-  it('prefers coordinates for Yandex Maps links', () => {
+  it('uses the canonical place map URL even for hidden places', () => {
     expect(
       buildNewsEventMapUrl({
-        location: 'КП Шелково, эко-клуб',
-        coordinates: { lat: 55.123456, lng: 38.654321 }
+        place: testPlace({ mapUrl: 'https://yandex.ru/navi/example' })
       })
-    ).toBe('https://yandex.ru/maps/?pt=38.654321,55.123456&z=16&l=map');
-  });
-
-  it('builds search links from location when coordinates are missing', () => {
-    const url = buildNewsEventMapUrl({ location: 'КП Шелково, эко-клуб' });
-
-    expect(url).toBeDefined();
-    expect(new URL(url ?? '').searchParams.get('text')).toBe('КП Шелково, эко-клуб');
+    ).toBe('https://yandex.ru/navi/example');
   });
 
   it('skips map links without coordinates or location', () => {
@@ -70,7 +64,7 @@ describe('buildNewsEventMapUrl', () => {
 
   it('builds Yandex Maps widget URLs from coordinates', () => {
     const url = buildNewsEventMapEmbedUrl({
-      coordinates: { lat: 55.123456, lng: 38.654321 }
+      place: testPlace({ coordinates: { lat: 55.123456, lng: 38.654321 } })
     });
 
     expect(url).toBeDefined();
@@ -81,7 +75,7 @@ describe('buildNewsEventMapUrl', () => {
   it('can offset Yandex Maps widget center for fixed overlay pins', () => {
     const url = buildNewsEventMapEmbedUrl(
       {
-        coordinates: { lat: 55.123456, lng: 38.654321 }
+        place: testPlace({ coordinates: { lat: 55.123456, lng: 38.654321 } })
       },
       { centerOffsetYPx: 50 }
     );
