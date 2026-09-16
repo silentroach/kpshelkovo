@@ -71,6 +71,14 @@ const monthUrl = eventMonthUrl(month.id);
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'События', href: '/events/' },
   { label: formatEventMonth(month), href: monthUrl },
+  ...(event
+    ? [
+        {
+          label: formatDate(event.startsDate),
+          href: eventDayUrl(event.startsDate),
+        },
+      ]
+    : []),
   { label: heading },
 ]);
 ---
@@ -86,6 +94,7 @@ const breadcrumbs = withHomeBreadcrumbs([
         title: `${event.status === 'cancelled' ? 'Отменено: ' : ''}${event.title} — События`,
         description,
         section: SEARCH_SECTIONS.events,
+        aliases: ['календарь мероприятий'],
       }
     : undefined}
 >
@@ -110,18 +119,6 @@ const breadcrumbs = withHomeBreadcrumbs([
         </>
       )
     }
-    <nav class="back-links" aria-label="Календарь событий">
-      {
-        event && (
-          <a href={eventDayUrl(event.startsDate)}>
-            ← События {formatDate(event.startsDate)}
-          </a>
-        )
-      }
-      <a href={monthUrl} data-pagefind-body={event ? '' : undefined}
-        >Календарь мероприятий: {formatEventMonth(month)}</a
-      >
-    </nav>
   </main>
 </BaseLayout>
 
@@ -129,36 +126,18 @@ const breadcrumbs = withHomeBreadcrumbs([
   .detail-content {
     display: grid;
     gap: 1.25rem;
-    padding: 0.75rem 1.25rem 0;
+    padding: 0.75rem 1.25rem 3rem;
   }
   .day-content {
     max-width: 56rem;
     padding-inline: 1.25rem;
-  }
-  .back-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.5rem;
-    padding: 1.5rem 1.25rem 3rem;
-  }
-  .back-links a {
-    display: inline-block;
-    padding-block: 0.5rem;
-    color: var(--color-primary);
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
-    overflow-wrap: anywhere;
-  }
-  .back-links a:focus-visible {
-    outline: 2px solid var(--color-accent-text);
-    outline-offset: 3px;
+    padding-bottom: 3rem;
   }
   @media (min-width: 48rem) {
     .detail-content {
-      padding: 1.25rem 1.5rem 0;
+      padding: 1.25rem 1.5rem 3rem;
     }
-    .day-content,
-    .back-links {
+    .day-content {
       padding-inline: 1.5rem;
     }
   }

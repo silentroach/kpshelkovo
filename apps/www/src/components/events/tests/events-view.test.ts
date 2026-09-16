@@ -434,7 +434,7 @@ describe('event calendar pages', () => {
     expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toBe(
       document.querySelector('meta[property="og:description"]')?.getAttribute('content')
     );
-    expect(document.querySelector('main a[href="/events/2026/09/"]')).toBeTruthy();
+    expect(document.querySelectorAll('main a[href="/events/2026/09/"]')).toHaveLength(1);
     expect(document.querySelector('meta[name="robots"]')).toBeFalsy();
 
     for (const link of links) {
@@ -459,13 +459,15 @@ describe('event calendar pages', () => {
       expect(detail.querySelectorAll('a[href="https://example.com/source"]')).toHaveLength(1);
       expect(detail.querySelector('a[download]')?.getAttribute('href')).toBe(record.icsUrl);
       expect(
-        detail.querySelector(`nav a[href="/events/${record.startsDate.replaceAll('-', '/')}/"]`)
-      ).toBeTruthy();
-      expect(
-        detail.querySelector(
-          `nav a[data-pagefind-body][href="/events/${record.startsDate.slice(0, 7).replace('-', '/')}/"]`
+        detail.querySelectorAll(
+          `main nav a[href="/events/${record.startsDate.replaceAll('-', '/')}/"]`
         )
-      ).toBeTruthy();
+      ).toHaveLength(1);
+      expect(
+        detail.querySelectorAll(
+          `main nav a[href="/events/${record.startsDate.slice(0, 7).replace('-', '/')}/"]`
+        )
+      ).toHaveLength(1);
       const schema = z
         .object({
           '@type': z.literal('Event'),

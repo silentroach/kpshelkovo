@@ -37,48 +37,17 @@ describe('event publication boundary', () => {
     }
   );
 
-  it.each([
-    '/events/2026/01/01/',
-    '/events/2026/01/list/',
-    '/events/2026/13/old/',
-    '/events/2026/01/',
-    '/news/2026/01/old/',
-    'https://kpshelkovo.online/events/2026/01/old/',
-    'events/2026/01/old/',
-    '/events/2026/01/old',
-    '/events/2026/01/old/?query',
-    '/events/2026/01/old/#anchor',
-    '/events/2026/01/../old/'
-  ])('rejects aliases outside the absolute detail-path contract: %s', (alias) => {
-    expect(() => entry('stable-id', '01.01.2026', { aliases: [alias] })).toThrow();
-  });
-
-  it('rejects canonical collisions, duplicate aliases, self aliases and alias chains in either order', () => {
+  it('rejects canonical URL collisions between different events', () => {
     const first = entry('first', '01.01.2026', { slug: 'same' });
     const second = entry('second', '02.01.2026', { slug: 'same' });
-    const alias = '/events/2025/12/old/';
-    const cases = [
-      [first, second],
-      [entry('self', '01.01.2026', { aliases: ['/events/2026/01/self/'] })],
-      [entry('duplicate', '01.01.2026', { aliases: [alias, alias] })],
-      [
-        entry('one', '01.01.2026', { aliases: [alias] }),
-        entry('two', '01.01.2026', { aliases: [alias] })
-      ],
-      [first, entry('moved', '01.02.2026', { aliases: ['/events/2026/01/same/'] })]
-    ];
-    for (const entries of cases) {
-      expect(() => buildEventsDataset(entries)).toThrow('event URL collision');
-      expect(() => buildEventsDataset(entries.toReversed())).toThrow('event URL collision');
-    }
+    expect(() => buildEventsDataset([first, second])).toThrow('event URL collision');
   });
 
   it('uses the Moscow start month and an independent slug while keeping identity on moves', () => {
     const original = event('stable-id', '01.01.2026 00:30', { slug: 'detail' });
     const moved = buildEventsDataset([
       entry('stable-id', '01.02.2026 00:30', {
-        slug: 'renamed',
-        aliases: [original.url, '/events/2025/12/earlier/']
+        slug: 'renamed'
       })
     ]).events[0];
     expect({
@@ -87,14 +56,9 @@ describe('event publication boundary', () => {
       slug: original.eventSlug,
       legacyAnchor: eventUrl(original.startsDate, original.id),
       moved: moved.url,
-      movedReference: moved.referenceKey,
-      aliases: moved.aliases
+      movedReference: moved.referenceKey
     }).toMatchInlineSnapshot(`
       {
-        "aliases": [
-          "/events/2026/01/detail/",
-          "/events/2025/12/earlier/",
-        ],
         "legacyAnchor": "/events/2026/01/01/#stable-id",
         "moved": "/events/2026/02/renamed/",
         "movedReference": "2026/02/renamed",

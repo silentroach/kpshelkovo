@@ -23,22 +23,12 @@ export const EventReferenceKeySchema = z
     'event reference must use YYYY/MM/slug'
   )
   .refine((key) => EventSlugSchema.safeParse(key.split('/')[2]).success, 'invalid event slug');
-export const EventAliasSchema = z
-  .string()
-  .refine(
-    (path) =>
-      path.startsWith('/events/') &&
-      path.endsWith('/') &&
-      EventReferenceKeySchema.safeParse(path.slice('/events/'.length, -1)).success,
-    'event alias must be an absolute site detail path /events/YYYY/MM/slug/'
-  );
 
 export const EventRoutesSchema = z
   .array(
     z.object({
       id: EventIdSchema,
-      url: EventAliasSchema,
-      aliases: z.array(EventAliasSchema).readonly()
+      url: z.string()
     })
   )
   .superRefine((events, ctx) => {
@@ -53,24 +43,21 @@ export const EventRoutesSchema = z
         });
       }
       ids.add(event.id);
-      [event.url, ...event.aliases].forEach((path, pathIndex) => {
-        const owner = paths.get(path);
-        if (owner) {
-          ctx.addIssue({
-            code: 'custom',
-            path: pathIndex === 0 ? [index, 'url'] : [index, 'aliases', pathIndex - 1],
-            message: `event URL collision "${path}" between "${owner}" and "${event.id}"`
-          });
-        }
-        paths.set(path, event.id);
-      });
+      const owner = paths.get(event.url);
+      if (owner) {
+        ctx.addIssue({
+          code: 'custom',
+          path: [index, 'url'],
+          message: `event URL collision "${event.url}" between "${owner}" and "${event.id}"`
+        });
+      }
+      paths.set(event.url, event.id);
     });
   });
 
 export const RawEventSchema = z
   .object({
     slug: EventSlugSchema,
-    aliases: z.array(EventAliasSchema).optional(),
     title: text,
     category: z.enum([
       'sport',

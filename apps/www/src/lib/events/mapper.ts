@@ -28,7 +28,6 @@ export const mapRawEvent = (entry: EventEntry, registry?: SiteMentionRegistry): 
     id,
     eventSlug: data.slug,
     referenceKey: eventReferenceKey(startsDate, data.slug),
-    aliases: data.aliases ?? [],
     title: data.title,
     category: data.category,
     status: data.status,

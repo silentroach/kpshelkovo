@@ -30,7 +30,6 @@ export interface EventRecord {
   readonly id: string;
   readonly eventSlug: string;
   readonly referenceKey: string;
-  readonly aliases: readonly string[];
   readonly title: string;
   readonly category: EventCategory;
   readonly status: EventStatus;

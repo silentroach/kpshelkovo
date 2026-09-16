@@ -84,7 +84,7 @@ beforeAll(() =>
 afterEach(() => vi.restoreAllMocks());
 
 describe('shared events in news', () => {
-  it('requires updated news references after a month or slug change even when an alias exists', () => {
+  it('requires updated news references after a month or slug change', () => {
     const original = migrated.find((event) => event.id === 'ok-meeting-june-2026')!;
     for (const extra of [
       { starts_at: '13.07.2026 16:00', slug: original.eventSlug },
@@ -98,8 +98,7 @@ describe('shared events in news', () => {
           title: original.title,
           category: original.category,
           source_url: original.sourceUrl,
-          legacy_uid: original.calendarUid,
-          aliases: [original.url]
+          legacy_uid: original.calendarUid
         })
       });
       expect(() =>
