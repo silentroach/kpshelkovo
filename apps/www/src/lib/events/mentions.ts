@@ -1,13 +1,20 @@
 import { extractFirstMarkdownText } from '@shelkovo/markdown';
 
 import { createEntityMentionSourceRefs, type EntityMentionSourceRef } from '@/lib/mentions';
+import { createPlaceMentionTarget } from '@/lib/places/mentions';
 
 import type { EventRecord } from './types';
 
 export const createEventMentionRefs = (event: EventRecord): readonly EntityMentionSourceRef[] => {
-  if (!event.mentions.length) return [];
+  const mentions = [
+    ...event.mentions,
+    ...(event.place
+      ? [createPlaceMentionTarget(event.place.slug, event.place.name, event.place.nameCases)]
+      : [])
+  ];
+  if (!mentions.length) return [];
 
-  return createEntityMentionSourceRefs(event.mentions, {
+  return createEntityMentionSourceRefs(mentions, {
     source: { section: 'events', kind: 'event', id: event.id },
     title: event.title,
     htmlUrl: event.url,

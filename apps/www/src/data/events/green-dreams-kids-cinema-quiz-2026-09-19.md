@@ -7,7 +7,8 @@ status: announced
 source_url: https://t.me/green_events/290
 price: 700 ₽
 audience: 7+
-location: Большая беседка ресторана Green Dreams
+place: green-dreams
+location_details: в большой беседке
 ---
 
 На киноквизе GREEN.EVENTS будут вопросы по популярным детским фильмам, мультфильмам и сериалам. Каждой команде обещают попкорн.

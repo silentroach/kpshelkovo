@@ -7,7 +7,8 @@ status: announced
 source_url: https://t.me/green_events/290
 price: 1200 ₽
 audience: Для взрослых
-location: Большая беседка ресторана Green Dreams
+place: green-dreams
+location_details: в большой беседке
 ---
 
 Киноквиз GREEN.EVENTS посвящён известным фильмам разных лет и стран. Каждой команде обещают попкорн.

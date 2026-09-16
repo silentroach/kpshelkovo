@@ -34,6 +34,9 @@ export const toEventPublic = (
     price: event.price,
     audience: event.audience,
     location: event.location,
+    placeId: event.place?.slug,
+    placeUrl: event.place?.canonical,
+    locationDetails: event.locationDetails,
     coordinates: event.coordinates
       ? { lat: event.coordinates.lat, lng: event.coordinates.lng }
       : undefined,

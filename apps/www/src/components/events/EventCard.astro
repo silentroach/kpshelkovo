@@ -105,10 +105,24 @@ const sourceLabel = telegramChannel
             ]}
           >
             <p class="location-label">Место</p>
-            <h2
-              class="ui-entry-title"
-              set:html={formatDynamicHtml(event.location ?? 'Место на карте')}
-            />
+            <h2 class="ui-entry-title">
+              {event.place ? (
+                <a
+                  href={event.place.url}
+                  class="site-text-link"
+                  set:html={formatDynamicHtml(event.place.name)}
+                />
+              ) : (
+                <span
+                  set:html={formatDynamicHtml(
+                    event.location ?? 'Место на карте',
+                  )}
+                />
+              )}
+            </h2>
+            {event.locationDetails && (
+              <p set:html={formatDynamicHtml(event.locationDetails)} />
+            )}
             <a
               href={mapUrl}
               target="_blank"

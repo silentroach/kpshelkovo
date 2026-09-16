@@ -5,10 +5,8 @@ category: community
 starts_at: 16.05.2026 15:00
 ends_at: 16.05.2026 16:00
 source_url: https://okkomfort.domyland.app/news?targetId=112028&entityName=news&t=okkomfort
-location: КП Шелково, Вилладж, возле спортивной площадки
-coordinates:
-  lat: 55.063808
-  lng: 37.725320
+place: apple-garden
+location_details: возле спортивной площадки
 organizer:
   name: ОК Комфорт
   type: organization

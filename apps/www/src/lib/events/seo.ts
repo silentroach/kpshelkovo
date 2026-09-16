@@ -43,7 +43,8 @@ export const buildEventJsonLd = (event: EventRecord, siteUrl: string): SchemaDoc
         ? {
             '@type': 'Place',
             name: event.location,
-            address: event.location,
+            url: event.place?.canonical,
+            address: event.place ? event.place.address : event.location,
             geo: event.coordinates
               ? {
                   '@type': 'GeoCoordinates',

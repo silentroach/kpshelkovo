@@ -8,7 +8,7 @@ exports[`shared events in news > preserves all five published URLs, UIDs, interv
       "lng": 37.755599,
     },
     "end": undefined,
-    "location": "ресторан Green Dreams, КП Гринвуд 2",
+    "location": "Ресторан Green Dreams",
     "organizer": {
       "name": "ОК Комфорт",
       "type": "organization",
@@ -21,11 +21,11 @@ exports[`shared events in news > preserves all five published URLs, UIDs, interv
   },
   {
     "coordinates": {
-      "lat": 55.063808,
-      "lng": 37.72532,
+      "lat": 55.06371,
+      "lng": 37.724333,
     },
     "end": "2026-05-16T16:00:00+03:00",
-    "location": "КП Шелково, Вилладж, возле спортивной площадки",
+    "location": "Яблоневый сад",
     "organizer": {
       "name": "ОК Комфорт",
       "type": "organization",
@@ -56,7 +56,7 @@ exports[`shared events in news > preserves all five published URLs, UIDs, interv
       "lng": 37.755967,
     },
     "end": "2026-05-09T17:00:00+03:00",
-    "location": "КП Гринвуд, у фруктового сада",
+    "location": "Фруктовый сад в Гринвуде",
     "organizer": {
       "name": "ОК Комфорт",
       "type": "organization",
@@ -78,7 +78,7 @@ exports[`shared events in news > preserves all five published URLs, UIDs, interv
       "lng": 37.720861,
     },
     "end": "2026-05-09T16:00:00+03:00",
-    "location": "д. Шелково, ул. Центральная, 46-48",
+    "location": "Памятник в деревне Шелково",
     "organizer": undefined,
     "performer": undefined,
     "start": "2026-05-09T15:00:00+03:00",

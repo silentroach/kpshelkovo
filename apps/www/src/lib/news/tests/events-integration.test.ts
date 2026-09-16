@@ -13,6 +13,8 @@ import * as eventLoad from '@/lib/events/load';
 import { mapRawEvent } from '@/lib/events/mapper';
 import { RawEventSchema } from '@/lib/events/raw-schema';
 import type { EventRecord } from '@/lib/events/types';
+import { mapRawPlace } from '@/lib/places/mapper';
+import { RawPlaceSchema } from '@/lib/places/raw-schema';
 import { createAstroContainer } from '@/test/astro-container';
 
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
@@ -41,7 +43,22 @@ const readMarkdown = (path: string) => {
 };
 const migrated = ids.map((id) => {
   const entry = readMarkdown(`../../../data/events/${id}.md`);
-  return mapRawEvent({ id, data: RawEventSchema.parse(entry.data), body: entry.body });
+  const data = RawEventSchema.parse(entry.data);
+  const place = data.place ? readMarkdown(`../../../data/places/${data.place}.md`) : undefined;
+  const places =
+    place && data.place
+      ? new Map([
+          [
+            data.place,
+            mapRawPlace({
+              id: data.place,
+              data: RawPlaceSchema.parse(place.data),
+              body: place.body
+            })
+          ]
+        ])
+      : undefined;
+  return mapRawEvent({ id, data, body: entry.body }, undefined, places);
 });
 const newsFrontmatter = z.object({
   title: z.string(),
@@ -195,7 +212,7 @@ describe('shared events in news', () => {
   });
 
   it.each([undefined, '03.06.2026'])(
-    'renders rich date-only cards completely, through=%s',
+    'keeps date uncertainty and conditional status on the compact surface, through=%s',
     async (through) => {
       const record = newsEventRecord(
         {
@@ -216,18 +233,24 @@ describe('shared events in news', () => {
       const window = new Window();
       window.document.body.innerHTML = html;
       const document = window.document;
+      expect(document.querySelector('time')?.textContent.replace(/\s+/g, ' ').trim()).toBe(
+        '1 июня'
+      );
       expect(document.querySelector('strong')?.textContent).toBe('При наборе группы');
-      expect(document.querySelector('a[href="https://example.com/register"]')).toBeTruthy();
-      expect(document.body.textContent.replaceAll('\u00a0', ' ')).toContain('600 или 800');
+      expect(document.querySelector('h2 a')?.getAttribute('href')).toBe(record.url);
+      expect(document.querySelector('a[href="https://example.com/register"]')).toBeFalsy();
+      expect(document.body.textContent.replaceAll('\u00a0', ' ')).not.toContain('600 или 800');
       expect(document.body.textContent).toContain('Место уточняется');
       expect(document.body.textContent).not.toContain('00:00');
       expect(!!document.querySelector('[download]')).toBe(!!through);
-      expect(document.querySelector('a[href="https://example.com/source"]')).toBeTruthy();
+      expect(document.body.textContent.replaceAll('\u00a0', ' ')).toContain(
+        through ? '1 июня 2026 — 3 июня 2026' : 'Время уточняется'
+      );
       window.close();
     }
   );
 
-  it('retains the mapped and location-only visual fixture scenarios', async () => {
+  it('retains the mapped and unknown-place visual fixture scenarios', async () => {
     const container = await createAstroContainer();
     const window = new Window();
     try {
@@ -251,12 +274,12 @@ describe('shared events in news', () => {
         {
           "locationOnly": {
             "download": "/news/2026/06/entrance/event.ics",
-            "map": "https://yandex.ru/maps/?text=%D0%9A%D0%9F%20%D0%A8%D0%B5%D0%BB%D0%BA%D0%BE%D0%B2%D0%BE%2C%20%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D1%8B%D0%B9%20%D0%B2%D1%8A%D0%B5%D0%B7%D0%B4&z=16&l=map",
+            "map": undefined,
             "mapCount": 0,
           },
           "mapped": {
             "download": "/news/2026/05/reglament/event.ics",
-            "map": "https://yandex.ru/maps/?pt=38.654321,55.123456&z=16&l=map",
+            "map": "https://yandex.ru/maps/?pt=38.654321,55.123456&z=18&l=map",
             "mapCount": 1,
           },
         }

@@ -1,11 +1,17 @@
 ---
 interface Props {
   readonly embedUrl?: string;
+  readonly treatment?: 'detail' | 'compact';
 }
-const { embedUrl } = Astro.props;
+const { embedUrl, treatment = 'detail' } = Astro.props;
 ---
 
-<div class="map-card-shell">
+<div
+  class:list={[
+    'map-card-shell',
+    { 'map-card-shell--compact': treatment === 'compact' },
+  ]}
+>
   {
     embedUrl && (
       <div class="map-background" aria-hidden="true" inert>
@@ -18,7 +24,7 @@ const { embedUrl } = Astro.props;
           />
           <span class="ui-map-marker" />
         </div>
-        <div class="map-wash" />
+        {treatment === 'detail' && <div class="map-wash" />}
       </div>
     )
   }
@@ -92,5 +98,22 @@ const { embedUrl } = Astro.props;
   }
   .map-content {
     padding: 1rem;
+  }
+  .map-card-shell--compact {
+    box-shadow: 0 0.65rem 1.55rem var(--color-shadow);
+  }
+  .map-card-shell--compact .map-background {
+    opacity: 0.36;
+  }
+  .map-card-shell--compact .map-layer {
+    top: -66%;
+    right: auto;
+    bottom: -8%;
+    width: 150%;
+    height: 164%;
+  }
+  .map-card-shell--compact iframe {
+    opacity: 1;
+    transform: translateY(50px);
   }
 </style>

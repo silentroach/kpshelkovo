@@ -35,9 +35,21 @@ const { events } = Astro.props;
           </h2>
           <p class="ui-num">{formatDynamicHtml(formatEventRange(event))}</p>
           <p>
-            {formatDynamicHtml(
-              event.location ??
-                (event.coordinates ? 'Место на карте' : 'Место уточняется'),
+            {event.place ? (
+              <a
+                href={event.place.url}
+                set:html={formatDynamicHtml(event.place.name)}
+              />
+            ) : (
+              formatDynamicHtml(
+                event.location ??
+                  (event.coordinates ? 'Место на карте' : 'Место уточняется'),
+              )
+            )}
+            {event.locationDetails && (
+              <span
+                set:html={formatDynamicHtml(`, ${event.locationDetails}`)}
+              />
             )}
           </p>
           {event.price && (

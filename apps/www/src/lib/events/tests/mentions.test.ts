@@ -5,6 +5,7 @@ import {
   createSiteBacklinksFromGraph,
   createSiteMentionRegistry
 } from '@/lib/mentions';
+import { testPlace } from '@/lib/places/tests/place.test-helper';
 
 import { buildEventsDataset } from '../load';
 import { createEventMentionRefs } from '../mentions';
@@ -48,6 +49,16 @@ const dataset = (body: string) =>
   );
 
 describe('event mentions', () => {
+  it('links the referenced place once even when the body mentions it too', () => {
+    const event = dataset('Meeting at @venue.').events[0]!;
+    const refs = createEventMentionRefs({
+      ...event,
+      place: testPlace({ slug: 'venue', name: 'Venue' })
+    });
+    expect(refs).toHaveLength(1);
+    expect(refs[0]?.target).toEqual({ type: 'place', slug: 'venue' });
+    expect(refs[0]?.htmlUrl).toBe(event.url);
+  });
   it('resolves canonical, case and labelled mentions and links each target once to the event detail', () => {
     const data = dataset('@host, @host:gen and [the host](@host) at @venue.');
     const refs = data.events.flatMap(createEventMentionRefs);

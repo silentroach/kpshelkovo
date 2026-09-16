@@ -51,7 +51,7 @@ const articleWithEvent = (
   attachments: [],
   events: [
     {
-      ...newsEventRecord(),
+      ...newsEventRecord({ place: 'club' }, undefined, new Map([['club', testPlace()]])),
       slug: 'event',
       title: 'Встреча по регламенту',
       description: 'Описание календарного события.',

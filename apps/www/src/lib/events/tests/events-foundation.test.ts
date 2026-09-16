@@ -118,6 +118,9 @@ describe('event publication boundary', () => {
     { source_url: undefined },
     { source_url: 'mailto:someone@example.com' },
     { legacy_uid: 'old@example.com\r\nSTATUS:CANCELLED' },
+    { location_details: 'В беседке' },
+    { place: 'club', location: 'Другое название' },
+    { place: 'club', coordinates: { lat: 55, lng: 38 } },
     { coordinates: { lat: 91, lng: 0 } }
   ])('rejects invalid event facts: %j', (extra) => {
     expect(() => entry('invalid', '01.01.2026', extra)).toThrow();

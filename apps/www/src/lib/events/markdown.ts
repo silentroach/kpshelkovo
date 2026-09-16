@@ -106,6 +106,8 @@ export const buildEventMarkdown = (event: EventRecord, siteUrl: string): string 
       md.listItem(
         `Место: ${event.location ?? (event.coordinates ? 'указано на карте' : 'уточняется')}`
       ),
+      ...(event.place ? [linkRow(event.place.markdownUrl, event.place.name, siteUrl)] : []),
+      ...(event.locationDetails ? [md.listItem(`Точка встречи: ${event.locationDetails}`)] : []),
       ...(event.price ? [md.listItem(`Цена: ${event.price}`)] : []),
       ...(event.audience ? [md.listItem(`Участники: ${event.audience}`)] : []),
       ...(event.coordinates

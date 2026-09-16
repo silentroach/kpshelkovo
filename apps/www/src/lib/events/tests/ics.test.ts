@@ -95,7 +95,7 @@ describe('event ICS', () => {
     );
     expect(ics.split('\r\n').every((line) => Buffer.byteLength(line) <= 75)).toBe(true);
     expect(unfold(ics)).toContain(
-      `SUMMARY:${title.replaceAll('\\', '\\\\').replaceAll(',', '\\,').replaceAll(';', '\\;').replaceAll('\n', '\\n')}\r\n`
+      `SUMMARY:${title.replaceAll('\\\n', '\\ \n').replaceAll('\\', '\\\\').replaceAll(',', '\\,').replaceAll(';', '\\;').replaceAll('\n', '\\n')}\r\n`
     );
     expect(unfold(ics)).toContain('GEO:55;38\r\n');
     expect(unfold(ics)).toContain(

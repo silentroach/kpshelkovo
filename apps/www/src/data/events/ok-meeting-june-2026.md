@@ -5,10 +5,8 @@ category: meetings
 starts_at: 13.06.2026 16:00
 status: cancelled
 source_url: https://t.me/shelkovoecoclub/20423/46589
-location: ресторан Green Dreams, КП Гринвуд 2
-coordinates:
-  lat: 55.074958
-  lng: 37.755599
+place: green-dreams
+location_details: в беседке
 organizer:
   name: ОК Комфорт
   type: organization

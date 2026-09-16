@@ -1,5 +1,6 @@
 import type { PreprocessedSiteMarkdownBody } from '@/lib/markdown/render';
 import type { EntityMentionTarget } from '@/lib/mentions';
+import type { Place } from '@/lib/places/types';
 
 import type { RawEvent } from './raw-schema';
 
@@ -47,6 +48,8 @@ export interface EventRecord {
   readonly mentions: readonly EntityMentionTarget[];
   readonly price?: string;
   readonly audience?: string;
+  readonly place?: Place;
+  readonly locationDetails?: string;
   readonly location?: string;
   readonly coordinates?: EventCoordinates;
   readonly organizer?: EventParticipant;

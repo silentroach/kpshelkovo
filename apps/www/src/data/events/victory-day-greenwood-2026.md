@@ -5,10 +5,8 @@ category: celebrations
 starts_at: 09.05.2026 14:00
 ends_at: 09.05.2026 17:00
 source_url: https://okkomfort.domyland.app/news?targetId=111551&entityName=news&t=okkomfort
-location: КП Гринвуд, у фруктового сада
-coordinates:
-  lat: 55.077635
-  lng: 37.755967
+place: greenwood-orchard
+location_details: у фруктового сада
 organizer:
   name: ОК Комфорт
   type: organization

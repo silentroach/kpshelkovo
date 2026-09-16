@@ -26,6 +26,9 @@ const fields = {
   price: text.optional(),
   audience: text.optional(),
   location: text.optional(),
+  placeId: text.optional(),
+  placeUrl: url.optional(),
+  locationDetails: text.optional(),
   coordinates: z
     .strictObject({
       lat: z.number().min(-90).max(90),

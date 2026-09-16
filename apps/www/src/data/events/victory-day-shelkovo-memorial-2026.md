@@ -5,10 +5,7 @@ category: celebrations
 starts_at: 09.05.2026 15:00
 ends_at: 09.05.2026 16:00
 source_url: https://kpshelkovo.online/news/2026/05/victory-day-greenwood/
-location: д. Шелково, ул. Центральная, 46-48
-coordinates:
-  lat: 55.065050
-  lng: 37.720861
+place: shelkovo-memorial
 legacy_uid: news-event-2026-05-victory-day-greenwood-shelkovo-memorial@kpshelkovo.online
 ---
 

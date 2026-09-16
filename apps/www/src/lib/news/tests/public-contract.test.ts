@@ -1,5 +1,7 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
+import { testPlace } from '@/lib/places/tests/place.test-helper';
+
 import { newsArticleEntry, newsArchiveSummaryEntries } from '../load.test-helper';
 import type { NewsPublicPayload } from '../public-dto';
 import type { NewsDataset } from '../types';
@@ -92,12 +94,13 @@ const dataset = (full = true): NewsDataset => {
               title: 'Meeting',
               starts_at: '02.05.2026 19:00',
               ends_at: full ? '02.05.2026 21:00' : undefined,
-              location: full ? 'Club' : undefined,
-              coordinates: full ? { lat: 55, lng: 38 } : undefined,
+              place: full ? 'club' : undefined,
+              location_details: full ? 'В беседке' : undefined,
               organizer: full ? { name: 'Organizer', type: 'organization' } : undefined,
               performer: full ? [{ name: 'Performer', type: 'person' }] : undefined
             },
-            full ? 'Event description' : '```text\nОписание\n```'
+            full ? 'Event description' : '```text\nОписание\n```',
+            new Map([['club', testPlace({ name: 'Club' })]])
           )
         ]
       ])

@@ -78,6 +78,8 @@ export const RawEventSchema = z
     source_url: z.url({ protocol: /^https?$/ }),
     price: text.optional(),
     audience: text.optional(),
+    place: EventIdSchema.optional(),
+    location_details: text.optional(),
     location: text.optional(),
     coordinates: z
       .object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) })
@@ -88,6 +90,20 @@ export const RawEventSchema = z
   })
   .strict()
   .superRefine((data, ctx) => {
+    if (data.location_details && !data.place) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['location_details'],
+        message: 'location_details requires place'
+      });
+    }
+    if (data.place && (data.location || data.coordinates)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['place'],
+        message: 'place cannot accompany inline location or coordinates'
+      });
+    }
     if (data.ends_at && (!data.starts_at.hasTime || data.ends_at.at <= data.starts_at.at)) {
       ctx.addIssue({
         code: 'custom',

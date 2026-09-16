@@ -57,6 +57,9 @@ export interface NewsPublicEventOrganizer {
 }
 
 export interface NewsPublicEvent {
+  readonly place_id?: string;
+  readonly place_url?: string;
+  readonly location_details?: string;
   readonly slug: string;
   readonly title: string;
   readonly description?: string;
@@ -210,6 +213,9 @@ function toPublicEvent(item: NewsEvent): NewsPublicEvent | undefined {
     starts_at: item.startsIso,
     ends_at: item.endsIso,
     location: item.location,
+    place_id: item.place?.slug,
+    place_url: item.place?.canonical,
+    location_details: item.locationDetails,
     coordinates: item.coordinates,
     map_url: mapUrl ? discoveryUrl(mapUrl) : undefined,
     ics_url: fullUrl(item.icsUrl),

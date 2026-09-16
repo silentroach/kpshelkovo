@@ -2,6 +2,7 @@ import { Window } from 'happy-dom';
 /// <reference types="astro/client" />
 import { describe, expect, it } from 'vitest';
 
+import { newsEventRecord } from '@/lib/news/tests/event.test-helper';
 import type { NewsEvent } from '@/lib/news/types';
 import { testPlace } from '@/lib/places/tests/place.test-helper';
 import { createAstroContainer } from '@/test/astro-container';
@@ -10,6 +11,7 @@ import { createAstroContainer } from '@/test/astro-container';
 import NewsEventCard from '../NewsEventCard.astro';
 
 const event: NewsEvent = {
+  ...newsEventRecord({ title: 'Встреча', starts_at: '02.05.2026 12:00' }),
   slug: 'meeting',
   title: 'Встреча',
   startsAt: new Date('2026-05-02T09:00:00Z'),
@@ -19,14 +21,11 @@ const event: NewsEvent = {
 };
 
 describe('event place card', () => {
-  it.each(['wide', 'compact'])(
-    'links a hidden place and keeps its map in the %s variant',
-    async (variant) => {
+  it('links a hidden place and keeps its map in the compact card', async () => {
       const place = testPlace({ name: 'Green Dreams', mapUrl: 'https://yandex.ru/navi/meeting' });
       const container = await createAstroContainer();
       const html = await container.renderToString(NewsEventCard, {
         props: {
-          variant,
           event: { ...event, place, locationDetails: 'в беседке' }
         }
       });
@@ -36,22 +35,18 @@ describe('event place card', () => {
       expect(html).toContain(`href="${place.mapUrl}"`);
       expect(html).toContain(`href="${event.icsUrl}"`);
       expect(html).not.toContain('<iframe');
-      expect(html.includes('<map-preview')).toBe(variant === 'compact');
-    }
-  );
+      expect(html).toContain('<map-preview');
+  });
 
-  it.each(['wide', 'compact'])(
-    'keeps the calendar but omits location and map without a place: %s',
-    async (variant) => {
+  it('keeps the calendar but omits place links and map without a place', async () => {
       const container = await createAstroContainer();
-      const html = await container.renderToString(NewsEventCard, { props: { variant, event } });
+      const html = await container.renderToString(NewsEventCard, { props: { event } });
       expect(html).toContain(`href="${event.icsUrl}"`);
       expect(html).not.toContain('href="/map/');
       expect(html).not.toContain('https://yandex.ru');
       expect(html).not.toContain('<iframe');
       expect(html).not.toContain('<map-preview');
-    }
-  );
+  });
 
   it('sends only the canonical event point, without place icon, areas or live hours', async () => {
     const place = testPlace({
@@ -76,7 +71,7 @@ describe('event place card', () => {
     });
     const container = await createAstroContainer();
     const html = await container.renderToString(NewsEventCard, {
-      props: { variant: 'compact', event: { ...event, place } }
+      props: { event: { ...event, place } }
     });
     const window = new Window();
     try {
@@ -103,7 +98,7 @@ describe('event place card', () => {
       const fallback = preview?.querySelector('[data-fallback]');
       expect(fallback?.getAttribute('href')).toBe(place.mapUrl);
       expect(fallback?.hasAttribute('hidden')).toBe(false);
-      const actions = window.document.querySelector('.news-event-compact-actions');
+      const actions = window.document.querySelector('.news-event-actions');
       expect([...actions!.querySelectorAll('a')].map((link) => link.getAttribute('href'))).toEqual([
         event.icsUrl
       ]);

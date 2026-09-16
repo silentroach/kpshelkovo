@@ -5,10 +5,7 @@ category: celebrations
 starts_at: 09.05.2026 13:00
 ends_at: 09.05.2026 14:00
 source_url: https://kpshelkovo.online/news/2026/05/victory-day-greenwood/
-location: КПП Гринвуд 2
-coordinates:
-  lat: 55.074958
-  lng: 37.755599
+place: greenwood-2-kpp
 legacy_uid: news-event-2026-05-victory-day-greenwood-shelkovo@kpshelkovo.online
 ---
 

@@ -3,8 +3,7 @@ import { CalendarPlusIcon, MapPinIcon } from '@shelkovo/ui/icons';
 import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 import { formatDynamicHtml } from '@shelkovo/markdown';
 import MapCardShell from '@/components/MapCardShell.astro';
-import { renderMarkdown } from '@/lib/markdown/render';
-import { EVENT_CATEGORY_LABELS, EVENT_STATUS_LABELS } from '@/lib/events/view';
+import { EVENT_STATUS_LABELS } from '@/lib/events/view';
 import type { NewsEvent } from '@/lib/news/types';
 import {
   buildNewsEventMapEmbedUrl,
@@ -32,16 +31,18 @@ const titleId = `news-event-title-${event.slug}`;
 ---
 
 <aside aria-labelledby={titleId} data-pagefind-body>
-  <MapCardShell embedUrl={buildNewsEventMapEmbedUrl(event)}>
+  <MapCardShell
+    treatment="compact"
+    embedUrl={buildNewsEventMapEmbedUrl(event, { centerOffsetYPx: 50 })}
+  >
     <div class="news-event-content">
       <time class="news-event-date" datetime={event.startsIso}>
-        <span class="news-event-day">{eventDay}</span>
+        <span class="news-event-day">{eventDay}</span>{' '}
         <span class="news-event-month">{eventMonth}</span>
       </time>
       <h2 id={titleId} class="news-event-title">
         <a href={event.url} set:html={formatDynamicHtml(event.title)} />
       </h2>
-      <p>{EVENT_CATEGORY_LABELS[event.category]}</p>
       <ul class="news-event-meta">
         <li>
           <svg
@@ -58,12 +59,34 @@ const titleId = `news-event-title-${event.slug}`;
           <span>{formatDynamicHtml(eventRange)}</span>
         </li>
         <li>
-          <MapPinIcon class="news-event-icon" /><span
-            set:html={formatDynamicHtml(
-              event.location ??
-                (event.coordinates ? 'Место на карте' : 'Место уточняется'),
-            )}
-          />
+          <MapPinIcon class="news-event-icon" />
+          <span>
+            {
+              event.place ? (
+                <a
+                  href={event.place.url}
+                  class="site-text-link"
+                  set:html={formatDynamicHtml(event.place.name)}
+                />
+              ) : (
+                <span
+                  set:html={formatDynamicHtml(
+                    event.location ??
+                      (event.coordinates
+                        ? 'Место на карте'
+                        : 'Место уточняется'),
+                  )}
+                />
+              )
+            }
+            {
+              event.locationDetails && (
+                <span
+                  set:html={formatDynamicHtml(`, ${event.locationDetails}`)}
+                />
+              )
+            }
+          </span>
         </li>
       </ul>
       {
@@ -75,26 +98,6 @@ const titleId = `news-event-title-${event.slug}`;
           </p>
         )
       }
-      {
-        event.price && (
-          <p>
-            Стоимость: <span set:html={formatDynamicHtml(event.price)} />
-          </p>
-        )
-      }
-      {
-        event.audience && (
-          <p>
-            Участники: <span set:html={formatDynamicHtml(event.audience)} />
-          </p>
-        )
-      }
-      <div class="ui-prose" set:html={renderMarkdown(event.body)} />
-      <p class="news-event-links">
-        <a href={event.sourceUrl}>Источник</a> · <a href={event.url}
-          >Подробнее</a
-        >
-      </p>
       <div class="news-event-actions" data-pagefind-ignore>
         {
           event.icsUrl && event.status !== 'cancelled' && (
@@ -105,7 +108,7 @@ const titleId = `news-event-title-${event.slug}`;
               aria-label="Добавить в календарь"
               title="Добавить в календарь"
             >
-              <CalendarPlusIcon class="news-event-icon" />
+              <CalendarPlusIcon class="news-event-icon news-event-icon--calendar" />
             </ResourceLink>
           )
         }
@@ -119,7 +122,20 @@ const titleId = `news-event-title-${event.slug}`;
               aria-label="Открыть на Яндекс Картах"
               title="Открыть на Яндекс Картах"
             >
-              <MapPinIcon class="news-event-icon" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                class="news-event-icon"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M19 10.2c0 5.1-7 10.05-7 10.05s-7-4.95-7-10.05a7 7 0 1 1 14 0Z" />
+                <circle cx="12" cy="10.2" r="2.35" />
+              </svg>
             </a>
           )
         }
@@ -191,11 +207,6 @@ const titleId = `news-event-title-${event.slug}`;
     font-weight: 600;
     line-height: 1.35;
   }
-  .news-event-links a {
-    color: var(--color-primary);
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
-  }
   [data-status='cancelled'] {
     color: var(--color-danger-text);
   }
@@ -216,9 +227,17 @@ const titleId = `news-event-title-${event.slug}`;
     height: 2.45rem;
     border: 1px solid var(--color-border-strong);
     border-radius: 0.62rem;
-    background: var(--color-surface-raised);
+    background: color-mix(
+      in oklab,
+      var(--color-surface-raised) 82%,
+      transparent
+    );
     color: var(--color-text);
     text-decoration: none;
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease,
+      color 0.2s ease;
   }
   .news-event-actions :global(.news-event-action--calendar) {
     border-color: color-mix(
@@ -241,5 +260,8 @@ const titleId = `news-event-title-${event.slug}`;
     width: 1.05rem;
     height: 1.05rem;
     flex: none;
+  }
+  aside :global(.news-event-icon--calendar) {
+    transform: translateY(-0.04rem);
   }
 </style>

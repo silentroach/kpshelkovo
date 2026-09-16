@@ -71,5 +71,13 @@ export const formatNewsEventRange = (
   return `${formatNewsDateTime(event.startsIso, event.startsTime)} - ${formatNewsDateTime(event.endsIso, event.endsTime)}`;
 };
 
-export const buildNewsEventMapUrl = (event: Pick<NewsEvent, 'place'>): string | undefined =>
-  event.place?.mapUrl;
+export const buildNewsEventMapUrl = (
+  event: Pick<NewsEvent, 'place' | 'coordinates' | 'location'>
+): string | undefined => {
+  if (event.place) return event.place.mapUrl;
+  if (event.coordinates)
+    return `https://yandex.ru/maps/?pt=${event.coordinates.lng},${event.coordinates.lat}&z=16&l=map`;
+  if (event.location)
+    return `https://yandex.ru/maps/?text=${encodeURIComponent(event.location)}&z=16&l=map`;
+  return;
+};
