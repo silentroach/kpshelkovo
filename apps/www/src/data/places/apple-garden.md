@@ -3,6 +3,7 @@ title: Яблоневый сад
 category: nature
 marker: apple
 status: existing
+show_on_map: true
 summary: Сад рядом со спортивной площадкой в Шелково Вилладж
 location:
   coordinates:

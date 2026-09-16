@@ -118,9 +118,13 @@ const schema = {
       }
 
       <nav aria-label="Действия с местом" class="place-actions">
-        <a href={placeHighlightUrl(place.slug)} class="site-text-link"
-          >Показать на общей карте</a
-        >
+        {
+          place.showOnMap && (
+            <a href={placeHighlightUrl(place.slug)} class="site-text-link">
+              Показать на общей карте
+            </a>
+          )
+        }
         <a href={place.mapUrl} class="site-text-link">Открыть в Яндекс Картах</a
         >
         {

@@ -173,7 +173,7 @@ describe('PlaceMap', () => {
     document.documentElement.style.removeProperty('--color-water');
   });
 
-  it('renders the place as an accessible detail link and fits the settlement', async () => {
+  it('renders the place as an accessible detail link and fits its coordinates', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: false }));
 
     render(PlaceMap, { props: { places: [place] } });
@@ -208,8 +208,8 @@ describe('PlaceMap', () => {
       mode: 'vector',
       location: {
         bounds: [
-          [37.708, 55.049],
-          [37.764, 55.081]
+          [37.715242, 55.059526],
+          [37.717242, 55.061526]
         ]
       }
     });
@@ -677,22 +677,24 @@ describe('PlaceMap', () => {
     );
   });
 
-  it('removes an unknown highlight slug without changing the map view', async () => {
-    vi.stubGlobal('matchMedia', () => ({ matches: false }));
-    const historyState = { navigation: 'map' };
-    window.history.replaceState(historyState, '', '/map/?h=titanik&from=issue');
-    const replaceState = vi.spyOn(window.history, 'replaceState');
+  it.each(['titanik', 'green-dreams'])(
+    'removes unpublished highlight %s without changing the map view',
+    async (slug) => {
+      vi.stubGlobal('matchMedia', () => ({ matches: false }));
+      const historyState = { navigation: 'map' };
+      window.history.replaceState(historyState, '', `/map/?h=${slug}&from=issue#map`);
+      const replaceState = vi.spyOn(window.history, 'replaceState');
 
-    render(PlaceMap, { props: { places: [place, titanicPlace] } });
+      render(PlaceMap, { props: { places: [place, titanicPlace] } });
 
-    await waitFor(() => expect(markerElements).toHaveLength(2));
+      await waitFor(() => expect(markerElements).toHaveLength(2));
 
-    expect({
-      focused: map.update.mock.calls.some(([update]) => Boolean(update.location?.center)),
-      highlights: markerElements.map((marker) => marker.dataset.highlighted),
-      replaceState: replaceState.mock.lastCall,
-      url: `${window.location.pathname}${window.location.search}${window.location.hash}`
-    }).toMatchInlineSnapshot(`
+      expect({
+        focused: map.update.mock.calls.some(([update]) => Boolean(update.location?.center)),
+        highlights: markerElements.map((marker) => marker.dataset.highlighted),
+        replaceState: replaceState.mock.lastCall,
+        url: `${window.location.pathname}${window.location.search}${window.location.hash}`
+      }).toMatchInlineSnapshot(`
       {
         "focused": false,
         "highlights": [
@@ -704,12 +706,13 @@ describe('PlaceMap', () => {
             "navigation": "map",
           },
           "",
-          "/map/?from=issue",
+          "/map/?from=issue#map",
         ],
-        "url": "/map/?from=issue",
+        "url": "/map/?from=issue#map",
       }
     `);
-  });
+    }
+  );
 
   it('cancels the place highlight timer when the map unmounts', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: false }));

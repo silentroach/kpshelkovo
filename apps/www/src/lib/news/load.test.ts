@@ -1,5 +1,7 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
+import { testPlace } from '@/lib/places/tests/place.test-helper';
+
 import { createPersonMentionTarget } from '../people/mentions';
 import type { NewsArticleEntry } from './load';
 import {
@@ -483,15 +485,12 @@ describe('buildNewsDataset', () => {
               description: 'Описание календарного события.',
               starts_at: '31.05.2026 19:00',
               ends_at: '31.05.2026 21:00',
-              location: 'КП Шелково, эко-клуб',
-              coordinates: {
-                lat: 55,
-                lng: 38
-              }
+              place: 'club'
             }
           ]
         })
-      ]
+      ],
+      { places: new Map([['club', testPlace()]]) }
     );
 
     expect(data.articles[0]?.events[0]).toMatchObject({
@@ -503,11 +502,7 @@ describe('buildNewsDataset', () => {
       endsIso: '2026-05-31T21:00:00+03:00',
       endsTime: '21:00',
       icsUrl: '/news/2026/05/event/event.ics',
-      location: 'КП Шелково, эко-клуб',
-      coordinates: {
-        lat: 55,
-        lng: 38
-      }
+      place: testPlace()
     });
     expect(data.articles[0]?.events[0]?.startsAt).toBeInstanceOf(Date);
     expect(data.articles[0]?.events[0]?.endsAt).toBeInstanceOf(Date);

@@ -61,6 +61,27 @@ const entry = (overrides?: Partial<PlaceEntry>): PlaceEntry => ({
 });
 
 describe('buildPlacesDataset', () => {
+  it('keeps different slugs with identical coordinates, regardless of map visibility', () => {
+    const data = buildPlacesDataset([
+      entry({ id: 'restaurant', data: rawPlace({ contact: undefined, show_on_map: true }) }),
+      entry({ id: 'checkpoint', data: rawPlace({ contact: undefined }) })
+    ]);
+    expect(data.places.map(({ slug, showOnMap }) => ({ slug, showOnMap }))).toMatchInlineSnapshot(`
+      [
+        {
+          "showOnMap": false,
+          "slug": "checkpoint",
+        },
+        {
+          "showOnMap": true,
+          "slug": "restaurant",
+        },
+      ]
+    `);
+    expect(data.bySlug.get('checkpoint')?.coordinates).toEqual(
+      data.bySlug.get('restaurant')?.coordinates
+    );
+  });
   it('maps a Markdown entry and resolves its optional contact', () => {
     const data = buildPlacesDataset([entry()], {
       contactUrls: new Map([['food/burzhuyka', '/sarafan/food/burzhuyka/']])
@@ -110,6 +131,7 @@ describe('buildPlacesDataset', () => {
         "searchAliases": [
           "где поесть в Форесте",
         ],
+        "showOnMap": false,
         "slug": "burzhuyka",
         "status": "existing",
         "summary": "Фудтрак в Шелково Форест",

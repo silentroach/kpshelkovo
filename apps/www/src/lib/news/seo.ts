@@ -28,15 +28,7 @@ interface ArticleInput extends BasePageInput {
 
 export interface NewsArticleEventInput extends Pick<
   NewsEvent,
-  | 'slug'
-  | 'title'
-  | 'description'
-  | 'startsIso'
-  | 'endsIso'
-  | 'location'
-  | 'coordinates'
-  | 'organizer'
-  | 'performer'
+  'slug' | 'title' | 'description' | 'startsIso' | 'endsIso' | 'place' | 'organizer' | 'performer'
 > {}
 
 export interface NewsArticleInput extends Omit<ArticleInput, 'type'> {
@@ -84,27 +76,21 @@ const articleSchema = (input: ArticleInput): readonly SchemaDoc[] => {
 };
 
 const eventLocationSchema = (event: NewsArticleEventInput): SchemaDoc | undefined => {
-  if (!event.location && !event.coordinates) {
-    return undefined;
+  const place = event.place;
+  if (!place) {
+    return;
   }
 
   return {
     '@type': 'Place',
-    ...(event.location
-      ? {
-          name: event.location,
-          address: event.location
-        }
-      : {}),
-    ...(event.coordinates
-      ? {
-          geo: {
-            '@type': 'GeoCoordinates',
-            latitude: event.coordinates.lat,
-            longitude: event.coordinates.lng
-          }
-        }
-      : {})
+    name: place.name,
+    url: place.canonical,
+    address: place.address,
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: place.coordinates.lat,
+      longitude: place.coordinates.lng
+    }
   };
 };
 

@@ -10,10 +10,10 @@
 
 Действующие решения:
 
-- [ADR-028](../../../docs/decisions/028-markdown-first-places-map.md): Markdown-first places, карточки `/map/<slug>/`, координаты и поведение `?h=`. При реализации нужно уточнить независимость места от карты и сценарии начального viewport.
-- [ADR-013](../../../docs/decisions/013-raw-domain-public-data-boundary.md): границы raw, domain и public DTO.
-- [ADR-012](../../../docs/decisions/012-entity-mention-graph.md): реестр сущностей и граф source refs. Структурная ссылка события добавляет источник связи, но не расширяет Markdown-синтаксис на произвольный frontmatter.
-- [ADR-011](../../../docs/decisions/011-public-surface-registry.md) и [ADR-025](../../../docs/decisions/025-static-full-text-search-with-pagefind.md): публикация карточки и поиск не зависят от видимости маркера.
+- [ADR-028](../../../../docs/decisions/028-markdown-first-places-map.md): Markdown-first places, карточки `/map/<slug>/`, координаты и поведение `?h=`. При реализации нужно уточнить независимость места от карты и сценарии начального viewport.
+- [ADR-013](../../../../docs/decisions/013-raw-domain-public-data-boundary.md): границы raw, domain и public DTO.
+- [ADR-012](../../../../docs/decisions/012-entity-mention-graph.md): реестр сущностей и граф source refs. Структурная ссылка события добавляет источник связи, но не расширяет Markdown-синтаксис на произвольный frontmatter.
+- [ADR-011](../../../../docs/decisions/011-public-surface-registry.md) и [ADR-025](../../../../docs/decisions/025-static-full-text-search-with-pagefind.md): публикация карточки и поиск не зависят от видимости маркера.
 
 ## Goals / Non-Goals
 

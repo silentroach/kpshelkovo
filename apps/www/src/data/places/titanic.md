@@ -3,6 +3,7 @@ title: Детская площадка «Титаник»
 category: children
 marker: titanic
 status: existing
+show_on_map: true
 summary: Детская площадка на песке с большим кораблём недалеко от дамбы
 location:
   coordinates:

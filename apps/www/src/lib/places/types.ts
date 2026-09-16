@@ -74,6 +74,7 @@ export type PlaceMentionRef = SiteMentionRef;
 export type PlaceBacklinks = SiteBacklinks;
 
 export interface Place {
+  readonly showOnMap: boolean;
   readonly slug: string;
   readonly name: string;
   readonly nameCases?: PlaceNameCaseForms;

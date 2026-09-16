@@ -1,17 +1,6 @@
 import { z } from 'astro/zod';
 
-import { PLACE_MAP_BOUNDS } from './schema';
-
-const position = z
-  .tuple([z.number().finite(), z.number().finite()])
-  .refine(
-    ([lng, lat]) =>
-      lng >= PLACE_MAP_BOUNDS.minLng &&
-      lng <= PLACE_MAP_BOUNDS.maxLng &&
-      lat >= PLACE_MAP_BOUNDS.minLat &&
-      lat <= PLACE_MAP_BOUNDS.maxLat,
-    { message: 'coordinates must be inside the supported Шелково map bounds' }
-  );
+const position = z.tuple([z.number().min(-180).max(180), z.number().min(-90).max(90)]);
 
 const polygonRing = z
   .array(position)

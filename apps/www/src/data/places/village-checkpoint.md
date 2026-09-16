@@ -3,6 +3,7 @@ title: КПП Вилладжа
 category: entrance
 marker: kpp
 status: existing
+show_on_map: true
 summary: Контрольно-пропускной пункт Шелково Вилладж
 location:
   coordinates:

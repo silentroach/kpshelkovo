@@ -1,5 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
+import { testPlace } from '@/lib/places/tests/place.test-helper';
+
 import type { NewsArticle, NewsEvent } from './types';
 
 let articleEventIcsUrl: typeof import('./routes').articleEventIcsUrl;
@@ -22,8 +24,8 @@ const event = (input?: {
   readonly slug?: string;
   readonly title?: string;
   readonly description?: string;
-  readonly location?: string;
-  readonly coordinates?: NewsEvent['coordinates'];
+  readonly place?: NewsEvent['place'];
+  readonly locationDetails?: string;
   readonly ends?: boolean;
 }): NewsEvent => ({
   slug: input?.slug ?? 'event',
@@ -40,8 +42,8 @@ const event = (input?: {
         endsIso: '2026-05-31T21:00:00+03:00',
         endsTime: '21:00'
       }),
-  location: input?.location,
-  coordinates: input?.coordinates
+  place: input?.place,
+  locationDetails: input?.locationDetails
 });
 
 const article = (input?: {
@@ -211,11 +213,7 @@ describe('buildArticleEventIcs', () => {
 
   it('includes article identity, location, geo, and URL', () => {
     const item = event({
-      location: 'КП Шелково, эко-клуб',
-      coordinates: {
-        lat: 55,
-        lng: 38
-      }
+      place: testPlace()
     });
     const ics = buildArticleEventIcs(
       article({

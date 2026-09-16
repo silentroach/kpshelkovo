@@ -26,7 +26,7 @@ const copyGeometryRing = (ring: readonly PlaceGeometryPosition[]): LngLat[] =>
   ring.map(([lng, lat]) => [lng, lat]);
 
 export const getPaddedBounds = (coordinates: readonly LngLat[]): LngLatBounds => {
-  if (coordinates.length < 2) return SETTLEMENT_BOUNDS;
+  if (coordinates.length === 0) return SETTLEMENT_BOUNDS;
 
   const longitudes = coordinates.map(([lng]) => lng);
   const latitudes = coordinates.map(([, lat]) => lat);
@@ -34,12 +34,18 @@ export const getPaddedBounds = (coordinates: readonly LngLat[]): LngLatBounds =>
   const maxLng = Math.max(...longitudes);
   const minLat = Math.min(...latitudes);
   const maxLat = Math.max(...latitudes);
-  const lngPadding = (maxLng - minLng) * BOUNDS_PADDING_RATIO;
-  const latPadding = (maxLat - minLat) * BOUNDS_PADDING_RATIO;
+  const lngPadding = (maxLng - minLng) * BOUNDS_PADDING_RATIO || 0.001;
+  const latPadding = (maxLat - minLat) * BOUNDS_PADDING_RATIO || 0.001;
 
   return [
-    [roundCoordinate(minLng - lngPadding), roundCoordinate(minLat - latPadding)],
-    [roundCoordinate(maxLng + lngPadding), roundCoordinate(maxLat + latPadding)]
+    [
+      roundCoordinate(Math.max(-180, minLng - lngPadding)),
+      roundCoordinate(Math.max(-90, minLat - latPadding))
+    ],
+    [
+      roundCoordinate(Math.min(180, maxLng + lngPadding)),
+      roundCoordinate(Math.min(90, maxLat + latPadding))
+    ]
   ];
 };
 

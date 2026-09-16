@@ -4,6 +4,7 @@ import type {
   PlaceMapPublicOpeningHoursDto,
   PlaceMapPublicPayloadDto
 } from './map-public-dto';
+import { selectMapPlaces } from './map-selection';
 import type { Place, PlaceGeometry, PlaceOpeningHours } from './types';
 
 const toPublicGeometry = (value: PlaceGeometry): PlaceMapPublicGeometryDto => ({
@@ -37,5 +38,5 @@ const toPublicPlace = (place: Place): PlaceMapPublicItemDto => ({
 });
 
 export const buildPlaceMapPublicPayload = (places: readonly Place[]): PlaceMapPublicPayloadDto => ({
-  places: places.map(toPublicPlace)
+  places: selectMapPlaces(places).map(toPublicPlace)
 });

@@ -86,23 +86,20 @@ const RawNewsEventSchema = z
     description: visibleText('events[].description').optional(),
     starts_at: contentDateTimeSchema('events[].starts_at'),
     ends_at: contentDateTimeSchema('events[].ends_at').optional(),
-    location: visibleText('events[].location').optional(),
-    coordinates: z
-      .object({
-        lat: z
-          .number()
-          .min(-90, 'events[].coordinates.lat must be between -90 and 90')
-          .max(90, 'events[].coordinates.lat must be between -90 and 90'),
-        lng: z
-          .number()
-          .min(-180, 'events[].coordinates.lng must be between -180 and 180')
-          .max(180, 'events[].coordinates.lng must be between -180 and 180')
-      })
-      .optional(),
+    place: text.regex(SLUG, 'events[].place must be a place slug').optional(),
+    location_details: visibleText('events[].location_details').optional(),
     organizer: eventParticipant('events[].organizer').optional(),
     performer: z.array(eventParticipant('events[].performer[]')).min(1).optional()
   })
+  .strict()
   .superRefine((data, ctx) => {
+    if (data.location_details && !data.place) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['location_details'],
+        message: 'events[].location_details requires place'
+      });
+    }
     const starts = data.starts_at;
     const ends = data.ends_at;
 

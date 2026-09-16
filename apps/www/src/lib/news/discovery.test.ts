@@ -20,6 +20,7 @@ let openapi: typeof import('./discovery').openapi;
 let schema: typeof import('./discovery').schema;
 let self: typeof import('./discovery').self;
 let surfaceHref: typeof surfaceHrefType;
+let testPlace: typeof import('@/lib/places/tests/place.test-helper').testPlace;
 
 const articleWithEvent = (
   authorKind: NewsArticle['author']['kind'] = 'editorial'
@@ -59,11 +60,8 @@ const articleWithEvent = (
       endsIso: '2026-05-31T21:00:00.000+03:00',
       endsTime: '21:00',
       icsUrl: '/news/2026/05/event/event.ics',
-      location: 'КП Шелково, эко-клуб',
-      coordinates: {
-        lat: 55,
-        lng: 38
-      },
+      place: testPlace(),
+      locationDetails: 'В беседке',
       organizer: {
         name: 'Редакция',
         type: 'organization'
@@ -102,6 +100,7 @@ beforeAll(async () => {
     SITE: 'https://example.com',
     BASE_URL: '/'
   });
+  ({ testPlace } = await import('@/lib/places/tests/place.test-helper'));
 
   ({ buildNewsPayload, catalog, links, openapi, schema, self } = await import('./discovery'));
   ({ expectSectionCatalogMatchesRegistry } =
@@ -226,11 +225,14 @@ describe('news discovery payload', () => {
         starts_at: '2026-05-31T19:00:00.000+03:00',
         ends_at: '2026-05-31T21:00:00.000+03:00',
         location: 'КП Шелково, эко-клуб',
+        place_id: 'club',
+        place_url: testPlace().canonical,
+        location_details: 'В беседке',
         coordinates: {
           lat: 55,
           lng: 38
         },
-        map_url: 'https://yandex.ru/maps/?pt=38,55&z=16&l=map',
+        map_url: 'https://yandex.ru/maps/?pt=38,55&z=18&l=map',
         ics_url: 'https://example.com/news/2026/05/event/event.ics',
         organizer: {
           name: 'Редакция',

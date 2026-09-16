@@ -5,7 +5,6 @@ import { RawSearchAliasesSchema } from '@/lib/search/raw-schema';
 
 import {
   PLACE_CATEGORIES,
-  PLACE_MAP_BOUNDS,
   PLACE_MARKERS,
   PLACE_STATUSES,
   PLACE_TIME,
@@ -73,15 +72,7 @@ const coordinates = z
     lat: z.number().min(-90).max(90),
     lng: z.number().min(-180).max(180)
   })
-  .strict()
-  .refine(
-    ({ lat, lng }) =>
-      lat >= PLACE_MAP_BOUNDS.minLat &&
-      lat <= PLACE_MAP_BOUNDS.maxLat &&
-      lng >= PLACE_MAP_BOUNDS.minLng &&
-      lng <= PLACE_MAP_BOUNDS.maxLng,
-    { message: 'coordinates must be inside the supported Шелково map bounds' }
-  );
+  .strict();
 
 const location = z
   .object({
@@ -121,6 +112,7 @@ export const RawPlaceSchema = z
     category: z.enum(PLACE_CATEGORIES),
     marker: z.enum(PLACE_MARKERS).optional(),
     status: z.enum(PLACE_STATUSES),
+    show_on_map: z.boolean().optional(),
     summary: nonBlankText,
     search_aliases: RawSearchAliasesSchema.optional(),
     location,

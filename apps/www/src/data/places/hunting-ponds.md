@@ -3,6 +3,7 @@ title: Охотничьи пруды
 category: water
 marker: fish
 status: existing
+show_on_map: true
 summary: Каскад озёр для рыбалки рядом с Шелково
 search_aliases:
   - рыболовные пруды

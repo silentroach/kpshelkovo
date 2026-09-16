@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { mapRawPlace } from '../mapper';
 import { RawPlaceSchema } from '../raw-schema';
 
 const place = {
@@ -31,6 +32,34 @@ const place = {
 } as const;
 
 describe('RawPlaceSchema', () => {
+  it.each([true, false, undefined])(
+    'normalizes visibility %s without a local coordinate restriction',
+    (showOnMap) => {
+      const data = RawPlaceSchema.parse({
+        ...place,
+        show_on_map: showOnMap,
+        location: { coordinates: { lat: 48.85, lng: 2.35 } }
+      });
+      expect(mapRawPlace({ id: 'remote', body: '', data }).showOnMap).toBe(showOnMap === true);
+    }
+  );
+
+  it.each([
+    { lat: -90, lng: -180 },
+    { lat: 90, lng: 180 }
+  ])('accepts world coordinate boundaries %j', (coordinates) => {
+    expect(RawPlaceSchema.safeParse({ ...place, location: { coordinates } }).success).toBe(true);
+  });
+
+  it.each([
+    undefined,
+    { lat: 91, lng: 0 },
+    { lat: 0, lng: -181 },
+    { lat: Number.NaN, lng: 0 },
+    { lat: '55', lng: 38 }
+  ])('rejects invalid coordinates %j', (coordinates) => {
+    expect(RawPlaceSchema.safeParse({ ...place, location: { coordinates } }).success).toBe(false);
+  });
   it('accepts a dedicated map place with a contact link', () => {
     expect(RawPlaceSchema.parse(place)).toMatchInlineSnapshot(`
       {

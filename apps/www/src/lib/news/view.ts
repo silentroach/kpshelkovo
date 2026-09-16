@@ -94,40 +94,26 @@ export const formatNewsEventRange = (
   return `${formatNewsDateTime(event.startsIso, event.startsTime)} - ${formatNewsDateTime(event.endsIso, event.endsTime)}`;
 };
 
-export const buildNewsEventMapUrl = (
-  event: Pick<NewsEvent, 'coordinates' | 'location'>
-): string | undefined => {
-  if (event.coordinates) {
-    const point = `${event.coordinates.lng},${event.coordinates.lat}`;
-
-    return `https://yandex.ru/maps/?pt=${point}&z=16&l=map`;
-  }
-
-  if (event.location) {
-    const query = encodeURIComponent(event.location);
-
-    return `https://yandex.ru/maps/?text=${query}&z=16&l=map`;
-  }
-
-  return undefined;
-};
+export const buildNewsEventMapUrl = (event: Pick<NewsEvent, 'place'>): string | undefined =>
+  event.place?.mapUrl;
 
 export const buildNewsEventMapEmbedUrl = (
-  event: Pick<NewsEvent, 'coordinates'>,
+  event: Pick<NewsEvent, 'place'>,
   opts?: {
     readonly centerOffsetYPx?: number;
   }
 ): string | undefined => {
-  if (!event.coordinates) {
-    return undefined;
+  const coordinates = event.place?.coordinates;
+  if (!coordinates) {
+    return;
   }
 
   const centerOffsetYPx = opts?.centerOffsetYPx;
   const lat =
     centerOffsetYPx !== undefined
-      ? shiftMapLatByPixels(event.coordinates.lat, centerOffsetYPx, MAP_WIDGET_ZOOM)
-      : event.coordinates.lat;
-  const point = `${event.coordinates.lng},${lat}`;
+      ? shiftMapLatByPixels(coordinates.lat, centerOffsetYPx, MAP_WIDGET_ZOOM)
+      : coordinates.lat;
+  const point = `${coordinates.lng},${lat}`;
   const params = new URLSearchParams({
     ll: point,
     z: String(MAP_WIDGET_ZOOM),

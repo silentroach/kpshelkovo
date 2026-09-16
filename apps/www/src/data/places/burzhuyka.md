@@ -3,6 +3,7 @@ title: Буржуйка
 category: food
 marker: foodtruck
 status: existing
+show_on_map: true
 summary: Фудтрак в Шелково Форест. Можно поесть на месте или заказать доставку
 # Связано с src/data/contacts/food/burzhuyka.md.
 # Если меняются общие сведения, адрес, ссылка на карту или координаты, обновите оба файла.

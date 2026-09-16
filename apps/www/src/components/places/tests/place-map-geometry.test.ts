@@ -19,8 +19,26 @@ const place = (slug: string, lng: number, lat: number): PlaceMapItem => ({
 });
 
 describe('place map geometry', () => {
-  it('uses settlement bounds until multiple places define a useful extent', () => {
-    expect(getPlaceBounds([place('burzhuyka', 37.716242, 55.060526)])).toMatchInlineSnapshot(`
+  it('frames a single remote place and includes it in a mixed extent', () => {
+    const remote = place('remote', 2.35, 48.85);
+    expect(getPlaceBounds([remote])).toMatchInlineSnapshot(`
+      [
+        [
+          2.349,
+          48.849,
+        ],
+        [
+          2.351,
+          48.851,
+        ],
+      ]
+    `);
+    const bounds = getPlaceBounds([remote, place('local', 37.72, 55.06)]);
+    expect(bounds[0][0]).toBeLessThan(2.35);
+    expect(bounds[1][0]).toBeGreaterThan(37.72);
+  });
+  it('uses settlement bounds only for an empty map', () => {
+    expect(getPlaceBounds([])).toMatchInlineSnapshot(`
         [
           [
             37.708,
