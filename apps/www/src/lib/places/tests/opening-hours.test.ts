@@ -33,22 +33,22 @@ describe('place opening hours', () => {
       [
         {
           "closed": false,
-          "days": "Пн",
+          "days": "пн",
           "hours": "10:00–19:00",
         },
         {
           "closed": true,
-          "days": "Вт",
+          "days": "вт",
           "hours": "выходной",
         },
         {
           "closed": false,
-          "days": "Ср–пт",
+          "days": "ср–пт",
           "hours": "10:00–19:00",
         },
         {
           "closed": false,
-          "days": "Сб–вс",
+          "days": "сб–вс",
           "hours": "10:00–20:00",
         },
       ]
@@ -67,17 +67,17 @@ describe('place opening hours', () => {
       [
         {
           "closed": false,
-          "days": "Пн–чт",
+          "days": "пн–чт",
           "hours": "09:00–22:00",
         },
         {
           "closed": false,
-          "days": "Пт–сб",
+          "days": "пт–сб",
           "hours": "09:00–23:00",
         },
         {
           "closed": false,
-          "days": "Вс",
+          "days": "вс",
           "hours": "09:00–22:00",
         },
       ]
@@ -97,12 +97,12 @@ describe('place opening hours', () => {
       [
         {
           "closed": false,
-          "days": "Пн–пт",
+          "days": "пн–пт",
           "hours": "09:00–13:00, 14:00–18:00",
         },
         {
           "closed": true,
-          "days": "Сб–вс",
+          "days": "сб–вс",
           "hours": "выходной",
         },
       ]
@@ -124,17 +124,17 @@ describe('place opening hours', () => {
       [
         {
           "closed": false,
-          "days": "Пн–чт",
+          "days": "пн–чт",
           "hours": "09:00–13:00, 14:00–18:00",
         },
         {
           "closed": false,
-          "days": "Пт",
+          "days": "пт",
           "hours": "09:00–13:00, 14:00–18:00, 19:00–20:00",
         },
         {
           "closed": true,
-          "days": "Сб–вс",
+          "days": "сб–вс",
           "hours": "выходной",
         },
       ]

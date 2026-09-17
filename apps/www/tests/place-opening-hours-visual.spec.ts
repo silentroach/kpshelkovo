@@ -43,6 +43,24 @@ for (const [device, viewport] of [
             String(variant === 'daily' || variant === 'differing-weekend-hours')
           );
           await expect(status).toBeVisible();
+          const label =
+            variant === 'daily'
+              ? 'Открыто до 23:00'
+              : variant === 'differing-weekend-hours'
+                ? 'Открыто до 22:00'
+                : 'Сейчас закрыто';
+          await expect(status).toHaveAttribute('title', label);
+          await expect(status).toBeEmpty();
+          await expect(status).toHaveAttribute('aria-hidden', 'true');
+          await expect(target.locator('[aria-live="polite"]')).toHaveText(label);
+          const labelBox = await target.locator('dt').boundingBox();
+          const dotBox = await status.boundingBox();
+          if (!labelBox || !dotBox) throw new Error('Hours label or indicator has no layout box');
+          expect(dotBox.width).toBe(8);
+          expect(dotBox.height).toBe(8);
+          expect(dotBox.x + dotBox.width).toBeLessThanOrEqual(labelBox.x + labelBox.width);
+          expect(dotBox.y).toBeGreaterThanOrEqual(labelBox.y);
+          expect(dotBox.y + dotBox.height).toBeLessThanOrEqual(labelBox.y + labelBox.height);
         }
 
         await expect(target).toHaveScreenshot(`place-opening-hours-${variant}-${device}.png`, {
@@ -50,6 +68,21 @@ for (const [device, viewport] of [
           caret: 'hide',
           scale: 'device'
         });
+
+        if (variant === 'split-intervals-description') {
+          for (const [instant, label, open] of [
+            ['2026-09-15T09:59:00Z', 'Открыто до 13:00', true],
+            ['2026-09-15T10:00:00Z', 'Сейчас закрыто', false],
+            ['2026-09-15T11:00:00Z', 'Открыто до 18:00', true],
+            ['2026-09-15T15:00:00Z', 'Сейчас закрыто', false]
+          ] as const) {
+            await page.clock.setFixedTime(new Date(instant));
+            await page.clock.runFor(60_000);
+            await expect(status).toHaveAttribute('title', label);
+            await expect(status).toHaveAttribute('data-open', String(open));
+            await expect(target.locator('[aria-live="polite"]')).toHaveText(label);
+          }
+        }
       });
     }
 

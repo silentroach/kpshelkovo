@@ -40,6 +40,9 @@ describe('PlaceOpeningHours HTML', () => {
         const status = document.querySelector('[data-place-opening-status]');
         expect(status?.hasAttribute('hidden')).toBe(true);
         expect(status?.textContent).toBe('');
+        expect(status?.closest('dt')?.tagName).toBe('DT');
+        expect(status?.hasAttribute('title')).toBe(false);
+        expect(document.querySelector('[aria-live="polite"]')?.textContent).toBe('');
         const note = document.querySelector('ul + p');
         expect(note?.textContent.replaceAll('\u00a0', ' ')).toBe(description);
         expect(document.querySelectorAll('p')).toHaveLength(description ? 1 : 0);

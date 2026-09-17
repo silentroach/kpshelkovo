@@ -3,7 +3,7 @@ import { PLACE_WEEKDAYS, type PlaceWeekday } from './schema';
 import type { PlaceOpeningHours } from './types';
 
 const PLACE_TIME_ZONE = 'Europe/Moscow';
-const WEEKDAY_LABELS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as const;
+const WEEKDAY_LABELS = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'] as const;
 
 export const formatPlaceOpeningHours = (
   openingHours: PlaceOpeningHours
@@ -26,7 +26,7 @@ export const formatPlaceOpeningHours = (
         ? 'Ежедневно'
         : start === end
           ? WEEKDAY_LABELS[start]!
-          : `${WEEKDAY_LABELS[start]}–${WEEKDAY_LABELS[end]!.toLowerCase()}`;
+          : `${WEEKDAY_LABELS[start]}–${WEEKDAY_LABELS[end]}`;
     rows.push({ days, hours: week[start] || 'выходной', closed: !week[start] });
     start = end + 1;
   }
