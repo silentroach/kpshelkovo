@@ -28,7 +28,7 @@ export interface PlaceMapPublicOpeningHoursPeriodDto {
 }
 
 export interface PlaceMapPublicOpeningHoursDto {
-  readonly description: string;
+  readonly description?: string;
   readonly periods: readonly PlaceMapPublicOpeningHoursPeriodDto[];
 }
 

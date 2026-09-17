@@ -8,6 +8,7 @@ import {
 import { absoluteUrl } from '@/lib/site';
 
 import { selectMapPlaces } from './map-selection';
+import { formatPlaceOpeningHours } from './opening-hours';
 import { placesDataUrl, placesMarkdownUrl, placesUrl } from './routes';
 import type { Place, PlaceMentionRef, PlaceWithBacklinks } from './types';
 import {
@@ -90,11 +91,19 @@ export const buildPlaceMarkdown = (place: PlaceWithBacklinks): string =>
       md.listItem(`Категория: ${formatPlaceCategory(place.category)}`),
       md.listItem(`Статус: ${formatPlaceStatus(place.status)}`),
       ...(place.address ? [md.listItem(`Адрес: ${place.address}`)] : []),
-      ...(place.openingHours
-        ? [md.listItem(`Время работы: ${place.openingHours.description}`)]
-        : []),
       md.listItem(`Координаты: ${place.coordinates.lat}, ${place.coordinates.lng}`)
     ]),
+    ...(place.openingHours
+      ? [
+          md.heading(2, 'Время работы'),
+          md.list(
+            formatPlaceOpeningHours(place.openingHours).map((row) =>
+              md.listItem(`${row.days}: ${row.hours}`)
+            )
+          ),
+          ...(place.openingHours.description ? [md.paragraph(place.openingHours.description)] : [])
+        ]
+      : []),
     md.heading(2, 'Ссылки'),
     md.list([
       md.listItem([md.paragraph([md.link(absoluteUrl(place.mapUrl), 'Открыть в Яндекс Картах')])]),

@@ -1,8 +1,10 @@
+import { z } from 'astro/zod';
 import { describe, expect, it } from 'vitest';
 
 import { buildPlaceMapPublicPayload } from '../map-public';
 import { selectMapPlaces } from '../map-selection';
 import { buildPlacesMarkdown } from '../markdown';
+import { PLACE_TIME, PLACE_WEEKDAYS } from '../schema';
 import type { Place } from '../types';
 
 const place: Place = {
@@ -48,6 +50,55 @@ const place: Place = {
 };
 
 describe('place map public DTO', () => {
+  it.each([undefined, 'Вход со двора.'])(
+    'serializes periods with optional explanation %s',
+    (description) => {
+      const openingHoursSchema = z
+        .object({
+          description: z.string().trim().min(1).optional(),
+          periods: z
+            .array(
+              z
+                .object({
+                  days: z.array(z.enum(PLACE_WEEKDAYS)).min(1),
+                  opens_at: z.string().regex(PLACE_TIME),
+                  closes_at: z.string().regex(PLACE_TIME)
+                })
+                .strict()
+            )
+            .min(1)
+        })
+        .strict();
+      const payloadSchema = z.object({
+        places: z.array(z.object({ opening_hours: openingHoursSchema }))
+      });
+      const payload = buildPlaceMapPublicPayload([
+        {
+          ...place,
+          openingHours: {
+            description,
+            periods: [{ days: ['mon'], opensAt: '09:00', closesAt: '13:00' }]
+          }
+        }
+      ]);
+      const serialized = JSON.stringify(payload);
+      const hours = payloadSchema.parse(JSON.parse(serialized)).places[0]?.opening_hours;
+      expect(hours?.description).toBe(description);
+      expect(hours?.periods).toMatchInlineSnapshot(`
+      [
+        {
+          "closes_at": "13:00",
+          "days": [
+            "mon",
+          ],
+          "opens_at": "09:00",
+        },
+      ]
+    `);
+      expect(serialized.includes('"description":')).toBe(Boolean(description));
+    }
+  );
+
   it('uses the same visible selection for JSON and Markdown, including an empty map', () => {
     const hidden = { ...place, slug: 'hidden', name: 'Hidden place', showOnMap: false };
     expect(selectMapPlaces([hidden, place])).toEqual([place]);

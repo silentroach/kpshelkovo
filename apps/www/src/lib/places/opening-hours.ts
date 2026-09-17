@@ -1,7 +1,38 @@
-import type { PlaceWeekday } from './schema';
+import type { PlaceOpeningHoursRow } from './opening-hours-types';
+import { PLACE_WEEKDAYS, type PlaceWeekday } from './schema';
 import type { PlaceOpeningHours } from './types';
 
 const PLACE_TIME_ZONE = 'Europe/Moscow';
+const WEEKDAY_LABELS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as const;
+
+export const formatPlaceOpeningHours = (
+  openingHours: PlaceOpeningHours
+): readonly PlaceOpeningHoursRow[] => {
+  const week = PLACE_WEEKDAYS.map((day) =>
+    openingHours.periods
+      .filter((period) => period.days.includes(day))
+      .sort((a, b) => a.opensAt.localeCompare(b.opensAt))
+      .map((period) => `${period.opensAt}–${period.closesAt}`)
+      .join(', ')
+  );
+  const rows: PlaceOpeningHoursRow[] = [];
+
+  for (let start = 0; start < week.length;) {
+    let end = start;
+    while (end + 1 < week.length && week[end + 1] === week[start]) end++;
+
+    const days =
+      start === 0 && end === 6
+        ? 'Ежедневно'
+        : start === end
+          ? WEEKDAY_LABELS[start]!
+          : `${WEEKDAY_LABELS[start]}–${WEEKDAY_LABELS[end]!.toLowerCase()}`;
+    rows.push({ days, hours: week[start] || 'выходной', closed: !week[start] });
+    start = end + 1;
+  }
+
+  return rows;
+};
 const WEEKDAY_BY_SHORT_NAME = new Map<string, PlaceWeekday>([
   ['Mon', 'mon'],
   ['Tue', 'tue'],

@@ -100,7 +100,7 @@ const openingHoursPeriod = z
 
 const openingHours = z
   .object({
-    description: nonBlankText,
+    description: nonBlankText.optional(),
     periods: z.array(openingHoursPeriod).min(1)
   })
   .strict();
@@ -123,6 +123,34 @@ export const RawPlaceSchema = z
       })
       .optional()
   })
-  .strict();
+  .strict()
+  .superRefine((place, ctx) => {
+    if (!place.opening_hours) return;
+
+    for (const day of PLACE_WEEKDAYS) {
+      const periods = place.opening_hours.periods
+        .map((period, index) => ({
+          days: period.days,
+          opens_at: period.opens_at,
+          closes_at: period.closes_at,
+          index
+        }))
+        .filter((period) => period.days.includes(day))
+        .sort((a, b) => a.opens_at.localeCompare(b.opens_at));
+
+      for (let index = 1; index < periods.length; index++) {
+        const previous = periods[index - 1]!;
+        const current = periods[index]!;
+        if (current.opens_at > previous.closes_at) continue;
+
+        const touching = current.opens_at === previous.closes_at;
+        ctx.addIssue({
+          code: 'custom',
+          path: ['opening_hours', 'periods', current.index],
+          message: `place "${place.title}": opening-hours periods conflict on ${day}: ${previous.opens_at}–${previous.closes_at} and ${current.opens_at}–${current.closes_at}${touching ? '; write continuous hours as one period' : ''}`
+        });
+      }
+    }
+  });
 
 export type RawPlace = z.output<typeof RawPlaceSchema>;

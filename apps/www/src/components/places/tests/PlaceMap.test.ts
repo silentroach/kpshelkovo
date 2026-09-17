@@ -252,6 +252,61 @@ describe('PlaceMap', () => {
     expect(markerElements[0]?.dataset.highlighted).toBe('true');
   });
 
+  it.each([
+    ['2026-08-17T07:00:00.000Z', 'открыто до 22:00', 'true'],
+    ['2026-08-18T12:00:00.000Z', 'сейчас закрыто', 'false']
+  ])('uses JSON periods without an explanation at %s', async (time, status, open) => {
+    vi.setSystemTime(new Date(time));
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        Response.json({
+          places: [
+            { ...publicPlace, opening_hours: { periods: publicPlace.opening_hours!.periods } }
+          ]
+        })
+      )
+    );
+
+    render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+
+    expect(markerElements[0]?.dataset.open).toBe(open);
+    expect(markerElements[0]?.title).toContain(status);
+    expect(markerElements[0]?.getAttribute('aria-label')).toContain(status);
+  });
+
+  it('omits hours, opening status and placeholders when JSON has no schedule', async () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        Response.json({
+          places: [{ ...publicPlace, opening_hours: undefined }]
+        })
+      )
+    );
+
+    render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+
+    const marker = markerElements[0];
+    expect({
+      open: marker?.dataset.open,
+      title: marker?.title,
+      ariaLabel: marker?.getAttribute('aria-label'),
+      text: marker?.textContent
+    }).toMatchInlineSnapshot(`
+      {
+        "ariaLabel": "Открыть место «Буржуйка»",
+        "open": undefined,
+        "text": "",
+        "title": "Буржуйка",
+      }
+    `);
+  });
+
   it('clears a requested highlight when map data cannot be loaded', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: false }));
     window.history.replaceState({}, '', '/map/?h=burzhuyka&from=issue');

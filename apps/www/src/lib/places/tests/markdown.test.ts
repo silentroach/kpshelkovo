@@ -1,5 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
+import { formatPlaceOpeningHours } from '../opening-hours';
+import type { PlaceOpeningHours } from '../types';
 import type { PlaceWithBacklinks } from '../types';
 
 let buildPlaceMarkdown: typeof import('../markdown').buildPlaceMarkdown;
@@ -65,6 +67,36 @@ beforeAll(async () => {
 });
 
 describe('places Markdown', () => {
+  it.each([undefined, 'Вход со двора.'])(
+    'publishes derived hours with optional note: %s',
+    (description) => {
+      const openingHours: PlaceOpeningHours = {
+        description,
+        periods: [
+          { days: ['mon', 'tue', 'wed', 'thu', 'fri'], opensAt: '14:00', closesAt: '18:00' },
+          { days: ['mon', 'tue', 'wed', 'thu', 'fri'], opensAt: '09:00', closesAt: '13:00' }
+        ]
+      };
+      const markdown = buildPlaceMarkdown({ ...place, showOnMap: false, openingHours });
+      const section = markdown.split('## Время работы\n\n')[1]?.split('\n## Ссылки')[0];
+      expect(section).toBeDefined();
+      for (const row of formatPlaceOpeningHours(openingHours)) {
+        expect(section).toContain(`- ${row.days}: ${row.hours}`);
+      }
+      expect(
+        section?.trimEnd().endsWith('выходной' + (description ? `\n\n${description}` : ''))
+      ).toBe(true);
+      expect(markdown).not.toMatch(/undefined|Сейчас закрыто|Открыто сейчас|<table/u);
+    }
+  );
+
+  it('omits hours and opening status when there is no schedule', () => {
+    const markdown = buildPlaceMarkdown({ ...place, openingHours: undefined });
+    expect(markdown).not.toMatch(
+      /Время работы|Часы работы|выходной|Открыто сейчас|Сейчас закрыто|неизвестно|расписание/iu
+    );
+  });
+
   it('publishes stable index and detail links without internal paths', () => {
     const markdown = [buildPlacesMarkdown([place]), buildPlaceMarkdown(place)].join('\n');
 
