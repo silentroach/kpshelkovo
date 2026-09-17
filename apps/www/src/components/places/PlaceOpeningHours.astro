@@ -34,7 +34,7 @@ const descriptionHtml = openingHours?.description
         <ul class="place-opening-hours-week">
           {rows.map((row) => (
             <li class="place-opening-hours-day" data-closed={row.closed}>
-              <span>{row.days}</span>
+              <span>{row.days}</span>{' '}
               <span class="ui-num">
                 {row.hours.split(', ').map((interval, index) => (
                   <>

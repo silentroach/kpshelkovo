@@ -29,6 +29,13 @@ describe('PlaceOpeningHours HTML', () => {
         const document = window.document;
         document.body.innerHTML = html;
         const rows = [...document.querySelectorAll('li')];
+        expect(rows.map((row) => row.textContent)).toMatchInlineSnapshot(`
+          [
+            "пн 09:00–13:00, 14:00–18:00",
+            "вт выходной",
+            "ср–вс 09:00–13:00, 14:00–18:00",
+          ]
+        `);
         expect(
           rows.map((row) => ({
             days: row.children[0]?.textContent,

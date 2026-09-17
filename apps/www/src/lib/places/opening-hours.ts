@@ -2,7 +2,7 @@ import type { PlaceOpeningHoursRow } from './opening-hours-types';
 import { PLACE_WEEKDAYS, type PlaceWeekday } from './schema';
 import type { PlaceOpeningHours } from './types';
 
-const PLACE_TIME_ZONE = 'Europe/Moscow';
+export const PLACE_TIME_ZONE = 'Europe/Moscow';
 const WEEKDAY_LABELS = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'] as const;
 
 export const formatPlaceOpeningHours = (

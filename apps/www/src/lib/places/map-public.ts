@@ -14,7 +14,7 @@ const toPublicGeometry = (value: PlaceGeometry): PlaceMapPublicGeometryDto => ({
   }
 });
 
-const toPublicOpeningHours = (value: PlaceOpeningHours): PlaceMapPublicOpeningHoursDto => ({
+export const toPublicOpeningHours = (value: PlaceOpeningHours): PlaceMapPublicOpeningHoursDto => ({
   description: value.description,
   periods: value.periods.map((period) => ({
     days: period.days,
