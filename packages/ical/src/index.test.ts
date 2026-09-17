@@ -51,7 +51,7 @@ const fixtures: readonly (readonly [string, CalendarEvent])[] = [
       startsAt: new Date('2026-09-19T20:30:00Z'),
       endsAt: new Date('2026-09-20T01:15:00Z'),
       title: specialText,
-      description: `Это тест импорта ICS. Символы ниже добавлены намеренно.\r\n${specialText}\rЗдесь должен быть перенос строки.\nИ здесь тоже.`,
+      description: `Это тест импорта ICS. Символы ниже добавлены намеренно.\r\n${specialText}\rОбратная косая черта перед переносом: \\\nЗдесь должен быть перенос строки.\nИ здесь тоже.`,
       location: { ...location, name: specialName },
       url: 'https://example.com/news/calendar/?a=1,2;b=3'
     }
@@ -102,8 +102,53 @@ describe('renderEventIcs', () => {
   it('encodes RFC 6868 parameters separately from TEXT', () => {
     const ics = unfold(renderEventIcs({ ...event, location: { ...location, name: specialName } }));
     expect(ics.split('\r\n').find((line) => line.startsWith('X-APPLE-'))).toBe(
-      String.raw`X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE="ТЕСТ места: кавычки ^'Лес^', буквальное ^^n, обратная косая черта \^nВторая строка^nТретья строка^nКонец; тест завершён":geo:55.06505,37.720861`
+      String.raw`X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE="ТЕСТ места: кавычки ^'Лес^', буквальное ^^n, обратная косая черта \ ^nВторая строка^nТретья строка^nКонец; тест завершён":geo:55.06505,37.720861`
     );
+  });
+
+  it.each(['\n', '\r\n', '\r'])(
+    'separates backslash from %j in all display fields for Apple Calendar',
+    (newline) => {
+      const text = `Slash\\${newline}Next`;
+      const ics = unfold(
+        renderEventIcs({
+          ...event,
+          title: text,
+          description: text,
+          location: { ...location, name: text, address: text }
+        })
+      );
+      expect(
+        ics.split('\r\n').filter((line) => /^(SUMMARY|DESCRIPTION|LOCATION|X-APPLE-)/.test(line))
+      ).toMatchInlineSnapshot(`
+          [
+            "SUMMARY:Slash\\\\ \\nNext",
+            "DESCRIPTION:Slash\\\\ \\nNext",
+            "LOCATION:Slash\\\\ \\nNext\\, Slash\\\\ \\nNext",
+            "X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE="Slash\\ ^nNext":geo:55.06505,37.720861",
+          ]
+        `);
+    }
+  );
+
+  it('preserves literal escapes, ordinary newlines and an existing separating space', () => {
+    const title = 'Ordinary\nliteral \\n / \\N\nspace\\ \nend';
+    expect(
+      unfold(renderEventIcs({ ...event, title }))
+        .split('\r\n')
+        .find((line) => line.startsWith('SUMMARY:'))
+    ).toMatchInlineSnapshot(`"SUMMARY:Ordinary\\nliteral \\\\n / \\\\N\\nspace\\\\ \\nend"`);
+  });
+
+  it('does not apply the display workaround to identifiers', () => {
+    const identifier = 'Slash\\\nNext';
+    const ics = unfold(renderEventIcs({ ...event, uid: identifier, prodId: identifier }));
+    expect(ics.split('\r\n').filter((line) => /^(UID|PRODID):/.test(line))).toMatchInlineSnapshot(`
+        [
+          "PRODID:Slash\\\\\\nNext",
+          "UID:Slash\\\\\\nNext",
+        ]
+      `);
   });
 
   it('preserves long Cyrillic and emoji across byte boundaries and escapes TEXT', () => {

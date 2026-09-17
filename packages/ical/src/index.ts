@@ -11,6 +11,11 @@ const coordinateFormat = new Intl.NumberFormat('en-US', {
 
 const normalizeNewlines = (value: string): string => value.replace(/\r\n?/g, '\n');
 
+// Apple Calendar displays a backslash immediately before a newline as literal escape text.
+// A separating space fixes import (manual checks in PR #758); apply only to display fields.
+const normalizeDisplayText = (value: string): string =>
+  normalizeNewlines(value).replaceAll('\\\n', '\\ \n');
+
 const escapeText = (value: string): string =>
   normalizeNewlines(value).replace(/[\\;,\n]/g, (char) => (char === '\n' ? '\\n' : `\\${char}`));
 
@@ -58,8 +63,8 @@ export function renderEventIcs(event: CalendarEvent): string {
     `DTSTAMP:${formatUtcDateTime(event.timestamp)}`,
     `DTSTART:${formatUtcDateTime(event.startsAt)}`,
     `DTEND:${formatUtcDateTime(event.endsAt)}`,
-    `SUMMARY:${escapeText(event.title)}`,
-    `DESCRIPTION:${escapeText(event.description)}`,
+    `SUMMARY:${escapeText(normalizeDisplayText(event.title))}`,
+    `DESCRIPTION:${escapeText(normalizeDisplayText(event.description))}`,
     `URL:${event.url}`
   ];
 
@@ -68,9 +73,9 @@ export function renderEventIcs(event: CalendarEvent): string {
     const lat = coordinateFormat.format(latitude);
     const lng = coordinateFormat.format(longitude);
     lines.push(
-      `LOCATION:${escapeText([name, address].filter(Boolean).join(', '))}`,
+      `LOCATION:${escapeText(normalizeDisplayText([name, address].filter(Boolean).join(', ')))}`,
       `GEO:${lat};${lng}`,
-      `X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE=${parameterValue(name)}:geo:${lat},${lng}`
+      `X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE=${parameterValue(normalizeDisplayText(name))}:geo:${lat},${lng}`
     );
   }
 
