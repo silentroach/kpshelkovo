@@ -21,8 +21,9 @@ const location = {
   longitude: 37.720861
 } as const;
 
-const specialText = 'Соседи, приходите; обсудим маршрут \\ и планы. 🌳 '.repeat(4);
-const specialName = 'Клуб "Лес" ^n \\ вход\r\nэтаж\rзал\nсад; север, юг';
+const specialText = 'ТЕСТ ICS: обратная косая черта \\; запятая ,; emoji 🌳';
+const specialName =
+  'ТЕСТ места: кавычки "Лес", буквальное ^n, обратная косая черта \\\r\nВторая строка\rТретья строка\nКонец; тест завершён';
 const fixtures: readonly (readonly [string, CalendarEvent])[] = [
   [
     'with-place',
@@ -50,7 +51,7 @@ const fixtures: readonly (readonly [string, CalendarEvent])[] = [
       startsAt: new Date('2026-09-19T20:30:00Z'),
       endsAt: new Date('2026-09-20T01:15:00Z'),
       title: specialText,
-      description: `${specialText}\r\nВторая строка\rТретья строка\nКонец.`,
+      description: `Это тест импорта ICS. Символы ниже добавлены намеренно.\r\n${specialText}\rЗдесь должен быть перенос строки.\nИ здесь тоже.`,
       location: { ...location, name: specialName },
       url: 'https://example.com/news/calendar/?a=1,2;b=3'
     }
@@ -101,7 +102,7 @@ describe('renderEventIcs', () => {
   it('encodes RFC 6868 parameters separately from TEXT', () => {
     const ics = unfold(renderEventIcs({ ...event, location: { ...location, name: specialName } }));
     expect(ics.split('\r\n').find((line) => line.startsWith('X-APPLE-'))).toBe(
-      String.raw`X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE="Клуб ^'Лес^' ^^n \ вход^nэтаж^nзал^nсад; север, юг":geo:55.06505,37.720861`
+      String.raw`X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE="ТЕСТ места: кавычки ^'Лес^', буквальное ^^n, обратная косая черта \^nВторая строка^nТретья строка^nКонец; тест завершён":geo:55.06505,37.720861`
     );
   });
 
