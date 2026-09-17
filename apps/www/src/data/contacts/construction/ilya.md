@@ -7,7 +7,11 @@ summary: 'Сантехника, электрика, сборка мебели. �
 contacts:
   phone: '+7 (926) 367-68-37'
   telegram: https://t.me/tequilahunter
-reviews: []
+reviews:
+  - sentiment: positive
+    summary: 'Сделал лестницу. Результатом довольны, Илью рекомендуют.'
+    published_at: 2025-08-06
+    url: https://t.me/shelkovoecoclub/15262/25415
 seo:
   description: 'Илья | Сантехника, электрика, сборка мебели'
 ---
