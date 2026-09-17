@@ -1,0 +1,82 @@
+name: КП Лосиноостровские усадьбы
+short_name: Лосиноостровские усадьбы
+slug: losinoostrovskie-usadby
+website: https://www.asterra.ru/projects/losinoostrovskie-usadby/
+is_baseline: false
+location:
+  address_text: МО, округ Щёлково, у д. Супонево
+  lat: 55.8792687
+  lng: 37.95374931
+  map_url: https://yandex.ru/maps/org/losinoostrovskiye_usadby/52908685621/
+  district: Щёлковский район
+tariff:
+  value: 614
+  unit: rub_per_sotka
+  period: month
+lots:
+  count: 192
+  area_ha: 36
+infrastructure:
+  roads: asphalt
+  sidewalks: no
+  lighting: yes
+  gas: yes
+  water: yes
+  sewage: yes
+  checkpoints: yes
+  security: yes
+  fencing: yes
+  underground_electricity: partial
+  admin_building: no
+  retail_or_services: no
+common_spaces:
+  club_infrastructure: no
+  playgrounds: yes
+  sports: yes
+  pool: no
+  fitness_club: no
+  restaurant: no
+  spa_center: no
+  walking_routes: no
+  water_access: yes
+  beach_zones: no
+  kids_club: no
+  sports_camp: no
+  primary_school: no
+  bbq_zones: yes
+service_model:
+  garbage_collection: no
+  snow_removal: yes
+  road_cleaning: yes
+  landscaping: yes
+  emergency_service: yes
+  dispatcher: yes
+sources:
+  - title: Сведения от жителей поселка
+    url: https://www.asterra.ru/projects/losinoostrovskie-usadby/
+    type: personal
+    date_checked: 2026-09-17
+    comment: >-
+      Тариф 614 ₽ за сотку в месяц и сведения об инфраструктуре, общих пространствах
+      и обслуживании взяты из сводной таблицы жителей поселка.
+  - title: Астерра — Лосиноостровские усадьбы
+    url: https://www.asterra.ru/projects/losinoostrovskie-usadby/
+    type: official
+    date_checked: 2026-09-17
+    comment: >-
+      На сайте застройщика указаны 192 участка, площадь 36 га и расположение
+      у деревни Супонево в Щёлковском районе; опубликованы координаты
+      55.87926870, 37.95374931. Описаны центральные газ, вода и канализация,
+      освещение, ограждение, КПП, круглосуточная охрана с видеонаблюдением,
+      детская и спортивная площадки. Упоминание летнего бассейна расходится
+      со сведениями жительницы; в карточке использованы её данные.
+  - title: ЦИАН — Лосиноостровские усадьбы
+    url: https://www.cian.ru/kottedzhnyj-poselok-losinoostrovskie-usadby-1558/
+    type: media
+    date_checked: 2026-09-17
+    comment: В карточке посёлка указаны асфальтированные дороги, 192 участка и площадь 36 га.
+  - title: Яндекс Карты — Лосиноостровские усадьбы
+    url: https://yandex.ru/maps/org/losinoostrovskiye_usadby/52908685621/
+    type: community
+    date_checked: 2026-09-17
+    comment: Карточка посёлка подтверждает расположение в городском округе Щёлково и ссылку на сайт застройщика Астерра.
