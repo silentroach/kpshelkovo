@@ -38,6 +38,10 @@ for (const [device, viewport] of [
           await expect(status).toHaveCount(0);
         } else {
           await expect(target.getByRole('list')).toBeVisible();
+          const timeStarts = await target
+            .getByRole('listitem')
+            .evaluateAll((rows) => rows.map((row) => row.children[1]!.getBoundingClientRect().x));
+          expect(new Set(timeStarts).size).toBe(1);
           await expect(status).toHaveAttribute(
             'data-open',
             String(variant === 'daily' || variant === 'differing-weekend-hours')
@@ -70,6 +74,44 @@ for (const [device, viewport] of [
         });
 
         if (variant === 'split-intervals-description') {
+          if (device === 'mobile') {
+            await page.setViewportSize({ width: 260, height: 900 });
+            const layout = await target.evaluate((element) => {
+              const label = element.querySelector('dt')!.getBoundingClientRect();
+              const value = element.querySelector('dd')!;
+              const week = value.querySelector('ul')!.getBoundingClientRect();
+              const description = value.querySelector('p')!.getBoundingClientRect();
+              return {
+                indent: week.x - label.x,
+                descriptionIndent: description.x - label.x,
+                rightInset:
+                  element.getBoundingClientRect().right - value.getBoundingClientRect().right,
+                availableWidth:
+                  value.clientWidth -
+                  parseFloat(getComputedStyle(value).paddingInlineStart) -
+                  parseFloat(getComputedStyle(value).paddingInlineEnd)
+              };
+            });
+            expect(layout).toEqual({
+              availableWidth: 208,
+              descriptionIndent: 12,
+              indent: 12,
+              rightInset: 0
+            });
+            const intervals = target.getByRole('listitem').first().locator('span > span');
+            const first = await intervals.nth(0).boundingBox();
+            const second = await intervals.nth(1).boundingBox();
+            if (!first || !second) throw new Error('Intervals have no layout box');
+            expect(second.x).toBe(first.x);
+            expect(second.y).toBeGreaterThan(first.y);
+            for (const interval of await intervals.all()) {
+              expect(await interval.evaluate((element) => element.getClientRects().length)).toBe(1);
+            }
+            expect(
+              await target.evaluate((element) => element.scrollWidth <= element.clientWidth)
+            ).toBe(true);
+            expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(260);
+          }
           for (const [instant, label, open] of [
             ['2026-09-15T09:59:00Z', 'Открыто до 13:00', true],
             ['2026-09-15T10:00:00Z', 'Сейчас закрыто', false],

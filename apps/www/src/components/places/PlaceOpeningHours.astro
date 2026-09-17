@@ -34,8 +34,15 @@ const descriptionHtml = openingHours?.description
         <ul class="place-opening-hours-week">
           {rows.map((row) => (
             <li class="place-opening-hours-day" data-closed={row.closed}>
-              <span>{row.days}:</span>
-              <span class="ui-num">{row.hours}</span>
+              <span>{row.days}</span>
+              <span class="ui-num">
+                {row.hours.split(', ').map((interval, index) => (
+                  <>
+                    {index > 0 && ', '}
+                    <span class="place-opening-hours-interval">{interval}</span>
+                  </>
+                ))}
+              </span>
             </li>
           ))}
         </ul>
@@ -119,6 +126,7 @@ const descriptionHtml = openingHours?.description
   .place-opening-hours-value {
     display: grid;
     min-width: 0;
+    padding-inline-start: 12px;
     justify-items: start;
     gap: 0.5rem;
     color: var(--color-text);
@@ -126,16 +134,22 @@ const descriptionHtml = openingHours?.description
 
   .place-opening-hours-week {
     display: grid;
-    gap: 0.25rem;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 0.25rem 0.75rem;
+    max-width: 100%;
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
   .place-opening-hours-day {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: 0.75rem;
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+  }
+
+  .place-opening-hours-interval {
+    white-space: nowrap;
   }
 
   .place-opening-hours-day[data-closed='true'] {
@@ -166,6 +180,10 @@ const descriptionHtml = openingHours?.description
   }
 
   @media (min-width: 40rem) {
+    .place-opening-hours-value {
+      padding-inline-start: 0;
+    }
+
     .place-opening-hours-row {
       grid-template-columns: 8rem minmax(0, 1fr);
       gap: 1rem;

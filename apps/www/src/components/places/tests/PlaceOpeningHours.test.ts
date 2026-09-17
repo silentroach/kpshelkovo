@@ -31,7 +31,7 @@ describe('PlaceOpeningHours HTML', () => {
         const rows = [...document.querySelectorAll('li')];
         expect(
           rows.map((row) => ({
-            days: row.children[0]?.textContent?.replace(/:$/u, ''),
+            days: row.children[0]?.textContent,
             hours: row.children[1]?.textContent,
             closed: row.dataset.closed === 'true'
           }))
