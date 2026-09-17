@@ -56,7 +56,7 @@ export interface PlaceOpeningHoursPeriod {
 }
 
 export interface PlaceOpeningHours {
-  readonly description: string;
+  readonly description?: string;
   readonly periods: readonly PlaceOpeningHoursPeriod[];
 }
 

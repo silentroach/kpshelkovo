@@ -14,7 +14,6 @@ location:
     lat: 55.060526
     lng: 37.716242
 opening_hours:
-  description: 'Пн, ср–пт — 10:00–19:00; сб–вс — 10:00–20:00; вторник — выходной'
   periods:
     - days: [mon, wed, thu, fri]
       opens_at: '10:00'

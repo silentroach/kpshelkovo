@@ -8,15 +8,10 @@ import {
 import { absoluteUrl } from '@/lib/site';
 
 import { selectMapPlaces } from './map-selection';
-import { placesDataUrl, placesMarkdownUrl, placesUrl } from './routes';
+import { toPlaceMarkdownPublic } from './markdown-public';
+import { placesDataUrl, placesUrl } from './routes';
 import type { Place, PlaceMentionRef, PlaceWithBacklinks } from './types';
-import {
-  formatPlaceBacklinkDate,
-  formatPlaceBacklinkKind,
-  formatPlaceCategory,
-  formatPlaceStatus,
-  placeBacklinkGroups
-} from './view';
+import { formatPlaceBacklinkDate, formatPlaceBacklinkKind, placeBacklinkGroups } from './view';
 
 const serialize = (children: Parameters<typeof createMarkdownDocument>[0]['children']): string =>
   serializeMarkdownDocument(createMarkdownDocument({ children }));
@@ -81,33 +76,14 @@ export const buildPlacesMarkdown = (places: readonly Place[]): string => {
 };
 
 export const buildPlaceMarkdown = (place: PlaceWithBacklinks): string =>
-  serialize([
-    md.heading(1, place.name),
-    md.paragraph(place.summary),
-    ...(place.body ? parseMarkdownFragment(place.body) : []),
-    md.heading(2, 'Сведения'),
-    md.list([
-      md.listItem(`Категория: ${formatPlaceCategory(place.category)}`),
-      md.listItem(`Статус: ${formatPlaceStatus(place.status)}`),
-      ...(place.address ? [md.listItem(`Адрес: ${place.address}`)] : []),
-      ...(place.openingHours
-        ? [md.listItem(`Время работы: ${place.openingHours.description}`)]
-        : []),
-      md.listItem(`Координаты: ${place.coordinates.lat}, ${place.coordinates.lng}`)
-    ]),
-    md.heading(2, 'Ссылки'),
-    md.list([
-      md.listItem([md.paragraph([md.link(absoluteUrl(place.mapUrl), 'Открыть в Яндекс Картах')])]),
-      ...(place.contact
-        ? [
-            md.listItem([
-              md.paragraph([
-                md.link(absoluteUrl(place.contact.url), 'Контакты и отзывы в «Сарафане»')
-              ])
-            ])
-          ]
-        : []),
-      md.listItem([md.paragraph([md.link(absoluteUrl(placesMarkdownUrl()), 'Все места на карте')])])
-    ]),
-    ...backlinksSection(place)
-  ]);
+  serializeMarkdownDocument(
+    createMarkdownDocument({
+      frontmatter: toPlaceMarkdownPublic(place),
+      children: [
+        md.heading(1, place.name),
+        md.paragraph(place.summary),
+        ...(place.body ? parseMarkdownFragment(place.body) : []),
+        ...backlinksSection(place)
+      ]
+    })
+  );

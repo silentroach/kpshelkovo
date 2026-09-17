@@ -4,7 +4,7 @@ import { createEntityMentionGraph, createSiteMentionRegistry } from '@/lib/menti
 
 import { buildPlacesDataset, buildPlacesGraphDataset } from '../load';
 import { createPlaceMentionTarget } from '../mentions';
-import type { RawPlace } from '../raw-schema';
+import { RawPlaceSchema, type RawPlace } from '../raw-schema';
 import type { PlaceEntry, PlaceGeometry } from '../types';
 
 const geometry: PlaceGeometry = {
@@ -61,6 +61,52 @@ const entry = (overrides?: Partial<PlaceEntry>): PlaceEntry => ({
 });
 
 describe('buildPlacesDataset', () => {
+  it.each([undefined, 'Вход со двора.'])(
+    'maps periods with optional explanation %s',
+    (description) => {
+      const data = RawPlaceSchema.parse(
+        rawPlace({
+          contact: undefined,
+          opening_hours: {
+            description,
+            periods: [{ days: ['mon'], opens_at: '09:00', closes_at: '13:00' }]
+          }
+        })
+      );
+      const loaded = buildPlacesDataset([entry({ data })]).places[0]?.openingHours;
+      expect(loaded?.description).toBe(description);
+      expect(loaded?.periods).toMatchInlineSnapshot(`
+      [
+        {
+          "closesAt": "13:00",
+          "days": [
+            "mon",
+          ],
+          "opensAt": "09:00",
+        },
+      ]
+    `);
+    }
+  );
+
+  it('RawPlaceSchema reports the place title and day for conflicting hours', () => {
+    expect(() =>
+      RawPlaceSchema.parse(
+        rawPlace({
+          contact: undefined,
+          opening_hours: {
+            periods: [
+              { days: ['wed'], opens_at: '09:00', closes_at: '13:00' },
+              { days: ['wed'], opens_at: '12:00', closes_at: '18:00' }
+            ]
+          }
+        })
+      )
+    ).toThrow(
+      /place .*Буржуйка.*: opening-hours periods conflict on wed: 09:00–13:00 and 12:00–18:00/
+    );
+  });
+
   it('keeps different slugs with identical coordinates, regardless of map visibility', () => {
     const data = buildPlacesDataset([
       entry({ id: 'restaurant', data: rawPlace({ contact: undefined, show_on_map: true }) }),

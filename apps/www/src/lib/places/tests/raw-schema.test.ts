@@ -32,6 +32,66 @@ const place = {
 } as const;
 
 describe('RawPlaceSchema', () => {
+  it.each([undefined, 'Вход со двора.'])(
+    'accepts optional opening-hours explanation %s',
+    (description) => {
+      const openingHours = { description, periods: place.opening_hours.periods };
+      expect(RawPlaceSchema.parse({ ...place, opening_hours: openingHours }).opening_hours).toEqual(
+        openingHours
+      );
+    }
+  );
+
+  it('accepts an absent schedule but rejects a blank explanation', () => {
+    expect(
+      RawPlaceSchema.parse({ ...place, opening_hours: undefined }).opening_hours
+    ).toBeUndefined();
+    expect(
+      RawPlaceSchema.safeParse({
+        ...place,
+        opening_hours: { description: '  ', periods: place.opening_hours.periods }
+      }).success
+    ).toBe(false);
+  });
+
+  it.each([
+    ['partial overlap', '12:00', '18:00'],
+    ['nested interval', '10:00', '12:00'],
+    ['duplicate', '09:00', '13:00'],
+    ['touching intervals', '13:00', '18:00']
+  ])('rejects %s in either input order', (_, opensAt, closesAt) => {
+    const periods = [
+      { days: ['mon', 'wed'], opens_at: '09:00', closes_at: '13:00' },
+      { days: ['wed', 'fri'], opens_at: opensAt, closes_at: closesAt }
+    ];
+    for (const ordered of [periods, periods.toReversed()]) {
+      const result = RawPlaceSchema.safeParse({ ...place, opening_hours: { periods: ordered } });
+      expect(result.success).toBe(false);
+      if (result.success) throw new Error('conflicting periods passed validation');
+      expect(result.error.issues).toHaveLength(1);
+      expect(result.error.issues[0]?.message).toContain(
+        `conflict on wed: 09:00–13:00 and ${opensAt}–${closesAt}`
+      );
+      if (opensAt === '13:00') {
+        expect(result.error.issues[0]?.message).toContain('write continuous hours as one period');
+      }
+    }
+  });
+
+  it.each([
+    { days: ['mon'], opens_at: '14:00', closes_at: '18:00' },
+    { days: ['tue'], opens_at: '09:00', closes_at: '13:00' }
+  ])('accepts a real break or the same hours on another day: %j', (period) => {
+    expect(
+      RawPlaceSchema.safeParse({
+        ...place,
+        opening_hours: {
+          periods: [period, { days: ['mon'], opens_at: '09:00', closes_at: '13:00' }]
+        }
+      }).success
+    ).toBe(true);
+  });
+
   it.each([true, false, undefined])(
     'normalizes visibility %s without a local coordinate restriction',
     (showOnMap) => {

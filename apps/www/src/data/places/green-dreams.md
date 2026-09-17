@@ -8,7 +8,6 @@ location:
     lat: 55.074958
     lng: 37.755599
 opening_hours:
-  description: 'Пн–чт и вс — 09:00–22:00; пт–сб — 09:00–23:00'
   periods:
     - days: [mon, tue, wed, thu, sun]
       opens_at: '09:00'

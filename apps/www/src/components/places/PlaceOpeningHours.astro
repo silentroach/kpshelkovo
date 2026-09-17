@@ -1,36 +1,64 @@
 ---
 import { formatDynamicHtml } from '@shelkovo/markdown';
 
+import { formatPlaceOpeningHours } from '@/lib/places/opening-hours';
 import type { PlaceOpeningHours } from '@/lib/places/types';
 
 interface Props {
-  readonly openingHours: PlaceOpeningHours;
+  readonly openingHours?: PlaceOpeningHours;
 }
 
 const { openingHours } = Astro.props;
-const descriptionHtml = formatDynamicHtml(openingHours.description);
+const rows = openingHours ? formatPlaceOpeningHours(openingHours) : [];
+const descriptionHtml = openingHours?.description
+  ? formatDynamicHtml(openingHours.description)
+  : undefined;
 ---
 
-<div class="place-opening-hours-row">
-  <dt class="place-opening-hours-label">Время работы</dt>
-  <dd class="place-opening-hours-value">
-    <span
-      class="ui-num place-opening-hours-description"
-      set:html={descriptionHtml}
-    />
-    <place-opening-hours data-opening-hours={JSON.stringify(openingHours)}>
-      <span
-        data-place-opening-status
-        data-open="false"
-        class="place-opening-hours-status"
-        aria-live="polite"
-        hidden></span>
-    </place-opening-hours>
-  </dd>
-</div>
+{
+  openingHours && (
+    <div class="place-opening-hours-row">
+      <dt class="place-opening-hours-label">
+        Время работы
+        <place-opening-hours data-opening-hours={JSON.stringify(openingHours)}>
+          <span
+            data-place-opening-status
+            class="place-opening-hours-status"
+            aria-hidden="true"
+            hidden
+          />
+          <span class="ui-visually-hidden" aria-live="polite" />
+        </place-opening-hours>
+      </dt>
+      <dd class="place-opening-hours-value">
+        <ul class="place-opening-hours-week">
+          {rows.map((row) => (
+            <li class="place-opening-hours-day" data-closed={row.closed}>
+              <span>{row.days}</span>{' '}
+              <span class="ui-num">
+                {row.hours.split(', ').map((interval, index) => (
+                  <>
+                    {index > 0 && ', '}
+                    <span class="place-opening-hours-interval">{interval}</span>
+                  </>
+                ))}
+              </span>
+            </li>
+          ))}
+        </ul>
+        {descriptionHtml && (
+          <p
+            class="place-opening-hours-description"
+            set:html={descriptionHtml}
+          />
+        )}
+      </dd>
+    </div>
+  )
+}
 
 <script>
-  import { isPlaceOpen } from '@/lib/places/opening-hours';
+  import { getPlaceClosingTime } from '@/lib/places/opening-hours';
   import type { PlaceOpeningHours } from '@/lib/places/types';
 
   class PlaceOpeningHoursElement extends HTMLElement {
@@ -42,14 +70,20 @@ const descriptionHtml = formatDynamicHtml(openingHours.description);
         '[data-place-opening-status]',
       );
 
-      if (!value || !status) return;
+      const announcement = this.querySelector<HTMLElement>('[aria-live]');
+      if (!value || !status || !announcement) return;
 
       const openingHours = JSON.parse(value) as PlaceOpeningHours;
       const update = (): void => {
-        const open = isPlaceOpen(openingHours);
+        const closingTime = getPlaceClosingTime(openingHours);
+        const label = closingTime
+          ? `Открыто до ${closingTime}`
+          : 'Сейчас закрыто';
 
-        status.dataset.open = String(open);
-        status.textContent = open ? 'Открыто сейчас' : 'Сейчас закрыто';
+        status.dataset.open = String(Boolean(closingTime));
+        status.title = label;
+        if (announcement.textContent !== label)
+          announcement.textContent = label;
         status.hidden = false;
       };
 
@@ -79,6 +113,10 @@ const descriptionHtml = formatDynamicHtml(openingHours.description);
   }
 
   .place-opening-hours-label {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    white-space: nowrap;
     color: var(--color-text-muted);
     font-size: 0.875rem;
     font-weight: 600;
@@ -86,38 +124,66 @@ const descriptionHtml = formatDynamicHtml(openingHours.description);
   }
 
   .place-opening-hours-value {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    column-gap: 0.75rem;
-    row-gap: 0.5rem;
+    display: grid;
+    min-width: 0;
+    padding-inline-start: 12px;
+    justify-items: start;
+    gap: 0.5rem;
+    color: var(--color-text);
+  }
+
+  .place-opening-hours-week {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 0.25rem 0.75rem;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .place-opening-hours-day {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+  }
+
+  .place-opening-hours-interval {
+    white-space: nowrap;
+  }
+
+  .place-opening-hours-day[data-closed='true'] {
+    color: var(--color-text-muted);
   }
 
   .place-opening-hours-description {
+    margin: 0;
     color: var(--color-text);
     font-size: 1rem;
     line-height: 1.75rem;
   }
 
   .place-opening-hours-status {
-    padding: 0.25rem 0.625rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-full);
-    background: var(--color-surface-muted);
-    color: var(--color-text-muted);
-    font-size: 0.75rem;
-    font-weight: 600;
-    line-height: 1.25rem;
-    white-space: nowrap;
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-danger);
+  }
+
+  .place-opening-hours-status[hidden] {
+    display: none;
   }
 
   .place-opening-hours-status[data-open='true'] {
-    border-color: var(--color-success-border);
-    background: var(--color-success-soft);
-    color: var(--color-success-text);
+    background: var(--color-success);
   }
 
   @media (min-width: 40rem) {
+    .place-opening-hours-value {
+      padding-inline-start: 0;
+    }
+
     .place-opening-hours-row {
       grid-template-columns: 8rem minmax(0, 1fr);
       gap: 1rem;

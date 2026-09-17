@@ -29,6 +29,9 @@
     "test:visual:news-event": "playwright test -c playwright.news-event-card-visual.local.config.ts",
     "test:visual:news-event:update": "playwright test -c playwright.news-event-card-visual.local.config.ts --update-snapshots",
     "test:visual:news-event:serve": "node ../../scripts/visual-fixture-launcher.mjs tests/news-event-card-visual 4327",
+    "test:visual:place-opening-hours": "playwright test -c playwright.place-opening-hours-visual.local.config.ts",
+    "test:visual:place-opening-hours:update": "playwright test -c playwright.place-opening-hours-visual.local.config.ts --update-snapshots",
+    "test:visual:place-opening-hours:serve": "node ../../scripts/visual-fixture-launcher.mjs tests/place-opening-hours-visual 4335",
     "test:visual:sticky-table": "playwright test -c playwright.sticky-table-visual.local.config.ts",
     "test:visual:sticky-table:update": "playwright test -c playwright.sticky-table-visual.local.config.ts --update-snapshots",
     "test:visual:sticky-table:serve": "node ../../scripts/visual-fixture-launcher.mjs tests/sticky-table-visual 4329"
