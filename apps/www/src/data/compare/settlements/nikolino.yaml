@@ -21,6 +21,9 @@ tariff:
   value: 51500
   unit: rub_per_lot
   period: month
+  note: В тариф также входит вода и интернет.
+
+water_in_tariff: true
 
 lots:
   count: 451
