@@ -266,6 +266,9 @@ importers:
       '@shelkovo/geo':
         specifier: workspace:*
         version: link:../../packages/geo
+      '@shelkovo/ical':
+        specifier: workspace:*
+        version: link:../../packages/ical
       '@shelkovo/markdown':
         specifier: workspace:*
         version: link:../../packages/markdown
@@ -361,6 +364,8 @@ importers:
       suncalc:
         specifier: ^2.0.2
         version: 2.0.2
+
+  packages/ical: {}
 
   packages/markdown:
     dependencies:

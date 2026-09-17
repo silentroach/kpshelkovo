@@ -1,0 +1,30 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Calendar Fixtures//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:calendar-escaped-text@example.com
+DTSTAMP:20260917T120000Z
+DTSTART:20260919T203000Z
+DTEND:20260920T011500Z
+SUMMARY:ТЕСТ ICS: обратная косая черта \\\; запя
+ тая \,\; emoji 🌳
+DESCRIPTION:Это тест импорта ICS. Символы ниже д
+ обавлены намеренно.\nТЕСТ ICS: обратная ко
+ сая черта \\\; запятая \,\; emoji 🌳\nОбратная к
+ осая черта перед переносом: \\ \nЗдесь дол
+ жен быть перенос строки.\nИ здесь тоже.
+URL:https://example.com/news/calendar/?a=1,2;b=3
+LOCATION:ТЕСТ места: кавычки "Лес"\, буквально
+ е ^n\, обратная косая черта \\ \nВторая стро
+ ка\nТретья строка\nКонец\; тест завершён\, 
+ улица Центральная\, 46–48
+GEO:55.06505;37.720861
+X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE="ТЕСТ 
+ места: кавычки ^'Лес^', буквальное ^^n, обра
+ тная косая черта \ ^nВторая строка^nТретья
+  строка^nКонец; тест завершён":geo:55.06505,37.7208
+ 61
+END:VEVENT
+END:VCALENDAR
