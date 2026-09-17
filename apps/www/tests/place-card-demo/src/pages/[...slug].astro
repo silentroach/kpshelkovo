@@ -1,0 +1,453 @@
+---
+import '@/styles/global.css';
+import '@/styles/site.css';
+
+import { formatDynamicHtml } from '@shelkovo/markdown';
+import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import SiteFooter from '@shelkovo/ui/SiteFooter.astro';
+import type { GetStaticPaths } from 'astro';
+
+import PlaceOpeningHours from '@/components/places/PlaceOpeningHours.astro';
+import { renderMarkdown } from '@/lib/markdown/render';
+import { formatPlaceStatus } from '@/lib/places/view';
+
+import PlacePreview from '../components/PlacePreview.astro';
+import { getDemoPlace, markerImages, nearbyPlaces } from '../data';
+import type { PlaceDemoProps as Props } from '../demo.types';
+
+export const getStaticPaths = (() => [
+  {
+    params: { slug: undefined },
+    props: { place: getDemoPlace('hunting-ponds') },
+  },
+  {
+    params: { slug: 'burzhuyka' },
+    props: { place: getDemoPlace('burzhuyka') },
+  },
+]) satisfies GetStaticPaths;
+
+const { place } = Astro.props;
+const neighbors = nearbyPlaces(place);
+const bodyHtml = renderMarkdown(place.body || place.summary);
+const home = 'https://kpshelkovo.online';
+const demos = [
+  { slug: 'hunting-ponds', url: '/', title: 'Охотничьи пруды' },
+  { slug: 'burzhuyka', url: '/burzhuyka/', title: 'Буржуйка' },
+];
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="data:," />
+    <title>{place.name} · Демо карточки места</title>
+  </head>
+  <body class="ui-root-site">
+    <header class="demo-header">
+      <div class="ui-page demo-header__inner">
+        <a href={home} class="demo-brand">Шелково Онлайн</a>
+        <span class="demo-label">Демо карточки</span>
+        <nav class="demo-switcher" aria-label="Примеры карточек">
+          {
+            demos.map((demo) => (
+              <a
+                href={demo.url}
+                aria-current={demo.slug === place.slug ? 'page' : undefined}
+              >
+                {demo.title}
+              </a>
+            ))
+          }
+        </nav>
+      </div>
+    </header>
+
+    <main class="ui-page place-page">
+      <div class="place-layout">
+        <div class="place-main">
+          <header class="ui-page-header place-header">
+            <div class="ui-page-header-stack">
+              <Breadcrumbs
+                items={[
+                  { label: 'Главная', href: home },
+                  { label: 'Карта', href: `${home}/map/` },
+                  { label: place.name },
+                ]}
+              />
+              <div class="place-heading">
+                <h1 class="ui-page-title">{place.name}</h1>
+                <div class="place-heading__actions">
+                  {
+                    place.showOnMap && (
+                      <a
+                        href={`${home}/map/?h=${place.slug}`}
+                        class="ui-btn ui-icon-action"
+                        aria-label="Показать на общей карте"
+                        title="Показать на общей карте"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.6"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="m9 18-6 3V6l6-3 6 3 6-3v15l-6 3-6-3Zm0 0V3m6 18V6" />
+                        </svg>
+                      </a>
+                    )
+                  }
+                  {
+                    place.contact && (
+                      <a
+                        href={place.contact.url}
+                        class="ui-btn ui-icon-action"
+                        aria-label="Контакты и отзывы"
+                        title="Контакты и отзывы"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.6"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <rect x="3" y="4" width="18" height="16" rx="2" />
+                          <circle cx="8" cy="9" r="2" />
+                          <path d="M5 17v-1a3 3 0 0 1 6 0v1m3-9h4m-4 4h4m-4 4h3" />
+                        </svg>
+                      </a>
+                    )
+                  }
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <article class="place-copy" aria-label="О месте">
+            {
+              place.openingHours && (
+                <dl class="place-facts">
+                  <PlaceOpeningHours openingHours={place.openingHours} />
+                </dl>
+              )
+            }
+            <div class="ui-prose" set:html={bodyHtml} />
+          </article>
+        </div>
+
+        <aside class="place-location" aria-label="Расположение">
+          <figure>
+            <PlacePreview {place} />
+            {
+              place.address && (
+                <figcaption set:html={formatDynamicHtml(place.address)} />
+              )
+            }
+          </figure>
+          {
+            neighbors.length > 0 && (
+              <section class="place-nearby" aria-labelledby="nearby-heading">
+                <h2 id="nearby-heading" class="ui-section-label">
+                  Рядом
+                </h2>
+                <ul class="place-nearby__list">
+                  {neighbors.map((neighbor) => {
+                    const marker = neighbor.marker
+                      ? markerImages[neighbor.marker]
+                      : undefined;
+                    return (
+                      <li>
+                        <a href={neighbor.canonical} class="place-nearby__link">
+                          <span class="place-nearby__icon" aria-hidden="true">
+                            {marker ? (
+                              <img
+                                src={marker.src}
+                                width={marker.width}
+                                height={marker.height}
+                                alt=""
+                              />
+                            ) : (
+                              <span class="place-nearby__point" />
+                            )}
+                          </span>
+                          <span class="place-nearby__name">
+                            {neighbor.name}
+                            {neighbor.status !== 'existing' && (
+                              <span class="ui-visually-hidden">
+                                , {formatPlaceStatus(neighbor.status)}
+                              </span>
+                            )}
+                          </span>
+                          <span class="place-nearby__arrow" aria-hidden="true">
+                            ↗
+                          </span>
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            )
+          }
+        </aside>
+      </div>
+    </main>
+
+    <SiteFooter>
+      <a slot="right" href={place.canonical} class="site-text-link"
+        >Текущая карточка на сайте ↗</a
+      >
+    </SiteFooter>
+  </body>
+</html>
+
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+  }
+
+  .demo-header {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .demo-header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 1rem;
+    padding: 0.625rem 1.25rem 0;
+  }
+
+  .demo-brand {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .demo-label {
+    margin-inline-start: auto;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+  }
+
+  .demo-switcher {
+    display: flex;
+    gap: 1.25rem;
+    flex-basis: 100%;
+    font-size: 0.875rem;
+  }
+
+  .demo-switcher a {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    border-bottom: 2px solid transparent;
+    color: var(--color-text-muted);
+  }
+
+  .demo-switcher a[aria-current='page'] {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .place-page {
+    flex: 1;
+    padding-block: 0.5rem 3rem;
+  }
+
+  .place-layout {
+    display: grid;
+    gap: 2.25rem;
+    padding-block-start: 0.75rem;
+    padding-inline: 1.25rem;
+  }
+
+  .place-main {
+    min-width: 0;
+  }
+
+  .place-header {
+    padding: 0 0 1.5rem;
+  }
+
+  .place-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+
+  .place-heading h1 {
+    min-width: 0;
+  }
+
+  .place-heading__actions {
+    display: flex;
+    flex: none;
+    gap: 0.5rem;
+  }
+
+  .place-heading__actions a {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .place-copy,
+  .place-location {
+    min-width: 0;
+  }
+
+  .place-copy .ui-prose {
+    max-width: 65ch;
+  }
+
+  .place-copy :global(.ui-prose > :first-child) {
+    margin-block-start: 0;
+  }
+
+  .place-facts {
+    margin-block-end: 1.75rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .place-facts :global(.place-opening-hours-row) {
+    border-top: 0;
+    padding-block-start: 0;
+  }
+
+  figcaption {
+    margin-block-start: 0.75rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .place-nearby {
+    margin-block-start: 1.5rem;
+  }
+
+  .place-nearby h2 {
+    margin-block-end: 0.5rem;
+    color: var(--color-text-muted);
+  }
+
+  .place-nearby__link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 3.5rem;
+    padding-block: 0.625rem;
+    color: var(--color-text);
+    transition:
+      color 120ms ease,
+      background-color 120ms ease;
+  }
+
+  .place-nearby__link:is(:hover, :active) {
+    color: var(--color-primary);
+    background: var(--color-primary-soft-2);
+  }
+
+  .place-nearby__icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 2rem;
+    height: 2rem;
+  }
+
+  .place-nearby__icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .place-nearby__point {
+    width: 0.625rem;
+    height: 0.625rem;
+    border: 2px solid var(--color-primary);
+    border-radius: 50%;
+  }
+
+  .place-nearby__name {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.4;
+  }
+
+  .place-nearby__arrow {
+    color: var(--color-text-muted);
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  @media (min-width: 48rem) {
+    .demo-header__inner {
+      min-height: 3.5rem;
+      padding: 0 1.5rem;
+    }
+
+    .demo-label {
+      margin-inline-start: 0;
+    }
+
+    .demo-switcher {
+      flex-basis: auto;
+      margin-inline-start: auto;
+    }
+
+    .demo-switcher a {
+      min-height: 3.5rem;
+    }
+
+    .place-layout {
+      padding-block-start: 1.25rem;
+      padding-inline: 1.5rem;
+    }
+
+    .place-header {
+      padding-block-end: 2rem;
+    }
+
+    .place-page {
+      padding-block: 0.5rem 4rem;
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .place-layout {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      align-items: start;
+      gap: clamp(2rem, 5vw, 4.5rem);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .place-layout {
+      padding-block-start: 1.5rem;
+    }
+
+    .place-header {
+      padding-block-end: 2.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .place-nearby__link {
+      transition: none;
+    }
+  }
+</style>

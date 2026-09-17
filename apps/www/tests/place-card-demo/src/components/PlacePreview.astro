@@ -1,0 +1,216 @@
+---
+import { markerImages } from '../data';
+import type { PlaceDemoProps as Props, PlacePreviewData } from '../demo.types';
+
+const { place } = Astro.props;
+const marker = place.marker ? markerImages[place.marker] : undefined;
+const preview = {
+  coordinates: place.coordinates,
+  geometry: place.geometry,
+} satisfies PlacePreviewData;
+---
+
+<place-card-preview
+  class="place-preview"
+  data-preview={JSON.stringify(preview)}
+  aria-label={`Местоположение: ${place.name}`}
+>
+  <div class="place-preview__canvas" data-canvas></div>
+  <div class="place-preview__message" data-fallback>
+    <p data-message role="status">Местоположение доступно в Яндекс Картах.</p>
+    <a href={place.mapUrl} class="site-text-link">Открыть в Яндекс Картах ↗</a>
+  </div>
+  <div class="place-preview__marker" data-marker hidden aria-hidden="true">
+    {
+      marker ? (
+        <img
+          src={marker.src}
+          width={marker.width}
+          height={marker.height}
+          alt=""
+          draggable="false"
+        />
+      ) : (
+        <span class="ui-map-marker" />
+      )
+    }
+  </div>
+</place-card-preview>
+
+<script>
+  import type { LngLat, YMap, YMapLocationRequest } from '@yandex/ymaps3-types';
+
+  import {
+    getPaddedBounds,
+    toMapGeometry,
+  } from '@/components/places/place-map-geometry';
+  import { loadYandexMaps } from '@/lib/yandex-maps/runtime';
+  import type { PlacePreviewData } from '../demo.types';
+
+  class PlaceCardPreview extends HTMLElement {
+    map?: YMap;
+    observer?: ResizeObserver;
+
+    connectedCallback(): void {
+      void this.initialize();
+    }
+
+    async initialize(): Promise<void> {
+      const canvas = this.querySelector<HTMLElement>('[data-canvas]');
+      const marker = this.querySelector<HTMLElement>('[data-marker]');
+      const message = this.querySelector<HTMLElement>('[data-message]');
+      const fallback = this.querySelector<HTMLElement>('[data-fallback]');
+      if (!canvas || !marker || !message || !fallback || !this.dataset.preview)
+        return;
+
+      message.textContent = 'Загружаем карту…';
+      try {
+        const data = JSON.parse(this.dataset.preview) as PlacePreviewData;
+        await loadYandexMaps();
+        if (!this.isConnected) return;
+        const maps = window.ymaps3;
+        if (!maps) throw new Error('Yandex Maps API is unavailable');
+
+        const point: LngLat = [data.coordinates.lng, data.coordinates.lat];
+        const geometry = data.geometry?.area.geometry;
+        const rings = geometry
+          ? geometry.type === 'Polygon'
+            ? geometry.coordinates
+            : geometry.coordinates.flat()
+          : [];
+        const coordinates: LngLat[] = [
+          point,
+          ...rings.flat().map(([lng, lat]): LngLat => [lng, lat]),
+        ];
+        const location: YMapLocationRequest = geometry
+          ? { bounds: getPaddedBounds(coordinates) }
+          : { center: point, zoom: 16.5 };
+
+        this.map = new maps.YMap(
+          canvas,
+          { location, behaviors: [], mode: 'vector' },
+          [
+            new maps.YMapDefaultSchemeLayer({
+              layers: {
+                ground: { zIndex: 0 },
+                buildings: { zIndex: 1 },
+                icons: { visible: false, zIndex: 2 },
+                labels: { zIndex: 3 },
+              },
+            }),
+            new maps.YMapDefaultFeaturesLayer(),
+          ],
+        );
+
+        if (geometry) {
+          const water = getComputedStyle(this)
+            .getPropertyValue('--color-water')
+            .trim();
+          this.map.addChild(
+            new maps.YMapFeature({
+              geometry: toMapGeometry(geometry),
+              style: {
+                fill: water,
+                fillOpacity: 0.06,
+                stroke: [
+                  { color: water, width: 2, opacity: 0.85, dash: [5, 3] },
+                ],
+                interactive: false,
+                simplificationRate: 0,
+              },
+            }),
+          );
+        }
+
+        marker.hidden = false;
+        this.map.addChild(new maps.YMapMarker({ coordinates: point }, marker));
+        this.observer = new ResizeObserver(() =>
+          this.map?.update({
+            location: { ...location, duration: 0 },
+            margin: geometry ? [16, 16, 48, 16] : [0, 0, 0, 0],
+          }),
+        );
+        this.observer.observe(canvas);
+        fallback.hidden = true;
+        this.dataset.ready = 'true';
+      } catch (error) {
+        console.error('Place card demo preview:', error);
+        message.textContent = 'Карта не загрузилась.';
+      }
+    }
+
+    disconnectedCallback(): void {
+      this.observer?.disconnect();
+      this.map?.destroy();
+    }
+  }
+
+  if (!customElements.get('place-card-preview')) {
+    customElements.define('place-card-preview', PlaceCardPreview);
+  }
+</script>
+
+<style>
+  .place-preview {
+    display: block;
+    position: relative;
+    height: 15rem;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-muted);
+  }
+
+  .place-preview__canvas {
+    width: 100%;
+    height: 100%;
+    touch-action: pan-y;
+  }
+
+  .place-preview__canvas :global(canvas) {
+    filter: saturate(0.7);
+  }
+
+  .place-preview__message {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    background: var(--color-surface-muted);
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  .place-preview__message a {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .place-preview__marker {
+    width: 3rem;
+    height: 3rem;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .place-preview__marker img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 1px white) drop-shadow(0 2px 3px rgb(0 0 0 / 18%));
+  }
+
+  [hidden] {
+    display: none;
+  }
+
+  @media (min-width: 60rem) {
+    .place-preview {
+      height: 20rem;
+    }
+  }
+</style>
