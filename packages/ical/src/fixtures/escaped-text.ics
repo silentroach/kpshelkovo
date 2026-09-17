@@ -1,0 +1,30 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Calendar Fixtures//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:calendar-escaped-text@example.com
+DTSTAMP:20260917T120000Z
+DTSTART:20260919T203000Z
+DTEND:20260920T011500Z
+SUMMARY:Соседи\, приходите\; обсудим маршрут \
+ \ и планы. 🌳 Соседи\, приходите\; обсудим 
+ маршрут \\ и планы. 🌳 Соседи\, приходите\; 
+ обсудим маршрут \\ и планы. 🌳 Соседи\, при
+ ходите\; обсудим маршрут \\ и планы. 🌳 
+DESCRIPTION:Соседи\, приходите\; обсудим маршру
+ т \\ и планы. 🌳 Соседи\, приходите\; обсуди
+ м маршрут \\ и планы. 🌳 Соседи\, приходите
+ \; обсудим маршрут \\ и планы. 🌳 Соседи\, п
+ риходите\; обсудим маршрут \\ и планы. 🌳 \n
+ Вторая строка\nТретья строка\nКонец.
+URL:https://example.com/news/calendar/?a=1,2;b=3
+LOCATION:Клуб "Лес" ^n \\ вход\nэтаж\nзал\nсад\; се
+ вер\, юг\, улица Центральная\, 46–48
+GEO:55.06505;37.720861
+X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE="Клуб 
+ ^'Лес^' ^^n \ вход^nэтаж^nзал^nсад; север, юг":geo
+ :55.06505,37.720861
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,2 @@
+# Preserve CRLF and significant spaces at folded line boundaries.
+*.ics -text diff whitespace=cr-at-eol,-blank-at-eol

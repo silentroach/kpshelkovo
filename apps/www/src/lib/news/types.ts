@@ -103,6 +103,10 @@ export interface NewsArticle {
   readonly mentions: readonly EntityMentionTarget[];
 }
 
+export type NewsArticleWithEvent = NewsArticle & {
+  readonly events: readonly [NewsEvent, ...NewsEvent[]];
+};
+
 export interface NewsListArticle {
   readonly id: string;
   readonly title: string;

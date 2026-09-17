@@ -1,0 +1,21 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//example.com//Calendar Fixtures//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:calendar-with-place@example.com
+DTSTAMP:20260917T120000Z
+DTSTART:20260919T090000Z
+DTEND:20260919T103000Z
+SUMMARY:Встреча соседей
+DESCRIPTION:Обсудим планы на осень.\n\nВстречае
+ мся у входа.
+URL:https://example.com/news/calendar/
+LOCATION:Место встречи\, улица Центральная\, 46
+ –48
+GEO:55.06505;37.720861
+X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE="Мест
+ о встречи":geo:55.06505,37.720861
+END:VEVENT
+END:VCALENDAR
