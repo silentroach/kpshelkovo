@@ -46,8 +46,9 @@ const titleId = `news-event-title-${event.slug}`;
             preview={{
               coordinates: event.place.coordinates,
               zoom: 16,
-              anchor: [0.75, 0.25],
+              anchor: [0.75, 0.45],
               muted: true,
+              mutedOpacity: 0.4,
             }}
             label={`Место события: ${event.place.name}`}
           >

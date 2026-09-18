@@ -128,7 +128,7 @@ export class MapPreviewElement extends HTMLElement {
             customization: [
               {
                 stylers: data.muted
-                  ? { saturation: -0.4, lightness: 0.2, opacity: 0.55 }
+                  ? { saturation: -0.4, lightness: 0.2, opacity: data.mutedOpacity ?? 0.55 }
                   : { saturation: -0.3 }
               }
             ]

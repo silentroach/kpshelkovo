@@ -86,13 +86,14 @@ describe('event place card', () => {
         {
           "anchor": [
             0.75,
-            0.25,
+            0.45,
           ],
           "coordinates": {
             "lat": 55,
             "lng": 38,
           },
           "muted": true,
+          "mutedOpacity": 0.4,
           "zoom": 16,
         }
       `);

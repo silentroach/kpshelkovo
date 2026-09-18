@@ -76,8 +76,9 @@ for (const [device, viewport] of [
         JSON.stringify({
           coordinates: { lat: 55.123456, lng: 38.654321 },
           zoom: 16,
-          anchor: [0.75, 0.25],
-          muted: true
+          anchor: [0.75, 0.45],
+          muted: true,
+          mutedOpacity: 0.4
         })
       );
       await expect(target.locator('iframe')).toHaveCount(0);
