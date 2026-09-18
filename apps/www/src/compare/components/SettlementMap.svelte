@@ -10,54 +10,21 @@
   } from '@/lib/yandex-maps/runtime';
 
   import { withBase } from '../lib/url';
-
-  interface SettlementMapData {
-    slug: string;
-    name: string;
-    shortName: string;
-    lat: number;
-    lng: number;
-    normalizedTariff: number;
-    isBaseline: boolean;
-    tariffText?: string;
-    tariffHint?: string;
-    companyText?: string;
-  }
-
-  interface Props {
-    settlements: readonly SettlementMapData[];
-    interactive?: boolean;
-    popup?: boolean;
-    shell?: boolean;
-    muted?: boolean;
-    height?: number;
-    focusX?: number;
-    startFromMoscow?: boolean;
-    fitRevision?: number;
-  }
-
-  interface MarkerLike {
-    slug: string;
-    marker: ymaps3.YMapMarker;
-    el: HTMLElement;
-  }
-
-  interface Range {
-    min: number;
-    max: number;
-  }
+  import type {
+    MapView,
+    MarkerLike,
+    Range,
+    SettlementMapData,
+    SettlementMapProps,
+    Tip
+  } from './settlement-map.types';
 
   let {
     settlements,
-    interactive = true,
-    popup = true,
-    shell = true,
-    muted = false,
     height = 375,
-    focusX = 0.5,
     startFromMoscow = false,
     fitRevision
-  }: Props = $props();
+  }: SettlementMapProps = $props();
 
   let mapContainer: HTMLDivElement | undefined;
   let popupEl: HTMLDivElement | undefined;
@@ -72,32 +39,10 @@
   let destroyed = false;
   let mapLoadRequest = 0;
   let hasAutofitted = false;
-  interface Tip {
-    item: SettlementMapData;
-    x: number;
-    y: number;
-    up: boolean;
-  }
-
   let tip: Tip | undefined = $state(undefined);
 
   const PAD = 32;
   const MOSCOW_LOCATION = { center: [37.6173, 55.7558], zoom: 9 } as const;
-
-  function clamp(v: number, min: number, max: number): number {
-    return Math.max(min, Math.min(max, v));
-  }
-
-  function shift(lng: number, zoom: number): number {
-    if (!mapContainer) return lng;
-
-    const fx = clamp(focusX, 0.05, 0.95);
-    if (Math.abs(fx - 0.5) < 0.01) return lng;
-
-    const w = Math.max(1, mapContainer.clientWidth);
-    const deg = 360 / (256 * 2 ** zoom);
-    return lng - (fx - 0.5) * w * deg;
-  }
 
   function getRange(list: readonly SettlementMapData[]): Range | undefined {
     const vals = list.filter((item) => !item.isBaseline).map((item) => item.normalizedTariff);
@@ -121,10 +66,7 @@
     return `rgb(${red}, ${green}, ${blue})`;
   }
 
-  function getMapView(): {
-    location: ymaps3.YMapLocationRequest;
-    margin: [number, number, number, number];
-  } {
+  function getMapView(): MapView {
     if (settlements.length === 0) {
       return {
         location: { center: [37.6173, 55.7558], zoom: 9 },
@@ -136,7 +78,7 @@
       const item = settlements[0];
       const zoom = 12;
       return {
-        location: { center: [shift(item.lng, zoom), item.lat], zoom },
+        location: { center: [item.lng, item.lat], zoom },
         margin: [0, 0, 0, 0]
       };
     }
@@ -176,7 +118,6 @@
 
     const { YMapMarker } = ym;
     const range = getRange(settlements);
-    const canOpenPopup = interactive && popup;
     const currentSlugs = new Set(settlements.map((s) => s.slug));
 
     for (const item of [...marks]) {
@@ -195,32 +136,24 @@
       const existing = bySlug.get(settlement.slug);
       if (existing) {
         existing.el.style.background = color;
-        existing.el.style.cursor = canOpenPopup ? 'pointer' : 'default';
         existing.marker.update?.({
           coordinates: [settlement.lng, settlement.lat]
         });
         continue;
       }
 
-      const el = document.createElement(canOpenPopup ? 'button' : 'div');
+      const el = document.createElement('button');
       el.className = 'settlement-map-marker ui-map-marker';
-      el.style.cssText = `
-        background: ${color};
-        cursor: ${canOpenPopup ? 'pointer' : 'default'};
-      `;
+      el.style.background = color;
       el.setAttribute('title', settlement.name);
-      if (canOpenPopup) {
-        el.setAttribute('type', 'button');
-        el.setAttribute('aria-label', `Показать данные о поселке «${settlement.name}»`);
-        el.setAttribute('aria-expanded', 'false');
-        el.addEventListener('click', (evt) => {
-          evt.stopPropagation();
-          const current = settlements.find((s) => s.slug === settlement.slug);
-          void open(current ?? settlement, el, evt.detail === 0);
-        });
-      } else {
-        el.setAttribute('aria-hidden', 'true');
-      }
+      el.setAttribute('type', 'button');
+      el.setAttribute('aria-label', `Показать данные о поселке «${settlement.name}»`);
+      el.setAttribute('aria-expanded', 'false');
+      el.addEventListener('click', (evt) => {
+        evt.stopPropagation();
+        const current = settlements.find((s) => s.slug === settlement.slug);
+        void open(current ?? settlement, el, evt.detail === 0);
+      });
 
       const marker = new YMapMarker({ coordinates: [settlement.lng, settlement.lat] }, el);
 
@@ -254,7 +187,9 @@
       map = new YMap(
         mapContainer,
         {
-          location: view.location
+          location: view.location,
+          copyrightsPosition: 'bottom left',
+          distributionPosition: 'top right'
         },
         [new YMapDefaultSchemeLayer(), new YMapDefaultFeaturesLayer()]
       );
@@ -539,7 +474,6 @@
 <div
   data-testid="settlement-map"
   class="settlement-map"
-  class:settlement-map--shell={shell}
   style={`height: ${height}px; min-height: ${height}px;`}
 >
   {#if isLoading}
@@ -563,7 +497,7 @@
     </div>
   {/if}
 
-  {#if tip && popup}
+  {#if tip}
     <div
       class="map-popup"
       style={`left: ${tip.x}px; top: ${tip.y}px; transform: translate(-50%, ${tip.up ? '-100%' : '0%'});`}
@@ -625,13 +559,7 @@
     {@attach captureMapContainer}
     {@attach synchronizeMap(settlementSignature, fitRevision, ymapsLoaded && !error)}
     class="map-canvas"
-    class:map-canvas--static={!interactive}
-    class:map-muted={muted}
   ></div>
-
-  {#if !interactive}
-    <div class="map-static-overlay" aria-hidden="true"></div>
-  {/if}
 </div>
 
 <style>
@@ -639,16 +567,12 @@
     position: relative;
     width: 100%;
     overflow: hidden;
-  }
-
-  .settlement-map--shell {
     border: 1px solid var(--color-border);
     background: var(--color-surface);
   }
 
-  :global(.ymaps-2-1-79-map) {
-    width: 100% !important;
-    height: 100% !important;
+  :global(.settlement-map-marker) {
+    cursor: pointer;
   }
 
   :global(.settlement-map-marker:focus-visible) {
@@ -661,14 +585,13 @@
     height: 100%;
   }
 
-  .map-canvas--static,
-  .map-popup {
-    pointer-events: none;
+  .map-canvas :global(:is(a, button):focus-visible) {
+    outline: 0.1875rem solid var(--color-focus);
+    outline-offset: 0.125rem;
   }
 
-  .map-muted {
-    opacity: 0.56;
-    filter: saturate(0.62) contrast(0.9) brightness(1.02);
+  .map-popup {
+    pointer-events: none;
   }
 
   .map-placeholder {
@@ -813,12 +736,6 @@
     top: -0.375rem;
     border-right: 0;
     border-bottom: 0;
-  }
-
-  .map-static-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 5;
   }
 
   @keyframes map-spin {

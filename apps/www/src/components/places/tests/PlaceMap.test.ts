@@ -206,6 +206,8 @@ describe('PlaceMap', () => {
     expect(mapProps[0]).toMatchObject({
       behaviors: ['drag', 'scrollZoom', 'pinchZoom', 'dblClick', 'oneFingerZoom'],
       mode: 'vector',
+      copyrightsPosition: 'bottom left',
+      distributionPosition: 'right',
       location: {
         bounds: [
           [37.715242, 55.059526],
@@ -354,6 +356,10 @@ describe('PlaceMap', () => {
       'oneFingerZoom'
     ]);
     expect(map.update.mock.lastCall?.[0].margin).toEqual([112, 32, 32, 32]);
+    expect(mapProps[0]).toMatchObject({
+      copyrightsPosition: 'bottom left',
+      distributionPosition: 'right'
+    });
   });
 
   it('uses the selected custom marker', async () => {

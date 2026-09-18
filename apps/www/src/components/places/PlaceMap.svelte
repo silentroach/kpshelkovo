@@ -553,7 +553,10 @@
           {
             location: { bounds: getCurrentPlaceBounds() },
             behaviors: mapBehaviors(),
-            mode: 'vector'
+            mode: 'vector',
+            copyrightsPosition: 'bottom left',
+            // The site header overlays the top edge of this full-page map.
+            distributionPosition: 'right'
           },
           [
             new YMapDefaultSchemeLayer({
@@ -673,6 +676,11 @@
   .place-map__canvas {
     width: 100%;
     height: 100%;
+  }
+
+  .place-map__canvas :global(:is(a, button):focus-visible) {
+    outline: 0.1875rem solid var(--color-focus);
+    outline-offset: 0.125rem;
   }
 
   .map-placeholder {

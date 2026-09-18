@@ -1,3 +1,7 @@
 import { createVisualFixtureAstroConfig } from '../config/astro-visual-fixture';
 
-export default createVisualFixtureAstroConfig();
+const config = createVisualFixtureAstroConfig();
+// testPlace builds canonical place URLs through Astro's SITE.
+config.site = 'https://kpshelkovo.online';
+
+export default config;

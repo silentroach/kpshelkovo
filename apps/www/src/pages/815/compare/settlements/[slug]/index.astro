@@ -2,8 +2,8 @@
 import CommonSpacesTable from '@/compare/components/CommonSpacesTable.svelte';
 import InfrastructureTable from '@/compare/components/InfrastructureTable.svelte';
 import ServiceTable from '@/compare/components/ServiceTable.svelte';
-import SettlementMap from '@/compare/components/SettlementMap.svelte';
 import SourcesList from '@/compare/components/SourcesList.svelte';
+import MapPreview from '@/components/maps/MapPreview.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import { GlobeIcon, MapPinIcon, TelegramIcon } from '@shelkovo/ui/icons';
@@ -150,19 +150,6 @@ const lotCalc = getLotCalc(
 const tipDesktopId = `${settlement.slug}-tariff-tip-desktop`;
 const tipMobileId = `${settlement.slug}-tariff-tip-mobile`;
 const assumption = tariffCalc?.assumption;
-const heroMap = hasPoint
-  ? [
-      {
-        slug: settlement.slug,
-        name: settlement.name,
-        shortName: settlement.shortName,
-        lat: settlement.location.lat,
-        lng: settlement.location.lng,
-        normalizedTariff: settlement.tariff.normalizedPerSotkaMonth,
-        isBaseline,
-      },
-    ]
-  : [];
 ---
 
 <BaseLayout
@@ -170,7 +157,6 @@ const heroMap = hasPoint
   description={pageMeta.description}
   keywords={pageMeta.keywords}
   schema={[schema, breadcrumb]}
-  preconnectYandexMaps
   search={search}
 >
   <main class="ui-page settlement-page">
@@ -184,29 +170,33 @@ const heroMap = hasPoint
     <section class="settlement-hero hero-bleed" data-testid="settlement-hero">
       <div
         class:list={[
-          'settlement-hero-map hero-map-fade',
+          'settlement-hero-map',
           { 'hero-map-placeholder': !hasPoint },
         ]}
       >
         {
           hasPoint && (
-            <div class="settlement-hero-map-canvas">
-              <SettlementMap
-                settlements={heroMap}
-                interactive={false}
-                popup={false}
-                shell={false}
-                muted={false}
-                height={430}
-                focusX={0.8}
-                client:visible
+            <MapPreview
+              preview={{
+                coordinates: {
+                  lat: settlement.location.lat,
+                  lng: settlement.location.lng,
+                },
+                zoom: 12,
+                anchor: [0.8, 0.5],
+                muted: true,
+              }}
+              label={settlement.name}
+            >
+              <div
+                class="ui-map-marker settlement-preview-marker"
+                style={`background: ${isBaseline ? '#064b08' : '#6a502e'}`}
+                title={settlement.name}
+                aria-hidden="true"
               />
-            </div>
+            </MapPreview>
           )
         }
-
-        <div class="settlement-hero-wash-top"></div>
-        <div class="settlement-hero-wash-bottom"></div>
       </div>
 
       <div class="ui-page settlement-hero-content">
@@ -763,20 +753,15 @@ const heroMap = hasPoint
     display: none;
   }
 
-  .settlement-hero-map,
-  .settlement-hero-map-canvas,
-  .settlement-hero-wash-top,
-  .settlement-hero-wash-bottom {
+  .settlement-hero-map {
     position: absolute;
     inset: 0;
-  }
-
-  .settlement-hero-map {
     overflow: hidden;
   }
 
-  .settlement-hero-map-canvas {
-    opacity: 0.8;
+  .settlement-preview-marker {
+    transform: translate(-50%, -50%);
+    pointer-events: none;
   }
 
   .settlement-hero-content {
@@ -784,7 +769,13 @@ const heroMap = hasPoint
     z-index: 10;
     display: flex;
     flex-direction: column;
-    padding: 2rem 1.25rem 1rem;
+    padding: 3.5rem 1.25rem 3rem;
+    pointer-events: none;
+  }
+
+  .settlement-hero-summary,
+  .settlement-labels {
+    pointer-events: auto;
   }
 
   .settlement-hero-label-row {
@@ -815,7 +806,7 @@ const heroMap = hasPoint
 
   .settlement-hero-summary {
     width: 100%;
-    max-width: 48rem;
+    max-width: min(48rem, 65vw);
     align-self: flex-start;
   }
 
@@ -1194,25 +1185,6 @@ const heroMap = hasPoint
     line-height: 1.75rem;
   }
 
-  .settlement-hero-wash-top {
-    background: linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--color-surface-raised) 80%, transparent) 0%,
-      color-mix(in oklab, var(--color-surface-raised) 42%, transparent) 46%,
-      color-mix(in oklab, var(--color-surface-raised) 8%, transparent) 70%,
-      transparent 84%
-    );
-  }
-
-  .settlement-hero-wash-bottom {
-    background: linear-gradient(
-      180deg,
-      transparent 62%,
-      color-mix(in oklab, var(--color-bg) 74%, transparent) 88%,
-      var(--color-bg) 100%
-    );
-  }
-
   .settlement-hero-title-shadow {
     text-shadow: 0 2px 10px
       color-mix(in oklab, var(--color-surface-raised) 75%, transparent);
@@ -1255,25 +1227,6 @@ const heroMap = hasPoint
     width: 100vw;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
-  }
-
-  .hero-map-fade {
-    mask-image: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.88) 48%,
-      rgba(0, 0, 0, 0.52) 74%,
-      rgba(0, 0, 0, 0.12) 90%,
-      rgba(0, 0, 0, 0) 100%
-    );
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.88) 48%,
-      rgba(0, 0, 0, 0.52) 74%,
-      rgba(0, 0, 0, 0.12) 90%,
-      rgba(0, 0, 0, 0) 100%
-    );
   }
 
   .hero-map-placeholder {
@@ -1333,6 +1286,11 @@ const heroMap = hasPoint
       right: 0;
       left: 0;
       margin-bottom: 0;
+      pointer-events: none;
+    }
+
+    .settlement-breadcrumbs :global(a) {
+      pointer-events: auto;
     }
 
     .settlement-hero {
@@ -1342,13 +1300,6 @@ const heroMap = hasPoint
     .settlement-mobile-header,
     .settlement-passport {
       display: none;
-    }
-  }
-
-  @media (min-width: 80rem) {
-    .settlement-hero-content {
-      padding-top: 2.5rem;
-      padding-bottom: 1.5rem;
     }
   }
 </style>

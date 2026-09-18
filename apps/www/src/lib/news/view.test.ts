@@ -2,12 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { testPlace } from '@/lib/places/tests/place.test-helper';
 
-import {
-  buildNewsEventMapEmbedUrl,
-  buildNewsEventMapUrl,
-  formatNewsEventMonth,
-  formatNewsEventRange
-} from './view';
+import { buildNewsEventMapUrl, formatNewsEventMonth, formatNewsEventRange } from './view';
 
 describe('formatNewsEventRange', () => {
   it('formats same-day event ranges', () => {
@@ -60,31 +55,5 @@ describe('buildNewsEventMapUrl', () => {
 
   it('skips map links without coordinates or location', () => {
     expect(buildNewsEventMapUrl({})).toBeUndefined();
-  });
-
-  it('builds Yandex Maps widget URLs from coordinates', () => {
-    const url = buildNewsEventMapEmbedUrl({
-      place: testPlace({ coordinates: { lat: 55.123456, lng: 38.654321 } })
-    });
-
-    expect(url).toBeDefined();
-    expect(new URL(url ?? '').searchParams.get('ll')).toBe('38.654321,55.123456');
-    expect(new URL(url ?? '').searchParams.get('pt')).toBeNull();
-  });
-
-  it('can offset Yandex Maps widget center for fixed overlay pins', () => {
-    const url = buildNewsEventMapEmbedUrl(
-      {
-        place: testPlace({ coordinates: { lat: 55.123456, lng: 38.654321 } })
-      },
-      { centerOffsetYPx: 50 }
-    );
-
-    const params = new URL(url ?? '').searchParams;
-    const [lng = Number.NaN, lat = Number.NaN] = (params.get('ll') ?? '').split(',').map(Number);
-
-    expect(lng).toBe(38.654321);
-    expect(lat).toBeLessThan(55.123456);
-    expect(lat).toBeGreaterThan(55.122);
   });
 });

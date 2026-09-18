@@ -2,9 +2,9 @@
 import { CalendarPlusIcon, MapPinIcon } from '@shelkovo/ui/icons';
 import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 import { formatDynamicHtml } from '@shelkovo/markdown';
+import MapPreview from '@/components/maps/MapPreview.astro';
 import type { NewsEvent } from '@/lib/news/types';
 import {
-  buildNewsEventMapEmbedUrl,
   buildNewsEventMapUrl,
   formatNewsEventMonth,
   formatNewsEventRange,
@@ -19,9 +19,6 @@ const { event, variant = 'wide' } = Astro.props;
 const isCompact = variant === 'compact';
 const eventRange = formatNewsEventRange(event);
 const mapUrl = buildNewsEventMapUrl(event);
-const mapEmbedUrl = isCompact
-  ? buildNewsEventMapEmbedUrl(event, { centerOffsetYPx: 50 })
-  : undefined;
 const hasCoordinates = event.place !== undefined;
 const eventDateParts = event.startsIso.slice(0, 10).split('-');
 const eventDay = String(Number(eventDateParts[2] ?? ''));
@@ -43,18 +40,22 @@ const titleId = `news-event-title-${event.slug}`;
       aria-labelledby={titleId}
       data-pagefind-body
     >
-      {mapEmbedUrl && (
-        <div class="news-event-compact-map" aria-hidden="true">
-          <div class="news-event-compact-map-layer">
-            <iframe
-              src={mapEmbedUrl}
-              title={`Фоновая карта места события: ${event.place?.name ?? event.title}`}
-              loading="lazy"
-              tabindex="-1"
-              class="news-event-compact-map-frame"
+      {event.place && (
+        <div class="news-event-compact-map">
+          <MapPreview
+            preview={{
+              coordinates: event.place.coordinates,
+              zoom: 16,
+              anchor: [0.75, 0.25],
+              muted: true,
+            }}
+            label={`Место события: ${event.place.name}`}
+          >
+            <span
+              class="ui-map-marker news-event-compact-map-pin"
+              aria-hidden="true"
             />
-            <span class="ui-map-marker news-event-compact-map-pin" />
-          </div>
+          </MapPreview>
         </div>
       )}
 
@@ -641,6 +642,7 @@ const titleId = `news-event-title-${event.slug}`;
   }
 
   .news-event-compact-card--mapped {
+    padding-bottom: 2.75rem;
     background:
       linear-gradient(
         110deg,
@@ -652,45 +654,32 @@ const titleId = `news-event-title-${event.slug}`;
   }
 
   .news-event-compact-map {
-    --news-event-compact-map-frame-shift-y: 50px;
     position: absolute;
     inset: 0;
     z-index: -1;
-    overflow: hidden;
-    opacity: 0.36;
-    pointer-events: none;
-  }
-
-  .news-event-compact-map-layer {
-    position: absolute;
-    top: -66%;
-    right: auto;
-    bottom: -8%;
-    left: 0;
-    width: 150%;
-    height: 164%;
-  }
-
-  .news-event-compact-map-frame {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border: 0;
-    filter: grayscale(0.18) saturate(0.78) contrast(0.92);
-    transform: translateY(var(--news-event-compact-map-frame-shift-y));
   }
 
   .news-event-compact-map-pin {
     --ui-map-marker-size: 18px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
+    display: block;
     transform: translate(-50%, -50%);
+    pointer-events: none;
   }
 
   .news-event-compact-content {
     display: grid;
     gap: 0.85rem;
+    pointer-events: none;
+  }
+
+  .news-event-compact-content a {
+    pointer-events: auto;
+  }
+
+  .news-event-compact-card--mapped .news-event-compact-date-card {
+    /* The SDK uses a text button here, not just an icon. */
+    padding-right: 10.25rem;
+    flex-wrap: wrap;
   }
 
   .news-event-compact-date-card {

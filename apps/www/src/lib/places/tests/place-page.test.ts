@@ -104,8 +104,7 @@ describe('/map/[slug]/', () => {
       summaryRendered: article?.textContent.replace(/\s/g, ' ').includes(fixture.place.summary),
       addressInArticle: article?.textContent.includes(fixture.place.address!),
       addressAfterPreview:
-        figure?.querySelector('place-map-preview ~ figcaption')?.textContent ===
-        fixture.place.address,
+        figure?.querySelector('.place-preview ~ figcaption')?.textContent === fixture.place.address,
       actionsByHeading: !!document.querySelector('h1 + nav a[href="/map/?h=apple-garden"]')
     }).toMatchInlineSnapshot(`
       {
@@ -124,7 +123,7 @@ describe('/map/[slug]/', () => {
     fixture.place.body = '';
     fixture.place.address = undefined;
     const document = await renderPage();
-    const preview = document.querySelector('place-map-preview');
+    const preview = document.querySelector('map-preview');
     const fallback = preview?.querySelector('[data-fallback]');
     expect({
       summaryRendered:

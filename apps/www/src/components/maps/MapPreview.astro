@@ -1,0 +1,86 @@
+---
+import type { MapPreviewProps as Props } from './map-preview.types';
+
+const { preview, label, class: className, mapUrl, ...rest } = Astro.props;
+---
+
+<map-preview
+  {...rest}
+  class:list={['map-preview', className]}
+  data-preview={JSON.stringify(preview)}
+  role="group"
+  aria-label={label}
+>
+  <div class="map-preview__canvas" data-canvas inert={!!mapUrl}></div>
+  {
+    mapUrl && (
+      <div class="map-preview__message" data-fallback>
+        <p data-message role="status">
+          Местоположение доступно в Яндекс Картах.
+        </p>
+        <a href={mapUrl} class="site-text-link">
+          Открыть в Яндекс Картах ↗
+        </a>
+      </div>
+    )
+  }
+  <template><slot /></template>
+</map-preview>
+
+<script>
+  import { MapPreviewElement } from './map-preview';
+
+  if (!customElements.get('map-preview')) {
+    customElements.define('map-preview', MapPreviewElement);
+  }
+</script>
+
+<style>
+  .map-preview {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: var(--color-surface-muted);
+  }
+
+  .map-preview__canvas {
+    width: 100%;
+    height: 100%;
+    touch-action: pan-y;
+  }
+
+  .map-preview__canvas :global(.ymaps3--map) {
+    /* The SDK sets touch-action: none inline even with behaviors disabled. */
+    touch-action: pan-y !important;
+  }
+
+  .map-preview__canvas :global(:is(a, button):focus-visible) {
+    outline: 0.1875rem solid var(--color-focus);
+    outline-offset: 0.125rem;
+  }
+
+  .map-preview__message {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    background: var(--color-surface-muted);
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  .map-preview__message[hidden] {
+    display: none;
+  }
+
+  .map-preview__message a {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+  }
+</style>

@@ -1,15 +1,15 @@
-import type { LngLat, YMap, YMapLocationRequest } from '@yandex/ymaps3-types';
+import type { LngLat, Margin, YMap, YMapLocationRequest } from '@yandex/ymaps3-types';
 
+import { getPaddedBounds, toMapGeometry } from '@/components/places/place-map-geometry';
 import { isPlaceOpen } from '@/lib/places/opening-hours';
 import { installYandexMapsRuntimeHeadPersistence, loadYandexMaps } from '@/lib/yandex-maps/runtime';
 
-import { getPaddedBounds, toMapGeometry } from './place-map-geometry';
-import type { PlacePreviewData } from './place-preview.types';
+import type { MapPreviewData } from './map-preview.types';
 
-export const getPreviewLocation = (data: PlacePreviewData): YMapLocationRequest => {
+export const getPreviewLocation = (data: MapPreviewData): YMapLocationRequest => {
   const point: LngLat = [data.coordinates.lng, data.coordinates.lat];
   const geometry = data.geometry?.area.geometry;
-  if (!geometry) return { center: point, zoom: 16.5, duration: 0 };
+  if (!geometry) return { center: point, zoom: data.zoom ?? 16.5, duration: 0 };
 
   const rings = geometry.type === 'Polygon' ? geometry.coordinates : geometry.coordinates.flat();
   return {
@@ -18,18 +18,69 @@ export const getPreviewLocation = (data: PlacePreviewData): YMapLocationRequest 
   };
 };
 
-export class PlacePreviewElement extends HTMLElement {
+export const getPreviewMargin = (
+  width: number,
+  height: number,
+  anchor?: MapPreviewData['anchor']
+): Margin => {
+  if (!anchor) return [32, 32, 64, 32];
+  const [x, y] = anchor;
+  // The canonical point stays at location.center, the center of the unpadded viewport.
+  return [
+    Math.max(0, 2 * y - 1) * height,
+    Math.max(0, 1 - 2 * x) * width,
+    Math.max(0, 1 - 2 * y) * height,
+    Math.max(0, 2 * x - 1) * width
+  ];
+};
+
+export class MapPreviewElement extends HTMLElement {
   private generation = 0;
   private map?: YMap;
+  private intersectionObserver?: IntersectionObserver;
+  private sizeObserver?: ResizeObserver;
   private actionObserver?: MutationObserver;
   private markerUpdateTimer?: number;
 
   connectedCallback(): void {
     installYandexMapsRuntimeHeadPersistence();
-    void this.initialize(++this.generation);
+    const generation = ++this.generation;
+    let nearby = false;
+    const start = (): void => {
+      if (
+        !this.isConnected ||
+        generation !== this.generation ||
+        !this.intersectionObserver ||
+        !nearby ||
+        this.clientWidth === 0 ||
+        this.clientHeight === 0
+      )
+        return;
+      this.stopWaiting();
+      void this.initialize(generation);
+    };
+    this.intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        nearby = entries.some((entry) => entry.target === this && entry.isIntersecting);
+        start();
+      },
+      { rootMargin: '200px' }
+    );
+    this.intersectionObserver.observe(this);
+    // A zero-sized intersecting element need not cross an IO threshold when shown.
+    this.sizeObserver = new ResizeObserver(start);
+    this.sizeObserver.observe(this);
+  }
+
+  private stopWaiting(): void {
+    this.intersectionObserver?.disconnect();
+    this.intersectionObserver = undefined;
+    this.sizeObserver?.disconnect();
+    this.sizeObserver = undefined;
   }
 
   private clearMap(): void {
+    this.stopWaiting();
     const map = this.map;
     this.map = undefined;
     this.actionObserver?.disconnect();
@@ -39,7 +90,7 @@ export class PlacePreviewElement extends HTMLElement {
     const fallback = this.querySelector<HTMLElement>('[data-fallback]');
     if (fallback) fallback.hidden = false;
     const canvas = this.querySelector<HTMLElement>('[data-canvas]');
-    if (canvas) canvas.inert = true;
+    if (canvas) canvas.inert = !!fallback;
     map?.destroy();
     canvas?.replaceChildren();
   }
@@ -49,13 +100,13 @@ export class PlacePreviewElement extends HTMLElement {
     const template = this.querySelector<HTMLTemplateElement>('template');
     const fallback = this.querySelector<HTMLElement>('[data-fallback]');
     const message = this.querySelector<HTMLElement>('[data-message]');
-    if (!canvas || !template || !fallback || !message || !this.dataset.preview) return;
+    if (!canvas || !template || !this.dataset.preview) return;
 
-    canvas.inert = true;
-    message.textContent = 'Загружаем карту…';
+    canvas.inert = !!fallback;
+    if (message) message.textContent = 'Загружаем карту…';
     try {
-      // This payload is rendered from the validated domain Place by the Astro component.
-      const data = JSON.parse(this.dataset.preview) as PlacePreviewData;
+      // Astro serializes this payload from the adapters' validated domain data.
+      const data = JSON.parse(this.dataset.preview) as MapPreviewData;
       await loadYandexMaps();
       if (!this.isConnected || generation !== this.generation) return;
       const maps = window.ymaps3;
@@ -66,11 +117,24 @@ export class PlacePreviewElement extends HTMLElement {
         canvas,
         {
           location,
-          margin: [32, 32, 64, 32],
+          margin: getPreviewMargin(canvas.clientWidth, canvas.clientHeight, data.anchor),
           behaviors: [],
-          mode: 'vector'
+          mode: 'vector',
+          copyrightsPosition: 'bottom left',
+          distributionPosition: 'top right'
         },
-        [new maps.YMapDefaultSchemeLayer({}), new maps.YMapDefaultFeaturesLayer({})]
+        [
+          new maps.YMapDefaultSchemeLayer({
+            customization: [
+              {
+                stylers: data.muted
+                  ? { saturation: -0.4, lightness: 0.2, opacity: 0.55 }
+                  : { saturation: -0.3 }
+              }
+            ]
+          }),
+          new maps.YMapDefaultFeaturesLayer({})
+        ]
       );
       this.map = map;
 
@@ -79,13 +143,15 @@ export class PlacePreviewElement extends HTMLElement {
         if (this.map !== map) return;
         const logo = canvas.querySelector('.ymaps3--map-copyrights__logo');
         logo?.setAttribute('aria-label', 'Яндекс Карты');
-        if (!rendered) return;
-        // The SDK loads this native action independently of its tile renderer.
-        const button = canvas.querySelector('.ymaps3--open-maps-button')?.closest('button');
-        if (!button || button.disabled) return;
-        canvas.inert = false;
-        if (fallback.contains(document.activeElement)) button.focus({ preventScroll: true });
-        fallback.hidden = true;
+        if (fallback) {
+          if (!rendered) return;
+          // The SDK loads this native action independently of its tile renderer.
+          const button = canvas.querySelector('.ymaps3--open-maps-button')?.closest('button');
+          if (!button || button.disabled) return;
+          canvas.inert = false;
+          if (fallback.contains(document.activeElement)) button.focus({ preventScroll: true });
+          fallback.hidden = true;
+        }
         if (logo) {
           this.actionObserver?.disconnect();
           this.actionObserver = undefined;
@@ -118,7 +184,7 @@ export class PlacePreviewElement extends HTMLElement {
 
       // YMap moves marker DOM into its canvas; retain the template for reconnects.
       const marker = template.content.firstElementChild?.cloneNode(true);
-      if (!(marker instanceof HTMLElement)) throw new Error('Place marker is unavailable');
+      if (!(marker instanceof HTMLElement)) throw new Error('Map preview marker is unavailable');
       const openingHours = data.openingHours;
       if (openingHours) {
         const refreshMarker = (): void => {
@@ -141,23 +207,27 @@ export class PlacePreviewElement extends HTMLElement {
             rendered = !!tiles && tiles.tilesTotal > 0 && tiles.tilesReady === tiles.tilesTotal;
             handOff();
           },
-          onResize: () => {
-            if (this.map !== map) return;
+          onResize: ({ size }) => {
+            if (this.map !== map || size.x === 0 || size.y === 0) return;
             try {
-              map.update({ location: getPreviewLocation(data) });
+              map.update({
+                location: getPreviewLocation(data),
+                margin: getPreviewMargin(size.x, size.y, data.anchor)
+              });
             } catch (error) {
               this.clearMap();
-              message.textContent = 'Карта не загрузилась.';
-              console.error('Place preview resize:', error);
+              if (message) message.textContent = 'Карта не загрузилась.';
+              console.error('Map preview resize:', error);
             }
           }
         })
       );
+      handOff();
     } catch (error) {
       if (!this.isConnected || generation !== this.generation) return;
       this.clearMap();
-      message.textContent = 'Карта не загрузилась.';
-      console.error('Place preview:', error);
+      if (message) message.textContent = 'Карта не загрузилась.';
+      console.error('Map preview:', error);
     }
   }
 

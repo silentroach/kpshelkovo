@@ -145,6 +145,8 @@ describe('SettlementMap', () => {
 
     expect(mockYandexMaps.YMap.mock.calls[0]?.[1]).toMatchInlineSnapshot(`
       {
+        "copyrightsPosition": "bottom left",
+        "distributionPosition": "top right",
         "location": {
           "center": [
             37.6173,
@@ -533,36 +535,6 @@ describe('SettlementMap', () => {
       expect(document.activeElement).toBe(marker);
       expect(marker?.getAttribute('aria-expanded')).toBe('false');
     });
-  });
-
-  it('keeps non-interactive markers out of the accessibility tree', async () => {
-    render(SettlementMap, {
-      props: {
-        settlements: [mockSettlements[0]],
-        interactive: false,
-        popup: false
-      }
-    });
-
-    await waitFor(() => {
-      expect(markers.length).toBe(1);
-    });
-
-    const marker = markers[0];
-
-    expect({
-      ariaHidden: marker?.getAttribute('aria-hidden'),
-      ariaLabel: marker?.getAttribute('aria-label') ?? undefined,
-      tabIndex: marker?.tabIndex,
-      tagName: marker?.tagName
-    }).toMatchInlineSnapshot(`
-      {
-        "ariaHidden": "true",
-        "ariaLabel": undefined,
-        "tabIndex": -1,
-        "tagName": "DIV",
-      }
-    `);
   });
 
   it('renders fallback message when API is unavailable', async () => {

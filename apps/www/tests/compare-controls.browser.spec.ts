@@ -26,10 +26,11 @@ const isExplorerDataUrl = (url: string): boolean => getExplorerDataVersion(url) 
 const yandexMapsReadyScript = `
   window.__yandexMapUpdates = [];
   class YMap {
-    constructor(_container, options) {
+    constructor(container, options) {
+      this.container = container;
       this.zoom = options.location.zoom ?? 9;
     }
-    addChild() {}
+    addChild(child) { if (child.el) this.container.append(child.el); }
     removeChild() {}
     update(options) { window.__yandexMapUpdates.push(options); }
     destroy() {}
@@ -39,7 +40,11 @@ const yandexMapsReadyScript = `
     YMap,
     YMapDefaultSchemeLayer: class {},
     YMapDefaultFeaturesLayer: class {},
-    YMapMarker: class { update() {} },
+    YMapMarker: class {
+      constructor(_options, el) { this.el = el; }
+      update() {}
+    },
+    YMapListener: class {},
   };
 `;
 
@@ -59,6 +64,33 @@ test.beforeEach(async ({ page }) => {
       body: yandexMapsReadyScript
     });
   });
+});
+
+test('defers the hidden settlement preview until desktop without shifting content', async ({
+  page
+}) => {
+  const mapRequests: string[] = [];
+  page.on('request', (request) => {
+    if (request.url().includes('api-maps.yandex.ru')) mapRequests.push(request.url());
+  });
+  await page.setViewportSize(mobileViewports[1]);
+  await page.goto('/815/compare/settlements/shelkovo/', { waitUntil: 'networkidle' });
+
+  const preview = page.locator('map-preview');
+  await expect(preview).toBeHidden();
+  expect(mapRequests).toHaveLength(0);
+  await expect(page.locator('link[rel="preconnect"][href*="api-maps.yandex.ru"]')).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Открыть поселок на Яндекс.Картах' })).toBeVisible();
+
+  await page.setViewportSize(desktopViewport);
+  await expect(preview).toBeVisible();
+  const before = await page.getByTestId('infrastructure-section').boundingBox();
+  await expect(preview.locator('[data-canvas] .ui-map-marker')).toHaveCount(1);
+  expect(mapRequests).toHaveLength(1);
+  const after = await page.getByTestId('infrastructure-section').boundingBox();
+  expect(after?.y).toBe(before?.y);
+  await expect(preview.locator('[data-fallback]')).toHaveCount(0);
+  await expect(page.getByTestId('settlement-map')).toHaveCount(0);
 });
 
 for (const { name, viewport } of breadcrumbViewports) {
