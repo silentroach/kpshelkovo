@@ -106,10 +106,10 @@ Workflow доставляет include рядом с site-файлом в `/tmp` 
 
 ## Фреймы
 
-`frame-src 'self' https://yandex.ru https://mc.yandex.ru https://mc.yandex.com`
+`frame-src 'self' https://mc.yandex.ru https://mc.yandex.com`
 
 - Same-origin фреймы разрешены для внутренних сценариев.
-- `https://yandex.ru` нужен для виджетов Яндекс Карт, встроенных через `<iframe>`.
+- Встроенные карты используют общий JS API v3. После удаления iframe из `NewsEventCard` потребителей `frame-src https://yandex.ru` в исходниках нет, поэтому это разрешение удалено. Обычным ссылкам на Яндекс Карты `frame-src` не нужен.
 - `https://mc.yandex.ru` и `https://mc.yandex.com` нужны для служебного скрытого фрейма Яндекс Метрики `/metrika/match.html`. Метрика использует оба хоста; разрешения в `script-src` и `connect-src` не разрешают загрузку iframe.
 
 JS API Яндекс Карт v3 не является iframe. Для него нужны `script-src`, `connect-src`, `img-src`, `style-src`, `font-src` и `worker-src`.
@@ -135,11 +135,6 @@ JS API Яндекс Карт v3 не является iframe. Для него н
 - Служебный фрейм: `https://mc.yandex.ru/metrika/match.html`, `https://mc.yandex.com/metrika/match.html`.
 - В текущей инициализации карта кликов и Вебвизор отключены.
 
-Яндекс Карты через iframe-виджеты:
-
-- Фреймы: `https://yandex.ru`.
-- Изображения и подключенные ресурсы карты могут загружаться с доменов Яндекс Карт внутри iframe, но ими управляет CSP самой страницы внутри iframe.
-
 JS API Яндекс Карт v3:
 
 - Официальная справка: `https://yandex.ru/maps-api/docs/js-api/common/connection/csp.html`.
@@ -157,3 +152,24 @@ Pagefind 1.5.2:
 - `connect-src 'self'` покрывает fetch-запросы metadata, index chunks и fragments.
 - `worker-src 'self' blob:` покрывает same-origin worker и создаваемую Pagefind worker-обертку.
 - Pagefind компилирует WebAssembly. Рекомендованный Pagefind токен `'wasm-unsafe-eval'` отдельно не добавлен, потому что текущий более широкий `'unsafe-eval'` уже нужен Яндекс Картам и фактически разрешает эту компиляцию.
+
+## Проверенные запросы JS API
+
+При локальной проверке 18 сентября 2026 года настоящий SDK 3.0.21108841 обращался к следующим источникам:
+
+- `api-maps.yandex.ru/v3/` — `Script`, разрешён в `script-src`; `/services/coverage/v2` — `Fetch`, разрешён в `connect-src`.
+- `yastatic.net/.../maps-front-jsapi-3/...` — JS/CSS-бандлы в `script-src` и `style-src`, worker-бандлы `content_provider.worker.js` и `gltf_decoder.worker.js`. Для обёрток воркеров и загрузки их кода сохраняются существующие `worker-src` и `script-src`.
+- `core-renderer-tiles.maps.yandex.net` — `Fetch` для `/style`, `/vmap3/tiles`, `/vmap3/icons` и `/fonts/*`, покрывается `connect-src https://*.maps.yandex.net`. Тип запроса важнее MIME: PNG-иконки и глифы здесь загружаются через fetch, а не через `img-src` или `font-src`.
+- Тот же `core-renderer-tiles.maps.yandex.net/tiles` — `Image` в baseline поселка, покрывается `img-src https://*.maps.yandex.net`.
+- `log.api-maps.yandex.ru/services/logging/watch/...` — `Fetch`, покрывается `connect-src https://*.api-maps.yandex.ru`; на границе замера запрос ещё не завершён.
+- `mc.yandex.ru/metrika/match.html` — служебный фрейм Метрики. Его XHR к `hdrc.yandex.net` и `mdd.yandex.net` выполняются внутри внешнего iframe и не требуют расширять `connect-src` родительской страницы.
+
+Все наблюдавшиеся источники JS API уже разрешены. Существующие разрешения SDK сохранены: отсутствие источника в одном наборе кадров не доказывает, что он больше не нужен. Запросы `/ads/` и рекламных партнёров прежнего `map-widget` внутри iframe не служат основанием для расширения CSP сайта.
+
+## Локальная проверка актуальной CSP
+
+Для проверки раздавать свежую сборку с enforced-заголовком `Content-Security-Policy`, прочитанным из актуального `security.conf`, и сверять заголовок в ответе HTML. Обычный статический сервер без CSP и режим Report-Only не проверяют применение политики. Собирать Console и Network с начала навигации, включая workers и дочерние фреймы.
+
+В [PR #763](https://github.com/silentroach/kpshelkovo/pull/763) проверены интерактивные карты мест и сравнения, превью точки и контуров, шапка поселка и новости с одним и несколькими событиями. На `localhost` настоящий API работает без CSP-нарушений при 390/1440 px, resize и Astro-навигации. Картографических iframe нет; разрешения SDK и служебных фреймов Метрики сохранены.
+
+Перед reload nginx выполнить `nginx -t` в окружении деплоя. Основной site-конфиг уже подключает `security.conf` во всех затронутых HTML locations со своим `add_header`.

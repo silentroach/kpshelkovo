@@ -14,7 +14,7 @@ import { createNewsArticleMentionRefs } from '../mentions';
 import { toNewsPublicPayload } from '../public-dto';
 import { newsPublicPayloadSchema } from '../public-schema';
 import { newsArticleSchema } from '../seo';
-import { buildNewsEventMapEmbedUrl, buildNewsEventMapUrl } from '../view';
+import { buildNewsEventMapUrl } from '../view';
 
 const articleEntry = (place?: string, body = '') =>
   newsArticleEntry({
@@ -55,7 +55,6 @@ describe('event place references', () => {
       expect(event.place).toBe(place);
       expect(event.locationDetails).toBe('В беседке; вход, справа');
       expect(buildNewsEventMapUrl(event)).toBe(place.mapUrl);
-      expect(new URL(buildNewsEventMapEmbedUrl(event)!).searchParams.get('ll')).toBe('38,55');
     }
   );
 
@@ -123,7 +122,6 @@ describe('event place references', () => {
       }
     `);
     expect(buildNewsEventMapUrl(event)).toBeUndefined();
-    expect(buildNewsEventMapEmbedUrl(event)).toBeUndefined();
     expect(buildArticleEventIcs(article, event)).not.toMatch(/LOCATION|GEO:/);
     expect(
       newsArticleSchema({

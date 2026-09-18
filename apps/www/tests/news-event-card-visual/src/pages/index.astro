@@ -5,22 +5,23 @@ import '@/styles/site.css';
 import NewsEventCard from '@/components/news/NewsEventCard.astro';
 import type { NewsEvent } from '@/lib/news/types';
 import { testPlace } from '@/lib/places/tests/place.test-helper';
+import MapBackground from '../../map-background.svg';
 
 const eventWithCoordinates = {
   slug: 'reglament',
   title: 'Встреча по регламенту',
-  startsAt: new Date('2026-05-31T19:00:00+03:00'),
-  startsIso: '2026-05-31T19:00:00.000+03:00',
+  startsAt: new Date('2026-09-30T19:00:00+03:00'),
+  startsIso: '2026-09-30T19:00:00.000+03:00',
   startsTime: '19:00',
-  endsAt: new Date('2026-05-31T21:00:00+03:00'),
-  endsIso: '2026-05-31T21:00:00.000+03:00',
+  endsAt: new Date('2026-09-30T21:00:00+03:00'),
+  endsIso: '2026-09-30T21:00:00.000+03:00',
   endsTime: '21:00',
   icsUrl: '/news/2026/05/reglament/event.ics',
   place: testPlace({ coordinates: { lat: 55.123456, lng: 38.654321 } }),
   locationDetails: 'в беседке',
 } satisfies NewsEvent;
 
-const eventWithoutCoordinates = {
+const eventWithoutPlace = {
   slug: 'entrance',
   title: 'Обсуждение благоустройства въезда',
   startsAt: new Date('2026-06-03T10:30:00+03:00'),
@@ -56,16 +57,93 @@ const eventWithoutCoordinates = {
         <p class="news-event-visual-label">Without a place</p>
         <div
           class="news-event-visual-target"
-          data-testid="news-event-card-location-only"
+          data-testid="news-event-card-no-place"
         >
-          <NewsEventCard event={eventWithoutCoordinates} variant="compact" />
+          <NewsEventCard event={eventWithoutPlace} variant="compact" />
         </div>
       </section>
     </main>
+    <!-- Static SDK-owned layout only; MapPreview supplies the marker at runtime. -->
+    <template id="map-sdk-fixture">
+      <div class="fixture-map">
+        <MapBackground class="fixture-map-background" aria-hidden="true" />
+        <div class="fixture-map-marker" data-fixture-marker></div>
+        <div class="fixture-map-copyright ymaps3--map-copyrights">
+          <a href="https://yandex.ru/maps/" class="ymaps3--map-copyrights__logo"
+            >Яндекс Карты</a
+          >
+          <a href="https://yandex.ru/legal/maps_termsofuse/"
+            >Условия использования</a
+          >
+        </div>
+        <button
+          type="button"
+          class="fixture-map-open"
+          aria-label="Открыть в Яндекс Картах"
+        >
+          <span class="ymaps3--open-maps-button">Открыть Яндекс Карты</span>
+        </button>
+      </div>
+    </template>
   </body>
 </html>
 
 <style>
+  .fixture-map {
+    position: absolute;
+    inset: 0;
+    font-family: Arial, sans-serif;
+  }
+
+  .fixture-map :global(.fixture-map-background) {
+    opacity: 0.4;
+    filter: saturate(0.6) brightness(1.2);
+  }
+
+  .fixture-map-marker {
+    position: absolute;
+    left: 75%;
+    top: 45%;
+  }
+
+  .fixture-map-copyright {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    display: grid;
+    gap: 2px;
+    font-size: 10px;
+    line-height: 12px;
+  }
+
+  .fixture-map :is(a, button) {
+    color: #222;
+    text-decoration: none;
+  }
+
+  .ymaps3--map-copyrights__logo {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+  }
+
+  .fixture-map-open {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: grid;
+    place-content: center;
+    width: 163.875px;
+    height: 36px;
+    border: 0;
+    padding: 0;
+    font-size: 14px;
+    white-space: nowrap;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 6px #0003;
+  }
+
   .news-event-visual-page {
     min-height: 100vh;
     margin: 0;

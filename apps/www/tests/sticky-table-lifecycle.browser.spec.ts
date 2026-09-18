@@ -11,6 +11,11 @@ const stickyRoutes = [
   '/815/compare/settlements/shelkovo/'
 ] as const;
 
+test.beforeEach(async ({ page }) => {
+  // Count site lifecycle listeners without Metrika's delayed scroll/resize listeners.
+  await page.route('https://mc.yandex.ru/**', (route) => route.abort());
+});
+
 const installWindowListenerTracker = (page: Page): Promise<void> =>
   page.addInitScript(
     ({ resizeCountKey, scrollCountKey, sessionKey }) => {
