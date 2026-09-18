@@ -185,6 +185,7 @@ const assumption = tariffCalc?.assumption;
                 zoom: 12,
                 anchor: [0.8, 0.5],
                 muted: true,
+                mutedOpacity: 0.4,
                 distributionPosition: 'bottom right',
               }}
               label={settlement.name}
@@ -785,7 +786,7 @@ const assumption = tariffCalc?.assumption;
   .settlement-hero-map :global(.ymaps3--map-copyrights),
   .settlement-hero-map
     :global(.ymaps3--control:has(.ymaps3--open-maps-button)) {
-    --settlement-map-fade-end: 0.3;
+    --settlement-map-fade-end: 0.2;
   }
 
   .settlement-hero-map :global(.ymaps3--map-copyrights) {
@@ -794,6 +795,14 @@ const assumption = tariffCalc?.assumption;
       max(var(--page-padding), (100cqw - var(--page-max)) / 2) + 1.25rem
     );
     margin-left: 0;
+  }
+
+  .settlement-hero-map
+    :global(.ymaps3--control:has(.ymaps3--open-maps-button)) {
+    /* The SDK already leaves 12px between its button and the map edge. */
+    margin-right: calc(
+      max(var(--page-padding), (100cqw - var(--page-max)) / 2) + 0.75rem
+    );
   }
 
   .settlement-hero-map

@@ -56,6 +56,7 @@ test.each([
           },
           "distributionPosition": "bottom right",
           "muted": true,
+          "mutedOpacity": 0.4,
           "zoom": 12,
         }
       `);
