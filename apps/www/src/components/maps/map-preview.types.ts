@@ -1,3 +1,5 @@
+import type { YMapProps } from '@yandex/ymaps3-types';
+
 import type { PlaceCoordinates, PlaceGeometry, PlaceOpeningHours } from '@/lib/places/types';
 
 export interface MapPreviewData {
@@ -9,6 +11,7 @@ export interface MapPreviewData {
   readonly anchor?: readonly [number, number];
   readonly muted?: boolean;
   readonly mutedOpacity?: number;
+  readonly distributionPosition?: YMapProps['distributionPosition'];
 }
 
 export interface MapPreviewProps {

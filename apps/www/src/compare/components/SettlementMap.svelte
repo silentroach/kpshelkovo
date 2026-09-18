@@ -189,7 +189,7 @@
         {
           location: view.location,
           copyrightsPosition: 'bottom left',
-          distributionPosition: 'top right'
+          distributionPosition: 'bottom right'
         },
         [new YMapDefaultSchemeLayer(), new YMapDefaultFeaturesLayer()]
       );
@@ -581,6 +581,7 @@
   }
 
   .map-canvas {
+    container-type: inline-size;
     width: 100%;
     height: 100%;
   }
@@ -588,6 +589,12 @@
   .map-canvas :global(:is(a, button):focus-visible) {
     outline: 0.1875rem solid var(--color-focus);
     outline-offset: 0.125rem;
+  }
+
+  @container (max-width: 32rem) {
+    .map-canvas :global(.ymaps3--map-copyrights_bottom) {
+      bottom: 3.5rem;
+    }
   }
 
   .map-popup {

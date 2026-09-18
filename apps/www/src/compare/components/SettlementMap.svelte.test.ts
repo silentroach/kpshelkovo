@@ -146,7 +146,7 @@ describe('SettlementMap', () => {
     expect(mockYandexMaps.YMap.mock.calls[0]?.[1]).toMatchInlineSnapshot(`
       {
         "copyrightsPosition": "bottom left",
-        "distributionPosition": "top right",
+        "distributionPosition": "bottom right",
         "location": {
           "center": [
             37.6173,

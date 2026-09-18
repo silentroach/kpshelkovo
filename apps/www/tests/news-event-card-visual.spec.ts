@@ -12,42 +12,39 @@ const screenshot = {
 // static map chrome; real MapPreview code clones and passes the production marker.
 const yandexMapsReadyScript = `
   window.ymaps3 = {
-    ready: Promise.resolve(),
+    ready: new Promise(resolve => window.addEventListener('fixture:maps-ready', resolve, { once: true })),
     YMap: class {
       constructor(container) {
         this.container = container;
         container.append(document.querySelector('#map-sdk-fixture').content.cloneNode(true));
       }
       addChild(child) {
-        if (!child.el) return;
-        this.container.querySelector('[data-fixture-marker]').append(child.el);
+        if (child.el) this.container.querySelector('[data-fixture-marker]').append(child.el);
+        if (child.props) window.addEventListener('fixture:tiles-ready', () => child.props.onStateChanged({
+          getLayerState: () => ({ tilesReady: 1, tilesTotal: 1 })
+        }), { once: true });
       }
       destroy() {}
     },
-    YMapDefaultSchemeLayer: class {},
+    YMapDefaultSchemeLayer: class { static defaultProps = { source: 'fixture' }; },
     YMapDefaultFeaturesLayer: class {},
     YMapMarker: class {
       constructor(_options, el) { this.el = el; }
     },
-    YMapListener: class {},
+    YMapListener: class {
+      constructor(props) { this.props = props; }
+    },
   };
 `;
 
-const expectActions = async (target: Locator, icsUrl: string, mapUrl?: string): Promise<void> => {
-  const calendarLink = target.getByRole('link', { name: 'Добавить в календарь' });
-  const mapLink = target.getByRole('link', { name: 'Открыть на Яндекс Картах' });
+const expectCalendarOnly = async (target: Locator, icsUrl: string): Promise<void> => {
+  const actions = target.locator('.news-event-compact-actions');
+  const calendarLink = actions.getByRole('link', { name: 'Добавить в календарь' });
 
+  await expect(actions.locator('a, button')).toHaveCount(1);
   await expect(calendarLink).toHaveAttribute('href', icsUrl);
   await expect(calendarLink).toHaveAttribute('download', /.+\.ics$/);
   await expectPaintedContent(calendarLink);
-  if (mapUrl) {
-    await expect(mapLink).toHaveAttribute('href', mapUrl);
-    await expect(mapLink).toHaveAttribute('target', '_blank');
-    await expectPaintedContent(mapLink);
-  } else {
-    await expect(mapLink).toHaveCount(0);
-    await expect(target.getByRole('link')).toHaveCount(1);
-  }
 };
 
 for (const [device, viewport] of [
@@ -65,7 +62,9 @@ for (const [device, viewport] of [
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(viewport.width);
     });
 
-    test('renders coordinates with background map, pin and actions', async ({ page }) => {
+    test('hands off the map fallback to native controls with only the calendar below', async ({
+      page
+    }) => {
       const target = page.getByTestId('news-event-card-coordinates');
 
       await expect(target.getByRole('complementary')).toBeVisible();
@@ -83,6 +82,28 @@ for (const [device, viewport] of [
       );
       await expect(target.locator('iframe')).toHaveCount(0);
       const canvas = preview.locator('[data-canvas]');
+      const fallback = preview.locator('a[data-fallback]');
+      const openMaps = canvas.getByRole('button', { name: 'Открыть в Яндекс Картах' });
+      await expect(preview.locator('[data-message]')).toHaveCount(0);
+      await expect(fallback).toBeVisible();
+      await expect(canvas).toHaveJSProperty('inert', true);
+      await fallback.focus();
+      await expect(fallback).toBeFocused();
+
+      // Release SDK readiness after focusing the SSR link; real MapPreview owns the handoff.
+      await page.evaluate(() => window.dispatchEvent(new Event('fixture:maps-ready')));
+      await expect(canvas.locator('.ymaps3--open-maps-button')).toBeAttached();
+      await expect(canvas).toBeHidden();
+      await expect(fallback).toBeVisible();
+      await expect(fallback).toBeFocused();
+      await page.evaluate(() => window.dispatchEvent(new Event('fixture:tiles-ready')));
+      await expect(fallback).toBeHidden();
+      await expect(fallback).toHaveAttribute(
+        'href',
+        'https://yandex.ru/maps/?pt=38.654321,55.123456&z=18&l=map'
+      );
+      await expect(canvas).toHaveJSProperty('inert', false);
+      await expect(openMaps).toBeFocused();
       await expect(canvas.locator('svg')).toBeVisible();
       const marker = canvas.locator('span.ui-map-marker.news-event-compact-map-pin');
       await expect(marker).toHaveCount(1);
@@ -93,9 +114,7 @@ for (const [device, viewport] of [
       expect(markerBox.width).toBe(18);
       expect(markerBox.height).toBe(18);
 
-      const openMapsBox = await canvas
-        .getByRole('link', { name: 'Открыть в Яндекс Картах' })
-        .boundingBox();
+      const openMapsBox = await openMaps.boundingBox();
       if (!openMapsBox) throw new Error('Missing native OpenMaps action');
       expect(markerBox.y).toBeGreaterThan(openMapsBox.y + openMapsBox.height);
       for (const text of ['30', 'сентября']) {
@@ -113,16 +132,15 @@ for (const [device, viewport] of [
         'href',
         '/map/club/'
       );
-      await expectActions(
-        target,
-        '/news/2026/05/reglament/event.ics',
-        'https://yandex.ru/maps/?pt=38.654321,55.123456&z=18&l=map'
-      );
+      await expectCalendarOnly(target, '/news/2026/05/reglament/event.ics');
 
       // Native SDK controls must remain reachable through the card's content layer.
       await target.getByRole('link', { name: 'КП Шелково, эко-клуб' }).focus();
-      for (const name of ['Открыть в Яндекс Картах', 'Условия использования', 'Яндекс Карты']) {
-        const action = canvas.getByRole('link', { name, exact: true });
+      for (const action of [
+        openMaps,
+        canvas.getByRole('link', { name: 'Условия использования', exact: true }),
+        canvas.getByRole('link', { name: 'Яндекс Карты', exact: true })
+      ]) {
         await page.keyboard.press('Shift+Tab');
         await expect(action).toBeFocused();
         await action.click({ trial: true });
@@ -152,7 +170,8 @@ for (const [device, viewport] of [
       await expect(target.locator('iframe')).toHaveCount(0);
       await expect(target.locator('map-preview')).toHaveCount(0);
       await expect(target.locator('.news-event-compact-map-pin')).toHaveCount(0);
-      await expectActions(target, '/news/2026/06/entrance/event.ics');
+      await expectCalendarOnly(target, '/news/2026/06/entrance/event.ics');
+      await expect(target.getByRole('link')).toHaveCount(1);
 
       await expect(target).toHaveScreenshot(`news-event-card-no-place-${device}.png`, screenshot);
     });

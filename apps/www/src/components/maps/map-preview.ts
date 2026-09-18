@@ -121,7 +121,7 @@ export class MapPreviewElement extends HTMLElement {
           behaviors: [],
           mode: 'vector',
           copyrightsPosition: 'bottom left',
-          distributionPosition: 'top right'
+          distributionPosition: data.distributionPosition ?? 'top right'
         },
         [
           new maps.YMapDefaultSchemeLayer({

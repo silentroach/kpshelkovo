@@ -100,7 +100,13 @@ describe('event place card', () => {
       const marker = preview?.querySelector('template')?.content;
       expect(marker?.querySelectorAll('.ui-map-marker')).toHaveLength(1);
       expect(marker?.querySelectorAll('img, [data-open]')).toHaveLength(0);
-      expect(preview?.querySelector('[data-fallback]')).toBeFalsy();
+      const fallback = preview?.querySelector('[data-fallback]');
+      expect(fallback?.getAttribute('href')).toBe(place.mapUrl);
+      expect(fallback?.hasAttribute('hidden')).toBe(false);
+      const actions = window.document.querySelector('.news-event-compact-actions');
+      expect([...actions!.querySelectorAll('a')].map((link) => link.getAttribute('href'))).toEqual([
+        event.icsUrl
+      ]);
     } finally {
       await window.happyDOM.close();
     }

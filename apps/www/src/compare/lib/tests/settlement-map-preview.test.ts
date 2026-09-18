@@ -54,6 +54,7 @@ test.each([
             "lat": 55,
             "lng": 37,
           },
+          "distributionPosition": "bottom right",
           "muted": true,
           "zoom": 12,
         }

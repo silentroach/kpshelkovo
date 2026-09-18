@@ -185,6 +185,7 @@ const assumption = tariffCalc?.assumption;
                 zoom: 12,
                 anchor: [0.8, 0.5],
                 muted: true,
+                distributionPosition: 'bottom right',
               }}
               label={settlement.name}
             >
@@ -754,9 +755,54 @@ const assumption = tariffCalc?.assumption;
   }
 
   .settlement-hero-map {
+    container-type: size;
     position: absolute;
     inset: 0;
     overflow: hidden;
+  }
+
+  .settlement-hero-map :global(map-preview) {
+    background: var(--color-bg);
+  }
+
+  .settlement-hero-map :global(canvas),
+  .settlement-hero-map :global(.ymaps3--map-copyrights),
+  .settlement-hero-map
+    :global(.ymaps3--control:has(.ymaps3--open-maps-button)) {
+    mask-image: linear-gradient(
+      to bottom,
+      black 0%,
+      rgb(0 0 0 / 88%) 48%,
+      rgb(0 0 0 / 52%) 74%,
+      rgb(0 0 0 / var(--settlement-map-fade-end, 0)) 100%
+    );
+    /* The drawing and native footer controls share the same full-height fade. */
+    mask-size: 100% 100cqh;
+    mask-position: bottom;
+    mask-repeat: no-repeat;
+  }
+
+  .settlement-hero-map :global(.ymaps3--map-copyrights),
+  .settlement-hero-map
+    :global(.ymaps3--control:has(.ymaps3--open-maps-button)) {
+    --settlement-map-fade-end: 0.3;
+  }
+
+  .settlement-hero-map :global(.ymaps3--map-copyrights) {
+    /* Match the title grid, accounting for the SDK text's 4px inset. */
+    left: calc(
+      max(var(--page-padding), (100cqw - var(--page-max)) / 2) + 1.25rem
+    );
+    margin-left: 0;
+  }
+
+  .settlement-hero-map
+    :global(.ymaps3--map-copyrights:is(:hover, :focus-within)),
+  .settlement-hero-map
+    :global(
+      .ymaps3--control:has(.ymaps3--open-maps-button):is(:hover, :focus-within)
+    ) {
+    mask-image: none;
   }
 
   .settlement-preview-marker {
@@ -769,7 +815,7 @@ const assumption = tariffCalc?.assumption;
     z-index: 10;
     display: flex;
     flex-direction: column;
-    padding: 3.5rem 1.25rem 3rem;
+    padding: 2rem 1.25rem 3rem;
     pointer-events: none;
   }
 
@@ -1300,6 +1346,12 @@ const assumption = tariffCalc?.assumption;
     .settlement-mobile-header,
     .settlement-passport {
       display: none;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .settlement-hero-content {
+      padding-top: 2.5rem;
     }
   }
 </style>

@@ -555,8 +555,7 @@
             behaviors: mapBehaviors(),
             mode: 'vector',
             copyrightsPosition: 'bottom left',
-            // The site header overlays the top edge of this full-page map.
-            distributionPosition: 'right'
+            distributionPosition: 'bottom right'
           },
           [
             new YMapDefaultSchemeLayer({
@@ -674,6 +673,7 @@
   }
 
   .place-map__canvas {
+    container-type: inline-size;
     width: 100%;
     height: 100%;
   }
@@ -681,6 +681,12 @@
   .place-map__canvas :global(:is(a, button):focus-visible) {
     outline: 0.1875rem solid var(--color-focus);
     outline-offset: 0.125rem;
+  }
+
+  @container (max-width: 32rem) {
+    .place-map__canvas :global(.ymaps3--map-copyrights_bottom) {
+      bottom: 3.5rem;
+    }
   }
 
   .map-placeholder {

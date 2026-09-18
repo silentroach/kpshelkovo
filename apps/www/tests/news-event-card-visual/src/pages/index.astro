@@ -68,7 +68,7 @@ const eventWithoutPlace = {
       <div class="fixture-map">
         <MapBackground class="fixture-map-background" aria-hidden="true" />
         <div class="fixture-map-marker" data-fixture-marker></div>
-        <div class="fixture-map-copyright">
+        <div class="fixture-map-copyright ymaps3--map-copyrights">
           <a href="https://yandex.ru/maps/" class="ymaps3--map-copyrights__logo"
             >Яндекс Карты</a
           >
@@ -76,11 +76,13 @@ const eventWithoutPlace = {
             >Условия использования</a
           >
         </div>
-        <a
-          href="https://yandex.ru/maps/?pt=38.654321,55.123456&z=16&l=map"
+        <button
+          type="button"
           class="fixture-map-open"
-          aria-label="Открыть в Яндекс Картах">Открыть Яндекс Карты</a
+          aria-label="Открыть в Яндекс Картах"
         >
+          <span class="ymaps3--open-maps-button">Открыть Яндекс Карты</span>
+        </button>
       </div>
     </template>
   </body>
@@ -114,7 +116,7 @@ const eventWithoutPlace = {
     line-height: 12px;
   }
 
-  .fixture-map a {
+  .fixture-map :is(a, button) {
     color: #222;
     text-decoration: none;
   }
@@ -133,6 +135,8 @@ const eventWithoutPlace = {
     place-content: center;
     width: 163.875px;
     height: 36px;
+    border: 0;
+    padding: 0;
     font-size: 14px;
     white-space: nowrap;
     border-radius: 8px;
