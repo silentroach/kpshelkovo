@@ -36,10 +36,35 @@ const titleId = `news-event-title-${event.slug}`;
     embedUrl={buildNewsEventMapEmbedUrl(event, { centerOffsetYPx: 50 })}
   >
     <div class="news-event-content">
-      <time class="news-event-date" datetime={event.startsIso}>
-        <span class="news-event-day">{eventDay}</span>{' '}
-        <span class="news-event-month">{eventMonth}</span>
-      </time>
+      <div class="news-event-date">
+        {
+          event.status === 'cancelled' && (
+            <span
+              class="news-event-cancelled"
+              role="img"
+              aria-label={EVENT_STATUS_LABELS.cancelled}
+              title={EVENT_STATUS_LABELS.cancelled}
+              data-pagefind-ignore
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="9" />
+                <path d="m9 9 6 6m0-6-6 6" />
+              </svg>
+            </span>
+          )
+        }
+        <time datetime={event.startsIso}>
+          <span class="news-event-day">{eventDay}</span>{' '}
+          <span class="news-event-month">{eventMonth}</span>
+        </time>
+      </div>
       <h2 id={titleId} class="news-event-title">
         <a href={event.url} set:html={formatDynamicHtml(event.title)} />
       </h2>
@@ -90,7 +115,7 @@ const titleId = `news-event-title-${event.slug}`;
         </li>
       </ul>
       {
-        event.status !== 'announced' && (
+        event.status === 'conditional' && (
           <p>
             <strong data-status={event.status}>
               {EVENT_STATUS_LABELS[event.status]}
@@ -154,12 +179,26 @@ const titleId = `news-event-title-${event.slug}`;
   }
   .news-event-date {
     display: flex;
-    align-items: baseline;
-    gap: 0.45rem;
+    align-items: center;
+    gap: 0.65rem;
     border-bottom: 1px solid
       color-mix(in oklab, var(--color-border) 78%, var(--color-accent) 22%);
     padding-bottom: 0.75rem;
     color: var(--color-primary);
+  }
+  .news-event-date time {
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+  }
+  .news-event-cancelled {
+    display: flex;
+    flex: none;
+    color: var(--color-danger-text);
+  }
+  .news-event-cancelled svg {
+    width: 1.35rem;
+    height: 1.35rem;
   }
   .news-event-day {
     font-family: var(--font-heading);
@@ -206,9 +245,6 @@ const titleId = `news-event-title-${event.slug}`;
     font-size: 0.9rem;
     font-weight: 600;
     line-height: 1.35;
-  }
-  [data-status='cancelled'] {
-    color: var(--color-danger-text);
   }
   [data-status='conditional'] {
     color: var(--color-warning-text);

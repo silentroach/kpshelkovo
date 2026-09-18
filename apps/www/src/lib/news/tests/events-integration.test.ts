@@ -189,7 +189,15 @@ describe('shared events in news', () => {
     const html = await container.renderToString(NewsEventCard, {
       props: { event }
     });
-    expect(html).toContain('Отменено');
+    const window = new Window();
+    try {
+      window.document.body.innerHTML = html;
+      const cancellation = window.document.querySelector('[role="img"][aria-label="Отменено"]');
+      expect(cancellation?.nextElementSibling?.tagName).toBe('TIME');
+      expect(window.document.body.textContent).not.toContain('Отменено');
+    } finally {
+      window.close();
+    }
     expect(html).not.toContain('download=');
     expect(
       toNewsPublicPayload(data).articles.find((item) => item.id === article.id)?.events?.[0]

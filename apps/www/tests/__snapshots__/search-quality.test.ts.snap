@@ -3537,7 +3537,7 @@ exports[`#224 events calendar adjacent controls 1`] = `
         "url": "/map/greenwood-orchard/",
       },
       {
-        "excerpt": "Бессмертный полк в Гринвуде. 13:00–14:00. КПП Гринвуд 2. 9 мая",
+        "excerpt": "Бессмертный полк в Гринвуде. 13:00–14:00. КПП Гринвуд 2. 9 мая.",
         "highlights": [
           "Гринвуде.",
           "Гринвуд",
@@ -3556,7 +3556,7 @@ exports[`#224 events calendar adjacent controls 1`] = `
         "url": "/kb/telegram/#соседние-поселки",
       },
       {
-        "excerpt": "ОК решила показывать их уже на встрече. Место встречи — ресторан Green Dreams в КП Гринвуд 2. Для мероприятия подготовлена беседка, рассчитанная до 20 жителей. 13 июня Встреча с ОК",
+        "excerpt": "ОК решила показывать их уже на встрече. Место встречи — ресторан Green Dreams в КП Гринвуд 2. Для мероприятия подготовлена беседка, рассчитанная до 20 жителей. 13 июня. Встреча с ОК",
         "highlights": [
           "Гринвуд",
         ],
@@ -4239,7 +4239,7 @@ exports[`#224 events calendar targets 1`] = `
         "url": "/events/2026/05/immortal-regiment-greenwood/#event-title",
       },
       {
-        "excerpt": "Бессмертный полк в Гринвуде. 13:00–14:00. КПП Гринвуд 2. 9 мая",
+        "excerpt": "Бессмертный полк в Гринвуде. 13:00–14:00. КПП Гринвуд 2. 9 мая.",
         "highlights": [
           "Бессмертный",
           "полк",
@@ -4277,7 +4277,7 @@ exports[`#224 events calendar targets 1`] = `
         "url": "/events/2026/05/victory-day-greenwood/#event-title",
       },
       {
-        "excerpt": "День Победы в Гринвуде. 14:00–17:00. Фруктовый сад в Гринвуде, у фруктового сада. 9 мая",
+        "excerpt": "День Победы в Гринвуде. 14:00–17:00. Фруктовый сад в Гринвуде, у фруктового сада. 9 мая.",
         "highlights": [
           "День",
           "Победы",
@@ -4409,7 +4409,7 @@ exports[`#224 events calendar targets 1`] = `
         "url": "/events/2026/06/ok-meeting-june/#event-title",
       },
       {
-        "excerpt": "Встреча с ОК Комфорт в Green Dreams. 16:00. Ресторан Green Dreams, в беседке. Отменено.",
+        "excerpt": "Встреча с ОК Комфорт в Green Dreams. 16:00. Ресторан Green Dreams, в беседке.",
         "highlights": [
           "Встреча",
           "ОК",
@@ -4429,7 +4429,7 @@ exports[`#224 events calendar targets 1`] = `
     "query": "встреча 13 июня",
     "results": [
       {
-        "excerpt": "Встреча с ОК Комфорт в Green Dreams. 16:00. Ресторан Green Dreams, в беседке. Отменено.",
+        "excerpt": "Встреча с ОК Комфорт в Green Dreams. 16:00. Ресторан Green Dreams, в беседке.",
         "highlights": [
           "Встреча",
         ],
