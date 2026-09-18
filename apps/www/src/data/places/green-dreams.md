@@ -5,8 +5,8 @@ status: existing
 summary: Ресторан с завтраками, доставкой и бронированием столиков
 location:
   coordinates:
-    lat: 55.074958
-    lng: 37.755599
+    lat: 55.074976
+    lng: 37.755478
 opening_hours:
   periods:
     - days: [mon, tue, wed, thu, sun]
