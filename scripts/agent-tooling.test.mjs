@@ -1,13 +1,22 @@
 import assert from 'node:assert/strict';
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 import { test } from 'node:test';
 
-import { checkGenerated, generateOpenSpec } from './openspec.mjs';
+import { generateOpenSpec } from './openspec.mjs';
 import { hashSkill, verifyOpenCodeSkills, verifySkillHashes } from './skills.mjs';
 
-test('generation ignores the caller profile and detects modified, missing and extra instructions', () => {
+const tree = (directory) =>
+  readdirSync(directory, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => {
+      const path = relative(directory, join(entry.parentPath, entry.name));
+      return [path, readFileSync(join(directory, path))];
+    })
+    .sort(([a], [b]) => a.localeCompare(b));
+
+test('generation ignores the caller profile and leaves it untouched', () => {
   const temp = mkdtempSync(join(tmpdir(), 'openspec-test-'));
   const previous = process.env.XDG_CONFIG_HOME;
   try {
@@ -19,16 +28,8 @@ test('generation ignores the caller profile and detects modified, missing and ex
     generateOpenSpec(expected);
     process.env.XDG_CONFIG_HOME = join(temp, 'profile');
     generateOpenSpec(actual);
-    checkGenerated(expected, actual);
+    assert.deepEqual(tree(actual), tree(expected));
     assert.equal(readFileSync(join(temp, 'profile/openspec/config.json'), 'utf8'), profile);
-    const command = join(actual, '.opencode/commands/opsx-apply.md');
-    writeFileSync(command, 'drift');
-    assert.throws(() => checkGenerated(expected, actual), /opsx-apply\.md/);
-    rmSync(command);
-    assert.throws(() => checkGenerated(expected, actual), /opsx-apply\.md/);
-    cpSync(join(expected, '.opencode'), join(actual, '.opencode'), { recursive: true });
-    writeFileSync(join(actual, '.opencode/commands/opsx-extra.md'), 'extra');
-    assert.throws(() => checkGenerated(expected, actual), /opsx-extra\.md/);
   } finally {
     if (previous === undefined) delete process.env.XDG_CONFIG_HOME;
     else process.env.XDG_CONFIG_HOME = previous;

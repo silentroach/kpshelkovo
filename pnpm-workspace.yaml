@@ -3,7 +3,7 @@ packages:
   - packages/*
 ignoreScripts: true
 
-minimumReleaseAge: 4320
+minimumReleaseAge: 2880
 autoInstallPeers: false
 
 overrides:

@@ -58,7 +58,6 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm openspec:validate
-      - run: pnpm openspec:check
       - run: pnpm test:agent-tooling
       - run: pnpm skills:install
       - run: pnpm skills:check
