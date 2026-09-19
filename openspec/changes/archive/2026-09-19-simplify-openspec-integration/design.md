@@ -2,7 +2,7 @@
 
 ## Context
 
-См. [proposal.md](proposal.md). [ADR-038](../../../docs/decisions/038-openspec-development-workflow.md) закрепляет штатную интеграцию и изоляцию личного профиля. Скрипт сейчас генерирует инструкции через `init` и `update`, сравнивает их с временным эталоном, а bootstrap повторяет генерацию для `check`.
+См. [proposal.md](proposal.md). [ADR-038](../../../../docs/decisions/038-openspec-development-workflow.md) закрепляет штатную интеграцию и изоляцию личного профиля. На момент подготовки change скрипт генерировал инструкции через `init` и `update`, сравнивал их с временным эталоном, а bootstrap повторял генерацию для `check`.
 
 После `spec cleanup` фактический набор совпадает с шестью workflows штатного `core`, но скрипт всё ещё добавляет `verify`. Правила отбора specs уже находятся в корневом `AGENTS.md`; ссылки на удалённый `openspec/AGENTS.md` устарели.
 
