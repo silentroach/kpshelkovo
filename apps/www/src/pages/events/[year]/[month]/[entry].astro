@@ -8,6 +8,7 @@ import EventList from '@/components/events/EventList.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
 import { loadEventsData } from '@/lib/events/load';
+import { isEventSearchable } from '@/lib/events/search';
 import { buildEventJsonLd } from '@/lib/events/seo';
 import { eventDayUrl, eventMonthUrl } from '@/lib/events/urls';
 import {
@@ -88,7 +89,7 @@ const breadcrumbs = withHomeBreadcrumbs([
   description={description}
   canonical={event?.url ?? day!.url}
   schema={event ? buildEventJsonLd(event, absoluteUrl('/')) : undefined}
-  search={event
+  search={event && isEventSearchable(event)
     ? {
         scope: 'manual',
         title: `${event.status === 'cancelled' ? 'Отменено: ' : ''}${event.title} — События`,

@@ -1,3 +1,5 @@
+import { buildEventMapUrl } from '@/lib/events/view';
+
 import { absoluteUrl } from '../site';
 import type {
   NewsArticle,
@@ -11,7 +13,6 @@ import type {
   NewsTagPage,
   NewsYearArchive
 } from './types';
-import { buildNewsEventMapUrl } from './view';
 
 export const NEWS_PUBLIC_AUTHOR_KINDS = ['official', 'community', 'editorial', 'other'] as const;
 export type NewsPublicAuthorKind = (typeof NEWS_PUBLIC_AUTHOR_KINDS)[number];
@@ -194,7 +195,7 @@ function toPublicCover(article: NewsArticle): NewsPublicCover | undefined {
 
 function toPublicEvent(item: NewsEvent): NewsPublicEvent | undefined {
   if (item.timePrecision !== 'datetime' || !item.icsUrl) return;
-  const mapUrl = buildNewsEventMapUrl(item);
+  const mapUrl = buildEventMapUrl(item);
 
   return {
     slug: item.slug,

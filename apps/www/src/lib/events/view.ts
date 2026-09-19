@@ -30,7 +30,11 @@ export const formatEventMonth = (month: EventMonth): string => {
   return label.charAt(0).toUpperCase() + label.slice(1);
 };
 
-export const formatEventRange = (event: EventRecord): string => {
+export const formatEventBadgeMonth = (iso: string): string => dateTimeFromISO(iso).toFormat('MMMM');
+
+export const formatEventRange = (
+  event: Pick<EventRecord, 'startsDate' | 'startsTime' | 'endsIso' | 'endsTime' | 'through'>
+): string => {
   const date = formatDate(event.startsDate);
   if (event.through) return `${date} – ${formatDate(event.through)}, включительно`;
   if (!event.startsTime) return `${date}, время не указано`;
@@ -39,6 +43,17 @@ export const formatEventRange = (event: EventRecord): string => {
   return dateTimeFromISO(event.endsIso).toISODate() === event.startsDate
     ? `${start}–${event.endsTime}`
     : `${start} – ${formatDate(event.endsIso)}, ${event.endsTime}`;
+};
+
+export const buildEventMapUrl = (
+  event: Pick<EventRecord, 'place' | 'coordinates' | 'location'>
+): string | undefined => {
+  if (event.place) return event.place.mapUrl;
+  if (event.coordinates)
+    return `https://yandex.ru/maps/?pt=${event.coordinates.lng},${event.coordinates.lat}&z=16&l=map`;
+  if (event.location)
+    return `https://yandex.ru/maps/?text=${encodeURIComponent(event.location)}&z=16&l=map`;
+  return;
 };
 
 export const buildEventMonthCells = (month: EventMonth) => {

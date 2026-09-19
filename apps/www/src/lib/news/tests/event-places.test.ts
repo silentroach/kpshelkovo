@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { buildEventMapUrl } from '@/lib/events/view';
 import { createEntityMentionGraph, createSiteMentionRegistry } from '@/lib/mentions';
 import { buildPlacesGraphDataset } from '@/lib/places/load';
 import { buildPlaceMarkdown } from '@/lib/places/markdown';
@@ -14,7 +15,6 @@ import { createNewsArticleMentionRefs } from '../mentions';
 import { toNewsPublicPayload } from '../public-dto';
 import { newsPublicPayloadSchema } from '../public-schema';
 import { newsArticleSchema } from '../seo';
-import { buildNewsEventMapUrl } from '../view';
 import { newsEventRecord } from './event.test-helper';
 
 const articleEntry = (place?: string, body = '') => ({
@@ -68,7 +68,7 @@ describe('event place references', () => {
       const event = dataset(articleEntry(place.slug), place).articles[0]!.events[0]!;
       expect(event.place).toBe(place);
       expect(event.locationDetails).toBe('В беседке; вход, справа');
-      expect(buildNewsEventMapUrl(event)).toBe(place.mapUrl);
+      expect(buildEventMapUrl(event)).toBe(place.mapUrl);
     }
   );
 
@@ -136,7 +136,7 @@ describe('event place references', () => {
         "title": "Встреча",
       }
     `);
-    expect(buildNewsEventMapUrl(event)).toBeUndefined();
+    expect(buildEventMapUrl(event)).toBeUndefined();
     expect(buildArticleEventIcs(article, event)).not.toMatch(/LOCATION|GEO:/);
     expect(
       newsArticleSchema({

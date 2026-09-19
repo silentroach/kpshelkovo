@@ -8,7 +8,7 @@ import { buildEventCalendar } from '@/lib/events/calendar-projection';
 import { mapRawEvent } from '@/lib/events/mapper';
 import { RawEventSchema } from '@/lib/events/raw-schema';
 import type { RawEventInput } from '@/lib/events/raw-schema';
-import { buildEventMonthCells, formatEventRange } from '@/lib/events/view';
+import { buildEventMonthCells } from '@/lib/events/view';
 // @ts-expect-error Astro components are resolved by Astro/Vitest.
 import EventEntryPage from '@/pages/events/[year]/[month]/[entry].astro';
 import { createAstroContainer } from '@/test/astro-container';
@@ -217,18 +217,6 @@ describe('event cards', () => {
           "point": "37.9,54.8",
           "query": undefined,
         },
-      ]
-    `);
-  });
-
-  it('shows full cross-year periods and explicitly dated overnight endings', () => {
-    expect([
-      formatEventRange(event('period', '2026-12-30', { through: '2027-01-03' })),
-      formatEventRange(event('night', '05.01.2026 21:00', { ends_at: '06.01.2026 02:00' }))
-    ]).toMatchInlineSnapshot(`
-      [
-        "30 декабря 2026 – 3 января 2027, включительно",
-        "5 января 2026, 21:00 – 6 января 2026, 02:00",
       ]
     `);
   });

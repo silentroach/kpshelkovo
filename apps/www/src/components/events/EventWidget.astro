@@ -3,26 +3,26 @@ import { CalendarPlusIcon, MapPinIcon } from '@shelkovo/ui/icons';
 import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 import { formatDynamicHtml } from '@shelkovo/markdown';
 import MapCardShell from '@/components/MapCardShell.astro';
-import { EVENT_STATUS_LABELS } from '@/lib/events/view';
-import type { EventWidgetProps as Props } from './event-widget.types';
 import {
-  buildNewsEventMapUrl,
-  formatNewsEventMonth,
-  formatNewsEventRange,
-} from '@/lib/news/view';
+  buildEventMapUrl,
+  EVENT_STATUS_LABELS,
+  formatEventBadgeMonth,
+  formatEventRange,
+} from '@/lib/events/view';
+import type { EventWidgetProps as Props } from './event-widget.types';
 
 const { event, newsSlug } = Astro.props;
-const mapUrl = buildNewsEventMapUrl(event);
+const mapUrl = buildEventMapUrl(event);
 const coordinates = event.place?.coordinates ?? event.coordinates;
 const eventDay = String(Number(event.startsDate.slice(8, 10)));
-const eventMonth = formatNewsEventMonth(event.startsIso);
+const eventMonth = formatEventBadgeMonth(event.startsIso);
 const eventTime = event.endsTime
   ? `${event.startsTime}–${event.endsTime}`
   : (event.startsTime ?? 'Время уточняется');
 const eventRange =
   event.through ||
   (event.endsIso && event.endsIso.slice(0, 10) !== event.startsIso.slice(0, 10))
-    ? formatNewsEventRange(event)
+    ? formatEventRange(event)
     : eventTime;
 const titleId = newsSlug
   ? `news-event-title-${newsSlug}`
@@ -45,7 +45,7 @@ const titleId = newsSlug
           datetime={event.startsIso}
           data-status={event.status === 'cancelled' ? event.status : undefined}
           aria-label={event.status === 'cancelled'
-            ? `${EVENT_STATUS_LABELS.cancelled}: ${formatNewsEventRange(event)}`
+            ? `${EVENT_STATUS_LABELS.cancelled}: ${formatEventRange(event)}`
             : undefined}
           title={event.status === 'cancelled'
             ? EVENT_STATUS_LABELS.cancelled
