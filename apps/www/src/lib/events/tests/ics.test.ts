@@ -96,6 +96,22 @@ describe('event ICS', () => {
     expect(() => exportIcs(item)).toThrow('time is unknown');
   });
 
+  it.each([{ starts_at: '05.01.2026 21:00' }, { starts_at: '05.01.2026', through: '07.01.2026' }])(
+    'keeps an unnamed point separate from the event title: %j',
+    (dates) => {
+      const ics = unfold(exportIcs(event({ ...dates, coordinates: { lat: 55, lng: 38 } })));
+      expect(ics.match(/^(?:LOCATION|GEO|X-APPLE-STRUCTURED-LOCATION)[^\r]+/gm))
+        .toMatchInlineSnapshot(`
+        [
+          "LOCATION:Место на карте",
+          "GEO:55;38",
+          "X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE="Место на карте":geo:55,38",
+        ]
+      `);
+      expect(ics).toContain('SUMMARY:Встреча\r\n');
+    }
+  );
+
   it('escapes text and folds UTF-8 without splitting codepoints', () => {
     const title = 'Праздник 🎉 '.repeat(15) + ',;\\\nконец';
     const ics = exportIcs(

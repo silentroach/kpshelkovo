@@ -101,7 +101,8 @@ const { coordinates, mapUrl } = Astro.props;
     padding: 1rem;
     pointer-events: none;
   }
-  .map-content :global(a) {
+  .map-content :global(a),
+  .map-content :global([title]) {
     pointer-events: auto;
   }
   .map-card-shell--mapped .map-content {

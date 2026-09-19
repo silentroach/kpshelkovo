@@ -138,7 +138,7 @@ describe('shared events in news', () => {
     );
   });
 
-  it('preserves all five published URLs, UIDs, intervals and participants', async () => {
+  it('preserves published URLs and UIDs with current event facts', async () => {
     const data = dataset();
     const payload = newsPublicPayloadSchema.parse(
       JSON.parse(JSON.stringify(toNewsPublicPayload(data)))

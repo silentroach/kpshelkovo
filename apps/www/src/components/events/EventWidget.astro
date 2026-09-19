@@ -75,7 +75,7 @@ const titleId = newsSlug
         <li>
           <svg
             viewBox="0 0 24 24"
-            class="news-event-icon"
+            class="news-event-icon news-event-icon--time"
             fill="none"
             stroke="currentColor"
             stroke-width="1.8"
@@ -255,6 +255,10 @@ const titleId = newsSlug
   }
   .news-event-meta :global(.news-event-icon) {
     margin-block-start: calc((1lh - 1.05rem) / 2);
+  }
+  .news-event-icon--time {
+    /* Оптическое выравнивание по цифрам Fira Sans. */
+    transform: translateY(-0.03em);
   }
   [data-status='conditional'] {
     color: var(--color-warning-text);

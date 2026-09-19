@@ -223,10 +223,11 @@ for (const [device, viewport] of [
         'href',
         '/events/calendar/reglament.ics'
       );
-      await expect(location.getByRole('link', { name: 'Добавить в календарь' })).toHaveCount(1);
+      await expect(location.getByRole('link', { name: 'Добавить в календарь' })).toHaveCount(0);
       await expect(location.getByRole('heading', { name: 'Встреча по регламенту' })).toBeVisible();
       await expect(location.getByRole('heading').getByRole('link')).toHaveCount(0);
-      await expect(detail.locator('header time, header a[download]')).toHaveCount(0);
+      await expect(detail.locator('header time')).toHaveCount(0);
+      await expect(detail.locator('header a[download]')).toHaveCount(1);
       await expect(location).toHaveScreenshot(`event-location-${device}.png`, screenshot);
     });
 
@@ -242,7 +243,10 @@ for (const [device, viewport] of [
       await expect(target.locator('a[download]')).toHaveCount(0);
       for (const part of await date.locator('span').all()) {
         await expect(part).toHaveCSS('text-decoration-line', 'line-through');
+        await part.hover({ timeout: 5_000 });
+        expect(await date.evaluate((element) => element.matches(':hover'))).toBe(true);
       }
+      await page.mouse.move(0, 0);
       await expect(target).toHaveScreenshot(`news-event-card-cancelled-${device}.png`, screenshot);
     });
   });

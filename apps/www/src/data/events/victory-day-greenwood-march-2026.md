@@ -3,7 +3,6 @@ slug: immortal-regiment-greenwood
 title: Бессмертный полк в Гринвуде
 category: celebrations
 starts_at: 09.05.2026 13:00
-ends_at: 09.05.2026 14:00
 source_url: https://kpshelkovo.online/news/2026/05/victory-day-greenwood/
 place: greenwood-2-kpp
 legacy_uid: news-event-2026-05-victory-day-greenwood-shelkovo@kpshelkovo.online

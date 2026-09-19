@@ -44,7 +44,7 @@ export const buildEventIcs = (
     location:
       event.location || event.coordinates
         ? {
-            name: event.location ?? event.title,
+            name: event.location ?? 'Место на карте',
             address: event.place?.address,
             latitude: event.coordinates?.lat,
             longitude: event.coordinates?.lng

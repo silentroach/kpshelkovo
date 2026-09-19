@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`shared events in news > preserves all five published URLs, UIDs, intervals and participants 1`] = `
+exports[`shared events in news > preserves published URLs and UIDs with current event facts 1`] = `
 [
   {
     "coordinates": {
@@ -41,7 +41,7 @@ exports[`shared events in news > preserves all five published URLs, UIDs, interv
       "lat": 55.074958,
       "lng": 37.755599,
     },
-    "end": "2026-05-09T14:00:00+03:00",
+    "end": undefined,
     "location": "КПП Гринвуд 2",
     "organizer": undefined,
     "performer": undefined,
