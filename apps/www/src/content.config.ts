@@ -6,7 +6,8 @@ import { SettlementSchema } from '@/compare/lib/schema';
 import { RawContactSchema } from '@/lib/contacts/raw-schema';
 import { contactSourceId } from '@/lib/contacts/source';
 import { rawMarkdownBody } from '@/lib/content-source';
-import { EventBodySchema, EventIdSchema, RawEventSchema } from '@/lib/events/raw-schema';
+import { RawEventSchema } from '@/lib/events/raw-schema';
+import { eventSourceId } from '@/lib/events/source';
 import { RawKbPageSchema } from '@/lib/kb/raw-schema';
 import { kbPageSourceId } from '@/lib/kb/source';
 import { RawMeetingSchema, RawMeetingTranscriptSchema } from '@/lib/meetings/raw-schema';
@@ -24,12 +25,10 @@ import { statusSourceId } from '@/lib/status/source';
 
 const events = defineCollection({
   loader: glob({
-    pattern: ['*.md', '!AGENTS.md'],
+    pattern: ['**/*.md', '!AGENTS.md', '!**/AGENTS.md'],
     base: './src/data/events',
-    generateId: ({ entry, base }) => {
-      EventBodySchema.parse(rawMarkdownBody(base, entry));
-      return EventIdSchema.parse(entry.replace(/\.md$/, ''));
-    }
+    generateId: ({ entry, data, base }) =>
+      eventSourceId(entry, data, () => rawMarkdownBody(base, entry))
   }),
   schema: RawEventSchema
 });

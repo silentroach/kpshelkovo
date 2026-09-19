@@ -29,7 +29,7 @@
 
 ## Events
 
-Новость ссылается на общую запись мероприятия из `apps/www/src/data/events/*.md`:
+Новость ссылается на общую запись мероприятия из `apps/www/src/data/events/YYYY/MM/<event-id>.md`:
 
 ```yaml
 events:

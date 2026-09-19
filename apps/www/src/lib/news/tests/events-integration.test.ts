@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { basename } from 'node:path';
 
 import { z } from 'astro/zod';
 import { Window } from 'happy-dom';
@@ -27,12 +28,12 @@ import { RawNewsEventsSchema } from '../raw-schema';
 import { newsArticleSchema } from '../seo';
 import { newsEventRecord } from './event.test-helper';
 
-const ids = [
-  'victory-day-greenwood-march-2026',
-  'victory-day-greenwood-2026',
-  'victory-day-shelkovo-memorial-2026',
-  'apple-garden-2026',
-  'ok-meeting-june-2026'
+const sourcePaths = [
+  '2026/05/victory-day-greenwood-march-2026',
+  '2026/05/victory-day-greenwood-2026',
+  '2026/05/victory-day-shelkovo-memorial-2026',
+  '2026/05/apple-garden-2026',
+  '2026/06/ok-meeting-june-2026'
 ] as const;
 const readMarkdown = (path: string) => {
   const match = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/.exec(
@@ -41,8 +42,8 @@ const readMarkdown = (path: string) => {
   if (!match) throw new Error(`Missing frontmatter: ${path}`);
   return { data: parse(match[1]) as unknown, body: match[2].trim() };
 };
-const migrated = ids.map((id) => {
-  const entry = readMarkdown(`../../../data/events/${id}.md`);
+const migrated = sourcePaths.map((path) => {
+  const entry = readMarkdown(`../../../data/events/${path}.md`);
   const data = RawEventSchema.parse(entry.data);
   const place = data.place ? readMarkdown(`../../../data/places/${data.place}.md`) : undefined;
   const places =
@@ -58,7 +59,7 @@ const migrated = ids.map((id) => {
           ]
         ])
       : undefined;
-  return mapRawEvent({ id, data, body: entry.body }, undefined, places);
+  return mapRawEvent({ id: basename(path), data, body: entry.body }, undefined, places);
 });
 const newsFrontmatter = z.object({
   title: z.string(),
@@ -346,7 +347,9 @@ describe('shared events in news', () => {
       [...migrated, dateOnly].find((event) => event.id === id)
     );
     const route = await import('@/pages/events/calendar/[id].ics');
-    expect((await route.getStaticPaths()).map((path) => path.params.id)).toEqual(ids);
+    expect((await route.getStaticPaths()).map((path) => path.params.id)).toEqual(
+      sourcePaths.map((path) => basename(path))
+    );
     expect((await route.GET({ params: { id: dateOnly.id } } as never)).status).toBe(404);
     const response = await route.GET({ params: { id: 'ok-meeting-june-2026' } } as never);
     expect(await response.text()).toContain(

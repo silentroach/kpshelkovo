@@ -1,3 +1,5 @@
+import { basename } from 'node:path';
+
 import { getCollection } from 'astro:content';
 
 import type { SiteMentionRegistry } from '@/lib/mentions';
@@ -29,7 +31,13 @@ export const loadEventsData = (): Promise<EventsDataset> => {
     getCollection('events'),
     loadSiteMentionRegistry(),
     loadPlacesData()
-  ]).then(([entries, registry, places]) => buildEventsDataset(entries, registry, places.bySlug));
+  ]).then(([entries, registry, places]) =>
+    buildEventsDataset(
+      entries.map(({ id, data, body }: EventEntry) => ({ id: basename(id), data, body })),
+      registry,
+      places.bySlug
+    )
+  );
   return cache;
 };
 export const loadEvents = async (): Promise<readonly EventRecord[]> =>
