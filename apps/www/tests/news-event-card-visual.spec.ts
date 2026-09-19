@@ -179,5 +179,61 @@ for (const [device, viewport] of [
 
       await expect(target).toHaveScreenshot(`news-event-card-no-place-${device}.png`, screenshot);
     });
+
+    test('uses the news map appearance and a single map action in event details', async ({
+      page
+    }) => {
+      const detail = page.getByTestId('event-detail');
+      const location = detail.getByRole('complementary');
+      await location.scrollIntoViewIfNeeded();
+      const preview = location.locator('map-preview');
+      const newsPreview = page.getByTestId('news-event-card-coordinates').locator('map-preview');
+      expect(await preview.getAttribute('data-preview')).toBe(
+        await newsPreview.getAttribute('data-preview')
+      );
+      const fallback = preview.locator('[data-fallback]');
+      const canvas = preview.locator('[data-canvas]');
+      const openMaps = canvas.getByRole('button', { name: 'Открыть в Яндекс Картах' });
+      await expect(location.locator('a[href^="https://yandex.ru/maps/"]')).toHaveCount(1);
+      await fallback.focus();
+      await page.evaluate(() => window.dispatchEvent(new Event('fixture:maps-ready')));
+      await expect(canvas.locator('.ymaps3--open-maps-button')).toBeAttached();
+      await page.evaluate(() => window.dispatchEvent(new Event('fixture:tiles-ready')));
+      await expect(fallback).toBeHidden();
+      await expect(openMaps).toBeFocused();
+      await expect(location.getByRole('link', { name: 'Открыть', exact: false })).toHaveCount(0);
+      await openMaps.click({ trial: true });
+      const copyright = canvas.locator('.ymaps3--map-copyrights');
+      await openMaps.blur();
+      await page.mouse.move(0, 0);
+      await expect(copyright).toHaveCSS('opacity', '0.4');
+      const logo = canvas.getByRole('link', { name: 'Яндекс Карты', exact: true });
+      await logo.focus();
+      await expect(copyright).toHaveCSS('opacity', '1');
+      await logo.click({ trial: true });
+      await logo.blur();
+      await page.mouse.move(0, 0);
+      await expect(detail.getByRole('link', { name: 'Добавить в календарь' })).toHaveAttribute(
+        'href',
+        '/events/calendar/reglament.ics'
+      );
+      await expect(location).toHaveScreenshot(`event-location-${device}.png`, screenshot);
+    });
+
+    test('marks cancellation on the date without an icon or calendar download', async ({
+      page
+    }) => {
+      const target = page.getByTestId('news-event-card-cancelled');
+      await target.scrollIntoViewIfNeeded();
+      const date = target.locator('time');
+      await expect(date).toHaveAttribute('aria-label', /^Отменено:/);
+      await expect(date).toHaveAttribute('title', 'Отменено');
+      await expect(target.getByRole('img', { name: 'Отменено' })).toHaveCount(0);
+      await expect(target.locator('a[download]')).toHaveCount(0);
+      for (const part of await date.locator('span').all()) {
+        await expect(part).toHaveCSS('text-decoration-line', 'line-through');
+      }
+      await expect(target).toHaveScreenshot(`news-event-card-cancelled-${device}.png`, screenshot);
+    });
   });
 }

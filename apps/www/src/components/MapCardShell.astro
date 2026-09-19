@@ -5,16 +5,14 @@ import type { PlaceCoordinates } from '@/lib/places/types';
 interface Props {
   readonly coordinates?: PlaceCoordinates;
   readonly mapUrl?: string;
-  readonly treatment?: 'detail' | 'compact';
 }
-const { coordinates, mapUrl, treatment = 'detail' } = Astro.props;
+const { coordinates, mapUrl } = Astro.props;
 ---
 
 <div
   class:list={[
     'map-card-shell',
     {
-      'map-card-shell--compact': treatment === 'compact',
       'map-card-shell--mapped': !!coordinates,
     },
   ]}
@@ -26,7 +24,7 @@ const { coordinates, mapUrl, treatment = 'detail' } = Astro.props;
           preview={{
             coordinates,
             zoom: 16,
-            anchor: treatment === 'compact' ? [0.75, 0.45] : [0.75, 0.3],
+            anchor: [0.75, 0.45],
             muted: true,
             mutedOpacity: 0.4,
           }}
@@ -65,7 +63,7 @@ const { coordinates, mapUrl, treatment = 'detail' } = Astro.props;
       );
     border-radius: 1rem;
     background: var(--color-surface-raised);
-    box-shadow: var(--shadow-1);
+    box-shadow: 0 0.65rem 1.55rem var(--color-shadow);
     overflow-wrap: anywhere;
   }
   .map-background {
@@ -112,14 +110,10 @@ const { coordinates, mapUrl, treatment = 'detail' } = Astro.props;
     outline: 2px solid var(--color-accent-text);
     outline-offset: 2px;
   }
-  .map-card-shell--compact {
-    box-shadow: 0 0.65rem 1.55rem var(--color-shadow);
-  }
-  .map-card-shell--compact :global(.ymaps3--map-copyrights) {
+  .map-card-shell :global(.ymaps3--map-copyrights) {
     opacity: 0.4;
   }
-  .map-card-shell--compact
-    :global(.ymaps3--map-copyrights:is(:hover, :focus-within)) {
+  .map-card-shell :global(.ymaps3--map-copyrights:is(:hover, :focus-within)) {
     opacity: 1;
   }
 </style>

@@ -31,7 +31,7 @@ const titleId = `news-event-title-${event.slug}`;
 ---
 
 <aside aria-labelledby={titleId} data-pagefind-body>
-  <MapCardShell treatment="compact" coordinates={coordinates} mapUrl={mapUrl}>
+  <MapCardShell coordinates={coordinates} mapUrl={mapUrl}>
     <div class="news-event-content">
       <div
         class:list={[
@@ -39,30 +39,16 @@ const titleId = `news-event-title-${event.slug}`;
           { 'news-event-date--mapped': !!coordinates },
         ]}
       >
-        {
-          event.status === 'cancelled' && (
-            <span
-              class="news-event-cancelled"
-              role="img"
-              aria-label={EVENT_STATUS_LABELS.cancelled}
-              title={EVENT_STATUS_LABELS.cancelled}
-              data-pagefind-ignore
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="9" />
-                <path d="m9 9 6 6m0-6-6 6" />
-              </svg>
-            </span>
-          )
-        }
-        <time datetime={event.startsIso}>
+        <time
+          datetime={event.startsIso}
+          data-status={event.status === 'cancelled' ? event.status : undefined}
+          aria-label={event.status === 'cancelled'
+            ? `${EVENT_STATUS_LABELS.cancelled}: ${formatNewsEventRange(event)}`
+            : undefined}
+          title={event.status === 'cancelled'
+            ? EVENT_STATUS_LABELS.cancelled
+            : undefined}
+        >
           <span class="news-event-day">{eventDay}</span>{' '}
           <span class="news-event-month">{eventMonth}</span>
         </time>
@@ -199,14 +185,11 @@ const titleId = `news-event-title-${event.slug}`;
     padding-right: 10.25rem;
     flex-wrap: wrap;
   }
-  .news-event-cancelled {
-    display: flex;
-    flex: none;
+  .news-event-date time[data-status='cancelled'] {
     color: var(--color-danger-text);
   }
-  .news-event-cancelled svg {
-    width: 1.35rem;
-    height: 1.35rem;
+  .news-event-date time[data-status='cancelled'] span {
+    text-decoration: line-through;
   }
   .news-event-day {
     font-family: var(--font-heading);

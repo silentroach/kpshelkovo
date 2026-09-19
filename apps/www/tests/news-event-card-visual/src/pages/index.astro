@@ -3,6 +3,7 @@ import '../../../config/visual-foundation.css';
 import '@/styles/site.css';
 
 import NewsEventCard from '@/components/news/NewsEventCard.astro';
+import EventCard from '@/components/events/EventCard.astro';
 import type { NewsEvent } from '@/lib/news/types';
 import { testPlace } from '@/lib/places/tests/place.test-helper';
 import MapBackground from '../../map-background.svg';
@@ -56,6 +57,12 @@ const eventWithoutPlace = {
   endsTime: '12:00',
   icsUrl: '/news/2026/06/entrance/event.ics',
 } satisfies NewsEvent;
+const eventDetail = {
+  ...eventWithCoordinates,
+  coordinates: eventWithCoordinates.place.coordinates,
+  location: eventWithCoordinates.place.name,
+  icsUrl: '/events/calendar/reglament.ics',
+};
 ---
 
 <!doctype html>
@@ -84,6 +91,24 @@ const eventWithoutPlace = {
           data-testid="news-event-card-no-place"
         >
           <NewsEventCard event={eventWithoutPlace} />
+        </div>
+      </section>
+      <section data-testid="event-detail">
+        <EventCard event={eventDetail} />
+      </section>
+      <section class="news-event-visual-card">
+        <p class="news-event-visual-label">Cancelled</p>
+        <div
+          class="news-event-visual-target"
+          data-testid="news-event-card-cancelled"
+        >
+          <NewsEventCard
+            event={{
+              ...eventWithCoordinates,
+              slug: 'cancelled',
+              status: 'cancelled',
+            }}
+          />
         </div>
       </section>
     </main>

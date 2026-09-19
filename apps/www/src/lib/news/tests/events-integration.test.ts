@@ -192,8 +192,10 @@ describe('shared events in news', () => {
     const window = new Window();
     try {
       window.document.body.innerHTML = html;
-      const cancellation = window.document.querySelector('[role="img"][aria-label="Отменено"]');
-      expect(cancellation?.nextElementSibling?.tagName).toBe('TIME');
+      const cancellation = window.document.querySelector('time[data-status="cancelled"]');
+      expect(cancellation?.getAttribute('datetime')).toBe(event.startsIso);
+      expect(cancellation?.getAttribute('aria-label')).toContain('Отменено:');
+      expect(window.document.querySelector('[role="img"][aria-label="Отменено"]')).toBeFalsy();
       expect(window.document.body.textContent).not.toContain('Отменено');
     } finally {
       window.close();

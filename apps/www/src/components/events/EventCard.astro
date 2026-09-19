@@ -120,18 +120,20 @@ const sourceLabel = telegramChannel
             {event.locationDetails && (
               <p set:html={formatDynamicHtml(event.locationDetails)} />
             )}
-            <a
-              href={mapUrl}
-              target="_blank"
-              rel="noreferrer noopener"
-              class="location-action"
-              data-pagefind-ignore
-            >
-              <>
-                <MapPinIcon class="event-icon" />
-                <span>Открыть на Яндекс Картах</span>
-              </>
-            </a>
+            {!event.coordinates && (
+              <a
+                href={mapUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+                class="location-action"
+                data-pagefind-ignore
+              >
+                <>
+                  <MapPinIcon class="event-icon" />
+                  <span>Открыть на Яндекс Картах</span>
+                </>
+              </a>
+            )}
           </div>
         </MapCardShell>
       </aside>
