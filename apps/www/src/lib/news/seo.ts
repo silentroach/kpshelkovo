@@ -1,5 +1,6 @@
 import type { SchemaDoc } from '@shelkovo/seo';
 
+import { buildEventJsonLd } from '@/lib/events/seo';
 import { breadcrumbListSchema } from '@/lib/json-ld';
 import type { BreadcrumbLink } from '@/lib/json-ld-types';
 
@@ -26,13 +27,8 @@ interface ArticleInput extends BasePageInput {
   readonly author?: AuthorInput;
 }
 
-export interface NewsArticleEventInput extends Pick<
-  NewsEvent,
-  'slug' | 'title' | 'description' | 'startsIso' | 'endsIso' | 'place' | 'organizer' | 'performer'
-> {}
-
 export interface NewsArticleInput extends Omit<ArticleInput, 'type'> {
-  readonly events?: readonly NewsArticleEventInput[];
+  readonly events?: readonly NewsEvent[];
 }
 
 export interface TechArticleInput extends Omit<ArticleInput, 'type'> {}
@@ -75,81 +71,8 @@ const articleSchema = (input: ArticleInput): readonly SchemaDoc[] => {
   return docs;
 };
 
-const eventLocationSchema = (event: NewsArticleEventInput): SchemaDoc | undefined => {
-  const place = event.place;
-  if (!place) {
-    return;
-  }
-
-  return {
-    '@type': 'Place',
-    name: place.name,
-    url: place.canonical,
-    address: place.address,
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: place.coordinates.lat,
-      longitude: place.coordinates.lng
-    }
-  };
-};
-
-const schemaType = (type: 'organization' | 'person'): string =>
-  type === 'person' ? 'Person' : 'Organization';
-
-const performerSchema = (
-  items: NewsEvent['performer']
-): SchemaDoc | readonly SchemaDoc[] | undefined => {
-  if (!items?.length) {
-    return undefined;
-  }
-
-  const docs = items.map((item) => ({
-    '@type': schemaType(item.type),
-    name: item.name
-  }));
-
-  return docs.length === 1 ? docs[0] : docs;
-};
-
-const newsEventSchema = (input: NewsArticleInput): readonly SchemaDoc[] => {
-  const events = input.events ?? [];
-
-  const url = absoluteUrl(input.url);
-
-  return events.map((event) => {
-    const location = eventLocationSchema(event);
-    const performer = performerSchema(event.performer);
-
-    return {
-      '@context': CONTEXT,
-      '@type': 'Event',
-      '@id': `${url}#event-${event.slug}`,
-      name: event.title,
-      description: event.description ?? input.description,
-      url,
-      mainEntityOfPage: url,
-      inLanguage: LANG,
-      eventStatus: 'https://schema.org/EventScheduled',
-      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-      startDate: event.startsIso,
-      ...(event.endsIso ? { endDate: event.endsIso } : {}),
-      ...(location ? { location } : {}),
-      ...(event.organizer
-        ? {
-            organizer: {
-              '@type': schemaType(event.organizer.type),
-              name: event.organizer.name
-            }
-          }
-        : {}),
-      ...(performer ? { performer } : {})
-    };
-  });
-};
-
 export const newsArticleSchema = (input: NewsArticleInput): readonly SchemaDoc[] => {
-  const events = newsEventSchema(input);
+  const events = (input.events ?? []).map((event) => buildEventJsonLd(event, absoluteUrl('/')));
 
   return [...articleSchema({ ...input, type: 'NewsArticle' }), ...events];
 };

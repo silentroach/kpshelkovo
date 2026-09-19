@@ -1,14 +1,31 @@
 import { readFile } from 'node:fs/promises';
 
-import { chromium, expect as expectPage, type Browser, type Locator } from '@playwright/test';
+import {
+  chromium,
+  expect as expectPage,
+  type Browser,
+  type Locator,
+  type Page
+} from '@playwright/test';
 import { preview, type PreviewServer } from 'vite';
 import { afterAll, beforeAll, expect, test } from 'vitest';
+import { z } from 'zod';
 
+import { EventsPublicPayloadSchema } from '../src/lib/events/public-schema';
+import { isEventSearchable } from '../src/lib/events/search';
 import { SEARCH_HIGHLIGHT_CLASS, SEARCH_HIGHLIGHT_PARAM } from '../src/lib/search/highlight';
 import type { StatusPublicPayloadDto } from '../src/lib/status/public-dto';
 
 const port = Number(process.env.SEARCH_QUALITY_PORT ?? 4330);
 const baseURL = `http://127.0.0.1:${String(port)}`;
+const isPublicEventSearchable = (
+  event: z.infer<typeof EventsPublicPayloadSchema>['events'][number]
+) =>
+  isEventSearchable({
+    startsDate: event.startsAt.slice(0, 10),
+    endsIso: event.timePrecision === 'datetime' ? event.endsAt : undefined,
+    through: event.timePrecision === 'date' ? event.through : undefined
+  });
 const queryGroups = [
   {
     name: '#121 short queries',
@@ -123,6 +140,36 @@ const queryGroups = [
     queries: ['экскаватор']
   },
   {
+    name: '#224 events calendar targets',
+    queries: [
+      'события',
+      'календарь мероприятий',
+      'мероприятия',
+      'бессмертный полк в гринвуде',
+      'день победы в гринвуде',
+      'митинг ко дню победы в деревне шелково',
+      'посадка яблоневого сада в вилладже',
+      'встреча с ок комфорт в green dreams',
+      'встреча 13 июня',
+      'киноквиз',
+      'детский киноквиз',
+      'взрослый киноквиз'
+    ]
+  },
+  {
+    name: '#224 events calendar adjacent controls',
+    queries: [
+      'гринвуд',
+      'яблоневый сад',
+      'озеленение',
+      'детская площадка',
+      'собрание запись запрещена',
+      'запрет записи',
+      'тариф 815',
+      'плановые работы'
+    ]
+  },
+  {
     name: 'status services and recent events',
     queries: [
       'статус',
@@ -149,6 +196,24 @@ const queryGroups = [
 
 const rankExpectations: ReadonlyMap<string, { readonly url: string; readonly maxRank: number }> =
   new Map([
+    [
+      'бессмертный полк в гринвуде',
+      { url: '/events/2026/05/immortal-regiment-greenwood/', maxRank: 8 }
+    ],
+    ['день победы в гринвуде', { url: '/events/2026/05/victory-day-greenwood/', maxRank: 8 }],
+    [
+      'митинг ко дню победы в деревне шелково',
+      { url: '/events/2026/05/victory-day-shelkovo-memorial/', maxRank: 8 }
+    ],
+    ['посадка яблоневого сада в вилладже', { url: '/events/2026/05/apple-garden/', maxRank: 8 }],
+    [
+      'встреча с ок комфорт в green dreams',
+      { url: '/events/2026/06/ok-meeting-june/', maxRank: 8 }
+    ],
+    ['встреча 13 июня', { url: '/events/2026/06/ok-meeting-june/', maxRank: 8 }],
+    ['киноквиз', { url: '/events/2026/09/kids-cinema-quiz/', maxRank: 8 }],
+    ['детский киноквиз', { url: '/events/2026/09/kids-cinema-quiz/', maxRank: 8 }],
+    ['взрослый киноквиз', { url: '/events/2026/09/adult-cinema-quiz/', maxRank: 8 }],
     ['где поесть', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
     ['еда', { url: '/map/burzhuyka/', maxRank: 2 }],
     ['как въехать грузовику', { url: '/news/2026/05/truck-entry-open/', maxRank: 1 }],
@@ -216,6 +281,7 @@ const statusTargets: ReadonlyMap<string, string> = new Map([
 let browser: Browser;
 let dialog: Locator;
 let input: Locator;
+let page: Page;
 let server: PreviewServer;
 
 const normalizedText = (value?: string): string => value?.replace(/\s+/gu, ' ').trim() ?? '';
@@ -271,7 +337,7 @@ beforeAll(async () => {
     }
   });
   browser = await chromium.launch();
-  const page = await browser.newPage({
+  page = await browser.newPage({
     viewport: { width: 1280, height: 800 }
   });
   await page.clock.setFixedTime('2026-08-16T12:00:00Z');
@@ -439,7 +505,7 @@ test('#355 preserves results and pagination across ClientRouter navigations', as
   }
 });
 
-test('status indexing policy and #372 KB sections in the production corpus', async () => {
+test('status, #224 events and #372 KB indexing policy in the production corpus', async () => {
   const page = await browser.newPage({
     viewport: { width: 1280, height: 800 }
   });
@@ -460,11 +526,25 @@ test('status indexing policy and #372 KB sections in the production corpus', asy
     });
     const root = page.locator('html');
     await expectPage(root).toHaveAttribute('data-pagefind-urls', /^\[/u);
-    const urls = JSON.parse(
-      (await root.getAttribute('data-pagefind-urls')) ?? '[]'
-    ) as readonly string[];
+    const urls = z
+      .array(z.string())
+      .parse(JSON.parse((await root.getAttribute('data-pagefind-urls')) ?? '[]'));
 
     expect(urls.length).toBeGreaterThan(0);
+    const eventUrls = urls.filter((url) => url.startsWith('/events/'));
+    // Compare the filtered corpus: the root plus current/recent event details,
+    // never one per day or monthly view.
+    const events = EventsPublicPayloadSchema.parse(
+      await (await page.request.get(`${baseURL}/events/events.json`)).json()
+    );
+    const expectedEventUrls = [
+      '/events/',
+      ...events.events.filter(isPublicEventSearchable).map((event) => new URL(event.url).pathname)
+    ];
+    expect(eventUrls.sort()).toEqual(expectedEventUrls.sort());
+    expect(
+      eventUrls.filter((url) => /^\/events\/\d{4}\/\d{2}\/(?:$|\d{2}\/|list\/)/u.test(url))
+    ).toEqual([]);
     expect(urls.filter((url) => url.startsWith('/status/calendar/'))).toEqual([]);
     expect(urls).not.toContain('/status/history/');
     expect(urls).toEqual(expect.arrayContaining([...new Set(statusTargets.values())]));
@@ -505,6 +585,12 @@ test('status indexing policy and #372 KB sections in the production corpus', asy
 for (const group of queryGroups) {
   test(group.name, async () => {
     const matrix = [];
+    const events = EventsPublicPayloadSchema.parse(
+      await (await page.request.get(`${baseURL}/events/events.json`)).json()
+    );
+    const searchableEventUrls = new Set(
+      events.events.filter(isPublicEventSearchable).map((event) => new URL(event.url).pathname)
+    );
     for (const query of group.queries) {
       const snapshot = await searchSnapshot(query);
       const archiveResult = snapshot.results.find((result) =>
@@ -542,13 +628,54 @@ for (const group of queryGroups) {
       }
 
       const expectation = rankExpectations.get(query);
-      if (expectation) {
+      if (
+        expectation &&
+        (!expectation.url.startsWith('/events/') || searchableEventUrls.has(expectation.url))
+      ) {
         const rank = snapshot.results.findIndex(
           (result) => result.url === expectation.url || result.url.startsWith(`${expectation.url}#`)
         );
 
         expect.soft(rank, `${query}: expected ${expectation.url}`).toBeGreaterThanOrEqual(0);
         expect.soft(rank + 1, `${query}: expected rank`).toBeLessThanOrEqual(expectation.maxRank);
+      }
+
+      if (query === 'события' || query === 'календарь мероприятий') {
+        expect
+          .soft(
+            snapshot.results.some((result) => result.url === '/events/'),
+            `${query}: include the events root`
+          )
+          .toBe(true);
+        expect
+          .soft(
+            snapshot.results.filter((result) => result.section === 'События').length,
+            `${query}: discover the events section in the first result batch`
+          )
+          .toBeGreaterThanOrEqual(1);
+      }
+
+      if (query === 'киноквиз') {
+        expect
+          .soft(snapshot.results.map((result) => result.url.split('#')[0]))
+          .toEqual(
+            expect.arrayContaining(
+              ['/events/2026/09/kids-cinema-quiz/', '/events/2026/09/adult-cinema-quiz/'].filter(
+                (url) => searchableEventUrls.has(url)
+              )
+            )
+          );
+      }
+
+      if (query === 'встреча с ок комфорт в green dreams' || query === 'встреча 13 июня') {
+        const meeting = snapshot.results.find((result) =>
+          result.url.startsWith('/events/2026/06/ok-meeting-june/')
+        );
+        if (meeting) {
+          expect
+            .soft(meeting.excerpt, `${query}: cancellation must remain visible`)
+            .toMatch(/отменено/iu);
+        }
       }
 
       if (query === 'буржуйка' || query === 'адрес буржуйки' || query === 'время работы буржуйки') {

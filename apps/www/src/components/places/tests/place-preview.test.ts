@@ -320,6 +320,15 @@ it('positions the canonical center with margins on either side of the container'
   }
 });
 
+it('passes the event copyright position to the SDK', async () => {
+  const { create } = setupMaps();
+  vi.mocked(loadYandexMaps).mockResolvedValue();
+  const element = mount({ coordinates: { lng: 37, lat: 55 }, copyrightsPosition: 'bottom right' });
+  approach(element);
+  await Promise.resolve();
+  expect(create.mock.calls[0]?.[1].copyrightsPosition).toBe('bottom right');
+});
+
 it('ignores a stale async failure after reconnect and preserves the original fallback', async () => {
   const first = Promise.withResolvers<void>();
   const second = Promise.withResolvers<void>();

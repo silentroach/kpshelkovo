@@ -1,0 +1,224 @@
+---
+import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import { dateTimeFromISO } from '@shelkovo/format';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
+import { eventMonthNavigation } from '@/lib/events/calendar-projection';
+import type {
+  EventCalendarProjection,
+  EventMonth,
+  EventMonthView,
+} from '@/lib/events/types';
+import { eventMonthUrl } from '@/lib/events/urls';
+import { eventPageDescription, formatEventMonth } from '@/lib/events/view';
+import { SEARCH_SECTIONS } from '@/lib/search/sections';
+import EventMonthCalendar from './EventMonthCalendar.astro';
+import EventList from './EventList.astro';
+
+interface Props {
+  readonly calendar: EventCalendarProjection;
+  readonly now: Date;
+  readonly month?: EventMonth;
+  readonly view?: EventMonthView;
+  readonly root?: boolean;
+}
+const { calendar, now, month, view = 'calendar', root = false } = Astro.props;
+const currentMonth = calendar.byMonth.get(
+  dateTimeFromISO(now.toISOString()).toFormat('yyyy-MM'),
+);
+const period = month ? formatEventMonth(month) : undefined;
+const title = root
+  ? 'События — Шелково Онлайн'
+  : `${period} — События — Шелково Онлайн`;
+const description = month
+  ? eventPageDescription(formatEventMonth(month), month.events)
+  : 'Календарь мероприятий для жителей Шелково и соседних посёлков. Опубликованных событий пока нет.';
+const navigation = month
+  ? eventMonthNavigation(calendar, month.id, view)
+  : undefined;
+const canonical = root || !month ? '/events/' : eventMonthUrl(month.id);
+const breadcrumbs = withHomeBreadcrumbs(
+  root
+    ? [{ label: 'События' }]
+    : [
+        { label: 'События', href: '/events/' },
+        { label: period ?? 'Календарь' },
+      ],
+);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  search={root
+    ? {
+        scope: 'manual',
+        title: 'События',
+        description,
+        section: SEARCH_SECTIONS.events,
+        aliases: ['календарь мероприятий'],
+      }
+    : undefined}
+>
+  <main class="ui-page">
+    <header class="ui-page-header">
+      <div class="ui-page-header-stack">
+        <Breadcrumbs items={breadcrumbs} />
+        <div>
+          <h1
+            class="ui-page-title"
+            data-pagefind-body={root ? true : undefined}
+          >
+            {root ? 'События' : period}
+          </h1>
+          {root && month && <p class="month-summary">{period}</p>}
+        </div>
+      </div>
+    </header>
+    <div class="events-content">
+      {
+        month ? (
+          <>
+            <div class="month-controls">
+              <nav aria-label="Вид месяца" class="view-switch">
+                <a
+                  href={eventMonthUrl(month.id)}
+                  aria-current={view === 'calendar' ? 'page' : undefined}
+                >
+                  Календарь
+                </a>
+                <a
+                  href={eventMonthUrl(month.id, 'list')}
+                  aria-current={view === 'list' ? 'page' : undefined}
+                >
+                  Список
+                </a>
+              </nav>
+              <nav aria-label="Месяцы с событиями" class="month-navigation">
+                {navigation?.previous && (
+                  <a
+                    href={navigation.previous}
+                    rel="prev"
+                    aria-label="Предыдущий месяц с событиями"
+                    title="Предыдущий месяц с событиями"
+                  >
+                    <span aria-hidden="true">←</span>
+                  </a>
+                )}
+                {currentMonth && month.id !== currentMonth.id && (
+                  <a
+                    class="current-month"
+                    href={eventMonthUrl(currentMonth.id, view)}
+                  >
+                    Текущий месяц
+                  </a>
+                )}
+                {navigation?.next && (
+                  <a
+                    href={navigation.next}
+                    rel="next"
+                    aria-label="Следующий месяц с событиями"
+                    title="Следующий месяц с событиями"
+                  >
+                    <span aria-hidden="true">→</span>
+                  </a>
+                )}
+              </nav>
+            </div>
+            {view === 'calendar' ? (
+              <EventMonthCalendar month={month} />
+            ) : (
+              <EventList events={month.events} />
+            )}
+          </>
+        ) : (
+          <p>Опубликованных событий пока нет.</p>
+        )
+      }
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .month-summary {
+    margin-top: 0.75rem;
+    color: var(--color-text-muted);
+  }
+  .events-content {
+    padding: 0 1.25rem 3rem;
+  }
+  .month-controls {
+    display: grid;
+    max-width: 22rem;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .view-switch {
+    display: inline-flex;
+    justify-self: start;
+    padding: 0.1875rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-muted);
+  }
+  .view-switch a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.25rem;
+    padding-inline: 1rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-full);
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .view-switch a[aria-current] {
+    border-color: var(--color-border);
+    background: var(--color-surface-raised);
+    color: var(--color-primary);
+  }
+  .month-navigation {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .month-navigation a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.5rem;
+    border-radius: var(--radius-full);
+    color: var(--color-primary);
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+  .month-navigation a[rel='prev'] {
+    grid-column: 1;
+  }
+  .month-navigation .current-month {
+    grid-column: 2;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .month-navigation a[rel='next'] {
+    grid-column: 3;
+  }
+  .view-switch a:hover,
+  .month-navigation a:hover {
+    background: var(--color-primary-soft);
+  }
+  .view-switch a:focus-visible,
+  .month-navigation a:focus-visible {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 2px;
+  }
+  @media (min-width: 48rem) {
+    .events-content {
+      padding-inline: 1.5rem;
+    }
+  }
+</style>

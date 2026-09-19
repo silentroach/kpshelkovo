@@ -1,0 +1,106 @@
+---
+import { formatDynamicHtml } from '@shelkovo/markdown';
+import type { EventRecord } from '@/lib/events/types';
+import {
+  EVENT_CATEGORY_LABELS,
+  EVENT_STATUS_LABELS,
+  formatEventRange,
+} from '@/lib/events/view';
+
+interface Props {
+  readonly events: readonly EventRecord[];
+}
+const { events } = Astro.props;
+---
+
+<ol class="event-list" role="list">
+  {
+    events.map((event) => {
+      return (
+        <li id={event.id}>
+          <p class="event-meta">
+            {EVENT_CATEGORY_LABELS[event.category]}
+            {event.status !== 'announced' && (
+              <>
+                {' '}
+                ·{' '}
+                <strong data-status={event.status}>
+                  {EVENT_STATUS_LABELS[event.status]}
+                </strong>
+              </>
+            )}
+          </p>
+          <h2 class="ui-entry-title">
+            <a href={event.url}>{formatDynamicHtml(event.title)}</a>
+          </h2>
+          <p class="ui-num">{formatDynamicHtml(formatEventRange(event))}</p>
+          <p>
+            {event.place ? (
+              <a
+                href={event.place.url}
+                set:html={formatDynamicHtml(event.place.name)}
+              />
+            ) : (
+              formatDynamicHtml(
+                event.location ??
+                  (event.coordinates ? 'Место на карте' : 'Место уточняется'),
+              )
+            )}
+            {event.locationDetails && (
+              <span
+                set:html={formatDynamicHtml(`, ${event.locationDetails}`)}
+              />
+            )}
+          </p>
+          {event.price && (
+            <p>
+              Стоимость: <span set:html={formatDynamicHtml(event.price)} />
+            </p>
+          )}
+          {event.audience && (
+            <p>
+              Для кого: <span set:html={formatDynamicHtml(event.audience)} />
+            </p>
+          )}
+        </li>
+      );
+    })
+  }
+</ol>
+
+<style>
+  .event-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  li {
+    scroll-margin-top: 6rem;
+    padding-block: 1.25rem;
+    border-top: 1px solid var(--color-border);
+    overflow-wrap: anywhere;
+  }
+  li > * + * {
+    margin-top: 0.5rem;
+  }
+  .event-meta {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+  a {
+    color: var(--color-primary);
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  a:focus-visible {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 3px;
+  }
+  [data-status='cancelled'] {
+    color: var(--color-danger-text);
+  }
+  [data-status='conditional'] {
+    color: var(--color-warning-text);
+  }
+</style>

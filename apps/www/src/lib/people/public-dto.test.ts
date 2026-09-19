@@ -44,6 +44,7 @@ const profile = (): PersonProfile => ({
     }
   ],
   backlinks: {
+    events: [],
     news: [
       {
         section: 'news',
@@ -84,6 +85,7 @@ describe('people public DTO adapters', () => {
             "backlink_count": 2,
             "backlinks": {
               "contacts": [],
+              "events": [],
               "news": [
                 {
                   "html_url": "https://example.com/news/2026/05/power-outage/",

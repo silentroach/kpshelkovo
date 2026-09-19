@@ -1,11 +1,7 @@
 import { padNumber } from '@shelkovo/format';
 import type { APIRoute, GetStaticPaths } from 'astro';
 
-import {
-  articleEventIcsFilename,
-  buildArticleEventIcs,
-  hasArticleEvents
-} from '@/lib/news/calendar';
+import { articleEventIcsFilename, buildArticleEventIcs } from '@/lib/news/calendar';
 import { loadNewsArticle, loadNewsArticles } from '@/lib/news/load';
 
 export const prerender = true;
@@ -13,15 +9,17 @@ export const prerender = true;
 export const getStaticPaths = (async () => {
   const articles = await loadNewsArticles();
 
-  return articles.filter(hasArticleEvents).flatMap((item) =>
-    item.events.map((event) => ({
-      params: {
-        year: String(item.year),
-        month: padNumber(item.month),
-        entry: item.entry,
-        event: event.slug
-      }
-    }))
+  return articles.flatMap((item) =>
+    item.events
+      .filter((event) => event.icsUrl)
+      .map((event) => ({
+        params: {
+          year: String(item.year),
+          month: padNumber(item.month),
+          entry: item.entry,
+          event: event.slug
+        }
+      }))
   );
 }) satisfies GetStaticPaths;
 
@@ -38,7 +36,7 @@ export const GET: APIRoute = async ({ params }) => {
   const article = await loadNewsArticle(`${year}/${month}/${entry}`);
   const event = article?.events.find((item) => item.slug === eventSlug);
 
-  if (!article || !event) {
+  if (!article || !event?.icsUrl) {
     return new Response('Not found', { status: 404 });
   }
 

@@ -2,11 +2,12 @@
 
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/lib/news/load', () => ({ loadNewsArticles: async () => [] }));
-
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import HomePage from '@/pages/index.astro';
 import { createAstroContainer } from '@/test/astro-container';
+
+// Hero markup does not depend on news or Astro's generated content store.
+vi.mock('@/lib/news/load', () => ({ loadNewsArticles: async () => [] }));
 
 const getImageTag = (html: string, attribute?: string): string => {
   const attributePattern = attribute ? `(?=[^>]*\\b${attribute}\\b)` : '';

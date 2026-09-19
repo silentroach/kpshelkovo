@@ -52,6 +52,28 @@ const formatUtcDateTime = (value: Date): string => {
 };
 
 export function renderEventIcs(event: CalendarEvent): string {
+  let interval: readonly string[];
+  switch (event.timePrecision) {
+    case 'date':
+      interval = [
+        `DTSTART;VALUE=DATE:${event.startsOn.replaceAll('-', '')}`,
+        event.endsOn
+          ? `DTEND;VALUE=DATE:${event.endsOn.replaceAll('-', '')}`
+          : `DURATION:P${event.durationDays}D`
+      ];
+      break;
+    case 'datetime':
+    case undefined:
+      interval = [
+        `DTSTART:${formatUtcDateTime(event.startsAt)}`,
+        `DTEND:${formatUtcDateTime(event.endsAt)}`
+      ];
+      break;
+    default: {
+      const exhaustive: never = event;
+      throw new Error(`Unsupported calendar interval: ${exhaustive}`);
+    }
+  }
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
@@ -61,8 +83,8 @@ export function renderEventIcs(event: CalendarEvent): string {
     'BEGIN:VEVENT',
     `UID:${escapeText(event.uid)}`,
     `DTSTAMP:${formatUtcDateTime(event.timestamp)}`,
-    `DTSTART:${formatUtcDateTime(event.startsAt)}`,
-    `DTEND:${formatUtcDateTime(event.endsAt)}`,
+    ...interval,
+    ...(event.status ? [`STATUS:${event.status}`] : []),
     `SUMMARY:${escapeText(normalizeDisplayText(event.title))}`,
     `DESCRIPTION:${escapeText(normalizeDisplayText(event.description))}`,
     `URL:${event.url}`
@@ -70,13 +92,17 @@ export function renderEventIcs(event: CalendarEvent): string {
 
   if (event.location) {
     const { name, address, latitude, longitude } = event.location;
-    const lat = coordinateFormat.format(latitude);
-    const lng = coordinateFormat.format(longitude);
     lines.push(
-      `LOCATION:${escapeText(normalizeDisplayText([name, address].filter(Boolean).join(', ')))}`,
-      `GEO:${lat};${lng}`,
-      `X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE=${parameterValue(normalizeDisplayText(name))}:geo:${lat},${lng}`
+      `LOCATION:${escapeText(normalizeDisplayText([name, address].filter(Boolean).join(', ')))}`
     );
+    if (latitude !== undefined && longitude !== undefined) {
+      const lat = coordinateFormat.format(latitude);
+      const lng = coordinateFormat.format(longitude);
+      lines.push(
+        `GEO:${lat};${lng}`,
+        `X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE=${parameterValue(normalizeDisplayText(name))}:geo:${lat},${lng}`
+      );
+    }
   }
 
   lines.push('END:VEVENT', 'END:VCALENDAR', '');

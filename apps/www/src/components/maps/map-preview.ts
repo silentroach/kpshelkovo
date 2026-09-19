@@ -120,7 +120,7 @@ export class MapPreviewElement extends HTMLElement {
           margin: getPreviewMargin(canvas.clientWidth, canvas.clientHeight, data.anchor),
           behaviors: [],
           mode: 'vector',
-          copyrightsPosition: 'bottom left',
+          copyrightsPosition: data.copyrightsPosition ?? 'bottom left',
           distributionPosition: data.distributionPosition ?? 'top right'
         },
         [

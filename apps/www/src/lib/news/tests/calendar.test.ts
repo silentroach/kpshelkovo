@@ -2,11 +2,13 @@ import { describe, expect, it } from 'vitest';
 
 import { testPlace } from '@/lib/places/tests/place.test-helper';
 
-import { articleEventIcsFilename, buildArticleEventIcs, hasArticleEvents } from '../calendar';
+import { articleEventIcsFilename, buildArticleEventIcs } from '../calendar';
 import { articleEventIcsUrl } from '../routes';
 import type { NewsArticle, NewsEvent } from '../types';
+import { newsEventRecord } from './event.test-helper';
 
 const event: NewsEvent = {
+  ...newsEventRecord({ legacy_uid: 'news-event-2026-04-ok-meeting-regulation-event@example.com' }),
   slug: 'event',
   title: 'Встреча по регламенту',
   startsAt: new Date('2026-05-31T19:00:00+03:00'),
@@ -48,7 +50,7 @@ describe('buildArticleEventIcs', () => {
     expect(lines(event).filter((line) => /^(UID|PRODID|DTSTAMP|SUMMARY|URL):/.test(line)))
       .toMatchInlineSnapshot(`
         [
-          "PRODID:-//example.com//News Events//RU",
+          "PRODID:-//example.com//Events//RU",
           "UID:news-event-2026-04-ok-meeting-regulation-event@example.com",
           "DTSTAMP:20260428T210000Z",
           "SUMMARY:Встреча по регламенту",
@@ -77,11 +79,15 @@ describe('buildArticleEventIcs', () => {
     expect(event.endsAt).toBeUndefined();
   });
 
-  it.each([
-    [undefined, 'Коротко о встрече'],
-    ['Описание события', 'Описание события']
-  ])('selects description %s and appends meeting details', (description, expected) => {
-    const item = { ...event, description, place: testPlace(), locationDetails: 'В беседке' };
+  it('uses the shared event body and appends meeting details', () => {
+    const expected = 'Описание события';
+    const item = {
+      ...event,
+      body: expected,
+      endsAt: new Date('2026-05-31T18:00:00Z'),
+      place: testPlace(),
+      locationDetails: 'В беседке'
+    };
     expect(lines(item)).toContain(`DESCRIPTION:${expected}\\n\\nВ беседке`);
     expect(lines({ ...item, locationDetails: undefined })).toContain(`DESCRIPTION:${expected}`);
   });
@@ -105,19 +111,17 @@ describe('article event route helpers', () => {
   it('keeps article-local event URLs and download names', () => {
     expect({
       url: articleEventIcsUrl({ year: 2026, month: 4, entry: article.entry, event: 'greenwood' }),
-      filename: articleEventIcsFilename({ slug: 'greenwood' }),
-      sanitizedFilename: articleEventIcsFilename({ slug: ' GreenWood! ' })
+      filename: articleEventIcsFilename({ slug: 'greenwood' })
     }).toMatchInlineSnapshot(`
       {
         "filename": "greenwood.ics",
-        "sanitizedFilename": "greenwood.ics",
         "url": "/news/2026/04/ok-meeting-regulation/greenwood.ics",
       }
     `);
   });
 
   it('marks past events without a place as route eligible', () => {
-    expect(hasArticleEvents(article)).toBe(true);
-    expect(hasArticleEvents({ ...article, events: [] })).toBe(false);
+    expect(buildArticleEventIcs(article, event)).toContain(`URL:${article.canonical}`);
+    expect(event.icsUrl).toBeDefined();
   });
 });

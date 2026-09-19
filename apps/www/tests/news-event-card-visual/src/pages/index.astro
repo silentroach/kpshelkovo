@@ -2,12 +2,25 @@
 import '../../../config/visual-foundation.css';
 import '@/styles/site.css';
 
-import NewsEventCard from '@/components/news/NewsEventCard.astro';
+import EventWidget from '@/components/events/EventWidget.astro';
+import EventCard from '@/components/events/EventCard.astro';
 import type { NewsEvent } from '@/lib/news/types';
 import { testPlace } from '@/lib/places/tests/place.test-helper';
 import MapBackground from '../../map-background.svg';
 
 const eventWithCoordinates = {
+  id: 'reglament',
+  eventSlug: 'reglament-meeting',
+  referenceKey: '2026/09/reglament-meeting',
+  category: 'meetings',
+  status: 'announced',
+  startsDate: '2026-09-30',
+  timePrecision: 'datetime',
+  sourceUrl: 'https://example.com/reglament',
+  body: 'На встрече обсудим регламент обслуживания поселка.',
+  mentions: [],
+  calendarUid: 'event-reglament@kpshelkovo.online',
+  url: '/events/2026/09/reglament-meeting/',
   slug: 'reglament',
   title: 'Встреча по регламенту',
   startsAt: new Date('2026-09-30T19:00:00+03:00'),
@@ -22,6 +35,18 @@ const eventWithCoordinates = {
 } satisfies NewsEvent;
 
 const eventWithoutPlace = {
+  id: 'entrance',
+  eventSlug: 'entrance-meeting',
+  referenceKey: '2026/06/entrance-meeting',
+  category: 'community',
+  status: 'announced',
+  startsDate: '2026-06-03',
+  timePrecision: 'datetime',
+  sourceUrl: 'https://example.com/entrance',
+  body: 'Обсудим благоустройство главного въезда и предложения жителей.',
+  mentions: [],
+  calendarUid: 'event-entrance@kpshelkovo.online',
+  url: '/events/2026/06/entrance-meeting/',
   slug: 'entrance',
   title: 'Обсуждение благоустройства въезда',
   startsAt: new Date('2026-06-03T10:30:00+03:00'),
@@ -32,6 +57,12 @@ const eventWithoutPlace = {
   endsTime: '12:00',
   icsUrl: '/news/2026/06/entrance/event.ics',
 } satisfies NewsEvent;
+const eventDetail = {
+  ...eventWithCoordinates,
+  coordinates: eventWithCoordinates.place.coordinates,
+  location: eventWithCoordinates.place.name,
+  icsUrl: '/events/calendar/reglament.ics',
+};
 ---
 
 <!doctype html>
@@ -49,7 +80,10 @@ const eventWithoutPlace = {
           class="news-event-visual-target"
           data-testid="news-event-card-coordinates"
         >
-          <NewsEventCard event={eventWithCoordinates} variant="compact" />
+          <EventWidget
+            event={eventWithCoordinates}
+            newsSlug={eventWithCoordinates.slug}
+          />
         </div>
       </section>
 
@@ -59,7 +93,29 @@ const eventWithoutPlace = {
           class="news-event-visual-target"
           data-testid="news-event-card-no-place"
         >
-          <NewsEventCard event={eventWithoutPlace} variant="compact" />
+          <EventWidget
+            event={eventWithoutPlace}
+            newsSlug={eventWithoutPlace.slug}
+          />
+        </div>
+      </section>
+      <section data-testid="event-detail">
+        <EventCard event={eventDetail} />
+      </section>
+      <section class="news-event-visual-card">
+        <p class="news-event-visual-label">Cancelled</p>
+        <div
+          class="news-event-visual-target"
+          data-testid="news-event-card-cancelled"
+        >
+          <EventWidget
+            newsSlug="cancelled"
+            event={{
+              ...eventWithCoordinates,
+              slug: 'cancelled',
+              status: 'cancelled',
+            }}
+          />
         </div>
       </section>
     </main>
@@ -177,8 +233,8 @@ const eventWithoutPlace = {
   }
 
   .news-event-visual-target {
-    /* Production desktop sidebar: 17.5rem plus screenshot padding. */
-    width: min(100%, 19rem);
+    /* Both production sidebars: 19rem plus screenshot padding. */
+    width: min(100%, 20.5rem);
     padding: 0.75rem;
     border-radius: 1.75rem;
     background: color-mix(in oklab, white 74%, var(--color-bg) 26%);

@@ -1,0 +1,120 @@
+---
+import MapPreview from '@/components/maps/MapPreview.astro';
+import type { PlaceCoordinates } from '@/lib/places/types';
+
+interface Props {
+  readonly coordinates?: PlaceCoordinates;
+  readonly mapUrl?: string;
+}
+const { coordinates, mapUrl } = Astro.props;
+---
+
+<div
+  class:list={[
+    'map-card-shell',
+    {
+      'map-card-shell--mapped': !!coordinates,
+    },
+  ]}
+>
+  {
+    coordinates && mapUrl && (
+      <div class="map-background" data-pagefind-ignore>
+        <MapPreview
+          preview={{
+            coordinates,
+            zoom: 16,
+            anchor: [0.75, 0.45],
+            muted: true,
+            mutedOpacity: 0.4,
+            copyrightsPosition: 'bottom right',
+          }}
+          label="Карта места"
+          mapUrl={mapUrl}
+        >
+          <span class="ui-map-marker" aria-hidden="true" />
+          <a
+            slot="fallback"
+            data-fallback
+            href={mapUrl}
+            target="_blank"
+            rel="noreferrer noopener"
+            class="map-fallback"
+          >
+            Открыть Яндекс Карты
+          </a>
+        </MapPreview>
+      </div>
+    )
+  }
+  <div class="map-content"><slot /></div>
+</div>
+
+<style>
+  .map-card-shell {
+    position: relative;
+    isolation: isolate;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid
+      color-mix(
+        in oklab,
+        var(--color-border-strong) 76%,
+        var(--color-primary) 24%
+      );
+    border-radius: 1rem;
+    background: var(--color-surface-raised);
+    box-shadow: 0 0.65rem 1.55rem var(--color-shadow);
+    overflow-wrap: anywhere;
+  }
+  .map-background {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+  }
+  .ui-map-marker {
+    --ui-map-marker-size: 18px;
+    display: block;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .map-fallback {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+    font-size: 0.75rem;
+    text-decoration: none;
+    box-shadow: var(--shadow-1);
+  }
+  .map-fallback[hidden] {
+    display: none;
+  }
+  .map-content {
+    padding: 1rem;
+    pointer-events: none;
+  }
+  .map-content :global(a) {
+    pointer-events: auto;
+  }
+  .map-card-shell--mapped .map-content {
+    padding-bottom: 2.75rem;
+  }
+  .map-card-shell :global(a:focus-visible) {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 2px;
+  }
+  .map-card-shell :global(.ymaps3--map-copyrights) {
+    opacity: 0.4;
+  }
+  .map-card-shell :global(.ymaps3--map-copyrights:is(:hover, :focus-within)) {
+    opacity: 1;
+  }
+</style>

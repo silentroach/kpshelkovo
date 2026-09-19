@@ -14,9 +14,14 @@ const yandexMapsReadyScript = `
   window.ymaps3 = {
     ready: new Promise(resolve => window.addEventListener('fixture:maps-ready', resolve, { once: true })),
     YMap: class {
-      constructor(container) {
+      constructor(container, props) {
         this.container = container;
         container.append(document.querySelector('#map-sdk-fixture').content.cloneNode(true));
+        if (props.copyrightsPosition === 'bottom right') {
+          const copyright = container.querySelector('.ymaps3--map-copyrights');
+          copyright.style.left = 'auto';
+          copyright.style.right = '8px';
+        }
       }
       addChild(child) {
         if (child.el) this.container.querySelector('[data-fixture-marker]').append(child.el);
@@ -38,7 +43,7 @@ const yandexMapsReadyScript = `
 `;
 
 const expectCalendarOnly = async (target: Locator, icsUrl: string): Promise<void> => {
-  const actions = target.locator('.news-event-compact-actions');
+  const actions = target.locator('.news-event-actions');
   const calendarLink = actions.getByRole('link', { name: 'Добавить в календарь' });
 
   await expect(actions.locator('a, button')).toHaveCount(1);
@@ -51,7 +56,7 @@ for (const [device, viewport] of [
   ['desktop', { width: 1440, height: 1100 }],
   ['mobile', { width: 390, height: 900 }]
 ] as const) {
-  test.describe(`NewsEventCard compact ${device}`, () => {
+  test.describe(`EventWidget ${device}`, () => {
     test.use({ viewport });
 
     test.beforeEach(async ({ page }) => {
@@ -77,7 +82,8 @@ for (const [device, viewport] of [
           zoom: 16,
           anchor: [0.75, 0.45],
           muted: true,
-          mutedOpacity: 0.4
+          mutedOpacity: 0.4,
+          copyrightsPosition: 'bottom right'
         })
       );
       await expect(target.locator('iframe')).toHaveCount(0);
@@ -105,7 +111,7 @@ for (const [device, viewport] of [
       await expect(canvas).toHaveJSProperty('inert', false);
       await expect(openMaps).toBeFocused();
       await expect(canvas.locator('svg')).toBeVisible();
-      const marker = canvas.locator('span.ui-map-marker.news-event-compact-map-pin');
+      const marker = canvas.locator('span.ui-map-marker');
       await expect(marker).toHaveCount(1);
       await expect(marker).toHaveAttribute('aria-hidden', 'true');
       await expect(marker).toBeVisible();
@@ -135,7 +141,7 @@ for (const [device, viewport] of [
       await expectCalendarOnly(target, '/news/2026/05/reglament/event.ics');
 
       // Native SDK controls must remain reachable through the card's content layer.
-      await target.getByRole('link', { name: 'КП Шелково, эко-клуб' }).focus();
+      await target.getByRole('heading').getByRole('link').focus();
       for (const action of [
         openMaps,
         canvas.getByRole('link', { name: 'Условия использования', exact: true }),
@@ -169,11 +175,75 @@ for (const [device, viewport] of [
       await expect(target.getByRole('heading')).toBeVisible();
       await expect(target.locator('iframe')).toHaveCount(0);
       await expect(target.locator('map-preview')).toHaveCount(0);
-      await expect(target.locator('.news-event-compact-map-pin')).toHaveCount(0);
+      await expect(target.locator('.ui-map-marker')).toHaveCount(0);
       await expectCalendarOnly(target, '/news/2026/06/entrance/event.ics');
-      await expect(target.getByRole('link')).toHaveCount(1);
+      await expect(target.getByRole('heading').getByRole('link')).toHaveAttribute(
+        'href',
+        '/events/2026/06/entrance-meeting/'
+      );
+      await expect(target.getByRole('link')).toHaveCount(2);
 
       await expect(target).toHaveScreenshot(`news-event-card-no-place-${device}.png`, screenshot);
+    });
+
+    test('uses the news map appearance and a single map action in event details', async ({
+      page
+    }) => {
+      const detail = page.getByTestId('event-detail');
+      const location = detail.getByRole('complementary');
+      await location.scrollIntoViewIfNeeded();
+      const preview = location.locator('map-preview');
+      const newsPreview = page.getByTestId('news-event-card-coordinates').locator('map-preview');
+      expect(await preview.getAttribute('data-preview')).toBe(
+        await newsPreview.getAttribute('data-preview')
+      );
+      const fallback = preview.locator('[data-fallback]');
+      const canvas = preview.locator('[data-canvas]');
+      const openMaps = canvas.getByRole('button', { name: 'Открыть в Яндекс Картах' });
+      await expect(location.locator('a[href^="https://yandex.ru/maps/"]')).toHaveCount(1);
+      await fallback.focus();
+      await page.evaluate(() => window.dispatchEvent(new Event('fixture:maps-ready')));
+      await expect(canvas.locator('.ymaps3--open-maps-button')).toBeAttached();
+      await page.evaluate(() => window.dispatchEvent(new Event('fixture:tiles-ready')));
+      await expect(fallback).toBeHidden();
+      await expect(openMaps).toBeFocused();
+      await expect(location.getByRole('link', { name: 'Открыть', exact: false })).toHaveCount(0);
+      await openMaps.click({ trial: true });
+      const copyright = canvas.locator('.ymaps3--map-copyrights');
+      await openMaps.blur();
+      await page.mouse.move(0, 0);
+      await expect(copyright).toHaveCSS('opacity', '0.4');
+      const logo = canvas.getByRole('link', { name: 'Яндекс Карты', exact: true });
+      await logo.focus();
+      await expect(copyright).toHaveCSS('opacity', '1');
+      await logo.click({ trial: true });
+      await logo.blur();
+      await page.mouse.move(0, 0);
+      await expect(detail.getByRole('link', { name: 'Добавить в календарь' })).toHaveAttribute(
+        'href',
+        '/events/calendar/reglament.ics'
+      );
+      await expect(location.getByRole('link', { name: 'Добавить в календарь' })).toHaveCount(1);
+      await expect(location.getByRole('heading', { name: 'Встреча по регламенту' })).toBeVisible();
+      await expect(location.getByRole('heading').getByRole('link')).toHaveCount(0);
+      await expect(detail.locator('header time, header a[download]')).toHaveCount(0);
+      await expect(location).toHaveScreenshot(`event-location-${device}.png`, screenshot);
+    });
+
+    test('marks cancellation on the date without an icon or calendar download', async ({
+      page
+    }) => {
+      const target = page.getByTestId('news-event-card-cancelled');
+      await target.scrollIntoViewIfNeeded();
+      const date = target.locator('time');
+      await expect(date).toHaveAttribute('aria-label', /^Отменено:/);
+      await expect(date).toHaveAttribute('title', 'Отменено');
+      await expect(target.getByRole('img', { name: 'Отменено' })).toHaveCount(0);
+      await expect(target.locator('a[download]')).toHaveCount(0);
+      for (const part of await date.locator('span').all()) {
+        await expect(part).toHaveCSS('text-decoration-line', 'line-through');
+      }
+      await expect(target).toHaveScreenshot(`news-event-card-cancelled-${device}.png`, screenshot);
     });
   });
 }

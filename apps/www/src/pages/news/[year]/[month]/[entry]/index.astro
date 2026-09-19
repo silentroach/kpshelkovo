@@ -4,7 +4,7 @@ import { getEntry } from 'astro:content';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import NewsAttachments from '@/components/news/NewsAttachments.astro';
-import NewsEventCard from '@/components/news/NewsEventCard.astro';
+import EventWidget from '@/components/events/EventWidget.astro';
 import NewsMeta from '@/components/news/NewsMeta.astro';
 import NewsPhotos from '@/components/news/NewsPhotos.astro';
 import {
@@ -136,7 +136,7 @@ const schema = newsArticleSchema({
 >
   <main class="news-article-page">
     {
-      hasHeroCover ? (
+      hasHeroCover && (
         <header class="news-hero">
           <Image
             src={heroCover.src}
@@ -194,15 +194,27 @@ const schema = newsArticleSchema({
             </div>
           </div>
         </header>
-      ) : (
-        <header class="ui-page ui-page-header">
-          <div class="ui-page-header-stack news-article-header__inner">
-            <Breadcrumbs items={breadcrumbs} linkLast />
+      )
+    }
 
-            <div class="news-article-header__content">
+    <article
+      class:list={[
+        'ui-page ui-page-header-stack news-article-layout',
+        {
+          'news-article-layout--with-cover': hasHeroCover,
+          'news-article-layout--with-events': hasEvents,
+        },
+      ]}
+    >
+      {
+        !hasHeroCover && (
+          <>
+            <div class="ui-page-header news-article-breadcrumbs">
+              <Breadcrumbs items={breadcrumbs} linkLast />
+            </div>
+            <header class="news-article-header__content">
               <div class="news-article-heading">
                 <h1 class="ui-page-title">{article.title}</h1>
-
                 {article.tags.length > 0 && (
                   <ul class="news-article-tags">
                     {article.tags.map((item) => (
@@ -219,7 +231,6 @@ const schema = newsArticleSchema({
                   </ul>
                 )}
               </div>
-
               <NewsMeta
                 publishedIso={article.publishedIso}
                 author={article.author}
@@ -228,69 +239,34 @@ const schema = newsArticleSchema({
                 appliesToAllAreas={article.appliesToAllAreas}
                 sourceUrl={article.sourceUrl}
               />
-            </div>
+            </header>
+          </>
+        )
+      }
+      {
+        bodyHtml && (
+          <div class="news-article-body">
+            <div class={NEWS_PROSE} data-pagefind-body set:html={bodyHtml} />
           </div>
-        </header>
-      )
-    }
-
-    <article
-      class:list={[
-        'ui-page news-article-content',
-        hasHeroCover ? 'news-article-content--with-cover' : undefined,
-      ]}
-    >
-      {
-        article.body && (
-          <section
-            class:list={[
-              'news-article-body-section',
-              hasHeroCover
-                ? 'news-article-body-section--with-cover'
-                : undefined,
-            ]}
-          >
-            <div
-              class:list={[
-                'news-article-body-layout',
-                hasEvents ? 'news-article-body-layout--with-event' : undefined,
-              ]}
-            >
-              <div class={NEWS_PROSE} data-pagefind-body set:html={bodyHtml} />
-
-              {hasEvents && (
-                <div class="news-article-event-aside">
-                  {article.events.map((event) => (
-                    <NewsEventCard event={event} variant="compact" />
-                  ))}
-                </div>
-              )}
-            </div>
-          </section>
         )
       }
-
       {
-        !article.body && hasEvents && (
-          <section
-            class:list={[
-              'news-article-event-section',
-              hasHeroCover
-                ? 'news-article-event-section--with-cover'
-                : undefined,
-            ]}
-          >
-            <div class="news-article-event-only">
-              {article.events.map((event) => (
-                <NewsEventCard event={event} variant="compact" />
-              ))}
-            </div>
-          </section>
+        hasEvents && (
+          <div class="news-article-event-aside">
+            {article.events.map((event) => (
+              <EventWidget event={event} newsSlug={event.slug} />
+            ))}
+          </div>
         )
       }
-
-      <NewsPhotos photos={article.photos} />
-      <NewsAttachments items={article.attachments} />
+      {
+        (article.photos.length > 0 || article.attachments.length > 0) && (
+          <div class="news-article-media">
+            <NewsPhotos photos={article.photos} />
+            <NewsAttachments items={article.attachments} />
+          </div>
+        )
+      }
     </article>
   </main>
 </BaseLayout>
@@ -396,9 +372,7 @@ const schema = newsArticleSchema({
   }
 
   .news-hero__breadcrumbs,
-  .news-hero__content,
-  .news-article-body-section,
-  .news-article-event-section {
+  .news-hero__content {
     padding-inline: 1.25rem;
   }
 
@@ -408,7 +382,7 @@ const schema = newsArticleSchema({
   }
 
   .news-hero__content-inner,
-  .news-article-header__inner {
+  .news-article-header__content {
     max-width: 56rem;
   }
 
@@ -459,42 +433,34 @@ const schema = newsArticleSchema({
     text-underline-offset: 0.18em;
   }
 
-  .news-article-content {
+  .news-article-layout {
     position: relative;
     z-index: 10;
-  }
-
-  .news-article-content--with-cover {
-    padding-block-start: 0;
-  }
-
-  .news-article-content > :global(:not(:last-child)) {
-    margin-block-end: 1.5rem;
-  }
-
-  .news-article-body-section {
-    padding-block-end: 1.5rem;
-  }
-
-  .news-article-body-section--with-cover {
-    padding-block-start: 1.5rem;
-  }
-
-  .news-article-event-section--with-cover {
-    margin-block-start: -2rem;
-  }
-
-  .news-article-body-layout {
     display: grid;
     align-items: start;
-    gap: 1.25rem;
+    padding-inline: 1.25rem;
   }
-
-  .news-article-event-aside,
-  .news-article-event-only {
+  .news-article-breadcrumbs {
+    padding-inline: 0;
+    padding-bottom: 0;
+  }
+  .news-article-body {
+    min-width: 0;
+  }
+  .news-article-layout--with-cover {
+    padding-block-start: 1.5rem;
+  }
+  .news-article-media {
+    min-width: 0;
+    margin-inline: -1.25rem;
+  }
+  .news-article-media > :global(:not(:last-child)) {
+    margin-block-end: 1.5rem;
+  }
+  .news-article-event-aside {
     display: grid;
     gap: 1rem;
-    width: min(100%, 24rem);
+    width: 100%;
   }
 
   @media (min-width: 48rem) {
@@ -513,8 +479,7 @@ const schema = newsArticleSchema({
 
     .news-hero__breadcrumbs,
     .news-hero__content,
-    .news-article-body-section,
-    .news-article-event-section {
+    .news-article-layout {
       padding-inline: 1.5rem;
     }
 
@@ -526,16 +491,11 @@ const schema = newsArticleSchema({
       column-gap: 1rem;
     }
 
-    .news-article-body-section {
-      padding-block-end: 2rem;
-    }
-
-    .news-article-body-section--with-cover {
+    .news-article-layout--with-cover {
       padding-block-start: 2rem;
     }
-
-    .news-article-event-section--with-cover {
-      margin-block-start: -2.5rem;
+    .news-article-media {
+      margin-inline: -1.5rem;
     }
   }
 
@@ -557,34 +517,40 @@ const schema = newsArticleSchema({
       padding-block-end: 2rem;
     }
 
-    .news-article-body-section {
-      padding-block-end: 2.5rem;
-    }
-
-    .news-article-body-section--with-cover {
+    .news-article-layout--with-cover {
       padding-block-start: 2.5rem;
     }
-
-    .news-article-event-section--with-cover {
-      margin-block-start: -3rem;
-    }
   }
 
-  @media (min-width: 72rem) {
-    .news-article-body-layout--with-event {
-      grid-template-columns: minmax(0, 70ch) minmax(14rem, 17.5rem);
+  @media (min-width: 64rem) {
+    .news-article-layout--with-events {
+      grid-template-columns: minmax(0, 1fr) 19rem;
+      grid-template-rows: auto auto 1fr auto;
       column-gap: clamp(1.5rem, 4vw, 3rem);
     }
-
+    .news-article-breadcrumbs,
+    .news-article-media {
+      grid-column: 1 / -1;
+    }
+    .news-article-header__content {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    .news-article-body {
+      grid-column: 1;
+      grid-row: 3;
+    }
     .news-article-event-aside {
       width: 100%;
+      grid-column: 2;
+      grid-row: 2 / 4;
     }
-  }
-
-  @media (max-width: 47.999rem) {
-    .news-article-event-aside,
-    .news-article-event-only {
-      width: 100%;
+    .news-article-layout--with-cover .news-article-body,
+    .news-article-layout--with-cover .news-article-event-aside {
+      grid-row: 1;
+    }
+    .news-article-layout--with-cover {
+      grid-template-rows: auto auto;
     }
   }
 </style>

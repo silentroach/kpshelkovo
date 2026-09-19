@@ -1,7 +1,5 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { testPlace } from '@/lib/places/tests/place.test-helper';
-
 import { createPersonMentionTarget } from '../people/mentions';
 import type { NewsArticleEntry } from './load';
 import {
@@ -10,6 +8,7 @@ import {
   newsArticleEntry as article,
   newsAuthorEntry as author
 } from './load.test-helper';
+import { newsEventRecord } from './tests/event.test-helper';
 
 type MutableMentionRegistry = Map<string, ReturnType<typeof createPersonMentionTarget>>;
 
@@ -481,16 +480,23 @@ describe('buildNewsDataset', () => {
           date: '04.05.2026 10:00',
           events: [
             {
-              title: 'Встреча по регламенту',
-              description: 'Описание календарного события.',
-              starts_at: '31.05.2026 19:00',
-              ends_at: '31.05.2026 21:00',
-              place: 'club'
+              event: '2026/05/meeting'
             }
           ]
         })
       ],
-      { places: new Map([['club', testPlace()]]) }
+      {
+        eventsById: new Map([
+          [
+            'meeting',
+            newsEventRecord({
+              ends_at: '31.05.2026 21:00',
+              location: 'КП Шелково, эко-клуб',
+              coordinates: { lat: 55, lng: 38 }
+            })
+          ]
+        ])
+      }
     );
 
     expect(data.articles[0]?.events[0]).toMatchObject({
@@ -502,7 +508,11 @@ describe('buildNewsDataset', () => {
       endsIso: '2026-05-31T21:00:00+03:00',
       endsTime: '21:00',
       icsUrl: '/news/2026/05/event/event.ics',
-      place: testPlace()
+      location: 'КП Шелково, эко-клуб',
+      coordinates: {
+        lat: 55,
+        lng: 38
+      }
     });
     expect(data.articles[0]?.events[0]?.startsAt).toBeInstanceOf(Date);
     expect(data.articles[0]?.events[0]?.endsAt).toBeInstanceOf(Date);
@@ -587,14 +597,23 @@ describe('buildNewsDataset', () => {
           date: '04.05.2026 10:00',
           events: [
             {
-              title: 'Праздник',
-              starts_at: '31.05.2026 19:00',
-              organizer: 'ОК Комфорт',
-              performer: ['Хор "Лейся, песня!"', 'Ансамбль "Ромашкино"']
+              event: '2026/05/meeting'
             }
           ]
         })
-      ]
+      ],
+      {
+        eventsById: new Map([
+          [
+            'meeting',
+            newsEventRecord({
+              title: 'Праздник',
+              organizer: 'ОК Комфорт',
+              performer: ['Хор "Лейся, песня!"', 'Ансамбль "Ромашкино"']
+            })
+          ]
+        ])
+      }
     );
 
     expect(data.articles[0]?.events[0]).toMatchObject({
@@ -619,12 +638,12 @@ describe('buildNewsDataset', () => {
           date: '04.05.2026 10:00',
           events: [
             {
-              title: 'Встреча по регламенту',
-              starts_at: '31.05.2026 19:00'
+              event: '2026/05/meeting'
             }
           ]
         })
-      ]
+      ],
+      { eventsById: new Map([['meeting', newsEventRecord()]]) }
     );
 
     expect(data.articles[0]?.events[0]).toMatchObject({
@@ -647,17 +666,26 @@ describe('buildNewsDataset', () => {
           date: '04.05.2026 10:00',
           events: [
             {
+              event: '2026/05/meeting'
+            }
+          ]
+        })
+      ],
+      {
+        eventsById: new Map([
+          [
+            'meeting',
+            newsEventRecord({
               title: 'Праздник',
-              starts_at: '31.05.2026 19:00',
               organizer: { name: 'Инициативная группа', type: 'person' },
               performer: [
                 { name: 'Иван Иванов', type: 'person' },
                 { name: 'Ансамбль', type: 'organization' }
               ]
-            }
+            })
           ]
-        })
-      ]
+        ])
+      }
     );
 
     expect(data.articles[0]?.events[0]).toMatchObject({

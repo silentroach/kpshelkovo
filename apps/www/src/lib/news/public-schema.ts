@@ -113,7 +113,11 @@ const event = z
     organizer: eventParticipant.optional(),
     performer: z.array(eventParticipant).optional()
   } satisfies PublicShape<NewsPublicEvent>)
-  .meta({ id: 'event' });
+  .meta({
+    id: 'event',
+    description:
+      'Совместимый календарный объект только для события с точным временем начала. Отмена и условный набор указаны в description. Даты без часов и многодневные периоды доступны в /events/events.json; связи с новостями найдите по их публичным URL.'
+  });
 
 const areas = z
   .array(z.enum(NEWS_AREAS))

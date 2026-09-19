@@ -168,13 +168,19 @@ export function schema(root: string): Record<string, unknown> {
           html_url: uri(),
           markdown_url: uri(),
           excerpt: text(1),
-          mentioned_at: dateTime()
+          mentioned_at: {
+            anyOf: [dateTime(), { type: 'string', format: 'date' }],
+            description: 'Дата события без часов либо точная дата и время, если они известны.'
+          }
         },
         ['section', 'kind', 'source_id', 'title', 'html_url', 'markdown_url']
       ),
       backlinks: obj(
         {
           news: list({
+            $ref: '#/$defs/backlink'
+          }),
+          events: list({
             $ref: '#/$defs/backlink'
           }),
           status: list({

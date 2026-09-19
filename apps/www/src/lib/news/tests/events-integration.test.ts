@@ -1,0 +1,356 @@
+import { readFileSync } from 'node:fs';
+
+import { z } from 'astro/zod';
+import { Window } from 'happy-dom';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { parse } from 'yaml';
+
+// @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
+import EventWidget from '@/components/events/EventWidget.astro';
+import { buildEventCalendar } from '@/lib/events/calendar-projection';
+import { buildEventIcs } from '@/lib/events/ics';
+import * as eventLoad from '@/lib/events/load';
+import { mapRawEvent } from '@/lib/events/mapper';
+import { RawEventSchema } from '@/lib/events/raw-schema';
+import type { EventRecord } from '@/lib/events/types';
+import { mapRawPlace } from '@/lib/places/mapper';
+import { RawPlaceSchema } from '@/lib/places/raw-schema';
+import { createAstroContainer } from '@/test/astro-container';
+
+// @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
+import Fixture from '../../../../tests/news-event-card-visual/src/pages/index.astro';
+import * as newsLoad from '../load';
+import { newsArticleEntry, newsArchiveSummaryEntries, newsAuthorEntry } from '../load.test-helper';
+import { toNewsPublicPayload } from '../public-dto';
+import { newsPublicPayloadSchema } from '../public-schema';
+import { RawNewsEventsSchema } from '../raw-schema';
+import { newsArticleSchema } from '../seo';
+import { newsEventRecord } from './event.test-helper';
+
+const ids = [
+  'victory-day-greenwood-march-2026',
+  'victory-day-greenwood-2026',
+  'victory-day-shelkovo-memorial-2026',
+  'apple-garden-2026',
+  'ok-meeting-june-2026'
+] as const;
+const readMarkdown = (path: string) => {
+  const match = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/.exec(
+    readFileSync(new URL(path, import.meta.url), 'utf8')
+  );
+  if (!match) throw new Error(`Missing frontmatter: ${path}`);
+  return { data: parse(match[1]) as unknown, body: match[2].trim() };
+};
+const migrated = ids.map((id) => {
+  const entry = readMarkdown(`../../../data/events/${id}.md`);
+  const data = RawEventSchema.parse(entry.data);
+  const place = data.place ? readMarkdown(`../../../data/places/${data.place}.md`) : undefined;
+  const places =
+    place && data.place
+      ? new Map([
+          [
+            data.place,
+            mapRawPlace({
+              id: data.place,
+              data: RawPlaceSchema.parse(place.data),
+              body: place.body
+            })
+          ]
+        ])
+      : undefined;
+  return mapRawEvent({ id, data, body: entry.body }, undefined, places);
+});
+const newsFrontmatter = z.object({
+  title: z.string(),
+  summary: z.string(),
+  date: z.string(),
+  events: RawNewsEventsSchema
+});
+const entries = ['victory-day-greenwood', 'apple-garden', 'ok-meeting-june'].map((slug) => {
+  const { data } = readMarkdown(`../../../data/news/articles/2026/05/${slug}.md`);
+  const raw = newsFrontmatter.parse(data);
+  const entry = newsArticleEntry({
+    id: `2026/05/${slug}`,
+    title: raw.title,
+    summary: raw.summary,
+    date: raw.date
+  });
+  return { ...entry, data: { ...entry.data, events: raw.events } };
+});
+const authors = [newsAuthorEntry({ id: 'ig', name: 'Редакция' })];
+const dataset = (events: readonly EventRecord[] = migrated) =>
+  newsLoad.buildNewsDataset(authors, entries, newsArchiveSummaryEntries(entries), {
+    eventsById: new Map(events.map((event) => [event.id, event]))
+  });
+const linkedDataset = (record: EventRecord) => {
+  const entry = newsArticleEntry({
+    id: '2026/05/linked',
+    title: 'Новость',
+    summary: 'Описание',
+    date: '01.05.2026',
+    events: [{ event: record.referenceKey }]
+  });
+  return newsLoad.buildNewsDataset(authors, [entry], newsArchiveSummaryEntries([entry]), {
+    eventsById: new Map([[record.id, record]])
+  });
+};
+
+beforeAll(() =>
+  Object.assign(import.meta.env, { SITE: 'https://kpshelkovo.online', BASE_URL: '/' })
+);
+afterEach(() => vi.restoreAllMocks());
+
+describe('shared events in news', () => {
+  it('requires updated news references after a month or slug change', () => {
+    const original = migrated.find((event) => event.id === 'ok-meeting-june-2026')!;
+    for (const extra of [
+      { starts_at: '13.07.2026 16:00', slug: original.eventSlug },
+      { starts_at: '13.06.2026 16:00', slug: 'renamed-meeting' }
+    ]) {
+      const moved = mapRawEvent({
+        id: original.id,
+        body: original.body,
+        data: RawEventSchema.parse({
+          ...extra,
+          title: original.title,
+          category: original.category,
+          source_url: original.sourceUrl,
+          legacy_uid: original.calendarUid
+        })
+      });
+      expect(() =>
+        dataset(migrated.map((event) => (event.id === moved.id ? moved : event)))
+      ).toThrow('references missing event "2026/06/ok-meeting-june"');
+      const linked = linkedDataset(moved).articles[0].events[0];
+      expect([linked.id, linked.calendarUid, linked.url, linked.eventSlug, linked.slug]).toEqual([
+        original.id,
+        original.calendarUid,
+        moved.url,
+        moved.eventSlug,
+        'event'
+      ]);
+    }
+  });
+
+  it('rejects unresolved references instead of silently dropping a card', () => {
+    expect(() => dataset([])).toThrow(
+      'references missing event "2026/05/immortal-regiment-greenwood"'
+    );
+  });
+
+  it('preserves all five published URLs, UIDs, intervals and participants', async () => {
+    const data = dataset();
+    const payload = newsPublicPayloadSchema.parse(
+      JSON.parse(JSON.stringify(toNewsPublicPayload(data)))
+    );
+    expect(payload.articles.flatMap((article) => article.events ?? [])).toHaveLength(5);
+    vi.spyOn(newsLoad, 'loadNewsArticles').mockResolvedValue(data.articles);
+    vi.spyOn(newsLoad, 'loadNewsArticle').mockImplementation(async (id) => data.byId.get(id));
+    const route = await import('@/pages/news/[year]/[month]/[entry]/[event].ics');
+    const paths = await route.getStaticPaths();
+    expect(paths).toHaveLength(5);
+    const evidence = await Promise.all(
+      paths.map(async ({ params }) => {
+        const response = await route.GET({ params } as never);
+        const ics = (await response.text()).replaceAll('\r\n ', '');
+        const article = data.byId.get(`${params.year}/${params.month}/${params.entry}`)!;
+        const event = article.events.find((event) => event.slug === params.event)!;
+        const publicEvent = payload.articles
+          .find((item) => item.id === article.id)!
+          .events!.find((item) => item.slug === params.event)!;
+        expect(ics).toContain(`URL:${article.canonical}\r\n`);
+        expect(response.headers.get('content-type')).toBe('text/calendar; charset=utf-8');
+        const sharedIcs = buildEventIcs(event, article.canonical, article.publishedAt).replaceAll(
+          '\r\n ',
+          ''
+        );
+        expect(sharedIcs.match(/^UID:(.+)$/m)?.[1]).toBe(ics.match(/^UID:(.+)$/m)?.[1]);
+        return {
+          url: new URL(publicEvent.ics_url).pathname,
+          uid: ics.match(/^UID:(.+)$/m)?.[1].trim(),
+          start: publicEvent.starts_at,
+          end: publicEvent.ends_at,
+          location: publicEvent.location,
+          coordinates: publicEvent.coordinates,
+          organizer: publicEvent.organizer,
+          performer: publicEvent.performer,
+          status: ics.match(/^STATUS:(.+)$/m)?.[1].trim()
+        };
+      })
+    );
+    expect(evidence).toMatchSnapshot();
+  });
+
+  it('reflects cancellation in HTML, legacy JSON, shared JSON-LD and old ICS', async () => {
+    const data = dataset();
+    const article = data.byId.get('2026/05/ok-meeting-june')!;
+    const event = article.events[0];
+    const container = await createAstroContainer();
+    const html = await container.renderToString(EventWidget, {
+      props: { event, newsSlug: event.slug }
+    });
+    const window = new Window();
+    try {
+      window.document.body.innerHTML = html;
+      const cancellation = window.document.querySelector('time[data-status="cancelled"]');
+      expect(cancellation?.getAttribute('datetime')).toBe(event.startsIso);
+      expect(cancellation?.getAttribute('aria-label')).toContain('Отменено:');
+      expect(window.document.querySelector('[role="img"][aria-label="Отменено"]')).toBeFalsy();
+      expect(window.document.body.textContent).not.toContain('Отменено');
+    } finally {
+      window.close();
+    }
+    expect(html).not.toContain('download=');
+    expect(
+      toNewsPublicPayload(data).articles.find((item) => item.id === article.id)?.events?.[0]
+        .description
+    ).toContain('Отменено.');
+    const jsonLd = newsArticleSchema({
+      name: article.title,
+      description: article.summary,
+      url: article.url,
+      events: article.events
+    });
+    expect(jsonLd.find((item) => item['@type'] === 'Event')?.eventStatus).toBe(
+      'https://schema.org/EventCancelled'
+    );
+    expect(buildEventIcs(event, article.canonical, article.publishedAt)).toContain(
+      'STATUS:CANCELLED'
+    );
+    expect(event.endsIso).toBeUndefined();
+    expect(jsonLd.find((item) => item['@type'] === 'Event')?.endDate).toBeUndefined();
+  });
+
+  it.each([undefined, '03.06.2026'])(
+    'keeps date uncertainty and conditional status on the compact surface, through=%s',
+    async (through) => {
+      const record = newsEventRecord(
+        {
+          starts_at: '01.06.2026',
+          through,
+          price: '600 или 800 ₽',
+          audience: 'От 8 лет',
+          status: 'conditional'
+        },
+        '**Условие:** от пяти участников. [Запись](https://example.com/register).'
+      );
+      const data = linkedDataset(record);
+      expect(toNewsPublicPayload(data).articles[0].events).toBeUndefined();
+      const container = await createAstroContainer();
+      const html = await container.renderToString(EventWidget, {
+        props: { event: data.articles[0].events[0], newsSlug: data.articles[0].events[0].slug }
+      });
+      const window = new Window();
+      window.document.body.innerHTML = html;
+      const document = window.document;
+      expect(document.querySelector('time')?.textContent.replace(/\s+/g, ' ').trim()).toBe(
+        '1 июня'
+      );
+      expect(document.querySelector('strong')?.textContent).toBe('При наборе группы');
+      expect(document.querySelector('h2 a')?.getAttribute('href')).toBe(record.url);
+      expect(document.querySelector('a[href="https://example.com/register"]')).toBeFalsy();
+      expect(document.body.textContent.replaceAll('\u00a0', ' ')).not.toContain('600 или 800');
+      expect(document.body.textContent).toContain('Место уточняется');
+      expect(document.body.textContent).not.toContain('00:00');
+      expect(!!document.querySelector('[download]')).toBe(!!through);
+      expect(document.body.textContent.replaceAll('\u00a0', ' ')).toContain(
+        through ? '1 июня 2026 — 3 июня 2026' : 'Время уточняется'
+      );
+      window.close();
+    }
+  );
+
+  it('retains the mapped and unknown-place visual fixture scenarios', async () => {
+    const container = await createAstroContainer();
+    const window = new Window();
+    try {
+      window.document.body.innerHTML = await container.renderToString(Fixture);
+      const mapped = window.document.querySelector('[data-testid="news-event-card-coordinates"]')!;
+      const withoutPlace = window.document.querySelector(
+        '[data-testid="news-event-card-no-place"]'
+      )!;
+      expect({
+        mapped: {
+          mapCount: mapped.querySelectorAll('map-preview').length,
+          map: mapped.querySelector('a[href*="yandex.ru/maps/"]')?.getAttribute('href'),
+          download: mapped.querySelector('[download]')?.getAttribute('href')
+        },
+        withoutPlace: {
+          mapCount: withoutPlace.querySelectorAll('map-preview').length,
+          map: withoutPlace.querySelector('a[href*="yandex.ru/maps/"]')?.getAttribute('href'),
+          download: withoutPlace.querySelector('[download]')?.getAttribute('href')
+        }
+      }).toMatchInlineSnapshot(`
+        {
+          "mapped": {
+            "download": "/news/2026/05/reglament/event.ics",
+            "map": "https://yandex.ru/maps/?pt=38.654321,55.123456&z=18&l=map",
+            "mapCount": 1,
+          },
+          "withoutPlace": {
+            "download": "/news/2026/06/entrance/event.ics",
+            "map": undefined,
+            "mapCount": 0,
+          },
+        }
+      `);
+    } finally {
+      window.close();
+    }
+  });
+
+  it('does not generate a legacy ICS URL for an unknown-time single date', async () => {
+    const data = linkedDataset(newsEventRecord({ starts_at: '01.06.2026' }));
+    vi.spyOn(newsLoad, 'loadNewsArticles').mockResolvedValue(data.articles);
+    vi.spyOn(newsLoad, 'loadNewsArticle').mockImplementation(async (id) => data.byId.get(id));
+    const route = await import('@/pages/news/[year]/[month]/[entry]/[event].ics');
+    expect(await route.getStaticPaths()).toEqual([]);
+    expect(
+      (
+        await route.GET({
+          params: { year: '2026', month: '05', entry: 'linked', event: 'event' }
+        } as never)
+      ).status
+    ).toBe(404);
+  });
+
+  it('uses an updated shared time and location in news, day projection and ICS', () => {
+    const record = newsEventRecord({
+      starts_at: '02.06.2026 18:30',
+      location: 'Новая площадка',
+      status: 'conditional'
+    });
+    const linked = linkedDataset(record).articles[0].events[0];
+    const day = buildEventCalendar([record]).days[0].events[0];
+    expect([linked.startsIso, linked.location]).toEqual([day.startsIso, day.location]);
+    const ics = buildEventIcs(linked, 'https://example.com', new Date('2026-01-01'));
+    expect(ics).toContain('DTSTART:20260602T153000Z');
+    expect(ics).toContain('LOCATION:Новая площадка');
+    expect(
+      toNewsPublicPayload(linkedDataset(record)).articles[0].events?.[0].description
+    ).toContain('При наборе группы.');
+    expect(
+      newsArticleSchema({
+        name: 'Новость',
+        description: 'Описание',
+        url: '/news/',
+        events: [linked]
+      }).find((item) => item['@type'] === 'Event')?.eventStatus
+    ).toBeUndefined();
+  });
+
+  it('generates new ICS endpoints only for exportable records, including cancelled ones', async () => {
+    const dateOnly = newsEventRecord({ starts_at: '01.06.2026' });
+    vi.spyOn(eventLoad, 'loadEvents').mockResolvedValue([...migrated, dateOnly]);
+    vi.spyOn(eventLoad, 'loadEvent').mockImplementation(async (id) =>
+      [...migrated, dateOnly].find((event) => event.id === id)
+    );
+    const route = await import('@/pages/events/calendar/[id].ics');
+    expect((await route.getStaticPaths()).map((path) => path.params.id)).toEqual(ids);
+    expect((await route.GET({ params: { id: dateOnly.id } } as never)).status).toBe(404);
+    const response = await route.GET({ params: { id: 'ok-meeting-june-2026' } } as never);
+    expect(await response.text()).toContain(
+      'UID:news-event-2026-05-ok-meeting-june-event@kpshelkovo.online'
+    );
+  });
+});

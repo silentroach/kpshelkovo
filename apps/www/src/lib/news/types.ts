@@ -1,4 +1,4 @@
-import type { Place } from '@/lib/places/types';
+import type { EventRecord } from '@/lib/events/types';
 
 import type { PreprocessedSiteMarkdownBody } from '../markdown/render';
 import type { EntityMentionTarget } from '../mentions';
@@ -43,31 +43,9 @@ export interface NewsCover {
   readonly alt: string;
 }
 
-export interface NewsEventOrganizer {
-  readonly name: string;
-  readonly type: 'organization' | 'person';
-}
-
-export interface NewsEventPerformer {
-  readonly name: string;
-  readonly type: 'organization' | 'person';
-}
-
-export interface NewsEvent {
+export interface NewsEvent extends EventRecord {
   readonly slug: string;
-  readonly title: string;
   readonly description?: string;
-  readonly startsAt: Date;
-  readonly startsIso: string;
-  readonly startsTime: string;
-  readonly endsAt?: Date;
-  readonly endsIso?: string;
-  readonly endsTime?: string;
-  readonly icsUrl: string;
-  readonly place?: Place;
-  readonly locationDetails?: string;
-  readonly organizer?: NewsEventOrganizer;
-  readonly performer?: readonly NewsEventPerformer[];
 }
 
 export interface NewsArticle {
@@ -102,10 +80,6 @@ export interface NewsArticle {
   readonly body: PreprocessedSiteMarkdownBody;
   readonly mentions: readonly EntityMentionTarget[];
 }
-
-export type NewsArticleWithEvent = NewsArticle & {
-  readonly events: readonly [NewsEvent, ...NewsEvent[]];
-};
 
 export interface NewsListArticle {
   readonly id: string;
