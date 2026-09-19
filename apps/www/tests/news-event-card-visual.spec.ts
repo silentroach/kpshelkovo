@@ -38,7 +38,7 @@ const yandexMapsReadyScript = `
 `;
 
 const expectCalendarOnly = async (target: Locator, icsUrl: string): Promise<void> => {
-  const actions = target.locator('.news-event-compact-actions');
+  const actions = target.locator('.news-event-actions');
   const calendarLink = actions.getByRole('link', { name: 'Добавить в календарь' });
 
   await expect(actions.locator('a, button')).toHaveCount(1);
@@ -105,7 +105,7 @@ for (const [device, viewport] of [
       await expect(canvas).toHaveJSProperty('inert', false);
       await expect(openMaps).toBeFocused();
       await expect(canvas.locator('svg')).toBeVisible();
-      const marker = canvas.locator('span.ui-map-marker.news-event-compact-map-pin');
+      const marker = canvas.locator('span.ui-map-marker');
       await expect(marker).toHaveCount(1);
       await expect(marker).toHaveAttribute('aria-hidden', 'true');
       await expect(marker).toBeVisible();
@@ -135,7 +135,7 @@ for (const [device, viewport] of [
       await expectCalendarOnly(target, '/news/2026/05/reglament/event.ics');
 
       // Native SDK controls must remain reachable through the card's content layer.
-      await target.getByRole('link', { name: 'КП Шелково, эко-клуб' }).focus();
+      await target.getByRole('heading').getByRole('link').focus();
       for (const action of [
         openMaps,
         canvas.getByRole('link', { name: 'Условия использования', exact: true }),
@@ -169,9 +169,13 @@ for (const [device, viewport] of [
       await expect(target.getByRole('heading')).toBeVisible();
       await expect(target.locator('iframe')).toHaveCount(0);
       await expect(target.locator('map-preview')).toHaveCount(0);
-      await expect(target.locator('.news-event-compact-map-pin')).toHaveCount(0);
+      await expect(target.locator('.ui-map-marker')).toHaveCount(0);
       await expectCalendarOnly(target, '/news/2026/06/entrance/event.ics');
-      await expect(target.getByRole('link')).toHaveCount(1);
+      await expect(target.getByRole('heading').getByRole('link')).toHaveAttribute(
+        'href',
+        '/events/2026/06/entrance-meeting/'
+      );
+      await expect(target.getByRole('link')).toHaveCount(2);
 
       await expect(target).toHaveScreenshot(`news-event-card-no-place-${device}.png`, screenshot);
     });

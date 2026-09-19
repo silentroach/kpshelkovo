@@ -23,6 +23,14 @@ const exportIcs = (item: ReturnType<typeof event>) =>
 const unfold = (ics: string) => ics.replaceAll('\r\n ', '');
 
 describe('event ICS', () => {
+  it('exports formatted descriptions as readable text, including later paragraphs', () => {
+    const ics = unfold(
+      exportIcs(event({}, '**Встреча**.\n\n[Записаться](https://example.com/register).'))
+    );
+    expect(ics).toContain('DESCRIPTION:Встреча. Записаться.');
+    expect(ics).not.toMatch(/\*\*|\[Записаться\]/);
+  });
+
   it('preserves a precise overnight interval', () => {
     const ics = exportIcs(event({ ends_at: '06.01.2026 02:00' }));
     expect(ics.match(/DT(?:START|END):[^\r]+/g)).toMatchInlineSnapshot(`

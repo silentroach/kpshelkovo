@@ -4,8 +4,8 @@ exports[`shared events in news > preserves all five published URLs, UIDs, interv
 [
   {
     "coordinates": {
-      "lat": 55.074958,
-      "lng": 37.755599,
+      "lat": 55.074976,
+      "lng": 37.755478,
     },
     "end": undefined,
     "location": "Ресторан Green Dreams",

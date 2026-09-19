@@ -22,12 +22,10 @@ const renderNav = async (pathname: string, variant: 'header' | 'mobile') => {
 
 describe('SiteNav', () => {
   it.each(['header', 'mobile'] as const)(
-    'links to events and marks nested dates in the %s navigation',
+    'temporarily omits events from the %s navigation',
     async (variant) => {
-      expect(await renderNav('/events/', variant)).toContain('href="/events/" aria-current="page"');
-      expect(await renderNav('/events/2026/09/19/', variant)).toContain(
-        'href="/events/" aria-current="location"'
-      );
+      expect(await renderNav('/events/', variant)).not.toContain('href="/events/"');
+      expect(await renderNav('/events/2026/09/19/', variant)).not.toContain('aria-current');
     }
   );
   it.each([

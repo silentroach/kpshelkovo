@@ -62,7 +62,7 @@ describe('event cards', () => {
     expect(facts).toContain(record.audience);
     expect(document.querySelectorAll('a[href="https://example.com/source"]')).toHaveLength(1);
     expect(document.querySelector('a[href="https://example.com/register"]')).toBeTruthy();
-    expect(document.querySelector('iframe, a[download]')).toBeFalsy();
+    expect(document.querySelector('iframe, map-preview, a[download]')).toBeFalsy();
     expect(text).not.toMatch(/00:00|Бесплатно|состоялось/);
   });
 
@@ -89,7 +89,8 @@ describe('event cards', () => {
     );
     expect(document.querySelector('aside h2')?.textContent).toBe(record.location);
     expect(document.querySelector('a[download]')).toBeFalsy();
-    expect(document.querySelector('iframe[loading="lazy"]')).toBeTruthy();
+    expect(document.querySelector('map-preview')).toBeTruthy();
+    expect(document.querySelector('iframe')).toBeFalsy();
     expect(document.querySelector('a[href*="pt=37.9,54.8"]')).toBeTruthy();
     expect(document.body.textContent).not.toContain('19:00');
   });
@@ -110,7 +111,7 @@ describe('event cards', () => {
     expect(document.body.textContent).not.toContain('19:00');
   });
 
-  it('renders one location card only when a name or coordinates exist, keeping maps decorative', async () => {
+  it('renders one location card only when a name or coordinates exist, keeping a map fallback', async () => {
     const container = await createAstroContainer();
     const locations = [
       { name: 'unknown', fields: {} },
@@ -129,20 +130,19 @@ describe('event cards', () => {
       );
       const card = document.querySelector('article');
       const aside = card?.querySelector('aside');
-      const frame = aside?.querySelector('iframe');
+      const preview = aside?.querySelector('map-preview');
       const mapLink = aside?.querySelector('a');
       const mapUrl = mapLink ? new URL(mapLink.href) : undefined;
       evidence.push({
         name,
         cards: document.querySelectorAll('aside').length,
-        maps: document.querySelectorAll('iframe').length,
+        maps: document.querySelectorAll('map-preview').length,
         mapLinks: document.querySelectorAll('a[href*="yandex.ru/maps/"]').length,
         point: mapUrl?.searchParams.get('pt') ?? undefined,
         query: mapUrl?.searchParams.get('text') ?? undefined,
-        decorativeMap: frame
-          ? frame.tabIndex === -1 &&
-            !!frame.closest('[aria-hidden="true"][inert]') &&
-            frame.getAttribute('loading') === 'lazy'
+        mapFallback: preview
+          ? !!preview.querySelector('[data-canvas][inert]') &&
+            !!preview.querySelector('a[data-fallback]:not([hidden])')
           : undefined,
         locationBetweenHeaderAndBody: aside
           ? aside.previousElementSibling?.tagName === 'HEADER' &&
@@ -170,8 +170,8 @@ describe('event cards', () => {
       [
         {
           "cards": 0,
-          "decorativeMap": undefined,
           "locationBetweenHeaderAndBody": undefined,
+          "mapFallback": undefined,
           "mapLinks": 0,
           "maps": 0,
           "name": "unknown",
@@ -180,8 +180,8 @@ describe('event cards', () => {
         },
         {
           "cards": 1,
-          "decorativeMap": undefined,
           "locationBetweenHeaderAndBody": true,
+          "mapFallback": undefined,
           "mapLinks": 1,
           "maps": 0,
           "name": "name-only",
@@ -190,9 +190,9 @@ describe('event cards', () => {
         },
         {
           "cards": 1,
-          "decorativeMap": true,
           "locationBetweenHeaderAndBody": true,
-          "mapLinks": 1,
+          "mapFallback": true,
+          "mapLinks": 2,
           "maps": 1,
           "name": "coordinates-only",
           "point": "37.9,54.8",
@@ -200,9 +200,9 @@ describe('event cards', () => {
         },
         {
           "cards": 1,
-          "decorativeMap": true,
           "locationBetweenHeaderAndBody": true,
-          "mapLinks": 1,
+          "mapFallback": true,
+          "mapLinks": 2,
           "maps": 1,
           "name": "both",
           "point": "37.9,54.8",
@@ -399,7 +399,7 @@ describe('event calendar pages', () => {
     );
     expect(
       document.querySelector(
-        '[data-pagefind-root], [data-pagefind-body], iframe, a[download], a[href="https://example.com/register"]'
+        '[data-pagefind-root], [data-pagefind-body], iframe, map-preview, a[download], a[href="https://example.com/register"]'
       )
     ).toBeFalsy();
     expect(document.querySelector('script[type="application/ld+json"]')).toBeFalsy();

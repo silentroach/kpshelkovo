@@ -1,30 +1,50 @@
 ---
+import MapPreview from '@/components/maps/MapPreview.astro';
+import type { PlaceCoordinates } from '@/lib/places/types';
+
 interface Props {
-  readonly embedUrl?: string;
+  readonly coordinates?: PlaceCoordinates;
+  readonly mapUrl?: string;
   readonly treatment?: 'detail' | 'compact';
 }
-const { embedUrl, treatment = 'detail' } = Astro.props;
+const { coordinates, mapUrl, treatment = 'detail' } = Astro.props;
 ---
 
 <div
   class:list={[
     'map-card-shell',
-    { 'map-card-shell--compact': treatment === 'compact' },
+    {
+      'map-card-shell--compact': treatment === 'compact',
+      'map-card-shell--mapped': !!coordinates,
+    },
   ]}
 >
   {
-    embedUrl && (
-      <div class="map-background" aria-hidden="true" inert>
-        <div class="map-layer">
-          <iframe
-            src={embedUrl}
-            title="Карта места"
-            loading="lazy"
-            tabindex="-1"
-          />
-          <span class="ui-map-marker" />
-        </div>
-        {treatment === 'detail' && <div class="map-wash" />}
+    coordinates && mapUrl && (
+      <div class="map-background" data-pagefind-ignore>
+        <MapPreview
+          preview={{
+            coordinates,
+            zoom: 16,
+            anchor: treatment === 'compact' ? [0.75, 0.45] : [0.75, 0.3],
+            muted: true,
+            mutedOpacity: 0.4,
+          }}
+          label="Карта места"
+          mapUrl={mapUrl}
+        >
+          <span class="ui-map-marker" aria-hidden="true" />
+          <a
+            slot="fallback"
+            data-fallback
+            href={mapUrl}
+            target="_blank"
+            rel="noreferrer noopener"
+            class="map-fallback"
+          >
+            Открыть Яндекс Карты
+          </a>
+        </MapPreview>
       </div>
     )
   }
@@ -53,67 +73,53 @@ const { embedUrl, treatment = 'detail' } = Astro.props;
     inset: 0;
     z-index: -1;
     overflow: hidden;
-    pointer-events: none;
-  }
-  .map-layer {
-    position: absolute;
-    top: -6rem;
-    left: 0;
-    width: var(--map-layer-width, 150%);
-    height: 20rem;
-  }
-  iframe {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border: 0;
-    opacity: var(--map-opacity, 0.36);
-    filter: grayscale(0.18) saturate(0.78) contrast(0.92);
   }
   .ui-map-marker {
     --ui-map-marker-size: 18px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
+    display: block;
     transform: translate(-50%, -50%);
+    pointer-events: none;
   }
-  .map-wash {
+  .map-fallback {
     position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(
-        180deg,
-        transparent var(--map-clear-height, 2rem),
-        var(--color-surface-raised) var(--map-solid-height, 5rem)
-      ),
-      var(
-        --map-side-wash,
-        linear-gradient(
-          90deg,
-          var(--color-surface-raised),
-          color-mix(in oklab, var(--color-surface-raised) 94%, transparent) 48%,
-          transparent 100%
-        )
-      );
+    top: 0.75rem;
+    right: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+    font-size: 0.75rem;
+    text-decoration: none;
+    box-shadow: var(--shadow-1);
+  }
+  .map-fallback[hidden] {
+    display: none;
   }
   .map-content {
     padding: 1rem;
+    pointer-events: none;
+  }
+  .map-content :global(a) {
+    pointer-events: auto;
+  }
+  .map-card-shell--mapped .map-content {
+    padding-bottom: 2.75rem;
+  }
+  .map-card-shell :global(a:focus-visible) {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 2px;
   }
   .map-card-shell--compact {
     box-shadow: 0 0.65rem 1.55rem var(--color-shadow);
   }
-  .map-card-shell--compact .map-background {
-    opacity: 0.36;
+  .map-card-shell--compact :global(.ymaps3--map-copyrights) {
+    opacity: 0.4;
   }
-  .map-card-shell--compact .map-layer {
-    top: -66%;
-    right: auto;
-    bottom: -8%;
-    width: 150%;
-    height: 164%;
-  }
-  .map-card-shell--compact iframe {
+  .map-card-shell--compact
+    :global(.ymaps3--map-copyrights:is(:hover, :focus-within)) {
     opacity: 1;
-    transform: translateY(50px);
   }
 </style>

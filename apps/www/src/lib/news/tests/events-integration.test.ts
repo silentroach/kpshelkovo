@@ -264,31 +264,31 @@ describe('shared events in news', () => {
     try {
       window.document.body.innerHTML = await container.renderToString(Fixture);
       const mapped = window.document.querySelector('[data-testid="news-event-card-coordinates"]')!;
-      const locationOnly = window.document.querySelector(
-        '[data-testid="news-event-card-location-only"]'
+      const withoutPlace = window.document.querySelector(
+        '[data-testid="news-event-card-no-place"]'
       )!;
       expect({
         mapped: {
-          mapCount: mapped.querySelectorAll('iframe[loading="lazy"]').length,
+          mapCount: mapped.querySelectorAll('map-preview').length,
           map: mapped.querySelector('a[href*="yandex.ru/maps/"]')?.getAttribute('href'),
           download: mapped.querySelector('[download]')?.getAttribute('href')
         },
-        locationOnly: {
-          mapCount: locationOnly.querySelectorAll('iframe').length,
-          map: locationOnly.querySelector('a[href*="yandex.ru/maps/"]')?.getAttribute('href'),
-          download: locationOnly.querySelector('[download]')?.getAttribute('href')
+        withoutPlace: {
+          mapCount: withoutPlace.querySelectorAll('map-preview').length,
+          map: withoutPlace.querySelector('a[href*="yandex.ru/maps/"]')?.getAttribute('href'),
+          download: withoutPlace.querySelector('[download]')?.getAttribute('href')
         }
       }).toMatchInlineSnapshot(`
         {
-          "locationOnly": {
-            "download": "/news/2026/06/entrance/event.ics",
-            "map": undefined,
-            "mapCount": 0,
-          },
           "mapped": {
             "download": "/news/2026/05/reglament/event.ics",
             "map": "https://yandex.ru/maps/?pt=38.654321,55.123456&z=18&l=map",
             "mapCount": 1,
+          },
+          "withoutPlace": {
+            "download": "/news/2026/06/entrance/event.ics",
+            "map": undefined,
+            "mapCount": 0,
           },
         }
       `);

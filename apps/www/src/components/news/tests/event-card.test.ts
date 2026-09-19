@@ -22,30 +22,30 @@ const event: NewsEvent = {
 
 describe('event place card', () => {
   it('links a hidden place and keeps its map in the compact card', async () => {
-      const place = testPlace({ name: 'Green Dreams', mapUrl: 'https://yandex.ru/navi/meeting' });
-      const container = await createAstroContainer();
-      const html = await container.renderToString(NewsEventCard, {
-        props: {
-          event: { ...event, place, locationDetails: 'в беседке' }
-        }
-      });
-      expect(html).toContain(`href="${place.url}"`);
-      expect(html).toContain('Green Dreams</a>');
-      expect(html).toContain('беседке');
-      expect(html).toContain(`href="${place.mapUrl}"`);
-      expect(html).toContain(`href="${event.icsUrl}"`);
-      expect(html).not.toContain('<iframe');
-      expect(html).toContain('<map-preview');
+    const place = testPlace({ name: 'Green Dreams', mapUrl: 'https://yandex.ru/navi/meeting' });
+    const container = await createAstroContainer();
+    const html = await container.renderToString(NewsEventCard, {
+      props: {
+        event: { ...event, place, locationDetails: 'в беседке' }
+      }
+    });
+    expect(html).toContain(`href="${place.url}"`);
+    expect(html).toContain('Green Dreams</a>');
+    expect(html).toContain('беседке');
+    expect(html).toContain(`href="${place.mapUrl}"`);
+    expect(html).toContain(`href="${event.icsUrl}"`);
+    expect(html).not.toContain('<iframe');
+    expect(html).toContain('<map-preview');
   });
 
   it('keeps the calendar but omits place links and map without a place', async () => {
-      const container = await createAstroContainer();
-      const html = await container.renderToString(NewsEventCard, { props: { event } });
-      expect(html).toContain(`href="${event.icsUrl}"`);
-      expect(html).not.toContain('href="/map/');
-      expect(html).not.toContain('https://yandex.ru');
-      expect(html).not.toContain('<iframe');
-      expect(html).not.toContain('<map-preview');
+    const container = await createAstroContainer();
+    const html = await container.renderToString(NewsEventCard, { props: { event } });
+    expect(html).toContain(`href="${event.icsUrl}"`);
+    expect(html).not.toContain('href="/map/');
+    expect(html).not.toContain('https://yandex.ru');
+    expect(html).not.toContain('<iframe');
+    expect(html).not.toContain('<map-preview');
   });
 
   it('sends only the canonical event point, without place icon, areas or live hours', async () => {

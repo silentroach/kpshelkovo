@@ -6,7 +6,6 @@ import MapCardShell from '@/components/MapCardShell.astro';
 import { EVENT_STATUS_LABELS } from '@/lib/events/view';
 import type { NewsEvent } from '@/lib/news/types';
 import {
-  buildNewsEventMapEmbedUrl,
   buildNewsEventMapUrl,
   formatNewsEventMonth,
   formatNewsEventRange,
@@ -17,6 +16,7 @@ interface Props {
 }
 const { event } = Astro.props;
 const mapUrl = buildNewsEventMapUrl(event);
+const coordinates = event.place?.coordinates ?? event.coordinates;
 const eventDay = String(Number(event.startsDate.slice(8, 10)));
 const eventMonth = formatNewsEventMonth(event.startsIso);
 const eventTime = event.endsTime
@@ -31,12 +31,14 @@ const titleId = `news-event-title-${event.slug}`;
 ---
 
 <aside aria-labelledby={titleId} data-pagefind-body>
-  <MapCardShell
-    treatment="compact"
-    embedUrl={buildNewsEventMapEmbedUrl(event, { centerOffsetYPx: 50 })}
-  >
+  <MapCardShell treatment="compact" coordinates={coordinates} mapUrl={mapUrl}>
     <div class="news-event-content">
-      <div class="news-event-date">
+      <div
+        class:list={[
+          'news-event-date',
+          { 'news-event-date--mapped': !!coordinates },
+        ]}
+      >
         {
           event.status === 'cancelled' && (
             <span
@@ -138,7 +140,7 @@ const titleId = `news-event-title-${event.slug}`;
           )
         }
         {
-          mapUrl && (
+          mapUrl && !coordinates && (
             <a
               href={mapUrl}
               target="_blank"
@@ -190,6 +192,12 @@ const titleId = `news-event-title-${event.slug}`;
     display: flex;
     align-items: baseline;
     gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+  .news-event-date--mapped {
+    /* Reserve the native map action at the top right, including on narrow cards. */
+    padding-right: 10.25rem;
+    flex-wrap: wrap;
   }
   .news-event-cancelled {
     display: flex;

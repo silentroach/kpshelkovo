@@ -1,4 +1,5 @@
 import { renderEventIcs } from '@shelkovo/ical';
+import { extractMarkdownText } from '@shelkovo/markdown';
 
 import type { EventRecord } from './types';
 
@@ -25,7 +26,7 @@ export const buildEventIcs = (
         : event.status === 'conditional'
           ? 'При наборе группы.'
           : '',
-      event.body,
+      extractMarkdownText(event.body),
       event.locationDetails,
       event.startsAt && !event.endsAt
         ? 'Точное окончание неизвестно. Два часа выделены условно для личного календаря.'

@@ -12,10 +12,7 @@ import {
   formatEventRange,
 } from '@/lib/events/view';
 import { renderMarkdown } from '@/lib/markdown/render';
-import {
-  buildNewsEventMapEmbedUrl,
-  buildNewsEventMapUrl,
-} from '@/lib/news/view';
+import { buildNewsEventMapUrl } from '@/lib/news/view';
 
 interface Props {
   readonly event: EventRecord;
@@ -97,7 +94,7 @@ const sourceLabel = telegramChannel
   {
     mapUrl && (
       <aside class="event-location" aria-label="Место мероприятия">
-        <MapCardShell embedUrl={buildNewsEventMapEmbedUrl(event)}>
+        <MapCardShell coordinates={event.coordinates} mapUrl={mapUrl}>
           <div
             class:list={[
               'location-content',
@@ -247,10 +244,6 @@ const sourceLabel = telegramChannel
     color: var(--color-text-muted);
   }
   .event-location {
-    --map-opacity: 0.8;
-    --map-clear-height: 3rem;
-    --map-solid-height: 6rem;
-    --map-side-wash: transparent;
     min-width: 0;
     align-self: start;
   }
@@ -323,8 +316,6 @@ const sourceLabel = telegramChannel
       grid-row: 2;
     }
     .event-location {
-      --map-clear-height: 5rem;
-      --map-solid-height: 8rem;
       grid-column: 2;
       grid-row: 1 / 3;
     }
