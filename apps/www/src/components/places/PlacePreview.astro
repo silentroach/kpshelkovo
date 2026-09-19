@@ -11,6 +11,8 @@ const preview = {
   coordinates: place.coordinates,
   geometry: place.geometry,
   openingHours: place.openingHours,
+  pinchZoom: true,
+  copyrightsPosition: 'bottom right',
 } satisfies MapPreviewData;
 ---
 
@@ -42,7 +44,16 @@ const preview = {
 <style>
   .place-preview {
     height: 15rem;
-    border: 1px solid var(--color-border);
+    overflow: hidden;
+    border: 1px solid
+      color-mix(
+        in oklab,
+        var(--color-border-strong) 76%,
+        var(--color-primary) 24%
+      );
+    border-radius: 1rem;
+    background: var(--color-surface-raised);
+    box-shadow: 0 0.65rem 1.55rem var(--color-shadow);
   }
 
   .place-preview__marker {

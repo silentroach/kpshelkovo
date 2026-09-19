@@ -85,8 +85,9 @@ const mount = (
 const setupMaps = () => {
   const destroy = vi.fn();
   const update = vi.fn();
+  const setBehaviors = vi.fn();
   const create = vi.fn(function (_canvas: HTMLElement, _props: YMapProps) {
-    return { addChild: vi.fn(), destroy, update };
+    return { addChild: vi.fn(), destroy, update, setBehaviors };
   });
   const marker = vi.fn(function (_props: YMapMarkerProps, _content: HTMLElement) {});
   const feature = vi.fn(function (_props: YMapFeatureProps) {});
@@ -100,7 +101,7 @@ const setupMaps = () => {
     YMapMarker: marker,
     YMapListener: listener
   });
-  return { create, marker, feature, listener, destroy, update };
+  return { create, marker, feature, listener, destroy, update, setBehaviors };
 };
 
 afterEach(() => {
@@ -304,6 +305,66 @@ it.each([
     });
   }
 );
+
+it('gates native wheel zoom to trackpad pinch before the SDK and cleans up on reconnect', async () => {
+  const { create, setBehaviors } = setupMaps();
+  vi.mocked(loadYandexMaps).mockResolvedValue();
+  const element = mount({ coordinates: { lng: 37, lat: 55 }, pinchZoom: true });
+  approach(element);
+  await Promise.resolve();
+  expect(create.mock.calls[0]?.[1].behaviors).toEqual(['pinchZoom']);
+
+  const canvas = element.querySelector<HTMLElement>('[data-canvas]')!;
+  const behaviorsAtCanvas: unknown[] = [];
+  canvas.addEventListener('wheel', () => behaviorsAtCanvas.push(setBehaviors.mock.lastCall?.[0]));
+  for (const ctrlKey of [false, true, false]) {
+    // happy-dom's WheelEvent drops mouse modifiers; this handler only reads ctrlKey.
+    const event = new MouseEvent('wheel', {
+      ctrlKey,
+      bubbles: true,
+      cancelable: true
+    });
+    canvas.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(false);
+  }
+  expect(behaviorsAtCanvas).toMatchInlineSnapshot(`
+    [
+      [
+        "pinchZoom",
+      ],
+      [
+        "pinchZoom",
+        "scrollZoom",
+      ],
+      [
+        "pinchZoom",
+      ],
+    ]
+  `);
+
+  element.remove();
+  canvas.dispatchEvent(new MouseEvent('wheel', { ctrlKey: true, bubbles: true }));
+  expect(setBehaviors).toHaveBeenCalledTimes(3);
+  document.body.append(element);
+  approach(element);
+  await Promise.resolve();
+  canvas.dispatchEvent(new MouseEvent('wheel', { ctrlKey: true, bubbles: true }));
+  expect(setBehaviors).toHaveBeenCalledTimes(4);
+});
+
+it('leaves ordinary and pinch wheel events to the browser on a fixed background', async () => {
+  const { setBehaviors } = setupMaps();
+  vi.mocked(loadYandexMaps).mockResolvedValue();
+  const element = mount();
+  approach(element);
+  await Promise.resolve();
+  for (const ctrlKey of [false, true]) {
+    const event = new MouseEvent('wheel', { ctrlKey, bubbles: true, cancelable: true });
+    element.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(false);
+  }
+  expect(setBehaviors).not.toHaveBeenCalled();
+});
 
 it('positions the canonical center with margins on either side of the container', () => {
   for (const anchor of [

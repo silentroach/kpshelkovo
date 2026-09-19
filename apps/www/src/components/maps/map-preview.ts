@@ -41,6 +41,7 @@ export class MapPreviewElement extends HTMLElement {
   private sizeObserver?: ResizeObserver;
   private actionObserver?: MutationObserver;
   private markerUpdateTimer?: number;
+  private gestureController?: AbortController;
 
   connectedCallback(): void {
     installYandexMapsRuntimeHeadPersistence();
@@ -83,6 +84,8 @@ export class MapPreviewElement extends HTMLElement {
     this.stopWaiting();
     const map = this.map;
     this.map = undefined;
+    this.gestureController?.abort();
+    this.gestureController = undefined;
     this.actionObserver?.disconnect();
     this.actionObserver = undefined;
     window.clearInterval(this.markerUpdateTimer);
@@ -118,7 +121,7 @@ export class MapPreviewElement extends HTMLElement {
         {
           location,
           margin: getPreviewMargin(canvas.clientWidth, canvas.clientHeight, data.anchor),
-          behaviors: [],
+          behaviors: data.pinchZoom ? ['pinchZoom'] : [],
           mode: 'vector',
           copyrightsPosition: data.copyrightsPosition ?? 'bottom left',
           distributionPosition: data.distributionPosition ?? 'top right'
@@ -137,6 +140,16 @@ export class MapPreviewElement extends HTMLElement {
         ]
       );
       this.map = map;
+
+      if (data.pinchZoom) {
+        this.gestureController = new AbortController();
+        // Trackpad pinch arrives as Ctrl+wheel; ordinary wheel must scroll the page.
+        this.addEventListener(
+          'wheel',
+          (event) => map.setBehaviors(event.ctrlKey ? ['pinchZoom', 'scrollZoom'] : ['pinchZoom']),
+          { capture: true, passive: true, signal: this.gestureController.signal }
+        );
+      }
 
       let rendered = false;
       const handOff = (): void => {
