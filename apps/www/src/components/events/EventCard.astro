@@ -3,7 +3,6 @@ import { formatDynamicHtml } from '@shelkovo/markdown';
 import LinkWithIcon from '@shelkovo/ui/LinkWithIcon.astro';
 import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 import { CalendarPlusIcon } from '@shelkovo/ui/icons';
-import { isDomylandUrl, isTelegramUrl } from '@shelkovo/url';
 import EventWidget from './EventWidget.astro';
 import type { EventRecord } from '@/lib/events/types';
 import { EVENT_CATEGORY_LABELS } from '@/lib/events/view';
@@ -13,21 +12,6 @@ interface Props {
   readonly event: EventRecord;
 }
 const { event } = Astro.props;
-const sourceUrl = new URL(event.sourceUrl);
-const telegramChannel = isTelegramUrl(event.sourceUrl)
-  ? sourceUrl.pathname.match(/^\/(?:s\/)?([a-zA-Z][\w]{4,})(?:\/|$)/)?.[1]
-  : undefined;
-const sourceLabel = telegramChannel
-  ? telegramChannel.toLowerCase() === 'green_events'
-    ? 'GREEN.EVENTS'
-    : `@${telegramChannel}`
-  : isTelegramUrl(event.sourceUrl)
-    ? 'Telegram'
-    : isDomylandUrl(event.sourceUrl)
-      ? 'Домиленд'
-      : sourceUrl.hostname === 'kpshelkovo.online'
-        ? 'Шелково Онлайн'
-        : sourceUrl.hostname.replace(/^www\./, '');
 ---
 
 <article
@@ -67,11 +51,7 @@ const sourceLabel = telegramChannel
     <div class="event-source">
       <span>{EVENT_CATEGORY_LABELS[event.category]}</span>{' '}
       <span aria-hidden="true">·</span>{' '}
-      <span>Источник:</span>{' '}<LinkWithIcon
-        href={event.sourceUrl}
-        label={sourceLabel}
-        ariaLabel={`Источник: ${sourceLabel}`}
-      />
+      <LinkWithIcon href={event.sourceUrl} ariaLabelPrefix="Источник" />
     </div>
   </header>
 
