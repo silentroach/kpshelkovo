@@ -1,6 +1,8 @@
 ---
 import { formatDynamicHtml } from '@shelkovo/markdown';
 import LinkWithIcon from '@shelkovo/ui/LinkWithIcon.astro';
+import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
+import { CalendarPlusIcon } from '@shelkovo/ui/icons';
 import { isDomylandUrl, isTelegramUrl } from '@shelkovo/url';
 import EventWidget from './EventWidget.astro';
 import type { EventRecord } from '@/lib/events/types';
@@ -35,14 +37,33 @@ const sourceLabel = telegramChannel
   data-pagefind-body
 >
   <header class="event-header">
-    <h1
-      id="event-title"
-      class="ui-page-title"
-      data-status={event.status === 'cancelled' ? event.status : undefined}
-      set:html={formatDynamicHtml(
-        event.status === 'cancelled' ? `Отменено: ${event.title}` : event.title,
-      )}
-    />
+    <div class="event-heading">
+      <h1
+        id="event-title"
+        class="ui-page-title"
+        data-status={event.status === 'cancelled' ? event.status : undefined}
+        set:html={formatDynamicHtml(
+          event.status === 'cancelled'
+            ? `Отменено: ${event.title}`
+            : event.title,
+        )}
+      />
+      {
+        event.icsUrl && event.status !== 'cancelled' && (
+          <span class="event-calendar" data-pagefind-ignore>
+            <ResourceLink
+              href={event.icsUrl}
+              download={`${event.id}.ics`}
+              class="ui-btn ui-icon-action"
+              aria-label="Добавить в календарь"
+              title="Добавить в календарь"
+            >
+              <CalendarPlusIcon />
+            </ResourceLink>
+          </span>
+        )
+      }
+    </div>
     <div class="event-source">
       <span>{EVENT_CATEGORY_LABELS[event.category]}</span>{' '}
       <span aria-hidden="true">·</span>{' '}
@@ -110,6 +131,19 @@ const sourceLabel = telegramChannel
   .event-main {
     min-width: 0;
   }
+  .event-heading {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .event-heading h1 {
+    min-width: 0;
+  }
+  .event-calendar {
+    display: inline-flex;
+    flex: none;
+    transform: translateY(0.25rem);
+  }
   .event-source {
     display: flex;
     flex-wrap: wrap;
@@ -150,6 +184,14 @@ const sourceLabel = telegramChannel
     .event-facts > div {
       grid-template-columns: 9rem minmax(0, 1fr);
       gap: 1rem;
+    }
+  }
+  @media (min-width: 48rem) {
+    .event-heading {
+      gap: 1.75rem;
+    }
+    .event-calendar {
+      transform: translateY(0.375rem);
     }
   }
   @media (min-width: 64rem) {

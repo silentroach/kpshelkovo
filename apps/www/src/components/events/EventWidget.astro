@@ -14,6 +14,9 @@ import type { EventWidgetProps as Props } from './event-widget.types';
 const { event, newsSlug } = Astro.props;
 const mapUrl = buildEventMapUrl(event);
 const coordinates = event.place?.coordinates ?? event.coordinates;
+const calendarUrl =
+  newsSlug && event.status !== 'cancelled' ? event.icsUrl : undefined;
+const mapActionUrl = !coordinates ? mapUrl : undefined;
 const eventDay = String(Number(event.startsDate.slice(8, 10)));
 const eventMonth = formatEventBadgeMonth(event.startsIso);
 const eventTime = event.endsTime
@@ -123,48 +126,48 @@ const titleId = newsSlug
           </p>
         )
       }
-      <div class="news-event-actions" data-pagefind-ignore>
-        {
-          event.icsUrl && event.status !== 'cancelled' && (
-            <ResourceLink
-              href={event.icsUrl}
-              download={`${newsSlug ?? event.id}.ics`}
-              class="news-event-action news-event-action--calendar"
-              aria-label="Добавить в календарь"
-              title="Добавить в календарь"
-            >
-              <CalendarPlusIcon class="news-event-icon news-event-icon--calendar" />
-            </ResourceLink>
-          )
-        }
-        {
-          mapUrl && !coordinates && (
-            <a
-              href={mapUrl}
-              target="_blank"
-              rel="noreferrer noopener"
-              class="news-event-action"
-              aria-label="Открыть на Яндекс Картах"
-              title="Открыть на Яндекс Картах"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                class="news-event-icon"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
+      {
+        (calendarUrl || mapActionUrl) && (
+          <div class="news-event-actions" data-pagefind-ignore>
+            {calendarUrl && (
+              <ResourceLink
+                href={calendarUrl}
+                download={`${newsSlug}.ics`}
+                class="news-event-action news-event-action--calendar"
+                aria-label="Добавить в календарь"
+                title="Добавить в календарь"
               >
-                <path d="M19 10.2c0 5.1-7 10.05-7 10.05s-7-4.95-7-10.05a7 7 0 1 1 14 0Z" />
-                <circle cx="12" cy="10.2" r="2.35" />
-              </svg>
-            </a>
-          )
-        }
-      </div>
+                <CalendarPlusIcon class="news-event-icon news-event-icon--calendar" />
+              </ResourceLink>
+            )}
+            {mapActionUrl && (
+              <a
+                href={mapActionUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+                class="news-event-action"
+                aria-label="Открыть на Яндекс Картах"
+                title="Открыть на Яндекс Картах"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  class="news-event-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M19 10.2c0 5.1-7 10.05-7 10.05s-7-4.95-7-10.05a7 7 0 1 1 14 0Z" />
+                  <circle cx="12" cy="10.2" r="2.35" />
+                </svg>
+              </a>
+            )}
+          </div>
+        )
+      }
     </div>
   </MapCardShell>
 </aside>

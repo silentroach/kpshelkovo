@@ -97,24 +97,30 @@ describe('event cards', () => {
     expect(document.body.textContent).not.toContain('19:00');
   });
 
-  it('offers eligible ICS without displaying the export-only two-hour end', async () => {
+  it('offers one eligible ICS beside the heading without displaying the export-only two-hour end', async () => {
     const container = await createAstroContainer();
     const record = event('timed', '19.09.2026 17:00');
     const document = documentFor(
       await container.renderToString(EventCard, { props: { event: record } })
     );
-    expect(document.querySelector('a[download]')?.getAttribute('href')).toBe(record.icsUrl);
-    expect(
-      document
-        .querySelector('a[download]')
-        ?.closest('aside')
-        ?.querySelector('time')
-        ?.getAttribute('datetime')
-    ).toBe(record.startsIso);
-    expect(document.querySelector('header time, header a[download]')).toBeFalsy();
-    expect(document.querySelector('a[download]')?.getAttribute('download')).toBe(
-      `${record.id}.ics`
-    );
+    const download = document.querySelector('h1')?.parentElement?.querySelector('a[download]');
+    expect({
+      downloads: document.querySelectorAll('a[download]').length,
+      href: download?.getAttribute('href'),
+      filename: download?.getAttribute('download'),
+      accessible: !!download?.getAttribute('aria-label') && !!download?.getAttribute('title'),
+      widgetActions: !!document.querySelector('aside .news-event-actions')
+    }).toMatchInlineSnapshot(`
+      {
+        "accessible": true,
+        "downloads": 1,
+        "filename": "timed.ics",
+        "href": "/events/calendar/timed.ics",
+        "widgetActions": false,
+      }
+    `);
+    expect(document.querySelector('aside time')?.getAttribute('datetime')).toBe(record.startsIso);
+    expect(document.querySelector('header time, aside a[download]')).toBeFalsy();
     expect(document.body.textContent).not.toContain('19:00');
   });
 
@@ -169,10 +175,11 @@ describe('event cards', () => {
       }
       if (aside) {
         expect(aside.querySelector('time')?.getAttribute('datetime')).toBe(record.startsIso);
-        expect(aside.querySelector('a[download]')?.getAttribute('href')).toBe(record.icsUrl);
+        expect(aside.querySelector('a[download]')).toBeFalsy();
         expect(aside.querySelector('h2')?.textContent.trim()).toBe(record.title);
         expect(aside.querySelector('h2 a')).toBeFalsy();
-        expect(card?.querySelector('header time, header a[download]')).toBeFalsy();
+        expect(card?.querySelector('header a[download]')?.getAttribute('href')).toBe(record.icsUrl);
+        expect(card?.querySelector('header time')).toBeFalsy();
       }
     }
     expect(evidence).toMatchInlineSnapshot(`
@@ -241,7 +248,10 @@ describe('event cards', () => {
       const text = widget.textContent.replaceAll('\u00a0', ' ');
       for (const part of expected) expect(text).toContain(part);
       expect(widget.querySelector('h2')?.textContent.trim()).toBe(record.title);
-      expect(widget.querySelector('a[download]')?.getAttribute('href')).toBe(record.icsUrl);
+      expect(widget.querySelector('a[download]')).toBeFalsy();
+      expect(document.querySelector('header a[download]')?.getAttribute('href')).toBe(
+        record.icsUrl
+      );
       expect(document.querySelectorAll('h1')).toHaveLength(1);
     }
   );
