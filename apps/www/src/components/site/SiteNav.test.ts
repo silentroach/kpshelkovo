@@ -21,6 +21,13 @@ const renderNav = async (pathname: string, variant: 'header' | 'mobile') => {
 };
 
 describe('SiteNav', () => {
+  it.each(['header', 'mobile'] as const)(
+    'temporarily omits events from the %s navigation',
+    async (variant) => {
+      expect(await renderNav('/events/', variant)).not.toContain('href="/events/"');
+      expect(await renderNav('/events/2026/09/19/', variant)).not.toContain('aria-current');
+    }
+  );
   it.each([
     ['header', '/news/', 'page'],
     ['header', '/news/2026/07/report/', 'location'],

@@ -1,0 +1,90 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`shared events in news > preserves published URLs and UIDs with current event facts 1`] = `
+[
+  {
+    "coordinates": {
+      "lat": 55.074976,
+      "lng": 37.755478,
+    },
+    "end": undefined,
+    "location": "Ресторан Green Dreams",
+    "organizer": {
+      "name": "ОК Комфорт",
+      "type": "organization",
+    },
+    "performer": undefined,
+    "start": "2026-06-13T16:00:00+03:00",
+    "status": "CANCELLED",
+    "uid": "news-event-2026-05-ok-meeting-june-event@kpshelkovo.online",
+    "url": "/news/2026/05/ok-meeting-june/event.ics",
+  },
+  {
+    "coordinates": {
+      "lat": 55.06371,
+      "lng": 37.724333,
+    },
+    "end": "2026-05-16T16:00:00+03:00",
+    "location": "Яблоневый сад",
+    "organizer": {
+      "name": "ОК Комфорт",
+      "type": "organization",
+    },
+    "performer": undefined,
+    "start": "2026-05-16T15:00:00+03:00",
+    "status": "CONFIRMED",
+    "uid": "news-event-2026-05-apple-garden-event@kpshelkovo.online",
+    "url": "/news/2026/05/apple-garden/event.ics",
+  },
+  {
+    "coordinates": {
+      "lat": 55.074958,
+      "lng": 37.755599,
+    },
+    "end": undefined,
+    "location": "КПП Гринвуд 2",
+    "organizer": undefined,
+    "performer": undefined,
+    "start": "2026-05-09T13:00:00+03:00",
+    "status": "CONFIRMED",
+    "uid": "news-event-2026-05-victory-day-greenwood-shelkovo@kpshelkovo.online",
+    "url": "/news/2026/05/victory-day-greenwood/shelkovo.ics",
+  },
+  {
+    "coordinates": {
+      "lat": 55.077635,
+      "lng": 37.755967,
+    },
+    "end": "2026-05-09T17:00:00+03:00",
+    "location": "Фруктовый сад в Гринвуде",
+    "organizer": {
+      "name": "ОК Комфорт",
+      "type": "organization",
+    },
+    "performer": [
+      {
+        "name": "Хор «Лейся, песня!»",
+        "type": "organization",
+      },
+    ],
+    "start": "2026-05-09T14:00:00+03:00",
+    "status": "CONFIRMED",
+    "uid": "news-event-2026-05-victory-day-greenwood-greenwood@kpshelkovo.online",
+    "url": "/news/2026/05/victory-day-greenwood/greenwood.ics",
+  },
+  {
+    "coordinates": {
+      "lat": 55.06505,
+      "lng": 37.720861,
+    },
+    "end": "2026-05-09T16:00:00+03:00",
+    "location": "Памятник в деревне Шелково",
+    "organizer": undefined,
+    "performer": undefined,
+    "start": "2026-05-09T15:00:00+03:00",
+    "status": "CONFIRMED",
+    "uid": "news-event-2026-05-victory-day-greenwood-shelkovo-memorial@kpshelkovo.online",
+    "url": "/news/2026/05/victory-day-greenwood/shelkovo-memorial.ics",
+  },
+]
+`;

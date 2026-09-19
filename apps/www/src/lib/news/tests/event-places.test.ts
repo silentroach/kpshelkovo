@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { buildEventMapUrl } from '@/lib/events/view';
 import { createEntityMentionGraph, createSiteMentionRegistry } from '@/lib/mentions';
 import { buildPlacesGraphDataset } from '@/lib/places/load';
 import { buildPlaceMarkdown } from '@/lib/places/markdown';
@@ -14,10 +15,11 @@ import { createNewsArticleMentionRefs } from '../mentions';
 import { toNewsPublicPayload } from '../public-dto';
 import { newsPublicPayloadSchema } from '../public-schema';
 import { newsArticleSchema } from '../seo';
-import { buildNewsEventMapUrl } from '../view';
+import { newsEventRecord } from './event.test-helper';
 
-const articleEntry = (place?: string, body = '') =>
-  newsArticleEntry({
+const articleEntry = (place?: string, body = '') => ({
+  placeSlug: place,
+  article: newsArticleEntry({
     id: '2026/05/meeting',
     title: 'Встреча',
     summary: 'Коротко о встрече',
@@ -25,21 +27,33 @@ const articleEntry = (place?: string, body = '') =>
     body,
     events: [
       {
-        title: 'Встреча',
-        starts_at: '02.05.2026 12:00',
-        place,
-        location_details: place ? 'В беседке; вход, справа' : undefined
+        event: '2026/05/meeting'
       }
     ]
-  });
+  })
+});
 
 const dataset = (entry: ReturnType<typeof articleEntry>, place?: Place) =>
   buildNewsDataset(
     [newsAuthorEntry({ id: 'ig', name: 'Редакция' })],
-    [entry],
-    newsArchiveSummaryEntries([entry]),
+    [entry.article],
+    newsArchiveSummaryEntries([entry.article]),
     {
-      places: new Map(place ? [[place.slug, place]] : []),
+      eventsById: new Map([
+        [
+          'meeting',
+          newsEventRecord(
+            {
+              title: 'Встреча',
+              starts_at: '02.05.2026 12:00',
+              place: entry.placeSlug,
+              location_details: entry.placeSlug ? 'В беседке; вход, справа' : undefined
+            },
+            'Коротко о встрече',
+            new Map(place ? [[place.slug, place]] : [])
+          )
+        ]
+      ]),
       mentionRegistry: createSiteMentionRegistry(
         place ? [createPlaceMentionTarget(place.slug, place.name)] : []
       )
@@ -54,15 +68,15 @@ describe('event place references', () => {
       const event = dataset(articleEntry(place.slug), place).articles[0]!.events[0]!;
       expect(event.place).toBe(place);
       expect(event.locationDetails).toBe('В беседке; вход, справа');
-      expect(buildNewsEventMapUrl(event)).toBe(place.mapUrl);
+      expect(buildEventMapUrl(event)).toBe(place.mapUrl);
     }
   );
 
   it.each(['unknown', 'person-slug'])(
-    'rejects a non-place reference %s with article and event context',
+    'rejects a non-place reference %s with shared event context',
     (slug) => {
       expect(() => dataset(articleEntry(slug))).toThrow(
-        `news article "2026/05/meeting" event "event" references missing place "${slug}"`
+        `event "meeting" references missing place "${slug}"`
       );
     }
   );
@@ -98,7 +112,7 @@ describe('event place references', () => {
         geo: { '@type': 'GeoCoordinates', latitude: 55, longitude: 38 }
       });
       const ics = buildArticleEventIcs(article, event).replaceAll('\r\n ', '');
-      expect(ics).toContain('DESCRIPTION:Коротко о встрече\\n\\nВ беседке\\; вход\\, справа\r\n');
+      expect(ics).toContain('DESCRIPTION:Коротко о встрече\\n\\nВ беседке\\; вход\\, справа\\n\\n');
       expect(ics).toContain(
         `LOCATION:КП Шелково\\, эко-клуб${address ? `\\, ${address.replaceAll(',', '\\,')}` : ''}\r\n`
       );
@@ -115,13 +129,14 @@ describe('event place references', () => {
     );
     expect(payload.articles[0]!.events![0]).toMatchInlineSnapshot(`
       {
+        "description": "Коротко о встрече",
         "ics_url": "https://kpshelkovo.online/news/2026/05/meeting/event.ics",
         "slug": "event",
         "starts_at": "2026-05-02T12:00:00+03:00",
         "title": "Встреча",
       }
     `);
-    expect(buildNewsEventMapUrl(event)).toBeUndefined();
+    expect(buildEventMapUrl(event)).toBeUndefined();
     expect(buildArticleEventIcs(article, event)).not.toMatch(/LOCATION|GEO:/);
     expect(
       newsArticleSchema({
@@ -130,7 +145,7 @@ describe('event place references', () => {
         url: article.url,
         events: article.events
       })[1]
-    ).not.toHaveProperty('location');
+    ).toHaveProperty('location', undefined);
   });
 
   it('updates old events from canonical place data without changing event identity', () => {

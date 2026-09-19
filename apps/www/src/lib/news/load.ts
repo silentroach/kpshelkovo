@@ -1,8 +1,9 @@
 import { padNumber } from '@shelkovo/format';
+import { extractFirstMarkdownText } from '@shelkovo/markdown';
 import { getCollection, type CollectionEntry } from 'astro:content';
 
-import { loadPlacesData } from '@/lib/places/load';
-import type { Place } from '@/lib/places/types';
+import { loadEventsData } from '@/lib/events/load';
+import type { EventRecord } from '@/lib/events/types';
 
 import { preprocessSiteMarkdownContent } from '../markdown/render';
 import type { SiteMentionRegistry } from '../mentions';
@@ -25,7 +26,6 @@ import type {
   NewsCover,
   NewsDataset,
   NewsEvent,
-  NewsEventPerformer,
   NewsHomeData,
   NewsListArticle,
   NewsMonthArchive,
@@ -137,42 +137,6 @@ const attachments = (items: readonly AttachmentInput[] | undefined): readonly Ne
     size: item.size
   })) ?? [];
 
-const normalizeEventOrganizer = (input: EventData['organizer']): NewsEvent['organizer'] => {
-  if (!input) {
-    return undefined;
-  }
-
-  if (typeof input === 'string') {
-    return { name: input, type: 'organization' };
-  }
-
-  return {
-    name: input.name,
-    type: input.type ?? 'organization'
-  };
-};
-
-const normalizeEventPerformerItem = (
-  input: NonNullable<EventData['performer']>[number]
-): NewsEventPerformer => {
-  if (typeof input === 'string') {
-    return { name: input, type: 'organization' };
-  }
-
-  return {
-    name: input.name,
-    type: input.type ?? 'organization'
-  };
-};
-
-const normalizeEventPerformers = (input: EventData['performer']): NewsEvent['performer'] => {
-  if (!input) {
-    return undefined;
-  }
-
-  return input.map(normalizeEventPerformerItem);
-};
-
 function normalizeEvent(
   input: EventData,
   route: {
@@ -180,50 +144,22 @@ function normalizeEvent(
     readonly month: string;
     readonly entry: string;
   },
-  places: ReadonlyMap<string, Place>
+  eventsByReferenceKey: ReadonlyMap<string, EventRecord>
 ): NewsEvent {
   const slug = input.slug ?? 'event';
-  const starts = input.starts_at;
-  const ends = input.ends_at;
-  const place = input.place ? places.get(input.place) : undefined;
-  if (input.place && !place) {
+  const event = eventsByReferenceKey.get(input.event);
+  if (!event) {
     throw new Error(
-      `news article "${route.year}/${route.month}/${route.entry}" event "${slug}" references missing place "${input.place}"`
+      `news article "${route.year}/${route.month}/${route.entry}" references missing event "${input.event}"`
     );
   }
 
   return {
+    ...event,
     slug,
-    title: input.title,
-    description: input.description,
-    startsAt: starts.at,
-    startsIso: starts.iso,
-    startsTime: starts.time,
-    icsUrl: articleEventIcsUrl({ ...route, event: slug }),
-    endsAt: ends?.at,
-    endsIso: ends?.iso,
-    endsTime: ends?.time,
-    place,
-    locationDetails: input.location_details,
-    organizer: normalizeEventOrganizer(input.organizer),
-    performer: normalizeEventPerformers(input.performer)
+    description: extractFirstMarkdownText(event.body),
+    icsUrl: event.icsUrl ? articleEventIcsUrl({ ...route, event: slug }) : undefined
   };
-}
-
-function normalizeEvents(
-  input: readonly EventData[] | undefined,
-  route: {
-    readonly year: string;
-    readonly month: string;
-    readonly entry: string;
-  },
-  places: ReadonlyMap<string, Place>
-): readonly NewsEvent[] {
-  if (!input) {
-    return [];
-  }
-
-  return input.map((item) => normalizeEvent(item, route, places));
 }
 
 function articleParts(entry: ArticleEntry): {
@@ -267,8 +203,8 @@ function normalizeArticle(
   entry: ArticleEntry,
   authors: ReadonlyMap<string, NewsAuthor>,
   mentionRegistry: SiteMentionRegistry,
-  places: ReadonlyMap<string, Place>,
-  now: Date
+  now: Date,
+  eventsByReferenceKey: ReadonlyMap<string, EventRecord>
 ): NewsArticle {
   const parts = articleParts(entry);
   const published = entry.data.date;
@@ -281,7 +217,9 @@ function normalizeArticle(
   const area = areas(entry.data.areas);
   const author = needAuthor(authors, authorId(entry.data.author), `news article "${entry.id}"`);
   const articleCover = cover(entry.data.cover, entry.data.cover_alt, `news article "${entry.id}"`);
-  const events = normalizeEvents(entry.data.events, parts, places);
+  const events = (entry.data.events ?? []).map((event: EventData) =>
+    normalizeEvent(event, parts, eventsByReferenceKey)
+  );
   const mappedPhotos = mapPhotos(entry.data.photos, entry.id, mentionRegistry);
   const body = preprocessSiteMarkdownContent(
     entry.body ?? '',
@@ -421,16 +359,20 @@ export function buildNewsDataset(
   opts?: {
     readonly now?: Date;
     readonly mentionRegistry?: SiteMentionRegistry;
-    readonly places?: ReadonlyMap<string, Place>;
+    readonly eventsById?: ReadonlyMap<string, EventRecord>;
   }
 ): NewsDataset {
   const now = opts?.now ?? new Date();
   const mentionRegistry = opts?.mentionRegistry ?? new Map();
+  const eventsByReferenceKey = new Map(
+    [...(opts?.eventsById?.values() ?? [])].map((event) => [event.referenceKey, event])
+  );
   const authors = authorMap(authorsData);
-  const places = opts?.places ?? new Map<string, Place>();
 
   const articles: readonly NewsArticle[] = articlesData
-    .map((item: ArticleEntry) => normalizeArticle(item, authors, mentionRegistry, places, now))
+    .map((item: ArticleEntry) =>
+      normalizeArticle(item, authors, mentionRegistry, now, eventsByReferenceKey)
+    )
     .sort(compareArticlesPublishedDesc);
 
   validateUniqueIds(articles);
@@ -460,18 +402,18 @@ export function buildNewsDataset(
 }
 
 async function buildNewsData(): Promise<NewsDataset> {
-  const [authorsData, articlesData, archiveSummariesData, mentionRegistry, places] =
+  const [authorsData, articlesData, archiveSummariesData, mentionRegistry, events] =
     await Promise.all([
       getCollection('newsAuthors') as Promise<readonly NewsAuthorEntry[]>,
       getCollection('newsArticles') as Promise<readonly NewsArticleEntry[]>,
       getCollection('newsArchiveSummaries') as Promise<readonly NewsArchiveSummaryEntry[]>,
       loadSiteMentionRegistry(),
-      loadPlacesData()
+      loadEventsData()
     ]);
 
   return buildNewsDataset(authorsData, articlesData, archiveSummariesData, {
     mentionRegistry,
-    places: places.bySlug
+    eventsById: events.byId
   });
 }
 

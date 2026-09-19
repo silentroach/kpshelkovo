@@ -1,4 +1,4 @@
-import type { LngLat, Margin, YMap, YMapLocationRequest } from '@yandex/ymaps3-types';
+import type { BehaviorType, LngLat, Margin, YMap, YMapLocationRequest } from '@yandex/ymaps3-types';
 
 import { getPaddedBounds, toMapGeometry } from '@/components/places/place-map-geometry';
 import { isPlaceOpen } from '@/lib/places/opening-hours';
@@ -41,6 +41,7 @@ export class MapPreviewElement extends HTMLElement {
   private sizeObserver?: ResizeObserver;
   private actionObserver?: MutationObserver;
   private markerUpdateTimer?: number;
+  private gestureController?: AbortController;
 
   connectedCallback(): void {
     installYandexMapsRuntimeHeadPersistence();
@@ -83,6 +84,8 @@ export class MapPreviewElement extends HTMLElement {
     this.stopWaiting();
     const map = this.map;
     this.map = undefined;
+    this.gestureController?.abort();
+    this.gestureController = undefined;
     this.actionObserver?.disconnect();
     this.actionObserver = undefined;
     window.clearInterval(this.markerUpdateTimer);
@@ -118,9 +121,9 @@ export class MapPreviewElement extends HTMLElement {
         {
           location,
           margin: getPreviewMargin(canvas.clientWidth, canvas.clientHeight, data.anchor),
-          behaviors: [],
+          behaviors: data.interactive ? ['pinchZoom'] : [],
           mode: 'vector',
-          copyrightsPosition: 'bottom left',
+          copyrightsPosition: data.copyrightsPosition ?? 'bottom left',
           distributionPosition: data.distributionPosition ?? 'top right'
         },
         [
@@ -137,6 +140,29 @@ export class MapPreviewElement extends HTMLElement {
         ]
       );
       this.map = map;
+
+      if (data.interactive) {
+        this.gestureController = new AbortController();
+        const options = { capture: true, passive: true, signal: this.gestureController.signal };
+        let behaviors: BehaviorType[] = ['pinchZoom'];
+        this.addEventListener(
+          'pointerdown',
+          (event) => {
+            behaviors =
+              event.pointerType === 'mouse' && event.button === 0
+                ? ['drag', 'pinchZoom']
+                : ['pinchZoom'];
+            map.setBehaviors(behaviors);
+          },
+          options
+        );
+        // Trackpad pinch arrives as Ctrl+wheel; ordinary wheel must scroll the page.
+        this.addEventListener(
+          'wheel',
+          (event) => map.setBehaviors(event.ctrlKey ? [...behaviors, 'scrollZoom'] : behaviors),
+          options
+        );
+      }
 
       let rendered = false;
       const handOff = (): void => {

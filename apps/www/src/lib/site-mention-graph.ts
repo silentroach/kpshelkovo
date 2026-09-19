@@ -1,4 +1,5 @@
 import { createContactMentionRefs } from './contacts/mentions';
+import { createEventMentionRefs } from './events/mentions';
 import { createEntityMentionGraph, type EntityMentionGraph } from './mentions';
 import { createNewsArticleMentionRefs } from './news/mentions';
 import { createPersonProfileMentionRefs } from './people/mention-refs';
@@ -16,6 +17,7 @@ const buildSiteMentionGraph = async (): Promise<EntityMentionGraph> => {
     { loadStatusData },
     { loadReviewsData },
     { loadPlacesData },
+    { loadEventsData },
     people
   ] = await Promise.all([
     import('./contacts/load'),
@@ -23,19 +25,22 @@ const buildSiteMentionGraph = async (): Promise<EntityMentionGraph> => {
     import('./status/load'),
     import('./reviews/load'),
     import('./places/load'),
+    import('./events/load'),
     loadPeopleData()
   ]);
-  const [contacts, news, status, reviews, places] = await Promise.all([
+  const [contacts, news, status, reviews, places, events] = await Promise.all([
     loadContactsData(),
     loadNewsData(),
     loadStatusData(),
     loadReviewsData(),
-    loadPlacesData()
+    loadPlacesData(),
+    loadEventsData()
   ]);
 
   return createEntityMentionGraph([
     ...contacts.contacts.flatMap(createContactMentionRefs),
     ...news.articles.flatMap(createNewsArticleMentionRefs),
+    ...events.events.flatMap(createEventMentionRefs),
     ...status.incidents.flatMap((incident) =>
       incident.hasPage ? createStatusIncidentMentionRefs(incident) : []
     ),

@@ -36,6 +36,7 @@ export const formatPlaceStatus = (status: PlaceStatus): string => PLACE_STATUS_L
 
 const PLACE_BACKLINK_SECTION_LABELS = {
   news: 'Новости',
+  events: 'События',
   status: 'Статус',
   reviews: 'Отзывы',
   places: 'Карта',
@@ -45,6 +46,7 @@ const PLACE_BACKLINK_SECTION_LABELS = {
 
 const PLACE_BACKLINK_KIND_LABELS = {
   article: 'Новость',
+  event: 'Мероприятие',
   incident: 'Инцидент',
   review: 'Отзыв',
   place: 'Место',

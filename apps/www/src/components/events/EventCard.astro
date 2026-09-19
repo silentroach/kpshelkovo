@@ -1,0 +1,196 @@
+---
+import { formatDynamicHtml } from '@shelkovo/markdown';
+import LinkWithIcon from '@shelkovo/ui/LinkWithIcon.astro';
+import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
+import { CalendarPlusIcon } from '@shelkovo/ui/icons';
+import EventWidget from './EventWidget.astro';
+import type { EventRecord } from '@/lib/events/types';
+import { EVENT_CATEGORY_LABELS } from '@/lib/events/view';
+import { renderMarkdown } from '@/lib/markdown/render';
+
+interface Props {
+  readonly event: EventRecord;
+}
+const { event } = Astro.props;
+---
+
+<article
+  id={event.id}
+  class="event-detail"
+  aria-labelledby="event-title"
+  data-pagefind-body
+>
+  <header class="event-header">
+    <div class="event-heading">
+      <h1
+        id="event-title"
+        class="ui-page-title"
+        data-status={event.status === 'cancelled' ? event.status : undefined}
+        set:html={formatDynamicHtml(
+          event.status === 'cancelled'
+            ? `Отменено: ${event.title}`
+            : event.title,
+        )}
+      />
+      {
+        event.icsUrl && event.status !== 'cancelled' && (
+          <span class="event-calendar" data-pagefind-ignore>
+            <ResourceLink
+              href={event.icsUrl}
+              download={`${event.id}.ics`}
+              class="ui-btn ui-icon-action"
+              aria-label="Добавить в календарь"
+              title="Добавить в календарь"
+            >
+              <CalendarPlusIcon />
+            </ResourceLink>
+          </span>
+        )
+      }
+    </div>
+    <div class="event-source">
+      <span>{EVENT_CATEGORY_LABELS[event.category]}</span>{' '}
+      <span aria-hidden="true">·</span>{' '}
+      <LinkWithIcon href={event.sourceUrl} ariaLabelPrefix="Источник" />
+    </div>
+  </header>
+
+  <div class="event-summary"><EventWidget event={event} /></div>
+
+  <div class="event-main">
+    {
+      (event.price ||
+        event.audience ||
+        event.organizer ||
+        !!event.performer?.length) && (
+        <dl class="event-facts">
+          {event.price && (
+            <div>
+              <dt>Стоимость</dt>{' '}
+              <dd set:html={formatDynamicHtml(event.price)} />
+            </div>
+          )}
+          {event.audience && (
+            <div>
+              <dt>Для кого</dt>{' '}
+              <dd set:html={formatDynamicHtml(event.audience)} />
+            </div>
+          )}
+          {event.organizer && (
+            <div>
+              <dt>Организатор</dt>{' '}
+              <dd set:html={formatDynamicHtml(event.organizer.name)} />
+            </div>
+          )}
+          {event.performer && event.performer.length > 0 && (
+            <div>
+              <dt>Участники программы</dt>{' '}
+              <dd
+                set:html={formatDynamicHtml(
+                  event.performer.map((person) => person.name).join(', '),
+                )}
+              />
+            </div>
+          )}
+        </dl>
+      )
+    }
+    <div class="ui-prose event-body" set:html={renderMarkdown(event.body)} />
+  </div>
+</article>
+
+<style>
+  .event-detail {
+    display: grid;
+    gap: 1.5rem;
+    min-width: 0;
+    scroll-margin-top: 6rem;
+    overflow-wrap: anywhere;
+  }
+  .event-header,
+  .event-main {
+    min-width: 0;
+  }
+  .event-heading {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .event-heading h1 {
+    min-width: 0;
+  }
+  .event-calendar {
+    display: inline-flex;
+    flex: none;
+    transform: translateY(0.25rem);
+  }
+  .event-source {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+  .event-summary {
+    min-width: 0;
+    align-self: start;
+  }
+  .event-detail :global(a:focus-visible) {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 3px;
+  }
+  .event-facts {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0 0 1.5rem;
+  }
+  .event-facts > div {
+    display: grid;
+    gap: 0.15rem;
+  }
+  dt {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+  dd {
+    margin: 0;
+  }
+  .event-body {
+    max-width: 72ch;
+  }
+  @media (min-width: 40rem) {
+    .event-facts > div {
+      grid-template-columns: 9rem minmax(0, 1fr);
+      gap: 1rem;
+    }
+  }
+  @media (min-width: 48rem) {
+    .event-heading {
+      gap: 1.75rem;
+    }
+    .event-calendar {
+      transform: translateY(0.375rem);
+    }
+  }
+  @media (min-width: 64rem) {
+    .event-detail {
+      grid-template-columns: minmax(0, 1fr) 19rem;
+      grid-template-rows: auto 1fr;
+      column-gap: 2rem;
+    }
+    .event-header {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .event-main {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    .event-summary {
+      grid-column: 2;
+      grid-row: 1 / 3;
+    }
+  }
+</style>

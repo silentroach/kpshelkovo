@@ -1,0 +1,131 @@
+---
+import { formatDate } from '@shelkovo/format';
+import type { EventMonth } from '@/lib/events/types';
+import {
+  buildEventMonthCells,
+  formatEventCount,
+  formatEventMonth,
+} from '@/lib/events/view';
+
+interface Props {
+  readonly month: EventMonth;
+}
+const { month } = Astro.props;
+const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+---
+
+<section
+  aria-label={`Календарь: ${formatEventMonth(month)}`}
+  class="event-calendar"
+>
+  <div class="weekdays" aria-hidden="true">
+    {weekdays.map((day) => <span>{day}</span>)}
+  </div>
+  <ol class="days" role="list">
+    {
+      buildEventMonthCells(month).map(({ number, date, inMonth, day }) => {
+        const cancelled = day?.events.every(
+          (event) => event.status === 'cancelled',
+        );
+        const label = day
+          ? `${formatDate(date)}: ${formatEventCount(day.events.length)}${cancelled ? ', все отменены' : ''}`
+          : undefined;
+        return (
+          <li aria-hidden={!inMonth ? 'true' : undefined}>
+            {!inMonth ? (
+              <span class="adjacent-day ui-num">{number}</span>
+            ) : day ? (
+              <a
+                href={day.url}
+                aria-label={label}
+                title={label}
+                data-cancelled={cancelled || undefined}
+              >
+                <span class="ui-num" aria-hidden="true">
+                  {number}
+                </span>
+              </a>
+            ) : (
+              <span class="empty-day ui-num">
+                <span aria-hidden="true">{number}</span>
+                <span class="ui-visually-hidden">
+                  {formatDate(date)}: нет опубликованных событий
+                </span>
+              </span>
+            )}
+          </li>
+        );
+      })
+    }
+  </ol>
+</section>
+
+<style>
+  .event-calendar {
+    max-width: 22rem;
+  }
+  .weekdays,
+  .days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    column-gap: 0.125rem;
+  }
+  .weekdays {
+    align-items: center;
+    height: 2rem;
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+  .days {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  .days a,
+  .adjacent-day,
+  .empty-day {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 2.5rem);
+    height: 2.5rem;
+    margin: 0.125rem auto;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  .days a {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .days a::after {
+    position: absolute;
+    bottom: 0.25rem;
+    width: 0.25rem;
+    height: 0.25rem;
+    border-radius: var(--radius-full);
+    background: currentColor;
+    content: '';
+  }
+  .days a:is(:hover, :focus-visible) {
+    background: var(--color-primary-soft);
+  }
+  .days a:focus-visible {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 2px;
+  }
+  .days a[data-cancelled] {
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+  }
+  .empty-day {
+    color: var(--color-text);
+  }
+  .adjacent-day {
+    color: color-mix(in oklab, var(--color-text-muted) 40%, transparent);
+  }
+</style>

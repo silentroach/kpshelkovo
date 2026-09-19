@@ -2,6 +2,7 @@
 
 import { Window } from 'happy-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod';
 
 import type { PlaceContact, PlaceOpeningHours } from '@/lib/places/types';
 import { createAstroContainer } from '@/test/astro-container';
@@ -25,6 +26,7 @@ const fixture = vi.hoisted(() => ({
     markdownUrl: '/map/apple-garden/index.md',
     canonical: 'https://example.com/map/apple-garden/',
     backlinks: {
+      events: [],
       news: [
         {
           section: 'news' as const,
@@ -89,6 +91,16 @@ describe('/map/[slug]/', () => {
     expect(!!document.querySelector('a[href="/map/?h=apple-garden"]')).toBe(visible);
     expect(document.querySelector(`a[href="${fixture.place.mapUrl}"]`)).toBeTruthy();
     expect(document.querySelector('meta[name="robots"][content*="noindex"]')).toBeFalsy();
+    expect(
+      z
+        .object({ interactive: z.boolean(), copyrightsPosition: z.string() })
+        .parse(JSON.parse(document.querySelector('map-preview')!.getAttribute('data-preview')!))
+    ).toMatchInlineSnapshot(`
+      {
+        "copyrightsPosition": "bottom right",
+        "interactive": true,
+      }
+    `);
   });
   it('keeps hours before prose and the address below the preview outside the article', async () => {
     fixture.place.openingHours = {

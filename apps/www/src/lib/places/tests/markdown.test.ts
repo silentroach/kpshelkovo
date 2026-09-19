@@ -61,6 +61,7 @@ const place: PlaceWithBacklinks = {
   body: 'Описание **места**.',
   mentions: [],
   backlinks: {
+    events: [],
     news: [
       {
         section: 'news',
@@ -351,6 +352,7 @@ describe('places Markdown', () => {
       ...place,
       body: '',
       backlinks: {
+        events: [],
         news: [],
         status: [],
         reviews: [],

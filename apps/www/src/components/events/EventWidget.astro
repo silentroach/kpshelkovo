@@ -1,0 +1,317 @@
+---
+import { CalendarPlusIcon, MapPinIcon } from '@shelkovo/ui/icons';
+import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
+import { formatDynamicHtml } from '@shelkovo/markdown';
+import MapCardShell from '@/components/MapCardShell.astro';
+import {
+  buildEventMapUrl,
+  EVENT_STATUS_LABELS,
+  formatEventBadgeMonth,
+  formatEventRange,
+} from '@/lib/events/view';
+import type { EventWidgetProps as Props } from './event-widget.types';
+
+const { event, newsSlug } = Astro.props;
+const mapUrl = buildEventMapUrl(event);
+const coordinates = event.place?.coordinates ?? event.coordinates;
+const calendarUrl =
+  newsSlug && event.status !== 'cancelled' ? event.icsUrl : undefined;
+const mapActionUrl = !coordinates ? mapUrl : undefined;
+const eventDay = String(Number(event.startsDate.slice(8, 10)));
+const eventMonth = formatEventBadgeMonth(event.startsIso);
+const eventTime = event.endsTime
+  ? `${event.startsTime}–${event.endsTime}`
+  : (event.startsTime ?? 'Время уточняется');
+const eventRange =
+  event.through ||
+  (event.endsIso && event.endsIso.slice(0, 10) !== event.startsIso.slice(0, 10))
+    ? formatEventRange(event)
+    : eventTime;
+const titleId = newsSlug
+  ? `news-event-title-${newsSlug}`
+  : `event-widget-title-${event.id}`;
+---
+
+<aside
+  aria-labelledby={titleId}
+  data-pagefind-body={newsSlug ? true : undefined}
+>
+  <MapCardShell coordinates={coordinates} mapUrl={mapUrl}>
+    <div class="news-event-content">
+      <div
+        class:list={[
+          'news-event-date',
+          { 'news-event-date--mapped': !!coordinates },
+        ]}
+      >
+        <time
+          datetime={event.startsIso}
+          data-status={event.status === 'cancelled' ? event.status : undefined}
+          aria-label={event.status === 'cancelled'
+            ? `${EVENT_STATUS_LABELS.cancelled}: ${formatEventRange(event)}`
+            : undefined}
+          title={event.status === 'cancelled'
+            ? EVENT_STATUS_LABELS.cancelled
+            : undefined}
+        >
+          <span class="news-event-day">{eventDay}</span>{' '}
+          <span class="news-event-month">{eventMonth}</span>
+        </time>
+      </div>
+      <h2
+        id={titleId}
+        class="news-event-title"
+        data-pagefind-ignore={newsSlug ? undefined : 'all'}
+      >
+        {
+          newsSlug ? (
+            <a href={event.url} set:html={formatDynamicHtml(event.title)} />
+          ) : (
+            <Fragment set:html={formatDynamicHtml(event.title)} />
+          )
+        }
+      </h2>
+      <ul class="news-event-meta">
+        <li>
+          <svg
+            viewBox="0 0 24 24"
+            class="news-event-icon news-event-icon--time"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            aria-hidden="true"
+            ><circle cx="12" cy="12" r="8.25"></circle><path
+              d="M12 7.75v4.75l3 1.75"></path></svg
+          >
+          <span>{formatDynamicHtml(eventRange)}</span>
+        </li>
+        <li>
+          <MapPinIcon class="news-event-icon" />
+          <span>
+            {
+              event.place ? (
+                <a
+                  href={event.place.url}
+                  class="site-text-link"
+                  set:html={formatDynamicHtml(event.place.name)}
+                />
+              ) : (
+                <span
+                  set:html={formatDynamicHtml(
+                    event.location ??
+                      (event.coordinates
+                        ? 'Место на карте'
+                        : 'Место уточняется'),
+                  )}
+                />
+              )
+            }
+            {
+              event.locationDetails && (
+                <span
+                  set:html={formatDynamicHtml(`, ${event.locationDetails}`)}
+                />
+              )
+            }
+          </span>
+        </li>
+      </ul>
+      {
+        event.status === 'conditional' && (
+          <p>
+            <strong data-status={event.status}>
+              {EVENT_STATUS_LABELS[event.status]}
+            </strong>
+          </p>
+        )
+      }
+      {
+        (calendarUrl || mapActionUrl) && (
+          <div class="news-event-actions" data-pagefind-ignore>
+            {calendarUrl && (
+              <ResourceLink
+                href={calendarUrl}
+                download={`${newsSlug}.ics`}
+                class="news-event-action news-event-action--calendar"
+                aria-label="Добавить в календарь"
+                title="Добавить в календарь"
+              >
+                <CalendarPlusIcon class="news-event-icon news-event-icon--calendar" />
+              </ResourceLink>
+            )}
+            {mapActionUrl && (
+              <a
+                href={mapActionUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+                class="news-event-action"
+                aria-label="Открыть на Яндекс Картах"
+                title="Открыть на Яндекс Картах"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  class="news-event-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M19 10.2c0 5.1-7 10.05-7 10.05s-7-4.95-7-10.05a7 7 0 1 1 14 0Z" />
+                  <circle cx="12" cy="10.2" r="2.35" />
+                </svg>
+              </a>
+            )}
+          </div>
+        )
+      }
+    </div>
+  </MapCardShell>
+</aside>
+
+<style>
+  aside {
+    min-width: 0;
+  }
+  .news-event-content {
+    display: grid;
+    gap: 0.85rem;
+  }
+  .news-event-date {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    border-bottom: 1px solid
+      color-mix(in oklab, var(--color-border) 78%, var(--color-accent) 22%);
+    padding-bottom: 0.75rem;
+    color: var(--color-primary);
+  }
+  .news-event-date time {
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+  .news-event-date--mapped {
+    /* Reserve the native map action at the top right, including on narrow cards. */
+    padding-right: 10.25rem;
+    flex-wrap: wrap;
+  }
+  .news-event-date time[data-status='cancelled'] {
+    color: var(--color-danger-text);
+  }
+  .news-event-date time[data-status='cancelled'] span {
+    text-decoration: line-through;
+  }
+  .news-event-day {
+    font-family: var(--font-heading);
+    font-size: 2.25rem;
+    font-weight: 700;
+    letter-spacing: -0.08em;
+    line-height: 0.9;
+  }
+  .news-event-month {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .news-event-title {
+    margin: 0;
+    color: var(--color-text);
+    font-family: var(--font-heading);
+    font-size: clamp(1.05rem, 0.98rem + 0.42vw, 1.22rem);
+    font-weight: 700;
+    letter-spacing: -0.012em;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+  .news-event-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .news-event-title a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+  .news-event-meta {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .news-event-meta li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  .news-event-meta :global(.news-event-icon) {
+    margin-block-start: calc((1lh - 1.05rem) / 2);
+  }
+  .news-event-icon--time {
+    /* Оптическое выравнивание по цифрам Fira Sans. */
+    transform: translateY(-0.03em);
+  }
+  [data-status='conditional'] {
+    color: var(--color-warning-text);
+  }
+  .news-event-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.55rem;
+    padding-top: 0.15rem;
+  }
+  .news-event-actions :global(.news-event-action) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.45rem;
+    height: 2.45rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.62rem;
+    background: color-mix(
+      in oklab,
+      var(--color-surface-raised) 82%,
+      transparent
+    );
+    color: var(--color-text);
+    text-decoration: none;
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease,
+      color 0.2s ease;
+  }
+  .news-event-actions :global(.news-event-action--calendar) {
+    border-color: color-mix(
+      in oklab,
+      var(--color-accent) 62%,
+      var(--color-border) 38%
+    );
+    color: var(--color-accent-text);
+  }
+  .news-event-actions :global(a:hover) {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  aside :global(a:focus-visible) {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 2px;
+  }
+  .news-event-icon,
+  aside :global(.news-event-icon) {
+    width: 1.05rem;
+    height: 1.05rem;
+    flex: none;
+  }
+  aside :global(.news-event-icon--calendar) {
+    transform: translateY(-0.04rem);
+  }
+</style>

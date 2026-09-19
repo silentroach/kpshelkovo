@@ -49,8 +49,7 @@ const cover = {
 };
 
 const event = {
-  title: 'Встреча по регламенту',
-  starts_at: '31.05.2026 19:00'
+  event: '2026/05/meeting'
 };
 
 const validationIssues = <Output>(result: z.ZodSafeParseResult<Output>, subject: string) => {
@@ -257,97 +256,41 @@ describe('RawNewsAuthorSchema', () => {
 
 describe('RawNewsEventsSchema', () => {
   it.each([
-    { location: 'Old inline location' },
-    { coordinates: { lat: 55, lng: 38 } },
-    { place: 'club', location: 'Old inline location' },
-    { place: 'club', coordinates: { lat: 55, lng: 38 } },
-    { place: 'club', location_details: '  ' },
-    { place: '@club' }
-  ])('rejects obsolete or invalid location data: %j', (fields) => {
-    expect(RawNewsEventsSchema.safeParse([{ ...event, ...fields }]).success).toBe(false);
+    'meeting',
+    'ok-meeting-june-2026',
+    '/events/2026/06/meeting/',
+    '2026/06/meeting/',
+    '2026/13/meeting',
+    '2026/6/meeting',
+    '2026/06/13',
+    '2026/06/list',
+    { collection: 'events', id: 'meeting' }
+  ])('rejects noncanonical reference syntax %j', (event) => {
+    expect(RawNewsEventsSchema.safeParse([{ event }]).success).toBe(false);
   });
-  it('trims valid event text at the raw boundary', () => {
+  it('resolves event references and preserves local slugs', () => {
     const [parsed] = RawNewsEventsSchema.parse([
       {
-        title: '  Встреча по регламенту  ',
-        description: '  Обсудим новый регламент.  ',
-        starts_at: '31.05.2026 19:00',
-        ends_at: '31.05.2026 21:00',
-        place: '  club  ',
-        location_details: '  В беседке  ',
-        organizer: '  ОК Комфорт  ',
-        performer: ['  Ведущий  ']
+        event: '2026/05/meeting',
+        slug: '  old-slug  '
       }
     ]);
     if (!parsed) {
       throw new Error('Expected a parsed news event');
     }
 
-    expect({
-      title: parsed.title,
-      description: parsed.description,
-      place: parsed.place,
-      locationDetails: parsed.location_details,
-      organizer: parsed.organizer,
-      performer: parsed.performer
-    }).toMatchInlineSnapshot(`
+    expect(parsed).toMatchInlineSnapshot(`
       {
-        "description": "Обсудим новый регламент.",
-        "locationDetails": "В беседке",
-        "organizer": "ОК Комфорт",
-        "performer": [
-          "Ведущий",
-        ],
-        "place": "club",
-        "title": "Встреча по регламенту",
+        "event": "2026/05/meeting",
+        "slug": "old-slug",
       }
     `);
   });
 
-  it.each([
-    {
-      name: 'start without time',
-      input: [{ ...event, starts_at: '31.05.2026' }],
-      message: 'events[].starts_at must use dd.mm.yyyy hh:mm and include time'
-    },
-    {
-      name: 'end without time',
-      input: [{ ...event, ends_at: '31.05.2026' }],
-      message: 'events[].ends_at must use dd.mm.yyyy hh:mm and include time'
-    },
-    {
-      name: 'details without a place',
-      input: [{ ...event, location_details: 'В беседке' }],
-      message: 'events[].location_details requires place'
-    },
-    {
-      name: 'blank performer',
-      input: [{ ...event, performer: ['   '] }],
-      message: 'events[].performer[] must not be blank'
-    }
-  ])('rejects $name', ({ input, message }) => {
-    expect(eventValidationIssues(input).map((issue) => issue.message)).toEqual([message]);
-  });
-
-  it('rejects an event that does not end after it starts', () => {
+  it('rejects embedded copies of event details', () => {
     expect(
-      eventValidationIssues([
-        {
-          ...event,
-          ends_at: '31.05.2026 19:00'
-        }
-      ])
-    ).toMatchInlineSnapshot(`
-      [
-        {
-          "message": "events[].ends_at must be later than events[].starts_at",
-          "path": [
-            0,
-            "ends_at",
-          ],
-        },
-      ]
-    `);
+      RawNewsEventsSchema.safeParse([{ ...event, starts_at: '31.05.2026 19:00' }]).success
+    ).toBe(false);
   });
 
   it('requires unique explicit slugs for multiple events', () => {

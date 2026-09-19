@@ -1,6 +1,10 @@
 import type { SearchSection } from './types';
 
 export const SEARCH_SECTIONS = {
+  events: {
+    id: 'events',
+    label: 'События'
+  },
   news: {
     id: 'news',
     label: 'Новости'

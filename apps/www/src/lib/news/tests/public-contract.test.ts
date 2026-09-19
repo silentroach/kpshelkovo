@@ -5,6 +5,7 @@ import { testPlace } from '@/lib/places/tests/place.test-helper';
 import { newsArticleEntry, newsArchiveSummaryEntries } from '../load.test-helper';
 import type { NewsPublicPayload } from '../public-dto';
 import type { NewsDataset } from '../types';
+import { newsEventRecord } from './event.test-helper';
 import type { ContractObject, ContractSchema, NewsOpenApi } from './public-contract.types';
 
 let getArticles: typeof import('@/pages/news/data/articles.json').GET;
@@ -36,14 +37,7 @@ const dataset = (full = true): NewsDataset => {
     events: [
       {
         slug: 'meeting',
-        title: 'Meeting',
-        starts_at: '02.05.2026 19:00',
-        ends_at: full ? '02.05.2026 21:00' : undefined,
-        description: full ? 'Event description' : undefined,
-        place: full ? 'club' : undefined,
-        location_details: full ? 'В беседке' : undefined,
-        organizer: full ? { name: 'Organizer', type: 'organization' } : undefined,
-        performer: full ? [{ name: 'Performer', type: 'person' }] : undefined
+        event: '2026/05/meeting'
       }
     ]
   });
@@ -91,7 +85,26 @@ const dataset = (full = true): NewsDataset => {
     ],
     articles,
     newsArchiveSummaryEntries(articles),
-    { places: new Map([['club', testPlace()]]) }
+    {
+      eventsById: new Map([
+        [
+          'meeting',
+          newsEventRecord(
+            {
+              title: 'Meeting',
+              starts_at: '02.05.2026 19:00',
+              ends_at: full ? '02.05.2026 21:00' : undefined,
+              place: full ? 'club' : undefined,
+              location_details: full ? 'В беседке' : undefined,
+              organizer: full ? { name: 'Organizer', type: 'organization' } : undefined,
+              performer: full ? [{ name: 'Performer', type: 'person' }] : undefined
+            },
+            full ? 'Event description' : '```text\nОписание\n```',
+            new Map([['club', testPlace({ name: 'Club' })]])
+          )
+        ]
+      ])
+    }
   );
 };
 

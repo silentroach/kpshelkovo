@@ -1,0 +1,20 @@
+---
+import type { InferGetStaticPropsType } from 'astro';
+import EventMonthPage from '@/components/events/EventMonthPage.astro';
+import { loadEventsBuildData } from '@/lib/events/build';
+
+export const getStaticPaths = async () => {
+  const {
+    data: { calendar },
+    now,
+  } = await loadEventsBuildData();
+  return calendar.months.map((month) => ({
+    params: { year: month.id.slice(0, 4), month: month.id.slice(5, 7) },
+    props: { calendar, month, now },
+  }));
+};
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+const { calendar, month, now } = Astro.props;
+---
+
+<EventMonthPage calendar={calendar} month={month} now={now} />

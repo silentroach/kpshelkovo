@@ -85,8 +85,9 @@ const mount = (
 const setupMaps = () => {
   const destroy = vi.fn();
   const update = vi.fn();
+  const setBehaviors = vi.fn();
   const create = vi.fn(function (_canvas: HTMLElement, _props: YMapProps) {
-    return { addChild: vi.fn(), destroy, update };
+    return { addChild: vi.fn(), destroy, update, setBehaviors };
   });
   const marker = vi.fn(function (_props: YMapMarkerProps, _content: HTMLElement) {});
   const feature = vi.fn(function (_props: YMapFeatureProps) {});
@@ -100,7 +101,7 @@ const setupMaps = () => {
     YMapMarker: marker,
     YMapListener: listener
   });
-  return { create, marker, feature, listener, destroy, update };
+  return { create, marker, feature, listener, destroy, update, setBehaviors };
 };
 
 afterEach(() => {
@@ -305,6 +306,90 @@ it.each([
   }
 );
 
+it('gates native wheel zoom to trackpad pinch before the SDK and cleans up on reconnect', async () => {
+  const { create, setBehaviors } = setupMaps();
+  vi.mocked(loadYandexMaps).mockResolvedValue();
+  const element = mount({ coordinates: { lng: 37, lat: 55 }, interactive: true });
+  approach(element);
+  await Promise.resolve();
+  expect(create.mock.calls[0]?.[1].behaviors).toEqual(['pinchZoom']);
+
+  const canvas = element.querySelector<HTMLElement>('[data-canvas]')!;
+  const behaviorsAtCanvas: unknown[] = [];
+  canvas.addEventListener('wheel', () => behaviorsAtCanvas.push(setBehaviors.mock.lastCall?.[0]));
+  for (const ctrlKey of [false, true, false]) {
+    // happy-dom's WheelEvent drops mouse modifiers; this handler only reads ctrlKey.
+    const event = new MouseEvent('wheel', {
+      ctrlKey,
+      bubbles: true,
+      cancelable: true
+    });
+    canvas.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(false);
+  }
+  expect(behaviorsAtCanvas).toMatchInlineSnapshot(`
+    [
+      [
+        "pinchZoom",
+      ],
+      [
+        "pinchZoom",
+        "scrollZoom",
+      ],
+      [
+        "pinchZoom",
+      ],
+    ]
+  `);
+
+  element.remove();
+  canvas.dispatchEvent(new PointerEvent('pointerdown', { pointerType: 'mouse', bubbles: true }));
+  canvas.dispatchEvent(new MouseEvent('wheel', { ctrlKey: true, bubbles: true }));
+  expect(setBehaviors).toHaveBeenCalledTimes(3);
+  document.body.append(element);
+  approach(element);
+  await Promise.resolve();
+  canvas.dispatchEvent(new MouseEvent('wheel', { ctrlKey: true, bubbles: true }));
+  expect(setBehaviors).toHaveBeenCalledTimes(4);
+});
+
+it('enables native dragging for the primary mouse button and preserves the input mode through wheel', async () => {
+  const { setBehaviors } = setupMaps();
+  vi.mocked(loadYandexMaps).mockResolvedValue();
+  const element = mount({ coordinates: { lng: 37, lat: 55 }, interactive: true });
+  approach(element);
+  await Promise.resolve();
+  const canvas = element.querySelector<HTMLElement>('[data-canvas]')!;
+  for (const [pointerType, button, behaviors] of [
+    ['mouse', 0, ['drag', 'pinchZoom']],
+    ['touch', 0, ['pinchZoom']],
+    ['mouse', 2, ['pinchZoom']],
+    ['mouse', 0, ['drag', 'pinchZoom']]
+  ] as const) {
+    canvas.dispatchEvent(new PointerEvent('pointerdown', { pointerType, button, bubbles: true }));
+    expect(setBehaviors).toHaveBeenLastCalledWith(behaviors);
+    canvas.dispatchEvent(new MouseEvent('wheel', { ctrlKey: true, bubbles: true }));
+    expect(setBehaviors).toHaveBeenLastCalledWith([...behaviors, 'scrollZoom']);
+    canvas.dispatchEvent(new MouseEvent('wheel', { bubbles: true }));
+    expect(setBehaviors).toHaveBeenLastCalledWith(behaviors);
+  }
+});
+
+it('leaves ordinary and pinch wheel events to the browser on a fixed background', async () => {
+  const { setBehaviors } = setupMaps();
+  vi.mocked(loadYandexMaps).mockResolvedValue();
+  const element = mount();
+  approach(element);
+  await Promise.resolve();
+  element.dispatchEvent(new PointerEvent('pointerdown', { pointerType: 'mouse', bubbles: true }));
+  for (const ctrlKey of [false, true]) {
+    const event = new MouseEvent('wheel', { ctrlKey, bubbles: true, cancelable: true });
+    element.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(false);
+  }
+  expect(setBehaviors).not.toHaveBeenCalled();
+});
+
 it('positions the canonical center with margins on either side of the container', () => {
   for (const anchor of [
     [0.75, 0.2],
@@ -318,6 +403,15 @@ it('positions the canonical center with margins on either side of the container'
       400 * anchor[1]
     ]);
   }
+});
+
+it('passes the event copyright position to the SDK', async () => {
+  const { create } = setupMaps();
+  vi.mocked(loadYandexMaps).mockResolvedValue();
+  const element = mount({ coordinates: { lng: 37, lat: 55 }, copyrightsPosition: 'bottom right' });
+  approach(element);
+  await Promise.resolve();
+  expect(create.mock.calls[0]?.[1].copyrightsPosition).toBe('bottom right');
 });
 
 it('ignores a stale async failure after reconnect and preserves the original fallback', async () => {

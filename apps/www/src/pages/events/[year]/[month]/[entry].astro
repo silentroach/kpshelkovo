@@ -1,0 +1,140 @@
+---
+import type { InferGetStaticPropsType } from 'astro';
+import { formatDate } from '@shelkovo/format';
+import { formatDynamicHtml } from '@shelkovo/markdown';
+import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import EventCard from '@/components/events/EventCard.astro';
+import EventList from '@/components/events/EventList.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
+import { loadEventsData } from '@/lib/events/load';
+import { isEventSearchable } from '@/lib/events/search';
+import { buildEventJsonLd } from '@/lib/events/seo';
+import { eventDayUrl, eventMonthUrl } from '@/lib/events/urls';
+import {
+  EVENT_STATUS_LABELS,
+  formatEventCount,
+  formatEventMonth,
+  formatEventRange,
+} from '@/lib/events/view';
+import { SEARCH_SECTIONS } from '@/lib/search/sections';
+import { absoluteUrl } from '@/lib/site';
+
+export const getStaticPaths = async () => {
+  const { calendar, events } = await loadEventsData();
+  return [
+    ...calendar.days.map((day) => ({
+      params: {
+        year: day.date.slice(0, 4),
+        month: day.date.slice(5, 7),
+        entry: day.date.slice(8, 10),
+      },
+      props: {
+        day,
+        event: undefined,
+        month: calendar.byMonth.get(day.date.slice(0, 7))!,
+      },
+    })),
+    ...events.map((event) => ({
+      params: {
+        year: event.startsDate.slice(0, 4),
+        month: event.startsDate.slice(5, 7),
+        entry: event.eventSlug,
+      },
+      props: {
+        event,
+        day: undefined,
+        month: calendar.byMonth.get(event.startsDate.slice(0, 7))!,
+      },
+    })),
+  ];
+};
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+const { day, event, month } = Astro.props;
+const heading = event ? event.title : formatDate(day!.date);
+const title = event
+  ? `${heading} — Шелково Онлайн`
+  : `${heading} — События — Шелково Онлайн`;
+const description = event
+  ? [
+      event.status !== 'announced'
+        ? `${EVENT_STATUS_LABELS[event.status]}.`
+        : undefined,
+      formatEventRange(event),
+      event.location,
+      event.price,
+      event.audience,
+    ]
+      .filter(Boolean)
+      .join(' · ')
+  : `${heading}: ${formatEventCount(day!.events.length)}. Время, места и условия участия. Подробности и источники на страницах мероприятий.`;
+const monthUrl = eventMonthUrl(month.id);
+const breadcrumbs = withHomeBreadcrumbs([
+  { label: 'События', href: '/events/' },
+  { label: formatEventMonth(month), href: monthUrl },
+  ...(event
+    ? [
+        {
+          label: formatDate(event.startsDate),
+          href: eventDayUrl(event.startsDate),
+        },
+      ]
+    : []),
+  { label: heading },
+]);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={event?.url ?? day!.url}
+  schema={event ? buildEventJsonLd(event, absoluteUrl('/')) : undefined}
+  search={event && isEventSearchable(event)
+    ? {
+        scope: 'manual',
+        title: `${event.status === 'cancelled' ? 'Отменено: ' : ''}${event.title} — События`,
+        description,
+        section: SEARCH_SECTIONS.events,
+        aliases: ['календарь мероприятий'],
+      }
+    : undefined}
+>
+  <main class="ui-page">
+    {
+      event ? (
+        <div class="ui-page-header ui-page-header-stack detail-content">
+          <Breadcrumbs items={breadcrumbs} />
+          <EventCard event={event} />
+        </div>
+      ) : (
+        <>
+          <header class="ui-page-header">
+            <div class="ui-page-header-stack">
+              <Breadcrumbs items={breadcrumbs} />
+              <h1 class="ui-page-title" set:html={formatDynamicHtml(heading)} />
+            </div>
+          </header>
+          <div class="day-content">
+            <EventList events={day!.events} />
+          </div>
+        </>
+      )
+    }
+  </main>
+</BaseLayout>
+
+<style>
+  .detail-content {
+    padding-bottom: 3rem;
+  }
+  .day-content {
+    max-width: 56rem;
+    padding-inline: 1.25rem;
+    padding-bottom: 3rem;
+  }
+  @media (min-width: 48rem) {
+    .day-content {
+      padding-inline: 1.5rem;
+    }
+  }
+</style>
