@@ -93,12 +93,12 @@ describe('/map/[slug]/', () => {
     expect(document.querySelector('meta[name="robots"][content*="noindex"]')).toBeFalsy();
     expect(
       z
-        .object({ pinchZoom: z.boolean(), copyrightsPosition: z.string() })
+        .object({ interactive: z.boolean(), copyrightsPosition: z.string() })
         .parse(JSON.parse(document.querySelector('map-preview')!.getAttribute('data-preview')!))
     ).toMatchInlineSnapshot(`
       {
         "copyrightsPosition": "bottom right",
-        "pinchZoom": true,
+        "interactive": true,
       }
     `);
   });

@@ -1,4 +1,4 @@
-import type { LngLat, Margin, YMap, YMapLocationRequest } from '@yandex/ymaps3-types';
+import type { BehaviorType, LngLat, Margin, YMap, YMapLocationRequest } from '@yandex/ymaps3-types';
 
 import { getPaddedBounds, toMapGeometry } from '@/components/places/place-map-geometry';
 import { isPlaceOpen } from '@/lib/places/opening-hours';
@@ -121,7 +121,7 @@ export class MapPreviewElement extends HTMLElement {
         {
           location,
           margin: getPreviewMargin(canvas.clientWidth, canvas.clientHeight, data.anchor),
-          behaviors: data.pinchZoom ? ['pinchZoom'] : [],
+          behaviors: data.interactive ? ['pinchZoom'] : [],
           mode: 'vector',
           copyrightsPosition: data.copyrightsPosition ?? 'bottom left',
           distributionPosition: data.distributionPosition ?? 'top right'
@@ -141,13 +141,26 @@ export class MapPreviewElement extends HTMLElement {
       );
       this.map = map;
 
-      if (data.pinchZoom) {
+      if (data.interactive) {
         this.gestureController = new AbortController();
+        const options = { capture: true, passive: true, signal: this.gestureController.signal };
+        let behaviors: BehaviorType[] = ['pinchZoom'];
+        this.addEventListener(
+          'pointerdown',
+          (event) => {
+            behaviors =
+              event.pointerType === 'mouse' && event.button === 0
+                ? ['drag', 'pinchZoom']
+                : ['pinchZoom'];
+            map.setBehaviors(behaviors);
+          },
+          options
+        );
         // Trackpad pinch arrives as Ctrl+wheel; ordinary wheel must scroll the page.
         this.addEventListener(
           'wheel',
-          (event) => map.setBehaviors(event.ctrlKey ? ['pinchZoom', 'scrollZoom'] : ['pinchZoom']),
-          { capture: true, passive: true, signal: this.gestureController.signal }
+          (event) => map.setBehaviors(event.ctrlKey ? [...behaviors, 'scrollZoom'] : behaviors),
+          options
         );
       }
 

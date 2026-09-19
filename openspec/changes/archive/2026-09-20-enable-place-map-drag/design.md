@@ -2,7 +2,7 @@
 
 Мотивация — в [proposal.md](proposal.md). `MapPreviewElement` включает `pinchZoom` только для `PlacePreview`; capture-обработчик wheel переключает `scrollZoom` для Ctrl+wheel. Простое добавление `drag` в один список недостаточно: следующий wheel перезапишет список, а сенсорный ввод может начать двигать карту вместо страницы.
 
-Подход следует [ADR-028](../../../docs/decisions/028-markdown-first-places-map.md), [ADR-034](../../../docs/decisions/034-native-css-architecture.md) и [ADR-039](../../../docs/decisions/039-shared-yandex-maps-runtime-and-preview.md). Штатный `drag` подтверждён [документацией Яндекс Карт](https://yandex.com/maps-api/docs/js-api/map/index.html) и установленными типами SDK.
+Подход следует [ADR-028](../../../../docs/decisions/028-markdown-first-places-map.md), [ADR-034](../../../../docs/decisions/034-native-css-architecture.md) и [ADR-039](../../../../docs/decisions/039-shared-yandex-maps-runtime-and-preview.md). Штатный `drag` подтверждён [документацией Яндекс Карт](https://yandex.com/maps-api/docs/js-api/map/index.html) и установленными типами SDK.
 
 ## Goals / Non-Goals
 

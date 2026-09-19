@@ -7,7 +7,7 @@ export interface MapPreviewData {
   readonly geometry?: PlaceGeometry;
   readonly openingHours?: PlaceOpeningHours;
   readonly zoom?: number;
-  readonly pinchZoom?: boolean;
+  readonly interactive?: boolean;
   /** Canonical point's position as fractions of the container's width and height. */
   readonly anchor?: readonly [number, number];
   readonly muted?: boolean;
