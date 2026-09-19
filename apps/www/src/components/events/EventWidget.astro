@@ -4,17 +4,14 @@ import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 import { formatDynamicHtml } from '@shelkovo/markdown';
 import MapCardShell from '@/components/MapCardShell.astro';
 import { EVENT_STATUS_LABELS } from '@/lib/events/view';
-import type { NewsEvent } from '@/lib/news/types';
+import type { EventWidgetProps as Props } from './event-widget.types';
 import {
   buildNewsEventMapUrl,
   formatNewsEventMonth,
   formatNewsEventRange,
 } from '@/lib/news/view';
 
-interface Props {
-  readonly event: NewsEvent;
-}
-const { event } = Astro.props;
+const { event, newsSlug } = Astro.props;
 const mapUrl = buildNewsEventMapUrl(event);
 const coordinates = event.place?.coordinates ?? event.coordinates;
 const eventDay = String(Number(event.startsDate.slice(8, 10)));
@@ -27,10 +24,15 @@ const eventRange =
   (event.endsIso && event.endsIso.slice(0, 10) !== event.startsIso.slice(0, 10))
     ? formatNewsEventRange(event)
     : eventTime;
-const titleId = `news-event-title-${event.slug}`;
+const titleId = newsSlug
+  ? `news-event-title-${newsSlug}`
+  : `event-widget-title-${event.id}`;
 ---
 
-<aside aria-labelledby={titleId} data-pagefind-body>
+<aside
+  aria-labelledby={titleId}
+  data-pagefind-body={newsSlug ? true : undefined}
+>
   <MapCardShell coordinates={coordinates} mapUrl={mapUrl}>
     <div class="news-event-content">
       <div
@@ -53,8 +55,18 @@ const titleId = `news-event-title-${event.slug}`;
           <span class="news-event-month">{eventMonth}</span>
         </time>
       </div>
-      <h2 id={titleId} class="news-event-title">
-        <a href={event.url} set:html={formatDynamicHtml(event.title)} />
+      <h2
+        id={titleId}
+        class="news-event-title"
+        data-pagefind-ignore={newsSlug ? undefined : 'all'}
+      >
+        {
+          newsSlug ? (
+            <a href={event.url} set:html={formatDynamicHtml(event.title)} />
+          ) : (
+            <Fragment set:html={formatDynamicHtml(event.title)} />
+          )
+        }
       </h2>
       <ul class="news-event-meta">
         <li>
@@ -116,7 +128,7 @@ const titleId = `news-event-title-${event.slug}`;
           event.icsUrl && event.status !== 'cancelled' && (
             <ResourceLink
               href={event.icsUrl}
-              download={`${event.slug}.ics`}
+              download={`${newsSlug ?? event.id}.ics`}
               class="news-event-action news-event-action--calendar"
               aria-label="Добавить в календарь"
               title="Добавить в календарь"
@@ -202,6 +214,7 @@ const titleId = `news-event-title-${event.slug}`;
     font-size: 1rem;
     font-weight: 600;
     line-height: 1;
+    white-space: nowrap;
   }
   .news-event-title {
     margin: 0;
@@ -236,6 +249,9 @@ const titleId = `news-event-title-${event.slug}`;
     font-size: 0.9rem;
     font-weight: 600;
     line-height: 1.35;
+  }
+  .news-event-meta :global(.news-event-icon) {
+    margin-block-start: calc((1lh - 1.05rem) / 2);
   }
   [data-status='conditional'] {
     color: var(--color-warning-text);

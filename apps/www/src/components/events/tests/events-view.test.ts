@@ -50,7 +50,7 @@ describe('event cards', () => {
       await container.renderToString(EventCard, { props: { event: record } })
     );
     const text = document.body.textContent.replaceAll('\u00a0', ' ');
-    expect(text).toContain('время не указано');
+    expect(text).toContain('Время уточняется');
     expect(text).toContain('Место уточняется');
     expect(text).toContain(record.price);
     expect(text).toContain(record.audience);
@@ -83,11 +83,13 @@ describe('event cards', () => {
     expect(document.querySelector('h1')?.textContent.replaceAll('\u00a0', ' ')).toBe(
       `Отменено: ${record.title}`
     );
-    expect(document.querySelectorAll('[data-status="cancelled"]')).toHaveLength(1);
+    expect(document.querySelector('aside time')?.getAttribute('aria-label')).toContain('Отменено:');
     expect(document.querySelector('[data-search-title]')?.getAttribute('data-search-title')).toBe(
       `Отменено: ${record.title} — События`
     );
-    expect(document.querySelector('aside h2')?.textContent).toBe(record.location);
+    expect(document.querySelector('aside')?.textContent).toContain(record.location);
+    expect(document.querySelector('aside h2')?.textContent.trim()).toBe(record.title);
+    expect(document.querySelector('aside h2 a')).toBeFalsy();
     expect(document.querySelector('a[download]')).toBeFalsy();
     expect(document.querySelector('map-preview')).toBeTruthy();
     expect(document.querySelector('iframe')).toBeFalsy();
@@ -105,13 +107,18 @@ describe('event cards', () => {
     expect(
       document
         .querySelector('a[download]')
-        ?.parentElement?.querySelector('time')
+        ?.closest('aside')
+        ?.querySelector('time')
         ?.getAttribute('datetime')
     ).toBe(record.startsIso);
+    expect(document.querySelector('header time, header a[download]')).toBeFalsy();
+    expect(document.querySelector('a[download]')?.getAttribute('download')).toBe(
+      `${record.id}.ics`
+    );
     expect(document.body.textContent).not.toContain('19:00');
   });
 
-  it('renders one location card only when a name or coordinates exist, keeping a map fallback', async () => {
+  it('keeps one date-and-place widget with the eligible actions, including an unknown location', async () => {
     const container = await createAstroContainer();
     const locations = [
       { name: 'unknown', fields: {} },
@@ -131,8 +138,8 @@ describe('event cards', () => {
       const card = document.querySelector('article');
       const aside = card?.querySelector('aside');
       const preview = aside?.querySelector('map-preview');
-      const mapLink = aside?.querySelector('a');
-      const mapUrl = mapLink ? new URL(mapLink.href) : undefined;
+      const mapLink = aside?.querySelector('a[href^="https://yandex.ru/"]');
+      const mapUrl = mapLink ? new URL(mapLink.getAttribute('href')!) : undefined;
       evidence.push({
         name,
         cards: document.querySelectorAll('aside').length,
@@ -145,32 +152,34 @@ describe('event cards', () => {
             !!preview.querySelector('a[data-fallback]:not([hidden])')
           : undefined,
         locationBetweenHeaderAndBody: aside
-          ? aside.previousElementSibling?.tagName === 'HEADER' &&
-            !!aside.nextElementSibling?.querySelector('a[href="https://example.com/register"]')
+          ? aside.parentElement?.previousElementSibling?.tagName === 'HEADER' &&
+            !!aside.parentElement?.nextElementSibling?.querySelector(
+              'a[href="https://example.com/register"]'
+            )
           : undefined
       });
       if (record.location) {
-        expect(document.querySelectorAll('aside h2')).toHaveLength(1);
-        expect(aside?.querySelector('h2')?.textContent.replaceAll('\u00a0', ' ')).toBe(
-          record.location
-        );
+        expect(aside?.textContent.replaceAll('\u00a0', ' ')).toContain(record.location);
         expect(card?.querySelector('header')?.textContent.replaceAll('\u00a0', ' ')).not.toContain(
           record.location
         );
-        expect(aside?.nextElementSibling?.textContent.replaceAll('\u00a0', ' ')).not.toContain(
-          record.location
-        );
+        expect(
+          aside?.parentElement?.nextElementSibling?.textContent.replaceAll('\u00a0', ' ')
+        ).not.toContain(record.location);
       }
       if (aside) {
-        expect(aside.querySelector('time, a[download]')).toBeFalsy();
-        expect(aside.querySelector('h2')?.textContent.trim()).not.toBe('');
+        expect(aside.querySelector('time')?.getAttribute('datetime')).toBe(record.startsIso);
+        expect(aside.querySelector('a[download]')?.getAttribute('href')).toBe(record.icsUrl);
+        expect(aside.querySelector('h2')?.textContent.trim()).toBe(record.title);
+        expect(aside.querySelector('h2 a')).toBeFalsy();
+        expect(card?.querySelector('header time, header a[download]')).toBeFalsy();
       }
     }
     expect(evidence).toMatchInlineSnapshot(`
       [
         {
-          "cards": 0,
-          "locationBetweenHeaderAndBody": undefined,
+          "cards": 1,
+          "locationBetweenHeaderAndBody": true,
           "mapFallback": undefined,
           "mapLinks": 0,
           "maps": 0,
@@ -223,6 +232,31 @@ describe('event cards', () => {
       ]
     `);
   });
+
+  it.each([
+    ['period', '30.12.2026', { through: '03.01.2027' }, ['30 декабря 2026', '3 января 2027']],
+    [
+      'night',
+      '05.01.2026 21:00',
+      { ends_at: '06.01.2026 02:00' },
+      ['5 января 2026', '6 января 2026', '21:00', '02:00']
+    ]
+  ] as const)(
+    'keeps the complete %s interval in the shared detail widget',
+    async (id, starts, extra, expected) => {
+      const record = event(id, starts, extra);
+      const container = await createAstroContainer();
+      const document = documentFor(
+        await container.renderToString(EventCard, { props: { event: record } })
+      );
+      const widget = document.querySelector('aside')!;
+      const text = widget.textContent.replaceAll('\u00a0', ' ');
+      for (const part of expected) expect(text).toContain(part);
+      expect(widget.querySelector('h2')?.textContent.trim()).toBe(record.title);
+      expect(widget.querySelector('a[download]')?.getAttribute('href')).toBe(record.icsUrl);
+      expect(document.querySelectorAll('h1')).toHaveLength(1);
+    }
+  );
 });
 
 describe('event calendar pages', () => {

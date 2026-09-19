@@ -12,6 +12,7 @@ export interface MapPreviewData {
   readonly muted?: boolean;
   readonly mutedOpacity?: number;
   readonly distributionPosition?: YMapProps['distributionPosition'];
+  readonly copyrightsPosition?: YMapProps['copyrightsPosition'];
 }
 
 export interface MapPreviewProps {

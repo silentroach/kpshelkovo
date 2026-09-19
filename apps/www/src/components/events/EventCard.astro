@@ -1,24 +1,16 @@
 ---
 import { formatDynamicHtml } from '@shelkovo/markdown';
 import LinkWithIcon from '@shelkovo/ui/LinkWithIcon.astro';
-import { CalendarPlusIcon, MapPinIcon } from '@shelkovo/ui/icons';
-import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 import { isDomylandUrl, isTelegramUrl } from '@shelkovo/url';
-import MapCardShell from '@/components/MapCardShell.astro';
+import EventWidget from './EventWidget.astro';
 import type { EventRecord } from '@/lib/events/types';
-import {
-  EVENT_CATEGORY_LABELS,
-  EVENT_STATUS_LABELS,
-  formatEventRange,
-} from '@/lib/events/view';
+import { EVENT_CATEGORY_LABELS } from '@/lib/events/view';
 import { renderMarkdown } from '@/lib/markdown/render';
-import { buildNewsEventMapUrl } from '@/lib/news/view';
 
 interface Props {
   readonly event: EventRecord;
 }
 const { event } = Astro.props;
-const mapUrl = buildNewsEventMapUrl(event);
 const sourceUrl = new URL(event.sourceUrl);
 const telegramChannel = isTelegramUrl(event.sourceUrl)
   ? sourceUrl.pathname.match(/^\/(?:s\/)?([a-zA-Z][\w]{4,})(?:\/|$)/)?.[1]
@@ -38,21 +30,11 @@ const sourceLabel = telegramChannel
 
 <article
   id={event.id}
-  class:list={['event-detail', { 'event-detail--located': !!mapUrl }]}
+  class="event-detail"
   aria-labelledby="event-title"
   data-pagefind-body
 >
   <header class="event-header">
-    <div class="event-labels">
-      <span>{EVENT_CATEGORY_LABELS[event.category]}</span>{' '}
-      {
-        event.status !== 'cancelled' && (
-          <strong class="event-status" data-status={event.status}>
-            {EVENT_STATUS_LABELS[event.status]}
-          </strong>
-        )
-      }
-    </div>
     <h1
       id="event-title"
       class="ui-page-title"
@@ -61,84 +43,18 @@ const sourceLabel = telegramChannel
         event.status === 'cancelled' ? `Отменено: ${event.title}` : event.title,
       )}
     />
-    <div class="event-date-actions">
-      <time datetime={event.startsIso} class="event-date ui-num"
-        >{formatDynamicHtml(formatEventRange(event))}</time
-      >
-      {
-        event.icsUrl && event.status !== 'cancelled' && (
-          <ResourceLink
-            href={event.icsUrl}
-            download={`${event.id}.ics`}
-            class="event-calendar"
-            data-pagefind-ignore
-          >
-            <>
-              <CalendarPlusIcon class="event-icon" />
-              <span>Добавить в календарь</span>
-            </>
-          </ResourceLink>
-        )
-      }
-    </div>
     <div class="event-source">
+      <span>{EVENT_CATEGORY_LABELS[event.category]}</span>{' '}
+      <span aria-hidden="true">·</span>{' '}
       <span>Источник:</span>{' '}<LinkWithIcon
         href={event.sourceUrl}
         label={sourceLabel}
         ariaLabel={`Источник: ${sourceLabel}`}
       />
     </div>
-    {!mapUrl && <p class="event-unknown">Место уточняется</p>}
   </header>
 
-  {
-    mapUrl && (
-      <aside class="event-location" aria-label="Место мероприятия">
-        <MapCardShell coordinates={event.coordinates} mapUrl={mapUrl}>
-          <div
-            class:list={[
-              'location-content',
-              { 'location-content--mapped': !!event.coordinates },
-            ]}
-          >
-            <p class="location-label">Место</p>
-            <h2 class="ui-entry-title">
-              {event.place ? (
-                <a
-                  href={event.place.url}
-                  class="site-text-link"
-                  set:html={formatDynamicHtml(event.place.name)}
-                />
-              ) : (
-                <span
-                  set:html={formatDynamicHtml(
-                    event.location ?? 'Место на карте',
-                  )}
-                />
-              )}
-            </h2>
-            {event.locationDetails && (
-              <p set:html={formatDynamicHtml(event.locationDetails)} />
-            )}
-            {!event.coordinates && (
-              <a
-                href={mapUrl}
-                target="_blank"
-                rel="noreferrer noopener"
-                class="location-action"
-                data-pagefind-ignore
-              >
-                <>
-                  <MapPinIcon class="event-icon" />
-                  <span>Открыть на Яндекс Картах</span>
-                </>
-              </a>
-            )}
-          </div>
-        </MapCardShell>
-      </aside>
-    )
-  }
+  <div class="event-summary"><EventWidget event={event} /></div>
 
   <div class="event-main">
     {
@@ -194,44 +110,6 @@ const sourceLabel = telegramChannel
   .event-main {
     min-width: 0;
   }
-  .event-labels {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1rem;
-    margin-bottom: 0.65rem;
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-  }
-  .event-status[data-status='conditional'] {
-    color: var(--color-warning-text);
-  }
-  .event-status[data-status='cancelled'] {
-    color: var(--color-danger-text);
-  }
-  .event-date-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem 1rem;
-    margin-top: 1rem;
-  }
-  .event-date {
-    font-weight: 600;
-  }
-  .event-date-actions :global(.event-calendar) {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    min-height: 2.5rem;
-    padding: 0.375rem 0.75rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-full);
-    color: var(--color-primary);
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-decoration: none;
-    white-space: normal;
-  }
   .event-source {
     display: flex;
     flex-wrap: wrap;
@@ -241,39 +119,9 @@ const sourceLabel = telegramChannel
     color: var(--color-text-muted);
     font-size: 0.875rem;
   }
-  .event-unknown {
-    margin-top: 0.75rem;
-    color: var(--color-text-muted);
-  }
-  .event-location {
+  .event-summary {
     min-width: 0;
     align-self: start;
-  }
-  .location-content {
-    display: grid;
-    gap: 0.65rem;
-  }
-  .location-content--mapped {
-    padding: 5rem 0 0;
-  }
-  .location-label {
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-  }
-  .location-action {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    min-height: 2.5rem;
-    color: var(--color-primary);
-    font-size: 0.875rem;
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
-  }
-  .event-detail :global(.event-icon) {
-    width: 1rem;
-    height: 1rem;
-    flex: none;
   }
   .event-detail :global(a:focus-visible) {
     outline: 2px solid var(--color-accent-text);
@@ -305,8 +153,9 @@ const sourceLabel = telegramChannel
     }
   }
   @media (min-width: 64rem) {
-    .event-detail--located {
+    .event-detail {
       grid-template-columns: minmax(0, 1fr) 19rem;
+      grid-template-rows: auto 1fr;
       column-gap: 2rem;
     }
     .event-header {
@@ -317,14 +166,9 @@ const sourceLabel = telegramChannel
       grid-column: 1;
       grid-row: 2;
     }
-    .event-location {
+    .event-summary {
       grid-column: 2;
       grid-row: 1 / 3;
-    }
-    .location-content--mapped {
-      min-height: 14rem;
-      align-content: end;
-      padding-top: 7rem;
     }
   }
 </style>

@@ -6,7 +6,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { parse } from 'yaml';
 
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
-import NewsEventCard from '@/components/news/NewsEventCard.astro';
+import EventWidget from '@/components/events/EventWidget.astro';
 import { buildEventCalendar } from '@/lib/events/calendar-projection';
 import { buildEventIcs } from '@/lib/events/ics';
 import * as eventLoad from '@/lib/events/load';
@@ -186,8 +186,8 @@ describe('shared events in news', () => {
     const article = data.byId.get('2026/05/ok-meeting-june')!;
     const event = article.events[0];
     const container = await createAstroContainer();
-    const html = await container.renderToString(NewsEventCard, {
-      props: { event }
+    const html = await container.renderToString(EventWidget, {
+      props: { event, newsSlug: event.slug }
     });
     const window = new Window();
     try {
@@ -237,8 +237,8 @@ describe('shared events in news', () => {
       const data = linkedDataset(record);
       expect(toNewsPublicPayload(data).articles[0].events).toBeUndefined();
       const container = await createAstroContainer();
-      const html = await container.renderToString(NewsEventCard, {
-        props: { event: data.articles[0].events[0] }
+      const html = await container.renderToString(EventWidget, {
+        props: { event: data.articles[0].events[0], newsSlug: data.articles[0].events[0].slug }
       });
       const window = new Window();
       window.document.body.innerHTML = html;

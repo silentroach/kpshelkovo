@@ -14,9 +14,14 @@ const yandexMapsReadyScript = `
   window.ymaps3 = {
     ready: new Promise(resolve => window.addEventListener('fixture:maps-ready', resolve, { once: true })),
     YMap: class {
-      constructor(container) {
+      constructor(container, props) {
         this.container = container;
         container.append(document.querySelector('#map-sdk-fixture').content.cloneNode(true));
+        if (props.copyrightsPosition === 'bottom right') {
+          const copyright = container.querySelector('.ymaps3--map-copyrights');
+          copyright.style.left = 'auto';
+          copyright.style.right = '8px';
+        }
       }
       addChild(child) {
         if (child.el) this.container.querySelector('[data-fixture-marker]').append(child.el);
@@ -51,7 +56,7 @@ for (const [device, viewport] of [
   ['desktop', { width: 1440, height: 1100 }],
   ['mobile', { width: 390, height: 900 }]
 ] as const) {
-  test.describe(`NewsEventCard compact ${device}`, () => {
+  test.describe(`EventWidget ${device}`, () => {
     test.use({ viewport });
 
     test.beforeEach(async ({ page }) => {
@@ -77,7 +82,8 @@ for (const [device, viewport] of [
           zoom: 16,
           anchor: [0.75, 0.45],
           muted: true,
-          mutedOpacity: 0.4
+          mutedOpacity: 0.4,
+          copyrightsPosition: 'bottom right'
         })
       );
       await expect(target.locator('iframe')).toHaveCount(0);
@@ -217,6 +223,10 @@ for (const [device, viewport] of [
         'href',
         '/events/calendar/reglament.ics'
       );
+      await expect(location.getByRole('link', { name: 'Добавить в календарь' })).toHaveCount(1);
+      await expect(location.getByRole('heading', { name: 'Встреча по регламенту' })).toBeVisible();
+      await expect(location.getByRole('heading').getByRole('link')).toHaveCount(0);
+      await expect(detail.locator('header time, header a[download]')).toHaveCount(0);
       await expect(location).toHaveScreenshot(`event-location-${device}.png`, screenshot);
     });
 

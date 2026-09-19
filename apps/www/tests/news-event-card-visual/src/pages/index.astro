@@ -2,7 +2,7 @@
 import '../../../config/visual-foundation.css';
 import '@/styles/site.css';
 
-import NewsEventCard from '@/components/news/NewsEventCard.astro';
+import EventWidget from '@/components/events/EventWidget.astro';
 import EventCard from '@/components/events/EventCard.astro';
 import type { NewsEvent } from '@/lib/news/types';
 import { testPlace } from '@/lib/places/tests/place.test-helper';
@@ -80,7 +80,10 @@ const eventDetail = {
           class="news-event-visual-target"
           data-testid="news-event-card-coordinates"
         >
-          <NewsEventCard event={eventWithCoordinates} />
+          <EventWidget
+            event={eventWithCoordinates}
+            newsSlug={eventWithCoordinates.slug}
+          />
         </div>
       </section>
 
@@ -90,7 +93,10 @@ const eventDetail = {
           class="news-event-visual-target"
           data-testid="news-event-card-no-place"
         >
-          <NewsEventCard event={eventWithoutPlace} />
+          <EventWidget
+            event={eventWithoutPlace}
+            newsSlug={eventWithoutPlace.slug}
+          />
         </div>
       </section>
       <section data-testid="event-detail">
@@ -102,7 +108,8 @@ const eventDetail = {
           class="news-event-visual-target"
           data-testid="news-event-card-cancelled"
         >
-          <NewsEventCard
+          <EventWidget
+            newsSlug="cancelled"
             event={{
               ...eventWithCoordinates,
               slug: 'cancelled',
@@ -226,8 +233,8 @@ const eventDetail = {
   }
 
   .news-event-visual-target {
-    /* Production desktop sidebar: 17.5rem plus screenshot padding. */
-    width: min(100%, 19rem);
+    /* Both production sidebars: 19rem plus screenshot padding. */
+    width: min(100%, 20.5rem);
     padding: 0.75rem;
     border-radius: 1.75rem;
     background: color-mix(in oklab, white 74%, var(--color-bg) 26%);
