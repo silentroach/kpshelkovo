@@ -77,8 +77,11 @@ const markerLabel = `Открыть карту: ${locationName}`;
   .map-background {
     position: absolute;
     inset: 0;
-    z-index: -1;
     overflow: hidden;
+  }
+  .map-background :global(.ymaps3--marker-layer) {
+    /* Keep the link's whole hit area above the event's linked title. */
+    z-index: 1;
   }
   .map-marker-link {
     display: grid;
@@ -109,6 +112,7 @@ const markerLabel = `Открыть карту: ${locationName}`;
     display: none;
   }
   .map-content {
+    position: relative;
     padding: 1rem;
     pointer-events: none;
   }

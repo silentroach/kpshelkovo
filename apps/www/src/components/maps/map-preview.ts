@@ -215,6 +215,10 @@ export class MapPreviewElement extends HTMLElement {
       // YMap moves marker DOM into its canvas; retain the template for reconnects.
       const marker = template.content.firstElementChild?.cloneNode(true);
       if (!(marker instanceof HTMLElement)) throw new Error('Map preview marker is unavailable');
+      if (marker instanceof HTMLAnchorElement && marker.href) {
+        // Preserve the browser's link menu before the SDK cancels context menus.
+        marker.addEventListener('contextmenu', (event) => event.stopPropagation());
+      }
       const openingHours = data.openingHours;
       if (openingHours) {
         const refreshMarker = (): void => {

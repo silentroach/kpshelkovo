@@ -408,6 +408,41 @@ it('leaves ordinary and pinch wheel events to the browser on a fixed background'
   expect(setBehaviors).not.toHaveBeenCalled();
 });
 
+it.each([true, false])(
+  'preserves the native menu only for a root marker link (link: %s)',
+  async (link) => {
+    const { marker } = setupMaps();
+    vi.mocked(loadYandexMaps).mockResolvedValue();
+    const element = mount({ coordinates: { lng: 37, lat: 55 } }, false);
+    if (!link) element.querySelector('template')!.innerHTML = '<span><img alt="" /></span>';
+    approach(element);
+    await Promise.resolve();
+    const content = marker.mock.calls[0]![1];
+    const canvas = element.querySelector<HTMLElement>('[data-canvas]')!;
+    const sdkMenu = vi.fn((event: Event) => event.preventDefault());
+    canvas.addEventListener('contextmenu', sdkMenu);
+    canvas.append(content);
+
+    const menu = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+    content.querySelector('img')!.dispatchEvent(menu);
+    expect(menu.defaultPrevented).toBe(!link);
+    expect(sdkMenu).toHaveBeenCalledTimes(link ? 0 : 1);
+
+    sdkMenu.mockClear();
+    const backgroundMenu = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+    canvas.dispatchEvent(backgroundMenu);
+    expect(sdkMenu).toHaveBeenCalledOnce();
+    expect(backgroundMenu.defaultPrevented).toBe(true);
+
+    const sdkPointer = vi.fn();
+    canvas.addEventListener('pointerdown', sdkPointer);
+    const pointer = new PointerEvent('pointerdown', { bubbles: true, cancelable: true });
+    content.dispatchEvent(pointer);
+    expect(sdkPointer).toHaveBeenCalledOnce();
+    expect(pointer.defaultPrevented).toBe(false);
+  }
+);
+
 it('positions the canonical center with margins on either side of the container', () => {
   for (const anchor of [
     [0.75, 0.2],
