@@ -1,5 +1,3 @@
-import { explorerGraphUrl } from 'virtual:settlements-explorer-assets';
-
 import type { ExplorerPayload } from '../lib/explorer';
 import type {
   ExplorerBootstrapDependencies,
@@ -11,27 +9,7 @@ import type {
 const ROOT_SELECTOR = '[data-explorer-root]';
 const ERROR_SELECTOR = '[data-explorer-error]';
 const RETRY_SELECTOR = '[data-explorer-retry]';
-let graphRequest: Promise<ExplorerClientModule> | undefined;
-let graphRetry = 0;
-
-const loadClient = (): Promise<ExplorerClientModule> => {
-  if (graphRequest) return graphRequest;
-
-  const graphUrl = new URL(explorerGraphUrl, window.location.origin);
-  if (graphRetry > 0) {
-    graphUrl.searchParams.set('explorer-retry', String(graphRetry));
-  }
-
-  graphRequest = (import(/* @vite-ignore */ graphUrl.href) as Promise<ExplorerClientModule>).catch(
-    (error) => {
-      graphRequest = undefined;
-      graphRetry += 1;
-      throw error;
-    }
-  );
-
-  return graphRequest;
-};
+const loadClient = (): Promise<ExplorerClientModule> => import('./explorer-component');
 
 const loadPayload = async (url: string): Promise<ExplorerPayload> => {
   const response = await fetch(url);
@@ -49,43 +27,59 @@ const dependencies: ExplorerBootstrapDependencies = {
 };
 
 export const startSettlementsExplorer = (
-  { root, error, retry, payloadUrl }: ExplorerBootstrapElements,
+  { root, error, message, retry, payloadUrl }: ExplorerBootstrapElements,
   runtime: ExplorerBootstrapDependencies = dependencies
 ): (() => void) => {
-  let state: 'idle' | 'loading' | 'error' | 'hydrated' = 'idle';
+  let state: 'idle' | 'loading' | 'data-error' | 'code-error' | 'hydrated' = 'idle';
   let disposed = false;
   let client: ExplorerClientModule | undefined;
   let instance: ExplorerInstance | undefined;
 
+  const showError = (cause: unknown, codeFailed: boolean): void => {
+    console.error('Settlements explorer hydration failed:', cause);
+    state = codeFailed ? 'code-error' : 'data-error';
+    message.textContent = codeFailed
+      ? 'Фильтры и сортировка недоступны. Попробуйте обновить страницу'
+      : 'Не удалось загрузить интерактивное сравнение';
+    retry.hidden = codeFailed;
+    retry.disabled = codeFailed;
+    error.hidden = false;
+  };
+
   const load = async (): Promise<void> => {
-    if (state === 'loading' || state === 'hydrated' || disposed) return;
+    if ((state !== 'idle' && state !== 'data-error') || disposed) return;
 
     state = 'loading';
     error.hidden = true;
 
+    const [loadedClient, payload] = await Promise.allSettled([
+      client ??
+        runtime.loadClient().catch((cause: unknown) => {
+          if (!disposed && root.isConnected) showError(cause, true);
+          throw cause;
+        }),
+      runtime.loadPayload(payloadUrl)
+    ]);
+    if (disposed || !root.isConnected) return;
+
+    if (loadedClient.status === 'rejected') return;
+    client = loadedClient.value;
+    if (payload.status === 'rejected') {
+      showError(payload.reason, false);
+      return;
+    }
+
     try {
-      const [loadedClient, payload] = await Promise.all([
-        runtime.loadClient(),
-        runtime.loadPayload(payloadUrl)
-      ]);
-
-      if (disposed || !root.isConnected) return;
-
-      client = loadedClient;
-      instance = client.hydrate(root, payload);
+      instance = client.hydrate(root, payload.value);
       state = 'hydrated';
       root.setAttribute('data-explorer-hydrated', '');
     } catch (loadError) {
-      if (disposed) return;
-
-      console.error('Settlements explorer hydration failed:', loadError);
-      state = 'error';
-      error.hidden = false;
+      showError(loadError, true);
     }
   };
 
   const retryLoad = (): void => {
-    if (state === 'error') void load();
+    if (state === 'data-error') void load();
   };
 
   retry.addEventListener('click', retryLoad);
@@ -102,11 +96,12 @@ const getElements = (): ExplorerBootstrapElements | undefined => {
   const root = document.querySelector<HTMLElement>(ROOT_SELECTOR);
   const error = document.querySelector<HTMLElement>(ERROR_SELECTOR);
   const retry = document.querySelector<HTMLButtonElement>(RETRY_SELECTOR);
+  const message = error?.querySelector<HTMLElement>('[data-explorer-error-message]');
   const payloadUrl = root?.dataset.explorerPayloadUrl;
 
-  if (!root || !error || !retry || !payloadUrl) return;
+  if (!root || !error || !message || !retry || !payloadUrl) return;
 
-  return { root, error, retry, payloadUrl };
+  return { root, error, message, retry, payloadUrl };
 };
 
 export const installSettlementsExplorer = (): void => {

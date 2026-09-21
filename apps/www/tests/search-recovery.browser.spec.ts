@@ -1,86 +1,52 @@
 import { expect, test } from '@playwright/test';
 
-const SEARCH_DIALOG_CHUNK_URL = /\/static\/SearchDialog[^/]*\.js(?:\?.*)?$/u;
-const QUERY = 'вода';
+const searchChunk = /\/static\/lazy\.[^/]+\.js(?:\?.*)?$/u;
 
-test('loads an independent component chunk when retrying', async ({ page }) => {
-  const requestedChunkUrls: string[] = [];
-  let allowRetryChunk = (): void => {
-    throw new Error('Expected a pending retry chunk');
-  };
-  const retryChunkBlocked = new Promise<void>((resolve) => {
-    allowRetryChunk = resolve;
+test('recovers a failed lazy import only after a browser reload', async ({ page }) => {
+  let blocked = true;
+  const requests: string[] = [];
+  let documents = 0;
+  page.on('request', (request) => {
+    if (request.isNavigationRequest() && request.frame() === page.mainFrame()) documents += 1;
   });
-
-  await page.route(SEARCH_DIALOG_CHUNK_URL, async (route) => {
-    requestedChunkUrls.push(route.request().url());
-    if (requestedChunkUrls.length === 1) {
-      await route.abort('failed');
-      return;
-    }
-
-    await retryChunkBlocked;
-    await route.continue();
+  await page.route(searchChunk, async (route) => {
+    requests.push(route.request().url());
+    if (blocked) await route.abort('failed');
+    else await route.continue();
   });
   await page.goto('/', { waitUntil: 'networkidle' });
-  expect(requestedChunkUrls).toHaveLength(0);
-
-  await page.getByRole('button', { name: 'Поиск', exact: true }).click();
-  const root = page.locator('[data-search-dialog-root]');
+  expect(requests).toHaveLength(0);
+  const opener = page.getByRole('button', { name: 'Поиск', exact: true });
+  const dialog = page.locator('[data-search-dialog]');
   const input = page.getByRole('searchbox', { name: 'Что найти на сайте' });
-  const loadMessage = page.locator('[data-search-load-message]');
-  await input.fill(QUERY);
-  await expect(loadMessage).toHaveText('Не удалось загрузить поиск');
 
-  await page.getByRole('button', { name: 'Повторить', exact: true }).click();
+  for (const documentCount of [1, 2]) {
+    await opener.click();
+    await input.fill('вода');
+    await expect(page.locator('[data-search-load-message]')).toContainText('обновить страницу');
+    await expect(page.locator('[data-search-load-announcement]')).toContainText(
+      'обновить страницу'
+    );
+    await expect(dialog.getByRole('button')).toHaveCount(1); // Only Close, no recovery action.
+    await expect(input).toBeFocused();
+    await page.waitForTimeout(500); // Observe a persistent failure without an automatic reload loop.
+    expect(documents).toBe(documentCount);
+    expect(requests.length).toBeGreaterThan(0);
+    await dialog.getByRole('button', { name: 'Закрыть' }).click();
+    await expect(opener).toBeFocused();
+    if (documentCount === 1) await page.reload({ waitUntil: 'networkidle' });
+  }
 
-  await expect.poll(() => requestedChunkUrls.length).toBe(2);
-  expect(requestedChunkUrls[1]).not.toBe(requestedChunkUrls[0]);
-  await expect(loadMessage).toHaveText('Пробуем загрузить поиск ещё раз…');
-  await expect(input).toBeFocused();
-  await expect(input).toHaveValue(QUERY);
-
-  allowRetryChunk();
-  await expect(root).toHaveAttribute('data-search-dialog-hydrated', '');
-  await expect(input).toBeFocused();
-  await expect(input).toHaveValue(QUERY);
-});
-
-test('uses a third fresh URL after two component graph failures', async ({ page }) => {
-  const requestedChunkUrls: string[] = [];
-
-  await page.route(SEARCH_DIALOG_CHUNK_URL, async (route) => {
-    requestedChunkUrls.push(route.request().url());
-    if (requestedChunkUrls.length <= 2) {
-      await route.abort('failed');
-      return;
-    }
-
-    await route.continue();
-  });
-  await page.goto('/', { waitUntil: 'networkidle' });
-
-  await page.getByRole('button', { name: 'Поиск', exact: true }).click();
-  const input = page.getByRole('searchbox', { name: 'Что найти на сайте' });
-  const loadMessage = page.locator('[data-search-load-message]');
-  await input.fill(QUERY);
-  await expect(loadMessage).toHaveText('Не удалось загрузить поиск');
-  await page.getByRole('button', { name: 'Повторить', exact: true }).click();
-
-  await expect(loadMessage).toHaveText('Не удалось загрузить поиск');
-  expect(requestedChunkUrls).toHaveLength(2);
-  expect(requestedChunkUrls[1]).not.toBe(requestedChunkUrls[0]);
-  await expect(input).toBeFocused();
-  await expect(input).toHaveValue(QUERY);
-
-  await page.getByRole('button', { name: 'Повторить', exact: true }).click();
-
-  await expect.poll(() => requestedChunkUrls.length).toBe(3);
-  expect(new Set(requestedChunkUrls).size).toBe(3);
+  blocked = false;
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(dialog).not.toBeVisible();
+  await opener.click();
   await expect(page.locator('[data-search-dialog-root]')).toHaveAttribute(
     'data-search-dialog-hydrated',
     ''
   );
+  await expect(input).toHaveValue('');
   await expect(input).toBeFocused();
-  await expect(input).toHaveValue(QUERY);
+  expect(documents).toBe(3);
+  expect(new Set(requests).size).toBe(1); // No cache-busting URLs.
 });

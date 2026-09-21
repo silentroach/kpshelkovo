@@ -326,7 +326,7 @@
     dialogElement
       ? [
           ...dialogElement.querySelectorAll<HTMLElement>(
-            'a[href], button:not([disabled]):not([data-search-retry]), input:not([disabled])'
+            'a[href], button:not([disabled]), input:not([disabled])'
           )
         ]
       : [];
@@ -570,15 +570,6 @@
 
     <div class="action-row search-load-status" hidden data-search-load-status>
       <p class="action-message" data-search-load-message></p>
-      <button
-        type="button"
-        class="ui-btn ui-btn-sm ui-btn-ghost retry-button"
-        hidden
-        disabled
-        data-search-retry
-      >
-        Повторить
-      </button>
     </div>
 
     {#if viewState !== 'initial'}

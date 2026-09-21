@@ -18,7 +18,7 @@ const deferredSettlementTables = [
 ] as const;
 const explorerControlSelector =
   '[data-testid="explorer-controls"] input, [data-testid="explorer-controls"] button, [data-testid="sort-select"]';
-const explorerGraphPattern = /\/static\/SettlementsExplorerClient\.[^/]+\.js(?:\?.*)?$/u;
+const explorerGraphPattern = /\/static\/explorer-component\.[^/]+\.js(?:\?.*)?$/u;
 const explorerDataPattern = /\/static\/settlements-explorer\/([a-f0-9]{64})\.json(?:\?.*)?$/u;
 const getExplorerDataVersion = (url: string): string | undefined =>
   explorerDataPattern.exec(url)?.[1];
@@ -307,13 +307,17 @@ test('keeps SSR cards and retries explorer hydration after a data failure', asyn
   expect(graphRequests).toHaveLength(1);
 });
 
-test('retries repeated production component graph failures with fresh URLs', async ({ page }) => {
+test('recovers a failed component after browser reload without an automatic reload loop', async ({
+  page
+}) => {
   const graphRequests: string[] = [];
   const explorerDataRequests: string[] = [];
+  let blocked = true;
+  let documents = 0;
   await page.setViewportSize(mobileViewports[1]);
   await page.route(explorerGraphPattern, async (route) => {
     graphRequests.push(route.request().url());
-    if (graphRequests.length <= 2) {
+    if (blocked) {
       await route.abort('failed');
       return;
     }
@@ -321,6 +325,7 @@ test('retries repeated production component graph failures with fresh URLs', asy
     await route.continue();
   });
   page.on('request', (request) => {
+    if (request.isNavigationRequest() && request.frame() === page.mainFrame()) documents += 1;
     const url = request.url();
     if (isExplorerDataUrl(url)) {
       explorerDataRequests.push(url);
@@ -329,29 +334,28 @@ test('retries repeated production component graph failures with fresh URLs', asy
 
   await page.goto('/815/compare/', { waitUntil: 'domcontentloaded' });
 
-  await expect(page.getByRole('alert')).toBeVisible();
-  expect(await page.getByTestId('settlement-card').count()).toBeGreaterThan(0);
-  expect(graphRequests).toHaveLength(1);
-  expect(explorerDataRequests).toHaveLength(1);
+  for (const documentCount of [1, 2]) {
+    await expect(page.getByRole('alert')).toContainText('обновить страницу');
+    await expect(page.getByRole('alert').getByRole('button')).toHaveCount(0);
+    expect(await page.getByTestId('settlement-card').count()).toBeGreaterThan(0);
+    for (const control of await page.locator(explorerControlSelector).all()) {
+      await expect(control).toBeDisabled();
+    }
+    await page.waitForTimeout(500); // Observe persistent failure without a reload loop.
+    expect(documents).toBe(documentCount);
+    expect(graphRequests.length).toBeGreaterThan(0);
+    expect(explorerDataRequests).toHaveLength(documentCount);
+    if (documentCount === 1) await page.reload({ waitUntil: 'domcontentloaded' });
+  }
 
-  await page.getByRole('button', { name: 'Попробовать снова' }).click();
-
-  await expect.poll(() => explorerDataRequests.length).toBe(2);
-  await expect.poll(() => graphRequests.length).toBe(2);
-  await expect(page.getByRole('alert')).toBeVisible();
-
-  await page.getByRole('button', { name: 'Попробовать снова' }).click();
-
-  await expect.poll(() => explorerDataRequests.length).toBe(3);
-  await expect.poll(() => graphRequests.length).toBe(3);
-  expect(new Set(graphRequests).size).toBe(3);
-  expect(
-    graphRequests.map((url) => new URL(url).searchParams.get('explorer-retry') ?? 'initial')
-  ).toEqual(['initial', '1', '2']);
+  blocked = false;
+  await page.reload({ waitUntil: 'domcontentloaded' });
   for (const control of await page.locator(explorerControlSelector).all()) {
     await expect(control).toBeEnabled();
   }
   await expect(page.getByRole('alert')).toBeHidden();
+  expect(documents).toBe(3);
+  expect(new Set(graphRequests).size).toBe(1);
 });
 
 test('reloads Yandex Maps after its ready promise rejects', async ({ page }) => {

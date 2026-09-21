@@ -9,8 +9,6 @@ import { defineConfig, type AstroIntegration } from 'astro/config';
 
 import { indexNowUrlManifest } from './src/integrations/indexnow-url-manifest';
 import { pagefindDevSnapshot } from './src/integrations/pagefind-dev-snapshot';
-import { retryableSearchDialog } from './src/integrations/retryable-search-dialog';
-import { retryableSettlementsExplorer } from './src/integrations/retryable-settlements-explorer';
 import { statusCalendarAlternateValidation } from './src/integrations/status-calendar-alternate-validation';
 import { createAstroMarkdownProcessor } from './src/lib/markdown/astro-processor';
 import { applySitemapMetadata, shouldIncludeSitemapPage } from './src/lib/sitemap';
@@ -86,7 +84,6 @@ export default defineConfig({
     server: {
       strictPort: true
     },
-    plugins: [...retryableSearchDialog(), ...retryableSettlementsExplorer()],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url))
