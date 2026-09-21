@@ -2,7 +2,7 @@
 title: Буржуйка
 slug: burzhuyka
 category: food
-updated_at: 2026-08-27
+updated_at: 2026-09-21
 summary: Фудтрак в Шелково Форест. Можно поесть на месте или заказать доставку
 search_aliases:
   - где поесть
@@ -24,6 +24,18 @@ vcf:
   organization: Буржуйка
   note: Фудтрак в Шелково Форест. Есть доставка.
 reviews:
+  - sentiment: positive
+    summary: 'Понравились сырники и осетинские пироги на завтрак.'
+    published_at: 2026-09-20
+    url: https://t.me/shelkovoecoclub/1/55953
+  - sentiment: positive
+    summary: 'Пирог, купленный утром в фудтраке, понравился.'
+    published_at: 2026-09-20
+    url: https://t.me/shelkovoecoclub/1/55993
+  - sentiment: positive
+    summary: 'Неоднократно брали обеды и оставались довольны вкусом.'
+    published_at: 2026-09-20
+    url: https://t.me/shelkovoecoclub/1/55995
   - sentiment: positive
     summary: 'Осетинский пирог с курицей, сыром и грибами понравился.'
     published_at: 2026-08-11
