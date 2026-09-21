@@ -1,5 +1,12 @@
 # Результаты проверок
 
+## Публикация — задача 4.4
+
+- Открыт [PR #774](https://github.com/silentroach/kpshelkovo/pull/774) с `Closes #743`, label `ai`, результатами проверок и ограничениями.
+- [Issue #743](https://github.com/silentroach/kpshelkovo/issues/743) обновлён: удаление retryable-графов вместо объединения; ссылка ведёт на архив change в рабочей ветке.
+- Проверены через GitHub API ссылка [коммита согласования](https://github.com/silentroach/kpshelkovo/commit/1a3474d987adfa822cf6dae23cb5046de27b8eb9), опубликованный `tasks.md`, base/head PR и closing issue. PR создан как draft до заключительной проверки полностью отмеченного архива.
+- Заключительная `pnpm openspec:validate`: **15 основных specs и 17 архивных changes прошли, 0 ошибок**. Все 14 задач выполнены.
+
 ## Синхронизация и архив — задача 4.3
 
 - Создана `openspec/specs/client-load-recovery/spec.md`: три требования и семь сценариев, Purpose из delta, без разовых условий. Сравнение delta/main показало только штатную замену заголовков.
