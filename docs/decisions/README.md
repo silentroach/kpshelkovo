@@ -41,5 +41,5 @@
 - [ADR-035: Страницы сервисов и свежие события в поиске](035-status-search-indexing.md) - принят, 2026-09-10.
 - [ADR-036: Короткие путеводители llms.txt v2](036-llms-v2-guides.md) - принят, 2026-09-12.
 - [ADR-037: Печать справки и новостей через CSS](037-content-print-css.md) - принят, 2026-09-13.
-- [ADR-038: OpenSpec как единый процесс разработки](038-openspec-development-workflow.md) - принят, 2026-09-14.
+- [ADR-038: OpenSpec как единый процесс разработки](038-openspec-development-workflow.md) - принят, 2026-09-14; требования — [agent-tooling](../../openspec/specs/agent-tooling/spec.md), процесс — [AGENTS.md](../../AGENTS.md#жизненный-цикл-изменений), эксплуатация — [окружение разработки](../development.md).
 - [ADR-039: Общий runtime Яндекс Карт и неподвижные превью](039-shared-yandex-maps-runtime-and-preview.md) - принят, 2026-09-18.
