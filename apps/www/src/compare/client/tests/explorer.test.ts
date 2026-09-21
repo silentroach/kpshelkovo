@@ -158,6 +158,32 @@ describe('settlements explorer bootstrap', () => {
     }
   );
 
+  it.each(['resolve', 'reject'] as const)(
+    'reports code failure before the pending payload can %s',
+    async (completion) => {
+      const elements = renderBootstrap();
+      const { client, runtime } = createRuntime();
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const data = Promise.withResolvers<ExplorerPayload>();
+      vi.mocked(runtime.loadClient).mockRejectedValue(new Error('JS'));
+      vi.mocked(runtime.loadPayload).mockReturnValue(data.promise);
+      startSettlementsExplorer(elements, runtime);
+
+      await vi.waitFor(() => expect(elements.error.hidden).toBe(false));
+      expect(elements.message.textContent).toContain('обновить страницу');
+      expect(elements.retry.hidden).toBe(true);
+
+      if (completion === 'reject') data.reject(new Error('data'));
+      else data.resolve(payload);
+      await Promise.allSettled([data.promise]);
+      await Promise.resolve();
+
+      expect(consoleError).toHaveBeenCalledOnce();
+      expect(elements.retry.hidden).toBe(true);
+      expect(client.hydrate).not.toHaveBeenCalled();
+    }
+  );
+
   it.each(['resolve', 'reject', 'detached'] as const)(
     'ignores %s completion after disposal or detachment',
     async (completion) => {

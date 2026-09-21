@@ -53,15 +53,16 @@ export const startSettlementsExplorer = (
     error.hidden = true;
 
     const [loadedClient, payload] = await Promise.allSettled([
-      client ?? runtime.loadClient(),
+      client ??
+        runtime.loadClient().catch((cause: unknown) => {
+          if (!disposed && root.isConnected) showError(cause, true);
+          throw cause;
+        }),
       runtime.loadPayload(payloadUrl)
     ]);
     if (disposed || !root.isConnected) return;
 
-    if (loadedClient.status === 'rejected') {
-      showError(loadedClient.reason, true);
-      return;
-    }
+    if (loadedClient.status === 'rejected') return;
     client = loadedClient.value;
     if (payload.status === 'rejected') {
       showError(payload.reason, false);
