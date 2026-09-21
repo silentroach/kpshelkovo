@@ -50,8 +50,6 @@ const bodyHtml = place.body ? renderMarkdown(place.body) : undefined;
 const addressHtml = place.address
   ? formatDynamicHtml(place.address)
   : undefined;
-const displayName =
-  place.status === 'underConstruction' ? `🚧 ${place.name}` : place.name;
 const neighbors = getNearbyPlaces(place, await loadPlaces());
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Карта', href: placesUrl() },
@@ -103,7 +101,7 @@ const schema = {
               <h1
                 class="ui-page-title"
                 data-pagefind-ignore="all"
-                set:html={formatDynamicHtml(displayName)}
+                set:html={formatDynamicHtml(place.name)}
               />
               {
                 (place.showOnMap || place.contact) && (
