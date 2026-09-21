@@ -57,6 +57,70 @@ afterEach(() => {
 });
 
 describe('timeline lazy navigation', () => {
+  it.each(['pointerover', 'focusin', 'touchstart'])(
+    'captures %s on new markers until page-load even when the module is already loaded',
+    async (eventType) => {
+      const { root, trigger, hydrate, pending, module, load } = setup();
+      intent(trigger);
+      pending.resolve(module);
+      await settle();
+      const next = renderTimeline(root);
+      hydrate.mockClear();
+
+      root.dispatchEvent(new Event('astro:after-swap'));
+      next.dispatchEvent(new Event(eventType, { bubbles: true }));
+      await settle();
+      expect(hydrate).not.toHaveBeenCalled();
+
+      root.dispatchEvent(new Event('astro:page-load'));
+      await settle();
+      expect(hydrate).toHaveBeenCalledExactlyOnceWith(root);
+      expect(root.querySelector<HTMLElement>('[role="tooltip"]')?.hidden).toBe(false);
+      expect(next.getAttribute('aria-describedby')).toBe('tooltip');
+      expect(load).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  it.each([true, false])(
+    'drops captured intent on the next swap (timelines: %s)',
+    async (hasTimelines) => {
+      const { root, trigger, hydrate, pending, module } = setup();
+      intent(trigger);
+      pending.resolve(module);
+      await settle();
+      const next = renderTimeline(root);
+      hydrate.mockClear();
+      root.dispatchEvent(new Event('astro:after-swap'));
+      intent(next);
+      const replay = vi.fn();
+      next.addEventListener('mouseenter', replay);
+
+      if (hasTimelines) {
+        renderTimeline(root);
+      } else {
+        root.body.replaceChildren();
+      }
+      await navigate(root);
+      expect(replay).not.toHaveBeenCalled();
+      expect(hydrate).toHaveBeenCalledTimes(hasTimelines ? 1 : 0);
+      expect(root.querySelector('[data-status-tooltip-open]')).toBeFalsy();
+    }
+  );
+
+  it('defers a captured first intent until page-load without preloading', async () => {
+    const { root, trigger, hydrate, pending, module, load } = setup();
+    root.dispatchEvent(new Event('astro:after-swap'));
+    intent(trigger);
+    await settle();
+    expect(load).not.toHaveBeenCalled();
+
+    root.dispatchEvent(new Event('astro:page-load'));
+    pending.resolve(module);
+    await settle();
+    expect(hydrate).toHaveBeenCalledExactlyOnceWith(root);
+    expect(root.querySelector<HTMLElement>('[role="tooltip"]')?.hidden).toBe(false);
+  });
+
   it('hydrates each new DOM once on navigation and return, reusing the module', async () => {
     const { root, trigger, hydrate, pending, module, load } = setup();
     intent(trigger);
@@ -227,8 +291,8 @@ describe('timeline lazy navigation', () => {
   it('refreshes again when an early interaction finishes before page-load', async () => {
     window.__STATUS_TIMELINE_NOW__ = Date.parse('2026-05-09T03:59:59Z');
     const { root, trigger, hydrate, pending, module } = setup();
-    root.dispatchEvent(new Event('astro:after-swap'));
     intent(trigger);
+    root.dispatchEvent(new Event('astro:after-swap'));
     pending.resolve(module);
     await settle();
     expect(trigger.dataset.tooltipPhaseLabel).toBe('идет');

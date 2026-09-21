@@ -59,6 +59,8 @@ export const bindStatusTimelineLazyHydration = (
   let domModulePromise: Promise<StatusTimelineDomModule> | undefined;
   let hydrationPromise: Promise<StatusTimelineDomModule | undefined> | undefined;
   let hasIntentListeners = false;
+  let awaitingPageLoad = false;
+  let pendingIntent: readonly [HTMLElement, string] | undefined;
 
   const removeIntentListeners = (): void => {
     if (!hasIntentListeners) {
@@ -106,22 +108,25 @@ export const bindStatusTimelineLazyHydration = (
       }
     })());
 
+  const hydrateForIntent = (trigger: HTMLElement, eventType: string): void => {
+    removeIntentListeners();
+    void hydrateLoadedTimelines().then((domModule) => {
+      if (domModule) {
+        replayStatusTimelineIntent(trigger, eventType);
+      }
+    });
+  };
+
   function handleIntent(event: Event): void {
     const trigger = getStatusTimelineTrigger(event.target || undefined);
-
     if (!trigger) {
       return;
     }
-
-    removeIntentListeners();
-
-    void hydrateLoadedTimelines().then((domModule) => {
-      if (!domModule) {
-        return;
-      }
-
-      replayStatusTimelineIntent(trigger, event.type);
-    });
+    if (awaitingPageLoad) {
+      pendingIntent = [trigger, event.type];
+      return;
+    }
+    hydrateForIntent(trigger, event.type);
   }
 
   function bindOrHydrate(): void {
@@ -131,6 +136,7 @@ export const bindStatusTimelineLazyHydration = (
     }
 
     if (domModulePromise) {
+      removeIntentListeners();
       void hydrateLoadedTimelines();
       return;
     }
@@ -139,5 +145,23 @@ export const bindStatusTimelineLazyHydration = (
   }
 
   bindOrHydrate();
-  rootDocument.addEventListener('astro:page-load', bindOrHydrate);
+  rootDocument.addEventListener('astro:after-swap', () => {
+    awaitingPageLoad = true;
+    pendingIntent = undefined;
+    if (hasStatusTimelines(rootDocument)) {
+      addIntentListeners();
+    } else {
+      removeIntentListeners();
+    }
+  });
+  rootDocument.addEventListener('astro:page-load', () => {
+    awaitingPageLoad = false;
+    const intent = pendingIntent;
+    pendingIntent = undefined;
+    if (intent) {
+      hydrateForIntent(...intent);
+    } else {
+      bindOrHydrate();
+    }
+  });
 };
