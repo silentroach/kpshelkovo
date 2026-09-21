@@ -1,5 +1,11 @@
 # Результаты проверок
 
+## Отказ JS в браузере — задача 3.1
+
+- `pnpm --filter @shelkovo/www test:browser:search-recovery`: 1 passed.
+- `pnpm --filter @shelkovo/www test:browser:compare`: 13 passed, включая отказ компонента, локальный повтор JSON и карты.
+- В production-сборке блокируются реальные `lazy.*.js` и `explorer-component.*.js`. Работающий bootstrap показывает подсказку; recovery-кнопок нет. Тесты проверяют счётчик запросов документов при сохраняющейся блокировке, повторяют ручной reload при всё ещё недоступном JS, затем снимают блокировку и подтверждают восстановление после `page.reload()`. URL модуля остаётся тем же, без cache-busting. Поиск после reload закрыт, запрос сброшен.
+
 ## Удаление standalone pipeline — задача 2.3
 
 - Удалены обе интеграции, их регистрации, virtual declarations, вспомогательные типы, минификатор и тесты специальных dev endpoints.
