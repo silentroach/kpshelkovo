@@ -41,16 +41,93 @@ describe('shared event widget', () => {
     expect(html).toContain('<map-preview');
   });
 
-  it('keeps the calendar but omits place links and map without a place', async () => {
-    const container = await createAstroContainer();
-    const html = await container.renderToString(EventWidget, {
-      props: { event, newsSlug: event.slug }
+  it.each([undefined, 'Площадка у реки'])(
+    'keeps the calendar without inventing a marker for location %s',
+    async (location) => {
+      const container = await createAstroContainer();
+      const html = await container.renderToString(EventWidget, {
+        props: { event: { ...event, location }, newsSlug: event.slug }
+      });
+      expect(html).toContain(`href="${event.icsUrl}"`);
+      expect(html).not.toContain('href="/map/');
+      expect(html.includes('https://yandex.ru/maps/?text=')).toBe(!!location);
+      expect(html).not.toContain('<iframe');
+      expect(html).not.toContain('<map-preview');
+    }
+  );
+
+  describe.each([
+    { placement: 'news', newsSlug: event.slug },
+    { placement: 'detail', newsSlug: undefined }
+  ])('$placement marker', ({ newsSlug }) => {
+    it.each([
+      {
+        kind: 'linked place',
+        record: {
+          ...event,
+          place: testPlace({ name: 'Эко-клуб', mapUrl: 'https://example.com/location/plan' })
+        },
+        context: 'Эко-клуб',
+        mapUrl: 'https://example.com/location/plan'
+      },
+      {
+        kind: 'inline venue',
+        record: { ...event, location: 'Площадка у реки', coordinates: { lat: 54.8, lng: 37.9 } },
+        context: 'Площадка у реки',
+        mapUrl: 'https://yandex.ru/maps/?pt=37.9,54.8&z=16&l=map'
+      },
+      {
+        kind: 'unnamed coordinates',
+        record: { ...event, coordinates: { lat: 54.8, lng: 37.9 } },
+        context: event.title,
+        mapUrl: 'https://yandex.ru/maps/?pt=37.9,54.8&z=16&l=map'
+      }
+    ])('links the $kind to its original destination', async ({ record, context, mapUrl }) => {
+      const container = await createAstroContainer();
+      const html = await container.renderToString(EventWidget, {
+        props: { event: record, newsSlug }
+      });
+      const window = new Window();
+      try {
+        window.document.body.innerHTML = html;
+        const preview = window.document.querySelector('map-preview');
+        const template = preview?.querySelector('template');
+        const marker = template?.content.querySelector('a');
+        expect(marker?.getAttribute('href')).toBe(mapUrl);
+        expect({
+          rootLink: template?.content.firstElementChild === marker,
+          hidden: marker?.hasAttribute('aria-hidden'),
+          tabIndex: marker?.tabIndex,
+          target: marker?.getAttribute('target'),
+          rel: marker?.getAttribute('rel'),
+          draggable: marker?.getAttribute('draggable'),
+          named: marker?.getAttribute('aria-label')?.includes(context),
+          titled: marker?.getAttribute('title')?.includes(context)
+        }).toMatchInlineSnapshot(`
+          {
+            "draggable": "false",
+            "hidden": false,
+            "named": true,
+            "rel": "noopener noreferrer",
+            "rootLink": true,
+            "tabIndex": 0,
+            "target": "_blank",
+            "titled": true,
+          }
+        `);
+        const fallback = preview?.querySelector('[data-fallback]');
+        expect(fallback?.getAttribute('href')).toBe(mapUrl);
+        expect(fallback?.textContent.trim()).toBe('Яндекс Карты');
+        expect(
+          [...window.document.querySelectorAll('.news-event-actions a')].map((link) =>
+            link.getAttribute('href')
+          )
+        ).toEqual(newsSlug ? [event.icsUrl] : []);
+        expect(!!window.document.querySelector('.news-event-actions')).toBe(!!newsSlug);
+      } finally {
+        await window.happyDOM.close();
+      }
     });
-    expect(html).toContain(`href="${event.icsUrl}"`);
-    expect(html).not.toContain('href="/map/');
-    expect(html).not.toContain('https://yandex.ru');
-    expect(html).not.toContain('<iframe');
-    expect(html).not.toContain('<map-preview');
   });
 
   it('sends only the canonical event point, without place icon, areas or live hours', async () => {

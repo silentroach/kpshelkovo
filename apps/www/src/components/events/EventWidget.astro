@@ -36,7 +36,11 @@ const titleId = newsSlug
   aria-labelledby={titleId}
   data-pagefind-body={newsSlug ? true : undefined}
 >
-  <MapCardShell coordinates={coordinates} mapUrl={mapUrl}>
+  <MapCardShell
+    coordinates={coordinates}
+    mapUrl={mapUrl}
+    locationName={event.place?.name ?? event.location ?? event.title}
+  >
     <div class="news-event-content">
       <div
         class:list={[

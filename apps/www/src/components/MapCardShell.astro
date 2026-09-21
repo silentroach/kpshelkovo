@@ -1,12 +1,9 @@
 ---
 import MapPreview from '@/components/maps/MapPreview.astro';
-import type { PlaceCoordinates } from '@/lib/places/types';
+import type { MapCardShellProps as Props } from './map-card-shell.types';
 
-interface Props {
-  readonly coordinates?: PlaceCoordinates;
-  readonly mapUrl?: string;
-}
-const { coordinates, mapUrl } = Astro.props;
+const { coordinates, mapUrl, locationName } = Astro.props;
+const markerLabel = `Открыть карту: ${locationName}`;
 ---
 
 <div
@@ -32,7 +29,17 @@ const { coordinates, mapUrl } = Astro.props;
           label="Карта места"
           mapUrl={mapUrl}
         >
-          <span class="ui-map-marker" aria-hidden="true" />
+          <a
+            class="map-marker-link"
+            href={mapUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            draggable="false"
+            aria-label={markerLabel}
+            title={markerLabel}
+          >
+            <span class="ui-map-marker" aria-hidden="true" />
+          </a>
           <a
             slot="fallback"
             data-fallback
@@ -41,7 +48,7 @@ const { coordinates, mapUrl } = Astro.props;
             rel="noreferrer noopener"
             class="map-fallback"
           >
-            Открыть Яндекс Карты
+            Яндекс Карты
           </a>
         </MapPreview>
       </div>
@@ -73,11 +80,15 @@ const { coordinates, mapUrl } = Astro.props;
     z-index: -1;
     overflow: hidden;
   }
-  .ui-map-marker {
-    --ui-map-marker-size: 18px;
-    display: block;
+  .map-marker-link {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
     transform: translate(-50%, -50%);
-    pointer-events: none;
+    pointer-events: auto;
+    cursor: pointer;
+    text-decoration: none;
   }
   .map-fallback {
     position: absolute;
