@@ -1,5 +1,28 @@
 # Результаты проверок
 
+## Production-приёмка и размеры — задача 3.2
+
+- Browser compare suite проверила SSR-карточки без JS, disabled controls, одну гидратированную выдачу, отсутствие hydration/mismatch сообщений, сохранение позиции списка, фильтры и URL-state на mobile/desktop.
+- Search-quality сценарии `#243`, `#154`, `#355` прошли на полной production-сборке: задержанный lazy chunk, синхронный фокус, сохранение ввода, highlight и повторная работа после ClientRouter-переходов.
+- В agent-browser дополнительно выполнен переход сравнение → главная → сравнение: тот же документ, 2 `astro:after-swap`, 64 карточки, `data-explorer-hydrated`, фильтр включён.
+- Просмотрены screenshots поиска и сравнения, scoped CSS загружен, нарушений вёрстки не обнаружено. Файлы: временный каталог сессии, `recovery-search.png` и `recovery-compare.png`. В локальном просмотре реальный API карты дал сетевую ошибку; штатный fallback виден, восстановление API отдельно проверено browser-тестом с управляемым ответом.
+
+Повторный холодный замер на `dist/www`, те же сценарии и метод, что в 1.1. Raw / gzip / brotli:
+
+- Главная: 8 JS, **36663 / 14628 / 12866**. Изменение: +971 / +583 / +508 байт.
+- Первое открытие поиска: 14 JS, **255987 / 85525 / 76844**. Изменение: −3680 / −552 / −576 байт.
+- Прямое сравнение: 14 JS, **107961 / 42397 / 37750**. Изменение: +2239 / +2312 / +1858 байт.
+
+Таким образом, общего выигрыша по трафику нет: поиск немного меньше, начальная страница и сравнение немного больше, запросов больше. Выигрыш изменения — удаление отдельного pipeline.
+
+Общие `/static/` запросы: прежние `ClientRouter`, `page`, `prefetch`, `preload-helper`, `lifecycle` с теми же хешами/размерами и `BaseLayout.astro_astro_type_script_index_0_lang.wMaevfro.js` (11208 / 4167 / 3622).
+
+Дополнительные запросы, относительно общих:
+
+- Главная: `index.astro_astro_type_script_index_0_lang.61sx_yDO.js` (669 / 409 / 347), `src.D8Rq6Akf.js` (5784 / 2782 / 2530).
+- Поиск добавляет: `lazy.CIO8icwE.js` (16223 / 6660 / 5876), `client.8uxDfU8K.js` (45556 / 17405 / 15862), `events.Dne4BRe6.js` (70624 / 21957 / 19631), `async.BUaV2Lsk.js` (111 / 125 / 99), прежние `/search/pagefind.js` и `/search/pagefind-worker.js` с теми же размерами.
+- Сравнение: `index.astro_astro_type_script_index_0_lang.CWXQTQCe.js` (2098 / 1142 / 984), `explorer-component.DtwPAc7A.js` (21624 / 8018 / 7007), `number.3RH8yx7B.js` (423 / 283 / 254), `runtime.BjK9mNpC.js` (1961 / 1045 / 893), `src.BmC_ntYh.js` (194 / 160 / 132), а также `src.D8Rq6Akf.js`, `async.BUaV2Lsk.js`, `client.8uxDfU8K.js` с размерами выше. Общие чанки в каждом сценарии учтены один раз.
+
 ## Отказ JS в браузере — задача 3.1
 
 - `pnpm --filter @shelkovo/www test:browser:search-recovery`: 1 passed.
