@@ -7,6 +7,7 @@ import type { PlacePreviewProps as Props } from './place-preview.types';
 
 const { place } = Astro.props;
 const marker = place.marker ? PLACE_MARKER_IMAGES[place.marker] : undefined;
+const markerLabel = `Открыть карту: ${place.name}`;
 const preview = {
   coordinates: place.coordinates,
   geometry: place.geometry,
@@ -22,7 +23,15 @@ const preview = {
     label={`Местоположение: ${place.name}`}
     mapUrl={place.mapUrl}
   >
-    <div class="place-preview__marker" aria-hidden="true">
+    <a
+      class="place-preview__marker"
+      href={place.mapUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      draggable="false"
+      aria-label={markerLabel}
+      title={markerLabel}
+    >
       {
         marker ? (
           <img
@@ -37,7 +46,7 @@ const preview = {
         )
       }
       {place.openingHours && <span class="place-preview__closed-indicator" />}
-    </div>
+    </a>
   </MapPreview>
 </div>
 
@@ -63,7 +72,9 @@ const preview = {
     width: 3rem;
     height: 3rem;
     transform: translate(-50%, -50%);
-    pointer-events: none;
+    pointer-events: auto;
+    cursor: pointer;
+    text-decoration: none;
   }
 
   .place-preview__marker img {
