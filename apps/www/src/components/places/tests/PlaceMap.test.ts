@@ -1,6 +1,10 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import type { YMapClustererProps } from '@yandex/ymaps3-clusterer';
-import type { MapEventUpdateHandler, YMapFeatureProps } from '@yandex/ymaps3-types';
+import type {
+  MapEventUpdateHandler,
+  YMapControlsProps,
+  YMapFeatureProps
+} from '@yandex/ymaps3-types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { PlaceMapPublicItemDto } from '@/lib/places/map-public-dto';
@@ -26,6 +30,12 @@ const map = {
   destroy: vi.fn(),
   zoom: 15
 };
+const nativeControl = {};
+const createControl = vi.fn(function (_props: YMapControlsProps, _children: readonly unknown[]) {
+  return nativeControl;
+});
+const extras = { YMapOpenMapsButton: vi.fn(function () {}) };
+const importModule = vi.fn(async (_module: string) => extras);
 const markerElements: HTMLElement[] = [];
 const mapElements: HTMLElement[] = [];
 const mapUpdateHandlers: MapEventUpdateHandler[] = [];
@@ -116,6 +126,8 @@ const installYandexMaps = (): void => {
     writable: true,
     value: {
       ready: Promise.resolve(),
+      import: importModule,
+      YMapControls: createControl,
       YMap: vi.fn(function YMap(element: HTMLElement, props: (typeof mapProps)[number]) {
         mapElements.push(element);
         mapProps.push(props);
@@ -229,6 +241,48 @@ describe('PlaceMap', () => {
 
     await fireEvent.keyDown(marker, { key: ' ' });
     expect(click).toHaveBeenCalledOnce();
+  });
+
+  it('adds the bottom-right native control once per mount and destroys its owning map', async () => {
+    const first = render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(map.addChild).toHaveBeenCalledWith(nativeControl));
+    expect(createControl.mock.calls[0]?.[0]).toEqual({ position: 'bottom right' });
+    first.unmount();
+    expect(map.destroy).toHaveBeenCalledOnce();
+
+    const second = render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(createControl).toHaveBeenCalledTimes(2));
+    second.unmount();
+    expect(map.destroy).toHaveBeenCalledTimes(2);
+  });
+
+  it.each(['resolve', 'reject'] as const)(
+    'does not add a control after unmount when its import later %ss',
+    async (outcome) => {
+      const imported = Promise.withResolvers<typeof extras>();
+      importModule.mockReturnValueOnce(imported.promise);
+      const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const view = render(PlaceMap, { props: { places: [place] } });
+      await waitFor(() => expect(importModule).toHaveBeenCalledOnce());
+      view.unmount();
+      expect(map.destroy).toHaveBeenCalledOnce();
+
+      if (outcome === 'resolve') imported.resolve(extras);
+      else imported.reject(new Error('Stale control'));
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+      expect(map.addChild).not.toHaveBeenCalled();
+      expect(log).not.toHaveBeenCalled();
+    }
+  );
+
+  it('uses the existing place fallback when the control module fails', async () => {
+    importModule.mockRejectedValueOnce(new Error('Control unavailable'));
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(PlaceMap, { props: { places: [place] } });
+    await screen.findByRole('status');
+    expect(screen.getByRole('link').getAttribute('href')).toBe(place.url);
+    expect(map.destroy).toHaveBeenCalledOnce();
+    expect(map.addChild).not.toHaveBeenCalled();
   });
 
   it('loads map places from JSON before applying a requested highlight', async () => {

@@ -2,6 +2,7 @@ import type { BehaviorType, LngLat, Margin, YMap, YMapLocationRequest } from '@y
 
 import { getPaddedBounds, toMapGeometry } from '@/components/places/place-map-geometry';
 import { isPlaceOpen } from '@/lib/places/opening-hours';
+import { createOpenMapsControl, OPEN_MAPS_BUTTON_TITLE } from '@/lib/yandex-maps/open-maps-control';
 import { installYandexMapsRuntimeHeadPersistence, loadYandexMaps } from '@/lib/yandex-maps/runtime';
 
 import type { MapPreviewData } from './map-preview.types';
@@ -165,14 +166,17 @@ export class MapPreviewElement extends HTMLElement {
       }
 
       let rendered = false;
+      let controlInstalled = false;
       const handOff = (): void => {
         if (this.map !== map) return;
         const logo = canvas.querySelector('.ymaps3--map-copyrights__logo');
         logo?.setAttribute('aria-label', 'Яндекс Карты');
         if (fallback) {
-          if (!rendered) return;
+          if (!rendered || !controlInstalled) return;
           // The SDK loads this native action independently of its tile renderer.
-          const button = canvas.querySelector('.ymaps3--open-maps-button')?.closest('button');
+          const button = Array.from(canvas.querySelectorAll('.ymaps3--open-maps-button'))
+            .find((element) => element.textContent?.trim() === OPEN_MAPS_BUTTON_TITLE)
+            ?.closest('button');
           if (!button || button.disabled) return;
           canvas.inert = false;
           if (fallback.contains(document.activeElement)) button.focus({ preventScroll: true });
@@ -248,6 +252,10 @@ export class MapPreviewElement extends HTMLElement {
           }
         })
       );
+      const control = await createOpenMapsControl(maps, data.distributionPosition ?? 'top right');
+      if (!this.isConnected || generation !== this.generation || this.map !== map) return;
+      map.addChild(control);
+      controlInstalled = true;
       handOff();
     } catch (error) {
       if (!this.isConnected || generation !== this.generation) return;

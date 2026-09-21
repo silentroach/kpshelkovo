@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/svelte';
+import type { YMapControlsProps } from '@yandex/ymaps3-types';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import SettlementMap from './SettlementMap.svelte';
@@ -9,6 +10,12 @@ const mockMap = {
   update: vi.fn(),
   destroy: vi.fn()
 };
+const nativeControl = {};
+const createControl = vi.fn(function (_props: YMapControlsProps, _children: readonly unknown[]) {
+  return nativeControl;
+});
+const extras = { YMapOpenMapsButton: vi.fn(function () {}) };
+const importModule = vi.fn(async (_module: string) => extras);
 
 const markers: HTMLElement[] = [];
 let resizeMap: (() => void) | undefined;
@@ -25,6 +32,8 @@ class TestResizeObserver implements ResizeObserver {
 
 const mockYandexMaps = {
   ready: Promise.resolve(),
+  import: importModule,
+  YMapControls: createControl,
   Map: vi.fn(function Map() {
     return mockMap;
   }),
@@ -134,6 +143,84 @@ describe('SettlementMap', () => {
     await waitFor(() => {
       expect(markers.length).toBe(mockSettlements.length);
     });
+  });
+
+  it('owns one bottom-right native control per mount and releases it with the map', async () => {
+    const first = render(SettlementMap, { props: { settlements: mockSettlements } });
+    await waitFor(() => expect(mockMap.addChild).toHaveBeenCalledWith(nativeControl));
+    expect(createControl.mock.calls[0]?.[0]).toEqual({ position: 'bottom right' });
+    first.unmount();
+    expect(mockMap.destroy).toHaveBeenCalledOnce();
+
+    const second = render(SettlementMap, { props: { settlements: mockSettlements } });
+    await waitFor(() => expect(createControl).toHaveBeenCalledTimes(2));
+    second.unmount();
+    expect(mockMap.destroy).toHaveBeenCalledTimes(2);
+  });
+
+  it.each(['resolve', 'reject'] as const)(
+    'ignores a late control import %s after unmount',
+    async (outcome) => {
+      const imported = Promise.withResolvers<typeof extras>();
+      importModule.mockReturnValueOnce(imported.promise);
+      const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const view = render(SettlementMap, { props: { settlements: mockSettlements } });
+      await waitFor(() => expect(importModule).toHaveBeenCalledOnce());
+      view.unmount();
+      expect(mockMap.destroy).toHaveBeenCalledOnce();
+
+      if (outcome === 'resolve') imported.resolve(extras);
+      else imported.reject(new Error('Stale control'));
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+      expect(mockMap.addChild).not.toHaveBeenCalled();
+      expect(log).not.toHaveBeenCalled();
+    }
+  );
+
+  it('does not create a map if SDK readiness completes after unmount', async () => {
+    const ready = Promise.withResolvers<void>();
+    let reads = 0;
+    Object.defineProperty(mockYandexMaps, 'ready', {
+      configurable: true,
+      get: () => (++reads === 1 ? Promise.resolve() : ready.promise)
+    });
+    const view = render(SettlementMap, { props: { settlements: mockSettlements } });
+    await waitFor(() => expect(reads).toBe(2));
+    view.unmount();
+    ready.resolve();
+    await new Promise((resolve) => window.setTimeout(resolve, 0));
+    expect(mockYandexMaps.YMap).not.toHaveBeenCalled();
+    expect(importModule).not.toHaveBeenCalled();
+  });
+
+  it('keeps overlapping synchronization waiting for the control and uses the latest filter', async () => {
+    vi.stubGlobal('ResizeObserver', TestResizeObserver);
+    const imported = Promise.withResolvers<typeof extras>();
+    importModule.mockReturnValueOnce(imported.promise);
+    const { rerender } = render(SettlementMap, { props: { settlements: mockSettlements } });
+    await waitFor(() => expect(importModule).toHaveBeenCalledOnce());
+    await rerender({ settlements: [mockSettlements[1]] });
+    resizeMap?.();
+    expect(markers).toHaveLength(0);
+    imported.resolve(extras);
+    await waitFor(() => expect(markers).toHaveLength(1));
+    expect(mockYandexMaps.YMap).toHaveBeenCalledOnce();
+    expect(createControl).toHaveBeenCalledOnce();
+    expect(mockMap.addChild.mock.calls.filter(([child]) => child === nativeControl)).toHaveLength(
+      1
+    );
+  });
+
+  it('destroys the partial map after control import failure and retries with a fresh control', async () => {
+    importModule.mockRejectedValueOnce(new Error('Control unavailable'));
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { getByRole } = render(SettlementMap, { props: { settlements: mockSettlements } });
+    const retry = await waitFor(() => getByRole('button', { name: 'Попробовать снова' }));
+    expect(mockMap.destroy).toHaveBeenCalledOnce();
+    expect(mockMap.addChild).not.toHaveBeenCalled();
+    await fireEvent.click(retry);
+    await waitFor(() => expect(mockMap.addChild).toHaveBeenCalledWith(nativeControl));
+    expect(importModule).toHaveBeenCalledTimes(2);
   });
 
   it('starts the explorer map over Moscow without an initial autofit', async () => {
