@@ -1,5 +1,13 @@
 # Результаты проверок
 
+## Dev и поисковая выдача — задача 3.4
+
+- Ограниченный временный harness: 2 passed. Для наличия и отсутствия snapshot вызван действующий `pagefindDevSnapshot` hook с `command: dev`, его `vite.define` передан обычному Vite middleware-mode pipeline без HTTP listener. Реальный `pagefindSearchClient` через `ssrLoadModule` вернул соответственно `ready` и `devUnavailable`. Подменялась только проверка наличия `.cache/pagefind/pagefind.js`; пользовательский snapshot не менялся. Harness удалён после проверки, `pnpm dev` не запускался.
+- Повтор всей матрицы с отдельным baseline snapshot: **14 snapshots совпали**, 12 passed / 6 failed (ровно прежние rank assertions).
+- Полная команда `pnpm test:search-quality`: 10 passed / 8 failed, 5 snapshot mismatches — тот же исходный результат. Основные snapshots не обновлялись. Лог: `recovery-search-quality.log` во временном каталоге сессии.
+- Один промежуточный запуск матрицы после browser-команд дал 18 ошибок: их `astro build` очищает индекс, но не запускает Pagefind. Повтор после полной `pnpm --filter @shelkovo/www build` восстановил индекс и дал совпадение с baseline; это ограничение последовательности команд, не регрессия поиска.
+- Непроверенной ручной приёмки, обязательной для согласованного change, не осталось. Новых улучшений ранжирования этим change не заявляется.
+
 ## Локальное восстановление данных — задача 3.3
 
 - `pnpm exec vitest run src/lib/search/tests/client.test.ts src/components/search/tests`: 3 файла, 44 passed. Проверено восстановление runtime/configuration Pagefind, exact search и rejected result data, а также UI поиска.
