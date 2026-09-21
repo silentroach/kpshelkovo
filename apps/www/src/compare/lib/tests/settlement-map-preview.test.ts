@@ -26,6 +26,7 @@ const baseline = mapRawSettlement(
 
 test.each([
   { slug: baseline.slug, mapUrl: 'https://yandex.ru/maps/org/123/?from=source', color: '#064b08' },
+  { slug: 'external', mapUrl: 'https://example.com/location/plan', color: '#6a502e' },
   { slug: 'other', mapUrl: undefined, color: '#6a502e' }
 ])(
   'renders the $slug preview and independent server map links',
@@ -61,20 +62,33 @@ test.each([
         }
       `);
       const template = preview?.querySelector('template');
-      const marker = template?.content.querySelector('div');
+      const marker = template?.content.querySelector('a');
       expect(template?.content.childElementCount).toBe(1);
-      expect(marker?.getAttribute('style')).toBe(`background: ${color}`);
+      expect(marker?.querySelector('span')?.getAttribute('style')).toBe(`background: ${color}`);
+      expect(marker?.getAttribute('href')).toBe(
+        mapUrl ?? 'https://yandex.ru/maps/?pt=37,55&z=15&l=map'
+      );
       expect({
-        hidden: marker?.getAttribute('aria-hidden'),
+        rootLink: template?.content.firstElementChild === marker,
+        hidden: marker?.hasAttribute('aria-hidden'),
         tabIndex: marker?.tabIndex,
-        tag: marker?.tagName
+        target: marker?.getAttribute('target'),
+        rel: marker?.getAttribute('rel'),
+        draggable: marker?.getAttribute('draggable'),
+        named: marker?.getAttribute('aria-label')?.includes(settlement.name),
+        titled: marker?.getAttribute('title')?.includes(settlement.name)
       }).toMatchInlineSnapshot(`
-      {
-        "hidden": "true",
-        "tabIndex": -1,
-        "tag": "DIV",
-      }
-    `);
+        {
+          "draggable": "false",
+          "hidden": false,
+          "named": true,
+          "rel": "noopener noreferrer",
+          "rootLink": true,
+          "tabIndex": 0,
+          "target": "_blank",
+          "titled": true,
+        }
+      `);
       const mapLinks = window.document.querySelectorAll(
         'a[aria-label="Открыть поселок на Яндекс.Картах"]'
       );

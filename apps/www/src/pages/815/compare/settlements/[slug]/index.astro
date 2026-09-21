@@ -85,6 +85,10 @@ const distanceFromShelkovo = !isBaseline
 const hasPoint =
   Number.isFinite(settlement.location.lat) &&
   Number.isFinite(settlement.location.lng);
+const mapUrl =
+  settlement.location.mapUrl ??
+  `https://yandex.ru/maps/?pt=${settlement.location.lng},${settlement.location.lat}&z=15&l=map`;
+const markerLabel = `Открыть карту: ${settlement.name}`;
 const company = settlement.managementCompany;
 const companyTitle = company?.title ?? '';
 const companyUrl = company?.url ?? '';
@@ -190,12 +194,21 @@ const assumption = tariffCalc?.assumption;
               }}
               label={settlement.name}
             >
-              <div
-                class="ui-map-marker settlement-preview-marker"
-                style={`background: ${isBaseline ? '#064b08' : '#6a502e'}`}
-                title={settlement.name}
-                aria-hidden="true"
-              />
+              <a
+                class="settlement-preview-marker"
+                href={mapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                draggable="false"
+                aria-label={markerLabel}
+                title={markerLabel}
+              >
+                <span
+                  class="ui-map-marker"
+                  style={`background: ${isBaseline ? '#064b08' : '#6a502e'}`}
+                  aria-hidden="true"
+                />
+              </a>
             </MapPreview>
           )
         }
@@ -278,8 +291,7 @@ const assumption = tariffCalc?.assumption;
                   )
                 }
                 <a
-                  href={settlement.location.mapUrl ??
-                    `https://yandex.ru/maps/?pt=${settlement.location.lng},${settlement.location.lat}&z=15&l=map`}
+                  href={mapUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Открыть поселок на Яндекс.Картах"
@@ -500,8 +512,7 @@ const assumption = tariffCalc?.assumption;
                 )
               }
               <a
-                href={settlement.location.mapUrl ??
-                  `https://yandex.ru/maps/?pt=${settlement.location.lng},${settlement.location.lat}&z=15&l=map`}
+                href={mapUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Открыть поселок на Яндекс.Картах"
@@ -815,8 +826,14 @@ const assumption = tariffCalc?.assumption;
   }
 
   .settlement-preview-marker {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
     transform: translate(-50%, -50%);
-    pointer-events: none;
+    pointer-events: auto;
+    cursor: pointer;
+    text-decoration: none;
   }
 
   .settlement-hero-content {
