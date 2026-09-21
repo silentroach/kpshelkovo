@@ -26,6 +26,7 @@ const baseline = mapRawSettlement(
 
 test.each([
   { slug: baseline.slug, mapUrl: 'https://yandex.ru/maps/org/123/?from=source', color: '#064b08' },
+  { slug: 'external', mapUrl: 'https://example.com/location/plan', color: '#6a502e' },
   { slug: 'other', mapUrl: undefined, color: '#6a502e' }
 ])(
   'renders the $slug preview and independent server map links',
@@ -56,7 +57,6 @@ test.each([
           },
           "distributionPosition": "bottom right",
           "muted": true,
-          "mutedOpacity": 0.4,
           "zoom": 12,
         }
       `);
@@ -66,15 +66,15 @@ test.each([
       expect(marker?.getAttribute('style')).toBe(`background: ${color}`);
       expect({
         hidden: marker?.getAttribute('aria-hidden'),
-        tabIndex: marker?.tabIndex,
-        tag: marker?.tagName
+        links: template?.content.querySelectorAll('a').length,
+        tabIndex: marker?.tabIndex
       }).toMatchInlineSnapshot(`
-      {
-        "hidden": "true",
-        "tabIndex": -1,
-        "tag": "DIV",
-      }
-    `);
+        {
+          "hidden": "true",
+          "links": 0,
+          "tabIndex": -1,
+        }
+      `);
       const mapLinks = window.document.querySelectorAll(
         'a[aria-label="Открыть поселок на Яндекс.Картах"]'
       );

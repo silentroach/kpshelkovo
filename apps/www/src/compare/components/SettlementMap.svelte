@@ -3,6 +3,7 @@
   import { onMount, onDestroy, tick } from 'svelte';
   import type { Attachment } from 'svelte/attachments';
 
+  import { createOpenMapsControl } from '@/lib/yandex-maps/open-maps-control';
   import {
     installYandexMapsRuntimeHeadPersistence,
     loadYandexMaps,
@@ -163,12 +164,12 @@
   }
 
   async function initializeMap(): Promise<void> {
-    if (!mapContainer || !ymapsLoaded) return;
+    if (destroyed || !mapContainer || !ymapsLoaded) return;
 
     try {
       await waitForStableLayout();
 
-      if (!mapContainer) return;
+      if (destroyed || !mapContainer) return;
 
       const ymaps3 = window.ymaps3;
 
@@ -179,6 +180,7 @@
       }
 
       await ymaps3.ready;
+      if (destroyed || !mapContainer) return;
 
       const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer } = ymaps3;
 
@@ -194,6 +196,11 @@
         [new YMapDefaultSchemeLayer(), new YMapDefaultFeaturesLayer()]
       );
 
+      const currentMap = map;
+      const control = await createOpenMapsControl(ymaps3, 'bottom right');
+      if (destroyed || map !== currentMap) return;
+      map.addChild(control);
+
       syncMarkers(ymaps3);
 
       isLoading = false;
@@ -207,6 +214,7 @@
         });
       }
     } catch (err) {
+      if (destroyed) return;
       if (map) {
         clearMarkers();
         map.destroy();
@@ -226,7 +234,7 @@
   }
 
   async function syncMap(autofit = false): Promise<boolean> {
-    if (!mapContainer) return false;
+    if (destroyed || !mapContainer) return false;
 
     const ymaps3 = window.ymaps3;
     if (!ymaps3) {
@@ -236,9 +244,9 @@
     }
 
     try {
-      if (!map) {
+      if (!map || mapInitialization) {
         await initMap();
-        if (!map) return false;
+        if (destroyed || !map) return false;
         if (!autofit) return true;
       }
 

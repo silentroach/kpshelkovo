@@ -4,8 +4,13 @@ import { Window } from 'happy-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
+import { PLACE_MARKER_IMAGES } from '@/components/places/marker-images';
+// @ts-expect-error Astro modules are resolved by Astro/Vitest at test time.
+import PlacePreview from '@/components/places/PlacePreview.astro';
 import type { PlaceContact, PlaceOpeningHours } from '@/lib/places/types';
 import { createAstroContainer } from '@/test/astro-container';
+
+import { testPlace } from './place.test-helper';
 
 const fixture = vi.hoisted(() => ({
   place: {
@@ -82,6 +87,80 @@ const originalPlace = { ...fixture.place };
 afterEach(() => {
   Object.assign(fixture.place, originalPlace);
   fixture.neighbors = [];
+});
+
+describe('place preview marker', () => {
+  it.each([
+    'https://yandex.ru/maps/org/123/?from=source',
+    'https://example.com/location/plan',
+    undefined
+  ])('preserves the resolved place URL %s on the root link', async (mapUrl) => {
+    const place = testPlace({
+      ...(mapUrl ? { mapUrl } : {}),
+      marker: 'fish',
+      openingHours: { periods: [{ days: ['mon'], opensAt: '09:00', closesAt: '18:00' }] },
+      geometry: {
+        area: {
+          precision: 'approximate',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [38, 55],
+                [39, 55],
+                [38, 56],
+                [38, 55]
+              ]
+            ]
+          }
+        }
+      }
+    });
+    const container = await createAstroContainer();
+    const html = await container.renderToString(PlacePreview, { props: { place } });
+    const window = new Window();
+    try {
+      window.document.body.innerHTML = html;
+      const preview = window.document.querySelector('map-preview');
+      const template = preview?.querySelector('template');
+      const marker = template?.content.querySelector('a');
+      expect(marker?.getAttribute('href')).toBe(
+        mapUrl ?? 'https://yandex.ru/maps/?pt=38,55&z=18&l=map'
+      );
+      expect({
+        rootLink: template?.content.firstElementChild === marker,
+        hidden: marker?.hasAttribute('aria-hidden'),
+        tabIndex: marker?.tabIndex,
+        target: marker?.getAttribute('target'),
+        rel: marker?.getAttribute('rel'),
+        draggable: marker?.getAttribute('draggable'),
+        named: marker?.getAttribute('aria-label')?.includes(place.name),
+        titled: marker?.getAttribute('title')?.includes(place.name)
+      }).toMatchInlineSnapshot(`
+        {
+          "draggable": "false",
+          "hidden": false,
+          "named": true,
+          "rel": "noopener noreferrer",
+          "rootLink": true,
+          "tabIndex": 0,
+          "target": "_blank",
+          "titled": true,
+        }
+      `);
+      expect(marker?.querySelector('img')?.getAttribute('src')).toBe(PLACE_MARKER_IMAGES.fish.src);
+      expect(marker?.querySelector('img')?.getAttribute('alt')).toBe('');
+      expect(marker?.querySelector('.place-preview__closed-indicator')).toBeTruthy();
+      expect(JSON.parse(preview?.getAttribute('data-preview') ?? '{}')).toMatchObject({
+        coordinates: place.coordinates,
+        geometry: place.geometry,
+        openingHours: place.openingHours,
+        interactive: true
+      });
+    } finally {
+      await window.happyDOM.close();
+    }
+  });
 });
 
 describe('/map/[slug]/', () => {

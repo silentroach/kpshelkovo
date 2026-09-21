@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import type {
   MapEvents,
+  YMapControlsProps,
   YMapDefaultSchemeLayerProps,
   YMapFeatureProps,
   YMapMarkerProps,
@@ -75,7 +76,7 @@ const mount = (
   const element = document.createElement('test-map-preview');
   element.dataset.preview = JSON.stringify(data);
   element.innerHTML =
-    '<div data-canvas inert></div><div data-fallback><p data-message></p><a href="https://yandex.ru/maps/?original">Map</a></div><template><span></span></template>';
+    '<div data-canvas inert></div><div data-fallback><p data-message></p><a href="https://yandex.ru/maps/?original">Map</a></div><template><a href="https://yandex.ru/maps/?original" target="_blank" rel="noopener noreferrer" title="Место на карте" aria-label="Место на карте"><img src="/marker.png" alt="" /></a></template>';
   if (!fallback) element.querySelector('[data-fallback]')?.remove();
   setSize(element, 640, 240);
   document.body.append(element);
@@ -93,7 +94,13 @@ const setupMaps = () => {
   const feature = vi.fn(function (_props: YMapFeatureProps) {});
   const listener = vi.fn(function (_props: Pick<MapEvents, 'onResize' | 'onStateChanged'>) {});
   const scheme = vi.fn(function (_props: YMapDefaultSchemeLayerProps) {});
+  const controls = vi.fn(function (_props: YMapControlsProps, _children: readonly unknown[]) {});
+  const openButton = vi.fn(function (_props: { readonly title: string }) {});
+  const extras = { YMapOpenMapsButton: openButton };
+  const importModule = vi.fn(async (_module: string) => extras);
   vi.stubGlobal('ymaps3', {
+    import: importModule,
+    YMapControls: controls,
     YMap: create,
     YMapDefaultSchemeLayer: Object.assign(scheme, { defaultProps: { source: 'scheme' } }),
     YMapDefaultFeaturesLayer: vi.fn(function () {}),
@@ -101,7 +108,18 @@ const setupMaps = () => {
     YMapMarker: marker,
     YMapListener: listener
   });
-  return { create, marker, feature, listener, destroy, update, setBehaviors };
+  return {
+    create,
+    marker,
+    feature,
+    listener,
+    destroy,
+    update,
+    setBehaviors,
+    controls,
+    importModule,
+    extras
+  };
 };
 
 afterEach(() => {
@@ -285,7 +303,7 @@ it.each([
     expect(marker.mock.calls[0]?.[0].coordinates).toEqual([37, 55]);
     const canvas = element.querySelector<HTMLElement>('[data-canvas]')!;
     const button = document.createElement('button');
-    button.innerHTML = '<span class="ymaps3--open-maps-button">Open Maps</span>';
+    button.innerHTML = '<span class="ymaps3--open-maps-button">Яндекс Карты</span>';
     const logo = document.createElement('a');
     logo.className = 'ymaps3--map-copyrights__logo';
     canvas.append(button, logo);
@@ -390,6 +408,41 @@ it('leaves ordinary and pinch wheel events to the browser on a fixed background'
   expect(setBehaviors).not.toHaveBeenCalled();
 });
 
+it.each([true, false])(
+  'preserves the native menu only for a root marker link (link: %s)',
+  async (link) => {
+    const { marker } = setupMaps();
+    vi.mocked(loadYandexMaps).mockResolvedValue();
+    const element = mount({ coordinates: { lng: 37, lat: 55 } }, false);
+    if (!link) element.querySelector('template')!.innerHTML = '<span><img alt="" /></span>';
+    approach(element);
+    await Promise.resolve();
+    const content = marker.mock.calls[0]![1];
+    const canvas = element.querySelector<HTMLElement>('[data-canvas]')!;
+    const sdkMenu = vi.fn((event: Event) => event.preventDefault());
+    canvas.addEventListener('contextmenu', sdkMenu);
+    canvas.append(content);
+
+    const menu = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+    content.querySelector('img')!.dispatchEvent(menu);
+    expect(menu.defaultPrevented).toBe(!link);
+    expect(sdkMenu).toHaveBeenCalledTimes(link ? 0 : 1);
+
+    sdkMenu.mockClear();
+    const backgroundMenu = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
+    canvas.dispatchEvent(backgroundMenu);
+    expect(sdkMenu).toHaveBeenCalledOnce();
+    expect(backgroundMenu.defaultPrevented).toBe(true);
+
+    const sdkPointer = vi.fn();
+    canvas.addEventListener('pointerdown', sdkPointer);
+    const pointer = new PointerEvent('pointerdown', { bubbles: true, cancelable: true });
+    content.dispatchEvent(pointer);
+    expect(sdkPointer).toHaveBeenCalledOnce();
+    expect(pointer.defaultPrevented).toBe(false);
+  }
+);
+
 it('positions the canonical center with margins on either side of the container', () => {
   for (const anchor of [
     [0.75, 0.2],
@@ -413,6 +466,109 @@ it('passes the event copyright position to the SDK', async () => {
   await Promise.resolve();
   expect(create.mock.calls[0]?.[1].copyrightsPosition).toBe('bottom right');
 });
+
+it.each(['top right', 'bottom right'] as const)(
+  'installs the compact native control at %s before handing off from the fallback',
+  async (position) => {
+    const { create, controls, importModule, extras, listener } = setupMaps();
+    const imported = Promise.withResolvers<typeof extras>();
+    importModule.mockReturnValueOnce(imported.promise);
+    vi.mocked(loadYandexMaps).mockResolvedValue();
+    const element = mount({ coordinates: { lng: 37, lat: 55 }, distributionPosition: position });
+    approach(element);
+    await Promise.resolve();
+
+    const canvas = element.querySelector<HTMLElement>('[data-canvas]')!;
+    const fallback = element.querySelector<HTMLElement>('[data-fallback]')!;
+    const fallbackLink = fallback.querySelector('a')!;
+    fallbackLink.focus();
+    const automatic = document.createElement('button');
+    automatic.innerHTML = '<span class="ymaps3--open-maps-button">Открыть Яндекс Карты</span>';
+    canvas.append(automatic);
+    listener.mock.calls[0]?.[0].onStateChanged?.({
+      getLayerState: () => ({ tilesReady: 1, tilesTotal: 1, tilesLoaded: 1 })
+    });
+    expect(fallback.hidden).toBe(false);
+    expect(controls).not.toHaveBeenCalled();
+
+    imported.resolve(extras);
+    await vi.waitFor(() => expect(controls).toHaveBeenCalledOnce());
+    expect(controls.mock.calls[0]?.[0]).toEqual({ position });
+    expect(create.mock.results[0]?.value.addChild).toHaveBeenCalledWith(controls.mock.instances[0]);
+    expect(fallback.hidden).toBe(false);
+    expect(document.activeElement).toBe(fallbackLink);
+
+    const compact = document.createElement('button');
+    compact.innerHTML = '<span class="ymaps3--open-maps-button">Яндекс Карты</span>';
+    compact.disabled = true;
+    canvas.append(compact);
+    await new Promise((resolve) => window.setTimeout(resolve, 0));
+    expect(fallback.hidden).toBe(false);
+    compact.disabled = false;
+    await vi.waitFor(() => expect(document.activeElement).toBe(compact));
+    expect(fallback.hidden).toBe(true);
+    expect(fallbackLink.href).toBe('https://yandex.ru/maps/?original');
+  }
+);
+
+it('restores the original fallback after control import failure and retries on reconnect', async () => {
+  const { controls, importModule, destroy } = setupMaps();
+  importModule.mockRejectedValueOnce(new Error('Control unavailable'));
+  vi.mocked(loadYandexMaps).mockResolvedValue();
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+  const element = mount();
+  approach(element);
+  await vi.waitFor(() => expect(destroy).toHaveBeenCalledOnce());
+  const fallback = element.querySelector<HTMLElement>('[data-fallback]')!;
+  expect({
+    hidden: fallback.hidden,
+    href: fallback.querySelector('a')?.getAttribute('href'),
+    inert: element.querySelector<HTMLElement>('[data-canvas]')?.inert
+  }).toMatchInlineSnapshot(`
+    {
+      "hidden": false,
+      "href": "https://yandex.ru/maps/?original",
+      "inert": true,
+    }
+  `);
+  expect(controls).not.toHaveBeenCalled();
+  element.remove();
+  document.body.append(element);
+  approach(element);
+  await vi.waitFor(() => expect(controls).toHaveBeenCalledOnce());
+  expect(importModule).toHaveBeenCalledTimes(2);
+});
+
+it.each(['resolve', 'reject'] as const)(
+  'ignores a stale control import %s after reconnect',
+  async (outcome) => {
+    const { create, controls, importModule, extras, destroy } = setupMaps();
+    const imported = Promise.withResolvers<typeof extras>();
+    importModule.mockReturnValueOnce(imported.promise);
+    vi.mocked(loadYandexMaps).mockResolvedValue();
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const element = mount();
+    approach(element);
+    await vi.waitFor(() => expect(importModule).toHaveBeenCalledOnce());
+    const oldMap = create.mock.results[0]!.value;
+    element.remove();
+    expect(destroy).toHaveBeenCalledOnce();
+    oldMap.addChild.mockClear();
+    document.body.append(element);
+    approach(element);
+    await vi.waitFor(() => expect(controls).toHaveBeenCalledOnce());
+    const currentMap = create.mock.results[1]!.value;
+    const currentChildren = currentMap.addChild.mock.calls.length;
+
+    if (outcome === 'resolve') imported.resolve(extras);
+    else imported.reject(new Error('Stale control'));
+    await new Promise((resolve) => window.setTimeout(resolve, 0));
+    expect(oldMap.addChild).not.toHaveBeenCalled();
+    expect(currentMap.addChild).toHaveBeenCalledTimes(currentChildren);
+    expect(destroy).toHaveBeenCalledOnce();
+    expect(log).not.toHaveBeenCalled();
+  }
+);
 
 it('ignores a stale async failure after reconnect and preserves the original fallback', async () => {
   const first = Promise.withResolvers<void>();
@@ -474,6 +630,24 @@ it.each(['tiles first', 'action first'])(
     await ready.promise;
     expect(create).toHaveBeenCalledOnce();
     const content = marker.mock.calls[0]![1];
+    expect(content).toBeInstanceOf(HTMLAnchorElement);
+    expect({
+      href: content.getAttribute('href'),
+      target: content.getAttribute('target'),
+      rel: content.getAttribute('rel'),
+      name: content.getAttribute('aria-label'),
+      title: content.title,
+      image: content.querySelector('img')?.getAttribute('src')
+    }).toMatchInlineSnapshot(`
+      {
+        "href": "https://yandex.ru/maps/?original",
+        "image": "/marker.png",
+        "name": "Место на карте",
+        "rel": "noopener noreferrer",
+        "target": "_blank",
+        "title": "Место на карте",
+      }
+    `);
     expect(content.dataset.open).toBe(scheduled ? 'false' : undefined);
     await vi.advanceTimersByTimeAsync(60_000);
     expect(content.dataset.open).toBe(scheduled ? 'true' : undefined);
@@ -494,7 +668,7 @@ it.each(['tiles first', 'action first'])(
     publishTiles(0, 0);
     expect(fallback?.hidden).toBe(false);
     const button = document.createElement('button');
-    button.innerHTML = '<span class="ymaps3--open-maps-button">Open Maps</span>';
+    button.innerHTML = '<span class="ymaps3--open-maps-button">Яндекс Карты</span>';
     const focus = vi.spyOn(button, 'focus');
     const outside = document.createElement('button');
     document.body.append(outside);
@@ -545,6 +719,12 @@ it.each(['tiles first', 'action first'])(
     expect(create).toHaveBeenCalledTimes(2);
     expect(marker).toHaveBeenCalledTimes(2);
     expect(marker.mock.calls[0]?.[1]).not.toBe(marker.mock.calls[1]?.[1]);
+    expect(marker.mock.calls[1]?.[1].getAttribute('href')).toBe(content.getAttribute('href'));
+    canvas.append(button);
+    listener.mock.calls[1]?.[0].onStateChanged?.({
+      getLayerState: () => ({ tilesReady: 1, tilesTotal: 1, tilesLoaded: 1 })
+    });
+    await vi.waitFor(() => expect(fallback?.hidden).toBe(true));
     expect(vi.getTimerCount()).toBe(scheduled ? 1 : 0);
   }
 );

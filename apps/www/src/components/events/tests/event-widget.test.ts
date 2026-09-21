@@ -41,16 +41,82 @@ describe('shared event widget', () => {
     expect(html).toContain('<map-preview');
   });
 
-  it('keeps the calendar but omits place links and map without a place', async () => {
-    const container = await createAstroContainer();
-    const html = await container.renderToString(EventWidget, {
-      props: { event, newsSlug: event.slug }
-    });
-    expect(html).toContain(`href="${event.icsUrl}"`);
-    expect(html).not.toContain('href="/map/');
-    expect(html).not.toContain('https://yandex.ru');
-    expect(html).not.toContain('<iframe');
-    expect(html).not.toContain('<map-preview');
+  it.each([undefined, 'Площадка у реки'])(
+    'keeps the calendar without inventing a marker for location %s',
+    async (location) => {
+      const container = await createAstroContainer();
+      const html = await container.renderToString(EventWidget, {
+        props: { event: { ...event, location }, newsSlug: event.slug }
+      });
+      expect(html).toContain(`href="${event.icsUrl}"`);
+      expect(html).not.toContain('href="/map/');
+      expect(html.includes('https://yandex.ru/maps/?text=')).toBe(!!location);
+      expect(html).not.toContain('<iframe');
+      expect(html).not.toContain('<map-preview');
+    }
+  );
+
+  describe.each([
+    { placement: 'news', newsSlug: event.slug },
+    { placement: 'detail', newsSlug: undefined }
+  ])('$placement marker', ({ newsSlug }) => {
+    it.each([
+      {
+        kind: 'linked place',
+        record: {
+          ...event,
+          place: testPlace({ name: 'Эко-клуб', mapUrl: 'https://example.com/location/plan' })
+        },
+        mapUrl: 'https://example.com/location/plan'
+      },
+      {
+        kind: 'inline venue',
+        record: { ...event, location: 'Площадка у реки', coordinates: { lat: 54.8, lng: 37.9 } },
+        mapUrl: 'https://yandex.ru/maps/?pt=37.9,54.8&z=16&l=map'
+      },
+      {
+        kind: 'unnamed coordinates',
+        record: { ...event, coordinates: { lat: 54.8, lng: 37.9 } },
+        mapUrl: 'https://yandex.ru/maps/?pt=37.9,54.8&z=16&l=map'
+      }
+    ])(
+      'keeps the $kind marker decorative and preserves the fallback URL',
+      async ({ record, mapUrl }) => {
+        const container = await createAstroContainer();
+        const html = await container.renderToString(EventWidget, {
+          props: { event: record, newsSlug }
+        });
+        const window = new Window();
+        try {
+          window.document.body.innerHTML = html;
+          const preview = window.document.querySelector('map-preview');
+          const template = preview?.querySelector('template');
+          const marker = template?.content.querySelector('span');
+          expect({
+            hidden: marker?.getAttribute('aria-hidden'),
+            links: template?.content.querySelectorAll('a').length,
+            tabIndex: marker?.tabIndex
+          }).toMatchInlineSnapshot(`
+          {
+            "hidden": "true",
+            "links": 0,
+            "tabIndex": -1,
+          }
+        `);
+          const fallback = preview?.querySelector('[data-fallback]');
+          expect(fallback?.getAttribute('href')).toBe(mapUrl);
+          expect(fallback?.textContent.trim()).toBe('Яндекс Карты');
+          expect(
+            [...window.document.querySelectorAll('.news-event-actions a')].map((link) =>
+              link.getAttribute('href')
+            )
+          ).toEqual(newsSlug ? [event.icsUrl] : []);
+          expect(!!window.document.querySelector('.news-event-actions')).toBe(!!newsSlug);
+        } finally {
+          await window.happyDOM.close();
+        }
+      }
+    );
   });
 
   it('sends only the canonical event point, without place icon, areas or live hours', async () => {
@@ -94,7 +160,6 @@ describe('shared event widget', () => {
           },
           "copyrightsPosition": "bottom right",
           "muted": true,
-          "mutedOpacity": 0.4,
           "zoom": 16,
         }
       `);

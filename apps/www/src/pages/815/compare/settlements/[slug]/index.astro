@@ -85,6 +85,9 @@ const distanceFromShelkovo = !isBaseline
 const hasPoint =
   Number.isFinite(settlement.location.lat) &&
   Number.isFinite(settlement.location.lng);
+const mapUrl =
+  settlement.location.mapUrl ??
+  `https://yandex.ru/maps/?pt=${settlement.location.lng},${settlement.location.lat}&z=15&l=map`;
 const company = settlement.managementCompany;
 const companyTitle = company?.title ?? '';
 const companyUrl = company?.url ?? '';
@@ -185,7 +188,6 @@ const assumption = tariffCalc?.assumption;
                 zoom: 12,
                 anchor: [0.8, 0.5],
                 muted: true,
-                mutedOpacity: 0.4,
                 distributionPosition: 'bottom right',
               }}
               label={settlement.name}
@@ -193,7 +195,6 @@ const assumption = tariffCalc?.assumption;
               <div
                 class="ui-map-marker settlement-preview-marker"
                 style={`background: ${isBaseline ? '#064b08' : '#6a502e'}`}
-                title={settlement.name}
                 aria-hidden="true"
               />
             </MapPreview>
@@ -278,8 +279,7 @@ const assumption = tariffCalc?.assumption;
                   )
                 }
                 <a
-                  href={settlement.location.mapUrl ??
-                    `https://yandex.ru/maps/?pt=${settlement.location.lng},${settlement.location.lat}&z=15&l=map`}
+                  href={mapUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Открыть поселок на Яндекс.Картах"
@@ -500,8 +500,7 @@ const assumption = tariffCalc?.assumption;
                 )
               }
               <a
-                href={settlement.location.mapUrl ??
-                  `https://yandex.ru/maps/?pt=${settlement.location.lng},${settlement.location.lat}&z=15&l=map`}
+                href={mapUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Открыть поселок на Яндекс.Картах"
@@ -766,7 +765,7 @@ const assumption = tariffCalc?.assumption;
     background: var(--color-bg);
   }
 
-  .settlement-hero-map :global(canvas),
+  .settlement-hero-map :global(.ymaps3--map),
   .settlement-hero-map :global(.ymaps3--map-copyrights),
   .settlement-hero-map
     :global(.ymaps3--control:has(.ymaps3--open-maps-button)) {

@@ -23,6 +23,7 @@
   import { placeUrl } from '@/lib/places/routes';
   import type { PlaceMarker } from '@/lib/places/schema';
   import { formatPlaceStatus } from '@/lib/places/view';
+  import { createOpenMapsControl } from '@/lib/yandex-maps/open-maps-control';
   import {
     installYandexMapsRuntimeHeadPersistence,
     loadYandexMaps,
@@ -570,6 +571,11 @@
           ]
         );
 
+        const currentMap = map;
+        const control = await createOpenMapsControl(ymaps3, 'bottom right');
+        if (destroyed || map !== currentMap) return;
+        map.addChild(control);
+
         markerContents = places.map((place) => [place, createMarkerContent(place)] as const);
         for (const place of places) {
           const feature = createAreaFeature(place, YMapFeature);
@@ -613,15 +619,14 @@
         }
         isLoading = false;
       } catch (reason) {
+        if (destroyed) return;
         console.error('Places map setup error:', reason);
         clearMap();
 
-        if (!destroyed) {
-          removeHighlightQuery(highlightedPlace?.slug ?? requestedSlug);
-          highlightedPlace = undefined;
-          error = reason instanceof Error ? reason.message : 'Карта недоступна';
-          isLoading = false;
-        }
+        removeHighlightQuery(highlightedPlace?.slug ?? requestedSlug);
+        highlightedPlace = undefined;
+        error = reason instanceof Error ? reason.message : 'Карта недоступна';
+        isLoading = false;
       }
     })();
 

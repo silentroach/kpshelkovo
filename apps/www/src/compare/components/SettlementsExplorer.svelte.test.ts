@@ -18,6 +18,10 @@ const mockMap = {
 
 const mockYandexMaps = {
   ready: Promise.resolve(),
+  import: vi.fn(async () => ({ YMapOpenMapsButton: vi.fn(function () {}) })),
+  YMapControls: vi.fn(function YMapControls() {
+    return {};
+  }),
   YMap: vi.fn(function YMap() {
     return mockMap;
   }),
