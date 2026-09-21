@@ -1,7 +1,7 @@
 /// <reference types="astro/client" />
 
 import { Window } from 'happy-dom';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
 import { buildEventCalendar } from '@/lib/events/calendar-projection';
@@ -66,7 +66,11 @@ describe('event cards', () => {
     expect(text).not.toMatch(/00:00|Бесплатно|состоялось/);
   });
 
-  it('keeps a cancelled card and map but hides the calendar download', async () => {
+  it('keeps a cancelled card and map but hides the calendar download', async ({
+    onTestFinished
+  }) => {
+    const now = vi.spyOn(Date, 'now').mockReturnValue(Date.parse('2026-09-19T12:00:00Z'));
+    onTestFinished(() => now.mockRestore());
     const container = await createAstroContainer();
     const record = event('cancelled', '19.09.2026 17:00', {
       status: 'cancelled',
@@ -87,6 +91,9 @@ describe('event cards', () => {
     expect(document.querySelector('[data-search-title]')?.getAttribute('data-search-title')).toBe(
       `Отменено: ${record.title} — События`
     );
+    expect(
+      document.querySelector('[data-pagefind-root] [data-pagefind-body]')?.textContent
+    ).toContain('Отменено:');
     expect(document.querySelector('aside')?.textContent).toContain(record.location);
     expect(document.querySelector('aside h2')?.textContent.trim()).toBe(record.title);
     expect(document.querySelector('aside h2 a')).toBeFalsy();

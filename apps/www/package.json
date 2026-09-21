@@ -21,7 +21,6 @@
     "test:browser:status-calendar-focus": "playwright test -c playwright.status-calendar-focus.local.config.ts",
     "test:browser:status-calendar-focus:serve": "astro build && ASTRO_PREVIEW_BACKGROUND=0 astro preview --host 127.0.0.1 --port 14332",
     "test:search-quality": "pnpm build && vitest run -c vitest.search-quality.config.ts",
-    "test:search-quality:update": "pnpm build && vitest run -c vitest.search-quality.config.ts -u",
     "test:watch": "vitest",
     "test:visual:status": "playwright test -c playwright.status-visual.local.config.ts",
     "test:visual:status:update": "playwright test -c playwright.status-visual.local.config.ts --update-snapshots",
