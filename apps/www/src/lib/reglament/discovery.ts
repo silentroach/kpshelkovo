@@ -637,7 +637,7 @@ export function detailOpenapi(root: string): Record<string, unknown> {
           operationId: 'getReglamentEstimateDetails2026',
           summary: 'Read reglament estimate details 2026 JSON',
           description:
-            'Возвращает детальные работы, ресурсы, контрольные итоги и нормализованный реестр ссылок на фрагменты исходных PDF.',
+            'Возвращает детальные работы, ресурсы, контрольные итоги и реестр `sources` с фрагментами исходных PDF. Идентификаторы в `source_refs`, в том числе внутри `needs_check`, разрешаются через `sources` того же ответа. ID действует только внутри этого документа: при обновлении набора тот же ID может обозначать другой источник, даже если `schema_version` не изменилась.',
           responses: {
             200: {
               description: 'Детальный JSON сметы регламента 2026',
