@@ -10,6 +10,7 @@ export interface ExplorerClientModule {
 export interface ExplorerBootstrapElements {
   readonly root: HTMLElement;
   readonly error: HTMLElement;
+  readonly message: HTMLElement;
   readonly retry: HTMLButtonElement;
   readonly payloadUrl: string;
 }
