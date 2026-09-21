@@ -1,5 +1,11 @@
 # Результаты проверок
 
+## Удаление standalone pipeline — задача 2.3
+
+- Удалены обе интеграции, их регистрации, virtual declarations, вспомогательные типы, минификатор и тесты специальных dev endpoints.
+- Поиск рабочих ссылок на `retryableSearchDialog`, `retryableSettlementsExplorer`, оба virtual module, `minifyStandaloneGraph`, удалённый тип загрузчика и `graphRetry` по исходникам проекта не дал совпадений.
+- `pnpm typecheck` и `pnpm build` прошли. Сборка: 354 страницы, Pagefind — 231 страница / 7836 слов, как в baseline.
+
 ## Сравнение — задача 2.2
 
 - `pnpm exec vitest run src/compare/client/tests/explorer.test.ts`: 9 passed. Параллельная загрузка, успешная гидрация, повтор только JSON с сохранением загруженного компонента, невосстановимый локально отказ кода/hydration, приоритет JS в обоих порядках двойного отказа, resolve/reject после dispose и отсоединение root.
