@@ -1,5 +1,12 @@
 # Результаты проверок
 
+## Полные проверки — задача 3.5
+
+- `pnpm test`: 7 workspace-задач прошли, `apps/www` — 207 файлов / 1442 теста, shared packages — ещё 117 тестов. Лог `recovery-tests.log` во временном каталоге сессии; сообщения об отказе API карты относятся к тестам отказа, failing tests нет.
+- `pnpm typecheck`: прошёл после всех изменений кода и тестов.
+- `pnpm build`: прошёл после удаления интеграций; последующие полные app-build и `pnpm test:search-quality` также успешно собрали сайт и индекс.
+- Browser-команды: search recovery — 1 passed, compare — 13 passed. Известные исходные search-quality ошибки и точное совпадение нового результата с baseline описаны в 3.4.
+
 ## Dev и поисковая выдача — задача 3.4
 
 - Ограниченный временный harness: 2 passed. Для наличия и отсутствия snapshot вызван действующий `pagefindDevSnapshot` hook с `command: dev`, его `vite.define` передан обычному Vite middleware-mode pipeline без HTTP listener. Реальный `pagefindSearchClient` через `ssrLoadModule` вернул соответственно `ready` и `devUnavailable`. Подменялась только проверка наличия `.cache/pagefind/pagefind.js`; пользовательский snapshot не менялся. Harness удалён после проверки, `pnpm dev` не запускался.
