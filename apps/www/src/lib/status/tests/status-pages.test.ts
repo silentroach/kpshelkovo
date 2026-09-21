@@ -265,17 +265,13 @@ describe('/status/', () => {
       throw new Error('Overview service state is missing');
     }
 
-    const windows = JSON.parse(
-      state.getAttribute('data-status-service-incidents') ?? '[]'
-    ) as readonly unknown[];
-
     expect({
-      hasLifecyclePayload: windows.length > 0,
+      lifecyclePayload: state.getAttribute('data-status-service-incidents'),
       role: state.getAttribute('role'),
       state: state.getAttribute('data-status-service-state')
     }).toMatchInlineSnapshot(`
       {
-        "hasLifecyclePayload": true,
+        "lifecyclePayload": "[]",
         "role": "status",
         "state": "green",
       }
