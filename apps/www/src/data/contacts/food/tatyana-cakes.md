@@ -6,8 +6,16 @@ summary: 'Классические торты на заказ и готовые 
 contacts:
   phone: '89969670018'
   telegram: 'https://t.me/tortgreen'
-updated_at: '2026-09-05'
+updated_at: '2026-09-21'
 reviews:
+  - sentiment: 'positive'
+    summary: 'Заказанные на выходные медовик и десерты «Павлова» понравились.'
+    published_at: '2026-09-20'
+    url: 'https://t.me/shelkovoecoclub/15261/55997'
+  - sentiment: 'positive'
+    summary: 'Особенно понравился «Наполеон».'
+    published_at: '2026-09-20'
+    url: 'https://t.me/shelkovoecoclub/15261/55999'
   - sentiment: 'positive'
     summary: 'Торт на день рождения дочери понравился и оформлением, и вкусом: не слишком сладкий. С Татьяной было приятно общаться.'
     published_at: '2026-07-19'
