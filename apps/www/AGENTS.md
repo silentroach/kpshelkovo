@@ -31,7 +31,7 @@ pnpm typecheck
 ## Правила
 
 - Compare данные живут в `src/data/compare`, logic/components — в `src/compare`, routes — в `src/pages/815/compare`.
-- Перед изменением Pagefind, поискового UI, индексируемой metadata, весов, quality-матрицы или `search_aliases` подключать skill `site-search`; сначала снимать production baseline, затем сравнивать выдачу после правки.
+- При изменении поискового кода и UI, разметки индексирования, metadata, правил корпуса, весов, настроек или версии Pagefind, поисковых тестов и `search_aliases` подключать skill `site-search`; он задаёт ручную проверку релевантности до/после по запросам задачи и проверку пользы алиасов. Обычное пополнение материалов по действующим правилам само по себе не требует поисковой приёмки.
 - Compare URL/base задается в `src/compare/lib/url.ts`; не завязывать его на Astro `base`.
 - Для CSS-владения следовать [ADR-034](../../docs/decisions/034-native-css-architecture.md): глобальные tokens, reset, site-level `ui-*` и generated-content styles принадлежат `apps/www`, а reusable package-компоненты владеют scoped CSS и документируют нужные semantic properties.
 - Для imports внутри `apps/www/src` предпочитать alias `@/…` вместо длинных relative-путей; относительные imports оставлять только для соседних файлов и путей вне `src`.

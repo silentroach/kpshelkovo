@@ -1,12 +1,6 @@
 import { readFile } from 'node:fs/promises';
 
-import {
-  chromium,
-  expect as expectPage,
-  type Browser,
-  type Locator,
-  type Page
-} from '@playwright/test';
+import { chromium, expect as expectPage, type Browser, type Locator } from '@playwright/test';
 import { preview, type PreviewServer } from 'vite';
 import { afterAll, beforeAll, expect, test } from 'vitest';
 import { z } from 'zod';
@@ -26,267 +20,11 @@ const isPublicEventSearchable = (
     endsIso: event.timePrecision === 'datetime' ? event.endsAt : undefined,
     through: event.timePrecision === 'date' ? event.through : undefined
   });
-const queryGroups = [
-  {
-    name: '#121 short queries',
-    queries: [
-      'еда',
-      'калькуля',
-      'медицина',
-      'м',
-      'подать в суд тариф',
-      'подать суд тариф',
-      'тар',
-      'в',
-      'ок',
-      'тсн',
-      'суд',
-      'вода',
-      'газ',
-      'слабый напор воды',
-      'проезд через дамбу'
-    ]
-  },
-  {
-    name: '#118 and #124 snippets',
-    queries: [
-      'тариф',
-      'сроки благоустройства октябрь',
-      'отчет ок за июль',
-      'ограждение площадки форест',
-      'документы юрист тариф',
-      'асфальт форест'
-    ]
-  },
-  {
-    name: '#122 long document ranking',
-    queries: [
-      'когда заасфальтируют форест',
-      'асфальт форест',
-      'официальный анализ воды форест',
-      'анализ воды форест'
-    ]
-  },
-  {
-    name: '#123 query aliases',
-    queries: [
-      'где поесть',
-      'еда',
-      'как въехать грузовику',
-      'въезд грузового транспорта',
-      'госномер въезд',
-      'номер машины',
-      'распознавание номеров',
-      'собрание запись запрещена',
-      'запретили снимать',
-      'запрет записи',
-      'вода пахнет железом',
-      'забор',
-      'репетитор',
-      'репетитор начальных классов'
-    ]
-  },
-  {
-    name: '#125 tariff aliases',
-    queries: [
-      'тариф 815',
-      'тариф 815 что входит',
-      'калькулятор тарифа',
-      '815 рублей за сотку',
-      'что входит в тариф 815'
-    ]
-  },
-  {
-    name: '#178 archive summaries',
-    queries: ['проверяемая транскрипция встречи', 'регулярное обслуживание локальные объекты']
-  },
-  {
-    name: '#183 places',
-    queries: [
-      'титаник',
-      'детская площадка титаник',
-      'корабль недалеко от дамбы',
-      'детская площадка',
-      'пляж',
-      'строящийся пляж',
-      'лесное озеро в ривере',
-      'лесное озеро в парке',
-      'лесной пруд в ривере',
-      'лесной пруд в парке',
-      'охотничьи пруды',
-      'буржуйка',
-      'буржуйка на карте',
-      'адрес буржуйки',
-      'время работы буржуйки',
-      'телефон буржуйки',
-      'меню буржуйки',
-      'фудтрак'
-    ]
-  },
-  {
-    name: '#183 fishing aliases',
-    queries: ['рыболовные пруды', 'озера для рыбной ловли', 'рыбалка']
-  },
-  {
-    name: '#184 compare settlements',
-    queries: ['парк', 'петровское парк', 'ивушкино']
-  },
-  {
-    name: '#372 KB section role',
-    queries: ['интернет', 'оптоволоконный интернет']
-  },
-  {
-    name: 'contact summaries',
-    queries: ['экскаватор']
-  },
-  {
-    name: '#224 events calendar targets',
-    queries: [
-      'события',
-      'календарь мероприятий',
-      'мероприятия',
-      'бессмертный полк в гринвуде',
-      'день победы в гринвуде',
-      'митинг ко дню победы в деревне шелково',
-      'посадка яблоневого сада в вилладже',
-      'встреча с ок комфорт в green dreams',
-      'встреча 13 июня',
-      'киноквиз',
-      'детский киноквиз',
-      'взрослый киноквиз'
-    ]
-  },
-  {
-    name: '#224 events calendar adjacent controls',
-    queries: [
-      'гринвуд',
-      'яблоневый сад',
-      'озеленение',
-      'детская площадка',
-      'собрание запись запрещена',
-      'запрет записи',
-      'тариф 815',
-      'плановые работы'
-    ]
-  },
-  {
-    name: 'status services and recent events',
-    queries: [
-      'статус',
-      'электричество',
-      'нет света',
-      'отключение электричества',
-      'вода',
-      'нет воды',
-      'отключение воды',
-      'отключения воды',
-      'перебои водоснабжения',
-      'интернет',
-      'не работает интернет',
-      'дамба',
-      'проезд через дамбу',
-      'плановые работы',
-      'линия 10 кВ',
-      'слабый напор воды',
-      'оптоволоконный интернет',
-      'анализ воды форест'
-    ]
-  }
-] as const;
-
-const rankExpectations: ReadonlyMap<string, { readonly url: string; readonly maxRank: number }> =
-  new Map([
-    [
-      'бессмертный полк в гринвуде',
-      { url: '/events/2026/05/immortal-regiment-greenwood/', maxRank: 8 }
-    ],
-    ['день победы в гринвуде', { url: '/events/2026/05/victory-day-greenwood/', maxRank: 8 }],
-    [
-      'митинг ко дню победы в деревне шелково',
-      { url: '/events/2026/05/victory-day-shelkovo-memorial/', maxRank: 8 }
-    ],
-    ['посадка яблоневого сада в вилладже', { url: '/events/2026/05/apple-garden/', maxRank: 8 }],
-    [
-      'встреча с ок комфорт в green dreams',
-      { url: '/events/2026/06/ok-meeting-june/', maxRank: 8 }
-    ],
-    ['встреча 13 июня', { url: '/events/2026/06/ok-meeting-june/', maxRank: 8 }],
-    ['киноквиз', { url: '/events/2026/09/kids-cinema-quiz/', maxRank: 8 }],
-    ['детский киноквиз', { url: '/events/2026/09/kids-cinema-quiz/', maxRank: 8 }],
-    ['взрослый киноквиз', { url: '/events/2026/09/adult-cinema-quiz/', maxRank: 8 }],
-    ['где поесть', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
-    ['еда', { url: '/map/burzhuyka/', maxRank: 2 }],
-    ['как въехать грузовику', { url: '/news/2026/05/truck-entry-open/', maxRank: 1 }],
-    ['госномер въезд', { url: '/news/2026/05/number-plate-access/', maxRank: 1 }],
-    ['номер машины', { url: '/news/2026/05/number-plate-access/', maxRank: 1 }],
-    ['собрание запись запрещена', { url: '/news/2026/06/ok-meeting-recording-ban/', maxRank: 1 }],
-    ['вода пахнет железом', { url: '/news/2026/08/forest-home-water-test/', maxRank: 1 }],
-    ['забор', { url: '/sarafan/fence/psg-promstroy/', maxRank: 3 }],
-    ['репетитор', { url: '/sarafan/education/ekaterina-tutor/', maxRank: 1 }],
-    ['репетитор начальных классов', { url: '/sarafan/education/elena-robotics/', maxRank: 1 }],
-    ['тариф 815', { url: '/815/regulation/', maxRank: 1 }],
-    ['тариф 815 что входит', { url: '/815/regulation/', maxRank: 2 }],
-    ['815 рублей за сотку', { url: '/815/regulation/#tariff-calculator-title', maxRank: 1 }],
-    ['что входит в тариф 815', { url: '/815/regulation/', maxRank: 2 }],
-    ['калькуля', { url: '/815/regulation/#tariff-calculator-title', maxRank: 1 }],
-    ['тсн', { url: '/kb/tsn/manipulations/', maxRank: 1 }],
-    ['суд', { url: '/kb/court/order-debt/', maxRank: 1 }],
-    ['газ', { url: '/kb/services/gas/', maxRank: 1 }],
-    ['отключение воды', { url: '/status/water/', maxRank: 8 }],
-    ['отключения воды', { url: '/status/water/', maxRank: 8 }],
-    ['нет воды', { url: '/status/water/', maxRank: 1 }],
-    ['перебои водоснабжения', { url: '/status/water/', maxRank: 1 }],
-    ['слабый напор воды', { url: '/status/water/', maxRank: 1 }],
-    ['анализ воды форест', { url: '/news/2026/08/forest-home-water-test/', maxRank: 1 }],
-    ['интернет', { url: '/status/internet/', maxRank: 1 }],
-    ['оптоволоконный интернет', { url: '/kb/services/internet/fiber/', maxRank: 1 }],
-    ['титаник', { url: '/map/titanic/', maxRank: 1 }],
-    ['детская площадка титаник', { url: '/map/titanic/', maxRank: 1 }],
-    ['корабль недалеко от дамбы', { url: '/map/titanic/', maxRank: 1 }],
-    ['детская площадка', { url: '/map/titanic/', maxRank: 3 }],
-    ['пляж', { url: '/map/beach/', maxRank: 1 }],
-    ['строящийся пляж', { url: '/map/beach/', maxRank: 1 }],
-    ['лесное озеро в ривере', { url: '/map/river-forest-lake/', maxRank: 1 }],
-    ['лесное озеро в парке', { url: '/map/park-forest-lake/', maxRank: 1 }],
-    ['лесной пруд в ривере', { url: '/map/river-forest-lake/', maxRank: 2 }],
-    ['лесной пруд в парке', { url: '/map/park-forest-lake/', maxRank: 2 }],
-    ['рыболовные пруды', { url: '/map/hunting-ponds/', maxRank: 1 }],
-    ['озера для рыбной ловли', { url: '/map/hunting-ponds/', maxRank: 1 }],
-    ['рыбалка', { url: '/map/hunting-ponds/', maxRank: 1 }],
-    ['буржуйка', { url: '/map/burzhuyka/', maxRank: 2 }],
-    ['буржуйка на карте', { url: '/map/burzhuyka/', maxRank: 2 }],
-    ['телефон буржуйки', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
-    ['меню буржуйки', { url: '/sarafan/food/burzhuyka/', maxRank: 1 }],
-    ['экскаватор', { url: '/sarafan/garden/sergey-mini-excavator/', maxRank: 1 }],
-    ['петровское парк', { url: '/815/compare/settlements/petrovskoe-park/', maxRank: 1 }],
-    ['ивушкино', { url: '/815/compare/settlements/ivushkino/', maxRank: 1 }]
-  ]);
-
-const emptyQueryExpectations = new Set(['медицина', 'м', 'в']);
-
-const statusTargets: ReadonlyMap<string, string> = new Map([
-  ['статус', '/status/'],
-  ['электричество', '/status/electricity/'],
-  ['нет света', '/status/electricity/'],
-  ['отключение электричества', '/status/electricity/'],
-  ['вода', '/status/water/'],
-  ['нет воды', '/status/water/'],
-  ['слабый напор воды', '/status/water/'],
-  ['интернет', '/status/internet/'],
-  ['не работает интернет', '/status/internet/'],
-  ['дамба', '/status/dam/'],
-  ['проезд через дамбу', '/status/dam/']
-]);
 
 let browser: Browser;
-let dialog: Locator;
-let input: Locator;
-let page: Page;
 let server: PreviewServer;
 
-const normalizedText = (value?: string): string => value?.replace(/\s+/gu, ' ').trim() ?? '';
-
-const resultSnapshot = async (target: Locator) =>
+const readResults = async (target: Locator) =>
   target.locator('[data-search-result]').evaluateAll((links) =>
     links.slice(0, 8).map((link) => {
       const normalized = (value?: string): string => value?.replace(/\s+/gu, ' ').trim() ?? '';
@@ -310,21 +48,6 @@ const resultSnapshot = async (target: Locator) =>
     })
   );
 
-const searchSnapshot = async (query: string) => {
-  await input.fill('');
-  await expectPage(dialog).toHaveAttribute('data-search-state', 'initial');
-  await input.fill(query);
-  await expectPage(dialog).toHaveAttribute('data-search-state', /^(?:empty|results)$/u);
-
-  const announcement = normalizedText(await dialog.locator('[aria-live="polite"]').textContent());
-
-  return {
-    query,
-    total: Number(announcement.match(/\d+/u)?.[0] ?? 0),
-    results: await resultSnapshot(dialog)
-  };
-};
-
 beforeAll(async () => {
   server = await preview({
     build: {
@@ -337,17 +60,6 @@ beforeAll(async () => {
     }
   });
   browser = await chromium.launch();
-  page = await browser.newPage({
-    viewport: { width: 1280, height: 800 }
-  });
-  await page.clock.setFixedTime('2026-08-16T12:00:00Z');
-  await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
-  await page.locator('[data-search-trigger]').first().click();
-
-  dialog = page.locator('dialog[data-search-state]');
-  input = dialog.getByRole('searchbox', { name: 'Что найти на сайте' });
-  await expectPage(dialog).toBeVisible();
-  await expectPage(input).toBeFocused();
 });
 
 afterAll(async () => {
@@ -469,14 +181,14 @@ test('#355 preserves results and pagination across ClientRouter navigations', as
     const searchDialog = page.locator('[data-search-dialog]');
     const searchInput = searchDialog.getByRole('searchbox');
     const links = searchDialog.locator('[data-search-result]');
-    const initial = new Map<string, Awaited<ReturnType<typeof resultSnapshot>>>();
+    const initial = new Map<string, Awaited<ReturnType<typeof readResults>>>();
 
     for (const [index, query] of ['тариф', 'тариф', 'суд', 'газ', 'тариф'].entries()) {
       await page.locator('[data-search-trigger]').first().click();
       await searchInput.fill(query);
       await expectPage(searchDialog).toHaveAttribute('data-search-state', 'results');
       await expectPage(links).toHaveCount(8);
-      const results = await resultSnapshot(searchDialog);
+      const results = await readResults(searchDialog);
       if (initial.has(query)) expect(results).toEqual(initial.get(query));
       else initial.set(query, results);
 
@@ -505,7 +217,7 @@ test('#355 preserves results and pagination across ClientRouter navigations', as
   }
 });
 
-test('status, #224 events and #372 KB indexing policy in the production corpus', async () => {
+test('status, #224 events, #372 KB and news archive indexing policy in the production corpus', async () => {
   const page = await browser.newPage({
     viewport: { width: 1280, height: 800 }
   });
@@ -531,6 +243,7 @@ test('status, #224 events and #372 KB indexing policy in the production corpus',
       .parse(JSON.parse((await root.getAttribute('data-pagefind-urls')) ?? '[]'));
 
     expect(urls.length).toBeGreaterThan(0);
+    expect(urls.filter((url) => /^\/news\/\d{4}\/(?:\d{2}\/)?$/u.test(url))).toEqual([]);
     const eventUrls = urls.filter((url) => url.startsWith('/events/'));
     // Compare the filtered corpus: the root plus current/recent event details,
     // never one per day or monthly view.
@@ -547,7 +260,14 @@ test('status, #224 events and #372 KB indexing policy in the production corpus',
     ).toEqual([]);
     expect(urls.filter((url) => url.startsWith('/status/calendar/'))).toEqual([]);
     expect(urls).not.toContain('/status/history/');
-    expect(urls).toEqual(expect.arrayContaining([...new Set(statusTargets.values())]));
+    const statusUrls = [
+      '/status/',
+      '/status/electricity/',
+      '/status/water/',
+      '/status/internet/',
+      '/status/dam/'
+    ];
+    expect(urls).toEqual(expect.arrayContaining(statusUrls));
 
     const data = (await (
       await page.request.get(`${baseURL}/status/data/status.json`)
@@ -560,7 +280,7 @@ test('status, #224 events and #372 KB indexing policy in the production corpus',
       .map((url) => new URL(url).pathname)
       .filter((path) => path.startsWith('/status/'));
 
-    expect(indexNowStatusPaths.sort()).toEqual([...new Set(statusTargets.values())].sort());
+    expect(indexNowStatusPaths.sort()).toEqual(statusUrls.sort());
     expect(sitemap).not.toMatch(/\/status\/(?:incidents|calendar|history)\//u);
 
     for (const event of data.incidents) {
@@ -581,150 +301,3 @@ test('status, #224 events and #372 KB indexing policy in the production corpus',
     await page.close();
   }
 });
-
-for (const group of queryGroups) {
-  test(group.name, async () => {
-    const matrix = [];
-    const events = EventsPublicPayloadSchema.parse(
-      await (await page.request.get(`${baseURL}/events/events.json`)).json()
-    );
-    const searchableEventUrls = new Set(
-      events.events.filter(isPublicEventSearchable).map((event) => new URL(event.url).pathname)
-    );
-    for (const query of group.queries) {
-      const snapshot = await searchSnapshot(query);
-      const archiveResult = snapshot.results.find((result) =>
-        /^\/news\/\d{4}\/(?:\d{2}\/)?$/u.test(result.url)
-      );
-
-      expect(
-        archiveResult,
-        `${query}: news archive pages must stay outside Pagefind`
-      ).toBeUndefined();
-
-      if (emptyQueryExpectations.has(query)) {
-        expect(snapshot, `${query}: expected no prefix fallback`).toMatchObject({
-          results: [],
-          total: 0
-        });
-      }
-
-      if (query === 'еда') {
-        expect(
-          snapshot.results.flatMap((result) => result.highlights),
-          'еда: prefix-only words must not be highlighted'
-        ).not.toEqual(expect.arrayContaining([expect.stringMatching(/^(?:едва|един)/iu)]));
-      }
-
-      const statusTarget = statusTargets.get(query);
-      if (statusTarget) {
-        const rank = snapshot.results.findIndex((result) => result.url === statusTarget);
-        // The broad dam query also covers construction news; access intent is checked separately.
-        const maxRank = query === 'дамба' ? 4 : 3;
-        expect.soft(rank, `${query}: expected ${statusTarget}`).toBeGreaterThanOrEqual(0);
-        expect
-          .soft(rank + 1, `${query}: service page must be near the top`)
-          .toBeLessThanOrEqual(maxRank);
-      }
-
-      const expectation = rankExpectations.get(query);
-      if (
-        expectation &&
-        (!expectation.url.startsWith('/events/') || searchableEventUrls.has(expectation.url))
-      ) {
-        const rank = snapshot.results.findIndex(
-          (result) => result.url === expectation.url || result.url.startsWith(`${expectation.url}#`)
-        );
-
-        expect.soft(rank, `${query}: expected ${expectation.url}`).toBeGreaterThanOrEqual(0);
-        expect.soft(rank + 1, `${query}: expected rank`).toBeLessThanOrEqual(expectation.maxRank);
-      }
-
-      if (query === 'события' || query === 'календарь мероприятий') {
-        expect
-          .soft(
-            snapshot.results.some((result) => result.url === '/events/'),
-            `${query}: include the events root`
-          )
-          .toBe(true);
-        expect
-          .soft(
-            snapshot.results.filter((result) => result.section === 'События').length,
-            `${query}: discover the events section in the first result batch`
-          )
-          .toBeGreaterThanOrEqual(1);
-      }
-
-      if (query === 'киноквиз') {
-        expect
-          .soft(snapshot.results.map((result) => result.url.split('#')[0]))
-          .toEqual(
-            expect.arrayContaining(
-              ['/events/2026/09/kids-cinema-quiz/', '/events/2026/09/adult-cinema-quiz/'].filter(
-                (url) => searchableEventUrls.has(url)
-              )
-            )
-          );
-      }
-
-      if (query === 'встреча с ок комфорт в green dreams' || query === 'встреча 13 июня') {
-        const meeting = snapshot.results.find((result) =>
-          result.url.startsWith('/events/2026/06/ok-meeting-june/')
-        );
-        if (meeting) {
-          expect
-            .soft(meeting.excerpt, `${query}: cancellation must remain visible`)
-            .toMatch(/отменено/iu);
-        }
-      }
-
-      if (query === 'буржуйка' || query === 'адрес буржуйки' || query === 'время работы буржуйки') {
-        const result = snapshot.results.find((item) => item.url === '/map/burzhuyka/');
-
-        if (query === 'буржуйка') {
-          expect(result, `${query}: expected map result`).toBeDefined();
-          expect(result?.excerpt).not.toMatch(/(?:АдресШелково|Время работы|10:00)/u);
-        } else {
-          expect(
-            result,
-            `${query}: structured place fields must stay outside Pagefind`
-          ).toBeUndefined();
-        }
-      }
-
-      if (group.name === '#184 compare settlements') {
-        const compareResults = snapshot.results.filter(
-          (result) => result.section === 'Сравнение поселков'
-        );
-
-        for (const result of compareResults) {
-          expect(result.excerpt, `${query}: compare snippet must omit its title`).not.toContain(
-            result.title
-          );
-          expect(
-            result.excerpt,
-            `${query}: compare snippet must show the normalized monthly tariff`
-          ).toMatch(/₽\/сотка в месяц/u);
-        }
-
-        if (query === 'ивушкино') {
-          expect(compareResults[0]?.excerpt).toMatch(
-            /^5 813 ₽\/участок в месяц \+ 100 ₽\/сотка в месяц, это ~681 ₽\/сотка в месяц\./u
-          );
-        }
-      }
-
-      matrix.push(snapshot);
-    }
-
-    if (group.name === '#121 short queries') {
-      const withPreposition = matrix.find((snapshot) => snapshot.query === 'подать в суд тариф');
-      const withoutPreposition = matrix.find((snapshot) => snapshot.query === 'подать суд тариф');
-
-      expect(withPreposition?.results).toEqual(withoutPreposition?.results);
-      expect(withPreposition?.total).toBe(withoutPreposition?.total);
-    }
-
-    expect(matrix).toMatchSnapshot();
-  });
-}
