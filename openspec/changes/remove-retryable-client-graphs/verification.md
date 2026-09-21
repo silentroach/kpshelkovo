@@ -1,5 +1,11 @@
 # Результаты проверок
 
+## Локальное восстановление данных — задача 3.3
+
+- `pnpm exec vitest run src/lib/search/tests/client.test.ts src/components/search/tests`: 3 файла, 44 passed. Проверено восстановление runtime/configuration Pagefind, exact search и rejected result data, а также UI поиска.
+- Пройденные browser compare сценарии подтверждают повтор JSON без повторного запроса компонента и повтор API карты без повторной загрузки JSON/компонента.
+- При реальном отказе API карты в локальном просмотре фильтр «Дешевле Шелково» продолжил работать: 64 → 49 карточек, `?price=cheaper`, тот же документ.
+
 ## Production-приёмка и размеры — задача 3.2
 
 - Browser compare suite проверила SSR-карточки без JS, disabled controls, одну гидратированную выдачу, отсутствие hydration/mismatch сообщений, сохранение позиции списка, фильтры и URL-state на mobile/desktop.
