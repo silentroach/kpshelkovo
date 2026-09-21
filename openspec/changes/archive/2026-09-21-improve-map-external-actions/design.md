@@ -10,9 +10,9 @@
 
 Действующие решения:
 
-- [ADR-039](../../../docs/decisions/039-shared-yandex-maps-runtime-and-preview.md): общий runtime, разделение превью и обзорных карт, слоты маркера и fallback, готовность и перенос фокуса.
-- [ADR-028](../../../docs/decisions/028-markdown-first-places-map.md): канонические координаты, иконки и геометрия мест.
-- [ADR-034](../../../docs/decisions/034-native-css-architecture.md): app-owned стили и компоненты карт.
+- [ADR-039](../../../../docs/decisions/039-shared-yandex-maps-runtime-and-preview.md): общий runtime, разделение превью и обзорных карт, слоты маркера и fallback, готовность и перенос фокуса.
+- [ADR-028](../../../../docs/decisions/028-markdown-first-places-map.md): канонические координаты, иконки и геометрия мест.
+- [ADR-034](../../../../docs/decisions/034-native-css-architecture.md): app-owned стили и компоненты карт.
 
 ### Проверенные возможности SDK
 
