@@ -1,5 +1,11 @@
 # Результаты проверок
 
+## Поиск — задача 2.1
+
+- `pnpm exec vitest run src/scripts/tests/site-runtime.test.ts`: 19 passed. Проверены синхронное открытие/фокус, ввод до гидрации, доступное сообщение, отсутствие recovery-кнопки и reload, закрытие с возвратом фокуса, игнорирование завершения после закрытия и Astro swap.
+- Удалены тесты специального cache-busting URL вместе с соответствующим загрузчиком; обычный импорт проверяется далее на production-сборке.
+- `SearchDialog.svelte`: Svelte autofixer не нашёл issues; предложения заменить существующие `bind:this` не относятся к change. Согласованная фраза «Поиск не загрузился. Попробуйте обновить страницу» проверена по `humanizer-ru`: коротко называет проблему и действие, редактура не требуется.
+
 ## Baseline — задача 1.2
 
 - После исходного `pnpm build` выполнен `pnpm exec vitest run -c vitest.search-quality.config.ts` в `apps/www`: 10 passed, 8 failed, 5 snapshot mismatches.
