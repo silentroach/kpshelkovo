@@ -1,6 +1,10 @@
+import { Window } from 'happy-dom';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
+// @ts-expect-error Astro components are resolved by Astro/Vitest at test time.
+import StatusServiceState from '@/components/status/StatusServiceState.astro';
 import { contentDateSchema } from '@/lib/content-date';
+import { createAstroContainer } from '@/test/astro-container';
 
 import { parseStatusIncidentWindows, resolveStatusIncidentState } from '../lifecycle';
 import type { StatusIncidentEntry } from '../load';
@@ -62,6 +66,66 @@ const statusSnapshot = (now: string) => {
 };
 
 describe('status lifecycle boundaries', () => {
+  it.each([
+    [Date.parse(START) - 1, true],
+    [Date.parse(START), true],
+    [Date.parse(END) - 1, true],
+    [Date.parse(END), false]
+  ] as const)('serializes only unfinished snapshot windows at %s', async (now, keepsWindow) => {
+    const data = buildStatusDataset([maintenanceEntry], { now: new Date(now) });
+    const summary = data.byService.get('dam');
+    const container = await createAstroContainer();
+    const document = new Window().document;
+    document.write(await container.renderToString(StatusServiceState, { props: { summary } }));
+
+    expect(
+      document
+        .querySelector('[data-status-service-state-label]')
+        ?.getAttribute('data-status-service-incidents')
+    ).toBe(
+      JSON.stringify(
+        keepsWindow
+          ? [
+              {
+                kind: 'maintenance',
+                start: Date.parse(START),
+                end: Date.parse(END)
+              }
+            ]
+          : []
+      )
+    );
+    expect(summary?.incidents).toHaveLength(1);
+  });
+
+  it.each([Date.parse(START) - 1, Date.parse(END)])(
+    'keeps an open incident in the client payload at %s',
+    async (now) => {
+      const data = buildStatusDataset(
+        [
+          {
+            ...maintenanceEntry,
+            data: { ...maintenanceEntry.data, kind: 'incident', ended_at: undefined }
+          }
+        ],
+        { now: new Date(now) }
+      );
+      const container = await createAstroContainer();
+      const document = new Window().document;
+      document.write(
+        await container.renderToString(StatusServiceState, {
+          props: { summary: data.byService.get('dam') }
+        })
+      );
+
+      expect(
+        document
+          .querySelector('[data-status-service-state-label]')
+          ?.getAttribute('data-status-service-incidents')
+      ).toBe(JSON.stringify([{ kind: 'incident', start: Date.parse(START) }]));
+    }
+  );
+
   it('publishes a future maintenance window as scheduled', () => {
     expect(statusSnapshot('2026-08-26T09:59:59.999+03:00')).toMatchInlineSnapshot(`
         {
