@@ -1,0 +1,242 @@
+// @vitest-environment happy-dom
+
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import { STATUS_AREAS } from '../schema';
+import { hydrateStatusTimelines } from '../timeline.dom';
+import { bindStatusTimelineLazyHydration } from '../timeline.lazy';
+
+const renderTimeline = (root: Document): HTMLElement => {
+  root.body.innerHTML = `
+    <div data-status-timeline data-range-days="10">
+      <div data-status-timeline-track>
+        <button data-status-problem data-status-kind="incident" data-status-service="electricity"
+          data-start="2026-05-09T03:00:00Z" data-end="2026-05-09T04:00:00Z"
+          data-tooltip-service-label="Electricity" data-tooltip-kind-label="Incident"
+          data-tooltip-title="Outage" data-tooltip-phase-label="scheduled"
+          data-tooltip-period-label="03:00–04:00"></button>
+      </div>
+      <div id="tooltip" data-status-timeline-tooltip role="tooltip" aria-hidden="true" hidden>
+        <p><span data-status-tooltip-title></span>
+          <span data-status-tooltip-phase-icon-alert hidden></span>
+          <span data-status-tooltip-phase-icon-check hidden></span>
+          <span data-status-tooltip-title-areas hidden></span></p>
+        <p data-status-tooltip-period></p>
+        <div data-status-tooltip-list hidden></div>
+        <div hidden>${STATUS_AREAS.map((area) => `<span data-status-tooltip-area-template="${area}"><span></span></span>`).join('')}</div>
+      </div>
+    </div>`;
+  return root.querySelector<HTMLElement>('[data-status-problem]')!;
+};
+
+const setup = () => {
+  const root = document.implementation.createHTMLDocument();
+  const trigger = renderTimeline(root);
+  const hydrate = vi.fn(hydrateStatusTimelines);
+  const module = { hydrateStatusTimelines: hydrate };
+  const pending = Promise.withResolvers<typeof module>();
+  const load = vi.fn(() => pending.promise);
+  bindStatusTimelineLazyHydration(root, load);
+  return { root, trigger, hydrate, module, pending, load };
+};
+
+// Drain the current async operation, including its replay, without timing assumptions
+// about the number of promise continuations inside the loader.
+const settle = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
+const intent = (trigger: HTMLElement): boolean =>
+  trigger.dispatchEvent(new Event('pointerover', { bubbles: true }));
+const navigate = async (root: Document): Promise<void> => {
+  root.dispatchEvent(new Event('astro:after-swap'));
+  await settle();
+  root.dispatchEvent(new Event('astro:page-load'));
+  await settle();
+};
+
+afterEach(() => {
+  delete window.__STATUS_TIMELINE_NOW__;
+});
+
+describe('timeline lazy navigation', () => {
+  it('hydrates each new DOM once on navigation and return, reusing the module', async () => {
+    const { root, trigger, hydrate, pending, module, load } = setup();
+    intent(trigger);
+    pending.resolve(module);
+    await settle();
+    expect(hydrate).toHaveBeenCalledTimes(1);
+
+    for (const page of ['service', 'back']) {
+      const next = renderTimeline(root);
+      next.dataset.page = page;
+      hydrate.mockClear();
+      await navigate(root);
+      expect(hydrate).toHaveBeenCalledExactlyOnceWith(root);
+      expect(next.dataset.statusTooltipBound).toBe('true');
+    }
+    expect(load).toHaveBeenCalledTimes(1);
+  });
+
+  it('shares pending interaction and navigation hydration, then opens the first tooltip', async () => {
+    const { root, trigger, hydrate, pending, module } = setup();
+    intent(trigger);
+    await navigate(root);
+    expect(hydrate).not.toHaveBeenCalled();
+    pending.resolve(module);
+    await settle();
+    expect(hydrate).toHaveBeenCalledExactlyOnceWith(root);
+    expect(root.querySelector<HTMLElement>('[role="tooltip"]')?.hidden).toBe(false);
+  });
+
+  it('hydrates only the current DOM after multiple replacements during loading', async () => {
+    const { root, trigger, hydrate, pending, module } = setup();
+    intent(trigger);
+    const replay = vi.fn();
+    trigger.addEventListener('mouseenter', replay);
+    const intermediate = renderTimeline(root);
+    await navigate(root);
+    const current = renderTimeline(root);
+    await navigate(root);
+    pending.resolve(module);
+    await settle();
+
+    expect(hydrate).toHaveBeenCalledExactlyOnceWith(root);
+    expect(intermediate.dataset.statusTooltipBound).toBeUndefined();
+    expect(current.dataset.statusTooltipBound).toBe('true');
+    expect(replay).not.toHaveBeenCalled();
+  });
+
+  it('skips hydration and detached intent after leaving timelines while loading', async () => {
+    const { root, trigger, hydrate, pending, module, load } = setup();
+    intent(trigger);
+    const replay = vi.fn();
+    trigger.addEventListener('mouseenter', replay);
+    root.body.replaceChildren();
+    await navigate(root);
+    pending.resolve(module);
+    await settle();
+    expect(hydrate).not.toHaveBeenCalled();
+    expect(replay).not.toHaveBeenCalled();
+
+    renderTimeline(root);
+    await navigate(root);
+    expect(hydrate).toHaveBeenCalledExactlyOnceWith(root);
+    expect(load).toHaveBeenCalledTimes(1);
+  });
+
+  it('stays lazy through navigation and retries a rejected load on the next intent', async () => {
+    const { root, hydrate, pending, module, load } = setup();
+    await navigate(root);
+    const trigger = renderTimeline(root);
+    await navigate(root);
+    expect(load).not.toHaveBeenCalled();
+
+    intent(trigger);
+    await navigate(root);
+    pending.reject(new Error('Module unavailable'));
+    await settle();
+    expect(hydrate).not.toHaveBeenCalled();
+    expect(load).toHaveBeenCalledTimes(1);
+
+    load.mockResolvedValue(module);
+    intent(trigger);
+    await settle();
+    expect(root.querySelector<HTMLElement>('[role="tooltip"]')?.hidden).toBe(false);
+    expect(hydrate).toHaveBeenCalledExactlyOnceWith(root);
+    await navigate(root);
+    expect(load).toHaveBeenCalledTimes(2);
+  });
+
+  it('uses page-load time when an incident starts or ends after the DOM swap', async () => {
+    window.__STATUS_TIMELINE_NOW__ = Date.parse('2026-05-09T02:00:00Z');
+    const { root, trigger, hydrate, pending, module } = setup();
+    intent(trigger);
+    pending.resolve(module);
+    await settle();
+
+    const states = [];
+    for (const [before, after] of [
+      ['2026-05-09T02:59:59Z', '2026-05-09T03:00:01Z'],
+      ['2026-05-09T03:59:59Z', '2026-05-09T04:00:00Z']
+    ] as const) {
+      const current = renderTimeline(root);
+      hydrate.mockClear();
+      window.__STATUS_TIMELINE_NOW__ = Date.parse(before);
+      root.dispatchEvent(new Event('astro:after-swap'));
+      await settle();
+      expect(hydrate).not.toHaveBeenCalled();
+
+      window.__STATUS_TIMELINE_NOW__ = Date.parse(after);
+      root.dispatchEvent(new Event('astro:page-load'));
+      await settle();
+      expect(hydrate).toHaveBeenCalledExactlyOnceWith(root);
+      current.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+      states.push({
+        phase: current.dataset.tooltipPhaseLabel,
+        label: current.getAttribute('aria-label'),
+        describedBy: current.getAttribute('aria-describedby'),
+        hidden: root.querySelector<HTMLElement>('[role="tooltip"]')?.hidden,
+        alert: root.querySelector<HTMLElement>('[data-status-tooltip-phase-icon-alert]')?.hidden,
+        check: root.querySelector<HTMLElement>('[data-status-tooltip-phase-icon-check]')?.hidden
+      });
+    }
+    expect(states).toMatchInlineSnapshot(`
+      [
+        {
+          "alert": false,
+          "check": true,
+          "describedBy": "tooltip",
+          "hidden": false,
+          "label": "Electricity. Incident. Outage. Статус: идет. 03:00–04:00",
+          "phase": "идет",
+        },
+        {
+          "alert": true,
+          "check": false,
+          "describedBy": "tooltip",
+          "hidden": false,
+          "label": "Electricity. Incident. Outage. Статус: восстановлено. 03:00–04:00",
+          "phase": "восстановлено",
+        },
+      ]
+    `);
+  });
+
+  it('uses module-ready time and preserves the first tooltip after a delayed load', async () => {
+    window.__STATUS_TIMELINE_NOW__ = Date.parse('2026-05-09T02:59:59Z');
+    const { root, trigger, hydrate, pending, module } = setup();
+    intent(trigger);
+    await navigate(root);
+    window.__STATUS_TIMELINE_NOW__ = Date.parse('2026-05-09T04:00:00Z');
+    pending.resolve(module);
+    await settle();
+    expect(hydrate).toHaveBeenCalledExactlyOnceWith(root);
+    expect({
+      phase: trigger.dataset.tooltipPhaseLabel,
+      label: trigger.getAttribute('aria-label'),
+      hidden: root.querySelector<HTMLElement>('[role="tooltip"]')?.hidden,
+      check: root.querySelector<HTMLElement>('[data-status-tooltip-phase-icon-check]')?.hidden
+    }).toMatchInlineSnapshot(`
+      {
+        "check": false,
+        "hidden": false,
+        "label": "Electricity. Incident. Outage. Статус: восстановлено. 03:00–04:00",
+        "phase": "восстановлено",
+      }
+    `);
+  });
+
+  it('refreshes again when an early interaction finishes before page-load', async () => {
+    window.__STATUS_TIMELINE_NOW__ = Date.parse('2026-05-09T03:59:59Z');
+    const { root, trigger, hydrate, pending, module } = setup();
+    root.dispatchEvent(new Event('astro:after-swap'));
+    intent(trigger);
+    pending.resolve(module);
+    await settle();
+    expect(trigger.dataset.tooltipPhaseLabel).toBe('идет');
+
+    window.__STATUS_TIMELINE_NOW__ = Date.parse('2026-05-09T04:00:00Z');
+    root.dispatchEvent(new Event('astro:page-load'));
+    await settle();
+    expect(trigger.dataset.tooltipPhaseLabel).toBe('восстановлено');
+    expect(hydrate).toHaveBeenCalledTimes(2);
+  });
+});

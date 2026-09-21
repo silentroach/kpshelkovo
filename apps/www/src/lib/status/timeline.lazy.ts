@@ -57,6 +57,7 @@ export const bindStatusTimelineLazyHydration = (
   boundDocuments.add(rootDocument);
 
   let domModulePromise: Promise<StatusTimelineDomModule> | undefined;
+  let hydrationPromise: Promise<StatusTimelineDomModule | undefined> | undefined;
   let hasIntentListeners = false;
 
   const removeIntentListeners = (): void => {
@@ -84,21 +85,26 @@ export const bindStatusTimelineLazyHydration = (
   const loadDomModule = async (): Promise<StatusTimelineDomModule | undefined> => {
     try {
       domModulePromise ??= loadStatusTimelineDom();
-
       return await domModulePromise;
     } catch {
       domModulePromise = undefined;
       bindOrHydrate();
-
-      return undefined;
+      return;
     }
   };
 
-  const hydrateLoadedTimelines = async (): Promise<void> => {
-    const domModule = await loadDomModule();
-
-    domModule?.hydrateStatusTimelines(rootDocument);
-  };
+  const hydrateLoadedTimelines = (): Promise<StatusTimelineDomModule | undefined> =>
+    (hydrationPromise ??= (async () => {
+      try {
+        const domModule = await loadDomModule();
+        if (hasStatusTimelines(rootDocument)) {
+          domModule?.hydrateStatusTimelines(rootDocument);
+        }
+        return domModule;
+      } finally {
+        hydrationPromise = undefined;
+      }
+    })());
 
   function handleIntent(event: Event): void {
     const trigger = getStatusTimelineTrigger(event.target || undefined);
@@ -109,12 +115,11 @@ export const bindStatusTimelineLazyHydration = (
 
     removeIntentListeners();
 
-    void loadDomModule().then((domModule) => {
+    void hydrateLoadedTimelines().then((domModule) => {
       if (!domModule) {
         return;
       }
 
-      domModule.hydrateStatusTimelines(rootDocument);
       replayStatusTimelineIntent(trigger, event.type);
     });
   }
@@ -134,6 +139,5 @@ export const bindStatusTimelineLazyHydration = (
   }
 
   bindOrHydrate();
-  rootDocument.addEventListener('astro:after-swap', bindOrHydrate);
   rootDocument.addEventListener('astro:page-load', bindOrHydrate);
 };
