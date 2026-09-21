@@ -57,36 +57,22 @@ test.each([
           },
           "distributionPosition": "bottom right",
           "muted": true,
-          "mutedOpacity": 0.4,
           "zoom": 12,
         }
       `);
       const template = preview?.querySelector('template');
-      const marker = template?.content.querySelector('a');
+      const marker = template?.content.querySelector('div');
       expect(template?.content.childElementCount).toBe(1);
-      expect(marker?.querySelector('span')?.getAttribute('style')).toBe(`background: ${color}`);
-      expect(marker?.getAttribute('href')).toBe(
-        mapUrl ?? 'https://yandex.ru/maps/?pt=37,55&z=15&l=map'
-      );
+      expect(marker?.getAttribute('style')).toBe(`background: ${color}`);
       expect({
-        rootLink: template?.content.firstElementChild === marker,
-        hidden: marker?.hasAttribute('aria-hidden'),
-        tabIndex: marker?.tabIndex,
-        target: marker?.getAttribute('target'),
-        rel: marker?.getAttribute('rel'),
-        draggable: marker?.getAttribute('draggable'),
-        named: marker?.getAttribute('aria-label')?.includes(settlement.name),
-        titled: marker?.getAttribute('title')?.includes(settlement.name)
+        hidden: marker?.getAttribute('aria-hidden'),
+        links: template?.content.querySelectorAll('a').length,
+        tabIndex: marker?.tabIndex
       }).toMatchInlineSnapshot(`
         {
-          "draggable": "false",
-          "hidden": false,
-          "named": true,
-          "rel": "noopener noreferrer",
-          "rootLink": true,
-          "tabIndex": 0,
-          "target": "_blank",
-          "titled": true,
+          "hidden": "true",
+          "links": 0,
+          "tabIndex": -1,
         }
       `);
       const mapLinks = window.document.querySelectorAll(

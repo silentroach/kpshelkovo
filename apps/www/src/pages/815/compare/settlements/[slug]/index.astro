@@ -88,7 +88,6 @@ const hasPoint =
 const mapUrl =
   settlement.location.mapUrl ??
   `https://yandex.ru/maps/?pt=${settlement.location.lng},${settlement.location.lat}&z=15&l=map`;
-const markerLabel = `Открыть карту: ${settlement.name}`;
 const company = settlement.managementCompany;
 const companyTitle = company?.title ?? '';
 const companyUrl = company?.url ?? '';
@@ -189,26 +188,15 @@ const assumption = tariffCalc?.assumption;
                 zoom: 12,
                 anchor: [0.8, 0.5],
                 muted: true,
-                mutedOpacity: 0.4,
                 distributionPosition: 'bottom right',
               }}
               label={settlement.name}
             >
-              <a
-                class="settlement-preview-marker"
-                href={mapUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                draggable="false"
-                aria-label={markerLabel}
-                title={markerLabel}
-              >
-                <span
-                  class="ui-map-marker"
-                  style={`background: ${isBaseline ? '#064b08' : '#6a502e'}`}
-                  aria-hidden="true"
-                />
-              </a>
+              <div
+                class="ui-map-marker settlement-preview-marker"
+                style={`background: ${isBaseline ? '#064b08' : '#6a502e'}`}
+                aria-hidden="true"
+              />
             </MapPreview>
           )
         }
@@ -777,7 +765,7 @@ const assumption = tariffCalc?.assumption;
     background: var(--color-bg);
   }
 
-  .settlement-hero-map :global(canvas),
+  .settlement-hero-map :global(.ymaps3--map),
   .settlement-hero-map :global(.ymaps3--map-copyrights),
   .settlement-hero-map
     :global(.ymaps3--control:has(.ymaps3--open-maps-button)) {
@@ -826,14 +814,8 @@ const assumption = tariffCalc?.assumption;
   }
 
   .settlement-preview-marker {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
     transform: translate(-50%, -50%);
-    pointer-events: auto;
-    cursor: pointer;
-    text-decoration: none;
+    pointer-events: none;
   }
 
   .settlement-hero-content {

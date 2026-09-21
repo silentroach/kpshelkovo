@@ -6,7 +6,11 @@ const { preview, label, class: className, mapUrl, ...rest } = Astro.props;
 
 <map-preview
   {...rest}
-  class:list={['map-preview', className]}
+  class:list={[
+    'map-preview',
+    className,
+    { 'map-preview--muted': preview.muted },
+  ]}
   data-preview={JSON.stringify(preview)}
   role="group"
   aria-label={label}
@@ -59,6 +63,12 @@ const { preview, label, class: className, mapUrl, ...rest } = Astro.props;
   .map-preview__canvas :global(.ymaps3--map) {
     /* The SDK sets touch-action: none inline even with behaviors disabled. */
     touch-action: pan-y !important;
+  }
+
+  .map-preview--muted .map-preview__canvas :global(.ymaps3--map) {
+    /* Composite the opaque marker over the map before fading their shared scene.
+       Native controls and attribution are siblings outside this scene. */
+    opacity: 0.4;
   }
 
   .map-preview__canvas :global(:is(a, button):focus-visible) {

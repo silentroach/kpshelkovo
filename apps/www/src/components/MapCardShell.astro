@@ -2,8 +2,7 @@
 import MapPreview from '@/components/maps/MapPreview.astro';
 import type { MapCardShellProps as Props } from './map-card-shell.types';
 
-const { coordinates, mapUrl, locationName } = Astro.props;
-const markerLabel = `Открыть карту: ${locationName}`;
+const { coordinates, mapUrl } = Astro.props;
 ---
 
 <div
@@ -23,23 +22,12 @@ const markerLabel = `Открыть карту: ${locationName}`;
             zoom: 16,
             anchor: [0.75, 0.45],
             muted: true,
-            mutedOpacity: 0.4,
             copyrightsPosition: 'bottom right',
           }}
           label="Карта места"
           mapUrl={mapUrl}
         >
-          <a
-            class="map-marker-link"
-            href={mapUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            draggable="false"
-            aria-label={markerLabel}
-            title={markerLabel}
-          >
-            <span class="ui-map-marker" aria-hidden="true" />
-          </a>
+          <span class="ui-map-marker" aria-hidden="true" />
           <a
             slot="fallback"
             data-fallback
@@ -77,21 +65,14 @@ const markerLabel = `Открыть карту: ${locationName}`;
   .map-background {
     position: absolute;
     inset: 0;
+    z-index: -1;
     overflow: hidden;
   }
-  .map-background :global(.ymaps3--marker-layer) {
-    /* Keep the link's whole hit area above the event's linked title. */
-    z-index: 1;
-  }
-  .map-marker-link {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
+  .ui-map-marker {
+    --ui-map-marker-size: 18px;
+    display: block;
     transform: translate(-50%, -50%);
-    pointer-events: auto;
-    cursor: pointer;
-    text-decoration: none;
+    pointer-events: none;
   }
   .map-fallback {
     position: absolute;
@@ -112,7 +93,6 @@ const markerLabel = `Открыть карту: ${locationName}`;
     display: none;
   }
   .map-content {
-    position: relative;
     padding: 1rem;
     pointer-events: none;
   }
