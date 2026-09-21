@@ -1,5 +1,12 @@
 # Результаты проверок
 
+## Синхронизация и архив — задача 4.3
+
+- Создана `openspec/specs/client-load-recovery/spec.md`: три требования и семь сценариев, Purpose из delta, без разовых условий. Сравнение delta/main показало только штатную замену заголовков.
+- `pnpm exec openspec validate --specs --strict --no-interactive`: 15 passed.
+- Change перенесён штатной командой `pnpm exec openspec archive remove-retryable-client-graphs --skip-specs --yes` после отдельного sync. Архив: `2026-09-21-remove-retryable-client-graphs`.
+- Проверка после переноса подтвердила 15 основных specs; архивный validator указал только ещё не закрытые завершающие пункты 4.3/4.4. Итоговая валидация архива выполняется после публикации и отметки 4.4.
+
 ## Ревью и соответствие spec — задача 4.2
 
 - Проверен весь diff от `960f6578`, включая новые артефакты и удаляемые файлы; staged/unstaged/untracked проверены отдельно. `git diff --check` чистый. Временные harness удалены. Ревью сложности по `ponytail-review`: новых лишних абстракций нет, отдельный pipeline удалён.
