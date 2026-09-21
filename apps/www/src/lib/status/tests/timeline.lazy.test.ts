@@ -57,6 +57,83 @@ afterEach(() => {
 });
 
 describe('timeline lazy navigation', () => {
+  describe.each([
+    { enter: 'pointerover', exit: 'pointerout', ExitEvent: PointerEvent },
+    { enter: 'focusin', exit: 'focusout', ExitEvent: FocusEvent }
+  ])('$enter lifetime', ({ enter, exit, ExitEvent }) => {
+    it('cancels intent when leaving the marker before page-load', async () => {
+      const { root, trigger, hydrate, pending, module } = setup();
+      intent(trigger);
+      pending.resolve(module);
+      await settle();
+      const next = renderTimeline(root);
+      hydrate.mockClear();
+      root.dispatchEvent(new Event('astro:after-swap'));
+      next.dispatchEvent(new Event(enter, { bubbles: true }));
+      next.dispatchEvent(new ExitEvent(exit, { bubbles: true, relatedTarget: root.body }));
+      root.dispatchEvent(new Event('astro:page-load'));
+      await settle();
+
+      expect(hydrate).toHaveBeenCalledExactlyOnceWith(root);
+      expect(root.querySelector<HTMLElement>('[role="tooltip"]')?.hidden).toBe(true);
+    });
+
+    it.each([false, true])(
+      'cancels intent during module loading (navigation: %s)',
+      async (navigation) => {
+        const { root, trigger, hydrate, pending, module } = setup();
+        if (navigation) {
+          root.dispatchEvent(new Event('astro:after-swap'));
+        }
+        trigger.dispatchEvent(new Event(enter, { bubbles: true }));
+        if (navigation) {
+          root.dispatchEvent(new Event('astro:page-load'));
+        }
+        await settle();
+        trigger.dispatchEvent(new ExitEvent(exit, { bubbles: true, relatedTarget: root.body }));
+        pending.resolve(module);
+        await settle();
+
+        expect(hydrate).toHaveBeenCalledExactlyOnceWith(root);
+        expect(root.querySelector<HTMLElement>('[role="tooltip"]')?.hidden).toBe(true);
+      }
+    );
+
+    it('preserves intent when moving between descendants of the marker', async () => {
+      const { root, trigger, hydrate, pending, module } = setup();
+      const first = root.createElement('span');
+      const second = root.createElement('span');
+      trigger.append(first, second);
+      root.dispatchEvent(new Event('astro:after-swap'));
+      first.dispatchEvent(new Event(enter, { bubbles: true }));
+      first.dispatchEvent(new ExitEvent(exit, { bubbles: true, relatedTarget: second }));
+      root.dispatchEvent(new Event('astro:page-load'));
+      await settle();
+      second.dispatchEvent(new ExitEvent(exit, { bubbles: true, relatedTarget: trigger }));
+      pending.resolve(module);
+      await settle();
+
+      expect(hydrate).toHaveBeenCalledExactlyOnceWith(root);
+      expect(root.querySelector<HTMLElement>('[role="tooltip"]')?.hidden).toBe(false);
+    });
+  });
+
+  it('keeps a tap intent when hover or focus ends during loading', async () => {
+    const { root, trigger, pending, module } = setup();
+    root.dispatchEvent(new Event('astro:after-swap'));
+    trigger.dispatchEvent(new Event('touchstart', { bubbles: true }));
+    trigger.dispatchEvent(
+      new PointerEvent('pointerout', { bubbles: true, relatedTarget: root.body })
+    );
+    root.dispatchEvent(new Event('astro:page-load'));
+    await settle();
+    trigger.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: root.body }));
+    pending.resolve(module);
+    await settle();
+
+    expect(root.querySelector<HTMLElement>('[role="tooltip"]')?.hidden).toBe(false);
+  });
+
   it.each(['pointerover', 'focusin', 'touchstart'])(
     'captures %s on new markers until page-load even when the module is already loaded',
     async (eventType) => {
@@ -150,7 +227,7 @@ describe('timeline lazy navigation', () => {
     expect(root.querySelector<HTMLElement>('[role="tooltip"]')?.hidden).toBe(false);
   });
 
-  it('hydrates only the current DOM after multiple replacements during loading', async () => {
+  it('hydrates the current DOM and replays only its intent after multiple replacements during loading', async () => {
     const { root, trigger, hydrate, pending, module } = setup();
     intent(trigger);
     const replay = vi.fn();
@@ -158,7 +235,11 @@ describe('timeline lazy navigation', () => {
     const intermediate = renderTimeline(root);
     await navigate(root);
     const current = renderTimeline(root);
-    await navigate(root);
+    root.dispatchEvent(new Event('astro:after-swap'));
+    current.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    const currentReplay = vi.fn();
+    current.addEventListener('focusin', currentReplay);
+    root.dispatchEvent(new Event('astro:page-load'));
     pending.resolve(module);
     await settle();
 
@@ -166,6 +247,8 @@ describe('timeline lazy navigation', () => {
     expect(intermediate.dataset.statusTooltipBound).toBeUndefined();
     expect(current.dataset.statusTooltipBound).toBe('true');
     expect(replay).not.toHaveBeenCalled();
+    expect(currentReplay).toHaveBeenCalledTimes(1);
+    expect(root.querySelector<HTMLElement>('[role="tooltip"]')?.hidden).toBe(false);
   });
 
   it('skips hydration and detached intent after leaving timelines while loading', async () => {

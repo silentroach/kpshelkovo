@@ -640,11 +640,10 @@ export const hydrateStatusTimeline = (
       bindStatusTimelineTooltipTrigger(root, node, tooltip);
     }
 
-    hideStatusTimelineSegment(node);
-
     const problemNode = parseStatusTimelineProblemNode(node);
 
     if (!problemNode) {
+      hideStatusTimelineSegment(node);
       return;
     }
 
@@ -664,6 +663,7 @@ export const hydrateStatusTimeline = (
     );
 
     if (!span) {
+      hideStatusTimelineSegment(node);
       return;
     }
 

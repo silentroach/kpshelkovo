@@ -108,13 +108,34 @@ export const bindStatusTimelineLazyHydration = (
       }
     })());
 
-  const hydrateForIntent = (trigger: HTMLElement, eventType: string): void => {
+  const hydrateForIntent = (): void => {
+    const intent = pendingIntent;
+    if (!intent) {
+      return;
+    }
     removeIntentListeners();
     void hydrateLoadedTimelines().then((domModule) => {
+      if (pendingIntent !== intent) {
+        return;
+      }
+      pendingIntent = undefined;
       if (domModule) {
-        replayStatusTimelineIntent(trigger, eventType);
+        replayStatusTimelineIntent(...intent);
       }
     });
+  };
+
+  const cancelIntent = (event: MouseEvent | FocusEvent, sourceEventType: string): void => {
+    if (pendingIntent?.[1] !== sourceEventType) {
+      return;
+    }
+    const [trigger] = pendingIntent;
+    if (
+      getStatusTimelineTrigger(event.target || undefined) === trigger &&
+      !(event.relatedTarget instanceof Node && trigger.contains(event.relatedTarget))
+    ) {
+      pendingIntent = undefined;
+    }
   };
 
   function handleIntent(event: Event): void {
@@ -122,11 +143,10 @@ export const bindStatusTimelineLazyHydration = (
     if (!trigger) {
       return;
     }
-    if (awaitingPageLoad) {
-      pendingIntent = [trigger, event.type];
-      return;
+    pendingIntent = [trigger, event.type];
+    if (!awaitingPageLoad) {
+      hydrateForIntent();
     }
-    hydrateForIntent(trigger, event.type);
   }
 
   function bindOrHydrate(): void {
@@ -145,9 +165,13 @@ export const bindStatusTimelineLazyHydration = (
   }
 
   bindOrHydrate();
+  rootDocument.addEventListener('pointerout', (event) => cancelIntent(event, 'pointerover'), true);
+  rootDocument.addEventListener('focusout', (event) => cancelIntent(event, 'focusin'), true);
   rootDocument.addEventListener('astro:after-swap', () => {
     awaitingPageLoad = true;
-    pendingIntent = undefined;
+    if (!pendingIntent?.[0].isConnected) {
+      pendingIntent = undefined;
+    }
     if (hasStatusTimelines(rootDocument)) {
       addIntentListeners();
     } else {
@@ -156,10 +180,8 @@ export const bindStatusTimelineLazyHydration = (
   });
   rootDocument.addEventListener('astro:page-load', () => {
     awaitingPageLoad = false;
-    const intent = pendingIntent;
-    pendingIntent = undefined;
-    if (intent) {
-      hydrateForIntent(...intent);
+    if (pendingIntent) {
+      hydrateForIntent();
     } else {
       bindOrHydrate();
     }
