@@ -1,7 +1,7 @@
-import { PARCEL_CODE, PARCEL_FEATURES } from './schema';
 import type { ParcelFeature, ParcelStatus } from './schema';
-import { GENPLAN_LOCATIONS, GENPLAN_STATUSES } from './source-schemas';
+import { PARCEL_CODE, PARCEL_FEATURES } from './schema.ts';
 import type { GenplanSnapshot } from './source-schemas';
+import { GENPLAN_LOCATIONS, GENPLAN_STATUSES } from './source-schemas.ts';
 import type { MappedGenplanSnapshot } from './source-types';
 
 const statuses: Record<(typeof GENPLAN_STATUSES)[number], ParcelStatus> = {

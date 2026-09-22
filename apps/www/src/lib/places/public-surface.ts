@@ -1,3 +1,4 @@
+import { parcelMapDataPath } from '@/lib/parcels/routes';
 import type { PublicSurfaceSlice } from '@/lib/public-surface/types';
 
 import {
@@ -37,6 +38,15 @@ export const placesPublicSurfaceSlice = {
       id: 'places:data',
       label: 'Облегчённые данные интерактивной карты',
       path: placesDataPath(),
+      mediaType: 'application/json',
+      cacheClass: 'data',
+      discoveryRoles: ['data-feed'],
+      catalogRole: 'item'
+    },
+    {
+      id: 'places:parcels-data',
+      label: 'Границы и обозначения участков Шелково',
+      path: parcelMapDataPath(),
       mediaType: 'application/json',
       cacheClass: 'data',
       discoveryRoles: ['data-feed'],

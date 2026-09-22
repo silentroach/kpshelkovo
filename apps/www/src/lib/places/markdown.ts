@@ -5,6 +5,7 @@ import {
   serializeMarkdownDocument
 } from '@shelkovo/markdown';
 
+import { parcelMapDataUrl } from '@/lib/parcels/routes';
 import { absoluteUrl } from '@/lib/site';
 
 import { selectMapPlaces } from './map-selection';
@@ -65,6 +66,13 @@ export const buildPlacesMarkdown = (places: readonly Place[]): string => {
     md.paragraph([
       md.text('Данные для интерактивной карты: '),
       md.link(absoluteUrl(placesDataUrl()), absoluteUrl(placesDataUrl()))
+    ]),
+    md.paragraph([
+      md.text('Кадастровые границы участков: '),
+      md.link(absoluteUrl(parcelMapDataUrl()), absoluteUrl(parcelMapDataUrl())),
+      md.text(
+        '. На карте слой включается вручную; поиск по полному коду участка ведёт к его контуру.'
+      )
     ]),
     md.heading(2, 'Места'),
     md.list(

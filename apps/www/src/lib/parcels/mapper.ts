@@ -1,4 +1,4 @@
-import type { ParcelEntry, Parcel } from './types';
+import type { ParcelEntry, Parcel } from './types.ts';
 
 export const mapRawParcel = (entry: ParcelEntry): Parcel => {
   const path = entry.data.code.toLowerCase().replace('-', '/');

@@ -1,8 +1,12 @@
 import { z } from 'astro/zod';
 
-import { RawPolygonGeometrySchema } from '@/lib/geometry/raw-polygon-schema';
-
-import { PARCEL_CADASTRAL_NUMBER, PARCEL_CODE, PARCEL_FEATURES, PARCEL_STATUSES } from './schema';
+import { RawPolygonGeometrySchema } from '../geometry/raw-polygon-schema.ts';
+import {
+  PARCEL_CADASTRAL_NUMBER,
+  PARCEL_CODE,
+  PARCEL_FEATURES,
+  PARCEL_STATUSES
+} from './schema.ts';
 
 const code = z.string().regex(PARCEL_CODE);
 

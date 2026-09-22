@@ -1,6 +1,6 @@
 import { z } from 'astro/zod';
 
-import { PARCEL_CADASTRAL_NUMBER, PARCEL_CODE, PARCEL_PARTS } from './schema';
+import { PARCEL_CADASTRAL_NUMBER, PARCEL_CODE, PARCEL_PARTS } from './schema.ts';
 
 const nonBlank = z.string().trim().min(1);
 const cadastralNumber = z.string().regex(PARCEL_CADASTRAL_NUMBER);
@@ -197,3 +197,14 @@ export type RawNspdFeature = z.output<typeof RawNspdFeatureSchema>;
 export type NspdMetadata = z.output<typeof NspdMetadataSchema>;
 export type GenplanSnapshot = z.output<typeof GenplanSnapshotSchema>;
 export type ParcelMatches = z.output<typeof ParcelMatchesSchema>;
+
+/** Only the source fields we retain; other fields may contain private details. */
+export const GenplanPagePlotSchema = z
+  .object({
+    id: z.string().min(1),
+    cadastral_number: z.string().nullable(),
+    status: z.enum(GENPLAN_STATUSES),
+    location: z.string().trim().pipe(z.enum(GENPLAN_LOCATIONS)),
+    objectprice: z.number().int().nonnegative().nullable()
+  })
+  .passthrough();

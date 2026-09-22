@@ -17,7 +17,12 @@ const displayOffset = z
   })
   .strict()
   .parse(
-    require('yaml').parse(readFileSync(new URL('../yandex-display.yaml', import.meta.url), 'utf8'))
+    require('yaml').parse(
+      readFileSync(
+        new URL('../../../../apps/www/src/config/parcel-map.yaml', import.meta.url),
+        'utf8'
+      )
+    )
   );
 const read = (name: string): string => readFileSync(new URL(`../${name}`, import.meta.url), 'utf8');
 const readRows = (name: string): unknown[] =>

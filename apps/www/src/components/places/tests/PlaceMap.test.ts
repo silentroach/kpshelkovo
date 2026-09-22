@@ -28,7 +28,11 @@ const map = {
   removeChild: vi.fn(),
   update: vi.fn(),
   destroy: vi.fn(),
-  zoom: 15
+  zoom: 15,
+  bounds: [
+    [37.7, 55.04],
+    [37.8, 55.08]
+  ] as [[number, number], [number, number]]
 };
 const nativeControl = {};
 const createControl = vi.fn(function (_props: YMapControlsProps, _children: readonly unknown[]) {
@@ -37,6 +41,7 @@ const createControl = vi.fn(function (_props: YMapControlsProps, _children: read
 const extras = { YMapOpenMapsButton: vi.fn(function () {}) };
 const importModule = vi.fn(async (_module: string) => extras);
 const markerElements: HTMLElement[] = [];
+const markerLocations: Array<{ readonly coordinates: readonly [number, number] }> = [];
 const mapElements: HTMLElement[] = [];
 const mapUpdateHandlers: MapEventUpdateHandler[] = [];
 const areaFeatures: Array<{
@@ -119,6 +124,32 @@ const pondsPlace: PlaceMapItem = {
   },
   url: '/map/hunting-ponds/'
 };
+const parcel = {
+  code: 'SHR-L43',
+  aliases: ['SHR-L44'],
+  part: 'shr',
+  geometry: {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [37.71, 55.06],
+        [37.72, 55.06],
+        [37.72, 55.07],
+        [37.71, 55.06]
+      ]
+    ]
+  },
+  labelCoordinates: [37.715, 55.065]
+};
+const parcelFetch = vi.fn(async (url: string) => {
+  if (url === '/map/data/parcel-search.json') {
+    return Response.json({
+      parcels: [{ code: parcel.code, aliases: parcel.aliases, part: parcel.part }]
+    });
+  }
+  if (url === '/map/data/parcels.json') return Response.json({ parcels: [parcel] });
+  throw new Error(`Unexpected request: ${url}`);
+});
 
 const installYandexMaps = (): void => {
   Object.defineProperty(window, 'ymaps3', {
@@ -152,7 +183,11 @@ const installYandexMaps = (): void => {
         if (props.onUpdate) mapUpdateHandlers.push(props.onUpdate);
         return {};
       }),
-      YMapMarker: vi.fn(function YMapMarker(_: unknown, element: HTMLElement) {
+      YMapMarker: vi.fn(function YMapMarker(
+        props: { readonly coordinates: readonly [number, number] },
+        element: HTMLElement
+      ) {
+        markerLocations.push(props);
         markerElements.push(element);
         return {};
       })
@@ -166,6 +201,7 @@ describe('PlaceMap', () => {
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-08-18T12:00:00.000Z'));
     markerElements.length = 0;
+    markerLocations.length = 0;
     mapElements.length = 0;
     mapUpdateHandlers.length = 0;
     areaFeatures.length = 0;
@@ -173,6 +209,10 @@ describe('PlaceMap', () => {
     schemeLayerProps.length = 0;
     mapProps.length = 0;
     document.documentElement.style.setProperty('--color-water', '#1c668c');
+    document.documentElement.style.setProperty('--color-neutral-soft', '#eef0ec');
+    document.documentElement.style.setProperty('--color-text-muted', '#45564b');
+    document.documentElement.style.setProperty('--color-accent', '#d6a22a');
+    document.documentElement.style.setProperty('--color-accent-text', '#805019');
     window.history.replaceState({}, '', '/map/');
     installYandexMaps();
   });
@@ -183,6 +223,14 @@ describe('PlaceMap', () => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
     document.documentElement.style.removeProperty('--color-water');
+    for (const name of [
+      '--color-neutral-soft',
+      '--color-text-muted',
+      '--color-accent',
+      '--color-accent-text'
+    ]) {
+      document.documentElement.style.removeProperty(name);
+    }
   });
 
   it('renders the place as an accessible detail link and fits its coordinates', async () => {
@@ -927,6 +975,259 @@ describe('PlaceMap', () => {
     });
 
     expect(mapElement.style.getPropertyValue('--place-map-marker-scale')).toBe('1.150');
+  });
+
+  it('loads parcel geometry only when switched on, reuses it after switching off and keeps places', async () => {
+    vi.stubGlobal('fetch', parcelFetch);
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+    expect(parcelFetch).not.toHaveBeenCalled();
+
+    const checkbox = screen.getByRole('checkbox', { name: 'Участки' });
+    await fireEvent.click(checkbox);
+    await waitFor(() =>
+      expect(areaFeatures.some(({ props }) => props.id === 'parcel-SHR-L43')).toBe(true)
+    );
+    expect(parcelFetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcels.json']);
+    expect(map.update.mock.lastCall?.[0].location.bounds).toEqual([
+      [37.715242, 55.059526],
+      [37.717242, 55.061526]
+    ]);
+
+    const feature = areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43');
+    await fireEvent.click(checkbox);
+    expect(map.removeChild).toHaveBeenCalledWith(feature);
+    await fireEvent.click(checkbox);
+    expect(parcelFetch).toHaveBeenCalledTimes(1);
+    expect(markerElements[0]?.getAttribute('href')).toBe(place.url);
+    expect(map.addChild).toHaveBeenCalledWith(nativeControl);
+  });
+
+  it('ignores a parcel response after the layer is disabled or the component unmounts', async () => {
+    const pending = Promise.withResolvers<Response>();
+    const fetch = vi.fn(() => pending.promise);
+    vi.stubGlobal('fetch', fetch);
+    const view = render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+    const checkbox = screen.getByRole('checkbox', { name: 'Участки' });
+    await fireEvent.click(checkbox);
+    await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+    await fireEvent.click(checkbox);
+    pending.resolve(Response.json({ parcels: [parcel] }));
+    await waitFor(() =>
+      expect((screen.getByRole('checkbox', { name: 'Участки' }) as HTMLInputElement).checked).toBe(
+        false
+      )
+    );
+    expect(areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43')).toBeUndefined();
+
+    const later = Promise.withResolvers<Response>();
+    fetch.mockReturnValue(later.promise);
+    await fireEvent.click(checkbox);
+    view.unmount();
+    later.resolve(Response.json({ parcels: [parcel] }));
+    await Promise.resolve();
+    expect(areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43')).toBeUndefined();
+  });
+
+  it('offers a retry after a failed manual request', async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(undefined, { status: 503 }))
+      .mockResolvedValueOnce(Response.json({ parcels: [parcel] }));
+    vi.stubGlobal('fetch', fetch);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Участки' }));
+    await screen.findByRole('alert');
+    await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+    await waitFor(() =>
+      expect(areaFeatures.some(({ props }) => props.id === 'parcel-SHR-L43')).toBe(true)
+    );
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows one short label from zoom 17 and one full-code selection for a merged parcel', async () => {
+    vi.stubGlobal('fetch', parcelFetch);
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Участки' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    const update = mapUpdateHandlers[0];
+    if (!update) throw new Error('Map listener missing');
+    expect(markerElements.some((element) => element.classList.contains('parcel-map-label'))).toBe(
+      false
+    );
+    update({
+      type: 'update',
+      location: {
+        center: [37.715, 55.065],
+        zoom: 17,
+        bounds: [
+          [37.7, 55.08],
+          [37.8, 55.04]
+        ]
+      },
+      camera: {},
+      mapInAction: false
+    });
+    const label = markerElements.find((element) => element.classList.contains('parcel-map-label'));
+    expect(label?.textContent).toBe('L43');
+    expect(label?.getAttribute('aria-label')).toBe('Выбрать участок SHR-L43');
+    if (!label) throw new Error('Parcel label missing');
+    const geometry = areaFeatures[0]?.props.geometry;
+    const labelIndex = markerElements.indexOf(label);
+    const labelCoordinates = markerLocations[labelIndex]?.coordinates;
+    if (geometry?.type !== 'Polygon' || !labelCoordinates)
+      throw new Error('Parcel display geometry missing');
+    const vertex = geometry.coordinates[0]?.[0];
+    expect(vertex?.[0] - 37.71).toBeCloseTo(labelCoordinates[0] - 37.715, 9);
+    expect(vertex?.[1] - 55.06).toBeCloseTo(labelCoordinates[1] - 55.065, 7);
+    const labelMarker = map.addChild.mock.lastCall?.[0];
+    await fireEvent.click(label);
+    expect(screen.getByText('SHR-L43 / SHR-L44')).toBeTruthy();
+
+    update({
+      type: 'update',
+      location: { center: [37.715, 55.065], zoom: 16, bounds: map.bounds },
+      camera: {},
+      mapInAction: false
+    });
+    expect(map.removeChild).toHaveBeenCalledWith(labelMarker);
+  });
+
+  it('replaces parcel selection, restarts its timer, and cancels it on unmount', async () => {
+    const secondParcel = {
+      ...parcel,
+      code: 'SHR-L46',
+      aliases: [],
+      labelCoordinates: [37.73, 55.065]
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Response.json({ parcels: [parcel, secondParcel] }))
+    );
+    const setTimeout = vi.spyOn(window, 'setTimeout');
+    const clearTimeout = vi.spyOn(window, 'clearTimeout');
+    const view = render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Участки' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    mapUpdateHandlers[0]?.({
+      type: 'update',
+      location: { center: [37.715, 55.065], zoom: 17, bounds: map.bounds },
+      camera: {},
+      mapInAction: false
+    });
+
+    const firstLabel = markerElements.find((element) => element.title === parcel.code);
+    const secondLabel = markerElements.find((element) => element.title === secondParcel.code);
+    if (!firstLabel || !secondLabel) throw new Error('Parcel labels missing');
+    await fireEvent.click(firstLabel);
+    const firstTimerIndex = setTimeout.mock.calls.findIndex(([, delay]) => delay === 5_000);
+    const firstTimer = setTimeout.mock.results[firstTimerIndex]?.value;
+
+    await fireEvent.click(secondLabel);
+    expect(screen.getByText('SHR-L46')).toBeTruthy();
+    expect(clearTimeout).toHaveBeenCalledWith(firstTimer);
+    expect(setTimeout.mock.calls.filter(([, delay]) => delay === 5_000)).toHaveLength(2);
+    expect(areaFeatures[0]?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.16 });
+    expect(areaFeatures[1]?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+
+    const secondTimerIndex = setTimeout.mock.calls.findLastIndex(([, delay]) => delay === 5_000);
+    const secondTimer = setTimeout.mock.results[secondTimerIndex]?.value;
+    view.unmount();
+    expect(clearTimeout).toHaveBeenCalledWith(secondTimer);
+  });
+
+  it('focuses alias links after resolving the dictionary, survives resize, and preserves URL state', async () => {
+    vi.stubGlobal('fetch', parcelFetch);
+    vi.stubGlobal('matchMedia', (query: string) => ({ matches: query.includes('reduced-motion') }));
+    const historyState = { navigation: 'parcel' };
+    window.history.replaceState(historyState, '', '/map/?q=a%20b&flag&p=shr-l44&h=burzhuyka#map');
+    const replace = vi.spyOn(window.history, 'replaceState');
+    const timeout = vi.spyOn(window, 'setTimeout');
+    render(PlaceMap, { props: { places: [place] } });
+
+    await waitFor(() => expect(screen.getByText('SHR-L43 / SHR-L44')).toBeTruthy());
+    expect(parcelFetch.mock.calls.map(([url]) => url)).toEqual([
+      '/map/data/parcel-search.json',
+      '/map/data/parcels.json'
+    ]);
+    expect(
+      map.update.mock.calls.find(([props]) => props.location?.duration === 0 && props.margin)?.[0]
+    ).toMatchObject({ location: { duration: 0, bounds: expect.any(Array) } });
+    expect(markerElements[0]?.dataset.highlighted).toBeUndefined();
+
+    const count = map.update.mock.calls.length;
+    document.dispatchEvent(new Event('astro:page-load'));
+    await waitFor(() => expect(map.update.mock.calls.length).toBe(count));
+
+    const timerIndex = timeout.mock.calls.findIndex(([, delay]) => delay === 5000);
+    const expire = timeout.mock.calls[timerIndex]?.[0];
+    const timer = timeout.mock.results[timerIndex]?.value;
+    if (typeof expire !== 'function') throw new Error('Parcel timeout missing');
+    window.clearTimeout(timer);
+    expire();
+    expect(replace.mock.lastCall).toEqual([historyState, '', '/map/?q=a%20b&flag&h=burzhuyka#map']);
+    document.dispatchEvent(new Event('astro:page-load'));
+    expect(map.update.mock.calls.length).toBe(count);
+  });
+
+  it('discards an unknown link before loading geometry without changing layer visibility', async () => {
+    vi.stubGlobal('fetch', parcelFetch);
+    window.history.replaceState({}, '', '/map/?p=SHR-L99&flag');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(window.location.search).toBe('?flag'));
+    expect(parcelFetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcel-search.json']);
+    expect((screen.getByRole('checkbox', { name: 'Участки' }) as HTMLInputElement).checked).toBe(
+      false
+    );
+    expect(areaFeatures).toHaveLength(0);
+  });
+
+  it('keeps a direct-link intent after a failed dictionary request and retries it', async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(undefined, { status: 503 }))
+      .mockImplementation(parcelFetch);
+    vi.stubGlobal('fetch', fetch);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    window.history.replaceState({}, '', '/map/?p=SHR-L44&from=search');
+    render(PlaceMap, { props: { places: [place] } });
+
+    await screen.findByRole('alert');
+    expect(window.location.search).toBe('?p=SHR-L44&from=search');
+    await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+    await waitFor(() => expect(screen.getByText('SHR-L43 / SHR-L44')).toBeTruthy());
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+      '/map/data/parcel-search.json',
+      '/map/data/parcel-search.json',
+      '/map/data/parcels.json'
+    ]);
+  });
+
+  it('treats a dictionary/geometry mismatch as retryable data error', async () => {
+    const fetch = vi
+      .fn()
+      .mockImplementationOnce(parcelFetch)
+      .mockResolvedValueOnce(Response.json({ parcels: [] }))
+      .mockImplementation(parcelFetch);
+    vi.stubGlobal('fetch', fetch);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    window.history.replaceState({}, '', '/map/?p=SHR-L43');
+    render(PlaceMap, { props: { places: [place] } });
+
+    await screen.findByRole('alert');
+    expect(window.location.search).toBe('?p=SHR-L43');
+    await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+    await waitFor(() => expect(screen.getByText('SHR-L43 / SHR-L44')).toBeTruthy());
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+      '/map/data/parcel-search.json',
+      '/map/data/parcels.json',
+      '/map/data/parcels.json'
+    ]);
   });
 
   it('renders an accessible cluster that zooms to its places', async () => {

@@ -14,6 +14,8 @@
   import { onMount } from 'svelte';
   import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
+  import { getUrlWithoutParcel, PARCEL_QUERY_PARAM } from '@/lib/parcels/parcel-url';
+  import { PARCEL_CODE } from '@/lib/parcels/schema';
   import type {
     PlaceMapPublicItemDto,
     PlaceMapPublicPayloadDto
@@ -30,6 +32,7 @@
     waitForStableLayout
   } from '@/lib/yandex-maps/runtime';
 
+  import type { ParcelLayer, ParcelMapPayload, ParcelSearchPayload } from './parcel-layer-types';
   import {
     createMapFeatures,
     getMarkerScale,
@@ -53,6 +56,8 @@
   const AREA_HOVER_LEAVE_DELAY_MS = 80;
   const MARKER_MAX_ZOOM = 16;
   const PLACE_FOCUS_ZOOM = MARKER_MAX_ZOOM;
+  const PARCEL_DATA_URL = '/map/data/parcels.json';
+  const PARCEL_SEARCH_URL = '/map/data/parcel-search.json';
   const toPlaceMapItem = (place: PlaceMapPublicItemDto): PlaceMapItem => ({
     slug: place.slug,
     name: place.name,
@@ -120,6 +125,12 @@
   let clusterFocusFrame: number | undefined;
   let isLoading = $state(true);
   let error: string | undefined = $state(undefined);
+  let parcelsEnabled = $state(false);
+  let parcelsLoading = $state(false);
+  let parcelsError = $state(false);
+  let selectedParcel = $state('');
+  let toggleParcels: (checked: boolean) => void;
+  let retryParcels = $state<() => void>(() => {});
   let errorPlace = $derived(places[0] ?? fallbackPlace);
 
   const mapBehaviors = (): ymaps3.BehaviorType[] => [
@@ -456,11 +467,132 @@
 
   onMount(() => {
     let destroyed = false;
+    let parcelRequest = 0;
+    let parcelLayer: ParcelLayer | undefined;
+    let parcelData: ParcelMapPayload | undefined;
+    let parcelDictionary: ParcelSearchPayload | undefined;
+    let pendingParcelCode: string | undefined;
+    let pendingParcelCanonical: string | undefined;
+    let preserveParcelCamera = false;
+    const requestedParcelCode =
+      new URL(window.location.href).searchParams.get(PARCEL_QUERY_PARAM) || undefined;
+    const parcelCode = requestedParcelCode?.toUpperCase();
+    const removeParcelQuery = (code?: string): void => {
+      const url = getUrlWithoutParcel(window.location.href, code);
+      if (url) window.history.replaceState(window.history.state, '', url);
+    };
+    const loadParcelDictionary = async (): Promise<ParcelSearchPayload> => {
+      if (parcelDictionary) return parcelDictionary;
+      const [response, { ParcelSearchPublicSchema }] = await Promise.all([
+        fetch(PARCEL_SEARCH_URL),
+        import('@/lib/parcels/map-public-schema')
+      ]);
+      if (!response.ok) throw new Error('Не удалось загрузить номера участков');
+      const payload = ParcelSearchPublicSchema.parse(await response.json());
+      if (!destroyed) parcelDictionary = payload;
+      return payload;
+    };
+    const loadParcelData = async (): Promise<ParcelMapPayload> => {
+      if (parcelData) return parcelData;
+      const [response, { ParcelMapPublicSchema }] = await Promise.all([
+        fetch(PARCEL_DATA_URL),
+        import('@/lib/parcels/map-public-schema')
+      ]);
+      if (!response.ok) throw new Error('Не удалось загрузить участки');
+      const payload = ParcelMapPublicSchema.parse(await response.json());
+      if (!destroyed) parcelData = payload;
+      return payload;
+    };
+    const enableParcels = async (code?: string): Promise<void> => {
+      const request = ++parcelRequest;
+      parcelsEnabled = true;
+      parcelsLoading = true;
+      parcelsError = false;
+      try {
+        if (!map || !mapContainer) return;
+        let canonical: string | undefined;
+        if (code) {
+          const dictionary = await loadParcelDictionary();
+          if (destroyed || request !== parcelRequest) return;
+          canonical = dictionary.parcels.find(
+            (item) => item.code === code || item.aliases.includes(code)
+          )?.code;
+          if (!canonical) {
+            removeParcelQuery(requestedParcelCode);
+            pendingParcelCode = undefined;
+            parcelsEnabled = false;
+            return;
+          }
+        }
+        const data = await loadParcelData();
+        if (destroyed || request !== parcelRequest || !map || !mapContainer) return;
+        if (!parcelLayer) {
+          const { createParcelLayer } = await import('./parcel-layer');
+          if (destroyed || request !== parcelRequest || !map || !mapContainer) return;
+          parcelLayer = createParcelLayer(
+            map,
+            window.ymaps3,
+            mapContainer,
+            (text) => (selectedParcel = text ?? ''),
+            (selectedCode) => {
+              if (pendingParcelCode && selectedCode === pendingParcelCanonical) {
+                removeParcelQuery(pendingParcelCode);
+                pendingParcelCode = undefined;
+                pendingParcelCanonical = undefined;
+              }
+            },
+            getViewMargin,
+            getMapZoomDuration
+          );
+        }
+        parcelLayer.enable(data.parcels);
+        parcelLayer.updateViewport(map.zoom, map.bounds);
+        if (canonical) {
+          if (!parcelLayer.focus(canonical)) {
+            parcelLayer.disable();
+            parcelData = undefined;
+            throw new Error('Номер найден, но контур участка недоступен');
+          }
+          preserveParcelCamera = true;
+          pendingParcelCode = requestedParcelCode;
+          pendingParcelCanonical = canonical;
+        }
+      } catch (reason) {
+        if (destroyed || request !== parcelRequest) return;
+        parcelLayer?.disable();
+        console.error('Parcel layer error:', reason);
+        parcelsError = true;
+        parcelsEnabled = false;
+      } finally {
+        if (!destroyed && request === parcelRequest) parcelsLoading = false;
+      }
+    };
+    toggleParcels = (checked: boolean): void => {
+      parcelsEnabled = checked;
+      if (!checked) {
+        parcelRequest++;
+        parcelsLoading = false;
+        parcelsError = false;
+        parcelLayer?.disable();
+        if (pendingParcelCode) {
+          removeParcelQuery(pendingParcelCode);
+          pendingParcelCode = undefined;
+          pendingParcelCanonical = undefined;
+        }
+        return;
+      }
+      void enableParcels(pendingParcelCode ? parcelCode : undefined);
+    };
+    retryParcels = (): void => {
+      void enableParcels(pendingParcelCode ? parcelCode : undefined);
+    };
     let highlightTimer: number | undefined;
     let markerUpdateTimer: number | undefined;
     let resizeObserver: ResizeObserver | undefined;
     const highlightUrl = new URL(window.location.href);
-    const requestedSlug = highlightUrl.searchParams.get(PLACE_HIGHLIGHT_QUERY_PARAM) || undefined;
+    const requestedSlug = !requestedParcelCode
+      ? highlightUrl.searchParams.get(PLACE_HIGHLIGHT_QUERY_PARAM) || undefined
+      : undefined;
     let highlightedPlace: PlaceMapItem | undefined;
 
     const startPlaceHighlight = (place: PlaceMapItem): void => {
@@ -492,6 +624,8 @@
       void waitForStableLayout().then(() => {
         if (destroyed) return;
 
+        if (preserveParcelCamera) return;
+
         if (highlightedPlace) {
           focusPlace(highlightedPlace, 0);
           return;
@@ -520,7 +654,11 @@
           ? places.find((place) => place.slug === requestedSlug)
           : undefined;
 
-        if (highlightUrl.searchParams.has(PLACE_HIGHLIGHT_QUERY_PARAM) && !highlightedPlace) {
+        if (
+          !requestedParcelCode &&
+          highlightUrl.searchParams.has(PLACE_HIGHLIGHT_QUERY_PARAM) &&
+          !highlightedPlace
+        ) {
           removeHighlightQuery(requestedSlug);
         }
 
@@ -589,6 +727,7 @@
           onUpdate: ({ location, mapInAction }) => {
             updateMarkerScale(location.zoom);
             if (!mapInAction) restoreClusterFocus();
+            parcelLayer?.updateViewport(location.zoom, location.bounds);
           }
         });
         mapClusterer = new YMapClusterer({
@@ -618,6 +757,14 @@
           markerUpdateTimer = window.setInterval(refreshMarkerContents, 60_000);
         }
         isLoading = false;
+        if (requestedParcelCode) {
+          if (!parcelCode || !PARCEL_CODE.test(parcelCode)) {
+            removeParcelQuery(requestedParcelCode);
+          } else {
+            pendingParcelCode = requestedParcelCode;
+            void enableParcels(parcelCode);
+          }
+        }
       } catch (reason) {
         if (destroyed) return;
         console.error('Places map setup error:', reason);
@@ -632,6 +779,8 @@
 
     return () => {
       destroyed = true;
+      parcelRequest++;
+      parcelLayer?.destroy();
       document.removeEventListener('astro:page-load', refresh);
       resizeObserver?.disconnect();
       if (highlightTimer !== undefined) {
@@ -666,6 +815,25 @@
   {/if}
 
   <div bind:this={mapContainer} class="place-map__canvas"></div>
+  {#if !error}
+    <div class="parcel-map-controls">
+      <label class="parcel-map-toggle">
+        <input
+          type="checkbox"
+          checked={parcelsEnabled}
+          onchange={(event) => toggleParcels(event.currentTarget.checked)}
+          disabled={isLoading}
+        />
+        Участки
+      </label>
+      {#if parcelsLoading}<span role="status">Загружаем участки…</span>{/if}
+      {#if parcelsError}
+        <span role="alert">Не удалось загрузить участки.</span>
+        <button type="button" onclick={retryParcels}>Повторить</button>
+      {/if}
+      <span aria-live="polite" class="parcel-map-selection">{selectedParcel}</span>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -681,6 +849,65 @@
     container-type: inline-size;
     width: 100%;
     height: 100%;
+  }
+
+  .parcel-map-controls {
+    position: absolute;
+    top: 4.5rem;
+    left: 1rem;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: min(90%, 26rem);
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 0.875rem;
+  }
+
+  .parcel-map-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+  .parcel-map-toggle input {
+    accent-color: var(--color-primary);
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .parcel-map-controls button {
+    border: 0;
+    background: none;
+    color: var(--color-primary);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .parcel-map-controls :is(input, button):focus-visible {
+    outline: 0.1875rem solid var(--color-focus);
+    outline-offset: 0.125rem;
+  }
+  .parcel-map-selection {
+    flex-basis: 100%;
+    font-weight: 600;
+  }
+
+  :global(.parcel-map-label) {
+    padding: 0.25rem 0.4rem;
+    border: 1px solid var(--color-neutral-border);
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.25;
+    transform: translate(-50%, -50%);
   }
 
   .place-map__canvas :global(:is(a, button):focus-visible) {

@@ -3,13 +3,13 @@ import { join } from 'node:path';
 
 import { parse as parseYaml } from 'yaml';
 
-import { PARCEL_PARTS } from './schema';
+import { PARCEL_PARTS } from './schema.ts';
 import {
   GenplanSnapshotSchema,
   NspdMetadataSchema,
   ParcelMatchesSchema,
   RawNspdFeatureSchema
-} from './source-schemas';
+} from './source-schemas.ts';
 import type { GenplanSnapshots, NspdSnapshot, ConfirmedMatches } from './source-types';
 
 export const readNspdSnapshot = async (directory: string): Promise<NspdSnapshot> => {

@@ -289,6 +289,7 @@ describe('places Markdown', () => {
     ]);
     expect(markdown).toContain('https://example.com/map/');
     expect(markdown).toContain('https://example.com/map/data/places.json');
+    expect(markdown).toContain('https://example.com/map/data/parcels.json');
     expect(markdown).toContain('https://example.com/map/burzhuyka/index.md');
     expect(markdown).not.toMatch(/^---|\/map\/hidden\/|apps\/www|src\/|repo:/u);
   });

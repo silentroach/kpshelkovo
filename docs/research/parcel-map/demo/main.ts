@@ -1,8 +1,8 @@
 import type { YMapFeature } from '@yandex/ymaps3-types';
 
+import { createDisplayOffset } from '../../../../apps/www/src/lib/parcels/display-offset';
 import { createOpenMapsControl } from '../../../../apps/www/src/lib/yandex-maps/open-maps-control';
 import { loadYandexMaps } from '../../../../apps/www/src/lib/yandex-maps/runtime';
-import { createDisplayOffset } from './display-offset';
 import type { DemoParcel } from './types';
 
 const data = __PARCEL_DEMO__;

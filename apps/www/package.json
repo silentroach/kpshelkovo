@@ -9,6 +9,7 @@
     "search:prepare": "rm -rf ../../.cache/pagefind && astro build && pagefind --output-path ../../.cache/pagefind",
     "preview": "astro preview",
     "typecheck": "astro sync && tsc --noEmit",
+    "parcels:update": "node scripts/parcels/update.ts",
     "test": "vitest run",
     "test:browser:compare": "playwright test -c playwright.compare-browser.local.config.ts",
     "test:browser:compare:serve": "astro build && ASTRO_PREVIEW_BACKGROUND=0 astro preview --host 127.0.0.1 --port 4330",

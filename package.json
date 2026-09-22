@@ -16,6 +16,7 @@
     "format:changed": "lint-staged",
     "test": "turbo run test",
     "test:search-quality": "pnpm --filter @shelkovo/www test:search-quality",
+    "parcels:update": "node apps/www/scripts/parcels/update.ts",
     "test:watch": "turbo run test:watch",
     "agents:setup": "pnpm install --frozen-lockfile && pnpm skills:install && pnpm openspec:generate",
     "skills:install": "node scripts/skills.mjs install",

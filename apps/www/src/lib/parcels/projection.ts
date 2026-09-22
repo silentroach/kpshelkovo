@@ -1,5 +1,4 @@
-import { RawPolygonGeometrySchema } from '@/lib/geometry/raw-polygon-schema';
-
+import { RawPolygonGeometrySchema } from '../geometry/raw-polygon-schema.ts';
 import type { RawNspdFeature } from './source-schemas';
 import type { ParcelGeometry, ParcelPosition } from './types';
 

@@ -1,6 +1,6 @@
 import { getCollection } from 'astro:content';
 
-import { mapRawParcel } from './mapper';
+import { mapRawParcel } from './mapper.ts';
 import type { ParcelEntry, Parcel, ParcelsDataset } from './types';
 
 export const buildParcelsDataset = (entries: readonly ParcelEntry[]): ParcelsDataset => {
