@@ -131,7 +131,7 @@ describe('parcel sources', () => {
               cadastralReference: '50:33:0010101:2998',
               status: 'Свободен',
               location: 'луговой',
-              objectprice: '1000000'
+              objectprice: 1000000
             }
           ]
         });

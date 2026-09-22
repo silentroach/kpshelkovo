@@ -5,6 +5,34 @@ import { PARCEL_CADASTRAL_NUMBER, PARCEL_CODE, PARCEL_PARTS } from './schema';
 const nonBlank = z.string().trim().min(1);
 const cadastralNumber = z.string().regex(PARCEL_CADASTRAL_NUMBER);
 const code = z.string().regex(PARCEL_CODE);
+
+export const GENPLAN_STATUSES = [
+  'Свободен',
+  'Забронирован',
+  'Продан',
+  'Снят с продажи',
+  'Без документов',
+  'Неразобранное',
+  'Закрыто и не реализовано'
+] as const;
+
+export const GENPLAN_LOCATIONS = [
+  'луговой',
+  'деревья на участке',
+  'с лесными деревьями',
+  'лесной участок',
+  'примыкает к лесу',
+  'с видом на лес',
+  'с выходом в лес',
+  'с выходом к реке',
+  'с видом на лес у реки',
+  'с выходом в лес и к реке',
+  'у леса и реки',
+  'с пляжем',
+  'с прудом',
+  'рядом с парком',
+  'в лесном парке'
+] as const;
 const projectedPosition = z.tuple([
   z.number().min(-20_037_509).max(20_037_509),
   z.number().min(-20_037_509).max(20_037_509)
@@ -74,11 +102,11 @@ export const GenplanSnapshotSchema = z
       .array(
         z
           .object({
-            id: nonBlank,
+            id: z.string().min(1),
             cadastralReference: z.string().optional(),
-            status: nonBlank,
-            location: z.string().optional(),
-            objectprice: z.union([z.string(), z.number()]).optional()
+            status: z.enum(GENPLAN_STATUSES),
+            location: z.string().trim().pipe(z.enum(GENPLAN_LOCATIONS)),
+            objectprice: z.number().int().nonnegative().optional()
           })
           .strict()
       )
