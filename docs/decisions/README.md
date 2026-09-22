@@ -6,17 +6,17 @@
 
 - [ADR-001: Упоминания по слагу в Markdown](001-markdown-slug-mentions.md) - принят, 2026-05-13.
 - [ADR-002: Client transitions, hover prefetch и кеширование HTML](002-client-transitions-prefetch-cache.md) - принят; выбор стратегии предзагрузки заменен ADR-032, 2026-05-14.
-- [ADR-003: Слоистый Markdown-рендер](003-markdown-pipeline-layering.md) - принят, 2026-05-14.
+- [ADR-003: Слоистый Markdown-рендер](003-markdown-pipeline-layering.md) - принят, 2026-05-14; рабочие правила — [инструкции приложения](../../apps/www/AGENTS.md#markdown), API — [README пакета](../../packages/markdown/README.md).
 - [ADR-004: Lighthouse-профиль без аналитики](004-lighthouse-analytics-profile.md) - принят, 2026-05-15.
 - [ADR-005: CSP без `unsafe-inline` для исполняемых скриптов](005-csp-inline-script-policy.md) - заменен ADR-017, 2026-05-15.
 - [ADR-006: HSTS без `includeSubDomains` и `preload`](006-hsts-policy.md) - принят, 2026-05-15.
 - [ADR-007: COOP без COEP для изоляции `opener`-связей](007-coop-origin-isolation.md) - принят, 2026-05-15.
-- [ADR-008: Генерация Markdown через AST](008-markdown-ast-generation.md) - принят, 2026-05-14.
+- [ADR-008: Генерация Markdown через AST](008-markdown-ast-generation.md) - принят, 2026-05-14; рабочие правила — [корневые инструкции](../../AGENTS.md#локальные-инструкции), API — [README пакета](../../packages/markdown/README.md).
 - [ADR-009: Markdown через `Accept` negotiation](009-markdown-accept-negotiation.md) - принят, 2026-05-17.
 - [ADR-010: Плановые работы в индикаторе статуса на главной](010-home-status-maintenance-indicator.md) - заменен ADR-031, 2026-05-18.
 - [ADR-011: Реестр публичных поверхностей](011-public-surface-registry.md) - принят, 2026-05-19.
 - [ADR-012: Единый граф упоминаний сущностей в Markdown](012-entity-mention-graph.md) - принят, 2026-05-20.
-- [ADR-013: Граница между внешними DTO, доменной моделью и публичными DTO](013-raw-domain-public-data-boundary.md) - принят, 2026-05-20.
+- [ADR-013: Граница между внешними DTO, доменной моделью и публичными DTO](013-raw-domain-public-data-boundary.md) - принят, 2026-05-20; рабочие правила — [Data Boundaries](../../apps/www/AGENTS.md#data-boundaries).
 - [ADR-014: Transcript-first архив встреч](014-meetings-transcript-first-archive.md) - принят, 2026-06-07.
 - [ADR-015: Markdown-first база знаний поселка](015-markdown-first-knowledge-base.md) - принят, 2026-06-16.
 - [ADR-016: Markdown-first отзывы собственников](016-markdown-first-owner-reviews.md) - принят, 2026-06-25.
