@@ -78,7 +78,7 @@ describe('people public DTO adapters', () => {
   it('documents legacy snake_case names kept in the public people JSON contract', () => {
     const payload = buildPeoplePublicPayload({ profiles: [profile()] });
 
-    expect(payload).toMatchInlineSnapshot(`
+    expect(JSON.parse(JSON.stringify(payload))).toMatchInlineSnapshot(`
       {
         "profiles": [
           {

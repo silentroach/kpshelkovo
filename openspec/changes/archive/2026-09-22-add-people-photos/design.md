@@ -12,11 +12,11 @@
 
 Действующие решения:
 
-- [ADR-013](../../../docs/decisions/013-raw-domain-public-data-boundary.md) — разделение raw, домена и публичных DTO.
-- [ADR-008](../../../docs/decisions/008-markdown-ast-generation.md) и [ADR-011](../../../docs/decisions/011-public-surface-registry.md) — генерация Markdown через AST и согласованность публичных представлений.
-- [ADR-034](../../../docs/decisions/034-native-css-architecture.md) — локальные стили страницы и существующие app-owned tokens.
-- [ADR-021](../../../docs/decisions/021-public-section-files-in-s3.md) — публичные media URL, раздел-владелец и недатированные изменяемые ключи по явному решению владельца. Портреты и их замену описывает [ADR-040](../../../docs/decisions/040-people-portraits-in-public-s3.md).
-- [ADR-023](../../../docs/decisions/023-news-images-in-public-s3.md) — существующий способ подготовки качественной JPEG-копии, который используем и для портретов.
+- [ADR-013](../../../../docs/decisions/013-raw-domain-public-data-boundary.md) — разделение raw, домена и публичных DTO.
+- [ADR-008](../../../../docs/decisions/008-markdown-ast-generation.md) и [ADR-011](../../../../docs/decisions/011-public-surface-registry.md) — генерация Markdown через AST и согласованность публичных представлений.
+- [ADR-034](../../../../docs/decisions/034-native-css-architecture.md) — локальные стили страницы и существующие app-owned tokens.
+- [ADR-021](../../../../docs/decisions/021-public-section-files-in-s3.md) — публичные media URL, раздел-владелец и недатированные изменяемые ключи по явному решению владельца. Портреты и их замену описывает [ADR-040](../../../../docs/decisions/040-people-portraits-in-public-s3.md).
+- [ADR-023](../../../../docs/decisions/023-news-images-in-public-s3.md) — существующий способ подготовки качественной JPEG-копии, который используем и для портретов.
 
 ## Goals / Non-Goals
 

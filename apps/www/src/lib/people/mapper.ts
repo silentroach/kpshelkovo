@@ -100,6 +100,7 @@ export const mapRawPersonProfile = (
     nameCases: entry.data.name_cases,
     company: entry.data.company,
     position: entry.data.position,
+    photo: entry.data.photo,
     url: personUrl(entry.id),
     markdownUrl: personMarkdownUrl(entry.id),
     canonical: personCanonical(entry.id),

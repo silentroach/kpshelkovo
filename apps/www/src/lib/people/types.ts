@@ -23,6 +23,17 @@ export type PersonBacklinkKind = SiteBacklinkKind;
 export type PersonMentionRef = SiteMentionRef;
 export type PersonBacklinks = SiteBacklinks;
 
+export interface PersonPhoto {
+  readonly src: string;
+  /** Фактические размеры опубликованного файла, не CSS-размер портрета. */
+  readonly width: number;
+  readonly height: number;
+  readonly source?: {
+    readonly label: string;
+    readonly url: string;
+  };
+}
+
 export interface PersonProfile {
   readonly id: string;
   readonly slug: string;
@@ -33,6 +44,7 @@ export interface PersonProfile {
   readonly nameCases?: PersonNameCaseForms;
   readonly company?: string;
   readonly position?: string;
+  readonly photo?: PersonPhoto;
   readonly url: string;
   readonly markdownUrl: string;
   readonly canonical: string;
