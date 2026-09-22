@@ -1,0 +1,49 @@
+import { z } from 'astro/zod';
+
+import { RawPolygonGeometrySchema } from '@/lib/geometry/raw-polygon-schema';
+
+import { PARCEL_CODE, PARCEL_FEATURES, PARCEL_STATUSES } from './schema';
+
+const code = z.string().regex(PARCEL_CODE);
+
+export const RawParcelSchema = z
+  .object({
+    code,
+    aliases: z.array(code).default([]),
+    cadastral_number: z.string().regex(/^\d{2}:\d{2}:\d{6,7}:\d+$/),
+    geometry: RawPolygonGeometrySchema,
+    area_m2: z.number().positive().optional(),
+    status: z.enum(PARCEL_STATUSES).optional(),
+    features: z.array(z.enum(PARCEL_FEATURES)).default([]),
+    price_history: z
+      .array(z.object({ on: z.iso.date(), price: z.number().int().positive() }).strict())
+      .default([])
+  })
+  .strict()
+  .superRefine(({ code, aliases, price_history }, ctx) => {
+    const seen = new Set([code]);
+
+    aliases.forEach((alias, index) => {
+      if (seen.has(alias)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['aliases', index],
+          message: `duplicate code ${alias}`
+        });
+      }
+      seen.add(alias);
+    });
+
+    price_history.forEach((observation, index) => {
+      const previous = price_history[index - 1];
+      if (previous && observation.on < previous.on) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['price_history', index],
+          message: 'price history must be ordered by observation date'
+        });
+      }
+    });
+  });
+
+export type RawParcel = z.output<typeof RawParcelSchema>;
