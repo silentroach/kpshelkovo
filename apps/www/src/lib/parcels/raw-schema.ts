@@ -2,7 +2,7 @@ import { z } from 'astro/zod';
 
 import { RawPolygonGeometrySchema } from '@/lib/geometry/raw-polygon-schema';
 
-import { PARCEL_CODE, PARCEL_FEATURES, PARCEL_STATUSES } from './schema';
+import { PARCEL_CADASTRAL_NUMBER, PARCEL_CODE, PARCEL_FEATURES, PARCEL_STATUSES } from './schema';
 
 const code = z.string().regex(PARCEL_CODE);
 
@@ -10,7 +10,7 @@ export const RawParcelSchema = z
   .object({
     code,
     aliases: z.array(code).default([]),
-    cadastral_number: z.string().regex(/^\d{2}:\d{2}:\d{6,7}:\d+$/),
+    cadastral_number: z.string().regex(PARCEL_CADASTRAL_NUMBER),
     geometry: RawPolygonGeometrySchema,
     area_m2: z.number().positive().optional(),
     status: z.enum(PARCEL_STATUSES).optional(),

@@ -22,3 +22,4 @@ export const PARCEL_FEATURES = [
 export type ParcelFeature = (typeof PARCEL_FEATURES)[number];
 
 export const PARCEL_CODE = /^(?:SHR|SHF|SHP|SHV)-[A-Z]+[0-9]+$/;
+export const PARCEL_CADASTRAL_NUMBER = /^\d{2}:\d{2}:\d{6,7}:\d+$/;
