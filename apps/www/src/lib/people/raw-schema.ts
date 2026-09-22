@@ -43,6 +43,11 @@ const personPhoto = z.object({
     .optional()
 });
 
+export const personPhotoSrcSchema = (slug: string) =>
+  z.literal(`https://media.kpshelkovo.online/people/${slug}.jpeg`, {
+    error: `people profile "${slug}" photo.src must use its canonical portrait URL`
+  });
+
 export const RawPersonProfileSchema = z.object({
   name: nonBlankText,
   seo: personSeo().optional(),

@@ -137,6 +137,30 @@ describe('people photos', () => {
   });
 
   it.each([
+    'https://media.kpshelkovo.online/people/another-person.jpeg',
+    'https://media.kpshelkovo.online/news/2026/09/example/portrait.jpeg'
+  ])('rejects a valid media URL that is not this profile’s portrait: %s', (src) => {
+    const data = RawPersonProfileSchema.parse({
+      ...rawProfile,
+      photo: { ...portrait, src }
+    });
+
+    expect(() => mapRawPersonProfile({ id: 'test-person', data }, createSiteMentionRegistry([])))
+      .toThrowErrorMatchingInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_value",
+          "values": [
+            "https://media.kpshelkovo.online/people/test-person.jpeg"
+          ],
+          "path": [],
+          "message": "people profile \\"test-person\\" photo.src must use its canonical portrait URL"
+        }
+      ]]
+    `);
+  });
+
+  it.each([
     { src: 'not-a-url' },
     { src: 'https://example.org/portrait.jpeg' },
     { src: portrait.src.replace('https:', 'http:') },
