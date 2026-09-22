@@ -1,6 +1,7 @@
 import type { EntityMentionTarget } from '../mentions';
 import { absoluteUrl } from '../site';
 import type { PersonNameCaseForms } from './name-cases';
+import type { PeoplePublicPhotoDto } from './public-dto.types';
 import { PERSON_MENTION_SECTIONS } from './schema';
 import type { PersonBacklinks, PersonContact, PersonMentionRef, PersonProfile } from './types';
 
@@ -49,6 +50,7 @@ export interface PeoplePublicProfileDto {
   readonly name_cases?: PersonNameCaseForms;
   readonly company?: string;
   readonly position?: string;
+  readonly photo?: PeoplePublicPhotoDto;
   readonly html_url: string;
   readonly markdown_url: string;
   readonly contacts: readonly PeoplePublicContactDto[];
@@ -123,6 +125,19 @@ const profileDto = (item: PersonProfile): PeoplePublicProfileDto => ({
   ...(item.nameCases ? { name_cases: item.nameCases } : {}),
   ...(item.company ? { company: item.company } : {}),
   ...(item.position ? { position: item.position } : {}),
+  photo: item.photo
+    ? {
+        src: item.photo.src,
+        width: item.photo.width,
+        height: item.photo.height,
+        source: item.photo.source
+          ? {
+              label: item.photo.source.label,
+              url: item.photo.source.url
+            }
+          : undefined
+      }
+    : undefined,
   html_url: item.canonical,
   markdown_url: fullUrl(item.markdownUrl),
   contacts: item.contacts.map(contactDto),

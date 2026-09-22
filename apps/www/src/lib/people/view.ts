@@ -176,6 +176,17 @@ export const buildPersonMarkdown = (profile: PersonProfile): string => {
   return serialize([
     md.heading(1, profile.name),
     ...(headline ? [md.paragraph(headline)] : []),
+    ...(profile.photo
+      ? [md.paragraph([{ type: 'image', url: profile.photo.src, alt: profile.name }])]
+      : []),
+    ...(profile.photo?.source
+      ? [
+          md.paragraph([
+            md.text('Фото: '),
+            md.link(profile.photo.source.url, profile.photo.source.label)
+          ])
+        ]
+      : []),
     ...section(
       'Контакты',
       profile.contacts.length > 0

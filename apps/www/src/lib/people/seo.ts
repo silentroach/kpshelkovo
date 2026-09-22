@@ -14,6 +14,7 @@ interface PersonProfilePageInput {
   readonly description: string;
   readonly company?: string;
   readonly position?: string;
+  readonly image?: string;
   readonly url: string;
   readonly contacts: readonly PersonContact[];
   readonly breadcrumbs?: readonly BreadcrumbLink[];
@@ -36,6 +37,7 @@ const personEntity = (input: PersonProfilePageInput): SchemaDoc => {
     description: input.description,
     url,
     mainEntityOfPage: url,
+    image: input.image,
     ...(input.position ? { jobTitle: input.position } : {}),
     ...(input.company
       ? {

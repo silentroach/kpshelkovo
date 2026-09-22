@@ -74,6 +74,7 @@ const schema = personProfilePageSchema({
   description,
   company: profile.company,
   position: profile.position,
+  image: profile.photo?.src,
   url: profile.url,
   contacts: profile.contacts,
   breadcrumbs: withHomeSchemaBreadcrumbs([
@@ -92,80 +93,97 @@ const schema = personProfilePageSchema({
   search={search}
 >
   <main class="ui-page person-profile">
-    <header class="ui-page-header">
-      <div class="ui-page-header-stack person-profile__header-inner">
-        <Breadcrumbs items={breadcrumbs} />
-
-        <div class="person-profile__intro">
-          <div class="person-profile__heading">
-            <h1 class="ui-page-title" data-pagefind-ignore="all">
-              {profile.name}
-            </h1>
-
-            {
-              headlineHtml && (
-                <p
-                  class="person-profile__headline"
-                  data-pagefind-body
-                  set:html={headlineHtml}
-                />
-              )
-            }
-          </div>
-
-          <section
-            aria-labelledby="person-contacts"
-            class="person-profile__contacts"
-            data-pagefind-ignore="all"
-          >
-            <h2 id="person-contacts" class="ui-section-label">Контакты</h2>
-
-            {
-              profile.contacts.length > 0 ? (
-                <ul class="person-profile__contact-list">
-                  {profile.contacts.map((contact) => (
-                    <li class="person-profile__contact">
-                      {contact.type === 'telegram' ? (
-                        <TelegramIcon class="person-profile__contact-icon person-profile__contact-icon--telegram" />
-                      ) : contact.type === 'phone' ? (
-                        <PhoneIcon class="person-profile__contact-icon person-profile__contact-icon--phone" />
-                      ) : (
-                        <span class="person-profile__contact-type">
-                          {formatPersonContactType(contact.type)}
-                        </span>
-                      )}
-
-                      <a
-                        href={contact.href}
-                        class="person-profile__contact-link"
-                      >
-                        {formatPersonContactCompactDisplay(contact)}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div class="person-profile__empty person-profile__empty--contacts">
-                  Контакты пока не опубликованы.
-                </div>
-              )
-            }
-          </section>
+    <div class="ui-page-header">
+      <div class="person-profile__header-inner">
+        <div class="person-profile__breadcrumbs">
+          <Breadcrumbs items={breadcrumbs} />
         </div>
-      </div>
-    </header>
+        <header class="person-profile__heading">
+          <h1 class="ui-page-title" data-pagefind-ignore="all">
+            {profile.name}
+          </h1>
 
-    {
-      profile.body && (
-        <article class="person-profile__article">
-          <div
-            class={`person-profile__body ${PEOPLE_PROSE}`}
-            data-pagefind-body
-            set:html={bodyHtml}
-          />
-        </article>
-      )
-    }
+          {
+            headlineHtml && (
+              <p
+                class="person-profile__headline"
+                data-pagefind-body
+                set:html={headlineHtml}
+              />
+            )
+          }
+        </header>
+
+        {
+          profile.photo && (
+            <figure class="person-profile__photo">
+              <img
+                src={profile.photo.src}
+                width={profile.photo.width}
+                height={profile.photo.height}
+                alt={profile.name}
+              />
+              {profile.photo.source && (
+                <figcaption>
+                  Фото:{' '}
+                  <a class="site-text-link" href={profile.photo.source.url}>
+                    {profile.photo.source.label}
+                  </a>
+                </figcaption>
+              )}
+            </figure>
+          )
+        }
+
+        <section
+          aria-labelledby="person-contacts"
+          class="person-profile__contacts"
+          data-pagefind-ignore="all"
+        >
+          <h2 id="person-contacts" class="ui-section-label">Контакты</h2>
+
+          {
+            profile.contacts.length > 0 ? (
+              <ul class="person-profile__contact-list">
+                {profile.contacts.map((contact) => (
+                  <li class="person-profile__contact">
+                    {contact.type === 'telegram' ? (
+                      <TelegramIcon class="person-profile__contact-icon person-profile__contact-icon--telegram" />
+                    ) : contact.type === 'phone' ? (
+                      <PhoneIcon class="person-profile__contact-icon person-profile__contact-icon--phone" />
+                    ) : (
+                      <span class="person-profile__contact-type">
+                        {formatPersonContactType(contact.type)}
+                      </span>
+                    )}
+
+                    <a href={contact.href} class="person-profile__contact-link">
+                      {formatPersonContactCompactDisplay(contact)}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div class="person-profile__empty person-profile__empty--contacts">
+                Контакты пока не опубликованы.
+              </div>
+            )
+          }
+        </section>
+
+        {
+          profile.body && (
+            <article class="person-profile__article">
+              <div
+                class={`person-profile__body ${PEOPLE_PROSE}`}
+                data-pagefind-body
+                set:html={bodyHtml}
+              />
+            </article>
+          )
+        }
+      </div>
+    </div>
 
     {
       showBacklinks && (
@@ -250,8 +268,38 @@ const schema = personProfilePageSchema({
     max-width: 56rem;
   }
 
-  .person-profile__intro > :not(:last-child) {
-    margin-block-end: 1rem;
+  .person-profile__header-inner:has(.person-profile__photo) {
+    max-width: none;
+  }
+
+  .person-profile__header-inner {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .person-profile__breadcrumbs {
+    margin-block-end: 0.25rem;
+  }
+
+  .person-profile__photo {
+    width: min(14rem, 100%);
+    margin: 0;
+    align-self: start;
+  }
+
+  .person-profile__photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .person-profile__photo figcaption {
+    margin-block-start: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
   }
 
   .person-profile__heading > :not(:last-child) {
@@ -333,7 +381,7 @@ const schema = personProfilePageSchema({
   }
 
   .person-profile__article {
-    padding-inline: 1.25rem;
+    align-self: start;
   }
 
   .person-profile__backlinks {
@@ -433,16 +481,27 @@ const schema = personProfilePageSchema({
   }
 
   @media (min-width: 48rem) {
+    .person-profile__header-inner:has(.person-profile__photo) {
+      grid-template-columns: minmax(0, 1fr) 14rem;
+      grid-template-rows: auto auto auto 1fr;
+      column-gap: 2rem;
+    }
+
+    .person-profile__photo {
+      grid-column: 2;
+      grid-row: 1 / 5;
+    }
+
+    .person-profile__contacts {
+      align-self: start;
+    }
+
     .person-profile {
       padding-block-end: 3rem;
     }
 
     .person-profile__headline {
       font-size: 1rem;
-    }
-
-    .person-profile__article {
-      padding-inline: 1.5rem;
     }
 
     .person-profile__backlinks {

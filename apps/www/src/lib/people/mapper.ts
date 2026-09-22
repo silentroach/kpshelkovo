@@ -1,5 +1,6 @@
 import { preprocessSiteMarkdownContent } from '../markdown/render';
 import type { SiteMentionRegistry } from '../mentions';
+import { personPhotoSrcSchema } from './raw-schema';
 import type { RawPersonContact, RawPersonProfile } from './raw-schema';
 import { personCanonical, personMarkdownUrl, personUrl } from './routes';
 import { EMPTY_PERSON_BACKLINKS } from './types';
@@ -85,6 +86,10 @@ export const mapRawPersonProfile = (
   entry: RawPersonProfileInput,
   registry: SiteMentionRegistry
 ): PersonProfile => {
+  if (entry.data.photo) {
+    personPhotoSrcSchema(entry.id).parse(entry.data.photo.src);
+  }
+
   const body = preprocessSiteMarkdownContent(
     entry.body ?? '',
     `people profile "${entry.id}" body`,
@@ -100,6 +105,7 @@ export const mapRawPersonProfile = (
     nameCases: entry.data.name_cases,
     company: entry.data.company,
     position: entry.data.position,
+    photo: entry.data.photo,
     url: personUrl(entry.id),
     markdownUrl: personMarkdownUrl(entry.id),
     canonical: personCanonical(entry.id),

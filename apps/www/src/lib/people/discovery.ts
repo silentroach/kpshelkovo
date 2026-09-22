@@ -141,6 +141,15 @@ export function schema(root: string): Record<string, unknown> {
         },
         ['type', 'value', 'display', 'href']
       ),
+      photo: obj(
+        {
+          src: uri(),
+          width: integer(1),
+          height: integer(1),
+          source: obj({ label: text(1), url: uri() }, ['label', 'url'])
+        },
+        ['src', 'width', 'height']
+      ),
       mention: obj(
         {
           type: {
@@ -208,6 +217,11 @@ export function schema(root: string): Record<string, unknown> {
           name: text(1),
           name_cases: {
             $ref: '#/$defs/nameCases'
+          },
+          photo: {
+            $ref: '#/$defs/photo',
+            description:
+              'Необязательный портрет: media URL, размеры файла и источник, если он известен.'
           },
           company: text(1),
           position: text(1),

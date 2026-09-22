@@ -43,3 +43,4 @@
 - [ADR-037: Печать справки и новостей через CSS](037-content-print-css.md) - принят, 2026-09-13.
 - [ADR-038: OpenSpec как единый процесс разработки](038-openspec-development-workflow.md) - принят, 2026-09-14; требования — [agent-tooling](../../openspec/specs/agent-tooling/spec.md), процесс — [AGENTS.md](../../AGENTS.md#жизненный-цикл-изменений), эксплуатация — [окружение разработки](../development.md).
 - [ADR-039: Общий runtime Яндекс Карт и неподвижные превью](039-shared-yandex-maps-runtime-and-preview.md) - принят, 2026-09-18.
+- [ADR-040: Портреты людей в публичном S3](040-people-portraits-in-public-s3.md) - принят, 2026-09-22.

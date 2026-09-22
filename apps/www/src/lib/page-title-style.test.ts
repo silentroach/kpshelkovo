@@ -6,7 +6,11 @@ import { describe, expect, it } from 'vitest';
 
 const srcRoot = fileURLToPath(new URL('../', import.meta.url));
 const sourceExtensions = new Set(['.astro', '.svelte']);
-const pageHeaderExceptions = new Set(['pages/815/compare/settlements/[slug]/index.astro']);
+const pageHeaderExceptions = new Set([
+  'pages/815/compare/settlements/[slug]/index.astro',
+  // Portrait spans the breadcrumbs, heading and details in a page-owned grid.
+  'pages/people/[slug]/index.astro'
+]);
 
 const collectSourceFiles = (directory: string): readonly string[] =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
