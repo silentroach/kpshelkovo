@@ -1,0 +1,150 @@
+{
+  "capturedOn": "2026-09-22",
+  "savedAt": "2026-09-22T14:10:17.875Z",
+  "nspd": {
+    "source": "https://nspd.gov.ru/map",
+    "layerId": 36048,
+    "categoryId": 36368,
+    "endpoint": "https://nspd.gov.ru/api/geoportal/v1/intersects?typeIntersect=fullObject",
+    "method": "POST",
+    "geometryCrs": "EPSG:3857",
+    "queryCrs": "EPSG:4326",
+    "viewportBounds3857": [
+      4196927.728363676, 7371244.868059167, 4203162.331281757, 7376804.386584845
+    ],
+    "queryRing4326": [
+      [37.70164324734113, 55.04829516977777],
+      [37.757649638258414, 55.04829516977777],
+      [37.757649638258414, 55.07689601397788],
+      [37.70164324734113, 55.07689601397788],
+      [37.70164324734113, 55.04829516977777]
+    ],
+    "featureCount": 3214,
+    "featuresWithoutArea": 3
+  },
+  "genplans": [
+    {
+      "part": "shv",
+      "page": "https://dgtime.ru/shv/shv-genplan/",
+      "image": "https://dgtime.ru/shv/shv-genplan/img/genplan.jpg?v=1.45",
+      "positions": "https://dgtime.ru/shv/shv-genplan/css/positions.css",
+      "imageWidth": 5000,
+      "imageHeight": 3000
+    },
+    {
+      "part": "shf",
+      "page": "https://dgtime.ru/shf/shf-genplan/",
+      "image": "https://dgtime.ru/shf/shf-genplan/img/genplan.jpg?v=1.45",
+      "positions": "https://dgtime.ru/shf/shf-genplan/css/positions.css",
+      "imageWidth": 5000,
+      "imageHeight": 3000
+    },
+    {
+      "part": "shr",
+      "page": "https://dgtime.ru/shr/shr-genplan/",
+      "image": "https://dgtime.ru/shr/shr-genplan/img/genplan.jpg?v=1.46",
+      "positions": "https://dgtime.ru/shr/shr-genplan/css/positions.css",
+      "imageWidth": 5000,
+      "imageHeight": 3000
+    },
+    {
+      "part": "shp",
+      "page": "https://dgtime.ru/shp/shp-genplan/",
+      "image": "https://dgtime.ru/shp/shp-genplan/img/genplan.jpg?v=1.45",
+      "positions": "https://dgtime.ru/shp/shp-genplan/css/positions.css",
+      "imageWidth": 5000,
+      "imageHeight": 3000
+    }
+  ],
+  "comparison": [
+    {
+      "part": "shv",
+      "records": 507,
+      "exactMatches": 496,
+      "missingCadastralReference": 0,
+      "textualCadastralReferences": 0,
+      "knownNumberAbsentFromArea": 11,
+      "withoutMarkerPosition": ["SHV-C91"]
+    },
+    {
+      "part": "shf",
+      "records": 361,
+      "exactMatches": 346,
+      "missingCadastralReference": 0,
+      "textualCadastralReferences": 1,
+      "knownNumberAbsentFromArea": 14,
+      "withoutMarkerPosition": ["SHF-V44"]
+    },
+    {
+      "part": "shr",
+      "records": 526,
+      "exactMatches": 492,
+      "missingCadastralReference": 19,
+      "textualCadastralReferences": 0,
+      "knownNumberAbsentFromArea": 15,
+      "withoutMarkerPosition": []
+    },
+    {
+      "part": "shp",
+      "records": 574,
+      "exactMatches": 252,
+      "missingCadastralReference": 303,
+      "textualCadastralReferences": 0,
+      "knownNumberAbsentFromArea": 19,
+      "withoutMarkerPosition": ["SHP-A64", "SHP-C10"]
+    }
+  ],
+  "preliminaryAlignment": {
+    "method": "Affine least squares from genplan label positions to area-weighted cadastral polygon centroids; exact cadastral-number matches only",
+    "sourceUnits": "percent of image width and height; x right, y down",
+    "targetCrs": "EPSG:3857",
+    "independentVerification": "pending",
+    "transforms": {
+      "shv": {
+        "imageOriginPercent": [49.99646464646466, 56.74496969696968],
+        "projectedOrigin": [4199308.347828882, 7373587.971249441],
+        "matrix": [
+          [41.409293290322275, -0.1514494533302936],
+          [-0.2925807920355418, -24.955475533845775]
+        ]
+      },
+      "shf": {
+        "imageOriginPercent": [50.48829479768781, 48.19500000000003],
+        "projectedOrigin": [4198127.476287999, 7373832.264986471],
+        "matrix": [
+          [37.16225145217322, -0.12777820137288723],
+          [-0.18270755959742968, -22.41402763573635]
+        ]
+      },
+      "shr": {
+        "imageOriginPercent": [48.61103658536583, 49.06134146341461],
+        "projectedOrigin": [4201274.198400579, 7374761.427776879],
+        "matrix": [
+          [57.12635078969827, 0.6225532895129441],
+          [0.580711233695512, -34.40367930352801]
+        ]
+      },
+      "shp": {
+        "imageOriginPercent": [48.46031872509958, 33.13956175298805],
+        "projectedOrigin": [4200843.947561111, 7373916.745187355],
+        "matrix": [
+          [50.01821445759476, 0.4083197126047344],
+          [0.6290864178448072, -29.847274901260754]
+        ]
+      }
+    }
+  },
+  "confirmedCorrespondences": [
+    {
+      "codes": ["SHR-L43", "SHR-L44"],
+      "cadastralNumber": "50:33:0010101:2998",
+      "evidence": "Владелец проекта подтвердил объединение в исследовательском разговоре 2026-09-22. Исходные 9,5 + 12 соток соответствуют нынешним 2150 м²; обе перенесённые метки попадают в этот контур."
+    },
+    {
+      "codes": ["SHF-V43"],
+      "cadastralNumber": "50:33:0010101:2842",
+      "previousCadastralNumber": "50:33:0010101:1598",
+      "evidence": "Застройщик явно указал нынешний номер с прежним в скобках. Геометрия нынешнего номера присутствует в снимке. Площадь расходится: 14 соток у застройщика и 2150 м² в НСПД; причина требует отдельной проверки."
+    }
+  ]
+}
