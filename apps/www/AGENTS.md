@@ -37,17 +37,23 @@ pnpm typecheck
 - Для imports внутри `apps/www/src` предпочитать alias `@/…` вместо длинных relative-путей; относительные imports оставлять только для соседних файлов и путей вне `src`.
 - Новые `.test.ts` в `apps/www` хранить в ближайшей папке `tests/`, а не рядом с исходным файлом.
 - Любые UI-подписи с количеством на русском языке обязательно склонять корректно (`1 новость`, `2 новости`, `5 новостей`).
+- Если нужна ссылка на compare, вести на `/815/compare/`, а не на legacy домен.
+- Если меняется deploy/base/root behavior, синхронно обновлять `ops/nginx/kpshelkovo-online.conf`.
+
+## Markdown
+
+- При изменении рендера или генератора сверять API с [README пакета](../../packages/markdown/README.md). Причины разделения слоёв — в [ADR-003](../../docs/decisions/003-markdown-pipeline-layering.md), выбора AST — в [ADR-008](../../docs/decisions/008-markdown-ast-generation.md).
 - Динамические текстовые блоки, которые рендерятся в HTML из markdown, CMS или других данных, прогонять через типограф на этапе рендера.
 - Типограф применять точечно к самому динамическому контенту, а не к целому layout или полной HTML-странице.
+- Правила типографики менять в `@shelkovo/markdown`; app-wrapper выбирает место применения и не держит собственный набор правил.
 - Для body markdown в `apps/www` использовать `@/lib/markdown/render`, а не пакетный `render` напрямую: app-wrapper подключает общий app-level слой mentions.
 - У отдельного Markdown-изображения непустой `title` рендерится видимой подписью: `![alt](url "Подпись")`. У изображения внутри текстового абзаца `title` остается обычной всплывающей подсказкой.
 - Если loader хранит уже подготовленный body markdown, он должен получать его через helper из `@/lib/markdown/render`, чтобы mentions/backlinks и HTML-render использовали один app-level pipeline.
-- Для публичных `.md` и `llms.txt` генерировать Markdown через `@shelkovo/markdown` AST API (`createMarkdownDocument`, `md`, `parseMarkdownFragment`, `serializeMarkdownDocument`) или общий app-helper поверх него, а не через ручной `lines.join('\n')` всего документа.
-- Из `@shelkovo/markdown` напрямую в app использовать только низкоуровневые helpers по назначению: `formatDynamicHtml` для короткого готового HTML/text, `extractFirstMarkdownText` для excerpt, `rehypeTypograf` только в markdown pipeline config, AST API — для генерации публичного Markdown.
+- Для публичных `.md` и `llms.txt` следовать [корневым правилам AST-генерации](../../AGENTS.md#локальные-инструкции).
+- Низкоуровневые helpers пакета можно импортировать напрямую по назначению из README: типографика коротких строк, извлечение текста, обработка AST и генерация Markdown. Плагины типографики использовать в конфигурации соответствующего Markdown pipeline. Прямой пакетный `render` допустим в app-wrapper и низкоуровневых тестах или конфигурациях, где не рендерится body markdown сайта.
 - Новые Markdown preprocessors, специфичные для сайта, добавлять в `@/lib/markdown/render` и его options, а не в `@shelkovo/markdown` и не в параллельный pipeline.
+- Общий Markdown-пакет не должен импортировать данные и route-утилиты сайта; доменные реестры, ошибки и backlinks принадлежат приложению.
 - Новые редакционные mention-enabled body surfaces должны подключать общий `SiteMentionRegistry` из `@/lib/mentions`; не добавлять отдельный people-only preprocessor.
-- Если нужна ссылка на compare, вести на `/815/compare/`, а не на legacy домен.
-- Если меняется deploy/base/root behavior, синхронно обновлять `ops/nginx/kpshelkovo-online.conf`.
 
 ## Entity Mentions
 
@@ -71,7 +77,13 @@ pnpm typecheck
 
 ## Data Boundaries
 
-- YAML/frontmatter читать как Raw DTO через Zod-схему, переводить в handwritten readonly domain model через mapper, а публичные JSON/agent-facing форматы собирать отдельным Public DTO adapter. `snake_case` допустим только на raw/public legacy границах, fixtures и в документации внешнего формата.
+- При добавлении или изменении источника данных соблюдать границы Raw DTO → domain model → Public DTO; причины разделения — в [ADR-013](../../docs/decisions/013-raw-domain-public-data-boundary.md).
+- YAML, frontmatter и ответы внешних сервисов проверять raw Zod-схемой. Default-значения и нормализации схемы относятся к чтению источника; raw-тип можно выводить через `z.output` или `z.infer`.
+- Доменные типы писать явно, с `camelCase`-полями и JSDoc для неочевидного смысла. Они не импортируют Zod и не выводятся из его схем. Домен — readonly-снимок: вложенные объекты и коллекции по возможности тоже readonly; runtime `Object.freeze()` не требуется. Для изменения создавать новый объект или отдельное представление.
+- Mapper — единственное место перевода Raw DTO в домен; вызывать его рядом с `getCollection()` или другим внешним входом. Он явно собирает доменную запись: различающиеся представления и enum-значения переводит, совпадающие по смыслу и допустимым значениям может присваивать напрямую. В mapper-е можно вычислять производные поля доменного снимка и проверять его инварианты; Zod `transform()` и общий recursive `snakeToCamel()` его не заменяют.
+- Схемы, доменные типы и mapper-ы хранить в разных файлах. Raw-схемы не импортируют доменные типы; mapper импортирует обе стороны. Внутренний код использует доменные типы и loaders, а public adapters — доменную модель и отдельные публичные типы.
+- Публичные JSON/agent-facing форматы собирать отдельным Public DTO adapter. Public DTO может выводиться из собственной публичной Zod-схемы; raw-схема и доменная модель не подменяют публичный контракт.
+- Новые публичные DTO используют `camelCase`, если внешний стандарт не требует другого формата. Существующий опубликованный формат сохранять при внутреннем рефакторинге; намеренное изменение согласовывать отдельно и синхронно обновлять схемы, discovery, llms-документы и тесты. `snake_case` и внешние enum-значения допустимы на raw/legacy public границах и в их adapters, fixtures и документации внешнего формата.
 - JSON-ответы и JSON-артефакты сборки сериализовать компактно, без отступов и завершающего перевода строки.
 
 ## Agent-Facing Surfaces
