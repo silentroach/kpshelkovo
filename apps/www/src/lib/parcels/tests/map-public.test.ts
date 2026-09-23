@@ -43,10 +43,9 @@ describe('parcel public payloads', () => {
 
     expect(ParcelMapPublicSchema.safeParse(payload).success).toBe(true);
     expect(
-      payload.parcels.map(({ code, aliases, labelCoordinates }) => ({
+      payload.parcels.map(({ code, aliases }) => ({
         code,
-        aliases,
-        labelCoordinates
+        aliases
       }))
     ).toMatchInlineSnapshot(`
       [
@@ -55,13 +54,15 @@ describe('parcel public payloads', () => {
             "SHR-L44",
           ],
           "code": "SHR-L43",
-          "labelCoordinates": [
-            37.015,
-            55.015,
-          ],
         },
       ]
     `);
+    const label = payload.parcels[0]?.labelCoordinates;
+    expect(label?.[0]).toBeGreaterThan(37.02);
+    expect(label?.[0]).toBeLessThan(37.03);
+    expect(label?.[1]).toBeGreaterThan(55.02);
+    expect(label?.[1]).toBeLessThan(55.03);
+    expect(payload.parcels[0]?.geometry).toEqual(parcel.geometry);
     expect(Object.keys(payload.parcels[0] ?? {}).sort()).toMatchInlineSnapshot(`
       [
         "aliases",

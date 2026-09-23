@@ -4,6 +4,7 @@ import * as SunCalc from 'suncalc';
 import type { CivilTwilight, Coordinates } from './types';
 
 export type { CivilTwilight, Coordinates } from './types';
+export { polygonLabelCoordinates } from './polygon-label';
 
 const CIVIL_TWILIGHT_ALTITUDE_DEGREES = -6;
 const SUNRISE_SUNSET_ALTITUDE_DEGREES = -0.833;

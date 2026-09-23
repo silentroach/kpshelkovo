@@ -12,6 +12,10 @@
   },
   "dependencies": {
     "@turf/distance": "^7.4.0",
+    "polylabel": "^2.1.0",
     "suncalc": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/polylabel": "^2.0.0"
   }
 }
