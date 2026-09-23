@@ -1,8 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import { createDisplayOffset } from '../display-offset';
+import { createDisplayOffset, fromWebMercator, toWebMercator } from './mercator';
 
-describe('parcel display offset', () => {
+describe('geographic projection and display offset', () => {
+  it('round-trips a known Web Mercator point', () => {
+    expect(toWebMercator([0, 0])).toEqual([0, -7.081154551613622e-10]);
+    expect(fromWebMercator([4180739.14, 7361866.11])[0]).toBeCloseTo(37.555, 2);
+    const point = [37.715, 55.06] as const;
+    const projected = toWebMercator(point);
+    expect(fromWebMercator(projected)[0]).toBeCloseTo(point[0], 10);
+    expect(fromWebMercator(projected)[1]).toBeCloseTo(point[1], 10);
+  });
   it('leaves zero offset untouched and moves east/north by ground metres from original coordinates', () => {
     const original: [number, number] = [37.715, 55.06];
     expect(createDisplayOffset(0, 0, 55.06)(original)).toEqual(original);

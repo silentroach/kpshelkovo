@@ -1,3 +1,4 @@
+import { createDisplayOffset } from '@shelkovo/geo';
 import type {
   DrawingStyle,
   LngLat,
@@ -13,7 +14,6 @@ import { parse as parseYaml } from 'yaml';
 import { z } from 'zod';
 
 import displayConfig from '@/config/parcel-map.yaml?raw';
-import { createDisplayOffset } from '@/lib/parcels/display-offset';
 
 import type { ParcelLayer, ParcelMapItem } from './parcel-layer-types';
 
@@ -184,11 +184,15 @@ export const createParcelLayer = (
       if (destroyed || active) return;
       items = parcels;
       const sourceBounds = boundsOf(parcels.flatMap((item) => vertices(item.geometry)));
-      shift = createDisplayOffset(
+      const offsetPosition = createDisplayOffset(
         offset.offset_east_m,
         offset.offset_north_m,
         (sourceBounds[0][1] + sourceBounds[1][1]) / 2
       );
+      shift = ([lng, lat]) => {
+        const [x, y] = offsetPosition([lng, lat]);
+        return [x, y];
+      };
       active = true;
       for (const item of items) {
         const feature = new sdk.YMapFeature({

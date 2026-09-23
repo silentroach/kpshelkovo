@@ -6,6 +6,7 @@ import type { LngLat, LngLatBounds } from '@yandex/ymaps3-types';
 import { defineConfig } from 'vite';
 import { z } from 'zod';
 
+import { fromWebMercator } from '../../../../packages/geo/src/index.ts';
 import type { DemoData, DemoParcel } from './types.ts';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
@@ -95,10 +96,6 @@ for (const match of capture.confirmedCorrespondences) {
 }
 
 // EPSG:3857 → WGS84; the source vertices are neither aligned nor simplified.
-const toLngLat = ([x, y]: readonly [number, number]): LngLat => [
-  ((x / 6378137) * 180) / Math.PI,
-  (Math.atan(Math.sinh(y / 6378137)) * 180) / Math.PI
-];
 const bounds = (points: readonly LngLat[]): LngLatBounds => {
   if (!points.length) throw new Error('Нет координат для карты');
   const xs = points.map(([x]) => x);
@@ -124,11 +121,13 @@ const demoParcels: DemoParcel[] = [...Map.groupBy(matched, (match) => match.numb
       source.geometry.type === 'Polygon'
         ? {
             type: 'Polygon' as const,
-            coordinates: source.geometry.coordinates.map((r) => r.map(toLngLat))
+            coordinates: source.geometry.coordinates.map((r) => r.map(fromWebMercator))
           }
         : {
             type: 'MultiPolygon' as const,
-            coordinates: source.geometry.coordinates.map((p) => p.map((r) => r.map(toLngLat)))
+            coordinates: source.geometry.coordinates.map((p) =>
+              p.map((r) => r.map(fromWebMercator))
+            )
           };
     const points =
       geometry.type === 'Polygon' ? geometry.coordinates.flat() : geometry.coordinates.flat(2);
