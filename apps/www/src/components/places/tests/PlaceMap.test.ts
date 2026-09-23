@@ -1273,6 +1273,42 @@ describe('PlaceMap', () => {
     expect(map.update.mock.calls.length).toBe(count);
   });
 
+  it('clears the direct link after selecting a different parcel', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        Response.json([
+          parcel,
+          { ...parcel, code: 'SHR-L46', aliases: [], labelCoordinates: [37.73, 55.065] }
+        ])
+      )
+    );
+    window.history.replaceState({}, '', '/map/?p=SHR-L43&flag#map');
+    const timeout = vi.spyOn(window, 'setTimeout');
+    render(PlaceMap, { props: { places: [place] } });
+
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    mapUpdateHandlers[0]?.({
+      type: 'update',
+      location: { center: [37.715, 55.065], zoom: 17, bounds: map.bounds },
+      camera: {},
+      mapInAction: false
+    });
+    const label = markerElements.find((element) => element.title === 'SHR-L46');
+    if (!label) throw new Error('Second parcel label missing');
+    await fireEvent.click(label);
+
+    const timerIndex = timeout.mock.calls.findLastIndex(([, delay]) => delay === 5_000);
+    const expire = timeout.mock.calls[timerIndex]?.[0];
+    const timer = timeout.mock.results[timerIndex]?.value;
+    if (typeof expire !== 'function') throw new Error('Parcel selection timer missing');
+    window.clearTimeout(timer);
+    expire();
+    expect(`${window.location.pathname}${window.location.search}${window.location.hash}`).toBe(
+      '/map/?flag#map'
+    );
+  });
+
   it('uses the label zoom for a direct link to a small parcel', async () => {
     vi.stubGlobal('fetch', parcelFetch);
     window.history.replaceState({}, '', '/map/?p=SHR-L43');

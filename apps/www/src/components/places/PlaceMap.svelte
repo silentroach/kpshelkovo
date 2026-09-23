@@ -482,7 +482,6 @@
     let parcelLayer: ParcelLayer | undefined;
     let parcelData: ParcelMapPayload | undefined;
     let pendingParcelCode: string | undefined;
-    let pendingParcelCanonical: string | undefined;
     let preserveParcelCamera = false;
     const requestedParcelCode =
       new URL(window.location.href).searchParams.get(PARCEL_QUERY_PARAM) || undefined;
@@ -527,11 +526,10 @@
             map,
             window.ymaps3,
             mapContainer,
-            (selectedCode) => {
-              if (pendingParcelCode && selectedCode === pendingParcelCanonical) {
+            () => {
+              if (pendingParcelCode) {
                 removeParcelQuery(pendingParcelCode);
                 pendingParcelCode = undefined;
-                pendingParcelCanonical = undefined;
               }
             },
             getMapZoomDuration
@@ -547,7 +545,6 @@
           }
           preserveParcelCamera = true;
           pendingParcelCode = requestedParcelCode;
-          pendingParcelCanonical = canonical;
         }
       } catch (reason) {
         if (destroyed || request !== parcelRequest) return;
@@ -569,7 +566,6 @@
         if (pendingParcelCode) {
           removeParcelQuery(pendingParcelCode);
           pendingParcelCode = undefined;
-          pendingParcelCanonical = undefined;
         }
         return;
       }

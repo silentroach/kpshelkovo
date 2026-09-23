@@ -32,7 +32,7 @@ export const createParcelLayer = (
   map: YMap,
   sdk: typeof ymaps3,
   container: HTMLElement,
-  onExpiry: (code: string) => void,
+  onExpiry: () => void,
   getDuration: () => number
 ): ParcelLayer => {
   let items: readonly ParcelMapItem[] = [];
@@ -82,7 +82,7 @@ export const createParcelLayer = (
     timer = window.setTimeout(() => {
       timer = undefined;
       clearSelection();
-      onExpiry(item.code);
+      onExpiry();
     }, SELECTION_MS);
   };
 
