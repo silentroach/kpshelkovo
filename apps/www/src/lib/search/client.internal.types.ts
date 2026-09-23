@@ -24,11 +24,18 @@ export interface PagefindSearchResponse {
   readonly results: readonly PagefindResultReference[];
 }
 
+export interface PagefindSearchOptions {
+  readonly filters: Readonly<Record<string, unknown>>;
+}
+
 export interface PagefindRuntime {
   readonly init: () => Promise<void>;
   readonly options: (options: PagefindOptions) => Promise<void>;
   readonly preload: (query: string) => Promise<void>;
-  readonly search: (query: string) => Promise<PagefindSearchResponse>;
+  readonly search: (
+    query: string | null,
+    options?: PagefindSearchOptions
+  ) => Promise<PagefindSearchResponse>;
 }
 
 export interface PagefindClientDependencies {

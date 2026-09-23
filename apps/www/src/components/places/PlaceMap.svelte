@@ -32,7 +32,7 @@
     waitForStableLayout
   } from '@/lib/yandex-maps/runtime';
 
-  import type { ParcelLayer, ParcelMapPayload, ParcelSearchPayload } from './parcel-layer-types';
+  import type { ParcelLayer, ParcelMapPayload } from './parcel-layer-types';
   import {
     createMapFeatures,
     getMarkerScale,
@@ -57,7 +57,6 @@
   const MARKER_MAX_ZOOM = 16;
   const PLACE_FOCUS_ZOOM = MARKER_MAX_ZOOM;
   const PARCEL_DATA_URL = '/map/data/parcels.json';
-  const PARCEL_SEARCH_URL = '/map/data/parcel-search.json';
   const toPlaceMapItem = (place: PlaceMapPublicItemDto): PlaceMapItem => ({
     slug: place.slug,
     name: place.name,
@@ -482,7 +481,6 @@
     let parcelRequest = 0;
     let parcelLayer: ParcelLayer | undefined;
     let parcelData: ParcelMapPayload | undefined;
-    let parcelDictionary: ParcelSearchPayload | undefined;
     let pendingParcelCode: string | undefined;
     let pendingParcelCanonical: string | undefined;
     let preserveParcelCamera = false;
@@ -492,17 +490,6 @@
     const removeParcelQuery = (code?: string): void => {
       const url = getUrlWithoutParcel(window.location.href, code);
       if (url) window.history.replaceState(window.history.state, '', url);
-    };
-    const loadParcelDictionary = async (): Promise<ParcelSearchPayload> => {
-      if (parcelDictionary) return parcelDictionary;
-      const [response, { ParcelSearchPublicSchema }] = await Promise.all([
-        fetch(PARCEL_SEARCH_URL),
-        import('@/lib/parcels/map-public-schema')
-      ]);
-      if (!response.ok) throw new Error('Не удалось загрузить номера участков');
-      const payload = ParcelSearchPublicSchema.parse(await response.json());
-      if (!destroyed) parcelDictionary = payload;
-      return payload;
     };
     const loadParcelData = async (): Promise<ParcelMapPayload> => {
       if (parcelData) return parcelData;
@@ -522,22 +509,17 @@
       parcelsError = false;
       try {
         if (!map || !mapContainer) return;
-        let canonical: string | undefined;
-        if (code) {
-          const dictionary = await loadParcelDictionary();
-          if (destroyed || request !== parcelRequest) return;
-          canonical = dictionary.parcels.find(
-            (item) => item.code === code || item.aliases.includes(code)
-          )?.code;
-          if (!canonical) {
-            removeParcelQuery(requestedParcelCode);
-            pendingParcelCode = undefined;
-            parcelsEnabled = false;
-            return;
-          }
-        }
         const data = await loadParcelData();
         if (destroyed || request !== parcelRequest || !map || !mapContainer) return;
+        const canonical = code
+          ? data.find((item) => item.code === code || item.aliases?.includes(code))?.code
+          : undefined;
+        if (code && !canonical) {
+          removeParcelQuery(requestedParcelCode);
+          pendingParcelCode = undefined;
+          parcelsEnabled = false;
+          return;
+        }
         if (!parcelLayer) {
           const { createParcelLayer } = await import('./parcel-layer');
           if (destroyed || request !== parcelRequest || !map || !mapContainer) return;

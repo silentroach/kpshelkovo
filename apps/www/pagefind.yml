@@ -1,3 +1,0 @@
-site: dist/site
-output_subdir: search
-root_selector: '[data-pagefind-root]'

@@ -5,9 +5,9 @@
   import type { Attachment } from 'svelte/attachments';
   import { on } from 'svelte/events';
 
+  import { pagefindSearchClient } from '@/lib/search/client';
   import type { SearchResult } from '@/lib/search/client.types';
   import { SEARCH_QUERY_MAX_LENGTH, SEARCH_RESULT_DEFAULT_LIMIT } from '@/lib/search/client.types';
-  import { siteSearchClient } from '@/lib/search/site-client';
 
   import { SEARCH_DIALOG_OPEN_EVENT } from './search-dialog.events';
   import type {
@@ -24,7 +24,7 @@
   const RESULT_FORMS = ['результат', 'результата', 'результатов'] as const;
   const FOUND_FORMS = ['Найден', 'Найдено', 'Найдено'] as const;
 
-  let { client = siteSearchClient, initialQuery = '' }: SearchDialogProps = $props();
+  let { client = pagefindSearchClient, initialQuery = '' }: SearchDialogProps = $props();
 
   const id = $props.id();
   const dialogId = `${id}-dialog`;

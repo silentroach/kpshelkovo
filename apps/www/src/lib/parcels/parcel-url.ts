@@ -1,12 +1,4 @@
-import { PARCEL_CODE } from './schema';
-
 export const PARCEL_QUERY_PARAM = 'p';
-
-/** Поиск формирует ссылки по основному коду; прямой URL может содержать полный алиас. */
-export const getParcelUrl = (code: string): string => {
-  if (!PARCEL_CODE.test(code)) throw new Error(`Некорректный код участка: ${code}`);
-  return `/map/?${PARCEL_QUERY_PARAM}=${code}`;
-};
 
 export const getUrlWithoutParcel = (href: string, expectedCode?: string): string | undefined => {
   const url = new URL(href);

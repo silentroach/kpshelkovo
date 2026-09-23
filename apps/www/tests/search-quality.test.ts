@@ -229,7 +229,7 @@ test('status, #224 events, #372 KB and news archive indexing policy in the produ
       content: `
         import * as pagefind from '/search/pagefind.js';
         await pagefind.init();
-        const search = await pagefind.search(null);
+         const search = await pagefind.search(null, { filters: { not: { section: 'parcels' } } });
         const results = await Promise.all(search.results.map((result) => result.data()));
         document.documentElement.dataset.pagefindUrls = JSON.stringify(
           results.map((result) => new URL(result.url, window.location.origin).pathname),

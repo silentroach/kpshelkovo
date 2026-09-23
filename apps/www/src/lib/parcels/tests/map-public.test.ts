@@ -1,8 +1,8 @@
 import { toWebMercator } from '@shelkovo/geo';
 import { describe, expect, it } from 'vitest';
 
-import { buildParcelMapPayload, buildParcelSearchPayload } from '../map-public';
-import { ParcelMapPublicSchema, ParcelSearchPublicSchema } from '../map-public-schema';
+import { buildParcelMapPayload } from '../map-public';
+import { ParcelMapPublicSchema } from '../map-public-schema';
 import type { Parcel } from '../types';
 
 const parcel: Parcel = {
@@ -135,25 +135,5 @@ describe('parcel public payloads', () => {
     for (const status of ['sold', 'reserved', 'unavailable', undefined] as const) {
       expect(buildParcelMapPayload([{ ...parcel, status }], config)).toEqual(expected);
     }
-  });
-
-  it('publishes an exact-search dictionary without coordinates or commercial data', () => {
-    const payload = buildParcelSearchPayload([parcel]);
-
-    expect(ParcelSearchPublicSchema.safeParse(payload).success).toBe(true);
-    expect(payload).toMatchInlineSnapshot(`
-      {
-        "parcels": [
-          {
-            "aliases": [
-              "SHR-L44",
-            ],
-            "code": "SHR-L43",
-            "part": "shr",
-          },
-        ],
-      }
-    `);
-    expect(ParcelSearchPublicSchema.safeParse(buildParcelMapPayload([parcel])).success).toBe(false);
   });
 });

@@ -1,9 +1,12 @@
+import { PARCEL_CODE } from '@/lib/parcels/schema';
+
 import type {
   PagefindClientDependencies,
   LoadedPagefindResult,
   PagefindOptions,
   PagefindResultReference,
   PagefindRuntime,
+  PagefindSearchOptions,
   PagefindSearchResponse
 } from './client.internal.types';
 import type { SearchClient, SearchResponse, SearchResult, SearchSubResult } from './client.types';
@@ -13,6 +16,16 @@ import { normalizeSearchHighlightQuery, SEARCH_HIGHLIGHT_PARAM } from './highlig
 const pagefindEntrypoint = '/search/pagefind.js';
 const canonicalUrlBase = 'https://kpshelkovo.online';
 const prefixFallbackMaxLength = 3;
+const shortParcelNumber = /^[A-Z]+[0-9]+$/;
+const textFilter = {
+  filters: { not: { section: 'parcels' } }
+} as const satisfies PagefindSearchOptions;
+const partNames: Readonly<Record<string, string>> = {
+  shr: 'Шелково Ривер',
+  shf: 'Шелково Форест',
+  shp: 'Шелково Парк',
+  shv: 'Шелково Вилладж'
+};
 const pagefindOptions = {
   highlightParam: SEARCH_HIGHLIGHT_PARAM,
   ranking: {
@@ -167,6 +180,26 @@ const normalizeResult = (
   };
 };
 
+const normalizeParcelResult = (value: unknown, query: string): SearchResult | undefined => {
+  const rawResult = asRecord(value);
+  const meta = asRecord(rawResult?.meta);
+  const title = cleanText(meta?.title);
+  const part = cleanText(meta?.part);
+  if (!title || !PARCEL_CODE.test(title) || !part || !partNames[part]) return;
+  if ((cleanText(rawResult?.raw_url) ?? cleanText(rawResult?.url)) !== `/map/?p=${title}`) return;
+
+  const alias = asStringList(cleanText(meta?.aliases)?.split(',')).find(
+    (code) => code === query || code.slice(code.indexOf('-') + 1) === query
+  );
+  return {
+    url: `/map/?p=${title}`,
+    title,
+    section: { id: 'parcels', label: 'Участки' },
+    matchContext: alias ? `${partNames[part]} · также ${alias}` : partNames[part],
+    subResults: []
+  };
+};
+
 const publishedDate = (value: string): Date | undefined => {
   const date = new Date(`${value}T00:00:00Z`);
   return Number.isNaN(date.getTime()) ? undefined : date;
@@ -293,7 +326,7 @@ const searchPagefind = async (
   query: string,
   searchExactToken: (token: string) => Promise<PagefindSearchResponse>
 ): Promise<readonly PagefindResultReference[]> => {
-  const broadSearch = pagefind.search(query);
+  const broadSearch = pagefind.search(query, textFilter);
   const token = exactSingleToken(query);
   if (!token) {
     return (await broadSearch).results;
@@ -402,7 +435,7 @@ export const createPagefindSearchClient = (
       return exactSearchPromise;
     }
 
-    const response = pagefind.search(`"${token}"`);
+    const response = pagefind.search(`"${token}"`, textFilter);
     exactSearchPromise = response;
     void response.catch(() => {
       if (exactSearchPromise === response) {
@@ -475,12 +508,14 @@ export const createPagefindSearchClient = (
     const requestId = ++latestRequestId;
     const query = normalizeQuery(rawQuery);
     const effectiveQuery = pagefindQuery(query);
+    const code = query.toUpperCase();
+    const isParcelQuery = PARCEL_CODE.test(code) || shortParcelNumber.test(code);
 
     if (!dependencies.available) {
       return { state: 'devUnavailable', query };
     }
 
-    if (!effectiveQuery) {
+    if (!effectiveQuery && !isParcelQuery) {
       cachedQuery = undefined;
       exactSearchPromise = undefined;
       resultCache = new Map();
@@ -500,15 +535,38 @@ export const createPagefindSearchClient = (
       return;
     }
 
-    const results = await searchPagefind(pagefind, effectiveQuery, (token) =>
-      searchExactToken(pagefind, token)
-    );
+    const [results, parcelReferences] = await Promise.all([
+      effectiveQuery
+        ? searchPagefind(pagefind, effectiveQuery, (token) => searchExactToken(pagefind, token))
+        : Promise.resolve([]),
+      isParcelQuery
+        ? // Pagefind's public API uses null to request a filter-only search.
+          pagefind
+            .search(null, { filters: { parcelCode: code } })
+            .then((response) => response.results)
+        : Promise.resolve([])
+    ]);
     if (requestId !== latestRequestId) {
       return;
     }
 
+    const parcels = (
+      await Promise.all(
+        parcelReferences.map(async (reference) =>
+          normalizeParcelResult(await reference.data(), code)
+        )
+      )
+    )
+      .filter((result): result is SearchResult => Boolean(result))
+      .filter(
+        (result, index, all) => all.findIndex((item) => item.title === result.title) === index
+      )
+      .sort((left, right) => left.title.localeCompare(right.title, 'en'));
+    if (requestId !== latestRequestId) return;
     const loaded = await Promise.all(
-      results.slice(0, limit).map((result) => loadCachedResult(result, queryCache))
+      results
+        .slice(0, Math.max(0, limit - parcels.length))
+        .map((result) => loadCachedResult(result, queryCache))
     );
     if (requestId !== latestRequestId) {
       return;
@@ -518,11 +576,14 @@ export const createPagefindSearchClient = (
       state: 'ready',
       query,
       searchQuery: effectiveQuery,
-      total: results.length,
-      results: rankResults(
-        loaded.filter((result): result is LoadedPagefindResult => Boolean(result)),
-        dependencies.now?.() ?? new Date()
-      )
+      total: parcels.length + results.length,
+      results: [
+        ...parcels,
+        ...rankResults(
+          loaded.filter((result): result is LoadedPagefindResult => Boolean(result)),
+          dependencies.now?.() ?? new Date()
+        )
+      ].slice(0, limit)
     };
   };
 

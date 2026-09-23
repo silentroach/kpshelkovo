@@ -1,16 +1,9 @@
-import { z } from 'astro/zod';
+import { z } from 'zod';
 
-import { RawPolygonGeometrySchema } from '@/lib/geometry/raw-polygon-schema';
-
-import { PARCEL_CODE, PARCEL_PARTS } from './schema';
+import { RawPolygonGeometrySchema } from '../geometry/raw-polygon-schema.ts';
+import { PARCEL_CODE, PARCEL_PARTS } from './schema.ts';
 
 const code = z.string().regex(PARCEL_CODE);
-const identity = {
-  code,
-  aliases: z.array(code),
-  part: z.enum(PARCEL_PARTS)
-};
-
 export const ParcelMapPublicSchema = z.array(
   z
     .object({
@@ -23,9 +16,4 @@ export const ParcelMapPublicSchema = z.array(
     .strict()
 );
 
-export const ParcelSearchPublicSchema = z
-  .object({ parcels: z.array(z.object(identity).strict()) })
-  .strict();
-
 export type ParcelMapPublicDto = z.output<typeof ParcelMapPublicSchema>;
-export type ParcelSearchPublicDto = z.output<typeof ParcelSearchPublicSchema>;

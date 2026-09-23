@@ -142,11 +142,6 @@ const parcel = {
   labelCoordinates: [37.715, 55.065]
 };
 const parcelFetch = vi.fn(async (url: string) => {
-  if (url === '/map/data/parcel-search.json') {
-    return Response.json({
-      parcels: [{ code: parcel.code, aliases: parcel.aliases, part: parcel.part }]
-    });
-  }
   if (url === '/map/data/parcels.json') return Response.json([parcel]);
   throw new Error(`Unexpected request: ${url}`);
 });
@@ -1202,7 +1197,7 @@ describe('PlaceMap', () => {
     expect(clearTimeout).toHaveBeenCalledWith(renewedTimer);
   });
 
-  it('focuses alias links after resolving the dictionary, survives resize, and preserves URL state', async () => {
+  it('focuses alias links from the geometry feed, survives resize, and preserves URL state', async () => {
     const fetch = vi.fn((url: string) =>
       url === '/map/data/parcels.json'
         ? Promise.resolve(
@@ -1246,10 +1241,7 @@ describe('PlaceMap', () => {
     expect(screen.getByRole('button', { name: 'Участки' }).getAttribute('aria-pressed')).toBe(
       'true'
     );
-    expect(fetch.mock.calls.map(([url]) => url)).toEqual([
-      '/map/data/parcel-search.json',
-      '/map/data/parcels.json'
-    ]);
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcels.json']);
     expect(map.update.mock.calls.find(([props]) => props.location?.zoom === 17)?.[0])
       .toMatchInlineSnapshot(`
         {
@@ -1293,20 +1285,23 @@ describe('PlaceMap', () => {
     );
   });
 
-  it('discards an unknown link before loading geometry without changing layer visibility', async () => {
+  it('discards an unknown link after loading geometry without changing layer visibility', async () => {
     vi.stubGlobal('fetch', parcelFetch);
     window.history.replaceState({}, '', '/map/?p=SHR-L99&flag');
     render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(window.location.search).toBe('?flag'));
-    expect(parcelFetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcel-search.json']);
+    expect(parcelFetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcels.json']);
     await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
     expect(screen.getByRole('button', { name: 'Участки' }).getAttribute('aria-pressed')).toBe(
       'false'
     );
     expect(areaFeatures).toHaveLength(0);
+    await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    expect(parcelFetch).toHaveBeenCalledTimes(1);
   });
 
-  it('keeps a direct-link intent after a failed dictionary request and retries it', async () => {
+  it('keeps a direct-link intent after a failed geometry request and retries it', async () => {
     const fetch = vi
       .fn()
       .mockResolvedValueOnce(new Response(undefined, { status: 503 }))
@@ -1321,17 +1316,15 @@ describe('PlaceMap', () => {
     await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
     await waitFor(() => expect(areaFeatures).toHaveLength(1));
     expect(fetch.mock.calls.map(([url]) => url)).toEqual([
-      '/map/data/parcel-search.json',
-      '/map/data/parcel-search.json',
+      '/map/data/parcels.json',
       '/map/data/parcels.json'
     ]);
   });
 
-  it('treats a dictionary/geometry mismatch as retryable data error', async () => {
+  it('treats invalid geometry data as a retryable error', async () => {
     const fetch = vi
       .fn()
-      .mockImplementationOnce(parcelFetch)
-      .mockResolvedValueOnce(Response.json([]))
+      .mockResolvedValueOnce(Response.json({ parcels: [] }))
       .mockImplementation(parcelFetch);
     vi.stubGlobal('fetch', fetch);
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -1343,7 +1336,6 @@ describe('PlaceMap', () => {
     await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
     await waitFor(() => expect(areaFeatures).toHaveLength(1));
     expect(fetch.mock.calls.map(([url]) => url)).toEqual([
-      '/map/data/parcel-search.json',
       '/map/data/parcels.json',
       '/map/data/parcels.json'
     ]);

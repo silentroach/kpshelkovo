@@ -4,12 +4,7 @@ import { z } from 'zod';
 
 import displayConfig from '@/config/parcel-map.yaml?raw';
 
-import {
-  ParcelMapPublicSchema,
-  ParcelSearchPublicSchema,
-  type ParcelMapPublicDto,
-  type ParcelSearchPublicDto
-} from './map-public-schema';
+import { ParcelMapPublicSchema, type ParcelMapPublicDto } from './map-public-schema';
 import type { Parcel } from './types';
 
 const DisplayConfigSchema = z
@@ -54,12 +49,3 @@ export const buildParcelMapPayload = (
     }))
   );
 };
-
-export const buildParcelSearchPayload = (parcels: readonly Parcel[]): ParcelSearchPublicDto =>
-  ParcelSearchPublicSchema.parse({
-    parcels: parcels.map((parcel) => ({
-      code: parcel.code,
-      aliases: parcel.aliases,
-      part: parcel.part
-    }))
-  });

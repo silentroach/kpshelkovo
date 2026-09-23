@@ -20,7 +20,7 @@ description: >-
 - `apps/www/src/lib/search` — клиент, типы и поисковые контракты;
 - `apps/www/src/layouts/BaseLayout.astro` — Pagefind root и metadata;
 - `apps/www/tests/search-quality.test.ts` — интеграционные проверки загрузки, переходов, догрузки и состава production-индекса;
-- `apps/www/pagefind.yml` — конфигурация индекса.
+- `apps/www/scripts/build-search-index.ts` — сборка индекса HTML и участков из `/map/data/parcels.json`.
 
 ## Проверка до изменения
 
