@@ -451,6 +451,22 @@ describe('parcel matching and updating', () => {
     expect(
       parseGenplanPage(html, 'shr', 'https://example.org/', '2026-09-22T12:00:00Z').plots[0]?.id
     ).toBe('L43');
+    expect(
+      parseGenplanPage(
+        `<!-- ${html} --><script data-description="a > b">window['houses_data'] = ${json}</script>`,
+        'shr',
+        'https://example.org/',
+        '2026-09-22T12:00:00Z'
+      ).plots[0]?.id
+    ).toBe('L43');
+    expect(() =>
+      parseGenplanPage(
+        `<!-- ${html} --><div data-example="<script>window['houses_data'] = []</script>"></div>`,
+        'shr',
+        'https://example.org/',
+        '2026-09-22T12:00:00Z'
+      )
+    ).toThrow('exactly one');
     expect(() =>
       parseGenplanPage(`${html}${html}`, 'shr', 'https://example.org/', '2026-09-22T12:00:00Z')
     ).toThrow('exactly one');
@@ -465,6 +481,22 @@ describe('parcel matching and updating', () => {
         '2026-09-22T12:00:00Z'
       )
     ).toThrow('unsupported');
+    expect(() =>
+      parseGenplanPage(
+        '<script>window["houses_data"] = []</script>',
+        'shr',
+        'https://example.org/',
+        '2026-09-22T12:00:00Z'
+      )
+    ).toThrow('exactly one');
+    expect(() =>
+      parseGenplanPage(
+        "<script>window['houses_data'] = [broken]</script>",
+        'shr',
+        'https://example.org/',
+        '2026-09-22T12:00:00Z'
+      )
+    ).toThrow();
     expect(() =>
       parseGenplanPage(
         "<script>window['houses_data'] = []</script>",

@@ -53,6 +53,7 @@
     "@yandex/ymaps3-clusterer": "^0.0.12",
     "astro": "^7.3.1",
     "diff": "^9.0.0",
+    "parse5": "^8.0.1",
     "svelte": "^5.57.0",
     "vcard-creator": "^1.0.0",
     "yaml": "^2.9.0",

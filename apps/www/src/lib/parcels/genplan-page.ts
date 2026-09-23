@@ -1,3 +1,6 @@
+import { defaultTreeAdapter, parse } from 'parse5';
+import type { DefaultTreeAdapterMap } from 'parse5';
+
 import type { ParcelPart } from './schema.ts';
 import { GenplanPagePlotSchema, GenplanSnapshotSchema } from './source-schemas.ts';
 import type { GenplanSnapshot } from './source-schemas.ts';
@@ -8,9 +11,20 @@ export const parseGenplanPage = (
   page: string,
   capturedAt: string
 ): GenplanSnapshot => {
-  const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)]
-    .map((match) => match[1]?.trim() ?? '')
-    .filter((script) => /window\['houses_data'\]/.test(script));
+  const scripts: string[] = [];
+  const visit = (node: DefaultTreeAdapterMap['parentNode']): void => {
+    if (defaultTreeAdapter.isElementNode(node) && node.tagName === 'script') {
+      const text = (defaultTreeAdapter.getChildNodes(node) ?? [])
+        .filter(defaultTreeAdapter.isTextNode)
+        .map(defaultTreeAdapter.getTextNodeContent)
+        .join('')
+        .trim();
+      if (text.includes("window['houses_data']")) scripts.push(text);
+    }
+    for (const child of defaultTreeAdapter.getChildNodes(node))
+      if (defaultTreeAdapter.isElementNode(child)) visit(child);
+  };
+  visit(parse(html));
   if (scripts.length !== 1)
     throw new Error(
       `${page}: expected exactly one houses_data assignment, found ${scripts.length}`
