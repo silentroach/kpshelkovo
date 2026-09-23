@@ -977,15 +977,24 @@
   }
 
   :global(.parcel-map-label) {
-    padding: 0.25rem 0.4rem;
-    border: 1px solid var(--color-neutral-border);
-    background: var(--color-surface-raised);
+    display: grid;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    place-items: center;
+    padding: 0.25rem;
+    border: 0;
+    background: transparent;
     color: var(--color-text);
     cursor: pointer;
-    font: inherit;
-    font-size: 0.75rem;
+    font-family: var(--font-body);
+    font-size: 12px;
     font-weight: 600;
     line-height: 1.25;
+    text-shadow:
+      -1px -1px 2px var(--color-surface-raised),
+      1px -1px 2px var(--color-surface-raised),
+      -1px 1px 2px var(--color-surface-raised),
+      1px 1px 2px var(--color-surface-raised);
     transform: translate(-50%, -50%);
   }
 
