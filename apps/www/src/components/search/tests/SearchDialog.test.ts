@@ -93,7 +93,7 @@ afterEach(() => {
 });
 
 describe('SearchDialog', () => {
-  it('retries parcel filtering, counts and loads text results, and opens the first parcel with Enter', async () => {
+  it('retries parcel search, counts and loads mixed results, and opens the first parcel with Enter', async () => {
     const intersections: Array<() => void> = [];
     vi.stubGlobal(
       'IntersectionObserver',
@@ -121,21 +121,28 @@ describe('SearchDialog', () => {
         meta: { title: `Результат ${index + 1}`, sectionId: 'news', sectionLabel: 'Новости' }
       }))
     );
-    let filterCalls = 0;
+    let searchCalls = 0;
     const search = vi.fn<PagefindRuntime['search']>(async (query) => {
-      if (query === null) {
-        if (++filterCalls === 1) throw new Error('Parcel filter unavailable');
+      if (++searchCalls === 1) throw new Error('Parcel search unavailable');
+      if (query === 'l43' || query === 'L43') {
         return {
-          results: (['SHR-L43', 'SHF-L43'] as const).map((code) => ({
-            id: code,
-            data: async () => ({
-              url: `/map/?p=${code}`,
-              meta: { title: code, part: code === 'SHR-L43' ? 'shr' : 'shf' }
-            })
-          }))
+          results: [
+            ...(['SHF-L43', 'SHR-L43'] as const).map((code) => ({
+              id: code,
+              data: async () => ({
+                raw_url: `/map/?p=${code}`,
+                meta: {
+                  title: code,
+                  part: code === 'SHR-L43' ? 'shr' : 'shf',
+                  sectionId: 'parcels'
+                }
+              })
+            })),
+            ...textData.map((data, index) => ({ id: `text-${index}`, data }))
+          ]
         };
       }
-      return { results: textData.map((data, index) => ({ id: `text-${index}`, data })) };
+      return { results: [] };
     });
     const client = createPagefindSearchClient({
       available: true,
@@ -172,7 +179,7 @@ describe('SearchDialog', () => {
         "/map/?p=SHR-L43",
       ]
     `);
-    expect(filterCalls).toBe(2);
+    expect(searchCalls).toBe(2);
     expect(textData.filter((load) => load.mock.calls.length)).toHaveLength(6);
 
     intersections[0]?.();
@@ -193,7 +200,7 @@ describe('SearchDialog', () => {
     await requestOpen(opener);
     await enterDebouncedQuery(view.getByRole('searchbox'), 'L43');
     await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(8));
-    expect(filterCalls).toBe(4);
+    expect(searchCalls).toBe(4);
 
     view.unmount();
     view = render(SearchDialog, { props: { client } });
@@ -202,7 +209,7 @@ describe('SearchDialog', () => {
     await waitFor(() =>
       expect(view.getAllByRole('link')[0]?.getAttribute('href')).toBe('/map/?p=SHF-L43')
     );
-    expect(filterCalls).toBe(5);
+    expect(searchCalls).toBe(5);
   });
 
   it('ignores a stale result for the same query after close and reopen', async () => {
@@ -263,11 +270,7 @@ describe('SearchDialog', () => {
       let view = render(SearchDialog, { props: { client } });
       await requestOpen(opener);
       await enterDebouncedQuery(view.getByRole('searchbox'), 'еда');
-      await waitFor(() =>
-        expect(search).toHaveBeenCalledWith('"еда"', {
-          filters: { not: { section: 'parcels' } }
-        })
-      );
+      await waitFor(() => expect(search).toHaveBeenCalledWith('"еда"'));
       view.unmount();
 
       view = render(SearchDialog, { props: { client } });

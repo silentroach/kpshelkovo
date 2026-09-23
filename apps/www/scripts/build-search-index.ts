@@ -33,21 +33,17 @@ try {
 
   for (const parcel of parcels) {
     const aliases = parcel.aliases ?? [];
-    const designation = [parcel.code, ...aliases];
     const record = await index.addCustomRecord({
       url: `/map/?p=${parcel.code}`,
-      content: parcel.code,
+      content: [parcel.code, ...aliases]
+        .flatMap((code) => [code, code.slice(code.indexOf('-') + 1)])
+        .join(' '),
       language: 'ru',
       meta: {
         title: parcel.code,
         sectionId: 'parcels',
-        sectionLabel: 'Участки',
         part: parcel.part,
         aliases: aliases.join(',')
-      },
-      filters: {
-        section: ['parcels'],
-        parcelCode: designation.flatMap((code) => [code, code.slice(code.indexOf('-') + 1)])
       }
     });
     failOnErrors(record.errors);

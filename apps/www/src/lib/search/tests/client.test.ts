@@ -95,43 +95,15 @@ describe('Pagefind search client', () => {
       [
         [
           "первый",
-          {
-            "filters": {
-              "not": {
-                "section": "parcels",
-              },
-            },
-          },
         ],
         [
           ""первый"",
-          {
-            "filters": {
-              "not": {
-                "section": "parcels",
-              },
-            },
-          },
         ],
         [
           "второй",
-          {
-            "filters": {
-              "not": {
-                "section": "parcels",
-              },
-            },
-          },
         ],
         [
           ""второй"",
-          {
-            "filters": {
-              "not": {
-                "section": "parcels",
-              },
-            },
-          },
         ],
       ]
     `);
@@ -725,9 +697,7 @@ describe('Pagefind search client', () => {
 
     expect(preload).toHaveBeenCalledOnce();
     expect(preload).toHaveBeenCalledWith('я'.repeat(SEARCH_QUERY_MAX_LENGTH));
-    expect(search).toHaveBeenCalledWith('я'.repeat(SEARCH_QUERY_MAX_LENGTH), {
-      filters: { not: { section: 'parcels' } }
-    });
+    expect(search).toHaveBeenCalledWith('я'.repeat(SEARCH_QUERY_MAX_LENGTH));
     expect(result?.query).toHaveLength(SEARCH_QUERY_MAX_LENGTH);
   });
 
@@ -783,13 +753,6 @@ describe('Pagefind search client', () => {
         "searchCalls": [
           [
             "подать суд тариф",
-            {
-              "filters": {
-                "not": {
-                  "section": "parcels",
-                },
-              },
-            },
           ],
         ],
       }
@@ -827,23 +790,9 @@ describe('Pagefind search client', () => {
         "searchCalls": [
           [
             "медицина",
-            {
-              "filters": {
-                "not": {
-                  "section": "parcels",
-                },
-              },
-            },
           ],
           [
             ""медицина"",
-            {
-              "filters": {
-                "not": {
-                  "section": "parcels",
-                },
-              },
-            },
           ],
         ],
       }
@@ -930,23 +879,9 @@ describe('Pagefind search client', () => {
         "searchCalls": [
           [
             "калькуля",
-            {
-              "filters": {
-                "not": {
-                  "section": "parcels",
-                },
-              },
-            },
           ],
           [
             ""калькуля"",
-            {
-              "filters": {
-                "not": {
-                  "section": "parcels",
-                },
-              },
-            },
           ],
         ],
       }
@@ -1058,23 +993,9 @@ describe('Pagefind search client', () => {
         "searchCalls": [
           [
             "еда",
-            {
-              "filters": {
-                "not": {
-                  "section": "parcels",
-                },
-              },
-            },
           ],
           [
             ""еда"",
-            {
-              "filters": {
-                "not": {
-                  "section": "parcels",
-                },
-              },
-            },
           ],
         ],
       }
@@ -1136,11 +1057,7 @@ describe('Pagefind search client', () => {
     });
 
     const olderRequest = client.search('старый');
-    await vi.waitFor(() =>
-      expect(search).toHaveBeenCalledWith('старый', {
-        filters: { not: { section: 'parcels' } }
-      })
-    );
+    await vi.waitFor(() => expect(search).toHaveBeenCalledWith('старый'));
     const newerResult = await client.search('новый');
     resolveOlder(
       responseWith({
@@ -1158,16 +1075,22 @@ describe('Pagefind search client', () => {
     await expect(olderRequest).resolves.toBeUndefined();
   });
 
-  it('joins exact parcel matches and filtered text within one limit, including aliases and repeated short numbers', async () => {
+  it('ranks distinct parts with pages in one batch, paginates, and explains only matched aliases', async () => {
     const parcel = (code: string, part: string, aliases = '') => ({
       url: `/map/?p=${code}&h=`,
       raw_url: `/map/?p=${code}`,
       meta: { title: code, part, aliases, sectionId: 'parcels' }
     });
-    const parcels = responseWith(parcel('SHV-A10', 'shv'), parcel('SHP-A10', 'shp', 'SHP-A11'));
-    const text = responseWith(validResult(1), validResult(2));
+    const results = trackedResponseWith(
+      validResult(1),
+      parcel('SHV-A10', 'shv'),
+      parcel('SHP-A10', 'shp', 'SHP-A11'),
+      validResult(2)
+    );
     const search = vi.fn<PagefindRuntime['search']>(async (query) =>
-      query === null ? parcels : text
+      query === 'a11' || query === 'shp-a11'
+        ? responseWith(parcel('SHP-A10', 'shp', 'SHP-A11'))
+        : results.response
     );
     const client = createPagefindSearchClient({
       available: true,
@@ -1180,65 +1103,55 @@ describe('Pagefind search client', () => {
     });
 
     const first = await client.search(' a10 ', 2);
-    const expanded = await client.search('A10', 4);
+    const expanded = await client.search(' a10 ', 4);
     expect(first).toMatchObject({
       state: 'ready',
       total: 4,
       results: [
-        { title: 'SHP-A10', url: '/map/?p=SHP-A10', matchContext: 'Шелково Парк' },
+        { title: 'Результат 1' },
         { title: 'SHV-A10', url: '/map/?p=SHV-A10', matchContext: 'Шелково Вилладж' }
       ]
     });
     expect(expanded).toMatchObject({
       total: 4,
       results: [
-        { title: 'SHP-A10' },
-        { title: 'SHV-A10' },
         { title: 'Результат 1' },
+        { title: 'SHV-A10' },
+        { title: 'SHP-A10', url: '/map/?p=SHP-A10', matchContext: 'Шелково Парк' },
         { title: 'Результат 2' }
       ]
     });
-    expect(search.mock.calls.filter(([query]) => query === null)).toMatchInlineSnapshot(`
+    expect(dataCallCount(results.data)).toBe(4);
+    const alias = await client.search('shp-a11', 1);
+    expect(alias).toMatchObject({
+      total: 1,
+      results: [{ title: 'SHP-A10', matchContext: 'Шелково Парк · также SHP-A11' }]
+    });
+    const shortAlias = await client.search('a11', 1);
+    expect(shortAlias).toMatchObject({
+      results: [{ title: 'SHP-A10', matchContext: 'Шелково Парк · также SHP-A11' }]
+    });
+    expect(search.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          null,
-          {
-            "filters": {
-              "parcelCode": "A10",
-            },
-          },
+          "a10",
         ],
         [
-          null,
-          {
-            "filters": {
-              "parcelCode": "A10",
-            },
-          },
+          "a10",
+        ],
+        [
+          "shp-a11",
+        ],
+        [
+          "a11",
         ],
       ]
     `);
-    expect(
-      search.mock.calls
-        .filter(([query]) => query !== null)
-        .every(
-          ([, options]) =>
-            options?.filters.not && JSON.stringify(options.filters.not) === '{"section":"parcels"}'
-        )
-    ).toBe(true);
-
-    const alias = await client.search('shp-a11', 1);
-    expect(alias).toMatchObject({
-      total: 4,
-      results: [{ title: 'SHP-A10', matchContext: 'Шелково Парк · также SHP-A11' }]
-    });
   });
 
-  it('does not promote a partial or numeric token to a parcel, and retries a rejected filter', async () => {
-    const search = vi.fn<PagefindRuntime['search']>(async (query) => {
-      if (query === null) throw new Error('filter failed');
-      return responseWith(validResult(1));
-    });
+  it('uses plain text search for numbers and code prefixes, and retries a failed designation search', async () => {
+    const search = vi.fn<PagefindRuntime['search']>(async () => responseWith(validResult(1)));
+    search.mockRejectedValueOnce(new Error('search failed'));
     const client = createPagefindSearchClient({
       available: true,
       loadPagefind: async () => ({
@@ -1248,22 +1161,24 @@ describe('Pagefind search client', () => {
         search
       })
     });
-    for (const query of ['43', 'SHR-L43X']) {
+    await expect(client.search('L43')).rejects.toThrow('search failed');
+    await expect(client.search('L43')).resolves.toMatchObject({ total: 1 });
+    for (const query of ['43', 'SHR-L', 'SHR-L43X']) {
       const response = await client.search(query);
       expect(response?.state === 'ready' && response.results[0]?.section.id).toBe('news');
     }
-    expect(search.mock.calls.some(([query]) => query === null)).toBe(false);
-    await expect(client.search('L43')).rejects.toThrow('filter failed');
-    await expect(client.search('L43')).rejects.toThrow('filter failed');
-    expect(search.mock.calls.filter(([query]) => query === null)).toHaveLength(2);
+    expect(search.mock.calls.filter(([query]) => query === 'L43')).toHaveLength(2);
+    expect(search.mock.calls.filter(([query]) => query === 'SHR-L')).toHaveLength(1);
   });
 
-  it('drops an older filter response after a newer parcel query finishes', async () => {
+  it('drops an older parcel response after a newer designation finishes', async () => {
     const older = Promise.withResolvers<PagefindSearchResponse>();
-    const search = vi.fn<PagefindRuntime['search']>(async (query, options) => {
-      if (query !== null) return responseWith();
-      if (options?.filters.parcelCode === 'L43') return older.promise;
-      return responseWith({ url: '/map/?p=SHP-A10', meta: { title: 'SHP-A10', part: 'shp' } });
+    const search = vi.fn<PagefindRuntime['search']>(async (query) => {
+      if (query === 'L43') return older.promise;
+      return responseWith({
+        raw_url: '/map/?p=SHP-A10',
+        meta: { title: 'SHP-A10', part: 'shp', sectionId: 'parcels' }
+      });
     });
     const client = createPagefindSearchClient({
       available: true,
@@ -1275,12 +1190,15 @@ describe('Pagefind search client', () => {
       })
     });
     const pending = client.search('L43');
-    await vi.waitFor(() => expect(search.mock.calls.some(([query]) => query === null)).toBe(true));
+    await vi.waitFor(() => expect(search).toHaveBeenCalledWith('L43'));
     await expect(client.search('A10')).resolves.toMatchObject({
       results: [{ title: 'SHP-A10' }]
     });
     older.resolve(
-      responseWith({ url: '/map/?p=SHR-L43', meta: { title: 'SHR-L43', part: 'shr' } })
+      responseWith({
+        raw_url: '/map/?p=SHR-L43',
+        meta: { title: 'SHR-L43', part: 'shr', sectionId: 'parcels' }
+      })
     );
     await expect(pending).resolves.toBeUndefined();
   });
