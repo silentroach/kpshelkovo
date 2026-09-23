@@ -7,8 +7,8 @@
 - `render(markdown, options?)`
   Рендерит Markdown в HTML. Выполняет preprocessors до парсинга, применяет GFM, отбрасывает raw HTML и типографирует текстовые узлы. Markdown-таблицы отклоняет с ошибкой. В `apps/www` body markdown проходит через `@/lib/markdown/render`, чтобы сработала доменная обработка приложения.
 
-- `MarkdownPreprocessor`, `RenderOptions`
-  Preprocessor принимает Markdown-строку и возвращает строку. `options.preprocess` принимает одну функцию или последовательность функций. `eagerImages: true` задаёт изображениям `loading="eager"`; по умолчанию используется `loading="lazy"`. Options пакета универсальны, доменная логика остаётся в приложении.
+- `MarkdownPreprocessor`, `MarkdownAstTransform`, `RenderOptions`
+  Preprocessor принимает Markdown-строку и возвращает строку. `options.preprocess` принимает одну функцию или последовательность функций. `options.transform` получает целый mdast `Root` после построения авторского `[TOC]` и функцию `reserveId(base)` для ID вставляемых элементов. Code nodes ещё содержат `lang` и `meta`; transform может изменить дерево на месте или вернуть другое `Root`. Авторские ID заголовков резервируются первыми, `options.reservedIds` защищает ID окружающей страницы. Затем документ рендерится как единое целое: GFM-ссылки по определению и заголовки продолжают работать. `eagerImages: true` задаёт изображениям `loading="eager"`; по умолчанию используется `loading="lazy"`. Options пакета универсальны, доменная логика остаётся в приложении.
 
 - `createMarkdownDocument({ frontmatter, children })`
   Создаёт mdast `Root`. Если передан `frontmatter`, добавляет YAML-узел первым. Объект сериализуется через `yaml` с блочными коллекциями, отступом в два пробела, без директив и переноса строк по ширине; кавычки определяются содержимым значений. Состав публичных полей выбирает вызывающий код.

@@ -556,6 +556,19 @@
     scroll-margin-top: 5rem;
   }
 
+  .ui-prose .ui-editorial-map {
+    --ui-editorial-map-height: min(22rem, 65svh);
+  }
+
+  .ui-prose .ui-editorial-map > editorial-map {
+    display: block;
+    block-size: var(--ui-editorial-map-height);
+  }
+
+  .ui-prose .ui-editorial-map .ui-editorial-map__title {
+    scroll-margin-block-start: calc(5rem + var(--ui-editorial-map-height) + 1.5rem);
+  }
+
   .ui-prose .ui-heading-anchor {
     display: inline-flex;
     width: 1.55rem;

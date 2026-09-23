@@ -1,3 +1,4 @@
+import { parseMarkdownFragment } from '@shelkovo/markdown';
 import { describe, expect, it } from 'vitest';
 import { parse } from 'yaml';
 
@@ -73,6 +74,45 @@ const yearArchive = (year: number, months: readonly NewsMonthArchive[]): NewsYea
 });
 
 describe('buildNewsArticleMarkdown', () => {
+  it('keeps each original map and generates captions without adding mentions', () => {
+    const raw = JSON.stringify({
+      type: 'FeatureCollection',
+      metadata: { name: '@unknown' },
+      features: [
+        { type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [37, 55] } }
+      ]
+    });
+    const second = JSON.stringify({
+      type: 'FeatureCollection',
+      features: [
+        { type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [38, 56] } }
+      ]
+    });
+    const input = article({
+      body: `\`\`\`map https://example.com/map\n${raw}\n\`\`\`\n\n\`\`\`map\n${second}\n\`\`\``
+    });
+    const markdown = buildNewsArticleMarkdown(input);
+    const nodes = parseMarkdownFragment(markdown);
+    const maps = nodes.flatMap((node) =>
+      node.type === 'code' && node.lang === 'map' ? [[node.meta, node.value]] : []
+    );
+
+    expect(maps).toMatchInlineSnapshot(`
+      [
+        [
+          "https://example.com/map",
+          "{"type":"FeatureCollection","metadata":{"name":"@unknown"},"features":[{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[37,55]}}]}",
+        ],
+        [
+          null,
+          "{"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[38,56]}}]}",
+        ],
+      ]
+    `);
+    expect(nodes.filter((node) => node.type === 'paragraph')).toHaveLength(1);
+    expect(input.mentions).toHaveLength(0);
+    expect(input.body).not.toContain('](');
+  });
   it.each([
     ['official', 'official'],
     ['community', 'community'],

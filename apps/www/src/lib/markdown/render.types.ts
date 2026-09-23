@@ -15,6 +15,10 @@ export interface RenderEntityMentionsOptions {
 export interface RenderSiteMarkdownOptions {
   readonly mentions?: RenderEntityMentionsOptions;
   readonly eagerImages?: boolean;
+  /** Enable only for news/KB bodies whose templates load editorial map assets. */
+  readonly editorialMaps?: boolean;
+  /** IDs already used by the surrounding page (outside its Markdown body). */
+  readonly reservedIds?: readonly string[];
 }
 
 export interface PreprocessedSiteMarkdown {

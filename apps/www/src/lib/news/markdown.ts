@@ -7,6 +7,8 @@ import {
   serializeMarkdownDocument
 } from '@shelkovo/markdown';
 
+import { appendEditorialMapCaptions } from '@/lib/markdown/editorial-maps-companion';
+
 import { absoluteUrl } from '../site';
 import { NEWS_LATEST_LIMIT } from './config';
 import { toNewsPublicAuthorKind } from './public-dto';
@@ -244,7 +246,12 @@ export function buildNewsArticleMarkdown(article: NewsArticle): string {
       frontmatter: articleFrontmatter(article),
       children: [
         md.heading(1, article.title),
-        ...(article.body ? parseMarkdownFragment(article.body.trim()) : []),
+        ...(article.body
+          ? appendEditorialMapCaptions(
+              parseMarkdownFragment(article.body.trim()),
+              `news article "${article.id}" body`
+            )
+          : []),
         ...photoSection(article),
         ...attachmentSection(article.attachments)
       ]

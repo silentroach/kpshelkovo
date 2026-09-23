@@ -196,6 +196,58 @@ describe('buildKbPages', () => {
     expect(pages[0]?.mentions.map((item) => item.slug)).toEqual(['kschemelinin']);
   });
 
+  it('validates map blocks and keeps their source separate from adjacent mentions', () => {
+    const rawMap = JSON.stringify({
+      type: 'FeatureCollection',
+      metadata: { name: '@unknown' },
+      features: [
+        { type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [37, 55] } }
+      ]
+    });
+    const [kbPage] = buildKbPages(
+      [
+        page({
+          id: 'services/map',
+          title: 'Схема',
+          body: `До карты @kschemelinin.\n\n\`\`\`map\n${rawMap}\n\`\`\`\n\nПосле карты @kschemelinin.`
+        })
+      ],
+      {
+        mentionRegistry: new Map([
+          ['kschemelinin', createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин')]
+        ])
+      }
+    );
+
+    expect(kbPage?.body).toContain(rawMap);
+    expect(kbPage?.body).not.toContain('До карты @kschemelinin');
+    expect(kbPage?.mentions.map((item) => item.slug)).toEqual(['kschemelinin']);
+  });
+
+  it('rejects an invalid map URL with the KB source and insertion number', () => {
+    expect(() =>
+      buildKbPages([
+        page({
+          id: 'services/map',
+          title: 'Схема',
+          body: '\`\`\`map url=https://example.com\n{"type":"FeatureCollection","features":[]}\n\`\`\`'
+        })
+      ])
+    ).toThrow('kb page "services/map" body map insertion 1 has invalid map URL');
+  });
+
+  it('rejects an empty map at load time with its KB source and insertion', () => {
+    expect(() =>
+      buildKbPages([
+        page({
+          id: 'services/map',
+          title: 'Схема',
+          body: '\`\`\`map\n{"type":"FeatureCollection","features":[]}\n\`\`\`'
+        })
+      ])
+    ).toThrow(/kb page "services\/map" body map insertion 1.*features.*at least one feature/u);
+  });
+
   it('fails clearly for unknown body mentions', () => {
     expect(() =>
       buildKbPages([

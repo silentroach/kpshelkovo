@@ -5,9 +5,14 @@
       "type": "Feature",
       "id": "area",
       "properties": {
-        "kind": "area",
         "precision": "approximate",
-        "outline_expansion_meters": 5
+        "outline_expansion_meters": 5,
+        "stroke": "#217ea3",
+        "stroke-width": 2,
+        "stroke-opacity": 0.85,
+        "stroke-dasharray": [5, 3],
+        "fill": "#217ea3",
+        "fill-opacity": 0.06
       },
       "geometry": {
         "type": "MultiPolygon",

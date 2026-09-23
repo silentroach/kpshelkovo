@@ -1,27 +1,63 @@
-import type { Root } from 'mdast';
+import type { Heading, Root } from 'mdast';
 import rehypeStringify from 'rehype-stringify';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified, type Plugin } from 'unified';
+import { visit } from 'unist-util-visit';
 
-import { uniqueHeadingSlug } from './heading-slugs';
+import { headingSlug, uniqueHeadingSlug } from './heading-slugs';
 import type { HtmlTreeNode } from './html-tree.types';
 import { rehypeImageFigures } from './image-figures';
 import { assertNoMarkdownTables } from './no-tables';
+import type { MarkdownAstTransform, RenderOptions } from './render.types';
 import { rehypeTaskListItemLabels } from './task-list-labels';
-import { expandTableOfContents } from './toc';
+import { expandTableOfContents, headingText } from './toc';
 import { rehypeTypograf } from './typography';
-
-export type MarkdownPreprocessor = (markdown: string) => string;
-
-export interface RenderOptions {
-  readonly preprocess?: MarkdownPreprocessor | readonly MarkdownPreprocessor[];
-  readonly eagerImages?: boolean;
-}
 
 const remarkNoMarkdownTables: Plugin<[], Root> = () => (tree) => {
   assertNoMarkdownTables(tree);
+};
+
+const remarkDocument: Plugin<
+  [MarkdownAstTransform | undefined, readonly string[] | undefined],
+  Root
+> = (transform, reservedIds) => (tree) => {
+  const usedIds = new Set(reservedIds);
+  const authoredIds = new Map<Heading, string>();
+  const headings: Heading[] = [];
+  let hasFootnotes = false;
+
+  visit(tree, (node) => {
+    if (node.type === 'heading') {
+      headings.push(node);
+    } else if (node.type === 'footnoteReference') {
+      hasFootnotes = true;
+    }
+  });
+
+  const reserveId = (base: string): string => {
+    const slug = headingSlug(base);
+    // GFM creates these fixed IDs during mdast → hast, after the app hook.
+    const footnoteId =
+      slug === 'footnote-label' ||
+      slug.startsWith('user-content-fn-') ||
+      slug.startsWith('user-content-fnref-');
+    return uniqueHeadingSlug(hasFootnotes && footnoteId ? `heading-${slug}` : base, usedIds);
+  };
+
+  // Reserve the author's headings before app-owned headings can be inserted.
+  headings.forEach((node) => {
+    const id = reserveId(headingText(node));
+    authoredIds.set(node, id);
+    node.data = {
+      ...node.data,
+      hProperties: { ...node.data?.hProperties, id }
+    };
+  });
+
+  const expanded = expandTableOfContents(tree, authoredIds);
+  return transform?.(expanded, reserveId) ?? expanded;
 };
 
 const HEADING_TAGS = new Set(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']);
@@ -63,10 +99,21 @@ const headingAnchor = (slug: string): HtmlTreeNode => ({
   ]
 });
 
-const addHeadingIds = (node: HtmlTreeNode, seenSlugs: Map<string, number>): void => {
+const collectIds = (node: HtmlTreeNode, usedIds: Set<string>): void => {
+  if (typeof node.properties?.id === 'string') {
+    usedIds.add(node.properties.id);
+  }
+
+  node.children?.forEach((child) => collectIds(child, usedIds));
+};
+
+const addHeadingIds = (node: HtmlTreeNode, usedIds: Set<string>): void => {
   if (node.tagName && HEADING_TAGS.has(node.tagName)) {
     const headingText = nodeText(node);
-    const slug = uniqueHeadingSlug(headingText, seenSlugs);
+    const slug =
+      typeof node.properties?.id === 'string'
+        ? node.properties.id
+        : uniqueHeadingSlug(headingText, usedIds);
 
     node.properties = node.properties ?? {};
     node.properties.id = slug;
@@ -78,27 +125,29 @@ const addHeadingIds = (node: HtmlTreeNode, seenSlugs: Map<string, number>): void
     node.children = [...(node.children ?? []), headingAnchor(slug)];
   }
 
-  node.children?.forEach((child) => addHeadingIds(child, seenSlugs));
+  node.children?.forEach((child) => addHeadingIds(child, usedIds));
 };
 
-const rehypeHeadingIds: Plugin<[], HtmlTreeNode> = () => (tree) => {
-  addHeadingIds(tree, new Map());
-};
+const rehypeHeadingIds: Plugin<[readonly string[] | undefined], HtmlTreeNode> =
+  (reservedIds) => (tree) => {
+    const usedIds = new Set(reservedIds);
+    collectIds(tree, usedIds);
+    addHeadingIds(tree, usedIds);
+  };
 
-const remarkTableOfContents: Plugin<[], Root> = () => (tree) => expandTableOfContents(tree);
-
-const processor = unified()
-  .use(remarkParse)
-  .use(remarkGfm)
-  .use(remarkTableOfContents)
-  .use(remarkNoMarkdownTables)
-  // Raw HTML is not passed through, so markdown content cannot inject markup.
-  .use(remarkRehype)
-  .use(rehypeHeadingIds)
-  .use(rehypeTaskListItemLabels)
-  .use(rehypeImageFigures)
-  .use(rehypeTypograf)
-  .use(rehypeStringify);
+const createProcessor = (options?: RenderOptions) =>
+  unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkDocument, options?.transform, options?.reservedIds)
+    .use(remarkNoMarkdownTables)
+    // Raw HTML is not passed through, so markdown content cannot inject markup.
+    .use(remarkRehype)
+    .use(rehypeHeadingIds, options?.reservedIds)
+    .use(rehypeTaskListItemLabels)
+    .use(rehypeImageFigures)
+    .use(rehypeTypograf)
+    .use(rehypeStringify);
 
 const preprocessMarkdown = (markdown: string, preprocess: RenderOptions['preprocess']): string => {
   if (!preprocess) {
@@ -116,6 +165,9 @@ export const render = (markdown: string, options?: RenderOptions): string => {
   const processed = preprocessMarkdown(markdown, options?.preprocess);
 
   return String(
-    processor.processSync({ value: processed, data: { eagerImages: options?.eagerImages } })
+    createProcessor(options).processSync({
+      value: processed,
+      data: { eagerImages: options?.eagerImages }
+    })
   );
 };

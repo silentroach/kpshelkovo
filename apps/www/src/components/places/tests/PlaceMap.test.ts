@@ -105,24 +105,106 @@ const pondsPlace: PlaceMapItem = {
   marker: 'fish',
   coordinates: { lat: 55.05717, lng: 37.744987 },
   geometry: {
-    area: {
-      precision: 'approximate',
-      geometry: {
-        type: 'MultiPolygon',
-        coordinates: [
-          [
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [37.742, 55.058] },
+        iconCaption: '<b>Вход</b>',
+        markerColor: '#b42c31'
+      },
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            [37.742, 55.058],
+            [37.748, 55.06]
+          ]
+        },
+        stroke: '#123456',
+        strokeWidth: 3,
+        strokeDasharray: [6, 3]
+      },
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'MultiPolygon',
+          coordinates: [
+            [
+              [
+                [37.74, 55.05],
+                [37.75, 55.05],
+                [37.75, 55.06],
+                [37.74, 55.05]
+              ]
+            ],
+            [
+              [
+                [37.76, 55.06],
+                [37.77, 55.06],
+                [37.77, 55.07],
+                [37.76, 55.06]
+              ]
+            ]
+          ]
+        },
+        fill: '#aaccdd',
+        fillOpacity: 0.24,
+        stroke: '#456789',
+        strokeOpacity: 0.7,
+        precision: 'approximate'
+      }
+    ]
+  },
+  url: '/map/hunting-ponds/'
+};
+const publicPondsPlace: PlaceMapPublicItemDto = {
+  ...publicPlace,
+  slug: 'hunting-ponds',
+  geometry: {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        id: 0,
+        geometry: { type: 'Point', coordinates: [37.742, 55.058] },
+        properties: { iconCaption: '<b>Вход</b>', 'marker-color': '#b42c31' }
+      },
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            [37.742, 55.058],
+            [37.748, 55.06]
+          ]
+        },
+        properties: { stroke: '#123456', 'stroke-width': 3, 'stroke-dasharray': [6, 3] }
+      },
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
             [
               [37.74, 55.05],
               [37.75, 55.05],
               [37.75, 55.06],
               [37.74, 55.05]
+            ],
+            [
+              [37.743, 55.052],
+              [37.746, 55.052],
+              [37.746, 55.054],
+              [37.743, 55.052]
             ]
           ]
-        ]
+        },
+        properties: { fill: '#aaccdd', 'fill-opacity': 0.24, precision: 'approximate' }
       }
-    }
-  },
-  url: '/map/hunting-ponds/'
+    ]
+  }
 };
 const parcel = {
   code: 'SHR-L43',
@@ -698,141 +780,454 @@ describe('PlaceMap', () => {
     `);
   });
 
-  it('previews an area on fine-pointer hover and keyboard focus', async () => {
-    vi.stubGlobal('matchMedia', (query: string) => ({
-      matches: query.includes('(hover: hover)')
-    }));
+  it('renders the full public collection as one hidden group, revealed by hover or focus', async () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({ matches: query.includes('(hover: hover)') }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Response.json({ places: [publicPondsPlace] }))
+    );
+    render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
+    await waitFor(() => expect(markerElements).toHaveLength(2));
 
-    render(PlaceMap, { props: { places: [pondsPlace] } });
-
-    await waitFor(() => expect(areaFeatures).toHaveLength(1));
-
-    const feature = areaFeatures[0];
-    const marker = markerElements[0];
-
-    if (!feature || !marker) throw new Error('area preview fixtures are missing');
-
-    expect({
-      id: feature.props.id,
-      geometryType: feature.props.geometry.type,
-      initialStyle: feature.props.style
-    }).toMatchInlineSnapshot(`
+    const link = markerElements.find((element) => element instanceof HTMLAnchorElement);
+    const caption = markerElements.find((element) => !(element instanceof HTMLAnchorElement));
+    if (!link || !caption) throw new Error('Map markers are missing');
+    expect(link.getAttribute('href')).toBe('/map/hunting-ponds/');
+    expect(caption.textContent).toBe('<b>Вход</b>');
+    expect(caption.querySelector('b')).toBeFalsy();
+    expect(
+      areaFeatures.map(({ props }) => ({ geometry: props.geometry, style: props.style }))
+    ).toMatchObject([
       {
-        "geometryType": "MultiPolygon",
-        "id": "hunting-ponds-area",
-        "initialStyle": {
-          "fillOpacity": 0,
-          "interactive": false,
-          "stroke": [],
-          "zIndex": 0,
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            [37.742, 55.058],
+            [37.748, 55.06]
+          ]
         },
-      }
-    `);
-
-    await fireEvent.mouseEnter(marker);
-    expect(feature.update.mock.lastCall?.[0].style).toMatchInlineSnapshot(`
+        style: { stroke: [{ color: '#123456', width: 3, dash: [6, 3] }] }
+      },
       {
-        "fill": "#1c668c",
-        "fillOpacity": 0,
-        "interactive": true,
-        "simplificationRate": 0,
-        "stroke": [
-          {
-            "color": "#1c668c",
-            "dash": [
-              5,
-              4,
-            ],
-            "opacity": 0.42,
-            "width": 4,
-          },
-          {
-            "color": "#1c668c",
-            "dash": [
-              5,
-              4,
-            ],
-            "opacity": 1,
-            "width": 2,
-          },
-        ],
-        "zIndex": 0,
+        geometry: {
+          type: 'Polygon',
+          coordinates: publicPondsPlace.geometry!.features[2]!.geometry.coordinates
+        },
+        style: { fill: '#aaccdd', fillOpacity: 0.24, fillRule: 'evenodd' }
       }
-    `);
+    ]);
+    expect(areaFeatures.every(({ props }) => !props.onClick && !props.properties)).toBe(true);
+    expect(clustererProps[0]?.features).toHaveLength(1);
+    expect(mapProps[0]?.location.bounds).toEqual([
+      [37.715242, 55.059526],
+      [37.717242, 55.061526]
+    ]);
+    const childCount = map.addChild.mock.calls.length;
+    await fireEvent.mouseEnter(link);
+    const shown = map.addChild.mock.calls.slice(childCount).map(([child]) => child);
+    expect(shown).toHaveLength(3);
+    expect(shown).toContain(areaFeatures[0]);
+    expect(shown).toContain(areaFeatures[1]);
 
-    const featureMouseEnter = feature.props.onMouseEnter;
-    const featureMouseLeave = feature.props.onMouseLeave;
-
-    if (!featureMouseEnter || !featureMouseLeave) {
-      throw new Error('area hover handlers are missing');
-    }
-
-    await fireEvent.mouseLeave(marker);
-    featureMouseEnter(new MouseEvent('mouseenter'), {
-      screenCoordinates: [0, 0],
-      coordinates: [37.74, 55.05],
-      details: {
-        type: 'mouseenter',
-        shiftKey: false,
-        altKey: false,
-        metaKey: false
-      },
-      stopPropagation: vi.fn()
-    });
-    await new Promise((resolve) => window.setTimeout(resolve, 100));
-    expect(feature.update.mock.lastCall?.[0].style).toMatchObject({
-      fillOpacity: 0,
-      interactive: true
-    });
-
-    featureMouseLeave(new MouseEvent('mouseleave'), {
-      screenCoordinates: [0, 0],
-      coordinates: [37.74, 55.05],
-      details: {
-        type: 'mouseleave',
-        shiftKey: false,
-        altKey: false,
-        metaKey: false
-      },
-      stopPropagation: vi.fn()
-    });
-    expect(feature.update.mock.lastCall?.[0].style).toEqual({
-      zIndex: 0,
-      fillOpacity: 0,
-      interactive: false,
-      stroke: []
-    });
-
-    await fireEvent.focus(marker);
-    expect(feature.update.mock.lastCall?.[0].style).toMatchObject({
-      fillOpacity: 0,
-      interactive: true
-    });
-
-    await fireEvent.keyDown(marker, { key: 'Escape' });
-    expect(feature.update.mock.lastCall?.[0].style).toEqual({
-      zIndex: 0,
-      fillOpacity: 0,
-      interactive: false,
-      stroke: []
-    });
+    await fireEvent.focus(link);
+    await fireEvent.mouseLeave(link);
+    expect(map.removeChild).not.toHaveBeenCalled();
+    await fireEvent.blur(link);
+    expect(map.removeChild.mock.calls.map(([child]) => child)).toEqual(shown);
+    await fireEvent.focus(link);
+    expect(map.addChild.mock.calls.slice(-3).map(([child]) => child)).toEqual(shown);
+    await fireEvent.keyDown(link, { key: 'Escape' });
+    expect(map.removeChild).toHaveBeenCalledTimes(6);
   });
 
-  it('shows an area with stronger styling during URL highlight', async () => {
+  it('hides additional geometry when a focused marker becomes a cluster without a blur event', async () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    const listen = vi.spyOn(HTMLAnchorElement.prototype, 'addEventListener');
+    const view = render(PlaceMap, { props: { places: [pondsPlace, place] } });
+    await waitFor(() => expect(clustererProps).toHaveLength(1));
+    const props = clustererProps[0]!;
+    const link = markerElements.find(
+      (element): element is HTMLAnchorElement =>
+        element instanceof HTMLAnchorElement && element.href.endsWith('/hunting-ponds/')
+    );
+    const canvas = mapElements[0];
+    if (!link || !canvas) throw new Error('Place marker is missing');
+    canvas.append(link);
+    link.focus();
+    expect(document.activeElement).toBe(link);
+    const objects = map.addChild.mock.calls.slice(-3).map(([object]) => object);
+    expect(objects).toHaveLength(3);
+
+    const pondFeature = props.features.find(({ id }) => id === pondsPlace.slug);
+    if (!pondFeature) throw new Error('Place feature is missing');
+    const renderFeatures = (features: YMapClustererProps['features']): void => {
+      props.onRender?.([
+        {
+          clusterId: features.length === 1 ? String(features[0]!.id) : 'cluster-ponds',
+          world: { x: 0, y: 0 },
+          lnglat: [37.74, 55.06],
+          features
+        }
+      ]);
+    };
+    renderFeatures([pondFeature]);
+    expect(map.removeChild).not.toHaveBeenCalled();
+
+    props.cluster([37.74, 55.06], props.features);
+    const cluster = markerElements.at(-1);
+    if (!cluster) throw new Error('Cluster marker is missing');
+    renderFeatures(props.features);
+    link.replaceWith(cluster);
+    expect(map.removeChild.mock.calls.map(([object]) => object)).toEqual(objects);
+
+    // The clusterer reuses its marker later; visibility requires a new focus/hover event.
+    cluster.replaceWith(link);
+    renderFeatures([pondFeature]);
+    expect(map.addChild.mock.calls.slice(-3).map(([object]) => object)).toEqual(objects);
+    expect(map.removeChild).toHaveBeenCalledTimes(3);
+
+    await fireEvent.mouseEnter(link);
+    expect(map.addChild.mock.calls.slice(-3).map(([object]) => object)).toEqual(objects);
+    renderFeatures(props.features);
+    expect(map.removeChild).toHaveBeenCalledTimes(6);
+
+    const options = listen.mock.calls.find(([type]) => type === 'focus')?.[2];
+    if (!options || typeof options === 'boolean' || !options.signal)
+      throw new Error('Marker event signal is missing');
+    expect(options.signal.aborted).toBe(false);
+    view.unmount();
+    expect(options.signal.aborted).toBe(true);
+  });
+
+  it.each([
+    ['Enter', false, false],
+    [' ', false, false],
+    ['Enter', true, false],
+    [' ', true, false],
+    ['Enter', true, true],
+    [' ', true, true]
+  ] as const)(
+    'keeps focus inside the map when a cluster splits after %s (quick Tab: %s, removed before render: %s)',
+    async (key, quickTab, removeBeforeRender) => {
+      vi.stubGlobal('matchMedia', () => ({ matches: false }));
+      const view = render(PlaceMap, { props: { places: [pondsPlace, place] } });
+      await waitFor(() => expect(clustererProps).toHaveLength(1));
+      const props = clustererProps[0]!;
+      const canvas = mapElements[0];
+      if (!canvas) throw new Error('Map canvas missing');
+
+      props.cluster([37.74, 55.06], props.features);
+      const cluster = markerElements.at(-1);
+      if (!(cluster instanceof HTMLButtonElement)) throw new Error('Cluster button missing');
+      canvas.append(cluster);
+      cluster.focus();
+      await fireEvent.keyDown(cluster, { key });
+      cluster.click(); // native keyboard activation dispatches a click with detail 0
+
+      expect(document.activeElement).toBe(canvas);
+      if (quickTab) {
+        const tab = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+        canvas.dispatchEvent(tab);
+        expect(tab.defaultPrevented).toBe(true);
+        expect(document.activeElement).toBe(canvas);
+      }
+      const update = mapUpdateHandlers[0];
+      if (!update) throw new Error('Map update listener missing');
+      update({
+        type: 'update',
+        location: { center: [37.74, 55.06], zoom: 16, bounds: map.bounds },
+        camera: {},
+        mapInAction: false
+      });
+      expect(document.activeElement).toBe(canvas);
+
+      if (removeBeforeRender) cluster.remove();
+      props.onRender?.(
+        props.features.map((feature) => ({
+          clusterId: String(feature.id),
+          world: { x: 0, y: 0 },
+          lnglat: feature.geometry.coordinates,
+          features: [feature]
+        }))
+      );
+      if (!removeBeforeRender) cluster.remove();
+      await Promise.resolve();
+      expect(canvas.contains(document.activeElement)).toBe(true);
+
+      const firstMarker = markerElements.find(
+        (element) =>
+          element instanceof HTMLAnchorElement && element.href.endsWith('/hunting-ponds/')
+      );
+      if (!firstMarker) throw new Error('First place marker missing');
+      canvas.append(firstMarker);
+      await waitFor(() => expect(document.activeElement).toBe(firstMarker));
+      expect(
+        map.addChild.mock.calls.filter(([child]) => areaFeatures.includes(child))
+      ).toHaveLength(2);
+      firstMarker.blur();
+      expect(
+        map.removeChild.mock.calls.filter(([child]) => areaFeatures.includes(child))
+      ).toHaveLength(2);
+      view.unmount();
+    }
+  );
+
+  it.each(['Tab', 'focus'] as const)(
+    'preserves another map control reached via %s before a cluster finishes rendering',
+    async (move) => {
+      const view = render(PlaceMap, { props: { places: [pondsPlace, place] } });
+      await waitFor(() => expect(clustererProps).toHaveLength(1));
+      const props = clustererProps[0]!;
+      const canvas = mapElements[0];
+      if (!canvas) throw new Error('Map canvas missing');
+      props.cluster([37.74, 55.06], props.features);
+      const cluster = markerElements.at(-1);
+      if (!(cluster instanceof HTMLButtonElement)) throw new Error('Cluster button missing');
+      canvas.append(cluster);
+      cluster.focus();
+      cluster.click();
+      expect(document.activeElement).toBe(canvas);
+
+      const otherControl = document.createElement('button');
+      canvas.append(otherControl);
+      if (move === 'Tab') {
+        await fireEvent.keyDown(canvas, { key: 'Tab' });
+        cluster.focus();
+        await fireEvent.keyDown(cluster, { key: 'Tab' });
+      }
+      otherControl.focus();
+      props.onRender?.(
+        props.features.map((feature) => ({
+          clusterId: String(feature.id),
+          world: { x: 0, y: 0 },
+          lnglat: feature.geometry.coordinates,
+          features: [feature]
+        }))
+      );
+      cluster.remove();
+      const firstMarker = markerElements.find(
+        (element) =>
+          element instanceof HTMLAnchorElement && element.href.endsWith('/hunting-ponds/')
+      );
+      if (!firstMarker) throw new Error('First place marker missing');
+      canvas.append(firstMarker);
+      await Promise.resolve();
+      expect(document.activeElement).toBe(otherControl);
+      expect(
+        map.addChild.mock.calls.filter(([child]) => areaFeatures.includes(child))
+      ).toHaveLength(0);
+      view.unmount();
+    }
+  );
+
+  it.each([false, true])(
+    'tracks a cluster through an intermediate render before it splits (quick Tab: %s)',
+    async (quickTab) => {
+      const view = render(PlaceMap, { props: { places: [pondsPlace, place] } });
+      await waitFor(() => expect(clustererProps).toHaveLength(1));
+      const props = clustererProps[0]!;
+      const canvas = mapElements[0];
+      if (!canvas) throw new Error('Map canvas missing');
+      props.cluster([37.74, 55.06], props.features);
+      const cluster = markerElements.at(-1);
+      if (!(cluster instanceof HTMLButtonElement)) throw new Error('Cluster button missing');
+      canvas.append(cluster);
+      cluster.focus();
+      cluster.click();
+      if (quickTab) {
+        await fireEvent.keyDown(canvas, { key: 'Tab' });
+        cluster.focus();
+      }
+
+      props.onRender?.([
+        {
+          clusterId: 'intermediate',
+          world: { x: 0, y: 0 },
+          lnglat: [37.74, 55.06],
+          features: props.features
+        }
+      ]);
+      await waitFor(() => expect(document.activeElement).toBe(cluster));
+      props.onRender?.(
+        props.features.map((feature) => ({
+          clusterId: String(feature.id),
+          world: { x: 0, y: 0 },
+          lnglat: feature.geometry.coordinates,
+          features: [feature]
+        }))
+      );
+      cluster.remove();
+      await Promise.resolve();
+      expect(canvas.contains(document.activeElement)).toBe(true);
+      const firstMarker = markerElements.find(
+        (element) =>
+          element instanceof HTMLAnchorElement && element.href.endsWith('/hunting-ponds/')
+      );
+      if (!firstMarker) throw new Error('First place marker missing');
+      canvas.append(firstMarker);
+      await waitFor(() => expect(document.activeElement).toBe(firstMarker));
+      firstMarker.blur();
+      expect(
+        map.removeChild.mock.calls.filter(([child]) => areaFeatures.includes(child))
+      ).toHaveLength(2);
+      view.unmount();
+    }
+  );
+
+  it.each([false, true])(
+    'returns focus to a remaining cluster (quick Tab: %s)',
+    async (quickTab) => {
+      const view = render(PlaceMap, { props: { places: [place, titanicPlace] } });
+      await waitFor(() => expect(clustererProps).toHaveLength(1));
+      const props = clustererProps[0]!;
+      const canvas = mapElements[0];
+      const update = mapUpdateHandlers[0];
+      if (!canvas || !update) throw new Error('Cluster focus fixtures missing');
+      props.cluster([37.74, 55.06], props.features);
+      const cluster = markerElements.at(-1);
+      if (!(cluster instanceof HTMLButtonElement)) throw new Error('Cluster button missing');
+      canvas.append(cluster);
+      cluster.focus();
+      cluster.click();
+      if (quickTab) {
+        await fireEvent.keyDown(canvas, { key: 'Tab' });
+        cluster.focus();
+      }
+      update({
+        type: 'update',
+        location: { center: [37.74, 55.06], zoom: 15, bounds: map.bounds },
+        camera: {},
+        mapInAction: false
+      });
+      expect(document.activeElement).toBe(quickTab ? cluster : canvas);
+      const renderedCluster = {
+        clusterId: 'still-together',
+        world: { x: 0, y: 0 },
+        lnglat: [37.74, 55.06] as [number, number],
+        features: props.features
+      };
+      props.onRender?.([renderedCluster]);
+      await waitFor(() => expect(document.activeElement).toBe(cluster));
+
+      const otherControl = document.createElement('button');
+      canvas.append(otherControl);
+      await fireEvent.keyDown(cluster, { key: 'Tab' });
+      otherControl.focus();
+      canvas.append(document.createElement('span'));
+      props.onRender?.([renderedCluster]);
+      await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
+      expect(document.activeElement).toBe(otherControl);
+      props.onRender?.(
+        props.features.map((feature) => ({
+          clusterId: String(feature.id),
+          world: { x: 0, y: 0 },
+          lnglat: feature.geometry.coordinates,
+          features: [feature]
+        }))
+      );
+      cluster.remove();
+      const firstMarker = markerElements.find((element) => element instanceof HTMLAnchorElement);
+      if (!firstMarker) throw new Error('First place marker missing');
+      canvas.append(firstMarker);
+      await Promise.resolve();
+      expect(document.activeElement).toBe(otherControl);
+      view.unmount();
+    }
+  );
+
+  it('cancels pending cluster focus on pointer interaction or unmount', async () => {
+    const cancelFrame = vi.spyOn(window, 'cancelAnimationFrame');
+    const requestFrame = vi.spyOn(window, 'requestAnimationFrame');
+    const view = render(PlaceMap, { props: { places: [place, titanicPlace] } });
+    await waitFor(() => expect(clustererProps).toHaveLength(1));
+    const props = clustererProps[0]!;
+    const canvas = mapElements[0];
+    if (!canvas) throw new Error('Map canvas missing');
+    props.cluster([37.74, 55.06], props.features);
+    const cluster = markerElements.at(-1);
+    if (!(cluster instanceof HTMLButtonElement)) throw new Error('Cluster button missing');
+    canvas.append(cluster);
+    cluster.focus();
+    cluster.click();
+    await fireEvent.pointerDown(cluster);
+    cluster.focus();
+    await fireEvent.click(cluster, { detail: 1 });
+    mapUpdateHandlers[0]?.({
+      type: 'update',
+      location: { center: [37.74, 55.06], zoom: 16, bounds: map.bounds },
+      camera: {},
+      mapInAction: false
+    });
+    props.onRender?.([
+      {
+        clusterId: String(props.features[0]!.id),
+        world: { x: 0, y: 0 },
+        lnglat: props.features[0]!.geometry.coordinates,
+        features: [props.features[0]!]
+      }
+    ]);
+    const firstMarker = markerElements.find((element) => element instanceof HTMLAnchorElement);
+    if (!firstMarker) throw new Error('Place marker missing');
+    canvas.append(firstMarker);
+    await Promise.resolve();
+    expect(document.activeElement).toBe(cluster);
+
+    cluster.focus();
+    cluster.click();
+    props.onRender?.([
+      {
+        clusterId: 'still-together',
+        world: { x: 0, y: 0 },
+        lnglat: [37.74, 55.06],
+        features: props.features
+      }
+    ]);
+    const frame = requestFrame.mock.results.at(-1)?.value;
+    view.unmount();
+    expect(cancelFrame).toHaveBeenCalledWith(frame);
+    document.body.append(firstMarker);
+    await Promise.resolve();
+    expect(document.activeElement).not.toBe(firstMarker);
+    firstMarker.remove();
+  });
+
+  it('temporarily reveals every extra object via URL on touch and removes the group on expiry', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: false }));
     window.history.replaceState({}, '', '/map/?h=hunting-ponds');
-
+    const timeout = vi.spyOn(window, 'setTimeout');
     render(PlaceMap, { props: { places: [pondsPlace] } });
-
     await waitFor(() =>
-      expect(areaFeatures[0]?.update).toHaveBeenCalledWith({
-        style: expect.objectContaining({
-          fillOpacity: 0,
-          interactive: false,
-          stroke: expect.arrayContaining([expect.objectContaining({ dash: [6, 3], width: 2.5 })])
-        })
-      })
+      expect(map.addChild.mock.calls.some(([child]) => child === areaFeatures[0])).toBe(true)
     );
+    const shown = map.addChild.mock.calls.filter(([child]) => areaFeatures.includes(child));
+    expect(shown).toHaveLength(2);
+    expect(clustererProps[0]?.features).toHaveLength(1);
+    const index = timeout.mock.calls.findIndex(([, delay]) => delay === 5_000);
+    const expire = timeout.mock.calls[index]?.[0];
+    const timer = timeout.mock.results[index]?.value;
+    if (typeof expire !== 'function') throw new Error('Place highlight timer is missing');
+    window.clearTimeout(timer);
+    expire();
+    expect(map.removeChild).toHaveBeenCalledTimes(3);
+    expect(areaFeatures.map(({ props }) => props.style?.stroke?.[0]?.color)).toEqual([
+      '#123456',
+      '#456789'
+    ]);
+  });
+
+  it('rejects legacy geometry.area instead of interpreting it as a public collection', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        Response.json({
+          places: [{ ...publicPondsPlace, geometry: { area: {} } }]
+        })
+      )
+    );
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
+    await screen.findByRole('status');
+    expect(markerElements).toHaveLength(0);
   });
 
   it.each(['titanik', 'green-dreams'])(
@@ -1435,6 +1830,14 @@ describe('PlaceMap', () => {
     cluster.focus();
     await fireEvent.click(cluster, { detail: 0 });
     cluster.replaceWith(marker);
+    props.onRender?.([
+      {
+        clusterId: String(props.features[0]!.id),
+        world: { x: 0, y: 0 },
+        lnglat: props.features[0]!.geometry.coordinates,
+        features: [props.features[0]!]
+      }
+    ]);
     update({
       type: 'update',
       location: {

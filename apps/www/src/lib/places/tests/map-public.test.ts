@@ -1,11 +1,24 @@
-import { z } from 'astro/zod';
+import { readFileSync } from 'node:fs';
+
 import { describe, expect, it } from 'vitest';
 
+import { parseEditorialGeometry } from '@/lib/geometry/editorial-mapper';
+import { EditorialPublicGeometrySchema } from '@/lib/geometry/editorial-public-schema';
+
+import { parsePlaceGeometryFiles } from '../geometry';
 import { buildPlaceMapPublicPayload } from '../map-public';
 import { selectMapPlaces } from '../map-selection';
 import { buildPlacesMarkdown } from '../markdown';
-import { PLACE_TIME, PLACE_WEEKDAYS } from '../schema';
 import type { Place } from '../types';
+
+const pondSource = readFileSync(
+  new URL('../../../data/places/hunting-ponds.geojson', import.meta.url),
+  'utf8'
+);
+const pondGeometry = parsePlaceGeometryFiles({ 'hunting-ponds.geojson': pondSource }).get(
+  'hunting-ponds'
+);
+if (!pondGeometry) throw new Error('pond sidecar missing');
 
 const place: Place = {
   showOnMap: true,
@@ -18,21 +31,7 @@ const place: Place = {
   body: 'Описание места.',
   mentions: [],
   coordinates: { lat: 55.05717, lng: 37.744987 },
-  geometry: {
-    area: {
-      precision: 'approximate',
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [37.74, 55.05],
-            [37.75, 55.05],
-            [37.74, 55.05]
-          ]
-        ]
-      }
-    }
-  },
+  geometry: pondGeometry,
   mapUrl: 'https://yandex.ru/maps/example',
   openingHours: {
     description: 'Ежедневно с 10:00 до 20:00',
@@ -53,25 +52,6 @@ describe('place map public DTO', () => {
   it.each([undefined, 'Вход со двора.'])(
     'serializes periods with optional explanation %s',
     (description) => {
-      const openingHoursSchema = z
-        .object({
-          description: z.string().trim().min(1).optional(),
-          periods: z
-            .array(
-              z
-                .object({
-                  days: z.array(z.enum(PLACE_WEEKDAYS)).min(1),
-                  opens_at: z.string().regex(PLACE_TIME),
-                  closes_at: z.string().regex(PLACE_TIME)
-                })
-                .strict()
-            )
-            .min(1)
-        })
-        .strict();
-      const payloadSchema = z.object({
-        places: z.array(z.object({ opening_hours: openingHoursSchema }))
-      });
       const payload = buildPlaceMapPublicPayload([
         {
           ...place,
@@ -82,7 +62,7 @@ describe('place map public DTO', () => {
         }
       ]);
       const serialized = JSON.stringify(payload);
-      const hours = payloadSchema.parse(JSON.parse(serialized)).places[0]?.opening_hours;
+      const hours = JSON.parse(serialized).places[0]?.opening_hours;
       expect(hours?.description).toBe(description);
       expect(hours?.periods).toMatchInlineSnapshot(`
       [
@@ -109,64 +89,128 @@ describe('place map public DTO', () => {
     expect(buildPlaceMapPublicPayload([hidden])).toEqual({ places: [] });
     expect(buildPlacesMarkdown([hidden])).toBe(buildPlacesMarkdown([]));
   });
-  it('keeps the public map feed independent from the full place model', () => {
-    expect(buildPlaceMapPublicPayload([place])).toMatchInlineSnapshot(`
+  it('keeps all existing public place fields apart from geometry', () => {
+    const { geometry, ...item } = buildPlaceMapPublicPayload([place]).places[0]!;
+    expect(geometry?.type).toBe('FeatureCollection');
+    expect(item).toMatchInlineSnapshot(`
       {
-        "places": [
-          {
-            "coordinates": {
-              "lat": 55.05717,
-              "lng": 37.744987,
-            },
-            "geometry": {
-              "area": {
-                "geometry": {
-                  "coordinates": [
-                    [
-                      [
-                        37.74,
-                        55.05,
-                      ],
-                      [
-                        37.75,
-                        55.05,
-                      ],
-                      [
-                        37.74,
-                        55.05,
-                      ],
-                    ],
-                  ],
-                  "type": "Polygon",
-                },
-                "precision": "approximate",
-              },
-            },
-            "html_url": "https://kpshelkovo.online/map/hunting-ponds/",
-            "marker": "fish",
-            "name": "Охотничьи пруды",
-            "opening_hours": {
-              "description": "Ежедневно с 10:00 до 20:00",
-              "periods": [
-                {
-                  "closes_at": "20:00",
-                  "days": [
-                    "mon",
-                    "tue",
-                    "wed",
-                    "thu",
-                    "fri",
-                    "sat",
-                    "sun",
-                  ],
-                  "opens_at": "10:00",
-                },
+        "coordinates": {
+          "lat": 55.05717,
+          "lng": 37.744987,
+        },
+        "html_url": "https://kpshelkovo.online/map/hunting-ponds/",
+        "marker": "fish",
+        "name": "Охотничьи пруды",
+        "opening_hours": {
+          "description": "Ежедневно с 10:00 до 20:00",
+          "periods": [
+            {
+              "closes_at": "20:00",
+              "days": [
+                "mon",
+                "tue",
+                "wed",
+                "thu",
+                "fri",
+                "sat",
+                "sun",
               ],
+              "opens_at": "10:00",
             },
-            "slug": "hunting-ponds",
-            "status": "existing",
-          },
+          ],
+        },
+        "slug": "hunting-ponds",
+        "status": "existing",
+      }
+    `);
+  });
+
+  it('publishes prepared pond coordinates and explicit styling without expansion instructions', () => {
+    const geometry = buildPlaceMapPublicPayload([place]).places[0]?.geometry;
+    const parsed = EditorialPublicGeometrySchema.parse(JSON.parse(JSON.stringify(geometry)));
+    const feature = parsed.features[0];
+    if (feature?.geometry.type !== 'MultiPolygon') throw new Error('pond geometry missing');
+
+    expect(feature.geometry.coordinates).toHaveLength(2);
+    expect(feature.geometry.coordinates[0]?.[0]?.[0]).not.toEqual([37.7488622, 55.0559004]);
+    expect(feature.properties).toMatchInlineSnapshot(`
+      {
+        "fill": "#217ea3",
+        "fill-opacity": 0.06,
+        "precision": "approximate",
+        "stroke": "#217ea3",
+        "stroke-dasharray": [
+          5,
+          3,
         ],
+        "stroke-opacity": 0.85,
+        "stroke-width": 2,
+      }
+    `);
+    expect(JSON.stringify(geometry)).not.toContain('outline_expansion_meters');
+    expect(pondSource).toContain('outline_expansion_meters');
+  });
+
+  it('preserves metadata, ID zero, ordinary text and normalized properties in the public collection', () => {
+    const source = {
+      type: 'FeatureCollection',
+      metadata: { name: 'Map', description: '<p>hidden</p>', creator: 'Editor' },
+      features: [
+        {
+          type: 'Feature',
+          id: 0,
+          properties: {
+            description: '**raw**',
+            iconCaption: '<b>Gate</b>',
+            'marker-color': '#123456',
+            stroke: '#abc',
+            'stroke-width': '2',
+            'stroke-opacity': '0.5',
+            'stroke-dasharray': '5 3',
+            fill: '#def',
+            'fill-opacity': '0.1'
+          },
+          geometry: { type: 'Point', coordinates: [37, 55] }
+        }
+      ]
+    };
+    const geometry = buildPlaceMapPublicPayload([
+      { ...place, geometry: parseEditorialGeometry(source, 'fixture') }
+    ]).places[0]?.geometry;
+    const parsed = EditorialPublicGeometrySchema.parse(JSON.parse(JSON.stringify(geometry)));
+
+    expect(parsed.metadata).toMatchInlineSnapshot(`
+      {
+        "creator": "Editor",
+        "description": "<p>hidden</p>",
+        "name": "Map",
+      }
+    `);
+    expect(parsed.features[0]).toMatchInlineSnapshot(`
+      {
+        "geometry": {
+          "coordinates": [
+            37,
+            55,
+          ],
+          "type": "Point",
+        },
+        "id": 0,
+        "properties": {
+          "description": "**raw**",
+          "fill": "#def",
+          "fill-opacity": 0.1,
+          "iconCaption": "<b>Gate</b>",
+          "marker-color": "#123456",
+          "stroke": "#abc",
+          "stroke-dasharray": [
+            5,
+            3,
+          ],
+          "stroke-opacity": 0.5,
+          "stroke-width": 2,
+        },
+        "type": "Feature",
       }
     `);
   });

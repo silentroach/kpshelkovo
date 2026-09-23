@@ -1,3 +1,4 @@
+import { parseMarkdownFragment } from '@shelkovo/markdown';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import type { KbPage } from '../types';
@@ -33,6 +34,35 @@ const page = (input: {
 });
 
 describe('kb markdown companions', () => {
+  it('keeps the original map URL and data while rewriting neighboring KB links', () => {
+    const raw = JSON.stringify({
+      type: 'FeatureCollection',
+      metadata: { name: 'Схема' },
+      features: [
+        { type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [37, 55] } }
+      ]
+    });
+    const markdown = buildKbPageMarkdown(
+      page({
+        title: 'Интернет',
+        body: `[Подробнее](/kb/services/internet/?part=1#access)\n\n\`\`\`map https://example.com/map\n${raw}\n\`\`\``
+      })
+    );
+    const nodes = parseMarkdownFragment(markdown);
+    const code = nodes.find((node) => node.type === 'code');
+
+    expect(code?.type === 'code' ? [code.lang, code.meta, code.value] : undefined)
+      .toMatchInlineSnapshot(`
+        [
+          "map",
+          "https://example.com/map",
+          "{"type":"FeatureCollection","metadata":{"name":"Схема"},"features":[{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[37,55]}}]}",
+        ]
+      `);
+    expect(markdown).toContain('https://example.com/kb/services/internet/index.md?part=1#access');
+    expect(markdown).toContain('[Схема](https://example.com/map)');
+    expect(markdown.match(/\[Схема\]\(https:\/\/example\.com\/map\)/gu)).toHaveLength(1);
+  });
   it('renders a kb page as markdown and points kb links to markdown companions', () => {
     const markdown = buildKbPageMarkdown(
       page({

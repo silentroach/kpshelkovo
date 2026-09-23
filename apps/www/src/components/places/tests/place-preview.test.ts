@@ -198,49 +198,83 @@ it('renders and refits the point and all separate polygons, including a distant 
   const data: MapPreviewData = {
     coordinates: { lng: 10, lat: 20 },
     geometry: {
-      area: {
-        precision: 'approximate',
-        geometry: {
-          type: 'MultiPolygon',
-          coordinates: [
-            [
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [16, 26] },
+          iconCaption: '<b>Схема</b>',
+          markerColor: '#ff6600'
+        },
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates: [
+              [12, 21],
+              [13, 22]
+            ]
+          },
+          stroke: '#123456',
+          strokeWidth: 3,
+          strokeDasharray: [4, 2]
+        },
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'MultiPolygon',
+            coordinates: [
               [
-                [11, 21],
-                [12, 21],
-                [11, 22],
-                [11, 21]
-              ]
-            ],
-            [
+                [
+                  [11, 21],
+                  [12, 21],
+                  [11, 22],
+                  [11, 21]
+                ]
+              ],
               [
-                [14, 24],
-                [15, 24],
-                [14, 25],
-                [14, 24]
+                [
+                  [14, 24],
+                  [15, 24],
+                  [14, 25],
+                  [14, 24]
+                ]
               ]
             ]
-          ]
+          },
+          fill: '#abc123',
+          fillOpacity: 0.2
         }
-      }
+      ]
     }
   };
-  const { create, feature, listener, update } = setupMaps();
+  const { create, feature, marker, listener, update } = setupMaps();
   vi.mocked(loadYandexMaps).mockResolvedValue();
   const element = mount(data);
   approach(element);
   await Promise.resolve();
-  expect(feature).toHaveBeenCalledOnce();
-  expect(feature.mock.calls[0]?.[0].geometry).toEqual(data.geometry?.area.geometry);
+  expect(feature.mock.calls.map(([props]) => props.geometry.type)).toEqual([
+    'LineString',
+    'MultiPolygon'
+  ]);
+  expect(feature.mock.calls.map(([props]) => props.style)).toMatchObject([
+    { stroke: [{ color: '#123456', width: 3, dash: [4, 2] }] },
+    { fill: '#abc123', fillOpacity: 0.2 }
+  ]);
+  expect(marker).toHaveBeenCalledTimes(2);
+  expect(marker.mock.calls[0]?.[1].textContent).toBe('<b>Схема</b>');
+  expect(marker.mock.calls[0]?.[1].querySelector('b')).toBeFalsy();
+  expect(marker.mock.calls[1]?.[1].getAttribute('href')).toBe('https://yandex.ru/maps/?original');
   expect(create.mock.calls[0]?.[1].location).toMatchInlineSnapshot(`
     {
       "bounds": [
         [
-          8.5,
-          18.5,
+          8.2,
+          18.2,
         ],
         [
-          16.5,
-          26.5,
+          17.8,
+          27.8,
         ],
       ],
       "duration": 0,
@@ -249,7 +283,7 @@ it('renders and refits the point and all separate polygons, including a distant 
   listener.mock.calls[0]?.[0].onResize?.({
     type: 'resize',
     size: { x: 320, y: 240 },
-    mapInAction: false
+    mapInAction: true
   });
   expect(update).toHaveBeenCalledWith({
     location: create.mock.calls[0]?.[1].location,

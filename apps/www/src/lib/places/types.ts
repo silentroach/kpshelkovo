@@ -1,5 +1,10 @@
 import type { CollectionEntry } from 'astro:content';
 
+import type {
+  EditorialFeatureCollection,
+  EditorialPolygonGeometry,
+  EditorialPosition
+} from '@/lib/geometry/editorial-types';
 import type { PreprocessedSiteMarkdownBody } from '@/lib/markdown/render';
 import type {
   EntityMentionLabelCaseForms,
@@ -22,27 +27,9 @@ export interface PlaceCoordinates {
   readonly lng: number;
 }
 
-export type PlaceGeometryPosition = readonly [lng: number, lat: number];
-export type PlacePolygonCoordinates = readonly (readonly PlaceGeometryPosition[])[];
-
-export type PlacePolygonGeometry =
-  | {
-      readonly type: 'Polygon';
-      readonly coordinates: PlacePolygonCoordinates;
-    }
-  | {
-      readonly type: 'MultiPolygon';
-      readonly coordinates: readonly PlacePolygonCoordinates[];
-    };
-
-export interface PlaceAreaGeometry {
-  readonly precision: 'approximate';
-  readonly geometry: PlacePolygonGeometry;
-}
-
-export interface PlaceGeometry {
-  readonly area: PlaceAreaGeometry;
-}
+export type PlaceGeometryPosition = EditorialPosition;
+export type PlacePolygonGeometry = EditorialPolygonGeometry;
+export type PlaceGeometry = EditorialFeatureCollection;
 
 export interface PlaceContact {
   readonly id: string;

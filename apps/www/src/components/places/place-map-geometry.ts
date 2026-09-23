@@ -1,14 +1,10 @@
 import type { Feature } from '@yandex/ymaps3-clusterer';
-import type {
-  LngLat,
-  LngLatBounds,
-  MultiPolygonGeometry,
-  PolygonGeometry
-} from '@yandex/ymaps3-types';
+import type { LngLat, LngLatBounds } from '@yandex/ymaps3-types';
 
+import type { EditorialPublicGeometry } from '@/lib/geometry/editorial-public-schema';
+import type { EditorialFeatureCollection } from '@/lib/geometry/editorial-types';
 import type { PlaceMapItem } from '@/lib/places/map-types';
 import { PLACE_MAP_BOUNDS } from '@/lib/places/schema';
-import type { PlaceGeometryPosition, PlacePolygonGeometry } from '@/lib/places/types';
 
 const SETTLEMENT_BOUNDS: LngLatBounds = [
   [PLACE_MAP_BOUNDS.minLng, PLACE_MAP_BOUNDS.minLat],
@@ -22,8 +18,6 @@ const MARKER_CLOSEUP_MAX_ZOOM = 18;
 const MARKER_CLOSEUP_MAX_SCALE = 1.3;
 
 const roundCoordinate = (value: number): number => Number(value.toFixed(6));
-const copyGeometryRing = (ring: readonly PlaceGeometryPosition[]): LngLat[] =>
-  ring.map(([lng, lat]) => [lng, lat]);
 
 export const getPaddedBounds = (coordinates: readonly LngLat[]): LngLatBounds => {
   if (coordinates.length === 0) return SETTLEMENT_BOUNDS;
@@ -70,21 +64,28 @@ export const getMarkerScale = (zoom: number): number => {
   return MARKER_MIN_SCALE + (1 - MARKER_MIN_SCALE) * progress;
 };
 
-export const toMapGeometry = (
-  geometry: PlacePolygonGeometry
-): PolygonGeometry | MultiPolygonGeometry => {
-  if (geometry.type === 'Polygon') {
-    return {
-      type: geometry.type,
-      coordinates: geometry.coordinates.map(copyGeometryRing)
-    };
-  }
-
-  return {
-    type: geometry.type,
-    coordinates: geometry.coordinates.map((polygon) => polygon.map(copyGeometryRing))
-  };
-};
+/** The public collection already contains prepared coordinates; only property names change here. */
+export const fromPublicEditorialGeometry = (
+  collection: EditorialPublicGeometry
+): EditorialFeatureCollection => ({
+  type: 'FeatureCollection',
+  metadata: collection.metadata,
+  features: collection.features.map((feature) => ({
+    type: 'Feature',
+    id: feature.id,
+    geometry: feature.geometry,
+    description: feature.properties.description,
+    iconCaption: feature.properties.iconCaption,
+    markerColor: feature.properties['marker-color'],
+    stroke: feature.properties.stroke,
+    strokeWidth: feature.properties['stroke-width'],
+    strokeOpacity: feature.properties['stroke-opacity'],
+    strokeDasharray: feature.properties['stroke-dasharray'],
+    fill: feature.properties.fill,
+    fillOpacity: feature.properties['fill-opacity'],
+    precision: feature.properties.precision
+  }))
+});
 
 export const createMapFeatures = (places: readonly PlaceMapItem[]): Feature[] =>
   places.map((place) => ({
