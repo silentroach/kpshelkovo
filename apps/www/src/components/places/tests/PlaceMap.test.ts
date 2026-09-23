@@ -899,9 +899,16 @@ describe('PlaceMap', () => {
     expect(options.signal.aborted).toBe(true);
   });
 
-  it.each(['Enter', ' '])(
-    'keeps focus inside the map until a cluster splits after %s',
-    async (key) => {
+  it.each([
+    ['Enter', false, false],
+    [' ', false, false],
+    ['Enter', true, false],
+    [' ', true, false],
+    ['Enter', true, true],
+    [' ', true, true]
+  ] as const)(
+    'keeps focus inside the map when a cluster splits after %s (quick Tab: %s, removed before render: %s)',
+    async (key, quickTab, removeBeforeRender) => {
       vi.stubGlobal('matchMedia', () => ({ matches: false }));
       const view = render(PlaceMap, { props: { places: [pondsPlace, place] } });
       await waitFor(() => expect(clustererProps).toHaveLength(1));
@@ -918,6 +925,11 @@ describe('PlaceMap', () => {
       cluster.click(); // native keyboard activation dispatches a click with detail 0
 
       expect(document.activeElement).toBe(canvas);
+      if (quickTab) {
+        await fireEvent.keyDown(canvas, { key: 'Tab' });
+        cluster.focus();
+        expect(document.activeElement).toBe(cluster);
+      }
       const update = mapUpdateHandlers[0];
       if (!update) throw new Error('Map update listener missing');
       update({
@@ -926,8 +938,9 @@ describe('PlaceMap', () => {
         camera: {},
         mapInAction: false
       });
-      expect(document.activeElement).toBe(canvas);
+      expect(document.activeElement).toBe(quickTab ? cluster : canvas);
 
+      if (removeBeforeRender) cluster.remove();
       props.onRender?.(
         props.features.map((feature) => ({
           clusterId: String(feature.id),
@@ -936,7 +949,7 @@ describe('PlaceMap', () => {
           features: [feature]
         }))
       );
-      cluster.remove();
+      if (!removeBeforeRender) cluster.remove();
       await Promise.resolve();
       expect(canvas.contains(document.activeElement)).toBe(true);
 
@@ -976,7 +989,11 @@ describe('PlaceMap', () => {
 
       const otherControl = document.createElement('button');
       canvas.append(otherControl);
-      if (move === 'Tab') await fireEvent.keyDown(canvas, { key: 'Tab' });
+      if (move === 'Tab') {
+        await fireEvent.keyDown(canvas, { key: 'Tab' });
+        cluster.focus();
+        await fireEvent.keyDown(cluster, { key: 'Tab' });
+      }
       otherControl.focus();
       props.onRender?.(
         props.features.map((feature) => ({
@@ -1002,45 +1019,52 @@ describe('PlaceMap', () => {
     }
   );
 
-  it('returns focus to a cluster that remains after the zoom settles', async () => {
-    const view = render(PlaceMap, { props: { places: [place, titanicPlace] } });
-    await waitFor(() => expect(clustererProps).toHaveLength(1));
-    const props = clustererProps[0]!;
-    const canvas = mapElements[0];
-    const update = mapUpdateHandlers[0];
-    if (!canvas || !update) throw new Error('Cluster focus fixtures missing');
-    props.cluster([37.74, 55.06], props.features);
-    const cluster = markerElements.at(-1);
-    if (!(cluster instanceof HTMLButtonElement)) throw new Error('Cluster button missing');
-    canvas.append(cluster);
-    cluster.focus();
-    cluster.click();
-    update({
-      type: 'update',
-      location: { center: [37.74, 55.06], zoom: 15, bounds: map.bounds },
-      camera: {},
-      mapInAction: false
-    });
-    expect(document.activeElement).toBe(canvas);
-    const renderedCluster = {
-      clusterId: 'still-together',
-      world: { x: 0, y: 0 },
-      lnglat: [37.74, 55.06] as [number, number],
-      features: props.features
-    };
-    props.onRender?.([renderedCluster]);
-    await waitFor(() => expect(document.activeElement).toBe(cluster));
+  it.each([false, true])(
+    'returns focus to a remaining cluster (quick Tab: %s)',
+    async (quickTab) => {
+      const view = render(PlaceMap, { props: { places: [place, titanicPlace] } });
+      await waitFor(() => expect(clustererProps).toHaveLength(1));
+      const props = clustererProps[0]!;
+      const canvas = mapElements[0];
+      const update = mapUpdateHandlers[0];
+      if (!canvas || !update) throw new Error('Cluster focus fixtures missing');
+      props.cluster([37.74, 55.06], props.features);
+      const cluster = markerElements.at(-1);
+      if (!(cluster instanceof HTMLButtonElement)) throw new Error('Cluster button missing');
+      canvas.append(cluster);
+      cluster.focus();
+      cluster.click();
+      if (quickTab) {
+        await fireEvent.keyDown(canvas, { key: 'Tab' });
+        cluster.focus();
+      }
+      update({
+        type: 'update',
+        location: { center: [37.74, 55.06], zoom: 15, bounds: map.bounds },
+        camera: {},
+        mapInAction: false
+      });
+      expect(document.activeElement).toBe(quickTab ? cluster : canvas);
+      const renderedCluster = {
+        clusterId: 'still-together',
+        world: { x: 0, y: 0 },
+        lnglat: [37.74, 55.06] as [number, number],
+        features: props.features
+      };
+      props.onRender?.([renderedCluster]);
+      await waitFor(() => expect(document.activeElement).toBe(cluster));
 
-    const otherControl = document.createElement('button');
-    canvas.append(otherControl);
-    await fireEvent.keyDown(cluster, { key: 'Tab' });
-    otherControl.focus();
-    canvas.append(document.createElement('span'));
-    props.onRender?.([renderedCluster]);
-    await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
-    expect(document.activeElement).toBe(otherControl);
-    view.unmount();
-  });
+      const otherControl = document.createElement('button');
+      canvas.append(otherControl);
+      await fireEvent.keyDown(cluster, { key: 'Tab' });
+      otherControl.focus();
+      canvas.append(document.createElement('span'));
+      props.onRender?.([renderedCluster]);
+      await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
+      expect(document.activeElement).toBe(otherControl);
+      view.unmount();
+    }
+  );
 
   it('cancels pending cluster focus on pointer interaction or unmount', async () => {
     const cancelFrame = vi.spyOn(window, 'cancelAnimationFrame');

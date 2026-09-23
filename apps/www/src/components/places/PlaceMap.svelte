@@ -125,6 +125,7 @@
   const visibleGeometry = new Set<string>();
   const markerEvents = new AbortController();
   let pendingClusterFocusId: Feature['id'] | undefined;
+  let pendingClusterSource: HTMLButtonElement | undefined;
   let clusterFocusObserver: MutationObserver | undefined;
   let clusterFocusFrame: number | undefined;
   let clusterFocusMarkerRendered = false;
@@ -313,6 +314,7 @@
     clusterFocusObserver = undefined;
     clusterFocusFrame = undefined;
     pendingClusterFocusId = undefined;
+    pendingClusterSource = undefined;
     clusterFocusMarkerRendered = false;
     clusterFocusClusterRendered = false;
   };
@@ -322,7 +324,10 @@
 
     // The SDK can remove a focused cluster before inserting its replacement.
     if (document.activeElement === document.body) mapContainer.focus({ preventScroll: true });
-    if (document.activeElement !== mapContainer) {
+    if (
+      document.activeElement !== mapContainer &&
+      document.activeElement !== pendingClusterSource
+    ) {
       cancelClusterFocus();
       return;
     }
@@ -361,6 +366,7 @@
       cancelClusterFocus();
       if (event.detail === 0 && document.activeElement === button && features[0] && mapContainer) {
         pendingClusterFocusId = features[0].id;
+        pendingClusterSource = button;
         mapContainer.focus({ preventScroll: true });
         clusterFocusObserver = new MutationObserver(restoreClusterFocus);
         clusterFocusObserver.observe(mapContainer, { childList: true, subtree: true });
@@ -416,7 +422,11 @@
     document.addEventListener('keydown', closeLayersOnEscape);
     const cancelFocusOnPointer = (): void => cancelClusterFocus();
     const cancelFocusOnMove = (event: FocusEvent): void => {
-      if (pendingClusterFocusId !== undefined && event.target !== mapContainer)
+      if (
+        pendingClusterFocusId !== undefined &&
+        event.target !== mapContainer &&
+        event.target !== pendingClusterSource
+      )
         cancelClusterFocus();
     };
     document.addEventListener('pointerdown', cancelFocusOnPointer, true);
@@ -424,7 +434,11 @@
     mapContainer?.addEventListener(
       'keydown',
       (event) => {
-        if (event.key === 'Tab') cancelClusterFocus();
+        if (
+          event.key === 'Tab' &&
+          (event.shiftKey || event.target !== mapContainer || !pendingClusterSource?.isConnected)
+        )
+          cancelClusterFocus();
       },
       { signal: markerEvents.signal }
     );
