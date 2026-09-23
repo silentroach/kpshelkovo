@@ -128,7 +128,6 @@ const parcel = {
   code: 'SHR-L43',
   aliases: ['SHR-L44'],
   part: 'shr',
-  muted: false,
   geometry: {
     type: 'Polygon',
     coordinates: [
@@ -985,9 +984,12 @@ describe('PlaceMap', () => {
     expect(parcelFetch).not.toHaveBeenCalled();
 
     const layers = screen.getByRole('button', { name: 'Слои' });
+    expect(layers.textContent).toBe('');
+    expect(layers.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
     await fireEvent.click(layers);
     expect(parcelFetch).not.toHaveBeenCalled();
     const toggle = screen.getByRole('button', { name: 'Участки' });
+    expect(toggle.textContent?.trim()).toBe('Участки');
     expect(layers.getAttribute('aria-expanded')).toBe('true');
     expect(toggle.getAttribute('aria-pressed')).toBe('false');
     await fireEvent.click(toggle);
@@ -1100,6 +1102,7 @@ describe('PlaceMap', () => {
     });
     const label = markerElements.find((element) => element.classList.contains('parcel-map-label'));
     expect(label?.textContent).toBe('L43');
+    expect(label?.querySelector('span')?.textContent).toBe('L43');
     expect(label?.getAttribute('aria-label')).toBe('Выбрать участок SHR-L43');
     if (!label) throw new Error('Parcel label missing');
     const geometry = areaFeatures[0]?.props.geometry;
@@ -1128,7 +1131,6 @@ describe('PlaceMap', () => {
     const secondParcel = {
       code: 'SHR-L46',
       part: parcel.part,
-      muted: true,
       geometry: parcel.geometry,
       labelCoordinates: [37.73, 55.065]
     };
@@ -1155,7 +1157,7 @@ describe('PlaceMap', () => {
         [
           {
             "color": "#45564b",
-            "opacity": 0.25,
+            "opacity": 0.5,
             "width": 1,
           },
         ],
@@ -1191,7 +1193,7 @@ describe('PlaceMap', () => {
     window.clearTimeout(secondTimer);
     expire();
     expect(areaFeatures[1]?.update.mock.lastCall?.[0].style).toMatchObject({
-      stroke: [{ color: '#45564b', width: 1, opacity: 0.25 }]
+      stroke: [{ color: '#45564b', width: 1, opacity: 0.5 }]
     });
     await fireEvent.click(secondLabel);
     const renewedTimerIndex = setTimeout.mock.calls.findLastIndex(([, delay]) => delay === 5_000);
@@ -1201,7 +1203,32 @@ describe('PlaceMap', () => {
   });
 
   it('focuses alias links after resolving the dictionary, survives resize, and preserves URL state', async () => {
-    vi.stubGlobal('fetch', parcelFetch);
+    const fetch = vi.fn((url: string) =>
+      url === '/map/data/parcels.json'
+        ? Promise.resolve(
+            Response.json([
+              {
+                ...parcel,
+                geometry: {
+                  type: 'MultiPolygon',
+                  coordinates: [
+                    parcel.geometry.coordinates,
+                    [
+                      [
+                        [37.8, 55.08],
+                        [37.81, 55.08],
+                        [37.81, 55.09],
+                        [37.8, 55.08]
+                      ]
+                    ]
+                  ]
+                }
+              }
+            ])
+          )
+        : parcelFetch(url)
+    );
+    vi.stubGlobal('fetch', fetch);
     vi.stubGlobal('matchMedia', (query: string) => ({ matches: query.includes('reduced-motion') }));
     const historyState = { navigation: 'parcel' };
     window.history.replaceState(historyState, '', '/map/?q=a%20b&flag&p=shr-l44&h=burzhuyka#map');
@@ -1219,13 +1246,24 @@ describe('PlaceMap', () => {
     expect(screen.getByRole('button', { name: 'Участки' }).getAttribute('aria-pressed')).toBe(
       'true'
     );
-    expect(parcelFetch.mock.calls.map(([url]) => url)).toEqual([
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([
       '/map/data/parcel-search.json',
       '/map/data/parcels.json'
     ]);
-    expect(
-      map.update.mock.calls.find(([props]) => props.location?.duration === 0 && props.margin)?.[0]
-    ).toMatchObject({ location: { duration: 0, bounds: expect.any(Array) } });
+    expect(map.update.mock.calls.find(([props]) => props.location?.zoom === 17)?.[0])
+      .toMatchInlineSnapshot(`
+        {
+          "location": {
+            "center": [
+              37.715,
+              55.065,
+            ],
+            "duration": 0,
+            "easing": "ease-in-out",
+            "zoom": 17,
+          },
+        }
+      `);
     expect(markerElements[0]?.dataset.highlighted).toBeUndefined();
 
     const count = map.update.mock.calls.length;
@@ -1241,6 +1279,18 @@ describe('PlaceMap', () => {
     expect(replace.mock.lastCall).toEqual([historyState, '', '/map/?q=a%20b&flag&h=burzhuyka#map']);
     document.dispatchEvent(new Event('astro:page-load'));
     expect(map.update.mock.calls.length).toBe(count);
+  });
+
+  it('uses the label zoom for a direct link to a small parcel', async () => {
+    vi.stubGlobal('fetch', parcelFetch);
+    window.history.replaceState({}, '', '/map/?p=SHR-L43');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    expect(map.update.mock.calls.find(([props]) => props.location?.zoom === 17)?.[0]).toMatchObject(
+      {
+        location: { center: parcel.labelCoordinates, zoom: 17 }
+      }
+    );
   });
 
   it('discards an unknown link before loading geometry without changing layer visibility', async () => {

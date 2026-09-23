@@ -552,7 +552,6 @@
                 pendingParcelCanonical = undefined;
               }
             },
-            getViewMargin,
             getMapZoomDuration
           );
         }
@@ -835,11 +834,22 @@
           bind:this={layersButton}
           type="button"
           class="parcel-map-layers-button"
+          aria-label="Слои"
           aria-expanded={layersOpen}
           aria-controls="parcel-map-layer-list"
           disabled={isLoading}
-          onclick={() => (layersOpen = !layersOpen)}>Слои <span aria-hidden="true">⌄</span></button
+          onclick={() => (layersOpen = !layersOpen)}
         >
+          <svg class="parcel-map-layer-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
         <div id="parcel-map-layer-list" class="parcel-map-layer-list" hidden={!layersOpen}>
           <button
             type="button"
@@ -849,12 +859,14 @@
           >
             <svg class="parcel-map-layer-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
-                d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"
+                d="m4 6 13-2 4 13-13 3L4 6Z"
                 stroke="currentColor"
                 stroke-width="1.6"
                 stroke-linecap="round"
                 stroke-linejoin="round"
               />
+              <circle cx="4" cy="6" r="1.5" fill="currentColor" />
+              <circle cx="21" cy="17" r="1.5" fill="currentColor" />
             </svg>
             Участки
           </button>
@@ -912,9 +924,9 @@
   .parcel-map-layers-button {
     display: inline-flex;
     align-items: center;
-    gap: 0.75rem;
+    justify-content: center;
+    min-width: 2.75rem;
     min-height: 2.75rem;
-    padding: 0.5rem 0.75rem;
     box-shadow: 0 0.125rem 0.4rem oklch(24% 0.04 145 / 0.16);
   }
 
@@ -987,15 +999,18 @@
     color: var(--color-text);
     cursor: pointer;
     font-family: var(--font-body);
-    font-size: 12px;
+    transform: translate(-50%, -50%);
+  }
+
+  :global(.parcel-map-label span) {
+    padding: 0.125rem 0.375rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+    box-shadow: 0 1px 2px oklch(24% 0.04 145 / 0.12);
+    font-size: 13px;
     font-weight: 600;
     line-height: 1.25;
-    text-shadow:
-      -1px -1px 2px var(--color-surface-raised),
-      1px -1px 2px var(--color-surface-raised),
-      -1px 1px 2px var(--color-surface-raised),
-      1px 1px 2px var(--color-surface-raised);
-    transform: translate(-50%, -50%);
   }
 
   .place-map__canvas :global(:is(a, button):focus-visible) {

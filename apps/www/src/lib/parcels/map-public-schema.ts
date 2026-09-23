@@ -17,7 +17,6 @@ export const ParcelMapPublicSchema = z.array(
       code,
       aliases: z.array(code).optional(),
       part: z.enum(PARCEL_PARTS),
-      muted: z.boolean(),
       geometry: RawPolygonGeometrySchema,
       labelCoordinates: z.tuple([z.number().min(-180).max(180), z.number().min(-90).max(90)])
     })

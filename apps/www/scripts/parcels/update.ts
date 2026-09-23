@@ -103,8 +103,10 @@ const main = async (): Promise<void> => {
       throw new Error('cadastral snapshot predates the accepted snapshot; use Git to roll back');
     if (
       !nspd.metadata.response.coverageVerified &&
-      (await readFile(`${input}/nspd.ndjson`, 'utf8')) !==
-        (await readFile(`${sourceDir}/nspd.ndjson`, 'utf8'))
+      ((await readFile(`${input}/nspd.ndjson`, 'utf8')) !==
+        (await readFile(`${sourceDir}/nspd.ndjson`, 'utf8')) ||
+        (await readFile(`${input}/nspd.json`, 'utf8')) !==
+          (await readFile(`${sourceDir}/nspd.json`, 'utf8')))
     )
       throw new Error('verify the new cadastral response coverage before accepting deletions');
   }

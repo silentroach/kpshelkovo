@@ -1,8 +1,6 @@
 import type {
   DrawingStyle,
-  LngLat,
   LngLatBounds,
-  Margin,
   MultiPolygonGeometry,
   PolygonGeometry,
   YMap,
@@ -14,10 +12,6 @@ import type { ParcelLayer, ParcelMapItem } from './parcel-layer-types';
 
 const LABEL_MIN_ZOOM = 17;
 const SELECTION_MS = 5_000;
-const vertices = (geometry: ParcelMapItem['geometry']): readonly LngLat[] =>
-  (geometry.type === 'Polygon' ? geometry.coordinates.flat() : geometry.coordinates.flat(2)).map(
-    ([lng, lat]) => [lng, lat]
-  );
 
 const toMapGeometry = (
   geometry: ParcelMapItem['geometry']
@@ -34,29 +28,11 @@ const toMapGeometry = (
         )
       };
 
-const boundsOf = (points: readonly LngLat[]): LngLatBounds => {
-  let minLng = Infinity;
-  let minLat = Infinity;
-  let maxLng = -Infinity;
-  let maxLat = -Infinity;
-  for (const [lng, lat] of points) {
-    minLng = Math.min(minLng, lng);
-    minLat = Math.min(minLat, lat);
-    maxLng = Math.max(maxLng, lng);
-    maxLat = Math.max(maxLat, lat);
-  }
-  return [
-    [minLng, minLat],
-    [maxLng, maxLat]
-  ];
-};
-
 export const createParcelLayer = (
   map: YMap,
   sdk: typeof ymaps3,
   container: HTMLElement,
   onExpiry: (code: string) => void,
-  getViewMargin: () => Margin,
   getDuration: () => number
 ): ParcelLayer => {
   let items: readonly ParcelMapItem[] = [];
@@ -76,12 +52,12 @@ export const createParcelLayer = (
     if (!value) throw new Error(`Не найден цвет карты ${name}`);
     return value;
   };
-  const normalStyle = (item: ParcelMapItem): DrawingStyle => ({
+  const normalStyle = (): DrawingStyle => ({
     zIndex: -1,
     interactive: true,
     simplificationRate: 0,
     fillOpacity: 0,
-    stroke: [{ color: token('--color-text-muted'), width: 1, opacity: item.muted ? 0.25 : 0.5 }]
+    stroke: [{ color: token('--color-text-muted'), width: 1, opacity: 0.5 }]
   });
   const selectedStyle = (): DrawingStyle => ({
     zIndex: -1,
@@ -95,7 +71,7 @@ export const createParcelLayer = (
   const clearSelection = (): void => {
     if (timer !== undefined) window.clearTimeout(timer);
     timer = undefined;
-    if (selected) features.get(selected.code)?.update({ style: normalStyle(selected) });
+    if (selected) features.get(selected.code)?.update({ style: normalStyle() });
     selected = undefined;
   };
 
@@ -131,7 +107,9 @@ export const createParcelLayer = (
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'parcel-map-label';
-        button.textContent = item.code.split('-')[1] ?? item.code;
+        const text = document.createElement('span');
+        text.textContent = item.code.split('-')[1] ?? item.code;
+        button.append(text);
         button.title = item.code;
         button.setAttribute('aria-label', `Выбрать участок ${item.code}`);
         button.addEventListener('click', (event) => {
@@ -169,7 +147,7 @@ export const createParcelLayer = (
         const feature = new sdk.YMapFeature({
           id: `parcel-${item.code}`,
           geometry: toMapGeometry(item.geometry),
-          style: normalStyle(item),
+          style: normalStyle(),
           onClick: () => select(item)
         });
         features.set(item.code, feature);
@@ -182,10 +160,13 @@ export const createParcelLayer = (
       if (!active || destroyed) return false;
       const item = items.find((parcel) => parcel.code === code || parcel.aliases?.includes(code));
       if (!item) return false;
-      const bounds = boundsOf(vertices(item.geometry));
       map.update({
-        location: { bounds, duration: getDuration(), easing: 'ease-in-out' },
-        margin: getViewMargin()
+        location: {
+          center: item.labelCoordinates,
+          zoom: LABEL_MIN_ZOOM,
+          duration: getDuration(),
+          easing: 'ease-in-out'
+        }
       });
       select(item);
       return true;

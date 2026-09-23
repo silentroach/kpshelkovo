@@ -21,7 +21,7 @@ describe('genplan mapping', () => {
     ['Неразобранное', 'unavailable'],
     ['Закрыто и не реализовано', 'unavailable']
   ])('%s maps to %s', (source, target) => {
-    expect(mapGenplanSnapshot(snapshot({ status: source })).plots[0]?.status).toBe(target);
+    expect(mapGenplanSnapshot(snapshot({ status: `  ${source}  ` })).plots[0]?.status).toBe(target);
   });
 
   it.each([

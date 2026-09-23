@@ -104,7 +104,7 @@ export const GenplanSnapshotSchema = z
           .object({
             id: z.string().min(1),
             cadastralReference: z.string().optional(),
-            status: z.enum(GENPLAN_STATUSES),
+            status: z.string().trim().pipe(z.enum(GENPLAN_STATUSES)),
             location: z.string().trim().pipe(z.enum(GENPLAN_LOCATIONS)),
             objectprice: z.number().int().nonnegative().optional()
           })
@@ -203,7 +203,7 @@ export const GenplanPagePlotSchema = z
   .object({
     id: z.string().min(1),
     cadastral_number: z.string().nullable(),
-    status: z.enum(GENPLAN_STATUSES),
+    status: z.string().trim().pipe(z.enum(GENPLAN_STATUSES)),
     location: z.string().trim().pipe(z.enum(GENPLAN_LOCATIONS)),
     objectprice: z.number().int().nonnegative().nullable()
   })

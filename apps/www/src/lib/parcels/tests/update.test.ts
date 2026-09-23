@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { mkdtemp, readFile, readdir, rm, mkdir, writeFile } from 'node:fs/promises';
+import { copyFile, mkdtemp, readFile, readdir, rm, mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -129,6 +129,44 @@ describe('parcel matching and updating', () => {
     expect(resolveParcels(changed, nspd([a, b]), confirmed).conflicts).toContain(
       'SHR-L43: confirmed reference changed for SHR-L44: 50:33:0010101:2998 (was 50:33:0010101:3000)'
     );
+  });
+
+  it('keeps confirmed parcels when a direct collision arrives before or after them', () => {
+    const confirmed = match(['SHR-L43'], a, { 'SHR-L43': a });
+    const original = saved(
+      reconcileParcels(plans([{ id: 'L43', cadastralReference: a }]), nspd([a]), confirmed, [])
+    );
+    for (const plots of [
+      [
+        { id: 'L45', cadastralReference: a },
+        { id: 'L43', cadastralReference: a }
+      ],
+      [
+        { id: 'L43', cadastralReference: a },
+        { id: 'L45', cadastralReference: a }
+      ]
+    ]) {
+      const sources = plans(plots);
+      const resolution = resolveParcels(sources, nspd([a]), confirmed);
+      expect({
+        candidates: resolution.candidates.map(({ plots }) => plots.map(({ code }) => code)),
+        conflicts: resolution.conflicts
+      }).toMatchInlineSnapshot(`
+        {
+          "candidates": [
+            [
+              "SHR-L43",
+            ],
+          ],
+          "conflicts": [
+            "SHR-L45: direct reference collides with confirmed group 50:33:0010101:2998",
+          ],
+        }
+      `);
+      const update = reconcileParcels(sources, nspd([a]), confirmed, original);
+      expect(update.deleted).toEqual([]);
+      expect(update.records[0]?.data.code).toBe('SHR-L43');
+    }
   });
 
   it('keeps the cadastral record through boundary change and merge; requires selection for a new number', () => {
@@ -453,6 +491,14 @@ describe('parcel matching and updating', () => {
     ).toBe('L43');
     expect(
       parseGenplanPage(
+        html.replace('Свободен', '  Свободен  '),
+        'shr',
+        'https://example.org/',
+        '2026-09-22T12:00:00Z'
+      ).plots[0]?.status
+    ).toBe('Свободен');
+    expect(
+      parseGenplanPage(
         `<!-- ${html} --><script data-description="a > b">window['houses_data'] = ${json}</script>`,
         'shr',
         'https://example.org/',
@@ -602,6 +648,29 @@ describe('parcel matching and updating', () => {
       );
       expect(result.status).not.toBe(0);
       expect(await readFile(new URL('genplans/shr.json', sources), 'utf8')).toBe(original);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  it('rejects changed metadata for an unverified cadastral repeat without changing accepted data', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'parcel-nspd-'));
+    const sources = new URL('../../../data/parcel-sources/', import.meta.url);
+    const accepted = await readFile(new URL('nspd.json', sources), 'utf8');
+    try {
+      await copyFile(new URL('nspd.ndjson', sources), join(directory, 'nspd.ndjson'));
+      const metadata = JSON.parse(accepted);
+      metadata.capturedOn = '2026-09-24';
+      await writeFile(join(directory, 'nspd.json'), JSON.stringify(metadata));
+      const script = new URL('../../../../scripts/parcels/update.ts', import.meta.url);
+      const result = spawnSync(
+        process.execPath,
+        [script.pathname, 'nspd', '--snapshot', directory],
+        { encoding: 'utf8', cwd: new URL('../../../../../', import.meta.url).pathname }
+      );
+      expect(result.status).not.toBe(0);
+      expect(result.stderr).toContain('verify the new cadastral response coverage');
+      expect(await readFile(new URL('nspd.json', sources), 'utf8')).toBe(accepted);
     } finally {
       await rm(directory, { recursive: true, force: true });
     }

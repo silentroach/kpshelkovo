@@ -55,6 +55,11 @@ export const resolveParcels = (
       conflicts.push(`${plot.code}: direct reference collides with confirmed group ${number}`);
       continue;
     }
+    if (match && !group.match) {
+      for (const direct of group.plots)
+        conflicts.push(`${direct.code}: direct reference collides with confirmed group ${number}`);
+      group.plots.length = 0;
+    }
     group.match = match;
     group.plots.push(plot);
     grouped.set(number, group);
