@@ -3,9 +3,9 @@ import { projectNspdGeometry } from './projection.ts';
 import { RawParcelSchema } from './raw-schema.ts';
 import { resolveParcels } from './resolve.ts';
 import type { ConfirmedMatches, MappedGenplanSnapshot, NspdSnapshot } from './source-types.ts';
+import { parcelRecordPath } from './source.ts';
 import type { ParcelChange, ParcelUpdate, SavedParcel } from './update-types.ts';
 
-const pathFor = (code: string): string => `${code.toLowerCase().replace('-', '/')}.md`;
 const same = (left: unknown, right: unknown): boolean =>
   JSON.stringify(left) === JSON.stringify(right);
 
@@ -129,7 +129,7 @@ export const reconcileParcels = (
       features,
       price_history: priceHistory
     });
-    const path = pathFor(code);
+    const path = parcelRecordPath(code);
     records.push({ path, data, body: retained?.body ?? '' });
     if (!retained) added.push(path);
     else {

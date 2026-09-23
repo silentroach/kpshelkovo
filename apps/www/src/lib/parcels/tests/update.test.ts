@@ -155,7 +155,7 @@ describe('parcel matching and updating', () => {
       [],
       old
     );
-    expect(second.geometryChanged).toEqual(['shr/l43.md', 'shr/l44.md']);
+    expect(second.geometryChanged).toEqual(['shr/l/l43.md', 'shr/l/l44.md']);
     const linked = match(['SHR-L43', 'SHR-L44'], a, { 'SHR-L43': a, 'SHR-L44': b }, 'SHR-L43');
     const merge = reconcileParcels(
       plans([
@@ -179,7 +179,7 @@ describe('parcel matching and updating', () => {
       {
         "kept": [
           [
-            "shr/l43.md",
+            "shr/l/l43.md",
             [
               "SHR-L44",
             ],
@@ -199,7 +199,7 @@ describe('parcel matching and updating', () => {
           "SHR-L43: part prices SHR-L43=300, SHR-L44=400; kept 100 (whole-parcel price unconfirmed)",
         ],
         "removed": [
-          "shr/l44.md",
+          "shr/l/l44.md",
         ],
       }
     `);
@@ -257,7 +257,7 @@ describe('parcel matching and updating', () => {
     ]).toMatchInlineSnapshot(`
         [
           [
-            "shr/l43.md -> shr/l44.md",
+            "shr/l/l43.md -> shr/l/l44.md",
           ],
           "Заметка **дословно**.
 
@@ -283,7 +283,7 @@ describe('parcel matching and updating', () => {
                 "price": 100,
               },
             ],
-            "path": "shr/l43.md",
+            "path": "shr/l/l43.md",
           },
           {
             "body": "",
@@ -293,17 +293,17 @@ describe('parcel matching and updating', () => {
                 "price": 200,
               },
             ],
-            "path": "shr/l44.md",
+            "path": "shr/l/l44.md",
           },
         ]
       `);
     expect(
       reconcileParcels(plans([{ id: 'L43', cadastralReference: a }]), nspd([b]), [], first).deleted
-    ).toEqual(['shr/l43.md']);
+    ).toEqual(['shr/l/l43.md']);
     expect(
       reconcileParcels(plans([{ id: 'L45', cadastralReference: b }]), nspd([a, b]), [], first)
         .deleted
-    ).toEqual(['shr/l43.md']);
+    ).toEqual(['shr/l/l43.md']);
   });
 
   it('keeps ambiguous status, unions features, and only observes a confirmed whole-parcel price', () => {
@@ -479,7 +479,7 @@ describe('parcel matching and updating', () => {
     const directory = await mkdtemp(join(tmpdir(), 'parcel-update-'));
     try {
       const first = reconcileParcels(
-        plans([{ id: 'L43', cadastralReference: a }]),
+        plans([{ id: 'L43', cadastralReference: a, objectprice: 100 }]),
         nspd([a]),
         [],
         []
@@ -490,27 +490,31 @@ describe('parcel matching and updating', () => {
         records: first.records.map((record) => ({ ...record, body }))
       });
       const stored = await readSavedParcels(directory);
-      const content = await readFile(join(directory, 'shr/l43.md'), 'utf8');
+      const content = await readFile(join(directory, 'shr/l/l43.md'), 'utf8');
       const repeated = reconcileParcels(
-        plans([{ id: 'L43', cadastralReference: a }]),
+        plans([{ id: 'L43', cadastralReference: a, objectprice: 100 }]),
         nspd([a]),
         [],
         stored
       );
       await writeParcelUpdate(directory, repeated);
-      expect(await readFile(join(directory, 'shr/l43.md'), 'utf8')).toBe(content);
+      expect(await readFile(join(directory, 'shr/l/l43.md'), 'utf8')).toBe(content);
       expect(repeated.added).toEqual([]);
       const renamed = reconcileParcels(
-        plans([{ id: 'L44', cadastralReference: a }]),
+        plans([{ id: 'M44', cadastralReference: a, objectprice: 100 }]),
         nspd([a]),
         [],
         stored
       );
       await writeParcelUpdate(directory, renamed);
       expect((await readSavedParcels(directory)).map((record) => record.path)).toEqual([
-        'shr/l44.md'
+        'shr/m/m44.md'
       ]);
       expect((await readSavedParcels(directory))[0]?.body).toBe(body);
+      expect((await readSavedParcels(directory))[0]?.data.price_history).toEqual(
+        stored[0]?.data.price_history
+      );
+      expect(renamed.renamed).toEqual(['shr/l/l43.md -> shr/m/m44.md']);
       expect(formatParcelUpdate(renamed, nspd([a]))).toContain('Переименованы: 1');
       expect(formatParcelUpdate(first, nspd([a]))).toContain('Добавлены: 1');
       expect(formatParcelUpdate(renamed, nspd([a]))).toContain('Удалены: 1');

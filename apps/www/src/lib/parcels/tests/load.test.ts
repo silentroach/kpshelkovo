@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { buildParcelsDataset } from '../load';
 import { RawParcelSchema } from '../raw-schema';
-import { parcelSourceId } from '../source';
+import { parcelRecordPath, parcelSourceId } from '../source';
 import type { ParcelEntry } from '../types';
 
 const geometry = {
@@ -22,7 +22,7 @@ const entry = (
   cadastralNumber = '50:33:0010101:2998',
   aliases: readonly string[] = []
 ): ParcelEntry => ({
-  id: code.toLowerCase().replace('-', '/'),
+  id: parcelRecordPath(code).slice(0, -3),
   body: 'Заметка **редактора**.\n',
   data: RawParcelSchema.parse({
     code,
@@ -67,9 +67,11 @@ describe('parcel dataset', () => {
   });
 
   it('rejects paths that do not match the primary code', () => {
-    expect(() => parcelSourceId('shr/l43/extra.md')).toThrow('parcel path');
-    expect(() => parcelSourceId('shr/L43.md')).toThrow('parcel path');
-    expect(() => buildParcelsDataset([{ ...entry(), id: 'shr/l44' }])).toThrow(
+    expect(parcelSourceId('shr/l/l43.md')).toBe('shr/l/l43');
+    expect(() => parcelSourceId('shr/l43.md')).toThrow('parcel path');
+    expect(() => parcelSourceId('shr/m/l43.md')).toThrow('parcel path');
+    expect(() => parcelSourceId('shr/L/l43.md')).toThrow('parcel path');
+    expect(() => buildParcelsDataset([{ ...entry(), id: 'shr/l/l44' }])).toThrow(
       'does not match primary code'
     );
   });

@@ -1,7 +1,8 @@
+import { parcelRecordPath } from './source.ts';
 import type { ParcelEntry, Parcel } from './types.ts';
 
 export const mapRawParcel = (entry: ParcelEntry): Parcel => {
-  const path = entry.data.code.toLowerCase().replace('-', '/');
+  const path = parcelRecordPath(entry.data.code).slice(0, -3);
   if (entry.id !== path) {
     throw new Error(`parcel path "${entry.id}" does not match primary code "${entry.data.code}"`);
   }
