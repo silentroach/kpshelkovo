@@ -11,7 +11,7 @@ tags:
 source_url: https://okkomfort.domyland.app/news?targetId=119187&entityName=news&t=okkomfort
 ---
 
-На время [реконструкции дамбы](/status/incidents/2026/09/dam-river-reconstruction/) жители поселка смогут пользоваться **[техническим въездом в Шелково Парк](@park-checkpoint)** (КПП № 4). [КПП Шелково Ривер](@river-checkpoint) на период работ закроют для проезда.
+На время [реконструкции дамбы](/status/incidents/2026/09/dam-river-reconstruction/) жители поселка смогут пользоваться **[техническим въездом в Шелково Парк](@park-checkpoint)** (КПП № 4). [КПП Шелково Ривер](@river-checkpoint) на период работ закроют для проезда. Ниже показана схема объезда из Семеновского.
 
 ```map https://yandex.ru/maps/?um=constructor%3A868dc810f703c33e9d996846f6e6ec6a103fff5a3c76fa44c6a05325a9666e0d&source=constructorLink
 {

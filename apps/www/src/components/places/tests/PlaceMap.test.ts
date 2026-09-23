@@ -926,9 +926,10 @@ describe('PlaceMap', () => {
 
       expect(document.activeElement).toBe(canvas);
       if (quickTab) {
-        await fireEvent.keyDown(canvas, { key: 'Tab' });
-        cluster.focus();
-        expect(document.activeElement).toBe(cluster);
+        const tab = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+        canvas.dispatchEvent(tab);
+        expect(tab.defaultPrevented).toBe(true);
+        expect(document.activeElement).toBe(canvas);
       }
       const update = mapUpdateHandlers[0];
       if (!update) throw new Error('Map update listener missing');
@@ -938,7 +939,7 @@ describe('PlaceMap', () => {
         camera: {},
         mapInAction: false
       });
-      expect(document.activeElement).toBe(quickTab ? cluster : canvas);
+      expect(document.activeElement).toBe(canvas);
 
       if (removeBeforeRender) cluster.remove();
       props.onRender?.(
@@ -1020,6 +1021,60 @@ describe('PlaceMap', () => {
   );
 
   it.each([false, true])(
+    'tracks a cluster through an intermediate render before it splits (quick Tab: %s)',
+    async (quickTab) => {
+      const view = render(PlaceMap, { props: { places: [pondsPlace, place] } });
+      await waitFor(() => expect(clustererProps).toHaveLength(1));
+      const props = clustererProps[0]!;
+      const canvas = mapElements[0];
+      if (!canvas) throw new Error('Map canvas missing');
+      props.cluster([37.74, 55.06], props.features);
+      const cluster = markerElements.at(-1);
+      if (!(cluster instanceof HTMLButtonElement)) throw new Error('Cluster button missing');
+      canvas.append(cluster);
+      cluster.focus();
+      cluster.click();
+      if (quickTab) {
+        await fireEvent.keyDown(canvas, { key: 'Tab' });
+        cluster.focus();
+      }
+
+      props.onRender?.([
+        {
+          clusterId: 'intermediate',
+          world: { x: 0, y: 0 },
+          lnglat: [37.74, 55.06],
+          features: props.features
+        }
+      ]);
+      await waitFor(() => expect(document.activeElement).toBe(cluster));
+      props.onRender?.(
+        props.features.map((feature) => ({
+          clusterId: String(feature.id),
+          world: { x: 0, y: 0 },
+          lnglat: feature.geometry.coordinates,
+          features: [feature]
+        }))
+      );
+      cluster.remove();
+      await Promise.resolve();
+      expect(canvas.contains(document.activeElement)).toBe(true);
+      const firstMarker = markerElements.find(
+        (element) =>
+          element instanceof HTMLAnchorElement && element.href.endsWith('/hunting-ponds/')
+      );
+      if (!firstMarker) throw new Error('First place marker missing');
+      canvas.append(firstMarker);
+      await waitFor(() => expect(document.activeElement).toBe(firstMarker));
+      firstMarker.blur();
+      expect(
+        map.removeChild.mock.calls.filter(([child]) => areaFeatures.includes(child))
+      ).toHaveLength(2);
+      view.unmount();
+    }
+  );
+
+  it.each([false, true])(
     'returns focus to a remaining cluster (quick Tab: %s)',
     async (quickTab) => {
       const view = render(PlaceMap, { props: { places: [place, titanicPlace] } });
@@ -1061,6 +1116,20 @@ describe('PlaceMap', () => {
       canvas.append(document.createElement('span'));
       props.onRender?.([renderedCluster]);
       await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
+      expect(document.activeElement).toBe(otherControl);
+      props.onRender?.(
+        props.features.map((feature) => ({
+          clusterId: String(feature.id),
+          world: { x: 0, y: 0 },
+          lnglat: feature.geometry.coordinates,
+          features: [feature]
+        }))
+      );
+      cluster.remove();
+      const firstMarker = markerElements.find((element) => element instanceof HTMLAnchorElement);
+      if (!firstMarker) throw new Error('First place marker missing');
+      canvas.append(firstMarker);
+      await Promise.resolve();
       expect(document.activeElement).toBe(otherControl);
       view.unmount();
     }

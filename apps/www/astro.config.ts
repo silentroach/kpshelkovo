@@ -64,7 +64,7 @@ export default defineConfig({
   markdown: {
     syntaxHighlight: {
       type: 'shiki',
-      excludeLangs: ['math', 'change', 'change-inline', 'change-block']
+      excludeLangs: ['math', 'change', 'change-inline', 'change-block', 'map']
     },
     processor: createAstroMarkdownProcessor()
   },

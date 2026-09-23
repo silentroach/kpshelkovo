@@ -346,7 +346,8 @@
       candidate.dataset.placeIds?.split(' ').includes(id)
     );
     if (cluster) {
-      cancelClusterFocus();
+      // Another render can replace this cluster before the zoom finishes.
+      pendingClusterSource = cluster;
       cluster.focus({ preventScroll: true });
     }
   };
@@ -434,11 +435,12 @@
     mapContainer?.addEventListener(
       'keydown',
       (event) => {
-        if (
-          event.key === 'Tab' &&
-          (event.shiftKey || event.target !== mapContainer || !pendingClusterSource?.isConnected)
-        )
-          cancelClusterFocus();
+        if (event.key !== 'Tab') return;
+        if (!event.shiftKey && event.target === mapContainer && pendingClusterSource?.isConnected) {
+          event.preventDefault();
+          return;
+        }
+        cancelClusterFocus();
       },
       { signal: markerEvents.signal }
     );
