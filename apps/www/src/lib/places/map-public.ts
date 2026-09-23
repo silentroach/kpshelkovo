@@ -1,18 +1,12 @@
+import { toPublicEditorialGeometry } from '@/lib/geometry/editorial-public';
+
 import type {
-  PlaceMapPublicGeometryDto,
   PlaceMapPublicItemDto,
   PlaceMapPublicOpeningHoursDto,
   PlaceMapPublicPayloadDto
 } from './map-public-dto';
 import { selectMapPlaces } from './map-selection';
-import type { Place, PlaceGeometry, PlaceOpeningHours } from './types';
-
-const toPublicGeometry = (value: PlaceGeometry): PlaceMapPublicGeometryDto => ({
-  area: {
-    precision: value.area.precision,
-    geometry: value.area.geometry
-  }
-});
+import type { Place, PlaceOpeningHours } from './types';
 
 export const toPublicOpeningHours = (value: PlaceOpeningHours): PlaceMapPublicOpeningHoursDto => ({
   description: value.description,
@@ -32,7 +26,7 @@ const toPublicPlace = (place: Place): PlaceMapPublicItemDto => ({
     lat: place.coordinates.lat,
     lng: place.coordinates.lng
   },
-  geometry: place.geometry ? toPublicGeometry(place.geometry) : undefined,
+  geometry: place.geometry ? toPublicEditorialGeometry(place.geometry) : undefined,
   opening_hours: place.openingHours ? toPublicOpeningHours(place.openingHours) : undefined,
   html_url: place.canonical
 });

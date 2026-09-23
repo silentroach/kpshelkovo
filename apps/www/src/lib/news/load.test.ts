@@ -214,6 +214,78 @@ describe('buildNewsDataset', () => {
     expect(data.articles[0]?.mentions.map((item) => item.slug)).toEqual(['kschemelinin']);
   });
 
+  it('validates map blocks at load time while keeping GeoJSON out of mentions and backlinks', () => {
+    const rawMap = JSON.stringify({
+      type: 'FeatureCollection',
+      metadata: { name: '@unknown' },
+      features: [
+        { type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [37, 55] } }
+      ]
+    });
+    const data = buildNewsDataset(
+      [author({ id: 'ig', name: 'Редакция' })],
+      [
+        article({
+          id: '2026/05/map',
+          title: 'Схема',
+          summary: 'Схема проезда',
+          date: '03.05.2026',
+          body: `О схеме рассказал @kschemelinin.\n\n\`\`\`map https://example.com/map\n${rawMap}\n\`\`\`\n\nЕщё слова @kschemelinin.`
+        })
+      ],
+      {
+        mentionRegistry: new Map([
+          ['kschemelinin', createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин')]
+        ])
+      }
+    );
+
+    expect(data.articles[0]?.body).toContain(rawMap);
+    expect(data.articles[0]?.body).not.toContain('О схеме рассказал @kschemelinin');
+    expect(data.articles[0]?.mentions.map((item) => item.slug)).toEqual(['kschemelinin']);
+  });
+
+  it('fails before publishing an invalid map in a news article', () => {
+    expect(() =>
+      buildNewsDataset(
+        [author({ id: 'ig', name: 'Редакция' })],
+        [
+          article({
+            id: '2026/05/map',
+            title: 'Схема',
+            summary: 'Схема проезда',
+            date: '03.05.2026',
+            body: '\`\`\`map\n{\n\`\`\`'
+          })
+        ]
+      )
+    ).toThrow('news article "2026/05/map" body map insertion 1 has invalid JSON');
+  });
+
+  it('rejects an empty map at load time with its article and insertion', () => {
+    const valid = JSON.stringify({
+      type: 'FeatureCollection',
+      features: [
+        { type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [37, 55] } }
+      ]
+    });
+
+    expect(() =>
+      buildNewsDataset(
+        [author({ id: 'ig', name: 'Редакция' })],
+        [
+          article({
+            id: '2026/05/map',
+            title: 'Схема',
+            summary: 'Схема проезда',
+            date: '03.05.2026',
+            body: `\`\`\`map\n${valid}\n\`\`\`\n\n\`\`\`map\n{"type":"FeatureCollection","features":[]}\n\`\`\``
+          })
+        ]
+      )
+    ).toThrow(/news article "2026\/05\/map" body map insertion 2.*features.*at least one feature/u);
+  });
+
   it('attaches summaries to their year and month archives', () => {
     const data = buildNewsDatasetSource(
       [author({ id: 'ig', name: 'Редакция' })],

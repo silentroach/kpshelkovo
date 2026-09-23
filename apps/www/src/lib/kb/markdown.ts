@@ -5,6 +5,7 @@ import {
   serializeMarkdownDocument
 } from '@shelkovo/markdown';
 
+import { appendEditorialMapCaptions } from '@/lib/markdown/editorial-maps-companion';
 import { absoluteUrl } from '@/lib/site';
 
 import { kbDetailMarkdownUrl, kbMarkdownUrl } from './routes';
@@ -40,8 +41,8 @@ const rewriteKbLinkNode = (node: MarkdownNode): void => {
   }
 };
 
-const kbMarkdownBody = (markdown: string) => {
-  const nodes = parseMarkdownFragment(markdown);
+const kbMarkdownBody = (markdown: string, source: string) => {
+  const nodes = appendEditorialMapCaptions(parseMarkdownFragment(markdown), source);
 
   for (const node of nodes) {
     rewriteKbLinkNode(node);
@@ -66,6 +67,6 @@ export const buildKbPageMarkdown = (page: KbPage): string =>
   serializeMarkdownDocument(
     createMarkdownDocument({
       frontmatter: kbFrontmatter(page),
-      children: [md.heading(1, page.title), ...kbMarkdownBody(page.body.trim())]
+      children: [md.heading(1, page.title), ...kbMarkdownBody(page.body.trim(), page.canonical)]
     })
   );

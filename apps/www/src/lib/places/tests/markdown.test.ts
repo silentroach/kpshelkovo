@@ -119,20 +119,24 @@ describe('places Markdown', () => {
       nameCases: { gen: 'Буржуйки' },
       searchAliases: ['фудтрак'],
       geometry: {
-        area: {
-          precision: 'approximate',
-          geometry: {
-            type: 'Polygon',
-            coordinates: [
-              [
-                [37.71, 55.06],
-                [37.72, 55.06],
-                [37.71, 55.07],
-                [37.71, 55.06]
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            precision: 'approximate',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [37.71, 55.06],
+                  [37.72, 55.06],
+                  [37.71, 55.07],
+                  [37.71, 55.06]
+                ]
               ]
-            ]
+            }
           }
-        }
+        ]
       }
     });
     expect(frontmatter).toMatchInlineSnapshot(`

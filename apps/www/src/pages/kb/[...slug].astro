@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import '@/components/maps/editorial-map.css';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import type { BreadcrumbItem } from '@/lib/breadcrumbs';
 import { kbBreadcrumbs } from '@/lib/kb/breadcrumbs';
@@ -88,6 +89,9 @@ const bodyHtml = page.body
       )
     }
   </main>
+  <script>
+    import '@/components/maps/editorial-map-element';
+  </script>
 </BaseLayout>
 
 <style>

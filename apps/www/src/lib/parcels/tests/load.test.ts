@@ -101,4 +101,29 @@ describe('parcel dataset', () => {
     expect(buildParcelsDataset([{ ...entry(), data: parcel }]).parcels[0]?.areaM2).toBe(2150);
     expect(parcel.status).toBeUndefined();
   });
+
+  it('keeps the parcel polygon boundary strict when editorial geometries include points and lines', () => {
+    expect(
+      RawParcelSchema.safeParse({
+        ...entry().data,
+        geometry: { type: 'Point', coordinates: [37.74, 55.05] }
+      }).success
+    ).toBe(false);
+    expect(
+      RawParcelSchema.safeParse({
+        ...entry().data,
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [37, 55],
+              [38, 55],
+              [38, 56],
+              [37, 56]
+            ]
+          ]
+        }
+      }).success
+    ).toBe(false);
+  });
 });

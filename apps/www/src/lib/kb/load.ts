@@ -1,5 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
+import { extractEditorialMaps } from '@/lib/markdown/editorial-maps';
 import { preprocessSiteMarkdownContent } from '@/lib/markdown/render';
 import type { SiteMentionRegistry } from '@/lib/mentions';
 import { loadSiteMentionRegistry } from '@/lib/mentions/registry';
@@ -69,6 +70,7 @@ const mapEntry = (
   isSection: boolean
 ): KbPage => {
   const flags = entry.data.flags ?? [];
+  extractEditorialMaps(entry.body ?? '', `kb page "${entry.id}" body`);
   const body = preprocessSiteMarkdownContent(
     entry.body ?? '',
     `kb page "${entry.id}" body`,

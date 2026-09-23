@@ -10,10 +10,10 @@
     TITANIC_MARKER
   } from '@shelkovo/ui/markers';
   import type { Feature } from '@yandex/ymaps3-clusterer';
-  import type { DrawingStyle } from '@yandex/ymaps3-types';
   import { onMount } from 'svelte';
-  import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
+  import { createEditorialMapObjects } from '@/components/maps/editorial-map';
+  import { EditorialPublicGeometrySchema } from '@/lib/geometry/editorial-public-schema';
   import { getUrlWithoutParcel, PARCEL_QUERY_PARAM } from '@/lib/parcels/parcel-url';
   import { PARCEL_CODE } from '@/lib/parcels/schema';
   import type {
@@ -35,10 +35,10 @@
   import type { ParcelLayer, ParcelMapPayload } from './parcel-layer-types';
   import {
     createMapFeatures,
+    fromPublicEditorialGeometry,
     getMarkerScale,
     getPaddedBounds,
-    getPlaceBounds,
-    toMapGeometry
+    getPlaceBounds
   } from './place-map-geometry';
   import { getUrlWithoutPlaceHighlight, PLACE_HIGHLIGHT_QUERY_PARAM } from './place-map-url';
 
@@ -53,7 +53,6 @@
   const CLUSTER_GRID_SIZE = 48;
   const CLUSTER_ZOOM_DURATION_MS = 220;
   const HIGHLIGHT_DURATION_MS = 5_000;
-  const AREA_HOVER_LEAVE_DELAY_MS = 80;
   const MARKER_MAX_ZOOM = 16;
   const PLACE_FOCUS_ZOOM = MARKER_MAX_ZOOM;
   const PARCEL_DATA_URL = '/map/data/parcels.json';
@@ -63,7 +62,9 @@
     marker: place.marker,
     status: place.status,
     coordinates: place.coordinates,
-    geometry: place.geometry,
+    geometry: place.geometry
+      ? fromPublicEditorialGeometry(EditorialPublicGeometrySchema.parse(place.geometry))
+      : undefined,
     openingHours: place.opening_hours
       ? {
           description: place.opening_hours.description,
@@ -113,15 +114,21 @@
   let map: ymaps3.YMap | undefined;
   let mapClusterer: ymaps3.YMapEntity<unknown> | undefined;
   let mapListener: ymaps3.YMapListener | undefined;
-  let mapAreaFeatures = new SvelteMap<string, ymaps3.YMapFeature>();
+  const mapEditorialObjects = new Map<
+    string,
+    readonly (ymaps3.YMapFeature | ymaps3.YMapMarker)[]
+  >();
   let markerContents: Array<readonly [PlaceMapItem, HTMLAnchorElement]> = [];
-  const markerHoveredAreas = new SvelteSet<string>();
-  const featureHoveredAreas = new SvelteSet<string>();
-  const focusedAreas = new SvelteSet<string>();
-  const highlightedAreas = new SvelteSet<string>();
-  const areaHoverLeaveTimers = new SvelteMap<string, number>();
+  const markerHoveredGeometry = new Set<string>();
+  const focusedGeometry = new Set<string>();
+  const highlightedGeometry = new Set<string>();
+  const visibleGeometry = new Set<string>();
+  const markerEvents = new AbortController();
   let pendingClusterFocusId: Feature['id'] | undefined;
+  let clusterFocusObserver: MutationObserver | undefined;
   let clusterFocusFrame: number | undefined;
+  let clusterFocusMarkerRendered = false;
+  let clusterFocusClusterRendered = false;
   let isLoading = $state(true);
   let error: string | undefined = $state(undefined);
   let parcelsEnabled = $state(false);
@@ -142,125 +149,31 @@
     'oneFingerZoom'
   ];
 
-  const supportsAreaHover = (): boolean =>
+  const supportsGeometryHover = (): boolean =>
     window.matchMedia?.('(hover: hover) and (pointer: fine)').matches ?? false;
 
-  const getMapToken = (name: string): string => {
-    const inheritedValue = mapContainer
-      ? getComputedStyle(mapContainer).getPropertyValue(name).trim()
-      : '';
-    const value = inheritedValue || document.documentElement.style.getPropertyValue(name).trim();
+  const updateGeometryVisibility = (place: PlaceMapItem): void => {
+    const objects = mapEditorialObjects.get(place.slug);
+    if (!map || !objects?.length) return;
 
-    if (!value) throw new Error(`Не найден цвет карты ${name}`);
-
-    return value;
-  };
-
-  const createAreaStyle = (state: 'hidden' | 'preview' | 'highlighted'): DrawingStyle => {
-    if (state === 'hidden') {
-      return {
-        zIndex: 0,
-        fillOpacity: 0,
-        interactive: false,
-        stroke: []
-      };
+    const show =
+      markerHoveredGeometry.has(place.slug) ||
+      focusedGeometry.has(place.slug) ||
+      highlightedGeometry.has(place.slug);
+    if (show === visibleGeometry.has(place.slug)) return;
+    for (const object of objects) {
+      if (show) map.addChild(object);
+      else map.removeChild(object);
     }
-
-    const highlighted = state === 'highlighted';
-    const water = getMapToken('--color-water');
-    const dash = highlighted ? [6, 3] : [5, 4];
-
-    return {
-      zIndex: 0,
-      fill: water,
-      fillOpacity: 0,
-      interactive: supportsAreaHover(),
-      simplificationRate: 0,
-      stroke: [
-        {
-          color: water,
-          dash,
-          opacity: 0.42,
-          width: highlighted ? 5 : 4
-        },
-        {
-          color: water,
-          dash,
-          opacity: 1,
-          width: highlighted ? 2.5 : 2
-        }
-      ]
-    };
+    if (show) visibleGeometry.add(place.slug);
+    else visibleGeometry.delete(place.slug);
   };
 
-  const updateAreaVisibility = (place: PlaceMapItem): void => {
-    const feature = mapAreaFeatures.get(place.slug);
-
-    if (!feature) return;
-
-    const highlighted = highlightedAreas.has(place.slug);
-    const previewed =
-      markerHoveredAreas.has(place.slug) ||
-      featureHoveredAreas.has(place.slug) ||
-      focusedAreas.has(place.slug);
-
-    feature.update({
-      style: createAreaStyle(highlighted ? 'highlighted' : previewed ? 'preview' : 'hidden')
-    });
-  };
-
-  const setAreaState = (place: PlaceMapItem, states: Set<string>, active: boolean): void => {
-    if (!place.geometry) return;
-
-    if (active) {
-      states.add(place.slug);
-    } else {
-      states.delete(place.slug);
-    }
-    updateAreaVisibility(place);
-  };
-
-  const cancelAreaHoverLeave = (place: PlaceMapItem): void => {
-    const timer = areaHoverLeaveTimers.get(place.slug);
-
-    if (timer === undefined) return;
-
-    window.clearTimeout(timer);
-    areaHoverLeaveTimers.delete(place.slug);
-  };
-
-  const scheduleAreaHoverLeave = (place: PlaceMapItem): void => {
-    cancelAreaHoverLeave(place);
-    areaHoverLeaveTimers.set(
-      place.slug,
-      window.setTimeout(() => {
-        areaHoverLeaveTimers.delete(place.slug);
-        setAreaState(place, markerHoveredAreas, false);
-      }, AREA_HOVER_LEAVE_DELAY_MS)
-    );
-  };
-
-  const createAreaFeature = (
-    place: PlaceMapItem,
-    YMapFeature: typeof ymaps3.YMapFeature
-  ): ymaps3.YMapFeature | undefined => {
-    const area = place.geometry?.area;
-
-    if (!area) return;
-
-    return new YMapFeature({
-      id: `${place.slug}-area`,
-      geometry: toMapGeometry(area.geometry),
-      style: createAreaStyle('hidden'),
-      onMouseEnter: () => {
-        if (!supportsAreaHover()) return;
-
-        cancelAreaHoverLeave(place);
-        setAreaState(place, featureHoveredAreas, true);
-        setAreaState(place, markerHoveredAreas, false);
-      },
-      onMouseLeave: () => setAreaState(place, featureHoveredAreas, false)
-    });
+  const setGeometryState = (place: PlaceMapItem, states: Set<string>, active: boolean): void => {
+    if (!mapEditorialObjects.has(place.slug)) return;
+    if (active) states.add(place.slug);
+    else states.delete(place.slug);
+    updateGeometryVisibility(place);
   };
 
   const updateMarkerContent = (place: PlaceMapItem, link: HTMLAnchorElement): void => {
@@ -298,31 +211,41 @@
   const createMarkerContent = (place: PlaceMapItem): HTMLAnchorElement => {
     const link = document.createElement('a');
     const visual = document.createElement('span');
+    const options = { signal: markerEvents.signal };
 
     link.className = 'place-map-marker';
     link.href = place.url;
     link.dataset.status = place.status;
     updateMarkerContent(place, link);
-    link.addEventListener('click', (event) => event.stopPropagation());
-    link.addEventListener('mouseenter', () => {
-      if (!supportsAreaHover()) return;
+    link.addEventListener('click', (event) => event.stopPropagation(), options);
+    link.addEventListener(
+      'mouseenter',
+      () => {
+        if (supportsGeometryHover()) setGeometryState(place, markerHoveredGeometry, true);
+      },
+      options
+    );
+    link.addEventListener(
+      'mouseleave',
+      () => setGeometryState(place, markerHoveredGeometry, false),
+      options
+    );
+    link.addEventListener('focus', () => setGeometryState(place, focusedGeometry, true), options);
+    link.addEventListener('blur', () => setGeometryState(place, focusedGeometry, false), options);
+    link.addEventListener(
+      'keydown',
+      (event) => {
+        if (event.key === 'Escape') {
+          setGeometryState(place, focusedGeometry, false);
+          return;
+        }
+        if (event.key !== ' ') return;
 
-      cancelAreaHoverLeave(place);
-      setAreaState(place, markerHoveredAreas, true);
-    });
-    link.addEventListener('mouseleave', () => scheduleAreaHoverLeave(place));
-    link.addEventListener('focus', () => setAreaState(place, focusedAreas, true));
-    link.addEventListener('blur', () => setAreaState(place, focusedAreas, false));
-    link.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        setAreaState(place, focusedAreas, false);
-        return;
-      }
-      if (event.key !== ' ') return;
-
-      event.preventDefault();
-      link.click();
-    });
+        event.preventDefault();
+        link.click();
+      },
+      options
+    );
 
     if (place.marker) {
       const markerImage = CUSTOM_MARKER_IMAGES[place.marker];
@@ -384,30 +307,43 @@
     });
   };
 
-  const restoreClusterFocus = (): void => {
-    const featureId = pendingClusterFocusId;
-
-    if (featureId === undefined) return;
-
+  const cancelClusterFocus = (): void => {
+    clusterFocusObserver?.disconnect();
+    if (clusterFocusFrame !== undefined) window.cancelAnimationFrame(clusterFocusFrame);
+    clusterFocusObserver = undefined;
+    clusterFocusFrame = undefined;
     pendingClusterFocusId = undefined;
-    clusterFocusFrame = window.requestAnimationFrame(() => {
-      clusterFocusFrame = undefined;
-      const id = String(featureId);
-      const marker = markerContents.find(([place]) => place.slug === id)?.[1];
+    clusterFocusMarkerRendered = false;
+    clusterFocusClusterRendered = false;
+  };
 
-      if (marker?.isConnected) {
-        marker.focus();
-        return;
-      }
+  const restoreClusterFocus = (): void => {
+    if (pendingClusterFocusId === undefined || !mapContainer) return;
 
-      const clusters =
-        mapContainer?.querySelectorAll<HTMLButtonElement>('.place-map-cluster') ?? [];
-      const cluster = Array.from(clusters).find((candidate) =>
-        candidate.dataset.placeIds?.split(' ').includes(id)
-      );
+    // The SDK can remove a focused cluster before inserting its replacement.
+    if (document.activeElement === document.body) mapContainer.focus({ preventScroll: true });
+    if (document.activeElement !== mapContainer) {
+      cancelClusterFocus();
+      return;
+    }
 
-      cluster?.focus();
-    });
+    const id = String(pendingClusterFocusId);
+    const marker = markerContents.find(([place]) => place.slug === id)?.[1];
+    if (clusterFocusMarkerRendered && marker?.isConnected && mapContainer.contains(marker)) {
+      cancelClusterFocus();
+      marker.focus({ preventScroll: true });
+      return;
+    }
+
+    if (!clusterFocusClusterRendered) return;
+    const clusters = mapContainer.querySelectorAll<HTMLButtonElement>('.place-map-cluster');
+    const cluster = Array.from(clusters).find((candidate) =>
+      candidate.dataset.placeIds?.split(' ').includes(id)
+    );
+    if (cluster) {
+      cancelClusterFocus();
+      cluster.focus({ preventScroll: true });
+    }
   };
 
   const createClusterContent = (features: readonly Feature[]): HTMLButtonElement => {
@@ -422,7 +358,13 @@
     button.setAttribute('aria-label', `${label}. Приблизить карту`);
     button.addEventListener('click', (event) => {
       event.stopPropagation();
-      pendingClusterFocusId = event.detail === 0 ? features[0]?.id : undefined;
+      cancelClusterFocus();
+      if (event.detail === 0 && document.activeElement === button && features[0] && mapContainer) {
+        pendingClusterFocusId = features[0].id;
+        mapContainer.focus({ preventScroll: true });
+        clusterFocusObserver = new MutationObserver(restoreClusterFocus);
+        clusterFocusObserver.observe(mapContainer, { childList: true, subtree: true });
+      }
       zoomToCluster(features);
     });
 
@@ -437,13 +379,12 @@
   };
 
   const clearMap = (): void => {
-    for (const timer of areaHoverLeaveTimers.values()) {
-      window.clearTimeout(timer);
-    }
-    areaHoverLeaveTimers.clear();
-
+    markerEvents.abort();
+    cancelClusterFocus();
     if (map) {
-      for (const feature of mapAreaFeatures.values()) map.removeChild(feature);
+      for (const slug of visibleGeometry) {
+        for (const object of mapEditorialObjects.get(slug) ?? []) map.removeChild(object);
+      }
       if (mapClusterer) map.removeChild(mapClusterer);
       if (mapListener) map.removeChild(mapListener);
       map.destroy();
@@ -451,17 +392,12 @@
 
     mapClusterer = undefined;
     mapListener = undefined;
-    mapAreaFeatures = new SvelteMap();
+    mapEditorialObjects.clear();
     markerContents = [];
-    markerHoveredAreas.clear();
-    featureHoveredAreas.clear();
-    focusedAreas.clear();
-    highlightedAreas.clear();
-    pendingClusterFocusId = undefined;
-    if (clusterFocusFrame !== undefined) {
-      window.cancelAnimationFrame(clusterFocusFrame);
-    }
-    clusterFocusFrame = undefined;
+    markerHoveredGeometry.clear();
+    focusedGeometry.clear();
+    highlightedGeometry.clear();
+    visibleGeometry.clear();
     mapContainer?.style.removeProperty('--place-map-marker-scale');
     map = undefined;
   };
@@ -478,6 +414,20 @@
     };
     document.addEventListener('pointerdown', closeLayersOutside);
     document.addEventListener('keydown', closeLayersOnEscape);
+    const cancelFocusOnPointer = (): void => cancelClusterFocus();
+    const cancelFocusOnMove = (event: FocusEvent): void => {
+      if (pendingClusterFocusId !== undefined && event.target !== mapContainer)
+        cancelClusterFocus();
+    };
+    document.addEventListener('pointerdown', cancelFocusOnPointer, true);
+    document.addEventListener('focusin', cancelFocusOnMove);
+    mapContainer?.addEventListener(
+      'keydown',
+      (event) => {
+        if (event.key === 'Tab') cancelClusterFocus();
+      },
+      { signal: markerEvents.signal }
+    );
     let parcelRequest = 0;
     let parcelLayer: ParcelLayer | undefined;
     let parcelData: ParcelMapPayload | undefined;
@@ -594,13 +544,13 @@
 
       marker.dataset.highlighted = 'true';
       marker.setAttribute('aria-current', 'location');
-      setAreaState(place, highlightedAreas, true);
+      setGeometryState(place, highlightedGeometry, true);
       focusPlace(place, getMapZoomDuration());
       highlightTimer = window.setTimeout(() => {
         highlightTimer = undefined;
         delete marker.dataset.highlighted;
         marker.removeAttribute('aria-current');
-        setAreaState(place, highlightedAreas, false);
+        setGeometryState(place, highlightedGeometry, false);
         highlightedPlace = undefined;
         removeHighlightQuery(place.slug);
       }, HIGHLIGHT_DURATION_MS);
@@ -666,14 +616,8 @@
 
         if (destroyed || !mapContainer) return;
 
-        const {
-          YMap,
-          YMapDefaultFeaturesLayer,
-          YMapDefaultSchemeLayer,
-          YMapFeature,
-          YMapListener,
-          YMapMarker
-        } = ymaps3;
+        const { YMap, YMapDefaultFeaturesLayer, YMapDefaultSchemeLayer, YMapListener, YMapMarker } =
+          ymaps3;
 
         map = new YMap(
           mapContainer,
@@ -704,17 +648,12 @@
 
         markerContents = places.map((place) => [place, createMarkerContent(place)] as const);
         for (const place of places) {
-          const feature = createAreaFeature(place, YMapFeature);
-
-          if (!feature) continue;
-
-          mapAreaFeatures.set(place.slug, feature);
-          map.addChild(feature);
+          if (!place.geometry) continue;
+          mapEditorialObjects.set(place.slug, createEditorialMapObjects(ymaps3, place.geometry));
         }
         mapListener = new YMapListener({
-          onUpdate: ({ location, mapInAction }) => {
+          onUpdate: ({ location }) => {
             updateMarkerScale(location.zoom);
-            if (!mapInAction) restoreClusterFocus();
             parcelLayer?.updateViewport(location.zoom, location.bounds);
           }
         });
@@ -722,6 +661,38 @@
           method: clusterByGrid({ gridSize: CLUSTER_GRID_SIZE }),
           features: createMapFeatures(places),
           maxZoom: PLACE_FOCUS_ZOOM - 1,
+          onRender: (clusters) => {
+            const visibleMarkers = new Set(
+              clusters
+                .filter(({ features }) => features.length === 1)
+                .map(({ features }) => String(features[0]!.id))
+            );
+            for (const [place] of markerContents) {
+              if (visibleMarkers.has(place.slug)) continue;
+              setGeometryState(place, markerHoveredGeometry, false);
+              setGeometryState(place, focusedGeometry, false);
+            }
+            if (clusterFocusFrame !== undefined) window.cancelAnimationFrame(clusterFocusFrame);
+            clusterFocusFrame = undefined;
+            clusterFocusMarkerRendered =
+              pendingClusterFocusId !== undefined &&
+              visibleMarkers.has(String(pendingClusterFocusId));
+            clusterFocusClusterRendered = false;
+            if (
+              pendingClusterFocusId !== undefined &&
+              clusters.some(
+                ({ features }) =>
+                  features.length > 1 && features.some(({ id }) => id === pendingClusterFocusId)
+              )
+            ) {
+              clusterFocusFrame = window.requestAnimationFrame(() => {
+                clusterFocusFrame = undefined;
+                clusterFocusClusterRendered = true;
+                restoreClusterFocus();
+              });
+            }
+            restoreClusterFocus();
+          },
           marker: (feature) => {
             const content = markerContents.find(([place]) => place.slug === feature.id)?.[1];
 
@@ -769,6 +740,8 @@
       destroyed = true;
       document.removeEventListener('pointerdown', closeLayersOutside);
       document.removeEventListener('keydown', closeLayersOnEscape);
+      document.removeEventListener('pointerdown', cancelFocusOnPointer, true);
+      document.removeEventListener('focusin', cancelFocusOnMove);
       parcelRequest++;
       parcelLayer?.destroy();
       document.removeEventListener('astro:page-load', refresh);
@@ -804,7 +777,7 @@
     </div>
   {/if}
 
-  <div bind:this={mapContainer} class="place-map__canvas"></div>
+  <div bind:this={mapContainer} class="place-map__canvas" tabindex="-1"></div>
   {#if !error}
     <div class="parcel-map-controls">
       <div class="parcel-map-layers" bind:this={layersControl}>
@@ -872,6 +845,11 @@
     container-type: inline-size;
     width: 100%;
     height: 100%;
+  }
+
+  .place-map__canvas:focus-visible {
+    outline: 0.1875rem solid var(--color-focus);
+    outline-offset: -0.1875rem;
   }
 
   .parcel-map-controls {

@@ -54,12 +54,21 @@
       display: none !important;
     }
 
+    /* Keep SDK backgrounds (including its logo) and marker colors intact. */
     .site-print-content main,
-    .site-print-content main * {
+    .site-print-content main :not(editorial-map, editorial-map *) {
       color: #111 !important;
       background: transparent !important;
       box-shadow: none !important;
       text-shadow: none !important;
+    }
+
+    .site-print-content editorial-map {
+      display: block !important;
+      width: 100% !important;
+      height: 70mm !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
     }
 
     .site-print-content main {
@@ -95,13 +104,13 @@
       line-height: 1.2;
     }
 
-    .site-print-content a[href] {
+    .site-print-content a[href]:not(editorial-map a) {
       text-decoration: underline !important;
       text-decoration-color: currentColor !important;
       text-underline-offset: 0.15em;
     }
 
-    .site-print-content a[href] span {
+    .site-print-content a[href]:not(editorial-map a) span {
       text-decoration: inherit !important;
     }
 
@@ -119,7 +128,7 @@
       break-inside: avoid;
     }
 
-    .site-print-content img {
+    .site-print-content img:not(editorial-map img) {
       width: auto !important;
       max-width: 100% !important;
       height: auto !important;

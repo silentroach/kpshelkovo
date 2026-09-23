@@ -1,13 +1,13 @@
-import { describe, expect, it } from 'vitest';
+import { expect, it } from 'vitest';
 
 import type { PlaceMapItem } from '@/lib/places/map-types';
 
 import {
   createMapFeatures,
+  fromPublicEditorialGeometry,
   getMarkerScale,
   getPaddedBounds,
-  getPlaceBounds,
-  toMapGeometry
+  getPlaceBounds
 } from '../place-map-geometry';
 
 const place = (slug: string, lng: number, lat: number): PlaceMapItem => ({
@@ -18,47 +18,68 @@ const place = (slug: string, lng: number, lat: number): PlaceMapItem => ({
   url: `/map/${slug}/`
 });
 
-describe('place map geometry', () => {
-  it('frames a single remote place and includes it in a mixed extent', () => {
-    const remote = place('remote', 2.35, 48.85);
-    expect(getPlaceBounds([remote])).toMatchInlineSnapshot(`
+it('frames canonical places independently of editorial geometry', () => {
+  const remote = place('remote', 2.35, 48.85);
+  const local = place('local', 37.72, 55.06);
+  expect(getPlaceBounds([remote])).toMatchInlineSnapshot(`
+    [
       [
-        [
-          2.349,
-          48.849,
-        ],
-        [
-          2.351,
-          48.851,
-        ],
+        2.349,
+        48.849,
+      ],
+      [
+        2.351,
+        48.851,
+      ],
+    ]
+  `);
+  expect(getPlaceBounds([remote, local])[1][0]).toBeGreaterThan(37.72);
+  expect(getPlaceBounds([])).toMatchInlineSnapshot(`
+    [
+      [
+        37.708,
+        55.049,
+      ],
+      [
+        37.764,
+        55.081,
+      ],
+    ]
+  `);
+  expect(createMapFeatures([remote, local]).map(({ id, geometry }) => ({ id, geometry })))
+    .toMatchInlineSnapshot(`
+      [
+        {
+          "geometry": {
+            "coordinates": [
+              2.35,
+              48.85,
+            ],
+            "type": "Point",
+          },
+          "id": "remote",
+        },
+        {
+          "geometry": {
+            "coordinates": [
+              37.72,
+              55.06,
+            ],
+            "type": "Point",
+          },
+          "id": "local",
+        },
       ]
     `);
-    const bounds = getPlaceBounds([remote, place('local', 37.72, 55.06)]);
-    expect(bounds[0][0]).toBeLessThan(2.35);
-    expect(bounds[1][0]).toBeGreaterThan(37.72);
-  });
-  it('uses settlement bounds only for an empty map', () => {
-    expect(getPlaceBounds([])).toMatchInlineSnapshot(`
-        [
-          [
-            37.708,
-            55.049,
-          ],
-          [
-            37.764,
-            55.081,
-          ],
-        ]
-      `);
-  });
+});
 
-  it('pads and rounds a multi-place extent deterministically', () => {
-    expect(
-      getPaddedBounds([
-        [37.716242, 55.060526],
-        [37.746894, 55.060703]
-      ])
-    ).toMatchInlineSnapshot(`
+it('keeps existing padded cluster extent and marker scale', () => {
+  expect(
+    getPaddedBounds([
+      [37.716242, 55.060526],
+      [37.746894, 55.060703]
+    ])
+  ).toMatchInlineSnapshot(`
       [
         [
           37.707046,
@@ -70,11 +91,8 @@ describe('place map geometry', () => {
         ],
       ]
     `);
-  });
-
-  it('scales marker graphics across overview and close-up zoom levels', () => {
-    expect([13.5, 15, 16, 17, 18, 19].map((zoom) => getMarkerScale(zoom).toFixed(3)))
-      .toMatchInlineSnapshot(`
+  expect([13.5, 15, 16, 17, 18, 19].map((zoom) => getMarkerScale(zoom).toFixed(3)))
+    .toMatchInlineSnapshot(`
       [
         "0.625",
         "0.850",
@@ -84,105 +102,44 @@ describe('place map geometry', () => {
         "1.300",
       ]
     `);
-  });
+});
 
-  it('adapts place geometry and coordinates to Yandex Maps features', () => {
-    const places = [
-      place('burzhuyka', 37.716242, 55.060526),
-      place('titanic', 37.746894, 55.060703)
-    ];
-
-    expect({
-      multiPolygon: toMapGeometry({
-        type: 'MultiPolygon',
-        coordinates: [
-          [
-            [
-              [37.74, 55.05],
-              [37.75, 55.05],
-              [37.74, 55.05]
-            ]
-          ]
-        ]
-      }),
-      polygon: toMapGeometry({
-        type: 'Polygon',
-        coordinates: [
-          [
-            [37.71, 55.06],
-            [37.72, 55.06],
-            [37.71, 55.06]
-          ]
-        ]
-      }),
-      features: createMapFeatures(places)
-    }).toMatchInlineSnapshot(`
+it('maps prepared public properties without changing coordinates or applying another expansion', () => {
+  const ring: [number, number][] = [
+    [37.74, 55.05],
+    [37.75, 55.05],
+    [37.74, 55.05]
+  ];
+  const result = fromPublicEditorialGeometry({
+    type: 'FeatureCollection',
+    features: [
       {
-        "features": [
-          {
-            "geometry": {
-              "coordinates": [
-                37.716242,
-                55.060526,
-              ],
-              "type": "Point",
-            },
-            "id": "burzhuyka",
-            "type": "Feature",
-          },
-          {
-            "geometry": {
-              "coordinates": [
-                37.746894,
-                55.060703,
-              ],
-              "type": "Point",
-            },
-            "id": "titanic",
-            "type": "Feature",
-          },
-        ],
-        "multiPolygon": {
-          "coordinates": [
-            [
-              [
-                [
-                  37.74,
-                  55.05,
-                ],
-                [
-                  37.75,
-                  55.05,
-                ],
-                [
-                  37.74,
-                  55.05,
-                ],
-              ],
-            ],
-          ],
-          "type": "MultiPolygon",
-        },
-        "polygon": {
-          "coordinates": [
-            [
-              [
-                37.71,
-                55.06,
-              ],
-              [
-                37.72,
-                55.06,
-              ],
-              [
-                37.71,
-                55.06,
-              ],
-            ],
-          ],
-          "type": "Polygon",
-        },
+        type: 'Feature',
+        id: 0,
+        geometry: { type: 'Polygon', coordinates: [ring] },
+        properties: {
+          stroke: '#123456',
+          'stroke-width': 2.5,
+          'stroke-opacity': 0.6,
+          'stroke-dasharray': [6, 3],
+          fill: '#abcdef',
+          'fill-opacity': 0.2,
+          description: '<b>hidden</b>',
+          precision: 'approximate'
+        }
       }
-    `);
+    ]
+  });
+  expect(result.features[0]).toMatchObject({
+    id: 0,
+    geometry: { type: 'Polygon', coordinates: [ring] },
+    stroke: '#123456',
+    strokeWidth: 2.5,
+    strokeOpacity: 0.6,
+    strokeDasharray: [6, 3],
+    fill: '#abcdef',
+    fillOpacity: 0.2,
+    description: '<b>hidden</b>',
+    precision: 'approximate'
   });
 });

@@ -15,6 +15,8 @@ export interface RenderEntityMentionsOptions {
 export interface RenderSiteMarkdownOptions {
   readonly mentions?: RenderEntityMentionsOptions;
   readonly eagerImages?: boolean;
+  /** IDs already used by the surrounding page (outside its Markdown body). */
+  readonly reservedIds?: readonly string[];
 }
 
 export interface PreprocessedSiteMarkdown {

@@ -294,6 +294,314 @@ describe('@shelkovo/markdown', () => {
       `);
   });
 
+  it('transforms code in one document while preserving its meta, references and author TOC', () => {
+    let calls = 0;
+    let codeMeta: string | undefined;
+    const html = render(
+      `[TOC]
+
+## Section
+
+\`\`\`diagram https://example.com/original
+<unsafe> & text
+\`\`\`
+
+[Source][source]
+
+## Section
+
+[source]: https://example.com/source`,
+      {
+        transform: (tree, reserveId) => {
+          calls += 1;
+          tree.children = tree.children.flatMap((node) => {
+            if (node.type !== 'code' || node.lang !== 'diagram') {
+              return [node];
+            }
+
+            codeMeta = node.meta ?? undefined;
+            return [
+              {
+                type: 'heading' as const,
+                depth: 3 as const,
+                data: { hProperties: { id: reserveId('Section') } },
+                children: [{ type: 'text' as const, value: 'Diagram' }]
+              },
+              {
+                type: 'paragraph' as const,
+                data: { hName: 'aside' },
+                children: [{ type: 'text' as const, value: node.value }]
+              }
+            ];
+          });
+        }
+      }
+    );
+    document.body.innerHTML = html;
+
+    expect({
+      calls,
+      codeMeta,
+      toc: Array.from(document.querySelectorAll('.ui-markdown-toc__list a'), (a) =>
+        a.getAttribute('href')
+      ),
+      headings: Array.from(document.querySelectorAll('h2, h3'), (h) => h.id),
+      source: document.querySelector('p a[href="https://example.com/source"]')?.textContent,
+      transformed: document.querySelector('aside')?.textContent,
+      unsafeMarkup: document.querySelector('unsafe')
+    }).toMatchInlineSnapshot(`
+      {
+        "calls": 1,
+        "codeMeta": "https://example.com/original",
+        "headings": [
+          "section",
+          "section-3",
+          "section-2",
+        ],
+        "source": "Source",
+        "toc": [
+          "#section",
+          "#section-2",
+        ],
+        "transformed": "<unsafe> & text",
+        "unsafeMarkup": null,
+      }
+    `);
+  });
+
+  it('reserves authored and generated ids even when names resemble duplicate suffixes', () => {
+    document.body.innerHTML = render(
+      '[TOC]\n\n## Section\n\n```diagram\nx\n```\n\n## Section-2\n\n## Section',
+      {
+        transform: (tree, reserveId) => {
+          tree.children = tree.children.flatMap((node) =>
+            node.type === 'code'
+              ? [
+                  {
+                    type: 'heading' as const,
+                    depth: 3 as const,
+                    data: { hProperties: { id: reserveId('section') } },
+                    children: [{ type: 'text' as const, value: 'Section' }]
+                  }
+                ]
+              : [node]
+          );
+        }
+      }
+    );
+
+    expect({
+      toc: Array.from(document.querySelectorAll('.ui-markdown-toc__list a'), (a) =>
+        a.getAttribute('href')
+      ),
+      headings: Array.from(document.querySelectorAll('h2, h3'), (h) => h.id)
+    }).toMatchInlineSnapshot(`
+      {
+        "headings": [
+          "section",
+          "section-4",
+          "section-2",
+          "section-3",
+        ],
+        "toc": [
+          "#section",
+          "#section-2",
+          "#section-3",
+        ],
+      }
+    `);
+  });
+
+  it('avoids IDs of surrounding page elements without breaking the author TOC', () => {
+    document.body.innerHTML = render('[TOC]\n\n## Section\n\n```diagram\nx\n```', {
+      reservedIds: ['section'],
+      transform: (tree, reserveId) => {
+        tree.children = tree.children.flatMap((node) =>
+          node.type === 'code'
+            ? [
+                {
+                  type: 'heading' as const,
+                  depth: 3 as const,
+                  data: { hProperties: { id: reserveId('section') } },
+                  children: [{ type: 'text' as const, value: 'Section' }]
+                }
+              ]
+            : [node]
+        );
+      }
+    });
+
+    expect({
+      toc: document.querySelector('.ui-markdown-toc__list a')?.getAttribute('href'),
+      ids: Array.from(document.querySelectorAll('h2, h3'), (h) => h.id)
+    }).toMatchInlineSnapshot(`
+      {
+        "ids": [
+          "section-2",
+          "section-3",
+        ],
+        "toc": "#section-2",
+      }
+    `);
+  });
+
+  it('reserves blockquote and list headings before generated headings without adding them to the TOC', () => {
+    document.body.innerHTML = render(
+      '[TOC]\n\n> ## map\n\n- Item\n\n  ## map\n\n[Jump](#map)\n\n```diagram\na\n```\n\n```diagram\nb\n```\n\n## Article',
+      {
+        transform: (tree, reserveId) => {
+          tree.children = tree.children.flatMap((node) =>
+            node.type === 'code'
+              ? [
+                  {
+                    type: 'heading' as const,
+                    depth: 3 as const,
+                    data: { hProperties: { id: reserveId('map') } },
+                    children: [{ type: 'text' as const, value: 'Map' }]
+                  }
+                ]
+              : [node]
+          );
+        }
+      }
+    );
+
+    expect({
+      toc: Array.from(document.querySelectorAll('.ui-markdown-toc__list a'), (a) =>
+        a.getAttribute('href')
+      ),
+      headingIds: Array.from(document.querySelectorAll('h2, h3'), (h) => h.id),
+      jump: document.querySelector('a[href="#map"]')?.getAttribute('href')
+    }).toMatchInlineSnapshot(`
+      {
+        "headingIds": [
+          "map",
+          "map-2",
+          "map-3",
+          "map-4",
+          "article",
+        ],
+        "jump": "#map",
+        "toc": [
+          "#article",
+        ],
+      }
+    `);
+  });
+
+  it('keeps GFM footnote targets unique and their links intact alongside headings and generated cards', () => {
+    document.body.innerHTML = render(
+      '[TOC]\n\n## footnote-label\n\n## user-content-fn-1\n\n## user-content-fnref-1\n\nNote[^1] again[^1]\n\n```diagram\na\n```\n\n```diagram\nb\n```\n\n[^1]: A note',
+      {
+        transform: (tree, reserveId) => {
+          tree.children = tree.children.flatMap((node) =>
+            node.type === 'code'
+              ? [
+                  {
+                    type: 'heading' as const,
+                    depth: 3 as const,
+                    data: { hProperties: { id: reserveId('user-content-fn-1') } },
+                    children: [{ type: 'text' as const, value: 'Diagram' }]
+                  }
+                ]
+              : [node]
+          );
+        }
+      }
+    );
+
+    const ids = Array.from(document.querySelectorAll('[id]'), (node) => node.id);
+    expect({
+      ids,
+      uniqueIds: new Set(ids).size === ids.length,
+      toc: Array.from(document.querySelectorAll('.ui-markdown-toc__list a'), (a) =>
+        a.getAttribute('href')
+      ),
+      footnoteRefs: Array.from(document.querySelectorAll('[data-footnote-ref]'), (a) => [
+        a.id,
+        a.getAttribute('href'),
+        a.getAttribute('aria-describedby')
+      ]),
+      backrefs: Array.from(document.querySelectorAll('[data-footnote-backref]'), (a) =>
+        a.getAttribute('href')
+      )
+    }).toMatchInlineSnapshot(`
+      {
+        "backrefs": [
+          "#user-content-fnref-1",
+          "#user-content-fnref-1-2",
+        ],
+        "footnoteRefs": [
+          [
+            "user-content-fnref-1",
+            "#user-content-fn-1",
+            "footnote-label",
+          ],
+          [
+            "user-content-fnref-1-2",
+            "#user-content-fn-1",
+            "footnote-label",
+          ],
+        ],
+        "ids": [
+          "heading-footnote-label",
+          "heading-user-content-fn-1",
+          "heading-user-content-fnref-1",
+          "user-content-fnref-1",
+          "user-content-fnref-1-2",
+          "heading-user-content-fn-1-2",
+          "heading-user-content-fn-1-3",
+          "footnote-label",
+          "user-content-fn-1",
+        ],
+        "toc": [
+          "#heading-footnote-label",
+          "#heading-user-content-fn-1",
+          "#heading-user-content-fnref-1",
+        ],
+        "uniqueIds": true,
+      }
+    `);
+  });
+
+  it('keeps other fenced code and fenced TOC literals with an AST transform', () => {
+    document.body.innerHTML = render(
+      '```change inline\n-before\n+after\n```\n\n```change block\n-before\n+after\n```\n\n```change\ninvalid\n```\n\n```diff\n[TOC]\n```\n\n```unknown\n@slug [TOC]\n```',
+      { transform: () => {} }
+    );
+
+    expect(
+      Array.from(document.querySelectorAll('pre code'), (code) => ({
+        language: code.className,
+        text: code.textContent?.trimEnd().replaceAll('\n', ' / ')
+      }))
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "language": "language-change",
+          "text": "-before / +after",
+        },
+        {
+          "language": "language-change",
+          "text": "-before / +after",
+        },
+        {
+          "language": "language-change",
+          "text": "invalid",
+        },
+        {
+          "language": "language-diff",
+          "text": "[TOC]",
+        },
+        {
+          "language": "language-unknown",
+          "text": "@slug [TOC]",
+        },
+      ]
+    `);
+    expect(document.querySelector('.ui-markdown-toc__list')).toBeNull();
+  });
+
   it('rejects tables when rendering Markdown strings', () => {
     expect(() => render('| Ключ | Значение |\n| --- | --- |\n| A | B |')).toThrow(
       'Markdown tables are not supported; use lists.'

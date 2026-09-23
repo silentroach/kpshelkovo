@@ -4,6 +4,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 
 import { loadEventsData } from '@/lib/events/load';
 import type { EventRecord } from '@/lib/events/types';
+import { extractEditorialMaps } from '@/lib/markdown/editorial-maps';
 
 import { preprocessSiteMarkdownContent } from '../markdown/render';
 import type { SiteMentionRegistry } from '../mentions';
@@ -221,6 +222,7 @@ function normalizeArticle(
     normalizeEvent(event, parts, eventsByReferenceKey)
   );
   const mappedPhotos = mapPhotos(entry.data.photos, entry.id, mentionRegistry);
+  extractEditorialMaps(entry.body ?? '', `news article "${entry.id}" body`);
   const body = preprocessSiteMarkdownContent(
     entry.body ?? '',
     `news article "${entry.id}" body`,

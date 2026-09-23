@@ -8,20 +8,8 @@ import { RawPlaceSchema, type RawPlace } from '../raw-schema';
 import type { PlaceEntry, PlaceGeometry } from '../types';
 
 const geometry: PlaceGeometry = {
-  area: {
-    precision: 'approximate',
-    geometry: {
-      type: 'Polygon',
-      coordinates: [
-        [
-          [37.74, 55.05],
-          [37.75, 55.05],
-          [37.75, 55.06],
-          [37.74, 55.05]
-        ]
-      ]
-    }
-  }
+  type: 'FeatureCollection',
+  features: [{ type: 'Feature', geometry: { type: 'Point', coordinates: [37.74, 55.05] } }]
 };
 
 const rawPlace = (overrides?: Partial<RawPlace>): RawPlace => ({
@@ -200,6 +188,8 @@ describe('buildPlacesDataset', () => {
     });
 
     expect(data.places[0]?.geometry).toBe(geometry);
+    expect(data.places[0]?.coordinates).toEqual({ lat: 55.060526, lng: 37.716242 });
+    expect(data.places[0]?.showOnMap).toBe(false);
   });
 
   it('rejects geometry without a matching Markdown place', () => {

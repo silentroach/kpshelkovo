@@ -1,146 +1,131 @@
+import { readFileSync } from 'node:fs';
+
 import { describe, expect, it } from 'vitest';
 
 import { parsePlaceGeometryFiles } from '../geometry';
 
-const geometrySource = (
-  ring: readonly (readonly [number, number])[],
-  outlineExpansionMeters?: number
-): string =>
+const geometrySource = (geometry: unknown, properties: Record<string, unknown> = {}): string =>
   JSON.stringify({
     type: 'FeatureCollection',
-    features: [
-      {
-        type: 'Feature',
-        id: 'area',
-        properties: {
-          kind: 'area',
-          precision: 'approximate',
-          outline_expansion_meters: outlineExpansionMeters
-        },
-        geometry: { type: 'Polygon', coordinates: [ring] }
-      }
-    ]
+    features: [{ type: 'Feature', id: 0, properties, geometry }]
   });
+
+const polygon = {
+  type: 'Polygon',
+  coordinates: [
+    [
+      [37.74, 55.05],
+      [37.75, 55.05],
+      [37.75, 55.06],
+      [37.74, 55.05]
+    ]
+  ]
+};
 
 describe('parsePlaceGeometryFiles', () => {
-  it('accepts a contour outside the settlement while rejecting coordinates outside world ranges', () => {
-    const remote = [
-      [2, 48],
-      [3, 48],
-      [3, 49],
-      [2, 48]
-    ] as const;
-    expect(
-      parsePlaceGeometryFiles({ 'remote.geojson': geometrySource(remote) }).has('remote')
-    ).toBe(true);
-    expect(() =>
-      parsePlaceGeometryFiles({
-        'invalid.geojson': geometrySource([
-          [181, 48],
-          [182, 48],
-          [182, 49],
-          [181, 48]
-        ])
-      })
-    ).toThrow('invalid');
-  });
-  it('maps a strict GeoJSON area to the place domain model', () => {
-    const geometries = parsePlaceGeometryFiles({
-      '../../data/places/pond.geojson': geometrySource([
-        [37.74, 55.05],
-        [37.75, 55.05],
-        [37.75, 55.06],
-        [37.74, 55.05]
-      ])
-    });
-
-    expect(geometries.get('pond')).toMatchInlineSnapshot(`
-      {
-        "area": {
-          "geometry": {
-            "coordinates": [
-              [
-                [
-                  37.74,
-                  55.05,
-                ],
-                [
-                  37.75,
-                  55.05,
-                ],
-                [
-                  37.75,
-                  55.06,
-                ],
-                [
-                  37.74,
-                  55.05,
-                ],
-              ],
-            ],
-            "type": "Polygon",
-          },
-          "precision": "approximate",
+  it('accepts one shared collection with points, lines and polygons under its canonical slug', () => {
+    const source = JSON.stringify({
+      type: 'FeatureCollection',
+      metadata: { name: 'Source' },
+      features: [
+        {
+          type: 'Feature',
+          id: 0,
+          properties: { iconCaption: 'Gate' },
+          geometry: { type: 'Point', coordinates: [37, 55] }
         },
-      }
-    `);
-  });
-
-  it('rejects an unclosed polygon ring', () => {
-    expect(() =>
-      parsePlaceGeometryFiles({
-        '../../data/places/pond.geojson': geometrySource([
-          [37.74, 55.05],
-          [37.75, 55.05],
-          [37.75, 55.06],
-          [37.74, 55.06]
-        ])
-      })
-    ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: place geometry "../../data/places/pond.geojson" is invalid: features.0.geometry.coordinates.0: polygon rings must be closed]`
-    );
-  });
-
-  it('expands each polygon beyond the source bounds', () => {
-    const geometries = parsePlaceGeometryFiles({
-      '../../data/places/pond.geojson': geometrySource(
-        [
-          [37.74, 55.05],
-          [37.75, 55.05],
-          [37.75, 55.06],
-          [37.74, 55.06],
-          [37.74, 55.05]
-        ],
-        5
-      )
+        {
+          type: 'Feature',
+          id: 'route',
+          properties: { 'stroke-dasharray': '5 3' },
+          geometry: {
+            type: 'LineString',
+            coordinates: [
+              [37, 55],
+              [38, 56]
+            ]
+          }
+        },
+        { type: 'Feature', properties: { precision: 'approximate' }, geometry: polygon }
+      ]
     });
-    const geometry = geometries.get('pond')?.area.geometry;
+    const geometries = parsePlaceGeometryFiles({ '../../data/places/pond.geojson': source });
 
-    if (geometry?.type !== 'Polygon') {
-      throw new Error('expanded polygon fixture is missing');
-    }
-
-    const ring = geometry.coordinates[0];
-
-    if (!ring) throw new Error('expanded polygon ring is missing');
-
-    const longitudes = ring.map(([lng]) => lng);
-    const latitudes = ring.map(([, lat]) => lat);
-    const metersPerLongitudeDegree = 111_320 * Math.cos((55.055 * Math.PI) / 180);
-    const expansion = [
-      (37.74 - Math.min(...longitudes)) * metersPerLongitudeDegree,
-      (Math.max(...longitudes) - 37.75) * metersPerLongitudeDegree,
-      (55.05 - Math.min(...latitudes)) * 111_320,
-      (Math.max(...latitudes) - 55.06) * 111_320
-    ].map((meters) => Number(meters.toFixed(1)));
-
-    expect(expansion).toMatchInlineSnapshot(`
+    expect([...geometries.keys()]).toEqual(['pond']);
+    expect(
+      geometries.get('pond')?.features.map(({ id, geometry, iconCaption, strokeDasharray }) => ({
+        id,
+        type: geometry.type,
+        iconCaption,
+        strokeDasharray
+      }))
+    ).toMatchInlineSnapshot(`
       [
-        5,
-        5,
-        5,
-        5,
+        {
+          "iconCaption": "Gate",
+          "id": 0,
+          "strokeDasharray": undefined,
+          "type": "Point",
+        },
+        {
+          "iconCaption": undefined,
+          "id": "route",
+          "strokeDasharray": [
+            5,
+            3,
+          ],
+          "type": "LineString",
+        },
+        {
+          "iconCaption": undefined,
+          "id": undefined,
+          "strokeDasharray": undefined,
+          "type": "Polygon",
+        },
       ]
     `);
+    expect(geometries.get('pond')?.metadata?.name).toBe('Source');
+  });
+
+  it('rejects an unknown field on feature ID 0 with the sidecar path', () => {
+    expect(() =>
+      parsePlaceGeometryFiles({ 'pond.geojson': geometrySource(polygon, { kind: 'area' }) })
+    ).toThrow(/place geometry "pond\.geojson".*features\.0\.properties\.kind.*feature 0 \(ID 0\)/);
+  });
+
+  it('rejects an empty sidecar with its file path', () => {
+    expect(() =>
+      parsePlaceGeometryFiles({ 'pond.geojson': '{"type":"FeatureCollection","features":[]}' })
+    ).toThrow(/place geometry "pond\.geojson".*features.*at least one feature/u);
+  });
+
+  it('rejects duplicate or malformed slugs', () => {
+    expect(() =>
+      parsePlaceGeometryFiles({
+        'a.geojson': geometrySource(polygon),
+        'places/a.geojson': geometrySource(polygon)
+      })
+    ).toThrow('duplicate place geometry for slug "a"');
+    expect(() =>
+      parsePlaceGeometryFiles({ 'Not-a-Slug.geojson': geometrySource(polygon) })
+    ).toThrow('must use [slug].geojson');
+  });
+
+  it('keeps the two pond areas, explicit dash and prepared expansion', () => {
+    const source = readFileSync(
+      new URL('../../../data/places/hunting-ponds.geojson', import.meta.url),
+      'utf8'
+    );
+    const geometry = parsePlaceGeometryFiles({ 'hunting-ponds.geojson': source }).get(
+      'hunting-ponds'
+    );
+    const feature = geometry?.features[0];
+    if (feature?.geometry.type !== 'MultiPolygon') throw new Error('pond geometry missing');
+
+    expect(feature.geometry.coordinates).toHaveLength(2);
+    expect(feature.geometry.coordinates[0]?.[0]?.[0]).not.toEqual([37.7488622, 55.0559004]);
+    expect(feature.strokeDasharray).toEqual([5, 3]);
+    expect(feature.precision).toBe('approximate');
+    expect(JSON.stringify(geometry)).not.toContain('outline_expansion_meters');
   });
 });

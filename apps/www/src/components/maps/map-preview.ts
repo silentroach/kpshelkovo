@@ -1,22 +1,20 @@
-import type { BehaviorType, LngLat, Margin, YMap, YMapLocationRequest } from '@yandex/ymaps3-types';
+import type { LngLat, Margin, YMap, YMapLocationRequest } from '@yandex/ymaps3-types';
 
-import { getPaddedBounds, toMapGeometry } from '@/components/places/place-map-geometry';
+import { createEditorialMapObjects, getEditorialMapBounds } from '@/components/maps/editorial-map';
 import { isPlaceOpen } from '@/lib/places/opening-hours';
 import { createOpenMapsControl, OPEN_MAPS_BUTTON_TITLE } from '@/lib/yandex-maps/open-maps-control';
 import { installYandexMapsRuntimeHeadPersistence, loadYandexMaps } from '@/lib/yandex-maps/runtime';
 
+import { installMapPreviewGestures } from './map-gestures';
 import type { MapPreviewData } from './map-preview.types';
 
 export const getPreviewLocation = (data: MapPreviewData): YMapLocationRequest => {
   const point: LngLat = [data.coordinates.lng, data.coordinates.lat];
-  const geometry = data.geometry?.area.geometry;
-  if (!geometry) return { center: point, zoom: data.zoom ?? 16.5, duration: 0 };
+  if (!data.geometry?.features.length)
+    return { center: point, zoom: data.zoom ?? 16.5, duration: 0 };
 
-  const rings = geometry.type === 'Polygon' ? geometry.coordinates : geometry.coordinates.flat();
-  return {
-    bounds: getPaddedBounds([point, ...rings.flat().map(([lng, lat]): LngLat => [lng, lat])]),
-    duration: 0
-  };
+  const bounds = getEditorialMapBounds(data.geometry, [point]);
+  return bounds ? { bounds, duration: 0 } : { center: point, zoom: data.zoom ?? 16.5, duration: 0 };
 };
 
 export const getPreviewMargin = (
@@ -141,26 +139,7 @@ export class MapPreviewElement extends HTMLElement {
       this.map = map;
 
       if (data.interactive) {
-        this.gestureController = new AbortController();
-        const options = { capture: true, passive: true, signal: this.gestureController.signal };
-        let behaviors: BehaviorType[] = ['pinchZoom'];
-        this.addEventListener(
-          'pointerdown',
-          (event) => {
-            behaviors =
-              event.pointerType === 'mouse' && event.button === 0
-                ? ['drag', 'pinchZoom']
-                : ['pinchZoom'];
-            map.setBehaviors(behaviors);
-          },
-          options
-        );
-        // Trackpad pinch arrives as Ctrl+wheel; ordinary wheel must scroll the page.
-        this.addEventListener(
-          'wheel',
-          (event) => map.setBehaviors(event.ctrlKey ? [...behaviors, 'scrollZoom'] : behaviors),
-          options
-        );
+        this.gestureController = installMapPreviewGestures(this, map);
       }
 
       let rendered = false;
@@ -193,21 +172,8 @@ export class MapPreviewElement extends HTMLElement {
         attributeFilter: ['disabled']
       });
 
-      const geometry = data.geometry?.area.geometry;
-      if (geometry) {
-        const water = getComputedStyle(this).getPropertyValue('--color-water').trim();
-        map.addChild(
-          new maps.YMapFeature({
-            geometry: toMapGeometry(geometry),
-            style: {
-              fill: water,
-              fillOpacity: 0.06,
-              stroke: [{ color: water, width: 2, opacity: 0.85, dash: [5, 3] }],
-              interactive: false,
-              simplificationRate: 0
-            }
-          })
-        );
+      if (data.geometry) {
+        for (const object of createEditorialMapObjects(maps, data.geometry)) map.addChild(object);
       }
 
       // YMap moves marker DOM into its canvas; retain the template for reconnects.

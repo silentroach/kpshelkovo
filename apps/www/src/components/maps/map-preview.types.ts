@@ -1,10 +1,11 @@
 import type { YMapProps } from '@yandex/ymaps3-types';
 
-import type { PlaceCoordinates, PlaceGeometry, PlaceOpeningHours } from '@/lib/places/types';
+import type { EditorialFeatureCollection } from '@/lib/geometry/editorial-types';
+import type { PlaceCoordinates, PlaceOpeningHours } from '@/lib/places/types';
 
 export interface MapPreviewData {
   readonly coordinates: PlaceCoordinates;
-  readonly geometry?: PlaceGeometry;
+  readonly geometry?: EditorialFeatureCollection;
   readonly openingHours?: PlaceOpeningHours;
   readonly zoom?: number;
   readonly interactive?: boolean;

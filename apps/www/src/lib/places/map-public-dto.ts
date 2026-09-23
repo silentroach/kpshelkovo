@@ -1,25 +1,6 @@
+import type { EditorialPublicGeometry } from '@/lib/geometry/editorial-public-schema';
+
 import type { PlaceMarker, PlaceStatus, PlaceWeekday } from './schema';
-
-export type PlaceMapPublicPositionDto = readonly [lng: number, lat: number];
-
-export type PlaceMapPublicPolygonCoordinatesDto = readonly (readonly PlaceMapPublicPositionDto[])[];
-
-export type PlaceMapPublicPolygonGeometryDto =
-  | {
-      readonly type: 'Polygon';
-      readonly coordinates: PlaceMapPublicPolygonCoordinatesDto;
-    }
-  | {
-      readonly type: 'MultiPolygon';
-      readonly coordinates: readonly PlaceMapPublicPolygonCoordinatesDto[];
-    };
-
-export interface PlaceMapPublicGeometryDto {
-  readonly area: {
-    readonly precision: 'approximate';
-    readonly geometry: PlaceMapPublicPolygonGeometryDto;
-  };
-}
 
 export interface PlaceMapPublicOpeningHoursPeriodDto {
   readonly days: readonly PlaceWeekday[];
@@ -41,7 +22,7 @@ export interface PlaceMapPublicItemDto {
     readonly lat: number;
     readonly lng: number;
   };
-  readonly geometry?: PlaceMapPublicGeometryDto;
+  readonly geometry?: EditorialPublicGeometry;
   readonly opening_hours?: PlaceMapPublicOpeningHoursDto;
   readonly html_url: string;
 }

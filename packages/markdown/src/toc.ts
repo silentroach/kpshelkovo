@@ -100,7 +100,7 @@ const phrasingText = (node: PhrasingContent): string => {
   return '';
 };
 
-const headingText = (heading: Heading): string =>
+export const headingText = (heading: Heading): string =>
   heading.children.map(phrasingText).join('').trim();
 
 const isTocLinkReference = (child: PhrasingContent): child is LinkReference =>
@@ -118,8 +118,11 @@ const isTocPlaceholder = (node: RootContent): boolean => {
   );
 };
 
-const collectTocEntries = (document: Root): readonly TocEntry[] => {
-  const seenSlugs = new Map<string, number>();
+const collectTocEntries = (
+  document: Root,
+  authoredIds?: ReadonlyMap<Heading, string>
+): readonly TocEntry[] => {
+  const seenSlugs = new Set<string>();
   const entries: TocEntry[] = [];
 
   document.children.forEach((node) => {
@@ -133,7 +136,7 @@ const collectTocEntries = (document: Root): readonly TocEntry[] => {
       return;
     }
 
-    const slug = uniqueHeadingSlug(title, seenSlugs);
+    const slug = authoredIds?.get(node) ?? uniqueHeadingSlug(title, seenSlugs);
 
     if (node.depth > 1) {
       entries.push({ depth: node.depth, slug, title });
@@ -181,12 +184,15 @@ const buildTocNodes = (entries: readonly TocEntry[]): readonly RootContent[] => 
   return [tocTitle(), tocRootList(buildTocItems(entries, 0, 1).items), tocSeparator()];
 };
 
-export const expandTableOfContents = (document: Root): Root => {
+export const expandTableOfContents = (
+  document: Root,
+  authoredIds?: ReadonlyMap<Heading, string>
+): Root => {
   if (!document.children.some(isTocPlaceholder)) {
     return document;
   }
 
-  const entries = collectTocEntries(document);
+  const entries = collectTocEntries(document, authoredIds);
 
   return {
     ...document,

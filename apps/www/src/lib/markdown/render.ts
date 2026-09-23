@@ -3,6 +3,7 @@ import { render } from '@shelkovo/markdown';
 import { normalizeEntityMentions } from '../mentions';
 import type { EntityMentionSourceEntity, SiteMentionRegistry } from '../mentions';
 import { normalizeContentDiffMarkdown, renderContentDiffBlocks } from './content-diff';
+import { transformEditorialMaps } from './editorial-maps-html';
 import { renderFileLinks } from './file-links';
 import type { PreprocessedSiteMarkdown, RenderSiteMarkdownOptions } from './render.types';
 
@@ -257,7 +258,11 @@ export const renderMarkdown = (markdown: string, options?: RenderSiteMarkdownOpt
 
   return renderFileLinks(
     renderContentDiffBlocks(
-      render(normalizeContentDiffMarkdown(preprocessed), { eagerImages: options?.eagerImages })
+      render(normalizeContentDiffMarkdown(preprocessed), {
+        eagerImages: options?.eagerImages,
+        reservedIds: options?.reservedIds,
+        transform: transformEditorialMaps(options?.mentions?.context ?? 'site markdown')
+      })
     )
   );
 };

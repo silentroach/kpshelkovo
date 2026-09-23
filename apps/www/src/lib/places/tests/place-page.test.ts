@@ -100,20 +100,24 @@ describe('place preview marker', () => {
       marker: 'fish',
       openingHours: { periods: [{ days: ['mon'], opensAt: '09:00', closesAt: '18:00' }] },
       geometry: {
-        area: {
-          precision: 'approximate',
-          geometry: {
-            type: 'Polygon',
-            coordinates: [
-              [
-                [38, 55],
-                [39, 55],
-                [38, 56],
-                [38, 55]
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            precision: 'approximate',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [38, 55],
+                  [39, 55],
+                  [38, 56],
+                  [38, 55]
+                ]
               ]
-            ]
+            }
           }
-        }
+        ]
       }
     });
     const container = await createAstroContainer();
