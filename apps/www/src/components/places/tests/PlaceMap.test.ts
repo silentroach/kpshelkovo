@@ -1082,8 +1082,8 @@ describe('PlaceMap', () => {
     if (geometry?.type !== 'Polygon' || !labelCoordinates)
       throw new Error('Parcel display geometry missing');
     const vertex = geometry.coordinates[0]?.[0];
-    expect(vertex?.[0] - 37.71).toBeCloseTo(labelCoordinates[0] - 37.715, 9);
-    expect(vertex?.[1] - 55.06).toBeCloseTo(labelCoordinates[1] - 55.065, 7);
+    expect(vertex).toEqual([37.71, 55.06]);
+    expect(labelCoordinates).toEqual([37.715, 55.065]);
     const labelMarker = map.addChild.mock.lastCall?.[0];
     await fireEvent.click(label);
     expect(screen.getByText('SHR-L43 / SHR-L44')).toBeTruthy();

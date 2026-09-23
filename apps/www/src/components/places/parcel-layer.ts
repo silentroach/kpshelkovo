@@ -1,4 +1,3 @@
-import { createDisplayOffset } from '@shelkovo/geo';
 import type {
   DrawingStyle,
   LngLat,
@@ -10,38 +9,28 @@ import type {
   YMapFeature,
   YMapMarker
 } from '@yandex/ymaps3-types';
-import { parse as parseYaml } from 'yaml';
-import { z } from 'zod';
-
-import displayConfig from '@/config/parcel-map.yaml?raw';
 
 import type { ParcelLayer, ParcelMapItem } from './parcel-layer-types';
 
 const LABEL_MIN_ZOOM = 17;
 const SELECTION_MS = 5_000;
-const offset = z
-  .object({ offset_east_m: z.number(), offset_north_m: z.number() })
-  .strict()
-  .parse(parseYaml(displayConfig));
-
 const vertices = (geometry: ParcelMapItem['geometry']): readonly LngLat[] =>
   (geometry.type === 'Polygon' ? geometry.coordinates.flat() : geometry.coordinates.flat(2)).map(
     ([lng, lat]) => [lng, lat]
   );
 
-const shiftedGeometry = (
-  geometry: ParcelMapItem['geometry'],
-  shift: (position: LngLat) => LngLat
+const toMapGeometry = (
+  geometry: ParcelMapItem['geometry']
 ): PolygonGeometry | MultiPolygonGeometry =>
   geometry.type === 'Polygon'
     ? {
         type: 'Polygon',
-        coordinates: geometry.coordinates.map((ring) => ring.map(([lng, lat]) => shift([lng, lat])))
+        coordinates: geometry.coordinates.map((ring) => ring.map(([lng, lat]) => [lng, lat]))
       }
     : {
         type: 'MultiPolygon',
         coordinates: geometry.coordinates.map((polygon) =>
-          polygon.map((ring) => ring.map(([lng, lat]) => shift([lng, lat])))
+          polygon.map((ring) => ring.map(([lng, lat]) => [lng, lat]))
         )
       };
 
@@ -133,7 +122,7 @@ export const createParcelLayer = (
     const visible = new Set<string>();
     if (zoom >= LABEL_MIN_ZOOM) {
       for (const item of items) {
-        const [lng, lat] = labelPosition(item);
+        const [lng, lat] = item.labelCoordinates;
         if (
           lng < Math.min(bounds[0][0], bounds[1][0]) ||
           lng > Math.max(bounds[0][0], bounds[1][0]) ||
@@ -166,10 +155,6 @@ export const createParcelLayer = (
     }
   };
 
-  // Опорная широта рассчитывается от исходного набора, а не от сдвинутых координат.
-  let shift = (position: LngLat): LngLat => position;
-  const labelPosition = (item: ParcelMapItem): LngLat => shift(item.labelCoordinates);
-
   const disable = (): void => {
     active = false;
     clearSelection();
@@ -183,21 +168,11 @@ export const createParcelLayer = (
     enable(parcels) {
       if (destroyed || active) return;
       items = parcels;
-      const sourceBounds = boundsOf(parcels.flatMap((item) => vertices(item.geometry)));
-      const offsetPosition = createDisplayOffset(
-        offset.offset_east_m,
-        offset.offset_north_m,
-        (sourceBounds[0][1] + sourceBounds[1][1]) / 2
-      );
-      shift = ([lng, lat]) => {
-        const [x, y] = offsetPosition([lng, lat]);
-        return [x, y];
-      };
       active = true;
       for (const item of items) {
         const feature = new sdk.YMapFeature({
           id: `parcel-${item.code}`,
-          geometry: shiftedGeometry(item.geometry, shift),
+          geometry: toMapGeometry(item.geometry),
           style: normalStyle(),
           onClick: () => select(item)
         });
@@ -211,7 +186,7 @@ export const createParcelLayer = (
       if (!active || destroyed) return false;
       const item = items.find((parcel) => parcel.code === code || parcel.aliases.includes(code));
       if (!item) return false;
-      const bounds = boundsOf(vertices(item.geometry).map(shift));
+      const bounds = boundsOf(vertices(item.geometry));
       map.update({
         location: { bounds, duration: getDuration(), easing: 'ease-in-out' },
         margin: getViewMargin()

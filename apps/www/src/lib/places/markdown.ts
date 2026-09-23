@@ -68,10 +68,10 @@ export const buildPlacesMarkdown = (places: readonly Place[]): string => {
       md.link(absoluteUrl(placesDataUrl()), absoluteUrl(placesDataUrl()))
     ]),
     md.paragraph([
-      md.text('Кадастровые границы участков: '),
+      md.text('Контуры участков для показа на Яндекс Картах: '),
       md.link(absoluteUrl(parcelMapDataUrl()), absoluteUrl(parcelMapDataUrl())),
       md.text(
-        '. На карте слой включается вручную; поиск по полному коду участка ведёт к его контуру.'
+        '. Координаты подготовлены для подложки и отличаются от исходного кадастра поправкой отображения. На карте слой включается вручную; поиск по полному коду ведёт к участку.'
       )
     ]),
     md.heading(2, 'Места'),
