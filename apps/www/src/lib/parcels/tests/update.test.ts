@@ -523,6 +523,8 @@ describe('parcel matching and updating', () => {
       });
       const stored = await readSavedParcels(directory);
       const content = await readFile(join(directory, 'shr/l/l43.md'), 'utf8');
+      expect(content).not.toContain('aliases: []');
+      expect(stored[0]?.data.aliases).toEqual([]);
       const repeated = reconcileParcels(
         plans([{ id: 'L43', cadastralReference: a, objectprice: 100 }]),
         nspd([a]),

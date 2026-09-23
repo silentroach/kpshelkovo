@@ -64,6 +64,7 @@ export const writeParcelUpdate = async (directory: string, update: ParcelUpdate)
     // Astro's Markdown frontmatter reader interprets unquoted YAML ISO dates as Date objects.
     const data = {
       ...record.data,
+      aliases: record.data.aliases.length ? record.data.aliases : undefined,
       price_history: record.data.price_history.map(({ on, price }) => {
         const quoted = new Scalar(on);
         quoted.type = Scalar.QUOTE_SINGLE;
