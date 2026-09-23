@@ -1,3 +1,9 @@
+import { createDisplayOffset, polygonLabelCoordinates } from '@shelkovo/geo';
+import { parse as parseYaml } from 'yaml';
+import { z } from 'zod';
+
+import displayConfig from '@/config/parcel-map.yaml?raw';
+
 import {
   ParcelMapPublicSchema,
   ParcelSearchPublicSchema,
@@ -58,8 +64,3 @@ export const buildParcelSearchPayload = (parcels: readonly Parcel[]): ParcelSear
       part: parcel.part
     }))
   });
-import { createDisplayOffset, polygonLabelCoordinates } from '@shelkovo/geo';
-import { parse as parseYaml } from 'yaml';
-import { z } from 'zod';
-
-import displayConfig from '@/config/parcel-map.yaml?raw';
