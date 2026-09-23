@@ -261,7 +261,9 @@ export const renderMarkdown = (markdown: string, options?: RenderSiteMarkdownOpt
       render(normalizeContentDiffMarkdown(preprocessed), {
         eagerImages: options?.eagerImages,
         reservedIds: options?.reservedIds,
-        transform: transformEditorialMaps(options?.mentions?.context ?? 'site markdown')
+        transform: options?.editorialMaps
+          ? transformEditorialMaps(options.mentions?.context ?? 'site markdown')
+          : undefined
       })
     )
   );

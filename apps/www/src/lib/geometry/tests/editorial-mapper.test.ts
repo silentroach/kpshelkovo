@@ -179,6 +179,42 @@ describe('editorial geometry boundary', () => {
     `);
   });
 
+  it.each(['marker-color', 'stroke', 'fill'])(
+    'rejects invalid %s colors with source, feature ID and field diagnostics',
+    (field) => {
+      for (const color of ['not-a-color', '#12', '#gggggg', 'rgb(nope)', 'var(--missing)']) {
+        expect(() =>
+          parseEditorialGeometry(
+            collection({ type: 'Point', coordinates: [37, 55] }, { [field]: color }),
+            'news/entry.md map insertion 2'
+          )
+        ).toThrow(
+          `editorial geometry "news/entry.md map insertion 2" is invalid: features.0.properties.${field} [feature 0 (ID 0)]: expected a valid CSS color`
+        );
+      }
+    }
+  );
+
+  it.each([
+    '#AbC',
+    '#1234',
+    '#123456',
+    '#12345678',
+    'red',
+    'rgb(20, 30, 40)',
+    'hsl(120 50% 25% / .5)'
+  ])('preserves valid color %s in all authored color fields', (color) => {
+    const feature = parseEditorialGeometry(
+      collection(
+        { type: 'Point', coordinates: [37, 55] },
+        { 'marker-color': color, stroke: color, fill: color }
+      ),
+      'colors.geojson'
+    ).features[0];
+
+    expect(feature).toMatchObject({ markerColor: color, stroke: color, fill: color });
+  });
+
   it('identifies the source, feature index, zero ID and precise field for rejected content', () => {
     expect(() =>
       parseEditorialGeometry(

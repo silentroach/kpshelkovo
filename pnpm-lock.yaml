@@ -315,12 +315,18 @@ importers:
       '@testing-library/svelte':
         specifier: ^5.4.2
         version: 5.4.2(svelte@5.57.0)(vite@8.2.2(@types/node@26.5.0)(esbuild@0.28.2)(yaml@2.9.0))(vitest@5.0.0(@types/node@26.5.0)(happy-dom@20.14.0)(vite@8.2.2(@types/node@26.5.0)(esbuild@0.28.2)(yaml@2.9.0)))
+      '@types/css-tree':
+        specifier: ^2.3.11
+        version: 2.3.11
       '@yandex/ymaps3-types':
         specifier: ^1.0.20914674
         version: 1.0.20914674
       astro-compressor:
         specifier: ^1.3.0
         version: 1.3.0
+      css-tree:
+        specifier: ^3.2.1
+        version: 3.2.1
       happy-dom:
         specifier: ^20.14.0
         version: 20.14.0
@@ -1608,6 +1614,9 @@ packages:
 
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
+
+  '@types/css-tree@2.3.11':
+    resolution: {integrity: sha512-aEokibJOI77uIlqoBOkVbaQGC9zII0A+JH1kcTNKW2CwyYWD8KM6qdo+4c77wD3wZOQfJuNWAr9M4hdk+YhDIg==}
 
   '@types/debug@4.1.13':
     resolution: {integrity: sha512-KSVgmQmzMwPlmtljOomayoR89W4FynCAi3E8PPs7vmDVPe84hT+vGPKkJfThkmXs0x0jAaa9U8uW8bbfyS2fWw==}
@@ -5211,6 +5220,8 @@ snapshots:
     dependencies:
       '@types/deep-eql': 4.0.2
       assertion-error: 2.0.1
+
+  '@types/css-tree@2.3.11': {}
 
   '@types/debug@4.1.13':
     dependencies:

@@ -42,7 +42,7 @@ if (!article || !source) {
 }
 
 const bodyHtml = article.body
-  ? renderMarkdown(article.body, { eagerImages: true })
+  ? renderMarkdown(article.body, { eagerImages: true, editorialMaps: true })
   : undefined;
 const monthName = formatNewsMonth(article.year, article.month, {
   capitalize: true,

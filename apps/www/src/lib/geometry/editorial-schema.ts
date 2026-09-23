@@ -1,3 +1,4 @@
+import { lexer } from 'css-tree';
 import { z } from 'zod';
 
 import { RawPolygonGeometrySchema } from './raw-polygon-schema';
@@ -14,6 +15,9 @@ const numericString = z
 const nonnegative = z.union([z.number().finite(), numericString]).pipe(z.number().nonnegative());
 const positive = z.union([z.number().finite(), numericString]).pipe(z.number().positive());
 const opacity = z.union([z.number().finite(), numericString]).pipe(z.number().min(0).max(1));
+const color = z.string().refine((value) => !lexer.matchType('color', value).error, {
+  message: 'expected a valid CSS color'
+});
 const dashArray = z
   .union([
     z.array(positive),
@@ -36,12 +40,12 @@ const properties = z
   .object({
     description: z.string().optional(),
     iconCaption: z.string().optional(),
-    'marker-color': z.string().min(1).optional(),
-    stroke: z.string().min(1).optional(),
+    'marker-color': color.optional(),
+    stroke: color.optional(),
     'stroke-width': nonnegative.optional(),
     'stroke-opacity': opacity.optional(),
     'stroke-dasharray': dashArray.optional(),
-    fill: z.string().min(1).optional(),
+    fill: color.optional(),
     'fill-opacity': opacity.optional(),
     precision: z.literal('approximate').optional(),
     outline_expansion_meters: z.number().positive().max(25).optional()

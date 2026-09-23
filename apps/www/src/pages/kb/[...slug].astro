@@ -59,7 +59,7 @@ const schema = kbPageSchema({
   description,
 });
 const bodyHtml = page.body
-  ? renderMarkdown(page.body, { eagerImages: true })
+  ? renderMarkdown(page.body, { eagerImages: true, editorialMaps: true })
   : undefined;
 ---
 

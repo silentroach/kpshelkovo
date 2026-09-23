@@ -26,11 +26,23 @@ const map = (name?: string, url?: string): string => {
 
 const document = (markdown: string, options?: Parameters<typeof renderMarkdown>[1]) => {
   const page = new Window().document;
-  page.body.innerHTML = renderMarkdown(markdown, options);
+  page.body.innerHTML = renderMarkdown(markdown, { editorialMaps: true, ...options });
   return page;
 };
 
 describe('editorial map HTML', () => {
+  it.each([undefined, { editorialMaps: false }])(
+    'keeps valid and malformed map fences as code unless explicitly enabled: %j',
+    (options) => {
+      const page = new Window().document;
+      page.body.innerHTML = renderMarkdown(`${map()}\n\n\`\`\`map\nnot JSON\n\`\`\``, options);
+
+      expect(page.querySelectorAll('editorial-map')).toHaveLength(0);
+      expect(page.querySelectorAll('pre code')).toHaveLength(2);
+      expect(page.querySelectorAll('pre code')[1]?.textContent).toBe('not JSON\n');
+    }
+  );
+
   it.each([
     ['Схема объезда', 'https://example.com/map', 'Схема объезда', 'https://example.com/map'],
     ['Схема объезда', undefined, 'Схема объезда', undefined],
@@ -58,6 +70,7 @@ describe('editorial map HTML', () => {
   it('keeps data script-safe and treats the map name as text, not HTML/Markdown/mention', () => {
     const name = '<svg onload=alert(1)> **@unknown**';
     const html = renderMarkdown(map(name), {
+      editorialMaps: true,
       mentions: { context: 'test article', registry: new Map() }
     });
     const page = new Window().document;
@@ -123,6 +136,7 @@ describe('editorial map HTML', () => {
   it('rejects malformed map code at render time with a source and insertion number', () => {
     expect(() =>
       renderMarkdown(`${map()}\n\n\`\`\`map\n{\n\`\`\``, {
+        editorialMaps: true,
         mentions: { context: 'test article', registry: new Map() }
       })
     ).toThrow('test article map insertion 2 has invalid JSON');
