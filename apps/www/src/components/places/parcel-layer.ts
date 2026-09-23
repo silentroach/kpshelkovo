@@ -76,13 +76,12 @@ export const createParcelLayer = (
     if (!value) throw new Error(`Не найден цвет карты ${name}`);
     return value;
   };
-  const normalStyle = (): DrawingStyle => ({
+  const normalStyle = (item: ParcelMapItem): DrawingStyle => ({
     zIndex: -1,
     interactive: true,
     simplificationRate: 0,
-    fill: token('--color-neutral-soft'),
-    fillOpacity: 0.16,
-    stroke: [{ color: token('--color-text-muted'), width: 1.5, opacity: 0.8 }]
+    fillOpacity: 0,
+    stroke: [{ color: token('--color-text-muted'), width: 1, opacity: item.muted ? 0.25 : 0.5 }]
   });
   const selectedStyle = (): DrawingStyle => ({
     zIndex: -1,
@@ -96,7 +95,7 @@ export const createParcelLayer = (
   const clearSelection = (): void => {
     if (timer !== undefined) window.clearTimeout(timer);
     timer = undefined;
-    if (selected) features.get(selected.code)?.update({ style: normalStyle() });
+    if (selected) features.get(selected.code)?.update({ style: normalStyle(selected) });
     selected = undefined;
   };
 
@@ -170,7 +169,7 @@ export const createParcelLayer = (
         const feature = new sdk.YMapFeature({
           id: `parcel-${item.code}`,
           geometry: toMapGeometry(item.geometry),
-          style: normalStyle(),
+          style: normalStyle(item),
           onClick: () => select(item)
         });
         features.set(item.code, feature);

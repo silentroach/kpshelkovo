@@ -70,6 +70,7 @@ describe('parcel public payloads', () => {
         "code",
         "geometry",
         "labelCoordinates",
+        "muted",
         "part",
       ]
     `);
@@ -127,6 +128,21 @@ describe('parcel public payloads', () => {
     expect(payload[1]?.geometry).toEqual(single.geometry);
     expect(payload[0]?.geometry).toEqual(parcel.geometry);
     expect(ParcelMapPublicSchema.safeParse({ parcels: payload }).success).toBe(false);
+  });
+
+  it('publishes only a muted flag for sale status, including unknown status', () => {
+    const payload = buildParcelMapPayload(
+      [
+        parcel,
+        { ...parcel, code: 'SHR-L45', status: 'sold' },
+        { ...parcel, code: 'SHR-L46', status: 'reserved' },
+        { ...parcel, code: 'SHR-L47', status: 'unavailable' },
+        { ...parcel, code: 'SHR-L48', status: undefined }
+      ],
+      { offset_east_m: 0, offset_north_m: 0 }
+    );
+    expect(payload.map(({ muted }) => muted)).toEqual([true, false, true, true, true]);
+    expect(payload.every((item) => !('status' in item))).toBe(true);
   });
 
   it('publishes an exact-search dictionary without coordinates or commercial data', () => {

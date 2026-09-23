@@ -128,6 +128,7 @@ const parcel = {
   code: 'SHR-L43',
   aliases: ['SHR-L44'],
   part: 'shr',
+  muted: false,
   geometry: {
     type: 'Polygon',
     coordinates: [
@@ -1127,6 +1128,7 @@ describe('PlaceMap', () => {
     const secondParcel = {
       code: 'SHR-L46',
       part: parcel.part,
+      muted: true,
       geometry: parcel.geometry,
       labelCoordinates: [37.73, 55.065]
     };
@@ -1141,6 +1143,24 @@ describe('PlaceMap', () => {
     await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
     await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
     await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    expect(areaFeatures.map(({ props }) => props.style?.stroke)).toMatchInlineSnapshot(`
+      [
+        [
+          {
+            "color": "#45564b",
+            "opacity": 0.5,
+            "width": 1,
+          },
+        ],
+        [
+          {
+            "color": "#45564b",
+            "opacity": 0.25,
+            "width": 1,
+          },
+        ],
+      ]
+    `);
     mapUpdateHandlers[0]?.({
       type: 'update',
       location: { center: [37.715, 55.065], zoom: 17, bounds: map.bounds },
@@ -1159,13 +1179,25 @@ describe('PlaceMap', () => {
     expect(screen.queryByText('SHR-L46')).toBeNull();
     expect(clearTimeout).toHaveBeenCalledWith(firstTimer);
     expect(setTimeout.mock.calls.filter(([, delay]) => delay === 5_000)).toHaveLength(2);
-    expect(areaFeatures[0]?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.16 });
+    expect(areaFeatures[0]?.update.mock.lastCall?.[0].style).toMatchObject({
+      stroke: [{ color: '#45564b', width: 1, opacity: 0.5 }]
+    });
     expect(areaFeatures[1]?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
 
     const secondTimerIndex = setTimeout.mock.calls.findLastIndex(([, delay]) => delay === 5_000);
     const secondTimer = setTimeout.mock.results[secondTimerIndex]?.value;
+    const expire = setTimeout.mock.calls[secondTimerIndex]?.[0];
+    if (typeof expire !== 'function') throw new Error('Parcel selection timer missing');
+    window.clearTimeout(secondTimer);
+    expire();
+    expect(areaFeatures[1]?.update.mock.lastCall?.[0].style).toMatchObject({
+      stroke: [{ color: '#45564b', width: 1, opacity: 0.25 }]
+    });
+    await fireEvent.click(secondLabel);
+    const renewedTimerIndex = setTimeout.mock.calls.findLastIndex(([, delay]) => delay === 5_000);
+    const renewedTimer = setTimeout.mock.results[renewedTimerIndex]?.value;
     view.unmount();
-    expect(clearTimeout).toHaveBeenCalledWith(secondTimer);
+    expect(clearTimeout).toHaveBeenCalledWith(renewedTimer);
   });
 
   it('focuses alias links after resolving the dictionary, survives resize, and preserves URL state', async () => {
