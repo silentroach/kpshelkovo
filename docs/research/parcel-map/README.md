@@ -2,7 +2,7 @@
 
 Материалы исследования от 22 сентября 2026 года для [карты решений «Участки Шелково: границы, номера и поиск»](https://github.com/silentroach/kpshelkovo/issues/804).
 
-Общая рабочая ветка — `feat/parcel-map-search`. Согласованный [change `add-parcel-map-search`](../../../openspec/changes/add-parcel-map-search/proposal.md) описывает продуктовый объём; материалы этого каталога показывают, как получен и проверен исходный снимок.
+Общая рабочая ветка — `feat/parcel-map-search`. [Архив change `add-parcel-map-search`](../../../openspec/changes/archive/2026-09-23-add-parcel-map-search/proposal.md) описывает согласованный объём; материалы этого каталога показывают, как получен и проверен исходный снимок.
 
 Читать при проверке привязки генпланов и исходного снимка. Процедура текущего обновления находится в [инструкции](../../parcel-updates.md), а решения об отдельном домене участков и поиске — в [ADR-041](../../decisions/041-parcel-records-and-exact-search.md).
 
@@ -44,7 +44,7 @@ pnpm exec vite preview --config docs/research/parcel-map/demo/vite.config.ts
 
 Поправка применяется в продуктовом слое Яндекс Карт. Последующие перевыгрузки кадастра сохраняют настройку; значения не вшиваются в координаты участков. Это уточнение входит в [решение о визуальном сопоставлении](https://github.com/silentroach/kpshelkovo/issues/808#issuecomment-5779071155).
 
-Долгоживущие правила отображения и сохранения исходных данных закреплены в [change](../../../openspec/changes/add-parcel-map-search/design.md). Числа поправки относятся к рабочей настройке, а количества и охват снимка остаются свидетельствами исследования.
+Долгоживущие правила отображения и сохранения исходных данных закреплены в [основных specs участков](../../../openspec/specs/parcel-map/spec.md); технический подход — в [архиве change](../../../openspec/changes/archive/2026-09-23-add-parcel-map-search/design.md). Числа поправки относятся к рабочей настройке, а количества и охват снимка остаются свидетельствами исследования.
 
 Сдвиг применяется только к отображению и каждый раз рассчитывается от исходной геометрии, поэтому последовательные правки не накапливают смещение. Метры означают расстояние на земле на средней широте охвата; для равномерного сдвига слоя учитывается масштаб Mercator. NDJSON, соответствия и площади не изменяются.
 
@@ -162,7 +162,7 @@ projectedPoint = projectedOrigin + matrix * offset
 - [Согласовать слой участков и поиск по номерам](https://github.com/silentroach/kpshelkovo/issues/805) — публичное поведение.
 - [Определить повторную выгрузку и проверку изменений участков](https://github.com/silentroach/kpshelkovo/issues/807) — окончательная инструкция обновления.
 
-Для действующих правил читать [parcel-records](../../../openspec/changes/add-parcel-map-search/specs/parcel-records/spec.md), [parcel-updates](../../../openspec/changes/add-parcel-map-search/specs/parcel-updates/spec.md), [parcel-map](../../../openspec/changes/add-parcel-map-search/specs/parcel-map/spec.md) и [search](../../../openspec/changes/add-parcel-map-search/specs/search/spec.md). Архитектурная причина разделения участков и мест — [ADR-041](../../decisions/041-parcel-records-and-exact-search.md).
+Для действующих правил читать [parcel-records](../../../openspec/specs/parcel-records/spec.md), [parcel-updates](../../../openspec/specs/parcel-updates/spec.md), [parcel-map](../../../openspec/specs/parcel-map/spec.md) и [search](../../../openspec/specs/search/spec.md). Архитектурная причина разделения участков и мест — [ADR-041](../../decisions/041-parcel-records-and-exact-search.md).
 
 ## Источники метода
 

@@ -14,12 +14,12 @@
 
 Основания архитектуры:
 
-- [ADR-013](../../../docs/decisions/013-raw-domain-public-data-boundary.md) — Raw DTO → domain model → Public DTO.
-- [ADR-025](../../../docs/decisions/025-static-full-text-search-with-pagefind.md) — Pagefind для содержательных HTML-страниц.
-- [ADR-028](../../../docs/decisions/028-markdown-first-places-map.md) — места, их видимость и общая карта.
-- [ADR-039](../../../docs/decisions/039-shared-yandex-maps-runtime-and-preview.md) — общее подключение Яндекс Карт и владение renderer-ами.
-- [ADR-011](../../../docs/decisions/011-public-surface-registry.md) — публикация и обнаружение данных.
-- [Дизайн-гайд](../../../docs/design/design-code-shelkovo.md) — семантические цвета, доступность действий и штатный интерфейс карты.
+- [ADR-013](../../../../docs/decisions/013-raw-domain-public-data-boundary.md) — Raw DTO → domain model → Public DTO.
+- [ADR-025](../../../../docs/decisions/025-static-full-text-search-with-pagefind.md) — Pagefind для содержательных HTML-страниц.
+- [ADR-028](../../../../docs/decisions/028-markdown-first-places-map.md) — места, их видимость и общая карта.
+- [ADR-039](../../../../docs/decisions/039-shared-yandex-maps-runtime-and-preview.md) — общее подключение Яндекс Карт и владение renderer-ами.
+- [ADR-011](../../../../docs/decisions/011-public-surface-registry.md) — публикация и обнаружение данных.
+- [Дизайн-гайд](../../../../docs/design/design-code-shelkovo.md) — семантические цвета, доступность действий и штатный интерфейс карты.
 
 ## Goals / Non-Goals
 

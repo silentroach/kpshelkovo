@@ -26,4 +26,4 @@
 
 - Поиск и карта используют самостоятельные публичные представления одного набора; новый снимок проходит редакционную проверку до сборки и публикации.
 - Участок не получает HTML-карточку и не становится местом. Коммерческие сведения остаются в редакционных данных до отдельного решения об их показе.
-- Текущие требования change `add-parcel-map-search`: [parcel-records](../../openspec/changes/add-parcel-map-search/specs/parcel-records/spec.md), [parcel-updates](../../openspec/changes/add-parcel-map-search/specs/parcel-updates/spec.md), [parcel-map](../../openspec/changes/add-parcel-map-search/specs/parcel-map/spec.md), [search](../../openspec/changes/add-parcel-map-search/specs/search/spec.md).
+- Действующие требования: [parcel-records](../../openspec/specs/parcel-records/spec.md), [parcel-updates](../../openspec/specs/parcel-updates/spec.md), [parcel-map](../../openspec/specs/parcel-map/spec.md), [search](../../openspec/specs/search/spec.md). Объём первоначального этапа сохранён в [архиве change](../../openspec/changes/archive/2026-09-23-add-parcel-map-search/proposal.md).
