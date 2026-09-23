@@ -553,6 +553,28 @@ describe('parcel matching and updating', () => {
     ).toThrow();
   });
 
+  it('keeps genplan plots in natural ID order regardless of source order', () => {
+    const snapshot = {
+      part: 'shr',
+      page: 'https://example.org/',
+      capturedAt: '2026-09-22T12:00:00Z',
+      plots: ['L10', 'L2', 'L1', 'L01'].map((id) => ({
+        id,
+        status: 'Свободен',
+        location: 'луговой'
+      }))
+    };
+    expect(GenplanSnapshotSchema.parse(snapshot).plots.map(({ id }) => id)).toEqual([
+      'L01',
+      'L1',
+      'L2',
+      'L10'
+    ]);
+    expect(
+      GenplanSnapshotSchema.parse({ ...snapshot, plots: snapshot.plots.toReversed() }).plots
+    ).toEqual(GenplanSnapshotSchema.parse(snapshot).plots);
+  });
+
   it('writes files atomically, preserves Markdown text, and repeats without file changes', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'parcel-update-'));
     try {

@@ -124,7 +124,13 @@ export const GenplanSnapshotSchema = z
         });
       ids.add(id);
     });
-  });
+  })
+  .transform((snapshot) => ({
+    ...snapshot,
+    plots: snapshot.plots.toSorted(
+      (a, b) => a.id.localeCompare(b.id, 'en', { numeric: true }) || a.id.localeCompare(b.id)
+    )
+  }));
 
 export const ParcelMatchesSchema = z
   .object({
