@@ -530,7 +530,7 @@ export const createPagefindSearchClient = (
     }
 
     const limit = normalizeResultLimit(rawLimit);
-    const queryCache = resultCacheFor(effectiveQuery);
+    const queryCache = resultCacheFor(query);
     const pagefind = await loadPagefind();
     if (requestId !== latestRequestId) {
       return;

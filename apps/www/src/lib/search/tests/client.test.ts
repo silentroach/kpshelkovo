@@ -1149,6 +1149,27 @@ describe('Pagefind search client', () => {
     `);
   });
 
+  it('refreshes the alias explanation when the full input changes but the Pagefind query does not', async () => {
+    const { runtime, search } = runtimeWith(
+      responseWith({
+        raw_url: '/map/?p=SHP-A10',
+        meta: { title: 'SHP-A10', part: 'shp', aliases: 'SHP-A11', sectionId: 'parcels' }
+      })
+    );
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => runtime
+    });
+
+    const broad = await client.search('SHP-A11 x');
+    const exact = await client.search('SHP-A11');
+    expect(search.mock.calls).toEqual([['SHP-A11'], ['SHP-A11']]);
+    expect(broad).toMatchObject({ results: [{ matchContext: 'Шелково Парк' }] });
+    expect(exact).toMatchObject({
+      results: [{ title: 'SHP-A10', matchContext: 'Шелково Парк · также SHP-A11' }]
+    });
+  });
+
   it('uses plain text search for numbers and code prefixes, and retries a failed designation search', async () => {
     const search = vi.fn<PagefindRuntime['search']>(async () => responseWith(validResult(1)));
     search.mockRejectedValueOnce(new Error('search failed'));

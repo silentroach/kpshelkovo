@@ -2,9 +2,12 @@ import type { NspdSnapshot } from './source-types.ts';
 import type { ParcelUpdate } from './update-types.ts';
 
 export const formatParcelUpdate = (update: ParcelUpdate, nspd: NspdSnapshot): string => {
+  const removed = update.deleted.filter(
+    (path) => !update.renamed.some((rename) => rename.startsWith(`${path} -> `))
+  );
   const sections: readonly [string, readonly string[]][] = [
     ['Добавлены', update.added],
-    ['Удалены', update.deleted],
+    ['Удалены', removed],
     ['Переименованы', update.renamed],
     ['Изменена геометрия', update.geometryChanged],
     ['Изменены сведения', update.detailsChanged],

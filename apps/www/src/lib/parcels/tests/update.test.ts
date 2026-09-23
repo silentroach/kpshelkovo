@@ -338,10 +338,14 @@ describe('parcel matching and updating', () => {
     expect(
       reconcileParcels(plans([{ id: 'L43', cadastralReference: a }]), nspd([b]), [], first).deleted
     ).toEqual(['shr/l/l43.md']);
-    expect(
-      reconcileParcels(plans([{ id: 'L45', cadastralReference: b }]), nspd([a, b]), [], first)
-        .deleted
-    ).toEqual(['shr/l/l43.md']);
+    const removed = reconcileParcels(
+      plans([{ id: 'L45', cadastralReference: b }]),
+      nspd([a, b]),
+      [],
+      first
+    );
+    expect(removed.deleted).toEqual(['shr/l/l43.md']);
+    expect(formatParcelUpdate(removed, nspd([a, b]))).toContain('Удалены: 1');
   });
 
   it('keeps ambiguous status, unions features, and only observes a confirmed whole-parcel price', () => {
@@ -619,7 +623,7 @@ describe('parcel matching and updating', () => {
       expect(renamed.renamed).toEqual(['shr/l/l43.md -> shr/m/m44.md']);
       expect(formatParcelUpdate(renamed, nspd([a]))).toContain('Переименованы: 1');
       expect(formatParcelUpdate(first, nspd([a]))).toContain('Добавлены: 1');
-      expect(formatParcelUpdate(renamed, nspd([a]))).toContain('Удалены: 1');
+      expect(formatParcelUpdate(renamed, nspd([a]))).toContain('Удалены: 0');
       expect(
         formatParcelUpdate(reconcileParcels(plans([{ id: 'L43' }]), nspd([a]), [], []), nspd([a]))
       ).toContain('Не сопоставлены: 1');
