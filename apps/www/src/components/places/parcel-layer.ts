@@ -55,7 +55,6 @@ export const createParcelLayer = (
   map: YMap,
   sdk: typeof ymaps3,
   container: HTMLElement,
-  onSelection: (text?: string) => void,
   onExpiry: (code: string) => void,
   getViewMargin: () => Margin,
   getDuration: () => number
@@ -99,14 +98,12 @@ export const createParcelLayer = (
     timer = undefined;
     if (selected) features.get(selected.code)?.update({ style: normalStyle() });
     selected = undefined;
-    onSelection();
   };
 
   const select = (item: ParcelMapItem): void => {
     clearSelection();
     selected = item;
     features.get(item.code)?.update({ style: selectedStyle() });
-    onSelection([item.code, ...(item.aliases ?? [])].join(' / '));
     timer = window.setTimeout(() => {
       timer = undefined;
       clearSelection();

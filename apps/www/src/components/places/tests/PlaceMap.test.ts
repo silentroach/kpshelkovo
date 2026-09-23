@@ -1072,7 +1072,7 @@ describe('PlaceMap', () => {
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
-  it('shows one short label from zoom 17 and one full-code selection for a merged parcel', async () => {
+  it('shows one short label from zoom 17 and no extra text for a merged parcel', async () => {
     vi.stubGlobal('fetch', parcelFetch);
     render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
@@ -1111,7 +1111,8 @@ describe('PlaceMap', () => {
     expect(labelCoordinates).toEqual([37.715, 55.065]);
     const labelMarker = map.addChild.mock.lastCall?.[0];
     await fireEvent.click(label);
-    expect(screen.getByText('SHR-L43 / SHR-L44')).toBeTruthy();
+    expect(areaFeatures[0]?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+    expect(screen.queryByText('SHR-L43 / SHR-L44')).toBeNull();
 
     update({
       type: 'update',
@@ -1155,7 +1156,7 @@ describe('PlaceMap', () => {
     const firstTimer = setTimeout.mock.results[firstTimerIndex]?.value;
 
     await fireEvent.click(secondLabel);
-    expect(screen.getByText('SHR-L46')).toBeTruthy();
+    expect(screen.queryByText('SHR-L46')).toBeNull();
     expect(clearTimeout).toHaveBeenCalledWith(firstTimer);
     expect(setTimeout.mock.calls.filter(([, delay]) => delay === 5_000)).toHaveLength(2);
     expect(areaFeatures[0]?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.16 });
@@ -1176,7 +1177,12 @@ describe('PlaceMap', () => {
     const timeout = vi.spyOn(window, 'setTimeout');
     render(PlaceMap, { props: { places: [place] } });
 
-    await waitFor(() => expect(screen.getByText('SHR-L43 / SHR-L44')).toBeTruthy());
+    await waitFor(() =>
+      expect(
+        areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43')?.update
+      ).toHaveBeenCalled()
+    );
+    expect(screen.queryByText('SHR-L43 / SHR-L44')).toBeNull();
     await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
     expect(screen.getByRole('button', { name: 'Участки' }).getAttribute('aria-pressed')).toBe(
       'true'
@@ -1231,7 +1237,7 @@ describe('PlaceMap', () => {
     await screen.findByRole('alert');
     expect(window.location.search).toBe('?p=SHR-L44&from=search');
     await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
-    await waitFor(() => expect(screen.getByText('SHR-L43 / SHR-L44')).toBeTruthy());
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
     expect(fetch.mock.calls.map(([url]) => url)).toEqual([
       '/map/data/parcel-search.json',
       '/map/data/parcel-search.json',
@@ -1253,7 +1259,7 @@ describe('PlaceMap', () => {
     await screen.findByRole('alert');
     expect(window.location.search).toBe('?p=SHR-L43');
     await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
-    await waitFor(() => expect(screen.getByText('SHR-L43 / SHR-L44')).toBeTruthy());
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
     expect(fetch.mock.calls.map(([url]) => url)).toEqual([
       '/map/data/parcel-search.json',
       '/map/data/parcels.json',

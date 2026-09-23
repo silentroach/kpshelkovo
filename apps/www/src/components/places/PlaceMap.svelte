@@ -128,7 +128,6 @@
   let parcelsEnabled = $state(false);
   let parcelsLoading = $state(false);
   let parcelsError = $state(false);
-  let selectedParcel = $state('');
   let layersOpen = $state(false);
   let layersControl: HTMLDivElement | undefined = $state(undefined);
   let layersButton: HTMLButtonElement | undefined = $state(undefined);
@@ -546,7 +545,6 @@
             map,
             window.ymaps3,
             mapContainer,
-            (text) => (selectedParcel = text ?? ''),
             (selectedCode) => {
               if (pendingParcelCode && selectedCode === pendingParcelCanonical) {
                 removeParcelQuery(pendingParcelCode);
@@ -867,7 +865,6 @@
         <span role="alert">Не удалось загрузить участки.</span>
         <button type="button" onclick={retryParcels}>Повторить</button>
       {/if}
-      <span aria-live="polite" class="parcel-map-selection">{selectedParcel}</span>
     </div>
   {/if}
 </div>
@@ -977,10 +974,6 @@
   .parcel-map-controls button:focus-visible {
     outline: 0.1875rem solid var(--color-focus);
     outline-offset: 0.125rem;
-  }
-  .parcel-map-selection {
-    flex-basis: 100%;
-    font-weight: 600;
   }
 
   :global(.parcel-map-label) {
