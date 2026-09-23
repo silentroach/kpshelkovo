@@ -1,9 +1,11 @@
 import dist from '@turf/distance';
 import * as SunCalc from 'suncalc';
 
-import type { CivilTwilight, Coordinates } from './types';
+import type { CivilTwilight, Coordinates } from './types.ts';
 
-export type { CivilTwilight, Coordinates } from './types';
+export type { CivilTwilight, Coordinates } from './types.ts';
+export { polygonLabelCoordinates } from './polygon-label.ts';
+export { createDisplayOffset, fromWebMercator, toWebMercator } from './mercator.ts';
 
 const CIVIL_TWILIGHT_ALTITUDE_DEGREES = -6;
 const SUNRISE_SUNSET_ALTITUDE_DEGREES = -0.833;

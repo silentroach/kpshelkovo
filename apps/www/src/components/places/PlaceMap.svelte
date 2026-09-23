@@ -14,6 +14,8 @@
   import { onMount } from 'svelte';
   import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
+  import { getUrlWithoutParcel, PARCEL_QUERY_PARAM } from '@/lib/parcels/parcel-url';
+  import { PARCEL_CODE } from '@/lib/parcels/schema';
   import type {
     PlaceMapPublicItemDto,
     PlaceMapPublicPayloadDto
@@ -30,6 +32,7 @@
     waitForStableLayout
   } from '@/lib/yandex-maps/runtime';
 
+  import type { ParcelLayer, ParcelMapPayload } from './parcel-layer-types';
   import {
     createMapFeatures,
     getMarkerScale,
@@ -53,6 +56,7 @@
   const AREA_HOVER_LEAVE_DELAY_MS = 80;
   const MARKER_MAX_ZOOM = 16;
   const PLACE_FOCUS_ZOOM = MARKER_MAX_ZOOM;
+  const PARCEL_DATA_URL = '/map/data/parcels.json';
   const toPlaceMapItem = (place: PlaceMapPublicItemDto): PlaceMapItem => ({
     slug: place.slug,
     name: place.name,
@@ -120,6 +124,14 @@
   let clusterFocusFrame: number | undefined;
   let isLoading = $state(true);
   let error: string | undefined = $state(undefined);
+  let parcelsEnabled = $state(false);
+  let parcelsLoading = $state(false);
+  let parcelsError = $state(false);
+  let layersOpen = $state(false);
+  let layersControl: HTMLDivElement | undefined = $state(undefined);
+  let layersButton: HTMLButtonElement | undefined = $state(undefined);
+  let toggleParcels: (checked: boolean) => void;
+  let retryParcels = $state<() => void>(() => {});
   let errorPlace = $derived(places[0] ?? fallbackPlace);
 
   const mapBehaviors = (): ymaps3.BehaviorType[] => [
@@ -456,11 +468,119 @@
 
   onMount(() => {
     let destroyed = false;
+    const closeLayersOutside = (event: PointerEvent): void => {
+      if (!layersControl?.contains(event.target as Node)) layersOpen = false;
+    };
+    const closeLayersOnEscape = (event: KeyboardEvent): void => {
+      if (event.key !== 'Escape' || !layersOpen) return;
+      layersOpen = false;
+      layersButton?.focus();
+    };
+    document.addEventListener('pointerdown', closeLayersOutside);
+    document.addEventListener('keydown', closeLayersOnEscape);
+    let parcelRequest = 0;
+    let parcelLayer: ParcelLayer | undefined;
+    let parcelData: ParcelMapPayload | undefined;
+    let pendingParcelCode: string | undefined;
+    let preserveParcelCamera = false;
+    const requestedParcelCode =
+      new URL(window.location.href).searchParams.get(PARCEL_QUERY_PARAM) || undefined;
+    const parcelCode = requestedParcelCode?.toUpperCase();
+    const removeParcelQuery = (code?: string): void => {
+      const url = getUrlWithoutParcel(window.location.href, code);
+      if (url) window.history.replaceState(window.history.state, '', url);
+    };
+    const loadParcelData = async (): Promise<ParcelMapPayload> => {
+      if (parcelData) return parcelData;
+      const [response, { ParcelMapPublicSchema }] = await Promise.all([
+        fetch(PARCEL_DATA_URL),
+        import('@/lib/parcels/map-public-schema')
+      ]);
+      if (!response.ok) throw new Error('Не удалось загрузить участки');
+      const payload = ParcelMapPublicSchema.parse(await response.json());
+      if (!destroyed) parcelData = payload;
+      return payload;
+    };
+    const enableParcels = async (code?: string): Promise<void> => {
+      const request = ++parcelRequest;
+      parcelsEnabled = true;
+      parcelsLoading = true;
+      parcelsError = false;
+      try {
+        if (!map || !mapContainer) return;
+        const data = await loadParcelData();
+        if (destroyed || request !== parcelRequest || !map || !mapContainer) return;
+        const canonical = code
+          ? data.find((item) => item.code === code || item.aliases?.includes(code))?.code
+          : undefined;
+        if (code && !canonical) {
+          removeParcelQuery(requestedParcelCode);
+          pendingParcelCode = undefined;
+          parcelsEnabled = false;
+          return;
+        }
+        if (!parcelLayer) {
+          const { createParcelLayer } = await import('./parcel-layer');
+          if (destroyed || request !== parcelRequest || !map || !mapContainer) return;
+          parcelLayer = createParcelLayer(
+            map,
+            window.ymaps3,
+            mapContainer,
+            () => {
+              if (pendingParcelCode) {
+                removeParcelQuery(pendingParcelCode);
+                pendingParcelCode = undefined;
+              }
+            },
+            getMapZoomDuration
+          );
+        }
+        parcelLayer.enable(data);
+        parcelLayer.updateViewport(map.zoom, map.bounds);
+        if (canonical) {
+          if (!parcelLayer.focus(canonical)) {
+            parcelLayer.disable();
+            parcelData = undefined;
+            throw new Error('Номер найден, но контур участка недоступен');
+          }
+          preserveParcelCamera = true;
+          pendingParcelCode = requestedParcelCode;
+        }
+      } catch (reason) {
+        if (destroyed || request !== parcelRequest) return;
+        parcelLayer?.disable();
+        console.error('Parcel layer error:', reason);
+        parcelsError = true;
+        parcelsEnabled = false;
+      } finally {
+        if (!destroyed && request === parcelRequest) parcelsLoading = false;
+      }
+    };
+    toggleParcels = (checked: boolean): void => {
+      parcelsEnabled = checked;
+      if (!checked) {
+        parcelRequest++;
+        parcelsLoading = false;
+        parcelsError = false;
+        parcelLayer?.disable();
+        if (pendingParcelCode) {
+          removeParcelQuery(pendingParcelCode);
+          pendingParcelCode = undefined;
+        }
+        return;
+      }
+      void enableParcels(pendingParcelCode ? parcelCode : undefined);
+    };
+    retryParcels = (): void => {
+      void enableParcels(pendingParcelCode ? parcelCode : undefined);
+    };
     let highlightTimer: number | undefined;
     let markerUpdateTimer: number | undefined;
     let resizeObserver: ResizeObserver | undefined;
     const highlightUrl = new URL(window.location.href);
-    const requestedSlug = highlightUrl.searchParams.get(PLACE_HIGHLIGHT_QUERY_PARAM) || undefined;
+    const requestedSlug = !requestedParcelCode
+      ? highlightUrl.searchParams.get(PLACE_HIGHLIGHT_QUERY_PARAM) || undefined
+      : undefined;
     let highlightedPlace: PlaceMapItem | undefined;
 
     const startPlaceHighlight = (place: PlaceMapItem): void => {
@@ -492,6 +612,8 @@
       void waitForStableLayout().then(() => {
         if (destroyed) return;
 
+        if (preserveParcelCamera) return;
+
         if (highlightedPlace) {
           focusPlace(highlightedPlace, 0);
           return;
@@ -520,7 +642,11 @@
           ? places.find((place) => place.slug === requestedSlug)
           : undefined;
 
-        if (highlightUrl.searchParams.has(PLACE_HIGHLIGHT_QUERY_PARAM) && !highlightedPlace) {
+        if (
+          !requestedParcelCode &&
+          highlightUrl.searchParams.has(PLACE_HIGHLIGHT_QUERY_PARAM) &&
+          !highlightedPlace
+        ) {
           removeHighlightQuery(requestedSlug);
         }
 
@@ -589,6 +715,7 @@
           onUpdate: ({ location, mapInAction }) => {
             updateMarkerScale(location.zoom);
             if (!mapInAction) restoreClusterFocus();
+            parcelLayer?.updateViewport(location.zoom, location.bounds);
           }
         });
         mapClusterer = new YMapClusterer({
@@ -618,6 +745,14 @@
           markerUpdateTimer = window.setInterval(refreshMarkerContents, 60_000);
         }
         isLoading = false;
+        if (requestedParcelCode) {
+          if (!parcelCode || !PARCEL_CODE.test(parcelCode)) {
+            removeParcelQuery(requestedParcelCode);
+          } else {
+            pendingParcelCode = requestedParcelCode;
+            void enableParcels(parcelCode);
+          }
+        }
       } catch (reason) {
         if (destroyed) return;
         console.error('Places map setup error:', reason);
@@ -632,6 +767,10 @@
 
     return () => {
       destroyed = true;
+      document.removeEventListener('pointerdown', closeLayersOutside);
+      document.removeEventListener('keydown', closeLayersOnEscape);
+      parcelRequest++;
+      parcelLayer?.destroy();
       document.removeEventListener('astro:page-load', refresh);
       resizeObserver?.disconnect();
       if (highlightTimer !== undefined) {
@@ -666,6 +805,58 @@
   {/if}
 
   <div bind:this={mapContainer} class="place-map__canvas"></div>
+  {#if !error}
+    <div class="parcel-map-controls">
+      <div class="parcel-map-layers" bind:this={layersControl}>
+        <button
+          bind:this={layersButton}
+          type="button"
+          class="parcel-map-layers-button"
+          aria-label="Слои"
+          aria-expanded={layersOpen}
+          aria-controls="parcel-map-layer-list"
+          disabled={isLoading}
+          onclick={() => (layersOpen = !layersOpen)}
+        >
+          <svg class="parcel-map-layer-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+        <div id="parcel-map-layer-list" class="parcel-map-layer-list" hidden={!layersOpen}>
+          <button
+            type="button"
+            class="parcel-map-layer"
+            aria-pressed={parcelsEnabled}
+            onclick={() => toggleParcels(!parcelsEnabled)}
+          >
+            <svg class="parcel-map-layer-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="m4 6 13-2 4 13-13 3L4 6Z"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <circle cx="4" cy="6" r="1.5" fill="currentColor" />
+              <circle cx="21" cy="17" r="1.5" fill="currentColor" />
+            </svg>
+            Участки
+          </button>
+        </div>
+      </div>
+      {#if parcelsLoading}<span role="status">Загружаем участки…</span>{/if}
+      {#if parcelsError}
+        <span role="alert">Не удалось загрузить участки.</span>
+        <button type="button" onclick={retryParcels}>Повторить</button>
+      {/if}
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -681,6 +872,123 @@
     container-type: inline-size;
     width: 100%;
     height: 100%;
+  }
+
+  .parcel-map-controls {
+    position: absolute;
+    top: 4.5rem;
+    left: 1rem;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    max-width: min(90%, 26rem);
+    color: var(--color-text);
+    font-size: 0.875rem;
+  }
+
+  .parcel-map-layers {
+    position: relative;
+  }
+
+  .parcel-map-layers-button,
+  .parcel-map-layer-list {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  .parcel-map-layers-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    box-shadow: 0 0.125rem 0.4rem oklch(24% 0.04 145 / 0.16);
+  }
+
+  .parcel-map-layer-list {
+    position: absolute;
+    top: calc(100% + 0.375rem);
+    left: 0;
+    min-width: 11rem;
+    padding: 0.25rem;
+    box-shadow: 0 0.25rem 0.75rem oklch(24% 0.04 145 / 0.18);
+  }
+
+  .parcel-map-layer {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.75rem;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    text-align: left;
+  }
+
+  .parcel-map-layer-icon {
+    width: 1.375rem;
+    height: 1.375rem;
+    flex: none;
+    color: var(--color-text-muted);
+  }
+
+  .parcel-map-layer[aria-pressed='true'] {
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+  }
+
+  .parcel-map-layer[aria-pressed='true'] .parcel-map-layer-icon {
+    color: var(--color-primary);
+  }
+
+  .parcel-map-controls button {
+    font: inherit;
+    cursor: pointer;
+  }
+  .parcel-map-controls button:hover:not(:disabled) {
+    background: var(--color-primary-soft);
+  }
+  .parcel-map-controls button:disabled {
+    cursor: wait;
+  }
+  .parcel-map-controls button:not(.parcel-map-layers-button, .parcel-map-layer) {
+    border: 0;
+    background: none;
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: underline;
+  }
+  .parcel-map-controls button:focus-visible {
+    outline: 0.1875rem solid var(--color-focus);
+    outline-offset: 0.125rem;
+  }
+
+  :global(.parcel-map-label) {
+    display: grid;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    place-items: center;
+    padding: 0.25rem;
+    border: 0;
+    background: transparent;
+    color: var(--color-text);
+    cursor: pointer;
+    font-family: var(--font-body);
+    transform: translate(-50%, -50%);
+  }
+
+  :global(.parcel-map-label span) {
+    padding: 0.125rem 0.375rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+    box-shadow: 0 1px 2px oklch(24% 0.04 145 / 0.12);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.25;
   }
 
   .place-map__canvas :global(:is(a, button):focus-visible) {

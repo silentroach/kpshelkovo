@@ -38,6 +38,7 @@
   let openerElement: HTMLElement | undefined;
   let restoreFocusOnClose = true;
   let pendingSearchTimer: ReturnType<typeof setTimeout> | undefined;
+  let requestId = 0;
 
   let query = $derived(initialQuery);
   let viewState = $state<SearchDialogState>('initial');
@@ -101,6 +102,7 @@
   });
 
   const clearResults = (): void => {
+    requestId += 1;
     results = [];
     requestedLimit = SEARCH_RESULT_DEFAULT_LIMIT;
     total = 0;
@@ -178,6 +180,7 @@
     Boolean(dialogElement?.open && query === requestedQuery);
 
   const beginSearch = (): void => {
+    requestId += 1;
     isSearching = true;
     isLoadingMore = false;
     loadMoreFailed = false;
@@ -186,8 +189,14 @@
     }
   };
 
-  const isCurrentRequest = (requestedQuery: string, mode: SearchDialogRequestMode): boolean =>
-    isCurrentVisibleQuery(requestedQuery) && (mode === 'initial' ? isSearching : isLoadingMore);
+  const isCurrentRequest = (
+    requestedQuery: string,
+    mode: SearchDialogRequestMode,
+    currentRequestId: number
+  ): boolean =>
+    requestId === currentRequestId &&
+    isCurrentVisibleQuery(requestedQuery) &&
+    (mode === 'initial' ? isSearching : isLoadingMore);
 
   const runSearch = async (
     requestedQuery: string,
@@ -198,15 +207,16 @@
       return;
     }
 
+    const currentRequestId = ++requestId;
     try {
       const response = await client.search(requestedQuery, limit);
       if (!response) {
-        if (isCurrentRequest(requestedQuery, mode) && mode === 'more') {
+        if (isCurrentRequest(requestedQuery, mode, currentRequestId) && mode === 'more') {
           isLoadingMore = false;
         }
         return;
       }
-      if (!isCurrentRequest(requestedQuery, mode)) {
+      if (!isCurrentRequest(requestedQuery, mode, currentRequestId)) {
         return;
       }
 
@@ -242,7 +252,7 @@
       }
       viewState = total > 0 ? 'results' : 'empty';
     } catch {
-      if (!isCurrentRequest(requestedQuery, mode)) {
+      if (!isCurrentRequest(requestedQuery, mode, currentRequestId)) {
         return;
       }
       if (mode === 'more') {

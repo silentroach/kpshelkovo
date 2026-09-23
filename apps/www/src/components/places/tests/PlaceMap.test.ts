@@ -28,7 +28,11 @@ const map = {
   removeChild: vi.fn(),
   update: vi.fn(),
   destroy: vi.fn(),
-  zoom: 15
+  zoom: 15,
+  bounds: [
+    [37.7, 55.04],
+    [37.8, 55.08]
+  ] as [[number, number], [number, number]]
 };
 const nativeControl = {};
 const createControl = vi.fn(function (_props: YMapControlsProps, _children: readonly unknown[]) {
@@ -37,6 +41,7 @@ const createControl = vi.fn(function (_props: YMapControlsProps, _children: read
 const extras = { YMapOpenMapsButton: vi.fn(function () {}) };
 const importModule = vi.fn(async (_module: string) => extras);
 const markerElements: HTMLElement[] = [];
+const markerLocations: Array<{ readonly coordinates: readonly [number, number] }> = [];
 const mapElements: HTMLElement[] = [];
 const mapUpdateHandlers: MapEventUpdateHandler[] = [];
 const areaFeatures: Array<{
@@ -119,6 +124,27 @@ const pondsPlace: PlaceMapItem = {
   },
   url: '/map/hunting-ponds/'
 };
+const parcel = {
+  code: 'SHR-L43',
+  aliases: ['SHR-L44'],
+  part: 'shr',
+  geometry: {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [37.71, 55.06],
+        [37.72, 55.06],
+        [37.72, 55.07],
+        [37.71, 55.06]
+      ]
+    ]
+  },
+  labelCoordinates: [37.715, 55.065]
+};
+const parcelFetch = vi.fn(async (url: string) => {
+  if (url === '/map/data/parcels.json') return Response.json([parcel]);
+  throw new Error(`Unexpected request: ${url}`);
+});
 
 const installYandexMaps = (): void => {
   Object.defineProperty(window, 'ymaps3', {
@@ -152,7 +178,11 @@ const installYandexMaps = (): void => {
         if (props.onUpdate) mapUpdateHandlers.push(props.onUpdate);
         return {};
       }),
-      YMapMarker: vi.fn(function YMapMarker(_: unknown, element: HTMLElement) {
+      YMapMarker: vi.fn(function YMapMarker(
+        props: { readonly coordinates: readonly [number, number] },
+        element: HTMLElement
+      ) {
+        markerLocations.push(props);
         markerElements.push(element);
         return {};
       })
@@ -166,6 +196,7 @@ describe('PlaceMap', () => {
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-08-18T12:00:00.000Z'));
     markerElements.length = 0;
+    markerLocations.length = 0;
     mapElements.length = 0;
     mapUpdateHandlers.length = 0;
     areaFeatures.length = 0;
@@ -173,6 +204,10 @@ describe('PlaceMap', () => {
     schemeLayerProps.length = 0;
     mapProps.length = 0;
     document.documentElement.style.setProperty('--color-water', '#1c668c');
+    document.documentElement.style.setProperty('--color-neutral-soft', '#eef0ec');
+    document.documentElement.style.setProperty('--color-text-muted', '#45564b');
+    document.documentElement.style.setProperty('--color-accent', '#d6a22a');
+    document.documentElement.style.setProperty('--color-accent-text', '#805019');
     window.history.replaceState({}, '', '/map/');
     installYandexMaps();
   });
@@ -183,6 +218,14 @@ describe('PlaceMap', () => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
     document.documentElement.style.removeProperty('--color-water');
+    for (const name of [
+      '--color-neutral-soft',
+      '--color-text-muted',
+      '--color-accent',
+      '--color-accent-text'
+    ]) {
+      document.documentElement.style.removeProperty(name);
+    }
   });
 
   it('renders the place as an accessible detail link and fits its coordinates', async () => {
@@ -927,6 +970,411 @@ describe('PlaceMap', () => {
     });
 
     expect(mapElement.style.getPropertyValue('--place-map-marker-scale')).toBe('1.150');
+  });
+
+  it('loads parcel geometry only when switched on, reuses it after switching off and keeps places', async () => {
+    vi.stubGlobal('fetch', parcelFetch);
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+    expect(parcelFetch).not.toHaveBeenCalled();
+
+    const layers = screen.getByRole('button', { name: 'Слои' });
+    expect(layers.textContent).toBe('');
+    expect(layers.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
+    await fireEvent.click(layers);
+    expect(parcelFetch).not.toHaveBeenCalled();
+    const toggle = screen.getByRole('button', { name: 'Участки' });
+    expect(toggle.textContent?.trim()).toBe('Участки');
+    expect(layers.getAttribute('aria-expanded')).toBe('true');
+    expect(toggle.getAttribute('aria-pressed')).toBe('false');
+    await fireEvent.click(toggle);
+    await waitFor(() =>
+      expect(areaFeatures.some(({ props }) => props.id === 'parcel-SHR-L43')).toBe(true)
+    );
+    expect(parcelFetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcels.json']);
+    expect(map.update.mock.lastCall?.[0].location.bounds).toEqual([
+      [37.715242, 55.059526],
+      [37.717242, 55.061526]
+    ]);
+
+    const feature = areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43');
+    expect(toggle.getAttribute('aria-pressed')).toBe('true');
+    expect(layers.getAttribute('aria-expanded')).toBe('true');
+    await fireEvent.click(toggle);
+    expect(map.removeChild).toHaveBeenCalledWith(feature);
+    await fireEvent.click(toggle);
+    expect(parcelFetch).toHaveBeenCalledTimes(1);
+    expect(markerElements[0]?.getAttribute('href')).toBe(place.url);
+    expect(map.addChild).toHaveBeenCalledWith(nativeControl);
+  });
+
+  it('closes the layer list outside and on Escape, returning keyboard focus', async () => {
+    vi.stubGlobal('fetch', parcelFetch);
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+
+    const layers = screen.getByRole('button', { name: 'Слои' });
+    await fireEvent.click(layers);
+    const toggle = screen.getByRole('button', { name: 'Участки' });
+    toggle.focus();
+    await fireEvent.keyDown(document, { key: 'Escape' });
+    expect(layers.getAttribute('aria-expanded')).toBe('false');
+    expect(document.activeElement).toBe(layers);
+
+    await fireEvent.click(layers);
+    await fireEvent.pointerDown(document.body);
+    expect(layers.getAttribute('aria-expanded')).toBe('false');
+    expect(parcelFetch).not.toHaveBeenCalled();
+  });
+
+  it('ignores a parcel response after the layer is disabled or the component unmounts', async () => {
+    const pending = Promise.withResolvers<Response>();
+    const fetch = vi.fn(() => pending.promise);
+    vi.stubGlobal('fetch', fetch);
+    const view = render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    const toggle = screen.getByRole('button', { name: 'Участки' });
+    await fireEvent.click(toggle);
+    await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+    await fireEvent.click(toggle);
+    pending.resolve(Response.json([parcel]));
+    await waitFor(() => expect(toggle.getAttribute('aria-pressed')).toBe('false'));
+    expect(areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43')).toBeUndefined();
+
+    const later = Promise.withResolvers<Response>();
+    fetch.mockReturnValue(later.promise);
+    await fireEvent.click(toggle);
+    view.unmount();
+    later.resolve(Response.json([parcel]));
+    await Promise.resolve();
+    expect(areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43')).toBeUndefined();
+  });
+
+  it('offers a retry after a failed manual request', async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(undefined, { status: 503 }))
+      .mockResolvedValueOnce(Response.json([parcel]));
+    vi.stubGlobal('fetch', fetch);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
+    await screen.findByRole('alert');
+    await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+    await waitFor(() =>
+      expect(areaFeatures.some(({ props }) => props.id === 'parcel-SHR-L43')).toBe(true)
+    );
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows one short label from zoom 17 and no extra text for a merged parcel', async () => {
+    vi.stubGlobal('fetch', parcelFetch);
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    const update = mapUpdateHandlers[0];
+    if (!update) throw new Error('Map listener missing');
+    expect(markerElements.some((element) => element.classList.contains('parcel-map-label'))).toBe(
+      false
+    );
+    update({
+      type: 'update',
+      location: {
+        center: [37.715, 55.065],
+        zoom: 17,
+        bounds: [
+          [37.7, 55.08],
+          [37.8, 55.04]
+        ]
+      },
+      camera: {},
+      mapInAction: false
+    });
+    const label = markerElements.find((element) => element.classList.contains('parcel-map-label'));
+    expect(label?.textContent).toBe('L43');
+    expect(label?.querySelector('span')?.textContent).toBe('L43');
+    expect(label?.getAttribute('aria-label')).toBe('Выбрать участок SHR-L43');
+    if (!label) throw new Error('Parcel label missing');
+    const geometry = areaFeatures[0]?.props.geometry;
+    const labelIndex = markerElements.indexOf(label);
+    const labelCoordinates = markerLocations[labelIndex]?.coordinates;
+    if (geometry?.type !== 'Polygon' || !labelCoordinates)
+      throw new Error('Parcel display geometry missing');
+    const vertex = geometry.coordinates[0]?.[0];
+    expect(vertex).toEqual([37.71, 55.06]);
+    expect(labelCoordinates).toEqual([37.715, 55.065]);
+    const labelMarker = map.addChild.mock.lastCall?.[0];
+    await fireEvent.click(label);
+    expect(areaFeatures[0]?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+    expect(screen.queryByText('SHR-L43 / SHR-L44')).toBeNull();
+
+    update({
+      type: 'update',
+      location: { center: [37.715, 55.065], zoom: 16, bounds: map.bounds },
+      camera: {},
+      mapInAction: false
+    });
+    expect(map.removeChild).toHaveBeenCalledWith(labelMarker);
+  });
+
+  it('replaces parcel selection, restarts its timer, and cancels it on unmount', async () => {
+    const secondParcel = {
+      code: 'SHR-L46',
+      part: parcel.part,
+      geometry: parcel.geometry,
+      labelCoordinates: [37.73, 55.065]
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Response.json([parcel, secondParcel]))
+    );
+    const setTimeout = vi.spyOn(window, 'setTimeout');
+    const clearTimeout = vi.spyOn(window, 'clearTimeout');
+    const view = render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    expect(areaFeatures.map(({ props }) => props.style?.stroke)).toMatchInlineSnapshot(`
+      [
+        [
+          {
+            "color": "#45564b",
+            "opacity": 0.5,
+            "width": 1,
+          },
+        ],
+        [
+          {
+            "color": "#45564b",
+            "opacity": 0.5,
+            "width": 1,
+          },
+        ],
+      ]
+    `);
+    mapUpdateHandlers[0]?.({
+      type: 'update',
+      location: { center: [37.715, 55.065], zoom: 17, bounds: map.bounds },
+      camera: {},
+      mapInAction: false
+    });
+
+    const firstLabel = markerElements.find((element) => element.title === parcel.code);
+    const secondLabel = markerElements.find((element) => element.title === secondParcel.code);
+    if (!firstLabel || !secondLabel) throw new Error('Parcel labels missing');
+    await fireEvent.click(firstLabel);
+    const firstTimerIndex = setTimeout.mock.calls.findIndex(([, delay]) => delay === 5_000);
+    const firstTimer = setTimeout.mock.results[firstTimerIndex]?.value;
+
+    await fireEvent.click(secondLabel);
+    expect(screen.queryByText('SHR-L46')).toBeNull();
+    expect(clearTimeout).toHaveBeenCalledWith(firstTimer);
+    expect(setTimeout.mock.calls.filter(([, delay]) => delay === 5_000)).toHaveLength(2);
+    expect(areaFeatures[0]?.update.mock.lastCall?.[0].style).toMatchObject({
+      stroke: [{ color: '#45564b', width: 1, opacity: 0.5 }]
+    });
+    expect(areaFeatures[1]?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+
+    const secondTimerIndex = setTimeout.mock.calls.findLastIndex(([, delay]) => delay === 5_000);
+    const secondTimer = setTimeout.mock.results[secondTimerIndex]?.value;
+    const expire = setTimeout.mock.calls[secondTimerIndex]?.[0];
+    if (typeof expire !== 'function') throw new Error('Parcel selection timer missing');
+    window.clearTimeout(secondTimer);
+    expire();
+    expect(areaFeatures[1]?.update.mock.lastCall?.[0].style).toMatchObject({
+      stroke: [{ color: '#45564b', width: 1, opacity: 0.5 }]
+    });
+    await fireEvent.click(secondLabel);
+    const renewedTimerIndex = setTimeout.mock.calls.findLastIndex(([, delay]) => delay === 5_000);
+    const renewedTimer = setTimeout.mock.results[renewedTimerIndex]?.value;
+    view.unmount();
+    expect(clearTimeout).toHaveBeenCalledWith(renewedTimer);
+  });
+
+  it('focuses alias links from the geometry feed, survives resize, and preserves URL state', async () => {
+    const fetch = vi.fn((url: string) =>
+      url === '/map/data/parcels.json'
+        ? Promise.resolve(
+            Response.json([
+              {
+                ...parcel,
+                geometry: {
+                  type: 'MultiPolygon',
+                  coordinates: [
+                    parcel.geometry.coordinates,
+                    [
+                      [
+                        [37.8, 55.08],
+                        [37.81, 55.08],
+                        [37.81, 55.09],
+                        [37.8, 55.08]
+                      ]
+                    ]
+                  ]
+                }
+              }
+            ])
+          )
+        : parcelFetch(url)
+    );
+    vi.stubGlobal('fetch', fetch);
+    vi.stubGlobal('matchMedia', (query: string) => ({ matches: query.includes('reduced-motion') }));
+    const historyState = { navigation: 'parcel' };
+    window.history.replaceState(historyState, '', '/map/?q=a%20b&flag&p=shr-l44&h=burzhuyka#map');
+    const replace = vi.spyOn(window.history, 'replaceState');
+    const timeout = vi.spyOn(window, 'setTimeout');
+    render(PlaceMap, { props: { places: [place] } });
+
+    await waitFor(() =>
+      expect(
+        areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43')?.update
+      ).toHaveBeenCalled()
+    );
+    expect(screen.queryByText('SHR-L43 / SHR-L44')).toBeNull();
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    expect(screen.getByRole('button', { name: 'Участки' }).getAttribute('aria-pressed')).toBe(
+      'true'
+    );
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcels.json']);
+    expect(map.update.mock.calls.find(([props]) => props.location?.zoom === 17)?.[0])
+      .toMatchInlineSnapshot(`
+        {
+          "location": {
+            "center": [
+              37.715,
+              55.065,
+            ],
+            "duration": 0,
+            "easing": "ease-in-out",
+            "zoom": 17,
+          },
+        }
+      `);
+    expect(markerElements[0]?.dataset.highlighted).toBeUndefined();
+
+    const count = map.update.mock.calls.length;
+    document.dispatchEvent(new Event('astro:page-load'));
+    await waitFor(() => expect(map.update.mock.calls.length).toBe(count));
+
+    const timerIndex = timeout.mock.calls.findIndex(([, delay]) => delay === 5000);
+    const expire = timeout.mock.calls[timerIndex]?.[0];
+    const timer = timeout.mock.results[timerIndex]?.value;
+    if (typeof expire !== 'function') throw new Error('Parcel timeout missing');
+    window.clearTimeout(timer);
+    expire();
+    expect(replace.mock.lastCall).toEqual([historyState, '', '/map/?q=a%20b&flag&h=burzhuyka#map']);
+    document.dispatchEvent(new Event('astro:page-load'));
+    expect(map.update.mock.calls.length).toBe(count);
+  });
+
+  it('clears the direct link after selecting a different parcel', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        Response.json([
+          parcel,
+          { ...parcel, code: 'SHR-L46', aliases: [], labelCoordinates: [37.73, 55.065] }
+        ])
+      )
+    );
+    window.history.replaceState({}, '', '/map/?p=SHR-L43&flag#map');
+    const timeout = vi.spyOn(window, 'setTimeout');
+    render(PlaceMap, { props: { places: [place] } });
+
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    mapUpdateHandlers[0]?.({
+      type: 'update',
+      location: { center: [37.715, 55.065], zoom: 17, bounds: map.bounds },
+      camera: {},
+      mapInAction: false
+    });
+    const label = markerElements.find((element) => element.title === 'SHR-L46');
+    if (!label) throw new Error('Second parcel label missing');
+    await fireEvent.click(label);
+
+    const timerIndex = timeout.mock.calls.findLastIndex(([, delay]) => delay === 5_000);
+    const expire = timeout.mock.calls[timerIndex]?.[0];
+    const timer = timeout.mock.results[timerIndex]?.value;
+    if (typeof expire !== 'function') throw new Error('Parcel selection timer missing');
+    window.clearTimeout(timer);
+    expire();
+    expect(`${window.location.pathname}${window.location.search}${window.location.hash}`).toBe(
+      '/map/?flag#map'
+    );
+  });
+
+  it('uses the label zoom for a direct link to a small parcel', async () => {
+    vi.stubGlobal('fetch', parcelFetch);
+    window.history.replaceState({}, '', '/map/?p=SHR-L43');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    expect(map.update.mock.calls.find(([props]) => props.location?.zoom === 17)?.[0]).toMatchObject(
+      {
+        location: { center: parcel.labelCoordinates, zoom: 17 }
+      }
+    );
+  });
+
+  it('discards an unknown link after loading geometry without changing layer visibility', async () => {
+    vi.stubGlobal('fetch', parcelFetch);
+    window.history.replaceState({}, '', '/map/?p=SHR-L99&flag');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(window.location.search).toBe('?flag'));
+    expect(parcelFetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcels.json']);
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    expect(screen.getByRole('button', { name: 'Участки' }).getAttribute('aria-pressed')).toBe(
+      'false'
+    );
+    expect(areaFeatures).toHaveLength(0);
+    await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    expect(parcelFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps a direct-link intent after a failed geometry request and retries it', async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(undefined, { status: 503 }))
+      .mockImplementation(parcelFetch);
+    vi.stubGlobal('fetch', fetch);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    window.history.replaceState({}, '', '/map/?p=SHR-L44&from=search');
+    render(PlaceMap, { props: { places: [place] } });
+
+    await screen.findByRole('alert');
+    expect(window.location.search).toBe('?p=SHR-L44&from=search');
+    await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+      '/map/data/parcels.json',
+      '/map/data/parcels.json'
+    ]);
+  });
+
+  it('treats invalid geometry data as a retryable error', async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(Response.json({ parcels: [] }))
+      .mockImplementation(parcelFetch);
+    vi.stubGlobal('fetch', fetch);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    window.history.replaceState({}, '', '/map/?p=SHR-L43');
+    render(PlaceMap, { props: { places: [place] } });
+
+    await screen.findByRole('alert');
+    expect(window.location.search).toBe('?p=SHR-L43');
+    await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+      '/map/data/parcels.json',
+      '/map/data/parcels.json'
+    ]);
   });
 
   it('renders an accessible cluster that zooms to its places', async () => {

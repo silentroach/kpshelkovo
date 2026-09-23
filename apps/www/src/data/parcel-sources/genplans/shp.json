@@ -1,0 +1,3722 @@
+{
+  "part": "shp",
+  "page": "https://dgtime.ru/shp/shp-genplan/",
+  "capturedAt": "2026-09-22T20:59:11.211Z",
+  "plots": [
+    {
+      "id": "B1",
+      "cadastralReference": "50:33:0010101:2779",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 6478800
+    },
+    {
+      "id": "B2",
+      "cadastralReference": "50:33:0010101:2778",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 6898850
+    },
+    {
+      "id": "B3",
+      "cadastralReference": "50:33:0010101:2777",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 6323850
+    },
+    {
+      "id": "B4",
+      "cadastralReference": "50:33:0010101:2776",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 5938900
+    },
+    {
+      "id": "B5",
+      "cadastralReference": "50:33:0010101:2775",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 4084050
+    },
+    {
+      "id": "B6",
+      "cadastralReference": "50:33:0010101:2774",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2799200
+    },
+    {
+      "id": "B7",
+      "cadastralReference": "50:33:0010101:2772",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 6208850
+    },
+    {
+      "id": "B8",
+      "cadastralReference": "50:33:0010101:2771",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 5998800
+    },
+    {
+      "id": "B9",
+      "cadastralReference": "50:33:0010101:2770",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3359200
+    },
+    {
+      "id": "B10",
+      "cadastralReference": "50:33:0010101:2769",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2799200
+    },
+    {
+      "id": "B11",
+      "cadastralReference": "50:33:0010101:2768",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 3999000
+    },
+    {
+      "id": "B12",
+      "cadastralReference": "50:33:0010101:2767",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 5168900
+    },
+    {
+      "id": "B14",
+      "cadastralReference": "50:33:0010101:2766",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2719200
+    },
+    {
+      "id": "B15",
+      "cadastralReference": "50:33:0010101:2765",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3599100
+    },
+    {
+      "id": "B16",
+      "cadastralReference": "50:33:0010101:2764",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 4299000
+    },
+    {
+      "id": "B17",
+      "cadastralReference": "50:33:0010101:2763",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 5638800
+    },
+    {
+      "id": "B18",
+      "cadastralReference": "50:33:0010101:2761",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 5038800
+    },
+    {
+      "id": "B19",
+      "cadastralReference": "50:33:0010101:2760",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 4499000
+    },
+    {
+      "id": "B20",
+      "cadastralReference": "50:33:0010101:2759",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 4948900
+    },
+    {
+      "id": "B21",
+      "cadastralReference": "50:33:0010101:2758",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 4299000
+    },
+    {
+      "id": "B22",
+      "cadastralReference": "50:33:0010101:2757",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2483080
+    },
+    {
+      "id": "B23",
+      "cadastralReference": "50:33:0010101:2756",
+      "status": "Забронирован",
+      "location": "с видом на лес",
+      "objectprice": 3399000
+    },
+    {
+      "id": "B24",
+      "cadastralReference": "50:33:0010101:2755",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 5638800
+    },
+    {
+      "id": "B25",
+      "cadastralReference": "50:33:0010101:2754",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 5168900
+    },
+    {
+      "id": "B26",
+      "cadastralReference": "50:33:0010101:2753",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2879100
+    },
+    {
+      "id": "B27",
+      "cadastralReference": "50:33:0010101:2752",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2719200
+    },
+    {
+      "id": "B28",
+      "cadastralReference": "50:33:0010101:2749",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3439200
+    },
+    {
+      "id": "B29",
+      "cadastralReference": "50:33:0010101:2750",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 5538046
+    },
+    {
+      "id": "B30",
+      "cadastralReference": "50:33:0010101:2747",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 3958900
+    },
+    {
+      "id": "B31",
+      "cadastralReference": "50:33:0010101:2748",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4266692
+    },
+    {
+      "id": "B32",
+      "cadastralReference": "50:33:0010101:2745",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4229100
+    },
+    {
+      "id": "B33",
+      "cadastralReference": "50:33:0010101:2746",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 3665000
+    },
+    {
+      "id": "B34",
+      "cadastralReference": "50:33:0010101:2743",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 5399000
+    },
+    {
+      "id": "B35",
+      "cadastralReference": "50:33:0010101:2744",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4229100
+    },
+    {
+      "id": "B36",
+      "cadastralReference": "50:33:0010101:2741",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4319100
+    },
+    {
+      "id": "B37",
+      "cadastralReference": "50:33:0010101:2742",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 3494000
+    },
+    {
+      "id": "B38",
+      "cadastralReference": "50:33:0010101:2738",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 6553850
+    },
+    {
+      "id": "B39",
+      "cadastralReference": "50:33:0010101:2739",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 5038950
+    },
+    {
+      "id": "B40",
+      "cadastralReference": "50:33:0010101:2737",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 7198800
+    },
+    {
+      "id": "B41",
+      "cadastralReference": "50:33:0010101:2736",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 6748500
+    },
+    {
+      "id": "B42",
+      "cadastralReference": "50:33:0010101:2735",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 7418600
+    },
+    {
+      "id": "B43",
+      "cadastralReference": "50:33:0010101:2734",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 5518800
+    },
+    {
+      "id": "B44",
+      "cadastralReference": "50:33:0010101:2733",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3988950
+    },
+    {
+      "id": "B45",
+      "cadastralReference": "50:33:0010101:2732",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3609050
+    },
+    {
+      "id": "B46",
+      "cadastralReference": "50:33:0010101:2731",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 6108700
+    },
+    {
+      "id": "B47",
+      "cadastralReference": "50:33:0010101:2730",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 4933950
+    },
+    {
+      "id": "B48",
+      "cadastralReference": "50:33:0010101:2728",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2974150
+    },
+    {
+      "id": "B49",
+      "cadastralReference": "50:33:0010101:2727",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3599000
+    },
+    {
+      "id": "B50",
+      "cadastralReference": "50:33:0010101:2718",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 4599000
+    },
+    {
+      "id": "C1",
+      "cadastralReference": "50:33:0010101:2657",
+      "status": "Снят с продажи",
+      "location": "лесной участок",
+      "objectprice": 8843550
+    },
+    {
+      "id": "C2",
+      "cadastralReference": "50:33:0010101:2656",
+      "status": "Снят с продажи",
+      "location": "лесной участок",
+      "objectprice": 6378550
+    },
+    {
+      "id": "C3",
+      "cadastralReference": "50:33:0010101:2655",
+      "status": "Снят с продажи",
+      "location": "лесной участок",
+      "objectprice": 5718700
+    },
+    {
+      "id": "C4",
+      "cadastralReference": "50:33:0010101:2654",
+      "status": "Снят с продажи",
+      "location": "лесной участок",
+      "objectprice": 5758800
+    },
+    {
+      "id": "C5",
+      "cadastralReference": "50:33:0010101:2653",
+      "status": "Снят с продажи",
+      "location": "лесной участок",
+      "objectprice": 5758800
+    },
+    {
+      "id": "C6",
+      "cadastralReference": "50:33:0010101:2649",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 5178600
+    },
+    {
+      "id": "C7",
+      "cadastralReference": "50:33:0010101:2650",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 4068900
+    },
+    {
+      "id": "C8",
+      "cadastralReference": "50:33:0010101:2651",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 3699000
+    },
+    {
+      "id": "C9",
+      "cadastralReference": "50:33:0010101:2533",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 3846960
+    },
+    {
+      "id": "C10",
+      "cadastralReference": "50:33:0010101:2534",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4678800
+    },
+    {
+      "id": "C11",
+      "cadastralReference": "50:33:0010101:2531",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 4993650
+    },
+    {
+      "id": "C12",
+      "cadastralReference": "50:33:0010101:2532",
+      "status": "Снят с продажи",
+      "location": "примыкает к лесу",
+      "objectprice": 5363550
+    },
+    {
+      "id": "C14",
+      "cadastralReference": "50:33:0010101:2805",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 3699000
+    },
+    {
+      "id": "C15",
+      "cadastralReference": "50:33:0010101:2804",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 5038800
+    },
+    {
+      "id": "C16",
+      "cadastralReference": "50:33:0010101:2803",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 4904432
+    },
+    {
+      "id": "C17",
+      "cadastralReference": "50:33:0010101:2802",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 5038800
+    },
+    {
+      "id": "C18",
+      "cadastralReference": "50:33:0010101:2801",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 5458700
+    },
+    {
+      "id": "C19",
+      "cadastralReference": "50:33:0010101:2800",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 5248750
+    },
+    {
+      "id": "C20",
+      "cadastralReference": "50:33:0010101:2799",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 5668650
+    },
+    {
+      "id": "C21",
+      "cadastralReference": "50:33:0010101:2798",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 4944764
+    },
+    {
+      "id": "C22",
+      "cadastralReference": "50:33:0010101:2797",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 4513950
+    },
+    {
+      "id": "C23",
+      "cadastralReference": "50:33:0010101:2796",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3799050
+    },
+    {
+      "id": "C24",
+      "cadastralReference": "50:33:0010101:2794",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 4199000
+    },
+    {
+      "id": "C25",
+      "cadastralReference": "50:33:0010101:2793",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4681611
+    },
+    {
+      "id": "C26",
+      "cadastralReference": "50:33:0010101:2792",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 5058900
+    },
+    {
+      "id": "C27",
+      "cadastralReference": "50:33:0010101:2791",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3599100
+    },
+    {
+      "id": "C28",
+      "cadastralReference": "50:33:0010101:2790",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3500000
+    },
+    {
+      "id": "C29",
+      "cadastralReference": "50:33:0010101:2789",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3199200
+    },
+    {
+      "id": "C30",
+      "cadastralReference": "50:33:0010101:2788",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 6378900
+    },
+    {
+      "id": "C31",
+      "cadastralReference": "50:33:0010101:2787",
+      "status": "Продан",
+      "location": "примыкает к лесу",
+      "objectprice": 6604899
+    },
+    {
+      "id": "C32",
+      "cadastralReference": "50:33:0010101:2786",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3779100
+    },
+    {
+      "id": "C33",
+      "cadastralReference": "50:33:0010101:2785",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3689100
+    },
+    {
+      "id": "C34",
+      "cadastralReference": "50:33:0010101:2780",
+      "status": "Свободен",
+      "location": "примыкает к лесу",
+      "objectprice": 7438800
+    },
+    {
+      "id": "C35",
+      "cadastralReference": "50:33:0010101:2781",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4723950
+    },
+    {
+      "id": "C36",
+      "cadastralReference": "50:33:0010101:2783",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3314150
+    },
+    {
+      "id": "C37",
+      "cadastralReference": "50:33:0010101:2782",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 4193277
+    },
+    {
+      "id": "C38",
+      "cadastralReference": "50:33:0010101:2601",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 4324970
+    },
+    {
+      "id": "C39",
+      "cadastralReference": "50:33:0010101:2604",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 5038800
+    },
+    {
+      "id": "C40",
+      "cadastralReference": "50:33:0010101:2605",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3799000
+    },
+    {
+      "id": "C41",
+      "cadastralReference": "50:33:0010101:2608",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3599000
+    },
+    {
+      "id": "C42",
+      "cadastralReference": "50:33:0010101:2610",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3419100
+    },
+    {
+      "id": "C43",
+      "cadastralReference": "50:33:0010101:2611",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3599000
+    },
+    {
+      "id": "C44",
+      "cadastralReference": "50:33:0010101:2614",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 4618900
+    },
+    {
+      "id": "C45",
+      "cadastralReference": "50:33:0010101:2615",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 5118720
+    },
+    {
+      "id": "C46",
+      "cadastralReference": "50:33:0010101:2617",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 4998750
+    },
+    {
+      "id": "C47",
+      "cadastralReference": "50:33:0010101:2619",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 4478880
+    },
+    {
+      "id": "C48",
+      "cadastralReference": "50:33:0010101:2620",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 5458700
+    },
+    {
+      "id": "C49",
+      "cadastralReference": "50:33:0010101:2621",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 5038800
+    },
+    {
+      "id": "C50",
+      "cadastralReference": "50:33:0010101:2622",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4618900
+    },
+    {
+      "id": "C51",
+      "cadastralReference": "50:33:0010101:2616",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4408950
+    },
+    {
+      "id": "C52",
+      "cadastralReference": "50:33:0010101:2613",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3999000
+    },
+    {
+      "id": "C53",
+      "cadastralReference": "50:33:0010101:2612",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3419100
+    },
+    {
+      "id": "C54",
+      "cadastralReference": "50:33:0010101:2609",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3999000
+    },
+    {
+      "id": "C55",
+      "cadastralReference": "50:33:0010101:2606",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3999000
+    },
+    {
+      "id": "C56",
+      "cadastralReference": "50:33:0010101:2603",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3599100
+    },
+    {
+      "id": "C57",
+      "cadastralReference": "50:33:0010101:2602",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3039200
+    },
+    {
+      "id": "C58",
+      "cadastralReference": "50:33:0010101:2632",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2774200
+    },
+    {
+      "id": "C59",
+      "cadastralReference": "50:33:0010101:2633",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4828850
+    },
+    {
+      "id": "C60",
+      "cadastralReference": "50:33:0010101:2631",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3599100
+    },
+    {
+      "id": "C61",
+      "cadastralReference": "50:33:0010101:2630",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3999000
+    },
+    {
+      "id": "C62",
+      "cadastralReference": "50:33:0010101:2628",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 4288900
+    },
+    {
+      "id": "C63",
+      "cadastralReference": "50:33:0010101:2626",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4408950
+    },
+    {
+      "id": "C64",
+      "cadastralReference": "50:33:0010101:2625",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4199000
+    },
+    {
+      "id": "C65",
+      "cadastralReference": "50:33:0010101:2623",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4408950
+    },
+    {
+      "id": "C66",
+      "cadastralReference": "50:33:0010101:2624",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2699100
+    },
+    {
+      "id": "C67",
+      "cadastralReference": "50:33:0010101:2627",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2999000
+    },
+    {
+      "id": "C68",
+      "cadastralReference": "50:33:0010101:2634",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4199000
+    },
+    {
+      "id": "C69",
+      "cadastralReference": "50:33:0010101:2635",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 4199000
+    },
+    {
+      "id": "C70",
+      "cadastralReference": "50:33:0010101:2636",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4199000
+    },
+    {
+      "id": "C71",
+      "cadastralReference": "50:33:0010101:2637",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4199000
+    },
+    {
+      "id": "C72",
+      "cadastralReference": "50:33:0010101:2638",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4912830
+    },
+    {
+      "id": "C73",
+      "cadastralReference": "50:33:0010101:2642",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3329100
+    },
+    {
+      "id": "C74",
+      "cadastralReference": "50:33:0010101:2639",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4366960
+    },
+    {
+      "id": "C75",
+      "cadastralReference": "50:33:0010101:2643",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3914596
+    },
+    {
+      "id": "C76",
+      "cadastralReference": "50:33:0010101:2644",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4618900
+    },
+    {
+      "id": "C77",
+      "cadastralReference": "50:33:0010101:2645",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4618900
+    },
+    {
+      "id": "C78",
+      "cadastralReference": "50:33:0010101:2646",
+      "status": "Забронирован",
+      "location": "с видом на лес",
+      "objectprice": 4199000
+    },
+    {
+      "id": "C79",
+      "cadastralReference": "50:33:0010101:2648",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3699000
+    },
+    {
+      "id": "C80",
+      "cadastralReference": "50:33:0010101:2647",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3329100
+    },
+    {
+      "id": "D1",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D2",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D3",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D4",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D5",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D6",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D7",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D8",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D9",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D10",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D11",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D12",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D14",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D15",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D16",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D17",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D18",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D19",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D20",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D21",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D22",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D23",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D24",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D25",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D26",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D27",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D28",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D29",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D30",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D31",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D32",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D33",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D34",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D35",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D36",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D37",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D38",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D39",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D40",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D41",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D42",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D43",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D44",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D45",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D46",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D47",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D48",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D49",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D50",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D51",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D52",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D53",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D54",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D55",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D56",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D57",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D58",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D59",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D60",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D61",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D62",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D63",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D64",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D65",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "D66",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F1",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F2",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F3",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F4",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F5",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F6",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F7",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F8",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F9",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F10",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F11",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F12",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F14",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F15",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F16",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F17",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F18",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F19",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F20",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F21",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F22",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F23",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F24",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F25",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F26",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F27",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F28",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F29",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F30",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F31",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F32",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F33",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F34",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F35",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F36",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "F37",
+      "cadastralReference": "50:33:0010101:2725",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2799000
+    },
+    {
+      "id": "F38",
+      "cadastralReference": "50:33:0010101:2724",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2699000
+    },
+    {
+      "id": "F39",
+      "cadastralReference": "50:33:0010101:2723",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4099000
+    },
+    {
+      "id": "F40",
+      "cadastralReference": "50:33:0010101:2722",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4199000
+    },
+    {
+      "id": "F41",
+      "cadastralReference": "50:33:0010101:2721",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4099000
+    },
+    {
+      "id": "F42",
+      "cadastralReference": "50:33:0010101:2720",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 3199000
+    },
+    {
+      "id": "F43",
+      "cadastralReference": "50:33:0010101:2719",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4199000
+    },
+    {
+      "id": "F44",
+      "cadastralReference": "50:33:0010101:2717",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 3935040
+    },
+    {
+      "id": "F45",
+      "cadastralReference": "50:33:0010101:2716",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2249100
+    },
+    {
+      "id": "F46",
+      "cadastralReference": "50:33:0010101:2715",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4199000
+    },
+    {
+      "id": "F47",
+      "cadastralReference": "50:33:0010101:2714",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2134100
+    },
+    {
+      "id": "F48",
+      "cadastralReference": "50:33:0010101:2713",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4282980
+    },
+    {
+      "id": "F49",
+      "cadastralReference": "50:33:0010101:2712",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2339100
+    },
+    {
+      "id": "F50",
+      "cadastralReference": "50:33:0010101:2711",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2249100
+    },
+    {
+      "id": "F51",
+      "cadastralReference": "50:33:0010101:2710",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2339100
+    },
+    {
+      "id": "F52",
+      "cadastralReference": "50:33:0010101:2709",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2429100
+    },
+    {
+      "id": "F53",
+      "cadastralReference": "50:33:0010101:2708",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2429100
+    },
+    {
+      "id": "F54",
+      "cadastralReference": "50:33:0010101:2706",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2339100
+    },
+    {
+      "id": "F55",
+      "cadastralReference": "50:33:0010101:2705",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2339100
+    },
+    {
+      "id": "F56",
+      "cadastralReference": "50:33:0010101:2704",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2429100
+    },
+    {
+      "id": "F57",
+      "cadastralReference": "50:33:0010101:2703",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2429100
+    },
+    {
+      "id": "F58",
+      "cadastralReference": "50:33:0010101:2702",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2339100
+    },
+    {
+      "id": "F59",
+      "cadastralReference": "50:33:0010101:2701",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2339100
+    },
+    {
+      "id": "F60",
+      "cadastralReference": "50:33:0010101:2700",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2789100
+    },
+    {
+      "id": "F61",
+      "cadastralReference": "50:33:0010101:2699",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2429100
+    },
+    {
+      "id": "F62",
+      "cadastralReference": "50:33:0010101:2698",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2339100
+    },
+    {
+      "id": "F63",
+      "cadastralReference": "50:33:0010101:2697",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2339100
+    },
+    {
+      "id": "F64",
+      "cadastralReference": "50:33:0010101:2695",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2429100
+    },
+    {
+      "id": "F65",
+      "cadastralReference": "50:33:0010101:2694",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2799000
+    },
+    {
+      "id": "F66",
+      "cadastralReference": "50:33:0010101:2693",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3499000
+    },
+    {
+      "id": "F67",
+      "cadastralReference": "50:33:0010101:2692",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3599000
+    },
+    {
+      "id": "F68",
+      "cadastralReference": "50:33:0010101:2691",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2799000
+    },
+    {
+      "id": "F69",
+      "cadastralReference": "50:33:0010101:2690",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2899000
+    },
+    {
+      "id": "F70",
+      "cadastralReference": "50:33:0010101:2689",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3499000
+    },
+    {
+      "id": "F71",
+      "cadastralReference": "50:33:0010101:2688",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3099000
+    },
+    {
+      "id": "F72",
+      "cadastralReference": "50:33:0010101:2687",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3099000
+    },
+    {
+      "id": "F73",
+      "cadastralReference": "50:33:0010101:2684",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2999000
+    },
+    {
+      "id": "F74",
+      "cadastralReference": "50:33:0010101:2686",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3099000
+    },
+    {
+      "id": "F75",
+      "cadastralReference": "50:33:0010101:2682",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3218850
+    },
+    {
+      "id": "F76",
+      "cadastralReference": "50:33:0010101:2683",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2519100
+    },
+    {
+      "id": "F77",
+      "cadastralReference": "50:33:0010101:2680",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3099000
+    },
+    {
+      "id": "F78",
+      "cadastralReference": "50:33:0010101:2681",
+      "status": "Продан",
+      "location": "лесной участок",
+      "objectprice": 6578600
+    },
+    {
+      "id": "F79",
+      "cadastralReference": "50:33:0010101:2679",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3699000
+    },
+    {
+      "id": "F80",
+      "cadastralReference": "50:33:0010101:2678",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2999000
+    },
+    {
+      "id": "F81",
+      "cadastralReference": "50:33:0010101:2677",
+      "status": "Продан",
+      "location": "лесной участок",
+      "objectprice": 6208650
+    },
+    {
+      "id": "F82",
+      "cadastralReference": "50:33:0010101:2676",
+      "status": "Продан",
+      "location": "лесной участок",
+      "objectprice": 7558650
+    },
+    {
+      "id": "F83",
+      "cadastralReference": "50:33:0010101:2675",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2999000
+    },
+    {
+      "id": "F84",
+      "cadastralReference": "50:33:0010101:2673",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3199000
+    },
+    {
+      "id": "F85",
+      "cadastralReference": "50:33:0010101:2672",
+      "status": "Продан",
+      "location": "лесной участок",
+      "objectprice": 5775397
+    },
+    {
+      "id": "F86",
+      "cadastralReference": "50:33:0010101:2671",
+      "status": "Свободен",
+      "location": "лесной участок",
+      "objectprice": 7248750
+    },
+    {
+      "id": "F87",
+      "cadastralReference": "50:33:0010101:2670",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3059100
+    },
+    {
+      "id": "F88",
+      "cadastralReference": "50:33:0010101:2669",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 4084050
+    },
+    {
+      "id": "F89",
+      "cadastralReference": "50:33:0010101:2662",
+      "status": "Продан",
+      "location": "лесной участок",
+      "objectprice": 6718600
+    },
+    {
+      "id": "F90",
+      "cadastralReference": "50:33:0010101:2661",
+      "status": "Продан",
+      "location": "лесной участок",
+      "objectprice": 5641955
+    },
+    {
+      "id": "F91",
+      "cadastralReference": "50:33:0010101:2668",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 5058900
+    },
+    {
+      "id": "F92",
+      "cadastralReference": "50:33:0010101:2667",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3989050
+    },
+    {
+      "id": "F93",
+      "cadastralReference": "50:33:0010101:2664",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 5854780
+    },
+    {
+      "id": "F94",
+      "cadastralReference": "50:33:0010101:2660",
+      "status": "Продан",
+      "location": "лесной участок",
+      "objectprice": 6118800
+    },
+    {
+      "id": "F95",
+      "cadastralReference": "50:33:0010101:2659",
+      "status": "Продан",
+      "location": "лесной участок",
+      "objectprice": 5353950
+    },
+    {
+      "id": "F96",
+      "cadastralReference": "50:33:0010101:2658",
+      "status": "Продан",
+      "location": "лесной участок",
+      "objectprice": 7078800
+    },
+    {
+      "id": "F97",
+      "cadastralReference": "50:33:0010101:2665",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 5373750
+    },
+    {
+      "id": "F98",
+      "cadastralReference": "50:33:0010101:2666",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3514050
+    },
+    {
+      "id": "G1",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G2",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G3",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G4",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G5",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G6",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G7",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G8",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G9",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G10",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G11",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G12",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G14",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G15",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G16",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G17",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G18",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G19",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G20",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G21",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G22",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G23",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G24",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G25",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G26",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G27",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G28",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G29",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G30",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G31",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G32",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G33",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G34",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G35",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G36",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G37",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G38",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G39",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G40",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G41",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G42",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G43",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G44",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G45",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G46",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G47",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G48",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G49",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G50",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G51",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G52",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G53",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G54",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G55",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G56",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G57",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G58",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G59",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G60",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G61",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G62",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G63",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G64",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G65",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G66",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G67",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G68",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G69",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G70",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G71",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G72",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G73",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G74",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G75",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G76",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G77",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G78",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G79",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G80",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G81",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G82",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G83",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G84",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G85",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G86",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G87",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G88",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G89",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G90",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G91",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G92",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G93",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G94",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G95",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G96",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G97",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "G98",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 0
+    },
+    {
+      "id": "P1",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P2",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P3",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P4",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P5",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P6",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P7",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P8",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P9",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P10",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P11",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P12",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P14",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P15",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P16",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P17",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P18",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P19",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P20",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P21",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P22",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P23",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P24",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P25",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P26",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P27",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P28",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P29",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P30",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P31",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P32",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P33",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P34",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P35",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P36",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P37",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P38",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P39",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P40",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P41",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P42",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P43",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P44",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P45",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P46",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P47",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P48",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P49",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P50",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P51",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P52",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P53",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P54",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P55",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P56",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P57",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P58",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P59",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "P60",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W1",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W2",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W3",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W4",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W5",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W6",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W7",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W8",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W9",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W10",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W11",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W12",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W14",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W15",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W16",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W17",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W18",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W19",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W20",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W21",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W22",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W23",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W24",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W25",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W26",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W27",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W28",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W29",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W30",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W31",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W32",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W33",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W34",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W35",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W36",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W37",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W38",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W39",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W40",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W41",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W42",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W43",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "W44",
+      "status": "Снят с продажи",
+      "location": "в лесном парке",
+      "objectprice": 0
+    },
+    {
+      "id": "А1",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 3699000
+    },
+    {
+      "id": "А2",
+      "cadastralReference": "50:33:0010101:2600",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 4068900
+    },
+    {
+      "id": "А3",
+      "cadastralReference": "50:33:0010101:2597",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2962860
+    },
+    {
+      "id": "А4",
+      "cadastralReference": "50:33:0010101:2598",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2429100
+    },
+    {
+      "id": "А5",
+      "cadastralReference": "50:33:0010101:2595",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2873000
+    },
+    {
+      "id": "А6",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2314100
+    },
+    {
+      "id": "А7",
+      "cadastralReference": "50:33:0010101:2592",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4303950
+    },
+    {
+      "id": "А8",
+      "cadastralReference": "50:33:0010101:2593",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2659050
+    },
+    {
+      "id": "А9",
+      "cadastralReference": "50:33:0010101:2591",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4713850
+    },
+    {
+      "id": "А10",
+      "cadastralReference": "50:33:0010101:2590",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2799000
+    },
+    {
+      "id": "А11",
+      "cadastralReference": "50:33:0010101:2588",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2879100
+    },
+    {
+      "id": "А12",
+      "cadastralReference": "50:33:0010101:2589",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2799000
+    },
+    {
+      "id": "А14",
+      "cadastralReference": "50:33:0010101:2586",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2999000
+    },
+    {
+      "id": "А15",
+      "cadastralReference": "50:33:0010101:2587",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 5058850
+    },
+    {
+      "id": "А16",
+      "cadastralReference": "50:33:0010101:2580",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4948900
+    },
+    {
+      "id": "А17",
+      "cadastralReference": "50:33:0010101:2584",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3518900
+    },
+    {
+      "id": "А18",
+      "cadastralReference": "50:33:0010101:2583",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4304664
+    },
+    {
+      "id": "А19",
+      "cadastralReference": "50:33:0010101:2582",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4599000
+    },
+    {
+      "id": "А20",
+      "cadastralReference": "50:33:0010101:2581",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 2879200
+    },
+    {
+      "id": "А21",
+      "cadastralReference": "50:33:0010101:2578",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4399000
+    },
+    {
+      "id": "А22",
+      "cadastralReference": "50:33:0010101:2579",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4838900
+    },
+    {
+      "id": "А23",
+      "cadastralReference": "50:33:0010101:2576",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3399000
+    },
+    {
+      "id": "А24",
+      "cadastralReference": "50:33:0010101:2577",
+      "status": "Свободен",
+      "location": "с видом на лес",
+      "objectprice": 4836375
+    },
+    {
+      "id": "А25",
+      "cadastralReference": "50:33:0010101:2573",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3099000
+    },
+    {
+      "id": "А26",
+      "cadastralReference": "50:33:0010101:2575",
+      "status": "Продан",
+      "location": "с видом на лес",
+      "objectprice": 3399000
+    },
+    {
+      "id": "А27",
+      "cadastralReference": "50:33:0010101:2571",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4918800
+    },
+    {
+      "id": "А28",
+      "cadastralReference": "50:33:0010101:2572",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4618900
+    },
+    {
+      "id": "А29",
+      "cadastralReference": "50:33:0010101:2568",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4618900
+    },
+    {
+      "id": "А30",
+      "cadastralReference": "50:33:0010101:2569",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4199000
+    },
+    {
+      "id": "А31",
+      "cadastralReference": "50:33:0010101:2570",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 3778950
+    },
+    {
+      "id": "А32",
+      "cadastralReference": "50:33:0010101:2564",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2294150
+    },
+    {
+      "id": "А33",
+      "cadastralReference": "50:33:0010101:2565",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4099000
+    },
+    {
+      "id": "А34",
+      "cadastralReference": "50:33:0010101:2566",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 5248750
+    },
+    {
+      "id": "А35",
+      "cadastralReference": "50:33:0010101:2567",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 4373750
+    },
+    {
+      "id": "А36",
+      "cadastralReference": "50:33:0010101:2558",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 5038800
+    },
+    {
+      "id": "А37",
+      "cadastralReference": "50:33:0010101:2559",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4408950
+    },
+    {
+      "id": "А38",
+      "cadastralReference": "50:33:0010101:2560",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 3399000
+    },
+    {
+      "id": "А39",
+      "cadastralReference": "50:33:0010101:2561",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2789100
+    },
+    {
+      "id": "А40",
+      "cadastralReference": "50:33:0010101:2562",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2159200
+    },
+    {
+      "id": "А41",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2054200
+    },
+    {
+      "id": "А42",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2054200
+    },
+    {
+      "id": "А43",
+      "cadastralReference": "50:33:0010101:2539",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2159200
+    },
+    {
+      "id": "А44",
+      "cadastralReference": "50:33:0010101:2540",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 1999200
+    },
+    {
+      "id": "А45",
+      "cadastralReference": "50:33:0010101:2538",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2079200
+    },
+    {
+      "id": "А46",
+      "cadastralReference": "50:33:0010101:2535",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2339100
+    },
+    {
+      "id": "А47",
+      "cadastralReference": "50:33:0010101:2546",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2079200
+    },
+    {
+      "id": "А48",
+      "cadastralReference": "50:33:0010101:2545",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2519100
+    },
+    {
+      "id": "А49",
+      "cadastralReference": "50:33:0010101:2542",
+      "status": "Продан",
+      "location": "луговой",
+      "objectprice": 2879200
+    },
+    {
+      "id": "А50",
+      "cadastralReference": "50:33:0010101:2543",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2429100
+    },
+    {
+      "id": "А51",
+      "cadastralReference": "50:33:0010101:2544",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2199685
+    },
+    {
+      "id": "А52",
+      "cadastralReference": "50:33:0010101:2547",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2294150
+    },
+    {
+      "id": "А53",
+      "cadastralReference": "50:33:0010101:2548",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2564050
+    },
+    {
+      "id": "А54",
+      "cadastralReference": "50:33:0010101:2549",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4017020
+    },
+    {
+      "id": "А55",
+      "cadastralReference": "50:33:0010101:2550",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4099000
+    },
+    {
+      "id": "А56",
+      "cadastralReference": "50:33:0010101:2551",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2564050
+    },
+    {
+      "id": "А57",
+      "cadastralReference": "50:33:0010101:2553",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2429100
+    },
+    {
+      "id": "А58",
+      "cadastralReference": "50:33:0010101:2554",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2564050
+    },
+    {
+      "id": "А59",
+      "cadastralReference": "50:33:0010101:2557",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 3569150
+    },
+    {
+      "id": "А60",
+      "cadastralReference": "50:33:0010101:2556",
+      "status": "Свободен",
+      "location": "луговой",
+      "objectprice": 4199000
+    },
+    {
+      "id": "А61",
+      "cadastralReference": "50:33:0010101:2555",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2938950
+    },
+    {
+      "id": "А62",
+      "cadastralReference": "50:33:0010101:2740",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2279050
+    },
+    {
+      "id": "А63",
+      "cadastralReference": "50:33:0010101:2729",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2638900
+    },
+    {
+      "id": "А64",
+      "cadastralReference": "50:33:0010101:2640",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 3598500
+    },
+    {
+      "id": "А65",
+      "cadastralReference": "50:33:0010101:2751",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 3039050
+    },
+    {
+      "id": "А66",
+      "cadastralReference": "50:33:0010101:2784",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2849050
+    },
+    {
+      "id": "А67",
+      "cadastralReference": "50:33:0010101:2795",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 3188900
+    },
+    {
+      "id": "А68",
+      "cadastralReference": "50:33:0010101:2530",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 3023657
+    },
+    {
+      "id": "А69",
+      "cadastralReference": "50:33:0010101:2541",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2999000
+    },
+    {
+      "id": "А70",
+      "cadastralReference": "50:33:0010101:2773",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 3148950
+    },
+    {
+      "id": "А71",
+      "cadastralReference": "50:33:0010101:2762",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 3390940
+    },
+    {
+      "id": "А72",
+      "cadastralReference": "50:33:0010101:2574",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 3358950
+    },
+    {
+      "id": "А73",
+      "cadastralReference": "50:33:0010101:2563",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2999000
+    },
+    {
+      "id": "А74",
+      "cadastralReference": "50:33:0010101:2552",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2849050
+    },
+    {
+      "id": "А75",
+      "cadastralReference": "50:33:0010101:2607",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2399200
+    },
+    {
+      "id": "А76",
+      "cadastralReference": "50:33:0010101:2596",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2849050
+    },
+    {
+      "id": "А77",
+      "cadastralReference": "50:33:0010101:2585",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 3358950
+    },
+    {
+      "id": "А78",
+      "cadastralReference": "50:33:0010101:2641",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 3568950
+    },
+    {
+      "id": "А79",
+      "cadastralReference": "50:33:0010101:2629",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2719150
+    },
+    {
+      "id": "А80",
+      "cadastralReference": "50:33:0010101:2618",
+      "status": "Снят с продажи",
+      "location": "луговой",
+      "objectprice": 2399200
+    },
+    {
+      "id": "А81",
+      "cadastralReference": "50:33:0010101:2674",
+      "status": "Снят с продажи",
+      "location": "примыкает к лесу",
+      "objectprice": 2559200
+    },
+    {
+      "id": "А82",
+      "cadastralReference": "50:33:0010101:2663",
+      "status": "Снят с продажи",
+      "location": "примыкает к лесу",
+      "objectprice": 3199000
+    },
+    {
+      "id": "А83",
+      "cadastralReference": "50:33:0010101:2652",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 3738900
+    },
+    {
+      "id": "А84",
+      "cadastralReference": "50:33:0010101:2707",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 4066870
+    },
+    {
+      "id": "А85",
+      "cadastralReference": "50:33:0010101:2696",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 3039050
+    },
+    {
+      "id": "А86",
+      "cadastralReference": "50:33:0010101:2685",
+      "status": "Снят с продажи",
+      "location": "с видом на лес",
+      "objectprice": 2559200
+    }
+  ]
+}

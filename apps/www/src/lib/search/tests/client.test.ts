@@ -97,13 +97,13 @@ describe('Pagefind search client', () => {
           "первый",
         ],
         [
-          "\"первый\"",
+          ""первый"",
         ],
         [
           "второй",
         ],
         [
-          "\"второй\"",
+          ""второй"",
         ],
       ]
     `);
@@ -552,11 +552,11 @@ describe('Pagefind search client', () => {
       ...validResult(1),
       excerpt: 'Совпадение <mark>второго</mark> запроса'
     }));
-    const search = vi.fn(async (query: string): Promise<PagefindSearchResponse> => ({
+    const search = vi.fn<PagefindRuntime['search']>(async (query) => ({
       results: [
         {
           id: 'shared-result',
-          data: query.includes('первый') ? firstData : secondData
+          data: query?.includes('первый') ? firstData : secondData
         }
       ]
     }));
@@ -615,11 +615,11 @@ describe('Pagefind search client', () => {
     });
     const olderData = vi.fn(() => olderDataPromise);
     const newerData = vi.fn(async () => validResult(2));
-    const search = vi.fn(async (query: string): Promise<PagefindSearchResponse> => ({
+    const search = vi.fn<PagefindRuntime['search']>(async (query) => ({
       results: [
         {
           id: 'shared-result',
-          data: query.includes('старый') ? olderData : newerData
+          data: query?.includes('старый') ? olderData : newerData
         }
       ]
     }));
@@ -649,10 +649,10 @@ describe('Pagefind search client', () => {
     const secondData = vi.fn(async () => validResult(2));
     const invalidData = vi.fn(async () => validResult(3));
     const search = vi.fn<PagefindRuntime['search']>(async (query) => {
-      if (query.includes('первый')) {
+      if (query?.includes('первый')) {
         return { results: [{ id: 'first-result', data: firstData }] };
       }
-      if (query.includes('второй')) {
+      if (query?.includes('второй')) {
         return { results: [{ id: 'second-result', data: secondData }] };
       }
 
@@ -761,7 +761,7 @@ describe('Pagefind search client', () => {
 
   it('rejects Pagefind inverse-prefix fallback for a missing long token', async () => {
     const broadResponse = responseWith(validResult(1));
-    const search = vi.fn(async (query: string) =>
+    const search = vi.fn<PagefindRuntime['search']>(async (query) =>
       query === '"медицина"' ? responseWith() : broadResponse
     );
     const runtime: PagefindRuntime = {
@@ -792,7 +792,7 @@ describe('Pagefind search client', () => {
             "медицина",
           ],
           [
-            "\"медицина\"",
+            ""медицина"",
           ],
         ],
       }
@@ -816,7 +816,7 @@ describe('Pagefind search client', () => {
         { id: 'meeting', score: 1, words: [1], data: secondData }
       ]
     };
-    const search = vi.fn(async (query: string) =>
+    const search = vi.fn<PagefindRuntime['search']>(async (query) =>
       query === '"калькуля"' ? responseWith() : broadResponse
     );
     const runtime: PagefindRuntime = {
@@ -881,7 +881,7 @@ describe('Pagefind search client', () => {
             "калькуля",
           ],
           [
-            "\"калькуля\"",
+            ""калькуля"",
           ],
         ],
       }
@@ -921,7 +921,7 @@ describe('Pagefind search client', () => {
         { id: 'meeting', data: data.exactMeeting }
       ]
     };
-    const search = vi.fn(async (query: string) =>
+    const search = vi.fn<PagefindRuntime['search']>(async (query) =>
       query === '"еда"' ? exactResponse : broadResponse
     );
     const runtime: PagefindRuntime = {
@@ -1004,7 +1004,7 @@ describe('Pagefind search client', () => {
 
   it('keeps prefix search for an unfinished short word without exact matches', async () => {
     const broadResponse = responseWith(validResult(1));
-    const search = vi.fn(async (query: string) =>
+    const search = vi.fn<PagefindRuntime['search']>(async (query) =>
       query === '"тар"' ? responseWith() : broadResponse
     );
     const runtime: PagefindRuntime = {
@@ -1030,7 +1030,7 @@ describe('Pagefind search client', () => {
       resolveOlder = resolve;
     });
     const options = vi.fn(async () => {});
-    const search = vi.fn((query: string) =>
+    const search = vi.fn<PagefindRuntime['search']>((query) =>
       query === 'старый'
         ? olderResponse
         : Promise.resolve(
@@ -1073,5 +1073,154 @@ describe('Pagefind search client', () => {
 
     expect(newerResult?.query).toBe('новый');
     await expect(olderRequest).resolves.toBeUndefined();
+  });
+
+  it('ranks distinct parts with pages in one batch, paginates, and explains only matched aliases', async () => {
+    const parcel = (code: string, part: string, aliases = '') => ({
+      url: `/map/?p=${code}&h=`,
+      raw_url: `/map/?p=${code}`,
+      meta: { title: code, part, aliases, sectionId: 'parcels' }
+    });
+    const results = trackedResponseWith(
+      validResult(1),
+      parcel('SHV-A10', 'shv'),
+      parcel('SHP-A10', 'shp', 'SHP-A11'),
+      validResult(2)
+    );
+    const search = vi.fn<PagefindRuntime['search']>(async (query) =>
+      query === 'a11' || query === 'shp-a11'
+        ? responseWith(parcel('SHP-A10', 'shp', 'SHP-A11'))
+        : results.response
+    );
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => ({
+        init: async () => {},
+        options: async () => {},
+        preload: async () => {},
+        search
+      })
+    });
+
+    const first = await client.search(' a10 ', 2);
+    const expanded = await client.search(' a10 ', 4);
+    expect(first).toMatchObject({
+      state: 'ready',
+      total: 4,
+      results: [
+        { title: 'Результат 1' },
+        { title: 'SHV-A10', url: '/map/?p=SHV-A10', matchContext: 'Шелково Вилладж' }
+      ]
+    });
+    expect(expanded).toMatchObject({
+      total: 4,
+      results: [
+        { title: 'Результат 1' },
+        { title: 'SHV-A10' },
+        { title: 'SHP-A10', url: '/map/?p=SHP-A10', matchContext: 'Шелково Парк' },
+        { title: 'Результат 2' }
+      ]
+    });
+    expect(dataCallCount(results.data)).toBe(4);
+    const alias = await client.search('shp-a11', 1);
+    expect(alias).toMatchObject({
+      total: 1,
+      results: [{ title: 'SHP-A10', matchContext: 'Шелково Парк · также SHP-A11' }]
+    });
+    const shortAlias = await client.search('a11', 1);
+    expect(shortAlias).toMatchObject({
+      results: [{ title: 'SHP-A10', matchContext: 'Шелково Парк · также SHP-A11' }]
+    });
+    expect(search.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "a10",
+        ],
+        [
+          "a10",
+        ],
+        [
+          "shp-a11",
+        ],
+        [
+          "a11",
+        ],
+      ]
+    `);
+  });
+
+  it('refreshes the alias explanation when the full input changes but the Pagefind query does not', async () => {
+    const { runtime, search } = runtimeWith(
+      responseWith({
+        raw_url: '/map/?p=SHP-A10',
+        meta: { title: 'SHP-A10', part: 'shp', aliases: 'SHP-A11', sectionId: 'parcels' }
+      })
+    );
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => runtime
+    });
+
+    const broad = await client.search('SHP-A11 x');
+    const exact = await client.search('SHP-A11');
+    expect(search.mock.calls).toEqual([['SHP-A11'], ['SHP-A11']]);
+    expect(broad).toMatchObject({ results: [{ matchContext: 'Шелково Парк' }] });
+    expect(exact).toMatchObject({
+      results: [{ title: 'SHP-A10', matchContext: 'Шелково Парк · также SHP-A11' }]
+    });
+  });
+
+  it('uses plain text search for numbers and code prefixes, and retries a failed designation search', async () => {
+    const search = vi.fn<PagefindRuntime['search']>(async () => responseWith(validResult(1)));
+    search.mockRejectedValueOnce(new Error('search failed'));
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => ({
+        init: async () => {},
+        options: async () => {},
+        preload: async () => {},
+        search
+      })
+    });
+    await expect(client.search('L43')).rejects.toThrow('search failed');
+    await expect(client.search('L43')).resolves.toMatchObject({ total: 1 });
+    for (const query of ['43', 'SHR-L', 'SHR-L43X']) {
+      const response = await client.search(query);
+      expect(response?.state === 'ready' && response.results[0]?.section.id).toBe('news');
+    }
+    expect(search.mock.calls.filter(([query]) => query === 'L43')).toHaveLength(2);
+    expect(search.mock.calls.filter(([query]) => query === 'SHR-L')).toHaveLength(1);
+  });
+
+  it('drops an older parcel response after a newer designation finishes', async () => {
+    const older = Promise.withResolvers<PagefindSearchResponse>();
+    const search = vi.fn<PagefindRuntime['search']>(async (query) => {
+      if (query === 'L43') return older.promise;
+      return responseWith({
+        raw_url: '/map/?p=SHP-A10',
+        meta: { title: 'SHP-A10', part: 'shp', sectionId: 'parcels' }
+      });
+    });
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => ({
+        init: async () => {},
+        options: async () => {},
+        preload: async () => {},
+        search
+      })
+    });
+    const pending = client.search('L43');
+    await vi.waitFor(() => expect(search).toHaveBeenCalledWith('L43'));
+    await expect(client.search('A10')).resolves.toMatchObject({
+      results: [{ title: 'SHP-A10' }]
+    });
+    older.resolve(
+      responseWith({
+        raw_url: '/map/?p=SHR-L43',
+        meta: { title: 'SHR-L43', part: 'shr', sectionId: 'parcels' }
+      })
+    );
+    await expect(pending).resolves.toBeUndefined();
   });
 });

@@ -14,6 +14,8 @@ import { RawMeetingSchema, RawMeetingTranscriptSchema } from '@/lib/meetings/raw
 import { meetingSourceId, meetingTranscriptYamlId } from '@/lib/meetings/source';
 import { RawNewsAuthorSchema, createRawNewsArticleSchema } from '@/lib/news/raw-schema';
 import { articleSourceId, newsArchiveSummaryId } from '@/lib/news/source';
+import { RawParcelSchema } from '@/lib/parcels/raw-schema';
+import { parcelSourceId } from '@/lib/parcels/source';
 import { RawPersonProfileSchema } from '@/lib/people/raw-schema';
 import { personSourceId } from '@/lib/people/source';
 import { RawPlaceSchema } from '@/lib/places/raw-schema';
@@ -87,6 +89,15 @@ const places = defineCollection({
   schema: RawPlaceSchema
 });
 
+const parcels = defineCollection({
+  loader: glob({
+    pattern: '**/*.md',
+    base: './src/data/parcels',
+    generateId: ({ entry }) => parcelSourceId(entry)
+  }),
+  schema: RawParcelSchema
+});
+
 const kbPages = defineCollection({
   loader: glob({
     pattern: ['**/*.md', '!AGENTS.md', '!**/AGENTS.md'],
@@ -151,6 +162,7 @@ export const collections = {
   kbPages,
   peopleProfiles,
   places,
+  parcels,
   meetingEntries,
   meetingTranscripts,
   reviews,

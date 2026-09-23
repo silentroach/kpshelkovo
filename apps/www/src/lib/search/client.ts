@@ -1,3 +1,5 @@
+import { PARCEL_CODE } from '@/lib/parcels/schema';
+
 import type {
   PagefindClientDependencies,
   LoadedPagefindResult,
@@ -13,6 +15,13 @@ import { normalizeSearchHighlightQuery, SEARCH_HIGHLIGHT_PARAM } from './highlig
 const pagefindEntrypoint = '/search/pagefind.js';
 const canonicalUrlBase = 'https://kpshelkovo.online';
 const prefixFallbackMaxLength = 3;
+const parcelDesignation = /^(?:(?:SHR|SHF|SHP|SHV)-[A-Z]+[0-9]*|[A-Z]+[0-9]+)$/;
+const partNames: Readonly<Record<string, string>> = {
+  shr: 'Шелково Ривер',
+  shf: 'Шелково Форест',
+  shp: 'Шелково Парк',
+  shv: 'Шелково Вилладж'
+};
 const pagefindOptions = {
   highlightParam: SEARCH_HIGHLIGHT_PARAM,
   ranking: {
@@ -164,6 +173,26 @@ const normalizeResult = (
     matchContext,
     excerptHtml: matchContext ? undefined : trustedPagefindExcerpt(rawResult?.excerpt),
     subResults: normalizeSubResults(rawResult?.sub_results, url)
+  };
+};
+
+const normalizeParcelResult = (value: unknown, query: string): SearchResult | undefined => {
+  const rawResult = asRecord(value);
+  const meta = asRecord(rawResult?.meta);
+  const title = cleanText(meta?.title);
+  const part = cleanText(meta?.part);
+  if (!title || !PARCEL_CODE.test(title) || !part || !partNames[part]) return;
+  if ((cleanText(rawResult?.raw_url) ?? cleanText(rawResult?.url)) !== `/map/?p=${title}`) return;
+
+  const alias = asStringList(cleanText(meta?.aliases)?.split(',')).find(
+    (code) => code === query || code.slice(code.indexOf('-') + 1) === query
+  );
+  return {
+    url: `/map/?p=${title}`,
+    title,
+    section: { id: 'parcels', label: 'Участки' },
+    matchContext: alias ? `${partNames[part]} · также ${alias}` : partNames[part],
+    subResults: []
   };
 };
 
@@ -424,19 +453,25 @@ export const createPagefindSearchClient = (
   };
 
   const loadResult = async (
-    reference: PagefindResultReference
+    reference: PagefindResultReference,
+    query: string
   ): Promise<LoadedPagefindResult | undefined> => {
-    const result = normalizeResult(await reference.data(), reference);
+    const data = await reference.data();
+    const result =
+      cleanText(asRecord(asRecord(data)?.meta)?.sectionId) === 'parcels'
+        ? normalizeParcelResult(data, query.toUpperCase())
+        : normalizeResult(data, reference);
     return result ? { result, score: pagefindScore(reference.score) } : undefined;
   };
 
   const loadCachedResult = (
     reference: PagefindResultReference,
+    query: string,
     cache: Map<string, Promise<LoadedPagefindResult | undefined>>
   ): Promise<LoadedPagefindResult | undefined> => {
     const id = cacheableResultId(reference.id);
     if (!id) {
-      return loadResult(reference);
+      return loadResult(reference, query);
     }
 
     const cached = cache.get(id);
@@ -444,7 +479,7 @@ export const createPagefindSearchClient = (
       return cached;
     }
 
-    const result = loadResult(reference);
+    const result = loadResult(reference, query);
     cache.set(id, result);
     void result.catch(() => {
       if (cache.get(id) === result) {
@@ -475,6 +510,7 @@ export const createPagefindSearchClient = (
     const requestId = ++latestRequestId;
     const query = normalizeQuery(rawQuery);
     const effectiveQuery = pagefindQuery(query);
+    const isParcelQuery = parcelDesignation.test(query.toUpperCase());
 
     if (!dependencies.available) {
       return { state: 'devUnavailable', query };
@@ -494,21 +530,23 @@ export const createPagefindSearchClient = (
     }
 
     const limit = normalizeResultLimit(rawLimit);
-    const queryCache = resultCacheFor(effectiveQuery);
+    const queryCache = resultCacheFor(query);
     const pagefind = await loadPagefind();
     if (requestId !== latestRequestId) {
       return;
     }
 
-    const results = await searchPagefind(pagefind, effectiveQuery, (token) =>
-      searchExactToken(pagefind, token)
-    );
+    const results = isParcelQuery
+      ? (await pagefind.search(effectiveQuery)).results
+      : await searchPagefind(pagefind, effectiveQuery, (token) =>
+          searchExactToken(pagefind, token)
+        );
     if (requestId !== latestRequestId) {
       return;
     }
 
     const loaded = await Promise.all(
-      results.slice(0, limit).map((result) => loadCachedResult(result, queryCache))
+      results.slice(0, limit).map((result) => loadCachedResult(result, query, queryCache))
     );
     if (requestId !== latestRequestId) {
       return;

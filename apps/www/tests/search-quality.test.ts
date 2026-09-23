@@ -232,7 +232,7 @@ test('status, #224 events, #372 KB and news archive indexing policy in the produ
         const search = await pagefind.search(null);
         const results = await Promise.all(search.results.map((result) => result.data()));
         document.documentElement.dataset.pagefindUrls = JSON.stringify(
-          results.map((result) => new URL(result.url, window.location.origin).pathname),
+          results.filter((result) => !result.url.startsWith('/map/?p=')).map((result) => new URL(result.url, window.location.origin).pathname),
         );
       `
     });

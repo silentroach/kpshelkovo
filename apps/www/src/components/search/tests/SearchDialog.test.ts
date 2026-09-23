@@ -93,6 +93,150 @@ afterEach(() => {
 });
 
 describe('SearchDialog', () => {
+  it('retries parcel search, counts and loads mixed results, and opens the first parcel with Enter', async () => {
+    const intersections: Array<() => void> = [];
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        readonly root = null;
+        readonly rootMargin = '0px';
+        readonly scrollMargin = '0px';
+        readonly thresholds: readonly number[] = [];
+
+        constructor(callback: IntersectionObserverCallback) {
+          intersections.push(() =>
+            callback([{ isIntersecting: true } as IntersectionObserverEntry], this)
+          );
+        }
+
+        readonly observe = vi.fn();
+        readonly disconnect = vi.fn();
+        readonly takeRecords = (): IntersectionObserverEntry[] => [];
+        readonly unobserve = vi.fn();
+      }
+    );
+    const textData = Array.from({ length: 9 }, (_, index) =>
+      vi.fn(async () => ({
+        url: `/news/result-${index + 1}/`,
+        meta: { title: `Результат ${index + 1}`, sectionId: 'news', sectionLabel: 'Новости' }
+      }))
+    );
+    let searchCalls = 0;
+    const search = vi.fn<PagefindRuntime['search']>(async (query) => {
+      if (++searchCalls === 1) throw new Error('Parcel search unavailable');
+      if (query === 'l43' || query === 'L43') {
+        return {
+          results: [
+            ...(['SHF-L43', 'SHR-L43'] as const).map((code) => ({
+              id: code,
+              data: async () => ({
+                raw_url: `/map/?p=${code}`,
+                meta: {
+                  title: code,
+                  part: code === 'SHR-L43' ? 'shr' : 'shf',
+                  sectionId: 'parcels'
+                }
+              })
+            })),
+            ...textData.map((data, index) => ({ id: `text-${index}`, data }))
+          ]
+        };
+      }
+      return { results: [] };
+    });
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => ({
+        init: async () => {},
+        options: async () => {},
+        preload: async () => {},
+        search
+      })
+    });
+    const opener = addOpener('Поиск');
+    let view = render(SearchDialog, { props: { client } });
+    const dialog = dialogFrom(view.container);
+
+    await requestOpen(opener);
+    const input = view.getByRole('searchbox');
+    await enterDebouncedQuery(input, 'l43');
+    const retry = await waitFor(() => view.getByRole('button', { name: 'Повторить' }));
+    expect(dialog.dataset.searchState).toBe('error');
+
+    await fireEvent.click(retry);
+    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(8));
+    expect(dialog.querySelector('[aria-live="polite"]')?.textContent?.trim()).toBe(
+      'Найдено 11 результатов'
+    );
+    expect(
+      view
+        .getAllByRole('link')
+        .slice(0, 2)
+        .map((link) => link.getAttribute('href'))
+    ).toMatchInlineSnapshot(`
+      [
+        "/map/?p=SHF-L43",
+        "/map/?p=SHR-L43",
+      ]
+    `);
+    expect(searchCalls).toBe(2);
+    expect(textData.filter((load) => load.mock.calls.length)).toHaveLength(6);
+
+    intersections[0]?.();
+    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(11));
+    expect(textData.filter((load) => load.mock.calls.length)).toHaveLength(9);
+    expect(
+      view.getAllByRole('link').filter((link) => link.getAttribute('href')?.startsWith('/map/?p='))
+    ).toHaveLength(2);
+
+    const first = view.getAllByRole('link')[0];
+    const activation = vi.fn((event: Event) => event.preventDefault());
+    first?.addEventListener('click', activation);
+    input.focus();
+    await fireEvent.keyDown(input, { key: 'Enter' });
+    expect(activation).toHaveBeenCalledOnce();
+    expect(dialog.open).toBe(false);
+
+    await requestOpen(opener);
+    await enterDebouncedQuery(view.getByRole('searchbox'), 'L43');
+    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(8));
+    expect(searchCalls).toBe(4);
+
+    view.unmount();
+    view = render(SearchDialog, { props: { client } });
+    await requestOpen(opener);
+    await enterDebouncedQuery(view.getByRole('searchbox'), 'L43');
+    await waitFor(() =>
+      expect(view.getAllByRole('link')[0]?.getAttribute('href')).toBe('/map/?p=SHF-L43')
+    );
+    expect(searchCalls).toBe(5);
+  });
+
+  it('ignores a stale result for the same query after close and reopen', async () => {
+    const old = Promise.withResolvers<SearchResponse>();
+    const search = vi
+      .fn<SearchClient['search']>()
+      .mockImplementationOnce(() => old.promise)
+      .mockImplementation(async () =>
+        readyResponse('L43', [{ ...resultAt(2), url: '/map/?p=SHR-L43' }])
+      );
+    const opener = addOpener('Поиск');
+    const view = render(SearchDialog, { props: { client: { search } } });
+    await requestOpen(opener);
+    await enterDebouncedQuery(view.getByRole('searchbox'), 'L43');
+    await waitFor(() => expect(search).toHaveBeenCalledOnce());
+
+    await fireEvent.click(view.getByRole('button', { name: 'Закрыть' }));
+    await requestOpen(opener);
+    await enterDebouncedQuery(view.getByRole('searchbox'), 'L43');
+    await waitFor(() =>
+      expect(view.getByRole('link').getAttribute('href')).toBe('/map/?p=SHR-L43')
+    );
+    old.resolve(readyResponse('L43', [resultAt(1)]));
+    await waitFor(() => expect(search).toHaveBeenCalledTimes(2));
+    expect(view.getByRole('link').getAttribute('href')).toBe('/map/?p=SHR-L43');
+  });
+
   it.each(['resolve', 'reject'] as const)(
     'reuses only the latest exact query across remounts despite an old %s',
     async (settlement) => {
