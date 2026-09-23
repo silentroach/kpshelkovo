@@ -86,7 +86,9 @@ export class EditorialMapElement extends HTMLElement {
             if (this.map !== map || !size.x || !size.y) return;
             try {
               map.update({
-                location: selected ? { ...selected, duration: 0 } : frame,
+                location: selected
+                  ? { center: selected.center, zoom: selected.zoom, duration: 0 }
+                  : { bounds: [[...bounds[0]], [...bounds[1]]], duration: 0 },
                 margin: MAP_MARGIN
               });
             } catch {

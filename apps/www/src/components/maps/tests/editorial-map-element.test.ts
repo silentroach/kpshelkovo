@@ -363,6 +363,13 @@ it('refits on resize and print resize until a SDK action, then preserves the fin
     props.location,
     props.location
   ]);
+  expect(update.mock.calls[0]?.[0].location).not.toBe(props.location);
+  expect(update.mock.calls[1]?.[0].location).not.toBe(update.mock.calls[0]?.[0].location);
+  if (!('bounds' in props.location)) throw new Error('Expected initial bounds');
+  expect(update.mock.calls[0]?.[0].location.bounds).not.toBe(props.location.bounds);
+  expect(update.mock.calls[1]?.[0].location.bounds).not.toBe(
+    update.mock.calls[0]?.[0].location.bounds
+  );
   handler.onActionStart?.({ type: 'pinchZoom', location: location(10, 20, 15), camera: {} });
   handler.onUpdate?.({
     type: 'update',
