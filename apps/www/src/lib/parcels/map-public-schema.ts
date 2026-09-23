@@ -11,19 +11,17 @@ const identity = {
   part: z.enum(PARCEL_PARTS)
 };
 
-export const ParcelMapPublicSchema = z
-  .object({
-    parcels: z.array(
-      z
-        .object({
-          ...identity,
-          geometry: RawPolygonGeometrySchema,
-          labelCoordinates: z.tuple([z.number().min(-180).max(180), z.number().min(-90).max(90)])
-        })
-        .strict()
-    )
-  })
-  .strict();
+export const ParcelMapPublicSchema = z.array(
+  z
+    .object({
+      code,
+      aliases: z.array(code).optional(),
+      part: z.enum(PARCEL_PARTS),
+      geometry: RawPolygonGeometrySchema,
+      labelCoordinates: z.tuple([z.number().min(-180).max(180), z.number().min(-90).max(90)])
+    })
+    .strict()
+);
 
 export const ParcelSearchPublicSchema = z
   .object({ parcels: z.array(z.object(identity).strict()) })

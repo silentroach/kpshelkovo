@@ -27,10 +27,10 @@ export const buildParcelMapPayload = (
     : 0;
   const shift = createDisplayOffset(config.offset_east_m, config.offset_north_m, referenceLatitude);
 
-  return ParcelMapPublicSchema.parse({
-    parcels: parcels.map((parcel) => ({
+  return ParcelMapPublicSchema.parse(
+    parcels.map((parcel) => ({
       code: parcel.code,
-      aliases: parcel.aliases,
+      ...(parcel.aliases.length ? { aliases: parcel.aliases } : {}),
       part: parcel.part,
       geometry:
         parcel.geometry.type === 'Polygon'
@@ -46,7 +46,7 @@ export const buildParcelMapPayload = (
             },
       labelCoordinates: shift(polygonLabelCoordinates(parcel.geometry))
     }))
-  });
+  );
 };
 
 export const buildParcelSearchPayload = (parcels: readonly Parcel[]): ParcelSearchPublicDto =>

@@ -106,7 +106,7 @@ export const createParcelLayer = (
     clearSelection();
     selected = item;
     features.get(item.code)?.update({ style: selectedStyle() });
-    onSelection([item.code, ...item.aliases].join(' / '));
+    onSelection([item.code, ...(item.aliases ?? [])].join(' / '));
     timer = window.setTimeout(() => {
       timer = undefined;
       clearSelection();
@@ -184,7 +184,7 @@ export const createParcelLayer = (
     disable,
     focus(code) {
       if (!active || destroyed) return false;
-      const item = items.find((parcel) => parcel.code === code || parcel.aliases.includes(code));
+      const item = items.find((parcel) => parcel.code === code || parcel.aliases?.includes(code));
       if (!item) return false;
       const bounds = boundsOf(vertices(item.geometry));
       map.update({

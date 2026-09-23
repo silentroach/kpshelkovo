@@ -147,7 +147,7 @@ const parcelFetch = vi.fn(async (url: string) => {
       parcels: [{ code: parcel.code, aliases: parcel.aliases, part: parcel.part }]
     });
   }
-  if (url === '/map/data/parcels.json') return Response.json({ parcels: [parcel] });
+  if (url === '/map/data/parcels.json') return Response.json([parcel]);
   throw new Error(`Unexpected request: ${url}`);
 });
 
@@ -1013,7 +1013,7 @@ describe('PlaceMap', () => {
     await fireEvent.click(checkbox);
     await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
     await fireEvent.click(checkbox);
-    pending.resolve(Response.json({ parcels: [parcel] }));
+    pending.resolve(Response.json([parcel]));
     await waitFor(() =>
       expect((screen.getByRole('checkbox', { name: 'Участки' }) as HTMLInputElement).checked).toBe(
         false
@@ -1025,7 +1025,7 @@ describe('PlaceMap', () => {
     fetch.mockReturnValue(later.promise);
     await fireEvent.click(checkbox);
     view.unmount();
-    later.resolve(Response.json({ parcels: [parcel] }));
+    later.resolve(Response.json([parcel]));
     await Promise.resolve();
     expect(areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43')).toBeUndefined();
   });
@@ -1034,7 +1034,7 @@ describe('PlaceMap', () => {
     const fetch = vi
       .fn()
       .mockResolvedValueOnce(new Response(undefined, { status: 503 }))
-      .mockResolvedValueOnce(Response.json({ parcels: [parcel] }));
+      .mockResolvedValueOnce(Response.json([parcel]));
     vi.stubGlobal('fetch', fetch);
     vi.spyOn(console, 'error').mockImplementation(() => {});
     render(PlaceMap, { props: { places: [place] } });
@@ -1099,14 +1099,14 @@ describe('PlaceMap', () => {
 
   it('replaces parcel selection, restarts its timer, and cancels it on unmount', async () => {
     const secondParcel = {
-      ...parcel,
       code: 'SHR-L46',
-      aliases: [],
+      part: parcel.part,
+      geometry: parcel.geometry,
       labelCoordinates: [37.73, 55.065]
     };
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => Response.json({ parcels: [parcel, secondParcel] }))
+      vi.fn(async () => Response.json([parcel, secondParcel]))
     );
     const setTimeout = vi.spyOn(window, 'setTimeout');
     const clearTimeout = vi.spyOn(window, 'clearTimeout');
@@ -1212,7 +1212,7 @@ describe('PlaceMap', () => {
     const fetch = vi
       .fn()
       .mockImplementationOnce(parcelFetch)
-      .mockResolvedValueOnce(Response.json({ parcels: [] }))
+      .mockResolvedValueOnce(Response.json([]))
       .mockImplementation(parcelFetch);
     vi.stubGlobal('fetch', fetch);
     vi.spyOn(console, 'error').mockImplementation(() => {});

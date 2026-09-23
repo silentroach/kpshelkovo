@@ -545,7 +545,7 @@
             getMapZoomDuration
           );
         }
-        parcelLayer.enable(data.parcels);
+        parcelLayer.enable(data);
         parcelLayer.updateViewport(map.zoom, map.bounds);
         if (canonical) {
           if (!parcelLayer.focus(canonical)) {

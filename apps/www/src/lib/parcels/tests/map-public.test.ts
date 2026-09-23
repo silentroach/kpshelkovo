@@ -44,7 +44,7 @@ describe('parcel public payloads', () => {
 
     expect(ParcelMapPublicSchema.safeParse(payload).success).toBe(true);
     expect(
-      payload.parcels.map(({ code, aliases }) => ({
+      payload.map(({ code, aliases }) => ({
         code,
         aliases
       }))
@@ -58,13 +58,13 @@ describe('parcel public payloads', () => {
         },
       ]
     `);
-    const label = payload.parcels[0]?.labelCoordinates;
+    const label = payload[0]?.labelCoordinates;
     expect(label?.[0]).toBeGreaterThan(37.02);
     expect(label?.[0]).toBeLessThan(37.03);
     expect(label?.[1]).toBeGreaterThan(55.02);
     expect(label?.[1]).toBeLessThan(55.03);
-    expect(payload.parcels[0]?.geometry).toEqual(parcel.geometry);
-    expect(Object.keys(payload.parcels[0] ?? {}).sort()).toMatchInlineSnapshot(`
+    expect(payload[0]?.geometry).toEqual(parcel.geometry);
+    expect(Object.keys(payload[0] ?? {}).sort()).toMatchInlineSnapshot(`
       [
         "aliases",
         "code",
@@ -83,9 +83,9 @@ describe('parcel public payloads', () => {
     expect(shifted).toEqual(again);
     expect(JSON.stringify(parcel)).toBe(source);
     expect(parcel.areaM2).toBe(1500);
-    expect(shifted.parcels[0]?.geometry.type).toBe('MultiPolygon');
-    const original = unchanged.parcels[0]?.geometry;
-    const moved = shifted.parcels[0]?.geometry;
+    expect(shifted[0]?.geometry.type).toBe('MultiPolygon');
+    const original = unchanged[0]?.geometry;
+    const moved = shifted[0]?.geometry;
     if (original?.type !== 'MultiPolygon' || moved?.type !== 'MultiPolygon')
       throw new Error('MultiPolygon missing');
     expect(moved.coordinates.map((polygon) => polygon.map((ring) => ring.length))).toEqual(
@@ -93,8 +93,8 @@ describe('parcel public payloads', () => {
     );
     const a = original.coordinates[0]?.[0]?.[0];
     const b = moved.coordinates[0]?.[0]?.[0];
-    const labelA = unchanged.parcels[0]?.labelCoordinates;
-    const labelB = shifted.parcels[0]?.labelCoordinates;
+    const labelA = unchanged[0]?.labelCoordinates;
+    const labelB = shifted[0]?.labelCoordinates;
     if (!a || !b || !labelA || !labelB) throw new Error('coordinates missing');
     const [vertexX, vertexY] = toWebMercator(b);
     const [sourceX, sourceY] = toWebMercator(a);
@@ -104,6 +104,29 @@ describe('parcel public payloads', () => {
     expect(vertexY - sourceY).toBeCloseTo(labelY - sourceLabelY, 4);
     expect(b[0]).toBeGreaterThan(a[0]);
     expect(b[1]).toBeGreaterThan(a[1]);
+  });
+
+  it('omits empty aliases while keeping every ring of Polygon and MultiPolygon', () => {
+    const coordinates =
+      parcel.geometry.type === 'MultiPolygon'
+        ? parcel.geometry.coordinates[0]
+        : parcel.geometry.coordinates;
+    if (!coordinates) throw new Error('polygon missing');
+    const single = {
+      ...parcel,
+      code: 'SHR-L45',
+      aliases: [],
+      geometry: { type: 'Polygon' as const, coordinates }
+    };
+    const payload = buildParcelMapPayload([parcel, single], {
+      offset_east_m: 0,
+      offset_north_m: 0
+    });
+    expect(Array.isArray(payload)).toBe(true);
+    expect(payload[1]?.aliases).toBeUndefined();
+    expect(payload[1]?.geometry).toEqual(single.geometry);
+    expect(payload[0]?.geometry).toEqual(parcel.geometry);
+    expect(ParcelMapPublicSchema.safeParse({ parcels: payload }).success).toBe(false);
   });
 
   it('publishes an exact-search dictionary without coordinates or commercial data', () => {
