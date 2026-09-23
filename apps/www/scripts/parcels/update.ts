@@ -1,6 +1,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseArgs } from 'node:util';
 
 import { mapGenplanSnapshot } from '../../src/lib/parcels/genplan-mapper.ts';
 import { parseGenplanPage } from '../../src/lib/parcels/genplan-page.ts';
@@ -49,12 +50,18 @@ const acceptedText = async (file: string): Promise<string | undefined> =>
   });
 
 const main = async (): Promise<void> => {
-  const [mode, flag, directory] = process.argv.slice(2);
+  const { positionals, values } = parseArgs({
+    args: process.argv.slice(2),
+    allowPositionals: true,
+    options: { snapshot: { type: 'string' } }
+  });
+  const [mode, ...extra] = positionals;
+  const directory = values.snapshot;
   if (
     (mode !== 'genplans' && mode !== 'nspd') ||
-    (flag !== undefined && (flag !== '--snapshot' || !directory)) ||
-    (mode === 'nspd' && !directory) ||
-    process.argv.length > (directory ? 5 : 3)
+    extra.length > 0 ||
+    directory === '' ||
+    (mode === 'nspd' && !directory)
   ) {
     throw new Error(
       'Usage: pnpm parcels:update genplans [--snapshot <directory>] | nspd --snapshot <directory>'
