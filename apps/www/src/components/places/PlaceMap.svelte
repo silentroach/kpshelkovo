@@ -129,6 +129,9 @@
   let parcelsLoading = $state(false);
   let parcelsError = $state(false);
   let selectedParcel = $state('');
+  let layersOpen = $state(false);
+  let layersControl: HTMLDivElement | undefined = $state(undefined);
+  let layersButton: HTMLButtonElement | undefined = $state(undefined);
   let toggleParcels: (checked: boolean) => void;
   let retryParcels = $state<() => void>(() => {});
   let errorPlace = $derived(places[0] ?? fallbackPlace);
@@ -467,6 +470,16 @@
 
   onMount(() => {
     let destroyed = false;
+    const closeLayersOutside = (event: PointerEvent): void => {
+      if (!layersControl?.contains(event.target as Node)) layersOpen = false;
+    };
+    const closeLayersOnEscape = (event: KeyboardEvent): void => {
+      if (event.key !== 'Escape' || !layersOpen) return;
+      layersOpen = false;
+      layersButton?.focus();
+    };
+    document.addEventListener('pointerdown', closeLayersOutside);
+    document.addEventListener('keydown', closeLayersOnEscape);
     let parcelRequest = 0;
     let parcelLayer: ParcelLayer | undefined;
     let parcelData: ParcelMapPayload | undefined;
@@ -779,6 +792,8 @@
 
     return () => {
       destroyed = true;
+      document.removeEventListener('pointerdown', closeLayersOutside);
+      document.removeEventListener('keydown', closeLayersOnEscape);
       parcelRequest++;
       parcelLayer?.destroy();
       document.removeEventListener('astro:page-load', refresh);
@@ -817,15 +832,36 @@
   <div bind:this={mapContainer} class="place-map__canvas"></div>
   {#if !error}
     <div class="parcel-map-controls">
-      <label class="parcel-map-toggle">
-        <input
-          type="checkbox"
-          checked={parcelsEnabled}
-          onchange={(event) => toggleParcels(event.currentTarget.checked)}
+      <div class="parcel-map-layers" bind:this={layersControl}>
+        <button
+          bind:this={layersButton}
+          type="button"
+          class="parcel-map-layers-button"
+          aria-expanded={layersOpen}
+          aria-controls="parcel-map-layer-list"
           disabled={isLoading}
-        />
-        Участки
-      </label>
+          onclick={() => (layersOpen = !layersOpen)}>Слои <span aria-hidden="true">⌄</span></button
+        >
+        <div id="parcel-map-layer-list" class="parcel-map-layer-list" hidden={!layersOpen}>
+          <button
+            type="button"
+            class="parcel-map-layer"
+            aria-pressed={parcelsEnabled}
+            onclick={() => toggleParcels(!parcelsEnabled)}
+          >
+            <svg class="parcel-map-layer-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Участки
+          </button>
+        </div>
+      </div>
       {#if parcelsLoading}<span role="status">Загружаем участки…</span>{/if}
       {#if parcelsError}
         <span role="alert">Не удалось загрузить участки.</span>
@@ -857,38 +893,88 @@
     left: 1rem;
     z-index: 2;
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 0.5rem;
     max-width: min(90%, 26rem);
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
     color: var(--color-text);
     font-size: 0.875rem;
   }
 
-  .parcel-map-toggle {
+  .parcel-map-layers {
+    position: relative;
+  }
+
+  .parcel-map-layers-button,
+  .parcel-map-layer-list {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  .parcel-map-layers-button {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    box-shadow: 0 0.125rem 0.4rem oklch(24% 0.04 145 / 0.16);
+  }
+
+  .parcel-map-layer-list {
+    position: absolute;
+    top: calc(100% + 0.375rem);
+    left: 0;
+    min-width: 11rem;
+    padding: 0.25rem;
+    box-shadow: 0 0.25rem 0.75rem oklch(24% 0.04 145 / 0.18);
+  }
+
+  .parcel-map-layer {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.75rem;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    text-align: left;
+  }
+
+  .parcel-map-layer-icon {
+    width: 1.375rem;
+    height: 1.375rem;
+    flex: none;
+    color: var(--color-text-muted);
+  }
+
+  .parcel-map-layer[aria-pressed='true'] {
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+  }
+
+  .parcel-map-layer[aria-pressed='true'] .parcel-map-layer-icon {
+    color: var(--color-primary);
+  }
+
+  .parcel-map-controls button {
+    font: inherit;
     cursor: pointer;
   }
-  .parcel-map-toggle input {
-    accent-color: var(--color-primary);
-    width: 1.25rem;
-    height: 1.25rem;
+  .parcel-map-controls button:hover:not(:disabled) {
+    background: var(--color-primary-soft);
   }
-  .parcel-map-controls button {
+  .parcel-map-controls button:disabled {
+    cursor: wait;
+  }
+  .parcel-map-controls button:not(.parcel-map-layers-button, .parcel-map-layer) {
     border: 0;
     background: none;
     color: var(--color-primary);
-    font: inherit;
     font-weight: 600;
-    cursor: pointer;
     text-decoration: underline;
   }
-  .parcel-map-controls :is(input, button):focus-visible {
+  .parcel-map-controls button:focus-visible {
     outline: 0.1875rem solid var(--color-focus);
     outline-offset: 0.125rem;
   }

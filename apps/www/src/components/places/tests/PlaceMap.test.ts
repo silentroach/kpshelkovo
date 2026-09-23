@@ -983,8 +983,13 @@ describe('PlaceMap', () => {
     await waitFor(() => expect(markerElements).toHaveLength(1));
     expect(parcelFetch).not.toHaveBeenCalled();
 
-    const checkbox = screen.getByRole('checkbox', { name: 'Участки' });
-    await fireEvent.click(checkbox);
+    const layers = screen.getByRole('button', { name: 'Слои' });
+    await fireEvent.click(layers);
+    expect(parcelFetch).not.toHaveBeenCalled();
+    const toggle = screen.getByRole('button', { name: 'Участки' });
+    expect(layers.getAttribute('aria-expanded')).toBe('true');
+    expect(toggle.getAttribute('aria-pressed')).toBe('false');
+    await fireEvent.click(toggle);
     await waitFor(() =>
       expect(areaFeatures.some(({ props }) => props.id === 'parcel-SHR-L43')).toBe(true)
     );
@@ -995,12 +1000,33 @@ describe('PlaceMap', () => {
     ]);
 
     const feature = areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43');
-    await fireEvent.click(checkbox);
+    expect(toggle.getAttribute('aria-pressed')).toBe('true');
+    expect(layers.getAttribute('aria-expanded')).toBe('true');
+    await fireEvent.click(toggle);
     expect(map.removeChild).toHaveBeenCalledWith(feature);
-    await fireEvent.click(checkbox);
+    await fireEvent.click(toggle);
     expect(parcelFetch).toHaveBeenCalledTimes(1);
     expect(markerElements[0]?.getAttribute('href')).toBe(place.url);
     expect(map.addChild).toHaveBeenCalledWith(nativeControl);
+  });
+
+  it('closes the layer list outside and on Escape, returning keyboard focus', async () => {
+    vi.stubGlobal('fetch', parcelFetch);
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+
+    const layers = screen.getByRole('button', { name: 'Слои' });
+    await fireEvent.click(layers);
+    const toggle = screen.getByRole('button', { name: 'Участки' });
+    toggle.focus();
+    await fireEvent.keyDown(document, { key: 'Escape' });
+    expect(layers.getAttribute('aria-expanded')).toBe('false');
+    expect(document.activeElement).toBe(layers);
+
+    await fireEvent.click(layers);
+    await fireEvent.pointerDown(document.body);
+    expect(layers.getAttribute('aria-expanded')).toBe('false');
+    expect(parcelFetch).not.toHaveBeenCalled();
   });
 
   it('ignores a parcel response after the layer is disabled or the component unmounts', async () => {
@@ -1009,21 +1035,18 @@ describe('PlaceMap', () => {
     vi.stubGlobal('fetch', fetch);
     const view = render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(markerElements).toHaveLength(1));
-    const checkbox = screen.getByRole('checkbox', { name: 'Участки' });
-    await fireEvent.click(checkbox);
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    const toggle = screen.getByRole('button', { name: 'Участки' });
+    await fireEvent.click(toggle);
     await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
-    await fireEvent.click(checkbox);
+    await fireEvent.click(toggle);
     pending.resolve(Response.json([parcel]));
-    await waitFor(() =>
-      expect((screen.getByRole('checkbox', { name: 'Участки' }) as HTMLInputElement).checked).toBe(
-        false
-      )
-    );
+    await waitFor(() => expect(toggle.getAttribute('aria-pressed')).toBe('false'));
     expect(areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43')).toBeUndefined();
 
     const later = Promise.withResolvers<Response>();
     fetch.mockReturnValue(later.promise);
-    await fireEvent.click(checkbox);
+    await fireEvent.click(toggle);
     view.unmount();
     later.resolve(Response.json([parcel]));
     await Promise.resolve();
@@ -1039,7 +1062,8 @@ describe('PlaceMap', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(markerElements).toHaveLength(1));
-    await fireEvent.click(screen.getByRole('checkbox', { name: 'Участки' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
     await screen.findByRole('alert');
     await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
     await waitFor(() =>
@@ -1052,7 +1076,8 @@ describe('PlaceMap', () => {
     vi.stubGlobal('fetch', parcelFetch);
     render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
-    await fireEvent.click(screen.getByRole('checkbox', { name: 'Участки' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
     await waitFor(() => expect(areaFeatures).toHaveLength(1));
     const update = mapUpdateHandlers[0];
     if (!update) throw new Error('Map listener missing');
@@ -1112,7 +1137,8 @@ describe('PlaceMap', () => {
     const clearTimeout = vi.spyOn(window, 'clearTimeout');
     const view = render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
-    await fireEvent.click(screen.getByRole('checkbox', { name: 'Участки' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
     await waitFor(() => expect(areaFeatures).toHaveLength(2));
     mapUpdateHandlers[0]?.({
       type: 'update',
@@ -1151,6 +1177,10 @@ describe('PlaceMap', () => {
     render(PlaceMap, { props: { places: [place] } });
 
     await waitFor(() => expect(screen.getByText('SHR-L43 / SHR-L44')).toBeTruthy());
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    expect(screen.getByRole('button', { name: 'Участки' }).getAttribute('aria-pressed')).toBe(
+      'true'
+    );
     expect(parcelFetch.mock.calls.map(([url]) => url)).toEqual([
       '/map/data/parcel-search.json',
       '/map/data/parcels.json'
@@ -1181,8 +1211,9 @@ describe('PlaceMap', () => {
     render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(window.location.search).toBe('?flag'));
     expect(parcelFetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcel-search.json']);
-    expect((screen.getByRole('checkbox', { name: 'Участки' }) as HTMLInputElement).checked).toBe(
-      false
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    expect(screen.getByRole('button', { name: 'Участки' }).getAttribute('aria-pressed')).toBe(
+      'false'
     );
     expect(areaFeatures).toHaveLength(0);
   });
