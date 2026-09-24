@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
+import { fromPublicEditorialGeometry } from '@/components/places/place-map-geometry';
 import { parseEditorialGeometry } from '@/lib/geometry/editorial-mapper';
 import { EditorialPublicGeometrySchema } from '@/lib/geometry/editorial-public-schema';
 
@@ -162,6 +163,7 @@ describe('place map public DTO', () => {
           properties: {
             description: '**raw**',
             iconCaption: '<b>Gate</b>',
+            iconContent: '0',
             'marker-color': '#123456',
             stroke: '#abc',
             'stroke-width': '2',
@@ -171,6 +173,12 @@ describe('place map public DTO', () => {
             'fill-opacity': '0.1'
           },
           geometry: { type: 'Point', coordinates: [37, 55] }
+        },
+        {
+          type: 'Feature',
+          id: 1,
+          properties: {},
+          geometry: { type: 'Point', coordinates: [38, 56] }
         }
       ]
     };
@@ -178,6 +186,14 @@ describe('place map public DTO', () => {
       { ...place, geometry: parseEditorialGeometry(source, 'fixture') }
     ]).places[0]?.geometry;
     const parsed = EditorialPublicGeometrySchema.parse(JSON.parse(JSON.stringify(geometry)));
+
+    expect(fromPublicEditorialGeometry(parsed).features.map(({ iconContent }) => iconContent))
+      .toMatchInlineSnapshot(`
+        [
+          "0",
+          undefined,
+        ]
+      `);
 
     expect(parsed.metadata).toMatchInlineSnapshot(`
       {
@@ -201,6 +217,7 @@ describe('place map public DTO', () => {
           "fill": "#def",
           "fill-opacity": 0.1,
           "iconCaption": "<b>Gate</b>",
+          "iconContent": "0",
           "marker-color": "#123456",
           "stroke": "#abc",
           "stroke-dasharray": [

@@ -40,6 +40,10 @@ const properties = z
   .object({
     description: z.string().optional(),
     iconCaption: z.string().optional(),
+    iconContent: z
+      .string()
+      .regex(/^[0-9]$/)
+      .optional(),
     'marker-color': color.optional(),
     stroke: color.optional(),
     'stroke-width': nonnegative.optional(),
@@ -67,6 +71,13 @@ const feature = z
   })
   .strict()
   .superRefine((value, context) => {
+    if (value.properties.iconContent !== undefined && value.geometry.type !== 'Point') {
+      context.addIssue({
+        code: 'custom',
+        path: ['properties', 'iconContent'],
+        message: 'iconContent requires a Point'
+      });
+    }
     if (
       value.properties.outline_expansion_meters !== undefined &&
       (value.properties.precision !== 'approximate' ||

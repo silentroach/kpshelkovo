@@ -25,6 +25,10 @@ export const EditorialPublicGeometrySchema = z
               .object({
                 description: z.string().optional(),
                 iconCaption: z.string().optional(),
+                iconContent: z
+                  .string()
+                  .regex(/^[0-9]$/)
+                  .optional(),
                 'marker-color': z.string().optional(),
                 stroke: z.string().optional(),
                 'stroke-width': z.number().nonnegative().optional(),
@@ -48,6 +52,15 @@ export const EditorialPublicGeometrySchema = z
             ])
           })
           .strict()
+          .superRefine((feature, context) => {
+            if (feature.properties.iconContent !== undefined && feature.geometry.type !== 'Point') {
+              context.addIssue({
+                code: 'custom',
+                path: ['properties', 'iconContent'],
+                message: 'iconContent requires a Point'
+              });
+            }
+          })
       )
       .min(1)
   })
