@@ -40,9 +40,12 @@ export const readSavedParcels = async (directory: string): Promise<readonly Save
       if (used.has(code)) throw new Error(`duplicate saved code ${code}`);
       used.add(code);
     }
-    if (numbers.has(record.data.cadastral_number))
-      throw new Error(`duplicate saved cadastral number ${record.data.cadastral_number}`);
-    numbers.add(record.data.cadastral_number);
+    for (const number of record.data.cadastral_parts?.map((part) => part.cadastral_number) ?? [
+      record.data.cadastral_number!
+    ]) {
+      if (numbers.has(number)) throw new Error(`duplicate saved cadastral number ${number}`);
+      numbers.add(number);
+    }
   }
   return records;
 };

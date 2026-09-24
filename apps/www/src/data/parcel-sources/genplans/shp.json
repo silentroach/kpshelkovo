@@ -1,7 +1,7 @@
 {
   "part": "shp",
   "page": "https://dgtime.ru/shp/shp-genplan/",
-  "capturedAt": "2026-09-22T20:59:11.211Z",
+  "capturedAt": "2026-09-24T06:30:06.953Z",
   "plots": [
     {
       "id": "B1",
@@ -3658,65 +3658,65 @@
     {
       "id": "А78",
       "cadastralReference": "50:33:0010101:2641",
-      "status": "Снят с продажи",
+      "status": "Свободен",
       "location": "луговой",
-      "objectprice": 3568950
+      "objectprice": 5983950
     },
     {
       "id": "А79",
       "cadastralReference": "50:33:0010101:2629",
-      "status": "Снят с продажи",
+      "status": "Свободен",
       "location": "луговой",
-      "objectprice": 2719150
+      "objectprice": 3654150
     },
     {
       "id": "А80",
       "cadastralReference": "50:33:0010101:2618",
-      "status": "Снят с продажи",
+      "status": "Свободен",
       "location": "луговой",
-      "objectprice": 2399200
+      "objectprice": 3359200
     },
     {
       "id": "А81",
       "cadastralReference": "50:33:0010101:2674",
-      "status": "Снят с продажи",
+      "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 2559200
+      "objectprice": 4159200
     },
     {
       "id": "А82",
       "cadastralReference": "50:33:0010101:2663",
-      "status": "Снят с продажи",
+      "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 3199000
+      "objectprice": 5399000
     },
     {
       "id": "А83",
       "cadastralReference": "50:33:0010101:2652",
-      "status": "Снят с продажи",
+      "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 3738900
+      "objectprice": 6268900
     },
     {
       "id": "А84",
       "cadastralReference": "50:33:0010101:2707",
-      "status": "Снят с продажи",
+      "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4066870
+      "objectprice": 6891870
     },
     {
       "id": "А85",
       "cadastralReference": "50:33:0010101:2696",
-      "status": "Снят с продажи",
+      "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 3039050
+      "objectprice": 5129050
     },
     {
       "id": "А86",
       "cadastralReference": "50:33:0010101:2685",
-      "status": "Снят с продажи",
+      "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 2559200
+      "objectprice": 4159200
     }
   ]
 }

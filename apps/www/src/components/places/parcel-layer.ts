@@ -52,13 +52,29 @@ export const createParcelLayer = (
     if (!value) throw new Error(`Не найден цвет карты ${name}`);
     return value;
   };
-  const normalStyle = (): DrawingStyle => ({
-    zIndex: -1,
-    interactive: true,
-    simplificationRate: 0,
-    fillOpacity: 0,
-    stroke: [{ color: token('--color-text-muted'), width: 1, opacity: 0.5 }]
-  });
+  const normalStyle = (item: ParcelMapItem): DrawingStyle => {
+    const fill =
+      item.status === 'available' || item.status === 'reserved'
+        ? token('--color-accent')
+        : item.status === 'unavailable'
+          ? 'oklch(88% 0 0)'
+          : undefined;
+    return {
+      zIndex: -1,
+      interactive: true,
+      simplificationRate: 0,
+      ...(fill
+        ? { fill, fillOpacity: item.status === 'unavailable' ? 0.25 : 0.22 }
+        : { fillOpacity: 0 }),
+      stroke: [
+        {
+          color: token('--color-text-muted'),
+          width: 1,
+          opacity: item.status === 'unavailable' ? 0.2 : 0.5
+        }
+      ]
+    };
+  };
   const selectedStyle = (): DrawingStyle => ({
     zIndex: -1,
     interactive: true,
@@ -71,7 +87,7 @@ export const createParcelLayer = (
   const clearSelection = (): void => {
     if (timer !== undefined) window.clearTimeout(timer);
     timer = undefined;
-    if (selected) features.get(selected.code)?.update({ style: normalStyle() });
+    if (selected) features.get(selected.code)?.update({ style: normalStyle(selected) });
     selected = undefined;
   };
 
@@ -107,6 +123,7 @@ export const createParcelLayer = (
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'parcel-map-label';
+        if (item.status === 'unavailable') button.classList.add('parcel-map-label--unavailable');
         const text = document.createElement('span');
         text.textContent = item.code.split('-')[1] ?? item.code;
         button.append(text);
@@ -147,7 +164,7 @@ export const createParcelLayer = (
         const feature = new sdk.YMapFeature({
           id: `parcel-${item.code}`,
           geometry: toMapGeometry(item.geometry),
-          style: normalStyle(),
+          style: normalStyle(item),
           onClick: () => select(item)
         });
         features.set(item.code, feature);

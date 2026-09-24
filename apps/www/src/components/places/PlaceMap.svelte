@@ -985,6 +985,19 @@
     line-height: 1.25;
   }
 
+  :global(.parcel-map-label--unavailable span) {
+    border-color: color-mix(in srgb, var(--color-border-strong) 25%, transparent);
+    background: color-mix(in srgb, var(--color-neutral-border) 25%, var(--color-surface) 75%);
+  }
+
+  :global(.parcel-map-label--unavailable) {
+    opacity: 0.7;
+  }
+
+  :global(.parcel-map-label--unavailable:focus-visible) {
+    opacity: 1;
+  }
+
   .place-map__canvas :global(:is(a, button):focus-visible) {
     outline: 0.1875rem solid var(--color-focus);
     outline-offset: 0.125rem;

@@ -19,18 +19,68 @@ export const resolveParcels = (
   const grouped = new Map<string, { plots: typeof plots; match?: ConfirmedMatches[number] }>();
   const unresolved: string[] = [];
   const conflicts: string[] = [];
+  const candidates: ParcelCandidate[] = [];
+  const claimed = new Map<string, string>();
+
+  for (const match of matches) {
+    const numbers = match.cadastral_numbers;
+    if (!numbers) continue;
+    const active = match.codes.flatMap((code) => {
+      const plot = byCode.get(code);
+      return plot ? [plot] : [];
+    });
+    if (!active.length) continue;
+    const collision = numbers.find((number) => claimed.has(number));
+    if (collision) {
+      conflicts.push(`${active[0]?.code}: multiple confirmations for ${collision}`);
+      continue;
+    }
+    for (const number of numbers) claimed.set(number, active[0]!.code);
+    const stale = active.find((plot) => {
+      const saved = match.source_cadastral_references[plot.code];
+      return typeof saved === 'string'
+        ? plot.cadastralReference !== saved
+        : plot.cadastralReference !== undefined;
+    });
+    if (stale) {
+      const saved = match.source_cadastral_references[stale.code];
+      conflicts.push(
+        `${stale.code}: confirmed reference changed: ${stale.cadastralReference ?? 'absent'} (was ${typeof saved === 'string' ? saved : 'absent'})`
+      );
+      continue;
+    }
+    const missing = numbers.filter((number) => !features.has(number));
+    if (missing.length) {
+      unresolved.push(
+        `${active.map((plot) => plot.code).join(', ')}: incomplete confirmed group, no cadastral contour ${missing.join(', ')}`
+      );
+      continue;
+    }
+    const parts = numbers.map((number) => features.get(number)!);
+    candidates.push({
+      cadastralNumber: numbers[0]!,
+      feature: parts[0]!,
+      parts,
+      plots: active.toSorted((a, b) => a.code.localeCompare(b.code)),
+      match
+    });
+  }
 
   for (const plot of plots) {
     const match = confirmed.get(plot.code);
+    if (match?.cadastral_numbers) continue;
     if (match) {
       // Missing former aliases are fine, but a changed source reference voids the confirmation.
       const active = match.codes.filter((code) => byCode.has(code));
-      const stale = active.find(
-        (code) => byCode.get(code)?.cadastralReference !== match.source_cadastral_references[code]
-      );
+      const stale = active.find((code) => {
+        const saved = match.source_cadastral_references[code];
+        const current = byCode.get(code)?.cadastralReference;
+        return typeof saved === 'string' ? current !== saved : current !== undefined;
+      });
       if (stale) {
+        const saved = match.source_cadastral_references[stale];
         conflicts.push(
-          `${plot.code}: confirmed reference changed for ${stale}: ${String(byCode.get(stale)?.cadastralReference)} (was ${match.source_cadastral_references[stale]})`
+          `${plot.code}: confirmed reference changed for ${stale}: ${byCode.get(stale)?.cadastralReference ?? 'absent'} (was ${typeof saved === 'string' ? saved : 'absent'})`
         );
         continue;
       }
@@ -44,6 +94,10 @@ export const resolveParcels = (
       unresolved.push(
         `${plot.code}: ${number ? `no cadastral contour ${number}` : `unmatched reference ${String(plot.cadastralReference)}`}`
       );
+      continue;
+    }
+    if (claimed.has(number)) {
+      conflicts.push(`${plot.code}: direct reference collides with confirmed group ${number}`);
       continue;
     }
     const group = grouped.get(number) ?? { plots: [], match };
@@ -65,7 +119,6 @@ export const resolveParcels = (
     grouped.set(number, group);
   }
 
-  const candidates: ParcelCandidate[] = [];
   for (const [cadastralNumber, group] of grouped) {
     const feature = features.get(cadastralNumber);
     if (!feature) throw new Error(`missing validated feature ${cadastralNumber}`);

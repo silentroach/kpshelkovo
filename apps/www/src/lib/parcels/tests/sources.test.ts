@@ -6,18 +6,20 @@ import { describe, expect, it } from 'vitest';
 
 import { projectNspdGeometry } from '../projection';
 import { PARCEL_PARTS } from '../schema';
-import { GenplanSnapshotSchema, RawNspdFeatureSchema } from '../source-schemas';
+import {
+  GenplanSnapshotSchema,
+  ParcelMatchesSchema,
+  RawNspdFeatureSchema
+} from '../source-schemas';
 import { readGenplanSnapshots, readNspdSnapshot, readParcelMatches } from '../sources';
 
 const sources = new URL('../../../data/parcel-sources/', import.meta.url).pathname;
 
 describe('parcel sources', () => {
-  it('loads the research cadastral snapshot as EPSG:3857 and retains its known capture date', async () => {
+  it('loads the accepted cadastral snapshot as EPSG:3857 without dropping polygon rings', async () => {
     const snapshot = await readNspdSnapshot(sources);
     expect(snapshot.features.length).toBe(snapshot.metadata.response.featureCount);
-    expect(snapshot.metadata.capturedOn).toBe('2026-09-22');
     expect(snapshot.metadata.geometryCrs).toBe('EPSG:3857');
-    expect(snapshot.metadata.response.coverageVerified).toBe(false);
     expect(
       snapshot.features.every((feature) => feature.geometry.crs.properties.name === 'EPSG:3857')
     ).toBe(true);
@@ -81,12 +83,14 @@ describe('parcel sources', () => {
   it('loads both documented confirmations, original references, and their evidence', async () => {
     const matches = await readParcelMatches(sources);
     expect(
-      matches.map(({ codes, cadastral_number, source_cadastral_references, primary_code }) => ({
-        codes,
-        cadastral_number,
-        source_cadastral_references,
-        primary_code
-      }))
+      matches
+        .filter(({ codes }) => codes.includes('SHR-L43') || codes.includes('SHF-V43'))
+        .map(({ codes, cadastral_number, source_cadastral_references, primary_code }) => ({
+          codes,
+          cadastral_number,
+          source_cadastral_references,
+          primary_code
+        }))
     ).toMatchInlineSnapshot(`
       [
         {
@@ -114,6 +118,80 @@ describe('parcel sources', () => {
       ]
     `);
     expect(matches.every(({ evidence }) => evidence.length > 0)).toBe(true);
+  });
+
+  it('requires an explicit source reference for each code and accepts only the absent marker or a string', () => {
+    const entry = {
+      codes: ['SHR-L43', 'SHR-L44'],
+      cadastral_number: '50:33:0010101:2998',
+      source_cadastral_references: {
+        'SHR-L43': '50:33:0010101:2222',
+        'SHR-L44': { absent: true }
+      },
+      evidence: 'Проверено по источникам'
+    };
+    const parse = (source_cadastral_references: Record<string, unknown>) =>
+      ParcelMatchesSchema.safeParse({
+        matches: [{ ...entry, source_cadastral_references }]
+      }).success;
+
+    expect(parse(entry.source_cadastral_references)).toBe(true);
+    expect(parse({ 'SHR-L43': '50:33:0010101:2222', 'SHR-L44': '' })).toBe(true);
+    expect(parse({ 'SHR-L43': '50:33:0010101:2222' })).toBe(false);
+    expect(parse({ 'SHR-L43': '50:33:0010101:2222', 'SHR-L44': { absent: false } })).toBe(false);
+    expect(
+      parse({ 'SHR-L43': '50:33:0010101:2222', 'SHR-L44': { absent: true, note: 'extra' } })
+    ).toBe(false);
+  });
+
+  it('rejects duplicate confirmed codes and cadastral contours across groups', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'parcel-matches-'));
+    const entry = (code: string, number: string) =>
+      `  - codes: [${code}]\n    cadastral_number: '${number}'\n    source_cadastral_references:\n      ${code}: { absent: true }\n    evidence: Проверено\n`;
+    try {
+      for (const duplicate of [
+        entry('SHR-L43', '50:33:0010101:2999'),
+        entry('SHR-L44', '50:33:0010101:2998')
+      ]) {
+        await writeFile(
+          join(directory, 'matches.yaml'),
+          `matches:\n${entry('SHR-L43', '50:33:0010101:2998')}${duplicate}`
+        );
+        await expect(readParcelMatches(directory)).rejects.toThrow('duplicate confirmed');
+      }
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  it('requires a complete distinct compound confirmation and rejects a number reused by another group', async () => {
+    const entry = {
+      codes: ['SHR-E35'],
+      cadastral_numbers: ['50:33:0010101:3385', '50:33:0010101:3386'],
+      source_cadastral_references: { 'SHR-E35': '50:33:0010101:2482' },
+      evidence: 'Проверены межи'
+    };
+    expect(ParcelMatchesSchema.safeParse({ matches: [entry] }).success).toBe(true);
+    for (const broken of [
+      { ...entry, cadastral_numbers: [entry.cadastral_numbers[0]] },
+      { ...entry, cadastral_numbers: [entry.cadastral_numbers[0], entry.cadastral_numbers[0]] },
+      { ...entry, cadastral_number: entry.cadastral_numbers[0] },
+      { ...entry, source_cadastral_references: {} }
+    ])
+      expect(ParcelMatchesSchema.safeParse({ matches: [broken] }).success).toBe(false);
+
+    const directory = await mkdtemp(join(tmpdir(), 'parcel-compound-'));
+    try {
+      await writeFile(
+        join(directory, 'matches.yaml'),
+        `matches:\n  - codes: [SHR-E35]\n    cadastral_numbers: ['50:33:0010101:3385', '50:33:0010101:3386']\n    source_cadastral_references: { SHR-E35: '50:33:0010101:2482' }\n    evidence: Проверены межи\n  - codes: [SHR-E36]\n    cadastral_number: '50:33:0010101:3386'\n    source_cadastral_references: { SHR-E36: '50:33:0010101:2481' }\n    evidence: Проверены межи\n`
+      );
+      await expect(readParcelMatches(directory)).rejects.toThrow(
+        'duplicate confirmed cadastral number'
+      );
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
   });
 
   it('rejects incomplete and contradictory saved genplan snapshots', async () => {

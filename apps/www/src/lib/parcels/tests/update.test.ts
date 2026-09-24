@@ -73,7 +73,7 @@ const plans = (
 const match = (
   codes: readonly string[],
   number: string,
-  references: Record<string, string>,
+  references: Record<string, string | { absent: true }>,
   primary?: string
 ): ConfirmedMatches => [
   {
@@ -129,6 +129,133 @@ describe('parcel matching and updating', () => {
     expect(resolveParcels(changed, nspd([a, b]), confirmed).conflicts).toContain(
       'SHR-L43: confirmed reference changed for SHR-L44: 50:33:0010101:2998 (was 50:33:0010101:3000)'
     );
+  });
+
+  it('reuses a confirmed absent reference, but flags any new reference even to its target', () => {
+    const confirmed = match(['SHR-L43'], a, { 'SHR-L43': { absent: true } });
+    const original = plans([{ id: 'L43' }]);
+    const first = reconcileParcels(original, nspd([a]), confirmed, []);
+    expect(first.records[0]?.data.code).toBe('SHR-L43');
+    const repeated = reconcileParcels(original, nspd([a]), confirmed, saved(first));
+    expect([repeated.added, repeated.deleted, repeated.conflicts]).toEqual([[], [], []]);
+    for (const number of [a, b]) {
+      const changed = resolveParcels(
+        plans([{ id: 'L43', cadastralReference: number }]),
+        nspd([a, b]),
+        confirmed
+      );
+      expect(changed.candidates).toEqual([]);
+      expect(changed.conflicts).toContain(
+        `SHR-L43: confirmed reference changed for SHR-L43: ${number} (was absent)`
+      );
+    }
+  });
+
+  it('imports a compound group once, preserves its history on repeat, and never publishes a partial group', () => {
+    const source = plans([{ id: 'E35', cadastralReference: c, objectprice: 200 }]);
+    const confirmed: ConfirmedMatches = [
+      {
+        codes: ['SHR-E35'],
+        cadastral_numbers: [a, b],
+        source_cadastral_references: { 'SHR-E35': c },
+        evidence: 'Проверены межи'
+      }
+    ];
+    const first = reconcileParcels(source, nspd([a, b]), confirmed, []);
+    expect(
+      first.records[0]?.data.cadastral_parts?.map(({ cadastral_number, area_m2 }) => ({
+        cadastral_number,
+        area_m2
+      }))
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "area_m2": 2150,
+          "cadastral_number": "50:33:0010101:2998",
+        },
+        {
+          "area_m2": 2150,
+          "cadastral_number": "50:33:0010101:2999",
+        },
+      ]
+    `);
+    expect(first.records[0]?.data.cadastral_number).toBeUndefined();
+    const repeated = reconcileParcels(source, nspd([a, b]), confirmed, saved(first));
+    expect([
+      repeated.added,
+      repeated.deleted,
+      repeated.geometryChanged,
+      repeated.detailsChanged,
+      repeated.records[0]?.data.price_history
+    ]).toMatchInlineSnapshot(`
+      [
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "on": "2026-09-22",
+            "price": 200,
+          },
+        ],
+      ]
+    `);
+    expect(repeated.records[0]?.body).toBe(saved(first)[0]?.body);
+    const incomplete = reconcileParcels(source, nspd([a]), confirmed, saved(first));
+    expect(incomplete.records).toEqual([]);
+    expect(incomplete.unresolved).toContain(
+      `SHR-E35: incomplete confirmed group, no cadastral contour ${b}`
+    );
+    expect(
+      resolveParcels(plans([{ id: 'E35', cadastralReference: a }]), nspd([a, b]), confirmed)
+        .conflicts[0]
+    ).toContain('confirmed reference changed');
+    const colliding = resolveParcels(
+      plans([
+        { id: 'E35', cadastralReference: c },
+        { id: 'E36', cadastralReference: b }
+      ]),
+      nspd([a, b]),
+      confirmed
+    );
+    expect(colliding.candidates).toHaveLength(1);
+    expect(colliding.conflicts).toContain(
+      `SHR-E36: direct reference collides with confirmed group ${b}`
+    );
+    const renamed = reconcileParcels(
+      plans([{ id: 'E36', cadastralReference: c }]),
+      nspd([a, b]),
+      [{ ...confirmed[0]!, codes: ['SHR-E36'], source_cadastral_references: { 'SHR-E36': c } }],
+      saved(first)
+    );
+    expect(renamed.records).toEqual([]);
+    expect(renamed.conflicts[0]).toContain('cadastral group identity changed');
+  });
+
+  it('checks the entire mixed-reference group and tolerates a vanished alias', () => {
+    const confirmed = match(
+      ['SHR-L43', 'SHR-L44'],
+      a,
+      { 'SHR-L43': b, 'SHR-L44': { absent: true } },
+      'SHR-L43'
+    );
+    const original = plans([{ id: 'L43', cadastralReference: b }, { id: 'L44' }]);
+    expect(
+      resolveParcels(original, nspd([a]), confirmed).candidates[0]?.plots.map(({ code }) => code)
+    ).toEqual(['SHR-L43', 'SHR-L44']);
+    const changed = resolveParcels(plans([{ id: 'L43' }, { id: 'L44' }]), nspd([a]), confirmed);
+    expect(changed.candidates).toEqual([]);
+    expect(changed.conflicts).toContain(
+      `SHR-L43: confirmed reference changed for SHR-L43: absent (was ${b})`
+    );
+    expect(
+      resolveParcels(
+        plans([{ id: 'L43', cadastralReference: b }]),
+        nspd([a]),
+        confirmed
+      ).candidates[0]?.plots.map(({ code }) => code)
+    ).toEqual(['SHR-L43']);
   });
 
   it('keeps confirmed parcels when a direct collision arrives before or after them', () => {
@@ -679,14 +806,14 @@ describe('parcel matching and updating', () => {
     }
   });
 
-  it('rejects changed metadata for an unverified cadastral repeat without changing accepted data', async () => {
+  it('rejects an unverified cadastral replacement without changing accepted data', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'parcel-nspd-'));
     const sources = new URL('../../../data/parcel-sources/', import.meta.url);
     const accepted = await readFile(new URL('nspd.json', sources), 'utf8');
     try {
       await copyFile(new URL('nspd.ndjson', sources), join(directory, 'nspd.ndjson'));
       const metadata = JSON.parse(accepted);
-      metadata.capturedOn = '2026-09-24';
+      metadata.response.coverageVerified = false;
       await writeFile(join(directory, 'nspd.json'), JSON.stringify(metadata));
       const script = new URL('../../../../scripts/parcels/update.ts', import.meta.url);
       const result = spawnSync(

@@ -69,10 +69,12 @@ export const readParcelMatches = async (directory: string): Promise<ConfirmedMat
   const numbers = new Set<string>();
 
   for (const match of matches) {
-    if (numbers.has(match.cadastral_number)) {
-      throw new Error(`duplicate confirmed cadastral number ${match.cadastral_number}`);
+    for (const number of match.cadastral_numbers ?? [match.cadastral_number!]) {
+      if (numbers.has(number)) {
+        throw new Error(`duplicate confirmed cadastral number ${number}`);
+      }
+      numbers.add(number);
     }
-    numbers.add(match.cadastral_number);
     for (const code of match.codes) {
       if (codes.has(code)) throw new Error(`duplicate confirmed code ${code}`);
       codes.add(code);
