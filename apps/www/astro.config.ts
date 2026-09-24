@@ -7,6 +7,7 @@ import svelte from '@astrojs/svelte';
 import compressor from 'astro-compressor';
 import { defineConfig, type AstroIntegration } from 'astro/config';
 
+import { clientBundleAnalysis } from './src/integrations/client-bundle-analysis';
 import { indexNowUrlManifest } from './src/integrations/indexnow-url-manifest';
 import { pagefindDevSnapshot } from './src/integrations/pagefind-dev-snapshot';
 import { statusCalendarAlternateValidation } from './src/integrations/status-calendar-alternate-validation';
@@ -91,6 +92,7 @@ export default defineConfig({
     }
   },
   integrations: [
+    process.env.BUNDLE_ANALYZE === '1' && clientBundleAnalysis(),
     pagefindDevSnapshot(),
     svelte(),
     preloadSitemapMetadata(),

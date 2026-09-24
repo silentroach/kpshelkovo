@@ -8,6 +8,7 @@
     "dev": "turbo run dev",
     "start": "pnpm dev",
     "build": "turbo run build",
+    "bundle:analyze": "pnpm --filter @shelkovo/www bundle:analyze",
     "search:prepare": "pnpm --filter @shelkovo/www search:prepare",
     "preview": "turbo run preview",
     "typecheck": "turbo run typecheck",

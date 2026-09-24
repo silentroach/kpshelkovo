@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build && node scripts/build-search-index.ts && node ../../scripts/compress-pagefind.mjs dist/site/search && rm -rf ../../dist/www && mkdir -p ../../dist && cp -R dist/site ../../dist/www",
+    "bundle:analyze": "BUNDLE_ANALYZE=1 pnpm build && node scripts/bundle-assets.ts",
     "search:prepare": "rm -rf ../../.cache/pagefind && astro build && node scripts/build-search-index.ts ../../.cache/pagefind",
     "preview": "astro preview",
     "typecheck": "astro sync && tsc --noEmit",
@@ -71,6 +72,7 @@
     "pagefind": "1.5.2",
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
+    "rollup-plugin-visualizer": "^7.1.1",
     "sharp": "^0.35.4",
     "typescript": "^7.0.2",
     "unified": "^11.0.5",
