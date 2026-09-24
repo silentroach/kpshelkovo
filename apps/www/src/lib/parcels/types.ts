@@ -21,12 +21,17 @@ export interface ParcelPriceObservation {
   readonly price: number;
 }
 
+export interface ParcelCadastralPart {
+  readonly cadastralNumber: string;
+  readonly geometry: ParcelGeometry;
+  readonly areaM2?: number;
+}
+
 export interface Parcel {
   readonly code: string;
   readonly aliases: readonly string[];
   readonly part: ParcelPart;
-  readonly cadastralNumber: string;
-  readonly geometry: ParcelGeometry;
+  readonly cadastralParts: readonly ParcelCadastralPart[];
   readonly areaM2?: number;
   readonly status?: ParcelStatus;
   readonly features: readonly ParcelFeature[];

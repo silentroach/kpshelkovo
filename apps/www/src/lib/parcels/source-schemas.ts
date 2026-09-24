@@ -138,7 +138,8 @@ export const ParcelMatchesSchema = z
       z
         .object({
           codes: z.array(code).min(1),
-          cadastral_number: cadastralNumber,
+          cadastral_number: cadastralNumber.optional(),
+          cadastral_numbers: z.array(cadastralNumber).min(2).optional(),
           source_cadastral_references: z.record(
             code,
             z.union([z.string(), z.object({ absent: z.literal(true) }).strict()])
@@ -150,6 +151,19 @@ export const ParcelMatchesSchema = z
         })
         .strict()
         .superRefine((match, ctx) => {
+          if (Boolean(match.cadastral_number) === Boolean(match.cadastral_numbers)) {
+            ctx.addIssue({ code: 'custom', message: 'specify exactly one cadastral form' });
+          }
+          if (
+            match.cadastral_numbers &&
+            new Set(match.cadastral_numbers).size !== match.cadastral_numbers.length
+          ) {
+            ctx.addIssue({
+              code: 'custom',
+              path: ['cadastral_numbers'],
+              message: 'duplicate cadastral numbers in group'
+            });
+          }
           const codes = new Set(match.codes);
           if (codes.size !== match.codes.length) {
             ctx.addIssue({ code: 'custom', path: ['codes'], message: 'duplicate match codes' });

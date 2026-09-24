@@ -151,6 +151,88 @@ describe('parcel matching and updating', () => {
     }
   });
 
+  it('imports a compound group once, preserves its history on repeat, and never publishes a partial group', () => {
+    const source = plans([{ id: 'E35', cadastralReference: c, objectprice: 200 }]);
+    const confirmed: ConfirmedMatches = [
+      {
+        codes: ['SHR-E35'],
+        cadastral_numbers: [a, b],
+        source_cadastral_references: { 'SHR-E35': c },
+        evidence: 'Проверены межи'
+      }
+    ];
+    const first = reconcileParcels(source, nspd([a, b]), confirmed, []);
+    expect(
+      first.records[0]?.data.cadastral_parts?.map(({ cadastral_number, area_m2 }) => ({
+        cadastral_number,
+        area_m2
+      }))
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "area_m2": 2150,
+          "cadastral_number": "50:33:0010101:2998",
+        },
+        {
+          "area_m2": 2150,
+          "cadastral_number": "50:33:0010101:2999",
+        },
+      ]
+    `);
+    expect(first.records[0]?.data.cadastral_number).toBeUndefined();
+    const repeated = reconcileParcels(source, nspd([a, b]), confirmed, saved(first));
+    expect([
+      repeated.added,
+      repeated.deleted,
+      repeated.geometryChanged,
+      repeated.detailsChanged,
+      repeated.records[0]?.data.price_history
+    ]).toMatchInlineSnapshot(`
+      [
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "on": "2026-09-22",
+            "price": 200,
+          },
+        ],
+      ]
+    `);
+    expect(repeated.records[0]?.body).toBe(saved(first)[0]?.body);
+    const incomplete = reconcileParcels(source, nspd([a]), confirmed, saved(first));
+    expect(incomplete.records).toEqual([]);
+    expect(incomplete.unresolved).toContain(
+      `SHR-E35: incomplete confirmed group, no cadastral contour ${b}`
+    );
+    expect(
+      resolveParcels(plans([{ id: 'E35', cadastralReference: a }]), nspd([a, b]), confirmed)
+        .conflicts[0]
+    ).toContain('confirmed reference changed');
+    const colliding = resolveParcels(
+      plans([
+        { id: 'E35', cadastralReference: c },
+        { id: 'E36', cadastralReference: b }
+      ]),
+      nspd([a, b]),
+      confirmed
+    );
+    expect(colliding.candidates).toHaveLength(1);
+    expect(colliding.conflicts).toContain(
+      `SHR-E36: direct reference collides with confirmed group ${b}`
+    );
+    const renamed = reconcileParcels(
+      plans([{ id: 'E36', cadastralReference: c }]),
+      nspd([a, b]),
+      [{ ...confirmed[0]!, codes: ['SHR-E36'], source_cadastral_references: { 'SHR-E36': c } }],
+      saved(first)
+    );
+    expect(renamed.records).toEqual([]);
+    expect(renamed.conflicts[0]).toContain('cadastral group identity changed');
+  });
+
   it('checks the entire mixed-reference group and tolerates a vanished alias', () => {
     const confirmed = match(
       ['SHR-L43', 'SHR-L44'],

@@ -9,28 +9,32 @@ const parcel: Parcel = {
   code: 'SHR-L43',
   aliases: ['SHR-L44'],
   part: 'shr',
-  cadastralNumber: '50:33:0000000:43',
-  geometry: {
-    type: 'MultiPolygon',
-    coordinates: [
-      [
-        [
-          [37, 55],
-          [37.01, 55],
-          [37.01, 55.01],
-          [37, 55]
+  cadastralParts: [
+    {
+      cadastralNumber: '50:33:0000000:43',
+      geometry: {
+        type: 'MultiPolygon',
+        coordinates: [
+          [
+            [
+              [37, 55],
+              [37.01, 55],
+              [37.01, 55.01],
+              [37, 55]
+            ]
+          ],
+          [
+            [
+              [37.02, 55.02],
+              [37.03, 55.02],
+              [37.03, 55.03],
+              [37.02, 55.02]
+            ]
+          ]
         ]
-      ],
-      [
-        [
-          [37.02, 55.02],
-          [37.03, 55.02],
-          [37.03, 55.03],
-          [37.02, 55.02]
-        ]
-      ]
-    ]
-  },
+      }
+    }
+  ],
   areaM2: 1500,
   status: 'available',
   features: ['meadow'],
@@ -63,7 +67,7 @@ describe('parcel public payloads', () => {
     expect(label?.[0]).toBeLessThan(37.03);
     expect(label?.[1]).toBeGreaterThan(55.02);
     expect(label?.[1]).toBeLessThan(55.03);
-    expect(payload[0]?.geometry).toEqual(parcel.geometry);
+    expect(payload[0]?.geometry).toEqual(parcel.cadastralParts[0]?.geometry);
     expect(Object.keys(payload[0] ?? {}).sort()).toMatchInlineSnapshot(`
       [
         "aliases",
@@ -109,15 +113,17 @@ describe('parcel public payloads', () => {
 
   it('omits empty aliases while keeping every ring of Polygon and MultiPolygon', () => {
     const coordinates =
-      parcel.geometry.type === 'MultiPolygon'
-        ? parcel.geometry.coordinates[0]
-        : parcel.geometry.coordinates;
+      parcel.cadastralParts[0]?.geometry.type === 'MultiPolygon'
+        ? parcel.cadastralParts[0].geometry.coordinates[0]
+        : parcel.cadastralParts[0]?.geometry.coordinates;
     if (!coordinates) throw new Error('polygon missing');
     const single = {
       ...parcel,
       code: 'SHR-L45',
       aliases: [],
-      geometry: { type: 'Polygon' as const, coordinates }
+      cadastralParts: [
+        { cadastralNumber: '50:33:0000000:45', geometry: { type: 'Polygon' as const, coordinates } }
+      ]
     };
     const payload = buildParcelMapPayload([parcel, single], {
       offset_east_m: 0,
@@ -125,8 +131,8 @@ describe('parcel public payloads', () => {
     });
     expect(Array.isArray(payload)).toBe(true);
     expect(payload[1]?.aliases).toBeUndefined();
-    expect(payload[1]?.geometry).toEqual(single.geometry);
-    expect(payload[0]?.geometry).toEqual(parcel.geometry);
+    expect(payload[1]?.geometry).toEqual(single.cadastralParts[0]?.geometry);
+    expect(payload[0]?.geometry).toEqual(parcel.cadastralParts[0]?.geometry);
     expect(ParcelMapPublicSchema.safeParse({ parcels: payload }).success).toBe(false);
   });
 
@@ -163,5 +169,38 @@ describe('parcel public payloads', () => {
       ]
     `);
     expect(payload[4]).not.toHaveProperty('status');
+  });
+
+  it('keeps each cadastral boundary and hole while distinguishing a group from a single MultiPolygon', () => {
+    const first = parcel.cadastralParts[0];
+    if (!first || first.geometry.type !== 'MultiPolygon') throw new Error('missing geometry');
+    const second = {
+      cadastralNumber: '50:33:0000000:44',
+      geometry: {
+        type: 'Polygon' as const,
+        coordinates: [
+          first.geometry.coordinates[0]![0]!,
+          [
+            [37.001, 55.001],
+            [37.002, 55.001],
+            [37.002, 55.002],
+            [37.001, 55.001]
+          ] as const
+        ]
+      },
+      areaM2: 500
+    };
+    const payload = buildParcelMapPayload(
+      [{ ...parcel, code: 'SHR-E35', cadastralParts: [first, second] }, parcel],
+      { offset_east_m: 0, offset_north_m: 0 }
+    );
+    expect(payload[0]?.multipleCadastralParcels).toBe(true);
+    expect(payload[1]).not.toHaveProperty('multipleCadastralParcels');
+    expect(payload[0]?.geometry).toMatchObject({
+      type: 'MultiPolygon',
+      coordinates: [...first.geometry.coordinates, second.geometry.coordinates]
+    });
+    expect(payload[0]?.labelCoordinates).toHaveLength(2);
+    expect(payload[0]).not.toHaveProperty('cadastralNumber');
   });
 });

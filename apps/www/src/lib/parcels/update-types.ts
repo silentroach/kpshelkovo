@@ -5,6 +5,7 @@ import type { MappedGenplanPlot, MappedGenplanSnapshot } from './source-types.ts
 export interface ParcelCandidate {
   readonly cadastralNumber: string;
   readonly feature: RawNspdFeature;
+  readonly parts?: readonly RawNspdFeature[];
   readonly plots: readonly MappedGenplanPlot[];
   readonly match?: ParcelMatches['matches'][number];
 }

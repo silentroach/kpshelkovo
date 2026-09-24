@@ -19,13 +19,15 @@ export const buildParcelsDataset = (entries: readonly ParcelEntry[]): ParcelsDat
       byCode.set(code, parcel);
     }
 
-    const previous = byCadastralNumber.get(parcel.cadastralNumber);
-    if (previous) {
-      throw new Error(
-        `parcel cadastral number "${parcel.cadastralNumber}" conflicts between "${previous.code}" and "${parcel.code}"`
-      );
+    for (const part of parcel.cadastralParts) {
+      const previous = byCadastralNumber.get(part.cadastralNumber);
+      if (previous) {
+        throw new Error(
+          `parcel cadastral number "${part.cadastralNumber}" conflicts between "${previous.code}" and "${parcel.code}"`
+        );
+      }
+      byCadastralNumber.set(part.cadastralNumber, parcel);
     }
-    byCadastralNumber.set(parcel.cadastralNumber, parcel);
   }
 
   return { parcels, byCode, byCadastralNumber };

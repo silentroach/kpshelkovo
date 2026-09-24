@@ -1517,6 +1517,62 @@ describe('PlaceMap', () => {
     expect(map.removeChild).toHaveBeenCalledWith(labelMarker);
   });
 
+  it('selects both contours without extra text for a compound position', async () => {
+    const group = {
+      ...parcel,
+      code: 'SHR-E35',
+      aliases: [],
+      multipleCadastralParcels: true,
+      geometry: {
+        type: 'MultiPolygon',
+        coordinates: [parcel.geometry.coordinates, parcel.geometry.coordinates]
+      }
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Response.json([group, parcel]))
+    );
+    const timeout = vi.spyOn(window, 'setTimeout');
+    window.history.replaceState({}, '', '/map/?p=SHR-E35');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    const feature = areaFeatures.find(({ props }) => props.id === 'parcel-SHR-E35');
+    expect(feature?.props.geometry).toMatchObject({
+      type: 'MultiPolygon',
+      coordinates: [parcel.geometry.coordinates, parcel.geometry.coordinates]
+    });
+    expect(feature?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+    const markersBeforeSelection = markerElements.length;
+    feature?.props.onClick?.(new MouseEvent('click'), {} as never);
+    expect(markerElements).toHaveLength(markersBeforeSelection);
+    expect(feature?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+
+    const expire = timeout.mock.calls.findLast(([, delay]) => delay === 5_000)?.[0];
+    if (typeof expire !== 'function') throw new Error('missing selection timeout');
+    expire();
+    expect(feature?.update.mock.lastCall?.[0].style).toEqual(feature?.props.style);
+    mapUpdateHandlers[0]?.({
+      type: 'update',
+      location: { center: [37.715, 55.065], zoom: 17, bounds: map.bounds },
+      camera: {},
+      mapInAction: false
+    });
+    const label = markerElements.find(
+      (element) => element.classList.contains('parcel-map-label') && element.title === 'SHR-E35'
+    );
+    if (!label) throw new Error('group label missing');
+    await fireEvent.click(label);
+    expect(markerElements.every((element) => !element.classList.contains('parcel-map-hint'))).toBe(
+      true
+    );
+    expect(feature?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+    const single = areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43');
+    single?.props.onClick?.(new MouseEvent('click'), {} as never);
+    expect(single?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+    expect(feature?.update.mock.lastCall?.[0].style).toEqual(feature?.props.style);
+  });
+
   it('shades known sale statuses only while restoring each parcel after selection', async () => {
     const parcels = (['available', 'reserved', 'unavailable', 'sold', undefined] as const).map(
       (status, index) => ({

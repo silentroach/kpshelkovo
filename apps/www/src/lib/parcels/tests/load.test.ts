@@ -37,11 +37,11 @@ describe('parcel dataset', () => {
     const dataset = buildParcelsDataset([entry('SHR-L43', '50:33:0010101:2998', ['SHR-L44'])]);
 
     expect(
-      dataset.parcels.map(({ code, aliases, part, cadastralNumber, areaM2, status, body }) => ({
+      dataset.parcels.map(({ code, aliases, part, cadastralParts, areaM2, status, body }) => ({
         code,
         aliases,
         part,
-        cadastralNumber,
+        cadastralNumber: cadastralParts[0]?.cadastralNumber,
         areaM2,
         status,
         body
@@ -62,7 +62,7 @@ describe('parcel dataset', () => {
         },
       ]
     `);
-    expect(dataset.parcels[0]?.geometry).toEqual(geometry);
+    expect(dataset.parcels[0]?.cadastralParts[0]?.geometry).toEqual(geometry);
     expect(dataset.byCode.get('SHR-L44')).toBe(dataset.byCode.get('SHR-L43'));
   });
 
@@ -91,13 +91,45 @@ describe('parcel dataset', () => {
     ).toThrow('parcel cadastral number "50:33:0010101:2998" conflicts');
   });
 
+  it('indexes every cadastral part of a group without inventing a group number or partial area', () => {
+    const parts = [
+      { cadastral_number: '50:33:0010101:3385', geometry, area_m2: 500 },
+      { cadastral_number: '50:33:0010101:3386', geometry, area_m2: 500 }
+    ];
+    const group = {
+      ...entry('SHR-E35'),
+      data: RawParcelSchema.parse({ code: 'SHR-E35', cadastral_parts: parts })
+    };
+    const dataset = buildParcelsDataset([group]);
+    expect(dataset.parcels[0]?.areaM2).toBe(1000);
+    expect([...dataset.byCadastralNumber.keys()]).toEqual(
+      parts.map((part) => part.cadastral_number)
+    );
+    expect(dataset.byCadastralNumber.get(parts[1]!.cadastral_number)).toBe(dataset.parcels[0]);
+    expect(dataset.parcels[0]).not.toHaveProperty('cadastralNumber');
+    expect(
+      buildParcelsDataset([
+        {
+          ...group,
+          data: RawParcelSchema.parse({
+            code: 'SHR-E35',
+            cadastral_parts: parts.map(({ area_m2: _, ...part }) => part)
+          })
+        }
+      ]).parcels[0]?.areaM2
+    ).toBeUndefined();
+    expect(() =>
+      buildParcelsDataset([group, entry('SHR-L43', parts[1]!.cadastral_number)])
+    ).toThrow('parcel cadastral number');
+  });
+
   it('accepts MultiPolygon and optional area without fabricating a status', () => {
     const parcel = RawParcelSchema.parse({
       ...entry().data,
       geometry: { type: 'MultiPolygon', coordinates: [geometry.coordinates] },
       area_m2: 2150
     });
-    expect(parcel.geometry.type).toBe('MultiPolygon');
+    expect(parcel.geometry?.type).toBe('MultiPolygon');
     expect(buildParcelsDataset([{ ...entry(), data: parcel }]).parcels[0]?.areaM2).toBe(2150);
     expect(parcel.status).toBeUndefined();
   });

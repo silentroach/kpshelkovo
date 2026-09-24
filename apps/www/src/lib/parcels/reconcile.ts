@@ -19,7 +19,15 @@ export const reconcileParcels = (
   const { candidates } = resolution;
   const unresolved = [...resolution.unresolved];
   const conflicts = [...resolution.conflicts];
-  const byNumber = new Map(previous.map((record) => [record.data.cadastral_number, record]));
+  const byNumber = new Map(
+    previous.flatMap((record) =>
+      (
+        record.data.cadastral_parts?.map((part) => part.cadastral_number) ?? [
+          record.data.cadastral_number!
+        ]
+      ).map((number) => [number, record] as const)
+    )
+  );
   const byCode = new Map(
     previous.flatMap((record) =>
       [record.data.code, ...record.data.aliases].map((code) => [code, record] as const)
@@ -46,6 +54,42 @@ export const reconcileParcels = (
 
   for (const candidate of candidates) {
     const codes = candidate.plots.map((plot) => plot.code);
+    if (candidate.parts) {
+      const numbers = candidate.parts.map((part) => part.properties.cadastralNumber);
+      const oldRecords = new Set(
+        [
+          ...codes.map((code) => byCode.get(code)),
+          ...numbers.map((number) => byNumber.get(number))
+        ].filter((record) => record !== undefined)
+      );
+      const retained = [...oldRecords][0];
+      if (
+        oldRecords.size > 1 ||
+        (retained &&
+          (!same(
+            (
+              retained.data.cadastral_parts?.map((part) => part.cadastral_number) ?? [
+                retained.data.cadastral_number!
+              ]
+            ).toSorted(),
+            numbers.toSorted()
+          ) ||
+            !same([retained.data.code, ...retained.data.aliases].toSorted(), codes.toSorted())))
+      ) {
+        conflicts.push(
+          `${codes.join(', ')}: cadastral group identity changed; confirm a new editorial record`
+        );
+        continue;
+      }
+    } else if (
+      codes.some((code) => byCode.get(code)?.data.cadastral_parts) ||
+      byNumber.get(candidate.cadastralNumber)?.data.cadastral_parts
+    ) {
+      conflicts.push(
+        `${codes.join(', ')}: cadastral group identity changed; confirm a new editorial record`
+      );
+      continue;
+    }
     const old = byNumber.get(candidate.cadastralNumber);
     const ancestors = new Set(
       codes.map((code) => byCode.get(code)).filter((record) => record !== undefined)
@@ -119,12 +163,18 @@ export const reconcileParcels = (
         priceHistory.push({ on: snapshot.observedOn, price: pricePlot.priceRub });
       }
     }
+    const parts = candidate.parts?.map((part) => ({
+      cadastral_number: part.properties.cadastralNumber,
+      geometry: projectNspdGeometry(part.geometry),
+      area_m2: part.properties.area
+    }));
     const data = RawParcelSchema.parse({
       code,
       aliases,
-      cadastral_number: candidate.cadastralNumber,
-      geometry: projectNspdGeometry(candidate.feature.geometry),
-      area_m2: candidate.feature.properties.area,
+      cadastral_number: parts ? undefined : candidate.cadastralNumber,
+      geometry: parts ? undefined : projectNspdGeometry(candidate.feature.geometry),
+      area_m2: parts ? undefined : candidate.feature.properties.area,
+      cadastral_parts: parts,
       status,
       features,
       price_history: priceHistory
@@ -134,8 +184,31 @@ export const reconcileParcels = (
     if (!retained) added.push(path);
     else {
       if (retained.path !== path) renamed.push(`${retained.path} -> ${path}`);
-      if (!same(retained.data.geometry, data.geometry)) geometryChanged.push(path);
-      if (!same({ ...retained.data, geometry: undefined }, { ...data, geometry: undefined }))
+      if (
+        !same(retained.data.geometry, data.geometry) ||
+        !same(
+          retained.data.cadastral_parts?.map((part) => part.geometry),
+          data.cadastral_parts?.map((part) => part.geometry)
+        )
+      )
+        geometryChanged.push(path);
+      if (
+        !same(
+          {
+            ...retained.data,
+            geometry: undefined,
+            cadastral_parts: retained.data.cadastral_parts?.map((part) => ({
+              ...part,
+              geometry: undefined
+            }))
+          },
+          {
+            ...data,
+            geometry: undefined,
+            cadastral_parts: data.cadastral_parts?.map((part) => ({ ...part, geometry: undefined }))
+          }
+        )
+      )
         detailsChanged.push(path);
     }
   }

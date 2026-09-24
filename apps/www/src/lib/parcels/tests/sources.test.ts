@@ -164,6 +164,36 @@ describe('parcel sources', () => {
     }
   });
 
+  it('requires a complete distinct compound confirmation and rejects a number reused by another group', async () => {
+    const entry = {
+      codes: ['SHR-E35'],
+      cadastral_numbers: ['50:33:0010101:3385', '50:33:0010101:3386'],
+      source_cadastral_references: { 'SHR-E35': '50:33:0010101:2482' },
+      evidence: 'Проверены межи'
+    };
+    expect(ParcelMatchesSchema.safeParse({ matches: [entry] }).success).toBe(true);
+    for (const broken of [
+      { ...entry, cadastral_numbers: [entry.cadastral_numbers[0]] },
+      { ...entry, cadastral_numbers: [entry.cadastral_numbers[0], entry.cadastral_numbers[0]] },
+      { ...entry, cadastral_number: entry.cadastral_numbers[0] },
+      { ...entry, source_cadastral_references: {} }
+    ])
+      expect(ParcelMatchesSchema.safeParse({ matches: [broken] }).success).toBe(false);
+
+    const directory = await mkdtemp(join(tmpdir(), 'parcel-compound-'));
+    try {
+      await writeFile(
+        join(directory, 'matches.yaml'),
+        `matches:\n  - codes: [SHR-E35]\n    cadastral_numbers: ['50:33:0010101:3385', '50:33:0010101:3386']\n    source_cadastral_references: { SHR-E35: '50:33:0010101:2482' }\n    evidence: Проверены межи\n  - codes: [SHR-E36]\n    cadastral_number: '50:33:0010101:3386'\n    source_cadastral_references: { SHR-E36: '50:33:0010101:2481' }\n    evidence: Проверены межи\n`
+      );
+      await expect(readParcelMatches(directory)).rejects.toThrow(
+        'duplicate confirmed cadastral number'
+      );
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
   it('rejects incomplete and contradictory saved genplan snapshots', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'parcel-sources-'));
     try {

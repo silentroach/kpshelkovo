@@ -13,9 +13,22 @@ export const mapRawParcel = (entry: ParcelEntry): Parcel => {
     code: entry.data.code,
     aliases: entry.data.aliases,
     part,
-    cadastralNumber: entry.data.cadastral_number,
-    geometry: entry.data.geometry,
-    areaM2: entry.data.area_m2,
+    cadastralParts: entry.data.cadastral_parts?.map((part) => ({
+      cadastralNumber: part.cadastral_number,
+      geometry: part.geometry,
+      areaM2: part.area_m2
+    })) ?? [
+      {
+        cadastralNumber: entry.data.cadastral_number!,
+        geometry: entry.data.geometry!,
+        areaM2: entry.data.area_m2
+      }
+    ],
+    areaM2: entry.data.cadastral_parts
+      ? entry.data.cadastral_parts.every((part) => part.area_m2 !== undefined)
+        ? entry.data.cadastral_parts.reduce((sum, part) => sum + part.area_m2!, 0)
+        : undefined
+      : entry.data.area_m2,
     status: entry.data.status,
     features: entry.data.features,
     priceHistory: entry.data.price_history.map(({ on, price }) => ({ on, price })),
