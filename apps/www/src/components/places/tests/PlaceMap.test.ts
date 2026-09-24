@@ -7,7 +7,6 @@ import type {
 } from '@yandex/ymaps3-types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { PlaceMapPublicItemDto } from '@/lib/places/map-public-dto';
 import type { PlaceMapItem } from '@/lib/places/map-types';
 
 import PlaceMap from '../PlaceMap.svelte';
@@ -72,23 +71,6 @@ const place: PlaceMapItem = {
     ]
   },
   url: '/map/burzhuyka/'
-};
-const publicPlace: PlaceMapPublicItemDto = {
-  slug: 'burzhuyka',
-  name: 'Буржуйка',
-  status: 'existing',
-  coordinates: { lat: 55.060526, lng: 37.716242 },
-  opening_hours: {
-    description: 'С 10:00 до 22:00, вторник — выходной',
-    periods: [
-      {
-        days: ['mon', 'wed', 'thu', 'fri', 'sat', 'sun'],
-        opens_at: '10:00',
-        closes_at: '22:00'
-      }
-    ]
-  },
-  html_url: 'https://kpshelkovo.online/map/burzhuyka/'
 };
 const titanicPlace: PlaceMapItem = {
   ...place,
@@ -158,53 +140,6 @@ const pondsPlace: PlaceMapItem = {
     ]
   },
   url: '/map/hunting-ponds/'
-};
-const publicPondsPlace: PlaceMapPublicItemDto = {
-  ...publicPlace,
-  slug: 'hunting-ponds',
-  geometry: {
-    type: 'FeatureCollection',
-    features: [
-      {
-        type: 'Feature',
-        id: 0,
-        geometry: { type: 'Point', coordinates: [37.742, 55.058] },
-        properties: { iconCaption: '<b>Вход</b>', 'marker-color': '#b42c31' }
-      },
-      {
-        type: 'Feature',
-        geometry: {
-          type: 'LineString',
-          coordinates: [
-            [37.742, 55.058],
-            [37.748, 55.06]
-          ]
-        },
-        properties: { stroke: '#123456', 'stroke-width': 3, 'stroke-dasharray': [6, 3] }
-      },
-      {
-        type: 'Feature',
-        geometry: {
-          type: 'Polygon',
-          coordinates: [
-            [
-              [37.74, 55.05],
-              [37.75, 55.05],
-              [37.75, 55.06],
-              [37.74, 55.05]
-            ],
-            [
-              [37.743, 55.052],
-              [37.746, 55.052],
-              [37.746, 55.054],
-              [37.743, 55.052]
-            ]
-          ]
-        },
-        properties: { fill: '#aaccdd', 'fill-opacity': 0.24, precision: 'approximate' }
-      }
-    ]
-  }
 };
 const parcel = {
   code: 'SHR-L43',
@@ -410,25 +345,21 @@ describe('PlaceMap', () => {
     expect(map.addChild).not.toHaveBeenCalled();
   });
 
-  it('loads map places from JSON before applying a requested highlight', async () => {
+  it('uses inline places for a requested highlight without fetching data', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: false }));
     window.history.replaceState({}, '', '/map/?h=burzhuyka');
-    const fetch = vi.fn(async () =>
-      Response.json({
-        places: [publicPlace]
-      })
-    );
+    const fetch = vi.fn();
     vi.stubGlobal('fetch', fetch);
 
     render(PlaceMap, {
       props: {
-        dataUrl: '/map/data/places.json'
+        places: [place]
       }
     });
 
     await waitFor(() => expect(markerElements).toHaveLength(1));
 
-    expect(fetch).toHaveBeenCalledWith('/map/data/places.json');
+    expect(fetch).not.toHaveBeenCalled();
     expect(markerElements[0]?.getAttribute('href')).toBe('/map/burzhuyka/');
     expect(markerElements[0]?.dataset.highlighted).toBe('true');
   });
@@ -436,21 +367,12 @@ describe('PlaceMap', () => {
   it.each([
     ['2026-08-17T07:00:00.000Z', 'открыто до 22:00', 'true'],
     ['2026-08-18T12:00:00.000Z', 'сейчас закрыто', 'false']
-  ])('uses JSON periods without an explanation at %s', async (time, status, open) => {
+  ])('uses inline periods without an explanation at %s', async (time, status, open) => {
     vi.setSystemTime(new Date(time));
     vi.stubGlobal('matchMedia', () => ({ matches: false }));
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () =>
-        Response.json({
-          places: [
-            { ...publicPlace, opening_hours: { periods: publicPlace.opening_hours!.periods } }
-          ]
-        })
-      )
-    );
-
-    render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
+    render(PlaceMap, {
+      props: { places: [{ ...place, openingHours: { periods: place.openingHours!.periods } }] }
+    });
     await waitFor(() => expect(markerElements).toHaveLength(1));
 
     expect(markerElements[0]?.dataset.open).toBe(open);
@@ -458,18 +380,9 @@ describe('PlaceMap', () => {
     expect(markerElements[0]?.getAttribute('aria-label')).toContain(status);
   });
 
-  it('omits hours, opening status and placeholders when JSON has no schedule', async () => {
+  it('omits hours, opening status and placeholders when a place has no schedule', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: false }));
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () =>
-        Response.json({
-          places: [{ ...publicPlace, opening_hours: undefined }]
-        })
-      )
-    );
-
-    render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
+    render(PlaceMap, { props: { places: [{ ...place, openingHours: undefined }] } });
     await waitFor(() => expect(markerElements).toHaveLength(1));
 
     const marker = markerElements[0];
@@ -488,22 +401,15 @@ describe('PlaceMap', () => {
     `);
   });
 
-  it('clears a requested highlight when map data cannot be loaded', async () => {
+  it('clears a requested highlight and preserves the place fallback when setup fails', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: false }));
     window.history.replaceState({}, '', '/map/?h=burzhuyka&from=issue');
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => new Response(undefined, { status: 503 }))
-    );
+    importModule.mockRejectedValueOnce(new Error('Control unavailable'));
     vi.spyOn(console, 'error').mockImplementation(() => {});
 
     render(PlaceMap, {
       props: {
-        dataUrl: '/map/data/places.json',
-        fallbackPlace: {
-          name: place.name,
-          url: place.url
-        }
+        places: [place]
       }
     });
 
@@ -780,13 +686,9 @@ describe('PlaceMap', () => {
     `);
   });
 
-  it('renders the full public collection as one hidden group, revealed by hover or focus', async () => {
+  it('renders the inline collection as one hidden group, revealed by hover or focus', async () => {
     vi.stubGlobal('matchMedia', (query: string) => ({ matches: query.includes('(hover: hover)') }));
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => Response.json({ places: [publicPondsPlace] }))
-    );
-    render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
+    render(PlaceMap, { props: { places: [pondsPlace] } });
     await waitFor(() => expect(markerElements).toHaveLength(2));
 
     const link = markerElements.find((element) => element instanceof HTMLAnchorElement);
@@ -810,8 +712,8 @@ describe('PlaceMap', () => {
       },
       {
         geometry: {
-          type: 'Polygon',
-          coordinates: publicPondsPlace.geometry!.features[2]!.geometry.coordinates
+          type: 'MultiPolygon',
+          coordinates: pondsPlace.geometry!.features[2]!.geometry.coordinates
         },
         style: { fill: '#aaccdd', fillOpacity: 0.24, fillRule: 'evenodd' }
       }
@@ -819,8 +721,8 @@ describe('PlaceMap', () => {
     expect(areaFeatures.every(({ props }) => !props.onClick && !props.properties)).toBe(true);
     expect(clustererProps[0]?.features).toHaveLength(1);
     expect(mapProps[0]?.location.bounds).toEqual([
-      [37.715242, 55.059526],
-      [37.717242, 55.061526]
+      [37.743987, 55.05617],
+      [37.745987, 55.05817]
     ]);
     const childCount = map.addChild.mock.calls.length;
     await fireEvent.mouseEnter(link);
@@ -1215,19 +1117,15 @@ describe('PlaceMap', () => {
     ]);
   });
 
-  it('rejects legacy geometry.area instead of interpreting it as a public collection', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () =>
-        Response.json({
-          places: [{ ...publicPondsPlace, geometry: { area: {} } }]
-        })
-      )
-    );
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
-    await screen.findByRole('status');
+  it('renders an empty map without fetching places or showing an error', async () => {
+    const fetch = vi.fn();
+    vi.stubGlobal('fetch', fetch);
+    render(PlaceMap, { props: { places: [] } });
+    await waitFor(() => expect(clustererProps).toHaveLength(1));
+    expect(clustererProps[0]?.features).toEqual([]);
     expect(markerElements).toHaveLength(0);
+    expect(fetch).not.toHaveBeenCalled();
+    expect(screen.queryByRole('status')).toBeFalsy();
   });
 
   it.each(['titanik', 'green-dreams'])(

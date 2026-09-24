@@ -12,13 +12,6 @@ export interface PlaceMapItem {
   readonly url: string;
 }
 
-export interface PlaceMapFallback {
-  readonly name: string;
-  readonly url: string;
-}
-
 export interface PlaceMapProps {
-  readonly dataUrl?: string;
-  readonly fallbackPlace?: PlaceMapFallback;
   readonly places?: readonly PlaceMapItem[];
 }

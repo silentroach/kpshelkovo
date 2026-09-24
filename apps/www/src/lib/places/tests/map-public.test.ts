@@ -2,7 +2,6 @@ import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { fromPublicEditorialGeometry } from '@/components/places/place-map-geometry';
 import { parseEditorialGeometry } from '@/lib/geometry/editorial-mapper';
 import { EditorialPublicGeometrySchema } from '@/lib/geometry/editorial-public-schema';
 
@@ -187,8 +186,7 @@ describe('place map public DTO', () => {
     ]).places[0]?.geometry;
     const parsed = EditorialPublicGeometrySchema.parse(JSON.parse(JSON.stringify(geometry)));
 
-    expect(fromPublicEditorialGeometry(parsed).features.map(({ iconContent }) => iconContent))
-      .toMatchInlineSnapshot(`
+    expect(parsed.features.map(({ properties }) => properties.iconContent)).toMatchInlineSnapshot(`
         [
           "0",
           undefined,

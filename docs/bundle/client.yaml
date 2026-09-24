@@ -1,4 +1,4 @@
-static/_...slug_.astro_astro_type_script_index_0_lang.BRKFKLJY.js:
+static/_...slug_.astro_astro_type_script_index_0_lang.BHUzbc-g.js:
   apps/www/src/pages/kb/[...slug].astro?astro&type=script&index=0&lang.ts:
     rendered: 0
 static/async.DQYjvbYA.js:
@@ -256,14 +256,187 @@ static/ComparisonTable.D0roAc6U.js:
     rendered: 5760
   apps/www/src/compare/components/ComparisonTable.svelte?svelte&type=style&lang.css:
     rendered: 0
-static/editorial-map-element.Bkd7aUI_.js:
+static/editorial-map-element.DKUaHGpW.js:
   apps/www/src/components/maps/editorial-map-element.ts:
     rendered: 4234
-static/editorial-map.C_r5aN4j.js:
+static/editorial-map.B2iT62zV.js:
   apps/www/src/components/maps/editorial-map.css:
     rendered: 0
   apps/www/src/components/maps/editorial-map.ts:
-    rendered: 3778
+    rendered: 3497
+static/esm.TQp3Y020.js:
+  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/index.js:
+    rendered: 0
+  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/helpers/throttle.js:
+    rendered: 640
+  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/helpers/utils.js:
+    rendered: 544
+  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/index.js:
+    rendered: 0
+  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/methods/clusterByGrid.js:
+    rendered: 3408
+  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/react/YMapClusterer.js:
+    rendered: 961
+  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/vue/YMapClusterer.js:
+    rendered: 1491
+  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/YMapClusterer.js:
+    rendered: 3655
+static/explorer-component.DBenQ_4a.js:
+  apps/www/src/compare/client/explorer-component.ts:
+    rendered: 274
+  apps/www/src/compare/components/SettlementCard.svelte:
+    rendered: 4313
+  apps/www/src/compare/components/SettlementCard.svelte?svelte&type=style&lang.css:
+    rendered: 0
+  apps/www/src/compare/components/SettlementMap.svelte:
+    rendered: 15441
+  apps/www/src/compare/components/SettlementMap.svelte?svelte&type=style&lang.css:
+    rendered: 0
+  apps/www/src/compare/components/SettlementsExplorer.svelte:
+    rendered: 15955
+  apps/www/src/compare/components/SettlementsExplorer.svelte?svelte&type=style&lang.css:
+    rendered: 0
+  apps/www/src/compare/lib/format.ts:
+    rendered: 374
+  apps/www/src/compare/lib/rating.ts:
+    rendered: 790
+  apps/www/src/compare/lib/url.ts:
+    rendered: 1301
+  packages/format/src/currency.ts:
+    rendered: 302
+  packages/format/src/locale.ts:
+    rendered: 115
+  packages/url/src/index.ts:
+    rendered: 381
+static/index.astro_astro_type_script_index_0_lang.BHUzbc-g.js:
+  apps/www/src/pages/news/[year]/[month]/[entry]/index.astro?astro&type=script&index=0&lang.ts:
+    rendered: 0
+static/index.astro_astro_type_script_index_0_lang.CTHep30p.js:
+  apps/www/src/lib/status/year-calendar.dom.ts:
+    rendered: 6185
+  apps/www/src/pages/status/calendar/[year]/index.astro?astro&type=script&index=0&lang.ts:
+    rendered: 144
+static/index.astro_astro_type_script_index_0_lang.D9AfZlmL.js:
+  apps/www/src/compare/client/explorer.ts:
+    rendered: 3189
+  apps/www/src/pages/815/compare/index.astro?astro&type=script&index=0&lang.ts:
+    rendered: 121
+static/index.astro_astro_type_script_index_0_lang.DOdg66mi.js:
+  apps/www/src/lib/home/hero.ts:
+    rendered: 1162
+  apps/www/src/pages/index.astro?astro&type=script&index=0&lang.ts:
+    rendered: 107
+static/index.astro_astro_type_script_index_0_lang.DxEQqlmB.js:
+  apps/www/src/lib/status/month-calendar.dom.ts:
+    rendered: 808
+  apps/www/src/pages/status/calendar/[year]/[month]/index.astro?astro&type=script&index=0&lang.ts:
+    rendered: 145
+static/index.astro_astro_type_script_index_0_lang.DZu290F3.js:
+  apps/www/src/lib/reglament/calculator-loader.ts:
+    rendered: 2692
+  apps/www/src/pages/815/regulation/index.astro?astro&type=script&index=0&lang.ts:
+    rendered: 310
+static/InfrastructureTable.BdD1H66s.js:
+  apps/www/src/compare/components/InfrastructureTable.svelte:
+    rendered: 3583
+static/lazy.DuhCY3Iq.js:
+  apps/www/src/components/search/lazy.ts:
+    rendered: 570
+  apps/www/src/components/search/search-dialog.events.ts:
+    rendered: 120
+  apps/www/src/components/search/SearchDialog.svelte:
+    rendered: 21653
+  apps/www/src/components/search/SearchDialog.svelte?svelte&type=style&lang.css:
+    rendered: 0
+  apps/www/src/lib/search/client.ts:
+    rendered: 12753
+  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/events/index.js:
+    rendered: 0
+  packages/ui/src/icons/system/Search.svelte:
+    rendered: 517
+static/lifecycle.D15KiOSI.js:
+  apps/www/src/lib/status/lifecycle.ts:
+    rendered: 2244
+static/map-gestures.BUvJ1ZxA.js:
+  apps/www/src/components/maps/map-gestures.ts:
+    rendered: 1349
+static/map-public-schema.DPh203Jk.js:
+  apps/www/src/lib/geometry/raw-polygon-schema.ts:
+    rendered: 1078
+  apps/www/src/lib/parcels/map-public-schema.ts:
+    rendered: 443
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/classic/errors.js:
+    rendered: 1545
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/classic/parse.js:
+    rendered: 819
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/classic/schemas.js:
+    rendered: 24558
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/api.js:
+    rendered: 10142
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/checks.js:
+    rendered: 11027
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/core.js:
+    rendered: 3023
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/doc.js:
+    rendered: 970
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/errors.js:
+    rendered: 3577
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/json-schema-processors.js:
+    rendered: 11647
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/memoizer.js:
+    rendered: 5473
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/parse.js:
+    rendered: 3891
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/regexes.js:
+    rendered: 3892
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/registries.js:
+    rendered: 1235
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/schemas.js:
+    rendered: 43738
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/to-json-schema.js:
+    rendered: 15597
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/util.js:
+    rendered: 13908
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/versions.js:
+    rendered: 146
+  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/locales/en.js:
+    rendered: 3851
+static/MapPreview.astro_astro_type_script_index_0_lang.DoXVPmMw.js:
+  apps/www/src/components/maps/map-preview.ts:
+    rendered: 6792
+  apps/www/src/components/maps/MapPreview.astro?astro&type=script&index=0&lang.ts:
+    rendered: 191
+static/number.3RH8yx7B.js:
+  packages/format/src/number.ts:
+    rendered: 877
+static/opening-hours.AIMoyxj1.js:
+  apps/www/src/lib/mentions/types.ts:
+    rendered: 293
+  apps/www/src/lib/places/opening-hours.ts:
+    rendered: 1441
+  apps/www/src/lib/places/schema.ts:
+    rendered: 143
+static/page.hqTgJEwh.js:
+  astro:scripts/page.js:
+    rendered: 53
+static/parcel-layer.CxwX4fxm.js:
+  apps/www/src/components/places/parcel-layer.ts:
+    rendered: 4766
+static/PlaceMap.BzdwirF_.js:
+  apps/www/src/components/places/place-map-geometry.ts:
+    rendered: 1686
+  apps/www/src/components/places/place-map-url.ts:
+    rendered: 698
+  apps/www/src/components/places/PlaceMap.svelte:
+    rendered: 25925
+  apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
+    rendered: 0
+  apps/www/src/lib/parcels/parcel-url.ts:
+    rendered: 658
+  apps/www/src/lib/places/view.ts:
+    rendered: 252
+  apps/www/src/lib/status/view.ts:
+    rendered: 138
   node_modules/.pnpm/typograf@7.8.0/node_modules/typograf/dist/typograf.es.mjs:
     rendered: 76249
   node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/compose/compose-collection.js:
@@ -395,146 +568,7 @@ static/editorial-map.C_r5aN4j.js:
   packages/markdown/src/render.ts:
     rendered: 0
   packages/markdown/src/typography.ts:
-    rendered: 1018
-static/esm.TQp3Y020.js:
-  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/index.js:
-    rendered: 0
-  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/helpers/throttle.js:
-    rendered: 640
-  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/helpers/utils.js:
-    rendered: 544
-  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/index.js:
-    rendered: 0
-  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/methods/clusterByGrid.js:
-    rendered: 3408
-  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/react/YMapClusterer.js:
-    rendered: 961
-  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/vue/YMapClusterer.js:
-    rendered: 1491
-  node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/YMapClusterer.js:
-    rendered: 3655
-static/explorer-component.CFU1-GIf.js:
-  apps/www/src/compare/client/explorer-component.ts:
-    rendered: 274
-  apps/www/src/compare/components/SettlementCard.svelte:
-    rendered: 4313
-  apps/www/src/compare/components/SettlementCard.svelte?svelte&type=style&lang.css:
-    rendered: 0
-  apps/www/src/compare/components/SettlementMap.svelte:
-    rendered: 15441
-  apps/www/src/compare/components/SettlementMap.svelte?svelte&type=style&lang.css:
-    rendered: 0
-  apps/www/src/compare/components/SettlementsExplorer.svelte:
-    rendered: 15955
-  apps/www/src/compare/components/SettlementsExplorer.svelte?svelte&type=style&lang.css:
-    rendered: 0
-  apps/www/src/compare/lib/format.ts:
-    rendered: 374
-  apps/www/src/compare/lib/rating.ts:
-    rendered: 790
-  apps/www/src/compare/lib/url.ts:
-    rendered: 1301
-  packages/format/src/currency.ts:
-    rendered: 302
-  packages/format/src/locale.ts:
-    rendered: 115
-static/index.astro_astro_type_script_index_0_lang.BRKFKLJY.js:
-  apps/www/src/pages/news/[year]/[month]/[entry]/index.astro?astro&type=script&index=0&lang.ts:
-    rendered: 0
-static/index.astro_astro_type_script_index_0_lang.CTHep30p.js:
-  apps/www/src/lib/status/year-calendar.dom.ts:
-    rendered: 6185
-  apps/www/src/pages/status/calendar/[year]/index.astro?astro&type=script&index=0&lang.ts:
-    rendered: 144
-static/index.astro_astro_type_script_index_0_lang.DJOMFFhA.js:
-  apps/www/src/compare/client/explorer.ts:
-    rendered: 3189
-  apps/www/src/pages/815/compare/index.astro?astro&type=script&index=0&lang.ts:
-    rendered: 121
-static/index.astro_astro_type_script_index_0_lang.DOdg66mi.js:
-  apps/www/src/lib/home/hero.ts:
-    rendered: 1162
-  apps/www/src/pages/index.astro?astro&type=script&index=0&lang.ts:
-    rendered: 107
-static/index.astro_astro_type_script_index_0_lang.DxEQqlmB.js:
-  apps/www/src/lib/status/month-calendar.dom.ts:
-    rendered: 808
-  apps/www/src/pages/status/calendar/[year]/[month]/index.astro?astro&type=script&index=0&lang.ts:
-    rendered: 145
-static/index.astro_astro_type_script_index_0_lang.DZu290F3.js:
-  apps/www/src/lib/reglament/calculator-loader.ts:
-    rendered: 2692
-  apps/www/src/pages/815/regulation/index.astro?astro&type=script&index=0&lang.ts:
-    rendered: 310
-static/InfrastructureTable.BdD1H66s.js:
-  apps/www/src/compare/components/InfrastructureTable.svelte:
-    rendered: 3583
-static/lazy.DuhCY3Iq.js:
-  apps/www/src/components/search/lazy.ts:
-    rendered: 570
-  apps/www/src/components/search/search-dialog.events.ts:
-    rendered: 120
-  apps/www/src/components/search/SearchDialog.svelte:
-    rendered: 21653
-  apps/www/src/components/search/SearchDialog.svelte?svelte&type=style&lang.css:
-    rendered: 0
-  apps/www/src/lib/search/client.ts:
-    rendered: 12753
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/events/index.js:
-    rendered: 0
-  packages/ui/src/icons/system/Search.svelte:
-    rendered: 517
-static/lifecycle.D15KiOSI.js:
-  apps/www/src/lib/status/lifecycle.ts:
-    rendered: 2244
-static/map-gestures.BUvJ1ZxA.js:
-  apps/www/src/components/maps/map-gestures.ts:
-    rendered: 1349
-static/map-public-schema.BK2XY_Lq.js:
-  apps/www/src/lib/parcels/map-public-schema.ts:
-    rendered: 443
-static/MapPreview.astro_astro_type_script_index_0_lang.7WAQRd45.js:
-  apps/www/src/components/maps/map-preview.ts:
-    rendered: 6792
-  apps/www/src/components/maps/MapPreview.astro?astro&type=script&index=0&lang.ts:
-    rendered: 191
-static/number.3RH8yx7B.js:
-  packages/format/src/number.ts:
-    rendered: 877
-static/opening-hours.B8fdtn2s.js:
-  apps/www/src/lib/mentions/types.ts:
-    rendered: 293
-  apps/www/src/lib/places/opening-hours.ts:
-    rendered: 1441
-  apps/www/src/lib/places/schema.ts:
-    rendered: 190
-static/page.hqTgJEwh.js:
-  astro:scripts/page.js:
-    rendered: 53
-static/parcel-layer.CxwX4fxm.js:
-  apps/www/src/components/places/parcel-layer.ts:
-    rendered: 4766
-static/PlaceMap.kPzb8q8B.js:
-  apps/www/src/components/places/place-map-geometry.ts:
-    rendered: 2446
-  apps/www/src/components/places/place-map-url.ts:
-    rendered: 698
-  apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 27068
-  apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
-    rendered: 0
-  apps/www/src/lib/geometry/editorial-public-schema.ts:
-    rendered: 1627
-  apps/www/src/lib/parcels/parcel-url.ts:
-    rendered: 658
-  apps/www/src/lib/places/routes.ts:
-    rendered: 344
-  apps/www/src/lib/places/view.ts:
-    rendered: 252
-  apps/www/src/lib/site.ts:
-    rendered: 115
-  apps/www/src/lib/status/view.ts:
-    rendered: 138
+    rendered: 1005
   packages/ui/src/markers/Animals.png?url:
     rendered: 133
   packages/ui/src/markers/Apple.png?url:
@@ -551,7 +585,7 @@ static/PlaceMap.kPzb8q8B.js:
     rendered: 125
   packages/ui/src/markers/Titanic.png?url:
     rendered: 133
-static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.DMm1y5oZ.js:
+static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.B13Xz4G6.js:
   apps/www/src/components/places/PlaceOpeningHours.astro?astro&type=script&index=0&lang.ts:
     rendered: 1167
 static/prefetch.cds4f2Tp.js:
@@ -565,45 +599,6 @@ static/preload-helper.CxFQXtKk.js:
 static/rating.astro_astro_type_script_index_0_lang.D_pWcIdF.js:
   apps/www/src/pages/815/compare/rating.astro?astro&type=script&index=0&lang.ts:
     rendered: 1094
-static/raw-polygon-schema.DYj05Cm8.js:
-  apps/www/src/lib/geometry/raw-polygon-schema.ts:
-    rendered: 1078
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/classic/errors.js:
-    rendered: 1545
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/classic/parse.js:
-    rendered: 819
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/classic/schemas.js:
-    rendered: 24558
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/api.js:
-    rendered: 10142
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/checks.js:
-    rendered: 11027
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/core.js:
-    rendered: 3023
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/doc.js:
-    rendered: 970
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/errors.js:
-    rendered: 3577
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/json-schema-processors.js:
-    rendered: 11647
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/memoizer.js:
-    rendered: 5473
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/parse.js:
-    rendered: 3891
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/regexes.js:
-    rendered: 3892
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/registries.js:
-    rendered: 1235
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/schemas.js:
-    rendered: 43738
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/to-json-schema.js:
-    rendered: 15597
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/util.js:
-    rendered: 13908
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/versions.js:
-    rendered: 146
-  node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/locales/en.js:
-    rendered: 3851
 static/runtime.Qhz4v4R0.js:
   apps/www/src/lib/yandex-maps/open-maps-control.ts:
     rendered: 369
@@ -621,9 +616,6 @@ static/schema.CkH8cRhQ.js:
 static/ServiceTable.W-7gissb.js:
   apps/www/src/compare/components/ServiceTable.svelte:
     rendered: 1229
-static/src.BmC_ntYh.js:
-  packages/url/src/index.ts:
-    rendered: 379
 static/src.DiOo9i3a.js:
   node_modules/.pnpm/@turf+distance@7.4.0/node_modules/@turf/distance/dist/esm/index.js:
     rendered: 683
