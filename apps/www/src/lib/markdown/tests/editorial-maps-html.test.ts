@@ -1,7 +1,6 @@
 import { Window } from 'happy-dom';
 import { describe, expect, it } from 'vitest';
 
-import { EditorialMapDataSchema } from '@/components/maps/editorial-map-data';
 import { createPersonMentionTarget } from '@/lib/people/mentions';
 
 import { renderMarkdown } from '../render';
@@ -57,9 +56,7 @@ describe('editorial map HTML', () => {
     const figcaption = figure?.querySelector('figcaption');
 
     expect(host?.getAttribute('data-pagefind-ignore')).toBe('all');
-    expect(
-      EditorialMapDataSchema.parse(JSON.parse(host?.getAttribute('data-geometry') ?? ''))
-    ).toMatchObject({
+    expect(JSON.parse(host?.getAttribute('data-geometry') ?? '')).toMatchObject({
       type: 'FeatureCollection',
       features: [{ id: 0, iconCaption: '<img src=x onerror=alert(1)>', iconContent: '7' }]
     });

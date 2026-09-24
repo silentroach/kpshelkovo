@@ -286,6 +286,37 @@ describe('buildNewsDataset', () => {
     ).toThrow(/news article "2026\/05\/map" body map insertion 2.*features.*at least one feature/u);
   });
 
+  it('rejects invalid coordinates before publishing the article', () => {
+    const invalid = JSON.stringify({
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          id: 0,
+          properties: {},
+          geometry: { type: 'Point', coordinates: [181, 55] }
+        }
+      ]
+    });
+
+    expect(() =>
+      buildNewsDataset(
+        [author({ id: 'ig', name: 'Редакция' })],
+        [
+          article({
+            id: '2026/05/map',
+            title: 'Схема',
+            summary: 'Схема проезда',
+            date: '03.05.2026',
+            body: `\`\`\`map\n${invalid}\n\`\`\``
+          })
+        ]
+      )
+    ).toThrow(
+      /news article "2026\/05\/map" body map insertion 1.*features\.0\.geometry\.coordinates\.0.*ID 0/u
+    );
+  });
+
   it('attaches summaries to their year and month archives', () => {
     const data = buildNewsDatasetSource(
       [author({ id: 'ig', name: 'Редакция' })],
