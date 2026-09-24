@@ -2,7 +2,7 @@
 
 ## Context
 
-См. [proposal.md](proposal.md). [ADR-015](../../../docs/decisions/015-markdown-first-knowledge-base.md) сейчас одновременно объясняет выбор редакционной модели и перечисляет правила KB. Реализация и проверки разделены между `apps/www/src/lib/kb/`, маршрутами `apps/www/src/pages/kb/`, sitemap и редакционными инструкциями `apps/www/src/data/kb/AGENTS.md`. `openspec/specs/search/spec.md` описывает общий поиск и подписи карт, но не маршруты и навигацию KB.
+См. [proposal.md](proposal.md). [ADR-015](../../../../docs/decisions/015-markdown-first-knowledge-base.md) сейчас одновременно объясняет выбор редакционной модели и перечисляет правила KB. Реализация и проверки разделены между `apps/www/src/lib/kb/`, маршрутами `apps/www/src/pages/kb/`, sitemap и редакционными инструкциями `apps/www/src/data/kb/AGENTS.md`. `openspec/specs/search/spec.md` описывает общий поиск и подписи карт, но не маршруты и навигацию KB.
 
 ## Goals / Non-Goals
 
@@ -14,7 +14,7 @@
 
 ### Один контракт KB, остальные области — по ссылке
 
-Создать отдельную spec `knowledge-base` для специфичных для раздела публичных URL, страниц-разделов, breadcrumbs, авторских ссылок, флагов KB и пары HTML/Markdown. Не расширять `search`: правила KB читаются вместе с их навигацией, а общий поиск и карты уже принадлежат `search`, [ADR-025](../../../docs/decisions/025-static-full-text-search-with-pagefind.md) и [ADR-035](../../../docs/decisions/035-status-search-indexing.md). Правила HTTP negotiation и MIME остаются у [ADR-009](../../../docs/decisions/009-markdown-accept-negotiation.md), регистрация поверхностей — у [ADR-011](../../../docs/decisions/011-public-surface-registry.md), рендер и генерация Markdown — у [ADR-003](../../../docs/decisions/003-markdown-pipeline-layering.md) и [ADR-008](../../../docs/decisions/008-markdown-ast-generation.md). Альтернатива — перенести все эти подробности в новую spec — породила бы расходящиеся копии общего контракта.
+Создать отдельную spec `knowledge-base` для специфичных для раздела публичных URL, страниц-разделов, breadcrumbs, авторских ссылок, флагов KB и пары HTML/Markdown. Не расширять `search`: правила KB читаются вместе с их навигацией, а общий поиск и карты уже принадлежат `search`, [ADR-025](../../../../docs/decisions/025-static-full-text-search-with-pagefind.md) и [ADR-035](../../../../docs/decisions/035-status-search-indexing.md). Правила HTTP negotiation и MIME остаются у [ADR-009](../../../../docs/decisions/009-markdown-accept-negotiation.md), регистрация поверхностей — у [ADR-011](../../../../docs/decisions/011-public-surface-registry.md), рендер и генерация Markdown — у [ADR-003](../../../../docs/decisions/003-markdown-pipeline-layering.md) и [ADR-008](../../../../docs/decisions/008-markdown-ast-generation.md). Альтернатива — перенести все эти подробности в новую spec — породила бы расходящиеся копии общего контракта.
 
 ### Развести смысл двух флагов без изменения правила KB
 
