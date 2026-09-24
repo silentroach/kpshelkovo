@@ -171,6 +171,18 @@ export const datasetSchema = z
     control_totals: z.array(controlTotalSchema)
   })
   .superRefine((dataset, context) => {
+    const workItemIds = new Set(dataset.work_items.map((item) => item.id));
+
+    dataset.resources.forEach((resource, index) => {
+      if (!workItemIds.has(resource.work_item_id)) {
+        context.addIssue({
+          code: 'custom',
+          message: `Resource ${resource.id} references unknown work_item_id: ${resource.work_item_id}`,
+          path: ['resources', index, 'work_item_id']
+        });
+      }
+    });
+
     const facts = [...dataset.work_items, ...dataset.resources, ...dataset.control_totals];
     const sourceRefs = facts.flatMap((fact) => [
       ...fact.source_refs,

@@ -194,6 +194,38 @@ describe('estimate details public schema', () => {
     `);
   });
 
+  it('rejects resource references to unknown work items', () => {
+    const payload = productionPayload();
+    const resource = payload.resources[0];
+
+    if (!resource) {
+      throw new Error('Production detail payload must contain a resource');
+    }
+
+    const invalid = {
+      ...payload,
+      resources: [
+        { ...resource, id: 'resource-example', work_item_id: 'missing-work' },
+        ...payload.resources.slice(1)
+      ]
+    };
+    const result = publicEstimateDetailDatasetSchema.safeParse(invalid);
+
+    expect(result.error?.issues.map(({ path, message }) => ({ path, message })))
+      .toMatchInlineSnapshot(`
+        [
+          {
+            "message": "Resource resource-example references unknown work_item_id: missing-work",
+            "path": [
+              "resources",
+              0,
+              "work_item_id",
+            ],
+          },
+        ]
+      `);
+  });
+
   it('rejects simultaneous plain and structured source quotes', () => {
     const payload = productionPayload();
     const sourceEntry = Object.entries(payload.sources).find(([, source]) => source.quote_items);
