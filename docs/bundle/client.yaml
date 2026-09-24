@@ -1,4 +1,4 @@
-static/_...slug_.astro_astro_type_script_index_0_lang.CfIqIFq0.js:
+static/_...slug_.astro_astro_type_script_index_0_lang.BRKFKLJY.js:
   apps/www/src/pages/kb/[...slug].astro?astro&type=script&index=0&lang.ts:
     rendered: 0
 static/async.DQYjvbYA.js:
@@ -256,11 +256,9 @@ static/ComparisonTable.D0roAc6U.js:
     rendered: 5760
   apps/www/src/compare/components/ComparisonTable.svelte?svelte&type=style&lang.css:
     rendered: 0
-static/editorial-map-element.D2-ZLQHd.js:
-  apps/www/src/components/maps/editorial-map-data.ts:
-    rendered: 1565
+static/editorial-map-element.Bkd7aUI_.js:
   apps/www/src/components/maps/editorial-map-element.ts:
-    rendered: 4264
+    rendered: 4234
 static/editorial-map.C_r5aN4j.js:
   apps/www/src/components/maps/editorial-map.css:
     rendered: 0
@@ -440,7 +438,7 @@ static/explorer-component.CFU1-GIf.js:
     rendered: 302
   packages/format/src/locale.ts:
     rendered: 115
-static/index.astro_astro_type_script_index_0_lang.CfIqIFq0.js:
+static/index.astro_astro_type_script_index_0_lang.BRKFKLJY.js:
   apps/www/src/pages/news/[year]/[month]/[entry]/index.astro?astro&type=script&index=0&lang.ts:
     rendered: 0
 static/index.astro_astro_type_script_index_0_lang.CTHep30p.js:
@@ -492,7 +490,7 @@ static/lifecycle.D15KiOSI.js:
 static/map-gestures.BUvJ1ZxA.js:
   apps/www/src/components/maps/map-gestures.ts:
     rendered: 1349
-static/map-public-schema.BH5vrWb_.js:
+static/map-public-schema.BK2XY_Lq.js:
   apps/www/src/lib/parcels/map-public-schema.ts:
     rendered: 443
 static/MapPreview.astro_astro_type_script_index_0_lang.7WAQRd45.js:
@@ -516,7 +514,7 @@ static/page.hqTgJEwh.js:
 static/parcel-layer.CxwX4fxm.js:
   apps/www/src/components/places/parcel-layer.ts:
     rendered: 4766
-static/PlaceMap.Cmu-C3xq.js:
+static/PlaceMap.kPzb8q8B.js:
   apps/www/src/components/places/place-map-geometry.ts:
     rendered: 2446
   apps/www/src/components/places/place-map-url.ts:
@@ -567,7 +565,7 @@ static/preload-helper.CxFQXtKk.js:
 static/rating.astro_astro_type_script_index_0_lang.D_pWcIdF.js:
   apps/www/src/pages/815/compare/rating.astro?astro&type=script&index=0&lang.ts:
     rendered: 1094
-static/raw-polygon-schema.C0BZ5Mjy.js:
+static/raw-polygon-schema.DYj05Cm8.js:
   apps/www/src/lib/geometry/raw-polygon-schema.ts:
     rendered: 1078
   node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/classic/errors.js:
@@ -575,7 +573,7 @@ static/raw-polygon-schema.C0BZ5Mjy.js:
   node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/classic/parse.js:
     rendered: 819
   node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/classic/schemas.js:
-    rendered: 24705
+    rendered: 24558
   node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/api.js:
     rendered: 10142
   node_modules/.pnpm/zod@4.5.4/node_modules/zod/v4/core/checks.js:
