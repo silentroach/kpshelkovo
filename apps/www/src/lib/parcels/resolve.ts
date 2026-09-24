@@ -25,12 +25,15 @@ export const resolveParcels = (
     if (match) {
       // Missing former aliases are fine, but a changed source reference voids the confirmation.
       const active = match.codes.filter((code) => byCode.has(code));
-      const stale = active.find(
-        (code) => byCode.get(code)?.cadastralReference !== match.source_cadastral_references[code]
-      );
+      const stale = active.find((code) => {
+        const saved = match.source_cadastral_references[code];
+        const current = byCode.get(code)?.cadastralReference;
+        return typeof saved === 'string' ? current !== saved : current !== undefined;
+      });
       if (stale) {
+        const saved = match.source_cadastral_references[stale];
         conflicts.push(
-          `${plot.code}: confirmed reference changed for ${stale}: ${String(byCode.get(stale)?.cadastralReference)} (was ${match.source_cadastral_references[stale]})`
+          `${plot.code}: confirmed reference changed for ${stale}: ${byCode.get(stale)?.cadastralReference ?? 'absent'} (was ${typeof saved === 'string' ? saved : 'absent'})`
         );
         continue;
       }

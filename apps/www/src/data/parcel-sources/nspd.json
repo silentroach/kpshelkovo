@@ -2,8 +2,8 @@
   "source": "https://nspd.gov.ru/map",
   "endpoint": "https://nspd.gov.ru/api/geoportal/v1/intersects?typeIntersect=fullObject",
   "method": "POST",
-  "capturedOn": "2026-09-22",
-  "savedAt": "2026-09-22T14:10:17.875Z",
+  "capturedOn": "2026-09-24",
+  "savedAt": "2026-09-24T06:37:04.052Z",
   "geometryCrs": "EPSG:3857",
   "queryCrs": "EPSG:4326",
   "queryRing4326": [
@@ -16,5 +16,5 @@
   "viewportBounds3857": [
     4196927.728363676, 7371244.868059167, 4203162.331281757, 7376804.386584845
   ],
-  "response": { "featureCount": 3214, "coverageVerified": false }
+  "response": { "featureCount": 3215, "coverageVerified": true }
 }

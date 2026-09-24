@@ -139,7 +139,10 @@ export const ParcelMatchesSchema = z
         .object({
           codes: z.array(code).min(1),
           cadastral_number: cadastralNumber,
-          source_cadastral_references: z.record(code, z.string()),
+          source_cadastral_references: z.record(
+            code,
+            z.union([z.string(), z.object({ absent: z.literal(true) }).strict()])
+          ),
           primary_code: code.optional(),
           evidence: nonBlank,
           price_source_code: code.optional(),

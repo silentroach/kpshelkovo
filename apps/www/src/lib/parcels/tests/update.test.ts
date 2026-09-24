@@ -73,7 +73,7 @@ const plans = (
 const match = (
   codes: readonly string[],
   number: string,
-  references: Record<string, string>,
+  references: Record<string, string | { absent: true }>,
   primary?: string
 ): ConfirmedMatches => [
   {
@@ -129,6 +129,51 @@ describe('parcel matching and updating', () => {
     expect(resolveParcels(changed, nspd([a, b]), confirmed).conflicts).toContain(
       'SHR-L43: confirmed reference changed for SHR-L44: 50:33:0010101:2998 (was 50:33:0010101:3000)'
     );
+  });
+
+  it('reuses a confirmed absent reference, but flags any new reference even to its target', () => {
+    const confirmed = match(['SHR-L43'], a, { 'SHR-L43': { absent: true } });
+    const original = plans([{ id: 'L43' }]);
+    const first = reconcileParcels(original, nspd([a]), confirmed, []);
+    expect(first.records[0]?.data.code).toBe('SHR-L43');
+    const repeated = reconcileParcels(original, nspd([a]), confirmed, saved(first));
+    expect([repeated.added, repeated.deleted, repeated.conflicts]).toEqual([[], [], []]);
+    for (const number of [a, b]) {
+      const changed = resolveParcels(
+        plans([{ id: 'L43', cadastralReference: number }]),
+        nspd([a, b]),
+        confirmed
+      );
+      expect(changed.candidates).toEqual([]);
+      expect(changed.conflicts).toContain(
+        `SHR-L43: confirmed reference changed for SHR-L43: ${number} (was absent)`
+      );
+    }
+  });
+
+  it('checks the entire mixed-reference group and tolerates a vanished alias', () => {
+    const confirmed = match(
+      ['SHR-L43', 'SHR-L44'],
+      a,
+      { 'SHR-L43': b, 'SHR-L44': { absent: true } },
+      'SHR-L43'
+    );
+    const original = plans([{ id: 'L43', cadastralReference: b }, { id: 'L44' }]);
+    expect(
+      resolveParcels(original, nspd([a]), confirmed).candidates[0]?.plots.map(({ code }) => code)
+    ).toEqual(['SHR-L43', 'SHR-L44']);
+    const changed = resolveParcels(plans([{ id: 'L43' }, { id: 'L44' }]), nspd([a]), confirmed);
+    expect(changed.candidates).toEqual([]);
+    expect(changed.conflicts).toContain(
+      `SHR-L43: confirmed reference changed for SHR-L43: absent (was ${b})`
+    );
+    expect(
+      resolveParcels(
+        plans([{ id: 'L43', cadastralReference: b }]),
+        nspd([a]),
+        confirmed
+      ).candidates[0]?.plots.map(({ code }) => code)
+    ).toEqual(['SHR-L43']);
   });
 
   it('keeps confirmed parcels when a direct collision arrives before or after them', () => {
@@ -679,14 +724,14 @@ describe('parcel matching and updating', () => {
     }
   });
 
-  it('rejects changed metadata for an unverified cadastral repeat without changing accepted data', async () => {
+  it('rejects an unverified cadastral replacement without changing accepted data', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'parcel-nspd-'));
     const sources = new URL('../../../data/parcel-sources/', import.meta.url);
     const accepted = await readFile(new URL('nspd.json', sources), 'utf8');
     try {
       await copyFile(new URL('nspd.ndjson', sources), join(directory, 'nspd.ndjson'));
       const metadata = JSON.parse(accepted);
-      metadata.capturedOn = '2026-09-24';
+      metadata.response.coverageVerified = false;
       await writeFile(join(directory, 'nspd.json'), JSON.stringify(metadata));
       const script = new URL('../../../../scripts/parcels/update.ts', import.meta.url);
       const result = spawnSync(
