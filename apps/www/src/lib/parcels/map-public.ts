@@ -33,6 +33,7 @@ export const buildParcelMapPayload = (
       code: parcel.code,
       ...(parcel.aliases.length ? { aliases: parcel.aliases } : {}),
       part: parcel.part,
+      ...(parcel.status ? { status: parcel.status } : {}),
       geometry:
         parcel.geometry.type === 'Polygon'
           ? {

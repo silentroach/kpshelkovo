@@ -71,6 +71,7 @@ describe('parcel public payloads', () => {
         "geometry",
         "labelCoordinates",
         "part",
+        "status",
       ]
     `);
   });
@@ -129,11 +130,38 @@ describe('parcel public payloads', () => {
     expect(ParcelMapPublicSchema.safeParse({ parcels: payload }).success).toBe(false);
   });
 
-  it('keeps sale status out of the map payload even when it is unknown', () => {
+  it('publishes only the known sale status without inventing one for unknown parcels', () => {
     const config = { offset_east_m: 0, offset_north_m: 0 };
-    const expected = buildParcelMapPayload([parcel], config);
-    for (const status of ['sold', 'reserved', 'unavailable', undefined] as const) {
-      expect(buildParcelMapPayload([{ ...parcel, status }], config)).toEqual(expected);
-    }
+    const payload = buildParcelMapPayload(
+      (['available', 'reserved', 'sold', 'unavailable', undefined] as const).map(
+        (status, index) => ({ ...parcel, code: `SHR-L${43 + index}`, status })
+      ),
+      config
+    );
+    expect(payload.map(({ code, status }) => ({ code, status }))).toMatchInlineSnapshot(`
+      [
+        {
+          "code": "SHR-L43",
+          "status": "available",
+        },
+        {
+          "code": "SHR-L44",
+          "status": "reserved",
+        },
+        {
+          "code": "SHR-L45",
+          "status": "sold",
+        },
+        {
+          "code": "SHR-L46",
+          "status": "unavailable",
+        },
+        {
+          "code": "SHR-L47",
+          "status": undefined,
+        },
+      ]
+    `);
+    expect(payload[4]).not.toHaveProperty('status');
   });
 });
