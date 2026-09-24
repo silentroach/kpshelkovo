@@ -1,13 +1,11 @@
 import { md } from '@shelkovo/markdown';
 import type { MarkdownAstTransform } from '@shelkovo/markdown';
 
-import { prepareEditorialGeometry } from '@/lib/geometry/editorial-view';
-
 import { editorialMapCaption, transformEditorialMapNodes } from './editorial-maps';
 import type { EditorialMapBlock } from './editorial-maps.types';
 
 const encodedGeometry = (map: EditorialMapBlock): string =>
-  JSON.stringify(prepareEditorialGeometry(map.geometry))
+  JSON.stringify(map.geometry)
     .replaceAll('<', '\\u003c')
     .replaceAll('>', '\\u003e')
     .replaceAll('&', '\\u0026');

@@ -2,7 +2,6 @@ import { DateTime } from 'luxon';
 
 const DATE_LOCALE = 'ru';
 const DATE_ZONE = 'Europe/Moscow';
-let dateFormatter: Intl.DateTimeFormat | undefined;
 
 export interface DateTimeFromPartsInput {
   readonly year: number;
@@ -41,21 +40,9 @@ const monthDateTime = (year: number, month: number): DateTime =>
 /**
  * Formats ISO date into Russian human-readable form.
  */
-export const formatDate = (iso: string): string => {
-  // An ISO timestamp without an offset is a Moscow wall date, not a browser-local instant.
-  const value = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(iso) ? iso : iso.slice(0, 10);
-  dateFormatter ??= new Intl.DateTimeFormat(DATE_LOCALE, {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: DATE_ZONE
-  });
-  return dateFormatter
-    .formatToParts(new Date(value))
-    .filter((part) => part.type === 'day' || part.type === 'month' || part.type === 'year')
-    .map((part) => part.value)
-    .join(' ');
-};
+export function formatDate(iso: string): string {
+  return dateTimeFromISO(iso).toFormat('d MMMM yyyy');
+}
 
 /**
  * Formats year and month in Russian.

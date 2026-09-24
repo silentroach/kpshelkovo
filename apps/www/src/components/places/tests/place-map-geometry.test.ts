@@ -4,6 +4,7 @@ import type { PlaceMapItem } from '@/lib/places/map-types';
 
 import {
   createMapFeatures,
+  fromPublicEditorialGeometry,
   getMarkerScale,
   getPaddedBounds,
   getPlaceBounds
@@ -101,4 +102,44 @@ it('keeps existing padded cluster extent and marker scale', () => {
         "1.300",
       ]
     `);
+});
+
+it('maps prepared public properties without changing coordinates or applying another expansion', () => {
+  const ring: [number, number][] = [
+    [37.74, 55.05],
+    [37.75, 55.05],
+    [37.74, 55.05]
+  ];
+  const result = fromPublicEditorialGeometry({
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        id: 0,
+        geometry: { type: 'Polygon', coordinates: [ring] },
+        properties: {
+          stroke: '#123456',
+          'stroke-width': 2.5,
+          'stroke-opacity': 0.6,
+          'stroke-dasharray': [6, 3],
+          fill: '#abcdef',
+          'fill-opacity': 0.2,
+          description: '<b>hidden</b>',
+          precision: 'approximate'
+        }
+      }
+    ]
+  });
+  expect(result.features[0]).toMatchObject({
+    id: 0,
+    geometry: { type: 'Polygon', coordinates: [ring] },
+    stroke: '#123456',
+    strokeWidth: 2.5,
+    strokeOpacity: 0.6,
+    strokeDasharray: [6, 3],
+    fill: '#abcdef',
+    fillOpacity: 0.2,
+    description: '<b>hidden</b>',
+    precision: 'approximate'
+  });
 });

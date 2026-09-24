@@ -1,7 +1,6 @@
 ---
 import MapPreview from '@/components/maps/MapPreview.astro';
 import type { MapPreviewData } from '@/components/maps/map-preview.types';
-import { prepareEditorialGeometry } from '@/lib/geometry/editorial-view';
 
 import { PLACE_MARKER_IMAGES } from './marker-images';
 import type { PlacePreviewProps as Props } from './place-preview.types';
@@ -11,9 +10,7 @@ const marker = place.marker ? PLACE_MARKER_IMAGES[place.marker] : undefined;
 const markerLabel = `Открыть карту: ${place.name}`;
 const preview = {
   coordinates: place.coordinates,
-  geometry: place.geometry
-    ? prepareEditorialGeometry(place.geometry)
-    : undefined,
+  geometry: place.geometry,
   openingHours: place.openingHours,
   interactive: true,
   copyrightsPosition: 'bottom right',

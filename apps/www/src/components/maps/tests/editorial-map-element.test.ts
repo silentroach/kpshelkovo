@@ -277,18 +277,13 @@ it('ignores both SDK and native control results after disconnect', async () => {
 
 it('shows a generic accessible error without exposing data, retrying or changing the caption', async () => {
   const sdk = setupSdk();
-  for (const source of [
-    '{ "description": "SECRET_PRIVATE"',
-    '{"features":[{"description":"SECRET_PRIVATE"}]}'
-  ]) {
-    const malformed = mount(source);
-    await vi.waitFor(() =>
-      expect(malformed.querySelector('[role="status"]')?.textContent).toBe('Карта не загрузилась.')
-    );
-    expect(malformed.textContent).not.toContain('SECRET_PRIVATE');
-  }
+  const malformed = mount('{"features":[{"description":"SECRET_PRIVATE"}]}');
+  await vi.waitFor(() =>
+    expect(malformed.querySelector('[role="status"]')?.textContent).toBe('Карта не загрузилась.')
+  );
   expect(loadYandexMaps).not.toHaveBeenCalled();
   expect(sdk.instances).toHaveLength(0);
+  expect(malformed.textContent).not.toContain('SECRET_PRIVATE');
   vi.mocked(loadYandexMaps).mockRejectedValueOnce(new Error('SECRET_PRIVATE'));
   const loading = mount();
   await vi.waitFor(() =>

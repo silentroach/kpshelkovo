@@ -13,12 +13,18 @@
   import { onMount } from 'svelte';
 
   import { createEditorialMapObjects } from '@/components/maps/editorial-map';
+  import { EditorialPublicGeometrySchema } from '@/lib/geometry/editorial-public-schema';
   import { getUrlWithoutParcel, PARCEL_QUERY_PARAM } from '@/lib/parcels/parcel-url';
   import { PARCEL_CODE } from '@/lib/parcels/schema';
+  import type {
+    PlaceMapPublicItemDto,
+    PlaceMapPublicPayloadDto
+  } from '@/lib/places/map-public-dto';
   import type { PlaceMapItem, PlaceMapProps } from '@/lib/places/map-types';
   import { getPlaceClosingTime } from '@/lib/places/opening-hours';
+  import { placeUrl } from '@/lib/places/routes';
   import type { PlaceMarker } from '@/lib/places/schema';
-  import { formatPlaceStatus } from '@/lib/places/status-label';
+  import { formatPlaceStatus } from '@/lib/places/view';
   import { createOpenMapsControl } from '@/lib/yandex-maps/open-maps-control';
   import {
     installYandexMapsRuntimeHeadPersistence,
@@ -29,13 +35,18 @@
   import type { ParcelLayer, ParcelMapPayload } from './parcel-layer-types';
   import {
     createMapFeatures,
+    fromPublicEditorialGeometry,
     getMarkerScale,
     getPaddedBounds,
     getPlaceBounds
   } from './place-map-geometry';
   import { getUrlWithoutPlaceHighlight, PLACE_HIGHLIGHT_QUERY_PARAM } from './place-map-url';
 
-  let { places = [] }: PlaceMapProps = $props();
+  let {
+    dataUrl = '',
+    fallbackPlace,
+    places = [] as readonly PlaceMapItem[]
+  }: PlaceMapProps = $props();
 
   const VIEW_MARGIN: ymaps3.Margin = [112, 80, 32, 80];
   const MOBILE_VIEW_MARGIN: ymaps3.Margin = [112, 32, 32, 32];
@@ -45,6 +56,36 @@
   const MARKER_MAX_ZOOM = 16;
   const PLACE_FOCUS_ZOOM = MARKER_MAX_ZOOM;
   const PARCEL_DATA_URL = '/map/data/parcels.json';
+  const toPlaceMapItem = (place: PlaceMapPublicItemDto): PlaceMapItem => ({
+    slug: place.slug,
+    name: place.name,
+    marker: place.marker,
+    status: place.status,
+    coordinates: place.coordinates,
+    geometry: place.geometry
+      ? fromPublicEditorialGeometry(EditorialPublicGeometrySchema.parse(place.geometry))
+      : undefined,
+    openingHours: place.opening_hours
+      ? {
+          description: place.opening_hours.description,
+          periods: place.opening_hours.periods.map((period) => ({
+            days: period.days,
+            opensAt: period.opens_at,
+            closesAt: period.closes_at
+          }))
+        }
+      : undefined,
+    url: placeUrl(place.slug)
+  });
+  const fetchPlaces = async (url: string): Promise<readonly PlaceMapItem[]> => {
+    if (!url) throw new Error('Не указан источник данных карты');
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Не удалось загрузить данные карты');
+
+    const payload = (await response.json()) as PlaceMapPublicPayloadDto;
+    return payload.places.map(toPlaceMapItem);
+  };
   const CUSTOM_MARKER_IMAGES: Readonly<
     Record<PlaceMarker, { readonly src: string; readonly width: number; readonly height: number }>
   > = {
@@ -99,7 +140,7 @@
   let layersButton: HTMLButtonElement | undefined = $state(undefined);
   let toggleParcels: (checked: boolean) => void;
   let retryParcels = $state<() => void>(() => {});
-  let errorPlace = $derived(places[0]);
+  let errorPlace = $derived(places[0] ?? fallbackPlace);
 
   const mapBehaviors = (): ymaps3.BehaviorType[] => [
     'drag',
@@ -557,10 +598,12 @@
 
     void (async () => {
       try {
-        await loadYandexMaps();
+        const placesRequest = places.length ? Promise.resolve(places) : fetchPlaces(dataUrl);
+        const [loadedPlaces] = await Promise.all([placesRequest, loadYandexMaps()]);
 
         if (destroyed || !mapContainer) return;
 
+        places = loadedPlaces;
         highlightedPlace = requestedSlug
           ? places.find((place) => place.slug === requestedSlug)
           : undefined;

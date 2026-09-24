@@ -1,6 +1,8 @@
 import type { Feature } from '@yandex/ymaps3-clusterer';
 import type { LngLat, LngLatBounds } from '@yandex/ymaps3-types';
 
+import type { EditorialPublicGeometry } from '@/lib/geometry/editorial-public-schema';
+import type { EditorialFeatureCollection } from '@/lib/geometry/editorial-types';
 import type { PlaceMapItem } from '@/lib/places/map-types';
 import { PLACE_MAP_BOUNDS } from '@/lib/places/schema';
 
@@ -61,6 +63,30 @@ export const getMarkerScale = (zoom: number): number => {
 
   return MARKER_MIN_SCALE + (1 - MARKER_MIN_SCALE) * progress;
 };
+
+/** The public collection already contains prepared coordinates; only property names change here. */
+export const fromPublicEditorialGeometry = (
+  collection: EditorialPublicGeometry
+): EditorialFeatureCollection => ({
+  type: 'FeatureCollection',
+  metadata: collection.metadata,
+  features: collection.features.map((feature) => ({
+    type: 'Feature',
+    id: feature.id,
+    geometry: feature.geometry,
+    description: feature.properties.description,
+    iconCaption: feature.properties.iconCaption,
+    iconContent: feature.properties.iconContent,
+    markerColor: feature.properties['marker-color'],
+    stroke: feature.properties.stroke,
+    strokeWidth: feature.properties['stroke-width'],
+    strokeOpacity: feature.properties['stroke-opacity'],
+    strokeDasharray: feature.properties['stroke-dasharray'],
+    fill: feature.properties.fill,
+    fillOpacity: feature.properties['fill-opacity'],
+    precision: feature.properties.precision
+  }))
+});
 
 export const createMapFeatures = (places: readonly PlaceMapItem[]): Feature[] =>
   places.map((place) => ({
