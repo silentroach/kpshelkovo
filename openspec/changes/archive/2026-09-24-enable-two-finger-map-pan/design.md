@@ -2,7 +2,7 @@
 
 ## Context
 
-См. [proposal.md](proposal.md). `editorial-map-element.ts` и интерактивное `map-preview.ts` используют общий `map-gestures.ts`: `drag` включается перед `pointerdown` только для мыши, `pinchZoom` остаётся для touch, а `touch-action: pan-y` сохраняет прокрутку страницы. Фоновые превью не подключают этот helper. Подход продолжает [ADR-039](../../../docs/decisions/039-shared-yandex-maps-runtime-and-preview.md) и [ADR-034](../../../docs/decisions/034-native-css-architecture.md).
+См. [proposal.md](proposal.md). `editorial-map-element.ts` и интерактивное `map-preview.ts` используют общий `map-gestures.ts`: `drag` включается перед `pointerdown` только для мыши, `pinchZoom` остаётся для touch, а `touch-action: pan-y` сохраняет прокрутку страницы. Фоновые превью не подключают этот helper. Подход продолжает [ADR-039](../../../../docs/decisions/039-shared-yandex-maps-runtime-and-preview.md) и [ADR-034](../../../../docs/decisions/034-native-css-architecture.md).
 
 В локальном пробнике на странице статьи с настоящим SDK: два пальца при одном `pinchZoom` не сдвинули маркер; разрешение штатного `drag` после появления второго активного касания сдвинуло его на 48 px без прокрутки страницы. Одиночное касание не переместило карту, вертикальный свайп прокрутил страницу. Это подтверждает технический путь в Chromium, но не заменяет проверки после реализации на целевых устройствах.
 
