@@ -2,6 +2,9 @@
 import type { YMapFeatureProps, YMapMarkerProps } from '@yandex/ymaps3-types';
 import { afterEach, expect, it, vi } from 'vitest';
 
+import { fromPublicEditorialGeometry } from '@/components/places/place-map-geometry';
+import { parseEditorialGeometry } from '@/lib/geometry/editorial-mapper';
+import { toPublicEditorialGeometry } from '@/lib/geometry/editorial-public';
 import type { EditorialFeatureCollection } from '@/lib/geometry/editorial-types';
 
 import { createEditorialMapObjects, getEditorialMapBounds } from '../editorial-map';
@@ -65,6 +68,38 @@ it('draws ordinary points with only explicit text labels, no HTML or popup', () 
     false
   );
   expect(sdk.marker.mock.calls[1]![1].textContent).toBe('');
+});
+
+it('centers a numbered point in its colored dot without replacing the caption or ordinary dot', () => {
+  const sdk = setupSdk();
+  const raw = {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [37, 55] },
+        properties: { iconContent: '2', iconCaption: 'Съезд', 'marker-color': '#1e98ff' }
+      },
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [38, 56] }, properties: {} }
+    ]
+  };
+  createEditorialMapObjects(
+    window.ymaps3!,
+    fromPublicEditorialGeometry(
+      toPublicEditorialGeometry(parseEditorialGeometry(raw, 'place.geojson'))
+    )
+  );
+
+  const [numbered, ordinary] = sdk.marker.mock.calls.map(([, element]) => element);
+  expect(numbered?.querySelector('.editorial-map-marker__dot.ui-map-marker')?.textContent).toBe(
+    '2'
+  );
+  expect(numbered?.querySelector('.editorial-map-marker__dot')?.getAttribute('style')).toContain(
+    '--ui-map-marker-color: #1e98ff'
+  );
+  expect(numbered?.querySelector('.editorial-map-marker__caption')?.textContent).toBe('Съезд');
+  expect(ordinary?.querySelector('.editorial-map-marker__dot')?.textContent).toBe('');
+  expect(ordinary?.querySelector('.editorial-map-marker__caption')).toBeFalsy();
 });
 
 it('passes line, polygon and multi-polygon geometry and domain styling to SDK', () => {

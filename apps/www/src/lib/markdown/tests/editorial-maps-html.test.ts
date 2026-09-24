@@ -1,6 +1,7 @@
 import { Window } from 'happy-dom';
 import { describe, expect, it } from 'vitest';
 
+import { EditorialMapDataSchema } from '@/components/maps/editorial-map-data';
 import { createPersonMentionTarget } from '@/lib/people/mentions';
 
 import { renderMarkdown } from '../render';
@@ -16,6 +17,7 @@ const map = (name?: string, url?: string): string => {
         geometry: { type: 'Point', coordinates: [37, 56] },
         properties: {
           iconCaption: '<img src=x onerror=alert(1)>',
+          iconContent: '7',
           description: '</script><script>alert(1)</script>'
         }
       }
@@ -55,9 +57,11 @@ describe('editorial map HTML', () => {
     const figcaption = figure?.querySelector('figcaption');
 
     expect(host?.getAttribute('data-pagefind-ignore')).toBe('all');
-    expect(JSON.parse(host?.getAttribute('data-geometry') ?? '')).toMatchObject({
+    expect(
+      EditorialMapDataSchema.parse(JSON.parse(host?.getAttribute('data-geometry') ?? ''))
+    ).toMatchObject({
       type: 'FeatureCollection',
-      features: [{ id: 0, iconCaption: '<img src=x onerror=alert(1)>' }]
+      features: [{ id: 0, iconCaption: '<img src=x onerror=alert(1)>', iconContent: '7' }]
     });
     expect(figcaption?.textContent?.replace('#', '').trim()).toBe(caption);
     expect(figcaption?.querySelector('a:not(.ui-heading-anchor)')?.getAttribute('href')).toBe(href);

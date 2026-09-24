@@ -266,6 +266,37 @@ describe('editorial geometry boundary', () => {
     ).toThrow(/features\.0\.properties\.outline_expansion_meters/);
   });
 
+  it.each('0123456789'.split(''))('preserves a single digit %s on a point', (digit) => {
+    const feature = parseEditorialGeometry(
+      collection({ type: 'Point', coordinates: [37, 55] }, { iconContent: digit }),
+      'map.geojson'
+    ).features[0];
+    expect(feature?.iconContent).toBe(digit);
+  });
+
+  it.each([
+    ['12', { type: 'Point', coordinates: [37, 55] }],
+    ['A', { type: 'Point', coordinates: [37, 55] }],
+    ['<b>1</b>', { type: 'Point', coordinates: [37, 55] }],
+    [
+      '1',
+      {
+        type: 'LineString',
+        coordinates: [
+          [37, 55],
+          [38, 56]
+        ]
+      }
+    ]
+  ])('rejects iconContent %s on %j with source, ID and field', (content, geometry) => {
+    expect(() =>
+      parseEditorialGeometry(
+        collection(geometry, { iconContent: content }, 'route'),
+        'news/entry.md map insertion 1'
+      )
+    ).toThrow(/news\/entry\.md map insertion 1.*features\.0\.properties\.iconContent.*ID "route"/);
+  });
+
   it('expands each approximate MultiPolygon part outward and shrinks each hole independently', () => {
     const source = collection(
       {

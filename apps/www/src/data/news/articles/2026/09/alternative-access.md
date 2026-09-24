@@ -59,7 +59,7 @@ source_url: https://okkomfort.domyland.app/news?targetId=119187&entityName=news&
       "type": "Feature",
       "id": 1,
       "geometry": { "coordinates": [37.76426411085491, 55.05675656992527], "type": "Point" },
-      "properties": { "iconCaption": "Семеновское", "marker-color": "#1e98ff" }
+      "properties": { "iconCaption": "Семеновское", "iconContent": "1", "marker-color": "#1e98ff" }
     },
     {
       "type": "Feature",
@@ -68,6 +68,7 @@ source_url: https://okkomfort.domyland.app/news?targetId=119187&entityName=news&
       "properties": {
         "description": "Открываются по звонку на специальный номер",
         "iconCaption": "Ворота",
+        "iconContent": "3",
         "marker-color": "#1e98ff"
       }
     },
@@ -75,7 +76,7 @@ source_url: https://okkomfort.domyland.app/news?targetId=119187&entityName=news&
       "type": "Feature",
       "id": 3,
       "geometry": { "coordinates": [37.76222026758543, 55.052873329671975], "type": "Point" },
-      "properties": { "iconCaption": "Съезд в Авдотьино", "marker-color": "#1e98ff" }
+      "properties": { "iconCaption": "Съезд в Авдотьино", "iconContent": "2", "marker-color": "#1e98ff" }
     }
   ]
 }

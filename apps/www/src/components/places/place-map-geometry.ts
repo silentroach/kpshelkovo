@@ -76,6 +76,7 @@ export const fromPublicEditorialGeometry = (
     geometry: feature.geometry,
     description: feature.properties.description,
     iconCaption: feature.properties.iconCaption,
+    iconContent: feature.properties.iconContent,
     markerColor: feature.properties['marker-color'],
     stroke: feature.properties.stroke,
     strokeWidth: feature.properties['stroke-width'],
