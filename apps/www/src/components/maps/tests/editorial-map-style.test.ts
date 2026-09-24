@@ -37,7 +37,7 @@ it('keeps labels wrappable and groups the caption with the map and its focusable
   expect(labelStyle.whiteSpace).toBe('normal');
   expect(labelStyle.overflowWrap).toBe('anywhere');
   expect(labelStyle.maxInlineSize).toContain('10rem');
-  expect(labelStyle.fontSize).toBe('13px');
+  expect(labelStyle.fontSize).toBe('12px');
   expect(labelStyle.fontWeight).toBe('400');
   expect(getComputedStyle(title).fontSize).toBe('0.875rem');
   expect(getComputedStyle(title).fontWeight).toBe('400');

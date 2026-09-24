@@ -332,10 +332,14 @@ it('preserves ordinary scrolling, enables deliberate pinch and releases mouse dr
   ]);
   element.dispatchEvent(new PointerEvent('pointerdown', { pointerType: 'mouse', button: 0 }));
   window.dispatchEvent(new PointerEvent('pointerup', { pointerType: 'mouse' }));
-  element.dispatchEvent(new PointerEvent('pointerdown', { pointerType: 'touch' }));
-  expect(instance.setBehaviors.mock.calls.slice(-3).map(([value]) => value)).toEqual([
+  element.dispatchEvent(new PointerEvent('pointerdown', { pointerType: 'touch', pointerId: 1 }));
+  element.dispatchEvent(new PointerEvent('pointerdown', { pointerType: 'touch', pointerId: 2 }));
+  window.dispatchEvent(new PointerEvent('pointerup', { pointerType: 'touch', pointerId: 1 }));
+  expect(instance.setBehaviors.mock.calls.slice(-5).map(([value]) => value)).toEqual([
     ['drag', 'pinchZoom'],
     ['pinchZoom'],
+    ['pinchZoom'],
+    ['drag', 'pinchZoom'],
     ['pinchZoom']
   ]);
 });

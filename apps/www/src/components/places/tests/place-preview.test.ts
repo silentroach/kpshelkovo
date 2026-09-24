@@ -427,6 +427,51 @@ it('enables native dragging for the primary mouse button and preserves the input
   }
 });
 
+it('drags with two touches over a marker, releases each contact and clears listeners on disconnect', async () => {
+  const { marker, setBehaviors } = setupMaps();
+  vi.mocked(loadYandexMaps).mockResolvedValue();
+  const element = mount({ coordinates: { lng: 37, lat: 55 }, interactive: true });
+  approach(element);
+  await Promise.resolve();
+  const canvas = element.querySelector<HTMLElement>('[data-canvas]')!;
+  const link = marker.mock.calls[0]![1];
+  canvas.append(link);
+  const touch = (target: EventTarget, type: string, pointerId: number): void => {
+    target.dispatchEvent(
+      new PointerEvent(type, { pointerType: 'touch', pointerId, bubbles: true })
+    );
+  };
+
+  touch(link, 'pointerdown', 1);
+  touch(canvas, 'pointerdown', 2);
+  canvas.dispatchEvent(new MouseEvent('wheel', { ctrlKey: true, bubbles: true }));
+  touch(window, 'pointercancel', 1);
+  touch(canvas, 'pointerdown', 3);
+  touch(window, 'pointerup', 2);
+  touch(window, 'pointerup', 3);
+  canvas.dispatchEvent(new PointerEvent('pointerdown', { pointerType: 'mouse', button: 0 }));
+  window.dispatchEvent(new Event('blur'));
+  expect(setBehaviors.mock.calls.map(([value]) => value.join(' + '))).toMatchInlineSnapshot(`
+    [
+      "pinchZoom",
+      "drag + pinchZoom",
+      "drag + pinchZoom + scrollZoom",
+      "pinchZoom",
+      "drag + pinchZoom",
+      "pinchZoom",
+      "pinchZoom",
+      "drag + pinchZoom",
+      "pinchZoom",
+    ]
+  `);
+  const calls = setBehaviors.mock.calls.length;
+  element.remove();
+  touch(window, 'pointercancel', 3);
+  window.dispatchEvent(new Event('blur'));
+  canvas.dispatchEvent(new MouseEvent('wheel', { ctrlKey: true, bubbles: true }));
+  expect(setBehaviors).toHaveBeenCalledTimes(calls);
+});
+
 it('leaves ordinary and pinch wheel events to the browser on a fixed background', async () => {
   const { setBehaviors } = setupMaps();
   vi.mocked(loadYandexMaps).mockResolvedValue();
