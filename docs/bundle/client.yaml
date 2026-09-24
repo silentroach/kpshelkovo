@@ -6,7 +6,7 @@ static/async.DQYjvbYA.js:
     rendered: 219
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/flags/async.js:
     rendered: 136
-static/BaseLayout.astro_astro_type_script_index_0_lang.DXtCIH8X.js:
+static/BaseLayout.astro_astro_type_script_index_0_lang.DmVm9OXw.js:
   apps/www/src/layouts/BaseLayout.astro?astro&type=script&index=0&lang.ts:
     rendered: 0
   apps/www/src/lib/home/status.ts:
@@ -415,7 +415,7 @@ static/esm.TQp3Y020.js:
     rendered: 1491
   node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/YMapClusterer.js:
     rendered: 3655
-static/explorer-component.BGXaqztO.js:
+static/explorer-component.CFU1-GIf.js:
   apps/www/src/compare/client/explorer-component.ts:
     rendered: 274
   apps/www/src/compare/components/SettlementCard.svelte:
@@ -440,11 +440,6 @@ static/explorer-component.BGXaqztO.js:
     rendered: 302
   packages/format/src/locale.ts:
     rendered: 115
-static/index.astro_astro_type_script_index_0_lang.Bp2yWyKD.js:
-  apps/www/src/compare/client/explorer.ts:
-    rendered: 3189
-  apps/www/src/pages/815/compare/index.astro?astro&type=script&index=0&lang.ts:
-    rendered: 121
 static/index.astro_astro_type_script_index_0_lang.CfIqIFq0.js:
   apps/www/src/pages/news/[year]/[month]/[entry]/index.astro?astro&type=script&index=0&lang.ts:
     rendered: 0
@@ -453,6 +448,11 @@ static/index.astro_astro_type_script_index_0_lang.CTHep30p.js:
     rendered: 6185
   apps/www/src/pages/status/calendar/[year]/index.astro?astro&type=script&index=0&lang.ts:
     rendered: 144
+static/index.astro_astro_type_script_index_0_lang.DJOMFFhA.js:
+  apps/www/src/compare/client/explorer.ts:
+    rendered: 3189
+  apps/www/src/pages/815/compare/index.astro?astro&type=script&index=0&lang.ts:
+    rendered: 121
 static/index.astro_astro_type_script_index_0_lang.DOdg66mi.js:
   apps/www/src/lib/home/hero.ts:
     rendered: 1162
@@ -471,7 +471,7 @@ static/index.astro_astro_type_script_index_0_lang.DZu290F3.js:
 static/InfrastructureTable.BdD1H66s.js:
   apps/www/src/compare/components/InfrastructureTable.svelte:
     rendered: 3583
-static/lazy.BuDQI0T3.js:
+static/lazy.DuhCY3Iq.js:
   apps/www/src/components/search/lazy.ts:
     rendered: 570
   apps/www/src/components/search/search-dialog.events.ts:
@@ -492,10 +492,10 @@ static/lifecycle.D15KiOSI.js:
 static/map-gestures.BUvJ1ZxA.js:
   apps/www/src/components/maps/map-gestures.ts:
     rendered: 1349
-static/map-public-schema.B3PfURLu.js:
+static/map-public-schema.BH5vrWb_.js:
   apps/www/src/lib/parcels/map-public-schema.ts:
     rendered: 443
-static/MapPreview.astro_astro_type_script_index_0_lang.q4rUhX4v.js:
+static/MapPreview.astro_astro_type_script_index_0_lang.7WAQRd45.js:
   apps/www/src/components/maps/map-preview.ts:
     rendered: 6792
   apps/www/src/components/maps/MapPreview.astro?astro&type=script&index=0&lang.ts:
@@ -503,280 +503,20 @@ static/MapPreview.astro_astro_type_script_index_0_lang.q4rUhX4v.js:
 static/number.3RH8yx7B.js:
   packages/format/src/number.ts:
     rendered: 877
-static/opening-hours.aQaYxppi.js:
-  apps/www/src/lib/mentions/backlinks.ts:
-    rendered: 0
-  apps/www/src/lib/mentions/index.ts:
-    rendered: 0
-  apps/www/src/lib/mentions/normalize.ts:
-    rendered: 109
+static/opening-hours.B8fdtn2s.js:
   apps/www/src/lib/mentions/types.ts:
     rendered: 293
   apps/www/src/lib/places/opening-hours.ts:
     rendered: 1441
   apps/www/src/lib/places/schema.ts:
     rendered: 190
-  node_modules/.pnpm/bail@2.0.2/node_modules/bail/index.js:
-    rendered: 136
-  node_modules/.pnpm/ccount@2.0.1/node_modules/ccount/index.js:
-    rendered: 410
-  node_modules/.pnpm/decode-named-character-reference@1.3.0/node_modules/decode-named-character-reference/index.dom.js:
-    rendered: 519
-  node_modules/.pnpm/devlop@1.1.0/node_modules/devlop/lib/default.js:
-    rendered: 115
-  node_modules/.pnpm/escape-string-regexp@5.0.0/node_modules/escape-string-regexp/index.js:
-    rendered: 311
-  node_modules/.pnpm/extend@3.0.2/node_modules/extend/index.js:
-    rendered: 2560
-  node_modules/.pnpm/is-plain-obj@4.1.0/node_modules/is-plain-obj/index.js:
-    rendered: 489
-  node_modules/.pnpm/longest-streak@3.1.0/node_modules/longest-streak/index.js:
-    rendered: 563
-  node_modules/.pnpm/markdown-table@3.0.4/node_modules/markdown-table/index.js:
-    rendered: 3993
-  node_modules/.pnpm/mdast-util-find-and-replace@3.0.2/node_modules/mdast-util-find-and-replace/lib/index.js:
-    rendered: 2659
-  node_modules/.pnpm/mdast-util-from-markdown@2.0.3_supports-color@5.5.0/node_modules/mdast-util-from-markdown/lib/index.js:
-    rendered: 18446
-  node_modules/.pnpm/mdast-util-gfm-autolink-literal@2.0.1/node_modules/mdast-util-gfm-autolink-literal/lib/index.js:
-    rendered: 4039
-  node_modules/.pnpm/mdast-util-gfm-footnote@2.1.0_supports-color@5.5.0/node_modules/mdast-util-gfm-footnote/lib/index.js:
-    rendered: 3363
-  node_modules/.pnpm/mdast-util-gfm-strikethrough@2.0.0_supports-color@5.5.0/node_modules/mdast-util-gfm-strikethrough/lib/index.js:
-    rendered: 1244
-  node_modules/.pnpm/mdast-util-gfm-table@2.0.0_supports-color@5.5.0/node_modules/mdast-util-gfm-table/lib/index.js:
-    rendered: 3666
-  node_modules/.pnpm/mdast-util-gfm-task-list-item@2.0.0_supports-color@5.5.0/node_modules/mdast-util-gfm-task-list-item/lib/index.js:
-    rendered: 2296
-  node_modules/.pnpm/mdast-util-gfm@3.1.0_supports-color@5.5.0/node_modules/mdast-util-gfm/lib/index.js:
-    rendered: 560
-  node_modules/.pnpm/mdast-util-phrasing@4.1.0/node_modules/mdast-util-phrasing/lib/index.js:
-    rendered: 385
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/blockquote.js:
-    rendered: 496
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/break.js:
-    rendered: 389
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/code.js:
-    rendered: 1350
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/definition.js:
-    rendered: 1350
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/emphasis.js:
-    rendered: 1188
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/heading.js:
-    rendered: 1180
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/html.js:
-    rendered: 241
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/image-reference.js:
-    rendered: 1062
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/image.js:
-    rendered: 1422
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/index.js:
-    rendered: 388
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/inline-code.js:
-    rendered: 1009
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/link-reference.js:
-    rendered: 1068
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/link.js:
-    rendered: 1856
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/list-item.js:
-    rendered: 1173
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/list.js:
-    rendered: 1694
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/paragraph.js:
-    rendered: 352
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/root.js:
-    rendered: 314
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/strong.js:
-    rendered: 1190
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/text.js:
-    rendered: 212
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/handle/thematic-break.js:
-    rendered: 356
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-bullet-ordered.js:
-    rendered: 406
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-bullet-other.js:
-    rendered: 679
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-bullet.js:
-    rendered: 401
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-emphasis.js:
-    rendered: 389
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-fence.js:
-    rendered: 376
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-list-item-indent.js:
-    rendered: 447
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-quote.js:
-    rendered: 377
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-rule-repetition.js:
-    rendered: 414
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-rule.js:
-    rendered: 393
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/check-strong.js:
-    rendered: 379
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/encode-character-reference.js:
-    rendered: 251
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/encode-info.js:
-    rendered: 902
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/format-code-as-indented.js:
-    rendered: 367
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/format-heading-as-setext.js:
-    rendered: 508
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/format-link-as-autolink.js:
-    rendered: 509
-  node_modules/.pnpm/mdast-util-to-markdown@2.1.2/node_modules/mdast-util-to-markdown/lib/util/pattern-in-scope.js:
-    rendered: 540
-  node_modules/.pnpm/mdast-util-to-string@4.0.0/node_modules/mdast-util-to-string/lib/index.js:
-    rendered: 1109
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/attention.js:
-    rendered: 4458
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/autolink.js:
-    rendered: 2468
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/blank-line.js:
-    rendered: 491
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/block-quote.js:
-    rendered: 1506
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/character-escape.js:
-    rendered: 714
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/character-reference.js:
-    rendered: 1786
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/code-fenced.js:
-    rendered: 5071
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/code-indented.js:
-    rendered: 1864
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/code-text.js:
-    rendered: 2945
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/content.js:
-    rendered: 1894
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/definition.js:
-    rendered: 2461
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/hard-break-escape.js:
-    rendered: 547
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/heading-atx.js:
-    rendered: 2627
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/html-flow.js:
-    rendered: 9718
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/html-text.js:
-    rendered: 7121
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/label-end.js:
-    rendered: 6667
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/label-start-image.js:
-    rendered: 888
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/label-start-link.js:
-    rendered: 692
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/line-ending.js:
-    rendered: 434
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/list.js:
-    rendered: 4630
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/setext-underline.js:
-    rendered: 2364
-  node_modules/.pnpm/micromark-core-commonmark@2.0.3/node_modules/micromark-core-commonmark/lib/thematic-break.js:
-    rendered: 1001
-  node_modules/.pnpm/micromark-extension-gfm-autolink-literal@2.1.0/node_modules/micromark-extension-gfm-autolink-literal/lib/syntax.js:
-    rendered: 8990
-  node_modules/.pnpm/micromark-extension-gfm-footnote@2.1.0/node_modules/micromark-extension-gfm-footnote/lib/syntax.js:
-    rendered: 7442
-  node_modules/.pnpm/micromark-extension-gfm-strikethrough@2.1.0/node_modules/micromark-extension-gfm-strikethrough/lib/syntax.js:
-    rendered: 3400
-  node_modules/.pnpm/micromark-extension-gfm-table@2.1.1/node_modules/micromark-extension-gfm-table/lib/edit-map.js:
-    rendered: 1345
-  node_modules/.pnpm/micromark-extension-gfm-table@2.1.1/node_modules/micromark-extension-gfm-table/lib/infer.js:
-    rendered: 904
-  node_modules/.pnpm/micromark-extension-gfm-table@2.1.1/node_modules/micromark-extension-gfm-table/lib/syntax.js:
-    rendered: 11230
-  node_modules/.pnpm/micromark-extension-gfm-task-list-item@2.1.0/node_modules/micromark-extension-gfm-task-list-item/lib/syntax.js:
-    rendered: 1683
-  node_modules/.pnpm/micromark-extension-gfm@3.0.0/node_modules/micromark-extension-gfm/index.js:
-    rendered: 287
-  node_modules/.pnpm/micromark-factory-destination@2.0.1/node_modules/micromark-factory-destination/index.js:
-    rendered: 2346
-  node_modules/.pnpm/micromark-factory-label@2.0.1/node_modules/micromark-factory-label/index.js:
-    rendered: 1558
-  node_modules/.pnpm/micromark-factory-space@2.0.1/node_modules/micromark-factory-space/index.js:
-    rendered: 552
-  node_modules/.pnpm/micromark-factory-title@2.0.1/node_modules/micromark-factory-title/index.js:
-    rendered: 1501
-  node_modules/.pnpm/micromark-factory-whitespace@2.0.1/node_modules/micromark-factory-whitespace/index.js:
-    rendered: 516
-  node_modules/.pnpm/micromark-util-character@2.1.1/node_modules/micromark-util-character/index.js:
-    rendered: 990
-  node_modules/.pnpm/micromark-util-chunked@2.0.1/node_modules/micromark-util-chunked/index.js:
-    rendered: 880
-  node_modules/.pnpm/micromark-util-classify-character@2.0.1/node_modules/micromark-util-classify-character/index.js:
-    rendered: 314
-  node_modules/.pnpm/micromark-util-combine-extensions@2.0.1/node_modules/micromark-util-combine-extensions/index.js:
-    rendered: 990
-  node_modules/.pnpm/micromark-util-decode-numeric-character-reference@2.0.2/node_modules/micromark-util-decode-numeric-character-reference/index.js:
-    rendered: 550
-  node_modules/.pnpm/micromark-util-decode-string@2.0.1/node_modules/micromark-util-decode-string/index.js:
-    rendered: 620
-  node_modules/.pnpm/micromark-util-html-tag-name@2.0.1/node_modules/micromark-util-html-tag-name/index.js:
-    rendered: 828
-  node_modules/.pnpm/micromark-util-normalize-identifier@2.0.1/node_modules/micromark-util-normalize-identifier/index.js:
-    rendered: 281
-  node_modules/.pnpm/micromark-util-resolve-all@2.0.1/node_modules/micromark-util-resolve-all/index.js:
-    rendered: 439
-  node_modules/.pnpm/micromark-util-subtokenize@2.1.0/node_modules/micromark-util-subtokenize/index.js:
-    rendered: 4218
-  node_modules/.pnpm/micromark-util-subtokenize@2.1.0/node_modules/micromark-util-subtokenize/lib/splice-buffer.js:
-    rendered: 2558
-  node_modules/.pnpm/micromark@4.0.2_supports-color@5.5.0/node_modules/micromark/lib/constructs.js:
-    rendered: 1492
-  node_modules/.pnpm/micromark@4.0.2_supports-color@5.5.0/node_modules/micromark/lib/create-tokenizer.js:
-    rendered: 7088
-  node_modules/.pnpm/micromark@4.0.2_supports-color@5.5.0/node_modules/micromark/lib/initialize/content.js:
-    rendered: 1237
-  node_modules/.pnpm/micromark@4.0.2_supports-color@5.5.0/node_modules/micromark/lib/initialize/document.js:
-    rendered: 5074
-  node_modules/.pnpm/micromark@4.0.2_supports-color@5.5.0/node_modules/micromark/lib/initialize/flow.js:
-    rendered: 1005
-  node_modules/.pnpm/micromark@4.0.2_supports-color@5.5.0/node_modules/micromark/lib/initialize/text.js:
-    rendered: 3522
-  node_modules/.pnpm/micromark@4.0.2_supports-color@5.5.0/node_modules/micromark/lib/parse.js:
-    rendered: 571
-  node_modules/.pnpm/micromark@4.0.2_supports-color@5.5.0/node_modules/micromark/lib/postprocess.js:
-    rendered: 207
-  node_modules/.pnpm/micromark@4.0.2_supports-color@5.5.0/node_modules/micromark/lib/preprocess.js:
-    rendered: 1893
-  node_modules/.pnpm/remark-gfm@4.0.1_supports-color@5.5.0/node_modules/remark-gfm/lib/index.js:
-    rendered: 694
-  node_modules/.pnpm/remark-parse@11.0.0_supports-color@5.5.0/node_modules/remark-parse/lib/index.js:
-    rendered: 428
-  node_modules/.pnpm/trough@2.2.0/node_modules/trough/lib/index.js:
-    rendered: 1758
-  node_modules/.pnpm/unified@11.0.5/node_modules/unified/lib/callable-instance.js:
-    rendered: 358
-  node_modules/.pnpm/unified@11.0.5/node_modules/unified/lib/index.js:
-    rendered: 8017
-  node_modules/.pnpm/unist-util-is@6.0.1/node_modules/unist-util-is/lib/index.js:
-    rendered: 1554
-  node_modules/.pnpm/unist-util-stringify-position@4.0.0/node_modules/unist-util-stringify-position/lib/index.js:
-    rendered: 729
-  node_modules/.pnpm/unist-util-visit-parents@6.0.2/node_modules/unist-util-visit-parents/lib/color.js:
-    rendered: 163
-  node_modules/.pnpm/unist-util-visit-parents@6.0.2/node_modules/unist-util-visit-parents/lib/index.js:
-    rendered: 1955
-  node_modules/.pnpm/unist-util-visit@5.1.0/node_modules/unist-util-visit/lib/index.js:
-    rendered: 713
-  node_modules/.pnpm/vfile-message@4.0.3/node_modules/vfile-message/lib/index.js:
-    rendered: 2820
-  node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/index.js:
-    rendered: 3765
-  node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/minpath.browser.js:
-    rendered: 4910
-  node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/minproc.browser.js:
-    rendered: 157
-  node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/minurl.browser.js:
-    rendered: 1315
-  node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/minurl.shared.js:
-    rendered: 351
-  rolldown/runtime.js:
-    rendered: 1426
 static/page.hqTgJEwh.js:
   astro:scripts/page.js:
     rendered: 53
 static/parcel-layer.CxwX4fxm.js:
   apps/www/src/components/places/parcel-layer.ts:
     rendered: 4766
-static/PlaceMap.B-MZ8gEU.js:
+static/PlaceMap.Cmu-C3xq.js:
   apps/www/src/components/places/place-map-geometry.ts:
     rendered: 2446
   apps/www/src/components/places/place-map-url.ts:
@@ -813,7 +553,7 @@ static/PlaceMap.B-MZ8gEU.js:
     rendered: 125
   packages/ui/src/markers/Titanic.png?url:
     rendered: 133
-static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.B3GcFsJE.js:
+static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.DMm1y5oZ.js:
   apps/www/src/components/places/PlaceOpeningHours.astro?astro&type=script&index=0&lang.ts:
     rendered: 1167
 static/prefetch.cds4f2Tp.js:

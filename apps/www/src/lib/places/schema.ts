@@ -1,4 +1,4 @@
-import { SITE_BACKLINK_KINDS, SITE_MENTION_SECTIONS } from '@/lib/mentions';
+import { SITE_BACKLINK_KINDS, SITE_MENTION_SECTIONS } from '@/lib/mentions/types';
 
 export const PLACE_CATEGORIES = [
   'entrance',
