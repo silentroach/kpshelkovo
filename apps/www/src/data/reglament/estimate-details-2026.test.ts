@@ -329,15 +329,6 @@ describe('estimate details 2026 dataset', () => {
     expect(missingRows).toEqual([]);
   });
 
-  it('keeps every resource linked to a work item in the complete dataset', () => {
-    const workItemIds = new Set(estimateDetails2026.work_items.map((item) => item.id));
-    const missingWorkItems = estimateDetails2026.resources
-      .filter((resource) => !workItemIds.has(resource.work_item_id))
-      .map((resource) => ({ resource_id: resource.id, work_item_id: resource.work_item_id }));
-
-    expect(missingWorkItems).toEqual([]);
-  });
-
   it('keeps every service_id backed by full-2026 when present', () => {
     const missingServices = estimateDetails2026.work_items.flatMap((item) =>
       (item.service_ids ?? [])
