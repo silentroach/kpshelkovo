@@ -93,6 +93,31 @@ afterEach(() => {
 });
 
 describe('SearchDialog', () => {
+  it('shows Moscow dates only for dated results and keeps result links usable', async () => {
+    const opener = addOpener('Поиск');
+    const view = render(SearchDialog, {
+      props: {
+        client: {
+          search: async (query: string) =>
+            readyResponse(query, [
+              { ...resultAt(1), publishedAt: '2026-03-31T22:30:00Z' },
+              resultAt(2)
+            ])
+        }
+      }
+    });
+
+    await requestOpen(opener);
+    await enterDebouncedQuery(view.getByRole('searchbox'), 'дата');
+    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(2));
+
+    expect(view.getByText('1 апреля 2026').closest('time')?.getAttribute('datetime')).toBe(
+      '2026-03-31T22:30:00Z'
+    );
+    expect(view.container.querySelectorAll('time')).toHaveLength(1);
+    expect(view.getAllByRole('link')[0]?.getAttribute('href')).toBe('/news/result-1/');
+  });
+
   it('retries parcel search, counts and loads mixed results, and opens the first parcel with Enter', async () => {
     const intersections: Array<() => void> = [];
     vi.stubGlobal(

@@ -6,7 +6,7 @@ static/async.DQYjvbYA.js:
     rendered: 219
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/flags/async.js:
     rendered: 136
-static/BaseLayout.astro_astro_type_script_index_0_lang.DmVm9OXw.js:
+static/BaseLayout.astro_astro_type_script_index_0_lang.DQMM9Pr1.js:
   apps/www/src/layouts/BaseLayout.astro?astro&type=script&index=0&lang.ts:
     rendered: 0
   apps/www/src/lib/home/status.ts:
@@ -339,7 +339,7 @@ static/index.astro_astro_type_script_index_0_lang.DZu290F3.js:
 static/InfrastructureTable.BdD1H66s.js:
   apps/www/src/compare/components/InfrastructureTable.svelte:
     rendered: 3583
-static/lazy.DuhCY3Iq.js:
+static/lazy.B5i04rsM.js:
   apps/www/src/components/search/lazy.ts:
     rendered: 570
   apps/www/src/components/search/search-dialog.events.ts:
@@ -352,6 +352,8 @@ static/lazy.DuhCY3Iq.js:
     rendered: 12753
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/events/index.js:
     rendered: 0
+  packages/format/src/date.ts:
+    rendered: 558
   packages/ui/src/icons/system/Search.svelte:
     rendered: 517
 static/lifecycle.D15KiOSI.js:
@@ -360,7 +362,7 @@ static/lifecycle.D15KiOSI.js:
 static/map-gestures.BUvJ1ZxA.js:
   apps/www/src/components/maps/map-gestures.ts:
     rendered: 1349
-static/map-public-schema.DPh203Jk.js:
+static/map-public-schema.Cffnl9lj.js:
   apps/www/src/lib/geometry/raw-polygon-schema.ts:
     rendered: 1078
   apps/www/src/lib/parcels/map-public-schema.ts:
@@ -422,7 +424,7 @@ static/page.hqTgJEwh.js:
 static/parcel-layer.CxwX4fxm.js:
   apps/www/src/components/places/parcel-layer.ts:
     rendered: 4766
-static/PlaceMap.BzdwirF_.js:
+static/PlaceMap.c8I1zDQ4.js:
   apps/www/src/components/places/place-map-geometry.ts:
     rendered: 1686
   apps/www/src/components/places/place-map-url.ts:
@@ -433,142 +435,8 @@ static/PlaceMap.BzdwirF_.js:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:
     rendered: 658
-  apps/www/src/lib/places/view.ts:
-    rendered: 252
-  apps/www/src/lib/status/view.ts:
-    rendered: 138
-  node_modules/.pnpm/typograf@7.8.0/node_modules/typograf/dist/typograf.es.mjs:
-    rendered: 76249
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/compose/compose-collection.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/compose/compose-doc.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/compose/compose-node.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/compose/compose-scalar.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/compose/composer.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/compose/resolve-block-map.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/compose/resolve-block-scalar.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/compose/resolve-block-seq.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/compose/resolve-flow-collection.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/compose/resolve-flow-scalar.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/doc/anchors.js:
-    rendered: 325
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/doc/applyReviver.js:
-    rendered: 1103
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/doc/createNode.js:
-    rendered: 2153
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/doc/directives.js:
-    rendered: 4012
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/doc/Document.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/index.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/log.js:
-    rendered: 207
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/nodes/addPairToJSMap.js:
-    rendered: 1604
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/nodes/Alias.js:
-    rendered: 2651
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/nodes/Collection.js:
-    rendered: 3050
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/nodes/identity.js:
-    rendered: 1314
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/nodes/Node.js:
-    rendered: 992
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/nodes/Pair.js:
-    rendered: 853
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/nodes/Scalar.js:
-    rendered: 619
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/nodes/toJS.js:
-    rendered: 688
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/nodes/YAMLMap.js:
-    rendered: 3082
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/nodes/YAMLSeq.js:
-    rendered: 2102
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/parse/cst-scalar.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/parse/cst-visit.js:
-    rendered: 1616
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/parse/cst.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/parse/lexer.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/parse/parser.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/public-api.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/common/map.js:
-    rendered: 386
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/common/null.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/common/seq.js:
-    rendered: 387
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/common/string.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/core/bool.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/core/float.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/core/schema.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/json/schema.js:
-    rendered: 1569
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/Schema.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/tags.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/yaml-1.1/binary.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/yaml-1.1/bool.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/yaml-1.1/float.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/yaml-1.1/merge.js:
-    rendered: 1618
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/yaml-1.1/omap.js:
-    rendered: 1123
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/yaml-1.1/pairs.js:
-    rendered: 937
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/yaml-1.1/schema.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/schema/yaml-1.1/set.js:
-    rendered: 1715
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/stringify/foldFlowLines.js:
-    rendered: 2953
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/stringify/stringify.js:
-    rendered: 3476
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/stringify/stringifyCollection.js:
-    rendered: 4212
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/stringify/stringifyComment.js:
-    rendered: 561
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/stringify/stringifyDocument.js:
-    rendered: 0
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/stringify/stringifyPair.js:
-    rendered: 3978
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/stringify/stringifyString.js:
-    rendered: 8531
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/dist/visit.js:
-    rendered: 4197
-  node_modules/.pnpm/yaml@2.9.0/node_modules/yaml/browser/index.js:
-    rendered: 0
-  packages/markdown/src/generate.ts:
-    rendered: 0
-  packages/markdown/src/index.ts:
-    rendered: 0
-  packages/markdown/src/plain-text.ts:
-    rendered: 0
-  packages/markdown/src/render.ts:
-    rendered: 0
-  packages/markdown/src/typography.ts:
-    rendered: 1005
+  apps/www/src/lib/places/status-label.ts:
+    rendered: 260
   packages/ui/src/markers/Animals.png?url:
     rendered: 133
   packages/ui/src/markers/Apple.png?url:
@@ -604,13 +472,9 @@ static/runtime.Qhz4v4R0.js:
     rendered: 369
   apps/www/src/lib/yandex-maps/runtime.ts:
     rendered: 3655
-static/schema.CkH8cRhQ.js:
+static/schema.ES40QtCI.js:
   apps/www/src/lib/parcels/schema.ts:
     rendered: 238
-  node_modules/.pnpm/luxon@3.7.2/node_modules/luxon/build/es6/luxon.mjs:
-    rendered: 125834
-  packages/format/src/date.ts:
-    rendered: 295
   packages/format/src/plural.ts:
     rendered: 430
 static/ServiceTable.W-7gissb.js:

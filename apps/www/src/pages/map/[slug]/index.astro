@@ -13,11 +13,11 @@ import { renderMarkdown } from '@/lib/markdown/render';
 import { loadPlaces, loadPlaceWithBacklinks } from '@/lib/places/load';
 import { getNearbyPlaces } from '@/lib/places/nearby';
 import { placeHighlightUrl, placesUrl } from '@/lib/places/routes';
+import { formatPlaceStatus } from '@/lib/places/status-label';
 import {
   formatPlaceBacklinkDate,
   formatPlaceBacklinkKind,
   formatPlaceCategory,
-  formatPlaceStatus,
   placeBacklinkGroups,
 } from '@/lib/places/view';
 import { SEARCH_SECTIONS } from '@/lib/search/sections';

@@ -18,7 +18,7 @@
   import type { PlaceMapItem, PlaceMapProps } from '@/lib/places/map-types';
   import { getPlaceClosingTime } from '@/lib/places/opening-hours';
   import type { PlaceMarker } from '@/lib/places/schema';
-  import { formatPlaceStatus } from '@/lib/places/view';
+  import { formatPlaceStatus } from '@/lib/places/status-label';
   import { createOpenMapsControl } from '@/lib/yandex-maps/open-maps-control';
   import {
     installYandexMapsRuntimeHeadPersistence,
