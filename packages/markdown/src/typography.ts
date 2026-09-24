@@ -1,3 +1,4 @@
+import { decodeHTML, escapeText } from 'entities';
 import type { HastPluginDefinition } from 'satteri';
 import Typograf from 'typograf';
 
@@ -44,10 +45,13 @@ if (!Typograf.getRule(BEFORE_NUMBER_SIGN_RULE)) {
   });
 }
 
-const typograf = new Typograf({
-  locale: ['ru', 'en-US'],
-  processingSeparateParts: true
-});
+const createTypograf = (): Typograf =>
+  new Typograf({
+    locale: ['ru', 'en-US'],
+    processingSeparateParts: true
+  });
+
+const typograf = createTypograf();
 
 function safeTagPattern(tag: string): RegExp {
   return new RegExp(`<${tag}(?:\\s[^>]*)?>[\\s\\S]*?<\\/${tag}>`, 'gi');
@@ -132,3 +136,15 @@ export const satteriTypograf = (): HastPluginDefinition => ({
 });
 
 export const formatDynamicHtml = (html: string): string => typograf.execute(html);
+
+let plainTextTypograf: Typograf | undefined;
+
+/** Returns plain text for textContent, not HTML for direct insertion. */
+export const formatPlainText = (text: string): string => {
+  if (!plainTextTypograf) {
+    plainTextTypograf = createTypograf();
+    // Protect escaped ampersands and literal entities from punctuation rules.
+    plainTextTypograf.addSafeTag(/&amp;(?:(?:#\d+|#x[\da-f]+|[a-z][\da-z]*);)?/gi);
+  }
+  return decodeHTML(plainTextTypograf.execute(escapeText(text)));
+};
