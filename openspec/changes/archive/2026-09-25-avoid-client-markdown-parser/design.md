@@ -4,7 +4,7 @@
 
 См. [proposal.md](proposal.md). `places/opening-hours.ts`, `places/routes.ts` и клиентский модуль геометрии карты импортируют `places/schema.ts`. Сейчас схема на верхнем уровне импортирует `SITE_MENTION_SECTIONS` и `SITE_BACKLINK_KINDS` через `mentions/index.ts`, который реэкспортирует `mentions/normalize.ts`. Тот создаёт Markdown-парсер на верхнем уровне, поэтому tree-shaking не убирает его из общего клиентского чанка.
 
-`PLACE_MENTION_SECTIONS` нужен только для группировки обратных ссылок в `places/view.ts` и её тесте; `PLACE_BACKLINK_KINDS` нигде не используется. Часы, видимое расписание и статус по Москве уже определены [place-opening-hours](../../specs/place-opening-hours/spec.md); механизм общего превью — [ADR-039](../../../docs/decisions/039-shared-yandex-maps-runtime-and-preview.md). Для Markdown-упоминаний действуют [ADR-003](../../../docs/decisions/003-markdown-pipeline-layering.md) и [ADR-012](../../../docs/decisions/012-entity-mention-graph.md). Изменение не переносит обработку Markdown в браузер и не меняет эти правила.
+`PLACE_MENTION_SECTIONS` нужен только для группировки обратных ссылок в `places/view.ts` и её тесте; `PLACE_BACKLINK_KINDS` нигде не используется. Часы, видимое расписание и статус по Москве уже определены [place-opening-hours](../../../specs/place-opening-hours/spec.md); механизм общего превью — [ADR-039](../../../../docs/decisions/039-shared-yandex-maps-runtime-and-preview.md). Для Markdown-упоминаний действуют [ADR-003](../../../../docs/decisions/003-markdown-pipeline-layering.md) и [ADR-012](../../../../docs/decisions/012-entity-mention-graph.md). Изменение не переносит обработку Markdown в браузер и не меняет эти правила.
 
 ## Goals / Non-Goals
 
