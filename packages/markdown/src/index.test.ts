@@ -10,7 +10,6 @@ import {
   extractFirstMarkdownText,
   extractMarkdownText,
   formatDynamicHtml,
-  formatPlainText,
   md,
   parseMarkdownFragment,
   rehypeTypograf,
@@ -22,24 +21,6 @@ import {
 
 const showNbsp = (value: string): string =>
   value.replaceAll('\u00A0', '·').replaceAll('\u202F', '·');
-
-describe('plain-text typography', () => {
-  it('formats quotes and non-breaking spaces without interpreting markup', () => {
-    expect(showNbsp(formatPlainText('"Шелково Ривер" п. № 1'))).toMatchInlineSnapshot(
-      `"«Шелково·Ривер» п.·№·1"`
-    );
-    expect(formatPlainText('<script>alert(1)</script> <b>текст</b>')).toContain(
-      '<script>alert (1)</script> <b>текст</b>'
-    );
-  });
-
-  it('preserves literal entity and Markdown syntax, and unchanged text', () => {
-    expect(formatPlainText('&amp; &nbsp; &#160; &lt;')).toBe('&amp; &nbsp; &#160; &lt;');
-    expect(formatPlainText('**слово** [ссылка](url)')).toBe('**слово** [ссылка](url)');
-    expect(formatPlainText('Привет')).toBe('Привет');
-    expect(formatPlainText('\uE000 &')).toContain('\uE000 &');
-  });
-});
 
 const renderDom = (markdown: string) => {
   document.body.innerHTML = render(markdown);

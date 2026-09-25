@@ -132,14 +132,3 @@ export const satteriTypograf = (): HastPluginDefinition => ({
 });
 
 export const formatDynamicHtml = (html: string): string => typograf.execute(html);
-
-/** Run site typography without interpreting authored text as HTML or entities. */
-export const formatPlainText = (value: string): string => {
-  let amp = '\uE000';
-  while (value.includes(amp)) amp += '\uE000';
-  return typograf
-    .execute(value.replaceAll('&', amp).replaceAll('<', '&lt;').replaceAll('>', '&gt;'))
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll(amp, '&');
-};

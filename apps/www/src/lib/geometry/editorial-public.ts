@@ -1,4 +1,3 @@
-import { prepareEditorialGeometry } from './editorial-display';
 import { EditorialPublicGeometrySchema } from './editorial-public-schema';
 import type { EditorialPublicGeometry } from './editorial-public-schema';
 import type { EditorialFeatureCollection } from './editorial-types';
@@ -9,7 +8,7 @@ export const toPublicEditorialGeometry = (
   EditorialPublicGeometrySchema.parse({
     type: 'FeatureCollection',
     metadata: collection.metadata,
-    features: prepareEditorialGeometry(collection).features.map((feature) => ({
+    features: collection.features.map((feature) => ({
       type: 'Feature',
       id: feature.id,
       geometry: feature.geometry,

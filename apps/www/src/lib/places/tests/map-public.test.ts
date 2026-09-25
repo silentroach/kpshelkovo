@@ -190,9 +190,7 @@ describe('place map public DTO', () => {
     const parsed = EditorialPublicGeometrySchema.parse(JSON.parse(JSON.stringify(geometry)));
 
     expect(editorial.features[0]?.iconCaption).toBe('"Шелково Ривер" <b>Gate</b> &amp;');
-    expect(parsed.features[0]?.properties.iconCaption?.replaceAll('\u00a0', '·')).toContain(
-      '«Шелково·Ривер» <b>Gate</b> &amp;'
-    );
+    expect(parsed.features[0]?.properties.iconCaption).toBe(editorial.features[0]?.iconCaption);
 
     expect(fromPublicEditorialGeometry(parsed).features.map(({ iconContent }) => iconContent))
       .toMatchInlineSnapshot(`
@@ -223,7 +221,7 @@ describe('place map public DTO', () => {
           "description": "**raw**",
           "fill": "#def",
           "fill-opacity": 0.1,
-          "iconCaption": "«Шелково Ривер» <b>Gate</b> &amp;",
+          "iconCaption": "\"Шелково Ривер\" <b>Gate</b> &amp;",
           "iconContent": "0",
           "marker-color": "#123456",
           "stroke": "#abc",

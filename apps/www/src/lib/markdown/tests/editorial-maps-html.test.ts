@@ -34,14 +34,12 @@ const document = (markdown: string, options?: Parameters<typeof renderMarkdown>[
 };
 
 describe('editorial map HTML', () => {
-  it('serializes prepared visible text without changing hidden descriptions or running markup', () => {
+  it('serializes visible text verbatim without changing hidden descriptions or running markup', () => {
     const page = document(map(undefined, undefined, '"Шелково Ривер" &amp; <img src=x>'));
     const host = page.querySelector('editorial-map');
     const geometry = JSON.parse(host?.getAttribute('data-geometry') ?? '');
 
-    expect(geometry.features[0].iconCaption.replaceAll('\u00a0', '·')).toBe(
-      '«Шелково·Ривер» &amp; <img src=x>'
-    );
+    expect(geometry.features[0].iconCaption).toBe('"Шелково Ривер" &amp; <img src=x>');
     expect(geometry.features[0].description).toBe('</script><script>alert(1)</script>');
     expect(page.querySelector('img, script')).toBeFalsy();
   });

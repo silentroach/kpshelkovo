@@ -3,7 +3,6 @@ import type { YMapFeatureProps, YMapMarkerProps } from '@yandex/ymaps3-types';
 import { afterEach, expect, it, vi } from 'vitest';
 
 import { fromPublicEditorialGeometry } from '@/components/places/place-map-geometry';
-import { prepareEditorialGeometry } from '@/lib/geometry/editorial-display';
 import { parseEditorialGeometry } from '@/lib/geometry/editorial-mapper';
 import { toPublicEditorialGeometry } from '@/lib/geometry/editorial-public';
 import type { EditorialFeatureCollection } from '@/lib/geometry/editorial-types';
@@ -239,7 +238,7 @@ it('omits absent SDK style properties for solid geometry, and keeps explicit das
   expect(Object.hasOwn(filledArea, 'fillOpacity')).toBe(false);
 });
 
-it('typographs visible point labels while preserving markup-like characters as plain text', () => {
+it('renders visible point labels verbatim without interpreting markup-like characters', () => {
   const sdk = setupSdk();
   const text = 'Шелково Ривер п. № 1 <b>ворота</b> & <img src=x>';
   const item = {
@@ -247,12 +246,10 @@ it('typographs visible point labels while preserving markup-like characters as p
     geometry: { type: 'Point' as const, coordinates: [37, 55] as const },
     iconCaption: text
   };
-  createEditorialMapObjects(window.ymaps3!, prepareEditorialGeometry(collection([item])));
+  createEditorialMapObjects(window.ymaps3!, collection([item]));
 
   const caption = sdk.marker.mock.calls[0]?.[1].querySelector('.editorial-map-marker__caption');
-  expect(
-    caption?.textContent?.replaceAll('\u00a0', '·').replaceAll('\u202f', '·')
-  ).toMatchInlineSnapshot(`"Шелково·Ривер п.·№·1 <b>ворота</b> & <img src=x>"`);
+  expect(caption?.textContent).toBe(text);
   expect(caption?.querySelector('b, img')).toBeFalsy();
   expect(item.iconCaption).toBe(text);
 });
