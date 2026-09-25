@@ -23,7 +23,6 @@
   import { getPlaceClosingTime } from '@/lib/places/opening-hours';
   import { placeUrl } from '@/lib/places/routes';
   import type { PlaceMarker } from '@/lib/places/schema';
-  import { formatPlaceStatus } from '@/lib/places/view';
   import { createOpenMapsControl } from '@/lib/yandex-maps/open-maps-control';
   import {
     installYandexMapsRuntimeHeadPersistence,
@@ -60,6 +59,7 @@
     name: place.name,
     marker: place.marker,
     status: place.status,
+    statusLabel: place.status_label,
     coordinates: place.coordinates,
     geometry: place.geometry ? fromPublicEditorialGeometry(place.geometry) : undefined,
     openingHours: place.opening_hours
@@ -183,7 +183,7 @@
       link.dataset.open = String(Boolean(closingTime));
     }
 
-    const status = place.status === 'existing' ? '' : `, ${formatPlaceStatus(place.status)}`;
+    const status = place.statusLabel ? `, ${place.statusLabel}` : '';
     let openingStatus = '';
 
     if (place.openingHours) {

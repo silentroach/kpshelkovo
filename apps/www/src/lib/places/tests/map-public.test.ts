@@ -123,6 +123,7 @@ describe('place map public DTO', () => {
         },
         "slug": "hunting-ponds",
         "status": "existing",
+        "status_label": undefined,
       }
     `);
   });
@@ -163,7 +164,7 @@ describe('place map public DTO', () => {
           id: 0,
           properties: {
             description: '**raw**',
-            iconCaption: '<b>Gate</b>',
+            iconCaption: '"Шелково Ривер" <b>Gate</b> &amp;',
             iconContent: '0',
             'marker-color': '#123456',
             stroke: '#abc',
@@ -183,10 +184,13 @@ describe('place map public DTO', () => {
         }
       ]
     };
-    const geometry = buildPlaceMapPublicPayload([
-      { ...place, geometry: parseEditorialGeometry(source, 'fixture') }
-    ]).places[0]?.geometry;
+    const editorial = parseEditorialGeometry(source, 'fixture');
+    const geometry = buildPlaceMapPublicPayload([{ ...place, geometry: editorial }]).places[0]
+      ?.geometry;
     const parsed = EditorialPublicGeometrySchema.parse(JSON.parse(JSON.stringify(geometry)));
+
+    expect(editorial.features[0]?.iconCaption).toBe('"Шелково Ривер" <b>Gate</b> &amp;');
+    expect(parsed.features[0]?.properties.iconCaption).toBe(editorial.features[0]?.iconCaption);
 
     expect(fromPublicEditorialGeometry(parsed).features.map(({ iconContent }) => iconContent))
       .toMatchInlineSnapshot(`
@@ -217,7 +221,7 @@ describe('place map public DTO', () => {
           "description": "**raw**",
           "fill": "#def",
           "fill-opacity": 0.1,
-          "iconCaption": "<b>Gate</b>",
+          "iconCaption": "\"Шелково Ривер\" <b>Gate</b> &amp;",
           "iconContent": "0",
           "marker-color": "#123456",
           "stroke": "#abc",

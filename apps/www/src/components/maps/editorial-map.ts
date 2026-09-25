@@ -1,4 +1,3 @@
-import { formatDynamicHtml } from '@shelkovo/markdown';
 import type {
   DrawingStyle,
   LineStringGeometry,
@@ -21,12 +20,6 @@ import './editorial-map.css';
 
 const copyPosition = ([lng, lat]: EditorialPosition): LngLat => [lng, lat];
 const copyRing = (ring: readonly EditorialPosition[]): LngLat[] => ring.map(copyPosition);
-const formatCaptionText = (value: string): string => {
-  const escaped = value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-  const decoder = document.createElement('textarea');
-  decoder.innerHTML = formatDynamicHtml(escaped);
-  return decoder.value;
-};
 
 const toMapGeometry = (
   geometry: Exclude<EditorialGeometry, { readonly type: 'Point' }>
@@ -86,7 +79,7 @@ export const createEditorialMapObjects = (
       if (feature.iconCaption !== undefined) {
         const caption = document.createElement('span');
         caption.className = 'editorial-map-marker__caption';
-        caption.textContent = formatCaptionText(feature.iconCaption);
+        caption.textContent = feature.iconCaption;
         marker.append(caption);
       }
       return new maps.YMapMarker(

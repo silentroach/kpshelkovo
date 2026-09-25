@@ -560,7 +560,8 @@ describe('PlaceMap', () => {
             slug: 'construction',
             name: 'Строительство',
             marker: 'construction',
-            status: 'underConstruction'
+            status: 'underConstruction',
+            statusLabel: 'Строится'
           },
           {
             ...titanicPlace,

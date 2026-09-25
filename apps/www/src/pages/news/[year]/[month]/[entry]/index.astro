@@ -7,6 +7,7 @@ import NewsAttachments from '@/components/news/NewsAttachments.astro';
 import EventWidget from '@/components/events/EventWidget.astro';
 import NewsMeta from '@/components/news/NewsMeta.astro';
 import NewsPhotos from '@/components/news/NewsPhotos.astro';
+import EditorialMapScript from '@/components/maps/EditorialMapScript.astro';
 import '@/components/maps/editorial-map.css';
 import {
   withHomeBreadcrumbs,
@@ -44,6 +45,7 @@ if (!article || !source) {
 const bodyHtml = article.body
   ? renderMarkdown(article.body, { eagerImages: true, editorialMaps: true })
   : undefined;
+const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
 const monthName = formatNewsMonth(article.year, article.month, {
   capitalize: true,
 });
@@ -270,9 +272,7 @@ const schema = newsArticleSchema({
       }
     </article>
   </main>
-  <script>
-    import '@/components/maps/editorial-map-element';
-  </script>
+  {hasEditorialMap && <EditorialMapScript />}
 </BaseLayout>
 
 <style>

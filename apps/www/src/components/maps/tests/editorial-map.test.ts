@@ -238,7 +238,7 @@ it('omits absent SDK style properties for solid geometry, and keeps explicit das
   expect(Object.hasOwn(filledArea, 'fillOpacity')).toBe(false);
 });
 
-it('typographs visible point labels while preserving markup-like characters as plain text', () => {
+it('renders visible point labels verbatim without interpreting markup-like characters', () => {
   const sdk = setupSdk();
   const text = 'Шелково Ривер п. № 1 <b>ворота</b> & <img src=x>';
   const item = {
@@ -249,9 +249,7 @@ it('typographs visible point labels while preserving markup-like characters as p
   createEditorialMapObjects(window.ymaps3!, collection([item]));
 
   const caption = sdk.marker.mock.calls[0]?.[1].querySelector('.editorial-map-marker__caption');
-  expect(
-    caption?.textContent?.replaceAll('\u00a0', '·').replaceAll('\u202f', '·')
-  ).toMatchInlineSnapshot(`"Шелково·Ривер п.·№·1 <b>ворота</b> & <img src=x>"`);
+  expect(caption?.textContent).toBe(text);
   expect(caption?.querySelector('b, img')).toBeFalsy();
   expect(item.iconCaption).toBe(text);
 });
