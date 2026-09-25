@@ -7,7 +7,7 @@ import { createPersonMentionTarget } from '@/lib/people/mentions';
 
 import { renderMarkdown } from '../render';
 
-const map = (name?: string, url?: string): string => {
+const map = (name?: string, url?: string, iconCaption = '<img src=x onerror=alert(1)>'): string => {
   const geojson = JSON.stringify({
     type: 'FeatureCollection',
     metadata: { name, description: '<script>hidden</script>', creator: '@unknown' },
@@ -17,7 +17,7 @@ const map = (name?: string, url?: string): string => {
         id: 0,
         geometry: { type: 'Point', coordinates: [37, 56] },
         properties: {
-          iconCaption: '<img src=x onerror=alert(1)>',
+          iconCaption,
           iconContent: '7',
           description: '</script><script>alert(1)</script>'
         }
@@ -34,6 +34,17 @@ const document = (markdown: string, options?: Parameters<typeof renderMarkdown>[
 };
 
 describe('editorial map HTML', () => {
+  it('serializes prepared visible text without changing hidden descriptions or running markup', () => {
+    const page = document(map(undefined, undefined, '"Шелково Ривер" &amp; <img src=x>'));
+    const host = page.querySelector('editorial-map');
+    const geometry = JSON.parse(host?.getAttribute('data-geometry') ?? '');
+
+    expect(geometry.features[0].iconCaption.replaceAll('\u00a0', '·')).toBe(
+      '«Шелково·Ривер» &amp; <img src=x>'
+    );
+    expect(geometry.features[0].description).toBe('</script><script>alert(1)</script>');
+    expect(page.querySelector('img, script')).toBeFalsy();
+  });
   it.each([undefined, { editorialMaps: false }])(
     'keeps valid and malformed map fences as code unless explicitly enabled: %j',
     (options) => {
@@ -136,6 +147,15 @@ describe('editorial map HTML', () => {
     expect(page.querySelectorAll('blockquote editorial-map')).toHaveLength(1);
     expect(page.querySelectorAll('editorial-map')).toHaveLength(2);
     expect(page.querySelector('blockquote')?.textContent).toContain('Пояснение');
+  });
+
+  it('distinguishes text-only material from material with multiple rendered map hosts', () => {
+    expect(renderMarkdown('Только текст.', { editorialMaps: true })).not.toContain(
+      '<editorial-map'
+    );
+    expect(
+      renderMarkdown(`${map()}\n\n${map()}`, { editorialMaps: true }).match(/<editorial-map\b/gu)
+    ).toHaveLength(2);
   });
 
   it('rejects malformed map code at render time with a source and insertion number', () => {

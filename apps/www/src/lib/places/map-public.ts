@@ -7,6 +7,7 @@ import type {
 } from './map-public-dto';
 import { selectMapPlaces } from './map-selection';
 import type { Place, PlaceOpeningHours } from './types';
+import { formatPlaceStatus } from './view';
 
 export const toPublicOpeningHours = (value: PlaceOpeningHours): PlaceMapPublicOpeningHoursDto => ({
   description: value.description,
@@ -22,6 +23,7 @@ const toPublicPlace = (place: Place): PlaceMapPublicItemDto => ({
   name: place.name,
   marker: place.marker,
   status: place.status,
+  status_label: place.status === 'existing' ? undefined : formatPlaceStatus(place.status),
   coordinates: {
     lat: place.coordinates.lat,
     lng: place.coordinates.lng

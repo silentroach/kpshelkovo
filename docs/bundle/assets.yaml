@@ -6,9 +6,9 @@
   bytes: 53506
   brotli: 8713
   gzip: 9781
-- file: static/BaseLayout.astro_astro_type_script_index_0_lang.CHwZc_-j.js
+- file: static/BaseLayout.astro_astro_type_script_index_0_lang.DUP_zzTY.js
   bytes: 11208
-  brotli: 3633
+  brotli: 3628
   gzip: 4168
 - file: static/Breadcrumbs.DivI-1Uo.css
   bytes: 1288
@@ -30,6 +30,10 @@
   bytes: 700
   brotli: 244
   gzip: 289
+- file: static/EditorialMapScript.astro_astro_type_script_index_0_lang.cXJBffb_.js
+  bytes: 2685
+  brotli: 1075
+  gzip: 1270
 - file: static/EventList.B3Fn8smW.css
   bytes: 771
   brotli: 248
@@ -50,10 +54,10 @@
   bytes: 493
   brotli: 200
   gzip: 229
-- file: static/MapPreview.astro_astro_type_script_index_0_lang.CQiITkCg.js
-  bytes: 4635
-  brotli: 1695
-  gzip: 1955
+- file: static/MapPreview.astro_astro_type_script_index_0_lang.DfDkkwPn.js
+  bytes: 4645
+  brotli: 1686
+  gzip: 1960
 - file: static/MapPreview.xXtRh7Ft.css
   bytes: 1092
   brotli: 299
@@ -74,10 +78,10 @@
   bytes: 1513
   brotli: 431
   gzip: 530
-- file: static/PlaceMap.a79D7T2u.js
-  bytes: 16002
-  brotli: 5611
-  gzip: 6379
+- file: static/PlaceMap.e1viUJ5y.js
+  bytes: 15866
+  brotli: 5545
+  gzip: 6286
 - file: static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.DYjIXngq.js
   bytes: 693
   brotli: 338
@@ -114,10 +118,6 @@
   bytes: 1304
   brotli: 626
   gzip: 694
-- file: static/_...slug_.astro_astro_type_script_index_0_lang.BRKFKLJY.js
-  bytes: 44
-  brotli: 48
-  gzip: 64
 - file: static/_..Dc4KKPXV.css
   bytes: 385
   brotli: 125
@@ -146,14 +146,10 @@
   bytes: 889
   brotli: 443
   gzip: 504
-- file: static/editorial-map-element.Bkd7aUI_.js
-  bytes: 2680
-  brotli: 1078
-  gzip: 1272
-- file: static/editorial-map.C_r5aN4j.js
-  bytes: 80778
-  brotli: 24670
-  gzip: 27820
+- file: static/editorial-map.B2iT62zV.js
+  bytes: 2039
+  brotli: 748
+  gzip: 825
 - file: static/editorial-map.Qjqa3SJq.css
   bytes: 2297
   brotli: 632
@@ -282,10 +278,6 @@
   bytes: 505
   brotli: 137
   gzip: 178
-- file: static/index.astro_astro_type_script_index_0_lang.BRKFKLJY.js
-  bytes: 44
-  brotli: 48
-  gzip: 64
 - file: static/index.astro_astro_type_script_index_0_lang.CTHep30p.js
   bytes: 2952
   brotli: 1007
@@ -310,10 +302,10 @@
   bytes: 8492
   brotli: 1609
   gzip: 1904
-- file: static/lazy.CWK2VW-8.js
-  bytes: 16969
-  brotli: 6160
-  gzip: 6970
+- file: static/lazy.D_cCQnU6.js
+  bytes: 87665
+  brotli: 25457
+  gzip: 28707
 - file: static/lazy._ANSDvYG.css
   bytes: 1999
   brotli: 534
@@ -362,10 +354,10 @@
   bytes: 2169
   brotli: 1008
   gzip: 1179
-- file: static/schema.BlemrARI.js
-  bytes: 70643
-  brotli: 19600
-  gzip: 21972
+- file: static/schema.DPOrA4AR.js
+  bytes: 220
+  brotli: 180
+  gzip: 203
 - file: static/src.BmC_ntYh.js
   bytes: 194
   brotli: 132

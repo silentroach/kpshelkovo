@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import EditorialMapScript from '@/components/maps/EditorialMapScript.astro';
 import '@/components/maps/editorial-map.css';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import type { BreadcrumbItem } from '@/lib/breadcrumbs';
@@ -61,6 +62,7 @@ const schema = kbPageSchema({
 const bodyHtml = page.body
   ? renderMarkdown(page.body, { eagerImages: true, editorialMaps: true })
   : undefined;
+const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
 ---
 
 <BaseLayout
@@ -89,9 +91,7 @@ const bodyHtml = page.body
       )
     }
   </main>
-  <script>
-    import '@/components/maps/editorial-map-element';
-  </script>
+  {hasEditorialMap && <EditorialMapScript />}
 </BaseLayout>
 
 <style>

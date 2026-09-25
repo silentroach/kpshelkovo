@@ -1,13 +1,14 @@
 import { md } from '@shelkovo/markdown';
 import type { MarkdownAstTransform } from '@shelkovo/markdown';
 
+import { prepareEditorialGeometry } from '@/lib/geometry/editorial-display';
 import { EditorialMapDataSchema } from '@/lib/geometry/editorial-map-data-schema';
 
 import { editorialMapCaption, transformEditorialMapNodes } from './editorial-maps';
 import type { EditorialMapBlock } from './editorial-maps.types';
 
 const encodedGeometry = (map: EditorialMapBlock, source: string): string => {
-  const result = EditorialMapDataSchema.safeParse(map.geometry);
+  const result = EditorialMapDataSchema.safeParse(prepareEditorialGeometry(map.geometry));
   if (!result.success) {
     const details = result.error.issues
       .map((issue) => {

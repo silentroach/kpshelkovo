@@ -6,6 +6,7 @@ export interface PlaceMapItem {
   readonly name: string;
   readonly marker?: PlaceMarker;
   readonly status: PlaceStatus;
+  readonly statusLabel?: string;
   readonly coordinates: PlaceCoordinates;
   readonly geometry?: PlaceGeometry;
   readonly openingHours?: PlaceOpeningHours;
