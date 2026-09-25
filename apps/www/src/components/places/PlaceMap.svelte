@@ -137,7 +137,7 @@
   let clusterFocusFrame: number | undefined;
   let clusterFocusMarkerRendered = false;
   let clusterFocusClusterRendered = false;
-  let isLoading = $state(true);
+  let mapReady = $state(false);
   let error: string | undefined = $state(undefined);
   let selectedParts = $state<ParcelPart[]>([]);
   let failedParts = $state<ParcelPart[]>([]);
@@ -415,6 +415,7 @@
     visibleGeometry.clear();
     mapContainer?.style.removeProperty('--place-map-marker-scale');
     map = undefined;
+    mapReady = false;
   };
 
   onMount(() => {
@@ -664,7 +665,6 @@
           removeHighlightQuery(highlightedPlace?.slug);
           highlightedPlace = undefined;
           error = 'Yandex Maps API недоступен';
-          isLoading = false;
           return;
         }
 
@@ -698,11 +698,6 @@
             new YMapDefaultFeaturesLayer()
           ]
         );
-
-        const currentMap = map;
-        const control = await createOpenMapsControl(ymaps3, 'bottom right');
-        if (destroyed || map !== currentMap) return;
-        map.addChild(control);
 
         markerContents = places.map((place) => [place, createMarkerContent(place)] as const);
         for (const place of places) {
@@ -773,7 +768,7 @@
         if (markerContents.some(([place]) => place.openingHours)) {
           markerUpdateTimer = window.setInterval(refreshMarkerContents, 60_000);
         }
-        isLoading = false;
+        mapReady = true;
         if (requestedParcelCode) {
           if (!parcelCode || !PARCEL_CODE.test(parcelCode)) {
             removeParcelQuery(requestedParcelCode);
@@ -783,15 +778,24 @@
             void enableParcelPart(pendingParcelPart, parcelCode, true);
           }
         }
+        const currentMap = map;
+        const control = await createOpenMapsControl(ymaps3, 'bottom right');
+        if (destroyed || map !== currentMap) return;
+        map.addChild(control);
       } catch (reason) {
         if (destroyed) return;
         console.error('Places map setup error:', reason);
+        for (const part of PARCEL_PARTS)
+          parcelRevisions.set(part, (parcelRevisions.get(part) ?? 0) + 1);
+        parcelLayer?.destroy();
+        parcelLayer = undefined;
+        if (highlightTimer !== undefined) window.clearTimeout(highlightTimer);
+        if (markerUpdateTimer !== undefined) window.clearInterval(markerUpdateTimer);
         clearMap();
 
         removeHighlightQuery(highlightedPlace?.slug ?? requestedSlug);
         highlightedPlace = undefined;
         error = reason instanceof Error ? reason.message : 'Карта недоступна';
-        isLoading = false;
       }
     })();
 
@@ -818,12 +822,6 @@
 </script>
 
 <div data-testid="place-map" class="place-map">
-  {#if isLoading}
-    <div class="map-placeholder map-placeholder--loading" aria-live="polite">
-      <p class="map-loading-message">Загружаем карту…</p>
-    </div>
-  {/if}
-
   {#if error}
     <div class="map-placeholder map-placeholder--error" role="status">
       <div class="map-error-panel">
@@ -848,7 +846,7 @@
           aria-label="Слои"
           aria-expanded={layersOpen}
           aria-controls="parcel-map-layer-list"
-          disabled={isLoading}
+          disabled={!mapReady}
           onclick={() => (layersOpen = !layersOpen)}
         >
           <svg class="parcel-map-layer-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -1163,31 +1161,15 @@
     background-size: 2rem 2rem;
   }
 
-  .map-placeholder--loading {
-    pointer-events: none;
-  }
-
   .map-placeholder--error {
     padding-inline: 1.25rem;
-  }
-
-  .map-loading-message,
-  .map-error-panel {
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-  }
-
-  .map-loading-message {
-    padding: 0.5rem 1rem;
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-    font-weight: 600;
-    line-height: 1.25rem;
   }
 
   .map-error-panel {
     max-width: 24rem;
     padding: 1.25rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
     text-align: center;
   }
 

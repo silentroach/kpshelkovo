@@ -1,7 +1,7 @@
 ---
 import type { MapPreviewProps as Props } from './map-preview.types';
 
-const { preview, label, class: className, mapUrl, ...rest } = Astro.props;
+const { preview, label, class: className, ...rest } = Astro.props;
 ---
 
 <map-preview
@@ -15,21 +15,10 @@ const { preview, label, class: className, mapUrl, ...rest } = Astro.props;
   role="group"
   aria-label={label}
 >
-  <div class="map-preview__canvas" data-canvas inert={!!mapUrl}></div>
-  {
-    mapUrl && (
-      <slot name="fallback">
-        <div class="map-preview__message" data-fallback>
-          <p data-message role="status">
-            Местоположение доступно в Яндекс Картах.
-          </p>
-          <a href={mapUrl} class="site-text-link">
-            Открыть в Яндекс Картах ↗
-          </a>
-        </div>
-      </slot>
-    )
-  }
+  <div class="map-preview__canvas" data-canvas></div>
+  <p class="map-preview__error" data-message role="alert" hidden>
+    Карта не загрузилась.
+  </p>
   <template><slot /></template>
 </map-preview>
 
@@ -56,10 +45,6 @@ const { preview, label, class: className, mapUrl, ...rest } = Astro.props;
     touch-action: pan-y;
   }
 
-  .map-preview__canvas[inert] {
-    visibility: hidden;
-  }
-
   .map-preview__canvas :global(.ymaps3--map) {
     /* The SDK sets touch-action: none inline even with behaviors disabled. */
     touch-action: pan-y !important;
@@ -76,27 +61,35 @@ const { preview, label, class: className, mapUrl, ...rest } = Astro.props;
     outline-offset: 0.125rem;
   }
 
-  .map-preview__message {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-content: center;
-    gap: 0.5rem;
-    padding: 1.5rem;
-    background: var(--color-surface-muted);
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-    text-align: center;
+  .map-preview__canvas :global(button[data-preview-auto-action]) {
+    display: none !important;
   }
 
-  .map-preview__message[hidden] {
+  .map-preview__canvas
+    :global(
+      button:disabled:is(
+          .ymaps3--open-maps-button,
+          :has(.ymaps3--open-maps-button)
+        )
+    ) {
+    display: none !important;
+  }
+
+  .map-preview__error[hidden] {
     display: none;
   }
 
-  .map-preview__message a {
-    display: inline-flex;
-    min-height: 2.75rem;
-    align-items: center;
-    justify-content: center;
+  .map-preview__error {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    max-width: calc(100% - 1.5rem);
+    margin: 0;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+    font-size: 0.875rem;
+    box-shadow: var(--shadow-1);
   }
 </style>

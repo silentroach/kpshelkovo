@@ -94,10 +94,6 @@
   touch-action: pan-y;
 }
 
-.editorial-map__canvas[inert] {
-  visibility: hidden;
-}
-
 .editorial-map__canvas .ymaps3--map {
   /* The SDK sets touch-action: none inline even when one-finger drag is disabled. */
   touch-action: pan-y !important;

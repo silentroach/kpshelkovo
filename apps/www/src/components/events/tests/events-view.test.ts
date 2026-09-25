@@ -100,7 +100,7 @@ describe('event cards', () => {
     expect(document.querySelector('a[download]')).toBeFalsy();
     expect(document.querySelector('map-preview')).toBeTruthy();
     expect(document.querySelector('iframe')).toBeFalsy();
-    expect(document.querySelector('a[href*="pt=37.9,54.8"]')).toBeTruthy();
+    expect(document.querySelector('a[href*="pt=37.9,54.8"]')).toBeFalsy();
     expect(document.body.textContent).not.toContain('19:00');
   });
 
@@ -160,10 +160,7 @@ describe('event cards', () => {
         mapLinks: document.querySelectorAll('a[href*="yandex.ru/maps/"]').length,
         point: mapUrl?.searchParams.get('pt') ?? undefined,
         query: mapUrl?.searchParams.get('text') ?? undefined,
-        mapFallback: preview
-          ? !!preview.querySelector('[data-canvas][inert]') &&
-            !!preview.querySelector('a[data-fallback]:not([hidden])')
-          : undefined,
+        mapFallback: preview ? !!preview.querySelector('[data-fallback]') : undefined,
         locationBetweenHeaderAndBody: aside
           ? aside.parentElement?.previousElementSibling?.tagName === 'HEADER' &&
             !!aside.parentElement?.nextElementSibling?.querySelector(
@@ -214,21 +211,21 @@ describe('event cards', () => {
         {
           "cards": 1,
           "locationBetweenHeaderAndBody": true,
-          "mapFallback": true,
-          "mapLinks": 1,
+          "mapFallback": false,
+          "mapLinks": 0,
           "maps": 1,
           "name": "coordinates-only",
-          "point": "37.9,54.8",
+          "point": undefined,
           "query": undefined,
         },
         {
           "cards": 1,
           "locationBetweenHeaderAndBody": true,
-          "mapFallback": true,
-          "mapLinks": 1,
+          "mapFallback": false,
+          "mapLinks": 0,
           "maps": 1,
           "name": "both",
-          "point": "37.9,54.8",
+          "point": undefined,
           "query": undefined,
         },
       ]

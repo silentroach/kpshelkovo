@@ -172,7 +172,9 @@ describe('/map/[slug]/', () => {
     fixture.place.showOnMap = visible;
     const document = await renderPage();
     expect(!!document.querySelector('a[href="/map/?h=apple-garden"]')).toBe(visible);
-    expect(document.querySelector(`a[href="${fixture.place.mapUrl}"]`)).toBeTruthy();
+    expect(document.querySelector('map-preview template')?.innerHTML).toContain(
+      fixture.place.mapUrl
+    );
     expect(document.querySelector('meta[name="robots"][content*="noindex"]')).toBeFalsy();
     expect(
       z
@@ -213,13 +215,12 @@ describe('/map/[slug]/', () => {
     `);
   });
 
-  it('renders a minimal hidden place with summary and a usable no-JS map fallback', async () => {
+  it('renders a minimal hidden place with summary and no no-JS map fallback', async () => {
     fixture.place.showOnMap = false;
     fixture.place.body = '';
     fixture.place.address = undefined;
     const document = await renderPage();
     const preview = document.querySelector('map-preview');
-    const fallback = preview?.querySelector('[data-fallback]');
     expect({
       summaryRendered:
         document.querySelector('article [data-pagefind-body]')?.textContent.replace(/\s/g, ' ') ===
@@ -227,15 +228,16 @@ describe('/map/[slug]/', () => {
       emptyBlocks: document.querySelectorAll(
         'article dl, aside figcaption, h1 + nav, aside section'
       ).length,
-      fallbackUrl: fallback?.querySelector('a')?.getAttribute('href'),
-      fallbackHidden: !!fallback?.closest('[hidden], [aria-hidden="true"], template'),
-      fallbackNamed: !!fallback?.querySelector('a')?.textContent.trim()
+      fallback: !!preview?.querySelector('[data-fallback], a'),
+      markerUrl: preview
+        ?.querySelector('template')
+        ?.content.querySelector('a')
+        ?.getAttribute('href')
     }).toMatchInlineSnapshot(`
       {
         "emptyBlocks": 0,
-        "fallbackHidden": false,
-        "fallbackNamed": true,
-        "fallbackUrl": "https://yandex.ru/maps/?pt=37.724333,55.06371",
+        "fallback": false,
+        "markerUrl": "https://yandex.ru/maps/?pt=37.724333,55.06371",
         "summaryRendered": true,
       }
     `);

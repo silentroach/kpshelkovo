@@ -285,7 +285,7 @@ describe('shared events in news', () => {
         {
           "mapped": {
             "download": "/news/2026/05/reglament/event.ics",
-            "map": "https://yandex.ru/maps/?pt=38.654321,55.123456&z=18&l=map",
+            "map": undefined,
             "mapCount": 1,
           },
           "withoutPlace": {

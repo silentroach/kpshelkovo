@@ -20,5 +20,4 @@ export interface MapPreviewProps {
   readonly preview: MapPreviewData;
   readonly label: string;
   readonly class?: string;
-  readonly mapUrl?: string;
 }

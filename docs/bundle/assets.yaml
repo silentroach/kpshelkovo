@@ -31,9 +31,9 @@
   brotli: 244
   gzip: 289
 - file: static/EditorialMapScript.astro_astro_type_script_index_0_lang.XXXXXXXX.js
-  bytes: 2685
-  brotli: 1075
-  gzip: 1270
+  bytes: 2579
+  brotli: 1032
+  gzip: 1217
 - file: static/EventList.XXXXXXXX.css
   bytes: 771
   brotli: 248
@@ -43,9 +43,9 @@
   brotli: 748
   gzip: 906
 - file: static/EventWidget.XXXXXXXX.css
-  bytes: 4744
-  brotli: 1051
-  gzip: 1252
+  bytes: 4383
+  brotli: 985
+  gzip: 1188
 - file: static/InfrastructureTable.XXXXXXXX.js
   bytes: 2533
   brotli: 954
@@ -55,13 +55,13 @@
   brotli: 200
   gzip: 229
 - file: static/MapPreview.XXXXXXXX.css
-  bytes: 1092
-  brotli: 299
-  gzip: 407
+  bytes: 1124
+  brotli: 327
+  gzip: 429
 - file: static/MapPreview.astro_astro_type_script_index_0_lang.XXXXXXXX.js
-  bytes: 4645
-  brotli: 1686
-  gzip: 1960
+  bytes: 4184
+  brotli: 1510
+  gzip: 1756
 - file: static/NewsArchiveSummary.XXXXXXXX.css
   bytes: 261
   brotli: 115
@@ -79,9 +79,9 @@
   brotli: 431
   gzip: 530
 - file: static/PlaceMap.XXXXXXXX.js
-  bytes: 18267
-  brotli: 6334
-  gzip: 7159
+  bytes: 18139
+  brotli: 6255
+  gzip: 7088
 - file: static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 693
   brotli: 338
@@ -147,9 +147,9 @@
   brotli: 436
   gzip: 502
 - file: static/editorial-map.XXXXXXXX.css
-  bytes: 2297
-  brotli: 632
-  gzip: 787
+  bytes: 2249
+  brotli: 618
+  gzip: 772
 - file: static/editorial-map.XXXXXXXX.js
   bytes: 2039
   brotli: 748
@@ -159,17 +159,17 @@
   brotli: 1780
   gzip: 2015
 - file: static/explorer-component.XXXXXXXX.css
-  bytes: 10251
-  brotli: 1995
-  gzip: 2300
+  bytes: 9963
+  brotli: 1920
+  gzip: 2211
 - file: static/explorer-component.XXXXXXXX.js
-  bytes: 21746
-  brotli: 7031
-  gzip: 8063
+  bytes: 21619
+  brotli: 6994
+  gzip: 8029
 - file: static/index-1.XXXXXXXX.css
-  bytes: 14857
-  brotli: 2584
-  gzip: 2939
+  bytes: 14569
+  brotli: 2503
+  gzip: 2843
 - file: static/index-2.XXXXXXXX.css
   bytes: 15555
   brotli: 2380
@@ -195,9 +195,9 @@
   brotli: 1609
   gzip: 1904
 - file: static/index-8.XXXXXXXX.css
-  bytes: 10914
-  brotli: 2150
-  gzip: 2493
+  bytes: 10646
+  brotli: 2110
+  gzip: 2448
 - file: static/index-9.XXXXXXXX.css
   bytes: 5757
   brotli: 993
@@ -300,8 +300,8 @@
   gzip: 1163
 - file: static/index.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 2119
-  brotli: 1009
-  gzip: 1162
+  brotli: 1008
+  gzip: 1160
 - file: static/lazy.XXXXXXXX.css
   bytes: 1999
   brotli: 534

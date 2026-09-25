@@ -44,7 +44,7 @@ static/ComparisonTable.XXXXXXXX.js:
     rendered: 0
 static/EditorialMapScript.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/components/maps/editorial-map-element.ts:
-    rendered: 4234
+    rendered: 4072
   apps/www/src/components/maps/EditorialMapScript.astro?astro&type=script&index=0&lang.ts:
     rendered: 0
 static/InfrastructureTable.XXXXXXXX.js:
@@ -52,7 +52,7 @@ static/InfrastructureTable.XXXXXXXX.js:
     rendered: 3583
 static/MapPreview.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/components/maps/map-preview.ts:
-    rendered: 6792
+    rendered: 6067
   apps/www/src/components/maps/MapPreview.astro?astro&type=script&index=0&lang.ts:
     rendered: 191
 static/PlaceMap.XXXXXXXX.js:
@@ -61,7 +61,7 @@ static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/place-map-url.ts:
     rendered: 698
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 32482
+    rendered: 32336
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:
@@ -340,7 +340,7 @@ static/explorer-component.XXXXXXXX.js:
   apps/www/src/compare/components/SettlementCard.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/compare/components/SettlementMap.svelte:
-    rendered: 15441
+    rendered: 15373
   apps/www/src/compare/components/SettlementMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/compare/components/SettlementsExplorer.svelte:

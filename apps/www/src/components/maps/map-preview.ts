@@ -44,6 +44,8 @@ export class MapPreviewElement extends HTMLElement {
 
   connectedCallback(): void {
     installYandexMapsRuntimeHeadPersistence();
+    const message = this.querySelector<HTMLElement>('[data-message]');
+    if (message) message.hidden = true;
     const generation = ++this.generation;
     let nearby = false;
     const start = (): void => {
@@ -89,10 +91,7 @@ export class MapPreviewElement extends HTMLElement {
     this.actionObserver = undefined;
     window.clearInterval(this.markerUpdateTimer);
     this.markerUpdateTimer = undefined;
-    const fallback = this.querySelector<HTMLElement>('[data-fallback]');
-    if (fallback) fallback.hidden = false;
     const canvas = this.querySelector<HTMLElement>('[data-canvas]');
-    if (canvas) canvas.inert = !!fallback;
     map?.destroy();
     canvas?.replaceChildren();
   }
@@ -100,12 +99,10 @@ export class MapPreviewElement extends HTMLElement {
   private async initialize(generation: number): Promise<void> {
     const canvas = this.querySelector<HTMLElement>('[data-canvas]');
     const template = this.querySelector<HTMLTemplateElement>('template');
-    const fallback = this.querySelector<HTMLElement>('[data-fallback]');
     const message = this.querySelector<HTMLElement>('[data-message]');
     if (!canvas || !template || !this.dataset.preview) return;
 
-    canvas.inert = !!fallback;
-    if (message) message.textContent = 'Загружаем карту…';
+    if (message) message.hidden = true;
     try {
       // Astro serializes this payload from the adapters' validated domain data.
       const data = JSON.parse(this.dataset.preview) as MapPreviewData;
@@ -142,35 +139,34 @@ export class MapPreviewElement extends HTMLElement {
         this.gestureController = installMapPreviewGestures(this, map);
       }
 
-      let rendered = false;
       let controlInstalled = false;
-      const handOff = (): void => {
+      const updateActions = (): void => {
         if (this.map !== map) return;
         const logo = canvas.querySelector('.ymaps3--map-copyrights__logo');
         logo?.setAttribute('aria-label', 'Яндекс Карты');
-        if (fallback) {
-          if (!rendered || !controlInstalled) return;
-          // The SDK loads this native action independently of its tile renderer.
-          const button = Array.from(canvas.querySelectorAll('.ymaps3--open-maps-button'))
-            .find((element) => element.textContent?.trim() === OPEN_MAPS_BUTTON_TITLE)
-            ?.closest('button');
-          if (!button || button.disabled) return;
-          canvas.inert = false;
-          if (fallback.contains(document.activeElement)) button.focus({ preventScroll: true });
-          fallback.hidden = true;
-        }
-        if (logo) {
-          this.actionObserver?.disconnect();
-          this.actionObserver = undefined;
+        for (const label of canvas.querySelectorAll('.ymaps3--open-maps-button')) {
+          const button = label.closest('button');
+          if (
+            !button ||
+            (controlInstalled &&
+              button.closest('.ymaps3--control') &&
+              label.textContent?.trim() === OPEN_MAPS_BUTTON_TITLE &&
+              !button.dataset.previewAutoAction)
+          )
+            continue;
+          // The SDK's automatic action is not the control we install; keep the scene usable.
+          button.dataset.previewAutoAction = 'true';
+          button.inert = true;
         }
       };
-      this.actionObserver = new MutationObserver(handOff);
+      this.actionObserver = new MutationObserver(updateActions);
       this.actionObserver.observe(canvas, {
         childList: true,
         subtree: true,
         attributes: true,
         attributeFilter: ['disabled']
       });
+      updateActions();
 
       if (data.geometry) {
         for (const object of createEditorialMapObjects(maps, data.geometry)) map.addChild(object);
@@ -196,15 +192,6 @@ export class MapPreviewElement extends HTMLElement {
       );
       map.addChild(
         new maps.YMapListener({
-          onStateChanged: (state) => {
-            if (this.map !== map) return;
-            const tiles = state.getLayerState(
-              `${maps.YMapDefaultSchemeLayer.defaultProps.source}:ground`,
-              'tile'
-            );
-            rendered = !!tiles && tiles.tilesTotal > 0 && tiles.tilesReady === tiles.tilesTotal;
-            handOff();
-          },
           onResize: ({ size }) => {
             if (this.map !== map || size.x === 0 || size.y === 0) return;
             try {
@@ -214,7 +201,7 @@ export class MapPreviewElement extends HTMLElement {
               });
             } catch (error) {
               this.clearMap();
-              if (message) message.textContent = 'Карта не загрузилась.';
+              if (message) message.hidden = false;
               console.error('Map preview resize:', error);
             }
           }
@@ -222,13 +209,13 @@ export class MapPreviewElement extends HTMLElement {
       );
       const control = await createOpenMapsControl(maps, data.distributionPosition ?? 'top right');
       if (!this.isConnected || generation !== this.generation || this.map !== map) return;
-      map.addChild(control);
       controlInstalled = true;
-      handOff();
+      map.addChild(control);
+      updateActions();
     } catch (error) {
       if (!this.isConnected || generation !== this.generation) return;
       this.clearMap();
-      if (message) message.textContent = 'Карта не загрузилась.';
+      if (message) message.hidden = false;
       console.error('Map preview:', error);
     }
   }
