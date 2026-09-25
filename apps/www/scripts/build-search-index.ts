@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import * as pagefind from 'pagefind';
 
 import { ParcelMapPublicSchema } from '../src/lib/parcels/map-public-schema.ts';
+import { PARCEL_PARTS } from '../src/lib/parcels/schema.ts';
 
 const site = resolve('dist/site');
 const output = resolve(process.argv[2] ?? 'dist/site/search');
@@ -12,9 +13,20 @@ const failOnErrors = (errors: readonly string[]): void => {
 };
 
 try {
-  const parcels = ParcelMapPublicSchema.parse(
-    JSON.parse(await readFile(resolve(site, 'map/data/parcels.json'), 'utf8'))
-  );
+  const parcels = (
+    await Promise.all(
+      PARCEL_PARTS.map(async (part) => {
+        const path = resolve(site, `map/data/parcels/${part}.json`);
+        try {
+          return ParcelMapPublicSchema.parse(JSON.parse(await readFile(path, 'utf8')));
+        } catch (error) {
+          throw new Error(`Invalid parcel map data: ${path}`, { cause: error });
+        }
+      })
+    )
+  )
+    .flat()
+    .sort((a, b) => a.code.localeCompare(b.code));
   const codes = new Set<string>();
   for (const parcel of parcels) {
     for (const code of [parcel.code, ...(parcel.aliases ?? [])]) {

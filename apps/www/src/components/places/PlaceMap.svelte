@@ -14,7 +14,7 @@
 
   import { createEditorialMapObjects } from '@/components/maps/editorial-map';
   import { getUrlWithoutParcel, PARCEL_QUERY_PARAM } from '@/lib/parcels/parcel-url';
-  import { PARCEL_CODE } from '@/lib/parcels/schema';
+  import { PARCEL_CODE, type ParcelPart } from '@/lib/parcels/schema';
   import type {
     PlaceMapPublicItemDto,
     PlaceMapPublicPayloadDto
@@ -43,7 +43,11 @@
   let {
     dataUrl = '',
     fallbackPlace,
-    places = [] as readonly PlaceMapItem[]
+    places = [] as readonly PlaceMapItem[],
+    forest,
+    village,
+    park,
+    river
   }: PlaceMapProps = $props();
 
   const VIEW_MARGIN: ymaps3.Margin = [112, 80, 32, 80];
@@ -53,7 +57,13 @@
   const HIGHLIGHT_DURATION_MS = 5_000;
   const MARKER_MAX_ZOOM = 16;
   const PLACE_FOCUS_ZOOM = MARKER_MAX_ZOOM;
-  const PARCEL_DATA_URL = '/map/data/parcels.json';
+  const PARCEL_PARTS: readonly ParcelPart[] = ['shf', 'shv', 'shp', 'shr'];
+  const PARCEL_PART_NAMES: Readonly<Record<ParcelPart, string>> = {
+    shf: 'Форест',
+    shv: 'Вилладж',
+    shp: 'Парк',
+    shr: 'Ривер'
+  };
   const toPlaceMapItem = (place: PlaceMapPublicItemDto): PlaceMapItem => ({
     slug: place.slug,
     name: place.name,
@@ -129,14 +139,15 @@
   let clusterFocusClusterRendered = false;
   let isLoading = $state(true);
   let error: string | undefined = $state(undefined);
-  let parcelsEnabled = $state(false);
-  let parcelsLoading = $state(false);
-  let parcelsError = $state(false);
+  let selectedParts = $state<ParcelPart[]>([]);
+  let failedParts = $state<ParcelPart[]>([]);
+  let allParcelsSelected = $derived(selectedParts.length === PARCEL_PARTS.length);
+  let someParcelsSelected = $derived(selectedParts.length > 0 && !allParcelsSelected);
   let layersOpen = $state(false);
   let layersControl: HTMLDivElement | undefined = $state(undefined);
   let layersButton: HTMLButtonElement | undefined = $state(undefined);
-  let toggleParcels: (checked: boolean) => void;
-  let retryParcels = $state<() => void>(() => {});
+  let toggleParcelPart: (part: ParcelPart, checked: boolean) => void;
+  let toggleAllParcels = $state<() => void>(() => {});
   let errorPlace = $derived(places[0] ?? fallbackPlace);
 
   const mapBehaviors = (): ymaps3.BehaviorType[] => [
@@ -441,10 +452,13 @@
       },
       { signal: markerEvents.signal }
     );
-    let parcelRequest = 0;
+    const parcelRevisions = new Map<ParcelPart, number>();
     let parcelLayer: ParcelLayer | undefined;
-    let parcelData: ParcelMapPayload | undefined;
+    const parcelData = new Map<ParcelPart, ParcelMapPayload>();
+    const parcelRequests = new Map<ParcelPart, Promise<ParcelMapPayload>>();
     let pendingParcelCode: string | undefined;
+    let pendingParcelPart: ParcelPart | undefined;
+    let retainUnknownParcelPart = false;
     let preserveParcelCamera = false;
     const requestedParcelCode =
       new URL(window.location.href).searchParams.get(PARCEL_QUERY_PARAM) || undefined;
@@ -453,86 +467,119 @@
       const url = getUrlWithoutParcel(window.location.href, code);
       if (url) window.history.replaceState(window.history.state, '', url);
     };
-    const loadParcelData = async (): Promise<ParcelMapPayload> => {
-      if (parcelData) return parcelData;
-      const response = await fetch(PARCEL_DATA_URL);
-      if (!response.ok) throw new Error('Не удалось загрузить участки');
-      return (await response.json()) as ParcelMapPayload;
+    const loadParcelData = async (part: ParcelPart): Promise<ParcelMapPayload> => {
+      const cached = parcelData.get(part);
+      if (cached) return cached;
+      let pending = parcelRequests.get(part);
+      if (!pending) {
+        pending = (async () => {
+          const response = await fetch(`/map/data/parcels/${part}.json`);
+          if (!response.ok) throw new Error('Не удалось загрузить участки');
+          const data: unknown = await response.json();
+          if (!Array.isArray(data)) throw new Error('Неверный формат данных участков');
+          return data as ParcelMapPayload;
+        })();
+        parcelRequests.set(part, pending);
+        void pending.then(
+          () => parcelRequests.delete(part),
+          () => parcelRequests.delete(part)
+        );
+      }
+      const data = await pending;
+      if (!destroyed) parcelData.set(part, data);
+      return data;
     };
-    const enableParcels = async (code?: string): Promise<void> => {
-      const request = ++parcelRequest;
-      parcelsEnabled = true;
-      parcelsLoading = true;
-      parcelsError = false;
+    const setParcelPart = (part: ParcelPart, checked: boolean): void => {
+      selectedParts = checked
+        ? selectedParts.includes(part)
+          ? selectedParts
+          : [...selectedParts, part]
+        : selectedParts.filter((selected) => selected !== part);
+    };
+    const enableParcelPart = async (
+      part: ParcelPart,
+      code?: string,
+      directLink = false
+    ): Promise<void> => {
+      const revision = (parcelRevisions.get(part) ?? 0) + 1;
+      parcelRevisions.set(part, revision);
+      setParcelPart(part, true);
+      failedParts = failedParts.filter((failed) => failed !== part);
+      const stillSelected = (): boolean =>
+        !destroyed && parcelRevisions.get(part) === revision && selectedParts.includes(part);
       try {
         if (!map || !mapContainer) return;
-        const data = await loadParcelData();
-        if (destroyed || request !== parcelRequest || !map || !mapContainer) return;
+        const data = await loadParcelData(part);
+        if (!stillSelected() || !map || !mapContainer) return;
         const canonical = code
           ? data.find((item) => item.code === code || item.aliases?.includes(code))?.code
           : undefined;
         if (code && !canonical) {
-          parcelData = data;
           removeParcelQuery(requestedParcelCode);
           pendingParcelCode = undefined;
-          parcelsEnabled = false;
-          return;
+          pendingParcelPart = undefined;
+          if (directLink && !retainUnknownParcelPart) {
+            setParcelPart(part, false);
+            return;
+          }
         }
         if (!parcelLayer) {
           const { createParcelLayer } = await import('./parcel-layer');
-          if (destroyed || request !== parcelRequest || !map || !mapContainer) return;
-          parcelLayer = createParcelLayer(
-            map,
-            window.ymaps3,
-            mapContainer,
-            () => {
-              if (pendingParcelCode) {
-                removeParcelQuery(pendingParcelCode);
-                pendingParcelCode = undefined;
-              }
-            },
-            getMapZoomDuration
-          );
+          if (!stillSelected() || !map || !mapContainer) return;
+          if (!parcelLayer)
+            parcelLayer = createParcelLayer(
+              map,
+              window.ymaps3,
+              mapContainer,
+              () => {
+                if (pendingParcelCode) {
+                  removeParcelQuery(pendingParcelCode);
+                  pendingParcelCode = undefined;
+                  pendingParcelPart = undefined;
+                }
+              },
+              getMapZoomDuration
+            );
         }
-        parcelLayer.enable(data);
+        parcelLayer.enable(part, data);
         parcelLayer.updateViewport(map.zoom, map.bounds);
         if (canonical) {
           if (!parcelLayer.focus(canonical)) {
-            parcelLayer.disable();
-            parcelData = undefined;
             throw new Error('Номер найден, но контур участка недоступен');
           }
           preserveParcelCamera = true;
           pendingParcelCode = requestedParcelCode;
         }
-        parcelData = data;
       } catch (reason) {
-        if (destroyed || request !== parcelRequest) return;
-        parcelLayer?.disable();
+        if (!stillSelected()) return;
+        parcelLayer?.disable(part);
+        parcelData.delete(part);
         console.error('Parcel layer error:', reason);
-        parcelsError = true;
-        parcelsEnabled = false;
-      } finally {
-        if (!destroyed && request === parcelRequest) parcelsLoading = false;
+        failedParts = failedParts.includes(part) ? failedParts : [...failedParts, part];
+        setParcelPart(part, false);
       }
     };
-    toggleParcels = (checked: boolean): void => {
-      parcelsEnabled = checked;
+    toggleParcelPart = (part: ParcelPart, checked: boolean): void => {
       if (!checked) {
-        parcelRequest++;
-        parcelsLoading = false;
-        parcelsError = false;
-        parcelLayer?.disable();
-        if (pendingParcelCode) {
+        parcelRevisions.set(part, (parcelRevisions.get(part) ?? 0) + 1);
+        setParcelPart(part, false);
+        failedParts = failedParts.filter((failed) => failed !== part);
+        parcelLayer?.disable(part);
+        if (pendingParcelCode && pendingParcelPart === part) {
           removeParcelQuery(pendingParcelCode);
           pendingParcelCode = undefined;
+          pendingParcelPart = undefined;
         }
         return;
       }
-      void enableParcels(pendingParcelCode ? parcelCode : undefined);
+      void enableParcelPart(part, pendingParcelPart === part ? parcelCode : undefined);
     };
-    retryParcels = (): void => {
-      void enableParcels(pendingParcelCode ? parcelCode : undefined);
+    toggleAllParcels = (): void => {
+      const checked = !allParcelsSelected;
+      if (checked && pendingParcelPart && selectedParts.includes(pendingParcelPart))
+        retainUnknownParcelPart = true;
+      for (const part of PARCEL_PARTS)
+        if (selectedParts.includes(part) !== checked) toggleParcelPart(part, checked);
     };
     let highlightTimer: number | undefined;
     let markerUpdateTimer: number | undefined;
@@ -731,7 +778,8 @@
             removeParcelQuery(requestedParcelCode);
           } else {
             pendingParcelCode = requestedParcelCode;
-            void enableParcels(parcelCode);
+            pendingParcelPart = parcelCode.slice(0, 3).toLowerCase() as ParcelPart;
+            void enableParcelPart(pendingParcelPart, parcelCode, true);
           }
         }
       } catch (reason) {
@@ -752,7 +800,8 @@
       document.removeEventListener('keydown', closeLayersOnEscape);
       document.removeEventListener('pointerdown', cancelFocusOnPointer, true);
       document.removeEventListener('focusin', cancelFocusOnMove);
-      parcelRequest++;
+      for (const part of PARCEL_PARTS)
+        parcelRevisions.set(part, (parcelRevisions.get(part) ?? 0) + 1);
       parcelLayer?.destroy();
       document.removeEventListener('astro:page-load', refresh);
       resizeObserver?.disconnect();
@@ -810,14 +859,18 @@
               stroke-linejoin="round"
             />
           </svg>
+          {#if selectedParts.length > 0}
+            <span class="parcel-map-selection-marker" aria-hidden="true">✓</span>
+          {/if}
         </button>
         <div id="parcel-map-layer-list" class="parcel-map-layer-list" hidden={!layersOpen}>
-          <button
-            type="button"
-            class="parcel-map-layer"
-            aria-pressed={parcelsEnabled}
-            onclick={() => toggleParcels(!parcelsEnabled)}
-          >
+          <label class="parcel-map-layer">
+            <input
+              type="checkbox"
+              checked={allParcelsSelected}
+              bind:indeterminate={someParcelsSelected}
+              onchange={toggleAllParcels}
+            />
             <svg class="parcel-map-layer-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
                 d="m4 6 13-2 4 13-13 3L4 6Z"
@@ -830,14 +883,42 @@
               <circle cx="21" cy="17" r="1.5" fill="currentColor" />
             </svg>
             Участки
-          </button>
+          </label>
+          {#each PARCEL_PARTS as part (part)}
+            <label
+              class="parcel-map-layer parcel-map-layer--part"
+              class:parcel-map-layer--error={failedParts.includes(part)}
+            >
+              <input
+                type="checkbox"
+                checked={selectedParts.includes(part)}
+                aria-invalid={failedParts.includes(part) ? 'true' : undefined}
+                aria-describedby={failedParts.includes(part)
+                  ? `parcel-map-error-${part}`
+                  : undefined}
+                onchange={(event) => toggleParcelPart(part, event.currentTarget.checked)}
+              />
+              <span class="parcel-map-part-icon" aria-hidden="true">
+                {#if part === 'shf'}{@render forest?.()}{:else if part === 'shv'}{@render village?.()}{:else if part === 'shp'}{@render park?.()}{:else}{@render river?.()}{/if}
+              </span>
+              {PARCEL_PART_NAMES[part]}
+              {#if failedParts.includes(part)}<span class="parcel-map-error-icon" aria-hidden="true"
+                  >!</span
+                >{/if}
+            </label>
+            {#if failedParts.includes(part)}
+              <span id={`parcel-map-error-${part}`} class="ui-visually-hidden"
+                >Не удалось показать участки.</span
+              >
+            {/if}
+          {/each}
         </div>
       </div>
-      {#if parcelsLoading}<span role="status">Загружаем участки…</span>{/if}
-      {#if parcelsError}
-        <span role="alert">Не удалось загрузить участки.</span>
-        <button type="button" onclick={retryParcels}>Повторить</button>
-      {/if}
+      {#each failedParts as part (part)}
+        <span class="ui-visually-hidden" role="alert"
+          >Не удалось показать участки: {PARCEL_PART_NAMES[part]}.</span
+        >
+      {/each}
     </div>
   {/if}
 </div>
@@ -888,6 +969,7 @@
   }
 
   .parcel-map-layers-button {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -896,11 +978,31 @@
     box-shadow: 0 0.125rem 0.4rem oklch(24% 0.04 145 / 0.16);
   }
 
+  .parcel-map-selection-marker {
+    position: absolute;
+    top: -0.25rem;
+    right: -0.25rem;
+    display: grid;
+    width: 1rem;
+    height: 1rem;
+    place-items: center;
+    border: 1px solid var(--color-surface);
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-surface);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    pointer-events: none;
+  }
+
   .parcel-map-layer-list {
     position: absolute;
     top: calc(100% + 0.375rem);
     left: 0;
-    min-width: 11rem;
+    min-width: 13rem;
+    max-height: max(6rem, calc(100svh - 10rem));
+    overflow-y: auto;
     padding: 0.25rem;
     box-shadow: 0 0.25rem 0.75rem oklch(24% 0.04 145 / 0.18);
   }
@@ -914,6 +1016,41 @@
     padding: 0.5rem;
     border-radius: 0.25rem;
     text-align: left;
+    cursor: pointer;
+  }
+
+  .parcel-map-layer--part {
+    padding-left: 1.25rem;
+  }
+
+  .parcel-map-layer--error {
+    background: color-mix(in srgb, var(--color-danger) 8%, var(--color-surface));
+    color: var(--color-danger-text);
+  }
+
+  .parcel-map-error-icon {
+    display: grid;
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: none;
+    place-items: center;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .parcel-map-layer input {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex: none;
+    accent-color: var(--color-primary);
+  }
+
+  .parcel-map-layer:focus-within {
+    outline: 0.1875rem solid var(--color-focus);
+    outline-offset: -0.1875rem;
   }
 
   .parcel-map-layer-icon {
@@ -923,31 +1060,32 @@
     color: var(--color-text-muted);
   }
 
-  .parcel-map-layer[aria-pressed='true'] {
-    background: var(--color-primary-soft);
-    color: var(--color-primary);
+  .parcel-map-part-icon {
+    display: flex;
+    width: 1.375rem;
+    height: 1.375rem;
+    flex: none;
+    align-items: center;
   }
 
-  .parcel-map-layer[aria-pressed='true'] .parcel-map-layer-icon {
-    color: var(--color-primary);
+  .parcel-map-part-icon :global(svg) {
+    width: 100%;
+    height: auto;
   }
 
   .parcel-map-controls button {
     font: inherit;
     cursor: pointer;
   }
-  .parcel-map-controls button:hover:not(:disabled) {
+  .parcel-map-controls button:hover:not(:disabled),
+  .parcel-map-layer:is(:hover, :active) {
     background: var(--color-primary-soft);
+  }
+  .parcel-map-layer--error:is(:hover, :active) {
+    background: color-mix(in srgb, var(--color-danger) 15%, var(--color-surface));
   }
   .parcel-map-controls button:disabled {
     cursor: wait;
-  }
-  .parcel-map-controls button:not(.parcel-map-layers-button, .parcel-map-layer) {
-    border: 0;
-    background: none;
-    color: var(--color-primary);
-    font-weight: 600;
-    text-decoration: underline;
   }
   .parcel-map-controls button:focus-visible {
     outline: 0.1875rem solid var(--color-focus);

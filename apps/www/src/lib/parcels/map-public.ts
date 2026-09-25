@@ -5,6 +5,7 @@ import { z } from 'zod';
 import displayConfig from '@/config/parcel-map.yaml?raw';
 
 import { ParcelMapPublicSchema, type ParcelMapPublicDto } from './map-public-schema';
+import type { ParcelPart } from './schema';
 import type { Parcel, ParcelGeometry } from './types';
 
 const DisplayConfigSchema = z
@@ -63,4 +64,32 @@ export const buildParcelMapPayload = (
       };
     })
   );
+};
+
+export const splitParcelMapPayload = (
+  payload: ParcelMapPublicDto
+): Record<ParcelPart, ParcelMapPublicDto> => {
+  const parts: Record<ParcelPart, ParcelMapPublicDto> = { shf: [], shv: [], shp: [], shr: [] };
+  const seen = new Set<string>();
+
+  for (const parcel of payload) {
+    const part = parts[parcel.part];
+    if (!part) throw new Error(`unknown parcel part "${parcel.part}"`);
+
+    for (const code of [parcel.code, ...(parcel.aliases ?? [])]) {
+      if (!code.startsWith(`${parcel.part.toUpperCase()}-`)) {
+        throw new Error(`parcel code "${code}" does not belong to part "${parcel.part}"`);
+      }
+      if (seen.has(code)) throw new Error(`duplicate parcel code "${code}"`);
+      seen.add(code);
+    }
+    part.push(parcel);
+  }
+
+  return {
+    shf: ParcelMapPublicSchema.parse(parts.shf),
+    shv: ParcelMapPublicSchema.parse(parts.shv),
+    shp: ParcelMapPublicSchema.parse(parts.shp),
+    shr: ParcelMapPublicSchema.parse(parts.shr)
+  };
 };

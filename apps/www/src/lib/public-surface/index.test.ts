@@ -48,7 +48,6 @@ import {
   newsMarkdownPath,
   newsPath
 } from '@/lib/news/routes';
-import { parcelMapDataPath } from '@/lib/parcels/routes';
 import {
   peopleApiCatalogPath,
   peopleDataPath,
@@ -587,7 +586,6 @@ describe('public surface registry', () => {
       'places:index',
       'places:index-markdown',
       'places:data',
-      'places:parcels-data',
       'places:detail',
       'places:detail-markdown'
     ]);
@@ -597,11 +595,11 @@ describe('public surface registry', () => {
       placesPath(),
       placesMarkdownPath(),
       placesDataPath(),
-      parcelMapDataPath(),
       placePattern(),
       placeMarkdownPattern()
     ]);
     expect(places.some((surface) => surface.discoveryRoles.includes('data-feed'))).toBe(true);
+    expect(places.some((surface) => surface.path?.includes('/map/data/parcels'))).toBe(false);
   });
 
   it('registers local reglament paths and external source PDF downloads', () => {

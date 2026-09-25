@@ -1,3 +1,5 @@
+import type { Snippet } from 'svelte';
+
 import type { PlaceMarker, PlaceStatus } from './schema';
 import type { PlaceCoordinates, PlaceGeometry, PlaceOpeningHours } from './types';
 
@@ -22,4 +24,8 @@ export interface PlaceMapProps {
   readonly dataUrl?: string;
   readonly fallbackPlace?: PlaceMapFallback;
   readonly places?: readonly PlaceMapItem[];
+  readonly forest?: Snippet;
+  readonly village?: Snippet;
+  readonly park?: Snippet;
+  readonly river?: Snippet;
 }
