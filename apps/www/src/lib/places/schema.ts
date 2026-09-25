@@ -1,5 +1,3 @@
-import { SITE_BACKLINK_KINDS, SITE_MENTION_SECTIONS } from '@/lib/mentions';
-
 export const PLACE_CATEGORIES = [
   'entrance',
   'children',
@@ -29,9 +27,6 @@ export type PlaceStatus = (typeof PLACE_STATUSES)[number];
 
 export const PLACE_WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
 export type PlaceWeekday = (typeof PLACE_WEEKDAYS)[number];
-
-export const PLACE_MENTION_SECTIONS = SITE_MENTION_SECTIONS;
-export const PLACE_BACKLINK_KINDS = SITE_BACKLINK_KINDS;
 
 export const PLACE_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export const PLACE_TIME = /^(?:[01]\d|2[0-3]):[0-5]\d$/;

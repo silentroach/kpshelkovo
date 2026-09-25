@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { createEntityMentionGraph, type EntityMentionSourceRef } from '@/lib/mentions';
+import { SITE_MENTION_SECTIONS } from '@/lib/mentions/types';
 
 import { createPlaceBacklinksFromGraph } from '../backlinks';
-import { PLACE_MENTION_SECTIONS } from '../schema';
 
 const refs: readonly EntityMentionSourceRef[] = (
   [
@@ -37,7 +37,7 @@ describe('createPlaceBacklinksFromGraph', () => {
 
     expect(
       Object.fromEntries(
-        PLACE_MENTION_SECTIONS.map((section) => [
+        SITE_MENTION_SECTIONS.map((section) => [
           section,
           backlinks[section].map((item) => item.sourceId)
         ])

@@ -1,8 +1,8 @@
+import { SITE_MENTION_SECTIONS } from '@/lib/mentions/types';
 import { formatNewsDate } from '@/lib/news/view';
 import { formatReviewDate } from '@/lib/reviews/view';
 import { formatStatusDate } from '@/lib/status/view';
 
-import { PLACE_MENTION_SECTIONS } from './schema';
 import type { PlaceCategory, PlaceStatus } from './schema';
 import type {
   PlaceBacklinkKind,
@@ -83,7 +83,7 @@ export const placeBacklinkGroups = (
   readonly label: string;
   readonly items: readonly PlaceMentionRef[];
 }[] =>
-  PLACE_MENTION_SECTIONS.map((section) => ({
+  SITE_MENTION_SECTIONS.map((section) => ({
     section,
     label: formatPlaceBacklinkSection(section),
     items: backlinks[section]
