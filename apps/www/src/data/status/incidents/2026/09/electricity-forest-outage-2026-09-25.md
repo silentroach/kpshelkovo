@@ -2,6 +2,7 @@
 service: electricity
 kind: incident
 started_at: 25.09.2026 05:00
+ended_at: 25.09.2026 13:00
 areas:
   - forest
 source_url: https://t.me/shelkovoecoclub/15264/56194
