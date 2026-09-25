@@ -34,7 +34,7 @@ export const createParcelLayer = (
   map: YMap,
   sdk: typeof ymaps3,
   container: HTMLElement,
-  onExpiry: () => void,
+  onSelectionEnd: () => void,
   getDuration: () => number
 ): ParcelLayer => {
   const itemsByPart = new Map<ParcelPart, readonly ParcelMapItem[]>();
@@ -99,7 +99,7 @@ export const createParcelLayer = (
     timer = window.setTimeout(() => {
       timer = undefined;
       clearSelection();
-      onExpiry();
+      onSelectionEnd();
     }, SELECTION_MS);
   };
 
@@ -148,10 +148,13 @@ export const createParcelLayer = (
     }
   };
 
-  const disable = (part: ParcelPart): void => {
+  const disable = (part: ParcelPart, finishSelection = true): void => {
     const items = itemsByPart.get(part);
     if (!items) return;
-    if (selected?.part === part) clearSelection();
+    if (selected?.part === part) {
+      clearSelection();
+      if (finishSelection) onSelectionEnd();
+    }
     itemsByPart.delete(part);
     for (const item of items) {
       const feature = features.get(item.code);
@@ -180,7 +183,7 @@ export const createParcelLayer = (
         }
         updateViewport(viewportZoom, viewportBounds);
       } catch (reason) {
-        disable(part);
+        disable(part, false);
         throw reason;
       }
     },
@@ -206,7 +209,7 @@ export const createParcelLayer = (
     updateViewport,
     destroy() {
       destroyed = true;
-      for (const part of itemsByPart.keys()) disable(part);
+      for (const part of itemsByPart.keys()) disable(part, false);
     }
   };
 };

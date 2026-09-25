@@ -2180,6 +2180,61 @@ describe('PlaceMap', () => {
     );
   });
 
+  it('does not focus a late direct-link response after another selection expires', async () => {
+    const forest = { ...parcel, code: 'SHF-M1', aliases: [], part: 'shf' };
+    const pending = Promise.withResolvers<Response>();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) =>
+        url.endsWith('shf.json') ? pending.promise : Promise.resolve(Response.json([parcel]))
+      )
+    );
+    window.history.replaceState({}, '', '/map/?p=SHF-M1&flag');
+    const timeout = vi.spyOn(window, 'setTimeout');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() =>
+      expect((screen.getByRole('button', { name: 'Слои' }) as HTMLButtonElement).disabled).toBe(
+        false
+      )
+    );
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    areaFeatures[0]?.props.onClick?.(new MouseEvent('click'), {} as never);
+
+    const timerIndex = timeout.mock.calls.findLastIndex(([, delay]) => delay === 5_000);
+    const expire = timeout.mock.calls[timerIndex]?.[0];
+    if (typeof expire !== 'function') throw new Error('Parcel selection timer missing');
+    window.clearTimeout(timeout.mock.results[timerIndex]?.value);
+    expire();
+    expect(window.location.search).toBe('?flag');
+
+    pending.resolve(Response.json([forest]));
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    expect(map.update.mock.calls.some(([update]) => update.location?.zoom === 17)).toBe(false);
+    expect(window.location.search).toBe('?flag');
+  });
+
+  it('clears a direct link when the replacement selection is disabled', async () => {
+    const forest = { ...parcel, code: 'SHF-M1', aliases: [], part: 'shf' };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => Response.json(url.endsWith('shf.json') ? [forest] : [parcel]))
+    );
+    window.history.replaceState({}, '', '/map/?p=SHF-M1&flag');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(areaFeatures[0]?.update).toHaveBeenCalled());
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    const river = screen.getByRole('checkbox', { name: 'Ривер' });
+    await fireEvent.click(river);
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    areaFeatures[1]?.props.onClick?.(new MouseEvent('click'), {} as never);
+    await fireEvent.click(river);
+
+    expect(window.location.search).toBe('?flag');
+    expect(map.removeChild).not.toHaveBeenCalledWith(areaFeatures[0]);
+  });
+
   it('uses the label zoom for a direct link to a small parcel', async () => {
     vi.stubGlobal('fetch', parcelFetch);
     window.history.replaceState({}, '', '/map/?p=SHR-L43');

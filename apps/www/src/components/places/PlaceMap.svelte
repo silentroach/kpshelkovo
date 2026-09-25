@@ -511,10 +511,11 @@
         if (!map || !mapContainer) return;
         const data = await loadParcelData(part);
         if (!stillSelected() || !map || !mapContainer) return;
-        const canonical = code
-          ? data.find((item) => item.code === code || item.aliases?.includes(code))?.code
+        const focusCode = pendingParcelCode ? code : undefined;
+        const canonical = focusCode
+          ? data.find((item) => item.code === focusCode || item.aliases?.includes(focusCode))?.code
           : undefined;
-        if (code && !canonical) {
+        if (focusCode && !canonical) {
           removeParcelQuery(requestedParcelCode);
           pendingParcelCode = undefined;
           pendingParcelPart = undefined;
@@ -543,7 +544,7 @@
         }
         parcelLayer.enable(part, data);
         parcelLayer.updateViewport(map.zoom, map.bounds);
-        if (canonical) {
+        if (canonical && pendingParcelCode) {
           if (!parcelLayer.focus(canonical)) {
             throw new Error('Номер найден, но контур участка недоступен');
           }
@@ -552,7 +553,7 @@
         }
       } catch (reason) {
         if (!stillSelected()) return;
-        parcelLayer?.disable(part);
+        parcelLayer?.disable(part, false);
         parcelData.delete(part);
         console.error('Parcel layer error:', reason);
         failedParts = failedParts.includes(part) ? failedParts : [...failedParts, part];

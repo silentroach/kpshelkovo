@@ -61,7 +61,7 @@ static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/place-map-url.ts:
     rendered: 698
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 26865
+    rendered: 32482
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:
@@ -172,7 +172,7 @@ static/client.XXXXXXXX.js:
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/slot.js:
     rendered: 0
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/snippet.js:
-    rendered: 751
+    rendered: 1052
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/svelte-component.js:
     rendered: 0
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/svelte-element.js:
@@ -206,7 +206,7 @@ static/client.XXXXXXXX.js:
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/bindings/this.js:
     rendered: 1272
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/bindings/universal.js:
-    rendered: 0
+    rendered: 541
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/bindings/window.js:
     rendered: 0
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/class.js:
@@ -242,7 +242,7 @@ static/client.XXXXXXXX.js:
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/error-handling.js:
     rendered: 1930
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/errors.js:
-    rendered: 6202
+    rendered: 6605
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/hydratable.js:
     rendered: 0
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/index.js:
@@ -418,7 +418,7 @@ static/page.XXXXXXXX.js:
     rendered: 53
 static/parcel-layer.XXXXXXXX.js:
   apps/www/src/components/places/parcel-layer.ts:
-    rendered: 4766
+    rendered: 5309
 static/prefetch.XXXXXXXX.js:
   node_modules/.pnpm/astro@7.3.1_@emnapi+core@1.11.1_@emnapi+runtime@1.11.3_@types+node@26.5.0_yaml@2.9.0/node_modules/astro/dist/prefetch/index.js:
     rendered: 5052
