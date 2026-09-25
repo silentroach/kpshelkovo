@@ -5,7 +5,6 @@ import {
   serializeMarkdownDocument
 } from '@shelkovo/markdown';
 
-import { parcelMapDataUrl } from '@/lib/parcels/routes';
 import { absoluteUrl } from '@/lib/site';
 
 import { selectMapPlaces } from './map-selection';
@@ -66,13 +65,6 @@ export const buildPlacesMarkdown = (places: readonly Place[]): string => {
     md.paragraph([
       md.text('Данные для интерактивной карты: '),
       md.link(absoluteUrl(placesDataUrl()), absoluteUrl(placesDataUrl()))
-    ]),
-    md.paragraph([
-      md.text('Контуры участков для показа на Яндекс Картах: '),
-      md.link(absoluteUrl(parcelMapDataUrl()), absoluteUrl(parcelMapDataUrl())),
-      md.text(
-        '. В JSON опубликован массив участков с кодом, частью, контуром и точкой подписи; алиасы указаны, если они есть. Координаты подготовлены для подложки и отличаются от исходного кадастра поправкой отображения. Исходный статус не публикуется. На карте слой включается вручную; поиск по полному коду ведёт к участку.'
-      )
     ]),
     md.heading(2, 'Места'),
     md.list(

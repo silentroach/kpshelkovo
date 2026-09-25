@@ -1,8 +1,9 @@
 import { toWebMercator } from '@shelkovo/geo';
 import { describe, expect, it } from 'vitest';
 
-import { buildParcelMapPayload } from '../map-public';
+import { buildParcelMapPayload, splitParcelMapPayload } from '../map-public';
 import { ParcelMapPublicSchema } from '../map-public-schema';
+import { PARCEL_PARTS, type ParcelPart } from '../schema';
 import type { Parcel } from '../types';
 
 const parcel: Parcel = {
@@ -43,6 +44,67 @@ const parcel: Parcel = {
 };
 
 describe('parcel public payloads', () => {
+  it('splits one prepared payload into four validated parts without changing or duplicating geometry', () => {
+    const parcels: Parcel[] = PARCEL_PARTS.map((part, index) => ({
+      ...parcel,
+      part,
+      code: `${part.toUpperCase()}-L${index + 1}`,
+      aliases: [`${part.toUpperCase()}-L${index + 10}`],
+      cadastralParts: [
+        {
+          cadastralNumber: `50:33:0000000:${index + 1}`,
+          geometry: {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [37, 55 + index],
+                [37.01, 55 + index],
+                [37.01, 55.01 + index],
+                [37, 55 + index]
+              ]
+            ]
+          }
+        }
+      ]
+    }));
+    const full = buildParcelMapPayload(parcels, { offset_east_m: 5.2, offset_north_m: 3.3 });
+    const parts = splitParcelMapPayload(full);
+    const combined = PARCEL_PARTS.flatMap((part) =>
+      ParcelMapPublicSchema.parse(JSON.parse(JSON.stringify(parts[part])))
+    );
+
+    for (const part of PARCEL_PARTS) {
+      expect(ParcelMapPublicSchema.safeParse(parts[part]).success).toBe(true);
+      expect(parts[part].every((entry) => entry.part === part)).toBe(true);
+    }
+    expect(new Set(combined.map(({ code }) => code)).size).toBe(full.length);
+    expect(new Set(combined.flatMap(({ code, aliases }) => [code, ...(aliases ?? [])])).size).toBe(
+      combined.reduce((count, { aliases }) => count + 1 + (aliases?.length ?? 0), 0)
+    );
+    expect(combined.toSorted((a, b) => a.code.localeCompare(b.code))).toEqual(
+      full.toSorted((a, b) => a.code.localeCompare(b.code))
+    );
+  });
+
+  it('rejects misplaced codes and aliases, unknown parts and duplicate identifiers', () => {
+    const prepared = buildParcelMapPayload([parcel]);
+    const entry = prepared[0]!;
+
+    expect(() => splitParcelMapPayload([{ ...entry, part: 'shf' }])).toThrow(/SHR-L43.*shf/u);
+    expect(() => splitParcelMapPayload([{ ...entry, aliases: ['SHF-L44'] }])).toThrow(
+      /SHF-L44.*shr/u
+    );
+    expect(() => splitParcelMapPayload([{ ...entry, part: 'invalid' as ParcelPart }])).toThrow(
+      /unknown parcel part/u
+    );
+    expect(() => splitParcelMapPayload([entry, { ...entry, aliases: [] }])).toThrow(
+      /duplicate parcel code "SHR-L43"/u
+    );
+    expect(() =>
+      splitParcelMapPayload([entry, { ...entry, code: 'SHR-L45', aliases: ['SHR-L43'] }])
+    ).toThrow(/duplicate parcel code "SHR-L43"/u);
+  });
+
   it('publishes one geometry and one label for the current parcel without editorial fields', () => {
     const payload = buildParcelMapPayload([parcel], { offset_east_m: 0, offset_north_m: 0 });
 

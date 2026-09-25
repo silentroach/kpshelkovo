@@ -5,6 +5,7 @@ import type {
   YMapControlsProps,
   YMapFeatureProps
 } from '@yandex/ymaps3-types';
+import { createRawSnippet } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { PlaceMapPublicItemDto } from '@/lib/places/map-public-dto';
@@ -224,7 +225,7 @@ const parcel = {
   labelCoordinates: [37.715, 55.065]
 };
 const parcelFetch = vi.fn(async (url: string) => {
-  if (url === '/map/data/parcels.json') return Response.json([parcel]);
+  if (url === '/map/data/parcels/shr.json') return Response.json([parcel]);
   throw new Error(`Unexpected request: ${url}`);
 });
 
@@ -1376,26 +1377,26 @@ describe('PlaceMap', () => {
     expect(parcelFetch).not.toHaveBeenCalled();
 
     const layers = screen.getByRole('button', { name: 'Слои' });
-    expect(layers.textContent).toBe('');
+    expect(layers.textContent?.trim()).toBe('');
     expect(layers.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
     await fireEvent.click(layers);
     expect(parcelFetch).not.toHaveBeenCalled();
-    const toggle = screen.getByRole('button', { name: 'Участки' });
-    expect(toggle.textContent?.trim()).toBe('Участки');
+    const toggle = screen.getByRole('checkbox', { name: 'Ривер' }) as HTMLInputElement;
+    expect(screen.getByRole('checkbox', { name: 'Участки' })).toBeDefined();
     expect(layers.getAttribute('aria-expanded')).toBe('true');
-    expect(toggle.getAttribute('aria-pressed')).toBe('false');
+    expect(toggle.checked).toBe(false);
     await fireEvent.click(toggle);
     await waitFor(() =>
       expect(areaFeatures.some(({ props }) => props.id === 'parcel-SHR-L43')).toBe(true)
     );
-    expect(parcelFetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcels.json']);
+    expect(parcelFetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcels/shr.json']);
     expect(map.update.mock.lastCall?.[0].location.bounds).toEqual([
       [37.715242, 55.059526],
       [37.717242, 55.061526]
     ]);
 
     const feature = areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43');
-    expect(toggle.getAttribute('aria-pressed')).toBe('true');
+    expect(toggle.checked).toBe(true);
     expect(layers.getAttribute('aria-expanded')).toBe('true');
     await fireEvent.click(toggle);
     expect(map.removeChild).toHaveBeenCalledWith(feature);
@@ -1405,6 +1406,233 @@ describe('PlaceMap', () => {
     expect(map.addChild).toHaveBeenCalledWith(nativeControl);
   });
 
+  it('lets each part finish independently and keeps neighbouring contours when one is hidden', async () => {
+    const forest = { ...parcel, code: 'SHF-M1', aliases: [], part: 'shf' };
+    const park = { ...parcel, code: 'SHP-B42', aliases: [], part: 'shp' };
+    const forestResponse = Promise.withResolvers<Response>();
+    const fetch = vi.fn((url: string) =>
+      url.endsWith('/shf.json') ? forestResponse.promise : Promise.resolve(Response.json([park]))
+    );
+    vi.stubGlobal('fetch', fetch);
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    const all = screen.getByRole('checkbox', { name: 'Участки' }) as HTMLInputElement;
+    const forestToggle = screen.getByRole('checkbox', { name: 'Форест' }) as HTMLInputElement;
+    const parkToggle = screen.getByRole('checkbox', { name: 'Парк' }) as HTMLInputElement;
+    expect(screen.getAllByRole('checkbox').map((input) => input.parentElement?.textContent?.trim()))
+      .toMatchInlineSnapshot(`
+        [
+          "Участки",
+          "Форест",
+          "Вилладж",
+          "Парк",
+          "Ривер",
+        ]
+      `);
+    expect(all.indeterminate).toBe(false);
+    await fireEvent.click(forestToggle);
+    await fireEvent.click(parkToggle);
+    await waitFor(() =>
+      expect(areaFeatures.some(({ props }) => props.id === 'parcel-SHP-B42')).toBe(true)
+    );
+    expect(areaFeatures.some(({ props }) => props.id === 'parcel-SHF-M1')).toBe(false);
+    expect(all.indeterminate).toBe(true);
+    const parkFeature = areaFeatures.find(({ props }) => props.id === 'parcel-SHP-B42');
+    await fireEvent.click(parkToggle);
+    expect(map.removeChild).toHaveBeenCalledWith(parkFeature);
+    forestResponse.resolve(Response.json([forest]));
+    await waitFor(() =>
+      expect(areaFeatures.some(({ props }) => props.id === 'parcel-SHF-M1')).toBe(true)
+    );
+    const forestFeature = areaFeatures.find(({ props }) => props.id === 'parcel-SHF-M1');
+    expect(map.removeChild).not.toHaveBeenCalledWith(forestFeature);
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+      '/map/data/parcels/shf.json',
+      '/map/data/parcels/shp.json'
+    ]);
+    await fireEvent.click(all);
+    await waitFor(() => expect(all.checked).toBe(true));
+    await fireEvent.click(all);
+    expect(all.checked).toBe(false);
+    expect(forestToggle.checked).toBe(false);
+    expect(map.removeChild).toHaveBeenCalledWith(forestFeature);
+  });
+
+  it('keeps all four parts in one layer when their requests finish together', async () => {
+    const codes = { shf: 'SHF-M1', shv: 'SHV-V1', shp: 'SHP-B42', shr: 'SHR-L43' } as const;
+    const fetch = vi.fn(async (url: string) => {
+      const part = url.match(/\/(shf|shv|shp|shr)\.json$/)?.[1] as keyof typeof codes;
+      return Response.json([{ ...parcel, code: codes[part], aliases: [], part }]);
+    });
+    vi.stubGlobal('fetch', fetch);
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    const all = screen.getByRole('checkbox', { name: 'Участки' }) as HTMLInputElement;
+    await fireEvent.click(all);
+    await waitFor(() => expect(areaFeatures).toHaveLength(4));
+    expect(fetch).toHaveBeenCalledTimes(4);
+    await fireEvent.click(all);
+    for (const feature of areaFeatures) expect(map.removeChild).toHaveBeenCalledWith(feature);
+  });
+
+  it('renders the four decorative area icons and toggles every checkbox with its label', async () => {
+    const icons = Object.fromEntries(
+      ['forest', 'village', 'park', 'river'].map((name) => [
+        name,
+        createRawSnippet(() => ({ render: () => `<svg data-area="${name}"></svg>` }))
+      ])
+    );
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Response.json([]))
+    );
+    render(PlaceMap, { props: { places: [place], ...icons } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    const checkboxes = screen.getAllByRole('checkbox') as HTMLInputElement[];
+    const all = checkboxes[0]!;
+    expect(checkboxes.map((checkbox) => checkbox.checked)).toEqual([
+      false,
+      false,
+      false,
+      false,
+      false
+    ]);
+    expect(checkboxes.map((checkbox) => checkbox.parentElement?.textContent?.trim()))
+      .toMatchInlineSnapshot(`
+        [
+          "Участки",
+          "Форест",
+          "Вилладж",
+          "Парк",
+          "Ривер",
+        ]
+      `);
+    expect(
+      checkboxes.slice(1).map((checkbox) => ({
+        icon: checkbox.parentElement?.querySelector('svg')?.getAttribute('data-area'),
+        decorative: checkbox.parentElement
+          ?.querySelector('[aria-hidden]')
+          ?.getAttribute('aria-hidden')
+      }))
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "decorative": "true",
+          "icon": "forest",
+        },
+        {
+          "decorative": "true",
+          "icon": "village",
+        },
+        {
+          "decorative": "true",
+          "icon": "park",
+        },
+        {
+          "decorative": "true",
+          "icon": "river",
+        },
+      ]
+    `);
+    for (const checkbox of checkboxes.slice(1)) {
+      await fireEvent.click(checkbox.parentElement!);
+      expect(checkbox.checked).toBe(true);
+    }
+    expect(all.checked).toBe(true);
+    expect(all.indeterminate).toBe(false);
+    await fireEvent.click(all.parentElement!);
+    expect(checkboxes.map((checkbox) => checkbox.checked)).toEqual([
+      false,
+      false,
+      false,
+      false,
+      false
+    ]);
+    expect(screen.getByRole('button', { name: 'Слои' }).getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('keeps a non-numeric selection marker on the layers trigger while any part is selected', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Response.json([]))
+    );
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+    const layers = screen.getByRole('button', { name: 'Слои' });
+    const marker = (): HTMLSpanElement | undefined =>
+      layers.querySelector<HTMLSpanElement>('span[aria-hidden="true"]') ?? undefined;
+    expect(marker()).toBeUndefined();
+    await fireEvent.click(layers);
+    const forest = screen.getByRole('checkbox', { name: 'Форест' });
+    const park = screen.getByRole('checkbox', { name: 'Парк' });
+    await fireEvent.click(forest);
+    expect(marker()?.textContent).toBe('✓');
+    await fireEvent.keyDown(document, { key: 'Escape' });
+    expect(layers.getAttribute('aria-expanded')).toBe('false');
+    expect(marker()?.textContent).toBe('✓');
+    await fireEvent.click(layers);
+    await fireEvent.click(park);
+    await fireEvent.click(forest);
+    expect(marker()?.textContent).toBe('✓');
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Участки' }));
+    expect(marker()?.textContent).toBe('✓');
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Участки' }));
+    expect(marker()).toBeUndefined();
+    expect(screen.getByRole('button', { name: 'Слои' })).toBe(layers);
+  });
+
+  it('exposes the mixed checkbox state and keeps keyboard selection and camera', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Response.json([]))
+    );
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+    const layers = screen.getByRole('button', { name: 'Слои' });
+    await fireEvent.click(layers);
+    const all = screen.getByRole('checkbox', { name: 'Участки' }) as HTMLInputElement;
+    const forest = screen.getByRole('checkbox', { name: 'Форест' }) as HTMLInputElement;
+    forest.focus();
+    await fireEvent.keyDown(forest, { key: ' ' });
+    await fireEvent.click(forest, { detail: 0 }); // Native checkbox keyboard activation
+    expect(document.activeElement).toBe(forest);
+    expect(forest.checked).toBe(true);
+    expect(all.indeterminate).toBe(true);
+    const cameraUpdates = map.update.mock.calls.length;
+    await fireEvent.click(all);
+    expect(all.checked).toBe(true);
+    expect(all.indeterminate).toBe(false);
+    expect(map.update).toHaveBeenCalledTimes(cameraUpdates);
+    await fireEvent.keyDown(document, { key: 'Escape' });
+    expect(document.activeElement).toBe(layers);
+  });
+
+  it('selects a parcel across parts without replacing either part or moving the camera', async () => {
+    const forest = { ...parcel, code: 'SHF-M1', aliases: [], part: 'shf' };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => Response.json(url.endsWith('shf.json') ? [forest] : [parcel]))
+    );
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Форест' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    const first = areaFeatures.find(({ props }) => props.id === 'parcel-SHF-M1');
+    const second = areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43');
+    const calls = map.update.mock.calls.length;
+    first?.props.onClick?.(new MouseEvent('click'), {} as never);
+    second?.props.onClick?.(new MouseEvent('click'), {} as never);
+    expect(first?.update.mock.lastCall?.[0].style).toEqual(first?.props.style);
+    expect(second?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+    expect(map.update.mock.calls).toHaveLength(calls);
+    expect(map.removeChild).not.toHaveBeenCalledWith(first);
+  });
+
   it('closes the layer list outside and on Escape, returning keyboard focus', async () => {
     vi.stubGlobal('fetch', parcelFetch);
     render(PlaceMap, { props: { places: [place] } });
@@ -1412,7 +1640,7 @@ describe('PlaceMap', () => {
 
     const layers = screen.getByRole('button', { name: 'Слои' });
     await fireEvent.click(layers);
-    const toggle = screen.getByRole('button', { name: 'Участки' });
+    const toggle = screen.getByRole('checkbox', { name: 'Ривер' }) as HTMLInputElement;
     toggle.focus();
     await fireEvent.keyDown(document, { key: 'Escape' });
     expect(layers.getAttribute('aria-expanded')).toBe('false');
@@ -1424,54 +1652,51 @@ describe('PlaceMap', () => {
     expect(parcelFetch).not.toHaveBeenCalled();
   });
 
-  it('ignores a parcel response after the layer is disabled or the component unmounts', async () => {
+  it('ignores a parcel response after the part is disabled or the component unmounts', async () => {
     const pending = Promise.withResolvers<Response>();
     const fetch = vi.fn(() => pending.promise);
     vi.stubGlobal('fetch', fetch);
     const view = render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(markerElements).toHaveLength(1));
     await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
-    const toggle = screen.getByRole('button', { name: 'Участки' });
+    const toggle = screen.getByRole('checkbox', { name: 'Ривер' }) as HTMLInputElement;
     await fireEvent.click(toggle);
     await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
     await fireEvent.click(toggle);
     pending.resolve(Response.json([parcel]));
-    await waitFor(() => expect(toggle.getAttribute('aria-pressed')).toBe('false'));
+    await waitFor(() => expect(toggle.checked).toBe(false));
     expect(areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43')).toBeUndefined();
 
     const later = Promise.withResolvers<Response>();
     fetch.mockReturnValue(later.promise);
-    await fireEvent.click(toggle);
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Парк' }));
     view.unmount();
     later.resolve(Response.json([parcel]));
     await Promise.resolve();
     expect(areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43')).toBeUndefined();
   });
 
-  it('does not let a late disabled response replace the active parcel cache', async () => {
+  it('reuses one in-flight request when a part is turned off and on before its response', async () => {
     const pending = Promise.withResolvers<Response>();
-    const fetch = vi
-      .fn()
-      .mockReturnValueOnce(pending.promise)
-      .mockResolvedValue(Response.json([parcel]));
+    const fetch = vi.fn(() => pending.promise);
     vi.stubGlobal('fetch', fetch);
     render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(markerElements).toHaveLength(1));
     await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
-    const toggle = screen.getByRole('button', { name: 'Участки' });
+    const toggle = screen.getByRole('checkbox', { name: 'Ривер' }) as HTMLInputElement;
     await fireEvent.click(toggle);
     await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
     await fireEvent.click(toggle);
     await fireEvent.click(toggle);
+    expect(fetch).toHaveBeenCalledOnce();
+    pending.resolve(Response.json([parcel]));
     await waitFor(() => expect(areaFeatures).toHaveLength(1));
-    pending.resolve(Response.json({ parcels: [] }));
-    await Promise.resolve();
     await fireEvent.click(toggle);
     await fireEvent.click(toggle);
     await waitFor(() => expect(areaFeatures).toHaveLength(2));
-    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(fetch).toHaveBeenCalledOnce();
     expect(screen.queryByRole('alert')).toBeNull();
-    expect(toggle.getAttribute('aria-pressed')).toBe('true');
+    expect(toggle.checked).toBe(true);
   });
 
   it('offers a retry after a failed manual request', async () => {
@@ -1484,13 +1709,88 @@ describe('PlaceMap', () => {
     render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(markerElements).toHaveLength(1));
     await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
-    await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
     await screen.findByRole('alert');
-    await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+    expect(
+      screen.getByRole('button', { name: 'Слои' }).querySelector('span[aria-hidden="true"]')
+    ).toBeNull();
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
     await waitFor(() =>
       expect(areaFeatures.some(({ props }) => props.id === 'parcel-SHR-L43')).toBe(true)
     );
     expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('reports one part failure without hiding a ready part, then retries through its checkbox', async () => {
+    const forest = { ...parcel, code: 'SHF-M1', aliases: [], part: 'shf' };
+    const fetch = vi
+      .fn()
+      .mockImplementationOnce(async () => Response.json([forest]))
+      .mockImplementationOnce(async () => new Response(undefined, { status: 503 }))
+      .mockImplementationOnce(async () => Response.json([parcel]));
+    vi.stubGlobal('fetch', fetch);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    const forestToggle = screen.getByRole('checkbox', { name: 'Форест' }) as HTMLInputElement;
+    const riverToggle = screen.getByRole('checkbox', { name: 'Ривер' }) as HTMLInputElement;
+    await fireEvent.click(forestToggle);
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    await fireEvent.click(riverToggle);
+    expect((await screen.findByRole('alert')).textContent).toContain('Ривер');
+    expect(
+      screen.getByRole('button', { name: 'Слои' }).querySelector('span[aria-hidden="true"]')
+        ?.textContent
+    ).toBe('✓');
+    expect(forestToggle.checked).toBe(true);
+    expect(riverToggle.checked).toBe(false);
+    expect(riverToggle.getAttribute('aria-invalid')).toBe('true');
+    expect(riverToggle.getAttribute('aria-describedby')).toBe('parcel-map-error-shr');
+    expect(riverToggle.parentElement?.textContent).toContain('!');
+    expect(screen.queryByText(/Загружаем участки|Повторить/)).toBeNull();
+    await fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.getByRole('alert').textContent).toContain('Ривер');
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(riverToggle);
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('rolls back partially added objects when applying one part fails', async () => {
+    const forest = { ...parcel, code: 'SHF-M1', aliases: [], part: 'shf' };
+    const second = { ...parcel, code: 'SHF-M2', aliases: [], part: 'shf' };
+    const fetch = vi.fn(async (url: string) =>
+      Response.json(url.endsWith('shf.json') ? [forest, second] : [parcel])
+    );
+    vi.stubGlobal('fetch', fetch);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    const ready = areaFeatures[0];
+    map.addChild
+      .mockImplementationOnce(() => {})
+      .mockImplementationOnce(() => {
+        throw new Error('SDK failed to add feature');
+      });
+    const forestToggle = screen.getByRole('checkbox', { name: 'Форест' }) as HTMLInputElement;
+    await fireEvent.click(forestToggle);
+    await screen.findByRole('alert');
+    expect(forestToggle.checked).toBe(false);
+    expect(map.removeChild).toHaveBeenCalledWith(areaFeatures[1]);
+    expect(map.removeChild).toHaveBeenCalledWith(areaFeatures[2]);
+    expect(map.removeChild).not.toHaveBeenCalledWith(ready);
+    await fireEvent.click(forestToggle);
+    await waitFor(() => expect(areaFeatures).toHaveLength(5));
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+      '/map/data/parcels/shr.json',
+      '/map/data/parcels/shf.json',
+      '/map/data/parcels/shf.json'
+    ]);
   });
 
   it('shows one short label from zoom 17 and no extra text for a merged parcel', async () => {
@@ -1498,7 +1798,7 @@ describe('PlaceMap', () => {
     render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
     await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
-    await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
     await waitFor(() => expect(areaFeatures).toHaveLength(1));
     const update = mapUpdateHandlers[0];
     if (!update) throw new Error('Map listener missing');
@@ -1619,7 +1919,7 @@ describe('PlaceMap', () => {
     await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
     expect(areaFeatures).toHaveLength(0);
     await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
-    await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
     await waitFor(() => expect(areaFeatures).toHaveLength(5));
 
     expect(
@@ -1705,7 +2005,7 @@ describe('PlaceMap', () => {
     const view = render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
     await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
-    await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
     await waitFor(() => expect(areaFeatures).toHaveLength(2));
     expect(areaFeatures.map(({ props }) => props.style?.stroke)).toMatchInlineSnapshot(`
       [
@@ -1766,7 +2066,7 @@ describe('PlaceMap', () => {
 
   it('focuses alias links from the geometry feed, survives resize, and preserves URL state', async () => {
     const fetch = vi.fn((url: string) =>
-      url === '/map/data/parcels.json'
+      url === '/map/data/parcels/shr.json'
         ? Promise.resolve(
             Response.json([
               {
@@ -1804,11 +2104,15 @@ describe('PlaceMap', () => {
       ).toHaveBeenCalled()
     );
     expect(screen.queryByText('SHR-L43 / SHR-L44')).toBeNull();
+    expect(
+      screen.getByRole('button', { name: 'Слои' }).querySelector('span[aria-hidden="true"]')
+        ?.textContent
+    ).toBe('✓');
     await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
-    expect(screen.getByRole('button', { name: 'Участки' }).getAttribute('aria-pressed')).toBe(
-      'true'
+    expect((screen.getByRole('checkbox', { name: 'Ривер' }) as HTMLInputElement).checked).toBe(
+      true
     );
-    expect(fetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcels.json']);
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcels/shr.json']);
     expect(map.update.mock.calls.find(([props]) => props.location?.zoom === 17)?.[0])
       .toMatchInlineSnapshot(`
         {
@@ -1876,6 +2180,61 @@ describe('PlaceMap', () => {
     );
   });
 
+  it('does not focus a late direct-link response after another selection expires', async () => {
+    const forest = { ...parcel, code: 'SHF-M1', aliases: [], part: 'shf' };
+    const pending = Promise.withResolvers<Response>();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) =>
+        url.endsWith('shf.json') ? pending.promise : Promise.resolve(Response.json([parcel]))
+      )
+    );
+    window.history.replaceState({}, '', '/map/?p=SHF-M1&flag');
+    const timeout = vi.spyOn(window, 'setTimeout');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() =>
+      expect((screen.getByRole('button', { name: 'Слои' }) as HTMLButtonElement).disabled).toBe(
+        false
+      )
+    );
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    areaFeatures[0]?.props.onClick?.(new MouseEvent('click'), {} as never);
+
+    const timerIndex = timeout.mock.calls.findLastIndex(([, delay]) => delay === 5_000);
+    const expire = timeout.mock.calls[timerIndex]?.[0];
+    if (typeof expire !== 'function') throw new Error('Parcel selection timer missing');
+    window.clearTimeout(timeout.mock.results[timerIndex]?.value);
+    expire();
+    expect(window.location.search).toBe('?flag');
+
+    pending.resolve(Response.json([forest]));
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    expect(map.update.mock.calls.some(([update]) => update.location?.zoom === 17)).toBe(false);
+    expect(window.location.search).toBe('?flag');
+  });
+
+  it('clears a direct link when the replacement selection is disabled', async () => {
+    const forest = { ...parcel, code: 'SHF-M1', aliases: [], part: 'shf' };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => Response.json(url.endsWith('shf.json') ? [forest] : [parcel]))
+    );
+    window.history.replaceState({}, '', '/map/?p=SHF-M1&flag');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(areaFeatures[0]?.update).toHaveBeenCalled());
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    const river = screen.getByRole('checkbox', { name: 'Ривер' });
+    await fireEvent.click(river);
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    areaFeatures[1]?.props.onClick?.(new MouseEvent('click'), {} as never);
+    await fireEvent.click(river);
+
+    expect(window.location.search).toBe('?flag');
+    expect(map.removeChild).not.toHaveBeenCalledWith(areaFeatures[0]);
+  });
+
   it('uses the label zoom for a direct link to a small parcel', async () => {
     vi.stubGlobal('fetch', parcelFetch);
     window.history.replaceState({}, '', '/map/?p=SHR-L43');
@@ -1888,18 +2247,132 @@ describe('PlaceMap', () => {
     );
   });
 
+  it('does not restart an active direct-link focus when selecting all parts', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => Response.json(url.endsWith('shr.json') ? [parcel] : []))
+    );
+    window.history.replaceState({}, '', '/map/?p=SHR-L43&other=1');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(areaFeatures[0]?.update).toHaveBeenCalled());
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Участки' }));
+    expect(map.update.mock.calls.filter(([update]) => update.location?.zoom === 17)).toHaveLength(
+      1
+    );
+    expect(window.location.search).toBe('?p=SHR-L43&other=1');
+  });
+
+  it('repeats an original parcel link on remount but opens the cleaned URL with no parts', async () => {
+    vi.stubGlobal('fetch', parcelFetch);
+    const original = '/map/?q=a%20b&flag&p=SHR-L43#map';
+    window.history.replaceState({}, '', original);
+    const timeout = vi.spyOn(window, 'setTimeout');
+    const first = render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    const index = timeout.mock.calls.findIndex(([, delay]) => delay === 5_000);
+    const expiry = timeout.mock.calls[index]?.[0];
+    const timer = timeout.mock.results[index]?.value;
+    if (typeof expiry !== 'function') throw new Error('Parcel highlight timer missing');
+    window.clearTimeout(timer);
+    expiry();
+    const cleaned = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    expect(cleaned).toBe('/map/?q=a%20b&flag#map');
+    first.unmount();
+
+    window.history.replaceState({}, '', original);
+    const second = render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    expect(parcelFetch).toHaveBeenCalledTimes(2);
+    second.unmount();
+
+    window.history.replaceState({}, '', cleaned);
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(3));
+    expect(parcelFetch).toHaveBeenCalledTimes(2);
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    expect((screen.getByRole('checkbox', { name: 'Ривер' }) as HTMLInputElement).checked).toBe(
+      false
+    );
+  });
+
+  it('routes a mixed-case alias through only its part and ignores malformed codes', async () => {
+    const park = { ...parcel, code: 'SHP-B42', aliases: ['SHP-B43'], part: 'shp' };
+    const fetch = vi.fn(async (_url: string) => Response.json([park]));
+    vi.stubGlobal('fetch', fetch);
+    window.history.replaceState({}, '', '/map/?p=shp-b43');
+    const view = render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcels/shp.json']);
+    expect(areaFeatures[0]?.props.id).toBe('parcel-SHP-B42');
+    view.unmount();
+
+    fetch.mockClear();
+    window.history.replaceState({}, '', '/map/?p=SHF-wrong');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(2));
+    await waitFor(() => expect(window.location.search).toBe(''));
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('cancels an in-flight direct link when its part is switched off', async () => {
+    const forest = { ...parcel, code: 'SHF-M1', aliases: [], part: 'shf' };
+    const pending = Promise.withResolvers<Response>();
+    const fetch = vi.fn(() => pending.promise);
+    vi.stubGlobal('fetch', fetch);
+    window.history.replaceState({}, '', '/map/?p=SHF-M1&flag#map');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    const toggle = screen.getByRole('checkbox', { name: 'Форест' }) as HTMLInputElement;
+    expect(toggle.checked).toBe(true);
+    await fireEvent.click(toggle);
+    expect(`${window.location.search}${window.location.hash}`).toBe('?flag#map');
+    pending.resolve(Response.json([forest]));
+    await Promise.resolve();
+    expect(areaFeatures).toHaveLength(0);
+    await fireEvent.click(toggle);
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    expect(fetch).toHaveBeenCalledOnce();
+    expect(map.update.mock.calls.some(([props]) => props.location?.zoom === 17)).toBe(false);
+  });
+
+  it('cancels an active URL highlight without a late focus or URL mutation', async () => {
+    vi.stubGlobal('fetch', parcelFetch);
+    const historyState = { navigation: 'parcel' };
+    window.history.replaceState(historyState, '', '/map/?p=SHR-L43&flag#map');
+    const timeout = vi.spyOn(window, 'setTimeout');
+    const clearTimeout = vi.spyOn(window, 'clearTimeout');
+    const replace = vi.spyOn(window.history, 'replaceState');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(areaFeatures[0]?.update).toHaveBeenCalled());
+    const timerIndex = timeout.mock.calls.findIndex(([, delay]) => delay === 5_000);
+    const timer = timeout.mock.results[timerIndex]?.value;
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    const river = screen.getByRole('checkbox', { name: 'Ривер' });
+    await fireEvent.click(river);
+    expect(clearTimeout).toHaveBeenCalledWith(timer);
+    expect(replace.mock.lastCall).toEqual([historyState, '', '/map/?flag#map']);
+    await fireEvent.click(river);
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    expect(map.update.mock.calls.filter(([update]) => update.location?.zoom === 17)).toHaveLength(
+      1
+    );
+    expect(parcelFetch).toHaveBeenCalledOnce();
+  });
+
   it('discards an unknown link after loading geometry without changing layer visibility', async () => {
     vi.stubGlobal('fetch', parcelFetch);
     window.history.replaceState({}, '', '/map/?p=SHR-L99&flag');
     render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(window.location.search).toBe('?flag'));
-    expect(parcelFetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcels.json']);
+    expect(parcelFetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcels/shr.json']);
     await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
-    expect(screen.getByRole('button', { name: 'Участки' }).getAttribute('aria-pressed')).toBe(
-      'false'
+    expect((screen.getByRole('checkbox', { name: 'Ривер' }) as HTMLInputElement).checked).toBe(
+      false
     );
     expect(areaFeatures).toHaveLength(0);
-    await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
     await waitFor(() => expect(areaFeatures).toHaveLength(1));
     expect(parcelFetch).toHaveBeenCalledTimes(1);
   });
@@ -1916,12 +2389,64 @@ describe('PlaceMap', () => {
 
     await screen.findByRole('alert');
     expect(window.location.search).toBe('?p=SHR-L44&from=search');
-    await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
     await waitFor(() => expect(areaFeatures).toHaveLength(1));
     expect(fetch.mock.calls.map(([url]) => url)).toEqual([
-      '/map/data/parcels.json',
-      '/map/data/parcels.json'
+      '/map/data/parcels/shr.json',
+      '/map/data/parcels/shr.json'
     ]);
+    expect(map.update.mock.calls.some(([update]) => update.location?.zoom === 17)).toBe(true);
+  });
+
+  it('keeps a requested link when applying its part fails, then focuses after a retry', async () => {
+    const fetch = vi.fn(async () => Response.json([parcel]));
+    vi.stubGlobal('fetch', fetch);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    window.history.replaceState({}, '', '/map/?p=SHR-L44&other=1#map');
+    map.update
+      .mockImplementationOnce(() => {})
+      .mockImplementationOnce(() => {
+        throw new Error('SDK focus unavailable');
+      });
+    render(PlaceMap, { props: { places: [place] } });
+    const alert = await screen.findByRole('alert');
+    expect(alert.textContent).toContain('Ривер');
+    expect(window.location.search).toBe('?p=SHR-L44&other=1');
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    const river = screen.getByRole('checkbox', { name: 'Ривер' }) as HTMLInputElement;
+    expect(river.checked).toBe(false);
+    await fireEvent.click(river);
+    await waitFor(() =>
+      expect(map.update.mock.calls.some(([update]) => update.location?.zoom === 17)).toBe(true)
+    );
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(window.location.search).toBe('?p=SHR-L44&other=1');
+  });
+
+  it('preserves an explicit group selection if a pending direct code turns out unknown', async () => {
+    const pending = Promise.withResolvers<Response>();
+    const fetch = vi.fn((url: string) =>
+      url.endsWith('/shr.json') ? pending.promise : Promise.resolve(Response.json([]))
+    );
+    vi.stubGlobal('fetch', fetch);
+    window.history.replaceState({}, '', '/map/?p=SHR-L99&flag#map');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Участки' }));
+    pending.resolve(Response.json([parcel]));
+    await waitFor(() => expect(window.location.search).toBe('?flag'));
+    expect((screen.getByRole('checkbox', { name: 'Ривер' }) as HTMLInputElement).checked).toBe(
+      true
+    );
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+      '/map/data/parcels/shr.json',
+      '/map/data/parcels/shf.json',
+      '/map/data/parcels/shv.json',
+      '/map/data/parcels/shp.json'
+    ]);
+    expect(map.update.mock.calls.some(([update]) => update.location?.zoom === 17)).toBe(false);
   });
 
   it('retries after an invalid wrapper causes an application error', async () => {
@@ -1936,12 +2461,13 @@ describe('PlaceMap', () => {
 
     await screen.findByRole('alert');
     expect(window.location.search).toBe('?p=SHR-L43');
-    await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
     await waitFor(() => expect(areaFeatures).toHaveLength(1));
     expect(map.update.mock.calls.some(([update]) => update.location?.zoom === 17)).toBe(true);
     expect(fetch.mock.calls.map(([url]) => url)).toEqual([
-      '/map/data/parcels.json',
-      '/map/data/parcels.json'
+      '/map/data/parcels/shr.json',
+      '/map/data/parcels/shr.json'
     ]);
   });
 
@@ -1952,9 +2478,9 @@ describe('PlaceMap', () => {
     render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(markerElements).toHaveLength(1));
     await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
-    await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
     await screen.findByRole('alert');
-    await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
     await waitFor(() => expect(areaFeatures).toHaveLength(1));
     expect(fetch).toHaveBeenCalledTimes(2);
   });

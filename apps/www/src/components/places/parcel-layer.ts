@@ -8,6 +8,8 @@ import type {
   YMapMarker
 } from '@yandex/ymaps3-types';
 
+import type { ParcelPart } from '@/lib/parcels/schema';
+
 import type { ParcelLayer, ParcelMapItem } from './parcel-layer-types';
 
 const LABEL_MIN_ZOOM = 17;
@@ -32,15 +34,14 @@ export const createParcelLayer = (
   map: YMap,
   sdk: typeof ymaps3,
   container: HTMLElement,
-  onExpiry: () => void,
+  onSelectionEnd: () => void,
   getDuration: () => number
 ): ParcelLayer => {
-  let items: readonly ParcelMapItem[] = [];
-  let features = new Map<string, YMapFeature>();
-  let labels = new Map<string, YMapMarker>();
+  const itemsByPart = new Map<ParcelPart, readonly ParcelMapItem[]>();
+  const features = new Map<string, YMapFeature>();
+  const labels = new Map<string, YMapMarker>();
   let selected: ParcelMapItem | undefined;
   let timer: number | undefined;
-  let active = false;
   let destroyed = false;
   let viewportZoom = map.zoom;
   let viewportBounds = map.bounds;
@@ -98,45 +99,46 @@ export const createParcelLayer = (
     timer = window.setTimeout(() => {
       timer = undefined;
       clearSelection();
-      onExpiry();
+      onSelectionEnd();
     }, SELECTION_MS);
   };
 
   const updateViewport = (zoom: number, bounds: LngLatBounds): void => {
     viewportZoom = zoom;
     viewportBounds = bounds;
-    if (!active || destroyed) return;
+    if (!itemsByPart.size || destroyed) return;
 
     const visible = new Set<string>();
     if (zoom >= LABEL_MIN_ZOOM) {
-      for (const item of items) {
-        const [lng, lat] = item.labelCoordinates;
-        if (
-          lng < Math.min(bounds[0][0], bounds[1][0]) ||
-          lng > Math.max(bounds[0][0], bounds[1][0]) ||
-          lat < Math.min(bounds[0][1], bounds[1][1]) ||
-          lat > Math.max(bounds[0][1], bounds[1][1])
-        )
-          continue;
-        visible.add(item.code);
-        if (labels.has(item.code)) continue;
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'parcel-map-label';
-        if (item.status === 'unavailable') button.classList.add('parcel-map-label--unavailable');
-        const text = document.createElement('span');
-        text.textContent = item.code.split('-')[1] ?? item.code;
-        button.append(text);
-        button.title = item.code;
-        button.setAttribute('aria-label', `Выбрать участок ${item.code}`);
-        button.addEventListener('click', (event) => {
-          event.stopPropagation();
-          select(item);
-        });
-        const marker = new sdk.YMapMarker({ coordinates: [lng, lat], zIndex: -1 }, button);
-        labels.set(item.code, marker);
-        map.addChild(marker);
-      }
+      for (const items of itemsByPart.values())
+        for (const item of items) {
+          const [lng, lat] = item.labelCoordinates;
+          if (
+            lng < Math.min(bounds[0][0], bounds[1][0]) ||
+            lng > Math.max(bounds[0][0], bounds[1][0]) ||
+            lat < Math.min(bounds[0][1], bounds[1][1]) ||
+            lat > Math.max(bounds[0][1], bounds[1][1])
+          )
+            continue;
+          visible.add(item.code);
+          if (labels.has(item.code)) continue;
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'parcel-map-label';
+          if (item.status === 'unavailable') button.classList.add('parcel-map-label--unavailable');
+          const text = document.createElement('span');
+          text.textContent = item.code.split('-')[1] ?? item.code;
+          button.append(text);
+          button.title = item.code;
+          button.setAttribute('aria-label', `Выбрать участок ${item.code}`);
+          button.addEventListener('click', (event) => {
+            event.stopPropagation();
+            select(item);
+          });
+          const marker = new sdk.YMapMarker({ coordinates: [lng, lat], zIndex: -1 }, button);
+          labels.set(item.code, marker);
+          map.addChild(marker);
+        }
     }
 
     for (const [code, marker] of labels) {
@@ -146,36 +148,52 @@ export const createParcelLayer = (
     }
   };
 
-  const disable = (): void => {
-    active = false;
-    clearSelection();
-    for (const feature of features.values()) map.removeChild(feature);
-    features.clear();
-    for (const marker of labels.values()) map.removeChild(marker);
-    labels.clear();
+  const disable = (part: ParcelPart, finishSelection = true): void => {
+    const items = itemsByPart.get(part);
+    if (!items) return;
+    if (selected?.part === part) {
+      clearSelection();
+      if (finishSelection) onSelectionEnd();
+    }
+    itemsByPart.delete(part);
+    for (const item of items) {
+      const feature = features.get(item.code);
+      if (feature) map.removeChild(feature);
+      features.delete(item.code);
+      const label = labels.get(item.code);
+      if (label) map.removeChild(label);
+      labels.delete(item.code);
+    }
   };
 
   return {
-    enable(parcels) {
-      if (destroyed || active) return;
-      items = parcels;
-      active = true;
-      for (const item of items) {
-        const feature = new sdk.YMapFeature({
-          id: `parcel-${item.code}`,
-          geometry: toMapGeometry(item.geometry),
-          style: normalStyle(item),
-          onClick: () => select(item)
-        });
-        features.set(item.code, feature);
-        map.addChild(feature);
+    enable(part, parcels) {
+      if (destroyed || itemsByPart.has(part)) return;
+      itemsByPart.set(part, parcels);
+      try {
+        for (const item of parcels) {
+          const feature = new sdk.YMapFeature({
+            id: `parcel-${item.code}`,
+            geometry: toMapGeometry(item.geometry),
+            style: normalStyle(item),
+            onClick: () => select(item)
+          });
+          features.set(item.code, feature);
+          map.addChild(feature);
+        }
+        updateViewport(viewportZoom, viewportBounds);
+      } catch (reason) {
+        disable(part, false);
+        throw reason;
       }
-      updateViewport(viewportZoom, viewportBounds);
     },
     disable,
     focus(code) {
-      if (!active || destroyed) return false;
-      const item = items.find((parcel) => parcel.code === code || parcel.aliases?.includes(code));
+      if (destroyed) return false;
+      const part = code.slice(0, 3).toLowerCase() as ParcelPart;
+      const item = itemsByPart
+        .get(part)
+        ?.find((parcel) => parcel.code === code || parcel.aliases?.includes(code));
       if (!item) return false;
       map.update({
         location: {
@@ -191,8 +209,7 @@ export const createParcelLayer = (
     updateViewport,
     destroy() {
       destroyed = true;
-      disable();
-      items = [];
+      for (const part of itemsByPart.keys()) disable(part, false);
     }
   };
 };

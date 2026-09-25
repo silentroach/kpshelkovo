@@ -15,12 +15,12 @@ description: >-
 
 Оценивай пользу поиска по реальной выдаче Pagefind. Автоматические тесты проверяют работу клиента и правила индексирования; релевантность меняющегося корпуса оценивай вручную через существующий интерфейс сайта.
 
-Архитектура поиска описана в `docs/decisions/025-static-full-text-search-with-pagefind.md`. Основные файлы:
+Архитектура поиска описана в `docs/decisions/025-static-full-text-search-with-pagefind.md`, поисковые записи участков — в `docs/decisions/041-parcel-records-and-exact-search.md`. Основные файлы:
 
 - `apps/www/src/lib/search` — клиент, типы и поисковые контракты;
 - `apps/www/src/layouts/BaseLayout.astro` — Pagefind root и metadata;
 - `apps/www/tests/search-quality.test.ts` — интеграционные проверки загрузки, переходов, догрузки и состава production-индекса;
-- `apps/www/scripts/build-search-index.ts` — сборка индекса HTML и участков из `/map/data/parcels.json`.
+- `apps/www/scripts/build-search-index.ts` — сборка индекса HTML и поисковых записей участков: читает четыре файла данных карты `/map/data/parcels/{shf,shv,shp,shr}.json`, проверяет каждый и уникальность кодов и алиасов в объединённом наборе; общего `/map/data/parcels.json` нет.
 
 ## Проверка до изменения
 
