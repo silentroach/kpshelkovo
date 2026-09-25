@@ -33,7 +33,7 @@ describe('shared event widget', () => {
     expect(html).toContain(`href="${place.url}"`);
     expect(html).toContain('Green Dreams</a>');
     expect(html).toContain('беседке');
-    expect(html).toContain(`href="${place.mapUrl}"`);
+    expect(html).not.toContain(`href="${place.mapUrl}"`);
     expect(html).toContain(`href="${event.icsUrl}"`);
     expect(html).toContain(`download="${event.slug}.ics"`);
     expect(html).toContain(`id="news-event-title-${event.slug}"`);
@@ -66,57 +66,51 @@ describe('shared event widget', () => {
         record: {
           ...event,
           place: testPlace({ name: 'Эко-клуб', mapUrl: 'https://example.com/location/plan' })
-        },
-        mapUrl: 'https://example.com/location/plan'
+        }
       },
       {
         kind: 'inline venue',
-        record: { ...event, location: 'Площадка у реки', coordinates: { lat: 54.8, lng: 37.9 } },
-        mapUrl: 'https://yandex.ru/maps/?pt=37.9,54.8&z=16&l=map'
+        record: { ...event, location: 'Площадка у реки', coordinates: { lat: 54.8, lng: 37.9 } }
       },
       {
         kind: 'unnamed coordinates',
-        record: { ...event, coordinates: { lat: 54.8, lng: 37.9 } },
-        mapUrl: 'https://yandex.ru/maps/?pt=37.9,54.8&z=16&l=map'
+        record: { ...event, coordinates: { lat: 54.8, lng: 37.9 } }
       }
-    ])(
-      'keeps the $kind marker decorative and preserves the fallback URL',
-      async ({ record, mapUrl }) => {
-        const container = await createAstroContainer();
-        const html = await container.renderToString(EventWidget, {
-          props: { event: record, newsSlug }
-        });
-        const window = new Window();
-        try {
-          window.document.body.innerHTML = html;
-          const preview = window.document.querySelector('map-preview');
-          const template = preview?.querySelector('template');
-          const marker = template?.content.querySelector('span');
-          expect({
-            hidden: marker?.getAttribute('aria-hidden'),
-            links: template?.content.querySelectorAll('a').length,
-            tabIndex: marker?.tabIndex
-          }).toMatchInlineSnapshot(`
+    ])('keeps the $kind marker decorative without a fallback URL', async ({ record }) => {
+      const container = await createAstroContainer();
+      const html = await container.renderToString(EventWidget, {
+        props: { event: record, newsSlug }
+      });
+      const window = new Window();
+      try {
+        window.document.body.innerHTML = html;
+        const preview = window.document.querySelector('map-preview');
+        const template = preview?.querySelector('template');
+        const marker = template?.content.querySelector('span');
+        expect({
+          hidden: marker?.getAttribute('aria-hidden'),
+          links: template?.content.querySelectorAll('a').length,
+          tabIndex: marker?.tabIndex
+        }).toMatchInlineSnapshot(`
           {
             "hidden": "true",
             "links": 0,
             "tabIndex": -1,
           }
         `);
-          const fallback = preview?.querySelector('[data-fallback]');
-          expect(fallback?.getAttribute('href')).toBe(mapUrl);
-          expect(fallback?.textContent.trim()).toBe('Яндекс Карты');
-          expect(
-            [...window.document.querySelectorAll('.news-event-actions a')].map((link) =>
-              link.getAttribute('href')
-            )
-          ).toEqual(newsSlug ? [event.icsUrl] : []);
-          expect(!!window.document.querySelector('.news-event-actions')).toBe(!!newsSlug);
-        } finally {
-          await window.happyDOM.close();
-        }
+        expect(
+          preview?.querySelector('[data-fallback], a[href^="https://yandex.ru/"]')
+        ).toBeFalsy();
+        expect(
+          [...window.document.querySelectorAll('.news-event-actions a')].map((link) =>
+            link.getAttribute('href')
+          )
+        ).toEqual(newsSlug ? [event.icsUrl] : []);
+        expect(!!window.document.querySelector('.news-event-actions')).toBe(!!newsSlug);
+      } finally {
+        await window.happyDOM.close();
       }
-    );
+    });
   });
 
   it('sends only the canonical event point, without place icon, areas or live hours', async () => {
@@ -170,9 +164,7 @@ describe('shared event widget', () => {
       const marker = preview?.querySelector('template')?.content;
       expect(marker?.querySelectorAll('.ui-map-marker')).toHaveLength(1);
       expect(marker?.querySelectorAll('img, [data-open]')).toHaveLength(0);
-      const fallback = preview?.querySelector('[data-fallback]');
-      expect(fallback?.getAttribute('href')).toBe(place.mapUrl);
-      expect(fallback?.hasAttribute('hidden')).toBe(false);
+      expect(preview?.querySelector('[data-fallback]')).toBeFalsy();
       const actions = window.document.querySelector('.news-event-actions');
       expect([...actions!.querySelectorAll('a')].map((link) => link.getAttribute('href'))).toEqual([
         event.icsUrl

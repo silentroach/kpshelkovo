@@ -196,11 +196,6 @@
         [new YMapDefaultSchemeLayer(), new YMapDefaultFeaturesLayer()]
       );
 
-      const currentMap = map;
-      const control = await createOpenMapsControl(ymaps3, 'bottom right');
-      if (destroyed || map !== currentMap) return;
-      map.addChild(control);
-
       syncMarkers(ymaps3);
 
       isLoading = false;
@@ -213,6 +208,26 @@
           margin: view.margin
         });
       }
+
+      const currentMap = map;
+      void createOpenMapsControl(ymaps3, 'bottom right')
+        .then((control) => {
+          if (destroyed || map !== currentMap) return;
+          currentMap.addChild(control);
+        })
+        .catch((err) => {
+          if (destroyed || map !== currentMap) return;
+          if (hasAutofitted) {
+            requestAutofit();
+            hasAutofitted = false;
+          }
+          clearMarkers();
+          currentMap.destroy();
+          map = undefined;
+          console.error('Map initialization error:', err);
+          error = 'Ошибка при загрузке карты';
+          isLoading = false;
+        });
     } catch (err) {
       if (destroyed) return;
       if (map) {
@@ -258,6 +273,7 @@
 
       const view = getMapView();
       if (!map.update) {
+        clearMarkers();
         map.destroy();
         map = undefined;
         hasAutofitted = false;
@@ -484,15 +500,6 @@
   class="settlement-map"
   style={`height: ${height}px; min-height: ${height}px;`}
 >
-  {#if isLoading}
-    <div class="map-placeholder">
-      <div class="map-message">
-        <div class="map-spinner"></div>
-        <p class="map-loading-text">Загрузка карты...</p>
-      </div>
-    </div>
-  {/if}
-
   {#if error}
     <div class="map-placeholder">
       <div class="map-message map-error">
@@ -576,7 +583,7 @@
     width: 100%;
     overflow: hidden;
     border: 1px solid var(--color-border);
-    background: var(--color-surface);
+    background: var(--color-bg-soft);
   }
 
   :global(.settlement-map-marker) {
@@ -633,16 +640,6 @@
     text-align: center;
   }
 
-  .map-spinner {
-    width: 2rem;
-    height: 2rem;
-    margin: 0 auto 0.75rem;
-    border-bottom: 0.125rem solid var(--color-text);
-    border-radius: 999px;
-    animation: map-spin 1s linear infinite;
-  }
-
-  .map-loading-text,
   .map-popup-tariff {
     color: var(--color-text-muted);
     font-size: 0.875rem;
@@ -751,11 +748,5 @@
     top: -0.375rem;
     border-right: 0;
     border-bottom: 0;
-  }
-
-  @keyframes map-spin {
-    to {
-      transform: rotate(360deg);
-    }
   }
 </style>

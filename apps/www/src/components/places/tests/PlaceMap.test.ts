@@ -371,7 +371,9 @@ describe('PlaceMap', () => {
 
   it('adds the bottom-right native control once per mount and destroys its owning map', async () => {
     const first = render(PlaceMap, { props: { places: [place] } });
-    await waitFor(() => expect(map.addChild).toHaveBeenCalledWith(nativeControl));
+    await waitFor(() =>
+      expect(map.addChild.mock.calls.map(([child]) => child)).toContain(nativeControl)
+    );
     expect(createControl.mock.calls[0]?.[0]).toEqual({ position: 'bottom right' });
     first.unmount();
     expect(map.destroy).toHaveBeenCalledOnce();
@@ -380,6 +382,81 @@ describe('PlaceMap', () => {
     await waitFor(() => expect(createControl).toHaveBeenCalledTimes(2));
     second.unmount();
     expect(map.destroy).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps the reserved map area unobstructed while the SDK is pending', async () => {
+    const ready = Promise.withResolvers<void>();
+    Object.defineProperty(window.ymaps3, 'ready', { value: ready.promise });
+
+    render(PlaceMap, { props: { places: [place] } });
+
+    expect(screen.getByTestId('place-map').children).toHaveLength(2);
+    expect(screen.getByRole('button', { name: 'Слои' }).hasAttribute('disabled')).toBe(true);
+    expect(screen.queryByRole('status')).toBeNull();
+    expect(mapElements).toHaveLength(0);
+
+    ready.resolve();
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+    expect(screen.getByTestId('place-map').children).toHaveLength(2);
+  });
+
+  it('renders markers, highlighted geometry and parcels while the native control is pending', async () => {
+    const imported = Promise.withResolvers<typeof extras>();
+    importModule.mockReturnValueOnce(imported.promise);
+    vi.stubGlobal('fetch', parcelFetch);
+    window.history.replaceState({}, '', '/map/?h=hunting-ponds');
+
+    render(PlaceMap, { props: { places: [pondsPlace, place] } });
+    expect(screen.getByTestId('place-map').children).toHaveLength(2);
+    expect(screen.getByRole('button', { name: 'Слои' }).hasAttribute('disabled')).toBe(true);
+    await waitFor(() => expect(importModule).toHaveBeenCalledOnce());
+
+    expect(screen.getByTestId('place-map').children).toHaveLength(2);
+    expect(mapElements[0]?.hasAttribute('inert')).toBe(false);
+    expect(screen.getByRole('button', { name: 'Слои' }).hasAttribute('disabled')).toBe(false);
+    expect(clustererProps).toHaveLength(1);
+    const marker = markerElements.find((element) => element instanceof HTMLAnchorElement);
+    expect(marker?.getAttribute('href')).toBe(pondsPlace.url);
+    expect(marker?.dataset.highlighted).toBe('true');
+    expect(map.addChild.mock.calls.map(([child]) => child)).toContain(areaFeatures[0]);
+    expect(map.addChild.mock.calls.map(([child]) => child)).not.toContain(nativeControl);
+    const clusters = clustererProps[0];
+    if (!clusters) throw new Error('Clusterer missing');
+    clusters.cluster([37.74, 55.06], clusters.features);
+    const cluster = markerElements.at(-1);
+    if (!cluster) throw new Error('Cluster marker missing');
+    await fireEvent.click(cluster, { detail: 1 });
+    expect(map.update.mock.lastCall?.[0].location.bounds).toBeDefined();
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
+    await waitFor(() =>
+      expect(areaFeatures.some(({ props }) => props.id === 'parcel-SHR-L43')).toBe(true)
+    );
+    expect(screen.getByTestId('place-map').children).toHaveLength(2);
+
+    imported.resolve(extras);
+    await waitFor(() =>
+      expect(map.addChild.mock.calls.map(([child]) => child)).toContain(nativeControl)
+    );
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it('focuses a requested parcel without waiting for the native control', async () => {
+    const imported = Promise.withResolvers<typeof extras>();
+    importModule.mockReturnValueOnce(imported.promise);
+    vi.stubGlobal('fetch', parcelFetch);
+    window.history.replaceState({}, '', '/map/?p=SHR-L43');
+
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(importModule).toHaveBeenCalledOnce());
+    await waitFor(() =>
+      expect(areaFeatures.some(({ props }) => props.id === 'parcel-SHR-L43')).toBe(true)
+    );
+
+    expect(map.update.mock.calls.some(([update]) => update.location?.zoom === 17)).toBe(true);
+    expect(map.addChild.mock.calls.map(([child]) => child)).not.toContain(nativeControl);
+    expect(screen.getByTestId('place-map').children).toHaveLength(2);
   });
 
   it.each(['resolve', 'reject'] as const)(
@@ -396,19 +473,52 @@ describe('PlaceMap', () => {
       if (outcome === 'resolve') imported.resolve(extras);
       else imported.reject(new Error('Stale control'));
       await new Promise((resolve) => window.setTimeout(resolve, 0));
-      expect(map.addChild).not.toHaveBeenCalled();
+      expect(clustererProps).toHaveLength(1);
+      expect(map.addChild.mock.calls.map(([child]) => child)).not.toContain(nativeControl);
       expect(log).not.toHaveBeenCalled();
     }
   );
 
-  it('uses the existing place fallback when the control module fails', async () => {
+  it('clears a prepared map and uses the place fallback when the control module fails', async () => {
     importModule.mockRejectedValueOnce(new Error('Control unavailable'));
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    render(PlaceMap, { props: { places: [place] } });
+    render(PlaceMap, { props: { places: [pondsPlace] } });
     await screen.findByRole('status');
-    expect(screen.getByRole('link').getAttribute('href')).toBe(place.url);
+    expect(clustererProps).toHaveLength(1);
+    expect(screen.getByRole('link').getAttribute('href')).toBe(pondsPlace.url);
     expect(map.destroy).toHaveBeenCalledOnce();
-    expect(map.addChild).not.toHaveBeenCalled();
+    expect(map.removeChild).toHaveBeenCalledTimes(2);
+    expect(map.addChild.mock.calls.map(([child]) => child)).not.toContain(nativeControl);
+  });
+
+  it('cleans up active highlight and parcel layer after a late control import failure', async () => {
+    const imported = Promise.withResolvers<typeof extras>();
+    importModule.mockReturnValueOnce(imported.promise);
+    vi.stubGlobal('fetch', parcelFetch);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const clearTimeout = vi.spyOn(window, 'clearTimeout');
+    window.history.replaceState({}, '', '/map/?h=hunting-ponds');
+    render(PlaceMap, { props: { places: [pondsPlace] } });
+
+    await waitFor(() => expect(importModule).toHaveBeenCalledOnce());
+    const highlighted = markerElements.find((element) => element instanceof HTMLAnchorElement);
+    expect(highlighted?.dataset.highlighted).toBe('true');
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
+    await waitFor(() =>
+      expect(areaFeatures.some(({ props }) => props.id === 'parcel-SHR-L43')).toBe(true)
+    );
+
+    imported.reject(new Error('Control unavailable'));
+    await screen.findByRole('status');
+    expect(map.destroy).toHaveBeenCalledOnce();
+    expect(map.removeChild).toHaveBeenCalledWith(areaFeatures[0]);
+    expect(map.removeChild).toHaveBeenCalledWith(
+      areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43')
+    );
+    expect(clearTimeout).toHaveBeenCalled();
+    expect(window.location.search).toBe('');
+    expect(screen.getByRole('link').getAttribute('href')).toBe(pondsPlace.url);
   });
 
   it('loads map places from JSON before applying a requested highlight', async () => {
@@ -790,6 +900,9 @@ describe('PlaceMap', () => {
     );
     render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
     await waitFor(() => expect(markerElements).toHaveLength(2));
+    await waitFor(() =>
+      expect(map.addChild.mock.calls.map(([child]) => child)).toContain(nativeControl)
+    );
 
     const link = markerElements.find((element) => element instanceof HTMLAnchorElement);
     const caption = markerElements.find((element) => !(element instanceof HTMLAnchorElement));
@@ -851,6 +964,9 @@ describe('PlaceMap', () => {
     const listen = vi.spyOn(HTMLAnchorElement.prototype, 'addEventListener');
     const view = render(PlaceMap, { props: { places: [pondsPlace, place] } });
     await waitFor(() => expect(clustererProps).toHaveLength(1));
+    await waitFor(() =>
+      expect(map.addChild.mock.calls.map(([child]) => child)).toContain(nativeControl)
+    );
     const props = clustererProps[0]!;
     const link = markerElements.find(
       (element): element is HTMLAnchorElement =>

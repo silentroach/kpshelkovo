@@ -132,12 +132,17 @@ const eventDetail = {
             >Условия использования</a
           >
         </div>
+      </div>
+    </template>
+    <template id="map-control-fixture">
+      <div class="ymaps3--control">
         <button
           type="button"
           class="fixture-map-open"
-          aria-label="Открыть в Яндекс Картах"
+          aria-label="Яндекс Карты"
         >
-          <span class="ymaps3--open-maps-button">Открыть Яндекс Карты</span>
+          <span class="ymaps3--open-maps-button">Яндекс Карты</span>
+          <span aria-hidden="true">Я</span>
         </button>
       </div>
     </template>
@@ -172,7 +177,7 @@ const eventDetail = {
     line-height: 12px;
   }
 
-  .fixture-map :is(a, button) {
+  .fixture-map a {
     color: #222;
     text-decoration: none;
   }
@@ -189,15 +194,25 @@ const eventDetail = {
     right: 12px;
     display: grid;
     place-content: center;
-    width: 163.875px;
+    width: 36px;
     height: 36px;
     border: 0;
     padding: 0;
-    font-size: 14px;
-    white-space: nowrap;
+    color: #d22;
+    font-size: 20px;
+    font-weight: 700;
     border-radius: 8px;
     background: white;
     box-shadow: 0 2px 6px #0003;
+  }
+
+  .fixture-map-open .ymaps3--open-maps-button {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .news-event-visual-page {

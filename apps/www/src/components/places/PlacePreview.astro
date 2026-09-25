@@ -21,11 +21,7 @@ const preview = {
 ---
 
 <div class="place-preview">
-  <MapPreview
-    preview={preview}
-    label={`Местоположение: ${place.name}`}
-    mapUrl={place.mapUrl}
-  >
+  <MapPreview preview={preview} label={`Местоположение: ${place.name}`}>
     <a
       class="place-preview__marker"
       href={place.mapUrl}

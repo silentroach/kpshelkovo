@@ -23,11 +23,10 @@ export class EditorialMapElement extends HTMLElement {
     this.setAttribute('aria-label', 'Карта');
     const canvas = document.createElement('div');
     canvas.className = 'editorial-map__canvas';
-    canvas.inert = true;
     const status = document.createElement('span');
     status.className = 'editorial-map__status';
     status.setAttribute('role', 'status');
-    status.textContent = 'Загружаем карту…';
+    status.hidden = true;
     this.replaceChildren(canvas, status);
     this.canvas = canvas;
     void this.initialize(generation, canvas, status);
@@ -114,8 +113,6 @@ export class EditorialMapElement extends HTMLElement {
       const control = await createOpenMapsControl(maps, 'top right');
       if (!current() || this.map !== map) return;
       map.addChild(control);
-      canvas.inert = false;
-      status.hidden = true;
     } catch {
       if (current()) this.fail(status);
     }
@@ -134,10 +131,7 @@ export class EditorialMapElement extends HTMLElement {
     this.observer = undefined;
     this.map?.destroy();
     this.map = undefined;
-    if (this.canvas) {
-      this.canvas.inert = true;
-      this.canvas.replaceChildren();
-    }
+    this.canvas?.replaceChildren();
   }
 
   disconnectedCallback(): void {
