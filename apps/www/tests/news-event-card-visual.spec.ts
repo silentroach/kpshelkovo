@@ -8,11 +8,17 @@ const screenshot = {
   scale: 'device'
 } as const;
 
-// Same minimal SDK shape as compare-controls.browser.spec.ts. The fixture supplies
-// static map chrome; real MapPreview code clones and passes the production marker.
+// The fixture supplies static map chrome; MapPreview clones the production marker.
 const yandexMapsReadyScript = `
+  const fixtureControlsReady = new Promise(resolve =>
+    window.addEventListener('fixture:controls-ready', resolve, { once: true })
+  );
   window.ymaps3 = {
     ready: new Promise(resolve => window.addEventListener('fixture:maps-ready', resolve, { once: true })),
+    import: async () => {
+      await fixtureControlsReady;
+      return { YMapOpenMapsButton: class {} };
+    },
     YMap: class {
       constructor(container, props) {
         this.container = container;
@@ -25,19 +31,20 @@ const yandexMapsReadyScript = `
       }
       addChild(child) {
         if (child.el) this.container.querySelector('[data-fixture-marker]').append(child.el);
-        if (child.props) window.addEventListener('fixture:tiles-ready', () => child.props.onStateChanged({
-          getLayerState: () => ({ tilesReady: 1, tilesTotal: 1 })
-        }), { once: true });
+        if (child.controls) this.container.querySelector('.fixture-map').append(
+          document.querySelector('#map-control-fixture').content.cloneNode(true)
+        );
       }
       destroy() {}
     },
-    YMapDefaultSchemeLayer: class { static defaultProps = { source: 'fixture' }; },
+    YMapDefaultSchemeLayer: class {},
     YMapDefaultFeaturesLayer: class {},
     YMapMarker: class {
       constructor(_options, el) { this.el = el; }
     },
-    YMapListener: class {
-      constructor(props) { this.props = props; }
+    YMapListener: class {},
+    YMapControls: class {
+      constructor(_props, controls) { this.controls = controls; }
     },
   };
 `;
@@ -67,7 +74,7 @@ for (const [device, viewport] of [
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(viewport.width);
     });
 
-    test('hands off the map fallback to native controls with only the calendar below', async ({
+    test('shows the map before its native action with only the calendar below', async ({
       page
     }) => {
       const target = page.getByTestId('news-event-card-coordinates');
@@ -82,35 +89,27 @@ for (const [device, viewport] of [
           zoom: 16,
           anchor: [0.75, 0.45],
           muted: true,
-          mutedOpacity: 0.4,
           copyrightsPosition: 'bottom right'
         })
       );
       await expect(target.locator('iframe')).toHaveCount(0);
       const canvas = preview.locator('[data-canvas]');
-      const fallback = preview.locator('a[data-fallback]');
-      const openMaps = canvas.getByRole('button', { name: 'Открыть в Яндекс Картах' });
-      await expect(preview.locator('[data-message]')).toHaveCount(0);
-      await expect(fallback).toBeVisible();
-      await expect(canvas).toHaveJSProperty('inert', true);
-      await fallback.focus();
-      await expect(fallback).toBeFocused();
+      const openMaps = canvas.getByRole('button', { name: 'Яндекс Карты' });
+      const placeLink = target.getByRole('link', { name: 'КП Шелково, эко-клуб' });
+      await expect(preview.locator('[data-message]')).toBeHidden();
+      await expect(preview.locator('[data-fallback]')).toHaveCount(0);
+      await expect(canvas).toBeVisible();
+      await expect(openMaps).toHaveCount(0);
+      await placeLink.focus();
 
-      // Release SDK readiness after focusing the SSR link; real MapPreview owns the handoff.
       await page.evaluate(() => window.dispatchEvent(new Event('fixture:maps-ready')));
-      await expect(canvas.locator('.ymaps3--open-maps-button')).toBeAttached();
-      await expect(canvas).toBeHidden();
-      await expect(fallback).toBeVisible();
-      await expect(fallback).toBeFocused();
-      await page.evaluate(() => window.dispatchEvent(new Event('fixture:tiles-ready')));
-      await expect(fallback).toBeHidden();
-      await expect(fallback).toHaveAttribute(
-        'href',
-        'https://yandex.ru/maps/?pt=38.654321,55.123456&z=18&l=map'
-      );
-      await expect(canvas).toHaveJSProperty('inert', false);
-      await expect(openMaps).toBeFocused();
-      await expect(canvas.locator('svg')).toBeVisible();
+      await expect(canvas.locator('.fixture-map-background')).toBeVisible();
+      await expect(placeLink).toBeFocused();
+      await expect(openMaps).toHaveCount(0);
+      await page.evaluate(() => window.dispatchEvent(new Event('fixture:controls-ready')));
+      await expect(openMaps).toBeVisible();
+      await expect(placeLink).toBeFocused();
+      await expect(preview.locator('[data-message]')).toBeHidden();
       const marker = canvas.locator('span.ui-map-marker');
       await expect(marker).toHaveCount(1);
       await expect(marker).toHaveAttribute('aria-hidden', 'true');
@@ -134,10 +133,7 @@ for (const [device, viewport] of [
         expect(overlaps, `Date text "${text}" overlaps OpenMaps`).toBe(false);
       }
 
-      await expect(target.getByRole('link', { name: 'КП Шелково, эко-клуб' })).toHaveAttribute(
-        'href',
-        '/map/club/'
-      );
+      await expect(placeLink).toHaveAttribute('href', '/map/club/');
       await expectCalendarOnly(target, '/news/2026/05/reglament/event.ics');
 
       // Native SDK controls must remain reachable through the card's content layer.
@@ -197,16 +193,19 @@ for (const [device, viewport] of [
       expect(await preview.getAttribute('data-preview')).toBe(
         await newsPreview.getAttribute('data-preview')
       );
-      const fallback = preview.locator('[data-fallback]');
       const canvas = preview.locator('[data-canvas]');
-      const openMaps = canvas.getByRole('button', { name: 'Открыть в Яндекс Картах' });
-      await expect(location.locator('a[href^="https://yandex.ru/maps/"]')).toHaveCount(1);
-      await fallback.focus();
+      const openMaps = canvas.getByRole('button', { name: 'Яндекс Карты' });
+      const placeLink = location.getByRole('link', { name: 'КП Шелково, эко-клуб' });
+      await expect(preview.locator('[data-message]')).toBeHidden();
+      await expect(preview.locator('[data-fallback]')).toHaveCount(0);
+      await expect(location.locator('a[href^="https://yandex.ru/maps/"]')).toHaveCount(0);
+      await placeLink.focus();
       await page.evaluate(() => window.dispatchEvent(new Event('fixture:maps-ready')));
-      await expect(canvas.locator('.ymaps3--open-maps-button')).toBeAttached();
-      await page.evaluate(() => window.dispatchEvent(new Event('fixture:tiles-ready')));
-      await expect(fallback).toBeHidden();
-      await expect(openMaps).toBeFocused();
+      await expect(canvas.locator('.fixture-map-background')).toBeVisible();
+      await expect(openMaps).toHaveCount(0);
+      await page.evaluate(() => window.dispatchEvent(new Event('fixture:controls-ready')));
+      await expect(openMaps).toBeVisible();
+      await expect(placeLink).toBeFocused();
       await expect(location.getByRole('link', { name: 'Открыть', exact: false })).toHaveCount(0);
       await openMaps.click({ trial: true });
       const copyright = canvas.locator('.ymaps3--map-copyrights');
@@ -236,6 +235,10 @@ for (const [device, viewport] of [
     }) => {
       const target = page.getByTestId('news-event-card-cancelled');
       await target.scrollIntoViewIfNeeded();
+      await page.evaluate(() => window.dispatchEvent(new Event('fixture:maps-ready')));
+      await expect(target.locator('.fixture-map-background')).toBeVisible();
+      await page.evaluate(() => window.dispatchEvent(new Event('fixture:controls-ready')));
+      await expect(target.getByRole('button', { name: 'Яндекс Карты' })).toBeVisible();
       const date = target.locator('time');
       await expect(date).toHaveAttribute('aria-label', /^Отменено:/);
       await expect(date).toHaveAttribute('title', 'Отменено');
