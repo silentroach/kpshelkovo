@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { fromPublicEditorialGeometry } from '@/components/places/place-map-geometry';
 import { parseEditorialGeometry } from '@/lib/geometry/editorial-mapper';
+import { toPublicEditorialGeometry } from '@/lib/geometry/editorial-public';
 import { EditorialPublicGeometrySchema } from '@/lib/geometry/editorial-public-schema';
 
 import { parsePlaceGeometryFiles } from '../geometry';
@@ -230,5 +231,32 @@ describe('place map public DTO', () => {
         "type": "Feature",
       }
     `);
+  });
+
+  it('rejects invalid prepared coordinates at the public adapter boundary', () => {
+    const collection = parseEditorialGeometry(
+      {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            id: 0,
+            geometry: { type: 'Point', coordinates: [37, 55] },
+            properties: {}
+          }
+        ]
+      },
+      'fixture'
+    );
+    const prepared = {
+      ...collection,
+      features: [
+        {
+          ...collection.features[0]!,
+          geometry: { type: 'Point' as const, coordinates: [Infinity, 55] as const }
+        }
+      ]
+    };
+    expect(() => toPublicEditorialGeometry(prepared)).toThrow(/coordinates/u);
   });
 });

@@ -275,11 +275,15 @@ it('ignores both SDK and native control results after disconnect', async () => {
   expect(instance.addChild).toHaveBeenCalledTimes(added);
 });
 
-it('shows a generic accessible error without exposing data, retrying or changing the caption', async () => {
+it('shows a generic accessible error for missing data, invalid JSON or SDK failure', async () => {
   const sdk = setupSdk();
-  const malformed = mount('{"features":[{"description":"SECRET_PRIVATE"}]}');
+  const malformed = mount('{"features":[{"description":"SECRET_PRIVATE"}]');
   await vi.waitFor(() =>
     expect(malformed.querySelector('[role="status"]')?.textContent).toBe('Карта не загрузилась.')
+  );
+  const missing = mount('');
+  await vi.waitFor(() =>
+    expect(missing.querySelector('[role="status"]')?.textContent).toBe('Карта не загрузилась.')
   );
   expect(loadYandexMaps).not.toHaveBeenCalled();
   expect(sdk.instances).toHaveLength(0);

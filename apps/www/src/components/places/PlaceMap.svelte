@@ -13,7 +13,6 @@
   import { onMount } from 'svelte';
 
   import { createEditorialMapObjects } from '@/components/maps/editorial-map';
-  import { EditorialPublicGeometrySchema } from '@/lib/geometry/editorial-public-schema';
   import { getUrlWithoutParcel, PARCEL_QUERY_PARAM } from '@/lib/parcels/parcel-url';
   import { PARCEL_CODE } from '@/lib/parcels/schema';
   import type {
@@ -62,9 +61,7 @@
     marker: place.marker,
     status: place.status,
     coordinates: place.coordinates,
-    geometry: place.geometry
-      ? fromPublicEditorialGeometry(EditorialPublicGeometrySchema.parse(place.geometry))
-      : undefined,
+    geometry: place.geometry ? fromPublicEditorialGeometry(place.geometry) : undefined,
     openingHours: place.opening_hours
       ? {
           description: place.opening_hours.description,
@@ -458,14 +455,9 @@
     };
     const loadParcelData = async (): Promise<ParcelMapPayload> => {
       if (parcelData) return parcelData;
-      const [response, { ParcelMapPublicSchema }] = await Promise.all([
-        fetch(PARCEL_DATA_URL),
-        import('@/lib/parcels/map-public-schema')
-      ]);
+      const response = await fetch(PARCEL_DATA_URL);
       if (!response.ok) throw new Error('Не удалось загрузить участки');
-      const payload = ParcelMapPublicSchema.parse(await response.json());
-      if (!destroyed) parcelData = payload;
-      return payload;
+      return (await response.json()) as ParcelMapPayload;
     };
     const enableParcels = async (code?: string): Promise<void> => {
       const request = ++parcelRequest;
@@ -480,6 +472,7 @@
           ? data.find((item) => item.code === code || item.aliases?.includes(code))?.code
           : undefined;
         if (code && !canonical) {
+          parcelData = data;
           removeParcelQuery(requestedParcelCode);
           pendingParcelCode = undefined;
           parcelsEnabled = false;
@@ -512,6 +505,7 @@
           preserveParcelCamera = true;
           pendingParcelCode = requestedParcelCode;
         }
+        parcelData = data;
       } catch (reason) {
         if (destroyed || request !== parcelRequest) return;
         parcelLayer?.disable();
