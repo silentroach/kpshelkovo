@@ -111,6 +111,12 @@ describe('parcel public payloads', () => {
     expect(b[1]).toBeGreaterThan(a[1]);
   });
 
+  it('rejects a non-finite display offset in the prepared payload', () => {
+    expect(() =>
+      buildParcelMapPayload([parcel], { offset_east_m: Infinity, offset_north_m: 0 })
+    ).toThrow(/coordinates/u);
+  });
+
   it('omits empty aliases while keeping every ring of Polygon and MultiPolygon', () => {
     const coordinates =
       parcel.cadastralParts[0]?.geometry.type === 'MultiPolygon'

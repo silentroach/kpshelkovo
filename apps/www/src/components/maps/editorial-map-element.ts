@@ -1,10 +1,10 @@
 import type { LngLat, Margin, YMap, YMapLocationRequest } from '@yandex/ymaps3-types';
 
+import type { EditorialFeatureCollection } from '@/lib/geometry/editorial-types';
 import { createOpenMapsControl } from '@/lib/yandex-maps/open-maps-control';
 import { installYandexMapsRuntimeHeadPersistence, loadYandexMaps } from '@/lib/yandex-maps/runtime';
 
 import { createEditorialMapObjects, getEditorialMapBounds } from './editorial-map';
-import { EditorialMapDataSchema } from './editorial-map-data';
 import { installMapPreviewGestures } from './map-gestures';
 
 const MAP_MARGIN: Margin = [32, 32, 64, 32];
@@ -42,7 +42,7 @@ export class EditorialMapElement extends HTMLElement {
     try {
       const source = this.dataset.geometry;
       if (!source) throw new Error('Missing map data');
-      const collection = EditorialMapDataSchema.parse(JSON.parse(source));
+      const collection = JSON.parse(source) as EditorialFeatureCollection;
       const bounds = getEditorialMapBounds(collection);
       if (!bounds) throw new Error('Empty map bounds');
       await loadYandexMaps();

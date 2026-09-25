@@ -169,7 +169,7 @@ const publicPondsPlace: PlaceMapPublicItemDto = {
         type: 'Feature',
         id: 0,
         geometry: { type: 'Point', coordinates: [37.742, 55.058] },
-        properties: { iconCaption: '<b>Вход</b>', 'marker-color': '#b42c31' }
+        properties: { iconCaption: '<b>Вход</b>', iconContent: '0', 'marker-color': '#b42c31' }
       },
       {
         type: 'Feature',
@@ -793,8 +793,12 @@ describe('PlaceMap', () => {
     const caption = markerElements.find((element) => !(element instanceof HTMLAnchorElement));
     if (!link || !caption) throw new Error('Map markers are missing');
     expect(link.getAttribute('href')).toBe('/map/hunting-ponds/');
-    expect(caption.textContent).toBe('<b>Вход</b>');
+    expect(caption.querySelector('.editorial-map-marker__caption')?.textContent).toBe(
+      '<b>Вход</b>'
+    );
     expect(caption.querySelector('b')).toBeFalsy();
+    expect(caption.querySelector('.editorial-map-marker__dot')?.textContent).toBe('0');
+    expect(markerLocations[markerElements.indexOf(caption)]?.coordinates).toEqual([37.742, 55.058]);
     expect(
       areaFeatures.map(({ props }) => ({ geometry: props.geometry, style: props.style }))
     ).toMatchObject([
@@ -1215,19 +1219,16 @@ describe('PlaceMap', () => {
     ]);
   });
 
-  it('rejects legacy geometry.area instead of interpreting it as a public collection', async () => {
+  it('shows the place fallback when JSON cannot be parsed', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () =>
-        Response.json({
-          places: [{ ...publicPondsPlace, geometry: { area: {} } }]
-        })
-      )
+      vi.fn(async () => new Response('{', { status: 200 }))
     );
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
+    render(PlaceMap, { props: { dataUrl: '/map/data/places.json', fallbackPlace: place } });
     await screen.findByRole('status');
     expect(markerElements).toHaveLength(0);
+    expect(screen.getByRole('link').getAttribute('href')).toBe(place.url);
   });
 
   it.each(['titanik', 'green-dreams'])(
@@ -1444,6 +1445,32 @@ describe('PlaceMap', () => {
     later.resolve(Response.json([parcel]));
     await Promise.resolve();
     expect(areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43')).toBeUndefined();
+  });
+
+  it('does not let a late disabled response replace the active parcel cache', async () => {
+    const pending = Promise.withResolvers<Response>();
+    const fetch = vi
+      .fn()
+      .mockReturnValueOnce(pending.promise)
+      .mockResolvedValue(Response.json([parcel]));
+    vi.stubGlobal('fetch', fetch);
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    const toggle = screen.getByRole('button', { name: 'Участки' });
+    await fireEvent.click(toggle);
+    await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+    await fireEvent.click(toggle);
+    await fireEvent.click(toggle);
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    pending.resolve(Response.json({ parcels: [] }));
+    await Promise.resolve();
+    await fireEvent.click(toggle);
+    await fireEvent.click(toggle);
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(toggle.getAttribute('aria-pressed')).toBe('true');
   });
 
   it('offers a retry after a failed manual request', async () => {
@@ -1896,7 +1923,7 @@ describe('PlaceMap', () => {
     ]);
   });
 
-  it('treats invalid geometry data as a retryable error', async () => {
+  it('retries after an invalid wrapper causes an application error', async () => {
     const fetch = vi
       .fn()
       .mockResolvedValueOnce(Response.json({ parcels: [] }))
@@ -1910,10 +1937,25 @@ describe('PlaceMap', () => {
     expect(window.location.search).toBe('?p=SHR-L43');
     await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
     await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    expect(map.update.mock.calls.some(([update]) => update.location?.zoom === 17)).toBe(true);
     expect(fetch.mock.calls.map(([url]) => url)).toEqual([
       '/map/data/parcels.json',
       '/map/data/parcels.json'
     ]);
+  });
+
+  it('retries a failed JSON response without caching it', async () => {
+    const fetch = vi.fn().mockResolvedValueOnce(new Response('{')).mockImplementation(parcelFetch);
+    vi.stubGlobal('fetch', fetch);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(markerElements).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Участки' }));
+    await screen.findByRole('alert');
+    await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
   it('renders an accessible cluster that zooms to its places', async () => {

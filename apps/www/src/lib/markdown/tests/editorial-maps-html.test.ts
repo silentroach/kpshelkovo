@@ -1,7 +1,8 @@
 import { Window } from 'happy-dom';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { EditorialMapDataSchema } from '@/components/maps/editorial-map-data';
+import { EditorialMapDataSchema } from '@/lib/geometry/editorial-map-data-schema';
+import * as editorialMapper from '@/lib/geometry/editorial-mapper';
 import { createPersonMentionTarget } from '@/lib/people/mentions';
 
 import { renderMarkdown } from '../render';
@@ -144,5 +145,30 @@ describe('editorial map HTML', () => {
         mentions: { context: 'test article', registry: new Map() }
       })
     ).toThrow('test article map insertion 2 has invalid JSON');
+  });
+
+  it('rejects invalid prepared data before writing HTML with the source, insertion, field and ID zero', () => {
+    const parse = editorialMapper.parseEditorialGeometry;
+    const spy = vi
+      .spyOn(editorialMapper, 'parseEditorialGeometry')
+      .mockImplementation((input, source) => {
+        const collection = parse(input, source);
+        return source.endsWith('insertion 2')
+          ? {
+              ...collection,
+              features: [{ ...collection.features[0]!, iconContent: 'invalid' }]
+            }
+          : collection;
+      });
+    try {
+      expect(() =>
+        renderMarkdown(`${map()}\n\n${map()}`, {
+          editorialMaps: true,
+          mentions: { context: 'test article', registry: new Map() }
+        })
+      ).toThrow(/test article map insertion 2.*features\.0\.iconContent.*feature 0 \(ID 0\)/);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });
