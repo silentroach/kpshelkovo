@@ -8,9 +8,9 @@
 
 Применимые решения:
 
-- [ADR-003](../../../docs/decisions/003-markdown-pipeline-layering.md): общие правила типографики принадлежат Markdown-пакету, а приложение использует свои адаптеры.
-- [ADR-033](../../../docs/decisions/033-integrated-tariff-comparison-section.md): сравнение остаётся частью общего приложения и build-потока.
-- [ADR-034](../../../docs/decisions/034-native-css-architecture.md): компоненты пакета владеют scoped CSS, media использует отдельный минимальный foundation.
+- [ADR-003](../../../../docs/decisions/003-markdown-pipeline-layering.md): общие правила типографики принадлежат Markdown-пакету, а приложение использует свои адаптеры.
+- [ADR-033](../../../../docs/decisions/033-integrated-tariff-comparison-section.md): сравнение остаётся частью общего приложения и build-потока.
+- [ADR-034](../../../../docs/decisions/034-native-css-architecture.md): компоненты пакета владеют scoped CSS, media использует отдельный минимальный foundation.
 
 ## Goals / Non-Goals
 
