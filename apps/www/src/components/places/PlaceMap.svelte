@@ -924,6 +924,8 @@
 
 <style>
   .place-map {
+    --parcel-map-boundary: oklch(55.4% 0.041 257.4);
+    --parcel-map-selection: oklch(46.9% 0.067 241.9);
     position: relative;
     width: 100%;
     height: 100%;

@@ -228,6 +228,7 @@ const parcelFetch = vi.fn(async (url: string) => {
   if (url === '/map/data/parcels/shr.json') return Response.json([parcel]);
   throw new Error(`Unexpected request: ${url}`);
 });
+const parcelSelectionColor = '#365f7d';
 
 const installYandexMaps = (): void => {
   Object.defineProperty(window, 'ymaps3', {
@@ -291,6 +292,8 @@ describe('PlaceMap', () => {
     document.documentElement.style.setProperty('--color-text-muted', '#45564b');
     document.documentElement.style.setProperty('--color-accent', '#d6a22a');
     document.documentElement.style.setProperty('--color-accent-text', '#805019');
+    document.documentElement.style.setProperty('--parcel-map-boundary', '#64748b');
+    document.documentElement.style.setProperty('--parcel-map-selection', parcelSelectionColor);
     window.history.replaceState({}, '', '/map/');
     installYandexMaps();
   });
@@ -305,7 +308,9 @@ describe('PlaceMap', () => {
       '--color-neutral-soft',
       '--color-text-muted',
       '--color-accent',
-      '--color-accent-text'
+      '--color-accent-text',
+      '--parcel-map-boundary',
+      '--parcel-map-selection'
     ]) {
       document.documentElement.style.removeProperty(name);
     }
@@ -1744,7 +1749,7 @@ describe('PlaceMap', () => {
     first?.props.onClick?.(new MouseEvent('click'), {} as never);
     second?.props.onClick?.(new MouseEvent('click'), {} as never);
     expect(first?.update.mock.lastCall?.[0].style).toEqual(first?.props.style);
-    expect(second?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+    expect(second?.update.mock.lastCall?.[0].style).toMatchObject({ fill: parcelSelectionColor });
     expect(map.update.mock.calls).toHaveLength(calls);
     expect(map.removeChild).not.toHaveBeenCalledWith(first);
   });
@@ -1949,7 +1954,9 @@ describe('PlaceMap', () => {
     expect(labelCoordinates).toEqual([37.715, 55.065]);
     const labelMarker = map.addChild.mock.lastCall?.[0];
     await fireEvent.click(label);
-    expect(areaFeatures[0]?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+    expect(areaFeatures[0]?.update.mock.lastCall?.[0].style).toMatchObject({
+      fill: parcelSelectionColor
+    });
     expect(screen.queryByText('SHR-L43 / SHR-L44')).toBeNull();
 
     update({
@@ -1986,11 +1993,11 @@ describe('PlaceMap', () => {
       type: 'MultiPolygon',
       coordinates: [parcel.geometry.coordinates, parcel.geometry.coordinates]
     });
-    expect(feature?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+    expect(feature?.update.mock.lastCall?.[0].style).toMatchObject({ fill: parcelSelectionColor });
     const markersBeforeSelection = markerElements.length;
     feature?.props.onClick?.(new MouseEvent('click'), {} as never);
     expect(markerElements).toHaveLength(markersBeforeSelection);
-    expect(feature?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+    expect(feature?.update.mock.lastCall?.[0].style).toMatchObject({ fill: parcelSelectionColor });
 
     const expire = timeout.mock.calls.findLast(([, delay]) => delay === 5_000)?.[0];
     if (typeof expire !== 'function') throw new Error('missing selection timeout');
@@ -2010,10 +2017,10 @@ describe('PlaceMap', () => {
     expect(markerElements.every((element) => !element.classList.contains('parcel-map-hint'))).toBe(
       true
     );
-    expect(feature?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+    expect(feature?.update.mock.lastCall?.[0].style).toMatchObject({ fill: parcelSelectionColor });
     const single = areaFeatures.find(({ props }) => props.id === 'parcel-SHR-L43');
     single?.props.onClick?.(new MouseEvent('click'), {} as never);
-    expect(single?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+    expect(single?.update.mock.lastCall?.[0].style).toMatchObject({ fill: parcelSelectionColor });
     expect(feature?.update.mock.lastCall?.[0].style).toEqual(feature?.props.style);
   });
 
@@ -2093,16 +2100,29 @@ describe('PlaceMap', () => {
     expect(areaFeatures[2]?.props.style?.stroke?.[0]?.opacity).toBe(0.2);
 
     await fireEvent.click(unavailable);
-    expect(areaFeatures[2]?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+    expect(areaFeatures[2]?.update.mock.lastCall?.[0].style).toMatchObject({
+      fill: parcelSelectionColor
+    });
     await fireEvent.click(available);
     expect(areaFeatures[2]?.update.mock.lastCall?.[0].style).toEqual(areaFeatures[2]?.props.style);
-    const timerIndex = timeout.mock.calls.findLastIndex(([, delay]) => delay === 5_000);
-    const expire = timeout.mock.calls[timerIndex]?.[0];
-    const timer = timeout.mock.results[timerIndex]?.value;
-    if (typeof expire !== 'function') throw new Error('Parcel selection timer missing');
-    window.clearTimeout(timer);
-    expire();
-    expect(areaFeatures[0]?.update.mock.lastCall?.[0].style).toEqual(areaFeatures[0]?.props.style);
+    for (const feature of areaFeatures) {
+      feature.props.onClick?.(new MouseEvent('click'), {} as never);
+      const selectedStyle = feature.update.mock.lastCall?.[0].style;
+      expect(selectedStyle).toMatchObject({
+        fill: parcelSelectionColor,
+        stroke: [{ color: parcelSelectionColor }]
+      });
+      expect(selectedStyle?.stroke[0].width).toBeGreaterThan(
+        feature.props.style?.stroke?.[0]?.width ?? 0
+      );
+      const timerIndex = timeout.mock.calls.findLastIndex(([, delay]) => delay === 5_000);
+      const expire = timeout.mock.calls[timerIndex]?.[0];
+      const timer = timeout.mock.results[timerIndex]?.value;
+      if (typeof expire !== 'function') throw new Error('Parcel selection timer missing');
+      window.clearTimeout(timer);
+      expire();
+      expect(feature.update.mock.lastCall?.[0].style).toEqual(feature.props.style);
+    }
   });
 
   it('replaces parcel selection, restarts its timer, and cancels it on unmount', async () => {
@@ -2127,14 +2147,14 @@ describe('PlaceMap', () => {
       [
         [
           {
-            "color": "#45564b",
+            "color": "#64748b",
             "opacity": 0.5,
             "width": 1,
           },
         ],
         [
           {
-            "color": "#45564b",
+            "color": "#64748b",
             "opacity": 0.5,
             "width": 1,
           },
@@ -2160,9 +2180,11 @@ describe('PlaceMap', () => {
     expect(clearTimeout).toHaveBeenCalledWith(firstTimer);
     expect(setTimeout.mock.calls.filter(([, delay]) => delay === 5_000)).toHaveLength(2);
     expect(areaFeatures[0]?.update.mock.lastCall?.[0].style).toMatchObject({
-      stroke: [{ color: '#45564b', width: 1, opacity: 0.5 }]
+      stroke: [{ color: '#64748b', width: 1, opacity: 0.5 }]
     });
-    expect(areaFeatures[1]?.update.mock.lastCall?.[0].style).toMatchObject({ fillOpacity: 0.3 });
+    expect(areaFeatures[1]?.update.mock.lastCall?.[0].style).toMatchObject({
+      fill: parcelSelectionColor
+    });
 
     const secondTimerIndex = setTimeout.mock.calls.findLastIndex(([, delay]) => delay === 5_000);
     const secondTimer = setTimeout.mock.results[secondTimerIndex]?.value;
@@ -2171,7 +2193,7 @@ describe('PlaceMap', () => {
     window.clearTimeout(secondTimer);
     expire();
     expect(areaFeatures[1]?.update.mock.lastCall?.[0].style).toMatchObject({
-      stroke: [{ color: '#45564b', width: 1, opacity: 0.5 }]
+      stroke: [{ color: '#64748b', width: 1, opacity: 0.5 }]
     });
     await fireEvent.click(secondLabel);
     const renewedTimerIndex = setTimeout.mock.calls.findLastIndex(([, delay]) => delay === 5_000);

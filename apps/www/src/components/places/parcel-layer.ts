@@ -69,7 +69,7 @@ export const createParcelLayer = (
         : { fillOpacity: 0 }),
       stroke: [
         {
-          color: token('--color-text-muted'),
+          color: token('--parcel-map-boundary'),
           width: 1,
           opacity: item.status === 'unavailable' ? 0.2 : 0.5
         }
@@ -80,9 +80,9 @@ export const createParcelLayer = (
     zIndex: -1,
     interactive: true,
     simplificationRate: 0,
-    fill: token('--color-accent'),
-    fillOpacity: 0.3,
-    stroke: [{ color: token('--color-accent-text'), width: 3 }]
+    fill: token('--parcel-map-selection'),
+    fillOpacity: 0.16,
+    stroke: [{ color: token('--parcel-map-selection'), width: 3 }]
   });
 
   const clearSelection = (): void => {
