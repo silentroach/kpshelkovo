@@ -469,17 +469,43 @@
       if (!selectedParcel || !mapContainer || !mapRoot) return;
       const rect = mapContainer.getBoundingClientRect();
       const anchor = anchorElement?.isConnected ? anchorElement.getBoundingClientRect() : undefined;
-      const width = Math.min(256, Math.max(0, rect.width - 24));
+      const width = popupElement?.offsetWidth || Math.min(240, Math.max(0, rect.width - 24));
       const height = popupElement?.offsetHeight || 160;
       const top = Math.min(112, Math.max(12, rect.height / 4));
       const bottom = Math.min(48, Math.max(12, rect.height / 5));
       const x = anchor ? anchor.left - rect.left + anchor.width / 2 : rect.width / 2;
       const y = anchor ? anchor.top - rect.top + anchor.height / 2 : rect.height / 2;
-      const popupX = Math.max(12, Math.min(rect.width - width - 12, x - width / 2));
-      const popupY =
-        y < top + height + 22 && y + 22 + height <= rect.height - bottom
-          ? Math.max(top, y + 22)
-          : Math.max(top, Math.min(rect.height - bottom - height, y - height - 22));
+      const gap = 40;
+      const maxY = rect.height - bottom - height;
+      let popupX = Math.max(12, Math.min(rect.width - width - 12, x - width / 2));
+      let popupY: number;
+      if (y - height - gap >= top && y - height - gap <= maxY) {
+        popupY = y - height - gap;
+      } else if (y + gap <= maxY) {
+        popupY = Math.max(top, y + gap);
+      } else if (
+        anchor &&
+        x >= 0 &&
+        x <= rect.width &&
+        y >= 0 &&
+        y <= rect.height &&
+        x + gap + width <= rect.width - 12
+      ) {
+        popupX = x + gap;
+        popupY = Math.max(top, Math.min(maxY, y - height / 2));
+      } else if (
+        anchor &&
+        x >= 0 &&
+        x <= rect.width &&
+        y >= 0 &&
+        y <= rect.height &&
+        x - gap - width >= 12
+      ) {
+        popupX = x - gap - width;
+        popupY = Math.max(top, Math.min(maxY, y - height / 2));
+      } else {
+        popupY = Math.max(top, Math.min(maxY, y - height - gap));
+      }
       const arrowX = x - popupX;
       let arrow: 'up' | 'down' | undefined;
       if (
@@ -491,8 +517,8 @@
         arrowX >= 12 &&
         arrowX <= width - 12
       ) {
-        if (y >= popupY + height + 16 && y - popupY - height <= 30) arrow = 'down';
-        else if (y <= popupY - 16 && popupY - y <= 30) arrow = 'up';
+        if (y >= popupY + height + 16 && y - popupY - height <= gap + 8) arrow = 'down';
+        else if (y <= popupY - 16 && popupY - y <= gap + 8) arrow = 'up';
       }
       popupPosition = {
         x: popupX,
@@ -519,15 +545,14 @@
           );
           if (!response.ok) throw new Error('Не удалось загрузить сведения об участке');
           const details = (await response.json()) as ParcelDetailsPublicDto;
-          if (!details || details.code !== code || !Array.isArray(details.priceHistory))
+          if (!details || details.code !== code || !Array.isArray(details.price?.history))
             throw new Error('Неверный формат сведений об участке');
           // Полную историю проверяет сборка; здесь защищаем только значения, показанные в попапе.
-          const latest = details.priceHistory.at(-1);
+          const last = details.price.last;
           if (
-            (details.areaM2 !== undefined &&
-              (!Number.isFinite(details.areaM2) || details.areaM2 <= 0)) ||
-            (latest !== undefined &&
-              (!latest || !Number.isFinite(latest.price) || latest.price <= 0))
+            (details.area !== undefined && (!Number.isFinite(details.area) || details.area <= 0)) ||
+            (last !== undefined && (!Number.isFinite(last) || last <= 0)) ||
+            (details.price.history.length === 0 ? last !== undefined : last === undefined)
           )
             throw new Error('Неверный формат сведений об участке');
           return details;
@@ -1177,13 +1202,13 @@
           >
         {:else if selectedDetails}
           <p class="parcel-map-popup__area">
-            {selectedDetails.areaM2
-              ? `${areaFormatter.format(selectedDetails.areaM2 / 100)} сот.`
+            {selectedDetails.area
+              ? `${areaFormatter.format(selectedDetails.area / 100)} сот.`
               : 'Нет данных о площади'}
           </p>
           <p class="parcel-map-popup__price">
-            {#if selectedDetails.priceHistory.at(-1)?.price}
-              <strong>{priceFormatter.format(selectedDetails.priceHistory.at(-1)!.price)} ₽</strong>
+            {#if selectedDetails.price.last}
+              <strong>{priceFormatter.format(selectedDetails.price.last)} ₽</strong>
             {:else}
               Нет данных о цене
             {/if}
@@ -1511,7 +1536,7 @@
     position: absolute;
     z-index: 3;
     box-sizing: border-box;
-    width: min(16rem, calc(100% - 1.5rem));
+    width: min(15rem, calc(100% - 1.5rem));
     max-height: calc(100% - min(7rem, 25%) - min(3rem, 20%));
     display: flex;
     flex-direction: column;
@@ -1522,7 +1547,7 @@
     overflow-y: auto;
     padding: 0.75rem;
     border: 1px solid var(--color-border);
-    background: var(--color-surface);
+    background: color-mix(in srgb, var(--color-surface) 96%, transparent);
     color: var(--color-text);
     font-size: 0.875rem;
     line-height: 1.4;
@@ -1591,13 +1616,18 @@
   }
 
   .parcel-map-popup__close:hover {
-    background: var(--color-surface-muted);
     color: var(--color-text);
   }
 
   .parcel-map-popup__close svg {
+    box-sizing: content-box;
     width: 1rem;
     height: 1rem;
+    padding: 0.375rem;
+  }
+
+  .parcel-map-popup__close:hover svg {
+    background: var(--color-surface-muted);
   }
 
   .parcel-map-popup__retry {
@@ -1615,7 +1645,7 @@
     width: 0.75rem;
     height: 0.75rem;
     border: 1px solid var(--color-border);
-    background: var(--color-surface);
+    background: color-mix(in srgb, var(--color-surface) 96%, transparent);
     pointer-events: none;
     transform: translateX(-50%) rotate(45deg);
   }

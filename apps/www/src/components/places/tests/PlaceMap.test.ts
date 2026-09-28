@@ -233,13 +233,15 @@ const parcelFetch = vi.fn(async (url: string) => {
 });
 const details: ParcelDetailsPublicDto = {
   code: parcel.code,
-  part: 'shr',
   status: 'available',
-  areaM2: 1050.5,
-  priceHistory: [
-    { on: '2026-09-01', price: 14_000_000 },
-    { on: '2026-09-02', price: 12_000_000 }
-  ]
+  area: 1050.5,
+  price: {
+    last: 12_000_000,
+    history: [
+      ['2026-09-01', 14_000_000],
+      ['2026-09-02', 12_000_000]
+    ]
+  }
 };
 const parcelWithDetails = vi.fn(async (url: string) =>
   url.endsWith('/details/SHR-L43.json')
@@ -2638,7 +2640,7 @@ describe('PlaceMap', () => {
           ...details,
           code: reserved.code,
           status: 'reserved',
-          priceHistory: []
+          price: { history: [] }
         });
       return Response.json([{ ...parcel, status: 'available' }, reserved, sold]);
     });
@@ -2705,7 +2707,9 @@ describe('PlaceMap', () => {
       .mockResolvedValueOnce(Response.json([{ ...parcel, status: 'available' }]))
       .mockResolvedValueOnce(new Response(undefined, { status: 503 }))
       .mockResolvedValueOnce(new Response('{'))
-      .mockResolvedValueOnce(Response.json({ ...details, areaM2: undefined, priceHistory: [] }));
+      .mockResolvedValueOnce(
+        Response.json({ ...details, area: undefined, price: { history: [] } })
+      );
     vi.stubGlobal('fetch', fetch);
     render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
@@ -2728,8 +2732,10 @@ describe('PlaceMap', () => {
       url.includes('/details/')
         ? Response.json(
             fetch.mock.calls.filter(([path]) => path.includes('/details/')).length === 1
-              ? { ...details, areaM2: 'bad', priceHistory: [{ on: '2026-09-28', price: 'bad' }] }
-              : details
+              ? { ...details, area: 'bad' }
+              : fetch.mock.calls.filter(([path]) => path.includes('/details/')).length === 2
+                ? { ...details, price: { ...details.price, last: 'bad' } }
+                : details
           )
         : Response.json([{ ...parcel, status: 'available' }])
     );
@@ -2743,8 +2749,10 @@ describe('PlaceMap', () => {
     await screen.findByRole('alert');
     expect(window.location.search).toBe('?p=SHR-L43');
     await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+    await screen.findByRole('alert');
+    await fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
     await waitFor(() => expect(screen.getByText(/12.000.000\s*₽/)).toBeDefined());
-    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(fetch).toHaveBeenCalledTimes(4);
   });
 
   it('reuses in-flight and successful details and ignores a late answer after closing', async () => {
@@ -2938,6 +2946,13 @@ describe('PlaceMap', () => {
   it('repositions and clamps the popup on map updates without moving camera or selection', async () => {
     vi.stubGlobal('fetch', parcelWithDetails);
     const canvasRect = { left: 10, top: 20, width: 420, height: 360 };
+    const updateMap = () =>
+      mapUpdateHandlers[0]?.({
+        type: 'update',
+        location: { center: [37.8, 55.1], zoom: 16, bounds: map.bounds },
+        camera: {},
+        mapInAction: false
+      });
     render(PlaceMap, { props: { places: [place] } });
     await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
     const canvas = mapElements[0]!;
@@ -2950,21 +2965,16 @@ describe('PlaceMap', () => {
     areaFeatures[0]?.props.onClick?.(new MouseEvent('click'), {} as never);
     const popup = (
       await screen.findByRole('button', { name: 'Закрыть сведения об участке' })
-    ).closest('.parcel-map-popup');
+    ).closest<HTMLDivElement>('.parcel-map-popup');
     const anchor = anchorElements[0];
     if (!popup || !anchor) throw new Error('Popup anchor missing');
     Object.defineProperty(popup, 'offsetHeight', { configurable: true, value: 80 });
     vi.spyOn(anchor, 'getBoundingClientRect').mockImplementation(
       () => ({ left: 390, top: 350, width: 1, height: 1 }) as DOMRect
     );
-    mapUpdateHandlers[0]?.({
-      type: 'update',
-      location: { center: [37.8, 55.1], zoom: 16, bounds: map.bounds },
-      camera: {},
-      mapInAction: false
-    });
-    await waitFor(() => expect(popup.getAttribute('style')).toContain('left: 152px'));
-    expect(popup.getAttribute('style')).toContain('top: 228.5px');
+    updateMap();
+    await waitFor(() => expect(popup.getAttribute('style')).toContain('left: 168px'));
+    expect(popup.getAttribute('style')).toContain('top: 210.5px');
     expect(popup.querySelector('.parcel-map-popup__arrow--down')?.getAttribute('aria-hidden')).toBe(
       'true'
     );
@@ -2972,39 +2982,60 @@ describe('PlaceMap', () => {
     vi.spyOn(anchor, 'getBoundingClientRect').mockImplementation(
       () => ({ left: 210, top: 100, width: 1, height: 1 }) as DOMRect
     );
-    mapUpdateHandlers[0]?.({
-      type: 'update',
-      location: { center: [37.8, 55.1], zoom: 16, bounds: map.bounds },
-      camera: {},
-      mapInAction: false
-    });
+    updateMap();
     await waitFor(() => expect(popup.querySelector('.parcel-map-popup__arrow--up')).toBeTruthy());
     vi.spyOn(anchor, 'getBoundingClientRect').mockImplementation(
       () => ({ left: 10, top: 350, width: 1, height: 1 }) as DOMRect
     );
-    mapUpdateHandlers[0]?.({
-      type: 'update',
-      location: { center: [37.8, 55.1], zoom: 16, bounds: map.bounds },
-      camera: {},
-      mapInAction: false
-    });
+    updateMap();
     await waitFor(() => expect(popup.getAttribute('style')).toContain('left: 12px'));
     expect(popup.querySelector('.parcel-map-popup__arrow')).toBeNull();
+    canvasRect.height = 180;
+    vi.spyOn(anchor, 'getBoundingClientRect').mockImplementation(
+      () => ({ left: 110, top: 110, width: 1, height: 1 }) as DOMRect
+    );
+    updateMap();
+    await waitFor(() => expect(popup.getAttribute('style')).toContain('left: 140.5px'));
+    expect(popup.getAttribute('style')).toContain('top: 50.5px');
+    expect(popup.querySelector('.parcel-map-popup__arrow')).toBeNull();
+    vi.spyOn(anchor, 'getBoundingClientRect').mockImplementation(
+      () => ({ left: 330, top: 110, width: 1, height: 1 }) as DOMRect
+    );
+    updateMap();
+    await waitFor(() => expect(popup.getAttribute('style')).toContain('left: 40.5px'));
+    expect(popup.getAttribute('style')).toContain('top: 50.5px');
+    expect(popup.querySelector('.parcel-map-popup__arrow')).toBeNull();
+    canvasRect.width = 220;
+    canvasRect.height = 130;
+    vi.spyOn(anchor, 'getBoundingClientRect').mockImplementation(
+      () => ({ left: 120, top: 90, width: 1, height: 1 }) as DOMRect
+    );
+    updateMap();
+    await waitFor(() => expect(popup.getAttribute('style')).toContain('top: 32.5px'));
+    expect(popup.getAttribute('style')).toContain('left: 12px');
+    expect(popup.querySelector('.parcel-map-popup__arrow')).toBeNull();
+    expect(window.location.search).toBe('?p=SHR-L43');
     canvasRect.width = 300;
     canvasRect.height = 180;
     vi.spyOn(anchor, 'getBoundingClientRect').mockImplementation(
       () => ({ left: -50, top: -50, width: 1, height: 1 }) as DOMRect
     );
-    mapUpdateHandlers[0]?.({
-      type: 'update',
-      location: { center: [37.9, 55.2], zoom: 15, bounds: map.bounds },
-      camera: {},
-      mapInAction: false
-    });
+    updateMap();
     await waitFor(() => expect(popup.getAttribute('style')).toContain('top: 45px'));
-    expect(popup.getAttribute('style')).toContain('left: 12px');
     expect(popup.querySelector('.parcel-map-popup__arrow')).toBeNull();
-    expect(window.location.search).toBe('?p=SHR-L43');
+
+    canvasRect.width = 420;
+    canvasRect.height = 360;
+    Object.defineProperty(popup, 'offsetWidth', { configurable: true, value: 360 });
+    vi.spyOn(anchor, 'getBoundingClientRect').mockImplementation(
+      () => ({ left: 418, top: 350, width: 1, height: 1 }) as DOMRect
+    );
+    updateMap();
+    await waitFor(() => expect(popup.style.left).toBe('48px'));
+    expect(Number.parseFloat(popup.style.left) + popup.offsetWidth).toBeLessThanOrEqual(
+      canvasRect.width - 12
+    );
+    expect(popup.querySelector('.parcel-map-popup__arrow')).toBeNull();
   });
 
   it('renders an accessible cluster that zooms to its places', async () => {

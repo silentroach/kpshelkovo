@@ -694,7 +694,7 @@ describe('SettlementMap', () => {
   });
 
   it('moves focus into a keyboard-opened popup and restores it on close', async () => {
-    const { container } = render(SettlementMap, {
+    const { container, getByRole } = render(SettlementMap, {
       props: { settlements: mockSettlements }
     });
 
@@ -736,7 +736,9 @@ describe('SettlementMap', () => {
       expect(marker?.getAttribute('aria-expanded')).toBe('true');
     });
 
-    container.querySelector<HTMLButtonElement>('button[aria-label="Закрыть попап"]')?.click();
+    const close = getByRole('button', { name: 'Закрыть попап' });
+    expect(close.getAttribute('type')).toBe('button');
+    close.click();
 
     await waitFor(() => {
       expect(document.activeElement).toBe(marker);

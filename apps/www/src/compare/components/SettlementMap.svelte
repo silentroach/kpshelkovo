@@ -725,11 +725,11 @@
     height: 2.75rem;
     margin: -0.625rem -0.625rem 0 0;
     place-items: center;
+    cursor: pointer;
     color: var(--color-text-muted);
   }
 
   .map-popup-close:hover {
-    background: var(--color-surface-muted);
     color: var(--color-text);
   }
 
@@ -739,8 +739,14 @@
   }
 
   .map-popup-close-icon {
+    box-sizing: content-box;
     width: 1rem;
     height: 1rem;
+    padding: 0.375rem;
+  }
+
+  .map-popup-close:hover .map-popup-close-icon {
+    background: var(--color-surface-muted);
   }
 
   .map-popup-company {

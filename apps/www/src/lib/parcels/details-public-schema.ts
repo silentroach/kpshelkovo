@@ -1,16 +1,18 @@
 import { z } from 'zod';
 
-import { PARCEL_CODE, PARCEL_PARTS } from './schema';
+import { PARCEL_CODE } from './schema';
 
 export const ParcelDetailsPublicSchema = z
   .object({
     code: z.string().regex(PARCEL_CODE),
-    part: z.enum(PARCEL_PARTS),
     status: z.enum(['available', 'reserved']),
-    areaM2: z.number().positive().optional(),
-    priceHistory: z.array(
-      z.object({ on: z.iso.date(), price: z.number().int().positive() }).strict()
-    )
+    area: z.number().positive().optional(),
+    price: z
+      .object({
+        last: z.number().int().positive().optional(),
+        history: z.array(z.tuple([z.iso.date(), z.number().int().positive()]))
+      })
+      .strict()
   })
   .strict();
 

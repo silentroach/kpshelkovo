@@ -45,29 +45,31 @@ describe('parcel public details', () => {
       price_history: [
         { on: '2026-09-01', price: 9000000 },
         { on: '2026-09-01', price: 8000000 },
-        { on: '2026-09-02', price: 9000000 }
+        { on: '2026-09-02', price: 7000000 }
       ]
     });
 
-    expect(buildParcelDetailsPayload(source)).toMatchInlineSnapshot(`
+    expect(JSON.parse(JSON.stringify(buildParcelDetailsPayload(source)))).toMatchInlineSnapshot(`
       {
-        "areaM2": 1250,
+        "area": 1250,
         "code": "SHR-L43",
-        "part": "shr",
-        "priceHistory": [
-          {
-            "on": "2026-09-01",
-            "price": 9000000,
-          },
-          {
-            "on": "2026-09-01",
-            "price": 8000000,
-          },
-          {
-            "on": "2026-09-02",
-            "price": 9000000,
-          },
-        ],
+        "price": {
+          "history": [
+            [
+              "2026-09-01",
+              9000000,
+            ],
+            [
+              "2026-09-01",
+              8000000,
+            ],
+            [
+              "2026-09-02",
+              7000000,
+            ],
+          ],
+          "last": 7000000,
+        },
         "status": "available",
       }
     `);
@@ -78,41 +80,53 @@ describe('parcel public details', () => {
       { cadastral_number: '50:33:0010101:3385', geometry, area_m2: 500 },
       { cadastral_number: '50:33:0010101:3386', geometry, area_m2: 750 }
     ];
-    const complete = buildParcelDetailsPayload(
-      parcel('SHR-E35', { cadastral_parts: parts, status: 'reserved' })
+    const complete = JSON.parse(
+      JSON.stringify(
+        buildParcelDetailsPayload(parcel('SHR-E35', { cadastral_parts: parts, status: 'reserved' }))
+      )
     );
-    const partial = buildParcelDetailsPayload(
-      parcel('SHR-E36', {
-        cadastral_parts: [parts[0], { cadastral_number: parts[1]!.cadastral_number, geometry }],
-        status: 'reserved'
-      })
+    const partial = JSON.parse(
+      JSON.stringify(
+        buildParcelDetailsPayload(
+          parcel('SHR-E36', {
+            cadastral_parts: [parts[0], { cadastral_number: parts[1]!.cadastral_number, geometry }],
+            status: 'reserved'
+          })
+        )
+      )
     );
 
     expect({ complete, partial }).toMatchInlineSnapshot(`
       {
         "complete": {
-          "areaM2": 1250,
+          "area": 1250,
           "code": "SHR-E35",
-          "part": "shr",
-          "priceHistory": [],
+          "price": {
+            "history": [],
+          },
           "status": "reserved",
         },
         "partial": {
-          "areaM2": undefined,
           "code": "SHR-E36",
-          "part": "shr",
-          "priceHistory": [],
+          "price": {
+            "history": [],
+          },
           "status": "reserved",
         },
       }
     `);
-    expect(JSON.stringify(partial)).not.toContain('areaM2');
   });
 
   it('rejects a malformed final public payload at the adapter boundary', () => {
     const source = parcel('SHR-L43', { ...cadastral, status: 'available' });
     expect(() =>
-      buildParcelDetailsPayload({ ...source, priceHistory: [{ on: 'bad', price: 0 }] })
+      buildParcelDetailsPayload({
+        ...source,
+        priceHistory: [
+          { on: 'bad', price: 0 },
+          { on: '2026-09-02', price: 9_000_000 }
+        ]
+      })
     ).toThrow();
   });
 
@@ -128,7 +142,7 @@ describe('parcel public details', () => {
         price_history: [
           { on: '2026-09-01', price: 9000000 },
           { on: '2026-09-01', price: 8000000 },
-          { on: '2026-09-02', price: 9000000 }
+          { on: '2026-09-02', price: 7000000 }
         ]
       }),
       parcel('SHR-L45', {
@@ -169,13 +183,23 @@ describe('parcel public details', () => {
       expect(response.headers.get('content-type')).toBe('application/json; charset=utf-8');
       expect(ParcelDetailsPublicSchema.parse(JSON.parse(text)).code).toBe(path.params.code);
       expect(text).toBe(JSON.stringify(JSON.parse(text)));
-      expect(text).not.toMatch(/aliases|geometry|cadastral|features|body|notes/);
+      expect(text).not.toMatch(/aliases|geometry|cadastral|features|body|notes|"part"/);
     }
-    expect(JSON.parse(paths[0]!.props.body)).toMatchObject({ areaM2: 1250 });
-    expect(JSON.parse(paths[0]!.props.body).priceHistory).toEqual(parcels[0]!.priceHistory);
+    expect(JSON.parse(paths[0]!.props.body)).toMatchObject({
+      area: 1250,
+      price: {
+        last: 7000000,
+        history: [
+          ['2026-09-01', 9000000],
+          ['2026-09-01', 8000000],
+          ['2026-09-02', 7000000]
+        ]
+      }
+    });
     expect(JSON.parse(paths[1]!.props.body)).toMatchObject({
-      priceHistory: [],
+      price: { history: [] },
       status: 'reserved'
     });
+    expect(paths[1]!.props.body).not.toContain('"last"');
   });
 });
