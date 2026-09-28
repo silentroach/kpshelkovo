@@ -258,13 +258,9 @@ const schema = {
         aria-label="Расположение"
         data-pagefind-ignore="all"
       >
-        <figure>
+        <figure class="place-map">
           <PlacePreview {place} />
-          {
-            addressHtml && (
-              <figcaption class="ui-media-caption" set:html={addressHtml} />
-            )
-          }
+          {addressHtml && <figcaption set:html={addressHtml} />}
         </figure>
         {
           neighbors.length > 0 && (
@@ -462,8 +458,21 @@ const schema = {
     margin-block-start: 0.375rem;
   }
 
-  figcaption {
-    margin-block-start: 0.5rem;
+  .place-map {
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    background: var(--color-surface-raised);
+  }
+
+  .place-map figcaption {
+    border-top: 1px solid var(--color-border);
+    padding: 0.625rem 0.875rem;
+    background: var(--color-surface-raised);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
   }
 
   .place-nearby {
