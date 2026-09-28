@@ -61,11 +61,11 @@ static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/place-map-url.ts:
     rendered: 698
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 32336
+    rendered: 46920
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:
-    rendered: 658
+    rendered: 951
   apps/www/src/lib/places/routes.ts:
     rendered: 344
   apps/www/src/lib/places/schema.ts:
@@ -340,7 +340,7 @@ static/explorer-component.XXXXXXXX.js:
   apps/www/src/compare/components/SettlementCard.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/compare/components/SettlementMap.svelte:
-    rendered: 15368
+    rendered: 16109
   apps/www/src/compare/components/SettlementMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/compare/components/SettlementsExplorer.svelte:
@@ -430,7 +430,7 @@ static/page.XXXXXXXX.js:
     rendered: 53
 static/parcel-layer.XXXXXXXX.js:
   apps/www/src/components/places/parcel-layer.ts:
-    rendered: 5309
+    rendered: 5315
 static/prefetch.XXXXXXXX.js:
   node_modules/.pnpm/astro@7.3.1_@emnapi+core@1.11.1_@emnapi+runtime@1.11.3_@types+node@26.5.0_yaml@2.9.0/node_modules/astro/dist/prefetch/index.js:
     rendered: 5052

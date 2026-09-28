@@ -274,6 +274,44 @@ describe('SettlementMap', () => {
     expect(createControl).toHaveBeenCalledOnce();
   });
 
+  it('keeps a tall popup inside the map and points the arrow at its marker only when aligned', async () => {
+    const { container } = render(SettlementMap, { props: { settlements: mockSettlements } });
+    await waitFor(() => expect(markers).toHaveLength(mockSettlements.length));
+    const canvas = container.querySelector('.map-canvas');
+    const marker = markers[0];
+    if (!canvas || !marker) throw new Error('Map or marker missing');
+    vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      top: 0,
+      width: 320,
+      height: 180
+    } as DOMRect);
+    const markerRect = { left: 0, top: 120, width: 20, height: 20 };
+    vi.spyOn(marker, 'getBoundingClientRect').mockImplementation(() => markerRect as DOMRect);
+    vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(
+      function (this: HTMLElement) {
+        return this.classList.contains('map-popup-panel') ? 110 : 0;
+      }
+    );
+
+    marker.click();
+    await waitFor(() =>
+      expect(container.querySelector<HTMLElement>('[data-testid="map-popup"]')?.style.top).toBe(
+        '122px'
+      )
+    );
+    expect(container.querySelector('[data-testid="map-popup-arrow"]')).toBeNull();
+
+    markerRect.left = 90;
+    markerRect.top = 140;
+    marker.click();
+    await waitFor(() =>
+      expect(
+        container.querySelector<HTMLElement>('[data-testid="map-popup-arrow"]')?.style.left
+      ).toBe('88px')
+    );
+  });
+
   it('destroys the partial map after control import failure and retries with a fresh control', async () => {
     const imported = Promise.withResolvers<typeof extras>();
     importModule.mockReturnValueOnce(imported.promise);
