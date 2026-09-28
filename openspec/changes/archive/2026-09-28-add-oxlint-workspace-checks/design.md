@@ -2,7 +2,7 @@
 
 ## Context
 
-См. [proposal.md](proposal.md). Корневые скрипты уже запускают `oxfmt`, Prettier для `.astro`, `lint-staged` и отдельные typecheck/тесты. Хук `.githooks/pre-commit` вызывает `pnpm lint-staged`; workflow `.github/workflows/ci.yml` выполняет `test` перед деплоем как для push, так и для плановой пересборки. Локальный стек включает Astro, Svelte и обычные JS/TS-файлы в приложениях, пакетах и скриптах. Процесс согласования и проверок определён [ADR-038](../../../docs/decisions/038-openspec-development-workflow.md).
+См. [proposal.md](proposal.md). Корневые скрипты уже запускают `oxfmt`, Prettier для `.astro`, `lint-staged` и отдельные typecheck/тесты. Хук `.githooks/pre-commit` вызывает `pnpm lint-staged`; workflow `.github/workflows/ci.yml` выполняет `test` перед деплоем как для push, так и для плановой пересборки. Локальный стек включает Astro, Svelte и обычные JS/TS-файлы в приложениях, пакетах и скриптах. Процесс согласования и проверок определён [ADR-038](../../../../docs/decisions/038-openspec-development-workflow.md).
 
 ## Goals / Non-Goals
 
