@@ -2,6 +2,9 @@ import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
+import { EditorialMapDataSchema } from '@/lib/geometry/editorial-map-data-schema';
+import { toPublicEditorialGeometry } from '@/lib/geometry/editorial-public';
+
 import { parsePlaceGeometryFiles } from '../geometry';
 
 const geometrySource = (geometry: unknown, properties: Record<string, unknown> = {}): string =>
@@ -23,6 +26,52 @@ const polygon = {
 };
 
 describe('parsePlaceGeometryFiles', () => {
+  it('prepares one rounded geometry for the place preview and public collection', () => {
+    const input = geometrySource({
+      type: 'Polygon',
+      coordinates: [
+        [
+          [37.123456789, 55.123456789],
+          [37.124, 55.123456789],
+          [37.124, 55.124],
+          [37.123456789, 55.123456789]
+        ]
+      ]
+    });
+    const geometry = parsePlaceGeometryFiles({ 'pond.geojson': input }).get('pond');
+    if (!geometry) throw new Error('place geometry missing');
+
+    expect(EditorialMapDataSchema.parse(geometry).features[0]?.geometry).toMatchInlineSnapshot(`
+      {
+        "coordinates": [
+          [
+            [
+              37.12345679,
+              55.12345679,
+            ],
+            [
+              37.124,
+              55.12345679,
+            ],
+            [
+              37.124,
+              55.124,
+            ],
+            [
+              37.12345679,
+              55.12345679,
+            ],
+          ],
+        ],
+        "type": "Polygon",
+      }
+    `);
+    expect(toPublicEditorialGeometry(geometry).features[0]?.geometry).toEqual(
+      geometry.features[0]?.geometry
+    );
+    expect(input).toContain('37.123456789');
+  });
+
   it('accepts one shared collection with points, lines and polygons under its canonical slug', () => {
     const source = JSON.stringify({
       type: 'FeatureCollection',

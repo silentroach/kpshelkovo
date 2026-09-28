@@ -1,3 +1,5 @@
+import { roundGeometry } from './coordinate-precision';
+import { EditorialMapDataSchema } from './editorial-map-data-schema';
 import { RawEditorialGeometrySchema } from './editorial-schema';
 import type { RawEditorialGeometry } from './editorial-schema';
 import type { EditorialFeatureCollection, EditorialGeometry } from './editorial-types';
@@ -11,10 +13,10 @@ const mapGeometry = (
   switch (geometry.type) {
     case 'Point':
     case 'LineString':
-      return geometry;
+      return roundGeometry(geometry);
     case 'Polygon':
     case 'MultiPolygon':
-      return expandPolygonGeometry(geometry, expansion, context);
+      return roundGeometry(expandPolygonGeometry(geometry, expansion, context));
     default: {
       const exhaustive: never = geometry;
       return exhaustive;
@@ -25,30 +27,50 @@ const mapGeometry = (
 export const mapEditorialGeometry = (
   raw: RawEditorialGeometry,
   source: string
-): EditorialFeatureCollection => ({
-  type: 'FeatureCollection',
-  metadata: raw.metadata,
-  features: raw.features.map((feature, index) => ({
-    type: 'Feature',
-    id: feature.id,
-    geometry: mapGeometry(
-      feature.geometry,
-      feature.properties.outline_expansion_meters,
-      `editorial geometry "${source}" feature ${index}${feature.id === undefined ? '' : ` (ID ${JSON.stringify(feature.id)})`}`
-    ),
-    description: feature.properties.description,
-    iconCaption: feature.properties.iconCaption,
-    iconContent: feature.properties.iconContent,
-    markerColor: feature.properties['marker-color'],
-    stroke: feature.properties.stroke,
-    strokeWidth: feature.properties['stroke-width'],
-    strokeOpacity: feature.properties['stroke-opacity'],
-    strokeDasharray: feature.properties['stroke-dasharray'],
-    fill: feature.properties.fill,
-    fillOpacity: feature.properties['fill-opacity'],
-    precision: feature.properties.precision
-  }))
-});
+): EditorialFeatureCollection => {
+  const mapped: EditorialFeatureCollection = {
+    type: 'FeatureCollection',
+    metadata: raw.metadata,
+    features: raw.features.map((feature, index) => ({
+      type: 'Feature',
+      id: feature.id,
+      geometry: mapGeometry(
+        feature.geometry,
+        feature.properties.outline_expansion_meters,
+        `editorial geometry "${source}" feature ${index}${feature.id === undefined ? '' : ` (ID ${JSON.stringify(feature.id)})`}`
+      ),
+      description: feature.properties.description,
+      iconCaption: feature.properties.iconCaption,
+      iconContent: feature.properties.iconContent,
+      markerColor: feature.properties['marker-color'],
+      stroke: feature.properties.stroke,
+      strokeWidth: feature.properties['stroke-width'],
+      strokeOpacity: feature.properties['stroke-opacity'],
+      strokeDasharray: feature.properties['stroke-dasharray'],
+      fill: feature.properties.fill,
+      fillOpacity: feature.properties['fill-opacity'],
+      precision: feature.properties.precision
+    }))
+  };
+  const result = EditorialMapDataSchema.safeParse(mapped);
+  if (!result.success) {
+    const details = result.error.issues
+      .map((issue) => {
+        const index =
+          issue.path[0] === 'features' && typeof issue.path[1] === 'number'
+            ? issue.path[1]
+            : undefined;
+        const id = index === undefined ? undefined : mapped.features[index]?.id;
+        const path = issue.path.join('.') || 'root';
+        return `${path}${index === undefined ? '' : ` [feature ${index}${id === undefined ? '' : ` (ID ${JSON.stringify(id)})`}]`}: ${issue.message}`;
+      })
+      .join('; ');
+    throw new Error(
+      `editorial geometry "${source}" is invalid after coordinate rounding: ${details}`
+    );
+  }
+  return result.data;
+};
 
 /** Validate at a source boundary and retain the source, feature index, ID and field in diagnostics. */
 export const parseEditorialGeometry = (

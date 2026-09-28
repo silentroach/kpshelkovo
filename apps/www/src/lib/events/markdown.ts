@@ -5,6 +5,7 @@ import {
   serializeMarkdownDocument
 } from '@shelkovo/markdown';
 
+import { toPublicEventCoordinates } from './public-coordinates';
 import type { EventDay, EventMonth, EventRecord } from './types';
 import { eventDayUrl, eventMonthUrl } from './urls';
 import { EVENT_CATEGORY_LABELS, EVENT_STATUS_LABELS } from './view';
@@ -88,8 +89,9 @@ export const buildEventsDayMarkdown = (day: EventDay, siteUrl: string): string =
     discovery(siteUrl)
   ]);
 
-export const buildEventMarkdown = (event: EventRecord, siteUrl: string): string =>
-  serialize([
+export const buildEventMarkdown = (event: EventRecord, siteUrl: string): string => {
+  const coordinates = toPublicEventCoordinates(event.coordinates);
+  return serialize([
     md.heading(1, event.title),
     md.list([
       md.listItem([md.paragraph([md.text('ID: '), md.inlineCode(event.id)])]),
@@ -110,9 +112,7 @@ export const buildEventMarkdown = (event: EventRecord, siteUrl: string): string 
       ...(event.locationDetails ? [md.listItem(`Точка встречи: ${event.locationDetails}`)] : []),
       ...(event.price ? [md.listItem(`Цена: ${event.price}`)] : []),
       ...(event.audience ? [md.listItem(`Участники: ${event.audience}`)] : []),
-      ...(event.coordinates
-        ? [md.listItem(`Координаты: ${event.coordinates.lat}, ${event.coordinates.lng}`)]
-        : []),
+      ...(coordinates ? [md.listItem(`Координаты: ${coordinates.lat}, ${coordinates.lng}`)] : []),
       ...(event.organizer ? [md.listItem(`Организатор: ${event.organizer.name}`)] : []),
       ...(event.performer?.length
         ? [md.listItem(`Исполнители: ${event.performer.map((person) => person.name).join(', ')}`)]
@@ -125,3 +125,4 @@ export const buildEventMarkdown = (event: EventRecord, siteUrl: string): string 
     ...parseMarkdownFragment(event.body),
     discovery(siteUrl)
   ]);
+};

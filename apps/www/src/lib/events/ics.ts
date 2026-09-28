@@ -1,6 +1,7 @@
 import { renderEventIcs } from '@shelkovo/ical';
 import { extractMarkdownText } from '@shelkovo/markdown';
 
+import { toPublicEventCoordinates } from './public-coordinates';
 import type { EventRecord } from './types';
 
 const DEFAULT_EVENT_DURATION_MS = 2 * 60 * 60 * 1000;
@@ -15,6 +16,7 @@ export const buildEventIcs = (
   if (!event.startsAt && !event.through) {
     throw new Error(`event "${event.id}" has no calendar export: time is unknown`);
   }
+  const coordinates = toPublicEventCoordinates(event.coordinates);
   const fields = {
     uid: event.calendarUid,
     prodId: `-//${new URL(siteUrl).host}//Events//RU`,
@@ -46,8 +48,8 @@ export const buildEventIcs = (
         ? {
             name: event.location ?? 'Место на карте',
             address: event.place?.address,
-            latitude: event.coordinates?.lat,
-            longitude: event.coordinates?.lng
+            latitude: coordinates?.lat,
+            longitude: coordinates?.lng
           }
         : undefined
   };

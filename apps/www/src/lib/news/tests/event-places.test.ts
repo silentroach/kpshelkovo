@@ -61,6 +61,36 @@ const dataset = (entry: ReturnType<typeof articleEntry>, place?: Place) =>
   );
 
 describe('event place references', () => {
+  it('keeps a supplied place map URL while rounding its published event coordinates', () => {
+    const mapUrl = 'https://maps.example/?pt=37.987654321987,55.123456789123';
+    const place = testPlace({
+      coordinates: { lat: 55.123456789123, lng: 37.987654321987 },
+      mapUrl
+    });
+    const data = dataset(articleEntry(place.slug), place);
+    const event = data.articles[0]!.events[0]!;
+    const published = toNewsPublicPayload(data).articles[0]!.events![0]!;
+    expect({
+      source: place.coordinates,
+      coordinates: published.coordinates,
+      eventMapUrl: buildEventMapUrl(event),
+      newsMapUrl: published.map_url
+    }).toMatchInlineSnapshot(`
+      {
+        "coordinates": {
+          "lat": 55.12345679,
+          "lng": 37.98765432,
+        },
+        "eventMapUrl": "https://maps.example/?pt=37.987654321987,55.123456789123",
+        "newsMapUrl": "https://maps.example/?pt=37.987654321987,55.123456789123",
+        "source": {
+          "lat": 55.123456789123,
+          "lng": 37.987654321987,
+        },
+      }
+    `);
+  });
+
   it.each([true, false])(
     'resolves a place with showOnMap=%s through the full dataset',
     (showOnMap) => {

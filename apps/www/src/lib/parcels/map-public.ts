@@ -3,6 +3,7 @@ import { parse as parseYaml } from 'yaml';
 import { z } from 'zod';
 
 import displayConfig from '@/config/parcel-map.yaml?raw';
+import { roundPosition } from '@/lib/geometry/coordinate-precision';
 
 import { ParcelMapPublicSchema, type ParcelMapPublicDto } from './map-public-schema';
 import type { ParcelPart } from './schema';
@@ -39,31 +40,35 @@ export const buildParcelMapPayload = (
     : 0;
   const shift = createDisplayOffset(config.offset_east_m, config.offset_north_m, referenceLatitude);
 
-  return ParcelMapPublicSchema.parse(
-    parcels.map((parcel) => {
-      const geometry = mapGeometry(parcel);
-      return {
-        code: parcel.code,
-        ...(parcel.aliases.length ? { aliases: parcel.aliases } : {}),
-        part: parcel.part,
-        ...(parcel.status ? { status: parcel.status } : {}),
-        ...(parcel.cadastralParts.length > 1 ? { multipleCadastralParcels: true } : {}),
-        geometry:
-          geometry.type === 'Polygon'
-            ? {
-                type: 'Polygon',
-                coordinates: geometry.coordinates.map((ring) => ring.map(shift))
-              }
-            : {
-                type: 'MultiPolygon',
-                coordinates: geometry.coordinates.map((polygon) =>
-                  polygon.map((ring) => ring.map(shift))
-                )
-              },
-        labelCoordinates: shift(polygonLabelCoordinates(geometry))
-      };
-    })
-  );
+  return parcels.map((parcel) => {
+    const geometry = mapGeometry(parcel);
+    const result = ParcelMapPublicSchema.element.safeParse({
+      code: parcel.code,
+      ...(parcel.aliases.length ? { aliases: parcel.aliases } : {}),
+      part: parcel.part,
+      ...(parcel.status ? { status: parcel.status } : {}),
+      ...(parcel.cadastralParts.length > 1 ? { multipleCadastralParcels: true } : {}),
+      geometry:
+        geometry.type === 'Polygon'
+          ? {
+              type: 'Polygon',
+              coordinates: geometry.coordinates.map((ring) =>
+                ring.map((position) => roundPosition(shift(position)))
+              )
+            }
+          : {
+              type: 'MultiPolygon',
+              coordinates: geometry.coordinates.map((polygon) =>
+                polygon.map((ring) => ring.map((position) => roundPosition(shift(position))))
+              )
+            },
+      labelCoordinates: roundPosition(shift(polygonLabelCoordinates(geometry)))
+    });
+    if (!result.success) {
+      throw new Error(`invalid public geometry for parcel ${parcel.code}: ${result.error.message}`);
+    }
+    return result.data;
+  });
 };
 
 export const splitParcelMapPayload = (

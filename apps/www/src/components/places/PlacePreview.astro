@@ -1,6 +1,7 @@
 ---
 import MapPreview from '@/components/maps/MapPreview.astro';
 import type { MapPreviewData } from '@/components/maps/map-preview.types';
+import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
 import { EditorialMapDataSchema } from '@/lib/geometry/editorial-map-data-schema';
 
 import { PLACE_MARKER_IMAGES } from './marker-images';
@@ -10,7 +11,10 @@ const { place } = Astro.props;
 const marker = place.marker ? PLACE_MARKER_IMAGES[place.marker] : undefined;
 const markerLabel = `Открыть карту: ${place.name}`;
 const preview = {
-  coordinates: place.coordinates,
+  coordinates: {
+    lat: normalizeCoordinate(place.coordinates.lat),
+    lng: normalizeCoordinate(place.coordinates.lng),
+  },
   geometry: place.geometry
     ? EditorialMapDataSchema.parse(place.geometry)
     : undefined,

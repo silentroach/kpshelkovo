@@ -112,6 +112,30 @@ beforeAll(async () => {
 });
 
 describe('places Markdown', () => {
+  it('publishes the rounded point but leaves the editorial map URL unchanged', () => {
+    const coordinates = { lat: 55.06070312345, lng: 37.74689498765 };
+    const mapUrl = 'https://yandex.ru/maps/?pt=37.74689498765,55.06070312345&source=editor';
+    const { frontmatter } = readCard({ ...place, coordinates, mapUrl });
+
+    expect({
+      coordinates: frontmatter.coordinates,
+      mapUrl: frontmatter.map_url,
+      source: coordinates
+    }).toMatchInlineSnapshot(`
+        {
+          "coordinates": {
+            "lat": 55.06070312,
+            "lng": 37.74689499,
+          },
+          "mapUrl": "https://yandex.ru/maps/?pt=37.74689498765,55.06070312345&source=editor",
+          "source": {
+            "lat": 55.06070312345,
+            "lng": 37.74689498765,
+          },
+        }
+      `);
+  });
+
   it('publishes only public metadata with precise coordinates and absolute URLs', () => {
     const { frontmatter, body } = readCard({
       ...place,

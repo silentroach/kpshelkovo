@@ -1,5 +1,6 @@
 import { dateTimeFromISO, formatDate, formatMonth } from '@shelkovo/format';
 
+import { toPublicEventCoordinates } from './public-coordinates';
 import type { EventCategory, EventMonth, EventRecord, EventStatus } from './types';
 
 export const EVENT_CATEGORY_LABELS: Readonly<Record<EventCategory, string>> = {
@@ -49,8 +50,10 @@ export const buildEventMapUrl = (
   event: Pick<EventRecord, 'place' | 'coordinates' | 'location'>
 ): string | undefined => {
   if (event.place) return event.place.mapUrl;
-  if (event.coordinates)
-    return `https://yandex.ru/maps/?pt=${event.coordinates.lng},${event.coordinates.lat}&z=16&l=map`;
+  const coordinates = toPublicEventCoordinates(event.coordinates);
+  if (coordinates) {
+    return `https://yandex.ru/maps/?pt=${coordinates.lng},${coordinates.lat}&z=16&l=map`;
+  }
   if (event.location)
     return `https://yandex.ru/maps/?text=${encodeURIComponent(event.location)}&z=16&l=map`;
   return;

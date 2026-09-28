@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest';
+import { parse } from 'yaml';
 
 import type { Contact, ContactCategoryPage } from '../types';
 
@@ -178,5 +179,29 @@ describe('contacts markdown companions', () => {
       # Сергей
       "
     `);
+  });
+
+  it('limits only published coordinates, keeping the saved map URL and source point', () => {
+    const coordinates = { lat: 55.123456789123, lng: 38.987654321987 };
+    const location = {
+      ...contact.location,
+      coordinates,
+      url: 'https://example.com/map?pt=38.987654321987,55.123456789123'
+    };
+    const markdown = buildContactMarkdown({ ...contact, location });
+    const frontmatter = parse(markdown.split('---')[1] ?? '') as { location: Contact['location'] };
+
+    expect(frontmatter.location).toMatchInlineSnapshot(`
+      {
+        "address": "Пионерская ул., 21, пгт Малино",
+        "coordinates": {
+          "lat": 55.12345679,
+          "lng": 38.98765432,
+        },
+        "title": "Золото Сибири",
+        "url": "https://example.com/map?pt=38.987654321987,55.123456789123",
+      }
+    `);
+    expect(coordinates).toEqual({ lat: 55.123456789123, lng: 38.987654321987 });
   });
 });

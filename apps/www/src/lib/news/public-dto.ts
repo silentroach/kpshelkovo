@@ -1,3 +1,4 @@
+import { toPublicEventCoordinates } from '@/lib/events/public-coordinates';
 import { buildEventMapUrl } from '@/lib/events/view';
 
 import { absoluteUrl } from '../site';
@@ -217,7 +218,7 @@ function toPublicEvent(item: NewsEvent): NewsPublicEvent | undefined {
     place_id: item.place?.slug,
     place_url: item.place?.canonical,
     location_details: item.locationDetails,
-    coordinates: item.coordinates,
+    coordinates: toPublicEventCoordinates(item.coordinates),
     map_url: mapUrl ? discoveryUrl(mapUrl) : undefined,
     ics_url: fullUrl(item.icsUrl),
     organizer: item.organizer,

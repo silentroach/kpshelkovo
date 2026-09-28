@@ -31,6 +31,7 @@ import {
 } from '@/compare/lib/seo';
 import { canon } from '@/compare/lib/site';
 import { telegram } from '@/compare/lib/url';
+import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
 import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
 
@@ -85,9 +86,11 @@ const distanceFromShelkovo = !isBaseline
 const hasPoint =
   Number.isFinite(settlement.location.lat) &&
   Number.isFinite(settlement.location.lng);
+const lat = normalizeCoordinate(settlement.location.lat);
+const lng = normalizeCoordinate(settlement.location.lng);
 const mapUrl =
   settlement.location.mapUrl ??
-  `https://yandex.ru/maps/?pt=${settlement.location.lng},${settlement.location.lat}&z=15&l=map`;
+  `https://yandex.ru/maps/?pt=${lng},${lat}&z=15&l=map`;
 const company = settlement.managementCompany;
 const companyTitle = company?.title ?? '';
 const companyUrl = company?.url ?? '';
@@ -133,8 +136,8 @@ const schema = {
     ? {
         geo: {
           '@type': 'GeoCoordinates',
-          latitude: settlement.location.lat,
-          longitude: settlement.location.lng,
+          latitude: lat,
+          longitude: lng,
         },
       }
     : {}),
@@ -182,8 +185,8 @@ const assumption = tariffCalc?.assumption;
             <MapPreview
               preview={{
                 coordinates: {
-                  lat: settlement.location.lat,
-                  lng: settlement.location.lng,
+                  lat,
+                  lng,
                 },
                 zoom: 12,
                 anchor: [0.8, 0.5],

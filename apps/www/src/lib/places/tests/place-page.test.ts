@@ -7,6 +7,8 @@ import { z } from 'zod';
 import { PLACE_MARKER_IMAGES } from '@/components/places/marker-images';
 // @ts-expect-error Astro modules are resolved by Astro/Vitest at test time.
 import PlacePreview from '@/components/places/PlacePreview.astro';
+import { buildPlaceMapPublicPayload } from '@/lib/places/map-public';
+import { toPlaceMarkdownPublic } from '@/lib/places/markdown-public';
 import type { PlaceContact, PlaceOpeningHours } from '@/lib/places/types';
 import { createAstroContainer } from '@/test/astro-container';
 
@@ -168,6 +170,61 @@ describe('place preview marker', () => {
 });
 
 describe('/map/[slug]/', () => {
+  it('uses the same bounded point in preview and JSON-LD and preserves an explicit map URL', async () => {
+    const coordinates = { lat: 55.06070312345, lng: 37.74689498765 };
+    const mapUrl = 'https://yandex.ru/maps/?pt=37.74689498765,55.06070312345&source=editor';
+    fixture.place.coordinates = coordinates;
+    fixture.place.mapUrl = mapUrl;
+    const document = await renderPage();
+    const schema = JSON.parse(
+      document.querySelector('script[type="application/ld+json"]')!.textContent!
+    );
+    const preview = JSON.parse(
+      document.querySelector('map-preview')!.getAttribute('data-preview')!
+    );
+    expect(
+      document
+        .querySelector('map-preview')
+        ?.querySelector('template')
+        ?.content.querySelector('a')
+        ?.getAttribute('href')
+    ).toBe(mapUrl);
+
+    expect({
+      preview: preview.coordinates,
+      geo: schema.geo,
+      json: buildPlaceMapPublicPayload([fixture.place]).places[0]?.coordinates,
+      markdown: toPlaceMarkdownPublic(fixture.place).coordinates,
+      sameAs: schema.sameAs,
+      source: coordinates
+    }).toMatchInlineSnapshot(`
+      {
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 55.06070312,
+          "longitude": 37.74689499,
+        },
+        "json": {
+          "lat": 55.06070312,
+          "lng": 37.74689499,
+        },
+        "markdown": {
+          "lat": 55.06070312,
+          "lng": 37.74689499,
+        },
+        "preview": {
+          "lat": 55.06070312,
+          "lng": 37.74689499,
+        },
+        "sameAs": "https://yandex.ru/maps/?pt=37.74689498765,55.06070312345&source=editor",
+        "source": {
+          "lat": 55.06070312345,
+          "lng": 37.74689498765,
+        },
+      }
+    `);
+  });
+
   it.each([true, false])('offers general-map focus only when showOnMap is %s', async (visible) => {
     fixture.place.showOnMap = visible;
     const document = await renderPage();

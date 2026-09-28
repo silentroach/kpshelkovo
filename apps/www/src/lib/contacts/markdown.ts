@@ -6,6 +6,7 @@ import {
   serializeMarkdownDocument
 } from '@shelkovo/markdown';
 
+import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
 import { absoluteUrl } from '@/lib/site';
 
 import { formatContactPhone } from './phone';
@@ -179,7 +180,10 @@ const contactLocationFrontmatter = (
   }
 
   if (location.coordinates) {
-    frontmatter.coordinates = location.coordinates;
+    frontmatter.coordinates = {
+      lat: normalizeCoordinate(location.coordinates.lat),
+      lng: normalizeCoordinate(location.coordinates.lng)
+    };
   }
 
   return frontmatter;

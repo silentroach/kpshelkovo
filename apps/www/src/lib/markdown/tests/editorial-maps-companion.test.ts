@@ -83,4 +83,127 @@ describe('editorial map companion AST', () => {
       ]
     `);
   });
+
+  it('normalizes only published geometry coordinates, without expanding or altering other source values', () => {
+    const input = source.replaceAll('[37,56]', '[37.123456789,56.123456789]');
+    const nodes = appendEditorialMapCaptions(
+      parseMarkdownFragment(
+        `\`\`\`map https://example.com/source?lat=55.123456789\n${input}\n\`\`\``
+      ),
+      'test article'
+    );
+    const code = nodes[0];
+    if (code?.type !== 'code') throw new Error('missing map code');
+    const original = JSON.parse(input);
+    const published = JSON.parse(code.value);
+    expect(input).toContain('[37.123456789,56.123456789]');
+    expect(published.features[0].geometry.coordinates[0][0]).toEqual([37.12345679, 56.12345679]);
+    expect(published.features[0].geometry.coordinates[0][1]).toEqual(
+      original.features[0].geometry.coordinates[0][1]
+    );
+    expect({
+      coordinate: published.features[0].geometry.coordinates[0][0],
+      untouched: published.features[0].properties,
+      metadata: published.metadata,
+      url: code.meta,
+      caption: nodes[1],
+      original: original.features[0].geometry.coordinates[0][0]
+    }).toMatchInlineSnapshot(`
+      {
+        "caption": {
+          "children": [
+            {
+              "children": [
+                {
+                  "type": "text",
+                  "value": "[Схема] @unknown **текст**",
+                },
+              ],
+              "type": "link",
+              "url": "https://example.com/source?lat=55.123456789",
+            },
+          ],
+          "type": "paragraph",
+        },
+        "coordinate": [
+          37.12345679,
+          56.12345679,
+        ],
+        "metadata": {
+          "description": "</script> secret",
+          "name": "[Схема] @unknown **текст**",
+        },
+        "original": [
+          37.123456789,
+          56.123456789,
+        ],
+        "untouched": {
+          "outline_expansion_meters": 2,
+          "precision": "approximate",
+          "stroke": "#123456",
+          "stroke-width": "2",
+        },
+        "url": "https://example.com/source?lat=55.123456789",
+      }
+    `);
+  });
+
+  it.each([
+    ['plain key', source],
+    ['escaped key', source.replace('"coordinates":', '"co\\u006frdinates":')]
+  ])('removes extra trailing zeroes from coordinate literals with %s', (_case, mapSource) => {
+    const input = mapSource
+      .replaceAll('[37,56]', '[37.123456790,56.123456790]')
+      .replace('"id":0', '"id":0.1234567890');
+    const nodes = appendEditorialMapCaptions(
+      parseMarkdownFragment(`\`\`\`map\n${input}\n\`\`\``),
+      'test article'
+    );
+    const code = nodes[0];
+    if (code?.type !== 'code') throw new Error('missing map code');
+
+    expect(code.value).not.toContain('37.123456790');
+    expect(JSON.parse(code.value).features[0].geometry.coordinates[0][0]).toEqual([
+      37.12345679, 56.12345679
+    ]);
+    expect(JSON.parse(code.value).features[0].id).toBe(0.123456789);
+
+    const unchanged = source.replace('"id":0', '"id":0.1234567890');
+    const untouched = appendEditorialMapCaptions(
+      parseMarkdownFragment(`\`\`\`map\n${unchanged}\n\`\`\``),
+      'test article'
+    )[0];
+    expect(untouched?.type === 'code' ? untouched.value : undefined).toBe(unchanged);
+  });
+
+  it('rejects a source contour that collapses in the published block', () => {
+    const input = JSON.stringify({
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          id: 'small',
+          properties: {},
+          geometry: {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [37, 55],
+                [37.01, 55],
+                [37.01, 55.0000000003],
+                [37, 55]
+              ]
+            ]
+          }
+        }
+      ]
+    });
+
+    expect(() =>
+      appendEditorialMapCaptions(
+        parseMarkdownFragment(`\`\`\`map\n${input}\n\`\`\``),
+        'news/map.md'
+      )
+    ).toThrow(/news\/map\.md map insertion 1.*after coordinate rounding.*coordinates/u);
+  });
 });

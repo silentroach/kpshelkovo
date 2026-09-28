@@ -203,12 +203,13 @@ describe('buildPlacesDataset', () => {
   });
 
   it('loads a standalone place with a generated map URL', () => {
+    const coordinates = { lat: 55.06070312345, lng: 37.74689498765 };
     const data = buildPlacesDataset([
       entry({
         data: rawPlace({
           contact: undefined,
           location: {
-            coordinates: { lat: 55.060703, lng: 37.746894 }
+            coordinates
           },
           opening_hours: undefined
         })
@@ -224,8 +225,38 @@ describe('buildPlacesDataset', () => {
       {
         "address": undefined,
         "contact": undefined,
-        "mapUrl": "https://yandex.ru/maps/?pt=37.746894,55.060703&z=18&l=map",
+        "mapUrl": "https://yandex.ru/maps/?pt=37.74689499,55.06070312&z=18&l=map",
         "openingHours": undefined,
+      }
+    `);
+    expect(data.places[0]?.coordinates).toBe(coordinates);
+    expect(coordinates).toMatchInlineSnapshot(`
+      {
+        "lat": 55.06070312345,
+        "lng": 37.74689498765,
+      }
+    `);
+  });
+
+  it('keeps an explicitly supplied map_url even when its point has more digits', () => {
+    const coordinates = { lat: 55.06070312345, lng: 37.74689498765 };
+    const mapUrl = 'https://yandex.ru/maps/?pt=37.74689498765,55.06070312345&source=editor';
+    const place = buildPlacesDataset([
+      entry({
+        data: rawPlace({
+          contact: undefined,
+          location: { coordinates, map_url: mapUrl }
+        })
+      })
+    ]).places[0];
+
+    expect({ mapUrl: place?.mapUrl, source: place?.coordinates }).toMatchInlineSnapshot(`
+      {
+        "mapUrl": "https://yandex.ru/maps/?pt=37.74689498765,55.06070312345&source=editor",
+        "source": {
+          "lat": 55.06070312345,
+          "lng": 37.74689498765,
+        },
       }
     `);
   });

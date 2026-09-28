@@ -1,5 +1,7 @@
 import { calculateDistance } from '@shelkovo/geo';
 
+import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
+
 import { toPublicComparisons, toPublicStats } from './public-dto';
 import type { ComparePublicPayload, ComparePublicSettlement } from './public-dto.types';
 import { ComparePublicPayloadSchema } from './public-schema';
@@ -67,8 +69,8 @@ export function toFull(
       is_baseline: isBaseline,
       location: {
         address_text: item.location.addressText,
-        lat: item.location.lat,
-        lng: item.location.lng,
+        lat: normalizeCoordinate(item.location.lat),
+        lng: normalizeCoordinate(item.location.lng),
         map_url: item.location.mapUrl,
         district: item.location.district
       },

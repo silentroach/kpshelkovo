@@ -167,10 +167,76 @@ describe('parcel public payloads', () => {
     const [sourceX, sourceY] = toWebMercator(a);
     const [labelX, labelY] = toWebMercator(labelB);
     const [sourceLabelX, sourceLabelY] = toWebMercator(labelA);
-    expect(vertexX - sourceX).toBeCloseTo(labelX - sourceLabelX, 4);
-    expect(vertexY - sourceY).toBeCloseTo(labelY - sourceLabelY, 4);
+    expect(vertexX - sourceX).toBeCloseTo(labelX - sourceLabelX, 2);
+    expect(vertexY - sourceY).toBeCloseTo(labelY - sourceLabelY, 2);
     expect(b[0]).toBeGreaterThan(a[0]);
     expect(b[1]).toBeGreaterThan(a[1]);
+    expect(JSON.stringify(shifted)).not.toMatch(/\d+\.\d{9}/);
+  });
+
+  it('limits both contour and label after shifting without changing precise source or offset settings', () => {
+    const precise: Parcel = {
+      ...parcel,
+      cadastralParts: [
+        {
+          cadastralNumber: '50:33:0000000:43',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [37.12345678901, 55.12345678901],
+                [37.13345678901, 55.12345678901],
+                [37.13345678901, 55.13345678901],
+                [37.12345678901, 55.12345678901]
+              ]
+            ]
+          }
+        }
+      ]
+    };
+    const config = { offset_east_m: 5.2, offset_north_m: 3.3 };
+    const source = JSON.stringify(precise);
+    const settings = JSON.stringify(config);
+    const zero = buildParcelMapPayload([precise], { offset_east_m: 0, offset_north_m: 0 });
+    const shifted = buildParcelMapPayload([precise], config);
+
+    expect(JSON.stringify(zero)).not.toMatch(/\d+\.\d{9}/);
+    expect(JSON.stringify(shifted)).not.toMatch(/\d+\.\d{9}/);
+    expect(shifted[0]?.labelCoordinates).not.toEqual(zero[0]?.labelCoordinates);
+    expect(shifted[0]?.geometry).not.toEqual(zero[0]?.geometry);
+    expect(ParcelMapPublicSchema.safeParse(shifted).success).toBe(true);
+    expect(JSON.stringify(precise)).toBe(source);
+    expect(JSON.stringify(config)).toBe(settings);
+  });
+
+  it('names the parcel when the display offset makes its rounded contour collapse', () => {
+    const first = 37.12345678;
+    const fragile: Parcel = {
+      ...parcel,
+      cadastralParts: [
+        {
+          cadastralNumber: '50:33:0000000:43',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [first, 55],
+                [37.1234567855, 55],
+                [37.133, 55.133],
+                [first, 55]
+              ]
+            ]
+          }
+        }
+      ]
+    };
+
+    expect(() =>
+      buildParcelMapPayload([fragile], { offset_east_m: 0, offset_north_m: 0 })
+    ).not.toThrow();
+    expect(() =>
+      buildParcelMapPayload([fragile], { offset_east_m: 5.2, offset_north_m: 3.3 })
+    ).toThrow(/parcel SHR-L43:/u);
   });
 
   it('rejects a non-finite display offset in the prepared payload', () => {

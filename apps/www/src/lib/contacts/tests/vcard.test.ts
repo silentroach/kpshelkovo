@@ -125,6 +125,25 @@ describe('contact vCard', () => {
     expect(lines.every((line) => new TextEncoder().encode(line).length <= 75)).toBe(true);
   });
 
+  it('limits GEO coordinates without changing the saved external map link', () => {
+    const coordinates = { lat: 55.123456789123, lng: 38.987654321987 };
+    const location = {
+      ...contact.location,
+      coordinates,
+      url: 'https://example.com/map?pt=38.987654321987,55.123456789123'
+    };
+    const lines = buildContactVcard({ ...contact, location }).split('\r\n');
+
+    expect(lines.filter((line) => line.startsWith('GEO:') || line.startsWith('item3.URL:')))
+      .toMatchInlineSnapshot(`
+        [
+          "item3.URL:https://example.com/map?pt=38.987654321987,55.123456789123",
+          "GEO:55.12345679;38.98765432",
+        ]
+      `);
+    expect(coordinates).toEqual({ lat: 55.123456789123, lng: 38.987654321987 });
+  });
+
   it('only includes unambiguous international and full phone numbers', () => {
     const phones = [
       '+49 (30) 1234‑5678',

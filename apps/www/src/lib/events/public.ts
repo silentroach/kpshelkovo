@@ -1,3 +1,4 @@
+import { toPublicEventCoordinates } from './public-coordinates';
 import type {
   EventNewsLinks,
   EventNewsReference,
@@ -37,9 +38,7 @@ export const toEventPublic = (
     placeId: event.place?.slug,
     placeUrl: event.place?.canonical,
     locationDetails: event.locationDetails,
-    coordinates: event.coordinates
-      ? { lat: event.coordinates.lat, lng: event.coordinates.lng }
-      : undefined,
+    coordinates: toPublicEventCoordinates(event.coordinates),
     organizer: event.organizer
       ? { name: event.organizer.name, type: event.organizer.type }
       : undefined,

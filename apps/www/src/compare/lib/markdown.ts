@@ -15,6 +15,8 @@ import {
   type MarkdownPhrasingInput
 } from '@shelkovo/markdown';
 
+import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
+
 import { loadAllData } from './data';
 import { formatTariffAuto, formatTariffOriginal, getTariffCalc, hasNonSotkaUnit } from './format';
 import { RATING_METHODOLOGY, type Rating } from './rating';
@@ -206,7 +208,7 @@ function delta(isBaseline: boolean, cmp?: ComparisonResult): string {
 function map(item: Settlement): string {
   return (
     item.location.mapUrl ??
-    `https://yandex.ru/maps/?pt=${item.location.lng},${item.location.lat}&z=15&l=map`
+    `https://yandex.ru/maps/?pt=${normalizeCoordinate(item.location.lng)},${normalizeCoordinate(item.location.lat)}&z=15&l=map`
   );
 }
 
