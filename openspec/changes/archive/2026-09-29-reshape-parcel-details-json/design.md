@@ -4,7 +4,7 @@
 
 Мотивация — в [proposal.md](proposal.md); контракт — в [specs/parcel-map/spec.md](specs/parcel-map/spec.md). Сейчас `details-public.ts` строит JSON из доменной записи, `details-public-schema.ts` проверяет его при сборке, а `PlaceMap.svelte` читает `response.json()` и отображает последнюю цену из `priceHistory`. Архивированный `add-parcel-details-popup` фиксирует прежнюю форму DTO; этот change — отдельное, запрошенное владельцем изменение формата до слияния PR #879.
 
-Решение опирается на [ADR-013](../../../docs/decisions/013-raw-domain-public-data-boundary.md): внутренние `areaM2` и `priceHistory` не переименовываем ради опубликованного представления. [ADR-041](../../../docs/decisions/041-parcel-records-and-exact-search.md) сохраняет отдельный статический файл сведений и отложенную загрузку.
+Решение опирается на [ADR-013](../../../../docs/decisions/013-raw-domain-public-data-boundary.md): внутренние `areaM2` и `priceHistory` не переименовываем ради опубликованного представления. [ADR-041](../../../../docs/decisions/041-parcel-records-and-exact-search.md) сохраняет отдельный статический файл сведений и отложенную загрузку.
 
 ## Goals / Non-Goals
 

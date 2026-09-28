@@ -320,8 +320,9 @@
     if (mapContainer) {
       const mapBox = mapContainer.getBoundingClientRect();
       const dotBox = el.getBoundingClientRect();
-      const w = 256;
       const p = 12;
+      if (popupEl) popupEl.style.maxWidth = `${Math.max(0, mapBox.width - 2 * p)}px`;
+      const w = popupEl?.offsetWidth || 256;
       const cx = dotBox.left - mapBox.left + dotBox.width / 2;
       const cy = dotBox.top - mapBox.top + dotBox.height / 2;
       const x = Math.max(p + w / 2, Math.min(mapBox.width - p - w / 2, cx));

@@ -312,6 +312,81 @@ describe('SettlementMap', () => {
     );
   });
 
+  it('uses the actual popup width near the map edge', async () => {
+    const { container } = render(SettlementMap, { props: { settlements: mockSettlements } });
+    await waitFor(() => expect(markers).toHaveLength(mockSettlements.length));
+    const canvas = container.querySelector('.map-canvas');
+    const marker = markers[0];
+    if (!canvas || !marker) throw new Error('Map or marker missing');
+    vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      top: 0,
+      width: 400,
+      height: 220
+    } as DOMRect);
+    vi.spyOn(marker, 'getBoundingClientRect').mockReturnValue({
+      left: 360,
+      top: 140,
+      width: 20,
+      height: 20
+    } as DOMRect);
+    vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockImplementation(
+      function (this: HTMLElement) {
+        return this.classList.contains('map-popup-panel') ? 320 : 0;
+      }
+    );
+
+    marker.click();
+    await waitFor(() =>
+      expect(container.querySelector<HTMLElement>('[data-testid="map-popup"]')?.style.left).toBe(
+        '228px'
+      )
+    );
+    expect(
+      container.querySelector<HTMLElement>('[data-testid="map-popup-arrow"]')?.style.left
+    ).toBe('302px');
+  });
+
+  it('keeps an enlarged popup inside a narrower map', async () => {
+    const { container } = render(SettlementMap, { props: { settlements: mockSettlements } });
+    await waitFor(() => expect(markers).toHaveLength(mockSettlements.length));
+    const canvas = container.querySelector('.map-canvas');
+    const marker = markers[0];
+    if (!canvas || !marker) throw new Error('Map or marker missing');
+    vi.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      top: 0,
+      width: 300,
+      height: 220
+    } as DOMRect);
+    vi.spyOn(marker, 'getBoundingClientRect').mockReturnValue({
+      left: 260,
+      top: 140,
+      width: 20,
+      height: 20
+    } as DOMRect);
+    vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockImplementation(
+      function (this: HTMLElement) {
+        return this.classList.contains('map-popup-panel')
+          ? Math.min(320, Number.parseInt(this.style.maxWidth))
+          : 0;
+      }
+    );
+
+    marker.click();
+    await waitFor(() =>
+      expect(container.querySelector<HTMLElement>('[data-testid="map-popup"]')?.style.left).toBe(
+        '150px'
+      )
+    );
+    expect(
+      container.querySelector<HTMLElement>('[data-testid="map-popup-panel"]')?.style.maxWidth
+    ).toBe('276px');
+    expect(
+      container.querySelector<HTMLElement>('[data-testid="map-popup-arrow"]')?.style.left
+    ).toBe('258px');
+  });
+
   it('destroys the partial map after control import failure and retries with a fresh control', async () => {
     const imported = Promise.withResolvers<typeof extras>();
     importModule.mockReturnValueOnce(imported.promise);
