@@ -113,7 +113,10 @@ describe('parcel dataset', () => {
           ...group,
           data: RawParcelSchema.parse({
             code: 'SHR-E35',
-            cadastral_parts: parts.map(({ area_m2: _, ...part }) => part)
+            cadastral_parts: parts.map(({ cadastral_number, geometry }) => ({
+              cadastral_number,
+              geometry
+            }))
           })
         }
       ]).parcels[0]?.areaM2

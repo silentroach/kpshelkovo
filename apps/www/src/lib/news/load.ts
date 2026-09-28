@@ -287,29 +287,29 @@ const archiveSummaryMap = (
 
   for (const entry of entries) {
     if (summaries.has(entry.id)) {
-      throw new Error(`duplicate news archive summary \"${entry.id}\"`);
+      throw new Error(`duplicate news archive summary "${entry.id}"`);
     }
 
     const body = preprocessSiteMarkdownContent(
       entry.body ?? '',
-      `news archive summary \"${entry.id}\" body`,
+      `news archive summary "${entry.id}" body`,
       mentionRegistry
     );
 
     if (!body.markdown) {
-      throw new Error(`news archive summary \"${entry.id}\" body is required`);
+      throw new Error(`news archive summary "${entry.id}" body is required`);
     }
 
     if (body.mentions.length > 0) {
       throw new Error(
-        `news archive summary \"${entry.id}\" must link to the source article instead of mentioning people directly`
+        `news archive summary "${entry.id}" must link to the source article instead of mentioning people directly`
       );
     }
 
     validateArchiveSummaryMarkdown(
       body.markdown,
       articleUrls,
-      `news archive summary \"${entry.id}\"`
+      `news archive summary "${entry.id}"`
     );
 
     summaries.set(entry.id, {

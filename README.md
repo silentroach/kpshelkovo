@@ -36,6 +36,7 @@ pnpm agents:setup
 pnpm dev
 
 # проверки
+pnpm lint
 pnpm typecheck
 pnpm test
 

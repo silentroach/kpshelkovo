@@ -15,6 +15,7 @@
     "format": "oxfmt --write . && prettier --write \"**/*.astro\"",
     "format:check": "oxfmt --check . && prettier --check \"**/*.astro\"",
     "format:changed": "lint-staged",
+    "lint": "oxlint --deny-warnings .",
     "test": "turbo run test",
     "test:search-quality": "pnpm --filter @shelkovo/www test:search-quality",
     "parcels:update": "node apps/www/scripts/parcels/update.ts",
@@ -37,6 +38,7 @@
     "happy-dom": "^20.14.0",
     "lint-staged": "^17.5.0",
     "oxfmt": "^0.67.0",
+    "oxlint": "^1.85.0",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
     "skills": "1.5.24",
@@ -48,8 +50,15 @@
     "zod": "^4.5.4"
   },
   "lint-staged": {
-    "*.astro": "prettier --write",
-    "!(*.astro)": "oxfmt --write --no-error-on-unmatched-pattern"
+    "*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,svelte}": [
+      "oxlint --fix --deny-warnings",
+      "oxfmt --write --no-error-on-unmatched-pattern"
+    ],
+    "*.astro": [
+      "oxlint --fix --deny-warnings",
+      "prettier --write"
+    ],
+    "!(*.js|*.jsx|*.mjs|*.cjs|*.ts|*.tsx|*.mts|*.cts|*.svelte|*.astro)": "oxfmt --write --no-error-on-unmatched-pattern"
   },
   "packageManager": "pnpm@12.4.1"
 }

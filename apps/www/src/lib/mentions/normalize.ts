@@ -54,7 +54,7 @@ interface MentionReplacement {
   readonly target: EntityMentionTarget;
 }
 
-const escapeLinkText = (value: string): string => value.replace(/([\\\[\]])/gu, '\\$1');
+const escapeLinkText = (value: string): string => value.replace(/([\\[\]])/gu, '\\$1');
 
 const escapeLinkTitle = (value: string): string => value.replace(/([\\"])/gu, '\\$1');
 
