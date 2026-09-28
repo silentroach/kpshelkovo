@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация — в [proposal.md](proposal.md), действующий контракт — в delta specs `public-coordinate-precision` и `markdown-service-blocks`. [ADR-013](../../../docs/decisions/013-raw-domain-public-data-boundary.md) отделяет входные данные от публичных адаптеров; [ADR-041](../../../docs/decisions/041-parcel-records-and-exact-search.md) хранит исходный кадастр отдельно от геометрии позиций и сдвига карты; [ADR-008](../../../docs/decisions/008-markdown-ast-generation.md) требует генерировать публичный Markdown через AST.
+Мотивация — в [proposal.md](proposal.md), действующий контракт — в delta specs `public-coordinate-precision` и `markdown-service-blocks`. [ADR-013](../../../../docs/decisions/013-raw-domain-public-data-boundary.md) отделяет входные данные от публичных адаптеров; [ADR-041](../../../../docs/decisions/041-parcel-records-and-exact-search.md) хранит исходный кадастр отдельно от геометрии позиций и сдвига карты; [ADR-008](../../../../docs/decisions/008-markdown-ast-generation.md) требует генерировать публичный Markdown через AST.
 
 Сейчас `projectNspdGeometry` сохраняет результат преобразования EPSG:3857 без ограничения разрядов; `reconcileParcels` сравнивает геометрию через `JSON.stringify`. Принятый снимок содержит 3328 колец и 32067 вершин: округление до восьми знаков в градусах не схлопывает их сегменты и не нарушает валидацию 1620 действующих записей, максимальное смещение вершины на этом снимке — около 0,64 мм. Семь знаков уже схлопывают один сегмент снимка. Это проверка текущих данных, не гарантия корректности будущего снимка.
 
