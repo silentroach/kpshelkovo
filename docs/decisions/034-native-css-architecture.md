@@ -109,7 +109,7 @@ Browser chrome metadata переезжает из `@shelkovo/ui/theme` в отд
 
 ### Оставить весь custom CSS unlayered
 
-Отклонено для глобальных стилей: явный master order нужен для безопасного сосуществования reset, base, primitives и generated content. Unlayered остается только component-scoped CSS, которому нужна предсказуемо более высокая сила.
+Отклонено для глобальных стилей: явный master order нужен для безопасного сосуществования reset, base, primitives и generated content. Unlayered остается только component-scoped CSS, которому нужна предсказуемо более высокая сила. Узкое исключение для явно подключаемого feature-owned CSS описано в [ADR-042](042-feature-owned-map-frame-css.md).
 
 ## Последствия
 

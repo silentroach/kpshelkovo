@@ -259,14 +259,11 @@ const schema = {
         aria-label="Расположение"
         data-pagefind-ignore="all"
       >
-        <figure class="place-map ui-map-frame">
+        <figure class="place-map map-frame">
           <PlacePreview {place} />
           {
             addressHtml && (
-              <figcaption
-                class="ui-map-frame__caption"
-                set:html={addressHtml}
-              />
+              <figcaption class="map-frame__caption" set:html={addressHtml} />
             )
           }
         </figure>

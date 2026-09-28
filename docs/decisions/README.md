@@ -37,7 +37,7 @@
 - [ADR-031: Единый жизненный цикл status-событий](031-status-incident-lifecycle.md) - принят, 2026-08-26.
 - [ADR-032: Предзагрузка HTML по нажатию](032-tap-prefetch.md) - принят, 2026-08-28.
 - [ADR-033: Сравнение тарифов как часть единого сайта](033-integrated-tariff-comparison-section.md) - принят, 2026-08-30.
-- [ADR-034: Нативная CSS-архитектура после Tailwind](034-native-css-architecture.md) - принят, 2026-08-31.
+- [ADR-034: Нативная CSS-архитектура после Tailwind](034-native-css-architecture.md) - принят, 2026-08-31; узкое исключение для feature-owned CSS — ADR-042.
 - [ADR-035: Страницы сервисов и свежие события в поиске](035-status-search-indexing.md) - принят, 2026-09-10.
 - [ADR-036: Короткие путеводители llms.txt v2](036-llms-v2-guides.md) - принят, 2026-09-12.
 - [ADR-037: Печать справки и новостей через CSS](037-content-print-css.md) - принят, 2026-09-13.
@@ -45,3 +45,4 @@
 - [ADR-039: Общий runtime Яндекс Карт и неподвижные превью](039-shared-yandex-maps-runtime-and-preview.md) - принят, 2026-09-18.
 - [ADR-040: Портреты людей в публичном S3](040-people-portraits-in-public-s3.md) - принят, 2026-09-22.
 - [ADR-041: Участки отдельно от мест, полнотекстовый поиск в Pagefind](041-parcel-records-and-exact-search.md) - принят, 2026-09-22; уточнён 2026-09-25; дополняет ADR-013/025/028/039.
+- [ADR-042: Общая рамка карты как feature-owned CSS](042-feature-owned-map-frame-css.md) - принят, 2026-09-28; уточняет ADR-034.

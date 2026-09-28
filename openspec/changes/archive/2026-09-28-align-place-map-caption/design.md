@@ -1,5 +1,7 @@
 # Design
 
+> Последующее переиспользование стилей и уточнение владения CSS описаны в [change `use-feature-owned-map-frame-styles`](../2026-09-28-use-feature-owned-map-frame-styles/design.md) и [ADR-042](../../../../docs/decisions/042-feature-owned-map-frame-css.md). Ниже сохранён исходный согласованный подход этого этапа.
+
 ## Context
 
 На `/map/[slug]/` адрес уже находится в `<figcaption>` под `PlacePreview`, но отделён от карты отступом `0.5rem`. У `PlacePreview` собственные цветная рамка, радиус `1rem` и тень. В новостях редакционная карта (`ui-editorial-map` в `apps/www/src/components/maps/editorial-map.css`) устроена иначе: одна нейтральная рамка и скругление `0.75rem` вокруг карты с подписью, белая нижняя панель отделена верхней границей и имеет padding `0.625rem 0.875rem`; тени нет. Её стили рамки и подписи ограничены `.ui-prose`, а оформление фотографий через `ui-media-caption` не даёт такого результата. Дизайн-гайд пока предписывает карте места тень и сходство с виджетом события. Владение локальными стилями следует [ADR-034](../../../../docs/decisions/034-native-css-architecture.md).
