@@ -67,7 +67,7 @@ const list = (
 ): Record<string, unknown> => ({
   type: 'array',
   items,
-  ...(extra ?? {})
+  ...extra
 });
 
 const obj = (

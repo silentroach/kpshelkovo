@@ -24,7 +24,7 @@ const takeSummary = (
   const summary = summaries.get(id);
 
   if (!summary) {
-    throw new Error(`news archive \"${id}\" is missing its summary`);
+    throw new Error(`news archive "${id}" is missing its summary`);
   }
 
   used.add(id);
@@ -86,7 +86,7 @@ export function buildArchives(
   const orphanSummaryId = [...summaries.keys()].find((id) => !usedSummaries.has(id));
 
   if (orphanSummaryId) {
-    throw new Error(`news archive summary \"${orphanSummaryId}\" has no matching archive`);
+    throw new Error(`news archive summary "${orphanSummaryId}" has no matching archive`);
   }
 
   return {

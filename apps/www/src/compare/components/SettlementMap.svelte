@@ -121,7 +121,7 @@
     const range = getRange(settlements);
     const currentSlugs = new Set(settlements.map((s) => s.slug));
 
-    for (const item of [...marks]) {
+    for (const item of marks) {
       if (!currentSlugs.has(item.slug)) {
         if (item.el === activeMarker) closePopup();
         map.removeChild?.(item.marker);

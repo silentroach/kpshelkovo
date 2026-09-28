@@ -560,5 +560,3 @@ runWhenDocumentReady(() => installStatusServiceStateHydration());
 bindMetrikaLoader();
 bindMetrikaTransitions();
 installSearchHighlights();
-
-export {};
