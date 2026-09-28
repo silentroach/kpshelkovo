@@ -1,5 +1,7 @@
 import VCard from 'vcard-creator';
 
+import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
+
 import { normalizeContactPhone } from './phone';
 import type { ContactVcfName, ContactWithVcf } from './types';
 import { contactExcerpt } from './view';
@@ -101,8 +103,8 @@ export const buildContactVcard = (contact: ContactWithVcf): string => {
 
   if (contact.location?.coordinates) {
     card.addGeo({
-      latitude: contact.location.coordinates.lat,
-      longitude: contact.location.coordinates.lng
+      latitude: normalizeCoordinate(contact.location.coordinates.lat),
+      longitude: normalizeCoordinate(contact.location.coordinates.lng)
     });
   }
 

@@ -64,6 +64,21 @@ const ratings = new Map<string, Rating>([
 ]);
 
 describe('toExplorer', () => {
+  it('publishes rounded map data without changing the domain coordinates', () => {
+    const location = { ...settlement.location, lat: 55.123456789123, lng: 38.987654321987 };
+    const [item] = toExplorer([{ ...settlement, location }], ratings, baseline);
+
+    expect(item?.location).toMatchInlineSnapshot(`
+      {
+        "district": "Истринский район",
+        "lat": 55.12345679,
+        "lng": 38.98765432,
+      }
+    `);
+    expect(location.lat).toBe(55.123456789123);
+    expect(location.lng).toBe(38.987654321987);
+  });
+
   it('keeps only fields needed by the main explorer', () => {
     const [item] = toExplorer([settlement], ratings, baseline);
 

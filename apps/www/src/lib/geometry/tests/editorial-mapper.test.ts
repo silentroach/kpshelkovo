@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { parseEditorialGeometry } from '../editorial-mapper';
+import { toPublicEditorialGeometry } from '../editorial-public';
 import { RawEditorialGeometrySchema } from '../editorial-schema';
 
 const fixture = (name: string): unknown =>
@@ -177,6 +178,80 @@ describe('editorial geometry boundary', () => {
         "name": "@place",
       }
     `);
+  });
+
+  it('rounds prepared shapes, including expanded holes, while retaining properties and the raw geometry', () => {
+    const source = collection(
+      { type: 'MultiPolygon', coordinates: [polygon] },
+      { precision: 'approximate', outline_expansion_meters: 5, 'stroke-width': '1.234567891' }
+    );
+    const original = JSON.stringify(source);
+    const prepared = parseEditorialGeometry(source, 'rounded.geojson');
+    expect(JSON.stringify(source)).toBe(original);
+    expect(JSON.stringify(prepared.features[0]?.geometry)).not.toMatch(/\d+\.\d{9}/);
+    expect(toPublicEditorialGeometry(prepared).features[0]?.geometry).toEqual(
+      prepared.features[0]?.geometry
+    );
+    expect(prepared.features[0]?.strokeWidth).toBe(1.234567891);
+    const point = parseEditorialGeometry(
+      collection({ type: 'Point', coordinates: [37.123456789, 55.123456789] }),
+      'point.geojson'
+    );
+    const line = parseEditorialGeometry(
+      collection({
+        type: 'LineString',
+        coordinates: [
+          [37.123456789, 55.123456789],
+          [38, 56]
+        ]
+      }),
+      'line.geojson'
+    );
+    expect([point.features[0]?.geometry, line.features[0]?.geometry]).toMatchInlineSnapshot(`
+      [
+        {
+          "coordinates": [
+            37.12345679,
+            55.12345679,
+          ],
+          "type": "Point",
+        },
+        {
+          "coordinates": [
+            [
+              37.12345679,
+              55.12345679,
+            ],
+            [
+              38,
+              56,
+            ],
+          ],
+          "type": "LineString",
+        },
+      ]
+    `);
+  });
+
+  it('reports a contour that becomes invalid after rounding with its source and feature', () => {
+    expect(() =>
+      parseEditorialGeometry(
+        collection({
+          type: 'Polygon',
+          coordinates: [
+            [
+              [37, 55],
+              [37.01, 55],
+              [37.01, 55.0000000003],
+              [37, 55]
+            ]
+          ]
+        }),
+        'collapsed.geojson'
+      )
+    ).toThrow(
+      /collapsed\.geojson.*after coordinate rounding.*features\.0\.geometry\.coordinates.*feature 0 \(ID 0\)/
+    );
   });
 
   it.each(['marker-color', 'stroke', 'fill'])(

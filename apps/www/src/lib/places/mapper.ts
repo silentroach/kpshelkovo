@@ -1,3 +1,4 @@
+import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
 import { preprocessSiteMarkdown, preprocessSiteMarkdownContent } from '@/lib/markdown/render';
 import type { SiteMentionRegistry } from '@/lib/mentions';
 
@@ -5,7 +6,7 @@ import { placeCanonical, placeMarkdownUrl, placeUrl } from './routes';
 import type { Place, PlaceContact, PlaceCoordinates, PlaceEntry, PlaceGeometry } from './types';
 
 const buildYandexMapUrl = (coordinates: PlaceCoordinates): string =>
-  `https://yandex.ru/maps/?pt=${coordinates.lng},${coordinates.lat}&z=18&l=map`;
+  `https://yandex.ru/maps/?pt=${normalizeCoordinate(coordinates.lng)},${normalizeCoordinate(coordinates.lat)}&z=18&l=map`;
 
 export const mapRawPlace = (
   entry: PlaceEntry,

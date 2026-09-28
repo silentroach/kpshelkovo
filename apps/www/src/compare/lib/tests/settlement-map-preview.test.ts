@@ -91,3 +91,58 @@ test.each([
     }
   }
 );
+
+test.each([
+  {
+    mapUrl: undefined,
+    expectedUrl: 'https://yandex.ru/maps/?pt=38.98765432,55.12345679&z=15&l=map'
+  },
+  {
+    mapUrl: 'https://example.com/map?pt=38.987654321987,55.123456789123',
+    expectedUrl: 'https://example.com/map?pt=38.987654321987,55.123456789123'
+  }
+])(
+  'limits coordinates in the preview and JSON-LD, preserving map URL $mapUrl',
+  async ({ mapUrl, expectedUrl }) => {
+    const location = { ...baseline.location, lat: 55.123456789123, lng: 38.987654321987, mapUrl };
+    const settlement = { ...baseline, location };
+    const container = await createAstroContainer();
+    const html = await container.renderToString(Page, {
+      props: { settlement, baseline, distanceFromMkad: 60 },
+      request: new Request('https://kpshelkovo.online/815/compare/settlements/shelkovo/')
+    });
+    const window = new Window();
+    try {
+      window.document.write(html);
+      const preview = window.document.querySelector('map-preview');
+      const place = Array.from(
+        window.document.querySelectorAll('script[type="application/ld+json"]')
+      )
+        .map(
+          (script) => JSON.parse(script.textContent ?? '{}') as { '@type'?: string; geo?: unknown }
+        )
+        .find((schema) => schema['@type'] === 'Place');
+
+      expect({
+        preview: JSON.parse(preview?.getAttribute('data-preview') ?? '{}'),
+        geo: place?.geo,
+        links: Array.from(
+          window.document.querySelectorAll('a[aria-label="Открыть поселок на Яндекс.Картах"]'),
+          (link) => link.getAttribute('href')
+        )
+      }).toMatchObject({
+        preview: { coordinates: { lat: 55.12345679, lng: 38.98765432 } },
+        geo: { latitude: 55.12345679, longitude: 38.98765432 },
+        links: [expectedUrl, expectedUrl]
+      });
+      expect(location).toEqual({
+        ...baseline.location,
+        lat: 55.123456789123,
+        lng: 38.987654321987,
+        mapUrl
+      });
+    } finally {
+      await window.happyDOM.close();
+    }
+  }
+);

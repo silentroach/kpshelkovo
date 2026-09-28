@@ -12,14 +12,18 @@ import { buildEventCalendar } from '@/lib/events/calendar-projection';
 import { buildEventIcs } from '@/lib/events/ics';
 import * as eventLoad from '@/lib/events/load';
 import { mapRawEvent } from '@/lib/events/mapper';
+import { buildEventMarkdown } from '@/lib/events/markdown';
+import { toEventPublic } from '@/lib/events/public';
 import { RawEventSchema } from '@/lib/events/raw-schema';
 import type { EventRecord } from '@/lib/events/types';
+import { buildEventMapUrl } from '@/lib/events/view';
 import { mapRawPlace } from '@/lib/places/mapper';
 import { RawPlaceSchema } from '@/lib/places/raw-schema';
 import { createAstroContainer } from '@/test/astro-container';
 
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import Fixture from '../../../../tests/news-event-card-visual/src/pages/index.astro';
+import { buildArticleEventIcs } from '../calendar';
 import * as newsLoad from '../load';
 import { newsArticleEntry, newsArchiveSummaryEntries, newsAuthorEntry } from '../load.test-helper';
 import { toNewsPublicPayload } from '../public-dto';
@@ -102,6 +106,91 @@ beforeAll(() =>
 afterEach(() => vi.restoreAllMocks());
 
 describe('shared events in news', () => {
+  it('publishes one rounded point in event and news HTML, JSON, Markdown, JSON-LD, ICS and generated URLs', async () => {
+    const source = { lat: 55.123456789123, lng: 37.987654321987 };
+    const record = newsEventRecord({ coordinates: source });
+    const data = linkedDataset(record);
+    const article = data.articles[0]!;
+    const linked = article.events[0]!;
+    const container = await createAstroContainer();
+    const html = await container.renderToString(EventWidget, { props: { event: record } });
+    const newsHtml = await container.renderToString(EventWidget, {
+      props: { event: linked, newsSlug: linked.slug }
+    });
+    const window = new Window();
+    try {
+      window.document.body.innerHTML = html;
+      const preview = JSON.parse(
+        window.document.querySelector('map-preview')!.getAttribute('data-preview')!
+      );
+      window.document.body.innerHTML = newsHtml;
+      const newsPreview = JSON.parse(
+        window.document.querySelector('map-preview')!.getAttribute('data-preview')!
+      );
+      const ics = buildEventIcs(record, 'https://example.com', new Date('2026-01-01')).replaceAll(
+        '\r\n ',
+        ''
+      );
+      const newsIcs = buildArticleEventIcs(article, linked);
+      const geo = newsArticleSchema({
+        name: article.title,
+        description: article.summary,
+        url: article.url,
+        events: article.events
+      })[1]!.location as { geo: unknown };
+      expect({
+        source: record.coordinates,
+        eventJson: toEventPublic(record, 'https://example.com').coordinates,
+        newsJson: toNewsPublicPayload(data).articles[0]!.events![0]!.coordinates,
+        preview: preview.coordinates,
+        newsPreview: newsPreview.coordinates,
+        markdown: buildEventMarkdown(record, 'https://example.com').match(
+          /Координаты: ([^\n]+)/
+        )?.[1],
+        geo: geo.geo,
+        link: buildEventMapUrl(record),
+        ics: ics.match(/GEO:[^\r\n]+/)?.[0],
+        appleGeo: ics.match(/:geo:[^\r\n]+/)?.[0],
+        newsIcs: newsIcs.match(/GEO:[^\r\n]+/)?.[0]
+      }).toMatchInlineSnapshot(`
+        {
+          "appleGeo": ":geo:55.12345679,37.98765432",
+          "eventJson": {
+            "lat": 55.12345679,
+            "lng": 37.98765432,
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 55.12345679,
+            "longitude": 37.98765432,
+          },
+          "ics": "GEO:55.12345679;37.98765432",
+          "link": "https://yandex.ru/maps/?pt=37.98765432,55.12345679&z=16&l=map",
+          "markdown": "55.12345679, 37.98765432",
+          "newsIcs": "GEO:55.12345679;37.98765432",
+          "newsJson": {
+            "lat": 55.12345679,
+            "lng": 37.98765432,
+          },
+          "newsPreview": {
+            "lat": 55.12345679,
+            "lng": 37.98765432,
+          },
+          "preview": {
+            "lat": 55.12345679,
+            "lng": 37.98765432,
+          },
+          "source": {
+            "lat": 55.123456789123,
+            "lng": 37.987654321987,
+          },
+        }
+      `);
+    } finally {
+      window.close();
+    }
+  });
+
   it('requires updated news references after a month or slug change', () => {
     const original = migrated.find((event) => event.id === 'ok-meeting-june-2026')!;
     for (const extra of [

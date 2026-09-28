@@ -165,14 +165,19 @@ export const reconcileParcels = (
     }
     const parts = candidate.parts?.map((part) => ({
       cadastral_number: part.properties.cadastralNumber,
-      geometry: projectNspdGeometry(part.geometry),
+      geometry: projectNspdGeometry(part.geometry, part.properties.cadastralNumber),
       area_m2: part.properties.area
     }));
     const data = RawParcelSchema.parse({
       code,
       aliases,
       cadastral_number: parts ? undefined : candidate.cadastralNumber,
-      geometry: parts ? undefined : projectNspdGeometry(candidate.feature.geometry),
+      geometry: parts
+        ? undefined
+        : projectNspdGeometry(
+            candidate.feature.geometry,
+            candidate.feature.properties.cadastralNumber
+          ),
       area_m2: parts ? undefined : candidate.feature.properties.area,
       cadastral_parts: parts,
       status,

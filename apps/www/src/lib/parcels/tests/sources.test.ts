@@ -80,6 +80,69 @@ describe('parcel sources', () => {
     expect(projected.coordinates[0]?.[0]?.[0]?.[1]).toBeCloseTo(55.04, 1);
   });
 
+  it('normalizes projected vertices without hiding boundary movement at eight decimals', () => {
+    const square: [number, number][] = [
+      [4_200_000, 7_370_000],
+      [4_200_100, 7_370_000],
+      [4_200_100, 7_370_100],
+      [4_200_000, 7_370_000]
+    ];
+    const geometry = RawNspdFeatureSchema.parse({
+      type: 'Feature',
+      id: 123,
+      geometry: {
+        type: 'Polygon',
+        coordinates: [square],
+        crs: { type: 'name', properties: { name: 'EPSG:3857' } }
+      },
+      properties: { cadastralNumber: '50:33:0010101:2998', status: 'Учтенный' }
+    }).geometry;
+    const source = JSON.stringify(geometry);
+    if (geometry.type !== 'Polygon') throw new Error('Polygon missing');
+    const first = projectNspdGeometry(geometry);
+    if (first.type !== 'Polygon') throw new Error('Polygon missing');
+    const noise = projectNspdGeometry({
+      ...geometry,
+      coordinates: [[...square.slice(0, 1), [4_200_100.00000001, 7_370_000], ...square.slice(2)]]
+    });
+    expect(noise).toEqual(first);
+    const shifted = projectNspdGeometry({
+      ...geometry,
+      coordinates: [[...square.slice(0, 1), [4_200_100.01, 7_370_000], ...square.slice(2)]]
+    });
+    if (shifted.type !== 'Polygon') throw new Error('Polygon missing');
+    expect(first.coordinates[0]?.[1]).not.toEqual(shifted.coordinates[0]?.[1]);
+    expect(JSON.stringify(first)).not.toMatch(/\d+\.\d{9}/);
+    expect(projectNspdGeometry(geometry)).toEqual(first);
+    expect(JSON.stringify(geometry)).toBe(source);
+  });
+
+  it('rejects a contour that collapses after projection and names its source', () => {
+    const x = 4_200_000;
+    const y = 7_370_000;
+    const geometry = RawNspdFeatureSchema.parse({
+      type: 'Feature',
+      id: 123,
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [x, y],
+            [x + 0.0001, y],
+            [x, y + 0.0001],
+            [x, y]
+          ]
+        ],
+        crs: { type: 'name', properties: { name: 'EPSG:3857' } }
+      },
+      properties: { cadastralNumber: '50:33:0010101:2998', status: 'Учтенный' }
+    }).geometry;
+
+    expect(() => projectNspdGeometry(geometry, '50:33:0010101:2998')).toThrow(
+      /invalid projected geometry from 50:33:0010101:2998/u
+    );
+  });
+
   it('loads both documented confirmations, original references, and their evidence', async () => {
     const matches = await readParcelMatches(sources);
     expect(

@@ -1,6 +1,7 @@
 import { extractMarkdownText } from '@shelkovo/markdown';
 import type { SchemaDoc } from '@shelkovo/seo';
 
+import { toPublicEventCoordinates } from './public-coordinates';
 import type { EventParticipant, EventRecord } from './types';
 
 const participantSchema = (person: EventParticipant): SchemaDoc => ({
@@ -10,6 +11,7 @@ const participantSchema = (person: EventParticipant): SchemaDoc => ({
 
 export const buildEventJsonLd = (event: EventRecord, siteUrl: string): SchemaDoc => {
   const url = new URL(event.url, siteUrl).href;
+  const coordinates = toPublicEventCoordinates(event.coordinates);
   const state =
     event.status === 'cancelled'
       ? 'Отменено. '
@@ -45,11 +47,11 @@ export const buildEventJsonLd = (event: EventRecord, siteUrl: string): SchemaDoc
             name: event.location,
             url: event.place?.canonical,
             address: event.place ? event.place.address : event.location,
-            geo: event.coordinates
+            geo: coordinates
               ? {
                   '@type': 'GeoCoordinates',
-                  latitude: event.coordinates.lat,
-                  longitude: event.coordinates.lng
+                  latitude: coordinates.lat,
+                  longitude: coordinates.lng
                 }
               : undefined
           }

@@ -98,6 +98,28 @@ const ratings = new Map<string, Rating>([
 ]);
 
 describe('toFull', () => {
+  it('publishes rounded points but retains the source and explicit map link', () => {
+    const location = {
+      ...row.location,
+      lat: 55.123456789123,
+      lng: 38.987654321987,
+      mapUrl: 'https://example.com/map?pt=38.987654321987,55.123456789123'
+    };
+    const [item] = toFull([{ ...row, location }], ratings, base);
+
+    expect(item?.location).toMatchInlineSnapshot(`
+      {
+        "address_text": "МО, округ Истра, д. Тестово",
+        "district": "Истринский район",
+        "lat": 55.12345679,
+        "lng": 38.98765432,
+        "map_url": "https://example.com/map?pt=38.987654321987,55.123456789123",
+      }
+    `);
+    expect(location.lat).toBe(55.123456789123);
+    expect(location.lng).toBe(38.987654321987);
+  });
+
   it('keeps full data, adds distance, and omits sources', () => {
     const list = toFull([base, row], ratings, base);
     const home = list.find((item) => item.slug === 'shelkovo');

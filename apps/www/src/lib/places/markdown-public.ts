@@ -1,3 +1,4 @@
+import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
 import { absoluteUrl } from '@/lib/site';
 
 import { toPublicOpeningHours } from './map-public';
@@ -15,8 +16,8 @@ export const toPlaceMarkdownPublic = (place: Place): PlaceMarkdownPublicDto => {
     status: place.status,
     address: place.address,
     coordinates: {
-      lat: place.coordinates.lat,
-      lng: place.coordinates.lng
+      lat: normalizeCoordinate(place.coordinates.lat),
+      lng: normalizeCoordinate(place.coordinates.lng)
     },
     html_url: place.canonical,
     map_url: absoluteUrl(place.mapUrl),

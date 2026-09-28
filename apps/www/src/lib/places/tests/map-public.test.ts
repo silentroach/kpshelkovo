@@ -51,6 +51,25 @@ const place: Place = {
 };
 
 describe('place map public DTO', () => {
+  it('limits the map point without changing the source', () => {
+    const coordinates = { lat: 55.06070312345, lng: 37.74689498765 };
+    const publicPoint = buildPlaceMapPublicPayload([{ ...place, coordinates }]).places[0]
+      ?.coordinates;
+
+    expect({ publicPoint, source: coordinates }).toMatchInlineSnapshot(`
+      {
+        "publicPoint": {
+          "lat": 55.06070312,
+          "lng": 37.74689499,
+        },
+        "source": {
+          "lat": 55.06070312345,
+          "lng": 37.74689498765,
+        },
+      }
+    `);
+  });
+
   it.each([undefined, 'Вход со двора.'])(
     'serializes periods with optional explanation %s',
     (description) => {

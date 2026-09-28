@@ -1,3 +1,5 @@
+import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
+
 import {
   toPublicComparisons,
   toPublicStats,
@@ -64,8 +66,8 @@ export function toExplorer(
         : {}),
       isBaseline: item.slug === baseline.slug,
       location: {
-        lat: item.location.lat,
-        lng: item.location.lng,
+        lat: normalizeCoordinate(item.location.lat),
+        lng: normalizeCoordinate(item.location.lng),
         district: item.location.district
       },
       tariff: {

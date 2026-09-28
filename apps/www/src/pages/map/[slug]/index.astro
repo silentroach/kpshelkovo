@@ -9,6 +9,7 @@ import PlaceOpeningHours from '@/components/places/PlaceOpeningHours.astro';
 import PlacePreview from '@/components/places/PlacePreview.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
+import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
 import { renderMarkdown } from '@/lib/markdown/render';
 import { loadPlaces, loadPlaceWithBacklinks } from '@/lib/places/load';
 import { getNearbyPlaces } from '@/lib/places/nearby';
@@ -76,8 +77,8 @@ const schema = {
   address: place.address,
   geo: {
     '@type': 'GeoCoordinates',
-    latitude: place.coordinates.lat,
-    longitude: place.coordinates.lng,
+    latitude: normalizeCoordinate(place.coordinates.lat),
+    longitude: normalizeCoordinate(place.coordinates.lng),
   },
   sameAs: place.mapUrl,
 };

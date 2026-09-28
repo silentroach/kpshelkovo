@@ -1,3 +1,4 @@
+import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
 import { toPublicEditorialGeometry } from '@/lib/geometry/editorial-public';
 
 import type {
@@ -25,8 +26,8 @@ const toPublicPlace = (place: Place): PlaceMapPublicItemDto => ({
   status: place.status,
   status_label: place.status === 'existing' ? undefined : formatPlaceStatus(place.status),
   coordinates: {
-    lat: place.coordinates.lat,
-    lng: place.coordinates.lng
+    lat: normalizeCoordinate(place.coordinates.lat),
+    lng: normalizeCoordinate(place.coordinates.lng)
   },
   geometry: place.geometry ? toPublicEditorialGeometry(place.geometry) : undefined,
   opening_hours: place.openingHours ? toPublicOpeningHours(place.openingHours) : undefined,

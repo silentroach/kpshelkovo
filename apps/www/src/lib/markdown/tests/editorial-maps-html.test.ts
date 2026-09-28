@@ -34,6 +34,28 @@ const document = (markdown: string, options?: Parameters<typeof renderMarkdown>[
 };
 
 describe('editorial map HTML', () => {
+  it('publishes rounded point coordinates without changing the authored map block', () => {
+    const body = map('Схема').replace(
+      '"coordinates":[37,56]',
+      '"coordinates":[37.123456789,56.123456789]'
+    );
+    const page = document(body);
+    const geometry = EditorialMapDataSchema.parse(
+      JSON.parse(page.querySelector('editorial-map')?.getAttribute('data-geometry') ?? '')
+    );
+
+    expect(geometry.features[0]?.geometry).toMatchInlineSnapshot(`
+      {
+        "coordinates": [
+          37.12345679,
+          56.12345679,
+        ],
+        "type": "Point",
+      }
+    `);
+    expect(body).toContain('37.123456789');
+  });
+
   it('serializes visible text verbatim without changing hidden descriptions or running markup', () => {
     const page = document(map(undefined, undefined, '"Шелково Ривер" &amp; <img src=x>'));
     const host = page.querySelector('editorial-map');

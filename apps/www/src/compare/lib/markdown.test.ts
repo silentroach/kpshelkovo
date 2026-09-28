@@ -343,4 +343,27 @@ describe('compare markdown navigation', () => {
       "
     `);
   });
+
+  it('limits generated map links while preserving explicit links and the source point', async () => {
+    const { buildSettlementMd } = await loadMarkdown();
+    const location = {
+      ...settlement.location,
+      lat: 55.123456789123,
+      lng: 38.987654321987,
+      mapUrl: undefined
+    };
+    const item = { ...settlement, location };
+    const savedUrl = 'https://example.com/map?pt=38.987654321987,55.123456789123';
+
+    const generated = buildSettlementMd({ settlement: item, baseline: item });
+    const explicit = buildSettlementMd({
+      settlement: { ...item, location: { ...location, mapUrl: savedUrl } },
+      baseline: item
+    });
+
+    expect(generated).toContain('https://yandex.ru/maps/?pt=38.98765432,55.12345679&z=15&l=map');
+    expect(explicit).toContain(savedUrl);
+    expect(location.lat).toBe(55.123456789123);
+    expect(location.lng).toBe(38.987654321987);
+  });
 });

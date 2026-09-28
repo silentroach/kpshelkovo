@@ -3,6 +3,7 @@ import { CalendarPlusIcon, MapPinIcon } from '@shelkovo/ui/icons';
 import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 import { formatDynamicHtml } from '@shelkovo/markdown';
 import MapCardShell from '@/components/MapCardShell.astro';
+import { toPublicEventCoordinates } from '@/lib/events/public-coordinates';
 import {
   buildEventMapUrl,
   EVENT_STATUS_LABELS,
@@ -13,7 +14,9 @@ import type { EventWidgetProps as Props } from './event-widget.types';
 
 const { event, newsSlug } = Astro.props;
 const mapUrl = buildEventMapUrl(event);
-const coordinates = event.place?.coordinates ?? event.coordinates;
+const coordinates = toPublicEventCoordinates(
+  event.place?.coordinates ?? event.coordinates,
+);
 const calendarUrl =
   newsSlug && event.status !== 'cancelled' ? event.icsUrl : undefined;
 const mapActionUrl = !coordinates ? mapUrl : undefined;
