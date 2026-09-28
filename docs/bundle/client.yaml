@@ -353,10 +353,18 @@ static/explorer-component.XXXXXXXX.js:
     rendered: 790
   apps/www/src/compare/lib/url.ts:
     rendered: 1301
+  node_modules/.pnpm/@turf+distance@7.4.0/node_modules/@turf/distance/dist/esm/index.js:
+    rendered: 683
+  node_modules/.pnpm/@turf+helpers@7.4.0/node_modules/@turf/helpers/dist/esm/index.js:
+    rendered: 1119
+  node_modules/.pnpm/@turf+invariant@7.4.0/node_modules/@turf/invariant/dist/esm/index.js:
+    rendered: 620
   packages/format/src/currency.ts:
     rendered: 302
   packages/format/src/locale.ts:
     rendered: 115
+  packages/geo/src/distance.ts:
+    rendered: 189
 static/index.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/compare/client/explorer.ts:
     rendered: 3189
@@ -367,6 +375,10 @@ static/index.astro_astro_type_script_index_0_lang-2.XXXXXXXX.js:
     rendered: 1162
   apps/www/src/pages/index.astro?astro&type=script&index=0&lang.ts:
     rendered: 107
+  node_modules/.pnpm/suncalc@2.0.2/node_modules/suncalc/index.js:
+    rendered: 8016
+  packages/geo/src/solar.ts:
+    rendered: 434
 static/index.astro_astro_type_script_index_0_lang-3.XXXXXXXX.js:
   apps/www/src/lib/reglament/calculator-loader.ts:
     rendered: 2692
@@ -441,21 +453,6 @@ static/schema.XXXXXXXX.js:
   packages/format/src/plural.ts:
     rendered: 430
 static/src.XXXXXXXX.js:
-  node_modules/.pnpm/@turf+distance@7.4.0/node_modules/@turf/distance/dist/esm/index.js:
-    rendered: 683
-  node_modules/.pnpm/@turf+helpers@7.4.0/node_modules/@turf/helpers/dist/esm/index.js:
-    rendered: 1119
-  node_modules/.pnpm/@turf+invariant@7.4.0/node_modules/@turf/invariant/dist/esm/index.js:
-    rendered: 620
-  node_modules/.pnpm/suncalc@2.0.2/node_modules/suncalc/index.js:
-    rendered: 8016
-  packages/geo/src/index.ts:
-    rendered: 565
-  packages/geo/src/mercator.ts:
-    rendered: 87
-  packages/geo/src/polygon-label.ts:
-    rendered: 0
-static/src-2.XXXXXXXX.js:
   packages/url/src/index.ts:
     rendered: 379
 static/timeline.dom.XXXXXXXX.js:
