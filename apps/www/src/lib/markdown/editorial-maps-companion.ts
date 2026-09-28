@@ -15,7 +15,27 @@ export const appendEditorialMapCaptions = (
 ): readonly MarkdownNode[] =>
   transformEditorialMapNodes(nodes, source, (node, map) => {
     const caption = editorialMapCaption(map);
-    const original = JSON.parse(node.value) as z.input<typeof RawEditorialGeometrySchema>;
+    // JSON.parse drops trailing zeroes; propagate raw literal precision through nested arrays.
+    const longDecimals = new WeakSet<object>();
+    let longCoordinateLiteral = false;
+    const original = JSON.parse(
+      node.value,
+      function (this: unknown, key: string, value: unknown, context?: { readonly source: string }) {
+        if (Array.isArray(this)) {
+          if (typeof value === 'number') {
+            if (!context)
+              throw new Error(`${source} map insertion ${map.index}: JSON source unavailable`);
+            if (/\.\d{9}/u.test(context.source)) longDecimals.add(this);
+          } else if (Array.isArray(value) && longDecimals.has(value)) {
+            longDecimals.add(this);
+          }
+        }
+        if (key === 'coordinates' && Array.isArray(value) && longDecimals.has(value)) {
+          longCoordinateLiteral = true;
+        }
+        return value;
+      }
+    ) as z.input<typeof RawEditorialGeometrySchema>;
     const prepared = {
       ...original,
       features: original.features.map((feature) => ({
@@ -23,11 +43,13 @@ export const appendEditorialMapCaptions = (
         geometry: roundGeometry(feature.geometry)
       }))
     };
-    const changed = prepared.features.some(
-      (feature, index) =>
-        JSON.stringify(feature.geometry.coordinates) !==
-        JSON.stringify(original.features[index]?.geometry.coordinates)
-    );
+    const changed =
+      longCoordinateLiteral ||
+      prepared.features.some(
+        (feature, index) =>
+          JSON.stringify(feature.geometry.coordinates) !==
+          JSON.stringify(original.features[index]?.geometry.coordinates)
+      );
     if (changed) {
       const result = RawEditorialGeometrySchema.safeParse(prepared);
       if (!result.success) {
