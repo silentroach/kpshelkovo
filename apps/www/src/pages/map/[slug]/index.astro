@@ -7,6 +7,7 @@ import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import { PLACE_MARKER_IMAGES } from '@/components/places/marker-images';
 import PlaceOpeningHours from '@/components/places/PlaceOpeningHours.astro';
 import PlacePreview from '@/components/places/PlacePreview.astro';
+import '@/components/maps/map-frame.css';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
 import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
@@ -258,9 +259,16 @@ const schema = {
         aria-label="Расположение"
         data-pagefind-ignore="all"
       >
-        <figure class="place-map">
+        <figure class="place-map ui-map-frame">
           <PlacePreview {place} />
-          {addressHtml && <figcaption set:html={addressHtml} />}
+          {
+            addressHtml && (
+              <figcaption
+                class="ui-map-frame__caption"
+                set:html={addressHtml}
+              />
+            )
+          }
         </figure>
         {
           neighbors.length > 0 && (
@@ -460,19 +468,6 @@ const schema = {
 
   .place-map {
     overflow: hidden;
-    border: 1px solid var(--color-border);
-    border-radius: 0.75rem;
-    background: var(--color-surface-raised);
-  }
-
-  .place-map figcaption {
-    border-top: 1px solid var(--color-border);
-    padding: 0.625rem 0.875rem;
-    background: var(--color-surface-raised);
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    line-height: 1.45;
-    overflow-wrap: anywhere;
   }
 
   .place-nearby {

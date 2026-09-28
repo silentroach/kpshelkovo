@@ -4,7 +4,10 @@ import { resolve } from 'node:path';
 
 import { afterEach, expect, it } from 'vitest';
 
-const css = readFileSync(resolve(process.cwd(), 'src/components/maps/editorial-map.css'), 'utf8');
+const css = [
+  readFileSync(resolve(process.cwd(), 'src/components/maps/map-frame.css'), 'utf8'),
+  readFileSync(resolve(process.cwd(), 'src/components/maps/editorial-map.css'), 'utf8')
+].join('\n');
 
 afterEach(() => {
   document.body.replaceChildren();
@@ -20,9 +23,9 @@ it('keeps labels wrappable and groups the caption with the map and its focusable
   const prose = document.createElement('div');
   prose.className = 'ui-prose';
   const figure = document.createElement('figure');
-  figure.className = 'ui-editorial-map';
+  figure.className = 'ui-editorial-map ui-map-frame';
   figure.innerHTML =
-    '<editorial-map></editorial-map><figcaption class="ui-editorial-map__caption"><h3 class="ui-editorial-map__title" id="editorial-map-1"><a href="https://example.org/map">Схема прохода</a></h3></figcaption>';
+    '<editorial-map></editorial-map><figcaption class="ui-editorial-map__caption ui-map-frame__caption"><h3 class="ui-editorial-map__title" id="editorial-map-1"><a href="https://example.org/map">Схема прохода</a></h3></figcaption>';
   const marker = document.createElement('span');
   marker.className = 'editorial-map-marker__caption';
   marker.textContent = 'Длинное название проезда через ворота';

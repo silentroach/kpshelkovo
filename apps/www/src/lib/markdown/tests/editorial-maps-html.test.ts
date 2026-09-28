@@ -88,6 +88,8 @@ describe('editorial map HTML', () => {
     const host = figure?.querySelector('editorial-map');
     const figcaption = figure?.querySelector('figcaption');
 
+    expect(figure?.classList.contains('ui-map-frame')).toBe(true);
+    expect(!!figcaption?.classList.contains('ui-map-frame__caption')).toBe(!!caption);
     expect(host?.getAttribute('data-pagefind-ignore')).toBe('all');
     expect(
       EditorialMapDataSchema.parse(JSON.parse(host?.getAttribute('data-geometry') ?? ''))

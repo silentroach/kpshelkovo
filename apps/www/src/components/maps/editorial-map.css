@@ -1,3 +1,5 @@
+@import './map-frame.css';
+
 .editorial-map-marker {
   position: relative;
   width: 0;
@@ -41,9 +43,6 @@
 
 .ui-prose .ui-editorial-map {
   margin-block: 1.25rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0.75rem;
-  background: var(--color-surface-raised);
 }
 
 .ui-editorial-map editorial-map {
@@ -58,15 +57,6 @@
 
 .ui-editorial-map editorial-map:last-child {
   border-radius: 0.75rem;
-}
-
-.ui-prose .ui-editorial-map__caption {
-  border-top: 1px solid var(--color-border);
-  padding: 0.625rem 0.875rem;
-  font-family: var(--font-body);
-  font-size: 0.875rem;
-  line-height: 1.45;
-  overflow-wrap: anywhere;
 }
 
 .ui-prose .ui-editorial-map__title {
