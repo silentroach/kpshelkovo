@@ -47,7 +47,7 @@ const mapFigure = (map: EditorialMapBlock, source: string, reserveId: (base: str
   figure.data = {
     hName: 'figure',
     hProperties: {
-      className: ['ui-editorial-map'],
+      className: ['ui-editorial-map', 'map-frame'],
       id: hasName ? undefined : id
     },
     hChildren: [
@@ -62,7 +62,7 @@ const mapFigure = (map: EditorialMapBlock, source: string, reserveId: (base: str
             {
               type: 'element' as const,
               tagName: 'figcaption',
-              properties: { className: ['ui-editorial-map__caption'] },
+              properties: { className: ['ui-editorial-map__caption', 'map-frame__caption'] },
               children: hasName
                 ? [
                     {

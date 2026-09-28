@@ -7,6 +7,7 @@ import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import { PLACE_MARKER_IMAGES } from '@/components/places/marker-images';
 import PlaceOpeningHours from '@/components/places/PlaceOpeningHours.astro';
 import PlacePreview from '@/components/places/PlacePreview.astro';
+import '@/components/maps/map-frame.css';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
 import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
@@ -258,9 +259,13 @@ const schema = {
         aria-label="Расположение"
         data-pagefind-ignore="all"
       >
-        <figure>
+        <figure class="place-map map-frame">
           <PlacePreview {place} />
-          {addressHtml && <figcaption set:html={addressHtml} />}
+          {
+            addressHtml && (
+              <figcaption class="map-frame__caption" set:html={addressHtml} />
+            )
+          }
         </figure>
         {
           neighbors.length > 0 && (
@@ -458,11 +463,8 @@ const schema = {
     margin-block-start: 0.375rem;
   }
 
-  figcaption {
-    margin-block-start: 0.75rem;
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-    line-height: 1.5;
+  .place-map {
+    overflow: hidden;
   }
 
   .place-nearby {

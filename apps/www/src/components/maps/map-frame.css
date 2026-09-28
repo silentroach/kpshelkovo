@@ -1,0 +1,17 @@
+/* Feature-owned and unlayered: may load before the site's layer order (ADR-042). */
+.map-frame {
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  background: var(--color-surface-raised);
+}
+
+.map-frame__caption {
+  border-top: 1px solid var(--color-border);
+  border-radius: 0 0 calc(0.75rem - 1px) calc(0.75rem - 1px);
+  padding: 0.625rem 0.875rem;
+  background: var(--color-surface-raised);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
