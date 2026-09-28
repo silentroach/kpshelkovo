@@ -260,7 +260,11 @@ const schema = {
       >
         <figure>
           <PlacePreview {place} />
-          {addressHtml && <figcaption set:html={addressHtml} />}
+          {
+            addressHtml && (
+              <figcaption class="ui-media-caption" set:html={addressHtml} />
+            )
+          }
         </figure>
         {
           neighbors.length > 0 && (
@@ -459,10 +463,7 @@ const schema = {
   }
 
   figcaption {
-    margin-block-start: 0.75rem;
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-    line-height: 1.5;
+    margin-block-start: 0.5rem;
   }
 
   .place-nearby {
