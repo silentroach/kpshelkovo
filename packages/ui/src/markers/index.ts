@@ -1,10 +1,10 @@
-import animalsMarkerUrl from './Animals.png?url';
-import appleMarkerUrl from './Apple.png?url';
-import constructionMarkerUrl from './Construction.png?url';
-import fishMarkerUrl from './Fish.png?url';
-import foodtruckMarkerUrl from './Foodtruck.png?url';
-import kppMarkerUrl from './Kpp.png?url';
-import titanicMarkerUrl from './Titanic.png?url';
+import animalsMarkerUrl from './Animals.webp?url';
+import appleMarkerUrl from './Apple.webp?url';
+import constructionMarkerUrl from './Construction.webp?url';
+import fishMarkerUrl from './Fish.webp?url';
+import foodtruckMarkerUrl from './Foodtruck.webp?url';
+import kppMarkerUrl from './Kpp.webp?url';
+import titanicMarkerUrl from './Titanic.webp?url';
 
 export const APPLE_MARKER = {
   src: appleMarkerUrl,

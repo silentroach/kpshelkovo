@@ -8,6 +8,10 @@ import {
   TITANIC_MARKER
 } from '@shelkovo/ui/markers';
 
+import type { PlaceMarker } from '@/lib/places/schema';
+
+import type { PlaceMarkerImage } from './marker-images.types';
+
 export const PLACE_MARKER_IMAGES = {
   apple: APPLE_MARKER,
   animals: ANIMALS_MARKER,
@@ -16,4 +20,4 @@ export const PLACE_MARKER_IMAGES = {
   foodtruck: FOODTRUCK_MARKER,
   kpp: KPP_MARKER,
   titanic: TITANIC_MARKER
-} as const;
+} as const satisfies Readonly<Record<PlaceMarker, PlaceMarkerImage>>;
