@@ -37,6 +37,7 @@ const HOME_HERO_FALLBACK_SELECTOR = '[data-home-hero-fallback]';
 const NAVIGATION_PENDING_ATTR = 'data-site-navigation-pending';
 const NAVIGATION_DELAY_MS = 50;
 const SEARCH_DIALOG_HYDRATED_ATTR = 'data-search-dialog-hydrated';
+const SEARCH_DIALOG_LOAD_DELAY_MS = 200;
 const SEARCH_DIALOG_LOAD_ANNOUNCEMENT_SELECTOR = '[data-search-load-announcement]';
 const SEARCH_DIALOG_LOAD_MESSAGE_SELECTOR = '[data-search-load-message]';
 const SEARCH_DIALOG_LOAD_STATUS_SELECTOR = '[data-search-load-status]';
@@ -376,6 +377,12 @@ const bindSiteHeaderMenu = (): void => {
 
 let latestSearchDialogRequest = 0;
 let nativeSearchDialogOpener: HTMLElement | undefined;
+let nativeSearchDialogLoadTimer: number | undefined;
+
+const clearNativeSearchDialogLoadTimer = (): void => {
+  window.clearTimeout(nativeSearchDialogLoadTimer);
+  nativeSearchDialogLoadTimer = undefined;
+};
 
 const setNativeSearchDialogLoadStatus = (root: HTMLElement, message: string): void => {
   const status = root.querySelector<HTMLElement>(SEARCH_DIALOG_LOAD_STATUS_SELECTOR);
@@ -405,15 +412,29 @@ const requestSearchDialog = async (
     return;
   }
 
+  clearNativeSearchDialogLoadTimer();
   setNativeSearchDialogLoadStatus(root, '');
   openSearchDialog(root, opener, input.value);
   nativeSearchDialogOpener = undefined;
 };
 
 const loadNativeSearchDialog = (root: HTMLElement, opener: HTMLElement): void => {
-  setNativeSearchDialogLoadStatus(root, 'Загружаем поиск…');
-
+  clearNativeSearchDialogLoadTimer();
   const requestId = ++latestSearchDialogRequest;
+  if (!root.hasAttribute(SEARCH_DIALOG_HYDRATED_ATTR)) {
+    nativeSearchDialogLoadTimer = window.setTimeout(() => {
+      nativeSearchDialogLoadTimer = undefined;
+      const dialog = root.querySelector<HTMLDialogElement>(SEARCH_DIALOG_SELECTOR);
+      if (
+        requestId === latestSearchDialogRequest &&
+        root.isConnected &&
+        dialog?.open &&
+        !root.hasAttribute(SEARCH_DIALOG_HYDRATED_ATTR)
+      ) {
+        setNativeSearchDialogLoadStatus(root, 'Загружаем поиск…');
+      }
+    }, SEARCH_DIALOG_LOAD_DELAY_MS);
+  }
   void requestSearchDialog(root, opener, requestId).catch((error: unknown) => {
     const dialog = root.querySelector<HTMLDialogElement>(SEARCH_DIALOG_SELECTOR);
     if (
@@ -425,6 +446,7 @@ const loadNativeSearchDialog = (root: HTMLElement, opener: HTMLElement): void =>
       return;
     }
 
+    clearNativeSearchDialogLoadTimer();
     console.error('Не удалось загрузить модуль поиска.', error);
     setNativeSearchDialogLoadStatus(root, 'Поиск не загрузился. Попробуйте обновить страницу');
   });
@@ -451,6 +473,7 @@ const finishNativeSearchDialogClose = (dialog: HTMLDialogElement): void => {
   }
 
   latestSearchDialogRequest += 1;
+  clearNativeSearchDialogLoadTimer();
   setNativeSearchDialogLoadStatus(root, '');
   const opener = nativeSearchDialogOpener;
   nativeSearchDialogOpener = undefined;
@@ -471,6 +494,7 @@ const bindSearchDialogLoader = (): void => {
   window.__shelkovoSearchDialogLoader = true;
   document.addEventListener('astro:before-swap', () => {
     latestSearchDialogRequest += 1;
+    clearNativeSearchDialogLoadTimer();
     nativeSearchDialogOpener = undefined;
     const root = document.querySelector<HTMLElement>(SEARCH_DIALOG_ROOT_SELECTOR);
     if (!root || root.hasAttribute(SEARCH_DIALOG_HYDRATED_ATTR)) {
