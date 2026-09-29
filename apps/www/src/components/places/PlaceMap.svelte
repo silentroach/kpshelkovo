@@ -35,6 +35,7 @@
     waitForStableLayout
   } from '@/lib/yandex-maps/runtime';
 
+  import type { PlaceMarkerImage } from './marker-images.types';
   import type { ParcelLayer, ParcelMapItem, ParcelMapPayload } from './parcel-layer-types';
   import {
     createMapFeatures,
@@ -100,9 +101,7 @@
     const payload = (await response.json()) as PlaceMapPublicPayloadDto;
     return payload.places.map(toPlaceMapItem);
   };
-  const CUSTOM_MARKER_IMAGES: Readonly<
-    Record<PlaceMarker, { readonly src: string; readonly width: number; readonly height: number }>
-  > = {
+  const CUSTOM_MARKER_IMAGES: Readonly<Record<PlaceMarker, PlaceMarkerImage>> = {
     apple: APPLE_MARKER,
     animals: ANIMALS_MARKER,
     foodtruck: FOODTRUCK_MARKER,

@@ -7,9 +7,9 @@
   brotli: 8713
   gzip: 9781
 - file: static/BaseLayout.astro_astro_type_script_index_0_lang.XXXXXXXX.js
-  bytes: 11208
-  brotli: 3621
-  gzip: 4167
+  bytes: 11417
+  brotli: 3682
+  gzip: 4230
 - file: static/Breadcrumbs.XXXXXXXX.css
   bytes: 1288
   brotli: 364
@@ -79,9 +79,9 @@
   brotli: 431
   gzip: 530
 - file: static/PlaceMap.XXXXXXXX.js
-  bytes: 25509
-  brotli: 8295
-  gzip: 9357
+  bytes: 25548
+  brotli: 8294
+  gzip: 9373
 - file: static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 693
   brotli: 338
@@ -163,9 +163,9 @@
   brotli: 1970
   gzip: 2265
 - file: static/explorer-component.XXXXXXXX.js
-  bytes: 23084
-  brotli: 7591
-  gzip: 8675
+  bytes: 23166
+  brotli: 7622
+  gzip: 8716
 - file: static/index-1.XXXXXXXX.css
   bytes: 14895
   brotli: 2558
@@ -191,9 +191,9 @@
   brotli: 554
   gzip: 686
 - file: static/index-7.XXXXXXXX.css
-  bytes: 8631
-  brotli: 1609
-  gzip: 1900
+  bytes: 8576
+  brotli: 1604
+  gzip: 1897
 - file: static/index-8.XXXXXXXX.css
   bytes: 13416
   brotli: 2543
@@ -300,7 +300,7 @@
   gzip: 1163
 - file: static/index.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 2092
-  brotli: 996
+  brotli: 995
   gzip: 1150
 - file: static/lazy.XXXXXXXX.css
   bytes: 1999
@@ -308,7 +308,7 @@
   gzip: 667
 - file: static/lazy.XXXXXXXX.js
   bytes: 87670
-  brotli: 25547
+  brotli: 25527
   gzip: 28733
 - file: static/lifecycle.XXXXXXXX.js
   bytes: 1222

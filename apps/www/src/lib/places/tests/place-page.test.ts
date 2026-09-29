@@ -9,6 +9,7 @@ import { PLACE_MARKER_IMAGES } from '@/components/places/marker-images';
 import PlacePreview from '@/components/places/PlacePreview.astro';
 import { buildPlaceMapPublicPayload } from '@/lib/places/map-public';
 import { toPlaceMarkdownPublic } from '@/lib/places/markdown-public';
+import type { PlaceMarker } from '@/lib/places/schema';
 import type { PlaceContact, PlaceOpeningHours } from '@/lib/places/types';
 import { createAstroContainer } from '@/test/astro-container';
 
@@ -53,7 +54,11 @@ const fixture = vi.hoisted(() => ({
       contacts: []
     }
   },
-  neighbors: [] as { readonly slug: string; readonly status: 'planned' | 'underConstruction' }[]
+  neighbors: [] as {
+    readonly slug: string;
+    readonly status: 'planned' | 'underConstruction';
+    readonly marker?: PlaceMarker;
+  }[]
 }));
 
 vi.mock('@/lib/places/load', () => ({
@@ -65,6 +70,7 @@ vi.mock('@/lib/places/load', () => ({
       slug: neighbor.slug,
       name: neighbor.slug,
       status: neighbor.status,
+      marker: neighbor.marker,
       url: `/map/${neighbor.slug}/`
     }))
   ],
@@ -130,11 +136,17 @@ describe('place preview marker', () => {
       const preview = window.document.querySelector('map-preview');
       const template = preview?.querySelector('template');
       const marker = template?.content.querySelector('a');
+      const image = marker?.querySelector('img');
       expect(marker?.getAttribute('href')).toBe(
         mapUrl ?? 'https://yandex.ru/maps/?pt=38,55&z=18&l=map'
       );
       expect({
         rootLink: template?.content.firstElementChild === marker,
+        imageInTemplateOnly: !preview?.querySelector('img') && !!image,
+        imageAttributeOrder: image
+          ?.getAttributeNames()
+          .filter((name) => ['sizes', 'srcset', 'src'].includes(name)),
+        imageDraggable: image?.getAttribute('draggable'),
         hidden: marker?.hasAttribute('aria-hidden'),
         tabIndex: marker?.tabIndex,
         target: marker?.getAttribute('target'),
@@ -146,6 +158,11 @@ describe('place preview marker', () => {
         {
           "draggable": "false",
           "hidden": false,
+          "imageAttributeOrder": [
+            "src",
+          ],
+          "imageDraggable": "false",
+          "imageInTemplateOnly": true,
           "named": true,
           "rel": "noopener noreferrer",
           "rootLink": true,
@@ -154,8 +171,12 @@ describe('place preview marker', () => {
           "titled": true,
         }
       `);
-      expect(marker?.querySelector('img')?.getAttribute('src')).toBe(PLACE_MARKER_IMAGES.fish.src);
-      expect(marker?.querySelector('img')?.getAttribute('alt')).toBe('');
+      expect(image?.getAttribute('src')).toBe(PLACE_MARKER_IMAGES.fish.src);
+      expect(image).toMatchObject({
+        width: PLACE_MARKER_IMAGES.fish.width,
+        height: PLACE_MARKER_IMAGES.fish.height,
+        alt: ''
+      });
       expect(marker?.querySelector('.place-preview__closed-indicator')).toBeTruthy();
       expect(JSON.parse(preview?.getAttribute('data-preview') ?? '{}')).toMatchObject({
         coordinates: place.coordinates,
@@ -323,11 +344,21 @@ describe('/map/[slug]/', () => {
   it('renders nearby links and accessible lifecycle status outside the indexed body without JS', async () => {
     fixture.place.showOnMap = false;
     fixture.neighbors = [
-      { slug: 'planned-place', status: 'planned' },
-      { slug: 'construction-place', status: 'underConstruction' }
+      { slug: 'planned-place', status: 'planned', marker: 'kpp' },
+      { slug: 'construction-place', status: 'underConstruction', marker: 'construction' }
     ];
     const document = await renderPage();
     const nearby = document.querySelector('aside section[aria-labelledby]');
+    for (const neighbor of fixture.neighbors) {
+      const image = nearby?.querySelector(`a[href="/map/${neighbor.slug}/"] img`);
+      const expected = PLACE_MARKER_IMAGES[neighbor.marker!];
+      expect(image?.getAttribute('src')).toBe(expected.src);
+      expect(image).toMatchObject({
+        width: expected.width,
+        height: expected.height,
+        alt: ''
+      });
+    }
     expect(
       [...nearby!.querySelectorAll('li a')].map((link) => ({
         href: link.getAttribute('href'),

@@ -73,7 +73,7 @@ const mount = (data: MapPreviewData = { coordinates: { lng: 37, lat: 55 } }): HT
   const element = document.createElement('test-map-preview');
   element.dataset.preview = JSON.stringify(data);
   element.innerHTML =
-    '<div data-canvas></div><p data-message role="alert" hidden>Карта не загрузилась.</p><template><a href="https://yandex.ru/maps/?original" target="_blank" rel="noopener noreferrer" title="Место на карте" aria-label="Место на карте"><img src="/marker.png" alt="" /></a></template>';
+    '<div data-canvas></div><p data-message role="alert" hidden>Карта не загрузилась.</p><template><a href="https://yandex.ru/maps/?original" target="_blank" rel="noopener noreferrer" title="Место на карте" aria-label="Место на карте"><img src="/marker.webp" width="144" height="137" alt="" /></a></template>';
   setSize(element, 640, 240);
   document.body.append(element);
   return element;
@@ -170,6 +170,29 @@ it('waits for a hidden zero-sized preview to have both dimensions, even if alrea
   setSize(element, 0, 0);
   setSize(element, 640, 240);
   expect(create).toHaveBeenCalledOnce();
+});
+
+it('keeps the image in its template until initialization and preserves it on reconnect', async () => {
+  const { marker } = setupMaps();
+  const ready = Promise.withResolvers<void>();
+  vi.mocked(loadYandexMaps).mockReturnValue(ready.promise);
+  const element = mount();
+  const templateImage = element.querySelector('template')!.content.querySelector('img')!;
+  expect(element.querySelector('img')).toBeFalsy();
+  approach(element);
+  expect(marker).not.toHaveBeenCalled();
+  ready.resolve();
+  await ready.promise;
+  const content = marker.mock.calls[0]![1];
+  expect(content.querySelector('img')).not.toBe(templateImage);
+  expect(content.querySelector('img')?.outerHTML).toBe(templateImage.outerHTML);
+  expect(content.getAttribute('href')).toBe('https://yandex.ru/maps/?original');
+
+  element.remove();
+  document.body.append(element);
+  approach(element);
+  await Promise.resolve();
+  expect(marker.mock.calls[1]?.[1].querySelector('img')?.outerHTML).toBe(templateImage.outerHTML);
 });
 
 it('does not start a removed preview or finish SDK initialization after disconnection', async () => {

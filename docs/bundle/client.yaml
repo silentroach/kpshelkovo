@@ -16,7 +16,7 @@ static/BaseLayout.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/scripts/search-dialog-loader.ts:
     rendered: 157
   apps/www/src/scripts/site-runtime.ts:
-    rendered: 12591
+    rendered: 13368
 static/ClientRouter.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   astro:transitions/client:
     rendered: 0
@@ -61,7 +61,7 @@ static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/place-map-url.ts:
     rendered: 698
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 47421
+    rendered: 47455
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:
@@ -72,22 +72,22 @@ static/PlaceMap.XXXXXXXX.js:
     rendered: 190
   apps/www/src/lib/site.ts:
     rendered: 115
-  packages/ui/src/markers/Animals.png?url:
-    rendered: 133
-  packages/ui/src/markers/Apple.png?url:
-    rendered: 129
-  packages/ui/src/markers/Construction.png?url:
-    rendered: 143
-  packages/ui/src/markers/Fish.png?url:
-    rendered: 127
-  packages/ui/src/markers/Foodtruck.png?url:
-    rendered: 137
+  packages/ui/src/markers/Animals.webp?url:
+    rendered: 134
+  packages/ui/src/markers/Apple.webp?url:
+    rendered: 130
+  packages/ui/src/markers/Construction.webp?url:
+    rendered: 144
+  packages/ui/src/markers/Fish.webp?url:
+    rendered: 128
+  packages/ui/src/markers/Foodtruck.webp?url:
+    rendered: 138
   packages/ui/src/markers/index.ts:
     rendered: 583
-  packages/ui/src/markers/Kpp.png?url:
-    rendered: 125
-  packages/ui/src/markers/Titanic.png?url:
-    rendered: 133
+  packages/ui/src/markers/Kpp.webp?url:
+    rendered: 126
+  packages/ui/src/markers/Titanic.webp?url:
+    rendered: 134
 static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/components/places/PlaceOpeningHours.astro?astro&type=script&index=0&lang.ts:
     rendered: 1167
@@ -340,7 +340,7 @@ static/explorer-component.XXXXXXXX.js:
   apps/www/src/compare/components/SettlementCard.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/compare/components/SettlementMap.svelte:
-    rendered: 16109
+    rendered: 16221
   apps/www/src/compare/components/SettlementMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/compare/components/SettlementsExplorer.svelte:

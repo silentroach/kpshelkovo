@@ -8,6 +8,7 @@ import type {
 import { createRawSnippet } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { PLACE_MARKER_IMAGES } from '@/components/places/marker-images';
 import type { ParcelDetailsPublicDto } from '@/lib/parcels/details-public-schema';
 import type { PlaceMapPublicItemDto } from '@/lib/places/map-public-dto';
 import type { PlaceMapItem } from '@/lib/places/map-types';
@@ -686,164 +687,55 @@ describe('PlaceMap', () => {
     });
   });
 
-  it('uses the selected custom marker', async () => {
-    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+  it.each(['apple', 'animals', 'construction', 'fish', 'foodtruck', 'kpp', 'titanic'] as const)(
+    'uses the full-size %s image and preserves the place link and status',
+    async (markerType) => {
+      vi.stubGlobal('matchMedia', () => ({ matches: false }));
+      render(PlaceMap, {
+        props: {
+          places: [
+            { ...place, marker: markerType, status: 'underConstruction', statusLabel: 'Строится' }
+          ]
+        }
+      });
+      await waitFor(() => expect(markerElements).toHaveLength(1));
 
-    render(PlaceMap, {
-      props: {
-        places: [
-          {
-            ...titanicPlace,
-            slug: 'apple-garden',
-            name: 'Яблоневый сад',
-            marker: 'apple'
-          },
-          { ...place, marker: 'foodtruck' },
-          titanicPlace,
-          {
-            ...titanicPlace,
-            slug: 'construction',
-            name: 'Строительство',
-            marker: 'construction',
-            status: 'underConstruction',
-            statusLabel: 'Строится'
-          },
-          {
-            ...titanicPlace,
-            slug: 'hunting-ponds',
-            name: 'Охотничьи пруды',
-            marker: 'fish'
-          },
-          {
-            ...titanicPlace,
-            slug: 'forest-checkpoint',
-            name: 'КПП Фореста',
-            marker: 'kpp'
-          },
-          {
-            ...titanicPlace,
-            slug: 'animals-wehome',
-            name: 'Животные в Зеркальных домах',
-            marker: 'animals'
-          }
-        ]
-      }
-    });
-
-    await waitFor(() => expect(markerElements).toHaveLength(7));
-
-    const markerDetails = markerElements.map((marker) => {
+      const marker = markerElements[0]!;
       const image = marker.querySelector('img');
-
-      return {
-        marker: marker.dataset.marker,
-        graphicClass: marker.querySelector('[aria-hidden="true"]')?.className,
-        hasClosedIndicator: Boolean(marker.querySelector('.place-map-marker-closed-indicator')),
-        imageClass: image?.className,
-        imageDimensions: [image?.width, image?.height],
-        imageFile: image?.src.split('/').at(-1),
-        usesDefaultPoint: Boolean(marker.querySelector('.ui-map-marker'))
-      };
-    });
-
-    expect(markerDetails).toMatchInlineSnapshot(`
-      [
+      const expected = PLACE_MARKER_IMAGES[markerType];
+      expect(image).toMatchObject({
+        src: new URL(expected.src, window.location.href).href,
+        width: expected.width,
+        height: expected.height,
+        alt: '',
+        draggable: false
+      });
+      expect(marker.dataset.marker).toBe(markerType);
+      expect({
+        imageAttributeOrder: image
+          ?.getAttributeNames()
+          .filter((name) => ['sizes', 'srcset', 'src'].includes(name)),
+        href: marker.getAttribute('href'),
+        status: marker.dataset.status,
+        open: marker.dataset.open,
+        ariaLabel: marker.getAttribute('aria-label'),
+        title: marker.title,
+        hasClosedIndicator: !!marker.querySelector('.place-map-marker-closed-indicator')
+      }).toMatchInlineSnapshot(`
         {
-          "graphicClass": "place-map-marker-graphic",
+          "ariaLabel": "Открыть место «Буржуйка», Строится, сейчас закрыто",
           "hasClosedIndicator": true,
-          "imageClass": "place-map-marker-image",
-          "imageDimensions": [
-            144,
-            144,
+          "href": "/map/burzhuyka/",
+          "imageAttributeOrder": [
+            "src",
           ],
-          "imageFile": "Apple.png",
-          "marker": "apple",
-          "usesDefaultPoint": false,
-        },
-        {
-          "graphicClass": "place-map-marker-graphic",
-          "hasClosedIndicator": true,
-          "imageClass": "place-map-marker-image",
-          "imageDimensions": [
-            144,
-            128,
-          ],
-          "imageFile": "Foodtruck.png",
-          "marker": "foodtruck",
-          "usesDefaultPoint": false,
-        },
-        {
-          "graphicClass": "place-map-marker-graphic",
-          "hasClosedIndicator": true,
-          "imageClass": "place-map-marker-image",
-          "imageDimensions": [
-            144,
-            137,
-          ],
-          "imageFile": "Titanic.png",
-          "marker": "titanic",
-          "usesDefaultPoint": false,
-        },
-        {
-          "graphicClass": "place-map-marker-graphic",
-          "hasClosedIndicator": true,
-          "imageClass": "place-map-marker-image",
-          "imageDimensions": [
-            144,
-            141,
-          ],
-          "imageFile": "Construction.png",
-          "marker": "construction",
-          "usesDefaultPoint": false,
-        },
-        {
-          "graphicClass": "place-map-marker-graphic",
-          "hasClosedIndicator": true,
-          "imageClass": "place-map-marker-image",
-          "imageDimensions": [
-            144,
-            144,
-          ],
-          "imageFile": "Fish.png",
-          "marker": "fish",
-          "usesDefaultPoint": false,
-        },
-        {
-          "graphicClass": "place-map-marker-graphic",
-          "hasClosedIndicator": true,
-          "imageClass": "place-map-marker-image",
-          "imageDimensions": [
-            144,
-            137,
-          ],
-          "imageFile": "Kpp.png",
-          "marker": "kpp",
-          "usesDefaultPoint": false,
-        },
-        {
-          "graphicClass": "place-map-marker-graphic",
-          "hasClosedIndicator": true,
-          "imageClass": "place-map-marker-image",
-          "imageDimensions": [
-            144,
-            144,
-          ],
-          "imageFile": "Animals.png",
-          "marker": "animals",
-          "usesDefaultPoint": false,
-        },
-      ]
-    `);
-    expect({
-      ariaLabel: markerElements[3]?.getAttribute('aria-label'),
-      title: markerElements[3]?.title
-    }).toMatchInlineSnapshot(`
-      {
-        "ariaLabel": "Открыть место «Строительство», Строится, сейчас закрыто",
-        "title": "Строительство",
-      }
-    `);
-  });
+          "open": "false",
+          "status": "underConstruction",
+          "title": "Буржуйка",
+        }
+      `);
+    }
+  );
 
   it('focuses and highlights the requested place for five seconds', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: false }));
