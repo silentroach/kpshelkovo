@@ -8,7 +8,7 @@
 
 ### Requirement: Метаданные карточки доступны во frontmatter
 
-Документ `/map/[slug]/index.md` SHALL начинаться с YAML frontmatter. Он SHALL содержать название места в `title`, машинный код `category`, lifecycle-код `status` (`existing`, `planned` или `underConstruction`), числовые `coordinates.lat` и `coordinates.lng` по [public-coordinate-precision](../public-coordinate-precision/spec.md) и `address` при наличии адреса. `status` SHALL не означать текущую открытость места. Отсутствующие необязательные сведения SHALL не публиковаться как пустые поля, `null` или строка `undefined`. Внутренние редакционные и технические поля SHALL не попадать в публичный frontmatter автоматически.
+Документ `/map/[slug]/index.md` SHALL начинаться с YAML frontmatter. Он SHALL содержать название места в `title`, машинный код `category`, lifecycle-код `status` (`existing`, `planned` или `underConstruction`), числовые `coordinates.lat` и `coordinates.lng` по [public-coordinate-precision](/openspec/specs/public-coordinate-precision/spec.md) и `address` при наличии адреса. `status` SHALL не означать текущую открытость места. Отсутствующие необязательные сведения SHALL не публиковаться как пустые поля, `null` или строка `undefined`. Внутренние редакционные и технические поля SHALL не попадать в публичный frontmatter автоматически.
 
 #### Scenario: Карточка с адресом
 

@@ -22,7 +22,7 @@
 
 ### Requirement: Скрытое с карты место остаётся публичной сущностью
 
-Публичная HTML- и Markdown-карточка, canonical URL, sitemap, поиск и упоминания места SHALL не зависеть от `show_on_map`. Карточка SHALL предлагать переход к точке на общей карте только для включённого места. Внешняя карта SHALL не зависеть от этого флажка: действия HTML-превью следуют [site-maps](../site-maps/spec.md), включая отсутствие резервного перехода при загрузке, ошибке и без JavaScript; Markdown сохраняет внешний URL по [place-markdown-card](../place-markdown-card/spec.md).
+Публичная HTML- и Markdown-карточка, canonical URL, sitemap, поиск и упоминания места SHALL не зависеть от `show_on_map`. Карточка SHALL предлагать переход к точке на общей карте только для включённого места. Внешняя карта SHALL не зависеть от этого флажка: действия HTML-превью следуют [site-maps](/openspec/specs/site-maps/spec.md), включая отсутствие резервного перехода при загрузке, ошибке и без JavaScript; Markdown сохраняет внешний URL по [place-markdown-card](/openspec/specs/place-markdown-card/spec.md).
 
 #### Scenario: Доступ к скрытой карточке
 

@@ -31,7 +31,7 @@
 
 ### Requirement: Новостной экспорт сохраняет контекст публикации
 
-Новостной ICS SHALL передавать интервал по общим правилам [events-calendar](../events-calendar/spec.md), сохранять момент публикации статьи в `DTSTAMP` и её каноническую ссылку в `URL`.
+Новостной ICS SHALL передавать интервал по общим правилам [events-calendar](/openspec/specs/events-calendar/spec.md), сохранять момент публикации статьи в `DTSTAMP` и её каноническую ссылку в `URL`.
 
 #### Scenario: Повторная сборка
 
