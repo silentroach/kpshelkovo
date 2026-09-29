@@ -73,7 +73,7 @@ const renderSearchShell = () => {
 beforeEach(() => {
   highlightSearchTerms.mockClear();
   installActiveVisitTracker.mockClear();
-  openSearchDialog.mockClear();
+  openSearchDialog.mockReset();
   loadSearchDialog.mockReset();
   loadSearchDialog.mockResolvedValue({ openSearchDialog });
 });
@@ -170,7 +170,9 @@ describe('home hero fallback', () => {
 
 describe('search dialog loader', () => {
   it('opens synchronously and forwards the exact pre-hydration query', async () => {
-    const { dialog, input, loadAnnouncement, loadMessage, opener, root } = renderSearchShell();
+    vi.useFakeTimers();
+    const { dialog, input, loadAnnouncement, loadMessage, loadStatus, opener, root } =
+      renderSearchShell();
 
     const click = new MouseEvent('click', {
       bubbles: true,
@@ -181,14 +183,171 @@ describe('search dialog loader', () => {
     expect(dialog.open).toBe(true);
     expect(document.activeElement).toBe(input);
     expect(click.defaultPrevented).toBe(true);
-    expect(loadMessage.textContent).toBe('Загружаем поиск…');
-    expect(loadAnnouncement.textContent).toBe('Загружаем поиск…');
+    expect(loadSearchDialog).toHaveBeenCalledOnce();
+    expect(loadStatus.hidden).toBe(true);
+    expect(loadMessage.textContent).toBe('');
+    expect(loadAnnouncement.textContent).toBe('');
 
     input.value = 'вода';
 
-    await vi.waitFor(() => expect(openSearchDialog).toHaveBeenCalledOnce());
+    await vi.advanceTimersByTimeAsync(0);
+    expect(openSearchDialog).toHaveBeenCalledOnce();
     expect(openSearchDialog).toHaveBeenCalledWith(root, opener, 'вода');
     expect(input.value).toBe('вода');
+    await vi.advanceTimersByTimeAsync(200);
+    expect(loadStatus.hidden).toBe(true);
+    expect(loadAnnouncement.textContent).toBe('');
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('shows and announces loading at 200 ms, then removes it immediately on readiness', async () => {
+    vi.useFakeTimers();
+    const pending = Promise.withResolvers<Awaited<ReturnType<typeof loadSearchDialog>>>();
+    loadSearchDialog.mockReturnValueOnce(pending.promise);
+    const { input, loadAnnouncement, loadMessage, loadStatus, opener, root } = renderSearchShell();
+
+    opener.click();
+    input.value = '  вода  ';
+    await vi.advanceTimersByTimeAsync(199);
+    expect(loadStatus.hidden).toBe(true);
+    expect(loadMessage.textContent).toBe('');
+    expect(loadAnnouncement.textContent).toBe('');
+
+    await vi.advanceTimersByTimeAsync(1);
+    expect(loadStatus.hidden).toBe(false);
+    expect(loadMessage.textContent).toBe('Загружаем поиск…');
+    expect(loadAnnouncement.textContent).toBe(loadMessage.textContent);
+    expect(document.activeElement).toBe(input);
+
+    pending.resolve({ openSearchDialog });
+    await vi.advanceTimersByTimeAsync(0);
+    expect(openSearchDialog).toHaveBeenCalledWith(root, opener, '  вода  ');
+    expect(input.value).toBe('  вода  ');
+    expect(loadStatus.hidden).toBe(true);
+    expect(loadMessage.textContent).toBe('');
+    expect(loadAnnouncement.textContent).toBe('');
+  });
+
+  it.each([100, 250])(
+    'shows failure immediately after %i ms without a later loading announcement',
+    async (delay) => {
+      vi.useFakeTimers();
+      const pending = Promise.withResolvers<Awaited<ReturnType<typeof loadSearchDialog>>>();
+      loadSearchDialog.mockReturnValueOnce(pending.promise);
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      const { input, loadAnnouncement, loadMessage, loadStatus, opener } = renderSearchShell();
+
+      opener.click();
+      input.value = 'вода';
+      await vi.advanceTimersByTimeAsync(delay);
+      pending.reject(new Error('chunk unavailable'));
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(loadStatus.hidden).toBe(false);
+      expect(loadMessage.textContent).toContain('обновить страницу');
+      expect(loadAnnouncement.textContent).toBe(loadMessage.textContent);
+      expect(input.value).toBe('вода');
+      expect(document.activeElement).toBe(input);
+      const message = loadMessage.textContent;
+      await vi.advanceTimersByTimeAsync(200);
+      expect(loadMessage.textContent).toBe(message);
+      expect(loadAnnouncement.textContent).toBe(message);
+      expect(vi.getTimerCount()).toBe(0);
+    }
+  );
+
+  it.each([
+    ['close', 100],
+    ['close', 250],
+    ['swap', 100],
+    ['swap', 250]
+  ] as const)('cancels the indicator on %s after %i ms', async (action, delay) => {
+    vi.useFakeTimers();
+    const pending = Promise.withResolvers<Awaited<ReturnType<typeof loadSearchDialog>>>();
+    loadSearchDialog.mockReturnValueOnce(pending.promise);
+    const { close, dialog, loadAnnouncement, loadMessage, loadStatus, opener } =
+      renderSearchShell();
+
+    opener.click();
+    await vi.advanceTimersByTimeAsync(delay);
+    if (action === 'close') {
+      close.click();
+      expect(document.activeElement).toBe(opener);
+    } else {
+      document.dispatchEvent(new Event('astro:before-swap'));
+      expect(document.activeElement).not.toBe(opener);
+    }
+    expect(vi.getTimerCount()).toBe(0);
+    await vi.advanceTimersByTimeAsync(200);
+    pending.resolve({ openSearchDialog });
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(dialog.open).toBe(false);
+    expect(openSearchDialog).not.toHaveBeenCalled();
+    expect(loadStatus.hidden).toBe(true);
+    expect(loadMessage.textContent).toBe('');
+    expect(loadAnnouncement.textContent).toBe('');
+  });
+
+  it.each([
+    ['resolve', 100],
+    ['resolve', 200],
+    ['reject', 100],
+    ['reject', 200]
+  ] as const)('ignores old %s after %i ms of a reopened request', async (completion, delay) => {
+    vi.useFakeTimers();
+    const previous = Promise.withResolvers<Awaited<ReturnType<typeof loadSearchDialog>>>();
+    const current = Promise.withResolvers<Awaited<ReturnType<typeof loadSearchDialog>>>();
+    loadSearchDialog.mockReturnValueOnce(previous.promise).mockReturnValueOnce(current.promise);
+    const { dialog, input, loadAnnouncement, loadMessage, loadStatus, opener, root } =
+      renderSearchShell();
+
+    opener.click();
+    await vi.advanceTimersByTimeAsync(100);
+    dialog.close();
+    opener.click();
+    input.value = 'дороги';
+    await vi.advanceTimersByTimeAsync(100);
+    expect(loadStatus.hidden).toBe(true);
+    await vi.advanceTimersByTimeAsync(delay - 100);
+
+    if (completion === 'resolve') {
+      previous.resolve({ openSearchDialog });
+    } else {
+      previous.reject(new Error('old chunk unavailable'));
+    }
+    await vi.advanceTimersByTimeAsync(0);
+    expect(openSearchDialog).not.toHaveBeenCalled();
+    expect(loadStatus.hidden).toBe(delay < 200);
+    expect(loadAnnouncement.textContent).toBe(loadMessage.textContent);
+    await vi.advanceTimersByTimeAsync(200 - delay);
+    expect(loadStatus.hidden).toBe(false);
+    expect(loadMessage.textContent).toBe('Загружаем поиск…');
+    expect(loadAnnouncement.textContent).toBe(loadMessage.textContent);
+
+    current.resolve({ openSearchDialog });
+    await vi.advanceTimersByTimeAsync(0);
+    expect(openSearchDialog).toHaveBeenCalledExactlyOnceWith(root, opener, 'дороги');
+    expect(loadStatus.hidden).toBe(true);
+    expect(loadAnnouncement.textContent).toBe('');
+  });
+
+  it('reopens a hydrated interface without scheduling a loading indicator', async () => {
+    vi.useFakeTimers();
+    const { dialog, input, loadAnnouncement, loadStatus, opener, root } = renderSearchShell();
+    openSearchDialog.mockImplementation(() => root.setAttribute('data-search-dialog-hydrated', ''));
+
+    opener.click();
+    await vi.advanceTimersByTimeAsync(0);
+    dialog.close();
+    opener.click();
+    expect(dialog.open).toBe(true);
+    expect(document.activeElement).toBe(input);
+    expect(vi.getTimerCount()).toBe(0);
+    await vi.advanceTimersByTimeAsync(200);
+    expect(openSearchDialog).toHaveBeenCalledTimes(2);
+    expect(loadStatus.hidden).toBe(true);
+    expect(loadAnnouncement.textContent).toBe('');
   });
 
   it('announces a failed import without a recovery button or automatic reload', async () => {
