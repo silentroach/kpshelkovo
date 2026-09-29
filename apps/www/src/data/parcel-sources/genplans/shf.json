@@ -1,7 +1,7 @@
 {
   "part": "shf",
   "page": "https://dgtime.ru/shf/shf-genplan/",
-  "capturedAt": "2026-09-28T08:35:38.423Z",
+  "capturedAt": "2026-09-29T09:17:37.984Z",
   "plots": [
     {
       "id": "M1",
@@ -90,7 +90,7 @@
     {
       "id": "M14",
       "cadastralReference": "50:33:0010101:1268",
-      "status": "Забронирован",
+      "status": "Свободен",
       "location": "с видом на лес",
       "objectprice": 3324050
     },
