@@ -9,7 +9,7 @@
 - `openspec/config.yaml` доставляет правила задач через `rules.tasks`, а инструкции исполнителю — через `operations.apply.guidance`. Изменение этих полей не требует править сгенерированные skills.
 - `scripts/openspec.mjs` обновляет только `openspec-*` skills и `opsx-*` commands. Собственный agent-файл хранится в Git и не требует изменения генератора.
 - `scripts/agent-tooling.test.mjs` проверяет генерацию и skills; runtime permissions и качество ревью эти тесты не проверяют. Workflow `Agent tooling` уже охватывает планируемые пути.
-- Основание решения — [ADR-038](../../../docs/decisions/038-openspec-development-workflow.md): штатная интеграция, проектные дополнения в собственных файлах и config, ревью внутри общего процесса. Нового архитектурного механизма нет.
+- Основание решения — [ADR-038](../../../../docs/decisions/038-openspec-development-workflow.md): штатная интеграция, проектные дополнения в собственных файлах и config, ревью внутри общего процесса. Нового архитектурного механизма нет.
 
 ## Goals / Non-Goals
 

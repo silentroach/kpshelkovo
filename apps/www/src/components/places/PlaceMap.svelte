@@ -10,10 +10,15 @@
     TITANIC_MARKER
   } from '@shelkovo/ui/markers';
   import type { Feature } from '@yandex/ymaps3-clusterer';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
 
   import { createEditorialMapObjects } from '@/components/maps/editorial-map';
-  import { getUrlWithoutParcel, PARCEL_QUERY_PARAM } from '@/lib/parcels/parcel-url';
+  import type { ParcelDetailsPublicDto } from '@/lib/parcels/details-public-schema';
+  import {
+    getUrlWithParcel,
+    getUrlWithoutParcel,
+    PARCEL_QUERY_PARAM
+  } from '@/lib/parcels/parcel-url';
   import { PARCEL_CODE, type ParcelPart } from '@/lib/parcels/schema';
   import type {
     PlaceMapPublicItemDto,
@@ -30,7 +35,7 @@
     waitForStableLayout
   } from '@/lib/yandex-maps/runtime';
 
-  import type { ParcelLayer, ParcelMapPayload } from './parcel-layer-types';
+  import type { ParcelLayer, ParcelMapItem, ParcelMapPayload } from './parcel-layer-types';
   import {
     createMapFeatures,
     fromPublicEditorialGeometry,
@@ -64,6 +69,8 @@
     shp: 'Парк',
     shr: 'Ривер'
   };
+  const areaFormatter = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
+  const priceFormatter = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 });
   const toPlaceMapItem = (place: PlaceMapPublicItemDto): PlaceMapItem => ({
     slug: place.slug,
     name: place.name,
@@ -146,6 +153,24 @@
   let layersOpen = $state(false);
   let layersControl: HTMLDivElement | undefined = $state(undefined);
   let layersButton: HTMLButtonElement | undefined = $state(undefined);
+  let mapRoot: HTMLDivElement | undefined;
+  let popupElement: HTMLDivElement | undefined = $state(undefined);
+  let popupClose: HTMLButtonElement | undefined = $state(undefined);
+  let selectedParcel: ParcelMapItem | undefined = $state(undefined);
+  let selectedDetails: ParcelDetailsPublicDto | undefined = $state(undefined);
+  let detailsLoading = $state(false);
+  let detailsError = $state(false);
+  let popupPosition:
+    | {
+        readonly x: number;
+        readonly y: number;
+        readonly arrowX: number;
+        readonly arrow?: 'up' | 'down';
+      }
+    | undefined = $state(undefined);
+  let retryDetails = $state<() => void>(() => {});
+  let closeParcel = $state<(restoreFocus?: boolean) => void>(() => {});
+  let clearSelectedParcel: (() => void) | undefined;
   let toggleParcelPart: (part: ParcelPart, checked: boolean) => void;
   let toggleAllParcels = $state<() => void>(() => {});
   let errorPlace = $derived(places[0] ?? fallbackPlace);
@@ -226,7 +251,14 @@
     link.href = place.url;
     link.dataset.status = place.status;
     updateMarkerContent(place, link);
-    link.addEventListener('click', (event) => event.stopPropagation(), options);
+    link.addEventListener(
+      'click',
+      (event) => {
+        event.stopPropagation();
+        clearSelectedParcel?.();
+      },
+      options
+    );
     link.addEventListener(
       'mouseenter',
       () => {
@@ -420,13 +452,280 @@
 
   onMount(() => {
     let destroyed = false;
+    let parcelLayer: ParcelLayer | undefined;
+    let popupAnchor: ymaps3.YMapMarker | undefined;
+    let anchorElement: HTMLDivElement | undefined;
+    let positionFrame: number | undefined;
+    let focusSource: HTMLButtonElement | undefined;
+    let selectionRevision = 0;
+    let focusingDirectLink = false;
+    let selectedThisGesture = false;
+    let pointerStart: { readonly x: number; readonly y: number } | undefined;
+    let pointerMoved = false;
+    const detailsCache = new Map<string, ParcelDetailsPublicDto>();
+    const detailsRequests = new Map<string, Promise<ParcelDetailsPublicDto>>();
+    const positionPopup = (): void => {
+      if (!selectedParcel || !mapContainer || !mapRoot) return;
+      const rect = mapContainer.getBoundingClientRect();
+      const anchor = anchorElement?.isConnected ? anchorElement.getBoundingClientRect() : undefined;
+      const width = popupElement?.offsetWidth || Math.min(240, Math.max(0, rect.width - 24));
+      const height = popupElement?.offsetHeight || 160;
+      const top = Math.min(112, Math.max(12, rect.height / 4));
+      const bottom = Math.min(48, Math.max(12, rect.height / 5));
+      const x = anchor ? anchor.left - rect.left + anchor.width / 2 : rect.width / 2;
+      const y = anchor ? anchor.top - rect.top + anchor.height / 2 : rect.height / 2;
+      const gap = 40;
+      const maxY = rect.height - bottom - height;
+      let popupX = Math.max(12, Math.min(rect.width - width - 12, x - width / 2));
+      let popupY: number;
+      if (y - height - gap >= top && y - height - gap <= maxY) {
+        popupY = y - height - gap;
+      } else if (y + gap <= maxY) {
+        popupY = Math.max(top, y + gap);
+      } else if (
+        anchor &&
+        x >= 0 &&
+        x <= rect.width &&
+        y >= 0 &&
+        y <= rect.height &&
+        x + gap + width <= rect.width - 12
+      ) {
+        popupX = x + gap;
+        popupY = Math.max(top, Math.min(maxY, y - height / 2));
+      } else if (
+        anchor &&
+        x >= 0 &&
+        x <= rect.width &&
+        y >= 0 &&
+        y <= rect.height &&
+        x - gap - width >= 12
+      ) {
+        popupX = x - gap - width;
+        popupY = Math.max(top, Math.min(maxY, y - height / 2));
+      } else {
+        popupY = Math.max(top, Math.min(maxY, y - height - gap));
+      }
+      const arrowX = x - popupX;
+      let arrow: 'up' | 'down' | undefined;
+      if (
+        anchor &&
+        x >= 0 &&
+        x <= rect.width &&
+        y >= 0 &&
+        y <= rect.height &&
+        arrowX >= 12 &&
+        arrowX <= width - 12
+      ) {
+        if (y >= popupY + height + 16 && y - popupY - height <= gap + 8) arrow = 'down';
+        else if (y <= popupY - 16 && popupY - y <= gap + 8) arrow = 'up';
+      }
+      popupPosition = {
+        x: popupX,
+        y: popupY,
+        arrowX,
+        arrow
+      };
+    };
+    const schedulePopupPosition = (): void => {
+      if (positionFrame !== undefined) window.cancelAnimationFrame(positionFrame);
+      positionFrame = window.requestAnimationFrame(() => {
+        positionFrame = undefined;
+        positionPopup();
+      });
+    };
+    const loadDetails = async (code: string): Promise<ParcelDetailsPublicDto> => {
+      const cached = detailsCache.get(code);
+      if (cached) return cached;
+      let pending = detailsRequests.get(code);
+      if (!pending) {
+        pending = (async () => {
+          const response = await fetch(
+            `/map/data/parcels/details/${encodeURIComponent(code)}.json`
+          );
+          if (!response.ok) throw new Error('Не удалось загрузить сведения об участке');
+          const details = (await response.json()) as ParcelDetailsPublicDto;
+          if (!details || details.code !== code || !Array.isArray(details.price?.history))
+            throw new Error('Неверный формат сведений об участке');
+          // Полную историю проверяет сборка; здесь защищаем только значения, показанные в попапе.
+          const last = details.price.last;
+          if (
+            (details.area !== undefined && (!Number.isFinite(details.area) || details.area <= 0)) ||
+            (last !== undefined && (!Number.isFinite(last) || last <= 0)) ||
+            (details.price.history.length === 0 ? last !== undefined : last === undefined)
+          )
+            throw new Error('Неверный формат сведений об участке');
+          return details;
+        })();
+        detailsRequests.set(code, pending);
+        void pending.then(
+          (details) => {
+            detailsRequests.delete(code);
+            if (!destroyed) detailsCache.set(code, details);
+          },
+          () => detailsRequests.delete(code)
+        );
+      }
+      return pending;
+    };
+    const showDetails = (item: ParcelMapItem): void => {
+      const revision = selectionRevision;
+      selectedDetails = detailsCache.get(item.code);
+      detailsError = false;
+      detailsLoading = !selectedDetails;
+      if (selectedDetails) return;
+      void loadDetails(item.code).then(
+        (details) => {
+          if (destroyed || selectionRevision !== revision) return;
+          selectedDetails = details;
+          detailsLoading = false;
+          schedulePopupPosition();
+        },
+        () => {
+          if (destroyed || selectionRevision !== revision) return;
+          detailsLoading = false;
+          detailsError = true;
+          schedulePopupPosition();
+        }
+      );
+    };
+    retryDetails = () => {
+      if (selectedParcel && !detailsLoading) showDetails(selectedParcel);
+    };
+    const removePopupAnchor = (): void => {
+      if (popupAnchor && map) map.removeChild(popupAnchor);
+      anchorElement?.remove();
+      popupAnchor = undefined;
+      anchorElement = undefined;
+      popupPosition = undefined;
+      if (positionFrame !== undefined) window.cancelAnimationFrame(positionFrame);
+      positionFrame = undefined;
+    };
+    const removeParcelQuery = (code?: string): void => {
+      const url = getUrlWithoutParcel(window.location.href, code);
+      if (url) window.history.replaceState(window.history.state, '', url);
+    };
+    const onParcelSelection = (item?: ParcelMapItem, source?: HTMLButtonElement): void => {
+      if (destroyed) return;
+      if (!item) {
+        const previousCode = selectedParcel?.code;
+        selectionRevision++;
+        selectedParcel = undefined;
+        selectedDetails = undefined;
+        detailsLoading = false;
+        detailsError = false;
+        focusSource = undefined;
+        removePopupAnchor();
+        removeParcelQuery(previousCode);
+        return;
+      }
+      selectedThisGesture = true;
+      if (!focusingDirectLink && pendingParcelCode) {
+        pendingParcelCode = undefined;
+        pendingParcelPart = undefined;
+      }
+      if (new URL(window.location.href).searchParams.get(PARCEL_QUERY_PARAM) !== item.code)
+        window.history.replaceState(
+          window.history.state,
+          '',
+          getUrlWithParcel(window.location.href, item.code)
+        );
+      if (selectedParcel?.code === item.code) {
+        if (source && (item.status === 'available' || item.status === 'reserved')) {
+          focusSource = source;
+          void tick().then(() => {
+            if (!destroyed && selectedParcel?.code === item.code && focusSource === source)
+              popupClose?.focus({ preventScroll: true });
+          });
+        }
+        return;
+      }
+      selectionRevision++;
+      removePopupAnchor();
+      selectedParcel = item;
+      selectedDetails = undefined;
+      detailsLoading = false;
+      detailsError = false;
+      focusSource = source;
+      if (item.status !== 'available' && item.status !== 'reserved') return;
+      if (map) {
+        anchorElement = document.createElement('div');
+        anchorElement.className = 'parcel-map-popup-anchor';
+        popupAnchor = new window.ymaps3.YMapMarker(
+          { coordinates: item.labelCoordinates },
+          anchorElement
+        );
+        map.addChild(popupAnchor);
+      }
+      positionPopup();
+      schedulePopupPosition();
+      showDetails(item);
+      if (source) {
+        void tick().then(() => {
+          if (!destroyed && selectedParcel?.code === item.code && focusSource === source)
+            popupClose?.focus({ preventScroll: true });
+        });
+      }
+    };
+    closeParcel = (restoreFocus = false): void => {
+      const source = focusSource;
+      parcelLayer?.clearSelection();
+      if (!restoreFocus) return;
+      if (source?.isConnected && mapContainer?.contains(source))
+        source.focus({ preventScroll: true });
+      else mapContainer?.focus({ preventScroll: true });
+    };
+    clearSelectedParcel = () => {
+      if (pendingParcelCode) {
+        removeParcelQuery(pendingParcelCode);
+        pendingParcelCode = undefined;
+        pendingParcelPart = undefined;
+      }
+      parcelLayer?.clearSelection();
+    };
+    const onPointerDown = (event: PointerEvent): void => {
+      pointerStart = { x: event.clientX, y: event.clientY };
+      pointerMoved = false;
+      selectedThisGesture = false;
+    };
+    const onPointerMove = (event: PointerEvent): void => {
+      if (
+        pointerStart &&
+        Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y) > 6
+      )
+        pointerMoved = true;
+    };
+    mapContainer?.addEventListener('pointerdown', onPointerDown, { signal: markerEvents.signal });
+    mapContainer?.addEventListener('pointermove', onPointerMove, { signal: markerEvents.signal });
     const closeLayersOutside = (event: PointerEvent): void => {
       if (!layersControl?.contains(event.target as Node)) layersOpen = false;
     };
     const closeLayersOnEscape = (event: KeyboardEvent): void => {
-      if (event.key !== 'Escape' || !layersOpen) return;
-      layersOpen = false;
-      layersButton?.focus();
+      if (event.key !== 'Escape' || event.defaultPrevented) return;
+      if (
+        layersOpen &&
+        (event.target === document ||
+          event.target === document.body ||
+          layersControl?.contains(event.target as Node))
+      ) {
+        layersOpen = false;
+        layersButton?.focus();
+        event.preventDefault();
+        return;
+      }
+      if (
+        !selectedParcel ||
+        (event.target instanceof Element && event.target.closest('[role="dialog"]'))
+      )
+        return;
+      if (
+        event.target !== document &&
+        event.target !== document.body &&
+        !mapRoot?.contains(event.target as Node)
+      )
+        return;
+      const restore = Boolean(popupElement?.contains(event.target as Node) || focusSource);
+      closeParcel(restore);
+      event.preventDefault();
     };
     document.addEventListener('pointerdown', closeLayersOutside);
     document.addEventListener('keydown', closeLayersOnEscape);
@@ -454,7 +753,6 @@
       { signal: markerEvents.signal }
     );
     const parcelRevisions = new Map<ParcelPart, number>();
-    let parcelLayer: ParcelLayer | undefined;
     const parcelData = new Map<ParcelPart, ParcelMapPayload>();
     const parcelRequests = new Map<ParcelPart, Promise<ParcelMapPayload>>();
     let pendingParcelCode: string | undefined;
@@ -464,10 +762,6 @@
     const requestedParcelCode =
       new URL(window.location.href).searchParams.get(PARCEL_QUERY_PARAM) || undefined;
     const parcelCode = requestedParcelCode?.toUpperCase();
-    const removeParcelQuery = (code?: string): void => {
-      const url = getUrlWithoutParcel(window.location.href, code);
-      if (url) window.history.replaceState(window.history.state, '', url);
-    };
     const loadParcelData = async (part: ParcelPart): Promise<ParcelMapPayload> => {
       const cached = parcelData.get(part);
       if (cached) return cached;
@@ -512,12 +806,12 @@
         if (!map || !mapContainer) return;
         const data = await loadParcelData(part);
         if (!stillSelected() || !map || !mapContainer) return;
-        const focusCode = pendingParcelCode ? code : undefined;
+        const focusCode = pendingParcelCode && pendingParcelPart === part ? code : undefined;
         const canonical = focusCode
           ? data.find((item) => item.code === focusCode || item.aliases?.includes(focusCode))?.code
           : undefined;
         if (focusCode && !canonical) {
-          removeParcelQuery(requestedParcelCode);
+          removeParcelQuery(pendingParcelCode);
           pendingParcelCode = undefined;
           pendingParcelPart = undefined;
           if (directLink && !retainUnknownParcelPart) {
@@ -533,24 +827,27 @@
               map,
               window.ymaps3,
               mapContainer,
-              () => {
-                if (pendingParcelCode) {
-                  removeParcelQuery(pendingParcelCode);
-                  pendingParcelCode = undefined;
-                  pendingParcelPart = undefined;
-                }
-              },
+              onParcelSelection,
               getMapZoomDuration
             );
         }
         parcelLayer.enable(part, data);
         parcelLayer.updateViewport(map.zoom, map.bounds);
         if (canonical && pendingParcelCode) {
-          if (!parcelLayer.focus(canonical)) {
-            throw new Error('Номер найден, но контур участка недоступен');
+          if (
+            new URL(window.location.href).searchParams.get(PARCEL_QUERY_PARAM) !== pendingParcelCode
+          )
+            return;
+          focusingDirectLink = true;
+          try {
+            if (!parcelLayer.focus(canonical))
+              throw new Error('Номер найден, но контур участка недоступен');
+          } finally {
+            focusingDirectLink = false;
           }
           preserveParcelCamera = true;
-          pendingParcelCode = requestedParcelCode;
+          pendingParcelCode = undefined;
+          pendingParcelPart = undefined;
         }
       } catch (reason) {
         if (!stillSelected()) return;
@@ -621,7 +918,8 @@
       void waitForStableLayout().then(() => {
         if (destroyed) return;
 
-        if (preserveParcelCamera) return;
+        positionPopup();
+        if (preserveParcelCamera || selectedParcel) return;
 
         if (highlightedPlace) {
           focusPlace(highlightedPlace, 0);
@@ -708,6 +1006,13 @@
           onUpdate: ({ location }) => {
             updateMarkerScale(location.zoom);
             parcelLayer?.updateViewport(location.zoom, location.bounds);
+            schedulePopupPosition();
+          },
+          onResize: schedulePopupPosition,
+          onClick: (object) => {
+            if (!object && !pointerMoved && !selectedThisGesture) clearSelectedParcel?.();
+            pointerStart = undefined;
+            selectedThisGesture = false;
           }
         });
         mapClusterer = new YMapClusterer({
@@ -789,6 +1094,7 @@
           parcelRevisions.set(part, (parcelRevisions.get(part) ?? 0) + 1);
         parcelLayer?.destroy();
         parcelLayer = undefined;
+        onParcelSelection();
         if (highlightTimer !== undefined) window.clearTimeout(highlightTimer);
         if (markerUpdateTimer !== undefined) window.clearInterval(markerUpdateTimer);
         clearMap();
@@ -808,6 +1114,8 @@
       for (const part of PARCEL_PARTS)
         parcelRevisions.set(part, (parcelRevisions.get(part) ?? 0) + 1);
       parcelLayer?.destroy();
+      removePopupAnchor();
+      clearSelectedParcel = undefined;
       document.removeEventListener('astro:page-load', refresh);
       resizeObserver?.disconnect();
       if (highlightTimer !== undefined) {
@@ -821,7 +1129,7 @@
   });
 </script>
 
-<div data-testid="place-map" class="place-map">
+<div bind:this={mapRoot} data-testid="place-map" class="place-map">
   {#if error}
     <div class="map-placeholder map-placeholder--error" role="status">
       <div class="map-error-panel">
@@ -836,6 +1144,94 @@
   {/if}
 
   <div bind:this={mapContainer} class="place-map__canvas" tabindex="-1"></div>
+  {#if selectedParcel && (selectedParcel.status === 'available' || selectedParcel.status === 'reserved')}
+    <div
+      bind:this={popupElement}
+      class="parcel-map-popup"
+      style:left={`${popupPosition?.x ?? 12}px`}
+      style:top={`${popupPosition?.y ?? 112}px`}
+      role="group"
+      aria-label={`Участок ${selectedParcel.code}`}
+    >
+      <div class="parcel-map-popup__panel">
+        <div class="parcel-map-popup__header">
+          <div class="parcel-map-popup__title">
+            <strong
+              ><span class="ui-visually-hidden">Участок {selectedParcel.code}</span><span
+                aria-hidden="true">{selectedParcel.code.split('-')[1] ?? selectedParcel.code}</span
+              ></strong
+            >
+            {#if selectedParcel.status === 'reserved'}
+              <span
+                class="parcel-map-popup__lock"
+                role="img"
+                aria-label="Забронирован"
+                title="Забронирован"
+                ><svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  aria-hidden="true"
+                  ><rect x="3" y="7" width="10" height="7" rx="1" /><path
+                    d="M5 7V5a3 3 0 0 1 6 0v2"
+                  /></svg
+                ></span
+              >
+            {/if}
+            <span class="parcel-map-popup__part">{PARCEL_PART_NAMES[selectedParcel.part]}</span>
+          </div>
+          <button
+            bind:this={popupClose}
+            type="button"
+            class="parcel-map-popup__close"
+            aria-label="Закрыть сведения об участке"
+            onclick={() => closeParcel(true)}
+          >
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path d="M5 5l10 10M15 5L5 15" />
+            </svg>
+          </button>
+        </div>
+        {#if detailsLoading}
+          <p role="status">Загружаем сведения…</p>
+        {:else if detailsError}
+          <p role="alert">Не удалось загрузить сведения об участке.</p>
+          <button type="button" class="parcel-map-popup__retry" onclick={retryDetails}
+            >Повторить</button
+          >
+        {:else if selectedDetails}
+          <p class="parcel-map-popup__area">
+            {selectedDetails.area
+              ? `${areaFormatter.format(selectedDetails.area / 100)} сот.`
+              : 'Нет данных о площади'}
+          </p>
+          <p class="parcel-map-popup__price">
+            {#if selectedDetails.price.last}
+              <strong>{priceFormatter.format(selectedDetails.price.last)} ₽</strong>
+            {:else}
+              Нет данных о цене
+            {/if}
+          </p>
+        {/if}
+      </div>
+      {#if popupPosition?.arrow}
+        <span
+          class="parcel-map-popup__arrow"
+          class:parcel-map-popup__arrow--up={popupPosition.arrow === 'up'}
+          class:parcel-map-popup__arrow--down={popupPosition.arrow === 'down'}
+          style:left={`${popupPosition.arrowX}px`}
+          aria-hidden="true"
+        ></span>
+      {/if}
+    </div>
+  {/if}
   {#if !error}
     <div class="parcel-map-controls">
       <div class="parcel-map-layers" bind:this={layersControl}>
@@ -948,7 +1344,7 @@
     position: absolute;
     top: 4.5rem;
     left: 1rem;
-    z-index: 2;
+    z-index: 4;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -1104,7 +1500,12 @@
     color: var(--color-text);
     cursor: pointer;
     font-family: var(--font-body);
+    pointer-events: auto;
     transform: translate(-50%, -50%);
+  }
+
+  :global(.ymaps3--marker:has(> :is(.parcel-map-label, .parcel-map-popup-anchor))) {
+    pointer-events: none;
   }
 
   :global(.parcel-map-label span) {
@@ -1129,6 +1530,142 @@
 
   :global(.parcel-map-label--unavailable:focus-visible) {
     opacity: 1;
+  }
+
+  :global(.parcel-map-popup-anchor) {
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+
+  .parcel-map-popup {
+    position: absolute;
+    z-index: 3;
+    box-sizing: border-box;
+    width: min(15rem, calc(100% - 1.5rem));
+    max-height: calc(100% - min(7rem, 25%) - min(3rem, 20%));
+    display: flex;
+    flex-direction: column;
+  }
+
+  .parcel-map-popup__panel {
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+    color: var(--color-text);
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .parcel-map-popup__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.375rem;
+  }
+
+  .parcel-map-popup__header strong {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .parcel-map-popup__title {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .parcel-map-popup__part {
+    color: var(--color-text-muted);
+  }
+
+  .parcel-map-popup__area {
+    color: var(--color-text-muted);
+  }
+
+  .parcel-map-popup__price {
+    margin-top: 0.5rem;
+  }
+
+  .parcel-map-popup__lock {
+    display: inline-flex;
+    margin-left: 0.375rem;
+    color: var(--color-text-muted);
+    vertical-align: middle;
+  }
+
+  .parcel-map-popup__lock svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .parcel-map-popup__close,
+  .parcel-map-popup__retry {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .parcel-map-popup__close {
+    margin: -0.625rem -0.625rem 0 0;
+    flex: none;
+    display: grid;
+    place-items: center;
+    color: var(--color-text-muted);
+  }
+
+  .parcel-map-popup__close:hover {
+    color: var(--color-text);
+  }
+
+  .parcel-map-popup__close svg {
+    box-sizing: content-box;
+    width: 1rem;
+    height: 1rem;
+    padding: 0.375rem;
+  }
+
+  .parcel-map-popup__close:hover svg {
+    background: var(--color-surface-muted);
+  }
+
+  .parcel-map-popup__retry {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .parcel-map-popup :is(button):focus-visible {
+    outline: 0.1875rem solid var(--color-focus);
+    outline-offset: -0.1875rem;
+  }
+
+  .parcel-map-popup__arrow {
+    position: absolute;
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 1px solid var(--color-border);
+    background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+    pointer-events: none;
+    transform: translateX(-50%) rotate(45deg);
+  }
+
+  .parcel-map-popup__arrow--down {
+    bottom: -0.375rem;
+    border-top: 0;
+    border-left: 0;
+  }
+
+  .parcel-map-popup__arrow--up {
+    top: -0.375rem;
+    border-right: 0;
+    border-bottom: 0;
   }
 
   .place-map__canvas :global(:is(a, button):focus-visible) {

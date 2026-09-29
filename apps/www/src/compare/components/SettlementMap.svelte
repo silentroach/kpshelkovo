@@ -313,20 +313,34 @@
     activeMarker = el;
     el.setAttribute('aria-expanded', 'true');
 
-    if (!mapContainer) {
-      tip = { item, x: 24, y: 24, up: false };
-    } else {
+    tip = { item, x: 24, y: 24, up: false };
+    await tick();
+    if (activeMarker !== el) return;
+
+    if (mapContainer) {
       const mapBox = mapContainer.getBoundingClientRect();
       const dotBox = el.getBoundingClientRect();
-      const w = 256;
       const p = 12;
+      if (popupEl) popupEl.style.maxWidth = `${Math.max(0, mapBox.width - 2 * p)}px`;
+      const w = popupEl?.offsetWidth || 256;
       const cx = dotBox.left - mapBox.left + dotBox.width / 2;
       const cy = dotBox.top - mapBox.top + dotBox.height / 2;
       const x = Math.max(p + w / 2, Math.min(mapBox.width - p - w / 2, cx));
-      const up = cy > 120;
-      const y = up ? cy - 16 : cy + 16;
+      const h = popupEl?.offsetHeight || 96;
+      const up = cy - h - 16 >= p || cy + h + 16 > mapBox.height - p;
+      const y = up
+        ? Math.max(h + p, Math.min(mapBox.height - p, cy - 16))
+        : Math.max(p, Math.min(mapBox.height - p - h, cy + 16));
+      const arrowX = cx - x + w / 2;
+      const gap = up ? cy - y : y - cy;
 
-      tip = { item, x, y, up };
+      tip = {
+        item,
+        x,
+        y,
+        up,
+        arrowX: arrowX >= p && arrowX <= w - p && gap >= 12 && gap <= 30 ? arrowX : undefined
+      };
     }
 
     if (!moveFocus) return;
@@ -559,13 +573,16 @@
             <strong>{tip.item.tariffText ?? formatTariff(tip.item.normalizedTariff)}</strong>
           </p>
         </div>
-        <div
-          class="map-popup-arrow"
-          class:map-popup-arrow--up={tip.up}
-          class:map-popup-arrow--down={!tip.up}
-          data-testid="map-popup-arrow"
-          aria-hidden="true"
-        ></div>
+        {#if tip.arrowX !== undefined}
+          <div
+            class="map-popup-arrow"
+            class:map-popup-arrow--up={tip.up}
+            class:map-popup-arrow--down={!tip.up}
+            style:left={`${tip.arrowX}px`}
+            data-testid="map-popup-arrow"
+            aria-hidden="true"
+          ></div>
+        {/if}
       </div>
     </div>
   {/if}
@@ -703,18 +720,34 @@
   }
 
   .map-popup-close {
-    padding: 0.25rem;
+    flex: none;
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin: -0.625rem -0.625rem 0 0;
+    place-items: center;
+    cursor: pointer;
     color: var(--color-text-muted);
   }
 
   .map-popup-close:hover {
-    background: var(--color-surface-muted);
     color: var(--color-text);
   }
 
+  .map-popup-close:focus-visible {
+    outline: 0.1875rem solid var(--color-focus);
+    outline-offset: -0.1875rem;
+  }
+
   .map-popup-close-icon {
+    box-sizing: content-box;
     width: 1rem;
     height: 1rem;
+    padding: 0.375rem;
+  }
+
+  .map-popup-close:hover .map-popup-close-icon {
+    background: var(--color-surface-muted);
   }
 
   .map-popup-company {
@@ -730,7 +763,6 @@
 
   .map-popup-arrow {
     position: absolute;
-    left: 50%;
     width: 0.75rem;
     height: 0.75rem;
     border: 1px solid var(--color-border);

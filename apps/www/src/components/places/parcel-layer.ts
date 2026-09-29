@@ -10,10 +10,9 @@ import type {
 
 import type { ParcelPart } from '@/lib/parcels/schema';
 
-import type { ParcelLayer, ParcelMapItem } from './parcel-layer-types';
+import type { ParcelLayer, ParcelMapItem, ParcelSelectionChange } from './parcel-layer-types';
 
 const LABEL_MIN_ZOOM = 17;
-const SELECTION_MS = 5_000;
 
 const toMapGeometry = (
   geometry: ParcelMapItem['geometry']
@@ -34,14 +33,13 @@ export const createParcelLayer = (
   map: YMap,
   sdk: typeof ymaps3,
   container: HTMLElement,
-  onSelectionEnd: () => void,
+  onSelectionChange: ParcelSelectionChange,
   getDuration: () => number
 ): ParcelLayer => {
   const itemsByPart = new Map<ParcelPart, readonly ParcelMapItem[]>();
   const features = new Map<string, YMapFeature>();
   const labels = new Map<string, YMapMarker>();
   let selected: ParcelMapItem | undefined;
-  let timer: number | undefined;
   let destroyed = false;
   let viewportZoom = map.zoom;
   let viewportBounds = map.bounds;
@@ -85,22 +83,18 @@ export const createParcelLayer = (
     stroke: [{ color: token('--parcel-map-selection'), width: 3 }]
   });
 
-  const clearSelection = (): void => {
-    if (timer !== undefined) window.clearTimeout(timer);
-    timer = undefined;
-    if (selected) features.get(selected.code)?.update({ style: normalStyle(selected) });
+  const clearSelection = (notify = true): void => {
+    if (!selected) return;
+    features.get(selected.code)?.update({ style: normalStyle(selected) });
     selected = undefined;
+    if (notify) onSelectionChange();
   };
 
-  const select = (item: ParcelMapItem): void => {
-    clearSelection();
+  const select = (item: ParcelMapItem, source?: HTMLButtonElement): void => {
+    if (selected?.code !== item.code) clearSelection(false);
     selected = item;
     features.get(item.code)?.update({ style: selectedStyle() });
-    timer = window.setTimeout(() => {
-      timer = undefined;
-      clearSelection();
-      onSelectionEnd();
-    }, SELECTION_MS);
+    onSelectionChange(item, source);
   };
 
   const updateViewport = (zoom: number, bounds: LngLatBounds): void => {
@@ -133,7 +127,7 @@ export const createParcelLayer = (
           button.setAttribute('aria-label', `Выбрать участок ${item.code}`);
           button.addEventListener('click', (event) => {
             event.stopPropagation();
-            select(item);
+            select(item, event.detail === 0 ? button : undefined);
           });
           const marker = new sdk.YMapMarker({ coordinates: [lng, lat], zIndex: -1 }, button);
           labels.set(item.code, marker);
@@ -152,8 +146,7 @@ export const createParcelLayer = (
     const items = itemsByPart.get(part);
     if (!items) return;
     if (selected?.part === part) {
-      clearSelection();
-      if (finishSelection) onSelectionEnd();
+      clearSelection(finishSelection);
     }
     itemsByPart.delete(part);
     for (const item of items) {
@@ -188,6 +181,9 @@ export const createParcelLayer = (
       }
     },
     disable,
+    clearSelection: () => {
+      if (!destroyed) clearSelection();
+    },
     focus(code) {
       if (destroyed) return false;
       const part = code.slice(0, 3).toLowerCase() as ParcelPart;

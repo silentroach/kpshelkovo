@@ -36,6 +36,7 @@ export interface Tip {
   readonly x: number;
   readonly y: number;
   readonly up: boolean;
+  readonly arrowX?: number;
 }
 
 export interface MapView {
