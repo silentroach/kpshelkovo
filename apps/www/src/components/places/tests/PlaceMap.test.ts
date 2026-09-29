@@ -2348,6 +2348,23 @@ describe('PlaceMap', () => {
     expect(window.location.search).toBe('?flag&p=SHR-L43');
   });
 
+  it('cancels a pending direct link on a blank map click', async () => {
+    const pending = Promise.withResolvers<Response>();
+    const fetch = vi.fn(() => pending.promise);
+    vi.stubGlobal('fetch', fetch);
+    window.history.replaceState({}, '', '/map/?p=SHR-L43&flag');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith('/map/data/parcels/shr.json'));
+
+    mapClickHandlers[0]?.(undefined);
+    expect(window.location.search).toBe('?flag');
+
+    pending.resolve(Response.json([parcel]));
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    expect(areaFeatures[0]?.update).not.toHaveBeenCalled();
+    expect(map.update.mock.calls.some(([update]) => update.location?.zoom === 17)).toBe(false);
+  });
+
   it('clears a direct link when the replacement selection is disabled', async () => {
     const forest = { ...parcel, code: 'SHF-M1', aliases: [], part: 'shf' };
     vi.stubGlobal(
@@ -2464,28 +2481,44 @@ describe('PlaceMap', () => {
     expect(map.update.mock.calls.some(([props]) => props.location?.zoom === 17)).toBe(false);
   });
 
-  it.each(['place', 'cluster'])(
-    'cancels a pending parcel link when selecting a %s',
-    async (target) => {
-      const pending = Promise.withResolvers<Response>();
-      vi.stubGlobal(
-        'fetch',
-        vi.fn(() => pending.promise)
-      );
-      window.history.replaceState({}, '', '/map/?p=SHR-L43&flag#map');
-      render(PlaceMap, { props: { places: [place] } });
-      await waitFor(() => expect(clustererProps).toHaveLength(1));
-      const clusterer = clustererProps[0]!;
-      if (target === 'cluster') clusterer.cluster([37.74, 55.06], clusterer.features);
-      const selected = target === 'cluster' ? markerElements.at(-1) : markerElements[0];
-      if (!selected) throw new Error('Map marker missing');
-      await fireEvent.click(selected);
-      expect(new URL(window.location.href).searchParams.has('p')).toBe(false);
-      pending.resolve(Response.json([parcel]));
-      await waitFor(() => expect(areaFeatures).toHaveLength(1));
-      expect(map.update.mock.calls.some(([props]) => props.location?.zoom === 17)).toBe(false);
-    }
-  );
+  it('cancels a pending parcel link when selecting a place', async () => {
+    const pending = Promise.withResolvers<Response>();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => pending.promise)
+    );
+    window.history.replaceState({}, '', '/map/?p=SHR-L43&flag#map');
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(clustererProps).toHaveLength(1));
+    const selected = markerElements[0];
+    if (!selected) throw new Error('Map marker missing');
+    await fireEvent.click(selected);
+    expect(new URL(window.location.href).searchParams.has('p')).toBe(false);
+    pending.resolve(Response.json([parcel]));
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    expect(map.update.mock.calls.some(([props]) => props.location?.zoom === 17)).toBe(false);
+  });
+
+  it('keeps a pending parcel link when zooming into a place cluster', async () => {
+    const pending = Promise.withResolvers<Response>();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => pending.promise)
+    );
+    window.history.replaceState({}, '', '/map/?p=SHR-L43&flag#map');
+    render(PlaceMap, { props: { places: [place, titanicPlace] } });
+    await waitFor(() => expect(clustererProps).toHaveLength(1));
+    const clusterer = clustererProps[0]!;
+    clusterer.cluster([37.74, 55.06], clusterer.features);
+    const cluster = markerElements.at(-1);
+    if (!cluster) throw new Error('Cluster marker missing');
+    await fireEvent.click(cluster);
+    expect(window.location.search).toBe('?p=SHR-L43&flag');
+
+    pending.resolve(Response.json([parcel]));
+    await waitFor(() => expect(areaFeatures[0]?.update).toHaveBeenCalled());
+    expect(map.update.mock.calls.some(([props]) => props.location?.zoom === 17)).toBe(true);
+  });
 
   it('cancels an active URL highlight without a late focus or URL mutation', async () => {
     vi.stubGlobal('fetch', parcelFetch);
@@ -2877,6 +2910,28 @@ describe('PlaceMap', () => {
     await waitFor(() =>
       expect(screen.queryByRole('button', { name: 'Закрыть сведения об участке' })).toBeNull()
     );
+  });
+
+  it('keeps the selected parcel and its link while zooming into a place cluster', async () => {
+    vi.stubGlobal('fetch', parcelFetch);
+    render(PlaceMap, { props: { places: [place, titanicPlace] } });
+    await waitFor(() => expect(clustererProps).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    areaFeatures[0]?.props.onClick?.(new MouseEvent('click'), {} as never);
+
+    const clusters = clustererProps[0]!;
+    clusters.cluster([37.74, 55.06], clusters.features);
+    const cluster = markerElements.at(-1);
+    if (!cluster) throw new Error('Cluster marker missing');
+    await fireEvent.click(cluster);
+
+    expect(map.update.mock.lastCall?.[0].location.bounds).toBeDefined();
+    expect(window.location.search).toBe('?p=SHR-L43');
+    expect(areaFeatures[0]?.update.mock.lastCall?.[0].style).toMatchObject({
+      fill: parcelSelectionColor
+    });
   });
 
   it('moves keyboard focus into the popup and returns it to the label or map', async () => {

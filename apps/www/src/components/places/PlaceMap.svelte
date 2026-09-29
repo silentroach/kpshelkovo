@@ -404,7 +404,6 @@
     button.setAttribute('aria-label', `${label}. Приблизить карту`);
     button.addEventListener('click', (event) => {
       event.stopPropagation();
-      clearSelectedParcel?.();
       cancelClusterFocus();
       if (event.detail === 0 && document.activeElement === button && features[0] && mapContainer) {
         pendingClusterFocusId = features[0].id;
@@ -1004,7 +1003,7 @@
           },
           onResize: schedulePopupPosition,
           onClick: (object) => {
-            if (!object && !pointerMoved && !selectedThisGesture) parcelLayer?.clearSelection();
+            if (!object && !pointerMoved && !selectedThisGesture) clearSelectedParcel?.();
             pointerStart = undefined;
             selectedThisGesture = false;
           }
