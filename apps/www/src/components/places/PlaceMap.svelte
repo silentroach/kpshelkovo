@@ -1265,17 +1265,14 @@
               bind:indeterminate={someParcelsSelected}
               onchange={toggleAllParcels}
             />
-            <svg class="parcel-map-layer-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="m4 6 13-2 4 13-13 3L4 6Z"
-                stroke="currentColor"
-                stroke-width="1.6"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <circle cx="4" cy="6" r="1.5" fill="currentColor" />
-              <circle cx="21" cy="17" r="1.5" fill="currentColor" />
-            </svg>
+            <img
+              class="parcel-map-layer-icon"
+              src="/icons/plots.webp"
+              width="22"
+              height="22"
+              alt=""
+              aria-hidden="true"
+            />
             Участки
           </label>
           {#each PARCEL_PARTS as part (part)}
@@ -1416,7 +1413,7 @@
   }
 
   .parcel-map-layer--part {
-    padding-left: 1.25rem;
+    padding-left: 2.25rem;
   }
 
   .parcel-map-layer--error {
