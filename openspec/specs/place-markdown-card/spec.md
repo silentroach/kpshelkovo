@@ -8,12 +8,12 @@
 
 ### Requirement: Метаданные карточки доступны во frontmatter
 
-Документ `/map/[slug]/index.md` SHALL начинаться с YAML frontmatter. Он SHALL содержать название места в `title`, машинный код `category`, lifecycle-код `status` (`existing`, `planned` или `underConstruction`), числовые `coordinates.lat` и `coordinates.lng` и `address` при наличии адреса. `status` SHALL не означать текущую открытость места. Отсутствующие необязательные сведения SHALL не публиковаться как пустые поля, `null` или строка `undefined`. Внутренние редакционные и технические поля SHALL не попадать в публичный frontmatter автоматически.
+Документ `/map/[slug]/index.md` SHALL начинаться с YAML frontmatter. Он SHALL содержать название места в `title`, машинный код `category`, lifecycle-код `status` (`existing`, `planned` или `underConstruction`), числовые `coordinates.lat` и `coordinates.lng` по [public-coordinate-precision](../public-coordinate-precision/spec.md) и `address` при наличии адреса. `status` SHALL не означать текущую открытость места. Отсутствующие необязательные сведения SHALL не публиковаться как пустые поля, `null` или строка `undefined`. Внутренние редакционные и технические поля SHALL не попадать в публичный frontmatter автоматически.
 
 #### Scenario: Карточка с адресом
 
 - **WHEN** потребитель читает Markdown-карточку места с адресом
-- **THEN** frontmatter содержит название, код категории, lifecycle-статус, адрес и точные числовые координаты этого места
+- **THEN** frontmatter содержит название, код категории, lifecycle-статус, адрес и числовые координаты места с установленной публичной точностью
 - **AND** для извлечения этих сведений не требуется разбирать русские подписи в body
 
 #### Scenario: Необязательные сведения отсутствуют

@@ -65,7 +65,7 @@
 
 ### Requirement: HTML и Markdown представляют одну страницу KB
 
-Каждая HTML-страница `/kb/` SHALL иметь соответствующий Markdown companion: `/kb/index.md` для корня и `/kb/<путь>/index.md` для вложенной страницы. Оба представления SHALL передавать заголовок и подготовленное редакционное содержание одной страницы; Markdown companion SHALL сохранять поддержанные флаги и вести внутренние ссылки на HTML-страницы KB к соответствующим Markdown companions. Общие правила выдачи Markdown по HTTP определяются вне контракта KB.
+Каждая HTML-страница `/kb/` SHALL иметь соответствующий Markdown companion: `/kb/index.md` для корня и `/kb/<путь>/index.md` для вложенной страницы. Оба представления SHALL передавать заголовок и подготовленное редакционное содержание одной страницы; Markdown companion SHALL сохранять поддержанные флаги и вести внутренние ссылки на HTML-страницы KB к соответствующим Markdown companions. HTTP-выдача Markdown определяется [ADR-009](../../../docs/decisions/009-markdown-accept-negotiation.md).
 
 #### Scenario: Читатель и машинный потребитель открывают одну страницу
 
