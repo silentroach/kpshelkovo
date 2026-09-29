@@ -2996,6 +2996,30 @@ describe('PlaceMap', () => {
     await fireEvent.keyDown(dialog, { key: 'Escape' });
     expect(window.location.search).toBe('?p=SHR-L43');
     dialog.remove();
+    await fireEvent.keyDown(document.body, { key: 'Escape' });
+    expect(window.location.search).toBe('');
+  });
+
+  it('handles body Escape after a direct link without intercepting external controls', async () => {
+    vi.stubGlobal('fetch', parcelWithDetails);
+    window.history.replaceState({}, '', '/map/?p=SHR-L43');
+    render(PlaceMap, { props: { places: [place] } });
+    await screen.findByRole('button', { name: 'Закрыть сведения об участке' });
+
+    const outside = document.createElement('button');
+    document.body.append(outside);
+    outside.focus();
+    await fireEvent.keyDown(outside, { key: 'Escape' });
+    expect(window.location.search).toBe('?p=SHR-L43');
+    outside.remove();
+
+    const layers = screen.getByRole('button', { name: 'Слои' });
+    await fireEvent.click(layers);
+    await fireEvent.keyDown(document.body, { key: 'Escape' });
+    expect(layers.getAttribute('aria-expanded')).toBe('false');
+    expect(window.location.search).toBe('?p=SHR-L43');
+    await fireEvent.keyDown(document.body, { key: 'Escape' });
+    expect(window.location.search).toBe('');
   });
 
   it('repositions and clamps the popup on map updates without moving camera or selection', async () => {

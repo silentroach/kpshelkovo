@@ -703,7 +703,9 @@
       if (event.key !== 'Escape' || event.defaultPrevented) return;
       if (
         layersOpen &&
-        (event.target === document || layersControl?.contains(event.target as Node))
+        (event.target === document ||
+          event.target === document.body ||
+          layersControl?.contains(event.target as Node))
       ) {
         layersOpen = false;
         layersButton?.focus();
@@ -715,7 +717,12 @@
         (event.target instanceof Element && event.target.closest('[role="dialog"]'))
       )
         return;
-      if (event.target !== document && !mapRoot?.contains(event.target as Node)) return;
+      if (
+        event.target !== document &&
+        event.target !== document.body &&
+        !mapRoot?.contains(event.target as Node)
+      )
+        return;
       const restore = Boolean(popupElement?.contains(event.target as Node) || focusSource);
       closeParcel(restore);
       event.preventDefault();
