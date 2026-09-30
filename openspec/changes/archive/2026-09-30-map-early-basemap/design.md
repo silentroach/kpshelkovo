@@ -2,9 +2,9 @@
 
 ## Context
 
-Мотивация — в [proposal](/openspec/changes/map-early-basemap/proposal.md). Astro-страница уже получает `selectMapPlaces(await loadPlaces())`, но передаёт Svelte только URL JSON и fallback. Клиент ждёт данные и SDK через `Promise.all`, затем импортирует кластеризатор и создаёт `YMap`. `getPlaceBounds` использует только основные координаты; `fitPlaces` сразу после создания повторно задаёт bounds и адаптивные margin.
+Мотивация — в [proposal](/openspec/changes/archive/2026-09-30-map-early-basemap/proposal.md). Astro-страница уже получает `selectMapPlaces(await loadPlaces())`, но передаёт Svelte только URL JSON и fallback. Клиент ждёт данные и SDK через `Promise.all`, затем импортирует кластеризатор и создаёт `YMap`. `getPlaceBounds` использует только основные координаты; `fitPlaces` сразу после создания повторно задаёт bounds и адаптивные margin.
 
-Действующие решения: [ADR-028](/docs/decisions/028-markdown-first-places-map.md) сохраняет статический сайт, клиентский renderer и единую видимую выборку; [ADR-013](/docs/decisions/013-raw-domain-public-data-boundary.md) задаёт границы данных. Требования — в [delta](/openspec/changes/map-early-basemap/specs/site-maps/spec.md), [site-maps](/openspec/specs/site-maps/spec.md), [place-map-visibility](/openspec/specs/place-map-visibility/spec.md) и [parcel-map](/openspec/specs/parcel-map/spec.md).
+Действующие решения: [ADR-028](/docs/decisions/028-markdown-first-places-map.md) сохраняет статический сайт, клиентский renderer и единую видимую выборку; [ADR-013](/docs/decisions/013-raw-domain-public-data-boundary.md) задаёт границы данных. Требования — в [delta](/openspec/changes/archive/2026-09-30-map-early-basemap/specs/site-maps/spec.md), [site-maps](/openspec/specs/site-maps/spec.md), [place-map-visibility](/openspec/specs/place-map-visibility/spec.md) и [parcel-map](/openspec/specs/parcel-map/spec.md).
 
 ## Goals / Non-Goals
 
@@ -28,7 +28,7 @@
 
 ### Независимые загрузки, одна карта
 
-Запустить загрузку SDK, мест и динамический импорт кластеризатора параллельно; сразу присоединить обработку отказов, чтобы раннее отклонение независимого promise не стало необработанным. По готовности SDK и стабильного контейнера создать единственный `YMap` с build-time bounds и актуальным адаптивным margin. Обычный кадр должен быть установлен до отображения, а не сначала без отступов, затем повторным `fitPlaces` после JSON.
+Запустить загрузку SDK и мест параллельно, а динамический импорт кластеризатора — сразу после готовности SDK, параллельно с ожиданием стабильного layout и загрузкой мест. Модуль кластеризатора при исполнении наследует классы SDK, поэтому его импорт до готовности SDK небезопасен. Сразу присоединить обработку отказов, чтобы раннее отклонение независимого promise не стало необработанным. По готовности SDK и стабильного контейнера создать единственный `YMap` с build-time bounds и актуальным адаптивным margin, не ожидая кластеризатор. Обычный кадр должен быть установлен до отображения, а не сначала без отступов, затем повторным `fitPlaces` после JSON.
 
 После готовности мест и кластеризатора подключить listener, маркеры и геометрию. Динамический импорт сохраняется; переход на статический импорт мог бы утяжелить начальный чанк. Не вводить очередь задач, универсальный менеджер фаз или отдельные экземпляры карты. Для существующих прямых вызовов компонента в тестах/с местами оставить совместимый путь вычисления bounds, когда новый prop не передан.
 
@@ -48,4 +48,4 @@
 
 ## Migration Plan
 
-Сейчас публикуется только план в draft PR ветки `perf/map-early-basemap`. После согласования отдельная сессия реализует задачи в той же ветке, обновит отчёты бандлов, проведёт приёмку, sync/archive и переведёт PR в готовый к ревью. Изменение доставляется обычной статической сборкой без миграции контента или JSON; откат возвращает весь PR вместе с bounds-prop и порядком setup.
+План опубликован в draft PR ветки `perf/map-early-basemap`, владелец разрешил реализацию в отдельной сессии. Эта сессия реализует задачи в той же ветке, обновит отчёты бандлов, проведёт приёмку, sync/archive и переведёт PR в готовый к ревью. Изменение доставляется обычной статической сборкой без миграции контента или JSON; откат возвращает весь PR вместе с bounds-prop и порядком setup.

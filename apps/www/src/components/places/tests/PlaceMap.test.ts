@@ -13,18 +13,11 @@ import type { ParcelDetailsPublicDto } from '@/lib/parcels/details-public-schema
 import type { PlaceMapPublicItemDto } from '@/lib/places/map-public-dto';
 import type { PlaceMapItem } from '@/lib/places/map-types';
 
+import { getPlaceBounds } from '../place-map-geometry';
 import PlaceMap from '../PlaceMap.svelte';
 
 const clustererProps = vi.hoisted(() => [] as YMapClustererProps[]);
-
-vi.mock('@yandex/ymaps3-clusterer', () => ({
-  YMapClusterer: vi.fn(function YMapClusterer(props: YMapClustererProps) {
-    clustererProps.push(props);
-    for (const feature of props.features) props.marker(feature);
-    return {};
-  }),
-  clusterByGrid: vi.fn(() => ({ render: vi.fn() }))
-}));
+const clustererImport = vi.hoisted(() => vi.fn<() => Promise<void>>());
 
 const map = {
   addChild: vi.fn(),
@@ -56,6 +49,7 @@ const areaFeatures: Array<{
 const schemeLayerProps: unknown[] = [];
 const mapProps: {
   readonly behaviors?: readonly string[];
+  readonly margin?: readonly number[];
   readonly location: {
     readonly bounds?: readonly (readonly [number, number])[];
   };
@@ -305,6 +299,19 @@ const installYandexMaps = (): void => {
 describe('PlaceMap', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.resetModules();
+    clustererImport.mockResolvedValue(undefined);
+    vi.doMock('@yandex/ymaps3-clusterer', async () => {
+      await clustererImport();
+      return {
+        YMapClusterer: vi.fn(function YMapClusterer(props: YMapClustererProps) {
+          clustererProps.push(props);
+          for (const feature of props.features) props.marker(feature);
+          return {};
+        }),
+        clusterByGrid: vi.fn(() => ({ render: vi.fn() }))
+      };
+    });
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-08-18T12:00:00.000Z'));
     markerElements.length = 0;
@@ -317,6 +324,7 @@ describe('PlaceMap', () => {
     clustererProps.length = 0;
     schemeLayerProps.length = 0;
     mapProps.length = 0;
+    map.zoom = 15;
     document.documentElement.style.setProperty('--color-water', '#1c668c');
     document.documentElement.style.setProperty('--color-neutral-soft', '#eef0ec');
     document.documentElement.style.setProperty('--color-text-muted', '#45564b');
@@ -476,6 +484,196 @@ describe('PlaceMap', () => {
     );
     expect(screen.queryByRole('status')).toBeNull();
   });
+
+  it.each(['JSON', 'clusterer'] as const)(
+    'creates one basemap before delayed %s and keeps a manually changed camera when markers arrive',
+    async (delayed) => {
+      const response = Promise.withResolvers<Response>();
+      const imported = Promise.withResolvers<void>();
+      vi.stubGlobal('matchMedia', () => ({ matches: false }));
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(() => response.promise)
+      );
+      clustererImport.mockReturnValueOnce(imported.promise);
+      if (delayed === 'JSON') imported.resolve();
+      else response.resolve(Response.json({ places: [publicPlace] }));
+
+      const initialBounds = getPlaceBounds([place]);
+      render(PlaceMap, { props: { dataUrl: '/map/data/places.json', initialBounds } });
+      await waitFor(() => expect(mapElements).toHaveLength(1));
+      expect(mapProps[0]).toMatchObject({
+        location: { bounds: initialBounds },
+        margin: [112, 80, 32, 80]
+      });
+      expect(markerElements).toHaveLength(0);
+      expect(screen.getByRole('button', { name: 'Слои' }).hasAttribute('disabled')).toBe(true);
+
+      // A real resize during the data gap still fits the build-time collection.
+      document.dispatchEvent(new Event('astro:page-load'));
+      await waitFor(() => expect(map.update).toHaveBeenCalled());
+      expect(map.update.mock.lastCall?.[0].location.bounds).toEqual(initialBounds);
+      map.zoom = 17; // SDK state after the user's zoom, before a listener exists.
+      map.update({ location: { center: [37.8, 55.1], zoom: 17 } });
+      const cameraUpdates = map.update.mock.calls.length;
+
+      response.resolve(Response.json({ places: [publicPlace] }));
+      imported.resolve();
+      await waitFor(() => expect(markerElements).toHaveLength(1));
+      expect(mapElements).toHaveLength(1);
+      expect(map.update).toHaveBeenCalledTimes(cameraUpdates);
+      expect(mapElements[0]?.style.getPropertyValue('--place-map-marker-scale')).toBe('1.150');
+      expect(screen.getByRole('button', { name: 'Слои' }).hasAttribute('disabled')).toBe(false);
+    }
+  );
+
+  it.each(['h=burzhuyka', 'p=shr-l44&h=burzhuyka'])(
+    'waits for objects before applying delayed direct link %s',
+    async (query) => {
+      const response = Promise.withResolvers<Response>();
+      const timeout = vi.spyOn(window, 'setTimeout');
+      vi.stubGlobal(
+        'fetch',
+        vi.fn((url: string) =>
+          url === '/map/data/places.json' ? response.promise : parcelFetch(url)
+        )
+      );
+      window.history.replaceState({}, '', `/map/?${query}`);
+      render(PlaceMap, {
+        props: { dataUrl: '/map/data/places.json', initialBounds: getPlaceBounds([place]) }
+      });
+      await waitFor(() => expect(mapElements).toHaveLength(1));
+      expect(map.update).not.toHaveBeenCalled();
+      expect(timeout.mock.calls.some(([, delay]) => delay === 5_000)).toBe(false);
+      expect(window.location.search).toBe(`?${query}`);
+
+      response.resolve(Response.json({ places: [publicPlace] }));
+      if (query.startsWith('p=')) {
+        await waitFor(() => expect(areaFeatures[0]?.update).toHaveBeenCalled());
+        expect(map.update.mock.lastCall?.[0].location.zoom).toBe(17);
+        expect(markerElements[0]?.dataset.highlighted).toBeUndefined();
+        expect(timeout.mock.calls.some(([, delay]) => delay === 5_000)).toBe(false);
+        expect(window.location.search).toBe('?h=burzhuyka&p=SHR-L43');
+      } else {
+        await waitFor(() => expect(markerElements[0]?.dataset.highlighted).toBe('true'));
+        expect(map.update.mock.lastCall?.[0].location.zoom).toBe(16);
+        expect(timeout.mock.calls.some(([, delay]) => delay === 5_000)).toBe(true);
+      }
+    }
+  );
+
+  it.each(['JSON', 'clusterer'] as const)(
+    'cleans up an early map on %s failure without waiting for the other resource',
+    async (failed) => {
+      const response = Promise.withResolvers<Response>();
+      const imported = Promise.withResolvers<void>();
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(() => response.promise)
+      );
+      clustererImport.mockReturnValueOnce(imported.promise);
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      window.history.replaceState({}, '', '/map/?h=burzhuyka&from=issue');
+      render(PlaceMap, { props: { dataUrl: '/map/data/places.json', fallbackPlace: place } });
+      await waitFor(() => expect(mapElements).toHaveLength(1));
+
+      if (failed === 'JSON') response.reject(new Error('Data unavailable'));
+      else imported.reject(new Error('Clusterer unavailable'));
+      await screen.findByRole('status');
+      expect(map.destroy).toHaveBeenCalledOnce();
+      expect(screen.getByRole('link').getAttribute('href')).toBe(place.url);
+      expect(window.location.search).toBe('?from=issue');
+
+      const replace = vi.spyOn(window.history, 'replaceState');
+      // A second rejection must be observed too, even after setup has failed.
+      if (failed === 'JSON') imported.reject(new Error('Late clusterer failure'));
+      else response.reject(new Error('Late data failure'));
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+      expect(clustererProps).toHaveLength(0);
+      expect(importModule).not.toHaveBeenCalled();
+      expect(map.destroy).toHaveBeenCalledOnce();
+      expect(replace).not.toHaveBeenCalled();
+    }
+  );
+
+  it('handles a JSON rejection while SDK is pending and never creates a late map', async () => {
+    const ready = Promise.withResolvers<void>();
+    Object.defineProperty(window.ymaps3, 'ready', { value: ready.promise });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('Data unavailable');
+      })
+    );
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(PlaceMap, { props: { dataUrl: '/map/data/places.json', fallbackPlace: place } });
+    await screen.findByRole('status');
+    ready.resolve();
+    await new Promise((resolve) => window.setTimeout(resolve, 180));
+    expect(mapElements).toHaveLength(0);
+    expect(markerElements).toHaveLength(0);
+  });
+
+  it.each(['resolve', 'reject'] as const)(
+    'ignores resources that later %s after the early map unmounts',
+    async (outcome) => {
+      const response = Promise.withResolvers<Response>();
+      const imported = Promise.withResolvers<void>();
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(() => response.promise)
+      );
+      clustererImport.mockReturnValueOnce(imported.promise);
+      const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+      window.history.replaceState({}, '', '/map/?h=burzhuyka&p=shr-l44');
+      const view = render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
+      await waitFor(() => expect(mapElements).toHaveLength(1));
+      view.unmount();
+      window.history.replaceState({}, '', '/news/?h=burzhuyka&p=shr-l44');
+      const replace = vi.spyOn(window.history, 'replaceState');
+      if (outcome === 'resolve') {
+        response.resolve(Response.json({ places: [publicPlace] }));
+        imported.resolve();
+      } else {
+        response.reject(new Error('Stale data'));
+        imported.reject(new Error('Stale import'));
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+      expect(mapElements).toHaveLength(1);
+      expect(map.destroy).toHaveBeenCalledOnce();
+      expect(markerElements).toHaveLength(0);
+      expect(map.addChild).not.toHaveBeenCalled();
+      expect(replace).not.toHaveBeenCalled();
+      expect(log).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each(['resolve', 'reject'] as const)(
+    'does not create a map or change the next page when SDK later %ss after unmount',
+    async (outcome) => {
+      const ready = Promise.withResolvers<void>();
+      const response = Promise.withResolvers<Response>();
+      const getReady = vi.fn(() => ready.promise);
+      Object.defineProperty(window.ymaps3, 'ready', { get: getReady });
+      const fetch = vi.fn(() => response.promise);
+      vi.stubGlobal('fetch', fetch);
+      const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+      window.history.replaceState({}, '', '/map/?h=burzhuyka');
+      const view = render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
+      await waitFor(() => expect(getReady).toHaveBeenCalledOnce());
+      view.unmount();
+      window.history.replaceState({}, '', '/news/?h=burzhuyka');
+      const replace = vi.spyOn(window.history, 'replaceState');
+      response.resolve(Response.json({ places: [publicPlace] }));
+      if (outcome === 'resolve') ready.resolve();
+      else ready.reject(new Error('Stale SDK'));
+      await new Promise((resolve) => window.setTimeout(resolve, 180));
+      expect(mapElements).toHaveLength(0);
+      expect(clustererImport).not.toHaveBeenCalled();
+      expect(replace).not.toHaveBeenCalled();
+      expect(log).not.toHaveBeenCalled();
+    }
+  );
 
   it('focuses a requested parcel without waiting for the native control', async () => {
     const imported = Promise.withResolvers<typeof extras>();
@@ -680,7 +878,7 @@ describe('PlaceMap', () => {
       'dblClick',
       'oneFingerZoom'
     ]);
-    expect(map.update.mock.lastCall?.[0].margin).toEqual([112, 32, 32, 32]);
+    expect(mapProps[0]?.margin).toEqual([112, 32, 32, 32]);
     expect(mapProps[0]).toMatchObject({
       copyrightsPosition: 'bottom left',
       distributionPosition: 'bottom right'
@@ -824,7 +1022,9 @@ describe('PlaceMap', () => {
       'fetch',
       vi.fn(async () => Response.json({ places: [publicPondsPlace] }))
     );
-    render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
+    render(PlaceMap, {
+      props: { dataUrl: '/map/data/places.json', initialBounds: getPlaceBounds([place]) }
+    });
     await waitFor(() => expect(markerElements).toHaveLength(2));
     await waitFor(() =>
       expect(map.addChild.mock.calls.map(([child]) => child)).toContain(nativeControl)
@@ -1432,7 +1632,7 @@ describe('PlaceMap', () => {
       expect(areaFeatures.some(({ props }) => props.id === 'parcel-SHR-L43')).toBe(true)
     );
     expect(parcelFetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcels/shr.json']);
-    expect(map.update.mock.lastCall?.[0].location.bounds).toEqual([
+    expect(mapProps[0]?.location.bounds).toEqual([
       [37.715242, 55.059526],
       [37.717242, 55.061526]
     ]);
@@ -2474,11 +2674,9 @@ describe('PlaceMap', () => {
     vi.stubGlobal('fetch', fetch);
     vi.spyOn(console, 'error').mockImplementation(() => {});
     window.history.replaceState({}, '', '/map/?p=SHR-L44&other=1#map');
-    map.update
-      .mockImplementationOnce(() => {})
-      .mockImplementationOnce(() => {
-        throw new Error('SDK focus unavailable');
-      });
+    map.update.mockImplementationOnce(() => {
+      throw new Error('SDK focus unavailable');
+    });
     render(PlaceMap, { props: { places: [place] } });
     const alert = await screen.findByRole('alert');
     expect(alert.textContent).toContain('Ривер');

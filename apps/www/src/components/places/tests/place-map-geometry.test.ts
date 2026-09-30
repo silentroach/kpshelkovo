@@ -33,7 +33,18 @@ it('frames canonical places independently of editorial geometry', () => {
       ],
     ]
   `);
-  expect(getPlaceBounds([remote, local])[1][0]).toBeGreaterThan(37.72);
+  expect(getPlaceBounds([remote, local])).toMatchInlineSnapshot(`
+    [
+      [
+        -8.261,
+        46.987,
+      ],
+      [
+        48.331,
+        56.923,
+      ],
+    ]
+  `);
   expect(getPlaceBounds([])).toMatchInlineSnapshot(`
     [
       [

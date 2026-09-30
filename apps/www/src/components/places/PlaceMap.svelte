@@ -49,6 +49,7 @@
   let {
     dataUrl = '',
     fallbackPlace,
+    initialBounds,
     places = [] as readonly PlaceMapItem[],
     forest,
     village,
@@ -110,7 +111,7 @@
     fish: FISH_MARKER,
     kpp: KPP_MARKER
   };
-  const getCurrentPlaceBounds = (): ymaps3.LngLatBounds => getPlaceBounds(places);
+  const getCurrentPlaceBounds = (): ymaps3.LngLatBounds => initialBounds ?? getPlaceBounds(places);
   const getMapZoomDuration = (): number =>
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : CLUSTER_ZOOM_DURATION_MS;
   const getViewMargin = (): ymaps3.Margin =>
@@ -451,6 +452,7 @@
 
   onMount(() => {
     let destroyed = false;
+    let setupFailed = false;
     let parcelLayer: ParcelLayer | undefined;
     let popupAnchor: ymaps3.YMapMarker | undefined;
     let anchorElement: HTMLDivElement | undefined;
@@ -915,7 +917,7 @@
 
     const refresh = (): void => {
       void waitForStableLayout().then(() => {
-        if (destroyed) return;
+        if (destroyed || setupFailed) return;
 
         positionPopup();
         if (preserveParcelCamera || selectedParcel) return;
@@ -938,16 +940,55 @@
 
     void (async () => {
       try {
-        const placesRequest = places.length ? Promise.resolve(places) : fetchPlaces(dataUrl);
-        const [loadedPlaces] = await Promise.all([placesRequest, loadYandexMaps()]);
+        const sdkRequest = loadYandexMaps();
+        const objectsRequest = Promise.all([
+          places.length ? Promise.resolve(places) : fetchPlaces(dataUrl),
+          // The module extends SDK classes at evaluation time; load it alongside layout, not before SDK.
+          sdkRequest.then(() => {
+            if (destroyed || setupFailed) return;
+            return import('@yandex/ymaps3-clusterer');
+          })
+        ]);
+        const basemapRequest = (async () => {
+          await sdkRequest;
+          if (destroyed || setupFailed || !mapContainer) return;
+          const ymaps3 = window.ymaps3;
+          if (!ymaps3) throw new Error('Yandex Maps API недоступен');
+          await waitForStableLayout();
+          if (destroyed || setupFailed || !mapContainer) return;
 
-        if (destroyed || !mapContainer) return;
+          map = new ymaps3.YMap(
+            mapContainer,
+            {
+              location: { bounds: getCurrentPlaceBounds() },
+              margin: getViewMargin(),
+              behaviors: mapBehaviors(),
+              mode: 'vector',
+              copyrightsPosition: 'bottom left',
+              distributionPosition: 'bottom right'
+            },
+            [
+              new ymaps3.YMapDefaultSchemeLayer({
+                layers: {
+                  ground: { zIndex: 0 },
+                  buildings: { zIndex: 1 },
+                  icons: { visible: false, zIndex: 2 },
+                  labels: { zIndex: 3 }
+                }
+              }),
+              new ymaps3.YMapDefaultFeaturesLayer()
+            ]
+          );
+        })();
+        // Observe both branches immediately, including failures before SDK/layout readiness.
+        const [, [loadedPlaces, clusterer]] = await Promise.all([basemapRequest, objectsRequest]);
+        if (destroyed || setupFailed || !map || !mapContainer || !clusterer) return;
+        const { YMapClusterer, clusterByGrid } = clusterer;
 
         places = loadedPlaces;
         highlightedPlace = requestedSlug
           ? places.find((place) => place.slug === requestedSlug)
           : undefined;
-
         if (
           !requestedParcelCode &&
           highlightUrl.searchParams.has(PLACE_HIGHLIGHT_QUERY_PARAM) &&
@@ -955,46 +996,8 @@
         ) {
           removeHighlightQuery(requestedSlug);
         }
-
         const ymaps3 = window.ymaps3;
-
-        if (!ymaps3) {
-          removeHighlightQuery(highlightedPlace?.slug);
-          highlightedPlace = undefined;
-          error = 'Yandex Maps API недоступен';
-          return;
-        }
-
-        await ymaps3.ready;
-        const { YMapClusterer, clusterByGrid } = await import('@yandex/ymaps3-clusterer');
-        await waitForStableLayout();
-
-        if (destroyed || !mapContainer) return;
-
-        const { YMap, YMapDefaultFeaturesLayer, YMapDefaultSchemeLayer, YMapListener, YMapMarker } =
-          ymaps3;
-
-        map = new YMap(
-          mapContainer,
-          {
-            location: { bounds: getCurrentPlaceBounds() },
-            behaviors: mapBehaviors(),
-            mode: 'vector',
-            copyrightsPosition: 'bottom left',
-            distributionPosition: 'bottom right'
-          },
-          [
-            new YMapDefaultSchemeLayer({
-              layers: {
-                ground: { zIndex: 0 },
-                buildings: { zIndex: 1 },
-                icons: { visible: false, zIndex: 2 },
-                labels: { zIndex: 3 }
-              }
-            }),
-            new YMapDefaultFeaturesLayer()
-          ]
-        );
+        const { YMapListener, YMapMarker } = ymaps3;
 
         markerContents = places.map((place) => [place, createMarkerContent(place)] as const);
         for (const place of places) {
@@ -1066,8 +1069,6 @@
 
         if (highlightedPlace) {
           startPlaceHighlight(highlightedPlace);
-        } else {
-          fitPlaces();
         }
         if (markerContents.some(([place]) => place.openingHours)) {
           markerUpdateTimer = window.setInterval(refreshMarkerContents, 60_000);
@@ -1088,6 +1089,7 @@
         map.addChild(control);
       } catch (reason) {
         if (destroyed) return;
+        setupFailed = true;
         console.error('Places map setup error:', reason);
         for (const part of PARCEL_PARTS)
           parcelRevisions.set(part, (parcelRevisions.get(part) ?? 0) + 1);

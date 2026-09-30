@@ -2,7 +2,10 @@ import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { fromPublicEditorialGeometry } from '@/components/places/place-map-geometry';
+import {
+  fromPublicEditorialGeometry,
+  getPlaceBounds
+} from '@/components/places/place-map-geometry';
 import { parseEditorialGeometry } from '@/lib/geometry/editorial-mapper';
 import { toPublicEditorialGeometry } from '@/lib/geometry/editorial-public';
 import { EditorialPublicGeometrySchema } from '@/lib/geometry/editorial-public-schema';
@@ -109,6 +112,23 @@ describe('place map public DTO', () => {
     expect(buildPlacesMarkdown([hidden, place])).toBe(buildPlacesMarkdown([place]));
     expect(buildPlaceMapPublicPayload([hidden])).toEqual({ places: [] });
     expect(buildPlacesMarkdown([hidden])).toBe(buildPlacesMarkdown([]));
+  });
+
+  it('frames the same visible domain points as JSON without hidden places or extra geometry', () => {
+    const hidden: Place = {
+      ...place,
+      slug: 'hidden',
+      showOnMap: false,
+      coordinates: { lng: -100, lat: -50 }
+    };
+    const outside: Place = { ...place, slug: 'outside', coordinates: { lng: 2.35, lat: 48.85 } };
+    const places = [hidden, place, outside];
+    const bounds = getPlaceBounds(selectMapPlaces(places));
+
+    expect(bounds).toEqual(getPlaceBounds(buildPlaceMapPublicPayload(places).places));
+    expect(bounds).toEqual(getPlaceBounds([place, outside]));
+    expect(getPlaceBounds(selectMapPlaces([hidden]))).toEqual(getPlaceBounds([]));
+    expect(getPlaceBounds([place])).toEqual(getPlaceBounds([{ coordinates: place.coordinates }]));
   });
   it('keeps all existing public place fields apart from geometry', () => {
     const { geometry, ...item } = buildPlaceMapPublicPayload([place]).places[0]!;
