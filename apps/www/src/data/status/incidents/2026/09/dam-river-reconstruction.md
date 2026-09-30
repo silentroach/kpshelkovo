@@ -3,7 +3,7 @@ title: Реконструкция дамбы
 service: dam
 kind: maintenance
 started_at: 24.09.2026
-ended_at: 31.10.2026
+ended_at: 01.11.2026 00:00
 areas:
   - river
 source_url: https://okkomfort.domyland.app/news?targetId=119187&entityName=news&t=okkomfort
