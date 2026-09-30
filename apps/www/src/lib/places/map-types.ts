@@ -1,3 +1,4 @@
+import type { LngLatBounds } from '@yandex/ymaps3-types';
 import type { Snippet } from 'svelte';
 
 import type { PlaceMarker, PlaceStatus } from './schema';
@@ -23,6 +24,7 @@ export interface PlaceMapFallback {
 export interface PlaceMapProps {
   readonly dataUrl?: string;
   readonly fallbackPlace?: PlaceMapFallback;
+  readonly initialBounds?: LngLatBounds;
   readonly places?: readonly PlaceMapItem[];
   readonly forest?: Snippet;
   readonly village?: Snippet;

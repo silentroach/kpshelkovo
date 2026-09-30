@@ -43,7 +43,9 @@ export const getPaddedBounds = (coordinates: readonly LngLat[]): LngLatBounds =>
   ];
 };
 
-export const getPlaceBounds = (places: readonly PlaceMapItem[]): LngLatBounds =>
+export const getPlaceBounds = (
+  places: readonly Pick<PlaceMapItem, 'coordinates'>[]
+): LngLatBounds =>
   getPaddedBounds(places.map((place): LngLat => [place.coordinates.lng, place.coordinates.lat]));
 
 export const getMarkerScale = (zoom: number): number => {
