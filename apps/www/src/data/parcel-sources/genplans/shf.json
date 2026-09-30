@@ -1,7 +1,7 @@
 {
   "part": "shf",
   "page": "https://dgtime.ru/shf/shf-genplan/",
-  "capturedAt": "2026-09-29T09:17:37.984Z",
+  "capturedAt": "2026-09-30T09:18:48.613Z",
   "plots": [
     {
       "id": "M1",
@@ -2458,7 +2458,7 @@
       "cadastralReference": "50:33:0010101:1557",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 4690457
+      "objectprice": 4288900
     },
     {
       "id": "W54",
