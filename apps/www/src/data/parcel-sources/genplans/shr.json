@@ -1,7 +1,7 @@
 {
   "part": "shr",
   "page": "https://dgtime.ru/shr/shr-genplan/",
-  "capturedAt": "2026-09-30T09:18:48.774Z",
+  "capturedAt": "2026-10-01T09:19:39.314Z",
   "plots": [
     {
       "id": "E1",
@@ -3655,7 +3655,7 @@
     {
       "id": "К11",
       "cadastralReference": "50:33:0010101:2458",
-      "status": "Забронирован",
+      "status": "Продан",
       "location": "с видом на лес",
       "objectprice": 4499000
     },
