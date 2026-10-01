@@ -1,8 +1,14 @@
 import { render } from '@testing-library/svelte';
-import { describe, it, expect } from 'vitest';
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
 
 import type { Source } from '../lib/settlement/types';
 import SourcesList from './SourcesList.svelte';
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 describe('SourcesList', () => {
   const mockSources: Source[] = [
@@ -38,10 +44,44 @@ describe('SourcesList', () => {
     expect(container.textContent).toContain('Чат жителей (Telegram)');
     expect(container.textContent).toContain('Статья в газете');
 
-    // Проверяем, что даты рендерятся в русском формате DD MMMM YYYY.
-    expect(container.textContent).toContain('10 марта 2026');
-    expect(container.textContent).toContain('15 марта 2026');
-    expect(container.textContent).toContain('20 февраля 2026');
+    expect([...container.querySelectorAll('.source-date')].map((date) => date.textContent?.trim()))
+      .toMatchInlineSnapshot(`
+      [
+        "10 марта",
+        "15 марта",
+        "20 февраля",
+      ]
+    `);
+  });
+
+  it('retains other years without changing source dates or links', () => {
+    const sources = ['2025-03-10', '2027-03-10'].map((dateChecked) => ({
+      ...mockSources[0]!,
+      dateChecked,
+      url: `https://example.com/${dateChecked}`
+    }));
+    const { container } = render(SourcesList, { props: { sources } });
+
+    expect(
+      [...container.querySelectorAll('li')].map((row, index) => ({
+        date: row.querySelector('.source-date')?.textContent?.trim(),
+        href: row.querySelector('a')?.getAttribute('href'),
+        raw: sources[index]?.dateChecked
+      }))
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "date": "10 марта 2025",
+          "href": "https://example.com/2025-03-10",
+          "raw": "2025-03-10",
+        },
+        {
+          "date": "10 марта 2027",
+          "href": "https://example.com/2027-03-10",
+          "raw": "2027-03-10",
+        },
+      ]
+    `);
   });
 
   it('renders source type badges with correct labels', () => {

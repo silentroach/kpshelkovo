@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { formatContactPhone } from '../phone';
 import {
@@ -8,6 +8,12 @@ import {
   formatContactReviewDate,
   hasManyPositiveContactReviews
 } from '../view';
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 describe('contact view helpers', () => {
   it('formats category labels', () => {
@@ -30,7 +36,7 @@ describe('contact view helpers', () => {
         publishedIso: '2026-04-07',
         url: 'https://t.me/example/1'
       })
-    ).toBe('7 апреля 2026');
+    ).toBe('7 апреля');
   });
 
   it.each([

@@ -1,7 +1,8 @@
 /// <reference types="astro/client" />
 
 import { Window } from 'happy-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { z } from 'zod';
 
 import { loadStatusData } from '@/lib/status/load';
 import { statusCalendarYearUrl, statusHistoryUrl } from '@/lib/status/routes';
@@ -14,6 +15,12 @@ import StatusIncidentPage from '@/pages/status/incidents/[year]/[month]/[entry]/
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import StatusPage from '@/pages/status/index.astro';
 import { createAstroContainer } from '@/test/astro-container';
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 const fixtures = vi.hoisted(() => {
   const incidents = Array.from({ length: 12 }, (_, index) => {
@@ -369,12 +376,25 @@ describe('/status/incidents/[year]/[month]/[entry]/', () => {
       })
     );
 
+    const articleSchema = z
+      .object({
+        datePublished: z.string(),
+        dateModified: z.string(),
+        url: z.url()
+      })
+      .parse(JSON.parse(document.querySelector('script[type="application/ld+json"]')!.textContent));
     expect({
       documentTitle: document.title,
-      heading: document.querySelector('h1')?.textContent.trim()
+      heading: document.querySelector('h1')?.textContent.trim(),
+      canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href'),
+      datePublished: articleSchema.datePublished,
+      dateModified: articleSchema.dateModified
     }).toMatchInlineSnapshot(`
       {
-        "documentTitle": "Тестовая запись 2, 2 августа 2026 — Шелково Онлайн",
+        "canonical": "https://kpshelkovo.online/status/incidents/2026/08/incident-2/",
+        "dateModified": "2026-08-02T13:00:00+03:00",
+        "datePublished": "2026-08-02T12:00:00+03:00",
+        "documentTitle": "Тестовая запись 2, 2 августа — Шелково Онлайн",
         "heading": "Тестовая запись 2",
       }
     `);

@@ -471,7 +471,7 @@ describe('/status/calendar/YYYY/', () => {
             "descriptionExists": true,
             "href": "/status/calendar/2026/01/#2026-01-01",
             "id": "2026-01-01",
-            "label": "1 января 2026: 0 проблем, 1 плановая работа",
+            "label": "1 января: 0 проблем, 1 плановая работа",
             "marker": "maintenance",
           },
           {
@@ -480,7 +480,7 @@ describe('/status/calendar/YYYY/', () => {
             "descriptionExists": true,
             "href": "/status/calendar/2026/08/#2026-08-23",
             "id": "2026-08-23",
-            "label": "23 августа 2026: 1 проблема, 0 плановых работ",
+            "label": "23 августа: 1 проблема, 0 плановых работ",
             "marker": "incident",
           },
           {
@@ -489,7 +489,7 @@ describe('/status/calendar/YYYY/', () => {
             "descriptionExists": true,
             "href": "/status/calendar/2026/08/#2026-08-24",
             "id": "2026-08-24",
-            "label": "24 августа 2026: 2 проблемы, 1 плановая работа",
+            "label": "24 августа: 2 проблемы, 1 плановая работа",
             "marker": "mixed",
           },
         ],
@@ -517,7 +517,7 @@ describe('/status/calendar/YYYY/', () => {
             "interactiveElements": 0,
             "label": "Откроется журнал за этот день",
             "role": "tooltip",
-            "text": "1·января·2026
+            "text": "1·января
       1·плановая·работа",
           },
           {
@@ -526,7 +526,7 @@ describe('/status/calendar/YYYY/', () => {
             "interactiveElements": 0,
             "label": "Откроется журнал за этот день",
             "role": "tooltip",
-            "text": "23·августа·2026
+            "text": "23·августа
       1·проблема",
           },
           {
@@ -535,7 +535,7 @@ describe('/status/calendar/YYYY/', () => {
             "interactiveElements": 0,
             "label": "Откроется журнал за этот день",
             "role": "tooltip",
-            "text": "24·августа·2026
+            "text": "24·августа
       2·проблемы
       1·плановая·работа",
           },

@@ -1,9 +1,15 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Review } from '../types';
 
 let reviewPageSchema: typeof import('../seo').reviewPageSchema;
 let reviewsCollectionPageSchema: typeof import('../seo').reviewsCollectionPageSchema;
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
@@ -35,6 +41,39 @@ const review = {
 } satisfies Review;
 
 describe('reviews schema', () => {
+  it('shortens generated names without shortening JSON-LD dates or URLs', () => {
+    const schema = reviewPageSchema({
+      review: { ...review, title: undefined },
+      description: 'Отзыв Алексея о жизни в Шелково.'
+    });
+
+    expect(
+      schema.map((item) => ({
+        name: item.name,
+        datePublished: item.datePublished,
+        url: item.url
+      }))
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "datePublished": "2026-06-25",
+          "name": "Отзыв собственника от 25 июня",
+          "url": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/",
+        },
+        {
+          "datePublished": "2026-06-25",
+          "name": "Отзыв собственника от 25 июня. Застройщик",
+          "url": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/",
+        },
+        {
+          "datePublished": "2026-06-25",
+          "name": "Отзыв собственника от 25 июня. Обслуживание",
+          "url": "https://example.com/reviews/2026-06-25-life-in-shelkovo-forest/",
+        },
+      ]
+    `);
+  });
+
   it('connects the collection, item list, and review entities', () => {
     const schema = reviewsCollectionPageSchema({
       name: 'Отзывы собственников',

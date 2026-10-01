@@ -3,7 +3,7 @@ import { basename } from 'node:path';
 
 import { z } from 'astro/zod';
 import { Window } from 'happy-dom';
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { parse } from 'yaml';
 
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
@@ -103,7 +103,14 @@ const linkedDataset = (record: EventRecord) => {
 beforeAll(() =>
   Object.assign(import.meta.env, { SITE: 'https://kpshelkovo.online', BASE_URL: '/' })
 );
-afterEach(() => vi.restoreAllMocks());
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.useRealTimers();
+});
 
 describe('shared events in news', () => {
   it('publishes one rounded point in event and news HTML, JSON, Markdown, JSON-LD, ICS and generated URLs', async () => {
@@ -344,7 +351,7 @@ describe('shared events in news', () => {
       expect(document.body.textContent).not.toContain('00:00');
       expect(!!document.querySelector('[download]')).toBe(!!through);
       expect(document.body.textContent.replaceAll('\u00a0', ' ')).toContain(
-        through ? '1 июня 2026 — 3 июня 2026' : 'Время уточняется'
+        through ? '1 июня — 3 июня' : 'Время уточняется'
       );
       window.close();
     }

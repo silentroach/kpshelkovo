@@ -1,9 +1,15 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createPersonMentionTarget } from '@/lib/people/mentions';
 
 import { createReviewMentionRefs } from '../mentions';
 import type { Review } from '../types';
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 const target = createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин');
 
@@ -24,6 +30,24 @@ const review = (input?: {
 });
 
 describe('createReviewMentionRefs', () => {
+  it('shortens a generated title while preserving the raw backlink datetime and URLs', () => {
+    const ref = createReviewMentionRefs({ ...review(), title: undefined })[0]!;
+
+    expect({
+      title: ref.title,
+      mentionedAt: ref.mentionedAt,
+      htmlUrl: ref.htmlUrl,
+      markdownUrl: ref.markdownUrl
+    }).toMatchInlineSnapshot(`
+      {
+        "htmlUrl": "/reviews/2026-06-25-test/",
+        "markdownUrl": "/reviews/2026-06-25-test/index.md",
+        "mentionedAt": "2026-06-25T00:00:00.000Z",
+        "title": "Отзыв собственника от 25 июня",
+      }
+    `);
+  });
+
   it('creates review source refs with review presentation fields', () => {
     expect(createReviewMentionRefs(review())).toMatchInlineSnapshot(`
       [

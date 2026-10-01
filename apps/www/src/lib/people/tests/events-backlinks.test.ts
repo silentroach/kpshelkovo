@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
 import { buildEventsDataset } from '@/lib/events/load';
@@ -12,7 +12,14 @@ import { schema } from '../discovery';
 import { buildPeopleGraphDataset } from '../load';
 import { buildPeoplePublicPayload } from '../public-dto';
 import { buildPeopleDataset } from '../registry';
-import { buildPersonMarkdown, personBacklinkGroups } from '../view';
+import type { PersonMentionRef } from '../types';
+import { buildPersonMarkdown, formatPersonBacklinkDate, personBacklinkGroups } from '../view';
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 describe('event backlink consumers', () => {
   it.each(['2026-12-30', '30.12.2026 18:00'])(
@@ -70,7 +77,49 @@ describe('event backlink consumers', () => {
       );
       const groups = placeBacklinkGroups(createPlaceBacklinksFromGraph(placeGraph, 'venue'));
       expect(groups.map((group) => group.section)).toEqual(['events']);
-      expect(formatPlaceBacklinkDate(groups[0]!.items[0]!)).toBe('30 декабря 2026');
+      expect(formatPlaceBacklinkDate(groups[0]!.items[0]!)).toBe('30 декабря');
+    }
+  );
+
+  it.each(['news', 'reviews', 'contacts'] as const)(
+    'formats %s datetime backlinks in Moscow without rewriting their source values',
+    (section) => {
+      const backlink = {
+        section,
+        kind: section === 'news' ? 'article' : section === 'reviews' ? 'review' : 'contact',
+        sourceId: 'dated-source',
+        title: 'Dated source',
+        htmlUrl: '/source/2026-12-31/',
+        markdownUrl: '/source/2026-12-31/index.md',
+        mentionedAt: '2026-12-31T21:00:00.123Z'
+      } satisfies PersonMentionRef;
+
+      expect([formatPersonBacklinkDate(backlink), formatPlaceBacklinkDate(backlink)])
+        .toMatchInlineSnapshot(`
+          [
+            "1 января 2027",
+            "1 января 2027",
+          ]
+        `);
+      vi.setSystemTime(new Date('2026-12-31T21:00:00Z'));
+      expect([formatPersonBacklinkDate(backlink), formatPlaceBacklinkDate(backlink)])
+        .toMatchInlineSnapshot(`
+          [
+            "1 января",
+            "1 января",
+          ]
+        `);
+      expect({
+        datetime: backlink.mentionedAt,
+        htmlUrl: backlink.htmlUrl,
+        markdownUrl: backlink.markdownUrl
+      }).toMatchInlineSnapshot(`
+        {
+          "datetime": "2026-12-31T21:00:00.123Z",
+          "htmlUrl": "/source/2026-12-31/",
+          "markdownUrl": "/source/2026-12-31/index.md",
+        }
+      `);
     }
   );
 });

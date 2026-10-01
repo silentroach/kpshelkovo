@@ -1,5 +1,5 @@
 import { formatPercentage, pluralize } from '@shelkovo/format';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { visibleWhitespace } from '@/lib/test/visible-whitespace';
 
@@ -8,6 +8,12 @@ import { mapRawSettlement } from './settlement/mapper';
 import type { RawSettlement } from './settlement/schema';
 
 const toDomain = (item: RawSettlement) => mapRawSettlement(item);
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 vi.mock('./data', () => ({
   loadAllData: async () => {
@@ -339,7 +345,7 @@ describe('compare markdown navigation', () => {
 
       ## Источники
 
-      - 1 мая 2026 — официальный источник — Публичная презентация: <https://example.com/source> (тариф и инфраструктура)
+      - 1 мая — официальный источник — Публичная презентация: <https://example.com/source> (тариф и инфраструктура)
       "
     `);
   });

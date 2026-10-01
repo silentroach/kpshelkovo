@@ -1,10 +1,16 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Review } from '../types';
 
 let buildReviewMarkdown: typeof import('../markdown').buildReviewMarkdown;
 let buildReviewsHomeMarkdown: typeof import('../markdown').buildReviewsHomeMarkdown;
 let buildReviewsRulesMarkdown: typeof import('../markdown').buildReviewsRulesMarkdown;
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
@@ -108,7 +114,7 @@ describe('reviews markdown companions', () => {
 
       # Год жизни в Шелково
 
-      25 июня 2026; Алексей; Шелково Форест.
+      25 июня; Алексей; Шелково Форест.
 
       Основной текст отзыва.
 

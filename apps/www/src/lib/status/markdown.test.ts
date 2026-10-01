@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { buildStatusCalendarProjection, toStatusCalendarRecord } from './calendar';
 import { getStatusMonthJournal } from './journal';
@@ -9,6 +9,8 @@ let buildStatusIncidentMarkdown: typeof import('./markdown').buildStatusIncident
 let buildStatusMonthMarkdown: typeof import('./markdown').buildStatusMonthMarkdown;
 
 beforeAll(async () => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
     BASE_URL: '/'
@@ -17,6 +19,7 @@ beforeAll(async () => {
   ({ buildStatusHomeMarkdown, buildStatusIncidentMarkdown, buildStatusMonthMarkdown } =
     await import('./markdown'));
 });
+afterAll(() => vi.useRealTimers());
 
 const incident = (input?: Partial<StatusIncidentWithDetail>): StatusIncidentWithDetail => ({
   id: '2026/05/electricity-river-outage',
@@ -247,12 +250,12 @@ describe('buildStatusMonthMarkdown', () => {
     expect(buildStatusMonthMarkdown(journal)).toMatchInlineSnapshot(`
       "# Статусы за май 2026 года
 
-      ## 2 мая 2026
+      ## 2 мая
 
       - [Продолжающееся отключение](https://example.com/status/incidents/2026/05/carryover/index.md) — Электричество; Инцидент; восстановлено; 1 мая, 23:00 - 2 мая, 02:30 (3 ч. 30 мин.)
       - [Новое отключение](https://example.com/status/incidents/2026/05/new-incident/index.md) — Электричество; Инцидент; восстановлено; 2 мая, 01:00 - 02:00 (1 ч.)
 
-      ## 1 мая 2026
+      ## 1 мая
 
       - [Продолжающееся отключение](https://example.com/status/incidents/2026/05/carryover/index.md) — Электричество; Инцидент; восстановлено; 1 мая, 23:00 - 2 мая, 02:30 (3 ч. 30 мин.)
       "

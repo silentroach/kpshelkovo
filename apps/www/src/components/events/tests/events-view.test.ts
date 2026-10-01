@@ -1,7 +1,7 @@
 /// <reference types="astro/client" />
 
 import { Window } from 'happy-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
 import { buildEventCalendar } from '@/lib/events/calendar-projection';
@@ -17,6 +17,12 @@ import { createAstroContainer } from '@/test/astro-container';
 import EventCard from '../EventCard.astro';
 // @ts-expect-error Astro components are resolved by Astro/Vitest.
 import EventMonthPage from '../EventMonthPage.astro';
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 const event = (id: string, starts: string, extra: Partial<RawEventInput> = {}) =>
   mapRawEvent({
@@ -233,12 +239,12 @@ describe('event cards', () => {
   });
 
   it.each([
-    ['period', '30.12.2026', { through: '03.01.2027' }, ['30 декабря 2026', '3 января 2027']],
+    ['period', '30.12.2026', { through: '03.01.2027' }, ['30 декабря', '3 января 2027']],
     [
       'night',
       '05.01.2026 21:00',
       { ends_at: '06.01.2026 02:00' },
-      ['5 января 2026', '6 января 2026', '21:00', '02:00']
+      ['5 января', '6 января', '21:00', '02:00']
     ]
   ] as const)(
     'keeps the complete %s interval in the shared detail widget',
@@ -361,8 +367,9 @@ describe('event calendar pages', () => {
     expect(
       grid?.querySelector('li[aria-hidden="true"] a, li[aria-hidden="true"] [data-cancelled]')
     ).toBeFalsy();
-    expect(grid?.querySelector('a')?.getAttribute('aria-label')).toContain(
-      '1 сентября 2026: 1 событие'
+    expect(grid?.querySelector('a')?.getAttribute('aria-label')).toContain('1 сентября: 1 событие');
+    expect(grid?.querySelector('.empty-day .ui-visually-hidden')?.textContent.trim()).toBe(
+      '3 сентября: нет опубликованных событий'
     );
     expect(grid?.querySelector('a[href="/events/2026/09/19/"]')?.getAttribute('title')).toContain(
       'все отменены'
@@ -518,5 +525,46 @@ describe('event calendar pages', () => {
       expect(schema.endDate).toBe(record.through);
       if (record.status === 'conditional') expect(schema.eventStatus).toBeUndefined();
     }
+  });
+
+  it('uses the generation year in day SEO without changing its URL', async () => {
+    const day = calendar.byDay.get('2026-09-02')!;
+    const container = await createAstroContainer();
+    const metadata = [];
+    for (const now of ['2026-10-01T09:00:00Z', '2027-01-01T09:00:00Z']) {
+      vi.setSystemTime(new Date(now));
+      const document = documentFor(
+        await container.renderToString(EventEntryPage, {
+          props: { day, month },
+          request: new Request(`https://kpshelkovo.online${day.url}`)
+        })
+      );
+      metadata.push({
+        title: document.title,
+        descriptionDate: document
+          .querySelector('meta[name="description"]')
+          ?.getAttribute('content')
+          ?.split(':')[0],
+        heading: document.querySelector('h1')?.textContent.replaceAll('\u00a0', ' '),
+        canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href')
+      });
+    }
+
+    expect(metadata).toMatchInlineSnapshot(`
+      [
+        {
+          "canonical": "https://kpshelkovo.online/events/2026/09/02/",
+          "descriptionDate": "2 сентября",
+          "heading": "2 сентября",
+          "title": "2 сентября — События — Шелково Онлайн",
+        },
+        {
+          "canonical": "https://kpshelkovo.online/events/2026/09/02/",
+          "descriptionDate": "2 сентября 2026",
+          "heading": "2 сентября 2026",
+          "title": "2 сентября 2026 — События — Шелково Онлайн",
+        },
+      ]
+    `);
   });
 });

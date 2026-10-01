@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { parse } from 'yaml';
 import { z } from 'zod';
 
@@ -6,6 +6,12 @@ import type { PlaceOpeningHours, PlaceWithBacklinks } from '../types';
 
 let buildPlaceMarkdown: typeof import('../markdown').buildPlaceMarkdown;
 let buildPlacesMarkdown: typeof import('../markdown').buildPlacesMarkdown;
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 const frontmatterSchema = z.strictObject({
   title: z.string().min(1),
@@ -356,7 +362,7 @@ describe('places Markdown', () => {
     );
     expect(body).toContain('## Где упоминается\n\n### Новости');
     expect(body).toContain(
-      '[В Шелково открылся фудтрак](https://example.com/news/2026/07/food-truck/index.md) — Новость; 23 июля 2026'
+      '[В Шелково открылся фудтрак](https://example.com/news/2026/07/food-truck/index.md) — Новость; 23 июля'
     );
     expect(body).toContain('Фудтрак работает каждый день.');
     expect(body).toContain('### Карта\n\n- [Пляж](https://example.com/map/beach/index.md) — Место');

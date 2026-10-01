@@ -1,8 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { testPlace } from '@/lib/places/tests/place.test-helper';
 
 import { buildEventMapUrl, formatEventBadgeMonth, formatEventRange } from '../view';
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 describe('formatEventRange', () => {
   it('formats same-day event ranges', () => {
@@ -13,7 +19,7 @@ describe('formatEventRange', () => {
         endsIso: '2026-05-31T21:00:00+03:00',
         endsTime: '21:00'
       })
-    ).toMatchInlineSnapshot(`"31 мая 2026, 19:00–21:00"`);
+    ).toMatchInlineSnapshot(`"31 мая, 19:00–21:00"`);
   });
 
   it('dates an overnight ending in Moscow even when its UTC date matches the start', () => {
@@ -24,7 +30,7 @@ describe('formatEventRange', () => {
         endsIso: '2026-05-31T22:00:00Z',
         endsTime: '01:00'
       })
-    ).toMatchInlineSnapshot(`"31 мая 2026, 23:30 – 1 июня 2026, 01:00"`);
+    ).toMatchInlineSnapshot(`"31 мая, 23:30 – 1 июня, 01:00"`);
   });
 
   it('formats open-ended event ranges with start time only', () => {
@@ -33,18 +39,25 @@ describe('formatEventRange', () => {
         startsDate: '2026-05-31',
         startsTime: '19:00'
       })
-    ).toMatchInlineSnapshot(`"31 мая 2026, 19:00"`);
+    ).toMatchInlineSnapshot(`"31 мая, 19:00"`);
   });
 
   it('keeps a cross-year date-only period inclusive without inventing hours', () => {
     expect(
       formatEventRange({ startsDate: '2026-12-30', through: '2027-01-03' })
-    ).toMatchInlineSnapshot(`"30 декабря 2026 – 3 января 2027, включительно"`);
+    ).toMatchInlineSnapshot(`"30 декабря – 3 января 2027, включительно"`);
+  });
+
+  it('keeps the previous year when regenerating the same period in the following year', () => {
+    vi.setSystemTime(new Date('2026-12-31T21:00:00Z'));
+    expect(
+      formatEventRange({ startsDate: '2026-12-30', through: '2027-01-03' })
+    ).toMatchInlineSnapshot(`"30 декабря 2026 – 3 января, включительно"`);
   });
 
   it('keeps unknown hours explicit for a single date', () => {
     expect(formatEventRange({ startsDate: '2026-05-31' })).toMatchInlineSnapshot(
-      `"31 мая 2026, время не указано"`
+      `"31 мая, время не указано"`
     );
   });
 });
