@@ -1,7 +1,7 @@
 /// <reference types="astro/client" />
 
 import { Window } from 'happy-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type {
   StatusCalendarDay,
@@ -13,6 +13,12 @@ import type { StatusIncident } from '@/lib/status/types';
 import * as StatusCalendarMonthPage from '@/pages/status/calendar/[year]/[month]/index.astro';
 import * as StatusCalendarMonthMarkdownRoute from '@/pages/status/calendar/[year]/[month]/index.md';
 import { createAstroContainer } from '@/test/astro-container';
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 const fixtures = vi.hoisted(() => {
   const carryover = {
@@ -228,6 +234,7 @@ const htmlJournal = (document: ReturnType<typeof parseHtml>) =>
       markerRole: marker?.getAttribute('role'),
       markerLabel: marker?.getAttribute('aria-label'),
       date: cleanText(heading?.querySelector('time')?.textContent ?? ''),
+      datetime: heading?.querySelector('time')?.getAttribute('datetime'),
       records: [...section.querySelectorAll('article h3')].map((record) => ({
         title: cleanText(record.textContent),
         href: record.querySelector('a')?.getAttribute('href')
@@ -329,8 +336,9 @@ describe('/status/calendar/YYYY/MM/', () => {
       {
         "days": [
           {
-            "date": "24 августа 2026",
-            "heading": "24 августа 2026",
+            "date": "24 августа",
+            "datetime": "2026-08-24",
+            "heading": "24 августа",
             "id": "2026-08-24",
             "marker": "mixed",
             "markerLabel": "Есть проблемы и плановые работы",
@@ -348,8 +356,9 @@ describe('/status/calendar/YYYY/MM/', () => {
             "tabindex": "-1",
           },
           {
-            "date": "23 августа 2026",
-            "heading": "23 августа 2026",
+            "date": "23 августа",
+            "datetime": "2026-08-23",
+            "heading": "23 августа",
             "id": "2026-08-23",
             "marker": "incident",
             "markerLabel": "Есть проблемы",
@@ -409,14 +418,14 @@ describe('/status/calendar/YYYY/MM/', () => {
         "contentType": "text/markdown; charset=utf-8",
         "days": [
           {
-            "date": "24 августа 2026",
+            "date": "24 августа",
             "records": [
               "Продолжающееся отключение",
               "Плановые работы без страницы",
             ],
           },
           {
-            "date": "23 августа 2026",
+            "date": "23 августа",
             "records": [
               "Более раннее отключение",
               "Продолжающееся отключение",

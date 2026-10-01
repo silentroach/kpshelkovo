@@ -93,6 +93,148 @@ afterEach(() => {
 });
 
 describe('SearchDialog', () => {
+  it('formats raw date metadata and leaves normalized missing dates absent without rendering HTML', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-10-01T12:00:00Z'));
+    const metadata = [
+      { publishedAt: '2026-07-01' },
+      { publishedAt: '2025-07-01' },
+      { publishedAt: '2026-12-31T21:00:00Z' },
+      {},
+      { publishedAt: '' },
+      { publishedAt: ' \t\n ' },
+      { publishedAt: 42 },
+      { publishedAt: '"><img src=x onerror=alert(1)>' }
+    ] as const;
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => ({
+        init: async () => {},
+        options: async () => {},
+        preload: async () => {},
+        search: async () => ({
+          results: metadata.map((meta, index) => ({
+            id: `date-${index}`,
+            data: async () => ({
+              url: `/news/result-${index}/`,
+              meta: {
+                title: `Результат ${index}`,
+                sectionId: 'news',
+                sectionLabel: 'Новости',
+                ...meta
+              }
+            })
+          }))
+        })
+      })
+    });
+    const opener = addOpener('Поиск');
+    const view = render(SearchDialog, { props: { client } });
+
+    await requestOpen(opener);
+    await fireEvent.input(view.getByRole('searchbox'), { target: { value: 'дата публикации' } });
+    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(metadata.length));
+
+    expect(
+      view.getAllByRole('link').map((link) => {
+        const time = link.querySelector('time');
+        return time ? `${time.dateTime}: ${time.textContent?.trim()}` : undefined;
+      })
+    ).toMatchInlineSnapshot(`
+      [
+        "2026-07-01: 1 июля",
+        "2025-07-01: 1 июля 2025",
+        "2026-12-31T21:00:00Z: 1 января 2027",
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        ""><img src=x onerror=alert(1)>: Invalid DateTime",
+      ]
+    `);
+    expect(view.container.querySelector('img, script')).toBeNull();
+  });
+
+  it('refreshes cached date labels after the Moscow new year in the same mounted dialog', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-12-31T20:59:59.999Z'));
+    const data = ['2026-07-01', '2026-12-31T21:00:00Z'].map((publishedAt, index) =>
+      vi.fn(async () => ({
+        url: `/news/result-${index}/`,
+        meta: {
+          title: `Результат ${index}`,
+          sectionId: 'news',
+          sectionLabel: 'Новости',
+          publishedAt
+        }
+      }))
+    );
+    const search = vi.fn<PagefindRuntime['search']>(async () => ({
+      results: data.map((load, index) => ({ id: `date-${index}`, data: load }))
+    }));
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => ({
+        init: async () => {},
+        options: async () => {},
+        preload: async () => {},
+        search
+      })
+    });
+    const opener = addOpener('Поиск');
+    const view = render(SearchDialog, { props: { client } });
+    const dialog = dialogFrom(view.container);
+    const dates = () =>
+      view.getAllByRole('link').map((link) => {
+        const time = link.querySelector('time');
+        return time ? `${time.dateTime}: ${time.textContent?.trim()}` : undefined;
+      });
+
+    await requestOpen(opener);
+    await fireEvent.input(view.getByRole('searchbox'), { target: { value: 'дата публикации' } });
+    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(data.length));
+    const before = dates();
+
+    await fireEvent.click(view.getByRole('button', { name: 'Закрыть' }));
+    expect(dialog.open).toBe(false);
+    vi.setSystemTime(new Date('2026-12-31T21:00:00Z'));
+    await requestOpen(opener);
+    await fireEvent.input(view.getByRole('searchbox'), { target: { value: 'дата публикации' } });
+    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(data.length));
+
+    expect({
+      after: dates(),
+      before,
+      dataCalls: data.map((load) => load.mock.calls.length),
+      sameDialog: dialogFrom(view.container) === dialog,
+      searches: search.mock.calls
+    }).toMatchInlineSnapshot(`
+      {
+        "after": [
+          "2026-07-01: 1 июля 2026",
+          "2026-12-31T21:00:00Z: 1 января",
+        ],
+        "before": [
+          "2026-07-01: 1 июля",
+          "2026-12-31T21:00:00Z: 1 января 2027",
+        ],
+        "dataCalls": [
+          1,
+          1,
+        ],
+        "sameDialog": true,
+        "searches": [
+          [
+            "дата публикации",
+          ],
+          [
+            "дата публикации",
+          ],
+        ],
+      }
+    `);
+  });
+
   it('retries parcel search, counts and loads mixed results, and opens the first parcel with Enter', async () => {
     const intersections: Array<() => void> = [];
     vi.stubGlobal(

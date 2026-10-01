@@ -405,12 +405,10 @@ static/lazy.XXXXXXXX.js:
     rendered: 0
   apps/www/src/lib/search/client.ts:
     rendered: 12753
-  node_modules/.pnpm/luxon@3.7.2/node_modules/luxon/build/es6/luxon.mjs:
-    rendered: 125834
   node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/events/index.js:
     rendered: 0
   packages/format/src/date.ts:
-    rendered: 295
+    rendered: 744
   packages/ui/src/icons/system/Search.svelte:
     rendered: 517
 static/lifecycle.XXXXXXXX.js:

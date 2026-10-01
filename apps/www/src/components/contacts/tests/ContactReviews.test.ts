@@ -1,7 +1,7 @@
 /// <reference types="astro/client" />
 
 import { type HTMLElement, Window } from 'happy-dom';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { mapRawContact } from '@/lib/contacts/mapper';
 import { buildContactMarkdown } from '@/lib/contacts/markdown';
@@ -12,6 +12,12 @@ import { createAstroContainer } from '@/test/astro-container';
 
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import ContactReviews from '../ContactReviews.astro';
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 const review = {
   sentiment: 'positive',
@@ -59,6 +65,7 @@ describe('ContactReviews', () => {
     expect(component.querySelector('li')?.textContent).toContain('Нейтральный:');
     expect(component.querySelector('a')?.getAttribute('href')).toBe(review.url);
     expect(buildContactMarkdown(contact)).toContain('sentiment: neutral');
+    expect(buildContactMarkdown(contact)).toContain('published_at: 2026-04-07');
   });
 
   it('renders safe review markdown with site typography', async () => {
@@ -98,11 +105,15 @@ describe('ContactReviews', () => {
 
     expect({
       icons: component.querySelectorAll('svg').length,
-      sourceUrl: component.querySelector('a')?.getAttribute('href')
+      sourceUrl: component.querySelector('a')?.getAttribute('href'),
+      accessibleDate: component.querySelector('a')?.getAttribute('aria-label'),
+      visibleDate: component.querySelector('.contact-review__meta')?.textContent.trim()
     }).toMatchInlineSnapshot(`
       {
+        "accessibleDate": "Открыть отзыв от 7 апреля",
         "icons": 1,
         "sourceUrl": "https://www.t.me/example/1",
+        "visibleDate": "7 апреля",
       }
     `);
   });

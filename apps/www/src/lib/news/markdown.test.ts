@@ -1,5 +1,5 @@
 import { parseMarkdownFragment } from '@shelkovo/markdown';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { parse } from 'yaml';
 
 import {
@@ -10,6 +10,12 @@ import {
   buildNewsYearMarkdown
 } from './markdown';
 import type { NewsArticle, NewsDataset, NewsMonthArchive, NewsYearArchive } from './types';
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 const article = (input?: Partial<NewsArticle>): NewsArticle => ({
   id: '2026/05/ktp-upgrade',
@@ -291,7 +297,7 @@ ignored: true
 
       Главное за месяц: [модернизация подстанций](/news/2026/05/ktp-upgrade/).
 
-      - [Россети планируют усилить три подстанции в КП Шелково](https://kpshelkovo.online/news/2026/05/ktp-upgrade/index.md) — 14 мая 2026, 22:16
+      - [Россети планируют усилить три подстанции в КП Шелково](https://kpshelkovo.online/news/2026/05/ktp-upgrade/index.md) — 14 мая, 22:16
 
         Краткое описание новости.
       "

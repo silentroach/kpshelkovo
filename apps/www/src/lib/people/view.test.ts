@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import type { PersonProfile } from './types';
 
@@ -9,6 +9,8 @@ let formatPersonHeadline: typeof import('./view').formatPersonHeadline;
 let mapRawPersonContact: typeof import('./mapper').mapRawPersonContact;
 
 beforeAll(async () => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
     BASE_URL: '/'
@@ -22,6 +24,7 @@ beforeAll(async () => {
   } = await import('./view'));
   ({ mapRawPersonContact } = await import('./mapper'));
 });
+afterAll(() => vi.useRealTimers());
 
 describe('mapRawPersonContact', () => {
   it('normalizes telegram handles with or without @', () => {
@@ -215,7 +218,7 @@ describe('buildPersonMarkdown', () => {
 
       ### Новости
 
-      - [Авария на линии](https://example.com/news/2026/05/electricity/index.md) — Новость; 3 мая 2026
+      - [Авария на линии](https://example.com/news/2026/05/electricity/index.md) — Новость; 3 мая
 
         Основной текст про Кирилла Щемелинина.
 
@@ -227,7 +230,7 @@ describe('buildPersonMarkdown', () => {
 
       ### Карта
 
-      - [Детская площадка «Титаник»](https://example.com/map/titanic/index.md) — Место; 19 августа 2026
+      - [Детская площадка «Титаник»](https://example.com/map/titanic/index.md) — Место; 19 августа
 
         Площадку показал Кирилл Щемелинин.
       "

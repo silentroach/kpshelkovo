@@ -1,6 +1,6 @@
 /// <reference types="astro/client" />
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Review } from '@/lib/reviews/types';
 import { visibleWhitespace } from '@/lib/test/visible-whitespace';
@@ -8,6 +8,12 @@ import { createAstroContainer } from '@/test/astro-container';
 
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import ReviewCard from './ReviewCard.astro';
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 const review = {
   id: '2026-06-25-life-in-shelkovo-forest',
@@ -46,6 +52,7 @@ describe('ReviewCard', () => {
 
     expect({
       text: visibleWhitespace(visibleText(html)),
+      datetime: html.match(/<time\b[^>]*datetime="([^"]+)"/u)?.[1],
       ariaLabels: ariaLabels(html),
       titles: [...html.matchAll(/ title="([^"]+)"/gu)].map((match) => match[1] ?? '')
     }).toMatchInlineSnapshot(`
@@ -56,7 +63,8 @@ describe('ReviewCard', () => {
           "Оценка 3 из 5",
           "Оценка 2 из 5",
         ],
-        "text": "Отзыв собственника от 25 июня 2026 25 июня 2026 Анонимный собственник Место и среда Застройщик Обслуживание",
+        "datetime": "2026-06-25",
+        "text": "Отзыв собственника от 25 июня 25 июня Анонимный собственник Место и среда Застройщик Обслуживание",
         "titles": [
           "Шелково Форест",
           "Земля МО",

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Review } from '../types';
 import {
@@ -10,6 +10,12 @@ import {
   formatReviewTitle,
   sortReviewAspects
 } from '../view';
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 const review: Review = {
   id: '2026-06-25-life-in-shelkovo-forest',
@@ -27,9 +33,9 @@ const review: Review = {
 
 describe('review view helpers', () => {
   it('formats fallback title, fallback author, date, and area', () => {
-    expect(formatReviewTitle(review)).toBe('Отзыв собственника от 25 июня 2026');
+    expect(formatReviewTitle(review)).toBe('Отзыв собственника от 25 июня');
     expect(formatReviewAuthor(review)).toBe('Анонимный собственник');
-    expect(formatReviewDate(review)).toBe('25 июня 2026');
+    expect(formatReviewDate(review)).toBe('25 июня');
     expect(formatReviewArea(review.area)).toBe('Шелково Форест');
   });
 

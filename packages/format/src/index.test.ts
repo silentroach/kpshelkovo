@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   count,
@@ -155,17 +155,66 @@ describe('format package', () => {
   });
 
   describe('formatDate', () => {
-    it('formats ISO dates in Russian', () => {
-      expect(formatDate('2026-04-03')).toBe('3 апреля 2026');
-      expect(formatDate('2026-01-15')).toBe('15 января 2026');
-      expect(formatDate('2026-12-31')).toBe('31 декабря 2026');
-      expect(formatDate('2026-05-01')).toBe('1 мая 2026');
-      expect(formatDate('2024-02-29')).toBe('29 февраля 2024');
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
     });
 
-    it('formats datetimes in Moscow timezone', () => {
-      expect(formatDate('2026-03-31T22:30:00Z')).toBe('1 апреля 2026');
+    afterEach(() => vi.useRealTimers());
+
+    it.each([
+      ['2026-04-03', '3 апреля'],
+      ['2026-01-15', '15 января'],
+      ['2026-12-31', '31 декабря'],
+      ['2026-05-01', '1 мая'],
+      ['2026-07-01', '1 июля'],
+      ['2025-07-01', '1 июля 2025'],
+      ['2027-07-01', '1 июля 2027'],
+      ['2024-02-29', '29 февраля 2024']
+    ] as const)('formats calendar date %s as %s with ordinary spaces', (iso, expected) => {
+      expect(formatDate(iso)).toBe(expected);
     });
+
+    it.each([
+      ['2026-03-31T22:30:00Z', '1 апреля'],
+      ['2026-04-01T00:30:00+03:00', '1 апреля'],
+      ['2026-03-31T19:30:00-04:00', '1 апреля'],
+      ['2026-03-31T20:59:59.999Z', '31 марта'],
+      ['2026-03-31T21:00:00.000Z', '1 апреля'],
+      ['2026-12-31T20:59:59.999Z', '31 декабря'],
+      ['2026-12-31T21:00:00.000Z', '1 января 2027'],
+      ['2027-01-01T00:30:00+14:00', '31 декабря'],
+      ['2026-12-31T23:30:00-04:00', '1 января 2027']
+    ] as const)('formats datetime %s using its Moscow day and year', (iso, expected) => {
+      expect(formatDate(iso)).toBe(expected);
+    });
+
+    it('refreshes the current Moscow year on every call without reimporting', () => {
+      const dates = ['2026-12-31', '2026-12-31T21:00:00Z'] as const;
+
+      vi.setSystemTime(new Date('2026-12-31T20:59:59.999Z'));
+      expect(dates.map(formatDate)).toMatchInlineSnapshot(`
+        [
+          "31 декабря",
+          "1 января 2027",
+        ]
+      `);
+
+      vi.setSystemTime(new Date('2026-12-31T21:00:00.000Z'));
+      expect(dates.map(formatDate)).toMatchInlineSnapshot(`
+        [
+          "31 декабря 2026",
+          "1 января",
+        ]
+      `);
+    });
+
+    it.each(['', 'not-an-iso', '2026-13-01'])(
+      'returns the invalid fallback without throwing for %j',
+      (iso) => {
+        expect(formatDate(iso)).toBe('Invalid DateTime');
+      }
+    );
   });
 
   describe('formatMonth', () => {
