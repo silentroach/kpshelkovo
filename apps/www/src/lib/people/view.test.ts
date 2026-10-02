@@ -208,7 +208,7 @@ describe('buildPersonMarkdown', () => {
 
       ## Контакты
 
-      - Telegram: [@Kirill\\_ZemlyaMO](https://t.me/Kirill_ZemlyaMO)
+      - Telegram: [@Kirill_ZemlyaMO](https://t.me/Kirill_ZemlyaMO)
 
       ## Профиль
 
