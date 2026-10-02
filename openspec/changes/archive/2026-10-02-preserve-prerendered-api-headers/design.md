@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация и границы — в [proposal](/openspec/changes/preserve-prerendered-api-headers/proposal.md), публичное поведение — в [delta spec](/openspec/changes/preserve-prerendered-api-headers/specs/static-api-response-metadata/spec.md).
+Мотивация и границы — в [proposal](/openspec/changes/archive/2026-10-02-preserve-prerendered-api-headers/proposal.md), публичное поведение — в [основной spec](/openspec/specs/static-api-response-metadata/spec.md).
 
 `apps/www` использует Astro 7.3.1 с `output: 'static'`. Обработчики задают заголовки на `Response`, а production nginx обслуживает файлы. Исследование нашло 94 endpoint-модуля, включая 26 параметризованных: Markdown, текстовые путеводители, JSON, каталоги API, RSS, ICS и vCard. Это снимок исходников, не количество URL и не ограничение генератора. Исходные 15 URL из issue входят в 20 JSON endpoints пяти API-семейств.
 
