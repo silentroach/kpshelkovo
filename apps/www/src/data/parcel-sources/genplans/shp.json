@@ -1,7 +1,7 @@
 {
   "part": "shp",
   "page": "https://dgtime.ru/shp/shp-genplan/",
-  "capturedAt": "2026-10-01T09:19:39.210Z",
+  "capturedAt": "2026-10-02T09:18:28.058Z",
   "plots": [
     {
       "id": "B1",
@@ -867,7 +867,7 @@
     {
       "id": "C76",
       "cadastralReference": "50:33:0010101:2644",
-      "status": "Свободен",
+      "status": "Забронирован",
       "location": "с видом на лес",
       "objectprice": 4618900
     },
