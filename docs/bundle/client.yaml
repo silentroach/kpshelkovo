@@ -20,17 +20,17 @@ static/BaseLayout.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
 static/ClientRouter.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   astro:transitions/client:
     rendered: 0
-  node_modules/.pnpm/astro@7.3.1_@emnapi+core@1.11.1_@emnapi+runtime@1.11.3_@types+node@26.5.0_yaml@2.9.0/node_modules/astro/components/ClientRouter.astro?astro&type=script&index=0&lang.ts:
-    rendered: 2831
-  node_modules/.pnpm/astro@7.3.1_@emnapi+core@1.11.1_@emnapi+runtime@1.11.3_@types+node@26.5.0_yaml@2.9.0/node_modules/astro/dist/runtime/server/render/server-islands-shared.js:
-    rendered: 273
-  node_modules/.pnpm/astro@7.3.1_@emnapi+core@1.11.1_@emnapi+runtime@1.11.3_@types+node@26.5.0_yaml@2.9.0/node_modules/astro/dist/transitions/events.js:
-    rendered: 3448
-  node_modules/.pnpm/astro@7.3.1_@emnapi+core@1.11.1_@emnapi+runtime@1.11.3_@types+node@26.5.0_yaml@2.9.0/node_modules/astro/dist/transitions/router.js:
-    rendered: 13657
-  node_modules/.pnpm/astro@7.3.1_@emnapi+core@1.11.1_@emnapi+runtime@1.11.3_@types+node@26.5.0_yaml@2.9.0/node_modules/astro/dist/transitions/swap-functions.js:
-    rendered: 5841
-  node_modules/.pnpm/astro@7.3.1_@emnapi+core@1.11.1_@emnapi+runtime@1.11.3_@types+node@26.5.0_yaml@2.9.0/node_modules/astro/dist/virtual-modules/transitions-router.js:
+  node_modules/.pnpm/astro@7.3.5_@types+node@26.5.0_yaml@2.9.1/node_modules/astro/components/ClientRouter.astro?astro&type=script&index=0&lang.ts:
+    rendered: 2788
+  node_modules/.pnpm/astro@7.3.5_@types+node@26.5.0_yaml@2.9.1/node_modules/astro/dist/runtime/server/render/server-islands-shared.js:
+    rendered: 230
+  node_modules/.pnpm/astro@7.3.5_@types+node@26.5.0_yaml@2.9.1/node_modules/astro/dist/transitions/events.js:
+    rendered: 3405
+  node_modules/.pnpm/astro@7.3.5_@types+node@26.5.0_yaml@2.9.1/node_modules/astro/dist/transitions/router.js:
+    rendered: 13614
+  node_modules/.pnpm/astro@7.3.5_@types+node@26.5.0_yaml@2.9.1/node_modules/astro/dist/transitions/swap-functions.js:
+    rendered: 5798
+  node_modules/.pnpm/astro@7.3.5_@types+node@26.5.0_yaml@2.9.1/node_modules/astro/dist/virtual-modules/transitions-router.js:
     rendered: 0
 static/CommonSpacesTable.XXXXXXXX.js:
   apps/www/src/compare/components/CommonSpacesTable.svelte:
@@ -73,21 +73,21 @@ static/PlaceMap.XXXXXXXX.js:
   apps/www/src/lib/site.ts:
     rendered: 115
   packages/ui/src/markers/Animals.webp?url:
-    rendered: 134
+    rendered: 125
   packages/ui/src/markers/Apple.webp?url:
-    rendered: 130
+    rendered: 119
   packages/ui/src/markers/Construction.webp?url:
-    rendered: 144
+    rendered: 140
   packages/ui/src/markers/Fish.webp?url:
-    rendered: 128
+    rendered: 116
   packages/ui/src/markers/Foodtruck.webp?url:
-    rendered: 138
+    rendered: 131
   packages/ui/src/markers/index.ts:
     rendered: 583
   packages/ui/src/markers/Kpp.webp?url:
-    rendered: 126
+    rendered: 113
   packages/ui/src/markers/Titanic.webp?url:
-    rendered: 134
+    rendered: 125
 static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/components/places/PlaceOpeningHours.astro?astro&type=script&index=0&lang.ts:
     rendered: 1167
@@ -100,9 +100,9 @@ static/StatusServiceTimeline.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/lib/status/timeline.lazy.ts:
     rendered: 2893
 static/async.XXXXXXXX.js:
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/disclose-version.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/disclose-version.js:
     rendered: 219
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/flags/async.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/flags/async.js:
     rendered: 136
 static/calculator-controller.XXXXXXXX.js:
   apps/www/src/lib/reglament/calculate.ts:
@@ -121,194 +121,194 @@ static/calculator-details.XXXXXXXX.js:
 static/client.XXXXXXXX.js:
   node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs:
     rendered: 569
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/attachments/index.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/attachments/index.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/constants.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/constants.js:
     rendered: 258
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/index-client.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/index-client.js:
     rendered: 1169
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/constants.js:
-    rendered: 1327
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/context.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/constants.js:
+    rendered: 1303
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/context.js:
     rendered: 1419
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dev/assign.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dev/assign.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dev/console-log.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dev/console-log.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dev/debug.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dev/debug.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dev/elements.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dev/elements.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dev/equality.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dev/equality.js:
     rendered: 1496
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dev/hmr.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dev/hmr.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dev/inspect.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dev/inspect.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dev/legacy.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dev/legacy.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dev/ownership.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dev/ownership.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dev/tracing.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dev/tracing.js:
     rendered: 339
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/async.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/blocks/async.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/await.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/blocks/await.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/boundary.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/blocks/boundary.js:
     rendered: 8348
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/branches.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/blocks/branches.js:
     rendered: 3092
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/css-props.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/blocks/css-props.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/each.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/blocks/each.js:
     rendered: 10844
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/html.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/blocks/html.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/if.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/blocks/if.js:
     rendered: 881
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/key.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/blocks/key.js:
     rendered: 463
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/slot.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/blocks/slot.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/snippet.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/blocks/snippet.js:
     rendered: 1052
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/svelte-component.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/blocks/svelte-component.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/svelte-element.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/blocks/svelte-element.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/blocks/svelte-head.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/blocks/svelte-head.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/css.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/css.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/actions.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/actions.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/attachments.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/attachments.js:
     rendered: 367
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/attributes.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/attributes.js:
     rendered: 3590
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/bindings/document.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/bindings/document.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/bindings/input.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/bindings/input.js:
     rendered: 1956
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/bindings/media.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/bindings/media.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/bindings/navigator.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/bindings/navigator.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/bindings/props.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/bindings/props.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/bindings/select.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/bindings/select.js:
     rendered: 2497
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/bindings/shared.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/bindings/shared.js:
     rendered: 803
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/bindings/size.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/bindings/size.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/bindings/this.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/bindings/this.js:
     rendered: 1272
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/bindings/universal.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/bindings/universal.js:
     rendered: 541
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/bindings/window.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/bindings/window.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/class.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/class.js:
     rendered: 878
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/custom-element.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/custom-element.js:
     rendered: 4557
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/customizable-select.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/customizable-select.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/events.js:
-    rendered: 3888
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/misc.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/events.js:
+    rendered: 4033
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/misc.js:
     rendered: 478
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/style.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/style.js:
     rendered: 1037
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/elements/transitions.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/transitions.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/hydration.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/hydration.js:
     rendered: 1412
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/legacy/event-modifiers.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/legacy/event-modifiers.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/legacy/lifecycle.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/legacy/lifecycle.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/legacy/misc.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/legacy/misc.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/operations.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/operations.js:
     rendered: 3745
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/reconciler.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/reconciler.js:
     rendered: 560
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/task.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/task.js:
     rendered: 528
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/dom/template.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/template.js:
     rendered: 3256
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/error-handling.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/error-handling.js:
     rendered: 1930
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/errors.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/errors.js:
     rendered: 6605
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/hydratable.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/hydratable.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/index.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/index.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/legacy.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/legacy.js:
     rendered: 141
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/loop.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/loop.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/proxy.js:
-    rendered: 6780
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/reactivity/async.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/proxy.js:
+    rendered: 6736
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/reactivity/async.js:
     rendered: 2733
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/reactivity/batch.js:
-    rendered: 17086
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/reactivity/deriveds.js:
-    rendered: 5932
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/reactivity/effects.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/reactivity/batch.js:
+    rendered: 17193
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/reactivity/deriveds.js:
+    rendered: 5875
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/reactivity/effects.js:
     rendered: 8307
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/reactivity/equality.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/reactivity/equality.js:
     rendered: 385
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/reactivity/props.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/reactivity/props.js:
     rendered: 2479
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/reactivity/sources.js:
-    rendered: 4610
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/reactivity/status.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/reactivity/sources.js:
+    rendered: 4719
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/reactivity/status.js:
     rendered: 446
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/reactivity/store.js:
-    rendered: 414
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/reactivity/utils.js:
-    rendered: 579
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/render.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/reactivity/store.js:
+    rendered: 376
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/reactivity/utils.js:
+    rendered: 352
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/render.js:
     rendered: 4155
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/runtime.js:
-    rendered: 11330
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/timing.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/runtime.js:
+    rendered: 11288
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/timing.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/validate.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/validate.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/client/warnings.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/warnings.js:
     rendered: 3910
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/flags/index.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/flags/index.js:
     rendered: 263
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/shared/attributes.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/shared/attributes.js:
     rendered: 3272
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/shared/clone.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/shared/clone.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/shared/dev.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/shared/dev.js:
     rendered: 1191
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/shared/errors.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/shared/errors.js:
     rendered: 996
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/shared/utils.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/shared/utils.js:
     rendered: 864
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/internal/shared/validate.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/shared/validate.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/legacy/legacy-client.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/legacy/legacy-client.js:
     rendered: 2181
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/reactivity/create-subscriber.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/reactivity/create-subscriber.js:
     rendered: 666
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/store/shared/index.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/store/shared/index.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/store/utils.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/store/utils.js:
     rendered: 0
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/utils.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/utils.js:
     rendered: 1287
 static/client.svelte.XXXXXXXX.js:
-  node_modules/.pnpm/@astrojs+svelte@9.0.1_@types+node@26.5.0_astro@7.3.1_@emnapi+core@1.11.1_@emnapi+runtim_53573c48e60df5d9ad4d624198dfa044/node_modules/@astrojs/svelte/dist/client.svelte.js:
+  node_modules/.pnpm/@astrojs+svelte@9.0.1_@types+node@26.5.0_astro@7.3.5_@types+node@26.5.0_yaml@2.9.1__esb_0bf31d074983e984f830ebe15b0cfd6c/node_modules/@astrojs/svelte/dist/client.svelte.js:
     rendered: 2022
 static/editorial-map.XXXXXXXX.js:
   apps/www/src/components/maps/editorial-map.css:
@@ -405,7 +405,7 @@ static/lazy.XXXXXXXX.js:
     rendered: 0
   apps/www/src/lib/search/client.ts:
     rendered: 12753
-  node_modules/.pnpm/svelte@5.57.0/node_modules/svelte/src/events/index.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/events/index.js:
     rendered: 0
   packages/format/src/date.ts:
     rendered: 744
@@ -430,13 +430,13 @@ static/parcel-layer.XXXXXXXX.js:
   apps/www/src/components/places/parcel-layer.ts:
     rendered: 5315
 static/prefetch.XXXXXXXX.js:
-  node_modules/.pnpm/astro@7.3.1_@emnapi+core@1.11.1_@emnapi+runtime@1.11.3_@types+node@26.5.0_yaml@2.9.0/node_modules/astro/dist/prefetch/index.js:
-    rendered: 5052
+  node_modules/.pnpm/astro@7.3.5_@types+node@26.5.0_yaml@2.9.1/node_modules/astro/dist/prefetch/index.js:
+    rendered: 5009
   virtual:astro:adapter-config/client:
     rendered: 92
 static/preload-helper.XXXXXXXX.js:
   vite/preload-helper.js:
-    rendered: 2373
+    rendered: 2401
 static/rating.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/pages/815/compare/rating.astro?astro&type=script&index=0&lang.ts:
     rendered: 1094
@@ -444,7 +444,7 @@ static/runtime.XXXXXXXX.js:
   apps/www/src/lib/yandex-maps/open-maps-control.ts:
     rendered: 369
   apps/www/src/lib/yandex-maps/runtime.ts:
-    rendered: 3655
+    rendered: 2375
 static/schema.XXXXXXXX.js:
   apps/www/src/lib/parcels/schema.ts:
     rendered: 105
