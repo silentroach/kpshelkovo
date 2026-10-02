@@ -1,6 +1,8 @@
-import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 
 import { parse, stringify } from 'yaml';
+
+import { readBundleAssetSizes } from './bundle-asset-sizes.ts';
 
 const workspace = new URL('../../../', import.meta.url);
 const output = new URL('dist/www/', workspace);
@@ -48,15 +50,13 @@ const assets = (
   await Promise.all(
     files.map(async (file) => {
       const url = new URL(`static/${file}`, output);
-      const [raw, brotli, gzip] = await Promise.all(
-        [url, new URL(`${url}.br`), new URL(`${url}.gz`)].map((asset) => stat(asset))
-      );
+      const sizes = await readBundleAssetSizes(url);
       return {
         file: chunkNames.get(`static/${file}`) ?? stableName(`static/${file}`),
         owner: cssOwners.get(file) ?? '',
-        bytes: raw.size,
-        brotli: brotli.size,
-        gzip: gzip.size
+        bytes: sizes.bytes,
+        brotli: sizes.brotli,
+        gzip: sizes.gzip
       };
     })
   )
@@ -65,8 +65,8 @@ const assets = (
     compare(a.file, b.file) ||
     compare(a.owner, b.owner) ||
     a.bytes - b.bytes ||
-    a.brotli - b.brotli ||
-    a.gzip - b.gzip
+    (a.brotli ?? -1) - (b.brotli ?? -1) ||
+    (a.gzip ?? -1) - (b.gzip ?? -1)
 );
 
 const assetCounts = new Map<string, number>();
