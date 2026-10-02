@@ -100,7 +100,7 @@ Workflow передаёт артефакт как `api-response-metadata.conf.ne
 
 Полный откат возвращает исходники, site config без include и прежний deploy-скрипт из того же изменения. Оставшийся неподключённый файл не участвует в ответах. Файлы сохраняемых поколений `/static/` и их срок хранения не меняются.
 
-Короткая регрессия проверяет реальные GET/HEAD и gzip на нескольких fixtures, без постоянного обхода сайта. В CI nginx устанавливается в test job. Локально:
+Короткая локальная регрессия проверяет реальные GET/HEAD и gzip на нескольких fixtures, без постоянного обхода сайта. CI не устанавливает nginx; тесты генератора работают без него. Runtime-тест запускается по явно заданному `NGINX_BIN`:
 
 ```bash
 NGINX_BIN=$(command -v nginx) pnpm --filter @shelkovo/www exec vitest run src/integrations/tests/static-response-metadata.nginx.test.ts
