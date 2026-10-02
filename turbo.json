@@ -42,6 +42,7 @@
     },
     "test": {
       "dependsOn": ["transit"],
+      "env": ["NGINX_BIN"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "$TURBO_ROOT$/scripts/visual-fixture-launcher.mjs",

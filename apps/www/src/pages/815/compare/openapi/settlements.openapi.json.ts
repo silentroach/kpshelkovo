@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 
-import { OAS, openapi } from '@/compare/lib/discovery';
+import { links, OAS, openapi } from '@/compare/lib/discovery';
 import { canonRoot } from '@/compare/lib/site';
 import { createJsonResponse } from '@/lib/json-response';
 
@@ -11,7 +11,8 @@ export const GET: APIRoute = async () => {
 
   return createJsonResponse(openapi(root), {
     headers: {
-      'Content-Type': `${OAS}; charset=utf-8`
+      'Content-Type': `${OAS}; charset=utf-8`,
+      Link: links(root)
     }
   });
 };

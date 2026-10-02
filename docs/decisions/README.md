@@ -46,3 +46,4 @@
 - [ADR-040: Портреты людей в публичном S3](040-people-portraits-in-public-s3.md) - принят, 2026-09-22.
 - [ADR-041: Участки отдельно от мест, полнотекстовый поиск в Pagefind](041-parcel-records-and-exact-search.md) - принят, 2026-09-22; уточнён 2026-09-25 и 2026-09-28; дополняет ADR-013/025/028/039.
 - [ADR-042: Общая рамка карты как feature-owned CSS](042-feature-owned-map-frame-css.md) - принят, 2026-09-28; уточняет ADR-034.
+- [ADR-043: Заголовки статических endpoints из ответов Astro](/docs/decisions/043-prerendered-endpoint-response-metadata.md) — принят, 2026-10-02; уточняет ручную границу nginx в ADR-011/036.

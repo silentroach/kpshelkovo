@@ -4,6 +4,8 @@
 
 Принят
 
+Прямая раздача Markdown endpoints уточнена в [ADR-043](/docs/decisions/043-prerendered-endpoint-response-metadata.md): её locations генерируются из ответов Astro, а дополняющая llms-связь использует существующий выбор путеводителя. HTML и согласование через `Accept` остаются ручными.
+
 ## Дата
 
 2026-09-12

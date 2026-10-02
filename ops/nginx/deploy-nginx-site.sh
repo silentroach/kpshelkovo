@@ -12,6 +12,9 @@ old="$dir/$name.enabled.bak"
 headers_src="$(dirname "$src")/security.conf.new"
 headers_dst=/etc/nginx/kps/security.conf
 headers_bak="$dir/security-headers.conf.bak"
+metadata_src="$(dirname "$src")/api-response-metadata.conf.new"
+metadata_dst=/etc/nginx/kps/api-response-metadata.conf
+metadata_bak="$dir/api-response-metadata.conf.bak"
 target="$dst"
 had_dst=false
 state=missing
@@ -21,12 +24,17 @@ clean() {
 }
 
 undo() {
-  # Restore the include together with its site config if nginx -t fails.
+  # Restore both includes together with their site config if nginx -t fails.
   if [ "$name" = kpshelkovo-online ]; then
     if [ -f "$headers_bak" ]; then
       install -m 644 "$headers_bak" "$headers_dst"
     else
       rm -f "$headers_dst"
+    fi
+    if [ -f "$metadata_bak" ]; then
+      install -m 644 "$metadata_bak" "$metadata_dst"
+    else
+      rm -f "$metadata_dst"
     fi
   fi
 
@@ -48,6 +56,10 @@ undo() {
 trap clean EXIT
 
 test -f "$src"
+if [ "$name" = kpshelkovo-online ]; then
+  test -s "$headers_src"
+  test -s "$metadata_src"
+fi
 
 if [ "$name" = media-kpshelkovo-online ]; then
   owner=${SUDO_USER:-root}
@@ -73,12 +85,15 @@ fi
 
 # Only the main site uses this snippet; install it before validating the config.
 if [ "$name" = kpshelkovo-online ]; then
-  test -f "$headers_src"
   if [ -f "$headers_dst" ]; then
     cp "$headers_dst" "$headers_bak"
   fi
+  if [ -f "$metadata_dst" ]; then
+    cp "$metadata_dst" "$metadata_bak"
+  fi
   install -d -m 755 /etc/nginx/kps
   install -m 644 "$headers_src" "$headers_dst"
+  install -m 644 "$metadata_src" "$metadata_dst"
 fi
 
 install -m 644 "$src" "$dst"

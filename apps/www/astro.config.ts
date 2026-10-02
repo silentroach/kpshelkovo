@@ -10,6 +10,7 @@ import { defineConfig, type AstroIntegration } from 'astro/config';
 import { clientBundleAnalysis } from './src/integrations/client-bundle-analysis';
 import { indexNowUrlManifest } from './src/integrations/indexnow-url-manifest';
 import { pagefindDevSnapshot } from './src/integrations/pagefind-dev-snapshot';
+import { staticResponseMetadata } from './src/integrations/static-response-metadata';
 import { statusCalendarAlternateValidation } from './src/integrations/status-calendar-alternate-validation';
 import { createAstroMarkdownProcessor } from './src/lib/markdown/astro-processor';
 import { applySitemapMetadata, shouldIncludeSitemapPage } from './src/lib/sitemap';
@@ -92,6 +93,7 @@ export default defineConfig({
     }
   },
   integrations: [
+    staticResponseMetadata(),
     process.env.BUNDLE_ANALYZE === '1' && clientBundleAnalysis(),
     pagefindDevSnapshot(),
     svelte(),
