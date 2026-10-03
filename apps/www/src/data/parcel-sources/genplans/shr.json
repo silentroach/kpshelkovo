@@ -1,21 +1,21 @@
 {
   "part": "shr",
   "page": "https://dgtime.ru/shr/shr-genplan/",
-  "capturedAt": "2026-10-02T09:18:28.189Z",
+  "capturedAt": "2026-10-03T09:18:16.880Z",
   "plots": [
     {
       "id": "E1",
       "cadastralReference": "50:33:0010101:2065",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4299000
+      "objectprice": 4399000
     },
     {
       "id": "E2",
       "cadastralReference": "50:33:0010101:2066",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5038800
+      "objectprice": 5158800
     },
     {
       "id": "E3",
@@ -29,42 +29,42 @@
       "cadastralReference": "50:33:0010101:2062",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5588700
+      "objectprice": 5718700
     },
     {
       "id": "E5",
       "cadastralReference": "50:33:0010101:2061",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4170030
+      "objectprice": 4267030
     },
     {
       "id": "E6",
       "cadastralReference": "50:33:0010101:2060",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5878600
+      "objectprice": 6018600
     },
     {
       "id": "E7",
       "cadastralReference": "50:33:0010101:2067",
       "status": "Свободен",
       "location": "с лесными деревьями",
-      "objectprice": 5458700
+      "objectprice": 5588700
     },
     {
       "id": "E8",
       "cadastralReference": "50:33:0010101:2057",
       "status": "Свободен",
       "location": "с лесными деревьями",
-      "objectprice": 5668650
+      "objectprice": 5803650
     },
     {
       "id": "E9",
       "cadastralReference": "50:33:0010101:2056",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5458700
+      "objectprice": 5588700
     },
     {
       "id": "E10",
@@ -78,14 +78,14 @@
       "cadastralReference": "50:33:0010101:2055",
       "status": "Свободен",
       "location": "с лесными деревьями",
-      "objectprice": 5878600
+      "objectprice": 6018600
     },
     {
       "id": "E12",
       "cadastralReference": "50:33:0010101:2051",
       "status": "Свободен",
       "location": "с лесными деревьями",
-      "objectprice": 5458700
+      "objectprice": 5588700
     },
     {
       "id": "E14",
@@ -99,21 +99,21 @@
       "cadastralReference": "50:33:0010101:2043",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5373750
+      "objectprice": 5498750
     },
     {
       "id": "E16",
       "cadastralReference": "50:33:0010101:2044",
       "status": "Свободен",
       "location": "с лесными деревьями",
-      "objectprice": 4618900
+      "objectprice": 4728900
     },
     {
       "id": "E17",
       "cadastralReference": "50:33:0010101:2041",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4948900
+      "objectprice": 5058900
     },
     {
       "id": "E18",
@@ -141,7 +141,7 @@
       "cadastralReference": "50:33:0010101:2497",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 8678600
+      "objectprice": 8818600
     },
     {
       "id": "E22",
@@ -155,21 +155,21 @@
       "cadastralReference": "50:33:0010101:2494",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 6108700
+      "objectprice": 6238700
     },
     {
       "id": "E24",
       "cadastralReference": "50:33:0010101:2493",
       "status": "Свободен",
       "location": "с лесными деревьями",
-      "objectprice": 9758400
+      "objectprice": 9918400
     },
     {
       "id": "E25",
       "cadastralReference": "50:33:0010101:2491",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 7798700
+      "objectprice": 7928700
     },
     {
       "id": "E26",
@@ -190,7 +190,7 @@
       "cadastralReference": "50:33:0010101:2490",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 7198800
+      "objectprice": 7318800
     },
     {
       "id": "E29",
@@ -218,7 +218,7 @@
       "cadastralReference": "50:33:0010101:2486",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 6958800
+      "objectprice": 7078800
     },
     {
       "id": "E33",
@@ -232,7 +232,7 @@
       "cadastralReference": "50:33:0010101:2483",
       "status": "Забронирован",
       "location": "с видом на лес",
-      "objectprice": 4199000
+      "objectprice": 4299000
     },
     {
       "id": "E35",
@@ -295,14 +295,14 @@
       "cadastralReference": "50:33:0010101:2430",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 7538700
+      "objectprice": 7668700
     },
     {
       "id": "E44",
       "cadastralReference": "50:33:0010101:2441",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4948900
+      "objectprice": 5058900
     },
     {
       "id": "E45",
@@ -323,14 +323,14 @@
       "cadastralReference": "50:33:0010101:2386",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4920930
+      "objectprice": 5027930
     },
     {
       "id": "E48",
       "cadastralReference": "50:33:0010101:2419",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 6998750
+      "objectprice": 7123750
     },
     {
       "id": "E49",
@@ -365,7 +365,7 @@
       "cadastralReference": "50:33:0010101:2330",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 6958800
+      "objectprice": 7078800
     },
     {
       "id": "E54",
@@ -379,7 +379,7 @@
       "cadastralReference": "50:33:0010101:2286",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 6598900
+      "objectprice": 6708900
     },
     {
       "id": "E56",
@@ -400,7 +400,7 @@
       "cadastralReference": "50:33:0010101:2275",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 8623750
+      "objectprice": 8748750
     },
     {
       "id": "E59",
@@ -414,7 +414,7 @@
       "cadastralReference": "50:33:0010101:2253",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 8398800
+      "objectprice": 8518800
     },
     {
       "id": "E61",
@@ -470,7 +470,7 @@
       "cadastralReference": "50:33:0010101:2164",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5388900
+      "objectprice": 5498900
     },
     {
       "id": "E69",
@@ -568,63 +568,63 @@
       "cadastralReference": "50:33:0010101:2518",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4618900
+      "objectprice": 4728900
     },
     {
       "id": "E83",
       "cadastralReference": "50:33:0010101:2507",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 4948900
+      "objectprice": 5058900
     },
     {
       "id": "E84",
       "cadastralReference": "50:33:0010101:2496",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 3333850
+      "objectprice": 3448850
     },
     {
       "id": "E85",
       "cadastralReference": "50:33:0010101:2485",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 3478800
+      "objectprice": 3598800
     },
     {
       "id": "E86",
       "cadastralReference": "50:33:0010101:2463",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 3043950
+      "objectprice": 3148950
     },
     {
       "id": "E87",
       "cadastralReference": "50:33:0010101:2352",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 3188900
+      "objectprice": 3298900
     },
     {
       "id": "E88",
       "cadastralReference": "50:33:0010101:2241",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 3238183
+      "objectprice": 3349883
     },
     {
       "id": "K1",
       "cadastralReference": "50:33:0010101:2470",
       "status": "Снят с продажи",
       "location": "рядом с парком",
-      "objectprice": 3599000
+      "objectprice": 3699000
     },
     {
       "id": "K2",
       "cadastralReference": "50:33:0010101:2469",
       "status": "Снят с продажи",
       "location": "рядом с парком",
-      "objectprice": 3499000
+      "objectprice": 3599000
     },
     {
       "id": "K14",
@@ -638,21 +638,21 @@
       "cadastralReference": "50:33:0010101:2454",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5058850
+      "objectprice": 5173850
     },
     {
       "id": "K16",
       "cadastralReference": "50:33:0010101:2456",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4499000
+      "objectprice": 4599000
     },
     {
       "id": "K17",
       "cadastralReference": "50:33:0010101:2455",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4768940
+      "objectprice": 4874940
     },
     {
       "id": "K18",
@@ -666,7 +666,7 @@
       "cadastralReference": "50:33:0010101:2442",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4618950
+      "objectprice": 4723950
     },
     {
       "id": "K20",
@@ -715,14 +715,14 @@
       "cadastralReference": "50:33:0010101:2434",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4838900
+      "objectprice": 4948900
     },
     {
       "id": "K27",
       "cadastralReference": "50:33:0010101:2445",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4399000
+      "objectprice": 4499000
     },
     {
       "id": "K28",
@@ -743,14 +743,14 @@
       "cadastralReference": "50:33:0010101:2448",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4623672
+      "objectprice": 4736472
     },
     {
       "id": "K31",
       "cadastralReference": "50:33:0010101:2451",
       "status": "Забронирован",
       "location": "с видом на лес",
-      "objectprice": 4199000
+      "objectprice": 4299000
     },
     {
       "id": "K32",
@@ -778,28 +778,28 @@
       "cadastralReference": "50:33:0010101:2468",
       "status": "Забронирован",
       "location": "с видом на лес",
-      "objectprice": 4099000
+      "objectprice": 4199000
     },
     {
       "id": "K36",
       "cadastralReference": "50:33:0010101:2433",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4099000
+      "objectprice": 4199000
     },
     {
       "id": "K37",
       "cadastralReference": "50:33:0010101:2432",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4099000
+      "objectprice": 4199000
     },
     {
       "id": "K38",
       "cadastralReference": "50:33:0010101:2431",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4099000
+      "objectprice": 4199000
     },
     {
       "id": "K39",
@@ -883,21 +883,21 @@
       "cadastralReference": "50:33:0010101:2417",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 3999000
+      "objectprice": 4099000
     },
     {
       "id": "K51",
       "cadastralReference": "50:33:0010101:2416",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4199000
+      "objectprice": 4299000
     },
     {
       "id": "K52",
       "cadastralReference": "50:33:0010101:2415",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4262960
+      "objectprice": 4366960
     },
     {
       "id": "K53",
@@ -925,7 +925,7 @@
       "cadastralReference": "50:33:0010101:2410",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4199000
+      "objectprice": 4299000
     },
     {
       "id": "K57",
@@ -946,14 +946,14 @@
       "cadastralReference": "50:33:0010101:2409",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4199000
+      "objectprice": 4299000
     },
     {
       "id": "K60",
       "cadastralReference": "50:33:0010101:2405",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4199000
+      "objectprice": 4299000
     },
     {
       "id": "K61",
@@ -974,7 +974,7 @@
       "cadastralReference": "50:33:0010101:2403",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4618900
+      "objectprice": 4728900
     },
     {
       "id": "K64",
@@ -995,14 +995,14 @@
       "cadastralReference": "50:33:0010101:2401",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4660890
+      "objectprice": 4771890
     },
     {
       "id": "K67",
       "cadastralReference": "50:33:0010101:2398",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4618900
+      "objectprice": 4728900
     },
     {
       "id": "K68",
@@ -1037,35 +1037,35 @@
       "cadastralReference": "50:33:0010101:2268",
       "status": "Снят с продажи",
       "location": "рядом с парком",
-      "objectprice": 3499000
+      "objectprice": 3599000
     },
     {
       "id": "L2",
       "cadastralReference": "50:33:0010101:2267",
       "status": "Снят с продажи",
       "location": "рядом с парком",
-      "objectprice": 3149100
+      "objectprice": 3239100
     },
     {
       "id": "L3",
       "cadastralReference": "50:33:0010101:2266",
       "status": "Снят с продажи",
       "location": "рядом с парком",
-      "objectprice": 3025110
+      "objectprice": 3114110
     },
     {
       "id": "L4",
       "cadastralReference": "50:33:0010101:2265",
       "status": "Забронирован",
       "location": "рядом с парком",
-      "objectprice": 4128820
+      "objectprice": 4246820
     },
     {
       "id": "L5",
       "cadastralReference": "50:33:0010101:2263",
       "status": "Забронирован",
       "location": "рядом с парком",
-      "objectprice": 4318800
+      "objectprice": 4438800
     },
     {
       "id": "L6",
@@ -1128,28 +1128,28 @@
       "cadastralReference": "50:33:0010101:2252",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4838900
+      "objectprice": 4948900
     },
     {
       "id": "L16",
       "cadastralReference": "50:33:0010101:2254",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5638800
+      "objectprice": 5758800
     },
     {
       "id": "L17",
       "cadastralReference": "50:33:0010101:2251",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 6208850
+      "objectprice": 6323850
     },
     {
       "id": "L18",
       "cadastralReference": "50:33:0010101:2250",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 9358700
+      "objectprice": 9488700
     },
     {
       "id": "L19",
@@ -1268,14 +1268,14 @@
       "cadastralReference": "50:33:0010101:2231",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4499000
+      "objectprice": 4599000
     },
     {
       "id": "L36",
       "cadastralReference": "50:33:0010101:2228",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 5878950
+      "objectprice": 5983950
     },
     {
       "id": "L37",
@@ -1289,7 +1289,7 @@
       "cadastralReference": "50:33:0010101:2226",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4799000
+      "objectprice": 4899000
     },
     {
       "id": "L39",
@@ -1310,7 +1310,7 @@
       "cadastralReference": "50:33:0010101:2225",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4319100
+      "objectprice": 4409100
     },
     {
       "id": "L42",
@@ -1345,7 +1345,7 @@
       "cadastralReference": "50:33:0010101:2217",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 7408700
+      "objectprice": 7538700
     },
     {
       "id": "L47",
@@ -1366,14 +1366,14 @@
       "cadastralReference": "50:33:0010101:2216",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 7408700
+      "objectprice": 7538700
     },
     {
       "id": "L50",
       "cadastralReference": "50:33:0010101:2213",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 7579670
+      "objectprice": 7712670
     },
     {
       "id": "L51",
@@ -1415,21 +1415,21 @@
       "cadastralReference": "50:33:0010101:2206",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5498900
+      "objectprice": 5608900
     },
     {
       "id": "L57",
       "cadastralReference": "50:33:0010101:2207",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 7798700
+      "objectprice": 7928700
     },
     {
       "id": "L58",
       "cadastralReference": "50:33:0010101:2204",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 6818900
+      "objectprice": 6928900
     },
     {
       "id": "L59",
@@ -1443,14 +1443,14 @@
       "cadastralReference": "50:33:0010101:2205",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5248950
+      "objectprice": 5353950
     },
     {
       "id": "L61",
       "cadastralReference": "50:33:0010101:2201",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4999000
+      "objectprice": 5099000
     },
     {
       "id": "L62",
@@ -1492,7 +1492,7 @@
       "cadastralReference": "50:33:0010101:2194",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 7278700
+      "objectprice": 7408700
     },
     {
       "id": "L68",
@@ -1513,7 +1513,7 @@
       "cadastralReference": "50:33:0010101:2193",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 6748750
+      "objectprice": 6873750
     },
     {
       "id": "L71",
@@ -1534,91 +1534,91 @@
       "cadastralReference": "50:33:0010101:2188",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 3299000
+      "objectprice": 3399000
     },
     {
       "id": "L74",
       "cadastralReference": "50:33:0010101:2189",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 3738900
+      "objectprice": 3848900
     },
     {
       "id": "L75",
       "cadastralReference": "50:33:0010101:2185",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 3534960
+      "objectprice": 3638960
     },
     {
       "id": "L76",
       "cadastralReference": "50:33:0010101:2187",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 3299000
+      "objectprice": 3399000
     },
     {
       "id": "L77",
       "cadastralReference": "50:33:0010101:2183",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 3299000
+      "objectprice": 3399000
     },
     {
       "id": "L78",
       "cadastralReference": "50:33:0010101:2184",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 3568950
+      "objectprice": 3673950
     },
     {
       "id": "L79",
       "cadastralReference": "50:33:0010101:2181",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 3738900
+      "objectprice": 3848900
     },
     {
       "id": "L80",
       "cadastralReference": "50:33:0010101:2182",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 2969100
+      "objectprice": 3059100
     },
     {
       "id": "L81",
       "cadastralReference": "50:33:0010101:2179",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 2969100
+      "objectprice": 3059100
     },
     {
       "id": "L82",
       "cadastralReference": "50:33:0010101:2180",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 3568950
+      "objectprice": 3673950
     },
     {
       "id": "L83",
       "cadastralReference": "50:33:0010101:2178",
       "status": "Снят с продажи",
       "location": "луговой",
-      "objectprice": 4228356
+      "objectprice": 4352756
     },
     {
       "id": "R1",
       "cadastralReference": "50:33:0010101:2271",
       "status": "Забронирован",
       "location": "с видом на лес",
-      "objectprice": 3399000
+      "objectprice": 3499000
     },
     {
       "id": "R2",
       "cadastralReference": "50:33:0010101:2270",
       "status": "Забронирован",
       "location": "с видом на лес",
-      "objectprice": 3263040
+      "objectprice": 3359040
     },
     {
       "id": "R3",
@@ -1681,28 +1681,28 @@
       "cadastralReference": "50:33:0010101:2027",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 5034050
+      "objectprice": 5129050
     },
     {
       "id": "R12",
       "cadastralReference": "50:33:0010101:2026",
       "status": "Свободен",
       "location": "с лесными деревьями",
-      "objectprice": 8761730
+      "objectprice": 8888730
     },
     {
       "id": "R14",
       "cadastralReference": "50:33:0010101:2025",
       "status": "Свободен",
       "location": "с лесными деревьями",
-      "objectprice": 7243950
+      "objectprice": 7348950
     },
     {
       "id": "R15",
       "cadastralReference": "50:33:0010101:2024",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 4769100
+      "objectprice": 4859100
     },
     {
       "id": "R16",
@@ -1723,14 +1723,14 @@
       "cadastralReference": "50:33:0010101:2021",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 8038800
+      "objectprice": 8158800
     },
     {
       "id": "R19",
       "cadastralReference": "50:33:0010101:2528",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 8038800
+      "objectprice": 8158800
     },
     {
       "id": "R20",
@@ -1744,7 +1744,7 @@
       "cadastralReference": "50:33:0010101:2526",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5926765
+      "objectprice": 6050265
     },
     {
       "id": "R22",
@@ -1765,14 +1765,14 @@
       "cadastralReference": "50:33:0010101:2523",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 7703850
+      "objectprice": 7818850
     },
     {
       "id": "R25",
       "cadastralReference": "50:33:0010101:2522",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 8373750
+      "objectprice": 8498750
     },
     {
       "id": "R26",
@@ -1807,7 +1807,7 @@
       "cadastralReference": "50:33:0010101:2516",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4799000
+      "objectprice": 4899000
     },
     {
       "id": "R31",
@@ -1835,7 +1835,7 @@
       "cadastralReference": "50:33:0010101:2512",
       "status": "Свободен",
       "location": "примыкает к лесу",
-      "objectprice": 8838700
+      "objectprice": 8968700
     },
     {
       "id": "R35",
@@ -1870,7 +1870,7 @@
       "cadastralReference": "50:33:0010101:2502",
       "status": "Снят с продажи",
       "location": "с лесными деревьями",
-      "objectprice": 16211502
+      "objectprice": 16346502
     },
     {
       "id": "R40",
@@ -1891,7 +1891,7 @@
       "cadastralReference": "50:33:0010101:2499",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 7018700
+      "objectprice": 7148700
     },
     {
       "id": "R43",
@@ -1919,21 +1919,21 @@
       "cadastralReference": "50:33:0010101:2045",
       "status": "Свободен",
       "location": "с лесными деревьями",
-      "objectprice": 4728900
+      "objectprice": 4838900
     },
     {
       "id": "R47",
       "cadastralReference": "50:33:0010101:2046",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4728900
+      "objectprice": 4838900
     },
     {
       "id": "R48",
       "cadastralReference": "50:33:0010101:2047",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5588700
+      "objectprice": 5718700
     },
     {
       "id": "R49",
@@ -1947,49 +1947,49 @@
       "cadastralReference": "50:33:0010101:2049",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5038800
+      "objectprice": 5158800
     },
     {
       "id": "R51",
       "cadastralReference": "50:33:0010101:2050",
       "status": "Свободен",
       "location": "с лесными деревьями",
-      "objectprice": 6718400
+      "objectprice": 6878400
     },
     {
       "id": "R52",
       "cadastralReference": "50:33:0010101:2058",
       "status": "Свободен",
       "location": "с лесными деревьями",
-      "objectprice": 5878600
+      "objectprice": 6018600
     },
     {
       "id": "R53",
       "cadastralReference": "50:33:0010101:2059",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4744870
+      "objectprice": 4857870
     },
     {
       "id": "R54",
       "cadastralReference": "50:33:0010101:2069",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4199000
+      "objectprice": 4299000
     },
     {
       "id": "R55",
       "cadastralReference": "50:33:0010101:2068",
       "status": "Свободен",
       "location": "с лесными деревьями",
-      "objectprice": 5458700
+      "objectprice": 5588700
     },
     {
       "id": "R56",
       "cadastralReference": "50:33:0010101:2070",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4618900
+      "objectprice": 4728900
     },
     {
       "id": "R57",
@@ -2003,14 +2003,14 @@
       "cadastralReference": "50:33:0010101:2072",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4918800
+      "objectprice": 5038800
     },
     {
       "id": "R59",
       "cadastralReference": "50:33:0010101:2073",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4828850
+      "objectprice": 4943850
     },
     {
       "id": "R60",
@@ -2038,35 +2038,35 @@
       "cadastralReference": "50:33:0010101:2078",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 3976575
+      "objectprice": 4069075
     },
     {
       "id": "R64",
       "cadastralReference": "50:33:0010101:2079",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4723950
+      "objectprice": 4828950
     },
     {
       "id": "R65",
       "cadastralReference": "50:33:0010101:2080",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4390029
+      "objectprice": 4497129
     },
     {
       "id": "R66",
       "cadastralReference": "50:33:0010101:2081",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5038800
+      "objectprice": 5158800
     },
     {
       "id": "R67",
       "cadastralReference": "50:33:0010101:2082",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5038800
+      "objectprice": 5158800
     },
     {
       "id": "R68",
@@ -2087,7 +2087,7 @@
       "cadastralReference": "50:33:0010101:2085",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 3779100
+      "objectprice": 3869100
     },
     {
       "id": "R71",
@@ -2108,14 +2108,14 @@
       "cadastralReference": "50:33:0010101:2089",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4558800
+      "objectprice": 4678800
     },
     {
       "id": "R74",
       "cadastralReference": "50:33:0010101:2090",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4199000
+      "objectprice": 4299000
     },
     {
       "id": "R75",
@@ -2150,7 +2150,7 @@
       "cadastralReference": "50:33:0010101:2095",
       "status": "Забронирован",
       "location": "с видом на лес",
-      "objectprice": 4728900
+      "objectprice": 4838900
     },
     {
       "id": "R80",
@@ -2171,14 +2171,14 @@
       "cadastralReference": "50:33:0010101:2099",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 5458700
+      "objectprice": 5588700
     },
     {
       "id": "R83",
       "cadastralReference": "50:33:0010101:2100",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4618900
+      "objectprice": 4728900
     },
     {
       "id": "R84",
@@ -2220,156 +2220,156 @@
       "cadastralReference": "50:33:0010101:2472",
       "status": "Снят с продажи",
       "location": "рядом с парком",
-      "objectprice": 4198800
+      "objectprice": 4318800
     },
     {
       "id": "S2",
       "cadastralReference": "50:33:0010101:2473",
       "status": "Снят с продажи",
       "location": "с видом на лес у реки",
-      "objectprice": 6578600
+      "objectprice": 6718600
     },
     {
       "id": "S3",
       "cadastralReference": "50:33:0010101:2474",
       "status": "Снят с продажи",
       "location": "с видом на лес у реки",
-      "objectprice": 7048500
+      "objectprice": 7198500
     },
     {
       "id": "S4",
       "cadastralReference": "50:33:0010101:2476",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 4566195
+      "objectprice": 4696695
     },
     {
       "id": "S5",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5168900
+      "objectprice": 5278900
     },
     {
       "id": "S6",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5168900
+      "objectprice": 5278900
     },
     {
       "id": "S7",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 3059100
+      "objectprice": 3149100
     },
     {
       "id": "S8",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 3059100
+      "objectprice": 3149100
     },
     {
       "id": "S9",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 4699000
+      "objectprice": 4799000
     },
     {
       "id": "S10",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5168900
+      "objectprice": 5278900
     },
     {
       "id": "S11",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 3059100
+      "objectprice": 3149100
     },
     {
       "id": "S12",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 3399000
+      "objectprice": 3499000
     },
     {
       "id": "S14",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5638800
+      "objectprice": 5758800
     },
     {
       "id": "S15",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5168900
+      "objectprice": 5278900
     },
     {
       "id": "S16",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 3059100
+      "objectprice": 3149100
     },
     {
       "id": "S17",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 3059100
+      "objectprice": 3149100
     },
     {
       "id": "S18",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5638800
+      "objectprice": 5758800
     },
     {
       "id": "S19",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5638800
+      "objectprice": 5758800
     },
     {
       "id": "S20",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 3399000
+      "objectprice": 3499000
     },
     {
       "id": "S21",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 2879200
+      "objectprice": 2959200
     },
     {
       "id": "S22",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 3988950
+      "objectprice": 4093950
     },
     {
       "id": "S23",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5403850
+      "objectprice": 5518850
     },
     {
       "id": "S24",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 4699000
+      "objectprice": 4799000
     },
     {
       "id": "S25",
       "cadastralReference": "50:33:0010101:2391",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 6248750
+      "objectprice": 6373750
     },
     {
       "id": "S26",
       "cadastralReference": "50:33:0010101:2392",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 3882578
+      "objectprice": 3984778
     },
     {
       "id": "S27",
@@ -2390,28 +2390,28 @@
       "cadastralReference": "50:33:0010101:2389",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 3699000
+      "objectprice": 3799000
     },
     {
       "id": "S30",
       "cadastralReference": "50:33:0010101:2390",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5873750
+      "objectprice": 5998750
     },
     {
       "id": "S31",
       "cadastralReference": "50:33:0010101:2384",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5978850
+      "objectprice": 6093850
     },
     {
       "id": "S32",
       "cadastralReference": "50:33:0010101:2385",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 3699000
+      "objectprice": 3799000
     },
     {
       "id": "S33",
@@ -2439,28 +2439,28 @@
       "cadastralReference": "50:33:0010101:2382",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 3699000
+      "objectprice": 3799000
     },
     {
       "id": "S37",
       "cadastralReference": "50:33:0010101:2383",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 6498750
+      "objectprice": 6623750
     },
     {
       "id": "S38",
       "cadastralReference": "50:33:0010101:2374",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 6123750
+      "objectprice": 6248750
     },
     {
       "id": "S39",
       "cadastralReference": "50:33:0010101:2376",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 3699000
+      "objectprice": 3799000
     },
     {
       "id": "S40",
@@ -2509,7 +2509,7 @@
       "cadastralReference": "50:33:0010101:2369",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 3869100
+      "objectprice": 3959100
     },
     {
       "id": "S47",
@@ -2530,28 +2530,28 @@
       "cadastralReference": "50:33:0010101:2372",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 2959200
+      "objectprice": 3039200
     },
     {
       "id": "S50",
       "cadastralReference": "50:33:0010101:2373",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5633850
+      "objectprice": 5748850
     },
     {
       "id": "S51",
       "cadastralReference": "50:33:0010101:2358",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5978850
+      "objectprice": 6093850
     },
     {
       "id": "S52",
       "cadastralReference": "50:33:0010101:2359",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 3039200
+      "objectprice": 3119200
     },
     {
       "id": "S53",
@@ -2621,14 +2621,14 @@
       "cadastralReference": "50:33:0010101:2336",
       "status": "Снят с продажи",
       "location": "с видом на лес",
-      "objectprice": 3039200
+      "objectprice": 3119200
     },
     {
       "id": "S63",
       "cadastralReference": "50:33:0010101:2337",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5199000
+      "objectprice": 5299000
     },
     {
       "id": "T1",
@@ -2649,7 +2649,7 @@
       "cadastralReference": "50:33:0010101:2173",
       "status": "Забронирован",
       "location": "с видом на лес",
-      "objectprice": 4838900
+      "objectprice": 4948900
     },
     {
       "id": "T4",
@@ -2663,14 +2663,14 @@
       "cadastralReference": "50:33:0010101:2172",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 4531146
+      "objectprice": 4636546
     },
     {
       "id": "T6",
       "cadastralReference": "50:33:0010101:2171",
       "status": "Свободен",
       "location": "луговой",
-      "objectprice": 4838900
+      "objectprice": 4948900
     },
     {
       "id": "T7",
@@ -2684,7 +2684,7 @@
       "cadastralReference": "50:33:0010101:2169",
       "status": "Свободен",
       "location": "луговой",
-      "objectprice": 4049100
+      "objectprice": 4139100
     },
     {
       "id": "T9",
@@ -2698,42 +2698,42 @@
       "cadastralReference": "50:33:0010101:2167",
       "status": "Свободен",
       "location": "луговой",
-      "objectprice": 4274050
+      "objectprice": 4369050
     },
     {
       "id": "T11",
       "cadastralReference": "50:33:0010101:2166",
       "status": "Свободен",
       "location": "луговой",
-      "objectprice": 4274050
+      "objectprice": 4369050
     },
     {
       "id": "T12",
       "cadastralReference": "50:33:0010101:2165",
       "status": "Свободен",
       "location": "луговой",
-      "objectprice": 4274050
+      "objectprice": 4369050
     },
     {
       "id": "T14",
       "cadastralReference": "50:33:0010101:2163",
       "status": "Свободен",
       "location": "луговой",
-      "objectprice": 4274050
+      "objectprice": 4369050
     },
     {
       "id": "T15",
       "cadastralReference": "50:33:0010101:2162",
       "status": "Свободен",
       "location": "луговой",
-      "objectprice": 4499000
+      "objectprice": 4599000
     },
     {
       "id": "T16",
       "cadastralReference": "50:33:0010101:2160",
       "status": "Свободен",
       "location": "луговой",
-      "objectprice": 4274050
+      "objectprice": 4369050
     },
     {
       "id": "T17",
@@ -2894,7 +2894,7 @@
       "cadastralReference": "50:33:0010101:2136",
       "status": "Свободен",
       "location": "луговой",
-      "objectprice": 4369050
+      "objectprice": 4464050
     },
     {
       "id": "T40",
@@ -3006,7 +3006,7 @@
       "cadastralReference": "50:33:0010101:2117",
       "status": "Свободен",
       "location": "луговой",
-      "objectprice": 4948900
+      "objectprice": 5058900
     },
     {
       "id": "T56",
@@ -3069,7 +3069,7 @@
       "cadastralReference": "50:33:0010101:2106",
       "status": "Свободен",
       "location": "луговой",
-      "objectprice": 4199000
+      "objectprice": 4299000
     },
     {
       "id": "T65",
@@ -3083,546 +3083,546 @@
       "cadastralReference": "50:33:0010101:2272",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3599000
+      "objectprice": 3699000
     },
     {
       "id": "V2",
       "cadastralReference": "50:33:0010101:2273",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 4558800
+      "objectprice": 4678800
     },
     {
       "id": "V3",
       "cadastralReference": "50:33:0010101:2274",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5123750
+      "objectprice": 5248750
     },
     {
       "id": "V4",
       "cadastralReference": "50:33:0010101:2276",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3778950
+      "objectprice": 3883950
     },
     {
       "id": "V5",
       "cadastralReference": "50:33:0010101:2277",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3419100
+      "objectprice": 3509100
     },
     {
       "id": "V6",
       "cadastralReference": "50:33:0010101:2278",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 4099000
+      "objectprice": 4199000
     },
     {
       "id": "V7",
       "cadastralReference": "50:33:0010101:2279",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 4713850
+      "objectprice": 4828850
     },
     {
       "id": "V8",
       "cadastralReference": "50:33:0010101:2280",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 4178900
+      "objectprice": 4288900
     },
     {
       "id": "V9",
       "cadastralReference": "50:33:0010101:2281",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3799000
+      "objectprice": 3899000
     },
     {
       "id": "V10",
       "cadastralReference": "50:33:0010101:2282",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 4508900
+      "objectprice": 4618900
     },
     {
       "id": "V11",
       "cadastralReference": "50:33:0010101:2283",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5738600
+      "objectprice": 5878600
     },
     {
       "id": "V12",
       "cadastralReference": "50:33:0010101:2284",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 4748750
+      "objectprice": 4873750
     },
     {
       "id": "V14",
       "cadastralReference": "50:33:0010101:2285",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 4288900
+      "objectprice": 4398900
     },
     {
       "id": "V15",
       "cadastralReference": "50:33:0010101:2287",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5248750
+      "objectprice": 5373750
     },
     {
       "id": "V16",
       "cadastralReference": "50:33:0010101:2288",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5398650
+      "objectprice": 5533650
     },
     {
       "id": "V17",
       "cadastralReference": "50:33:0010101:2289",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 4918800
+      "objectprice": 5038800
     },
     {
       "id": "V18",
       "cadastralReference": "50:33:0010101:2290",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 5123750
+      "objectprice": 5248750
     },
     {
       "id": "V19",
       "cadastralReference": "50:33:0010101:2291",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 6158600
+      "objectprice": 6298600
     },
     {
       "id": "V20",
       "cadastralReference": "50:33:0010101:2292",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5848700
+      "objectprice": 5978700
     },
     {
       "id": "V21",
       "cadastralReference": "50:33:0010101:2293",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 4385930
+      "objectprice": 4492930
     },
     {
       "id": "V22",
       "cadastralReference": "50:33:0010101:2294",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 4099000
+      "objectprice": 4199000
     },
     {
       "id": "V23",
       "cadastralReference": "50:33:0010101:2295",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5748750
+      "objectprice": 5873750
     },
     {
       "id": "V24",
       "cadastralReference": "50:33:0010101:2296",
       "status": "Снят с продажи",
       "location": "с пляжем",
-      "objectprice": 8162430
+      "objectprice": 8319430
     },
     {
       "id": "V25",
       "cadastralReference": "50:33:0010101:2298",
       "status": "Снят с продажи",
       "location": "с пляжем",
-      "objectprice": 7838400
+      "objectprice": 7998400
     },
     {
       "id": "V26",
       "cadastralReference": "50:33:0010101:2299",
       "status": "Снят с продажи",
       "location": "с пляжем",
-      "objectprice": 7838400
+      "objectprice": 7998400
     },
     {
       "id": "V27",
       "cadastralReference": "50:33:0010101:2301",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 4099000
+      "objectprice": 4199000
     },
     {
       "id": "V28",
       "cadastralReference": "50:33:0010101:2300",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 4099000
+      "objectprice": 4199000
     },
     {
       "id": "V29",
       "cadastralReference": "50:33:0010101:2303",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 4099000
+      "objectprice": 4199000
     },
     {
       "id": "V30",
       "cadastralReference": "50:33:0010101:2302",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 4099000
+      "objectprice": 4199000
     },
     {
       "id": "V31",
       "cadastralReference": "50:33:0010101:2304",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3899000
+      "objectprice": 3999000
     },
     {
       "id": "V32",
       "cadastralReference": "50:33:0010101:2305",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3899000
+      "objectprice": 3999000
     },
     {
       "id": "V33",
       "cadastralReference": "50:33:0010101:2306",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3899000
+      "objectprice": 3999000
     },
     {
       "id": "V34",
       "cadastralReference": "50:33:0010101:2307",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3899000
+      "objectprice": 3999000
     },
     {
       "id": "V35",
       "cadastralReference": "50:33:0010101:2309",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 4254880
+      "objectprice": 4366880
     },
     {
       "id": "V36",
       "cadastralReference": "50:33:0010101:2310",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3950960
+      "objectprice": 4054960
     },
     {
       "id": "V37",
       "cadastralReference": "50:33:0010101:2311",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3920568
+      "objectprice": 4023768
     },
     {
       "id": "V38",
       "cadastralReference": "50:33:0010101:2314",
       "status": "Снят с продажи",
       "location": "с видом на лес у реки",
-      "objectprice": 4178900
+      "objectprice": 4288900
     },
     {
       "id": "V39",
       "cadastralReference": "50:33:0010101:2313",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3799000
+      "objectprice": 3899000
     },
     {
       "id": "V40",
       "cadastralReference": "50:33:0010101:2312",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3893975
+      "objectprice": 3996475
     },
     {
       "id": "V41",
       "cadastralReference": "50:33:0010101:2315",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 4368850
+      "objectprice": 4483850
     },
     {
       "id": "V42",
       "cadastralReference": "50:33:0010101:2316",
       "status": "Снят с продажи",
       "location": "с видом на лес у реки",
-      "objectprice": 4678800
+      "objectprice": 4798800
     },
     {
       "id": "V43",
       "cadastralReference": "50:33:0010101:2320",
       "status": "Снят с продажи",
       "location": "с видом на лес у реки",
-      "objectprice": 6148500
+      "objectprice": 6298500
     },
     {
       "id": "V44",
       "cadastralReference": "50:33:0010101:2318",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 4178900
+      "objectprice": 4288900
     },
     {
       "id": "V45",
       "cadastralReference": "50:33:0010101:2317",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 4178900
+      "objectprice": 4288900
     },
     {
       "id": "V46",
       "cadastralReference": "50:33:0010101:2323",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3799000
+      "objectprice": 3899000
     },
     {
       "id": "V47",
       "cadastralReference": "50:33:0010101:2322",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3988950
+      "objectprice": 4093950
     },
     {
       "id": "V48",
       "cadastralReference": "50:33:0010101:2321",
       "status": "Снят с продажи",
       "location": "с видом на лес у реки",
-      "objectprice": 5738600
+      "objectprice": 5878600
     },
     {
       "id": "V49",
       "cadastralReference": "50:33:0010101:2326",
       "status": "Снят с продажи",
       "location": "с видом на лес у реки",
-      "objectprice": 5738600
+      "objectprice": 5878600
     },
     {
       "id": "V50",
       "cadastralReference": "50:33:0010101:2325",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3419100
+      "objectprice": 3509100
     },
     {
       "id": "V51",
       "cadastralReference": "50:33:0010101:2324",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3239100
+      "objectprice": 3329100
     },
     {
       "id": "V52",
       "cadastralReference": "50:33:0010101:2331",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3778950
+      "objectprice": 3883950
     },
     {
       "id": "V53",
       "cadastralReference": "50:33:0010101:2329",
       "status": "Снят с продажи",
       "location": "у леса и реки",
-      "objectprice": 3699000
+      "objectprice": 3799000
     },
     {
       "id": "V54",
       "cadastralReference": "50:33:0010101:2328",
       "status": "Снят с продажи",
       "location": "с видом на лес у реки",
-      "objectprice": 5328700
+      "objectprice": 5458700
     },
     {
       "id": "V55",
       "cadastralReference": "50:33:0010101:2327",
       "status": "Снят с продажи",
       "location": "с видом на лес у реки",
-      "objectprice": 5848500
+      "objectprice": 5998500
     },
     {
       "id": "V56",
       "cadastralReference": "50:33:0010101:2338",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 7018700
+      "objectprice": 7148700
     },
     {
       "id": "V57",
       "cadastralReference": "50:33:0010101:2339",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5938900
+      "objectprice": 6048900
     },
     {
       "id": "V58",
       "cadastralReference": "50:33:0010101:2340",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5938900
+      "objectprice": 6048900
     },
     {
       "id": "V59",
       "cadastralReference": "50:33:0010101:2342",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 5938900
+      "objectprice": 6048900
     },
     {
       "id": "V60",
       "cadastralReference": "50:33:0010101:2343",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 6478800
+      "objectprice": 6598800
     },
     {
       "id": "V61",
       "cadastralReference": "50:33:0010101:2344",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 6748750
+      "objectprice": 6873750
     },
     {
       "id": "V62",
       "cadastralReference": "50:33:0010101:2345",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 6748750
+      "objectprice": 6873750
     },
     {
       "id": "V63",
       "cadastralReference": "50:33:0010101:2346",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 6478800
+      "objectprice": 6598800
     },
     {
       "id": "V64",
       "cadastralReference": "50:33:0010101:2347",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 7018700
+      "objectprice": 7148700
     },
     {
       "id": "V65",
       "cadastralReference": "50:33:0010101:2348",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 7278600
+      "objectprice": 7418600
     },
     {
       "id": "V66",
       "cadastralReference": "50:33:0010101:2349",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 7278600
+      "objectprice": 7418600
     },
     {
       "id": "V67",
       "cadastralReference": "50:33:0010101:2350",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 7278600
+      "objectprice": 7418600
     },
     {
       "id": "V68",
       "cadastralReference": "50:33:0010101:2351",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 7018650
+      "objectprice": 7153650
     },
     {
       "id": "V69",
       "cadastralReference": "50:33:0010101:2354",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 6342780
+      "objectprice": 6464780
     },
     {
       "id": "V70",
       "cadastralReference": "50:33:0010101:2355",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 6457158
+      "objectprice": 6581358
     },
     {
       "id": "V71",
       "cadastralReference": "50:33:0010101:2356",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 6748750
+      "objectprice": 6873750
     },
     {
       "id": "V72",
       "cadastralReference": "50:33:0010101:2357",
       "status": "Снят с продажи",
       "location": "с пляжем",
-      "objectprice": 7148700
+      "objectprice": 7278700
     },
     {
       "id": "V73",
       "cadastralReference": "50:33:0010101:2505",
       "status": "Снят с продажи",
       "location": "с пляжем",
-      "objectprice": 6858600
+      "objectprice": 6998600
     },
     {
       "id": "V74",
       "cadastralReference": "50:33:0010101:2508",
       "status": "Снят с продажи",
       "location": "с пляжем",
-      "objectprice": 6122797
+      "objectprice": 6253097
     },
     {
       "id": "V75",
       "cadastralReference": "50:33:0010101:2504",
       "status": "Снят с продажи",
       "location": "с выходом к реке",
-      "objectprice": 10398000
+      "objectprice": 10598000
     },
     {
       "id": "К3",
       "cadastralReference": "50:33:0010101:2471",
       "status": "Снят с продажи",
       "location": "рядом с парком",
-      "objectprice": 3430960
+      "objectprice": 3534960
     },
     {
       "id": "К4",
       "cadastralReference": "50:33:0010101:2467",
       "status": "Забронирован",
       "location": "рядом с парком",
-      "objectprice": 3599100
+      "objectprice": 3689100
     },
     {
       "id": "К5",
       "cadastralReference": "50:33:0010101:2466",
       "status": "Забронирован",
       "location": "рядом с парком",
-      "objectprice": 4062758
+      "objectprice": 4166958
     },
     {
       "id": "К6",
       "cadastralReference": "50:33:0010101:2465",
       "status": "Забронирован",
       "location": "рядом с парком",
-      "objectprice": 4068900
+      "objectprice": 4178900
     },
     {
       "id": "К7",
@@ -3643,7 +3643,7 @@
       "cadastralReference": "50:33:0010101:2460",
       "status": "Свободен",
       "location": "рядом с парком",
-      "objectprice": 4556940
+      "objectprice": 4662940
     },
     {
       "id": "К10",
