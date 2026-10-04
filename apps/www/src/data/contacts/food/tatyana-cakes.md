@@ -6,8 +6,12 @@ summary: 'Классические торты на заказ и готовые 
 contacts:
   phone: '89969670018'
   telegram: 'https://t.me/tortgreen'
-updated_at: '2026-09-26'
+updated_at: '2026-10-04'
 reviews:
+  - sentiment: 'positive'
+    summary: 'Купленный торт «Прага» понравился по вкусу.'
+    published_at: '2026-10-03'
+    url: 'https://t.me/shelkovoecoclub/15261/56802'
   - sentiment: 'positive'
     summary: 'Заказанный десерт «Павлова» понравился.'
     published_at: '2026-09-25'
