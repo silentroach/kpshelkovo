@@ -27,14 +27,6 @@ const ptSerif = {
 export const wwwFontFamilies = [firaSans, ptSerif];
 
 export const mediaFontFamilies = [
-  { ...firaSans, weights: [600], subsets: ['cyrillic'] },
-  { ...ptSerif, subsets: ['cyrillic'] }
+  { ...firaSans, weights: [600], subsets: ['cyrillic'], optimizedFallbacks: false },
+  { ...ptSerif, subsets: ['cyrillic'], optimizedFallbacks: false }
 ] satisfies Array<Omit<NonNullable<AstroUserConfig['fonts']>[number], 'provider'>>;
-
-export const fontPreloads = {
-  firaSans: [
-    { weight: 400, style: 'normal', subset: 'cyrillic' },
-    { weight: 600, style: 'normal', subset: 'cyrillic' }
-  ],
-  ptSerif: [{ weight: 700, style: 'normal', subset: 'cyrillic' }]
-};

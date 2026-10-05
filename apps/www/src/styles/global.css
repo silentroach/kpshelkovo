@@ -137,8 +137,9 @@
 }
 
 @layer content {
+  /* Loaded 70/65ch in Fira Sans 400 (0 = 0.558em), stable while fonts load. */
   .ui-prose {
-    max-width: 70ch;
+    max-width: 39.06em;
     color: var(--color-text);
     font-size: 1rem;
     line-height: 1.75;
@@ -146,7 +147,7 @@
   }
 
   .ui-prose-narrow {
-    max-width: 65ch;
+    max-width: 36.27em;
   }
 
   .ui-prose p,

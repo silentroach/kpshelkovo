@@ -1,6 +1,6 @@
 # Astro Fonts: исходная точка приёмки
 
-Baseline для [#907](https://github.com/silentroach/kpshelkovo/issues/907) и [adopt-astro-fonts](/openspec/changes/adopt-astro-fonts/design.md#4-приёмка-по-поведению-и-стоимости-загрузки). Здесь только результаты **до** миграции; сравнение с Fonts API ещё не выполнено.
+Baseline для [#907](https://github.com/silentroach/kpshelkovo/issues/907) и [adopt-astro-fonts](/openspec/changes/archive/2026-10-05-adopt-astro-fonts/design.md#4-приёмка-по-поведению-и-стоимости-загрузки). Здесь только результаты **до** миграции; последующее сравнение записано в [отчёте 5 октября](/docs/research/2026-10-05-astro-fonts-acceptance.md).
 
 ## Восстановление 5 октября
 
@@ -10,7 +10,7 @@ Baseline для [#907](https://github.com/silentroach/kpshelkovo/issues/907) и 
 
 Скрипты восстановлены в `astro-fonts-907-resume/browser-acceptance/`: `preview.py`, `observe.js`, `measure.py`, `summarize.py`, `costs.mjs`; инструкция — `report.md` в том же каталоге. Свежие normal-прогоны шести URL в обоих viewport сохранили 12 PNG/JSON и подтвердили старые ручные font faces, геометрию, переносы и стоимость HTML/CSS/WOFF2 из этого отчёта. Нагрузка CPU не была изолирована: timing этих прогонов не использовать для числового сравнения.
 
-Успешной сборки с Fonts API пока нет. Cold/slow, fallback, warm/router и latin-ext ещё нужно переснять на одинаковых baseline/after условиях; соответствующие ветви восстановленных скриптов пока не проверены запуском. Старые инструкции ниже описывают протокол и исторические пути, а не доступный сейчас набор файлов.
+На момент восстановления baseline успешной сборки с Fonts API ещё не было. Позднее обе production-сборки и полная paired-матрица завершились; результаты и обнаруженные регрессии — в [отчёте приёмки 5 октября](/docs/research/2026-10-05-astro-fonts-acceptance.md). Старые инструкции ниже описывают протокол и исторические пути, а не доступный сейчас набор файлов.
 
 ## Сохранённые artifacts
 

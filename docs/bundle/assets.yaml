@@ -1,11 +1,11 @@
 - file: static/404.XXXXXXXX.css
-  bytes: 1552
-  brotli: 609
-  gzip: 710
+  bytes: 1547
+  brotli: 593
+  gzip: 700
 - file: static/BaseLayout.XXXXXXXX.css
-  bytes: 53506
-  brotli: 8713
-  gzip: 9781
+  bytes: 50914
+  brotli: 8261
+  gzip: 9284
 - file: static/BaseLayout.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 11404
   brotli: 3671

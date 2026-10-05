@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { extname, join, relative as relativePath, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { fontPreloads, mediaFonts, wwwFonts } from '@shelkovo/ui/fonts';
+import { mediaFonts, wwwFonts } from '@shelkovo/ui/fonts';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
@@ -21,8 +21,7 @@ const fontPolicySchema = z.object({
   provider: z.object({ name: z.literal('fontsource') }),
   styles: z.tuple([z.literal('normal')]),
   formats: z.tuple([z.literal('woff2')]),
-  display: z.literal('swap'),
-  optimizedFallbacks: z.literal(true)
+  display: z.literal('swap')
 });
 
 const collectSourceFiles = (directory: string): readonly string[] =>
@@ -86,20 +85,6 @@ describe('font budget', () => {
           "Fira Sans: 600 cyrillic (--font-fira-sans; system-ui)",
           "PT Serif: 700 cyrillic (--font-pt-serif; Georgia, serif)",
         ],
-      ]
-    `);
-  });
-
-  it('preloads only the three critical cyrillic faces', () => {
-    expect(
-      Object.entries(fontPreloads).flatMap(([family, preloads]) =>
-        preloads.map(({ weight, style, subset }) => `${family}: ${weight} ${style} ${subset}`)
-      )
-    ).toMatchInlineSnapshot(`
-      [
-        "firaSans: 400 normal cyrillic",
-        "firaSans: 600 normal cyrillic",
-        "ptSerif: 700 normal cyrillic",
       ]
     `);
   });
