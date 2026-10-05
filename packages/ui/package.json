@@ -62,6 +62,8 @@
     "test:visual:breadcrumbs:serve": "astro build --root tests/breadcrumbs-visual && ASTRO_PREVIEW_BACKGROUND=0 astro preview --root tests/breadcrumbs-visual --host 127.0.0.1 --port 4325"
   },
   "dependencies": {
+    "@fontsource/fira-sans": "5.3.0",
+    "@fontsource/pt-serif": "5.3.0",
     "@shelkovo/url": "workspace:*"
   },
   "devDependencies": {
