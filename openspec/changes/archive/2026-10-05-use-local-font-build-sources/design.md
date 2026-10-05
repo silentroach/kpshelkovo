@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация — в [proposal](/openspec/changes/use-local-font-build-sources/proposal.md). База: master `2065393d802eb8383a1b11161d8983b2c25641ab`; рабочая ветка `fix/font-build-local-source`.
+Мотивация — в [proposal](/openspec/changes/archive/2026-10-05-use-local-font-build-sources/proposal.md). База: master `2065393d802eb8383a1b11161d8983b2c25641ab`; рабочая ветка `fix/font-build-local-source`.
 
 Общие определения `/packages/ui/fonts.ts` подключены к www, media и шести визуальным хостам. Fontsource разрешает удалённые метаданные, после чего `CachedFontFetcher` Astro 7.3.5 скачивает WOFF2 обычным `fetch` без повтора этого запроса. При сбое CI кеш отсутствовал, а PT Serif Cyrillic 700 завершился с `fetch failed`. Дальнейшая проверка URL дала HTTP 200 и 20916 bytes; лог не позволяет отличить DNS, TLS или иной транспортный сбой. Неправильный URL не подтверждён.
 
