@@ -134,6 +134,37 @@ pnpm exec openspec status --change <change> --json
 
 Несовместимый метод исключай из набора по согласованию с владельцем. Для обновления установщика `skills` также сохраняй точную версию и проверяй совместимость lock-формата и алгоритма хеша. Глобальный набор этим способом не обновляется.
 
+### Сканер humanizer-ru
+
+`pnpm agents:setup` восстанавливает весь skill, включая сканер, но не устанавливает его Python-зависимости. Для сканера нужны Python 3.10+ и пакеты `razdel>=0.5`, `pymorphy3>=2.0`. Из корня checkout проверь запуск:
+
+```bash
+python3 .agents/skills/humanizer-ru/scripts/scan.py --help
+```
+
+Если сканер сообщает о нехватке зависимостей, создай отдельное окружение вне каталога skills:
+
+```bash
+python3 -m venv "$HOME/.venvs/kpshelkovo-humanizer"
+"$HOME/.venvs/kpshelkovo-humanizer/bin/python" -m pip install 'razdel>=0.5' 'pymorphy3>=2.0'
+source "$HOME/.venvs/kpshelkovo-humanizer/bin/activate"
+python3 .agents/skills/humanizer-ru/scripts/scan.py --help
+```
+
+Активируй это окружение в терминале перед запуском агента, чтобы его `python3` видел зависимости. После обновления skill перезапусти агент. Окружение внутри `.agents/skills/` нарушит проверку состава или хеша и может быть удалено при переустановке.
+
+Для новостей передавай `--genre news`, как описано в [news-maker](/.agents/skills/news-maker/SKILL.md). Сохрани исходный редакционный текст перед правкой и сравни его с чистовиком:
+
+```bash
+python3 .agents/skills/humanizer-ru/scripts/scan.py /path/to/after.md --genre news --before /path/to/before.md
+```
+
+В эти временные файлы переноси проверяемый видимый текст; YAML frontmatter сканер сам не исключает. Заголовок, summary и другие видимые поля проверяй как текст без служебных ключей. Код `1` означает найденные жёсткие запреты; при `--before` код `2` может означать расхождение фактов, поэтому читай отчёт и stderr. Ошибки запуска тоже дают код `2`.
+
+В версии 3.31.3 Markdown-подзаголовки `##` снижают балл как «обвязка чата» даже с `--genre news`. Оценивай такие находки по [правилам видимых текстов](/AGENTS.md#видимые-тексты): полезные заголовки и акценты нужны читателю. Совпадение извлечённых фактов требует отдельной сверки смысла, особенно обещаний, условий и атрибуции.
+
+Запуск локального `scan.py` использует ревизию из `skills-lock.json`. Предлагаемый upstream fallback `uvx ru-humanizer` загружает отдельный пакет из PyPI, чью версию этот lock не закрепляет. MCP-сервер и отдельный CLI для работы установленного skill не требуются.
+
 ## Шрифты при сборке
 
 Общие определения в [fonts.ts](/packages/ui/fonts.ts) используют штатный `fontProviders.local()` Astro Fonts API. WOFF2 и Unicode-диапазоны берутся из установленных `@fontsource/fira-sans` и `@fontsource/pt-serif` в `/packages/ui`; точные версии пакетов и lock-файл закрепляют источник. После `pnpm install --frozen-lockfile` разрешение и копирование шрифтов работают без Fontsource API/CDN, в том числе с пустым font cache. Самой установке нужен npm registry либо заполненный pnpm store.

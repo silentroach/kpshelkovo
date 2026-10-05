@@ -59,10 +59,10 @@
     },
     "humanizer-ru": {
       "source": "ilyautov/humanizer-ru",
-      "ref": "d24cda37bb5f9b17842970dda649b1cccc35ca76",
+      "ref": "1e035ad6b64c56c6e770ed28d076e2cbda3d1aed",
       "sourceType": "github",
       "skillPath": "skills/humanizer-ru/SKILL.md",
-      "computedHash": "923bae7f9773b1a91846538fe9c86d4c18855b56533c611a42be72795f09abc1"
+      "computedHash": "545430e5d33bfdfaac7e1aa144aa4716a27b118dd6a064ca4db53b04a2a3260a"
     },
     "nginx-expert": {
       "source": "personamanagmentlayer/pcl",
