@@ -40,6 +40,12 @@ pnpm typecheck
 - Если нужна ссылка на compare, вести на `/815/compare/`, а не на legacy домен.
 - Если меняется deploy/base/root behavior, синхронно обновлять `ops/nginx/kpshelkovo-online.conf`.
 
+## Клиентский JavaScript
+
+- Проектный исполняемый код по умолчанию держать в обработанных модулях: `src/scripts/*`, компонентных `<script>` без `is:inline` или других собранных ассетах.
+- Raw inline-обработчики HTML вроде `onclick="..."` запрещены политикой `script-src-attr 'none'`; подключать обработчики из клиентского модуля.
+- Новый raw inline-скрипт допустим только с отдельным обоснованием и синхронной записью в [CSP.md](/ops/nginx/CSP.md). Причины существующих исключений для генераторов и интеграций — в [ADR-017](/docs/decisions/017-csp-inline-exceptions-for-astro-yandex-maps.md).
+
 ## Markdown
 
 - При изменении рендера или генератора сверять API с [README пакета](../../packages/markdown/README.md). Причины разделения слоёв — в [ADR-003](../../docs/decisions/003-markdown-pipeline-layering.md), выбора AST — в [ADR-008](../../docs/decisions/008-markdown-ast-generation.md).
