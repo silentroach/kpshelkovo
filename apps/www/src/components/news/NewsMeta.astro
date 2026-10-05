@@ -7,7 +7,7 @@ import { formatNewsAuthor, formatNewsDate } from '../../lib/news/view';
 
 interface Props {
   readonly publishedIso: string;
-  readonly author?: Pick<NewsAuthor, 'name' | 'shortName' | 'url'>;
+  readonly author?: Pick<NewsAuthor, 'name' | 'shortName' | 'url' | 'kind'>;
   readonly fullAuthorName?: boolean;
   readonly areas?: readonly NewsArea[];
   readonly appliesToAllAreas?: boolean;
@@ -40,17 +40,18 @@ const visibleAreas = appliesToAllAreas ? [] : areas;
   <time datetime={publishedIso} class="news-meta-date">
     {formatNewsDate(publishedIso)}
   </time>
-  {
-    author &&
-      (author.url ? (
-        <a href={author.url} class="ui-link news-meta-author">
-          {formatNewsAuthor(author, { short: !fullAuthorName })}
-        </a>
-      ) : (
-        <span>{formatNewsAuthor(author, { short: !fullAuthorName })}</span>
-      ))
-  }
-  {visibleAreas.map((area) => <ShelkovoAreaIcon area={area} />)}
+  {author &&
+    author.kind !== 'editorial' &&
+    (author.url ? (
+      <a href={author.url} class="ui-link news-meta-author">
+        {formatNewsAuthor(author, { short: !fullAuthorName })}
+      </a>
+    ) : (
+      <span>{formatNewsAuthor(author, { short: !fullAuthorName })}</span>
+    ))}
+  {visibleAreas.map((area) => (
+    <ShelkovoAreaIcon area={area} />
+  ))}
   {sourceUrl && <LinkWithIcon href={sourceUrl} ariaLabelPrefix="Источник" />}
 </div>
 
