@@ -31,7 +31,7 @@
 - [ADR-025: Статический полнотекстовый поиск через Pagefind](025-static-full-text-search-with-pagefind.md) - принят; правила корпуса и возрастного ранжирования статуса заменены ADR-035, 2026-08-14.
 - [ADR-026: IndexNow после статического deploy](/docs/decisions/026-indexnow-after-static-deploy.md) - заменён [ADR-027](/docs/decisions/027-indexnow-new-pages-only.md), 2026-08-16; исторический указатель.
 - [ADR-027: IndexNow только для новых страниц](/docs/decisions/027-indexnow-new-pages-only.md) - принят, 2026-08-16; публикация и восстановление — [deploy-runbook](/README.md#indexnow).
-- [ADR-028: Markdown-first карта мест с типизированными маркерами](028-markdown-first-places-map.md) - принят, 2026-08-19.
+- [ADR-028: Markdown-first карта мест с типизированными маркерами](/docs/decisions/028-markdown-first-places-map.md) - принят, 2026-08-19; контракты — [place-map-visibility](/openspec/specs/place-map-visibility/spec.md), [site-maps](/openspec/specs/site-maps/spec.md) и связанные specs карточки; редактура — [инструкции мест](/apps/www/src/data/places/AGENTS.md).
 - [ADR-029: Аспектные оценки как отзывы об организациях](029-review-aspects-as-organization-reviews.md) - принят, 2026-08-20.
 - [ADR-030: Нормализованные источники детальной сметы](030-normalized-estimate-detail-sources.md) - принят, 2026-08-26; действующий контракт — [estimate-detail-sources](../../openspec/specs/estimate-detail-sources/spec.md).
 - [ADR-031: Единый жизненный цикл status-событий](031-status-incident-lifecycle.md) - принят, 2026-08-26.
@@ -42,7 +42,7 @@
 - [ADR-036: Короткие путеводители llms.txt v2](036-llms-v2-guides.md) - принят, 2026-09-12.
 - [ADR-037: Печать справки и новостей через CSS](037-content-print-css.md) - принят, 2026-09-13.
 - [ADR-038: OpenSpec как единый процесс разработки](038-openspec-development-workflow.md) - принят, 2026-09-14; требования — [agent-tooling](../../openspec/specs/agent-tooling/spec.md), процесс — [AGENTS.md](../../AGENTS.md#жизненный-цикл-изменений), эксплуатация — [окружение разработки](../development.md).
-- [ADR-039: Общий runtime Яндекс Карт и неподвижные превью](039-shared-yandex-maps-runtime-and-preview.md) - принят, 2026-09-18.
+- [ADR-039: Общий runtime Яндекс Карт и неподвижные превью](/docs/decisions/039-shared-yandex-maps-runtime-and-preview.md) - принят, 2026-09-18; общие гарантии — [site-maps](/openspec/specs/site-maps/spec.md), композиция — [дизайн-гайд](/docs/design/design-code-shelkovo.md#фоновые-карты-и-неподвижные-превью).
 - [ADR-040: Портреты людей в публичном S3](040-people-portraits-in-public-s3.md) - принят, 2026-09-22.
 - [ADR-041: Участки отдельно от мест, полнотекстовый поиск в Pagefind](041-parcel-records-and-exact-search.md) - принят, 2026-09-22; уточнён 2026-09-25 и 2026-09-28; дополняет ADR-013/025/028/039.
 - [ADR-042: Общая рамка карты как feature-owned CSS](042-feature-owned-map-frame-css.md) - принят, 2026-09-28; уточняет ADR-034.
