@@ -32,6 +32,6 @@ Markdown-представление разделено на компактный
 
 ## Владельцы требований и инструкций
 
-- Проверяемый контракт источника, якорей и публичных URL — [meetings-archive](/openspec/changes/extract-meetings-archive-contract/specs/meetings-archive/spec.md).
+- Проверяемый контракт источника, якорей и публичных URL — [meetings-archive](/openspec/specs/meetings-archive/spec.md).
 - Подготовка транскрипции — [редакционные правила](/apps/www/src/data/meetings/AGENTS.md); формат и проверка исходных данных — [raw-схемы](/apps/www/src/lib/meetings/raw-schema.ts) и [mapper](/apps/www/src/lib/meetings/mapper.ts).
 - Общие правила Markdown и публичных представлений — [ADR-008](/docs/decisions/008-markdown-ast-generation.md), [ADR-009](/docs/decisions/009-markdown-accept-negotiation.md) и [ADR-011](/docs/decisions/011-public-surface-registry.md); упоминания — [ADR-012](/docs/decisions/012-entity-mention-graph.md).

@@ -2,7 +2,7 @@
 
 Локальные правила для `src/data/meetings`.
 
-- Перед подготовкой или правкой встречи сверь [контракт архива](/openspec/changes/extract-meetings-archive-contract/specs/meetings-archive/spec.md); причины transcript-first — в [ADR-014](/docs/decisions/014-meetings-transcript-first-archive.md).
+- Перед подготовкой или правкой встречи сверь [контракт архива](/openspec/specs/meetings-archive/spec.md); причины transcript-first — в [ADR-014](/docs/decisions/014-meetings-transcript-first-archive.md).
 - Одна встреча = одна slug-директория в lower-case Latin с цифрами и дефисами.
 - В каждой директории встречи обязательны `index.yaml` и `transcript.yaml`.
 - Не создавай встречу без полной транскрипции.
