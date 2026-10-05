@@ -22,12 +22,12 @@
 - [ADR-016: Markdown-first отзывы собственников](016-markdown-first-owner-reviews.md) - принят, 2026-06-25.
 - [ADR-017: CSP с inline-исключениями для Astro и Яндекс Карт](/docs/decisions/017-csp-inline-exceptions-for-astro-yandex-maps.md) - принят, 2026-07-01; правила кода — [инструкции приложения](/apps/www/AGENTS.md#клиентский-javascript), исключения — [CSP.md](/ops/nginx/CSP.md).
 - [ADR-018: Markdown-first сарафан](/docs/decisions/018-markdown-first-useful-contacts.md) — принят, 2026-07-06; каталог без гарантии качества, последующие решения об отзывах и самостоятельных карточках.
-- [ADR-019: Публичный media-origin через nginx перед S3](019-public-media-origin.md) - принят, 2026-07-10.
-- [ADR-020: Отдельное Astro-приложение для media error pages](020-separate-media-error-app.md) - принят, 2026-07-11.
-- [ADR-021: Публичные файлы разделов в S3](021-public-section-files-in-s3.md) - принят, 2026-07-13.
+- [ADR-019: Публичный media-origin через nginx перед S3](/docs/decisions/019-public-media-origin.md) - принят, 2026-07-10; доставка — [public-media](/openspec/specs/public-media/spec.md), эксплуатация — [origin runbook](/ops/nginx/media-kpshelkovo-online.md).
+- [ADR-020: Отдельное Astro-приложение для media error pages](/docs/decisions/020-separate-media-error-app.md) - принят, 2026-07-11; контракт ошибки — [public-media](/openspec/specs/public-media/spec.md).
+- [ADR-021: Публичные файлы разделов в S3](/docs/decisions/021-public-section-files-in-s3.md) - принят, 2026-07-13; требования — [public-media](/openspec/specs/public-media/spec.md), публикация — [storage runbook](/ops/storage/public-media.md).
 - [ADR-022: Разрешить использование публичного контента системами ИИ](022-ai-content-signals-policy.md) - принят, 2026-07-22.
-- [ADR-023: Оригиналы фотографий новостей в публичном S3](023-news-images-in-public-s3.md) - принят, 2026-07-23.
-- [ADR-024: Иллюстрации отзывов в публичном S3](024-review-images-in-public-s3.md) - принят, 2026-08-10.
+- [ADR-023: Фотографии новостей в публичном S3](/docs/decisions/023-news-images-in-public-s3.md) - принят, 2026-07-23; подготовленные web-master — [public-media](/openspec/specs/public-media/spec.md).
+- [ADR-024: Иллюстрации отзывов в публичном S3](/docs/decisions/024-review-images-in-public-s3.md) - принят, 2026-08-10; публикация и авторская позиция — [public-media](/openspec/specs/public-media/spec.md).
 - [ADR-025: Статический полнотекстовый поиск через Pagefind](025-static-full-text-search-with-pagefind.md) - принят; правила корпуса и возрастного ранжирования статуса заменены ADR-035, 2026-08-14.
 - [ADR-026: IndexNow после статического deploy](/docs/decisions/026-indexnow-after-static-deploy.md) - заменён [ADR-027](/docs/decisions/027-indexnow-new-pages-only.md), 2026-08-16; исторический указатель.
 - [ADR-027: IndexNow только для новых страниц](/docs/decisions/027-indexnow-new-pages-only.md) - принят, 2026-08-16; публикация и восстановление — [deploy-runbook](/README.md#indexnow).
