@@ -2,7 +2,9 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { extname, join, relative as relativePath, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { fontPreloads, mediaFonts, wwwFonts } from '@shelkovo/ui/fonts';
 import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
 
 const appSrcRoot = fileURLToPath(new URL('../../', import.meta.url));
 const appTestsRoot = fileURLToPath(new URL('../../../tests/', import.meta.url));
@@ -15,6 +17,13 @@ const disallowedWeightClassPattern =
   /\bfont-(?:thin|extralight|light|medium|bold|extrabold|black)\b/gu;
 const arbitraryWeightClassPattern = /\bfont-\[(\d+)\]/gu;
 const cssWeightPattern = /font-weight:\s*([^;]+);/gu;
+const fontPolicySchema = z.object({
+  provider: z.object({ name: z.literal('fontsource') }),
+  styles: z.tuple([z.literal('normal')]),
+  formats: z.tuple([z.literal('woff2')]),
+  display: z.literal('swap'),
+  optimizedFallbacks: z.literal(true)
+});
 
 const collectSourceFiles = (directory: string): readonly string[] =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -31,15 +40,6 @@ const workspaceRelativePath = (filePath: string): string =>
   relativePath(workspaceRoot, filePath).split(sep).join('/');
 
 const lineAt = (source: string, index: number): number => source.slice(0, index).split('\n').length;
-
-const extractFontFaces = (source: string): readonly string[] =>
-  [...source.matchAll(/@font-face\s*\{([\s\S]*?)\}/gu)].map(([, block]) => {
-    const family = block?.match(/font-family:\s*'([^']+)'/u)?.[1];
-    const weight = block?.match(/font-weight:\s*(\d+)/u)?.[1];
-    const file = block?.match(/files\/([^')]+\.woff2)/u)?.[1];
-
-    return `${family} ${weight}: ${file}`;
-  });
 
 const findWeightViolations = (filePath: string): readonly string[] => {
   const source = readFileSync(filePath, 'utf8');
@@ -64,49 +64,54 @@ const findWeightViolations = (filePath: string): readonly string[] => {
 };
 
 describe('font budget', () => {
-  it('keeps production faces and source weights within the shared budget', () => {
-    const stylesPath = join(appSrcRoot, 'styles/global.css');
-    const standaloneStylesPath = join(uiRoot, 'standalone-error.css');
-    const preloadsPath = join(uiRoot, 'src/FontPreloads.astro');
+  it('keeps shared font definitions within the budget without resolving providers', () => {
+    for (const font of [...wwwFonts, ...mediaFonts]) {
+      fontPolicySchema.parse(font);
+    }
+
+    expect(
+      [wwwFonts, mediaFonts].map((fonts) =>
+        fonts.map(
+          (font) =>
+            `${font.name}: ${font.weights.join('/')} ${font.subsets.join('/')} (${font.cssVariable}; ${font.fallbacks.join(', ')})`
+        )
+      )
+    ).toMatchInlineSnapshot(`
+      [
+        [
+          "Fira Sans: 400/600 latin/cyrillic/latin-ext (--font-fira-sans; system-ui)",
+          "PT Serif: 700 latin/cyrillic/latin-ext (--font-pt-serif; Georgia, serif)",
+        ],
+        [
+          "Fira Sans: 600 cyrillic (--font-fira-sans; system-ui)",
+          "PT Serif: 700 cyrillic (--font-pt-serif; Georgia, serif)",
+        ],
+      ]
+    `);
+  });
+
+  it('preloads only the three critical cyrillic faces', () => {
+    expect(
+      Object.entries(fontPreloads).flatMap(([family, preloads]) =>
+        preloads.map(({ weight, style, subset }) => `${family}: ${weight} ${style} ${subset}`)
+      )
+    ).toMatchInlineSnapshot(`
+      [
+        "firaSans: 400 normal cyrillic",
+        "firaSans: 600 normal cyrillic",
+        "ptSerif: 700 normal cyrillic",
+      ]
+    `);
+  });
+
+  it('keeps source weights within the shared budget', () => {
     const sourceFiles = [
       ...collectSourceFiles(appSrcRoot),
       ...collectSourceFiles(appTestsRoot),
       ...collectSourceFiles(join(uiRoot, 'src')),
-      standaloneStylesPath
+      join(uiRoot, 'standalone-error.css')
     ];
-    const preloads = [
-      ...readFileSync(preloadsPath, 'utf8').matchAll(/files\/([^']+\.woff2)'/gu)
-    ].map(([, file]) => file);
 
-    expect({
-      fontFaces: extractFontFaces(readFileSync(stylesPath, 'utf8')),
-      preloads,
-      standaloneFontFaces: extractFontFaces(readFileSync(standaloneStylesPath, 'utf8')),
-      violations: sourceFiles.flatMap(findWeightViolations)
-    }).toMatchInlineSnapshot(`
-      {
-        "fontFaces": [
-          "PT Serif 700: pt-serif-cyrillic-700-normal.woff2",
-          "PT Serif 700: pt-serif-latin-ext-700-normal.woff2",
-          "PT Serif 700: pt-serif-latin-700-normal.woff2",
-          "Fira Sans 400: fira-sans-cyrillic-400-normal.woff2",
-          "Fira Sans 400: fira-sans-latin-ext-400-normal.woff2",
-          "Fira Sans 400: fira-sans-latin-400-normal.woff2",
-          "Fira Sans 600: fira-sans-cyrillic-600-normal.woff2",
-          "Fira Sans 600: fira-sans-latin-ext-600-normal.woff2",
-          "Fira Sans 600: fira-sans-latin-600-normal.woff2",
-        ],
-        "preloads": [
-          "fira-sans-cyrillic-400-normal.woff2",
-          "fira-sans-cyrillic-600-normal.woff2",
-          "pt-serif-cyrillic-700-normal.woff2",
-        ],
-        "standaloneFontFaces": [
-          "PT Serif 700: pt-serif-cyrillic-700-normal.woff2",
-          "Fira Sans 600: fira-sans-cyrillic-600-normal.woff2",
-        ],
-        "violations": [],
-      }
-    `);
+    expect(sourceFiles.flatMap(findWeightViolations)).toEqual([]);
   });
 });

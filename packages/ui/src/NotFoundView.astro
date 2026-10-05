@@ -92,7 +92,7 @@ const logoSrcset = logoImages
   h1 {
     max-width: 42rem;
     margin: 1.75rem 0 0;
-    font-family: 'PT Serif', Georgia, serif;
+    font-family: var(--font-heading, serif);
     font-size: clamp(2.25rem, 8vw, 3rem);
     font-weight: 700;
     line-height: 1.08;
@@ -104,7 +104,7 @@ const logoSrcset = logoImages
     max-width: 36rem;
     margin: 1rem 0 0;
     color: oklch(46% 0.02 135);
-    font-family: 'Fira Sans', system-ui, sans-serif;
+    font-family: var(--font-body, system-ui);
     font-size: 1.0625rem;
     line-height: 1.7;
     text-wrap: pretty;
@@ -113,7 +113,7 @@ const logoSrcset = logoImages
   a {
     margin-top: 1.75rem;
     color: oklch(36% 0.115 143);
-    font-family: 'Fira Sans', system-ui, sans-serif;
+    font-family: var(--font-body, system-ui);
     font-weight: 600;
     text-decoration-color: oklch(36% 0.115 143 / 0.45);
     text-decoration-thickness: 0.08em;

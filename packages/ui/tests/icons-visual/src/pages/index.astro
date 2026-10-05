@@ -1,5 +1,6 @@
 ---
 import '../../../visual-foundation.css';
+import Fonts from '@shelkovo/ui/Fonts.astro';
 import {
   AlertCircleIcon,
   CalendarPlusIcon,
@@ -150,6 +151,7 @@ const markers = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <Fonts />
     <title>Каталог иконок</title>
   </head>
   <body class="ui-root-site icons-visual-page">
@@ -166,33 +168,31 @@ const markers = [
         </div>
 
         <div class="icons-visual-groups">
-          {
-            standaloneGroups.map((group) => (
-              <section
-                class="icons-visual-group"
-                aria-labelledby={`icons-${group.label}`}
-              >
-                <h3 id={`icons-${group.label}`}>{group.label}</h3>
-                <ul class="icons-visual-list">
-                  {group.icons.map(({ name, Icon, wide }) => (
-                    <li
-                      class="icons-visual-item"
-                      data-icon-item
-                      data-icon-name={name}
-                    >
-                      <Icon
-                        class:list={[
-                          'icons-visual-icon',
-                          wide && 'icons-visual-icon--wide',
-                        ]}
-                      />
-                      <span>{name}</span>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))
-          }
+          {standaloneGroups.map((group) => (
+            <section
+              class="icons-visual-group"
+              aria-labelledby={`icons-${group.label}`}
+            >
+              <h3 id={`icons-${group.label}`}>{group.label}</h3>
+              <ul class="icons-visual-list">
+                {group.icons.map(({ name, Icon, wide }) => (
+                  <li
+                    class="icons-visual-item"
+                    data-icon-item
+                    data-icon-name={name}
+                  >
+                    <Icon
+                      class:list={[
+                        'icons-visual-icon',
+                        wide && 'icons-visual-icon--wide',
+                      ]}
+                    />
+                    <span>{name}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
         </div>
       </section>
 
@@ -206,22 +206,20 @@ const markers = [
         </div>
 
         <ul class="icons-visual-markers">
-          {
-            markers.map(({ name, image }) => (
-              <li data-marker-item data-marker-name={name}>
-                <div class="icons-visual-marker-stage" aria-hidden="true">
-                  <img
-                    class="icons-visual-marker"
-                    src={image.src}
-                    width={image.width}
-                    height={image.height}
-                    alt=""
-                  />
-                </div>
-                <span>{name}</span>
-              </li>
-            ))
-          }
+          {markers.map(({ name, image }) => (
+            <li data-marker-item data-marker-name={name}>
+              <div class="icons-visual-marker-stage" aria-hidden="true">
+                <img
+                  class="icons-visual-marker"
+                  src={image.src}
+                  width={image.width}
+                  height={image.height}
+                  alt=""
+                />
+              </div>
+              <span>{name}</span>
+            </li>
+          ))}
         </ul>
       </section>
 
@@ -232,17 +230,15 @@ const markers = [
         </div>
 
         <ul class="icons-visual-links">
-          {
-            linkIcons.map(({ name, label, href, Icon }) => (
-              <li data-icon-item data-icon-name={name}>
-                <a href={href} class="icons-visual-link">
-                  <Icon class="icons-visual-icon" />
-                  <span>{label}</span>
-                  <small>{name}</small>
-                </a>
-              </li>
-            ))
-          }
+          {linkIcons.map(({ name, label, href, Icon }) => (
+            <li data-icon-item data-icon-name={name}>
+              <a href={href} class="icons-visual-link">
+                <Icon class="icons-visual-icon" />
+                <span>{label}</span>
+                <small>{name}</small>
+              </a>
+            </li>
+          ))}
         </ul>
       </section>
     </main>

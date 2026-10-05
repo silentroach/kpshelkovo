@@ -1,3 +1,4 @@
+import { mediaFonts } from '@shelkovo/ui/fonts';
 import { defineConfig } from 'astro/config';
 
 const devServerPort = 4322;
@@ -9,6 +10,7 @@ export default defineConfig({
     port: devServerPort
   },
   cacheDir: '../../node_modules/.astro/media',
+  fonts: mediaFonts,
   outDir: 'dist/site',
   srcDir: 'src',
   vite: {

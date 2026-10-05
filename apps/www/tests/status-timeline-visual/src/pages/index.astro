@@ -2,6 +2,7 @@
 import '../../../config/visual-foundation.css';
 import '@/styles/site.css';
 
+import Fonts from '@shelkovo/ui/Fonts.astro';
 import StatusServiceTimeline from '@/components/status/StatusServiceTimeline.astro';
 import type { StatusTimelineIncidentInput } from '@/lib/status/timeline';
 
@@ -118,6 +119,7 @@ const denseProblemIncidents: readonly StatusTimelineIncidentInput[] = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <Fonts />
     <title>Status timeline visual fixture</title>
     <script
       is:inline

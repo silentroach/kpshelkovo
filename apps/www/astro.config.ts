@@ -4,6 +4,7 @@ import { constants } from 'node:zlib';
 import type { SitemapItem } from '@astrojs/sitemap';
 import sitemap from '@astrojs/sitemap';
 import svelte from '@astrojs/svelte';
+import { wwwFonts } from '@shelkovo/ui/fonts';
 import compressor from 'astro-compressor';
 import { defineConfig, type AstroIntegration } from 'astro/config';
 
@@ -53,6 +54,7 @@ export default defineConfig({
     port: devServerPort
   },
   cacheDir: '../../node_modules/.astro/www',
+  fonts: wwwFonts,
   image: {
     remotePatterns: [
       {

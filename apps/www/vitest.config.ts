@@ -1,5 +1,7 @@
 /// <reference types="vitest/config" />
 
+import { fileURLToPath } from 'node:url';
+
 import { getViteConfig } from 'astro/config';
 
 const visualTests = ['tests/**/*.visual.local.spec.ts'];
@@ -20,31 +22,53 @@ const domTests = [
   'src/scripts/tests/site-runtime.test.ts'
 ];
 
-export default getViteConfig({
-  test: {
-    projects: [
-      {
-        extends: true,
-        test: {
-          name: 'node',
-          environment: 'node',
-          include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
-          exclude: [...visualTests, ...searchQualityTests, ...domTests]
-        }
-      },
-      {
-        extends: true,
-        resolve: {
-          conditions: ['browser', 'default']
+export default getViteConfig(
+  {
+    resolve: {
+      alias: {
+        // Font delivery is checked by real builds; markup tests stay offline.
+        '@shelkovo/ui/Fonts.astro': fileURLToPath(
+          new URL('./src/test/Fonts.astro', import.meta.url)
+        )
+      }
+    },
+    test: {
+      projects: [
+        {
+          extends: true,
+          test: {
+            name: 'node',
+            environment: 'node',
+            include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
+            exclude: [...visualTests, ...searchQualityTests, ...domTests]
+          }
         },
-        test: {
-          name: 'dom',
-          environment: 'happy-dom',
-          include: domTests,
-          exclude: [...visualTests, ...searchQualityTests],
-          setupFiles: ['./vitest.dom.setup.ts']
+        {
+          extends: true,
+          resolve: {
+            conditions: ['browser', 'default']
+          },
+          test: {
+            name: 'dom',
+            environment: 'happy-dom',
+            include: domTests,
+            exclude: [...visualTests, ...searchQualityTests],
+            setupFiles: ['./vitest.dom.setup.ts']
+          }
+        }
+      ]
+    }
+  },
+  {
+    integrations: [
+      {
+        name: 'offline-markup-fonts',
+        hooks: {
+          'astro:config:setup': ({ config }) => {
+            config.fonts = [];
+          }
         }
       }
     ]
   }
-});
+);
