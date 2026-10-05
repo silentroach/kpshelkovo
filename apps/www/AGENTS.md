@@ -63,7 +63,7 @@ pnpm typecheck
 
 ## Entity Mentions
 
-- Упоминания людей работают через общий app-level слой `src/lib/mentions`; `src/lib/people/mentions.ts` только адаптирует профиль человека в generic mention target.
+- При редактуре упоминаний, подключении нового контекста или изменении backlinks сверяй [entity-mentions](/openspec/specs/entity-mentions/spec.md); причины общего app-level слоя — в [ADR-001](/docs/decisions/001-markdown-slug-mentions.md) и [ADR-012](/docs/decisions/012-entity-mention-graph.md).
 - Люди и места входят в единый `SiteMentionRegistry`; их короткие slug не должны пересекаться.
 - В `src/data/people/*.md` живут профили людей для раздела `/people/`; canonical slug человека равен имени файла без `.md`, например `kschemelinin`.
 - Если человек из `people` упоминается в `news`, `status` или другом редакционном Markdown body, в source markdown нужно писать `@slug`, `@slug:case` или `[видимый текст](@slug)`, а не plain text имя и не ручную ссылку на `/people/.../`.
@@ -79,7 +79,7 @@ pnpm typecheck
 - Профиль человека и место не могут упоминать сами себя в собственном Markdown body.
 - Если у профиля есть `position` и/или `company`, они должны попадать в title markdown-ссылки mention как контекст человека.
 - Для атрибуции к внешнему источнику ссылку ставь на вводную фразу, например `[По словам](https://t.me/...) @kschemelinin, ...`.
-- Source refs для backlinks публикуют соседние адаптеры разделов: `contacts/mentions.ts`, `news/mentions.ts`, `places/mentions.ts`, `reviews/mentions.ts`, `status/mentions.ts`, `people/mention-refs.ts`; общий graph не должен импортировать доменные datasets источников.
+- Source refs публикуют адаптеры источников, подключённые в [composition root](/apps/www/src/lib/site-mention-graph.ts); общий graph не импортирует доменные datasets. Структурные связи мероприятий определяет [news-event-places](/openspec/specs/news-event-places/spec.md), формат Markdown-карточки места — [place-markdown-card](/openspec/specs/place-markdown-card/spec.md).
 
 ## Data Boundaries
 

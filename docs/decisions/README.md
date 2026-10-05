@@ -4,7 +4,7 @@
 
 ## Список ADR
 
-- [ADR-001: Упоминания по слагу в Markdown](001-markdown-slug-mentions.md) - принят, 2026-05-13.
+- [ADR-001: Упоминания по слагу в Markdown](/docs/decisions/001-markdown-slug-mentions.md) - принят, 2026-05-13; действующий контракт — [entity-mentions](/openspec/specs/entity-mentions/spec.md), редактура — [инструкции приложения](/apps/www/AGENTS.md#entity-mentions).
 - [ADR-002: Клиентские переходы и кеширование HTML](/docs/decisions/002-client-transitions-prefetch-cache.md) - принят, 2026-05-14; исторический `hover` заменён ADR-032; контракты — [site-navigation](/openspec/specs/site-navigation/spec.md) и [client-load-recovery](/openspec/specs/client-load-recovery/spec.md).
 - [ADR-003: Слоистый Markdown-рендер](003-markdown-pipeline-layering.md) - принят, 2026-05-14; рабочие правила — [инструкции приложения](../../apps/www/AGENTS.md#markdown), API — [README пакета](../../packages/markdown/README.md).
 - [ADR-004: Lighthouse-профиль без аналитики](/docs/decisions/004-lighthouse-analytics-profile.md) - принят, 2026-05-15; диагностические пороги — [lighthouserc.cjs](/lighthouserc.cjs).
@@ -15,7 +15,7 @@
 - [ADR-009: Markdown через `Accept` negotiation](009-markdown-accept-negotiation.md) - принят, 2026-05-17.
 - [ADR-010: Плановые работы в индикаторе статуса на главной](010-home-status-maintenance-indicator.md) - заменен ADR-031, 2026-05-18.
 - [ADR-011: Реестр публичных поверхностей](011-public-surface-registry.md) - принят, 2026-05-19.
-- [ADR-012: Единый граф упоминаний сущностей в Markdown](012-entity-mention-graph.md) - принят, 2026-05-20.
+- [ADR-012: Единый граф упоминаний сущностей в Markdown](/docs/decisions/012-entity-mention-graph.md) - принят, 2026-05-20; общие гарантии — [entity-mentions](/openspec/specs/entity-mentions/spec.md), структурные связи — [news-event-places](/openspec/specs/news-event-places/spec.md), Markdown места — [place-markdown-card](/openspec/specs/place-markdown-card/spec.md).
 - [ADR-013: Граница между внешними DTO, доменной моделью и публичными DTO](013-raw-domain-public-data-boundary.md) - принят, 2026-05-20; рабочие правила — [Data Boundaries](../../apps/www/AGENTS.md#data-boundaries).
 - [ADR-014: Transcript-first архив встреч](/docs/decisions/014-meetings-transcript-first-archive.md) — принят, 2026-06-07; причины отделения источника от выводов и деления по исходным записям.
 - [ADR-015: Markdown-first база знаний поселка](015-markdown-first-knowledge-base.md) - принят, 2026-06-16; действующий контракт — [knowledge-base](../../openspec/specs/knowledge-base/spec.md), редакционные правила — [инструкции KB](../../apps/www/src/data/kb/AGENTS.md).
