@@ -275,8 +275,8 @@
 #### Scenario: Получение Markdown
 
 - **WHEN** клиент открывает опубликованный Markdown URL либо запрашивает HTML-адрес с `Accept: text/markdown`
-- **THEN** он получает соответствующее представление с правильным типом содержимого, а согласованный ответ учитывает `Vary: Accept`
-- **THEN** ссылки обнаружения в HTML и HTTP указывают на подходящий Markdown и корневой `llms.txt`
+- **THEN** он получает соответствующее Markdown-представление по правилам [public-markdown-delivery](/openspec/specs/public-markdown-delivery/spec.md)
+- **THEN** связи обнаружения и выбор путеводителя следуют [public-content-discovery](/openspec/specs/public-content-discovery/spec.md)
 
 ### Requirement: SEO календаря и страниц дней
 
