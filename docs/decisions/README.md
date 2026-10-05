@@ -5,7 +5,7 @@
 ## Список ADR
 
 - [ADR-001: Упоминания по слагу в Markdown](001-markdown-slug-mentions.md) - принят, 2026-05-13.
-- [ADR-002: Client transitions, hover prefetch и кеширование HTML](002-client-transitions-prefetch-cache.md) - принят; выбор стратегии предзагрузки заменен ADR-032, 2026-05-14.
+- [ADR-002: Клиентские переходы и кеширование HTML](/docs/decisions/002-client-transitions-prefetch-cache.md) - принят, 2026-05-14; исторический `hover` заменён ADR-032; контракты — [site-navigation](/openspec/specs/site-navigation/spec.md) и [client-load-recovery](/openspec/specs/client-load-recovery/spec.md).
 - [ADR-003: Слоистый Markdown-рендер](003-markdown-pipeline-layering.md) - принят, 2026-05-14; рабочие правила — [инструкции приложения](../../apps/www/AGENTS.md#markdown), API — [README пакета](../../packages/markdown/README.md).
 - [ADR-004: Lighthouse-профиль без аналитики](/docs/decisions/004-lighthouse-analytics-profile.md) - принят, 2026-05-15; диагностические пороги — [lighthouserc.cjs](/lighthouserc.cjs).
 - [ADR-005: CSP без `unsafe-inline` для исполняемых скриптов](/docs/decisions/005-csp-inline-script-policy.md) - заменён [ADR-017](/docs/decisions/017-csp-inline-exceptions-for-astro-yandex-maps.md), 2026-05-15; исторический указатель.
@@ -35,8 +35,8 @@
 - [ADR-029: Аспектные оценки как отзывы об организациях](029-review-aspects-as-organization-reviews.md) - принят, 2026-08-20.
 - [ADR-030: Нормализованные источники детальной сметы](030-normalized-estimate-detail-sources.md) - принят, 2026-08-26; действующий контракт — [estimate-detail-sources](../../openspec/specs/estimate-detail-sources/spec.md).
 - [ADR-031: Единый жизненный цикл status-событий](031-status-incident-lifecycle.md) - принят, 2026-08-26.
-- [ADR-032: Предзагрузка HTML по нажатию](032-tap-prefetch.md) - принят, 2026-08-28.
-- [ADR-033: Сравнение тарифов как часть единого сайта](033-integrated-tariff-comparison-section.md) - принят, 2026-08-30.
+- [ADR-032: Предзагрузка HTML по нажатию](/docs/decisions/032-tap-prefetch.md) - принят, 2026-08-28; действующий контракт — [site-navigation](/openspec/specs/site-navigation/spec.md), настройки — [astro.config.ts](/apps/www/astro.config.ts).
+- [ADR-033: Сравнение тарифов как часть единого сайта](/docs/decisions/033-integrated-tariff-comparison-section.md) - принят, 2026-08-30; публичный префикс — [site-navigation](/openspec/specs/site-navigation/spec.md), названия — [глоссарий](/GLOSSARY.md#разделы-сайта).
 - [ADR-034: Нативная CSS-архитектура после Tailwind](/docs/decisions/034-native-css-architecture.md) - принят, 2026-08-31; значения токенов — [tokens.css](/apps/www/src/styles/tokens.css), семантика — [дизайн-гайд](/docs/design/design-code-shelkovo.md), исключение для feature-owned CSS — [ADR-042](/docs/decisions/042-feature-owned-map-frame-css.md).
 - [ADR-035: Страницы сервисов и свежие события в поиске](035-status-search-indexing.md) - принят, 2026-09-10.
 - [ADR-036: Короткие путеводители llms.txt v2](036-llms-v2-guides.md) - принят, 2026-09-12.
