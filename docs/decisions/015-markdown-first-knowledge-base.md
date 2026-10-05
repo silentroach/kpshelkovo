@@ -20,7 +20,7 @@
 
 Действующее поведение описано в [контракте базы знаний](../../openspec/specs/knowledge-base/spec.md): файловые и публичные маршруты, роль страницы-раздела, breadcrumbs, авторская навигация, флаги индексации и соответствие HTML и Markdown. Редакционные правила и текущие поля frontmatter — в [инструкциях KB](../../apps/www/src/data/kb/AGENTS.md); допустимые поля проверяет схема `apps/www/src/lib/kb/raw-schema.ts`. Поиск уже работает, а `sources` хранит внутренний редакционный журнал источников.
 
-Общие правила поиска см. в [ADR-025](025-static-full-text-search-with-pagefind.md) и [search spec](../../openspec/specs/search/spec.md); согласование Markdown по HTTP — в [ADR-009](009-markdown-accept-negotiation.md), регистрация публичных поверхностей — в [ADR-011](011-public-surface-registry.md), рендер и генерация Markdown — в [ADR-003](003-markdown-pipeline-layering.md) и [ADR-008](008-markdown-ast-generation.md).
+Общие правила поиска см. в [ADR-025](/docs/decisions/025-static-full-text-search-with-pagefind.md) и [search spec](/openspec/specs/search/spec.md); HTTP-выдачу и индексацию Markdown companions — в [public-markdown-delivery](/openspec/specs/public-markdown-delivery/spec.md), обнаружение ресурсов — в [public-content-discovery](/openspec/specs/public-content-discovery/spec.md). Причины выбора реестра, рендера и генерации — в [ADR-011](/docs/decisions/011-public-surface-registry.md), [ADR-003](/docs/decisions/003-markdown-pipeline-layering.md) и [ADR-008](/docs/decisions/008-markdown-ast-generation.md).
 
 ## Рассмотренные альтернативы
 
