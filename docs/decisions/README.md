@@ -7,10 +7,10 @@
 - [ADR-001: Упоминания по слагу в Markdown](001-markdown-slug-mentions.md) - принят, 2026-05-13.
 - [ADR-002: Client transitions, hover prefetch и кеширование HTML](002-client-transitions-prefetch-cache.md) - принят; выбор стратегии предзагрузки заменен ADR-032, 2026-05-14.
 - [ADR-003: Слоистый Markdown-рендер](003-markdown-pipeline-layering.md) - принят, 2026-05-14; рабочие правила — [инструкции приложения](../../apps/www/AGENTS.md#markdown), API — [README пакета](../../packages/markdown/README.md).
-- [ADR-004: Lighthouse-профиль без аналитики](004-lighthouse-analytics-profile.md) - принят, 2026-05-15.
-- [ADR-005: CSP без `unsafe-inline` для исполняемых скриптов](005-csp-inline-script-policy.md) - заменен ADR-017, 2026-05-15.
-- [ADR-006: HSTS без `includeSubDomains` и `preload`](006-hsts-policy.md) - принят, 2026-05-15.
-- [ADR-007: COOP без COEP для изоляции `opener`-связей](007-coop-origin-isolation.md) - принят, 2026-05-15.
+- [ADR-004: Lighthouse-профиль без аналитики](/docs/decisions/004-lighthouse-analytics-profile.md) - принят, 2026-05-15; диагностические пороги — [lighthouserc.cjs](/lighthouserc.cjs).
+- [ADR-005: CSP без `unsafe-inline` для исполняемых скриптов](/docs/decisions/005-csp-inline-script-policy.md) - заменён [ADR-017](/docs/decisions/017-csp-inline-exceptions-for-astro-yandex-maps.md), 2026-05-15; исторический указатель.
+- [ADR-006: HSTS без `includeSubDomains` и `preload`](/docs/decisions/006-hsts-policy.md) - принят, 2026-05-15; значения — [security.conf](/ops/nginx/security.conf) и [site-конфиг](/ops/nginx/kpshelkovo-online.conf).
+- [ADR-007: COOP без COEP для изоляции `opener`-связей](/docs/decisions/007-coop-origin-isolation.md) - принят, 2026-05-15; заголовок — [security.conf](/ops/nginx/security.conf).
 - [ADR-008: Генерация Markdown через AST](008-markdown-ast-generation.md) - принят, 2026-05-14; рабочие правила — [корневые инструкции](../../AGENTS.md#локальные-инструкции), API — [README пакета](../../packages/markdown/README.md).
 - [ADR-009: Markdown через `Accept` negotiation](009-markdown-accept-negotiation.md) - принят, 2026-05-17.
 - [ADR-010: Плановые работы в индикаторе статуса на главной](010-home-status-maintenance-indicator.md) - заменен ADR-031, 2026-05-18.
@@ -20,7 +20,7 @@
 - [ADR-014: Transcript-first архив встреч](014-meetings-transcript-first-archive.md) - принят, 2026-06-07.
 - [ADR-015: Markdown-first база знаний поселка](015-markdown-first-knowledge-base.md) - принят, 2026-06-16; действующий контракт — [knowledge-base](../../openspec/specs/knowledge-base/spec.md), редакционные правила — [инструкции KB](../../apps/www/src/data/kb/AGENTS.md).
 - [ADR-016: Markdown-first отзывы собственников](016-markdown-first-owner-reviews.md) - принят, 2026-06-25.
-- [ADR-017: CSP с inline-исключениями для Astro и Яндекс Карт](017-csp-inline-exceptions-for-astro-yandex-maps.md) - принят, 2026-07-01.
+- [ADR-017: CSP с inline-исключениями для Astro и Яндекс Карт](/docs/decisions/017-csp-inline-exceptions-for-astro-yandex-maps.md) - принят, 2026-07-01; правила кода — [инструкции приложения](/apps/www/AGENTS.md#клиентский-javascript), исключения — [CSP.md](/ops/nginx/CSP.md).
 - [ADR-018: Markdown-first сарафан](018-markdown-first-useful-contacts.md) - принят, 2026-07-06.
 - [ADR-019: Публичный media-origin через nginx перед S3](019-public-media-origin.md) - принят, 2026-07-10.
 - [ADR-020: Отдельное Astro-приложение для media error pages](020-separate-media-error-app.md) - принят, 2026-07-11.
@@ -29,15 +29,15 @@
 - [ADR-023: Оригиналы фотографий новостей в публичном S3](023-news-images-in-public-s3.md) - принят, 2026-07-23.
 - [ADR-024: Иллюстрации отзывов в публичном S3](024-review-images-in-public-s3.md) - принят, 2026-08-10.
 - [ADR-025: Статический полнотекстовый поиск через Pagefind](025-static-full-text-search-with-pagefind.md) - принят; правила корпуса и возрастного ранжирования статуса заменены ADR-035, 2026-08-14.
-- [ADR-026: IndexNow после статического deploy](026-indexnow-after-static-deploy.md) - заменён ADR-027, 2026-08-16.
-- [ADR-027: IndexNow только для новых страниц](027-indexnow-new-pages-only.md) - принят, 2026-08-16.
+- [ADR-026: IndexNow после статического deploy](/docs/decisions/026-indexnow-after-static-deploy.md) - заменён [ADR-027](/docs/decisions/027-indexnow-new-pages-only.md), 2026-08-16; исторический указатель.
+- [ADR-027: IndexNow только для новых страниц](/docs/decisions/027-indexnow-new-pages-only.md) - принят, 2026-08-16; публикация и восстановление — [deploy-runbook](/README.md#indexnow).
 - [ADR-028: Markdown-first карта мест с типизированными маркерами](028-markdown-first-places-map.md) - принят, 2026-08-19.
 - [ADR-029: Аспектные оценки как отзывы об организациях](029-review-aspects-as-organization-reviews.md) - принят, 2026-08-20.
 - [ADR-030: Нормализованные источники детальной сметы](030-normalized-estimate-detail-sources.md) - принят, 2026-08-26; действующий контракт — [estimate-detail-sources](../../openspec/specs/estimate-detail-sources/spec.md).
 - [ADR-031: Единый жизненный цикл status-событий](031-status-incident-lifecycle.md) - принят, 2026-08-26.
 - [ADR-032: Предзагрузка HTML по нажатию](032-tap-prefetch.md) - принят, 2026-08-28.
 - [ADR-033: Сравнение тарифов как часть единого сайта](033-integrated-tariff-comparison-section.md) - принят, 2026-08-30.
-- [ADR-034: Нативная CSS-архитектура после Tailwind](034-native-css-architecture.md) - принят, 2026-08-31; узкое исключение для feature-owned CSS — ADR-042.
+- [ADR-034: Нативная CSS-архитектура после Tailwind](/docs/decisions/034-native-css-architecture.md) - принят, 2026-08-31; значения токенов — [tokens.css](/apps/www/src/styles/tokens.css), семантика — [дизайн-гайд](/docs/design/design-code-shelkovo.md), исключение для feature-owned CSS — [ADR-042](/docs/decisions/042-feature-owned-map-frame-css.md).
 - [ADR-035: Страницы сервисов и свежие события в поиске](035-status-search-indexing.md) - принят, 2026-09-10.
 - [ADR-036: Короткие путеводители llms.txt v2](036-llms-v2-guides.md) - принят, 2026-09-12.
 - [ADR-037: Печать справки и новостей через CSS](037-content-print-css.md) - принят, 2026-09-13.
