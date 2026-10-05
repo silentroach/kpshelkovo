@@ -19,7 +19,7 @@
 - [ADR-013: Граница между внешними DTO, доменной моделью и публичными DTO](013-raw-domain-public-data-boundary.md) - принят, 2026-05-20; рабочие правила — [Data Boundaries](../../apps/www/AGENTS.md#data-boundaries).
 - [ADR-014: Transcript-first архив встреч](/docs/decisions/014-meetings-transcript-first-archive.md) — принят, 2026-06-07; причины отделения источника от выводов и деления по исходным записям.
 - [ADR-015: Markdown-first база знаний поселка](015-markdown-first-knowledge-base.md) - принят, 2026-06-16; действующий контракт — [knowledge-base](../../openspec/specs/knowledge-base/spec.md), редакционные правила — [инструкции KB](../../apps/www/src/data/kb/AGENTS.md).
-- [ADR-016: Markdown-first отзывы собственников](016-markdown-first-owner-reviews.md) - принят, 2026-06-25.
+- [ADR-016: Markdown-first отзывы собственников](/docs/decisions/016-markdown-first-owner-reviews.md) — принят, 2026-06-25; причины ручной публикации и независимых аспектов, JSON-LD заменён ADR-029.
 - [ADR-017: CSP с inline-исключениями для Astro и Яндекс Карт](/docs/decisions/017-csp-inline-exceptions-for-astro-yandex-maps.md) - принят, 2026-07-01; правила кода — [инструкции приложения](/apps/www/AGENTS.md#клиентский-javascript), исключения — [CSP.md](/ops/nginx/CSP.md).
 - [ADR-018: Markdown-first сарафан](/docs/decisions/018-markdown-first-useful-contacts.md) — принят, 2026-07-06; каталог без гарантии качества, последующие решения об отзывах и самостоятельных карточках.
 - [ADR-019: Публичный media-origin через nginx перед S3](/docs/decisions/019-public-media-origin.md) - принят, 2026-07-10; доставка — [public-media](/openspec/specs/public-media/spec.md), эксплуатация — [origin runbook](/ops/nginx/media-kpshelkovo-online.md).
@@ -32,7 +32,7 @@
 - [ADR-026: IndexNow после статического deploy](/docs/decisions/026-indexnow-after-static-deploy.md) - заменён [ADR-027](/docs/decisions/027-indexnow-new-pages-only.md), 2026-08-16; исторический указатель.
 - [ADR-027: IndexNow только для новых страниц](/docs/decisions/027-indexnow-new-pages-only.md) - принят, 2026-08-16; публикация и восстановление — [deploy-runbook](/README.md#indexnow).
 - [ADR-028: Markdown-first карта мест с типизированными маркерами](/docs/decisions/028-markdown-first-places-map.md) - принят, 2026-08-19; контракты — [place-map-visibility](/openspec/specs/place-map-visibility/spec.md), [site-maps](/openspec/specs/site-maps/spec.md) и связанные specs карточки; редактура — [инструкции мест](/apps/www/src/data/places/AGENTS.md).
-- [ADR-029: Аспектные оценки как отзывы об организациях](029-review-aspects-as-organization-reviews.md) - принят, 2026-08-20.
+- [ADR-029: Аспектные оценки как отзывы об организациях](/docs/decisions/029-review-aspects-as-organization-reviews.md) — принят, 2026-08-20; причины разделения ItemPage и оценённых Review организаций.
 - [ADR-030: Нормализованные источники детальной сметы](030-normalized-estimate-detail-sources.md) - принят, 2026-08-26; действующий контракт — [estimate-detail-sources](../../openspec/specs/estimate-detail-sources/spec.md).
 - [ADR-031: Единый жизненный цикл status-событий](031-status-incident-lifecycle.md) - принят, 2026-08-26.
 - [ADR-032: Предзагрузка HTML по нажатию](/docs/decisions/032-tap-prefetch.md) - принят, 2026-08-28; действующий контракт — [site-navigation](/openspec/specs/site-navigation/spec.md), настройки — [astro.config.ts](/apps/www/astro.config.ts).
