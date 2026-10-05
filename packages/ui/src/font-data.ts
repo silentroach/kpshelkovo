@@ -8,13 +8,12 @@ const fontDataSchema = z.record(
     z.object({
       weight: z.string(),
       style: z.string(),
-      subset: z.string(),
-      src: z.array(z.object({ url: z.string().min(1), format: z.literal('woff2') })).min(1)
+      src: z.tuple([z.object({ url: z.string().min(1), format: z.literal('woff2') })])
     })
   )
 );
 
-// Astro may swallow metadata errors and resolve an empty or partial font family.
+// The local provider omits subset labels; each configured subset has its own WOFF2.
 export const assertFontData = (
   data: unknown,
   families: typeof wwwFontFamilies | typeof mediaFontFamilies
@@ -26,17 +25,17 @@ export const assertFontData = (
 
     for (const weight of family.weights) {
       for (const style of family.styles) {
-        for (const subset of family.subsets) {
-          if (
-            !faces.some(
-              (face) =>
-                face.weight === String(weight) && face.style === style && face.subset === subset
-            )
-          ) {
-            throw new Error(
-              `Missing required font face: ${family.name} ${weight} ${style} ${subset}`
-            );
-          }
+        const matchingFaces = faces.filter(
+          (face) => face.weight === String(weight) && face.style === style
+        );
+        const sources = new Set(matchingFaces.map((face) => face.src[0].url));
+        if (
+          matchingFaces.length !== family.subsets.length ||
+          sources.size !== family.subsets.length
+        ) {
+          throw new Error(
+            `Incomplete font faces: ${family.name} ${weight} ${style} (expected ${family.subsets.length} distinct subsets)`
+          );
         }
       }
     }

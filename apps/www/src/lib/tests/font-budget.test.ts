@@ -18,7 +18,7 @@ const disallowedWeightClassPattern =
 const arbitraryWeightClassPattern = /\bfont-\[(\d+)\]/gu;
 const cssWeightPattern = /font-weight:\s*([^;]+);/gu;
 const fontPolicySchema = z.object({
-  provider: z.object({ name: z.literal('fontsource') }),
+  provider: z.object({ name: z.literal('local') }),
   styles: z.tuple([z.literal('normal')]),
   formats: z.tuple([z.literal('woff2')]),
   display: z.literal('swap')
@@ -87,6 +87,33 @@ describe('font budget', () => {
         ],
       ]
     `);
+  });
+
+  it('supplies a readable WOFF2 and unicode range for every required variant', () => {
+    for (const font of [...wwwFonts, ...mediaFonts]) {
+      expect(font.options.variants).toHaveLength(
+        font.subsets.length * font.styles.length * font.weights.length
+      );
+      for (const subset of font.subsets) {
+        for (const weight of font.weights) {
+          const variant = font.options.variants.find(
+            (item) =>
+              item.weight === weight && item.src[0].endsWith(`-${subset}-${weight}-normal.woff2`)
+          );
+          expect(variant, `${font.name} ${subset} ${weight}`).toBeDefined();
+          if (!variant) continue;
+          expect(readFileSync(variant.src[0]).subarray(0, 4).toString()).toBe('wOF2');
+          const ranges = variant.unicodeRange.join(',');
+          expect(ranges).toContain(
+            subset === 'cyrillic'
+              ? 'U+0400-045F'
+              : subset === 'latin'
+                ? 'U+0000-00FF'
+                : 'U+0100-02BA'
+          );
+        }
+      }
+    }
   });
 
   it('keeps source weights within the shared budget', () => {

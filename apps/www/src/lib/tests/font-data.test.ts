@@ -1,19 +1,25 @@
 import { describe, expect, it } from 'vitest';
 
 import { assertFontData } from '../../../../../packages/ui/src/font-data';
-import { wwwFontFamilies } from '../../../../../packages/ui/src/font-families';
+import { mediaFontFamilies, wwwFontFamilies } from '../../../../../packages/ui/src/font-families';
 
-const resolvedFonts = () =>
+const resolvedFonts = (
+  families: typeof wwwFontFamilies | typeof mediaFontFamilies = wwwFontFamilies
+) =>
   Object.fromEntries(
-    wwwFontFamilies.map((family) => [
+    families.map((family) => [
       family.cssVariable,
       family.weights.flatMap((weight) =>
         family.styles.flatMap((style) =>
           family.subsets.map((subset) => ({
             weight: String(weight),
             style,
-            subset,
-            src: [{ url: '/static/fonts/font.woff2', format: 'woff2' }]
+            src: [
+              {
+                url: `/static/fonts/${family.cssVariable}-${subset}-${weight}.woff2`,
+                format: 'woff2'
+              }
+            ]
           }))
         )
       )
@@ -21,22 +27,28 @@ const resolvedFonts = () =>
   );
 
 describe('required font faces', () => {
-  it('accepts the complete matrix without resolving fonts over the network', () => {
-    expect(() => assertFontData(resolvedFonts(), wwwFontFamilies)).not.toThrow();
+  it.each([
+    { host: 'www', families: wwwFontFamilies },
+    { host: 'media', families: mediaFontFamilies }
+  ])('accepts complete $host faces without subset labels', ({ families }) => {
+    expect(() => assertFontData(resolvedFonts(families), families)).not.toThrow();
   });
 
-  it.each(['empty family', 'missing subset'])(
+  it.each(['empty family', 'missing subset', 'duplicate subset'])(
     'rejects %s instead of publishing fallback-only pages',
     (failure) => {
       const data = resolvedFonts();
       const faces = data['--font-fira-sans'] ?? [];
-      data['--font-fira-sans'] =
-        failure === 'empty family'
-          ? []
-          : faces.filter((face) => !(face.weight === '400' && face.subset === 'latin'));
+      if (failure === 'empty family') {
+        data['--font-fira-sans'] = [];
+      } else if (failure === 'missing subset') {
+        faces.shift();
+      } else {
+        faces[0] = faces[1]!;
+      }
 
       expect(() => assertFontData(data, wwwFontFamilies)).toThrowErrorMatchingInlineSnapshot(
-        `[Error: Missing required font face: Fira Sans 400 normal latin]`
+        `[Error: Incomplete font faces: Fira Sans 400 normal (expected 3 distinct subsets)]`
       );
     }
   );
