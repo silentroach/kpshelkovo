@@ -10,14 +10,14 @@
     },
     "agent-browser": {
       "source": "vercel-labs/agent-browser",
-      "ref": "8c15ff9f71ae60c7e99e66afe1e2d4b9bf414fe2",
+      "ref": "526157cfd4ec64f45939f9ba0f10d5936aa7ac33",
       "sourceType": "github",
       "skillPath": "skills/agent-browser/SKILL.md",
       "computedHash": "dd491d53824ad9286ec950aee667098446332429a6d41fe28b4ba11f1959264c"
     },
     "apple-design": {
       "source": "emilkowalski/skills",
-      "ref": "85e8e2363b713506e1d5b6e07a0eb2da66be1bc3",
+      "ref": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d",
       "sourceType": "github",
       "skillPath": "skills/apple-design/SKILL.md",
       "computedHash": "0190417d092a0df447b000154e39733ea6d97efad6d3bec8a6ce3845aeb88914"
@@ -45,14 +45,14 @@
     },
     "domain-modeling": {
       "source": "mattpocock/skills",
-      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "ref": "4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
       "sourceType": "github",
       "skillPath": "skills/engineering/domain-modeling/SKILL.md",
-      "computedHash": "a11713c0ff7870efa3c331b2e273f09116158485246edc89ae5088eefd1b0b48"
+      "computedHash": "b3eb40152b81f0c98fd2095a023c019452dbdce56f7540cc67fece2972db8369"
     },
     "grilling": {
       "source": "mattpocock/skills",
-      "ref": "3cca18b368ae95cdbdebbff572ccafa662551015",
+      "ref": "4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
       "sourceType": "github",
       "skillPath": "skills/productivity/grilling/SKILL.md",
       "computedHash": "4dd886b0196bf43729d954ae326016f2bd9f5f79d892500b407c33a753362f14"
@@ -80,24 +80,24 @@
     },
     "ponytail": {
       "source": "dietrichgebert/ponytail",
-      "ref": "e3ba2aa6f1e6f0bc4d69eb09c9f0d0a93af56156",
+      "ref": "926589fcfdf3e04a3a9608f7d9d415e09af41b23",
       "sourceType": "github",
       "skillPath": "skills/ponytail/SKILL.md",
       "computedHash": "210fa0831f649ce9f8a305f7b7c8cf2a0dd09ac4dd53067109941b96e7811d4e"
     },
     "ponytail-audit": {
       "source": "dietrichgebert/ponytail",
-      "ref": "e3ba2aa6f1e6f0bc4d69eb09c9f0d0a93af56156",
+      "ref": "926589fcfdf3e04a3a9608f7d9d415e09af41b23",
       "sourceType": "github",
       "skillPath": "skills/ponytail-audit/SKILL.md",
-      "computedHash": "8b8d72e6ff70b65b6c9518d470fcf29dc696eea93d28f3efa10fdcc60cbd696d"
+      "computedHash": "33a1360f2b611ec0bc3288cc27c24f0d0760ed3245b3c67c25b4d94ce842a6a1"
     },
     "ponytail-review": {
       "source": "dietrichgebert/ponytail",
-      "ref": "e3ba2aa6f1e6f0bc4d69eb09c9f0d0a93af56156",
+      "ref": "926589fcfdf3e04a3a9608f7d9d415e09af41b23",
       "sourceType": "github",
       "skillPath": "skills/ponytail-review/SKILL.md",
-      "computedHash": "4646594fcd75455533f7ff1425f4f1c5ba0fa65f88241bf262b1c4fc275f049a"
+      "computedHash": "09c824396581b0048a4feb504e21a9b3f943c9ec06b77eec04737c0f741c6d25"
     },
     "seo": {
       "source": "addyosmani/web-quality-skills",
@@ -108,14 +108,14 @@
     },
     "svelte-code-writer": {
       "source": "sveltejs/ai-tools",
-      "ref": "e7d93fcc168b5f4b3fec57c22f49a36d57e8ee1a",
+      "ref": "6b5d0dab3c9c083387247ab20dc684573481076b",
       "sourceType": "github",
       "skillPath": "plugins/claude/svelte/skills/svelte-code-writer/SKILL.md",
       "computedHash": "6f78193a79906175595ce8e4ca8d726da350eb99035a9544b6553620df5673a1"
     },
     "wayfinder": {
       "source": "mattpocock/skills",
-      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "ref": "4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
       "sourceType": "github",
       "skillPath": "skills/engineering/wayfinder/SKILL.md",
       "computedHash": "fa790eb4255b13d24d7e33ff4891ccd3d621558cc0ab87ae226777538ea16a8f"
@@ -129,7 +129,7 @@
     },
     "writing-for-agents": {
       "source": "mattpocock/skills",
-      "ref": "3cca18b368ae95cdbdebbff572ccafa662551015",
+      "ref": "4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
       "sourceType": "github",
       "skillPath": "skills/productivity/writing-for-agents/SKILL.md",
       "computedHash": "95da47fc97af998e85b7d7e6d57b3ac76727c1e290cfe9ea09005aacb826959f"
