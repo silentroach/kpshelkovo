@@ -29,8 +29,8 @@
 - [ADR-023: Оригиналы фотографий новостей в публичном S3](023-news-images-in-public-s3.md) - принят, 2026-07-23.
 - [ADR-024: Иллюстрации отзывов в публичном S3](024-review-images-in-public-s3.md) - принят, 2026-08-10.
 - [ADR-025: Статический полнотекстовый поиск через Pagefind](025-static-full-text-search-with-pagefind.md) - принят; правила корпуса и возрастного ранжирования статуса заменены ADR-035, 2026-08-14.
-- [ADR-026: IndexNow после статического deploy](026-indexnow-after-static-deploy.md) - заменён ADR-027, 2026-08-16.
-- [ADR-027: IndexNow только для новых страниц](027-indexnow-new-pages-only.md) - принят, 2026-08-16.
+- [ADR-026: IndexNow после статического deploy](/docs/decisions/026-indexnow-after-static-deploy.md) - заменён [ADR-027](/docs/decisions/027-indexnow-new-pages-only.md), 2026-08-16; исторический указатель.
+- [ADR-027: IndexNow только для новых страниц](/docs/decisions/027-indexnow-new-pages-only.md) - принят, 2026-08-16; публикация и восстановление — [deploy-runbook](/README.md#indexnow).
 - [ADR-028: Markdown-first карта мест с типизированными маркерами](028-markdown-first-places-map.md) - принят, 2026-08-19.
 - [ADR-029: Аспектные оценки как отзывы об организациях](029-review-aspects-as-organization-reviews.md) - принят, 2026-08-20.
 - [ADR-030: Нормализованные источники детальной сметы](030-normalized-estimate-detail-sources.md) - принят, 2026-08-26; действующий контракт — [estimate-detail-sources](../../openspec/specs/estimate-detail-sources/spec.md).
