@@ -40,7 +40,7 @@
 - [ADR-034: Нативная CSS-архитектура после Tailwind](/docs/decisions/034-native-css-architecture.md) - принят, 2026-08-31; значения токенов — [tokens.css](/apps/www/src/styles/tokens.css), семантика — [дизайн-гайд](/docs/design/design-code-shelkovo.md), исключение для feature-owned CSS — [ADR-042](/docs/decisions/042-feature-owned-map-frame-css.md).
 - [ADR-035: Страницы сервисов и свежие события в поиске](035-status-search-indexing.md) - принят, 2026-09-10.
 - [ADR-036: Короткие путеводители llms.txt v2](036-llms-v2-guides.md) - принят, 2026-09-12.
-- [ADR-037: Печать справки и новостей через CSS](037-content-print-css.md) - принят, 2026-09-13.
+- [ADR-037: Печать справки и новостей через CSS](/docs/decisions/037-content-print-css.md) — принят, 2026-09-13; причины штатной печати существующего DOM и eager-загрузки иллюстраций.
 - [ADR-038: OpenSpec как единый процесс разработки](038-openspec-development-workflow.md) - принят, 2026-09-14; требования — [agent-tooling](../../openspec/specs/agent-tooling/spec.md), процесс — [AGENTS.md](../../AGENTS.md#жизненный-цикл-изменений), эксплуатация — [окружение разработки](../development.md).
 - [ADR-039: Общий runtime Яндекс Карт и неподвижные превью](039-shared-yandex-maps-runtime-and-preview.md) - принят, 2026-09-18.
 - [ADR-040: Портреты людей в публичном S3](040-people-portraits-in-public-s3.md) - принят, 2026-09-22.
