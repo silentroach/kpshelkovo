@@ -21,7 +21,7 @@
 - [ADR-015: Markdown-first база знаний поселка](015-markdown-first-knowledge-base.md) - принят, 2026-06-16; действующий контракт — [knowledge-base](../../openspec/specs/knowledge-base/spec.md), редакционные правила — [инструкции KB](../../apps/www/src/data/kb/AGENTS.md).
 - [ADR-016: Markdown-first отзывы собственников](016-markdown-first-owner-reviews.md) - принят, 2026-06-25.
 - [ADR-017: CSP с inline-исключениями для Astro и Яндекс Карт](/docs/decisions/017-csp-inline-exceptions-for-astro-yandex-maps.md) - принят, 2026-07-01; правила кода — [инструкции приложения](/apps/www/AGENTS.md#клиентский-javascript), исключения — [CSP.md](/ops/nginx/CSP.md).
-- [ADR-018: Markdown-first сарафан](018-markdown-first-useful-contacts.md) - принят, 2026-07-06.
+- [ADR-018: Markdown-first сарафан](/docs/decisions/018-markdown-first-useful-contacts.md) — принят, 2026-07-06; каталог без гарантии качества, последующие решения об отзывах и самостоятельных карточках.
 - [ADR-019: Публичный media-origin через nginx перед S3](019-public-media-origin.md) - принят, 2026-07-10.
 - [ADR-020: Отдельное Astro-приложение для media error pages](020-separate-media-error-app.md) - принят, 2026-07-11.
 - [ADR-021: Публичные файлы разделов в S3](021-public-section-files-in-s3.md) - принят, 2026-07-13.
