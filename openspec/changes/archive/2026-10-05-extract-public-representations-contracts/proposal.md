@@ -6,10 +6,11 @@
 
 ## What Changes
 
-- Выделить `public-markdown-delivery`: прямые companions, negotiated HTML URL, MIME, cache policy, обе оси `Vary`, alternate-связи и `noindex, follow` обычных companions, включая KB; публичные `SKILL.md` остаются отдельным исключением.
-- Выделить `public-content-discovery`: согласованность опубликованных ресурсов и каталогов, наиболее конкретный llms с корневым fallback, именованные абсолютные ссылки, объяснение полноты источников и разрешающие AI Content-Signal.
+- Выделить `public-markdown-delivery`: прямой и negotiated-доступ к объявленному Markdown, включая общий документ раздела и Markdown-only вход, MIME, cache policy, обе оси `Vary`, alternate-связи с существующими представлениями и `noindex, follow` обычных companions, включая KB; публичные `SKILL.md` остаются отдельным исключением.
+- Выделить `public-content-discovery`: согласованность опубликованных ресурсов и каталогов, наиболее конкретный llms с корневым fallback, структуру H1/blockquote/необязательное введение/H2 со списками именованных абсолютных ссылок, объяснение полноты источников и разрешающие AI Content-Signal.
 - После согласования оставить в ADR причины архитектурных решений и ссылки на specs. Реестр остаётся описательным; его устройство и AST-генерация не становятся схемой публичных полей.
 - В `events-calendar` заменить повтор общих правил доставки и discovery ссылками на их владельцев, сохранив доступность Markdown и предметные сценарии мероприятий.
+- Перенаправить HTTP-правила ADR-016 и `knowledge-base` к `public-markdown-delivery`, сохранив предметные правила отзывов и соответствие HTML/Markdown страниц KB. Уточнить границу реестра в ADR-011: корневые потребители используют общую карту, разделовые генераторы сохраняют самостоятельность.
 
 ## Capabilities
 
@@ -21,6 +22,7 @@
 ### Modified Capabilities
 
 - `events-calendar`: общие правила HTTP-доставки и выбора путеводителя делегируются `public-markdown-delivery` и `public-content-discovery`; оба способа доступа к Markdown сохраняются.
+- `knowledge-base`: HTTP-владелец заменён прямой ссылкой на `public-markdown-delivery`; соответствие HTML/Markdown, флаги и переходы между страницами KB сохраняются.
 
 ## Impact
 

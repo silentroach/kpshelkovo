@@ -2,23 +2,34 @@
 
 ## Purpose
 
-Позволять людям, агентам и HTTP-клиентам надёжно получать объявленное Markdown-представление страницы по прямой ссылке и через согласование формата.
+Позволять людям, агентам и HTTP-клиентам надёжно получать объявленное Markdown-представление публичного ресурса по прямой ссылке и через согласование формата.
 
 ## Requirements
 
 ### Requirement: Объявленный Markdown доступен по прямому и согласуемому адресу
 
-Страница с поддержкой Markdown negotiation SHALL сохранять прямой URL своего companion и возвращать Markdown по canonical HTML URL при явном приемлемом `Accept: text/markdown`. Обычный запрос HTML SHALL получать HTML. Markdown SHALL иметь `Content-Type: text/markdown; charset=utf-8` и явную политику кеширования; прямой URL SHALL выбирать ресурс самим путём. Страница без companion SHALL NOT объявлять его или имитировать negotiation.
+Публичная точка входа с поддержкой Markdown negotiation SHALL сохранять прямой URL объявленного Markdown-представления и возвращать этот документ при явном приемлемом `Accept: text/markdown`. Объявленное представление может быть общим документом раздела для нескольких HTML-страниц; negotiation допускается и у Markdown-only точки входа. Если HTML-представление опубликовано, обычный запрос HTML SHALL получать HTML. Markdown SHALL иметь `Content-Type: text/markdown; charset=utf-8` и явную политику кеширования; прямой URL SHALL выбирать ресурс самим путём. Точка входа без объявленного Markdown-представления SHALL NOT обещать его или имитировать negotiation.
 
 #### Scenario: Два способа чтения
 
-- **WHEN** клиент запрашивает прямой companion и canonical HTML URL с `Accept: text/markdown`
-- **THEN** оба запроса возвращают Markdown той же страницы с корректным MIME
-- **AND** HTML-запрос canonical URL возвращает HTML
+- **WHEN** у публичной точки входа есть HTML и объявленное Markdown-представление
+- **THEN** прямой Markdown URL и запрос точки входа с `Accept: text/markdown` возвращают объявленный документ с корректным MIME
+- **AND** обычный HTML-запрос точки входа возвращает HTML
+
+#### Scenario: Несколько HTML-страниц используют общий Markdown
+
+- **WHEN** несколько HTML-страниц раздела объявляют один общий Markdown-документ
+- **THEN** их negotiated-ответы и прямой Markdown URL возвращают этот объявленный документ
+
+#### Scenario: Negotiated-вход без HTML-версии
+
+- **WHEN** публичная точка входа поддерживает negotiation и объявляет Markdown-документ без HTML-версии
+- **THEN** прямой Markdown URL и запрос точки входа с `Accept: text/markdown` возвращают объявленный документ
+- **AND** ссылки обнаружения не объявляют несуществующее HTML-представление
 
 #### Scenario: У страницы нет машинного представления
 
-- **WHEN** страница не публикует Markdown companion
+- **WHEN** точка входа не объявляет Markdown-представление
 - **THEN** она не объявляет несуществующую альтернативу
 
 ### Requirement: Кеш различает формат и сжатие ответа
@@ -32,16 +43,16 @@
 
 ### Requirement: Альтернативные представления обнаруживаются из HTML и HTTP
 
-HTML-страница с companion SHALL объявлять его через HTTP `Link` с `rel="alternate"; type="text/markdown"`, HTML `<link rel="alternate" type="text/markdown">` и текстовый указатель для инструментов чтения HTML. Negotiated Markdown-ответ SHALL публиковать обратную HTTP alternate-ссылку на HTML с типом `text/html`. Прямой companion SHALL оставаться самостоятельной точкой входа; обратный HTTP `Link` для каждого прямого Markdown URL не является обязательным.
+HTML-страница с объявленным Markdown-представлением SHALL указывать его через HTTP `Link` с `rel="alternate"; type="text/markdown"`, HTML `<link rel="alternate" type="text/markdown">` и текстовый указатель для инструментов чтения HTML. Если у negotiated-точки входа опубликовано HTML-представление, её Markdown-ответ SHALL публиковать обратную HTTP alternate-ссылку на него с типом `text/html`. Ссылки SHALL NOT объявлять несуществующее HTML-представление. Прямой Markdown URL SHALL оставаться самостоятельной точкой входа; обратный HTTP `Link` для каждого прямого Markdown URL не является обязательным.
 
 #### Scenario: Клиент начинает с HTML
 
-- **WHEN** HTTP-клиент либо инструмент чтения HTML открывает страницу с companion
+- **WHEN** HTTP-клиент либо инструмент чтения HTML открывает страницу с объявленным Markdown-представлением
 - **THEN** он может обнаружить Markdown её альтернативными ссылками
 
 #### Scenario: Клиент согласовал Markdown
 
-- **WHEN** Markdown получен через `Accept` по HTML URL
+- **WHEN** Markdown получен через `Accept` по адресу с опубликованным HTML-представлением
 - **THEN** заголовок ответа позволяет обнаружить HTML-представление
 
 ### Requirement: Обычные companions не создают отдельную поисковую копию
