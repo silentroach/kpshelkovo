@@ -9,7 +9,7 @@ import {
   imageMimeType,
   serializeSchema,
 } from '@shelkovo/seo';
-import FontPreloads from '@shelkovo/ui/FontPreloads.astro';
+import Fonts from '@shelkovo/ui/Fonts.astro';
 import type { SchemaDoc } from '@shelkovo/seo';
 import SiteFooter from '@shelkovo/ui/SiteFooter.astro';
 import SearchDialog from '@/components/search/SearchDialog.svelte';
@@ -113,7 +113,7 @@ const searchMetadata = search
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <FontPreloads />
+    <Fonts />
     <meta name="theme-color" content={themeColor} />
     <meta name="description" content={description} />
     {keywordContent && <meta name="keywords" content={keywordContent} />}
@@ -129,11 +129,9 @@ const searchMetadata = search
       type="text/plain"
       href={absoluteUrl(llmsPathForPage(Astro.url.pathname))}
     />
-    {
-      markdownAlternate && (
-        <link rel="alternate" type="text/markdown" href={markdownAlternate} />
-      )
-    }
+    {markdownAlternate && (
+      <link rel="alternate" type="text/markdown" href={markdownAlternate} />
+    )}
     {robots && <meta name="robots" content={robots} />}
 
     <meta property="og:title" content={title} />
@@ -145,16 +143,12 @@ const searchMetadata = search
     {social && <meta property="og:image" content={social} />}
     {socialAlt && <meta property="og:image:alt" content={socialAlt} />}
     {socialMime && <meta property="og:image:type" content={socialMime} />}
-    {
-      social && imageWidth && (
-        <meta property="og:image:width" content={String(imageWidth)} />
-      )
-    }
-    {
-      social && imageHeight && (
-        <meta property="og:image:height" content={String(imageHeight)} />
-      )
-    }
+    {social && imageWidth && (
+      <meta property="og:image:width" content={String(imageWidth)} />
+    )}
+    {social && imageHeight && (
+      <meta property="og:image:height" content={String(imageHeight)} />
+    )}
 
     <meta
       name="twitter:card"
@@ -165,11 +159,9 @@ const searchMetadata = search
     {social && <meta name="twitter:image" content={social} />}
     {socialAlt && <meta name="twitter:image:alt" content={socialAlt} />}
 
-    {
-      preconnectYandexMaps && (
-        <link rel="preconnect" href="https://api-maps.yandex.ru" />
-      )
-    }
+    {preconnectYandexMaps && (
+      <link rel="preconnect" href="https://api-maps.yandex.ru" />
+    )}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
@@ -182,32 +174,30 @@ const searchMetadata = search
       color={browserColor.mask}
     />
     <title>{title}</title>
-    {docs.map((item) => <script type="application/ld+json" set:html={item} />)}
+    {docs.map((item) => (
+      <script type="application/ld+json" set:html={item} />
+    ))}
     <ClientRouter />
     <script src="../scripts/site-runtime.ts"></script>
   </head>
   <body class={bodyClasses}>
-    {
-      markdownAlternate && (
-        <div class="ui-visually-hidden" aria-hidden="true">
-          Markdown-версия этой страницы доступна по адресу {markdownAlternate}.
-        </div>
-      )
-    }
+    {markdownAlternate && (
+      <div class="ui-visually-hidden" aria-hidden="true">
+        Markdown-версия этой страницы доступна по адресу {markdownAlternate}.
+      </div>
+    )}
     <div class="site-navigation-progress" aria-hidden="true"></div>
-    {
-      enableMetrika && (
-        <noscript>
-          <div>
-            <img
-              src={`https://mc.yandex.ru/watch/${ymId}`}
-              style="position:absolute; left:-9999px;"
-              alt=""
-            />
-          </div>
-        </noscript>
-      )
-    }
+    {enableMetrika && (
+      <noscript>
+        <div>
+          <img
+            src={`https://mc.yandex.ru/watch/${ymId}`}
+            style="position:absolute; left:-9999px;"
+            alt=""
+          />
+        </div>
+      </noscript>
+    )}
     <div
       class:list={[
         'site-page-shell',
@@ -220,12 +210,12 @@ const searchMetadata = search
         data-pagefind-root={search ? true : undefined}
         data-pagefind-body={search?.scope === 'page' ? true : undefined}
         data-pagefind-meta={searchMetadata}
-        data-pagefind-filter={search
-          ? 'section[data-search-section-id]'
-          : undefined}
-        data-pagefind-sort={search?.publishedAt
-          ? 'date[data-search-published-at]'
-          : undefined}
+        data-pagefind-filter={
+          search ? 'section[data-search-section-id]' : undefined
+        }
+        data-pagefind-sort={
+          search?.publishedAt ? 'date[data-search-published-at]' : undefined
+        }
         data-search-title={search?.title}
         data-search-description={search?.description}
         data-search-section-id={search?.section.id}

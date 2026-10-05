@@ -1,0 +1,15 @@
+---
+import { Font, fontData } from 'astro:assets';
+import { assertFontData } from './font-data';
+import { mediaFontFamilies, wwwFontFamilies } from './font-families';
+
+interface Props {
+  readonly media?: boolean;
+}
+
+const { media = false } = Astro.props;
+assertFontData(fontData, media ? mediaFontFamilies : wwwFontFamilies);
+---
+
+<Font cssVariable="--font-fira-sans" preload={false} />
+<Font cssVariable="--font-pt-serif" preload={false} />

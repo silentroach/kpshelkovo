@@ -2,6 +2,7 @@
 import '../../../config/visual-foundation.css';
 import '@/styles/site.css';
 
+import Fonts from '@shelkovo/ui/Fonts.astro';
 import PlaceOpeningHours from '@/components/places/PlaceOpeningHours.astro';
 import type { PlaceOpeningHours as OpeningHours } from '@/lib/places/types';
 
@@ -59,26 +60,25 @@ const schedules = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <Fonts />
     <title>Place opening hours visual fixture</title>
   </head>
   <body class="ui-root-site">
     <main>
-      {
-        Object.entries(schedules).map(([variant, openingHours]) => (
-          <section>
-            <p class="fixture-label">{variant}</p>
-            <dl data-testid={variant}>
-              {variant === 'no-hours' && (
-                <div class="fixture-fact">
-                  <dt>Адрес</dt>
-                  <dd>Шелково Форест, Берёзовая улица</dd>
-                </div>
-              )}
-              <PlaceOpeningHours openingHours={openingHours} />
-            </dl>
-          </section>
-        ))
-      }
+      {Object.entries(schedules).map(([variant, openingHours]) => (
+        <section>
+          <p class="fixture-label">{variant}</p>
+          <dl data-testid={variant}>
+            {variant === 'no-hours' && (
+              <div class="fixture-fact">
+                <dt>Адрес</dt>
+                <dd>Шелково Форест, Берёзовая улица</dd>
+              </div>
+            )}
+            <PlaceOpeningHours openingHours={openingHours} />
+          </dl>
+        </section>
+      ))}
     </main>
   </body>
 </html>

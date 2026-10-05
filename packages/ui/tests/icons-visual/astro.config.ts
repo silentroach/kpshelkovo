@@ -1,9 +1,11 @@
 import { fileURLToPath } from 'node:url';
 
+import { wwwFonts } from '@shelkovo/ui/fonts';
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   output: 'static',
+  fonts: wwwFonts,
   srcDir: 'src',
   outDir: 'dist',
   vite: {

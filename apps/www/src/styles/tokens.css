@@ -70,8 +70,8 @@
     --color-yandex-maps-light: #ff8277;
     --color-star: oklch(69% 0.12 84);
 
-    --font-heading: 'PT Serif', Georgia, serif;
-    --font-body: 'Fira Sans', system-ui, sans-serif;
+    --font-heading: var(--font-pt-serif, Georgia, serif);
+    --font-body: var(--font-fira-sans, system-ui);
 
     --radius-sm: 0.25rem;
     --radius-md: 0.375rem;

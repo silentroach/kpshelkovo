@@ -2,6 +2,7 @@
 import '../../../config/visual-foundation.css';
 import '@/styles/site.css';
 
+import Fonts from '@shelkovo/ui/Fonts.astro';
 import EventWidget from '@/components/events/EventWidget.astro';
 import EventCard from '@/components/events/EventCard.astro';
 import type { NewsEvent } from '@/lib/news/types';
@@ -70,6 +71,7 @@ const eventDetail = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <Fonts />
     <title>News event card visual fixture</title>
   </head>
   <body class="ui-root-site news-event-visual-page">
@@ -125,12 +127,15 @@ const eventDetail = {
         <MapBackground class="fixture-map-background" aria-hidden="true" />
         <div class="fixture-map-marker" data-fixture-marker></div>
         <div class="fixture-map-copyright ymaps3--map-copyrights">
-          <a href="https://yandex.ru/maps/" class="ymaps3--map-copyrights__logo"
-            >Яндекс Карты</a
+          <a
+            href="https://yandex.ru/maps/"
+            class="ymaps3--map-copyrights__logo"
           >
-          <a href="https://yandex.ru/legal/maps_termsofuse/"
-            >Условия использования</a
-          >
+            Яндекс Карты
+          </a>
+          <a href="https://yandex.ru/legal/maps_termsofuse/">
+            Условия использования
+          </a>
         </div>
       </div>
     </template>

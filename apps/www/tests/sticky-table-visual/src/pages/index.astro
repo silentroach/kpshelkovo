@@ -2,6 +2,8 @@
 import '../../../config/visual-foundation.css';
 import '@/styles/site.css';
 
+import Fonts from '@shelkovo/ui/Fonts.astro';
+
 const estimateRows = [
   {
     work: 'Круглосуточный пост охраны',
@@ -64,6 +66,7 @@ const comparisonRows = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <Fonts />
     <title>Sticky table visual fixture</title>
   </head>
   <body class="ui-root-site sticky-table-visual-page">
@@ -105,25 +108,20 @@ const comparisonRows = [
               </tr>
             </thead>
             <tbody>
-              {
-                estimateRows.map((row) => (
-                  <tr>
-                    <td class="sticky-table-visual-td">
-                      <span
-                        class="sticky-table-visual-check"
-                        aria-hidden="true"
-                      >
-                        ✓
-                      </span>
-                      {row.work}
-                    </td>
-                    <td class="sticky-table-visual-td">{row.base}</td>
-                    <td class="sticky-table-visual-td">{row.frequency}</td>
-                    <td class="sticky-table-visual-td">{row.rate}</td>
-                    <td class="sticky-table-visual-td">{row.contribution}</td>
-                  </tr>
-                ))
-              }
+              {estimateRows.map((row) => (
+                <tr>
+                  <td class="sticky-table-visual-td">
+                    <span class="sticky-table-visual-check" aria-hidden="true">
+                      ✓
+                    </span>
+                    {row.work}
+                  </td>
+                  <td class="sticky-table-visual-td">{row.base}</td>
+                  <td class="sticky-table-visual-td">{row.frequency}</td>
+                  <td class="sticky-table-visual-td">{row.rate}</td>
+                  <td class="sticky-table-visual-td">{row.contribution}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -143,9 +141,7 @@ const comparisonRows = [
           data-ui-sticky-table-shell
           data-testid="sticky-table-compare-shell"
         >
-          <table
-            class="ui-table ui-sticky-table sticky-table-visual-comparison-table"
-          >
+          <table class="ui-table ui-sticky-table sticky-table-visual-comparison-table">
             <caption class="sticky-table-visual-caption">
               Тестовое сравнение инфраструктуры
             </caption>
@@ -159,21 +155,19 @@ const comparisonRows = [
               </tr>
             </thead>
             <tbody>
-              {
-                comparisonRows.map(([label, current, base]) => (
-                  <tr class="ui-table-row">
-                    <td class="ui-table-cell sticky-table-visual-comparison-label">
-                      {label}
-                    </td>
-                    <td class="ui-table-cell ui-table-cell-center">
-                      <span class="ui-badge ui-badge-info">{current}</span>
-                    </td>
-                    <td class="ui-table-cell ui-table-cell-center">
-                      <span class="ui-badge ui-badge-success">{base}</span>
-                    </td>
-                  </tr>
-                ))
-              }
+              {comparisonRows.map(([label, current, base]) => (
+                <tr class="ui-table-row">
+                  <td class="ui-table-cell sticky-table-visual-comparison-label">
+                    {label}
+                  </td>
+                  <td class="ui-table-cell ui-table-cell-center">
+                    <span class="ui-badge ui-badge-info">{current}</span>
+                  </td>
+                  <td class="ui-table-cell ui-table-cell-center">
+                    <span class="ui-badge ui-badge-success">{base}</span>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
