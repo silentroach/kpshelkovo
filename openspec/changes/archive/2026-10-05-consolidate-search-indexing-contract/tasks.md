@@ -68,3 +68,29 @@ pnpm --filter @shelkovo/www exec vitest run \
 - Дата начала в поисковом заголовке подтверждена статически по [маршруту события](/apps/www/src/pages/status/incidents/[year]/[month]/[entry]/index.astro) и передаче `search.title` в metadata через [BaseLayout](/apps/www/src/layouts/BaseLayout.astro). Отдельный runtime- или браузерный тест этого заголовка не запускался.
 - `pnpm openspec:validate`: 27 specs и 56 архивов прошли, 0 ошибок; только информационные замечания о длине требований. Адресный `oxfmt --check`, `git diff --check` и собственное ревью полного diff исправления прошли.
 - Изменения ограничены документацией. Код, корпус, ранжирование, алиасы и контракты KB, участков, внешней индексации и фаз статуса сохранены; #118/#122/#124 остаются отдельными задачами. Ручное сравнение релевантности, build, typecheck и production-проверка для этой правки не выполнялись. Независимое ревью и публикацию исправления координирует основная сессия.
+
+## Исправления по повторному ревью PR #941 — 2026-10-05
+
+- [4186789690](https://github.com/silentroach/kpshelkovo/pull/941#discussion_r4186789690): основной spec и delta требуют фактического включения содержательных материалов поддерживаемых типов. Сценарий обычного материала защищает возможность читателя найти опубликованный текст; отбор KB, мероприятий, статуса и специальных записей участков остаётся у прежних владельцев. Перечень типов открыт для развития, исторический набор страниц пилота не закрепляется.
+- [4186789701](https://github.com/silentroach/kpshelkovo/pull/941#discussion_r4186789701): внешняя индексация HTML явно отделена от общей доставки Markdown. Владелец HTTP-политики robots — `public-markdown-delivery` из #781 / PR #935; сценарий статуса ссылается на его правило. Сохранены существующие представления, включая использование `/status/index.md` для negotiated `/status/history/`; новых companion URL правка не требует.
+- [4186789712](https://github.com/silentroach/kpshelkovo/pull/941#discussion_r4186789712): главная и постоянные страницы сервисов сохраняют включение в sitemap и допустимость новых URL для IndexNow по ADR-027. Сценарий постоянной точки входа дополнен положительным результатом; правило отправки только новых страниц после публикации остаётся общим.
+- Исправление подготовлено поверх локального `4c0f223d04a9fc2a62f9031c708b07176957f5c6` на точной зависимости `24ba12c2a954b3c26aa5d89cb2fd1934bea7c72b`. Первые 10 требований / 28 сценариев сохранены побайтово; main равен базе плюс delta с 6 требованиями / 19 сценариями. Все прежние 17 сценариев delta сохранены, четыре незатронутых требования не изменились.
+- Адресная команда ниже: 12 тестов прошли, 36 пропущены фильтром. Проверены поисковая разметка BaseLayout и карточки контакта, исключения KB и мероприятий, включение постоянных страниц статуса в sitemap, отправка только новых допустимых URL IndexNow, общий Markdown response header и Markdown-ответы месячного/годового календарей.
+
+```bash
+pnpm --filter @shelkovo/www exec vitest run \
+  src/layouts/BaseLayout.test.ts \
+  src/lib/contacts/tests/contact-page.test.ts \
+  src/lib/markdown/tests/response.test.ts \
+  src/lib/sitemap.test.ts \
+  src/lib/tests/indexnow.test.ts \
+  src/lib/status/tests/status-calendar-year-page.test.ts \
+  src/lib/status/tests/status-calendar-month-pages.test.ts \
+  src/lib/kb/tests/search.test.ts \
+  src/lib/events/tests/search.test.ts \
+  -t 'BaseLayout search contract|indexes the summary and body without indexing contact methods|preserves the markdown response contract|publishes status landing pages but excludes events and archives regardless of date|submits only new indexable pages after verifying the key|keeps affected dates and targets aligned in HTML and Markdown|keeps the same days and records in HTML and Markdown|includes articles and excludes sections, noindex, and opted-out pages|keeps future, current and recently ended events, including the 30-day boundary'
+```
+
+- `pnpm openspec:validate`: 32 specs и 62 архива прошли, 0 ошибок; только информационные замечания о длине требований. Форматирование изменённых файлов, `git diff --check` и собственное ревью полного diff исправления прошли.
+- Проверка файловых ссылок оставляет ровно одну отсутствующую цель: `/openspec/specs/public-markdown-delivery/spec.md`. Её правило сверено с основным spec в соседней рабочей копии #781, разделом «Обычные companions не создают отдельную поисковую копию». Остальные локальные цели существуют. Зависимость зафиксирована в proposal; публикация ожидает попадания PR #935 в общую базу либо согласованной цепочки PR. Копия владельца в этой ветке не создавалась.
+- Проверки разметки не заменяют сборку production-корпуса, а тесты Markdown Response — проверку nginx-доставки. Существующая конфигурация прямого и negotiated Markdown сверена статически; браузер, `test:search-quality`, build, typecheck и production-проверки не запускались. Код и корпус не менялись; новые тесты не добавлялись. Независимое ревью, обновление зависимости #782 и публикацию координирует основная сессия.

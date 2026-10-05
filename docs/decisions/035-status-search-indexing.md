@@ -26,9 +26,9 @@
 
 ## Владельцы действующих правил
 
-- [search](/openspec/specs/search/spec.md) — постоянные точки входа, включительное окно актуальности от окончания, индексируемый текст и внешняя индексация: `noindex, follow`, self-canonical, разрешённый обход и исключение из sitemap/IndexNow.
+- [search](/openspec/specs/search/spec.md) — постоянные точки входа, включительное окно актуальности от окончания, индексируемый текст, внешняя индексация HTML и отбор URL статуса для sitemap/IndexNow.
 - [status-lifecycle](/openspec/specs/status-lifecycle/spec.md) — фазы, граница окончания, снимок сборки и свежесть публикации. Расписание задано в [CI/CD](/.github/workflows/ci.yml).
-- [ADR-009](/docs/decisions/009-markdown-accept-negotiation.md) и [nginx-конфигурация](/ops/nginx/kpshelkovo-online.conf) — прямые Markdown-версии и content negotiation, включая `X-Robots-Tag`.
+- [public-markdown-delivery](/openspec/specs/public-markdown-delivery/spec.md) — общая доставка и политика robots прямых Markdown companions и negotiated Markdown-ответов. Причины content negotiation — [ADR-009](/docs/decisions/009-markdown-accept-negotiation.md), реализация — [nginx-конфигурация](/ops/nginx/kpshelkovo-online.conf).
 - [sitemap](/apps/www/src/lib/sitemap.ts) и [IndexNow](/apps/www/src/lib/indexnow.ts) — отбор внешних URL и отправка после публикации по [ADR-027](/docs/decisions/027-indexnow-new-pages-only.md).
 
 ## Рассмотренные альтернативы
