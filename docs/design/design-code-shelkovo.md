@@ -161,7 +161,7 @@ components:
 
 Система намеренно плоская. Глубина появляется через типографику, строгие разделители, мягкие подложки и редкие тени, а не через тяжелые карточки. Сравнительные и табличные поверхности должны быть читаемыми прежде всего, красивыми только после этого.
 
-**Source of Truth:** runtime-значения канонических tokens живут в app-owned `apps/www/src/styles/tokens.css`, который подключается через общий `global.css` по [ADR-034](../decisions/034-native-css-architecture.md). Канонический логотип живет в `packages/ui/src/assets/logo.png`. Этот документ объясняет смысл токенов, правила применения и ограничения; при переносе или изменении значения runtime CSS и этот документ обновляются синхронно.
+**Source of Truth:** актуальные имена и runtime-значения общесайтовых tokens принадлежат [tokens.css](/apps/www/src/styles/tokens.css), подключённому через [global.css](/apps/www/src/styles/global.css). Этот документ объясняет их смысл, применение и визуальные ограничения; при изменении значений его обновляют синхронно с runtime CSS. Границы владения стилями и причины устройства каскада описаны в [ADR-034](/docs/decisions/034-native-css-architecture.md). Канонический логотип живёт в [packages/ui/src/assets/logo.png](/packages/ui/src/assets/logo.png).
 
 **Key Characteristics:**
 
@@ -213,7 +213,7 @@ components:
 
 ### Runtime Token Families
 
-Канонический runtime-контракт определен в [ADR-034](../decisions/034-native-css-architecture.md). Design guide использует те же semantic families:
+Актуальные токены и значения находятся в [tokens.css](/apps/www/src/styles/tokens.css). Семейства состояний объединяют следующие роли:
 
 - success и danger: base, foreground, soft, border, text;
 - warning: base, graphic, soft, border, text;
@@ -344,7 +344,6 @@ Fira Sans использовать только в реальных весах 4
 
 - **Ambient Low** (`--shadow-1: 0 0.25rem 0.75rem oklch(27% 0.05 142 / 0.055)`): легкая тень для спокойных карточек и вспомогательных панелей, если границы недостаточно.
 - **Ambient Raised** (`--shadow-2: 0 0.75rem 2rem oklch(27% 0.05 142 / 0.085)`): только для поверхностей, которые реально должны быть выше страницы.
-- **Hero Glow** (`--hero-glow-a`, `--hero-glow-b`): мягкие декоративные свечения, не использовать как универсальный эффект.
 
 ### Named Rules
 

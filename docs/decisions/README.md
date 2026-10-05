@@ -37,7 +37,7 @@
 - [ADR-031: Единый жизненный цикл status-событий](031-status-incident-lifecycle.md) - принят, 2026-08-26.
 - [ADR-032: Предзагрузка HTML по нажатию](032-tap-prefetch.md) - принят, 2026-08-28.
 - [ADR-033: Сравнение тарифов как часть единого сайта](033-integrated-tariff-comparison-section.md) - принят, 2026-08-30.
-- [ADR-034: Нативная CSS-архитектура после Tailwind](034-native-css-architecture.md) - принят, 2026-08-31; узкое исключение для feature-owned CSS — ADR-042.
+- [ADR-034: Нативная CSS-архитектура после Tailwind](/docs/decisions/034-native-css-architecture.md) - принят, 2026-08-31; значения токенов — [tokens.css](/apps/www/src/styles/tokens.css), семантика — [дизайн-гайд](/docs/design/design-code-shelkovo.md), исключение для feature-owned CSS — [ADR-042](/docs/decisions/042-feature-owned-map-frame-css.md).
 - [ADR-035: Страницы сервисов и свежие события в поиске](035-status-search-indexing.md) - принят, 2026-09-10.
 - [ADR-036: Короткие путеводители llms.txt v2](036-llms-v2-guides.md) - принят, 2026-09-12.
 - [ADR-037: Печать справки и новостей через CSS](037-content-print-css.md) - принят, 2026-09-13.
