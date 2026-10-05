@@ -22,7 +22,7 @@ Print-оформление ограничено справкой и новост
 
 ## Владельцы требований и оформления
 
-- Содержимое, ссылки, скрытие интерфейса и читаемое разбиение — [content-print](/openspec/changes/extract-content-print-contract/specs/content-print/spec.md).
+- Содержимое, ссылки, скрытие интерфейса и читаемое разбиение — [content-print](/openspec/specs/content-print/spec.md).
 - Печать загруженных редакционных карт, включая сцену и выбранный кадр, — [site-maps](/openspec/specs/site-maps/spec.md#requirement-markdown-карта-остаётся-содержимым-печатной-страницы). Отдельного ожидания внешних ресурсов перед системным диалогом не вводится.
 - Владение CSS — [ADR-034](/docs/decisions/034-native-css-architecture.md); визуальные параметры — [дизайн-гайд](/docs/design/design-code-shelkovo.md#печатное-представление); текущие селекторы и переопределения — [print.css](/apps/www/src/styles/print.css).
 
