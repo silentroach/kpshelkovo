@@ -32,7 +32,7 @@
 
 ## Владельцы требований и инструкций
 
-- Карточки, источники отзывов, правило звезды и контактные действия — [contacts-catalog](/openspec/changes/extract-contacts-catalog-contract/specs/contacts-catalog/spec.md).
+- Карточки, источники отзывов, правило звезды и контактные действия — [contacts-catalog](/openspec/specs/contacts-catalog/spec.md).
 - Подготовка карточек, отбор отзывов и включение vCard — [редакционные правила](/apps/www/src/data/contacts/AGENTS.md); актуальные поля и категории — [raw-схема](/apps/www/src/lib/contacts/raw-schema.ts).
 - Общие упоминания в body — [ADR-012](/docs/decisions/012-entity-mention-graph.md), поиск — [ADR-025](/docs/decisions/025-static-full-text-search-with-pagefind.md), Markdown и HTTP/discovery — [ADR-008](/docs/decisions/008-markdown-ast-generation.md), [ADR-009](/docs/decisions/009-markdown-accept-negotiation.md) и [ADR-011](/docs/decisions/011-public-surface-registry.md).
 - Явная связь `place_slug` с местами рассматривается отдельно в [#188](https://github.com/silentroach/kpshelkovo/issues/188).

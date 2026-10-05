@@ -2,7 +2,7 @@
 
 Локальные правила для данных раздела `Сарафан`.
 
-- Перед добавлением или правкой карточки сверь [контракт каталога](/openspec/changes/extract-contacts-catalog-contract/specs/contacts-catalog/spec.md); причины модели — [ADR-018](/docs/decisions/018-markdown-first-useful-contacts.md).
+- Перед добавлением или правкой карточки сверь [контракт каталога](/openspec/specs/contacts-catalog/spec.md); причины модели — [ADR-018](/docs/decisions/018-markdown-first-useful-contacts.md).
 - Один Markdown-файл в этой папке равен одному опубликованному контакту.
 - Не добавлять реальные контакты без источника от пользователя.
 - Frontmatter должен проходить `RawContactSchema`: `title`, `slug`, `category`, `updated_at`, `contacts` обязательны.
