@@ -12,6 +12,7 @@
 - В `events-calendar` заменить повтор общих правил доставки и discovery ссылками на их владельцев, сохранив доступность Markdown и предметные сценарии мероприятий.
 - Перенаправить HTTP-правила ADR-016 и `knowledge-base` к `public-markdown-delivery`, сохранив предметные правила отзывов и соответствие HTML/Markdown страниц KB. Уточнить границу реестра в ADR-011: корневые потребители используют общую карту, разделовые генераторы сохраняют самостоятельность.
 - После интеграции сокращённой ADR-016 сохранить в `owner-reviews` принятую обязанность индекса, правил и отдельных отзывов поддерживать Markdown negotiation; общие правила HTTP/discovery остаются у двух общих владельцев.
+- После сокращения ADR-018 сохранить в `contacts-catalog` принятую обязанность общего списка, опубликованных категорийных списков и карточек контактов поддерживать Markdown negotiation по общим правилам HTTP/discovery.
 
 ## Capabilities
 
@@ -25,6 +26,7 @@
 - `events-calendar`: общие правила HTTP-доставки и выбора путеводителя делегируются `public-markdown-delivery` и `public-content-discovery`; оба способа доступа к Markdown сохраняются.
 - `knowledge-base`: HTTP-владелец заменён прямой ссылкой на `public-markdown-delivery`; соответствие HTML/Markdown, флаги и переходы между страницами KB сохраняются.
 - `owner-reviews`: канонические HTML URL индекса, правил и отдельных отзывов сохраняют выдачу Markdown через `Accept: text/markdown` и прямые companions; HTTP/discovery делегируются общим владельцам.
+- `contacts-catalog`: канонические HTML URL общего списка, опубликованных категорийных списков и карточек сохраняют выдачу Markdown через `Accept: text/markdown` и прямые companions; HTTP/discovery делегируются общим владельцам.
 
 ## Impact
 
