@@ -1,6 +1,6 @@
 # Reviews Data
 
-- Перед публикацией или заменой отзыва сверь [правила публикации](/apps/www/src/data/review-rules.md) и [контракт отзывов](/openspec/changes/extract-owner-reviews-contract/specs/owner-reviews/spec.md). Юридические формулировки принадлежат правилам; причины модели — [ADR-016](/docs/decisions/016-markdown-first-owner-reviews.md).
+- Перед публикацией или заменой отзыва сверь [правила публикации](/apps/www/src/data/review-rules.md) и [контракт отзывов](/openspec/specs/owner-reviews/spec.md). Юридические формулировки принадлежат правилам; причины модели — [ADR-016](/docs/decisions/016-markdown-first-owner-reviews.md).
 - Отзывы хранятся как опубликованные Markdown-файлы `**/*.md`.
 - Публикация файла означает, что текущий собственник уже проверен вручную вне сайта.
 - Текст автора не редактировать: если нужен другой текст, запросить новую версию у автора и заменить body целиком.

@@ -28,7 +28,7 @@ JSON-LD списка перечисляет `ItemPage`, чтобы список 
 
 ## Владельцы требований
 
-- Наблюдаемое соответствие JSON-LD и видимого предмета оценки — [owner-reviews](/openspec/changes/extract-owner-reviews-contract/specs/owner-reviews/spec.md).
+- Наблюдаемое соответствие JSON-LD и видимого предмета оценки — [owner-reviews](/openspec/specs/owner-reviews/spec.md).
 - Текущая сборка JSON-LD — [SEO adapter](/apps/www/src/lib/reviews/seo.ts); редакционная модель — [ADR-016](/docs/decisions/016-markdown-first-owner-reviews.md).
 
 ## Источники

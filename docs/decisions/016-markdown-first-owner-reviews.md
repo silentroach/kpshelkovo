@@ -31,6 +31,6 @@
 
 ## Владельцы требований и инструкций
 
-- Авторство, приватность, аспекты и машинная атрибуция — [owner-reviews](/openspec/changes/extract-owner-reviews-contract/specs/owner-reviews/spec.md).
+- Авторство, приватность, аспекты и машинная атрибуция — [owner-reviews](/openspec/specs/owner-reviews/spec.md).
 - Порядок отправки, модерация и точные юридические формулировки — [правила публикации](/apps/www/src/data/review-rules.md); подготовка файлов — [редакционные инструкции](/apps/www/src/data/reviews/AGENTS.md), структура данных — [raw-схема](/apps/www/src/lib/reviews/raw-schema.ts).
 - Иллюстрации — [ADR-024](/docs/decisions/024-review-images-in-public-s3.md). Общие упоминания — [ADR-012](/docs/decisions/012-entity-mention-graph.md), Markdown и HTTP/discovery — [ADR-008](/docs/decisions/008-markdown-ast-generation.md), [ADR-009](/docs/decisions/009-markdown-accept-negotiation.md) и [ADR-011](/docs/decisions/011-public-surface-registry.md).
