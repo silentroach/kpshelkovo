@@ -94,4 +94,4 @@ pnpm typecheck
 
 ## Agent-Facing Surfaces
 
-Если меняются section routes, markdown companions, JSON feeds, `llms.txt`, skills или discovery docs для разделов, связанные agent-facing поверхности нужно синхронно пересматривать.
+При изменении section routes, Markdown companions, JSON feeds, `llms.txt`, публичных skills или discovery docs сверяй связанные поверхности с [public-content-discovery](/openspec/specs/public-content-discovery/spec.md), а HTTP-выдачу Markdown — с [public-markdown-delivery](/openspec/specs/public-markdown-delivery/spec.md). Новую публичную поверхность регистрируй в [реестре](/apps/www/src/lib/public-surface/index.ts) или явно обоснуй исключение по границам [ADR-011](/docs/decisions/011-public-surface-registry.md).

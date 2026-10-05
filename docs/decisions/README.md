@@ -12,9 +12,9 @@
 - [ADR-006: HSTS без `includeSubDomains` и `preload`](/docs/decisions/006-hsts-policy.md) - принят, 2026-05-15; значения — [security.conf](/ops/nginx/security.conf) и [site-конфиг](/ops/nginx/kpshelkovo-online.conf).
 - [ADR-007: COOP без COEP для изоляции `opener`-связей](/docs/decisions/007-coop-origin-isolation.md) - принят, 2026-05-15; заголовок — [security.conf](/ops/nginx/security.conf).
 - [ADR-008: Генерация Markdown через AST](008-markdown-ast-generation.md) - принят, 2026-05-14; рабочие правила — [корневые инструкции](../../AGENTS.md#локальные-инструкции), API — [README пакета](../../packages/markdown/README.md).
-- [ADR-009: Markdown через `Accept` negotiation](009-markdown-accept-negotiation.md) - принят, 2026-05-17.
+- [ADR-009: Markdown через `Accept` negotiation](/docs/decisions/009-markdown-accept-negotiation.md) - принят, 2026-05-17; HTTP-контракт — [public-markdown-delivery](/openspec/specs/public-markdown-delivery/spec.md).
 - [ADR-010: Плановые работы в индикаторе статуса на главной](/docs/decisions/010-home-status-maintenance-indicator.md) - заменён [ADR-031](/docs/decisions/031-status-incident-lifecycle.md), 2026-05-18; исторический указатель.
-- [ADR-011: Реестр публичных поверхностей](011-public-surface-registry.md) - принят, 2026-05-19.
+- [ADR-011: Реестр публичных поверхностей](/docs/decisions/011-public-surface-registry.md) - принят, 2026-05-19; обнаружение ресурсов — [public-content-discovery](/openspec/specs/public-content-discovery/spec.md).
 - [ADR-012: Единый граф упоминаний сущностей в Markdown](/docs/decisions/012-entity-mention-graph.md) - принят, 2026-05-20; общие гарантии — [entity-mentions](/openspec/specs/entity-mentions/spec.md), структурные связи — [news-event-places](/openspec/specs/news-event-places/spec.md), Markdown места — [place-markdown-card](/openspec/specs/place-markdown-card/spec.md).
 - [ADR-013: Граница между внешними DTO, доменной моделью и публичными DTO](013-raw-domain-public-data-boundary.md) - принят, 2026-05-20; рабочие правила — [Data Boundaries](../../apps/www/AGENTS.md#data-boundaries).
 - [ADR-014: Transcript-first архив встреч](/docs/decisions/014-meetings-transcript-first-archive.md) — принят, 2026-06-07; причины отделения источника от выводов и деления по исходным записям.
@@ -25,7 +25,7 @@
 - [ADR-019: Публичный media-origin через nginx перед S3](/docs/decisions/019-public-media-origin.md) - принят, 2026-07-10; доставка — [public-media](/openspec/specs/public-media/spec.md), эксплуатация — [origin runbook](/ops/nginx/media-kpshelkovo-online.md).
 - [ADR-020: Отдельное Astro-приложение для media error pages](/docs/decisions/020-separate-media-error-app.md) - принят, 2026-07-11; контракт ошибки — [public-media](/openspec/specs/public-media/spec.md).
 - [ADR-021: Публичные файлы разделов в S3](/docs/decisions/021-public-section-files-in-s3.md) - принят, 2026-07-13; требования — [public-media](/openspec/specs/public-media/spec.md), публикация — [storage runbook](/ops/storage/public-media.md).
-- [ADR-022: Разрешить использование публичного контента системами ИИ](022-ai-content-signals-policy.md) - принят, 2026-07-22.
+- [ADR-022: Разрешить использование публичного контента системами ИИ](/docs/decisions/022-ai-content-signals-policy.md) - принят, 2026-07-22; политика — [public-content-discovery](/openspec/specs/public-content-discovery/spec.md).
 - [ADR-023: Фотографии новостей в публичном S3](/docs/decisions/023-news-images-in-public-s3.md) - принят, 2026-07-23; подготовленные web-master — [public-media](/openspec/specs/public-media/spec.md).
 - [ADR-024: Иллюстрации отзывов в публичном S3](/docs/decisions/024-review-images-in-public-s3.md) - принят, 2026-08-10; публикация и авторская позиция — [public-media](/openspec/specs/public-media/spec.md).
 - [ADR-025: Статический полнотекстовый поиск через Pagefind](025-static-full-text-search-with-pagefind.md) - принят; правила корпуса и возрастного ранжирования статуса заменены ADR-035, 2026-08-14.
@@ -39,7 +39,7 @@
 - [ADR-033: Сравнение тарифов как часть единого сайта](/docs/decisions/033-integrated-tariff-comparison-section.md) - принят, 2026-08-30; публичный префикс — [site-navigation](/openspec/specs/site-navigation/spec.md), названия — [глоссарий](/GLOSSARY.md#разделы-сайта).
 - [ADR-034: Нативная CSS-архитектура после Tailwind](/docs/decisions/034-native-css-architecture.md) - принят, 2026-08-31; значения токенов — [tokens.css](/apps/www/src/styles/tokens.css), семантика — [дизайн-гайд](/docs/design/design-code-shelkovo.md), исключение для feature-owned CSS — [ADR-042](/docs/decisions/042-feature-owned-map-frame-css.md).
 - [ADR-035: Страницы сервисов и свежие события в поиске](035-status-search-indexing.md) - принят, 2026-09-10.
-- [ADR-036: Короткие путеводители llms.txt v2](036-llms-v2-guides.md) - принят, 2026-09-12.
+- [ADR-036: Короткие путеводители llms.txt v2](/docs/decisions/036-llms-v2-guides.md) - принят, 2026-09-12; требования к путеводителям — [public-content-discovery](/openspec/specs/public-content-discovery/spec.md).
 - [ADR-037: Печать справки и новостей через CSS](/docs/decisions/037-content-print-css.md) — принят, 2026-09-13; причины штатной печати существующего DOM и eager-загрузки иллюстраций.
 - [ADR-038: OpenSpec как единый процесс разработки](038-openspec-development-workflow.md) - принят, 2026-09-14; требования — [agent-tooling](../../openspec/specs/agent-tooling/spec.md), процесс — [AGENTS.md](../../AGENTS.md#жизненный-цикл-изменений), эксплуатация — [окружение разработки](../development.md).
 - [ADR-039: Общий runtime Яндекс Карт и неподвижные превью](/docs/decisions/039-shared-yandex-maps-runtime-and-preview.md) - принят, 2026-09-18; общие гарантии — [site-maps](/openspec/specs/site-maps/spec.md), композиция — [дизайн-гайд](/docs/design/design-code-shelkovo.md#фоновые-карты-и-неподвижные-превью).

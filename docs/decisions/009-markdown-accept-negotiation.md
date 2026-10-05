@@ -6,127 +6,38 @@
 
 ## Дата
 
-2026-05-17
-
-Обновлено 2026-07-22.
+2026-05-17; уточнён 2026-07-22.
 
 ## Контекст
 
-Корневой сайт `kpshelkovo.online` собирается как статическое Astro-приложение и обслуживается nginx. Для ряда публичных HTML-страниц рядом генерируются Markdown companion-файлы: `index.md` у главной, разделов, архивов, статуса и Compare.
+Статический сайт публикует HTML для людей и Markdown для агентов и терминальных клиентов. Прямая ссылка на `.md` удобна для цитирования, а запрос публичной точки входа с `Accept: text/markdown` позволяет клиенту получить объявленное текстовое представление уже известного адреса.
 
-Эти Markdown-страницы нужны агентам, терминальным клиентам и другим машинным потребителям. У сайта уже есть два способа получить их:
-
-- прямой URL companion-файла, например `/news/index.md`;
-- canonical HTML URL с заголовком `Accept: text/markdown`, например `/news/`.
-
-Второй способ является HTTP content negotiation: один и тот же URL может вернуть `text/html` или `text/markdown` в зависимости от request header `Accept`. Это удобно для агентов, потому что они могут запрашивать машинный вариант того же канонического адреса, который видит человек.
-
-Но у content negotiation есть кешевый контракт. Если ответ зависит от `Accept`, все варианты этого negotiated URL должны явно сообщать кешам `Vary: Accept`. Иначе shared cache, CDN или промежуточный прокси может сохранить один вариант и отдать его клиенту с другим `Accept`.
-
-Сжатие добавляет отдельную ось вариации через `Accept-Encoding`. `Vary: Accept-Encoding` не заменяет `Vary: Accept`: первый заголовок описывает gzip/brotli-варианты тела, второй - выбор media type.
+Выбор формата по заголовку создаёт риск для общих кешей: без `Vary: Accept` кеш может вернуть HTML клиенту Markdown или наоборот. Вариация по сжатию через `Accept-Encoding` решает другую задачу и не заменяет вариацию по формату.
 
 ## Решение
 
-Сохраняем оба публичных способа доступа к Markdown:
+Сохраняем оба способа доступа: отдельный Markdown URL и negotiation публичной точки входа по явному `Accept`. Объявленное представление может быть общим документом раздела; отдельная HTML-версия есть не у каждой Markdown-точки входа. Выбор делает nginx перед статической сборкой. User-Agent не определяет формат: клиент должен управлять им явно.
 
-- прямые `.md` companion URLs как стабильные, ссылочные, машинно-читаемые ресурсы;
-- negotiated HTML URLs, которые отдают Markdown при `Accept: text/markdown`.
+Действующий HTTP-контракт — [public-markdown-delivery](/openspec/specs/public-markdown-delivery/spec.md): MIME, кеширование, обе оси `Vary`, alternate-связи и `noindex, follow` обычных companions, включая KB, с отдельным исключением публичных `SKILL.md`. Связь с путеводителем принадлежит [public-content-discovery](/openspec/specs/public-content-discovery/spec.md).
 
-На production-слое nginx выбирает Markdown, когда клиент явно перечисляет `text/markdown` в `Accept`. Прямой URL `.md` или `.txt` выбирает ресурс самим путем и не участвует в negotiation.
-
-Любой route, который выбирает HTML или Markdown по request header `Accept`, обязан отдавать `Vary: Accept` на обеих ветках ответа:
-
-- HTML-вариант negotiated URL;
-- Markdown-вариант того же negotiated URL.
-
-Если nginx или другой слой сжатия также добавляет `Vary: Accept-Encoding`, оба значения должны сохраняться. Допустимы несколько полей `Vary` или один общий список значений, если итоговый HTTP-ответ эквивалентно сообщает обе оси вариации.
-
-HTML объявляет Markdown через HTTP `Link` с `rel="alternate"`. Negotiated Markdown-ответ публикует обратную HTTP-ссылку на HTML. HTML дополнительно содержит `<link rel="alternate" type="text/markdown">` и короткий скрытый указатель на companion URL, чтобы Markdown могли найти как HTTP-клиенты, так и инструменты, которые читают только HTML.
-
-Прямые `.md` URLs не являются content negotiation по пути: сам URL уже выбирает Markdown-ресурс. Для них обязательны корректный `Content-Type: text/markdown`, явная cache policy и стабильная генерация Markdown. `Vary: Accept` на прямых `.md` URLs не нужен для корректности, но может оставаться в nginx как совместимое операционное поведение.
-
-## Область действия
-
-Решение относится к публичным маршрутам `apps/www`, которые обслуживаются через `ops/nginx/kpshelkovo-online.conf` и используют `Accept: text/markdown` для выбора companion Markdown.
-
-Решение не меняет правила генерации Markdown. Генерацию регулирует ADR-008, а Markdown-рендер в HTML - ADR-003.
-
-Решение не требует добавлять content negotiation всем HTML-страницам. Если новый раздел не готов отдавать Markdown companion, его HTML URL не должен объявлять или имитировать поддержку `Accept: text/markdown`.
+Прямой `.md` выбирает ресурс путём. Обратная HTTP alternate-ссылка negotiated Markdown ведёт к опубликованному HTML-представлению, когда оно есть; требование такой ссылки у каждого прямого companion или Markdown-only входа добавило бы другой контракт.
 
 ## Рассмотренные альтернативы
 
-### Оставить только прямые `.md` URLs
+- **Только прямые `.md` URL.** Проще кеширование, но клиенту пришлось бы сначала находить companion, а уже опубликованный доступ через canonical URL сломался бы.
+- **Query-параметр вместо `Accept`.** Создал бы третий адрес того же содержания. Отдельный адрес уже есть у companion, а HTTP negotiation выражает выбор представления.
+- **Выбор по User-Agent.** Ненадёжная эвристика усложнила бы cache key и лишила клиента явного контроля.
+- **Отключение кеширования HTML.** Ухудшило бы обычную навигацию, не заменяя корректный `Vary` для промежуточных кешей. Причины короткого HTML-кеша — в [ADR-002](/docs/decisions/002-client-transitions-prefetch-cache.md).
 
-Плюсы:
+## Последствия и точки сопровождения
 
-- проще кеширование: разные media type живут на разных URL;
-- не нужен `Vary: Accept` на HTML routes;
-- меньше nginx-логики.
-
-Минусы:
-
-- агенту нужно сначала найти companion URL через `Link`, discovery или HTML;
-- canonical URL нельзя напрямую запросить как Markdown;
-- уже существующий публичный контракт `Accept: text/markdown` пришлось бы ломать.
-
-Отклонено: negotiated canonical URL полезен для агентов и уже является частью публичной поверхности сайта.
-
-### Использовать query-параметр вместо `Accept`
-
-Плюсы:
-
-- кеши различают варианты по URL без `Vary: Accept`;
-- проще отлаживать в браузере.
-
-Минусы:
-
-- появляется третий адрес того же содержания рядом с HTML URL и `.md` URL;
-- query-параметр хуже выражает выбор представления ресурса, чем HTTP `Accept`;
-- нужно заново документировать и поддерживать еще один публичный контракт.
-
-Отклонено: прямые `.md` URLs уже покрывают сценарий отдельного адреса, а `Accept` лучше подходит для выбора представления canonical URL.
-
-### Выбирать Markdown по User-Agent
-
-Плюсы:
-
-- агентам не нужно выставлять `Accept`;
-- можно сохранить один видимый URL.
-
-Минусы:
-
-- User-Agent ненадежен и плохо нормализуется;
-- кешевый ключ становится еще менее очевидным;
-- клиенты теряют явный контроль над желаемым media type.
-
-Отклонено: формат ответа должен выбираться явным `Accept`, а не эвристикой по клиенту.
-
-### Отключить кеширование negotiated HTML routes
-
-Плюсы:
-
-- меньше риск долгоживущей ошибочной отдачи из shared cache;
-- проще рассуждать о свежести.
-
-Минусы:
-
-- это не заменяет `Vary: Accept` для промежуточных кешей;
-- ухудшает предзагрузку и краткий HTML-кеш, принятый в ADR-002;
-- наказывает обычную HTML-навигацию из-за машинного варианта.
-
-Отклонено: правильный заголовок `Vary` решает корректность, а короткий HTML-кеш остается полезным.
-
-## Последствия
-
-- Новые negotiated HTML routes должны добавлять `Vary: Accept` вместе с HTML cache policy.
-- Новый HTML route с Markdown companion должен публиковать alternate-ссылку в HTML и HTTP, а negotiated Markdown-ответ - обратную HTTP-ссылку на HTML.
-- Регрессионный тест nginx coverage должен падать, если route с `Accept: text/markdown` не сообщает `Vary: Accept`.
-- При подключении CDN нужно проверить, что он уважает `Vary: Accept` или явно нормализует cache key до нужных вариантов, например HTML и Markdown.
-- Если маршрут перестает поддерживать Markdown по `Accept`, нужно убрать и саму ветку negotiation, и связанные discovery-обещания.
-- `Vary: Accept-Encoding` от gzip/brotli должен сохраняться независимо от `Vary: Accept`.
+- Доставку реализует [site-конфиг nginx](/ops/nginx/kpshelkovo-online.conf), HTML-объявления — [BaseLayout](/apps/www/src/layouts/BaseLayout.astro), заголовки app-ответа — [response helper](/apps/www/src/lib/markdown/response.ts).
+- При изменении доставки или подключении CDN проверяют реальные HTML/Markdown-ответы и сохранность обеих осей `Vary`. Проверка helper не подтверждает поведение nginx и общего кеша.
+- Известное расхождение delivery headers отслеживается в [#479](https://github.com/silentroach/kpshelkovo/issues/479). Оно не меняет нормативный контракт; перенос требований не подтверждает исправность production.
+- Генерация Markdown и рендер остаются решениями [ADR-008](/docs/decisions/008-markdown-ast-generation.md) и [ADR-003](/docs/decisions/003-markdown-pipeline-layering.md).
 
 ## Источники
 
-- HTTP Semantics, `Accept`: https://www.rfc-editor.org/rfc/rfc9110.html#field.accept
-- HTTP Semantics, `Vary`: https://www.rfc-editor.org/rfc/rfc9110.html#field.vary
-- HTTP Caching: https://www.rfc-editor.org/rfc/rfc9111.html
+- [HTTP Semantics: Accept](https://www.rfc-editor.org/rfc/rfc9110.html#field.accept)
+- [HTTP Semantics: Vary](https://www.rfc-editor.org/rfc/rfc9110.html#field.vary)
+- [HTTP Caching](https://www.rfc-editor.org/rfc/rfc9111.html)
