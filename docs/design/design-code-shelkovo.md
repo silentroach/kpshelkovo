@@ -424,7 +424,7 @@ Fira Sans использовать только в реальных весах 4
 - **Соседи:** короткий список иконок и названий под превью, без вложенных карточек, горизонтальных разделителей и видимых подписей состояния. Для запланированного или строящегося места состояние остаётся в доступном тексте ссылки. Пустой список не показывать; близость не оформлять как обещание пешего маршрута.
 - **Визуальный язык:** плоские поверхности, существующие роли PT Serif / Fira Sans и спокойные semantic colors. Иерархию создавать расположением и интервалами в рамках действующего Font Budget.
 
-Поведение превью и выбор соседей описаны в [ADR-028](../decisions/028-markdown-first-places-map.md); продуктовые контракты — в [place-card-presentation](../../openspec/specs/place-card-presentation/spec.md) и [place-nearby-navigation](../../openspec/specs/place-nearby-navigation/spec.md).
+Поведение превью и выбор соседей определены в [place-card-presentation](/openspec/specs/place-card-presentation/spec.md) и [place-nearby-navigation](/openspec/specs/place-nearby-navigation/spec.md); причины модели места и маркеров — в [ADR-028](/docs/decisions/028-markdown-first-places-map.md).
 
 ### Карточка человека
 
@@ -457,7 +457,7 @@ Fira Sans использовать только в реальных весах 4
 - **Действие события:** сверху справа появляется только готовая короткая штатная кнопка перехода на текущий кадр, независимо от тайлов. До готовности, при ошибке и без JavaScript резервного перехода нет; ссылка на место в сведениях события остаётся. В новости и на странице мероприятия поведение одинаково; нижняя дублирующая ссылка на карту не добавляется.
 - **Ссылки поселка:** существующие desktop/mobile ссылки на исходный адрес или координатный fallback остаются самостоятельными и при работающей карте; отдельный overlay-fallback не добавляется.
 
-Общий runtime, Astro custom element, отложенный старт через `IntersectionObserver` и отдельная кастомизация подложки описаны в [ADR-039](../decisions/039-shared-yandex-maps-runtime-and-preview.md).
+Причины общего runtime, компактного preview и отдельного оформления сцены описаны в [ADR-039](/docs/decisions/039-shared-yandex-maps-runtime-and-preview.md); поведение карт — в [site-maps](/openspec/specs/site-maps/spec.md).
 
 ### Inputs / Fields
 
