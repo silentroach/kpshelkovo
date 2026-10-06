@@ -15,6 +15,13 @@
       "skillPath": "skills/agent-browser/SKILL.md",
       "computedHash": "dd491d53824ad9286ec950aee667098446332429a6d41fe28b4ba11f1959264c"
     },
+    "animate": {
+      "source": "emilkowalski/skills",
+      "ref": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d",
+      "sourceType": "github",
+      "skillPath": "skills/animate/SKILL.md",
+      "computedHash": "7598d33e7f60dd5c24531eaaa897621cc3bdb48e8050324211627973bc59c4ce"
+    },
     "apple-design": {
       "source": "emilkowalski/skills",
       "ref": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d",
@@ -42,6 +49,13 @@
       "sourceType": "github",
       "skillPath": "skills/core-web-vitals/SKILL.md",
       "computedHash": "601b2cbb920fb0ea9814a3f11232d7883e1eb0923865218502ab1d73e9fc5172"
+    },
+    "design-taste-frontend": {
+      "source": "Leonxlnx/taste-skill",
+      "ref": "ce26fc25c0e5e8cab638f883de62d9a86ee5e45b",
+      "sourceType": "github",
+      "skillPath": "skills/taste-skill/SKILL.md",
+      "computedHash": "6d838b246d0e35d0b53f4f23f98ba7a1dd561937e64f7d0c7553b0928e376c3e"
     },
     "domain-modeling": {
       "source": "mattpocock/skills",
@@ -112,6 +126,13 @@
       "sourceType": "github",
       "skillPath": "plugins/claude/svelte/skills/svelte-code-writer/SKILL.md",
       "computedHash": "6f78193a79906175595ce8e4ca8d726da350eb99035a9544b6553620df5673a1"
+    },
+    "svelte-core-bestpractices": {
+      "source": "sveltejs/ai-tools",
+      "ref": "6b5d0dab3c9c083387247ab20dc684573481076b",
+      "sourceType": "github",
+      "skillPath": "plugins/claude/svelte/skills/svelte-core-bestpractices/SKILL.md",
+      "computedHash": "3cd6c1f1a92b8bf52af8120e5cb3a93b5512f83b905fd902b895adafb7225456"
     },
     "wayfinder": {
       "source": "mattpocock/skills",

@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация и объём — в [proposal](/openspec/changes/adopt-taste-and-svelte-skills/proposal.md). Текущий `pnpm skills:check` подтверждает 19 внешних и 4 собственных skills. [Установщик](/scripts/skills.mjs) уже изолирует HOME, проверяет полный состав и хеши перед копированием; [тесты](/scripts/agent-tooling.test.mjs) покрывают нарушения установки и независимость генерации от профиля.
+Мотивация и объём — в [proposal](/openspec/changes/archive/2026-10-06-adopt-taste-and-svelte-skills/proposal.md). Текущий `pnpm skills:check` подтверждает 19 внешних и 4 собственных skills. [Установщик](/scripts/skills.mjs) уже изолирует HOME, проверяет полный состав и хеши перед копированием; [тесты](/scripts/agent-tooling.test.mjs) покрывают нарушения установки и независимость генерации от профиля.
 
 Решение следует [ADR-038](/docs/decisions/038-openspec-development-workflow.md): исходный upstream, закреплённые источники, проектные дополнения в правилах. [ADR-034](/docs/decisions/034-native-css-architecture.md) определяет CSS-владение, токены и светлую тему. Новый ADR для расширения набора не нужен.
 
