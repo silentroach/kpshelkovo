@@ -29,7 +29,7 @@
 ## Impact
 
 - Затрагиваются главная в `apps/www`, app-owned helpers новостей и статусов, подключение клиентской сводки, адресные тесты и [дизайн-гайд](/docs/design/design-code-shelkovo.md). Новые зависимости не нужны.
-- Визуальное решение и опорные снимки находятся в [design.md](/openspec/changes/prioritize-homepage-news-and-status/design.md) и [mockups](/openspec/changes/prioritize-homepage-news-and-status/mockups/README.md).
+- Визуальное решение и опорные снимки находятся в [design.md](/openspec/changes/archive/2026-10-06-prioritize-homepage-news-and-status/design.md) и [mockups](/openspec/changes/archive/2026-10-06-prioritize-homepage-news-and-status/mockups/README.md).
 - Дополнительные справочные ссылки и знакомство с посёлком не входят в принятый макет. [#689](https://github.com/silentroach/kpshelkovo/issues/689) остаётся самостоятельной инициативой. Общесайтовая переработка типографики из [#947](https://github.com/silentroach/kpshelkovo/issues/947) не требуется для этого change.
 - Оптимизация ранней загрузки панорамы из [#395](https://github.com/silentroach/kpshelkovo/issues/395) остаётся отдельной задачей. Здесь проверяем сохранность выбора day/night, одной загрузки нужного изображения и размеров, удерживающих layout.
 - Markdown главной сохраняет роль путеводителя; новую подборку в него не дублируем. Публичный status JSON и его схема не меняются. Встроенные данные сводки служат клиентскому UI, отдельный endpoint не вводится.

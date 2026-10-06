@@ -1,0 +1,117 @@
+---
+import { formatDynamicHtml } from '@shelkovo/markdown';
+import NewsMeta from '@/components/news/NewsMeta.astro';
+import { articleUrl } from '@/lib/news/routes';
+import type { NewsArticle } from '@/lib/news/types';
+
+interface Props {
+  readonly article: NewsArticle;
+  readonly lead?: boolean;
+}
+
+const { article, lead = false } = Astro.props;
+---
+
+<article
+  class:list={['home-news-article', { 'home-news-article--lead': lead }]}
+>
+  <div class="home-news-article__meta">
+    {lead && article.pinned && (
+      <span class="home-news-article__pin">Закреплено</span>
+    )}
+    <NewsMeta
+      publishedIso={article.publishedIso}
+      author={article.author}
+      fullAuthorName
+    />
+  </div>
+  <h2 class="ui-entry-title home-news-article__title">
+    <a href={articleUrl(article)} class="ui-link">
+      {formatDynamicHtml(article.title)}
+    </a>
+  </h2>
+  <p class:list={['home-news-article__summary', { 'ui-copy': lead }]}>
+    {formatDynamicHtml(article.summary)}
+  </p>
+</article>
+
+<style>
+  .home-news-article {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .home-news-article + .home-news-article {
+    margin-block-start: 1.5rem;
+    padding-block-start: 1.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .home-news-article__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1rem;
+    margin-block-end: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  .home-news-article__pin {
+    color: var(--color-accent-text);
+    font-weight: 600;
+  }
+
+  .home-news-article__title {
+    font-size: 1.3125rem;
+    text-wrap: initial;
+  }
+
+  .home-news-article__title a {
+    transition: none;
+  }
+
+  .home-news-article :global(a:focus-visible) {
+    outline-color: currentColor;
+  }
+
+  .home-news-article__summary {
+    margin-block-start: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .home-news-article:not(.home-news-article--lead) .home-news-article__summary {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .home-news-article--lead .home-news-article__title {
+    font-size: 1.8125rem;
+    line-height: 1.2;
+    letter-spacing: -0.012em;
+  }
+
+  .home-news-article--lead .home-news-article__summary {
+    margin-block-start: 1.25rem;
+  }
+
+  @media (min-width: 48rem) {
+    .home-news-article:not(.home-news-article--lead)
+      .home-news-article__summary {
+      display: none;
+    }
+
+    .home-news-article:not(.home-news-article--lead) .home-news-article__title {
+      font-family: var(--font-body);
+      font-size: 1.0625rem;
+      font-weight: 400;
+      line-height: 1.75;
+      text-wrap: pretty;
+    }
+
+    .home-news-article--lead .home-news-article__title {
+      font-size: 2.25rem;
+      line-height: 1.16;
+    }
+  }
+</style>

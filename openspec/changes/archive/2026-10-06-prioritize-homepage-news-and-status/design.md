@@ -2,7 +2,7 @@
 
 ## Context
 
-Причина изменения описана в [proposal](/openspec/changes/prioritize-homepage-news-and-status/proposal.md). Владелец согласовал композицию по [макетам](/openspec/changes/prioritize-homepage-news-and-status/mockups/README.md), затем отдельно подтвердил разделители на обоих размерах экрана.
+Причина изменения описана в [proposal](/openspec/changes/archive/2026-10-06-prioritize-homepage-news-and-status/proposal.md). Владелец согласовал композицию по [макетам](/openspec/changes/archive/2026-10-06-prioritize-homepage-news-and-status/mockups/README.md), затем отдельно подтвердил разделители на обоих размерах экрана.
 
 Точки опоры в текущем приложении:
 
@@ -99,7 +99,7 @@
 - Таймеры, polling и отдельный `visibilitychange` не добавляются. В открытой вкладке само течение времени не переключает состояние; при следующем подключении учитываются известные окна. Новые редакционные записи и исправления поступают с новой публикацией сайта.
 - Без JavaScript, при отсутствии payload или ошибке разбора JSON остаётся серверный снимок. Корректность структуры обеспечивает генерация; клиент не проверяет заново структуру доверенного объекта. Ошибка разбора не скрывает новости и не подменяет состояние ложной нормой.
 
-Это расширение живого представления сервисов, а не пересборка статических списков событий `/status/`. Границу фиксирует delta к [status-lifecycle](/openspec/changes/prioritize-homepage-news-and-status/specs/status-lifecycle/spec.md).
+Это расширение живого представления сервисов, а не пересборка статических списков событий `/status/`. Границу фиксирует delta к [status-lifecycle](/openspec/changes/archive/2026-10-06-prioritize-homepage-news-and-status/specs/status-lifecycle/spec.md).
 
 ## Risks / Trade-offs
 
