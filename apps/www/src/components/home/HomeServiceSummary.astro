@@ -1,0 +1,168 @@
+---
+import {
+  getHomeServiceMessages,
+  getHomeServiceWindows,
+} from '@/lib/home/service-summary';
+import { HomeServiceWindowsSchema } from '@/lib/home/service-summary.schema';
+import { statusServiceUrl } from '@/lib/status/routes';
+import { STATUS_SERVICES } from '@/lib/status/schema';
+import type { StatusIncident } from '@/lib/status/types';
+import { formatStatusService } from '@/lib/status/view';
+
+interface Props {
+  readonly incidents: readonly StatusIncident[];
+  readonly buildNow: number;
+}
+
+const { incidents, buildNow } = Astro.props;
+const payload = HomeServiceWindowsSchema.parse(
+  getHomeServiceWindows(incidents, buildNow),
+);
+const messages = getHomeServiceMessages(payload, buildNow);
+const services = [
+  ...messages.map(({ service }) => service),
+  ...STATUS_SERVICES.filter(
+    (service) => !messages.some((message) => message.service === service),
+  ),
+];
+---
+
+<nav
+  class="home-services"
+  aria-label="Состояние сервисов"
+  data-home-service-summary
+  hidden={messages.length === 0}
+>
+  <div class="home-services__list" data-home-service-list>
+    {services.map((service) => {
+      const message = messages.find((item) => item.service === service);
+      return (
+        <a
+          class="home-services__link"
+          href={statusServiceUrl(service)}
+          data-home-service={service}
+          data-phase={message?.phase ?? ''}
+          data-kind={message?.kind ?? ''}
+          hidden={!message}
+        >
+          <span class="home-services__text">
+            <strong>{formatStatusService(service)}</strong>{' '}
+            <span class="home-services__separator" aria-hidden="true">
+              |
+            </span>{' '}
+            <span data-home-service-label>{message?.label}</span>
+          </span>
+        </a>
+      );
+    })}
+  </div>
+</nav>
+<script
+  type="application/json"
+  data-home-service-windows
+  set:html={JSON.stringify(payload)}
+/>
+<script>
+  import { installHomeServiceSummary } from '@/lib/home/service-summary.dom';
+
+  installHomeServiceSummary();
+</script>
+
+<style>
+  .home-services {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    padding-block: 4rem 1.25rem;
+    color: var(--color-surface-raised);
+    background: linear-gradient(
+      to top,
+      oklch(15% 0.025 145 / 0.88),
+      oklch(15% 0.025 145 / 0.72) 65%,
+      transparent
+    );
+  }
+
+  .home-services__list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: min(calc(100% - 2.5rem), 70.75rem);
+    margin-inline: auto;
+  }
+
+  .home-services__link {
+    --service-marker: var(--color-accent);
+    display: grid;
+    grid-template-columns: 0.5625rem minmax(0, 1fr);
+    align-items: start;
+    column-gap: 0.625rem;
+    max-width: 100%;
+    min-height: 1.875rem;
+    padding-block: 0.25rem;
+    color: inherit;
+    font-size: 0.875rem;
+    line-height: 1.375rem;
+    text-decoration: none;
+  }
+
+  .home-services__link::before {
+    content: '';
+    width: 0.5625rem;
+    height: 0.5625rem;
+    margin-block-start: 0.375rem;
+    border: 2px solid var(--service-marker);
+    border-radius: 50%;
+    background: var(--service-marker);
+  }
+
+  .home-services__link[data-kind='incident'] {
+    --service-marker: color-mix(
+      in oklab,
+      var(--color-danger) 60%,
+      var(--color-surface-raised)
+    );
+  }
+
+  .home-services__link[data-phase='scheduled']::before {
+    background: transparent;
+  }
+
+  .home-services__text {
+    overflow-wrap: anywhere;
+  }
+
+  [data-home-service-label] {
+    color: color-mix(in oklab, var(--color-surface-raised) 82%, transparent);
+  }
+
+  .home-services__separator {
+    color: color-mix(in oklab, var(--color-surface-raised) 35%, transparent);
+  }
+
+  .home-services__link:is(:hover, :focus-visible) {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .home-services__link:focus-visible {
+    outline: 2px solid var(--color-surface-raised);
+    outline-offset: 3px;
+  }
+
+  @media (min-width: 48rem) {
+    .home-services {
+      padding-block-end: 1.75rem;
+    }
+
+    .home-services__list {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0.375rem 2.5rem;
+    }
+
+    .home-services__link {
+      font-size: 1rem;
+    }
+  }
+</style>

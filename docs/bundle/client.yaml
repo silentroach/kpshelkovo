@@ -47,6 +47,13 @@ static/EditorialMapScript.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
     rendered: 4072
   apps/www/src/components/maps/EditorialMapScript.astro?astro&type=script&index=0&lang.ts:
     rendered: 0
+static/HomeServiceSummary.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
+  apps/www/src/components/home/HomeServiceSummary.astro?astro&type=script&index=0&lang.ts:
+    rendered: 131
+  apps/www/src/lib/home/service-summary.dom.ts:
+    rendered: 1742
+  apps/www/src/lib/home/service-summary.ts:
+    rendered: 1571
 static/InfrastructureTable.XXXXXXXX.js:
   apps/www/src/compare/components/InfrastructureTable.svelte:
     rendered: 3583
@@ -310,6 +317,9 @@ static/client.XXXXXXXX.js:
 static/client.svelte.XXXXXXXX.js:
   node_modules/.pnpm/@astrojs+svelte@9.0.1_@types+node@26.5.0_astro@7.3.5_@types+node@26.5.0_yaml@2.9.1__esb_0bf31d074983e984f830ebe15b0cfd6c/node_modules/@astrojs/svelte/dist/client.svelte.js:
     rendered: 2022
+static/date.XXXXXXXX.js:
+  packages/format/src/date.ts:
+    rendered: 755
 static/editorial-map.XXXXXXXX.js:
   apps/www/src/components/maps/editorial-map.css:
     rendered: 0
@@ -407,8 +417,6 @@ static/lazy.XXXXXXXX.js:
     rendered: 12753
   node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/events/index.js:
     rendered: 0
-  packages/format/src/date.ts:
-    rendered: 744
   packages/ui/src/icons/system/Search.svelte:
     rendered: 517
 static/lifecycle.XXXXXXXX.js:
@@ -446,6 +454,11 @@ static/runtime.XXXXXXXX.js:
   apps/www/src/lib/yandex-maps/runtime.ts:
     rendered: 3655
 static/schema.XXXXXXXX.js:
+  apps/www/src/lib/areas.ts:
+    rendered: 98
+  apps/www/src/lib/status/schema.ts:
+    rendered: 147
+static/schema-2.XXXXXXXX.js:
   apps/www/src/lib/parcels/schema.ts:
     rendered: 105
   packages/format/src/plural.ts:
@@ -454,10 +467,6 @@ static/src.XXXXXXXX.js:
   packages/url/src/index.ts:
     rendered: 379
 static/timeline.dom.XXXXXXXX.js:
-  apps/www/src/lib/areas.ts:
-    rendered: 98
-  apps/www/src/lib/status/schema.ts:
-    rendered: 147
   apps/www/src/lib/status/timeline-tooltip.ts:
     rendered: 780
   apps/www/src/lib/status/timeline.dom.ts:

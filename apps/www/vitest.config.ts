@@ -13,6 +13,7 @@ const domTests = [
   'src/components/search/tests/**/*.test.ts',
   'src/lib/home/hero.dom.test.ts',
   'src/lib/home/status.dom.test.ts',
+  'src/lib/home/tests/**/*.dom.test.ts',
   'src/lib/tests/sticky-table-headers.dom.test.ts',
   'src/lib/yandex-maps/tests/**/*.test.ts',
   'src/lib/status/timeline.dom.test.ts',

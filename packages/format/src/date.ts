@@ -47,7 +47,7 @@ const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
 /**
  * Formats ISO date into Russian human-readable form.
  */
-export const formatDate = (iso: string): string => {
+export const formatDate = (iso: string, now: Date = new Date()): string => {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) {
     return 'Invalid DateTime';
@@ -57,9 +57,7 @@ export const formatDate = (iso: string): string => {
   const day = parts.find((part) => part.type === 'day')?.value;
   const month = parts.find((part) => part.type === 'month')?.value;
   const year = parts.find((part) => part.type === 'year')?.value;
-  const currentYear = dateFormatter
-    .formatToParts(new Date())
-    .find((part) => part.type === 'year')?.value;
+  const currentYear = dateFormatter.formatToParts(now).find((part) => part.type === 'year')?.value;
 
   return `${day} ${month}${year === currentYear ? '' : ` ${year}`}`;
 };

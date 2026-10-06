@@ -193,7 +193,7 @@ describe('format package', () => {
       const dates = ['2026-12-31', '2026-12-31T21:00:00Z'] as const;
 
       vi.setSystemTime(new Date('2026-12-31T20:59:59.999Z'));
-      expect(dates.map(formatDate)).toMatchInlineSnapshot(`
+      expect(dates.map((iso) => formatDate(iso))).toMatchInlineSnapshot(`
         [
           "31 декабря",
           "1 января 2027",
@@ -201,12 +201,24 @@ describe('format package', () => {
       `);
 
       vi.setSystemTime(new Date('2026-12-31T21:00:00.000Z'));
-      expect(dates.map(formatDate)).toMatchInlineSnapshot(`
+      expect(dates.map((iso) => formatDate(iso))).toMatchInlineSnapshot(`
         [
           "31 декабря 2026",
           "1 января",
         ]
       `);
+    });
+
+    it('uses the supplied Moscow year instead of the system clock', () => {
+      const now = new Date('2031-12-31T21:00:00Z');
+
+      expect(['2031-12-31', '2031-12-31T21:00:00Z'].map((iso) => formatDate(iso, now)))
+        .toMatchInlineSnapshot(`
+          [
+            "31 декабря 2031",
+            "1 января",
+          ]
+        `);
     });
 
     it.each(['', 'not-an-iso', '2026-13-01'])(
