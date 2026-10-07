@@ -39,13 +39,13 @@ const satteriHtml = async (html: string, passes = 1): Promise<string> => {
 };
 
 describe('shared typography AST adapter', () => {
-  it('balances inline leading quotes against the space before strong and links', async () => {
+  it('preserves ordinary quotes and spaces in strong and links without extra wrappers', async () => {
     const source =
       '<p>сообщение <strong>«Оформление пропуска недоступно»</strong>. Позже <a href="/help/">«Личный помощник» ответил</a>.</p>';
     const html = formatDynamicHtml(source);
     const expected = dom(html).innerHTML;
     expect(expected).toMatchInlineSnapshot(
-      `"<p>сообщение<span class="typograf-oa-sp-lquote"> </span><strong><span class="typograf-oa-lquote">«</span>Оформление пропуска недоступно»</strong>. Позже<span class="typograf-oa-sp-lquote"> </span><a href="/help/"><span class="typograf-oa-lquote">«</span>Личный помощник» ответил</a>.</p>"`
+      `"<p>сообщение <strong>«Оформление пропуска недоступно»</strong>. Позже <a href="/help/">«Личный помощник» ответил</a>.</p>"`
     );
     expect(dom(rehypeHtml(source)).innerHTML).toBe(expected);
     expect(dom(await satteriHtml(source)).innerHTML).toBe(expected);
@@ -54,43 +54,13 @@ describe('shared typography AST adapter', () => {
     expect(dom(await satteriHtml(source, 2)).innerHTML).toBe(expected);
   });
 
-  it.each([
-    '«8-10 октября»',
-    '<strong>«8-10 октября»</strong>',
-    '<a href="/events/">«8-10 октября»</a>',
-    '<strong><em>«8-10 октября»</em></strong>'
-  ])('keeps real paragraph-start hanging quotes through inline formatting: %s', async (content) => {
-    const source = `<p>Предыдущий абзац.</p><p>${content}</p>`;
-    const html = formatDynamicHtml(source);
-    const expected = dom(html).innerHTML;
-    expect(dom(html).querySelectorAll('.typograf-oa-n-lquote')).toHaveLength(1);
-    expect(dom(html).querySelectorAll('.typograf-oa-sp-lquote')).toHaveLength(0);
-    expect(dom(rehypeHtml(source, 2)).innerHTML).toBe(expected);
-    expect(dom(await satteriHtml(source, 2)).innerHTML).toBe(expected);
-    expect(formatDynamicHtml(html)).toBe(html);
-  });
-
-  it.each([
-    '<p>слово<strong>«8-10 октября»</strong></p>',
-    '<p><code>«код»</code> <strong>«8-10 октября»</strong></p>',
-    '<p>Строка<br><strong>«8-10 октября»</strong></p>',
-    '<p>Начало <em>слово <strong>«8-10 октября»</strong></em></p>',
-    '<p><em>Начало </em><a href="/">«8-10 октября»</a></p>',
-    '<p><em>Начало</em> «8-10 октября»</p>',
-    '<p><!--note--> «8-10 октября»</p>',
-    '<p><strong>«Начало»</strong> «8-10 октября»</p>'
-  ])('retains inline and protected boundaries when aligning quotes: %s', async (source) => {
-    const html = formatDynamicHtml(source);
-    const expected = dom(html).innerHTML;
-    expect(dom(rehypeHtml(source, 2)).innerHTML).toBe(expected);
-    expect(dom(await satteriHtml(source, 2)).innerHTML).toBe(expected);
-    expect(formatDynamicHtml(html)).toBe(html);
-  });
-
   it('matches the HTML path inside complete emphasis and links', async () => {
     const source =
       '<p>Начало <strong>8-10 октября</strong>, затем <a href="/events/" title="8-10 октября">«8-10 октября»</a>.</p>';
     const expected = dom(formatDynamicHtml(source)).innerHTML;
+    expect(dom(expected).querySelector('a')?.innerHTML).toMatchInlineSnapshot(
+      `"«<span class="nowrap-date-range">8–10&nbsp;октября</span>»"`
+    );
     expect(dom(rehypeHtml(source)).innerHTML).toBe(expected);
     expect(dom(await satteriHtml(source)).innerHTML).toBe(expected);
   });
@@ -100,8 +70,8 @@ describe('shared typography AST adapter', () => {
       '<p>  &lt;em&gt; &amp;copy; «8-10 октября» \t\n<strong>слово</strong>\n  конец  </p>';
     const rehype = dom(rehypeHtml(source));
     const satteri = dom(await satteriHtml(source));
-    expect(showNbsp(rehype.innerHTML)).toMatchInlineSnapshot(`
-      "<p>  &lt;em&gt; &amp;copy;<span class="typograf-oa-sp-lquote"> </span><span class="typograf-oa-lquote">«</span><span class="nowrap-date-range">8–10&nbsp;октября</span>» 	
+    expect(showNbsp(rehype.innerHTML).replaceAll('\t', '→')).toMatchInlineSnapshot(`
+      "<p>  &lt;em&gt; &amp;copy; «<span class="nowrap-date-range">8–10&nbsp;октября</span>» →
       <strong>слово</strong>
         конец  </p>"
     `);

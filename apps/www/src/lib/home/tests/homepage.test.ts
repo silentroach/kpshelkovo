@@ -131,13 +131,13 @@ describe('homepage server HTML', () => {
       [
         {
           "literalElements": 0,
-          "quote": true,
+          "quote": false,
           "range": "8–10 октября",
           "text": "«8–10 октября» <em>текст</em> &amp;",
         },
         {
           "literalElements": 0,
-          "quote": true,
+          "quote": false,
           "range": "11–13 октября",
           "text": "«11–13 октября» <strong>текст</strong> &amp;",
         },

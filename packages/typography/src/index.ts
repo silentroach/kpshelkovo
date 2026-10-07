@@ -1,45 +1,4 @@
-import Typograf, { type TypografContext } from 'typograf';
-
-export const TYPOGRAPHY_BLOCK_TAGS = new Set([
-  'address',
-  'article',
-  'aside',
-  'blockquote',
-  'body',
-  'br',
-  'dd',
-  'div',
-  'dl',
-  'dt',
-  'fieldset',
-  'figcaption',
-  'figure',
-  'footer',
-  'form',
-  'h1',
-  'h2',
-  'h3',
-  'h4',
-  'h5',
-  'h6',
-  'header',
-  'hr',
-  'li',
-  'main',
-  'nav',
-  'ol',
-  'p',
-  'pre',
-  'section',
-  'table',
-  'tbody',
-  'td',
-  'tfoot',
-  'th',
-  'thead',
-  'tr',
-  'ul'
-]);
+import Typograf from 'typograf';
 
 export const TYPOGRAPHY_SKIP_TAGS = new Set([
   'code',
@@ -54,12 +13,7 @@ export const TYPOGRAPHY_SKIP_TAGS = new Set([
   'var'
 ]);
 
-export const TYPOGRAPHY_WRAPPER_CLASSES = new Set([
-  'nowrap-date-range',
-  'typograf-oa-lquote',
-  'typograf-oa-n-lquote',
-  'typograf-oa-sp-lquote'
-]);
+export const TYPOGRAPHY_WRAPPER_CLASSES = new Set(['nowrap-date-range']);
 
 const BRAND_PART_RULE = 'ru/nbsp/shelkovoPartName';
 
@@ -88,78 +42,6 @@ const DATE_RANGE = new RegExp(
 );
 const DATE_RANGE_DASH_RULE = 'ru/dash/shelkovoDateRange';
 const DATE_RANGE_HTML_RULE = 'ru/html/nowrapDateRange';
-const QUOTE_CONTEXT_RULE = 'ru/html/quoteContext';
-
-function alignHtmlQuotes(text: string, context: TypografContext): string {
-  if (!/[«„]/u.test(text)) {
-    return text;
-  }
-  let result = '';
-  let cursor = 0;
-  let hasContent = false;
-  let space: number | undefined;
-  // Typograf's hidden-tag labels are inspected through its public safeTags API.
-  const tokens = /\uF000tf\d+\uF000|<span class="typograf-oa-(n-)?lquote">([^<]*)<\/span>|([«„])/gu;
-  for (const match of text.matchAll(tokens)) {
-    const between = text.slice(cursor, match.index);
-    result += between;
-    if (/\n\n[ \u00A0]*$/u.test(between)) {
-      hasContent = false;
-    } else if (/[^\s\uF001]/u.test(between)) {
-      hasContent = true;
-    }
-    if (between) {
-      space = /[ \u00A0\n]$/u.test(between) ? result.length - 1 : undefined;
-    }
-
-    const quote = match[2] ?? match[3];
-    if (quote !== undefined) {
-      if (match[2] !== undefined && !match[1]) {
-        // The stock rule already paired this quote with its preceding space.
-        result += match[0];
-      } else if (hasContent && space !== undefined) {
-        result = `${result.slice(0, space)}<span class="typograf-oa-sp-lquote">${result[space]}</span>${result.slice(space + 1)}`;
-        result += `<span class="typograf-oa-lquote">${quote}</span>`;
-      } else {
-        result += hasContent ? quote : `<span class="typograf-oa-n-lquote">${quote}</span>`;
-      }
-      hasContent = true;
-      space = undefined;
-    } else {
-      const part = { ...context, text: match[0] };
-      for (const group of ['html', 'own', 'url']) {
-        context.safeTags.show(part, group);
-      }
-      const tag = part.text.match(/^<\/?([a-z][\w:-]*)/iu)?.[1]?.toLowerCase();
-      if (tag && TYPOGRAPHY_BLOCK_TAGS.has(tag)) {
-        hasContent = false;
-        space = undefined;
-      } else if (
-        tag !== 'script' &&
-        tag !== 'style' &&
-        ((!tag && !part.text.startsWith('<!--')) ||
-          (tag && (TYPOGRAPHY_SKIP_TAGS.has(tag) || tag === 'img' || tag === 'input')))
-      ) {
-        hasContent = true;
-        space = undefined;
-      }
-      result += match[0];
-    }
-    cursor = match.index + match[0].length;
-  }
-  return result + text.slice(cursor);
-}
-
-if (!Typograf.getRule(QUOTE_CONTEXT_RULE)) {
-  Typograf.addRule({
-    name: QUOTE_CONTEXT_RULE,
-    index: 1011,
-    htmlAttrs: false,
-    // optalign/quote (1010) treats every hidden inline tag as a line start.
-    // Pair such quotes with the preceding space, keeping formatting boundaries.
-    handler: (text, _settings, context) => alignHtmlQuotes(text, context)
-  });
-}
 
 if (!Typograf.getRule(DATE_RANGE_DASH_RULE)) {
   Typograf.addRule({
@@ -174,30 +56,24 @@ if (!Typograf.getRule(DATE_RANGE_DASH_RULE)) {
 if (!Typograf.getRule(DATE_RANGE_HTML_RULE)) {
   Typograf.addRule({
     name: DATE_RANGE_HTML_RULE,
-    // The html group (1210) runs after spaces, dashes, and optalign/quote (1010).
+    // The html group (1210) runs after spaces and dashes.
     htmlAttrs: false,
     handler: (text) => text.replace(DATE_RANGE, '<span class="nowrap-date-range">$&</span>')
   });
   Typograf.addRule({
-    name: 'ru/html/unwrapTypography',
+    name: 'ru/html/unwrapDateRange',
     queue: 'hide-safe-tags-html',
     htmlAttrs: false,
     // Unwrap after protected elements and comments, before ordinary HTML tags.
-    // This also replaces optalign/quote's earlier start-queue cleanup, which
-    // would otherwise remove quote spans from code examples.
-    handler: (text) =>
-      text.replace(
-        /<span class="(?:nowrap-date-range|typograf-oa-(?:n-|sp-)?lquote)">([^<]*)<\/span>/gu,
-        '$1'
-      )
+    handler: (text) => text.replace(/<span class="nowrap-date-range">([^<]*)<\/span>/gu, '$1')
   });
 }
 
 const typograf = new Typograf({
   locale: ['ru', 'en-US'],
   processingSeparateParts: true,
-  enableRule: 'ru/optalign/quote',
-  ruleFilter: (rule) => rule.name !== 'ru/optalign/quote' || rule.queue !== 'start'
+  // Keep the author's link boundaries, matching node-local AST processing.
+  disableRule: 'common/punctuation/quoteLink'
 });
 
 for (const tag of TYPOGRAPHY_SKIP_TAGS) {

@@ -21,6 +21,7 @@
 Выбран отказ от эффекта на всех поверхностях, включая обычные абзацы. Сохранение выравнивания только в заголовках потребовало бы отдельного режима без подтверждённого реального случая; сохранение текущих обходов оставило бы цену поддержки необязательного эффекта.
 
 - В [ядре](/packages/typography/src/index.ts) удалить включение `ru/optalign/quote`, относящийся к его start-очистке фильтр конструктора, `QUOTE_CONTEXT_RULE`, его регистрацию, `alignHtmlQuotes`, импорт `TypografContext` и `TYPOGRAPHY_BLOCK_TAGS`.
+- Для сохранения границ ссылок отключить штатное `common/punctuation/quoteLink`: без optalign-обёртки оно выносит кавычки из `<a>«текст»</a>`, тогда как AST-пути сохраняют их внутри ссылки. Это обнаружил существующий тест согласованности HTML и AST; достаточно настройки одного Typograf.
 - В [AST-адаптерах](/packages/markdown/src/typography.ts) удалить `alignTreeQuotes`, его вызов после rehype-обхода, Satteri `after` и ставшие мёртвыми импорты. Удалить [typography.types.ts](/packages/markdown/src/typography.types.ts), который содержит только `TypographyNodeReplacement`.
 - Удалить классы `typograf-oa-*` из `TYPOGRAPHY_WRAPPER_CLASSES`, очистки сгенерированных обёрток и [global.css](/apps/www/src/styles/global.css). Сохранить распознавание `nowrap-date-range` и узкую очистку его обёртки для повторного HTML-прохода в очереди после защиты кода, комментариев и атрибутов.
 

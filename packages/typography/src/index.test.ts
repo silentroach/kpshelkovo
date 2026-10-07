@@ -15,7 +15,7 @@ const dom = (html: string): HTMLDivElement => {
 
 describe('typography output contracts', () => {
   it('keeps ordinary typography in text output without HTML wrappers', () => {
-    const output = formatText('«8-10 октября» в Шелково Ривер, Приложение №1');
+    const output = formatText('"8-10 октября" в Шелково Ривер, Приложение №1');
     expect(showNbsp(output)).toMatchInlineSnapshot(
       `"«8–10·октября» в·Шелково·Ривер, Приложение·№·1"`
     );
@@ -41,17 +41,16 @@ describe('typography output contracts', () => {
     expect(element.querySelector('img')).toBeNull();
     expect(element.querySelectorAll('span.nowrap-date-range')).toHaveLength(1);
     expect(showNbsp(element.innerHTML)).toMatchInlineSnapshot(
-      `"&lt;img src=x onerror="alert(1)"&gt;<span class="typograf-oa-sp-lquote"> </span><span class="typograf-oa-lquote">«</span><span class="nowrap-date-range">8–10&nbsp;октября</span>» &amp;quot;"`
+      `"&lt;img src=x onerror="alert(1)"&gt; «<span class="nowrap-date-range">8–10&nbsp;октября</span>» &amp;quot;"`
     );
     expect(element.textContent).not.toMatch(/[\u2060\u200B\uFEFF]/u);
   });
 
   it('keeps literal typography-class tags as text rather than normalizing them as output', () => {
-    const source =
-      '<span class="nowrap-date-range">8-10 октября</span><span class="typograf-oa-n-lquote">«</span>';
+    const source = '<span class="nowrap-date-range">8-10 октября</span>';
     const html = formatTextHtml(source);
     expect(showNbsp(dom(html).textContent)).toMatchInlineSnapshot(
-      `"<span class="nowrap-date-range">8–10·октября</span><span class="typograf-oa-n-lquote">«</span>"`
+      `"<span class="nowrap-date-range">8–10·октября</span>"`
     );
     expect(dom(html).textContent).toBe(formatText(source));
     expect(dom(html).querySelectorAll('.nowrap-date-range')).toHaveLength(1);
@@ -103,13 +102,12 @@ describe('typography output contracts', () => {
     );
   });
 
-  it('applies only hanging quotes together with dates, and stays idempotent', () => {
-    const html = formatDynamicHtml('<p>Программа «8-10 октября» (день, вечер).</p>');
+  it('formats ordinary quotes and dates, and stays idempotent', () => {
+    const html = formatDynamicHtml('<p>Программа "8-10 октября" (день, вечер).</p>');
     expect(showNbsp(html)).toMatchInlineSnapshot(
-      `"<p>Программа<span class="typograf-oa-sp-lquote"> </span><span class="typograf-oa-lquote">«</span><span class="nowrap-date-range">8–10·октября</span>» (день, вечер).</p>"`
+      `"<p>Программа «<span class="nowrap-date-range">8–10·октября</span>» (день, вечер).</p>"`
     );
     expect(formatDynamicHtml(html)).toBe(html);
-    expect(html).not.toMatch(/typograf-oa-(?:.*bracket|comma)/u);
     expect(dom(html).textContent).toBe(formatText('Программа «8-10 октября» (день, вечер).'));
   });
 
@@ -140,18 +138,15 @@ describe('typography output contracts', () => {
     expect(formatDynamicHtml(formatDynamicHtml(html))).toBe(formatDynamicHtml(html));
   });
 
-  it.each(['nowrap-date-range', 'typograf-oa-n-lquote'])(
-    'preserves literal %s markup inside attributes during cleanup',
-    (className) => {
-      const attribute = `<span class="${className}">8-10 октября</span>`;
-      const openingTag = `<a title='${attribute}' data-note="дата > 8-10 октября">`;
-      const html = formatDynamicHtml(`${openingTag}«8-10 октября»</a>`);
-      expect(html).toContain(openingTag);
-      expect(dom(html).querySelector('a')?.getAttribute('title')).toBe(attribute);
-      expect(dom(html).querySelectorAll('.nowrap-date-range')).toHaveLength(1);
-      expect(formatDynamicHtml(html)).toBe(html);
-    }
-  );
+  it('preserves literal date markup inside attributes during cleanup', () => {
+    const attribute = '<span class="nowrap-date-range">8-10 октября</span>';
+    const openingTag = `<a title='${attribute}' data-note="дата > 8-10 октября">`;
+    const html = formatDynamicHtml(`${openingTag}«8-10 октября»</a>`);
+    expect(html).toContain(openingTag);
+    expect(dom(html).querySelector('a')?.getAttribute('title')).toBe(attribute);
+    expect(dom(html).querySelectorAll('.nowrap-date-range')).toHaveLength(1);
+    expect(formatDynamicHtml(html)).toBe(html);
+  });
 
   it.each(['code', 'kbd', 'math', 'object', 'pre', 'samp', 'script', 'style', 'textarea', 'var'])(
     'leaves protected <%s> content untouched',
@@ -162,8 +157,7 @@ describe('typography output contracts', () => {
   );
 
   it('preserves existing typography markup inside protected HTML', () => {
-    const content =
-      '<span class="typograf-oa-n-lquote">«</span><span class="nowrap-date-range">8–10\u00A0октября</span>»';
+    const content = '«<span class="nowrap-date-range">8–10\u00A0октября</span>»';
     const html = `<code>${content}</code><!--${content}-->`;
     expect(formatDynamicHtml(html)).toBe(html);
   });

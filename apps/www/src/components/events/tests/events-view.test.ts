@@ -76,7 +76,7 @@ describe('event cards', () => {
       {
         "literalElements": 0,
         "location": "«11–13 октября» <strong>текст</strong> &amp;",
-        "quote": true,
+        "quote": false,
         "title": "«8–10 октября» <em>текст</em> &amp;",
         "titleRange": "8–10 октября",
       }
