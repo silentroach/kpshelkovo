@@ -92,13 +92,6 @@
       "skillPath": "skills/performance/SKILL.md",
       "computedHash": "ce9d36f139a1b2a6a8ac2cb222698963b8076d2dd8b41685e8e8ae589cdcf1e4"
     },
-    "ponytail": {
-      "source": "dietrichgebert/ponytail",
-      "ref": "926589fcfdf3e04a3a9608f7d9d415e09af41b23",
-      "sourceType": "github",
-      "skillPath": "skills/ponytail/SKILL.md",
-      "computedHash": "210fa0831f649ce9f8a305f7b7c8cf2a0dd09ac4dd53067109941b96e7811d4e"
-    },
     "ponytail-audit": {
       "source": "dietrichgebert/ponytail",
       "ref": "926589fcfdf3e04a3a9608f7d9d415e09af41b23",
