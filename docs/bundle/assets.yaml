@@ -3,9 +3,9 @@
   brotli: 593
   gzip: 700
 - file: static/BaseLayout.XXXXXXXX.css
-  bytes: 51117
-  brotli: 8316
-  gzip: 9347
+  bytes: 50971
+  brotli: 8276
+  gzip: 9304
 - file: static/BaseLayout.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 11427
   brotli: 3688

@@ -18,7 +18,7 @@ Markdown на сайте объединяет универсальную обр�
 
 ## Решение
 
-- `@shelkovo/markdown` отвечает за универсальный Markdown-to-HTML pipeline и безопасный вывод, извлечение текста, генерацию Markdown и AST-адаптеры `rehypeTypograf`/`satteriTypograf`, включая коррекцию контекста дерева.
+- `@shelkovo/markdown` отвечает за универсальный Markdown-to-HTML pipeline и безопасный вывод, извлечение текста, генерацию Markdown и AST-адаптеры `rehypeTypograf`/`satteriTypograf`.
 - `@shelkovo/typography` владеет строковыми API и единственной регистрацией общих правил Typograf. Его корневой вход пригоден для клиента и сервера, не зависит от Markdown, Satteri и приложения. Markdown-адаптеры используют это ядро и его общие определения; направление зависимости — `markdown → typography`.
 - Приложение выбирает места применения типографики и владеет CSS сгенерированных обёрток по [ADR-034](/docs/decisions/034-native-css-architecture.md).
 - Body markdown сайта проходит через одну обёртку приложения. Она объединяет доменную предобработку и вызов пакетного рендера; подготовка текста для mentions/backlinks использует тот же слой.

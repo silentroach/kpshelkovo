@@ -292,7 +292,7 @@ ${list}
         [
           {
             "literalElements": 0,
-            "quote": true,
+            "quote": false,
             "ranges": [
               "8–10 октября",
             ],
@@ -300,7 +300,7 @@ ${list}
           },
           {
             "literalElements": 0,
-            "quote": true,
+            "quote": false,
             "ranges": [
               "8–10 октября",
             ],
