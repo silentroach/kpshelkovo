@@ -436,7 +436,7 @@ static/page.XXXXXXXX.js:
     rendered: 53
 static/parcel-layer.XXXXXXXX.js:
   apps/www/src/components/places/parcel-layer.ts:
-    rendered: 5315
+    rendered: 5530
 static/prefetch.XXXXXXXX.js:
   node_modules/.pnpm/astro@7.3.5_@types+node@26.5.0_yaml@2.9.1/node_modules/astro/dist/prefetch/index.js:
     rendered: 5009
