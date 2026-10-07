@@ -9,7 +9,6 @@ import {
   createMarkdownDocument,
   extractFirstMarkdownText,
   extractMarkdownText,
-  formatDynamicHtml,
   md,
   parseMarkdownFragment,
   rehypeTypograf,
@@ -195,19 +194,6 @@ describe('@shelkovo/markdown', () => {
       !\\[alt]\\(bad)
       "
     `);
-  });
-
-  it('formats dynamic HTML with project typography rules', () => {
-    expect(formatDynamicHtml('Шелково Ривер')).toBe('Шелково\u00A0Ривер');
-    expect(formatDynamicHtml('<p>Шелково Парк</p>')).toBe('<p>Шелково\u00A0Парк</p>');
-    expect(formatDynamicHtml('Новости Шелково')).toBe('Новости Шелково');
-  });
-
-  it('keeps a word before a number sign and its number on the same line', () => {
-    expect(showNbsp(formatDynamicHtml('в Приложении №1'))).toMatchInlineSnapshot(
-      `"в·Приложении·№·1"`
-    );
-    expect(showNbsp(formatDynamicHtml('п. № 1'))).toMatchInlineSnapshot(`"п.·№·1"`);
   });
 
   it('formats Satteri HTML text with project typography rules', async () => {

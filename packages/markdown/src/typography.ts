@@ -1,12 +1,12 @@
-import { htmlToHast, type HastContent, type HastNode, type HastPluginDefinition } from 'satteri';
-
-import type { HtmlTreeNode } from './html-tree.types';
 import {
   formatTextHtml,
   TYPOGRAPHY_BLOCK_TAGS,
   TYPOGRAPHY_SKIP_TAGS,
   TYPOGRAPHY_WRAPPER_CLASSES
-} from './typography-core';
+} from '@shelkovo/typography';
+import { htmlToHast, type HastContent, type HastNode, type HastPluginDefinition } from 'satteri';
+
+import type { HtmlTreeNode } from './html-tree.types';
 import type { TypographyNodeReplacement } from './typography.types';
 
 const classesOf = (node: HtmlTreeNode): readonly unknown[] => {

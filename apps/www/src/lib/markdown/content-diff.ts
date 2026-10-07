@@ -1,4 +1,4 @@
-import { formatDynamicHtml, formatText, formatTextHtml } from '@shelkovo/markdown';
+import { formatDynamicHtml, formatText, formatTextHtml } from '@shelkovo/typography';
 import {
   diffLines,
   diffWords,
