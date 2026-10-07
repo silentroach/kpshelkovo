@@ -4,6 +4,53 @@ import { polygonLabelCoordinates } from './polygon-label';
 import type { PolygonGeometry } from './types';
 
 describe('polygon label position', () => {
+  it('unions a readonly array of Polygon and MultiPolygon without changing the input', () => {
+    const geometries: readonly PolygonGeometry[] = [
+      {
+        type: 'MultiPolygon',
+        coordinates: [
+          [
+            [
+              [0.004, 0],
+              [0.0045, 0],
+              [0.0045, 0.0005],
+              [0.004, 0.0005],
+              [0.004, 0]
+            ]
+          ],
+          [
+            [
+              [0, 0],
+              [0.001, 0],
+              [0.001, 0.002],
+              [0, 0.002],
+              [0, 0]
+            ]
+          ]
+        ]
+      },
+      {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [0.001, 0],
+            [0.002, 0],
+            [0.002, 0.002],
+            [0.001, 0.002],
+            [0.001, 0]
+          ]
+        ]
+      }
+    ];
+    const source = JSON.stringify(geometries);
+    const [lng, lat] = polygonLabelCoordinates(geometries);
+
+    expect(lng).toBeCloseTo(0.001, 8);
+    expect(lat).toBeCloseTo(0.001, 8);
+    expect(JSON.stringify(geometries)).toBe(source);
+    expect(() => polygonLabelCoordinates([])).toThrow('Polygon has no interior label position');
+  });
+
   it('places the label inside a concave polygon instead of its bounding-box centre', () => {
     const geometry: PolygonGeometry = {
       type: 'Polygon',

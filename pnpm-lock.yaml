@@ -293,9 +293,6 @@ importers:
       parse5:
         specifier: ^8.0.1
         version: 8.0.1
-      polyclip-ts:
-        specifier: 0.16.8
-        version: 0.16.8
       svelte:
         specifier: ^5.57.1
         version: 5.57.1
@@ -376,6 +373,9 @@ importers:
       '@turf/distance':
         specifier: ^7.4.0
         version: 7.4.0
+      polyclip-ts:
+        specifier: 0.16.8
+        version: 0.16.8
       polylabel:
         specifier: ^2.1.0
         version: 2.1.0

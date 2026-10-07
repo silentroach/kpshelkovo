@@ -1,5 +1,4 @@
 import { createDisplayOffset, polygonLabelCoordinates } from '@shelkovo/geo';
-import { union } from 'polyclip-ts';
 import { parse as parseYaml } from 'yaml';
 import { z } from 'zod';
 
@@ -43,16 +42,9 @@ export const buildParcelMapPayload = (
 
   return parcels.map((parcel) => {
     const geometry = mapGeometry(parcel);
-    const labelGeometry: ParcelGeometry =
-      parcel.cadastralParts.length > 1 && geometry.type === 'MultiPolygon'
-        ? {
-            type: 'MultiPolygon',
-            coordinates: union(
-              geometry.coordinates.map((polygon) =>
-                polygon.map((ring) => ring.map(([lng, lat]): [number, number] => [lng, lat]))
-              )
-            )
-          }
+    const labelGeometry =
+      parcel.cadastralParts.length > 1
+        ? parcel.cadastralParts.map(({ geometry }) => geometry)
         : geometry;
     const result = ParcelMapPublicSchema.element.safeParse({
       code: parcel.code,
