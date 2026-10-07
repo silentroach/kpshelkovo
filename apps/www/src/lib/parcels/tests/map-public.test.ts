@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { buildParcelMapPayload, splitParcelMapPayload } from '../map-public';
 import { ParcelMapPublicSchema } from '../map-public-schema';
 import { PARCEL_PARTS, type ParcelPart } from '../schema';
-import type { Parcel } from '../types';
+import type { Parcel, ParcelPolygon } from '../types';
 
 const parcel: Parcel = {
   code: 'SHR-L43',
@@ -43,7 +43,104 @@ const parcel: Parcel = {
   body: 'Редакционная заметка'
 };
 
+const rectangle = (west: number, south: number, east: number, north: number): ParcelPolygon => [
+  [
+    [west, south],
+    [east, south],
+    [east, north],
+    [west, north],
+    [west, south]
+  ]
+];
+const adjacentPolygons = [rectangle(0, 0, 0.001, 0.002), rectangle(0.001, 0, 0.002, 0.002)];
+const compound: Parcel = {
+  ...parcel,
+  cadastralParts: adjacentPolygons.map((coordinates, index) => ({
+    cadastralNumber: `50:33:0000000:${43 + index}`,
+    geometry: { type: 'Polygon', coordinates }
+  }))
+};
+
 describe('parcel public payloads', () => {
+  it.each([{ aliases: [] }, { aliases: ['SHR-L44'] }])(
+    'places the common label on the internal seam with aliases $aliases',
+    ({ aliases }) => {
+      const [result] = buildParcelMapPayload([{ ...compound, aliases }], {
+        offset_east_m: 0,
+        offset_north_m: 0
+      });
+
+      expect(result?.labelCoordinates).toEqual([0.001, 0.001]);
+      expect(result?.geometry).toEqual({ type: 'MultiPolygon', coordinates: adjacentPolygons });
+    }
+  );
+
+  it('keeps the per-polygon label for one cadastral MultiPolygon with an alias', () => {
+    const geometry = { type: 'MultiPolygon' as const, coordinates: adjacentPolygons };
+    const [result] = buildParcelMapPayload(
+      [{ ...parcel, cadastralParts: [{ cadastralNumber: '50:33:0000000:43', geometry }] }],
+      { offset_east_m: 0, offset_north_m: 0 }
+    );
+
+    expect(result?.labelCoordinates[0]).toBeCloseTo(0.0005, 8);
+    expect(result?.geometry).toEqual(geometry);
+    expect(result).not.toHaveProperty('multipleCadastralParcels');
+  });
+
+  it('keeps the common label outside a hole in the combined territory', () => {
+    const polygons: readonly ParcelPolygon[] = [
+      [rectangle(0, 0, 0.006, 0.006)[0]!, rectangle(0.002, 0.002, 0.004, 0.004)[0]!],
+      rectangle(0.006, 0, 0.007, 0.006)
+    ];
+    const [result] = buildParcelMapPayload(
+      [
+        {
+          ...compound,
+          cadastralParts: compound.cadastralParts.map((part, index) => ({
+            ...part,
+            geometry: { type: 'Polygon', coordinates: polygons[index]! }
+          }))
+        }
+      ],
+      { offset_east_m: 0, offset_north_m: 0 }
+    );
+    if (!result) throw new Error('parcel missing');
+    const [lng, lat] = result.labelCoordinates;
+
+    expect(lng > 0 && lng < 0.007 && lat > 0 && lat < 0.006).toBe(true);
+    expect(lng < 0.002 || lng > 0.004 || lat < 0.002 || lat > 0.004).toBe(true);
+    expect(result.geometry).toEqual({ type: 'MultiPolygon', coordinates: polygons });
+  });
+
+  it('considers every polygon of a cadastral part without bridging disconnected parts', () => {
+    const separatePolygons = [rectangle(0, 0, 0.001, 0.001), rectangle(0.004, 0, 0.006, 0.002)];
+    const lastPolygon = rectangle(0.01, 0, 0.0105, 0.0005);
+    const [result] = buildParcelMapPayload(
+      [
+        {
+          ...compound,
+          cadastralParts: [
+            {
+              cadastralNumber: '50:33:0000000:43',
+              geometry: { type: 'MultiPolygon', coordinates: separatePolygons }
+            },
+            {
+              cadastralNumber: '50:33:0000000:44',
+              geometry: { type: 'Polygon', coordinates: lastPolygon }
+            }
+          ]
+        }
+      ],
+      { offset_east_m: 0, offset_north_m: 0 }
+    );
+
+    expect(result?.labelCoordinates).toEqual([0.005, 0.001]);
+    expect(result?.geometry).toEqual({
+      type: 'MultiPolygon',
+      coordinates: [...separatePolygons, lastPolygon]
+    });
+  });
+
   it('splits one prepared payload into four validated parts without changing or duplicating geometry', () => {
     const parcels: Parcel[] = PARCEL_PARTS.map((part, index) => ({
       ...parcel,
@@ -142,37 +239,40 @@ describe('parcel public payloads', () => {
     `);
   });
 
-  it('shifts all rings and the label together from source coordinates without changing the source', () => {
-    const source = JSON.stringify(parcel);
-    const unchanged = buildParcelMapPayload([parcel], { offset_east_m: 0, offset_north_m: 0 });
-    const shifted = buildParcelMapPayload([parcel], { offset_east_m: 5.2, offset_north_m: 3.3 });
-    const again = buildParcelMapPayload([parcel], { offset_east_m: 5.2, offset_north_m: 3.3 });
-    expect(shifted).toEqual(again);
-    expect(JSON.stringify(parcel)).toBe(source);
-    expect(parcel.areaM2).toBe(1500);
-    expect(shifted[0]?.geometry.type).toBe('MultiPolygon');
-    const original = unchanged[0]?.geometry;
-    const moved = shifted[0]?.geometry;
-    if (original?.type !== 'MultiPolygon' || moved?.type !== 'MultiPolygon')
-      throw new Error('MultiPolygon missing');
-    expect(moved.coordinates.map((polygon) => polygon.map((ring) => ring.length))).toEqual(
-      original.coordinates.map((polygon) => polygon.map((ring) => ring.length))
-    );
-    const a = original.coordinates[0]?.[0]?.[0];
-    const b = moved.coordinates[0]?.[0]?.[0];
-    const labelA = unchanged[0]?.labelCoordinates;
-    const labelB = shifted[0]?.labelCoordinates;
-    if (!a || !b || !labelA || !labelB) throw new Error('coordinates missing');
-    const [vertexX, vertexY] = toWebMercator(b);
-    const [sourceX, sourceY] = toWebMercator(a);
-    const [labelX, labelY] = toWebMercator(labelB);
-    const [sourceLabelX, sourceLabelY] = toWebMercator(labelA);
-    expect(vertexX - sourceX).toBeCloseTo(labelX - sourceLabelX, 2);
-    expect(vertexY - sourceY).toBeCloseTo(labelY - sourceLabelY, 2);
-    expect(b[0]).toBeGreaterThan(a[0]);
-    expect(b[1]).toBeGreaterThan(a[1]);
-    expect(JSON.stringify(shifted)).not.toMatch(/\d+\.\d{9}/);
-  });
+  it.each([parcel, compound])(
+    'shifts all rings and the label together without changing the source (%#)',
+    (input) => {
+      const source = JSON.stringify(input);
+      const unchanged = buildParcelMapPayload([input], { offset_east_m: 0, offset_north_m: 0 });
+      const shifted = buildParcelMapPayload([input], { offset_east_m: 5.2, offset_north_m: 3.3 });
+      const again = buildParcelMapPayload([input], { offset_east_m: 5.2, offset_north_m: 3.3 });
+      expect(shifted).toEqual(again);
+      expect(JSON.stringify(input)).toBe(source);
+      expect(input.areaM2).toBe(1500);
+      expect(shifted[0]?.geometry.type).toBe('MultiPolygon');
+      const original = unchanged[0]?.geometry;
+      const moved = shifted[0]?.geometry;
+      if (original?.type !== 'MultiPolygon' || moved?.type !== 'MultiPolygon')
+        throw new Error('MultiPolygon missing');
+      expect(moved.coordinates.map((polygon) => polygon.map((ring) => ring.length))).toEqual(
+        original.coordinates.map((polygon) => polygon.map((ring) => ring.length))
+      );
+      const a = original.coordinates[0]?.[0]?.[0];
+      const b = moved.coordinates[0]?.[0]?.[0];
+      const labelA = unchanged[0]?.labelCoordinates;
+      const labelB = shifted[0]?.labelCoordinates;
+      if (!a || !b || !labelA || !labelB) throw new Error('coordinates missing');
+      const [vertexX, vertexY] = toWebMercator(b);
+      const [sourceX, sourceY] = toWebMercator(a);
+      const [labelX, labelY] = toWebMercator(labelB);
+      const [sourceLabelX, sourceLabelY] = toWebMercator(labelA);
+      expect(vertexX - sourceX).toBeCloseTo(labelX - sourceLabelX, 2);
+      expect(vertexY - sourceY).toBeCloseTo(labelY - sourceLabelY, 2);
+      expect(b[0]).toBeGreaterThan(a[0]);
+      expect(b[1]).toBeGreaterThan(a[1]);
+      expect(JSON.stringify(shifted)).not.toMatch(/\d+\.\d{9}/);
+    }
+  );
 
   it('limits both contour and label after shifting without changing precise source or offset settings', () => {
     const precise: Parcel = {

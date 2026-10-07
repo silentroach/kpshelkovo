@@ -42,6 +42,10 @@ export const buildParcelMapPayload = (
 
   return parcels.map((parcel) => {
     const geometry = mapGeometry(parcel);
+    const labelGeometry =
+      parcel.cadastralParts.length > 1
+        ? parcel.cadastralParts.map(({ geometry }) => geometry)
+        : geometry;
     const result = ParcelMapPublicSchema.element.safeParse({
       code: parcel.code,
       ...(parcel.aliases.length ? { aliases: parcel.aliases } : {}),
@@ -62,7 +66,7 @@ export const buildParcelMapPayload = (
                 polygon.map((ring) => ring.map((position) => roundPosition(shift(position))))
               )
             },
-      labelCoordinates: roundPosition(shift(polygonLabelCoordinates(geometry)))
+      labelCoordinates: roundPosition(shift(polygonLabelCoordinates(labelGeometry)))
     });
     if (!result.success) {
       throw new Error(`invalid public geometry for parcel ${parcel.code}: ${result.error.message}`);
