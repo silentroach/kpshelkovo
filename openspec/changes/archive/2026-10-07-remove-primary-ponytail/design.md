@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация и границы — в [proposal](/openspec/changes/remove-primary-ponytail/proposal.md). Основной `ponytail` подключается через правило `/AGENTS.md` и широкий `description` установленного skill. [OpenCode V2](https://opencode.ai/v2/docs/skills) обнаруживает `/.agents/skills/` и показывает модели описания доступных skills.
+Мотивация и границы — в [proposal](/openspec/changes/archive/2026-10-07-remove-primary-ponytail/proposal.md). Основной `ponytail` подключается через правило `/AGENTS.md` и широкий `description` установленного skill. [OpenCode V2](https://opencode.ai/v2/docs/skills) обнаруживает `/.agents/skills/` и показывает модели описания доступных skills.
 
 `/scripts/skills.mjs` восстанавливает внешний набор по `/skills-lock.json` и до установки отклоняет неизвестные каталоги. `/.opencode/agents/reviewer.md` уже задаёт два прохода; внешний `ponytail-review` предлагает также `shrink` и итог по числу удалённых строк. [ADR-038](/docs/decisions/038-openspec-development-workflow.md) закрепляет исходные upstream-skills без проектных patches.
 
