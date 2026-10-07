@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация и объём — в [proposal](/openspec/changes/add-opencode-advisor/proposal.md). Корневой `AGENTS.md` уже требует согласовывать крупные обходы с владельцем. Профиль [reviewer](/.opencode/agents/reviewer.md) даёт образец технического запрета `edit` при широких исследовательских инструментах; он оценивает готовый diff.
+Мотивация и объём — в [proposal](/openspec/changes/archive/2026-10-07-add-opencode-advisor/proposal.md). Корневой `AGENTS.md` уже требует согласовывать крупные обходы с владельцем. Профиль [reviewer](/.opencode/agents/reviewer.md) даёт образец технического запрета `edit` при широких исследовательских инструментах; он оценивает готовый diff.
 
 [ADR-038](/docs/decisions/038-openspec-development-workflow.md) задаёт единый процесс и хранение проектных дополнений отдельно от upstream. Новый профиль укладывается в это решение. `openspec/config.yaml` доставляет context во все стадии и guidance исполнителю; генератор не требует изменений. Существующий workflow `Agent tooling` уже охватывает все затронутые пути.
 
