@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация — в [proposal](/openspec/changes/disable-hanging-quotes/proposal.md#why). Короткий дизайн нужен, поскольку удаление пересекает строковое ядро, два AST-адаптера, CSS приложения и защитные тесты.
+Мотивация — в [proposal](/openspec/changes/archive/2026-10-07-disable-hanging-quotes/proposal.md#why). Короткий дизайн нужен, поскольку удаление пересекает строковое ядро, два AST-адаптера, CSS приложения и защитные тесты.
 
 - Основная сессия проверила исходники и все готовые `dist/www/**/*.html` через parse5: 370 страниц, 3213 элементов `h1`–`h6`, 0 заголовков с начальной кавычкой `«`, `„`, `“`, `"`, `'` или `‘`. В исходниках такие заголовки найдены только в тестах. Это разовое свидетельство для решения, а не требование к будущему контенту.
 - В строковом ядре включено `ru/optalign/quote`; `ru/html/quoteContext` исправляет контекст скрытых HTML-тегов через `alignHtmlQuotes`. AST-адаптеры повторяют коррекцию в `alignTreeQuotes`. Реальный случай — цитата внутри `strong` и ссылка внутри абзаца на `/news/2026/08/guest-passes-disputed-debt/`; прежняя приёмка зафиксирована в [отчёте](/docs/research/date-range-typography-2026-10-07/README.md).
@@ -22,7 +22,7 @@
 
 - В [ядре](/packages/typography/src/index.ts) удалить включение `ru/optalign/quote`, относящийся к его start-очистке фильтр конструктора, `QUOTE_CONTEXT_RULE`, его регистрацию, `alignHtmlQuotes`, импорт `TypografContext` и `TYPOGRAPHY_BLOCK_TAGS`.
 - Для сохранения границ ссылок отключить штатное `common/punctuation/quoteLink`: без optalign-обёртки оно выносит кавычки из `<a>«текст»</a>`, тогда как AST-пути сохраняют их внутри ссылки. Это обнаружил существующий тест согласованности HTML и AST; достаточно настройки одного Typograf.
-- В [AST-адаптерах](/packages/markdown/src/typography.ts) удалить `alignTreeQuotes`, его вызов после rehype-обхода, Satteri `after` и ставшие мёртвыми импорты. Удалить [typography.types.ts](/packages/markdown/src/typography.types.ts), который содержит только `TypographyNodeReplacement`.
+- В [AST-адаптерах](/packages/markdown/src/typography.ts) удалить `alignTreeQuotes`, его вызов после rehype-обхода, Satteri `after` и ставшие мёртвыми импорты. Удалить `/packages/markdown/src/typography.types.ts`, который содержит только `TypographyNodeReplacement`.
 - Удалить классы `typograf-oa-*` из `TYPOGRAPHY_WRAPPER_CLASSES`, очистки сгенерированных обёрток и [global.css](/apps/www/src/styles/global.css). Сохранить распознавание `nowrap-date-range` и узкую очистку его обёртки для повторного HTML-прохода в очереди после защиты кода, комментариев и атрибутов.
 
 ### Безопасность и даты остаются отдельной обязанностью
