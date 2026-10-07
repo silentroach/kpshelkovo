@@ -1,7 +1,7 @@
 ---
 import { CalendarPlusIcon, MapPinIcon } from '@shelkovo/ui/icons';
 import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
-import { formatDynamicHtml } from '@shelkovo/markdown';
+import { formatTextHtml } from '@shelkovo/markdown';
 import MapCardShell from '@/components/MapCardShell.astro';
 import { toPublicEventCoordinates } from '@/lib/events/public-coordinates';
 import {
@@ -50,12 +50,16 @@ const titleId = newsSlug
         <time
           datetime={event.startsIso}
           data-status={event.status === 'cancelled' ? event.status : undefined}
-          aria-label={event.status === 'cancelled'
-            ? `${EVENT_STATUS_LABELS.cancelled}: ${formatEventRange(event)}`
-            : undefined}
-          title={event.status === 'cancelled'
-            ? EVENT_STATUS_LABELS.cancelled
-            : undefined}
+          aria-label={
+            event.status === 'cancelled'
+              ? `${EVENT_STATUS_LABELS.cancelled}: ${formatEventRange(event)}`
+              : undefined
+          }
+          title={
+            event.status === 'cancelled'
+              ? EVENT_STATUS_LABELS.cancelled
+              : undefined
+          }
         >
           <span class="news-event-day">{eventDay}</span>{' '}
           <span class="news-event-month">{eventMonth}</span>
@@ -66,13 +70,11 @@ const titleId = newsSlug
         class="news-event-title"
         data-pagefind-ignore={newsSlug ? undefined : 'all'}
       >
-        {
-          newsSlug ? (
-            <a href={event.url} set:html={formatDynamicHtml(event.title)} />
-          ) : (
-            <Fragment set:html={formatDynamicHtml(event.title)} />
-          )
-        }
+        {newsSlug ? (
+          <a href={event.url} set:html={formatTextHtml(event.title)} />
+        ) : (
+          <Fragment set:html={formatTextHtml(event.title)} />
+        )}
       </h2>
       <ul class="news-event-meta">
         <li>
@@ -84,93 +86,82 @@ const titleId = newsSlug
             stroke-width="1.8"
             stroke-linecap="round"
             aria-hidden="true"
-            ><circle cx="12" cy="12" r="8.25"></circle><path
-              d="M12 7.75v4.75l3 1.75"></path></svg
           >
-          <span>{formatDynamicHtml(eventRange)}</span>
+            <circle cx="12" cy="12" r="8.25"></circle>
+            <path d="M12 7.75v4.75l3 1.75"></path>
+          </svg>
+          <span set:html={formatTextHtml(eventRange)} />
         </li>
         <li>
           <MapPinIcon class="news-event-icon" />
           <span>
-            {
-              event.place ? (
-                <a
-                  href={event.place.url}
-                  class="site-text-link"
-                  set:html={formatDynamicHtml(event.place.name)}
-                />
-              ) : (
-                <span
-                  set:html={formatDynamicHtml(
-                    event.location ??
-                      (event.coordinates
-                        ? 'Место на карте'
-                        : 'Место уточняется'),
-                  )}
-                />
-              )
-            }
-            {
-              event.locationDetails && (
-                <span
-                  set:html={formatDynamicHtml(`, ${event.locationDetails}`)}
-                />
-              )
-            }
+            {event.place ? (
+              <a
+                href={event.place.url}
+                class="site-text-link"
+                set:html={formatTextHtml(event.place.name)}
+              />
+            ) : (
+              <span
+                set:html={formatTextHtml(
+                  event.location ??
+                    (event.coordinates ? 'Место на карте' : 'Место уточняется'),
+                )}
+              />
+            )}
+            {event.locationDetails && (
+              <span set:html={formatTextHtml(`, ${event.locationDetails}`)} />
+            )}
           </span>
         </li>
       </ul>
-      {
-        event.status === 'conditional' && (
-          <p>
-            <strong data-status={event.status}>
-              {EVENT_STATUS_LABELS[event.status]}
-            </strong>
-          </p>
-        )
-      }
-      {
-        (calendarUrl || mapActionUrl) && (
-          <div class="news-event-actions" data-pagefind-ignore>
-            {calendarUrl && (
-              <ResourceLink
-                href={calendarUrl}
-                download={`${newsSlug}.ics`}
-                class="news-event-action news-event-action--calendar"
-                aria-label="Добавить в календарь"
-                title="Добавить в календарь"
+      {event.status === 'conditional' && (
+        <p>
+          <strong data-status={event.status}>
+            {EVENT_STATUS_LABELS[event.status]}
+          </strong>
+        </p>
+      )}
+      {(calendarUrl || mapActionUrl) && (
+        <div class="news-event-actions" data-pagefind-ignore>
+          {calendarUrl && (
+            <ResourceLink
+              href={calendarUrl}
+              download={`${newsSlug}.ics`}
+              class="news-event-action news-event-action--calendar"
+              aria-label="Добавить в календарь"
+              title="Добавить в календарь"
+            >
+              <CalendarPlusIcon class="news-event-icon news-event-icon--calendar" />
+            </ResourceLink>
+          )}
+          {mapActionUrl && (
+            <a
+              href={mapActionUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+              class="news-event-action"
+              aria-label="Открыть на Яндекс Картах"
+              title="Открыть на Яндекс Картах"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                class="news-event-icon"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
               >
-                <CalendarPlusIcon class="news-event-icon news-event-icon--calendar" />
-              </ResourceLink>
-            )}
-            {mapActionUrl && (
-              <a
-                href={mapActionUrl}
-                target="_blank"
-                rel="noreferrer noopener"
-                class="news-event-action"
-                aria-label="Открыть на Яндекс Картах"
-                title="Открыть на Яндекс Картах"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  class="news-event-icon"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M19 10.2c0 5.1-7 10.05-7 10.05s-7-4.95-7-10.05a7 7 0 1 1 14 0Z" />
-                  <circle cx="12" cy="10.2" r="2.35" />
-                </svg>
-              </a>
-            )}
-          </div>
-        )
-      }
+                <path d="M19 10.2c0 5.1-7 10.05-7 10.05s-7-4.95-7-10.05a7 7 0 1 1 14 0Z" />
+                <circle cx="12" cy="10.2" r="2.35" />
+              </svg>
+            </a>
+          )}
+        </div>
+      )}
     </div>
   </MapCardShell>
 </aside>

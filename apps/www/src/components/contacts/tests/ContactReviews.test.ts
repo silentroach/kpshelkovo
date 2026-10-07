@@ -88,7 +88,7 @@ describe('ContactReviews', () => {
       })
     ).toMatchInlineSnapshot(`
       {
-        "html": "<p>Помог с <strong>электричеством</strong> в&nbsp;«Шелково&nbsp;Парк».</p>",
+        "html": "<p>Помог с <strong>электричеством</strong> в<span class="typograf-oa-sp-lquote">&nbsp;</span><span class="typograf-oa-lquote">«</span>Шелково&nbsp;Парк».</p>",
         "scripts": 0,
         "text": "Помог с электричеством в·«Шелково·Парк».",
       }

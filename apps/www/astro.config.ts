@@ -1,3 +1,4 @@
+import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { constants } from 'node:zlib';
 
@@ -80,6 +81,20 @@ export default defineConfig({
   publicDir: 'public',
   vite: {
     envDir: '../..',
+    plugins: [
+      {
+        name: 'satteri-native-import',
+        enforce: 'pre',
+        applyToEnvironment: (environment) => environment.config.consumer === 'server',
+        resolveId(id, importer) {
+          if (id === 'satteri' && importer) {
+            // Keep native binding resolution inside Satteri's package. Resolve
+            // from its workspace consumer: pnpm does not expose it at app root.
+            return { id: createRequire(importer).resolve(id), external: true };
+          }
+        }
+      }
+    ],
     build: {
       // Keep processed scripts external so CSP does not need broad inline JS.
       assetsInlineLimit: 0

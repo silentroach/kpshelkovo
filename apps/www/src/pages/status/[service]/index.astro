@@ -1,6 +1,6 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import { formatDynamicHtml } from '@shelkovo/markdown';
+import { formatTextHtml } from '@shelkovo/markdown';
 
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import StatusIncidentRow from '@/components/status/StatusIncidentRow.astro';
@@ -99,13 +99,11 @@ const schema = collectionPageSchema({
         <Breadcrumbs items={breadcrumbs} />
 
         <div class="ui-page-header-stack" data-pagefind-body>
-          <h1 class="ui-page-title">
-            {heading}
-          </h1>
+          <h1 class="ui-page-title">{heading}</h1>
           <p
             class="ui-muted"
             data-pagefind-weight="2"
-            set:html={formatDynamicHtml(description)}
+            set:html={formatTextHtml(description)}
           />
         </div>
       </div>
@@ -130,19 +128,17 @@ const schema = collectionPageSchema({
           <h2 class="ui-section-title">История</h2>
         </div>
 
-        {
-          latestIncidents.length > 0 ? (
-            <div class="status-service-history__rows">
-              {latestIncidents.map((incident) => (
-                <StatusIncidentRow incident={incident} />
-              ))}
-            </div>
-          ) : (
-            <p class="status-service-history__empty">
-              Пока без записей по этому сервису.
-            </p>
-          )
-        }
+        {latestIncidents.length > 0 ? (
+          <div class="status-service-history__rows">
+            {latestIncidents.map((incident) => (
+              <StatusIncidentRow incident={incident} />
+            ))}
+          </div>
+        ) : (
+          <p class="status-service-history__empty">
+            Пока без записей по этому сервису.
+          </p>
+        )}
       </div>
     </section>
   </main>

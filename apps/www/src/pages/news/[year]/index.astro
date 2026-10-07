@@ -1,6 +1,6 @@
 ---
 import { count } from '@shelkovo/format';
-import { formatDynamicHtml } from '@shelkovo/markdown';
+import { formatTextHtml } from '@shelkovo/markdown';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import NewsArchiveSummary from '@/components/news/NewsArchiveSummary.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -63,9 +63,7 @@ const schema = collectionPageSchema({
       <div class="ui-page-header-stack">
         <Breadcrumbs items={breadcrumbs} />
 
-        <h1 class="ui-page-title">
-          Новости за {archive.year} год
-        </h1>
+        <h1 class="ui-page-title">Новости за {archive.year} год</h1>
 
         <NewsArchiveSummary
           summary={archive.summary}
@@ -80,31 +78,29 @@ const schema = collectionPageSchema({
     >
       <div class="news-archive-container">
         <ul class="news-archive-list">
-          {
-            months.map((item) => (
-              <li>
-                <a href={item.url} class="news-archive-row">
-                  <span class="news-archive-row__content">
-                    <span class="ui-card-title news-archive-row__title">
-                      {formatNewsMonth(item.year, item.month, {
-                        capitalize: true,
-                        includeYear: false,
-                      })}
-                    </span>
-                    <span
-                      class="news-archive-row__count"
-                      set:html={formatDynamicHtml(
-                        count(item.count, ['новость', 'новости', 'новостей']),
-                      )}
-                    />
+          {months.map((item) => (
+            <li>
+              <a href={item.url} class="news-archive-row">
+                <span class="news-archive-row__content">
+                  <span class="ui-card-title news-archive-row__title">
+                    {formatNewsMonth(item.year, item.month, {
+                      capitalize: true,
+                      includeYear: false,
+                    })}
                   </span>
-                  <span class="news-archive-row__arrow" aria-hidden="true">
-                    →
-                  </span>
-                </a>
-              </li>
-            ))
-          }
+                  <span
+                    class="news-archive-row__count"
+                    set:html={formatTextHtml(
+                      count(item.count, ['новость', 'новости', 'новостей']),
+                    )}
+                  />
+                </span>
+                <span class="news-archive-row__arrow" aria-hidden="true">
+                  →
+                </span>
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
     </section>

@@ -213,7 +213,7 @@ describe('mapRawMeeting', () => {
     });
 
     expect(result.transcript.segments[0]?.textHtml).toMatchInlineSnapshot(`
-      "<p>Компания «ОК» &#x26; жители
+      "<p>Компания<span class="typograf-oa-sp-lquote"> </span><span class="typograf-oa-lquote">«</span>ОК» &#x26; жители
       Первая строка
       Вторая строка</p>
       <p>link</p>"

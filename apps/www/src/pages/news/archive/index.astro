@@ -1,6 +1,6 @@
 ---
 import { count } from '@shelkovo/format';
-import { formatDynamicHtml } from '@shelkovo/markdown';
+import { formatTextHtml } from '@shelkovo/markdown';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import {
@@ -52,34 +52,32 @@ const schema = collectionPageSchema({
 
     <section class="news-archive-content" aria-label="Новости по годам">
       <div class="news-archive-container">
-        {
-          archives.years.length > 0 ? (
-            <ul class="news-archive-list">
-              {archives.years.map((item) => (
-                <li>
-                  <a href={item.url} class="news-archive-row">
-                    <span class="news-archive-row__content">
-                      <span class="ui-card-title news-archive-row__title">
-                        {item.year}
-                      </span>
-                      <span
-                        class="news-archive-row__count"
-                        set:html={formatDynamicHtml(
-                          count(item.count, ['новость', 'новости', 'новостей']),
-                        )}
-                      />
+        {archives.years.length > 0 ? (
+          <ul class="news-archive-list">
+            {archives.years.map((item) => (
+              <li>
+                <a href={item.url} class="news-archive-row">
+                  <span class="news-archive-row__content">
+                    <span class="ui-card-title news-archive-row__title">
+                      {item.year}
                     </span>
-                    <span class="news-archive-row__arrow" aria-hidden="true">
-                      →
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p class="ui-copy news-archive-empty">Публикаций пока нет.</p>
-          )
-        }
+                    <span
+                      class="news-archive-row__count"
+                      set:html={formatTextHtml(
+                        count(item.count, ['новость', 'новости', 'новостей']),
+                      )}
+                    />
+                  </span>
+                  <span class="news-archive-row__arrow" aria-hidden="true">
+                    →
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="ui-copy news-archive-empty">Публикаций пока нет.</p>
+        )}
       </div>
     </section>
   </main>

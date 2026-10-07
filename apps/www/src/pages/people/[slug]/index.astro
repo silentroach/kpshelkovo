@@ -1,7 +1,7 @@
 ---
 import type { GetStaticPaths } from 'astro';
 
-import { formatDynamicHtml } from '@shelkovo/markdown';
+import { formatTextHtml } from '@shelkovo/markdown';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import { PhoneIcon, TelegramIcon } from '@shelkovo/ui/icons';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -54,7 +54,7 @@ if (!profile) {
 const bodyHtml = profile.body ? renderMarkdown(profile.body) : undefined;
 const description = profile.seo?.description ?? describePersonProfile(profile);
 const headline = formatPersonHeadline(profile);
-const headlineHtml = headline ? formatDynamicHtml(headline) : undefined;
+const headlineHtml = headline ? formatTextHtml(headline) : undefined;
 const title = `${profile.name} — Люди — Шелково Онлайн`;
 const search = {
   scope: 'manual',
@@ -103,157 +103,149 @@ const schema = personProfilePageSchema({
             {profile.name}
           </h1>
 
-          {
-            headlineHtml && (
-              <p
-                class="person-profile__headline"
-                data-pagefind-body
-                set:html={headlineHtml}
-              />
-            )
-          }
+          {headlineHtml && (
+            <p
+              class="person-profile__headline"
+              data-pagefind-body
+              set:html={headlineHtml}
+            />
+          )}
         </header>
 
-        {
-          profile.photo && (
-            <figure class="person-profile__photo">
-              <img
-                src={profile.photo.src}
-                width={profile.photo.width}
-                height={profile.photo.height}
-                alt={profile.name}
-              />
-              {profile.photo.source && (
-                <figcaption>
-                  Фото:{' '}
-                  <a class="site-text-link" href={profile.photo.source.url}>
-                    {profile.photo.source.label}
-                  </a>
-                </figcaption>
-              )}
-            </figure>
-          )
-        }
+        {profile.photo && (
+          <figure class="person-profile__photo">
+            <img
+              src={profile.photo.src}
+              width={profile.photo.width}
+              height={profile.photo.height}
+              alt={profile.name}
+            />
+            {profile.photo.source && (
+              <figcaption>
+                Фото:{' '}
+                <a class="site-text-link" href={profile.photo.source.url}>
+                  {profile.photo.source.label}
+                </a>
+              </figcaption>
+            )}
+          </figure>
+        )}
 
         <section
           aria-labelledby="person-contacts"
           class="person-profile__contacts"
           data-pagefind-ignore="all"
         >
-          <h2 id="person-contacts" class="ui-section-label">Контакты</h2>
+          <h2 id="person-contacts" class="ui-section-label">
+            Контакты
+          </h2>
 
-          {
-            profile.contacts.length > 0 ? (
-              <ul class="person-profile__contact-list">
-                {profile.contacts.map((contact) => (
-                  <li class="person-profile__contact">
-                    {contact.type === 'telegram' ? (
-                      <TelegramIcon class="person-profile__contact-icon person-profile__contact-icon--telegram" />
-                    ) : contact.type === 'phone' ? (
-                      <PhoneIcon class="person-profile__contact-icon person-profile__contact-icon--phone" />
-                    ) : (
-                      <span class="person-profile__contact-type">
-                        {formatPersonContactType(contact.type)}
-                      </span>
-                    )}
+          {profile.contacts.length > 0 ? (
+            <ul class="person-profile__contact-list">
+              {profile.contacts.map((contact) => (
+                <li class="person-profile__contact">
+                  {contact.type === 'telegram' ? (
+                    <TelegramIcon class="person-profile__contact-icon person-profile__contact-icon--telegram" />
+                  ) : contact.type === 'phone' ? (
+                    <PhoneIcon class="person-profile__contact-icon person-profile__contact-icon--phone" />
+                  ) : (
+                    <span class="person-profile__contact-type">
+                      {formatPersonContactType(contact.type)}
+                    </span>
+                  )}
 
-                    <a href={contact.href} class="person-profile__contact-link">
-                      {formatPersonContactCompactDisplay(contact)}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div class="person-profile__empty person-profile__empty--contacts">
-                Контакты пока не опубликованы.
-              </div>
-            )
-          }
+                  <a href={contact.href} class="person-profile__contact-link">
+                    {formatPersonContactCompactDisplay(contact)}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div class="person-profile__empty person-profile__empty--contacts">
+              Контакты пока не опубликованы.
+            </div>
+          )}
         </section>
 
-        {
-          profile.body && (
-            <article class="person-profile__article">
-              <div
-                class={`person-profile__body ${PEOPLE_PROSE}`}
-                data-pagefind-body
-                set:html={bodyHtml}
-              />
-            </article>
-          )
-        }
+        {profile.body && (
+          <article class="person-profile__article">
+            <div
+              class={`person-profile__body ${PEOPLE_PROSE}`}
+              data-pagefind-body
+              set:html={bodyHtml}
+            />
+          </article>
+        )}
       </div>
     </div>
 
-    {
-      showBacklinks && (
-        <section class="person-profile__backlinks" data-pagefind-ignore="all">
-          <div class="person-profile__backlinks-inner">
-            <div class="person-profile__backlinks-heading">
-              <h2 class="ui-section-label">Где упоминается</h2>
-              <p class="person-profile__backlinks-description">
-                Упоминания в новостях, статусе поселка, отзывах, карте мест,
-                других публичных профилях и сарафане.
-              </p>
-            </div>
-
-            {backlinkGroups.length > 0 ? (
-              <div class="person-profile__backlink-groups">
-                {backlinkGroups.map((group) => (
-                  <section
-                    aria-labelledby={`person-backlinks-${group.section}`}
-                    class="person-profile__backlink-group"
-                  >
-                    <h3
-                      id={`person-backlinks-${group.section}`}
-                      class="person-profile__backlink-section"
-                    >
-                      {formatPersonBacklinkSection(group.section)}
-                    </h3>
-
-                    <ul class="person-profile__backlink-list">
-                      {group.items.map((backlink) => (
-                        <li>
-                          <a
-                            href={backlink.htmlUrl}
-                            class="person-profile__backlink-card"
-                          >
-                            <div class="person-profile__backlink-meta">
-                              <span class="person-profile__backlink-kind">
-                                {formatPersonBacklinkKind(backlink.kind)}
-                              </span>
-                              {backlink.mentionedAt && (
-                                <time datetime={backlink.mentionedAt}>
-                                  {formatPersonBacklinkDate(backlink)}
-                                </time>
-                              )}
-                            </div>
-
-                            <h4 class="person-profile__backlink-title">
-                              {backlink.title}
-                            </h4>
-
-                            {backlink.excerpt && (
-                              <p class="person-profile__backlink-excerpt">
-                                {backlink.excerpt}
-                              </p>
-                            )}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                ))}
-              </div>
-            ) : (
-              <div class="person-profile__empty person-profile__empty--backlinks">
-                Публичных упоминаний пока не найдено.
-              </div>
-            )}
+    {showBacklinks && (
+      <section class="person-profile__backlinks" data-pagefind-ignore="all">
+        <div class="person-profile__backlinks-inner">
+          <div class="person-profile__backlinks-heading">
+            <h2 class="ui-section-label">Где упоминается</h2>
+            <p class="person-profile__backlinks-description">
+              Упоминания в новостях, статусе поселка, отзывах, карте мест,
+              других публичных профилях и сарафане.
+            </p>
           </div>
-        </section>
-      )
-    }
+
+          {backlinkGroups.length > 0 ? (
+            <div class="person-profile__backlink-groups">
+              {backlinkGroups.map((group) => (
+                <section
+                  aria-labelledby={`person-backlinks-${group.section}`}
+                  class="person-profile__backlink-group"
+                >
+                  <h3
+                    id={`person-backlinks-${group.section}`}
+                    class="person-profile__backlink-section"
+                  >
+                    {formatPersonBacklinkSection(group.section)}
+                  </h3>
+
+                  <ul class="person-profile__backlink-list">
+                    {group.items.map((backlink) => (
+                      <li>
+                        <a
+                          href={backlink.htmlUrl}
+                          class="person-profile__backlink-card"
+                        >
+                          <div class="person-profile__backlink-meta">
+                            <span class="person-profile__backlink-kind">
+                              {formatPersonBacklinkKind(backlink.kind)}
+                            </span>
+                            {backlink.mentionedAt && (
+                              <time datetime={backlink.mentionedAt}>
+                                {formatPersonBacklinkDate(backlink)}
+                              </time>
+                            )}
+                          </div>
+
+                          <h4 class="person-profile__backlink-title">
+                            {backlink.title}
+                          </h4>
+
+                          {backlink.excerpt && (
+                            <p class="person-profile__backlink-excerpt">
+                              {backlink.excerpt}
+                            </p>
+                          )}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
+            </div>
+          ) : (
+            <div class="person-profile__empty person-profile__empty--backlinks">
+              Публичных упоминаний пока не найдено.
+            </div>
+          )}
+        </div>
+      </section>
+    )}
   </main>
 </BaseLayout>
 

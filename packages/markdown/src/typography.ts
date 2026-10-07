@@ -1,95 +1,141 @@
-import type { HastPluginDefinition } from 'satteri';
-import Typograf from 'typograf';
+import { htmlToHast, type HastContent, type HastNode, type HastPluginDefinition } from 'satteri';
 
-interface HastNode {
-  readonly type: string;
-  readonly tagName?: string;
-  value?: string;
-  readonly children?: readonly HastNode[];
+import type { HtmlTreeNode } from './html-tree.types';
+import {
+  formatTextHtml,
+  TYPOGRAPHY_BLOCK_TAGS,
+  TYPOGRAPHY_SKIP_TAGS,
+  TYPOGRAPHY_WRAPPER_CLASSES
+} from './typography-core';
+import type { TypographyNodeReplacement } from './typography.types';
+
+const classesOf = (node: HtmlTreeNode): readonly unknown[] => {
+  const value = node.properties?.className;
+  return typeof value === 'string' ? value.split(/\s+/u) : Array.isArray(value) ? value : [];
+};
+
+const isProtected = (node: HtmlTreeNode): boolean => {
+  const tag = node.tagName?.toLowerCase();
+  if (tag && TYPOGRAPHY_SKIP_TAGS.has(tag)) {
+    return true;
+  }
+
+  return (
+    tag === 'span' &&
+    classesOf(node).some((name) => typeof name === 'string' && TYPOGRAPHY_WRAPPER_CLASSES.has(name))
+  );
+};
+
+/** Repair node-local line-start quotes using the surrounding inline flow. */
+function alignTreeQuotes(root: HtmlTreeNode, replace: TypographyNodeReplacement): void {
+  let hasContent = false;
+  let lastText: HtmlTreeNode | undefined;
+  let lastParent: HtmlTreeNode | undefined;
+
+  const visit = (parent: HtmlTreeNode): void => {
+    // Rehype replacements can splice an earlier sibling while this walk runs.
+    for (const node of parent.children?.slice() ?? []) {
+      const tag = node.tagName?.toLowerCase();
+      if (tag && TYPOGRAPHY_BLOCK_TAGS.has(tag)) {
+        if (!isProtected(node)) {
+          alignTreeQuotes(node, replace);
+        }
+        hasContent = false;
+        lastText = undefined;
+      } else if (node.type === 'text' && typeof node.value === 'string') {
+        if (/\n\n[ \u00A0]*$/u.test(node.value)) {
+          hasContent = false;
+        } else if (/\S/u.test(node.value)) {
+          hasContent = true;
+        }
+        lastText = /[ \u00A0\n]$/u.test(node.value) ? node : undefined;
+        lastParent = parent;
+      } else if (tag === 'span' && classesOf(node).includes('typograf-oa-n-lquote')) {
+        if (hasContent) {
+          const previous = lastText?.value;
+          if (lastText && lastParent && previous) {
+            const replacements: HtmlTreeNode[] = [];
+            if (previous.length > 1) {
+              replacements.push({ type: 'text', value: previous.slice(0, -1) });
+            }
+            replacements.push({
+              type: 'element',
+              tagName: 'span',
+              properties: { className: ['typograf-oa-sp-lquote'] },
+              children: [{ type: 'text', value: previous.slice(-1) }]
+            });
+            replace(lastText, lastParent, replacements);
+            replace(node, parent, [
+              {
+                ...node,
+                properties: {
+                  ...node.properties,
+                  className: classesOf(node).map((name) =>
+                    name === 'typograf-oa-n-lquote' ? 'typograf-oa-lquote' : name
+                  )
+                }
+              }
+            ]);
+          } else {
+            replace(node, parent, node.children ?? []);
+          }
+        }
+        hasContent = true;
+        lastText = undefined;
+      } else if (isProtected(node) || tag === 'img' || tag === 'input' || node.type === 'raw') {
+        if (
+          tag !== 'script' &&
+          tag !== 'style' &&
+          !classesOf(node).includes('typograf-oa-sp-lquote')
+        ) {
+          hasContent = true;
+          lastText = undefined;
+        }
+      } else {
+        visit(node);
+      }
+    }
+  };
+  visit(root);
 }
 
-const TYPOGRAPHY_SKIP_TAGS = new Set([
-  'code',
-  'kbd',
-  'math',
-  'pre',
-  'samp',
-  'script',
-  'style',
-  'textarea'
-]);
-
-const BRAND_PART_RULE = 'ru/nbsp/shelkovoPartName';
-
-if (!Typograf.getRule(BRAND_PART_RULE)) {
-  Typograf.addRule({
-    name: BRAND_PART_RULE,
-    // Keep brand compounds like "Шелково Ривер" on one line.
-    handler: (text) => text.replace(/Шелково (?=[A-ZА-ЯЁ])/gu, 'Шелково\u00A0')
-  });
-}
-
-const BEFORE_NUMBER_SIGN_RULE = 'ru/nbsp/beforeNumberSign';
-
-if (!Typograf.getRule(BEFORE_NUMBER_SIGN_RULE)) {
-  Typograf.addRule({
-    name: BEFORE_NUMBER_SIGN_RULE,
-    // Run before Typograf's own ru/nbsp/afterNumberSign so the narrow
-    // non-breaking space it inserts between "№" and the digit does not block
-    // this rule.
-    index: 505,
-    // Keep a word before a number sign and its number on the same line,
-    // e.g. "Приложение №1" or "п. № 1".
-    handler: (text) => text.replace(/(?<=[\p{L}.,;:!?)])\s+(?=№\s*\d)/gu, '\u00A0')
-  });
-}
-
-const typograf = new Typograf({
-  locale: ['ru', 'en-US'],
-  processingSeparateParts: true
-});
-
-function safeTagPattern(tag: string): RegExp {
-  return new RegExp(`<${tag}(?:\\s[^>]*)?>[\\s\\S]*?<\\/${tag}>`, 'gi');
-}
-
-for (const tag of TYPOGRAPHY_SKIP_TAGS) {
-  typograf.addSafeTag(safeTagPattern(tag));
-}
-
-const hasText = (value: string): boolean => /\S/u.test(value);
-
-function formatTextNode(value: string): string {
+/** The only text → AST boundary, shared by the rehype and Satteri adapters. */
+function formatTextNode(value: string): HastContent[] {
   const withoutPrefix = value.trimStart();
   const core = withoutPrefix.trimEnd();
   const prefix = value.slice(0, value.length - withoutPrefix.length);
   const suffix = withoutPrefix.slice(core.length);
+  if (!core) {
+    return [{ type: 'text', value }];
+  }
 
-  return core ? `${prefix}${typograf.execute(core)}${suffix}` : value;
+  const tree = htmlToHast(formatTextHtml(core), { fragment: true });
+  if (tree.type !== 'root') {
+    throw new Error('Typography HTML fragment must produce a HAST root');
+  }
+
+  const children: HastContent[] = tree.children;
+  if (prefix) {
+    children.unshift({ type: 'text', value: prefix });
+  }
+  if (suffix) {
+    children.push({ type: 'text', value: suffix });
+  }
+  return children;
 }
 
-function visitText(node: HastNode, readonlyParents: readonly string[]): void {
-  if (node.type === 'text' && typeof node.value === 'string') {
-    if (readonlyParents.some((tag) => TYPOGRAPHY_SKIP_TAGS.has(tag)) || !hasText(node.value)) {
-      return;
+function visitText(node: HtmlTreeNode): void {
+  if (isProtected(node) || !node.children) {
+    return;
+  }
+
+  node.children = node.children.flatMap((child) => {
+    if (child.type === 'text' && typeof child.value === 'string') {
+      return formatTextNode(child.value);
     }
-
-    node.value = formatTextNode(node.value);
-    return;
-  }
-
-  if (!node.children || node.children.length === 0) {
-    return;
-  }
-
-  const parents =
-    typeof node.tagName === 'string'
-      ? [...readonlyParents, node.tagName.toLowerCase()]
-      : readonlyParents;
-
-  for (const child of node.children) {
-    visitText(child, parents);
-  }
+    visitText(child);
+    return [child];
+  });
 }
 
 /**
@@ -97,38 +143,34 @@ function visitText(node: HastNode, readonlyParents: readonly string[]): void {
  * Exported for framework markdown pipelines, for example Astro config.
  */
 export function rehypeTypograf() {
-  return (tree: HastNode): void => {
-    visitText(tree, []);
+  return (tree: HtmlTreeNode): void => {
+    visitText(tree);
+    alignTreeQuotes(tree, (node, parent, replacements) => {
+      parent.children?.splice(parent.children.indexOf(node), 1, ...replacements);
+    });
   };
 }
 
 export const satteriTypograf = (): HastPluginDefinition => ({
   name: 'shelkovo-typograf',
   text(node, ctx) {
-    if (!hasText(node.value)) {
+    if (!/\S/u.test(node.value)) {
       return;
     }
 
-    let parent = ctx.parent(node);
+    let parent: Readonly<HastNode> | undefined = ctx.parent(node);
     while (parent) {
-      if (
-        'tagName' in parent &&
-        typeof parent.tagName === 'string' &&
-        TYPOGRAPHY_SKIP_TAGS.has(parent.tagName.toLowerCase())
-      ) {
+      if (isProtected(parent)) {
         return;
       }
-
-      const nextParent = ctx.parent(parent);
-      if (!nextParent) {
-        break;
-      }
-
-      parent = nextParent;
+      parent = ctx.parent(parent);
     }
 
-    ctx.setProperty(node, 'value', formatTextNode(node.value));
+    ctx.replaceNode(node, formatTextNode(node.value));
+  },
+  after(root, ctx) {
+    alignTreeQuotes(root, (node, _parent, replacements) => {
+      ctx.replaceNode(node as HastNode, replacements as HastContent[]);
+    });
   }
 });
-
-export const formatDynamicHtml = (html: string): string => typograf.execute(html);

@@ -1,5 +1,5 @@
 ---
-import { formatDynamicHtml } from '@shelkovo/markdown';
+import { formatTextHtml } from '@shelkovo/markdown';
 import LinkWithIcon from '@shelkovo/ui/LinkWithIcon.astro';
 import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 import { CalendarPlusIcon } from '@shelkovo/ui/icons';
@@ -26,27 +26,25 @@ const { event } = Astro.props;
         id="event-title"
         class="ui-page-title"
         data-status={event.status === 'cancelled' ? event.status : undefined}
-        set:html={formatDynamicHtml(
+        set:html={formatTextHtml(
           event.status === 'cancelled'
             ? `Отменено: ${event.title}`
             : event.title,
         )}
       />
-      {
-        event.icsUrl && event.status !== 'cancelled' && (
-          <span class="event-calendar" data-pagefind-ignore>
-            <ResourceLink
-              href={event.icsUrl}
-              download={`${event.id}.ics`}
-              class="ui-btn ui-icon-action"
-              aria-label="Добавить в календарь"
-              title="Добавить в календарь"
-            >
-              <CalendarPlusIcon />
-            </ResourceLink>
-          </span>
-        )
-      }
+      {event.icsUrl && event.status !== 'cancelled' && (
+        <span class="event-calendar" data-pagefind-ignore>
+          <ResourceLink
+            href={event.icsUrl}
+            download={`${event.id}.ics`}
+            class="ui-btn ui-icon-action"
+            aria-label="Добавить в календарь"
+            title="Добавить в календарь"
+          >
+            <CalendarPlusIcon />
+          </ResourceLink>
+        </span>
+      )}
     </div>
     <div class="event-source">
       <span>{EVENT_CATEGORY_LABELS[event.category]}</span>{' '}
@@ -55,46 +53,44 @@ const { event } = Astro.props;
     </div>
   </header>
 
-  <div class="event-summary"><EventWidget event={event} /></div>
+  <div class="event-summary">
+    <EventWidget event={event} />
+  </div>
 
   <div class="event-main">
-    {
-      (event.price ||
-        event.audience ||
-        event.organizer ||
-        !!event.performer?.length) && (
-        <dl class="event-facts">
-          {event.price && (
-            <div>
-              <dt>Стоимость</dt>{' '}
-              <dd set:html={formatDynamicHtml(event.price)} />
-            </div>
-          )}
-          {event.audience && (
-            <div>
-              <dt>Для кого</dt>{' '}
-              <dd set:html={formatDynamicHtml(event.audience)} />
-            </div>
-          )}
-          {event.organizer && (
-            <div>
-              <dt>Организатор</dt>{' '}
-              <dd set:html={formatDynamicHtml(event.organizer.name)} />
-            </div>
-          )}
-          {event.performer && event.performer.length > 0 && (
-            <div>
-              <dt>Участники программы</dt>{' '}
-              <dd
-                set:html={formatDynamicHtml(
-                  event.performer.map((person) => person.name).join(', '),
-                )}
-              />
-            </div>
-          )}
-        </dl>
-      )
-    }
+    {(event.price ||
+      event.audience ||
+      event.organizer ||
+      !!event.performer?.length) && (
+      <dl class="event-facts">
+        {event.price && (
+          <div>
+            <dt>Стоимость</dt> <dd set:html={formatTextHtml(event.price)} />
+          </div>
+        )}
+        {event.audience && (
+          <div>
+            <dt>Для кого</dt> <dd set:html={formatTextHtml(event.audience)} />
+          </div>
+        )}
+        {event.organizer && (
+          <div>
+            <dt>Организатор</dt>{' '}
+            <dd set:html={formatTextHtml(event.organizer.name)} />
+          </div>
+        )}
+        {event.performer && event.performer.length > 0 && (
+          <div>
+            <dt>Участники программы</dt>{' '}
+            <dd
+              set:html={formatTextHtml(
+                event.performer.map((person) => person.name).join(', '),
+              )}
+            />
+          </div>
+        )}
+      </dl>
+    )}
     <div class="ui-prose event-body" set:html={renderMarkdown(event.body)} />
   </div>
 </article>

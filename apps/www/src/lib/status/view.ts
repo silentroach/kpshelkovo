@@ -1,5 +1,5 @@
 import { count, dateTimeFromISO, formatDate, formatMonth, pluralize } from '@shelkovo/format';
-import { formatDynamicHtml } from '@shelkovo/markdown';
+import { formatText } from '@shelkovo/markdown/typography';
 
 import { formatArea } from '../areas';
 import type { StatusCalendarDay } from './calendar.types';
@@ -99,7 +99,7 @@ const CURRENT_STATUS_YEAR = dateTimeFromISO(new Date().toISOString()).year;
 
 const formatStatusNbsp = (value: string): string => value.replaceAll(' ', NBSP);
 
-const formatStatusTooltipText = (value: string): string => formatDynamicHtml(value);
+const formatStatusTooltipText = (value: string): string => formatText(value);
 
 const joinStatusValueAndUnit = (
   value: number,

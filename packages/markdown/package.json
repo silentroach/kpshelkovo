@@ -5,10 +5,11 @@
   "type": "module",
   "sideEffects": [
     "./src/index.ts",
-    "./src/typography.ts"
+    "./src/typography-core.ts"
   ],
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./typography": "./src/typography-core.ts"
   },
   "scripts": {
     "test": "vitest run",

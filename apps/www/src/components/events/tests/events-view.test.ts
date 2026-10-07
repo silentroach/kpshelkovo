@@ -16,6 +16,8 @@ import { createAstroContainer } from '@/test/astro-container';
 // @ts-expect-error Astro components are resolved by Astro/Vitest.
 import EventCard from '../EventCard.astro';
 // @ts-expect-error Astro components are resolved by Astro/Vitest.
+import EventList from '../EventList.astro';
+// @ts-expect-error Astro components are resolved by Astro/Vitest.
 import EventMonthPage from '../EventMonthPage.astro';
 
 beforeEach(() => {
@@ -45,6 +47,42 @@ const documentFor = (html: string) => {
 };
 
 describe('event cards', () => {
+  it.each([
+    ['detail', EventCard],
+    ['list', EventList]
+  ])('renders safe title and location typography in the %s', async (_name, component) => {
+    const container = await createAstroContainer();
+    const record = event('range', '2026-10-08', {
+      title: '«8-10 октября» <em>текст</em> &amp;',
+      location: '«11–13 октября» <strong>текст</strong> &amp;'
+    });
+    const document = documentFor(
+      await container.renderToString(component, { props: { event: record, events: [record] } })
+    );
+    const heading = document.querySelector('h1, h2 a')!;
+    const location = [...document.querySelectorAll('.nowrap-date-range')].find(
+      (element) => element.textContent.replaceAll('\u00a0', ' ') === '11–13 октября'
+    );
+
+    expect({
+      title: heading.textContent.replaceAll('\u00a0', ' '),
+      titleRange: heading
+        .querySelector('.nowrap-date-range')
+        ?.textContent.replaceAll('\u00a0', ' '),
+      quote: !!heading.querySelector('[class^="typograf-oa-"]'),
+      location: location?.parentElement?.textContent.replaceAll('\u00a0', ' ').trim(),
+      literalElements: document.querySelectorAll('em, strong').length
+    }).toMatchInlineSnapshot(`
+      {
+        "literalElements": 0,
+        "location": "«11–13 октября» <strong>текст</strong> &amp;",
+        "quote": true,
+        "title": "«8–10 октября» <em>текст</em> &amp;",
+        "titleRange": "8–10 октября",
+      }
+    `);
+  });
+
   it('preserves unknown time/place, price options, registration and a single source', async () => {
     const container = await createAstroContainer();
     const record = event('unknown', '2026-09-19', {

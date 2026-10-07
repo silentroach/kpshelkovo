@@ -1,5 +1,5 @@
 ---
-import { formatDynamicHtml } from '@shelkovo/markdown';
+import { formatTextHtml } from '@shelkovo/markdown';
 
 import { formatPlaceOpeningHours } from '@/lib/places/opening-hours';
 import type { PlaceOpeningHours } from '@/lib/places/types';
@@ -11,51 +11,46 @@ interface Props {
 const { openingHours } = Astro.props;
 const rows = openingHours ? formatPlaceOpeningHours(openingHours) : [];
 const descriptionHtml = openingHours?.description
-  ? formatDynamicHtml(openingHours.description)
+  ? formatTextHtml(openingHours.description)
   : undefined;
 ---
 
-{
-  openingHours && (
-    <div class="place-opening-hours-row">
-      <dt class="place-opening-hours-label">
-        Время работы
-        <place-opening-hours data-opening-hours={JSON.stringify(openingHours)}>
-          <span
-            data-place-opening-status
-            class="place-opening-hours-status"
-            aria-hidden="true"
-            hidden
-          />
-          <span class="ui-visually-hidden" aria-live="polite" />
-        </place-opening-hours>
-      </dt>
-      <dd class="place-opening-hours-value">
-        <ul class="place-opening-hours-week">
-          {rows.map((row) => (
-            <li class="place-opening-hours-day" data-closed={row.closed}>
-              <span>{row.days}</span>{' '}
-              <span class="ui-num">
-                {row.hours.split(', ').map((interval, index) => (
-                  <>
-                    {index > 0 && ', '}
-                    <span class="place-opening-hours-interval">{interval}</span>
-                  </>
-                ))}
-              </span>
-            </li>
-          ))}
-        </ul>
-        {descriptionHtml && (
-          <p
-            class="place-opening-hours-description"
-            set:html={descriptionHtml}
-          />
-        )}
-      </dd>
-    </div>
-  )
-}
+{openingHours && (
+  <div class="place-opening-hours-row">
+    <dt class="place-opening-hours-label">
+      Время работы
+      <place-opening-hours data-opening-hours={JSON.stringify(openingHours)}>
+        <span
+          data-place-opening-status
+          class="place-opening-hours-status"
+          aria-hidden="true"
+          hidden
+        />
+        <span class="ui-visually-hidden" aria-live="polite" />
+      </place-opening-hours>
+    </dt>
+    <dd class="place-opening-hours-value">
+      <ul class="place-opening-hours-week">
+        {rows.map((row) => (
+          <li class="place-opening-hours-day" data-closed={row.closed}>
+            <span>{row.days}</span>{' '}
+            <span class="ui-num">
+              {row.hours.split(', ').map((interval, index) => (
+                <>
+                  {index > 0 && ', '}
+                  <span class="place-opening-hours-interval">{interval}</span>
+                </>
+              ))}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {descriptionHtml && (
+        <p class="place-opening-hours-description" set:html={descriptionHtml} />
+      )}
+    </dd>
+  </div>
+)}
 
 <script>
   import { getPlaceClosingTime } from '@/lib/places/opening-hours';
