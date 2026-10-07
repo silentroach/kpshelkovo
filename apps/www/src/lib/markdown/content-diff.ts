@@ -1,4 +1,4 @@
-import { formatDynamicHtml } from '@shelkovo/markdown';
+import { formatDynamicHtml, formatText, formatTextHtml } from '@shelkovo/markdown';
 import {
   diffLines,
   diffWords,
@@ -104,8 +104,6 @@ const escapeHtml = (value: string): string =>
 
 const normalizeBlockText = (value: string): string => value.replace(/\r\n?/gu, '\n').trim();
 
-const typographText = (value: string): string => decodeHtml(formatDynamicHtml(escapeHtml(value)));
-
 const textWeight = (value: string): number => value.replace(/[^\p{Letter}\p{Number}]/gu, '').length;
 
 const isHighlightableChange = (value: string): boolean => /[\p{Letter}\p{Number}]/u.test(value);
@@ -113,8 +111,8 @@ const isHighlightableChange = (value: string): boolean => /[\p{Letter}\p{Number}
 const hasTrailingNumber = (value: string): boolean => TRAILING_NUMBER.test(value);
 
 const typographContentDiffSource = (source: ContentDiffSource): ContentDiffSource => ({
-  removed: typographText(source.removed),
-  added: typographText(source.added)
+  removed: formatText(source.removed),
+  added: formatText(source.added)
 });
 
 const mergeMoneySuffixChanges = (changes: readonly Change[]): readonly Change[] => {
@@ -401,9 +399,11 @@ const renderSideText = (
   sourceText: string,
   side: ContentDiffSide
 ): string =>
-  sideSegments(changes, sourceText, side)
-    .map((segment) => renderSegment(segment, side))
-    .join('');
+  formatDynamicHtml(
+    sideSegments(changes, sourceText, side)
+      .map((segment) => renderSegment(segment, side))
+      .join('')
+  );
 
 const changedTextWeight = (changes: readonly Change[]): number =>
   changes.reduce(
@@ -481,7 +481,7 @@ const resolvedContentDiffMode = (
 ): ContentDiffMode =>
   preference === 'auto' ? autoContentDiffMode(source, changes, lineChanges) : preference;
 
-const renderFullSideText = (value: string): string => escapeHtml(value);
+const renderFullSideText = (value: string): string => formatTextHtml(value);
 
 export const normalizeContentDiffMarkdown = (markdown: string): string =>
   markdown.replace(CHANGE_FENCE_INFO, '$1change-$2');

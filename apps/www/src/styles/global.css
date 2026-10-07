@@ -137,6 +137,19 @@
 }
 
 @layer content {
+  /* Typograf output includes short strings outside .ui-prose. */
+  .site-page-content .nowrap-date-range {
+    white-space: nowrap;
+  }
+
+  .site-page-content .typograf-oa-sp-lquote {
+    margin-right: 0.44em;
+  }
+
+  .site-page-content :is(.typograf-oa-lquote, .typograf-oa-n-lquote) {
+    margin-left: -0.44em;
+  }
+
   /* Loaded 70/65ch in Fira Sans 400 (0 = 0.558em), stable while fonts load. */
   .ui-prose {
     max-width: 39.06em;

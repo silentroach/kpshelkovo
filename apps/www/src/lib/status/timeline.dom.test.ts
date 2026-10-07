@@ -7,6 +7,7 @@ import { STATUS_AREAS, type StatusService } from './schema';
 import type { StatusTimelineTooltipItemDto } from './timeline-tooltip.types';
 import { hydrateStatusTimeline, hydrateStatusTimelines } from './timeline.dom';
 import { bindStatusTimelineLazyHydration } from './timeline.lazy';
+import { buildStatusTimelineTooltipData } from './view';
 
 interface TooltipInput {
   readonly serviceLabel: string;
@@ -558,13 +559,22 @@ describe('hydrateStatusTimeline', () => {
   });
 
   it('fills tooltip text from data attributes without injecting HTML', () => {
+    const tooltip = buildStatusTimelineTooltipData({
+      service: 'water',
+      incident: {
+        kind: 'incident',
+        title: '«8-10 мая» <strong>текст</strong> &amp;',
+        phase: 'active',
+        startedIso: '2026-05-08T00:00:00Z',
+        startedHasTime: true,
+        endedHasTime: false
+      }
+    });
     const root = renderTimeline([
       {
         id: 'safe',
         start: '2026-05-08T00:00:00Z',
-        tooltip: {
-          title: '<strong>Опасно</strong>'
-        }
+        tooltip
       }
     ]);
 
@@ -574,12 +584,20 @@ describe('hydrateStatusTimeline', () => {
 
     getProblemNode('safe').dispatchEvent(new Event('mouseenter'));
 
-    expect(getTooltipField('[data-status-tooltip-title]').textContent).toBe(
-      '<strong>Опасно</strong>'
-    );
-    expect(getTooltipField('[data-status-tooltip-title]').innerHTML).toBe(
-      '&lt;strong&gt;Опасно&lt;/strong&gt;'
-    );
+    const title = getTooltipField('[data-status-tooltip-title]');
+    expect({
+      title: title.textContent.replaceAll('\u00a0', ' '),
+      elements: title.childElementCount,
+      labelHasTitle: getProblemNode('safe').getAttribute('aria-label')?.includes(tooltip.title),
+      generatedTags: getProblemNode('safe').getAttribute('aria-label')?.includes('<span')
+    }).toMatchInlineSnapshot(`
+      {
+        "elements": 0,
+        "generatedTags": false,
+        "labelHasTitle": true,
+        "title": "«8–10 мая» <strong>текст</strong> &amp;",
+      }
+    `);
   });
 
   it('renders every canonical area from single tooltip runtime data', () => {

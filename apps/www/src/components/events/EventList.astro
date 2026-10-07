@@ -1,5 +1,5 @@
 ---
-import { formatDynamicHtml } from '@shelkovo/markdown';
+import { formatTextHtml } from '@shelkovo/markdown';
 import type { EventRecord } from '@/lib/events/types';
 import {
   EVENT_CATEGORY_LABELS,
@@ -14,58 +14,56 @@ const { events } = Astro.props;
 ---
 
 <ol class="event-list" role="list">
-  {
-    events.map((event) => {
-      return (
-        <li id={event.id}>
-          <p class="event-meta">
-            {EVENT_CATEGORY_LABELS[event.category]}
-            {event.status !== 'announced' && (
-              <>
-                {' '}
-                ·{' '}
-                <strong data-status={event.status}>
-                  {EVENT_STATUS_LABELS[event.status]}
-                </strong>
-              </>
-            )}
-          </p>
-          <h2 class="ui-entry-title">
-            <a href={event.url}>{formatDynamicHtml(event.title)}</a>
-          </h2>
-          <p class="ui-num">{formatDynamicHtml(formatEventRange(event))}</p>
-          <p>
-            {event.place ? (
-              <a
-                href={event.place.url}
-                set:html={formatDynamicHtml(event.place.name)}
-              />
-            ) : (
-              formatDynamicHtml(
+  {events.map((event) => {
+    return (
+      <li id={event.id}>
+        <p class="event-meta">
+          {EVENT_CATEGORY_LABELS[event.category]}
+          {event.status !== 'announced' && (
+            <>
+              {' '}
+              ·{' '}
+              <strong data-status={event.status}>
+                {EVENT_STATUS_LABELS[event.status]}
+              </strong>
+            </>
+          )}
+        </p>
+        <h2 class="ui-entry-title">
+          <a href={event.url} set:html={formatTextHtml(event.title)} />
+        </h2>
+        <p class="ui-num" set:html={formatTextHtml(formatEventRange(event))} />
+        <p>
+          {event.place ? (
+            <a
+              href={event.place.url}
+              set:html={formatTextHtml(event.place.name)}
+            />
+          ) : (
+            <Fragment
+              set:html={formatTextHtml(
                 event.location ??
                   (event.coordinates ? 'Место на карте' : 'Место уточняется'),
-              )
-            )}
-            {event.locationDetails && (
-              <span
-                set:html={formatDynamicHtml(`, ${event.locationDetails}`)}
-              />
-            )}
+              )}
+            />
+          )}
+          {event.locationDetails && (
+            <span set:html={formatTextHtml(`, ${event.locationDetails}`)} />
+          )}
+        </p>
+        {event.price && (
+          <p>
+            Стоимость: <span set:html={formatTextHtml(event.price)} />
           </p>
-          {event.price && (
-            <p>
-              Стоимость: <span set:html={formatDynamicHtml(event.price)} />
-            </p>
-          )}
-          {event.audience && (
-            <p>
-              Для кого: <span set:html={formatDynamicHtml(event.audience)} />
-            </p>
-          )}
-        </li>
-      );
-    })
-  }
+        )}
+        {event.audience && (
+          <p>
+            Для кого: <span set:html={formatTextHtml(event.audience)} />
+          </p>
+        )}
+      </li>
+    );
+  })}
 </ol>
 
 <style>

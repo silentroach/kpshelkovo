@@ -1,3 +1,4 @@
+import { Window } from 'happy-dom';
 import { describe, expect, it } from 'vitest';
 
 import { createPersonMentionTarget } from '../people/mentions';
@@ -268,6 +269,51 @@ ${list}
         </div>
       </section>"
     `);
+  });
+
+  it.each(['inline', 'block'])('adds typography after computing a %s diff', async (mode) => {
+    const window = new Window();
+    try {
+      window.document.body.innerHTML = renderMarkdown(`\`\`\`change ${mode}
+-«8-10 октября» <em>текст</em> &amp; раньше
++«8–10 октября» <em>текст</em> &amp; позже
+\`\`\``);
+      const document = window.document;
+      expect(
+        [...document.querySelectorAll('.ui-content-diff__text')].map((element) => ({
+          text: element.textContent.replaceAll('\u00a0', ' '),
+          ranges: [...element.querySelectorAll('.nowrap-date-range')].map((range) =>
+            range.textContent.replaceAll('\u00a0', ' ')
+          ),
+          quote: !!element.querySelector('[class^="typograf-oa-"]'),
+          literalElements: element.querySelectorAll('em').length
+        }))
+      ).toMatchInlineSnapshot(`
+        [
+          {
+            "literalElements": 0,
+            "quote": true,
+            "ranges": [
+              "8–10 октября",
+            ],
+            "text": "«8–10 октября» <em>текст</em> &amp; раньше",
+          },
+          {
+            "literalElements": 0,
+            "quote": true,
+            "ranges": [
+              "8–10 октября",
+            ],
+            "text": "«8–10 октября» <em>текст</em> &amp; позже",
+          },
+        ]
+      `);
+      expect(
+        [...document.querySelectorAll('del, ins')].map((element) => element.textContent)
+      ).toEqual(mode === 'inline' ? ['раньше', 'позже'] : []);
+    } finally {
+      await window.happyDOM.close();
+    }
   });
 
   it('keeps recognizable multi-line price lists side by side', () => {

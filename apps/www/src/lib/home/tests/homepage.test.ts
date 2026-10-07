@@ -109,6 +109,42 @@ describe('homepage server HTML', () => {
     expect(main.querySelector('a[href="/news/"]')).toBeNull();
   });
 
+  it('renders title and summary typography without interpreting literal markup', async () => {
+    vi.mocked(loadNewsArticles).mockResolvedValue([
+      {
+        ...article('range'),
+        title: '«8-10 октября» <em>текст</em> &amp;',
+        summary: '«11–13 октября» <strong>текст</strong> &amp;'
+      }
+    ]);
+    const main = await renderHome();
+    const card = main.querySelector('article')!;
+
+    expect(
+      [...card.querySelectorAll('h2 a, p')].map((element) => ({
+        text: element.textContent.replaceAll('\u00a0', ' ').trim(),
+        range: element.querySelector('.nowrap-date-range')?.textContent.replaceAll('\u00a0', ' '),
+        quote: !!element.querySelector('[class^="typograf-oa-"]'),
+        literalElements: element.querySelectorAll('em, strong').length
+      }))
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "literalElements": 0,
+          "quote": true,
+          "range": "8–10 октября",
+          "text": "«8–10 октября» <em>текст</em> &amp;",
+        },
+        {
+          "literalElements": 0,
+          "quote": true,
+          "range": "11–13 октября",
+          "text": "«11–13 октября» <strong>текст</strong> &amp;",
+        },
+      ]
+    `);
+  });
+
   it('renders the selected lead before two secondary articles with dates, attribution and a pin', async () => {
     const lead = article('lead', 'official', true);
     vi.mocked(loadNewsArticles).mockResolvedValue([

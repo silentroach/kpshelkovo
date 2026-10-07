@@ -1,7 +1,7 @@
 ---
 import type { InferGetStaticPropsType } from 'astro';
 import { formatDate } from '@shelkovo/format';
-import { formatDynamicHtml } from '@shelkovo/markdown';
+import { formatTextHtml } from '@shelkovo/markdown';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import EventCard from '@/components/events/EventCard.astro';
 import EventList from '@/components/events/EventList.astro';
@@ -89,37 +89,37 @@ const breadcrumbs = withHomeBreadcrumbs([
   description={description}
   canonical={event?.url ?? day!.url}
   schema={event ? buildEventJsonLd(event, absoluteUrl('/')) : undefined}
-  search={event && isEventSearchable(event)
-    ? {
-        scope: 'manual',
-        title: `${event.status === 'cancelled' ? 'Отменено: ' : ''}${event.title} — События`,
-        description,
-        section: SEARCH_SECTIONS.events,
-        aliases: ['календарь мероприятий'],
-      }
-    : undefined}
+  search={
+    event && isEventSearchable(event)
+      ? {
+          scope: 'manual',
+          title: `${event.status === 'cancelled' ? 'Отменено: ' : ''}${event.title} — События`,
+          description,
+          section: SEARCH_SECTIONS.events,
+          aliases: ['календарь мероприятий'],
+        }
+      : undefined
+  }
 >
   <main class="ui-page">
-    {
-      event ? (
-        <div class="ui-page-header ui-page-header-stack detail-content">
-          <Breadcrumbs items={breadcrumbs} />
-          <EventCard event={event} />
-        </div>
-      ) : (
-        <>
-          <header class="ui-page-header">
-            <div class="ui-page-header-stack">
-              <Breadcrumbs items={breadcrumbs} />
-              <h1 class="ui-page-title" set:html={formatDynamicHtml(heading)} />
-            </div>
-          </header>
-          <div class="day-content">
-            <EventList events={day!.events} />
+    {event ? (
+      <div class="ui-page-header ui-page-header-stack detail-content">
+        <Breadcrumbs items={breadcrumbs} />
+        <EventCard event={event} />
+      </div>
+    ) : (
+      <>
+        <header class="ui-page-header">
+          <div class="ui-page-header-stack">
+            <Breadcrumbs items={breadcrumbs} />
+            <h1 class="ui-page-title" set:html={formatTextHtml(heading)} />
           </div>
-        </>
-      )
-    }
+        </header>
+        <div class="day-content">
+          <EventList events={day!.events} />
+        </div>
+      </>
+    )}
   </main>
 </BaseLayout>
 

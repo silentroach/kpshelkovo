@@ -1,5 +1,5 @@
 ---
-import { formatDynamicHtml } from '@shelkovo/markdown';
+import { formatTextHtml } from '@shelkovo/markdown';
 import NewsMeta from '@/components/news/NewsMeta.astro';
 import { articleUrl } from '@/lib/news/routes';
 import type { NewsArticle } from '@/lib/news/types';
@@ -26,13 +26,16 @@ const { article, lead = false } = Astro.props;
     />
   </div>
   <h2 class="ui-entry-title home-news-article__title">
-    <a href={articleUrl(article)} class="ui-link">
-      {formatDynamicHtml(article.title)}
-    </a>
+    <a
+      href={articleUrl(article)}
+      class="ui-link"
+      set:html={formatTextHtml(article.title)}
+    />
   </h2>
-  <p class:list={['home-news-article__summary', { 'ui-copy': lead }]}>
-    {formatDynamicHtml(article.summary)}
-  </p>
+  <p
+    class:list={['home-news-article__summary', { 'ui-copy': lead }]}
+    set:html={formatTextHtml(article.summary)}
+  />
 </article>
 
 <style>

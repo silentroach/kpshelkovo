@@ -1,6 +1,6 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import { formatDynamicHtml } from '@shelkovo/markdown';
+import { formatTextHtml } from '@shelkovo/markdown';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 
 import ContactMethods from '@/components/contacts/ContactMethods.astro';
@@ -53,7 +53,7 @@ const search = {
   aliases: contact.searchAliases,
 } satisfies SearchDocument;
 const summaryHtml = contact.summary
-  ? formatDynamicHtml(contact.summary)
+  ? formatTextHtml(contact.summary)
   : undefined;
 const bodyHtml = renderMarkdown(contact.body || description);
 const categoryUrl = contactCategoryUrl({ category: contact.category });
@@ -91,23 +91,19 @@ const schema = contactPageSchema({
           <h1 class="ui-page-title" data-pagefind-ignore="all">
             {contact.title}
           </h1>
-          {
-            contact.vcf ? (
-              <span class="sarafan-contact-vcf">
-                <ContactVcfLink vcf={contact.vcf} />
-              </span>
-            ) : null
-          }
+          {contact.vcf ? (
+            <span class="sarafan-contact-vcf">
+              <ContactVcfLink vcf={contact.vcf} />
+            </span>
+          ) : null}
         </div>
-        {
-          summaryHtml ? (
-            <p
-              class="sarafan-contact-summary"
-              data-pagefind-body
-              set:html={summaryHtml}
-            />
-          ) : null
-        }
+        {summaryHtml ? (
+          <p
+            class="sarafan-contact-summary"
+            data-pagefind-body
+            set:html={summaryHtml}
+          />
+        ) : null}
       </div>
     </header>
 
@@ -123,19 +119,17 @@ const schema = contactPageSchema({
         data-pagefind-body
         set:html={bodyHtml}
       />
-      {
-        contact.reviews.length > 0 ? (
-          <section class="sarafan-contact-reviews" data-pagefind-ignore="all">
-            <h2 id={reviewsHeadingId} class="ui-prose-title">
-              Отзывы
-            </h2>
-            <ContactReviews
-              reviews={contact.reviews}
-              labelledBy={reviewsHeadingId}
-            />
-          </section>
-        ) : null
-      }
+      {contact.reviews.length > 0 ? (
+        <section class="sarafan-contact-reviews" data-pagefind-ignore="all">
+          <h2 id={reviewsHeadingId} class="ui-prose-title">
+            Отзывы
+          </h2>
+          <ContactReviews
+            reviews={contact.reviews}
+            labelledBy={reviewsHeadingId}
+          />
+        </section>
+      ) : null}
     </article>
   </main>
 </BaseLayout>
