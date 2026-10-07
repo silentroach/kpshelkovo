@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация и согласованный объём — в [proposal.md](/openspec/changes/label-repartitioned-parcels/proposal.md). Дизайн нужен для выбора существующего способа группировки и разового исправления идентичности `SHP-A2`.
+Мотивация и согласованный объём — в [proposal.md](/openspec/changes/archive/2026-10-07-label-repartitioned-parcels/proposal.md). Дизайн нужен для выбора существующего способа группировки и разового исправления идентичности `SHP-A2`.
 
 [ADR-041](/docs/decisions/041-parcel-records-and-exact-search.md) уже допускает одну редакционную позицию с алиасами и несколькими самостоятельными кадастровыми участками. [ADR-013](/docs/decisions/013-raw-domain-public-data-boundary.md) разделяет источник, домен и публичные данные. Новый архитектурный механизм не требуется.
 
