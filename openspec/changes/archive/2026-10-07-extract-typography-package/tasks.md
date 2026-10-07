@@ -12,7 +12,7 @@
 ## 3. Общая приёмка
 
 - [x] 3.1 Выполнить `pnpm lint`, `pnpm typecheck`, `pnpm test` и production-сборку с `pnpm bundle:analyze`. Сравнить состав и размеры с исходными отчётами, сохранить актуальные YAML; подтвердить сохранность результатов типографики и сборку Markdown с нативным Satteri. Отдельной клиентской production-пробой корневого импорта проверить отсутствие Markdown/Satteri/нативных модулей и выполнение правил диапазона дат и названия посёлка после tree-shaking.
-- [x] 3.2 Выполнить `pnpm openspec:validate` и проверку форматирования изменённых файлов; сверить реализацию с [design.md](/openspec/changes/extract-typography-package/design.md) и сохранность действующих требований [date-labels](/openspec/specs/date-labels/spec.md).
+- [x] 3.2 Выполнить `pnpm openspec:validate` и проверку форматирования изменённых файлов; сверить реализацию с [design.md](/openspec/changes/archive/2026-10-07-extract-typography-package/design.md) и сохранность действующих требований [date-labels](/openspec/specs/date-labels/spec.md).
 - [x] 3.3 Передать reviewer весь актуальный diff относительно точного SHA базы PR #961, включая staged, unstaged и новые файлы, артефакты и результаты проверок. Разобрать замечания, исправить подтверждённые и провести адресный повтор по [правилам ревью](/docs/development.md#ревью-изменения-в-opencode). При недоступности reviewer выполнить и явно обозначить самопроверку требований/регрессий и отдельный проход `ponytail-review`.
 
 После приёмки — архивирование без delta specs, проверка архива, адресное ревью изменений от архивирования и публикация PR по [жизненному циклу](/AGENTS.md#жизненный-цикл-изменений).

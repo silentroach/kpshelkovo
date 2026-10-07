@@ -2,7 +2,7 @@
 
 ## Context
 
-Причина изменения — в [proposal.md](/openspec/changes/extract-typography-package/proposal.md). Фактическая граница уже видна в коде: `/packages/markdown/src/typography-core.ts` зависит только от Typograf, а `/packages/markdown/src/typography.ts` подключает Satteri и адаптирует текстовые узлы обоих AST-путей. Строковые функции экспортируются из корня Markdown-пакета и отдельного клиентского subpath.
+Причина изменения — в [proposal.md](/openspec/changes/archive/2026-10-07-extract-typography-package/proposal.md). Фактическая граница уже видна в коде: `/packages/markdown/src/typography-core.ts` зависит только от Typograf, а `/packages/markdown/src/typography.ts` подключает Satteri и адаптирует текстовые узлы обоих AST-путей. Строковые функции экспортируются из корня Markdown-пакета и отдельного клиентского subpath.
 
 [ADR-003](/docs/decisions/003-markdown-pipeline-layering.md) сохраняет общий Markdown-pipeline и app-level обработку упоминаний. Его описание владельца типографических правил нужно уточнить при выделении ядра. По [ADR-034](/docs/decisions/034-native-css-architecture.md) CSS для создаваемой разметки принадлежит приложению.
 
