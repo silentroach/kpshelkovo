@@ -222,6 +222,35 @@ const parcel = {
   },
   labelCoordinates: [37.715, 55.065]
 };
+const parcelContours = [
+  [
+    [
+      [37.71, 55.06],
+      [37.72, 55.06],
+      [37.72, 55.07],
+      [37.71, 55.07],
+      [37.71, 55.06]
+    ]
+  ],
+  [
+    [
+      [37.72, 55.06],
+      [37.73, 55.06],
+      [37.73, 55.07],
+      [37.72, 55.07],
+      [37.72, 55.06]
+    ]
+  ],
+  [
+    [
+      [37.73, 55.06],
+      [37.74, 55.06],
+      [37.74, 55.07],
+      [37.73, 55.07],
+      [37.73, 55.06]
+    ]
+  ]
+] as const;
 const parcelFetch = vi.fn(async (url: string) => {
   if (url === '/map/data/parcels/shr.json') return Response.json([parcel]);
   throw new Error(`Unexpected request: ${url}`);
@@ -2035,59 +2064,77 @@ describe('PlaceMap', () => {
     ]);
   });
 
-  it('shows one short label from zoom 17 and no extra text for a merged parcel', async () => {
-    vi.stubGlobal('fetch', parcelFetch);
-    render(PlaceMap, { props: { places: [place] } });
-    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
-    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
-    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
-    await waitFor(() => expect(areaFeatures).toHaveLength(1));
-    const update = mapUpdateHandlers[0];
-    if (!update) throw new Error('Map listener missing');
-    expect(markerElements.some((element) => element.classList.contains('parcel-map-label'))).toBe(
-      false
-    );
-    update({
-      type: 'update',
-      location: {
-        center: [37.715, 55.065],
-        zoom: 17,
-        bounds: [
-          [37.7, 55.08],
-          [37.8, 55.04]
-        ]
-      },
-      camera: {},
-      mapInAction: false
-    });
-    const label = markerElements.find((element) => element.classList.contains('parcel-map-label'));
-    expect(label?.textContent).toBe('L43');
-    expect(label?.querySelector('span')?.textContent).toBe('L43');
-    expect(label?.getAttribute('aria-label')).toBe('Выбрать участок SHR-L43');
-    if (!label) throw new Error('Parcel label missing');
-    const geometry = areaFeatures[0]?.props.geometry;
-    const labelIndex = markerElements.indexOf(label);
-    const labelCoordinates = markerLocations[labelIndex]?.coordinates;
-    if (geometry?.type !== 'Polygon' || !labelCoordinates)
-      throw new Error('Parcel display geometry missing');
-    const vertex = geometry.coordinates[0]?.[0];
-    expect(vertex).toEqual([37.71, 55.06]);
-    expect(labelCoordinates).toEqual([37.715, 55.065]);
-    const labelMarker = map.addChild.mock.lastCall?.[0];
-    await fireEvent.click(label);
-    expect(areaFeatures[0]?.update.mock.lastCall?.[0].style).toMatchObject({
-      fill: parcelSelectionColor
-    });
-    expect(screen.queryByText('SHR-L43 / SHR-L44')).toBeNull();
+  it.each([
+    parcel.geometry,
+    { type: 'MultiPolygon', coordinates: [parcelContours[0], parcelContours[2]] }
+  ])(
+    'shows only the primary label from zoom 17 for one cadastral $type with an alias',
+    async (geometry) => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => Response.json([{ ...parcel, geometry }]))
+      );
+      render(PlaceMap, { props: { places: [place] } });
+      await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+      await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+      await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
+      await waitFor(() => expect(areaFeatures).toHaveLength(1));
+      const update = mapUpdateHandlers[0];
+      if (!update) throw new Error('Map listener missing');
+      expect(markerElements.some((element) => element.classList.contains('parcel-map-label'))).toBe(
+        false
+      );
+      update({
+        type: 'update',
+        location: {
+          center: [37.715, 55.065],
+          zoom: 17,
+          bounds: [
+            [37.7, 55.08],
+            [37.8, 55.04]
+          ]
+        },
+        camera: {},
+        mapInAction: false
+      });
+      const label = markerElements.find((element) =>
+        element.classList.contains('parcel-map-label')
+      );
+      if (!label) throw new Error('Parcel label missing');
+      expect({
+        text: label.textContent,
+        title: label.title,
+        name: label.getAttribute('aria-label')
+      }).toMatchInlineSnapshot(`
+        {
+          "name": "Выбрать участок SHR-L43",
+          "text": "L43",
+          "title": "SHR-L43",
+        }
+      `);
+      expect(
+        markerElements.filter((element) => element.classList.contains('parcel-map-label'))
+      ).toHaveLength(1);
+      expect(areaFeatures[0]?.props.geometry).toEqual(geometry);
+      const labelIndex = markerElements.indexOf(label);
+      const labelCoordinates = markerLocations[labelIndex]?.coordinates;
+      expect(labelCoordinates).toEqual([37.715, 55.065]);
+      const labelMarker = map.addChild.mock.lastCall?.[0];
+      await fireEvent.click(label);
+      expect(areaFeatures[0]?.update.mock.lastCall?.[0].style).toMatchObject({
+        fill: parcelSelectionColor
+      });
+      expect(screen.queryByText('SHR-L43 / SHR-L44')).toBeNull();
 
-    update({
-      type: 'update',
-      location: { center: [37.715, 55.065], zoom: 16, bounds: map.bounds },
-      camera: {},
-      mapInAction: false
-    });
-    expect(map.removeChild).toHaveBeenCalledWith(labelMarker);
-  });
+      update({
+        type: 'update',
+        location: { center: [37.715, 55.065], zoom: 16, bounds: map.bounds },
+        camera: {},
+        mapInAction: false
+      });
+      expect(map.removeChild).toHaveBeenCalledWith(labelMarker);
+    }
+  );
 
   it('selects both contours without extra text for a compound position', async () => {
     const group = {
@@ -2097,7 +2144,7 @@ describe('PlaceMap', () => {
       multipleCadastralParcels: true,
       geometry: {
         type: 'MultiPolygon',
-        coordinates: [parcel.geometry.coordinates, parcel.geometry.coordinates]
+        coordinates: parcelContours.slice(0, 2)
       }
     };
     vi.stubGlobal(
@@ -2111,7 +2158,7 @@ describe('PlaceMap', () => {
     const feature = areaFeatures.find(({ props }) => props.id === 'parcel-SHR-E35');
     expect(feature?.props.geometry).toMatchObject({
       type: 'MultiPolygon',
-      coordinates: [parcel.geometry.coordinates, parcel.geometry.coordinates]
+      coordinates: parcelContours.slice(0, 2)
     });
     expect(feature?.update.mock.lastCall?.[0].style).toMatchObject({ fill: parcelSelectionColor });
     const markersBeforeSelection = markerElements.length;
@@ -2130,6 +2177,17 @@ describe('PlaceMap', () => {
       (element) => element.classList.contains('parcel-map-label') && element.title === 'SHR-E35'
     );
     if (!label) throw new Error('group label missing');
+    expect({
+      text: label.textContent,
+      title: label.title,
+      name: label.getAttribute('aria-label')
+    }).toMatchInlineSnapshot(`
+      {
+        "name": "Выбрать участок SHR-E35",
+        "text": "E35",
+        "title": "SHR-E35",
+      }
+    `);
     await fireEvent.click(label);
     expect(markerElements.every((element) => !element.classList.contains('parcel-map-hint'))).toBe(
       true
@@ -2140,6 +2198,110 @@ describe('PlaceMap', () => {
     expect(single?.update.mock.lastCall?.[0].style).toMatchObject({ fill: parcelSelectionColor });
     expect(feature?.update.mock.lastCall?.[0].style).toEqual(feature?.props.style);
   });
+
+  it.each([
+    ['shr-k40', 'SHR-K41'],
+    ['shr-k2', 'SHR-K19'],
+    ['shr-k10', 'SHR-K19']
+  ])(
+    'labels two-to-three and three-to-three groups and selects the whole group via alias %s',
+    async (alias, code) => {
+      const groups = [
+        { ...parcel, code: 'SHR-K41', aliases: ['SHR-K40'] },
+        { ...parcel, code: 'SHR-K19', aliases: ['SHR-K10', 'SHR-K2'] }
+      ].map((item) => ({
+        ...item,
+        multipleCadastralParcels: true,
+        geometry: { type: 'MultiPolygon', coordinates: parcelContours }
+      }));
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => Response.json(groups))
+      );
+      window.history.replaceState({}, '', `/map/?p=${alias}`);
+      render(PlaceMap, { props: { places: [place] } });
+      await waitFor(() => expect(areaFeatures).toHaveLength(2));
+      const selected = areaFeatures.find(({ props }) => props.id === `parcel-${code}`);
+      expect(selected?.update.mock.lastCall?.[0].style).toMatchObject({
+        fill: parcelSelectionColor
+      });
+      expect(window.location.search).toBe(`?p=${code}`);
+      expect(map.update.mock.lastCall?.[0].location).toMatchObject({
+        center: parcel.labelCoordinates,
+        zoom: 17
+      });
+      expect(areaFeatures.map(({ props }) => props.geometry)).toEqual(
+        groups.map(({ geometry }) => geometry)
+      );
+      expect(
+        markerElements.filter((element) => element.classList.contains('parcel-map-label'))
+      ).toHaveLength(0);
+
+      const update = mapUpdateHandlers[0];
+      const canvas = mapElements[0];
+      if (!update || !canvas) throw new Error('Map missing');
+      map.zoom = 17;
+      update({
+        type: 'update',
+        location: { center: [37.715, 55.065], zoom: 17, bounds: map.bounds },
+        camera: {},
+        mapInAction: false
+      });
+      const labels = markerElements.filter((element) =>
+        element.classList.contains('parcel-map-label')
+      );
+      expect(
+        labels.map((label) => ({
+          tag: label.tagName,
+          text: label.textContent,
+          title: label.title,
+          name: label.getAttribute('aria-label')
+        }))
+      ).toMatchInlineSnapshot(`
+        [
+          {
+            "name": "Выбрать участок SHR-K41 / SHR-K40",
+            "tag": "BUTTON",
+            "text": "K41/K40",
+            "title": "SHR-K41 / SHR-K40",
+          },
+          {
+            "name": "Выбрать участок SHR-K19 / SHR-K2 / SHR-K10",
+            "tag": "BUTTON",
+            "text": "K19/K2/K10",
+            "title": "SHR-K19 / SHR-K2 / SHR-K10",
+          },
+        ]
+      `);
+      canvas.append(...labels);
+      map.update.mockClear();
+      for (const [index, group] of groups.entries()) {
+        await fireEvent.keyDown(document, { key: 'Escape' });
+        const label = labels[index];
+        const feature = areaFeatures[index];
+        if (!label || !feature) throw new Error('Group missing');
+        label.focus();
+        await fireEvent.click(label, { detail: 0 });
+        expect(document.activeElement).toBe(label);
+        expect(window.location.search).toBe(`?p=${group.code}`);
+        expect(feature.update.mock.lastCall?.[0].style).toMatchObject({
+          fill: parcelSelectionColor
+        });
+
+        await fireEvent.keyDown(label, { key: 'Escape' });
+        expect(feature.update.mock.lastCall?.[0].style).toEqual(feature.props.style);
+        feature.props.onClick?.(new MouseEvent('click'), {} as never);
+        expect(window.location.search).toBe(`?p=${group.code}`);
+        expect(feature.update.mock.lastCall?.[0].style).toMatchObject({
+          fill: parcelSelectionColor
+        });
+      }
+      expect(map.update).not.toHaveBeenCalled();
+      expect(
+        markerElements.filter((element) => element.classList.contains('parcel-map-label'))
+      ).toHaveLength(2);
+    }
+  );
 
   it('shades known sale statuses only while restoring each parcel after selection', async () => {
     const parcels = (['available', 'reserved', 'unavailable', 'sold', undefined] as const).map(

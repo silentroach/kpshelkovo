@@ -116,15 +116,24 @@ export const createParcelLayer = (
             continue;
           visible.add(item.code);
           if (labels.has(item.code)) continue;
+          const codes =
+            item.multipleCadastralParcels && item.aliases?.length
+              ? [
+                  item.code,
+                  ...item.aliases.toSorted((a, b) =>
+                    a.localeCompare(b, undefined, { numeric: true })
+                  )
+                ]
+              : [item.code];
           const button = document.createElement('button');
           button.type = 'button';
           button.className = 'parcel-map-label';
           if (item.status === 'unavailable') button.classList.add('parcel-map-label--unavailable');
           const text = document.createElement('span');
-          text.textContent = item.code.split('-')[1] ?? item.code;
+          text.textContent = codes.map((code) => code.split('-')[1] ?? code).join('/');
           button.append(text);
-          button.title = item.code;
-          button.setAttribute('aria-label', `Выбрать участок ${item.code}`);
+          button.title = codes.join(' / ');
+          button.setAttribute('aria-label', `Выбрать участок ${button.title}`);
           button.addEventListener('click', (event) => {
             event.stopPropagation();
             select(item, event.detail === 0 ? button : undefined);
