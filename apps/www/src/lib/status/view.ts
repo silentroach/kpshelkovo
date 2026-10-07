@@ -1,5 +1,5 @@
 import { count, dateTimeFromISO, formatDate, formatMonth, pluralize } from '@shelkovo/format';
-import { formatText } from '@shelkovo/markdown/typography';
+import { formatText } from '@shelkovo/typography';
 
 import { formatArea } from '../areas';
 import type { StatusCalendarDay } from './calendar.types';

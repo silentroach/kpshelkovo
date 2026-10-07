@@ -47,6 +47,7 @@
     "@shelkovo/ical": "workspace:*",
     "@shelkovo/markdown": "workspace:*",
     "@shelkovo/seo": "workspace:*",
+    "@shelkovo/typography": "workspace:*",
     "@shelkovo/ui": "workspace:*",
     "@shelkovo/url": "workspace:*",
     "@yandex/ymaps3-clusterer": "^0.0.12",
