@@ -17,7 +17,10 @@ const statusWindows = getHomeStatusWindows(status.incidents, buildNow);
 
 <header class="site-header">
   <div class="site-header-inner ui-page">
-    <a href="/" class="site-header-brand"> Шелково Онлайн </a>
+    <a href="/" class="site-header-brand">
+      {' '}
+      Шелково Онлайн{' '}
+    </a>
 
     <div class="site-header-desktop-nav">
       <SiteNav
@@ -74,6 +77,8 @@ const statusWindows = getHomeStatusWindows(status.incidents, buildNow);
   }
 
   .site-header-inner {
+    /* Keep the navigation's width budget proportional to enlarged text. */
+    --page-max: 73.75rem;
     display: flex;
     min-height: 3rem;
     align-items: center;
@@ -310,7 +315,10 @@ const statusWindows = getHomeStatusWindows(status.incidents, buildNow);
       gap: 1rem;
       padding: 0.625rem 1.5rem;
     }
+  }
 
+  /* The full navigation needs more room than the page's tablet layout. */
+  @media (min-width: 56rem) {
     .site-header-desktop-nav {
       display: block;
     }
