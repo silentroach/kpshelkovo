@@ -4,6 +4,22 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import SettlementMap from './SettlementMap.svelte';
 
+vi.mock(import('@/lib/yandex-maps/runtime'), async (importOriginal) => {
+  const runtime = await importOriginal();
+  return {
+    ...runtime,
+    // The runtime loader calls its own layout helper, not this mocked export.
+    // With the test SDK installed, retain readiness without either layout delay.
+    // Script loading and recovery remain covered by the real runtime tests.
+    waitForStableLayout: async () => {},
+    loadYandexMaps: async () => {
+      const maps = window.ymaps3;
+      if (!maps) return runtime.loadYandexMaps();
+      await maps.ready;
+    }
+  };
+});
+
 const mockMap = {
   addChild: vi.fn(),
   removeChild: vi.fn(),
@@ -288,11 +304,11 @@ describe('SettlementMap', () => {
     } as DOMRect);
     const markerRect = { left: 0, top: 120, width: 20, height: 20 };
     vi.spyOn(marker, 'getBoundingClientRect').mockImplementation(() => markerRect as DOMRect);
-    vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(
-      function (this: HTMLElement) {
-        return this.classList.contains('map-popup-panel') ? 110 : 0;
-      }
-    );
+    vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (
+      this: HTMLElement
+    ) {
+      return this.classList.contains('map-popup-panel') ? 110 : 0;
+    });
 
     marker.click();
     await waitFor(() =>
@@ -330,11 +346,11 @@ describe('SettlementMap', () => {
       width: 20,
       height: 20
     } as DOMRect);
-    vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockImplementation(
-      function (this: HTMLElement) {
-        return this.classList.contains('map-popup-panel') ? 320 : 0;
-      }
-    );
+    vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockImplementation(function (
+      this: HTMLElement
+    ) {
+      return this.classList.contains('map-popup-panel') ? 320 : 0;
+    });
 
     marker.click();
     await waitFor(() =>
@@ -365,13 +381,13 @@ describe('SettlementMap', () => {
       width: 20,
       height: 20
     } as DOMRect);
-    vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockImplementation(
-      function (this: HTMLElement) {
-        return this.classList.contains('map-popup-panel')
-          ? Math.min(320, Number.parseInt(this.style.maxWidth))
-          : 0;
-      }
-    );
+    vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockImplementation(function (
+      this: HTMLElement
+    ) {
+      return this.classList.contains('map-popup-panel')
+        ? Math.min(320, Number.parseInt(this.style.maxWidth))
+        : 0;
+    });
 
     marker.click();
     await waitFor(() =>
@@ -561,6 +577,9 @@ describe('SettlementMap', () => {
 
     vi.useFakeTimers();
     resizeMap();
+    await vi.runAllTimersAsync();
+    expect(mockYandexMaps.YMap).not.toHaveBeenCalled();
+    expect(readyReads).toBe(2);
     resolveInitialization?.();
     await vi.runAllTimersAsync();
 
