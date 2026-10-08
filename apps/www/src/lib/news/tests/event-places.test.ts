@@ -138,7 +138,7 @@ describe('event place references', () => {
         '@type': 'Place',
         name: place.name,
         url: place.canonical,
-        ...(address ? { address } : {}),
+        address,
         geo: { '@type': 'GeoCoordinates', latitude: 55, longitude: 38 }
       });
       const ics = buildArticleEventIcs(article, event).replaceAll('\r\n ', '');

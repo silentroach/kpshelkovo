@@ -89,14 +89,10 @@ const incidentFrontmatter = (incident: StatusIncident): Readonly<Record<string, 
     phase: getStatusIncidentPhase(incident).label,
     startedAt: statusDate(incident.started.iso, incident.started.hasTime),
     startedHasTime: incident.started.hasTime,
-    ...(incident.ended
-      ? {
-          endedAt: statusDate(incident.ended.iso, incident.ended.hasTime),
-          endedHasTime: incident.ended.hasTime
-        }
-      : {}),
-    ...(areas.length > 0 ? { areas } : {}),
-    ...(incident.sourceUrl ? { sourceUrl: abs(incident.sourceUrl) } : {})
+    endedAt: incident.ended ? statusDate(incident.ended.iso, incident.ended.hasTime) : undefined,
+    endedHasTime: incident.ended?.hasTime,
+    areas: areas.length > 0 ? areas : undefined,
+    sourceUrl: incident.sourceUrl ? abs(incident.sourceUrl) : undefined
   };
 };
 

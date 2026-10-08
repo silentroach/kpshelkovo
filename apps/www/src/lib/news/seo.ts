@@ -57,10 +57,10 @@ const articleSchema = (input: ArticleInput): readonly SchemaDoc[] => {
       url,
       mainEntityOfPage: url,
       inLanguage: LANG,
-      ...(input.datePublished ? { datePublished: input.datePublished } : {}),
-      ...(input.dateModified ? { dateModified: input.dateModified } : {}),
-      ...(image ? { image } : {}),
-      ...(input.author ? { author: input.author } : {})
+      datePublished: input.datePublished || undefined,
+      dateModified: input.dateModified || undefined,
+      image,
+      author: input.author
     }
   ];
 

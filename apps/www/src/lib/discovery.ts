@@ -43,9 +43,9 @@ export function catalog(root: string): Record<string, unknown> {
           .map((surface) => item(root, surface));
 
         return {
-          ...(anchor ? { anchor: surfaceHref(root, anchor) } : {}),
-          ...(items.length ? { item: items } : {}),
-          ...(serviceDesc.length ? { 'service-desc': serviceDesc } : {})
+          anchor: anchor ? surfaceHref(root, anchor) : undefined,
+          item: items.length ? items : undefined,
+          'service-desc': serviceDesc.length ? serviceDesc : undefined
         };
       })
       .filter(hasCatalogLinks)

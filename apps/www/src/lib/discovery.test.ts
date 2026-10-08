@@ -50,8 +50,8 @@ describe('root api catalog', () => {
 
       return expect.objectContaining({
         anchor: anchor && surfaceHref(root, anchor),
-        ...(item.length ? { item: expect.arrayContaining(item) } : {}),
-        ...(serviceDesc.length ? { 'service-desc': expect.arrayContaining(serviceDesc) } : {})
+        item: item.length ? expect.arrayContaining(item) : undefined,
+        'service-desc': serviceDesc.length ? expect.arrayContaining(serviceDesc) : undefined
       });
     });
 

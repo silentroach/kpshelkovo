@@ -236,11 +236,9 @@ export function getTariffCalc(
     intro: multi
       ? 'Тариф состоит из нескольких частей. Для сравнения каждая часть приведена к ₽/сотка в месяц, затем значения суммированы.'
       : 'Тариф приведен к ₽/сотка в месяц для корректного сравнения.',
-    ...(lot
-      ? {
-          assumption: `Допущение: 1 участок = ${area(size)}${join(area(size))}${why(lots)}`
-        }
-      : {}),
+    assumption: lot
+      ? `Допущение: 1 участок = ${area(size)}${join(area(size))}${why(lots)}`
+      : undefined,
     rows,
     total: `${money(calculation.normalizedPerSotkaMonth, '/сотка')} в месяц`
   };

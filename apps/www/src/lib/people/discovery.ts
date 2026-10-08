@@ -35,7 +35,7 @@ const star = (value: string): readonly { readonly value: string; readonly langua
 
 const text = (minLength = 0): Record<string, unknown> => ({
   type: 'string',
-  ...(minLength > 0 ? { minLength } : {})
+  minLength: minLength > 0 ? minLength : undefined
 });
 
 const uri = (): Record<string, unknown> => ({

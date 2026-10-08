@@ -15,7 +15,8 @@
     "format": "oxfmt --write . && prettier --write \"**/*.astro\"",
     "format:check": "oxfmt --check . && prettier --check \"**/*.astro\"",
     "format:changed": "lint-staged",
-    "lint": "oxlint --deny-warnings .",
+    "lint": "pnpm test:lint && oxlint --deny-warnings .",
+    "test:lint": "node --test tools/oxlint/*.test.ts",
     "test": "turbo run test",
     "test:search-quality": "pnpm --filter @shelkovo/www test:search-quality",
     "parcels:update": "node apps/www/scripts/parcels/update.ts",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@fission-ai/openspec": "1.13.2",
     "@lhci/cli": "^0.15.1",
+    "@oxlint/plugins": "1.86.0",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@testing-library/svelte": "^5.4.2",
     "@yandex/ymaps3-types": "^1.0.21354683",
@@ -38,7 +40,7 @@
     "happy-dom": "^20.14.5",
     "lint-staged": "^17.6.0",
     "oxfmt": "^0.71.0",
-    "oxlint": "^1.86.0",
+    "oxlint": "1.86.0",
     "prettier": "^3.9.9",
     "prettier-plugin-astro": "^1.1.0",
     "skills": "1.7.0",
@@ -51,11 +53,11 @@
   },
   "lint-staged": {
     "*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,svelte}": [
-      "oxlint --fix --deny-warnings",
+      "oxlint --fix --deny-warnings --no-error-on-unmatched-pattern",
       "oxfmt --write --no-error-on-unmatched-pattern"
     ],
     "*.astro": [
-      "oxlint --fix --deny-warnings",
+      "oxlint --fix --deny-warnings --no-error-on-unmatched-pattern",
       "prettier --write"
     ],
     "!(*.js|*.jsx|*.mjs|*.cjs|*.ts|*.tsx|*.mts|*.cts|*.svelte|*.astro)": "oxfmt --write --no-error-on-unmatched-pattern"

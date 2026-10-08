@@ -160,9 +160,9 @@ function articleFrontmatter(article: NewsArticle): Readonly<Record<string, unkno
       name: formatNewsAuthor(article.author, { short: false }),
       kind: toNewsPublicAuthorKind(article.author.kind)
     },
-    ...(areas.length > 0 ? { areas } : {}),
-    ...(tags.length > 0 ? { tags } : {}),
-    ...(article.sourceUrl ? { source_url: abs(article.sourceUrl) } : {})
+    areas: areas.length > 0 ? areas : undefined,
+    tags: tags.length > 0 ? tags : undefined,
+    source_url: article.sourceUrl ? abs(article.sourceUrl) : undefined
   };
 }
 

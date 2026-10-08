@@ -48,10 +48,10 @@ export const buildParcelMapPayload = (
         : geometry;
     const result = ParcelMapPublicSchema.element.safeParse({
       code: parcel.code,
-      ...(parcel.aliases.length ? { aliases: parcel.aliases } : {}),
+      aliases: parcel.aliases.length ? parcel.aliases : undefined,
       part: parcel.part,
-      ...(parcel.status ? { status: parcel.status } : {}),
-      ...(parcel.cadastralParts.length > 1 ? { multipleCadastralParcels: true } : {}),
+      status: parcel.status,
+      multipleCadastralParcels: parcel.cadastralParts.length > 1 ? true : undefined,
       geometry:
         geometry.type === 'Polygon'
           ? {

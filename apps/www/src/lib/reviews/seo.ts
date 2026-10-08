@@ -193,17 +193,13 @@ export const reviewsCollectionPageSchema = (
       publisher: organizationSchema(),
       about: shelkovoPlaceSchema(),
       publishingPrinciples: rulesUrl,
-      ...(url !== rulesUrl ? { significantLink: rulesUrl } : {}),
-      ...(input.items[0] ? { dateModified: input.items[0].publishedIso } : {}),
-      ...(list
-        ? {
-            mainEntity: { '@id': list['@id'] },
-            hasPart: input.items.map((review) => ({
-              '@id': `${absoluteUrl(review.url)}#webpage`
-            }))
-          }
-        : {}),
-      ...(breadcrumb ? { breadcrumb: { '@id': breadcrumb['@id'] } } : {})
+      significantLink: url !== rulesUrl ? rulesUrl : undefined,
+      dateModified: input.items[0]?.publishedIso,
+      mainEntity: list ? { '@id': list['@id'] } : undefined,
+      hasPart: list
+        ? input.items.map((review) => ({ '@id': `${absoluteUrl(review.url)}#webpage` }))
+        : undefined,
+      breadcrumb: breadcrumb ? { '@id': breadcrumb['@id'] } : undefined
     }
   ];
 
@@ -247,7 +243,7 @@ export const reviewPageSchema = (input: ReviewPageInput): readonly SchemaDoc[] =
         : undefined,
       mentions: mentions.length ? mentions : undefined,
       relatedLink: absoluteUrl(reviewsRulesUrl()),
-      ...(breadcrumb ? { breadcrumb: { '@id': breadcrumb['@id'] } } : {})
+      breadcrumb: breadcrumb ? { '@id': breadcrumb['@id'] } : undefined
     },
     ...reviewEntities.map((entity) => ({
       '@context': CONTEXT,

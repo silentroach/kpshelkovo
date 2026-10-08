@@ -49,11 +49,11 @@ export const TariffSchema = z
     const notes = list.flatMap((item) => (item.note ? [item.note] : []));
     const note = notes.length ? [...new Set(notes)].join('; ') : undefined;
 
-    const base = {
+    const base: z.output<typeof TariffPartSchema> = {
       value: first.value,
       unit: first.unit,
       period: first.period,
-      ...(note ? { note } : {})
+      note
     };
 
     if (list.length === 1) return base;

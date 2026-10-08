@@ -121,7 +121,7 @@ const schema = newsArticleSchema({
   datePublished: article.publishedIso,
   image: images.length > 0 ? images : undefined,
   author,
-  ...(hasEvents ? { events: article.events } : {}),
+  events: hasEvents ? article.events : undefined,
 });
 ---
 

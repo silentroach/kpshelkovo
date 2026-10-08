@@ -91,8 +91,8 @@ export const md = {
   code: (value: string, lang?: string, meta?: string): Code => ({
     type: 'code',
     value,
-    ...(lang ? { lang } : {}),
-    ...(meta ? { meta } : {})
+    lang: lang || undefined,
+    meta: meta || undefined
   }),
   heading: (depth: Heading['depth'], children: MarkdownPhrasingInput): Heading => ({
     type: 'heading',
@@ -104,19 +104,19 @@ export const md = {
     type: 'link',
     url,
     children: toPhrasingChildren(children),
-    ...(title ? { title } : {})
+    title: title || undefined
   }),
   list: (children: readonly ListItem[], options: MarkdownListOptions = {}): List => ({
     type: 'list',
     children: [...children],
-    ...(options.ordered === undefined ? {} : { ordered: options.ordered }),
+    ordered: options.ordered,
     spread: options.spread ?? false,
-    ...(options.start === undefined ? {} : { start: options.start })
+    start: options.start
   }),
   listItem: (input: MarkdownListItemInput, options: MarkdownListItemOptions = {}): ListItem => ({
     type: 'listItem',
     children: toListItemChildren(input),
-    ...(options.checked === undefined ? {} : { checked: options.checked }),
+    checked: options.checked,
     spread: options.spread ?? false
   }),
   paragraph: (children: MarkdownPhrasingInput): Paragraph => ({

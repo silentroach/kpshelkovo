@@ -37,6 +37,6 @@ describe('kb schema', () => {
         "BreadcrumbList",
       ]
     `);
-    expect(schema[0]).not.toHaveProperty('mainEntity');
+    expect(schema[0]?.mainEntity).toBeUndefined();
   });
 });

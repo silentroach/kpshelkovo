@@ -24,7 +24,7 @@ const urls = paths.map((path) =>
 );
 
 const collect = {
-  ...(target === 'static' ? { staticDistDir: './dist/www' } : {}),
+  staticDistDir: target === 'static' ? './dist/www' : undefined,
   url: urls,
   numberOfRuns: 2
 };

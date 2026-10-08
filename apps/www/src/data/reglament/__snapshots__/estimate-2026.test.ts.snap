@@ -9,16 +9,19 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 1.1",
+        "note": undefined,
         "page": 1,
         "pdf": "final",
       },
       {
         "fragment": "локальный ресурсный сметный расчет",
+        "note": undefined,
         "page": 9,
         "pdf": "waste",
       },
       {
         "fragment": "калькуляция стоимости услуг",
+        "note": undefined,
         "page": 13,
         "pdf": "waste",
       },
@@ -33,11 +36,13 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 2.1",
+        "note": undefined,
         "page": 1,
         "pdf": "final",
       },
       {
         "fragment": "итого по разделу зимней механизированной уборки",
+        "note": undefined,
         "page": 12,
         "pdf": "cleaning",
       },
@@ -52,11 +57,13 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 2.2",
+        "note": undefined,
         "page": 1,
         "pdf": "final",
       },
       {
         "fragment": "итого по разделу зимней ручной уборки",
+        "note": undefined,
         "page": 17,
         "pdf": "cleaning",
       },
@@ -71,11 +78,13 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 2.3",
+        "note": undefined,
         "page": 1,
         "pdf": "final",
       },
       {
         "fragment": "итого по разделу летней механизированной уборки",
+        "note": undefined,
         "page": 19,
         "pdf": "cleaning",
       },
@@ -90,11 +99,13 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 2.4",
+        "note": undefined,
         "page": 1,
         "pdf": "final",
       },
       {
         "fragment": "итого по разделу летней ручной уборки",
+        "note": undefined,
         "page": 24,
         "pdf": "cleaning",
       },
@@ -109,11 +120,13 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 3.1",
+        "note": undefined,
         "page": 1,
         "pdf": "final",
       },
       {
         "fragment": "итого по разделу кошения травостоя",
+        "note": undefined,
         "page": 9,
         "pdf": "landscaping",
       },
@@ -128,11 +141,13 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 3.2",
+        "note": undefined,
         "page": 1,
         "pdf": "final",
       },
       {
         "fragment": "итого по разделу ухода за деревьями",
+        "note": undefined,
         "page": 17,
         "pdf": "landscaping",
       },
@@ -147,11 +162,13 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 3.3",
+        "note": undefined,
         "page": 2,
         "pdf": "final",
       },
       {
         "fragment": "обработка от клещей и борьба с борщевиком",
+        "note": undefined,
         "page": 18,
         "pdf": "landscaping",
       },
@@ -166,11 +183,13 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 3.4",
+        "note": undefined,
         "page": 2,
         "pdf": "final",
       },
       {
         "fragment": "итого по услуге ухода за лесом",
+        "note": undefined,
         "page": 19,
         "pdf": "landscaping",
       },
@@ -185,11 +204,13 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 4.1",
+        "note": undefined,
         "page": 2,
         "pdf": "final",
       },
       {
         "fragment": "локальный ресурсный сметный расчет",
+        "note": undefined,
         "page": 6,
         "pdf": "improvement",
       },
@@ -204,6 +225,7 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 4.2",
+        "note": undefined,
         "page": 2,
         "pdf": "final",
       },
@@ -236,11 +258,13 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 5.1",
+        "note": undefined,
         "page": 2,
         "pdf": "final",
       },
       {
         "fragment": "раздел круглосуточного пропускного режима",
+        "note": undefined,
         "page": 5,
         "pdf": "security",
       },
@@ -255,11 +279,13 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 5.2",
+        "note": undefined,
         "page": 2,
         "pdf": "final",
       },
       {
         "fragment": "итого по техническому обслуживанию средств охраны",
+        "note": undefined,
         "page": 10,
         "pdf": "security",
       },
@@ -274,11 +300,13 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 5.3",
+        "note": undefined,
         "page": 2,
         "pdf": "final",
       },
       {
         "fragment": "итого по диспетчерскому обслуживанию",
+        "note": undefined,
         "page": 11,
         "pdf": "security",
       },
@@ -293,16 +321,19 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 6.1",
+        "note": undefined,
         "page": 2,
         "pdf": "final",
       },
       {
         "fragment": "локальный ресурсный сметный расчет по работе с региональным оператором",
+        "note": undefined,
         "page": 3,
         "pdf": "waste",
       },
       {
         "fragment": "калькуляция стоимости услуг по работе с региональным оператором",
+        "note": undefined,
         "page": 5,
         "pdf": "waste",
       },
@@ -317,11 +348,13 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 7.1",
+        "note": undefined,
         "page": 2,
         "pdf": "final",
       },
       {
         "fragment": "обслуживание светильников и кабельных сетей",
+        "note": undefined,
         "page": 7,
         "pdf": "lighting",
       },
@@ -336,16 +369,19 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 7.2",
+        "note": undefined,
         "page": 2,
         "pdf": "final",
       },
       {
         "fragment": "нормативный расчет электроэнергии",
+        "note": undefined,
         "page": 6,
         "pdf": "lighting",
       },
       {
         "fragment": "локальный расчет электроэнергии",
+        "note": undefined,
         "page": 8,
         "pdf": "lighting",
       },
@@ -360,11 +396,13 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 7.3",
+        "note": undefined,
         "page": 2,
         "pdf": "final",
       },
       {
         "fragment": "текущий ремонт опор уличного освещения",
+        "note": undefined,
         "page": 9,
         "pdf": "lighting",
       },
@@ -379,11 +417,13 @@ exports[`estimate2026 baseline data > keeps all official row totals and source r
     "source_refs": [
       {
         "fragment": "строка 7.4",
+        "note": undefined,
         "page": 2,
         "pdf": "final",
       },
       {
         "fragment": "обслуживание КТП, КРН и трансформаторов",
+        "note": undefined,
         "page": 10,
         "pdf": "lighting",
       },
@@ -866,6 +906,7 @@ exports[`estimate2026 baseline data > keeps the disputed improvement repair sour
   "source_refs": [
     {
       "fragment": "строка 4.2",
+      "note": undefined,
       "page": 2,
       "pdf": "final",
     },

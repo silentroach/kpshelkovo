@@ -90,8 +90,8 @@ const mentionDto = (item: EntityMentionTarget): PeoplePublicMentionDto => {
     type: item.type,
     slug: item.slug,
     name: item.label,
-    ...(typeof company === 'string' ? { company } : {}),
-    ...(typeof position === 'string' ? { position } : {}),
+    company: typeof company === 'string' ? company : undefined,
+    position: typeof position === 'string' ? position : undefined,
     html_url: fullUrl(item.htmlUrl),
     markdown_url: fullUrl(item.markdownUrl)
   };
@@ -104,8 +104,8 @@ const backlinkDto = (item: PersonMentionRef): PeoplePublicBacklinkDto => ({
   title: item.title,
   html_url: fullUrl(item.htmlUrl),
   markdown_url: fullUrl(item.markdownUrl),
-  ...(item.excerpt ? { excerpt: item.excerpt } : {}),
-  ...(item.mentionedAt ? { mentioned_at: item.mentionedAt } : {})
+  excerpt: item.excerpt || undefined,
+  mentioned_at: item.mentionedAt || undefined
 });
 
 const backlinksDto = (value: PersonBacklinks): PeoplePublicBacklinksDto => ({
@@ -122,9 +122,9 @@ const profileDto = (item: PersonProfile): PeoplePublicProfileDto => ({
   id: item.id,
   slug: item.slug,
   name: item.name,
-  ...(item.nameCases ? { name_cases: item.nameCases } : {}),
-  ...(item.company ? { company: item.company } : {}),
-  ...(item.position ? { position: item.position } : {}),
+  name_cases: item.nameCases,
+  company: item.company || undefined,
+  position: item.position || undefined,
   photo: item.photo
     ? {
         src: item.photo.src,

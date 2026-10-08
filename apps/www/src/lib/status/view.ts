@@ -258,7 +258,7 @@ export const getStatusIncidentPeriod = (
             nonBreaking: opts?.nonBreaking
           })
     },
-    ...(incident.duration ? { duration: formatStatusDuration(incident.duration, opts) } : {})
+    duration: incident.duration ? formatStatusDuration(incident.duration, opts) : undefined
   };
 };
 

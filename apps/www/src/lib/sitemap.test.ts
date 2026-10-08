@@ -77,26 +77,32 @@ describe('buildSitemapMetadataIndex', () => {
       {
         "firstArticle": {
           "changefreq": "monthly",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-05-04T12:30:00+03:00",
         },
         "home": {
           "changefreq": "daily",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-05-04T12:30:00+03:00",
         },
         "monthArchive": {
           "changefreq": "daily",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-05-04T12:30:00+03:00",
         },
         "newsArchive": {
           "changefreq": "daily",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-05-04T12:30:00+03:00",
         },
         "olderArticle": {
           "changefreq": "monthly",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-04-20T09:00:00+03:00",
         },
         "tag": {
           "changefreq": "daily",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-05-04T12:30:00+03:00",
         },
       }
@@ -150,22 +156,28 @@ describe('buildSitemapMetadataIndex', () => {
       {
         "compareHome": {
           "changefreq": "monthly",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-04-12",
         },
         "compareRating": {
           "changefreq": "yearly",
+          "excludeFromSitemap": undefined,
+          "lastmod": undefined,
         },
         "electricityIncident": undefined,
         "electricityService": {
           "changefreq": "hourly",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-05-01T09:00:00+03:00",
         },
         "home": {
           "changefreq": "daily",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-05-03T14:00:00+03:00",
         },
         "riverSettlement": {
           "changefreq": "monthly",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-04-12",
         },
         "statusHistory": undefined,
@@ -206,6 +218,7 @@ describe('buildSitemapMetadataIndex', () => {
         "history": undefined,
         "status": {
           "changefreq": "hourly",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-12-31T21:00:00.000Z",
         },
       }
@@ -242,11 +255,13 @@ describe('buildSitemapMetadataIndex', () => {
         "home": undefined,
         "original": {
           "changefreq": "yearly",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-05-20",
         },
         "section": undefined,
         "updated": {
           "changefreq": "yearly",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-06-14T10:30:00+03:00",
         },
       }
@@ -317,18 +332,22 @@ describe('buildSitemapMetadataIndex', () => {
       {
         "category": {
           "changefreq": "monthly",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-07-07",
         },
         "contact": {
           "changefreq": "monthly",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-07-07",
         },
         "olderContact": {
           "changefreq": "monthly",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-07-06",
         },
         "section": {
           "changefreq": "monthly",
+          "excludeFromSitemap": undefined,
           "lastmod": "2026-07-07",
         },
       }
@@ -337,6 +356,29 @@ describe('buildSitemapMetadataIndex', () => {
 });
 
 describe('applySitemapMetadata', () => {
+  it('preserves existing values when indexed metadata is undefined', () => {
+    const index = new Map([
+      ['/news/', { lastmod: undefined, changefreq: undefined, excludeFromSitemap: undefined }]
+    ]);
+
+    expect(
+      applySitemapMetadata(
+        {
+          url: 'https://example.com/news/',
+          lastmod: '2026-05-01',
+          changefreq: ChangeFreqEnum.MONTHLY
+        },
+        index
+      )
+    ).toMatchInlineSnapshot(`
+      {
+        "changefreq": "monthly",
+        "lastmod": "2026-05-01",
+        "url": "https://example.com/news/",
+      }
+    `);
+  });
+
   it('adds metadata only for known paths', () => {
     const index = new Map([
       [

@@ -44,7 +44,7 @@ export const GET: APIRoute = async (context) => {
     items: data.incidents.map((item) => ({
       title: item.title,
       description: description(item),
-      ...(item.hasPage ? { link: item.url } : {}),
+      link: item.hasPage ? item.url : undefined,
       pubDate: item.ended?.at ?? item.started.at,
       categories: categories(item)
     })),
