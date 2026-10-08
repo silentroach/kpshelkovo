@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Мобильные хлебные крошки: макет</title>
+    <style>
+      /* Локальный макет. Шрифты берём с уже запущенного dev-сервера. */
+      @font-face {
+        font-family: 'Fira Sans';
+        src: url('/static/fonts/font-fira-sans-400-normal-e3822b075373eec8.woff2') format('woff2');
+        font-weight: 400;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'Fira Sans';
+        src: url('/static/fonts/font-fira-sans-400-normal-3691c4b98eab8332.woff2') format('woff2');
+        font-weight: 400;
+        font-display: swap;
+        unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116;
+      }
+      @font-face {
+        font-family: 'Fira Sans';
+        src: url('/static/fonts/font-fira-sans-600-normal-aee7fc448115de64.woff2') format('woff2');
+        font-weight: 600;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'Fira Sans';
+        src: url('/static/fonts/font-fira-sans-600-normal-a53e083586ffbf4b.woff2') format('woff2');
+        font-weight: 600;
+        font-display: swap;
+        unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116;
+      }
+      @font-face {
+        font-family: 'PT Serif';
+        src: url('/static/fonts/font-pt-serif-700-normal-9601f258049b517c.woff2') format('woff2');
+        font-weight: 700;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'PT Serif';
+        src: url('/static/fonts/font-pt-serif-700-normal-511c936f7998d9c9.woff2') format('woff2');
+        font-weight: 700;
+        font-display: swap;
+        unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116;
+      }
+
+      :root {
+        color-scheme: light;
+        --bg: oklch(99.1% 0.002 125);
+        --text: oklch(24% 0.04 145);
+        --muted: oklch(46% 0.02 135);
+        --border: oklch(89.2% 0.012 130);
+        --primary: oklch(36% 0.115 143);
+        --primary-soft: oklch(96.5% 0.014 140);
+        --quiet-surface: oklch(98% 0.003 125);
+        --nested-indent: 12px;
+        font:
+          16px / 1.6 'Fira Sans',
+          system-ui,
+          sans-serif;
+        color: var(--text);
+        background: oklch(96.8% 0.008 135);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body,
+      h1,
+      h2,
+      p,
+      ol {
+        margin: 0;
+      }
+      a {
+        color: var(--primary);
+        text-underline-offset: 0.2em;
+      }
+      a:focus-visible,
+      summary:focus-visible,
+      input:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 3px;
+      }
+      .lab {
+        padding: 28px 24px 48px;
+      }
+      .lab-header {
+        max-width: 70rem;
+        margin: 0 auto 28px;
+      }
+      .lab-title {
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+      .lab-description {
+        margin-top: 8px;
+        color: var(--muted);
+        max-width: 68ch;
+      }
+      .width-picker,
+      .appearance-picker {
+        margin: 16px 0 0;
+        padding: 0;
+        border: 0;
+      }
+      .width-picker legend,
+      .appearance-picker legend {
+        margin-bottom: 6px;
+        font-size: 14px;
+      }
+      .width-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 20px;
+      }
+      .width-options label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        min-height: 32px;
+      }
+      .width-options input {
+        accent-color: var(--primary);
+      }
+      .gallery {
+        --preview-width: 390px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--preview-width)), 1fr));
+        align-items: start;
+        gap: 32px 24px;
+        max-width: 1300px;
+        margin-inline: auto;
+      }
+      body:has(#width-320:checked) .gallery {
+        --preview-width: 320px;
+      }
+      body:has(#width-desktop:checked) .gallery {
+        --preview-width: 1000px;
+      }
+      .example {
+        width: min(100%, var(--preview-width));
+        margin-inline: auto;
+      }
+      .example-label {
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .preview {
+        container: page / inline-size;
+        background: var(--bg);
+        outline: 1px solid var(--border);
+        min-height: 540px;
+      }
+      .site-header {
+        border-bottom: 1px solid color-mix(in oklab, var(--border) 68%, transparent);
+      }
+      .site-inner,
+      .page {
+        width: calc(100% - clamp(16px, 3cqi, 32px) * 2);
+        margin-inline: auto;
+        padding-inline: 20px;
+      }
+      .site-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        min-height: 53px;
+      }
+      .site-brand {
+        font:
+          700 16px / 1.2 'PT Serif',
+          Georgia,
+          serif;
+        letter-spacing: -0.02em;
+        color: var(--text);
+        text-decoration: none;
+      }
+      .site-menu {
+        position: relative;
+        flex: none;
+      }
+      .site-menu summary {
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .site-menu nav {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 8px);
+        z-index: 1;
+        width: 180px;
+        padding: 12px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+      }
+      .site-menu nav a {
+        display: block;
+        padding-block: 4px;
+      }
+      .page {
+        padding-top: 16px;
+        padding-bottom: 32px;
+      }
+      .page-heading {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .page-title {
+        font:
+          700 36px / 1.08 'PT Serif',
+          Georgia,
+          serif;
+        letter-spacing: -0.018em;
+        text-wrap: balance;
+        overflow-wrap: anywhere;
+      }
+      .page-copy {
+        margin-top: 24px;
+        line-height: 1.75;
+      }
+      .page-copy p + p {
+        margin-top: 16px;
+      }
+      .page-copy strong {
+        font-weight: 600;
+      }
+      .page-meta {
+        margin-top: 12px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .page-facts {
+        margin-top: 24px;
+        border-top: 1px solid var(--border);
+        padding-top: 16px;
+      }
+      .page-facts p + p {
+        margin-top: 8px;
+      }
+      .page-facts span {
+        color: var(--muted);
+      }
+
+      /* Ширина контейнера имитирует экран, чтобы сравнивать размеры в одном HTML. */
+      .breadcrumbs ol {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 4px 6px;
+        padding: 0;
+        list-style: none;
+        font-size: 14px;
+        line-height: 20px;
+      }
+      .breadcrumbs li {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        min-width: 0;
+      }
+      .breadcrumbs a {
+        min-width: 0;
+        text-decoration: none;
+        overflow-wrap: anywhere;
+      }
+      .breadcrumbs a:is(:hover, :focus-visible) {
+        text-decoration: underline;
+      }
+      .breadcrumbs .separator {
+        flex: none;
+        color: var(--muted);
+      }
+      .breadcrumbs [aria-current] {
+        overflow-wrap: anywhere;
+      }
+
+      @container page (width < 640px) {
+        body:has(#background-green:checked, #background-quiet:checked) .breadcrumbs {
+          --side-inset: calc(20px + clamp(16px, 3cqi, 32px));
+          margin-top: -16px;
+          margin-inline: calc(-1 * var(--side-inset));
+          padding: 16px var(--side-inset);
+          background: var(--primary-soft);
+        }
+        body:has(#background-quiet:checked) .breadcrumbs {
+          padding-block: 12px;
+          background: var(--quiet-surface);
+        }
+        body:has(#background-quiet:checked) .breadcrumbs a {
+          color: var(--muted);
+        }
+        body:has(#background-quiet:checked) .breadcrumbs a:is(:hover, :focus-visible) {
+          color: var(--primary);
+        }
+        .breadcrumbs ol {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0;
+        }
+        .breadcrumbs li:first-child,
+        .breadcrumbs li:last-child {
+          display: none;
+        }
+        .breadcrumbs li:nth-child(n + 3) {
+          margin-inline-start: var(--nested-indent);
+        }
+        .breadcrumbs li:nth-child(2) .separator {
+          display: none;
+        }
+        .breadcrumbs a {
+          padding-block: 2px;
+        }
+        .breadcrumbs .separator {
+          padding-top: 2px;
+          align-self: flex-start;
+        }
+      }
+      @container page (width >= 768px) {
+        .page-title {
+          font-size: 48px;
+        }
+        .page,
+        .site-inner {
+          padding-inline: 24px;
+        }
+        .page {
+          padding-block: 20px 40px;
+        }
+        .breadcrumbs ol,
+        .breadcrumbs li {
+          column-gap: 8px;
+        }
+        .page-copy {
+          max-width: 65ch;
+          font-size: 17px;
+        }
+      }
+      @media (width < 640px) {
+        .lab {
+          padding: 20px 0 32px;
+        }
+        .lab-header {
+          padding-inline: 20px;
+        }
+        .example-label {
+          padding-inline: 20px;
+        }
+        .preview {
+          outline: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="lab">
+      <header class="lab-header">
+        <h1 class="lab-title">Мобильные хлебные крошки</h1>
+        <p class="lab-description">
+          Макет для обсуждения. На мобильном скрыты главная и текущая страница. Первая крошка без
+          отступа, остальные начинаются с новой строки с одинаковым отступом 12 px. От 640 px
+          показана обычная цепочка.
+        </p>
+        <fieldset class="width-picker">
+          <legend>Ширина примеров, если позволяет окно</legend>
+          <div class="width-options">
+            <label><input id="width-320" type="radio" name="width" />320 px</label>
+            <label><input id="width-390" type="radio" name="width" checked />390 px</label>
+            <label><input id="width-desktop" type="radio" name="width" />Компьютер, 1000 px</label>
+          </div>
+        </fieldset>
+        <fieldset class="appearance-picker">
+          <legend>Оформление крошек на мобильном</legend>
+          <div class="width-options">
+            <label><input id="background-none" type="radio" name="appearance" />Без фона</label>
+            <label
+              ><input id="background-green" type="radio" name="appearance" />Зелёная полоса</label
+            >
+            <label
+              ><input id="background-quiet" type="radio" name="appearance" checked />Тихий
+              фон</label
+            >
+          </div>
+        </fieldset>
+      </header>
+
+      <div class="gallery">
+        <section class="example" aria-labelledby="place-example">
+          <h2 class="example-label" id="place-example">Место · один родитель</h2>
+          <div class="preview">
+            <header class="site-header">
+              <div class="site-inner">
+                <a class="site-brand" href="/">Шелково Онлайн</a>
+                <details class="site-menu">
+                  <summary>Меню</summary>
+                  <nav aria-label="Меню примера места">
+                    <a href="/map/">Карта</a><a href="/news/">Новости</a
+                    ><a href="/kb/">База знаний</a>
+                  </nav>
+                </details>
+              </div>
+            </header>
+            <article class="page">
+              <header class="page-heading">
+                <nav class="breadcrumbs" aria-label="Хлебные крошки места">
+                  <ol>
+                    <li><a href="/">Главная</a></li>
+                    <li>
+                      <span class="separator" aria-hidden="true">›</span><a href="/map/">Карта</a>
+                    </li>
+                    <li>
+                      <span class="separator" aria-hidden="true">›</span
+                      ><span aria-current="page">Памятник в деревне Шелково</span>
+                    </li>
+                  </ol>
+                </nav>
+                <h2 class="page-title">Памятник в&nbsp;деревне Шелково</h2>
+              </header>
+              <div class="page-copy">
+                <p>Памятник воинам, погибшим в&nbsp;годы Великой Отечественной войны</p>
+              </div>
+              <div class="page-facts">
+                <p><span>Адрес</span><br />д. Шелково, улица Центральная, 46–48</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="example" aria-labelledby="kb-example">
+          <h2 class="example-label" id="kb-example">База знаний · два родителя</h2>
+          <div class="preview">
+            <header class="site-header">
+              <div class="site-inner">
+                <a class="site-brand" href="/">Шелково Онлайн</a>
+                <details class="site-menu">
+                  <summary>Меню</summary>
+                  <nav aria-label="Меню примера статьи">
+                    <a href="/map/">Карта</a><a href="/news/">Новости</a
+                    ><a href="/kb/">База знаний</a>
+                  </nav>
+                </details>
+              </div>
+            </header>
+            <article class="page">
+              <header class="page-heading">
+                <nav class="breadcrumbs" aria-label="Хлебные крошки статьи">
+                  <ol>
+                    <li><a href="/">Главная</a></li>
+                    <li>
+                      <span class="separator" aria-hidden="true">›</span
+                      ><a href="/kb/">База знаний</a>
+                    </li>
+                    <li>
+                      <span class="separator" aria-hidden="true">›</span
+                      ><a href="/kb/before-you-buy/">Перед покупкой участка</a>
+                    </li>
+                    <li>
+                      <span class="separator" aria-hidden="true">›</span
+                      ><span aria-current="page"
+                        >Кто управляет коттеджным поселком: УК, ТСН или СНТ</span
+                      >
+                    </li>
+                  </ol>
+                </nav>
+                <h2 class="page-title">Кто управляет коттеджным поселком: УК, ТСН или СНТ</h2>
+              </header>
+              <div class="page-copy">
+                <p>
+                  До&nbsp;покупки участка выясните,
+                  <strong
+                    >кому принадлежат дороги и&nbsp;сети, кто назначает платежи и&nbsp;с&nbsp;кого
+                    спрашивать за&nbsp;работу</strong
+                  >. Это могут быть разные организации.
+                </p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="example" aria-labelledby="event-example">
+          <h2 class="example-label" id="event-example">Мероприятие · три родителя</h2>
+          <div class="preview">
+            <header class="site-header">
+              <div class="site-inner">
+                <a class="site-brand" href="/">Шелково Онлайн</a>
+                <details class="site-menu">
+                  <summary>Меню</summary>
+                  <nav aria-label="Меню примера мероприятия">
+                    <a href="/events/">События</a><a href="/news/">Новости</a
+                    ><a href="/kb/">База знаний</a>
+                  </nav>
+                </details>
+              </div>
+            </header>
+            <article class="page">
+              <header class="page-heading">
+                <nav class="breadcrumbs" aria-label="Хлебные крошки мероприятия">
+                  <ol>
+                    <li><a href="/">Главная</a></li>
+                    <li>
+                      <span class="separator" aria-hidden="true">›</span
+                      ><a href="/events/">События</a>
+                    </li>
+                    <li>
+                      <span class="separator" aria-hidden="true">›</span
+                      ><a href="/events/2026/09/">Сентябрь 2026 года</a>
+                    </li>
+                    <li>
+                      <span class="separator" aria-hidden="true">›</span
+                      ><a href="/events/2026/09/19/">19 сентября</a>
+                    </li>
+                    <li>
+                      <span class="separator" aria-hidden="true">›</span
+                      ><span aria-current="page">Детский киноквиз</span>
+                    </li>
+                  </ol>
+                </nav>
+                <h2 class="page-title">Детский киноквиз</h2>
+              </header>
+              <p class="page-meta">Игры и квизы</p>
+              <div class="page-facts">
+                <p><strong>19 сентября 2026 года, 17:00</strong></p>
+                <p><span>Стоимость</span><br />700 ₽</p>
+                <p><span>Для кого</span><br />7+</p>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
