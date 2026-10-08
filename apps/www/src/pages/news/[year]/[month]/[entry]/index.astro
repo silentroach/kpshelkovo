@@ -160,7 +160,7 @@ const schema = newsArticleSchema({
         <div class="news-hero-overlay-side" />
 
         <div class="ui-page news-hero__layout">
-          <div class="news-hero__breadcrumbs">
+          <div class="ui-breadcrumbs news-hero__breadcrumbs">
             <Breadcrumbs items={breadcrumbs} linkLast />
           </div>
 
@@ -212,7 +212,7 @@ const schema = newsArticleSchema({
     >
       {!hasHeroCover && (
         <>
-          <div class="ui-page-header news-article-breadcrumbs">
+          <div class="ui-page-header ui-breadcrumbs news-article-breadcrumbs">
             <Breadcrumbs items={breadcrumbs} linkLast />
           </div>
           <header class="news-article-header__content">
@@ -293,13 +293,6 @@ const schema = newsArticleSchema({
     --news-hero-overlay-side-strong: oklch(24% 0.04 145 / 0.36);
     --news-hero-overlay-side-mid: oklch(24% 0.04 145 / 0.18);
     --news-hero-overlay-side-soft: oklch(24% 0.04 145 / 0.06);
-    --color-text: var(--news-hero-foreground);
-    --color-text-muted: var(--news-hero-muted-foreground);
-    --color-primary: var(--news-hero-primary);
-    --color-primary-hover: var(--news-hero-primary-hover);
-    --color-border: var(--news-hero-border);
-    --color-border-strong: var(--news-hero-border-strong);
-    --color-focus: var(--news-hero-ring);
 
     position: relative;
     isolation: isolate;
@@ -374,6 +367,14 @@ const schema = newsArticleSchema({
   }
 
   .news-hero__content {
+    --color-text: var(--news-hero-foreground);
+    --color-text-muted: var(--news-hero-muted-foreground);
+    --color-primary: var(--news-hero-primary);
+    --color-primary-hover: var(--news-hero-primary-hover);
+    --color-border: var(--news-hero-border);
+    --color-border-strong: var(--news-hero-border-strong);
+    --color-focus: var(--news-hero-ring);
+
     margin-block-start: auto;
     padding-block-end: 1rem;
   }
@@ -458,6 +459,32 @@ const schema = newsArticleSchema({
     display: grid;
     gap: 1rem;
     width: 100%;
+  }
+
+  @media screen and (width < 40rem) {
+    .news-hero__layout {
+      padding-block-start: 0;
+    }
+
+    .news-hero__breadcrumbs :global(.breadcrumbs) {
+      margin-block-start: 0;
+    }
+
+    .news-hero__content {
+      padding-block-start: 1.25rem;
+    }
+  }
+
+  @media (min-width: 40rem) {
+    .news-hero__breadcrumbs {
+      --color-text: var(--news-hero-foreground);
+      --color-text-muted: var(--news-hero-muted-foreground);
+      --color-primary: var(--news-hero-primary);
+      --color-primary-hover: var(--news-hero-primary-hover);
+      --color-border: var(--news-hero-border);
+      --color-border-strong: var(--news-hero-border-strong);
+      --color-focus: var(--news-hero-ring);
+    }
   }
 
   @media (min-width: 48rem) {

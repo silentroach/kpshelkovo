@@ -1,5 +1,13 @@
 # Передача в следующую сессию
 
+## Продолжение 8 октября 2026 года
+
+Владелец разрешил реализацию плана, затем при приёмке согласовал дополнительный средний режим. Актуальные артефакты согласования сохранены в коммите `8fdcd429`; отметка — в [#980](https://github.com/silentroach/kpshelkovo/issues/980#issuecomment-6059098701). Разрешены commit, push реализации и перевод существующего PR #982 из draft в готовый к ревью. Реализация завершена, требования синхронизированы, change архивирован. Состояние задач хранит [tasks.md](/openspec/changes/archive/2026-10-08-mobile-breadcrumbs/tasks.md), результаты проверок — [verification.md](/openspec/changes/archive/2026-10-08-mobile-breadcrumbs/verification.md).
+
+Дальше сохранена исходная передача при подготовке планового PR. Её указания о ещё не полученном разрешении и ещё не выполненных проверках описывают тот момент, а не текущее состояние.
+
+## Исходная передача
+
 Состояние на 8 октября 2026 года. Задача — [#980](https://github.com/silentroach/kpshelkovo/issues/980), рабочая ветка — `design/980-mobile-breadcrumbs`.
 
 ## Откуда продолжать
@@ -12,14 +20,14 @@
 
 1. Прочитать обсуждение PR этой ветки и #980, проверить фактический `git status` и актуальный change.
 2. Подтвердить разрешение владельца на реализацию. После разрешения оставить в #980 отметку со ссылкой на коммит согласованного плана по корневому [процессу](/AGENTS.md#согласование-и-передача).
-3. Продолжить через `openspec-apply-change` по [tasks.md](/openspec/changes/mobile-breadcrumbs/tasks.md), сохраняя рабочую ветку и существующий PR. Команды OpenSpec выполнять через `pnpm exec openspec` из корня workspace.
+3. Продолжить через `openspec-apply-change` по [tasks.md](/openspec/changes/archive/2026-10-08-mobile-breadcrumbs/tasks.md), сохраняя рабочую ветку и существующий PR. Команды OpenSpec выполнять через `pnpm exec openspec` из корня workspace.
 
-Объём — в [proposal.md](/openspec/changes/mobile-breadcrumbs/proposal.md), требования — в [delta spec](/openspec/changes/mobile-breadcrumbs/specs/site-navigation/spec.md), параметры и технический подход — в [design.md](/openspec/changes/mobile-breadcrumbs/design.md). Этот файл хранит контекст передачи, а не вторую версию плана.
+Объём — в [proposal.md](/openspec/changes/archive/2026-10-08-mobile-breadcrumbs/proposal.md), требования — в [delta spec](/openspec/changes/archive/2026-10-08-mobile-breadcrumbs/specs/site-navigation/spec.md), параметры и технический подход — в [design.md](/openspec/changes/archive/2026-10-08-mobile-breadcrumbs/design.md). Этот файл хранит контекст передачи, а не вторую версию плана.
 
 ## Визуальный ориентир
 
-- [preview.html](/openspec/changes/mobile-breadcrumbs/preview.html) — сохранённый макет, по которому обсуждалось решение. По умолчанию выбраны «Тихий фон» и ширина примеров 390 px. Также есть 320 и 1000 px, «Без фона» и «Зелёная полоса» для сравнения.
-- [quiet-390.png](/openspec/changes/mobile-breadcrumbs/quiet-390.png) — скриншот выбранного варианта: три примера шириной 390 px в окне 1280 px.
+- [preview.html](/openspec/changes/archive/2026-10-08-mobile-breadcrumbs/preview.html) — сохранённый макет, по которому обсуждалось решение. По умолчанию выбраны «Тихий фон» и ширина примеров 390 px. Также есть 320 и 1000 px, «Без фона» и «Зелёная полоса» для сравнения.
+- [quiet-390.png](/openspec/changes/archive/2026-10-08-mobile-breadcrumbs/quiet-390.png) — скриншот выбранного варианта: три примера шириной 390 px в окне 1280 px.
 - В макете container queries имитируют ширину экрана внутри примеров. При реализации нужен breakpoint viewport из design.
 - Макет перенесён из `apps/www/public/breadcrumbs-preview.html` в change при подготовке PR. Пункт 2.2 задач остаётся проверкой отсутствия временной публичной копии после реализации.
 

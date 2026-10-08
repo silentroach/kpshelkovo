@@ -169,7 +169,7 @@ const assumption = tariffCalc?.assumption;
       {searchDescription}
     </p>
 
-    <div class="settlement-breadcrumbs ui-page-header">
+    <div class="settlement-breadcrumbs ui-page-header ui-breadcrumbs">
       <Breadcrumbs items={breadcrumbs} />
     </div>
 
@@ -1242,6 +1242,13 @@ const assumption = tariffCalc?.assumption;
       ),
       var(--color-bg-soft);
     background-size: 32px 32px;
+  }
+
+  @media screen and (width < 40rem) {
+    .settlement-breadcrumbs.ui-page-header {
+      --ui-breadcrumb-inset: 1.5rem;
+      padding-inline: 1.5rem;
+    }
   }
 
   @media (min-width: 48rem) {

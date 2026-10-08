@@ -24,6 +24,17 @@ const breadcrumbsWithUnlinkedSection = [
   { label: 'Люди' },
   { label: 'Иван Иванов' },
 ];
+
+const longBreadcrumbs = [
+  { label: 'Главная', href: '/' },
+  { label: 'Справка', href: '/kb/' },
+  {
+    label: 'Документы и правила обслуживания общего имущества посёлка',
+    href: '/kb/documents/',
+  },
+  { label: 'Обслуживание', href: '/kb/documents/service/' },
+  { label: 'Текущая страница' },
+];
 ---
 
 <!doctype html>
@@ -67,6 +78,12 @@ const breadcrumbsWithUnlinkedSection = [
           <Breadcrumbs items={breadcrumbsWithUnlinkedSection} />
         </div>
       </section>
+      <section class="breadcrumbs-visual-card">
+        <p class="breadcrumbs-visual-label">Long parent trail</p>
+        <div class="breadcrumbs-visual-target" data-testid="breadcrumbs-long">
+          <Breadcrumbs items={longBreadcrumbs} />
+        </div>
+      </section>
     </main>
   </body>
 </html>
@@ -91,6 +108,7 @@ const breadcrumbsWithUnlinkedSection = [
 
   .breadcrumbs-visual-card {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.75rem;
   }
 
@@ -115,5 +133,12 @@ const breadcrumbsWithUnlinkedSection = [
 
   .breadcrumbs-visual-target--wide {
     width: 46rem;
+  }
+
+  @media (width < 40rem) {
+    .breadcrumbs-visual-shell {
+      padding: 1rem;
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 </style>
