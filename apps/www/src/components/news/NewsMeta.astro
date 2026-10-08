@@ -80,4 +80,32 @@ const visibleAreas = appliesToAllAreas ? [] : areas;
   .news-meta-author {
     font-weight: 600;
   }
+
+  .news-meta--list {
+    min-width: 0;
+    gap: 0.25rem 1rem;
+    overflow-wrap: anywhere;
+  }
+
+  .news-meta--list .news-meta-date,
+  .news-meta--list .news-meta-author {
+    color: var(--color-text-muted);
+  }
+
+  .news-meta--list .news-meta-author {
+    text-decoration-line: none;
+    text-decoration-color: currentColor;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .news-meta--list .news-meta-author:is(:hover, :focus-visible) {
+    color: var(--color-primary);
+    text-decoration-line: underline;
+  }
+
+  .news-meta--list .news-meta-author:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
 </style>

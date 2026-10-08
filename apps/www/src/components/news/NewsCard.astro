@@ -13,43 +13,42 @@ const { article, featured = false } = Astro.props;
 ---
 
 <article class:list={[featured ? 'ui-shell-strong' : 'ui-shell', 'news-card']}>
-  {
-    featured && article.cover && (
-      <img
-        src={article.cover.url}
-        alt={article.cover.alt}
-        loading="lazy"
-        width={article.cover.width}
-        height={article.cover.height}
-        class="news-card__cover"
-      />
-    )
-  }
+  {featured && article.cover && (
+    <img
+      src={article.cover.url}
+      alt={article.cover.alt}
+      loading="lazy"
+      width={article.cover.width}
+      height={article.cover.height}
+      class="news-card__cover"
+    />
+  )}
 
   <div class="news-card__content">
     <div class="news-card__header">
       <h3 class="ui-entry-title news-card__title">
-        <a href={article.url} class="ui-link">{article.title}</a>
-        {
-          article.pinned && (
-            <>
-              <span
-                class="news-card__pinned-icon"
-                title="закреплено сверху"
-                aria-hidden="true"
-              >
-                <StarIcon />
-              </span>
-              <span class="news-card__pinned-label">Закреплено сверху</span>
-            </>
-          )
-        }
+        <a href={article.url} class="ui-link">
+          {article.title}
+        </a>
+        {article.pinned && (
+          <>
+            <span
+              class="news-card__pinned-icon"
+              title="закреплено сверху"
+              aria-hidden="true"
+            >
+              <StarIcon />
+            </span>
+            <span class="news-card__pinned-label">Закреплено сверху</span>
+          </>
+        )}
       </h3>
 
       <NewsMeta
         publishedIso={article.publishedIso}
         author={article.author}
         fullAuthorName
+        className="news-meta--list"
       />
     </div>
 
@@ -88,6 +87,28 @@ const { article, featured = false } = Astro.props;
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
+    font-size: 1.5rem;
+  }
+
+  .news-card__title a {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--color-text);
+    text-decoration-line: none;
+    text-decoration-color: currentColor;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    transition: none;
+  }
+
+  .news-card__title a:is(:hover, :focus-visible) {
+    color: var(--color-primary);
+    text-decoration-line: underline;
+  }
+
+  .news-card__title a:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
   }
 
   .news-card__pinned-icon {
