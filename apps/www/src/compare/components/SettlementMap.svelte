@@ -597,6 +597,8 @@
 <style>
   .settlement-map {
     position: relative;
+    /* Keep SDK control layers below site navigation. */
+    isolation: isolate;
     width: 100%;
     overflow: hidden;
     border: 1px solid var(--color-border);

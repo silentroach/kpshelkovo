@@ -47,6 +47,8 @@
 
 .ui-editorial-map editorial-map {
   position: relative;
+  /* Keep SDK control layers below site navigation. */
+  isolation: isolate;
   display: block;
   width: 100%;
   block-size: var(--ui-editorial-map-height, min(22rem, 65svh));
