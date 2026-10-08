@@ -74,8 +74,8 @@ exports[`shared events in news > preserves published URLs and UIDs with current 
   },
   {
     "coordinates": {
-      "lat": 55.06505,
-      "lng": 37.720861,
+      "lat": 55.065126,
+      "lng": 37.723079,
     },
     "end": "2026-05-09T16:00:00+03:00",
     "location": "Памятник в деревне Шелково",
