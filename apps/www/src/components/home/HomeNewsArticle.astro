@@ -23,6 +23,7 @@ const { article, lead = false } = Astro.props;
       publishedIso={article.publishedIso}
       author={article.author}
       fullAuthorName
+      className="news-meta--list"
     />
   </div>
   <h2 class="ui-entry-title home-news-article__title">
@@ -61,7 +62,7 @@ const { article, lead = false } = Astro.props;
   }
 
   .home-news-article__pin {
-    color: var(--color-accent-text);
+    color: var(--color-text-muted);
     font-weight: 600;
   }
 
@@ -71,11 +72,22 @@ const { article, lead = false } = Astro.props;
   }
 
   .home-news-article__title a {
+    color: var(--color-text);
+    text-decoration-line: none;
+    text-decoration-color: currentColor;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
     transition: none;
   }
 
-  .home-news-article :global(a:focus-visible) {
-    outline-color: currentColor;
+  .home-news-article__title a:is(:hover, :focus-visible) {
+    color: var(--color-primary);
+    text-decoration-line: underline;
+  }
+
+  .home-news-article__title a:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
   }
 
   .home-news-article__summary {
