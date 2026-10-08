@@ -43,6 +43,12 @@
     padding-top: 1rem;
   }
 
+  @media screen and (width < 40rem) {
+    .ui-root-site.site-has-header .breadcrumbs:not(.breadcrumbs--desktop-only) {
+      margin-block-start: -1rem;
+    }
+  }
+
   @media (min-width: 48rem) {
     .ui-root-site.site-has-header {
       --site-sticky-offset: 3.5625rem;

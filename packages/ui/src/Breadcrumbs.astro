@@ -11,9 +11,9 @@ interface Props {
 
 const { items, linkLast = false } = Astro.props;
 const lastIndex = items.length - 1;
-const mobileItems = items.slice(0, lastIndex);
-const mobileShowsOnlyHome =
-  mobileItems.length === 1 && mobileItems[0]?.href === '/';
+const firstParentIndex = items.findIndex(
+  (item, index) => index < lastIndex && item.href !== '/',
+);
 let structuredPosition = 0;
 const renderedItems = items.map((item, index) => {
   const isStructuredItem = Boolean(item.href) || index === lastIndex;
@@ -28,66 +28,70 @@ const renderedItems = items.map((item, index) => {
 });
 ---
 
-{
-  items.length > 0 && (
-    <nav
-      aria-label="Хлебные крошки"
-      class={mobileShowsOnlyHome ? 'breadcrumbs--desktop-only' : undefined}
-      data-pagefind-ignore="all"
+{items.length > 0 && (
+  <nav
+    aria-label="Хлебные крошки"
+    class:list={[
+      'breadcrumbs',
+      { 'breadcrumbs--desktop-only': firstParentIndex === -1 },
+    ]}
+    data-pagefind-ignore="all"
+  >
+    <ol
+      class="breadcrumbs-list"
+      itemscope
+      itemtype="https://schema.org/BreadcrumbList"
     >
-      <ol
-        class="breadcrumbs-list"
-        itemscope
-        itemtype="https://schema.org/BreadcrumbList"
-      >
-        {renderedItems.map(({ item, index, structuredPosition }) => (
-          <li
-            class:list={[
-              'breadcrumbs-item',
-              { 'breadcrumbs-item--current': index === lastIndex },
-            ]}
-            itemprop={structuredPosition ? 'itemListElement' : undefined}
-            itemscope={structuredPosition ? true : undefined}
-            itemtype={
-              structuredPosition ? 'https://schema.org/ListItem' : undefined
-            }
-          >
-            {index > 0 && <span aria-hidden="true">›</span>}
-            {item.href && (linkLast || index < lastIndex) ? (
-              <a
-                href={item.href}
-                class="breadcrumbs-link"
-                itemprop={structuredPosition ? 'item' : undefined}
-              >
-                <span itemprop={structuredPosition ? 'name' : undefined}>
-                  {item.label}
-                </span>
-              </a>
-            ) : (
-              <span
-                class="breadcrumbs-current"
-                aria-current={index === items.length - 1 ? 'page' : undefined}
-                itemprop={structuredPosition ? 'name' : undefined}
-              >
+      {renderedItems.map(({ item, index, structuredPosition }) => (
+        <li
+          class:list={[
+            'breadcrumbs-item',
+            {
+              'breadcrumbs-item--current': index === lastIndex,
+              'breadcrumbs-item--home': item.href === '/',
+              'breadcrumbs-item--parent-first': index === firstParentIndex,
+            },
+          ]}
+          itemprop={structuredPosition ? 'itemListElement' : undefined}
+          itemscope={structuredPosition ? true : undefined}
+          itemtype={
+            structuredPosition ? 'https://schema.org/ListItem' : undefined
+          }
+        >
+          {index > 0 && (
+            <span class="breadcrumbs-separator" aria-hidden="true">
+              ›
+            </span>
+          )}
+          {item.href && (linkLast || index < lastIndex) ? (
+            <a
+              href={item.href}
+              class="breadcrumbs-link"
+              itemprop={structuredPosition ? 'item' : undefined}
+            >
+              <span itemprop={structuredPosition ? 'name' : undefined}>
                 {item.label}
               </span>
-            )}
-            {structuredPosition && (
-              <meta itemprop="position" content={String(structuredPosition)} />
-            )}
-          </li>
-        ))}
-      </ol>
-    </nav>
-  )
-}
+            </a>
+          ) : (
+            <span
+              class="breadcrumbs-current"
+              aria-current={index === items.length - 1 ? 'page' : undefined}
+              itemprop={structuredPosition ? 'name' : undefined}
+            >
+              {item.label}
+            </span>
+          )}
+          {structuredPosition && (
+            <meta itemprop="position" content={String(structuredPosition)} />
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}
 
 <style>
-  .breadcrumbs--desktop-only,
-  .breadcrumbs-item--current {
-    display: none;
-  }
-
   .breadcrumbs-list {
     display: flex;
     flex-wrap: wrap;
@@ -132,13 +136,63 @@ const renderedItems = items.map((item, index) => {
     font-weight: 400;
   }
 
-  @media (min-width: 40rem) {
-    .breadcrumbs--desktop-only {
-      display: block;
+  @media (width < 64rem) {
+    .breadcrumbs--desktop-only,
+    .breadcrumbs-item--home,
+    .breadcrumbs-item--current,
+    .breadcrumbs-item--parent-first .breadcrumbs-separator {
+      display: none;
     }
 
-    .breadcrumbs-item--current {
-      display: flex;
+    .breadcrumbs-item {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .breadcrumbs-separator {
+      flex-shrink: 0;
+    }
+
+    .breadcrumbs-link,
+    .breadcrumbs-current {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .breadcrumbs-link:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+  }
+
+  @media (width < 40rem) {
+    .breadcrumbs-list {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    .breadcrumbs-item {
+      align-items: flex-start;
+      margin-inline-start: 0.75rem;
+    }
+
+    .breadcrumbs-item--parent-first {
+      margin-inline-start: 0;
+    }
+
+    .breadcrumbs-separator {
+      padding-block: 0.125rem;
+    }
+
+    .breadcrumbs-link,
+    .breadcrumbs-current {
+      padding-block: 0.125rem;
+      color: var(--color-text-muted);
+    }
+
+    .breadcrumbs-link:is(:hover, :focus-visible) {
+      color: var(--color-primary);
     }
   }
 

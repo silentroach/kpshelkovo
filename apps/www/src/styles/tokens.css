@@ -7,6 +7,7 @@
     --color-surface: oklch(100% 0 0);
     --color-surface-raised: oklch(100% 0 0);
     --color-surface-muted: oklch(96.8% 0.008 135);
+    --color-breadcrumb-surface: oklch(98% 0.003 125);
     --color-border: oklch(89.2% 0.012 130);
     --color-border-strong: oklch(82% 0.018 130);
 

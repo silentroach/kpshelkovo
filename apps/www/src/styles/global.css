@@ -715,6 +715,23 @@
     gap: 1.25rem;
   }
 
+  @media screen and (width < 40rem) {
+    /* The app owns the strip; Breadcrumbs owns its list and visibility. */
+    .site-page-content .breadcrumbs:not(.breadcrumbs--desktop-only) {
+      margin-block-start: -0.75rem;
+      margin-inline: calc(-1 * (var(--page-padding) + var(--ui-breadcrumb-inset, 1.25rem)));
+      padding-block: 0.75rem;
+      padding-inline: calc(var(--page-padding) + var(--ui-breadcrumb-inset, 1.25rem));
+      background: var(--color-breadcrumb-surface);
+    }
+  }
+
+  @media screen and (width < 64rem) {
+    .ui-breadcrumbs:has(> .breadcrumbs--desktop-only) {
+      display: none;
+    }
+  }
+
   .ui-section-title {
     font-family: var(--font-heading);
     font-size: 1.5rem;
