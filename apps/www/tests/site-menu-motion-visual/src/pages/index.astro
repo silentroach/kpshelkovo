@@ -1,0 +1,219 @@
+---
+import '../../../config/visual-foundation.css';
+import '@/styles/site.css';
+import Fonts from '@shelkovo/ui/Fonts.astro';
+import SiteHeader from '@/components/site/SiteHeader.astro';
+import MapBackground from '../../../news-event-card-visual/map-background.svg';
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <Fonts />
+    <title>Проба открытия меню</title>
+  </head>
+  <body class="ui-root-site" data-effect="slide" data-background="page">
+    <div class="demo-stage" id="demo-stage">
+      <MapBackground class="demo-map" aria-hidden="true" />
+      <SiteHeader />
+      <main class="demo-content ui-page">
+        <h1>Проба открытия меню</h1>
+        <p>Открой «Меню» в шапке. На широком экране попробуй «Тариф 815».</p>
+        <form class="demo-controls" aria-label="Настройки пробы">
+          <label>
+            Эффект
+            <select name="effect">
+              <option value="instant">Мгновенно</option>
+              <option value="fade">Прозрачность</option>
+              <option value="slide" selected>
+                Прозрачность и смещение
+              </option>
+            </select>
+          </label>
+          <label>
+            Фон
+            <select name="background">
+              <option value="page">Обычная страница</option>
+              <option value="map">Карта</option>
+            </select>
+          </label>
+          <label class="demo-check">
+            <input type="checkbox" name="instantClose" /> Закрывать мгновенно
+          </label>
+          <label class="demo-check">
+            <input type="checkbox" name="reduce" /> Уменьшить движение
+          </label>
+        </form>
+        <p class="demo-note">
+          150 мс · смещение 4 px. Системная настройка уменьшенного движения тоже
+          действует.
+        </p>
+        <p class="demo-note" data-demo-message role="status">
+          Ссылки в этой пробе закрывают меню, но не уводят со страницы. Поиск
+          отключён.
+        </p>
+      </main>
+    </div>
+    <script>
+      import '../demo';
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  .demo-stage {
+    position: relative;
+    min-height: 100dvh;
+    isolation: isolate;
+  }
+  .demo-map {
+    display: none;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    object-fit: cover;
+  }
+  body[data-background='map'] .demo-map {
+    display: block;
+  }
+  .demo-content {
+    padding: 2rem 1.25rem;
+  }
+  .demo-content h1 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+  }
+  .demo-content p {
+    max-width: 40rem;
+    margin-bottom: 1.5rem;
+  }
+  .demo-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 1rem 1.5rem;
+    max-width: 45rem;
+  }
+  .demo-controls label {
+    display: grid;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+  }
+  .demo-controls select {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 0.6rem;
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+    max-width: 100%;
+  }
+  .demo-controls .demo-check {
+    display: flex;
+    align-items: center;
+    min-height: 2.5rem;
+  }
+  .demo-controls input {
+    accent-color: var(--color-primary);
+  }
+  .demo-note {
+    font-size: 0.875rem;
+    margin-top: 1.5rem;
+  }
+  body[data-background='map'] .demo-content {
+    background: var(--color-surface-raised);
+    margin-top: 25rem;
+  }
+
+  /* Keep native details semantics, but let CSS retain the panel during its exit. */
+  #demo-stage .site-header-menu::details-content {
+    content-visibility: visible;
+  }
+  #demo-stage .site-header-mobile-panel,
+  #demo-stage .site-nav-submenu {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-4px);
+    pointer-events: none;
+    transition:
+      opacity 150ms cubic-bezier(0.23, 1, 0.32, 1),
+      transform 150ms cubic-bezier(0.23, 1, 0.32, 1),
+      visibility 0s 150ms;
+  }
+  #demo-stage .site-header-menu[open] .site-header-mobile-panel,
+  #demo-stage .site-nav-dropdown[data-open] .site-nav-submenu {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition-delay: 0s;
+  }
+  #demo-stage .site-nav-submenu {
+    opacity: 1;
+    transition:
+      transform 150ms cubic-bezier(0.23, 1, 0.32, 1),
+      visibility 0s 150ms;
+  }
+  #demo-stage .site-nav-dropdown[data-open] .site-nav-submenu {
+    transition-delay: 0s;
+  }
+  #demo-stage .site-header-menu-icon,
+  #demo-stage .site-nav-dropdown-icon {
+    transition: transform 150ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  body[data-effect='fade']
+    #demo-stage
+    :is(.site-header-mobile-panel, .site-nav-submenu),
+  body[data-reduce]
+    #demo-stage
+    :is(.site-header-mobile-panel, .site-nav-submenu),
+  body:is([data-effect='fade'], [data-reduce])
+    #demo-stage
+    .site-header-menu[open]
+    .site-header-mobile-panel,
+  body:is([data-effect='fade'], [data-reduce])
+    #demo-stage
+    .site-nav-dropdown[data-open]
+    .site-nav-submenu {
+    transform: none;
+  }
+  body[data-effect='instant']
+    #demo-stage
+    :is(
+      .site-header-mobile-panel,
+      .site-nav-submenu,
+      .site-nav-glass-panel,
+      .site-header-menu-icon,
+      .site-nav-dropdown-icon
+    ) {
+    transition: none;
+  }
+  body[data-reduce]
+    #demo-stage
+    :is(.site-header-menu-icon, .site-nav-dropdown-icon) {
+    transition: none;
+  }
+  body[data-instant-close]
+    #demo-stage
+    .site-header-menu:not([open])
+    :is(.site-header-mobile-panel, .site-header-menu-icon),
+  body[data-instant-close]
+    #demo-stage
+    .site-nav-dropdown:not([data-open])
+    :is(.site-nav-submenu, .site-nav-glass-panel, .site-nav-dropdown-icon) {
+    transition: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #demo-stage :is(.site-header-mobile-panel, .site-nav-submenu),
+    #demo-stage .site-header-menu[open] .site-header-mobile-panel,
+    #demo-stage .site-nav-dropdown[data-open] .site-nav-submenu {
+      transform: none;
+    }
+    #demo-stage :is(.site-header-menu-icon, .site-nav-dropdown-icon) {
+      transition: none;
+    }
+  }
+</style>

@@ -2,6 +2,9 @@
   :root {
     color-scheme: light;
 
+    --site-menu-duration: 150ms;
+    --site-menu-ease: cubic-bezier(0.23, 1, 0.32, 1);
+
     --color-bg: oklch(99.1% 0.002 125);
     --color-bg-soft: oklch(98.8% 0.003 125);
     --color-surface: oklch(100% 0 0);
