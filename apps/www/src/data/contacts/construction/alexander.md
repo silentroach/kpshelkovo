@@ -2,12 +2,16 @@
 title: Александр
 slug: alexander
 category: construction
-updated_at: 2026-09-12
+updated_at: 2026-10-07
 summary: 'Строительство и инженерные работы под ключ, контроль подрядчика со стороны заказчика'
 contacts:
   phone: '+7 905 048-48-84'
   telegram: https://t.me/SancesStroy
 reviews:
+  - sentiment: positive
+    summary: 'Сделал коммуникации, электрику, санузел, отопление и финишную отделку под ключ. Результатом довольны; бригада помогла решить сложности с материалами.'
+    published_at: 2026-10-07
+    url: https://t.me/shelkovoecoclub/15263/57020
   - sentiment: positive
     summary: 'Размораживал трубы, делал деревянный подиум и дорожки, помог с колодцем и бойлером. На момент отзыва разобрал вздувшийся пол в санузле и продолжал ремонт.'
     published_at: 2026-05-21
