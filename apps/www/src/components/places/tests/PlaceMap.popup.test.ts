@@ -187,6 +187,50 @@ describe('PlaceMap', () => {
     await waitFor(() => expect(screen.getByText(/12.000.000\s*₽/)).toBeDefined());
   });
 
+  it('keeps the current area and price when previous details arrive late and reuses both snapshots', async () => {
+    const pending = Promise.withResolvers<Response>();
+    const secondParcel = { ...parcel, code: 'SHR-L45', status: 'reserved' as const };
+    const secondDetails = {
+      ...details,
+      code: secondParcel.code,
+      status: secondParcel.status,
+      area: 800,
+      price: { last: 9_000_000, history: [['2026-01-01', 9_000_000]] }
+    };
+    const fetch = vi.fn((url: string) => {
+      if (url.endsWith('/details/SHR-L43.json')) return pending.promise;
+      if (url.endsWith('/details/SHR-L45.json'))
+        return Promise.resolve(Response.json(secondDetails));
+      return Promise.resolve(Response.json([{ ...parcel, status: 'available' }, secondParcel]));
+    });
+    vi.stubGlobal('fetch', fetch);
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    areaFeatures[0]?.props.onClick?.(new MouseEvent('click'), {} as never);
+    await screen.findByRole('status');
+    areaFeatures[1]?.props.onClick?.(new MouseEvent('click'), {} as never);
+    await screen.findByText(/9.000.000\s*₽/);
+    expect(screen.getByText('8 сот.')).toBeDefined();
+
+    pending.resolve(Response.json(details));
+    await new Promise((resolve) => window.setTimeout(resolve, 0));
+    expect(screen.getByRole('group', { name: 'Участок SHR-L45' })).toBeDefined();
+    expect(screen.getByText(/9.000.000\s*₽/)).toBeDefined();
+    expect(screen.getByText('8 сот.')).toBeDefined();
+    expect(screen.queryByText(/12.000.000\s*₽/)).toBeNull();
+
+    areaFeatures[0]?.props.onClick?.(new MouseEvent('click'), {} as never);
+    await screen.findByText(/12.000.000\s*₽/);
+    expect(screen.getByText(/10,51 сот\./)).toBeDefined();
+    areaFeatures[1]?.props.onClick?.(new MouseEvent('click'), {} as never);
+    await screen.findByText(/9.000.000\s*₽/);
+    expect(screen.getByText('8 сот.')).toBeDefined();
+    expect(fetch).toHaveBeenCalledTimes(3);
+  });
+
   it('does not restore a superseded popup when its details arrive late', async () => {
     const pending = Promise.withResolvers<Response>();
     vi.stubGlobal(

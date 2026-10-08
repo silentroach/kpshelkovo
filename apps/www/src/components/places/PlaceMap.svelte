@@ -156,8 +156,8 @@
   let mapRoot: HTMLDivElement | undefined;
   let popupElement: HTMLDivElement | undefined = $state(undefined);
   let popupClose: HTMLButtonElement | undefined = $state(undefined);
-  let selectedParcel: ParcelMapItem | undefined = $state(undefined);
-  let selectedDetails: ParcelDetailsPublicDto | undefined = $state(undefined);
+  let selectedParcel: ParcelMapItem | undefined = $state.raw(undefined);
+  let selectedDetails: ParcelDetailsPublicDto | undefined = $state.raw(undefined);
   let detailsLoading = $state(false);
   let detailsError = $state(false);
   let popupPosition:
