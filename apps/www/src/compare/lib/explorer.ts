@@ -58,12 +58,12 @@ export function toExplorer(
       shortName: item.shortName,
       slug: item.slug,
       rating: ratings.get(item.slug)?.score ?? 0,
-      ...(item.rabstvo ? { rabstvo: true } : {}),
-      ...(company
-        ? {
-            managementCompany: company.url ? { title: company.title } : company.title
-          }
-        : {}),
+      rabstvo: item.rabstvo ? true : undefined,
+      managementCompany: company
+        ? company.url
+          ? { title: company.title }
+          : company.title
+        : undefined,
       isBaseline: item.slug === baseline.slug,
       location: {
         lat: normalizeCoordinate(item.location.lat),

@@ -84,7 +84,7 @@ describe('parcel public payloads', () => {
 
     expect(result?.labelCoordinates[0]).toBeCloseTo(0.0005, 8);
     expect(result?.geometry).toEqual(geometry);
-    expect(result).not.toHaveProperty('multipleCadastralParcels');
+    expect(result?.multipleCadastralParcels).toBeUndefined();
   });
 
   it('keeps the common label outside a hole in the combined territory', () => {
@@ -227,7 +227,7 @@ describe('parcel public payloads', () => {
     expect(label?.[1]).toBeGreaterThan(55.02);
     expect(label?.[1]).toBeLessThan(55.03);
     expect(payload[0]?.geometry).toEqual(parcel.cadastralParts[0]?.geometry);
-    expect(Object.keys(payload[0] ?? {}).sort()).toMatchInlineSnapshot(`
+    expect(Object.keys(JSON.parse(JSON.stringify(payload))[0] ?? {}).sort()).toMatchInlineSnapshot(`
       [
         "aliases",
         "code",
@@ -402,7 +402,7 @@ describe('parcel public payloads', () => {
         },
       ]
     `);
-    expect(payload[4]).not.toHaveProperty('status');
+    expect(payload[4]?.status).toBeUndefined();
   });
 
   it('keeps each cadastral boundary and hole while distinguishing a group from a single MultiPolygon', () => {
@@ -429,7 +429,7 @@ describe('parcel public payloads', () => {
       { offset_east_m: 0, offset_north_m: 0 }
     );
     expect(payload[0]?.multipleCadastralParcels).toBe(true);
-    expect(payload[1]).not.toHaveProperty('multipleCadastralParcels');
+    expect(payload[1]?.multipleCadastralParcels).toBeUndefined();
     expect(payload[0]?.geometry).toMatchObject({
       type: 'MultiPolygon',
       coordinates: [...first.geometry.coordinates, second.geometry.coordinates]

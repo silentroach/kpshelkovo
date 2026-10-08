@@ -104,7 +104,6 @@ describe('place preview marker', () => {
     undefined
   ])('preserves the resolved place URL %s on the root link', async (mapUrl) => {
     const place = testPlace({
-      ...(mapUrl ? { mapUrl } : {}),
       marker: 'fish',
       openingHours: { periods: [{ days: ['mon'], opensAt: '09:00', closesAt: '18:00' }] },
       geometry: {
@@ -129,7 +128,9 @@ describe('place preview marker', () => {
       }
     });
     const container = await createAstroContainer();
-    const html = await container.renderToString(PlacePreview, { props: { place } });
+    const html = await container.renderToString(PlacePreview, {
+      props: { place: { ...place, mapUrl: mapUrl ?? place.mapUrl } }
+    });
     const window = new Window();
     try {
       window.document.body.innerHTML = html;

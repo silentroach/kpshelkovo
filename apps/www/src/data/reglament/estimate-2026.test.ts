@@ -57,12 +57,7 @@ describe('estimate2026 baseline data', () => {
         title: row.title,
         annual_gross: row.baseline.annual_gross,
         tariff_per_sotka_month: row.baseline.tariff_per_sotka_month,
-        source_refs: row.source_refs.map((ref) => ({
-          pdf: ref.pdf,
-          page: ref.page,
-          fragment: ref.fragment,
-          ...(ref.note ? { note: ref.note } : {})
-        }))
+        source_refs: row.source_refs
       }))
     );
 
@@ -151,12 +146,7 @@ describe('estimate2026 baseline data', () => {
       materials: row.baseline.breakdown.materials,
       description: row.description,
       tags: row.tags,
-      source_refs: row.source_refs.map((ref) => ({
-        pdf: ref.pdf,
-        page: ref.page,
-        fragment: ref.fragment,
-        ...(ref.note ? { note: ref.note } : {})
-      }))
+      source_refs: row.source_refs
     }).toMatchSnapshot();
   });
 });

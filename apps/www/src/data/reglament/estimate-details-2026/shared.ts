@@ -141,7 +141,7 @@ export const estimateDetailSourcePdfs = ESTIMATE_DETAIL_SOURCE_PDFS.map(
     return {
       pdf,
       title: detailSourcePdfTitles[pdf],
-      ...(pagesTotal ? { pages_total: pagesTotal } : {})
+      pages_total: pagesTotal || undefined
     };
   }
 );
@@ -226,7 +226,7 @@ export const detailNeedsCheckStatus = (
   status_label_ru: detailStatusLabels.needs_check,
   needs_check: {
     reason,
-    ...(source_refs ? { source_refs } : {})
+    source_refs
   }
 });
 

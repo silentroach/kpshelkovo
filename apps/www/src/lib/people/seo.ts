@@ -38,21 +38,16 @@ const personEntity = (input: PersonProfilePageInput): SchemaDoc => {
     url,
     mainEntityOfPage: url,
     image: input.image,
-    ...(input.position ? { jobTitle: input.position } : {}),
-    ...(input.company
+    jobTitle: input.position || undefined,
+    worksFor: input.company
       ? {
-          worksFor: {
-            '@type': 'Organization',
-            name: input.company
-          }
+          '@type': 'Organization',
+          name: input.company
         }
-      : {}),
-    ...(telephones.length === 1
-      ? { telephone: telephones[0] }
-      : telephones.length > 1
-        ? { telephone: telephones }
-        : {}),
-    ...(sameAs.length > 0 ? { sameAs } : {})
+      : undefined,
+    telephone:
+      telephones.length === 1 ? telephones[0] : telephones.length > 1 ? telephones : undefined,
+    sameAs: sameAs.length > 0 ? sameAs : undefined
   };
 };
 

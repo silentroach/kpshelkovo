@@ -1,5 +1,35 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "ignorePatterns": [
+    "tools/oxlint/rules/**",
+    ".agents/skills/accessibility/**",
+    ".agents/skills/agent-browser/**",
+    ".agents/skills/animate/**",
+    ".agents/skills/apple-design/**",
+    ".agents/skills/astro/**",
+    ".agents/skills/best-practices/**",
+    ".agents/skills/core-web-vitals/**",
+    ".agents/skills/design-taste-frontend/**",
+    ".agents/skills/domain-modeling/**",
+    ".agents/skills/grilling/**",
+    ".agents/skills/humanizer-ru/**",
+    ".agents/skills/nginx-expert/**",
+    ".agents/skills/performance/**",
+    ".agents/skills/ponytail-audit/**",
+    ".agents/skills/ponytail-review/**",
+    ".agents/skills/seo/**",
+    ".agents/skills/svelte-code-writer/**",
+    ".agents/skills/svelte-core-bestpractices/**",
+    ".agents/skills/wayfinder/**",
+    ".agents/skills/web-quality-audit/**",
+    ".agents/skills/writing-for-agents/**",
+    ".opencode/skills/**",
+    ".opencode/commands/opsx-*.md"
+  ],
+  "jsPlugins": [{ "name": "local", "specifier": "./tools/oxlint/index.ts" }],
+  "rules": {
+    "local/no-conditional-empty-object-spread": "error"
+  },
   "overrides": [
     {
       "files": ["**/*.test.ts"],

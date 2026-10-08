@@ -148,15 +148,13 @@ export const mapRawStatusIncident = (
       iso: started.iso,
       hasTime: started.hasTime
     },
-    ...(ended
+    ended: ended
       ? {
-          ended: {
-            at: ended.at,
-            iso: ended.iso,
-            hasTime: ended.hasTime
-          }
+          at: ended.at,
+          iso: ended.iso,
+          hasTime: ended.hasTime
         }
-      : {}),
+      : undefined,
     phase: state.phase,
     appliesToAllAreas: area.appliesToAllAreas,
     areas: area.areas,

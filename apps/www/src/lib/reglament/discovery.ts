@@ -155,7 +155,7 @@ const star = (value: string): readonly { readonly value: string; readonly langua
 
 const text = (minLength = 0): Record<string, unknown> => ({
   type: 'string',
-  ...(minLength > 0 ? { minLength } : {})
+  minLength: minLength > 0 ? minLength : undefined
 });
 
 const integer = (minimum = 0): Record<string, unknown> => ({
@@ -165,7 +165,7 @@ const integer = (minimum = 0): Record<string, unknown> => ({
 
 const number = (minimum?: number): Record<string, unknown> => ({
   type: 'number',
-  ...(minimum === undefined ? {} : { minimum })
+  minimum
 });
 
 const flag = (): Record<string, unknown> => ({ type: 'boolean' });
@@ -258,8 +258,8 @@ const rowPayload = (
     title: row.title,
     kind: row.kind,
     coefficient_policy: row.coefficient_policy,
-    ...(row.description ? { description: row.description } : {}),
-    ...(row.tags ? { tags: [...row.tags] } : {}),
+    description: row.description || undefined,
+    tags: row.tags ? [...row.tags] : undefined,
     baseline: {
       ...row.baseline,
       breakdown: { ...row.baseline.breakdown }
@@ -271,7 +271,7 @@ const rowPayload = (
     },
     source_refs: row.source_refs.map(sourceRef),
     editable_fields: row.editable_fields.map((field) => ({ ...field })),
-    ...(children && children.length > 0 ? { children } : {})
+    children: children?.length ? children : undefined
   };
 };
 

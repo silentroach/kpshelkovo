@@ -43,7 +43,7 @@ export const collectionPageSchema = (input: CollectionPageInput): readonly Schem
       description: input.description,
       url,
       inLanguage: LANG,
-      ...(list ? { mainEntity: { '@id': list['@id'] } } : {})
+      mainEntity: list ? { '@id': list['@id'] } : undefined
     }
   ];
 

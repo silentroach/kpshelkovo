@@ -140,9 +140,9 @@ const setMetadata = (
   const lastmod = laterLastmod(current?.lastmod, metadata.lastmod);
   const changefreq = metadata.changefreq ?? current?.changefreq;
   const next = {
-    ...(lastmod ? { lastmod } : {}),
-    ...(changefreq ? { changefreq } : {}),
-    ...(current?.excludeFromSitemap ? { excludeFromSitemap: true } : {})
+    lastmod,
+    changefreq,
+    excludeFromSitemap: current?.excludeFromSitemap ? true : undefined
   } satisfies SitemapMetadata;
 
   if (next.lastmod || next.changefreq || next.excludeFromSitemap) {
@@ -322,5 +322,11 @@ export const applySitemapMetadata = (
     return;
   }
 
-  return metadata ? { ...item, ...metadata } : item;
+  return metadata
+    ? {
+        ...item,
+        lastmod: metadata.lastmod ?? item.lastmod,
+        changefreq: metadata.changefreq ?? item.changefreq
+      }
+    : item;
 };

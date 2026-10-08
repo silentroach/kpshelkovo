@@ -131,16 +131,14 @@ const schema = {
   keywords: pageMeta.keywords.join(', '),
   address: settlement.location.addressText,
   mainEntityOfPage: pageUrl,
-  ...(same.length ? { sameAs: same } : {}),
-  ...(hasPoint
+  sameAs: same.length ? same : undefined,
+  geo: hasPoint
     ? {
-        geo: {
-          '@type': 'GeoCoordinates',
-          latitude: lat,
-          longitude: lng,
-        },
+        '@type': 'GeoCoordinates',
+        latitude: lat,
+        longitude: lng,
       }
-    : {}),
+    : undefined,
 };
 const tariffCalc = getTariffCalc(
   settlement.tariff,
@@ -167,7 +165,9 @@ const assumption = tariffCalc?.assumption;
 >
   <main class="ui-page settlement-page">
     <h1 class="ui-visually-hidden">{settlement.name}</h1>
-    <p class="ui-visually-hidden" data-pagefind-body>{searchDescription}</p>
+    <p class="ui-visually-hidden" data-pagefind-body>
+      {searchDescription}
+    </p>
 
     <div class="settlement-breadcrumbs ui-page-header">
       <Breadcrumbs items={breadcrumbs} />
@@ -180,59 +180,51 @@ const assumption = tariffCalc?.assumption;
           { 'hero-map-placeholder': !hasPoint },
         ]}
       >
-        {
-          hasPoint && (
-            <MapPreview
-              preview={{
-                coordinates: {
-                  lat,
-                  lng,
-                },
-                zoom: 12,
-                anchor: [0.8, 0.5],
-                muted: true,
-                distributionPosition: 'bottom right',
-              }}
-              label={settlement.name}
-            >
-              <div
-                class="ui-map-marker settlement-preview-marker"
-                style={`background: ${isBaseline ? '#064b08' : '#6a502e'}`}
-                aria-hidden="true"
-              />
-            </MapPreview>
-          )
-        }
+        {hasPoint && (
+          <MapPreview
+            preview={{
+              coordinates: {
+                lat,
+                lng,
+              },
+              zoom: 12,
+              anchor: [0.8, 0.5],
+              muted: true,
+              distributionPosition: 'bottom right',
+            }}
+            label={settlement.name}
+          >
+            <div
+              class="ui-map-marker settlement-preview-marker"
+              style={`background: ${isBaseline ? '#064b08' : '#6a502e'}`}
+              aria-hidden="true"
+            />
+          </MapPreview>
+        )}
       </div>
 
       <div class="ui-page settlement-hero-content">
         <div class="settlement-hero-label-row">
           <div class="settlement-labels">
-            {
-              waterInc && (
-                <span class="ui-badge ui-badge-water" title={waterTitle}>
-                  Вода в тарифе
-                </span>
-              )
-            }
-            {
-              obman && (
-                <a
-                  href={obmanUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="ui-badge ui-badge-danger settlement-badge-link"
-                  title="Открыть Telegram-канал Коттеджное рабство"
-                >
-                  Коттеджное рабство
-                </a>
-              )
-            }
-            {
-              isBaseline && (
-                <span class="ui-badge ui-badge-info">Наш посёлок</span>
-              )
-            }
+            {waterInc && (
+              <span class="ui-badge ui-badge-water" title={waterTitle}>
+                Вода в тарифе
+              </span>
+            )}
+            {obman && (
+              <a
+                href={obmanUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="ui-badge ui-badge-danger settlement-badge-link"
+                title="Открыть Telegram-канал Коттеджное рабство"
+              >
+                Коттеджное рабство
+              </a>
+            )}
+            {isBaseline && (
+              <span class="ui-badge ui-badge-info">Наш посёлок</span>
+            )}
           </div>
         </div>
 
@@ -253,34 +245,30 @@ const assumption = tariffCalc?.assumption;
                 </div>
               </div>
               <div class="settlement-hero-actions">
-                {
-                  settlement.website && (
-                    <a
-                      href={settlement.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Открыть сайт поселка"
-                      class="ui-icon-btn"
-                      title="Перейти на сайт поселка"
-                    >
-                      <GlobeIcon class="settlement-icon settlement-icon--desktop" />
-                    </a>
-                  )
-                }
-                {
-                  tg && (
-                    <a
-                      href={tg}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Открыть Telegram-канал поселка"
-                      class="ui-icon-btn"
-                      title="Перейти в Telegram-канал"
-                    >
-                      <TelegramIcon class="settlement-icon settlement-icon--desktop settlement-icon--telegram" />
-                    </a>
-                  )
-                }
+                {settlement.website && (
+                  <a
+                    href={settlement.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Открыть сайт поселка"
+                    class="ui-icon-btn"
+                    title="Перейти на сайт поселка"
+                  >
+                    <GlobeIcon class="settlement-icon settlement-icon--desktop" />
+                  </a>
+                )}
+                {tg && (
+                  <a
+                    href={tg}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Открыть Telegram-канал поселка"
+                    class="ui-icon-btn"
+                    title="Перейти в Telegram-канал"
+                  >
+                    <TelegramIcon class="settlement-icon settlement-icon--desktop settlement-icon--telegram" />
+                  </a>
+                )}
                 <a
                   href={mapUrl}
                   target="_blank"
@@ -289,35 +277,31 @@ const assumption = tariffCalc?.assumption;
                   class="ui-icon-btn"
                   title="Открыть на Яндекс.Картах"
                 >
-                  <MapPinIcon
-                    class="settlement-icon settlement-icon--desktop"
-                  />
+                  <MapPinIcon class="settlement-icon settlement-icon--desktop" />
                 </a>
               </div>
             </div>
             <p class="settlement-hero-district settlement-hero-text-shadow">
               {settlement.location.district}
             </p>
-            {
-              companyTitle && (
-                <div class="settlement-hero-glass-pill settlement-company-pill">
-                  <span class="settlement-company-label">Обслуживается</span>
-                  {companyUrl ? (
-                    <a
-                      href={companyUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="settlement-company-link"
-                      title="Перейти на сайт управляющей компании"
-                    >
-                      {companyTitle}
-                    </a>
-                  ) : (
-                    <span class="settlement-company-name">{companyTitle}</span>
-                  )}
-                </div>
-              )
-            }
+            {companyTitle && (
+              <div class="settlement-hero-glass-pill settlement-company-pill">
+                <span class="settlement-company-label">Обслуживается</span>
+                {companyUrl ? (
+                  <a
+                    href={companyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="settlement-company-link"
+                    title="Перейти на сайт управляющей компании"
+                  >
+                    {companyTitle}
+                  </a>
+                ) : (
+                  <span class="settlement-company-name">{companyTitle}</span>
+                )}
+              </div>
+            )}
           </div>
 
           <div
@@ -340,103 +324,89 @@ const assumption = tariffCalc?.assumption;
                 >
                   {formatTariffAuto(settlement.tariff)}
                 </span>
-                {
-                  tariffCalc && (
-                    <div
-                      id={tipDesktopId}
-                      role="tooltip"
-                      class="settlement-hero-tooltip"
-                    >
-                      <p class="settlement-tooltip-muted">{tariffCalc.intro}</p>
-                      {assumption && (
-                        <p class="settlement-tooltip-muted settlement-tooltip-line">
-                          {assumption}
-                        </p>
-                      )}
-                      {lotCalc && (
-                        <div class="settlement-tooltip-section">
-                          <p class="settlement-tooltip-title">
-                            Средняя площадь участка
-                          </p>
-                          <p class="settlement-tooltip-muted settlement-tooltip-line">
-                            Данные: {lotCalc.known}
-                          </p>
-                          {lotCalc.factors && (
-                            <p class="settlement-tooltip-muted">
-                              Вычет: {lotCalc.factors}
-                            </p>
-                          )}
-                          <p class="settlement-tooltip-text">
-                            Итого: {lotCalc.total}
-                          </p>
-                        </div>
-                      )}
-                      <div
-                        class:list={[
-                          'settlement-tooltip-rows',
-                          { 'settlement-tooltip-rows--divided': lotCalc },
-                        ]}
-                      >
-                        {tariffCalc.rows.map((item) => (
-                          <div>
-                            <p class="settlement-tooltip-title">{item.title}</p>
-                            <p class="settlement-tooltip-muted">
-                              {item.source}
-                            </p>
-                            <p class="settlement-tooltip-text">
-                              {item.formula}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                      <p class="settlement-tooltip-total">
-                        Итого: {tariffCalc.total}
+                {tariffCalc && (
+                  <div
+                    id={tipDesktopId}
+                    role="tooltip"
+                    class="settlement-hero-tooltip"
+                  >
+                    <p class="settlement-tooltip-muted">{tariffCalc.intro}</p>
+                    {assumption && (
+                      <p class="settlement-tooltip-muted settlement-tooltip-line">
+                        {assumption}
                       </p>
+                    )}
+                    {lotCalc && (
+                      <div class="settlement-tooltip-section">
+                        <p class="settlement-tooltip-title">
+                          Средняя площадь участка
+                        </p>
+                        <p class="settlement-tooltip-muted settlement-tooltip-line">
+                          Данные: {lotCalc.known}
+                        </p>
+                        {lotCalc.factors && (
+                          <p class="settlement-tooltip-muted">
+                            Вычет: {lotCalc.factors}
+                          </p>
+                        )}
+                        <p class="settlement-tooltip-text">
+                          Итого: {lotCalc.total}
+                        </p>
+                      </div>
+                    )}
+                    <div
+                      class:list={[
+                        'settlement-tooltip-rows',
+                        { 'settlement-tooltip-rows--divided': lotCalc },
+                      ]}
+                    >
+                      {tariffCalc.rows.map((item) => (
+                        <div>
+                          <p class="settlement-tooltip-title">{item.title}</p>
+                          <p class="settlement-tooltip-muted">{item.source}</p>
+                          <p class="settlement-tooltip-text">{item.formula}</p>
+                        </div>
+                      ))}
                     </div>
-                  )
-                }
+                    <p class="settlement-tooltip-total">
+                      Итого: {tariffCalc.total}
+                    </p>
+                  </div>
+                )}
               </div>
-              {
-                settlement.tariff.normalizedIsEstimate && (
-                  <p class="settlement-tariff-detail settlement-tariff-detail--estimate">
-                    {formatTariffBase(settlement.tariff)}
-                  </p>
-                )
-              }
-              {
-                settlement.tariff.note && (
-                  <p class="settlement-tariff-detail">
-                    {settlement.tariff.note}
-                  </p>
-                )
-              }
+              {settlement.tariff.normalizedIsEstimate && (
+                <p class="settlement-tariff-detail settlement-tariff-detail--estimate">
+                  {formatTariffBase(settlement.tariff)}
+                </p>
+              )}
+              {settlement.tariff.note && (
+                <p class="settlement-tariff-detail">{settlement.tariff.note}</p>
+              )}
             </div>
 
-            {
-              hasDelta && comparison && (
-                <div class="settlement-hero-glass-card">
-                  <p class="settlement-fact-label">Разница с Шелково</p>
-                  <p
-                    class:list={[
-                      'ui-num',
-                      'settlement-delta-value',
-                      comparison.isCheaper
-                        ? 'settlement-delta-value--cheaper'
-                        : 'settlement-delta-value--costlier',
-                    ]}
-                  >
-                    {comparison.isCheaper ? '−' : '+'}
-                    {formatCurrency(Math.abs(comparison.tariffDelta))}
-                  </p>
-                  <p class="settlement-fact-detail">
-                    {comparison.isCheaper ? 'Дешевле' : 'Дороже'} на{' '}
-                    {formatPercentage(comparison.tariffDeltaPercent / 100, {
-                      signed: false,
-                    })}
-                  </p>
-                </div>
-              )
-            }
+            {hasDelta && comparison && (
+              <div class="settlement-hero-glass-card">
+                <p class="settlement-fact-label">Разница с Шелково</p>
+                <p
+                  class:list={[
+                    'ui-num',
+                    'settlement-delta-value',
+                    comparison.isCheaper
+                      ? 'settlement-delta-value--cheaper'
+                      : 'settlement-delta-value--costlier',
+                  ]}
+                >
+                  {comparison.isCheaper ? '−' : '+'}
+                  {formatCurrency(Math.abs(comparison.tariffDelta))}
+                </p>
+                <p class="settlement-fact-detail">
+                  {comparison.isCheaper ? 'Дешевле' : 'Дороже'} на{' '}
+                  {formatPercentage(comparison.tariffDeltaPercent / 100, {
+                    signed: false,
+                  })}
+                </p>
+              </div>
+            )}
 
             <div class="settlement-hero-glass-card">
               <p class="settlement-fact-label">Расположение</p>
@@ -449,13 +419,11 @@ const assumption = tariffCalc?.assumption;
               >
                 {formatDistance(distanceFromMkad)} от МКАД
               </p>
-              {
-                distanceFromShelkovo > 0 && (
-                  <p class="settlement-fact-detail">
-                    {formatDistance(distanceFromShelkovo)} от Шелково
-                  </p>
-                )
-              }
+              {distanceFromShelkovo > 0 && (
+                <p class="settlement-fact-detail">
+                  {formatDistance(distanceFromShelkovo)} от Шелково
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -472,36 +440,32 @@ const assumption = tariffCalc?.assumption;
               </div>
             </div>
             <div class="settlement-mobile-actions">
-              {
-                settlement.website && (
-                  <a
-                    href={settlement.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Открыть сайт поселка"
-                    class="ui-btn ui-btn-sm ui-btn-outline settlement-mobile-action"
-                    title="Перейти на сайт поселка"
-                  >
-                    <GlobeIcon class="settlement-icon" />
-                    <span>Сайт</span>
-                  </a>
-                )
-              }
-              {
-                tg && (
-                  <a
-                    href={tg}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Открыть Telegram-канал поселка"
-                    class="ui-btn ui-btn-sm ui-btn-outline settlement-mobile-action"
-                    title="Перейти в Telegram-канал"
-                  >
-                    <TelegramIcon class="settlement-icon settlement-icon--telegram" />
-                    <span>Telegram</span>
-                  </a>
-                )
-              }
+              {settlement.website && (
+                <a
+                  href={settlement.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Открыть сайт поселка"
+                  class="ui-btn ui-btn-sm ui-btn-outline settlement-mobile-action"
+                  title="Перейти на сайт поселка"
+                >
+                  <GlobeIcon class="settlement-icon" />
+                  <span>Сайт</span>
+                </a>
+              )}
+              {tg && (
+                <a
+                  href={tg}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Открыть Telegram-канал поселка"
+                  class="ui-btn ui-btn-sm ui-btn-outline settlement-mobile-action"
+                  title="Перейти в Telegram-канал"
+                >
+                  <TelegramIcon class="settlement-icon settlement-icon--telegram" />
+                  <span>Telegram</span>
+                </a>
+              )}
               <a
                 href={mapUrl}
                 target="_blank"
@@ -516,56 +480,50 @@ const assumption = tariffCalc?.assumption;
             </div>
           </div>
         </div>
-        <p class="settlement-mobile-district">
-          {settlement.location.district}
-        </p>
-        {
-          companyTitle && (
-            <p class="settlement-mobile-company">
-              Обслуживается:{' '}
-              {companyUrl ? (
-                <a
-                  href={companyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="settlement-company-link settlement-company-link--mobile"
-                  title="Перейти на сайт управляющей компании"
-                >
-                  {companyTitle}
-                </a>
-              ) : (
-                <span class="settlement-company-name">{companyTitle}</span>
-              )}
-            </p>
-          )
-        }
-      </div>
-
-      {
-        hasLabels && (
-          <div class="settlement-mobile-labels">
-            {waterInc && (
-              <span class="ui-badge ui-badge-water" title={waterTitle}>
-                Вода в тарифе
-              </span>
-            )}
-            {obman && (
+        <p class="settlement-mobile-district">{settlement.location.district}</p>
+        {companyTitle && (
+          <p class="settlement-mobile-company">
+            Обслуживается:{' '}
+            {companyUrl ? (
               <a
-                href={obmanUrl}
+                href={companyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="ui-badge ui-badge-danger settlement-badge-link"
-                title="Открыть Telegram-канал Коттеджное рабство"
+                class="settlement-company-link settlement-company-link--mobile"
+                title="Перейти на сайт управляющей компании"
               >
-                Коттеджное рабство
+                {companyTitle}
               </a>
+            ) : (
+              <span class="settlement-company-name">{companyTitle}</span>
             )}
-            {isBaseline && (
-              <span class="ui-badge ui-badge-info">Наш посёлок</span>
-            )}
-          </div>
-        )
-      }
+          </p>
+        )}
+      </div>
+
+      {hasLabels && (
+        <div class="settlement-mobile-labels">
+          {waterInc && (
+            <span class="ui-badge ui-badge-water" title={waterTitle}>
+              Вода в тарифе
+            </span>
+          )}
+          {obman && (
+            <a
+              href={obmanUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="ui-badge ui-badge-danger settlement-badge-link"
+              title="Открыть Telegram-канал Коттеджное рабство"
+            >
+              Коттеджное рабство
+            </a>
+          )}
+          {isBaseline && (
+            <span class="ui-badge ui-badge-info">Наш посёлок</span>
+          )}
+        </div>
+      )}
     </header>
 
     <section class="settlement-passport" data-testid="base-info-section">
@@ -584,97 +542,89 @@ const assumption = tariffCalc?.assumption;
             >
               {formatTariffAuto(settlement.tariff)}
             </span>
-            {
-              tariffCalc && (
-                <div
-                  id={tipMobileId}
-                  role="tooltip"
-                  class="settlement-hero-tooltip settlement-hero-tooltip--mobile"
-                >
-                  <p class="settlement-tooltip-muted">{tariffCalc.intro}</p>
-                  {assumption && (
-                    <p class="settlement-tooltip-muted settlement-tooltip-line">
-                      {assumption}
-                    </p>
-                  )}
-                  {lotCalc && (
-                    <div class="settlement-tooltip-section">
-                      <p class="settlement-tooltip-title">
-                        Средняя площадь участка
-                      </p>
-                      <p class="settlement-tooltip-muted settlement-tooltip-line">
-                        Данные: {lotCalc.known}
-                      </p>
-                      {lotCalc.factors && (
-                        <p class="settlement-tooltip-muted">
-                          Вычет: {lotCalc.factors}
-                        </p>
-                      )}
-                      <p class="settlement-tooltip-text">
-                        Итого: {lotCalc.total}
-                      </p>
-                    </div>
-                  )}
-                  <div
-                    class:list={[
-                      'settlement-tooltip-rows',
-                      { 'settlement-tooltip-rows--divided': lotCalc },
-                    ]}
-                  >
-                    {tariffCalc.rows.map((item) => (
-                      <div>
-                        <p class="settlement-tooltip-title">{item.title}</p>
-                        <p class="settlement-tooltip-muted">{item.source}</p>
-                        <p class="settlement-tooltip-text">{item.formula}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <p class="settlement-tooltip-total">
-                    Итого: {tariffCalc.total}
+            {tariffCalc && (
+              <div
+                id={tipMobileId}
+                role="tooltip"
+                class="settlement-hero-tooltip settlement-hero-tooltip--mobile"
+              >
+                <p class="settlement-tooltip-muted">{tariffCalc.intro}</p>
+                {assumption && (
+                  <p class="settlement-tooltip-muted settlement-tooltip-line">
+                    {assumption}
                   </p>
+                )}
+                {lotCalc && (
+                  <div class="settlement-tooltip-section">
+                    <p class="settlement-tooltip-title">
+                      Средняя площадь участка
+                    </p>
+                    <p class="settlement-tooltip-muted settlement-tooltip-line">
+                      Данные: {lotCalc.known}
+                    </p>
+                    {lotCalc.factors && (
+                      <p class="settlement-tooltip-muted">
+                        Вычет: {lotCalc.factors}
+                      </p>
+                    )}
+                    <p class="settlement-tooltip-text">
+                      Итого: {lotCalc.total}
+                    </p>
+                  </div>
+                )}
+                <div
+                  class:list={[
+                    'settlement-tooltip-rows',
+                    { 'settlement-tooltip-rows--divided': lotCalc },
+                  ]}
+                >
+                  {tariffCalc.rows.map((item) => (
+                    <div>
+                      <p class="settlement-tooltip-title">{item.title}</p>
+                      <p class="settlement-tooltip-muted">{item.source}</p>
+                      <p class="settlement-tooltip-text">{item.formula}</p>
+                    </div>
+                  ))}
                 </div>
-              )
-            }
+                <p class="settlement-tooltip-total">
+                  Итого: {tariffCalc.total}
+                </p>
+              </div>
+            )}
           </div>
-          {
-            settlement.tariff.normalizedIsEstimate && (
-              <span class="settlement-passport-detail">
-                {formatTariffBase(settlement.tariff)}
-              </span>
-            )
-          }
-          {
-            settlement.tariff.note && (
-              <span class="settlement-passport-detail">
-                {settlement.tariff.note}
-              </span>
-            )
-          }
+          {settlement.tariff.normalizedIsEstimate && (
+            <span class="settlement-passport-detail">
+              {formatTariffBase(settlement.tariff)}
+            </span>
+          )}
+          {settlement.tariff.note && (
+            <span class="settlement-passport-detail">
+              {settlement.tariff.note}
+            </span>
+          )}
         </div>
 
-        {
-          hasDelta && comparison && (
-            <p class="settlement-passport-comparison">
-              <span class="settlement-passport-key">Сравнение с Шелково: </span>
-              <span
-                class:list={[
-                  'ui-num',
-                  'settlement-passport-delta',
-                  comparison.isCheaper
-                    ? 'settlement-delta-value--cheaper'
-                    : 'settlement-delta-value--costlier',
-                ]}
-              >
-                {comparison.isCheaper ? '−' : '+'}
-                {formatCurrency(Math.abs(comparison.tariffDelta))}
-              </span>
-              , {comparison.isCheaper ? 'дешевле' : 'дороже'} на{' '}
-              {formatPercentage(comparison.tariffDeltaPercent / 100, {
-                signed: false,
-              })}
-            </p>
-          )
-        }
+        {hasDelta && comparison && (
+          <p class="settlement-passport-comparison">
+            <span class="settlement-passport-key">Сравнение с Шелково: </span>
+            <span
+              class:list={[
+                'ui-num',
+                'settlement-passport-delta',
+                comparison.isCheaper
+                  ? 'settlement-delta-value--cheaper'
+                  : 'settlement-delta-value--costlier',
+              ]}
+            >
+              {comparison.isCheaper ? '−' : '+'}
+              {formatCurrency(Math.abs(comparison.tariffDelta))}
+            </span>
+            , {comparison.isCheaper ? 'дешевле' : 'дороже'} на{' '}
+            {formatPercentage(comparison.tariffDeltaPercent / 100, {
+              signed: false,
+            })}
+          </p>
+        )}
 
         <p class="settlement-passport-location">
           <span class="settlement-passport-key">Расположение: </span>
@@ -682,11 +632,9 @@ const assumption = tariffCalc?.assumption;
           <span title="Примерная оценка по координатам, без учёта дорог">
             , {formatDistance(distanceFromMkad)} от МКАД
           </span>
-          {
-            distanceFromShelkovo > 0 && (
-              <span>, {formatDistance(distanceFromShelkovo)} от Шелково</span>
-            )
-          }
+          {distanceFromShelkovo > 0 && (
+            <span>, {formatDistance(distanceFromShelkovo)} от Шелково</span>
+          )}
         </p>
       </div>
     </section>
@@ -724,17 +672,12 @@ const assumption = tariffCalc?.assumption;
       />
     </section>
 
-    {
-      settlement.sources.length > 0 && (
-        <section
-          class="settlement-sources-section"
-          data-testid="sources-section"
-        >
-          <h2 class="settlement-sources-title">Источники</h2>
-          <SourcesList sources={settlement.sources} />
-        </section>
-      )
-    }
+    {settlement.sources.length > 0 && (
+      <section class="settlement-sources-section" data-testid="sources-section">
+        <h2 class="settlement-sources-title">Источники</h2>
+        <SourcesList sources={settlement.sources} />
+      </section>
+    )}
   </main>
 </BaseLayout>
 

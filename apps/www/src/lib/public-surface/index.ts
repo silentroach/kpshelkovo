@@ -34,8 +34,8 @@ export const surfaceToLinksetItem = (
 ): PublicSurfaceLinksetItem => ({
   href: surfaceHref(root, surface),
   type: surface.mediaType,
-  ...(surface.linkRelations?.length ? { rel: surface.linkRelations.map((link) => link.rel) } : {}),
-  ...(surface.label ? { title: surface.label } : {})
+  rel: surface.linkRelations?.length ? surface.linkRelations.map((link) => link.rel) : undefined,
+  title: surface.label || undefined
 });
 
 const assertUniqueRegistryIds = (slices: readonly PublicSurfaceSlice[]): void => {
