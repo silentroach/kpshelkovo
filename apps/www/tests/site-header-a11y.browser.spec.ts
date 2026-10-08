@@ -30,7 +30,7 @@ test('removes the closed tariff submenu from desktop keyboard flow', async ({ pa
   const icon = page.locator('[data-site-nav-dropdown-icon]');
   const compareLink = page.getByRole('link', { name: 'Сравнение тарифов' });
 
-  await expect(menu).toHaveAttribute('hidden', '');
+  await expect(menu).toHaveAttribute('inert', '');
   await page.keyboard.press('Tab');
   await page.keyboard.press('Tab');
   await page.keyboard.press('Tab');
@@ -40,14 +40,14 @@ test('removes the closed tariff submenu from desktop keyboard flow', async ({ pa
 
   await page.keyboard.press('Enter');
   await expect(tariffButton).toHaveAttribute('aria-expanded', 'true');
-  await expect(menu).not.toHaveAttribute('hidden', '');
+  await expect(menu).not.toHaveAttribute('inert', '');
   await expectChevronExpanded(icon, true);
   await page.keyboard.press('Tab');
   await expect(compareLink).toBeFocused();
 
   await page.keyboard.press('Escape');
   await expect(tariffButton).toHaveAttribute('aria-expanded', 'false');
-  await expect(menu).toHaveAttribute('hidden', '');
+  await expect(menu).toHaveAttribute('inert', '');
   await expect(tariffButton).toBeFocused();
   await expectChevronExpanded(icon, false);
 
@@ -68,21 +68,21 @@ test('toggles the hovered tariff submenu and closes it from outside', async ({ p
   await expectChevronExpanded(icon, true);
 
   await tariffButton.click();
-  await expect(menu).toHaveAttribute('hidden', '');
+  await expect(menu).toHaveAttribute('inert', '');
   await expectChevronExpanded(icon, false);
 
   await tariffButton.click();
   await expect(menu).toBeVisible();
   await expectChevronExpanded(icon, true);
   await tariffButton.click();
-  await expect(menu).toHaveAttribute('hidden', '');
+  await expect(menu).toHaveAttribute('inert', '');
   await expectChevronExpanded(icon, false);
 
   await page.getByRole('link', { name: 'Шелково Онлайн' }).hover();
   await tariffButton.hover();
   await expect(menu).toBeVisible();
   await page.locator('.site-page-content').click({ position: { x: 2, y: 2 } });
-  await expect(menu).toHaveAttribute('hidden', '');
+  await expect(menu).toHaveAttribute('inert', '');
 });
 
 test('toggles the tariff submenu with touch activation', async ({ baseURL, browser }) => {
@@ -102,7 +102,7 @@ test('toggles the tariff submenu with touch activation', async ({ baseURL, brows
     await tariffButton.tap();
     await expect(menu).toBeVisible();
     await tariffButton.tap();
-    await expect(menu).toHaveAttribute('hidden', '');
+    await expect(menu).toHaveAttribute('inert', '');
   } finally {
     await context.close();
   }
@@ -128,22 +128,22 @@ test('keeps non-hover pen and touch activation open through pointer leave', asyn
           pointerType: currentPointerType
         })
       );
-      const hiddenAfterEnter = menu.hidden;
+      const hiddenAfterEnter = menu.inert;
       button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
       const buttonFocused = document.activeElement === button;
-      const hiddenAfterClick = menu.hidden;
+      const hiddenAfterClick = menu.inert;
       element.dispatchEvent(
         new PointerEvent('pointerleave', {
           pointerId: 7,
           pointerType: currentPointerType
         })
       );
-      const hiddenAfterLeave = menu.hidden;
+      const hiddenAfterLeave = menu.inert;
       button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
 
       return {
         buttonFocused,
-        hiddenStates: [hiddenAfterEnter, hiddenAfterClick, hiddenAfterLeave, menu.hidden]
+        hiddenStates: [hiddenAfterEnter, hiddenAfterClick, hiddenAfterLeave, menu.inert]
       };
     }, pointerType);
 
@@ -171,7 +171,7 @@ test('keeps tariff links available without JavaScript', async ({ baseURL, browse
     const icon = page.locator('[data-site-nav-dropdown-icon]');
     const compareLink = page.getByRole('link', { name: 'Сравнение тарифов' });
 
-    await expect(menu).not.toHaveAttribute('hidden', '');
+    await expect(menu).not.toHaveAttribute('inert', '');
     await expect(menu).toBeHidden();
     await expectChevronExpanded(icon, false);
     await tariffButton.hover();
@@ -229,6 +229,80 @@ test('shows keyboard-only focus on the mobile menu button', async ({ page }) => 
   await menuButton.click();
   await expect(page.locator('details.site-header-menu')).toHaveAttribute('open', '');
   expect(await hasNonColorFocusIndicator(menuButton)).toBe(false);
+});
+
+test('removes panel movement and animated chevrons with reduced motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/reviews/', { waitUntil: 'networkidle' });
+    const mobile = width < 896;
+    const trigger = page.locator(
+      mobile ? 'summary[aria-label="Меню"]' : '[data-site-nav-dropdown-button]'
+    );
+    const panel = page.locator(
+      mobile ? '.site-header-mobile-panel' : '[data-site-nav-dropdown-menu]'
+    );
+    const icon = page.locator(mobile ? '.site-header-menu-icon' : '[data-site-nav-dropdown-icon]');
+    await expect(panel).toHaveCSS('transform', 'none');
+    await expect(icon).toHaveCSS('transition-duration', '0s');
+    await trigger.focus();
+    await page.keyboard.press('Enter');
+    await expect(panel).not.toHaveAttribute('inert', '');
+    await expect(panel).toHaveCSS('transform', 'none');
+    await page.keyboard.press('Escape');
+    await expect(panel).toHaveAttribute('inert', '');
+    await expect(panel).toHaveCSS('transform', 'none');
+  }
+});
+
+test('keeps mobile input immediate through repeated toggles and a layout change', async ({
+  page
+}) => {
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('/reviews/', { waitUntil: 'networkidle' });
+    const trigger = page.locator('summary[aria-label="Меню"]');
+    const panel = page.locator('.site-header-mobile-panel');
+    await trigger.evaluate((element) => {
+      if (!(element instanceof HTMLElement)) throw new Error('Expected menu trigger');
+      element.click();
+      element.click();
+      element.click();
+    });
+    await expect(panel).not.toHaveAttribute('inert', '');
+    await panel.locator('a').first().focus();
+    await page.keyboard.press('Escape');
+    await expect(trigger).toBeFocused();
+    await expect(panel).toHaveAttribute('inert', '');
+    await page.keyboard.press('Enter');
+    await panel.locator('a').first().focus();
+    await page.setViewportSize({ width: 896, height: 844 });
+    await expect(page.locator('details.site-header-menu')).not.toHaveAttribute('open', '');
+    await expect(page.getByRole('link', { name: 'Шелково Онлайн' })).toBeFocused();
+    await page.setViewportSize({ width, height: 844 });
+    await expect(panel).toHaveAttribute('inert', '');
+  }
+});
+
+test('restores disappearing header focus without stealing focus from the page', async ({
+  page
+}) => {
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.goto('/reviews/rules/', { waitUntil: 'networkidle' });
+  const brand = page.getByRole('link', { name: 'Шелково Онлайн' });
+  const summary = page.locator('summary[aria-label="Меню"]');
+  await summary.focus();
+  await page.setViewportSize({ width: 896, height: 900 });
+  await expect(brand).toBeFocused();
+  await page.locator('.site-header-desktop-nav a').first().focus();
+  await page.setViewportSize({ width: 390, height: 900 });
+  await expect(brand).toBeFocused();
+  const contentLink = page.locator('main a:visible').first();
+  await contentLink.focus();
+  await expect(contentLink).toBeFocused();
+  await page.setViewportSize({ width: 896, height: 900 });
+  await expect(contentLink).toBeFocused();
 });
 
 test('keeps the sticky desktop header visible while search is open', async ({ page }) => {

@@ -43,169 +43,167 @@ const statusCurrent = getCurrent('/status/');
 const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
 ---
 
-{
-  isMobile ? (
-    <nav aria-label={ariaLabel} class="site-nav site-nav-mobile">
-      <a href="/news/" aria-current={newsCurrent} class="site-nav-mobile-link">
-        Новости
-      </a>
-      {/* <a
+{isMobile ? (
+  <nav aria-label={ariaLabel} class="site-nav site-nav-mobile">
+    <a href="/news/" aria-current={newsCurrent} class="site-nav-mobile-link">
+      Новости
+    </a>
+    {/* <a
         href="/events/"
         aria-current={eventsCurrent}
         class="site-nav-mobile-link"
       >
         События
       </a> */}
-      <div
-        class="site-nav-mobile-group"
-        data-current-section={isTariffCurrent ? '' : undefined}
+    <div
+      class="site-nav-mobile-group"
+      data-current-section={isTariffCurrent ? '' : undefined}
+    >
+      <p class="site-nav-mobile-label">
+        Тариф 815
+        {isTariffCurrent && (
+          <span class="ui-visually-hidden">, текущий раздел</span>
+        )}
+      </p>
+      <a
+        href="/815/compare/"
+        aria-current={compareCurrent}
+        class="site-nav-mobile-link site-nav-mobile-nested"
       >
-        <p class="site-nav-mobile-label">
-          Тариф 815
-          {isTariffCurrent && (
-            <span class="ui-visually-hidden">, текущий раздел</span>
-          )}
-        </p>
-        <a
-          href="/815/compare/"
-          aria-current={compareCurrent}
-          class="site-nav-mobile-link site-nav-mobile-nested"
-        >
-          Сравнение тарифов
-        </a>
-        <a
-          href="/815/regulation/"
-          aria-current={regulationCurrent}
-          class="site-nav-mobile-link site-nav-mobile-nested"
-        >
-          Регламент
-        </a>
-      </div>
+        Сравнение тарифов
+      </a>
+      <a
+        href="/815/regulation/"
+        aria-current={regulationCurrent}
+        class="site-nav-mobile-link site-nav-mobile-nested"
+      >
+        Регламент
+      </a>
+    </div>
 
-      <a href="/map/" aria-current={placesCurrent} class="site-nav-mobile-link">
-        Карта
-      </a>
+    <a href="/map/" aria-current={placesCurrent} class="site-nav-mobile-link">
+      Карта
+    </a>
 
-      <a href="/kb/" aria-current={kbCurrent} class="site-nav-mobile-link">
-        База знаний
-      </a>
-      <a
-        href="/sarafan/"
-        aria-current={sarafanCurrent}
-        class="site-nav-mobile-link"
-      >
-        Сарафан
-      </a>
-      <a
-        href="/reviews/"
-        aria-current={reviewsCurrent}
-        class="site-nav-mobile-link"
-      >
-        Отзывы
-      </a>
-      <a
-        href="/status/"
-        aria-current={statusCurrent}
-        aria-label={statusAriaLabel}
-        class="site-nav-mobile-link site-nav-mobile-status-link"
-        data-home-status-link
-        data-home-status-state={statusState}
-      >
-        <span>Статус</span>
-        <span
-          aria-hidden="true"
-          data-home-status-dot
-          class="site-nav-status-dot"
-        />
-      </a>
-    </nav>
-  ) : (
-    <nav aria-label={ariaLabel} class="site-nav site-nav-header">
-      <a href="/news/" aria-current={newsCurrent} class="site-nav-link">
-        Новости
-      </a>
-      {/* <a href="/events/" aria-current={eventsCurrent} class="site-nav-link">
+    <a href="/kb/" aria-current={kbCurrent} class="site-nav-mobile-link">
+      База знаний
+    </a>
+    <a
+      href="/sarafan/"
+      aria-current={sarafanCurrent}
+      class="site-nav-mobile-link"
+    >
+      Сарафан
+    </a>
+    <a
+      href="/reviews/"
+      aria-current={reviewsCurrent}
+      class="site-nav-mobile-link"
+    >
+      Отзывы
+    </a>
+    <a
+      href="/status/"
+      aria-current={statusCurrent}
+      aria-label={statusAriaLabel}
+      class="site-nav-mobile-link site-nav-mobile-status-link"
+      data-home-status-link
+      data-home-status-state={statusState}
+    >
+      <span>Статус</span>
+      <span
+        aria-hidden="true"
+        data-home-status-dot
+        class="site-nav-status-dot"
+      />
+    </a>
+  </nav>
+) : (
+  <nav aria-label={ariaLabel} class="site-nav site-nav-header">
+    <a href="/news/" aria-current={newsCurrent} class="site-nav-link">
+      Новости
+    </a>
+    {/* <a href="/events/" aria-current={eventsCurrent} class="site-nav-link">
         События
       </a> */}
-      <div
-        class="site-nav-dropdown"
-        data-site-nav-dropdown
-        data-current-section={isTariffCurrent ? '' : undefined}
+    <div
+      class="site-nav-dropdown"
+      data-site-nav-dropdown
+      data-current-section={isTariffCurrent ? '' : undefined}
+    >
+      <button
+        type="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-controls={tariffMenuId}
+        data-site-nav-dropdown-button
+        class="site-nav-link site-nav-dropdown-button"
       >
-        <button
-          type="button"
-          aria-haspopup="true"
-          aria-expanded="false"
-          aria-controls={tariffMenuId}
-          data-site-nav-dropdown-button
-          class="site-nav-link site-nav-dropdown-button"
-        >
-          <span>Тариф 815</span>
-          {isTariffCurrent && (
-            <span class="ui-visually-hidden">, текущий раздел</span>
-          )}
-          <span
-            aria-hidden="true"
-            data-site-nav-dropdown-icon
-            class="site-nav-dropdown-icon"
-          />
-        </button>
-        <div
-          id={tariffMenuId}
-          data-site-nav-dropdown-menu
-          class="site-nav-submenu"
-        >
-          <div class="site-nav-glass-panel">
-            <a
-              href="/815/compare/"
-              aria-current={compareCurrent}
-              class="site-nav-submenu-link"
-            >
-              Сравнение тарифов
-            </a>
-            <a
-              href="/815/regulation/"
-              aria-current={regulationCurrent}
-              class="site-nav-submenu-link"
-            >
-              Регламент
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <a href="/map/" aria-current={placesCurrent} class="site-nav-link">
-        Карта
-      </a>
-
-      <a href="/kb/" aria-current={kbCurrent} class="site-nav-link">
-        База знаний
-      </a>
-      <a href="/sarafan/" aria-current={sarafanCurrent} class="site-nav-link">
-        Сарафан
-      </a>
-      <a href="/reviews/" aria-current={reviewsCurrent} class="site-nav-link">
-        Отзывы
-      </a>
-      <a
-        href="/status/"
-        aria-current={statusCurrent}
-        aria-label={statusAriaLabel}
-        class="site-nav-link site-nav-status-link"
-        data-home-status-link
-        data-home-status-state={statusState}
-      >
-        <span>Статус</span>
+        <span>Тариф 815</span>
+        {isTariffCurrent && (
+          <span class="ui-visually-hidden">, текущий раздел</span>
+        )}
         <span
           aria-hidden="true"
-          data-home-status-dot
-          class="site-nav-status-dot"
+          data-site-nav-dropdown-icon
+          class="site-nav-dropdown-icon"
         />
-      </a>
-      <SearchTrigger variant="header" />
-    </nav>
-  )
-}
+      </button>
+      <div
+        id={tariffMenuId}
+        data-site-nav-dropdown-menu
+        class="site-nav-submenu"
+      >
+        <div class="site-nav-glass-panel">
+          <a
+            href="/815/compare/"
+            aria-current={compareCurrent}
+            class="site-nav-submenu-link"
+          >
+            Сравнение тарифов
+          </a>
+          <a
+            href="/815/regulation/"
+            aria-current={regulationCurrent}
+            class="site-nav-submenu-link"
+          >
+            Регламент
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <a href="/map/" aria-current={placesCurrent} class="site-nav-link">
+      Карта
+    </a>
+
+    <a href="/kb/" aria-current={kbCurrent} class="site-nav-link">
+      База знаний
+    </a>
+    <a href="/sarafan/" aria-current={sarafanCurrent} class="site-nav-link">
+      Сарафан
+    </a>
+    <a href="/reviews/" aria-current={reviewsCurrent} class="site-nav-link">
+      Отзывы
+    </a>
+    <a
+      href="/status/"
+      aria-current={statusCurrent}
+      aria-label={statusAriaLabel}
+      class="site-nav-link site-nav-status-link"
+      data-home-status-link
+      data-home-status-state={statusState}
+    >
+      <span>Статус</span>
+      <span
+        aria-hidden="true"
+        data-home-status-dot
+        class="site-nav-status-dot"
+      />
+    </a>
+    <SearchTrigger variant="header" />
+  </nav>
+)}
 
 <style>
   .site-nav-header {
@@ -317,7 +315,7 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
     border-inline: 0.25rem solid transparent;
     border-top: 0.3125rem solid currentColor;
     opacity: 0.7;
-    transition: transform 0.2s ease;
+    transition: transform var(--site-menu-duration) var(--site-menu-ease);
   }
 
   .site-nav-link:is(:hover, :focus-visible) {
@@ -353,6 +351,9 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
       0 0.75rem 1.75rem oklch(24% 0.04 145 / 0.1);
     -webkit-backdrop-filter: saturate(165%) blur(16px);
     backdrop-filter: saturate(165%) blur(16px);
+    /* Fade the glass itself: a translucent ancestor would cut off its backdrop. */
+    opacity: 0;
+    transition: opacity var(--site-menu-duration) var(--site-menu-ease);
   }
 
   .site-nav-submenu {
@@ -365,11 +366,9 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
     padding-top: 0.5rem;
     pointer-events: none;
     transform: translateY(-0.25rem);
-    opacity: 0;
     transition:
-      opacity 0.15s ease-out,
-      transform 0.15s ease-out,
-      visibility 0.15s ease-out;
+      transform var(--site-menu-duration) var(--site-menu-ease),
+      visibility 0s var(--site-menu-duration);
   }
 
   .site-nav-submenu-link {
@@ -397,11 +396,27 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
     visibility: visible;
     pointer-events: auto;
     transform: translateY(0);
+    transition-delay: 0s;
+  }
+
+  .site-nav-dropdown:not([data-site-nav-dropdown-hydrated]):is(
+      :hover,
+      :focus-within
+    )
+    .site-nav-glass-panel,
+  .site-nav-dropdown[data-open] .site-nav-glass-panel {
     opacity: 1;
   }
 
-  .site-nav-submenu[hidden] {
-    display: none;
+  @media (prefers-reduced-motion: reduce) {
+    .site-nav-dropdown-icon {
+      transition: none;
+    }
+
+    .site-nav-submenu,
+    .site-nav-dropdown[data-open] .site-nav-submenu {
+      transform: none;
+    }
   }
 
   .site-nav-dropdown:not([data-site-nav-dropdown-hydrated]):is(

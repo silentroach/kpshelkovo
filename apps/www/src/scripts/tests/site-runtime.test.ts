@@ -468,6 +468,75 @@ describe('search dialog loader', () => {
 });
 
 describe('site header menu', () => {
+  it('restores focus when CSS has hidden its responsive header area before blur', () => {
+    vi.spyOn(document, 'hasFocus').mockReturnValue(true);
+    document.body.innerHTML = `
+      <a href="/" class="site-header-brand">Brand</a>
+      <div class="site-header-mobile-actions"><button type="button">Menu</button></div>
+    `;
+    const brand = document.querySelector<HTMLElement>('.site-header-brand');
+    const navigation = document.querySelector<HTMLElement>('.site-header-mobile-actions');
+    const trigger = navigation?.querySelector<HTMLButtonElement>('button');
+    if (!brand || !navigation || !trigger) throw new Error('Expected responsive header');
+    trigger.focus();
+    navigation.style.display = 'none';
+    trigger.blur();
+    expect(document.activeElement).toBe(brand);
+  });
+
+  it('does not redirect normal focus loss from a visible header area', () => {
+    vi.spyOn(document, 'hasFocus').mockReturnValue(true);
+    document.body.innerHTML = `
+      <a href="/" class="site-header-brand">Brand</a>
+      <div class="site-header-mobile-actions"><button type="button">Menu</button></div>
+      <button type="button" data-outside>Outside</button>
+    `;
+    const trigger = document.querySelector<HTMLButtonElement>('.site-header-mobile-actions button');
+    const outside = document.querySelector<HTMLButtonElement>('[data-outside]');
+    if (!trigger || !outside) throw new Error('Expected focus targets');
+    trigger.focus();
+    outside.focus();
+    expect(document.activeElement).toBe(outside);
+  });
+  it('updates input availability synchronously on rapid summary toggles and link selection', () => {
+    document.body.innerHTML = `
+      <details class="site-header-menu">
+        <summary>Menu</summary>
+        <div class="site-header-mobile-panel"><a href="/news/">News</a></div>
+      </details>
+    `;
+    document.dispatchEvent(new Event('astro:page-load'));
+    const menu = document.querySelector<HTMLDetailsElement>('details');
+    const summary = menu?.querySelector<HTMLElement>('summary');
+    const panel = menu?.querySelector<HTMLElement>('.site-header-mobile-panel');
+    const link = panel?.querySelector<HTMLAnchorElement>('a');
+    if (!menu || !summary || !panel || !link) throw new Error('Expected mobile menu');
+    const states = [panel.inert];
+    // happy-dom toggles summary before MouseEvent bubbles; test our handler without that default.
+    summary.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+    states.push(panel.inert);
+    summary.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+    states.push(panel.inert);
+    summary.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+    states.push(panel.inert);
+    link.focus();
+    link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    states.push(panel.inert);
+    expect({ states, open: menu.open, focusRestored: document.activeElement === summary })
+      .toMatchInlineSnapshot(`
+      {
+        "focusRestored": true,
+        "open": false,
+        "states": [
+          true,
+          false,
+          true,
+          false,
+          true,
+        ],
+      }
+    `);
+  });
   it('closes after a pointer press outside', () => {
     document.body.innerHTML = `
       <button type="button">Outside</button>
@@ -626,10 +695,10 @@ describe('desktop site navigation dropdown', () => {
   it('hides closed links semantically and restores the trigger on Escape', () => {
     const { button, menu, submenuLink } = renderDropdown();
 
-    expect(menu.hidden).toBe(true);
+    expect(menu.inert).toBe(true);
     button.focus();
     button.click();
-    expect(menu.hidden).toBe(false);
+    expect(menu.inert).toBe(false);
     expect(button.getAttribute('aria-expanded')).toBe('true');
 
     submenuLink.focus();
@@ -638,34 +707,42 @@ describe('desktop site navigation dropdown', () => {
     expect({
       expanded: button.getAttribute('aria-expanded'),
       focusRestored: document.activeElement === button,
-      menuHidden: menu.hidden
+      menuInert: menu.inert
     }).toMatchInlineSnapshot(`
       {
         "expanded": "false",
         "focusRestored": true,
-        "menuHidden": true,
+        "menuInert": true,
       }
     `);
   });
 
   it('toggles after hover and still closes after an outside pointer press', () => {
+    const matchMedia = window.matchMedia.bind(window);
+    vi.spyOn(window, 'matchMedia').mockImplementation((query) => {
+      const result = matchMedia(query);
+      if (query === '(hover: hover) and (pointer: fine)') {
+        Object.defineProperty(result, 'matches', { value: true });
+      }
+      return result;
+    });
     const { button, dropdown, menu } = renderDropdown();
 
     dropdown.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
-    const hiddenStates = [menu.hidden];
+    const hiddenStates = [menu.inert];
 
     button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
-    hiddenStates.push(menu.hidden);
+    hiddenStates.push(menu.inert);
     button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
-    hiddenStates.push(menu.hidden);
+    hiddenStates.push(menu.inert);
     button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
-    hiddenStates.push(menu.hidden);
+    hiddenStates.push(menu.inert);
 
     dropdown.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
-    hiddenStates.push(menu.hidden);
+    hiddenStates.push(menu.inert);
 
     document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
-    hiddenStates.push(menu.hidden);
+    hiddenStates.push(menu.inert);
 
     expect(hiddenStates).toMatchInlineSnapshot(`
       [
@@ -683,16 +760,16 @@ describe('desktop site navigation dropdown', () => {
     'keeps a %s click-opened menu open after non-hover pointer leave',
     (pointerType) => {
       const { button, dropdown, menu } = renderDropdown();
-      const hiddenStates = [menu.hidden];
+      const hiddenStates = [menu.inert];
 
       dropdown.dispatchEvent(new PointerEvent('pointerenter', { pointerId: 7, pointerType }));
-      hiddenStates.push(menu.hidden);
+      hiddenStates.push(menu.inert);
       button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
-      hiddenStates.push(menu.hidden);
+      hiddenStates.push(menu.inert);
       dropdown.dispatchEvent(new PointerEvent('pointerleave', { pointerId: 7, pointerType }));
-      hiddenStates.push(menu.hidden);
+      hiddenStates.push(menu.inert);
       button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
-      hiddenStates.push(menu.hidden);
+      hiddenStates.push(menu.inert);
 
       expect({
         buttonFocused: document.activeElement === button,
@@ -711,4 +788,45 @@ describe('desktop site navigation dropdown', () => {
       `);
     }
   );
+
+  it('resets an open desktop menu and moves focus to the brand when its layout disappears', () => {
+    const matchMedia = window.matchMedia.bind(window);
+    const layout = matchMedia('(min-width: 56rem)');
+    vi.spyOn(window, 'matchMedia').mockImplementation((query) =>
+      query === '(min-width: 56rem)' ? layout : matchMedia(query)
+    );
+    const { button, dropdown, menu, submenuLink } = renderDropdown();
+    const brand = document.createElement('a');
+    brand.href = '/';
+    brand.className = 'site-header-brand';
+    document.body.prepend(brand);
+    button.click();
+    submenuLink.focus();
+    layout.dispatchEvent(new Event('change'));
+    expect({
+      open: dropdown.hasAttribute('data-open'),
+      inert: menu.inert,
+      focusVisible: document.activeElement === brand
+    }).toMatchInlineSnapshot(`
+      {
+        "focusVisible": true,
+        "inert": true,
+        "open": false,
+      }
+    `);
+  });
+
+  it('does not open from synthetic mouse hover on a non-hover device', () => {
+    const matchMedia = window.matchMedia.bind(window);
+    vi.spyOn(window, 'matchMedia').mockImplementation((query) => {
+      const result = matchMedia(query);
+      if (query === '(hover: hover) and (pointer: fine)') {
+        Object.defineProperty(result, 'matches', { value: false });
+      }
+      return result;
+    });
+    const { dropdown, menu } = renderDropdown();
+    dropdown.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
+    expect(menu.inert).toBe(true);
+  });
 });
