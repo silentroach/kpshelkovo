@@ -1074,13 +1074,13 @@ const serviceToEstimateMap = [
   ),
   mapItem(
     'summer-road-gutters-cleaning',
-    'explicit_found',
-    explicitFound,
+    'partial',
+    partial,
     ['cleaning'],
     ['cleaning-summer-manual'],
     [source(125, 'Сводная смета / строка 2.4')],
     'Летняя ручная уборка использует базу «открытые ливневые траншеи»; это близко к дорожным лоткам, но не совпадает дословно.',
-    null
+    'частично сопоставлено'
   ),
   mapItem(
     'summer-tree-shrub-care',

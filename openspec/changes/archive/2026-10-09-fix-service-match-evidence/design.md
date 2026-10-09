@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация — в [proposal](/openspec/changes/fix-service-match-evidence/proposal.md). `full-2026.ts` служит общим источником сопоставлений для HTML услуг, публичного JSON и Markdown. Существующие адаптеры уже поддерживают `partial`; решение требуется на уровне данных, а не каждого представления.
+Мотивация — в [proposal](/openspec/changes/archive/2026-10-09-fix-service-match-evidence/proposal.md). `full-2026.ts` служит общим источником сопоставлений для HTML услуг, публичного JSON и Markdown. Существующие адаптеры уже поддерживают `partial`; решение требуется на уровне данных, а не каждого представления.
 
 ## Goals / Non-Goals
 

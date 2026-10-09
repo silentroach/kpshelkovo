@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 let buildFullReglamentChecksMarkdown: typeof import('./full-markdown').buildFullReglamentChecksMarkdown;
 let buildFullReglamentMarkdown: typeof import('./full-markdown').buildFullReglamentMarkdown;
+let buildFullReglamentServiceMapMarkdown: typeof import('./full-markdown').buildFullReglamentServiceMapMarkdown;
 let buildReglamentMarkdown: typeof import('./markdown').buildReglamentMarkdown;
 let estimate2026: typeof import('@/data/reglament/estimate-2026').estimate2026;
 
@@ -12,8 +13,11 @@ beforeAll(async () => {
   });
 
   ({ buildReglamentMarkdown } = await import('./markdown'));
-  ({ buildFullReglamentChecksMarkdown, buildFullReglamentMarkdown } =
-    await import('./full-markdown'));
+  ({
+    buildFullReglamentChecksMarkdown,
+    buildFullReglamentMarkdown,
+    buildFullReglamentServiceMapMarkdown
+  } = await import('./full-markdown'));
   ({ estimate2026 } = await import('@/data/reglament/estimate-2026'));
 });
 
@@ -45,5 +49,22 @@ describe('reglament markdown companions', () => {
     const markdown = buildFullReglamentChecksMarkdown();
 
     expect(markdown).toMatchSnapshot();
+  });
+
+  it('keeps road-gutter cleaning partial in the service map without adding a manual check', () => {
+    const markdown = buildFullReglamentServiceMapMarkdown();
+    const relevantLines = markdown
+      .split('\n')
+      .filter((line) => /summer-road-gutters-cleaning|`(?:explicit_found|partial)`\):/u.test(line));
+
+    expect(relevantLines).toMatchInlineSnapshot(`
+      [
+        "- найдено явно (\`explicit_found\`): 5",
+        "- найдено частично (\`partial\`): 14",
+        "- summer-road-gutters-cleaning: частично (\`partial\`); строки сметы: cleaning-summer-manual; Летняя ручная уборка использует базу «открытые ливневые траншеи»; это близко к дорожным лоткам, но не совпадает дословно.",
+      ]
+    `);
+    expect(markdown).toContain('https://example.com/815/regulation/data/full-2026.json');
+    expect(buildFullReglamentChecksMarkdown()).not.toContain('summer-road-gutters-cleaning');
   });
 });

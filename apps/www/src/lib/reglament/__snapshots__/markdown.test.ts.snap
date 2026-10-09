@@ -102,8 +102,8 @@ exports[`reglament markdown companions > keeps full-reglament thematic files as 
 
 ## Статусы сопоставления услуг
 
-- найдено явно (\`explicit_found\`): 6
-- найдено частично (\`partial\`): 13
+- найдено явно (\`explicit_found\`): 5
+- найдено частично (\`partial\`): 14
 - не найдено (\`not_found\`): 4
 - требует проверки (\`needs_check\`): 1
 
