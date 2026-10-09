@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация — в [proposal](/openspec/changes/simplify-settlements-media-query/proposal.md). `/apps/www/src/compare/components/SettlementsExplorer.svelte` вручную хранит `mobile`, подписывается на `matchMedia` и снимает подписку. В существующем `onMount` ширина единожды определяет `showMap`, затем включаются контролы. Сервер отдаёт длинные подписи, скрытую карту и desktop-placeholder высотой 375px.
+Мотивация — в [proposal](/openspec/changes/archive/2026-10-09-simplify-settlements-media-query/proposal.md). `/apps/www/src/compare/components/SettlementsExplorer.svelte` вручную хранит `mobile`, подписывается на `matchMedia` и снимает подписку. В существующем `onMount` ширина единожды определяет `showMap`, затем включаются контролы. Сервер отдаёт длинные подписи, скрытую карту и desktop-placeholder высотой 375px.
 
 Svelte 5.57.1 на сервере использует fallback `MediaQuery`, а браузерный конструктор сразу читает `matchMedia`. Поэтому одного fallback недостаточно для согласованной первой разметки. Компонент гидратируется вручную через `/apps/www/src/compare/client/explorer-component.ts`; bootstrap менять не нужно.
 

@@ -8,7 +8,7 @@ const mobileViewports = [
 ] as const;
 const desktopViewport = { width: 1440, height: 900 } as const;
 const breadcrumbViewports = [
-  { name: 'mobile', viewport: { width: 640, height: 844 } },
+  { name: 'middle', viewport: { width: 640, height: 844 } },
   { name: 'desktop', viewport: desktopViewport }
 ] as const;
 const deferredSettlementTables = [
@@ -37,6 +37,8 @@ const yandexMapsReadyScript = `
   }
   window.ymaps3 = {
     ready: Promise.resolve(),
+    import: async () => ({ YMapOpenMapsButton: class {} }),
+    YMapControls: class { addChild() {} },
     YMap,
     YMapDefaultSchemeLayer: class {},
     YMapDefaultFeaturesLayer: class {},
@@ -148,16 +150,24 @@ for (const { name, viewport } of breadcrumbViewports) {
   });
 }
 
-test('aligns settlement breadcrumbs with the compare index', async ({ page }) => {
+test('keeps parent breadcrumbs on middle screens and aligns the full desktop hierarchy', async ({
+  page
+}) => {
   for (const { name, viewport } of breadcrumbViewports) {
     await test.step(name, async () => {
       await page.setViewportSize(viewport);
       await page.goto('/815/compare/', { waitUntil: 'domcontentloaded' });
 
       const indexBreadcrumbs = page.getByRole('navigation', {
-        name: 'Хлебные крошки'
+        name: 'Хлебные крошки',
+        includeHidden: true
       });
-      await expect(indexBreadcrumbs).toBeVisible();
+      if (name === 'middle') {
+        await expect(indexBreadcrumbs).toHaveCount(1);
+        await expect(indexBreadcrumbs).toBeHidden();
+      } else {
+        await expect(indexBreadcrumbs).toBeVisible();
+      }
       const indexTop = await indexBreadcrumbs.evaluate(
         (element) => element.getBoundingClientRect().top
       );
@@ -170,6 +180,13 @@ test('aligns settlement breadcrumbs with the compare index', async ({ page }) =>
         name: 'Хлебные крошки'
       });
       await expect(settlementBreadcrumbs).toBeVisible();
+      if (name === 'middle') {
+        const parentLink = settlementBreadcrumbs.getByRole('link');
+        await expect(parentLink).toHaveCount(1);
+        await expect(parentLink).toBeVisible();
+        await expect(parentLink).toHaveAttribute('href', '/815/compare/');
+        return;
+      }
       const settlementTop = await settlementBreadcrumbs.evaluate(
         (element) => element.getBoundingClientRect().top
       );
@@ -456,6 +473,101 @@ test('keeps the desktop list position through hydration', async ({ baseURL, brow
     .evaluate((element) => element.getBoundingClientRect().top);
 
   expect(hydratedListTop).toBeCloseTo(serverListTop, 0);
+});
+
+for (const initialWidth of [767, 768]) {
+  test(`keeps the initial and manual map choices while resizing from ${initialWidth}px`, async ({
+    page
+  }) => {
+    const hydrationMessages: string[] = [];
+    page.on('console', (message) => {
+      if (/hydration|mismatch/iu.test(message.text())) hydrationMessages.push(message.text());
+    });
+    await page.setViewportSize({ width: initialWidth, height: 900 });
+    await page.goto('/815/compare/', { waitUntil: 'networkidle' });
+    const button = page.getByTestId('map-toggle');
+    const map = page.getByTestId('filtered-map');
+    await expect(button).toBeEnabled();
+
+    for (const manualChoice of [false, true]) {
+      if (manualChoice) await button.click();
+      const expectedMap = manualChoice ? initialWidth === 767 : initialWidth === 768;
+      for (const width of [initialWidth, initialWidth === 767 ? 768 : 767, initialWidth]) {
+        await page.setViewportSize({ width, height: 900 });
+        await expect(
+          page.getByRole('radio', {
+            name: width <= 767 ? 'Дешевле' : 'Дешевле Шелково',
+            exact: true
+          })
+        ).toBeEnabled();
+        await expect(
+          page.getByRole('radio', {
+            name: width <= 767 ? 'Дороже' : 'Дороже Шелково',
+            exact: true
+          })
+        ).toBeEnabled();
+        await expect(button).toHaveAttribute('aria-expanded', String(expectedMap));
+        await expect(map).toHaveCount(expectedMap ? 1 : 0);
+      }
+    }
+    expect(hydrationMessages).toHaveLength(0);
+  });
+}
+
+test('releases and reconnects one explorer media subscription through Astro navigation', async ({
+  page
+}) => {
+  const hydrationMessages: string[] = [];
+  page.on('console', (message) => {
+    if (/hydration|mismatch/iu.test(message.text())) hydrationMessages.push(message.text());
+  });
+  await page.addInitScript(`
+    const matchMedia = window.matchMedia.bind(window);
+    const listeners = new Set();
+    Object.defineProperty(window, '__explorerMediaSubscriptions', { get: () => listeners.size });
+    window.matchMedia = (query) => {
+      const media = matchMedia(query);
+      if (query !== '(max-width: 767px)') return media;
+      const add = media.addEventListener.bind(media);
+      const remove = media.removeEventListener.bind(media);
+      media.addEventListener = (type, listener, options) => {
+        if (type === 'change') listeners.add(listener);
+        add(type, listener, options);
+      };
+      media.removeEventListener = (type, listener, options) => {
+        if (type === 'change') listeners.delete(listener);
+        remove(type, listener, options);
+      };
+      return media;
+    };
+  `);
+  const activeSubscriptions = (): Promise<number> =>
+    page.evaluate(() => Reflect.get(window, '__explorerMediaSubscriptions') as number);
+  await page.setViewportSize(mobileViewports[1]);
+  await page.goto('/815/compare/', { waitUntil: 'networkidle' });
+  await expect.poll(activeSubscriptions).toBe(1);
+  await page.evaluate(() => Reflect.set(window, '__explorerClientNavigation', true));
+
+  for (let visit = 0; visit < 2; visit += 1) {
+    await page.getByTestId('rating-help-link').click();
+    await expect(page).toHaveURL(/\/815\/compare\/rating\/$/u);
+    expect(await page.evaluate(() => Reflect.get(window, '__explorerClientNavigation'))).toBe(true);
+    await expect.poll(activeSubscriptions).toBe(0);
+    await page
+      .getByRole('navigation', { name: 'Хлебные крошки' })
+      .getByRole('link', { name: 'Сравнение тарифов' })
+      .click();
+    await expect(page).toHaveURL(/\/815\/compare\/$/u);
+    await expect(page.getByTestId('map-toggle')).toBeEnabled();
+    await expect.poll(activeSubscriptions).toBe(1);
+    await page.setViewportSize({ width: 768, height: 900 });
+    await expect(page.getByRole('radio', { name: /^Дешевле Шелково/ })).toBeEnabled();
+    await expect(page.getByTestId('filtered-map')).toHaveCount(0);
+    await page.setViewportSize(mobileViewports[1]);
+    await expect(page.getByRole('radio', { name: 'Дешевле', exact: true })).toBeEnabled();
+    await expect.poll(activeSubscriptions).toBe(1);
+  }
+  expect(hydrationMessages).toHaveLength(0);
 });
 
 test('keeps every tariff filter usable beside the map button on mobile', async ({ page }) => {
