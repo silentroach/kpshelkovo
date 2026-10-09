@@ -46,7 +46,7 @@ interface GroupedTimelineInput {
   readonly serviceLabel: string;
   readonly groupTitle: string;
   readonly start: string;
-  readonly end: string;
+  readonly end?: string;
   readonly items: readonly StatusTimelineTooltipItemDto[];
 }
 
@@ -176,7 +176,7 @@ const renderGroupedTimeline = ({
           data-status-kind="incident"
           data-status-service="${service}"
           data-start="${start}"
-          data-end="${end}"
+          ${end ? `data-end="${end}"` : ''}
           data-tooltip-service-label="${escapeAttribute(serviceLabel)}"
           data-tooltip-group-title="${escapeAttribute(groupTitle)}"
           data-tooltip-items="${escapeAttribute(JSON.stringify(items))}"
@@ -302,23 +302,130 @@ describe('hydrateStatusTimeline', () => {
     expect(readSegmentMetric(getGreenSegments()[0]!, '--segment-width')).toBeCloseTo(100);
   });
 
-  it('clips an active problem without end date to the client-side now', () => {
+  it.each(['incident', 'maintenance'] as const)(
+    'extends an open %s past its saved geometry end to the client-side now',
+    (kind) => {
+      const root = renderTimeline([
+        {
+          id: 'active',
+          kind,
+          start: '2026-05-08T00:00:00Z'
+        }
+      ]);
+      const node = getProblemNode('active');
+      node.dataset.geometryStart = '2026-05-08T00:00:00Z';
+      node.dataset.geometryEnd = '2026-05-10T00:00:00Z';
+
+      hydrateStatusTimeline(root, {
+        nowMs: Date.parse('2026-05-11T00:00:00Z')
+      });
+
+      expect({
+        hidden: node.hidden,
+        left: readSegmentMetric(node, '--segment-left'),
+        width: readSegmentMetric(node, '--segment-width'),
+        green: getGreenSegments().map((segment) => ({
+          left: readSegmentMetric(segment, '--segment-left'),
+          width: readSegmentMetric(segment, '--segment-width')
+        }))
+      }).toMatchInlineSnapshot(`
+      {
+        "green": [
+          {
+            "left": 0,
+            "width": 70,
+          },
+        ],
+        "hidden": false,
+        "left": 70,
+        "width": 30,
+      }
+    `);
+    }
+  );
+
+  it('keeps a group open when one of its records has no end', () => {
+    const root = renderGroupedTimeline({
+      id: 'open-group',
+      serviceLabel: 'Вода',
+      groupTitle: '2 события',
+      start: '2026-05-08T00:00:00Z',
+      items: [
+        {
+          kind: 'incident',
+          title: 'Ended',
+          phase: 'resolved',
+          startedIso: '2026-05-08T00:00:00Z',
+          endedIso: '2026-05-08T01:00:00Z',
+          periodLabel: '8 мая'
+        },
+        {
+          kind: 'incident',
+          title: 'Open',
+          phase: 'active',
+          startedIso: '2026-05-08T02:00:00Z',
+          periodLabel: 'Начиная с 8 мая'
+        }
+      ]
+    });
+    const node = getProblemNode('open-group');
+    node.dataset.geometryStart = '2026-05-08T00:00:00Z';
+    node.dataset.geometryEnd = '2026-05-10T00:00:00Z';
+
+    hydrateStatusTimeline(root, { nowMs: Date.parse('2026-05-11T00:00:00Z') });
+
+    expect({
+      left: readSegmentMetric(node, '--segment-left'),
+      width: readSegmentMetric(node, '--segment-width'),
+      greenCount: getGreenSegments().length,
+      phase: node.dataset.tooltipPhaseLabel
+    }).toMatchInlineSnapshot(`
+      {
+        "greenCount": 1,
+        "left": 70,
+        "phase": "идет",
+        "width": 30,
+      }
+    `);
+  });
+
+  it('preserves the daily geometry of a completed problem', () => {
     const root = renderTimeline([
       {
-        id: 'active',
-        start: '2026-05-08T00:00:00Z'
+        id: 'completed',
+        start: '2026-05-08T03:00:00Z',
+        end: '2026-05-08T04:00:00Z'
       }
     ]);
+    const node = getProblemNode('completed');
+    node.dataset.geometryStart = '2026-05-07T21:00:00Z';
+    node.dataset.geometryEnd = '2026-05-08T21:00:00Z';
 
-    hydrateStatusTimeline(root, {
-      nowMs: Date.parse('2026-05-10T00:00:00Z')
-    });
+    hydrateStatusTimeline(root, { nowMs: Date.parse('2026-05-11T00:00:00Z') });
 
-    const node = getProblemNode('active');
-
-    expect(node.hidden).toBe(false);
-    expect(readSegmentMetric(node, '--segment-left')).toBeCloseTo(80);
-    expect(readSegmentMetric(node, '--segment-width')).toBeCloseTo(20);
+    expect({
+      left: readSegmentMetric(node, '--segment-left'),
+      width: readSegmentMetric(node, '--segment-width'),
+      green: getGreenSegments().map((segment) => ({
+        left: readSegmentMetric(segment, '--segment-left'),
+        width: readSegmentMetric(segment, '--segment-width')
+      }))
+    }).toMatchInlineSnapshot(`
+      {
+        "green": [
+          {
+            "left": 0,
+            "width": 68.75,
+          },
+          {
+            "left": 78.75,
+            "width": 21.25,
+          },
+        ],
+        "left": 68.75,
+        "width": 10,
+      }
+    `);
   });
 
   it('shows a hidden future problem node once it enters the client-side window', () => {
