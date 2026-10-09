@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация — в [proposal](/openspec/changes/omit-unavailable-html-alternate/proposal.md). `/meetings/` явно настроен как Markdown-only negotiated вход: при подходящем Accept он передаёт `$md` в общий `@markdown`, иначе возвращает 404. `@markdown` безусловно добавляет HTML alternate. Отдельные встречи имеют обе опубликованные версии.
+Мотивация — в [proposal](/openspec/changes/archive/2026-10-09-omit-unavailable-html-alternate/proposal.md). `/meetings/` явно настроен как Markdown-only negotiated вход: при подходящем Accept он передаёт `$md` в общий `@markdown`, иначе возвращает 404. `@markdown` безусловно добавляет HTML alternate. Отдельные встречи имеют обе опубликованные версии.
 
 Действующий контракт — [public-markdown-delivery](/openspec/specs/public-markdown-delivery/spec.md). Ручная конфигурация доставки и границы реестра следуют [ADR-011](/docs/decisions/011-public-surface-registry.md); Markdown-first архив — [ADR-014](/docs/decisions/014-meetings-transcript-first-archive.md). HTML-хаб не нужен для этой правки.
 

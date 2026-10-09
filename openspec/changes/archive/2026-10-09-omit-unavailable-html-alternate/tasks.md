@@ -12,7 +12,7 @@
 
 ## 3. Production-приёмка после человеческого merge/deploy
 
-- [ ] 3.1 Проверить production GET/HEAD Markdown-only negotiated входа, прямого Markdown и существующей HTML/Markdown-пары; подтвердить корректность alternate/MIME/прочих предусмотренных заголовков, записать время и SHA deploy. Не отмечать выполненным по локальному результату.
+- [x] 3.1 Проверить production GET/HEAD Markdown-only negotiated входа, прямого Markdown и существующей HTML/Markdown-пары; подтвердить корректность alternate/MIME/прочих предусмотренных заголовков, записать время и SHA deploy. Не отмечать выполненным по локальному результату.
 
 ## Workflow follow-up
 
