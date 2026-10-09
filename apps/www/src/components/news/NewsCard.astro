@@ -1,4 +1,5 @@
 ---
+import { formatTextHtml } from '@shelkovo/typography';
 import { StarIcon } from '@shelkovo/ui/icons';
 import type { NewsListArticle } from '../../lib/news/types';
 import NewsMeta from './NewsMeta.astro';
@@ -27,9 +28,11 @@ const { article, featured = false } = Astro.props;
   <div class="news-card__content">
     <div class="news-card__header">
       <h3 class="ui-entry-title news-card__title">
-        <a href={article.url} class="ui-link">
-          {article.title}
-        </a>
+        <a
+          href={article.url}
+          class="ui-link"
+          set:html={formatTextHtml(article.title)}
+        />
         {article.pinned && (
           <>
             <span
@@ -52,7 +55,10 @@ const { article, featured = false } = Astro.props;
       />
     </div>
 
-    <p class="ui-copy news-card__summary">{article.summary}</p>
+    <p
+      class="ui-copy news-card__summary"
+      set:html={formatTextHtml(article.summary)}
+    />
 
     <NewsTagList items={article.tags} compact />
   </div>

@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация — в [proposal](/openspec/changes/format-news-card-typography/proposal.md). Главная уже использует `formatTextHtml` для обоих полей. `NewsCard` используется через `NewsList` в ленте, месячном архиве и подборках по тегу; исходные строки сохраняет loader.
+Мотивация — в [proposal](/openspec/changes/archive/2026-10-09-format-news-card-typography/proposal.md). Главная уже использует `formatTextHtml` для обоих полей. `NewsCard` используется через `NewsList` в ленте, месячном архиве и подборках по тегу; исходные строки сохраняет loader.
 
 ## Goals / Non-Goals
 
