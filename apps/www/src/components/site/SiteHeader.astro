@@ -263,7 +263,8 @@ const statusWindows = getHomeStatusWindows(status.incidents, buildNow);
     backdrop-filter: saturate(165%) blur(16px);
   }
 
-  .site-header-menu[data-site-header-menu-hydrated] .site-header-mobile-panel {
+  /* Keep hydration from fading an initially visible closed panel out. */
+  .site-header-menu .site-header-mobile-panel {
     visibility: hidden;
     pointer-events: none;
     opacity: 0;
@@ -274,8 +275,7 @@ const statusWindows = getHomeStatusWindows(status.incidents, buildNow);
       visibility 0s var(--site-menu-duration);
   }
 
-  .site-header-menu[data-site-header-menu-hydrated][open]
-    .site-header-mobile-panel {
+  .site-header-menu[open] .site-header-mobile-panel {
     visibility: visible;
     pointer-events: auto;
     opacity: 1;
@@ -288,9 +288,8 @@ const statusWindows = getHomeStatusWindows(status.incidents, buildNow);
       transition: none;
     }
 
-    .site-header-menu[data-site-header-menu-hydrated] .site-header-mobile-panel,
-    .site-header-menu[data-site-header-menu-hydrated][open]
-      .site-header-mobile-panel {
+    .site-header-menu .site-header-mobile-panel,
+    .site-header-menu[open] .site-header-mobile-panel {
       transform: none;
     }
   }
