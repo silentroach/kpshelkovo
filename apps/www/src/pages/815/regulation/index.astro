@@ -392,9 +392,10 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
               <p>
                 Смета разложена на разделы и строки. Меняйте объемы,
                 периодичность и цены: калькулятор сразу пересчитает тариф в{' '}
-                <span class="reglament-emphasis" data-pagefind-weight="5"
-                  >₽/сотка за месяц</span
-                > и покажет, как изменилась итоговая сумма.
+                <span class="reglament-emphasis" data-pagefind-weight="5">
+                  ₽/сотка за месяц
+                </span>{' '}
+                и покажет, как изменилась итоговая сумма.
               </p>
               <p>
                 Для проверки по полному регламенту рядом есть справочники:{' '}
@@ -404,7 +405,8 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                 и{' '}
                 <a class="ui-link reglament-link" href={reglamentServicesUrl()}>
                   какие услуги указаны в регламенте
-                </a>.
+                </a>
+                .
               </p>
             </div>
           </div>
@@ -432,11 +434,9 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
           <div class="reglament-total">
             <p class="reglament-total__label">Разница</p>
             <p class="reglament-total__value" data-reglament-current-delta>
-              {
-                formatReglamentMoneyDelta(
-                  payload.computed.delta_tariff_per_sotka_month,
-                )
-              }
+              {formatReglamentMoneyDelta(
+                payload.computed.delta_tariff_per_sotka_month,
+              )}
             </p>
             <p class="reglament-total__note">к официальному тарифу</p>
           </div>
@@ -452,9 +452,8 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
           data-reglament-reset
           hidden
         >
-          <span class="reglament-reset__long">Сбросить</span><span
-            class="reglament-reset__short">Сброс</span
-          >
+          <span class="reglament-reset__long">Сбросить</span>
+          <span class="reglament-reset__short">Сброс</span>
         </button>
         <span class="ui-visually-hidden">Текущий тариф</span>
         <span class="reglament-sticky-total__values">
@@ -499,476 +498,463 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
           </p>
         </div>
 
-        {
-          viewSections.map((section) => (
-            <section aria-labelledby={section.id}>
-              <div class="reglament-section-header">
-                <div class="reglament-section-heading" data-pagefind-body>
-                  <h3
-                    id={section.id}
-                    class="ui-prose-title"
-                    data-pagefind-weight="1.5"
-                  >
-                    {section.title}
-                  </h3>
-                  <p
-                    class="reglament-section-sources"
-                    data-pagefind-weight="0.3"
-                  >
-                    Источники раздела:{' '}
-                    {section.source_refs.map((ref, index) => (
-                      <>
-                        {index > 0 && '; '}
-                        <ResourceLink
-                          class="ui-link reglament-source-link"
-                          href={ref.pdf_url}
-                          type="application/pdf"
-                          reload
-                        >
-                          {formatEstimateSourceRefLabel(ref)}
-                        </ResourceLink>
-                      </>
-                    ))}
-                  </p>
-                </div>
-                <div class="reglament-section-total">
-                  <p
-                    class="reglament-section-total__tariff"
-                    data-reglament-section-tariff={section.id}
-                  >
-                    {formatReglamentTariff(
-                      section.official.tariff_per_sotka_month,
-                    )}
-                  </p>
-                  <p
-                    class="reglament-section-total__annual"
-                    data-reglament-section-annual={section.id}
-                  >
-                    {formatReglamentAnnualMoney(section.official.annual_gross)}
-                  </p>
-                  <p
-                    class="reglament-section-total__delta"
-                    data-reglament-section-delta={section.id}
-                  >
-                    {formatReglamentMoneyDelta(
-                      section.computed.delta_tariff_per_sotka_month,
-                    )}
-                  </p>
-                </div>
+        {viewSections.map((section) => (
+          <section aria-labelledby={section.id}>
+            <div class="reglament-section-header">
+              <div class="reglament-section-heading" data-pagefind-body>
+                <h3
+                  id={section.id}
+                  class="ui-prose-title"
+                  data-pagefind-weight="1.5"
+                >
+                  {section.title}
+                </h3>
+                <p class="reglament-section-sources" data-pagefind-weight="0.3">
+                  Источники раздела:{' '}
+                  {section.source_refs.map((ref, index) => (
+                    <>
+                      {index > 0 && '; '}
+                      <ResourceLink
+                        class="ui-link reglament-source-link"
+                        href={ref.pdf_url}
+                        type="application/pdf"
+                        reload
+                      >
+                        {formatEstimateSourceRefLabel(ref)}
+                      </ResourceLink>
+                    </>
+                  ))}
+                </p>
               </div>
+              <div class="reglament-section-total">
+                <p
+                  class="reglament-section-total__tariff"
+                  data-reglament-section-tariff={section.id}
+                >
+                  {formatReglamentTariff(
+                    section.official.tariff_per_sotka_month,
+                  )}
+                </p>
+                <p
+                  class="reglament-section-total__annual"
+                  data-reglament-section-annual={section.id}
+                >
+                  {formatReglamentAnnualMoney(section.official.annual_gross)}
+                </p>
+                <p
+                  class="reglament-section-total__delta"
+                  data-reglament-section-delta={section.id}
+                >
+                  {formatReglamentMoneyDelta(
+                    section.computed.delta_tariff_per_sotka_month,
+                  )}
+                </p>
+              </div>
+            </div>
 
-              <div
-                class="reglament-table-shell ui-sticky-table-shell"
-                data-ui-sticky-table-shell
-              >
-                <table class="reglament-table">
-                  <caption class="ui-visually-hidden">{section.title}</caption>
-                  <thead class="reglament-table__head">
-                    <tr>
-                      <th class="reglament-table__header reglament-table__header--work">
-                        Работа
-                      </th>
-                      <th class="reglament-table__header reglament-table__header--base">
-                        База
-                      </th>
-                      <th class="reglament-table__header reglament-table__header--frequency">
-                        Периодичность
-                      </th>
-                      <th class="reglament-table__header reglament-table__header--rate">
-                        Цена/ставка
-                      </th>
-                      <th class="reglament-table__header reglament-table__header--contribution">
-                        Вклад в тариф
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {section.rows.map((row) => (
-                      <>
-                        <tr>
-                          <td class="reglament-table__cell">
-                            <div class="reglament-row-copy" data-pagefind-body>
-                              <div class="reglament-row-heading">
-                                {row.controls.enabled && (
-                                  <input
-                                    class="reglament-checkbox"
-                                    type="checkbox"
-                                    checked={row.baseline.is_enabled}
-                                    aria-label="Включить позицию"
-                                    aria-describedby={row.titleId}
-                                    data-pagefind-ignore="all"
-                                    data-reglament-field="enabled"
-                                    data-reglament-row-id={row.id}
-                                    data-reglament-baseline={String(
-                                      row.baseline.is_enabled,
-                                    )}
-                                  />
-                                )}
-                                <h4
-                                  id={row.titleId}
-                                  class="reglament-table-text reglament-row-title"
-                                  data-pagefind-weight="2"
-                                >
-                                  {row.title}
-                                </h4>
-                              </div>
-                              <p class="ui-visually-hidden" aria-hidden="true">
-                                {row.searchText}
-                              </p>
-                              <p
-                                class="ui-visually-hidden"
-                                aria-hidden="true"
-                                data-pagefind-weight="0.3"
-                              >
-                                {row.searchSources}
-                              </p>
-                            </div>
-                          </td>
-                          <td class="reglament-table__cell reglament-table__cell--muted">
-                            {row.controls.base ? (
-                              <label
-                                class="reglament-control"
-                                data-pagefind-ignore="all"
-                              >
-                                <span class="reglament-input-shell">
-                                  <input
-                                    class="reglament-input"
-                                    type="text"
-                                    inputmode="decimal"
-                                    value={formatReglamentInputNumber(
-                                      row.controls.base.value,
-                                    )}
-                                    aria-label={`${row.title}: ${row.controls.base.label}`}
-                                    aria-describedby={inputErrorId(
-                                      row.id,
-                                      row.controls.base.key,
-                                    )}
-                                    data-reglament-field={row.controls.base.key}
-                                    data-reglament-row-id={row.id}
-                                    data-reglament-baseline={String(
-                                      row.controls.base.value,
-                                    )}
-                                  />
-                                  {row.controls.base.unit && (
-                                    <span class="reglament-input-unit">
-                                      {row.controls.base.unit}
-                                    </span>
+            <div
+              class="reglament-table-shell ui-sticky-table-shell"
+              data-ui-sticky-table-shell
+            >
+              <table class="reglament-table">
+                <caption class="ui-visually-hidden">{section.title}</caption>
+                <thead class="reglament-table__head">
+                  <tr>
+                    <th class="reglament-table__header reglament-table__header--work">
+                      Работа
+                    </th>
+                    <th class="reglament-table__header reglament-table__header--base">
+                      База
+                    </th>
+                    <th class="reglament-table__header reglament-table__header--frequency">
+                      Периодичность
+                    </th>
+                    <th class="reglament-table__header reglament-table__header--rate">
+                      Цена/ставка
+                    </th>
+                    <th class="reglament-table__header reglament-table__header--contribution">
+                      Вклад в тариф
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {section.rows.map((row) => (
+                    <>
+                      <tr>
+                        <td class="reglament-table__cell">
+                          <div class="reglament-row-copy" data-pagefind-body>
+                            <div class="reglament-row-heading">
+                              {row.controls.enabled && (
+                                <input
+                                  class="reglament-checkbox"
+                                  type="checkbox"
+                                  checked={row.baseline.is_enabled}
+                                  aria-label="Включить позицию"
+                                  aria-describedby={row.titleId}
+                                  data-pagefind-ignore="all"
+                                  data-reglament-field="enabled"
+                                  data-reglament-row-id={row.id}
+                                  data-reglament-baseline={String(
+                                    row.baseline.is_enabled,
                                   )}
-                                </span>
-                                <span
-                                  id={inputErrorId(
+                                />
+                              )}
+                              <h4
+                                id={row.titleId}
+                                class="reglament-table-text reglament-row-title"
+                                data-pagefind-weight="2"
+                              >
+                                {row.title}
+                              </h4>
+                            </div>
+                            <p class="ui-visually-hidden" aria-hidden="true">
+                              {row.searchText}
+                            </p>
+                            <p
+                              class="ui-visually-hidden"
+                              aria-hidden="true"
+                              data-pagefind-weight="0.3"
+                            >
+                              {row.searchSources}
+                            </p>
+                          </div>
+                        </td>
+                        <td class="reglament-table__cell reglament-table__cell--muted">
+                          {row.controls.base ? (
+                            <label
+                              class="reglament-control"
+                              data-pagefind-ignore="all"
+                            >
+                              <span class="reglament-input-shell">
+                                <input
+                                  class="reglament-input"
+                                  type="text"
+                                  inputmode="decimal"
+                                  value={formatReglamentInputNumber(
+                                    row.controls.base.value,
+                                  )}
+                                  aria-label={`${row.title}: ${row.controls.base.label}`}
+                                  aria-describedby={inputErrorId(
                                     row.id,
                                     row.controls.base.key,
                                   )}
-                                  class="reglament-input-error"
-                                  aria-live="polite"
-                                  aria-atomic="true"
-                                  hidden
-                                />
-                              </label>
-                            ) : row.baseline.base ? (
-                              <span class="reglament-table-text">
-                                {formatDisplayValue(row.baseline.base)}
-                              </span>
-                            ) : (
-                              <span
-                                class="reglament-table-text reglament-missing"
-                                data-pagefind-ignore="all"
-                              >
-                                <span class="reglament-missing__label">
-                                  <span class="reglament-semibold">
-                                    {row.missing.base.label}
-                                  </span>
-                                  <span class="reglament-missing-help">
-                                    <button
-                                      class="reglament-missing-help-button"
-                                      type="button"
-                                      aria-label="Почему здесь нет поля ввода"
-                                      aria-describedby={
-                                        row.missing.base.tooltipId
-                                      }
-                                    >
-                                      ?
-                                    </button>
-                                    <span
-                                      id={row.missing.base.tooltipId}
-                                      class="reglament-missing-tooltip"
-                                      role="tooltip"
-                                    >
-                                      {row.missing.base.reason}
-                                    </span>
-                                  </span>
-                                </span>
-                              </span>
-                            )}
-                          </td>
-                          <td class="reglament-table__cell reglament-table__cell--muted">
-                            {row.controls.frequency ? (
-                              <label
-                                class="reglament-control"
-                                data-pagefind-ignore="all"
-                              >
-                                <span class="reglament-input-shell">
-                                  <input
-                                    class="reglament-input"
-                                    type="text"
-                                    inputmode="decimal"
-                                    value={formatReglamentInputNumber(
-                                      row.controls.frequency.value,
-                                    )}
-                                    aria-label={`${row.title}: ${row.controls.frequency.label}`}
-                                    aria-describedby={inputErrorId(
-                                      row.id,
-                                      row.controls.frequency.key,
-                                    )}
-                                    data-reglament-field={
-                                      row.controls.frequency.key
-                                    }
-                                    data-reglament-row-id={row.id}
-                                    data-reglament-baseline={String(
-                                      row.controls.frequency.value,
-                                    )}
-                                  />
-                                  {row.controls.frequency.unit && (
-                                    <span class="reglament-input-unit">
-                                      {row.controls.frequency.unit}
-                                    </span>
+                                  data-reglament-field={row.controls.base.key}
+                                  data-reglament-row-id={row.id}
+                                  data-reglament-baseline={String(
+                                    row.controls.base.value,
                                   )}
+                                />
+                                {row.controls.base.unit && (
+                                  <span class="reglament-input-unit">
+                                    {row.controls.base.unit}
+                                  </span>
+                                )}
+                              </span>
+                              <span
+                                id={inputErrorId(row.id, row.controls.base.key)}
+                                class="reglament-input-error"
+                                aria-live="polite"
+                                aria-atomic="true"
+                                hidden
+                              />
+                            </label>
+                          ) : row.baseline.base ? (
+                            <span class="reglament-table-text">
+                              {formatDisplayValue(row.baseline.base)}
+                            </span>
+                          ) : (
+                            <span
+                              class="reglament-table-text reglament-missing"
+                              data-pagefind-ignore="all"
+                            >
+                              <span class="reglament-missing__label">
+                                <span class="reglament-semibold">
+                                  {row.missing.base.label}
                                 </span>
-                                <span
-                                  id={inputErrorId(
+                                <span class="reglament-missing-help">
+                                  <button
+                                    class="reglament-missing-help-button"
+                                    type="button"
+                                    aria-label="Почему здесь нет поля ввода"
+                                    aria-describedby={
+                                      row.missing.base.tooltipId
+                                    }
+                                  >
+                                    ?
+                                  </button>
+                                  <span
+                                    id={row.missing.base.tooltipId}
+                                    class="reglament-missing-tooltip"
+                                    role="tooltip"
+                                  >
+                                    {row.missing.base.reason}
+                                  </span>
+                                </span>
+                              </span>
+                            </span>
+                          )}
+                        </td>
+                        <td class="reglament-table__cell reglament-table__cell--muted">
+                          {row.controls.frequency ? (
+                            <label
+                              class="reglament-control"
+                              data-pagefind-ignore="all"
+                            >
+                              <span class="reglament-input-shell">
+                                <input
+                                  class="reglament-input"
+                                  type="text"
+                                  inputmode="decimal"
+                                  value={formatReglamentInputNumber(
+                                    row.controls.frequency.value,
+                                  )}
+                                  aria-label={`${row.title}: ${row.controls.frequency.label}`}
+                                  aria-describedby={inputErrorId(
                                     row.id,
                                     row.controls.frequency.key,
                                   )}
-                                  class="reglament-input-error"
-                                  aria-live="polite"
-                                  aria-atomic="true"
-                                  hidden
-                                />
-                              </label>
-                            ) : row.baseline.frequency ? (
-                              <span class="reglament-table-text">
-                                {formatDisplayValue(row.baseline.frequency)}
-                              </span>
-                            ) : (
-                              <span
-                                class="reglament-table-text reglament-missing"
-                                data-pagefind-ignore="all"
-                              >
-                                <span class="reglament-missing__label">
-                                  <span class="reglament-semibold">
-                                    {row.missing.frequency.label}
-                                  </span>
-                                  <span class="reglament-missing-help">
-                                    <button
-                                      class="reglament-missing-help-button"
-                                      type="button"
-                                      aria-label="Почему здесь нет поля ввода"
-                                      aria-describedby={
-                                        row.missing.frequency.tooltipId
-                                      }
-                                    >
-                                      ?
-                                    </button>
-                                    <span
-                                      id={row.missing.frequency.tooltipId}
-                                      class="reglament-missing-tooltip"
-                                      role="tooltip"
-                                    >
-                                      {row.missing.frequency.reason}
-                                    </span>
-                                  </span>
-                                </span>
-                              </span>
-                            )}
-                          </td>
-                          <td class="reglament-table__cell reglament-table__cell--muted">
-                            {row.controls.rate ? (
-                              <label
-                                class="reglament-control"
-                                data-pagefind-ignore="all"
-                              >
-                                <span class="reglament-input-shell">
-                                  <input
-                                    class="reglament-input"
-                                    type="text"
-                                    inputmode="decimal"
-                                    value={formatReglamentInputNumber(
-                                      row.controls.rate.value,
-                                    )}
-                                    aria-label={`${row.title}: ${row.controls.rate.label}`}
-                                    aria-describedby={inputErrorId(
-                                      row.id,
-                                      row.controls.rate.key,
-                                    )}
-                                    data-reglament-field={row.controls.rate.key}
-                                    data-reglament-row-id={row.id}
-                                    data-reglament-baseline={String(
-                                      row.controls.rate.value,
-                                    )}
-                                  />
-                                  {row.controls.rate.unit && (
-                                    <span class="reglament-input-unit">
-                                      {row.controls.rate.unit}
-                                    </span>
+                                  data-reglament-field={
+                                    row.controls.frequency.key
+                                  }
+                                  data-reglament-row-id={row.id}
+                                  data-reglament-baseline={String(
+                                    row.controls.frequency.value,
                                   )}
+                                />
+                                {row.controls.frequency.unit && (
+                                  <span class="reglament-input-unit">
+                                    {row.controls.frequency.unit}
+                                  </span>
+                                )}
+                              </span>
+                              <span
+                                id={inputErrorId(
+                                  row.id,
+                                  row.controls.frequency.key,
+                                )}
+                                class="reglament-input-error"
+                                aria-live="polite"
+                                aria-atomic="true"
+                                hidden
+                              />
+                            </label>
+                          ) : row.baseline.frequency ? (
+                            <span class="reglament-table-text">
+                              {formatDisplayValue(row.baseline.frequency)}
+                            </span>
+                          ) : (
+                            <span
+                              class="reglament-table-text reglament-missing"
+                              data-pagefind-ignore="all"
+                            >
+                              <span class="reglament-missing__label">
+                                <span class="reglament-semibold">
+                                  {row.missing.frequency.label}
                                 </span>
-                                <span
-                                  id={inputErrorId(
+                                <span class="reglament-missing-help">
+                                  <button
+                                    class="reglament-missing-help-button"
+                                    type="button"
+                                    aria-label="Почему здесь нет поля ввода"
+                                    aria-describedby={
+                                      row.missing.frequency.tooltipId
+                                    }
+                                  >
+                                    ?
+                                  </button>
+                                  <span
+                                    id={row.missing.frequency.tooltipId}
+                                    class="reglament-missing-tooltip"
+                                    role="tooltip"
+                                  >
+                                    {row.missing.frequency.reason}
+                                  </span>
+                                </span>
+                              </span>
+                            </span>
+                          )}
+                        </td>
+                        <td class="reglament-table__cell reglament-table__cell--muted">
+                          {row.controls.rate ? (
+                            <label
+                              class="reglament-control"
+                              data-pagefind-ignore="all"
+                            >
+                              <span class="reglament-input-shell">
+                                <input
+                                  class="reglament-input"
+                                  type="text"
+                                  inputmode="decimal"
+                                  value={formatReglamentInputNumber(
+                                    row.controls.rate.value,
+                                  )}
+                                  aria-label={`${row.title}: ${row.controls.rate.label}`}
+                                  aria-describedby={inputErrorId(
                                     row.id,
                                     row.controls.rate.key,
                                   )}
-                                  class="reglament-input-error"
-                                  aria-live="polite"
-                                  aria-atomic="true"
-                                  hidden
+                                  data-reglament-field={row.controls.rate.key}
+                                  data-reglament-row-id={row.id}
+                                  data-reglament-baseline={String(
+                                    row.controls.rate.value,
+                                  )}
                                 />
-                              </label>
-                            ) : row.baseline.price ? (
-                              <span class="reglament-table-text">
-                                {formatDisplayValue(row.baseline.price)}
-                              </span>
-                            ) : (
-                              <span
-                                class="reglament-table-text reglament-missing"
-                                data-pagefind-ignore="all"
-                              >
-                                <span class="reglament-missing__label">
-                                  <span class="reglament-semibold">
-                                    {row.missing.rate.label}
+                                {row.controls.rate.unit && (
+                                  <span class="reglament-input-unit">
+                                    {row.controls.rate.unit}
                                   </span>
-                                  <span class="reglament-missing-help">
-                                    <button
-                                      class="reglament-missing-help-button"
-                                      type="button"
-                                      aria-label="Почему здесь нет поля ввода"
-                                      aria-describedby={
-                                        row.missing.rate.tooltipId
-                                      }
-                                    >
-                                      ?
-                                    </button>
-                                    <span
-                                      id={row.missing.rate.tooltipId}
-                                      class="reglament-missing-tooltip"
-                                      role="tooltip"
-                                    >
-                                      {row.missing.rate.reason}
-                                    </span>
+                                )}
+                              </span>
+                              <span
+                                id={inputErrorId(row.id, row.controls.rate.key)}
+                                class="reglament-input-error"
+                                aria-live="polite"
+                                aria-atomic="true"
+                                hidden
+                              />
+                            </label>
+                          ) : row.baseline.price ? (
+                            <span class="reglament-table-text">
+                              {formatDisplayValue(row.baseline.price)}
+                            </span>
+                          ) : (
+                            <span
+                              class="reglament-table-text reglament-missing"
+                              data-pagefind-ignore="all"
+                            >
+                              <span class="reglament-missing__label">
+                                <span class="reglament-semibold">
+                                  {row.missing.rate.label}
+                                </span>
+                                <span class="reglament-missing-help">
+                                  <button
+                                    class="reglament-missing-help-button"
+                                    type="button"
+                                    aria-label="Почему здесь нет поля ввода"
+                                    aria-describedby={
+                                      row.missing.rate.tooltipId
+                                    }
+                                  >
+                                    ?
+                                  </button>
+                                  <span
+                                    id={row.missing.rate.tooltipId}
+                                    class="reglament-missing-tooltip"
+                                    role="tooltip"
+                                  >
+                                    {row.missing.rate.reason}
                                   </span>
                                 </span>
-                                {row.missing.rate.detail && (
-                                  <span class="reglament-missing__detail">
-                                    {row.missing.rate.detail}
-                                  </span>
-                                )}
                               </span>
-                            )}
-                          </td>
-                          <td
-                            class="reglament-table__cell reglament-table__cell--contribution"
-                            data-pagefind-ignore="all"
-                          >
-                            <span
-                              class="reglament-table-text"
-                              data-reglament-row-tariff={row.id}
-                            >
-                              {formatReglamentTariffValue(
-                                row.computed.tariff_per_sotka_month,
+                              {row.missing.rate.detail && (
+                                <span class="reglament-missing__detail">
+                                  {row.missing.rate.detail}
+                                </span>
                               )}
                             </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td class="reglament-details-cell" colspan="5">
-                            <details
-                              class="reglament-details"
-                              data-reglament-editor-row={row.id}
-                              data-reglament-editor-title-id={row.titleId}
-                            >
-                              <summary class="reglament-details-summary">
-                                <svg
-                                  class="reglament-details-icon"
-                                  viewBox="0 0 12 12"
-                                  aria-hidden="true"
-                                >
-                                  <path
-                                    d="M4.5 2.5 8 6l-3.5 3.5"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.8"
-                                  />
-                                </svg>
-                                <span>Детали расчета и источники</span>
-                              </summary>
-                              <div class="reglament-details__content">
-                                {row.description && (
-                                  <p class="reglament-muted">
-                                    {row.description}
-                                  </p>
-                                )}
-
-                                <div class="reglament-details__summary">
-                                  <div class="reglament-details__group">
-                                    <p class="reglament-details__label">
-                                      Источники
-                                    </p>
-                                    <ul class="reglament-details__list">
-                                      {row.source_refs.map((ref) => (
-                                        <li>
-                                          <ResourceLink
-                                            class="ui-link reglament-source-link"
-                                            href={ref.pdf_url}
-                                            type="application/pdf"
-                                            reload
-                                          >
-                                            {formatEstimateSourceRefLabel(ref)}
-                                          </ResourceLink>
-                                          {ref.note && (
-                                            <span class="reglament-source-note">
-                                              {ref.note}
-                                            </span>
-                                          )}
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                  <div
-                                    class="reglament-details__group"
-                                    data-pagefind-ignore="all"
-                                  >
-                                    <p class="reglament-details__label">
-                                      Сумма за год
-                                    </p>
-                                    <p
-                                      class="reglament-details__annual"
-                                      data-reglament-row-annual={row.id}
-                                    >
-                                      {formatReglamentAnnualMoney(
-                                        row.computed.annual_gross,
-                                      )}
-                                    </p>
-                                  </div>
-                                </div>
-
-                                <div
-                                  data-reglament-editor-host={row.id}
-                                  data-pagefind-ignore="all"
+                          )}
+                        </td>
+                        <td
+                          class="reglament-table__cell reglament-table__cell--contribution"
+                          data-pagefind-ignore="all"
+                        >
+                          <span
+                            class="reglament-table-text"
+                            data-reglament-row-tariff={row.id}
+                          >
+                            {formatReglamentTariffValue(
+                              row.computed.tariff_per_sotka_month,
+                            )}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="reglament-details-cell" colspan="5">
+                          <details
+                            class="reglament-details"
+                            data-reglament-editor-row={row.id}
+                            data-reglament-editor-title-id={row.titleId}
+                          >
+                            <summary class="reglament-details-summary">
+                              <svg
+                                class="reglament-details-icon"
+                                viewBox="0 0 12 12"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  d="M4.5 2.5 8 6l-3.5 3.5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
                                 />
+                              </svg>
+                              <span>Детали расчета и источники</span>
+                            </summary>
+                            <div class="reglament-details__content">
+                              {row.description && (
+                                <p class="reglament-muted">{row.description}</p>
+                              )}
+
+                              <div class="reglament-details__summary">
+                                <div class="reglament-details__group">
+                                  <p class="reglament-details__label">
+                                    Источники
+                                  </p>
+                                  <ul class="reglament-details__list">
+                                    {row.source_refs.map((ref) => (
+                                      <li>
+                                        <ResourceLink
+                                          class="ui-link reglament-source-link"
+                                          href={ref.pdf_url}
+                                          type="application/pdf"
+                                          reload
+                                        >
+                                          {formatEstimateSourceRefLabel(ref)}
+                                        </ResourceLink>
+                                        {ref.note && (
+                                          <span class="reglament-source-note">
+                                            {ref.note}
+                                          </span>
+                                        )}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                                <div
+                                  class="reglament-details__group"
+                                  data-pagefind-ignore="all"
+                                >
+                                  <p class="reglament-details__label">
+                                    Сумма за год
+                                  </p>
+                                  <p
+                                    class="reglament-details__annual"
+                                    data-reglament-row-annual={row.id}
+                                  >
+                                    {formatReglamentAnnualMoney(
+                                      row.computed.annual_gross,
+                                    )}
+                                  </p>
+                                </div>
                               </div>
-                            </details>
-                          </td>
-                        </tr>
-                      </>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          ))
-        }
+
+                              <div
+                                data-reglament-editor-host={row.id}
+                                data-pagefind-ignore="all"
+                              />
+                            </div>
+                          </details>
+                        </td>
+                      </tr>
+                    </>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ))}
       </div>
     </section>
 
@@ -977,36 +963,32 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       data-reglament-editor-config
       set:html={editorConfigJson}
     />
-
     <template data-reglament-editor-template data-pagefind-ignore="all">
       <div class="reglament-editor" data-reglament-editor>
         <div class="reglament-editor__section">
           <p class="reglament-editor__label">Состав расчета</p>
           <dl class="reglament-breakdown">
-            {
-              breakdownFields.map((field) => (
-                <div
-                  class="reglament-breakdown__row"
-                  data-reglament-breakdown-row={field.key}
-                >
-                  <dt class="reglament-breakdown__term">{field.label}</dt>
-                  <dd
-                    class="reglament-breakdown__value"
-                    data-reglament-breakdown-value
-                  />
-                </div>
-              ))
-            }
+            {breakdownFields.map((field) => (
+              <div
+                class="reglament-breakdown__row"
+                data-reglament-breakdown-row={field.key}
+              >
+                <dt class="reglament-breakdown__term">{field.label}</dt>
+                <dd
+                  class="reglament-breakdown__value"
+                  data-reglament-breakdown-value
+                />
+              </div>
+            ))}
           </dl>
         </div>
 
         <fieldset class="reglament-expert-fields" data-reglament-expert-fields>
-          <legend class="reglament-editor__label"> Дополнительные поля </legend>
+          <legend class="reglament-editor__label">Дополнительные поля</legend>
           <div
             class="reglament-expert-fields__list"
             data-reglament-expert-fields-list
-          >
-          </div>
+          ></div>
         </fieldset>
       </div>
     </template>
@@ -1027,7 +1009,8 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
           aria-live="polite"
           aria-atomic="true"
           data-reglament-control-error
-          hidden></span>
+          hidden
+        ></span>
       </label>
     </template>
 
@@ -1035,7 +1018,8 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       <label class="reglament-control reglament-control--expert">
         <span
           class="reglament-control__label"
-          data-reglament-control-visible-label></span>
+          data-reglament-control-visible-label
+        ></span>
         <span class="reglament-input-shell">
           <input class="reglament-input" type="text" inputmode="decimal" />
           <span class="reglament-input-unit" data-reglament-control-unit></span>
@@ -1045,7 +1029,8 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
           aria-live="polite"
           aria-atomic="true"
           data-reglament-control-error
-          hidden></span>
+          hidden
+        ></span>
       </label>
     </template>
   </main>
