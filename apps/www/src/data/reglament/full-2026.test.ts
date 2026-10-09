@@ -49,12 +49,56 @@ describe('full reglament 2026 dataset', () => {
       { explicit_found: 0, partial: 0, not_found: 0, needs_check: 0 }
     );
 
-    expect(statuses).toEqual({
-      explicit_found: 6,
-      partial: 13,
-      not_found: 4,
-      needs_check: 1
-    });
+    expect(statuses).toMatchInlineSnapshot(`
+      {
+        "explicit_found": 5,
+        "needs_check": 1,
+        "not_found": 4,
+        "partial": 14,
+      }
+    `);
+  });
+
+  it('keeps road-gutter cleaning partial with its evidence and estimate links', () => {
+    const mapping = fullReglamentDataset2026.service_to_estimate_map.find(
+      (item) => item.service_id === 'summer-road-gutters-cleaning'
+    );
+
+    expect(mapping).toMatchInlineSnapshot(`
+      {
+        "estimate_row_ids": [
+          "cleaning-summer-manual",
+        ],
+        "estimate_section_ids": [
+          "cleaning",
+        ],
+        "estimate_source_refs": [
+          {
+            "fragment": "Сводная смета / строка 2.4",
+            "page": 125,
+            "pdf": "full",
+          },
+        ],
+        "explanation": "Летняя ручная уборка в смете рассчитана для открытых ливневых траншей. Источник не подтверждает, что они соответствуют дорожным лоткам из перечня услуг.",
+        "service_id": "summer-road-gutters-cleaning",
+        "source_refs": [
+          {
+            "fragment": "Приложение №4 / В летний период / строка 6",
+            "page": 135,
+            "pdf": "full",
+            "quote": "Уборка дорожных лотков от мусора и скошенной травы ручным способом: 15 раз в летний период",
+          },
+          {
+            "fragment": "Сводная смета / строка 2.4",
+            "page": 125,
+            "pdf": "full",
+          },
+        ],
+        "status": "partial",
+        "status_label_ru": "частично",
+        "verification_note": "частично сопоставлено",
+      }
+    `);
   });
 
   it('keeps PDF source refs on every fact without repo paths', () => {

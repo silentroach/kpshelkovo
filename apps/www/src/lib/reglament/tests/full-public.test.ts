@@ -13,6 +13,55 @@ const keyVariants = (values: readonly PublicFullReglamentSourceRef[]): readonly 
   unique(values.map((value) => keys(value).join(',')));
 
 describe('full reglament public contract', () => {
+  it('publishes road-gutter cleaning as partial with its evidence and estimate links', async () => {
+    Object.assign(import.meta.env, {
+      SITE: 'https://example.com',
+      BASE_URL: '/'
+    });
+    const { GET } = await import('../../../pages/815/regulation/data/full-2026.json');
+    const response = await GET({} as never);
+    const payload = validatePublicFullReglamentDataset(await response.json());
+    const mapping = payload.service_to_estimate_map.find(
+      (item) => item.service_id === 'summer-road-gutters-cleaning'
+    );
+
+    expect(mapping).toMatchInlineSnapshot(`
+      {
+        "estimate_row_ids": [
+          "cleaning-summer-manual",
+        ],
+        "estimate_section_ids": [
+          "cleaning",
+        ],
+        "estimate_source_refs": [
+          {
+            "fragment": "Сводная смета / строка 2.4",
+            "page": 125,
+            "pdf": "full",
+          },
+        ],
+        "explanation": "Летняя ручная уборка в смете рассчитана для открытых ливневых траншей. Источник не подтверждает, что они соответствуют дорожным лоткам из перечня услуг.",
+        "service_id": "summer-road-gutters-cleaning",
+        "source_refs": [
+          {
+            "fragment": "Приложение №4 / В летний период / строка 6",
+            "page": 135,
+            "pdf": "full",
+            "quote": "Уборка дорожных лотков от мусора и скошенной травы ручным способом: 15 раз в летний период",
+          },
+          {
+            "fragment": "Сводная смета / строка 2.4",
+            "page": 125,
+            "pdf": "full",
+          },
+        ],
+        "status": "partial",
+        "status_label_ru": "частично",
+        "verification_note": "частично сопоставлено",
+      }
+    `);
+  });
+
   it('keeps the meaningful full-2026.json shape and values stable', async () => {
     Object.assign(import.meta.env, {
       SITE: 'https://example.com',
