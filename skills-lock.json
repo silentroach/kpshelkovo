@@ -10,7 +10,7 @@
     },
     "agent-browser": {
       "source": "vercel-labs/agent-browser",
-      "ref": "526157cfd4ec64f45939f9ba0f10d5936aa7ac33",
+      "ref": "0207911f1bd4d0393eddaa90f2e50f96e0fb8974",
       "sourceType": "github",
       "skillPath": "skills/agent-browser/SKILL.md",
       "computedHash": "dd491d53824ad9286ec950aee667098446332429a6d41fe28b4ba11f1959264c"
@@ -52,31 +52,31 @@
     },
     "design-taste-frontend": {
       "source": "Leonxlnx/taste-skill",
-      "ref": "ce26fc25c0e5e8cab638f883de62d9a86ee5e45b",
+      "ref": "18dfc928b135629e0eddfdd445a06400d04ed439",
       "sourceType": "github",
       "skillPath": "skills/taste-skill/SKILL.md",
       "computedHash": "6d838b246d0e35d0b53f4f23f98ba7a1dd561937e64f7d0c7553b0928e376c3e"
     },
     "domain-modeling": {
       "source": "mattpocock/skills",
-      "ref": "4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
+      "ref": "49dd158d1076134a641b33efb035946536778336",
       "sourceType": "github",
       "skillPath": "skills/engineering/domain-modeling/SKILL.md",
       "computedHash": "b3eb40152b81f0c98fd2095a023c019452dbdce56f7540cc67fece2972db8369"
     },
     "grilling": {
       "source": "mattpocock/skills",
-      "ref": "4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
+      "ref": "49dd158d1076134a641b33efb035946536778336",
       "sourceType": "github",
       "skillPath": "skills/productivity/grilling/SKILL.md",
-      "computedHash": "4dd886b0196bf43729d954ae326016f2bd9f5f79d892500b407c33a753362f14"
+      "computedHash": "ef1641a2047b71b60f1942cd35efb47d3afc9d584dff5a0b01f8c7db923aaa08"
     },
     "humanizer-ru": {
       "source": "ilyautov/humanizer-ru",
-      "ref": "1e035ad6b64c56c6e770ed28d076e2cbda3d1aed",
+      "ref": "f2fe1f364d1a968e6f0f842c68ecd8c9c0dcc485",
       "sourceType": "github",
       "skillPath": "skills/humanizer-ru/SKILL.md",
-      "computedHash": "545430e5d33bfdfaac7e1aa144aa4716a27b118dd6a064ca4db53b04a2a3260a"
+      "computedHash": "8a439a48c8bf73c035dafc581cc063cfabd46b46ff6b0dca8410703c8152d1bb"
     },
     "nginx-expert": {
       "source": "personamanagmentlayer/pcl",
@@ -94,17 +94,17 @@
     },
     "ponytail-audit": {
       "source": "dietrichgebert/ponytail",
-      "ref": "926589fcfdf3e04a3a9608f7d9d415e09af41b23",
+      "ref": "9cc65d03aa2da1db7121b912d03596409ee340b8",
       "sourceType": "github",
       "skillPath": "skills/ponytail-audit/SKILL.md",
-      "computedHash": "33a1360f2b611ec0bc3288cc27c24f0d0760ed3245b3c67c25b4d94ce842a6a1"
+      "computedHash": "1d718f893dabc01caad0dacef86444b5b4b3e1e59409527d66e8b5dd0cd85ae0"
     },
     "ponytail-review": {
       "source": "dietrichgebert/ponytail",
-      "ref": "926589fcfdf3e04a3a9608f7d9d415e09af41b23",
+      "ref": "9cc65d03aa2da1db7121b912d03596409ee340b8",
       "sourceType": "github",
       "skillPath": "skills/ponytail-review/SKILL.md",
-      "computedHash": "09c824396581b0048a4feb504e21a9b3f943c9ec06b77eec04737c0f741c6d25"
+      "computedHash": "800dc0c86402978e12359f701b9e0c81ba4607a0cd0027f4596d0f835a67eadc"
     },
     "seo": {
       "source": "addyosmani/web-quality-skills",
@@ -129,10 +129,10 @@
     },
     "wayfinder": {
       "source": "mattpocock/skills",
-      "ref": "4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
+      "ref": "49dd158d1076134a641b33efb035946536778336",
       "sourceType": "github",
       "skillPath": "skills/engineering/wayfinder/SKILL.md",
-      "computedHash": "fa790eb4255b13d24d7e33ff4891ccd3d621558cc0ab87ae226777538ea16a8f"
+      "computedHash": "71d1296ae9f1ea0397f385f72d11ca3473827f5d067df4d06c58eb03377a57ce"
     },
     "web-quality-audit": {
       "source": "addyosmani/web-quality-skills",
@@ -143,7 +143,7 @@
     },
     "writing-for-agents": {
       "source": "mattpocock/skills",
-      "ref": "4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
+      "ref": "49dd158d1076134a641b33efb035946536778336",
       "sourceType": "github",
       "skillPath": "skills/productivity/writing-for-agents/SKILL.md",
       "computedHash": "95da47fc97af998e85b7d7e6d57b3ac76727c1e290cfe9ea09005aacb826959f"
