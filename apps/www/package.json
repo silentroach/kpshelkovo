@@ -64,7 +64,7 @@
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@testing-library/svelte": "^5.4.2",
     "@types/css-tree": "^3.2.0",
-    "@yandex/ymaps3-types": "^1.0.21354683",
+    "@yandex/ymaps3-types": "^1.0.21414904",
     "astro-compressor": "^2.0.1",
     "css-tree": "^3.2.1",
     "happy-dom": "^20.14.5",
@@ -75,7 +75,7 @@
     "sharp": "^0.35.5",
     "typescript": "^7.0.2",
     "unified": "^11.0.5",
-    "vite": "^8.3.1",
-    "vitest": "^5.0.2"
+    "vite": "^8.3.3",
+    "vitest": "^5.0.3"
   }
 }
