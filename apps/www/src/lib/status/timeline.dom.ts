@@ -654,11 +654,10 @@ export const hydrateStatusTimeline = (
     const span = clipStatusTimelineSpan(
       {
         startMs: problemNode.geometryStartMs ?? problemNode.startMs,
-        ...(problemNode.geometryEndMs !== undefined
-          ? { endMs: problemNode.geometryEndMs }
-          : problemNode.endMs !== undefined
-            ? { endMs: problemNode.endMs }
-            : {})
+        endMs:
+          problemNode.endMs === undefined
+            ? undefined
+            : (problemNode.geometryEndMs ?? problemNode.endMs)
       },
       range
     );
