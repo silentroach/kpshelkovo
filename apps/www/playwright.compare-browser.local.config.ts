@@ -8,7 +8,11 @@ const cwd = fileURLToPath(new URL('.', import.meta.url));
 
 export default defineConfig({
   testDir: './tests',
-  testMatch: ['compare-controls.browser.spec.ts', 'sticky-table-lifecycle.browser.spec.ts'],
+  testMatch: [
+    'compare-controls.browser.spec.ts',
+    'sticky-table-lifecycle.browser.spec.ts',
+    'regulation-tooltip.browser.spec.ts'
+  ],
   fullyParallel: false,
   workers: 1,
   reporter: 'list',
