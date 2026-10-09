@@ -8,7 +8,12 @@
 
 ### Requirement: Объявленный Markdown доступен по прямому и согласуемому адресу
 
-Публичная точка входа с поддержкой Markdown negotiation SHALL сохранять прямой URL объявленного Markdown-представления и возвращать этот документ при явном приемлемом `Accept: text/markdown`. Объявленное представление может быть общим документом раздела для нескольких HTML-страниц; negotiation допускается и у Markdown-only точки входа. Если HTML-представление опубликовано, обычный запрос HTML SHALL получать HTML. Markdown SHALL иметь `Content-Type: text/markdown; charset=utf-8` и явную политику кеширования; прямой URL SHALL выбирать ресурс самим путём. Точка входа без объявленного Markdown-представления SHALL NOT обещать его или имитировать negotiation.
+Точка с Markdown negotiation SHALL сохранять прямой URL объявленного документа и возвращать его при явном приемлемом `Accept: text/markdown`. Обычный HTML-запрос SHALL получать HTML, если оно опубликовано. Markdown SHALL иметь `Content-Type: text/markdown; charset=utf-8` и явную политику кеширования; прямой URL SHALL выбирать ресурс путём. Без объявленного Markdown точка SHALL NOT обещать его или имитировать negotiation.
+
+#### Scenario: Общее или единственное Markdown-представление
+
+- **WHEN** несколько HTML-страниц объявляют общий документ раздела либо точка входа имеет только Markdown
+- **THEN** negotiation допустима и возвращает объявленный документ
 
 #### Scenario: Два способа чтения
 
@@ -43,7 +48,7 @@
 
 ### Requirement: Альтернативные представления обнаруживаются из HTML и HTTP
 
-HTML-страница с объявленным Markdown-представлением SHALL указывать его через HTTP `Link` с `rel="alternate"; type="text/markdown"`, HTML `<link rel="alternate" type="text/markdown">` и текстовый указатель для инструментов чтения HTML. Если у negotiated-точки входа опубликовано HTML-представление, её Markdown-ответ SHALL публиковать обратную HTTP alternate-ссылку на него с типом `text/html`. Ссылки SHALL NOT объявлять несуществующее HTML-представление. Прямой Markdown URL SHALL оставаться самостоятельной точкой входа; обратный HTTP `Link` для каждого прямого Markdown URL не является обязательным.
+HTML-страница SHALL указывать объявленный Markdown через HTTP `Link` с `rel="alternate"; type="text/markdown"`, HTML `<link rel="alternate" type="text/markdown">` и текстовый указатель инструментам чтения. Negotiated Markdown SHALL давать обратный HTTP alternate с `text/html` только при опубликованном HTML; ссылки SHALL NOT объявлять несуществующий HTML. Прямой Markdown URL SHALL оставаться самостоятельным входом без обязательного обратного HTTP `Link`.
 
 #### Scenario: Клиент начинает с HTML
 
