@@ -8,7 +8,13 @@
 
 ### Requirement: Метаданные карточки доступны во frontmatter
 
-Документ `/map/[slug]/index.md` SHALL начинаться с YAML frontmatter. Он SHALL содержать название места в `title`, машинный код `category`, lifecycle-код `status` (`existing`, `planned` или `underConstruction`), числовые `coordinates.lat` и `coordinates.lng` по [public-coordinate-precision](/openspec/specs/public-coordinate-precision/spec.md) и `address` при наличии адреса. `status` SHALL не означать текущую открытость места. Отсутствующие необязательные сведения SHALL не публиковаться как пустые поля, `null` или строка `undefined`. Внутренние редакционные и технические поля SHALL не попадать в публичный frontmatter автоматически.
+`/map/[slug]/index.md` SHALL начинаться с YAML frontmatter: название в `title`, машинный `category`, lifecycle `status` (`existing`, `planned`, `underConstruction`), числовые `coordinates.lat` и `coordinates.lng` по [public-coordinate-precision](/openspec/specs/public-coordinate-precision/spec.md), `address` при наличии. `status` SHALL NOT означать текущую открытость. Неизвестные optional-сведения и внутренние поля SHALL NOT публиковаться автоматически.
+
+#### Scenario: Необязательное поле отсутствует
+
+- **WHEN** у места нет необязательных сведений
+- **THEN** frontmatter не содержит для них пустых полей, `null` или строки `undefined`
+- **THEN** внутренние редакционные и технические поля также не переносятся автоматически
 
 #### Scenario: Карточка с адресом
 
@@ -40,7 +46,7 @@ Frontmatter SHALL содержать абсолютные `html_url` с canonica
 
 ### Requirement: Body сохраняет редакционный текст и контекст упоминаний
 
-После frontmatter документ SHALL содержать H1 с названием, вводный summary, имеющийся редакционный Markdown и раздел «Где упоминается». Обратные ссылки SHALL сохранять группировку, ссылки на Markdown-материалы и имеющиеся даты, виды и выдержки; при отсутствии упоминаний SHALL сохраняться явное пустое состояние. Body SHALL не содержать автоматически сформированных разделов «Сведения» и «Время работы» либо отдельного generated-пояснения расписания. Это правило SHALL не удалять авторские фрагменты с похожими заголовками или сведениями из редакционного body.
+После frontmatter SHALL идти H1 с названием, вводный summary, имеющийся редакционный Markdown и «Где упоминается». Backlinks SHALL сохранять группировку, Markdown-ссылки, имеющиеся даты, виды и выдержки; без упоминаний SHALL быть явное пустое состояние. Body SHALL NOT добавлять generated-разделы «Сведения», «Время работы» и пояснение расписания, сохраняя авторские фрагменты с похожими заголовками и сведениями.
 
 #### Scenario: Карточка с редакционным текстом и упоминаниями
 
