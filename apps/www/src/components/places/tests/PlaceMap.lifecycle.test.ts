@@ -2,6 +2,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { describe, expect, it, vi } from 'vitest';
 
+import { waitForStableLayout } from '@/lib/yandex-maps/runtime';
+
 import { getPlaceBounds } from '../place-map-geometry';
 import PlaceMap from '../PlaceMap.svelte';
 import {
@@ -20,6 +22,7 @@ import {
   publicPlace,
   pondsPlace,
   parcelFetch,
+  parcelWithDetails,
   registerPlaceMapSetup
 } from './support';
 
@@ -28,7 +31,7 @@ vi.mock(import('@/lib/yandex-maps/runtime'), async (importOriginal) => {
   const runtime = await importOriginal();
   return {
     ...runtime,
-    waitForStableLayout: async () => {},
+    waitForStableLayout: vi.fn(async () => {}),
     loadYandexMaps: async () => {
       const maps = window.ymaps3;
       if (!maps) return runtime.loadYandexMaps();
@@ -39,6 +42,99 @@ vi.mock(import('@/lib/yandex-maps/runtime'), async (importOriginal) => {
 
 describe('PlaceMap', () => {
   registerPlaceMapSetup();
+
+  it.each(['ordinary', 'highlight', 'parcel'] as const)(
+    'keeps one canvas observer and the %s camera through resize and reactive updates',
+    async (mode) => {
+      const observe = vi.fn();
+      const disconnect = vi.fn();
+      const observer = vi.fn(function (_refresh: () => void) {
+        return { observe, disconnect };
+      });
+      vi.stubGlobal('ResizeObserver', observer);
+      vi.stubGlobal('fetch', parcelWithDetails);
+      window.history.replaceState(
+        {},
+        '',
+        mode === 'highlight' ? '/map/?h=burzhuyka' : mode === 'parcel' ? '/map/?p=SHR-L43' : '/map/'
+      );
+      const view = render(PlaceMap, { props: { places: [place] } });
+      await waitFor(() => expect(map.addChild).toHaveBeenCalledWith(nativeControl));
+      if (mode === 'parcel')
+        await screen.findByRole('button', { name: 'Закрыть сведения об участке' });
+      const canvas = mapElements[0];
+      if (!canvas) throw new Error('Canvas missing');
+      const refresh = observer.mock.calls[0]?.[0];
+      if (!refresh) throw new Error('Resize observer missing');
+      expect(observe).toHaveBeenCalledExactlyOnceWith(canvas);
+
+      await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+      const focused = screen.getByRole('button', { name: 'Слои' });
+      focused.focus();
+      map.update.mockClear();
+      refresh();
+      await tick();
+      if (mode === 'parcel') {
+        expect(map.update).not.toHaveBeenCalled();
+        expect(screen.getByRole('button', { name: 'Закрыть сведения об участке' })).toBeDefined();
+        expect(window.location.search).toBe('?p=SHR-L43');
+      } else if (mode === 'highlight') {
+        expect(map.update.mock.lastCall?.[0].location).toMatchInlineSnapshot(`
+          {
+            "center": [
+              37.716242,
+              55.060526,
+            ],
+            "duration": 0,
+            "easing": "ease-in-out",
+            "zoom": 16,
+          }
+        `);
+      } else {
+        expect(map.update.mock.lastCall?.[0].location.bounds).toEqual(getPlaceBounds([place]));
+      }
+      expect(document.activeElement).toBe(focused);
+      expect(observer).toHaveBeenCalledOnce();
+      expect(mapElements).toHaveLength(1);
+      expect(disconnect).not.toHaveBeenCalled();
+      view.unmount();
+      expect(disconnect).toHaveBeenCalledOnce();
+    }
+  );
+
+  it('ignores pending layout and stale resize callbacks after unmount, then observes the next canvas', async () => {
+    const observe = vi.fn();
+    const disconnect = vi.fn();
+    const observer = vi.fn(function (_refresh: () => void) {
+      return { observe, disconnect };
+    });
+    vi.stubGlobal('ResizeObserver', observer);
+    const first = render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(map.addChild).toHaveBeenCalledWith(nativeControl));
+    const refresh = observer.mock.calls[0]?.[0];
+    if (!refresh) throw new Error('Resize observer missing');
+    const layout = Promise.withResolvers<void>();
+    vi.mocked(waitForStableLayout).mockReturnValueOnce(layout.promise);
+    refresh();
+    first.unmount();
+    map.update.mockClear();
+    refresh();
+    document.dispatchEvent(new Event('astro:page-load'));
+    await tick();
+    expect(map.update).not.toHaveBeenCalled();
+    expect(disconnect).toHaveBeenCalledOnce();
+
+    const second = render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(createControl).toHaveBeenCalledTimes(2));
+    expect(observer).toHaveBeenCalledTimes(2);
+    expect(observe.mock.lastCall?.[0]).toBe(mapElements[1]);
+    layout.resolve();
+    document.dispatchEvent(new Event('astro:page-load'));
+    await tick();
+    expect(map.update).toHaveBeenCalledOnce();
+    second.unmount();
+    expect(disconnect).toHaveBeenCalledTimes(2);
+  });
 
   it('adds the bottom-right native control once per mount and destroys its owning map', async () => {
     const first = render(PlaceMap, { props: { places: [place] } });

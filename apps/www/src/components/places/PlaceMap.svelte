@@ -11,6 +11,7 @@
   } from '@shelkovo/ui/markers';
   import type { Feature } from '@yandex/ymaps3-clusterer';
   import { onMount, tick } from 'svelte';
+  import type { Attachment } from 'svelte/attachments';
 
   import { createEditorialMapObjects } from '@/components/maps/editorial-map';
   import type { ParcelDetailsPublicDto } from '@/lib/parcels/details-public-schema';
@@ -174,6 +175,27 @@
   let toggleParcelPart: (part: ParcelPart, checked: boolean) => void;
   let toggleAllParcels = $state<() => void>(() => {});
   let errorPlace = $derived(places[0] ?? fallbackPlace);
+  let refreshMapLayout: (() => void) | undefined;
+
+  const observeCanvasSize: Attachment<HTMLDivElement> = (canvas) => {
+    let disposed = false;
+    const refresh = (): void => {
+      void waitForStableLayout().then(() => {
+        if (disposed) return;
+        refreshMapLayout?.();
+      });
+    };
+    const observer =
+      typeof ResizeObserver !== 'undefined' ? new ResizeObserver(refresh) : undefined;
+    observer?.observe(canvas);
+    document.addEventListener('astro:page-load', refresh);
+
+    return () => {
+      disposed = true;
+      observer?.disconnect();
+      document.removeEventListener('astro:page-load', refresh);
+    };
+  };
 
   const mapBehaviors = (): ymaps3.BehaviorType[] => [
     'drag',
@@ -883,7 +905,6 @@
     };
     let highlightTimer: number | undefined;
     let markerUpdateTimer: number | undefined;
-    let resizeObserver: ResizeObserver | undefined;
     const highlightUrl = new URL(window.location.href);
     const requestedSlug = !requestedParcelCode
       ? highlightUrl.searchParams.get(PLACE_HIGHLIGHT_QUERY_PARAM) || undefined
@@ -915,28 +936,19 @@
 
     installYandexMapsRuntimeHeadPersistence();
 
-    const refresh = (): void => {
-      void waitForStableLayout().then(() => {
-        if (destroyed || setupFailed) return;
+    refreshMapLayout = (): void => {
+      if (destroyed || setupFailed) return;
 
-        positionPopup();
-        if (preserveParcelCamera || selectedParcel) return;
+      positionPopup();
+      if (preserveParcelCamera || selectedParcel) return;
 
-        if (highlightedPlace) {
-          focusPlace(highlightedPlace, 0);
-          return;
-        }
+      if (highlightedPlace) {
+        focusPlace(highlightedPlace, 0);
+        return;
+      }
 
-        fitPlaces();
-      });
+      fitPlaces();
     };
-
-    document.addEventListener('astro:page-load', refresh);
-
-    if (typeof ResizeObserver !== 'undefined' && mapContainer) {
-      resizeObserver = new ResizeObserver(refresh);
-      resizeObserver.observe(mapContainer);
-    }
 
     void (async () => {
       try {
@@ -1117,8 +1129,7 @@
       parcelLayer?.destroy();
       removePopupAnchor();
       clearSelectedParcel = undefined;
-      document.removeEventListener('astro:page-load', refresh);
-      resizeObserver?.disconnect();
+      refreshMapLayout = undefined;
       if (highlightTimer !== undefined) {
         window.clearTimeout(highlightTimer);
       }
@@ -1144,7 +1155,12 @@
     </div>
   {/if}
 
-  <div bind:this={mapContainer} class="place-map__canvas" tabindex="-1"></div>
+  <div
+    bind:this={mapContainer}
+    {@attach observeCanvasSize}
+    class="place-map__canvas"
+    tabindex="-1"
+  ></div>
   {#if selectedParcel && (selectedParcel.status === 'available' || selectedParcel.status === 'reserved')}
     <div
       bind:this={popupElement}
