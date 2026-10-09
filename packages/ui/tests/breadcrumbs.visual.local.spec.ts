@@ -6,6 +6,111 @@ test.describe('Breadcrumbs visual', () => {
     await page.goto('/', { waitUntil: 'networkidle' });
   });
 
+  for (const width of [320, 390, 639, 640, 1023, 1024]) {
+    test(`decorates only a single linked mobile parent without JavaScript at ${width}px`, async ({
+      page
+    }) => {
+      await page.setViewportSize({ width, height: 844 });
+      for (const id of ['breadcrumbs-single', 'breadcrumbs-single-linked-last']) {
+        const target = page.getByTestId(id);
+        const arrow = target.locator('.breadcrumbs-up');
+        await expect(arrow).toHaveText('‹');
+        await expect(arrow).toHaveAttribute('aria-hidden', 'true');
+        if (width < 640) await expect(arrow).toBeVisible();
+        else await expect(arrow).toBeHidden();
+        const link = target.getByRole('link', { name: 'Люди', exact: true });
+        await expect(link).toHaveAccessibleName('Люди');
+        await expect(link).toHaveAttribute('href', '/people/');
+        expect(
+          await target.locator('[itemprop="itemListElement"]').evaluateAll((elements) =>
+            elements.map((element) => ({
+              name: element.querySelector('[itemprop="name"]')?.textContent?.trim(),
+              href: element.querySelector('[itemprop="item"]')?.getAttribute('href') ?? undefined,
+              position: element.querySelector('[itemprop="position"]')?.getAttribute('content')
+            }))
+          )
+        ).toEqual([
+          { name: 'Главная', href: '/', position: '1' },
+          { name: 'Люди', href: '/people/', position: '2' },
+          {
+            name: 'Иван Иванов',
+            href: id === 'breadcrumbs-single-linked-last' ? '/people/ivan/' : undefined,
+            position: '3'
+          }
+        ]);
+        if (width < 1024) {
+          await expect(target.locator('li:visible')).toHaveCount(1);
+          await expect(target.getByRole('link')).toHaveCount(1);
+        }
+      }
+      for (const id of [
+        'breadcrumbs-article',
+        'breadcrumbs-unlinked-section',
+        'breadcrumbs-mixed',
+        'breadcrumbs-section'
+      ]) {
+        await expect(page.getByTestId(id).locator('.breadcrumbs-up')).toHaveCount(0);
+      }
+      if (width < 1024) {
+        const mixed = page.getByTestId('breadcrumbs-mixed');
+        await expect(mixed.locator('li:visible')).toHaveCount(2);
+        await expect(mixed.getByRole('link')).toHaveCount(1);
+      }
+    });
+  }
+
+  test('activates the single parent original URL on direct no-JS entry', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const link = page
+      .getByTestId('breadcrumbs-single')
+      .getByRole('link', { name: 'Люди', exact: true });
+    await link.focus();
+    await expect(link).toHaveCSS('outline-style', 'solid');
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL('/people/');
+  });
+
+  test('wraps the single parent with its arrow at the first line, including 200% text', async ({
+    page
+  }) => {
+    await page.setViewportSize({ width: 320, height: 844 });
+    for (const fontSize of ['16px', '32px']) {
+      await page.locator('html').evaluate((element, value) => {
+        element.style.fontSize = value;
+      }, fontSize);
+      const target = page.getByTestId('breadcrumbs-single-long');
+      const arrow = target.locator('.breadcrumbs-up');
+      await expect(arrow).toBeVisible();
+      const geometry = await target
+        .locator('[itemprop="name"]')
+        .nth(1)
+        .evaluate((element) => {
+          const range = document.createRange();
+          range.selectNodeContents(element);
+          const lines = Array.from(range.getClientRects(), (rect) => ({ x: rect.x, y: rect.y }));
+          const arrowBox = element
+            .closest('li')!
+            .querySelector('.breadcrumbs-up')!
+            .getBoundingClientRect();
+          return { lines, arrowX: arrowBox.x, arrowY: arrowBox.y };
+        });
+      expect(geometry.lines.length).toBeGreaterThan(1);
+      for (const line of geometry.lines) expect(line.x).toBeCloseTo(geometry.lines[0]!.x, 1);
+      expect(geometry.arrowX).toBeLessThan(geometry.lines[0]!.x);
+      expect(Math.abs(geometry.arrowY - geometry.lines[0]!.y)).toBeLessThan(8);
+      expect(
+        await target
+          .locator('nav')
+          .evaluate(
+            (element) => element.scrollWidth <= Math.ceil(element.getBoundingClientRect().width)
+          )
+      ).toBe(true);
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)
+      ).toBe(true);
+    }
+  });
+
   test('renders a section trail with a current page item', async ({ page }) => {
     const target = page.getByTestId('breadcrumbs-section');
     const list = target.locator('ol');
