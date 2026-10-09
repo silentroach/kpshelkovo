@@ -61,7 +61,7 @@ describe('reglament markdown companions', () => {
       [
         "- найдено явно (\`explicit_found\`): 5",
         "- найдено частично (\`partial\`): 14",
-        "- summer-road-gutters-cleaning: частично (\`partial\`); строки сметы: cleaning-summer-manual; Летняя ручная уборка использует базу «открытые ливневые траншеи»; это близко к дорожным лоткам, но не совпадает дословно.",
+        "- summer-road-gutters-cleaning: частично (\`partial\`); строки сметы: cleaning-summer-manual; Летняя ручная уборка в смете рассчитана для открытых ливневых траншей. Источник не подтверждает, что они соответствуют дорожным лоткам из перечня услуг.",
       ]
     `);
     expect(markdown).toContain('https://example.com/815/regulation/data/full-2026.json');
