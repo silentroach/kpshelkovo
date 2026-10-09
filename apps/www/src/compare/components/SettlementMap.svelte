@@ -285,7 +285,7 @@
       map.update({
         location: {
           ...view.location,
-          duration: 250
+          duration: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : 250
         },
         margin: view.margin
       });

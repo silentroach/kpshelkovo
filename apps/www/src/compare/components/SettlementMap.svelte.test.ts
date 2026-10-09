@@ -3,6 +3,7 @@ import type { YMapControlsProps } from '@yandex/ymaps3-types';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import SettlementMap from './SettlementMap.svelte';
+import SettlementsExplorer from './SettlementsExplorer.svelte';
 
 vi.mock(import('@/lib/yandex-maps/runtime'), async (importOriginal) => {
   const runtime = await importOriginal();
@@ -494,6 +495,221 @@ describe('SettlementMap', () => {
         ],
       }
     `);
+  });
+
+  it('reads the live motion preference on each autofit without moving for preference changes', async () => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let reduce = false;
+    vi.spyOn(preference, 'matches', 'get').mockImplementation(() => reduce);
+    vi.spyOn(window, 'matchMedia').mockReturnValue(preference);
+    const { rerender } = render(SettlementMap, {
+      props: { settlements: mockSettlements, startFromMoscow: true, fitRevision: 0 }
+    });
+    await waitFor(() => expect(mockYandexMaps.YMap).toHaveBeenCalledOnce());
+
+    for (const [index, reduced] of [false, true, false].entries()) {
+      reduce = reduced;
+      preference.dispatchEvent(new Event('change'));
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+      expect(mockMap.update).toHaveBeenCalledTimes(index);
+      await rerender({
+        settlements: [mockSettlements[1]],
+        startFromMoscow: true,
+        fitRevision: index + 1
+      });
+      await waitFor(() => expect(mockMap.update).toHaveBeenCalledTimes(index + 1));
+    }
+    expect(mockMap.update.mock.calls.map(([update]) => update.location.duration))
+      .toMatchInlineSnapshot(`
+        [
+          250,
+          0,
+          250,
+        ]
+      `);
+    expect(mockYandexMaps.YMap).toHaveBeenCalledOnce();
+  });
+
+  it.each([false, true])(
+    'keeps initial bounds fitting instant and ignores sorting with reduce=%s',
+    async (reduce) => {
+      const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+      vi.spyOn(preference, 'matches', 'get').mockReturnValue(reduce);
+      vi.spyOn(window, 'matchMedia').mockReturnValue(preference);
+      const { rerender } = render(SettlementMap, {
+        props: { settlements: mockSettlements, fitRevision: 0 }
+      });
+      await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
+      expect(mockMap.update.mock.calls[0]?.[0].location.duration).toBe(0);
+      mockMap.update.mockClear();
+
+      await rerender({ settlements: mockSettlements.toReversed(), fitRevision: 0 });
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+      expect(mockMap.update).not.toHaveBeenCalled();
+      expect(mockMap.removeChild).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each([false, true])('keeps the last rapid filter revision with reduce=%s', async (reduce) => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    vi.spyOn(preference, 'matches', 'get').mockReturnValue(reduce);
+    vi.spyOn(window, 'matchMedia').mockReturnValue(preference);
+    const { rerender } = render(SettlementMap, {
+      props: { settlements: mockSettlements, startFromMoscow: true, fitRevision: 0 }
+    });
+    await waitFor(() => expect(markers).toHaveLength(mockSettlements.length));
+    await Promise.all([
+      rerender({ settlements: [mockSettlements[0]], fitRevision: 1 }),
+      rerender({ settlements: [mockSettlements[1]], fitRevision: 2 }),
+      rerender({ settlements: [mockSettlements[2]], fitRevision: 3 })
+    ]);
+    await waitFor(() => expect(mockMap.update).toHaveBeenCalled());
+    await new Promise((resolve) => window.setTimeout(resolve, 0));
+    expect(mockMap.update.mock.calls.map(([update]) => update.location)).toEqual([
+      { center: [37.1, 55.78], zoom: 12, duration: reduce ? 0 : 250 }
+    ]);
+    expect(mockMap.removeChild.mock.calls.map(([marker]) => marker.el.title))
+      .toMatchInlineSnapshot(`
+        [
+          "КП Шелково",
+          "КП Лесное",
+        ]
+      `);
+  });
+
+  it.each([false, true])(
+    'reads preference after delayed initialization and keeps the last filter with reduce=%s',
+    async (reduce) => {
+      const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let currentReduce = !reduce;
+      vi.spyOn(preference, 'matches', 'get').mockImplementation(() => currentReduce);
+      vi.spyOn(window, 'matchMedia').mockReturnValue(preference);
+      const ready = Promise.withResolvers<void>();
+      let reads = 0;
+      Object.defineProperty(mockYandexMaps, 'ready', {
+        configurable: true,
+        get: () => (++reads === 1 ? Promise.resolve() : ready.promise)
+      });
+      const { rerender } = render(SettlementMap, {
+        props: { settlements: mockSettlements, startFromMoscow: true, fitRevision: 0 }
+      });
+      await waitFor(() => expect(reads).toBe(2));
+      await rerender({ settlements: [mockSettlements[0]], fitRevision: 1 });
+      await rerender({ settlements: [mockSettlements[1]], fitRevision: 2 });
+      await rerender({ settlements: [mockSettlements[2]], fitRevision: 3 });
+      expect(mockMap.update).not.toHaveBeenCalled();
+      currentReduce = reduce;
+      ready.resolve();
+      await waitFor(() => expect(mockMap.update).toHaveBeenCalled());
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+      for (const [update] of mockMap.update.mock.calls) {
+        expect(update.location).toEqual({
+          center: [37.1, 55.78],
+          zoom: 12,
+          duration: reduce ? 0 : 250
+        });
+      }
+      expect(mockYandexMaps.YMap).toHaveBeenCalledOnce();
+      expect(markers.map((marker) => marker.title)).toMatchInlineSnapshot(`
+      [
+        "Усадьбы Истра",
+      ]
+    `);
+    }
+  );
+
+  it.each([false, true])('filters through the real explorer with reduce=%s', async (reduce) => {
+    const matchMedia = window.matchMedia.bind(window);
+    vi.spyOn(window, 'matchMedia').mockImplementation((query) => {
+      const media = matchMedia(query);
+      vi.spyOn(media, 'matches', 'get').mockReturnValue(
+        query === '(prefers-reduced-motion: reduce)' && reduce
+      );
+      return media;
+    });
+    const previousUrl = window.location.href;
+    window.history.replaceState({}, '', '/815/compare/');
+    try {
+      const { container, getByTestId } = render(SettlementsExplorer, {
+        props: {
+          settlements: mockSettlements.map((settlement) => ({
+            slug: settlement.slug,
+            name: settlement.name,
+            shortName: settlement.shortName,
+            rating: 70,
+            isBaseline: settlement.isBaseline,
+            managementCompany: settlement.companyText,
+            location: { lat: settlement.lat, lng: settlement.lng, district: 'Истринский район' },
+            tariff: {
+              normalizedPerSotkaMonth: settlement.normalizedTariff,
+              normalizedIsEstimate: false
+            }
+          })),
+          comparisons: Object.fromEntries(
+            mockSettlements.map((settlement) => [
+              settlement.slug,
+              {
+                tariffDelta: settlement.normalizedTariff - 120,
+                tariffDeltaPercent: ((settlement.normalizedTariff - 120) / 120) * 100,
+                isCheaper: settlement.normalizedTariff < 120
+              }
+            ])
+          ),
+          stats: {
+            shelkovoTariff: 120,
+            medianTariff: 120,
+            peerMedianTariff: 120,
+            meanTariff: 350 / 3,
+            minTariff: 80,
+            maxTariff: 150,
+            shelkovoRank: 2,
+            totalSettlements: 3,
+            cheaperCount: 1,
+            moreExpensiveCount: 1,
+            shelkovoVsMedianPercent: 0,
+            shelkovoVsPeerMedianPercent: 0,
+            shelkovoVsMeanPercent: 3
+          }
+        }
+      });
+      await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
+      expect(markers).toHaveLength(mockSettlements.length);
+      mockMap.update.mockClear();
+      await fireEvent.click(getByTestId('price-cheaper'));
+      await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
+      expect(
+        [...container.querySelectorAll('[data-testid="settlement-card"] h3')].map((heading) =>
+          heading.textContent?.trim()
+        )
+      ).toMatchInlineSnapshot(`
+        [
+          "Лесное",
+        ]
+      `);
+      expect(mockMap.removeChild.mock.calls.map(([marker]) => marker.el.title).sort())
+        .toMatchInlineSnapshot(`
+          [
+            "КП Шелково",
+            "Усадьбы Истра",
+          ]
+        `);
+      expect(mockMap.update.mock.calls[0]?.[0].location).toEqual({
+        center: [37.2, 55.85],
+        zoom: 12,
+        duration: reduce ? 0 : 250
+      });
+    } finally {
+      window.history.replaceState({}, '', previousUrl);
+    }
+  });
+
+  it('keeps the ordinary autofit duration when matchMedia is unavailable', async () => {
+    vi.stubGlobal('matchMedia', undefined);
+    render(SettlementMap, {
+      props: { settlements: [mockSettlements[1]], startFromMoscow: true, fitRevision: 1 }
+    });
+    await waitFor(() => expect(mockMap.update).toHaveBeenCalledOnce());
+    expect(mockMap.update.mock.calls[0]?.[0].location.duration).toBe(250);
   });
 
   it('applies a filter revision that advanced before the map mounted', async () => {
