@@ -30,7 +30,7 @@
     "postinstall": "node scripts/hooks.mjs"
   },
   "devDependencies": {
-    "@fission-ai/openspec": "1.13.2",
+    "@fission-ai/openspec": "1.14.1",
     "@lhci/cli": "^0.15.1",
     "@oxlint/plugins": "1.86.0",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
