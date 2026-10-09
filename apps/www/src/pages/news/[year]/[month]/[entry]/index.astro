@@ -462,6 +462,10 @@ const schema = newsArticleSchema({
   }
 
   @media screen and (width < 40rem) {
+    .news-article-header__content .ui-page-title {
+      overflow-wrap: anywhere;
+    }
+
     .news-hero__layout {
       padding-block-start: 0;
     }

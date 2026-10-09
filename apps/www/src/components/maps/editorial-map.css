@@ -45,6 +45,27 @@
   margin-block: 1.25rem;
 }
 
+@media screen and (width < 40rem) {
+  .news-article-layout .ui-prose > .ui-editorial-map,
+  .kb-body .ui-prose > .ui-editorial-map {
+    width: auto;
+    margin-inline: calc(-1 * (var(--page-padding) + 1.25rem));
+    border-radius: 0;
+  }
+
+  .news-article-layout .ui-prose > .ui-editorial-map > editorial-map,
+  .kb-body .ui-prose > .ui-editorial-map > editorial-map,
+  .news-article-layout .ui-prose > .ui-editorial-map > .ui-editorial-map__caption,
+  .kb-body .ui-prose > .ui-editorial-map > .ui-editorial-map__caption {
+    border-radius: 0;
+  }
+
+  .news-article-layout .ui-editorial-map__caption,
+  .kb-body .ui-editorial-map__caption {
+    text-align: center;
+  }
+}
+
 .ui-editorial-map editorial-map {
   position: relative;
   /* Keep SDK control layers below site navigation. */
