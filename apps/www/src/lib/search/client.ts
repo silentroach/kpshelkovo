@@ -64,14 +64,6 @@ const pagefindScore = (value: unknown): number =>
 const asStringList = (value: unknown): readonly string[] =>
   Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
 
-const subResultScore = (value: unknown): number =>
-  Array.isArray(value)
-    ? value.reduce((total, item) => {
-        const score = asRecord(item)?.balanced_score;
-        return total + pagefindScore(score);
-      }, 0)
-    : 0;
-
 const newsTagContext = (value: unknown): string | undefined => {
   const labels = cleanText(value)
     ?.split(',')
@@ -85,7 +77,7 @@ const newsTagContext = (value: unknown): string | undefined => {
   return `${prefix}: ${labels.join(', ')}.`;
 };
 
-const normalizeUrl = (value: unknown, requireAnchor = false): string | undefined => {
+const normalizeUrl = (value: unknown, preserveAnchor = false): string | undefined => {
   const rawUrl = cleanText(value);
   if (!rawUrl) {
     return;
@@ -98,12 +90,8 @@ const normalizeUrl = (value: unknown, requireAnchor = false): string | undefined
     }
 
     const pathname = url.pathname.replace(/\/index\.html$/u, '/') || '/';
-    if (requireAnchor && !url.hash) {
-      return;
-    }
-
     return `${pathname}${normalizeSearchHighlightQuery(url.search)}${
-      requireAnchor ? url.hash : ''
+      preserveAnchor ? url.hash : ''
     }`;
   } catch {
     return;
@@ -115,29 +103,22 @@ const normalizeSubResults = (value: unknown, pageUrl: string): readonly SearchSu
     return [];
   }
 
-  return value
-    .flatMap((item, index) => {
-      const rawSubResult = asRecord(item);
-      const url = normalizeUrl(rawSubResult?.url, true);
-      const title = cleanText(rawSubResult?.title);
-      if (!url || !title || url.slice(0, url.indexOf('#')) !== pageUrl) {
-        return [];
-      }
+  return value.flatMap((item) => {
+    const rawSubResult = asRecord(item);
+    const url = normalizeUrl(rawSubResult?.url, true);
+    const title = cleanText(rawSubResult?.title);
+    if (!url || !title || url.split('#')[0] !== pageUrl) {
+      return [];
+    }
 
-      return [
-        {
-          index,
-          score: subResultScore(rawSubResult?.weighted_locations),
-          result: {
-            url,
-            title,
-            excerptHtml: trustedPagefindExcerpt(rawSubResult?.excerpt)
-          } satisfies SearchSubResult
-        }
-      ];
-    })
-    .sort((left, right) => right.score - left.score || left.index - right.index)
-    .map((item) => item.result);
+    return [
+      {
+        url,
+        title,
+        excerptHtml: trustedPagefindExcerpt(rawSubResult?.excerpt)
+      }
+    ];
+  });
 };
 
 const normalizeResult = (

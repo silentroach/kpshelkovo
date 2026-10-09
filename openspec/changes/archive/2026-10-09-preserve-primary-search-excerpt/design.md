@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация — в [proposal](/openspec/changes/preserve-primary-search-excerpt/proposal.md). `resultRow` в `/apps/www/src/components/search/SearchDialog.svelte` заменяет основной excerpt первым якорным. `/apps/www/src/lib/search/client.ts` предварительно исключает безъякорные секции и сортирует якорные по внутренним оценкам Pagefind. UI-тест закрепляет эту подмену.
+Мотивация — в [proposal](/openspec/changes/archive/2026-10-09-preserve-primary-search-excerpt/proposal.md). `resultRow` в `/apps/www/src/components/search/SearchDialog.svelte` заменяет основной excerpt первым якорным. `/apps/www/src/lib/search/client.ts` предварительно исключает безъякорные секции и сортирует якорные по внутренним оценкам Pagefind. UI-тест закрепляет эту подмену.
 
 Решение уже принято в [search](/openspec/specs/search/spec.md), требование «Переход из выдачи сохраняет контекст совпадения»; архитектура — [ADR-025](/docs/decisions/025-static-full-text-search-with-pagefind.md). Delta specs не нужны: `skip_specs: true`.
 
