@@ -14,6 +14,10 @@ const lastIndex = items.length - 1;
 const firstParentIndex = items.findIndex(
   (item, index) => index < lastIndex && item.href !== '/',
 );
+const parents = items.filter(
+  (item, index) => index < lastIndex && item.href !== '/',
+);
+const hasSingleLinkedParent = parents.length === 1 && Boolean(parents[0]?.href);
 let structuredPosition = 0;
 const renderedItems = items.map((item, index) => {
   const isStructuredItem = Boolean(item.href) || index === lastIndex;
@@ -63,6 +67,11 @@ const renderedItems = items.map((item, index) => {
               ›
             </span>
           )}
+          {hasSingleLinkedParent && index === firstParentIndex && (
+            <span class="breadcrumbs-up" aria-hidden="true">
+              ‹
+            </span>
+          )}
           {item.href && (linkLast || index < lastIndex) ? (
             <a
               href={item.href}
@@ -92,6 +101,10 @@ const renderedItems = items.map((item, index) => {
 )}
 
 <style>
+  .breadcrumbs-up {
+    display: none;
+  }
+
   .breadcrumbs-list {
     display: flex;
     flex-wrap: wrap;
@@ -182,6 +195,12 @@ const renderedItems = items.map((item, index) => {
     }
 
     .breadcrumbs-separator {
+      padding-block: 0.125rem;
+    }
+
+    .breadcrumbs-up {
+      display: block;
+      flex-shrink: 0;
       padding-block: 0.125rem;
     }
 

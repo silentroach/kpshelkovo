@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация — в [proposal](/openspec/changes/add-mobile-breadcrumb-up-arrow/proposal.md). Shared-компонент строит один SSR-список с полной microdata. До `64rem` скрыты главная и последний элемент, даже с `linkLast`; до `40rem` оставшиеся родители расположены вертикально. Первый видимый элемент не имеет разделителя.
+Мотивация — в [proposal](/openspec/changes/archive/2026-10-09-add-mobile-breadcrumb-up-arrow/proposal.md). Shared-компонент строит один SSR-список с полной microdata. До `64rem` скрыты главная и последний элемент, даже с `linkLast`; до `40rem` оставшиеся родители расположены вертикально. Первый видимый элемент не имеет разделителя.
 
 ## Goals / Non-Goals
 
