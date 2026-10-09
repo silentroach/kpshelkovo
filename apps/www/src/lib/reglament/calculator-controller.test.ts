@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 
+import { within } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { estimate2026 } from '@/data/reglament/estimate-2026';
@@ -760,15 +761,15 @@ describe('buildReglamentCalculatorChanges', () => {
     `);
   });
 
-  it('preserves the row title used as a checkbox description', () => {
+  it('preserves the row title used as a checkbox name after toggling and rehydration', () => {
     document.body.innerHTML = `
       <div data-reglament-calculator>
         <input
           type="checkbox"
           checked
-          aria-describedby="reglament-row-title-lighting"
+          aria-labelledby="reglament-row-title-lighting"
           data-reglament-field="enabled"
-          data-reglament-row-id="lighting"
+          data-reglament-row-id="lighting-electricity"
           data-reglament-baseline="true"
         />
         <h4 id="reglament-row-title-lighting">Освещение территории</h4>
@@ -783,18 +784,28 @@ describe('buildReglamentCalculatorChanges', () => {
       !(checkbox instanceof HTMLInputElement) ||
       !(title instanceof HTMLElement)
     ) {
-      throw new Error('Missing checkbox description fixture nodes');
+      throw new Error('Missing checkbox name fixture nodes');
     }
 
     hydrateReglamentCalculator(root, calculationInput);
+    checkbox.click();
+    hydrateReglamentCalculator(root, calculationInput);
+
+    expect(
+      within(root).getByRole('checkbox', {
+        name: 'Освещение территории',
+        description: '',
+        checked: false
+      })
+    ).toBe(checkbox);
 
     expect({
-      describedBy: checkbox.getAttribute('aria-describedby'),
+      labelledBy: checkbox.getAttribute('aria-labelledby'),
       titleHidden: title.hidden,
       titleText: title.textContent
     }).toMatchInlineSnapshot(`
       {
-        "describedBy": "reglament-row-title-lighting",
+        "labelledBy": "reglament-row-title-lighting",
         "titleHidden": false,
         "titleText": "Освещение территории",
       }
