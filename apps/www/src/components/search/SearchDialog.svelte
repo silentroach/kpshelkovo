@@ -72,13 +72,24 @@
   };
 
   const resultRow = (result: SearchResult): SearchDialogResultRow => {
-    const anchoredResult = result.subResults.find((item) => hasAnchor(item.url));
+    const primaryExcerpt = result.excerptHtml?.replace(/\s+/gu, ' ').trim();
+    const matchingResults = primaryExcerpt
+      ? result.subResults.filter(
+          (item) => item.excerptHtml?.replace(/\s+/gu, ' ').trim() === primaryExcerpt
+        )
+      : [];
+    const targets = new Set(matchingResults.map((item) => item.url));
+    const matchedResult = matchingResults[0];
+    const anchoredResult =
+      targets.size === 1 && matchedResult && hasAnchor(matchedResult.url)
+        ? matchedResult
+        : undefined;
 
     return {
       contextTitle: anchoredResult?.title,
       result,
       url: anchoredResult?.url ?? result.url,
-      excerptHtml: anchoredResult?.excerptHtml ?? result.excerptHtml
+      excerptHtml: primaryExcerpt ? result.excerptHtml : undefined
     };
   };
 

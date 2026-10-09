@@ -315,7 +315,7 @@ describe('Pagefind search client', () => {
     expect(search.mock.calls.filter(([query]) => query === '"еда"')).toHaveLength(2);
   });
 
-  it('normalizes allowlisted result fields and anchored sub-results', async () => {
+  it('preserves same-document sub-results in Pagefind order without internal scoring', async () => {
     const { runtime } = runtimeWith(
       responseWith(
         {
@@ -334,7 +334,7 @@ describe('Pagefind search client', () => {
             {
               url: '/news/item/?h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5',
               title: 'Страница целиком',
-              excerpt: 'Без якоря'
+              excerpt: '  Без\nякоря и &lt;script&gt;alert(1)&lt;/script&gt;'
             },
             {
               url: '/news/item/?h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#overview',
@@ -351,6 +351,16 @@ describe('Pagefind search client', () => {
             {
               url: '/news/other/#details',
               title: 'Другой документ',
+              excerpt: 'Не должен попасть в результат'
+            },
+            {
+              url: 'https://example.com/news/item/#details',
+              title: 'Внешний документ',
+              excerpt: 'Не должен попасть в результат'
+            },
+            {
+              url: '/news/other/',
+              title: 'Другой документ без якоря',
               excerpt: 'Не должен попасть в результат'
             }
           ]
@@ -385,14 +395,19 @@ describe('Pagefind search client', () => {
             },
             "subResults": [
               {
-                "excerptHtml": "Еще <mark>текст</mark>",
-                "title": "Подробности",
-                "url": "/news/item/?h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#details",
+                "excerptHtml": "Без якоря и &lt;script&gt;alert(1)&lt;/script&gt;",
+                "title": "Страница целиком",
+                "url": "/news/item/?h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5",
               },
               {
                 "excerptHtml": "Общий фрагмент",
                 "title": "Обзор",
                 "url": "/news/item/?h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#overview",
+              },
+              {
+                "excerptHtml": "Еще <mark>текст</mark>",
+                "title": "Подробности",
+                "url": "/news/item/?h=%D1%82%D0%B5%D0%BA%D1%81%D1%82&h=%D1%81%D0%BE%D0%B2%D0%BF%D0%B0%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5#details",
               },
             ],
             "title": "Заголовок новости",

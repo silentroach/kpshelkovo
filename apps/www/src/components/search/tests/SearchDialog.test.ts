@@ -914,7 +914,7 @@ describe('SearchDialog', () => {
       url: '/news/long-page/',
       title: 'Основная страница',
       section: { id: 'news', label: 'Новости' },
-      excerptHtml: 'Текст страницы с <mark>совпадением</mark>',
+      excerptHtml: 'Якорный <mark>фрагмент</mark>',
       subResults: [
         {
           url: '/news/long-page/#',
@@ -966,6 +966,139 @@ describe('SearchDialog', () => {
     expect(describedLink?.textContent).toContain('Описание <strong>остается текстом</strong>');
     expect(describedLink?.querySelector('strong')).toBeNull();
   });
+
+  it.each([
+    {
+      name: 'unrelated anchor',
+      excerpts: ['Чужой <mark>фрагмент</mark>'],
+      targets: ['#other'],
+      anchored: false
+    },
+    {
+      name: 'later matching anchor',
+      excerpts: [
+        'Чужой <mark>фрагмент</mark>',
+        'Текст с <mark>совпадением</mark> и &lt;script&gt;'
+      ],
+      targets: ['#other', '#details'],
+      anchored: true
+    },
+    {
+      name: 'normalized whitespace',
+      excerpts: ['  Текст\nс <mark>совпадением</mark>  и &lt;script&gt;  '],
+      targets: ['#details'],
+      anchored: true
+    },
+    {
+      name: 'duplicate target',
+      excerpts: [
+        'Текст с <mark>совпадением</mark> и &lt;script&gt;',
+        'Текст с <mark>совпадением</mark> и &lt;script&gt;'
+      ],
+      targets: ['#details', '#details'],
+      anchored: true
+    },
+    {
+      name: 'multiple anchors',
+      excerpts: [
+        'Текст с <mark>совпадением</mark> и &lt;script&gt;',
+        'Текст с <mark>совпадением</mark> и &lt;script&gt;'
+      ],
+      targets: ['#details', '#other'],
+      anchored: false
+    },
+    {
+      name: 'canonical and anchor',
+      excerpts: [
+        'Текст с <mark>совпадением</mark> и &lt;script&gt;',
+        'Текст с <mark>совпадением</mark> и &lt;script&gt;'
+      ],
+      targets: ['', '#details'],
+      anchored: false
+    },
+    {
+      name: 'canonical match',
+      excerpts: ['Текст с <mark>совпадением</mark> и &lt;script&gt;'],
+      targets: [''],
+      anchored: false
+    },
+    {
+      name: 'missing sub-result excerpt',
+      excerpts: [undefined],
+      targets: ['#details'],
+      anchored: false
+    },
+    {
+      name: 'empty sub-result excerpt',
+      excerpts: [' \n '],
+      targets: ['#details'],
+      anchored: false
+    },
+    {
+      name: 'empty anchor',
+      excerpts: ['Текст с <mark>совпадением</mark> и &lt;script&gt;'],
+      targets: ['#'],
+      anchored: false
+    },
+    { name: 'no sub-results', excerpts: [], targets: [], anchored: false }
+  ])('preserves the primary excerpt with $name', async ({ excerpts, targets, anchored }) => {
+    const primaryExcerpt = 'Текст с <mark>совпадением</mark> и &lt;script&gt;';
+    const url = '/news/long-page/?h=совпадение';
+    const result: SearchResult = {
+      url,
+      title: 'Основная страница',
+      section: { id: 'news', label: 'Новости' },
+      excerptHtml: primaryExcerpt,
+      subResults: excerpts.map((excerptHtml, index) => ({
+        url: `${url}${targets[index]}`,
+        title: 'Контекст секции',
+        excerptHtml
+      }))
+    };
+    const client: SearchClient = { search: async (query) => readyResponse(query, [result]) };
+    const opener = addOpener('Поиск');
+    const view = render(SearchDialog, { props: { client } });
+    await requestOpen(opener);
+    await enterDebouncedQuery(view.getByRole('searchbox'), 'совпадение');
+    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(1));
+    const link = view.getByRole('link');
+    expect(link.getAttribute('href')).toBe(`${url}${anchored ? '#details' : ''}`);
+    expect(link.querySelector('p')?.textContent).toBe(
+      `${anchored ? 'Контекст секции:\u00a0' : ''}Текст с совпадением и <script>`
+    );
+    expect(link.querySelector('mark')?.textContent).toBe('совпадением');
+    expect(link.querySelector('script')).toBeNull();
+  });
+
+  it.each([undefined, '', ' \n '])(
+    'does not replace an absent primary excerpt (%j)',
+    async (excerptHtml) => {
+      const result: SearchResult = {
+        url: '/news/long-page/',
+        title: 'Основная страница',
+        section: { id: 'news', label: 'Новости' },
+        description: 'Описание страницы',
+        excerptHtml,
+        subResults: [
+          {
+            url: '/news/long-page/#details',
+            title: 'Чужая секция',
+            excerptHtml: 'Чужой <mark>фрагмент</mark>'
+          }
+        ]
+      };
+      const client: SearchClient = { search: async (query) => readyResponse(query, [result]) };
+      const opener = addOpener('Поиск');
+      const view = render(SearchDialog, { props: { client } });
+      await requestOpen(opener);
+      await enterDebouncedQuery(view.getByRole('searchbox'), 'совпадение');
+      await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(1));
+      const link = view.getByRole('link');
+      expect(link.getAttribute('href')).toBe(result.url);
+      expect(link.textContent).not.toContain('Чужой фрагмент');
+      expect(link.textContent).toContain('Описание страницы');
+    }
+  );
 
   it('handles empty, unavailable, current errors, and stale thrown errors', async () => {
     const staleRequest = deferred<SearchResponse | undefined>();
