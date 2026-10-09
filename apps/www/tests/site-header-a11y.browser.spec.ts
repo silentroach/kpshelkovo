@@ -212,6 +212,84 @@ test('shows non-color keyboard focus on the brand at desktop and mobile sizes', 
   }
 });
 
+for (const hasTouch of [false, true]) {
+  for (const path of ['/reviews/', '/']) {
+    test(`keeps the closed mobile panel transparent during logo navigation from ${path} (${hasTouch ? 'touch' : 'mouse'})`, async ({
+      baseURL,
+      browser
+    }) => {
+      const context = await browser.newContext({
+        baseURL,
+        hasTouch,
+        viewport: { width: 390, height: 844 }
+      });
+      const page = await context.newPage();
+
+      try {
+        await page.goto(path);
+        await expect(page.locator('details.site-header-menu')).toHaveAttribute(
+          'data-site-header-menu-hydrated',
+          'true'
+        );
+        await page.evaluate(() => {
+          for (const eventName of ['astro:after-swap', 'astro:page-load']) {
+            document.addEventListener(
+              eventName,
+              () => {
+                const panel = document.querySelector('.site-header-mobile-panel');
+                if (!panel) throw new Error('Expected mobile menu panel');
+                sessionStorage.setItem(eventName, getComputedStyle(panel).opacity);
+              },
+              { once: true }
+            );
+          }
+        });
+
+        const brand = page.getByRole('link', { name: 'Шелково Онлайн' });
+        if (hasTouch) {
+          await brand.tap();
+        } else {
+          await brand.click();
+        }
+        await expect
+          .poll(() => page.evaluate(() => sessionStorage.getItem('astro:page-load')))
+          .toBe('0');
+        expect(await page.evaluate(() => sessionStorage.getItem('astro:after-swap'))).toBe('0');
+        await expect(page).toHaveURL('/');
+
+        const trigger = page.locator('summary[aria-label="Меню"]');
+        await trigger.click();
+        await expect(page.locator('.site-header-mobile-panel')).toHaveCSS('opacity', '1');
+      } finally {
+        await context.close();
+      }
+    });
+  }
+}
+
+test('keeps the mobile menu usable without JavaScript', async ({ baseURL, browser }) => {
+  const context = await browser.newContext({
+    baseURL,
+    javaScriptEnabled: false,
+    viewport: { width: 390, height: 844 }
+  });
+  const page = await context.newPage();
+
+  try {
+    await page.goto('/reviews/');
+    const trigger = page.locator('summary[aria-label="Меню"]');
+    const panel = page.locator('.site-header-mobile-panel');
+    await expect(panel).toBeHidden();
+    await trigger.click();
+    await expect(panel).toBeVisible();
+    await expect(panel).toHaveCSS('opacity', '1');
+    await trigger.click();
+    await expect(panel).toBeHidden();
+  } finally {
+    await context.close();
+  }
+});
+
 test('shows keyboard-only focus on the mobile menu button', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/reviews/', { waitUntil: 'networkidle' });
