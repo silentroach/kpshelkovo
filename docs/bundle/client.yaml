@@ -16,7 +16,7 @@ static/BaseLayout.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/scripts/search-dialog-loader.ts:
     rendered: 157
   apps/www/src/scripts/site-runtime.ts:
-    rendered: 13368
+    rendered: 15614
 static/ClientRouter.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   astro:transitions/client:
     rendered: 0
@@ -68,7 +68,7 @@ static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/place-map-url.ts:
     rendered: 698
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 47437
+    rendered: 47633
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:
@@ -342,6 +342,9 @@ static/esm.XXXXXXXX.js:
     rendered: 1491
   node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/YMapClusterer/YMapClusterer.js:
     rendered: 3655
+static/events.XXXXXXXX.js:
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/events/index.js:
+    rendered: 0
 static/explorer-component.XXXXXXXX.js:
   apps/www/src/compare/client/explorer-component.ts:
     rendered: 274
@@ -350,11 +353,11 @@ static/explorer-component.XXXXXXXX.js:
   apps/www/src/compare/components/SettlementCard.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/compare/components/SettlementMap.svelte:
-    rendered: 16221
+    rendered: 16291
   apps/www/src/compare/components/SettlementMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/compare/components/SettlementsExplorer.svelte:
-    rendered: 15955
+    rendered: 15764
   apps/www/src/compare/components/SettlementsExplorer.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/compare/lib/format.ts:
@@ -369,6 +372,22 @@ static/explorer-component.XXXXXXXX.js:
     rendered: 1119
   node_modules/.pnpm/@turf+invariant@7.4.0/node_modules/@turf/invariant/dist/esm/index.js:
     rendered: 620
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/reactivity/date.js:
+    rendered: 0
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/reactivity/index-client.js:
+    rendered: 0
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/reactivity/map.js:
+    rendered: 0
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/reactivity/media-query.js:
+    rendered: 626
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/reactivity/reactive-value.js:
+    rendered: 330
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/reactivity/set.js:
+    rendered: 0
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/reactivity/url-search-params.js:
+    rendered: 0
+  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/reactivity/url.js:
+    rendered: 0
   packages/format/src/currency.ts:
     rendered: 302
   packages/format/src/locale.ts:
@@ -385,8 +404,8 @@ static/index.astro_astro_type_script_index_0_lang-2.XXXXXXXX.js:
     rendered: 1162
   apps/www/src/pages/index.astro?astro&type=script&index=0&lang.ts:
     rendered: 107
-  node_modules/.pnpm/suncalc@2.0.2/node_modules/suncalc/index.js:
-    rendered: 8016
+  node_modules/.pnpm/suncalc@2.1.1/node_modules/suncalc/index.js:
+    rendered: 8386
   packages/geo/src/solar.ts:
     rendered: 434
 static/index.astro_astro_type_script_index_0_lang-3.XXXXXXXX.js:
@@ -415,8 +434,6 @@ static/lazy.XXXXXXXX.js:
     rendered: 0
   apps/www/src/lib/search/client.ts:
     rendered: 12753
-  node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/events/index.js:
-    rendered: 0
   packages/ui/src/icons/system/Search.svelte:
     rendered: 517
 static/lifecycle.XXXXXXXX.js:
@@ -444,7 +461,7 @@ static/prefetch.XXXXXXXX.js:
     rendered: 92
 static/preload-helper.XXXXXXXX.js:
   vite/preload-helper.js:
-    rendered: 2401
+    rendered: 2841
 static/rating.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/pages/815/compare/rating.astro?astro&type=script&index=0&lang.ts:
     rendered: 1094

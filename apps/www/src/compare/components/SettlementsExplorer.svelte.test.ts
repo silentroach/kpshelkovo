@@ -133,20 +133,30 @@ function cardNames(container: HTMLElement): string[] {
 const currentPath = (): string =>
   `${window.location.pathname}${window.location.search}${window.location.hash}`;
 
-function setScreen(mobile: boolean): void {
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: vi.fn().mockImplementation((query: string) => ({
-      matches: mobile && query.includes('max-width: 767px'),
-      media: query,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn()
-    }))
-  });
-}
+const setViewport = (initialWidth: number) => {
+  let width = initialWidth;
+  const query = '(max-width: 767px)';
+  const matchMedia = window.matchMedia.bind(window);
+  const media = matchMedia(query);
+  vi.spyOn(media, 'matches', 'get').mockImplementation(() => width <= 767);
+  vi.spyOn(window, 'matchMedia').mockImplementation((nextQuery) =>
+    nextQuery === query ? media : matchMedia(nextQuery)
+  );
+
+  return {
+    media,
+    resize: (nextWidth: number): void => {
+      width = nextWidth;
+      media.dispatchEvent(
+        new MediaQueryListEvent('change', { matches: media.matches, media: query })
+      );
+    }
+  };
+};
+
+const setScreen = (mobile: boolean): void => {
+  setViewport(mobile ? 767 : 768);
+};
 
 describe('SettlementsExplorer', () => {
   beforeEach(() => {
@@ -174,6 +184,84 @@ describe('SettlementsExplorer', () => {
     await waitFor(() => {
       expect(container.querySelector('[data-testid="filtered-map"]')).toBeNull();
     });
+  });
+
+  it.each([767, 768])(
+    'updates both filter labels across the breakpoint from %ipx without changing the initial map choice',
+    async (width) => {
+      const { resize } = setViewport(width);
+      const { getByTestId, queryByTestId, getByRole } = render(SettlementsExplorer, {
+        props: { settlements, comparisons, stats }
+      });
+      await waitFor(() => expect(getByTestId('map-toggle').hasAttribute('disabled')).toBe(false));
+
+      for (const nextWidth of [width, width === 767 ? 768 : 767, width]) {
+        resize(nextWidth);
+        await waitFor(() => {
+          expect(
+            getByRole('radio', {
+              name: nextWidth <= 767 ? 'Дешевле' : 'Дешевле Шелково'
+            })
+          ).toBeTruthy();
+          expect(
+            getByRole('radio', {
+              name: nextWidth <= 767 ? 'Дороже' : 'Дороже Шелково'
+            })
+          ).toBeTruthy();
+        });
+        expect(Boolean(queryByTestId('filtered-map'))).toBe(width === 768);
+      }
+    }
+  );
+
+  it.each([767, 768])(
+    'preserves the manual map choice through resize in both directions from %ipx',
+    async (width) => {
+      const { resize } = setViewport(width);
+      const { getByTestId, queryByTestId, getByRole } = render(SettlementsExplorer, {
+        props: { settlements, comparisons, stats }
+      });
+      const button = getByTestId('map-toggle');
+      await waitFor(() => expect(button.hasAttribute('disabled')).toBe(false));
+      await fireEvent.click(button);
+
+      for (const nextWidth of [width === 767 ? 768 : 767, width]) {
+        resize(nextWidth);
+        await waitFor(() =>
+          expect(
+            getByRole('radio', {
+              name: nextWidth <= 767 ? 'Дешевле' : 'Дешевле Шелково'
+            })
+          ).toBeTruthy()
+        );
+        expect(Boolean(queryByTestId('filtered-map'))).toBe(width === 767);
+        expect(button.getAttribute('aria-expanded')).toBe(String(width === 767));
+      }
+    }
+  );
+
+  it('releases the media subscription after unmount and reconnects only once on remount', async () => {
+    const { media, resize } = setViewport(767);
+    const add = vi.spyOn(media, 'addEventListener');
+    const remove = vi.spyOn(media, 'removeEventListener');
+    const first = render(SettlementsExplorer, { props: { settlements, comparisons, stats } });
+    await waitFor(() => expect(add).toHaveBeenCalledOnce());
+
+    first.unmount();
+    await waitFor(() => expect(remove).toHaveBeenCalledOnce());
+    expect(remove.mock.calls[0]?.slice(0, 2)).toEqual(add.mock.calls[0]?.slice(0, 2));
+
+    resize(768);
+    const second = render(SettlementsExplorer, { props: { settlements, comparisons, stats } });
+    await waitFor(() => expect(add).toHaveBeenCalledTimes(2));
+    expect(second.getByTestId('map-toggle').getAttribute('aria-expanded')).toBe('true');
+    resize(767);
+    await waitFor(() => expect(second.getByRole('radio', { name: 'Дешевле' })).toBeTruthy());
+    expect(add).toHaveBeenCalledTimes(2);
+
+    second.unmount();
+    await waitFor(() => expect(remove).toHaveBeenCalledTimes(2));
+    expect(remove.mock.calls[1]?.slice(0, 2)).toEqual(add.mock.calls[1]?.slice(0, 2));
   });
 
   it('keeps the map button label and disclosure state in sync', async () => {

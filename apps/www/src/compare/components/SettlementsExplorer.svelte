@@ -2,6 +2,7 @@
   import { compareRuText } from '@shelkovo/format';
   import { calculateDistance } from '@shelkovo/geo';
   import { onMount } from 'svelte';
+  import { MediaQuery } from 'svelte/reactivity';
 
   import { formatTariffAuto, getTariffHint } from '@/compare/lib/format';
 
@@ -79,7 +80,7 @@
   let sortBy = $state<ExplorerSort>(DEFAULT_EXPLORER_QUERY.sortBy);
   let priceFilter = $state<ExplorerPriceFilter>(DEFAULT_EXPLORER_QUERY.priceFilter);
   let showMap = $state(false);
-  let mobile = $state(false);
+  const mobile = new MediaQuery('(max-width: 767px)', false);
   let controlsReady = $state(false);
   let mapFitRevision = $state(0);
 
@@ -182,19 +183,8 @@
     mapFitRevision += 1;
     syncExplorerUrl();
 
-    const media = window.matchMedia('(max-width: 767px)');
-    mobile = media.matches;
-    showMap = !mobile;
+    showMap = !mobile.current;
     controlsReady = true;
-
-    const onChange = (e: MediaQueryListEvent) => {
-      mobile = e.matches;
-    };
-    media.addEventListener('change', onChange);
-
-    return () => {
-      media.removeEventListener('change', onChange);
-    };
   });
 </script>
 
@@ -244,7 +234,7 @@
                 ? 'ui-btn-primary ui-btn-soft'
                 : 'ui-btn-ghost'}"
             >
-              {mobile ? 'Дешевле' : 'Дешевле Шелково'}
+              {controlsReady && mobile.current ? 'Дешевле' : 'Дешевле Шелково'}
               <span
                 class="filter-count filter-count--cheaper"
                 aria-hidden="true"
@@ -272,7 +262,7 @@
                 ? 'ui-btn-primary ui-btn-soft'
                 : 'ui-btn-ghost'}"
             >
-              {mobile ? 'Дороже' : 'Дороже Шелково'}
+              {controlsReady && mobile.current ? 'Дороже' : 'Дороже Шелково'}
               <span
                 class="filter-count filter-count--more"
                 aria-hidden="true"
