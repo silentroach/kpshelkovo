@@ -2,6 +2,7 @@
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 
+import StickyTableScript from '@/components/common/StickyTableScript.astro';
 import { estimate2026 } from '@/data/reglament/estimate-2026';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import {
@@ -1826,4 +1827,5 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
     document.addEventListener('astro:after-swap', hydrateCalculator);
     document.addEventListener('astro:page-load', hydrateCalculator);
   </script>
+  <StickyTableScript />
 </BaseLayout>

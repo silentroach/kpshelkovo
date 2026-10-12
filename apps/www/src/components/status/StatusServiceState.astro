@@ -23,6 +23,12 @@ const lifecycleWindows = summary.incidents
   {formatStatusServiceState(summary.serviceStatus)}
 </p>
 
+<script>
+  import { installStatusServiceStateHydration } from '@/lib/status/lifecycle.dom';
+
+  installStatusServiceStateHydration();
+</script>
+
 <style>
   .status-service-state[data-status-service-state='green'] {
     color: var(--color-success);

@@ -3,6 +3,7 @@ import CommonSpacesTable from '@/compare/components/CommonSpacesTable.svelte';
 import InfrastructureTable from '@/compare/components/InfrastructureTable.svelte';
 import ServiceTable from '@/compare/components/ServiceTable.svelte';
 import SourcesList from '@/compare/components/SourcesList.svelte';
+import StickyTableScript from '@/components/common/StickyTableScript.astro';
 import MapPreview from '@/components/maps/MapPreview.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
@@ -679,6 +680,7 @@ const assumption = tariffCalc?.assumption;
       </section>
     )}
   </main>
+  <StickyTableScript />
 </BaseLayout>
 
 <style>

@@ -8,6 +8,7 @@ import {
   VillageIcon,
 } from '@shelkovo/ui/icons';
 
+import StickyTableScript from '@/components/common/StickyTableScript.astro';
 import { fullReglamentDataset2026 } from '@/data/reglament/full-2026';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import {
@@ -160,108 +161,104 @@ const villageIcons = {
           Таблицы общего имущества
         </h2>
 
-        {
-          groups.map((group) => (
-            <section class="assets-group" aria-labelledby={group.category}>
-              <div class="assets-group-header" data-pagefind-body>
-                <h3
-                  id={group.category}
-                  class="ui-section-title"
-                  data-pagefind-weight="1.5"
-                >
-                  {group.title}
-                </h3>
-                <p class="assets-source" data-pagefind-weight="0.3">
-                  Источник:{' '}
-                  <ResourceLink
-                    class="ui-link"
-                    href={reglamentFullSourcePdfUrl()}
-                    type="application/pdf"
-                    reload
-                  >
-                    полный регламент
-                  </ResourceLink>
-                  , Приложение №2, стр. 128-130. Значения перенесены как
-                  справочные факты; пустые ячейки сохранены пустыми.
-                </p>
-              </div>
-
-              <div
-                class="reglament-table-shell ui-sticky-table-shell assets-table-shell"
-                data-ui-sticky-table-shell
+        {groups.map((group) => (
+          <section class="assets-group" aria-labelledby={group.category}>
+            <div class="assets-group-header" data-pagefind-body>
+              <h3
+                id={group.category}
+                class="ui-section-title"
+                data-pagefind-weight="1.5"
               >
-                <table class="assets-table">
-                  <caption class="ui-visually-hidden">{group.title}</caption>
-                  <thead class="assets-table-head">
-                    <tr>
-                      <th class="assets-table-heading assets-table-object">
-                        Объект
-                      </th>
-                      <th class="assets-table-heading">Ед. изм.</th>
-                      {fullReglamentDataset2026.villages.map((village) => {
-                        const AreaIcon = villageIcons[village.id];
+                {group.title}
+              </h3>
+              <p class="assets-source" data-pagefind-weight="0.3">
+                Источник:{' '}
+                <ResourceLink
+                  class="ui-link"
+                  href={reglamentFullSourcePdfUrl()}
+                  type="application/pdf"
+                  reload
+                >
+                  полный регламент
+                </ResourceLink>
+                , Приложение №2, стр. 128-130. Значения перенесены как
+                справочные факты; пустые ячейки сохранены пустыми.
+              </p>
+            </div>
 
-                        return (
-                          <th class="assets-table-heading assets-table-number">
-                            <span class="assets-village">
-                              <AreaIcon class="assets-village-icon" />
-                              <span>
-                                {village.title.replace('Шелково ', '')}
-                              </span>
-                            </span>
-                          </th>
-                        );
-                      })}
-                      <th class="assets-table-heading assets-table-number assets-table-total-heading">
-                        Всего
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {group.assets.map((asset) => {
-                      const note = publicVerificationNote(
-                        asset.verification_note,
-                      );
+            <div
+              class="reglament-table-shell ui-sticky-table-shell assets-table-shell"
+              data-ui-sticky-table-shell
+            >
+              <table class="assets-table">
+                <caption class="ui-visually-hidden">{group.title}</caption>
+                <thead class="assets-table-head">
+                  <tr>
+                    <th class="assets-table-heading assets-table-object">
+                      Объект
+                    </th>
+                    <th class="assets-table-heading">Ед. изм.</th>
+                    {fullReglamentDataset2026.villages.map((village) => {
+                      const AreaIcon = villageIcons[village.id];
 
                       return (
-                        <tr>
-                          <td class="assets-table-cell">
-                            <div class="assets-item" data-pagefind-body>
-                              <h4
-                                id={`reglament-asset-${asset.id}`}
-                                class="assets-item-title"
-                                data-pagefind-weight="2"
-                              >
-                                {asset.title}
-                              </h4>
-                              <p class="ui-visually-hidden" aria-hidden="true">
-                                {assetSearchText(asset, group.title)}
-                              </p>
-                              {note && <p class="assets-note">{note}</p>}
-                            </div>
-                          </td>
-                          <td class="assets-table-cell assets-table-muted">
-                            {asset.unit ?? '-'}
-                          </td>
-                          {fullReglamentDataset2026.villages.map((village) => (
-                            <td class="assets-table-cell assets-table-number assets-table-muted">
-                              {displayQuantity(
-                                asset.values_by_village[village.id],
-                              )}
-                            </td>
-                          ))}
-                          <td class="assets-table-cell assets-table-number assets-table-total">
-                            {displayQuantity(asset.total)}
-                          </td>
-                        </tr>
+                        <th class="assets-table-heading assets-table-number">
+                          <span class="assets-village">
+                            <AreaIcon class="assets-village-icon" />
+                            <span>{village.title.replace('Шелково ', '')}</span>
+                          </span>
+                        </th>
                       );
                     })}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          ))
-        }
+                    <th class="assets-table-heading assets-table-number assets-table-total-heading">
+                      Всего
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {group.assets.map((asset) => {
+                    const note = publicVerificationNote(
+                      asset.verification_note,
+                    );
+
+                    return (
+                      <tr>
+                        <td class="assets-table-cell">
+                          <div class="assets-item" data-pagefind-body>
+                            <h4
+                              id={`reglament-asset-${asset.id}`}
+                              class="assets-item-title"
+                              data-pagefind-weight="2"
+                            >
+                              {asset.title}
+                            </h4>
+                            <p class="ui-visually-hidden" aria-hidden="true">
+                              {assetSearchText(asset, group.title)}
+                            </p>
+                            {note && <p class="assets-note">{note}</p>}
+                          </div>
+                        </td>
+                        <td class="assets-table-cell assets-table-muted">
+                          {asset.unit ?? '-'}
+                        </td>
+                        {fullReglamentDataset2026.villages.map((village) => (
+                          <td class="assets-table-cell assets-table-number assets-table-muted">
+                            {displayQuantity(
+                              asset.values_by_village[village.id],
+                            )}
+                          </td>
+                        ))}
+                        <td class="assets-table-cell assets-table-number assets-table-total">
+                          {displayQuantity(asset.total)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ))}
       </div>
     </section>
   </main>
@@ -451,4 +448,5 @@ const villageIcons = {
       }
     }
   </style>
+  <StickyTableScript />
 </BaseLayout>
