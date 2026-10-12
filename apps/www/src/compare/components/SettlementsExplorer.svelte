@@ -326,13 +326,15 @@
       <div class="sort-field">
         <select
           id={sortid}
-          value={sortBy}
+          bind:value={
+            () => sortBy,
+            (nextSort: ExplorerSort) => {
+              sortBy = nextSort;
+              syncExplorerUrl();
+            }
+          }
           disabled={!controlsReady}
           aria-label="Сортировка поселков"
-          onchange={(e) => {
-            sortBy = (e.currentTarget as HTMLSelectElement).value as typeof sortBy;
-            syncExplorerUrl();
-          }}
           class="sort-select"
           data-testid="sort-select"
         >
