@@ -27,7 +27,8 @@ const CONTACT_CATEGORY_LABELS: Record<ContactCategory, string> = {
   garden: 'Сад и участок',
   food: 'Еда и продукты',
   electricity: 'Электричество',
-  education: 'Дети и обучение'
+  education: 'Дети и обучение',
+  travel: 'Путешествия'
 };
 
 const CONTACT_CATEGORY_EMOJI: Record<ContactCategory, string> = {
@@ -38,7 +39,8 @@ const CONTACT_CATEGORY_EMOJI: Record<ContactCategory, string> = {
   garden: '🌿',
   food: '🍕',
   electricity: '⚡',
-  education: '📚'
+  education: '📚',
+  travel: '✈️'
 };
 
 const CONTACT_REVIEW_SENTIMENT_LABELS: Record<ContactReview['sentiment'], string> = {
@@ -54,9 +56,9 @@ export const CONTACTS_PROSE = 'ui-prose ui-prose-narrow';
 export const CONTACTS_CHAT_LABEL = 'чате жителей Шелково';
 export const CONTACTS_CHAT_URL = 'https://t.me/shelkovoecoclub';
 
-export const CONTACTS_INTRO_PREFIX = 'Сарафан собирается из опыта соседей в ';
+export const CONTACTS_INTRO_PREFIX = 'Сарафан собирается из отзывов и самопрезентаций соседей в ';
 export const CONTACTS_INTRO_SUFFIX =
-  ': кого позвали, как прошла работа, к кому готовы обратиться снова. Лучше меньше контактов, зато с понятным живым контекстом.';
+  '. Здесь можно найти исполнителей по опыту жителей и познакомиться с услугами самих соседей.';
 export const CONTACTS_NEIGHBOR_TABLE_PREFIX = ' Также есть ';
 export const CONTACTS_NEIGHBOR_TABLE_LABEL = 'табличка из соседнего чата Гринвуда';
 export const CONTACTS_NEIGHBOR_TABLE_URL =

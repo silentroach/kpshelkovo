@@ -93,7 +93,7 @@ describe('contacts markdown companions', () => {
     expect(markdown).toMatchInlineSnapshot(`
       "# Сарафан
 
-      Сарафан собирается из опыта соседей в [чате жителей Шелково](https://t.me/shelkovoecoclub): кого позвали, как прошла работа, к кому готовы обратиться снова. Лучше меньше контактов, зато с понятным живым контекстом. Также есть [табличка из соседнего чата Гринвуда](https://docs.google.com/spreadsheets/d/1ckmDY1B54Mx9UB1chbybwdbPTF87R--uv2li7VhCfg8/edit?usp=drivesdk).
+      Сарафан собирается из отзывов и самопрезентаций соседей в [чате жителей Шелково](https://t.me/shelkovoecoclub). Здесь можно найти исполнителей по опыту жителей и познакомиться с услугами самих соседей. Также есть [табличка из соседнего чата Гринвуда](https://docs.google.com/spreadsheets/d/1ckmDY1B54Mx9UB1chbybwdbPTF87R--uv2li7VhCfg8/edit?usp=drivesdk).
 
       ## Категории
 
