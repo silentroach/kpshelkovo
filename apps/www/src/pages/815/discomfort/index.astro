@@ -49,9 +49,6 @@ const events = data.events.map((event) => ({
   dateHtml: formatDynamicHtml(formatDiscomfortDate(event.dateIso)),
   titleHtml: formatDynamicHtml(event.title),
 }));
-const latestDateHtml = data.latestEvent
-  ? formatDynamicHtml(formatDiscomfortDate(data.latestEvent.dateIso))
-  : undefined;
 ---
 
 <BaseLayout
@@ -68,7 +65,7 @@ const latestDateHtml = data.latestEvent
 >
   <main class="ui-page discomfort-page">
     <section class="ui-page-header">
-      <div class="ui-page-header-stack discomfort-content">
+      <div class="ui-page-header-stack">
         <Breadcrumbs items={breadcrumbs} />
 
         <div>
@@ -108,23 +105,17 @@ const latestDateHtml = data.latestEvent
 
           <div class="discomfort-lead">
             <p class="ui-copy">{DISCOMFORT_LEAD}</p>
-            {data.latestEvent && latestDateHtml && (
-              <p class="discomfort-latest">
-                Последнее событие —{' '}
-                <time
-                  datetime={data.latestEvent.dateIso}
-                  set:html={latestDateHtml}
-                />
-              </p>
-            )}
           </div>
         </div>
       </div>
     </section>
 
     <section class="discomfort-timeline" aria-labelledby="timeline-title">
-      <div class="discomfort-content">
-        <h2 id="timeline-title" class="ui-visually-hidden">
+      <div>
+        <h2
+          id="timeline-title"
+          class="ui-prose-title discomfort-timeline-title"
+        >
           Хронология
         </h2>
         <ol class="discomfort-events" role="list">
@@ -170,21 +161,23 @@ const latestDateHtml = data.latestEvent
   .discomfort-page {
     padding-bottom: 2.5rem;
   }
-  .discomfort-content {
-    max-width: 64rem;
-  }
   .discomfort-quote {
     margin-top: 1.75rem;
+    margin-left: auto;
     max-width: 56rem;
     background: var(--color-primary-soft);
-    padding: 1.75rem 1.25rem;
+    padding: 1.25rem;
   }
-  .discomfort-quote-content,
+  .discomfort-quote-text {
+    font-size: 1.5rem;
+    line-height: 1.25;
+    hyphens: none;
+  }
   .discomfort-lead {
     max-width: 48rem;
   }
   .discomfort-quote-caption {
-    margin: 1.75rem 0 0 auto;
+    margin: 1.25rem 0 0 auto;
     max-width: 36rem;
     text-align: right;
     font-size: 0.875rem;
@@ -195,17 +188,16 @@ const latestDateHtml = data.latestEvent
     margin-top: 1.5rem;
     color: var(--color-text-muted);
   }
-  .discomfort-latest {
-    margin-top: 0.75rem;
-    font-size: 0.875rem;
-    line-height: 1.5rem;
-  }
   .discomfort-timeline {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     padding-inline: 1.25rem;
   }
   .discomfort-events {
     list-style: none;
+  }
+  .discomfort-timeline-title {
+    margin-bottom: 1.5rem;
+    margin-left: 2rem;
   }
   .discomfort-event {
     display: grid;
@@ -221,6 +213,13 @@ const latestDateHtml = data.latestEvent
     grid-row: 1;
     font-size: 0.875rem;
     line-height: 1.5rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+  .discomfort-event-date:hover,
+  .discomfort-event-date:focus-visible {
+    color: var(--color-primary);
+    text-decoration: underline;
   }
   .discomfort-event-marker {
     position: relative;
@@ -276,23 +275,24 @@ const latestDateHtml = data.latestEvent
       padding-bottom: 3.5rem;
     }
     .discomfort-quote {
-      margin-top: 2rem;
-      padding: 2.5rem 2.25rem;
-    }
-    .discomfort-quote blockquote {
-      padding-inline: 1.25rem;
+      width: 85%;
+      margin-top: 1.75rem;
+      padding: 1.5rem 2rem;
     }
     .discomfort-quote-text {
-      font-size: 2.25rem;
-      line-height: 1.12;
+      font-size: 1.75rem;
+      line-height: 1.25;
     }
     .discomfort-quote-caption {
       font-size: 1rem;
       line-height: 1.75rem;
     }
     .discomfort-timeline {
-      margin-top: 2.5rem;
+      margin-top: 1.75rem;
       padding-inline: 1.5rem;
+    }
+    .discomfort-timeline-title {
+      margin-left: 14rem;
     }
     .discomfort-event {
       grid-template-columns: 10rem 1rem minmax(0, 1fr);
@@ -316,6 +316,9 @@ const latestDateHtml = data.latestEvent
     }
   }
   @media (min-width: 64rem) {
+    .discomfort-quote {
+      width: 75%;
+    }
     .discomfort-page {
       padding-bottom: 4rem;
     }

@@ -2,7 +2,7 @@ import {
   createMarkdownDocument,
   md,
   parseMarkdownFragment,
-  serializeMarkdownDocument,
+  serializeMarkdownDocument
 } from '@shelkovo/markdown';
 
 import { absoluteUrl } from '@/lib/site';
@@ -12,14 +12,14 @@ import {
   DISCOMFORT_PAGE_TITLE,
   DISCOMFORT_QUOTE,
   DISCOMFORT_QUOTE_TIMESTAMP,
-  DISCOMFORT_QUOTE_TIMESTAMP_URL,
+  DISCOMFORT_QUOTE_TIMESTAMP_URL
 } from './config';
 import type { DiscomfortDataset, DiscomfortEvent } from './types';
 import { formatDiscomfortDate } from './view';
 
 export const DISCOMFORT_MARKDOWN_HEADERS = {
   'Content-Type': 'text/markdown; charset=utf-8',
-  'X-Robots-Tag': 'noindex, follow',
+  'X-Robots-Tag': 'noindex, follow'
 } as const;
 
 type MarkdownListItem = ReturnType<typeof md.listItem>;
@@ -31,9 +31,9 @@ const eventListItem = (event: DiscomfortEvent): MarkdownListItem =>
   md.listItem(
     [
       md.paragraph(`${formatDiscomfortDate(event.dateIso)} — ${event.title}.`),
-      ...(parseMarkdownFragment(event.body) as MarkdownListBlocks),
+      ...(parseMarkdownFragment(event.body) as MarkdownListBlocks)
     ],
-    { spread: true },
+    { spread: true }
   );
 
 export const buildDiscomfortMarkdown = (data: DiscomfortDataset): string =>
@@ -46,28 +46,18 @@ export const buildDiscomfortMarkdown = (data: DiscomfortDataset): string =>
           md.link(
             abs(data.quoteAuthor.htmlUrl),
             data.quoteAuthor.label,
-            data.quoteAuthor.linkTitle,
+            data.quoteAuthor.linkTitle
           ),
           md.text(' на встрече по новому тарифу, '),
-          md.link(
-            abs(DISCOMFORT_QUOTE_TIMESTAMP_URL),
-            DISCOMFORT_QUOTE_TIMESTAMP,
-          ),
-          md.text('.'),
+          md.link(abs(DISCOMFORT_QUOTE_TIMESTAMP_URL), DISCOMFORT_QUOTE_TIMESTAMP),
+          md.text('.')
         ]),
         md.paragraph(DISCOMFORT_LEAD),
-        ...(data.latestEvent
-          ? [
-              md.paragraph(
-                `Последнее событие — ${formatDiscomfortDate(data.latestEvent.dateIso)}.`,
-              ),
-            ]
-          : []),
         md.heading(2, 'Хронология'),
         md.list(data.events.map(eventListItem), {
           ordered: true,
-          spread: true,
-        }),
-      ],
-    }),
+          spread: true
+        })
+      ]
+    })
   );

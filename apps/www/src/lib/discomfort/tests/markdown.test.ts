@@ -5,18 +5,13 @@ import { createPersonMentionTarget } from '@/lib/people/mentions';
 import { buildDiscomfortMarkdown } from '../markdown';
 import type { DiscomfortDataset, DiscomfortEvent } from '../types';
 
-const event = (
-  slug: string,
-  dateIso: string,
-  title: string,
-  body: string,
-): DiscomfortEvent => ({
+const event = (slug: string, dateIso: string, title: string, body: string): DiscomfortEvent => ({
   slug,
   dateIso,
   title,
   url: `/815/discomfort/#${slug}`,
   body,
-  mentions: [],
+  mentions: []
 });
 
 describe('buildDiscomfortMarkdown', () => {
@@ -26,14 +21,14 @@ describe('buildDiscomfortMarkdown', () => {
         'bills',
         '2026-04-29',
         'Счета по 815 ₽',
-        'ОК выставила **счета**. [Источник](/news/first/).',
+        'ОК выставила **счета**. [Источник](/news/first/).'
       ),
       event(
         'passes',
         '2026-08-20',
         'Гостевые пропуска',
-        'Комментарий [Юрия Кизилова](/people/ykizilov/).',
-      ),
+        'Комментарий [Юрия Кизилова](/people/ykizilov/).'
+      )
     ];
     const data: DiscomfortDataset = {
       events,
@@ -43,8 +38,8 @@ describe('buildDiscomfortMarkdown', () => {
         'Юрий Кизилов',
         undefined,
         'ОК "Комфорт"',
-        'Руководитель',
-      ),
+        'Руководитель'
+      )
     };
 
     expect(buildDiscomfortMarkdown(data)).toMatchInlineSnapshot(`
@@ -55,8 +50,6 @@ describe('buildDiscomfortMarkdown', () => {
       [Юрий Кизилов](https://kpshelkovo.online/people/ykizilov/ "Руководитель, ОК \\"Комфорт\\"") на встрече по новому тарифу, [01:39:30](https://kpshelkovo.online/meetings/2026-02-21-ok/#t-01-39-30).
 
       Хронология того, как спор о повышении тарифа с 544 до 815 ₽ перешел из счетов и переговоров в ограничения для жителей.
-
-      Последнее событие — 20 августа 2026 года.
 
       ## Хронология
 
