@@ -459,7 +459,6 @@
 
   const excerptSegments = (
     excerptHtml: string,
-    contextTitle?: string,
     breakBeforeComparison = false
   ): readonly SearchExcerptSegment[] => {
     const decoder = document.createElement('textarea');
@@ -481,13 +480,6 @@
       if (decoder.value) {
         segments.push({ highlighted, text: decoder.value });
       }
-    }
-
-    if (contextTitle && !excerptStartsWithTitle(segments, contextTitle)) {
-      segments.unshift({
-        highlighted: false,
-        text: `${contextTitle}:\u00a0`
-      });
     }
 
     if (!breakBeforeComparison) {
@@ -645,9 +637,11 @@
                   {#if row.excerptHtml}
                     {@const segments = excerptSegments(
                       row.excerptHtml,
-                      row.contextTitle,
                       row.result.section.id === 'compare'
                     )}
+                    {#if row.contextTitle && !excerptStartsWithTitle(segments, row.contextTitle)}
+                      <p class="result-context">{row.contextTitle}</p>
+                    {/if}
                     <p
                       class={[
                         'site-search-result-excerpt result-excerpt',
@@ -816,6 +810,15 @@
     overflow-wrap: anywhere;
     font-size: 1rem;
     line-height: 1.5rem;
+  }
+
+  .result-context {
+    margin-top: 0.25rem;
+    overflow-wrap: anywhere;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
   }
 
   .result-excerpt {

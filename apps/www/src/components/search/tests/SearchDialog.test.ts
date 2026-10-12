@@ -959,7 +959,15 @@ describe('SearchDialog', () => {
     expect(anchoredLink?.getAttribute('href')).toBe('/news/long-page/#details');
     expect(anchoredLink?.getAttribute('data-astro-prefetch')).toBe('false');
     expect(anchoredLink?.querySelector('h3')?.textContent?.trim()).toBe('Основная страница');
-    expect(anchoredLink?.textContent).toContain('Юрий Кизилов в 00:26:20:\u00a0Якорный фрагмент');
+    expect({
+      context: anchoredLink?.querySelector('.result-context')?.textContent,
+      excerpt: anchoredLink?.querySelector('.site-search-result-excerpt')?.textContent
+    }).toMatchInlineSnapshot(`
+      {
+        "context": "Юрий Кизилов в 00:26:20",
+        "excerpt": "Якорный фрагмент",
+      }
+    `);
     expect(anchoredLink?.querySelector('mark')?.textContent).toBe('фрагмент');
     expect(taggedLink?.textContent).toContain('Темы новости: благоустройство, дороги.');
     expect(taggedLink?.textContent).not.toContain('Это описание не должно заменить контекст тегов');
@@ -1063,11 +1071,141 @@ describe('SearchDialog', () => {
     await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(1));
     const link = view.getByRole('link');
     expect(link.getAttribute('href')).toBe(`${url}${anchored ? '#details' : ''}`);
-    expect(link.querySelector('p')?.textContent).toBe(
-      `${anchored ? 'Контекст секции:\u00a0' : ''}Текст с совпадением и <script>`
+    expect(link.querySelector('.result-context')?.textContent).toBe(
+      anchored ? 'Контекст секции' : undefined
+    );
+    expect(link.querySelector('.site-search-result-excerpt')?.textContent).toBe(
+      'Текст с совпадением и <script>'
     );
     expect(link.querySelector('mark')?.textContent).toBe('совпадением');
     expect(link.querySelector('script')).toBeNull();
+  });
+
+  it.each([
+    {
+      name: 'heading tail',
+      title: 'Еще один срок вместо результата',
+      excerptHtml: 'один <mark>срок</mark> вместо результата.',
+      text: 'один срок вместо результата.',
+      context: true
+    },
+    {
+      name: 'paragraph tail',
+      title: 'Оригиналы бланков',
+      excerptHtml: 'вы получили от <mark>юриста.</mark>',
+      text: 'вы получили от юриста.',
+      context: true
+    },
+    {
+      name: 'list item tail',
+      title: 'Что сообщила ОК',
+      excerptHtml: 'строительным работам. Дороги в <mark>Форесте:</mark>',
+      text: 'строительным работам. Дороги в Форесте:',
+      context: true
+    },
+    {
+      name: 'complete marked heading and entities',
+      title: 'Что сообщила ОК',
+      excerptHtml: 'Что сообщила <mark>ОК.</mark> &lt;script&gt; &amp; текст…',
+      text: 'Что сообщила ОК. <script> & текст…',
+      context: false
+    },
+    {
+      name: 'whitespace between adjacent marks',
+      title: 'Ограждение площадки',
+      excerptHtml: '<mark>площадке.</mark> <mark>Ограждение</mark>',
+      text: 'площадке. Ограждение',
+      context: true
+    },
+    {
+      name: 'nonbreaking space entity between adjacent marks',
+      title: 'Ограждение площадки',
+      excerptHtml: '<mark>площадке.</mark>&nbsp;<mark>Ограждение</mark>',
+      text: 'площадке.\u00a0Ограждение',
+      context: true
+    },
+    {
+      name: 'literal markup in context and excerpt',
+      title: '<script>alert(1)</script>',
+      excerptHtml: '&lt;img src=x onerror=alert(1)&gt; <mark>текст</mark>',
+      text: '<img src=x onerror=alert(1)> текст',
+      context: true
+    }
+  ])(
+    'separates heading context without rewriting the $name',
+    async ({ title, excerptHtml, text, context }) => {
+      const url = '/news/fragment/?h=текст#details';
+      const result: SearchResult = {
+        url: '/news/fragment/?h=текст',
+        title: 'Основная страница',
+        section: { id: 'news', label: 'Новости' },
+        excerptHtml,
+        subResults: [{ url, title, excerptHtml }]
+      };
+      const client: SearchClient = { search: async (query) => readyResponse(query, [result]) };
+      const opener = addOpener('Поиск');
+      const view = render(SearchDialog, { props: { client } });
+      await requestOpen(opener);
+      await enterDebouncedQuery(view.getByRole('searchbox'), 'текст');
+      await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(1));
+      const link = view.getByRole('link');
+      const excerpt = link.querySelector('.site-search-result-excerpt');
+      const heading = link.querySelector('.result-context');
+
+      expect({ context: heading?.textContent, excerpt: excerpt?.textContent }).toEqual({
+        context: context ? title : undefined,
+        excerpt: text
+      });
+      expect(heading?.nextElementSibling).toBe(context ? excerpt : undefined);
+      expect(link.querySelectorAll('script, img')).toHaveLength(0);
+      expect(link.getAttribute('href')).toBe(url);
+    }
+  );
+
+  it('preserves highlights while separating context', async () => {
+    const excerptHtml = '<mark>площадке.</mark>&nbsp;<mark>Ограждение</mark> &amp; текст';
+    const result: SearchResult = {
+      url: '/news/fragment/',
+      title: 'Основная страница',
+      section: { id: 'news', label: 'Новости' },
+      excerptHtml,
+      subResults: [{ url: '/news/fragment/#details', title: 'Контекст секции', excerptHtml }]
+    };
+    const client: SearchClient = { search: async (query) => readyResponse(query, [result]) };
+    const opener = addOpener('Поиск');
+    const view = render(SearchDialog, { props: { client } });
+    await requestOpen(opener);
+    await enterDebouncedQuery(view.getByRole('searchbox'), 'ограждение');
+    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(1));
+    const link = view.getByRole('link');
+
+    expect(
+      [...(link.querySelector('.site-search-result-excerpt')?.childNodes ?? [])]
+        .map((node) => ({
+          kind: node instanceof HTMLElement ? node.tagName.toLowerCase() : 'text',
+          text: node.textContent?.replaceAll('\u00a0', '·')
+        }))
+        .filter((node) => node.text)
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "kind": "mark",
+          "text": "площадке.",
+        },
+        {
+          "kind": "text",
+          "text": "·",
+        },
+        {
+          "kind": "mark",
+          "text": "Ограждение",
+        },
+        {
+          "kind": "text",
+          "text": " & текст",
+        },
+      ]
+    `);
   });
 
   it.each([undefined, '', ' \n '])(
