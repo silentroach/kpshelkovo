@@ -28,7 +28,7 @@ const readResults = async (target: Locator) =>
   target.locator('[data-search-result]').evaluateAll((links) =>
     links.slice(0, 8).map((link) => {
       const normalized = (value?: string): string => value?.replace(/\s+/gu, ' ').trim() ?? '';
-      const excerpt = link.querySelector('p');
+      const excerpt = link.querySelector('.site-search-result-excerpt') ?? link.querySelector('p');
       const href = link.getAttribute('href') ?? '';
       const url = new URL(href, window.location.origin);
 

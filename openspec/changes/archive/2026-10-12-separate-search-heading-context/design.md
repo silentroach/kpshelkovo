@@ -2,13 +2,13 @@
 
 ## Context
 
-Мотивация и согласованный ограниченный результат — в [proposal](/openspec/changes/separate-search-heading-context/proposal.md). Рабочая база — `d23c24119284ed7fdd33254337002b8845a90dfe`, ветка `fix/118-search-snippets`. Основная архитектура остаётся по [ADR-025](/docs/decisions/025-static-full-text-search-with-pagefind.md), владение scoped CSS — по [ADR-034](/docs/decisions/034-native-css-architecture.md).
+Мотивация и согласованный ограниченный результат — в [proposal](/openspec/changes/archive/2026-10-12-separate-search-heading-context/proposal.md). Рабочая база — `d23c24119284ed7fdd33254337002b8845a90dfe`, ветка `fix/118-search-snippets`. Основная архитектура остаётся по [ADR-025](/docs/decisions/025-static-full-text-search-with-pagefind.md), владение scoped CSS — по [ADR-034](/docs/decisions/034-native-css-architecture.md).
 
 В [SearchDialog](/apps/www/src/components/search/SearchDialog.svelte) `resultRow` уже сохраняет primary excerpt и выбирает якорь только при равенстве непустых excerpt после нормализации пробелов и единственной цели. Но `excerptSegments` приписывает `${contextTitle}: `, если декодированный фрагмент не начинается полным заголовком. В результате заголовок и окно слов Pagefind попадают в один `<p>`. [Fixture-тесты](/apps/www/src/components/search/tests/SearchDialog.test.ts) закрепляют это двоеточие; исправить нужно эти ожидания, сохранив проверки #124.
 
 Предшествующее read-only исследование существующего индекса подтвердило сохранность исходного текста и произвольные начала окон Pagefind. Для «сроки благоустройства октябрь» основной и секционный excerpts совпадали и начинались с «один срок вместо результата»; для «асфальт форест» — с «строительным работам». Пример без пробела между «площадке.» и «Ограждение» не воспроизвёлся в сыром excerpt; это контроль UI-декодирования, а не доказанный дефект Markdown-render. Эти наблюдения не заменяют baseline данной рабочей базы.
 
-Действующие [search](/openspec/specs/search/spec.md) и [решение #124](/openspec/changes/archive/2026-10-09-preserve-primary-search-excerpt/design.md) сохраняют primary excerpt, безопасный контекст, same-document переходы, `h`, canonical fallback и ленивую подсветку. Delta только [добавляет правило представления](/openspec/changes/separate-search-heading-context/specs/search/spec.md); существующие требования не переписываются.
+Действующие [search](/openspec/specs/search/spec.md) и [решение #124](/openspec/changes/archive/2026-10-09-preserve-primary-search-excerpt/design.md) сохраняют primary excerpt, безопасный контекст, same-document переходы, `h`, canonical fallback и ленивую подсветку. Delta только [добавляет правило представления](/openspec/changes/archive/2026-10-12-separate-search-heading-context/specs/search/spec.md); существующие требования не переписываются.
 
 ## Goals / Non-Goals
 
