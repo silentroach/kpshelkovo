@@ -168,7 +168,7 @@ describe('SettlementsExplorer', () => {
       selector: string
     ) {
       return selector === ':checked'
-        ? ([...this.options].find((option) => option.selected) ?? null)
+        ? this.options.item(this.selectedIndex)
         : querySelector.call(this, selector);
     });
     window.history.replaceState({}, '', '/815/compare/');
