@@ -74,6 +74,12 @@ pnpm build
 
 Точные пути и rsync-параметры принадлежат workflow, формат ключа, endpoint, лимит пачки и таймаут — [helper-у](/apps/www/src/lib/indexnow.ts). Раздачу key-файла как `text/plain` с `Cache-Control: no-store` задаёт [nginx-конфиг](/ops/nginx/kpshelkovo-online.conf). Отсутствие ключа останавливает подготовку до публикации; доступность его публичной копии проверяется после неё. Справка по настройке secret — [GitHub Actions](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets).
 
+## Яндекс Метрика
+
+Флаг `analytics.metrika.enabled` в [конфиге аналитики](/apps/www/src/config/analytics.ts) управляет подключением счётчика только при сборке. Сейчас Метрика временно выключена (`false`). Чтобы вернуть её, установи `true`, выполни `pnpm build` и опубликуй новую сборку через обычный deploy. Для отключения установи `false` и повтори сборку и публикацию.
+
+Клиентский runtime не читает конфиг. При отключении готовый HTML не содержит маркера счётчика и `noscript`-пикселя; загрузка Метрики, просмотры и цели не запускаются. В dev Метрика всегда выключена; `LIGHTHOUSE_DISABLE_ANALYTICS=true` принудительно выключает её и при `enabled: true`.
+
 ## Автоматическое обновление данных
 
 Часть данных проекта обновляет Hermes Agent, который авторизуется через GitHub App `kpshelkovo-hermes-agent`. Агент создаёт отдельную ветку, запускает проверки и предлагает изменения через pull request — напрямую в `master` данные не записываются.

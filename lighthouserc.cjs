@@ -3,7 +3,7 @@ const productionOrigin = (
   process.env.LHCI_PRODUCTION_ORIGIN ?? 'https://kpshelkovo.online'
 ).replace(/\/+$/, '');
 const allowedTargets = new Set(['production', 'static']);
-// Production includes accepted Yandex Metrika third-party-cookie noise.
+// Production allows accepted third-party-cookie noise when Yandex Metrika is enabled.
 const bestPracticesMinScore = target === 'production' ? 0.75 : 0.9;
 
 if (!allowedTargets.has(target)) {

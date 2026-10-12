@@ -92,6 +92,57 @@ afterEach(() => {
 });
 
 describe('Yandex Metrika', () => {
+  it('does not install analytics without the build-time marker', async () => {
+    vi.useFakeTimers();
+    const append = vi.spyOn(document.head, 'append').mockImplementation(() => {});
+
+    vi.resetModules();
+    await import('../site-runtime');
+    window.dispatchEvent(new Event('load'));
+    await vi.advanceTimersByTimeAsync(2_000);
+    history.replaceState({}, '', '/news/');
+    document.dispatchEvent(new Event('astro:page-load'));
+
+    expect({
+      ym: window.ym,
+      deferred: window.__shelkovoYmDeferred,
+      loaded: window.__shelkovoYmLoaded,
+      transitions: window.__shelkovoYmTransitions,
+      scripts: append.mock.calls.length,
+      trackers: installActiveVisitTracker.mock.calls.length
+    }).toMatchInlineSnapshot(`
+      {
+        "deferred": undefined,
+        "loaded": undefined,
+        "scripts": 0,
+        "trackers": 0,
+        "transitions": undefined,
+        "ym": undefined,
+      }
+    `);
+  });
+
+  it('loads the counter and records client navigation with the marker', async () => {
+    vi.useFakeTimers();
+    document.documentElement.dataset.siteMetrikaId = '108975391';
+    const append = vi.spyOn(document.head, 'append').mockImplementation(() => {});
+
+    vi.resetModules();
+    await import('../site-runtime');
+    window.dispatchEvent(new Event('load'));
+    await vi.advanceTimersByTimeAsync(1_000);
+    history.replaceState({}, '', '/news/');
+    document.dispatchEvent(new Event('astro:page-load'));
+
+    expect(append).toHaveBeenCalledOnce();
+    const script = append.mock.calls[0]?.[0];
+    if (!(script instanceof HTMLScriptElement)) {
+      throw new Error('Expected counter script');
+    }
+    expect(script.src).toBe('https://mc.yandex.ru/metrika/tag.js?id=108975391');
+    expect(window.ym?.a?.at(-1)).toEqual([108975391, 'hit', location.href]);
+  });
+
   it('queues goals before the delayed counter load', async () => {
     vi.useFakeTimers();
     document.documentElement.dataset.siteMetrikaId = '108975391';
