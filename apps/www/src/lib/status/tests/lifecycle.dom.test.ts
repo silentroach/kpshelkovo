@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { hydrateStatusServiceStates } from '../lifecycle.dom';
+import { hydrateStatusServiceStates, installStatusServiceStateHydration } from '../lifecycle.dom';
 
 const START_MS = Date.parse('2026-08-18T10:00:00+03:00');
 const END_MS = Date.parse('2026-08-18T11:00:00+03:00');
@@ -42,6 +42,7 @@ const currentServiceState = (label: HTMLElement) => ({
 afterEach(() => {
   document.body.innerHTML = '';
   delete window.__shelkovoStatusServiceStateHydration;
+  vi.restoreAllMocks();
 });
 
 describe('hydrateStatusServiceStates', () => {
@@ -109,5 +110,82 @@ describe('hydrateStatusServiceStates', () => {
         },
       }
     `);
+  });
+});
+
+describe('installStatusServiceStateHydration', () => {
+  it('hydrates current and swapped labels without duplicating navigation listeners', () => {
+    const addEventListener = vi.spyOn(document, 'addEventListener');
+    let nowMs = START_MS - 1;
+    const options = { now: () => nowMs };
+
+    try {
+      const initial = renderServiceState('incident', true);
+      installStatusServiceStateHydration(options);
+      const states = [currentServiceState(initial)];
+
+      const second = initial.cloneNode(true);
+      if (!(second instanceof HTMLElement)) {
+        throw new Error('Expected cloned service state');
+      }
+      initial.after(second);
+      nowMs = START_MS;
+      installStatusServiceStateHydration(options);
+      states.push(currentServiceState(initial), currentServiceState(second));
+
+      const swapped = renderServiceState('maintenance');
+      document.dispatchEvent(new Event('astro:after-swap'));
+      states.push(currentServiceState(swapped));
+
+      nowMs = END_MS;
+      document.dispatchEvent(new Event('astro:page-load'));
+      states.push(currentServiceState(swapped));
+
+      expect(states).toMatchInlineSnapshot(`
+        [
+          {
+            "label": "В норме",
+            "role": "status",
+            "state": "green",
+          },
+          {
+            "label": "Инцидент",
+            "role": "status",
+            "state": "red",
+          },
+          {
+            "label": "Инцидент",
+            "role": "status",
+            "state": "red",
+          },
+          {
+            "label": "Работы",
+            "role": "status",
+            "state": "amber",
+          },
+          {
+            "label": "В норме",
+            "role": "status",
+            "state": "green",
+          },
+        ]
+      `);
+      expect(
+        addEventListener.mock.calls
+          .filter(([type]) => type === 'astro:after-swap' || type === 'astro:page-load')
+          .map(([type]) => type)
+      ).toMatchInlineSnapshot(`
+        [
+          "astro:after-swap",
+          "astro:page-load",
+        ]
+      `);
+    } finally {
+      addEventListener.mock.calls.forEach(([type, listener]) => {
+        if (type === 'astro:after-swap' || type === 'astro:page-load') {
+          document.removeEventListener(type, listener);
+        }
+      });
+    }
   });
 });

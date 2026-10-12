@@ -1,7 +1,5 @@
 import { installHomeStatusHydration } from '@/lib/home/status';
 import { highlightSearchTerms } from '@/lib/search/highlight';
-import { installStatusServiceStateHydration } from '@/lib/status/lifecycle.dom';
-import { installStickyTableHeaders } from '@/lib/sticky-table-headers';
 import { installActiveVisitTracker } from '@/scripts/active-visit';
 import { loadSearchDialog } from '@/scripts/search-dialog-loader';
 
@@ -664,9 +662,7 @@ document.addEventListener('astro:before-swap', removeIncomingHomeHeroFallback);
 bindSiteHeaderMenu();
 bindSearchDialogLoader();
 installSiteNavDropdowns();
-installStickyTableHeaders();
 runWhenDocumentReady(() => installHomeStatusHydration());
-runWhenDocumentReady(() => installStatusServiceStateHydration());
 bindMetrikaLoader();
 bindMetrikaTransitions();
 installSearchHighlights();

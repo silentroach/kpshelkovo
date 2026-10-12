@@ -5,18 +5,12 @@ static/BaseLayout.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
     rendered: 1600
   apps/www/src/lib/search/highlight.ts:
     rendered: 1339
-  apps/www/src/lib/status/lifecycle.dom.ts:
-    rendered: 1148
-  apps/www/src/lib/status/service-state.ts:
-    rendered: 232
-  apps/www/src/lib/sticky-table-headers.ts:
-    rendered: 2466
   apps/www/src/scripts/active-visit.ts:
     rendered: 3259
   apps/www/src/scripts/search-dialog-loader.ts:
     rendered: 157
   apps/www/src/scripts/site-runtime.ts:
-    rendered: 15614
+    rendered: 15519
 static/ClientRouter.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   astro:transitions/client:
     rendered: 0
@@ -101,11 +95,23 @@ static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
 static/ServiceTable.XXXXXXXX.js:
   apps/www/src/compare/components/ServiceTable.svelte:
     rendered: 1229
+static/StatusServiceState.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
+  apps/www/src/components/status/StatusServiceState.astro?astro&type=script&index=0&lang.ts:
+    rendered: 142
+  apps/www/src/lib/status/lifecycle.dom.ts:
+    rendered: 1148
+  apps/www/src/lib/status/service-state.ts:
+    rendered: 232
 static/StatusServiceTimeline.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/components/status/StatusServiceTimeline.astro?astro&type=script&index=0&lang.ts:
     rendered: 142
   apps/www/src/lib/status/timeline.lazy.ts:
     rendered: 2893
+static/StickyTableScript.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
+  apps/www/src/components/common/StickyTableScript.astro?astro&type=script&index=0&lang.ts:
+    rendered: 132
+  apps/www/src/lib/sticky-table-headers.ts:
+    rendered: 2466
 static/async.XXXXXXXX.js:
   node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/disclose-version.js:
     rendered: 219
@@ -429,11 +435,11 @@ static/lazy.XXXXXXXX.js:
   apps/www/src/components/search/search-dialog.events.ts:
     rendered: 120
   apps/www/src/components/search/SearchDialog.svelte:
-    rendered: 21653
+    rendered: 22025
   apps/www/src/components/search/SearchDialog.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/search/client.ts:
-    rendered: 12753
+    rendered: 12287
   packages/ui/src/icons/system/Search.svelte:
     rendered: 517
 static/lifecycle.XXXXXXXX.js:
@@ -469,7 +475,7 @@ static/runtime.XXXXXXXX.js:
   apps/www/src/lib/yandex-maps/open-maps-control.ts:
     rendered: 369
   apps/www/src/lib/yandex-maps/runtime.ts:
-    rendered: 3655
+    rendered: 2375
 static/schema.XXXXXXXX.js:
   apps/www/src/lib/areas.ts:
     rendered: 98
@@ -487,6 +493,6 @@ static/timeline.dom.XXXXXXXX.js:
   apps/www/src/lib/status/timeline-tooltip.ts:
     rendered: 780
   apps/www/src/lib/status/timeline.dom.ts:
-    rendered: 16355
+    rendered: 16303
   apps/www/src/lib/status/timeline.ts:
     rendered: 2669

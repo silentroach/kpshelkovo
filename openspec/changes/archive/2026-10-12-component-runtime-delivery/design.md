@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация и границы — в [proposal](/openspec/changes/component-runtime-delivery/proposal.md); задача — [#848](https://github.com/silentroach/kpshelkovo/issues/848). Исследована база `d23c24119284ed7fdd33254337002b8845a90dfe` в ветке `perf/848-component-runtime-delivery`.
+Мотивация и границы — в [proposal](/openspec/changes/archive/2026-10-12-component-runtime-delivery/proposal.md); задача — [#848](https://github.com/silentroach/kpshelkovo/issues/848). Исследована база `d23c24119284ed7fdd33254337002b8845a90dfe` в ветке `perf/848-component-runtime-delivery`.
 
 - [BaseLayout](/apps/www/src/layouts/BaseLayout.astro) подключает общий [site-runtime](/apps/www/src/scripts/site-runtime.ts). Последний статически импортирует и запускает `installStickyTableHeaders` и `installStatusServiceStateHydration` независимо от наличия компонентов.
 - [Табличный installer](/apps/www/src/lib/sticky-table-headers.ts) имеет модульный singleton, сразу ищет shells, подписывается на `astro:after-swap` и `astro:page-load`. При отсутствии таблиц снимает scroll/resize listeners, отменяет requestAnimationFrame и освобождает ссылки на shells.

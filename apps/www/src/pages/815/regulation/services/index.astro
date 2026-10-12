@@ -2,6 +2,7 @@
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 
+import StickyTableScript from '@/components/common/StickyTableScript.astro';
 import { fullReglamentDataset2026 } from '@/data/reglament/full-2026';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import type {
@@ -163,132 +164,126 @@ const serviceSearchText = (
           Таблицы услуг регламента
         </h2>
 
-        {
-          groups.map((group) => (
-            <section class="services-group" aria-labelledby={group.group}>
-              <div class="services-group-header" data-pagefind-body>
-                <h3
-                  id={group.group}
-                  class="ui-section-title"
-                  data-pagefind-weight="1.5"
-                >
-                  {group.title}
-                </h3>
-                <p class="services-source" data-pagefind-weight="0.3">
-                  Источник:{' '}
-                  <ResourceLink
-                    class="ui-link"
-                    href={reglamentFullSourcePdfUrl()}
-                    type="application/pdf"
-                    reload
-                  >
-                    полный регламент
-                  </ResourceLink>
-                  , Приложение №4, стр. 135. Услуги и периодичность перенесены
-                  из полного регламента; годовые кратности сметы здесь не
-                  пересчитываются автоматически.
-                </p>
-              </div>
-
-              <div
-                class="reglament-table-shell ui-sticky-table-shell services-table-shell"
-                data-ui-sticky-table-shell
+        {groups.map((group) => (
+          <section class="services-group" aria-labelledby={group.group}>
+            <div class="services-group-header" data-pagefind-body>
+              <h3
+                id={group.group}
+                class="ui-section-title"
+                data-pagefind-weight="1.5"
               >
-                <table class="services-table">
-                  <caption class="ui-visually-hidden">{group.title}</caption>
-                  <thead class="services-table-head">
-                    <tr>
-                      <th class="services-table-heading services-table-service-heading">
-                        Услуга
-                      </th>
-                      <th class="services-table-heading services-table-frequency-heading">
-                        Периодичность
-                      </th>
-                      <th class="services-table-heading services-table-status-heading">
-                        Статус
-                      </th>
-                      <th class="services-table-heading services-table-mapping-heading">
-                        Сопоставление
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {group.services.map((service) => {
-                      const mapping = mappingByService.get(service.id);
-                      const verificationNote = mapping
-                        ? mappingVerificationNote(mapping)
-                        : null;
+                {group.title}
+              </h3>
+              <p class="services-source" data-pagefind-weight="0.3">
+                Источник:{' '}
+                <ResourceLink
+                  class="ui-link"
+                  href={reglamentFullSourcePdfUrl()}
+                  type="application/pdf"
+                  reload
+                >
+                  полный регламент
+                </ResourceLink>
+                , Приложение №4, стр. 135. Услуги и периодичность перенесены из
+                полного регламента; годовые кратности сметы здесь не
+                пересчитываются автоматически.
+              </p>
+            </div>
 
-                      return (
-                        <tr>
-                          <td class="services-table-cell">
-                            <div class="services-item" data-pagefind-body>
-                              <h4
-                                id={`reglament-service-${service.id}`}
-                                class="services-item-title"
-                                data-pagefind-weight="2"
-                              >
-                                {service.title}
-                              </h4>
-                              <p class="ui-visually-hidden" aria-hidden="true">
-                                {serviceSearchText(
-                                  service,
-                                  group.title,
-                                  mapping,
-                                )}
-                              </p>
-                            </div>
-                          </td>
-                          <td class="services-table-cell services-table-muted">
-                            <span class="services-frequency">
-                              {service.frequency_raw}
+            <div
+              class="reglament-table-shell ui-sticky-table-shell services-table-shell"
+              data-ui-sticky-table-shell
+            >
+              <table class="services-table">
+                <caption class="ui-visually-hidden">{group.title}</caption>
+                <thead class="services-table-head">
+                  <tr>
+                    <th class="services-table-heading services-table-service-heading">
+                      Услуга
+                    </th>
+                    <th class="services-table-heading services-table-frequency-heading">
+                      Периодичность
+                    </th>
+                    <th class="services-table-heading services-table-status-heading">
+                      Статус
+                    </th>
+                    <th class="services-table-heading services-table-mapping-heading">
+                      Сопоставление
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {group.services.map((service) => {
+                    const mapping = mappingByService.get(service.id);
+                    const verificationNote = mapping
+                      ? mappingVerificationNote(mapping)
+                      : null;
+
+                    return (
+                      <tr>
+                        <td class="services-table-cell">
+                          <div class="services-item" data-pagefind-body>
+                            <h4
+                              id={`reglament-service-${service.id}`}
+                              class="services-item-title"
+                              data-pagefind-weight="2"
+                            >
+                              {service.title}
+                            </h4>
+                            <p class="ui-visually-hidden" aria-hidden="true">
+                              {serviceSearchText(service, group.title, mapping)}
+                            </p>
+                          </div>
+                        </td>
+                        <td class="services-table-cell services-table-muted">
+                          <span class="services-frequency">
+                            {service.frequency_raw}
+                          </span>
+                          {service.frequency_note && (
+                            <span class="services-frequency-note">
+                              {service.frequency_note}
                             </span>
-                            {service.frequency_note && (
-                              <span class="services-frequency-note">
-                                {service.frequency_note}
-                              </span>
-                            )}
-                          </td>
-                          <td class="services-table-cell">
-                            {mapping && (
-                              <span
-                                class:list={[
-                                  'ui-badge',
-                                  statusClasses[mapping.status],
-                                ]}
-                              >
-                                {statusLabels[mapping.status]}
-                              </span>
-                            )}
-                          </td>
-                          <td class="services-table-cell services-table-muted">
-                            {mapping && (
-                              <div class="services-mapping">
-                                <p>
-                                  <span class="services-estimate-source">
-                                    {estimateSourceLabel(mapping)}
-                                  </span>
+                          )}
+                        </td>
+                        <td class="services-table-cell">
+                          {mapping && (
+                            <span
+                              class:list={[
+                                'ui-badge',
+                                statusClasses[mapping.status],
+                              ]}
+                            >
+                              {statusLabels[mapping.status]}
+                            </span>
+                          )}
+                        </td>
+                        <td class="services-table-cell services-table-muted">
+                          {mapping && (
+                            <div class="services-mapping">
+                              <p>
+                                <span class="services-estimate-source">
+                                  {estimateSourceLabel(mapping)}
+                                </span>
+                              </p>
+                              <p class="services-mapping-note">
+                                {mapping.explanation}
+                              </p>
+                              {verificationNote && (
+                                <p class="services-verification-note">
+                                  {verificationNote}
                                 </p>
-                                <p class="services-mapping-note">
-                                  {mapping.explanation}
-                                </p>
-                                {verificationNote && (
-                                  <p class="services-verification-note">
-                                    {verificationNote}
-                                  </p>
-                                )}
-                              </div>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          ))
-        }
+                              )}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ))}
       </div>
     </section>
   </main>
@@ -486,4 +481,5 @@ const serviceSearchText = (
       }
     }
   </style>
+  <StickyTableScript />
 </BaseLayout>
