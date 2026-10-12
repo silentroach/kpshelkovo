@@ -95,6 +95,7 @@ export const publicSurfaceRegistry = createPublicSurfaceRegistry([
   peoplePublicSurfaceSlice,
   placesPublicSurfaceSlice,
   reviewsPublicSurfaceSlice,
+  discomfortPublicSurfaceSlice,
   reglamentPublicSurfaceSlice,
   comparePublicSurfaceSlice
 ]);

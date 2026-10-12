@@ -1,4 +1,4 @@
-import { formatDate } from '@shelkovo/format';
+import { dateTimeFromISO } from '@shelkovo/format';
 
 export const formatDiscomfortDate = (dateIso: string): string =>
-  `${formatDate(dateIso)} года`;
+  `${dateTimeFromISO(dateIso).toFormat('d MMMM yyyy')} года`;

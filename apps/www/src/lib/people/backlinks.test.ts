@@ -63,6 +63,7 @@ describe('createPeopleBacklinksFromGraph', () => {
             "title": "Иван Петров",
           },
         ],
+        "discomfort": [],
         "events": [],
         "news": [
           {

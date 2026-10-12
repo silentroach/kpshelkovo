@@ -154,6 +154,7 @@ describe('buildPersonMarkdown', () => {
       mentions: [],
       backlinks: {
         events: [],
+        discomfort: [],
         news: [
           {
             section: 'news',
@@ -260,6 +261,7 @@ describe('buildPersonMarkdown', () => {
       mentions: [],
       backlinks: {
         events: [],
+        discomfort: [],
         news: [],
         status: [],
         reviews: [],
@@ -315,6 +317,7 @@ describe('buildPersonMarkdown', () => {
       mentions: [],
       backlinks: {
         events: [],
+        discomfort: [],
         news: [],
         status: [],
         reviews: [],

@@ -68,6 +68,7 @@ const place: PlaceWithBacklinks = {
   mentions: [],
   backlinks: {
     events: [],
+    discomfort: [],
     news: [
       {
         section: 'news',
@@ -388,6 +389,7 @@ describe('places Markdown', () => {
       body: '',
       backlinks: {
         events: [],
+        discomfort: [],
         news: [],
         status: [],
         reviews: [],

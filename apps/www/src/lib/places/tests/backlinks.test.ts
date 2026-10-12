@@ -47,6 +47,7 @@ describe('createPlaceBacklinksFromGraph', () => {
         "contacts": [
           "contact-item",
         ],
+        "discomfort": [],
         "events": [
           "event-item",
         ],

@@ -40,7 +40,10 @@ const kbCurrent = getCurrent('/kb/');
 const sarafanCurrent = getCurrent('/sarafan/');
 const reviewsCurrent = getCurrent('/reviews/');
 const statusCurrent = getCurrent('/status/');
-const isTariffCurrent = Boolean(compareCurrent || regulationCurrent || discomfortCurrent);
+const discomfortCurrent = getCurrent('/815/discomfort/');
+const isTariffCurrent = Boolean(
+  compareCurrent || regulationCurrent || discomfortCurrent,
+);
 ---
 
 {isMobile ? (
@@ -79,7 +82,11 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent || discomfor
       >
         Регламент
       </a>
-      <a href="/815/discomfort/" aria-current={discomfortCurrent} class="site-nav-mobile-link site-nav-mobile-nested">
+      <a
+        href="/815/discomfort/"
+        aria-current={discomfortCurrent}
+        class="site-nav-mobile-link site-nav-mobile-nested"
+      >
         Дискомфорт
       </a>
     </div>
@@ -172,7 +179,11 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent || discomfor
           >
             Регламент
           </a>
-          <a href="/815/discomfort/" aria-current={discomfortCurrent} class="site-nav-submenu-link">
+          <a
+            href="/815/discomfort/"
+            aria-current={discomfortCurrent}
+            class="site-nav-submenu-link"
+          >
             Дискомфорт
           </a>
         </div>

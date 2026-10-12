@@ -10,7 +10,7 @@ let buildDiscomfortDataset: typeof import('../load').buildDiscomfortDataset;
 beforeAll(async () => {
   Object.assign(import.meta.env, {
     SITE: 'https://example.com',
-    BASE_URL: '/',
+    BASE_URL: '/'
   });
 
   ({ buildDiscomfortDataset } = await import('../load'));
@@ -26,12 +26,12 @@ const entry = (input: {
   body: input.body ?? 'Текст события.',
   data: {
     date: input.date,
-    title: input.title ?? 'Событие',
-  },
+    title: input.title ?? 'Событие'
+  }
 });
 
 const mentionRegistry = new Map([
-  ['ykizilov', createPersonMentionTarget('ykizilov', 'Юрий Кизилов')],
+  ['ykizilov', createPersonMentionTarget('ykizilov', 'Юрий Кизилов')]
 ]);
 
 describe('buildDiscomfortDataset', () => {
@@ -41,14 +41,14 @@ describe('buildDiscomfortDataset', () => {
         entry({ id: 'newest', date: '2026-08-20' }),
         entry({ id: 'same-date-b', date: '2026-06-13' }),
         entry({ id: 'oldest', date: '2026-04-29' }),
-        entry({ id: 'same-date-a', date: '2026-06-13' }),
+        entry({ id: 'same-date-a', date: '2026-06-13' })
       ],
-      { mentionRegistry },
+      { mentionRegistry }
     );
 
     expect({
       slugs: data.events.map((event) => event.slug),
-      latestEvent: data.latestEvent,
+      latestEvent: data.latestEvent
     }).toMatchInlineSnapshot(`
       {
         "latestEvent": {
@@ -57,6 +57,7 @@ describe('buildDiscomfortDataset', () => {
           "mentions": [],
           "slug": "newest",
           "title": "Событие",
+          "updatedIso": undefined,
           "url": "/815/discomfort/#newest",
         },
         "slugs": [
@@ -75,15 +76,15 @@ describe('buildDiscomfortDataset', () => {
         entry({
           id: 'with-mention',
           date: '2026-08-20',
-          body: '**Факт** со [ссылкой](/news/) и комментарием @ykizilov.',
-        }),
+          body: '**Факт** со [ссылкой](/news/) и комментарием @ykizilov.'
+        })
       ],
-      { mentionRegistry },
+      { mentionRegistry }
     );
 
     expect(data.events[0]).toMatchObject({
       body: '**Факт** со [ссылкой](/news/) и комментарием [Юрий Кизилов](/people/ykizilov/).',
-      mentions: [expect.objectContaining({ slug: 'ykizilov' })],
+      mentions: [expect.objectContaining({ slug: 'ykizilov' })]
     });
   });
 
@@ -92,17 +93,16 @@ describe('buildDiscomfortDataset', () => {
       buildDiscomfortDataset(
         [
           entry({ id: 'duplicate', date: '2026-04-29' }),
-          entry({ id: 'duplicate', date: '2026-06-13' }),
+          entry({ id: 'duplicate', date: '2026-06-13' })
         ],
-        { mentionRegistry },
-      ),
+        { mentionRegistry }
+      )
     ).toThrow('duplicate discomfort event slug "duplicate"');
 
     expect(() =>
-      buildDiscomfortDataset(
-        [entry({ id: 'blank', date: '2026-04-29', body: '   ' })],
-        { mentionRegistry },
-      ),
+      buildDiscomfortDataset([entry({ id: 'blank', date: '2026-04-29', body: '   ' })], {
+        mentionRegistry
+      })
     ).toThrow('discomfort event "blank" body is required');
 
     expect(() =>
@@ -111,32 +111,27 @@ describe('buildDiscomfortDataset', () => {
           entry({
             id: 'unknown-mention',
             date: '2026-04-29',
-            body: 'Комментарий @unknown.',
-          }),
+            body: 'Комментарий @unknown.'
+          })
         ],
-        { mentionRegistry },
-      ),
+        { mentionRegistry }
+      )
     ).toThrow(/unknown/u);
   });
 
   it('requires the quote author in the mention registry', () => {
     expect(() =>
       buildDiscomfortDataset([entry({ id: 'event', date: '2026-04-29' })], {
-        mentionRegistry: new Map(),
-      }),
-    ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: discomfort quote author "ykizilov" is required]`,
-    );
+        mentionRegistry: new Map()
+      })
+    ).toThrowErrorMatchingInlineSnapshot(`[Error: discomfort quote author "ykizilov" is required]`);
 
     expect(() =>
       buildDiscomfortDataset([entry({ id: 'event', date: '2026-04-29' })], {
         mentionRegistry: new Map([
-          [
-            'ykizilov',
-            createPlaceMentionTarget('ykizilov', 'Место с совпавшим slug'),
-          ],
-        ]),
-      }),
+          ['ykizilov', createPlaceMentionTarget('ykizilov', 'Место с совпавшим slug')]
+        ])
+      })
     ).toThrow('discomfort quote author "ykizilov" is required');
   });
 });
