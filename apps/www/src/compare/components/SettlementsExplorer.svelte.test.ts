@@ -161,6 +161,16 @@ const setScreen = (mobile: boolean): void => {
 describe('SettlementsExplorer', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // happy-dom misses :checked options used by Svelte; remove once it supports them.
+    const querySelector = HTMLSelectElement.prototype.querySelector;
+    vi.spyOn(HTMLSelectElement.prototype, 'querySelector').mockImplementation(function (
+      this: HTMLSelectElement,
+      selector: string
+    ) {
+      return selector === ':checked'
+        ? this.options.item(this.selectedIndex)
+        : querySelector.call(this, selector);
+    });
     window.history.replaceState({}, '', '/815/compare/');
     Object.defineProperty(window, 'ymaps3', {
       value: mockYandexMaps,
