@@ -14,6 +14,7 @@ import type { SchemaDoc } from '@shelkovo/seo';
 import SiteFooter from '@shelkovo/ui/SiteFooter.astro';
 import SearchDialog from '@/components/search/SearchDialog.svelte';
 import SiteHeader from '@/components/site/SiteHeader.astro';
+import { analytics } from '@/config/analytics';
 import { browserColor, themeColor } from '@/lib/browser-colors';
 import { llmsPathForPage } from '@/lib/public-surface';
 import type { SearchDocument } from '@/lib/search/types';
@@ -78,8 +79,8 @@ const docs = serializeSchema(schema);
 const prod = import.meta.env.PROD;
 const disableAnalytics =
   import.meta.env.LIGHTHOUSE_DISABLE_ANALYTICS === 'true';
-const enableMetrika = prod && !disableAnalytics;
-const ymId = 108975391;
+const enableMetrika = prod && analytics.metrika.enabled && !disableAnalytics;
+const ymId = analytics.metrika.id;
 const bodyClasses = [
   'ui-root-site',
   /^\/(kb|news)(\/|$)/u.test(Astro.url.pathname) && 'site-print-content',

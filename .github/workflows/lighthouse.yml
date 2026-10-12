@@ -128,7 +128,9 @@ jobs:
           appendSummary('## Lighthouse CI');
           appendSummary('');
           appendSummary(`Target: \`${process.env.LIGHTHOUSE_SITE_TARGET}\``);
-          appendSummary(`Analytics: \`${process.env.LIGHTHOUSE_DISABLE_ANALYTICS === 'true' ? 'disabled' : 'enabled'}\``);
+          appendSummary(process.env.LIGHTHOUSE_SITE_TARGET === 'static'
+            ? 'Analytics: `forced off for the static build`'
+            : 'Analytics: `checking the published site configuration`');
           appendSummary('');
 
           if (selectedReports.length === 0) {
@@ -161,7 +163,7 @@ jobs:
           if (metrikaFindings.length > 0) {
             appendSummary('### Yandex Metrika Best Practices Finding');
             appendSummary('');
-            appendSummary('Production Lighthouse runs intentionally keep Yandex Metrika enabled. The recurring third-party-cookie Best Practices finding is an accepted external-service limitation; scheduled static runs disable analytics with `LIGHTHOUSE_DISABLE_ANALYTICS=true`.');
+            appendSummary('These reports contain Yandex Metrika findings from the inspected pages. Third-party-cookie Best Practices findings are an external-service limitation; static runs force analytics off with `LIGHTHOUSE_DISABLE_ANALYTICS=true`. Production runs inspect the published site and do not override its analytics configuration.');
             appendSummary('');
 
             for (const finding of metrikaFindings) {

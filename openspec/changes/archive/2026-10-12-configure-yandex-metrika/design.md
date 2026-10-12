@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация — в [proposal](/openspec/changes/configure-yandex-metrika/proposal.md). `BaseLayout.astro` определяет подключение через `PROD` и `LIGHTHOUSE_DISABLE_ANALYTICS`, публикуя `data-site-metrika-id` и пиксель. `site-runtime.ts` уже не устанавливает загрузчик и обработчики Метрики без этого атрибута. Адресные тесты интеграции находятся в `src/scripts/tests/site-runtime.test.ts`.
+Мотивация — в [proposal](/openspec/changes/archive/2026-10-12-configure-yandex-metrika/proposal.md). `BaseLayout.astro` определяет подключение через `PROD` и `LIGHTHOUSE_DISABLE_ANALYTICS`, публикуя `data-site-metrika-id` и пиксель. `site-runtime.ts` уже не устанавливает загрузчик и обработчики Метрики без этого атрибута. Адресные тесты интеграции находятся в `src/scripts/tests/site-runtime.test.ts`.
 
 [ADR-004](/docs/decisions/004-lighthouse-analytics-profile.md) требует пересмотра предположения об обязательной аналитике production. [ADR-002](/docs/decisions/002-client-transitions-prefetch-cache.md) задаёт контекст клиентских переходов; их учёт при включённой Метрике сохраняется.
 
