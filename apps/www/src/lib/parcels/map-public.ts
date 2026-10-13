@@ -52,8 +52,8 @@ export const buildParcelMapPayload = (
       aliases: parcel.aliases.length ? parcel.aliases : undefined,
       part: parcel.part,
       status: parcel.status,
-      areaM2: includeDetails ? parcel.areaM2 : undefined,
-      priceRub: includeDetails ? parcel.priceHistory.at(-1)?.price : undefined,
+      area: includeDetails ? parcel.areaM2 : undefined,
+      price: includeDetails ? parcel.priceHistory.at(-1)?.price : undefined,
       multipleCadastralParcels: parcel.cadastralParts.length > 1 ? true : undefined,
       geometry:
         geometry.type === 'Polygon'

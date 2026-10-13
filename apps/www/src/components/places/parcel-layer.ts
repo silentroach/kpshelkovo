@@ -31,13 +31,11 @@ const updateLabel = (label: ParcelLabel, item: ParcelMapItem, zoom: number): voi
   if (expanded) {
     for (const [value, className] of [
       [
-        item.priceRub === undefined ? undefined : `${priceFormatter.format(item.priceRub)}\u00a0₽`,
+        item.price === undefined ? undefined : `${priceFormatter.format(item.price)}\u00a0₽`,
         'parcel-map-label__price'
       ],
       [
-        item.areaM2 === undefined
-          ? undefined
-          : `${areaFormatter.format(item.areaM2 / 100)}\u00a0сот.`,
+        item.area === undefined ? undefined : `${areaFormatter.format(item.area / 100)}\u00a0сот.`,
         'parcel-map-label__area'
       ]
     ] as const) {

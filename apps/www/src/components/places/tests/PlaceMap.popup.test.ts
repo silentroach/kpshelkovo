@@ -41,7 +41,7 @@ describe('PlaceMap', () => {
       const fetch = vi.fn(async (url: string) =>
         url.includes('/details/')
           ? Response.json(details)
-          : Response.json([{ ...parcel, status: 'available', priceRub: 12_000_000, areaM2: 1051 }])
+          : Response.json([{ ...parcel, status: 'available', price: 12_000_000, area: 1051 }])
       );
       vi.stubGlobal('fetch', fetch);
       render(PlaceMap, { props: { places: [place] } });

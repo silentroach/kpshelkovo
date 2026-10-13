@@ -47,8 +47,8 @@ describe('PlaceMap', () => {
       status: 'available',
       multipleCadastralParcels: true,
       geometry: { type: 'MultiPolygon', coordinates: parcelContours },
-      priceRub: 3_401_055,
-      areaM2: 945
+      price: 3_401_055,
+      area: 945
     };
     vi.stubGlobal(
       'fetch',
@@ -120,10 +120,10 @@ describe('PlaceMap', () => {
     [undefined, 3_401_055, 945, ['L43']]
   ] as const)(
     'renders only known eligible values immediately at zoom 18: %s %s %s',
-    async (status, priceRub, areaM2, rows) => {
+    async (status, price, area, rows) => {
       vi.stubGlobal(
         'fetch',
-        vi.fn(async () => Response.json([{ ...parcel, status, priceRub, areaM2 }]))
+        vi.fn(async () => Response.json([{ ...parcel, status, price, area }]))
       );
       render(PlaceMap, { props: { places: [place] } });
       await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));

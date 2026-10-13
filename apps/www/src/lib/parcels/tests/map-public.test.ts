@@ -94,18 +94,18 @@ describe('parcel public payloads', () => {
       const payload = ParcelMapPublicSchema.parse(JSON.parse(text));
       const details = buildParcelDetailsPayload(source);
 
-      expect(payload.map(({ areaM2, priceRub }) => ({ areaM2, priceRub }))).toMatchInlineSnapshot(`
+      expect(payload.map(({ area, price }) => ({ area, price }))).toMatchInlineSnapshot(`
           [
             {
-              "areaM2": 945.25,
-              "priceRub": 3401055,
+              "area": 945.25,
+              "price": 3401055,
             },
           ]
         `);
-      expect(payload[0]?.areaM2).toBe(details.area);
-      expect(payload[0]?.priceRub).toBe(details.price.last);
+      expect(payload[0]?.area).toBe(details.area);
+      expect(payload[0]?.price).toBe(details.price.last);
       expect(text).toBe(JSON.stringify(JSON.parse(text)));
-      expect(text).not.toMatch(/priceHistory|history|features|body|notes/u);
+      expect(text).not.toMatch(/areaM2|priceRub|priceHistory|history|features|body|notes/u);
       expect(payload[0]?.geometry).toEqual({
         type: 'MultiPolygon',
         coordinates: adjacentPolygons
@@ -130,15 +130,15 @@ describe('parcel public payloads', () => {
       );
       expect(
         payload.map((entry) =>
-          Object.keys(entry).filter((key) => key === 'areaM2' || key === 'priceRub')
+          Object.keys(entry).filter((key) => key === 'area' || key === 'price')
         )
       ).toMatchInlineSnapshot(`
         [
           [
-            "priceRub",
+            "price",
           ],
           [
-            "areaM2",
+            "area",
           ],
           [],
         ]
@@ -151,7 +151,7 @@ describe('parcel public payloads', () => {
     (status) => {
       const text = JSON.stringify(buildParcelMapPayload([{ ...parcel, status }]));
       expect(ParcelMapPublicSchema.parse(JSON.parse(text))).toHaveLength(1);
-      expect(text).not.toMatch(/areaM2|priceRub|priceHistory|history|features|body|notes/u);
+      expect(text).not.toMatch(/area|price|history|features|body|notes/u);
     }
   );
 
@@ -323,12 +323,12 @@ describe('parcel public payloads', () => {
     expect(Object.keys(JSON.parse(JSON.stringify(payload))[0] ?? {}).sort()).toMatchInlineSnapshot(`
       [
         "aliases",
-        "areaM2",
+        "area",
         "code",
         "geometry",
         "labelCoordinates",
         "part",
-        "priceRub",
+        "price",
         "status",
       ]
     `);
