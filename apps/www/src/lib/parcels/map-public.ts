@@ -41,6 +41,7 @@ export const buildParcelMapPayload = (
   const shift = createDisplayOffset(config.offset_east_m, config.offset_north_m, referenceLatitude);
 
   return parcels.map((parcel) => {
+    const includeDetails = parcel.status === 'available' || parcel.status === 'reserved';
     const geometry = mapGeometry(parcel);
     const labelGeometry =
       parcel.cadastralParts.length > 1
@@ -51,6 +52,8 @@ export const buildParcelMapPayload = (
       aliases: parcel.aliases.length ? parcel.aliases : undefined,
       part: parcel.part,
       status: parcel.status,
+      areaM2: includeDetails ? parcel.areaM2 : undefined,
+      priceRub: includeDetails ? parcel.priceHistory.at(-1)?.price : undefined,
       multipleCadastralParcels: parcel.cadastralParts.length > 1 ? true : undefined,
       geometry:
         geometry.type === 'Polygon'

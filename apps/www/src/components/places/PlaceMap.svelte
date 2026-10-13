@@ -1507,6 +1507,7 @@
 
   :global(.parcel-map-label) {
     display: grid;
+    gap: 0.125rem;
     min-width: 2.75rem;
     min-height: 2.75rem;
     place-items: center;
@@ -1516,6 +1517,8 @@
     color: var(--color-text);
     cursor: pointer;
     font-family: var(--font-body);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
     pointer-events: auto;
     transform: translate(-50%, -50%);
   }
@@ -1524,7 +1527,12 @@
     pointer-events: none;
   }
 
-  :global(.parcel-map-label span) {
+  :global(.parcel-map-label:focus-visible) {
+    outline: 0.1875rem solid var(--color-focus);
+    outline-offset: 0.125rem;
+  }
+
+  :global(.parcel-map-label__number) {
     padding: 0.125rem 0.375rem;
     border: 1px solid var(--color-border);
     border-radius: 999px;
@@ -1535,7 +1543,26 @@
     line-height: 1.25;
   }
 
-  :global(.parcel-map-label--unavailable span) {
+  :global(.parcel-map-label__detail) {
+    line-height: 1.25;
+    text-shadow:
+      0 0 2px var(--color-surface),
+      0 0 4px var(--color-surface),
+      0 0 6px var(--color-surface);
+  }
+
+  :global(.parcel-map-label__price) {
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  :global(.parcel-map-label__area) {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  :global(.parcel-map-label--unavailable .parcel-map-label__number) {
     border-color: color-mix(in srgb, var(--color-border-strong) 25%, transparent);
     background: color-mix(in srgb, var(--color-neutral-border) 25%, var(--color-surface) 75%);
   }

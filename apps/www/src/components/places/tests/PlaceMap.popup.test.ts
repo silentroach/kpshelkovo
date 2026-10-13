@@ -35,6 +35,57 @@ vi.mock(import('@/lib/yandex-maps/runtime'), async (importOriginal) => {
 describe('PlaceMap', () => {
   registerPlaceMapSetup();
 
+  it.each([0, 1, 2])(
+    'opens the same popup through label row %s without fetching details on zoom',
+    async (rowIndex) => {
+      const fetch = vi.fn(async (url: string) =>
+        url.includes('/details/')
+          ? Response.json(details)
+          : Response.json([{ ...parcel, status: 'available', priceRub: 12_000_000, areaM2: 1051 }])
+      );
+      vi.stubGlobal('fetch', fetch);
+      render(PlaceMap, { props: { places: [place] } });
+      await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+      await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+      await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
+      await waitFor(() => expect(areaFeatures).toHaveLength(1));
+      const updateZoom = (zoom: number) =>
+        mapUpdateHandlers[0]?.({
+          type: 'update',
+          location: { center: [37.715, 55.065], zoom, bounds: map.bounds },
+          camera: {},
+          mapInAction: false
+        });
+      for (const zoom of [17, 18, 17, 18]) updateZoom(zoom);
+      expect(fetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/parcels/shr.json']);
+      const label = markerElements.find((element) => element.title === parcel.code);
+      const canvas = mapElements[0];
+      const row = label?.children[rowIndex];
+      if (!label || !canvas || !row) throw new Error('Parcel label missing');
+      canvas.append(label);
+      await fireEvent.click(row, { detail: 1 });
+      const popup = await screen.findByRole('group', { name: 'Участок SHR-L43' });
+      await waitFor(() => expect(popup.textContent).toContain('10,51 сот.'));
+      for (const zoom of [17, 18, 17.999, 18.001]) {
+        updateZoom(zoom);
+        expect(screen.getByRole('group', { name: 'Участок SHR-L43' })).toBe(popup);
+        expect(window.location.search).toBe('?p=SHR-L43');
+      }
+      expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+        '/map/data/parcels/shr.json',
+        '/map/data/parcels/details/SHR-L43.json'
+      ]);
+      await fireEvent.click(screen.getByRole('button', { name: 'Закрыть сведения об участке' }));
+      label.focus();
+      await fireEvent.click(label, { detail: 0 });
+      const close = await screen.findByRole('button', { name: 'Закрыть сведения об участке' });
+      await waitFor(() => expect(document.activeElement).toBe(close));
+      await fireEvent.click(close);
+      expect(document.activeElement).toBe(label);
+      expect(fetch).toHaveBeenCalledTimes(2);
+    }
+  );
+
   it('opens a permanent popup with the last price and exact area only for sale statuses', async () => {
     const reserved = { ...parcel, code: 'SHR-L45', status: 'reserved' as const };
     const sold = { ...parcel, code: 'SHR-L46', status: 'sold' as const };

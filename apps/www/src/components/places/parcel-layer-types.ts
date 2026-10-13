@@ -1,4 +1,4 @@
-import type { LngLatBounds } from '@yandex/ymaps3-types';
+import type { LngLatBounds, YMapMarker } from '@yandex/ymaps3-types';
 
 import type { ParcelMapPublicDto } from '@/lib/parcels/map-public-schema';
 import type { ParcelPart } from '@/lib/parcels/schema';
@@ -6,6 +6,12 @@ import type { ParcelPart } from '@/lib/parcels/schema';
 export type ParcelMapItem = ParcelMapPublicDto[number];
 export type ParcelMapPayload = ParcelMapPublicDto;
 export type ParcelSelectionChange = (item?: ParcelMapItem, source?: HTMLButtonElement) => void;
+
+export interface ParcelLabel {
+  readonly marker: YMapMarker;
+  readonly button: HTMLButtonElement;
+  expanded: boolean;
+}
 
 export interface ParcelLayer {
   enable(part: ParcelPart, parcels: readonly ParcelMapItem[]): void;

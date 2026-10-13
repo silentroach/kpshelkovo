@@ -1,9 +1,13 @@
 import { toWebMercator } from '@shelkovo/geo';
 import { describe, expect, it } from 'vitest';
 
+import { buildParcelDetailsPayload } from '../details-public';
 import { buildParcelMapPayload, splitParcelMapPayload } from '../map-public';
 import { ParcelMapPublicSchema } from '../map-public-schema';
+import { mapRawParcel } from '../mapper';
+import { RawParcelSchema } from '../raw-schema';
 import { PARCEL_PARTS, type ParcelPart } from '../schema';
+import { parcelRecordPath } from '../source';
 import type { Parcel, ParcelPolygon } from '../types';
 
 const parcel: Parcel = {
@@ -62,6 +66,95 @@ const compound: Parcel = {
 };
 
 describe('parcel public payloads', () => {
+  it.each(['available', 'reserved'] as const)(
+    'publishes exact domain area and the final lower price shared with details for %s',
+    (status) => {
+      const source = mapRawParcel({
+        id: parcelRecordPath(compound.code).slice(0, -3),
+        body: compound.body,
+        data: RawParcelSchema.parse({
+          code: compound.code,
+          aliases: compound.aliases,
+          status,
+          features: compound.features,
+          cadastral_parts: compound.cadastralParts.map((part, index) => ({
+            cadastral_number: part.cadastralNumber,
+            geometry: part.geometry,
+            area_m2: index === 0 ? 500 : 445.25
+          })),
+          price_history: [
+            { on: '2026-09-01', price: 9000000 },
+            { on: '2026-09-01', price: 3401055 }
+          ]
+        })
+      });
+      const text = JSON.stringify(
+        buildParcelMapPayload([source], { offset_east_m: 0, offset_north_m: 0 })
+      );
+      const payload = ParcelMapPublicSchema.parse(JSON.parse(text));
+      const details = buildParcelDetailsPayload(source);
+
+      expect(payload.map(({ areaM2, priceRub }) => ({ areaM2, priceRub }))).toMatchInlineSnapshot(`
+          [
+            {
+              "areaM2": 945.25,
+              "priceRub": 3401055,
+            },
+          ]
+        `);
+      expect(payload[0]?.areaM2).toBe(details.area);
+      expect(payload[0]?.priceRub).toBe(details.price.last);
+      expect(text).toBe(JSON.stringify(JSON.parse(text)));
+      expect(text).not.toMatch(/priceHistory|history|features|body|notes/u);
+      expect(payload[0]?.geometry).toEqual({
+        type: 'MultiPolygon',
+        coordinates: adjacentPolygons
+      });
+      expect(payload[0]?.labelCoordinates).toEqual([0.001, 0.001]);
+    }
+  );
+
+  it.each(['available', 'reserved'] as const)(
+    'omits each unknown value independently for %s without deriving an area from geometry',
+    (status) => {
+      const payload = ParcelMapPublicSchema.parse(
+        JSON.parse(
+          JSON.stringify(
+            buildParcelMapPayload([
+              { ...parcel, status, areaM2: undefined },
+              { ...parcel, status, priceHistory: [] },
+              { ...parcel, status, areaM2: undefined, priceHistory: [] }
+            ])
+          )
+        )
+      );
+      expect(
+        payload.map((entry) =>
+          Object.keys(entry).filter((key) => key === 'areaM2' || key === 'priceRub')
+        )
+      ).toMatchInlineSnapshot(`
+        [
+          [
+            "priceRub",
+          ],
+          [
+            "areaM2",
+          ],
+          [],
+        ]
+      `);
+    }
+  );
+
+  it.each(['sold', 'unavailable', undefined] as const)(
+    'omits area and price for %s even when both remain in the domain record',
+    (status) => {
+      const text = JSON.stringify(buildParcelMapPayload([{ ...parcel, status }]));
+      expect(ParcelMapPublicSchema.parse(JSON.parse(text))).toHaveLength(1);
+      expect(text).not.toMatch(/areaM2|priceRub|priceHistory|history|features|body|notes/u);
+    }
+  );
+
   it.each([{ aliases: [] }, { aliases: ['SHR-L44'] }])(
     'places the common label on the internal seam with aliases $aliases',
     ({ aliases }) => {
@@ -230,10 +323,12 @@ describe('parcel public payloads', () => {
     expect(Object.keys(JSON.parse(JSON.stringify(payload))[0] ?? {}).sort()).toMatchInlineSnapshot(`
       [
         "aliases",
+        "areaM2",
         "code",
         "geometry",
         "labelCoordinates",
         "part",
+        "priceRub",
         "status",
       ]
     `);
