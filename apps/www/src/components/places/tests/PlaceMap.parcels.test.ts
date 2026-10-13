@@ -17,6 +17,7 @@ import {
   place,
   titanicPlace,
   parcel,
+  details,
   parcelContours,
   parcelFetch,
   parcelSelectionColor,
@@ -39,6 +40,113 @@ vi.mock(import('@/lib/yandex-maps/runtime'), async (importOriginal) => {
 
 describe('PlaceMap', () => {
   registerPlaceMapSetup();
+
+  it('formats one compound label with exact rubles and sotkas and preserves it across zoom 18', async () => {
+    const group = {
+      ...parcel,
+      status: 'available',
+      multipleCadastralParcels: true,
+      geometry: { type: 'MultiPolygon', coordinates: parcelContours },
+      price: 3_401_055,
+      area: 945
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => Response.json(url.includes('/details/') ? details : [group]))
+    );
+    render(PlaceMap, { props: { places: [place] } });
+    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
+    await waitFor(() => expect(areaFeatures).toHaveLength(1));
+    const updateZoom = (zoom: number) =>
+      mapUpdateHandlers[0]?.({
+        type: 'update',
+        location: { center: [37.715, 55.065], zoom, bounds: map.bounds },
+        camera: {},
+        mapInAction: false
+      });
+    updateZoom(17);
+    const label = markerElements.find((element) => element.title === 'SHR-L43 / SHR-L44');
+    const canvas = mapElements[0];
+    if (!label || !canvas) throw new Error('Parcel label missing');
+    canvas.append(label);
+    label.focus();
+    expect(label.children).toHaveLength(1);
+    const marker = map.addChild.mock.lastCall?.[0];
+    await fireEvent.click(label, { detail: 1 });
+    const selectionCalls = areaFeatures[0]?.update.mock.calls.length;
+    for (const zoom of [18, 17, 17.999, 18.001, 18, 17]) {
+      updateZoom(zoom);
+      expect(document.activeElement).toBe(label);
+      expect(markerElements.filter((element) => element.title === label.title)).toHaveLength(1);
+      expect(map.removeChild).not.toHaveBeenCalledWith(marker);
+      expect(window.location.search).toBe('?p=SHR-L43');
+      expect(areaFeatures[0]?.update).toHaveBeenCalledTimes(selectionCalls!);
+      if (zoom >= 18) {
+        expect({
+          rows: Array.from(label.children, (row) => row.textContent?.replaceAll('\u00a0', '·')),
+          name: label.getAttribute('aria-label')?.replaceAll('\u00a0', '·')
+        }).toMatchInlineSnapshot(`
+          {
+            "name": "Выбрать участок SHR-L43 / SHR-L44, 3·401·055·₽, 9,45·сот.",
+            "rows": [
+              "L43/L44",
+              "3·401·055·₽",
+              "9,45·сот.",
+            ],
+          }
+        `);
+      } else {
+        expect(label.children).toHaveLength(1);
+        expect(label.getAttribute('aria-label')).toBe('Выбрать участок SHR-L43 / SHR-L44');
+      }
+    }
+    expect(label.tabIndex).toBe(0);
+    expect(label.querySelectorAll('button, a, input, [tabindex]')).toHaveLength(0);
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
+    expect(map.removeChild).toHaveBeenCalledWith(marker);
+    expect(window.location.search).toBe('');
+  });
+
+  it.each([
+    ['available', 3_401_055, 945, ['L43', '3·401·055·₽', '9,45·сот.']],
+    ['reserved', 12_000_001, 800, ['L43', '12·000·001·₽', '8·сот.']],
+    ['available', undefined, 951.234, ['L43', '9,51·сот.']],
+    ['reserved', 3_401_055, undefined, ['L43', '3·401·055·₽']],
+    ['available', undefined, undefined, ['L43']],
+    ['sold', 3_401_055, 945, ['L43']],
+    ['unavailable', 3_401_055, 945, ['L43']],
+    [undefined, 3_401_055, 945, ['L43']]
+  ] as const)(
+    'renders only known eligible values immediately at zoom 18: %s %s %s',
+    async (status, price, area, rows) => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => Response.json([{ ...parcel, status, price, area }]))
+      );
+      render(PlaceMap, { props: { places: [place] } });
+      await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+      map.zoom = 18;
+      mapUpdateHandlers[0]?.({
+        type: 'update',
+        location: { center: [37.715, 55.065], zoom: 18, bounds: map.bounds },
+        camera: {},
+        mapInAction: false
+      });
+      await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+      await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
+      await waitFor(() => expect(areaFeatures).toHaveLength(1));
+      const label = markerElements.find((element) => element.title === parcel.code);
+      if (!label) throw new Error('Parcel label missing');
+      expect(
+        Array.from(label.children, (row) => row.textContent?.replaceAll('\u00a0', '·'))
+      ).toEqual(rows);
+      expect(label.getAttribute('aria-label')?.replaceAll('\u00a0', '·')).toBe(
+        [`Выбрать участок ${parcel.code}`, ...rows.slice(1)].join(', ')
+      );
+    }
+  );
 
   it('loads parcel geometry only when switched on, reuses it after switching off and keeps places', async () => {
     vi.stubGlobal('fetch', parcelFetch);

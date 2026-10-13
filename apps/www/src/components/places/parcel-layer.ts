@@ -4,15 +4,54 @@ import type {
   MultiPolygonGeometry,
   PolygonGeometry,
   YMap,
-  YMapFeature,
-  YMapMarker
+  YMapFeature
 } from '@yandex/ymaps3-types';
 
 import type { ParcelPart } from '@/lib/parcels/schema';
 
-import type { ParcelLayer, ParcelMapItem, ParcelSelectionChange } from './parcel-layer-types';
+import type {
+  ParcelLabel,
+  ParcelLayer,
+  ParcelMapItem,
+  ParcelSelectionChange
+} from './parcel-layer-types';
 
 const LABEL_MIN_ZOOM = 17;
+const DETAILS_MIN_ZOOM = 18;
+const priceFormatter = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 });
+const areaFormatter = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
+
+const updateLabel = (label: ParcelLabel, item: ParcelMapItem, zoom: number): void => {
+  const expanded =
+    zoom >= DETAILS_MIN_ZOOM && (item.status === 'available' || item.status === 'reserved');
+  if (label.expanded === expanded) return;
+  label.expanded = expanded;
+  for (const row of label.button.querySelectorAll('.parcel-map-label__detail')) row.remove();
+  const details: string[] = [];
+  if (expanded) {
+    for (const [value, className] of [
+      [
+        item.price === undefined ? undefined : `${priceFormatter.format(item.price)}\u00a0₽`,
+        'parcel-map-label__price'
+      ],
+      [
+        item.area === undefined ? undefined : `${areaFormatter.format(item.area / 100)}\u00a0сот.`,
+        'parcel-map-label__area'
+      ]
+    ] as const) {
+      if (!value) continue;
+      const row = document.createElement('span');
+      row.className = `parcel-map-label__detail ${className}`;
+      row.textContent = value;
+      label.button.append(row);
+      details.push(value);
+    }
+  }
+  label.button.setAttribute(
+    'aria-label',
+    [`Выбрать участок ${label.button.title}`, ...details].join(', ')
+  );
+};
 
 const toMapGeometry = (
   geometry: ParcelMapItem['geometry']
@@ -38,7 +77,7 @@ export const createParcelLayer = (
 ): ParcelLayer => {
   const itemsByPart = new Map<ParcelPart, readonly ParcelMapItem[]>();
   const features = new Map<string, YMapFeature>();
-  const labels = new Map<string, YMapMarker>();
+  const labels = new Map<string, ParcelLabel>();
   let selected: ParcelMapItem | undefined;
   let destroyed = false;
   let viewportZoom = map.zoom;
@@ -115,7 +154,11 @@ export const createParcelLayer = (
           )
             continue;
           visible.add(item.code);
-          if (labels.has(item.code)) continue;
+          const existing = labels.get(item.code);
+          if (existing) {
+            updateLabel(existing, item, zoom);
+            continue;
+          }
           const codes =
             item.multipleCadastralParcels && item.aliases?.length
               ? [
@@ -130,6 +173,7 @@ export const createParcelLayer = (
           button.className = 'parcel-map-label';
           if (item.status === 'unavailable') button.classList.add('parcel-map-label--unavailable');
           const text = document.createElement('span');
+          text.className = 'parcel-map-label__number';
           text.textContent = codes.map((code) => code.split('-')[1] ?? code).join('/');
           button.append(text);
           button.title = codes.join(' / ');
@@ -139,14 +183,16 @@ export const createParcelLayer = (
             select(item, event.detail === 0 ? button : undefined);
           });
           const marker = new sdk.YMapMarker({ coordinates: [lng, lat], zIndex: -1 }, button);
-          labels.set(item.code, marker);
+          const label = { marker, button, expanded: false };
+          labels.set(item.code, label);
+          updateLabel(label, item, zoom);
           map.addChild(marker);
         }
     }
 
-    for (const [code, marker] of labels) {
+    for (const [code, label] of labels) {
       if (visible.has(code)) continue;
-      map.removeChild(marker);
+      map.removeChild(label.marker);
       labels.delete(code);
     }
   };
@@ -163,7 +209,7 @@ export const createParcelLayer = (
       if (feature) map.removeChild(feature);
       features.delete(item.code);
       const label = labels.get(item.code);
-      if (label) map.removeChild(label);
+      if (label) map.removeChild(label.marker);
       labels.delete(item.code);
     }
   };
