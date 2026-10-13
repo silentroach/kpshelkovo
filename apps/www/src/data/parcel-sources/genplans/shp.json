@@ -1,7 +1,7 @@
 {
   "part": "shp",
   "page": "https://dgtime.ru/shp/shp-genplan/",
-  "capturedAt": "2026-10-07T09:17:44.141Z",
+  "capturedAt": "2026-10-13T09:38:41.207Z",
   "plots": [
     {
       "id": "B1",
@@ -3616,44 +3616,44 @@
     {
       "id": "А72",
       "cadastralReference": "50:33:0010101:2574",
-      "status": "Снят с продажи",
+      "status": "Свободен",
       "location": "луговой",
-      "objectprice": 3463950
+      "objectprice": 6088950
     },
     {
       "id": "А73",
       "cadastralReference": "50:33:0010101:2563",
-      "status": "Снят с продажи",
+      "status": "Свободен",
       "location": "луговой",
-      "objectprice": 3099000
+      "objectprice": 4939000
     },
     {
       "id": "А74",
       "cadastralReference": "50:33:0010101:2552",
-      "status": "Снят с продажи",
+      "status": "Свободен",
       "location": "луговой",
-      "objectprice": 2944050
+      "objectprice": 4084050
     },
     {
       "id": "А75",
       "cadastralReference": "50:33:0010101:2607",
-      "status": "Снят с продажи",
+      "status": "Свободен",
       "location": "луговой",
-      "objectprice": 2479200
+      "objectprice": 3439200
     },
     {
       "id": "А76",
       "cadastralReference": "50:33:0010101:2596",
-      "status": "Снят с продажи",
+      "status": "Свободен",
       "location": "луговой",
-      "objectprice": 2944050
+      "objectprice": 4179050
     },
     {
       "id": "А77",
       "cadastralReference": "50:33:0010101:2585",
-      "status": "Снят с продажи",
+      "status": "Свободен",
       "location": "луговой",
-      "objectprice": 3463950
+      "objectprice": 6088950
     },
     {
       "id": "А78",
