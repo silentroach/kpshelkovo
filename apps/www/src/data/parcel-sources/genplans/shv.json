@@ -1,7 +1,7 @@
 {
   "part": "shv",
   "page": "https://dgtime.ru/shv/shv-genplan/",
-  "capturedAt": "2026-10-07T09:17:43.723Z",
+  "capturedAt": "2026-10-13T09:38:41.070Z",
   "plots": [
     {
       "id": "A3",
@@ -1770,7 +1770,7 @@
     {
       "id": "D50",
       "cadastralReference": "50:33:0010101:1689",
-      "status": "Свободен",
+      "status": "Продан",
       "location": "с видом на лес",
       "objectprice": 4318800
     },
