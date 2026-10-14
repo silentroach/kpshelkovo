@@ -478,6 +478,7 @@
   }
 
   .filter-label {
+    border-radius: var(--radius-full);
     white-space: nowrap;
   }
 
@@ -595,7 +596,7 @@
     min-width: 0;
     flex: 1 1 0%;
     border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-lg);
     padding: 0.5rem 0.75rem;
     background: var(--color-surface);
     color: var(--color-text);

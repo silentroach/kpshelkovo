@@ -455,11 +455,21 @@ const serviceSearchText = (
       }
 
       .services-table-service-heading {
-        border-top-left-radius: var(--radius-xl);
+        border-top-left-radius: calc(var(--radius-xl) - 1px);
       }
 
       .services-table-mapping-heading {
-        border-top-right-radius: var(--radius-xl);
+        border-top-right-radius: calc(var(--radius-xl) - 1px);
+      }
+
+      .services-table-shell[data-ui-sticky-table-stuck]
+        .services-table-service-heading {
+        border-top-left-radius: 0;
+      }
+
+      .services-table-shell[data-ui-sticky-table-stuck]
+        .services-table-mapping-heading {
+        border-top-right-radius: 0;
       }
     }
 

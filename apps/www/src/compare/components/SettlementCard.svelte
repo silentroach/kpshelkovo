@@ -187,6 +187,7 @@
       display: flex;
       flex-direction: column;
       border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
       background: var(--color-surface);
       padding: 1.25rem;
     }

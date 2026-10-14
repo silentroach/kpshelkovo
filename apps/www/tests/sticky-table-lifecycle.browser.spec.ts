@@ -157,3 +157,26 @@ test('updates sticky state on direct load and a fresh client destination', async
   expect(await getBrowserSession(page)).toBe(browserSession);
   await scrollIntoStickyState(shell);
 });
+
+test('straightens the header corners only while the table is stuck', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+
+  for (const pathname of stickyRoutes) {
+    await page.goto(pathname, { waitUntil: 'domcontentloaded' });
+    const shell = page.locator(stickyTableSelector).first();
+    const first = shell.locator('thead th').first();
+    const last = shell.locator('thead th').last();
+    await expect(shell).not.toHaveAttribute('data-ui-sticky-table-stuck');
+    await expect(first).not.toHaveCSS('border-top-left-radius', '0px');
+    await expect(last).not.toHaveCSS('border-top-right-radius', '0px');
+
+    await scrollIntoStickyState(shell);
+    await expect(first).toHaveCSS('border-top-left-radius', '0px');
+    await expect(last).toHaveCSS('border-top-right-radius', '0px');
+
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    await expect(shell).not.toHaveAttribute('data-ui-sticky-table-stuck');
+    await expect(first).not.toHaveCSS('border-top-left-radius', '0px');
+    await expect(last).not.toHaveCSS('border-top-right-radius', '0px');
+  }
+});

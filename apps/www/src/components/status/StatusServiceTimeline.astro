@@ -306,87 +306,85 @@ const timelineGroups = incidents
 >
   <div class="status-service-timeline__track">
     <div class="status-service-timeline__segments" data-status-timeline-track>
-      {
-        timelineGroups.map(
-          ({
-            compactMarker,
-            endIso,
-            geometryEndIso,
-            geometryStartIso,
-            href,
-            hidden,
-            id,
-            left,
-            phaseIcon,
-            reachesRangeEnd,
-            statusKind,
-            tone,
-            tooltip,
-            tooltipAreaLabel,
-            tooltipAreas,
-            tooltipLabel,
-            tooltipItems,
-            tooltipServiceLabel,
-            tooltipTitle,
-            startIso,
-            width,
-          }) => {
-            const TimelineSegment = href ? 'a' : 'button';
+      {timelineGroups.map(
+        ({
+          compactMarker,
+          endIso,
+          geometryEndIso,
+          geometryStartIso,
+          href,
+          hidden,
+          id,
+          left,
+          phaseIcon,
+          reachesRangeEnd,
+          statusKind,
+          tone,
+          tooltip,
+          tooltipAreaLabel,
+          tooltipAreas,
+          tooltipLabel,
+          tooltipItems,
+          tooltipServiceLabel,
+          tooltipTitle,
+          startIso,
+          width,
+        }) => {
+          const TimelineSegment = href ? 'a' : 'button';
 
-            return (
-              <TimelineSegment
-                href={href}
-                type={href ? undefined : 'button'}
-                title={tooltipLabel}
-                aria-label={tooltipLabel}
-                data-incident-id={id}
-                data-status-problem
-                data-status-kind={statusKind}
-                data-status-service={service}
-                data-start={startIso}
-                data-end={endIso}
-                data-geometry-start={geometryStartIso}
-                data-geometry-end={geometryEndIso}
-                data-tooltip-service-label={
-                  tooltip?.serviceLabel ?? tooltipServiceLabel
-                }
-                data-tooltip-kind-label={tooltip?.kindLabel}
-                data-tooltip-title={tooltip?.title}
-                data-tooltip-phase-label={tooltip?.phaseLabel}
-                data-tooltip-phase-icon={tooltip ? phaseIcon : undefined}
-                data-tooltip-period-label={tooltip?.periodLabel}
-                data-tooltip-area-label={tooltipAreaLabel}
-                data-tooltip-areas={
-                  tooltipAreas ? serializeAreas(tooltipAreas) : undefined
-                }
-                data-tooltip-group-title={tooltip ? undefined : tooltipTitle}
-                data-tooltip-items={tooltipItems}
-                class:list={[
-                  'status-service-timeline__segment status-service-timeline__segment--problem',
-                  compactMarker &&
-                    'status-service-timeline__segment--compact-marker',
-                  reachesRangeEnd &&
-                    'status-service-timeline__segment--problem-active-end',
-                  tone === 'amber'
-                    ? 'status-service-timeline__segment--amber'
-                    : 'status-service-timeline__segment--red',
-                ]}
-                hidden={hidden}
-                style={
-                  hidden || left === undefined || width === undefined
-                    ? undefined
-                    : `--segment-left: ${left}; --segment-width: ${width};`
-                }
-              >
-                <span
-                  class="status-service-timeline__segment-marker"
-                  aria-hidden="true"
-                />
-              </TimelineSegment>
-            );
-          },
-        )
-      }
+          return (
+            <TimelineSegment
+              href={href}
+              type={href ? undefined : 'button'}
+              title={tooltipLabel}
+              aria-label={tooltipLabel}
+              data-incident-id={id}
+              data-status-problem
+              data-status-kind={statusKind}
+              data-status-service={service}
+              data-start={startIso}
+              data-end={endIso}
+              data-geometry-start={geometryStartIso}
+              data-geometry-end={geometryEndIso}
+              data-tooltip-service-label={
+                tooltip?.serviceLabel ?? tooltipServiceLabel
+              }
+              data-tooltip-kind-label={tooltip?.kindLabel}
+              data-tooltip-title={tooltip?.title}
+              data-tooltip-phase-label={tooltip?.phaseLabel}
+              data-tooltip-phase-icon={tooltip ? phaseIcon : undefined}
+              data-tooltip-period-label={tooltip?.periodLabel}
+              data-tooltip-area-label={tooltipAreaLabel}
+              data-tooltip-areas={
+                tooltipAreas ? serializeAreas(tooltipAreas) : undefined
+              }
+              data-tooltip-group-title={tooltip ? undefined : tooltipTitle}
+              data-tooltip-items={tooltipItems}
+              class:list={[
+                'status-service-timeline__segment status-service-timeline__segment--problem',
+                compactMarker &&
+                  'status-service-timeline__segment--compact-marker',
+                reachesRangeEnd &&
+                  'status-service-timeline__segment--problem-active-end',
+                tone === 'amber'
+                  ? 'status-service-timeline__segment--amber'
+                  : 'status-service-timeline__segment--red',
+              ]}
+              hidden={hidden}
+              style={
+                hidden || left === undefined || width === undefined
+                  ? undefined
+                  : `--segment-left: ${left}; --segment-width: ${width};`
+              }
+            >
+              <span
+                class="status-service-timeline__segment-marker"
+                aria-hidden="true"
+              />
+            </TimelineSegment>
+          );
+        },
+      )}
     </div>
   </div>
 
@@ -419,24 +417,24 @@ const timelineGroups = incidents
       <span
         class="status-service-timeline__tooltip-areas"
         data-status-tooltip-title-areas
-        hidden></span>
+        hidden
+      ></span>
     </p>
-    <p class="status-service-timeline__tooltip-row" data-status-tooltip-period>
-    </p>
+    <p
+      class="status-service-timeline__tooltip-row"
+      data-status-tooltip-period
+    ></p>
     <div
       class="status-service-timeline__tooltip-list"
       data-status-tooltip-list
       hidden
-    >
-    </div>
+    ></div>
     <div data-status-tooltip-area-templates hidden>
-      {
-        STATUS_AREAS.map((area) => (
-          <span data-status-tooltip-area-template={area}>
-            <ShelkovoAreaIcon area={area} />
-          </span>
-        ))
-      }
+      {STATUS_AREAS.map((area) => (
+        <span data-status-tooltip-area-template={area}>
+          <ShelkovoAreaIcon area={area} />
+        </span>
+      ))}
     </div>
   </div>
 </div>
@@ -609,7 +607,7 @@ const timelineGroups = incidents
         var(--color-border) 56%,
         var(--color-surface-raised) 44%
       );
-    border-radius: 1rem;
+    border-radius: var(--radius-2xl);
     background: color-mix(
       in oklab,
       var(--color-surface-raised) 90%,

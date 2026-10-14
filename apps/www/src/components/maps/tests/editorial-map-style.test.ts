@@ -22,6 +22,7 @@ it('keeps labels wrappable and groups the caption with the map and its focusable
 
   const prose = document.createElement('div');
   prose.className = 'ui-prose';
+  prose.style.setProperty('--radius-xl', '12px');
   const figure = document.createElement('figure');
   figure.className = 'ui-editorial-map map-frame';
   figure.innerHTML =

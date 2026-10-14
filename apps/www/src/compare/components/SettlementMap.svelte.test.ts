@@ -104,7 +104,15 @@ const mockSettlements = [
 ];
 
 describe('SettlementMap', () => {
+  let popupGeometryStyles: HTMLStyleElement;
+
   beforeEach(() => {
+    // DOM tests do not load the app tokens or component CSS; provide resolved geometry only.
+    popupGeometryStyles = document.createElement('style');
+    popupGeometryStyles.dataset.popupGeometryFixture = 'settlement';
+    popupGeometryStyles.textContent =
+      'html { font-size: 16px; } .map-popup-panel { border-radius: 16px; }';
+    document.head.append(popupGeometryStyles);
     vi.clearAllMocks();
     markers.length = 0;
     resizeMap = undefined;
@@ -125,6 +133,7 @@ describe('SettlementMap', () => {
   });
 
   afterEach(() => {
+    popupGeometryStyles.remove();
     vi.useRealTimers();
     cleanup();
     vi.restoreAllMocks();
@@ -319,6 +328,11 @@ describe('SettlementMap', () => {
     );
     expect(container.querySelector('[data-testid="map-popup-arrow"]')).toBeNull();
 
+    markerRect.left = 20;
+    markerRect.top = 140;
+    await fireEvent.click(marker);
+    expect(container.querySelector('[data-testid="map-popup-arrow"]')).toBeNull();
+
     markerRect.left = 90;
     markerRect.top = 140;
     marker.click();
@@ -330,6 +344,7 @@ describe('SettlementMap', () => {
   });
 
   it('uses the actual popup width near the map edge', async () => {
+    vi.stubGlobal('ResizeObserver', TestResizeObserver);
     const { container } = render(SettlementMap, { props: { settlements: mockSettlements } });
     await waitFor(() => expect(markers).toHaveLength(mockSettlements.length));
     const canvas = container.querySelector('.map-canvas');
@@ -341,12 +356,13 @@ describe('SettlementMap', () => {
       width: 400,
       height: 220
     } as DOMRect);
-    vi.spyOn(marker, 'getBoundingClientRect').mockReturnValue({
+    const markerRect = {
       left: 360,
       top: 140,
       width: 20,
       height: 20
-    } as DOMRect);
+    };
+    vi.spyOn(marker, 'getBoundingClientRect').mockImplementation(() => markerRect as DOMRect);
     vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockImplementation(function (
       this: HTMLElement
     ) {
@@ -359,9 +375,33 @@ describe('SettlementMap', () => {
         '228px'
       )
     );
-    expect(
-      container.querySelector<HTMLElement>('[data-testid="map-popup-arrow"]')?.style.left
-    ).toBe('302px');
+    expect(container.querySelector('[data-testid="map-popup-arrow"]')).toBeNull();
+
+    markerRect.left = 330;
+    await fireEvent.click(marker);
+    await waitFor(() =>
+      expect(
+        container.querySelector<HTMLElement>('[data-testid="map-popup-arrow"]')?.style.left
+      ).toBe('272px')
+    );
+    popupGeometryStyles.textContent =
+      'html { font-size: 32px; } .map-popup-panel { border-radius: 32px; }';
+    resizeMap?.();
+    await waitFor(() => expect(container.querySelector('[data-testid="map-popup"]')).toBeNull());
+    await fireEvent.click(marker);
+    await waitFor(() =>
+      expect(container.querySelector<HTMLElement>('[data-testid="map-popup"]')?.style.left).toBe(
+        '228px'
+      )
+    );
+    expect(container.querySelector('[data-testid="map-popup-arrow"]')).toBeNull();
+    markerRect.left = 320;
+    await fireEvent.click(marker);
+    await waitFor(() =>
+      expect(
+        container.querySelector<HTMLElement>('[data-testid="map-popup-arrow"]')?.style.left
+      ).toBe('262px')
+    );
   });
 
   it('keeps an enlarged popup inside a narrower map', async () => {
@@ -399,9 +439,7 @@ describe('SettlementMap', () => {
     expect(
       container.querySelector<HTMLElement>('[data-testid="map-popup-panel"]')?.style.maxWidth
     ).toBe('276px');
-    expect(
-      container.querySelector<HTMLElement>('[data-testid="map-popup-arrow"]')?.style.left
-    ).toBe('258px');
+    expect(container.querySelector('[data-testid="map-popup-arrow"]')).toBeNull();
   });
 
   it('destroys the partial map after control import failure and retries with a fresh control', async () => {
