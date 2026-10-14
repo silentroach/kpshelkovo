@@ -1,7 +1,7 @@
 {
   "part": "shr",
   "page": "https://dgtime.ru/shr/shr-genplan/",
-  "capturedAt": "2026-10-13T09:38:41.334Z",
+  "capturedAt": "2026-10-14T09:17:34.364Z",
   "plots": [
     {
       "id": "E1",
@@ -386,7 +386,7 @@
       "cadastralReference": "50:33:0010101:2308",
       "status": "Свободен",
       "location": "с видом на лес",
-      "objectprice": 3919200
+      "objectprice": 4191120
     },
     {
       "id": "E57",
