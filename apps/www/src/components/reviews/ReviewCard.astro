@@ -30,35 +30,35 @@ const ratedAspects = sortReviewAspects(review.aspects).filter(
   >
     <div class="review-card__summary">
       <h3 class="ui-entry-title">
-        <a href={review.url} class="ui-link">{formatReviewTitle(review)}</a>
+        <a href={review.url} class="ui-title-link">
+          {formatReviewTitle(review)}
+        </a>
       </h3>
       <div class="review-card__meta">
         <ReviewMeta review={review} />
       </div>
     </div>
 
-    {
-      ratedAspects.length > 0 && (
-        <ul class="review-card__aspects">
-          {ratedAspects.map((aspect) => (
-            <li class="review-card__aspect">
-              <span
-                class="review-card__aspect-label"
-                title={formatReviewAspectLabelHint(aspect.type)}
-              >
-                {formatReviewAspectLabel(aspect.type)}
-              </span>
-              <div class="review-card__rating">
-                <StarRating
-                  rating={aspect.rating}
-                  label={`Оценка ${aspect.rating} из 5`}
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
-      )
-    }
+    {ratedAspects.length > 0 && (
+      <ul class="review-card__aspects">
+        {ratedAspects.map((aspect) => (
+          <li class="review-card__aspect">
+            <span
+              class="review-card__aspect-label"
+              title={formatReviewAspectLabelHint(aspect.type)}
+            >
+              {formatReviewAspectLabel(aspect.type)}
+            </span>
+            <div class="review-card__rating">
+              <StarRating
+                rating={aspect.rating}
+                label={`Оценка ${aspect.rating} из 5`}
+              />
+            </div>
+          </li>
+        ))}
+      </ul>
+    )}
   </div>
 </article>
 

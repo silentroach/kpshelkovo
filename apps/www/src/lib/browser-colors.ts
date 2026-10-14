@@ -1,4 +1,4 @@
-export const themeColor = '#fcfcfb';
+export const themeColor = '#fafbf8';
 
 export const browserColor = {
   tile: '#fefbf8',

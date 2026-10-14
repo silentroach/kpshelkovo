@@ -43,7 +43,7 @@ describe('Hero', () => {
   });
 
   it('renders subtitle link when provided', () => {
-    const { container } = render(Hero, {
+    const { getByRole } = render(Hero, {
       props: {
         title: 'Test Title',
         subtitle: 'Сравнение по цене и',
@@ -52,8 +52,8 @@ describe('Hero', () => {
       }
     });
 
-    const link = container.querySelector('a[href="/815/compare/rating/"]');
-    expect(link?.textContent).toContain('рейтингу');
-    expect(link?.className).toContain('ui-link');
+    expect(getByRole('link', { name: 'рейтингу' }).getAttribute('href')).toBe(
+      '/815/compare/rating/'
+    );
   });
 });

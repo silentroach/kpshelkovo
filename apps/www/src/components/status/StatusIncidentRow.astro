@@ -35,40 +35,34 @@ const TitleIcon = titleIcon?.Icon;
   <div class="status-incident-row__content">
     <div class="status-incident-row__header">
       <h3 class="ui-entry-title">
-        {
-          titleIcon && TitleIcon && (
-            <span
-              aria-hidden="true"
-              class:list={[
-                'status-incident-row__icon',
-                `status-incident-row__icon--${titleIcon.tone}`,
-              ]}
-            >
-              <TitleIcon />
-            </span>
-          )
-        }
-        {
-          incident.hasPage ? (
-            // prettier-ignore
-            <a href={incident.url} class="ui-link status-incident-row__title">{incident.title}</a>
-          ) : (
-            <span class="status-incident-row__title">{incident.title}</span>
-          )
-        }
+        {titleIcon && TitleIcon && (
+          <span
+            aria-hidden="true"
+            class:list={[
+              'status-incident-row__icon',
+              `status-incident-row__icon--${titleIcon.tone}`,
+            ]}
+          >
+            <TitleIcon />
+          </span>
+        )}
+        {incident.hasPage ? (
+          // prettier-ignore
+          <a href={incident.url} class="ui-title-link status-incident-row__title">{incident.title}</a>
+        ) : (
+          <span class="status-incident-row__title">{incident.title}</span>
+        )}
       </h3>
 
       <StatusIncidentMeta incident={incident} />
     </div>
 
-    {
-      excerptHtml && (
-        <div
-          class="ui-copy status-incident-row__excerpt"
-          set:html={excerptHtml}
-        />
-      )
-    }
+    {excerptHtml && (
+      <div
+        class="ui-copy status-incident-row__excerpt"
+        set:html={excerptHtml}
+      />
+    )}
   </div>
 </article>
 

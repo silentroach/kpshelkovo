@@ -25,7 +25,7 @@
   <div class="settlement-header">
     <div class="settlement-identity">
       <h3 class="settlement-title">
-        <a href={withBase(`settlements/${settlement.slug}/`)} class="ui-link">
+        <a href={withBase(`settlements/${settlement.slug}/`)} class="ui-title-link">
           {settlement.shortName}
         </a>
       </h3>

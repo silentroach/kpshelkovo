@@ -1354,6 +1354,7 @@
   .place-map__canvas:focus-visible {
     outline: 0.1875rem solid var(--color-focus);
     outline-offset: -0.1875rem;
+    box-shadow: inset 0 0 0 0.3125rem var(--color-surface);
   }
 
   .parcel-map-controls {
@@ -1714,6 +1715,7 @@
   .place-map__canvas :global(:is(a, button):focus-visible) {
     outline: 0.1875rem solid var(--color-focus);
     outline-offset: 0.125rem;
+    box-shadow: 0 0 0 0.4375rem var(--color-surface);
   }
 
   @container (max-width: 32rem) {
@@ -1877,7 +1879,10 @@
   }
 
   :global(.place-map-marker:focus-visible) {
-    box-shadow: 0 0 0 0.1875rem var(--color-focus);
+    box-shadow:
+      0 0 0 0.125rem var(--color-surface),
+      0 0 0 0.3125rem var(--color-focus),
+      0 0 0 0.4375rem var(--color-surface);
   }
 
   :global(.place-map-marker[data-open='false'] .place-map-marker-point-surface) {
@@ -1983,6 +1988,7 @@
   :global(.place-map-cluster:focus-visible) {
     outline: 0.1875rem solid var(--color-focus);
     outline-offset: 0.125rem;
+    box-shadow: 0 0 0 0.4375rem var(--color-surface);
     transform: translate(-50%, -50%) scale(1.08);
   }
 

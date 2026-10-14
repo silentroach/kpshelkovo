@@ -384,7 +384,8 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
   }
 
   .site-nav-submenu-link:focus-visible {
-    outline: none;
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
   }
 
   .site-nav-dropdown:not([data-site-nav-dropdown-hydrated]):is(
@@ -481,10 +482,15 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
     outline: none;
   }
 
+  .site-nav-mobile-link:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+  }
+
   .site-nav-mobile-label {
     min-height: 2rem;
     padding-bottom: 0.25rem;
-    color: var(--color-text-muted);
+    color: var(--color-text);
     font-size: 0.8125rem;
     letter-spacing: 0.02em;
   }

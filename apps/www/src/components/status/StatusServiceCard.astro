@@ -59,70 +59,66 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
 
 <article class="status-service-row ui-shell" data-status-service-card>
   <div class="status-service-row__layout">
-    {
-      serviceHref ? (
-        <a href={serviceHref} class="status-service-row__service-link">
-          <span
-            class:list={[
-              'status-service-row__icon',
-              `status-service-row__icon--${summary.service}`,
-            ]}
-          >
-            <ServiceIcon />
-          </span>
+    {serviceHref ? (
+      <a href={serviceHref} class="status-service-row__service-link">
+        <span
+          class:list={[
+            'status-service-row__icon',
+            `status-service-row__icon--${summary.service}`,
+          ]}
+        >
+          <ServiceIcon />
+        </span>
 
-          <div class="status-service-row__service-name">
-            <h3 class="ui-card-title status-service-row__linked-title">
-              {serviceLabel}
-            </h3>
-          </div>
-        </a>
-      ) : (
-        <div class="status-service-row__service">
-          <span
-            class:list={[
-              'status-service-row__icon',
-              `status-service-row__icon--${summary.service}`,
-            ]}
-          >
-            <ServiceIcon />
-          </span>
-
-          <div class="status-service-row__service-name">
-            <h3 class="ui-card-title">{serviceLabel}</h3>
-          </div>
+        <div class="status-service-row__service-name">
+          <h3 class="ui-card-title status-service-row__linked-title">
+            {serviceLabel}
+          </h3>
         </div>
-      )
-    }
+      </a>
+    ) : (
+      <div class="status-service-row__service">
+        <span
+          class:list={[
+            'status-service-row__icon',
+            `status-service-row__icon--${summary.service}`,
+          ]}
+        >
+          <ServiceIcon />
+        </span>
+
+        <div class="status-service-row__service-name">
+          <h3 class="ui-card-title">{serviceLabel}</h3>
+        </div>
+      </div>
+    )}
 
     <div class="status-service-row__timeline">
-      {
-        hasResponsiveTimeline ? (
-          <>
-            <div data-status-timeline-viewport="mobile">
-              <StatusServiceTimeline
-                service={summary.service}
-                incidents={timelineIncidents}
-                timelineDays={resolvedMobileTimelineDays}
-              />
-            </div>
+      {hasResponsiveTimeline ? (
+        <>
+          <div data-status-timeline-viewport="mobile">
+            <StatusServiceTimeline
+              service={summary.service}
+              incidents={timelineIncidents}
+              timelineDays={resolvedMobileTimelineDays}
+            />
+          </div>
 
-            <div data-status-timeline-viewport="desktop">
-              <StatusServiceTimeline
-                service={summary.service}
-                incidents={timelineIncidents}
-                timelineDays={timelineDays}
-              />
-            </div>
-          </>
-        ) : (
-          <StatusServiceTimeline
-            service={summary.service}
-            incidents={timelineIncidents}
-            timelineDays={timelineDays}
-          />
-        )
-      }
+          <div data-status-timeline-viewport="desktop">
+            <StatusServiceTimeline
+              service={summary.service}
+              incidents={timelineIncidents}
+              timelineDays={timelineDays}
+            />
+          </div>
+        </>
+      ) : (
+        <StatusServiceTimeline
+          service={summary.service}
+          incidents={timelineIncidents}
+          timelineDays={timelineDays}
+        />
+      )}
     </div>
 
     <div class="status-service-row__state">
@@ -132,44 +128,40 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
     <div class="status-service-row__latest">
       <p class="status-service-row__latest-label">Последняя запись</p>
 
-      {
-        latestRecord ? (
-          <div class="status-service-row__latest-content">
-            {latestRecord.hasPage ? (
-              <a
-                href={latestRecord.url}
-                class="site-inline-link status-service-row__latest-title"
-              >
-                {latestRecord.title}
-              </a>
-            ) : (
-              <p class="status-service-row__latest-title">
-                {latestRecord.title}
-              </p>
-            )}
-            {(latestMoment || latestAreas.length > 0) && (
-              <div class="status-service-row__latest-meta">
-                {latestMoment && <span>{latestMoment}</span>}
-                {latestAreas.map((area) => (
-                  <ShelkovoAreaIcon area={area} />
-                ))}
-              </div>
-            )}
-            {latestDuration && (
-              <p class="status-service-row__latest-meta">
-                Длительность: {latestDuration}
-              </p>
-            )}
-          </div>
-        ) : (
-          <div class="status-service-row__latest-content">
-            <p class="status-service-row__latest-empty">
-              Пока без записей по этому сервису
+      {latestRecord ? (
+        <div class="status-service-row__latest-content">
+          {latestRecord.hasPage ? (
+            <a
+              href={latestRecord.url}
+              class="site-inline-link status-service-row__latest-title"
+            >
+              {latestRecord.title}
+            </a>
+          ) : (
+            <p class="status-service-row__latest-title">{latestRecord.title}</p>
+          )}
+          {(latestMoment || latestAreas.length > 0) && (
+            <div class="status-service-row__latest-meta">
+              {latestMoment && <span>{latestMoment}</span>}
+              {latestAreas.map((area) => (
+                <ShelkovoAreaIcon area={area} />
+              ))}
+            </div>
+          )}
+          {latestDuration && (
+            <p class="status-service-row__latest-meta">
+              Длительность: {latestDuration}
             </p>
-            <p class="status-service-row__latest-meta">-</p>
-          </div>
-        )
-      }
+          )}
+        </div>
+      ) : (
+        <div class="status-service-row__latest-content">
+          <p class="status-service-row__latest-empty">
+            Пока без записей по этому сервису
+          </p>
+          <p class="status-service-row__latest-meta">-</p>
+        </div>
+      )}
     </div>
   </div>
 </article>
@@ -249,8 +241,12 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
     transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .status-service-row__service-link:hover .status-service-row__linked-title {
+  .status-service-row__service-link:is(:hover, :focus-visible)
+    .status-service-row__linked-title {
     color: var(--color-primary);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
   }
 
   [data-status-timeline-viewport='desktop'],

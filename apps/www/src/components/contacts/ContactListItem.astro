@@ -20,21 +20,19 @@ const reviewHighlightLabel = 'Много положительных отзыво
 <article class="contact-list-item">
   <div class="contact-list-item__content">
     <h3 class="ui-card-title contact-list-item__title">
-      <a href={contact.url} class="ui-link">
+      <a href={contact.url} class="ui-title-link">
         {contact.title}
       </a>
-      {
-        showReviewHighlight && (
-          <span
-            class="contact-list-item__review-highlight"
-            role="img"
-            aria-label={reviewHighlightLabel}
-            title={reviewHighlightLabel}
-          >
-            <StarIcon />
-          </span>
-        )
-      }
+      {showReviewHighlight && (
+        <span
+          class="contact-list-item__review-highlight"
+          role="img"
+          aria-label={reviewHighlightLabel}
+          title={reviewHighlightLabel}
+        >
+          <StarIcon />
+        </span>
+      )}
     </h3>
 
     {excerpt ? <p class="contact-list-item__excerpt">{excerpt}</p> : null}

@@ -227,7 +227,7 @@ const titleId = newsSlug
     color: inherit;
     text-decoration: none;
   }
-  .news-event-title a:hover {
+  .news-event-title a:is(:hover, :focus-visible) {
     color: var(--color-primary);
     text-decoration: underline;
   }

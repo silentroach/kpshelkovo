@@ -30,13 +30,18 @@ const { events } = Astro.props;
           )}
         </p>
         <h2 class="ui-entry-title">
-          <a href={event.url} set:html={formatTextHtml(event.title)} />
+          <a
+            href={event.url}
+            class="ui-title-link"
+            set:html={formatTextHtml(event.title)}
+          />
         </h2>
         <p class="ui-num" set:html={formatTextHtml(formatEventRange(event))} />
         <p>
           {event.place ? (
             <a
               href={event.place.url}
+              class="site-text-link"
               set:html={formatTextHtml(event.place.name)}
             />
           ) : (
@@ -84,16 +89,6 @@ const { events } = Astro.props;
   .event-meta {
     color: var(--color-text-muted);
     font-size: 0.875rem;
-  }
-  a {
-    color: var(--color-primary);
-  }
-  a:hover {
-    text-decoration: underline;
-  }
-  a:focus-visible {
-    outline: 2px solid var(--color-accent-text);
-    outline-offset: 3px;
   }
   [data-status='cancelled'] {
     color: var(--color-danger-text);
