@@ -104,17 +104,10 @@ const statusWindows = getHomeStatusWindows(status.incidents, buildNow);
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: color-mix(
-      in oklab,
-      var(--color-surface-raised) 74%,
-      transparent
-    );
-    box-shadow:
-      inset 0 1px 0
-        color-mix(in oklab, var(--color-surface-raised) 86%, transparent),
-      0 1px 0 color-mix(in oklab, var(--color-surface-raised) 54%, transparent);
-    -webkit-backdrop-filter: saturate(145%) blur(4px);
-    backdrop-filter: saturate(145%) blur(4px);
+    background: var(--surface-glass-nav);
+    box-shadow: var(--surface-glass-highlight);
+    -webkit-backdrop-filter: var(--surface-glass-filter);
+    backdrop-filter: var(--surface-glass-filter);
     pointer-events: none;
   }
 
@@ -247,20 +240,13 @@ const statusWindows = getHomeStatusWindows(status.incidents, buildNow);
     top: calc(100% + 0.75rem);
     right: 0;
     width: min(20rem, calc(100vw - 2rem));
-    border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
+    border: 1px solid var(--surface-glass-border);
     border-radius: var(--radius-2xl);
-    background: color-mix(
-      in oklab,
-      var(--color-surface-raised) 68%,
-      transparent
-    );
+    background: var(--surface-glass-nav);
     padding: 0.5rem;
-    box-shadow:
-      inset 0 1px 0
-        color-mix(in oklab, var(--color-surface-raised) 90%, transparent),
-      0 1rem 2rem oklch(24% 0.04 145 / 0.12);
-    -webkit-backdrop-filter: saturate(165%) blur(16px);
-    backdrop-filter: saturate(165%) blur(16px);
+    box-shadow: var(--surface-glass-highlight), var(--shadow-2);
+    -webkit-backdrop-filter: var(--surface-glass-filter);
+    backdrop-filter: var(--surface-glass-filter);
   }
 
   /* Keep hydration from fading an initially visible closed panel out. */

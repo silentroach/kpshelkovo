@@ -1,0 +1,17 @@
+{
+  "reducedTransparency": true,
+  "surfaces": [
+    {
+      "class": "site-header-mobile-panel",
+      "backgroundImage": "none",
+      "backgroundColor": "oklch(1 0 0)",
+      "blur": "none"
+    },
+    {
+      "class": "site-search-dialog",
+      "backgroundImage": "none",
+      "backgroundColor": "oklch(1 0 0)",
+      "blur": "none"
+    }
+  ]
+}

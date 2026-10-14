@@ -1166,8 +1166,10 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       z-index: 20;
       padding: 0.25rem 1.25rem;
       border-block: 1px solid var(--color-border);
-      background: var(--color-surface-muted);
-      box-shadow: 0 0.45rem 1rem oklch(27% 0.05 142 / 0.055);
+      background: var(--surface-glass-muted);
+      -webkit-backdrop-filter: var(--surface-glass-filter);
+      backdrop-filter: var(--surface-glass-filter);
+      box-shadow: var(--shadow-1);
     }
 
     .reglament-sticky-total__inner {
@@ -1674,8 +1676,10 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       width: min(18rem, calc(100vw - 2rem));
       border-radius: var(--radius-2xl);
       border: 1px solid var(--color-border);
-      background: var(--color-surface);
-      box-shadow: 0 0.75rem 1.6rem oklch(27% 0.05 142 / 0.12);
+      background: var(--surface-glass-reading);
+      -webkit-backdrop-filter: var(--surface-glass-filter);
+      backdrop-filter: var(--surface-glass-filter);
+      box-shadow: var(--surface-glass-highlight), var(--shadow-2);
       color: var(--color-text);
       font-size: 0.75rem;
       font-weight: 600;

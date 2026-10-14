@@ -31,8 +31,15 @@
     --color-focus: var(--color-accent-text);
 
     --color-shadow: oklch(24% 0.04 145 / 0.09);
-    --shadow-1: 0 0.25rem 0.75rem oklch(27% 0.05 142 / 0.055);
-    --shadow-2: 0 0.75rem 2rem oklch(27% 0.05 142 / 0.085);
+    --shadow-1: 0 1px 3px oklch(24% 0.025 145 / 0.06), 0 6px 16px -4px oklch(24% 0.025 145 / 0.08);
+    --shadow-2: 0 2px 4px oklch(24% 0.025 145 / 0.07), 0 12px 24px -6px oklch(24% 0.025 145 / 0.14);
+    --surface-glass-nav: var(--color-surface);
+    --surface-glass-reading: var(--color-surface);
+    --surface-glass-muted: var(--color-surface-muted);
+    --surface-glass-arrow: var(--color-surface);
+    --surface-glass-filter: none;
+    --surface-glass-border: color-mix(in oklab, var(--color-border) 78%, var(--color-surface));
+    --surface-glass-highlight: inset 0 1px 0 oklch(100% 0 0 / 0.85);
 
     --color-success: oklch(53% 0.12 145);
     --color-success-foreground: var(--color-surface-raised);
@@ -85,5 +92,39 @@
     --radius-full: 999px;
     --page-max: 1180px;
     --page-padding: clamp(1rem, 3vw, 2rem);
+  }
+
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    :root {
+      --surface-glass-nav: linear-gradient(
+        135deg,
+        oklch(100% 0 0 / 0.96),
+        oklch(100% 0 0 / 0.82) 55%,
+        oklch(100% 0 0 / 0.92)
+      );
+      --surface-glass-reading: linear-gradient(
+        135deg,
+        oklch(100% 0 0 / 0.98),
+        oklch(100% 0 0 / 0.92) 55%,
+        oklch(100% 0 0 / 0.96)
+      );
+      --surface-glass-muted: linear-gradient(
+        180deg,
+        oklch(96.02% 0.0085 128.6 / 0.99),
+        oklch(96.02% 0.0085 128.6 / 0.96)
+      );
+      --surface-glass-arrow: oklch(100% 0 0 / 0.96);
+      --surface-glass-filter: blur(20px) saturate(110%);
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    :root {
+      --surface-glass-nav: var(--color-surface);
+      --surface-glass-reading: var(--color-surface);
+      --surface-glass-muted: var(--color-surface-muted);
+      --surface-glass-arrow: var(--color-surface);
+      --surface-glass-filter: none;
+    }
   }
 }

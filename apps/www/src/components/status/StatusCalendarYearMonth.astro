@@ -250,8 +250,10 @@ const weekdays = [
     translate: calc(-50% + var(--status-calendar-tooltip-shift-x, 0px)) 0;
     border: 1px solid var(--color-border-strong);
     border-radius: var(--radius-2xl);
-    background: var(--color-surface-raised);
-    box-shadow: var(--shadow-1);
+    background: var(--surface-glass-reading);
+    -webkit-backdrop-filter: var(--surface-glass-filter);
+    backdrop-filter: var(--surface-glass-filter);
+    box-shadow: var(--surface-glass-highlight), var(--shadow-2);
     color: var(--color-text);
     display: none;
     font-size: 0.8125rem;

@@ -203,11 +203,13 @@
     border: 0;
     border-radius: var(--radius-2xl);
     color: var(--color-text);
-    background: oklch(97.2% 0 0);
+    background: var(--surface-glass-reading);
+    -webkit-backdrop-filter: var(--surface-glass-filter);
+    backdrop-filter: var(--surface-glass-filter);
     box-shadow:
       0 0 0 2px var(--color-border-strong),
-      0 0.5rem 1.5rem -0.5rem oklch(20% 0 0 / 0.16),
-      0 1.5rem 3.5rem -0.75rem oklch(20% 0 0 / 0.28);
+      var(--surface-glass-highlight),
+      var(--shadow-2);
   }
 
   .site-search-dialog[open] {

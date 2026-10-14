@@ -1,0 +1,19 @@
+{
+  "height": 844,
+  "overflow": 0,
+  "root": "16px",
+  "scroll": [0, 0],
+  "surfaces": [
+    {
+      "background": "linear-gradient(135deg, oklch(1 0 0 / 0.96), oklch(1 0 0 / 0.82) 55%, oklch(1 0 0 / 0.92))",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "blur": "blur(20px) saturate(1.1)",
+      "class": "site-header-mobile-panel",
+      "overflow": "visible",
+      "rect": [16, 56, 276, 396],
+      "shadow": "oklch(1 0 0 / 0.85) 0px 1px 0px 0px inset, oklch(0.24 0.025 145 / 0.07) 0px 2px 4px 0px, oklch(0.24 0.025 145 / 0.14) 0px 12px 24px -6px"
+    }
+  ],
+  "url": "http://127.0.0.1:14339/815/compare/",
+  "width": 320
+}

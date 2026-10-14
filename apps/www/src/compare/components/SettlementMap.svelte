@@ -708,10 +708,13 @@
 
   .map-popup-panel {
     width: 16rem;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--surface-glass-border);
     border-radius: var(--radius-2xl);
     padding: 0.75rem;
-    background: var(--color-surface);
+    background: var(--surface-glass-reading);
+    -webkit-backdrop-filter: var(--surface-glass-filter);
+    backdrop-filter: var(--surface-glass-filter);
+    box-shadow: var(--surface-glass-highlight), var(--shadow-2);
     pointer-events: auto;
   }
 
@@ -779,10 +782,12 @@
 
   .map-popup-arrow {
     position: absolute;
+    /* Keep the joining edge above the panel's backdrop stacking context. */
+    z-index: 1;
     width: 0.75rem;
     height: 0.75rem;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
+    border: 1px solid var(--surface-glass-border);
+    background: var(--surface-glass-arrow);
     transform: translateX(-50%) rotate(45deg);
   }
 

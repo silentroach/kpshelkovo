@@ -1,0 +1,28 @@
+{
+  "height": 1000,
+  "overflow": 0,
+  "root": "16px",
+  "scroll": [0, 0],
+  "surfaces": [
+    {
+      "background": "linear-gradient(135deg, oklch(1 0 0 / 0.98), oklch(1 0 0 / 0.92) 55%, oklch(1 0 0 / 0.96))",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "blur": "blur(20px) saturate(1.1)",
+      "class": "settlement-hero-glass-card settlement-tariff-card",
+      "overflow": "visible",
+      "rect": [154, 264.828125, 272, 94],
+      "shadow": "none"
+    },
+    {
+      "background": "linear-gradient(135deg, oklch(1 0 0 / 0.98), oklch(1 0 0 / 0.92) 55%, oklch(1 0 0 / 0.96))",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "blur": "blur(20px) saturate(1.1)",
+      "class": "settlement-hero-glass-card",
+      "overflow": "visible",
+      "rect": [438, 264.828125, 272, 94],
+      "shadow": "none"
+    }
+  ],
+  "url": "http://127.0.0.1:14339/815/compare/settlements/shelkovo/",
+  "width": 1440
+}
