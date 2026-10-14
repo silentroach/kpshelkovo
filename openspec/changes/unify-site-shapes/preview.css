@@ -1,0 +1,99 @@
+/* Временная браузерная примерка #1048. Не подключается к приложению.
+   !important перекрывает production scoped CSS только для парных снимков. */
+
+.ui-btn,
+.sort-select,
+.reglament-reset,
+.reglament-input-shell,
+.reglament-details-summary,
+.site-header-menu-button,
+.site-nav-dropdown-button,
+.site-nav-status-link,
+.site-nav-submenu-link,
+.site-nav-mobile-link,
+.parcel-map-layer {
+  border-radius: var(--radius-lg) !important;
+}
+
+.ui-btn-outline,
+.site-header-menu-button {
+  border-color: var(--color-border-strong) !important;
+}
+
+.ui-btn-outline:is(:hover, :focus-visible),
+.site-header-menu-button:is(:hover, :focus-visible) {
+  border-color: var(--color-primary) !important;
+}
+
+.filter-label,
+.view-switch,
+.view-switch a {
+  border-radius: var(--radius-full) !important;
+}
+
+.ui-icon-btn,
+.ui-icon-action,
+.news-event-action,
+.site-search-trigger,
+.site-search-dialog__close,
+.site-header-status-link,
+.reglament-missing-help-button,
+.parcel-map-layers-button,
+.map-popup-close,
+.map-popup-close-icon,
+.parcel-map-popup__close,
+.parcel-map-popup__close svg {
+  border-radius: var(--radius-full) !important;
+}
+
+.reglament-totals,
+.ui-sticky-table-surface,
+.map-card-shell,
+.map-frame,
+.settlement-map {
+  border-radius: var(--radius-xl) !important;
+}
+
+.ui-sticky-table-surface .ui-sticky-table-head th:first-child {
+  border-top-left-radius: calc(var(--radius-xl) - 1px) !important;
+}
+
+.ui-sticky-table-surface .ui-sticky-table-head th:last-child {
+  border-top-right-radius: calc(var(--radius-xl) - 1px) !important;
+}
+
+.ui-sticky-table-shell[data-ui-sticky-table-stuck] thead th:first-child {
+  border-top-left-radius: 0 !important;
+}
+
+.ui-sticky-table-shell[data-ui-sticky-table-stuck] thead th:last-child {
+  border-top-right-radius: 0 !important;
+}
+
+.map-frame__caption {
+  border-radius: 0 0 calc(var(--radius-xl) - 1px) calc(var(--radius-xl) - 1px) !important;
+}
+
+.site-search-dialog,
+.site-nav-glass-panel,
+.site-header-mobile-panel,
+.map-popup-panel,
+.parcel-map-popup__panel,
+.parcel-map-layer-list,
+.reglament-missing-tooltip {
+  border-radius: var(--radius-2xl) !important;
+}
+
+@media (min-width: 48rem) {
+  .compare-settlement-card {
+    border-radius: var(--radius-xl) !important;
+  }
+}
+
+@media (max-width: 39.999rem) {
+  .ui-prose > .ui-editorial-map,
+  .ui-prose > .ui-editorial-map > editorial-map,
+  .ui-prose > .ui-editorial-map > .map-frame__caption {
+    border-radius: 0 !important;
+  }
+}
