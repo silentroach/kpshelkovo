@@ -1,5 +1,5 @@
 import { z } from 'astro/zod';
-import { reference, type SchemaContext } from 'astro:content';
+import { reference } from 'astro:content';
 
 import { contentDateSchema } from '@/lib/content-date';
 import { EventReferenceKeySchema } from '@/lib/events/raw-schema';
@@ -155,41 +155,30 @@ export const RawNewsAuthorSchema = z.object({
 
 export type RawNewsAuthor = z.output<typeof RawNewsAuthorSchema>;
 
-export const createRawNewsArticleSchema = (image: SchemaContext['image']) =>
-  z
-    .object({
-      title: visibleText('title'),
-      summary: visibleText('summary'),
-      date: contentDateSchema('date'),
-      time: forbiddenTime('time').optional(),
-      author: reference('newsAuthors'),
-      pinned: z.boolean().optional(),
-      pinned_until: contentDateSchema('pinned_until').optional(),
-      areas: z.array(z.enum(NEWS_AREAS)).min(1).optional(),
-      tags: z.array(tag()).min(1).optional(),
-      search_aliases: RawSearchAliasesSchema.optional(),
-      source_url: absoluteUrl('source_url').optional(),
-      cover: image().optional(),
-      cover_alt: text.optional(),
-      events: RawNewsEventsSchema.optional(),
-      ...media(),
-      seo: z
-        .object({
-          title: visibleText('seo.title').optional(),
-          description: visibleText('seo.description').optional()
-        })
-        .optional()
-    })
-    .superRefine((data, ctx) => {
-      if (data.cover && !data.cover_alt) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['cover_alt'],
-          message: 'cover_alt is required when cover is set'
-        });
-      }
+export const RawNewsArticleSchema = z
+  .object({
+    title: visibleText('title'),
+    summary: visibleText('summary'),
+    date: contentDateSchema('date'),
+    time: forbiddenTime('time').optional(),
+    author: reference('newsAuthors'),
+    pinned: z.boolean().optional(),
+    pinned_until: contentDateSchema('pinned_until').optional(),
+    areas: z.array(z.enum(NEWS_AREAS)).min(1).optional(),
+    tags: z.array(tag()).min(1).optional(),
+    search_aliases: RawSearchAliasesSchema.optional(),
+    source_url: absoluteUrl('source_url').optional(),
+    events: RawNewsEventsSchema.optional(),
+    ...media(),
+    seo: z
+      .object({
+        title: visibleText('seo.title').optional(),
+        description: visibleText('seo.description').optional()
+      })
+      .optional()
+  })
+  .superRefine((data, ctx) => {
+    validateTags(data.tags, ctx);
+  });
 
-      validateTags(data.tags, ctx);
-    });
-
-export type RawNewsArticle = z.output<ReturnType<typeof createRawNewsArticleSchema>>;
+export type RawNewsArticle = z.output<typeof RawNewsArticleSchema>;

@@ -1,0 +1,185 @@
+{
+  "success": true,
+  "data": {
+    "lifecycle": {
+      "effectiveLaunch": {
+        "browserLaunched": true,
+        "engine": "chrome",
+        "launchHash": 11677035664275010974
+      },
+      "launched": false,
+      "relaunchedBrowser": false,
+      "restartedBackground": false,
+      "restoreStatus": "not_configured",
+      "reused": true,
+      "saveStatus": "not_attempted"
+    },
+    "origin": "http://127.0.0.1:14365/news/2026/08/forest-village-asphalt/",
+    "result": {
+      "documentWidth": 320,
+      "focus": {
+        "background": "oklch(0.9865 0.0041 121.6)",
+        "bottom": 1609.71875,
+        "href": null,
+        "left": 0,
+        "outline": "oklch(0.2821 0.0101 164.2) none 3px",
+        "outlineOffset": "0px",
+        "ratio": 13.9,
+        "right": 320,
+        "text": "Markdown-версия этой страницы доступна по адресу https://kpshelkovo.online/news/2026/08/forest-village-asphalt/index.md. Шелково Онлайн НовостиТариф 815Сравнение тарифовРегламентКартаБаза знанийСарафанОтзывыСтатусМенюНовостиТариф 815Сравнение тарифовРегламентКартаБаза знанийСарафанОтзывыСтатус[{\"kind\":\"maintenance\",\"start\":1790197200000,\"end\":1793480400000},{\"kind\":\"maintenance\",\"start\":1792044000000,\"end\":1792072800000}]Главная›Новости›2026›Август›Асфальтирование запланировали в Форесте и Вилладже на 31 августа и 1 сентябряАсфальтирование запланировали в Форесте и Вилладже на 31 августа и 1 сентября#благоустройство#дороги#ограничение31 августаОК КомфортисточникАсфальт планируют укладывать 31 августа и 1 сентября с 9:00 до 20:00 в двух частях КП Шелково:\n\nФорест: N40–N49 и W35–W48;\nВилладж: E1–E16, D1–D12, C35–C45 и M40–M47.\n\nС 1 по 7 сентября грузовой транспорт на эти участки не пропустят. Даты могут измениться из-за погоды.\nСо 2 сентября ОК планирует готовить дороги в Ривере к асфальтированию. Во время работ проезд легковых машин могут временно ограничивать, но конкретные участки и часы компания пока не назвала.\n\nЭто следующий объявленный этап работ после укладки асфальта в секторе V Фореста. Общий ориентир остаётся прежним: ОК рассчитывает закончить асфальтирование в Форесте до 6 сентября, в Вилладже и Ривере — до 30 сентября. Запланированные на 2026 год дороги отмечены на схемах Фореста, Вилладжа и Ривера.Поиск по сайту  Что найти на сайте",
+        "top": 0,
+        "visible": false
+      },
+      "heading": "Асфальтирование запланировали в Форесте и Вилладже на 31 августа и 1 сентября",
+      "images": [],
+      "measurements": [
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 248,
+          "color": "oklch(0.2821 0.0101 164.2)",
+          "height": 272,
+          "left": 36,
+          "ratio": 13.9,
+          "right": 284,
+          "scrollWidth": 248,
+          "size": "36px",
+          "text": "Асфальтирование запланировали в Форесте и Вилладже на 31 августа и 1 сентября",
+          "weight": "700"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 0,
+          "color": "oklab(0.463836 -0.0330916 0.0142487)",
+          "height": 15,
+          "left": 36,
+          "ratio": 6.65,
+          "right": 147,
+          "scrollWidth": 0,
+          "size": "13px",
+          "text": "#благоустройство",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 0,
+          "color": "oklab(0.463836 -0.0330916 0.0142487)",
+          "height": 15,
+          "left": 159,
+          "ratio": 6.65,
+          "right": 209,
+          "scrollWidth": 0,
+          "size": "13px",
+          "text": "#дороги",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 0,
+          "color": "oklab(0.463836 -0.0330916 0.0142487)",
+          "height": 15,
+          "left": 36,
+          "ratio": 6.65,
+          "right": 123,
+          "scrollWidth": 0,
+          "size": "13px",
+          "text": "#ограничение",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 66,
+          "color": "oklch(0.2821 0.0101 164.2)",
+          "height": 24,
+          "left": 36,
+          "ratio": 13.9,
+          "right": 102,
+          "scrollWidth": 66,
+          "size": "14px",
+          "text": "31 августа",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 82,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "height": 24,
+          "left": 112,
+          "ratio": 9.16,
+          "right": 194,
+          "scrollWidth": 82,
+          "size": "14px",
+          "text": "ОК Комфорт",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 27,
+          "color": "oklch(0.5124 0.0183 154.1)",
+          "height": 16,
+          "left": 204,
+          "ratio": 5.43,
+          "right": 231,
+          "scrollWidth": 27,
+          "size": "14px",
+          "text": "",
+          "weight": "400"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 26,
+          "color": "oklch(0.5124 0.0183 154.1)",
+          "height": 16,
+          "left": 241,
+          "ratio": 5.43,
+          "right": 267,
+          "scrollWidth": 26,
+          "size": "14px",
+          "text": "",
+          "weight": "400"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 31,
+          "color": "oklch(0.5124 0.0183 154.1)",
+          "height": 16,
+          "left": 36,
+          "ratio": 5.43,
+          "right": 67,
+          "scrollWidth": 31,
+          "size": "14px",
+          "text": "",
+          "weight": "400"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 79,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "height": 24,
+          "left": 77,
+          "ratio": 9.16,
+          "right": 156,
+          "scrollWidth": 79,
+          "size": "14px",
+          "text": "источник",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 61,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "height": 24,
+          "left": 95,
+          "ratio": 9.16,
+          "right": 156,
+          "scrollWidth": 61,
+          "size": "14px",
+          "text": "источник",
+          "weight": "600"
+        }
+      ],
+      "url": "/news/2026/08/forest-village-asphalt/",
+      "viewport": 320
+    }
+  },
+  "error": null
+}

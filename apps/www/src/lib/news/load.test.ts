@@ -1,7 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { createPersonMentionTarget } from '../people/mentions';
-import type { NewsArticleEntry } from './load';
 import {
   createTestNewsDatasetBuilder,
   newsArchiveSummaryEntries,
@@ -610,13 +609,7 @@ describe('buildNewsDataset', () => {
               date: '04.05.2026 10:00',
               searchAliases: ['как найти новость']
             }).data,
-            source_url: 'https://example.com/source',
-            cover: {
-              src: '/cover.jpg',
-              width: 1200,
-              height: 675
-            } as NewsArticleEntry['data']['cover'],
-            cover_alt: 'Обложка новости'
+            source_url: 'https://example.com/source'
           }
         }
       ]
@@ -628,20 +621,13 @@ describe('buildNewsDataset', () => {
       publishedIso: '2026-05-04T10:00:00+03:00',
       appliesToAllAreas: true,
       searchAliases: ['как найти новость'],
-      sourceUrl: 'https://example.com/source',
-      cover: {
-        url: '/cover.jpg',
-        width: 1200,
-        height: 675,
-        alt: 'Обложка новости'
-      }
+      sourceUrl: 'https://example.com/source'
     });
     expect(domainArticle?.publishedAt).toBeInstanceOf(Date);
     expect(data.byId.get('2026/05/article-domain')).toBe(domainArticle);
     expect(Object.keys(data.home.latest[0] ?? {}).sort()).toMatchInlineSnapshot(`
       [
         "author",
-        "cover",
         "id",
         "markdownUrl",
         "month",

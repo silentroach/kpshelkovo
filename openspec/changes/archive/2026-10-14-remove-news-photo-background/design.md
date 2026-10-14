@@ -2,7 +2,7 @@
 
 ## Context
 
-Причина изменения — в [proposal](/openspec/changes/remove-news-photo-background/proposal.md#why), исходная задача — [#1065](https://github.com/silentroach/kpshelkovo/issues/1065).
+Причина изменения — в [proposal](/openspec/changes/archive/2026-10-14-remove-news-photo-background/proposal.md#why), исходная задача — [#1065](https://github.com/silentroach/kpshelkovo/issues/1065).
 
 Визуальная задача: житель читает новость с телефона и сразу различает заголовок, дату, автора и источник. Основа — существующий спокойный редакционный дизайн сайта, PT Serif/Fira Sans и светлые семантические цвета. Снимок текущей шапки на 390 px подтверждает наложение метаданных на светлое затухание фотографии; исходные снимки сохранены в [приёмке палитры](/openspec/changes/archive/2026-10-14-refine-site-color-roles/acceptance/).
 

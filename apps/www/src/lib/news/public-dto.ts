@@ -46,13 +46,6 @@ export interface NewsPublicAttachment {
   readonly size?: string;
 }
 
-export interface NewsPublicCover {
-  readonly url: string;
-  readonly alt: string;
-  readonly width: number;
-  readonly height: number;
-}
-
 export interface NewsPublicEventOrganizer {
   readonly name: string;
   readonly type: 'organization' | 'person';
@@ -94,7 +87,6 @@ export interface NewsPublicArticle {
   readonly author: NewsPublicAuthor;
   readonly areas: readonly string[];
   readonly tags: readonly NewsPublicTag[];
-  readonly cover?: NewsPublicCover;
   readonly events?: readonly NewsPublicEvent[];
   readonly photos: readonly NewsPublicPhoto[];
   readonly attachments: readonly NewsPublicAttachment[];
@@ -181,19 +173,6 @@ const toPublicAttachment = (item: NewsAttachment): NewsPublicAttachment => ({
   size: item.size
 });
 
-function toPublicCover(article: NewsArticle): NewsPublicCover | undefined {
-  const cover = article.cover;
-
-  if (!cover) return undefined;
-
-  return {
-    url: fullUrl(cover.url),
-    alt: cover.alt,
-    width: cover.width,
-    height: cover.height
-  };
-}
-
 function toPublicEvent(item: NewsEvent): NewsPublicEvent | undefined {
   if (item.timePrecision !== 'datetime' || !item.icsUrl) return;
   const mapUrl = buildEventMapUrl(item);
@@ -244,7 +223,6 @@ function toPublicArticle(item: NewsArticle): NewsPublicArticle {
     author: toPublicAuthor(item.author),
     areas: [...item.areas],
     tags: item.tags.map(toPublicTag),
-    cover: toPublicCover(item),
     events: events.length > 0 ? events : undefined,
     photos: item.photos.map(toPublicPhoto),
     attachments: item.attachments.map(toPublicAttachment),

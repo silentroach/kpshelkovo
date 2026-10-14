@@ -8,7 +8,6 @@ import {
   type NewsPublicArticle,
   type NewsPublicAttachment,
   type NewsPublicAuthor,
-  type NewsPublicCover,
   type NewsPublicEvent,
   type NewsPublicEventOrganizer,
   type NewsPublicPayload,
@@ -73,15 +72,6 @@ const attachment = z
   } satisfies PublicShape<NewsPublicAttachment>)
   .meta({ id: 'attachment' });
 
-const cover = z
-  .strictObject({
-    url: uri,
-    alt: text,
-    width: dimension,
-    height: dimension
-  } satisfies PublicShape<NewsPublicCover>)
-  .meta({ id: 'cover' });
-
 const coordinates = z
   .strictObject({
     lat: z.number().min(-90).max(90),
@@ -142,7 +132,6 @@ const article = z
     author,
     areas,
     tags: z.array(tag),
-    cover: cover.optional(),
     events: z.array(event).min(1).optional(),
     photos: z.array(photo),
     attachments: z.array(attachment),

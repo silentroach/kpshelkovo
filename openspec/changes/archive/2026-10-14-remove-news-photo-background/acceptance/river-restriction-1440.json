@@ -1,0 +1,169 @@
+{
+  "success": true,
+  "data": {
+    "lifecycle": {
+      "effectiveLaunch": {
+        "browserLaunched": true,
+        "engine": "chrome",
+        "launchHash": 11677035664275010974
+      },
+      "launched": false,
+      "relaunchedBrowser": false,
+      "restartedBackground": false,
+      "restoreStatus": "not_configured",
+      "reused": true,
+      "saveStatus": "not_attempted"
+    },
+    "origin": "http://127.0.0.1:14365/news/2026/04/river-restriction/",
+    "result": {
+      "documentWidth": 1440,
+      "focus": {
+        "background": "oklch(0.9865 0.0041 121.6)",
+        "bottom": 973.453125,
+        "href": null,
+        "left": 0,
+        "outline": "oklch(0.2821 0.0101 164.2) none 3px",
+        "outlineOffset": "0px",
+        "ratio": 13.9,
+        "right": 1440,
+        "text": "Markdown-версия этой страницы доступна по адресу https://kpshelkovo.online/news/2026/04/river-restriction/index.md. Шелково Онлайн НовостиТариф 815Сравнение тарифовРегламентКартаБаза знанийСарафанОтзывыСтатусМенюНовостиТариф 815Сравнение тарифовРегламентКартаБаза знанийСарафанОтзывыСтатус[{\"kind\":\"maintenance\",\"start\":1790197200000,\"end\":1793480400000},{\"kind\":\"maintenance\",\"start\":1792044000000,\"end\":1792072800000}]Главная›Новости›2026›Апрель›Проезд через дамбу временно закрытПроезд через дамбу временно закрыт#дамба#мост#ограничение#река30 апреляОК КомфортисточникИз-за погодных условий проезд через КПП Шелково Ривер по дамбе ограничен до 10 мая.\nДля доступа к домам и участкам рекомендуется пользоваться проездом через КПП в коттеджных посёлках Шелково Форест и Шелково Вилладж.\n\nПозже ОК Комфорт уточнил, что проезд по дамбе пока не открывают из-за текущего уровня воды в реке. Ограничение сохраняется до 10 мая, но если вода уйдёт раньше, дорогу обещают открыть сразу.Поиск по сайту  Что найти на сайте",
+        "top": 0,
+        "visible": false
+      },
+      "heading": "Проезд через дамбу временно закрыт",
+      "images": [
+        {
+          "alt": "Подтопленная дамба у КПП Шелково Ривер",
+          "height": 720,
+          "loaded": true,
+          "loading": "eager",
+          "renderedHeight": 372,
+          "renderedWidth": 662,
+          "width": 1280
+        }
+      ],
+      "measurements": [
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 896,
+          "color": "oklch(0.2821 0.0101 164.2)",
+          "height": 52,
+          "left": 154,
+          "ratio": 13.9,
+          "right": 1050,
+          "scrollWidth": 896,
+          "size": "48px",
+          "text": "Проезд через дамбу временно закрыт",
+          "weight": "700"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 0,
+          "color": "oklab(0.463836 -0.0330916 0.0142487)",
+          "height": 15,
+          "left": 154,
+          "ratio": 6.65,
+          "right": 199,
+          "scrollWidth": 0,
+          "size": "13px",
+          "text": "#дамба",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 0,
+          "color": "oklab(0.463836 -0.0330916 0.0142487)",
+          "height": 15,
+          "left": 215,
+          "ratio": 6.65,
+          "right": 250,
+          "scrollWidth": 0,
+          "size": "13px",
+          "text": "#мост",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 0,
+          "color": "oklab(0.463836 -0.0330916 0.0142487)",
+          "height": 15,
+          "left": 266,
+          "ratio": 6.65,
+          "right": 354,
+          "scrollWidth": 0,
+          "size": "13px",
+          "text": "#ограничение",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 0,
+          "color": "oklab(0.463836 -0.0330916 0.0142487)",
+          "height": 15,
+          "left": 370,
+          "ratio": 6.65,
+          "right": 406,
+          "scrollWidth": 0,
+          "size": "13px",
+          "text": "#река",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 66,
+          "color": "oklch(0.2821 0.0101 164.2)",
+          "height": 24,
+          "left": 154,
+          "ratio": 13.9,
+          "right": 220,
+          "scrollWidth": 66,
+          "size": "14px",
+          "text": "30 апреля",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 82,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "height": 24,
+          "left": 230,
+          "ratio": 9.16,
+          "right": 312,
+          "scrollWidth": 82,
+          "size": "14px",
+          "text": "ОК Комфорт",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 79,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "height": 24,
+          "left": 322,
+          "ratio": 9.16,
+          "right": 401,
+          "scrollWidth": 79,
+          "size": "14px",
+          "text": "источник",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 61,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "height": 24,
+          "left": 340,
+          "ratio": 9.16,
+          "right": 401,
+          "scrollWidth": 61,
+          "size": "14px",
+          "text": "источник",
+          "weight": "600"
+        }
+      ],
+      "url": "/news/2026/04/river-restriction/",
+      "viewport": 1440
+    }
+  },
+  "error": null
+}

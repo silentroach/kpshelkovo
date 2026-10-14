@@ -14,17 +14,6 @@ const { article, featured = false } = Astro.props;
 ---
 
 <article class:list={[featured ? 'ui-shell-strong' : 'ui-shell', 'news-card']}>
-  {featured && article.cover && (
-    <img
-      src={article.cover.url}
-      alt={article.cover.alt}
-      loading="lazy"
-      width={article.cover.width}
-      height={article.cover.height}
-      class="news-card__cover"
-    />
-  )}
-
   <div class="news-card__content">
     <div class="news-card__header">
       <h3 class="ui-entry-title news-card__title">
@@ -68,13 +57,6 @@ const { article, featured = false } = Astro.props;
   .news-card {
     height: 100%;
     overflow: hidden;
-  }
-
-  .news-card__cover {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    border-bottom: 1px solid var(--color-border-strong);
-    object-fit: cover;
   }
 
   .news-card__content {

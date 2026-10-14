@@ -9,7 +9,6 @@ import { extractEditorialMaps } from '@/lib/markdown/editorial-maps';
 import { preprocessSiteMarkdownContent } from '../markdown/render';
 import type { SiteMentionRegistry } from '../mentions';
 import { loadSiteMentionRegistry } from '../mentions/registry';
-import { withBase } from '../site';
 import { validateArchiveSummaryMarkdown } from './archive-summary';
 import { buildArchives, newsMonthKey } from './archives';
 import { NEWS_LATEST_LIMIT } from './config';
@@ -24,7 +23,6 @@ import type {
   NewsArchives,
   NewsAttachment,
   NewsAuthor,
-  NewsCover,
   NewsDataset,
   NewsEvent,
   NewsHomeData,
@@ -45,7 +43,6 @@ type ArticleData = ArticleEntry['data'];
 type EventData = NonNullable<ArticleData['events']>[number];
 type AttachmentInput = NonNullable<ArticleData['attachments']>[number];
 type AuthorReference = ArticleData['author'];
-type CoverInput = NonNullable<ArticleData['cover']>;
 type PhotoInput = NonNullable<ArticleData['photos']>[number];
 let cache: Promise<NewsDataset> | undefined;
 
@@ -82,27 +79,6 @@ function needAuthor(
 
   return author;
 }
-
-const assetUrl = (asset: CoverInput | undefined): string | undefined =>
-  asset ? withBase(asset.src) : undefined;
-
-const cover = (
-  asset: CoverInput | undefined,
-  alt: string | undefined,
-  context: string
-): NewsCover | undefined => {
-  const url = assetUrl(asset);
-
-  if (!asset || !url) return undefined;
-  if (!alt) throw new Error(`${context} cover_alt is required when cover is set`);
-
-  return {
-    url,
-    width: asset.width,
-    height: asset.height,
-    alt
-  };
-};
 
 const mapPhotos = (
   items: readonly PhotoInput[] | undefined,
@@ -217,7 +193,6 @@ function normalizeArticle(
 
   const area = areas(entry.data.areas);
   const author = needAuthor(authors, authorId(entry.data.author), `news article "${entry.id}"`);
-  const articleCover = cover(entry.data.cover, entry.data.cover_alt, `news article "${entry.id}"`);
   const events = (entry.data.events ?? []).map((event: EventData) =>
     normalizeEvent(event, parts, eventsByReferenceKey)
   );
@@ -249,7 +224,6 @@ function normalizeArticle(
     searchAliases: entry.data.search_aliases,
     pinned: isPinnedAtBuild(entry.data, now),
     sourceUrl: entry.data.source_url,
-    cover: articleCover,
     photos: mappedPhotos.map((item) => item.photo),
     attachments: attachments(entry.data.attachments),
     events,
@@ -274,7 +248,6 @@ const toListArticle = (article: NewsArticle): NewsListArticle => ({
   time: article.time,
   tags: article.tags,
   pinned: article.pinned,
-  cover: article.cover,
   summary: article.summary
 });
 
