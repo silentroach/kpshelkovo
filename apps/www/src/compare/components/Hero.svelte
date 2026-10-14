@@ -26,7 +26,7 @@
     <p class="ui-copy hero-subtitle">
       {subtitle}
       {#if subtitleLinkHref && subtitleLinkText}
-        <a href={subtitleLinkHref} class="ui-link hero-link">
+        <a href={subtitleLinkHref} class="site-text-link hero-link">
           {subtitleLinkText}
         </a>
       {/if}

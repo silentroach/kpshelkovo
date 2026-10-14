@@ -5,30 +5,30 @@
     --site-menu-duration: 150ms;
     --site-menu-ease: cubic-bezier(0.23, 1, 0.32, 1);
 
-    --color-bg: oklch(99.1% 0.002 125);
-    --color-bg-soft: oklch(98.8% 0.003 125);
+    --color-bg: oklch(98.65% 0.0041 121.6);
+    --color-bg-soft: oklch(97.95% 0.0057 128.5);
     --color-surface: oklch(100% 0 0);
     --color-surface-raised: oklch(100% 0 0);
-    --color-surface-muted: oklch(96.8% 0.008 135);
-    --color-breadcrumb-surface: oklch(98% 0.003 125);
-    --color-border: oklch(89.2% 0.012 130);
-    --color-border-strong: oklch(82% 0.018 130);
+    --color-surface-muted: oklch(96.02% 0.0085 128.6);
+    --color-breadcrumb-surface: oklch(96.72% 0.0069 124.4);
+    --color-border: oklch(89.32% 0.0149 132.5);
+    --color-border-strong: oklch(62.72% 0.023 140.9);
 
-    --color-text: oklch(24% 0.04 145);
-    --color-text-muted: oklch(46% 0.02 135);
-    --color-text-soft: oklch(56% 0.015 132);
+    --color-text: oklch(28.21% 0.0101 164.2);
+    --color-text-muted: oklch(51.24% 0.0183 154.1);
+    --color-text-soft: var(--color-text-muted);
 
-    --color-primary: oklch(36% 0.115 143);
-    --color-primary-hover: oklch(30% 0.105 143);
-    --color-primary-soft: oklch(96.5% 0.014 140);
-    --color-primary-soft-2: oklch(98.2% 0.006 140);
+    --color-primary: oklch(38.46% 0.065 157.9);
+    --color-primary-hover: oklch(33.34% 0.0565 158.2);
+    --color-primary-soft: oklch(95.04% 0.014 138.7);
+    --color-primary-soft-2: oklch(96.92% 0.0085 128.6);
 
     --color-accent: oklch(83% 0.155 78);
     --color-accent-hover: oklch(76% 0.165 72);
     --color-accent-soft: oklch(95.3% 0.045 82);
-    --color-accent-text: oklch(43% 0.075 72);
+    --color-accent-text: oklch(51.25% 0.0872 78.2);
     --color-earth: oklch(45% 0.06 72);
-    --color-focus: var(--color-accent);
+    --color-focus: var(--color-accent-text);
 
     --color-shadow: oklch(24% 0.04 145 / 0.09);
     --shadow-1: 0 0.25rem 0.75rem oklch(27% 0.05 142 / 0.055);
@@ -63,8 +63,8 @@
     --color-unknown: oklch(48% 0.04 125);
     --color-unknown-soft: oklch(96.8% 0.004 125);
     --color-unknown-border: oklch(88.5% 0.008 130);
-    --color-neutral-soft: oklch(96.8% 0.004 125);
-    --color-neutral-border: oklch(88.5% 0.008 130);
+    --color-neutral-soft: var(--color-surface-muted);
+    --color-neutral-border: var(--color-border);
 
     --color-telegram: #229ed9;
     --color-whatsapp: #25d366;

@@ -475,8 +475,12 @@
   }
 
   .filter-input:focus-visible + .filter-label {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
+    outline: 2px solid var(--color-focus);
+    outline-offset: -2px;
+  }
+
+  .filter-input:checked + .filter-label {
+    border-color: var(--color-primary);
   }
 
   .filter-count {
@@ -578,7 +582,7 @@
     display: block;
     min-width: 0;
     flex: 1 1 0%;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-strong);
     border-radius: var(--radius-sm);
     padding: 0.5rem 0.75rem;
     background: var(--color-surface);

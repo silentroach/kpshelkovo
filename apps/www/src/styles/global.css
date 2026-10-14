@@ -67,7 +67,7 @@
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {
-    outline: 2px solid color-mix(in oklab, var(--color-focus) 64%, transparent);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
   }
 }
@@ -117,6 +117,24 @@
 
   .ui-link:hover {
     color: var(--color-primary-hover);
+  }
+
+  .ui-title-link {
+    color: var(--color-text);
+    text-decoration-line: none;
+    text-decoration-color: currentColor;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .ui-title-link:is(:hover, :focus-visible) {
+    color: var(--color-primary);
+    text-decoration-line: underline;
+  }
+
+  .ui-title-link:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
   }
 
   .ui-muted {
