@@ -623,6 +623,7 @@
   .map-canvas :global(:is(a, button):focus-visible) {
     outline: 0.1875rem solid var(--color-focus);
     outline-offset: 0.125rem;
+    box-shadow: 0 0 0 0.4375rem var(--color-surface);
   }
 
   @container (max-width: 32rem) {

@@ -570,6 +570,51 @@ test('releases and reconnects one explorer media subscription through Astro navi
   expect(hydrationMessages).toHaveLength(0);
 });
 
+test('keeps keyboard-selected tariff filters fully visible on mobile', async ({ page }) => {
+  for (const viewport of mobileViewports) {
+    await page.setViewportSize(viewport);
+    await page.goto('/815/compare/');
+    const all = page.getByTestId('price-all');
+    const mapButton = page.getByTestId('map-toggle');
+    await expect(all).toBeEnabled();
+    await mapButton.focus();
+    await page.keyboard.press('Shift+Tab');
+    await expect(all).toBeFocused();
+    const scrollY = await page.evaluate(() => window.scrollY);
+
+    for (const [key, id] of [
+      ['ArrowRight', 'cheaper'],
+      ['ArrowRight', 'more'],
+      ['ArrowRight', 'all'],
+      ['ArrowLeft', 'more'],
+      ['ArrowLeft', 'cheaper'],
+      ['ArrowLeft', 'all']
+    ] as const) {
+      await page.keyboard.press(key);
+      const radio = page.getByTestId(`price-${id}`);
+      await expect(radio).toBeChecked();
+      await expect(radio).toBeFocused();
+      await expect
+        .poll(() =>
+          page.locator(`[data-testid="price-${id}"] + label`).evaluate((label) => {
+            const group = label.closest('[data-testid="price-filter-group"]');
+            if (!group) throw new Error('Price filter group is missing');
+            const bounds = group.getBoundingClientRect();
+            const rect = label.getBoundingClientRect();
+            return rect.left >= bounds.left - 1 && rect.right <= bounds.right + 1;
+          })
+        )
+        .toBe(true);
+      expect(await page.evaluate(() => window.scrollY)).toBe(scrollY);
+    }
+
+    await page.keyboard.press('Tab');
+    await expect(mapButton).toBeFocused();
+    await page.keyboard.press('Shift+Tab');
+    await expect(all).toBeFocused();
+  }
+});
+
 test('keeps every tariff filter usable beside the map button on mobile', async ({ page }) => {
   for (const viewport of mobileViewports) {
     await test.step(`${viewport.width}px`, async () => {

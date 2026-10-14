@@ -49,67 +49,61 @@ const galleryPhotos = photos.map((photo, index) => {
 });
 ---
 
-{
-  photos.length > 0 && (
-    <section class="news-photos">
-      <div class="news-photos__body" data-pagefind-body>
-        <Heading
-          id="news-photos"
-          class="ui-prose-title"
-          data-pagefind-weight="0"
-        >
-          {title}
-        </Heading>
+{photos.length > 0 && (
+  <section class="news-photos">
+    <div class="news-photos__body" data-pagefind-body>
+      <Heading id="news-photos" class="ui-prose-title" data-pagefind-weight="0">
+        {title}
+      </Heading>
 
-        <div class="news-photos__gallery">
-          {galleryPhotos.map((photo) => (
-            <figure
+      <div class="news-photos__gallery">
+        {galleryPhotos.map((photo) => (
+          <figure
+            class:list={[
+              'news-photos__figure',
+              photo.fullWidth ? 'news-photos__figure--full' : undefined,
+            ]}
+          >
+            <a
+              href={photo.url}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label={`Открыть фото: ${photo.alt}`}
               class:list={[
-                'news-photos__figure',
-                photo.fullWidth ? 'news-photos__figure--full' : undefined,
+                'news-photos__link',
+                photo.fullWidth ? undefined : 'news-photos__link--cropped',
               ]}
             >
-              <a
-                href={photo.url}
-                target="_blank"
-                rel="noreferrer noopener"
-                aria-label={`Открыть фото: ${photo.alt}`}
+              <Image
+                src={photo.url}
+                width={photo.renderedWidth}
+                height={photo.renderedHeight}
+                widths={photo.widths}
+                sizes={photo.sizes}
+                format="webp"
+                quality={82}
+                alt={photo.alt}
+                loading="eager"
+                decoding="async"
                 class:list={[
-                  'news-photos__link',
-                  photo.fullWidth ? undefined : 'news-photos__link--cropped',
+                  'news-photos__image',
+                  photo.fullWidth ? undefined : 'news-photos__image--cropped',
                 ]}
-              >
-                <Image
-                  src={photo.url}
-                  width={photo.renderedWidth}
-                  height={photo.renderedHeight}
-                  widths={photo.widths}
-                  sizes={photo.sizes}
-                  format="webp"
-                  quality={82}
-                  alt={photo.alt}
-                  loading="eager"
-                  decoding="async"
-                  class:list={[
-                    'news-photos__image',
-                    photo.fullWidth ? undefined : 'news-photos__image--cropped',
-                  ]}
-                />
-              </a>
-              {photo.captionHtml && (
-                <figcaption
-                  class="ui-media-caption"
-                  data-pagefind-weight="0.7"
-                  set:html={photo.captionHtml}
-                />
-              )}
-            </figure>
-          ))}
-        </div>
+              />
+            </a>
+            {photo.captionHtml && (
+              <figcaption
+                class="ui-media-caption"
+                data-pagefind-weight="0.7"
+                set:html={photo.captionHtml}
+              />
+            )}
+          </figure>
+        ))}
       </div>
-    </section>
-  )
-}
+    </div>
+  </section>
+)}
 
 <style>
   .news-photos {
@@ -143,7 +137,7 @@ const galleryPhotos = photos.map((photo, index) => {
   }
 
   .news-photos__link:focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid var(--color-focus);
     outline-offset: 4px;
   }
 

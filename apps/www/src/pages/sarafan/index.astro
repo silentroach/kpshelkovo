@@ -60,13 +60,16 @@ const sectionId = (category: string): string => category;
         <div>
           <h1 class="ui-page-title">Сарафан</h1>
           <p class="ui-copy sarafan-intro">
-            {CONTACTS_INTRO_PREFIX}<a
-              href={CONTACTS_CHAT_URL}
-              class="site-text-link">{CONTACTS_CHAT_LABEL}</a
-            >{CONTACTS_INTRO_SUFFIX}{CONTACTS_NEIGHBOR_TABLE_PREFIX}<a
-              href={CONTACTS_NEIGHBOR_TABLE_URL}
-              class="site-text-link">{CONTACTS_NEIGHBOR_TABLE_LABEL}</a
-            >{CONTACTS_NEIGHBOR_TABLE_SUFFIX}
+            {CONTACTS_INTRO_PREFIX}
+            <a href={CONTACTS_CHAT_URL} class="site-text-link">
+              {CONTACTS_CHAT_LABEL}
+            </a>
+            {CONTACTS_INTRO_SUFFIX}
+            {CONTACTS_NEIGHBOR_TABLE_PREFIX}
+            <a href={CONTACTS_NEIGHBOR_TABLE_URL} class="site-text-link">
+              {CONTACTS_NEIGHBOR_TABLE_LABEL}
+            </a>
+            {CONTACTS_NEIGHBOR_TABLE_SUFFIX}
           </p>
         </div>
       </div>
@@ -74,65 +77,62 @@ const sectionId = (category: string): string => category;
 
     <section class="sarafan-content">
       <h2 class="ui-visually-hidden">Категории сарафана</h2>
-      {
-        data.categories.length > 0 ? (
-          <div class="sarafan-categories">
-            {data.categories.map((category) => (
-              <a
-                href={`#${sectionId(category.category)}`}
-                class="sarafan-category-pill"
-              >
-                <span aria-hidden="true">
-                  {formatContactCategoryEmoji(category.category)}
-                </span>{' '}
-                {formatContactCategory(category.category)}
-              </a>
-            ))}
-          </div>
-        ) : null
-      }
+      {data.categories.length > 0 ? (
+        <div class="sarafan-categories">
+          {data.categories.map((category) => (
+            <a
+              href={`#${sectionId(category.category)}`}
+              class="sarafan-category-pill"
+            >
+              <span aria-hidden="true">
+                {formatContactCategoryEmoji(category.category)}
+              </span>{' '}
+              {formatContactCategory(category.category)}
+            </a>
+          ))}
+        </div>
+      ) : null}
 
-      {
-        data.categories.length > 0 ? (
-          <div class="sarafan-groups">
-            {data.categories.map((category) => {
-              const label = formatContactCategory(category.category);
+      {data.categories.length > 0 ? (
+        <div class="sarafan-groups">
+          {data.categories.map((category) => {
+            const label = formatContactCategory(category.category);
 
-              return (
-                <section aria-labelledby={sectionId(category.category)}>
-                  <div class="sarafan-group-heading">
-                    <h2
-                      id={sectionId(category.category)}
-                      class="ui-group-title sarafan-group-title"
+            return (
+              <section aria-labelledby={sectionId(category.category)}>
+                <div class="sarafan-group-heading">
+                  <h2
+                    id={sectionId(category.category)}
+                    class="ui-group-title sarafan-group-title"
+                  >
+                    <a
+                      href={category.url}
+                      class="ui-title-link sarafan-group-link"
                     >
-                      <a href={category.url} class="ui-link sarafan-group-link">
-                        <span aria-hidden="true" class="sarafan-group-emoji">
-                          {formatContactCategoryEmoji(category.category)}
-                        </span>
-                        {label}
-                      </a>
-                    </h2>
-                  </div>
+                      <span aria-hidden="true" class="sarafan-group-emoji">
+                        {formatContactCategoryEmoji(category.category)}
+                      </span>
+                      {label}
+                    </a>
+                  </h2>
+                </div>
 
-                  <div class="sarafan-contact-list">
-                    <div class="sarafan-contact-grid">
-                      {category.contacts.map((contact) => (
-                        <ContactListItem contact={contact} />
-                      ))}
-                    </div>
+                <div class="sarafan-contact-list">
+                  <div class="sarafan-contact-grid">
+                    {category.contacts.map((contact) => (
+                      <ContactListItem contact={contact} />
+                    ))}
                   </div>
-                </section>
-              );
-            })}
-          </div>
-        ) : (
-          <div class="ui-shell sarafan-empty">
-            <p class="ui-copy sarafan-empty__message">
-              {CONTACTS_EMPTY_MESSAGE}
-            </p>
-          </div>
-        )
-      }
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      ) : (
+        <div class="ui-shell sarafan-empty">
+          <p class="ui-copy sarafan-empty__message">{CONTACTS_EMPTY_MESSAGE}</p>
+        </div>
+      )}
     </section>
   </main>
 </BaseLayout>

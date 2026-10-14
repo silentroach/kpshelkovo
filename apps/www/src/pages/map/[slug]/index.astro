@@ -467,9 +467,15 @@ const schema = {
     color: var(--color-text);
   }
 
-  .place-nearby__link:is(:hover, :active) {
+  .place-nearby__link:is(:hover, :active, :focus-visible) {
     color: var(--color-primary);
     background: var(--color-primary-soft-2);
+  }
+
+  .place-nearby__link:is(:hover, :focus-visible) .place-nearby__name {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
   }
 
   .place-nearby__icon {

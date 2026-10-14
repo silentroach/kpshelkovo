@@ -51,15 +51,17 @@ const breadcrumbs = withHomeBreadcrumbs(
   title={title}
   description={description}
   canonical={canonical}
-  search={root
-    ? {
-        scope: 'manual',
-        title: 'События',
-        description,
-        section: SEARCH_SECTIONS.events,
-        aliases: ['календарь мероприятий'],
-      }
-    : undefined}
+  search={
+    root
+      ? {
+          scope: 'manual',
+          title: 'События',
+          description,
+          section: SEARCH_SECTIONS.events,
+          aliases: ['календарь мероприятий'],
+        }
+      : undefined
+  }
 >
   <main class="ui-page">
     <header class="ui-page-header">
@@ -77,65 +79,63 @@ const breadcrumbs = withHomeBreadcrumbs(
       </div>
     </header>
     <div class="events-content">
-      {
-        month ? (
-          <>
-            <div class="month-controls">
-              <nav aria-label="Вид месяца" class="view-switch">
+      {month ? (
+        <>
+          <div class="month-controls">
+            <nav aria-label="Вид месяца" class="view-switch">
+              <a
+                href={eventMonthUrl(month.id)}
+                aria-current={view === 'calendar' ? 'page' : undefined}
+              >
+                Календарь
+              </a>
+              <a
+                href={eventMonthUrl(month.id, 'list')}
+                aria-current={view === 'list' ? 'page' : undefined}
+              >
+                Список
+              </a>
+            </nav>
+            <nav aria-label="Месяцы с событиями" class="month-navigation">
+              {navigation?.previous && (
                 <a
-                  href={eventMonthUrl(month.id)}
-                  aria-current={view === 'calendar' ? 'page' : undefined}
+                  href={navigation.previous}
+                  rel="prev"
+                  aria-label="Предыдущий месяц с событиями"
+                  title="Предыдущий месяц с событиями"
                 >
-                  Календарь
+                  <span aria-hidden="true">←</span>
                 </a>
+              )}
+              {currentMonth && month.id !== currentMonth.id && (
                 <a
-                  href={eventMonthUrl(month.id, 'list')}
-                  aria-current={view === 'list' ? 'page' : undefined}
+                  class="current-month"
+                  href={eventMonthUrl(currentMonth.id, view)}
                 >
-                  Список
+                  Текущий месяц
                 </a>
-              </nav>
-              <nav aria-label="Месяцы с событиями" class="month-navigation">
-                {navigation?.previous && (
-                  <a
-                    href={navigation.previous}
-                    rel="prev"
-                    aria-label="Предыдущий месяц с событиями"
-                    title="Предыдущий месяц с событиями"
-                  >
-                    <span aria-hidden="true">←</span>
-                  </a>
-                )}
-                {currentMonth && month.id !== currentMonth.id && (
-                  <a
-                    class="current-month"
-                    href={eventMonthUrl(currentMonth.id, view)}
-                  >
-                    Текущий месяц
-                  </a>
-                )}
-                {navigation?.next && (
-                  <a
-                    href={navigation.next}
-                    rel="next"
-                    aria-label="Следующий месяц с событиями"
-                    title="Следующий месяц с событиями"
-                  >
-                    <span aria-hidden="true">→</span>
-                  </a>
-                )}
-              </nav>
-            </div>
-            {view === 'calendar' ? (
-              <EventMonthCalendar month={month} />
-            ) : (
-              <EventList events={month.events} />
-            )}
-          </>
-        ) : (
-          <p>Опубликованных событий пока нет.</p>
-        )
-      }
+              )}
+              {navigation?.next && (
+                <a
+                  href={navigation.next}
+                  rel="next"
+                  aria-label="Следующий месяц с событиями"
+                  title="Следующий месяц с событиями"
+                >
+                  <span aria-hidden="true">→</span>
+                </a>
+              )}
+            </nav>
+          </div>
+          {view === 'calendar' ? (
+            <EventMonthCalendar month={month} />
+          ) : (
+            <EventList events={month.events} />
+          )}
+        </>
+      ) : (
+        <p>Опубликованных событий пока нет.</p>
+      )}
     </div>
   </main>
 </BaseLayout>
@@ -176,7 +176,7 @@ const breadcrumbs = withHomeBreadcrumbs(
     text-decoration: none;
   }
   .view-switch a[aria-current] {
-    border-color: var(--color-border);
+    border-color: var(--color-primary);
     background: var(--color-surface-raised);
     color: var(--color-primary);
   }

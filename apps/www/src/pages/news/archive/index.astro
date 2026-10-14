@@ -116,7 +116,7 @@ const schema = collectionPageSchema({
   }
 
   .news-archive-row:focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
   }
 
@@ -126,7 +126,7 @@ const schema = collectionPageSchema({
 
   .news-archive-row__title {
     display: block;
-    color: var(--color-primary);
+    color: var(--color-text);
     transition: color 150ms ease;
   }
 
@@ -147,9 +147,15 @@ const schema = collectionPageSchema({
     transition: color 150ms ease;
   }
 
-  .news-archive-row:hover
+  .news-archive-row:is(:hover, :focus-visible)
     :is(.news-archive-row__title, .news-archive-row__arrow) {
     color: var(--color-primary-hover);
+  }
+
+  .news-archive-row:is(:hover, :focus-visible) .news-archive-row__title {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
   }
 
   .news-archive-empty {

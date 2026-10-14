@@ -193,7 +193,19 @@
     <div class="controls-row">
       <fieldset class="filter-fieldset">
         <legend class="visually-hidden">Фильтр по тарифу</legend>
-        <div class="filter-group" data-testid="price-filter-group">
+        <div
+          class="filter-group"
+          data-testid="price-filter-group"
+          onfocusin={(event) => {
+            if (event.target instanceof HTMLInputElement) {
+              event.target.labels?.[0]?.scrollIntoView({
+                block: 'nearest',
+                inline: 'nearest',
+                behavior: 'instant'
+              });
+            }
+          }}
+        >
           <span class="filter-caption" aria-hidden="true">Фильтр:</span>
           <span class="filter-option">
             <input

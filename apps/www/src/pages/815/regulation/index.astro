@@ -400,11 +400,17 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
               </p>
               <p>
                 Для проверки по полному регламенту рядом есть справочники:{' '}
-                <a class="ui-link reglament-link" href={reglamentAssetsUrl()}>
+                <a
+                  class="site-text-link reglament-link"
+                  href={reglamentAssetsUrl()}
+                >
                   что входит в общее имущество
                 </a>{' '}
                 и{' '}
-                <a class="ui-link reglament-link" href={reglamentServicesUrl()}>
+                <a
+                  class="site-text-link reglament-link"
+                  href={reglamentServicesUrl()}
+                >
                   какие услуги указаны в регламенте
                 </a>
                 .
@@ -1405,7 +1411,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       display: inline-flex;
       max-width: 100%;
       overflow: hidden;
-      border: 1px solid var(--color-border);
+      border: 1px solid var(--color-border-strong);
       border-radius: var(--radius-lg);
       background: var(--color-surface);
       vertical-align: top;
@@ -1417,8 +1423,8 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
 
     .reglament-input-shell:focus-within {
       border-color: var(--color-primary);
-      box-shadow: 0 0 0 2px
-        color-mix(in oklch, var(--color-primary), transparent 80%);
+      outline: 2px solid var(--color-focus);
+      outline-offset: -2px;
     }
 
     .reglament-input-shell:has(.reglament-input[aria-invalid='true']) {
@@ -1514,8 +1520,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
 
     .reglament-details-summary:focus-visible {
       border-radius: var(--radius-md);
-      box-shadow: 0 0 0 2px
-        color-mix(in oklch, var(--color-primary), transparent 75%);
+      box-shadow: 0 0 0 2px var(--color-focus);
     }
 
     .reglament-details-summary::-webkit-details-marker {
@@ -1629,8 +1634,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
     }
 
     .reglament-missing-help-button:focus-visible {
-      outline: 2px solid
-        color-mix(in oklch, var(--color-primary), transparent 70%);
+      outline: 2px solid var(--color-focus);
       outline-offset: 2px;
     }
 
