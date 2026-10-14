@@ -1,0 +1,169 @@
+{
+  "success": true,
+  "data": {
+    "lifecycle": {
+      "effectiveLaunch": {
+        "browserLaunched": true,
+        "engine": "chrome",
+        "launchHash": 11677035664275010974
+      },
+      "launched": false,
+      "relaunchedBrowser": false,
+      "restartedBackground": false,
+      "restoreStatus": "not_configured",
+      "reused": true,
+      "saveStatus": "not_attempted"
+    },
+    "origin": "http://127.0.0.1:14365/news/2026/04/river-restriction/",
+    "result": {
+      "documentWidth": 390,
+      "focus": {
+        "background": "oklch(0.9865 0.0041 121.6)",
+        "bottom": 359.625,
+        "href": "https://kpshelkovo.online/kb/ok/",
+        "left": 112.265625,
+        "outline": "oklch(0.5125 0.0872 78.2) solid 2px",
+        "outlineOffset": "2px",
+        "ratio": 5.54,
+        "right": 194.28125,
+        "text": "ОК Комфорт",
+        "top": 335.625,
+        "visible": true
+      },
+      "heading": "Проезд через дамбу временно закрыт",
+      "images": [
+        {
+          "alt": "Подтопленная дамба у КПП Шелково Ривер",
+          "height": 720,
+          "loaded": true,
+          "loading": "eager",
+          "renderedHeight": 178,
+          "renderedWidth": 316,
+          "width": 1280
+        }
+      ],
+      "measurements": [
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 318,
+          "color": "oklch(0.2821 0.0101 164.2)",
+          "height": 117,
+          "left": 36,
+          "ratio": 13.9,
+          "right": 354,
+          "scrollWidth": 318,
+          "size": "36px",
+          "text": "Проезд через дамбу временно закрыт",
+          "weight": "700"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 0,
+          "color": "oklab(0.463836 -0.0330916 0.0142487)",
+          "height": 15,
+          "left": 36,
+          "ratio": 6.65,
+          "right": 81,
+          "scrollWidth": 0,
+          "size": "13px",
+          "text": "#дамба",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 0,
+          "color": "oklab(0.463836 -0.0330916 0.0142487)",
+          "height": 15,
+          "left": 93,
+          "ratio": 6.65,
+          "right": 128,
+          "scrollWidth": 0,
+          "size": "13px",
+          "text": "#мост",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 0,
+          "color": "oklab(0.463836 -0.0330916 0.0142487)",
+          "height": 15,
+          "left": 140,
+          "ratio": 6.65,
+          "right": 228,
+          "scrollWidth": 0,
+          "size": "13px",
+          "text": "#ограничение",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 0,
+          "color": "oklab(0.462087 -0.0331737 0.0142683)",
+          "height": 15,
+          "left": 240,
+          "ratio": 6.68,
+          "right": 276,
+          "scrollWidth": 0,
+          "size": "13px",
+          "text": "#река",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 66,
+          "color": "oklch(0.2821 0.0101 164.2)",
+          "height": 24,
+          "left": 36,
+          "ratio": 13.9,
+          "right": 102,
+          "scrollWidth": 66,
+          "size": "14px",
+          "text": "30 апреля",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 82,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "height": 24,
+          "left": 112,
+          "ratio": 9.16,
+          "right": 194,
+          "scrollWidth": 82,
+          "size": "14px",
+          "text": "ОК Комфорт",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 79,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "height": 24,
+          "left": 204,
+          "ratio": 9.16,
+          "right": 283,
+          "scrollWidth": 79,
+          "size": "14px",
+          "text": "источник",
+          "weight": "600"
+        },
+        {
+          "background": "oklch(0.9865 0.0041 121.6)",
+          "clientWidth": 61,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "height": 24,
+          "left": 222,
+          "ratio": 9.16,
+          "right": 283,
+          "scrollWidth": 61,
+          "size": "14px",
+          "text": "источник",
+          "weight": "600"
+        }
+      ],
+      "url": "/news/2026/04/river-restriction/",
+      "viewport": 390
+    }
+  },
+  "error": null
+}

@@ -1,6 +1,4 @@
 ---
-import { Image } from 'astro:assets';
-import { getEntry } from 'astro:content';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import NewsAttachments from '@/components/news/NewsAttachments.astro';
@@ -24,21 +22,16 @@ import type { SearchDocument } from '@/lib/search/types';
 
 export const getStaticPaths = newsArticleStaticPaths;
 
-const HERO_COVER_WIDTHS = [480, 768, 960, 1280, 1600, 2200] as const;
-
 const year = Astro.params.year;
 const month = Astro.params.month;
 const entry = Astro.params.entry;
-
 if (!year || !month || !entry) {
   throw new Error('news article params are required');
 }
 
 const id = `${year}/${month}/${entry}`;
 const article = await loadNewsArticle(id);
-const source = await getEntry('newsArticles', id);
-
-if (!article || !source) {
+if (!article) {
   throw new Error(`news article "${id}" not found`);
 }
 
@@ -46,33 +39,10 @@ const bodyHtml = article.body
   ? renderMarkdown(article.body, { eagerImages: true, editorialMaps: true })
   : undefined;
 const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
-const monthName = formatNewsMonth(article.year, article.month, {
-  capitalize: true,
-});
 const monthBreadcrumbName = formatNewsMonth(article.year, article.month, {
   capitalize: true,
   includeYear: false,
 });
-const heroCoverWidth = source.data.cover
-  ? Math.min(source.data.cover.width, 2200)
-  : undefined;
-const heroCover =
-  source.data.cover && heroCoverWidth
-    ? {
-        src: source.data.cover,
-        width: heroCoverWidth,
-        height: Math.round(
-          (source.data.cover.height * heroCoverWidth) / source.data.cover.width,
-        ),
-        widths: [
-          ...HERO_COVER_WIDTHS.filter(
-            (candidate) => candidate < heroCoverWidth,
-          ),
-          heroCoverWidth,
-        ],
-      }
-    : undefined;
-const hasHeroCover = Boolean(heroCover);
 const hasEvents = article.events.length > 0;
 const title = `${article.seo?.title ?? article.title} — Новости — Шелково Онлайн`;
 const description = article.seo?.description ?? article.summary;
@@ -88,10 +58,7 @@ const search = {
 const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Новости', href: newsUrl() },
   { label: String(article.year), href: yearUrl(article.year) },
-  {
-    label: monthBreadcrumbName,
-    href: monthUrl(article.year, article.month),
-  },
+  { label: monthBreadcrumbName, href: monthUrl(article.year, article.month) },
   { label: article.title },
 ]);
 const author =
@@ -102,12 +69,7 @@ const author =
         name: article.author.name,
         url: article.author.url,
       };
-const images = [
-  ...new Set([
-    ...(article.cover ? [article.cover.url] : []),
-    ...article.photos.map((photo) => photo.url),
-  ]),
-];
+const images = [...new Set(article.photos.map((photo) => photo.url))];
 const schema = newsArticleSchema({
   name: article.title,
   description,
@@ -129,8 +91,6 @@ const schema = newsArticleSchema({
   title={title}
   description={description}
   canonical={article.url}
-  image={article.cover?.url}
-  imageAlt={article.cover?.alt}
   type="article"
   keywords={[
     'новости Шелково',
@@ -141,110 +101,43 @@ const schema = newsArticleSchema({
   search={search}
 >
   <main class="news-article-page">
-    {hasHeroCover && (
-      <header class="news-hero">
-        <Image
-          src={heroCover.src}
-          width={heroCover.width}
-          height={heroCover.height}
-          widths={heroCover.widths}
-          sizes="100vw"
-          format="webp"
-          quality={82}
-          alt=""
-          aria-hidden="true"
-          priority
-          class="news-hero__image"
-        />
-        <div class="news-hero-overlay-top" />
-        <div class="news-hero-overlay-side" />
-
-        <div class="ui-page news-hero__layout">
-          <div class="ui-breadcrumbs news-hero__breadcrumbs">
-            <Breadcrumbs items={breadcrumbs} linkLast />
-          </div>
-
-          <div class="news-hero__content">
-            <div class="news-hero__content-inner">
-              <div class="news-article-heading">
-                <h1 class="ui-page-title">{article.title}</h1>
-
-                {article.tags.length > 0 && (
-                  <ul class="news-article-tags">
-                    {article.tags.map((item) => (
-                      <li>
-                        <a
-                          href={item.url}
-                          aria-label={`Тег ${item.label}`}
-                          class="news-tag-inline-link"
-                        >
-                          #{item.label}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-
-              <NewsMeta
-                publishedIso={article.publishedIso}
-                author={article.author}
-                fullAuthorName
-                areas={article.areas}
-                appliesToAllAreas={article.appliesToAllAreas}
-                sourceUrl={article.sourceUrl}
-                variant="prominent"
-              />
-            </div>
-          </div>
-        </div>
-      </header>
-    )}
-
     <article
       class:list={[
         'ui-page ui-page-header-stack news-article-layout',
-        {
-          'news-article-layout--with-cover': hasHeroCover,
-          'news-article-layout--with-events': hasEvents,
-        },
+        { 'news-article-layout--with-events': hasEvents },
       ]}
     >
-      {!hasHeroCover && (
-        <>
-          <div class="ui-page-header ui-breadcrumbs news-article-breadcrumbs">
-            <Breadcrumbs items={breadcrumbs} linkLast />
-          </div>
-          <header class="news-article-header__content">
-            <div class="news-article-heading">
-              <h1 class="ui-page-title">{article.title}</h1>
-              {article.tags.length > 0 && (
-                <ul class="news-article-tags">
-                  {article.tags.map((item) => (
-                    <li>
-                      <a
-                        href={item.url}
-                        aria-label={`Тег ${item.label}`}
-                        class="news-tag-inline-link"
-                      >
-                        #{item.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            <NewsMeta
-              publishedIso={article.publishedIso}
-              author={article.author}
-              fullAuthorName
-              areas={article.areas}
-              appliesToAllAreas={article.appliesToAllAreas}
-              sourceUrl={article.sourceUrl}
-            />
-          </header>
-        </>
-      )}
+      <div class="ui-page-header ui-breadcrumbs news-article-breadcrumbs">
+        <Breadcrumbs items={breadcrumbs} linkLast />
+      </div>
+      <header class="news-article-header__content">
+        <div class="news-article-heading">
+          <h1 class="ui-page-title">{article.title}</h1>
+          {article.tags.length > 0 && (
+            <ul class="news-article-tags">
+              {article.tags.map((item) => (
+                <li>
+                  <a
+                    href={item.url}
+                    aria-label={`Тег ${item.label}`}
+                    class="news-tag-inline-link"
+                  >
+                    #{item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <NewsMeta
+          publishedIso={article.publishedIso}
+          author={article.author}
+          fullAuthorName
+          areas={article.areas}
+          appliesToAllAreas={article.appliesToAllAreas}
+          sourceUrl={article.sourceUrl}
+        />
+      </header>
       {bodyHtml && (
         <div class="news-article-body">
           <div class={NEWS_PROSE} data-pagefind-body set:html={bodyHtml} />
@@ -273,118 +166,10 @@ const schema = newsArticleSchema({
     padding-block-end: 1.5rem;
   }
 
-  .news-hero {
-    --news-hero-foreground: oklch(97.2% 0.004 130);
-    --news-hero-muted-foreground: oklch(88.8% 0.012 130);
-    --news-hero-primary: oklch(90.5% 0.022 142);
-    --news-hero-primary-hover: oklch(96.4% 0.01 140);
-    --news-hero-border: color-mix(
-      in oklab,
-      var(--news-hero-foreground) 24%,
-      transparent
-    );
-    --news-hero-border-strong: color-mix(
-      in oklab,
-      var(--news-hero-foreground) 52%,
-      transparent
-    );
-    --news-hero-ring: oklch(97% 0.01 140);
-    --news-hero-overlay-top: oklch(24% 0.04 145 / 0.14);
-    --news-hero-overlay-side-strong: oklch(24% 0.04 145 / 0.36);
-    --news-hero-overlay-side-mid: oklch(24% 0.04 145 / 0.18);
-    --news-hero-overlay-side-soft: oklch(24% 0.04 145 / 0.06);
-
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    background: var(--color-bg);
-  }
-
-  .news-hero__image {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: 50% 64%;
-    filter: brightness(1.05);
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      rgb(0 0 0) 0%,
-      rgb(0 0 0) 68%,
-      rgb(0 0 0 / 86%) 82%,
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      to bottom,
-      rgb(0 0 0) 0%,
-      rgb(0 0 0) 68%,
-      rgb(0 0 0 / 86%) 82%,
-      transparent 100%
-    );
-  }
-
-  .news-hero-overlay-top,
-  .news-hero-overlay-side {
-    position: absolute;
-  }
-
-  .news-hero-overlay-top {
-    inset-block-start: 0;
-    inset-inline: 0;
-    height: 6rem;
-    background: linear-gradient(
-      to bottom,
-      var(--news-hero-overlay-top),
-      transparent
-    );
-  }
-
-  .news-hero-overlay-side {
-    inset-block: 0;
-    inset-inline-start: 0;
-    width: min(54rem, 100%);
-    background: linear-gradient(
-      90deg,
-      var(--news-hero-overlay-side-strong) 0%,
-      var(--news-hero-overlay-side-mid) 52%,
-      var(--news-hero-overlay-side-soft) 78%,
-      transparent 100%
-    );
-  }
-
-  .news-hero__layout {
-    position: relative;
-    display: flex;
-    min-height: 20rem;
-    flex-direction: column;
-    padding-block-start: 1rem;
-  }
-
-  .news-hero__breadcrumbs,
-  .news-hero__content {
-    padding-inline: 1.25rem;
-  }
-
-  .news-hero__content {
-    --color-text: var(--news-hero-foreground);
-    --color-text-muted: var(--news-hero-muted-foreground);
-    --color-primary: var(--news-hero-primary);
-    --color-primary-hover: var(--news-hero-primary-hover);
-    --color-border: var(--news-hero-border);
-    --color-border-strong: var(--news-hero-border-strong);
-    --color-focus: var(--news-hero-ring);
-
-    margin-block-start: auto;
-    padding-block-end: 1rem;
-  }
-
-  .news-hero__content-inner,
   .news-article-header__content {
     max-width: 56rem;
   }
 
-  .news-hero__content-inner > :global(:not(:last-child)),
   .news-article-header__content > :global(:not(:last-child)) {
     margin-block-end: 1rem;
   }
@@ -445,9 +230,6 @@ const schema = newsArticleSchema({
   .news-article-body {
     min-width: 0;
   }
-  .news-article-layout--with-cover {
-    padding-block-start: 1.5rem;
-  }
   .news-article-media {
     min-width: 0;
     margin-inline: -1.25rem;
@@ -465,62 +247,17 @@ const schema = newsArticleSchema({
     .news-article-header__content .ui-page-title {
       overflow-wrap: anywhere;
     }
-
-    .news-hero__layout {
-      padding-block-start: 0;
-    }
-
-    .news-hero__breadcrumbs :global(.breadcrumbs) {
-      margin-block-start: 0;
-    }
-
-    .news-hero__content {
-      padding-block-start: 1.25rem;
-    }
-  }
-
-  @media (min-width: 40rem) {
-    .news-hero__breadcrumbs {
-      --color-text: var(--news-hero-foreground);
-      --color-text-muted: var(--news-hero-muted-foreground);
-      --color-primary: var(--news-hero-primary);
-      --color-primary-hover: var(--news-hero-primary-hover);
-      --color-border: var(--news-hero-border);
-      --color-border-strong: var(--news-hero-border-strong);
-      --color-focus: var(--news-hero-ring);
-    }
   }
 
   @media (min-width: 48rem) {
     .news-article-page {
       padding-block-end: 2.5rem;
     }
-
-    .news-hero-overlay-top {
-      height: 7rem;
-    }
-
-    .news-hero__layout {
-      min-height: 24rem;
-      padding-block-start: 1.25rem;
-    }
-
-    .news-hero__breadcrumbs,
-    .news-hero__content,
     .news-article-layout {
       padding-inline: 1.5rem;
     }
-
-    .news-hero__content {
-      padding-block-end: 1.5rem;
-    }
-
     .news-article-tags {
       column-gap: 1rem;
-    }
-
-    .news-article-layout--with-cover {
-      padding-block-start: 2rem;
     }
     .news-article-media {
       margin-inline: -1.5rem;
@@ -531,26 +268,6 @@ const schema = newsArticleSchema({
     .news-article-page {
       padding-block-end: 3rem;
     }
-
-    .news-hero-overlay-top {
-      height: 8rem;
-    }
-
-    .news-hero__layout {
-      min-height: 28rem;
-      padding-block-start: 1.5rem;
-    }
-
-    .news-hero__content {
-      padding-block-end: 2rem;
-    }
-
-    .news-article-layout--with-cover {
-      padding-block-start: 2.5rem;
-    }
-  }
-
-  @media (min-width: 64rem) {
     .news-article-layout--with-events {
       grid-template-columns: minmax(0, 1fr) 19rem;
       grid-template-rows: auto auto 1fr auto;
@@ -572,13 +289,6 @@ const schema = newsArticleSchema({
       width: 100%;
       grid-column: 2;
       grid-row: 2 / 4;
-    }
-    .news-article-layout--with-cover .news-article-body,
-    .news-article-layout--with-cover .news-article-event-aside {
-      grid-row: 1;
-    }
-    .news-article-layout--with-cover {
-      grid-template-rows: auto auto;
     }
   }
 </style>

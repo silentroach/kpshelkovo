@@ -1,31 +1,9 @@
 import { z } from 'astro/zod';
-import type { SchemaContext } from 'astro:content';
 import { describe, expect, it } from 'vitest';
 
-import {
-  createRawNewsArticleSchema,
-  RawNewsAuthorSchema,
-  RawNewsEventsSchema
-} from '../raw-schema';
+import { RawNewsArticleSchema, RawNewsAuthorSchema, RawNewsEventsSchema } from '../raw-schema';
 
-const image: SchemaContext['image'] = () =>
-  z.object({
-    src: z.string(),
-    width: z.number(),
-    height: z.number(),
-    format: z.union([
-      z.literal('png'),
-      z.literal('jpg'),
-      z.literal('jpeg'),
-      z.literal('tiff'),
-      z.literal('webp'),
-      z.literal('gif'),
-      z.literal('svg'),
-      z.literal('avif'),
-      z.literal('apng')
-    ])
-  });
-const articleSchema = createRawNewsArticleSchema(image);
+const articleSchema = RawNewsArticleSchema;
 
 const article = {
   title: 'Заголовок новости',
@@ -39,13 +17,6 @@ const photo = {
   width: 1280,
   height: 960,
   alt: 'Фото с места'
-};
-
-const cover = {
-  src: '/src/data/news/articles/2026/05/article/cover.jpeg',
-  width: 1200,
-  height: 675,
-  format: 'jpeg' as const
 };
 
 const event = {
@@ -78,8 +49,6 @@ describe('news article raw schema', () => {
       ...article,
       title: '  Заголовок новости  ',
       summary: '  Краткое описание новости.  ',
-      cover,
-      cover_alt: '  Вид на поселок  ',
       attachments: [
         {
           title: '  Публичный договор  ',
@@ -104,7 +73,6 @@ describe('news article raw schema', () => {
     expect({
       title: parsed.title,
       summary: parsed.summary,
-      cover_alt: parsed.cover_alt,
       attachments: parsed.attachments,
       photos: parsed.photos,
       seo: parsed.seo
@@ -118,7 +86,6 @@ describe('news article raw schema', () => {
             "url": "/documents/contract.pdf",
           },
         ],
-        "cover_alt": "Вид на поселок",
         "photos": [
           {
             "alt": "Фото с места",
@@ -208,18 +175,6 @@ describe('news article raw schema', () => {
   ])('rejects whitespace-only $field at its path', ({ field, input, path }) => {
     expect(articleValidationIssues(input)).toEqual([
       { path, message: `${field} must not be blank` }
-    ]);
-  });
-
-  it.each([
-    { case: 'omitted', input: { ...article, cover } },
-    { case: 'blank', input: { ...article, cover, cover_alt: ' \t ' } }
-  ])('requires a non-blank cover_alt when it is $case', ({ input }) => {
-    expect(articleValidationIssues(input)).toEqual([
-      {
-        path: ['cover_alt'],
-        message: 'cover_alt is required when cover is set'
-      }
     ]);
   });
 });

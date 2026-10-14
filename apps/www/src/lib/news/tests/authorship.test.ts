@@ -1,6 +1,5 @@
 import { readFileSync } from 'node:fs';
 
-import * as content from 'astro:content';
 import { Window } from 'happy-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { parse } from 'yaml';
@@ -29,12 +28,14 @@ const readAuthor = (id: string): NewsAuthorEntry => ({
 });
 const editorial = readAuthor('editorial');
 
-const fixture = (author = editorial, withCover = false) => {
+const fixture = (author = editorial, withPhoto = false) => {
   const source = newsArticleEntry({
     id: '2026/10/authorship',
     title: 'Test article',
     summary: 'Test summary',
-    body: 'Test body',
+    body: withPhoto
+      ? 'Before.\n\n![Photo](https://media.kpshelkovo.online/news/test/photo.jpeg)\n\nAfter.'
+      : 'Test body',
     date: '02.10.2026',
     tags: ['новости']
   });
@@ -45,18 +46,13 @@ const fixture = (author = editorial, withCover = false) => {
       ...source.data,
       author: { collection: 'newsAuthors' as const, id: author.id },
       areas: ['forest' as const],
-      source_url: 'https://example.com/source',
-      cover: withCover
-        ? { src: '/cover.jpg', width: 1280, height: 960, format: 'jpg' as const }
-        : undefined,
-      cover_alt: withCover ? 'Cover' : undefined
+      source_url: 'https://example.com/source'
     }
   };
   const data = news.buildNewsDataset([author], [entry], newsArchiveSummaryEntries([entry]));
   const article = data.articles[0]!;
   vi.spyOn(news, 'loadNewsArticle').mockResolvedValue(article);
   vi.spyOn(news, 'loadNewsData').mockResolvedValue(data);
-  vi.spyOn(content, 'getEntry').mockResolvedValue(entry);
   return article;
 };
 
@@ -101,9 +97,9 @@ describe('news authorship', () => {
   });
 
   it.each([false, true])(
-    'keeps article metadata without an editorial signature (cover: %s)',
-    async (withCover) => {
-      const article = fixture(editorial, withCover);
+    'keeps article metadata without an editorial signature (body photo: %s)',
+    async (withPhoto) => {
+      const article = fixture(editorial, withPhoto);
       const schema = await renderPage();
       const meta = window.document.querySelector('main .news-meta')!;
       expect({
@@ -127,11 +123,51 @@ describe('news authorship', () => {
         "visibleAuthor": false,
       }
     `);
-      expect(Boolean(window.document.querySelector('main img[aria-hidden="true"]'))).toBe(
-        withCover
+      expect(window.document.querySelectorAll('main header img')).toHaveLength(0);
+      expect(window.document.querySelectorAll('main .news-article-body img')).toHaveLength(
+        withPhoto ? 1 : 0
       );
     }
   );
+
+  it('keeps a body photo between paragraphs without assigning a social image', async () => {
+    const article = fixture(editorial, true);
+    await renderPage();
+    const image = window.document.querySelector('main .news-article-body img')!;
+    const paragraph = image.closest('p')!;
+    expect({
+      alt: image.getAttribute('alt'),
+      loading: image.getAttribute('loading'),
+      before: paragraph.previousElementSibling?.textContent,
+      after: paragraph.nextElementSibling?.textContent,
+      ogImage: Boolean(window.document.querySelector('meta[property="og:image"]')),
+      twitterImage: Boolean(window.document.querySelector('meta[name="twitter:image"]')),
+      twitterCard: window.document
+        .querySelector('meta[name="twitter:card"]')
+        ?.getAttribute('content'),
+      ogTitle: window.document.querySelector('meta[property="og:title"]')?.getAttribute('content'),
+      ogDescription: window.document
+        .querySelector('meta[property="og:description"]')
+        ?.getAttribute('content')
+    }).toMatchInlineSnapshot(`
+      {
+        "after": "After.",
+        "alt": "Photo",
+        "before": "Before.",
+        "loading": "eager",
+        "ogDescription": "Test summary",
+        "ogImage": false,
+        "ogTitle": "Test article — Новости — Шелково Онлайн",
+        "twitterCard": "summary",
+        "twitterImage": false,
+      }
+    `);
+    const payload = newsPublicPayloadSchema.parse(await (await getArticles({} as never)).json());
+    expect(payload.articles[0]?.body_markdown).toBe(article.body);
+    const markdown = buildNewsArticleMarkdown(article);
+    expect(markdown.indexOf('Before.')).toBeLessThan(markdown.indexOf('![Photo]'));
+    expect(markdown.indexOf('![Photo]')).toBeLessThan(markdown.indexOf('After.'));
+  });
 
   it.each([
     { author: readAuthor('ig'), schemaType: 'Person' },

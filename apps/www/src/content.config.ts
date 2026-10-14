@@ -12,7 +12,7 @@ import { RawKbPageSchema } from '@/lib/kb/raw-schema';
 import { kbPageSourceId } from '@/lib/kb/source';
 import { RawMeetingSchema, RawMeetingTranscriptSchema } from '@/lib/meetings/raw-schema';
 import { meetingSourceId, meetingTranscriptYamlId } from '@/lib/meetings/source';
-import { RawNewsAuthorSchema, createRawNewsArticleSchema } from '@/lib/news/raw-schema';
+import { RawNewsAuthorSchema, RawNewsArticleSchema } from '@/lib/news/raw-schema';
 import { articleSourceId, newsArchiveSummaryId } from '@/lib/news/source';
 import { RawParcelSchema } from '@/lib/parcels/raw-schema';
 import { parcelSourceId } from '@/lib/parcels/source';
@@ -49,7 +49,7 @@ const newsArticles = defineCollection({
     base: './src/data/news/articles',
     generateId: ({ entry, data }) => articleSourceId(entry, data)
   }),
-  schema: ({ image }) => createRawNewsArticleSchema(image)
+  schema: RawNewsArticleSchema
 });
 
 const newsArchiveSummaries = defineCollection({

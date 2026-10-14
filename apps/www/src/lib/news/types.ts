@@ -36,13 +36,6 @@ export interface NewsAttachment {
   readonly size?: string;
 }
 
-export interface NewsCover {
-  readonly url: string;
-  readonly width: number;
-  readonly height: number;
-  readonly alt: string;
-}
-
 export interface NewsEvent extends EventRecord {
   readonly slug: string;
   readonly description?: string;
@@ -72,7 +65,6 @@ export interface NewsArticle {
   readonly searchAliases?: readonly string[];
   readonly pinned: boolean;
   readonly sourceUrl?: string;
-  readonly cover?: NewsCover;
   readonly photos: readonly NewsPhoto[];
   readonly attachments: readonly NewsAttachment[];
   readonly events: readonly NewsEvent[];
@@ -94,7 +86,6 @@ export interface NewsListArticle {
   readonly time?: string;
   readonly tags: readonly NewsTag[];
   readonly pinned: boolean;
-  readonly cover?: NewsCover;
   readonly summary: string;
 }
 

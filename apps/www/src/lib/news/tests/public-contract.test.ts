@@ -48,10 +48,6 @@ const dataset = (full = true): NewsDataset => {
         ...entry.data,
         tags: ['события'],
         source_url: full ? 'https://example.com/source' : undefined,
-        cover: full
-          ? { src: '/cover.jpg', width: 1280, height: 960, format: 'jpg' as const }
-          : undefined,
-        cover_alt: full ? 'Cover' : undefined,
         photos: [
           {
             url: 'https://example.com/photo.jpg',
@@ -174,6 +170,9 @@ describe('serialized news contracts', () => {
     const payload = await serializedFeed(dataset());
     expect(payload.total_count).toBe(1);
     expectValid(payload);
+    expect(payload.articles[0]).not.toHaveProperty('cover');
+    expect(standalone.$defs?.article.properties).not.toHaveProperty('cover');
+    expect(standalone.$defs).not.toHaveProperty('cover');
 
     const objects = contractObjects(standalone, payload);
     // Include inline objects and both uses of eventParticipant, not only $defs.
@@ -183,7 +182,6 @@ describe('serialized news contracts', () => {
         "$.articles[0]",
         "$.articles[0].author",
         "$.articles[0].tags[0]",
-        "$.articles[0].cover",
         "$.articles[0].events[0]",
         "$.articles[0].events[0].coordinates",
         "$.articles[0].events[0].organizer",
@@ -285,7 +283,6 @@ describe('serialized news contracts', () => {
     ['$.articles[0]', 'events', []],
     ['$.articles[0].author', 'kind', 'unknown'],
     ['$.articles[0].author', 'url', 'relative'],
-    ['$.articles[0].cover', 'width', 0],
     ['$.articles[0].photos[0]', 'height', 1.5],
     ['$.articles[0].photos[0]', 'caption', ''],
     ['$.articles[0].attachments[0]', 'type', ''],

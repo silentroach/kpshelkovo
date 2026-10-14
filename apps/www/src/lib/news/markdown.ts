@@ -99,16 +99,7 @@ const photoLine = (label: string, photo: NewsPhoto): MarkdownListItem => {
 };
 
 function photoSection(article: NewsArticle): readonly MarkdownNode[] {
-  const rows = pick<MarkdownListItem>([
-    article.cover
-      ? md.listItem(
-          `Обложка: ${pick([abs(article.cover.url), `alt: ${inline(article.cover.alt)}`]).join(
-            ' — '
-          )}`
-        )
-      : undefined,
-    ...article.photos.map((photo, index) => photoLine(`Фото ${index + 1}`, photo))
-  ]);
+  const rows = article.photos.map((photo, index) => photoLine(`Фото ${index + 1}`, photo));
 
   return rows.length > 0 ? section('Фото', rows) : [];
 }
