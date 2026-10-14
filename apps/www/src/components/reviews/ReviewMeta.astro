@@ -20,14 +20,12 @@ const { review, showVerified = false, className } = Astro.props;
   </time>
   <span>{formatReviewAuthor(review)}</span>
   <ShelkovoAreaIcon area={review.area} />
-  {
-    showVerified && (
-      <span class="review-meta-verified">
-        <CheckCircleIcon />
-        проверенный собственник
-      </span>
-    )
-  }
+  {showVerified && (
+    <span class="review-meta-verified">
+      <CheckCircleIcon />
+      проверенный собственник
+    </span>
+  )}
 </div>
 
 <style>
@@ -42,8 +40,8 @@ const { review, showVerified = false, className } = Astro.props;
   }
 
   .review-meta-date {
-    color: var(--color-text);
-    font-weight: 600;
+    color: var(--color-text-muted);
+    font-weight: 400;
   }
 
   .review-meta-verified {
@@ -51,7 +49,7 @@ const { review, showVerified = false, className } = Astro.props;
     align-items: center;
     gap: 0.25rem;
     color: var(--color-success);
-    font-weight: 600;
+    font-weight: 400;
   }
 
   .review-meta-verified > :global(svg) {

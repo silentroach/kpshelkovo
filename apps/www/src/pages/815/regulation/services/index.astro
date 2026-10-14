@@ -169,7 +169,7 @@ const serviceSearchText = (
             <div class="services-group-header" data-pagefind-body>
               <h3
                 id={group.group}
-                class="ui-section-title"
+                class="ui-group-title"
                 data-pagefind-weight="1.5"
               >
                 {group.title}
@@ -225,7 +225,7 @@ const serviceSearchText = (
                           <div class="services-item" data-pagefind-body>
                             <h4
                               id={`reglament-service-${service.id}`}
-                              class="services-item-title"
+                              class="ui-card-title services-item-title"
                               data-pagefind-weight="2"
                             >
                               {service.title}
@@ -417,6 +417,13 @@ const serviceSearchText = (
     .services-estimate-source {
       color: var(--color-text);
       font-weight: 600;
+    }
+
+    .services-item-title {
+      font-size: inherit;
+    }
+    .services-estimate-source {
+      font-weight: 400;
     }
 
     .services-table-muted {

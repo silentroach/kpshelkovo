@@ -14,10 +14,8 @@ import {
   formatReglamentInputNumber,
   formatReglamentAnnualMoney,
   formatReglamentMoney,
-  formatReglamentMoneyDelta,
   formatReglamentNumber,
-  formatReglamentTariff,
-  formatReglamentTariffValue,
+  formatReglamentSignedNumber,
   parseReglamentNumberInput
 } from './format';
 import { EDITABLE_FIELD_KEYS, type CostBreakdown, type EditableFieldKey } from './schema';
@@ -376,9 +374,23 @@ const setText = (elements: readonly HTMLElement[], value: string): void => {
   });
 };
 
+const setAmountText = (elements: readonly HTMLElement[], number: string, suffix: string): void => {
+  elements.forEach((element) => {
+    const numberNode = element.firstChild;
+    if (numberNode instanceof Text && element.lastElementChild?.classList.contains('ui-unit')) {
+      numberNode.data = number;
+      return;
+    }
+    const unit = element.querySelector('.ui-unit') ?? document.createElement('span');
+    unit.className = 'ui-unit';
+    unit.textContent = `\u00a0${suffix}`;
+    element.replaceChildren(document.createTextNode(number), unit);
+  });
+};
+
 const setDeltaText = (elements: readonly HTMLElement[], value: number): void => {
   elements.forEach((element) => {
-    element.textContent = formatReglamentMoneyDelta(value);
+    setAmountText([element], formatReglamentSignedNumber(value), '₽');
     element.dataset.reglamentDeltaTone = deltaTone(value);
   });
 };
@@ -391,9 +403,10 @@ const setCurrentTariffText = (
   const tone = deltaTone(result.delta_tariff_per_sotka_month);
   const isBaseline = tone === 'zero';
 
-  setText(
+  setAmountText(
     getIndexedElements(index, CURRENT_TARIFF_ATTRIBUTE),
-    formatReglamentTariff(result.tariff_per_sotka_month)
+    formatReglamentNumber(result.tariff_per_sotka_month),
+    '₽/сотка'
   );
   getIndexedElements(index, CURRENT_TARIFF_TONE_ATTRIBUTE).forEach((node) => {
     if (isBaseline) {
@@ -415,7 +428,7 @@ const setCurrentTariffText = (
 
 const setRowTariffText = (index: ReglamentCalculatorDomIndex, row: CalculatedEstimateRow): void => {
   getIndexedElements(index, ROW_TARIFF_ATTRIBUTE, row.id).forEach((node) => {
-    node.textContent = formatReglamentTariffValue(row.tariff_per_sotka_month);
+    setAmountText([node], formatReglamentNumber(row.tariff_per_sotka_month), '₽');
     const tone = deltaTone(row.delta_tariff_per_sotka_month);
 
     if (tone === 'zero') {
@@ -482,9 +495,10 @@ const renderReglamentCalculator = (
   );
 
   for (const section of result.sections) {
-    setText(
+    setAmountText(
       getIndexedElements(index, SECTION_TARIFF_ATTRIBUTE, section.id),
-      formatReglamentTariff(section.tariff_per_sotka_month)
+      formatReglamentNumber(section.tariff_per_sotka_month),
+      '₽/сотка'
     );
     setText(
       getIndexedElements(index, SECTION_ANNUAL_ATTRIBUTE, section.id),

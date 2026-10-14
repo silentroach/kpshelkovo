@@ -89,9 +89,7 @@ const schema = techArticleSchema({
 
         <div class="meeting-summary">
           <div class="meeting-heading">
-            <h1 class="ui-page-title">
-              {meeting.title}
-            </h1>
+            <h1 class="ui-page-title">{meeting.title}</h1>
 
             <div class="meeting-meta">
               <time
@@ -101,23 +99,19 @@ const schema = techArticleSchema({
                 {formatMeetingDate(meeting.date)}
               </time>
 
-              {
-                sourceLinks.map((source) => (
-                  <span data-pagefind-ignore="all">
-                    <LinkWithIcon
-                      href={source.href}
-                      label={source.label}
-                      ariaLabelPrefix={source.label}
-                    />
-                  </span>
-                ))
-              }
+              {sourceLinks.map((source) => (
+                <span data-pagefind-ignore="all">
+                  <LinkWithIcon
+                    href={source.href}
+                    label={source.label}
+                    ariaLabelPrefix={source.label}
+                  />
+                </span>
+              ))}
             </div>
           </div>
 
-          <p class="meeting-context">
-            {meeting.context}
-          </p>
+          <p class="ui-copy meeting-context">{meeting.context}</p>
         </div>
       </div>
     </header>
@@ -125,96 +119,96 @@ const schema = techArticleSchema({
     <div class="meeting-content">
       <div class="meeting-content__inner">
         <section class="meeting-section" aria-labelledby="meeting-speakers">
-          <h2 id="meeting-speakers" class="ui-section-title">Участники</h2>
+          <h2 id="meeting-speakers" class="ui-section-title">
+            Участники
+          </h2>
 
           <ul class="meeting-speakers">
-            {
-              meeting.transcript.speakers.map((speaker) => (
-                <li
-                  id={formatMeetingSpeakerAnchor(speaker)}
-                  class="meeting-speaker"
-                >
-                  <span class="meeting-speaker__name">
-                    {speaker.url ? (
-                      <a href={speaker.url} class="ui-link">
-                        {speaker.label}
-                      </a>
-                    ) : (
-                      <span>{speaker.label}</span>
-                    )}
-                  </span>
-
-                  {speaker.description && (
-                    <span class="meeting-speaker__description">
-                      {' '}
-                      — {speaker.description}
-                    </span>
+            {meeting.transcript.speakers.map((speaker) => (
+              <li
+                id={formatMeetingSpeakerAnchor(speaker)}
+                class="meeting-speaker"
+              >
+                <span class="meeting-speaker__name">
+                  {speaker.url ? (
+                    <a href={speaker.url} class="ui-link">
+                      {speaker.label}
+                    </a>
+                  ) : (
+                    <span>{speaker.label}</span>
                   )}
-                </li>
-              ))
-            }
+                </span>
+
+                {speaker.description && (
+                  <span class="meeting-speaker__description">
+                    {' '}
+                    — {speaker.description}
+                  </span>
+                )}
+              </li>
+            ))}
           </ul>
         </section>
 
         <section class="meeting-section" aria-labelledby="meeting-transcript">
-          <h2 id="meeting-transcript" class="ui-section-title">Транскрипция</h2>
+          <h2 id="meeting-transcript" class="ui-section-title">
+            Транскрипция
+          </h2>
 
           <ol class="meeting-transcript">
-            {
-              meeting.transcript.parts.map((part) => (
-                <>
-                  {hasTranscriptParts && (
-                    <li class="meeting-transcript-part">
-                      <h3 class="ui-card-title">
-                        {formatTranscriptPartLabel(part)}
+            {meeting.transcript.parts.map((part) => (
+              <>
+                {hasTranscriptParts && (
+                  <li class="meeting-transcript-part">
+                    <h3 class="ui-card-title">
+                      {formatTranscriptPartLabel(part)}
+                    </h3>
+                  </li>
+                )}
+
+                {part.segments.map((segment) => {
+                  const timestamp = formatTranscriptTime(segment.start);
+
+                  return (
+                    <li class="meeting-transcript-segment">
+                      <h3
+                        id={segment.anchor}
+                        class="meeting-transcript-anchor ui-visually-hidden"
+                        aria-hidden="true"
+                        data-pagefind-weight="0"
+                      >
+                        {segment.speaker.label} в {timestamp}
                       </h3>
+
+                      <div
+                        class="meeting-transcript-meta"
+                        data-pagefind-ignore="all"
+                      >
+                        <a
+                          href={`#${segment.anchor}`}
+                          aria-label={`Ссылка на фрагмент ${timestamp}`}
+                          class="ui-link ui-num meeting-transcript-time"
+                        >
+                          {timestamp}
+                        </a>
+
+                        <a
+                          href={`#${formatMeetingSpeakerAnchor(segment.speaker)}`}
+                          class="ui-link meeting-transcript-speaker"
+                        >
+                          {segment.speaker.label}
+                        </a>
+                      </div>
+
+                      <div
+                        class="ui-copy meeting-transcript-text"
+                        set:html={segment.textHtml}
+                      />
                     </li>
-                  )}
-
-                  {part.segments.map((segment) => {
-                    const timestamp = formatTranscriptTime(segment.start);
-
-                    return (
-                      <li class="meeting-transcript-segment">
-                        <h3
-                          id={segment.anchor}
-                          class="meeting-transcript-anchor ui-visually-hidden"
-                          aria-hidden="true"
-                          data-pagefind-weight="0"
-                        >
-                          {segment.speaker.label} в {timestamp}
-                        </h3>
-
-                        <div
-                          class="meeting-transcript-meta"
-                          data-pagefind-ignore="all"
-                        >
-                          <a
-                            href={`#${segment.anchor}`}
-                            aria-label={`Ссылка на фрагмент ${timestamp}`}
-                            class="ui-link ui-num meeting-transcript-time"
-                          >
-                            {timestamp}
-                          </a>
-
-                          <a
-                            href={`#${formatMeetingSpeakerAnchor(segment.speaker)}`}
-                            class="ui-link meeting-transcript-speaker"
-                          >
-                            {segment.speaker.label}
-                          </a>
-                        </div>
-
-                        <div
-                          class="meeting-transcript-text"
-                          set:html={segment.textHtml}
-                        />
-                      </li>
-                    );
-                  })}
-                </>
-              ))
-            }
+                  );
+                })}
+              </>
+            ))}
           </ol>
         </section>
       </div>
@@ -254,11 +248,13 @@ const schema = techArticleSchema({
     font-weight: 600;
   }
 
+  .meeting-meta :global(.link-with-icon) {
+    font-weight: 400;
+  }
+
   .meeting-context {
     max-width: 48rem;
     color: var(--color-text);
-    font-size: 1rem;
-    line-height: 1.75rem;
   }
 
   .meeting-content {
@@ -365,8 +361,6 @@ const schema = techArticleSchema({
     min-width: 0;
     margin-block-start: 0.25rem;
     color: var(--color-text);
-    font-size: 0.9375rem;
-    line-height: 1.5rem;
   }
 
   .meeting-transcript-segment::before {
@@ -450,8 +444,6 @@ const schema = techArticleSchema({
 
     .meeting-transcript-text {
       margin-block-start: 0;
-      font-size: 1rem;
-      line-height: 1.75rem;
     }
   }
 

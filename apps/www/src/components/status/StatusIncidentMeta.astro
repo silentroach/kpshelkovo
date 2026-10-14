@@ -25,18 +25,14 @@ const sourceUrl = incident.sourceUrl;
 >
   <StatusIncidentPeriod incident={incident} />
 
-  {
-    !incident.appliesToAllAreas &&
-      incident.areas.map((area) => <ShelkovoAreaIcon area={area} />)
-  }
+  {!incident.appliesToAllAreas &&
+    incident.areas.map((area) => <ShelkovoAreaIcon area={area} />)}
 
-  {
-    sourceUrl && (
-      <span data-pagefind-ignore="all">
-        <LinkWithIcon href={sourceUrl} ariaLabelPrefix="Источник" />
-      </span>
-    )
-  }
+  {sourceUrl && (
+    <span data-pagefind-ignore="all">
+      <LinkWithIcon href={sourceUrl} ariaLabelPrefix="Источник" />
+    </span>
+  )}
 </div>
 
 <style>
@@ -54,5 +50,9 @@ const sourceUrl = incident.sourceUrl;
   .status-incident-meta--prominent {
     column-gap: 1rem;
     font-size: 0.9375rem;
+  }
+
+  .status-incident-meta :global(.link-with-icon) {
+    font-weight: 400;
   }
 </style>

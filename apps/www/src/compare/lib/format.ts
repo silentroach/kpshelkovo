@@ -69,6 +69,9 @@ export function formatTariffAuto(tariff: TariffLike): string {
   return `~${text}`;
 }
 
+export const formatTariffNumber = (tariff: TariffLike): string =>
+  `${tariff.normalizedIsEstimate ? '~' : ''}${formatNumberRu(Math.round(tariff.normalizedPerSotkaMonth), { maximumFractionDigits: 0 })}`;
+
 /**
  * Format original tariff (before normalization).
  */

@@ -16,47 +16,45 @@ const { items, compact = false, className } = Astro.props;
 const tagAriaLabel = (label: string): string => `Тег ${label}`;
 ---
 
-{
-  items.length > 0 &&
-    (compact ? (
-      <ul class:list={['news-tag-list news-tag-list--compact', className]}>
-        {items.map((item) => (
-          <li>
-            <a
-              href={item.url}
-              aria-label={tagAriaLabel(item.label)}
-              class="news-tag-link news-tag-link--compact"
-            >
-              <span>#{item.label}</span>
-              {typeof item.count === 'number' && (
-                <span class="news-tag-count ui-num">{item.count}</span>
-              )}
-            </a>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <ul
-        role="list"
-        class:list={['news-tag-list news-tag-list--full', className]}
-      >
-        {items.map((item) => (
-          <li class="news-tag-item">
-            <a
-              href={item.url}
-              aria-label={tagAriaLabel(item.label)}
-              class="news-tag-row"
-            >
-              <span class="news-tag-link">#{item.label}</span>
-              {typeof item.count === 'number' && (
-                <span class="news-tag-count ui-num">{item.count}</span>
-              )}
-            </a>
-          </li>
-        ))}
-      </ul>
-    ))
-}
+{items.length > 0 &&
+  (compact ? (
+    <ul class:list={['news-tag-list news-tag-list--compact', className]}>
+      {items.map((item) => (
+        <li>
+          <a
+            href={item.url}
+            aria-label={tagAriaLabel(item.label)}
+            class="news-tag-link news-tag-link--compact"
+          >
+            <span>#{item.label}</span>
+            {typeof item.count === 'number' && (
+              <span class="news-tag-count ui-num">{item.count}</span>
+            )}
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <ul
+      role="list"
+      class:list={['news-tag-list news-tag-list--full', className]}
+    >
+      {items.map((item) => (
+        <li class="news-tag-item">
+          <a
+            href={item.url}
+            aria-label={tagAriaLabel(item.label)}
+            class="news-tag-row"
+          >
+            <span class="news-tag-link">#{item.label}</span>
+            {typeof item.count === 'number' && (
+              <span class="news-tag-count ui-num">{item.count}</span>
+            )}
+          </a>
+        </li>
+      ))}
+    </ul>
+  ))}
 
 <style>
   .news-tag-list--compact {
@@ -84,7 +82,7 @@ const tagAriaLabel = (label: string): string => `Тег ${label}`;
       var(--color-text-muted) 62%
     );
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 400;
     line-height: 1.4;
     text-decoration-line: underline;
     text-decoration-color: transparent;
