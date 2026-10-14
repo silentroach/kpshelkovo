@@ -21,34 +21,34 @@
 
 ### Меню над фотографией
 
-- [Сейчас и рекомендованный C, телефон](/openspec/changes/refine-site-surfaces/preview/menu-390-recommended.webp).
-- Все варианты: [390 px](/openspec/changes/refine-site-surfaces/preview/menu-390-comparison.webp), [320 px](/openspec/changes/refine-site-surfaces/preview/menu-320-comparison.webp), [desktop-подменю 1440 px](/openspec/changes/refine-site-surfaces/preview/menu-1440-comparison.webp).
-- [Дневная панорама, 390 px](/openspec/changes/refine-site-surfaces/preview/menu-day-390-comparison.webp): в том же документе включён существующий дневной asset из `data-day-src` / `data-day-srcset`. Внутри четырёх кадров изображение одинаковое. Другие снимки главной используют фактически выбранную сайтом вечернюю панораму.
+- [Сейчас и рекомендованный C, телефон](/openspec/changes/archive/2026-10-14-refine-site-surfaces/preview/menu-390-recommended.webp).
+- Все варианты: [390 px](/openspec/changes/archive/2026-10-14-refine-site-surfaces/preview/menu-390-comparison.webp), [320 px](/openspec/changes/archive/2026-10-14-refine-site-surfaces/preview/menu-320-comparison.webp), [desktop-подменю 1440 px](/openspec/changes/archive/2026-10-14-refine-site-surfaces/preview/menu-1440-comparison.webp).
+- [Дневная панорама, 390 px](/openspec/changes/archive/2026-10-14-refine-site-surfaces/preview/menu-day-390-comparison.webp): в том же документе включён существующий дневной asset из `data-day-src` / `data-day-srcset`. Внутри четырёх кадров изображение одинаковое. Другие снимки главной используют фактически выбранную сайтом вечернюю панораму.
 
 ### Поиск
 
 Запрос «тариф», фокус в поле. Реальная production-выдача; окно прокручивается по прежним правилам.
 
-- Над прокрученным калькулятором: [1440 px](/openspec/changes/refine-site-surfaces/preview/search-1440-comparison.webp), [390 px](/openspec/changes/refine-site-surfaces/preview/search-390-comparison.webp).
-- Над фотографией главной: [390 px](/openspec/changes/refine-site-surfaces/preview/search-home-390-comparison.webp), [320 px](/openspec/changes/refine-site-surfaces/preview/search-home-320-comparison.webp).
+- Над прокрученным калькулятором: [1440 px](/openspec/changes/archive/2026-10-14-refine-site-surfaces/preview/search-1440-comparison.webp), [390 px](/openspec/changes/archive/2026-10-14-refine-site-surfaces/preview/search-390-comparison.webp).
+- Над фотографией главной: [390 px](/openspec/changes/archive/2026-10-14-refine-site-surfaces/preview/search-home-390-comparison.webp), [320 px](/openspec/changes/archive/2026-10-14-refine-site-surfaces/preview/search-home-320-comparison.webp).
 
 ### Карта
 
 Настоящий SDK на [общей карте](https://kpshelkovo.online/map/?p=SHF-W50). Выбран W50. В исходном кадре сквозь белый попап видны соседние номера; в вариантах с blur эти детали подавлены.
 
-- Попап: [1440 px](/openspec/changes/refine-site-surfaces/preview/map-1440-comparison.webp), [390 px](/openspec/changes/refine-site-surfaces/preview/map-390-comparison.webp), [320 px](/openspec/changes/refine-site-surfaces/preview/map-320-comparison.webp).
-- [Панель слоёв, 1440 px](/openspec/changes/refine-site-surfaces/preview/layers-1440-comparison.webp).
+- Попап: [1440 px](/openspec/changes/archive/2026-10-14-refine-site-surfaces/preview/map-1440-comparison.webp), [390 px](/openspec/changes/archive/2026-10-14-refine-site-surfaces/preview/map-390-comparison.webp), [320 px](/openspec/changes/archive/2026-10-14-refine-site-surfaces/preview/map-320-comparison.webp).
+- [Панель слоёв, 1440 px](/openspec/changes/archive/2026-10-14-refine-site-surfaces/preview/layers-1440-comparison.webp).
 
 ### Закреплённый итог
 
-- [Шапка и итог калькулятора, 1440 px](/openspec/changes/refine-site-surfaces/preview/calculator-1440-comparison.webp): прокрутка страницы 1500 px, итог находится на y=57 px. В новых вариантах через шапку не читаются силуэты прокручиваемого текста; полоса итога сохраняет спокойную плотную заливку.
+- [Шапка и итог калькулятора, 1440 px](/openspec/changes/archive/2026-10-14-refine-site-surfaces/preview/calculator-1440-comparison.webp): прокрутка страницы 1500 px, итог находится на y=57 px. В новых вариантах через шапку не читаются силуэты прокручиваемого текста; полоса итога сохраняет спокойную плотную заливку.
 
 ## Как проверено
 
 - **13 контекстов, 52 кадра.** Для каждой четвёрки сравнивались полный видимый текст документа, значения и checked-состояния полей, координаты и размер выбранной поверхности, прокрутка и переполнение страницы. Все сравнения совпали с исходным состоянием. Измерения сохранены в соседних `*-measurements.json`; текст хранится только в виде SHA-256.
 - Размеры viewport — 1440 × 1000, 390 × 844 и 320 × 844. Горизонтальное переполнение документа во всех сохранённых состояниях — 0 px.
 - Съёмка выполнялась после загрузки шрифтов, изображений первого экрана и завершения конечных переходов. Контент и числа не редактировались. Состояния меню открыты с клавиатуры; у поиска виден существующий внешний контур фокуса.
-- Временный [CSS](/openspec/changes/refine-site-surfaces/preview.css) не подключён к приложению. Переключатель вариантов существует только в браузерной сессии.
+- Временный [CSS](/openspec/changes/archive/2026-10-14-refine-site-surfaces/preview.css) не подключён к приложению. Переключатель вариантов существует только в браузерной сессии.
 
 ## Контраст
 
