@@ -143,15 +143,9 @@
   }
 
   .ui-copy {
-    font-size: 1rem;
-    line-height: 1.75;
+    font-size: 1.0625rem;
+    line-height: 1.65;
     text-wrap: pretty;
-  }
-
-  @media (min-width: 48rem) {
-    .ui-copy {
-      font-size: 1.0625rem;
-    }
   }
 }
 
@@ -163,15 +157,36 @@
 
   /* Loaded 70/65ch in Fira Sans 400 (0 = 0.558em), stable while fonts load. */
   .ui-prose {
-    max-width: 39.06em;
+    max-width: 39.06rem;
     color: var(--color-text);
-    font-size: 1rem;
-    line-height: 1.75;
+    font-size: 1.0625rem;
+    line-height: 1.65;
     text-wrap: pretty;
   }
 
   .ui-prose-narrow {
-    max-width: 36.27em;
+    max-width: 36.27rem;
+  }
+
+  @media (min-width: 48rem) {
+    .ui-prose {
+      max-width: 41.50125rem;
+    }
+    .ui-prose-narrow {
+      max-width: 38.536875rem;
+    }
+  }
+
+  .ui-prose-catalog {
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .ui-prose.ui-prose-catalog h2 {
+    font-family: var(--font-body);
+    font-weight: 600;
+    line-height: 1.3333333333;
+    letter-spacing: normal;
   }
 
   .ui-prose p,
@@ -705,6 +720,13 @@
 @layer primitives {
   .ui-num {
     font-variant-numeric: tabular-nums;
+  }
+
+  .ui-unit {
+    font-size: max(0.875rem, 0.625em);
+    font-weight: 400;
+    letter-spacing: normal;
+    color: var(--color-text-muted);
   }
 
   .ui-map-marker {

@@ -166,7 +166,7 @@ const villageIcons = {
             <div class="assets-group-header" data-pagefind-body>
               <h3
                 id={group.category}
-                class="ui-section-title"
+                class="ui-group-title"
                 data-pagefind-weight="1.5"
               >
                 {group.title}
@@ -227,7 +227,7 @@ const villageIcons = {
                           <div class="assets-item" data-pagefind-body>
                             <h4
                               id={`reglament-asset-${asset.id}`}
-                              class="assets-item-title"
+                              class="ui-card-title assets-item-title"
                               data-pagefind-weight="2"
                             >
                               {asset.title}
@@ -397,10 +397,14 @@ const villageIcons = {
       font-weight: 600;
     }
 
+    .assets-item-title {
+      font-size: inherit;
+    }
+
     .assets-note {
-      font-size: 0.75rem;
-      font-weight: 600;
-      line-height: 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.5;
     }
 
     .assets-table-muted {

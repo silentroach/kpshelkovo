@@ -4,7 +4,7 @@
 
 Дата: 14 октября 2026 года. Задача [#1047](https://github.com/silentroach/kpshelkovo/issues/1047). Ветка `plan/1047-site-typography`, базовый checkout `fe0ba479`. Владелец принял вариант с поправкой: ссылка автора новости без подчёркивания в покое, с подчёркиванием при hover и клавиатурном фокусе. Остальные параметры приняты.
 
-**Остановка перед реализацией:** владелец явно попросил «фиксируем, но остановись перед реализацией». Для изменения приложения требуется отдельное разрешение.
+После фиксации выбора в `dd5ad986` владелец отдельно разрешил реализацию. Результаты применения, проверки и прежние дефекты находятся в [приёмке](/openspec/changes/archive/2026-10-14-refine-site-typography/acceptance.md).
 
 ## С чего начать просмотр
 
@@ -12,12 +12,12 @@
 
 Рабочий заголовок — Fira Sans 600, 20 px вместо PT Serif 700, 24 px. Источники и годовые суммы увеличены с 12 до 14 px. Число остаётся главным, единица набрана обычным начертанием. На 320 px выбранный длинный заголовок занимает три строки вместо четырёх.
 
-![Калькулятор на 390 px: слева исходное оформление, справа примерка](/openspec/changes/refine-site-typography/preview/calculator-390-detail-pair.webp)
+![Калькулятор на 390 px: слева исходное оформление, справа примерка](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/calculator-390-detail-pair.webp)
 
-- [Полная шапка, 390 px](/openspec/changes/refine-site-typography/preview/calculator-390-pair.webp).
-- [Компьютер, 1440 px](/openspec/changes/refine-site-typography/preview/calculator-1440-pair.webp).
-- [Длинный раздел, 320 px](/openspec/changes/refine-site-typography/preview/calculator-320-detail-pair.webp).
-- [Шапка, 320 px](/openspec/changes/refine-site-typography/preview/calculator-320-pair.webp).
+- [Полная шапка, 390 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/calculator-390-pair.webp).
+- [Компьютер, 1440 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/calculator-1440-pair.webp).
+- [Длинный раздел, 320 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/calculator-320-detail-pair.webp).
+- [Шапка, 320 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/calculator-320-pair.webp).
 
 В шапке подписи итогов стали обычного регистра и веса, 14 px; пояснения также 14 px. Более читаемые подписи добавляют высоты; владелец принял этот вариант по снимкам.
 
@@ -25,41 +25,41 @@
 
 Размер заголовка остаётся 24 px. Дата, автор и ссылки тегов используют обычный вес. Ссылка автора в покое без подчёркивания; при наведении и клавиатурном фокусе оно появляется. Снимки ленты на 320, 390 и 1440 px обновлены после этой поправки.
 
-![Новости на 390 px: слева исходное оформление, справа примерка](/openspec/changes/refine-site-typography/preview/news-390-pair.webp)
+![Новости на 390 px: слева исходное оформление, справа примерка](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/news-390-pair.webp)
 
-- [Компьютер, 1440 px](/openspec/changes/refine-site-typography/preview/news-1440-pair.webp).
-- [Узкий экран, 320 px](/openspec/changes/refine-site-typography/preview/news-320-pair.webp).
+- [Компьютер, 1440 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/news-1440-pair.webp).
+- [Узкий экран, 320 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/news-320-pair.webp).
 
 ### Статья: более крупные буквы при почти прежней высоте строки
 
 На телефоне слева 16 px / 1,75, справа 17 px / 1,65. Физическая высота строки почти совпадает: 28 и 28,05 px. Справа меньше букв помещается в строку, поэтому абзац может стать выше. На компьютере размер остаётся 17 px, интерлиньяж уменьшается с 1,75 до 1,65. Ширина колонки и отступы абзацев сохранены.
 
-![Текст статьи на 390 px: слева исходное оформление, справа примерка](/openspec/changes/refine-site-typography/preview/article-390-detail-pair.webp)
+![Текст статьи на 390 px: слева исходное оформление, справа примерка](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/article-390-detail-pair.webp)
 
-- [Шапка и начало статьи, 390 px](/openspec/changes/refine-site-typography/preview/article-390-pair.webp).
-- [Компьютер, 1440 px](/openspec/changes/refine-site-typography/preview/article-1440-pair.webp).
-- [Текст, 320 px](/openspec/changes/refine-site-typography/preview/article-320-detail-pair.webp).
-- [Шапка, 320 px](/openspec/changes/refine-site-typography/preview/article-320-pair.webp).
+- [Шапка и начало статьи, 390 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/article-390-pair.webp).
+- [Компьютер, 1440 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/article-1440-pair.webp).
+- [Текст, 320 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/article-320-detail-pair.webp).
+- [Шапка, 320 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/article-320-pair.webp).
 
 ### Сравнение тарифов: название, цена, пояснение
 
 Название поселка — Fira Sans 600, 18 px на телефоне и 20 px на компьютере. Число сохраняет исходный размер; единица — 14–15 px и обычный вес. Пояснение разницы в цене также использует обычный вес. Первую попытку с мобильными названиями 20 px заменили на более собранные 18 px до итоговых снимков.
 
-![Список тарифов на 390 px: слева исходное оформление, справа примерка](/openspec/changes/refine-site-typography/preview/compare-390-detail-pair.webp)
+![Список тарифов на 390 px: слева исходное оформление, справа примерка](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/compare-390-detail-pair.webp)
 
-- [Начало страницы, 390 px](/openspec/changes/refine-site-typography/preview/compare-390-pair.webp).
-- [Компьютер, 1440 px](/openspec/changes/refine-site-typography/preview/compare-1440-pair.webp).
-- [Список, 320 px](/openspec/changes/refine-site-typography/preview/compare-320-detail-pair.webp).
-- [Начало страницы, 320 px](/openspec/changes/refine-site-typography/preview/compare-320-pair.webp).
+- [Начало страницы, 390 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/compare-390-pair.webp).
+- [Компьютер, 1440 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/compare-1440-pair.webp).
+- [Список, 320 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/compare-320-detail-pair.webp).
+- [Начало страницы, 320 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/compare-320-pair.webp).
 
 ### База знаний: группы каталога
 
 Размер 24 px сохранён; группы набраны Fira Sans 600 вместо PT Serif 700. Ссылки и организация списка остаются прежними.
 
-![Каталог базы знаний на 390 px: слева исходное оформление, справа примерка](/openspec/changes/refine-site-typography/preview/kb-390-pair.webp)
+![Каталог базы знаний на 390 px: слева исходное оформление, справа примерка](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/kb-390-pair.webp)
 
-- [Компьютер, 1440 px](/openspec/changes/refine-site-typography/preview/kb-1440-pair.webp).
-- [Узкий экран, 320 px](/openspec/changes/refine-site-typography/preview/kb-320-pair.webp).
+- [Компьютер, 1440 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/kb-1440-pair.webp).
+- [Узкий экран, 320 px](/openspec/changes/archive/2026-10-14-refine-site-typography/preview/kb-320-pair.webp).
 
 ## Что именно сравниваем
 
@@ -78,11 +78,11 @@
 - В сравнении тарифов на обеих половинах карта закрыта штатной кнопкой, выбраны все записи и сортировка по условному уровню по убыванию.
 - Для всех 15 сочетаний страницы и ширины проверено полное совпадение `main.textContent` до и после примерки. Ширина документа после примерки совпала с viewport во всех 15 случаях; на просмотренных длинных заголовках и подписях обрезки не обнаружено. Таблицы калькулятора сохраняют локальную горизонтальную прокрутку.
 - После поправки автора повторно снята лента на 320/390/1440 px: текст сохранён, ширина документа совпадает с viewport. На 390 px проверены обычное состояние, hover и клавиатурный фокус ссылки автора: вес 400, подчёркивание только при взаимодействии, контур фокуса 2 px; ширина и высота ссылки во всех состояниях совпадают.
-- Это визуальное исследование. Увеличенный текст, полный клавиатурный проход, печать, fallback шрифтов, изменённые значения и сброс входят в приёмку реализации из [tasks](/openspec/changes/refine-site-typography/tasks.md).
-- Документы proposal/design/specs/tasks подготовлены. `pnpm openspec:validate` прошёл: 46 активных/spec проверок и 97 архивов; внутренние ссылки и форматирование проверены. Документы и 21 парный снимок сохранены локально в рабочей ветке; опубликованного коммита согласования пока нет.
+- Это визуальное исследование. Увеличенный текст, полный клавиатурный проход, печать, fallback шрифтов, изменённые значения и сброс входят в приёмку реализации из [tasks](/openspec/changes/archive/2026-10-14-refine-site-typography/tasks.md).
+- Документы proposal/design/specs/tasks подготовлены. На этапе планирования `pnpm openspec:validate` прошёл: 46 активных/spec проверок и 97 архивов; внутренние ссылки и форматирование проверены. Документы и 21 парный снимок согласования сохранены и опубликованы в `dd5ad986`.
 
 ## Принятое решение
 
 Владелец принял спокойные метаданные, отделённые единицы, рабочие заголовки Fira Sans и текст статьи 17 px / 1,65. Дополнительные строки на телефоне и более крупные источники калькулятора показаны в сравнении. Постоянное подчёркивание автора отклонено: в строке метаданных оно создаёт лишний акцент; hover и клавиатурный фокус сохраняют подчёркивание.
 
-Решение записано в [design](/openspec/changes/refine-site-typography/design.md). Следующий шаг возможен только после отдельного разрешения владельца на реализацию.
+Решение записано в [design](/openspec/changes/archive/2026-10-14-refine-site-typography/design.md). Реализация разрешена отдельным сообщением владельца; старые дефекты, подтверждённые сравнением с базой, вынесены в #1069–#1073.

@@ -527,6 +527,9 @@ describe('buildReglamentCalculatorChanges', () => {
     expect(arrow.hidden).toBe(true);
     expect(stickyTariff.dataset.reglamentDeltaTone).toBeUndefined();
 
+    const unit = stickyTariff.querySelector('.ui-unit');
+    expect(unit?.textContent).toBe('\u00a0₽/сотка');
+
     input.value = '1573084';
     input.dispatchEvent(new Event('input', { bubbles: true }));
 
@@ -535,6 +538,7 @@ describe('buildReglamentCalculatorChanges', () => {
     expect(arrow.textContent).toBe('→');
     expect(arrow.hidden).toBe(false);
     expect(stickyTariff.textContent).toMatchInlineSnapshot(`"902,48 ₽/сотка"`);
+    expect(stickyTariff.querySelector('.ui-unit')).toBe(unit);
     expect(stickyTariff.dataset.reglamentDeltaTone).toBe('positive');
     expect(reset.hidden).toBe(false);
 
@@ -549,6 +553,7 @@ describe('buildReglamentCalculatorChanges', () => {
 
     expect(input.value).toBe(formatReglamentInputNumber(1_473_084));
     expect(stickyTariff.textContent).toMatchInlineSnapshot(`"902,07 ₽/сотка"`);
+    expect(stickyTariff.querySelector('.ui-unit')).toBe(unit);
     expect(stickyTariff.dataset.reglamentDeltaTone).toBeUndefined();
     expect(originalTariff.hidden).toBe(true);
     expect(arrow.hidden).toBe(true);

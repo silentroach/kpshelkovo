@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { formatPercentage, formatTariff } from '@shelkovo/format';
+  import { formatPercentage, formatNumberRu } from '@shelkovo/format';
 
   import type { Stats } from '../lib/settlement/types';
 
@@ -44,7 +44,9 @@
       </div>
       <div class="metric-result">
         <div class="ui-num metric-value" data-testid="kpi-peer-median">
-          {formatTariff(stats.peerMedianTariff)}
+          {formatNumberRu(Math.round(stats.peerMedianTariff), { maximumFractionDigits: 0 })}<span
+            class="ui-unit">&nbsp;₽/сотка</span
+          >
         </div>
         <div class={`ui-num metric-delta ${getMedianTone(stats.shelkovoVsPeerMedianPercent)}`}>
           {getDeltaText(stats.shelkovoVsPeerMedianPercent)}
@@ -59,7 +61,9 @@
       </div>
       <div class="metric-result">
         <div class="ui-num metric-value">
-          {formatTariff(stats.medianTariff)}
+          {formatNumberRu(Math.round(stats.medianTariff), { maximumFractionDigits: 0 })}<span
+            class="ui-unit">&nbsp;₽/сотка</span
+          >
         </div>
         <div class={`ui-num metric-delta ${getMedianTone(stats.shelkovoVsMedianPercent)}`}>
           {getDeltaText(stats.shelkovoVsMedianPercent)}

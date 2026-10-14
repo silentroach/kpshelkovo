@@ -59,12 +59,13 @@ const visibleAreas = appliesToAllAreas ? [] : areas;
   }
 
   .news-meta-date {
-    color: var(--color-text);
-    font-weight: 600;
+    color: var(--color-text-muted);
+    font-weight: 400;
   }
 
   .news-meta-author {
-    font-weight: 600;
+    color: var(--color-text-muted);
+    font-weight: 400;
   }
 
   .news-meta--list {
@@ -73,25 +74,31 @@ const visibleAreas = appliesToAllAreas ? [] : areas;
     overflow-wrap: anywhere;
   }
 
-  .news-meta--list .news-meta-date,
-  .news-meta--list .news-meta-author {
-    color: var(--color-text-muted);
-  }
-
-  .news-meta--list .news-meta-author {
+  .news-meta-author {
     text-decoration-line: none;
     text-decoration-color: currentColor;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.2em;
   }
 
-  .news-meta--list .news-meta-author:is(:hover, :focus-visible) {
+  .news-meta-author:is(:hover, :focus-visible) {
     color: var(--color-primary);
     text-decoration-line: underline;
   }
 
-  .news-meta--list .news-meta-author:focus-visible {
+  .news-meta-author:focus-visible {
     outline: 2px solid currentColor;
     outline-offset: 3px;
+  }
+
+  .news-meta :global(.link-with-icon) {
+    color: var(--color-text-muted);
+    font-weight: 400;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .news-meta :global(.link-with-icon:is(:hover, :focus-visible)) {
+    color: var(--color-primary);
   }
 </style>

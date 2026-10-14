@@ -21,7 +21,7 @@ import {
 import { loadAllData } from '@/compare/lib/data';
 import {
   getLotCalc,
-  formatTariffAuto,
+  formatTariffNumber,
   formatTariffBase,
   getTariffCalc,
 } from '@/compare/lib/format';
@@ -323,7 +323,8 @@ const assumption = tariffCalc?.assumption;
                   tabindex={tariffCalc ? 0 : undefined}
                   aria-describedby={tariffCalc ? tipDesktopId : undefined}
                 >
-                  {formatTariffAuto(settlement.tariff)}
+                  {formatTariffNumber(settlement.tariff)}
+                  <span class="ui-unit">{'\u00a0₽/сотка'}</span>
                 </span>
                 {tariffCalc && (
                   <div
@@ -541,7 +542,8 @@ const assumption = tariffCalc?.assumption;
               tabindex={tariffCalc ? 0 : undefined}
               aria-describedby={tariffCalc ? tipMobileId : undefined}
             >
-              {formatTariffAuto(settlement.tariff)}
+              {formatTariffNumber(settlement.tariff)}
+              <span class="ui-unit">{'\u00a0₽/сотка'}</span>
             </span>
             {tariffCalc && (
               <div
@@ -1209,6 +1211,10 @@ const assumption = tariffCalc?.assumption;
       var(--color-surface-raised) 58%,
       transparent
     );
+  }
+
+  .settlement-hero-glass-card .ui-unit {
+    color: inherit;
   }
 
   .settlement-hero-tooltip {

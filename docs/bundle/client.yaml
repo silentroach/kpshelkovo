@@ -121,9 +121,9 @@ static/calculator-controller.XXXXXXXX.js:
   apps/www/src/lib/reglament/calculate.ts:
     rendered: 8976
   apps/www/src/lib/reglament/calculator-controller.ts:
-    rendered: 15256
+    rendered: 15816
   apps/www/src/lib/reglament/format.ts:
-    rendered: 1070
+    rendered: 813
   apps/www/src/lib/reglament/schema.ts:
     rendered: 305
 static/calculator-details.XXXXXXXX.js:
@@ -211,7 +211,7 @@ static/client.XXXXXXXX.js:
   node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/bindings/props.js:
     rendered: 0
   node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/bindings/select.js:
-    rendered: 2497
+    rendered: 3612
   node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/bindings/shared.js:
     rendered: 803
   node_modules/.pnpm/svelte@5.57.1/node_modules/svelte/src/internal/client/dom/elements/bindings/size.js:
@@ -355,7 +355,7 @@ static/explorer-component.XXXXXXXX.js:
   apps/www/src/compare/client/explorer-component.ts:
     rendered: 274
   apps/www/src/compare/components/SettlementCard.svelte:
-    rendered: 4313
+    rendered: 4404
   apps/www/src/compare/components/SettlementCard.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/compare/components/SettlementMap.svelte:
@@ -363,11 +363,11 @@ static/explorer-component.XXXXXXXX.js:
   apps/www/src/compare/components/SettlementMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/compare/components/SettlementsExplorer.svelte:
-    rendered: 15764
+    rendered: 15838
   apps/www/src/compare/components/SettlementsExplorer.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/compare/lib/format.ts:
-    rendered: 374
+    rendered: 547
   apps/www/src/compare/lib/rating.ts:
     rendered: 790
   apps/www/src/compare/lib/url.ts:
@@ -435,7 +435,7 @@ static/lazy.XXXXXXXX.js:
   apps/www/src/components/search/search-dialog.events.ts:
     rendered: 120
   apps/www/src/components/search/SearchDialog.svelte:
-    rendered: 22025
+    rendered: 22438
   apps/www/src/components/search/SearchDialog.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/search/client.ts:
@@ -459,7 +459,7 @@ static/page.XXXXXXXX.js:
     rendered: 53
 static/parcel-layer.XXXXXXXX.js:
   apps/www/src/components/places/parcel-layer.ts:
-    rendered: 5530
+    rendered: 6914
 static/prefetch.XXXXXXXX.js:
   node_modules/.pnpm/astro@7.3.5_@types+node@26.5.0_yaml@2.9.1/node_modules/astro/dist/prefetch/index.js:
     rendered: 5009
@@ -475,7 +475,7 @@ static/runtime.XXXXXXXX.js:
   apps/www/src/lib/yandex-maps/open-maps-control.ts:
     rendered: 369
   apps/www/src/lib/yandex-maps/runtime.ts:
-    rendered: 2375
+    rendered: 3655
 static/schema.XXXXXXXX.js:
   apps/www/src/lib/areas.ts:
     rendered: 98

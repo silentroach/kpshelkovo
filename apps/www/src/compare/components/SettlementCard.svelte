@@ -1,7 +1,7 @@
 <script lang="ts">
   import { formatCurrency } from '@shelkovo/format';
 
-  import { formatTariffAuto, getTariffHint } from '@/compare/lib/format';
+  import { formatTariffNumber, getTariffHint } from '@/compare/lib/format';
 
   import type { ExplorerSettlement } from '../lib/explorer';
   import type { ComparisonResult } from '../lib/settlement/types';
@@ -17,14 +17,14 @@
 
   let { settlement, comparison, rank, total, isBaseline }: Props = $props();
 
-  const tariffText = $derived(formatTariffAuto(settlement.tariff));
+  const tariffText = $derived(formatTariffNumber(settlement.tariff));
   const tariffHint = $derived(getTariffHint(settlement.tariff));
 </script>
 
 <article data-testid="settlement-card" class="ui-shell compare-settlement-card">
   <div class="settlement-header">
     <div class="settlement-identity">
-      <h3 class="settlement-title">
+      <h3 class="ui-card-title settlement-title">
         <a href={withBase(`settlements/${settlement.slug}/`)} class="ui-title-link">
           {settlement.shortName}
         </a>
@@ -62,7 +62,7 @@
   <div class="tariff-summary">
     <div class="tariff-row">
       <span class="ui-num tariff" title={tariffHint}>
-        {tariffText}
+        {tariffText}<span class="ui-unit">&nbsp;₽/сотка</span>
       </span>
       {#if !isBaseline && comparison && comparison.tariffDelta !== 0}
         {#if comparison.isCheaper}
@@ -103,8 +103,7 @@
 
   .settlement-title {
     color: var(--color-text);
-    font-size: 1rem;
-    line-height: 1.25;
+    font-size: 1.125rem;
   }
 
   .settlement-location {
@@ -172,7 +171,7 @@
   .tariff-delta {
     max-width: 9rem;
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 400;
     line-height: 1.25;
     text-align: right;
   }

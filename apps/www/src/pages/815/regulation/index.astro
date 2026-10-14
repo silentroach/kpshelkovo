@@ -18,6 +18,7 @@ import {
   formatReglamentInputNumber,
   formatReglamentMoneyDelta,
   formatReglamentNumber,
+  formatReglamentSignedNumber,
   formatReglamentTariff,
   formatReglamentTariffValue,
 } from '@/lib/reglament/format';
@@ -423,7 +424,8 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
           <div class="reglament-total reglament-total--divided">
             <p class="reglament-total__label">Официальный тариф</p>
             <p class="reglament-total__value">
-              {formatReglamentTariff(payload.official.tariff_per_sotka_month)}
+              {formatReglamentNumber(payload.official.tariff_per_sotka_month)}
+              <span class="ui-unit">{'\u00a0₽/сотка'}</span>
             </p>
             <p class="reglament-total__note">
               {formatReglamentAnnualMoney(payload.official.annual_gross)}
@@ -432,7 +434,8 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
           <div class="reglament-total reglament-total--divided">
             <p class="reglament-total__label">Текущий пересчет</p>
             <p class="reglament-total__value" data-reglament-current-tariff>
-              {formatReglamentTariff(payload.computed.tariff_per_sotka_month)}
+              {formatReglamentNumber(payload.computed.tariff_per_sotka_month)}
+              <span class="ui-unit">{'\u00a0₽/сотка'}</span>
             </p>
             <p class="reglament-total__note" data-reglament-current-annual>
               {formatReglamentAnnualMoney(payload.computed.annual_gross)}
@@ -441,9 +444,10 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
           <div class="reglament-total">
             <p class="reglament-total__label">Разница</p>
             <p class="reglament-total__value" data-reglament-current-delta>
-              {formatReglamentMoneyDelta(
+              {formatReglamentSignedNumber(
                 payload.computed.delta_tariff_per_sotka_month,
               )}
+              <span class="ui-unit">{'\u00a0₽'}</span>
             </p>
             <p class="reglament-total__note">к официальному тарифу</p>
           </div>
@@ -484,7 +488,8 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
             data-reglament-current-tariff
             data-reglament-current-tariff-tone
           >
-            {formatReglamentTariff(payload.computed.tariff_per_sotka_month)}
+            {formatReglamentNumber(payload.computed.tariff_per_sotka_month)}
+            <span class="ui-unit">{'\u00a0₽/сотка'}</span>
           </strong>
         </span>
       </div>
@@ -496,7 +501,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
     >
       <div class="reglament-sections__inner">
         <div class="reglament-sections__intro" data-pagefind-body>
-          <h2 id="estimate-sections-title" class="ui-section-title">
+          <h2 id="estimate-sections-title" class="ui-group-title">
             Разделы сметы
           </h2>
           <p class="reglament-sections__description">
@@ -511,7 +516,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
               <div class="reglament-section-heading" data-pagefind-body>
                 <h3
                   id={section.id}
-                  class="ui-prose-title"
+                  class="ui-card-title"
                   data-pagefind-weight="1.5"
                 >
                   {section.title}
@@ -538,9 +543,10 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                   class="reglament-section-total__tariff"
                   data-reglament-section-tariff={section.id}
                 >
-                  {formatReglamentTariff(
+                  {formatReglamentNumber(
                     section.official.tariff_per_sotka_month,
                   )}
+                  <span class="ui-unit">{'\u00a0₽/сотка'}</span>
                 </p>
                 <p
                   class="reglament-section-total__annual"
@@ -868,9 +874,10 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
                             class="reglament-table-text"
                             data-reglament-row-tariff={row.id}
                           >
-                            {formatReglamentTariffValue(
+                            {formatReglamentNumber(
                               row.computed.tariff_per_sotka_month,
                             )}
+                            <span class="ui-unit">{'\u00a0₽'}</span>
                           </span>
                         </td>
                       </tr>
@@ -1081,9 +1088,12 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
     }
 
     .reglament-emphasis,
-    .reglament-link,
     .reglament-semibold {
       font-weight: 600;
+    }
+
+    .reglament-link {
+      font-weight: 400;
     }
 
     .reglament-emphasis {
@@ -1116,20 +1126,38 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       text-transform: uppercase;
     }
 
+    .reglament-total__label {
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.5;
+      letter-spacing: normal;
+      text-transform: none;
+    }
+
+    .reglament-total__value,
+    .reglament-section-total__tariff,
+    .reglament-sticky-total__values,
+    .reglament-table input,
+    .reglament-table__cell--contribution,
+    .reglament-total__note,
+    .reglament-section-total__annual {
+      font-variant-numeric: tabular-nums;
+    }
+
     .reglament-total__value {
       margin-block-start: 0.5rem;
       color: var(--color-text);
       font-size: 1.5rem;
       font-weight: 600;
-      letter-spacing: -0.025em;
+      letter-spacing: normal;
       line-height: 2rem;
     }
 
     .reglament-total__note {
       margin-block-start: 0.25rem;
       color: var(--color-text-muted);
-      font-size: 0.75rem;
-      line-height: 1rem;
+      font-size: 0.875rem;
+      line-height: 1.5;
     }
 
     .reglament-sticky-total {
@@ -1252,8 +1280,8 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
 
     .reglament-section-sources {
       color: var(--color-text-muted);
-      font-size: 0.75rem;
-      line-height: 1.25rem;
+      font-size: 0.875rem;
+      line-height: 1.5;
     }
 
     .reglament-source-link {
@@ -1269,19 +1297,19 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       color: var(--color-text);
       font-size: 1.125rem;
       font-weight: 600;
-      letter-spacing: -0.025em;
+      letter-spacing: normal;
       line-height: 1.75rem;
     }
 
     .reglament-section-total__annual,
     .reglament-section-total__delta {
       color: var(--color-text-muted);
-      font-size: 0.75rem;
-      line-height: 1rem;
+      font-size: 0.875rem;
+      line-height: 1.5;
     }
 
     .reglament-section-total__delta {
-      font-weight: 600;
+      font-weight: 400;
     }
 
     .reglament-table-shell {
