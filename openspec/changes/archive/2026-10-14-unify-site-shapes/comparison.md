@@ -16,8 +16,8 @@
 
 ## Как снято
 
-- Источник — реальные страницы `https://kpshelkovo.online/` на дату примерки; база рабочей ветки — `9ff4de2e`. Точный SHA production-деплоя не устанавливался. Наблюдаемые исходные формы соответствуют описанию в [design](/openspec/changes/unify-site-shapes/design.md).
-- В каждой паре слева исходное отображение, справа тот же документ с [временным CSS](/openspec/changes/unify-site-shapes/preview.css). CSS подключался только в браузерную сессию. `!important` в нём нужен для перекрытия production scoped-стилей; это не схема будущего каскада приложения.
+- Источник — реальные страницы `https://kpshelkovo.online/` на дату примерки; база рабочей ветки — `9ff4de2e`. Точный SHA production-деплоя не устанавливался. Наблюдаемые исходные формы соответствуют описанию в [design](/openspec/changes/archive/2026-10-14-unify-site-shapes/design.md).
+- В каждой паре слева исходное отображение, справа тот же документ с [временным CSS](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview.css). CSS подключался только в браузерную сессию. `!important` в нём нужен для перекрытия production scoped-стилей; это не схема будущего каскада приложения.
 - Всего **29 пар**: девять контекстов на 1440 × 1000, 390 × 844 и 320 × 844 плюс выбранный фильтр и панель слоёв на 320 px. Для поиска показан вырезанный из viewport диалог с небольшим полем вокруг него; остальные пары показывают viewport целиком.
 - Снимки сделаны в Chromium после готовности шрифтов и завершения конечных CSS-переходов. Карты используют настоящий SDK. Положение прокрутки и состояние управления внутри пары одинаковые.
 - Перед и после CSS сравнивались видимый текст страницы, значения и checked-состояния полей, координаты и размеры видимых проверяемых контролов и поверхностей, положение прокрутки. **Все 29 сравнений прошли:** текст и данные не менялись, проверяемая геометрия совпала, горизонтальное переполнение документа было 0 px с обеих сторон.
@@ -29,49 +29,49 @@
 
 Источник: [сравнение](https://kpshelkovo.online/815/compare/). Фильтр «Все», сортировка по условному уровню, карта скрыта. Видны различия прямоугольника и капсулы, select 4 → 8 px и карточек 0 → 12 px; на телефоне записи остаются строками.
 
-- [1440 px](/openspec/changes/unify-site-shapes/preview/compare-1440-pair.webp), [390 px](/openspec/changes/unify-site-shapes/preview/compare-390-pair.webp), [320 px](/openspec/changes/unify-site-shapes/preview/compare-320-pair.webp).
-- [Выбранный фильтр с клавиатурным фокусом, 320 px](/openspec/changes/unify-site-shapes/preview/compare-focus-320-pair.webp): выбран «Дороже». Подпись и внутренний контур помещаются в видимую часть прокручиваемой полосы; показаны семь результатов.
+- [1440 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/compare-1440-pair.webp), [390 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/compare-390-pair.webp), [320 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/compare-320-pair.webp).
+- [Выбранный фильтр с клавиатурным фокусом, 320 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/compare-focus-320-pair.webp): выбран «Дороже». Подпись и внутренний контур помещаются в видимую часть прокручиваемой полосы; показаны семь результатов.
 
 ### Попап сравнения
 
 Источник тот же; открыта карточка «Николино» на карте. После каждого изменения ширины попап открывался заново, поскольку существующий интерфейс закрывает его при resize.
 
-- [1440 px](/openspec/changes/unify-site-shapes/preview/compare-popup-1440-pair.webp), [390 px](/openspec/changes/unify-site-shapes/preview/compare-popup-390-pair.webp), [320 px](/openspec/changes/unify-site-shapes/preview/compare-popup-320-pair.webp).
+- [1440 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/compare-popup-1440-pair.webp), [390 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/compare-popup-390-pair.webp), [320 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/compare-popup-320-pair.webp).
 
 ### Калькулятор
 
 Источник: [калькулятор](https://kpshelkovo.online/815/regulation/). Показаны первый раздел, редактируемое поле с единицей и клавиатурным фокусом, кнопка сброса. На телефоне таблица горизонтально прокручена до полей базы и периодичности.
 
-- [1440 px](/openspec/changes/unify-site-shapes/preview/calculator-1440-pair.webp), [390 px](/openspec/changes/unify-site-shapes/preview/calculator-390-pair.webp), [320 px](/openspec/changes/unify-site-shapes/preview/calculator-320-pair.webp).
+- [1440 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/calculator-1440-pair.webp), [390 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/calculator-390-pair.webp), [320 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/calculator-320-pair.webp).
 
 ### События
 
 Источники: [календарь](https://kpshelkovo.online/events/) и [детский киноквиз](https://kpshelkovo.online/events/2026/09/kids-cinema-quiz/). Календарные капсулы служат образцом уже подходящей формы; на странице мероприятия видна поверхность 16 → 12 px рядом с круглым действием календаря.
 
-- Календарь: [1440 px](/openspec/changes/unify-site-shapes/preview/calendar-1440-pair.webp), [390 px](/openspec/changes/unify-site-shapes/preview/calendar-390-pair.webp), [320 px](/openspec/changes/unify-site-shapes/preview/calendar-320-pair.webp).
-- Мероприятие: [1440 px](/openspec/changes/unify-site-shapes/preview/event-1440-pair.webp), [390 px](/openspec/changes/unify-site-shapes/preview/event-390-pair.webp), [320 px](/openspec/changes/unify-site-shapes/preview/event-320-pair.webp).
+- Календарь: [1440 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/calendar-1440-pair.webp), [390 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/calendar-390-pair.webp), [320 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/calendar-320-pair.webp).
+- Мероприятие: [1440 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/event-1440-pair.webp), [390 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/event-390-pair.webp), [320 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/event-320-pair.webp).
 
 ### Место и общая карта
 
 Источники: [Буржуйка](https://kpshelkovo.online/map/burzhuyka/) и [позиция W50](https://kpshelkovo.online/map/?p=SHF-W50). Карта места с подписью уже использует 12 px: эти пары подтверждают согласованность существующей формы. На общей карте видны новый радиус попапа, его стрелка и круглая кнопка слоёв.
 
-- Место: [1440 px](/openspec/changes/unify-site-shapes/preview/place-1440-pair.webp), [390 px](/openspec/changes/unify-site-shapes/preview/place-390-pair.webp), [320 px](/openspec/changes/unify-site-shapes/preview/place-320-pair.webp).
-- Попап участка: [1440 px](/openspec/changes/unify-site-shapes/preview/parcel-popup-1440-pair.webp), [390 px](/openspec/changes/unify-site-shapes/preview/parcel-popup-390-pair.webp), [320 px](/openspec/changes/unify-site-shapes/preview/parcel-popup-320-pair.webp).
-- [Панель слоёв, 320 px](/openspec/changes/unify-site-shapes/preview/parcel-layers-320-pair.webp): внешние углы 16 px, пункты 8 px, checkbox нативные.
+- Место: [1440 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/place-1440-pair.webp), [390 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/place-390-pair.webp), [320 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/place-320-pair.webp).
+- Попап участка: [1440 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/parcel-popup-1440-pair.webp), [390 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/parcel-popup-390-pair.webp), [320 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/parcel-popup-320-pair.webp).
+- [Панель слоёв, 320 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/parcel-layers-320-pair.webp): внешние углы 16 px, пункты 8 px, checkbox нативные.
 
 ### Меню и поиск
 
 Меню открыто с клавиатуры на [главной](https://kpshelkovo.online/) поверх вечерней панорамы. На ширине 320 px существующее меню показывает иконку вместо видимого слова; роль кнопки меню остаётся 8 px. Поиск открыт из калькулятора, фокус находится в строке запроса.
 
-- Меню: [1440 px](/openspec/changes/unify-site-shapes/preview/menu-1440-pair.webp), [390 px](/openspec/changes/unify-site-shapes/preview/menu-390-pair.webp), [320 px](/openspec/changes/unify-site-shapes/preview/menu-320-pair.webp).
-- Поиск: [1440 px](/openspec/changes/unify-site-shapes/preview/search-1440-pair.webp), [390 px](/openspec/changes/unify-site-shapes/preview/search-390-pair.webp), [320 px](/openspec/changes/unify-site-shapes/preview/search-320-pair.webp).
+- Меню: [1440 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/menu-1440-pair.webp), [390 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/menu-390-pair.webp), [320 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/menu-320-pair.webp).
+- Поиск: [1440 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/search-1440-pair.webp), [390 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/search-390-pair.webp), [320 px](/openspec/changes/archive/2026-10-14-unify-site-shapes/preview/search-320-pair.webp).
 
 ## Проверки и границы результата
 
 - Фокус выбранного фильтра на 320 px проверен через native input: label находится целиком внутри полосы, выбранное состояние и фокус видны. CSS не изменил его размеры и положение.
 - В калькуляторе поле с единицей образует общий контур 8 px; фокус оболочки — непрозрачные 2 px. Показанная кнопка сброса меняет капсулу на 8 px.
 - Для применяемых непрозрачных цветов контраст рассчитан по полученным в браузере sRGB-значениям: `border-strong` на `surface` — **3.51:1**, на `surface-muted` — **3.13:1**; `focus` на этих фонах — **5.75:1** и **5.14:1**.
-- Выдача поиска, состояние календаря, факты в карточках и SDK-карты использованы как реальные контексты примерки. Полная функциональная приёмка, проверка увеличенного текста, печати, всех потребителей и локальной реализации выполняются после разрешения общего применения по [задачам](/openspec/changes/unify-site-shapes/tasks.md).
+- Выдача поиска, состояние календаря, факты в карточках и SDK-карты использованы как реальные контексты примерки. Полная функциональная приёмка, проверка увеличенного текста, печати, всех потребителей и локальной реализации выполняются после разрешения общего применения по [задачам](/openspec/changes/archive/2026-10-14-unify-site-shapes/tasks.md).
 - Снимки и проверка геометрии относятся к выбранным состояниям. Совпадение геометрии не заменяет измерения контраста полупрозрачных панелей или проверку всех крайних положений стрелки попапа. Эти проверки входят в приёмку реализации.
 
 ## Решение владельца
