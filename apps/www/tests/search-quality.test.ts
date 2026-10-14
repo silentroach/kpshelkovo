@@ -140,6 +140,31 @@ test('#243 cold search activation survives a delayed lazy chunk', async () => {
   await page.close();
 });
 
+test('search input focus highlights the dialog without an underline', async () => {
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
+  await page.locator('[data-search-trigger]:visible').first().click();
+
+  const dialog = page.locator('[data-search-dialog]');
+  const input = dialog.getByRole('searchbox');
+  await expectPage(input).toBeFocused();
+  await expectPage(input).toHaveCSS('box-shadow', 'none');
+  await expectPage(dialog).toHaveCSS('outline-style', 'solid');
+
+  await input.press('Tab');
+  const close = dialog.locator('[data-search-close]');
+  await expectPage(close).toBeFocused();
+  await expectPage(close).toHaveCSS('outline-style', 'solid');
+  await expectPage(dialog).toHaveCSS('outline-style', 'none');
+
+  await close.press('Shift+Tab');
+  await expectPage(input).toBeFocused();
+  await expectPage(dialog).toHaveCSS('outline-style', 'solid');
+  await input.press('Escape');
+  await expectPage(dialog).not.toBeVisible();
+  await page.close();
+});
+
 test('#154 search result highlighting', async () => {
   const page = await browser.newPage({
     viewport: { width: 1280, height: 800 }
