@@ -32,111 +32,105 @@ const weekdays = [
   <table aria-labelledby={titleId} class="status-calendar-month__table">
     <thead>
       <tr>
-        {
-          weekdays.map(([short, full]) => (
-            <th
-              scope="col"
-              aria-label={full}
-              class="status-calendar-month__weekday"
-            >
-              <span aria-hidden="true">{short}</span>
-            </th>
-          ))
-        }
+        {weekdays.map(([short, full]) => (
+          <th
+            scope="col"
+            aria-label={full}
+            class="status-calendar-month__weekday"
+          >
+            <span aria-hidden="true">{short}</span>
+          </th>
+        ))}
       </tr>
     </thead>
     <tbody>
-      {
-        month.weeks.map((week) => (
-          <tr>
-            {week.map((day) => {
-              const status = day.status;
-              const linkLabel = status
-                ? formatStatusCalendarDayLabel(status)
-                : undefined;
-              const tooltipSummary = status
-                ? formatStatusCalendarDayTooltipSummary(status)
-                : undefined;
-              const tooltipId = status
-                ? `status-calendar-tooltip-${day.id}`
-                : undefined;
+      {month.weeks.map((week) => (
+        <tr>
+          {week.map((day) => {
+            const status = day.status;
+            const linkLabel = status
+              ? formatStatusCalendarDayLabel(status)
+              : undefined;
+            const tooltipSummary = status
+              ? formatStatusCalendarDayTooltipSummary(status)
+              : undefined;
+            const tooltipId = status
+              ? `status-calendar-tooltip-${day.id}`
+              : undefined;
 
-              return (
-                <td
-                  aria-hidden={!day.isInMonth ? 'true' : undefined}
-                  class="status-calendar-month__cell"
-                  data-status-calendar-cell={day.id}
-                  data-status-calendar-adjacent={
-                    !day.isInMonth ? day.id : undefined
+            return (
+              <td
+                aria-hidden={!day.isInMonth ? 'true' : undefined}
+                class="status-calendar-month__cell"
+                data-status-calendar-cell={day.id}
+                data-status-calendar-adjacent={
+                  !day.isInMonth ? day.id : undefined
+                }
+              >
+                <div
+                  class="status-calendar-date"
+                  data-status-calendar-date={day.isInMonth ? day.id : undefined}
+                  data-status-calendar-tooltip-root={
+                    status ? day.id : undefined
                   }
+                  data-status-calendar-tooltip-summary={tooltipSummary}
                 >
-                  <div
-                    class="status-calendar-date"
-                    data-status-calendar-date={
-                      day.isInMonth ? day.id : undefined
-                    }
-                    data-status-calendar-tooltip-root={
-                      status ? day.id : undefined
-                    }
-                    data-status-calendar-tooltip-summary={tooltipSummary}
-                  >
-                    {!day.isInMonth ? (
-                      <span class="ui-num status-calendar-date__adjacent-day">
-                        {day.day}
-                      </span>
-                    ) : status ? (
-                      <a
-                        href={statusCalendarDayUrl({
-                          year: month.year,
-                          month: month.month,
-                          id: day.id,
-                        })}
-                        aria-label={linkLabel}
-                        aria-describedby={tooltipId}
-                        class="status-calendar-date__link"
-                        data-status-calendar-day-link={day.id}
-                        data-status-calendar-marker={status.kind}
-                      >
-                        <span
-                          aria-hidden="true"
-                          class="ui-num status-calendar-date__incident-day"
-                        >
-                          {day.day}
-                        </span>
-                      </a>
-                    ) : (
-                      <time
-                        datetime={day.id}
-                        class="ui-num status-calendar-date__regular-day"
-                      >
-                        {day.day}
-                      </time>
-                    )}
-
-                    {status && (
+                  {!day.isInMonth ? (
+                    <span class="ui-num status-calendar-date__adjacent-day">
+                      {day.day}
+                    </span>
+                  ) : status ? (
+                    <a
+                      href={statusCalendarDayUrl({
+                        year: month.year,
+                        month: month.month,
+                        id: day.id,
+                      })}
+                      aria-label={linkLabel}
+                      aria-describedby={tooltipId}
+                      class="status-calendar-date__link"
+                      data-status-calendar-day-link={day.id}
+                      data-status-calendar-marker={status.kind}
+                    >
                       <span
-                        id={tooltipId}
-                        role="tooltip"
-                        aria-label={tooltipDescription}
                         aria-hidden="true"
-                        class="status-calendar-date__tooltip"
-                        data-status-calendar-tooltip={day.id}
+                        class="ui-num status-calendar-date__incident-day"
                       >
-                        <span
-                          aria-hidden="true"
-                          data-status-calendar-tooltip-text
-                        >
-                          {tooltipSummary}
-                        </span>
+                        {day.day}
                       </span>
-                    )}
-                  </div>
-                </td>
-              );
-            })}
-          </tr>
-        ))
-      }
+                    </a>
+                  ) : (
+                    <time
+                      datetime={day.id}
+                      class="ui-num status-calendar-date__regular-day"
+                    >
+                      {day.day}
+                    </time>
+                  )}
+
+                  {status && (
+                    <span
+                      id={tooltipId}
+                      role="tooltip"
+                      aria-label={tooltipDescription}
+                      aria-hidden="true"
+                      class="status-calendar-date__tooltip"
+                      data-status-calendar-tooltip={day.id}
+                    >
+                      <span
+                        aria-hidden="true"
+                        data-status-calendar-tooltip-text
+                      >
+                        {tooltipSummary}
+                      </span>
+                    </span>
+                  )}
+                </div>
+              </td>
+            );
+          })}
+        </tr>
+      ))}
     </tbody>
   </table>
 </section>
@@ -183,7 +177,7 @@ const weekdays = [
     width: 2.5rem;
     height: 2.5rem;
     margin-inline: auto;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-full);
   }
 
   .status-calendar-date--today {
@@ -255,7 +249,7 @@ const weekdays = [
     padding: 0.5rem 0.625rem;
     translate: calc(-50% + var(--status-calendar-tooltip-shift-x, 0px)) 0;
     border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-2xl);
     background: var(--color-surface-raised);
     box-shadow: var(--shadow-1);
     color: var(--color-text);

@@ -144,19 +144,17 @@ const distanceFloor = `После ${formatNumberUnitRu(lastDistancePoint.ringKm,
             <div class="rating-panel rating-panel--roomy">
               <p class="rating-eyebrow">Итоговая структура</p>
               <dl class="rating-weight-list">
-                {
-                  weights.map(({ value, label, note }) => (
-                    <div class="rating-weight-row">
-                      <dt class="rating-weight-heading">
-                        <span class="rating-weight-label">{label}</span>
-                        <span class="ui-num rating-weight-value">
-                          {percentage(value)}
-                        </span>
-                      </dt>
-                      <dd class="rating-weight-note">{note}</dd>
-                    </div>
-                  ))
-                }
+                {weights.map(({ value, label, note }) => (
+                  <div class="rating-weight-row">
+                    <dt class="rating-weight-heading">
+                      <span class="rating-weight-label">{label}</span>
+                      <span class="ui-num rating-weight-value">
+                        {percentage(value)}
+                      </span>
+                    </dt>
+                    <dd class="rating-weight-note">{note}</dd>
+                  </div>
+                ))}
               </dl>
             </div>
           </aside>
@@ -188,30 +186,27 @@ const distanceFloor = `После ${formatNumberUnitRu(lastDistancePoint.ringKm,
             <p class="rating-eyebrow">Формула и веса</p>
             <h2 class="ui-section-title">Из чего складывается цифра</h2>
             <div class="rating-formula">
-              <pre
-                class="ui-num rating-formula-code"><code>{formula}</code></pre>
+              <pre class="ui-num rating-formula-code"><code>{formula}</code></pre>
             </div>
             <p class="ui-copy rating-copy">
-              Каждый блок переводится в шкалу {blockRange} и умножается на свой вес.
-              Итоговое число {scoreRange} показывает силу поселка по текущей модели
-              оценки.
+              Каждый блок переводится в шкалу {blockRange} и умножается на свой
+              вес. Итоговое число {scoreRange} показывает силу поселка по
+              текущей модели оценки.
             </p>
             <div class="rating-grid rating-grid--weights">
-              {
-                weights.map(({ value, label, note }) => (
-                  <div class="rating-panel rating-panel--compact">
-                    <div class="rating-card-row">
-                      <div>
-                        <h3 class="rating-card-heading">{label}</h3>
-                        <p class="rating-card-copy">{note}</p>
-                      </div>
-                      <span class="ui-num rating-card-value">
-                        {percentage(value)}
-                      </span>
+              {weights.map(({ value, label, note }) => (
+                <div class="rating-panel rating-panel--compact">
+                  <div class="rating-card-row">
+                    <div>
+                      <h3 class="rating-card-heading">{label}</h3>
+                      <p class="rating-card-copy">{note}</p>
                     </div>
+                    <span class="ui-num rating-card-value">
+                      {percentage(value)}
+                    </span>
                   </div>
-                ))
-              }
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -241,8 +236,8 @@ const distanceFloor = `После ${formatNumberUnitRu(lastDistancePoint.ringKm,
               <div class="rating-callout rating-callout--danger">
                 <p class="rating-eyebrow">Минус к рейтингу</p>
                 <h3 class="rating-callout-title">
-                  −{points(RATING_METHODOLOGY.adjustments.rabstvoPenalty)} за упоминание
-                  в «Коттеджном рабстве»
+                  −{points(RATING_METHODOLOGY.adjustments.rabstvoPenalty)} за
+                  упоминание в «Коттеджном рабстве»
                 </h3>
                 <p class="rating-note">
                   Если поселок фигурирует в канале «Коттеджное рабство», модель
@@ -285,9 +280,8 @@ const distanceFloor = `После ${formatNumberUnitRu(lastDistancePoint.ringKm,
               <p>
                 Подтвержденный признак получает полный балл. Ограниченный или
                 компромиссный вариант получает часть баллов. Если признака нет,
-                начисляется {
-                  formatNumberRu(RATING_METHODOLOGY.availabilityScores.no)
-                }.
+                начисляется{' '}
+                {formatNumberRu(RATING_METHODOLOGY.availabilityScores.no)}.
               </p>
               <p>
                 Для некоторых признаков есть градация. Например, полностью
@@ -370,9 +364,8 @@ const distanceFloor = `После ${formatNumberUnitRu(lastDistancePoint.ringKm,
             <p class="ui-copy rating-copy">
               Для расчета берется расстояние по координатам до центра Москвы. Из
               него вычитается приблизительный радиус МКАД. Получается условное
-              расстояние «за МКАД» с весом {
-                percentage(RATING_METHODOLOGY.groupWeights.distance)
-              }.
+              расстояние «за МКАД» с весом{' '}
+              {percentage(RATING_METHODOLOGY.groupWeights.distance)}.
             </p>
             <div class="rating-panel rating-panel--roomy">
               <p class="rating-note">
@@ -381,7 +374,9 @@ const distanceFloor = `После ${formatNumberUnitRu(lastDistancePoint.ringKm,
                 проигрывал только из-за расстояния.
               </p>
               <ul class="rating-list">
-                {distanceRows.map((row) => <li>{row}</li>)}
+                {distanceRows.map((row) => (
+                  <li>{row}</li>
+                ))}
                 <li>{distanceFloor}</li>
               </ul>
             </div>
@@ -492,18 +487,16 @@ const distanceFloor = `После ${formatNumberUnitRu(lastDistancePoint.ringKm,
         <div class="rating-page-nav">
           <p class="rating-eyebrow">На странице</p>
           <nav class="rating-page-nav-links">
-            {
-              nav.map(([id, label]) => (
-                <a
-                  href={withBase(`/rating/#${id}`)}
-                  class="rating-page-nav-link"
-                  data-rating-nav-link
-                  data-section-id={id}
-                >
-                  {label}
-                </a>
-              ))
-            }
+            {nav.map(([id, label]) => (
+              <a
+                href={withBase(`/rating/#${id}`)}
+                class="rating-page-nav-link"
+                data-rating-nav-link
+                data-section-id={id}
+              >
+                {label}
+              </a>
+            ))}
           </nav>
         </div>
 
@@ -930,7 +923,7 @@ const distanceFloor = `После ${formatNumberUnitRu(lastDistancePoint.ringKm,
       display: block;
       padding: 0.375rem 0.75rem;
       border: 1px solid transparent;
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-lg);
       color: var(--color-text-muted);
       font-size: 0.875rem;
       line-height: 1.25rem;

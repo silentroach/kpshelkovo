@@ -333,13 +333,22 @@
         : Math.max(p, Math.min(mapBox.height - p - h, cy + 16));
       const arrowX = cx - x + w / 2;
       const gap = up ? cy - y : y - cy;
+      const panelRadius = popupEl
+        ? Number.parseFloat(getComputedStyle(popupEl).borderRadius)
+        : Infinity;
+      const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+      // The arrow is a rotated .75rem square; leave .0625rem clear of the rounded corner.
+      const arrowInset = Math.max(p, panelRadius + rootFontSize * (0.75 / Math.SQRT2 + 0.0625));
 
       tip = {
         item,
         x,
         y,
         up,
-        arrowX: arrowX >= p && arrowX <= w - p && gap >= 12 && gap <= 30 ? arrowX : undefined
+        arrowX:
+          arrowX >= arrowInset && arrowX <= w - arrowInset && gap >= 12 && gap <= 30
+            ? arrowX
+            : undefined
       };
     }
 
@@ -602,6 +611,7 @@
     width: 100%;
     overflow: hidden;
     border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
     background: var(--color-bg-soft);
   }
 
@@ -699,6 +709,7 @@
   .map-popup-panel {
     width: 16rem;
     border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
     padding: 0.75rem;
     background: var(--color-surface);
     pointer-events: auto;
@@ -729,6 +740,7 @@
     height: 2.75rem;
     margin: -0.625rem -0.625rem 0 0;
     place-items: center;
+    border-radius: var(--radius-full);
     cursor: pointer;
     color: var(--color-text-muted);
   }
@@ -747,6 +759,7 @@
     width: 1rem;
     height: 1rem;
     padding: 0.375rem;
+    border-radius: var(--radius-full);
   }
 
   .map-popup-close:hover .map-popup-close-icon {

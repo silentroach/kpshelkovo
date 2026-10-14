@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import PlaceMap from '../PlaceMap.svelte';
 import {
@@ -34,6 +34,17 @@ vi.mock(import('@/lib/yandex-maps/runtime'), async (importOriginal) => {
 
 describe('PlaceMap', () => {
   registerPlaceMapSetup();
+  let popupGeometryStyles: HTMLStyleElement;
+
+  beforeEach(() => {
+    // DOM tests do not load the app tokens or component CSS; provide resolved geometry only.
+    popupGeometryStyles = document.createElement('style');
+    popupGeometryStyles.dataset.popupGeometryFixture = 'parcel';
+    popupGeometryStyles.textContent =
+      'html { font-size: 16px; } .parcel-map-popup__panel { border-radius: 16px; }';
+    document.head.append(popupGeometryStyles);
+  });
+  afterEach(() => popupGeometryStyles.remove());
 
   it.each([0, 1, 2])(
     'opens the same popup through label row %s without fetching details on zoom',
@@ -504,16 +515,51 @@ describe('PlaceMap', () => {
     );
     expect(window.location.search).toBe('?p=SHR-L43');
     vi.spyOn(anchor, 'getBoundingClientRect').mockImplementation(
+      () => ({ left: 400, top: 350, width: 1, height: 1 }) as DOMRect
+    );
+    updateMap();
+    await waitFor(() => expect(popup.querySelector('.parcel-map-popup__arrow')).toBeNull());
+    expect(popup.style.left).toBe('168px');
+    vi.spyOn(anchor, 'getBoundingClientRect').mockImplementation(
       () => ({ left: 210, top: 100, width: 1, height: 1 }) as DOMRect
     );
     updateMap();
     await waitFor(() => expect(popup.querySelector('.parcel-map-popup__arrow--up')).toBeTruthy());
+    const anchorRect = { left: 40, top: 350, width: 1, height: 1 };
+    vi.spyOn(anchor, 'getBoundingClientRect').mockImplementation(() => anchorRect as DOMRect);
+    updateMap();
+    await waitFor(() => expect(popup.style.left).toBe('12px'));
+    expect(popup.querySelector('.parcel-map-popup__arrow')).toBeNull();
+    anchorRect.left = 67;
+    updateMap();
+    await waitFor(() =>
+      expect(popup.querySelector<HTMLElement>('.parcel-map-popup__arrow')?.style.left).toBe(
+        '45.5px'
+      )
+    );
+
+    popupGeometryStyles.textContent =
+      'html { font-size: 32px; } .parcel-map-popup__panel { border-radius: 32px; }';
+    canvasRect.width = 300;
+    updateMap();
+    await waitFor(() => expect(popup.querySelector('.parcel-map-popup__arrow')).toBeNull());
+    expect(popup.style.left).toBe('12px');
+    anchorRect.left = 90;
+    updateMap();
+    await waitFor(() =>
+      expect(popup.querySelector<HTMLElement>('.parcel-map-popup__arrow')?.style.left).toBe(
+        '68.5px'
+      )
+    );
+    popupGeometryStyles.textContent =
+      'html { font-size: 16px; } .parcel-map-popup__panel { border-radius: 16px; }';
+    canvasRect.width = 420;
     vi.spyOn(anchor, 'getBoundingClientRect').mockImplementation(
       () => ({ left: 10, top: 350, width: 1, height: 1 }) as DOMRect
     );
     updateMap();
     await waitFor(() => expect(popup.getAttribute('style')).toContain('left: 12px'));
-    expect(popup.querySelector('.parcel-map-popup__arrow')).toBeNull();
+    await waitFor(() => expect(popup.querySelector('.parcel-map-popup__arrow')).toBeNull());
     canvasRect.height = 180;
     vi.spyOn(anchor, 'getBoundingClientRect').mockImplementation(
       () => ({ left: 110, top: 110, width: 1, height: 1 }) as DOMRect

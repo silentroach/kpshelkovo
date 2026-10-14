@@ -529,6 +529,13 @@
         popupY = Math.max(top, Math.min(maxY, y - height - gap));
       }
       const arrowX = x - popupX;
+      const panel = popupElement?.querySelector<HTMLElement>('.parcel-map-popup__panel');
+      const panelRadius = panel
+        ? Number.parseFloat(getComputedStyle(panel).borderRadius)
+        : Infinity;
+      const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+      // The arrow is a rotated .75rem square; leave .0625rem clear of the rounded corner.
+      const arrowInset = Math.max(12, panelRadius + rootFontSize * (0.75 / Math.SQRT2 + 0.0625));
       let arrow: 'up' | 'down' | undefined;
       if (
         anchor &&
@@ -536,8 +543,8 @@
         x <= rect.width &&
         y >= 0 &&
         y <= rect.height &&
-        arrowX >= 12 &&
-        arrowX <= width - 12
+        arrowX >= arrowInset &&
+        arrowX <= width - arrowInset
       ) {
         if (y >= popupY + height + 16 && y - popupY - height <= gap + 8) arrow = 'down';
         else if (y <= popupY - 16 && popupY - y <= gap + 8) arrow = 'up';
@@ -1389,6 +1396,7 @@
     justify-content: center;
     min-width: 2.75rem;
     min-height: 2.75rem;
+    border-radius: var(--radius-full);
     box-shadow: 0 0.125rem 0.4rem oklch(24% 0.04 145 / 0.16);
   }
 
@@ -1418,6 +1426,7 @@
     max-height: max(6rem, calc(100svh - 10rem));
     overflow-y: auto;
     padding: 0.25rem;
+    border-radius: var(--radius-2xl);
     box-shadow: 0 0.25rem 0.75rem oklch(24% 0.04 145 / 0.18);
   }
 
@@ -1428,7 +1437,7 @@
     gap: 0.625rem;
     min-height: 2.75rem;
     padding: 0.5rem;
-    border-radius: 0.25rem;
+    border-radius: var(--radius-lg);
     text-align: left;
     cursor: pointer;
   }
@@ -1597,6 +1606,7 @@
     overflow-y: auto;
     padding: 0.75rem;
     border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
     background: color-mix(in srgb, var(--color-surface) 96%, transparent);
     color: var(--color-text);
     font-size: 0.875rem;
@@ -1662,6 +1672,7 @@
     flex: none;
     display: grid;
     place-items: center;
+    border-radius: var(--radius-full);
     color: var(--color-text-muted);
   }
 
@@ -1674,6 +1685,7 @@
     width: 1rem;
     height: 1rem;
     padding: 0.375rem;
+    border-radius: var(--radius-full);
   }
 
   .parcel-map-popup__close:hover svg {
@@ -1681,6 +1693,7 @@
   }
 
   .parcel-map-popup__retry {
+    border-radius: var(--radius-lg);
     color: var(--color-primary);
     text-decoration: underline;
   }

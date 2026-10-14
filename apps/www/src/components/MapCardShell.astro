@@ -13,25 +13,25 @@ const { coordinates, mapUrl } = Astro.props;
     },
   ]}
 >
-  {
-    coordinates && mapUrl && (
-      <div class="map-background" data-pagefind-ignore>
-        <MapPreview
-          preview={{
-            coordinates,
-            zoom: 16,
-            anchor: [0.75, 0.45],
-            muted: true,
-            copyrightsPosition: 'bottom right',
-          }}
-          label="Карта места"
-        >
-          <span class="ui-map-marker" aria-hidden="true" />
-        </MapPreview>
-      </div>
-    )
-  }
-  <div class="map-content"><slot /></div>
+  {coordinates && mapUrl && (
+    <div class="map-background" data-pagefind-ignore>
+      <MapPreview
+        preview={{
+          coordinates,
+          zoom: 16,
+          anchor: [0.75, 0.45],
+          muted: true,
+          copyrightsPosition: 'bottom right',
+        }}
+        label="Карта места"
+      >
+        <span class="ui-map-marker" aria-hidden="true" />
+      </MapPreview>
+    </div>
+  )}
+  <div class="map-content">
+    <slot />
+  </div>
 </div>
 
 <style>
@@ -46,7 +46,7 @@ const { coordinates, mapUrl } = Astro.props;
         var(--color-border-strong) 76%,
         var(--color-primary) 24%
       );
-    border-radius: 1rem;
+    border-radius: var(--radius-xl);
     background: var(--color-surface-raised);
     box-shadow: 0 0.65rem 1.55rem var(--color-shadow);
     overflow-wrap: anywhere;

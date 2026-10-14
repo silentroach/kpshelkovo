@@ -377,7 +377,7 @@
     margin-block: 1.5rem;
     overflow: hidden;
     border: 1px solid var(--color-border);
-    border-radius: 1rem;
+    border-radius: var(--radius-xl);
     background: var(--color-surface);
   }
 
@@ -597,7 +597,7 @@
 
   .ui-sticky-table-surface {
     border: 1px solid var(--color-border);
-    border-radius: 1rem;
+    border-radius: var(--radius-xl);
     background-color: var(--color-surface);
   }
 
@@ -617,11 +617,11 @@
   }
 
   .ui-sticky-table-surface .ui-sticky-table-head th:first-child {
-    border-top-left-radius: calc(1rem - 1px);
+    border-top-left-radius: calc(var(--radius-xl) - 1px);
   }
 
   .ui-sticky-table-surface .ui-sticky-table-head th:last-child {
-    border-top-right-radius: calc(1rem - 1px);
+    border-top-right-radius: calc(var(--radius-xl) - 1px);
   }
 
   .ui-sticky-table-shell[data-ui-sticky-table-stuck] thead th:first-child {
@@ -863,7 +863,7 @@
     justify-content: center;
     gap: 0.4rem;
     border: 1px solid var(--color-border);
-    border-radius: 0;
+    border-radius: var(--radius-lg);
     background: var(--color-surface-raised);
     color: var(--color-text);
     font-size: 0.875rem;
@@ -903,7 +903,7 @@
   }
 
   .ui-btn-outline {
-    border-color: color-mix(in oklab, var(--color-border) 86%, var(--color-text) 14%);
+    border-color: var(--color-border-strong);
     background: var(--color-surface-raised);
     color: color-mix(in oklab, var(--color-text) 88%, var(--color-text-muted) 12%);
   }
@@ -996,7 +996,7 @@
     width: 2rem;
     height: 2rem;
     border: 1px solid transparent;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-full);
     background: transparent;
     color: color-mix(in oklab, var(--color-text-muted) 86%, var(--color-text) 14%);
     transition:
@@ -1015,7 +1015,7 @@
     width: 2.5rem;
     height: 2.5rem;
     flex: none;
-    border-radius: 999px;
+    border-radius: var(--radius-full);
     border-color: color-mix(in oklch, var(--color-accent-text) 18%, transparent);
     background: color-mix(in oklch, var(--color-accent-soft) 48%, transparent);
     color: var(--color-accent-text);

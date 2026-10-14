@@ -419,11 +419,20 @@ const villageIcons = {
       }
 
       .assets-table-object {
-        border-top-left-radius: var(--radius-xl);
+        border-top-left-radius: calc(var(--radius-xl) - 1px);
       }
 
       .assets-table-total-heading {
-        border-top-right-radius: var(--radius-xl);
+        border-top-right-radius: calc(var(--radius-xl) - 1px);
+      }
+
+      .assets-table-shell[data-ui-sticky-table-stuck] .assets-table-object {
+        border-top-left-radius: 0;
+      }
+
+      .assets-table-shell[data-ui-sticky-table-stuck]
+        .assets-table-total-heading {
+        border-top-right-radius: 0;
       }
     }
 

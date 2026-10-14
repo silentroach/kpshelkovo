@@ -74,12 +74,12 @@
   width: 100%;
   block-size: var(--ui-editorial-map-height, min(22rem, 65svh));
   overflow: hidden;
-  border-radius: 0.75rem 0.75rem 0 0;
+  border-radius: calc(var(--radius-xl) - 1px) calc(var(--radius-xl) - 1px) 0 0;
   background: var(--color-surface-muted);
 }
 
 .ui-editorial-map editorial-map:last-child {
-  border-radius: 0.75rem;
+  border-radius: calc(var(--radius-xl) - 1px);
 }
 
 .ui-prose .ui-editorial-map__title {
