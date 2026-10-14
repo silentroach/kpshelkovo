@@ -1,0 +1,54 @@
+[
+  {
+    "url": "https://kpshelkovo.online/",
+    "width": 390,
+    "height": 844,
+    "rect": [8, 8, 374, 828],
+    "scroll": [0, 0],
+    "overflow": 0,
+    "background": "none",
+    "blur": "none",
+    "variant": "before",
+    "textHash": "b84dfc8a162e11b937ea9b260d822f9b220b62dd53fec46a1fc6c5731cdb9999",
+    "unchanged": true
+  },
+  {
+    "url": "https://kpshelkovo.online/",
+    "width": 390,
+    "height": 844,
+    "rect": [8, 8, 374, 828],
+    "scroll": [0, 0],
+    "overflow": 0,
+    "background": "linear-gradient(oklch(1 0 0 / 0.92), oklch(1 0 0 / 0.92))",
+    "blur": "blur(20px) saturate(1.1)",
+    "variant": "a",
+    "textHash": "b84dfc8a162e11b937ea9b260d822f9b220b62dd53fec46a1fc6c5731cdb9999",
+    "unchanged": true
+  },
+  {
+    "url": "https://kpshelkovo.online/",
+    "width": 390,
+    "height": 844,
+    "rect": [8, 8, 374, 828],
+    "scroll": [0, 0],
+    "overflow": 0,
+    "background": "linear-gradient(oklch(1 0 0 / 0.96), oklch(1 0 0 / 0.96))",
+    "blur": "blur(20px) saturate(1.1)",
+    "variant": "b",
+    "textHash": "b84dfc8a162e11b937ea9b260d822f9b220b62dd53fec46a1fc6c5731cdb9999",
+    "unchanged": true
+  },
+  {
+    "url": "https://kpshelkovo.online/",
+    "width": 390,
+    "height": 844,
+    "rect": [8, 8, 374, 828],
+    "scroll": [0, 0],
+    "overflow": 0,
+    "background": "linear-gradient(135deg, oklch(1 0 0 / 0.98), oklch(1 0 0 / 0.92) 55%, oklch(1 0 0 / 0.96))",
+    "blur": "blur(20px) saturate(1.1)",
+    "variant": "c",
+    "textHash": "b84dfc8a162e11b937ea9b260d822f9b220b62dd53fec46a1fc6c5731cdb9999",
+    "unchanged": true
+  }
+]

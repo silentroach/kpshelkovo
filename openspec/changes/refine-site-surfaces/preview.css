@@ -1,0 +1,128 @@
+/* Visual study only. Inject into a production document, then set
+   document.documentElement.dataset.surfacePreview to a, b or c.
+   Remove the attribute to restore the original rendering. */
+:root[data-surface-preview] {
+  --preview-blur: blur(20px) saturate(110%);
+  --preview-arrow: oklch(100% 0 0 / 0.96);
+  --preview-edge: color-mix(in oklab, var(--color-border) 78%, var(--color-surface));
+  --preview-highlight: inset 0 1px 0 oklch(100% 0 0 / 0.85);
+  --preview-shadow-low:
+    0 1px 3px oklch(24% 0.025 145 / 0.06), 0 6px 16px -4px oklch(24% 0.025 145 / 0.08);
+  --preview-shadow-panel:
+    0 2px 4px oklch(24% 0.025 145 / 0.07), 0 12px 24px -6px oklch(24% 0.025 145 / 0.14);
+}
+
+/* A: lighter uniform navigation glass; denser reading surfaces. */
+:root[data-surface-preview='a'] {
+  --preview-nav: linear-gradient(oklch(100% 0 0 / 0.86), oklch(100% 0 0 / 0.86));
+  --preview-reading: linear-gradient(oklch(100% 0 0 / 0.92), oklch(100% 0 0 / 0.92));
+  --preview-sticky: linear-gradient(
+    oklch(96.02% 0.0085 128.6 / 0.96),
+    oklch(96.02% 0.0085 128.6 / 0.96)
+  );
+}
+
+/* B: denser uniform glass. */
+:root[data-surface-preview='b'] {
+  --preview-nav: linear-gradient(oklch(100% 0 0 / 0.92), oklch(100% 0 0 / 0.92));
+  --preview-reading: linear-gradient(oklch(100% 0 0 / 0.96), oklch(100% 0 0 / 0.96));
+  --preview-sticky: linear-gradient(
+    oklch(96.02% 0.0085 128.6 / 0.98),
+    oklch(96.02% 0.0085 128.6 / 0.98)
+  );
+}
+
+/* C: a directional, milky highlight with a quieter translucent middle.
+   Reading surfaces retain a higher opacity floor for secondary text. */
+:root[data-surface-preview='c'] {
+  --preview-nav: linear-gradient(
+    135deg,
+    oklch(100% 0 0 / 0.96),
+    oklch(100% 0 0 / 0.82) 55%,
+    oklch(100% 0 0 / 0.92)
+  );
+  --preview-reading: linear-gradient(
+    135deg,
+    oklch(100% 0 0 / 0.98),
+    oklch(100% 0 0 / 0.92) 55%,
+    oklch(100% 0 0 / 0.96)
+  );
+  --preview-sticky: linear-gradient(
+    180deg,
+    oklch(96.02% 0.0085 128.6 / 0.99),
+    oklch(96.02% 0.0085 128.6 / 0.96)
+  );
+}
+
+:root[data-surface-preview] :is(.site-header-mobile-panel, .site-nav-glass-panel) {
+  background: var(--preview-nav) !important;
+  border-color: var(--preview-edge) !important;
+  box-shadow: var(--preview-highlight), var(--preview-shadow-panel) !important;
+  -webkit-backdrop-filter: var(--preview-blur) !important;
+  backdrop-filter: var(--preview-blur) !important;
+}
+
+:root[data-surface-preview] .site-header::before {
+  background: var(--preview-nav) !important;
+  box-shadow: var(--preview-highlight) !important;
+  -webkit-backdrop-filter: var(--preview-blur) !important;
+  backdrop-filter: var(--preview-blur) !important;
+}
+
+:root[data-surface-preview]
+  :is(
+    .site-search-dialog,
+    .parcel-map-layer-list,
+    .parcel-map-popup__panel,
+    .map-popup-panel,
+    .status-service-timeline__tooltip,
+    .status-calendar-date__tooltip,
+    .reglament-missing-tooltip,
+    .settlement-hero-tooltip
+  ) {
+  background: var(--preview-reading) !important;
+  border-color: var(--preview-edge) !important;
+  box-shadow: var(--preview-highlight), var(--preview-shadow-panel) !important;
+  -webkit-backdrop-filter: var(--preview-blur) !important;
+  backdrop-filter: var(--preview-blur) !important;
+}
+
+/* Preserve the search dialog's existing external frame and focus geometry. */
+:root[data-surface-preview] .site-search-dialog {
+  box-shadow:
+    0 0 0 2px var(--color-border-strong),
+    var(--preview-highlight),
+    var(--preview-shadow-panel) !important;
+}
+
+:root[data-surface-preview] .reglament-sticky-total {
+  background: var(--preview-sticky) !important;
+  box-shadow: var(--preview-shadow-low) !important;
+  -webkit-backdrop-filter: var(--preview-blur) !important;
+  backdrop-filter: var(--preview-blur) !important;
+}
+
+/* Arrow material must join its panel cleanly; no independent cast shadow. */
+:root[data-surface-preview] :is(.parcel-map-popup__arrow, .map-popup-arrow) {
+  background: var(--preview-arrow) !important;
+  border-color: var(--preview-edge) !important;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root[data-surface-preview] {
+    --preview-nav: linear-gradient(var(--color-surface), var(--color-surface));
+    --preview-reading: var(--preview-nav);
+    --preview-sticky: linear-gradient(var(--color-surface-muted), var(--color-surface-muted));
+    --preview-arrow: var(--color-surface);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root[data-surface-preview] {
+    --preview-nav: linear-gradient(var(--color-surface), var(--color-surface));
+    --preview-reading: var(--preview-nav);
+    --preview-sticky: linear-gradient(var(--color-surface-muted), var(--color-surface-muted));
+    --preview-arrow: var(--color-surface);
+    --preview-blur: none;
+  }
+}

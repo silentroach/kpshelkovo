@@ -1,0 +1,54 @@
+[
+  {
+    "url": "https://kpshelkovo.online/map/?p=SHF-W50",
+    "width": 390,
+    "height": 844,
+    "rect": [75.5, 309.5, 240, 113.1875],
+    "scroll": [0, 0],
+    "overflow": 0,
+    "background": "none",
+    "blur": "none",
+    "variant": "before",
+    "textHash": "fb433d3e09add3be94405fe5218cdba5cbdbd912053c8236fe31df2dbf0b958b",
+    "unchanged": true
+  },
+  {
+    "url": "https://kpshelkovo.online/map/?p=SHF-W50",
+    "width": 390,
+    "height": 844,
+    "rect": [75.5, 309.5, 240, 113.1875],
+    "scroll": [0, 0],
+    "overflow": 0,
+    "background": "linear-gradient(oklch(1 0 0 / 0.92), oklch(1 0 0 / 0.92))",
+    "blur": "blur(20px) saturate(1.1)",
+    "variant": "a",
+    "textHash": "fb433d3e09add3be94405fe5218cdba5cbdbd912053c8236fe31df2dbf0b958b",
+    "unchanged": true
+  },
+  {
+    "url": "https://kpshelkovo.online/map/?p=SHF-W50",
+    "width": 390,
+    "height": 844,
+    "rect": [75.5, 309.5, 240, 113.1875],
+    "scroll": [0, 0],
+    "overflow": 0,
+    "background": "linear-gradient(oklch(1 0 0 / 0.96), oklch(1 0 0 / 0.96))",
+    "blur": "blur(20px) saturate(1.1)",
+    "variant": "b",
+    "textHash": "fb433d3e09add3be94405fe5218cdba5cbdbd912053c8236fe31df2dbf0b958b",
+    "unchanged": true
+  },
+  {
+    "url": "https://kpshelkovo.online/map/?p=SHF-W50",
+    "width": 390,
+    "height": 844,
+    "rect": [75.5, 309.5, 240, 113.1875],
+    "scroll": [0, 0],
+    "overflow": 0,
+    "background": "linear-gradient(135deg, oklch(1 0 0 / 0.98), oklch(1 0 0 / 0.92) 55%, oklch(1 0 0 / 0.96))",
+    "blur": "blur(20px) saturate(1.1)",
+    "variant": "c",
+    "textHash": "fb433d3e09add3be94405fe5218cdba5cbdbd912053c8236fe31df2dbf0b958b",
+    "unchanged": true
+  }
+]
