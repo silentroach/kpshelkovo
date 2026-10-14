@@ -601,21 +601,13 @@ const timelineGroups = incidents
     width: min(22rem, calc(100% - 0.5rem));
     max-width: calc(100vw - 1.5rem);
     padding: 0.75rem 0.85rem;
-    border: 1px solid
-      color-mix(
-        in oklab,
-        var(--color-border) 56%,
-        var(--color-surface-raised) 44%
-      );
+    border: 1px solid var(--surface-glass-border);
     border-radius: var(--radius-2xl);
-    background: color-mix(
-      in oklab,
-      var(--color-surface-raised) 90%,
-      transparent
-    );
+    background: var(--surface-glass-reading);
     color: var(--color-text);
-    backdrop-filter: blur(5px);
-    box-shadow: 0 1.1rem 2.5rem oklch(24% 0.03 230 / 0.18);
+    -webkit-backdrop-filter: var(--surface-glass-filter);
+    backdrop-filter: var(--surface-glass-filter);
+    box-shadow: var(--surface-glass-highlight), var(--shadow-2);
     pointer-events: none;
     transform: translateX(-50%);
   }

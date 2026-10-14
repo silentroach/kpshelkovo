@@ -1,0 +1,28 @@
+{
+  "height": 844,
+  "overflow": 0,
+  "root": "16px",
+  "scroll": [0, 919],
+  "surfaces": [
+    {
+      "background": "linear-gradient(oklch(0.9602 0.0085 128.6 / 0.99), oklch(0.9602 0.0085 128.6 / 0.96))",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "blur": "blur(20px) saturate(1.1)",
+      "class": "reglament-sticky-total",
+      "overflow": "visible",
+      "rect": [16, 0, 358, 46],
+      "shadow": "oklch(0.24 0.025 145 / 0.06) 0px 1px 3px 0px, oklch(0.24 0.025 145 / 0.08) 0px 6px 16px -4px"
+    },
+    {
+      "background": "linear-gradient(135deg, oklch(1 0 0 / 0.98), oklch(1 0 0 / 0.92) 55%, oklch(1 0 0 / 0.96))",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "blur": "blur(20px) saturate(1.1)",
+      "class": "reglament-missing-tooltip",
+      "overflow": "visible",
+      "rect": [36, 468.453125, 288, 91.5625],
+      "shadow": "oklch(1 0 0 / 0.85) 0px 1px 0px 0px inset, oklch(0.24 0.025 145 / 0.07) 0px 2px 4px 0px, oklch(0.24 0.025 145 / 0.14) 0px 12px 24px -6px"
+    }
+  ],
+  "url": "http://127.0.0.1:14339/815/regulation/",
+  "width": 390
+}

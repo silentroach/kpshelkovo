@@ -1427,7 +1427,11 @@
     overflow-y: auto;
     padding: 0.25rem;
     border-radius: var(--radius-2xl);
-    box-shadow: 0 0.25rem 0.75rem oklch(24% 0.04 145 / 0.18);
+    background: var(--surface-glass-reading);
+    border-color: var(--surface-glass-border);
+    -webkit-backdrop-filter: var(--surface-glass-filter);
+    backdrop-filter: var(--surface-glass-filter);
+    box-shadow: var(--surface-glass-highlight), var(--shadow-2);
   }
 
   .parcel-map-layer {
@@ -1605,9 +1609,12 @@
     min-height: 0;
     overflow-y: auto;
     padding: 0.75rem;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--surface-glass-border);
     border-radius: var(--radius-2xl);
-    background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+    background: var(--surface-glass-reading);
+    -webkit-backdrop-filter: var(--surface-glass-filter);
+    backdrop-filter: var(--surface-glass-filter);
+    box-shadow: var(--surface-glass-highlight), var(--shadow-2);
     color: var(--color-text);
     font-size: 0.875rem;
     line-height: 1.4;
@@ -1705,10 +1712,12 @@
 
   .parcel-map-popup__arrow {
     position: absolute;
+    /* Keep the joining edge above the panel's backdrop stacking context. */
+    z-index: 1;
     width: 0.75rem;
     height: 0.75rem;
-    border: 1px solid var(--color-border);
-    background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+    border: 1px solid var(--surface-glass-border);
+    background: var(--surface-glass-arrow);
     pointer-events: none;
     transform: translateX(-50%) rotate(45deg);
   }

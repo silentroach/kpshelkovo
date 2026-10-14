@@ -1,0 +1,54 @@
+[
+  {
+    "url": "https://kpshelkovo.online/815/regulation/",
+    "width": 390,
+    "height": 844,
+    "rect": [8, 8, 374, 828],
+    "scroll": [0, 1500],
+    "overflow": 0,
+    "background": "none",
+    "blur": "none",
+    "variant": "before",
+    "textHash": "347e6c86fceda815666f0c881567ebe215f6a1f8c3fdbf95aebb8340fff581bd",
+    "unchanged": true
+  },
+  {
+    "url": "https://kpshelkovo.online/815/regulation/",
+    "width": 390,
+    "height": 844,
+    "rect": [8, 8, 374, 828],
+    "scroll": [0, 1500],
+    "overflow": 0,
+    "background": "linear-gradient(oklch(1 0 0 / 0.92), oklch(1 0 0 / 0.92))",
+    "blur": "blur(20px) saturate(1.1)",
+    "variant": "a",
+    "textHash": "347e6c86fceda815666f0c881567ebe215f6a1f8c3fdbf95aebb8340fff581bd",
+    "unchanged": true
+  },
+  {
+    "url": "https://kpshelkovo.online/815/regulation/",
+    "width": 390,
+    "height": 844,
+    "rect": [8, 8, 374, 828],
+    "scroll": [0, 1500],
+    "overflow": 0,
+    "background": "linear-gradient(oklch(1 0 0 / 0.96), oklch(1 0 0 / 0.96))",
+    "blur": "blur(20px) saturate(1.1)",
+    "variant": "b",
+    "textHash": "347e6c86fceda815666f0c881567ebe215f6a1f8c3fdbf95aebb8340fff581bd",
+    "unchanged": true
+  },
+  {
+    "url": "https://kpshelkovo.online/815/regulation/",
+    "width": 390,
+    "height": 844,
+    "rect": [8, 8, 374, 828],
+    "scroll": [0, 1500],
+    "overflow": 0,
+    "background": "linear-gradient(135deg, oklch(1 0 0 / 0.98), oklch(1 0 0 / 0.92) 55%, oklch(1 0 0 / 0.96))",
+    "blur": "blur(20px) saturate(1.1)",
+    "variant": "c",
+    "textHash": "347e6c86fceda815666f0c881567ebe215f6a1f8c3fdbf95aebb8340fff581bd",
+    "unchanged": true
+  }
+]

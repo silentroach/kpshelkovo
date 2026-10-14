@@ -1,0 +1,19 @@
+{
+  "height": 844,
+  "overflow": 0,
+  "root": "16px",
+  "scroll": [0, 0],
+  "surfaces": [
+    {
+      "background": "none",
+      "backgroundColor": "oklch(1 0 0)",
+      "blur": "none",
+      "class": "map-card-shell map-card-shell--mapped",
+      "overflow": "hidden",
+      "rect": [36, 301.140625, 318, 219.859375],
+      "shadow": "none"
+    }
+  ],
+  "url": "http://127.0.0.1:14339/events/2026/09/kids-cinema-quiz/",
+  "width": 390
+}
