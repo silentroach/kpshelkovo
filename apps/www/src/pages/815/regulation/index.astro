@@ -431,7 +431,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
               {formatReglamentAnnualMoney(payload.official.annual_gross)}
             </p>
           </div>
-          <div class="reglament-total reglament-total--divided">
+          <div class="reglament-total reglament-total--divided reglament-total--current">
             <p class="reglament-total__label">Текущий пересчет</p>
             <p class="reglament-total__value" data-reglament-current-tariff>
               {formatReglamentNumber(payload.computed.tariff_per_sotka_month)}
@@ -1109,7 +1109,24 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
     }
 
     .reglament-total {
-      padding: 1rem;
+      padding: 1rem 1.125rem;
+    }
+
+    .reglament-total--current {
+      background: var(--color-primary-soft);
+    }
+
+    .reglament-total--current .reglament-total__label {
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    .reglament-total--current .reglament-total__value {
+      font-size: 2rem;
+    }
+
+    .reglament-totals .ui-unit {
+      font-size: 0.875rem;
     }
 
     .reglament-total--divided {
@@ -1150,7 +1167,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       font-size: 1.5rem;
       font-weight: 600;
       letter-spacing: normal;
-      line-height: 2rem;
+      line-height: 2.5rem;
     }
 
     .reglament-total__note {
@@ -1772,7 +1789,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       }
 
       .reglament-total {
-        padding: 1.25rem;
+        padding: 1.125rem 1.25rem;
       }
 
       .reglament-total--divided {

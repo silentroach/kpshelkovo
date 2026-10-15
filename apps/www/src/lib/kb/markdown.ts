@@ -5,6 +5,7 @@ import {
   serializeMarkdownDocument
 } from '@shelkovo/markdown';
 
+import { transformContentEmphasis } from '@/lib/markdown/content-emphasis';
 import { appendEditorialMapCaptions } from '@/lib/markdown/editorial-maps-companion';
 import { absoluteUrl } from '@/lib/site';
 
@@ -42,7 +43,10 @@ const rewriteKbLinkNode = (node: MarkdownNode): void => {
 };
 
 const kbMarkdownBody = (markdown: string, source: string) => {
-  const nodes = appendEditorialMapCaptions(parseMarkdownFragment(markdown), source);
+  const nodes = appendEditorialMapCaptions(
+    transformContentEmphasis(parseMarkdownFragment(markdown), 'markdown'),
+    source
+  );
 
   for (const node of nodes) {
     rewriteKbLinkNode(node);

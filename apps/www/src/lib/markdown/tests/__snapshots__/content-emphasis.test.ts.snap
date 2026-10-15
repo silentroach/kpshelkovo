@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`editorial emphasis > preserves references, mentions, TOC and maps in one document 1`] = `
+{
+  "backlink": [
+    {
+      "excerpt": "Условия Первый абзац: Житель. См. документ. Второй абзац. пункт",
+      "source": {
+        "id": "2026/01/test",
+        "kind": "article",
+        "section": "news",
+      },
+    },
+  ],
+  "maps": 1,
+  "markersInCompanion": false,
+  "paragraphs": [
+    "Условия",
+    "Первый абзац: Житель.",
+    "См. документ.",
+    "Второй абзац.",
+  ],
+  "person": "/people/resident/",
+  "source": "https://example.com/source",
+  "sourceInCompanion": true,
+  "title": "Условия",
+  "toc": [
+    "#раздел",
+  ],
+}
+`;

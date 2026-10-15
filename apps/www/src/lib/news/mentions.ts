@@ -1,5 +1,4 @@
-import { extractFirstMarkdownText } from '@shelkovo/markdown';
-
+import { extractFirstContentText } from '@/lib/markdown/content-emphasis';
 import { createPlaceMentionTarget } from '@/lib/places/mentions';
 
 import { createEntityMentionSourceRefs } from '../mentions';
@@ -38,7 +37,7 @@ export const createNewsArticleMentionRefs = (
     title: article.title,
     htmlUrl: article.url,
     markdownUrl: article.markdownUrl,
-    excerpt: extractFirstMarkdownText(article.body),
+    excerpt: extractFirstContentText(article.body),
     mentionedAt: article.publishedIso,
     sortKey: article.publishedAt.valueOf()
   });

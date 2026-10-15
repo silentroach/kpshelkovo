@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import type { KbPage } from '../types';
 
 let kbPageSchema: typeof import('../seo').kbPageSchema;
+let kbPageDescription: typeof import('../seo').kbPageDescription;
 
 beforeAll(async () => {
   Object.assign(import.meta.env, {
@@ -10,7 +11,7 @@ beforeAll(async () => {
     BASE_URL: '/'
   });
 
-  ({ kbPageSchema } = await import('../seo'));
+  ({ kbPageSchema, kbPageDescription } = await import('../seo'));
 });
 
 const rootPage: KbPage = {
@@ -24,6 +25,17 @@ const rootPage: KbPage = {
 };
 
 describe('kb schema', () => {
+  it('extracts a readable description when an editorial block comes first', () => {
+    expect(
+      kbPageDescription({
+        ...rootPage,
+        routeSlug: 'test',
+        body: '> [!NOTE]\n> **Условия**\n>\n> Сначала сверьте сведения в документе.\n>\n> [!SOURCE]\n> Основание приведено в справке.'
+      })
+    ).toMatchInlineSnapshot(
+      `"Условия Сначала сверьте сведения в документе. Основание приведено в справке."`
+    );
+  });
   it('describes the root page without an automatically generated item list', () => {
     const schema = kbPageSchema({
       page: rootPage,

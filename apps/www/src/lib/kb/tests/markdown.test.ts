@@ -34,6 +34,18 @@ const page = (input: {
 });
 
 describe('kb markdown companions', () => {
+  it('removes editorial markers while preserving the title and KB source link', () => {
+    const markdown = buildKbPageMarkdown(
+      page({
+        title: 'Условия',
+        routeSlug: 'test',
+        body: '> [!NOTE]\n> **Условие**\n>\n> Проверка.\n>\n> [!SOURCE]\n> См. [справку](/kb/services/gas/).'
+      })
+    );
+    expect(markdown.includes('[!')).toBe(false);
+    expect(markdown.match(/\*\*Условие\*\*/gu)).toHaveLength(1);
+    expect(markdown).toContain('https://example.com/kb/services/gas/index.md');
+  });
   it('keeps the original map URL and data while rewriting neighboring KB links', () => {
     const raw = JSON.stringify({
       type: 'FeatureCollection',
