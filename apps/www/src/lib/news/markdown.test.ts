@@ -55,6 +55,17 @@ const article = (input?: Partial<NewsArticle>): NewsArticle => ({
   ...input
 });
 
+it('publishes editorial blocks without technical markers and with one readable title', () => {
+  const markdown = buildNewsArticleMarkdown(
+    article({
+      body: '> [!WARNING]\n> **Важно**\n>\n> Проверьте [документ](https://example.com/document).\n>\n> [!SOURCE]\n> Условие подтверждено.'
+    })
+  );
+  expect(markdown.includes('[!')).toBe(false);
+  expect(markdown.match(/\*\*Важно\*\*/gu)).toHaveLength(1);
+  expect(markdown).toContain('[документ](https://example.com/document)');
+});
+
 const monthArchive = (year: number, month: number): NewsMonthArchive => ({
   id: `${year}/${String(month).padStart(2, '0')}`,
   year,

@@ -2,8 +2,8 @@
 
 15 октября 2026 года владелец посмотрел сравнение «сейчас / примерка» на реальных страницах и принял оформление без поправок: «даю добро — фиксируем». Разрешено переносить выбранный вид в сайт и обновлять дизайн-гайд.
 
-- [Принятый вид на широком экране](/openspec/changes/refine-content-emphasis/screenshots/approved-desktop.png).
-- [Принятый вид на телефоне](/openspec/changes/refine-content-emphasis/screenshots/approved-mobile.png).
+- [Принятый вид на широком экране](/openspec/changes/archive/2026-10-15-refine-content-emphasis/screenshots/approved-desktop.png).
+- [Принятый вид на телефоне](/openspec/changes/archive/2026-10-15-refine-content-emphasis/screenshots/approved-mobile.png).
 - Исходные фрагменты и отдельные примерки сохранены рядом в `screenshots/`: `fact`, `gas`, `warning`, `quote`, `result`; `desktop` соответствует 1440 × 1000, `mobile` — 390 × 844. Файлы `before` показывают исходный вид, `after` — согласованную браузерную примерку.
 
 Это снимки прототипа с production-страниц, подготовленные временными изменениями DOM и CSS. При подготовке каждого варианта проверено сохранение исходного текста, кроме добавленных заголовков. Они фиксируют визуальный выбор; проверки реализации описываются отдельно в отчёте приёмки.

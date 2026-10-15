@@ -7,6 +7,7 @@ import {
   serializeMarkdownDocument
 } from '@shelkovo/markdown';
 
+import { transformContentEmphasis } from '@/lib/markdown/content-emphasis';
 import { appendEditorialMapCaptions } from '@/lib/markdown/editorial-maps-companion';
 
 import { absoluteUrl } from '../site';
@@ -239,7 +240,7 @@ export function buildNewsArticleMarkdown(article: NewsArticle): string {
         md.heading(1, article.title),
         ...(article.body
           ? appendEditorialMapCaptions(
-              parseMarkdownFragment(article.body.trim()),
+              transformContentEmphasis(parseMarkdownFragment(article.body.trim()), 'markdown'),
               `news article "${article.id}" body`
             )
           : []),

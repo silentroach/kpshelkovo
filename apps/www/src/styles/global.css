@@ -338,10 +338,75 @@
   }
 
   .ui-prose blockquote {
+    margin-block: 1.75rem;
+    border-inline-start: 2px solid
+      color-mix(in oklab, var(--color-border-strong) 55%, var(--color-border));
+    padding-inline-start: 1.25rem;
+    color: var(--color-text);
+    font-style: normal;
+  }
+
+  .ui-prose .ui-callout {
     margin-block: 1.5rem;
-    border-left: 2px solid var(--color-border);
-    padding-left: 1rem;
+    padding: 1.125rem 1.25rem;
+    border: 1px solid color-mix(in oklab, var(--color-primary) 13%, var(--color-primary-soft));
+    border-radius: var(--radius-xl);
+    background: var(--color-primary-soft);
+    color: var(--color-text);
+  }
+
+  .ui-prose .ui-callout--warning {
+    border-color: color-mix(in oklab, var(--color-warning-text) 13%, var(--color-warning-soft));
+    background: var(--color-warning-soft);
+  }
+
+  .ui-prose .ui-callout > p {
+    margin-block: 0.65rem 0;
+  }
+
+  .ui-prose .ui-callout > .ui-callout__title {
+    margin: 0 0 0.55rem;
+    color: var(--color-primary);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: normal;
+    line-height: 1.4;
+  }
+
+  .ui-prose .ui-callout--warning > .ui-callout__title {
+    color: var(--color-warning-text);
+  }
+
+  .ui-prose .ui-callout > .ui-callout__title + p {
+    margin-block-start: 0;
+  }
+
+  .ui-prose .ui-callout > .ui-callout__source {
+    margin-block-start: 0.8rem;
     color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .ui-prose .ui-callout__source a {
+    color: inherit;
+    font-weight: 400;
+  }
+
+  .ui-prose .ui-callout__source a:is(:hover, :focus-visible) {
+    color: var(--color-primary);
+  }
+
+  @media (max-width: 40rem) {
+    .ui-prose .ui-callout {
+      padding: 1rem;
+    }
+
+    .ui-prose blockquote {
+      padding-inline-start: 1rem;
+    }
   }
 
   .ui-prose ul.ui-markdown-toc__list a {
