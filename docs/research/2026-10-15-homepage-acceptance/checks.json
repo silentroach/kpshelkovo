@@ -1,0 +1,2495 @@
+{
+  "url": "https://kpshelkovo.online/",
+  "date": "2026-10-15",
+  "browser": "HeadlessChrome/147.0.0.0, macOS, DPR 1",
+  "sourceCommit": "9709d9d36b841292c5e71ddf962edd1f29f65bb5",
+  "linkStateReview": {
+    "reviewUrl": "https://github.com/silentroach/kpshelkovo/pull/1086#discussion_r4286438562",
+    "previousCommit": "5000a03158f1dbf130b06f4482c489145c1d1769",
+    "diagnostic": {
+      "center": {
+        "hitTag": "H2",
+        "insideLink": false,
+        "x": 995.25,
+        "y": 721.53125
+      },
+      "color": "oklch(0.2821 0.0101 164.2)",
+      "fragments": [
+        {
+          "height": 21,
+          "width": 269.1875,
+          "x": 860.65625,
+          "y": 696.15625
+        },
+        {
+          "height": 21,
+          "width": 171.953125,
+          "x": 860.65625,
+          "y": 725.90625
+        }
+      ],
+      "hovered": false,
+      "underline": "none"
+    }
+  },
+  "fixtures": [
+    [
+      {
+        "service": "dam",
+        "windows": [
+          {
+            "kind": "maintenance",
+            "start": 1791999656498
+          }
+        ]
+      },
+      {
+        "service": "electricity",
+        "windows": [
+          {
+            "kind": "incident",
+            "start": 1791999656498
+          }
+        ]
+      },
+      {
+        "service": "water",
+        "windows": [
+          {
+            "kind": "maintenance",
+            "start": 1819702800000
+          }
+        ]
+      },
+      {
+        "service": "internet",
+        "windows": [
+          {
+            "kind": "incident",
+            "start": 1822294800000
+          }
+        ]
+      }
+    ],
+    [
+      {
+        "service": "dam",
+        "windows": [
+          {
+            "kind": "maintenance",
+            "start": 1791999747828
+          }
+        ]
+      },
+      {
+        "service": "electricity",
+        "windows": [
+          {
+            "kind": "incident",
+            "start": 1822294800000
+          }
+        ]
+      },
+      {
+        "service": "water",
+        "windows": [
+          {
+            "kind": "maintenance",
+            "start": 1819702800000
+          }
+        ]
+      },
+      {
+        "service": "internet",
+        "windows": [
+          {
+            "kind": "incident",
+            "start": 1822294800000
+          }
+        ]
+      }
+    ]
+  ],
+  "cases": [
+    {
+      "name": "day-1440-0-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 1000,
+        "width": 1440
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 533.796875,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 533.796875,
+      "summary": {
+        "hidden": true,
+        "rect": {
+          "height": 0,
+          "width": 0,
+          "x": 0,
+          "y": 0
+        }
+      },
+      "links": []
+    },
+    {
+      "name": "day-1440-1-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 1000,
+        "width": 1440
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 533.796875,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 533.796875,
+      "summary": {
+        "hidden": false,
+        "rect": {
+          "height": 122,
+          "width": 1440,
+          "x": 0,
+          "y": 410.796875
+        }
+      },
+      "links": [
+        {
+          "service": "dam",
+          "phase": "active",
+          "kind": "maintenance",
+          "href": "/status/dam/",
+          "text": "Дамба | Идут работы",
+          "rect": {
+            "height": 30,
+            "width": 175.65625,
+            "x": 154,
+            "y": 474.796875
+          }
+        }
+      ]
+    },
+    {
+      "name": "day-1440-4-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 1000,
+        "width": 1440
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 533.796875,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 533.796875,
+      "summary": {
+        "hidden": false,
+        "rect": {
+          "height": 122,
+          "width": 1440,
+          "x": 0,
+          "y": 410.796875
+        }
+      },
+      "links": [
+        {
+          "service": "electricity",
+          "phase": "active",
+          "kind": "incident",
+          "href": "/status/electricity/",
+          "text": "Электричество | Перебой",
+          "rect": {
+            "height": 30,
+            "width": 212.390625,
+            "x": 154,
+            "y": 474.796875
+          }
+        },
+        {
+          "service": "dam",
+          "phase": "active",
+          "kind": "maintenance",
+          "href": "/status/dam/",
+          "text": "Дамба | Идут работы",
+          "rect": {
+            "height": 30,
+            "width": 175.65625,
+            "x": 406.390625,
+            "y": 474.796875
+          }
+        },
+        {
+          "service": "water",
+          "phase": "scheduled",
+          "kind": "maintenance",
+          "href": "/status/water/",
+          "text": "Вода | Работы с 31 августа 2027",
+          "rect": {
+            "height": 30,
+            "width": 250.90625,
+            "x": 622.046875,
+            "y": 474.796875
+          }
+        },
+        {
+          "service": "internet",
+          "phase": "scheduled",
+          "kind": "incident",
+          "href": "/status/internet/",
+          "text": "Интернет | Перебой с 30 сентября 2027",
+          "rect": {
+            "height": 30,
+            "width": 312.453125,
+            "x": 912.953125,
+            "y": 474.796875
+          }
+        }
+      ],
+      "contrast": [
+        {
+          "service": "electricity",
+          "text": [
+            {
+              "text": "Электричество",
+              "minimum": 13.163
+            },
+            {
+              "text": "Перебой",
+              "minimum": 9.637
+            }
+          ],
+          "whiteFocusMinimum": 13.083
+        },
+        {
+          "service": "dam",
+          "text": [
+            {
+              "text": "Дамба",
+              "minimum": 13.204
+            },
+            {
+              "text": "Идут работы",
+              "minimum": 9.812
+            }
+          ],
+          "whiteFocusMinimum": 12.651
+        },
+        {
+          "service": "water",
+          "text": [
+            {
+              "text": "Вода",
+              "minimum": 15.13
+            },
+            {
+              "text": "Работы с 31 августа 2027",
+              "minimum": 10.081
+            }
+          ],
+          "whiteFocusMinimum": 13.438
+        },
+        {
+          "service": "internet",
+          "text": [
+            {
+              "text": "Интернет",
+              "minimum": 13.364
+            },
+            {
+              "text": "Перебой с 30 сентября 2027",
+              "minimum": 9.268
+            }
+          ],
+          "whiteFocusMinimum": 13.442
+        }
+      ]
+    },
+    {
+      "name": "night-1440-0-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 1000,
+        "width": 1440
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 533.796875,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 533.796875,
+      "summary": {
+        "hidden": true,
+        "rect": {
+          "height": 0,
+          "width": 0,
+          "x": 0,
+          "y": 0
+        }
+      },
+      "links": []
+    },
+    {
+      "name": "night-1440-1-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 1000,
+        "width": 1440
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 533.796875,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 533.796875,
+      "summary": {
+        "hidden": false,
+        "rect": {
+          "height": 122,
+          "width": 1440,
+          "x": 0,
+          "y": 410.796875
+        }
+      },
+      "links": [
+        {
+          "service": "dam",
+          "phase": "active",
+          "kind": "maintenance",
+          "href": "/status/dam/",
+          "text": "Дамба | Идут работы",
+          "rect": {
+            "height": 30,
+            "width": 175.65625,
+            "x": 154,
+            "y": 474.796875
+          }
+        }
+      ]
+    },
+    {
+      "name": "night-1440-4-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 1000,
+        "width": 1440
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 533.796875,
+        "width": 1440,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 533.796875,
+      "summary": {
+        "hidden": false,
+        "rect": {
+          "height": 122,
+          "width": 1440,
+          "x": 0,
+          "y": 410.796875
+        }
+      },
+      "links": [
+        {
+          "service": "electricity",
+          "phase": "active",
+          "kind": "incident",
+          "href": "/status/electricity/",
+          "text": "Электричество | Перебой",
+          "rect": {
+            "height": 30,
+            "width": 212.390625,
+            "x": 154,
+            "y": 474.796875
+          }
+        },
+        {
+          "service": "dam",
+          "phase": "active",
+          "kind": "maintenance",
+          "href": "/status/dam/",
+          "text": "Дамба | Идут работы",
+          "rect": {
+            "height": 30,
+            "width": 175.65625,
+            "x": 406.390625,
+            "y": 474.796875
+          }
+        },
+        {
+          "service": "water",
+          "phase": "scheduled",
+          "kind": "maintenance",
+          "href": "/status/water/",
+          "text": "Вода | Работы с 31 августа 2027",
+          "rect": {
+            "height": 30,
+            "width": 250.90625,
+            "x": 622.046875,
+            "y": 474.796875
+          }
+        },
+        {
+          "service": "internet",
+          "phase": "scheduled",
+          "kind": "incident",
+          "href": "/status/internet/",
+          "text": "Интернет | Перебой с 30 сентября 2027",
+          "rect": {
+            "height": 30,
+            "width": 312.453125,
+            "x": 912.953125,
+            "y": 474.796875
+          }
+        }
+      ],
+      "contrast": [
+        {
+          "service": "electricity",
+          "text": [
+            {
+              "text": "Электричество",
+              "minimum": 15.165
+            },
+            {
+              "text": "Перебой",
+              "minimum": 12.093
+            }
+          ],
+          "whiteFocusMinimum": 15.797
+        },
+        {
+          "service": "dam",
+          "text": [
+            {
+              "text": "Дамба",
+              "minimum": 18.765
+            },
+            {
+              "text": "Идут работы",
+              "minimum": 12.586
+            }
+          ],
+          "whiteFocusMinimum": 18.27
+        },
+        {
+          "service": "water",
+          "text": [
+            {
+              "text": "Вода",
+              "minimum": 18.636
+            },
+            {
+              "text": "Работы с 31 августа 2027",
+              "minimum": 12.323
+            }
+          ],
+          "whiteFocusMinimum": 18.246
+        },
+        {
+          "service": "internet",
+          "text": [
+            {
+              "text": "Интернет",
+              "minimum": 18.581
+            },
+            {
+              "text": "Перебой с 30 сентября 2027",
+              "minimum": 12.028
+            }
+          ],
+          "whiteFocusMinimum": 18.415
+        }
+      ]
+    },
+    {
+      "name": "day-390-0-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 844,
+        "width": 390
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 321,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 321,
+      "summary": {
+        "hidden": true,
+        "rect": {
+          "height": 0,
+          "width": 0,
+          "x": 0,
+          "y": 0
+        }
+      },
+      "links": []
+    },
+    {
+      "name": "day-390-1-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 844,
+        "width": 390
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 321,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 321,
+      "summary": {
+        "hidden": false,
+        "rect": {
+          "height": 114,
+          "width": 390,
+          "x": 0,
+          "y": 206
+        }
+      },
+      "links": [
+        {
+          "service": "dam",
+          "phase": "active",
+          "kind": "maintenance",
+          "href": "/status/dam/",
+          "text": "Дамба | Идут работы",
+          "rect": {
+            "height": 30,
+            "width": 156.09375,
+            "x": 20,
+            "y": 270
+          }
+        }
+      ]
+    },
+    {
+      "name": "day-390-4-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 844,
+        "width": 390
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 321,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 321,
+      "summary": {
+        "hidden": false,
+        "rect": {
+          "height": 204,
+          "width": 390,
+          "x": 0,
+          "y": 116
+        }
+      },
+      "links": [
+        {
+          "service": "electricity",
+          "phase": "active",
+          "kind": "incident",
+          "href": "/status/electricity/",
+          "text": "Электричество | Перебой",
+          "rect": {
+            "height": 30,
+            "width": 188.234375,
+            "x": 20,
+            "y": 180
+          }
+        },
+        {
+          "service": "dam",
+          "phase": "active",
+          "kind": "maintenance",
+          "href": "/status/dam/",
+          "text": "Дамба | Идут работы",
+          "rect": {
+            "height": 30,
+            "width": 156.09375,
+            "x": 20,
+            "y": 210
+          }
+        },
+        {
+          "service": "water",
+          "phase": "scheduled",
+          "kind": "maintenance",
+          "href": "/status/water/",
+          "text": "Вода | Работы с 31 августа 2027",
+          "rect": {
+            "height": 30,
+            "width": 221.921875,
+            "x": 20,
+            "y": 240
+          }
+        },
+        {
+          "service": "internet",
+          "phase": "scheduled",
+          "kind": "incident",
+          "href": "/status/internet/",
+          "text": "Интернет | Перебой с 30 сентября 2027",
+          "rect": {
+            "height": 30,
+            "width": 275.78125,
+            "x": 20,
+            "y": 270
+          }
+        }
+      ],
+      "contrast": [
+        {
+          "service": "electricity",
+          "text": [
+            {
+              "text": "Электричество",
+              "minimum": 11.618
+            },
+            {
+              "text": "Перебой",
+              "minimum": 8.406
+            }
+          ],
+          "whiteFocusMinimum": 8.959
+        },
+        {
+          "service": "dam",
+          "text": [
+            {
+              "text": "Дамба",
+              "minimum": 15.969
+            },
+            {
+              "text": "Идут работы",
+              "minimum": 10.76
+            }
+          ],
+          "whiteFocusMinimum": 16.059
+        },
+        {
+          "service": "water",
+          "text": [
+            {
+              "text": "Вода",
+              "minimum": 16.761
+            },
+            {
+              "text": "Работы с 31 августа 2027",
+              "minimum": 11.333
+            }
+          ],
+          "whiteFocusMinimum": 14.741
+        },
+        {
+          "service": "internet",
+          "text": [
+            {
+              "text": "Интернет",
+              "minimum": 16.557
+            },
+            {
+              "text": "Перебой с 30 сентября 2027",
+              "minimum": 10.55
+            }
+          ],
+          "whiteFocusMinimum": 14.427
+        }
+      ]
+    },
+    {
+      "name": "night-390-0-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 844,
+        "width": 390
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 321,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 321,
+      "summary": {
+        "hidden": true,
+        "rect": {
+          "height": 0,
+          "width": 0,
+          "x": 0,
+          "y": 0
+        }
+      },
+      "links": []
+    },
+    {
+      "name": "night-390-1-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 844,
+        "width": 390
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 321,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 321,
+      "summary": {
+        "hidden": false,
+        "rect": {
+          "height": 114,
+          "width": 390,
+          "x": 0,
+          "y": 206
+        }
+      },
+      "links": [
+        {
+          "service": "dam",
+          "phase": "active",
+          "kind": "maintenance",
+          "href": "/status/dam/",
+          "text": "Дамба | Идут работы",
+          "rect": {
+            "height": 30,
+            "width": 156.09375,
+            "x": 20,
+            "y": 270
+          }
+        }
+      ]
+    },
+    {
+      "name": "night-390-4-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 844,
+        "width": 390
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 321,
+        "width": 390,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 321,
+      "summary": {
+        "hidden": false,
+        "rect": {
+          "height": 204,
+          "width": 390,
+          "x": 0,
+          "y": 116
+        }
+      },
+      "links": [
+        {
+          "service": "electricity",
+          "phase": "active",
+          "kind": "incident",
+          "href": "/status/electricity/",
+          "text": "Электричество | Перебой",
+          "rect": {
+            "height": 30,
+            "width": 188.234375,
+            "x": 20,
+            "y": 180
+          }
+        },
+        {
+          "service": "dam",
+          "phase": "active",
+          "kind": "maintenance",
+          "href": "/status/dam/",
+          "text": "Дамба | Идут работы",
+          "rect": {
+            "height": 30,
+            "width": 156.09375,
+            "x": 20,
+            "y": 210
+          }
+        },
+        {
+          "service": "water",
+          "phase": "scheduled",
+          "kind": "maintenance",
+          "href": "/status/water/",
+          "text": "Вода | Работы с 31 августа 2027",
+          "rect": {
+            "height": 30,
+            "width": 221.921875,
+            "x": 20,
+            "y": 240
+          }
+        },
+        {
+          "service": "internet",
+          "phase": "scheduled",
+          "kind": "incident",
+          "href": "/status/internet/",
+          "text": "Интернет | Перебой с 30 сентября 2027",
+          "rect": {
+            "height": 30,
+            "width": 275.78125,
+            "x": 20,
+            "y": 270
+          }
+        }
+      ],
+      "contrast": [
+        {
+          "service": "electricity",
+          "text": [
+            {
+              "text": "Электричество",
+              "minimum": 9.057
+            },
+            {
+              "text": "Перебой",
+              "minimum": 10.815
+            }
+          ],
+          "whiteFocusMinimum": 8.98
+        },
+        {
+          "service": "dam",
+          "text": [
+            {
+              "text": "Дамба",
+              "minimum": 10.862
+            },
+            {
+              "text": "Идут работы",
+              "minimum": 7.588
+            }
+          ],
+          "whiteFocusMinimum": 9.763
+        },
+        {
+          "service": "water",
+          "text": [
+            {
+              "text": "Вода",
+              "minimum": 17.792
+            },
+            {
+              "text": "Работы с 31 августа 2027",
+              "minimum": 10.678
+            }
+          ],
+          "whiteFocusMinimum": 11.479
+        },
+        {
+          "service": "internet",
+          "text": [
+            {
+              "text": "Интернет",
+              "minimum": 18.135
+            },
+            {
+              "text": "Перебой с 30 сентября 2027",
+              "minimum": 10.73
+            }
+          ],
+          "whiteFocusMinimum": 17.518
+        }
+      ]
+    },
+    {
+      "name": "day-320-0-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 844,
+        "width": 320
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 321,
+        "width": 320,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 321,
+      "summary": {
+        "hidden": true,
+        "rect": {
+          "height": 0,
+          "width": 0,
+          "x": 0,
+          "y": 0
+        }
+      },
+      "links": []
+    },
+    {
+      "name": "day-320-1-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 844,
+        "width": 320
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 321,
+        "width": 320,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 321,
+      "summary": {
+        "hidden": false,
+        "rect": {
+          "height": 114,
+          "width": 320,
+          "x": 0,
+          "y": 206
+        }
+      },
+      "links": [
+        {
+          "service": "dam",
+          "phase": "active",
+          "kind": "maintenance",
+          "href": "/status/dam/",
+          "text": "Дамба | Идут работы",
+          "rect": {
+            "height": 30,
+            "width": 156.09375,
+            "x": 20,
+            "y": 270
+          }
+        }
+      ]
+    },
+    {
+      "name": "day-320-4-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 844,
+        "width": 320
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 321,
+        "width": 320,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 321,
+      "summary": {
+        "hidden": false,
+        "rect": {
+          "height": 204,
+          "width": 320,
+          "x": 0,
+          "y": 116
+        }
+      },
+      "links": [
+        {
+          "service": "electricity",
+          "phase": "active",
+          "kind": "incident",
+          "href": "/status/electricity/",
+          "text": "Электричество | Перебой",
+          "rect": {
+            "height": 30,
+            "width": 188.234375,
+            "x": 20,
+            "y": 180
+          }
+        },
+        {
+          "service": "dam",
+          "phase": "active",
+          "kind": "maintenance",
+          "href": "/status/dam/",
+          "text": "Дамба | Идут работы",
+          "rect": {
+            "height": 30,
+            "width": 156.09375,
+            "x": 20,
+            "y": 210
+          }
+        },
+        {
+          "service": "water",
+          "phase": "scheduled",
+          "kind": "maintenance",
+          "href": "/status/water/",
+          "text": "Вода | Работы с 31 августа 2027",
+          "rect": {
+            "height": 30,
+            "width": 221.921875,
+            "x": 20,
+            "y": 240
+          }
+        },
+        {
+          "service": "internet",
+          "phase": "scheduled",
+          "kind": "incident",
+          "href": "/status/internet/",
+          "text": "Интернет | Перебой с 30 сентября 2027",
+          "rect": {
+            "height": 30,
+            "width": 275.78125,
+            "x": 20,
+            "y": 270
+          }
+        }
+      ],
+      "contrast": [
+        {
+          "service": "electricity",
+          "text": [
+            {
+              "text": "Электричество",
+              "minimum": 11.618
+            },
+            {
+              "text": "Перебой",
+              "minimum": 8.406
+            }
+          ],
+          "whiteFocusMinimum": 8.959
+        },
+        {
+          "service": "dam",
+          "text": [
+            {
+              "text": "Дамба",
+              "minimum": 15.969
+            },
+            {
+              "text": "Идут работы",
+              "minimum": 10.76
+            }
+          ],
+          "whiteFocusMinimum": 16.059
+        },
+        {
+          "service": "water",
+          "text": [
+            {
+              "text": "Вода",
+              "minimum": 16.761
+            },
+            {
+              "text": "Работы с 31 августа 2027",
+              "minimum": 11.333
+            }
+          ],
+          "whiteFocusMinimum": 14.741
+        },
+        {
+          "service": "internet",
+          "text": [
+            {
+              "text": "Интернет",
+              "minimum": 16.557
+            },
+            {
+              "text": "Перебой с 30 сентября 2027",
+              "minimum": 10.55
+            }
+          ],
+          "whiteFocusMinimum": 14.427
+        }
+      ]
+    },
+    {
+      "name": "night-320-0-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 844,
+        "width": 320
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 321,
+        "width": 320,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 321,
+      "summary": {
+        "hidden": true,
+        "rect": {
+          "height": 0,
+          "width": 0,
+          "x": 0,
+          "y": 0
+        }
+      },
+      "links": []
+    },
+    {
+      "name": "night-320-1-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 844,
+        "width": 320
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 321,
+        "width": 320,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 321,
+      "summary": {
+        "hidden": false,
+        "rect": {
+          "height": 114,
+          "width": 320,
+          "x": 0,
+          "y": 206
+        }
+      },
+      "links": [
+        {
+          "service": "dam",
+          "phase": "active",
+          "kind": "maintenance",
+          "href": "/status/dam/",
+          "text": "Дамба | Идут работы",
+          "rect": {
+            "height": 30,
+            "width": 156.09375,
+            "x": 20,
+            "y": 270
+          }
+        }
+      ]
+    },
+    {
+      "name": "night-320-4-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 844,
+        "width": 320
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 321,
+        "width": 320,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 321,
+      "summary": {
+        "hidden": false,
+        "rect": {
+          "height": 204,
+          "width": 320,
+          "x": 0,
+          "y": 116
+        }
+      },
+      "links": [
+        {
+          "service": "electricity",
+          "phase": "active",
+          "kind": "incident",
+          "href": "/status/electricity/",
+          "text": "Электричество | Перебой",
+          "rect": {
+            "height": 30,
+            "width": 188.234375,
+            "x": 20,
+            "y": 180
+          }
+        },
+        {
+          "service": "dam",
+          "phase": "active",
+          "kind": "maintenance",
+          "href": "/status/dam/",
+          "text": "Дамба | Идут работы",
+          "rect": {
+            "height": 30,
+            "width": 156.09375,
+            "x": 20,
+            "y": 210
+          }
+        },
+        {
+          "service": "water",
+          "phase": "scheduled",
+          "kind": "maintenance",
+          "href": "/status/water/",
+          "text": "Вода | Работы с 31 августа 2027",
+          "rect": {
+            "height": 30,
+            "width": 221.921875,
+            "x": 20,
+            "y": 240
+          }
+        },
+        {
+          "service": "internet",
+          "phase": "scheduled",
+          "kind": "incident",
+          "href": "/status/internet/",
+          "text": "Интернет | Перебой с 30 сентября 2027",
+          "rect": {
+            "height": 30,
+            "width": 275.78125,
+            "x": 20,
+            "y": 270
+          }
+        }
+      ],
+      "contrast": [
+        {
+          "service": "electricity",
+          "text": [
+            {
+              "text": "Электричество",
+              "minimum": 9.057
+            },
+            {
+              "text": "Перебой",
+              "minimum": 10.815
+            }
+          ],
+          "whiteFocusMinimum": 8.98
+        },
+        {
+          "service": "dam",
+          "text": [
+            {
+              "text": "Дамба",
+              "minimum": 10.862
+            },
+            {
+              "text": "Идут работы",
+              "minimum": 7.588
+            }
+          ],
+          "whiteFocusMinimum": 9.763
+        },
+        {
+          "service": "water",
+          "text": [
+            {
+              "text": "Вода",
+              "minimum": 17.792
+            },
+            {
+              "text": "Работы с 31 августа 2027",
+              "minimum": 10.678
+            }
+          ],
+          "whiteFocusMinimum": 11.479
+        },
+        {
+          "service": "internet",
+          "text": [
+            {
+              "text": "Интернет",
+              "minimum": 18.135
+            },
+            {
+              "text": "Перебой с 30 сентября 2027",
+              "minimum": 10.73
+            }
+          ],
+          "whiteFocusMinimum": 17.518
+        }
+      ]
+    },
+    {
+      "name": "long-day-320-4-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 844,
+        "width": 320
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 321,
+        "width": 320,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 321,
+      "summary": {
+        "hidden": false,
+        "rect": {
+          "height": 226,
+          "width": 320,
+          "x": 0,
+          "y": 94
+        }
+      },
+      "links": [
+        {
+          "service": "dam",
+          "phase": "active",
+          "kind": "maintenance",
+          "href": "/status/dam/",
+          "text": "Дамба | Идут работы",
+          "rect": {
+            "height": 30,
+            "width": 156.09375,
+            "x": 20,
+            "y": 158
+          }
+        },
+        {
+          "service": "water",
+          "phase": "scheduled",
+          "kind": "maintenance",
+          "href": "/status/water/",
+          "text": "Вода | Работы с 31 августа 2027",
+          "rect": {
+            "height": 30,
+            "width": 221.921875,
+            "x": 20,
+            "y": 188
+          }
+        },
+        {
+          "service": "electricity",
+          "phase": "scheduled",
+          "kind": "incident",
+          "href": "/status/electricity/",
+          "text": "Электричество | Перебой с 30 сентября 2027",
+          "rect": {
+            "height": 52,
+            "width": 280,
+            "x": 20,
+            "y": 218
+          }
+        },
+        {
+          "service": "internet",
+          "phase": "scheduled",
+          "kind": "incident",
+          "href": "/status/internet/",
+          "text": "Интернет | Перебой с 30 сентября 2027",
+          "rect": {
+            "height": 30,
+            "width": 275.78125,
+            "x": 20,
+            "y": 270
+          }
+        }
+      ],
+      "contrast": [
+        {
+          "service": "dam",
+          "text": [
+            {
+              "text": "Дамба",
+              "minimum": 11.808
+            },
+            {
+              "text": "Идут работы",
+              "minimum": 8.645
+            }
+          ],
+          "whiteFocusMinimum": 9.644
+        },
+        {
+          "service": "water",
+          "text": [
+            {
+              "text": "Вода",
+              "minimum": 13.609
+            },
+            {
+              "text": "Работы с 31 августа 2027",
+              "minimum": 8.504
+            }
+          ],
+          "whiteFocusMinimum": 11.463
+        },
+        {
+          "service": "electricity",
+          "text": [
+            {
+              "text": "Электричество",
+              "minimum": 15.458
+            },
+            {
+              "text": "Перебой с 30 сентября 2027",
+              "minimum": 10.264
+            }
+          ],
+          "whiteFocusMinimum": 10.896
+        },
+        {
+          "service": "internet",
+          "text": [
+            {
+              "text": "Интернет",
+              "minimum": 16.361
+            },
+            {
+              "text": "Перебой с 30 сентября 2027",
+              "minimum": 10.638
+            }
+          ],
+          "whiteFocusMinimum": 14.661
+        }
+      ]
+    },
+    {
+      "name": "long-night-320-4-services",
+      "viewport": {
+        "dpr": 1,
+        "height": 844,
+        "width": 320
+      },
+      "overflow": 0,
+      "hero": {
+        "height": 321,
+        "width": 320,
+        "x": 0,
+        "y": 0
+      },
+      "newsTop": 321,
+      "summary": {
+        "hidden": false,
+        "rect": {
+          "height": 226,
+          "width": 320,
+          "x": 0,
+          "y": 94
+        }
+      },
+      "links": [
+        {
+          "service": "dam",
+          "phase": "active",
+          "kind": "maintenance",
+          "href": "/status/dam/",
+          "text": "Дамба | Идут работы",
+          "rect": {
+            "height": 30,
+            "width": 156.09375,
+            "x": 20,
+            "y": 158
+          }
+        },
+        {
+          "service": "water",
+          "phase": "scheduled",
+          "kind": "maintenance",
+          "href": "/status/water/",
+          "text": "Вода | Работы с 31 августа 2027",
+          "rect": {
+            "height": 30,
+            "width": 221.921875,
+            "x": 20,
+            "y": 188
+          }
+        },
+        {
+          "service": "electricity",
+          "phase": "scheduled",
+          "kind": "incident",
+          "href": "/status/electricity/",
+          "text": "Электричество | Перебой с 30 сентября 2027",
+          "rect": {
+            "height": 52,
+            "width": 280,
+            "x": 20,
+            "y": 218
+          }
+        },
+        {
+          "service": "internet",
+          "phase": "scheduled",
+          "kind": "incident",
+          "href": "/status/internet/",
+          "text": "Интернет | Перебой с 30 сентября 2027",
+          "rect": {
+            "height": 30,
+            "width": 275.78125,
+            "x": 20,
+            "y": 270
+          }
+        }
+      ],
+      "contrast": [
+        {
+          "service": "dam",
+          "text": [
+            {
+              "text": "Дамба",
+              "minimum": 18.248
+            },
+            {
+              "text": "Идут работы",
+              "minimum": 11.468
+            }
+          ],
+          "whiteFocusMinimum": 4.729
+        },
+        {
+          "service": "water",
+          "text": [
+            {
+              "text": "Вода",
+              "minimum": 9.495
+            },
+            {
+              "text": "Работы с 31 августа 2027",
+              "minimum": 7.631
+            }
+          ],
+          "whiteFocusMinimum": 9.942
+        },
+        {
+          "service": "electricity",
+          "text": [
+            {
+              "text": "Электричество",
+              "minimum": 13.055
+            },
+            {
+              "text": "Перебой с 30 сентября 2027",
+              "minimum": 8.537
+            }
+          ],
+          "whiteFocusMinimum": 10.514
+        },
+        {
+          "service": "internet",
+          "text": [
+            {
+              "text": "Интернет",
+              "minimum": 18.135
+            },
+            {
+              "text": "Перебой с 30 сентября 2027",
+              "minimum": 10.76
+            }
+          ],
+          "whiteFocusMinimum": 17.549
+        }
+      ]
+    }
+  ],
+  "serviceKeyboardStops": [
+    {
+      "width": 1440,
+      "mode": "day",
+      "href": "/status/electricity/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "electricity",
+      "visible": true
+    },
+    {
+      "width": 1440,
+      "mode": "day",
+      "href": "/status/dam/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "dam",
+      "visible": true
+    },
+    {
+      "width": 1440,
+      "mode": "day",
+      "href": "/status/water/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "water",
+      "visible": true
+    },
+    {
+      "width": 1440,
+      "mode": "day",
+      "href": "/status/internet/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "internet",
+      "visible": true
+    },
+    {
+      "width": 1440,
+      "mode": "night",
+      "href": "/status/electricity/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "electricity",
+      "visible": true
+    },
+    {
+      "width": 1440,
+      "mode": "night",
+      "href": "/status/dam/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "dam",
+      "visible": true
+    },
+    {
+      "width": 1440,
+      "mode": "night",
+      "href": "/status/water/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "water",
+      "visible": true
+    },
+    {
+      "width": 1440,
+      "mode": "night",
+      "href": "/status/internet/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "internet",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "mode": "day",
+      "href": "/status/electricity/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "electricity",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "mode": "day",
+      "href": "/status/dam/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "dam",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "mode": "day",
+      "href": "/status/water/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "water",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "mode": "day",
+      "href": "/status/internet/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "internet",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "mode": "night",
+      "href": "/status/electricity/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "electricity",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "mode": "night",
+      "href": "/status/dam/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "dam",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "mode": "night",
+      "href": "/status/water/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "water",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "mode": "night",
+      "href": "/status/internet/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "internet",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "day",
+      "href": "/status/electricity/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "electricity",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "day",
+      "href": "/status/dam/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "dam",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "day",
+      "href": "/status/water/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "water",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "day",
+      "href": "/status/internet/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "internet",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "night",
+      "href": "/status/electricity/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "electricity",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "night",
+      "href": "/status/dam/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "dam",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "night",
+      "href": "/status/water/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "water",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "night",
+      "href": "/status/internet/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "internet",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "day",
+      "href": "/status/dam/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "dam",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "day",
+      "href": "/status/water/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "water",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "day",
+      "href": "/status/electricity/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "electricity",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "day",
+      "href": "/status/internet/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "internet",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "night",
+      "href": "/status/dam/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "dam",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "night",
+      "href": "/status/water/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "water",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "night",
+      "href": "/status/electricity/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "electricity",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "mode": "night",
+      "href": "/status/internet/",
+      "offset": "3px",
+      "outline": "oklch(1 0 0) solid 2px",
+      "service": "internet",
+      "visible": true
+    }
+  ],
+  "interactions": {
+    "serviceEnter": "/status/dam/",
+    "pages": [
+      {
+        "width": 1440,
+        "path": "/",
+        "background": "linear-gradient(135deg, oklch(1 0 0 / 0.96), oklch(1 0 0 / 0.82) 55%, oklch(1 0 0 / 0.92))",
+        "filter": "blur(20px) saturate(1.1)",
+        "overflow": 0
+      },
+      {
+        "width": 1440,
+        "path": "/news/",
+        "background": "linear-gradient(135deg, oklch(1 0 0 / 0.96), oklch(1 0 0 / 0.82) 55%, oklch(1 0 0 / 0.92))",
+        "filter": "blur(20px) saturate(1.1)",
+        "overflow": 0
+      },
+      {
+        "width": 390,
+        "path": "/",
+        "background": "linear-gradient(135deg, oklch(1 0 0 / 0.96), oklch(1 0 0 / 0.82) 55%, oklch(1 0 0 / 0.92))",
+        "filter": "blur(20px) saturate(1.1)",
+        "overflow": 0
+      },
+      {
+        "width": 390,
+        "path": "/news/",
+        "background": "linear-gradient(135deg, oklch(1 0 0 / 0.96), oklch(1 0 0 / 0.82) 55%, oklch(1 0 0 / 0.92))",
+        "filter": "blur(20px) saturate(1.1)",
+        "overflow": 0
+      }
+    ],
+    "links": [
+      {
+        "width": 1440,
+        "selector": ".home-news-article--lead .news-meta-author",
+        "point": {
+          "insideLink": true,
+          "x": 383,
+          "y": 668
+        },
+        "normal": {
+          "active": false,
+          "color": "oklch(0.5124 0.0183 154.1)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [95, 106, 98, 255],
+          "focusVisible": false,
+          "hovered": false,
+          "href": "https://kpshelkovo.online/kb/ok/",
+          "outline": "oklch(0.5124 0.0183 154.1) none 3px",
+          "outlineStyle": "none",
+          "outlineWidth": "3px",
+          "rect": {
+            "height": 24,
+            "width": 81.15625,
+            "x": 342.328125,
+            "y": 656.15625
+          },
+          "rgba": [95, 106, 98, 255],
+          "runningAnimations": 0,
+          "underline": "none"
+        },
+        "hover": {
+          "active": false,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [95, 106, 98, 255],
+          "focusVisible": false,
+          "hovered": true,
+          "href": "https://kpshelkovo.online/kb/ok/",
+          "outline": "oklch(0.3846 0.065 157.9) none 3px",
+          "outlineStyle": "none",
+          "outlineWidth": "3px",
+          "rect": {
+            "height": 24,
+            "width": 81.15625,
+            "x": 342.328125,
+            "y": 656.15625
+          },
+          "rgba": [33, 78, 54, 255],
+          "runningAnimations": 0,
+          "underline": "underline"
+        },
+        "focused": {
+          "active": true,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [95, 106, 98, 255],
+          "focusVisible": true,
+          "hovered": false,
+          "href": "https://kpshelkovo.online/kb/ok/",
+          "outline": "oklch(0.3846 0.065 157.9) solid 2px",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "rect": {
+            "height": 24,
+            "width": 81.15625,
+            "x": 342.328125,
+            "y": 656.15625
+          },
+          "rgba": [33, 78, 54, 255],
+          "runningAnimations": 0,
+          "underline": "underline"
+        }
+      },
+      {
+        "width": 1440,
+        "selector": ".home-news-article--lead h2 a",
+        "point": {
+          "insideLink": true,
+          "x": 460,
+          "y": 713
+        },
+        "normal": {
+          "active": false,
+          "color": "oklch(0.2821 0.0101 164.2)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [37, 43, 40, 255],
+          "focusVisible": false,
+          "hovered": false,
+          "href": "/news/2026/09/alternative-access/",
+          "outline": "oklch(0.2821 0.0101 164.2) none 3px",
+          "outlineStyle": "none",
+          "outlineWidth": "3px",
+          "rect": {
+            "height": 88.75,
+            "width": 611.328125,
+            "x": 154,
+            "y": 689.15625
+          },
+          "rgba": [37, 43, 40, 255],
+          "runningAnimations": 0,
+          "underline": "none"
+        },
+        "hover": {
+          "active": false,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [37, 43, 40, 255],
+          "focusVisible": false,
+          "hovered": true,
+          "href": "/news/2026/09/alternative-access/",
+          "outline": "oklch(0.3846 0.065 157.9) none 3px",
+          "outlineStyle": "none",
+          "outlineWidth": "3px",
+          "rect": {
+            "height": 88.75,
+            "width": 611.328125,
+            "x": 154,
+            "y": 689.15625
+          },
+          "rgba": [33, 78, 54, 255],
+          "runningAnimations": 0,
+          "underline": "underline"
+        },
+        "focused": {
+          "active": true,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [37, 43, 40, 255],
+          "focusVisible": true,
+          "hovered": false,
+          "href": "/news/2026/09/alternative-access/",
+          "outline": "oklch(0.3846 0.065 157.9) solid 2px",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "rect": {
+            "height": 88.75,
+            "width": 611.328125,
+            "x": 154,
+            "y": 689.15625
+          },
+          "rgba": [33, 78, 54, 255],
+          "runningAnimations": 0,
+          "underline": "underline"
+        }
+      },
+      {
+        "width": 1440,
+        "selector": ".home-news__secondary .home-news-article h2 a",
+        "point": {
+          "insideLink": true,
+          "x": 995,
+          "y": 707
+        },
+        "normal": {
+          "active": false,
+          "color": "oklch(0.2821 0.0101 164.2)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [37, 43, 40, 255],
+          "focusVisible": false,
+          "hovered": false,
+          "href": "/news/2026/10/domyland-pass-phone/",
+          "outline": "oklch(0.2821 0.0101 164.2) none 3px",
+          "outlineStyle": "none",
+          "outlineWidth": "3px",
+          "rect": {
+            "height": 50.75,
+            "width": 269.1875,
+            "x": 860.65625,
+            "y": 696.15625
+          },
+          "rgba": [37, 43, 40, 255],
+          "runningAnimations": 0,
+          "underline": "none"
+        },
+        "hover": {
+          "active": false,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [37, 43, 40, 255],
+          "focusVisible": false,
+          "hovered": true,
+          "href": "/news/2026/10/domyland-pass-phone/",
+          "outline": "oklch(0.3846 0.065 157.9) none 3px",
+          "outlineStyle": "none",
+          "outlineWidth": "3px",
+          "rect": {
+            "height": 50.75,
+            "width": 269.1875,
+            "x": 860.65625,
+            "y": 696.15625
+          },
+          "rgba": [33, 78, 54, 255],
+          "runningAnimations": 0,
+          "underline": "underline"
+        },
+        "focused": {
+          "active": true,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [37, 43, 40, 255],
+          "focusVisible": true,
+          "hovered": false,
+          "href": "/news/2026/10/domyland-pass-phone/",
+          "outline": "oklch(0.3846 0.065 157.9) solid 2px",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "rect": {
+            "height": 50.75,
+            "width": 269.1875,
+            "x": 860.65625,
+            "y": 696.15625
+          },
+          "rgba": [33, 78, 54, 255],
+          "runningAnimations": 0,
+          "underline": "underline"
+        }
+      },
+      {
+        "width": 1440,
+        "enter": "/news/2026/10/domyland-pass-phone/",
+        "expected": "/news/2026/10/domyland-pass-phone/"
+      },
+      {
+        "width": 390,
+        "selector": ".home-news-article--lead .news-meta-author",
+        "point": {
+          "insideLink": true,
+          "x": 249,
+          "y": 422
+        },
+        "normal": {
+          "active": false,
+          "color": "oklch(0.5124 0.0183 154.1)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [95, 106, 98, 255],
+          "focusVisible": false,
+          "hovered": false,
+          "href": "https://kpshelkovo.online/kb/ok/",
+          "outline": "oklch(0.5124 0.0183 154.1) none 3px",
+          "outlineStyle": "none",
+          "outlineWidth": "3px",
+          "rect": {
+            "height": 24,
+            "width": 81.15625,
+            "x": 208.328125,
+            "y": 416.546875
+          },
+          "rgba": [95, 106, 98, 255],
+          "runningAnimations": 0,
+          "underline": "none"
+        },
+        "hover": {
+          "active": false,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [95, 106, 98, 255],
+          "focusVisible": false,
+          "hovered": true,
+          "href": "https://kpshelkovo.online/kb/ok/",
+          "outline": "oklch(0.3846 0.065 157.9) none 3px",
+          "outlineStyle": "none",
+          "outlineWidth": "3px",
+          "rect": {
+            "height": 24,
+            "width": 81.15625,
+            "x": 208.328125,
+            "y": 416.546875
+          },
+          "rgba": [33, 78, 54, 255],
+          "runningAnimations": 0,
+          "underline": "underline"
+        },
+        "focused": {
+          "active": true,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [95, 106, 98, 255],
+          "focusVisible": true,
+          "hovered": false,
+          "href": "https://kpshelkovo.online/kb/ok/",
+          "outline": "oklch(0.3846 0.065 157.9) solid 2px",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "rect": {
+            "height": 24,
+            "width": 81.15625,
+            "x": 208.328125,
+            "y": 416.546875
+          },
+          "rgba": [33, 78, 54, 255],
+          "runningAnimations": 0,
+          "underline": "underline"
+        }
+      },
+      {
+        "width": 390,
+        "selector": ".home-news-article--lead h2 a",
+        "point": {
+          "insideLink": true,
+          "x": 144,
+          "y": 388
+        },
+        "normal": {
+          "active": false,
+          "color": "oklch(0.2821 0.0101 164.2)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [37, 43, 40, 255],
+          "focusVisible": false,
+          "hovered": false,
+          "href": "/news/2026/09/alternative-access/",
+          "outline": "oklch(0.2821 0.0101 164.2) none 3px",
+          "outlineStyle": "none",
+          "outlineWidth": "3px",
+          "rect": {
+            "height": 107.59375,
+            "width": 323.46875,
+            "x": 20,
+            "y": 450.546875
+          },
+          "rgba": [37, 43, 40, 255],
+          "runningAnimations": 0,
+          "underline": "none"
+        },
+        "hover": {
+          "active": false,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [37, 43, 40, 255],
+          "focusVisible": false,
+          "hovered": true,
+          "href": "/news/2026/09/alternative-access/",
+          "outline": "oklch(0.3846 0.065 157.9) none 3px",
+          "outlineStyle": "none",
+          "outlineWidth": "3px",
+          "rect": {
+            "height": 107.59375,
+            "width": 323.46875,
+            "x": 20,
+            "y": 450.546875
+          },
+          "rgba": [33, 78, 54, 255],
+          "runningAnimations": 0,
+          "underline": "underline"
+        },
+        "focused": {
+          "active": true,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [37, 43, 40, 255],
+          "focusVisible": true,
+          "hovered": false,
+          "href": "/news/2026/09/alternative-access/",
+          "outline": "oklch(0.3846 0.065 157.9) solid 2px",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "rect": {
+            "height": 107.59375,
+            "width": 323.46875,
+            "x": 20,
+            "y": 450.546875
+          },
+          "rgba": [33, 78, 54, 255],
+          "runningAnimations": 0,
+          "underline": "underline"
+        }
+      },
+      {
+        "width": 390,
+        "selector": ".home-news__secondary .home-news-article h2 a",
+        "point": {
+          "insideLink": true,
+          "x": 121,
+          "y": 403
+        },
+        "normal": {
+          "active": false,
+          "color": "oklch(0.2821 0.0101 164.2)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [37, 43, 40, 255],
+          "focusVisible": false,
+          "hovered": false,
+          "href": "/news/2026/10/domyland-pass-phone/",
+          "outline": "oklch(0.2821 0.0101 164.2) none 3px",
+          "outlineStyle": "none",
+          "outlineWidth": "3px",
+          "rect": {
+            "height": 82.59375,
+            "width": 242.625,
+            "x": 20,
+            "y": 801.171875
+          },
+          "rgba": [37, 43, 40, 255],
+          "runningAnimations": 0,
+          "underline": "none"
+        },
+        "hover": {
+          "active": false,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [37, 43, 40, 255],
+          "focusVisible": false,
+          "hovered": true,
+          "href": "/news/2026/10/domyland-pass-phone/",
+          "outline": "oklch(0.3846 0.065 157.9) none 3px",
+          "outlineStyle": "none",
+          "outlineWidth": "3px",
+          "rect": {
+            "height": 82.59375,
+            "width": 242.625,
+            "x": 20,
+            "y": 801.171875
+          },
+          "rgba": [33, 78, 54, 255],
+          "runningAnimations": 0,
+          "underline": "underline"
+        },
+        "focused": {
+          "active": true,
+          "color": "oklch(0.3846 0.065 157.9)",
+          "expectedActionRgba": [33, 78, 54, 255],
+          "expectedNormalRgba": [37, 43, 40, 255],
+          "focusVisible": true,
+          "hovered": false,
+          "href": "/news/2026/10/domyland-pass-phone/",
+          "outline": "oklch(0.3846 0.065 157.9) solid 2px",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "rect": {
+            "height": 82.59375,
+            "width": 242.625,
+            "x": 20,
+            "y": 801.171875
+          },
+          "rgba": [33, 78, 54, 255],
+          "runningAnimations": 0,
+          "underline": "underline"
+        }
+      },
+      {
+        "width": 390,
+        "enter": "/news/2026/10/domyland-pass-phone/",
+        "expected": "/news/2026/10/domyland-pass-phone/"
+      }
+    ],
+    "axe": [
+      {
+        "width": 1440,
+        "version": "4.12.1",
+        "counts": {
+          "inapplicable": 44,
+          "incomplete": 2,
+          "passes": 19,
+          "violations": 0
+        },
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "aria-valid-attr-value",
+            "nodes": [
+              {
+                "target": [".site-nav-dropdown-button"],
+                "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"site-header-tariff-menu\""
+              }
+            ]
+          },
+          {
+            "id": "color-contrast",
+            "nodes": [
+              {
+                "target": [".site-header-brand"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+              },
+              {
+                "target": [".site-nav-link[href$=\"news/\"]"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+              },
+              {
+                "target": [".site-nav-dropdown-button > span:nth-child(1)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+              },
+              {
+                "target": [".site-nav-link[href$=\"map/\"]"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+              },
+              {
+                "target": [".site-nav-link[href$=\"kb/\"]"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+              },
+              {
+                "target": [".site-nav-link[href$=\"sarafan/\"]"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+              },
+              {
+                "target": [".site-nav-link[href$=\"reviews/\"]"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+              },
+              {
+                "target": [".site-nav-status-link > span:nth-child(1)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+              },
+              {
+                "target": [
+                  "a[href$=\"dam/\"] > .home-services__text[data-astro-cid-ebo4hyw3=\"\"] > strong"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "target": [
+                  "a[href$=\"dam/\"] > .home-services__text[data-astro-cid-ebo4hyw3=\"\"] > span[data-home-service-label=\"\"][data-astro-cid-ebo4hyw3=\"\"]"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "width": 390,
+        "version": "4.12.1",
+        "counts": {
+          "inapplicable": 43,
+          "incomplete": 1,
+          "passes": 20,
+          "violations": 0
+        },
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "nodes": [
+              {
+                "target": [".site-header-brand"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+              },
+              {
+                "target": [".site-header-menu-label"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+              },
+              {
+                "target": [
+                  "a[href$=\"dam/\"] > .home-services__text[data-astro-cid-ebo4hyw3=\"\"] > strong"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "target": [
+                  "a[href$=\"dam/\"] > .home-services__text[data-astro-cid-ebo4hyw3=\"\"] > span[data-home-service-label=\"\"][data-astro-cid-ebo4hyw3=\"\"]"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "menu": {
+      "exists": true,
+      "expanded": "true",
+      "links": 2,
+      "panelVisible": true,
+      "afterEscape": {
+        "expanded": "false",
+        "returned": true
+      }
+    }
+  }
+}
