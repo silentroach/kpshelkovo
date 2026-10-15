@@ -1,8 +1,8 @@
-# Первая примерка новостей
+# Приёмка оформления новостей
 
 ## Состояние
 
-15 октября 2026 года. Реализация разрешена владельцем; окончательные параметры ещё не согласованы. Это отчёт первой примерки, не завершение change и не основание закрывать #1053. Дизайн-гайд будет обновлён после выбора владельца.
+15 октября 2026 года. Владелец принял подложку закрепления и размеры вступления по снимкам коммита `a3ce688b`, разрешив завершить change. Принятые значения внесены в дизайн-гайд; реализация после примерки не менялась.
 
 - Ветка: `plan/1053-news-presentation`.
 - База: `09b7be695abf8c1a529a3906f2954281a8423996`.
@@ -21,13 +21,13 @@
 
 В парных снимках слева production до правки, справа локальная примерка.
 
-- [Лента, сравнение на 390 px](/openspec/changes/refine-news-presentation/screenshots/compare-feed-390.webp).
-- [Налоговая статья, сравнение на 390 px](/openspec/changes/refine-news-presentation/screenshots/compare-tax-390.webp).
-- [Инструкция про объезд, сравнение на 390 px](/openspec/changes/refine-news-presentation/screenshots/compare-access-390.webp).
-- Лента на 1440 px: [до](/openspec/changes/refine-news-presentation/screenshots/before-feed-1440.webp), [после](/openspec/changes/refine-news-presentation/screenshots/after-feed-1440.webp).
-- Налоговая статья на 1440 px: [до](/openspec/changes/refine-news-presentation/screenshots/before-tax-1440.webp), [после](/openspec/changes/refine-news-presentation/screenshots/after-tax-1440.webp).
-- Инструкция про объезд на 1440 px: [до](/openspec/changes/refine-news-presentation/screenshots/before-access-1440.webp), [после](/openspec/changes/refine-news-presentation/screenshots/after-access-1440.webp).
-- Узкие состояния: [лента 320 px](/openspec/changes/refine-news-presentation/screenshots/after-feed-320.webp), [налоговая статья 320 px](/openspec/changes/refine-news-presentation/screenshots/after-tax-320.webp), [объезд 320 px](/openspec/changes/refine-news-presentation/screenshots/after-access-320.webp).
+- [Лента, сравнение на 390 px](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/compare-feed-390.webp).
+- [Налоговая статья, сравнение на 390 px](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/compare-tax-390.webp).
+- [Инструкция про объезд, сравнение на 390 px](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/compare-access-390.webp).
+- Лента на 1440 px: [до](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/before-feed-1440.webp), [после](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/after-feed-1440.webp).
+- Налоговая статья на 1440 px: [до](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/before-tax-1440.webp), [после](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/after-tax-1440.webp).
+- Инструкция про объезд на 1440 px: [до](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/before-access-1440.webp), [после](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/after-access-1440.webp).
+- Узкие состояния: [лента 320 px](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/after-feed-320.webp), [налоговая статья 320 px](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/after-tax-320.webp), [объезд 320 px](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/after-access-320.webp).
 
 ## Первичные измерения
 
@@ -47,9 +47,21 @@
 - Найдено существующее ограничение при 320 px и увеличении корневого размера текста до 200%: внутреннее переполнение и обрезка карточек. Оно воспроизводится и на production с одинаковыми размерами: карточка 256 px, её `scrollWidth` 392 px, страница 328 px. Это проверка root font scaling, не browser zoom. Новую регрессию примерки не обнаружили; исправление общего поведения увеличенного текста не входит в эту локальную примерку.
 - Проверка проведена в headless Chromium. Нативные мобильные браузеры и системное увеличение текста не проверены.
 
+## Завершающая интеграционная проверка
+
+После согласования примерки отдельный субагент проверил оставшиеся сценарии в сессии `issue1053-final-qa`, не повторяя пройденную матрицу.
+
+- `/news/2026/05/ok-meeting-june/` проверена на 1440×1000, 390×844 и 320×844. Настоящая карта загрузилась, переполнения нет. Вступление имеет 20/18/18 px, основной текст 17 px, теги 13 px и вес 400.
+- Временное удаление тегов на всех трёх ширинах не создаёт пустой панели или переполнения. Исходный DOM восстановлен перезагрузкой.
+- Контрольная главная на тех же ширинах сохраняет прежнее оформление: прозрачные новостные блоки и метаданные 14 px, без переполнения.
+- У тега статьи и источника проверены фактический hover и клавиатурный фокус через Tab на всех трёх ширинах. Контур 2 px с отступом 2 px не обрезается. Enter открывает страницу тега, Back возвращает статью. Внешний источник сохраняет нативный адрес Telegram, `_blank`, `noreferrer noopener`; внешний сайт не открывали.
+- На фоне статьи `#fafbf8` контраст тега 6.65:1, при hover/focus 8.06:1; источника 5.43:1, при hover/focus 9.16:1; контура фокуса 5.54:1. Метод расчёта тот же, что у первичных измерений.
+- Итоговые снимки: [мероприятие 1440 px](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/final-event-1440.webp), [390 px](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/final-event-390.webp), [320 px](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/final-event-320.webp), [контрольная главная 390 px](/openspec/changes/archive/2026-10-15-refine-news-presentation/screenshots/final-home-390.webp).
+
 ## Автоматические проверки
 
 - `pnpm openspec:validate`: 50 активных specs/change и 101 архив успешно прошли строгую валидацию.
+- После sync/archive: 49 основных specs и 102 архива успешно прошли ту же строгую валидацию; форматирование изменённых документов и `git diff --check` также прошли.
 - `pnpm typecheck`: успешно.
 - `pnpm lint`: успешно, включая 8 тестов локального правила Oxlint.
 - `pnpm --filter @shelkovo/www exec vitest run`: 242 файла, 2003 теста успешно.
@@ -62,6 +74,6 @@
 
 Необязательное предложение: сократить набор булевых полей снимка теста закрепления. Для первой примерки тест сохранён: он проверяет два состояния и доступность, его снимок остаётся небольшим. К этому упрощению можно вернуться при окончательном ревью; на поведение сайта оно не влияет.
 
-## Дальнейшая приёмка
+## Завершение
 
-Перед завершением change остаются согласование примерки, обновление дизайн-гайда, итоговая интеграционная проверка, включая страницу с мероприятием, и ревью окончательного состояния. Print media потребуется повторить, только если изменятся его входы.
+Повтор reviewer после согласования не нашёл дефектов реализации; замечание о противоречивом перечне оставшихся этапов в этом отчёте исправлено. Адресный повтор подтвердил исправление, просмотрел четыре итоговых снимка и не нашёл препятствий для sync/archive. Реализация с момента примерки не менялась, поэтому результаты тестов, сборки и браузерных проверок остаются актуальными. Основные specs синхронизированы, все 6 задач завершены, change архивирован. Финальный адресный повтор reviewer проверил staged diff синхронизации, архив, задачи и ссылки, не обнаружив препятствий для подготовки PR.
