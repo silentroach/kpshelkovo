@@ -160,7 +160,7 @@ const schema = techArticleSchema({
               <>
                 {hasTranscriptParts && (
                   <li class="meeting-transcript-part">
-                    <h3 class="ui-card-title">
+                    <h3 class="ui-prose-title">
                       {formatTranscriptPartLabel(part)}
                     </h3>
                   </li>
@@ -185,18 +185,18 @@ const schema = techArticleSchema({
                         data-pagefind-ignore="all"
                       >
                         <a
+                          href={`#${formatMeetingSpeakerAnchor(segment.speaker)}`}
+                          class="ui-link meeting-transcript-speaker"
+                        >
+                          {segment.speaker.label}
+                        </a>
+
+                        <a
                           href={`#${segment.anchor}`}
                           aria-label={`Ссылка на фрагмент ${timestamp}`}
                           class="ui-link ui-num meeting-transcript-time"
                         >
                           {timestamp}
-                        </a>
-
-                        <a
-                          href={`#${formatMeetingSpeakerAnchor(segment.speaker)}`}
-                          class="ui-link meeting-transcript-speaker"
-                        >
-                          {segment.speaker.label}
                         </a>
                       </div>
 
@@ -304,15 +304,21 @@ const schema = techArticleSchema({
   }
 
   .meeting-transcript {
-    border-block-start: 1px solid var(--color-border);
+    padding-block-start: 0.5rem;
   }
 
-  .meeting-transcript > :global(:not(:last-child)) {
-    border-block-end: 1px solid var(--color-border);
+  .meeting-transcript-segment + .meeting-transcript-segment {
+    margin-block-start: 0.5rem;
   }
 
   .meeting-transcript-part {
-    padding-block: 2.5rem 1rem;
+    padding-block-end: 1rem;
+  }
+
+  .meeting-transcript-segment + .meeting-transcript-part {
+    margin-block-start: 2rem;
+    border-block-start: 1px solid var(--color-border);
+    padding-block-start: 1.5rem;
   }
 
   .meeting-transcript-segment {
@@ -347,14 +353,24 @@ const schema = techArticleSchema({
 
   .meeting-transcript-time {
     display: inline-block;
+    color: var(--color-text-muted);
     font-size: 0.875rem;
     line-height: 1.5rem;
+    white-space: nowrap;
+    text-decoration-color: color-mix(in oklab, currentColor 38%, transparent);
+  }
+
+  .meeting-transcript-time:is(:hover, :focus-visible) {
+    color: var(--color-primary);
+    text-decoration-color: currentColor;
   }
 
   .meeting-transcript-speaker {
-    font-size: 0.8125rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-size: 1rem;
     font-weight: 600;
-    line-height: 1.25rem;
+    line-height: 1.5rem;
   }
 
   .meeting-transcript-text {
@@ -414,7 +430,12 @@ const schema = techArticleSchema({
     }
 
     .meeting-transcript-part {
-      padding-block: 3rem 1.25rem;
+      padding-block-end: 1.25rem;
+    }
+
+    .meeting-transcript-segment + .meeting-transcript-part {
+      margin-block-start: 2.5rem;
+      padding-block-start: 2rem;
     }
 
     .meeting-transcript-segment {
@@ -436,10 +457,6 @@ const schema = techArticleSchema({
     .meeting-transcript-time,
     .meeting-transcript-speaker {
       display: block;
-    }
-
-    .meeting-transcript-speaker {
-      font-size: 0.875rem;
     }
 
     .meeting-transcript-text {
