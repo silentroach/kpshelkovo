@@ -2,7 +2,7 @@
 
 ## Context
 
-В проекте уже есть Markdown-профили `advisor` и `reviewer`. OpenCode V2 поддерживает отдельную модель подагента и запрет действия `subagent`. Мотивация — в [proposal](/openspec/changes/add-opencode-worker/proposal.md); размещение проектных правил следует [ADR-038](/docs/decisions/038-openspec-development-workflow.md).
+В проекте уже есть Markdown-профили `advisor` и `reviewer`. OpenCode V2 поддерживает отдельную модель подагента и запрет действия `subagent`. Мотивация — в [proposal](/openspec/changes/archive/2026-10-15-add-opencode-worker/proposal.md); размещение проектных правил следует [ADR-038](/docs/decisions/038-openspec-development-workflow.md).
 
 ## Goals / Non-Goals
 
