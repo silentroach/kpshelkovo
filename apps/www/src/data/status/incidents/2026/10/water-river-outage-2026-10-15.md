@@ -3,6 +3,7 @@ title: Внеплановое отключение воды в Шелково Р
 service: water
 kind: incident
 started_at: 15.10.2026
+ended_at: 15.10.2026 16:00
 areas:
   - river
 source_url: https://okkomfort.domyland.app/news?targetId=119568&entityName=news&t=okkomfort
