@@ -237,19 +237,33 @@ const schema = techArticleSchema({
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.625rem;
+    gap: 0.625rem 1rem;
     color: var(--color-text-muted);
     font-size: 0.875rem;
     line-height: 1.5rem;
   }
 
   .meeting-meta__date {
-    color: var(--color-text);
-    font-weight: 600;
+    font-weight: 400;
   }
 
   .meeting-meta :global(.link-with-icon) {
+    color: var(--color-text-muted);
     font-weight: 400;
+    text-decoration-line: none;
+    text-decoration-color: currentColor;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .meeting-meta :global(.link-with-icon:is(:hover, :focus-visible)) {
+    color: var(--color-primary);
+    text-decoration-line: underline;
+  }
+
+  .meeting-meta :global(.link-with-icon:focus-visible) {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
   }
 
   .meeting-context {

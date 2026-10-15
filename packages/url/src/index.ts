@@ -1,6 +1,6 @@
 const ABSOLUTE_URL_SCHEME = /^(?:https?:|mailto:|tel:)/i;
 const TELEGRAM_HOST = /^(?:www\.)?(?:t\.me|telegram\.me)$/i;
-const DOMYLAND_HOST = /^(?:[^.]+\.)*domyland\.app$/i;
+const DOMYLAND_HOST = /^(?:[^.]+\.)*domyland\.(?:app|ru)$/i;
 
 export const isAbsoluteUrl = (value: string): boolean =>
   ABSOLUTE_URL_SCHEME.test(value) || value.startsWith('//');
