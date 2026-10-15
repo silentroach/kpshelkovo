@@ -52,7 +52,7 @@ const visibleAreas = appliesToAllAreas ? [] : areas;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.625rem;
+    gap: 0.625rem 1rem;
     color: var(--color-text-muted);
     font-size: 0.875rem;
     line-height: 1.5rem;
@@ -63,42 +63,31 @@ const visibleAreas = appliesToAllAreas ? [] : areas;
     font-weight: 400;
   }
 
-  .news-meta-author {
-    color: var(--color-text-muted);
-    font-weight: 400;
-  }
-
   .news-meta--list {
     min-width: 0;
     gap: 0.25rem 1rem;
     overflow-wrap: anywhere;
   }
 
-  .news-meta-author {
+  .news-meta-author,
+  .news-meta :global(.link-with-icon) {
+    color: var(--color-text-muted);
+    font-weight: 400;
     text-decoration-line: none;
     text-decoration-color: currentColor;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.2em;
   }
 
-  .news-meta-author:is(:hover, :focus-visible) {
+  .news-meta-author:is(:hover, :focus-visible),
+  .news-meta :global(.link-with-icon:is(:hover, :focus-visible)) {
     color: var(--color-primary);
     text-decoration-line: underline;
   }
 
-  .news-meta-author:focus-visible {
+  .news-meta-author:focus-visible,
+  .news-meta :global(.link-with-icon:focus-visible) {
     outline: 2px solid currentColor;
     outline-offset: 3px;
-  }
-
-  .news-meta :global(.link-with-icon) {
-    color: var(--color-text-muted);
-    font-weight: 400;
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
-  }
-
-  .news-meta :global(.link-with-icon:is(:hover, :focus-visible)) {
-    color: var(--color-primary);
   }
 </style>

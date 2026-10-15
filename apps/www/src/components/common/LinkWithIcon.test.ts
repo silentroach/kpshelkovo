@@ -22,21 +22,25 @@ describe('LinkWithIcon', () => {
     expect(html).toContain('@shelkovoecoclub');
   });
 
-  it('renders Domyland icon and default source label', async () => {
-    const container = await createAstroContainer();
-    const html = await container.renderToString(LinkWithIcon, {
-      props: {
-        href: 'https://okkomfort.domyland.app/news',
-        ariaLabelPrefix: 'Источник'
-      }
-    });
+  it.each(['https://okkomfort.domyland.app/news', 'https://lk.domyland.ru/newsfeed/news/119395'])(
+    'renders Domyland icon and default source label for %s',
+    async (href) => {
+      const container = await createAstroContainer();
+      const html = await container.renderToString(LinkWithIcon, {
+        props: {
+          href,
+          ariaLabelPrefix: 'Источник'
+        }
+      });
 
-    expect(html).toContain('aria-label="Источник: Домиленд"');
-    expect(html).toContain('viewBox="0 0 133 141"');
-    expect(html).toContain('>источник<');
-  });
+      expect(html).toContain('aria-label="Источник: Домиленд"');
+      expect(html).toContain('viewBox="0 0 133 141"');
+      expect(html).toContain('>источник<');
+      expect(html).toContain(`href="${href}"`);
+    }
+  );
 
-  it('renders generic external link with hostname label', async () => {
+  it('renders a globe for generic external links with hostname label', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(LinkWithIcon, {
       props: {
@@ -47,7 +51,8 @@ describe('LinkWithIcon', () => {
     });
 
     expect(html).toContain('aria-label="Источник: example.com"');
-    expect(html).not.toContain('viewBox="0 0 24 24"');
+    expect(html).toContain('viewBox="0 0 24 24"');
+    expect(html).toContain('stroke="currentColor"');
     expect(html).not.toContain('viewBox="0 0 133 141"');
     expect(html).toContain('>Подробнее<');
   });

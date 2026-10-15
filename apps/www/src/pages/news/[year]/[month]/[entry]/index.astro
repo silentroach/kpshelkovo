@@ -243,20 +243,6 @@ const schema = newsArticleSchema({
     width: 100%;
   }
 
-  @media screen {
-    .news-article-body > .ui-prose > :global(p:first-child:not(:has(img))) {
-      color: var(--color-text);
-      font-size: 1.125rem;
-      line-height: 1.6;
-    }
-  }
-
-  @media screen and (min-width: 48rem) {
-    .news-article-body > .ui-prose > :global(p:first-child:not(:has(img))) {
-      font-size: 1.25rem;
-    }
-  }
-
   @media screen and (width < 40rem) {
     .news-article-header__content .ui-page-title {
       overflow-wrap: anywhere;

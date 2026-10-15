@@ -66,22 +66,29 @@ describe('telegram package', () => {
 });
 
 describe('isDomylandUrl', () => {
-  it('detects domyland app URLs with http and https', () => {
+  it('detects domyland app and ru URLs with http and https', () => {
     expect(isDomylandUrl('https://okkomfort.domyland.app/news')).toBe(true);
     expect(isDomylandUrl('http://demo.domyland.app')).toBe(true);
     expect(isDomylandUrl('https://domyland.app')).toBe(true);
-    expect(isDomylandUrl('https://domyland.ru')).toBe(false);
+    expect(isDomylandUrl('https://domyland.ru')).toBe(true);
+    expect(isDomylandUrl('https://lk.domyland.ru/newsfeed/news/119395')).toBe(true);
+    expect(isDomylandUrl('http://okkomfort.domyland.ru/news')).toBe(true);
+    expect(isDomylandUrl('https://example.domyland.ru.evil.com')).toBe(false);
     expect(isDomylandUrl('https://example.com/domyland.app')).toBe(false);
   });
 
   it('handles query strings and hashes without a trailing slash', () => {
     expect(isDomylandUrl('https://domyland.app?foo=bar')).toBe(true);
     expect(isDomylandUrl('https://okkomfort.domyland.app#section')).toBe(true);
+    expect(isDomylandUrl('https://lk.domyland.ru?foo=bar')).toBe(true);
+    expect(isDomylandUrl('https://okkomfort.domyland.ru#section')).toBe(true);
   });
 
   it('rejects non-http schemes and relative paths', () => {
     expect(isDomylandUrl('ftp://domyland.app')).toBe(false);
     expect(isDomylandUrl('//domyland.app')).toBe(false);
     expect(isDomylandUrl('/domyland.app')).toBe(false);
+    expect(isDomylandUrl('ftp://domyland.ru')).toBe(false);
+    expect(isDomylandUrl('//domyland.ru')).toBe(false);
   });
 });

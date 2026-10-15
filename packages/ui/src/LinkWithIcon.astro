@@ -1,5 +1,6 @@
 ---
 import DomylandIcon from './icons/system/Domyland.astro';
+import GlobeIcon from './icons/system/Globe.astro';
 import TelegramIcon from './icons/system/Telegram.astro';
 import { isDomylandUrl, isTelegramUrl } from '@shelkovo/url';
 
@@ -50,18 +51,24 @@ const resolvedAriaLabel =
   aria-label={resolvedAriaLabel}
   class:list={[
     'ui-link link-with-icon',
-    (isTelegramLink || isDomylandLink) && 'link-with-icon--branded',
     isTelegramLink && 'link-with-icon--telegram',
     className,
   ]}
 >
   {isTelegramLink && <TelegramIcon class={resolvedIconClass} />}
   {isDomylandLink && <DomylandIcon class={resolvedIconClass} />}
+  {!isTelegramLink && !isDomylandLink && (
+    <GlobeIcon class={resolvedIconClass} />
+  )}
   <span class={textClass}>{resolvedLabel}</span>
 </a>
 
 <style>
   .link-with-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    vertical-align: top;
     color: var(--color-primary);
     font-weight: 600;
     transition: color 0.2s ease;
@@ -71,16 +78,11 @@ const resolvedAriaLabel =
     color: var(--color-primary-hover);
   }
 
-  .link-with-icon--branded {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
   .link-with-icon > :global(.link-with-icon__icon) {
     width: 0.875rem;
     height: 0.875rem;
     flex-shrink: 0;
+    transform: translateY(1px);
   }
 
   .link-with-icon--telegram > :global(.link-with-icon__icon) {
