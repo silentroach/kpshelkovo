@@ -1,6 +1,7 @@
 /// <reference types="astro/client" />
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { Window } from 'happy-dom';
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createAstroContainer } from '@/test/astro-container';
 
@@ -13,6 +14,10 @@ beforeEach(() => {
   vi.setSystemTime(new Date('2026-10-01T09:00:00Z'));
 });
 afterEach(() => vi.useRealTimers());
+
+const window = new Window();
+const document = window.document;
+afterAll(() => window.happyDOM.close());
 
 const baseArticle: NewsListArticle = {
   id: '2026/05/pinned',
@@ -57,28 +62,61 @@ describe('NewsCard', () => {
     `);
   });
 
-  it('announces pinned state without prohibited aria-label on a plain span', async () => {
+  it('keeps the pinned label visible in metadata outside the native heading link', async () => {
     const container = await createAstroContainer();
-    const html = await container.renderToString(NewsCard, {
-      props: { article: baseArticle }
-    });
+    const states = [];
+    for (const pinned of [true, false]) {
+      document.body.innerHTML = await container.renderToString(NewsCard, {
+        props: { article: { ...baseArticle, pinned } }
+      });
+      const heading = document.querySelector('h3');
+      const link = heading?.querySelector('a[href]');
+      const metadata = document.querySelector('.news-card__meta');
+      const label = document.querySelector('.news-card__pinned-label');
 
-    const heading = html.match(/<h3[\s\S]*?<\/h3>/u)?.[0] ?? '';
+      states.push({
+        pinned,
+        hasLabel: Boolean(label),
+        hasTextLabel: Boolean(label?.textContent.trim()),
+        labelSharesMetadataWithDate: Boolean(
+          label && metadata?.contains(label) && metadata.querySelector('time[datetime]')
+        ),
+        labelInsideHeading: Boolean(label && heading?.contains(label)),
+        labelHidden: Boolean(label?.closest('[hidden], [aria-hidden="true"], .sr-only')),
+        hasProhibitedSpanAriaLabel: Boolean(document.querySelector('span[aria-label]')),
+        headingContainsOnlyArticleTitle: heading?.textContent.trim() === baseArticle.title,
+        nativeArticleLink:
+          link?.getAttribute('href') === baseArticle.url &&
+          !link.hasAttribute('role') &&
+          !link.hasAttribute('tabindex')
+      });
+    }
 
-    expect({
-      hasAccessiblePinnedLabel: /<span(?![^>]*aria-hidden)[^>]*>Закреплено сверху<\/span>/u.test(
-        heading
-      ),
-      href: heading.match(/<a href="([^"]+)"/u)?.[1],
-      hasDecorativePinnedIcon: /title="закреплено сверху" aria-hidden="true"/u.test(heading),
-      hasProhibitedAriaLabel: /aria-label=/u.test(heading)
-    }).toMatchInlineSnapshot(`
-      {
-        "hasAccessiblePinnedLabel": true,
-        "hasDecorativePinnedIcon": true,
-        "hasProhibitedAriaLabel": false,
-        "href": "/news/2026/05/pinned/",
-      }
+    expect(states).toMatchInlineSnapshot(`
+      [
+        {
+          "hasLabel": true,
+          "hasProhibitedSpanAriaLabel": false,
+          "hasTextLabel": true,
+          "headingContainsOnlyArticleTitle": true,
+          "labelHidden": false,
+          "labelInsideHeading": false,
+          "labelSharesMetadataWithDate": true,
+          "nativeArticleLink": true,
+          "pinned": true,
+        },
+        {
+          "hasLabel": false,
+          "hasProhibitedSpanAriaLabel": false,
+          "hasTextLabel": false,
+          "headingContainsOnlyArticleTitle": true,
+          "labelHidden": false,
+          "labelInsideHeading": false,
+          "labelSharesMetadataWithDate": false,
+          "nativeArticleLink": true,
+          "pinned": false,
+        },
+      ]
     `);
   });
 });

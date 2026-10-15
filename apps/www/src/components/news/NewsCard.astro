@@ -1,6 +1,5 @@
 ---
 import { formatTextHtml } from '@shelkovo/typography';
-import { StarIcon } from '@shelkovo/ui/icons';
 import type { NewsListArticle } from '../../lib/news/types';
 import NewsMeta from './NewsMeta.astro';
 import NewsTagList from './NewsTagList.astro';
@@ -13,7 +12,13 @@ interface Props {
 const { article, featured = false } = Astro.props;
 ---
 
-<article class:list={[featured ? 'ui-shell-strong' : 'ui-shell', 'news-card']}>
+<article
+  class:list={[
+    featured ? 'ui-shell-strong' : 'ui-shell',
+    'news-card',
+    { 'news-card--pinned': article.pinned },
+  ]}
+>
   <div class="news-card__content">
     <div class="news-card__header">
       <h3 class="ui-entry-title news-card__title">
@@ -22,26 +27,19 @@ const { article, featured = false } = Astro.props;
           class="ui-link"
           set:html={formatTextHtml(article.title)}
         />
-        {article.pinned && (
-          <>
-            <span
-              class="news-card__pinned-icon"
-              title="закреплено сверху"
-              aria-hidden="true"
-            >
-              <StarIcon />
-            </span>
-            <span class="news-card__pinned-label">Закреплено сверху</span>
-          </>
-        )}
       </h3>
 
-      <NewsMeta
-        publishedIso={article.publishedIso}
-        author={article.author}
-        fullAuthorName
-        className="news-meta--list"
-      />
+      <div class="news-card__meta">
+        {article.pinned && (
+          <span class="news-card__pinned-label">Закреплено</span>
+        )}
+        <NewsMeta
+          publishedIso={article.publishedIso}
+          author={article.author}
+          fullAuthorName
+          className="news-meta--list"
+        />
+      </div>
     </div>
 
     <p
@@ -59,6 +57,14 @@ const { article, featured = false } = Astro.props;
     overflow: hidden;
   }
 
+  .news-card--pinned {
+    background: color-mix(
+      in oklab,
+      var(--color-accent-soft) 35%,
+      var(--color-bg)
+    );
+  }
+
   .news-card__content {
     padding: 1.25rem;
   }
@@ -72,9 +78,6 @@ const { article, featured = false } = Astro.props;
   }
 
   .news-card__title {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
     font-size: 1.5rem;
   }
 
@@ -99,28 +102,19 @@ const { article, featured = false } = Astro.props;
     outline-offset: 3px;
   }
 
-  .news-card__pinned-icon {
-    display: inline-flex;
-    flex-shrink: 0;
-    margin-block-start: 0.25rem;
-    color: var(--color-star);
-  }
-
-  .news-card__pinned-icon > :global(svg) {
-    width: 1rem;
-    height: 1rem;
+  .news-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1rem;
   }
 
   .news-card__pinned-label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+    color: var(--color-accent-text);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5rem;
   }
 
   .news-card__summary {

@@ -185,7 +185,7 @@ const schema = newsArticleSchema({
     row-gap: 0.375rem;
     color: var(--color-text-muted);
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 400;
     line-height: 1.25rem;
   }
 
@@ -195,7 +195,7 @@ const schema = newsArticleSchema({
       var(--color-primary) 38%,
       var(--color-text-muted) 62%
     );
-    font-weight: 600;
+    font-weight: 400;
     text-decoration-line: underline;
     text-decoration-color: transparent;
     text-decoration-thickness: 0.08em;
@@ -241,6 +241,20 @@ const schema = newsArticleSchema({
     display: grid;
     gap: 1rem;
     width: 100%;
+  }
+
+  @media screen {
+    .news-article-body > .ui-prose > :global(p:first-child:not(:has(img))) {
+      color: var(--color-text);
+      font-size: 1.125rem;
+      line-height: 1.6;
+    }
+  }
+
+  @media screen and (min-width: 48rem) {
+    .news-article-body > .ui-prose > :global(p:first-child:not(:has(img))) {
+      font-size: 1.25rem;
+    }
   }
 
   @media screen and (width < 40rem) {
