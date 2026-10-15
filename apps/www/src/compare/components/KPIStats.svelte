@@ -16,8 +16,8 @@
   }
 
   function getMedianTone(diff: number): string {
-    if (diff > 0) return 'danger';
-    if (diff < 0) return 'success';
+    if (diff > 0) return 'costlier';
+    if (diff < 0) return 'cheaper';
     return 'muted';
   }
 </script>
@@ -192,12 +192,12 @@
     line-height: 1.25;
   }
 
-  .danger {
-    color: var(--color-danger-text);
+  .costlier {
+    color: var(--color-warning-text);
   }
 
-  .success {
-    color: var(--color-success-text);
+  .cheaper {
+    color: var(--color-primary);
   }
 
   .muted {

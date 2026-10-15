@@ -510,15 +510,15 @@
   }
 
   .filter-count--cheaper {
-    border-color: var(--color-success-border);
-    background: var(--color-success-soft);
-    color: var(--color-success-text);
+    border-color: var(--color-border);
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
   }
 
   .filter-count--more {
-    border-color: var(--color-danger-border);
-    background: var(--color-danger-soft);
-    color: var(--color-danger-text);
+    border-color: var(--color-warning-border);
+    background: var(--color-warning-soft);
+    color: var(--color-warning-text);
   }
 
   .map-toggle {

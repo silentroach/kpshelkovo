@@ -66,11 +66,11 @@
       </span>
       {#if !isBaseline && comparison && comparison.tariffDelta !== 0}
         {#if comparison.isCheaper}
-          <span class="ui-num tariff-delta ui-delta-success">
+          <span class="ui-num tariff-delta tariff-delta--cheaper">
             дешевле на {formatCurrency(Math.abs(comparison.tariffDelta))}
           </span>
         {:else}
-          <span class="ui-num tariff-delta ui-delta-warning">
+          <span class="ui-num tariff-delta tariff-delta--costlier">
             дороже на {formatCurrency(Math.abs(comparison.tariffDelta))}
           </span>
         {/if}
@@ -145,7 +145,7 @@
     align-items: center;
     color: var(--color-text-muted);
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 400;
     line-height: 1;
   }
 
@@ -174,6 +174,14 @@
     font-weight: 400;
     line-height: 1.25;
     text-align: right;
+  }
+
+  .tariff-delta--cheaper {
+    color: var(--color-primary);
+  }
+
+  .tariff-delta--costlier {
+    color: var(--color-warning-text);
   }
 
   .baseline-label {
