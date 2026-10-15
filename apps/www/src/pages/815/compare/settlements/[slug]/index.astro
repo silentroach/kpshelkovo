@@ -377,7 +377,7 @@ const assumption = tariffCalc?.assumption;
                 )}
               </div>
               {settlement.tariff.normalizedIsEstimate && (
-                <p class="settlement-tariff-detail settlement-tariff-detail--estimate">
+                <p class="settlement-tariff-detail">
                   {formatTariffBase(settlement.tariff)}
                 </p>
               )}
@@ -1048,12 +1048,18 @@ const assumption = tariffCalc?.assumption;
     line-height: 1rem;
   }
 
-  .settlement-tariff-detail--estimate {
-    opacity: 0.75;
+  .settlement-tariff-value {
+    font-size: 1.75rem;
+    line-height: 1.25;
+  }
+
+  .settlement-tariff-value .ui-unit {
+    display: inline-block;
+    white-space: nowrap;
   }
 
   .settlement-delta-value--cheaper {
-    color: var(--color-success-text);
+    color: var(--color-primary);
   }
 
   .settlement-delta-value--costlier {
