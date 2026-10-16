@@ -1,0 +1,976 @@
+<!doctype html>
+<html data-astro-transition-scope="astro-nfpogox7-1" lang="ru" data-astro-cid-z4jru4n3="">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c';
+        src: url('/static/fonts/e3822b075373eec8.woff2') format('woff2');
+        font-display: swap;
+        unicode-range:
+          U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+          U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        font-weight: 400;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c';
+        src: url('/static/fonts/aee7fc448115de64.woff2') format('woff2');
+        font-display: swap;
+        unicode-range:
+          U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+          U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        font-weight: 600;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c';
+        src: url('/static/fonts/3691c4b98eab8332.woff2') format('woff2');
+        font-display: swap;
+        unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+        font-weight: 400;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c';
+        src: url('/static/fonts/a53e083586ffbf4b.woff2') format('woff2');
+        font-display: swap;
+        unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+        font-weight: 600;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c';
+        src: url('/static/fonts/9177237b79521d03.woff2') format('woff2');
+        font-display: swap;
+        unicode-range:
+          U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+          U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+          U+2C60-2C7F, U+A720-A7FF;
+        font-weight: 400;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c';
+        src: url('/static/fonts/7a770559affdd68f.woff2') format('woff2');
+        font-display: swap;
+        unicode-range:
+          U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+          U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+          U+2C60-2C7F, U+A720-A7FF;
+        font-weight: 600;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: BlinkMacSystemFont';
+        src: local('BlinkMacSystemFont');
+        font-display: swap;
+        font-weight: 400;
+        font-style: normal;
+        size-adjust: 109.963%;
+        ascent-override: 85.0286%;
+        descent-override: 24.099%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Segoe UI';
+        src: local('Segoe UI');
+        font-display: swap;
+        font-weight: 400;
+        font-style: normal;
+        size-adjust: 103.3022%;
+        ascent-override: 90.5111%;
+        descent-override: 25.6529%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Roboto';
+        src: local('Roboto');
+        font-display: swap;
+        font-weight: 400;
+        font-style: normal;
+        size-adjust: 102.962%;
+        ascent-override: 90.8102%;
+        descent-override: 25.7376%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Helvetica Neue';
+        src: local('Helvetica Neue');
+        font-display: swap;
+        font-weight: 400;
+        font-style: normal;
+        size-adjust: 101.7778%;
+        ascent-override: 91.8668%;
+        descent-override: 26.0371%;
+        line-gap-override: 0%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Arial';
+        src: local('Arial');
+        font-display: swap;
+        font-weight: 400;
+        font-style: normal;
+        size-adjust: 102.7365%;
+        ascent-override: 91.0095%;
+        descent-override: 25.7942%;
+        line-gap-override: 0%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: BlinkMacSystemFont';
+        src: local('BlinkMacSystemFont');
+        font-display: swap;
+        font-weight: 600;
+        font-style: normal;
+        size-adjust: 109.963%;
+        ascent-override: 85.0286%;
+        descent-override: 24.099%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Segoe UI';
+        src: local('Segoe UI');
+        font-display: swap;
+        font-weight: 600;
+        font-style: normal;
+        size-adjust: 103.3022%;
+        ascent-override: 90.5111%;
+        descent-override: 25.6529%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Roboto';
+        src: local('Roboto');
+        font-display: swap;
+        font-weight: 600;
+        font-style: normal;
+        size-adjust: 102.962%;
+        ascent-override: 90.8102%;
+        descent-override: 25.7376%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Helvetica Neue';
+        src: local('Helvetica Neue');
+        font-display: swap;
+        font-weight: 600;
+        font-style: normal;
+        size-adjust: 101.7778%;
+        ascent-override: 91.8668%;
+        descent-override: 26.0371%;
+        line-gap-override: 0%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Arial';
+        src: local('Arial');
+        font-display: swap;
+        font-weight: 600;
+        font-style: normal;
+        size-adjust: 102.7365%;
+        ascent-override: 91.0095%;
+        descent-override: 25.7942%;
+        line-gap-override: 0%;
+      }
+      :root {
+        --font-fira-sans:
+          'Fira Sans-43195dd6e5c2d84c', 'Fira Sans-43195dd6e5c2d84c fallback: BlinkMacSystemFont',
+          'Fira Sans-43195dd6e5c2d84c fallback: Segoe UI',
+          'Fira Sans-43195dd6e5c2d84c fallback: Roboto',
+          'Fira Sans-43195dd6e5c2d84c fallback: Helvetica Neue',
+          'Fira Sans-43195dd6e5c2d84c fallback: Arial', system-ui;
+      }
+    </style>
+    <style>
+      @font-face {
+        font-family: 'PT Serif-1748d6e42043ee54';
+        src: url('/static/fonts/9601f258049b517c.woff2') format('woff2');
+        font-display: swap;
+        unicode-range:
+          U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+          U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        font-weight: 700;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'PT Serif-1748d6e42043ee54';
+        src: url('/static/fonts/511c936f7998d9c9.woff2') format('woff2');
+        font-display: swap;
+        unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+        font-weight: 700;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'PT Serif-1748d6e42043ee54';
+        src: url('/static/fonts/8e83367aa2fb4680.woff2') format('woff2');
+        font-display: swap;
+        unicode-range:
+          U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+          U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+          U+2C60-2C7F, U+A720-A7FF;
+        font-weight: 700;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'PT Serif-1748d6e42043ee54 fallback: Times New Roman Bold';
+        src: local('Times New Roman Bold');
+        font-display: swap;
+        font-weight: 700;
+        font-style: normal;
+        size-adjust: 111.8772%;
+        ascent-override: 92.8697%;
+        descent-override: 25.5637%;
+        line-gap-override: 0%;
+      }
+      :root {
+        --font-pt-serif:
+          'PT Serif-1748d6e42043ee54', 'PT Serif-1748d6e42043ee54 fallback: Times New Roman Bold',
+          Georgia, serif;
+      }
+    </style>
+    <meta name="theme-color" content="#fafbf8" />
+    <meta
+      name="description"
+      content="Справочная статья базы знаний Шелково: Как связаться с ОК Комфорт."
+    />
+    <meta
+      name="keywords"
+      content="Шелково, Ступино, Семеновское, Земля МО, застройщик Земля МО, ОК Комфорт, обслуживающая компания ОК Комфорт, Шелково Ривер, Shelkovo River, Шелково Форест, Shelkovo Forest, Шелково Парк, Shelkovo Park, Шелково Вилладж, Shelkovo Village"
+    />
+    <meta name="generator" content="Astro v7.3.8" />
+    <meta name="application-name" content="Шелково Онлайн" />
+    <meta name="apple-mobile-web-app-title" content="Шелково" />
+    <meta name="msapplication-TileColor" content="#fefbf8" />
+    <meta name="msapplication-TileImage" content="/mstile-150x150.png" />
+    <link rel="canonical" href="https://kpshelkovo.online/kb/ok/contacts/" />
+    <link rel="describedby" type="text/plain" href="https://kpshelkovo.online/llms.txt" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="https://kpshelkovo.online/kb/ok/contacts/index.md"
+    />
+    <meta property="og:title" content="Как связаться с ОК Комфорт — База знаний — Шелково Онлайн" />
+    <meta
+      property="og:description"
+      content="Справочная статья базы знаний Шелково: Как связаться с ОК Комфорт."
+    />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:url" content="https://kpshelkovo.online/kb/ok/contacts/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Шелково Онлайн" />
+    <meta name="twitter:card" content="summary" />
+    <meta
+      name="twitter:title"
+      content="Как связаться с ОК Комфорт — База знаний — Шелково Онлайн"
+    />
+    <meta
+      name="twitter:description"
+      content="Справочная статья базы знаний Шелково: Как связаться с ОК Комфорт."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5f6b39" />
+    <title>Как связаться с ОК Комфорт — База знаний — Шелково Онлайн</title>
+    <meta name="astro-view-transitions-enabled" content="true" />
+    <meta name="astro-view-transitions-fallback" content="animate" />
+    <link rel="stylesheet" href="/static/Breadcrumbs.90yX9Ho8.css" />
+    <link rel="stylesheet" href="/static/editorial-map.pygfD25z.css" />
+    <link rel="stylesheet" href="/static/lazy.DXg5leyc.css" />
+    <link rel="stylesheet" href="/static/BaseLayout.CJ7lz2o4.css" />
+    <link rel="stylesheet" href="/static/_..Dc4KKPXV.css" />
+    <style>
+      [data-astro-transition-scope='astro-nfpogox7-1'] {
+        view-transition-name: root;
+      }
+      @layer astro {
+        ::view-transition-old(root) {
+          animation: none;
+          opacity: 0;
+          mix-blend-mode: normal;
+        }
+        ::view-transition-new(root) {
+          animation: none;
+          mix-blend-mode: normal;
+        }
+        ::view-transition-group(root) {
+          animation: none;
+        }
+      }
+      [data-astro-transition-fallback='old'] [data-astro-transition-scope='astro-nfpogox7-1'],
+      [data-astro-transition-fallback='old'][data-astro-transition-scope='astro-nfpogox7-1'] {
+        animation: none;
+        mix-blend-mode: normal;
+      }
+      [data-astro-transition-fallback='new'] [data-astro-transition-scope='astro-nfpogox7-1'],
+      [data-astro-transition-fallback='new'][data-astro-transition-scope='astro-nfpogox7-1'] {
+        animation: none;
+        mix-blend-mode: normal;
+      }
+    </style>
+  </head>
+  <body class="ui-root-site site-print-content site-has-header" data-astro-cid-z4jru4n3="">
+    <div class="ui-visually-hidden" aria-hidden="true" data-astro-cid-z4jru4n3="">
+      Markdown-версия этой страницы доступна по адресу
+      https://kpshelkovo.online/kb/ok/contacts/index.md.
+    </div>
+    <div class="site-navigation-progress" aria-hidden="true" data-astro-cid-z4jru4n3=""></div>
+    <div class="site-page-shell" data-astro-cid-z4jru4n3="">
+      <header class="site-header" data-astro-cid-jae56hh5="">
+        <div class="site-header-inner ui-page" data-astro-cid-jae56hh5="">
+          <a href="https://kpshelkovo.online/" class="site-header-brand" data-astro-cid-jae56hh5="">
+            Шелково Онлайн
+          </a>
+          <div class="site-header-desktop-nav" data-astro-cid-jae56hh5="">
+            <nav
+              aria-label="Главное меню"
+              class="site-nav site-nav-header"
+              data-astro-cid-kjc35efj=""
+            >
+              <a
+                href="https://kpshelkovo.online/news/"
+                class="site-nav-link"
+                data-astro-cid-kjc35efj=""
+                >Новости</a
+              >
+              <div class="site-nav-dropdown" data-site-nav-dropdown="" data-astro-cid-kjc35efj="">
+                <button
+                  type="button"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  aria-controls="site-header-tariff-menu"
+                  data-site-nav-dropdown-button=""
+                  class="site-nav-link site-nav-dropdown-button"
+                  data-astro-cid-kjc35efj=""
+                >
+                  <span data-astro-cid-kjc35efj="">Тариф 815</span
+                  ><span
+                    aria-hidden="true"
+                    data-site-nav-dropdown-icon=""
+                    class="site-nav-dropdown-icon"
+                    data-astro-cid-kjc35efj=""
+                  ></span>
+                </button>
+                <div
+                  id="site-header-tariff-menu"
+                  data-site-nav-dropdown-menu=""
+                  class="site-nav-submenu"
+                  data-astro-cid-kjc35efj=""
+                >
+                  <div class="site-nav-glass-panel" data-astro-cid-kjc35efj="">
+                    <a
+                      href="https://kpshelkovo.online/815/compare/"
+                      class="site-nav-submenu-link"
+                      data-astro-cid-kjc35efj=""
+                      >Сравнение тарифов</a
+                    ><a
+                      href="https://kpshelkovo.online/815/regulation/"
+                      class="site-nav-submenu-link"
+                      data-astro-cid-kjc35efj=""
+                      >Регламент</a
+                    >
+                  </div>
+                </div>
+              </div>
+              <a
+                href="https://kpshelkovo.online/map/"
+                class="site-nav-link"
+                data-astro-cid-kjc35efj=""
+                >Карта</a
+              ><a
+                href="https://kpshelkovo.online/kb/"
+                aria-current="location"
+                class="site-nav-link"
+                data-astro-cid-kjc35efj=""
+                >База знаний</a
+              ><a
+                href="https://kpshelkovo.online/sarafan/"
+                class="site-nav-link"
+                data-astro-cid-kjc35efj=""
+                >Сарафан</a
+              ><a
+                href="https://kpshelkovo.online/reviews/"
+                class="site-nav-link"
+                data-astro-cid-kjc35efj=""
+                >Отзывы</a
+              ><a
+                href="https://kpshelkovo.online/status/"
+                aria-label="Статус: плановые работы"
+                class="site-nav-link site-nav-status-link"
+                data-home-status-link=""
+                data-home-status-state="amber"
+                data-astro-cid-kjc35efj=""
+                ><span data-astro-cid-kjc35efj="">Статус</span
+                ><span
+                  aria-hidden="true"
+                  data-home-status-dot=""
+                  class="site-nav-status-dot"
+                  data-astro-cid-kjc35efj=""
+                ></span></a
+              ><button
+                type="button"
+                class="site-search-trigger site-search-trigger--header"
+                aria-label="Поиск"
+                title="Поиск"
+                aria-haspopup="dialog"
+                data-search-trigger=""
+                data-pagefind-ignore="all"
+                data-astro-cid-zhcemkkk=""
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="10.75" cy="10.75" r="6.5"></circle>
+                  <path d="m15.5 15.5 4.25 4.25"></path>
+                </svg>
+              </button>
+            </nav>
+          </div>
+          <div class="site-header-mobile-actions" data-astro-cid-jae56hh5="">
+            <a
+              href="https://kpshelkovo.online/status/"
+              aria-label="Статус: плановые работы"
+              title="Статус: плановые работы"
+              class="site-header-status-link"
+              data-home-status-link=""
+              data-home-status-state="amber"
+              data-astro-cid-jae56hh5=""
+              ><span
+                aria-hidden="true"
+                class="site-header-status-dot"
+                data-astro-cid-jae56hh5=""
+              ></span></a
+            ><button
+              type="button"
+              class="site-search-trigger site-search-trigger--mobile"
+              aria-label="Поиск"
+              title="Поиск"
+              aria-haspopup="dialog"
+              data-search-trigger=""
+              data-pagefind-ignore="all"
+              data-astro-cid-zhcemkkk=""
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="10.75" cy="10.75" r="6.5"></circle>
+                <path d="m15.5 15.5 4.25 4.25"></path>
+              </svg>
+            </button>
+            <details class="site-header-menu" data-astro-cid-jae56hh5="">
+              <summary class="site-header-menu-button" aria-label="Меню" data-astro-cid-jae56hh5="">
+                <span class="site-header-menu-label" data-astro-cid-jae56hh5="">Меню</span
+                ><span
+                  aria-hidden="true"
+                  class="site-header-menu-icon"
+                  data-astro-cid-jae56hh5=""
+                ></span>
+              </summary>
+              <div class="site-header-mobile-panel" data-astro-cid-jae56hh5="">
+                <nav
+                  aria-label="Главное меню сайта"
+                  class="site-nav site-nav-mobile"
+                  data-astro-cid-kjc35efj=""
+                >
+                  <a
+                    href="https://kpshelkovo.online/news/"
+                    class="site-nav-mobile-link"
+                    data-astro-cid-kjc35efj=""
+                    >Новости</a
+                  >
+                  <div class="site-nav-mobile-group" data-astro-cid-kjc35efj="">
+                    <p class="site-nav-mobile-label" data-astro-cid-kjc35efj="">Тариф 815</p>
+                    <a
+                      href="https://kpshelkovo.online/815/compare/"
+                      class="site-nav-mobile-link site-nav-mobile-nested"
+                      data-astro-cid-kjc35efj=""
+                      >Сравнение тарифов</a
+                    ><a
+                      href="https://kpshelkovo.online/815/regulation/"
+                      class="site-nav-mobile-link site-nav-mobile-nested"
+                      data-astro-cid-kjc35efj=""
+                      >Регламент</a
+                    >
+                  </div>
+                  <a
+                    href="https://kpshelkovo.online/map/"
+                    class="site-nav-mobile-link"
+                    data-astro-cid-kjc35efj=""
+                    >Карта</a
+                  ><a
+                    href="https://kpshelkovo.online/kb/"
+                    aria-current="location"
+                    class="site-nav-mobile-link"
+                    data-astro-cid-kjc35efj=""
+                    >База знаний</a
+                  ><a
+                    href="https://kpshelkovo.online/sarafan/"
+                    class="site-nav-mobile-link"
+                    data-astro-cid-kjc35efj=""
+                    >Сарафан</a
+                  ><a
+                    href="https://kpshelkovo.online/reviews/"
+                    class="site-nav-mobile-link"
+                    data-astro-cid-kjc35efj=""
+                    >Отзывы</a
+                  ><a
+                    href="https://kpshelkovo.online/status/"
+                    aria-label="Статус: плановые работы"
+                    class="site-nav-mobile-link site-nav-mobile-status-link"
+                    data-home-status-link=""
+                    data-home-status-state="amber"
+                    data-astro-cid-kjc35efj=""
+                    ><span data-astro-cid-kjc35efj="">Статус</span
+                    ><span
+                      aria-hidden="true"
+                      data-home-status-dot=""
+                      class="site-nav-status-dot"
+                      data-astro-cid-kjc35efj=""
+                    ></span
+                  ></a>
+                </nav>
+              </div>
+            </details>
+          </div>
+        </div>
+      </header>
+      <div
+        class="site-page-content"
+        data-pagefind-root="true"
+        data-pagefind-body="true"
+        data-pagefind-meta="title[data-search-title], description[data-search-description], sectionId[data-search-section-id], sectionLabel[data-search-section-label]"
+        data-pagefind-filter="section[data-search-section-id]"
+        data-search-title="Как связаться с ОК Комфорт"
+        data-search-description="Справочная статья базы знаний Шелково: Как связаться с ОК Комфорт."
+        data-search-section-id="knowledge-base"
+        data-search-section-label="База знаний"
+        data-astro-cid-z4jru4n3=""
+      >
+        <main class="ui-page kb-page" data-astro-cid-dqu5pb4k="">
+          <header class="ui-page-header" data-astro-cid-dqu5pb4k="">
+            <div class="ui-page-header-stack kb-header" data-astro-cid-dqu5pb4k="">
+              <nav
+                aria-label="Хлебные крошки"
+                class="breadcrumbs"
+                data-pagefind-ignore="all"
+                data-astro-cid-d632246g=""
+              >
+                <ol
+                  class="breadcrumbs-list"
+                  itemscope=""
+                  itemtype="https://schema.org/BreadcrumbList"
+                  data-astro-cid-d632246g=""
+                >
+                  <li
+                    class="breadcrumbs-item breadcrumbs-item--home"
+                    itemprop="itemListElement"
+                    itemscope=""
+                    itemtype="https://schema.org/ListItem"
+                    data-astro-cid-d632246g=""
+                  >
+                    <a
+                      href="https://kpshelkovo.online/"
+                      class="breadcrumbs-link"
+                      itemprop="item"
+                      data-astro-cid-d632246g=""
+                      ><span itemprop="name" data-astro-cid-d632246g="">Главная</span></a
+                    ><meta itemprop="position" content="1" />
+                  </li>
+                  <li
+                    class="breadcrumbs-item breadcrumbs-item--parent-first"
+                    itemprop="itemListElement"
+                    itemscope=""
+                    itemtype="https://schema.org/ListItem"
+                    data-astro-cid-d632246g=""
+                  >
+                    <span
+                      class="breadcrumbs-separator"
+                      aria-hidden="true"
+                      data-astro-cid-d632246g=""
+                      >›</span
+                    ><a
+                      href="https://kpshelkovo.online/kb/"
+                      class="breadcrumbs-link"
+                      itemprop="item"
+                      data-astro-cid-d632246g=""
+                      ><span itemprop="name" data-astro-cid-d632246g="">База знаний</span></a
+                    ><meta itemprop="position" content="2" />
+                  </li>
+                  <li
+                    class="breadcrumbs-item"
+                    itemprop="itemListElement"
+                    itemscope=""
+                    itemtype="https://schema.org/ListItem"
+                    data-astro-cid-d632246g=""
+                  >
+                    <span
+                      class="breadcrumbs-separator"
+                      aria-hidden="true"
+                      data-astro-cid-d632246g=""
+                      >›</span
+                    ><a
+                      href="https://kpshelkovo.online/kb/ok/"
+                      class="breadcrumbs-link"
+                      itemprop="item"
+                      data-astro-cid-d632246g=""
+                      ><span itemprop="name" data-astro-cid-d632246g="">ОК Комфорт</span></a
+                    ><meta itemprop="position" content="3" />
+                  </li>
+                  <li
+                    class="breadcrumbs-item breadcrumbs-item--current"
+                    itemprop="itemListElement"
+                    itemscope=""
+                    itemtype="https://schema.org/ListItem"
+                    data-astro-cid-d632246g=""
+                  >
+                    <span
+                      class="breadcrumbs-separator"
+                      aria-hidden="true"
+                      data-astro-cid-d632246g=""
+                      >›</span
+                    ><span
+                      class="breadcrumbs-current"
+                      aria-current="page"
+                      itemprop="name"
+                      data-astro-cid-d632246g=""
+                      >Как связаться с ОК Комфорт</span
+                    ><meta itemprop="position" content="4" />
+                  </li>
+                </ol>
+              </nav>
+              <h1 class="ui-page-title" data-pagefind-ignore="all" data-astro-cid-dqu5pb4k="">
+                Как связаться с ОК Комфорт
+              </h1>
+            </div>
+          </header>
+          <article class="kb-body" data-astro-cid-dqu5pb4k="">
+            <div class="ui-prose" data-astro-cid-dqu5pb4k="">
+              <h2 id="единый-номер" aria-label="Единый номер">
+                Единый номер<a
+                  aria-label="Ссылка на этот раздел"
+                  class="ui-heading-anchor"
+                  data-pagefind-ignore="all"
+                  href="#единый-номер"
+                  title="Ссылка на этот раздел"
+                  ><span aria-hidden="true">#</span></a
+                >
+              </h2>
+              <p>
+                <strong><a href="tel:+74951500208">+7&nbsp;495&nbsp;150-02-08</a></strong
+                >, ежедневно <strong>с&nbsp;10:00 до&nbsp;18:00</strong>. Добавочные:
+              </p>
+              <ul>
+                <li>
+                  <strong>1</strong> —&nbsp;подключение коммуникаций и&nbsp;дополнительные услуги;
+                </li>
+                <li><strong>2</strong> —&nbsp;обслуживание посёлка и&nbsp;начисление платежей;</li>
+                <li><strong>3</strong> —&nbsp;электроснабжение;</li>
+                <li>
+                  <strong>4</strong> —&nbsp;консультация по&nbsp;пропускам и&nbsp;разрешениям
+                  для&nbsp;рабочих.
+                </li>
+              </ul>
+              <p>
+                <strong
+                  >В
+                  <a href="https://lk.domyland.ru/services/17418">«Справочной информации» ОК</a>
+                  добавочные отличаются:</strong
+                >
+                4&nbsp;— газификация, 5&nbsp;— охрана дома, 6&nbsp;— консультация по&nbsp;пропускам.
+                Если&nbsp;попали не&nbsp;в&nbsp;тот отдел, попросите оператора единого номера
+                соединить вас с&nbsp;нужным.
+              </p>
+              <p>
+                Официальный сайт —
+                <strong><a href="https://ok-komfort.ru/">ok-komfort.ru</a></strong
+                >. Написать в&nbsp;ОК&nbsp;можно на
+                <strong><a href="mailto:info@ok-komfort.ru">info@ok-komfort.ru</a></strong
+                >.
+              </p>
+              <h2 id="охрана-и-экстренные-службы" aria-label="Охрана и экстренные службы">
+                Охрана и&nbsp;экстренные службы<a
+                  aria-label="Ссылка на этот раздел"
+                  class="ui-heading-anchor"
+                  data-pagefind-ignore="all"
+                  href="#охрана-и-экстренные-службы"
+                  title="Ссылка на этот раздел"
+                  ><span aria-hidden="true">#</span></a
+                >
+              </h2>
+              <p>
+                <strong
+                  >«Комфорт Security»:
+                  <a href="tel:+74958225019">+7&nbsp;495&nbsp;822-50-19</a></strong
+                >:
+              </p>
+              <ul>
+                <li>добавочный <strong>1</strong> —&nbsp;продажа охранных услуг;</li>
+                <li>добавочный <strong>2</strong> —&nbsp;оперативный дежурный.</li>
+              </ul>
+              <p>Экстренные службы и&nbsp;горячая линия электросетей:</p>
+              <ul>
+                <li>
+                  <strong><a href="tel:112">112</a></strong> —&nbsp;единый номер экстренных вызовов;
+                </li>
+                <li>
+                  <strong><a href="tel:104">104</a></strong> —&nbsp;газовая служба;
+                </li>
+                <li>
+                  <strong><a href="tel:+78002200220">+7&nbsp;800&nbsp;220-02-20</a></strong>
+                  —&nbsp;горячая линия «Россети Московский регион».
+                </li>
+              </ul>
+              <h2 id="отделы-и-руководство" aria-label="Отделы и руководство">
+                Отделы и&nbsp;руководство<a
+                  aria-label="Ссылка на этот раздел"
+                  class="ui-heading-anchor"
+                  data-pagefind-ignore="all"
+                  href="#отделы-и-руководство"
+                  title="Ссылка на этот раздел"
+                  ><span aria-hidden="true">#</span></a
+                >
+              </h2>
+              <ul>
+                <li>
+                  Управляющий посёлка —
+                  <a
+                    href="https://kpshelkovo.online/people/gmozgov/"
+                    title='Управляющий КП Шелково, ОК "Комфорт"'
+                    >Геннадий Мозгов</a
+                  >.
+                </li>
+                <li>
+                  Руководитель отдела «Комфорт-Эксплуатация» —
+                  <a
+                    href="https://kpshelkovo.online/people/dkochergin/"
+                    title='Руководитель отдела «Комфорт-Эксплуатация», ОК "Комфорт"'
+                    >Денис Кочергин</a
+                  >.
+                </li>
+                <li>
+                  Руководитель отдела «Комфорт-Сервис» —
+                  <a
+                    href="https://kpshelkovo.online/people/ykira/"
+                    title='Руководитель отдела «Комфорт-Сервис», ОК "Комфорт"'
+                    >Ярослав Кира</a
+                  >.
+                </li>
+                <li>
+                  Директор ОК&nbsp;Комфорт —
+                  <a
+                    href="https://kpshelkovo.online/people/ykizilov/"
+                    title='Руководитель, ОК "Комфорт"'
+                    >Юрий Кизилов</a
+                  >.
+                </li>
+              </ul>
+              <p>
+                Сотрудники
+                <a href="https://ok-komfort.ru/company/">общих отделов ОК&nbsp;Комфорт</a>:
+              </p>
+              <ul>
+                <li>
+                  Инженер по&nbsp;эксплуатации зданий и&nbsp;сооружений —
+                  <a
+                    href="https://kpshelkovo.online/people/akornyakov/"
+                    title='Инженер по эксплуатации зданий и сооружений, ОК "Комфорт"'
+                    >Андрей Корняков</a
+                  >.
+                </li>
+                <li>
+                  Менеджер отдела энергетики —
+                  <a
+                    href="https://kpshelkovo.online/people/nmakhrova/"
+                    title='Менеджер отдела энергетики, ОК "Комфорт"'
+                    >Надежда Махрова</a
+                  >.
+                </li>
+                <li>
+                  Менеджер-бухгалтер отдела «Комфорт-Эксплуатация» —
+                  <a
+                    href="https://kpshelkovo.online/people/ekurenkova/"
+                    title='Менеджер-бухгалтер отдела «Комфорт-Эксплуатация», ОК "Комфорт"'
+                    >Екатерина Куренкова</a
+                  >.
+                </li>
+                <li>
+                  Менеджер отдела эксплуатации —
+                  <a
+                    href="https://kpshelkovo.online/people/stkacheva/"
+                    title='Менеджер отдела эксплуатации, ОК "Комфорт"'
+                    >Светлана Ткачёва</a
+                  >.
+                </li>
+                <li>
+                  Менеджер отдела сопровождения —
+                  <a
+                    href="https://kpshelkovo.online/people/ebakharueva/"
+                    title='Менеджер отдела сопровождения, ОК "Комфорт"'
+                    >Елена Бахаруева</a
+                  >.
+                </li>
+              </ul>
+              <h2 id="вопрос-или-запись-на-приём" aria-label="Вопрос или запись на приём">
+                Вопрос или&nbsp;запись на&nbsp;приём<a
+                  aria-label="Ссылка на этот раздел"
+                  class="ui-heading-anchor"
+                  data-pagefind-ignore="all"
+                  href="#вопрос-или-запись-на-приём"
+                  title="Ссылка на этот раздел"
+                  ><span aria-hidden="true">#</span></a
+                >
+              </h2>
+              <p>
+                В&nbsp;Telegram с&nbsp;вопросами по&nbsp;обслуживанию, идеями и&nbsp;сообщениями
+                о&nbsp;проблемах можно обратиться к
+                <a href="https://t.me/assistant_komfortTatyana">Татьяне, личному помощнику ОК</a>.
+                <strong
+                  >Лучше писать публично в
+                  <a href="https://t.me/shelkovoecoclub/20423"
+                    >теме «Коммуникация с&nbsp;ОК&nbsp;„Комфорт“» чата посёлка</a
+                  >, а&nbsp;не&nbsp;в&nbsp;личные сообщения.</strong
+                >
+              </p>
+              <p>
+                Татьяна
+                <a href="https://t.me/shelkovoecoclub/20423/57187"
+                  >на&nbsp;связи
+                  <strong>с&nbsp;понедельника по&nbsp;пятницу с&nbsp;10:00 до&nbsp;18:00</strong></a
+                >. По&nbsp;оперативным вопросам в&nbsp;выходные обращайтесь к&nbsp;менеджерам
+                по&nbsp;единому номеру, добавочный <strong>2</strong>, а&nbsp;после 18:00
+                к&nbsp;дежурным сотрудникам. Если&nbsp;вопрос требует изучения, согласования
+                или&nbsp;ответа профильного специалиста, Татьяна вернётся к&nbsp;нему
+                в&nbsp;ближайший рабочий день.
+              </p>
+              <p>
+                В&nbsp;Домиленде откройте
+                <strong><a href="https://lk.domyland.ru/services/11931">«Задать вопрос»</a></strong
+                >, напишите обращение сотрудникам ОК&nbsp;и&nbsp;при&nbsp;необходимости приложите
+                фото.
+              </p>
+              <p>
+                Чтобы записаться на&nbsp;приём к&nbsp;директору, откройте в&nbsp;Домиленде
+                <strong
+                  ><a href="https://lk.domyland.ru/services/115162"
+                    >«Записаться на&nbsp;прием к&nbsp;Директору»</a
+                  ></strong
+                >
+                и&nbsp;заполните поле <strong>«Вопрос, который необходимо обсудить»</strong>.
+              </p>
+              <p>
+                Если&nbsp;сотрудники не&nbsp;смогли ответить на&nbsp;вопрос, ОК&nbsp;предлагает
+                позвонить или&nbsp;написать в&nbsp;Telegram по&nbsp;номеру
+                <strong><a href="tel:+79267698591">+7&nbsp;926&nbsp;769-85-91</a></strong
+                >.
+              </p>
+              <h2 id="каналы-объявлений" aria-label="Каналы объявлений">
+                Каналы объявлений<a
+                  aria-label="Ссылка на этот раздел"
+                  class="ui-heading-anchor"
+                  data-pagefind-ignore="all"
+                  href="#каналы-объявлений"
+                  title="Ссылка на этот раздел"
+                  ><span aria-hidden="true">#</span></a
+                >
+              </h2>
+              <ul>
+                <li><a href="https://t.me/okkomfort">ОК&nbsp;Комфорт в&nbsp;Telegram</a>.</li>
+                <li><a href="https://max.ru/id7728821502_biz">ОК&nbsp;Комфорт в&nbsp;MAX</a>.</li>
+              </ul>
+            </div>
+          </article>
+        </main>
+      </div>
+    </div>
+    <div data-search-dialog-root="" data-astro-cid-z4jru4n3="">
+      <!--[--><!--$s0-s1-->
+      <dialog
+        id="s0-s1-dialog"
+        class="site-search-dialog"
+        aria-labelledby="s0-s1-heading"
+        data-pagefind-ignore="all"
+        data-search-dialog=""
+        data-search-state="initial"
+      >
+        <div class="site-search-dialog__surface">
+          <h2 id="s0-s1-heading" class="visually-hidden svelte-lcnlkt">Поиск по сайту</h2>
+          <div class="site-search-dialog__field svelte-lcnlkt">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="10.75" cy="10.75" r="6.5"></circle>
+              <path d="m15.5 15.5 4.25 4.25"></path></svg
+            ><!---->
+            <label for="s0-s1-input" class="visually-hidden svelte-lcnlkt"
+              >Что найти на сайте</label
+            >
+            <input
+              value=""
+              id="s0-s1-input"
+              type="search"
+              name="site-search"
+              class="site-search-dialog__input"
+              placeholder="Что найти?"
+              autocomplete="off"
+              maxlength="200"
+              data-search-input=""
+            />
+            <button
+              type="button"
+              class="site-search-dialog__close"
+              aria-label="Закрыть"
+              data-search-close=""
+            >
+              <svg
+                class="close-icon svelte-lcnlkt"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path d="m6.75 6.75 10.5 10.5"></path>
+                <path d="m17.25 6.75-10.5 10.5"></path>
+              </svg>
+            </button>
+          </div>
+          <div
+            class="action-row search-load-status svelte-lcnlkt"
+            hidden=""
+            data-search-load-status=""
+          >
+            <p class="action-message svelte-lcnlkt" data-search-load-message=""></p>
+          </div>
+          <!--[-1--><!--]-->
+        </div>
+        <p
+          class="visually-hidden svelte-lcnlkt"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          data-search-load-announcement=""
+        ></p>
+      </dialog>
+      <!--]-->
+    </div>
+  </body>
+</html>

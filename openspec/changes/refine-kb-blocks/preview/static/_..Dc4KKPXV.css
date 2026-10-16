@@ -1,0 +1,22 @@
+.kb-page[data-astro-cid-dqu5pb4k] {
+  padding-block-end: 2rem;
+}
+.kb-header[data-astro-cid-dqu5pb4k] {
+  max-width: 56rem;
+}
+.kb-body[data-astro-cid-dqu5pb4k] {
+  padding-inline: 1.25rem;
+}
+@media (width >= 48rem) {
+  .kb-page[data-astro-cid-dqu5pb4k] {
+    padding-block-end: 3rem;
+  }
+  .kb-body[data-astro-cid-dqu5pb4k] {
+    padding-inline: 1.5rem;
+  }
+}
+@media (width >= 64rem) {
+  .kb-page[data-astro-cid-dqu5pb4k] {
+    padding-block-end: 3.5rem;
+  }
+}
