@@ -59,6 +59,7 @@ pnpm typecheck
 
 ## Markdown
 
+- Перед добавлением или правкой редакционного Markdown сверяй авторскую разметку с [README Markdown-пакета](/packages/markdown/README.md).
 - При изменении рендера, AST-адаптеров или генератора сверять API с [README Markdown-пакета](/packages/markdown/README.md). Причины разделения слоёв — в [ADR-003](/docs/decisions/003-markdown-pipeline-layering.md), выбора AST — в [ADR-008](/docs/decisions/008-markdown-ast-generation.md).
 - Для body markdown в `apps/www` использовать `@/lib/markdown/render`, а не пакетный `render` напрямую: app-wrapper подключает общий app-level слой mentions.
 - У отдельного Markdown-изображения непустой `title` рендерится видимой подписью: `![alt](url "Подпись")`. У изображения внутри текстового абзаца `title` остается обычной всплывающей подсказкой.

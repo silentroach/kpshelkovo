@@ -1,0 +1,4 @@
+before-*.html linguist-generated=true
+after-*.html linguist-generated=true
+static/** linguist-vendored=true
+licenses/** linguist-vendored=true

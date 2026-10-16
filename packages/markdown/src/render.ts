@@ -13,6 +13,7 @@ import { assertNoMarkdownTables } from './no-tables';
 import type { MarkdownAstTransform, RenderOptions } from './render.types';
 import { rehypeTaskListItemLabels } from './task-list-labels';
 import { expandTableOfContents, headingText } from './toc';
+import { prepareTocAnnotations, remarkTocSyntax } from './toc-annotations';
 import { rehypeTypograf } from './typography';
 
 const remarkNoMarkdownTables: Plugin<[], Root> = () => (tree) => {
@@ -22,7 +23,8 @@ const remarkNoMarkdownTables: Plugin<[], Root> = () => (tree) => {
 const remarkDocument: Plugin<
   [MarkdownAstTransform | undefined, readonly string[] | undefined],
   Root
-> = (transform, reservedIds) => (tree) => {
+> = (transform, reservedIds) => (tree, file) => {
+  prepareTocAnnotations(tree, String(file));
   const usedIds = new Set(reservedIds);
   const authoredIds = new Map<Heading, string>();
   const headings: Heading[] = [];
@@ -139,6 +141,7 @@ const createProcessor = (options?: RenderOptions) =>
   unified()
     .use(remarkParse)
     .use(remarkGfm)
+    .use(remarkTocSyntax)
     .use(remarkDocument, options?.transform, options?.reservedIds)
     .use(remarkNoMarkdownTables)
     // Raw HTML is not passed through, so markdown content cannot inject markup.

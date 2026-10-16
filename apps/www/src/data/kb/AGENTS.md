@@ -2,6 +2,8 @@
 
 Короткие правила для `apps/www/src/data/kb`. Действующее поведение страниц, навигации и индексации — в [контракте KB](../../../../../openspec/specs/knowledge-base/spec.md); причины выбора Markdown-файлов и авторской навигации — в [ADR-015](../../../../../docs/decisions/015-markdown-first-knowledge-base.md).
 
+Перед правкой авторской Markdown-разметки сверяй [README Markdown-пакета](/packages/markdown/README.md); для обновления оферт используй [промпт](/prompts/oferta.md).
+
 - Markdown-файлы базы знаний лежат в этой папке; корень раздела — `index.md`.
 - В frontmatter разрешены `title`, опциональные `flags`, `seo.description` и `sources`; поддержаны флаги `noindex` и `exclude-from-site-search`.
 - `seo.description` использовать только для HTML meta description, когда автоматическая выдержка из Markdown слишком общая, короткая или повторяется на похожих страницах.

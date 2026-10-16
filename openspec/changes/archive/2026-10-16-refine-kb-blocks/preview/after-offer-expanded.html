@@ -1,0 +1,2775 @@
+<!doctype html>
+<html data-astro-transition-scope="astro-nfpogox7-1" lang="ru" data-astro-cid-z4jru4n3="">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c';
+        src: url('/static/fonts/e3822b075373eec8.woff2') format('woff2');
+        font-display: swap;
+        unicode-range:
+          U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+          U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        font-weight: 400;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c';
+        src: url('/static/fonts/aee7fc448115de64.woff2') format('woff2');
+        font-display: swap;
+        unicode-range:
+          U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+          U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        font-weight: 600;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c';
+        src: url('/static/fonts/3691c4b98eab8332.woff2') format('woff2');
+        font-display: swap;
+        unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+        font-weight: 400;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c';
+        src: url('/static/fonts/a53e083586ffbf4b.woff2') format('woff2');
+        font-display: swap;
+        unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+        font-weight: 600;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c';
+        src: url('/static/fonts/9177237b79521d03.woff2') format('woff2');
+        font-display: swap;
+        unicode-range:
+          U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+          U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+          U+2C60-2C7F, U+A720-A7FF;
+        font-weight: 400;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c';
+        src: url('/static/fonts/7a770559affdd68f.woff2') format('woff2');
+        font-display: swap;
+        unicode-range:
+          U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+          U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+          U+2C60-2C7F, U+A720-A7FF;
+        font-weight: 600;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: BlinkMacSystemFont';
+        src: local('BlinkMacSystemFont');
+        font-display: swap;
+        font-weight: 400;
+        font-style: normal;
+        size-adjust: 109.963%;
+        ascent-override: 85.0286%;
+        descent-override: 24.099%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Segoe UI';
+        src: local('Segoe UI');
+        font-display: swap;
+        font-weight: 400;
+        font-style: normal;
+        size-adjust: 103.3022%;
+        ascent-override: 90.5111%;
+        descent-override: 25.6529%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Roboto';
+        src: local('Roboto');
+        font-display: swap;
+        font-weight: 400;
+        font-style: normal;
+        size-adjust: 102.962%;
+        ascent-override: 90.8102%;
+        descent-override: 25.7376%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Helvetica Neue';
+        src: local('Helvetica Neue');
+        font-display: swap;
+        font-weight: 400;
+        font-style: normal;
+        size-adjust: 101.7778%;
+        ascent-override: 91.8668%;
+        descent-override: 26.0371%;
+        line-gap-override: 0%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Arial';
+        src: local('Arial');
+        font-display: swap;
+        font-weight: 400;
+        font-style: normal;
+        size-adjust: 102.7365%;
+        ascent-override: 91.0095%;
+        descent-override: 25.7942%;
+        line-gap-override: 0%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: BlinkMacSystemFont';
+        src: local('BlinkMacSystemFont');
+        font-display: swap;
+        font-weight: 600;
+        font-style: normal;
+        size-adjust: 109.963%;
+        ascent-override: 85.0286%;
+        descent-override: 24.099%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Segoe UI';
+        src: local('Segoe UI');
+        font-display: swap;
+        font-weight: 600;
+        font-style: normal;
+        size-adjust: 103.3022%;
+        ascent-override: 90.5111%;
+        descent-override: 25.6529%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Roboto';
+        src: local('Roboto');
+        font-display: swap;
+        font-weight: 600;
+        font-style: normal;
+        size-adjust: 102.962%;
+        ascent-override: 90.8102%;
+        descent-override: 25.7376%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Helvetica Neue';
+        src: local('Helvetica Neue');
+        font-display: swap;
+        font-weight: 600;
+        font-style: normal;
+        size-adjust: 101.7778%;
+        ascent-override: 91.8668%;
+        descent-override: 26.0371%;
+        line-gap-override: 0%;
+      }
+      @font-face {
+        font-family: 'Fira Sans-43195dd6e5c2d84c fallback: Arial';
+        src: local('Arial');
+        font-display: swap;
+        font-weight: 600;
+        font-style: normal;
+        size-adjust: 102.7365%;
+        ascent-override: 91.0095%;
+        descent-override: 25.7942%;
+        line-gap-override: 0%;
+      }
+      :root {
+        --font-fira-sans:
+          'Fira Sans-43195dd6e5c2d84c', 'Fira Sans-43195dd6e5c2d84c fallback: BlinkMacSystemFont',
+          'Fira Sans-43195dd6e5c2d84c fallback: Segoe UI',
+          'Fira Sans-43195dd6e5c2d84c fallback: Roboto',
+          'Fira Sans-43195dd6e5c2d84c fallback: Helvetica Neue',
+          'Fira Sans-43195dd6e5c2d84c fallback: Arial', system-ui;
+      }
+    </style>
+    <style>
+      @font-face {
+        font-family: 'PT Serif-1748d6e42043ee54';
+        src: url('/static/fonts/9601f258049b517c.woff2') format('woff2');
+        font-display: swap;
+        unicode-range:
+          U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+          U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        font-weight: 700;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'PT Serif-1748d6e42043ee54';
+        src: url('/static/fonts/511c936f7998d9c9.woff2') format('woff2');
+        font-display: swap;
+        unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+        font-weight: 700;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'PT Serif-1748d6e42043ee54';
+        src: url('/static/fonts/8e83367aa2fb4680.woff2') format('woff2');
+        font-display: swap;
+        unicode-range:
+          U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+          U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+          U+2C60-2C7F, U+A720-A7FF;
+        font-weight: 700;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'PT Serif-1748d6e42043ee54 fallback: Times New Roman Bold';
+        src: local('Times New Roman Bold');
+        font-display: swap;
+        font-weight: 700;
+        font-style: normal;
+        size-adjust: 111.8772%;
+        ascent-override: 92.8697%;
+        descent-override: 25.5637%;
+        line-gap-override: 0%;
+      }
+      :root {
+        --font-pt-serif:
+          'PT Serif-1748d6e42043ee54', 'PT Serif-1748d6e42043ee54 fallback: Times New Roman Bold',
+          Georgia, serif;
+      }
+    </style>
+    <meta name="theme-color" content="#fafbf8" />
+    <meta
+      name="description"
+      content="Публичная оферта ОК Комфорт для Шелково Парк: обслуживание инфраструктуры, платежи, пропускной режим и правила поселка."
+    />
+    <meta
+      name="keywords"
+      content="Шелково, Ступино, Семеновское, Земля МО, застройщик Земля МО, ОК Комфорт, обслуживающая компания ОК Комфорт, Шелково Ривер, Shelkovo River, Шелково Форест, Shelkovo Forest, Шелково Парк, Shelkovo Park, Шелково Вилладж, Shelkovo Village"
+    />
+    <meta name="generator" content="Astro v7.3.8" />
+    <meta name="application-name" content="Шелково Онлайн" />
+    <meta name="apple-mobile-web-app-title" content="Шелково" />
+    <meta name="msapplication-TileColor" content="#fefbf8" />
+    <meta name="msapplication-TileImage" content="/mstile-150x150.png" />
+    <link rel="canonical" href="https://kpshelkovo.online/kb/ok/offer/shelkovo-park/" />
+    <link rel="describedby" type="text/plain" href="https://kpshelkovo.online/llms.txt" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="https://kpshelkovo.online/kb/ok/offer/shelkovo-park/index.md"
+    />
+    <meta
+      property="og:title"
+      content="Публичная оферта - Шелково Парк — База знаний — Шелково Онлайн"
+    />
+    <meta
+      property="og:description"
+      content="Публичная оферта ОК Комфорт для Шелково Парк: обслуживание инфраструктуры, платежи, пропускной режим и правила поселка."
+    />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:url" content="https://kpshelkovo.online/kb/ok/offer/shelkovo-park/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Шелково Онлайн" />
+    <meta name="twitter:card" content="summary" />
+    <meta
+      name="twitter:title"
+      content="Публичная оферта - Шелково Парк — База знаний — Шелково Онлайн"
+    />
+    <meta
+      name="twitter:description"
+      content="Публичная оферта ОК Комфорт для Шелково Парк: обслуживание инфраструктуры, платежи, пропускной режим и правила поселка."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5f6b39" />
+    <title>Публичная оферта - Шелково Парк — База знаний — Шелково Онлайн</title>
+    <meta name="astro-view-transitions-enabled" content="true" />
+    <meta name="astro-view-transitions-fallback" content="animate" />
+    <link rel="stylesheet" href="/static/Breadcrumbs.90yX9Ho8.css" />
+    <link rel="stylesheet" href="/static/editorial-map.pygfD25z.css" />
+    <link rel="stylesheet" href="/static/lazy.DXg5leyc.css" />
+    <link rel="stylesheet" href="/static/BaseLayout.CJ7lz2o4.css" />
+    <link rel="stylesheet" href="/static/_..Dc4KKPXV.css" />
+    <style>
+      [data-astro-transition-scope='astro-nfpogox7-1'] {
+        view-transition-name: root;
+      }
+      @layer astro {
+        ::view-transition-old(root) {
+          animation: none;
+          opacity: 0;
+          mix-blend-mode: normal;
+        }
+        ::view-transition-new(root) {
+          animation: none;
+          mix-blend-mode: normal;
+        }
+        ::view-transition-group(root) {
+          animation: none;
+        }
+      }
+      [data-astro-transition-fallback='old'] [data-astro-transition-scope='astro-nfpogox7-1'],
+      [data-astro-transition-fallback='old'][data-astro-transition-scope='astro-nfpogox7-1'] {
+        animation: none;
+        mix-blend-mode: normal;
+      }
+      [data-astro-transition-fallback='new'] [data-astro-transition-scope='astro-nfpogox7-1'],
+      [data-astro-transition-fallback='new'][data-astro-transition-scope='astro-nfpogox7-1'] {
+        animation: none;
+        mix-blend-mode: normal;
+      }
+    </style>
+    <style>
+      /* Visual proposal only. Uses the current site's semantic colors and fonts. */
+      .kb-page.kb-preview-page {
+        width: 100%;
+      }
+
+      .kb-preview-page > .ui-page-header,
+      .kb-preview-column,
+      .kb-preview-toc__inner {
+        box-sizing: border-box;
+        width: min(calc(100% - var(--page-padding) * 2), var(--page-max));
+        margin-inline: auto;
+      }
+
+      .kb-preview-column,
+      .kb-preview-toc__inner {
+        padding-inline: 1.25rem;
+      }
+
+      .kb-preview-page .kb-body {
+        padding-inline: 0;
+      }
+
+      .kb-body .ui-prose.kb-preview-toc {
+        margin-block: 1.5rem;
+        padding-block: 1.5rem;
+        max-width: none;
+        border: 0;
+        border-radius: 0;
+        background: var(--color-breadcrumb-surface);
+        font-size: 1rem;
+        line-height: 1.5;
+      }
+
+      .kb-body .kb-preview-toc .ui-markdown-toc__title {
+        margin: 0 0 0.75rem;
+        font-size: 1.0625rem;
+        line-height: 1.5;
+      }
+
+      .kb-preview-toc:not(.kb-preview-toc--grouped) .ui-markdown-toc__list {
+        max-width: 39.06rem;
+      }
+
+      .kb-body .kb-preview-toc .ui-markdown-toc__list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .kb-body .kb-preview-toc .ui-markdown-toc__list ul {
+        margin-block: 0.375rem 0;
+        padding-inline-start: 1.25rem;
+        border: 0;
+        list-style: none;
+        font-size: 0.9375rem;
+        line-height: 1.45;
+      }
+
+      .kb-body .kb-preview-toc .ui-markdown-toc__list ul a {
+        color: var(--color-text-muted);
+      }
+
+      .kb-body .kb-preview-toc .ui-markdown-toc__list ul a:is(:hover, :focus-visible) {
+        color: var(--color-primary);
+      }
+
+      .kb-body .kb-preview-toc .ui-markdown-toc__list li {
+        margin: 0;
+        padding: 0;
+      }
+
+      .kb-body .kb-preview-toc .ui-markdown-toc__list li + li {
+        margin-block-start: 0.5rem;
+      }
+
+      .kb-body .kb-preview-toc .ui-markdown-toc__list a {
+        text-decoration-line: none;
+        text-underline-offset: 0.2em;
+      }
+
+      .kb-body .kb-preview-toc .ui-markdown-toc__list a:is(:hover, :focus-visible) {
+        text-decoration-line: underline;
+        text-decoration-color: currentColor;
+      }
+
+      .kb-body .kb-preview-toc--grouped .ui-markdown-toc__title {
+        margin: 0;
+        font-size: 1.25rem;
+        line-height: 1.3;
+      }
+
+      .kb-preview-toc__heading {
+        margin-block-end: 1.5rem;
+      }
+
+      .kb-body .kb-preview-toc a.kb-preview-toc__intro {
+        display: inline-block;
+        margin-block-start: 0.75rem;
+        font-size: 1rem;
+        font-weight: 400;
+        text-decoration: none;
+      }
+
+      .kb-body .kb-preview-toc a.kb-preview-toc__intro:is(:hover, :focus-visible) {
+        text-decoration: underline;
+      }
+
+      .kb-preview-toc__groups {
+        display: grid;
+        gap: 1.75rem;
+      }
+
+      .kb-body .kb-preview-toc .kb-preview-toc__group-title {
+        margin: 0 0 0.5rem;
+        color: var(--color-text-muted);
+        font-size: 0.875rem;
+        font-weight: 600;
+        line-height: 1.5;
+      }
+
+      .kb-body .kb-preview-toc--grouped .ui-markdown-toc__list li + li {
+        margin-block-start: 0;
+      }
+
+      .kb-body .kb-preview-toc--grouped .ui-markdown-toc__list a {
+        display: grid;
+        grid-template-columns: 1.75rem minmax(0, 1fr);
+        align-items: baseline;
+        gap: 0.25rem;
+        padding-block: 0.375rem;
+        text-decoration: none;
+      }
+
+      .kb-preview-toc__number {
+        color: var(--color-text-muted);
+        font-size: 0.875rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .kb-body .kb-preview-toc--grouped .ui-markdown-toc__list a:is(:hover, :focus-visible) {
+        text-decoration: none;
+      }
+
+      .kb-preview-toc--grouped a:is(:hover, :focus-visible) .kb-preview-toc__label {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      .kb-body .kb-preview-toc a:focus-visible,
+      .kb-body .kb-preview-document a:focus-visible {
+        outline: 2px solid var(--color-focus);
+        outline-offset: 3px;
+      }
+
+      .kb-body .kb-preview-document {
+        margin-block: 1.5rem;
+        padding: 1.125rem 1.25rem;
+        border: 1px solid color-mix(in oklab, var(--color-warning-text) 10%, var(--color-bg));
+        border-radius: var(--radius-xl);
+        background: color-mix(in oklab, var(--color-warning-soft) 55%, var(--color-bg));
+      }
+
+      .kb-body .kb-preview-document > p {
+        margin: 0;
+      }
+
+      .kb-body .kb-preview-document .kb-preview-document__edition {
+        font-size: 1rem;
+        line-height: 1.5;
+      }
+
+      .kb-body .kb-preview-document a.ui-file-link {
+        display: inline-flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        max-width: 100%;
+        font-weight: 600;
+      }
+
+      .kb-body .kb-preview-document .ui-file-link__icon {
+        flex: none;
+        width: 1.25rem;
+        height: 1.25rem;
+        margin: 0.125rem 0 0;
+      }
+
+      .kb-body .kb-preview-document .kb-preview-document__note {
+        margin-block-start: 0.375rem;
+        margin-inline-start: 1.75rem;
+        color: var(--color-text-muted);
+        font-size: 0.875rem;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 40rem) {
+        .kb-body .kb-preview-document {
+          padding: 1rem;
+        }
+      }
+
+      @media (min-width: 48rem) {
+        .kb-preview-column,
+        .kb-preview-toc__inner {
+          padding-inline: 1.5rem;
+        }
+
+        .kb-preview-toc:not(.kb-preview-toc--grouped) .ui-markdown-toc__list {
+          max-width: 41.50125rem;
+        }
+
+        .kb-preview-toc__groups {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+          gap: 4rem;
+        }
+      }
+
+      @media print {
+        .kb-preview-toc {
+          display: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="ui-root-site site-print-content site-has-header" data-astro-cid-z4jru4n3="">
+    <div class="ui-visually-hidden" aria-hidden="true" data-astro-cid-z4jru4n3="">
+      Markdown-версия этой страницы доступна по адресу
+      https://kpshelkovo.online/kb/ok/offer/shelkovo-park/index.md.
+    </div>
+    <div class="site-navigation-progress" aria-hidden="true" data-astro-cid-z4jru4n3=""></div>
+    <div class="site-page-shell" data-astro-cid-z4jru4n3="">
+      <header class="site-header" data-astro-cid-jae56hh5="">
+        <div class="site-header-inner ui-page" data-astro-cid-jae56hh5="">
+          <a href="https://kpshelkovo.online/" class="site-header-brand" data-astro-cid-jae56hh5="">
+            Шелково Онлайн
+          </a>
+          <div class="site-header-desktop-nav" data-astro-cid-jae56hh5="">
+            <nav
+              aria-label="Главное меню"
+              class="site-nav site-nav-header"
+              data-astro-cid-kjc35efj=""
+            >
+              <a
+                href="https://kpshelkovo.online/news/"
+                class="site-nav-link"
+                data-astro-cid-kjc35efj=""
+                >Новости</a
+              >
+              <div class="site-nav-dropdown" data-site-nav-dropdown="" data-astro-cid-kjc35efj="">
+                <button
+                  type="button"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  aria-controls="site-header-tariff-menu"
+                  data-site-nav-dropdown-button=""
+                  class="site-nav-link site-nav-dropdown-button"
+                  data-astro-cid-kjc35efj=""
+                >
+                  <span data-astro-cid-kjc35efj="">Тариф 815</span
+                  ><span
+                    aria-hidden="true"
+                    data-site-nav-dropdown-icon=""
+                    class="site-nav-dropdown-icon"
+                    data-astro-cid-kjc35efj=""
+                  ></span>
+                </button>
+                <div
+                  id="site-header-tariff-menu"
+                  data-site-nav-dropdown-menu=""
+                  class="site-nav-submenu"
+                  data-astro-cid-kjc35efj=""
+                >
+                  <div class="site-nav-glass-panel" data-astro-cid-kjc35efj="">
+                    <a
+                      href="https://kpshelkovo.online/815/compare/"
+                      class="site-nav-submenu-link"
+                      data-astro-cid-kjc35efj=""
+                      >Сравнение тарифов</a
+                    ><a
+                      href="https://kpshelkovo.online/815/regulation/"
+                      class="site-nav-submenu-link"
+                      data-astro-cid-kjc35efj=""
+                      >Регламент</a
+                    >
+                  </div>
+                </div>
+              </div>
+              <a
+                href="https://kpshelkovo.online/map/"
+                class="site-nav-link"
+                data-astro-cid-kjc35efj=""
+                >Карта</a
+              ><a
+                href="https://kpshelkovo.online/kb/"
+                aria-current="location"
+                class="site-nav-link"
+                data-astro-cid-kjc35efj=""
+                >База знаний</a
+              ><a
+                href="https://kpshelkovo.online/sarafan/"
+                class="site-nav-link"
+                data-astro-cid-kjc35efj=""
+                >Сарафан</a
+              ><a
+                href="https://kpshelkovo.online/reviews/"
+                class="site-nav-link"
+                data-astro-cid-kjc35efj=""
+                >Отзывы</a
+              ><a
+                href="https://kpshelkovo.online/status/"
+                aria-label="Статус: плановые работы"
+                class="site-nav-link site-nav-status-link"
+                data-home-status-link=""
+                data-home-status-state="amber"
+                data-astro-cid-kjc35efj=""
+                ><span data-astro-cid-kjc35efj="">Статус</span
+                ><span
+                  aria-hidden="true"
+                  data-home-status-dot=""
+                  class="site-nav-status-dot"
+                  data-astro-cid-kjc35efj=""
+                ></span></a
+              ><button
+                type="button"
+                class="site-search-trigger site-search-trigger--header"
+                aria-label="Поиск"
+                title="Поиск"
+                aria-haspopup="dialog"
+                data-search-trigger=""
+                data-pagefind-ignore="all"
+                data-astro-cid-zhcemkkk=""
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="10.75" cy="10.75" r="6.5"></circle>
+                  <path d="m15.5 15.5 4.25 4.25"></path>
+                </svg>
+              </button>
+            </nav>
+          </div>
+          <div class="site-header-mobile-actions" data-astro-cid-jae56hh5="">
+            <a
+              href="https://kpshelkovo.online/status/"
+              aria-label="Статус: плановые работы"
+              title="Статус: плановые работы"
+              class="site-header-status-link"
+              data-home-status-link=""
+              data-home-status-state="amber"
+              data-astro-cid-jae56hh5=""
+              ><span
+                aria-hidden="true"
+                class="site-header-status-dot"
+                data-astro-cid-jae56hh5=""
+              ></span></a
+            ><button
+              type="button"
+              class="site-search-trigger site-search-trigger--mobile"
+              aria-label="Поиск"
+              title="Поиск"
+              aria-haspopup="dialog"
+              data-search-trigger=""
+              data-pagefind-ignore="all"
+              data-astro-cid-zhcemkkk=""
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="10.75" cy="10.75" r="6.5"></circle>
+                <path d="m15.5 15.5 4.25 4.25"></path>
+              </svg>
+            </button>
+            <details class="site-header-menu" data-astro-cid-jae56hh5="">
+              <summary class="site-header-menu-button" aria-label="Меню" data-astro-cid-jae56hh5="">
+                <span class="site-header-menu-label" data-astro-cid-jae56hh5="">Меню</span
+                ><span
+                  aria-hidden="true"
+                  class="site-header-menu-icon"
+                  data-astro-cid-jae56hh5=""
+                ></span>
+              </summary>
+              <div class="site-header-mobile-panel" data-astro-cid-jae56hh5="">
+                <nav
+                  aria-label="Главное меню сайта"
+                  class="site-nav site-nav-mobile"
+                  data-astro-cid-kjc35efj=""
+                >
+                  <a
+                    href="https://kpshelkovo.online/news/"
+                    class="site-nav-mobile-link"
+                    data-astro-cid-kjc35efj=""
+                    >Новости</a
+                  >
+                  <div class="site-nav-mobile-group" data-astro-cid-kjc35efj="">
+                    <p class="site-nav-mobile-label" data-astro-cid-kjc35efj="">Тариф 815</p>
+                    <a
+                      href="https://kpshelkovo.online/815/compare/"
+                      class="site-nav-mobile-link site-nav-mobile-nested"
+                      data-astro-cid-kjc35efj=""
+                      >Сравнение тарифов</a
+                    ><a
+                      href="https://kpshelkovo.online/815/regulation/"
+                      class="site-nav-mobile-link site-nav-mobile-nested"
+                      data-astro-cid-kjc35efj=""
+                      >Регламент</a
+                    >
+                  </div>
+                  <a
+                    href="https://kpshelkovo.online/map/"
+                    class="site-nav-mobile-link"
+                    data-astro-cid-kjc35efj=""
+                    >Карта</a
+                  ><a
+                    href="https://kpshelkovo.online/kb/"
+                    aria-current="location"
+                    class="site-nav-mobile-link"
+                    data-astro-cid-kjc35efj=""
+                    >База знаний</a
+                  ><a
+                    href="https://kpshelkovo.online/sarafan/"
+                    class="site-nav-mobile-link"
+                    data-astro-cid-kjc35efj=""
+                    >Сарафан</a
+                  ><a
+                    href="https://kpshelkovo.online/reviews/"
+                    class="site-nav-mobile-link"
+                    data-astro-cid-kjc35efj=""
+                    >Отзывы</a
+                  ><a
+                    href="https://kpshelkovo.online/status/"
+                    aria-label="Статус: плановые работы"
+                    class="site-nav-mobile-link site-nav-mobile-status-link"
+                    data-home-status-link=""
+                    data-home-status-state="amber"
+                    data-astro-cid-kjc35efj=""
+                    ><span data-astro-cid-kjc35efj="">Статус</span
+                    ><span
+                      aria-hidden="true"
+                      data-home-status-dot=""
+                      class="site-nav-status-dot"
+                      data-astro-cid-kjc35efj=""
+                    ></span
+                  ></a>
+                </nav>
+              </div>
+            </details>
+          </div>
+        </div>
+      </header>
+      <div
+        class="site-page-content"
+        data-pagefind-root="true"
+        data-pagefind-body="true"
+        data-pagefind-meta="title[data-search-title], description[data-search-description], sectionId[data-search-section-id], sectionLabel[data-search-section-label]"
+        data-pagefind-filter="section[data-search-section-id]"
+        data-search-title="Публичная оферта - Шелково Парк"
+        data-search-description="Публичная оферта ОК Комфорт для Шелково Парк: обслуживание инфраструктуры, платежи, пропускной режим и правила поселка."
+        data-search-section-id="knowledge-base"
+        data-search-section-label="База знаний"
+        data-astro-cid-z4jru4n3=""
+      >
+        <main class="ui-page kb-page kb-preview-page" data-astro-cid-dqu5pb4k="">
+          <header class="ui-page-header" data-astro-cid-dqu5pb4k="">
+            <div class="ui-page-header-stack kb-header" data-astro-cid-dqu5pb4k="">
+              <nav
+                aria-label="Хлебные крошки"
+                class="breadcrumbs"
+                data-pagefind-ignore="all"
+                data-astro-cid-d632246g=""
+              >
+                <ol
+                  class="breadcrumbs-list"
+                  itemscope=""
+                  itemtype="https://schema.org/BreadcrumbList"
+                  data-astro-cid-d632246g=""
+                >
+                  <li
+                    class="breadcrumbs-item breadcrumbs-item--home"
+                    itemprop="itemListElement"
+                    itemscope=""
+                    itemtype="https://schema.org/ListItem"
+                    data-astro-cid-d632246g=""
+                  >
+                    <a
+                      href="https://kpshelkovo.online/"
+                      class="breadcrumbs-link"
+                      itemprop="item"
+                      data-astro-cid-d632246g=""
+                      ><span itemprop="name" data-astro-cid-d632246g="">Главная</span></a
+                    ><meta itemprop="position" content="1" />
+                  </li>
+                  <li
+                    class="breadcrumbs-item breadcrumbs-item--parent-first"
+                    itemprop="itemListElement"
+                    itemscope=""
+                    itemtype="https://schema.org/ListItem"
+                    data-astro-cid-d632246g=""
+                  >
+                    <span
+                      class="breadcrumbs-separator"
+                      aria-hidden="true"
+                      data-astro-cid-d632246g=""
+                      >›</span
+                    ><a
+                      href="https://kpshelkovo.online/kb/"
+                      class="breadcrumbs-link"
+                      itemprop="item"
+                      data-astro-cid-d632246g=""
+                      ><span itemprop="name" data-astro-cid-d632246g="">База знаний</span></a
+                    ><meta itemprop="position" content="2" />
+                  </li>
+                  <li
+                    class="breadcrumbs-item"
+                    itemprop="itemListElement"
+                    itemscope=""
+                    itemtype="https://schema.org/ListItem"
+                    data-astro-cid-d632246g=""
+                  >
+                    <span
+                      class="breadcrumbs-separator"
+                      aria-hidden="true"
+                      data-astro-cid-d632246g=""
+                      >›</span
+                    ><a
+                      href="https://kpshelkovo.online/kb/ok/"
+                      class="breadcrumbs-link"
+                      itemprop="item"
+                      data-astro-cid-d632246g=""
+                      ><span itemprop="name" data-astro-cid-d632246g="">ОК Комфорт</span></a
+                    ><meta itemprop="position" content="3" />
+                  </li>
+                  <li
+                    class="breadcrumbs-item breadcrumbs-item--current"
+                    itemprop="itemListElement"
+                    itemscope=""
+                    itemtype="https://schema.org/ListItem"
+                    data-astro-cid-d632246g=""
+                  >
+                    <span
+                      class="breadcrumbs-separator"
+                      aria-hidden="true"
+                      data-astro-cid-d632246g=""
+                      >›</span
+                    ><span
+                      class="breadcrumbs-current"
+                      aria-current="page"
+                      itemprop="name"
+                      data-astro-cid-d632246g=""
+                      >Публичная оферта - Шелково Парк</span
+                    ><meta itemprop="position" content="4" />
+                  </li>
+                </ol>
+              </nav>
+              <h1 class="ui-page-title" data-pagefind-ignore="all" data-astro-cid-dqu5pb4k="">
+                Публичная оферта - Шелково Парк
+              </h1>
+            </div>
+          </header>
+          <article class="kb-body" data-astro-cid-dqu5pb4k="">
+            <div class="kb-preview-column">
+              <div class="ui-prose" data-astro-cid-dqu5pb4k="">
+                <aside class="kb-preview-document">
+                  <p class="kb-preview-document__edition">
+                    <a
+                      href="https://media.kpshelkovo.online/kb/ok/offer/2026-07-07/shelkovo-park.pdf"
+                      class="ui-file-link"
+                      title="Оригинал документа (PDF)"
+                      ><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 28 24"
+                        class="ui-file-link__icon"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.45"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path
+                          class="ui-file-pdf-icon__page"
+                          d="M7.25 2.75h8l5.5 5.5v13H7.25z"
+                        ></path>
+                        <path class="ui-file-pdf-icon__label" d="M15.25 2.75v5.5h5.5"></path>
+                        <path
+                          class="ui-file-pdf-icon__label"
+                          d="M9.25 17.75v-5h1.5a1.5 1.5 0 0 1 0 3h-1.5"
+                        ></path>
+                        <path
+                          class="ui-file-pdf-icon__label"
+                          d="M13.75 12.75v5h1a2.5 2.5 0 0 0 0-5h-1"
+                        ></path>
+                        <path
+                          class="ui-file-pdf-icon__label"
+                          d="M18.25 17.75v-5h2.5M18.25 15.25h2"
+                        ></path></svg
+                      ><span>Оригинал от 09 июня 2026</span></a
+                    >
+                  </p>
+                  <p class="kb-preview-document__note">
+                    Текст распознан автоматически и может содержать неточности.
+                  </p>
+                </aside>
+              </div>
+            </div>
+            <nav class="ui-prose kb-preview-toc" aria-label="Содержание">
+              <div class="kb-preview-toc__inner">
+                <p class="ui-markdown-toc__title"><strong>Содержание</strong></p>
+                <ul class="ui-markdown-toc__list">
+                  <li><a href="#термины-и-определения">Термины и&nbsp;определения</a></li>
+                  <li><a href="#1-общие-положения">1. Общие положения</a></li>
+                  <li><a href="#2-предмет-договора">2. Предмет договора</a></li>
+                  <li>
+                    <a href="#3-акцепт-оферты-и-заключение-договора"
+                      >3. Акцепт оферты и&nbsp;заключение договора</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#4-права-и-обязанности-сторон">4. Права и&nbsp;обязанности сторон</a>
+                  </li>
+                  <li>
+                    <a href="#5-стоимость-услуг-работ-и-порядок-расчетов"
+                      >5. Стоимость услуг (работ) и&nbsp;порядок расчетов</a
+                    >
+                  </li>
+                  <li><a href="#6-порядок-разрешения-споров">6. Порядок разрешения споров</a></li>
+                  <li>
+                    <a href="#7-форс-мажорные-обстоятельства">7. Форс-мажорные обстоятельства</a>
+                  </li>
+                  <li><a href="#8-ответственность-сторон">8. Ответственность сторон</a></li>
+                  <li><a href="#9-конфиденциальность">9. Конфиденциальность</a></li>
+                  <li><a href="#10-прочие-условия">10. Прочие условия</a></li>
+                  <li>
+                    <a href="#11-qr-code-для-скачивания-мобильного-приложения"
+                      >11. QR&nbsp;code для&nbsp;скачивания мобильного приложения</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#12-адреса-и-реквизиты-сторон">12. Адреса и&nbsp;реквизиты сторон</a>
+                  </li>
+                  <li>
+                    <a
+                      href="#приложение-1-перечень-оказываемых-услуг-обслуживающей-компании-состав-и-периодичность-выполняемых-работ"
+                      >Приложение&nbsp;№ 1: Перечень оказываемых услуг обслуживающей компании.
+                      Состав и&nbsp;периодичность выполняемых работ</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#приложение-2-правила-проведения-строительно-монтажных-работ-на-территории-коттеджного-поселка"
+                      >Приложение&nbsp;№ 2: Правила проведения строительно-монтажных работ
+                      на&nbsp;территории коттеджного поселка</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#приложение-3-дополнительные-услуги-оказываемые-обслуживающей-компанией"
+                      >Приложение&nbsp;№ 3: Дополнительные услуги, оказываемые Обслуживающей
+                      компанией</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="#приложение-4-технические-условия-по-устройству-ограждения-участка-в-кп-shelkovo-park"
+                      >Приложение&nbsp;№ 4: Технические Условия по&nbsp;устройству ограждения
+                      участка в&nbsp;КП&nbsp;«Shelkovo Park»</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#приложение-5-технические-условия-на-организацию-въездной-группы"
+                      >Приложение&nbsp;№ 5: Технические Условия на&nbsp;организацию въездной
+                      группы</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#приложение-6-технические-условия-по-монтажу-станции-сгбо"
+                      >Приложение&nbsp;№ 6: Технические условия по&nbsp;монтажу станции СГБО</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#приложение-7-правила-внутреннего-проживания-на-территории-поселка"
+                      >Приложение&nbsp;№ 7: Правила внутреннего проживания на&nbsp;территории
+                      поселка</a
+                    >
+                  </li>
+                </ul>
+              </div>
+            </nav>
+            <div class="kb-preview-column">
+              <div class="ui-prose" data-astro-cid-dqu5pb4k="">
+                <h1
+                  id="публичный-договор-с-обслуживающей-компанией"
+                  aria-label="Публичный договор с обслуживающей компанией"
+                >
+                  Публичный договор с&nbsp;обслуживающей компанией<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#публичный-договор-с-обслуживающей-компанией"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h1>
+
+                <p>
+                  Настоящий публичный договор составлен в&nbsp;соответствии с&nbsp;требованиями
+                  статей
+                  <a
+                    href="https://www.consultant.ru/document/cons_doc_LAW_5142/5b4886fd41d95bd272f7a06c75e26762630ac683/"
+                    >426</a
+                  >,
+                  <a
+                    href="https://www.consultant.ru/document/cons_doc_LAW_5142/1a77b2ec302d6a384a228dff59e53680ccffaaca/"
+                    >437</a
+                  >
+                  Гражданского кодекса Российской Федерации и&nbsp;является официальным, публичным
+                  и&nbsp;безотзывным предложением (публичной офертой) Общества с&nbsp;ограниченной
+                  ответственностью «Комфорт», в&nbsp;лице Директора Кизилова Юрия Викторовича,
+                  действующего на&nbsp;основании Устава, именуемое в&nbsp;дальнейшем «Обслуживающая
+                  компания», с&nbsp;одной Стороны, адресован физическим и&nbsp;юридическим лицам,
+                  владеющим на&nbsp;праве собственности, а&nbsp;также пользующимся на&nbsp;ином
+                  законном основании земельными участками, жилыми и&nbsp;нежилыми помещениями,
+                  находящихся в&nbsp;Коттеджном поселке «Shelkovo Park», находящийся по&nbsp;адресу:
+                  Российская Федерация, Московская область, г.&nbsp;о. Ступино, с.&nbsp;Семеновское,
+                  именуемым в&nbsp;дальнейшем «Клиент», с&nbsp;другой стороны, при&nbsp;совместном
+                  упоминании «Стороны», заключают настоящий договор на&nbsp;указанных ниже условиях:
+                </p>
+                <h2 id="термины-и-определения" aria-label="Термины и определения">
+                  Термины и&nbsp;определения<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#термины-и-определения"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>
+                  Оферта&nbsp;— публичное предложение Обслуживающей компании, адресованное любому
+                  физическому лицу (гражданину), или&nbsp;юридическому лицу (организации), имеющих
+                  в&nbsp;собственности земельный участок на&nbsp;территории Поселка, заключить
+                  с&nbsp;ним Договор на&nbsp;оказание комплекса эксплуатационных услуг
+                  по&nbsp;обслуживанию территории Единой инфраструктуры поселка, перечень которых
+                  изложен в
+                  <a
+                    href="#%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-1-%D0%BF%D0%B5%D1%80%D0%B5%D1%87%D0%B5%D0%BD%D1%8C-%D0%BE%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D0%BC%D1%8B%D1%85-%D1%83%D1%81%D0%BB%D1%83%D0%B3-%D0%BE%D0%B1%D1%81%D0%BB%D1%83%D0%B6%D0%B8%D0%B2%D0%B0%D1%8E%D1%89%D0%B5%D0%B9-%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D0%B8-%D1%81%D0%BE%D1%81%D1%82%D0%B0%D0%B2-%D0%B8-%D0%BF%D0%B5%D1%80%D0%B8%D0%BE%D0%B4%D0%B8%D1%87%D0%BD%D0%BE%D1%81%D1%82%D1%8C-%D0%B2%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D1%8F%D0%B5%D0%BC%D1%8B%D1%85-%D1%80%D0%B0%D0%B1%D0%BE%D1%82"
+                    >Приложении&nbsp;№ 1</a
+                  >
+                  к&nbsp;настоящему Договору на&nbsp;существующих условиях, содержащихся
+                  в&nbsp;Договоре.
+                </p>
+                <p>
+                  Акцепт&nbsp;— полное и&nbsp;безоговорочное принятие Клиентом условий Договора.
+                </p>
+                <p>
+                  Услуги&nbsp;— услуги, оказываемые Обслуживающей компанией Клиенту, перечень
+                  которых приведен в
+                  <a
+                    href="#%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-1-%D0%BF%D0%B5%D1%80%D0%B5%D1%87%D0%B5%D0%BD%D1%8C-%D0%BE%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D0%BC%D1%8B%D1%85-%D1%83%D1%81%D0%BB%D1%83%D0%B3-%D0%BE%D0%B1%D1%81%D0%BB%D1%83%D0%B6%D0%B8%D0%B2%D0%B0%D1%8E%D1%89%D0%B5%D0%B9-%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D0%B8-%D1%81%D0%BE%D1%81%D1%82%D0%B0%D0%B2-%D0%B8-%D0%BF%D0%B5%D1%80%D0%B8%D0%BE%D0%B4%D0%B8%D1%87%D0%BD%D0%BE%D1%81%D1%82%D1%8C-%D0%B2%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D1%8F%D0%B5%D0%BC%D1%8B%D1%85-%D1%80%D0%B0%D0%B1%D0%BE%D1%82"
+                    >Приложении&nbsp;№ 1</a
+                  >
+                  к&nbsp;настоящей оферте, а&nbsp;также размещены на&nbsp;официальном сайте
+                  Обслуживающей компании в&nbsp;сети Интернет (<a href="https://ok-komfort.ru/"
+                    >https://ok-komfort.ru/</a
+                  >).
+                </p>
+                <p>
+                  Поселок&nbsp;— коттеджный поселок «Shelkovo Park», находящийся по&nbsp;адресу:
+                  Российская Федерация, Московская область, г.&nbsp;о. Ступино, с.&nbsp;Семеновское,
+                  включающий в&nbsp;себя земельные участки и&nbsp;жилые дома, объединенные единой
+                  инфраструктурой.
+                </p>
+                <p>
+                  Земельный участок&nbsp;— участок, предназначенный для&nbsp;строительства жилого
+                  дома, расположенный на&nbsp;территории Поселка.
+                </p>
+                <p>
+                  Клиент&nbsp;— физическое/юридическое лицо, владеющее Земельным участком,
+                  являющееся Стороной по&nbsp;Договору, а&nbsp;также лицо, действующее от&nbsp;имени
+                  Клиента в&nbsp;установленном законом порядке. В&nbsp;целях понимания настоящего
+                  Договора в&nbsp;пунктах, касающихся Правил внутреннего проживания
+                  на&nbsp;территории Поселка (далее по&nbsp;тексту&nbsp;— «Правила проживания»)
+                  под&nbsp;Клиентом также понимается все лица, имеющие доступ на&nbsp;Земельный
+                  участок на&nbsp;законных основаниях.
+                </p>
+                <p>
+                  Единая инфраструктура поселка&nbsp;— вся территория в&nbsp;границах Поселка,
+                  расположенная за&nbsp;пределами территории Земельных участков, с&nbsp;находящимся
+                  на&nbsp;ней движимым и&nbsp;недвижимым имуществом, предназначенная
+                  для&nbsp;доступа к&nbsp;Земельным участкам, в&nbsp;состав которой,
+                  в&nbsp;частности, входят: земельные участки общего пользования, внешний забор,
+                  сети инженерно-технического обеспечения, здания и&nbsp;сооружения, предназначенные
+                  для&nbsp;организации пропускного режима и&nbsp;инженерно-технического обеспечения,
+                  внутрипоселковые дороги, детские и&nbsp;спортивные площадки, многолетние зеленые
+                  насаждения, элементы озеленения и&nbsp;благоустройства и&nbsp;другие подобные
+                  объекты для&nbsp;организации досуга, отдыха и&nbsp;иных потребностей Клиентов.
+                </p>
+                <p>
+                  Оборудование&nbsp;— означает инженерные системы и&nbsp;сети Поселка,
+                  обеспечивающие нормальное его функционирование, а&nbsp;также приспособления
+                  и&nbsp;механизмы, необходимые для&nbsp;осуществления работ по&nbsp;эксплуатации
+                  Поселка в&nbsp;целом.
+                </p>
+                <h2 id="1-общие-положения" aria-label="1. Общие положения">
+                  1. Общие положения<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#1-общие-положения"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>
+                  1.1. Стороны, заключая настоящий Договор, исходят из&nbsp;следующих начал
+                  и&nbsp;предпосылок:
+                </p>
+                <ul>
+                  <li>
+                    Клиент приобрел земельный участок на&nbsp;территории Коттеджного поселка
+                    «Shelkovo Park»;
+                  </li>
+                  <li>
+                    у&nbsp;Клиента присутствует необходимость в&nbsp;получении комплекса
+                    эксплуатационных и&nbsp;других видов услуг, использовании общей территории,
+                    дорог и&nbsp;инфраструктуры Коттеджного поселка «Shelkovo Park»;
+                  </li>
+                  <li>
+                    Обслуживающая компания вступает во&nbsp;взаимоотношения с&nbsp;третьими лицами
+                    и&nbsp;заключает соответствующие договоры, направленные на&nbsp;обеспечение
+                    потребностей Клиента в&nbsp;использовании общих объектов инфраструктуры
+                    и&nbsp;общих мест пользования Коттеджного поселка «Shelkovo Park».
+                  </li>
+                </ul>
+                <p>
+                  1.2. В&nbsp;соответствии с
+                  <a href="https://www.consultant.ru/document/cons_doc_LAW_5142/"
+                    >Гражданским кодексом РФ</a
+                  >,
+                  <a href="https://www.consultant.ru/document/cons_doc_LAW_51057/"
+                    >Жилищным кодексом РФ</a
+                  >
+                  и&nbsp;другими нормативными актами, граждане и&nbsp;организации обязаны
+                  своевременно совершать платежи в&nbsp;счет оплаты коммунальных, эксплуатационных
+                  и&nbsp;иных услуг по&nbsp;настоящему Договору.
+                </p>
+                <p>
+                  1.3. Полным и&nbsp;безоговорочным акцептом настоящей публичной оферты является
+                  приобретение Клиентом права собственности или&nbsp;иного законного основания
+                  пользования, владения, распоряжения на&nbsp;земельный участок в&nbsp;коттеджном
+                  поселке «Shelkovo Park» (<a
+                    href="https://www.consultant.ru/document/cons_doc_LAW_5142/912ecd30f8655752c373ce4bde835b3832154b11/"
+                    >ст.&nbsp;438 ГК&nbsp;РФ</a
+                  >).
+                </p>
+                <p>
+                  1.4. Акцепт оферты означает, что Клиент согласен со&nbsp;всеми положениями
+                  настоящего Договора, и&nbsp;равносилен заключению договора с&nbsp;обслуживающей
+                  компанией.
+                </p>
+                <p>
+                  1.5. Данная оферта вступает в&nbsp;силу с&nbsp;момента размещения
+                  на&nbsp;официальном сайте Обслуживающей компании в&nbsp;сети Интернет (<a
+                    href="https://ok-komfort.ru/"
+                    >https://ok-komfort.ru/</a
+                  >).
+                </p>
+                <h2 id="2-предмет-договора" aria-label="2. Предмет договора">
+                  2. Предмет договора<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#2-предмет-договора"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>
+                  2.1. По&nbsp;настоящему Договору Обслуживающая компания обязуется оказывать
+                  Клиенту комплекс эксплуатационных услуг по&nbsp;обслуживанию территории Единой
+                  инфраструктуры поселка, перечень которых изложен в
+                  <a
+                    href="#%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-1-%D0%BF%D0%B5%D1%80%D0%B5%D1%87%D0%B5%D0%BD%D1%8C-%D0%BE%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D0%BC%D1%8B%D1%85-%D1%83%D1%81%D0%BB%D1%83%D0%B3-%D0%BE%D0%B1%D1%81%D0%BB%D1%83%D0%B6%D0%B8%D0%B2%D0%B0%D1%8E%D1%89%D0%B5%D0%B9-%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D0%B8-%D1%81%D0%BE%D1%81%D1%82%D0%B0%D0%B2-%D0%B8-%D0%BF%D0%B5%D1%80%D0%B8%D0%BE%D0%B4%D0%B8%D1%87%D0%BD%D0%BE%D1%81%D1%82%D1%8C-%D0%B2%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D1%8F%D0%B5%D0%BC%D1%8B%D1%85-%D1%80%D0%B0%D0%B1%D0%BE%D1%82"
+                    >Приложении&nbsp;№ 1</a
+                  >
+                  к&nbsp;настоящему Договору, а&nbsp;Клиент обязуется оплачивать указанные услуги
+                  в&nbsp;порядке и&nbsp;на&nbsp;условиях, предусмотренных настоящим Договором.
+                </p>
+                <p>
+                  2.2. По&nbsp;желанию Клиента ему могут быть оказаны дополнительные услуги. Полный
+                  перечень дополнительных услуг, предоставляемых Обслуживающей компанией, указан
+                  на&nbsp;официальном сайте Обслуживающей компании в&nbsp;сети Интернет (<a
+                    href="https://ok-komfort.ru/"
+                    >https://ok-komfort.ru/</a
+                  >) в&nbsp;разделе «Услуги», в&nbsp;мобильном приложении «КОМФОРТ», а&nbsp;также в
+                  <a
+                    href="#%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-3-%D0%B4%D0%BE%D0%BF%D0%BE%D0%BB%D0%BD%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D0%B5-%D1%83%D1%81%D0%BB%D1%83%D0%B3%D0%B8-%D0%BE%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D0%BC%D1%8B%D0%B5-%D0%BE%D0%B1%D1%81%D0%BB%D1%83%D0%B6%D0%B8%D0%B2%D0%B0%D1%8E%D1%89%D0%B5%D0%B9-%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D0%B5%D0%B9"
+                    >Приложении&nbsp;№ 3</a
+                  >, являющимся неотъемлемой частью данного Договора.
+                </p>
+                <p>
+                  2.3. Услуги, предоставляемые Обслуживающей компанией, обеспечивают надлежащее
+                  содержание Единой инфраструктуры поселка и&nbsp;направлены на&nbsp;обеспечение
+                  благоприятных и&nbsp;безопасных условий проживания Клиентов.
+                </p>
+                <p>
+                  2.4. Условия настоящего Договора являются одинаковыми для&nbsp;всех Клиентов
+                  Поселка.
+                </p>
+                <h2
+                  id="3-акцепт-оферты-и-заключение-договора"
+                  aria-label="3. Акцепт оферты и заключение договора"
+                >
+                  3. Акцепт оферты и&nbsp;заключение договора<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#3-акцепт-оферты-и-заключение-договора"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>
+                  3.1. Начиная с&nbsp;даты подписания Клиентом договора купли-продажи земельного
+                  участка, либо с&nbsp;даты подписания Клиентом предварительного договора
+                  купли-продажи земельного участка, но&nbsp;не&nbsp;ранее размещения настоящей
+                  оферты на&nbsp;официальном сайте Обслуживающей компании в&nbsp;сети Интернет,
+                  последний оплачивает услуги Обслуживающей компании на&nbsp;условиях,
+                  предусмотренных настоящей Офертой.
+                </p>
+                <p>
+                  3.2. С&nbsp;момента приобретения Клиентом права собственности или&nbsp;иного
+                  законного основания пользования, владения, распоряжения на&nbsp;земельный участок
+                  в&nbsp;коттеджном поселке «Shelkovo Park» (<a
+                    href="https://www.consultant.ru/document/cons_doc_LAW_5142/912ecd30f8655752c373ce4bde835b3832154b11/"
+                    >ст.&nbsp;438 ГК&nbsp;РФ</a
+                  >), но&nbsp;не&nbsp;ранее размещения настоящей оферты на&nbsp;официальном сайте
+                  Обслуживающей компании в&nbsp;сети Интернет, настоящая оферта признается
+                  акцептованной, а&nbsp;Договор на&nbsp;условиях настоящей оферты считается
+                  заключенным.
+                </p>
+                <p>
+                  3.3. Клиентами настоящей Оферты являются собственники земельных участков
+                  на&nbsp;основании заключенных договоров купли-продажи земельных участков либо
+                  пользователи земельных участков на&nbsp;основании заключенных предварительных
+                  договоров купли-продажи земельных участков на&nbsp;территории Коттеджного поселка
+                  «Shelkovo Park», находящийся по&nbsp;адресу: Российская Федерация, Московская
+                  область, г.&nbsp;о. Ступино, с.&nbsp;Семеновское.
+                </p>
+                <p>
+                  3.4. Оферта может быть отозвана Обслуживающей компанией в&nbsp;одностороннем
+                  порядке без&nbsp;указания причин до&nbsp;истечения срока для&nbsp;акцепта,
+                  о&nbsp;чем Обслуживающая компания указывает на&nbsp;Сайте.
+                </p>
+                <p>
+                  3.5. Настоящая Оферта вступает в&nbsp;силу с&nbsp;момента её&nbsp;размещения
+                  на&nbsp;Сайте и&nbsp;действует до&nbsp;момента её&nbsp;отзыва Обслуживающей
+                  компанией.
+                </p>
+                <p>
+                  3.6. В&nbsp;случае внесения Обслуживающей компанией изменений в&nbsp;Оферту такие
+                  изменения вступают в&nbsp;силу с&nbsp;момента размещения новой редакции Оферты
+                  на&nbsp;Сайте.
+                </p>
+                <h2 id="4-права-и-обязанности-сторон" aria-label="4. Права и обязанности сторон">
+                  4. Права и&nbsp;обязанности сторон<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#4-права-и-обязанности-сторон"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>4.1. Обслуживающая компания обязана:</p>
+                <p>
+                  4.1.1. Оказывать Клиенту комплекс услуг, перечень которых изложен в
+                  <a
+                    href="#%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-1-%D0%BF%D0%B5%D1%80%D0%B5%D1%87%D0%B5%D0%BD%D1%8C-%D0%BE%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D0%BC%D1%8B%D1%85-%D1%83%D1%81%D0%BB%D1%83%D0%B3-%D0%BE%D0%B1%D1%81%D0%BB%D1%83%D0%B6%D0%B8%D0%B2%D0%B0%D1%8E%D1%89%D0%B5%D0%B9-%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D0%B8-%D1%81%D0%BE%D1%81%D1%82%D0%B0%D0%B2-%D0%B8-%D0%BF%D0%B5%D1%80%D0%B8%D0%BE%D0%B4%D0%B8%D1%87%D0%BD%D0%BE%D1%81%D1%82%D1%8C-%D0%B2%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D1%8F%D0%B5%D0%BC%D1%8B%D1%85-%D1%80%D0%B0%D0%B1%D0%BE%D1%82"
+                    >Приложение&nbsp;№ 1</a
+                  >.
+                </p>
+                <p>
+                  4.1.2. Доводить до&nbsp;сведения Клиентов информацию по&nbsp;порядку обслуживания
+                  территории и&nbsp;оказания эксплуатационных услуг, путем направления
+                  информационных писем на&nbsp;электронную почту, через мобильное приложение
+                  «КОМФОРТ», а&nbsp;также на&nbsp;официальном сайте Обслуживающей компании
+                  в&nbsp;сети Интернет (<a href="https://ok-komfort.ru/">https://ok-komfort.ru/</a
+                  >). Организовывать и&nbsp;вести прием Клиентов.
+                </p>
+                <p>
+                  4.1.3. Осуществлять содержание, техническое обслуживание, эксплуатацию
+                  и&nbsp;функционирование объектов инфраструктуры Единой инфраструктуры поселка
+                  и&nbsp;его Оборудования. Заключать для&nbsp;этих целей все необходимые договоры,
+                  соглашения с&nbsp;подрядными и&nbsp;иными организациями.
+                </p>
+                <p>
+                  4.1.4. Рассматривать поступившие от&nbsp;Клиента жалобы и&nbsp;предложения
+                  и&nbsp;принимать необходимые меры по&nbsp;их&nbsp;разрешению.
+                </p>
+                <p>
+                  4.1.5. Осуществлять меры, направленные на&nbsp;исполнение всеми Клиентами Правил
+                  внутреннего проживания на&nbsp;территории Поселка, в&nbsp;том числе применения
+                  к&nbsp;лицам, не&nbsp;соблюдающим Правила проживания, санкций в&nbsp;виде
+                  частичного или&nbsp;полного прекращения оказания соответствующих услуг
+                  до&nbsp;момента устранения нарушения.
+                </p>
+                <p>4.1.6. Производить сбор платежей от&nbsp;Клиентов в&nbsp;счет оплаты услуг.</p>
+                <p>
+                  4.1.7. Участвовать во&nbsp;всех проверках и&nbsp;обследованиях Поселка,
+                  а&nbsp;также в&nbsp;составлении актов по&nbsp;фактам непредставления,
+                  некачественного или&nbsp;несвоевременного предоставления услуг
+                  по&nbsp;обслуживанию согласно настоящему Договору.
+                </p>
+                <p>4.2. Обслуживающая компания имеет право:</p>
+                <p>
+                  4.2.1. Самостоятельно определять порядок и&nbsp;способ выполнения (оказания)
+                  услуг, численность и&nbsp;состав необходимого для&nbsp;оказания услуг персонала.
+                  Самостоятельно или&nbsp;с&nbsp;привлечением иных лиц и&nbsp;специалистов, имеющих
+                  необходимые навыки, оборудование, организовать проведение работ по&nbsp;содержанию
+                  и&nbsp;текущему ремонту Оборудования Поселка.
+                </p>
+                <p>
+                  4.2.2. Самостоятельно определять порядок и&nbsp;способ выполнения обязательств,
+                  как&nbsp;собственными силами, так и&nbsp;силами сторонних организаций
+                  без&nbsp;согласования с&nbsp;Клиентом, но&nbsp;в&nbsp;его интересах.
+                </p>
+                <p>
+                  4.2.3. Вносить предложения по&nbsp;модернизации существующих систем
+                  и&nbsp;объектов инфраструктуры на&nbsp;территории Поселка.
+                </p>
+                <p>
+                  4.2.4. Составлять акты, дефектные ведомости, выявленным в&nbsp;процессе
+                  эксплуатации объектов инфраструктуры Поселка.
+                </p>
+                <p>
+                  4.2.5. При&nbsp;необходимости представлять интересы Клиента в&nbsp;органах
+                  государственной власти и&nbsp;местного самоуправления, контрольных, надзорных
+                  и&nbsp;иных органах и&nbsp;организациях по&nbsp;вопросам, связанным
+                  с&nbsp;исполнением настоящего Договора, на&nbsp;основании дополнительного
+                  соглашения, поручения, доверенности.
+                </p>
+                <p>
+                  4.2.6. Принимать меры по&nbsp;взысканию задолженности Клиента по&nbsp;оплате
+                  за&nbsp;услуги (работы) по&nbsp;обслуживанию Поселка. В&nbsp;случае просрочки
+                  Клиентом платежей более чем на&nbsp;2 (два) месяца по&nbsp;настоящему Договору,
+                  Обслуживающая компания вправе ограничить доступ Клиента к&nbsp;объектам
+                  инфраструктуры, в&nbsp;том числе, ограничить (запретить) проезд частного
+                  или&nbsp;строительного автотранспорта.
+                </p>
+                <p>
+                  4.2.7. В&nbsp;случае невыполнения Клиентом требований, указанных в&nbsp;пункте
+                  4.3.8., Обслуживающая компания направляет на&nbsp;адрес электронной почты Клиента,
+                  указанной в&nbsp;настоящем Договоре, уведомление о&nbsp;необходимости проведения
+                  работ. Если&nbsp;по&nbsp;истечению 30 (тридцати) календарных дней с&nbsp;момента
+                  получения уведомления Клиентом не&nbsp;предпринимаются меры по&nbsp;исполнению
+                  пункта 4.3.8. Обслуживающая компания самостоятельно выполняет данные работы
+                  в&nbsp;соответствии с&nbsp;прейскурантом, действующим на&nbsp;момент проведения
+                  работ. Счет за&nbsp;выполненные работы направляется Клиенту на&nbsp;электронную
+                  почту и&nbsp;через мобильное приложение «КОМФОРТ». В&nbsp;течение 10 (десяти)
+                  рабочих дней с&nbsp;момента направления счета Клиент обязан оплатить выполненные
+                  работы.
+                </p>
+                <p>4.3. Клиент обязуется:</p>
+                <p>
+                  4.3.1. Перед началом строительства провести консультационную встречу
+                  с&nbsp;сотрудником Обслуживающей компании, с&nbsp;целью ознакомления
+                  с&nbsp;порядком и&nbsp;правилами проведения строительно-монтажных работ.
+                </p>
+                <p>
+                  4.3.2. Проводить строительно-монтажные работы согласно установленным правилам,
+                  изложенным в
+                  <a
+                    href="#%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-2-%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0-%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F-%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE-%D0%BC%D0%BE%D0%BD%D1%82%D0%B0%D0%B6%D0%BD%D1%8B%D1%85-%D1%80%D0%B0%D0%B1%D0%BE%D1%82-%D0%BD%D0%B0-%D1%82%D0%B5%D1%80%D1%80%D0%B8%D1%82%D0%BE%D1%80%D0%B8%D0%B8-%D0%BA%D0%BE%D1%82%D1%82%D0%B5%D0%B4%D0%B6%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BF%D0%BE%D1%81%D0%B5%D0%BB%D0%BA%D0%B0"
+                    >Приложении&nbsp;№ 2</a
+                  >, являющимся неотъемлемой частью данного Договора.
+                </p>
+                <p>
+                  4.3.3. В&nbsp;надлежащие сроки и&nbsp;в&nbsp;полном объеме совершать платежи
+                  в&nbsp;счет оплаты коммунальных, эксплуатационных и&nbsp;иных услуг
+                  по&nbsp;настоящему Договору.
+                </p>
+                <p>
+                  4.3.4. При&nbsp;покупке земельного участка, граничащего с&nbsp;землями лесного
+                  фонда, установить заднюю часть ограждения согласно Технических Условий
+                  в&nbsp;течение 30 (тридцати) календарных дней с&nbsp;момента заключения настоящего
+                  Договора. Технические Условия предоставляются Обслуживающей компанией. Услуга
+                  по&nbsp;установке ограждения может быть оказана Обслуживающей компанией.
+                </p>
+                <p>
+                  4.3.5. При&nbsp;покупке земельного участка с&nbsp;уже установленным ограждением
+                  по&nbsp;общей/смежной стороне с&nbsp;соседним участком, оплатить стоимость
+                  установленного ограждения собственнику соседнего участка, в&nbsp;размере 50%
+                  от&nbsp;общей стоимости, в&nbsp;течение 30 (тридцати дней) с&nbsp;момента
+                  подписания настоящего Договора.
+                </p>
+                <p>
+                  4.3.6. В&nbsp;течение 6 (шести) месяцев с&nbsp;момента заключения настоящего
+                  Договора, установить ограждение по&nbsp;трем сторонам участка, за&nbsp;исключением
+                  фасадной, в&nbsp;случае отсутствия строительно-монтажных работ на&nbsp;участке.
+                  Технические Условия предоставляются Обслуживающей компанией. Услуга
+                  по&nbsp;установке ограждения может быть оказана Обслуживающей компанией.
+                </p>
+                <p>
+                  4.3.7. В&nbsp;случае, если&nbsp;соседствующий земельный участок, принадлежащий
+                  другому Клиенту, ограждается до&nbsp;истечения 6 (шести) календарных месяцев
+                  с&nbsp;момента подписания настоящего Договора, Клиент обязуется оплатить 50%
+                  стоимости общей стороны ограждения собственнику соседнего участка, в&nbsp;течение
+                  30 (тридцати) календарных дней с&nbsp;момента установки общей/смежной стороны
+                  ограждения.
+                </p>
+                <p>
+                  4.3.8. Поддерживать внешний вид ограждения в&nbsp;надлежащем виде. Мойка
+                  производится по&nbsp;мере загрязнения, ремонт, окрашивание ограждения и&nbsp;его
+                  элементов производится по&nbsp;мере необходимости, но&nbsp;не&nbsp;реже одного
+                  раза в&nbsp;три года.
+                </p>
+                <p>
+                  4.3.9. В&nbsp;течение 12 (двенадцати) календарных месяцев с&nbsp;момента
+                  завершения строительных работ на&nbsp;земельном участке, организовать посадку 5
+                  (пяти) деревьев вдоль фасадной стороны земельного участка.
+                </p>
+                <p>
+                  4.3.10. Обеспечить содержание зеленых насаждений, расположенных на&nbsp;его
+                  земельном участке, в&nbsp;том числе осуществлять покос травостоя. Травостой
+                  необходимо стричь при&nbsp;высоте более 50 (пятидесяти) сантиметров.
+                </p>
+                <p>
+                  4.3.11. Осуществить подключение к&nbsp;центральным инженерным сетям
+                  электроснабжения, водоснабжения, только с&nbsp;помощью Обслуживающей компании.
+                  Стоимость подключения представлена в
+                  <a
+                    href="#%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-3-%D0%B4%D0%BE%D0%BF%D0%BE%D0%BB%D0%BD%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D0%B5-%D1%83%D1%81%D0%BB%D1%83%D0%B3%D0%B8-%D0%BE%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D0%BC%D1%8B%D0%B5-%D0%BE%D0%B1%D1%81%D0%BB%D1%83%D0%B6%D0%B8%D0%B2%D0%B0%D1%8E%D1%89%D0%B5%D0%B9-%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D0%B5%D0%B9"
+                    >Приложении&nbsp;№ 3</a
+                  >
+                  к&nbsp;Договору.
+                </p>
+                <p>
+                  4.3.12. Установить систему пожарной безопасности в&nbsp;виде пожарных извещателей
+                  в&nbsp;жилом доме. Данная услуга может быть оказана Обслуживающей компанией.
+                </p>
+                <p>
+                  4.3.13. При&nbsp;необходимости предоставить Обслуживающей компании полномочия
+                  по&nbsp;представлению интересов Клиента в&nbsp;различных организациях
+                  по&nbsp;заключению хозяйственных и&nbsp;прочих договоров, необходимых
+                  для&nbsp;исполнения настоящего Договора.
+                </p>
+                <p>
+                  4.3.14. Полностью возместить документально подтвержденный ущерб Обслуживающей
+                  компании, нанесенный своими действиями или&nbsp;действиями своих гостей объектам
+                  инфраструктуры.
+                </p>
+                <p>
+                  4.3.15. Соблюдать Правила внутреннего проживания на&nbsp;территории поселка,
+                  обеспечивать соблюдение Правил внутреннего проживания на&nbsp;территории поселка
+                  третьими лицами, приглашенными Клиентом.
+                </p>
+                <p>
+                  4.3.16. В&nbsp;случае продажи земельного участка произвести с&nbsp;Обслуживающей
+                  компанией сверку платежей по&nbsp;Договору и&nbsp;произвести окончательные
+                  взаиморасчеты не&nbsp;менее чем за&nbsp;3 (Три) дня до&nbsp;прекращения действия
+                  Договора, а&nbsp;также подписать дополнительное соглашение о&nbsp;прекращении
+                  действия Договора в&nbsp;связи с&nbsp;продажей объекта недвижимости.
+                </p>
+                <p>
+                  4.3.17. В&nbsp;случае продажи земельного участка Клиент обязан уведомить
+                  Покупателя своего земельного участка о&nbsp;необходимости заключения с&nbsp;ним,
+                  как&nbsp;с&nbsp;новым собственником Договора, а&nbsp;также предпринять все
+                  необходимые действия для&nbsp;перезаключения договора между Обслуживающей
+                  компанией и&nbsp;новым собственником настоящего Договора.
+                </p>
+                <p>
+                  4.3.18. В&nbsp;случае проведения работ по&nbsp;асфальтированию внутрипоселковых
+                  дорог на&nbsp;территории коттеджного поселка, Клиент обязуется оплатить часть
+                  стоимости данных работ. Общая стоимость работ по&nbsp;асфальтированию
+                  внутрипоселковых дорог будет равномерно разделена между всеми Клиентами,
+                  являющимися жителями коттеджного поселка. Стоимость данных работ будет
+                  сформирована исходя из&nbsp;среднерыночной стоимости на&nbsp;период проведения
+                  работ.
+                </p>
+                <p>4.4. Клиент имеет право:</p>
+                <p>
+                  4.4.1. В&nbsp;порядке и&nbsp;на&nbsp;условиях, установленных настоящим Договором,
+                  пользоваться Единой инфраструктурой поселка и&nbsp;Оборудованием Коттеджного
+                  поселка.
+                </p>
+                <p>
+                  4.4.2. Требовать от&nbsp;Исполнителя получения услуг, определенных настоящим
+                  Договором, в&nbsp;надлежащие сроки и&nbsp;надлежащего качества.
+                </p>
+                <h2
+                  id="5-стоимость-услуг-работ-и-порядок-расчетов"
+                  aria-label="5. Стоимость услуг (работ) и порядок расчетов"
+                >
+                  5. Стоимость услуг (работ) и&nbsp;порядок расчетов<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#5-стоимость-услуг-работ-и-порядок-расчетов"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>
+                  5.1. Стоимость услуг Обслуживающей компании состоит из&nbsp;ежемесячных платежей
+                  в&nbsp;размере 815 (Восемьсот пятнадцать) рублей с&nbsp;сотки. Расчетным периодом
+                  Стороны признают календарный месяц. Размер ежемесячных платежей устанавливается
+                  ежегодно. В&nbsp;случае досрочного или&nbsp;очередного изменения размера
+                  ежемесячных платежей в&nbsp;соответствии с&nbsp;п.&nbsp;5.10. настоящего Договора
+                  Обслуживающая компания уведомляет Клиента об&nbsp;изменении размера платы
+                  по&nbsp;настоящему Договору путем уведомления на&nbsp;эл. адрес Клиента, указанный
+                  в&nbsp;настоящем Договоре и/или через мобильное приложение «КОМФОРТ», и/или
+                  посредством размещения информации на&nbsp;официальном сайте Обслуживающей компании
+                  в&nbsp;сети Интернет (<a href="https://ok-komfort.ru/">https://ok-komfort.ru/</a
+                  >).
+                </p>
+                <p>
+                  5.2. В&nbsp;стоимости услуг Обслуживающей компании не&nbsp;учитываются расходы
+                  на&nbsp;капитальный ремонт и&nbsp;аварийные ремонтные работы объектов
+                  инфраструктуры. Стоимость таких работ оценивается Обслуживающей компанией путем
+                  составления сметы и&nbsp;согласовывается с&nbsp;Клиентами. По&nbsp;результату
+                  согласования сметы Клиент обязуется произвести соответствующую оплату. Данное
+                  согласование проходит путем уведомления на&nbsp;эл. адрес Клиента, указанный
+                  в&nbsp;настоящем Договоре и/или через мобильное приложение «КОМФОРТ» и/или
+                  посредством размещения информации на&nbsp;официальном сайте Обслуживающей компании
+                  в&nbsp;сети Интернет (<a href="https://ok-komfort.ru/">https://ok-komfort.ru/</a
+                  >). Клиент обязан в&nbsp;течение 24 (двадцати четырех) часов с&nbsp;момента
+                  получения сметы рассмотреть ее&nbsp;и&nbsp;согласовать. При&nbsp;отсутствии
+                  мотивированного отказа в&nbsp;указанный срок смета считается согласованной,
+                  а&nbsp;работы&nbsp;— подлежащими оплате. Сумма сбора включается Обслуживающей
+                  компанией в&nbsp;ближайший платежный документ отдельной строкой
+                  как&nbsp;«Экстренные аварийные работы по&nbsp;уведомлению №…». Подписания
+                  отдельного Дополнительного соглашения не&nbsp;требуется.
+                </p>
+                <p>
+                  5.3. Оплата услуг Обслуживающей компании производится ежемесячно, не&nbsp;позднее
+                  20 (двадцатого) числа текущего месяца. Оплата осуществляется безналичным платежом,
+                  посредством мобильного приложения. Для&nbsp;установки мобильного приложения
+                  Клиенту необходимо обратиться в&nbsp;Обслуживающую компанию.
+                </p>
+                <p>
+                  5.4. Оплата электроэнергии, потребленной Клиентом, производится им&nbsp;напрямую
+                  ресурсоснабжающей организации в&nbsp;соответствии с&nbsp;заключенным договором
+                  электроснабжения между Клиентом и&nbsp;ресурсоснабжающей организацией.
+                </p>
+                <p>
+                  5.5. Оплата газоснабжения, потребленной Клиентом, производится им&nbsp;напрямую
+                  ресурсоснабжающей организации в&nbsp;соответствии с&nbsp;заключенным договором
+                  газоснабжения между Клиентом и&nbsp;ресурсоснабжающей организацией.
+                </p>
+                <p>
+                  5.6. Оплата водопотребления является самостоятельной частью платежа. Оплата
+                  производится по&nbsp;тарифу, действующему на&nbsp;момент оплаты (Распоряжение
+                  Комитета по&nbsp;ценам и&nbsp;тарифам Московской области
+                  <a href="https://publication.pravo.gov.ru/document/5001202512260010"
+                    >№ 372-Р от&nbsp;19.12.2025 года</a
+                  >) и&nbsp;составляет 84,37&nbsp;руб. за&nbsp;1 куб.м потребленного Клиентом
+                  водоснабжения согласно показаниям индивидуальных счетчиков водопотребления.
+                </p>
+                <p>
+                  5.7. Если&nbsp;Клиент за&nbsp;соответствующий отчетный период произвел оплату
+                  в&nbsp;большем объеме, то&nbsp;образовавшаяся разница засчитывается в&nbsp;счет
+                  платежа за&nbsp;следующий расчетный период.
+                </p>
+                <p>
+                  5.8. Если&nbsp;Клиент за&nbsp;соответствующий месяц не&nbsp;произвел оплату
+                  или&nbsp;произвел её&nbsp;в&nbsp;меньшем объеме, то&nbsp;Клиент считается
+                  нарушившим условия оплаты, и&nbsp;с&nbsp;момента истечения срока оплаты,
+                  установленного п.&nbsp;5.3 настоящего Договора, до&nbsp;момента погашения Клиентом
+                  суммы недоплаты, начинает исчисляться срок просрочки оплаты.
+                </p>
+                <p>
+                  5.9. Клиент, несвоевременно и/или не&nbsp;полностью оплативший услуги, обязан
+                  уплатить Обслуживающей компании пени в&nbsp;размере 1% (одного) процента
+                  от&nbsp;невыплаченных в&nbsp;срок сумм за&nbsp;каждый день просрочки, начиная
+                  со&nbsp;следующего дня после наступления установленного срока оплаты по&nbsp;день
+                  фактической выплаты включительно. В&nbsp;данном случае суммы, уплаченные Клиентом
+                  за&nbsp;услуги по&nbsp;настоящему Договору, зачитываются в&nbsp;первую очередь
+                  в&nbsp;счет уплаты начисленных пеней. Остаток внесенной суммы засчитывается
+                  в&nbsp;счёт оплаты услуг Обслуживающей компании.
+                </p>
+                <p>
+                  5.10. В&nbsp;случае систематической просрочки Клиентом сроков внесения необходимых
+                  платежей (более двух раз), Обслуживающая компания уведомляет Клиента (посредством
+                  направления письма на&nbsp;электронный адрес) о&nbsp;суммах задолженности Клиента
+                  и&nbsp;начисленных пенях, а&nbsp;также оставляет за&nbsp;собой право прекратить
+                  оказание коммунальных и&nbsp;иных услуг Клиенту. В&nbsp;этом случае дальнейшее
+                  подключение Клиента к&nbsp;коммунальным сетям производится при&nbsp;условии полной
+                  оплаты имеющейся задолженности, пеней, а&nbsp;также при&nbsp;условии внесения
+                  Клиентом отдельной платы за&nbsp;подключение, размер которой устанавливается
+                  Обслуживающей компанией ежегодно.
+                </p>
+                <p>
+                  5.11. Неиспользование услуг, согласованных в&nbsp;настоящем договоре,
+                  не&nbsp;является основанием для&nbsp;невнесения стоимости услуг Обслуживающей
+                  компании, указанной в&nbsp;п.&nbsp;5.1 настоящего Договора.
+                </p>
+                <p>
+                  5.12. Обслуживающая компания вправе не&nbsp;чаще одного раза в&nbsp;год увеличить
+                  размер оплаты оказываемых услуг, но&nbsp;на&nbsp;процент, не&nbsp;превышающий
+                  среднее значение показателя ключевой ставки Центрального банка России,
+                  прогнозируемого на&nbsp;будущий&nbsp;год. Значение показателя определяется исходя
+                  из&nbsp;среднесрочного прогноза ключевой ставки Банка России в&nbsp;декабре
+                  каждого года.
+                </p>
+                <h2 id="6-порядок-разрешения-споров" aria-label="6. Порядок разрешения споров">
+                  6. Порядок разрешения споров<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#6-порядок-разрешения-споров"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>
+                  6.1. Все разногласия, возникающие в&nbsp;процессе исполнения настоящего Договора,
+                  будут, по&nbsp;возможности, разрешаться путем переговоров.
+                </p>
+                <p>
+                  6.2. При&nbsp;невозможности урегулирования в&nbsp;процессе переговоров спорных
+                  вопросов, споры разрешаются в&nbsp;суде в&nbsp;порядке, установленным действующим
+                  законодательством&nbsp;РФ.
+                </p>
+                <h2
+                  id="7-форс-мажорные-обстоятельства"
+                  aria-label="7. Форс-мажорные обстоятельства"
+                >
+                  7. Форс-мажорные обстоятельства<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#7-форс-мажорные-обстоятельства"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>
+                  7.1. Любая сторона может быть освобождена полностью или&nbsp;частично
+                  от&nbsp;исполнения своих обязательств по&nbsp;настоящему Договору,
+                  если&nbsp;докажет, что причиной этого явились обстоятельства непреодолимой силы,
+                  носящие чрезвычайный характер, возникшие после заключения настоящего Договора,
+                  и&nbsp;которые при&nbsp;этом делают невозможным для&nbsp;указанной стороны полное
+                  или&nbsp;частичное исполнение своих обязательств по&nbsp;настоящему Договору,
+                  и&nbsp;которые сторона не&nbsp;могла ни&nbsp;предвидеть, ни&nbsp;предотвратить
+                  разумными мерами.
+                </p>
+                <p>
+                  7.2. К&nbsp;обстоятельствам и&nbsp;событиям непреодолимой силы относятся,
+                  в&nbsp;частности, обстоятельства и&nbsp;события, на&nbsp;которые указанная сторона
+                  не&nbsp;могла оказывать влияние и&nbsp;за&nbsp;возникновение которых не&nbsp;несет
+                  и&nbsp;не&nbsp;может нести ответственности, в&nbsp;том числе: стихийные бедствия,
+                  техногенные катастрофы, пандемия, запреты органов государственной
+                  или&nbsp;муниципальной власти, нормативные акты органов государственной
+                  или&nbsp;муниципальной власти, войны или&nbsp;военные действия, акты терроризма,
+                  а&nbsp;также любые другие обстоятельства и&nbsp;(или) события, находящиеся вне
+                  разумного контроля указанной стороны, а&nbsp;также их&nbsp;последствия.
+                </p>
+                <h2 id="8-ответственность-сторон" aria-label="8. Ответственность сторон">
+                  8. Ответственность сторон<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#8-ответственность-сторон"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>
+                  8.1. В&nbsp;случае неисполнения или&nbsp;ненадлежащего исполнения одной
+                  из&nbsp;Сторон своих обязательств, вытекающих из&nbsp;настоящего Договора,
+                  а&nbsp;также виновных действий любой Стороны, виновная Сторона обязана возместить
+                  другой Стороне причиненные таким неисполнением или&nbsp;ненадлежащим исполнением,
+                  а&nbsp;также виновными действиями прямые убытки.
+                </p>
+                <p>
+                  8.2. В&nbsp;случае несвоевременного и&nbsp;(или) не&nbsp;полного внесения Клиентом
+                  предусмотренных настоящим Договором платежей, Обслуживающая компания имеет право
+                  на&nbsp;внесудебное начисление и&nbsp;взыскание пеней на&nbsp;сумму задолженности
+                  Клиента в&nbsp;размере 1% (одного) процента от&nbsp;невыплаченных в&nbsp;срок сумм
+                  за&nbsp;каждый день просрочки, начиная со&nbsp;следующего дня после наступления
+                  установленного срока оплаты по&nbsp;день фактической выплаты включительно.
+                </p>
+                <p>
+                  8.3. В&nbsp;случае систематической просрочки Клиентом сроков внесения необходимых
+                  платежей (более двух раз), Обслуживающая компания уведомляет Клиента (посредством
+                  направления письма на&nbsp;электронный адрес) о&nbsp;суммах задолженности Клиента
+                  и&nbsp;начисленных пенях, а&nbsp;также оставляет за&nbsp;собой право прекратить
+                  оказание коммунальных и&nbsp;иных услуг Клиенту. В&nbsp;этом случае дальнейшее
+                  подключение Клиента к&nbsp;коммунальным сетям производится при&nbsp;условии полной
+                  оплаты имеющейся задолженности, пеней, а&nbsp;также при&nbsp;условии внесения
+                  Клиентом отдельной платы за&nbsp;подключение, размер которой устанавливается
+                  Обслуживающей компанией ежегодно.
+                </p>
+                <p>
+                  8.4. В&nbsp;случае неоплаты Клиентом услуг Обслуживающей компании
+                  в&nbsp;установленный настоящим Договором срок (более 30 дней), Обслуживающая
+                  компания вправе ограничить доступ Клиенту, третьим лицам (гостям, рабочим,
+                  строительной бригаде Клиента) для&nbsp;проезда в&nbsp;Поселок.
+                </p>
+                <p>
+                  8.5. В&nbsp;случае неисполнения Клиентом Правил внутреннего проживания
+                  на&nbsp;территории коттеджного поселка (<a
+                    href="#%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-7-%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0-%D0%B2%D0%BD%D1%83%D1%82%D1%80%D0%B5%D0%BD%D0%BD%D0%B5%D0%B3%D0%BE-%D0%BF%D1%80%D0%BE%D0%B6%D0%B8%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F-%D0%BD%D0%B0-%D1%82%D0%B5%D1%80%D1%80%D0%B8%D1%82%D0%BE%D1%80%D0%B8%D0%B8-%D0%BF%D0%BE%D1%81%D0%B5%D0%BB%D0%BA%D0%B0"
+                    >Приложение&nbsp;№ 7</a
+                  >
+                  к&nbsp;Договору), Правил поведения строительно-монтажных работ на&nbsp;территории
+                  коттеджного поселка (<a
+                    href="#%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-2-%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0-%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F-%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE-%D0%BC%D0%BE%D0%BD%D1%82%D0%B0%D0%B6%D0%BD%D1%8B%D1%85-%D1%80%D0%B0%D0%B1%D0%BE%D1%82-%D0%BD%D0%B0-%D1%82%D0%B5%D1%80%D1%80%D0%B8%D1%82%D0%BE%D1%80%D0%B8%D0%B8-%D0%BA%D0%BE%D1%82%D1%82%D0%B5%D0%B4%D0%B6%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BF%D0%BE%D1%81%D0%B5%D0%BB%D0%BA%D0%B0"
+                    >Приложение&nbsp;№ 2</a
+                  >,
+                  <a
+                    href="#%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-4-%D1%82%D0%B5%D1%85%D0%BD%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5-%D1%83%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D1%8F-%D0%BF%D0%BE-%D1%83%D1%81%D1%82%D1%80%D0%BE%D0%B9%D1%81%D1%82%D0%B2%D1%83-%D0%BE%D0%B3%D1%80%D0%B0%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F-%D1%83%D1%87%D0%B0%D1%81%D1%82%D0%BA%D0%B0-%D0%B2-%D0%BA%D0%BF-shelkovo-park"
+                    >Приложение&nbsp;№ 4</a
+                  >,
+                  <a
+                    href="#%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-5-%D1%82%D0%B5%D1%85%D0%BD%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5-%D1%83%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D1%8F-%D0%BD%D0%B0-%D0%BE%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8E-%D0%B2%D1%8A%D0%B5%D0%B7%D0%B4%D0%BD%D0%BE%D0%B9-%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D1%8B"
+                    >Приложение&nbsp;№ 5</a
+                  >,
+                  <a
+                    href="#%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-6-%D1%82%D0%B5%D1%85%D0%BD%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5-%D1%83%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D1%8F-%D0%BF%D0%BE-%D0%BC%D0%BE%D0%BD%D1%82%D0%B0%D0%B6%D1%83-%D1%81%D1%82%D0%B0%D0%BD%D1%86%D0%B8%D0%B8-%D1%81%D0%B3%D0%B1%D0%BE"
+                    >Приложение&nbsp;№ 6</a
+                  >) Обслуживающая компания вправе ограничить допуск в&nbsp;коттеджный поселок,
+                  третьим лицам (гостям, рабочим, строительным бригадам Клиента).
+                </p>
+                <p>
+                  8.6. Все действия, связанные с&nbsp;присоединением к&nbsp;общепоселковому
+                  имуществу Клиент обязан согласовать с&nbsp;Обслуживающей компанией. В&nbsp;случае
+                  выявления несогласованного присоединения Обслуживающая компания составляет акт
+                  о&nbsp;данном нарушении, выставляет штраф и&nbsp;демонтирует незаконное строение
+                  (присоединение) с&nbsp;удержанием стоимости демонтажа с&nbsp;Клиента.
+                </p>
+                <p>
+                  8.7. Обслуживающая компания не&nbsp;несет ответственность за&nbsp;действия
+                  энергоснабжающих и&nbsp;газоснабжающих организаций, коммунальные услуги которых
+                  будет потреблять Клиент, равно как&nbsp;не&nbsp;несет ответственности
+                  за&nbsp;возможный ущерб, который может возникнуть у&nbsp;Клиента в&nbsp;связи
+                  с&nbsp;нарушением вышеназванными организациями порядка предоставления коммунальных
+                  услуг.
+                </p>
+                <p>
+                  8.8. Обслуживающая компания не&nbsp;несет ответственность за&nbsp;качество
+                  выполняемых работ и&nbsp;услуг, а&nbsp;также за&nbsp;вред, причиненный имуществу
+                  и&nbsp;здоровью Клиента в&nbsp;случае неисполнения Клиентом требований,
+                  предусмотренных настоящим Договором.
+                </p>
+                <h2 id="9-конфиденциальность" aria-label="9. Конфиденциальность">
+                  9. Конфиденциальность<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#9-конфиденциальность"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>
+                  9.1. Настоящим Клиент&nbsp;— физическое лицо подтверждает и&nbsp;гарантирует
+                  Обслуживающей компании, что он&nbsp;при&nbsp;заключении Договора сообщил
+                  достоверные данные, в&nbsp;том числе персональные данные и&nbsp;номер телефона,
+                  адрес электронной почты, и&nbsp;дает согласие Обслуживающей компании
+                  в&nbsp;соответствии с&nbsp;требованиями законодательства РФ, в&nbsp;том числе
+                  федерального закона от&nbsp;27.07.2006 года
+                  <a href="https://www.consultant.ru/document/cons_doc_LAW_61801/">№ 152-ФЗ</a>
+                  «О&nbsp;персональных данных», на&nbsp;проверку, обработку своих персональных
+                  данных, указанных в&nbsp;Договоре, а&nbsp;именно: ФИО, дата и&nbsp;место рождения,
+                  гражданство, адрес проживания, номер телефона, адрес регистрации, номер паспорта,
+                  сведения о&nbsp;дате его выдачи и&nbsp;выдавшем органе, регистрационный номер
+                  автомобиля. Под&nbsp;обработкой персональных данных понимается сбор,
+                  систематизация, накопление, хранение, уточнение (обновление, изменение),
+                  использование и&nbsp;распространение (в&nbsp;т.&nbsp;ч. раскрытие информации
+                  в&nbsp;соответствии с&nbsp;действующим законодательством), обезличивание,
+                  уничтожение и&nbsp;любые другие действия (операции) с&nbsp;персональными данными.
+                  Данное согласие может быть отозвано Клиентом в&nbsp;любой момент путем подачи
+                  письменного заявления Обслуживающей компании. Согласие действует в&nbsp;течение
+                  срока хранения персональных данных Клиента. При&nbsp;поступлении письменного
+                  заявления Клиента о&nbsp;прекращении действия согласия, персональные данные
+                  Клиента незамедлительно уничтожаются установленным способом.
+                </p>
+                <p>
+                  9.2. Настоящим Клиент дает свое согласие Обслуживающей компании на&nbsp;передачу
+                  номера телефона Клиента собственникам смежных земельных участков. Принимая
+                  настоящую публичную оферту Клиент подтверждает свое согласие на&nbsp;передачу его
+                  номера телефона собственникам смежных земельных участков.
+                </p>
+                <h2 id="10-прочие-условия" aria-label="10. Прочие условия">
+                  10. Прочие условия<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#10-прочие-условия"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>
+                  10.1. Уведомления, согласования, запросы или&nbsp;иные сообщения между сторонами
+                  должны быть сделаны в&nbsp;письменном виде и&nbsp;подписаны сторонами. Сообщение
+                  будет считаться должным образом доставленным, если&nbsp;оно будет направлено
+                  в&nbsp;электронном виде с&nbsp;подтверждением, доставлено лично,
+                  или&nbsp;если&nbsp;его доставка подтверждена почтовым документом
+                  по&nbsp;реквизитам, указанным в&nbsp;настоящем Договоре.
+                </p>
+                <p>
+                  10.2. Все соглашения, приложения, дополнения, акты и&nbsp;протоколы
+                  к&nbsp;настоящему Договору при&nbsp;условии совершения их&nbsp;надлежащим образом
+                  уполномоченными представителями сторон, будут считаться неотъемлемой частью
+                  настоящего Договора.
+                </p>
+                <p>
+                  10.3. Полным и&nbsp;безоговорочным акцептом настоящей публичной оферты является
+                  приобретение Клиентом права собственности или&nbsp;иного законного основания
+                  пользования, владения, распоряжения на&nbsp;земельный участок в&nbsp;коттеджном
+                  поселке «Shelkovo Park» (<a
+                    href="https://www.consultant.ru/document/cons_doc_LAW_5142/912ecd30f8655752c373ce4bde835b3832154b11/"
+                    >ст.&nbsp;438 ГК&nbsp;РФ</a
+                  >) и&nbsp;действует в&nbsp;течение пяти&nbsp;лет. Если&nbsp;за&nbsp;10 дней
+                  до&nbsp;окончания срока действия настоящего договора стороны не&nbsp;изъявили
+                  письменного желания о&nbsp;его прекращении, то&nbsp;настоящий договор считается
+                  продленным на&nbsp;5 лет, количество пролонгаций по&nbsp;настоящему договору
+                  неограниченно.
+                </p>
+                <p>
+                  10.4. Все заключенные Сторонами Приложения к&nbsp;Договору являются неотъемлемой
+                  частью настоящего Договора.
+                </p>
+                <h2
+                  id="11-qr-code-для-скачивания-мобильного-приложения"
+                  aria-label="11. QR code для скачивания мобильного приложения"
+                >
+                  11. QR&nbsp;code для&nbsp;скачивания мобильного приложения<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#11-qr-code-для-скачивания-мобильного-приложения"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>
+                  QR-код не&nbsp;попал в&nbsp;распознанный текст. Откройте QR-код в
+                  <a href="https://ok-komfort.ru/objects/shelkovo-eco-club/"
+                    >оригинальном документе</a
+                  >.
+                </p>
+                <h2 id="12-адреса-и-реквизиты-сторон" aria-label="12. Адреса и реквизиты сторон">
+                  12. Адреса и&nbsp;реквизиты сторон<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#12-адреса-и-реквизиты-сторон"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>Обслуживающая компания: КОМФОРТ</p>
+                <ul>
+                  <li>ОГРН 1127747040112</li>
+                  <li>ИНН/КПП 7728821502/504501001</li>
+                  <li>
+                    Юридический адрес: 142802, Россия, Московская область, г.&nbsp;Ступино,
+                    ул.&nbsp;Калинина, д.&nbsp;46, к. 3, офис 6, лит. А
+                  </li>
+                  <li>р/с 40702810038000290339</li>
+                  <li>к/с 30101810400000000225</li>
+                  <li>в&nbsp;ПАО Сбербанк</li>
+                  <li>БИК банка 044525225</li>
+                  <li>Тел.: <a href="tel:+74951500208">+7&nbsp;495&nbsp;150-02-08</a></li>
+                  <li>Сайт: <a href="https://ok-komfort.ru/">https://ok-komfort.ru/</a></li>
+                  <li>Email: <a href="mailto:info@ok-komfort.ru">info@ok-komfort.ru</a></li>
+                  <li>Директор: /Кизилов Ю.В./</li>
+                </ul>
+                <hr />
+                <h2
+                  id="приложение-1-перечень-оказываемых-услуг-обслуживающей-компании-состав-и-периодичность-выполняемых-работ"
+                  aria-label="Приложение № 1: Перечень оказываемых услуг обслуживающей компании. Состав и периодичность выполняемых работ"
+                >
+                  Приложение&nbsp;№ 1: Перечень оказываемых услуг обслуживающей компании. Состав
+                  и&nbsp;периодичность выполняемых работ<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#приложение-1-перечень-оказываемых-услуг-обслуживающей-компании-состав-и-периодичность-выполняемых-работ"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>Круглогодично:</p>
+                <ol>
+                  <li>
+                    Организация контрольно-пропускного режима с&nbsp;привлечением ЧОП&nbsp;—
+                    круглосуточно.
+                  </li>
+                  <li>
+                    Прием жителей коттеджного посёлка в&nbsp;офисе Обслуживающей компании&nbsp;—
+                    ежедневно.
+                  </li>
+                  <li>
+                    Ремонт объектов на&nbsp;территории общего пользования&nbsp;—
+                    по&nbsp;необходимости.
+                  </li>
+                  <li>
+                    Ремонт периметрального ограждения коттеджного поселка&nbsp;—
+                    по&nbsp;необходимости.
+                  </li>
+                  <li>Очистка урн в&nbsp;местах общего пользования&nbsp;— ежедневно.</li>
+                  <li>Очистка индивидуальных мусорных баков&nbsp;— ежедневно.</li>
+                  <li>Вывоз ТБО&nbsp;— 3 раза в&nbsp;неделю.</li>
+                  <li>
+                    Газопровод: обслуживание и&nbsp;содержание после ввода
+                    в&nbsp;эксплуатацию&nbsp;— 1 раз в&nbsp;месяц.
+                  </li>
+                  <li>
+                    Линии электропередач: обслуживание и&nbsp;содержание после ввода
+                    в&nbsp;эксплуатацию&nbsp;— 1 раз в&nbsp;месяц.
+                  </li>
+                </ol>
+                <p>В&nbsp;зимний период:</p>
+                <ol>
+                  <li>
+                    Расчистка внутренних дорог в&nbsp;коттеджном посёлке от&nbsp;снега
+                    и&nbsp;наледи&nbsp;— 1 раз в&nbsp;день.
+                  </li>
+                  <li>
+                    Расчистка снега на&nbsp;тропинках, детских и&nbsp;спортивных площадках&nbsp;— 1
+                    раз в&nbsp;день.
+                  </li>
+                  <li>
+                    Расчистка свежевыпавшего снега с&nbsp;дорог в&nbsp;дни обильных
+                    снегопадов&nbsp;— 2 раза в&nbsp;день.
+                  </li>
+                  <li>
+                    Вывоз снега в&nbsp;места временного складирования за&nbsp;пределами
+                    поселка&nbsp;— по&nbsp;необходимости.
+                  </li>
+                  <li>
+                    Отсыпка внутренних дорог антигололедным составом&nbsp;— 1 раз в&nbsp;день.
+                  </li>
+                </ol>
+                <p>В&nbsp;летний период:</p>
+                <ol>
+                  <li>Чистка дорог ручным способом&nbsp;— в&nbsp;местах загрязнения.</li>
+                  <li>Чистка дорог механизированным способом&nbsp;— 1 раз в&nbsp;неделю.</li>
+                  <li>Полив дорог&nbsp;— по&nbsp;необходимости.</li>
+                  <li>
+                    Уход за&nbsp;газоном в&nbsp;местах общего пользования, уборка прополка&nbsp;— 7
+                    раз в&nbsp;летний период.
+                  </li>
+                  <li>
+                    Покос газонов в&nbsp;местах общего пользования&nbsp;— 15 раз в&nbsp;летний
+                    период.
+                  </li>
+                  <li>
+                    Уборка дорожных лотков от&nbsp;мусора и&nbsp;скошенной травы ручным
+                    способом&nbsp;— 15 раз в&nbsp;летний период.
+                  </li>
+                  <li>
+                    Полив газонов в&nbsp;местах общего пользования&nbsp;— 4 раза в&nbsp;месяц.
+                  </li>
+                  <li>
+                    Уход за&nbsp;деревьями и&nbsp;кустарниками. Санитарная обрезка, опрыскивание
+                    от&nbsp;вредителей&nbsp;— 2 раза в&nbsp;год.
+                  </li>
+                  <li>
+                    Полив деревьев, кустарников, зеленых насаждений в&nbsp;местах общего
+                    пользования&nbsp;— 4 раза в&nbsp;месяц.
+                  </li>
+                  <li>Очистка водоемов&nbsp;— 1 раз в&nbsp;неделю.</li>
+                  <li>Уборка территории пляжа&nbsp;— 2 раза в&nbsp;неделю в&nbsp;летний период.</li>
+                  <li>Покраска бортового камня&nbsp;— 1 раз в&nbsp;год.</li>
+                </ol>
+                <hr />
+                <h2
+                  id="приложение-2-правила-проведения-строительно-монтажных-работ-на-территории-коттеджного-поселка"
+                  aria-label="Приложение № 2: Правила проведения строительно-монтажных работ на территории коттеджного поселка"
+                >
+                  Приложение&nbsp;№ 2: Правила проведения строительно-монтажных работ
+                  на&nbsp;территории коттеджного поселка<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#приложение-2-правила-проведения-строительно-монтажных-работ-на-территории-коттеджного-поселка"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>
+                  1. После подписания договора с&nbsp;Обслуживающей компанией Клиенту необходимо:
+                </p>
+                <p>
+                  1.1. Скачать и&nbsp;зарегистрироваться в&nbsp;мобильном приложении «КОМФОРТ».
+                  Регистрация производится по&nbsp;номеру телефона Клиента, указанного
+                  в&nbsp;настоящем договоре.
+                </p>
+                <p>
+                  1.2. Получить «пропуск собственника». Для&nbsp;оформления пропуска необходимо
+                  оставить заявку через мобильное приложение «КОМФОРТ». В&nbsp;заявке необходимо
+                  указать следующую информацию: номер участка, ФИО собственника автомобиля
+                  (как&nbsp;в&nbsp;ПТС), марка автомобиля, модель автомобиля, регистрационный номер
+                  автомобиля. Количество автомобилей не&nbsp;ограничено.
+                </p>
+                <p>2. Перед началом проведения СМР Клиенту необходимо:</p>
+                <p>
+                  2.1. Провести индивидуальную встречу с&nbsp;представителем Обслуживающей компании
+                  на&nbsp;предмет консультирования по&nbsp;этапам проведения строительно-монтажных
+                  работ.
+                </p>
+                <p>
+                  2.2. Уведомить, посредством телефонного звонка в&nbsp;Обслуживающую компанию
+                  (по&nbsp;тел. <a href="tel:+74951500208">+7&nbsp;495&nbsp;150-02-08</a>),
+                  не&nbsp;менее чем за&nbsp;20 (Двадцать) рабочих дней, о&nbsp;начале проведения
+                  и&nbsp;об&nbsp;окончании проведения строительно-монтажных работ
+                  на&nbsp;принадлежащем Клиенту земельном участке.
+                </p>
+                <p>
+                  2.3. Организовать строительство въездной группы на&nbsp;территории участка
+                  согласно Техническим Условиям. Технические Условия (ТУ) по&nbsp;организации
+                  въездной группы являются
+                  <a
+                    href="#%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-5-%D1%82%D0%B5%D1%85%D0%BD%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5-%D1%83%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D1%8F-%D0%BD%D0%B0-%D0%BE%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8E-%D0%B2%D1%8A%D0%B5%D0%B7%D0%B4%D0%BD%D0%BE%D0%B9-%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D1%8B"
+                    >Приложением&nbsp;№ 5</a
+                  >
+                  к&nbsp;настоящему Договору. Услуга по&nbsp;организации и&nbsp;строительству
+                  въездной группы осуществляется только Обслуживающей компанией.
+                </p>
+                <p>
+                  2.4. Осуществить подключение к&nbsp;центральным инженерным сетям электроснабжения,
+                  водоснабжения, только с&nbsp;помощью Обслуживающей компании. Бурение
+                  индивидуальных скважин на&nbsp;воду запрещено.
+                </p>
+                <p>
+                  2.5. Огородить земельный участок по&nbsp;всему периметру согласно&nbsp;ТУ.
+                  Технические условия по&nbsp;устройству ограждения выдаются в&nbsp;офисе
+                  Обслуживающей компании.
+                </p>
+                <p>
+                  2.6. Выписать рукописную доверенность (в&nbsp;свободной форме)
+                  на&nbsp;представителя Клиента, ответственного за&nbsp;проведение СМР
+                  на&nbsp;участке, с&nbsp;указанием контактов. Образец доверенности представлен
+                  в&nbsp;мобильном приложении Обслуживающей компании.
+                </p>
+                <p>
+                  2.7. Оформить временные пропуска на&nbsp;представителя Клиента, а&nbsp;также
+                  на&nbsp;лиц, проводящих строительно-монтажные работы на&nbsp;территории участка.
+                  Для&nbsp;оформления временных пропусков необходимо предоставить в&nbsp;офис
+                  Обслуживающей Компании оригиналы паспортов каждого лица, на&nbsp;которого
+                  оформляется пропуск.
+                </p>
+                <p>
+                  2.8. Письменно согласовать расположение строения/строений на&nbsp;участке
+                  с&nbsp;указанием линейных размеров (отступов) от&nbsp;границ участка до&nbsp;свеса
+                  кровли каждого из&nbsp;строений, а&nbsp;также с&nbsp;указанием цветового решения
+                  кровельного покрытия RAL и&nbsp;цветового решения отделки фасадов&nbsp;RAL.
+                </p>
+                <p>
+                  2.9. Во&nbsp;избежание распространения строительного мусора на&nbsp;прилегающие
+                  участки&nbsp;— оборудовать на&nbsp;территории своего участка огороженную площадку
+                  для&nbsp;временного хранения строительных отходов и/или материалов.
+                </p>
+                <p>3. Общие правила проведения строительно-монтажных работ:</p>
+                <p>
+                  3.1. С&nbsp;целью создания единого архитектурного облика Поселка
+                  при&nbsp;строительстве домов, хозяйственных построек, бань, навесов и&nbsp;гаражей
+                  цвет (RAL) кровельного покрытия&nbsp;— коричневый/оттенки коричневого,
+                  серый/оттенки серого.
+                </p>
+                <p>
+                  3.2. Отделка фасадов домов, хозяйственных построек, бань, навесов и&nbsp;гаражей
+                  виниловым сайдингом запрещена. Цвет фасада: от&nbsp;светло-серого
+                  до&nbsp;темно-серого, от&nbsp;светло-коричневого до&nbsp;темно-коричневого. Проект
+                  фасадной отделки зданий, расположенных на&nbsp;участке, необходимо письменно
+                  согласовать с&nbsp;Обслуживающей компанией.
+                </p>
+                <p>3.3. Возведение мансардных ломаных кровель не&nbsp;допускается.</p>
+                <p>
+                  3.4. Заявки на&nbsp;разовый въезд грузового транспортного средства принимаются
+                  через мобильное приложение «КОМФОРТ». Необходимая информация для&nbsp;получения
+                  разрешения на&nbsp;разовый въезд: название поселка, номер участка, марка ТС, номер
+                  ТС, вид груза. Заявка на&nbsp;грузовой транспорт осуществляется за&nbsp;день
+                  до&nbsp;въезда.
+                </p>
+                <p>
+                  3.5. Въезд грузовой/строительной техники, на&nbsp;территорию поселка,
+                  осуществляется в&nbsp;будни с&nbsp;понедельника по&nbsp;пятницу: в&nbsp;период
+                  с&nbsp;15&nbsp;мая по&nbsp;30&nbsp;сентября: с&nbsp;9:00–20:00 часов,
+                  в&nbsp;период с&nbsp;01&nbsp;октября по&nbsp;14&nbsp;мая: с&nbsp;9:00–18:00 часов.
+                  В&nbsp;выходные и&nbsp;праздничные дни (с&nbsp;момента ввода в&nbsp;эксплуатацию
+                  более 60% домовладений на&nbsp;территории коттеджного поселка, въезд
+                  грузовой/строительной техники в&nbsp;выходные и&nbsp;праздничные дни будет
+                  запрещен) разовый въезд грузовой/строительной техники на&nbsp;территорию поселка
+                  осуществляется на&nbsp;платной основе по&nbsp;следующим тарифам (с&nbsp;актуальным
+                  списком и&nbsp;стоимостью оказываемых услуг Вы&nbsp;можете ознакомиться
+                  на&nbsp;официальном сайте Обслуживающей компании
+                  <a href="https://ok-komfort.ru/">https://ok-komfort.ru/</a>, а&nbsp;также
+                  в&nbsp;мобильном приложение «КОМФОРТ»):
+                </p>
+                <ol>
+                  <li>Погрузчик&nbsp;— по&nbsp;запросу.</li>
+                  <li>ЗИЛ&nbsp;— 5301 «Бычок»&nbsp;— по&nbsp;запросу.</li>
+                  <li>Самосвал&nbsp;— по&nbsp;запросу.</li>
+                  <li>Манипулятор&nbsp;— по&nbsp;запросу.</li>
+                  <li>Эвакуатор&nbsp;— по&nbsp;запросу.</li>
+                  <li>Бетононасос&nbsp;— по&nbsp;запросу.</li>
+                  <li>Кран&nbsp;— по&nbsp;запросу.</li>
+                  <li>Бортовой грузовик&nbsp;— по&nbsp;запросу.</li>
+                  <li>Газели до&nbsp;3.5 тонн&nbsp;— бесплатно.</li>
+                  <li>Ассенизаторские машины&nbsp;— бесплатно.</li>
+                </ol>
+                <p>
+                  3.6. Въезд фур, длинномеров, автопоездов, грузовой техники длинной свыше 10
+                  метров, далее гостевой парковки на&nbsp;въезде в&nbsp;коттеджный поселок запрещен.
+                  Клиент обязан организовать процедуру перегруза доставляемых строительных
+                  материалов с&nbsp;использованием автомобильных манипуляторов за&nbsp;пределами
+                  поселка. Данная услуга может быть оказана Обслуживающей компанией.
+                </p>
+                <p>
+                  3.7. Въезд автобетоносмесителей вместительностью свыше 5 куб/м, строительной
+                  техники общей массой, превышающей 20 тонн на&nbsp;территорию коттеджного поселка
+                  запрещен.
+                </p>
+                <p>
+                  3.8. При&nbsp;проведении бетонных работ с&nbsp;привлечением бетононасоса,
+                  бетононасос и&nbsp;разгружающийся в&nbsp;него автобетоносмеситель должны
+                  располагаться на&nbsp;участке собственника. Приемка бетона с&nbsp;дороги
+                  запрещена. Пропуск автобетоносмесителей на&nbsp;территорию поселка осуществляется
+                  по&nbsp;очереди.
+                </p>
+                <p>
+                  3.9. В&nbsp;период весенней распутицы с&nbsp;01&nbsp;апреля по&nbsp;10&nbsp;мая,
+                  въезд любого грузового транспорта на&nbsp;территорию поселка запрещен (даты могут
+                  корректироваться в&nbsp;зависимости от&nbsp;погодных условий).
+                </p>
+                <p>
+                  3.10. Складирование строительного материала, песка, щебня, мусора, грунта,
+                  установка бытовок, установка мусорного контейнера, парковка строительной техники
+                  и&nbsp;личного автотранспорта, погрузочно-разгрузочные работы и&nbsp;т.&nbsp;д.
+                  осуществляется строго на&nbsp;территории участка собственника.
+                </p>
+                <p>
+                  3.11. Установка бытовок, складирование строительных материалов
+                  и&nbsp;строительного мусора на&nbsp;не&nbsp;огороженном участке запрещена.
+                </p>
+                <p>
+                  3.12. В&nbsp;связи с&nbsp;прохождением центральных инженерных коммуникаций
+                  по&nbsp;границе участков, высадка деревьев, кустарников на&nbsp;общественной
+                  территории запрещена.
+                </p>
+                <p>
+                  3.13. Сброс дренажных, условно чистых и&nbsp;ливневых вод на&nbsp;общественные
+                  территории строго запрещен. Сброс осуществляется в&nbsp;дренажный колодец,
+                  расположенный на&nbsp;территории участка. Глубина дренажного колодца не&nbsp;менее
+                  трех колец, в&nbsp;зависимости от&nbsp;расположения участка.
+                </p>
+                <p>
+                  3.14. Согласно закону «Об&nbsp;обеспечении тишины и&nbsp;покоя граждан
+                  на&nbsp;территории Московской области», шумные работы можно проводить:
+                </p>
+                <ul>
+                  <li>
+                    В&nbsp;будние дни (с&nbsp;понедельника по&nbsp;пятницу включительно) с&nbsp;9:00
+                    до&nbsp;19:00 часов;
+                  </li>
+                  <li>В&nbsp;субботу с&nbsp;10:00 до&nbsp;19:00 часов;</li>
+                  <li>
+                    В&nbsp;воскресенье и&nbsp;установленные федеральным законодательством нерабочие
+                    праздничные дни шумные работы запрещены;
+                  </li>
+                  <li>
+                    Перерыв на&nbsp;работы с&nbsp;13:00 до&nbsp;15:00 часов вне зависимости
+                    от&nbsp;дня недели.
+                  </li>
+                </ul>
+                <p>
+                  3.15. На&nbsp;общественной территории поселка и&nbsp;в&nbsp;границах
+                  приобретаемого участка запрещено, сжигание бытовых отходов, строительного мусора,
+                  травы, листвы, и&nbsp;т.&nbsp;д.
+                </p>
+                <p>
+                  3.16. Для&nbsp;утилизации бытовых отходов Клиенту необходимо установить мусорный
+                  бак объемом 120 литров с&nbsp;откидной крышкой, цвет бака: темно-зеленый.
+                  Утилизация бытовых отходов осуществляется силами Обслуживающей компании один раз
+                  в&nbsp;сутки. Бак устанавливается на&nbsp;территории общего пользования,
+                  в&nbsp;зоне въезда на&nbsp;участок. Объем бытовых отходов не&nbsp;должен превышать
+                  вместимость мусорного бака. Складирование бытовых отходов вне мусорного бака
+                  запрещено.
+                </p>
+                <p>
+                  3.17. Любая реклама на&nbsp;территории поселка запрещена. Размещение баннеров
+                  на&nbsp;фасадах домов, ограждений, бытовок
+                  и&nbsp;т.&nbsp;д.&nbsp;не&nbsp;допускается.
+                </p>
+                <p>
+                  В&nbsp;случае систематического нарушения вышеперечисленных правил, Обслуживающая
+                  компания оставляет за&nbsp;собой право ограничить въезд на&nbsp;территорию поселка
+                  строительной техники, материалов и&nbsp;т.&nbsp;д. до&nbsp;устранения замечаний.
+                </p>
+                <hr />
+                <h2
+                  id="приложение-3-дополнительные-услуги-оказываемые-обслуживающей-компанией"
+                  aria-label="Приложение № 3: Дополнительные услуги, оказываемые Обслуживающей компанией"
+                >
+                  Приложение&nbsp;№ 3: Дополнительные услуги, оказываемые Обслуживающей компанией<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#приложение-3-дополнительные-услуги-оказываемые-обслуживающей-компанией"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>
+                  Перечень и&nbsp;стоимость услуг подлежит корректированию. С&nbsp;актуальным
+                  списком оказываемых услуг Вы&nbsp;можете ознакомиться на&nbsp;официальном сайте
+                  Обслуживающей компании
+                  <a href="https://ok-komfort.ru/">https://ok-komfort.ru/</a>, а&nbsp;также
+                  в&nbsp;мобильном приложении «КОМФОРТ».
+                </p>
+                <p>Подключение коммуникаций:</p>
+                <ol>
+                  <li>Подключение к&nbsp;системе электроснабжения&nbsp;— 197 000&nbsp;руб.</li>
+                  <li>Подключение к&nbsp;системе водоснабжения&nbsp;— 121 000&nbsp;руб.</li>
+                  <li>Подключение к&nbsp;системе газоснабжения&nbsp;— 490 000&nbsp;руб.</li>
+                  <li>Прокол под&nbsp;дорогой (при&nbsp;необходимости)&nbsp;— 60 000&nbsp;руб.</li>
+                  <li>Подключение к&nbsp;сети Интернет&nbsp;— 12 000&nbsp;руб.</li>
+                </ol>
+                <p>Комплексные работы на&nbsp;участке:</p>
+                <ol>
+                  <li>Строительство въездной группы&nbsp;— 192 000&nbsp;руб.</li>
+                  <li>Проход под&nbsp;калитку&nbsp;— 50 000&nbsp;руб.</li>
+                  <li>
+                    Комплексная подготовка участка к&nbsp;строительству (утилизация деревьев,
+                    уточнение кадастровых границ, посадка дома, уборка снега/травы,
+                    выравнивание)&nbsp;— индивидуальный расчёт.
+                  </li>
+                  <li>
+                    Строительство ограждения на&nbsp;земельном участке&nbsp;— индивидуальный расчёт.
+                  </li>
+                  <li>
+                    Инженерные сети (проект и&nbsp;комплексное подключение всех коммуникаций
+                    на&nbsp;участке: водоснабжение, электроснабжение, оптоволокно, распределительный
+                    щит, кессон, контур заземления)&nbsp;— индивидуальный расчёт.
+                  </li>
+                  <li>
+                    СГБО (проект и&nbsp;монтаж станции глубокой биологической очистки, дренажный
+                    колодец)&nbsp;— индивидуальный расчёт.
+                  </li>
+                  <li>
+                    Комплексное благоустройство участка (отвод ливневых вод, поверхностный дренаж,
+                    дренажный колодец, дорожки, газон, парковка: асфальтная крошка, брусчатка,
+                    бетон)&nbsp;— индивидуальный расчёт.
+                  </li>
+                </ol>
+                <p>Услуги для&nbsp;вашего комфортного проживания:</p>
+                <ol>
+                  <li>Обслуживание/модификация СГБО&nbsp;— от&nbsp;15 000&nbsp;руб.</li>
+                  <li>Обслуживание автоматики ворот&nbsp;— от&nbsp;5 000&nbsp;руб.</li>
+                  <li>Ремонт/покраска ограждения&nbsp;— от&nbsp;15 000&nbsp;руб.</li>
+                  <li>Топосъемка&nbsp;— от&nbsp;20 000&nbsp;руб.</li>
+                  <li>Регистрация строений&nbsp;— от&nbsp;35 000&nbsp;руб.</li>
+                  <li>Межевание/объединение участков&nbsp;— от&nbsp;25 000&nbsp;руб.</li>
+                  <li>Ландшафтный дизайн&nbsp;— индивидуальный расчёт.</li>
+                  <li>Геология&nbsp;— от&nbsp;45 000&nbsp;руб.</li>
+                  <li>Страхование&nbsp;— индивидуальный расчёт.</li>
+                  <li>Клининг&nbsp;— индивидуальный расчёт.</li>
+                  <li>Барбекю, сауна, камин&nbsp;— индивидуальный расчёт.</li>
+                </ol>
+                <hr />
+                <h2
+                  id="приложение-4-технические-условия-по-устройству-ограждения-участка-в-кп-shelkovo-park"
+                  aria-label="Приложение № 4: Технические Условия по устройству ограждения участка в КП «Shelkovo Park»"
+                >
+                  Приложение&nbsp;№ 4: Технические Условия по&nbsp;устройству ограждения участка
+                  в&nbsp;КП&nbsp;«Shelkovo Park»<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#приложение-4-технические-условия-по-устройству-ограждения-участка-в-кп-shelkovo-park"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>
+                  ОБЯЗАТЕЛЬНЫМ УСЛОВИЕМ ЯВЛЯЕТСЯ УТОЧНЕНИЕ КАДАСТРОВЫХ ГРАНИЦ И&nbsp;ТОЧЕК ПЕРЕД
+                  ЗАКЛЮЧЕНИЕМ ДОГОВОРА.
+                </p>
+                <p>
+                  Ограждение выполняется в&nbsp;единой стилистике поселка в&nbsp;строгом
+                  соответствии с&nbsp;настоящими Техническими условиями, при&nbsp;перепаде высот
+                  по&nbsp;рельефу участка ограждение монтируется ступенями, не&nbsp;допускается
+                  устанавливать ограждение выше, либо ниже высоты горизонта с&nbsp;соседними
+                  участками:
+                </p>
+                <ul>
+                  <li>
+                    Металлические столбы 420×80-100 мм&nbsp;с&nbsp;рисунком лазерной резки
+                    в&nbsp;соответствии с&nbsp;ТЗ, порошковая окраска,
+                    <a href="https://ral.ru/ral8017">цвет 8017</a>, Н=2000-2500&nbsp;мм. Количество
+                    металлических столбов на&nbsp;фасадной части ограждения не&nbsp;менее двух
+                    (обязательно по&nbsp;углам участка и&nbsp;на&nbsp;изгибах ограждения),
+                    расстояние между столбами 2500&nbsp;мм.
+                  </li>
+                  <li>
+                    Фасадное ограждение&nbsp;— верхняя часть забора металлическая полоса
+                    с&nbsp;рисунком лазерной резки в&nbsp;соответствии с&nbsp;ТЗ, размещается
+                    на&nbsp;территории собственника, порошковая окраска,
+                    <a href="https://ral.ru/ral8017">цвет 8017</a>, нижняя часть забора
+                    Евроштакетник «ВЕРТИКАЛЬ». Ламель односторонняя, М-образная, текстурированная,
+                    0,35&nbsp;мм х&nbsp;125-130 мм&nbsp;(ширина развертки 155-156 мм)
+                    х&nbsp;1800&nbsp;мм., <a href="https://ral.ru/ral8017">RAL 8017</a>, фактура
+                    «текстурированный шелк», с&nbsp;обратной стороны окраска
+                    <a href="https://ral.ru/ral8017">RAL 8017</a>, Расстояние между ламелями
+                    60&nbsp;мм (+ 2-3 мм), высота секции 2000&nbsp;мм.
+                  </li>
+                  <li>
+                    Монолитный фундамент 250×400 мм, на&nbsp;буронабивных сваях с&nbsp;шагом
+                    2500&nbsp;мм, устанавливается на&nbsp;территории собственника, каркас
+                    сваи&nbsp;— стальная арматура А1-А3, d=8-10 мм, размер каркаса ф150 мм*h1500 мм,
+                    арматура стальная А3 d=10-12 мм, высота ленты не&nbsp;должна превышать
+                    150&nbsp;мм от&nbsp;уровня земли. Отлив шириной 260-280 мм, конфигурация
+                    «домик», фактура «текстурированный шелк»,
+                    <a href="https://ral.ru/ral8017">RAL 8017</a>, (не&nbsp;входит в&nbsp;общую
+                    стоимость по&nbsp;договору, устанавливается на&nbsp;усмотрение собственника).
+                  </li>
+                  <li>
+                    Между участками ограждение&nbsp;— Евроштакетник «ВЕРТИКАЛЬ», 0,35&nbsp;мм
+                    x&nbsp;125-130 (+3 мм) x&nbsp;2000&nbsp;мм.,
+                    <a href="https://ral.ru/ral8017">RAL 8017</a>, текстурированный, М-образный,
+                    двусторонний, верхний рез «фигурный», крепление с&nbsp;2 сторон
+                    со&nbsp;смещением 50%, на&nbsp;кровельные саморезы,
+                    <a href="https://ral.ru/ral8017">RAL 8017</a>. Расстояние между ламелями
+                    60&nbsp;мм (+2-3 мм), высота секции 2000&nbsp;мм.
+                  </li>
+                  <li>
+                    Столб «стандарт»&nbsp;— 60&nbsp;мм x&nbsp;40&nbsp;мм x&nbsp;3&nbsp;мм,
+                    Н=3,3-3,5&nbsp;м (в&nbsp;грунте -1,3-1,5&nbsp;м), шаг 2500&nbsp;мм. Заглушка
+                    60&nbsp;мм x&nbsp;40&nbsp;мм. Окраска столба Kovali 3 в&nbsp;1 полуглянец,
+                    <a href="https://ral.ru/ral8017">RAL 8017</a>.
+                  </li>
+                  <li>
+                    Перемычки 40&nbsp;мм x&nbsp;40&nbsp;мм x&nbsp;1,5&nbsp;мм — 2 шт., окраска
+                    <a href="https://ral.ru/ral8017">RAL 8017</a> Kovali 3 в&nbsp;1 полуглянец.
+                  </li>
+                  <li>
+                    Ворота и&nbsp;калитка выполняются в&nbsp;единой стилистике поселка (порошковая
+                    окраска, <a href="https://ral.ru/ral8017">RAL 8017</a>)&nbsp;— внутреннее
+                    заполнение Евроштакетник «ВЕРТИКАЛЬ», М-образный, Ламель односторонняя,
+                    0,35&nbsp;мм x&nbsp;125-130 мм&nbsp;(ширина развертки 155-156 мм) х1800-2000
+                    мм., <a href="https://ral.ru/ral8017">RAL 8017</a>, фактура «текстурированный
+                    шелк», с&nbsp;обратной стороны окраска,
+                    <a href="https://ral.ru/ral8017">RAL 8017</a>, высота конструкции ворот
+                    2000&nbsp;мм.
+                  </li>
+                  <li>Стандартизованные размеры проемов ворот и&nbsp;калитки:</li>
+                  <li>ширина проема откатных ворот 4500&nbsp;мм — 5000&nbsp;мм.</li>
+                  <li>ширина проема распашных ворот 4000&nbsp;мм (открывание внутрь участка).</li>
+                  <li>ширина проема для&nbsp;калитки 1000&nbsp;мм (открывание калитки наружу).</li>
+                  <li>
+                    Минимальный отступ от&nbsp;границы участка до&nbsp;калитки либо ворот&nbsp;—
+                    2500&nbsp;мм.
+                  </li>
+                  <li>
+                    Рекомендованный отступ от&nbsp;границы участка до&nbsp;начала проема ворот
+                    (при&nbsp;открывании откатных ворот в&nbsp;сторону ближайшей границы
+                    участка)&nbsp;— 7000&nbsp;мм.
+                  </li>
+                </ul>
+                <p>
+                  Обязательное условие, перед началом строительно-монтажных работ по&nbsp;устройству
+                  ограждения, письменно согласовать эскиз ограждения в&nbsp;Обслуживающей Компании.
+                </p>
+                <hr />
+                <h2
+                  id="приложение-5-технические-условия-на-организацию-въездной-группы"
+                  aria-label="Приложение № 5: Технические Условия на организацию въездной группы"
+                >
+                  Приложение&nbsp;№ 5: Технические Условия на&nbsp;организацию въездной группы<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#приложение-5-технические-условия-на-организацию-въездной-группы"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>Въезд:</p>
+                <ol>
+                  <li>Подготовка основания дренажного кювета 100-300&nbsp;мм.</li>
+                  <li>Подушка из&nbsp;песка под&nbsp;трубу&nbsp;— 50&nbsp;мм.</li>
+                  <li>Подушка из&nbsp;щебня фракции 40×70&nbsp;— 70&nbsp;мм.</li>
+                  <li>
+                    Труба металлическая диаметром 300&nbsp;мм, длина не&nbsp;более 6000&nbsp;мм.
+                  </li>
+                  <li>Обсыпка трубы песком с&nbsp;послойной трамбовкой.</li>
+                  <li>Подушка из&nbsp;щебня фракции 40×70&nbsp;— 100-150&nbsp;мм.</li>
+                  <li>Расклинцовка щебнем фракции 20*40&nbsp;— 40&nbsp;мм.</li>
+                  <li>слой асфальтовой крошки&nbsp;— 20&nbsp;мм.</li>
+                  <li>
+                    Концы трубы закованы в&nbsp;бетонные оголовки. Ширина оголовков 250&nbsp;мм.,
+                    с&nbsp;двух сторон. Высота оголовков не&nbsp;более 100&nbsp;мм от&nbsp;верха
+                    дорожного полотна.
+                  </li>
+                </ol>
+                <p>Парковка:</p>
+                <ol>
+                  <li>Разработка корыта под&nbsp;парковку глубиной 300&nbsp;мм.</li>
+                  <li>Геотекстиль.</li>
+                  <li>Песчаная подушка толщиной 100&nbsp;мм.</li>
+                  <li>Щебень фракции 40×70, толщина 150&nbsp;мм.</li>
+                  <li>Расклинцовка щебнем 20×40, толщина 50&nbsp;мм.</li>
+                  <li>Стандартный размер парковки 5500×6000&nbsp;мм.</li>
+                </ol>
+                <p>ТЕХНОЛОГИЯ СТРОИТЕЛЬСТВА ВЪЕЗДНОЙ ГРУППЫ</p>
+                <ul>
+                  <li>2,5&nbsp;м</li>
+                  <li>2&nbsp;см — асфальтная крошка</li>
+                  <li>Щебень 20/40</li>
+                  <li>Щебень 40/70</li>
+                  <li>5&nbsp;см</li>
+                  <li>10&nbsp;см</li>
+                  <li>Песок</li>
+                  <li>20&nbsp;см</li>
+                  <li>7&nbsp;см — щебень 40/70</li>
+                  <li>Песок</li>
+                </ul>
+                <hr />
+                <h2
+                  id="приложение-6-технические-условия-по-монтажу-станции-сгбо"
+                  aria-label="Приложение № 6: Технические условия по монтажу станции СГБО"
+                >
+                  Приложение&nbsp;№ 6: Технические условия по&nbsp;монтажу станции СГБО<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#приложение-6-технические-условия-по-монтажу-станции-сгбо"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>
+                  Настоящие технические условия, далее ТУ, предназначены для&nbsp;установки
+                  и&nbsp;вводу в&nbsp;эксплуатацию станции СГБО, обязательные для&nbsp;монтажа
+                  на&nbsp;всех поселках.
+                </p>
+                <p>
+                  Все работы по&nbsp;монтажу и&nbsp;запуску станции СГБО должны проводится
+                  специалистами компании, осуществляющую монтаж станции СГБО, имеющим необходимые
+                  допуски.
+                </p>
+                <p>
+                  Станция СГБО, предназначена для&nbsp;биологической очистки сточных вод
+                  не&nbsp;менее 98% (использование биофильтра с&nbsp;биореактором обязательна),
+                  должна быть обязательно сертифицирована (использование материалов, разрешенным
+                  Государственным комитетом санэпидемиологического надзора Российской Федерации),
+                  обеспечивать очистку сточных вод до&nbsp;нормативов СанПин 2.1.5.980-00.
+                </p>
+                <p>
+                  Станция СГБО должна работать в&nbsp;интервалах заданного времени (наличие
+                  таймера).
+                </p>
+                <p>Станция СГБО должна работать в&nbsp;2 режимах (СГБО и&nbsp;септик).</p>
+                <p>
+                  При&nbsp;отключении станции СГБО от&nbsp;электросети более чем на&nbsp;одни сутки,
+                  система должна переходить в&nbsp;автономный режим, режим септика. Открытый сброс
+                  вод на&nbsp;грунт ЗАПРЕЩЕН.
+                </p>
+                <p>
+                  Подключение станции СГБО должно соответствовать ПУЭ (правила устройства
+                  электроустановок)
+                </p>
+                <p>
+                  Расположение станции СГБО должно быть оптимальным для&nbsp;обслуживания одного
+                  либо нескольких строений.
+                </p>
+                <p>
+                  При&nbsp;монтаже станции СГБО необходимо учитывать особенности участка,
+                  а&nbsp;именно:
+                </p>
+                <ul>
+                  <li>а) состав грунта (песок, суглинок, глина, известняк)</li>
+                  <li>б) уровень грунтовых вод</li>
+                  <li>в) характер рельефа местности</li>
+                  <li>г) близость водозаборных сооружений</li>
+                  <li>д) климатические и&nbsp;геологические особенности</li>
+                </ul>
+                <p>
+                  При&nbsp;размещении станции на&nbsp;участке следует учитывать следующие
+                  рекомендации:
+                </p>
+                <p>ЗАПРЕЩАЕТСЯ!!!</p>
+                <ul>
+                  <li>
+                    Заглубляться в&nbsp;грунт на&nbsp;глубину более 1&nbsp;м от&nbsp;верхнего края
+                    корпуса станции до&nbsp;нулевой отметки грунта (горловина станции)
+                  </li>
+                  <li>Применять строительную технику при&nbsp;обратной засыпке станции</li>
+                  <li>Проводить уплотнение грунта с&nbsp;помощью строительной техники</li>
+                  <li>Осуществлять движение транспорта над станцией</li>
+                  <li>Высаживать деревья ближе 3 метров от&nbsp;места расположения станции</li>
+                  <li>Осуществлять полную откачку воды из&nbsp;всех камер</li>
+                  <li>
+                    Сброс сточных вод на&nbsp;грунт (обязательна установка фильтрационного колодца
+                    не&nbsp;менее 3 метров глубиной)
+                  </li>
+                </ul>
+                <p>
+                  Выполнение подводящих коммуникаций и&nbsp;отведение очищенной воды следует
+                  осуществлять в&nbsp;соответствии с&nbsp;рекомендациями организации изготовителя
+                  и&nbsp;проектом привязки станции к&nbsp;местности
+                </p>
+                <p>
+                  Лица, осуществляющие монтаж станции, должны знать требования СП&nbsp;32.13330.2012
+                </p>
+                <p>Техническое обслуживание</p>
+                <p>
+                  Заключается в&nbsp;периодической откачке осадка, не&nbsp;реже 1 раза в&nbsp;год,
+                  либо при&nbsp;необходимости
+                </p>
+                <p>
+                  Для&nbsp;прекращения работы станции на&nbsp;длительный период от&nbsp;3 месяцев
+                  и&nbsp;более, необходимо проводить консервацию и&nbsp;расконсервацию.
+                </p>
+                <hr />
+                <h2
+                  id="приложение-7-правила-внутреннего-проживания-на-территории-поселка"
+                  aria-label="Приложение № 7: Правила внутреннего проживания на территории поселка"
+                >
+                  Приложение&nbsp;№ 7: Правила внутреннего проживания на&nbsp;территории поселка<a
+                    aria-label="Ссылка на этот раздел"
+                    class="ui-heading-anchor"
+                    data-pagefind-ignore="all"
+                    href="#приложение-7-правила-внутреннего-проживания-на-территории-поселка"
+                    title="Ссылка на этот раздел"
+                    ><span aria-hidden="true">#</span></a
+                  >
+                </h2>
+                <p>На&nbsp;территории Поселка Клиент обязуется:</p>
+                <ol>
+                  <li>
+                    Соблюдать и&nbsp;поддерживать чистоту на&nbsp;территории Земельного участка,
+                    а&nbsp;также соблюдать и&nbsp;содействовать поддержанию чистоты
+                    на&nbsp;территории поселка в&nbsp;целом.
+                  </li>
+                  <li>
+                    Не&nbsp;нарушать установленный режим охраны территории поселка, а&nbsp;именно:
+                    проезд личного транспорта на&nbsp;территорию поселка осуществляется
+                    круглосуточно, данные на&nbsp;автомобили владельца (марка, государственный
+                    номер) передаются сотрудникам Обслуживающей компании.
+                  </li>
+                  <li>
+                    Допуск гостей, гостевых транспортных средств, такси, служб доставки
+                    осуществляется по&nbsp;предварительному уведомлению сотрудников Обслуживающей
+                    компании.
+                  </li>
+                  <li>
+                    Не&nbsp;осуществлять мойку транспортных средств на&nbsp;территории Единой
+                    инфраструктуры поселка.
+                  </li>
+                  <li>
+                    Не&nbsp;допускать выбрасывание бытового мусора (бумаги, окурков, использованных
+                    упаковок, бутылок и&nbsp;т.&nbsp;п.) на&nbsp;территории поселка, кроме
+                    специально предусмотренной площадки для&nbsp;сбора бытового мусора.
+                  </li>
+                  <li>
+                    Своевременно оперативно выбрасывать бытовой мусор в&nbsp;специально отведенные
+                    места, для&nbsp;его последующего вывоза Обслуживающей компанией; строительный
+                    мусор вывозить собственными силами или&nbsp;силами третьих лиц
+                    по&nbsp;предварительному уведомлению сотрудников Обслуживающей компании
+                    за&nbsp;пределы территории поселка.
+                  </li>
+                  <li>
+                    Не&nbsp;допускать нанесение надписей, рисунков, вывешивание объявлений, афиш,
+                    плакатов иной печатной продукции на&nbsp;заборах и&nbsp;других местах
+                    на&nbsp;территории поселка без&nbsp;согласования с&nbsp;Обслуживающей компанией.
+                  </li>
+                  <li>
+                    Не&nbsp;допускать хранение посторонних вещей и&nbsp;предметов, а&nbsp;также
+                    строительных материалов на&nbsp;территории Единой инфраструктуры поселка
+                    без&nbsp;предварительного согласования с&nbsp;Обслуживающей компанией.
+                  </li>
+                  <li>
+                    Не&nbsp;вырубать существующие зеленые насаждения на&nbsp;территории Единой
+                    инфраструктуры поселка, сохранять цветы и&nbsp;другие элементы благоустройства
+                    и&nbsp;озеленения на&nbsp;территории Единой инфраструктуры поселка.
+                  </li>
+                  <li>
+                    Не&nbsp;осуществлять курение табака, распитие алкогольных напитков
+                    в&nbsp;общественных местах на&nbsp;территории поселка в&nbsp;соответствии
+                    с&nbsp;законодательством Российской Федерации.
+                  </li>
+                  <li>
+                    При&nbsp;выгуле домашних животных использовать намордник и&nbsp;поводок,
+                    осуществлять за&nbsp;ними уборку.
+                  </li>
+                  <li>
+                    Запрещается осуществлять парковку транспортных средств на&nbsp;внутрипоселковых
+                    дорогах вне территории специально отведенных для&nbsp;парковки автотранспорта.
+                  </li>
+                  <li>
+                    Использовать Земельный участок и&nbsp;возведенные на&nbsp;нем строения
+                    в&nbsp;соответствии с&nbsp;их&nbsp;назначением. Запрещается использовать
+                    Земельный участок и&nbsp;возведенные на&nbsp;нем строения для&nbsp;ведения
+                    предпринимательской деятельности (организации магазинов, точек общественного
+                    питания), под&nbsp;офис и&nbsp;в&nbsp;производственных целях.
+                  </li>
+                  <li>Соблюдать правила противопожарной безопасности.</li>
+                  <li>
+                    Бережно относиться к&nbsp;средствам благоустройства территории Поселка,
+                    в&nbsp;том числе к&nbsp;зеленым насаждениям.
+                  </li>
+                  <li>
+                    Соблюдать тишину в&nbsp;вечернее, ночное время, в&nbsp;выходные
+                    и&nbsp;праздничные дни в&nbsp;соответствии с&nbsp;действующим законодательством
+                    Российской Федерации.
+                  </li>
+                  <li>На&nbsp;территории Поселка также не&nbsp;допускается:</li>
+                </ol>
+                <ul>
+                  <li>
+                    Привозить и&nbsp;использовать огнестрельное оружие (за&nbsp;исключением
+                    зарегистрированного в&nbsp;установленном законом порядке, при&nbsp;условии
+                    соблюдения правил хранения). Ответственность за&nbsp;соблюдение правил хранения
+                    и&nbsp;использования оружия несет лицо, за&nbsp;которым зарегистрировано оружие;
+                  </li>
+                  <li>
+                    Провозить баллоны с&nbsp;горючими газами и&nbsp;легковоспламеняющимися
+                    жидкостями, за&nbsp;исключением технического оборудования в&nbsp;составе
+                    автотранспортных средств;
+                  </li>
+                  <li>Привозить и&nbsp;употреблять наркотические вещества и&nbsp;средства;</li>
+                  <li>
+                    Превышать скорость движения автотранспортных средств на&nbsp;территории Поселка
+                    свыше 20 км/ч., применять на&nbsp;территории Поселка автомобильные звуковые
+                    сигналы;
+                  </li>
+                  <li>
+                    Купаться (входить в&nbsp;воду) и&nbsp;использовать объекты Единой инфраструктуры
+                    поселка в&nbsp;алкогольном или&nbsp;наркотическом опьянении.
+                  </li>
+                </ul>
+                <p>
+                  За&nbsp;невыполнение или&nbsp;ненадлежащее выполнение настоящих Правил
+                  на&nbsp;Собственника налагается штраф в&nbsp;размере 5 000 (пяти тысяч) рублей
+                  за&nbsp;каждый установленный факт нарушения. Фиксация факта нарушения производится
+                  сотрудником путём фото-/видеосъёмки.
+                </p>
+                <p>
+                  В&nbsp;случае выявления фактов нарушения настоящих правил Обслуживающая компания,
+                  уполномоченный сотрудник Обслуживающей компании, составляет в&nbsp;простой
+                  письменной форме Акт о&nbsp;нарушении Правил проживания в&nbsp;поселке
+                  с&nbsp;приложением подтверждающих документов, фото/видео материалов
+                  и&nbsp;направляет Клиенту по&nbsp;электронной почте. На&nbsp;основании Акта
+                  о&nbsp;нарушении Правил проживания в&nbsp;поселке оформляется квитанция
+                  для&nbsp;оплаты штрафа. Штраф может быть также удержан Обслуживающей компанией
+                  из&nbsp;оплаченных по&nbsp;договору на&nbsp;оказание услуг по&nbsp;обслуживанию
+                  сумм. Денежные средства, полученные Обслуживающей компанией в&nbsp;счет уплаты
+                  штрафа, направляются на&nbsp;благоустройство территории поселка.
+                </p>
+                <p>
+                  В&nbsp;случае причинения Клиентом ущерба оборудованию, средствам благоустройства,
+                  территории поселка или&nbsp;другим частям поселка, Клиент обязан за&nbsp;свой счет
+                  возместить нанесенный ущерб или&nbsp;восстановить до&nbsp;первоначального
+                  состояния собственными силами. Ущерб, причиненный оборудованию, средствам
+                  благоустройства, территории поселка или&nbsp;другим частям поселка, возмещается
+                  в&nbsp;порядке, установленном законодательством Российской Федерации.
+                </p>
+              </div>
+            </div>
+          </article>
+        </main>
+      </div>
+    </div>
+    <div data-search-dialog-root="" data-astro-cid-z4jru4n3="">
+      <!--[--><!--$s0-s1-->
+      <dialog
+        id="s0-s1-dialog"
+        class="site-search-dialog"
+        aria-labelledby="s0-s1-heading"
+        data-pagefind-ignore="all"
+        data-search-dialog=""
+        data-search-state="initial"
+      >
+        <div class="site-search-dialog__surface">
+          <h2 id="s0-s1-heading" class="visually-hidden svelte-lcnlkt">Поиск по сайту</h2>
+          <div class="site-search-dialog__field svelte-lcnlkt">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="10.75" cy="10.75" r="6.5"></circle>
+              <path d="m15.5 15.5 4.25 4.25"></path></svg
+            ><!---->
+            <label for="s0-s1-input" class="visually-hidden svelte-lcnlkt"
+              >Что найти на сайте</label
+            >
+            <input
+              value=""
+              id="s0-s1-input"
+              type="search"
+              name="site-search"
+              class="site-search-dialog__input"
+              placeholder="Что найти?"
+              autocomplete="off"
+              maxlength="200"
+              data-search-input=""
+            />
+            <button
+              type="button"
+              class="site-search-dialog__close"
+              aria-label="Закрыть"
+              data-search-close=""
+            >
+              <svg
+                class="close-icon svelte-lcnlkt"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path d="m6.75 6.75 10.5 10.5"></path>
+                <path d="m17.25 6.75-10.5 10.5"></path>
+              </svg>
+            </button>
+          </div>
+          <div
+            class="action-row search-load-status svelte-lcnlkt"
+            hidden=""
+            data-search-load-status=""
+          >
+            <p class="action-message svelte-lcnlkt" data-search-load-message=""></p>
+          </div>
+          <!--[-1--><!--]-->
+        </div>
+        <p
+          class="visually-hidden svelte-lcnlkt"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          data-search-load-announcement=""
+        ></p>
+      </dialog>
+      <!--]-->
+    </div>
+  </body>
+</html>

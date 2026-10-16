@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>База знаний: визуальная примерка #1058</title>
+    <link rel="stylesheet" href="preview.css" />
+    <script type="module" src="preview.js"></script>
+  </head>
+  <body>
+    <header class="toolbar">
+      <div class="intro">
+        <h1>База знаний: примерка</h1>
+        <p>Текущие страницы и предложенное оформление. Каждую страницу можно прокручивать.</p>
+      </div>
+      <div class="controls">
+        <label
+          >Материал
+          <select id="page">
+            <option value="offer">Оферта</option>
+            <option value="gas">Подключение газа</option>
+            <option value="contacts">Контакты ОК</option>
+            <option value="catalog">Каталог</option>
+          </select>
+        </label>
+        <label
+          >Экран
+          <select id="width">
+            <option value="390">Телефон · 390 px</option>
+            <option value="320">Узкий телефон · 320 px</option>
+            <option value="1440">Компьютер · 1440 px</option>
+          </select>
+        </label>
+        <label id="toc-style-label"
+          >Оглавление оферты
+          <select id="toc-style">
+            <option value="grouped">Договор и приложения</option>
+            <option value="expanded">Сплошной список</option>
+          </select>
+        </label>
+        <button id="jump" type="button">К оглавлению</button>
+      </div>
+      <p id="description" class="description" aria-live="polite"></p>
+    </header>
+    <main class="comparison">
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Сейчас</h2>
+          <a id="before-link" target="_blank" rel="noopener">Открыть отдельно</a>
+        </div>
+        <div class="frame-space">
+          <iframe id="before" title="Текущая страница" width="390" height="844"></iframe>
+        </div>
+      </section>
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Примерка</h2>
+          <a id="after-link" target="_blank" rel="noopener">Открыть отдельно</a>
+        </div>
+        <div class="frame-space">
+          <iframe id="after" title="Предложенное оформление" width="390" height="844"></iframe>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
