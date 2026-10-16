@@ -68,8 +68,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
-    "astro": "^7.3.5",
-    "svelte": "^5.57.1",
+    "astro": "^7.3.8",
+    "svelte": "^5.57.2",
     "typescript": "^7.0.2"
   }
 }
