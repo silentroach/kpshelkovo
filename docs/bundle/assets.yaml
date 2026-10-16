@@ -1,18 +1,18 @@
 - file: static/404.XXXXXXXX.css
   bytes: 1547
-  brotli: 593
-  gzip: 700
+  brotli: 598
+  gzip: 701
 - file: static/BaseLayout.XXXXXXXX.css
-  bytes: 56179
-  brotli: 8954
-  gzip: 10028
+  bytes: 56203
+  brotli: 8983
+  gzip: 10057
 - file: static/BaseLayout.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 11090
   brotli: 3515
   gzip: 4053
 - file: static/Breadcrumbs.XXXXXXXX.css
   bytes: 2418
-  brotli: 534
+  brotli: 530
   gzip: 628
 - file: static/ClientRouter.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 13908
@@ -20,24 +20,24 @@
   gzip: 4782
 - file: static/CommonSpacesTable.XXXXXXXX.js
   bytes: 1322
-  brotli: 649
-  gzip: 784
+  brotli: 630
+  gzip: 783
 - file: static/ComparisonTable.XXXXXXXX.css
-  bytes: 1280
-  brotli: 382
-  gzip: 489
+  bytes: 1443
+  brotli: 430
+  gzip: 550
 - file: static/ComparisonTable.XXXXXXXX.js
-  bytes: 3555
-  brotli: 1420
-  gzip: 1682
+  bytes: 3602
+  brotli: 1416
+  gzip: 1698
 - file: static/ContactListItem.XXXXXXXX.css
   bytes: 700
   brotli: 244
   gzip: 289
 - file: static/EditorialMapScript.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 3265
-  brotli: 1254
-  gzip: 1452
+  brotli: 1253
+  gzip: 1451
 - file: static/EventList.XXXXXXXX.css
   bytes: 555
   brotli: 197
@@ -56,12 +56,12 @@
   gzip: 939
 - file: static/InfrastructureTable.XXXXXXXX.js
   bytes: 2533
-  brotli: 955
-  gzip: 1150
+  brotli: 954
+  gzip: 1148
 - file: static/LinkWithIcon.XXXXXXXX.css
   bytes: 488
-  brotli: 200
-  gzip: 244
+  brotli: 202
+  gzip: 242
 - file: static/MapPreview.XXXXXXXX.css
   bytes: 1200
   brotli: 350
@@ -69,7 +69,7 @@
 - file: static/MapPreview.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 4175
   brotli: 1513
-  gzip: 1755
+  gzip: 1754
 - file: static/NewsArchiveSummary.XXXXXXXX.css
   bytes: 261
   brotli: 115
@@ -91,9 +91,9 @@
   brotli: 2685
   gzip: 3104
 - file: static/PlaceMap.XXXXXXXX.js
-  bytes: 29821
-  brotli: 9555
-  gzip: 10751
+  bytes: 29858
+  brotli: 9587
+  gzip: 10763
 - file: static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 693
   brotli: 338
@@ -104,8 +104,8 @@
   gzip: 294
 - file: static/ServiceTable.XXXXXXXX.js
   bytes: 920
-  brotli: 478
-  gzip: 564
+  brotli: 477
+  gzip: 562
 - file: static/ShelkovoAreaIcon.XXXXXXXX.css
   bytes: 204
   brotli: 111
@@ -174,9 +174,9 @@
   brotli: 829
   gzip: 1008
 - file: static/editorial-map.XXXXXXXX.js
-  bytes: 2039
+  bytes: 2058
   brotli: 748
-  gzip: 825
+  gzip: 829
 - file: static/esm.XXXXXXXX.js
   bytes: 5147
   brotli: 1780
@@ -189,16 +189,16 @@
   gzip: 2398
 - file: static/explorer-component.XXXXXXXX.js
   bytes: 23952
-  brotli: 7972
-  gzip: 9153
+  brotli: 7992
+  gzip: 9154
 - file: static/index-1.XXXXXXXX.css
   bytes: 15520
   brotli: 2671
   gzip: 3034
 - file: static/index-2.XXXXXXXX.css
-  bytes: 15862
-  brotli: 2427
-  gzip: 2809
+  bytes: 16082
+  brotli: 2473
+  gzip: 2861
 - file: static/index-3.XXXXXXXX.css
   bytes: 3968
   brotli: 702
@@ -256,9 +256,9 @@
   brotli: 232
   gzip: 276
 - file: static/index-17.XXXXXXXX.css
-  bytes: 6049
-  brotli: 1001
-  gzip: 1147
+  bytes: 6671
+  brotli: 1085
+  gzip: 1259
 - file: static/index-18.XXXXXXXX.css
   bytes: 1541
   brotli: 339
@@ -325,8 +325,8 @@
   gzip: 1162
 - file: static/index.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 2107
-  brotli: 1002
-  gzip: 1155
+  brotli: 1001
+  gzip: 1154
 - file: static/lazy.XXXXXXXX.css
   bytes: 2154
   brotli: 550
@@ -358,9 +358,9 @@
   brotli: 159
   gzip: 182
 - file: static/parcel-layer.XXXXXXXX.js
-  bytes: 4534
-  brotli: 1812
-  gzip: 2084
+  bytes: 4539
+  brotli: 1820
+  gzip: 2094
 - file: static/parcel-set-outline.XXXXXXXX.js
   bytes: 42207
   brotli: 13640
@@ -382,9 +382,9 @@
   brotli: 276
   gzip: 350
 - file: static/runtime.XXXXXXXX.js
-  bytes: 2158
-  brotli: 1012
-  gzip: 1178
+  bytes: 1500
+  brotli: 746
+  gzip: 886
 - file: static/schema-2.XXXXXXXX.js
   bytes: 220
   brotli: 180
