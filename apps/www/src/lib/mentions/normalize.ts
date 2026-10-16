@@ -1,6 +1,4 @@
-import remarkGfm from 'remark-gfm';
-import remarkParse from 'remark-parse';
-import { unified } from 'unified';
+import { parseMarkdownFragment } from '@shelkovo/markdown';
 
 import {
   ENTITY_MENTION_DEFAULT_LABEL_CASE,
@@ -12,7 +10,6 @@ import {
   type SiteMentionRegistry
 } from './types';
 
-const parser = unified().use(remarkParse).use(remarkGfm);
 const SLUG_START = /[a-z0-9]/u;
 const SLUG_CHAR = /[a-z0-9-]/u;
 const CASE_CHAR = /[a-z]/u;
@@ -455,7 +452,7 @@ export const normalizeEntityMentions = (input: {
     };
   }
 
-  const tree = parser.parse(input.markdown) as MarkdownNode;
+  const tree: MarkdownNode = { type: 'root', children: parseMarkdownFragment(input.markdown) };
   const replacements = [
     ...collectTextNodes(tree, input.context).flatMap(({ start, end }) =>
       mentionReplacements(input.markdown.slice(start, end), start, input.context, input.registry)

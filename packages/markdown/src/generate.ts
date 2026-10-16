@@ -14,6 +14,7 @@ import type {
   ThematicBreak,
   Yaml
 } from 'mdast';
+import { directiveFromMarkdown } from 'mdast-util-directive';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown, frontmatterToMarkdown } from 'mdast-util-frontmatter';
 import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm';
@@ -32,12 +33,25 @@ import type {
 } from './generate-types';
 import { assertNoMarkdownTables } from './no-tables';
 import { expandTableOfContents } from './toc';
+import { prepareTocAnnotations, tocDirectiveSyntax } from './toc-annotations';
 
-const createParseExtensions = () => [gfm(), frontmatter(['yaml'])];
+const createParseExtensions = () => [gfm(), frontmatter(['yaml']), tocDirectiveSyntax()];
 
-const createMdastExtensions = () => [gfmFromMarkdown(), frontmatterFromMarkdown(['yaml'])];
+const createMdastExtensions = () => [
+  gfmFromMarkdown(),
+  frontmatterFromMarkdown(['yaml']),
+  directiveFromMarkdown()
+];
 
-const createSerializeExtensions = () => [gfmToMarkdown(), frontmatterToMarkdown(['yaml'])];
+const createSerializeExtensions = () => [
+  gfmToMarkdown(),
+  frontmatterToMarkdown(['yaml']),
+  {
+    unsafe: [
+      { character: ':', after: ':*toc-(?:group|omit)(?![\\w-])', inConstruct: 'phrasing' as const }
+    ]
+  }
+];
 
 const toPhrasingChildren = (input: MarkdownPhrasingInput): PhrasingContent[] =>
   typeof input === 'string' ? [md.text(input)] : [...input];
@@ -53,13 +67,22 @@ const serializeFrontmatter = (frontmatter: MarkdownFrontmatter): string =>
     lineWidth: 0
   }).trimEnd();
 
+const companionNodes = (children: readonly RootContent[]): RootContent[] =>
+  children.flatMap((node) => {
+    if (node.type === 'blockquote' && node.data?.tocContainer) {
+      return companionNodes(node.children);
+    }
+    return [node];
+  });
+
 export const createMarkdownDocument = ({ frontmatter, children }: MarkdownDocumentInput): Root => ({
   type: 'root',
   children: [...(frontmatter ? [md.yaml(serializeFrontmatter(frontmatter))] : []), ...children]
 });
 
 export const serializeMarkdownDocument = (document: Root): string => {
-  const expandedDocument = expandTableOfContents(document);
+  const expandedDocument = expandTableOfContents(prepareTocAnnotations(structuredClone(document)));
+  expandedDocument.children = companionNodes(expandedDocument.children);
   assertNoMarkdownTables(expandedDocument);
 
   const markdown = toMarkdown(expandedDocument, {
@@ -78,10 +101,13 @@ export const serializeMarkdownDocument = (document: Root): string => {
 };
 
 export const parseMarkdownFragment = (markdown: string): readonly RootContent[] =>
-  fromMarkdown(markdown, {
-    extensions: createParseExtensions(),
-    mdastExtensions: createMdastExtensions()
-  }).children.filter((node) => node.type !== 'yaml');
+  prepareTocAnnotations(
+    fromMarkdown(markdown, {
+      extensions: createParseExtensions(),
+      mdastExtensions: createMdastExtensions()
+    }),
+    markdown
+  ).children.filter((node) => node.type !== 'yaml');
 
 export const md = {
   blockquote: (children: readonly BlockContent[]): RootContent => ({

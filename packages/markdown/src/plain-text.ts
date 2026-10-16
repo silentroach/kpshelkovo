@@ -9,7 +9,7 @@ const BLOCK_JOIN_TYPES = new Set([
   'tableCell',
   'tableRow'
 ]);
-const SKIPPED_NODE_TYPES = new Set(['code', 'definition', 'html']);
+const SKIPPED_NODE_TYPES = new Set(['code', 'definition', 'html', 'leafDirective']);
 
 interface MarkdownNode {
   readonly type: string;

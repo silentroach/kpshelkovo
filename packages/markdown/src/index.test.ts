@@ -264,20 +264,24 @@ describe('@shelkovo/markdown', () => {
 
   it('expands [TOC] before rendering Markdown to HTML', () => {
     expect(render('[TOC]\n\n## Раздел\n\n### Детали\n\n## Раздел')).toMatchInlineSnapshot(`
-        "<p class="ui-markdown-toc__title"><strong>Содержание</strong></p>
-        <ul class="ui-markdown-toc__list">
-        <li><a href="#раздел">Раздел</a>
-        <ul>
-        <li><a href="#детали">Детали</a></li>
-        </ul>
-        </li>
-        <li><a href="#раздел-2">Раздел</a></li>
-        </ul>
-        <hr>
-        <h2 id="раздел" aria-label="Раздел">Раздел<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" data-pagefind-ignore="all" href="#раздел" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>
-        <h3 id="детали" aria-label="Детали">Детали<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" data-pagefind-ignore="all" href="#детали" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h3>
-        <h2 id="раздел-2" aria-label="Раздел">Раздел<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" data-pagefind-ignore="all" href="#раздел-2" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>"
-      `);
+      "<nav class="ui-markdown-toc" aria-label="Содержание">
+      <div class="ui-markdown-toc__inner">
+      <p class="ui-markdown-toc__title"><strong>Содержание</strong></p>
+      <ul class="ui-markdown-toc__list">
+      <li><a href="#раздел"><span class="ui-markdown-toc__label">Раздел</span></a>
+      <ul>
+      <li><a href="#детали"><span class="ui-markdown-toc__label">Детали</span></a></li>
+      </ul>
+      </li>
+      <li><a href="#раздел-2"><span class="ui-markdown-toc__label">Раздел</span></a></li>
+      </ul>
+      <hr>
+      </div>
+      </nav>
+      <h2 id="раздел" aria-label="Раздел">Раздел<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" data-pagefind-ignore="all" href="#раздел" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>
+      <h3 id="детали" aria-label="Детали">Детали<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" data-pagefind-ignore="all" href="#детали" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h3>
+      <h2 id="раздел-2" aria-label="Раздел">Раздел<a aria-label="Ссылка на этот раздел" class="ui-heading-anchor" data-pagefind-ignore="all" href="#раздел-2" title="Ссылка на этот раздел"><span aria-hidden="true">#</span></a></h2>"
+    `);
   });
 
   it('transforms code in one document while preserving its meta, references and author TOC', () => {

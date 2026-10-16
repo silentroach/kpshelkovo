@@ -1,4 +1,5 @@
 import type {
+  BlockContent,
   Heading,
   Link,
   LinkReference,
@@ -14,23 +15,30 @@ import type {
 } from 'mdast';
 
 import { uniqueHeadingSlug } from './heading-slugs';
+import type { TocEntry, TocBuildResult, TocGroup } from './toc-annotations.types';
 
 const TOC_PLACEHOLDER = '[TOC]';
 const TOC_REFERENCE_IDENTIFIER = 'toc';
 const TOC_TITLE = 'Содержание';
 
-type TocEntry = {
-  readonly depth: Heading['depth'];
-  readonly slug: string;
-  readonly title: string;
-};
-
-type TocBuildResult = {
-  readonly items: readonly ListItem[];
-  readonly nextIndex: number;
-};
-
 const text = (value: string): Text => ({ type: 'text', value });
+
+const linkText = (value: string, className: string): Text => ({
+  type: 'text',
+  value,
+  data: { hName: 'span', hProperties: { className: [className] } }
+});
+
+const tocLinkLabel = (title: string): Text[] => {
+  const number = /^(\d+(?:\.\d+)*[.):]?)(\s+)([\s\S]+)$/u.exec(title);
+  return number
+    ? [
+        linkText(number[1], 'ui-markdown-toc__number'),
+        text(number[2]),
+        linkText(number[3], 'ui-markdown-toc__label')
+      ]
+    : [linkText(title, 'ui-markdown-toc__label')];
+};
 
 const tocTitle = (): Paragraph => ({
   type: 'paragraph',
@@ -55,7 +63,7 @@ const tocLink = (entry: TocEntry): Link => ({
       href: `#${entry.slug}`
     }
   },
-  children: [text(entry.title)]
+  children: tocLinkLabel(entry.title)
 });
 
 const tocList = (children: readonly ListItem[]): List => ({
@@ -124,8 +132,13 @@ const collectTocEntries = (
 ): readonly TocEntry[] => {
   const seenSlugs = new Set<string>();
   const entries: TocEntry[] = [];
+  let group: TocGroup | undefined;
 
   document.children.forEach((node) => {
+    if (node.type === 'leafDirective') {
+      group = { title: node.children.map(phrasingText).join('').trim() };
+      return;
+    }
     if (node.type !== 'heading') {
       return;
     }
@@ -139,7 +152,7 @@ const collectTocEntries = (
     const slug = authoredIds?.get(node) ?? uniqueHeadingSlug(title, seenSlugs);
 
     if (node.depth > 1) {
-      entries.push({ depth: node.depth, slug, title });
+      entries.push({ depth: node.depth, slug, title: node.data?.tocTitle ?? title, group });
     }
   });
 
@@ -181,23 +194,82 @@ const buildTocNodes = (entries: readonly TocEntry[]): readonly RootContent[] => 
     return [];
   }
 
-  return [tocTitle(), tocRootList(buildTocItems(entries, 0, 1).items), tocSeparator()];
+  const groups: BlockContent[] = [];
+  const intro = entries.filter((entry) => !entry.group);
+  const named = [...new Set(entries.flatMap((entry) => (entry.group ? [entry.group] : [])))];
+  named.forEach((group) => {
+    const items = entries.filter((entry) => entry.group === group);
+    groups.push({
+      type: 'blockquote',
+      data: {
+        tocContainer: true,
+        hName: 'div',
+        hProperties: { className: ['ui-markdown-toc__group'] }
+      },
+      children: [
+        {
+          type: 'paragraph',
+          data: { hProperties: { className: ['ui-markdown-toc__group-title'] } },
+          children: [{ type: 'strong', children: [text(group.title)] }]
+        },
+        tocRootList(buildTocItems(items, 0, 1).items)
+      ]
+    });
+  });
+  const nodes: BlockContent[] = [
+    tocTitle(),
+    ...(intro.length ? [tocRootList(buildTocItems(intro, 0, 1).items)] : []),
+    ...(groups.length
+      ? [
+          {
+            type: 'blockquote' as const,
+            data: {
+              tocContainer: true,
+              hName: 'div',
+              hProperties: { className: ['ui-markdown-toc__groups'] }
+            },
+            children: groups
+          }
+        ]
+      : []),
+    tocSeparator()
+  ];
+  return [
+    {
+      type: 'blockquote',
+      data: {
+        tocContainer: true,
+        hName: 'nav',
+        hProperties: {
+          className: ['ui-markdown-toc', ...(groups.length ? ['ui-markdown-toc--grouped'] : [])],
+          ariaLabel: TOC_TITLE
+        }
+      },
+      children: [
+        {
+          type: 'blockquote',
+          data: {
+            tocContainer: true,
+            hName: 'div',
+            hProperties: { className: ['ui-markdown-toc__inner'] }
+          },
+          children: nodes
+        }
+      ]
+    }
+  ];
 };
 
 export const expandTableOfContents = (
   document: Root,
   authoredIds?: ReadonlyMap<Heading, string>
 ): Root => {
-  if (!document.children.some(isTocPlaceholder)) {
-    return document;
-  }
-
   const entries = collectTocEntries(document, authoredIds);
 
   return {
     ...document,
     children: document.children.flatMap((node) =>
-      isTocPlaceholder(node) ? buildTocNodes(entries) : [node]
+      node.type === 'leafDirective' ? [] : isTocPlaceholder(node) ? buildTocNodes(entries) : [node]
     )
   };
 };

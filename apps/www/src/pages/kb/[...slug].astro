@@ -74,7 +74,9 @@ const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
   schema={schema}
   search={search}
 >
-  <main class="ui-page kb-page">
+  <main
+    class:list={['ui-page', 'kb-page', { 'kb-page--document': page.routeSlug }]}
+  >
     <header class="ui-page-header">
       <div class="ui-page-header-stack kb-header">
         <Breadcrumbs items={breadcrumbs} />
@@ -88,7 +90,10 @@ const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
     {bodyHtml && (
       <article class="kb-body">
         <div
-          class:list={['ui-prose', { 'ui-prose-catalog': !page.routeSlug }]}
+          class:list={[
+            'ui-prose',
+            { 'kb-prose': page.routeSlug, 'ui-prose-catalog': !page.routeSlug },
+          ]}
           set:html={bodyHtml}
         />
       </article>
@@ -110,6 +115,277 @@ const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
     padding-inline: 1.25rem;
   }
 
+  /* Keep the normal reading column while the generated TOC spans the page.
+     Block flow preserves the existing prose's collapsing vertical margins. */
+  .kb-page--document {
+    --kb-body-padding: 1.25rem;
+    --kb-reading-width: 39.06rem;
+    --kb-content-inset: calc(
+      max(var(--page-padding), (100% - var(--page-max)) / 2) +
+        var(--kb-body-padding)
+    );
+    width: 100%;
+  }
+
+  .kb-page--document > .ui-page-header {
+    width: min(calc(100% - var(--page-padding) * 2), var(--page-max));
+    margin-inline: auto;
+  }
+
+  .kb-page--document .kb-body {
+    padding-inline: 0;
+  }
+
+  .kb-prose {
+    max-width: none;
+  }
+
+  .kb-prose > :global(:not(.ui-markdown-toc)) {
+    max-width: min(
+      var(--kb-reading-width),
+      calc(100% - var(--kb-content-inset) * 2)
+    );
+    margin-inline: var(--kb-content-inset);
+  }
+
+  .kb-prose > :global(.ui-markdown-toc) {
+    margin-block: 1.5rem;
+    padding-block: 1.5rem;
+    padding-inline: var(--kb-content-inset);
+    border: 0;
+    border-radius: 0;
+    background: var(--color-breadcrumb-surface);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__title) {
+    margin: 0 0 0.75rem;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .kb-prose
+    :global(
+      .ui-markdown-toc:has(.ui-markdown-toc__groups) .ui-markdown-toc__title
+    ) {
+    font-size: 1.25rem;
+    line-height: 1.3;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__inner > .ui-markdown-toc__list) {
+    max-width: var(--kb-reading-width);
+  }
+
+  .kb-prose :global(.ui-markdown-toc hr) {
+    display: none;
+  }
+
+  .kb-prose :global(.ui-markdown-toc .ui-markdown-toc__list) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    line-height: 1.5;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__list ul) {
+    margin-block: 0.375rem 0;
+    padding-inline-start: 1.25rem;
+    border: 0;
+    list-style: none;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__list li) {
+    margin: 0;
+    padding: 0;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__list li + li) {
+    margin-block-start: 0.5rem;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__list a) {
+    color: var(--color-primary);
+    font-weight: 400;
+    text-decoration-line: none;
+    text-underline-offset: 0.2em;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__list ul a) {
+    color: var(--color-text-muted);
+  }
+
+  .kb-prose :global(.ui-markdown-toc__list a:is(:hover, :focus-visible)) {
+    color: var(--color-primary);
+    text-decoration-line: underline;
+    text-decoration-color: currentColor;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__groups) {
+    display: grid;
+    gap: 1.75rem;
+    margin-block-start: 1.5rem;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__group) {
+    min-width: 0;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__group-title) {
+    margin: 0 0 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .kb-prose
+    :global(
+      .ui-markdown-toc:has(.ui-markdown-toc__groups)
+        .ui-markdown-toc__list
+        li
+        + li
+    ) {
+    margin-block-start: 0;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__group .ui-markdown-toc__list a) {
+    display: block;
+    padding-block: 0.375rem;
+  }
+
+  .kb-prose
+    :global(
+      .ui-markdown-toc:has(.ui-markdown-toc__groups)
+        a:has(> .ui-markdown-toc__number)
+    ) {
+    display: grid;
+    grid-template-columns: minmax(1.75rem, max-content) minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0.25rem;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__number) {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .kb-prose
+    :global(
+      .ui-markdown-toc:has(.ui-markdown-toc__groups)
+        a:is(:hover, :focus-visible):has(> .ui-markdown-toc__label)
+    ) {
+    text-decoration-line: none;
+  }
+
+  .kb-prose
+    :global(
+      .ui-markdown-toc:has(.ui-markdown-toc__groups)
+        a:is(:hover, :focus-visible)
+        > .ui-markdown-toc__label
+    ) {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  /* A NOTE whose entire title is one file link is the original-file recipe. */
+  .kb-prose
+    :global(
+      .ui-callout--note:has(
+        > .ui-callout__title > strong:only-child > a.ui-file-link:only-child
+      )
+    ) {
+    border-color: color-mix(
+      in oklab,
+      var(--color-warning-text) 10%,
+      var(--color-bg)
+    );
+    background: color-mix(
+      in oklab,
+      var(--color-warning-soft) 55%,
+      var(--color-bg)
+    );
+  }
+
+  .kb-prose
+    :global(
+      .ui-callout--note
+        > .ui-callout__title:has(
+          > strong:only-child > a.ui-file-link:only-child
+        )
+    ) {
+    margin-block-end: 0;
+    line-height: 1.5;
+  }
+
+  .kb-prose
+    :global(
+      .ui-callout--note
+        > .ui-callout__title
+        > strong:only-child
+        > a.ui-file-link:only-child
+    ) {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .kb-prose
+    :global(
+      .ui-callout--note
+        > .ui-callout__title
+        > strong:only-child
+        > a.ui-file-link:only-child
+        > .ui-file-link__icon
+    ) {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0.125rem 0 0;
+  }
+
+  .kb-prose
+    :global(
+      .ui-callout--note:has(
+          > .ui-callout__title > strong:only-child > a.ui-file-link:only-child
+        )
+        > p:not(.ui-callout__title)
+    ) {
+    margin-block-start: 0.375rem;
+    margin-inline-start: 1.75rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .kb-prose :global(.ui-markdown-toc a:focus-visible),
+  .kb-prose
+    :global(
+      .ui-callout--note
+        > .ui-callout__title
+        > strong:only-child
+        > a.ui-file-link:only-child:focus-visible
+    ) {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  @media screen and (width < 40rem) {
+    /* This root is already full width; do not apply the map's normal breakout. */
+    .kb-prose > :global(.ui-editorial-map) {
+      max-width: none;
+      margin-inline: 0;
+    }
+  }
+
   @media (min-width: 48rem) {
     .kb-page {
       padding-block-end: 3rem;
@@ -118,11 +394,47 @@ const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
     .kb-body {
       padding-inline: 1.5rem;
     }
+
+    .kb-page--document {
+      --kb-body-padding: 1.5rem;
+      --kb-reading-width: 41.50125rem;
+    }
+
+    .kb-prose
+      :global(
+        .ui-markdown-toc__groups:has(
+          > .ui-markdown-toc__group + .ui-markdown-toc__group
+        )
+      ) {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+      column-gap: 4rem;
+    }
   }
 
   @media (min-width: 64rem) {
     .kb-page {
       padding-block-end: 3.5rem;
+    }
+  }
+
+  @media print {
+    .kb-page--document > .ui-page-header {
+      width: 100%;
+    }
+
+    .kb-prose > :global(:not(.ui-markdown-toc)) {
+      max-width: none;
+      margin-inline: 0;
+    }
+
+    .kb-prose
+      :global(
+        .ui-callout--note:has(
+            > .ui-callout__title > strong:only-child > a.ui-file-link:only-child
+          )
+          > p:not(.ui-callout__title)
+      ) {
+      margin-inline-start: 0;
     }
   }
 </style>
