@@ -1,18 +1,18 @@
 # Примерка карточек «Сарафана»
 
-Первая примерка для #1059 отклонена владельцем. Снимки ниже сохранены как история обсуждения; актуальный выбор описан в [design](/openspec/changes/refine-sarafan-card-presentation/design.md): убрать только серую подложку нейтрального пересказа, сохранив эмоджи и прежнюю плотность.
+Первая примерка для #1059 отклонена владельцем. Снимки ниже сохранены как история обсуждения; актуальный выбор описан в [design](/openspec/changes/archive/2026-10-16-refine-sarafan-card-presentation/design.md): убрать только серую подложку нейтрального пересказа, сохранив эмоджи и прежнюю плотность.
 
 Снимки получены с production-страниц в отдельной браузерной сессии. Для вида «после» временно изменены DOM и CSS открытой страницы. Код приложения не менялся. Слева на сравнениях исходный вид, справа кандидат; подписи над изображениями относятся к стенду.
 
 ## Сравнения
 
-- [Александр, desktop](/openspec/changes/refine-sarafan-card-presentation/preview/alexander-desktop.webp): кадр содержательной части страницы из viewport 1440 × 1000.
-- [Александр, мобильные отзывы](/openspec/changes/refine-sarafan-card-presentation/preview/alexander-mobile-reviews.webp): весь блок трёх отзывов при ширине 390 px, выровненный по началу секции.
-- [«Агромаш», мобильные отзывы](/openspec/changes/refine-sarafan-card-presentation/preview/agromash-mobile-reviews.webp): верхний фрагмент длинного списка при ширине 390 px.
-- [Полная мобильная карточка Александра](/openspec/changes/refine-sarafan-card-presentation/preview/alexander-390-after.webp).
-- [Полная мобильная карточка «Агромаша»](/openspec/changes/refine-sarafan-card-presentation/preview/agromash-390-after.webp).
-- [«Баха», отрицательный и положительные отзывы на 320 px](/openspec/changes/refine-sarafan-card-presentation/preview/bakha-320-after.webp).
-- [Игорь, короткая карточка на 320 px](/openspec/changes/refine-sarafan-card-presentation/preview/igor-320-after.webp).
+- [Александр, desktop](/openspec/changes/archive/2026-10-16-refine-sarafan-card-presentation/preview/alexander-desktop.webp): кадр содержательной части страницы из viewport 1440 × 1000.
+- [Александр, мобильные отзывы](/openspec/changes/archive/2026-10-16-refine-sarafan-card-presentation/preview/alexander-mobile-reviews.webp): весь блок трёх отзывов при ширине 390 px, выровненный по началу секции.
+- [«Агромаш», мобильные отзывы](/openspec/changes/archive/2026-10-16-refine-sarafan-card-presentation/preview/agromash-mobile-reviews.webp): верхний фрагмент длинного списка при ширине 390 px.
+- [Полная мобильная карточка Александра](/openspec/changes/archive/2026-10-16-refine-sarafan-card-presentation/preview/alexander-390-after.webp).
+- [Полная мобильная карточка «Агромаша»](/openspec/changes/archive/2026-10-16-refine-sarafan-card-presentation/preview/agromash-390-after.webp).
+- [«Баха», отрицательный и положительные отзывы на 320 px](/openspec/changes/archive/2026-10-16-refine-sarafan-card-presentation/preview/bakha-320-after.webp).
+- [Игорь, короткая карточка на 320 px](/openspec/changes/archive/2026-10-16-refine-sarafan-card-presentation/preview/igor-320-after.webp).
 
 ## Что примерили
 

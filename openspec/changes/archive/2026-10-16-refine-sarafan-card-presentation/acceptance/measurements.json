@@ -1,0 +1,117 @@
+[
+  {
+    "width": 1440,
+    "before": {
+      "background": "oklch(0.9602 0.0085 128.6)",
+      "emoji": "😐",
+      "font": "14px",
+      "height": 368.78125,
+      "lineHeight": "20px",
+      "overflow": false,
+      "sentiment": "Нейтральный:",
+      "url": "https://t.me/shelkovoecoclub/15262/55289"
+    },
+    "after": {
+      "background": "rgba(0, 0, 0, 0)",
+      "emoji": "😐",
+      "font": "14px",
+      "height": 368.78125,
+      "lineHeight": "20px",
+      "overflow": false,
+      "sentiment": "Нейтральный:",
+      "url": "https://t.me/shelkovoecoclub/15262/55289"
+    },
+    "htmlUnchanged": true,
+    "positiveHover": "oklch(0.9692 0.0085 128.6)",
+    "focus": {
+      "shadow": "oklch(1 0 0) 0px 0px 0px 2px, oklch(0.5125 0.0872 78.2) 0px 0px 0px 4px",
+      "url": "https://t.me/shelkovoecoclub/15262/55289",
+      "visible": true
+    }
+  },
+  {
+    "width": 390,
+    "before": {
+      "background": "oklch(0.9602 0.0085 128.6)",
+      "emoji": "😐",
+      "font": "14px",
+      "height": 508.78125,
+      "lineHeight": "20px",
+      "overflow": false,
+      "sentiment": "Нейтральный:",
+      "url": "https://t.me/shelkovoecoclub/15262/55289"
+    },
+    "after": {
+      "background": "rgba(0, 0, 0, 0)",
+      "emoji": "😐",
+      "font": "14px",
+      "height": 508.78125,
+      "lineHeight": "20px",
+      "overflow": false,
+      "sentiment": "Нейтральный:",
+      "url": "https://t.me/shelkovoecoclub/15262/55289"
+    },
+    "htmlUnchanged": true,
+    "positiveHover": "oklch(0.9692 0.0085 128.6)",
+    "focus": {
+      "shadow": "oklch(1 0 0) 0px 0px 0px 2px, oklch(0.5125 0.0872 78.2) 0px 0px 0px 4px",
+      "url": "https://t.me/shelkovoecoclub/15262/55289",
+      "visible": true
+    }
+  },
+  {
+    "width": 320,
+    "before": {
+      "background": "oklch(0.9602 0.0085 128.6)",
+      "emoji": "😐",
+      "font": "14px",
+      "height": 588.78125,
+      "lineHeight": "20px",
+      "overflow": false,
+      "sentiment": "Нейтральный:",
+      "url": "https://t.me/shelkovoecoclub/15262/55289"
+    },
+    "after": {
+      "background": "rgba(0, 0, 0, 0)",
+      "emoji": "😐",
+      "font": "14px",
+      "height": 588.78125,
+      "lineHeight": "20px",
+      "overflow": false,
+      "sentiment": "Нейтральный:",
+      "url": "https://t.me/shelkovoecoclub/15262/55289"
+    },
+    "htmlUnchanged": true,
+    "positiveHover": "oklch(0.9692 0.0085 128.6)",
+    "focus": {
+      "shadow": "oklch(1 0 0) 0px 0px 0px 2px, oklch(0.5125 0.0872 78.2) 0px 0px 0px 4px",
+      "url": "https://t.me/shelkovoecoclub/15262/55289",
+      "visible": true
+    }
+  },
+  {
+    "keyboardSourceNavigation": {
+      "lifecycle": {
+        "effectiveLaunch": {
+          "browserLaunched": true,
+          "engine": "chrome",
+          "launchHash": 11677035664275010974
+        },
+        "launched": false,
+        "relaunchedBrowser": false,
+        "restartedBackground": false,
+        "restoreStatus": "not_configured",
+        "reused": true,
+        "saveStatus": "not_attempted"
+      },
+      "url": "https://t.me/shelkovoecoclub/15262/55289"
+    }
+  },
+  {
+    "negative": {
+      "background": "oklch(0.952 0.045 25)",
+      "emoji": "👎",
+      "overflow": false
+    }
+  }
+]
