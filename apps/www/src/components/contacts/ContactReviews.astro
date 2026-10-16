@@ -22,47 +22,42 @@ const sentimentEmoji = {
 } as const satisfies Record<ContactReview['sentiment'], string>;
 ---
 
-{
-  reviews.length > 0 ? (
-    <ul aria-labelledby={labelledBy} class="contact-reviews">
-      {reviews.map((review) => (
-        <li>
-          <div
-            class:list={[
-              'contact-review',
-              `contact-review--${review.sentiment}`,
-            ]}
-          >
-            <a
-              href={review.url}
-              class="contact-review__overlay"
-              aria-label={`Открыть отзыв от ${formatContactReviewDate(review)}`}
+{reviews.length > 0 ? (
+  <ul aria-labelledby={labelledBy} class="contact-reviews">
+    {reviews.map((review) => (
+      <li>
+        <div
+          class:list={['contact-review', `contact-review--${review.sentiment}`]}
+        >
+          <a
+            href={review.url}
+            class="contact-review__overlay"
+            aria-label={`Открыть отзыв от ${formatContactReviewDate(review)}`}
+          />
+          <span class="contact-review__emoji" aria-hidden="true">
+            {sentimentEmoji[review.sentiment]}
+          </span>
+          <span class="contact-review__sentiment">
+            {formatContactReviewSentiment(review.sentiment)}:{' '}
+          </span>
+          <div class="contact-review__content">
+            <div
+              class="contact-review__summary"
+              data-pagefind-body
+              set:html={renderMarkdown(review.summary)}
             />
-            <span class="contact-review__emoji" aria-hidden="true">
-              {sentimentEmoji[review.sentiment]}
+            <span class="contact-review__meta">
+              {isTelegramUrl(review.url) ? (
+                <TelegramIcon class="contact-review__telegram-icon" />
+              ) : null}
+              <span>{formatContactReviewDate(review)}</span>
             </span>
-            <span class="contact-review__sentiment">
-              {formatContactReviewSentiment(review.sentiment)}:{' '}
-            </span>
-            <div class="contact-review__content">
-              <div
-                class="contact-review__summary"
-                data-pagefind-body
-                set:html={renderMarkdown(review.summary)}
-              />
-              <span class="contact-review__meta">
-                {isTelegramUrl(review.url) ? (
-                  <TelegramIcon class="contact-review__telegram-icon" />
-                ) : null}
-                <span>{formatContactReviewDate(review)}</span>
-              </span>
-            </div>
           </div>
-        </li>
-      ))}
-    </ul>
-  ) : null
-}
+        </div>
+      </li>
+    ))}
+  </ul>
+) : null}
 
 <style>
   .contact-reviews {
@@ -88,10 +83,6 @@ const sentimentEmoji = {
 
   .contact-review--positive:hover {
     background: var(--color-primary-soft-2);
-  }
-
-  .contact-review--neutral {
-    background: var(--color-neutral-soft);
   }
 
   .contact-review--negative {
