@@ -29,8 +29,26 @@ function resize() {
 }
 
 function update() {
-  const mode = page.value === 'offer' ? tocStyle.value : 'expanded';
-  const paths = [`before-${page.value}.html`, `after-${page.value}-${mode}.html`];
+  let paths;
+  switch (page.value) {
+    case 'gas':
+      paths = ['before-gas.html', 'after-gas-expanded.html'];
+      break;
+    case 'contacts':
+      paths = ['before-contacts.html', 'after-contacts-expanded.html'];
+      break;
+    case 'catalog':
+      paths = ['before-catalog.html', 'after-catalog-expanded.html'];
+      break;
+    case 'offer':
+      paths = [
+        'before-offer.html',
+        tocStyle.value === 'expanded' ? 'after-offer-expanded.html' : 'after-offer-grouped.html'
+      ];
+      break;
+    default:
+      return;
+  }
   frames.forEach((frame, index) => {
     if (!frame.src.endsWith('/' + paths[index])) frame.src = paths[index];
   });
