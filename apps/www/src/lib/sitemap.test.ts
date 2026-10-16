@@ -40,6 +40,19 @@ describe('shouldIncludeSitemapPage', () => {
 });
 
 describe('buildSitemapMetadataIndex', () => {
+  it('uses the latest Discomfort update for the section lastmod', () => {
+    const index = buildSitemapMetadataIndex({
+      newsArticles: [], statusIncidents: [], settlements: [], meetings: [], kbPages: [], contacts: [],
+      discomfortEvents: [{ lastmod: '2026-04-29' }, { lastmod: '2026-08-22' }, { lastmod: '2026-06-13' }]
+    });
+    expect(index.get('/815/discomfort/')).toMatchInlineSnapshot(`
+      {
+        "changefreq": "monthly",
+        "excludeFromSitemap": undefined,
+        "lastmod": "2026-08-22",
+      }
+    `);
+  });
   it('uses publication and update dates for news pages and archives', () => {
     const index = buildSitemapMetadataIndex({
       newsArticles: [

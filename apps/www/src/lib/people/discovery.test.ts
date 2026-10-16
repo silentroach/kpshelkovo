@@ -52,6 +52,7 @@ const profile = (): PersonProfile => ({
   ],
   backlinks: {
     events: [],
+    discomfort: [],
     news: [
       {
         section: 'news',
@@ -255,7 +256,8 @@ describe('people discovery payload', () => {
       'reviews',
       'places',
       'people',
-      'contacts'
+      'contacts',
+      'discomfort'
     ]);
     expect(openapiDefs.kind?.enum).toEqual([
       'article',
@@ -264,7 +266,8 @@ describe('people discovery payload', () => {
       'review',
       'place',
       'person',
-      'contact'
+      'contact',
+      'quote'
     ]);
     expect(defs.backlinks?.required).toEqual([
       'news',
@@ -273,7 +276,8 @@ describe('people discovery payload', () => {
       'reviews',
       'places',
       'people',
-      'contacts'
+      'contacts',
+      'discomfort'
     ]);
     expect(openapiDefs.profile?.required).toEqual(defs.profile?.required);
     expect(

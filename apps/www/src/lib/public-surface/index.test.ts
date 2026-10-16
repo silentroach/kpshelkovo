@@ -26,6 +26,7 @@ import {
   contactsPath
 } from '@/lib/contacts/routes';
 import { catalog } from '@/lib/discovery';
+import { discomfortMarkdownPath, discomfortPath } from '@/lib/discomfort/routes';
 import { kbDetailMarkdownPattern, kbDetailPattern, kbMarkdownPath, kbPath } from '@/lib/kb/routes';
 import { siteApiCatalogPath, siteLlmsPath, siteMarkdownPath } from '@/lib/llms';
 import {
@@ -535,6 +536,10 @@ describe('public surface registry', () => {
   });
 
   it('registers contacts HTML, Markdown and vCard surfaces without feeds or APIs', () => {
+    expect(publicSurfaceRegistry.surfacesByOwner('discomfort').map((surface) => surface.path)).toEqual([
+      discomfortPath(),
+      discomfortMarkdownPath()
+    ]);
     const contacts = publicSurfaceRegistry.surfacesByOwner('contacts');
     const rootCatalog = catalog('https://example.com/sub') as {
       readonly linkset: readonly {

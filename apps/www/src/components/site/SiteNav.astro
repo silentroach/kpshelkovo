@@ -40,7 +40,10 @@ const kbCurrent = getCurrent('/kb/');
 const sarafanCurrent = getCurrent('/sarafan/');
 const reviewsCurrent = getCurrent('/reviews/');
 const statusCurrent = getCurrent('/status/');
-const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
+const discomfortCurrent = getCurrent('/815/discomfort/');
+const isTariffCurrent = Boolean(
+  compareCurrent || regulationCurrent || discomfortCurrent,
+);
 ---
 
 {isMobile ? (
@@ -65,6 +68,13 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
           <span class="ui-visually-hidden">, текущий раздел</span>
         )}
       </p>
+      <a
+        href="/815/discomfort/"
+        aria-current={discomfortCurrent}
+        class="site-nav-mobile-link site-nav-mobile-nested"
+      >
+        Дискомфорт
+      </a>
       <a
         href="/815/compare/"
         aria-current={compareCurrent}
@@ -155,6 +165,13 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
         class="site-nav-submenu"
       >
         <div class="site-nav-glass-panel">
+          <a
+            href="/815/discomfort/"
+            aria-current={discomfortCurrent}
+            class="site-nav-submenu-link"
+          >
+            Дискомфорт
+          </a>
           <a
             href="/815/compare/"
             aria-current={compareCurrent}

@@ -4,6 +4,11 @@ beforeAll(() => {
   Object.assign(import.meta.env, { SITE: 'https://example.com', BASE_URL: '/' });
 });
 
+it('root llms links to the Discomfort timeline', async () => {
+  const { build } = await import('../llms');
+  expect(build()).toContain('https://example.com/815/discomfort/index.md');
+});
+
 it.each([
   ['root', () => import('../llms')],
   ['news', () => import('../news/llms')],

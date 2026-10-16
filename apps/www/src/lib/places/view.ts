@@ -41,7 +41,8 @@ const PLACE_BACKLINK_SECTION_LABELS = {
   reviews: 'Отзывы',
   places: 'Карта',
   people: 'Люди',
-  contacts: 'Сарафан'
+  contacts: 'Сарафан',
+  discomfort: 'ОК Дискомфорт'
 } as const satisfies Readonly<Record<PlaceMentionSection, string>>;
 
 const PLACE_BACKLINK_KIND_LABELS = {
@@ -51,7 +52,8 @@ const PLACE_BACKLINK_KIND_LABELS = {
   review: 'Отзыв',
   place: 'Место',
   person: 'Профиль',
-  contact: 'Контакт'
+  contact: 'Контакт',
+  quote: 'Цитата'
 } as const satisfies Readonly<Record<PlaceBacklinkKind, string>>;
 
 export const formatPlaceBacklinkSection = (section: PlaceMentionSection): string =>
