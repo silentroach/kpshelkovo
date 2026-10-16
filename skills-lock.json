@@ -106,6 +106,13 @@
       "skillPath": "skills/ponytail-review/SKILL.md",
       "computedHash": "800dc0c86402978e12359f701b9e0c81ba4607a0cd0027f4596d0f835a67eadc"
     },
+    "research": {
+      "source": "mattpocock/skills",
+      "ref": "49dd158d1076134a641b33efb035946536778336",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/research/SKILL.md",
+      "computedHash": "c8c1cba327a6f824b554cd978079a3dadd7406d73174f8fb9bfef58824691970"
+    },
     "seo": {
       "source": "addyosmani/web-quality-skills",
       "ref": "afa8da942115f2961fdbfa80807ea0b232ff6c00",
