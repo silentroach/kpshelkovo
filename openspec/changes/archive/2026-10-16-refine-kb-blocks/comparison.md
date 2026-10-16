@@ -4,16 +4,16 @@
 
 ## Актуальный вид
 
-Оформление и точные параметры описаны в [design](/openspec/changes/refine-kb-blocks/design.md). Снимки ниже отражают последние поправки: вводная ссылка под заголовком, полноширинная полоса, две группы, мягкий блок оригинала, дата без повтора и спокойные подпункты без вертикальной линии.
+Оформление и точные параметры описаны в [design](/openspec/changes/archive/2026-10-16-refine-kb-blocks/design.md). Снимки ниже отражают последние поправки: вводная ссылка под заголовком, полноширинная полоса, две группы, мягкий блок оригинала, дата без повтора и спокойные подпункты без вертикальной линии.
 
 ## Где посмотреть
 
-- [Как запустить сохранённый стенд](/openspec/changes/refine-kb-blocks/preview/README.md). Он использует вложенные HTML, CSS и шрифты, а не текущий production или файлы `.cache`.
-- [Оферта, 1440×1000](/openspec/changes/refine-kb-blocks/screenshots/offer-desktop.png).
-- [Оферта, 390×844](/openspec/changes/refine-kb-blocks/screenshots/offer-mobile.png).
-- [Оферта, 320×844](/openspec/changes/refine-kb-blocks/screenshots/offer-narrow.png).
-- [Вложенный пункт газовой инструкции, 390×844](/openspec/changes/refine-kb-blocks/screenshots/gas-nested-mobile.png).
-- [Пояснение в контактах, 390×844](/openspec/changes/refine-kb-blocks/screenshots/contacts-note-mobile.png).
+- [Как запустить сохранённый стенд](/openspec/changes/archive/2026-10-16-refine-kb-blocks/preview/README.md). Он использует вложенные HTML, CSS и шрифты, а не текущий production или файлы `.cache`.
+- [Оферта, 1440×1000](/openspec/changes/archive/2026-10-16-refine-kb-blocks/screenshots/offer-desktop.png).
+- [Оферта, 390×844](/openspec/changes/archive/2026-10-16-refine-kb-blocks/screenshots/offer-mobile.png).
+- [Оферта, 320×844](/openspec/changes/archive/2026-10-16-refine-kb-blocks/screenshots/offer-narrow.png).
+- [Вложенный пункт газовой инструкции, 390×844](/openspec/changes/archive/2026-10-16-refine-kb-blocks/screenshots/gas-nested-mobile.png).
+- [Пояснение в контактах, 390×844](/openspec/changes/archive/2026-10-16-refine-kb-blocks/screenshots/contacts-note-mobile.png).
 - На стенде также доступен контрольный каталог. Сплошной список оферты оставлен для сравнения; выбран сгруппированный режим.
 
 ## Проверки прототипа
@@ -24,4 +24,4 @@
 - `axe-core` по WCAG 2 A/AA не обнаружил нарушений в сгруппированном TOC и вложенном списке газовой инструкции; отдельная AA-проверка блока оригинала также прошла без нарушений и непроверенных случаев.
 - Структурная проверка плана: `pnpm openspec:validate`, 51 активная проверка и 107 архивных прошли. Окончательные результаты форматирования, lint прототипа и reviewer-прохода приводятся в planning PR.
 
-Это проверки временных HTML-копий. Проверки будущей реализации, companions, печати и поиска перечислены в [tasks](/openspec/changes/refine-kb-blocks/tasks.md).
+Это проверки временных HTML-копий. Проверки будущей реализации, companions, печати и поиска перечислены в [tasks](/openspec/changes/archive/2026-10-16-refine-kb-blocks/tasks.md).

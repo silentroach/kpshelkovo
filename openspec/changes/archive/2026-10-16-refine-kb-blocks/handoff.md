@@ -1,11 +1,13 @@
 # Передача реализации в следующую сессию
 
+> Историческая передача этапа планирования. Реализация разрешена в следующей сессии и завершена; результаты — в [implementation-checks.md](/openspec/changes/archive/2026-10-16-refine-kb-blocks/implementation-checks.md).
+
 ## Статус и начало работы
 
-Владелец прямо попросил завершить эту сессию отдельным PR с планом и материалами передачи, **без реализации**. Задачи в [tasks](/openspec/changes/refine-kb-blocks/tasks.md) не выполнены. Разрешение начать реализацию нужно получить в новой сессии; одобрение примерки и planning PR его не заменяют.
+Владелец прямо попросил завершить эту сессию отдельным PR с планом и материалами передачи, **без реализации**. Задачи в [tasks](/openspec/changes/archive/2026-10-16-refine-kb-blocks/tasks.md) не выполнены. Разрешение начать реализацию нужно получить в новой сессии; одобрение примерки и planning PR его не заменяют.
 
-1. Прочитать [proposal](/openspec/changes/refine-kb-blocks/proposal.md), [design](/openspec/changes/refine-kb-blocks/design.md), обе delta specs и [tasks](/openspec/changes/refine-kb-blocks/tasks.md).
-2. Открыть [зафиксированную примерку](/openspec/changes/refine-kb-blocks/preview/README.md) и [снимки с результатами проверки](/openspec/changes/refine-kb-blocks/comparison.md).
+1. Прочитать [proposal](/openspec/changes/archive/2026-10-16-refine-kb-blocks/proposal.md), [design](/openspec/changes/archive/2026-10-16-refine-kb-blocks/design.md), обе delta specs и [tasks](/openspec/changes/archive/2026-10-16-refine-kb-blocks/tasks.md).
+2. Открыть [зафиксированную примерку](/openspec/changes/archive/2026-10-16-refine-kb-blocks/preview/README.md) и [снимки с результатами проверки](/openspec/changes/archive/2026-10-16-refine-kb-blocks/comparison.md).
 3. Сверить рабочую ветку и действующие инструкции. Исследование начато от коммита `21260836923e602d6c03cc1a914761c36be07c70`; зависимости и соседний код после него могли обновиться. Снимки production отдельно зафиксированы 16 октября 2026 года.
 4. После разрешения владельца продолжить change через штатный apply workflow. Issue: [#1058](https://github.com/silentroach/kpshelkovo/issues/1058), родитель: [#1045](https://github.com/silentroach/kpshelkovo/issues/1045).
 

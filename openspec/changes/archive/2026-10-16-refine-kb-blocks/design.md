@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация и границы описаны в [proposal](/openspec/changes/refine-kb-blocks/proposal.md). Владелец одобрил запись двух универсальных аннотаций TOC в план и отдельно потребовал документацию для агентов и обновление промпта оферт. Разрешения реализации ещё нет.
+Мотивация и границы описаны в [proposal](/openspec/changes/archive/2026-10-16-refine-kb-blocks/proposal.md). Владелец одобрил запись двух универсальных аннотаций TOC в план и отдельно потребовал документацию для агентов и обновление промпта оферт. Разрешения реализации ещё нет.
 
 - [KB route](/apps/www/src/pages/kb/[...slug].astro) рендерит подготовленный Markdown целиком через app-wrapper. Строка основного текста имеет установленную ширину.
 - [TOC renderer](/packages/markdown/src/toc.ts) создаёт отдельные узлы подписи, списка и разделителя. В [HTML renderer](/packages/markdown/src/render.ts) заголовки и их ID вычисляются до app-level AST transform. Изменение подписи и групп должно происходить раньше этого app-hook.
@@ -157,4 +157,4 @@ Inline/fenced code сохраняется буквально. Маркер гр�
 
 ## Preview
 
-Воспроизводимая версия находится в [preview](/openspec/changes/refine-kb-blocks/preview/README.md), снимки и проверки в [comparison](/openspec/changes/refine-kb-blocks/comparison.md). Она использует зафиксированные HTML-копии и локальные CSS/шрифты. Выбран режим «Договор и приложения»; сравнение со сплошным списком осталось на стенде. Эти материалы задают визуальный ориентир, а общий формат реализуется по delta specs. Порядок продолжения работы находится в [handoff](/openspec/changes/refine-kb-blocks/handoff.md).
+Воспроизводимая версия находится в [preview](/openspec/changes/archive/2026-10-16-refine-kb-blocks/preview/README.md), снимки и проверки в [comparison](/openspec/changes/archive/2026-10-16-refine-kb-blocks/comparison.md). Она использует зафиксированные HTML-копии и локальные CSS/шрифты. Выбран режим «Договор и приложения»; сравнение со сплошным списком осталось на стенде. Эти материалы задают визуальный ориентир, а общий формат реализуется по delta specs. Порядок продолжения работы находится в [handoff](/openspec/changes/archive/2026-10-16-refine-kb-blocks/handoff.md).
