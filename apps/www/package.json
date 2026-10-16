@@ -60,14 +60,14 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.64.0",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@testing-library/svelte": "^5.4.2",
     "@types/css-tree": "^3.2.0",
-    "@yandex/ymaps3-types": "^1.0.21414904",
+    "@yandex/ymaps3-types": "^1.0.21527208",
     "astro-compressor": "^2.0.1",
     "css-tree": "^3.2.1",
-    "happy-dom": "^20.14.5",
+    "happy-dom": "^21.0.1",
     "pagefind": "1.5.2",
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
@@ -75,7 +75,7 @@
     "sharp": "^0.35.5",
     "typescript": "^7.0.2",
     "unified": "^11.0.5",
-    "vite": "^8.3.3",
-    "vitest": "^5.0.3"
+    "vite": "^8.3.4",
+    "vitest": "^5.0.4"
   }
 }
