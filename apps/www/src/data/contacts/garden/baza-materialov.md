@@ -2,9 +2,10 @@
 title: База Нерудных Материалов и Спецтехники
 slug: baza-materialov
 category: garden
-updated_at: 2026-08-24
+updated_at: 2026-10-16
 summary: 'Песок, щебень, плодородная земля и спецтехника'
 contacts:
+  phone: +7 977 536-49-40
   telegram: https://t.me/NoviiBitPesokSebenSpectehnika
 vcf:
   enable: true
