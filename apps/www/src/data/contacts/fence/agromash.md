@@ -2,7 +2,7 @@
 title: ООО «Агромаш»
 slug: agromash
 category: fence
-updated_at: 2026-10-16
+updated_at: 2026-10-18
 summary: 'Производство и установка заборов, ворот и калиток'
 contacts:
   phone: '+7 985 774-75-04'
@@ -13,6 +13,10 @@ vcf:
   organization: ООО «Агромаш»
   note: Производство и установка заборов, ворот и калиток. Контакт — Сергей.
 reviews:
+  - sentiment: positive
+    summary: 'Забор установили по техническому заданию и достаточно быстро.'
+    published_at: 2026-10-17
+    url: https://t.me/shelkovoecoclub/15262/57689
   - sentiment: positive
     summary: 'Забор установили напрямую через Сергея, без участия УК. Результатом довольны.'
     published_at: 2026-09-17
