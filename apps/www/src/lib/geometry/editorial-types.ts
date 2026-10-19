@@ -18,6 +18,7 @@ export interface EditorialFeature {
   readonly geometry: EditorialGeometry;
   readonly description?: string;
   readonly iconCaption?: string;
+  readonly captionOnly?: boolean;
   readonly iconContent?: string;
   readonly markerColor?: string;
   readonly stroke?: string;

@@ -15,6 +15,7 @@ export const toPublicEditorialGeometry = (
       properties: {
         description: feature.description,
         iconCaption: feature.iconCaption,
+        captionOnly: feature.captionOnly,
         iconContent: feature.iconContent,
         'marker-color': feature.markerColor,
         stroke: feature.stroke,
