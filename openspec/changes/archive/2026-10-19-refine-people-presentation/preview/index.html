@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Профили людей: сравнение для #1063</title>
+    <link rel="stylesheet" href="gallery.css" />
+    <script src="gallery.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <h1>Профили людей</h1>
+      <p>Примерка для #1063 · 19 октября 2026</p>
+      <div class="controls">
+        <label
+          >Профиль
+          <select id="profile">
+            <option value="kschemelinin">Кирилл Щемелинин · фото и два контакта</option>
+            <option value="gmozgov">Геннадий Мозгов · фото и описание</option>
+            <option value="msorochinsky">Максим Сорочинский · без фото</option>
+            <option value="sminakov">Сергей Минаков · прежняя роль в описании</option>
+            <option value="ykizilov">Юрий Кизилов · Земля МО</option>
+          </select>
+        </label>
+        <label
+          >Ширина страницы
+          <select id="width">
+            <option value="390">390 px · телефон</option>
+            <option value="320">320 px · узкий экран</option>
+            <option value="1440">1440 px · компьютер</option>
+          </select>
+        </label>
+      </div>
+      <p id="note" aria-live="polite"></p>
+      <p class="hint">
+        Слева текущий сайт, справа предложение. Нажми на снимок, чтобы открыть его в натуральном
+        размере.
+      </p>
+      <a id="pair" href="images/kschemelinin-390-pair.webp">Парное сравнение одним файлом</a>
+    </header>
+    <main class="comparison">
+      <figure>
+        <figcaption>Сейчас</figcaption>
+        <a id="before-link" href="images/kschemelinin-390-before.webp"
+          ><img
+            id="before"
+            src="images/kschemelinin-390-before.webp"
+            alt="Кирилл Щемелинин: текущее оформление"
+        /></a>
+      </figure>
+      <figure>
+        <figcaption>Предложение</figcaption>
+        <a id="after-link" href="images/kschemelinin-390-after.webp"
+          ><img
+            id="after"
+            src="images/kschemelinin-390-after.webp"
+            alt="Кирилл Щемелинин: предложенное оформление"
+        /></a>
+      </figure>
+    </main>
+  </body>
+</html>
