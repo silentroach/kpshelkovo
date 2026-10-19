@@ -68,6 +68,33 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
+for (const viewport of [...mobileViewports, desktopViewport]) {
+  test(`preserves distinct settlement status meanings at ${viewport.width}px`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await page.goto('/815/compare/settlements/artemovo-izhs/');
+
+    const table = page.getByTestId('infrastructure-section').getByRole('table');
+    for (const status of [
+      'Частично асфальт',
+      'Частично',
+      'Открытая',
+      'Только на КПП',
+      'По столбам',
+      'Неизвестно',
+      'Нет',
+      'Есть'
+    ]) {
+      const cell = table.getByRole('cell', { name: status, exact: true }).first();
+      await expect(cell).toBeVisible();
+      await expect(cell.getByText(status, { exact: true })).toBeVisible();
+    }
+
+    expect(await table.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(
+      true
+    );
+  });
+}
+
 test('defers the hidden settlement preview until desktop without shifting content', async ({
   page
 }) => {
