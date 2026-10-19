@@ -40,6 +40,7 @@ const properties = z
   .object({
     description: z.string().optional(),
     iconCaption: z.string().optional(),
+    captionOnly: z.boolean().optional(),
     iconContent: z
       .string()
       .regex(/^[0-9]$/)
@@ -71,6 +72,18 @@ const feature = z
   })
   .strict()
   .superRefine((value, context) => {
+    if (
+      value.properties.captionOnly !== undefined &&
+      (value.geometry.type !== 'Point' ||
+        (value.properties.captionOnly &&
+          (!value.properties.iconCaption?.trim() || value.properties.iconContent !== undefined)))
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['properties', 'captionOnly'],
+        message: 'captionOnly requires a Point; true requires a caption without iconContent'
+      });
+    }
     if (value.properties.iconContent !== undefined && value.geometry.type !== 'Point') {
       context.addIssue({
         code: 'custom',

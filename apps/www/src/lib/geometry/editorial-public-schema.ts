@@ -25,6 +25,7 @@ export const EditorialPublicGeometrySchema = z
               .object({
                 description: z.string().optional(),
                 iconCaption: z.string().optional(),
+                captionOnly: z.boolean().optional(),
                 iconContent: z
                   .string()
                   .regex(/^[0-9]$/)
@@ -53,6 +54,19 @@ export const EditorialPublicGeometrySchema = z
           })
           .strict()
           .superRefine((feature, context) => {
+            if (
+              feature.properties.captionOnly !== undefined &&
+              (feature.geometry.type !== 'Point' ||
+                (feature.properties.captionOnly &&
+                  (!feature.properties.iconCaption?.trim() ||
+                    feature.properties.iconContent !== undefined)))
+            ) {
+              context.addIssue({
+                code: 'custom',
+                path: ['properties', 'captionOnly'],
+                message: 'captionOnly requires a Point; true requires a caption without iconContent'
+              });
+            }
             if (feature.properties.iconContent !== undefined && feature.geometry.type !== 'Point') {
               context.addIssue({
                 code: 'custom',

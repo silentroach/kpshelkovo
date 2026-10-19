@@ -3,8 +3,10 @@ import type { YMapFeatureProps, YMapMarkerProps } from '@yandex/ymaps3-types';
 import { afterEach, expect, it, vi } from 'vitest';
 
 import { fromPublicEditorialGeometry } from '@/components/places/place-map-geometry';
+import { EditorialMapDataSchema } from '@/lib/geometry/editorial-map-data-schema';
 import { parseEditorialGeometry } from '@/lib/geometry/editorial-mapper';
 import { toPublicEditorialGeometry } from '@/lib/geometry/editorial-public';
+import { EditorialPublicGeometrySchema } from '@/lib/geometry/editorial-public-schema';
 import type { EditorialFeatureCollection } from '@/lib/geometry/editorial-types';
 
 import { createEditorialMapObjects, getEditorialMapBounds } from '../editorial-map';
@@ -24,6 +26,98 @@ const setupSdk = () => {
 };
 
 afterEach(() => vi.unstubAllGlobals());
+
+it.each([true, false, undefined])(
+  'preserves captionOnly %s through every map boundary',
+  (captionOnly) => {
+    const sdk = setupSdk();
+    const text = ' <b>Проход</b> **к парку** ';
+    const domain = parseEditorialGeometry(
+      {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [37, 55] },
+            properties: { captionOnly, iconCaption: text }
+          }
+        ]
+      },
+      'caption.geojson'
+    );
+    const htmlData = EditorialMapDataSchema.parse(JSON.parse(JSON.stringify(domain)));
+    const publicData = toPublicEditorialGeometry(htmlData);
+    const clientData = fromPublicEditorialGeometry(publicData);
+    expect([
+      htmlData.features[0]?.captionOnly,
+      publicData.features[0]?.properties.captionOnly,
+      clientData.features[0]?.captionOnly
+    ]).toEqual([captionOnly, captionOnly, captionOnly]);
+    createEditorialMapObjects(window.ymaps3!, clientData);
+    const node = sdk.marker.mock.calls[0]![1];
+    expect(Boolean(node.querySelector('.editorial-map-marker__dot'))).toBe(!captionOnly);
+    expect(node.textContent).toBe(text);
+    expect(node.querySelector('b, strong')).toBeFalsy();
+  }
+);
+
+it.each([
+  {
+    geometry: {
+      type: 'LineString',
+      coordinates: [
+        [37, 55],
+        [38, 56]
+      ]
+    },
+    captionOnly: true,
+    iconCaption: 'Проход'
+  },
+  {
+    geometry: {
+      type: 'LineString',
+      coordinates: [
+        [37, 55],
+        [38, 56]
+      ]
+    },
+    captionOnly: false,
+    iconCaption: 'Проход'
+  },
+  { geometry: { type: 'Point', coordinates: [37, 55] }, captionOnly: true },
+  { geometry: { type: 'Point', coordinates: [37, 55] }, captionOnly: true, iconCaption: '  ' },
+  {
+    geometry: { type: 'Point', coordinates: [37, 55] },
+    captionOnly: true,
+    iconCaption: 'Проход',
+    iconContent: '1'
+  }
+])(
+  'rejects invalid caption-only data at each boundary: %j',
+  ({ geometry, captionOnly, iconCaption, iconContent }) => {
+    const raw = {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          id: 'caption',
+          geometry,
+          properties: { captionOnly, iconCaption, iconContent }
+        }
+      ]
+    };
+    expect(() => parseEditorialGeometry(raw, 'caption.geojson')).toThrow(
+      /caption\.geojson.*captionOnly.*caption/
+    );
+    expect(EditorialPublicGeometrySchema.safeParse(raw).success).toBe(false);
+    expect(
+      EditorialMapDataSchema.safeParse({
+        type: 'FeatureCollection',
+        features: [{ type: 'Feature', geometry, captionOnly, iconCaption, iconContent }]
+      }).success
+    ).toBe(false);
+  }
+);
 
 it('draws ordinary points with only explicit text labels, no HTML or popup', () => {
   const sdk = setupSdk();

@@ -34,6 +34,7 @@ export const EditorialMapDataSchema: z.ZodType<EditorialFeatureCollection> = z.s
           ]),
           description: z.string().optional(),
           iconCaption: z.string().optional(),
+          captionOnly: z.boolean().optional(),
           iconContent: z
             .string()
             .regex(/^[0-9]$/)
@@ -52,6 +53,18 @@ export const EditorialMapDataSchema: z.ZodType<EditorialFeatureCollection> = z.s
           precision: z.literal('approximate').optional()
         })
         .superRefine((feature, context) => {
+          if (
+            feature.captionOnly !== undefined &&
+            (feature.geometry.type !== 'Point' ||
+              (feature.captionOnly &&
+                (!feature.iconCaption?.trim() || feature.iconContent !== undefined)))
+          ) {
+            context.addIssue({
+              code: 'custom',
+              path: ['captionOnly'],
+              message: 'captionOnly requires a Point; true requires a caption without iconContent'
+            });
+          }
           if (feature.iconContent !== undefined && feature.geometry.type !== 'Point') {
             context.addIssue({
               code: 'custom',

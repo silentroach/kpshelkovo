@@ -70,12 +70,14 @@ export const createEditorialMapObjects = (
     if (feature.geometry.type === 'Point') {
       const marker = document.createElement('div');
       marker.className = 'editorial-map-marker';
-      const dot = document.createElement('span');
-      dot.className = 'editorial-map-marker__dot ui-map-marker';
-      if (feature.iconContent !== undefined) dot.textContent = feature.iconContent;
-      if (feature.markerColor !== undefined)
-        dot.style.setProperty('--ui-map-marker-color', feature.markerColor);
-      marker.append(dot);
+      if (!feature.captionOnly) {
+        const dot = document.createElement('span');
+        dot.className = 'editorial-map-marker__dot ui-map-marker';
+        if (feature.iconContent !== undefined) dot.textContent = feature.iconContent;
+        if (feature.markerColor !== undefined)
+          dot.style.setProperty('--ui-map-marker-color', feature.markerColor);
+        marker.append(dot);
+      }
       if (feature.iconCaption !== undefined) {
         const caption = document.createElement('span');
         caption.className = 'editorial-map-marker__caption';
