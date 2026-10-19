@@ -23,10 +23,10 @@ import { formatParcelUpdate } from '../../src/lib/parcels/update-report.ts';
 const sourceDir = fileURLToPath(new URL('../../src/data/parcel-sources/', import.meta.url));
 const recordsDir = fileURLToPath(new URL('../../src/data/parcels/', import.meta.url));
 const pages = {
-  shr: 'https://dgtime.ru/shr/shr-genplan/',
-  shf: 'https://dgtime.ru/shf/shf-genplan/',
-  shp: 'https://dgtime.ru/shp/shp-genplan/',
-  shv: 'https://dgtime.ru/shv/shv-genplan/'
+  shr: 'https://genplan.zmotech.ru/shelkovo-river/',
+  shf: 'https://genplan.zmotech.ru/shelkovo-forest/',
+  shp: 'https://genplan.zmotech.ru/shelkovo-park/',
+  shv: 'https://genplan.zmotech.ru/shelkovo-village/'
 } as const;
 
 const acquireGenplans = async (): Promise<GenplanSnapshots> =>

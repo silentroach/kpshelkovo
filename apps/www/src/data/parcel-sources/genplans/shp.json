@@ -1,7 +1,7 @@
 {
   "part": "shp",
-  "page": "https://dgtime.ru/shp/shp-genplan/",
-  "capturedAt": "2026-10-17T09:17:11.667Z",
+  "page": "https://genplan.zmotech.ru/shelkovo-park/",
+  "capturedAt": "2026-10-19T11:27:50.771Z",
   "plots": [
     {
       "id": "B1",
@@ -3310,7 +3310,7 @@
     {
       "id": "А28",
       "cadastralReference": "50:33:0010101:2572",
-      "status": "Свободен",
+      "status": "Забронирован",
       "location": "луговой",
       "objectprice": 4728900
     },
@@ -3672,7 +3672,7 @@
     {
       "id": "А80",
       "cadastralReference": "50:33:0010101:2618",
-      "status": "Свободен",
+      "status": "Забронирован",
       "location": "луговой",
       "objectprice": 3439200
     },
