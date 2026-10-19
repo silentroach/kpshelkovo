@@ -1,8 +1,19 @@
 import { md, parseMarkdownFragment } from '@shelkovo/markdown';
 
+import { EditorialMapDataSchema } from '@/lib/geometry/editorial-map-data-schema';
+import { EditorialParcelLabelsSchema } from '@/lib/geometry/editorial-map-labels-schema';
 import { parseEditorialGeometry } from '@/lib/geometry/editorial-mapper';
 
-import type { EditorialMapBlock } from './editorial-maps.types';
+import {
+  EditorialMapSourceKindSchema,
+  EditorialMapSourceSchema
+} from './editorial-map-source-schema';
+import type {
+  EditorialMapBlock,
+  EditorialMapSelection,
+  EditorialMapSelectionResolver,
+  EditorialMapResolvedSelection
+} from './editorial-maps.types';
 
 type MarkdownNode = ReturnType<typeof parseMarkdownFragment>[number];
 type CodeNode = Extract<MarkdownNode, { type: 'code' }>;
@@ -30,7 +41,7 @@ const mapUrl = (meta: string | undefined, source: string): string | undefined =>
   return value;
 };
 
-/** Shared by early loader validation and the future HTML/companion AST transforms. */
+/** Parse and prepare own geometry without resolving references or loading datasets. */
 export const parseEditorialMapCode = (
   node: CodeNode,
   source: string,
@@ -46,7 +57,66 @@ export const parseEditorialMapCode = (
     throw new Error(`${context} has invalid JSON: ${String(error)}`);
   }
 
-  return { index, url, geometry: parseEditorialGeometry(input, context) };
+  const kind = EditorialMapSourceKindSchema.safeParse(input);
+  if (
+    kind.success &&
+    kind.data.type === 'FeatureCollection' &&
+    kind.data.sets === undefined &&
+    kind.data.parcels === undefined &&
+    kind.data.places === undefined &&
+    kind.data.outline === undefined
+  ) {
+    return { index, url, geometry: parseEditorialGeometry(input, context) };
+  }
+  const result = EditorialMapSourceSchema.safeParse(input);
+  if (!result.success) {
+    throw new Error(`${context} has invalid map definition: ${result.error.message}`);
+  }
+  const raw = result.data;
+  const selection: EditorialMapSelection = {
+    sets: raw.sets,
+    parcels: raw.parcels,
+    places: raw.places,
+    outline: raw.outline
+  };
+  if (!raw.features.length && !selectionHasReferences(selection)) {
+    throw new Error(`${context} requires at least one feature or reference`);
+  }
+  const geometry = raw.features.length
+    ? parseEditorialGeometry(
+        { type: 'FeatureCollection', metadata: raw.metadata, features: raw.features },
+        context
+      )
+    : { type: 'FeatureCollection' as const, metadata: raw.metadata, features: [] };
+  return { index, url, geometry, selection };
+};
+
+const selectionHasReferences = (selection: EditorialMapSelection): boolean =>
+  selection.sets.length + selection.parcels.length + selection.places.length > 0;
+
+/** Resolve references only; the author geometry is prepared separately by the parser. */
+export const resolveEditorialMapSelection = (
+  map: EditorialMapBlock,
+  source: string,
+  resolver?: EditorialMapSelectionResolver
+): EditorialMapResolvedSelection => {
+  const context = `${source} map insertion ${map.index}`;
+  if (!map.selection || !selectionHasReferences(map.selection)) {
+    return { geometry: { type: 'FeatureCollection', features: [] }, parcelLabels: [] };
+  }
+  if (!resolver) throw new Error(`${context} requires an editorial map resolver`);
+  try {
+    const resolved = resolver(map.selection, context);
+    EditorialMapDataSchema.parse({
+      type: 'FeatureCollection',
+      metadata: map.geometry.metadata,
+      features: [...resolved.geometry.features, ...map.geometry.features]
+    });
+    const parcelLabels = EditorialParcelLabelsSchema.parse(resolved.parcelLabels);
+    return { geometry: resolved.geometry, parcelLabels };
+  } catch (error) {
+    throw new Error(`${context} has invalid resolved map: ${String(error)}`);
+  }
 };
 
 export const editorialMapCaption = (map: EditorialMapBlock): string | undefined => {
@@ -114,3 +184,8 @@ export const extractEditorialMaps = (
   parseMarkdownFragment(markdown).forEach(visit);
   return maps;
 };
+
+export const hasEditorialMapReferences = (markdown: string, source: string): boolean =>
+  extractEditorialMaps(markdown, source).some(
+    (map) => !!map.selection && selectionHasReferences(map.selection)
+  );

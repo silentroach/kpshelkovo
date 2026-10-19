@@ -1,10 +1,28 @@
 import type { Feature } from '@yandex/ymaps3-clusterer';
 import type { LngLat, LngLatBounds } from '@yandex/ymaps3-types';
 
+import { getEditorialMapBounds } from '@/components/maps/editorial-map';
 import type { EditorialPublicGeometry } from '@/lib/geometry/editorial-public-schema';
 import type { EditorialFeatureCollection } from '@/lib/geometry/editorial-types';
 import type { PlaceMapItem } from '@/lib/places/map-types';
 import { PLACE_MAP_BOUNDS } from '@/lib/places/schema';
+
+import type { ParcelMapItem } from './parcel-layer-types';
+
+export const getSelectionSetBounds = (
+  parcels: readonly ParcelMapItem[],
+  places: readonly PlaceMapItem[]
+): LngLatBounds | undefined =>
+  getEditorialMapBounds(
+    {
+      type: 'FeatureCollection',
+      features: [
+        ...parcels.map((parcel) => ({ type: 'Feature' as const, geometry: parcel.geometry })),
+        ...places.flatMap((place) => place.geometry?.features ?? [])
+      ]
+    },
+    places.map((place) => [place.coordinates.lng, place.coordinates.lat])
+  );
 
 const SETTLEMENT_BOUNDS: LngLatBounds = [
   [PLACE_MAP_BOUNDS.minLng, PLACE_MAP_BOUNDS.minLat],

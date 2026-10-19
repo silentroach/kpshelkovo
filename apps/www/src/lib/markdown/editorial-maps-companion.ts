@@ -1,20 +1,68 @@
 import { md, parseMarkdownFragment } from '@shelkovo/markdown';
 import type { z } from 'zod';
 
-import { roundGeometry } from '@/lib/geometry/coordinate-precision';
+import { roundGeometry, roundPosition } from '@/lib/geometry/coordinate-precision';
+import { toPublicEditorialGeometry } from '@/lib/geometry/editorial-public';
 import { RawEditorialGeometrySchema } from '@/lib/geometry/editorial-schema';
 
-import { editorialMapCaption, transformEditorialMapNodes } from './editorial-maps';
+import type { EditorialMapSourceSchema } from './editorial-map-source-schema';
+import {
+  editorialMapCaption,
+  resolveEditorialMapSelection,
+  transformEditorialMapNodes
+} from './editorial-maps';
+import type { EditorialMapSelectionResolver } from './editorial-maps.types';
 
 type MarkdownNode = ReturnType<typeof parseMarkdownFragment>[number];
 
-/** Add one plain-text caption after each original map code node; do not modify the body. */
+/** Expand short maps and add one caption in the companion AST, leaving source Markdown intact. */
 export const appendEditorialMapCaptions = (
   nodes: readonly MarkdownNode[],
-  source: string
+  source: string,
+  resolver?: EditorialMapSelectionResolver
 ): readonly MarkdownNode[] =>
   transformEditorialMapNodes(nodes, source, (node, map) => {
     const caption = editorialMapCaption(map);
+    if (map.selection) {
+      const resolved = resolveEditorialMapSelection(map, source, resolver);
+      // The extractor validated this node; retain numeric strings and expansion settings.
+      const original = JSON.parse(node.value) as z.input<typeof EditorialMapSourceSchema>;
+      const imported = resolved.geometry.features.length
+        ? toPublicEditorialGeometry(resolved.geometry).features
+        : [];
+      const prepared = {
+        type: 'FeatureCollection' as const,
+        metadata: original.metadata,
+        features: [
+          ...imported.map((feature) => ({ ...feature, geometry: roundGeometry(feature.geometry) })),
+          ...resolved.parcelLabels.map((label) => ({
+            type: 'Feature' as const,
+            properties: { iconCaption: label.text },
+            geometry: { type: 'Point' as const, coordinates: roundPosition(label.coordinates) }
+          })),
+          ...(original.features ?? []).map((feature) => ({
+            ...feature,
+            geometry: roundGeometry(feature.geometry)
+          }))
+        ]
+      };
+      const result = RawEditorialGeometrySchema.safeParse(prepared);
+      if (!result.success) {
+        throw new Error(
+          `${source} map insertion ${map.index} is invalid after coordinate rounding: ${result.error.message}`
+        );
+      }
+      return [
+        md.code(
+          JSON.stringify(prepared, undefined, 2),
+          node.lang ?? undefined,
+          node.meta ?? undefined
+        ),
+        ...(caption
+          ? [md.paragraph(map.url ? [md.link(map.url, caption)] : [md.text(caption)])]
+          : [])
+      ];
+    }
     // JSON.parse drops trailing zeroes; propagate raw literal precision through nested arrays.
     const longDecimals = new WeakSet<object>();
     let longCoordinateLiteral = false;

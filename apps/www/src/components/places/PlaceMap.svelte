@@ -15,6 +15,7 @@
   import type { Attachment } from 'svelte/attachments';
 
   import { createEditorialMapObjects } from '@/components/maps/editorial-map';
+  import type { MapSelectionSetPublicDto } from '@/lib/map-selection-sets/public-types';
   import type { ParcelDetailsPublicDto } from '@/lib/parcels/details-public-schema';
   import {
     getUrlWithParcel,
@@ -46,7 +47,13 @@
     getPaddedBounds,
     getPlaceBounds
   } from './place-map-geometry';
-  import { getUrlWithoutPlaceHighlight, PLACE_HIGHLIGHT_QUERY_PARAM } from './place-map-url';
+  import { getSelectionSetBounds } from './place-map-geometry';
+  import {
+    getUrlWithoutPlaceHighlight,
+    getUrlWithoutSelectionSet,
+    PLACE_HIGHLIGHT_QUERY_PARAM,
+    SELECTION_SET_QUERY_PARAM
+  } from './place-map-url';
 
   let {
     dataUrl = '',
@@ -139,6 +146,8 @@
   const markerHoveredGeometry = new Set<string>();
   const focusedGeometry = new Set<string>();
   const highlightedGeometry = new Set<string>();
+  const setPlaces = new Set<string>();
+  const setMarkers = new Map<string, ymaps3.YMapMarker>();
   const visibleGeometry = new Set<string>();
   const markerEvents = new AbortController();
   let pendingClusterFocusId: Feature['id'] | undefined;
@@ -178,6 +187,10 @@
   let toggleAllParcels = $state<() => void>(() => {});
   let errorPlace = $derived(places[0] ?? fallbackPlace);
   let refreshMapLayout: (() => void) | undefined;
+  let requestedSet = $state<string | undefined>();
+  let setError = $state<string | undefined>();
+  let outlineError = $state(false);
+  let clearSet = $state<() => void>(() => {});
 
   const observeCanvasSize: Attachment<HTMLDivElement> = (canvas) => {
     let disposed = false;
@@ -217,7 +230,8 @@
     const show =
       markerHoveredGeometry.has(place.slug) ||
       focusedGeometry.has(place.slug) ||
-      highlightedGeometry.has(place.slug);
+      highlightedGeometry.has(place.slug) ||
+      setPlaces.has(place.slug);
     if (show === visibleGeometry.has(place.slug)) return;
     for (const object of objects) {
       if (show) map.addChild(object);
@@ -465,6 +479,8 @@
     mapListener = undefined;
     mapEditorialObjects.clear();
     markerContents = [];
+    setMarkers.clear();
+    setPlaces.clear();
     markerHoveredGeometry.clear();
     focusedGeometry.clear();
     highlightedGeometry.clear();
@@ -487,6 +503,109 @@
     let selectedThisGesture = false;
     let pointerStart: { readonly x: number; readonly y: number } | undefined;
     let pointerMoved = false;
+    const initialUrl = new URL(window.location.href);
+    requestedSet = initialUrl.searchParams.get(SELECTION_SET_QUERY_PARAM) || undefined;
+    // Even an invalid p/h owns the initial focus; the set never becomes a fallback target.
+    const preserveSetCamera = Boolean(requestedSet);
+    let pendingSetFit = Boolean(
+      requestedSet &&
+      !initialUrl.searchParams.get(PARCEL_QUERY_PARAM) &&
+      !initialUrl.searchParams.get(PLACE_HIGHLIGHT_QUERY_PARAM)
+    );
+    let activeSet: MapSelectionSetPublicDto | undefined;
+    const disabledSetParts = new Set<ParcelPart>();
+    const readyParcelParts = new Set<ParcelPart>();
+    const cancelSetFit = (): void => {
+      pendingSetFit = false;
+    };
+    const syncSetPlaces = (): void => {
+      if (!map || !mapClusterer) return;
+      const previousPlaces = new Set(setPlaces);
+      for (const marker of setMarkers.values()) map.removeChild(marker);
+      setMarkers.clear();
+      setPlaces.clear();
+      for (const slug of activeSet?.places ?? []) setPlaces.add(slug);
+      mapClusterer.update({
+        features: createMapFeatures(places.filter((place) => !setPlaces.has(place.slug)))
+      });
+      for (const [place, content] of markerContents) {
+        if (place.geometry && previousPlaces.has(place.slug) !== setPlaces.has(place.slug)) {
+          if (visibleGeometry.delete(place.slug))
+            for (const object of mapEditorialObjects.get(place.slug) ?? []) map.removeChild(object);
+          const color =
+            getComputedStyle(mapContainer!).getPropertyValue('--parcel-map-set').trim() ||
+            document.documentElement.style.getPropertyValue('--parcel-map-set').trim();
+          const geometry = setPlaces.has(place.slug)
+            ? {
+                type: 'FeatureCollection' as const,
+                features: place.geometry.features.map((feature) => ({
+                  ...feature,
+                  markerColor: color,
+                  stroke: color,
+                  strokeWidth: 3,
+                  strokeOpacity: 1,
+                  fill: color,
+                  fillOpacity: 0.22
+                }))
+              }
+            : place.geometry;
+          mapEditorialObjects.set(place.slug, createEditorialMapObjects(window.ymaps3, geometry));
+        }
+        if (setPlaces.has(place.slug)) {
+          content.dataset.selectionSet = 'true';
+          const marker = new window.ymaps3.YMapMarker(
+            {
+              coordinates: [place.coordinates.lng, place.coordinates.lat]
+            },
+            content
+          );
+          setMarkers.set(place.slug, marker);
+          map.addChild(marker);
+        } else delete content.dataset.selectionSet;
+        updateGeometryVisibility(place);
+      }
+    };
+    const fitSelectionSet = (): void => {
+      if (!activeSet || !map) return;
+      const parts = new Set(
+        activeSet.parcels.map((code) => code.slice(0, 3).toLowerCase() as ParcelPart)
+      );
+      if ([...parts].some((part) => !readyParcelParts.has(part) || !selectedParts.includes(part)))
+        return;
+      const members = [...parts]
+        .flatMap((part) => parcelData.get(part) ?? [])
+        .filter((item) => activeSet?.parcels.includes(item.code));
+      if (members.length !== activeSet.parcels.length) {
+        setError = 'Не удалось показать весь набор.';
+        return;
+      }
+      if (!pendingSetFit) return;
+      const bounds = getSelectionSetBounds(
+        members,
+        places.filter((place) => setPlaces.has(place.slug))
+      );
+      if (!bounds) return;
+      pendingSetFit = false;
+      map.update({
+        location: { bounds, duration: getMapZoomDuration(), easing: 'ease-in-out' },
+        margin: getViewMargin()
+      });
+    };
+    clearSet = (): void => {
+      requestedSet = undefined;
+      activeSet = undefined;
+      pendingSetFit = false;
+      setError = undefined;
+      outlineError = false;
+      parcelLayer?.setMembership([]);
+      syncSetPlaces();
+      window.history.replaceState(
+        window.history.state,
+        '',
+        getUrlWithoutSelectionSet(window.location.href)
+      );
+      mapContainer?.focus({ preventScroll: true });
+    };
     const detailsCache = new Map<string, ParcelDetailsPublicDto>();
     const detailsRequests = new Map<string, Promise<ParcelDetailsPublicDto>>();
     const positionPopup = (): void => {
@@ -651,6 +770,7 @@
         return;
       }
       selectedThisGesture = true;
+      if (!focusingDirectLink) cancelSetFit();
       if (!focusingDirectLink && pendingParcelCode) {
         pendingParcelCode = undefined;
         pendingParcelPart = undefined;
@@ -707,6 +827,7 @@
       else mapContainer?.focus({ preventScroll: true });
     };
     clearSelectedParcel = () => {
+      cancelSetFit();
       if (pendingParcelCode) {
         removeParcelQuery(pendingParcelCode);
         pendingParcelCode = undefined;
@@ -715,6 +836,7 @@
       parcelLayer?.clearSelection();
     };
     const onPointerDown = (event: PointerEvent): void => {
+      cancelSetFit();
       pointerStart = { x: event.clientX, y: event.clientY };
       pointerMoved = false;
       selectedThisGesture = false;
@@ -728,6 +850,11 @@
     };
     mapContainer?.addEventListener('pointerdown', onPointerDown, { signal: markerEvents.signal });
     mapContainer?.addEventListener('pointermove', onPointerMove, { signal: markerEvents.signal });
+    mapContainer?.addEventListener('wheel', cancelSetFit, {
+      signal: markerEvents.signal,
+      passive: true
+    });
+    mapContainer?.addEventListener('keydown', cancelSetFit, { signal: markerEvents.signal });
     const closeLayersOutside = (event: PointerEvent): void => {
       if (!layersControl?.contains(event.target as Node)) layersOpen = false;
     };
@@ -846,7 +973,11 @@
           removeParcelQuery(pendingParcelCode);
           pendingParcelCode = undefined;
           pendingParcelPart = undefined;
-          if (directLink && !retainUnknownParcelPart) {
+          if (
+            directLink &&
+            !retainUnknownParcelPart &&
+            !activeSet?.parcels.some((member) => member.startsWith(`${part.toUpperCase()}-`))
+          ) {
             setParcelPart(part, false);
             return;
           }
@@ -860,11 +991,17 @@
               window.ymaps3,
               mapContainer,
               onParcelSelection,
-              getMapZoomDuration
+              getMapZoomDuration,
+              (failed) => {
+                if (requestedSet && activeSet) outlineError = failed;
+              }
             );
+          parcelLayer.setMembership(activeSet?.parcels ?? [], activeSet?.outline);
         }
         parcelLayer.enable(part, data);
+        readyParcelParts.add(part);
         parcelLayer.updateViewport(map.zoom, map.bounds);
+        fitSelectionSet();
         if (canonical && pendingParcelCode) {
           if (
             new URL(window.location.href).searchParams.get(PARCEL_QUERY_PARAM) !== pendingParcelCode
@@ -884,6 +1021,7 @@
       } catch (reason) {
         if (!stillSelected()) return;
         parcelLayer?.disable(part, false);
+        readyParcelParts.delete(part);
         parcelData.delete(part);
         console.error('Parcel layer error:', reason);
         failedParts = failedParts.includes(part) ? failedParts : [...failedParts, part];
@@ -892,6 +1030,9 @@
     };
     toggleParcelPart = (part: ParcelPart, checked: boolean): void => {
       if (!checked) {
+        cancelSetFit();
+        disabledSetParts.add(part);
+        readyParcelParts.delete(part);
         parcelRevisions.set(part, (parcelRevisions.get(part) ?? 0) + 1);
         setParcelPart(part, false);
         failedParts = failedParts.filter((failed) => failed !== part);
@@ -903,6 +1044,7 @@
         }
         return;
       }
+      disabledSetParts.delete(part);
       void enableParcelPart(part, pendingParcelPart === part ? parcelCode : undefined);
     };
     toggleAllParcels = (): void => {
@@ -949,7 +1091,7 @@
       if (destroyed || setupFailed) return;
 
       positionPopup();
-      if (preserveParcelCamera || selectedParcel) return;
+      if (preserveSetCamera || preserveParcelCamera || selectedParcel) return;
 
       if (highlightedPlace) {
         focusPlace(highlightedPlace, 0);
@@ -1049,6 +1191,7 @@
                 .map(({ features }) => String(features[0]!.id))
             );
             for (const [place] of markerContents) {
+              if (setPlaces.has(place.slug)) continue;
               if (visibleMarkers.has(place.slug)) continue;
               setGeometryState(place, markerHoveredGeometry, false);
               setGeometryState(place, focusedGeometry, false);
@@ -1104,6 +1247,45 @@
             void enableParcelPart(pendingParcelPart, parcelCode, true);
           }
         }
+        const setId = requestedSet;
+        if (setId) {
+          void (async () => {
+            try {
+              if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(setId)) throw new Error('Invalid set id');
+              const response = await fetch(
+                `/map/data/selection-sets/${encodeURIComponent(setId)}.json`
+              );
+              if (!response.ok) throw new Error('Set unavailable');
+              const definition = (await response.json()) as MapSelectionSetPublicDto;
+              if (destroyed || requestedSet !== setId) return;
+              if (
+                definition.id !== setId ||
+                !Array.isArray(definition.parcels) ||
+                !Array.isArray(definition.places) ||
+                typeof definition.outline !== 'boolean'
+              )
+                throw new Error('Invalid set data');
+              if (definition.places.some((slug) => !places.some((place) => place.slug === slug)))
+                throw new Error('Missing set place');
+              activeSet = definition;
+              syncSetPlaces();
+              parcelLayer?.setMembership(definition.parcels, definition.outline);
+              const parts = new Set(
+                definition.parcels.map((code) => code.slice(0, 3).toLowerCase() as ParcelPart)
+              );
+              for (const part of parts) {
+                if (disabledSetParts.has(part)) continue;
+                if (!PARCEL_PARTS.includes(part)) throw new Error('Unknown set part');
+                if (!selectedParts.includes(part)) void enableParcelPart(part);
+              }
+              fitSelectionSet();
+            } catch (reason) {
+              if (destroyed || requestedSet !== setId) return;
+              console.error('Selection set error:', reason);
+              setError = 'Не удалось показать набор.';
+            }
+          })();
+        }
         const currentMap = map;
         const control = await createOpenMapsControl(ymaps3, 'bottom right');
         if (destroyed || map !== currentMap) return;
@@ -1129,6 +1311,7 @@
 
     return () => {
       destroyed = true;
+      pendingSetFit = false;
       document.removeEventListener('pointerdown', closeLayersOutside);
       document.removeEventListener('keydown', closeLayersOnEscape);
       document.removeEventListener('pointerdown', cancelFocusOnPointer, true);
@@ -1260,6 +1443,12 @@
   {/if}
   {#if !error}
     <div class="parcel-map-controls">
+      {#if requestedSet}
+        <button type="button" class="parcel-map-clear-set" onclick={clearSet}>Снять набор</button>
+        {#if setError || outlineError}<p class="parcel-map-set-error" role="alert">
+            {setError ?? 'Не удалось показать общую обводку.'}
+          </p>{/if}
+      {/if}
       <div class="parcel-map-layers" bind:this={layersControl}>
         <button
           bind:this={layersButton}
@@ -1345,6 +1534,7 @@
   .place-map {
     --parcel-map-boundary: oklch(55.4% 0.041 257.4);
     --parcel-map-selection: oklch(46.9% 0.067 241.9);
+    --parcel-map-set: #7c3aed;
     position: relative;
     /* Keep SDK control layers below site navigation. */
     isolation: isolate;
@@ -1372,7 +1562,8 @@
     left: 1rem;
     z-index: 4;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: flex-start;
     gap: 0.5rem;
     max-width: min(90%, 26rem);
@@ -1382,6 +1573,30 @@
 
   .parcel-map-layers {
     position: relative;
+  }
+
+  .parcel-map-clear-set,
+  .parcel-map-set-error {
+    margin: 0;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-text);
+    line-height: 1.4;
+  }
+  .parcel-map-clear-set {
+    min-height: 2.75rem;
+  }
+  .parcel-map-set-error {
+    max-width: 15rem;
+  }
+
+  :global(.place-map-marker[data-selection-set='true']) {
+    outline: 3px solid var(--parcel-map-set);
+    outline-offset: 3px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 6px var(--color-surface);
   }
 
   .parcel-map-layers-button,

@@ -14,6 +14,20 @@ afterEach(() => {
   document.head.querySelector('[data-editorial-map-style]')?.remove();
 });
 
+it('centres the noninteractive parcel capsule on its map coordinates', () => {
+  const style = document.createElement('style');
+  style.dataset.editorialMapStyle = '';
+  style.textContent = css;
+  document.head.append(style);
+  const label = document.createElement('span');
+  label.className = 'editorial-parcel-label';
+  label.textContent = 'A1/A2';
+  document.body.append(label);
+
+  expect(getComputedStyle(label).transform).toBe('translate(-50%, -50%)');
+  expect(getComputedStyle(label).pointerEvents).toBe('none');
+});
+
 it('keeps labels wrappable and groups the caption with the map and its focusable link', () => {
   const style = document.createElement('style');
   style.dataset.editorialMapStyle = '';

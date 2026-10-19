@@ -3,8 +3,12 @@ import type { MarkdownAstTransform } from '@shelkovo/markdown';
 
 import { EditorialMapDataSchema } from '@/lib/geometry/editorial-map-data-schema';
 
-import { editorialMapCaption, transformEditorialMapNodes } from './editorial-maps';
-import type { EditorialMapBlock } from './editorial-maps.types';
+import {
+  editorialMapCaption,
+  resolveEditorialMapSelection,
+  transformEditorialMapNodes
+} from './editorial-maps';
+import type { EditorialMapBlock, EditorialMapSelectionResolver } from './editorial-maps.types';
 
 const encodedGeometry = (map: EditorialMapBlock, source: string): string => {
   const result = EditorialMapDataSchema.safeParse(map.geometry);
@@ -34,7 +38,20 @@ const encodedGeometry = (map: EditorialMapBlock, source: string): string => {
     .replaceAll('&', '\\u0026');
 };
 
-const mapFigure = (map: EditorialMapBlock, source: string, reserveId: (base: string) => string) => {
+const mapFigure = (
+  map: EditorialMapBlock,
+  source: string,
+  reserveId: (base: string) => string,
+  resolver?: EditorialMapSelectionResolver
+) => {
+  const resolved = resolveEditorialMapSelection(map, source, resolver);
+  const prepared = {
+    ...map,
+    geometry: {
+      ...map.geometry,
+      features: [...resolved.geometry.features, ...map.geometry.features]
+    }
+  };
   const caption = editorialMapCaption(map);
   const hasName = !!map.geometry.metadata?.name?.trim();
   const id = reserveId(`editorial-map-${map.index}`);
@@ -54,7 +71,14 @@ const mapFigure = (map: EditorialMapBlock, source: string, reserveId: (base: str
       {
         type: 'element',
         tagName: 'editorial-map',
-        properties: { dataGeometry: encodedGeometry(map, source), dataPagefindIgnore: 'all' },
+        properties: {
+          dataGeometry: encodedGeometry(prepared, source),
+          dataParcelLabels: JSON.stringify(resolved.parcelLabels)
+            .replaceAll('<', '\\u003c')
+            .replaceAll('>', '\\u003e')
+            .replaceAll('&', '\\u0026'),
+          dataPagefindIgnore: 'all'
+        },
         children: []
       },
       ...(caption
@@ -84,9 +108,9 @@ const mapFigure = (map: EditorialMapBlock, source: string, reserveId: (base: str
 
 /** The package has already resolved the authored TOC and reserved heading IDs. */
 export const transformEditorialMaps =
-  (source: string): MarkdownAstTransform =>
+  (source: string, resolver?: EditorialMapSelectionResolver): MarkdownAstTransform =>
   (document, reserveId) => {
     document.children = transformEditorialMapNodes(document.children, source, (_node, map) => [
-      mapFigure(map, source, reserveId)
+      mapFigure(map, source, reserveId, resolver)
     ]);
   };

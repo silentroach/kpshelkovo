@@ -17,6 +17,7 @@ export interface ParcelLayer {
   enable(part: ParcelPart, parcels: readonly ParcelMapItem[]): void;
   disable(part: ParcelPart, finishSelection?: boolean): void;
   clearSelection(): void;
+  setMembership(codes: readonly string[], outline?: boolean): void;
   focus(code: string): boolean;
   updateViewport(zoom: number, bounds: LngLatBounds): void;
   destroy(): void;

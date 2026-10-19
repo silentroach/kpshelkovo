@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 
+import { loadEditorialMapResolverForMarkdown } from '@/lib/markdown/editorial-map-resolver-load';
 import { createMarkdownResponse } from '@/lib/markdown/response';
 import { loadNewsArticle } from '@/lib/news/load';
 import { buildNewsArticleMarkdown } from '@/lib/news/markdown';
@@ -24,5 +25,9 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error(`news article "${year}/${month}/${entry}" not found`);
   }
 
-  return createMarkdownResponse(buildNewsArticleMarkdown(article));
+  const resolver = await loadEditorialMapResolverForMarkdown(
+    article.body ?? '',
+    `news article "${article.id}" body`
+  );
+  return createMarkdownResponse(buildNewsArticleMarkdown(article, resolver));
 };

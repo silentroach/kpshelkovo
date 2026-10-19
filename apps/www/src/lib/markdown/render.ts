@@ -265,10 +265,10 @@ export const renderMarkdown = (markdown: string, options?: RenderSiteMarkdownOpt
         transform: (document, reserveId) => {
           transformContentEmphasis(document.children, 'html');
           if (options?.editorialMaps) {
-            transformEditorialMaps(options.mentions?.context ?? 'site markdown')(
-              document,
-              reserveId
-            );
+            transformEditorialMaps(
+              options.editorialMapSource ?? options.mentions?.context ?? 'site markdown',
+              options.editorialMapResolver
+            )(document, reserveId);
           }
         }
       })

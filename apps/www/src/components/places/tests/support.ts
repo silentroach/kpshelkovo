@@ -13,6 +13,7 @@ import type { PlaceMapItem } from '@/lib/places/map-types';
 
 export const clustererProps: YMapClustererProps[] = [];
 export const clustererImport = vi.fn<() => Promise<void>>();
+export const clustererUpdates = vi.fn();
 
 export const map = {
   addChild: vi.fn(),
@@ -333,7 +334,7 @@ export const registerPlaceMapSetup = (): void => {
         YMapClusterer: vi.fn(function YMapClusterer(props: YMapClustererProps) {
           clustererProps.push(props);
           for (const feature of props.features) props.marker(feature);
-          return {};
+          return { update: clustererUpdates };
         }),
         clusterByGrid: vi.fn(() => ({ render: vi.fn() }))
       };
@@ -358,6 +359,7 @@ export const registerPlaceMapSetup = (): void => {
     document.documentElement.style.setProperty('--color-accent-text', '#805019');
     document.documentElement.style.setProperty('--parcel-map-boundary', '#64748b');
     document.documentElement.style.setProperty('--parcel-map-selection', parcelSelectionColor);
+    document.documentElement.style.setProperty('--parcel-map-set', '#935632');
     window.history.replaceState({}, '', '/map/');
     installYandexMaps();
   });
@@ -374,7 +376,8 @@ export const registerPlaceMapSetup = (): void => {
       '--color-accent',
       '--color-accent-text',
       '--parcel-map-boundary',
-      '--parcel-map-selection'
+      '--parcel-map-selection',
+      '--parcel-map-set'
     ]) {
       document.documentElement.style.removeProperty(name);
     }
