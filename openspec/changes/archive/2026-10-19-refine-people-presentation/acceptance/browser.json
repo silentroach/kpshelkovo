@@ -1,0 +1,962 @@
+{
+  "checkedAt": "2026-10-19T15:32:15.380Z",
+  "results": [
+    {
+      "slug": "kschemelinin",
+      "articleRect": {
+        "bottom": 834.828125,
+        "height": 88.09375,
+        "left": 36,
+        "right": 354,
+        "top": 746.734375,
+        "width": 318,
+        "x": 36,
+        "y": 746.734375
+      },
+      "body": "Ранее занимал должность главного энергетика ОК «Комфорт».",
+      "bodyHtml": "<p>Ранее занимал должность главного энергетика ОК&nbsp;«Комфорт».</p>",
+      "breadcrumbsRect": {
+        "bottom": 101,
+        "height": 32,
+        "left": 36,
+        "right": 354,
+        "top": 69,
+        "width": 318,
+        "x": 36,
+        "y": 69
+      },
+      "company": "ОК «Комфорт»",
+      "contactTop": 297.75,
+      "contactWeight": "400",
+      "contacts": [
+        ["Kirill_ZemlyaMO", "https://t.me/Kirill_ZemlyaMO"],
+        ["+7 (967) 246-37-49", "tel:+79672463749"]
+      ],
+      "fontStatus": "loaded",
+      "hasContacts": true,
+      "linkOrder": [
+        "https://t.me/Kirill_ZemlyaMO",
+        "tel:+79672463749",
+        "https://ok-komfort.ru/company/"
+      ],
+      "name": "Кирилл Щемелинин",
+      "order": ["DIV", "HEADER", "SECTION", "FIGURE", "ARTICLE"],
+      "photo": {
+        "displayHeight": 296,
+        "displayWidth": 222,
+        "height": "600",
+        "naturalWidth": 450,
+        "src": "https://media.kpshelkovo.online/people/kschemelinin.jpeg",
+        "width": "450"
+      },
+      "photoRect": {
+        "bottom": 730.734375,
+        "height": 327,
+        "left": 36,
+        "right": 260,
+        "top": 403.734375,
+        "width": 224,
+        "x": 36,
+        "y": 403.734375
+      },
+      "position": "Исполняющий обязанности директора по эксплуатации",
+      "roleCount": 2,
+      "schema": {
+        "@context": "https://schema.org",
+        "@id": "https://kpshelkovo.online/people/kschemelinin/#person",
+        "@type": "Person",
+        "description": "Ранее занимал должность главного энергетика ОК «Комфорт».",
+        "image": "https://media.kpshelkovo.online/people/kschemelinin.jpeg",
+        "jobTitle": "Исполняющий обязанности директора по эксплуатации",
+        "mainEntityOfPage": "https://kpshelkovo.online/people/kschemelinin/",
+        "name": "Кирилл Щемелинин",
+        "sameAs": ["https://t.me/Kirill_ZemlyaMO"],
+        "telephone": "+7 (967) 246-37-49",
+        "url": "https://kpshelkovo.online/people/kschemelinin/",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "ОК \"Комфорт\""
+        }
+      },
+      "scrollWidth": 390,
+      "source": "https://ok-komfort.ru/company/",
+      "width": 390
+    },
+    {
+      "slug": "kschemelinin",
+      "articleRect": {
+        "bottom": 862.875,
+        "height": 116.140625,
+        "left": 36,
+        "right": 284,
+        "top": 746.734375,
+        "width": 248,
+        "x": 36,
+        "y": 746.734375
+      },
+      "body": "Ранее занимал должность главного энергетика ОК «Комфорт».",
+      "bodyHtml": "<p>Ранее занимал должность главного энергетика ОК&nbsp;«Комфорт».</p>",
+      "breadcrumbsRect": {
+        "bottom": 101,
+        "height": 32,
+        "left": 36,
+        "right": 284,
+        "top": 69,
+        "width": 248,
+        "x": 36,
+        "y": 69
+      },
+      "company": "ОК «Комфорт»",
+      "contactTop": 297.75,
+      "contactWeight": "400",
+      "contacts": [
+        ["Kirill_ZemlyaMO", "https://t.me/Kirill_ZemlyaMO"],
+        ["+7 (967) 246-37-49", "tel:+79672463749"]
+      ],
+      "fontStatus": "loaded",
+      "hasContacts": true,
+      "linkOrder": [
+        "https://t.me/Kirill_ZemlyaMO",
+        "tel:+79672463749",
+        "https://ok-komfort.ru/company/"
+      ],
+      "name": "Кирилл Щемелинин",
+      "order": ["DIV", "HEADER", "SECTION", "FIGURE", "ARTICLE"],
+      "photo": {
+        "displayHeight": 296,
+        "displayWidth": 222,
+        "height": "600",
+        "naturalWidth": 450,
+        "src": "https://media.kpshelkovo.online/people/kschemelinin.jpeg",
+        "width": "450"
+      },
+      "photoRect": {
+        "bottom": 730.734375,
+        "height": 327,
+        "left": 36,
+        "right": 260,
+        "top": 403.734375,
+        "width": 224,
+        "x": 36,
+        "y": 403.734375
+      },
+      "position": "Исполняющий обязанности директора по эксплуатации",
+      "roleCount": 2,
+      "schema": {
+        "@context": "https://schema.org",
+        "@id": "https://kpshelkovo.online/people/kschemelinin/#person",
+        "@type": "Person",
+        "description": "Ранее занимал должность главного энергетика ОК «Комфорт».",
+        "image": "https://media.kpshelkovo.online/people/kschemelinin.jpeg",
+        "jobTitle": "Исполняющий обязанности директора по эксплуатации",
+        "mainEntityOfPage": "https://kpshelkovo.online/people/kschemelinin/",
+        "name": "Кирилл Щемелинин",
+        "sameAs": ["https://t.me/Kirill_ZemlyaMO"],
+        "telephone": "+7 (967) 246-37-49",
+        "url": "https://kpshelkovo.online/people/kschemelinin/",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "ОК \"Комфорт\""
+        }
+      },
+      "scrollWidth": 320,
+      "source": "https://ok-komfort.ru/company/",
+      "width": 320
+    },
+    {
+      "slug": "kschemelinin",
+      "articleRect": {
+        "bottom": 409.859375,
+        "height": 60.046875,
+        "left": 154,
+        "right": 1030,
+        "top": 349.8125,
+        "width": 876,
+        "x": 154,
+        "y": 349.8125
+      },
+      "body": "Ранее занимал должность главного энергетика ОК «Комфорт».",
+      "bodyHtml": "<p>Ранее занимал должность главного энергетика ОК&nbsp;«Комфорт».</p>",
+      "breadcrumbsRect": {
+        "bottom": 97,
+        "height": 20,
+        "left": 154,
+        "right": 1030,
+        "top": 77,
+        "width": 876,
+        "x": 154,
+        "y": 77
+      },
+      "company": "ОК «Комфорт»",
+      "contactTop": 243.828125,
+      "contactWeight": "400",
+      "contacts": [
+        ["Kirill_ZemlyaMO", "https://t.me/Kirill_ZemlyaMO"],
+        ["+7 (967) 246-37-49", "tel:+79672463749"]
+      ],
+      "fontStatus": "loaded",
+      "hasContacts": true,
+      "linkOrder": [
+        "https://t.me/Kirill_ZemlyaMO",
+        "tel:+79672463749",
+        "https://ok-komfort.ru/company/"
+      ],
+      "name": "Кирилл Щемелинин",
+      "order": ["DIV", "HEADER", "SECTION", "FIGURE", "ARTICLE"],
+      "photo": {
+        "displayHeight": 296,
+        "displayWidth": 222,
+        "height": "600",
+        "naturalWidth": 450,
+        "src": "https://media.kpshelkovo.online/people/kschemelinin.jpeg",
+        "width": "450"
+      },
+      "photoRect": {
+        "bottom": 404,
+        "height": 327,
+        "left": 1062,
+        "right": 1286,
+        "top": 77,
+        "width": 224,
+        "x": 1062,
+        "y": 77
+      },
+      "position": "Исполняющий обязанности директора по эксплуатации",
+      "roleCount": 2,
+      "schema": {
+        "@context": "https://schema.org",
+        "@id": "https://kpshelkovo.online/people/kschemelinin/#person",
+        "@type": "Person",
+        "description": "Ранее занимал должность главного энергетика ОК «Комфорт».",
+        "image": "https://media.kpshelkovo.online/people/kschemelinin.jpeg",
+        "jobTitle": "Исполняющий обязанности директора по эксплуатации",
+        "mainEntityOfPage": "https://kpshelkovo.online/people/kschemelinin/",
+        "name": "Кирилл Щемелинин",
+        "sameAs": ["https://t.me/Kirill_ZemlyaMO"],
+        "telephone": "+7 (967) 246-37-49",
+        "url": "https://kpshelkovo.online/people/kschemelinin/",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "ОК \"Комфорт\""
+        }
+      },
+      "scrollWidth": 1440,
+      "source": "https://ok-komfort.ru/company/",
+      "width": 1440
+    },
+    {
+      "slug": "gmozgov",
+      "articleRect": {
+        "bottom": 1102.46875,
+        "height": 452.609375,
+        "left": 36,
+        "right": 354,
+        "top": 649.859375,
+        "width": 318,
+        "x": 36,
+        "y": 649.859375
+      },
+      "body": "Техническое обслуживание и эксплуатация инженерных сетей, организация коммунальных работ в поселках.\nФанат своей работы и ставит её в пример остальным в отзыве на Яндекс Картах о посёлке, которым управляет:\n\nСупер посёлок, всё отлично, для строящегося поселка. ОК отличная, справляется на 100%, многим поселкам поучится так заботится о поселке",
+      "bodyHtml": "<p>Техническое обслуживание и&nbsp;эксплуатация инженерных сетей, организация коммунальных работ в&nbsp;поселках.</p>\n<p>Фанат своей работы и&nbsp;ставит её&nbsp;в&nbsp;пример остальным <a href=\"https://yandex.ru/maps/org/92228099436/reviews?reviews%5BpublicId%5D=8cj1z8bhut9xa5cbrbcmvh1rpg&amp;utm_source=review\">в&nbsp;отзыве на&nbsp;Яндекс Картах</a> о&nbsp;посёлке, которым управляет:</p>\n<blockquote>\n<p>Супер посёлок, всё отлично, для&nbsp;строящегося поселка. ОК&nbsp;отличная, справляется на&nbsp;100%, многим поселкам поучится так заботится о&nbsp;поселке</p>\n</blockquote>",
+      "breadcrumbsRect": {
+        "bottom": 101,
+        "height": 32,
+        "left": 36,
+        "right": 354,
+        "top": 69,
+        "width": 318,
+        "x": 36,
+        "y": 69
+      },
+      "company": "ОК «Комфорт»",
+      "contactTop": 234.875,
+      "contactWeight": "400",
+      "contacts": [["+7 (968) 636-42-68", "tel:+79686364268"]],
+      "fontStatus": "loaded",
+      "hasContacts": true,
+      "linkOrder": [
+        "tel:+79686364268",
+        "https://ok-komfort.ru/company/",
+        "https://yandex.ru/maps/org/92228099436/reviews?reviews%5BpublicId%5D=8cj1z8bhut9xa5cbrbcmvh1rpg&utm_source=review"
+      ],
+      "name": "Геннадий Мозгов",
+      "order": ["DIV", "HEADER", "SECTION", "FIGURE", "ARTICLE"],
+      "photo": {
+        "displayHeight": 296,
+        "displayWidth": 222,
+        "height": "600",
+        "naturalWidth": 450,
+        "src": "https://media.kpshelkovo.online/people/gmozgov.jpeg",
+        "width": "450"
+      },
+      "photoRect": {
+        "bottom": 633.859375,
+        "height": 327,
+        "left": 36,
+        "right": 260,
+        "top": 306.859375,
+        "width": 224,
+        "x": 36,
+        "y": 306.859375
+      },
+      "position": "Управляющий КП Шелково",
+      "roleCount": 2,
+      "schema": {
+        "@context": "https://schema.org",
+        "@id": "https://kpshelkovo.online/people/gmozgov/#person",
+        "@type": "Person",
+        "description": "Техническое обслуживание и эксплуатация инженерных сетей, организация коммунальных работ в поселках.",
+        "image": "https://media.kpshelkovo.online/people/gmozgov.jpeg",
+        "jobTitle": "Управляющий КП Шелково",
+        "mainEntityOfPage": "https://kpshelkovo.online/people/gmozgov/",
+        "name": "Геннадий Мозгов",
+        "telephone": "+7 (968) 636-42-68",
+        "url": "https://kpshelkovo.online/people/gmozgov/",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "ОК \"Комфорт\""
+        }
+      },
+      "scrollWidth": 390,
+      "source": "https://ok-komfort.ru/company/",
+      "width": 390
+    },
+    {
+      "slug": "gmozgov",
+      "articleRect": {
+        "bottom": 1225.484375,
+        "height": 536.75,
+        "left": 36,
+        "right": 284,
+        "top": 688.734375,
+        "width": 248,
+        "x": 36,
+        "y": 688.734375
+      },
+      "body": "Техническое обслуживание и эксплуатация инженерных сетей, организация коммунальных работ в поселках.\nФанат своей работы и ставит её в пример остальным в отзыве на Яндекс Картах о посёлке, которым управляет:\n\nСупер посёлок, всё отлично, для строящегося поселка. ОК отличная, справляется на 100%, многим поселкам поучится так заботится о поселке",
+      "bodyHtml": "<p>Техническое обслуживание и&nbsp;эксплуатация инженерных сетей, организация коммунальных работ в&nbsp;поселках.</p>\n<p>Фанат своей работы и&nbsp;ставит её&nbsp;в&nbsp;пример остальным <a href=\"https://yandex.ru/maps/org/92228099436/reviews?reviews%5BpublicId%5D=8cj1z8bhut9xa5cbrbcmvh1rpg&amp;utm_source=review\">в&nbsp;отзыве на&nbsp;Яндекс Картах</a> о&nbsp;посёлке, которым управляет:</p>\n<blockquote>\n<p>Супер посёлок, всё отлично, для&nbsp;строящегося поселка. ОК&nbsp;отличная, справляется на&nbsp;100%, многим поселкам поучится так заботится о&nbsp;поселке</p>\n</blockquote>",
+      "breadcrumbsRect": {
+        "bottom": 101,
+        "height": 32,
+        "left": 36,
+        "right": 284,
+        "top": 69,
+        "width": 248,
+        "x": 36,
+        "y": 69
+      },
+      "company": "ОК «Комфорт»",
+      "contactTop": 273.75,
+      "contactWeight": "400",
+      "contacts": [["+7 (968) 636-42-68", "tel:+79686364268"]],
+      "fontStatus": "loaded",
+      "hasContacts": true,
+      "linkOrder": [
+        "tel:+79686364268",
+        "https://ok-komfort.ru/company/",
+        "https://yandex.ru/maps/org/92228099436/reviews?reviews%5BpublicId%5D=8cj1z8bhut9xa5cbrbcmvh1rpg&utm_source=review"
+      ],
+      "name": "Геннадий Мозгов",
+      "order": ["DIV", "HEADER", "SECTION", "FIGURE", "ARTICLE"],
+      "photo": {
+        "displayHeight": 296,
+        "displayWidth": 222,
+        "height": "600",
+        "naturalWidth": 450,
+        "src": "https://media.kpshelkovo.online/people/gmozgov.jpeg",
+        "width": "450"
+      },
+      "photoRect": {
+        "bottom": 672.734375,
+        "height": 327,
+        "left": 36,
+        "right": 260,
+        "top": 345.734375,
+        "width": 224,
+        "x": 36,
+        "y": 345.734375
+      },
+      "position": "Управляющий КП Шелково",
+      "roleCount": 2,
+      "schema": {
+        "@context": "https://schema.org",
+        "@id": "https://kpshelkovo.online/people/gmozgov/#person",
+        "@type": "Person",
+        "description": "Техническое обслуживание и эксплуатация инженерных сетей, организация коммунальных работ в поселках.",
+        "image": "https://media.kpshelkovo.online/people/gmozgov.jpeg",
+        "jobTitle": "Управляющий КП Шелково",
+        "mainEntityOfPage": "https://kpshelkovo.online/people/gmozgov/",
+        "name": "Геннадий Мозгов",
+        "telephone": "+7 (968) 636-42-68",
+        "url": "https://kpshelkovo.online/people/gmozgov/",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "ОК \"Комфорт\""
+        }
+      },
+      "scrollWidth": 320,
+      "source": "https://ok-komfort.ru/company/",
+      "width": 320
+    },
+    {
+      "slug": "gmozgov",
+      "articleRect": {
+        "bottom": 572.09375,
+        "height": 256.28125,
+        "left": 154,
+        "right": 1030,
+        "top": 315.8125,
+        "width": 876,
+        "x": 154,
+        "y": 315.8125
+      },
+      "body": "Техническое обслуживание и эксплуатация инженерных сетей, организация коммунальных работ в поселках.\nФанат своей работы и ставит её в пример остальным в отзыве на Яндекс Картах о посёлке, которым управляет:\n\nСупер посёлок, всё отлично, для строящегося поселка. ОК отличная, справляется на 100%, многим поселкам поучится так заботится о поселке",
+      "bodyHtml": "<p>Техническое обслуживание и&nbsp;эксплуатация инженерных сетей, организация коммунальных работ в&nbsp;поселках.</p>\n<p>Фанат своей работы и&nbsp;ставит её&nbsp;в&nbsp;пример остальным <a href=\"https://yandex.ru/maps/org/92228099436/reviews?reviews%5BpublicId%5D=8cj1z8bhut9xa5cbrbcmvh1rpg&amp;utm_source=review\">в&nbsp;отзыве на&nbsp;Яндекс Картах</a> о&nbsp;посёлке, которым управляет:</p>\n<blockquote>\n<p>Супер посёлок, всё отлично, для&nbsp;строящегося поселка. ОК&nbsp;отличная, справляется на&nbsp;100%, многим поселкам поучится так заботится о&nbsp;поселке</p>\n</blockquote>",
+      "breadcrumbsRect": {
+        "bottom": 97,
+        "height": 20,
+        "left": 154,
+        "right": 1030,
+        "top": 77,
+        "width": 876,
+        "x": 154,
+        "y": 77
+      },
+      "company": "ОК «Комфорт»",
+      "contactTop": 243.828125,
+      "contactWeight": "400",
+      "contacts": [["+7 (968) 636-42-68", "tel:+79686364268"]],
+      "fontStatus": "loaded",
+      "hasContacts": true,
+      "linkOrder": [
+        "tel:+79686364268",
+        "https://ok-komfort.ru/company/",
+        "https://yandex.ru/maps/org/92228099436/reviews?reviews%5BpublicId%5D=8cj1z8bhut9xa5cbrbcmvh1rpg&utm_source=review"
+      ],
+      "name": "Геннадий Мозгов",
+      "order": ["DIV", "HEADER", "SECTION", "FIGURE", "ARTICLE"],
+      "photo": {
+        "displayHeight": 296,
+        "displayWidth": 222,
+        "height": "600",
+        "naturalWidth": 450,
+        "src": "https://media.kpshelkovo.online/people/gmozgov.jpeg",
+        "width": "450"
+      },
+      "photoRect": {
+        "bottom": 404,
+        "height": 327,
+        "left": 1062,
+        "right": 1286,
+        "top": 77,
+        "width": 224,
+        "x": 1062,
+        "y": 77
+      },
+      "position": "Управляющий КП Шелково",
+      "roleCount": 2,
+      "schema": {
+        "@context": "https://schema.org",
+        "@id": "https://kpshelkovo.online/people/gmozgov/#person",
+        "@type": "Person",
+        "description": "Техническое обслуживание и эксплуатация инженерных сетей, организация коммунальных работ в поселках.",
+        "image": "https://media.kpshelkovo.online/people/gmozgov.jpeg",
+        "jobTitle": "Управляющий КП Шелково",
+        "mainEntityOfPage": "https://kpshelkovo.online/people/gmozgov/",
+        "name": "Геннадий Мозгов",
+        "telephone": "+7 (968) 636-42-68",
+        "url": "https://kpshelkovo.online/people/gmozgov/",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "ОК \"Комфорт\""
+        }
+      },
+      "scrollWidth": 1440,
+      "source": "https://ok-komfort.ru/company/",
+      "width": 1440
+    },
+    {
+      "slug": "msorochinsky",
+      "articleRect": {
+        "bottom": 646.15625,
+        "height": 300.421875,
+        "left": 36,
+        "right": 354,
+        "top": 345.734375,
+        "width": 318,
+        "x": 36,
+        "y": 345.734375
+      },
+      "body": "Более 20 лет работает в энергетике. Ранее был инженером-электриком в «Газпроме», затем 13 лет — главным инженером районных электрических сетей в Нижегородской области.\nОтвечает за электроснабжение коттеджных поселков, техническое состояние электрооборудования и обслуживание уличного освещения.",
+      "bodyHtml": "<p>Более 20 лет работает в&nbsp;энергетике. Ранее был инженером-электриком в&nbsp;«Газпроме», затем 13 лет&nbsp;— главным инженером районных электрических сетей в&nbsp;Нижегородской области.</p>\n<p>Отвечает за&nbsp;электроснабжение коттеджных поселков, техническое состояние электрооборудования и&nbsp;обслуживание уличного освещения.</p>",
+      "breadcrumbsRect": {
+        "bottom": 101,
+        "height": 32,
+        "left": 36,
+        "right": 354,
+        "top": 69,
+        "width": 318,
+        "x": 36,
+        "y": 69
+      },
+      "company": "ОК «Комфорт»",
+      "contactTop": 273.75,
+      "contactWeight": "400",
+      "contacts": [["+7 (967) 246-27-43", "tel:+79672462743"]],
+      "fontStatus": "loaded",
+      "hasContacts": true,
+      "linkOrder": ["tel:+79672462743"],
+      "name": "Максим Сорочинский",
+      "order": ["DIV", "HEADER", "SECTION", "ARTICLE"],
+      "photo": null,
+      "position": "Главный энергетик",
+      "roleCount": 2,
+      "schema": {
+        "@context": "https://schema.org",
+        "@id": "https://kpshelkovo.online/people/msorochinsky/#person",
+        "@type": "Person",
+        "description": "Более 20 лет работает в энергетике. Ранее был инженером-электриком в «Газпроме», затем 13 лет — главным инженером районных электрических сетей в Нижегородской области.",
+        "jobTitle": "Главный энергетик",
+        "mainEntityOfPage": "https://kpshelkovo.online/people/msorochinsky/",
+        "name": "Максим Сорочинский",
+        "telephone": "+7 (967) 246-27-43",
+        "url": "https://kpshelkovo.online/people/msorochinsky/",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "ОК \"Комфорт\""
+        }
+      },
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "slug": "msorochinsky",
+      "articleRect": {
+        "bottom": 814.4375,
+        "height": 468.703125,
+        "left": 36,
+        "right": 284,
+        "top": 345.734375,
+        "width": 248,
+        "x": 36,
+        "y": 345.734375
+      },
+      "body": "Более 20 лет работает в энергетике. Ранее был инженером-электриком в «Газпроме», затем 13 лет — главным инженером районных электрических сетей в Нижегородской области.\nОтвечает за электроснабжение коттеджных поселков, техническое состояние электрооборудования и обслуживание уличного освещения.",
+      "bodyHtml": "<p>Более 20 лет работает в&nbsp;энергетике. Ранее был инженером-электриком в&nbsp;«Газпроме», затем 13 лет&nbsp;— главным инженером районных электрических сетей в&nbsp;Нижегородской области.</p>\n<p>Отвечает за&nbsp;электроснабжение коттеджных поселков, техническое состояние электрооборудования и&nbsp;обслуживание уличного освещения.</p>",
+      "breadcrumbsRect": {
+        "bottom": 101,
+        "height": 32,
+        "left": 36,
+        "right": 284,
+        "top": 69,
+        "width": 248,
+        "x": 36,
+        "y": 69
+      },
+      "company": "ОК «Комфорт»",
+      "contactTop": 273.75,
+      "contactWeight": "400",
+      "contacts": [["+7 (967) 246-27-43", "tel:+79672462743"]],
+      "fontStatus": "loaded",
+      "hasContacts": true,
+      "linkOrder": ["tel:+79672462743"],
+      "name": "Максим Сорочинский",
+      "order": ["DIV", "HEADER", "SECTION", "ARTICLE"],
+      "photo": null,
+      "position": "Главный энергетик",
+      "roleCount": 2,
+      "schema": {
+        "@context": "https://schema.org",
+        "@id": "https://kpshelkovo.online/people/msorochinsky/#person",
+        "@type": "Person",
+        "description": "Более 20 лет работает в энергетике. Ранее был инженером-электриком в «Газпроме», затем 13 лет — главным инженером районных электрических сетей в Нижегородской области.",
+        "jobTitle": "Главный энергетик",
+        "mainEntityOfPage": "https://kpshelkovo.online/people/msorochinsky/",
+        "name": "Максим Сорочинский",
+        "telephone": "+7 (967) 246-27-43",
+        "url": "https://kpshelkovo.online/people/msorochinsky/",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "ОК \"Комфорт\""
+        }
+      },
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "slug": "msorochinsky",
+      "articleRect": {
+        "bottom": 476,
+        "height": 160.1875,
+        "left": 154,
+        "right": 1050,
+        "top": 315.8125,
+        "width": 896,
+        "x": 154,
+        "y": 315.8125
+      },
+      "body": "Более 20 лет работает в энергетике. Ранее был инженером-электриком в «Газпроме», затем 13 лет — главным инженером районных электрических сетей в Нижегородской области.\nОтвечает за электроснабжение коттеджных поселков, техническое состояние электрооборудования и обслуживание уличного освещения.",
+      "bodyHtml": "<p>Более 20 лет работает в&nbsp;энергетике. Ранее был инженером-электриком в&nbsp;«Газпроме», затем 13 лет&nbsp;— главным инженером районных электрических сетей в&nbsp;Нижегородской области.</p>\n<p>Отвечает за&nbsp;электроснабжение коттеджных поселков, техническое состояние электрооборудования и&nbsp;обслуживание уличного освещения.</p>",
+      "breadcrumbsRect": {
+        "bottom": 97,
+        "height": 20,
+        "left": 154,
+        "right": 1050,
+        "top": 77,
+        "width": 896,
+        "x": 154,
+        "y": 77
+      },
+      "company": "ОК «Комфорт»",
+      "contactTop": 243.828125,
+      "contactWeight": "400",
+      "contacts": [["+7 (967) 246-27-43", "tel:+79672462743"]],
+      "fontStatus": "loaded",
+      "hasContacts": true,
+      "linkOrder": ["tel:+79672462743"],
+      "name": "Максим Сорочинский",
+      "order": ["DIV", "HEADER", "SECTION", "ARTICLE"],
+      "photo": null,
+      "position": "Главный энергетик",
+      "roleCount": 2,
+      "schema": {
+        "@context": "https://schema.org",
+        "@id": "https://kpshelkovo.online/people/msorochinsky/#person",
+        "@type": "Person",
+        "description": "Более 20 лет работает в энергетике. Ранее был инженером-электриком в «Газпроме», затем 13 лет — главным инженером районных электрических сетей в Нижегородской области.",
+        "jobTitle": "Главный энергетик",
+        "mainEntityOfPage": "https://kpshelkovo.online/people/msorochinsky/",
+        "name": "Максим Сорочинский",
+        "telephone": "+7 (967) 246-27-43",
+        "url": "https://kpshelkovo.online/people/msorochinsky/",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "ОК \"Комфорт\""
+        }
+      },
+      "scrollWidth": 1440,
+      "width": 1440
+    },
+    {
+      "slug": "sminakov",
+      "articleRect": {
+        "bottom": 263.96875,
+        "height": 88.09375,
+        "left": 36,
+        "right": 354,
+        "top": 175.875,
+        "width": 318,
+        "x": 36,
+        "y": 175.875
+      },
+      "body": "Бывший руководитель группы компаний «Земля МО».",
+      "bodyHtml": "<p>Бывший руководитель группы компаний «Земля МО».</p>",
+      "breadcrumbsRect": {
+        "bottom": 101,
+        "height": 32,
+        "left": 36,
+        "right": 354,
+        "top": 69,
+        "width": 318,
+        "x": 36,
+        "y": 69
+      },
+      "contactWeight": null,
+      "contacts": [],
+      "fontStatus": "loaded",
+      "hasContacts": false,
+      "linkOrder": [],
+      "name": "Сергей Минаков",
+      "order": ["DIV", "HEADER", "ARTICLE"],
+      "photo": null,
+      "roleCount": 0,
+      "schema": {
+        "@context": "https://schema.org",
+        "@id": "https://kpshelkovo.online/people/sminakov/#person",
+        "@type": "Person",
+        "description": "Бывший руководитель группы компаний «Земля МО».",
+        "mainEntityOfPage": "https://kpshelkovo.online/people/sminakov/",
+        "name": "Сергей Минаков",
+        "url": "https://kpshelkovo.online/people/sminakov/"
+      },
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "slug": "sminakov",
+      "articleRect": {
+        "bottom": 302.84375,
+        "height": 88.09375,
+        "left": 36,
+        "right": 284,
+        "top": 214.75,
+        "width": 248,
+        "x": 36,
+        "y": 214.75
+      },
+      "body": "Бывший руководитель группы компаний «Земля МО».",
+      "bodyHtml": "<p>Бывший руководитель группы компаний «Земля МО».</p>",
+      "breadcrumbsRect": {
+        "bottom": 101,
+        "height": 32,
+        "left": 36,
+        "right": 284,
+        "top": 69,
+        "width": 248,
+        "x": 36,
+        "y": 69
+      },
+      "contactWeight": null,
+      "contacts": [],
+      "fontStatus": "loaded",
+      "hasContacts": false,
+      "linkOrder": [],
+      "name": "Сергей Минаков",
+      "order": ["DIV", "HEADER", "ARTICLE"],
+      "photo": null,
+      "roleCount": 0,
+      "schema": {
+        "@context": "https://schema.org",
+        "@id": "https://kpshelkovo.online/people/sminakov/#person",
+        "@type": "Person",
+        "description": "Бывший руководитель группы компаний «Земля МО».",
+        "mainEntityOfPage": "https://kpshelkovo.online/people/sminakov/",
+        "name": "Сергей Минаков",
+        "url": "https://kpshelkovo.online/people/sminakov/"
+      },
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "slug": "sminakov",
+      "articleRect": {
+        "bottom": 244.875,
+        "height": 60.046875,
+        "left": 154,
+        "right": 1050,
+        "top": 184.828125,
+        "width": 896,
+        "x": 154,
+        "y": 184.828125
+      },
+      "body": "Бывший руководитель группы компаний «Земля МО».",
+      "bodyHtml": "<p>Бывший руководитель группы компаний «Земля МО».</p>",
+      "breadcrumbsRect": {
+        "bottom": 97,
+        "height": 20,
+        "left": 154,
+        "right": 1050,
+        "top": 77,
+        "width": 896,
+        "x": 154,
+        "y": 77
+      },
+      "contactWeight": null,
+      "contacts": [],
+      "fontStatus": "loaded",
+      "hasContacts": false,
+      "linkOrder": [],
+      "name": "Сергей Минаков",
+      "order": ["DIV", "HEADER", "ARTICLE"],
+      "photo": null,
+      "roleCount": 0,
+      "schema": {
+        "@context": "https://schema.org",
+        "@id": "https://kpshelkovo.online/people/sminakov/#person",
+        "@type": "Person",
+        "description": "Бывший руководитель группы компаний «Земля МО».",
+        "mainEntityOfPage": "https://kpshelkovo.online/people/sminakov/",
+        "name": "Сергей Минаков",
+        "url": "https://kpshelkovo.online/people/sminakov/"
+      },
+      "scrollWidth": 1440,
+      "width": 1440
+    },
+    {
+      "slug": "ykizilov",
+      "articleRect": {
+        "bottom": 428.953125,
+        "height": 88.09375,
+        "left": 36,
+        "right": 354,
+        "top": 340.859375,
+        "width": 318,
+        "x": 36,
+        "y": 340.859375
+      },
+      "body": "Записаться на приём можно через Домиленд.",
+      "bodyHtml": "<p>Записаться на&nbsp;приём можно через <a href=\"https://lk.domyland.ru/services/115162\">Домиленд</a>.</p>",
+      "breadcrumbsRect": {
+        "bottom": 101,
+        "height": 32,
+        "left": 36,
+        "right": 354,
+        "top": 69,
+        "width": 318,
+        "x": 36,
+        "y": 69
+      },
+      "company": "группа компаний «Земля МО»",
+      "contactTop": 234.875,
+      "contactWeight": "400",
+      "contacts": [
+        ["Ykizilov", "https://t.me/Ykizilov"],
+        ["+7 (926) 769-85-91", "tel:+79267698591"]
+      ],
+      "fontStatus": "loaded",
+      "hasContacts": true,
+      "linkOrder": [
+        "https://t.me/Ykizilov",
+        "tel:+79267698591",
+        "https://lk.domyland.ru/services/115162"
+      ],
+      "name": "Юрий Кизилов",
+      "order": ["DIV", "HEADER", "SECTION", "ARTICLE"],
+      "photo": null,
+      "position": "Генеральный директор",
+      "roleCount": 2,
+      "schema": {
+        "@context": "https://schema.org",
+        "@id": "https://kpshelkovo.online/people/ykizilov/#person",
+        "@type": "Person",
+        "description": "Записаться на приём можно через Домиленд.",
+        "jobTitle": "Генеральный директор",
+        "mainEntityOfPage": "https://kpshelkovo.online/people/ykizilov/",
+        "name": "Юрий Кизилов",
+        "sameAs": ["https://t.me/Ykizilov"],
+        "telephone": "+7 (926) 769-85-91",
+        "url": "https://kpshelkovo.online/people/ykizilov/",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "группа компаний «Земля МО»"
+        }
+      },
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "slug": "ykizilov",
+      "articleRect": {
+        "bottom": 467.828125,
+        "height": 88.09375,
+        "left": 36,
+        "right": 284,
+        "top": 379.734375,
+        "width": 248,
+        "x": 36,
+        "y": 379.734375
+      },
+      "body": "Записаться на приём можно через Домиленд.",
+      "bodyHtml": "<p>Записаться на&nbsp;приём можно через <a href=\"https://lk.domyland.ru/services/115162\">Домиленд</a>.</p>",
+      "breadcrumbsRect": {
+        "bottom": 101,
+        "height": 32,
+        "left": 36,
+        "right": 284,
+        "top": 69,
+        "width": 248,
+        "x": 36,
+        "y": 69
+      },
+      "company": "группа компаний «Земля МО»",
+      "contactTop": 273.75,
+      "contactWeight": "400",
+      "contacts": [
+        ["Ykizilov", "https://t.me/Ykizilov"],
+        ["+7 (926) 769-85-91", "tel:+79267698591"]
+      ],
+      "fontStatus": "loaded",
+      "hasContacts": true,
+      "linkOrder": [
+        "https://t.me/Ykizilov",
+        "tel:+79267698591",
+        "https://lk.domyland.ru/services/115162"
+      ],
+      "name": "Юрий Кизилов",
+      "order": ["DIV", "HEADER", "SECTION", "ARTICLE"],
+      "photo": null,
+      "position": "Генеральный директор",
+      "roleCount": 2,
+      "schema": {
+        "@context": "https://schema.org",
+        "@id": "https://kpshelkovo.online/people/ykizilov/#person",
+        "@type": "Person",
+        "description": "Записаться на приём можно через Домиленд.",
+        "jobTitle": "Генеральный директор",
+        "mainEntityOfPage": "https://kpshelkovo.online/people/ykizilov/",
+        "name": "Юрий Кизилов",
+        "sameAs": ["https://t.me/Ykizilov"],
+        "telephone": "+7 (926) 769-85-91",
+        "url": "https://kpshelkovo.online/people/ykizilov/",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "группа компаний «Земля МО»"
+        }
+      },
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "slug": "ykizilov",
+      "articleRect": {
+        "bottom": 409.859375,
+        "height": 60.046875,
+        "left": 154,
+        "right": 1050,
+        "top": 349.8125,
+        "width": 896,
+        "x": 154,
+        "y": 349.8125
+      },
+      "body": "Записаться на приём можно через Домиленд.",
+      "bodyHtml": "<p>Записаться на&nbsp;приём можно через <a href=\"https://lk.domyland.ru/services/115162\">Домиленд</a>.</p>",
+      "breadcrumbsRect": {
+        "bottom": 97,
+        "height": 20,
+        "left": 154,
+        "right": 1050,
+        "top": 77,
+        "width": 896,
+        "x": 154,
+        "y": 77
+      },
+      "company": "группа компаний «Земля МО»",
+      "contactTop": 243.828125,
+      "contactWeight": "400",
+      "contacts": [
+        ["Ykizilov", "https://t.me/Ykizilov"],
+        ["+7 (926) 769-85-91", "tel:+79267698591"]
+      ],
+      "fontStatus": "loaded",
+      "hasContacts": true,
+      "linkOrder": [
+        "https://t.me/Ykizilov",
+        "tel:+79267698591",
+        "https://lk.domyland.ru/services/115162"
+      ],
+      "name": "Юрий Кизилов",
+      "order": ["DIV", "HEADER", "SECTION", "ARTICLE"],
+      "photo": null,
+      "position": "Генеральный директор",
+      "roleCount": 2,
+      "schema": {
+        "@context": "https://schema.org",
+        "@id": "https://kpshelkovo.online/people/ykizilov/#person",
+        "@type": "Person",
+        "description": "Записаться на приём можно через Домиленд.",
+        "jobTitle": "Генеральный директор",
+        "mainEntityOfPage": "https://kpshelkovo.online/people/ykizilov/",
+        "name": "Юрий Кизилов",
+        "sameAs": ["https://t.me/Ykizilov"],
+        "telephone": "+7 (926) 769-85-91",
+        "url": "https://kpshelkovo.online/people/ykizilov/",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "группа компаний «Земля МО»"
+        }
+      },
+      "scrollWidth": 1440,
+      "width": 1440
+    }
+  ]
+}

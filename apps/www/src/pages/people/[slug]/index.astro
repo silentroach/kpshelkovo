@@ -22,7 +22,6 @@ import {
   formatPersonBacklinkSection,
   formatPersonContactCompactDisplay,
   formatPersonContactType,
-  formatPersonHeadline,
   personBacklinkGroups,
   PEOPLE_PROSE,
 } from '@/lib/people/view';
@@ -53,8 +52,12 @@ if (!profile) {
 
 const bodyHtml = profile.body ? renderMarkdown(profile.body) : undefined;
 const description = profile.seo?.description ?? describePersonProfile(profile);
-const headline = formatPersonHeadline(profile);
-const headlineHtml = headline ? formatTextHtml(headline) : undefined;
+const positionHtml = profile.position
+  ? formatTextHtml(profile.position)
+  : undefined;
+const companyHtml = profile.company
+  ? formatTextHtml(profile.company)
+  : undefined;
 const title = `${profile.name} — Люди — Шелково Онлайн`;
 const search = {
   scope: 'manual',
@@ -103,44 +106,28 @@ const schema = personProfilePageSchema({
             {profile.name}
           </h1>
 
-          {headlineHtml && (
-            <p
-              class="person-profile__headline"
-              data-pagefind-body
-              set:html={headlineHtml}
-            />
+          {(positionHtml || companyHtml) && (
+            <div class="person-profile__role" data-pagefind-body>
+              {positionHtml && (
+                <p class="person-profile__position" set:html={positionHtml} />
+              )}
+              {companyHtml && (
+                <p class="person-profile__company" set:html={companyHtml} />
+              )}
+            </div>
           )}
         </header>
 
-        {profile.photo && (
-          <figure class="person-profile__photo">
-            <img
-              src={profile.photo.src}
-              width={profile.photo.width}
-              height={profile.photo.height}
-              alt={profile.name}
-            />
-            {profile.photo.source && (
-              <figcaption>
-                Фото:{' '}
-                <a class="site-text-link" href={profile.photo.source.url}>
-                  {profile.photo.source.label}
-                </a>
-              </figcaption>
-            )}
-          </figure>
-        )}
+        {profile.contacts.length > 0 && (
+          <section
+            aria-labelledby="person-contacts"
+            class="person-profile__contacts"
+            data-pagefind-ignore="all"
+          >
+            <h2 id="person-contacts" class="ui-section-label">
+              Контакты
+            </h2>
 
-        <section
-          aria-labelledby="person-contacts"
-          class="person-profile__contacts"
-          data-pagefind-ignore="all"
-        >
-          <h2 id="person-contacts" class="ui-section-label">
-            Контакты
-          </h2>
-
-          {profile.contacts.length > 0 ? (
             <ul class="person-profile__contact-list">
               {profile.contacts.map((contact) => (
                 <li class="person-profile__contact">
@@ -160,12 +147,27 @@ const schema = personProfilePageSchema({
                 </li>
               ))}
             </ul>
-          ) : (
-            <div class="person-profile__empty person-profile__empty--contacts">
-              Контакты пока не опубликованы.
-            </div>
-          )}
-        </section>
+          </section>
+        )}
+
+        {profile.photo && (
+          <figure class="person-profile__photo">
+            <img
+              src={profile.photo.src}
+              width={profile.photo.width}
+              height={profile.photo.height}
+              alt={profile.name}
+            />
+            {profile.photo.source && (
+              <figcaption>
+                Фото:{' '}
+                <a class="site-text-link" href={profile.photo.source.url}>
+                  {profile.photo.source.label}
+                </a>
+              </figcaption>
+            )}
+          </figure>
+        )}
 
         {profile.body && (
           <article class="person-profile__article">
@@ -285,6 +287,8 @@ const schema = personProfilePageSchema({
     display: block;
     width: 100%;
     height: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
   }
 
   .person-profile__photo figcaption {
@@ -294,21 +298,33 @@ const schema = personProfilePageSchema({
     line-height: 1.5;
   }
 
-  .person-profile__heading > :not(:last-child) {
-    margin-block-end: 0.625rem;
+  .person-profile__role {
+    display: grid;
+    gap: 0.125rem;
+    max-width: 48rem;
+    margin-block-start: 0.75rem;
   }
 
-  .person-profile__headline,
+  .person-profile__position {
+    color: var(--color-text);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .person-profile__company {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
   .person-profile__backlinks-description,
   .person-profile__backlink-excerpt,
   .person-profile__empty {
     color: var(--color-text-muted);
     font-size: 0.875rem;
     line-height: 1.5rem;
-  }
-
-  .person-profile__headline {
-    max-width: 48rem;
   }
 
   .person-profile__contacts > :not(:last-child) {
@@ -325,17 +341,16 @@ const schema = personProfilePageSchema({
   }
 
   .person-profile__contact {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    column-gap: 0.75rem;
-    row-gap: 0.375rem;
+    display: grid;
+    grid-template-columns: 1rem minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: 0.625rem;
   }
 
   .person-profile__contact :global(.person-profile__contact-icon) {
     width: 1rem;
     height: 1rem;
-    flex-shrink: 0;
+    align-self: center;
   }
 
   .person-profile__contact :global(.person-profile__contact-icon--telegram) {
@@ -353,23 +368,28 @@ const schema = personProfilePageSchema({
   }
 
   .person-profile__contact-link {
-    color: var(--color-text);
+    justify-self: start;
+    color: var(--color-primary);
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 400;
     transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .person-profile__contact-link:hover {
-    color: var(--color-primary);
+  .person-profile__contact-link:is(:hover, :focus-visible) {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .person-profile__contact-link:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
   }
 
   .person-profile__empty {
     border: 1px dashed color-mix(in oklab, var(--color-border) 80%, transparent);
     border-radius: var(--radius-xl);
-  }
-
-  .person-profile__empty--contacts {
-    padding: 0.75rem 1rem;
   }
 
   .person-profile__article {
@@ -488,16 +508,23 @@ const schema = personProfilePageSchema({
       grid-row: 1 / 5;
     }
 
+    .person-profile__header-inner:has(.person-profile__photo):not(
+        :has(.person-profile__contacts)
+      ) {
+      grid-template-rows: auto auto 1fr;
+    }
+
+    .person-profile__header-inner:not(:has(.person-profile__contacts))
+      .person-profile__photo {
+      grid-row: 1 / 4;
+    }
+
     .person-profile__contacts {
       align-self: start;
     }
 
     .person-profile {
       padding-block-end: 3rem;
-    }
-
-    .person-profile__headline {
-      font-size: 1rem;
     }
 
     .person-profile__backlinks {

@@ -6,16 +6,16 @@
 
 ## Галерея
 
-[Открыть локальное сравнение](http://127.0.0.1:4363/). В галерее можно выбрать профиль и ширину: 390, 320 или 1440 px. Нажатие на изображение открывает его отдельно. [Запуск и состав файлов](/openspec/changes/refine-people-presentation/preview/README.md).
+[Открыть локальное сравнение](http://127.0.0.1:4363/). В галерее можно выбрать профиль и ширину: 390, 320 или 1440 px. Нажатие на изображение открывает его отдельно. [Запуск и состав файлов](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/README.md).
 
 ## Кирилл Щемелинин: роль, контакты и портрет
 
 Должность стала самостоятельной строкой основного цвета, организация стоит ниже. Контакты на телефоне следуют сразу за сведениями о человеке. Ссылки используют обычное начертание и зелёный цвет действия. Портрет сохраняет полный кадр; тонкая граница и радиус 12 px оформляют край.
 
-![Кирилл Щемелинин, 390 px: слева текущий вид, справа предложение](/openspec/changes/refine-people-presentation/preview/images/kschemelinin-390-pair.webp)
+![Кирилл Щемелинин, 390 px: слева текущий вид, справа предложение](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/images/kschemelinin-390-pair.webp)
 
-- [Узкий экран, 320 px](/openspec/changes/refine-people-presentation/preview/images/kschemelinin-320-pair.webp).
-- [Компьютер, 1440 px](/openspec/changes/refine-people-presentation/preview/images/kschemelinin-1440-pair.webp).
+- [Узкий экран, 320 px](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/images/kschemelinin-320-pair.webp).
+- [Компьютер, 1440 px](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/images/kschemelinin-1440-pair.webp).
 
 На 390 px начало контактного блока поднялось с 616 до 298 px от верха страницы. Дополнительная строка организации увеличивает общий текстовый блок; портрет на телефоне теперь расположен ниже контактов. На desktop верх портрета остаётся на прежней высоте 77 px.
 
@@ -29,16 +29,16 @@
 
 Слева текущий профиль содержит «Руководитель, ОК „Комфорт“». Справа меняется выбранная должность; контакты и ссылка на запись через Домиленд сохраняются. Для данных достаточно существующих одиночных `position` и `company`.
 
-![Юрий Кизилов, 390 px: слева текущий профиль, справа одна должность в Земле МО](/openspec/changes/refine-people-presentation/preview/images/ykizilov-390-pair.webp)
+![Юрий Кизилов, 390 px: слева текущий профиль, справа одна должность в Земле МО](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/images/ykizilov-390-pair.webp)
 
-- [Узкий экран, 320 px](/openspec/changes/refine-people-presentation/preview/images/ykizilov-320-pair.webp).
-- [Компьютер, 1440 px](/openspec/changes/refine-people-presentation/preview/images/ykizilov-1440-pair.webp).
+- [Узкий экран, 320 px](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/images/ykizilov-320-pair.webp).
+- [Компьютер, 1440 px](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/images/ykizilov-1440-pair.webp).
 
 ## Другие случаи
 
-- Геннадий Мозгов, портрет и длинное описание: [390 px](/openspec/changes/refine-people-presentation/preview/images/gmozgov-390-pair.webp), [320 px](/openspec/changes/refine-people-presentation/preview/images/gmozgov-320-pair.webp), [1440 px](/openspec/changes/refine-people-presentation/preview/images/gmozgov-1440-pair.webp).
-- Максим Сорочинский, профиль без фотографии: [390 px](/openspec/changes/refine-people-presentation/preview/images/msorochinsky-390-pair.webp), [320 px](/openspec/changes/refine-people-presentation/preview/images/msorochinsky-320-pair.webp), [1440 px](/openspec/changes/refine-people-presentation/preview/images/msorochinsky-1440-pair.webp).
-- Сергей Минаков, прежняя роль в описании: [390 px](/openspec/changes/refine-people-presentation/preview/images/sminakov-390-pair.webp), [320 px](/openspec/changes/refine-people-presentation/preview/images/sminakov-320-pair.webp), [1440 px](/openspec/changes/refine-people-presentation/preview/images/sminakov-1440-pair.webp). Подзаголовок с должностью и организацией убран. Обычный абзац сообщает: «Бывший руководитель группы компаний „Земля МО“». Вся секция контактов отсутствует, включая заголовок и сообщение; пустое место для неё не сохраняется.
+- Геннадий Мозгов, портрет и длинное описание: [390 px](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/images/gmozgov-390-pair.webp), [320 px](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/images/gmozgov-320-pair.webp), [1440 px](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/images/gmozgov-1440-pair.webp).
+- Максим Сорочинский, профиль без фотографии: [390 px](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/images/msorochinsky-390-pair.webp), [320 px](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/images/msorochinsky-320-pair.webp), [1440 px](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/images/msorochinsky-1440-pair.webp).
+- Сергей Минаков, прежняя роль в описании: [390 px](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/images/sminakov-390-pair.webp), [320 px](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/images/sminakov-320-pair.webp), [1440 px](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/images/sminakov-1440-pair.webp). Подзаголовок с должностью и организацией убран. Обычный абзац сообщает: «Бывший руководитель группы компаний „Земля МО“». Вся секция контактов отсутствует, включая заголовок и сообщение; пустое место для неё не сохраняется.
 
 ## Что проверено в примерке
 
@@ -49,7 +49,7 @@
 - После проверки источников переснят Юрий на 320/390/1440 px с единственной должностью «Генеральный директор»; контактные значения и ссылки, имя и описание сохранены.
 - Реальные фото имеют почти одинаковые пропорции 3:4. Другие пропорции, незаполненные должность/организация, увеличенный текст и проверка готового Astro-рендера входят в будущую приёмку.
 - Мобильные снимки полные, из viewport 390×844 и 320×844. Desktop снят в 1440×1000 и обрезан по общей высоте содержимого обеих половин, чтобы убрать пустое поле внизу; масштаб и ширина не менялись.
-- Числовые результаты сохранены в [checks.json](/openspec/changes/refine-people-presentation/preview/checks.json).
+- Числовые результаты сохранены в [checks.json](/openspec/changes/archive/2026-10-19-refine-people-presentation/preview/checks.json).
 - `pnpm openspec:validate`: прошли 52 проверки активных изменений/спецификаций и 110 архивов. Oxlint исходников примерки и oxfmt всех её текстовых файлов прошли. Галерея проверена в браузере: выбор профиля и ширины меняет оба снимка, ссылки ведут к выбранным изображениям.
 
-Примерка подготовлена временными DOM/CSS-изменениями в браузере. План реализации находится в [design](/openspec/changes/refine-people-presentation/design.md) и [tasks](/openspec/changes/refine-people-presentation/tasks.md).
+Примерка подготовлена временными DOM/CSS-изменениями в браузере. План реализации находится в [design](/openspec/changes/archive/2026-10-19-refine-people-presentation/design.md) и [tasks](/openspec/changes/archive/2026-10-19-refine-people-presentation/tasks.md).

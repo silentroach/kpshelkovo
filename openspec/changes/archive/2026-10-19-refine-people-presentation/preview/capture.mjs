@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 
 const root = dirname(fileURLToPath(import.meta.url));
-const workspace = resolve(root, '../../../..');
+const workspace = resolve(root, '../../../../..');
 const require = createRequire(join(workspace, 'apps/www/package.json'));
 const sharp = require('sharp');
 const session = execFileSync(
