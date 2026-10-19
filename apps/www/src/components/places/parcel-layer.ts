@@ -100,6 +100,7 @@ export const createParcelLayer = (
     return value;
   };
   const normalStyle = (item: ParcelMapItem): DrawingStyle => {
+    const opacityFactor = membership.size > 0 ? 0.5 : 1;
     const fill =
       item.status === 'available' || item.status === 'reserved'
         ? token('--color-accent')
@@ -110,14 +111,13 @@ export const createParcelLayer = (
       zIndex: -1,
       interactive: true,
       simplificationRate: 0,
-      ...(fill
-        ? { fill, fillOpacity: item.status === 'unavailable' ? 0.25 : 0.22 }
-        : { fillOpacity: 0 }),
+      fill,
+      fillOpacity: fill ? (item.status === 'unavailable' ? 0.25 : 0.22) * opacityFactor : 0,
       stroke: [
         {
           color: token('--parcel-map-boundary'),
           width: 1,
-          opacity: item.status === 'unavailable' ? 0.2 : 0.5
+          opacity: (item.status === 'unavailable' ? 0.2 : 0.5) * opacityFactor
         }
       ]
     };
