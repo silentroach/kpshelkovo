@@ -2,6 +2,7 @@
 service: electricity
 kind: incident
 started_at: 18.10.2026 14:00
+ended_at: 18.10.2026 14:30
 areas:
   - forest
 source_url: https://okkomfort.domyland.app/news?targetId=119603&entityName=news&t=okkomfort
