@@ -164,6 +164,16 @@
     text-wrap: pretty;
   }
 
+  @media screen {
+    .ui-prose {
+      overflow-wrap: anywhere;
+    }
+
+    .ui-prose :is(table, pre, code) {
+      overflow-wrap: normal;
+    }
+  }
+
   .ui-prose-narrow {
     max-width: 36.27rem;
   }
