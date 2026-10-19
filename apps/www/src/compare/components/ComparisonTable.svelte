@@ -47,7 +47,7 @@
 
   {#snippet badge(status: ComparisonStatus)}
     <span class="ui-badge {status.tone}">
-      <span class="status-icon">{status.icon}</span>
+      <span class="status-icon" aria-hidden="true">{status.icon}</span>
       <span class="status-text">{status.text}</span>
     </span>
   {/snippet}
@@ -152,7 +152,8 @@
   }
 
   .status-text {
-    display: none;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .comparison-grid {
@@ -165,7 +166,7 @@
   }
 
   .status-column {
-    width: 5rem;
+    width: 5.5rem;
     text-align: center;
   }
 
@@ -182,11 +183,20 @@
     line-height: 1.25rem;
   }
 
-  @media (min-width: 40rem) {
-    .status-text {
-      display: inline;
+  @media (width < 40rem) {
+    .ui-table-cell-center {
+      padding-inline: 0.25rem;
     }
 
+    .ui-badge {
+      flex-direction: column;
+      max-width: 100%;
+      padding-inline: 0.125rem;
+      line-height: 1.25;
+    }
+  }
+
+  @media (min-width: 40rem) {
     .status-column {
       width: 12rem;
     }
