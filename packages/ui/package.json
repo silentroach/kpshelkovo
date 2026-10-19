@@ -45,6 +45,7 @@
     "./markers/Fish.webp": "./src/markers/Fish.webp",
     "./markers/Foodtruck.webp": "./src/markers/Foodtruck.webp",
     "./markers/Kpp.webp": "./src/markers/Kpp.webp",
+    "./markers/Park.webp": "./src/markers/Park.webp",
     "./markers/Titanic.webp": "./src/markers/Titanic.webp",
     "./SiteFooter.astro": "./src/SiteFooter.astro",
     "./standalone-error.css": "./standalone-error.css",

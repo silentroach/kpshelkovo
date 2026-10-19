@@ -199,7 +199,16 @@ describe('PlaceMap', () => {
     });
   });
 
-  it.each(['apple', 'animals', 'construction', 'fish', 'foodtruck', 'kpp', 'titanic'] as const)(
+  it.each([
+    'apple',
+    'animals',
+    'construction',
+    'fish',
+    'foodtruck',
+    'kpp',
+    'park',
+    'titanic'
+  ] as const)(
     'uses the full-size %s image and preserves the place link and status',
     async (markerType) => {
       vi.stubGlobal('matchMedia', () => ({ matches: false }));
