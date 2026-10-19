@@ -48,7 +48,7 @@ function daysWithoutIncidents(
     return { mode: 'activeIncident' };
   }
 
-  const latest = incidents.find((item) => item.kind === 'incident' && item.ended);
+  const latest = incidents.find((item) => item.kind === 'incident' && item.phase === 'resolved');
 
   if (!latest?.ended) {
     return { mode: 'noIncidents' };
