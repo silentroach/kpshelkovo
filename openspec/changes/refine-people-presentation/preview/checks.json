@@ -1,0 +1,281 @@
+{
+  "updatedAt": "2026-10-19T15:22:33.971Z",
+  "checks": [
+    {
+      "slug": "kschemelinin",
+      "width": 390,
+      "before": {
+        "headline": "Исполняющий обязанности директора по эксплуатации, ОК «Комфорт»",
+        "contactTop": 616.40625,
+        "photoTop": 272.75
+      },
+      "after": {
+        "roles": [["Исполняющий обязанности директора по эксплуатации", "ОК «Комфорт»"]],
+        "contactTop": 297.75,
+        "photoTop": 403.734375,
+        "scrollWidth": 390,
+        "contactWeight": "400"
+      },
+      "preserved": true,
+      "imageHeight": 891,
+      "capturedAt": "2026-10-19T15:01:43.007Z"
+    },
+    {
+      "slug": "kschemelinin",
+      "width": 320,
+      "before": {
+        "headline": "Исполняющий обязанности директора по эксплуатации, ОК «Комфорт»",
+        "contactTop": 640.40625,
+        "photoTop": 296.75
+      },
+      "after": {
+        "roles": [["Исполняющий обязанности директора по эксплуатации", "ОК «Комфорт»"]],
+        "contactTop": 297.75,
+        "photoTop": 403.734375,
+        "scrollWidth": 320,
+        "contactWeight": "400"
+      },
+      "preserved": true,
+      "imageHeight": 919,
+      "capturedAt": "2026-10-19T15:01:43.007Z"
+    },
+    {
+      "slug": "kschemelinin",
+      "width": 1440,
+      "before": {
+        "headline": "Исполняющий обязанности директора по эксплуатации, ОК «Комфорт»",
+        "contactTop": 218.828125,
+        "photoTop": 77
+      },
+      "after": {
+        "roles": [["Исполняющий обязанности директора по эксплуатации", "ОК «Комфорт»"]],
+        "contactTop": 243.828125,
+        "photoTop": 77,
+        "scrollWidth": 1440,
+        "contactWeight": "400"
+      },
+      "preserved": true,
+      "imageHeight": 450,
+      "capturedAt": "2026-10-19T15:01:43.007Z"
+    },
+    {
+      "slug": "gmozgov",
+      "width": 390,
+      "before": {
+        "headline": "Управляющий КП Шелково, ОК «Комфорт»",
+        "contactTop": 553.53125,
+        "photoTop": 209.875
+      },
+      "after": {
+        "roles": [["Управляющий КП Шелково", "ОК «Комфорт»"]],
+        "contactTop": 234.875,
+        "photoTop": 306.859375,
+        "scrollWidth": 390,
+        "contactWeight": "400"
+      },
+      "preserved": true,
+      "imageHeight": 1158,
+      "capturedAt": "2026-10-19T15:01:43.007Z"
+    },
+    {
+      "slug": "gmozgov",
+      "width": 320,
+      "before": {
+        "headline": "Управляющий КП Шелково, ОК «Комфорт»",
+        "contactTop": 616.40625,
+        "photoTop": 272.75
+      },
+      "after": {
+        "roles": [["Управляющий КП Шелково", "ОК «Комфорт»"]],
+        "contactTop": 273.75,
+        "photoTop": 345.734375,
+        "scrollWidth": 320,
+        "contactWeight": "400"
+      },
+      "preserved": true,
+      "imageHeight": 1281,
+      "capturedAt": "2026-10-19T15:01:43.007Z"
+    },
+    {
+      "slug": "gmozgov",
+      "width": 1440,
+      "before": {
+        "headline": "Управляющий КП Шелково, ОК «Комфорт»",
+        "contactTop": 218.828125,
+        "photoTop": 77
+      },
+      "after": {
+        "roles": [["Управляющий КП Шелково", "ОК «Комфорт»"]],
+        "contactTop": 243.828125,
+        "photoTop": 77,
+        "scrollWidth": 1440,
+        "contactWeight": "400"
+      },
+      "preserved": true,
+      "imageHeight": 613,
+      "capturedAt": "2026-10-19T15:01:43.007Z"
+    },
+    {
+      "slug": "msorochinsky",
+      "width": 390,
+      "before": {
+        "headline": "Главный энергетик, ОК «Комфорт»",
+        "contactTop": 248.75
+      },
+      "after": {
+        "roles": [["Главный энергетик", "ОК «Комфорт»"]],
+        "contactTop": 273.75,
+        "scrollWidth": 390,
+        "contactWeight": "400"
+      },
+      "preserved": true,
+      "imageHeight": 844,
+      "capturedAt": "2026-10-19T15:01:43.007Z"
+    },
+    {
+      "slug": "msorochinsky",
+      "width": 320,
+      "before": {
+        "headline": "Главный энергетик, ОК «Комфорт»",
+        "contactTop": 248.75
+      },
+      "after": {
+        "roles": [["Главный энергетик", "ОК «Комфорт»"]],
+        "contactTop": 273.75,
+        "scrollWidth": 320,
+        "contactWeight": "400"
+      },
+      "preserved": true,
+      "imageHeight": 870,
+      "capturedAt": "2026-10-19T15:01:43.007Z"
+    },
+    {
+      "slug": "msorochinsky",
+      "width": 1440,
+      "before": {
+        "headline": "Главный энергетик, ОК «Комфорт»",
+        "contactTop": 218.828125
+      },
+      "after": {
+        "roles": [["Главный энергетик", "ОК «Комфорт»"]],
+        "contactTop": 243.828125,
+        "scrollWidth": 1440,
+        "contactWeight": "400"
+      },
+      "preserved": true,
+      "imageHeight": 516,
+      "capturedAt": "2026-10-19T15:01:43.007Z"
+    },
+    {
+      "slug": "sminakov",
+      "width": 390,
+      "capturedAt": "2026-10-19T15:22:26.921Z",
+      "before": {
+        "headline": "Бывший руководитель, группа компаний «Земля МО»",
+        "contactTop": 233.875
+      },
+      "after": {
+        "roles": [],
+        "hasContactsSection": false,
+        "scrollWidth": 390,
+        "contactWeight": null
+      },
+      "preserved": true,
+      "editorialChange": "Бывшая должность перенесена из подзаголовка в body.",
+      "imageHeight": 844
+    },
+    {
+      "slug": "sminakov",
+      "width": 320,
+      "capturedAt": "2026-10-19T15:22:26.921Z",
+      "before": {
+        "headline": "Бывший руководитель, группа компаний «Земля МО»",
+        "contactTop": 272.75
+      },
+      "after": {
+        "roles": [],
+        "hasContactsSection": false,
+        "scrollWidth": 320,
+        "contactWeight": null
+      },
+      "preserved": true,
+      "editorialChange": "Бывшая должность перенесена из подзаголовка в body.",
+      "imageHeight": 844
+    },
+    {
+      "slug": "sminakov",
+      "width": 1440,
+      "capturedAt": "2026-10-19T15:22:26.921Z",
+      "before": {
+        "headline": "Бывший руководитель, группа компаний «Земля МО»",
+        "contactTop": 218.828125
+      },
+      "after": {
+        "roles": [],
+        "hasContactsSection": false,
+        "scrollWidth": 1440,
+        "contactWeight": null
+      },
+      "preserved": true,
+      "editorialChange": "Бывшая должность перенесена из подзаголовка в body.",
+      "imageHeight": 341
+    },
+    {
+      "slug": "ykizilov",
+      "width": 390,
+      "capturedAt": "2026-10-19T15:22:26.921Z",
+      "before": {
+        "headline": "Руководитель, ОК «Комфорт»",
+        "contactTop": 209.875
+      },
+      "after": {
+        "roles": [["Генеральный директор", "группа компаний «Земля МО»"]],
+        "hasContactsSection": true,
+        "contactTop": 234.875,
+        "scrollWidth": 390,
+        "contactWeight": "400"
+      },
+      "preserved": true,
+      "editorialChange": "Уточнена единственная должность в группе компаний «Земля МО».",
+      "imageHeight": 844
+    },
+    {
+      "slug": "ykizilov",
+      "width": 320,
+      "capturedAt": "2026-10-19T15:22:26.921Z",
+      "before": {
+        "headline": "Руководитель, ОК «Комфорт»",
+        "contactTop": 248.75
+      },
+      "after": {
+        "roles": [["Генеральный директор", "группа компаний «Земля МО»"]],
+        "hasContactsSection": true,
+        "contactTop": 273.75,
+        "scrollWidth": 320,
+        "contactWeight": "400"
+      },
+      "preserved": true,
+      "editorialChange": "Уточнена единственная должность в группе компаний «Земля МО».",
+      "imageHeight": 844
+    },
+    {
+      "slug": "ykizilov",
+      "width": 1440,
+      "capturedAt": "2026-10-19T15:22:26.921Z",
+      "before": {
+        "headline": "Руководитель, ОК «Комфорт»",
+        "contactTop": 218.828125
+      },
+      "after": {
+        "roles": [["Генеральный директор", "группа компаний «Земля МО»"]],
+        "hasContactsSection": true,
+        "contactTop": 243.828125,
+        "scrollWidth": 1440,
+        "contactWeight": "400"
+      },
+      "preserved": true,
+      "editorialChange": "Уточнена единственная должность в группе компаний «Земля МО».",
+      "imageHeight": 450
+    }
+  ]
+}

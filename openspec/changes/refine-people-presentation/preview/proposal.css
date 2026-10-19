@@ -1,0 +1,77 @@
+/* Visual study on a captured production DOM, scoped to this candidate. */
+.person-profile--preview .person-profile__roles {
+  display: grid;
+  gap: 0.875rem;
+  margin-block-start: 0.75rem;
+}
+
+.person-profile--preview .person-profile__role {
+  display: grid;
+  gap: 0.125rem;
+  max-width: 48rem;
+}
+
+.person-profile--preview .person-profile__position {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.person-profile--preview .person-profile__company {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.person-profile--preview .person-profile__photo img {
+  box-sizing: border-box;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+.person-profile--preview .person-profile__contact {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 0.625rem;
+}
+
+.person-profile--preview .person-profile__contact-icon {
+  align-self: center;
+}
+
+.person-profile--preview .person-profile__contact-link {
+  justify-self: start;
+  color: var(--color-primary);
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.person-profile--preview .person-profile__contact-link:is(:hover, :focus-visible) {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.person-profile--preview .person-profile__contact-link:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+@media (min-width: 48rem) {
+  .person-profile--preview
+    .person-profile__header-inner:has(.person-profile__photo):not(:has(.person-profile__contacts)) {
+    grid-template-rows: auto auto 1fr;
+  }
+
+  .person-profile--preview
+    .person-profile__header-inner:not(:has(.person-profile__contacts))
+    .person-profile__photo {
+    grid-row: 1 / 4;
+  }
+}
