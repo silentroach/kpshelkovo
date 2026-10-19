@@ -4,6 +4,7 @@ import constructionMarkerUrl from './Construction.webp?url';
 import fishMarkerUrl from './Fish.webp?url';
 import foodtruckMarkerUrl from './Foodtruck.webp?url';
 import kppMarkerUrl from './Kpp.webp?url';
+import parkMarkerUrl from './Park.webp?url';
 import titanicMarkerUrl from './Titanic.webp?url';
 
 export const APPLE_MARKER = {
@@ -40,6 +41,12 @@ export const KPP_MARKER = {
   src: kppMarkerUrl,
   width: 144,
   height: 137
+} as const;
+
+export const PARK_MARKER = {
+  src: parkMarkerUrl,
+  width: 144,
+  height: 142
 } as const;
 
 export const TITANIC_MARKER = {

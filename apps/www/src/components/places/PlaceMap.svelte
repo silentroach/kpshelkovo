@@ -7,6 +7,7 @@
     FISH_MARKER,
     FOODTRUCK_MARKER,
     KPP_MARKER,
+    PARK_MARKER,
     TITANIC_MARKER
   } from '@shelkovo/ui/markers';
   import type { Feature } from '@yandex/ymaps3-clusterer';
@@ -110,7 +111,8 @@
     titanic: TITANIC_MARKER,
     construction: CONSTRUCTION_MARKER,
     fish: FISH_MARKER,
-    kpp: KPP_MARKER
+    kpp: KPP_MARKER,
+    park: PARK_MARKER
   };
   const getCurrentPlaceBounds = (): ymaps3.LngLatBounds => initialBounds ?? getPlaceBounds(places);
   const getMapZoomDuration = (): number =>
