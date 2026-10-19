@@ -7,6 +7,7 @@ import {
 
 import { transformContentEmphasis } from '@/lib/markdown/content-emphasis';
 import { appendEditorialMapCaptions } from '@/lib/markdown/editorial-maps-companion';
+import type { EditorialMapSelectionResolver } from '@/lib/markdown/editorial-maps.types';
 import { absoluteUrl } from '@/lib/site';
 
 import { kbDetailMarkdownUrl, kbMarkdownUrl } from './routes';
@@ -42,10 +43,15 @@ const rewriteKbLinkNode = (node: MarkdownNode): void => {
   }
 };
 
-const kbMarkdownBody = (markdown: string, source: string) => {
+const kbMarkdownBody = (
+  markdown: string,
+  source: string,
+  editorialMapResolver?: EditorialMapSelectionResolver
+) => {
   const nodes = appendEditorialMapCaptions(
     transformContentEmphasis(parseMarkdownFragment(markdown), 'markdown'),
-    source
+    source,
+    editorialMapResolver
   );
 
   for (const node of nodes) {
@@ -67,10 +73,16 @@ const kbFrontmatter = (page: KbPage): { readonly title: string; flags?: readonly
   return frontmatter;
 };
 
-export const buildKbPageMarkdown = (page: KbPage): string =>
+export const buildKbPageMarkdown = (
+  page: KbPage,
+  editorialMapResolver?: EditorialMapSelectionResolver
+): string =>
   serializeMarkdownDocument(
     createMarkdownDocument({
       frontmatter: kbFrontmatter(page),
-      children: [md.heading(1, page.title), ...kbMarkdownBody(page.body.trim(), page.canonical)]
+      children: [
+        md.heading(1, page.title),
+        ...kbMarkdownBody(page.body.trim(), page.canonical, editorialMapResolver)
+      ]
     })
   );

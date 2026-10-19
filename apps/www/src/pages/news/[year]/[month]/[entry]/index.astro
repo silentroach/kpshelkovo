@@ -12,6 +12,7 @@ import {
   withHomeSchemaBreadcrumbs,
 } from '@/lib/breadcrumbs';
 import { renderMarkdown } from '@/lib/markdown/render';
+import { loadEditorialMapResolverForMarkdown } from '@/lib/markdown/editorial-map-resolver-load';
 import { loadNewsArticle } from '@/lib/news/load';
 import { newsArticleSchema } from '@/lib/news/seo';
 import { newsArticleStaticPaths } from '@/lib/news/static-paths';
@@ -35,8 +36,18 @@ if (!article) {
   throw new Error(`news article "${id}" not found`);
 }
 
+const editorialMapSource = `news article "${article.id}" body`;
+const editorialMapResolver = await loadEditorialMapResolverForMarkdown(
+  article.body ?? '',
+  editorialMapSource,
+);
 const bodyHtml = article.body
-  ? renderMarkdown(article.body, { eagerImages: true, editorialMaps: true })
+  ? renderMarkdown(article.body, {
+      eagerImages: true,
+      editorialMaps: true,
+      editorialMapResolver,
+      editorialMapSource,
+    })
   : undefined;
 const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
 const monthBreadcrumbName = formatNewsMonth(article.year, article.month, {

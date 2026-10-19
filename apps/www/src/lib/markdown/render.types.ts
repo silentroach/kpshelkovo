@@ -3,6 +3,7 @@ import type {
   EntityMentionTarget,
   SiteMentionRegistry
 } from '../mentions';
+import type { EditorialMapSelectionResolver } from './editorial-maps.types';
 
 export type PreprocessedSiteMarkdownBody = string;
 
@@ -17,6 +18,8 @@ export interface RenderSiteMarkdownOptions {
   readonly eagerImages?: boolean;
   /** Enable only for news/KB bodies whose templates load editorial map assets. */
   readonly editorialMaps?: boolean;
+  readonly editorialMapResolver?: EditorialMapSelectionResolver;
+  readonly editorialMapSource?: string;
   /** IDs already used by the surrounding page (outside its Markdown body). */
   readonly reservedIds?: readonly string[];
 }

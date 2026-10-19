@@ -38,7 +38,9 @@ static/ComparisonTable.XXXXXXXX.js:
     rendered: 0
 static/EditorialMapScript.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/components/maps/editorial-map-element.ts:
-    rendered: 4072
+    rendered: 4633
+  apps/www/src/components/maps/editorial-parcel-labels.ts:
+    rendered: 903
   apps/www/src/components/maps/EditorialMapScript.astro?astro&type=script&index=0&lang.ts:
     rendered: 0
 static/HomeServiceSummary.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
@@ -58,11 +60,11 @@ static/MapPreview.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
     rendered: 191
 static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/place-map-geometry.ts:
-    rendered: 2446
+    rendered: 2779
   apps/www/src/components/places/place-map-url.ts:
-    rendered: 698
+    rendered: 1125
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 48037
+    rendered: 55134
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:
@@ -459,9 +461,25 @@ static/opening-hours.XXXXXXXX.js:
 static/page.XXXXXXXX.js:
   astro:scripts/page.js:
     rendered: 53
+static/parcel-label.XXXXXXXX.js:
+  apps/www/src/components/places/parcel-label.ts:
+    rendered: 376
 static/parcel-layer.XXXXXXXX.js:
   apps/www/src/components/places/parcel-layer.ts:
-    rendered: 6914
+    rendered: 8473
+static/parcel-set-outline.XXXXXXXX.js:
+  apps/www/src/components/places/parcel-set-outline.ts:
+    rendered: 750
+  apps/www/src/lib/geometry/coordinate-precision.ts:
+    rendered: 127
+  node_modules/.pnpm/bignumber.js@9.3.1/node_modules/bignumber.js/bignumber.mjs:
+    rendered: 35712
+  node_modules/.pnpm/polyclip-ts@0.16.8/node_modules/polyclip-ts/dist/esm/index.js:
+    rendered: 32226
+  node_modules/.pnpm/splaytree-ts@1.0.2/node_modules/splaytree-ts/dist/esm/index.js:
+    rendered: 10412
+  packages/geo/src/polygon-union.ts:
+    rendered: 464
 static/prefetch.XXXXXXXX.js:
   node_modules/.pnpm/astro@7.3.8_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/prefetch/index.js:
     rendered: 5024

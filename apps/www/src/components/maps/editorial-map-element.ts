@@ -1,10 +1,12 @@
 import type { LngLat, Margin, YMap, YMapLocationRequest } from '@yandex/ymaps3-types';
 
+import type { EditorialParcelLabel } from '@/lib/geometry/editorial-map-labels.types';
 import type { EditorialFeatureCollection } from '@/lib/geometry/editorial-types';
 import { createOpenMapsControl } from '@/lib/yandex-maps/open-maps-control';
 import { installYandexMapsRuntimeHeadPersistence, loadYandexMaps } from '@/lib/yandex-maps/runtime';
 
 import { createEditorialMapObjects, getEditorialMapBounds } from './editorial-map';
+import { createEditorialParcelLabels } from './editorial-parcel-labels';
 import { installMapPreviewGestures } from './map-gestures';
 
 const MAP_MARGIN: Margin = [32, 32, 64, 32];
@@ -15,6 +17,8 @@ export class EditorialMapElement extends HTMLElement {
   private gestures?: AbortController;
   private observer?: MutationObserver;
   private canvas?: HTMLElement;
+  private clearParcelLabels?: () => void;
+  private updateParcelLabels: (zoom: number) => void = () => {};
 
   connectedCallback(): void {
     installYandexMapsRuntimeHeadPersistence();
@@ -65,6 +69,14 @@ export class EditorialMapElement extends HTMLElement {
       this.map = map;
       this.gestures = installMapPreviewGestures(this, map);
       for (const object of createEditorialMapObjects(maps, collection)) map.addChild(object);
+      const labelSource = this.dataset.parcelLabels;
+      const parcelLabels = labelSource
+        ? (JSON.parse(labelSource) as readonly EditorialParcelLabel[])
+        : [];
+      const parcelLabelLayer = createEditorialParcelLabels(maps, map, parcelLabels);
+      this.clearParcelLabels = parcelLabelLayer.destroy;
+      this.updateParcelLabels = parcelLabelLayer.update;
+      this.updateParcelLabels(map.zoom);
 
       let selected: { readonly center: LngLat; readonly zoom: number } | undefined;
       map.addChild(
@@ -74,7 +86,9 @@ export class EditorialMapElement extends HTMLElement {
             selected = { center: [...location.center], zoom: location.zoom };
           },
           onUpdate: ({ location, mapInAction }) => {
-            if (this.map !== map || !selected || !mapInAction) return;
+            if (this.map !== map) return;
+            this.updateParcelLabels(location.zoom);
+            if (!selected || !mapInAction) return;
             selected = { center: [...location.center], zoom: location.zoom };
           },
           onActionEnd: ({ location }) => {
@@ -86,7 +100,11 @@ export class EditorialMapElement extends HTMLElement {
             try {
               map.update({
                 location: selected
-                  ? { center: selected.center, zoom: selected.zoom, duration: 0 }
+                  ? {
+                      center: selected.center,
+                      zoom: selected.zoom,
+                      duration: 0
+                    }
                   : { bounds: [[...bounds[0]], [...bounds[1]]], duration: 0 },
                 margin: MAP_MARGIN
               });
@@ -125,6 +143,9 @@ export class EditorialMapElement extends HTMLElement {
   }
 
   private clearMap(): void {
+    this.clearParcelLabels?.();
+    this.clearParcelLabels = undefined;
+    this.updateParcelLabels = () => {};
     this.gestures?.abort();
     this.gestures = undefined;
     this.observer?.disconnect();

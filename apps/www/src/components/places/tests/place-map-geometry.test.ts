@@ -7,7 +7,8 @@ import {
   fromPublicEditorialGeometry,
   getMarkerScale,
   getPaddedBounds,
-  getPlaceBounds
+  getPlaceBounds,
+  getSelectionSetBounds
 } from '../place-map-geometry';
 
 const place = (slug: string, lng: number, lat: number): PlaceMapItem => ({
@@ -16,6 +17,57 @@ const place = (slug: string, lng: number, lat: number): PlaceMapItem => ({
   status: 'existing',
   coordinates: { lng, lat },
   url: `/map/${slug}/`
+});
+
+it('frames set geometry together with its main marker, not just its label point', () => {
+  const member: PlaceMapItem = {
+    ...place('member', 37, 55),
+    geometry: {
+      type: 'FeatureCollection',
+      features: [
+        { type: 'Feature', geometry: { type: 'Point', coordinates: [36, 55] } },
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates: [
+              [37, 54],
+              [37, 56]
+            ]
+          }
+        },
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'MultiPolygon',
+            coordinates: [
+              [
+                [
+                  [38, 55],
+                  [38, 56],
+                  [37, 55],
+                  [38, 55]
+                ]
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  };
+  expect(getSelectionSetBounds([], [member])).toMatchInlineSnapshot(`
+    [
+      [
+        35.4,
+        53.4,
+      ],
+      [
+        38.6,
+        56.6,
+      ],
+    ]
+  `);
+  expect(getSelectionSetBounds([], [])).toBeUndefined();
 });
 
 it('frames canonical places independently of editorial geometry', () => {

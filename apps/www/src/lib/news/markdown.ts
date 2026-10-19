@@ -9,6 +9,7 @@ import {
 
 import { transformContentEmphasis } from '@/lib/markdown/content-emphasis';
 import { appendEditorialMapCaptions } from '@/lib/markdown/editorial-maps-companion';
+import type { EditorialMapSelectionResolver } from '@/lib/markdown/editorial-maps.types';
 
 import { absoluteUrl } from '../site';
 import { NEWS_LATEST_LIMIT } from './config';
@@ -232,7 +233,10 @@ export function buildNewsMonthMarkdown(input: { readonly archive: NewsMonthArchi
   ]);
 }
 
-export function buildNewsArticleMarkdown(article: NewsArticle): string {
+export function buildNewsArticleMarkdown(
+  article: NewsArticle,
+  editorialMapResolver?: EditorialMapSelectionResolver
+): string {
   return serializeMarkdownDocument(
     createMarkdownDocument({
       frontmatter: articleFrontmatter(article),
@@ -241,7 +245,8 @@ export function buildNewsArticleMarkdown(article: NewsArticle): string {
         ...(article.body
           ? appendEditorialMapCaptions(
               transformContentEmphasis(parseMarkdownFragment(article.body.trim()), 'markdown'),
-              `news article "${article.id}" body`
+              `news article "${article.id}" body`,
+              editorialMapResolver
             )
           : []),
         ...photoSection(article),

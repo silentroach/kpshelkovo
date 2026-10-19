@@ -9,6 +9,7 @@ import type {
 
 import type { ParcelPart } from '@/lib/parcels/schema';
 
+import { formatParcelLabel, getParcelLabelCodes, PARCEL_LABEL_MIN_ZOOM } from './parcel-label';
 import type {
   ParcelLabel,
   ParcelLayer,
@@ -16,10 +17,13 @@ import type {
   ParcelSelectionChange
 } from './parcel-layer-types';
 
-const LABEL_MIN_ZOOM = 17;
 const DETAILS_MIN_ZOOM = 18;
-const priceFormatter = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 });
-const areaFormatter = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
+const priceFormatter = new Intl.NumberFormat('ru-RU', {
+  maximumFractionDigits: 0
+});
+const areaFormatter = new Intl.NumberFormat('ru-RU', {
+  maximumFractionDigits: 2
+});
 
 const updateLabel = (label: ParcelLabel, item: ParcelMapItem, zoom: number): void => {
   const expanded =
@@ -73,12 +77,17 @@ export const createParcelLayer = (
   sdk: typeof ymaps3,
   container: HTMLElement,
   onSelectionChange: ParcelSelectionChange,
-  getDuration: () => number
+  getDuration: () => number,
+  onOutlineError?: (failed: boolean) => void
 ): ParcelLayer => {
   const itemsByPart = new Map<ParcelPart, readonly ParcelMapItem[]>();
   const features = new Map<string, YMapFeature>();
   const labels = new Map<string, ParcelLabel>();
   let selected: ParcelMapItem | undefined;
+  let membership = new Set<string>();
+  let outlineEnabled = false;
+  let outline: YMapFeature | undefined;
+  let outlineRevision = 0;
   let destroyed = false;
   let viewportZoom = map.zoom;
   let viewportBounds = map.bounds;
@@ -122,9 +131,47 @@ export const createParcelLayer = (
     stroke: [{ color: token('--parcel-map-selection'), width: 3 }]
   });
 
+  const memberStyle = (): DrawingStyle => ({
+    zIndex: -1,
+    interactive: true,
+    simplificationRate: 0,
+    fill: token('--parcel-map-set'),
+    fillOpacity: 0.22,
+    stroke: [{ color: token('--parcel-map-set'), width: 2, opacity: 0.9 }]
+  });
+  const baseStyle = (item: ParcelMapItem): DrawingStyle =>
+    membership.has(item.code) ? memberStyle() : normalStyle(item);
+
+  const refreshOutline = (): void => {
+    const revision = ++outlineRevision;
+    if (outline) map.removeChild(outline);
+    outline = undefined;
+    if (destroyed || !outlineEnabled) return;
+    const geometries = [...itemsByPart.values()].flatMap((items) =>
+      items.filter((item) => membership.has(item.code)).map((item) => item.geometry)
+    );
+    if (!geometries.length) return;
+    void import('./parcel-set-outline').then(
+      ({ createParcelSetOutline }) => {
+        if (destroyed || outlineRevision !== revision) return;
+        try {
+          const feature = createParcelSetOutline(sdk, geometries, token('--parcel-map-set'));
+          map.addChild(feature);
+          outline = feature;
+          onOutlineError?.(false);
+        } catch {
+          onOutlineError?.(true);
+        }
+      },
+      () => {
+        if (!destroyed && outlineRevision === revision) onOutlineError?.(true);
+      }
+    );
+  };
+
   const clearSelection = (notify = true): void => {
     if (!selected) return;
-    features.get(selected.code)?.update({ style: normalStyle(selected) });
+    features.get(selected.code)?.update({ style: baseStyle(selected) });
     selected = undefined;
     if (notify) onSelectionChange();
   };
@@ -142,7 +189,7 @@ export const createParcelLayer = (
     if (!itemsByPart.size || destroyed) return;
 
     const visible = new Set<string>();
-    if (zoom >= LABEL_MIN_ZOOM) {
+    if (zoom >= PARCEL_LABEL_MIN_ZOOM) {
       for (const items of itemsByPart.values())
         for (const item of items) {
           const [lng, lat] = item.labelCoordinates;
@@ -159,22 +206,14 @@ export const createParcelLayer = (
             updateLabel(existing, item, zoom);
             continue;
           }
-          const codes =
-            item.multipleCadastralParcels && item.aliases?.length
-              ? [
-                  item.code,
-                  ...item.aliases.toSorted((a, b) =>
-                    a.localeCompare(b, undefined, { numeric: true })
-                  )
-                ]
-              : [item.code];
+          const codes = getParcelLabelCodes(item);
           const button = document.createElement('button');
           button.type = 'button';
           button.className = 'parcel-map-label';
           if (item.status === 'unavailable') button.classList.add('parcel-map-label--unavailable');
           const text = document.createElement('span');
           text.className = 'parcel-map-label__number';
-          text.textContent = codes.map((code) => code.split('-')[1] ?? code).join('/');
+          text.textContent = formatParcelLabel(item);
           button.append(text);
           button.title = codes.join(' / ');
           button.setAttribute('aria-label', `Выбрать участок ${button.title}`);
@@ -212,6 +251,7 @@ export const createParcelLayer = (
       if (label) map.removeChild(label.marker);
       labels.delete(item.code);
     }
+    refreshOutline();
   };
 
   return {
@@ -223,13 +263,14 @@ export const createParcelLayer = (
           const feature = new sdk.YMapFeature({
             id: `parcel-${item.code}`,
             geometry: toMapGeometry(item.geometry),
-            style: normalStyle(item),
+            style: baseStyle(item),
             onClick: () => select(item)
           });
           features.set(item.code, feature);
           map.addChild(feature);
         }
         updateViewport(viewportZoom, viewportBounds);
+        refreshOutline();
       } catch (reason) {
         disable(part, false);
         throw reason;
@@ -238,6 +279,17 @@ export const createParcelLayer = (
     disable,
     clearSelection: () => {
       if (!destroyed) clearSelection();
+    },
+    setMembership(codes, enabled = false) {
+      if (destroyed) return;
+      membership = new Set(codes);
+      outlineEnabled = enabled;
+      for (const items of itemsByPart.values())
+        for (const item of items)
+          features.get(item.code)?.update({
+            style: selected?.code === item.code ? selectedStyle() : baseStyle(item)
+          });
+      refreshOutline();
     },
     focus(code) {
       if (destroyed) return false;
@@ -249,7 +301,7 @@ export const createParcelLayer = (
       map.update({
         location: {
           center: item.labelCoordinates,
-          zoom: LABEL_MIN_ZOOM,
+          zoom: PARCEL_LABEL_MIN_ZOOM,
           duration: getDuration(),
           easing: 'ease-in-out'
         }

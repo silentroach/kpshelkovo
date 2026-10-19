@@ -2,6 +2,7 @@ import type { APIRoute, GetStaticPaths } from 'astro';
 
 import { loadKbPages } from '@/lib/kb/load';
 import { buildKbPageMarkdown } from '@/lib/kb/markdown';
+import { loadEditorialMapResolverForMarkdown } from '@/lib/markdown/editorial-map-resolver-load';
 import { createMarkdownResponse } from '@/lib/markdown/response';
 
 export const prerender = true;
@@ -21,5 +22,6 @@ export const GET: APIRoute = async ({ params }) => {
     throw new Error(routeSlug ? `kb page "${routeSlug}" not found` : 'kb root page not found');
   }
 
-  return createMarkdownResponse(buildKbPageMarkdown(page));
+  const resolver = await loadEditorialMapResolverForMarkdown(page.body, page.canonical);
+  return createMarkdownResponse(buildKbPageMarkdown(page, resolver));
 };

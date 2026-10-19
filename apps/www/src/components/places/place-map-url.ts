@@ -1,4 +1,23 @@
 export const PLACE_HIGHLIGHT_QUERY_PARAM = 'h';
+export const SELECTION_SET_QUERY_PARAM = 'set';
+
+export const getUrlWithoutSelectionSet = (href: string): string => {
+  const url = new URL(href);
+  const query = url.search
+    .slice(1)
+    .split('&')
+    .filter((part) => {
+      const name = part.split('=')[0]!;
+      try {
+        return decodeURIComponent(name.replaceAll('+', ' ')) !== SELECTION_SET_QUERY_PARAM;
+      } catch {
+        return true;
+      }
+    })
+    .join('&');
+  url.search = query ? `?${query}` : '';
+  return `${url.pathname}${url.search}${url.hash}`;
+};
 
 export const getUrlWithoutPlaceHighlight = (
   href: string,
