@@ -1,8 +1,8 @@
 import VCard from 'vcard-creator';
 
+import { normalizeContactPhone } from '@/lib/contact-methods/phone';
 import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
 
-import { normalizeContactPhone } from './phone';
 import type { ContactVcfName, ContactWithVcf } from './types';
 import { contactExcerpt } from './view';
 

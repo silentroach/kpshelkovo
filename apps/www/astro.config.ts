@@ -57,13 +57,13 @@ export default defineConfig({
   cacheDir: '../../node_modules/.astro/www',
   fonts: wwwFonts,
   image: {
-    remotePatterns: [
-      {
+    remotePatterns: ['/news/**', '/ukogo/**', '/reviews/**', '/people/**', '/kb/**'].map(
+      (pathname) => ({
         protocol: 'https',
         hostname: 'media.kpshelkovo.online',
-        pathname: '/news/**'
-      }
-    ]
+        pathname
+      })
+    )
   },
   markdown: {
     syntaxHighlight: {

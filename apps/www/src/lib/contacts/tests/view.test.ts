@@ -1,8 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { formatContactPhone } from '../phone';
+import { formatContactPhone } from '@/lib/contact-methods/phone';
+import { contactMethods } from '@/lib/contact-methods/view';
+
 import {
-  contactMethods,
   contactPlace,
   formatContactCategory,
   formatContactReviewDate,

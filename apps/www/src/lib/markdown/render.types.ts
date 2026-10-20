@@ -22,6 +22,8 @@ export interface RenderSiteMarkdownOptions {
   readonly editorialMapSource?: string;
   /** IDs already used by the surrounding page (outside its Markdown body). */
   readonly reservedIds?: readonly string[];
+  /** Namespace this body's HTML targets independently from surrounding bodies. */
+  readonly idPrefix?: string;
 }
 
 export interface PreprocessedSiteMarkdown {

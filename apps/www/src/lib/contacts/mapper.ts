@@ -1,3 +1,4 @@
+import { mapRawContactMethods } from '@/lib/contact-methods/mapper';
 import {
   preprocessSiteMarkdownContent,
   type PreprocessedSiteMarkdown
@@ -6,7 +7,7 @@ import type { SiteMentionRegistry } from '@/lib/mentions';
 
 import type { ContactEntry } from './load';
 import { contactCanonical, contactMarkdownUrl, contactUrl, contactVcfUrl } from './routes';
-import type { Contact, ContactContacts, ContactLocation, ContactReview, ContactVcf } from './types';
+import type { Contact, ContactLocation, ContactReview, ContactVcf } from './types';
 
 const preprocessContactContent = (
   markdown: string,
@@ -24,14 +25,6 @@ const preprocessContactContent = (
     mentions: []
   };
 };
-
-const mapContacts = (contacts: ContactEntry['data']['contacts']): ContactContacts => ({
-  phone: contacts.phone,
-  telegram: contacts.telegram,
-  whatsapp: contacts.whatsapp,
-  email: contacts.email,
-  website: contacts.website
-});
 
 const mapLocation = (location: ContactEntry['data']['location']): ContactLocation | undefined =>
   location
@@ -119,7 +112,7 @@ export const mapRawContact = (
     updatedIso: entry.data.updated_at,
     summary: entry.data.summary,
     searchAliases: entry.data.search_aliases,
-    contacts: mapContacts(entry.data.contacts),
+    contacts: mapRawContactMethods(entry.data.contacts),
     location: mapLocation(entry.data.location),
     reviews: mapReviews(entry.data.reviews),
     seo: entry.data.seo,

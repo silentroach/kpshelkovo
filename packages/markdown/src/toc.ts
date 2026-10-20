@@ -14,7 +14,7 @@ import type {
   ThematicBreak
 } from 'mdast';
 
-import { uniqueHeadingSlug } from './heading-slugs';
+import { assignAuthoredHeadingIds, headingText, phrasingText } from './heading-ids';
 import type { TocEntry, TocBuildResult, TocGroup } from './toc-annotations.types';
 
 const TOC_PLACEHOLDER = '[TOC]';
@@ -96,21 +96,6 @@ const tocListItem = (entry: TocEntry, childLists: readonly List[] = []): ListIte
   ]
 });
 
-const phrasingText = (node: PhrasingContent): string => {
-  if ('value' in node && typeof node.value === 'string') {
-    return node.value;
-  }
-
-  if ('children' in node) {
-    return node.children.map(phrasingText).join('');
-  }
-
-  return '';
-};
-
-export const headingText = (heading: Heading): string =>
-  heading.children.map(phrasingText).join('').trim();
-
 const isTocLinkReference = (child: PhrasingContent): child is LinkReference =>
   child.type === 'linkReference' && child.identifier.toLowerCase() === TOC_REFERENCE_IDENTIFIER;
 
@@ -128,9 +113,8 @@ const isTocPlaceholder = (node: RootContent): boolean => {
 
 const collectTocEntries = (
   document: Root,
-  authoredIds?: ReadonlyMap<Heading, string>
+  authoredIds: ReadonlyMap<Heading, string>
 ): readonly TocEntry[] => {
-  const seenSlugs = new Set<string>();
   const entries: TocEntry[] = [];
   let group: TocGroup | undefined;
 
@@ -149,7 +133,10 @@ const collectTocEntries = (
       return;
     }
 
-    const slug = authoredIds?.get(node) ?? uniqueHeadingSlug(title, seenSlugs);
+    const slug = authoredIds.get(node);
+    if (!slug) {
+      throw new Error('TOC heading is missing its authored ID');
+    }
 
     if (node.depth > 1) {
       entries.push({ depth: node.depth, slug, title: node.data?.tocTitle ?? title, group });
@@ -264,7 +251,10 @@ export const expandTableOfContents = (
   document: Root,
   authoredIds?: ReadonlyMap<Heading, string>
 ): Root => {
-  const entries = collectTocEntries(document, authoredIds);
+  const entries = collectTocEntries(
+    document,
+    authoredIds ?? assignAuthoredHeadingIds(document).authoredIds
+  );
 
   return {
     ...document,

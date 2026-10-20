@@ -1,5 +1,6 @@
 import { z } from 'astro/zod';
 
+import { RawContactMethodsSchema } from '@/lib/contact-methods/raw-schema';
 import { RawSearchAliasesSchema } from '@/lib/search/raw-schema';
 
 import {
@@ -37,26 +38,6 @@ const contactDate = (name: string) =>
     });
 
     return z.NEVER;
-  });
-
-const contacts = z
-  .object({
-    phone: nonBlankText.optional(),
-    telegram: contactUrl.optional(),
-    whatsapp: contactUrl.optional(),
-    email: nonBlankText.email().optional(),
-    website: contactUrl.optional()
-  })
-  .strict()
-  .superRefine((value, ctx) => {
-    if (value.phone || value.telegram || value.whatsapp || value.email || value.website) {
-      return;
-    }
-
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'contacts must include at least one public contact method'
-    });
   });
 
 const location = z
@@ -100,11 +81,7 @@ const vcfName = z
   .strict();
 
 const vcfContactFields = {
-  phone: nonBlankText.optional(),
-  telegram: contactUrl.optional(),
-  whatsapp: contactUrl.optional(),
-  email: nonBlankText.email().optional(),
-  website: contactUrl.optional(),
+  ...RawContactMethodsSchema.shape,
   address: nonBlankText.optional(),
   job_title: nonBlankText.optional(),
   role: nonBlankText.optional(),
@@ -146,7 +123,7 @@ export const RawContactSchema = z
     updated_at: contactDate('updated_at'),
     summary: nonBlankText.optional(),
     search_aliases: RawSearchAliasesSchema.optional(),
-    contacts,
+    contacts: RawContactMethodsSchema,
     location: location.optional(),
     reviews: z.array(review).optional(),
     seo: seo.optional(),

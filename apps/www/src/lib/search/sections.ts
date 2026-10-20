@@ -37,6 +37,10 @@ export const SEARCH_SECTIONS = {
     id: 'sarafan',
     label: 'Сарафан'
   },
+  inventory: {
+    id: 'inventory',
+    label: 'У кого есть'
+  },
   compare: {
     id: 'compare',
     label: 'Сравнение поселков'

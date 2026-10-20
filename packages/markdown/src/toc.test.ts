@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   createMarkdownDocument,
+  expandTableOfContents,
   extractMarkdownText,
   parseMarkdownFragment,
   render,
@@ -23,6 +24,71 @@ const navigation = (
 };
 
 describe('authored TOC annotations', () => {
+  it('uses the HTML heading IDs for standalone TOC expansion in the GFM footnote namespace', () => {
+    const input =
+      '[TOC]\n\n## Footnote label\n\n## :toc-omit[user-content-]fn-note\n\n## user-content-fnref-note\n\nText[^note] [Footnote heading](#footnote-label).\n\n[^note]: Note.';
+    const expected = navigation(input);
+    expect(expected).toMatchInlineSnapshot(`
+      [
+        [
+          "Footnote label",
+          "#heading-footnote-label",
+        ],
+        [
+          "fn-note",
+          "#heading-user-content-fn-note",
+        ],
+        [
+          "user-content-fnref-note",
+          "#heading-user-content-fnref-note",
+        ],
+      ]
+    `);
+    for (const [, href] of expected) {
+      expect(document.getElementById(href!.slice(1))?.tagName).toBe('H2');
+    }
+    expect(
+      document.getElementById('heading-user-content-fn-note')?.getAttribute('aria-label')
+    ).toBe('user-content-fn-note');
+    expect(document.getElementById('footnote-label')?.closest('[data-footnotes]')).toBeTruthy();
+
+    const expanded = expandTableOfContents(
+      createMarkdownDocument({ children: parseMarkdownFragment(input) })
+    );
+    document.body.innerHTML = render(serializeMarkdownDocument(expanded));
+    expect(
+      [...document.querySelectorAll('body > ul a')].map((link) => [
+        link.textContent,
+        link.getAttribute('href')
+      ])
+    ).toEqual(expected);
+  });
+
+  it('reserves a nested heading before an identically named root TOC heading', () => {
+    const input = '[TOC]\n\n> ## Shared\n\n## Shared\n\n## Shared';
+    const expected = navigation(input);
+    expect(expected).toMatchInlineSnapshot(`
+      [
+        [
+          "Shared",
+          "#shared-2",
+        ],
+        [
+          "Shared",
+          "#shared-3",
+        ],
+      ]
+    `);
+    expect(document.querySelector('blockquote h2')?.id).toBe('shared');
+    document.body.innerHTML = render(companion(input));
+    expect(
+      [...document.querySelectorAll('body > ul a')].map((link) => [
+        link.textContent,
+        link.getAttribute('href')
+      ])
+    ).toEqual(expected);
+  });
+
   const source =
     '[TOC]\n\n# Document\n\n## Introduction\n\n### Details\n\n::toc-group[Main]\n\n## 3. Terms\n\n### 3.2 Detail\n\n::toc-group[Attachments]\n\n## :toc-omit[Attachment A:] 1. Services\n\n## :toc-omit[Attachment B:] 1. Services\n\n## :toc-omit[Attachment B:] 1. Services';
 

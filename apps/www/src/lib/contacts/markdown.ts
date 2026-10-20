@@ -6,10 +6,10 @@ import {
   serializeMarkdownDocument
 } from '@shelkovo/markdown';
 
+import { formatContactPhone } from '@/lib/contact-methods/phone';
 import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
 import { absoluteUrl } from '@/lib/site';
 
-import { formatContactPhone } from './phone';
 import type { Contact, ContactCategoryPage, ContactsDataset } from './types';
 import {
   CONTACTS_CHAT_LABEL,

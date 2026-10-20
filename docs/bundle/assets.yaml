@@ -34,6 +34,10 @@
   bytes: 700
   brotli: 244
   gzip: 289
+- file: static/ContactMethods.XXXXXXXX.css
+  bytes: 1657
+  brotli: 421
+  gzip: 518
 - file: static/EditorialMapScript.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 3265
   brotli: 1254
@@ -58,6 +62,14 @@
   bytes: 2533
   brotli: 955
   gzip: 1150
+- file: static/InventoryKindList.XXXXXXXX.css
+  bytes: 401
+  brotli: 191
+  gzip: 241
+- file: static/InventoryPage.XXXXXXXX.css
+  bytes: 448
+  brotli: 173
+  gzip: 218
 - file: static/LinkWithIcon.XXXXXXXX.css
   bytes: 488
   brotli: 200
@@ -92,8 +104,8 @@
   gzip: 3104
 - file: static/PlaceMap.XXXXXXXX.js
   bytes: 29821
-  brotli: 9555
-  gzip: 10751
+  brotli: 9557
+  gzip: 10753
 - file: static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 693
   brotli: 338
@@ -272,9 +284,9 @@
   brotli: 137
   gzip: 178
 - file: static/index-21.XXXXXXXX.css
-  bytes: 5019
-  brotli: 991
-  gzip: 1187
+  bytes: 3931
+  brotli: 805
+  gzip: 981
 - file: static/index-22.XXXXXXXX.css
   bytes: 715
   brotli: 193
@@ -307,6 +319,14 @@
   bytes: 5847
   brotli: 934
   gzip: 1105
+- file: static/index-30.XXXXXXXX.css
+  bytes: 1602
+  brotli: 481
+  gzip: 583
+- file: static/index-31.XXXXXXXX.css
+  bytes: 1063
+  brotli: 339
+  gzip: 437
 - file: static/index.astro_astro_type_script_index_0_lang-2.XXXXXXXX.js
   bytes: 5357
   brotli: 2403
@@ -358,9 +378,9 @@
   brotli: 159
   gzip: 182
 - file: static/parcel-layer.XXXXXXXX.js
-  bytes: 4534
-  brotli: 1812
-  gzip: 2084
+  bytes: 4539
+  brotli: 1820
+  gzip: 2094
 - file: static/parcel-set-outline.XXXXXXXX.js
   bytes: 42207
   brotli: 13640
