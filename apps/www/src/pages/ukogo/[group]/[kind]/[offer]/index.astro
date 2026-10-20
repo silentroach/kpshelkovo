@@ -1,0 +1,114 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { formatTextHtml } from '@shelkovo/typography';
+import ContactMethods from '@/components/contacts/ContactMethods.astro';
+import InventoryPage from '@/components/inventory/InventoryPage.astro';
+import InventoryPhotos from '@/components/inventory/InventoryPhotos.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { loadInventoryData } from '@/lib/inventory/load';
+import { inventoryUrl } from '@/lib/inventory/routes';
+import { formatInventoryPrice } from '@/lib/inventory/view';
+import { renderMarkdown } from '@/lib/markdown/render';
+import { SEARCH_SECTIONS } from '@/lib/search/sections';
+import type { SearchDocument } from '@/lib/search/types';
+
+export const getStaticPaths = (async () => {
+  const data = await loadInventoryData();
+  return data.offers.map((offer) => {
+    const kind = data.byKind.get(offer.kindId);
+    if (!kind) throw new Error(`inventory kind "${offer.kindId}" not found`);
+    return { params: { group: kind.group, kind: kind.id, offer: offer.id } };
+  });
+}) satisfies GetStaticPaths;
+
+const data = await loadInventoryData();
+const kind = data.byKind.get(Astro.params.kind ?? '');
+if (!kind || kind.group !== Astro.params.group)
+  throw new Error('inventory kind not found');
+const group = data.byGroup.get(kind.group);
+if (!group) throw new Error('inventory group not found');
+const offer = data.offers.find(
+  (item) => item.id === Astro.params.offer && item.kindId === kind.id,
+);
+if (!offer) throw new Error('inventory offer not found');
+const search: SearchDocument = {
+  scope: 'manual',
+  title: offer.title,
+  description: offer.summary,
+  section: SEARCH_SECTIONS.inventory,
+};
+const bodyHtml = renderMarkdown(offer.body, { idPrefix: offer.bodyIdPrefix });
+---
+
+<BaseLayout
+  title={`${offer.title} — У кого есть — Шелково Онлайн`}
+  description={offer.summary}
+  canonical={offer.url}
+  search={search}
+>
+  <InventoryPage
+    title={offer.title}
+    searchable
+    parents={[
+      { label: 'У кого есть', href: inventoryUrl() },
+      { label: group.title, href: group.url },
+      { label: kind.title, href: kind.url },
+    ]}
+  >
+    <div class="inventory-detail__terms" data-pagefind-ignore="all">
+      <p
+        class="inventory-detail__price ui-num"
+        set:html={formatTextHtml(formatInventoryPrice(offer.price))}
+      />
+      <p>
+        <span set:html={formatTextHtml(offer.owner.name)} />
+        {' · '}
+        <a class="site-text-link" href={offer.owner.parcel.url}>
+          Участок {offer.owner.parcel.code}
+        </a>
+      </p>
+      <ContactMethods
+        contacts={offer.owner.contacts}
+        headingId={`${offer.anchorId}-contacts`}
+        compact
+      />
+    </div>
+    <div class="inventory-detail__description" data-pagefind-body>
+      <p class="inventory-detail__kind" set:html={formatTextHtml(kind.title)} />
+      <p
+        class="inventory-detail__summary"
+        set:html={formatTextHtml(offer.summary)}
+      />
+      {bodyHtml && <div class="ui-prose" set:html={bodyHtml} />}
+    </div>
+    <InventoryPhotos photos={offer.photos} />
+    <p data-pagefind-ignore="all">
+      <a class="site-text-link" href={offer.listingUrl}>
+        Вернуться к списку: {kind.title}
+      </a>
+    </p>
+  </InventoryPage>
+</BaseLayout>
+
+<style>
+  .inventory-detail__terms {
+    display: grid;
+    gap: 0.625rem;
+    max-width: 52rem;
+  }
+  .inventory-detail__price {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  .inventory-detail__description {
+    max-width: 48rem;
+  }
+  .inventory-detail__kind {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+  .inventory-detail__summary {
+    margin-bottom: 1.25rem;
+  }
+</style>

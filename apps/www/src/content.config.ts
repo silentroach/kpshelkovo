@@ -8,6 +8,12 @@ import { contactSourceId } from '@/lib/contacts/source';
 import { rawMarkdownBody } from '@/lib/content-source';
 import { RawEventSchema } from '@/lib/events/raw-schema';
 import { eventSourceId } from '@/lib/events/source';
+import {
+  RawInventoryKindSchema,
+  RawInventoryOfferSchema,
+  RawInventoryOwnerSchema
+} from '@/lib/inventory/raw-schema';
+import { inventorySourceId } from '@/lib/inventory/source';
 import { RawKbPageSchema } from '@/lib/kb/raw-schema';
 import { kbPageSourceId } from '@/lib/kb/source';
 import { RawMeetingSchema, RawMeetingTranscriptSchema } from '@/lib/meetings/raw-schema';
@@ -152,6 +158,33 @@ const settlements = defineCollection({
   schema: SettlementSchema
 });
 
+const inventoryOwners = defineCollection({
+  loader: glob({
+    pattern: ['**/*.md', '!AGENTS.md', '!**/AGENTS.md'],
+    base: './src/data/inventory/owners',
+    generateId: ({ entry }) => inventorySourceId(entry)
+  }),
+  schema: RawInventoryOwnerSchema
+});
+
+const inventoryKinds = defineCollection({
+  loader: glob({
+    pattern: ['**/*.md', '!AGENTS.md', '!**/AGENTS.md'],
+    base: './src/data/inventory/kinds',
+    generateId: ({ entry }) => inventorySourceId(entry)
+  }),
+  schema: RawInventoryKindSchema
+});
+
+const inventoryOffers = defineCollection({
+  loader: glob({
+    pattern: ['**/*.md', '!AGENTS.md', '!**/AGENTS.md'],
+    base: './src/data/inventory/offers',
+    generateId: ({ entry }) => inventorySourceId(entry)
+  }),
+  schema: RawInventoryOfferSchema
+});
+
 export const collections = {
   events,
   newsAuthors,
@@ -166,5 +199,8 @@ export const collections = {
   meetingEntries,
   meetingTranscripts,
   reviews,
+  inventoryOwners,
+  inventoryKinds,
+  inventoryOffers,
   contacts
 };

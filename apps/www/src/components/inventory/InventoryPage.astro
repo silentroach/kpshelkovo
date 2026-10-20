@@ -1,0 +1,59 @@
+---
+import { formatTextHtml } from '@shelkovo/typography';
+import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
+
+interface Props {
+  readonly title: string;
+  readonly parents?: readonly {
+    readonly label: string;
+    readonly href: string;
+  }[];
+  readonly searchable?: boolean;
+}
+const { title, parents = [], searchable = false } = Astro.props;
+const breadcrumbs = withHomeBreadcrumbs([...parents, { label: title }]);
+---
+
+<main class="ui-page inventory-page">
+  <header class="ui-page-header">
+    <div class="ui-page-header-stack">
+      <Breadcrumbs items={breadcrumbs} />
+      <div>
+        <h1
+          class="ui-page-title"
+          data-pagefind-body={searchable || undefined}
+          set:html={formatTextHtml(title)}
+        />
+        <div class="inventory-page__intro">
+          <slot name="intro" />
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="inventory-page__content">
+    <slot />
+  </div>
+</main>
+
+<style>
+  .inventory-page {
+    padding-block-end: 3rem;
+    overflow-wrap: anywhere;
+  }
+  .inventory-page__intro:not(:empty) {
+    max-width: 48rem;
+    margin-block-start: 0.75rem;
+  }
+  .inventory-page__content {
+    padding-inline: 1.25rem;
+  }
+  .inventory-page__content > :global(:not(:last-child)) {
+    margin-block-end: 2rem;
+  }
+  @media (min-width: 48rem) {
+    .inventory-page__content {
+      padding-inline: 1.5rem;
+    }
+  }
+</style>

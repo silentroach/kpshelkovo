@@ -1,0 +1,43 @@
+---
+import LinkWithIcon from '@shelkovo/ui/LinkWithIcon.astro';
+import InventoryPage from '@/components/inventory/InventoryPage.astro';
+import InventoryKindList from '@/components/inventory/InventoryKindList.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { loadInventoryData } from '@/lib/inventory/load';
+import { inventoryUrl } from '@/lib/inventory/routes';
+import { inventoryContentsGroups } from '@/lib/inventory/view';
+const groups = inventoryContentsGroups(await loadInventoryData());
+---
+
+<BaseLayout
+  title="У кого есть — Шелково Онлайн"
+  description="Инвентарь у соседей в Шелково: предложения для стройки, сада и дома, условия пользования и контакты владельцев."
+  canonical={inventoryUrl()}
+>
+  <InventoryPage title="У кого есть">
+    <p slot="intro" class="ui-copy">
+      Хотите сдать инвентарь в аренду или дать попользоваться бесплатно?{' '}
+      Напишите{' '}
+      <LinkWithIcon
+        href="https://t.me/silentroach"
+        label="silentroach"
+        ariaLabel="Написать silentroach в Telegram"
+      />
+      .
+    </p>
+    {groups.length > 0 ? (
+      groups.map((group) => (
+        <section aria-labelledby={`group-${group.id}`}>
+          <h2 id={`group-${group.id}`} class="ui-group-title">
+            <a class="ui-title-link" href={group.url}>
+              {group.title}
+            </a>
+          </h2>
+          <InventoryKindList kinds={group.kinds} />
+        </section>
+      ))
+    ) : (
+      <p class="ui-copy">В каталоге пока нет предложений.</p>
+    )}
+  </InventoryPage>
+</BaseLayout>

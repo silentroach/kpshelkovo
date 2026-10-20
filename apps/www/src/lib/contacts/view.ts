@@ -1,15 +1,7 @@
 import { dateTimeFromISO, formatDate } from '@shelkovo/format';
 
-import { formatContactPhone, normalizeContactPhone } from './phone';
 import type { ContactCategory } from './schema';
-import type { ContactContacts, ContactLocation, ContactReview } from './types';
-
-export interface ContactMethod {
-  readonly type: keyof ContactContacts;
-  readonly label: string;
-  readonly value: string;
-  readonly href?: string;
-}
+import type { ContactLocation, ContactReview } from './types';
 
 export interface ContactPlace {
   readonly label: string;
@@ -67,41 +59,6 @@ export const CONTACTS_NEIGHBOR_TABLE_SUFFIX = '.';
 export const CONTACTS_EMPTY_MESSAGE =
   'Пока здесь ничего нет. Добавим контакты, когда появится живой опыт соседей.';
 
-const phoneHref = (phone: string): string | undefined => {
-  const normalized = normalizeContactPhone(phone);
-
-  return normalized ? `tel:${normalized}` : undefined;
-};
-
-const method = (
-  type: keyof ContactContacts,
-  label: string,
-  value: string | undefined,
-  href?: string
-): ContactMethod | undefined =>
-  value
-    ? {
-        type,
-        label,
-        value,
-        href
-      }
-    : undefined;
-
-const telegramValue = (url: string | undefined): string | undefined => {
-  if (!url) {
-    return;
-  }
-
-  try {
-    const username = new URL(url).pathname.split('/').find(Boolean);
-
-    return username ? `@${username}` : url;
-  } catch {
-    return url;
-  }
-};
-
 export const formatContactCategory = (category: ContactCategory): string =>
   CONTACT_CATEGORY_LABELS[category];
 
@@ -138,23 +95,6 @@ export const hasManyPositiveContactReviews = (
       ({ sentiment, publishedAt }) => sentiment === 'positive' && publishedAt > lastNegative
     ).length >= MANY_POSITIVE_CONTACT_REVIEWS_THRESHOLD
   );
-};
-
-export const contactMethods = (contacts: ContactContacts): readonly ContactMethod[] => {
-  const phone = contacts.phone ? formatContactPhone(contacts.phone) : undefined;
-
-  return [
-    method('phone', 'Телефон', phone, contacts.phone ? phoneHref(contacts.phone) : undefined),
-    method('telegram', 'Telegram', telegramValue(contacts.telegram), contacts.telegram),
-    method('whatsapp', 'WhatsApp', contacts.whatsapp, contacts.whatsapp),
-    method(
-      'email',
-      'Email',
-      contacts.email,
-      contacts.email ? `mailto:${contacts.email}` : undefined
-    ),
-    method('website', 'Сайт', contacts.website, contacts.website)
-  ].filter((item): item is ContactMethod => Boolean(item));
 };
 
 export const contactPlace = (location?: ContactLocation): ContactPlace | undefined =>

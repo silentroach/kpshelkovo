@@ -13,7 +13,13 @@ export type {
   MarkdownPhrasingInput
 } from './generate-types';
 export { resolveMarkdownResourceReferences } from './references';
+export { expandTableOfContents } from './toc';
 export { extractFirstMarkdownText, extractMarkdownText } from './plain-text';
-export { render } from './render';
-export type { MarkdownAstTransform, MarkdownPreprocessor, RenderOptions } from './render.types';
+export { render, renderWithMetadata } from './render';
+export type {
+  MarkdownAstTransform,
+  MarkdownPreprocessor,
+  RenderedMarkdown,
+  RenderOptions
+} from './render.types';
 export { rehypeTypograf, satteriTypograf } from './typography';
