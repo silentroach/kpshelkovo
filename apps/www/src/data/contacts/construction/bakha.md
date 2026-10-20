@@ -2,11 +2,15 @@
 title: Баха
 slug: bakha
 category: construction
-updated_at: 2026-10-18
+updated_at: 2026-10-20
 summary: 'Бригада разнорабочих: строительство, отделка и работы на участке'
 contacts:
   phone: '+7 926 983-01-21'
 reviews:
+  - sentiment: positive
+    summary: 'Черновое выравнивание участка: после звонка в воскресенье Баха прислал видеоотчёт уже в понедельник.'
+    published_at: 2026-10-19
+    url: https://t.me/shelkovoecoclub/15263/57838
   - sentiment: positive
     summary: 'Сделали две лестницы, дорожки и костровую зону. Результат понравился.'
     published_at: 2026-10-17
