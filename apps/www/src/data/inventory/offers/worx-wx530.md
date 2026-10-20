@@ -6,6 +6,12 @@ kind: circular-saws
 price:
   value: 500
   period: day
+photos:
+  - url: https://media.kpshelkovo.online/ukogo/worx-wx530/product.jpeg
+    width: 800
+    height: 800
+    alt: Аккумуляторная дисковая пила WORX WX530 и зарядное устройство
+    caption: Фото модели из магазина. Зарядное устройство по запросу.
 ---
 
 Для прямых и наклонных пропилов по дереву. Работает от аккумулятора WORX PowerShare 20 В, без подключения к розетке.
