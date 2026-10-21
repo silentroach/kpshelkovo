@@ -61,7 +61,11 @@ const bodyHtml = renderMarkdown(offer.body, { idPrefix: offer.bodyIdPrefix });
         set:html={formatTextHtml(formatInventoryPrice(offer.price))}
       />
       <p>
-        <span set:html={formatTextHtml(offer.owner.name)} />
+        <a
+          class="site-text-link"
+          href={offer.owner.url}
+          set:html={formatTextHtml(offer.owner.name)}
+        />
         {' · '}
         <a class="site-text-link" href={offer.owner.parcel.url}>
           Участок {offer.owner.parcel.code}
@@ -82,11 +86,6 @@ const bodyHtml = renderMarkdown(offer.body, { idPrefix: offer.bodyIdPrefix });
       {bodyHtml && <div class="ui-prose" set:html={bodyHtml} />}
     </div>
     <InventoryPhotos photos={offer.photos} />
-    <p data-pagefind-ignore="all">
-      <a class="site-text-link" href={offer.listingUrl}>
-        Вернуться к списку: {kind.title}
-      </a>
-    </p>
   </InventoryPage>
 </BaseLayout>
 

@@ -3,13 +3,15 @@ import { Window } from 'happy-dom';
 import { describe, expect, it } from 'vitest';
 
 import { renderMarkdownWithMetadata } from '@/lib/markdown/render';
+import { absoluteUrl } from '@/lib/site';
 
 import { buildInventoryDataset } from '../load';
 import {
   buildInventoryGroupMarkdown,
   buildInventoryHomeMarkdown,
   buildInventoryKindMarkdown,
-  buildInventoryOfferMarkdown
+  buildInventoryOfferMarkdown,
+  buildInventoryOwnerMarkdown
 } from '../markdown';
 import { kindEntry, offerEntry, ownerEntry, parcels } from './fixtures';
 
@@ -110,7 +112,6 @@ describe('inventory Markdown companions', () => {
           "https://kpshelkovo.online/ukogo/construction/grinder/index.md",
         ]
       `);
-    expect(document.body.textContent).toContain('1 предложение');
     expect(markdown).not.toContain('/home/');
     const group = data.byGroup.get('construction')!;
     const groupMarkdown = buildInventoryGroupMarkdown(group);
@@ -186,7 +187,7 @@ describe('inventory Markdown companions', () => {
     }
   });
 
-  it('preserves all price variants, owner contacts, parcel and photo alternatives/captions', () => {
+  it('preserves prices, owners, parcels and photos while keeping contacts in detail companions', () => {
     const photoUrl = 'https://media.kpshelkovo.online/ukogo/fixed/tool.jpeg';
     const data = buildInventoryDataset(
       {
@@ -235,7 +236,11 @@ describe('inventory Markdown companions', () => {
       ['Бесплатно', '350 ₽/сутки', 'Цена по договорённости'].every((price) => text.includes(price))
     ).toBe(true);
     expect([...document.querySelectorAll('a[href^="tel:"]')]).toHaveLength(0);
-    expect(document.body.textContent).toContain('Телефон: 123 доб. 4');
+    expect(document.body.textContent).not.toContain('123 доб. 4');
+    expect(document.body.textContent).toContain(`Владелец: ${kind.offers[0]!.owner.name}`);
+    expect(
+      document.querySelectorAll('a[href="https://kpshelkovo.online/ukogo/owners/anna/index.md"]')
+    ).toHaveLength(3);
     expect(
       [...document.querySelectorAll('a[href]')].filter((a) =>
         [
@@ -245,7 +250,7 @@ describe('inventory Markdown companions', () => {
           'https://example.com/'
         ].includes(a.getAttribute('href')!)
       )
-    ).toHaveLength(12);
+    ).toHaveLength(0);
     expect(
       document.querySelectorAll('a[href="https://kpshelkovo.online/map/?p=SHR-L43"]')
     ).toHaveLength(3);
@@ -270,12 +275,35 @@ describe('inventory Markdown companions', () => {
       document.body.innerHTML = render(detail);
       const detailText = document.body.textContent.replace(/[\u00a0\u202f]/gu, ' ');
       expect(detailText).toContain(offer.summary);
+      expect(
+        document.querySelector('a[href="https://kpshelkovo.online/ukogo/owners/anna/index.md"]')
+          ?.textContent
+      ).toBe(offer.owner.name);
       expect(detailText).toContain(expectedPrices.get(offer.id)!);
       expect(
         document.querySelector('a[href="https://kpshelkovo.online/map/?p=SHR-L43"]')
       ).toBeTruthy();
       expect(document.body.textContent).toContain('Телефон: 123 доб. 4');
       expect(document.querySelector('a[href^="tel:"]')).toBeFalsy();
+      expect(
+        [...document.querySelectorAll('a[href]')]
+          .map((link) => link.getAttribute('href'))
+          .filter((href) =>
+            [
+              'https://t.me/example',
+              'https://wa.me/79000000000',
+              'mailto:anna@example.com',
+              'https://example.com/'
+            ].includes(href!)
+          )
+      ).toMatchInlineSnapshot(`
+        [
+          "https://t.me/example",
+          "https://wa.me/79000000000",
+          "mailto:anna@example.com",
+          "https://example.com/",
+        ]
+      `);
       expect(detail).toContain(offer.canonical);
       expect(detail).toContain(`https://kpshelkovo.online${offer.listingUrl}`);
       expect(detail).not.toContain('https://t.me/silentroach');
@@ -301,6 +329,104 @@ describe('inventory Markdown companions', () => {
         ]
       `);
     expect(document.body.textContent).toContain('Два **диска** [в комплекте].');
+  });
+
+  it('groups only the owner’s compact offers with one contact and parcel in the header', () => {
+    const photoUrl = 'https://media.kpshelkovo.online/ukogo/first/tool.jpeg';
+    const data = buildInventoryDataset(
+      {
+        owners: [
+          ownerEntry(),
+          ownerEntry('boris', { name: 'Борис', contacts: { email: 'boris@example.com' } })
+        ],
+        kinds: [kindEntry('vacuum', { title: 'Пылесос', group: 'home' }), kindEntry()],
+        offers: [
+          offerEntry('second', { title: 'Яркая модель' }),
+          offerEntry(
+            'first',
+            {
+              title: 'Альфа',
+              photos: [
+                {
+                  url: photoUrl,
+                  width: 1200,
+                  height: 800,
+                  alt: 'Комплект',
+                  caption: 'Фото комплекта'
+                }
+              ]
+            },
+            'Полный body не нужен в списке.'
+          ),
+          offerEntry('vacuum', { kind: 'vacuum', title: 'Домашний', price: 0 }),
+          offerEntry('foreign', { owner: 'boris', title: 'Чужое предложение' })
+        ]
+      },
+      { parcels }
+    );
+    const owner = data.byOwner.get('anna')!;
+    const markdown = buildInventoryOwnerMarkdown(owner, data);
+    document.body.innerHTML = render(markdown);
+    const text = document.body.textContent.replace(/[\u00a0\u202f]/gu, ' ');
+    expect(document.querySelector('h1')?.textContent).toContain(owner.name);
+    expect(
+      [
+        ...document.querySelectorAll(
+          'h2 > a:not(.ui-heading-anchor), h3 > a:not(.ui-heading-anchor)'
+        )
+      ].map((link) => link.getAttribute('href'))
+    ).toMatchInlineSnapshot(`
+      [
+        "https://kpshelkovo.online/ukogo/construction/grinder/index.md",
+        "https://kpshelkovo.online/ukogo/construction/grinder/first/index.md",
+        "https://kpshelkovo.online/ukogo/construction/grinder/second/index.md",
+        "https://kpshelkovo.online/ukogo/home/vacuum/index.md",
+        "https://kpshelkovo.online/ukogo/home/vacuum/vacuum/index.md",
+      ]
+    `);
+    expect(document.querySelectorAll('a[href="https://t.me/example"]')).toHaveLength(1);
+    expect(
+      document.querySelectorAll('a[href="https://kpshelkovo.online/map/?p=SHR-L43"]')
+    ).toHaveLength(1);
+    expect(document.body.textContent.match(/Анна/gu)).toHaveLength(1);
+    expect(markdown).not.toMatch(/Борис|Чужое предложение|boris@example|Полный body|Владелец:/u);
+    expect(document.querySelectorAll('h2')).toHaveLength(2);
+    expect(document.querySelectorAll('h3')).toHaveLength(3);
+    expect(document.querySelector('img')?.getAttribute('src')).toBe(photoUrl);
+    expect(document.querySelector('img')?.parentElement?.getAttribute('href')).toBe(
+      absoluteUrl(data.offers.find((offer) => offer.id === 'first')!.markdownUrl)
+    );
+    expect(document.body.textContent).toContain('Фото комплекта');
+    expect(
+      data.offers
+        .filter((offer) => offer.owner.id === owner.id)
+        .every((offer) => text.includes(offer.summary))
+    ).toBe(true);
+    expect(document.body.textContent).toContain('Бесплатно');
+    expect(document.querySelector(`a[href="${owner.canonical}"]`)).toBeTruthy();
+    expect(markdown).toContain('/ukogo/index.md');
+  });
+
+  it('keeps the existing owner’s companion before their first and after their last offer', () => {
+    const source = { owners: [ownerEntry()], kinds: [kindEntry()], offers: [] };
+    const empty = buildInventoryDataset(source, { parcels });
+    const populated = buildInventoryDataset({ ...source, offers: [offerEntry()] }, { parcels });
+    const removed = buildInventoryDataset(source, { parcels });
+    const owner = populated.byOwner.get('anna')!;
+    for (const data of [empty, removed]) {
+      const markdown = buildInventoryOwnerMarkdown(data.byOwner.get('anna')!, data);
+      document.body.innerHTML = render(markdown);
+      expect(markdown).toContain(owner.canonical);
+      expect(markdown).toContain('/ukogo/index.md');
+      expect(document.body.textContent).toContain(owner.name);
+      expect(document.body.textContent).toContain('Пока нет предложений.');
+      expect(document.querySelectorAll('a[href="https://t.me/example"]')).toHaveLength(1);
+      expect(
+        document.querySelectorAll('a[href="https://kpshelkovo.online/map/?p=SHR-L43"]')
+      ).toHaveLength(1);
+      expect(document.querySelectorAll('h2, h3, img')).toHaveLength(0);
+      expect(markdown).not.toContain('https://t.me/silentroach');
+    }
   });
 
   it('keeps body and return links when the last offer is removed, and the root invitation when empty', () => {

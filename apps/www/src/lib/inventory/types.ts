@@ -11,7 +11,7 @@ export interface InventoryLinks {
   readonly canonical: string;
 }
 
-export interface InventoryOwner {
+export interface InventoryOwner extends InventoryLinks {
   readonly id: string;
   readonly name: string;
   readonly contacts: ContactMethods;
@@ -74,6 +74,7 @@ export interface InventoryDataset {
   readonly offers: readonly InventoryOffer[];
   readonly byGroup: ReadonlyMap<InventoryGroupId, InventoryGroup>;
   readonly byKind: ReadonlyMap<string, InventoryKind>;
+  readonly byOwner: ReadonlyMap<string, InventoryOwner>;
 }
 
 export interface InventoryBuildOptions {
@@ -83,6 +84,9 @@ export interface InventoryBuildOptions {
 
 export interface InventoryGroupRouteInput {
   readonly group: string;
+}
+export interface InventoryOwnerRouteInput {
+  readonly id: string;
 }
 export interface InventoryKindRouteInput extends InventoryGroupRouteInput {
   readonly id: string;

@@ -5,7 +5,8 @@ import { isInventoryId } from './schema';
 import type {
   InventoryGroupRouteInput,
   InventoryKindRouteInput,
-  InventoryOfferRouteInput
+  InventoryOfferRouteInput,
+  InventoryOwnerRouteInput
 } from './types';
 
 export const inventoryPath = (): string => '/ukogo/';
@@ -13,6 +14,19 @@ export const inventoryMarkdownPath = (): string => '/ukogo/index.md';
 export const inventoryUrl = (): string => withBase(inventoryPath());
 export const inventoryMarkdownUrl = (): string => withBase(inventoryMarkdownPath());
 export const inventoryCanonical = (): string => canon(inventoryPath());
+
+export const inventoryOwnerPath = ({ id }: InventoryOwnerRouteInput): string => {
+  if (!isInventoryId(id)) throw new Error(`inventory owner id "${id}" is invalid`);
+  return `${inventoryPath()}owners/${id}/`;
+};
+export const inventoryOwnerMarkdownPath = (input: InventoryOwnerRouteInput): string =>
+  `${inventoryOwnerPath(input)}index.md`;
+export const inventoryOwnerUrl = (input: InventoryOwnerRouteInput): string =>
+  withBase(inventoryOwnerPath(input));
+export const inventoryOwnerMarkdownUrl = (input: InventoryOwnerRouteInput): string =>
+  withBase(inventoryOwnerMarkdownPath(input));
+export const inventoryOwnerCanonical = (input: InventoryOwnerRouteInput): string =>
+  canon(inventoryOwnerPath(input));
 
 export const inventoryGroupPath = ({ group }: InventoryGroupRouteInput): string => {
   if (!isInventoryGroup(group)) throw new Error(`inventory group "${group}" is invalid`);
@@ -60,6 +74,8 @@ export const inventoryOfferAnchor = (id: string): string => {
 };
 
 export const inventoryGroupPattern = (): string => '/ukogo/:group/';
+export const inventoryOwnerPattern = (): string => '/ukogo/owners/:owner/';
+export const inventoryOwnerMarkdownPattern = (): string => '/ukogo/owners/:owner/index.md';
 export const inventoryGroupMarkdownPattern = (): string => '/ukogo/:group/index.md';
 export const inventoryKindPattern = (): string => '/ukogo/:group/:kind/';
 export const inventoryKindMarkdownPattern = (): string => '/ukogo/:group/:kind/index.md';

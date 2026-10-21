@@ -8,7 +8,9 @@ import {
   inventoryKindPattern,
   inventoryKindMarkdownPattern,
   inventoryOfferPattern,
-  inventoryOfferMarkdownPattern
+  inventoryOfferMarkdownPattern,
+  inventoryOwnerPattern,
+  inventoryOwnerMarkdownPattern
 } from './routes';
 
 export const inventoryPublicSurfaceSlice = {
@@ -77,6 +79,28 @@ export const inventoryPublicSurfaceSlice = {
       id: 'inventory:kind-markdown',
       label: 'Markdown вида инвентаря',
       routePattern: inventoryKindMarkdownPattern(),
+      mediaType: 'text/markdown',
+      cacheClass: 'markdown',
+      discoveryRoles: ['markdown-companion'],
+      linkRelations: [{ rel: 'describedby', href: '/llms.txt', mediaType: 'text/plain' }]
+    },
+    {
+      id: 'inventory:owner',
+      label: 'Владелец инвентаря',
+      routePattern: inventoryOwnerPattern(),
+      mediaType: 'text/html',
+      cacheClass: 'html',
+      discoveryRoles: ['detail-page'],
+      acceptsNegotiation: 'required',
+      linkRelations: [
+        { rel: 'alternate', href: inventoryOwnerMarkdownPattern(), mediaType: 'text/markdown' },
+        { rel: 'describedby', href: '/llms.txt', mediaType: 'text/plain' }
+      ]
+    },
+    {
+      id: 'inventory:owner-markdown',
+      label: 'Markdown владельца инвентаря',
+      routePattern: inventoryOwnerMarkdownPattern(),
       mediaType: 'text/markdown',
       cacheClass: 'markdown',
       discoveryRoles: ['markdown-companion'],

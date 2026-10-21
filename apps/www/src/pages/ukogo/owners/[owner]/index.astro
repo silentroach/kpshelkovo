@@ -1,0 +1,75 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { formatTextHtml } from '@shelkovo/typography';
+import ContactMethods from '@/components/contacts/ContactMethods.astro';
+import InventoryOffer from '@/components/inventory/InventoryOffer.astro';
+import InventoryPage from '@/components/inventory/InventoryPage.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { loadInventoryData } from '@/lib/inventory/load';
+import { inventoryUrl } from '@/lib/inventory/routes';
+import { inventoryOwnerKinds } from '@/lib/inventory/view';
+
+export const getStaticPaths = (async () => {
+  const data = await loadInventoryData();
+  return data.owners.map((owner) => ({ params: { owner: owner.id } }));
+}) satisfies GetStaticPaths;
+
+const data = await loadInventoryData();
+const owner = data.byOwner.get(Astro.params.owner ?? '');
+if (!owner) throw new Error('inventory owner not found');
+const kinds = inventoryOwnerKinds(data, owner.id);
+---
+
+<BaseLayout
+  title={`${owner.name} — У кого есть — Шелково Онлайн`}
+  description={`Инвентарь и контакты: ${owner.name}, участок ${owner.parcel.code}.`}
+  canonical={owner.url}
+>
+  <InventoryPage
+    title={owner.name}
+    parents={[{ label: 'У кого есть', href: inventoryUrl() }]}
+  >
+    <div slot="intro" class="inventory-owner__contacts">
+      <p>
+        <a class="site-text-link" href={owner.parcel.url}>
+          Участок {owner.parcel.code}
+        </a>
+      </p>
+      <ContactMethods
+        contacts={owner.contacts}
+        headingId={`owner-${owner.id}-contacts`}
+        compact
+      />
+    </div>
+    {kinds.map((kind) => (
+      <section aria-labelledby={`owner-${owner.id}-kind-${kind.id}`}>
+        <h2
+          id={`owner-${owner.id}-kind-${kind.id}`}
+          class="ui-section-title inventory-owner__kind"
+        >
+          <a
+            class="ui-title-link"
+            href={kind.url}
+            set:html={formatTextHtml(kind.title)}
+          />
+        </h2>
+        {kind.offers.map((offer) => (
+          <InventoryOffer offer={offer} showOwner={false} headingLevel="h3" />
+        ))}
+      </section>
+    ))}
+    {kinds.length === 0 && (
+      <p class="ui-muted">Сейчас нет предложений этого владельца.</p>
+    )}
+  </InventoryPage>
+</BaseLayout>
+
+<style>
+  .inventory-owner__contacts {
+    display: grid;
+    gap: 0.625rem;
+  }
+  .inventory-owner__kind {
+    margin-block-end: 1.25rem;
+  }
+</style>

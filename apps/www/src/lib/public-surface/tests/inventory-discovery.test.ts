@@ -1,10 +1,22 @@
-import { expect, it } from 'vitest';
+import type { APIContext } from 'astro';
+import { createContext } from 'astro/middleware';
+import { expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
 import { catalog } from '@/lib/discovery';
+import * as inventoryLoad from '@/lib/inventory/load';
+import { ownerEntry, kindEntry, offerEntry, parcels } from '@/lib/inventory/tests/fixtures';
 import { build } from '@/lib/llms';
 import { llmsPathForPage, publicSurfaceRegistry } from '@/lib/public-surface';
 import { applySitemapMetadata, shouldIncludeSitemapPage } from '@/lib/sitemap';
+import { GET, getStaticPaths } from '@/pages/ukogo/owners/[owner]/index.md';
+
+const ownerContext = (owner: string): APIContext =>
+  createContext({
+    request: new Request(`https://kpshelkovo.online/ukogo/owners/${owner}/index.md`),
+    params: { owner },
+    defaultLocale: 'ru'
+  });
 
 it('discovers the inventory Markdown entry without inventing a feed or section guide', () => {
   const payload = z
@@ -43,6 +55,8 @@ it('keeps every HTML level indexable with Markdown negotiation and the root guid
       "/ukogo/:group/index.md",
       "/ukogo/:group/:kind/",
       "/ukogo/:group/:kind/index.md",
+      "/ukogo/owners/:owner/",
+      "/ukogo/owners/:owner/index.md",
       "/ukogo/:group/:kind/:offer/",
       "/ukogo/:group/:kind/:offer/index.md",
     ]
@@ -56,5 +70,58 @@ it('keeps every HTML level indexable with Markdown negotiation and the root guid
     ]);
     expect(shouldIncludeSitemapPage(path)).toBe(true);
     expect(applySitemapMetadata({ url: path }, new Map())).toEqual({ url: path });
+  }
+});
+
+it('generates companions for populated and empty owners, but not deleted or unknown owners', async () => {
+  const data = inventoryLoad.buildInventoryDataset(
+    {
+      owners: [ownerEntry(), ownerEntry('boris', { name: 'Борис' })],
+      kinds: [kindEntry()],
+      offers: [offerEntry()]
+    },
+    { parcels }
+  );
+  const load = vi.spyOn(inventoryLoad, 'loadInventoryData').mockResolvedValue(data);
+  try {
+    const paths = await getStaticPaths();
+    expect(paths).toMatchInlineSnapshot(`
+      [
+        {
+          "params": {
+            "owner": "anna",
+          },
+        },
+        {
+          "params": {
+            "owner": "boris",
+          },
+        },
+      ]
+    `);
+    for (const { params } of paths) {
+      const owner = data.byOwner.get(params.owner)!;
+      expect(owner.markdownUrl).toBe(`/ukogo/owners/${params.owner}/index.md`);
+      expect(owner.canonical).toBe(`https://kpshelkovo.online/ukogo/owners/${params.owner}/`);
+      expect(shouldIncludeSitemapPage(owner.canonical)).toBe(true);
+      const response = await GET(ownerContext(params.owner));
+      expect(response.headers.get('content-type')).toBe('text/markdown; charset=utf-8');
+      const text = await response.text();
+      expect(text).toContain(owner.canonical);
+      expect(text.includes('Пока нет предложений.')).toBe(params.owner === 'boris');
+    }
+    await expect(GET(ownerContext('missing'))).rejects.toThrow(
+      'inventory owner "missing" not found'
+    );
+    load.mockResolvedValue(
+      inventoryLoad.buildInventoryDataset(
+        { owners: [ownerEntry()], kinds: [kindEntry()], offers: [offerEntry()] },
+        { parcels }
+      )
+    );
+    expect((await getStaticPaths()).map(({ params }) => params.owner)).toEqual(['anna']);
+    await expect(GET(ownerContext('boris'))).rejects.toThrow('inventory owner "boris" not found');
+  } finally {
+    load.mockRestore();
   }
 });
