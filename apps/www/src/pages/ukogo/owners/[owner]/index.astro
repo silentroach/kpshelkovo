@@ -1,13 +1,12 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import { formatTextHtml } from '@shelkovo/typography';
 import ContactMethods from '@/components/contacts/ContactMethods.astro';
 import InventoryOffer from '@/components/inventory/InventoryOffer.astro';
 import InventoryPage from '@/components/inventory/InventoryPage.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { loadInventoryData } from '@/lib/inventory/load';
 import { inventoryUrl } from '@/lib/inventory/routes';
-import { inventoryOwnerKinds } from '@/lib/inventory/view';
+import { inventoryOwnerOffers } from '@/lib/inventory/view';
 
 export const getStaticPaths = (async () => {
   const data = await loadInventoryData();
@@ -17,7 +16,7 @@ export const getStaticPaths = (async () => {
 const data = await loadInventoryData();
 const owner = data.byOwner.get(Astro.params.owner ?? '');
 if (!owner) throw new Error('inventory owner not found');
-const kinds = inventoryOwnerKinds(data, owner.id);
+const offers = inventoryOwnerOffers(data, owner.id);
 ---
 
 <BaseLayout
@@ -27,6 +26,7 @@ const kinds = inventoryOwnerKinds(data, owner.id);
 >
   <InventoryPage
     title={owner.name}
+    breadcrumbLabel={`${owner.name}: инвентарь`}
     parents={[{ label: 'У кого есть', href: inventoryUrl() }]}
   >
     <div slot="intro" class="inventory-owner__contacts">
@@ -41,24 +41,17 @@ const kinds = inventoryOwnerKinds(data, owner.id);
         compact
       />
     </div>
-    {kinds.map((kind) => (
-      <section aria-labelledby={`owner-${owner.id}-kind-${kind.id}`}>
-        <h2
-          id={`owner-${owner.id}-kind-${kind.id}`}
-          class="ui-section-title inventory-owner__kind"
-        >
-          <a
-            class="ui-title-link"
-            href={kind.url}
-            set:html={formatTextHtml(kind.title)}
+    {offers.length > 0 ? (
+      <div>
+        {offers.map((offer) => (
+          <InventoryOffer
+            offer={offer}
+            showOwner={false}
+            kind={data.byKind.get(offer.kindId)}
           />
-        </h2>
-        {kind.offers.map((offer) => (
-          <InventoryOffer offer={offer} showOwner={false} headingLevel="h3" />
         ))}
-      </section>
-    ))}
-    {kinds.length === 0 && (
+      </div>
+    ) : (
       <p class="ui-muted">Сейчас нет предложений этого владельца.</p>
     )}
   </InventoryPage>
@@ -68,8 +61,5 @@ const kinds = inventoryOwnerKinds(data, owner.id);
   .inventory-owner__contacts {
     display: grid;
     gap: 0.625rem;
-  }
-  .inventory-owner__kind {
-    margin-block-end: 1.25rem;
   }
 </style>

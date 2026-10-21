@@ -1,20 +1,17 @@
 import { compareRuText, formatNumberUnitRu } from '@shelkovo/format';
 
-import type { InventoryDataset, InventoryGroup, InventoryKind, InventoryPrice } from './types';
+import type { InventoryDataset, InventoryGroup, InventoryOffer, InventoryPrice } from './types';
 
 export const inventoryContentsGroups = (dataset: InventoryDataset): readonly InventoryGroup[] =>
   dataset.groups.filter((group) => group.kinds.length > 0);
 
-export const inventoryOwnerKinds = (
+export const inventoryOwnerOffers = (
   dataset: InventoryDataset,
   ownerId: string
-): readonly InventoryKind[] =>
-  dataset.kinds.flatMap((kind) => {
-    const offers = dataset.offers
-      .filter((offer) => offer.kindId === kind.id && offer.owner.id === ownerId)
-      .sort((a, b) => compareRuText(a.title, b.title) || compareRuText(a.id, b.id));
-    return offers.length > 0 ? [{ ...kind, offers }] : [];
-  });
+): readonly InventoryOffer[] =>
+  dataset.offers
+    .filter((offer) => offer.owner.id === ownerId)
+    .sort((a, b) => compareRuText(a.title, b.title) || compareRuText(a.id, b.id));
 
 export const formatInventoryPrice = (price: InventoryPrice): string => {
   switch (price.type) {

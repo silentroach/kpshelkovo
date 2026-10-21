@@ -331,7 +331,7 @@ describe('inventory Markdown companions', () => {
     expect(document.body.textContent).toContain('Два **диска** [в комплекте].');
   });
 
-  it('groups only the owner’s compact offers with one contact and parcel in the header', () => {
+  it('lists only the owner’s compact offers with kind links and one contact and parcel in the header', () => {
     const photoUrl = 'https://media.kpshelkovo.online/ukogo/first/tool.jpeg';
     const data = buildInventoryDataset(
       {
@@ -370,18 +370,17 @@ describe('inventory Markdown companions', () => {
     const text = document.body.textContent.replace(/[\u00a0\u202f]/gu, ' ');
     expect(document.querySelector('h1')?.textContent).toContain(owner.name);
     expect(
-      [
-        ...document.querySelectorAll(
-          'h2 > a:not(.ui-heading-anchor), h3 > a:not(.ui-heading-anchor)'
-        )
-      ].map((link) => link.getAttribute('href'))
+      [...document.querySelectorAll('h2 > a:not(.ui-heading-anchor)')].map((link) =>
+        link.getAttribute('href')
+      )
     ).toMatchInlineSnapshot(`
       [
         "https://kpshelkovo.online/ukogo/construction/grinder/index.md",
         "https://kpshelkovo.online/ukogo/construction/grinder/first/index.md",
-        "https://kpshelkovo.online/ukogo/construction/grinder/second/index.md",
         "https://kpshelkovo.online/ukogo/home/vacuum/index.md",
         "https://kpshelkovo.online/ukogo/home/vacuum/vacuum/index.md",
+        "https://kpshelkovo.online/ukogo/construction/grinder/index.md",
+        "https://kpshelkovo.online/ukogo/construction/grinder/second/index.md",
       ]
     `);
     expect(document.querySelectorAll('a[href="https://t.me/example"]')).toHaveLength(1);
@@ -390,8 +389,8 @@ describe('inventory Markdown companions', () => {
     ).toHaveLength(1);
     expect(document.body.textContent.match(/Анна/gu)).toHaveLength(1);
     expect(markdown).not.toMatch(/Борис|Чужое предложение|boris@example|Полный body|Владелец:/u);
-    expect(document.querySelectorAll('h2')).toHaveLength(2);
-    expect(document.querySelectorAll('h3')).toHaveLength(3);
+    expect(document.querySelectorAll('h2')).toHaveLength(3);
+    expect(document.querySelectorAll('h3')).toHaveLength(0);
     expect(document.querySelector('img')?.getAttribute('src')).toBe(photoUrl);
     expect(document.querySelector('img')?.parentElement?.getAttribute('href')).toBe(
       absoluteUrl(data.offers.find((offer) => offer.id === 'first')!.markdownUrl)
