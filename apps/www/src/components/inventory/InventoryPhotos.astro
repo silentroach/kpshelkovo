@@ -4,8 +4,9 @@ import { formatText } from '@shelkovo/typography';
 import type { InventoryPhoto } from '@/lib/inventory/types';
 interface Props {
   readonly photos: readonly InventoryPhoto[];
+  readonly leading?: boolean;
 }
-const { photos } = Astro.props;
+const { photos, leading = false } = Astro.props;
 const gallery = photos.map((photo) => {
   const width = Math.min(photo.width, 1600);
   return {
@@ -22,8 +23,11 @@ const gallery = photos.map((photo) => {
 ---
 
 {gallery.length > 0 && (
-  <div class="inventory-photos" data-pagefind-ignore="all">
-    {gallery.map(({ photo, width, height, widths }) => (
+  <div
+    class:list={['inventory-photos', { 'inventory-photos--leading': leading }]}
+    data-pagefind-ignore="all"
+  >
+    {gallery.map(({ photo, width, height, widths }, index) => (
       <figure>
         <a
           href={photo.url}
@@ -34,11 +38,11 @@ const gallery = photos.map((photo) => {
             width={width}
             height={height}
             widths={widths}
-            sizes="(min-width: 1180px) 558px, (min-width: 768px) calc((100vw - 4rem) / 2), calc(100vw - 2.5rem)"
+            sizes="(min-width: 48rem) calc((min(100vw - clamp(2rem, 6vw, 4rem), 1180px) - 5rem) / 2), calc(100vw - clamp(2rem, 6vw, 4rem) - 2.5rem)"
             format="webp"
             quality={82}
             alt={formatText(photo.alt)}
-            loading="lazy"
+            loading={leading && index === 0 ? 'eager' : 'lazy'}
             decoding="async"
           />
         </a>
@@ -55,7 +59,7 @@ const gallery = photos.map((photo) => {
 <style>
   .inventory-photos {
     display: grid;
-    gap: 1.5rem 1rem;
+    gap: 1.5rem 2rem;
   }
   figure {
     min-width: 0;
@@ -82,7 +86,7 @@ const gallery = photos.map((photo) => {
     margin-block-start: 0.5rem;
   }
   @media (min-width: 48rem) {
-    .inventory-photos {
+    .inventory-photos:not(.inventory-photos--leading) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }

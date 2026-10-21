@@ -119,8 +119,11 @@ export const buildInventoryHomeMarkdown = (data: InventoryDataset): string => {
   const groups = inventoryContentsGroups(data);
   return serialize([
     md.heading(1, 'У кого есть'),
+    md.paragraph(
+      'Нужен инструмент или инвентарь на время? Посмотрите, что можно взять у соседей в аренду или бесплатно.'
+    ),
     md.paragraph([
-      md.text('Хотите сдать инвентарь в аренду или дать попользоваться бесплатно? '),
+      md.text('Хотите добавить свою вещь? '),
       md.text('Напишите '),
       md.link('https://t.me/silentroach', 'silentroach'),
       md.text('.')
@@ -169,8 +172,12 @@ export const buildInventoryOwnerMarkdown = (
   ]);
 };
 
-export const buildInventoryOfferMarkdown = (offer: InventoryOffer): string =>
-  serialize([
+export const buildInventoryOfferMarkdown = (offer: InventoryOffer): string => {
+  const photos = offer.photos.map((photo): readonly InventoryMarkdownNode[] => [
+    md.paragraph([{ type: 'image', url: photo.url, alt: photo.alt }]),
+    ...(photo.caption ? [md.paragraph(photo.caption)] : [])
+  ]);
+  return serialize([
     md.heading(1, offer.title),
     md.paragraph([md.link(offer.canonical, 'Страница предложения')]),
     md.paragraph([md.link(absoluteUrl(offer.listingUrl), 'К списку предложений')]),
@@ -178,9 +185,8 @@ export const buildInventoryOfferMarkdown = (offer: InventoryOffer): string =>
     ...offerFacts(offer),
     ...ownerFacts(offer.owner),
     ownerContacts(offer.owner),
+    ...(photos[0] ?? []),
     ...bodyNodes(offer, offer.canonical),
-    ...offer.photos.flatMap((photo): InventoryMarkdownNode[] => [
-      md.paragraph([{ type: 'image', url: photo.url, alt: photo.alt }]),
-      ...(photo.caption ? [md.paragraph(photo.caption)] : [])
-    ])
+    ...photos.slice(1).flat()
   ]);
+};

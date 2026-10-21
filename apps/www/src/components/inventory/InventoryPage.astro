@@ -50,6 +50,14 @@ const breadcrumbs = withHomeBreadcrumbs([
     padding-block-end: 3rem;
     overflow-wrap: anywhere;
   }
+  .inventory-page .ui-page-header {
+    padding-block-end: 1.5rem;
+  }
+  .inventory-page .ui-page-title {
+    max-width: 48rem;
+    font-size: clamp(2rem, calc(0.857142857rem + 5.714285714vw), 2.25rem);
+    overflow-wrap: anywhere;
+  }
   .inventory-page__intro:not(:empty) {
     max-width: 48rem;
     margin-block-start: 0.75rem;
@@ -61,6 +69,9 @@ const breadcrumbs = withHomeBreadcrumbs([
     margin-block-end: 2rem;
   }
   @media (min-width: 48rem) {
+    .inventory-page .ui-page-title {
+      font-size: 3rem;
+    }
     .inventory-page__content {
       padding-inline: 1.5rem;
     }

@@ -16,16 +16,21 @@ const groups = inventoryContentsGroups(await loadInventoryData());
   canonical={inventoryUrl()}
 >
   <InventoryPage title="У кого есть">
-    <p slot="intro" class="ui-copy ui-muted">
-      Хотите сдать инвентарь в аренду или дать попользоваться бесплатно?{' '}
-      Напишите{' '}
-      <LinkWithIcon
-        href="https://t.me/silentroach"
-        label="silentroach"
-        ariaLabel="Написать silentroach в Telegram"
-      />
-      .
-    </p>
+    <Fragment slot="intro">
+      <p class="ui-copy">
+        Нужен инструмент или инвентарь на время? Посмотрите, что можно взять у
+        соседей в аренду или бесплатно.
+      </p>
+      <p class="ui-copy ui-muted inventory-invitation">
+        Хотите добавить свою вещь? Напишите{' '}
+        <LinkWithIcon
+          href="https://t.me/silentroach"
+          label="silentroach"
+          ariaLabel="Написать silentroach в Telegram"
+        />
+        .
+      </p>
+    </Fragment>
     <div class="inventory-contents">
       {groups.length > 0 && (
         <nav class="inventory-groups-nav" aria-label="Группы инвентаря">
@@ -69,15 +74,21 @@ const groups = inventoryContentsGroups(await loadInventoryData());
 </BaseLayout>
 
 <style>
+  .inventory-invitation {
+    margin-block-start: 0.75rem;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
   .inventory-contents {
-    margin-block-start: 2rem;
+    max-width: 48rem;
   }
 
   .inventory-groups-nav {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-block-end: 2.5rem;
+    margin-block-end: 2rem;
   }
 
   .inventory-group-pill {
@@ -111,12 +122,8 @@ const groups = inventoryContentsGroups(await loadInventoryData());
   }
 
   .inventory-group-kinds {
-    padding-block-start: 0.5rem;
+    max-width: 48rem;
     border-block-start: 1px solid var(--color-border);
-  }
-
-  .inventory-group-kinds :global(.inventory-kinds) {
-    margin-block-start: 0;
   }
 
   .inventory-group-link {

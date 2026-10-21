@@ -3,11 +3,11 @@ import type { GetStaticPaths } from 'astro';
 import { formatTextHtml } from '@shelkovo/typography';
 import ContactMethods from '@/components/contacts/ContactMethods.astro';
 import InventoryPage from '@/components/inventory/InventoryPage.astro';
+import InventoryDetailPrice from '@/components/inventory/InventoryDetailPrice.astro';
 import InventoryPhotos from '@/components/inventory/InventoryPhotos.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { loadInventoryData } from '@/lib/inventory/load';
 import { inventoryUrl } from '@/lib/inventory/routes';
-import { formatInventoryPrice } from '@/lib/inventory/view';
 import { renderMarkdown } from '@/lib/markdown/render';
 import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
@@ -55,59 +55,94 @@ const bodyHtml = renderMarkdown(offer.body, { idPrefix: offer.bodyIdPrefix });
       { label: kind.title, href: kind.url },
     ]}
   >
-    <div class="inventory-detail__terms" data-pagefind-ignore="all">
-      <p
-        class="inventory-detail__price ui-num"
-        set:html={formatTextHtml(formatInventoryPrice(offer.price))}
-      />
-      <p>
-        <a
-          class="site-text-link"
-          href={offer.owner.url}
-          set:html={formatTextHtml(offer.owner.name)}
+    <p
+      slot="intro"
+      class="inventory-detail__kind"
+      data-pagefind-body
+      set:html={formatTextHtml(kind.title)}
+    />
+    <div
+      class:list={[
+        'inventory-detail__hero',
+        { 'inventory-detail__hero--with-photo': offer.photos.length > 0 },
+      ]}
+    >
+      <div class="inventory-detail__overview">
+        <p
+          class="inventory-detail__summary ui-prose"
+          data-pagefind-body
+          set:html={formatTextHtml(offer.summary)}
         />
-        {' · '}
-        <a class="site-text-link" href={offer.owner.parcel.url}>
-          Участок {offer.owner.parcel.code}
-        </a>
-      </p>
-      <ContactMethods
-        contacts={offer.owner.contacts}
-        headingId={`${offer.anchorId}-contacts`}
-        compact
-      />
+        <div class="inventory-detail__terms" data-pagefind-ignore="all">
+          <InventoryDetailPrice price={offer.price} />
+          <p>
+            <a
+              class="site-text-link"
+              href={offer.owner.url}
+              set:html={formatTextHtml(offer.owner.name)}
+            />
+            {' · '}
+            <a class="site-text-link" href={offer.owner.parcel.url}>
+              Участок {offer.owner.parcel.code}
+            </a>
+          </p>
+          <ContactMethods
+            contacts={offer.owner.contacts}
+            headingId={`${offer.anchorId}-contacts`}
+            compact
+          />
+        </div>
+      </div>
+      {offer.photos.length > 0 && (
+        <div class="inventory-detail__first-photo">
+          <InventoryPhotos photos={offer.photos.slice(0, 1)} leading />
+        </div>
+      )}
     </div>
-    <div class="inventory-detail__description" data-pagefind-body>
-      <p class="inventory-detail__kind" set:html={formatTextHtml(kind.title)} />
-      <p
-        class="inventory-detail__summary"
-        set:html={formatTextHtml(offer.summary)}
-      />
-      {bodyHtml && <div class="ui-prose" set:html={bodyHtml} />}
-    </div>
-    <InventoryPhotos photos={offer.photos} />
+    {bodyHtml && (
+      <div class="inventory-detail__description" data-pagefind-body>
+        <div class="ui-prose" set:html={bodyHtml} />
+      </div>
+    )}
+    <InventoryPhotos photos={offer.photos.slice(1)} />
   </InventoryPage>
 </BaseLayout>
 
 <style>
+  .inventory-detail__hero {
+    display: grid;
+    gap: 2rem;
+    align-items: start;
+  }
+  .inventory-detail__overview,
+  .inventory-detail__first-photo {
+    min-width: 0;
+  }
   .inventory-detail__terms {
     display: grid;
     gap: 0.625rem;
-    max-width: 52rem;
-  }
-  .inventory-detail__price {
-    font-size: 1.5rem;
-    font-weight: 600;
   }
   .inventory-detail__description {
-    max-width: 48rem;
+    max-width: 41.50125rem;
   }
   .inventory-detail__kind {
     color: var(--color-text-muted);
-    font-size: 0.875rem;
-    margin-bottom: 0.5rem;
+    font-size: 1rem;
   }
   .inventory-detail__summary {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  @media (min-width: 48rem) {
+    .inventory-detail__hero--with-photo {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .inventory-detail__hero--with-photo .inventory-detail__overview {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .inventory-detail__first-photo {
+      grid-column: 1;
+      grid-row: 1;
+    }
   }
 </style>
