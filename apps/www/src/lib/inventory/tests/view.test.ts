@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { buildInventoryDataset } from '../load';
-import { inventoryOwnerKinds } from '../view';
+import { inventoryOwnerOffers } from '../view';
 import { kindEntry, offerEntry, ownerEntry, parcels } from './fixtures';
 
 describe('owner inventory selection', () => {
-  it('selects only the owner offers, preserves kind order and sorts models by title then ID', () => {
+  it('selects only the owner offers and sorts across kinds by model title then ID', () => {
     const dataset = buildInventoryDataset(
       {
         owners: [ownerEntry(), ownerEntry('anna-2')],
@@ -27,65 +27,34 @@ describe('owner inventory selection', () => {
       { parcels }
     );
     const originalOrder = dataset.offers.map((offer) => offer.id);
-    const selected = inventoryOwnerKinds(dataset, 'anna');
-    expect(selected.map((kind) => [kind.id, kind.offers.map((offer) => offer.id)]))
-      .toMatchInlineSnapshot(`
-        [
-          [
-            "grinder",
-            [
-              "b",
-              "c",
-              "a",
-            ],
-          ],
-          [
-            "vacuum",
-            [
-              "vacuum-a",
-            ],
-          ],
-        ]
-      `);
-    expect(
-      inventoryOwnerKinds(dataset, 'anna-2').map((kind) => [
-        kind.id,
-        kind.offers.map((offer) => offer.id)
-      ])
-    ).toMatchInlineSnapshot(`
+    const selected = inventoryOwnerOffers(dataset, 'anna');
+    expect(selected.map((offer) => offer.id)).toMatchInlineSnapshot(`
       [
-        [
-          "grinder",
-          [
-            "other-grinder",
-          ],
-        ],
-        [
-          "vacuum",
-          [
-            "other-vacuum",
-          ],
-        ],
-        [
-          "plane",
-          [
-            "other-plane",
-          ],
-        ],
+        "b",
+        "c",
+        "vacuum-a",
+        "a",
+      ]
+    `);
+    expect(inventoryOwnerOffers(dataset, 'anna-2').map((offer) => offer.id)).toMatchInlineSnapshot(`
+      [
+        "other-grinder",
+        "other-plane",
+        "other-vacuum",
       ]
     `);
     expect(dataset.offers.map((offer) => offer.id)).toEqual(originalOrder);
-    expect(selected[0]?.offers[0]).toBe(dataset.offers.find((offer) => offer.id === 'b'));
+    expect(selected[0]).toBe(dataset.offers.find((offer) => offer.id === 'b'));
     expect(dataset.byKind.get('grinder')?.offers).toHaveLength(4);
   });
 
-  it('returns no kinds for unused or unknown owners and after removal of the last offer', () => {
+  it('returns no offers for unused or unknown owners and after removal of the last offer', () => {
     const owners = [ownerEntry(), ownerEntry('unused')];
     const kinds = [kindEntry()];
     const populated = buildInventoryDataset({ owners, kinds, offers: [offerEntry()] }, { parcels });
-    expect(inventoryOwnerKinds(populated, 'unused')).toEqual([]);
-    expect(inventoryOwnerKinds(populated, 'unknown')).toEqual([]);
+    expect(inventoryOwnerOffers(populated, 'unused')).toEqual([]);
+    expect(inventoryOwnerOffers(populated, 'unknown')).toEqual([]);
     const empty = buildInventoryDataset({ owners, kinds, offers: [] }, { parcels });
-    expect(inventoryOwnerKinds(empty, 'anna')).toEqual([]);
+    expect(inventoryOwnerOffers(empty, 'anna')).toEqual([]);
   });
 });

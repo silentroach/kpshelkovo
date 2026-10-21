@@ -1,14 +1,14 @@
 ---
 import { formatTextHtml } from '@shelkovo/typography';
-import type { InventoryOffer } from '@/lib/inventory/types';
+import type { InventoryKind, InventoryOffer } from '@/lib/inventory/types';
 import { formatInventoryPrice } from '@/lib/inventory/view';
 import InventoryPreview from './InventoryPreview.astro';
 interface Props {
   readonly offer: InventoryOffer;
   readonly showOwner?: boolean;
-  readonly headingLevel?: 'h2' | 'h3';
+  readonly kind?: Pick<InventoryKind, 'title' | 'url'>;
 }
-const { offer, showOwner = true, headingLevel: Heading = 'h2' } = Astro.props;
+const { offer, showOwner = true, kind } = Astro.props;
 const photo = offer.photos[0];
 ---
 
@@ -22,13 +22,29 @@ const photo = offer.photos[0];
 >
   {photo && <InventoryPreview photo={photo} href={offer.url} />}
   <header class="inventory-offer__heading">
-    <Heading id={`${offer.anchorId}-title`} class="ui-card-title">
+    <h2
+      id={`${offer.anchorId}-title`}
+      class:list={[
+        'ui-card-title',
+        { 'inventory-offer__title-with-kind': !!kind },
+      ]}
+    >
+      {kind && (
+        <span class="inventory-offer__kind">
+          <a
+            class="ui-title-link"
+            href={kind.url}
+            set:html={formatTextHtml(kind.title)}
+          />
+          <span aria-hidden="true">›</span>
+        </span>
+      )}
       <a
         href={offer.url}
         class="ui-title-link"
         set:html={formatTextHtml(offer.title)}
       />
-    </Heading>
+    </h2>
     <p
       class="inventory-offer__price ui-num"
       set:html={formatTextHtml(formatInventoryPrice(offer.price))}
@@ -88,6 +104,24 @@ const photo = offer.photos[0];
     font-size: 1.125rem;
     font-weight: 400;
     line-height: 1.5;
+  }
+  .inventory-offer__title-with-kind {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.5rem;
+  }
+  .inventory-offer__kind {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .inventory-offer__kind a:not(:hover, :focus-visible) {
+    color: var(--color-text-muted);
   }
   .inventory-offer__summary {
     grid-area: summary;

@@ -210,16 +210,18 @@ describe('inventory HTML pages', () => {
     }
   });
 
-  it('groups only the selected owner offers under linked kinds with one shared contact block', async () => {
+  it('lists only the selected owner offers with a kind link per card and one shared contact block', async () => {
     const anna = await renderOwner('anna');
     const boris = await renderOwner('boris');
     expect(
       [anna, boris].map((page) => ({
         name: page.querySelector('main h1')?.textContent,
-        kinds: [...page.querySelectorAll('main section > h2 a')].map((link) =>
+        kinds: [...page.querySelectorAll('article .inventory-offer__kind a')].map((link) =>
           link.getAttribute('href')
         ),
-        models: [...page.querySelectorAll('article h3 a')].map((link) => link.getAttribute('href')),
+        models: [...page.querySelectorAll('article h2 > a')].map((link) =>
+          link.getAttribute('href')
+        ),
         parcel: page.querySelector('main a[href^="/map/?p="]')?.getAttribute('href'),
         contactBlocks: [...page.querySelectorAll('main section[aria-labelledby$="-contacts"]')].map(
           (section) => section.getAttribute('aria-labelledby')
@@ -251,6 +253,7 @@ describe('inventory HTML pages', () => {
           ],
           "kinds": [
             "/ukogo/construction/drill/",
+            "/ukogo/construction/drill/",
           ],
           "models": [
             "/ukogo/construction/drill/paid/",
@@ -267,6 +270,9 @@ describe('inventory HTML pages', () => {
     ] as const) {
       const owner = fixture.data?.byOwner.get(ownerId);
       if (!owner) throw new Error('fixture owner missing');
+      expect(page.querySelector('main nav [aria-current="page"]')?.textContent).toContain(
+        owner.name
+      );
       const expected = fixture.data?.offers.filter((offer) => offer.owner.id === ownerId) ?? [];
       const cards = [...page.querySelectorAll('article')];
       expect(cards.map((card) => card.id).sort()).toEqual(
@@ -274,7 +280,14 @@ describe('inventory HTML pages', () => {
       );
       for (const offer of expected) {
         const card = page.getElementById(offer.anchorId);
-        expect(card?.querySelector('h3')?.id).toBe(`${offer.anchorId}-title`);
+        expect(card?.querySelector('h2')?.id).toBe(`${offer.anchorId}-title`);
+        const kind = fixture.data?.byKind.get(offer.kindId);
+        expect(card?.querySelector('h2 .inventory-offer__kind a')?.getAttribute('href')).toBe(
+          kind?.url
+        );
+        expect(card?.querySelector('h2 .inventory-offer__kind a')?.textContent).toBe(
+          formatText(kind?.title ?? '')
+        );
         expect(card?.getAttribute('aria-labelledby')).toBe(`${offer.anchorId}-title`);
         expect(card?.querySelector('.inventory-offer__summary')?.textContent).toBe(
           formatText(offer.summary)
@@ -289,7 +302,7 @@ describe('inventory HTML pages', () => {
       }
       expect(
         page.querySelectorAll(
-          'article h2, article .inventory-offer__owner, article a[href^="/map/"], article a[href^="tel:"], article a[href^="mailto:"], article a[href^="https://t.me/"], article .ui-prose, article figure'
+          'article h3, article .inventory-offer__owner, article a[href^="/map/"], article a[href^="tel:"], article a[href^="mailto:"], article a[href^="https://t.me/"], article .ui-prose, article figure'
         )
       ).toHaveLength(0);
       expect(page.querySelector(`[aria-labelledby="owner-${ownerId}-contacts"] a`)).toBeTruthy();
@@ -312,7 +325,6 @@ describe('inventory HTML pages', () => {
         "/ukogo/",
       ]
     `);
-    expect(anna.querySelector('main nav')?.textContent).toContain('Анна');
     expect(anna.querySelector('main a[href="/ukogo/owners/"]')).toBeFalsy();
   });
 

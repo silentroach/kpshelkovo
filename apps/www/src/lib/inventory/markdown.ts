@@ -22,7 +22,7 @@ import type {
   InventoryOffer,
   InventoryOwner
 } from './types';
-import { formatInventoryPrice, inventoryContentsGroups, inventoryOwnerKinds } from './view';
+import { formatInventoryPrice, inventoryContentsGroups, inventoryOwnerOffers } from './view';
 
 const serialize = (children: readonly InventoryMarkdownNode[]): string =>
   serializeMarkdownDocument(createMarkdownDocument({ children }));
@@ -98,9 +98,12 @@ const offerFacts = (offer: InventoryOffer): readonly InventoryMarkdownNode[] => 
 
 const offerNodes = (
   offer: InventoryOffer,
-  headingDepth: 2 | 3 = 2
+  kind?: InventoryKind
 ): readonly InventoryMarkdownNode[] => [
-  md.heading(headingDepth, [md.link(absoluteUrl(offer.markdownUrl), offer.title)]),
+  md.heading(2, [
+    ...(kind ? [md.link(absoluteUrl(kind.markdownUrl), kind.title), md.text(' › ')] : []),
+    md.link(absoluteUrl(offer.markdownUrl), offer.title)
+  ]),
   ...offer.photos
     .slice(0, 1)
     .flatMap((photo): InventoryMarkdownNode[] => [
@@ -153,18 +156,15 @@ export const buildInventoryOwnerMarkdown = (
   owner: InventoryOwner,
   data: InventoryDataset
 ): string => {
-  const kinds = inventoryOwnerKinds(data, owner.id);
+  const offers = inventoryOwnerOffers(data, owner.id);
   return serialize([
     md.heading(1, owner.name),
     md.paragraph([md.link(owner.canonical, 'Страница владельца')]),
     catalogLink(),
     ownerParcel(owner),
     ownerContacts(owner),
-    ...(kinds.length
-      ? kinds.flatMap((kind) => [
-          md.heading(2, [md.link(absoluteUrl(kind.markdownUrl), kind.title)]),
-          ...kind.offers.flatMap((offer) => offerNodes(offer, 3))
-        ])
+    ...(offers.length
+      ? offers.flatMap((offer) => offerNodes(offer, data.byKind.get(offer.kindId)))
       : [md.paragraph('Пока нет предложений.')])
   ]);
 };
