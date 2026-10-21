@@ -1,7 +1,7 @@
 ---
 title: Екатерина Лукичева
 slug: ekaterina-lukicheva
-category: travel
+category: services
 updated_at: 2026-10-11
 summary: 'Турагент, жительница Шелково: подбор туров под запрос и сопровождение поездки'
 contacts:

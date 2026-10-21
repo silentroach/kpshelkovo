@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация: [proposal](/openspec/changes/organize-sarafan-categories/proposal.md). Модель каталога определяет [ADR-018](/docs/decisions/018-markdown-first-useful-contacts.md).
+Мотивация: [proposal](/openspec/changes/archive/2026-10-21-organize-sarafan-categories/proposal.md). Модель каталога определяет [ADR-018](/docs/decisions/018-markdown-first-useful-contacts.md).
 
 `CONTACT_CATEGORIES` уже задаёт порядок `data.categories`, общий для HTML и Markdown. Загрузчик требует совпадения пути исходника с `category/slug`; адреса HTML, Markdown и vCard выводятся из категории автоматически.
 
@@ -16,7 +16,7 @@
 
 - Задать порядок в `CONTACT_CATEGORIES`: `construction`, `electricity`, `fence`, `furniture`, `garden`, `waste-removal`, `food`, `education`, `services`. Отдельный сортировщик не нужен; внутри категории сохраняется сортировка контактов по названию.
 - Заменить `travel` и `insurance` на `services`, подпись «Услуги», эмоджи 💼. Перенести `ekaterina-lukicheva.md` и `yulia-uvarova.md` в каталог `services` и изменить их `category`.
-- Зафиксировать редакционный порядок в действующем дизайн-гайде. Существующий тест загрузчика проверяет порядок на перемешанных записях; расширить его категорией услуг и проверить пропуск пустой категории.
+- Реестр категорий хранит актуальный порядок; дизайн-гайд не дублирует этот список. Существующий тест загрузчика проверяет порядок на перемешанных записях; расширить его категорией услуг и проверить пропуск пустой категории.
 - Сборкой проверить новые HTML/Markdown/vCard, canonical, ссылки каталога и sitemap, отсутствие старых артефактов. Не создавать постоянный smoke-обход ради разового переноса.
 
 ## Risks / Trade-offs

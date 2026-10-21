@@ -1,7 +1,7 @@
 ---
 title: Юлия Уварова
 slug: yulia-uvarova
-category: insurance
+category: services
 updated_at: 2026-10-16
 summary: Помощь с оформлением страховки дома
 contacts:
