@@ -91,7 +91,8 @@ export const buildInventoryDataset = (
     offers,
     groups,
     byGroup: new Map(groups.map((group) => [group.id, group])),
-    byKind: new Map(kinds.map((kind) => [kind.id, kind]))
+    byKind: new Map(kinds.map((kind) => [kind.id, kind])),
+    byOwner
   };
 };
 

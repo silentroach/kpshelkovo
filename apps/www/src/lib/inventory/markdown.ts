@@ -1,4 +1,3 @@
-import { count } from '@shelkovo/format';
 import {
   createMarkdownDocument,
   expandTableOfContents,
@@ -20,9 +19,10 @@ import type {
   InventoryDataset,
   InventoryGroup,
   InventoryKind,
-  InventoryOffer
+  InventoryOffer,
+  InventoryOwner
 } from './types';
-import { formatInventoryPrice, inventoryContentsGroups } from './view';
+import { formatInventoryPrice, inventoryContentsGroups, inventoryOwnerKinds } from './view';
 
 const serialize = (children: readonly InventoryMarkdownNode[]): string =>
   serializeMarkdownDocument(createMarkdownDocument({ children }));
@@ -31,12 +31,7 @@ const catalogLink = (): InventoryMarkdownNode =>
   md.paragraph([md.link(absoluteUrl(inventoryMarkdownUrl()), 'Весь каталог')]);
 
 const kindLine = (kind: InventoryKind) =>
-  md.listItem([
-    md.paragraph([
-      md.link(absoluteUrl(kind.markdownUrl), kind.title),
-      md.text(`: ${count(kind.offers.length, ['предложение', 'предложения', 'предложений'])}`)
-    ])
-  ]);
+  md.listItem([md.paragraph([md.link(absoluteUrl(kind.markdownUrl), kind.title)])]);
 
 const bodyLink = (
   url: string,
@@ -76,15 +71,17 @@ const bodyNodes = (body: InventoryBody, canonical: string): readonly InventoryMa
   return document.children;
 };
 
-const offerFacts = (offer: InventoryOffer): readonly InventoryMarkdownNode[] => [
-  md.paragraph(offer.summary),
-  md.paragraph(formatInventoryPrice(offer.price)),
-  md.paragraph(`Владелец: ${offer.owner.name}`),
-  md.paragraph([
-    md.link(absoluteUrl(offer.owner.parcel.url), `Участок ${offer.owner.parcel.code}`)
-  ]),
+const ownerFacts = (owner: InventoryOwner): readonly InventoryMarkdownNode[] => [
+  md.paragraph([md.text('Владелец: '), md.link(absoluteUrl(owner.markdownUrl), owner.name)]),
+  ownerParcel(owner)
+];
+
+const ownerParcel = (owner: InventoryOwner): InventoryMarkdownNode =>
+  md.paragraph([md.link(absoluteUrl(owner.parcel.url), `Участок ${owner.parcel.code}`)]);
+
+const ownerContacts = (owner: InventoryOwner): InventoryMarkdownNode =>
   md.list(
-    contactMethods(offer.owner.contacts).map((method) =>
+    contactMethods(owner.contacts).map((method) =>
       md.listItem([
         md.paragraph([
           md.text(`${method.label}: `),
@@ -92,11 +89,18 @@ const offerFacts = (offer: InventoryOffer): readonly InventoryMarkdownNode[] => 
         ])
       ])
     )
-  )
+  );
+
+const offerFacts = (offer: InventoryOffer): readonly InventoryMarkdownNode[] => [
+  md.paragraph(offer.summary),
+  md.paragraph(formatInventoryPrice(offer.price))
 ];
 
-const offerNodes = (offer: InventoryOffer): readonly InventoryMarkdownNode[] => [
-  md.heading(2, [md.link(absoluteUrl(offer.markdownUrl), offer.title)]),
+const offerNodes = (
+  offer: InventoryOffer,
+  headingDepth: 2 | 3 = 2
+): readonly InventoryMarkdownNode[] => [
+  md.heading(headingDepth, [md.link(absoluteUrl(offer.markdownUrl), offer.title)]),
   ...offer.photos
     .slice(0, 1)
     .flatMap((photo): InventoryMarkdownNode[] => [
@@ -105,8 +109,7 @@ const offerNodes = (offer: InventoryOffer): readonly InventoryMarkdownNode[] => 
       ]),
       ...(photo.caption ? [md.paragraph(photo.caption)] : [])
     ]),
-  ...offerFacts(offer),
-  md.paragraph([md.link(absoluteUrl(offer.markdownUrl), 'Подробнее')])
+  ...offerFacts(offer)
 ];
 
 export const buildInventoryHomeMarkdown = (data: InventoryDataset): string => {
@@ -142,9 +145,29 @@ export const buildInventoryKindMarkdown = (kind: InventoryKind): string =>
     catalogLink(),
     ...bodyNodes(kind, kind.canonical),
     ...(kind.offers.length
-      ? kind.offers.flatMap(offerNodes)
+      ? kind.offers.flatMap((offer) => [...offerNodes(offer), ...ownerFacts(offer.owner)])
       : [md.paragraph('Пока нет предложений.')])
   ]);
+
+export const buildInventoryOwnerMarkdown = (
+  owner: InventoryOwner,
+  data: InventoryDataset
+): string => {
+  const kinds = inventoryOwnerKinds(data, owner.id);
+  return serialize([
+    md.heading(1, owner.name),
+    md.paragraph([md.link(owner.canonical, 'Страница владельца')]),
+    catalogLink(),
+    ownerParcel(owner),
+    ownerContacts(owner),
+    ...(kinds.length
+      ? kinds.flatMap((kind) => [
+          md.heading(2, [md.link(absoluteUrl(kind.markdownUrl), kind.title)]),
+          ...kind.offers.flatMap((offer) => offerNodes(offer, 3))
+        ])
+      : [md.paragraph('Пока нет предложений.')])
+  ]);
+};
 
 export const buildInventoryOfferMarkdown = (offer: InventoryOffer): string =>
   serialize([
@@ -153,6 +176,8 @@ export const buildInventoryOfferMarkdown = (offer: InventoryOffer): string =>
     md.paragraph([md.link(absoluteUrl(offer.listingUrl), 'К списку предложений')]),
     catalogLink(),
     ...offerFacts(offer),
+    ...ownerFacts(offer.owner),
+    ownerContacts(offer.owner),
     ...bodyNodes(offer, offer.canonical),
     ...offer.photos.flatMap((photo): InventoryMarkdownNode[] => [
       md.paragraph([{ type: 'image', url: photo.url, alt: photo.alt }]),

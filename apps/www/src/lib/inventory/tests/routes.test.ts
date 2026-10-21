@@ -17,11 +17,56 @@ import {
   inventoryOfferPath,
   inventoryOfferPattern,
   inventoryOfferUrl,
-  inventoryUrl
+  inventoryUrl,
+  inventoryOwnerCanonical,
+  inventoryOwnerMarkdownPath,
+  inventoryOwnerMarkdownPattern,
+  inventoryOwnerMarkdownUrl,
+  inventoryOwnerPath,
+  inventoryOwnerPattern,
+  inventoryOwnerUrl
 } from '../routes';
 import { inventorySourceId } from '../source';
 
 describe('inventory identities and routes', () => {
+  it('exposes owner HTML, Markdown, canonical and discovery patterns by ID', () => {
+    const owner = { id: 'ikalashnikov' };
+    expect([
+      inventoryOwnerPath(owner),
+      inventoryOwnerUrl(owner),
+      inventoryOwnerCanonical(owner),
+      inventoryOwnerMarkdownPath(owner),
+      inventoryOwnerMarkdownUrl(owner),
+      inventoryOwnerPattern(),
+      inventoryOwnerMarkdownPattern()
+    ]).toMatchInlineSnapshot(`
+      [
+        "/ukogo/owners/ikalashnikov/",
+        "/ukogo/owners/ikalashnikov/",
+        "https://kpshelkovo.online/ukogo/owners/ikalashnikov/",
+        "/ukogo/owners/ikalashnikov/index.md",
+        "/ukogo/owners/ikalashnikov/index.md",
+        "/ukogo/owners/:owner/",
+        "/ukogo/owners/:owner/index.md",
+      ]
+    `);
+  });
+
+  it.each(['', '../anna', 'anna#x', 'anna--a', 'Anna', 'anna/other'])(
+    'rejects unsafe owner ID %j across all owner helpers',
+    (id) => {
+      for (const route of [
+        inventoryOwnerPath,
+        inventoryOwnerUrl,
+        inventoryOwnerCanonical,
+        inventoryOwnerMarkdownPath,
+        inventoryOwnerMarkdownUrl
+      ]) {
+        expect(() => route({ id })).toThrow('inventory owner id');
+      }
+    }
+  );
+
   it('publishes HTML, Markdown and self-canonical at four levels', () => {
     const route = { group: 'construction', id: 'grinder-125', offerId: 'neighbor-tool-1' };
     expect([

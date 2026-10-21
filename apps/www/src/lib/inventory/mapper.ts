@@ -12,7 +12,10 @@ import {
   inventoryOfferAnchor,
   inventoryOfferCanonical,
   inventoryOfferMarkdownUrl,
-  inventoryOfferUrl
+  inventoryOfferUrl,
+  inventoryOwnerCanonical,
+  inventoryOwnerMarkdownUrl,
+  inventoryOwnerUrl
 } from './routes';
 import type { InventoryKindEntry, InventoryOfferEntry, InventoryOwnerEntry } from './source-types';
 import type {
@@ -47,7 +50,10 @@ export const mapRawInventoryOwner = (
   id: entry.id,
   name: entry.data.name,
   contacts: mapRawContactMethods(entry.data.contacts),
-  parcel: { code: parcelCode, url: withBase(getUrlWithParcel(canon('/map/'), parcelCode)) }
+  parcel: { code: parcelCode, url: withBase(getUrlWithParcel(canon('/map/'), parcelCode)) },
+  url: inventoryOwnerUrl(entry),
+  markdownUrl: inventoryOwnerMarkdownUrl(entry),
+  canonical: inventoryOwnerCanonical(entry)
 });
 
 export const mapRawInventoryPrice = (price: RawInventoryOffer['price']): InventoryPrice => {

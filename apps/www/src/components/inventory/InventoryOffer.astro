@@ -1,30 +1,34 @@
 ---
 import { formatTextHtml } from '@shelkovo/typography';
-import ContactMethods from '@/components/contacts/ContactMethods.astro';
 import type { InventoryOffer } from '@/lib/inventory/types';
 import { formatInventoryPrice } from '@/lib/inventory/view';
 import InventoryPreview from './InventoryPreview.astro';
 interface Props {
   readonly offer: InventoryOffer;
+  readonly showOwner?: boolean;
+  readonly headingLevel?: 'h2' | 'h3';
 }
-const { offer } = Astro.props;
+const { offer, showOwner = true, headingLevel: Heading = 'h2' } = Astro.props;
 const photo = offer.photos[0];
 ---
 
 <article
   id={offer.anchorId}
-  class:list={['inventory-offer', { 'inventory-offer--photo': !!photo }]}
+  class:list={[
+    'inventory-offer',
+    { 'inventory-offer--photo': !!photo, 'inventory-offer--owner': showOwner },
+  ]}
   aria-labelledby={`${offer.anchorId}-title`}
 >
   {photo && <InventoryPreview photo={photo} href={offer.url} />}
   <header class="inventory-offer__heading">
-    <h2 id={`${offer.anchorId}-title`} class="ui-card-title">
+    <Heading id={`${offer.anchorId}-title`} class="ui-card-title">
       <a
         href={offer.url}
         class="ui-title-link"
         set:html={formatTextHtml(offer.title)}
       />
-    </h2>
+    </Heading>
     <p
       class="inventory-offer__price ui-num"
       set:html={formatTextHtml(formatInventoryPrice(offer.price))}
@@ -34,53 +38,56 @@ const photo = offer.photos[0];
     class="inventory-offer__summary"
     set:html={formatTextHtml(offer.summary)}
   />
-  <p class="inventory-offer__owner">
-    <span set:html={formatTextHtml(offer.owner.name)} />
-    {' · '}
-    <a class="site-text-link" href={offer.owner.parcel.url}>
-      {offer.owner.parcel.code}
-    </a>
-  </p>
-  <div class="inventory-offer__actions">
-    <ContactMethods
-      contacts={offer.owner.contacts}
-      headingId={`${offer.anchorId}-contacts`}
-      headingLevel="h3"
-      compact
-    />
-    <a
-      class="site-text-link inventory-offer__details"
-      href={offer.url}
-      aria-label={`Подробнее: ${offer.title}`}
-    >
-      Подробнее
-    </a>
-  </div>
+  {showOwner && (
+    <p class="inventory-offer__owner">
+      <a
+        class="site-text-link"
+        href={offer.owner.url}
+        set:html={formatTextHtml(offer.owner.name)}
+      />
+      {' · '}
+      <a class="site-text-link" href={offer.owner.parcel.url}>
+        {offer.owner.parcel.code}
+      </a>
+    </p>
+  )}
 </article>
 
 <style>
   .inventory-offer {
     display: grid;
-    grid-template-areas: 'heading' 'summary' 'owner' 'actions';
-    gap: 0.625rem 1rem;
+    grid-template-areas: 'heading' 'summary';
+    gap: 0.625rem 1.5rem;
     max-width: 52rem;
-    padding-block: 1.25rem;
-    border-block-start: 1px solid var(--color-border);
+    padding-block-end: 1.25rem;
     scroll-margin-top: calc(var(--site-sticky-offset) + 1rem);
+  }
+  .inventory-offer--owner {
+    grid-template-areas: 'heading' 'summary' 'owner';
+  }
+  .inventory-offer + .inventory-offer {
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--color-border);
   }
   .inventory-offer--photo {
     grid-template-columns: 6rem minmax(0, 1fr);
-    grid-template-areas: 'photo heading' 'summary summary' 'owner owner' 'actions actions';
+    grid-template-areas: 'photo heading' 'summary summary';
+  }
+  .inventory-offer--photo.inventory-offer--owner {
+    grid-template-areas: 'photo heading' 'summary summary' 'owner owner';
+  }
+  .inventory-offer__heading .ui-title-link {
+    text-decoration-line: underline;
   }
   .inventory-offer__heading {
     grid-area: heading;
     min-width: 0;
   }
   .inventory-offer__price {
-    margin-top: 0.375rem;
-    font-size: 1.25rem;
-    font-weight: 600;
-    line-height: 1.4;
+    margin-top: 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 400;
+    line-height: 1.5;
   }
   .inventory-offer__summary {
     grid-area: summary;
@@ -90,20 +97,14 @@ const photo = offer.photos[0];
     color: var(--color-text-muted);
     font-size: 0.875rem;
   }
-  .inventory-offer__actions {
-    grid-area: actions;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.25rem 1.5rem;
-  }
-  .inventory-offer__details {
-    padding-block: 0.25rem;
-  }
   @media (min-width: 48rem) {
     .inventory-offer--photo {
       grid-template-columns: 10rem minmax(0, 1fr);
-      grid-template-areas: 'photo heading' 'photo summary' 'photo owner' 'photo actions';
+      grid-template-areas: 'photo heading' 'photo summary';
+      column-gap: 2rem;
+    }
+    .inventory-offer--photo.inventory-offer--owner {
+      grid-template-areas: 'photo heading' 'photo summary' 'photo owner';
     }
   }
 </style>

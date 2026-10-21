@@ -9,6 +9,78 @@ import { inventoryContentsGroups } from '../view';
 import { kindEntry, offerEntry, ownerEntry, parcels } from './fixtures';
 
 describe('inventory dataset', () => {
+  it('keeps owner links when name, parcel and contacts change', () => {
+    const before = buildInventoryDataset(
+      { owners: [ownerEntry()], kinds: [], offers: [] },
+      { parcels }
+    );
+    const after = buildInventoryDataset(
+      {
+        owners: [
+          ownerEntry('anna', {
+            name: 'Другое имя',
+            parcel: 'SHR-L44',
+            contacts: { email: 'new@example.com' }
+          })
+        ],
+        kinds: [],
+        offers: []
+      },
+      { parcels: new Map([...parcels, ['SHR-L44', { code: 'SHR-L44' }]]) }
+    );
+    const owner = after.byOwner.get('anna');
+    expect(owner).toMatchInlineSnapshot(`
+      {
+        "canonical": "https://kpshelkovo.online/ukogo/owners/anna/",
+        "contacts": {
+          "email": "new@example.com",
+          "phone": undefined,
+          "telegram": undefined,
+          "website": undefined,
+          "whatsapp": undefined,
+        },
+        "id": "anna",
+        "markdownUrl": "/ukogo/owners/anna/index.md",
+        "name": "Другое имя",
+        "parcel": {
+          "code": "SHR-L44",
+          "url": "/map/?p=SHR-L44",
+        },
+        "url": "/ukogo/owners/anna/",
+      }
+    `);
+    expect([owner?.url, owner?.markdownUrl, owner?.canonical]).toEqual([
+      before.byOwner.get('anna')?.url,
+      before.byOwner.get('anna')?.markdownUrl,
+      before.byOwner.get('anna')?.canonical
+    ]);
+  });
+
+  it('indexes owners with equal names independently and retains an owner after the last offer', () => {
+    const owners = [ownerEntry('anna-2'), ownerEntry()];
+    const kinds = [kindEntry()];
+    const populated = buildInventoryDataset({ owners, kinds, offers: [offerEntry()] }, { parcels });
+    const empty = buildInventoryDataset({ owners, kinds, offers: [] }, { parcels });
+    expect(populated.owners.map((owner) => [owner.id, owner.url])).toMatchInlineSnapshot(`
+      [
+        [
+          "anna",
+          "/ukogo/owners/anna/",
+        ],
+        [
+          "anna-2",
+          "/ukogo/owners/anna-2/",
+        ],
+      ]
+    `);
+    expect(empty.byOwner.get('anna')).toEqual(populated.byOwner.get('anna'));
+    expect(empty.byOwner.get('anna-2')).toBe(empty.owners[1]);
+    expect(populated.offers[0]?.owner).toBe(populated.byOwner.get('anna'));
+    expect(empty.byOwner.get('unknown')).toBeUndefined();
+    const removed = buildInventoryDataset({ owners: [], kinds, offers: [] }, { parcels });
+    expect(removed.byOwner.get('anna')).toBeUndefined();
+  });
+
   it('resolves aliases, shares owners and orders full offers by owner then stable ID', () => {
     const dataset = buildInventoryDataset(
       {

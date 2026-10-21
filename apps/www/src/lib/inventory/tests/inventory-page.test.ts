@@ -24,6 +24,10 @@ import KindPage from '@/pages/ukogo/[group]/[kind]/index.astro';
 import GroupPage from '@/pages/ukogo/[group]/index.astro';
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import RootPage from '@/pages/ukogo/index.astro';
+import OwnerPage, {
+  getStaticPaths as ownerStaticPaths
+  // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
+} from '@/pages/ukogo/owners/[owner]/index.astro';
 
 const parse = (html: string) => {
   const document = new Window().document;
@@ -37,6 +41,15 @@ const renderKind = async () =>
     ).renderToString(KindPage, {
       params: { group: 'construction', kind: 'drill' },
       request: new Request('https://example.com/ukogo/construction/drill/')
+    })
+  );
+const renderOwner = async (owner: string) =>
+  parse(
+    await (
+      await createAstroContainer()
+    ).renderToString(OwnerPage, {
+      params: { owner },
+      request: new Request(`https://example.com/ukogo/owners/${owner}/`)
     })
   );
 
@@ -59,7 +72,7 @@ describe('inventory HTML pages', () => {
     expect(page.querySelector('h2 a')?.getAttribute('href')).toBe(offer.url);
   });
 
-  it('renders all offers with distinct contacts, canonical parcels and all price states', async () => {
+  it('renders owners, canonical parcels and all prices without contact actions in listings', async () => {
     const page = await renderKind();
     const offers = [...page.querySelectorAll('article')];
     expect(
@@ -67,37 +80,23 @@ describe('inventory HTML pages', () => {
         id: offer.id,
         title: offer.querySelector('h2 a')?.textContent,
         price: visibleWhitespace(offer.querySelector('.inventory-offer__price')?.textContent),
-        parcel: offer.querySelector('a[href*="?p="]')?.getAttribute('href'),
-        contacts: [
-          ...offer.querySelectorAll('a[href^="tel:"], a[href^="mailto:"], a[href^="https://t.me/"]')
-        ].map((link) => link.getAttribute('href'))
+        parcel: offer.querySelector('a[href*="?p="]')?.getAttribute('href')
       }))
     ).toMatchInlineSnapshot(`
       [
         {
-          "contacts": [
-            "mailto:anna@example.com",
-          ],
           "id": "offer-free",
           "parcel": "/map/?p=SHP-A2",
           "price": "Бесплатно",
           "title": "Дрель Model 200",
         },
         {
-          "contacts": [
-            "tel:+79969670018",
-            "https://t.me/example_boris",
-          ],
           "id": "offer-negotiable",
           "parcel": "/map/?p=SHP-A1",
           "price": "Цена по·договорённости",
           "title": "Дрель Model 300",
         },
         {
-          "contacts": [
-            "tel:+79969670018",
-            "https://t.me/example_boris",
-          ],
           "id": "offer-paid",
           "parcel": "/map/?p=SHP-A1",
           "price": "1·200·₽/сутки",
@@ -110,19 +109,24 @@ describe('inventory HTML pages', () => {
     );
     const ids = [...page.querySelectorAll('[id]')].map((node) => node.id);
     expect(new Set(ids).size).toBe(ids.length);
+    expect(
+      page.querySelectorAll(
+        'article a[href^="tel:"], article a[href^="mailto:"], article a[href^="https://t.me/"]'
+      )
+    ).toHaveLength(0);
     for (const offer of fixture.data?.byKind.get('drill')?.offers ?? []) {
       const card = page.getElementById(offer.anchorId);
       expect(card?.querySelector('.inventory-offer__summary')?.textContent).toBe(
         formatText(offer.summary)
       );
-      expect(card?.querySelector('a[aria-label^="Подробнее:"]')?.getAttribute('href')).toBe(
-        offer.url
+      expect(card?.querySelector('.inventory-offer__owner')?.textContent).toContain(
+        offer.owner.name
+      );
+      expect(card?.querySelector('.inventory-offer__owner a')?.getAttribute('href')).toBe(
+        offer.owner.url
       );
     }
     for (const offer of offers) {
-      const contacts = offer.querySelector('section[aria-labelledby]');
-      expect(contacts?.getAttribute('aria-labelledby')).toBe(`${offer.id}-contacts`);
-      expect(page.getElementById(`${offer.id}-contacts`)?.textContent.trim()).toBeTruthy();
       expect(offer.querySelector(`[id^="${offer.id}-body-"]`)).toBeFalsy();
     }
   });
@@ -170,6 +174,15 @@ describe('inventory HTML pages', () => {
       }
     `);
     expect(page.querySelector('a[href="https://t.me/silentroach"]')).toBeFalsy();
+    const contacts = page.querySelector('section[aria-labelledby="offer-paid-contacts"]');
+    expect(page.getElementById('offer-paid-contacts')?.textContent.trim()).toBeTruthy();
+    expect([...contacts!.querySelectorAll('a')].map((link) => link.getAttribute('href')))
+      .toMatchInlineSnapshot(`
+        [
+          "tel:+79969670018",
+          "https://t.me/example_boris",
+        ]
+      `);
     expect(
       [...page.querySelectorAll('.inventory-photos figure a')].map((link) =>
         link.getAttribute('href')
@@ -177,7 +190,10 @@ describe('inventory HTML pages', () => {
     ).toEqual(
       fixture.data?.offers.find((offer) => offer.id === 'paid')?.photos.map((photo) => photo.url)
     );
-    expect(page.querySelector('main a[href="/ukogo/construction/drill/#offer-paid"]')).toBeTruthy();
+    expect(page.querySelector('main nav a[href="/ukogo/construction/drill/"]')).toBeTruthy();
+    expect(
+      page.querySelector('.inventory-detail__terms a[href="/ukogo/owners/boris/"]')?.textContent
+    ).toBe('Борис');
     expect(page.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(
       'https://kpshelkovo.online/ukogo/construction/drill/paid/'
     );
@@ -192,6 +208,175 @@ describe('inventory HTML pages', () => {
         page.getElementById(decodeURIComponent((link.getAttribute('href') ?? '').slice(1)))
       ).toBeTruthy();
     }
+  });
+
+  it('groups only the selected owner offers under linked kinds with one shared contact block', async () => {
+    const anna = await renderOwner('anna');
+    const boris = await renderOwner('boris');
+    expect(
+      [anna, boris].map((page) => ({
+        name: page.querySelector('main h1')?.textContent,
+        kinds: [...page.querySelectorAll('main section > h2 a')].map((link) =>
+          link.getAttribute('href')
+        ),
+        models: [...page.querySelectorAll('article h3 a')].map((link) => link.getAttribute('href')),
+        parcel: page.querySelector('main a[href^="/map/?p="]')?.getAttribute('href'),
+        contactBlocks: [...page.querySelectorAll('main section[aria-labelledby$="-contacts"]')].map(
+          (section) => section.getAttribute('aria-labelledby')
+        ),
+        canonical: page.querySelector('link[rel="canonical"]')?.getAttribute('href')
+      }))
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "canonical": "https://kpshelkovo.online/ukogo/owners/anna/",
+          "contactBlocks": [
+            "owner-anna-contacts",
+          ],
+          "kinds": [
+            "/ukogo/garden/mower/",
+            "/ukogo/construction/drill/",
+          ],
+          "models": [
+            "/ukogo/garden/mower/garden/",
+            "/ukogo/construction/drill/free/",
+          ],
+          "name": "Анна",
+          "parcel": "/map/?p=SHP-A2",
+        },
+        {
+          "canonical": "https://kpshelkovo.online/ukogo/owners/boris/",
+          "contactBlocks": [
+            "owner-boris-contacts",
+          ],
+          "kinds": [
+            "/ukogo/construction/drill/",
+          ],
+          "models": [
+            "/ukogo/construction/drill/paid/",
+            "/ukogo/construction/drill/negotiable/",
+          ],
+          "name": "Борис",
+          "parcel": "/map/?p=SHP-A1",
+        },
+      ]
+    `);
+    for (const [ownerId, page] of [
+      ['anna', anna],
+      ['boris', boris]
+    ] as const) {
+      const owner = fixture.data?.byOwner.get(ownerId);
+      if (!owner) throw new Error('fixture owner missing');
+      const expected = fixture.data?.offers.filter((offer) => offer.owner.id === ownerId) ?? [];
+      const cards = [...page.querySelectorAll('article')];
+      expect(cards.map((card) => card.id).sort()).toEqual(
+        expected.map((offer) => offer.anchorId).sort()
+      );
+      for (const offer of expected) {
+        const card = page.getElementById(offer.anchorId);
+        expect(card?.querySelector('h3')?.id).toBe(`${offer.anchorId}-title`);
+        expect(card?.getAttribute('aria-labelledby')).toBe(`${offer.anchorId}-title`);
+        expect(card?.querySelector('.inventory-offer__summary')?.textContent).toBe(
+          formatText(offer.summary)
+        );
+        expect(card?.querySelector('.inventory-offer__price')?.textContent.trim()).toBeTruthy();
+        expect(card?.querySelector('img')?.getAttribute('alt')).toBe(
+          offer.photos[0] ? formatText(offer.photos[0].alt) : undefined
+        );
+        if (offer.photos.length > 0) {
+          expect(card?.querySelector('a:has(img)')?.getAttribute('href')).toBe(offer.url);
+        }
+      }
+      expect(
+        page.querySelectorAll(
+          'article h2, article .inventory-offer__owner, article a[href^="/map/"], article a[href^="tel:"], article a[href^="mailto:"], article a[href^="https://t.me/"], article .ui-prose, article figure'
+        )
+      ).toHaveLength(0);
+      expect(page.querySelector(`[aria-labelledby="owner-${ownerId}-contacts"] a`)).toBeTruthy();
+      expect(page.getElementById(`owner-${ownerId}-contacts`)?.textContent.trim()).toBeTruthy();
+      expect(
+        page.querySelector(
+          'a[href="https://t.me/silentroach"], [data-pagefind-body], [data-search-section-id], meta[name="robots"][content*="noindex"]'
+        )
+      ).toBeFalsy();
+      const ids = [...page.querySelectorAll('[id]')].map((node) => node.id);
+      expect(new Set(ids).size).toBe(ids.length);
+      for (const section of page.querySelectorAll('main section[aria-labelledby]')) {
+        expect(page.getElementById(section.getAttribute('aria-labelledby') ?? '')).toBeTruthy();
+      }
+    }
+    expect([...anna.querySelectorAll('main nav a')].map((link) => link.getAttribute('href')))
+      .toMatchInlineSnapshot(`
+      [
+        "/",
+        "/ukogo/",
+      ]
+    `);
+    expect(anna.querySelector('main nav')?.textContent).toContain('Анна');
+    expect(anna.querySelector('main a[href="/ukogo/owners/"]')).toBeFalsy();
+  });
+
+  it('retains an empty owner header and contacts without a duplicate back link', async () => {
+    fixture.data = inventoryPageFixture(true);
+    expect(await ownerStaticPaths()).toMatchInlineSnapshot(`
+      [
+        {
+          "params": {
+            "owner": "anna",
+          },
+        },
+        {
+          "params": {
+            "owner": "boris",
+          },
+        },
+      ]
+    `);
+    const page = await renderOwner('boris');
+    expect({
+      name: page.querySelector('main h1')?.textContent,
+      parcel: page.querySelector('main a[href^="/map/?p="]')?.getAttribute('href'),
+      phone: page.querySelector('main a[href^="tel:"]')?.getAttribute('href'),
+      empty: page
+        .querySelector('main')
+        ?.textContent.includes('Сейчас нет предложений этого владельца.'),
+      offers: page.querySelectorAll('article').length,
+      backLinks: page.querySelectorAll('main a[href="/ukogo/"]').length,
+      canonical: page.querySelector('link[rel="canonical"]')?.getAttribute('href')
+    }).toMatchInlineSnapshot(`
+      {
+        "backLinks": 1,
+        "canonical": "https://kpshelkovo.online/ukogo/owners/boris/",
+        "empty": true,
+        "name": "Борис",
+        "offers": 0,
+        "parcel": "/map/?p=SHP-A1",
+        "phone": "tel:+79969670018",
+      }
+    `);
+  });
+
+  it('rejects a missing or deleted owner instead of showing another owner page', async () => {
+    await expect(renderOwner('missing')).rejects.toThrow('inventory owner not found');
+    const data = inventoryPageFixture(true);
+    fixture.data = {
+      ...data,
+      owners: data.owners.filter((owner) => owner.id !== 'boris'),
+      byOwner: new Map(
+        data.owners.filter((owner) => owner.id !== 'boris').map((owner) => [owner.id, owner])
+      )
+    };
+    await expect(renderOwner('boris')).rejects.toThrow('inventory owner not found');
+    expect(await ownerStaticPaths()).toMatchInlineSnapshot(`
+      [
+        {
+          "params": {
+            "owner": "anna",
+          },
+        },
+      ]
+    `);
+    expect((await renderOwner('anna')).querySelector('main h1')?.textContent).toBe('Анна');
   });
 
   it('does not render removed offers or offers requested through another kind or group', async () => {
