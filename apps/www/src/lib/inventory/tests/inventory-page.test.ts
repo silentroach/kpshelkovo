@@ -210,6 +210,75 @@ describe('inventory HTML pages', () => {
     }
   });
 
+  it('keeps contact and the first photo before detail body, without duplicating gallery images', async () => {
+    const container = await createAstroContainer();
+    const observations = [];
+    for (const offerId of ['paid', 'free', 'negotiable']) {
+      const page = parse(
+        await container.renderToString(OfferPage, {
+          params: { group: 'construction', kind: 'drill', offer: offerId },
+          request: new Request(`https://example.com/ukogo/construction/drill/${offerId}/`)
+        })
+      );
+      const main = page.querySelector('main');
+      if (!main) throw new Error('detail main missing');
+      const sequence = [
+        ...main.querySelectorAll(
+          'a[href^="tel:"], a[href^="mailto:"], figure, .inventory-detail__description .ui-prose'
+        )
+      ].map((node) =>
+        node.tagName === 'FIGURE'
+          ? 'photo'
+          : node.classList.contains('ui-prose')
+            ? 'body'
+            : 'contact'
+      );
+      const images = [...main.querySelectorAll('figure a')].map((node) =>
+        node.getAttribute('href')
+      );
+      const offer = fixture.data?.offers.find((item) => item.id === offerId);
+      expect(images).toEqual(offer?.photos.map((photo) => photo.url));
+      observations.push({
+        offerId,
+        price: visibleWhitespace(
+          main.querySelector('.inventory-detail__price')?.textContent.trim()
+        ),
+        sequence
+      });
+    }
+    expect(observations).toMatchInlineSnapshot(`
+      [
+        {
+          "offerId": "paid",
+          "price": "1·200·₽/сутки",
+          "sequence": [
+            "contact",
+            "photo",
+            "body",
+            "photo",
+          ],
+        },
+        {
+          "offerId": "free",
+          "price": "Бесплатно",
+          "sequence": [
+            "contact",
+            "body",
+          ],
+        },
+        {
+          "offerId": "negotiable",
+          "price": "Цена по·договорённости",
+          "sequence": [
+            "contact",
+            "photo",
+            "body",
+          ],
+        },
+      ]
+    `);
+  });
+
   it('lists only the selected owner offers with a kind link per card and one shared contact block', async () => {
     const anna = await renderOwner('anna');
     const boris = await renderOwner('boris');

@@ -1,0 +1,39 @@
+---
+import { formatNumberUnitRu } from '@shelkovo/format';
+import { formatTextHtml } from '@shelkovo/typography';
+import type { InventoryPrice } from '@/lib/inventory/types';
+import { formatInventoryPrice } from '@/lib/inventory/view';
+
+interface Props {
+  readonly price: InventoryPrice;
+}
+const { price } = Astro.props;
+const periods = { hour: '/час', day: '/сутки', once: ' разово' };
+---
+
+<p class="inventory-detail__price ui-num">
+  {price.type === 'fixed' ? (
+    <>
+      <span
+        set:html={formatTextHtml(
+          formatNumberUnitRu(price.value, '₽', { maximumFractionDigits: 2 }),
+        )}
+      />
+      <span class="inventory-detail__period">{periods[price.period]}</span>
+    </>
+  ) : (
+    <span set:html={formatTextHtml(formatInventoryPrice(price))} />
+  )}
+</p>
+
+<style>
+  .inventory-detail__price {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  .inventory-detail__period {
+    font-size: 1.0625rem;
+    font-weight: 400;
+  }
+</style>

@@ -11,7 +11,7 @@ const { kinds } = Astro.props;
   {kinds.map((kind) => (
     <li>
       <a
-        class="site-text-link"
+        class="site-text-link inventory-kinds__link"
         href={kind.url}
         set:html={formatTextHtml(kind.title)}
       />
@@ -23,11 +23,17 @@ const { kinds } = Astro.props;
   .inventory-kinds {
     max-width: 48rem;
     padding: 0;
-    margin: 1rem 0 0;
+    margin: 0;
     list-style: none;
   }
-  .inventory-kinds li {
+  .inventory-kinds__link {
+    display: block;
+    min-height: 2.75rem;
     padding-block: 0.75rem;
+  }
+  .inventory-kinds__link:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
   }
   .inventory-kinds li + li {
     border-block-start: 1px solid var(--color-border);

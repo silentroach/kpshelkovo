@@ -20,7 +20,6 @@ const photo = offer.photos[0];
   ]}
   aria-labelledby={`${offer.anchorId}-title`}
 >
-  {photo && <InventoryPreview photo={photo} href={offer.url} />}
   <header class="inventory-offer__heading">
     <h2
       id={`${offer.anchorId}-title`}
@@ -31,25 +30,30 @@ const photo = offer.photos[0];
     >
       {kind && (
         <span class="inventory-offer__kind">
-          <a
-            class="ui-title-link"
-            href={kind.url}
-            set:html={formatTextHtml(kind.title)}
-          />
-          <span aria-hidden="true">›</span>
+          {[
+            <a
+              class="ui-title-link"
+              href={kind.url}
+              set:html={formatTextHtml(kind.title)}
+            />,
+            <span aria-hidden="true">{'\u00a0›'}</span>,
+          ]}
         </span>
-      )}
+      )}{' '}
       <a
         href={offer.url}
         class="ui-title-link"
         set:html={formatTextHtml(offer.title)}
       />
     </h2>
+  </header>
+  <div class="inventory-offer__visual">
+    {photo && <InventoryPreview photo={photo} href={offer.url} />}
     <p
       class="inventory-offer__price ui-num"
       set:html={formatTextHtml(formatInventoryPrice(offer.price))}
     />
-  </header>
+  </div>
   <p
     class="inventory-offer__summary"
     set:html={formatTextHtml(offer.summary)}
@@ -72,7 +76,7 @@ const photo = offer.photos[0];
 <style>
   .inventory-offer {
     display: grid;
-    grid-template-areas: 'heading' 'summary';
+    grid-template-areas: 'heading' 'visual' 'summary';
     align-items: start;
     gap: 0.75rem 1.5rem;
     max-width: 52rem;
@@ -80,18 +84,23 @@ const photo = offer.photos[0];
     scroll-margin-top: calc(var(--site-sticky-offset) + 1rem);
   }
   .inventory-offer--owner {
-    grid-template-areas: 'heading' 'summary' 'owner';
+    grid-template-areas: 'heading' 'visual' 'summary' 'owner';
   }
   .inventory-offer + .inventory-offer {
     padding-block-start: 1.25rem;
     border-block-start: 1px solid var(--color-border);
   }
-  .inventory-offer--photo {
-    grid-template-columns: 6rem minmax(0, 1fr);
-    grid-template-areas: 'photo heading' 'summary summary';
+  .inventory-offer__visual {
+    grid-area: visual;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    gap: 0.75rem 1.5rem;
+    min-width: 0;
   }
-  .inventory-offer--photo.inventory-offer--owner {
-    grid-template-areas: 'photo heading' 'summary summary' 'owner owner';
+  .inventory-offer__visual > :global(.inventory-preview) {
+    flex: 0 0 6rem;
+    min-width: 0;
   }
   .inventory-offer__heading .ui-title-link {
     text-decoration-line: underline;
@@ -99,23 +108,24 @@ const photo = offer.photos[0];
   .inventory-offer__heading {
     grid-area: heading;
     min-width: 0;
+    margin-block-end: -0.25rem;
+  }
+  .inventory-offer--photo .inventory-offer__heading {
+    margin-block-end: 0;
   }
   .inventory-offer__price {
-    margin-top: 0.5rem;
+    grid-area: price;
+    flex: 1 1 min-content;
+    max-width: 100%;
+    overflow-wrap: break-word;
     font-size: 1.125rem;
     font-weight: 400;
     line-height: 1.5;
   }
   .inventory-offer__title-with-kind {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.25rem 0.5rem;
+    text-wrap: wrap;
   }
   .inventory-offer__kind {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 0.5rem;
     color: var(--color-text-muted);
     font-size: 1rem;
     font-weight: 400;
@@ -133,15 +143,27 @@ const photo = offer.photos[0];
     font-size: 0.875rem;
   }
   @media (min-width: 48rem) {
+    .inventory-offer {
+      grid-template-areas: 'heading' 'price' 'summary';
+    }
+    .inventory-offer--owner {
+      grid-template-areas: 'heading' 'price' 'summary' 'owner';
+    }
+    .inventory-offer__visual {
+      display: contents;
+    }
     .inventory-offer--photo {
       grid-template-columns: 10rem minmax(0, 1fr);
-      grid-template-areas: 'photo heading' 'photo summary';
-      grid-template-rows: min-content 1fr;
+      grid-template-areas: 'photo heading' 'photo price' 'photo summary';
+      grid-template-rows: min-content min-content 1fr;
       column-gap: 2rem;
     }
+    .inventory-offer--photo .inventory-offer__heading {
+      margin-block-end: -0.25rem;
+    }
     .inventory-offer--photo.inventory-offer--owner {
-      grid-template-areas: 'photo heading' 'photo summary' 'photo owner';
-      grid-template-rows: min-content min-content 1fr;
+      grid-template-areas: 'photo heading' 'photo price' 'photo summary' 'photo owner';
+      grid-template-rows: min-content min-content min-content 1fr;
     }
   }
 </style>

@@ -9,6 +9,44 @@ import InventoryPhotos from '../InventoryPhotos.astro';
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import InventoryPreview from '../InventoryPreview.astro';
 
+it('keeps the leading photo eager and preserves its original, alternative and caption', async () => {
+  const container = await createAstroContainer();
+  const window = new Window();
+  const url = 'https://media.kpshelkovo.online/ukogo/tool/kit.jpeg';
+  try {
+    window.document.write(
+      await container.renderToString(InventoryPhotos, {
+        props: {
+          leading: true,
+          photos: [{ url, width: 1200, height: 800, alt: 'Комплект', caption: 'Фото владельца' }]
+        }
+      })
+    );
+    const image = window.document.querySelector('img');
+    expect({
+      count: window.document.querySelectorAll('figure').length,
+      loading: image?.getAttribute('loading'),
+      alt: image?.getAttribute('alt'),
+      original: window.document.querySelector('figure a')?.getAttribute('href'),
+      caption: window.document.querySelector('figcaption')?.textContent?.trim(),
+      excludedFromSearch: window.document
+        .querySelector('.inventory-photos')
+        ?.getAttribute('data-pagefind-ignore')
+    }).toMatchInlineSnapshot(`
+      {
+        "alt": "Комплект",
+        "caption": "Фото владельца",
+        "count": 1,
+        "excludedFromSearch": "all",
+        "loading": "eager",
+        "original": "https://media.kpshelkovo.online/ukogo/tool/kit.jpeg",
+      }
+    `);
+  } finally {
+    await window.happyDOM.close();
+  }
+});
+
 it.each([
   'ukogo/tool/kit.jpeg',
   'news/2026/10/work/kit.jpeg',

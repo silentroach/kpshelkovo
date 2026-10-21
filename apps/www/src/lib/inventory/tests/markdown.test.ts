@@ -329,6 +329,20 @@ describe('inventory Markdown companions', () => {
         ]
       `);
     expect(document.body.textContent).toContain('Два **диска** [в комплекте].');
+    const detailOrder = [...document.querySelectorAll('img, p')]
+      .filter(
+        (node) =>
+          node.tagName === 'IMG' ||
+          node.textContent.replace(/[\u00a0\u202f]/gu, ' ') === 'Диск 125 мм.'
+      )
+      .map((node) => (node.tagName === 'IMG' ? node.getAttribute('src') : 'body'));
+    expect(detailOrder).toMatchInlineSnapshot(`
+      [
+        "https://media.kpshelkovo.online/ukogo/fixed/tool.jpeg",
+        "body",
+        "https://media.kpshelkovo.online/ukogo/fixed/case.jpeg",
+      ]
+    `);
   });
 
   it('lists only the owner’s compact offers with kind links and one contact and parcel in the header', () => {
