@@ -94,9 +94,10 @@ describe('buildContactsDataset', () => {
     ]);
   });
 
-  it('orders categories by their usefulness to residents', () => {
-    const data = buildContactsDataset([
+  it('orders populated categories by resident tasks regardless of input order', () => {
+    const entries = [
       entry({ id: 'fence/fence', data: { category: 'fence' } }),
+      entry({ id: 'services/services', data: { category: 'services' } }),
       entry({
         id: 'education/education',
         data: { category: 'education' }
@@ -111,21 +112,33 @@ describe('buildContactsDataset', () => {
         data: { category: 'construction' }
       }),
       entry({ id: 'furniture/furniture', data: { category: 'furniture' } }),
+      entry({ id: 'food/food', data: { category: 'food' } }),
       entry({
         id: 'electricity/electricity',
         data: { category: 'electricity' }
       })
-    ]);
+    ];
 
-    expect(data.categories.map((item) => item.category)).toEqual([
-      'electricity',
-      'construction',
-      'furniture',
-      'fence',
-      'waste-removal',
-      'education',
-      'garden'
-    ]);
+    const categories = buildContactsDataset(entries).categories.map((item) => item.category);
+    expect(categories).toMatchInlineSnapshot(`
+      [
+        "construction",
+        "electricity",
+        "fence",
+        "furniture",
+        "garden",
+        "waste-removal",
+        "food",
+        "education",
+        "services",
+      ]
+    `);
+    const partial = buildContactsDataset(
+      entries.filter(({ data }) => data.category !== 'furniture')
+    );
+    expect(partial.categories.map((item) => item.category)).toEqual(
+      categories.filter((category) => category !== 'furniture')
+    );
   });
 
   it('gives blank-body contacts reachable detail URLs', () => {

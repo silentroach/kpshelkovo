@@ -28,8 +28,7 @@ const CONTACT_CATEGORY_LABELS: Record<ContactCategory, string> = {
   food: 'Еда и продукты',
   electricity: 'Электричество',
   education: 'Дети и обучение',
-  travel: 'Путешествия',
-  insurance: 'Страхование'
+  services: 'Услуги'
 };
 
 const CONTACT_CATEGORY_EMOJI: Record<ContactCategory, string> = {
@@ -41,8 +40,7 @@ const CONTACT_CATEGORY_EMOJI: Record<ContactCategory, string> = {
   food: '🍕',
   electricity: '⚡',
   education: '📚',
-  travel: '✈️',
-  insurance: '🛡️'
+  services: '💼'
 };
 
 const CONTACT_REVIEW_SENTIMENT_LABELS: Record<ContactReview['sentiment'], string> = {
