@@ -73,7 +73,8 @@ const photo = offer.photos[0];
   .inventory-offer {
     display: grid;
     grid-template-areas: 'heading' 'summary';
-    gap: 0.625rem 1.5rem;
+    align-items: start;
+    gap: 0.75rem 1.5rem;
     max-width: 52rem;
     padding-block-end: 1.25rem;
     scroll-margin-top: calc(var(--site-sticky-offset) + 1rem);
@@ -116,7 +117,7 @@ const photo = offer.photos[0];
     align-items: baseline;
     gap: 0.5rem;
     color: var(--color-text-muted);
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
   }
@@ -135,10 +136,12 @@ const photo = offer.photos[0];
     .inventory-offer--photo {
       grid-template-columns: 10rem minmax(0, 1fr);
       grid-template-areas: 'photo heading' 'photo summary';
+      grid-template-rows: min-content 1fr;
       column-gap: 2rem;
     }
     .inventory-offer--photo.inventory-offer--owner {
       grid-template-areas: 'photo heading' 'photo summary' 'photo owner';
+      grid-template-rows: min-content min-content 1fr;
     }
   }
 </style>
