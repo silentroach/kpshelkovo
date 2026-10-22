@@ -9,6 +9,7 @@ const contact = {
   category: 'fence',
   updatedAt: new Date('2026-07-06T00:00:00.000Z'),
   updatedIso: '2026-07-06',
+  summary: 'Установка заборов.',
   contacts: {
     phone: '+7 900 000-00-00'
   },

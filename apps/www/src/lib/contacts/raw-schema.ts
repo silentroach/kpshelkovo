@@ -144,7 +144,7 @@ export const RawContactSchema = z
     }),
     category: z.enum(CONTACT_CATEGORIES),
     updated_at: contactDate('updated_at'),
-    summary: nonBlankText.optional(),
+    summary: nonBlankText,
     search_aliases: RawSearchAliasesSchema.optional(),
     contacts,
     location: location.optional(),

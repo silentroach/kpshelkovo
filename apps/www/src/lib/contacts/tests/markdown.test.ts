@@ -23,6 +23,8 @@ const contact = {
   category: 'fence',
   updatedAt: new Date('2026-07-06T00:00:00.000Z'),
   updatedIso: '2026-07-06',
+  summary: 'Установка заборов.',
+  seo: { description: 'Монтаж ограждений для частных домов.' },
   searchAliases: ['служебный поисковый алиас'],
   contacts: {
     phone: '8 (900) 000-00-00',
@@ -63,6 +65,7 @@ const blankBodyContact = {
   category: 'fence',
   updatedAt: new Date('2026-07-06T00:00:00.000Z'),
   updatedIso: '2026-07-06',
+  summary: 'Установка заборов.',
   contacts: {
     phone: '+7(985) 774-75-04'
   },
@@ -122,6 +125,9 @@ describe('contacts markdown companions', () => {
       expect(markdown).not.toMatch(
         /\+7 900 000-00-00|t\.me\/example|yandex\.ru\/maps|contact\.vcf/u
       );
+      expect(markdown).toContain(contact.summary);
+      expect(markdown).not.toContain(contact.body);
+      expect(markdown).not.toContain(contact.seo.description);
     }
   });
 
@@ -138,6 +144,7 @@ describe('contacts markdown companions', () => {
         phone: +7 900 000-00-00
         telegram: https://t.me/example
         email: team@example.com
+      summary: Установка заборов.
       location:
         title: Золото Сибири
         url: https://yandex.ru/maps/-/CTq-BEOk
@@ -174,6 +181,7 @@ describe('contacts markdown companions', () => {
       updated_at: 2026-07-06
       contacts:
         phone: +7 985 774-75-04
+      summary: Установка заборов.
       ---
 
       # Сергей

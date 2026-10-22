@@ -1,9 +1,8 @@
 import { dateTimeFromISO, formatDate } from '@shelkovo/format';
-import { extractFirstMarkdownText } from '@shelkovo/markdown';
 
 import { formatContactPhone, normalizeContactPhone } from './phone';
 import type { ContactCategory } from './schema';
-import type { Contact, ContactContacts, ContactLocation, ContactReview } from './types';
+import type { ContactContacts, ContactLocation, ContactReview } from './types';
 
 export interface ContactMethod {
   readonly type: keyof ContactContacts;
@@ -140,9 +139,6 @@ export const hasManyPositiveContactReviews = (
     ).length >= MANY_POSITIVE_CONTACT_REVIEWS_THRESHOLD
   );
 };
-
-export const contactExcerpt = (contact: Pick<Contact, 'body' | 'summary'>): string =>
-  contact.summary || (extractFirstMarkdownText(contact.body) ?? '');
 
 export const contactMethods = (contacts: ContactContacts): readonly ContactMethod[] => {
   const phone = contacts.phone ? formatContactPhone(contacts.phone) : undefined;

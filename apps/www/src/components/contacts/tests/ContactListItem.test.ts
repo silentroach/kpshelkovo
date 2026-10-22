@@ -22,6 +22,7 @@ const contact = {
   category: 'construction',
   updatedAt: new Date('2026-08-01T00:00:00.000Z'),
   updatedIso: '2026-08-01',
+  summary: 'Строительство домов.',
   contacts: { phone: '+7 900 000-00-00' },
   location: {
     title: 'Пример места',
@@ -31,7 +32,8 @@ const contact = {
   url: '/sarafan/construction/example/',
   markdownUrl: '/sarafan/construction/example/index.md',
   canonical: 'https://example.com/sarafan/construction/example/',
-  body: '',
+  body: 'Условия работы обсуждаются после замеров.',
+  seo: { description: 'Короткий текст для внешнего превью.' },
   mentions: []
 } satisfies Contact;
 
@@ -48,6 +50,9 @@ describe('ContactListItem', () => {
 
     expect(html).toContain('href="/sarafan/construction/example/"');
     expect(html).not.toMatch(/\+7 900 000-00-00|yandex\.ru\/maps\/example/u);
+    expect(html).toContain(contact.summary);
+    expect(html).not.toContain(contact.body);
+    expect(html).not.toContain(contact.seo.description);
   });
 
   it('shows the highlight with matching native title and accessible description', async () => {

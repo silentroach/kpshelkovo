@@ -2,17 +2,13 @@
 import { StarIcon } from '@shelkovo/ui/icons';
 
 import type { Contact } from '@/lib/contacts/types';
-import {
-  contactExcerpt,
-  hasManyPositiveContactReviews,
-} from '@/lib/contacts/view';
+import { hasManyPositiveContactReviews } from '@/lib/contacts/view';
 
 interface Props {
   readonly contact: Contact;
 }
 
 const { contact } = Astro.props;
-const excerpt = contactExcerpt(contact);
 const showReviewHighlight = hasManyPositiveContactReviews(contact.reviews);
 const reviewHighlightLabel =
   'За последнее время соседи оставили много хороших отзывов.';
@@ -36,7 +32,7 @@ const reviewHighlightLabel =
       )}
     </h3>
 
-    {excerpt ? <p class="contact-list-item__excerpt">{excerpt}</p> : null}
+    <p class="contact-list-item__excerpt">{contact.summary}</p>
   </div>
 </article>
 

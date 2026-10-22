@@ -8,7 +8,7 @@ contacts:
   phone: '8 (903) 519-95-88'
 reviews:
   - sentiment: positive
-    summary: 'Повторно помог с вывозом мусора; в отзыве отмечен быстрый приезд.'
+    summary: 'Повторно помог с вывозом мусора, быстро приехал.'
     published_at: 2026-09-14
     url: https://t.me/shelkovoecoclub/15263/55586
 ---

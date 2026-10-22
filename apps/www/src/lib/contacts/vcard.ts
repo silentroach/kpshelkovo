@@ -4,7 +4,6 @@ import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
 
 import { normalizeContactPhone } from './phone';
 import type { ContactVcfName, ContactWithVcf } from './types';
-import { contactExcerpt } from './view';
 
 const addPersonName = (card: VCard, fullName: string, name: ContactVcfName): void => {
   card.addFullName(fullName).addName({
@@ -43,7 +42,7 @@ export const buildContactVcard = (contact: ContactWithVcf): string => {
   const website = vcf.website ?? contact.contacts.website;
   const address = vcf.address ?? contact.location?.address;
   const profileUrl = contact.canonical;
-  const note = vcf.note ?? contactExcerpt(contact);
+  const note = vcf.note ?? contact.summary;
 
   // Explicit charset prevents Apple Contacts from decoding Cyrillic as MacRoman.
   card.setCharset('UTF-8');

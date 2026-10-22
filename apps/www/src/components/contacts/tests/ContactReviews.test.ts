@@ -44,6 +44,7 @@ describe('ContactReviews', () => {
         slug: 'example',
         category: 'construction',
         updated_at: review.publishedIso,
+        summary: 'Мастерские услуги.',
         contacts: { phone: '+7 900 000-00-00' },
         reviews: [
           {

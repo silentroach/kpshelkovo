@@ -2,7 +2,7 @@
 
 ## Context
 
-Проблема и согласованный объём описаны в [proposal](/openspec/changes/clarify-sarafan-descriptions/proposal.md). Решения согласованы с владельцем при обсуждении #1142; подготовка этих артефактов разрешена, разрешение реализации ещё требуется.
+Проблема и согласованный объём описаны в [proposal](/openspec/changes/archive/2026-10-22-clarify-sarafan-descriptions/proposal.md). Решения согласованы с владельцем при обсуждении #1142. Разрешение реализации зафиксировано в [комментарии к задаче](https://github.com/silentroach/kpshelkovo/issues/1142#issuecomment-6339789607).
 
 В [шаблоне карточки](/apps/www/src/pages/sarafan/[category]/[slug]/index.astro) `description` выбирается из SEO-поля или общей приписки и используется сразу для метаданных, поиска и fallback основного текста. [Списки и другие потребители](/apps/www/src/lib/contacts/view.ts) отдельно выбирают `summary`, затем первый текст body. [Markdown-карточка](/apps/www/src/lib/contacts/markdown.ts) уже публикует только настоящий body, а summary, контакты и отзывы хранит во frontmatter.
 

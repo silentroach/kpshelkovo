@@ -127,6 +127,7 @@ const contact = (input: {
     slug: input.id.split('/').pop() ?? input.id,
     category: 'fence',
     updated_at: '2026-07-06',
+    summary: 'Установка заборов.',
     contacts: {
       phone: '+7 900 000-00-00'
     }

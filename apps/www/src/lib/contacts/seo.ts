@@ -6,7 +6,7 @@ import { absoluteUrl } from '@/lib/site';
 
 import { normalizeContactPhone } from './phone';
 import type { Contact } from './types';
-import { contactExcerpt, formatContactCategory } from './view';
+import { formatContactCategory } from './view';
 
 const CONTEXT = 'https://schema.org';
 const LANG = 'ru-RU';
@@ -43,7 +43,7 @@ const contactPointSchema = (contact: Contact, url: string): SchemaDoc => {
     '@type': 'ContactPoint',
     '@id': `${url}#contact`,
     name: contact.title,
-    description: contactExcerpt(contact),
+    description: contact.summary,
     contactType: formatContactCategory(contact.category),
     areaServed: {
       '@type': 'Place',
