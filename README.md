@@ -8,7 +8,7 @@
 
 ```text
 apps/
-  www/       # основное Astro-приложение kpshelkovo.online, включая /815/compare
+  www/       # основное Astro-приложение kpshelkovo.online
   media/     # статическая 404 для media.kpshelkovo.online
 packages/
   ui/        # shared styles / UI primitives
