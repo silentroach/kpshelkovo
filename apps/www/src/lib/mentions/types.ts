@@ -10,7 +10,8 @@ export const SITE_MENTION_SECTIONS = [
   'reviews',
   'places',
   'people',
-  'contacts'
+  'contacts',
+  'discomfort'
 ] as const;
 export const SITE_BACKLINK_KINDS = [
   'article',
@@ -19,7 +20,8 @@ export const SITE_BACKLINK_KINDS = [
   'review',
   'place',
   'person',
-  'contact'
+  'contact',
+  'quote'
 ] as const;
 
 export type EntityMentionType = (typeof ENTITY_MENTION_TYPES)[number];

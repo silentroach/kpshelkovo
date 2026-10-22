@@ -45,6 +45,7 @@ const profile = (): PersonProfile => ({
   ],
   backlinks: {
     events: [],
+    discomfort: [],
     news: [
       {
         section: 'news',
@@ -85,6 +86,7 @@ describe('people public DTO adapters', () => {
             "backlink_count": 2,
             "backlinks": {
               "contacts": [],
+              "discomfort": [],
               "events": [],
               "news": [
                 {
@@ -113,7 +115,7 @@ describe('people public DTO adapters', () => {
               "status": [],
             },
             "body_markdown": "Публичный профиль.",
-            "company": "ОК \"Комфорт\"",
+            "company": "ОК "Комфорт"",
             "contacts": [
               {
                 "display": "@Kirill_ZemlyaMO",

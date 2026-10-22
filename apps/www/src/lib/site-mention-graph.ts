@@ -1,4 +1,5 @@
 import { createContactMentionRefs } from './contacts/mentions';
+import { createDiscomfortMentionRefs } from './discomfort/mentions';
 import { createEventMentionRefs } from './events/mentions';
 import { createEntityMentionGraph, type EntityMentionGraph } from './mentions';
 import { createNewsArticleMentionRefs } from './news/mentions';
@@ -18,6 +19,7 @@ const buildSiteMentionGraph = async (): Promise<EntityMentionGraph> => {
     { loadReviewsData },
     { loadPlacesData },
     { loadEventsData },
+    { loadDiscomfortData },
     people
   ] = await Promise.all([
     import('./contacts/load'),
@@ -26,15 +28,17 @@ const buildSiteMentionGraph = async (): Promise<EntityMentionGraph> => {
     import('./reviews/load'),
     import('./places/load'),
     import('./events/load'),
+    import('./discomfort/load'),
     loadPeopleData()
   ]);
-  const [contacts, news, status, reviews, places, events] = await Promise.all([
+  const [contacts, news, status, reviews, places, events, discomfort] = await Promise.all([
     loadContactsData(),
     loadNewsData(),
     loadStatusData(),
     loadReviewsData(),
     loadPlacesData(),
-    loadEventsData()
+    loadEventsData(),
+    loadDiscomfortData()
   ]);
 
   return createEntityMentionGraph([
@@ -46,6 +50,7 @@ const buildSiteMentionGraph = async (): Promise<EntityMentionGraph> => {
     ),
     ...reviews.reviews.flatMap(createReviewMentionRefs),
     ...places.places.flatMap(createPlaceMentionRefs),
+    ...createDiscomfortMentionRefs(discomfort),
     ...people.profiles.flatMap(createPersonProfileMentionRefs)
   ]);
 };

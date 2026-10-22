@@ -44,5 +44,9 @@ export const SEARCH_SECTIONS = {
   regulation: {
     id: 'regulation',
     label: 'Регламент'
+  },
+  discomfort: {
+    id: 'discomfort',
+    label: 'ОК Дискомфорт'
   }
 } as const satisfies Readonly<Record<string, SearchSection>>;

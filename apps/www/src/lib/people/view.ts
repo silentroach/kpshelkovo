@@ -34,7 +34,8 @@ const BACKLINK_SECTION_LABELS: Record<PersonMentionSection, string> = {
   reviews: 'Отзывы',
   places: 'Карта',
   people: 'Люди',
-  contacts: 'Сарафан'
+  contacts: 'Сарафан',
+  discomfort: 'ОК Дискомфорт'
 };
 
 const BACKLINK_KIND_LABELS: Record<PersonBacklinkKind, string> = {
@@ -44,7 +45,8 @@ const BACKLINK_KIND_LABELS: Record<PersonBacklinkKind, string> = {
   review: 'Отзыв',
   place: 'Место',
   person: 'Профиль',
-  contact: 'Контакт'
+  contact: 'Контакт',
+  quote: 'Цитата'
 };
 
 export const PEOPLE_PROSE = NEWS_PROSE;

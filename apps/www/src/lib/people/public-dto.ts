@@ -41,6 +41,7 @@ export interface PeoplePublicBacklinksDto {
   readonly places: readonly PeoplePublicBacklinkDto[];
   readonly people: readonly PeoplePublicBacklinkDto[];
   readonly contacts: readonly PeoplePublicBacklinkDto[];
+  readonly discomfort: readonly PeoplePublicBacklinkDto[];
 }
 
 export interface PeoplePublicProfileDto {
@@ -115,7 +116,8 @@ const backlinksDto = (value: PersonBacklinks): PeoplePublicBacklinksDto => ({
   reviews: value.reviews.map(backlinkDto),
   places: value.places.map(backlinkDto),
   people: value.people.map(backlinkDto),
-  contacts: value.contacts.map(backlinkDto)
+  contacts: value.contacts.map(backlinkDto),
+  discomfort: value.discomfort.map(backlinkDto)
 });
 
 const profileDto = (item: PersonProfile): PeoplePublicProfileDto => ({

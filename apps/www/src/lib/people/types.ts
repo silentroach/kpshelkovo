@@ -67,5 +67,6 @@ export const EMPTY_PERSON_BACKLINKS: PersonBacklinks = {
   reviews: [],
   places: [],
   people: [],
-  contacts: []
+  contacts: [],
+  discomfort: []
 };
