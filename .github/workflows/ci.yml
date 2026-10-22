@@ -200,19 +200,17 @@ jobs:
           scp $scp_opts ops/nginx/kpshelkovo-online.conf "$DEPLOY_USER@$DEPLOY_HOST:/tmp/kpshelkovo-online.conf.new"
           scp $scp_opts ops/nginx/security.conf "$DEPLOY_USER@$DEPLOY_HOST:/tmp/security.conf.new"
           scp $scp_opts ops/nginx/media-kpshelkovo-online.conf "$DEPLOY_USER@$DEPLOY_HOST:/tmp/media-kpshelkovo-online.conf.new"
-          scp $scp_opts ops/nginx/sravni-shelkovo.conf "$DEPLOY_USER@$DEPLOY_HOST:/tmp/sravni-shelkovo.conf.new"
 
           ssh $ssh_opts "$DEPLOY_USER@$DEPLOY_HOST" '
             set -eu
 
-            trap "rm -f /tmp/deploy-nginx-service.sh /tmp/deploy-nginx-site.sh /tmp/nginx-service-restart.conf.new /tmp/kpshelkovo-online.conf.new /tmp/security.conf.new /tmp/media-kpshelkovo-online.conf.new /tmp/sravni-shelkovo.conf.new" EXIT
+            trap "rm -f /tmp/deploy-nginx-service.sh /tmp/deploy-nginx-site.sh /tmp/nginx-service-restart.conf.new /tmp/kpshelkovo-online.conf.new /tmp/security.conf.new /tmp/media-kpshelkovo-online.conf.new" EXIT
 
             sudo -n install -m 755 /tmp/deploy-nginx-service.sh /usr/local/sbin/deploy-nginx-service
             sudo -n install -m 755 /tmp/deploy-nginx-site.sh /usr/local/sbin/deploy-nginx-site
             sudo -n /usr/local/sbin/deploy-nginx-service /tmp/nginx-service-restart.conf.new
             sudo -n /usr/local/sbin/deploy-nginx-site /tmp/kpshelkovo-online.conf.new kpshelkovo-online
             sudo -n /usr/local/sbin/deploy-nginx-site /tmp/media-kpshelkovo-online.conf.new media-kpshelkovo-online
-            sudo -n /usr/local/sbin/deploy-nginx-site /tmp/sravni-shelkovo.conf.new sravni-shelkovo
           '
 
       - name: Sync build to server
@@ -335,5 +333,4 @@ jobs:
             echo
             echo '- https://kpshelkovo.online'
             echo '- https://media.kpshelkovo.online'
-            echo '- https://сравни.шелково.рф'
           } >> "$GITHUB_STEP_SUMMARY"

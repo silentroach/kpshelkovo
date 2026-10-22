@@ -8,7 +8,7 @@
 
 ```text
 apps/
-  www/       # основное Astro-приложение kpshelkovo.online, включая /815/compare
+  www/       # основное Astro-приложение kpshelkovo.online
   media/     # статическая 404 для media.kpshelkovo.online
 packages/
   ui/        # shared styles / UI primitives
@@ -52,8 +52,8 @@ pnpm build
 ## Деплой
 
 - `kpshelkovo.online` получает содержимое `dist/www`
+- `www.kpshelkovo.online` перенаправляет на основной сайт
 - `media.kpshelkovo.online` получает error app из `dist/media`, а остальные запросы проксирует в S3
-- старый compare-домен обслуживается nginx-редиректами
 - nginx-конфиги лежат в `ops/nginx/`
 
 ### IndexNow
