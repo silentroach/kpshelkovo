@@ -1,6 +1,6 @@
 /// <reference types="astro/client" />
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { Contact, ContactReview } from '@/lib/contacts/types';
 import { createAstroContainer } from '@/test/astro-container';
@@ -36,6 +36,10 @@ const contact = {
 } satisfies Contact;
 
 describe('ContactListItem', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('does not expose contact details in a list item', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(ContactListItem, {
@@ -46,16 +50,32 @@ describe('ContactListItem', () => {
     expect(html).not.toMatch(/\+7 900 000-00-00|yandex\.ru\/maps\/example/u);
   });
 
-  it('describes the review highlight with a native title', async () => {
+  it('shows the highlight with matching native title and accessible description', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-10-22T12:00:00.000Z'));
     const container = await createAstroContainer();
     const html = await container.renderToString(ContactListItem, {
       props: { contact }
     });
 
-    expect(html).toContain(
-      'role="img" aria-label="Много положительных отзывов" title="Много положительных отзывов"'
-    );
+    const attributes = html.match(/aria-label="([^"]+)" title="([^"]+)"/u);
+    expect(attributes?.[1]).toBeTruthy();
+    expect(attributes?.[1]).toBe(attributes?.[2]);
+    expect(html).toContain('role="img"');
     expect(html).not.toContain('role="tooltip"');
     expect(html).toMatch(/<svg[^>]+aria-hidden="true"/u);
+  });
+
+  it('hides the highlight when reviews do not meet the threshold', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-10-22T12:00:00.000Z'));
+    const container = await createAstroContainer();
+    const html = await container.renderToString(ContactListItem, {
+      props: {
+        contact: { ...contact, reviews: contact.reviews.slice(0, 4) }
+      }
+    });
+
+    expect(html).not.toContain('contact-list-item__review-highlight');
   });
 });

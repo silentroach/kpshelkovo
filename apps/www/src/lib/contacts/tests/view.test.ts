@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { formatContactPhone } from '../phone';
+import type { ContactReview } from '../types';
 import {
   contactMethods,
   contactPlace,
@@ -8,6 +9,13 @@ import {
   formatContactReviewDate,
   hasManyPositiveContactReviews
 } from '../view';
+
+const reviewsOn = (
+  sentiment: ContactReview['sentiment'],
+  publishedIso: string,
+  count = 1
+): readonly Pick<ContactReview, 'sentiment' | 'publishedIso'>[] =>
+  Array.from({ length: count }, () => ({ sentiment, publishedIso }));
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
@@ -53,13 +61,121 @@ describe('contact view helpers', () => {
     ({ positive, neutral, negative, highlighted }) => {
       expect(
         hasManyPositiveContactReviews([
-          ...Array.from({ length: positive }, () => ({ sentiment: 'positive' as const })),
-          ...Array.from({ length: neutral }, () => ({ sentiment: 'neutral' as const })),
-          ...Array.from({ length: negative }, () => ({ sentiment: 'negative' as const }))
+          ...reviewsOn('positive', '2026-09-01', positive),
+          ...reviewsOn('neutral', '2026-09-15', neutral),
+          ...reviewsOn('negative', '2026-09-01', negative)
         ])
       ).toBe(highlighted);
     }
   );
+
+  it.each([4, 5, 6])('counts %i positives strictly after the latest negative', (count) => {
+    expect(
+      hasManyPositiveContactReviews([
+        ...reviewsOn('positive', '2026-06-01', 5),
+        ...reviewsOn('negative', '2026-07-01'),
+        ...reviewsOn('positive', '2026-08-01', count),
+        ...reviewsOn('neutral', '2026-09-01')
+      ])
+    ).toBe(count >= 5);
+  });
+
+  it('starts the count again after another negative', () => {
+    const recovered = [
+      ...reviewsOn('negative', '2026-06-01'),
+      ...reviewsOn('positive', '2026-07-01', 5)
+    ];
+    const reset = [...recovered, ...reviewsOn('negative', '2026-08-01')];
+
+    expect(hasManyPositiveContactReviews(recovered)).toBe(true);
+    expect(hasManyPositiveContactReviews(reset)).toBe(false);
+    expect(
+      hasManyPositiveContactReviews([...reset, ...reviewsOn('positive', '2026-09-01', 5)])
+    ).toBe(true);
+  });
+
+  it.each([false, true])(
+    'ignores same-day positives regardless of order (reversed: %s)',
+    (reverse) => {
+      const reviews = [
+        ...reviewsOn('positive', '2026-07-01', 5),
+        ...reviewsOn('negative', '2026-08-01'),
+        ...reviewsOn('positive', '2026-08-01', 5),
+        ...reviewsOn('positive', '2026-09-01', 4),
+        ...reviewsOn('negative', '2026-06-01')
+      ];
+      const ordered = Object.freeze(reverse ? reviews.toReversed() : reviews);
+
+      expect(hasManyPositiveContactReviews(ordered)).toBe(false);
+      expect(
+        hasManyPositiveContactReviews([...ordered, ...reviewsOn('positive', '2026-09-02')])
+      ).toBe(true);
+    }
+  );
+
+  it.each([
+    { date: '2025-09-30', highlighted: false },
+    { date: '2025-10-01', highlighted: true },
+    { date: '2026-10-01', highlighted: true },
+    { date: '2026-10-02', highlighted: false }
+  ])('includes only positives inside the inclusive year: $date', ({ date, highlighted }) => {
+    expect(
+      hasManyPositiveContactReviews([
+        ...reviewsOn('positive', '2026-09-01', 4),
+        ...reviewsOn('positive', date)
+      ])
+    ).toBe(highlighted);
+  });
+
+  it.each([
+    { date: '2025-09-30', highlighted: true },
+    { date: '2025-10-01', highlighted: false },
+    { date: '2026-10-01', highlighted: false },
+    { date: '2026-10-02', highlighted: true }
+  ])('includes only negatives inside the inclusive year: $date', ({ date, highlighted }) => {
+    expect(
+      hasManyPositiveContactReviews([
+        ...reviewsOn('positive', '2025-10-01', 5),
+        ...reviewsOn('negative', date)
+      ])
+    ).toBe(highlighted);
+  });
+
+  it.each([
+    { date: '2023-02-27', highlighted: false },
+    { date: '2023-02-28', highlighted: true },
+    { date: '2024-02-29', highlighted: true },
+    { date: '2024-03-01', highlighted: false }
+  ])('uses a calendar year ending on leap day: $date', ({ date, highlighted }) => {
+    expect(
+      hasManyPositiveContactReviews(
+        [...reviewsOn('positive', '2024-02-01', 4), ...reviewsOn('positive', date)],
+        new Date('2024-02-29T09:00:00Z')
+      )
+    ).toBe(highlighted);
+  });
+
+  it.each([
+    { now: '2026-10-01T20:59:59Z', highlighted: false },
+    { now: '2026-10-01T21:00:00Z', highlighted: true }
+  ])('uses the Moscow day at $now', ({ now, highlighted }) => {
+    expect(
+      hasManyPositiveContactReviews(
+        [...reviewsOn('positive', '2026-09-01', 4), ...reviewsOn('positive', '2026-10-02')],
+        new Date(now)
+      )
+    ).toBe(highlighted);
+  });
+
+  it('loses the star when a positive leaves the calendar-year window', () => {
+    const reviews = [
+      ...reviewsOn('positive', '2026-09-01', 4),
+      ...reviewsOn('positive', '2025-10-01')
+    ];
+
+    expect(hasManyPositiveContactReviews(reviews, new Date('2026-10-01T09:00:00Z'))).toBe(true);
+    expect(hasManyPositiveContactReviews(reviews, new Date('2026-10-02T09:00:00Z'))).toBe(false);
+  });
 
   it('builds display methods in stable order with safe hrefs', () => {
     expect(

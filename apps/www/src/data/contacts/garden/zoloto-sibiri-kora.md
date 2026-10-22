@@ -2,7 +2,7 @@
 title: Кора в Малино
 slug: zoloto-sibiri-kora
 category: garden
-updated_at: 2026-07-13
+updated_at: 2026-10-22
 summary: 'Производство коры в Малино. Лучше приезжать лично: на доставку есть жалобы.'
 contacts:
   phone: '+7 991 737-55-56'
@@ -18,7 +18,7 @@ vcf:
   kind: organization
   organization: Золото Сибири
 reviews:
-  - sentiment: positive
+  - sentiment: neutral
     summary: 'На площадке большой выбор коры, но лучше ехать лично: на доставку пожаловались.'
     published_at: 2026-07-07
     url: https://t.me/shelkovoecoclub/1/49653

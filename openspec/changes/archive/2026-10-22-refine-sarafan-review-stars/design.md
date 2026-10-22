@@ -2,7 +2,7 @@
 
 ## Context
 
-Причины и объём описаны в [proposal](/openspec/changes/refine-sarafan-review-stars/proposal.md). Решения ниже уточняют календарные границы, порядок отзывов и способ показа подсказки до реализации.
+Причины и объём описаны в [proposal](/openspec/changes/archive/2026-10-22-refine-sarafan-review-stars/proposal.md). Решения ниже уточняют календарные границы, порядок отзывов и способ показа подсказки до реализации.
 
 [hasManyPositiveContactReviews](/apps/www/src/lib/contacts/view.ts) сейчас получает только тональности и считает все записи. [ContactListItem](/apps/www/src/components/contacts/ContactListItem.astro) использует результат в обоих HTML-списках; звезда уже имеет нативный `title` и `aria-label`. Даты отзывов доступны в домене как календарные строки `publishedIso`.
 
