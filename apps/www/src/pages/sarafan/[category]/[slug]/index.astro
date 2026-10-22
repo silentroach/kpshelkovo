@@ -42,20 +42,16 @@ if (!contact) {
 
 const category = formatContactCategory(contact.category);
 const title = `${contact.title} — ${category} — Сарафан — Шелково Онлайн`;
-const description =
-  contact.seo?.description ??
-  `Контакт из раздела «Сарафан»: ${category}. Перед обращением уточняйте цену, сроки и состав работ.`;
+const description = contact.seo?.description ?? contact.summary;
 const search = {
   scope: 'manual',
   title: contact.title,
-  description,
+  description: contact.summary,
   section: SEARCH_SECTIONS.sarafan,
   aliases: contact.searchAliases,
 } satisfies SearchDocument;
-const summaryHtml = contact.summary
-  ? formatTextHtml(contact.summary)
-  : undefined;
-const bodyHtml = renderMarkdown(contact.body || description);
+const summaryHtml = formatTextHtml(contact.summary);
+const bodyHtml = contact.body ? renderMarkdown(contact.body) : undefined;
 const categoryUrl = contactCategoryUrl({ category: contact.category });
 const reviewsHeadingId = 'contact-reviews';
 const breadcrumbs = withHomeBreadcrumbs([
@@ -97,13 +93,11 @@ const schema = contactPageSchema({
             </span>
           ) : null}
         </div>
-        {summaryHtml ? (
-          <p
-            class="sarafan-contact-summary"
-            data-pagefind-body
-            set:html={summaryHtml}
-          />
-        ) : null}
+        <p
+          class="sarafan-contact-summary"
+          data-pagefind-body
+          set:html={summaryHtml}
+        />
       </div>
     </header>
 
@@ -114,13 +108,15 @@ const schema = contactPageSchema({
           location={contact.location}
         />
       </div>
-      <div
-        class="ui-prose sarafan-contact-prose"
-        data-pagefind-body
-        set:html={bodyHtml}
-      />
+      {bodyHtml && (
+        <div
+          class="ui-prose sarafan-contact-prose"
+          data-pagefind-body
+          set:html={bodyHtml}
+        />
+      )}
       {contact.reviews.length > 0 ? (
-        <section class="sarafan-contact-reviews" data-pagefind-ignore="all">
+        <section class="sarafan-contact-reviews">
           <h2 id={reviewsHeadingId} class="ui-prose-title">
             Отзывы
           </h2>

@@ -21,7 +21,6 @@ import {
   CONTACTS_NEIGHBOR_TABLE_PREFIX,
   CONTACTS_NEIGHBOR_TABLE_SUFFIX,
   CONTACTS_NEIGHBOR_TABLE_URL,
-  contactExcerpt,
   formatContactCategory
 } from './view';
 
@@ -41,7 +40,7 @@ interface ContactFrontmatter extends Readonly<Record<string, unknown>> {
   readonly slug: string;
   readonly category: string;
   readonly updated_at: string;
-  readonly summary?: string;
+  readonly summary: string;
   readonly contacts: Contact['contacts'];
   readonly location?: ContactFrontmatterLocation;
   readonly reviews?: readonly ContactFrontmatterReview[];
@@ -64,7 +63,7 @@ type MutableContactFrontmatter = Record<string, unknown> & {
   slug: string;
   category: string;
   updated_at: string;
-  summary?: string;
+  summary: string;
   contacts: Contact['contacts'];
   location?: ContactFrontmatterLocation;
   reviews?: readonly ContactFrontmatterReview[];
@@ -100,16 +99,13 @@ const contactsIntro = (): MarkdownNode =>
 
 const contactsEmpty = (): MarkdownNode => md.paragraph(CONTACTS_EMPTY_MESSAGE);
 
-const contactLine = (contact: Contact) => {
-  const excerpt = contactExcerpt(contact);
-
-  return md.listItem([
+const contactLine = (contact: Contact) =>
+  md.listItem([
     md.paragraph([
       md.link(abs(contact.markdownUrl), contact.title),
-      ...(excerpt ? [md.text(` — ${excerpt}`)] : [])
+      md.text(` — ${contact.summary}`)
     ])
   ]);
-};
 
 const categoryLine = (category: ContactCategoryPage) =>
   md.listItem([
@@ -125,12 +121,9 @@ const contactFrontmatter = (contact: Contact): ContactFrontmatter => {
     slug: contact.slug,
     category: formatContactCategory(contact.category),
     updated_at: contact.updatedIso,
-    contacts: contactContactsFrontmatter(contact.contacts)
+    contacts: contactContactsFrontmatter(contact.contacts),
+    summary: contact.summary
   };
-
-  if (contact.summary) {
-    frontmatter.summary = contact.summary;
-  }
 
   const location = contactLocationFrontmatter(contact.location);
 

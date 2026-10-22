@@ -10,6 +10,7 @@ describe('RawContactSchema', () => {
         slug: 'ivan-petrov-fence',
         category: 'fence',
         updated_at: '2026-07-06',
+        summary: 'Установка заборов и ворот.',
         contacts: {
           phone: '+7 900 000-00-00'
         }
@@ -21,6 +22,7 @@ describe('RawContactSchema', () => {
           "phone": "+7 900 000-00-00",
         },
         "slug": "ivan-petrov-fence",
+        "summary": "Установка заборов и ворот.",
         "title": "Иван Петров",
         "updated_at": "2026-07-06",
       }
@@ -34,6 +36,7 @@ describe('RawContactSchema', () => {
         slug: 'fences-and-gates',
         category: 'fence',
         updated_at: '2026-07-06',
+        summary: 'Заборы и ворота.',
         contacts: {
           telegram: 'https://t.me/example',
           whatsapp: 'https://wa.me/79000000000',
@@ -61,6 +64,7 @@ describe('RawContactSchema', () => {
         slug: 'bark-and-soil',
         category: 'garden',
         updated_at: '2026-07-07',
+        summary: 'Продажа коры и грунта.',
         contacts: {
           phone: '+7 900 000-00-00'
         },
@@ -91,6 +95,7 @@ describe('RawContactSchema', () => {
         slug: 'electrician',
         category: 'electricity',
         updated_at: '2026-07-08',
+        summary: 'Электромонтажные работы.',
         contacts: {
           phone: '+7 900 000-00-00'
         },
@@ -122,6 +127,7 @@ describe('RawContactSchema', () => {
         slug: 'alexander-eremin',
         category: 'electricity',
         updated_at: '2026-07-13',
+        summary: 'Помощь по вопросам электричества.',
         contacts: {
           phone: '+7 985 414-57-87'
         },
@@ -154,6 +160,7 @@ describe('RawContactSchema', () => {
       slug: 'useful-contact',
       category: 'garden',
       updated_at: '2026-07-13',
+      summary: 'Садовые услуги.',
       contacts: { phone: '+7 900 000-00-00' }
     };
 
@@ -181,6 +188,7 @@ describe('RawContactSchema', () => {
       slug: 'ivan-petrov-fence',
       category: 'fence',
       updated_at: '2026-07-06',
+      summary: 'Установка заборов.',
       contacts: { phone: '+7 900 000-00-00' }
     };
 
@@ -194,11 +202,25 @@ describe('RawContactSchema', () => {
       title: 'Иван Петров',
       slug: 'ivan-petrov-fence',
       category: 'fence',
-      updated_at: '2026-07-06'
+      updated_at: '2026-07-06',
+      summary: 'Установка заборов.'
     };
 
     expect(RawContactSchema.safeParse({ ...base, contacts: {} }).success).toBe(false);
     expect(RawContactSchema.safeParse({ ...base, contacts: { phone: '   ' } }).success).toBe(false);
+  });
+
+  it('requires a non-blank summary', () => {
+    const base = {
+      title: 'Иван Петров',
+      slug: 'ivan-petrov-fence',
+      category: 'fence',
+      updated_at: '2026-07-06',
+      contacts: { phone: '+7 900 000-00-00' }
+    };
+
+    expect(RawContactSchema.safeParse(base).success).toBe(false);
+    expect(RawContactSchema.safeParse({ ...base, summary: '   ' }).success).toBe(false);
   });
 
   it('rejects non-HTTPS contact URLs', () => {
@@ -206,7 +228,8 @@ describe('RawContactSchema', () => {
       title: 'Иван Петров',
       slug: 'ivan-petrov-fence',
       category: 'fence',
-      updated_at: '2026-07-06'
+      updated_at: '2026-07-06',
+      summary: 'Установка заборов.'
     };
 
     expect(
@@ -250,6 +273,7 @@ describe('RawContactSchema', () => {
       slug: 'ivan-petrov-fence',
       category: 'fence',
       updated_at: '2026-07-06',
+      summary: 'Установка заборов.',
       contacts: { phone: '+7 900 000-00-00' },
       status: 'draft',
       reviews: [],
