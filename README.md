@@ -54,7 +54,6 @@ pnpm build
 - `kpshelkovo.online` получает содержимое `dist/www`
 - `www.kpshelkovo.online` перенаправляет на основной сайт
 - `media.kpshelkovo.online` получает error app из `dist/media`, а остальные запросы проксирует в S3
-- сравнение тарифов публикуется на основном сайте по `/815/compare/`
 - nginx-конфиги лежат в `ops/nginx/`
 
 ### IndexNow
