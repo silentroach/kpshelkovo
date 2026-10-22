@@ -52,8 +52,9 @@ pnpm build
 ## Деплой
 
 - `kpshelkovo.online` получает содержимое `dist/www`
+- `www.kpshelkovo.online` перенаправляет на основной сайт
 - `media.kpshelkovo.online` получает error app из `dist/media`, а остальные запросы проксирует в S3
-- старый compare-домен обслуживается nginx-редиректами
+- сравнение тарифов публикуется на основном сайте по `/815/compare/`
 - nginx-конфиги лежат в `ops/nginx/`
 
 ### IndexNow
