@@ -1,4 +1,4 @@
-import { formatDate } from '@shelkovo/format';
+import { dateTimeFromISO, formatDate } from '@shelkovo/format';
 import { extractFirstMarkdownText } from '@shelkovo/markdown';
 
 import { formatContactPhone, normalizeContactPhone } from './phone';
@@ -116,11 +116,30 @@ export const formatContactReviewDate = (review: ContactReview): string =>
   formatDate(review.publishedIso);
 
 export const hasManyPositiveContactReviews = (
-  reviews: readonly Pick<ContactReview, 'sentiment'>[]
-): boolean =>
-  !reviews.some(({ sentiment }) => sentiment === 'negative') &&
-  reviews.filter(({ sentiment }) => sentiment === 'positive').length >=
-    MANY_POSITIVE_CONTACT_REVIEWS_THRESHOLD;
+  reviews: readonly Pick<ContactReview, 'sentiment' | 'publishedIso'>[],
+  now: Date = new Date()
+): boolean => {
+  const today = dateTimeFromISO(now.toISOString()).startOf('day');
+  const windowStart = today.minus({ months: 12 }).toMillis();
+  const windowEnd = today.toMillis();
+  const recentReviews = reviews
+    .map(({ sentiment, publishedIso }) => ({
+      sentiment,
+      publishedAt: dateTimeFromISO(publishedIso).toMillis()
+    }))
+    .filter(({ publishedAt }) => publishedAt >= windowStart && publishedAt <= windowEnd);
+  const lastNegative = recentReviews.reduce(
+    (latest, { sentiment, publishedAt }) =>
+      sentiment === 'negative' ? Math.max(latest, publishedAt) : latest,
+    Number.NEGATIVE_INFINITY
+  );
+
+  return (
+    recentReviews.filter(
+      ({ sentiment, publishedAt }) => sentiment === 'positive' && publishedAt > lastNegative
+    ).length >= MANY_POSITIVE_CONTACT_REVIEWS_THRESHOLD
+  );
+};
 
 export const contactExcerpt = (contact: Pick<Contact, 'body' | 'summary'>): string =>
   contact.summary || (extractFirstMarkdownText(contact.body) ?? '');

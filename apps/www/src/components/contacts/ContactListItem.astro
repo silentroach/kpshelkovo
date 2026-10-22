@@ -14,7 +14,8 @@ interface Props {
 const { contact } = Astro.props;
 const excerpt = contactExcerpt(contact);
 const showReviewHighlight = hasManyPositiveContactReviews(contact.reviews);
-const reviewHighlightLabel = 'Много положительных отзывов';
+const reviewHighlightLabel =
+  'За последнее время соседи оставили много хороших отзывов.';
 ---
 
 <article class="contact-list-item">
