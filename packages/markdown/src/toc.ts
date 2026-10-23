@@ -136,7 +136,7 @@ const collectTocEntries = (
 
   document.children.forEach((node) => {
     if (node.type === 'leafDirective') {
-      group = { title: node.children.map(phrasingText).join('').trim() };
+      group = { title: node.children.map(phrasingText).join('').trim() || undefined };
       return;
     }
     if (node.type !== 'heading') {
@@ -207,11 +207,15 @@ const buildTocNodes = (entries: readonly TocEntry[]): readonly RootContent[] => 
         hProperties: { className: ['ui-markdown-toc__group'] }
       },
       children: [
-        {
-          type: 'paragraph',
-          data: { hProperties: { className: ['ui-markdown-toc__group-title'] } },
-          children: [{ type: 'strong', children: [text(group.title)] }]
-        },
+        ...(group.title
+          ? [
+              {
+                type: 'paragraph',
+                data: { hProperties: { className: ['ui-markdown-toc__group-title'] } },
+                children: [{ type: 'strong', children: [text(group.title)] }]
+              } satisfies Paragraph
+            ]
+          : []),
         tocRootList(buildTocItems(items, 0, 1).items)
       ]
     });

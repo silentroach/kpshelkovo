@@ -129,6 +129,77 @@ describe('authored TOC annotations', () => {
     expect(document.querySelectorAll('.ui-markdown-toc__group')).toHaveLength(count);
   });
 
+  it('keeps unnamed groups separate beside named groups and introductory branches', () => {
+    const input =
+      '[TOC]\n\n## Intro\n\n### Details\n\n  ::toc-group  \n\n## Alpha\n\n### Child\n\n::toc-group[Named]\n\n## Beta\n\n::toc-group\n\n## Gamma\n\n::toc-group';
+    const links = navigation(input);
+    expect(
+      [...document.querySelectorAll('.ui-markdown-toc__group')].map((group) => ({
+        title: group.querySelector('.ui-markdown-toc__group-title')?.textContent,
+        links: [...group.querySelectorAll('a')].map((link) => link.getAttribute('href'))
+      }))
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "links": [
+            "#alpha",
+            "#child",
+          ],
+          "title": undefined,
+        },
+        {
+          "links": [
+            "#beta",
+          ],
+          "title": "Named",
+        },
+        {
+          "links": [
+            "#gamma",
+          ],
+          "title": undefined,
+        },
+      ]
+    `);
+    expect(
+      document.querySelector('.ui-markdown-toc__inner > ul > li > ul a')?.getAttribute('href')
+    ).toBe('#details');
+    const result = companion(input);
+    expect(result).not.toContain('toc-group');
+    expect(companion(result)).toBe(result);
+    document.body.innerHTML = render(result);
+    expect(
+      [...document.querySelectorAll('a:not(.ui-heading-anchor)')].map((link) => [
+        link.textContent,
+        link.getAttribute('href')
+      ])
+    ).toEqual(links);
+    const ast = createMarkdownDocument({ children: parseMarkdownFragment(input) });
+    expect(serializeMarkdownDocument(ast)).toBe(serializeMarkdownDocument(ast));
+    expect(extractMarkdownText(input)).not.toMatch(/toc-group|Named/u);
+  });
+
+  it('omits group titles in HTML and Markdown when all groups are unnamed', () => {
+    const input = '[TOC]\n\n::toc-group\n\n## Alpha\n\n::toc-group\n\n## Beta';
+    navigation(input);
+    expect(document.querySelectorAll('.ui-markdown-toc__group')).toHaveLength(2);
+    expect(document.querySelectorAll('.ui-markdown-toc__group-title')).toHaveLength(0);
+    expect(companion(input)).toMatchInlineSnapshot(`
+      "**Содержание**
+
+      - [Alpha](#alpha)
+
+      * [Beta](#beta)
+
+      ---
+
+      ## Alpha
+
+      ## Beta
+      "
+    `);
+  });
+
   it('does not change full heading IDs when annotations are added', () => {
     const annotated = navigation('[TOC]\n\n## **:toc-omit[Attachment:]** 5. Terms');
     const original = navigation('[TOC]\n\n## **Attachment:** 5. Terms');
@@ -167,12 +238,17 @@ describe('authored TOC annotations', () => {
 
   it.each([
     '::toc-group[]\n\n## Heading',
+    '::toc-group[ ]\n\n## Heading',
+    '::toc-group{#id}\n\n## Heading',
     '::toc-group[Name]{#id}\n\n## Heading',
     '## :toc-omit[Everything]',
     '## **:toc-omit[Everything]**',
     '## Parent\n\n::toc-group[Split]\n\n### Child',
+    '## Parent\n\n::toc-group\n\n### Child',
     '> ::toc-group[Nested]',
+    '> ::toc-group',
     'Outside :toc-omit[Heading]',
+    '## :toc-omit',
     ':toc-group[Inline]',
     '::toc-omit[Leaf]',
     ':::toc-group[Container]\nText\n:::',

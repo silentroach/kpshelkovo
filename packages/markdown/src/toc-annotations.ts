@@ -99,14 +99,21 @@ export const prepareTocAnnotations = (tree: Root, source?: string): Root => {
     ) {
       if (node.type === 'containerDirective')
         failTocAnnotation(node, 'container directives are not supported');
+      if (node.name === 'toc-group') {
+        if (node.type !== 'leafDirective' || !rootChild)
+          failTocAnnotation(node, 'toc-group must be a standalone root-level leaf directive');
+        const raw = source?.slice(node.position?.start.offset, node.position?.end.offset);
+        if (raw?.trim() === '::toc-group' || node.data?.tocUnnamedGroup) {
+          node.data = { ...node.data, tocUnnamedGroup: true };
+          return;
+        }
+      }
       const result = parameters.safeParse({
         title: inlineText(node.children),
         attributes: node.attributes ?? {}
       });
       if (!result.success) failTocAnnotation(node, 'expected nonempty label and no attributes');
       if (node.name === 'toc-group') {
-        if (node.type !== 'leafDirective' || !rootChild)
-          failTocAnnotation(node, 'toc-group must be a standalone root-level leaf directive');
         node.children.forEach((child) => walk(child, false, false));
         return;
       }
