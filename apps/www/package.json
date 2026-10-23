@@ -38,10 +38,10 @@
     "test:visual:sticky-table:serve": "node ../../scripts/visual-fixture-launcher.mjs tests/sticky-table-visual 4329"
   },
   "dependencies": {
-    "@astrojs/markdown-satteri": "^0.4.3",
+    "@astrojs/markdown-satteri": "^0.4.4",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
-    "@astrojs/svelte": "^9.0.1",
+    "@astrojs/svelte": "^9.1.0",
     "@shelkovo/format": "workspace:*",
     "@shelkovo/geo": "workspace:*",
     "@shelkovo/ical": "workspace:*",
@@ -51,7 +51,7 @@
     "@shelkovo/ui": "workspace:*",
     "@shelkovo/url": "workspace:*",
     "@yandex/ymaps3-clusterer": "^0.0.12",
-    "astro": "^7.3.8",
+    "astro": "^7.4.1",
     "diff": "^9.0.0",
     "parse5": "^8.0.1",
     "svelte": "^5.57.2",
