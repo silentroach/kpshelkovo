@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация и границы описаны в [proposal](/openspec/changes/add-editorial-review-agent/proposal.md). Требования дополняют существующий [agent-tooling](/openspec/specs/agent-tooling/spec.md), не меняя технический reviewer.
+Мотивация и границы описаны в [proposal](/openspec/changes/archive/2026-10-23-add-editorial-review-agent/proposal.md). Требования дополняют существующий [agent-tooling](/openspec/specs/agent-tooling/spec.md), не меняя технический reviewer.
 
 Корневой `AGENTS.md` уже требует humanizer-ru для текстов сайта; news-maker и правила мероприятий дополняют это требование. Humanizer требует независимой вычитки чистовика и предоставляет режим аудита. Проектные профили лежат в `.opencode/agents/`; advisor уже использует `openai/gpt-6-astra#xhigh`. Каталог OpenCode подтвердил наличие модели и варианта.
 

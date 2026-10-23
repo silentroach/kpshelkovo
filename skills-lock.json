@@ -78,6 +78,13 @@
       "skillPath": "skills/humanizer-ru/SKILL.md",
       "computedHash": "8a439a48c8bf73c035dafc581cc063cfabd46b46ff6b0dca8410703c8152d1bb"
     },
+    "infostyle": {
+      "source": "artgas1/infostyle-skill",
+      "ref": "623322d47ddf0bf10dc1208ed6de0d64856d4a38",
+      "sourceType": "github",
+      "skillPath": "skills/infostyle/SKILL.md",
+      "computedHash": "c79b0de6b64ea8e7e1597956e9b2045d3a8348764152fe71ecf0dd4cb782fec3"
+    },
     "nginx-expert": {
       "source": "personamanagmentlayer/pcl",
       "ref": "79ccaa9820486121fa33aaa696ec16fa1607bf02",

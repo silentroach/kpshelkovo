@@ -1,5 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "permissions": [{ "action": "skill", "resource": "infostyle", "effect": "deny" }],
   "mcp": {
     "astro": {
       "type": "remote",
