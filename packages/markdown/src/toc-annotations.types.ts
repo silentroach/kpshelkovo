@@ -1,11 +1,12 @@
 import type { Heading, ListItem } from 'mdast';
 
-export type TocGroup = { readonly title: string };
+export type TocGroup = { readonly title?: string };
 
 declare module 'mdast' {
   interface Data {
     tocTitle?: string;
     tocContainer?: boolean;
+    tocUnnamedGroup?: boolean;
   }
 }
 
