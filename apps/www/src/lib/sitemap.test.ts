@@ -8,6 +8,21 @@ import {
 } from './sitemap';
 
 describe('shouldIncludeSitemapPage', () => {
+  it('includes inventory contents but excludes offers and owners in every normalized URL form', () => {
+    const contents = ['/ukogo/', '/ukogo/construction/', '/ukogo/construction/drill/'];
+    const details = ['/ukogo/construction/drill/paid/', '/ukogo/owners/anna/'];
+    for (const [paths, included] of [
+      [contents, true],
+      [details, false]
+    ] as const) {
+      for (const path of paths) {
+        for (const url of [path, path.slice(0, -1), `${path}index`, `${path}index.html`]) {
+          expect(shouldIncludeSitemapPage(`https://kpshelkovo.online${url}`), url).toBe(included);
+        }
+      }
+    }
+  });
+
   it('publishes status landing pages but excludes events and archives regardless of date', () => {
     expect({
       rootErrorPage: shouldIncludeSitemapPage('https://kpshelkovo.online/404/index.html'),

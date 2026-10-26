@@ -3,9 +3,6 @@ title: WORX WX530
 summary: Аккумуляторная пила, диск 165 мм, пропил до 55 мм. В комплекте заряженный аккумулятор 2 А·ч, зарядка по запросу.
 owner: ikalashnikov
 kind: circular-saw
-price:
-  value: 500
-  period: day
 photos:
   - url: https://media.kpshelkovo.online/ukogo/worx-wx530/product.jpeg
     width: 800

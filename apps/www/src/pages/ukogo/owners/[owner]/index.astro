@@ -23,6 +23,7 @@ const offers = inventoryOwnerOffers(data, owner.id);
   title={`${owner.name} — У кого есть — Шелково Онлайн`}
   description={`Инвентарь и контакты: ${owner.name}, участок ${owner.parcel.code}.`}
   canonical={owner.url}
+  robots="noindex, follow"
 >
   <InventoryPage
     title={owner.name}

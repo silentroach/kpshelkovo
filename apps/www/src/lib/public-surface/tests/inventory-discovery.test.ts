@@ -45,7 +45,7 @@ it('discovers the inventory Markdown entry without inventing a feed or section g
   expect(build()).not.toMatch(/\/ukogo\/(?:llms\.txt|.*\.json)|apps\/www|src\/data/);
 });
 
-it('keeps every HTML level indexable with Markdown negotiation and the root guide', () => {
+it('keeps Markdown negotiation and the root guide at every HTML level', () => {
   const surfaces = publicSurfaceRegistry.surfacesByOwner('inventory');
   expect(surfaces.map((surface) => surface.path ?? surface.routePattern)).toMatchInlineSnapshot(`
     [
@@ -68,7 +68,9 @@ it('keeps every HTML level indexable with Markdown negotiation and the root guid
       { rel: 'alternate', href: `${path}index.md`, mediaType: 'text/markdown' },
       { rel: 'describedby', href: llmsPathForPage(path), mediaType: 'text/plain' }
     ]);
-    expect(shouldIncludeSitemapPage(path)).toBe(true);
+    expect(shouldIncludeSitemapPage(path)).toBe(
+      !['inventory:owner', 'inventory:offer'].includes(surface.id)
+    );
     expect(applySitemapMetadata({ url: path }, new Map())).toEqual({ url: path });
   }
 });
@@ -103,7 +105,7 @@ it('generates companions for populated and empty owners, but not deleted or unkn
       const owner = data.byOwner.get(params.owner)!;
       expect(owner.markdownUrl).toBe(`/ukogo/owners/${params.owner}/index.md`);
       expect(owner.canonical).toBe(`https://kpshelkovo.online/ukogo/owners/${params.owner}/`);
-      expect(shouldIncludeSitemapPage(owner.canonical)).toBe(true);
+      expect(shouldIncludeSitemapPage(owner.canonical)).toBe(false);
       const response = await GET(ownerContext(params.owner));
       expect(response.headers.get('content-type')).toBe('text/markdown; charset=utf-8');
       const text = await response.text();

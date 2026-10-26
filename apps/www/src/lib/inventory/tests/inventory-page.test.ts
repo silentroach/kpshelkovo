@@ -134,6 +134,7 @@ describe('inventory HTML pages', () => {
   it('keeps full descriptions out of listings and indexes only the detail editorial content', async () => {
     const listing = await renderKind();
     expect(listing.querySelector('[data-pagefind-body], [data-search-section-id]')).toBeFalsy();
+    expect(listing.querySelector('meta[name="robots"][content*="noindex"]')).toBeFalsy();
     expect(listing.body.textContent).not.toContain('Вернуть чистым');
     expect(listing.querySelector('article figure, article .ui-prose')).toBeFalsy();
     const page = parse(
@@ -196,6 +197,9 @@ describe('inventory HTML pages', () => {
     ).toBe('Борис');
     expect(page.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(
       'https://kpshelkovo.online/ukogo/construction/drill/paid/'
+    );
+    expect(page.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe(
+      'noindex, follow'
     );
     const content = [...page.querySelectorAll('main a[href^="tel:"], main [data-pagefind-body]')];
     expect(content.findIndex((node) => node.getAttribute('href')?.startsWith('tel:'))).toBeLessThan(
@@ -378,9 +382,12 @@ describe('inventory HTML pages', () => {
       expect(page.getElementById(`owner-${ownerId}-contacts`)?.textContent.trim()).toBeTruthy();
       expect(
         page.querySelector(
-          'a[href="https://t.me/silentroach"], [data-pagefind-body], [data-search-section-id], meta[name="robots"][content*="noindex"]'
+          'a[href="https://t.me/silentroach"], [data-pagefind-body], [data-search-section-id]'
         )
       ).toBeFalsy();
+      expect(page.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe(
+        'noindex, follow'
+      );
       const ids = [...page.querySelectorAll('[id]')].map((node) => node.id);
       expect(new Set(ids).size).toBe(ids.length);
       for (const section of page.querySelectorAll('main section[aria-labelledby]')) {
@@ -423,7 +430,8 @@ describe('inventory HTML pages', () => {
         ?.textContent.includes('Сейчас нет предложений этого владельца.'),
       offers: page.querySelectorAll('article').length,
       backLinks: page.querySelectorAll('main a[href="/ukogo/"]').length,
-      canonical: page.querySelector('link[rel="canonical"]')?.getAttribute('href')
+      canonical: page.querySelector('link[rel="canonical"]')?.getAttribute('href'),
+      robots: page.querySelector('meta[name="robots"]')?.getAttribute('content')
     }).toMatchInlineSnapshot(`
       {
         "backLinks": 1,
@@ -433,6 +441,7 @@ describe('inventory HTML pages', () => {
         "offers": 0,
         "parcel": "/map/?p=SHP-A1",
         "phone": "tel:+79969670018",
+        "robots": "noindex, follow",
       }
     `);
   });
@@ -573,5 +582,8 @@ describe('inventory HTML pages', () => {
       await container.renderToString(GroupPage, { params: { group: 'home' } })
     );
     expect(emptyGroup.querySelector('main a[href="/ukogo/"]')).toBeTruthy();
+    for (const page of [empty, emptyGroup, await renderKind()]) {
+      expect(page.querySelector('meta[name="robots"][content*="noindex"]')).toBeFalsy();
+    }
   });
 });

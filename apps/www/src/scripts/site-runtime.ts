@@ -305,8 +305,11 @@ const bindSiteNavDropdown = (dropdown: HTMLElement): void => {
         return;
       }
 
+      const restoreFocus =
+        dropdown.contains(document.activeElement) ||
+        (event.target instanceof Node && dropdown.contains(event.target));
       setOpen(false);
-      button.focus();
+      if (restoreFocus) button.focus();
     },
     { signal }
   );
