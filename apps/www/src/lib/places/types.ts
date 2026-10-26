@@ -16,7 +16,13 @@ import type {
 } from '@/lib/mentions';
 
 import type { RawPlace } from './raw-schema';
-import type { PlaceCategory, PlaceMarker, PlaceStatus, PlaceWeekday } from './schema';
+import type {
+  PlaceCategory,
+  PlaceMapLayer,
+  PlaceMarker,
+  PlaceStatus,
+  PlaceWeekday
+} from './schema';
 
 export type PlaceEntry = Pick<CollectionEntry<'places'>, 'id' | 'body'> & {
   readonly data: RawPlace;
@@ -62,6 +68,7 @@ export type PlaceBacklinks = SiteBacklinks;
 
 export interface Place {
   readonly showOnMap: boolean;
+  readonly mapLayer?: PlaceMapLayer;
   readonly slug: string;
   readonly name: string;
   readonly nameCases?: PlaceNameCaseForms;

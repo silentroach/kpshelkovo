@@ -137,6 +137,7 @@ describe('buildPlacesDataset', () => {
           "lng": 37.716242,
         },
         "geometry": undefined,
+        "mapLayer": undefined,
         "mapUrl": "https://yandex.ru/navi/-/CTfgq-5r",
         "markdownUrl": "/map/burzhuyka/index.md",
         "marker": "foodtruck",

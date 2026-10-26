@@ -6,6 +6,7 @@ import type {
   PlaceMapPublicOpeningHoursDto,
   PlaceMapPublicPayloadDto
 } from './map-public-dto';
+import { PlaceMapPublicPayloadSchema } from './map-public-schema';
 import { selectMapPlaces } from './map-selection';
 import type { Place, PlaceOpeningHours } from './types';
 import { formatPlaceStatus } from './view';
@@ -21,6 +22,7 @@ export const toPublicOpeningHours = (value: PlaceOpeningHours): PlaceMapPublicOp
 
 const toPublicPlace = (place: Place): PlaceMapPublicItemDto => ({
   slug: place.slug,
+  mapLayer: place.mapLayer,
   name: place.name,
   marker: place.marker,
   status: place.status,
@@ -34,6 +36,5 @@ const toPublicPlace = (place: Place): PlaceMapPublicItemDto => ({
   html_url: place.canonical
 });
 
-export const buildPlaceMapPublicPayload = (places: readonly Place[]): PlaceMapPublicPayloadDto => ({
-  places: selectMapPlaces(places).map(toPublicPlace)
-});
+export const buildPlaceMapPublicPayload = (places: readonly Place[]): PlaceMapPublicPayloadDto =>
+  PlaceMapPublicPayloadSchema.parse({ places: selectMapPlaces(places).map(toPublicPlace) });

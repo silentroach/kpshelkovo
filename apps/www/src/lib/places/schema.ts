@@ -19,9 +19,13 @@ export const PLACE_MARKERS = [
   'construction',
   'fish',
   'kpp',
+  'ktp',
   'park'
 ] as const;
 export type PlaceMarker = (typeof PLACE_MARKERS)[number];
+
+export const PLACE_MAP_LAYERS = ['infrastructure'] as const;
+export type PlaceMapLayer = (typeof PLACE_MAP_LAYERS)[number];
 
 export const PLACE_STATUSES = ['existing', 'planned', 'underConstruction'] as const;
 export type PlaceStatus = (typeof PLACE_STATUSES)[number];

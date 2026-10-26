@@ -5,6 +5,7 @@ import { RawSearchAliasesSchema } from '@/lib/search/raw-schema';
 
 import {
   PLACE_CATEGORIES,
+  PLACE_MAP_LAYERS,
   PLACE_MARKERS,
   PLACE_STATUSES,
   PLACE_TIME,
@@ -113,6 +114,7 @@ export const RawPlaceSchema = z
     marker: z.enum(PLACE_MARKERS).optional(),
     status: z.enum(PLACE_STATUSES),
     show_on_map: z.boolean().optional(),
+    map_layer: z.enum(PLACE_MAP_LAYERS).optional(),
     summary: nonBlankText,
     search_aliases: RawSearchAliasesSchema.optional(),
     location,

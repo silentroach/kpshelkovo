@@ -206,6 +206,7 @@ describe('PlaceMap', () => {
     'fish',
     'foodtruck',
     'kpp',
+    'ktp',
     'park',
     'titanic'
   ] as const)(

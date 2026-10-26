@@ -14,17 +14,17 @@ static/BaseLayout.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
 static/ClientRouter.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   astro:transitions/client:
     rendered: 0
-  node_modules/.pnpm/astro@7.3.8_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/components/ClientRouter.astro?astro&type=script&index=0&lang.ts:
+  node_modules/.pnpm/astro@7.4.1_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/components/ClientRouter.astro?astro&type=script&index=0&lang.ts:
     rendered: 2803
-  node_modules/.pnpm/astro@7.3.8_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/runtime/server/render/server-islands-shared.js:
+  node_modules/.pnpm/astro@7.4.1_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/runtime/server/render/server-islands-shared.js:
     rendered: 245
-  node_modules/.pnpm/astro@7.3.8_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/transitions/events.js:
+  node_modules/.pnpm/astro@7.4.1_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/transitions/events.js:
     rendered: 3420
-  node_modules/.pnpm/astro@7.3.8_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/transitions/router.js:
+  node_modules/.pnpm/astro@7.4.1_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/transitions/router.js:
     rendered: 13629
-  node_modules/.pnpm/astro@7.3.8_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/transitions/swap-functions.js:
+  node_modules/.pnpm/astro@7.4.1_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/transitions/swap-functions.js:
     rendered: 5868
-  node_modules/.pnpm/astro@7.3.8_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/virtual-modules/transitions-router.js:
+  node_modules/.pnpm/astro@7.4.1_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/virtual-modules/transitions-router.js:
     rendered: 0
 static/CommonSpacesTable.XXXXXXXX.js:
   apps/www/src/compare/components/CommonSpacesTable.svelte:
@@ -59,16 +59,20 @@ static/MapPreview.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/components/maps/MapPreview.astro?astro&type=script&index=0&lang.ts:
     rendered: 191
 static/PlaceMap.XXXXXXXX.js:
+  apps/www/src/components/places/marker-images.ts:
+    rendered: 308
   apps/www/src/components/places/place-map-geometry.ts:
     rendered: 2826
   apps/www/src/components/places/place-map-url.ts:
     rendered: 1125
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 55134
+    rendered: 57303
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:
     rendered: 951
+  apps/www/src/lib/places/map-layers.ts:
+    rendered: 182
   apps/www/src/lib/places/routes.ts:
     rendered: 344
   apps/www/src/lib/places/schema.ts:
@@ -86,8 +90,10 @@ static/PlaceMap.XXXXXXXX.js:
   packages/ui/src/markers/Foodtruck.webp?url:
     rendered: 131
   packages/ui/src/markers/index.ts:
-    rendered: 652
+    rendered: 719
   packages/ui/src/markers/Kpp.webp?url:
+    rendered: 113
+  packages/ui/src/markers/Ktp.webp?url:
     rendered: 113
   packages/ui/src/markers/Park.webp?url:
     rendered: 116
@@ -325,7 +331,7 @@ static/client.XXXXXXXX.js:
   node_modules/.pnpm/svelte@5.57.2/node_modules/svelte/src/utils.js:
     rendered: 1287
 static/client.svelte.XXXXXXXX.js:
-  node_modules/.pnpm/@astrojs+svelte@9.0.1_@types+node@26.5.0_astro@7.3.8_@types+node@26.5.0_esbuild@0.28.2__82a73a9b1e219d9f43e18c1159f283a8/node_modules/@astrojs/svelte/dist/client.svelte.js:
+  node_modules/.pnpm/@astrojs+svelte@9.1.0_@types+node@26.5.0_astro@7.4.1_@types+node@26.5.0_esbuild@0.28.2__65819eba706b86f9dc5acffbc6de696e/node_modules/@astrojs/svelte/dist/client.svelte.js:
     rendered: 2022
 static/date.XXXXXXXX.js:
   packages/format/src/date.ts:
@@ -481,7 +487,7 @@ static/parcel-set-outline.XXXXXXXX.js:
   packages/geo/src/polygon-union.ts:
     rendered: 464
 static/prefetch.XXXXXXXX.js:
-  node_modules/.pnpm/astro@7.3.8_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/prefetch/index.js:
+  node_modules/.pnpm/astro@7.4.1_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/prefetch/index.js:
     rendered: 5024
   virtual:astro:adapter-config/client:
     rendered: 92
@@ -495,7 +501,7 @@ static/runtime.XXXXXXXX.js:
   apps/www/src/lib/yandex-maps/open-maps-control.ts:
     rendered: 369
   apps/www/src/lib/yandex-maps/runtime.ts:
-    rendered: 2375
+    rendered: 3655
 static/schema.XXXXXXXX.js:
   apps/www/src/lib/areas.ts:
     rendered: 98

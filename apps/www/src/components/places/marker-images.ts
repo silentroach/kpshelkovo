@@ -5,6 +5,7 @@ import {
   FISH_MARKER,
   FOODTRUCK_MARKER,
   KPP_MARKER,
+  KTP_MARKER,
   PARK_MARKER,
   TITANIC_MARKER
 } from '@shelkovo/ui/markers';
@@ -20,6 +21,7 @@ export const PLACE_MARKER_IMAGES = {
   fish: FISH_MARKER,
   foodtruck: FOODTRUCK_MARKER,
   kpp: KPP_MARKER,
+  ktp: KTP_MARKER,
   park: PARK_MARKER,
   titanic: TITANIC_MARKER
 } as const satisfies Readonly<Record<PlaceMarker, PlaceMarkerImage>>;

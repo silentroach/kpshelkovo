@@ -1,11 +1,12 @@
 import type { LngLatBounds } from '@yandex/ymaps3-types';
 import type { Snippet } from 'svelte';
 
-import type { PlaceMarker, PlaceStatus } from './schema';
+import type { PlaceMapLayer, PlaceMarker, PlaceStatus } from './schema';
 import type { PlaceCoordinates, PlaceGeometry, PlaceOpeningHours } from './types';
 
 export interface PlaceMapItem {
   readonly slug: string;
+  readonly mapLayer?: PlaceMapLayer;
   readonly name: string;
   readonly marker?: PlaceMarker;
   readonly status: PlaceStatus;

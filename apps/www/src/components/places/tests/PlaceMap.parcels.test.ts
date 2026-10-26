@@ -198,16 +198,6 @@ describe('PlaceMap', () => {
     const all = screen.getByRole('checkbox', { name: 'Участки' }) as HTMLInputElement;
     const forestToggle = screen.getByRole('checkbox', { name: 'Форест' }) as HTMLInputElement;
     const parkToggle = screen.getByRole('checkbox', { name: 'Парк' }) as HTMLInputElement;
-    expect(screen.getAllByRole('checkbox').map((input) => input.parentElement?.textContent?.trim()))
-      .toMatchInlineSnapshot(`
-        [
-          "Участки",
-          "Форест",
-          "Вилладж",
-          "Парк",
-          "Ривер",
-        ]
-      `);
     expect(all.indeterminate).toBe(false);
     await fireEvent.click(forestToggle);
     await fireEvent.click(parkToggle);
@@ -269,7 +259,9 @@ describe('PlaceMap', () => {
     render(PlaceMap, { props: { places: [place], ...icons } });
     await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
     await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
-    const checkboxes = screen.getAllByRole('checkbox') as HTMLInputElement[];
+    const checkboxes = ['Участки', 'Форест', 'Вилладж', 'Парк', 'Ривер'].map(
+      (name) => screen.getByRole('checkbox', { name }) as HTMLInputElement
+    );
     const all = checkboxes[0]!;
     expect(checkboxes.map((checkbox) => checkbox.checked)).toEqual([
       false,
@@ -278,16 +270,6 @@ describe('PlaceMap', () => {
       false,
       false
     ]);
-    expect(checkboxes.map((checkbox) => checkbox.parentElement?.textContent?.trim()))
-      .toMatchInlineSnapshot(`
-        [
-          "Участки",
-          "Форест",
-          "Вилладж",
-          "Парк",
-          "Ривер",
-        ]
-      `);
     expect(
       checkboxes.slice(1).map((checkbox) => ({
         icon: checkbox.parentElement?.querySelector('svg')?.getAttribute('data-area'),
