@@ -12,7 +12,7 @@ describe('getNearbyPlaces', () => {
     const infrastructure = testPlace({
       slug: 'ktp-16',
       showOnMap: true,
-      mapLayer: 'infrastructure'
+      mapLayer: 'infra'
     });
     const ordinary = testPlace({ slug: 'ordinary', showOnMap: true });
     expect(getNearbyPlaces(testPlace(), [ordinary, infrastructure]).map(({ slug }) => slug))

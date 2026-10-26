@@ -13,6 +13,7 @@ import { EditorialPublicGeometrySchema } from '@/lib/geometry/editorial-public-s
 import { parsePlaceGeometryFiles } from '../geometry';
 import { isPlaceLayerVisible } from '../map-layers';
 import { buildPlaceMapPublicPayload } from '../map-public';
+import { PlaceMapPublicPayloadSchema } from '../map-public-schema';
 import { selectMapPlaces } from '../map-selection';
 import { buildPlacesMarkdown } from '../markdown';
 import type { Place } from '../types';
@@ -55,12 +56,21 @@ const place: Place = {
 };
 
 describe('place map public DTO', () => {
+  it('rejects the retired infrastructure layer in the public format', () => {
+    const payload = buildPlaceMapPublicPayload([place]);
+    expect(
+      PlaceMapPublicPayloadSchema.safeParse({
+        places: [{ ...payload.places[0], mapLayer: 'infrastructure' }]
+      }).success
+    ).toBe(false);
+  });
+
   it('publishes infrastructure while keeping it out of the initial frame', () => {
     const infrastructure: Place = {
       ...place,
       slug: 'ktp-16',
       markdownUrl: '/map/ktp-16/index.md',
-      mapLayer: 'infrastructure',
+      mapLayer: 'infra',
       coordinates: { lat: 0, lng: 0 }
     };
     const places = selectMapPlaces([place, infrastructure]);
@@ -74,7 +84,7 @@ describe('place map public DTO', () => {
             "slug": "hunting-ponds",
           },
           {
-            "mapLayer": "infrastructure",
+            "mapLayer": "infra",
             "slug": "ktp-16",
           },
         ]

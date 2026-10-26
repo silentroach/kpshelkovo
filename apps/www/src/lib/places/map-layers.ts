@@ -4,4 +4,4 @@ import type { Place } from './types';
 export const isPlaceLayerVisible = (
   place: Pick<Place, 'mapLayer'>,
   infrastructureEnabled = false
-): boolean => place.mapLayer !== 'infrastructure' || infrastructureEnabled;
+): boolean => place.mapLayer !== 'infra' || infrastructureEnabled;

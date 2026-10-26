@@ -64,19 +64,19 @@ static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/place-map-geometry.ts:
     rendered: 2826
   apps/www/src/components/places/place-map-url.ts:
-    rendered: 1125
+    rendered: 1407
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 57303
+    rendered: 57608
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:
     rendered: 951
   apps/www/src/lib/places/map-layers.ts:
-    rendered: 182
+    rendered: 173
   apps/www/src/lib/places/routes.ts:
     rendered: 344
   apps/www/src/lib/places/schema.ts:
-    rendered: 190
+    rendered: 224
   apps/www/src/lib/site.ts:
     rendered: 115
   packages/ui/src/markers/Animals.webp?url:
@@ -509,7 +509,7 @@ static/schema.XXXXXXXX.js:
     rendered: 147
 static/schema-2.XXXXXXXX.js:
   apps/www/src/lib/parcels/schema.ts:
-    rendered: 105
+    rendered: 160
   packages/format/src/plural.ts:
     rendered: 430
 static/src.XXXXXXXX.js:
