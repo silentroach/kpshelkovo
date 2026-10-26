@@ -32,7 +32,7 @@ const place = {
 } as const;
 
 describe('RawPlaceSchema', () => {
-  it.each([undefined, 'infrastructure'] as const)(
+  it.each([undefined, 'infra'] as const)(
     'maps layer %s independently of category and publication',
     (mapLayer) => {
       const data = RawPlaceSchema.parse({ ...place, show_on_map: true, map_layer: mapLayer });
@@ -45,8 +45,8 @@ describe('RawPlaceSchema', () => {
     }
   );
 
-  it('rejects an unsupported editorial layer', () => {
-    expect(RawPlaceSchema.safeParse({ ...place, map_layer: 'unknown' }).success).toBe(false);
+  it.each(['unknown', 'infrastructure'])('rejects unsupported editorial layer %s', (mapLayer) => {
+    expect(RawPlaceSchema.safeParse({ ...place, map_layer: mapLayer }).success).toBe(false);
   });
 
   it.each([undefined, 'Вход со двора.'])(

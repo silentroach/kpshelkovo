@@ -1,5 +1,18 @@
+import { PARCEL_PARTS, type ParcelPart } from '@/lib/parcels/schema';
+import { PLACE_MAP_LAYERS, type PlaceMapLayer } from '@/lib/places/schema';
+
 export const PLACE_HIGHLIGHT_QUERY_PARAM = 'h';
 export const SELECTION_SET_QUERY_PARAM = 'set';
+
+export const getInitialMapLayers = (
+  params: URLSearchParams
+): readonly (ParcelPart | PlaceMapLayer)[] => {
+  const requested = new Set(params.getAll('l').flatMap((value) => value.split(',')));
+  return [
+    ...PARCEL_PARTS.filter((part) => requested.has('parcels') || requested.has(part)),
+    ...PLACE_MAP_LAYERS.filter((layer) => requested.has(layer))
+  ];
+};
 
 export const getUrlWithoutSelectionSet = (href: string): string => {
   const url = new URL(href);

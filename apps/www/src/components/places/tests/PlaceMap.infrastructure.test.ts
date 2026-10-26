@@ -28,7 +28,7 @@ const infrastructure: PlaceMapItem = {
   slug: 'ktp-16',
   name: 'КТП №16',
   marker: 'ktp',
-  mapLayer: 'infrastructure',
+  mapLayer: 'infra',
   coordinates: { lat: 55.067389, lng: 37.744332 },
   url: '/map/ktp-16/'
 };
@@ -176,7 +176,7 @@ describe('PlaceMap infrastructure layer', () => {
       'fetch',
       vi.fn(async () =>
         Response.json({
-          places: [publicPlace, { ...publicPlace, slug: 'ktp-16', mapLayer: 'infrastructure' }]
+          places: [publicPlace, { ...publicPlace, slug: 'ktp-16', mapLayer: 'infra' }]
         })
       )
     );
@@ -204,7 +204,7 @@ describe('PlaceMap infrastructure layer', () => {
           {
             ...publicPlace,
             slug: 'ktp-16',
-            mapLayer: 'infrastructure',
+            mapLayer: 'infra',
             coordinates: infrastructure.coordinates
           }
         ]

@@ -39,6 +39,7 @@
   } from './place-map-geometry';
   import { getSelectionSetBounds } from './place-map-geometry';
   import {
+    getInitialMapLayers,
     getUrlWithoutPlaceHighlight,
     getUrlWithoutSelectionSet,
     PLACE_HIGHLIGHT_QUERY_PARAM,
@@ -491,6 +492,8 @@
     let pointerStart: { readonly x: number; readonly y: number } | undefined;
     let pointerMoved = false;
     const initialUrl = new URL(window.location.href);
+    const initialLayers = getInitialMapLayers(initialUrl.searchParams);
+    infrastructureEnabled = initialLayers.includes('infra');
     requestedSet = initialUrl.searchParams.get(SELECTION_SET_QUERY_PARAM) || undefined;
     // Even an invalid p/h owns the initial focus; the set never becomes a fallback target.
     const preserveSetCamera = Boolean(requestedSet);
@@ -1078,7 +1081,7 @@
       if (!checked) {
         cancelSetFit();
         cancelClusterFocus();
-        if (highlightedPlace?.mapLayer === 'infrastructure') clearPlaceHighlight();
+        if (highlightedPlace?.mapLayer === 'infra') clearPlaceHighlight();
         for (const [place, content] of markerContents) {
           if (isPlaceVisible(place)) continue;
           if (content === document.activeElement) mapContainer?.focus({ preventScroll: true });
@@ -1172,7 +1175,7 @@
         highlightedPlace = requestedSlug
           ? places.find((place) => place.slug === requestedSlug)
           : undefined;
-        if (highlightedPlace?.mapLayer === 'infrastructure') {
+        if (highlightedPlace?.mapLayer === 'infra') {
           if (infrastructureDisabled) highlightedPlace = undefined;
           else infrastructureEnabled = true;
         }
@@ -1268,8 +1271,12 @@
           } else {
             pendingParcelCode = requestedParcelCode;
             pendingParcelPart = parcelCode.slice(0, 3).toLowerCase() as ParcelPart;
+            retainUnknownParcelPart = initialLayers.includes(pendingParcelPart);
             void enableParcelPart(pendingParcelPart, parcelCode, true);
           }
+        }
+        for (const layer of initialLayers) {
+          if (layer !== 'infra' && layer !== pendingParcelPart) void enableParcelPart(layer);
         }
         const setId = requestedSet;
         if (setId) {
@@ -1295,8 +1302,7 @@
               if (
                 !infrastructureDisabled &&
                 places.some(
-                  (place) =>
-                    place.mapLayer === 'infrastructure' && definition.places.includes(place.slug)
+                  (place) => place.mapLayer === 'infra' && definition.places.includes(place.slug)
                 )
               )
                 infrastructureEnabled = true;
