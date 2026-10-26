@@ -1,7 +1,7 @@
 {
   "part": "shr",
   "page": "https://genplan.zmotech.ru/shelkovo-river/",
-  "capturedAt": "2026-10-24T19:03:55.343Z",
+  "capturedAt": "2026-10-26T19:05:30.984Z",
   "plots": [
     {
       "id": "E1",
@@ -1924,7 +1924,7 @@
     {
       "id": "R47",
       "cadastralReference": "50:33:0010101:2046",
-      "status": "Свободен",
+      "status": "Забронирован",
       "location": "с видом на лес",
       "objectprice": 4838900
     },
