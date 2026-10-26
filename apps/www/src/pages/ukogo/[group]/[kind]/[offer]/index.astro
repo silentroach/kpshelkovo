@@ -1,0 +1,149 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { formatTextHtml } from '@shelkovo/typography';
+import ContactMethods from '@/components/contacts/ContactMethods.astro';
+import InventoryPage from '@/components/inventory/InventoryPage.astro';
+import InventoryDetailPrice from '@/components/inventory/InventoryDetailPrice.astro';
+import InventoryPhotos from '@/components/inventory/InventoryPhotos.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { loadInventoryData } from '@/lib/inventory/load';
+import { inventoryUrl } from '@/lib/inventory/routes';
+import { renderMarkdown } from '@/lib/markdown/render';
+import { SEARCH_SECTIONS } from '@/lib/search/sections';
+import type { SearchDocument } from '@/lib/search/types';
+
+export const getStaticPaths = (async () => {
+  const data = await loadInventoryData();
+  return data.offers.map((offer) => {
+    const kind = data.byKind.get(offer.kindId);
+    if (!kind) throw new Error(`inventory kind "${offer.kindId}" not found`);
+    return { params: { group: kind.group, kind: kind.id, offer: offer.id } };
+  });
+}) satisfies GetStaticPaths;
+
+const data = await loadInventoryData();
+const kind = data.byKind.get(Astro.params.kind ?? '');
+if (!kind || kind.group !== Astro.params.group)
+  throw new Error('inventory kind not found');
+const group = data.byGroup.get(kind.group);
+if (!group) throw new Error('inventory group not found');
+const offer = data.offers.find(
+  (item) => item.id === Astro.params.offer && item.kindId === kind.id,
+);
+if (!offer) throw new Error('inventory offer not found');
+const search: SearchDocument = {
+  scope: 'manual',
+  title: offer.title,
+  description: offer.summary,
+  section: SEARCH_SECTIONS.inventory,
+};
+const bodyHtml = renderMarkdown(offer.body, { idPrefix: offer.bodyIdPrefix });
+---
+
+<BaseLayout
+  title={`${offer.title} — У кого есть — Шелково Онлайн`}
+  description={offer.summary}
+  canonical={offer.url}
+  robots="noindex, follow"
+  search={search}
+>
+  <InventoryPage
+    title={offer.title}
+    searchable
+    parents={[
+      { label: 'У кого есть', href: inventoryUrl() },
+      { label: group.title, href: group.url },
+      { label: kind.title, href: kind.url },
+    ]}
+  >
+    <p
+      slot="intro"
+      class="inventory-detail__kind"
+      data-pagefind-body
+      set:html={formatTextHtml(kind.title)}
+    />
+    <div
+      class:list={[
+        'inventory-detail__hero',
+        { 'inventory-detail__hero--with-photo': offer.photos.length > 0 },
+      ]}
+    >
+      <div class="inventory-detail__overview">
+        <p
+          class="inventory-detail__summary ui-prose"
+          data-pagefind-body
+          set:html={formatTextHtml(offer.summary)}
+        />
+        <div class="inventory-detail__terms" data-pagefind-ignore="all">
+          <InventoryDetailPrice price={offer.price} />
+          <p>
+            <a
+              class="site-text-link"
+              href={offer.owner.url}
+              set:html={formatTextHtml(offer.owner.name)}
+            />
+            {' · '}
+            <a class="site-text-link" href={offer.owner.parcel.url}>
+              Участок {offer.owner.parcel.code}
+            </a>
+          </p>
+          <ContactMethods
+            contacts={offer.owner.contacts}
+            headingId={`${offer.anchorId}-contacts`}
+            compact
+          />
+        </div>
+      </div>
+      {offer.photos.length > 0 && (
+        <div class="inventory-detail__first-photo">
+          <InventoryPhotos photos={offer.photos.slice(0, 1)} leading />
+        </div>
+      )}
+    </div>
+    {bodyHtml && (
+      <div class="inventory-detail__description" data-pagefind-body>
+        <div class="ui-prose" set:html={bodyHtml} />
+      </div>
+    )}
+    <InventoryPhotos photos={offer.photos.slice(1)} />
+  </InventoryPage>
+</BaseLayout>
+
+<style>
+  .inventory-detail__hero {
+    display: grid;
+    gap: 2rem;
+    align-items: start;
+  }
+  .inventory-detail__overview,
+  .inventory-detail__first-photo {
+    min-width: 0;
+  }
+  .inventory-detail__terms {
+    display: grid;
+    gap: 0.625rem;
+  }
+  .inventory-detail__description {
+    max-width: 41.50125rem;
+  }
+  .inventory-detail__kind {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+  }
+  .inventory-detail__summary {
+    margin-bottom: 1.5rem;
+  }
+  @media (min-width: 48rem) {
+    .inventory-detail__hero--with-photo {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .inventory-detail__hero--with-photo .inventory-detail__overview {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .inventory-detail__first-photo {
+      grid-column: 1;
+      grid-row: 1;
+    }
+  }
+</style>

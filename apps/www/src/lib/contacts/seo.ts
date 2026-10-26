@@ -1,10 +1,10 @@
 import type { SchemaDoc } from '@shelkovo/seo';
 
+import { normalizeContactPhone } from '@/lib/contact-methods/phone';
 import { breadcrumbListSchema, collectionPageSchema } from '@/lib/json-ld';
 import type { BreadcrumbLink } from '@/lib/json-ld-types';
 import { absoluteUrl } from '@/lib/site';
 
-import { normalizeContactPhone } from './phone';
 import type { Contact } from './types';
 import { formatContactCategory } from './view';
 

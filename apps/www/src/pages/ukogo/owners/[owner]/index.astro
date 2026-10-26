@@ -1,0 +1,68 @@
+---
+import type { GetStaticPaths } from 'astro';
+import ContactMethods from '@/components/contacts/ContactMethods.astro';
+import InventoryOffer from '@/components/inventory/InventoryOffer.astro';
+import InventoryPage from '@/components/inventory/InventoryPage.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { loadInventoryData } from '@/lib/inventory/load';
+import { inventoryUrl } from '@/lib/inventory/routes';
+import { inventoryOwnerOffers } from '@/lib/inventory/view';
+
+export const getStaticPaths = (async () => {
+  const data = await loadInventoryData();
+  return data.owners.map((owner) => ({ params: { owner: owner.id } }));
+}) satisfies GetStaticPaths;
+
+const data = await loadInventoryData();
+const owner = data.byOwner.get(Astro.params.owner ?? '');
+if (!owner) throw new Error('inventory owner not found');
+const offers = inventoryOwnerOffers(data, owner.id);
+---
+
+<BaseLayout
+  title={`${owner.name} — У кого есть — Шелково Онлайн`}
+  description={`Инвентарь и контакты: ${owner.name}, участок ${owner.parcel.code}.`}
+  canonical={owner.url}
+  robots="noindex, follow"
+>
+  <InventoryPage
+    title={owner.name}
+    breadcrumbLabel={`${owner.name}: инвентарь`}
+    parents={[{ label: 'У кого есть', href: inventoryUrl() }]}
+  >
+    <div slot="intro" class="inventory-owner__contacts">
+      <p>
+        <a class="site-text-link" href={owner.parcel.url}>
+          Участок {owner.parcel.code}
+        </a>
+      </p>
+      <ContactMethods
+        contacts={owner.contacts}
+        headingId={`owner-${owner.id}-contacts`}
+        compact
+      />
+    </div>
+    {offers.length > 0 ? (
+      <div>
+        {offers.map((offer) => (
+          <InventoryOffer
+            offer={offer}
+            showOwner={false}
+            kind={data.byKind.get(offer.kindId)}
+          />
+        ))}
+      </div>
+    ) : (
+      <p class="ui-muted">Сейчас нет предложений этого владельца.</p>
+    )}
+  </InventoryPage>
+</BaseLayout>
+
+<style>
+  .inventory-owner__contacts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1.5rem;
+  }
+</style>

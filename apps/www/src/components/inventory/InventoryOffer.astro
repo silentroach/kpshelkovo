@@ -1,0 +1,169 @@
+---
+import { formatTextHtml } from '@shelkovo/typography';
+import type { InventoryKind, InventoryOffer } from '@/lib/inventory/types';
+import { formatInventoryPrice } from '@/lib/inventory/view';
+import InventoryPreview from './InventoryPreview.astro';
+interface Props {
+  readonly offer: InventoryOffer;
+  readonly showOwner?: boolean;
+  readonly kind?: Pick<InventoryKind, 'title' | 'url'>;
+}
+const { offer, showOwner = true, kind } = Astro.props;
+const photo = offer.photos[0];
+---
+
+<article
+  id={offer.anchorId}
+  class:list={[
+    'inventory-offer',
+    { 'inventory-offer--photo': !!photo, 'inventory-offer--owner': showOwner },
+  ]}
+  aria-labelledby={`${offer.anchorId}-title`}
+>
+  <header class="inventory-offer__heading">
+    <h2
+      id={`${offer.anchorId}-title`}
+      class:list={[
+        'ui-card-title',
+        { 'inventory-offer__title-with-kind': !!kind },
+      ]}
+    >
+      {kind && (
+        <span class="inventory-offer__kind">
+          {[
+            <a
+              class="ui-title-link"
+              href={kind.url}
+              set:html={formatTextHtml(kind.title)}
+            />,
+            <span aria-hidden="true">{'\u00a0›'}</span>,
+          ]}
+        </span>
+      )}{' '}
+      <a
+        href={offer.url}
+        class="ui-title-link"
+        set:html={formatTextHtml(offer.title)}
+      />
+    </h2>
+  </header>
+  <div class="inventory-offer__visual">
+    {photo && <InventoryPreview photo={photo} href={offer.url} />}
+    <p
+      class="inventory-offer__price ui-num"
+      set:html={formatTextHtml(formatInventoryPrice(offer.price))}
+    />
+  </div>
+  <p
+    class="inventory-offer__summary"
+    set:html={formatTextHtml(offer.summary)}
+  />
+  {showOwner && (
+    <p class="inventory-offer__owner">
+      <a
+        class="site-text-link"
+        href={offer.owner.url}
+        set:html={formatTextHtml(offer.owner.name)}
+      />
+      {' · '}
+      <a class="site-text-link" href={offer.owner.parcel.url}>
+        {offer.owner.parcel.code}
+      </a>
+    </p>
+  )}
+</article>
+
+<style>
+  .inventory-offer {
+    display: grid;
+    grid-template-areas: 'heading' 'visual' 'summary';
+    align-items: start;
+    gap: 0.75rem 1.5rem;
+    max-width: 52rem;
+    padding-block-end: 1.25rem;
+    scroll-margin-top: calc(var(--site-sticky-offset) + 1rem);
+  }
+  .inventory-offer--owner {
+    grid-template-areas: 'heading' 'visual' 'summary' 'owner';
+  }
+  .inventory-offer + .inventory-offer {
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--color-border);
+  }
+  .inventory-offer__visual {
+    grid-area: visual;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    gap: 0.75rem 1.5rem;
+    min-width: 0;
+  }
+  .inventory-offer__visual > :global(.inventory-preview) {
+    flex: 0 0 6rem;
+    min-width: 0;
+  }
+  .inventory-offer__heading .ui-title-link {
+    text-decoration-line: underline;
+  }
+  .inventory-offer__heading {
+    grid-area: heading;
+    min-width: 0;
+    margin-block-end: -0.25rem;
+  }
+  .inventory-offer--photo .inventory-offer__heading {
+    margin-block-end: 0;
+  }
+  .inventory-offer__price {
+    grid-area: price;
+    flex: 1 1 min-content;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    font-size: 1.125rem;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .inventory-offer__title-with-kind {
+    text-wrap: wrap;
+  }
+  .inventory-offer__kind {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  .inventory-offer__kind a:not(:hover, :focus-visible) {
+    color: var(--color-text-muted);
+  }
+  .inventory-offer__summary {
+    grid-area: summary;
+  }
+  .inventory-offer__owner {
+    grid-area: owner;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+  @media (min-width: 48rem) {
+    .inventory-offer {
+      grid-template-areas: 'heading' 'price' 'summary';
+    }
+    .inventory-offer--owner {
+      grid-template-areas: 'heading' 'price' 'summary' 'owner';
+    }
+    .inventory-offer__visual {
+      display: contents;
+    }
+    .inventory-offer--photo {
+      grid-template-columns: 10rem minmax(0, 1fr);
+      grid-template-areas: 'photo heading' 'photo price' 'photo summary';
+      grid-template-rows: min-content min-content 1fr;
+      column-gap: 2rem;
+    }
+    .inventory-offer--photo .inventory-offer__heading {
+      margin-block-end: -0.25rem;
+    }
+    .inventory-offer--photo.inventory-offer--owner {
+      grid-template-areas: 'photo heading' 'photo price' 'photo summary' 'photo owner';
+      grid-template-rows: min-content min-content min-content 1fr;
+    }
+  }
+</style>

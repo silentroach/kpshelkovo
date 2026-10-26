@@ -1,0 +1,39 @@
+---
+import type { GetStaticPaths } from 'astro';
+import InventoryPage from '@/components/inventory/InventoryPage.astro';
+import InventoryKindList from '@/components/inventory/InventoryKindList.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { loadInventoryData } from '@/lib/inventory/load';
+import { inventoryUrl } from '@/lib/inventory/routes';
+export const getStaticPaths = (async () =>
+  (await loadInventoryData()).groups.map((group) => ({
+    params: { group: group.id },
+  }))) satisfies GetStaticPaths;
+const group = (await loadInventoryData()).groups.find(
+  (entry) => entry.id === Astro.params.group,
+);
+if (!group)
+  throw new Error(`inventory group "${Astro.params.group}" not found`);
+---
+
+<BaseLayout
+  title={`${group.title} — У кого есть — Шелково Онлайн`}
+  description={`Инвентарь у соседей: ${group.title.toLocaleLowerCase('ru-RU')}. Выберите вид, чтобы посмотреть предложения и связаться с владельцем.`}
+  canonical={group.url}
+>
+  <InventoryPage
+    title={group.title}
+    parents={[{ label: 'У кого есть', href: inventoryUrl() }]}
+  >
+    {group.kinds.length > 0 ? (
+      <InventoryKindList kinds={group.kinds} />
+    ) : (
+      <div class="ui-prose">
+        <p>В этой группе пока нет предложений.</p>
+        <p>
+          <a href={inventoryUrl()}>Вернуться в каталог</a>
+        </p>
+      </div>
+    )}
+  </InventoryPage>
+</BaseLayout>

@@ -96,6 +96,10 @@ export const shouldIncludeSitemapPage = (url: string): boolean => {
     return /^\/events\/(?:\d{4}\/\d{2}\/(?:(?!list\/)[a-z0-9]+(?:-[a-z0-9]+)*\/)?)?$/u.test(path);
   }
 
+  if (/^\/ukogo\/(?:owners\/[^/]+\/|[^/]+\/[^/]+\/[^/]+\/)$/u.test(path)) {
+    return false;
+  }
+
   return !ERROR_PAGE.test(path) && !/^\/status\/(?:incidents|history|calendar)\//u.test(path);
 };
 

@@ -743,6 +743,248 @@ describe('desktop site navigation dropdown', () => {
     return { dropdown, button, menu, submenuLink };
   };
 
+  const renderDropdowns = () => {
+    const tariff = renderDropdown();
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      `
+        <div data-site-nav-dropdown>
+          <button type="button" aria-expanded="false" data-site-nav-dropdown-button>Directory</button>
+          <div data-site-nav-dropdown-menu>
+            <a href="/ukogo/"><span>Inventory</span></a>
+          </div>
+        </div>
+        <button type="button" data-outside>Outside</button>
+        <a href="/" class="site-header-brand">Brand</a>
+      `
+    );
+    document.dispatchEvent(new Event('astro:page-load'));
+    const dropdown = document.querySelectorAll<HTMLElement>('[data-site-nav-dropdown]')[1];
+    const button = dropdown?.querySelector<HTMLButtonElement>('[data-site-nav-dropdown-button]');
+    const menu = dropdown?.querySelector<HTMLElement>('[data-site-nav-dropdown-menu]');
+    const submenuLink = menu?.querySelector<HTMLAnchorElement>('a');
+    const outside = document.querySelector<HTMLButtonElement>('[data-outside]');
+    const brand = document.querySelector<HTMLAnchorElement>('.site-header-brand');
+    if (!dropdown || !button || !menu || !submenuLink || !outside || !brand) {
+      throw new Error('Expected two desktop navigation dropdowns');
+    }
+
+    return { tariff, directory: { dropdown, button, menu, submenuLink }, outside, brand };
+  };
+
+  it('controls only its own list and applies rapid repeated clicks immediately', () => {
+    const { tariff, directory } = renderDropdowns();
+    for (const [current, other] of [
+      [tariff, directory],
+      [directory, tariff]
+    ] as const) {
+      const states = [current.menu.inert];
+      current.button.click();
+      states.push(current.menu.inert);
+      current.button.click();
+      states.push(current.menu.inert);
+      current.button.click();
+      states.push(current.menu.inert);
+      expect({
+        states,
+        expanded: current.button.getAttribute('aria-expanded'),
+        open: current.dropdown.hasAttribute('data-open'),
+        otherExpanded: other.button.getAttribute('aria-expanded'),
+        otherInert: other.menu.inert
+      }).toMatchInlineSnapshot(`
+        {
+          "expanded": "true",
+          "open": true,
+          "otherExpanded": "false",
+          "otherInert": true,
+          "states": [
+            true,
+            false,
+            true,
+            false,
+          ],
+        }
+      `);
+      current.button.click();
+    }
+  });
+
+  it('closes the previous group when keyboard focus moves between buttons or outside', () => {
+    const { tariff, directory, outside } = renderDropdowns();
+    tariff.button.focus();
+    tariff.button.click();
+    tariff.submenuLink.focus();
+    expect(tariff.menu.inert).toBe(false);
+
+    directory.button.focus();
+    expect(tariff.menu.inert).toBe(true);
+    directory.button.click();
+    directory.submenuLink.focus();
+    expect(directory.menu.inert).toBe(false);
+
+    tariff.button.focus();
+    expect(directory.menu.inert).toBe(true);
+    tariff.button.click();
+    outside.focus();
+    expect(tariff.menu.inert).toBe(true);
+    expect(document.activeElement).toBe(outside);
+  });
+
+  it('switches groups on touch and closes outside without stealing focus', () => {
+    const { tariff, directory, outside } = renderDropdowns();
+    for (const current of [tariff, directory, tariff, directory]) {
+      current.button.dispatchEvent(
+        new PointerEvent('pointerdown', {
+          bubbles: true,
+          pointerType: 'touch'
+        })
+      );
+      current.button.click();
+      current.dropdown.dispatchEvent(new PointerEvent('pointerleave', { pointerType: 'touch' }));
+      expect(current.menu.inert).toBe(false);
+      expect((current === tariff ? directory : tariff).menu.inert).toBe(true);
+    }
+
+    outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' }));
+    outside.focus();
+    expect([tariff.menu.inert, directory.menu.inert]).toEqual([true, true]);
+    expect(document.activeElement).toBe(outside);
+  });
+
+  it('returns Escape focus to the owning trigger in either group', () => {
+    const { tariff, directory } = renderDropdowns();
+    for (const current of [tariff, directory]) {
+      current.button.focus();
+      current.button.click();
+      current.submenuLink.focus();
+      current.submenuLink.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+      );
+      expect([tariff.menu.inert, directory.menu.inert]).toEqual([true, true]);
+      expect(document.activeElement).toBe(current.button);
+      expect(current.button.getAttribute('aria-expanded')).toBe('false');
+    }
+  });
+
+  it.each(['tariff', 'directory'] as const)(
+    'does not let a hover-open sibling steal Escape focus from %s',
+    (activeGroup) => {
+      const matchMedia = window.matchMedia.bind(window);
+      vi.spyOn(window, 'matchMedia').mockImplementation((query) => {
+        const result = matchMedia(query);
+        if (query === '(hover: hover) and (pointer: fine)') {
+          Object.defineProperty(result, 'matches', { value: true });
+        }
+        return result;
+      });
+      const { tariff, directory } = renderDropdowns();
+      const current = activeGroup === 'tariff' ? tariff : directory;
+      const other = activeGroup === 'tariff' ? directory : tariff;
+      other.dropdown.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
+      current.button.focus();
+      current.button.click();
+      current.submenuLink.focus();
+      expect([tariff.menu.inert, directory.menu.inert]).toEqual([false, false]);
+
+      current.submenuLink.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+      );
+
+      expect(document.activeElement).toBe(current.button);
+      expect([tariff.menu.inert, directory.menu.inert]).toEqual([true, true]);
+    }
+  );
+
+  it('closes either selected link immediately without canceling navigation', () => {
+    const { tariff, directory } = renderDropdowns();
+    for (const current of [tariff, directory]) {
+      current.button.click();
+      current.submenuLink.focus();
+      const click = new MouseEvent('click', { bubbles: true, cancelable: true });
+      (current.submenuLink.firstElementChild ?? current.submenuLink).dispatchEvent(click);
+      expect({
+        canceled: click.defaultPrevented,
+        focused: document.activeElement === current.button,
+        inert: current.menu.inert,
+        expanded: current.button.getAttribute('aria-expanded')
+      }).toMatchInlineSnapshot(`
+        {
+          "canceled": false,
+          "expanded": "false",
+          "focused": true,
+          "inert": true,
+        }
+      `);
+    }
+  });
+
+  it('binds each group once across repeated initialization and binds replacement DOM after navigation', async () => {
+    const { tariff, directory } = renderDropdowns();
+    vi.resetModules();
+    await import('../site-runtime');
+    for (const current of [tariff, directory]) {
+      current.button.click();
+      document.dispatchEvent(new Event('astro:after-swap'));
+      document.dispatchEvent(new Event('astro:page-load'));
+      document.dispatchEvent(new Event('astro:page-load'));
+      expect(current.menu.inert).toBe(false);
+      current.button.click();
+      expect(current.menu.inert).toBe(true);
+    }
+
+    document.dispatchEvent(new Event('astro:before-swap'));
+    const next = renderDropdowns();
+    document.dispatchEvent(new Event('astro:after-swap'));
+    document.dispatchEvent(new Event('astro:page-load'));
+    for (const current of [next.tariff, next.directory]) {
+      current.button.click();
+      expect(current.menu.inert).toBe(false);
+      current.button.click();
+      expect(current.menu.inert).toBe(true);
+    }
+    for (const previous of [tariff, directory]) {
+      previous.button.click();
+      expect(previous.menu.inert).toBe(true);
+    }
+  });
+
+  it('resets both groups across layout changes without restoring an old open state', () => {
+    const matchMedia = window.matchMedia.bind(window);
+    const layout = matchMedia('(min-width: 56rem)');
+    vi.spyOn(window, 'matchMedia').mockImplementation((query) =>
+      query === '(min-width: 56rem)' ? layout : matchMedia(query)
+    );
+    const { tariff, directory, brand } = renderDropdowns();
+    for (const current of [tariff, directory]) {
+      current.button.click();
+      current.submenuLink.focus();
+      Object.defineProperty(layout, 'matches', { configurable: true, value: false });
+      layout.dispatchEvent(new Event('change'));
+      Object.defineProperty(layout, 'matches', { configurable: true, value: true });
+      layout.dispatchEvent(new Event('change'));
+      expect({
+        focused: document.activeElement === brand,
+        expanded: [
+          tariff.button.getAttribute('aria-expanded'),
+          directory.button.getAttribute('aria-expanded')
+        ],
+        inert: [tariff.menu.inert, directory.menu.inert]
+      }).toMatchInlineSnapshot(`
+        {
+          "expanded": [
+            "false",
+            "false",
+          ],
+          "focused": true,
+          "inert": [
+            true,
+            true,
+          ],
+        }
+      `);
+    }
+  });
+
   it('hides closed links semantically and restores the trigger on Escape', () => {
     const { button, menu, submenuLink } = renderDropdown();
 

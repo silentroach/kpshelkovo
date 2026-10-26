@@ -20,6 +20,7 @@ const {
 
 const isMobile = variant === 'mobile';
 const tariffMenuId = 'site-header-tariff-menu';
+const directoryMenuId = 'site-header-directory-menu';
 const pathname = Astro.url.pathname;
 const currentPathname =
   pathname === '/' ? pathname : `${pathname.replace(/\/+$/, '')}/`;
@@ -38,9 +39,13 @@ const compareCurrent = getCurrent('/815/compare/');
 const regulationCurrent = getCurrent('/815/regulation/');
 const kbCurrent = getCurrent('/kb/');
 const sarafanCurrent = getCurrent('/sarafan/');
+const inventoryCurrent = getCurrent('/ukogo/');
 const reviewsCurrent = getCurrent('/reviews/');
 const statusCurrent = getCurrent('/status/');
 const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
+const isDirectoryCurrent = Boolean(
+  placesCurrent || kbCurrent || sarafanCurrent || inventoryCurrent,
+);
 ---
 
 {isMobile ? (
@@ -81,20 +86,45 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
       </a>
     </div>
 
-    <a href="/map/" aria-current={placesCurrent} class="site-nav-mobile-link">
-      Карта
-    </a>
-
-    <a href="/kb/" aria-current={kbCurrent} class="site-nav-mobile-link">
-      База знаний
-    </a>
-    <a
-      href="/sarafan/"
-      aria-current={sarafanCurrent}
-      class="site-nav-mobile-link"
+    <div
+      class="site-nav-mobile-group"
+      data-current-section={isDirectoryCurrent ? '' : undefined}
     >
-      Сарафан
-    </a>
+      <p class="site-nav-mobile-label">
+        Справочник
+        {isDirectoryCurrent && (
+          <span class="ui-visually-hidden">, текущий раздел</span>
+        )}
+      </p>
+      <a
+        href="/map/"
+        aria-current={placesCurrent}
+        class="site-nav-mobile-link site-nav-mobile-nested"
+      >
+        Карта
+      </a>
+      <a
+        href="/kb/"
+        aria-current={kbCurrent}
+        class="site-nav-mobile-link site-nav-mobile-nested"
+      >
+        База знаний
+      </a>
+      <a
+        href="/sarafan/"
+        aria-current={sarafanCurrent}
+        class="site-nav-mobile-link site-nav-mobile-nested"
+      >
+        Сарафан
+      </a>
+      <a
+        href="/ukogo/"
+        aria-current={inventoryCurrent}
+        class="site-nav-mobile-link site-nav-mobile-nested"
+      >
+        У кого есть
+      </a>
+    </div>
     <a
       href="/reviews/"
       aria-current={reviewsCurrent}
@@ -173,16 +203,62 @@ const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
       </div>
     </div>
 
-    <a href="/map/" aria-current={placesCurrent} class="site-nav-link">
-      Карта
-    </a>
-
-    <a href="/kb/" aria-current={kbCurrent} class="site-nav-link">
-      База знаний
-    </a>
-    <a href="/sarafan/" aria-current={sarafanCurrent} class="site-nav-link">
-      Сарафан
-    </a>
+    <div
+      class="site-nav-dropdown"
+      data-site-nav-dropdown
+      data-current-section={isDirectoryCurrent ? '' : undefined}
+    >
+      <button
+        type="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-controls={directoryMenuId}
+        data-site-nav-dropdown-button
+        class="site-nav-link site-nav-dropdown-button"
+      >
+        <span>Справочник</span>
+        {isDirectoryCurrent && (
+          <span class="ui-visually-hidden">, текущий раздел</span>
+        )}
+        <span
+          aria-hidden="true"
+          data-site-nav-dropdown-icon
+          class="site-nav-dropdown-icon"
+        />
+      </button>
+      <div
+        id={directoryMenuId}
+        data-site-nav-dropdown-menu
+        class="site-nav-submenu"
+      >
+        <div class="site-nav-glass-panel">
+          <a
+            href="/map/"
+            aria-current={placesCurrent}
+            class="site-nav-submenu-link"
+          >
+            Карта
+          </a>
+          <a href="/kb/" aria-current={kbCurrent} class="site-nav-submenu-link">
+            База знаний
+          </a>
+          <a
+            href="/sarafan/"
+            aria-current={sarafanCurrent}
+            class="site-nav-submenu-link"
+          >
+            Сарафан
+          </a>
+          <a
+            href="/ukogo/"
+            aria-current={inventoryCurrent}
+            class="site-nav-submenu-link"
+          >
+            У кого есть
+          </a>
+        </div>
+      </div>
+    </div>
     <a href="/reviews/" aria-current={reviewsCurrent} class="site-nav-link">
       Отзывы
     </a>

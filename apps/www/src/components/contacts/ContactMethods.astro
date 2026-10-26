@@ -1,55 +1,66 @@
 ---
-import type { ContactContacts, ContactLocation } from '@/lib/contacts/types';
-import { contactMethods, contactPlace } from '@/lib/contacts/view';
+import type { ContactMethods } from '@/lib/contact-methods/types';
+import { contactMethods } from '@/lib/contact-methods/view';
+import type { ContactLocation } from '@/lib/contacts/types';
+import { contactPlace } from '@/lib/contacts/view';
 
 interface Props {
-  readonly contacts: ContactContacts;
+  readonly contacts: ContactMethods;
   readonly location?: ContactLocation;
+  readonly headingId?: string;
+  readonly headingLevel?: 'h2' | 'h3';
+  readonly compact?: boolean;
 }
 
-const { contacts, location } = Astro.props;
+const {
+  contacts,
+  location,
+  headingId = 'contact-methods',
+  headingLevel = 'h2',
+  compact = false,
+} = Astro.props;
+const Heading = headingLevel;
 const methods = contactMethods(contacts);
 const place = contactPlace(location);
 const heading = place ? 'Контакты и адрес' : 'Способы связи';
 ---
 
-<section aria-labelledby="contact-methods" class="contact-methods">
-  <h2 id="contact-methods" class="contact-methods__heading">
+<section
+  aria-labelledby={headingId}
+  class:list={['contact-methods', { 'contact-methods--compact': compact }]}
+>
+  <Heading id={headingId} class="contact-methods__heading">
     {heading}
-  </h2>
+  </Heading>
   <dl class="contact-methods__list">
-    {
-      place ? (
-        <div class="contact-methods__row">
-          <dt class="contact-methods__label">{place.label}</dt>
-          <dd class="contact-methods__value">
-            <a href={place.href} class="ui-link contact-methods__link">
-              {place.title}
-            </a>
-            {place.address ? (
-              <p class="contact-methods__address">{place.address}</p>
-            ) : null}
-          </dd>
-        </div>
-      ) : null
-    }
+    {place ? (
+      <div class="contact-methods__row">
+        <dt class="contact-methods__label">{place.label}</dt>
+        <dd class="contact-methods__value">
+          <a href={place.href} class="ui-link contact-methods__link">
+            {place.title}
+          </a>
+          {place.address ? (
+            <p class="contact-methods__address">{place.address}</p>
+          ) : null}
+        </dd>
+      </div>
+    ) : null}
 
-    {
-      methods.map((method) => (
-        <div class="contact-methods__row">
-          <dt class="contact-methods__label">{method.label}</dt>
-          <dd class="contact-methods__value">
-            {method.href ? (
-              <a href={method.href} class="ui-link contact-methods__link">
-                {method.value}
-              </a>
-            ) : (
-              method.value
-            )}
-          </dd>
-        </div>
-      ))
-    }
+    {methods.map((method) => (
+      <div class="contact-methods__row">
+        <dt class="contact-methods__label">{method.label}</dt>
+        <dd class="contact-methods__value">
+          {method.href ? (
+            <a href={method.href} class="ui-link contact-methods__link">
+              {method.value}
+            </a>
+          ) : (
+            method.value
+          )}
+        </dd>
+      </div>
+    ))}
   </dl>
 </section>
 
@@ -115,5 +126,24 @@ const heading = place ? 'Контакты и адрес' : 'Способы св�
       align-items: start;
       gap: 1rem;
     }
+  }
+  .contact-methods--compact .contact-methods__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1rem;
+  }
+  .contact-methods--compact .contact-methods__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.375rem;
+    padding-block: 0.25rem;
+    border: 0;
+  }
+  .contact-methods--compact .contact-methods__label {
+    font-weight: 400;
+  }
+  .contact-methods--compact .contact-methods__value {
+    overflow-wrap: anywhere;
   }
 </style>

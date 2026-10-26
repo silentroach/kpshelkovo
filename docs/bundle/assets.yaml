@@ -3,13 +3,13 @@
   brotli: 593
   gzip: 700
 - file: static/BaseLayout.XXXXXXXX.css
-  bytes: 56203
-  brotli: 8980
-  gzip: 10056
+  bytes: 56250
+  brotli: 8992
+  gzip: 10064
 - file: static/BaseLayout.astro_astro_type_script_index_0_lang.XXXXXXXX.js
-  bytes: 11090
-  brotli: 3520
-  gzip: 4052
+  bytes: 11190
+  brotli: 3530
+  gzip: 4068
 - file: static/Breadcrumbs.XXXXXXXX.css
   bytes: 2418
   brotli: 534
@@ -34,6 +34,10 @@
   bytes: 700
   brotli: 244
   gzip: 289
+- file: static/ContactMethods.XXXXXXXX.css
+  bytes: 1657
+  brotli: 421
+  gzip: 518
 - file: static/EditorialMapScript.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 3265
   brotli: 1252
@@ -58,6 +62,18 @@
   bytes: 2533
   brotli: 954
   gzip: 1148
+- file: static/InventoryKindList.XXXXXXXX.css
+  bytes: 461
+  brotli: 170
+  gzip: 229
+- file: static/InventoryOffer.XXXXXXXX.css
+  bytes: 2933
+  brotli: 659
+  gzip: 778
+- file: static/InventoryPage.XXXXXXXX.css
+  bytes: 824
+  brotli: 244
+  gzip: 290
 - file: static/LinkWithIcon.XXXXXXXX.css
   bytes: 488
   brotli: 200
@@ -272,9 +288,9 @@
   brotli: 137
   gzip: 178
 - file: static/index-21.XXXXXXXX.css
-  bytes: 5019
-  brotli: 991
-  gzip: 1187
+  bytes: 3931
+  brotli: 805
+  gzip: 981
 - file: static/index-22.XXXXXXXX.css
   bytes: 715
   brotli: 193
@@ -307,6 +323,17 @@
   bytes: 5847
   brotli: 934
   gzip: 1105
+- file: static/index-30.XXXXXXXX.css
+  bytes: 1701
+  brotli: 457
+  gzip: 551
+- file: static/index-31.XXXXXXXX.css
+  bytes: 1533
+  brotli: 433
+  gzip: 536
+- file: static/index-32.XXXXXXXX.css
+  bytes: 120
+  brotli: 104
 - file: static/index.astro_astro_type_script_index_0_lang-2.XXXXXXXX.js
   bytes: 5357
   brotli: 2403
@@ -333,8 +360,8 @@
   gzip: 679
 - file: static/lazy.XXXXXXXX.js
   bytes: 16999
-  brotli: 6213
-  gzip: 7022
+  brotli: 6184
+  gzip: 7021
 - file: static/lifecycle.XXXXXXXX.js
   bytes: 1229
   brotli: 493

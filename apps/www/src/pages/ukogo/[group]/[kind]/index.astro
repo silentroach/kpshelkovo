@@ -1,0 +1,54 @@
+---
+import type { GetStaticPaths } from 'astro';
+import InventoryPage from '@/components/inventory/InventoryPage.astro';
+import InventoryOffer from '@/components/inventory/InventoryOffer.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { loadInventoryData } from '@/lib/inventory/load';
+import { inventoryUrl } from '@/lib/inventory/routes';
+import { renderMarkdown } from '@/lib/markdown/render';
+export const getStaticPaths = (async () =>
+  (await loadInventoryData()).kinds.map((kind) => ({
+    params: { group: kind.group, kind: kind.id },
+  }))) satisfies GetStaticPaths;
+const data = await loadInventoryData();
+const kind = data.byKind.get(Astro.params.kind ?? '');
+if (!kind || kind.group !== Astro.params.group)
+  throw new Error(
+    `inventory kind "${Astro.params.group}/${Astro.params.kind}" not found`,
+  );
+const group = data.byGroup.get(kind.group);
+if (!group) throw new Error(`inventory group "${kind.group}" not found`);
+const searchable = kind.offers.length > 0;
+const description = `${kind.title}: предложения соседей в Шелково, условия пользования и контакты владельцев.`;
+const bodyHtml = renderMarkdown(kind.body, { idPrefix: kind.bodyIdPrefix });
+---
+
+<BaseLayout
+  title={`${kind.title} — У кого есть — Шелково Онлайн`}
+  description={description}
+  canonical={kind.url}
+>
+  <InventoryPage
+    title={kind.title}
+    parents={[
+      { label: 'У кого есть', href: inventoryUrl() },
+      { label: group.title, href: group.url },
+    ]}
+  >
+    {bodyHtml && <div class="ui-prose" set:html={bodyHtml} />}
+    {searchable ? (
+      <div>
+        {kind.offers.map((offer) => (
+          <InventoryOffer offer={offer} />
+        ))}
+      </div>
+    ) : (
+      <div class="ui-prose">
+        <p>Сейчас нет предложений этого вида.</p>
+        <p>
+          <a href={inventoryUrl()}>Вернуться в каталог</a>
+        </p>
+      </div>
+    )}
+  </InventoryPage>
+</BaseLayout>

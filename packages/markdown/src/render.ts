@@ -1,18 +1,19 @@
-import type { Heading, Root } from 'mdast';
+import type { Root } from 'mdast';
 import rehypeStringify from 'rehype-stringify';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified, type Plugin } from 'unified';
-import { visit } from 'unist-util-visit';
 
-import { headingSlug, uniqueHeadingSlug } from './heading-slugs';
+import { assignAuthoredHeadingIds } from './heading-ids';
+import { uniqueHeadingSlug } from './heading-slugs';
 import type { HtmlTreeNode } from './html-tree.types';
 import { rehypeImageFigures } from './image-figures';
+import { rehypeLocalIds } from './local-ids';
 import { assertNoMarkdownTables } from './no-tables';
-import type { MarkdownAstTransform, RenderOptions } from './render.types';
+import type { MarkdownAstTransform, RenderedMarkdown, RenderOptions } from './render.types';
 import { rehypeTaskListItemLabels } from './task-list-labels';
-import { expandTableOfContents, headingText } from './toc';
+import { expandTableOfContents } from './toc';
 import { prepareTocAnnotations, remarkTocSyntax } from './toc-annotations';
 import { rehypeTypograf } from './typography';
 
@@ -25,39 +26,7 @@ const remarkDocument: Plugin<
   Root
 > = (transform, reservedIds) => (tree, file) => {
   prepareTocAnnotations(tree, String(file));
-  const usedIds = new Set(reservedIds);
-  const authoredIds = new Map<Heading, string>();
-  const headings: Heading[] = [];
-  let hasFootnotes = false;
-
-  visit(tree, (node) => {
-    if (node.type === 'heading') {
-      headings.push(node);
-    } else if (node.type === 'footnoteReference') {
-      hasFootnotes = true;
-    }
-  });
-
-  const reserveId = (base: string): string => {
-    const slug = headingSlug(base);
-    // GFM creates these fixed IDs during mdast → hast, after the app hook.
-    const footnoteId =
-      slug === 'footnote-label' ||
-      slug.startsWith('user-content-fn-') ||
-      slug.startsWith('user-content-fnref-');
-    return uniqueHeadingSlug(hasFootnotes && footnoteId ? `heading-${slug}` : base, usedIds);
-  };
-
-  // Reserve the author's headings before app-owned headings can be inserted.
-  headings.forEach((node) => {
-    const id = reserveId(headingText(node));
-    authoredIds.set(node, id);
-    node.data = {
-      ...node.data,
-      hProperties: { ...node.data?.hProperties, id }
-    };
-  });
-
+  const { authoredIds, reserveId } = assignAuthoredHeadingIds(tree, reservedIds);
   const expanded = expandTableOfContents(tree, authoredIds);
   return transform?.(expanded, reserveId) ?? expanded;
 };
@@ -137,7 +106,7 @@ const rehypeHeadingIds: Plugin<[readonly string[] | undefined], HtmlTreeNode> =
     addHeadingIds(tree, usedIds);
   };
 
-const createProcessor = (options?: RenderOptions) =>
+const createProcessor = (localIds: Map<string, string>, options?: RenderOptions) =>
   unified()
     .use(remarkParse)
     .use(remarkGfm)
@@ -150,6 +119,7 @@ const createProcessor = (options?: RenderOptions) =>
     .use(rehypeTaskListItemLabels)
     .use(rehypeImageFigures)
     .use(rehypeTypograf)
+    .use(rehypeLocalIds, localIds, options?.idPrefix)
     .use(rehypeStringify);
 
 const preprocessMarkdown = (markdown: string, preprocess: RenderOptions['preprocess']): string => {
@@ -164,13 +134,18 @@ const preprocessMarkdown = (markdown: string, preprocess: RenderOptions['preproc
   return preprocess.reduce((value, fn) => fn(value), markdown);
 };
 
-export const render = (markdown: string, options?: RenderOptions): string => {
+export const renderWithMetadata = (markdown: string, options?: RenderOptions): RenderedMarkdown => {
   const processed = preprocessMarkdown(markdown, options?.preprocess);
+  const localIds = new Map<string, string>();
 
-  return String(
-    createProcessor(options).processSync({
+  const html = String(
+    createProcessor(localIds, options).processSync({
       value: processed,
       data: { eagerImages: options?.eagerImages }
     })
   );
+  return { html, localIds };
 };
+
+export const render = (markdown: string, options?: RenderOptions): string =>
+  renderWithMetadata(markdown, options).html;

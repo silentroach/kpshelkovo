@@ -14,5 +14,13 @@ export interface RenderOptions {
   readonly transform?: MarkdownAstTransform;
   /** IDs owned by the surrounding page, outside this Markdown document. */
   readonly reservedIds?: readonly string[];
+  /** Namespace every final HTML ID and references to targets inside this fragment. */
+  readonly idPrefix?: string;
   readonly eagerImages?: boolean;
+}
+
+export interface RenderedMarkdown {
+  readonly html: string;
+  /** Original final-HAST ID → emitted ID; identity mapping without idPrefix. */
+  readonly localIds: ReadonlyMap<string, string>;
 }

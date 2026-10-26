@@ -1,0 +1,54 @@
+---
+import { Image } from 'astro:assets';
+import { formatText } from '@shelkovo/typography';
+import type { InventoryPhoto } from '@/lib/inventory/types';
+interface Props {
+  readonly photo: InventoryPhoto;
+  readonly href: string;
+}
+const { photo, href } = Astro.props;
+const width = Math.min(photo.width, 480);
+const height = Math.round((photo.height * width) / photo.width);
+const widths = [
+  ...new Set([96, 160, 320, width].filter((candidate) => candidate <= width)),
+];
+---
+
+<a class="inventory-preview" href={href}>
+  <Image
+    src={photo.url}
+    width={width}
+    height={height}
+    widths={widths}
+    sizes="(min-width: 768px) 160px, 96px"
+    format="webp"
+    quality={82}
+    alt={formatText(photo.alt)}
+    loading="lazy"
+    decoding="async"
+  />
+</a>
+
+<style>
+  .inventory-preview {
+    grid-area: photo;
+    display: block;
+    align-self: start;
+  }
+  .inventory-preview:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 4px;
+  }
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 8rem;
+    object-fit: contain;
+  }
+  @media (min-width: 48rem) {
+    img {
+      max-height: 11rem;
+    }
+  }
+</style>

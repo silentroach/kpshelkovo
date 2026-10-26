@@ -1,15 +1,8 @@
+import type { ContactMethods } from '@/lib/contact-methods/types';
 import type { PreprocessedSiteMarkdownBody } from '@/lib/markdown/render';
 import type { EntityMentionTarget } from '@/lib/mentions';
 
 import type { ContactCategory, ContactReviewSentiment } from './schema';
-
-export interface ContactContacts {
-  readonly phone?: string;
-  readonly telegram?: string;
-  readonly whatsapp?: string;
-  readonly email?: string;
-  readonly website?: string;
-}
 
 export interface ContactSeo {
   readonly description?: string;
@@ -77,7 +70,7 @@ interface ContactBase {
   readonly updatedIso: string;
   readonly summary: string;
   readonly searchAliases?: readonly string[];
-  readonly contacts: ContactContacts;
+  readonly contacts: ContactMethods;
   readonly location?: ContactLocation;
   readonly reviews: readonly ContactReview[];
   readonly seo?: ContactSeo;

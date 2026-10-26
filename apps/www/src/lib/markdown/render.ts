@@ -1,4 +1,4 @@
-import { render } from '@shelkovo/markdown';
+import { renderWithMetadata, type RenderedMarkdown } from '@shelkovo/markdown';
 
 import { normalizeEntityMentions } from '../mentions';
 import type { EntityMentionSourceEntity, SiteMentionRegistry } from '../mentions';
@@ -254,24 +254,31 @@ export const preprocessSiteMarkdownContent = (
       };
 };
 
-export const renderMarkdown = (markdown: string, options?: RenderSiteMarkdownOptions): string => {
+export const renderMarkdownWithMetadata = (
+  markdown: string,
+  options?: RenderSiteMarkdownOptions
+): RenderedMarkdown => {
   const preprocessed = preprocessSiteMarkdown(markdown, options).markdown;
+  const rendered = renderWithMetadata(normalizeContentDiffMarkdown(preprocessed), {
+    eagerImages: options?.eagerImages,
+    reservedIds: options?.reservedIds,
+    idPrefix: options?.idPrefix,
+    transform: (document, reserveId) => {
+      transformContentEmphasis(document.children, 'html');
+      if (options?.editorialMaps) {
+        transformEditorialMaps(
+          options.editorialMapSource ?? options.mentions?.context ?? 'site markdown',
+          options.editorialMapResolver
+        )(document, reserveId);
+      }
+    }
+  });
 
-  return renderFileLinks(
-    renderContentDiffBlocks(
-      render(normalizeContentDiffMarkdown(preprocessed), {
-        eagerImages: options?.eagerImages,
-        reservedIds: options?.reservedIds,
-        transform: (document, reserveId) => {
-          transformContentEmphasis(document.children, 'html');
-          if (options?.editorialMaps) {
-            transformEditorialMaps(
-              options.editorialMapSource ?? options.mentions?.context ?? 'site markdown',
-              options.editorialMapResolver
-            )(document, reserveId);
-          }
-        }
-      })
-    )
-  );
+  return {
+    html: renderFileLinks(renderContentDiffBlocks(rendered.html)),
+    localIds: rendered.localIds
+  };
 };
+
+export const renderMarkdown = (markdown: string, options?: RenderSiteMarkdownOptions): string =>
+  renderMarkdownWithMetadata(markdown, options).html;
