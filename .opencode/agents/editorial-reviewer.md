@@ -1,7 +1,7 @@
 ---
 description: Проверяет русскоязычные тексты сайта и ухудшения от редактуры; возвращает замечания и вопросы без правок.
 mode: subagent
-model: openai/gpt-6-astra#xhigh
+model: openai/gpt-6.1-terra#high
 permissions:
   - action: edit
     resource: '*'

@@ -1,7 +1,7 @@
 ---
 description: Проверяет весь diff изменения по требованиям, регрессиям и неоправданной сложности; возвращает замечания автору без правок.
 mode: subagent
-model: openai/gpt-6-sol
+model: openai/gpt-6.1-sol
 permissions:
   - action: edit
     resource: '*'
