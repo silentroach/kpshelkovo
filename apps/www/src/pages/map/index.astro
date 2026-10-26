@@ -9,12 +9,14 @@ import {
 } from '@shelkovo/ui/icons/areas';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { loadPlaces } from '@/lib/places/load';
+import { isPlaceLayerVisible } from '@/lib/places/map-layers';
 import { selectMapPlaces } from '@/lib/places/map-selection';
 import { placesDataUrl, placesUrl } from '@/lib/places/routes';
 
 const places = selectMapPlaces(await loadPlaces());
-const initialBounds = getPlaceBounds(places);
-const firstPlace = places[0];
+const initialPlaces = places.filter((place) => isPlaceLayerVisible(place));
+const initialBounds = getPlaceBounds(initialPlaces);
+const firstPlace = initialPlaces[0];
 const fallbackPlace = firstPlace
   ? { name: firstPlace.name, url: firstPlace.url }
   : undefined;
@@ -67,15 +69,16 @@ const schema = {
     <noscript>
       <div class="map-fallback">
         <p class="map-fallback__copy">
-          Для карты нужен JavaScript. <a
-            href={places[0]?.url ?? placesUrl()}
+          Для карты нужен JavaScript.{' '}
+          <a
+            href={firstPlace?.url ?? placesUrl()}
             class="site-text-link map-fallback__link"
-            >{
-              places[0]
-                ? `Открыть карточку «${places[0].name}»`
-                : 'Открыть раздел'
-            }</a
-          >.
+          >
+            {firstPlace
+              ? `Открыть карточку «${firstPlace.name}»`
+              : 'Открыть раздел'}
+          </a>
+          .
         </p>
       </div>
     </noscript>

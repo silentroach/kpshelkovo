@@ -1,15 +1,5 @@
 <script lang="ts">
   import { pluralize } from '@shelkovo/format';
-  import {
-    APPLE_MARKER,
-    ANIMALS_MARKER,
-    CONSTRUCTION_MARKER,
-    FISH_MARKER,
-    FOODTRUCK_MARKER,
-    KPP_MARKER,
-    PARK_MARKER,
-    TITANIC_MARKER
-  } from '@shelkovo/ui/markers';
   import type { Feature } from '@yandex/ymaps3-clusterer';
   import { onMount, tick } from 'svelte';
   import type { Attachment } from 'svelte/attachments';
@@ -23,6 +13,7 @@
     PARCEL_QUERY_PARAM
   } from '@/lib/parcels/parcel-url';
   import { PARCEL_CODE, type ParcelPart } from '@/lib/parcels/schema';
+  import { isPlaceLayerVisible } from '@/lib/places/map-layers';
   import type {
     PlaceMapPublicItemDto,
     PlaceMapPublicPayloadDto
@@ -30,7 +21,6 @@
   import type { PlaceMapItem, PlaceMapProps } from '@/lib/places/map-types';
   import { getPlaceClosingTime } from '@/lib/places/opening-hours';
   import { placeUrl } from '@/lib/places/routes';
-  import type { PlaceMarker } from '@/lib/places/schema';
   import { createOpenMapsControl } from '@/lib/yandex-maps/open-maps-control';
   import {
     installYandexMapsRuntimeHeadPersistence,
@@ -38,7 +28,7 @@
     waitForStableLayout
   } from '@/lib/yandex-maps/runtime';
 
-  import type { PlaceMarkerImage } from './marker-images.types';
+  import { PLACE_MARKER_IMAGES } from './marker-images';
   import type { ParcelLayer, ParcelMapItem, ParcelMapPayload } from './parcel-layer-types';
   import {
     createMapFeatures,
@@ -84,6 +74,7 @@
   const priceFormatter = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 });
   const toPlaceMapItem = (place: PlaceMapPublicItemDto): PlaceMapItem => ({
     slug: place.slug,
+    mapLayer: place.mapLayer,
     name: place.name,
     marker: place.marker,
     status: place.status,
@@ -111,17 +102,8 @@
     const payload = (await response.json()) as PlaceMapPublicPayloadDto;
     return payload.places.map(toPlaceMapItem);
   };
-  const CUSTOM_MARKER_IMAGES: Readonly<Record<PlaceMarker, PlaceMarkerImage>> = {
-    apple: APPLE_MARKER,
-    animals: ANIMALS_MARKER,
-    foodtruck: FOODTRUCK_MARKER,
-    titanic: TITANIC_MARKER,
-    construction: CONSTRUCTION_MARKER,
-    fish: FISH_MARKER,
-    kpp: KPP_MARKER,
-    park: PARK_MARKER
-  };
-  const getCurrentPlaceBounds = (): ymaps3.LngLatBounds => initialBounds ?? getPlaceBounds(places);
+  const getCurrentPlaceBounds = (): ymaps3.LngLatBounds =>
+    initialBounds ?? getPlaceBounds(places.filter((place) => isPlaceLayerVisible(place)));
   const getMapZoomDuration = (): number =>
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : CLUSTER_ZOOM_DURATION_MS;
   const getViewMargin = (): ymaps3.Margin =>
@@ -159,6 +141,10 @@
   let mapReady = $state(false);
   let error: string | undefined = $state(undefined);
   let selectedParts = $state<ParcelPart[]>([]);
+  let infrastructureEnabled = $state(false);
+  let toggleInfrastructure = $state<(checked: boolean) => void>(() => {});
+  const isPlaceVisible = (place: PlaceMapItem): boolean =>
+    isPlaceLayerVisible(place, infrastructureEnabled);
   let failedParts = $state<ParcelPart[]>([]);
   let allParcelsSelected = $derived(selectedParts.length === PARCEL_PARTS.length);
   let someParcelsSelected = $derived(selectedParts.length > 0 && !allParcelsSelected);
@@ -185,7 +171,7 @@
   let clearSelectedParcel: (() => void) | undefined;
   let toggleParcelPart: (part: ParcelPart, checked: boolean) => void;
   let toggleAllParcels = $state<() => void>(() => {});
-  let errorPlace = $derived(places[0] ?? fallbackPlace);
+  let errorPlace = $derived(places.find((place) => isPlaceLayerVisible(place)) ?? fallbackPlace);
   let refreshMapLayout: (() => void) | undefined;
   let requestedSet = $state<string | undefined>();
   let setError = $state<string | undefined>();
@@ -228,10 +214,11 @@
     if (!map || !objects?.length) return;
 
     const show =
-      markerHoveredGeometry.has(place.slug) ||
-      focusedGeometry.has(place.slug) ||
-      highlightedGeometry.has(place.slug) ||
-      setPlaces.has(place.slug);
+      isPlaceVisible(place) &&
+      (markerHoveredGeometry.has(place.slug) ||
+        focusedGeometry.has(place.slug) ||
+        highlightedGeometry.has(place.slug) ||
+        setPlaces.has(place.slug));
     if (show === visibleGeometry.has(place.slug)) return;
     for (const object of objects) {
       if (show) map.addChild(object);
@@ -327,7 +314,7 @@
     );
 
     if (place.marker) {
-      const markerImage = CUSTOM_MARKER_IMAGES[place.marker];
+      const markerImage = PLACE_MARKER_IMAGES[place.marker];
       const image = document.createElement('img');
 
       link.dataset.marker = place.marker;
@@ -514,6 +501,7 @@
     );
     let activeSet: MapSelectionSetPublicDto | undefined;
     const disabledSetParts = new Set<ParcelPart>();
+    let infrastructureDisabled = false;
     const readyParcelParts = new Set<ParcelPart>();
     const cancelSetFit = (): void => {
       pendingSetFit = false;
@@ -526,7 +514,9 @@
       setPlaces.clear();
       for (const slug of activeSet?.places ?? []) setPlaces.add(slug);
       mapClusterer.update({
-        features: createMapFeatures(places.filter((place) => !setPlaces.has(place.slug)))
+        features: createMapFeatures(
+          places.filter((place) => isPlaceVisible(place) && !setPlaces.has(place.slug))
+        )
       });
       for (const [place, content] of markerContents) {
         if (place.geometry && previousPlaces.has(place.slug) !== setPlaces.has(place.slug)) {
@@ -553,6 +543,10 @@
         }
         if (setPlaces.has(place.slug)) {
           content.dataset.selectionSet = 'true';
+          if (!isPlaceVisible(place)) {
+            updateGeometryVisibility(place);
+            continue;
+          }
           const marker = new window.ymaps3.YMapMarker(
             {
               coordinates: [place.coordinates.lng, place.coordinates.lat]
@@ -567,6 +561,7 @@
     };
     const fitSelectionSet = (): void => {
       if (!activeSet || !map) return;
+      if (places.some((place) => setPlaces.has(place.slug) && !isPlaceVisible(place))) return;
       const parts = new Set(
         activeSet.parcels.map((code) => code.slice(0, 3).toLowerCase() as ParcelPart)
       );
@@ -1062,6 +1057,38 @@
       : undefined;
     let highlightedPlace: PlaceMapItem | undefined;
 
+    const clearPlaceHighlight = (): void => {
+      if (highlightTimer !== undefined) window.clearTimeout(highlightTimer);
+      highlightTimer = undefined;
+      if (!highlightedPlace) return;
+      const place = highlightedPlace;
+      const marker = markerContents.find(([candidate]) => candidate.slug === place.slug)?.[1];
+      if (marker) {
+        delete marker.dataset.highlighted;
+        marker.removeAttribute('aria-current');
+      }
+      setGeometryState(place, highlightedGeometry, false);
+      highlightedPlace = undefined;
+      removeHighlightQuery(place.slug);
+    };
+
+    toggleInfrastructure = (checked): void => {
+      infrastructureEnabled = checked;
+      infrastructureDisabled = !checked;
+      if (!checked) {
+        cancelSetFit();
+        cancelClusterFocus();
+        if (highlightedPlace?.mapLayer === 'infrastructure') clearPlaceHighlight();
+        for (const [place, content] of markerContents) {
+          if (isPlaceVisible(place)) continue;
+          if (content === document.activeElement) mapContainer?.focus({ preventScroll: true });
+          markerHoveredGeometry.delete(place.slug);
+          focusedGeometry.delete(place.slug);
+        }
+      }
+      syncSetPlaces();
+    };
+
     const startPlaceHighlight = (place: PlaceMapItem): void => {
       const marker = markerContents.find(([candidate]) => candidate.slug === place.slug)?.[1];
 
@@ -1075,14 +1102,7 @@
       marker.setAttribute('aria-current', 'location');
       setGeometryState(place, highlightedGeometry, true);
       focusPlace(place, getMapZoomDuration());
-      highlightTimer = window.setTimeout(() => {
-        highlightTimer = undefined;
-        delete marker.dataset.highlighted;
-        marker.removeAttribute('aria-current');
-        setGeometryState(place, highlightedGeometry, false);
-        highlightedPlace = undefined;
-        removeHighlightQuery(place.slug);
-      }, HIGHLIGHT_DURATION_MS);
+      highlightTimer = window.setTimeout(clearPlaceHighlight, HIGHLIGHT_DURATION_MS);
     };
 
     installYandexMapsRuntimeHeadPersistence();
@@ -1152,6 +1172,10 @@
         highlightedPlace = requestedSlug
           ? places.find((place) => place.slug === requestedSlug)
           : undefined;
+        if (highlightedPlace?.mapLayer === 'infrastructure') {
+          if (infrastructureDisabled) highlightedPlace = undefined;
+          else infrastructureEnabled = true;
+        }
         if (
           !requestedParcelCode &&
           highlightUrl.searchParams.has(PLACE_HIGHLIGHT_QUERY_PARAM) &&
@@ -1182,7 +1206,7 @@
         });
         mapClusterer = new YMapClusterer({
           method: clusterByGrid({ gridSize: CLUSTER_GRID_SIZE }),
-          features: createMapFeatures(places),
+          features: createMapFeatures(places.filter(isPlaceVisible)),
           maxZoom: PLACE_FOCUS_ZOOM - 1,
           onRender: (clusters) => {
             const visibleMarkers = new Set(
@@ -1268,6 +1292,14 @@
               if (definition.places.some((slug) => !places.some((place) => place.slug === slug)))
                 throw new Error('Missing set place');
               activeSet = definition;
+              if (
+                !infrastructureDisabled &&
+                places.some(
+                  (place) =>
+                    place.mapLayer === 'infrastructure' && definition.places.includes(place.slug)
+                )
+              )
+                infrastructureEnabled = true;
               syncSetPlaces();
               parcelLayer?.setMembership(definition.parcels, definition.outline);
               const parts = new Set(
@@ -1469,7 +1501,7 @@
               stroke-linejoin="round"
             />
           </svg>
-          {#if selectedParts.length > 0}
+          {#if selectedParts.length > 0 || infrastructureEnabled}
             <span class="parcel-map-selection-marker" aria-hidden="true">✓</span>
           {/if}
         </button>
@@ -1519,6 +1551,22 @@
               >
             {/if}
           {/each}
+          <label class="parcel-map-layer">
+            <input
+              type="checkbox"
+              checked={infrastructureEnabled}
+              onchange={(event) => toggleInfrastructure(event.currentTarget.checked)}
+            />
+            <img
+              class="parcel-map-layer-icon"
+              src="/icons/infrastructure.webp"
+              width="22"
+              height="22"
+              alt=""
+              aria-hidden="true"
+            />
+            Инфраструктура
+          </label>
         </div>
       </div>
       {#each failedParts as part (part)}

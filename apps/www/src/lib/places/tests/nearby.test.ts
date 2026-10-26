@@ -8,6 +8,22 @@ import { testPlace } from './place.test-helper';
 afterEach(() => vi.restoreAllMocks());
 
 describe('getNearbyPlaces', () => {
+  it('keeps nearby infrastructure and ordinary places in the same candidate pool', () => {
+    const infrastructure = testPlace({
+      slug: 'ktp-16',
+      showOnMap: true,
+      mapLayer: 'infrastructure'
+    });
+    const ordinary = testPlace({ slug: 'ordinary', showOnMap: true });
+    expect(getNearbyPlaces(testPlace(), [ordinary, infrastructure]).map(({ slug }) => slug))
+      .toMatchInlineSnapshot(`
+        [
+          "ktp-16",
+          "ordinary",
+        ]
+      `);
+  });
+
   it('selects the three nearest visible places without reordering the input', () => {
     const place = testPlace({ showOnMap: true });
     const places = Object.freeze([

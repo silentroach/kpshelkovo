@@ -27,6 +27,7 @@ export const mapRawPlace = (
 
   return {
     showOnMap: entry.data.show_on_map === true,
+    mapLayer: entry.data.map_layer,
     slug: entry.id,
     name: entry.data.title,
     nameCases: entry.data.name_cases,

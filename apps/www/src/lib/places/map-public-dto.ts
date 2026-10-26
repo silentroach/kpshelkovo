@@ -1,6 +1,6 @@
 import type { EditorialPublicGeometry } from '@/lib/geometry/editorial-public-schema';
 
-import type { PlaceMarker, PlaceStatus, PlaceWeekday } from './schema';
+import type { PlaceMapLayer, PlaceMarker, PlaceStatus, PlaceWeekday } from './schema';
 
 export interface PlaceMapPublicOpeningHoursPeriodDto {
   readonly days: readonly PlaceWeekday[];
@@ -15,6 +15,7 @@ export interface PlaceMapPublicOpeningHoursDto {
 
 export interface PlaceMapPublicItemDto {
   readonly slug: string;
+  readonly mapLayer?: PlaceMapLayer;
   readonly name: string;
   readonly marker?: PlaceMarker;
   readonly status: PlaceStatus;

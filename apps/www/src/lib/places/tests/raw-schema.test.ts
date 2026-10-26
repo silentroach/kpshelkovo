@@ -32,6 +32,23 @@ const place = {
 } as const;
 
 describe('RawPlaceSchema', () => {
+  it.each([undefined, 'infrastructure'] as const)(
+    'maps layer %s independently of category and publication',
+    (mapLayer) => {
+      const data = RawPlaceSchema.parse({ ...place, show_on_map: true, map_layer: mapLayer });
+      const mapped = mapRawPlace({ id: 'layer-place', body: '', data });
+      expect({
+        mapLayer: mapped.mapLayer,
+        category: mapped.category,
+        published: mapped.showOnMap
+      }).toEqual({ mapLayer, category: 'food', published: true });
+    }
+  );
+
+  it('rejects an unsupported editorial layer', () => {
+    expect(RawPlaceSchema.safeParse({ ...place, map_layer: 'unknown' }).success).toBe(false);
+  });
+
   it.each([undefined, 'Вход со двора.'])(
     'accepts optional opening-hours explanation %s',
     (description) => {

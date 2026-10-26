@@ -11,6 +11,7 @@ import { toPublicEditorialGeometry } from '@/lib/geometry/editorial-public';
 import { EditorialPublicGeometrySchema } from '@/lib/geometry/editorial-public-schema';
 
 import { parsePlaceGeometryFiles } from '../geometry';
+import { isPlaceLayerVisible } from '../map-layers';
 import { buildPlaceMapPublicPayload } from '../map-public';
 import { selectMapPlaces } from '../map-selection';
 import { buildPlacesMarkdown } from '../markdown';
@@ -54,6 +55,43 @@ const place: Place = {
 };
 
 describe('place map public DTO', () => {
+  it('publishes infrastructure while keeping it out of the initial frame', () => {
+    const infrastructure: Place = {
+      ...place,
+      slug: 'ktp-16',
+      markdownUrl: '/map/ktp-16/index.md',
+      mapLayer: 'infrastructure',
+      coordinates: { lat: 0, lng: 0 }
+    };
+    const places = selectMapPlaces([place, infrastructure]);
+    const initialPlaces = places.filter((item) => isPlaceLayerVisible(item));
+    expect(
+      buildPlaceMapPublicPayload(places).places.map(({ slug, mapLayer }) => ({ slug, mapLayer }))
+    ).toMatchInlineSnapshot(`
+        [
+          {
+            "mapLayer": undefined,
+            "slug": "hunting-ponds",
+          },
+          {
+            "mapLayer": "infrastructure",
+            "slug": "ktp-16",
+          },
+        ]
+      `);
+    expect(getPlaceBounds(initialPlaces)).toEqual(getPlaceBounds([place]));
+    expect(buildPlacesMarkdown(places)).toContain('/map/ktp-16/');
+    expect(getPlaceBounds([infrastructure].filter((item) => isPlaceLayerVisible(item)))).toEqual(
+      getPlaceBounds([])
+    );
+  });
+
+  it('validates the prepared payload before publishing it', () => {
+    expect(() =>
+      buildPlaceMapPublicPayload([{ ...place, coordinates: { lat: 91, lng: 0 } }])
+    ).toThrow();
+  });
+
   it('limits the map point without changing the source', () => {
     const coordinates = { lat: 55.06070312345, lng: 37.74689498765 };
     const publicPoint = buildPlaceMapPublicPayload([{ ...place, coordinates }]).places[0]
@@ -140,6 +178,7 @@ describe('place map public DTO', () => {
           "lng": 37.744987,
         },
         "html_url": "https://kpshelkovo.online/map/hunting-ponds/",
+        "mapLayer": undefined,
         "marker": "fish",
         "name": "Охотничьи пруды",
         "opening_hours": {
