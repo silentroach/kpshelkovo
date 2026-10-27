@@ -3,8 +3,13 @@ import { Window } from 'happy-dom';
 import { describe, expect, it } from 'vitest';
 
 import { EditorialMapDataSchema } from '@/lib/geometry/editorial-map-data-schema';
+import { createEditorialMapSelectionResolver } from '@/lib/geometry/editorial-map-selection';
+import { toPublicEditorialGeometry } from '@/lib/geometry/editorial-public';
 import { RawEditorialGeometrySchema } from '@/lib/geometry/editorial-schema';
 import type { EditorialFeatureCollection } from '@/lib/geometry/editorial-types';
+import { mapRawSelectionSet } from '@/lib/map-selection-sets/mapper';
+import { toMapSelectionSetPublicDto } from '@/lib/map-selection-sets/public';
+import { mapSelectionSetRawSchema } from '@/lib/map-selection-sets/raw-schema';
 
 import { extractEditorialMaps, hasEditorialMapReferences } from '../editorial-maps';
 import { appendEditorialMapCaptions } from '../editorial-maps-companion';
@@ -47,6 +52,149 @@ const resolver: EditorialMapSelectionResolver = () => ({
 });
 
 describe('short editorial maps', () => {
+  it('publishes the same prepared numbered set route and authored line in HTML and companion', () => {
+    const set = toMapSelectionSetPublicDto(
+      mapRawSelectionSet(
+        'route',
+        mapSelectionSetRawSchema.parse({
+          places: ['finish'],
+          features: [
+            {
+              type: 'Feature',
+              properties: { iconContent: '19', iconCaption: 'Finish', 'marker-color': '#123456' },
+              geometry: { type: 'Point', coordinates: [37.123456789, 55.123456789] }
+            },
+            {
+              type: 'Feature',
+              properties: { stroke: '#654321', 'stroke-width': 4 },
+              geometry: {
+                type: 'LineString',
+                coordinates: [
+                  [37, 55],
+                  [37.123456789, 55.123456789]
+                ]
+              }
+            }
+          ]
+        })
+      )
+    );
+    const ready = createEditorialMapSelectionResolver({
+      parcels: [],
+      places: [
+        {
+          slug: 'finish',
+          name: 'Park',
+          showOnMap: true,
+          coordinates: { lng: 37.12345678, lat: 55.12345678 }
+        }
+      ],
+      sets: [set]
+    });
+    const body = fence({
+      sets: ['route', 'route'],
+      features: [
+        {
+          type: 'Feature',
+          properties: { stroke: '#abcdef' },
+          geometry: {
+            type: 'LineString',
+            coordinates: [
+              [38, 56],
+              [38.1, 56.1]
+            ]
+          }
+        }
+      ]
+    });
+    const page = new Window().document;
+    page.body.innerHTML = renderMarkdown(body, {
+      editorialMaps: true,
+      editorialMapResolver: ready
+    });
+    const html = EditorialMapDataSchema.parse(
+      JSON.parse(page.querySelector('editorial-map')?.getAttribute('data-geometry') ?? '')
+    );
+    const code = appendEditorialMapCaptions(parseMarkdownFragment(body), 'article', ready)[0];
+    if (code?.type !== 'code') throw new Error('missing code');
+    const companion = RawEditorialGeometrySchema.parse(JSON.parse(code.value));
+    expect(companion.features).toEqual(toPublicEditorialGeometry(html).features);
+    expect(companion.features.slice(1, 3)).toEqual(set.geometry?.features);
+    expect(
+      companion.features.map((feature) => ({
+        geometry: feature.geometry,
+        properties: feature.properties
+      }))
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "geometry": {
+            "coordinates": [
+              37.12345678,
+              55.12345678,
+            ],
+            "type": "Point",
+          },
+          "properties": {
+            "iconCaption": "Park",
+            "marker-color": "#7c3aed",
+          },
+        },
+        {
+          "geometry": {
+            "coordinates": [
+              37.12345679,
+              55.12345679,
+            ],
+            "type": "Point",
+          },
+          "properties": {
+            "iconCaption": "Finish",
+            "iconContent": "19",
+            "marker-color": "#123456",
+          },
+        },
+        {
+          "geometry": {
+            "coordinates": [
+              [
+                37,
+                55,
+              ],
+              [
+                37.12345679,
+                55.12345679,
+              ],
+            ],
+            "type": "LineString",
+          },
+          "properties": {
+            "stroke": "#654321",
+            "stroke-width": 4,
+          },
+        },
+        {
+          "geometry": {
+            "coordinates": [
+              [
+                38,
+                56,
+              ],
+              [
+                38.1,
+                56.1,
+              ],
+            ],
+            "type": "LineString",
+          },
+          "properties": {
+            "stroke": "#abcdef",
+          },
+        },
+      ]
+    `);
+  });
+
   it('parses reference-only and mixed maps independently of datasets and resolution', () => {
     const maps = extractEditorialMaps(
       `${fence({ sets: ['parent'] })}\n\n${fence({ type: 'FeatureCollection', sets: ['parent'], parcels: ['SHP-A1'], places: ['place'], features: [ownFeature], metadata: { name: '@unknown' }, outline: true }, 'https://example.com/map')}`,

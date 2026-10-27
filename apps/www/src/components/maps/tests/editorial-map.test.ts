@@ -91,6 +91,12 @@ it.each([
     captionOnly: true,
     iconCaption: 'Проход',
     iconContent: '1'
+  },
+  {
+    geometry: { type: 'Point', coordinates: [37, 55] },
+    captionOnly: true,
+    iconCaption: 'Проход',
+    iconContent: '19'
   }
 ])(
   'rejects invalid caption-only data at each boundary: %j',
@@ -143,12 +149,14 @@ it('draws ordinary points with only explicit text labels, no HTML or popup', () 
           37.7,
           55.1,
         ],
+        "zIndex": 0,
       },
       {
         "coordinates": [
           37.8,
           55.2,
         ],
+        "zIndex": 0,
       },
     ]
   `);
@@ -164,37 +172,47 @@ it('draws ordinary points with only explicit text labels, no HTML or popup', () 
   expect(sdk.marker.mock.calls[1]![1].textContent).toBe('');
 });
 
-it('centers a numbered point in its colored dot without replacing the caption or ordinary dot', () => {
-  const sdk = setupSdk();
-  const raw = {
-    type: 'FeatureCollection',
-    features: [
-      {
-        type: 'Feature',
-        geometry: { type: 'Point', coordinates: [37, 55] },
-        properties: { iconContent: '2', iconCaption: 'Съезд', 'marker-color': '#1e98ff' }
-      },
-      { type: 'Feature', geometry: { type: 'Point', coordinates: [38, 56] }, properties: {} }
-    ]
-  };
-  createEditorialMapObjects(
-    window.ymaps3!,
-    fromPublicEditorialGeometry(
-      toPublicEditorialGeometry(parseEditorialGeometry(raw, 'place.geojson'))
-    )
-  );
+it.each(['0', '2', '19', '99'])(
+  'renders point number %s literally without replacing the caption or ordinary dot',
+  (iconContent) => {
+    const sdk = setupSdk();
+    const raw = {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [37, 55] },
+          properties: { iconContent, iconCaption: 'Съезд', 'marker-color': '#1e98ff' }
+        },
+        { type: 'Feature', geometry: { type: 'Point', coordinates: [38, 56] }, properties: {} }
+      ]
+    };
+    createEditorialMapObjects(
+      window.ymaps3!,
+      fromPublicEditorialGeometry(
+        toPublicEditorialGeometry(parseEditorialGeometry(raw, 'place.geojson'))
+      )
+    );
 
-  const [numbered, ordinary] = sdk.marker.mock.calls.map(([, element]) => element);
-  expect(numbered?.querySelector('.editorial-map-marker__dot.ui-map-marker')?.textContent).toBe(
-    '2'
-  );
-  expect(numbered?.querySelector('.editorial-map-marker__dot')?.getAttribute('style')).toContain(
-    '--ui-map-marker-color: #1e98ff'
-  );
-  expect(numbered?.querySelector('.editorial-map-marker__caption')?.textContent).toBe('Съезд');
-  expect(ordinary?.querySelector('.editorial-map-marker__dot')?.textContent).toBe('');
-  expect(ordinary?.querySelector('.editorial-map-marker__caption')).toBeFalsy();
-});
+    const [numbered, ordinary] = sdk.marker.mock.calls.map(([, element]) => element);
+    expect(sdk.marker.mock.calls.map(([props]) => props.zIndex)).toMatchInlineSnapshot(`
+      [
+        1,
+        0,
+      ]
+    `);
+    expect(numbered?.querySelector('.editorial-map-marker__dot.ui-map-marker')?.textContent).toBe(
+      iconContent
+    );
+    expect(numbered?.querySelector('.editorial-map-marker__dot')?.childElementCount).toBe(0);
+    expect(numbered?.querySelector('.editorial-map-marker__dot')?.getAttribute('style')).toContain(
+      '--ui-map-marker-color: #1e98ff'
+    );
+    expect(numbered?.querySelector('.editorial-map-marker__caption')?.textContent).toBe('Съезд');
+    expect(ordinary?.querySelector('.editorial-map-marker__dot')?.textContent).toBe('');
+    expect(ordinary?.querySelector('.editorial-map-marker__caption')).toBeFalsy();
+  }
+);
 
 it('passes line, polygon and multi-polygon geometry and domain styling to SDK', () => {
   const sdk = setupSdk();

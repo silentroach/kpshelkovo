@@ -62,11 +62,11 @@ static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/marker-images.ts:
     rendered: 308
   apps/www/src/components/places/place-map-geometry.ts:
-    rendered: 2826
+    rendered: 2877
   apps/www/src/components/places/place-map-url.ts:
     rendered: 1407
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 57608
+    rendered: 58261
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:
@@ -340,7 +340,7 @@ static/editorial-map.XXXXXXXX.js:
   apps/www/src/components/maps/editorial-map.css:
     rendered: 0
   apps/www/src/components/maps/editorial-map.ts:
-    rendered: 3536
+    rendered: 3592
 static/esm.XXXXXXXX.js:
   node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/index.js:
     rendered: 0

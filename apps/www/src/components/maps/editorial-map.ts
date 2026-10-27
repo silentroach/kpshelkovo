@@ -85,7 +85,10 @@ export const createEditorialMapObjects = (
         marker.append(caption);
       }
       return new maps.YMapMarker(
-        { coordinates: copyPosition(feature.geometry.coordinates) },
+        {
+          coordinates: copyPosition(feature.geometry.coordinates),
+          zIndex: feature.iconContent === undefined ? 0 : 1
+        },
         marker
       );
     }

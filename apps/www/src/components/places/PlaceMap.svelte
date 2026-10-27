@@ -5,6 +5,7 @@
   import type { Attachment } from 'svelte/attachments';
 
   import { createEditorialMapObjects } from '@/components/maps/editorial-map';
+  import type { EditorialFeatureCollection } from '@/lib/geometry/editorial-types';
   import type { MapSelectionSetPublicDto } from '@/lib/map-selection-sets/public-types';
   import type { ParcelDetailsPublicDto } from '@/lib/parcels/details-public-schema';
   import {
@@ -125,6 +126,7 @@
     string,
     readonly (ymaps3.YMapFeature | ymaps3.YMapMarker)[]
   >();
+  let setGeometryObjects: (ymaps3.YMapFeature | ymaps3.YMapMarker)[] = [];
   let markerContents: Array<readonly [PlaceMapItem, HTMLAnchorElement]> = [];
   const markerHoveredGeometry = new Set<string>();
   const focusedGeometry = new Set<string>();
@@ -451,9 +453,15 @@
     });
   };
 
+  const clearSetGeometry = (): void => {
+    for (const object of setGeometryObjects) map?.removeChild(object);
+    setGeometryObjects = [];
+  };
+
   const clearMap = (): void => {
     markerEvents.abort();
     cancelClusterFocus();
+    clearSetGeometry();
     if (map) {
       for (const slug of visibleGeometry) {
         for (const object of mapEditorialObjects.get(slug) ?? []) map.removeChild(object);
@@ -503,6 +511,7 @@
       !initialUrl.searchParams.get(PLACE_HIGHLIGHT_QUERY_PARAM)
     );
     let activeSet: MapSelectionSetPublicDto | undefined;
+    let setGeometry: EditorialFeatureCollection | undefined;
     const disabledSetParts = new Set<ParcelPart>();
     let infrastructureDisabled = false;
     const readyParcelParts = new Set<ParcelPart>();
@@ -580,7 +589,8 @@
       if (!pendingSetFit) return;
       const bounds = getSelectionSetBounds(
         members,
-        places.filter((place) => setPlaces.has(place.slug))
+        places.filter((place) => setPlaces.has(place.slug)),
+        setGeometry
       );
       if (!bounds) return;
       pendingSetFit = false;
@@ -592,6 +602,8 @@
     clearSet = (): void => {
       requestedSet = undefined;
       activeSet = undefined;
+      setGeometry = undefined;
+      clearSetGeometry();
       pendingSetFit = false;
       setError = undefined;
       outlineError = false;
@@ -1298,6 +1310,15 @@
                 throw new Error('Invalid set data');
               if (definition.places.some((slug) => !places.some((place) => place.slug === slug)))
                 throw new Error('Missing set place');
+              if (definition.geometry) {
+                const geometry = fromPublicEditorialGeometry(definition.geometry);
+                const objects = createEditorialMapObjects(ymaps3, geometry);
+                for (const object of objects) {
+                  map.addChild(object);
+                  setGeometryObjects.push(object);
+                }
+                setGeometry = geometry;
+              }
               activeSet = definition;
               if (
                 !infrastructureDisabled &&
@@ -1319,6 +1340,8 @@
               fitSelectionSet();
             } catch (reason) {
               if (destroyed || requestedSet !== setId) return;
+              setGeometry = undefined;
+              clearSetGeometry();
               console.error('Selection set error:', reason);
               setError = 'Не удалось показать набор.';
             }

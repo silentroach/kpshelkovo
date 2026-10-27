@@ -28,7 +28,7 @@ export const EditorialPublicGeometrySchema = z
                 captionOnly: z.boolean().optional(),
                 iconContent: z
                   .string()
-                  .regex(/^[0-9]$/)
+                  .regex(/^(?:0|[1-9][0-9]?)$/)
                   .optional(),
                 'marker-color': z.string().optional(),
                 stroke: z.string().optional(),

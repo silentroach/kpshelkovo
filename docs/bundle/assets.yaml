@@ -40,8 +40,8 @@
   gzip: 518
 - file: static/EditorialMapScript.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 3265
-  brotli: 1252
-  gzip: 1452
+  brotli: 1255
+  gzip: 1453
 - file: static/EventList.XXXXXXXX.css
   bytes: 555
   brotli: 197
@@ -85,7 +85,7 @@
 - file: static/MapPreview.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 4175
   brotli: 1514
-  gzip: 1755
+  gzip: 1756
 - file: static/NewsArchiveSummary.XXXXXXXX.css
   bytes: 261
   brotli: 115
@@ -107,9 +107,9 @@
   brotli: 2685
   gzip: 3104
 - file: static/PlaceMap.XXXXXXXX.js
-  bytes: 31124
-  brotli: 9867
-  gzip: 11096
+  bytes: 31335
+  brotli: 9968
+  gzip: 11168
 - file: static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 693
   brotli: 338
@@ -190,9 +190,9 @@
   brotli: 829
   gzip: 1008
 - file: static/editorial-map.XXXXXXXX.js
-  bytes: 2058
-  brotli: 748
-  gzip: 829
+  bytes: 2092
+  brotli: 766
+  gzip: 847
 - file: static/esm.XXXXXXXX.js
   bytes: 5147
   brotli: 1780

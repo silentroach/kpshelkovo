@@ -2,8 +2,10 @@ import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
+import { EditorialMapDataSchema } from '../editorial-map-data-schema';
 import { parseEditorialGeometry } from '../editorial-mapper';
 import { toPublicEditorialGeometry } from '../editorial-public';
+import { EditorialPublicGeometrySchema } from '../editorial-public-schema';
 import { RawEditorialGeometrySchema } from '../editorial-schema';
 
 const fixture = (name: string): unknown =>
@@ -341,20 +343,33 @@ describe('editorial geometry boundary', () => {
     ).toThrow(/features\.0\.properties\.outline_expansion_meters/);
   });
 
-  it.each('0123456789'.split(''))('preserves a single digit %s on a point', (digit) => {
-    const feature = parseEditorialGeometry(
-      collection({ type: 'Point', coordinates: [37, 55] }, { iconContent: digit }),
-      'map.geojson'
-    ).features[0];
-    expect(feature?.iconContent).toBe(digit);
-  });
+  it.each([...'0123456789'.split(''), '10', '19', '99'])(
+    'preserves point number %s through raw, domain-data and public boundaries',
+    (iconContent) => {
+      const domain = parseEditorialGeometry(
+        collection({ type: 'Point', coordinates: [37, 55] }, { iconContent, captionOnly: false }),
+        'map.geojson'
+      );
+      const htmlData = EditorialMapDataSchema.parse(JSON.parse(JSON.stringify(domain)));
+      const publicData = toPublicEditorialGeometry(htmlData);
+      expect([
+        domain.features[0]?.iconContent,
+        htmlData.features[0]?.iconContent,
+        publicData.features[0]?.properties.iconContent
+      ]).toEqual([iconContent, iconContent, iconContent]);
+      expect(publicData.features[0]?.properties.captionOnly).toBe(false);
+    }
+  );
 
   it.each([
-    ['12', { type: 'Point', coordinates: [37, 55] }],
+    ['100', { type: 'Point', coordinates: [37, 55] }],
+    ['01', { type: 'Point', coordinates: [37, 55] }],
+    ['-1', { type: 'Point', coordinates: [37, 55] }],
+    [19, { type: 'Point', coordinates: [37, 55] }],
     ['A', { type: 'Point', coordinates: [37, 55] }],
     ['<b>1</b>', { type: 'Point', coordinates: [37, 55] }],
     [
-      '1',
+      '19',
       {
         type: 'LineString',
         coordinates: [
@@ -370,6 +385,16 @@ describe('editorial geometry boundary', () => {
         'news/entry.md map insertion 1'
       )
     ).toThrow(/news\/entry\.md map insertion 1.*features\.0\.properties\.iconContent.*ID "route"/);
+    expect(
+      EditorialPublicGeometrySchema.safeParse(collection(geometry, { iconContent: content }))
+        .success
+    ).toBe(false);
+    expect(
+      EditorialMapDataSchema.safeParse({
+        type: 'FeatureCollection',
+        features: [{ type: 'Feature', geometry, iconContent: content }]
+      }).success
+    ).toBe(false);
   });
 
   it('expands each approximate MultiPolygon part outward and shrinks each hole independently', () => {

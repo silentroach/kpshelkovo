@@ -44,7 +44,8 @@ export const resolveMapSelectionSets = (
       id,
       parcelCodes: [...parcelCodes].sort(),
       placeSlugs: [...placeSlugs].sort(),
-      outline: definition.outline
+      outline: definition.outline,
+      geometry: definition.geometry
     };
     completed.set(id, result);
     return result;

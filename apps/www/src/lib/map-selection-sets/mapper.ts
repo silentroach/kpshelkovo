@@ -1,3 +1,5 @@
+import { mapEditorialGeometry } from '@/lib/geometry/editorial-mapper';
+
 import type { RawMapSelectionSet } from './raw-schema';
 import type { MapSelectionSet } from './types';
 
@@ -6,5 +8,11 @@ export const mapRawSelectionSet = (id: string, raw: RawMapSelectionSet): MapSele
   parcelCodes: raw.parcels,
   placeSlugs: raw.places,
   setIds: raw.sets,
-  outline: raw.outline
+  outline: raw.outline,
+  geometry: raw.features?.length
+    ? mapEditorialGeometry(
+        { type: 'FeatureCollection', features: raw.features },
+        `map selection set "${id}"`
+      )
+    : undefined
 });
