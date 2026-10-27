@@ -1,10 +1,18 @@
 import { z } from 'zod';
 
+import { RawEditorialGeometrySchema } from '@/lib/geometry/editorial-schema';
+
+const selectionFeature = RawEditorialGeometrySchema.shape.features.element.refine(
+  (feature) => feature.geometry.type === 'Point' || feature.geometry.type === 'LineString',
+  { path: ['geometry', 'type'], message: 'selection sets support only Point and LineString' }
+);
+
 export const mapSelectionSetRawSchema = z
   .object({
     parcels: z.array(z.string()).optional().default([]),
     places: z.array(z.string()).optional().default([]),
     sets: z.array(z.string()).optional().default([]),
+    features: z.array(selectionFeature).optional(),
     outline: z.boolean().optional().default(false)
   })
   .strict()

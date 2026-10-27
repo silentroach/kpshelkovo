@@ -49,6 +49,7 @@ export const buildMapSelectionSets = async (
         parcels: [...new Set(parcelCodes)].sort(),
         places: placeSlugs,
         sets: raw.sets,
+        features: raw.features,
         outline: raw.outline
       });
       return domain;

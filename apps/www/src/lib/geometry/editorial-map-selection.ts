@@ -1,6 +1,7 @@
 import { unionPolygonGeometries } from '@shelkovo/geo';
 
 import { formatParcelLabel } from '@/components/places/parcel-label';
+import { fromPublicEditorialGeometry } from '@/components/places/place-map-geometry';
 import type {
   EditorialMapResolvedSelection,
   EditorialMapSelectionResolver
@@ -29,11 +30,13 @@ export const createEditorialMapSelectionResolver = (
   return (selection, context): EditorialMapResolvedSelection => {
     const parcelCodes = new Set(selection.parcels);
     const placeSlugs = new Set(selection.places);
-    for (const id of selection.sets) {
+    const setFeatures: EditorialFeature[] = [];
+    for (const id of new Set(selection.sets)) {
       const set = setsById.get(id);
       if (!set) throw new Error(`${context} references unknown map selection set "${id}"`);
       for (const code of set.parcels) parcelCodes.add(code);
       for (const slug of set.places) placeSlugs.add(slug);
+      if (set.geometry) setFeatures.push(...fromPublicEditorialGeometry(set.geometry).features);
     }
     const parcels = new Map<string, EditorialMapSelectionSources['parcels'][number]>();
     for (const code of parcelCodes) {
@@ -75,6 +78,7 @@ export const createEditorialMapSelectionResolver = (
         });
       }
     }
+    features.push(...setFeatures);
     if (selection.outline && parcels.size) {
       const geometry = roundGeometry(
         unionPolygonGeometries([...parcels.values()].map((parcel) => parcel.geometry))

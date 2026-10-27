@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import type { MapSelectionSetPublicDto } from '@/lib/map-selection-sets/public-types';
 import type { EditorialMapSelection } from '@/lib/markdown/editorial-maps.types';
 import { buildParcelMapPayload } from '@/lib/parcels/map-public';
 import type { Parcel } from '@/lib/parcels/types';
@@ -88,6 +89,70 @@ const selection: EditorialMapSelection = {
 };
 
 describe('editorial map selection resolver', () => {
+  it('imports only directly referenced prepared set geometry once without recoloring or renumbering', () => {
+    const child: MapSelectionSetPublicDto = {
+      id: 'child',
+      parcels: ['SHP-A1'],
+      places: [],
+      outline: false,
+      geometry: {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            properties: { iconContent: '19', 'marker-color': '#123456' },
+            geometry: { type: 'Point', coordinates: [37.12345678, 55.12345678] }
+          }
+        ]
+      }
+    };
+    const parent: MapSelectionSetPublicDto = {
+      id: 'parent',
+      parcels: ['SHP-A1'],
+      places: [],
+      outline: false
+    };
+    const resolve = createEditorialMapSelectionResolver({
+      parcels: [parcel],
+      places: [],
+      sets: [parent, child]
+    });
+    expect(
+      resolve({ sets: ['parent'], parcels: [], places: [], outline: false }, 'parent').geometry
+        .features
+    ).toHaveLength(1);
+    const result = resolve(
+      { sets: ['parent', 'child', 'child'], parcels: [], places: [], outline: false },
+      'mixed'
+    );
+    expect(result.geometry.features).toHaveLength(2);
+    expect(result.geometry.features[1]).toMatchInlineSnapshot(`
+      {
+        "captionOnly": undefined,
+        "description": undefined,
+        "fill": undefined,
+        "fillOpacity": undefined,
+        "geometry": {
+          "coordinates": [
+            37.12345678,
+            55.12345678,
+          ],
+          "type": "Point",
+        },
+        "iconCaption": undefined,
+        "iconContent": "19",
+        "id": undefined,
+        "markerColor": "#123456",
+        "precision": undefined,
+        "stroke": undefined,
+        "strokeDasharray": undefined,
+        "strokeOpacity": undefined,
+        "strokeWidth": undefined,
+        "type": "Feature",
+      }
+    `);
+  });
+
   it('deduplicates a compound parcel and retains every place geometry without commercial data', () => {
     const result = createEditorialMapSelectionResolver(sources)(selection, 'test map 1');
     expect(result.geometry.features.map((feature) => feature.geometry.type)).toMatchInlineSnapshot(`

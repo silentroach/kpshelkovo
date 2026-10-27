@@ -11,14 +11,16 @@ import type { ParcelMapItem } from './parcel-layer-types';
 
 export const getSelectionSetBounds = (
   parcels: readonly ParcelMapItem[],
-  places: readonly PlaceMapItem[]
+  places: readonly PlaceMapItem[],
+  geometry?: EditorialFeatureCollection
 ): LngLatBounds | undefined =>
   getEditorialMapBounds(
     {
       type: 'FeatureCollection',
       features: [
         ...parcels.map((parcel) => ({ type: 'Feature' as const, geometry: parcel.geometry })),
-        ...places.flatMap((place) => place.geometry?.features ?? [])
+        ...places.flatMap((place) => place.geometry?.features ?? []),
+        ...(geometry?.features ?? [])
       ]
     },
     places.map((place) => [place.coordinates.lng, place.coordinates.lat])
