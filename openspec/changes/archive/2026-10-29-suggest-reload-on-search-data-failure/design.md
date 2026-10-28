@@ -2,7 +2,7 @@
 
 ## Context
 
-Причина и выбранный объём описаны в [proposal](/openspec/changes/suggest-reload-on-search-data-failure/proposal.md). Архитектура статического поиска и владелец контракта восстановления заданы в [ADR-025](/docs/decisions/025-static-full-text-search-with-pagefind.md).
+Причина и выбранный объём описаны в [proposal](/openspec/changes/archive/2026-10-29-suggest-reload-on-search-data-failure/proposal.md). Архитектура статического поиска и владелец контракта восстановления заданы в [ADR-025](/docs/decisions/025-static-full-text-search-with-pagefind.md).
 
 [SearchDialog.svelte](/apps/www/src/components/search/SearchDialog.svelte) уже различает ошибку первой выдачи (`viewState = 'error'`) и отказ догрузки (`loadMoreFailed`). Во втором случае результаты сохраняются, а наблюдатель догрузки заменяется сообщением и кнопкой. Обе кнопки вызывают поиск на том же клиенте. В [#899](https://github.com/silentroach/kpshelkovo/issues/899) воспроизведён отказ fragments Pagefind 1.5.2, который повторный вызов не устраняет; эта версия по-прежнему закреплена в приложении.
 
