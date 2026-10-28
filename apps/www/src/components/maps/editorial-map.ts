@@ -87,7 +87,7 @@ export const createEditorialMapObjects = (
       return new maps.YMapMarker(
         {
           coordinates: copyPosition(feature.geometry.coordinates),
-          zIndex: feature.iconContent === undefined ? 0 : 1
+          zIndex: feature.iconContent !== undefined || feature.iconCaption !== undefined ? 1 : 0
         },
         marker
       );

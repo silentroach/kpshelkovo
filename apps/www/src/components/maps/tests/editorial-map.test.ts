@@ -149,7 +149,7 @@ it('draws ordinary points with only explicit text labels, no HTML or popup', () 
           37.7,
           55.1,
         ],
-        "zIndex": 0,
+        "zIndex": 1,
       },
       {
         "coordinates": [
