@@ -14,7 +14,6 @@
     "SHV-G36",
     "SHF-M71",
     "SHF-N24",
-    "SHF-M70",
     "SHF-M36",
     "SHF-W58",
     "SHF-V4"
@@ -399,7 +398,7 @@
       "id": "stop-11",
       "properties": {
         "iconContent": "11",
-        "description": "Форест: M71, M70",
+        "description": "Форест: M71",
         "marker-color": "#7c3aed"
       },
       "geometry": { "type": "Point", "coordinates": [37.71725805, 55.06175133] }
@@ -445,9 +444,9 @@
       "id": "stop-16",
       "properties": {
         "iconContent": "16",
-        "description": "Финиш: лесной парк Фореста",
+        "description": "Финиш",
         "marker-color": "#7c3aed",
-        "iconCaption": "Финиш: лесной парк Фореста"
+        "iconCaption": "Финиш"
       },
       "geometry": { "type": "Point", "coordinates": [37.708384, 55.062483] }
     }
