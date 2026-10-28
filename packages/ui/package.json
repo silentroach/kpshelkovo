@@ -53,7 +53,8 @@
     "./icons/system/Domyland.astro": "./src/icons/system/Domyland.astro",
     "./LinkWithIcon.astro": "./src/LinkWithIcon.astro",
     "./ResourceLink.astro": "./src/ResourceLink.astro",
-    "./file-icons": "./src/icons/system/file-icons.ts"
+    "./file-icons": "./src/icons/system/file-icons.ts",
+    "./telegram-icon": "./src/icons/system/telegram-icon.ts"
   },
   "scripts": {
     "test:visual:icons": "playwright test -c playwright.icons-visual.local.config.ts",

@@ -2,15 +2,30 @@ import type { Plugin } from 'unified';
 
 import type { HtmlTreeNode } from './html-tree.types';
 
+/** Inline wrappers and decorative SVG do not change a linked image's content. */
+const contentImage = (node: HtmlTreeNode): HtmlTreeNode | undefined => {
+  if (node.tagName === 'img') return node;
+  if (node.tagName !== 'a' && node.tagName !== 'span') return;
+
+  const children = node.children?.filter(
+    (child) =>
+      !(
+        child.tagName === 'svg' &&
+        (child.properties?.ariaHidden === 'true' || child.properties?.ariaHidden === true)
+      )
+  );
+  const child = children?.length === 1 ? children[0] : undefined;
+  return child ? contentImage(child) : undefined;
+};
+
 const toImageFigure = (node: HtmlTreeNode): HtmlTreeNode => {
   const content = node.children?.length === 1 ? node.children[0] : undefined;
   if (!content) {
     return node;
   }
 
-  const image =
-    content.tagName === 'a' && content.children?.length === 1 ? content.children[0] : content;
-  if (!image || image.tagName !== 'img') {
+  const image = contentImage(content);
+  if (!image) {
     return node;
   }
 

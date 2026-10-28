@@ -7,6 +7,7 @@ import { transformContentEmphasis } from './content-emphasis';
 import { transformEditorialMaps } from './editorial-maps-html';
 import { renderFileLinks } from './file-links';
 import type { PreprocessedSiteMarkdown, RenderSiteMarkdownOptions } from './render.types';
+import { transformTelegramLinks } from './telegram-links';
 
 const FENCED_CODE_BLOCK_LINE = /^[ \t]{0,3}(`{3,}|~{3,})/;
 const HYPHENATED_ORDERED_LIST_ITEM_LINE = /^([ \t]*)-\s+(\d+)([.)])(\s+)/;
@@ -265,6 +266,7 @@ export const renderMarkdownWithMetadata = (
     idPrefix: options?.idPrefix,
     transform: (document, reserveId) => {
       transformContentEmphasis(document.children, 'html');
+      transformTelegramLinks(document, reserveId);
       if (options?.editorialMaps) {
         transformEditorialMaps(
           options.editorialMapSource ?? options.mentions?.context ?? 'site markdown',
