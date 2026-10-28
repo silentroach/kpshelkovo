@@ -235,7 +235,7 @@ describe('SearchDialog', () => {
     `);
   });
 
-  it('retries parcel search, counts and loads mixed results, and opens the first parcel with Enter', async () => {
+  it('counts and loads mixed results, and opens the first parcel with Enter', async () => {
     const intersections: Array<() => void> = [];
     vi.stubGlobal(
       'IntersectionObserver',
@@ -265,7 +265,7 @@ describe('SearchDialog', () => {
     );
     let searchCalls = 0;
     const search = vi.fn<PagefindRuntime['search']>(async (query) => {
-      if (++searchCalls === 1) throw new Error('Parcel search unavailable');
+      searchCalls += 1;
       if (query === 'l43' || query === 'L43') {
         return {
           results: [
@@ -302,10 +302,6 @@ describe('SearchDialog', () => {
     await requestOpen(opener);
     const input = view.getByRole('searchbox');
     await enterDebouncedQuery(input, 'l43');
-    const retry = await waitFor(() => view.getByRole('button', { name: 'Повторить' }));
-    expect(dialog.dataset.searchState).toBe('error');
-
-    await fireEvent.click(retry);
     await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(8));
     expect(dialog.querySelector('[aria-live="polite"]')?.textContent?.trim()).toBe(
       'Найдено 11 результатов'
@@ -321,7 +317,7 @@ describe('SearchDialog', () => {
         "/map/?p=SHR-L43",
       ]
     `);
-    expect(searchCalls).toBe(2);
+    expect(searchCalls).toBe(1);
     expect(textData.filter((load) => load.mock.calls.length)).toHaveLength(6);
 
     intersections[0]?.();
@@ -342,7 +338,7 @@ describe('SearchDialog', () => {
     await requestOpen(opener);
     await enterDebouncedQuery(view.getByRole('searchbox'), 'L43');
     await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(8));
-    expect(searchCalls).toBe(4);
+    expect(searchCalls).toBe(3);
 
     view.unmount();
     view = render(SearchDialog, { props: { client } });
@@ -351,7 +347,7 @@ describe('SearchDialog', () => {
     await waitFor(() =>
       expect(view.getAllByRole('link')[0]?.getAttribute('href')).toBe('/map/?p=SHF-L43')
     );
-    expect(searchCalls).toBe(5);
+    expect(searchCalls).toBe(4);
   });
 
   it('ignores a stale result for the same query after close and reopen', async () => {
@@ -644,163 +640,182 @@ describe('SearchDialog', () => {
     );
   });
 
-  it('renders trusted results progressively and supports arrows and Enter', async () => {
-    const intersections: Array<() => void> = [];
-    const observe = vi.fn();
-    const disconnect = vi.fn();
-    vi.stubGlobal(
-      'IntersectionObserver',
-      class {
-        readonly root = null;
-        readonly rootMargin = '0px';
-        readonly scrollMargin = '0px';
-        readonly thresholds: readonly number[] = [];
+  it.each(['ready', 'error'] as const)(
+    'handles %s progressive results and keyboard navigation',
+    async (expansionState) => {
+      const intersections: Array<() => void> = [];
+      const observe = vi.fn();
+      const disconnect = vi.fn();
+      vi.stubGlobal(
+        'IntersectionObserver',
+        class {
+          readonly root = null;
+          readonly rootMargin = '0px';
+          readonly scrollMargin = '0px';
+          readonly thresholds: readonly number[] = [];
 
-        constructor(callback: IntersectionObserverCallback) {
-          intersections.push(() =>
-            callback([{ isIntersecting: true } as IntersectionObserverEntry], this)
-          );
+          constructor(callback: IntersectionObserverCallback) {
+            intersections.push(() =>
+              callback([{ isIntersecting: true } as IntersectionObserverEntry], this)
+            );
+          }
+
+          readonly disconnect = disconnect;
+          readonly observe = observe;
+          readonly takeRecords = (): IntersectionObserverEntry[] => [];
+          readonly unobserve = vi.fn();
         }
+      );
+      const initialPending = deferred<SearchResponse | undefined>();
+      const firstExpansion = deferred<SearchResponse | undefined>();
+      const secondExpansion = deferred<SearchResponse | undefined>();
+      const search = vi.fn(
+        (_query: string, limit?: number): Promise<SearchResponse | undefined> => {
+          switch (limit) {
+            case 8:
+              return initialPending.promise;
+            case 16:
+              return firstExpansion.promise;
+            case 24:
+              return secondExpansion.promise;
+            default:
+              return Promise.reject(new Error(`Unexpected limit: ${limit}`));
+          }
+        }
+      );
+      const client: SearchClient = { search };
+      const opener = addOpener('Поиск');
+      const view = render(SearchDialog, { props: { client } });
+      const dialog = dialogFrom(view.container);
 
-        readonly disconnect = disconnect;
-        readonly observe = observe;
-        readonly takeRecords = (): IntersectionObserverEntry[] => [];
-        readonly unobserve = vi.fn();
+      await requestOpen(opener);
+      const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+      await fireEvent.input(input, { target: { value: 'вод' } });
+      await fireEvent.input(input, { target: { value: 'вода' } });
+
+      expect(search).not.toHaveBeenCalled();
+      expect(dialog.dataset.searchState).toBe('loading');
+      expect(
+        view.getByRole('region', { name: 'Результаты поиска' }).getAttribute('aria-busy')
+      ).toBe('true');
+
+      vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS - 1);
+      expect(search).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(1);
+      vi.useRealTimers();
+      expect(search).toHaveBeenCalledOnce();
+      expect(search).toHaveBeenCalledWith('вода', 8);
+
+      initialPending.resolve(
+        readyResponse(
+          'вода',
+          Array.from({ length: 8 }, (_, index) => resultAt(index + 1)),
+          18
+        )
+      );
+
+      await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(8));
+      const firstResult = view.getAllByRole('link')[0];
+      expect(firstResult?.getAttribute('href')).toBe('/news/result-1/');
+      expect(firstResult?.querySelector('time')?.dateTime).toBe('2026-08-14');
+      expect(firstResult?.querySelector('mark')?.textContent).toBe('слово');
+      expect(firstResult?.querySelector('script')).toBeNull();
+      expect(firstResult?.tabIndex).toBe(0);
+      expect(dialog.dataset.searchState).toBe('results');
+      expect(dialog.querySelector('[aria-live="polite"]')?.textContent?.trim()).toBe(
+        'Найдено 18 результатов'
+      );
+
+      const tabEvent = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        key: 'Tab'
+      });
+      input.dispatchEvent(tabEvent);
+      expect(tabEvent.defaultPrevented).toBe(false);
+
+      expect(observe).toHaveBeenCalledOnce();
+      intersections[0]?.();
+
+      await waitFor(() => expect(search).toHaveBeenLastCalledWith('вода', 16));
+      expect(view.getAllByRole('link')).toHaveLength(8);
+      intersections[0]?.();
+      expect(search).toHaveBeenCalledTimes(2);
+
+      firstExpansion.resolve(
+        readyResponse(
+          'вода',
+          Array.from({ length: 14 }, (_, index) => resultAt(index + 1)),
+          18
+        )
+      );
+      await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(14));
+
+      expect(disconnect).toHaveBeenCalled();
+      expect(observe).toHaveBeenCalledTimes(2);
+      intersections[1]?.();
+      await waitFor(() => expect(search).toHaveBeenLastCalledWith('вода', 24));
+      expect(view.getAllByRole('link')).toHaveLength(14);
+
+      if (expansionState === 'error') {
+        secondExpansion.reject(new Error('Pagefind fragment failed'));
+        const message = await waitFor(() =>
+          view.getByText(/Не удалось загрузить остальные результаты/u)
+        );
+        expect(message.textContent).toContain('обновить страницу');
+        expect(message.closest('[role="status"]')).toBeTruthy();
+        expect(view.getAllByRole('link')).toHaveLength(14);
+        expect(
+          [...dialog.querySelectorAll('button')].map((button) => button.getAttribute('aria-label'))
+        ).toMatchInlineSnapshot(`
+        [
+          "Закрыть",
+        ]
+      `);
+        expect(observe).toHaveBeenCalledTimes(2);
+        expect(search).toHaveBeenCalledTimes(3);
+        await fireEvent.keyDown(input, { key: 'ArrowDown' });
+        expect(document.activeElement).toBe(view.getAllByRole('link')[0]);
+        await fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'Escape' });
+        expect(dialog.open).toBe(false);
+        expect(document.activeElement).toBe(opener);
+        return;
       }
-    );
-    const initialPending = deferred<SearchResponse | undefined>();
-    const firstExpansion = deferred<SearchResponse | undefined>();
-    const failedSecondExpansion = deferred<SearchResponse | undefined>();
-    const retriedSecondExpansion = deferred<SearchResponse | undefined>();
-    let secondExpansionRequests = 0;
-    const search = vi.fn((_query: string, limit?: number): Promise<SearchResponse | undefined> => {
-      switch (limit) {
-        case 8:
-          return initialPending.promise;
-        case 16:
-          return firstExpansion.promise;
-        case 24:
-          secondExpansionRequests += 1;
-          return secondExpansionRequests === 1
-            ? failedSecondExpansion.promise
-            : retriedSecondExpansion.promise;
-        default:
-          return Promise.reject(new Error(`Unexpected limit: ${limit}`));
-      }
-    });
-    const client: SearchClient = { search };
-    const opener = addOpener('Поиск');
-    const view = render(SearchDialog, { props: { client } });
-    const dialog = dialogFrom(view.container);
 
-    await requestOpen(opener);
-    const input = view.getByRole('searchbox', { name: 'Что найти на сайте' });
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
-    await fireEvent.input(input, { target: { value: 'вод' } });
-    await fireEvent.input(input, { target: { value: 'вода' } });
+      secondExpansion.resolve(
+        readyResponse(
+          'вода',
+          Array.from({ length: 16 }, (_, index) => resultAt(index + 1)),
+          18
+        )
+      );
+      await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(16));
+      expect(observe).toHaveBeenCalledTimes(2);
 
-    expect(search).not.toHaveBeenCalled();
-    expect(dialog.dataset.searchState).toBe('loading');
-    expect(view.getByRole('region', { name: 'Результаты поиска' }).getAttribute('aria-busy')).toBe(
-      'true'
-    );
+      input.focus();
+      await fireEvent.keyDown(input, { key: 'ArrowDown' });
+      expect(document.activeElement).toBe(view.getAllByRole('link')[0]);
+      await fireEvent.keyDown(document.activeElement as HTMLElement, {
+        key: 'ArrowDown'
+      });
+      expect(document.activeElement).toBe(view.getAllByRole('link')[1]);
+      await fireEvent.keyDown(document.activeElement as HTMLElement, {
+        key: 'ArrowUp'
+      });
+      expect(document.activeElement).toBe(view.getAllByRole('link')[0]);
 
-    vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS - 1);
-    expect(search).not.toHaveBeenCalled();
-    vi.advanceTimersByTime(1);
-    vi.useRealTimers();
-    expect(search).toHaveBeenCalledOnce();
-    expect(search).toHaveBeenCalledWith('вода', 8);
+      const activatedResult = view.getAllByRole('link')[0];
+      const activation = vi.fn((event: Event) => event.preventDefault());
+      activatedResult?.addEventListener('click', activation);
+      input.focus();
+      await fireEvent.keyDown(input, { key: 'Enter' });
 
-    initialPending.resolve(
-      readyResponse(
-        'вода',
-        Array.from({ length: 8 }, (_, index) => resultAt(index + 1)),
-        18
-      )
-    );
-
-    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(8));
-    const firstResult = view.getAllByRole('link')[0];
-    expect(firstResult?.getAttribute('href')).toBe('/news/result-1/');
-    expect(firstResult?.querySelector('time')?.dateTime).toBe('2026-08-14');
-    expect(firstResult?.querySelector('mark')?.textContent).toBe('слово');
-    expect(firstResult?.querySelector('script')).toBeNull();
-    expect(firstResult?.tabIndex).toBe(0);
-    expect(dialog.dataset.searchState).toBe('results');
-    expect(dialog.querySelector('[aria-live="polite"]')?.textContent?.trim()).toBe(
-      'Найдено 18 результатов'
-    );
-
-    const tabEvent = new KeyboardEvent('keydown', {
-      bubbles: true,
-      cancelable: true,
-      key: 'Tab'
-    });
-    input.dispatchEvent(tabEvent);
-    expect(tabEvent.defaultPrevented).toBe(false);
-
-    expect(observe).toHaveBeenCalledOnce();
-    intersections[0]?.();
-
-    await waitFor(() => expect(search).toHaveBeenLastCalledWith('вода', 16));
-    expect(view.getAllByRole('link')).toHaveLength(8);
-    intersections[0]?.();
-    expect(search).toHaveBeenCalledTimes(2);
-
-    firstExpansion.resolve(
-      readyResponse(
-        'вода',
-        Array.from({ length: 14 }, (_, index) => resultAt(index + 1)),
-        18
-      )
-    );
-    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(14));
-
-    expect(disconnect).toHaveBeenCalled();
-    expect(observe).toHaveBeenCalledTimes(2);
-    intersections[1]?.();
-    await waitFor(() => expect(search).toHaveBeenLastCalledWith('вода', 24));
-    expect(view.getAllByRole('link')).toHaveLength(14);
-
-    failedSecondExpansion.reject(new Error('Pagefind fragment failed'));
-    const retryButton = await waitFor(() => view.getByRole('button', { name: 'Повторить' }));
-    expect(view.getAllByRole('link')).toHaveLength(14);
-
-    await fireEvent.click(retryButton);
-    await waitFor(() => expect(search).toHaveBeenLastCalledWith('вода', 24));
-    retriedSecondExpansion.resolve(
-      readyResponse(
-        'вода',
-        Array.from({ length: 16 }, (_, index) => resultAt(index + 1)),
-        18
-      )
-    );
-    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(16));
-    expect(observe).toHaveBeenCalledTimes(3);
-
-    input.focus();
-    await fireEvent.keyDown(input, { key: 'ArrowDown' });
-    expect(document.activeElement).toBe(view.getAllByRole('link')[0]);
-    await fireEvent.keyDown(document.activeElement as HTMLElement, {
-      key: 'ArrowDown'
-    });
-    expect(document.activeElement).toBe(view.getAllByRole('link')[1]);
-    await fireEvent.keyDown(document.activeElement as HTMLElement, {
-      key: 'ArrowUp'
-    });
-    expect(document.activeElement).toBe(view.getAllByRole('link')[0]);
-
-    const activatedResult = view.getAllByRole('link')[0];
-    const activation = vi.fn((event: Event) => event.preventDefault());
-    activatedResult?.addEventListener('click', activation);
-    input.focus();
-    await fireEvent.keyDown(input, { key: 'Enter' });
-
-    expect(activation).toHaveBeenCalledOnce();
-    expect(dialog.open).toBe(false);
-    expect(document.activeElement).not.toBe(opener);
-  });
+      expect(activation).toHaveBeenCalledOnce();
+      expect(dialog.open).toBe(false);
+      expect(document.activeElement).not.toBe(opener);
+    }
+  );
 
   it('keeps current results visible without activating them during a refined search', async () => {
     const refinedSearch = deferred<SearchResponse | undefined>();
@@ -1275,6 +1290,22 @@ describe('SearchDialog', () => {
 
     await enterDebouncedQuery(input, 'ошибка');
     await waitFor(() => expect(dialog.dataset.searchState).toBe('error'));
+    const errorRegion = view.getByRole('region', { name: 'Результаты поиска' });
+    expect(errorRegion.textContent).toContain('обновить страницу');
+    expect(dialog.querySelector('[aria-live="polite"]')?.textContent?.trim()).toBe(
+      errorRegion.textContent?.trim()
+    );
+    expect(
+      [...dialog.querySelectorAll('button')].map((button) => button.getAttribute('aria-label'))
+    ).toMatchInlineSnapshot(`
+      [
+        "Закрыть",
+      ]
+    `);
+    await fireEvent.click(view.getByRole('button', { name: 'Закрыть' }));
+    expect(dialog.open).toBe(false);
+    expect(document.activeElement).toBe(opener);
+    await requestOpen(opener);
 
     await enterDebouncedQuery(input, 'старый');
     await enterDebouncedQuery(input, 'новый');

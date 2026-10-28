@@ -23,6 +23,7 @@
   const SEARCH_GOAL = 'search';
   const RESULT_FORMS = ['результат', 'результата', 'результатов'] as const;
   const FOUND_FORMS = ['Найден', 'Найдено', 'Найдено'] as const;
+  const SEARCH_ERROR_MESSAGE = 'Поиск не работает. Попробуйте обновить страницу.';
 
   let { client = pagefindSearchClient, initialQuery = '' }: SearchDialogProps = $props();
 
@@ -104,7 +105,7 @@
       case 'empty':
         return 'По вашему запросу ничего не найдено';
       case 'error':
-        return 'Поиск сейчас не работает';
+        return SEARCH_ERROR_MESSAGE;
       case 'dev-unavailable':
         return 'Локальный поисковый индекс недоступен';
       case 'initial':
@@ -289,12 +290,6 @@
       void runSearch(requestedQuery, SEARCH_RESULT_DEFAULT_LIMIT, 'initial');
     }, SEARCH_DEBOUNCE_MS);
     pendingSearchTimer = timer;
-  };
-
-  const retrySearch = (): void => {
-    clearPendingSearch();
-    beginSearch();
-    void runSearch(query, SEARCH_RESULT_DEFAULT_LIMIT, 'initial');
   };
 
   const loadMore = (): void => {
@@ -600,14 +595,7 @@
           <p class="state-message">Ничего не нашли</p>
         {:else if viewState === 'error'}
           <div class="action-row">
-            <p class="action-message">Поиск не работает</p>
-            <button
-              type="button"
-              class="ui-btn ui-btn-sm ui-btn-ghost retry-button"
-              onclick={retrySearch}
-            >
-              Повторить
-            </button>
+            <p class="action-message">{SEARCH_ERROR_MESSAGE}</p>
           </div>
         {:else if viewState === 'dev-unavailable'}
           <p class="state-message">Локальный поиск недоступен</p>
@@ -671,14 +659,9 @@
           {#if hasMoreResults}
             {#if loadMoreFailed}
               <div class="action-row" role="status">
-                <p class="action-message">Не удалось загрузить остальные результаты</p>
-                <button
-                  type="button"
-                  class="ui-btn ui-btn-sm ui-btn-ghost retry-button"
-                  onclick={loadMore}
-                >
-                  Повторить
-                </button>
+                <p class="action-message">
+                  Не удалось загрузить остальные результаты. Попробуйте обновить страницу.
+                </p>
               </div>
             {:else}
               {#key requestedLimit}
@@ -764,10 +747,6 @@
     font-size: 0.875rem;
     font-weight: 600;
     line-height: 1.25rem;
-  }
-
-  .retry-button {
-    flex-shrink: 0;
   }
 
   .result-item {
