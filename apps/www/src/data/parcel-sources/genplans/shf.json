@@ -1,7 +1,7 @@
 {
   "part": "shf",
   "page": "https://genplan.zmotech.ru/shelkovo-forest/",
-  "capturedAt": "2026-10-26T19:05:30.660Z",
+  "capturedAt": "2026-10-28T19:03:03.064Z",
   "plots": [
     {
       "id": "M1",
@@ -958,7 +958,7 @@
     {
       "id": "N61",
       "cadastralReference": "50:33:0010101:1245",
-      "status": "Свободен",
+      "status": "Забронирован",
       "location": "с видом на лес",
       "objectprice": 3239100
     },
