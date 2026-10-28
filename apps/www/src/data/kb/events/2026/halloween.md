@@ -58,11 +58,11 @@ sources:
 - Машина Евгении, Майская, 70: 1 ребёнок + 1 от [A_lelya_M](https://t.me/A_lelya_M); **2 свободных места**.
 - Машина [an_mosc](https://t.me/an_mosc), [SHF-V79](/map/?p=SHF-V79): 1 ребёнок.
 - Машина [DemonHMR](https://t.me/DemonHMR): 2 ребёнка; **2 свободных места**.
+- Машина [Belikova_Ekaterina1](https://t.me/Belikova_Ekaterina1), [G38](/map/?p=SHV-G38): 6 детей.
 
 **По машинам пока нет информации**
 
 - [Morozova_Karina](https://t.me/Morozova_Karina): 2 ребёнка.
-- [Belikova_Ekaterina1](https://t.me/Belikova_Ekaterina1): 6 детей.
 - [RodinaElla](https://t.me/RodinaElla): 3 ребёнка.
 - Мария, [G36](/map/?p=SHV-G36): 1 ребёнок.
 - [Tisha_88](https://t.me/Tisha_88), [N24](/map/?p=SHF-N24): 1 ребёнок.
