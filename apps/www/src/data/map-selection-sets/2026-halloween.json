@@ -2,7 +2,6 @@
   "parcels": [
     "SHP-C42",
     "SHP-C79",
-    "SHP-F50",
     "SHR-L20",
     "SHR-L43",
     "SHR-E46",
@@ -148,7 +147,6 @@
           [37.736293, 55.061347],
           [37.736229, 55.061275],
           [37.736151, 55.061141],
-          [37.733369, 55.061484],
           [37.733205, 55.061504],
           [37.732935, 55.061537],
           [37.73258, 55.061576],
@@ -363,21 +361,15 @@
     },
     {
       "type": "Feature",
-      "id": "stop-7",
-      "properties": { "iconContent": "7", "description": "Парк: F50", "marker-color": "#7c3aed" },
-      "geometry": { "type": "Point", "coordinates": [37.73336929, 55.06148343] }
-    },
-    {
-      "type": "Feature",
       "id": "stop-8",
-      "properties": { "iconContent": "8", "description": "Ривер: E46", "marker-color": "#7c3aed" },
+      "properties": { "iconContent": "7", "description": "Ривер: E46", "marker-color": "#7c3aed" },
       "geometry": { "type": "Point", "coordinates": [37.73273254, 55.06651877] }
     },
     {
       "type": "Feature",
       "id": "stop-9",
       "properties": {
-        "iconContent": "9",
+        "iconContent": "8",
         "description": "Вилладж: G84, G36, G38",
         "marker-color": "#7c3aed"
       },
@@ -387,7 +379,7 @@
       "type": "Feature",
       "id": "stop-10",
       "properties": {
-        "iconContent": "10",
+        "iconContent": "9",
         "description": "Вилладж: E50",
         "marker-color": "#7c3aed"
       },
@@ -397,7 +389,7 @@
       "type": "Feature",
       "id": "stop-11",
       "properties": {
-        "iconContent": "11",
+        "iconContent": "10",
         "description": "Форест: M71",
         "marker-color": "#7c3aed"
       },
@@ -407,7 +399,7 @@
       "type": "Feature",
       "id": "stop-12",
       "properties": {
-        "iconContent": "12",
+        "iconContent": "11",
         "description": "Форест: W58",
         "marker-color": "#7c3aed"
       },
@@ -417,7 +409,7 @@
       "type": "Feature",
       "id": "stop-13",
       "properties": {
-        "iconContent": "13",
+        "iconContent": "12",
         "description": "Форест: M36",
         "marker-color": "#7c3aed"
       },
@@ -427,7 +419,7 @@
       "type": "Feature",
       "id": "stop-14",
       "properties": {
-        "iconContent": "14",
+        "iconContent": "13",
         "description": "Форест: N24",
         "marker-color": "#7c3aed"
       },
@@ -436,14 +428,14 @@
     {
       "type": "Feature",
       "id": "stop-15",
-      "properties": { "iconContent": "15", "description": "Форест: V4", "marker-color": "#7c3aed" },
+      "properties": { "iconContent": "14", "description": "Форест: V4", "marker-color": "#7c3aed" },
       "geometry": { "type": "Point", "coordinates": [37.70816598, 55.06334206] }
     },
     {
       "type": "Feature",
       "id": "stop-16",
       "properties": {
-        "iconContent": "16",
+        "iconContent": "15",
         "description": "Финиш",
         "marker-color": "#7c3aed",
         "iconCaption": "Финиш"
