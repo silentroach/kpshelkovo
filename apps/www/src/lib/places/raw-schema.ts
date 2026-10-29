@@ -115,6 +115,7 @@ export const RawPlaceSchema = z
     status: z.enum(PLACE_STATUSES),
     show_on_map: z.boolean().optional(),
     map_layer: z.enum(PLACE_MAP_LAYERS).optional(),
+    map_preview: z.literal('square').optional(),
     summary: nonBlankText,
     search_aliases: RawSearchAliasesSchema.optional(),
     location,

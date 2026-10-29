@@ -1,10 +1,13 @@
+import { parseMarkdownFragment } from '@shelkovo/markdown';
 import { Window } from 'happy-dom';
 import { describe, expect, it, vi } from 'vitest';
 
 import { EditorialMapDataSchema } from '@/lib/geometry/editorial-map-data-schema';
 import * as editorialMapper from '@/lib/geometry/editorial-mapper';
+import { RawEditorialGeometrySchema } from '@/lib/geometry/editorial-schema';
 import { createPersonMentionTarget } from '@/lib/people/mentions';
 
+import { appendEditorialMapCaptions } from '../editorial-maps-companion';
 import { renderMarkdown } from '../render';
 
 const map = (name?: string, url?: string, iconCaption = '<img src=x onerror=alert(1)>'): string => {
@@ -18,6 +21,7 @@ const map = (name?: string, url?: string, iconCaption = '<img src=x onerror=aler
         geometry: { type: 'Point', coordinates: [37, 56] },
         properties: {
           iconCaption,
+          captionPosition: 'right',
           iconContent: '7',
           description: '</script><script>alert(1)</script>'
         }
@@ -34,6 +38,23 @@ const document = (markdown: string, options?: Parameters<typeof renderMarkdown>[
 };
 
 describe('editorial map HTML', () => {
+  it('keeps the caption side in HTML and the Markdown companion', () => {
+    const source = map('Схема');
+    const page = document(source);
+    const html = EditorialMapDataSchema.parse(
+      JSON.parse(page.querySelector('editorial-map')?.getAttribute('data-geometry') ?? '')
+    );
+    const block = appendEditorialMapCaptions(parseMarkdownFragment(source), 'placement').find(
+      (node) => node.type === 'code'
+    );
+    if (block?.type !== 'code') throw new Error('missing map block');
+    const companion = RawEditorialGeometrySchema.parse(JSON.parse(block.value));
+    expect([
+      html.features[0]?.captionPosition,
+      companion.features[0]?.properties.captionPosition
+    ]).toEqual(['right', 'right']);
+  });
+
   it('publishes rounded point coordinates without changing the authored map block', () => {
     const body = map('Схема').replace(
       '"coordinates":[37,56]',

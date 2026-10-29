@@ -27,6 +27,91 @@ const setupSdk = () => {
 
 afterEach(() => vi.unstubAllGlobals());
 
+it.each(['top', 'right', 'bottom', 'left', undefined] as const)(
+  'preserves caption side %s without moving the anchor or adding a default',
+  (captionPosition) => {
+    for (const captionOnly of [true, false]) {
+      const sdk = setupSdk();
+      const domain = parseEditorialGeometry(
+        {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: { type: 'Point', coordinates: [37, 55] },
+              properties: { iconCaption: 'Gate', captionOnly, captionPosition }
+            }
+          ]
+        },
+        'caption-position.geojson'
+      );
+      const html = EditorialMapDataSchema.parse(JSON.parse(JSON.stringify(domain)));
+      const serialized = JSON.stringify(toPublicEditorialGeometry(html));
+      const published = EditorialPublicGeometrySchema.parse(JSON.parse(serialized));
+      const client = fromPublicEditorialGeometry(published);
+      expect([
+        html.features[0]?.captionPosition,
+        published.features[0]?.properties.captionPosition,
+        client.features[0]?.captionPosition
+      ]).toEqual([captionPosition, captionPosition, captionPosition]);
+      if (captionPosition === undefined) expect(serialized).not.toContain('captionPosition');
+      createEditorialMapObjects(window.ymaps3!, client);
+      expect(sdk.marker.mock.calls[0]?.[0].coordinates).toEqual([37, 55]);
+      expect(sdk.marker.mock.calls[0]?.[1].dataset.captionPosition).toBe(captionPosition);
+      expect(getEditorialMapBounds(client)).toEqual(
+        getEditorialMapBounds(
+          collection([{ type: 'Feature', geometry: { type: 'Point', coordinates: [37, 55] } }])
+        )
+      );
+    }
+  }
+);
+
+it.each([
+  {
+    geometry: { type: 'Point', coordinates: [37, 55] },
+    iconCaption: 'Gate',
+    captionPosition: 'diagonal'
+  },
+  {
+    geometry: { type: 'Point', coordinates: [37, 55] },
+    iconCaption: undefined,
+    captionPosition: 'left'
+  },
+  { geometry: { type: 'Point', coordinates: [37, 55] }, iconCaption: '  ', captionPosition: 'top' },
+  {
+    geometry: {
+      type: 'LineString',
+      coordinates: [
+        [37, 55],
+        [38, 56]
+      ]
+    },
+    iconCaption: 'Gate',
+    captionPosition: 'right'
+  }
+])(
+  'rejects invalid caption placement at every boundary: %j',
+  ({ geometry, iconCaption, captionPosition }) => {
+    const raw = {
+      type: 'FeatureCollection',
+      features: [
+        { type: 'Feature', id: 'gate', geometry, properties: { iconCaption, captionPosition } }
+      ]
+    };
+    expect(() => parseEditorialGeometry(raw, 'placement.geojson')).toThrow(
+      /placement\.geojson.*captionPosition.*gate/
+    );
+    expect(EditorialPublicGeometrySchema.safeParse(raw).success).toBe(false);
+    expect(
+      EditorialMapDataSchema.safeParse({
+        type: 'FeatureCollection',
+        features: [{ type: 'Feature', geometry, iconCaption, captionPosition }]
+      }).success
+    ).toBe(false);
+  }
+);
+
 it.each([true, false, undefined])(
   'preserves captionOnly %s through every map boundary',
   (captionOnly) => {
@@ -456,4 +541,5 @@ it('frames a single point, line and separate areas without a primary place marke
     }
   `);
   expect(getEditorialMapBounds(collection([]))).toBeUndefined();
+  expect(getEditorialMapBounds(point, [], 0.15)).toEqual(getEditorialMapBounds(point));
 });

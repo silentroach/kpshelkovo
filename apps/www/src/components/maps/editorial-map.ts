@@ -70,6 +70,8 @@ export const createEditorialMapObjects = (
     if (feature.geometry.type === 'Point') {
       const marker = document.createElement('div');
       marker.className = 'editorial-map-marker';
+      if (feature.captionPosition !== undefined)
+        marker.dataset.captionPosition = feature.captionPosition;
       if (!feature.captionOnly) {
         const dot = document.createElement('span');
         dot.className = 'editorial-map-marker__dot ui-map-marker';
@@ -101,7 +103,8 @@ export const createEditorialMapObjects = (
 /** Undefined means there is no geometry to frame; extra coordinates can include a primary marker. */
 export const getEditorialMapBounds = (
   collection: EditorialFeatureCollection,
-  extraCoordinates: readonly LngLat[] = []
+  extraCoordinates: readonly LngLat[] = [],
+  paddingRatio = 0.3
 ): LngLatBounds | undefined => {
   const positions: readonly EditorialPosition[] = collection.features.flatMap(({ geometry }) => {
     switch (geometry.type) {
@@ -131,8 +134,8 @@ export const getEditorialMapBounds = (
     minLat = Math.min(minLat, lat);
     maxLat = Math.max(maxLat, lat);
   }
-  const lngPadding = (maxLng - minLng) * 0.3 || 0.001;
-  const latPadding = (maxLat - minLat) * 0.3 || 0.001;
+  const lngPadding = (maxLng - minLng) * paddingRatio || 0.001;
+  const latPadding = (maxLat - minLat) * paddingRatio || 0.001;
   const round = (value: number): number => Number(value.toFixed(6));
   return [
     [round(Math.max(-180, minLng - lngPadding)), round(Math.max(-90, minLat - latPadding))],

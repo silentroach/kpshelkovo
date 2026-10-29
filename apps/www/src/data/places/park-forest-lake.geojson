@@ -5,11 +5,12 @@
       "type": "Feature",
       "id": "future-park-approach",
       "properties": {
-        "description": "Будущий проход к парку",
+        "description": "Будущий проход к пруду",
         "precision": "approximate",
         "stroke": "#b87518",
-        "stroke-width": 3,
-        "stroke-dasharray": [6, 4]
+        "stroke-width": 2,
+        "stroke-opacity": 0.85,
+        "stroke-dasharray": [1, 3]
       },
       "geometry": {
         "type": "LineString",
@@ -63,7 +64,7 @@
       "type": "Feature",
       "id": "future-park-approach-caption",
       "properties": {
-        "iconCaption": "Будущий проход к парку",
+        "iconCaption": "Будущий проход к пруду",
         "captionOnly": true
       },
       "geometry": {

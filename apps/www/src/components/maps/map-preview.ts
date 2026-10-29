@@ -13,7 +13,7 @@ export const getPreviewLocation = (data: MapPreviewData): YMapLocationRequest =>
   if (!data.geometry?.features.length)
     return { center: point, zoom: data.zoom ?? 16.5, duration: 0 };
 
-  const bounds = getEditorialMapBounds(data.geometry, [point]);
+  const bounds = getEditorialMapBounds(data.geometry, [point], 0.15);
   return bounds ? { bounds, duration: 0 } : { center: point, zoom: data.zoom ?? 16.5, duration: 0 };
 };
 

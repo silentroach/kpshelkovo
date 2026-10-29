@@ -19,6 +19,8 @@ export interface EditorialFeature {
   readonly description?: string;
   readonly iconCaption?: string;
   readonly captionOnly?: boolean;
+  /** Screen side relative to the point; absent means bottom. */
+  readonly captionPosition?: 'top' | 'right' | 'bottom' | 'left';
   readonly iconContent?: string;
   readonly markerColor?: string;
   readonly stroke?: string;

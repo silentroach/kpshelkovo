@@ -41,6 +41,24 @@
   transform: translateX(-50%);
 }
 
+.editorial-map-marker[data-caption-position='top'] .editorial-map-marker__caption {
+  top: auto;
+  bottom: 12px;
+}
+
+.editorial-map-marker[data-caption-position='right'] .editorial-map-marker__caption {
+  top: 0;
+  left: 12px;
+  transform: translateY(-50%);
+}
+
+.editorial-map-marker[data-caption-position='left'] .editorial-map-marker__caption {
+  top: 0;
+  right: 12px;
+  left: auto;
+  transform: translateY(-50%);
+}
+
 .editorial-parcel-label {
   display: block;
   padding: 0.0625rem 0.25rem;

@@ -129,6 +129,7 @@ describe('editorial map selection resolver', () => {
     expect(result.geometry.features[1]).toMatchInlineSnapshot(`
       {
         "captionOnly": undefined,
+        "captionPosition": undefined,
         "description": undefined,
         "fill": undefined,
         "fillOpacity": undefined,

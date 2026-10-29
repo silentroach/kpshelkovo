@@ -26,6 +26,7 @@ export const EditorialPublicGeometrySchema = z
                 description: z.string().optional(),
                 iconCaption: z.string().optional(),
                 captionOnly: z.boolean().optional(),
+                captionPosition: z.enum(['top', 'right', 'bottom', 'left']).optional(),
                 iconContent: z
                   .string()
                   .regex(/^(?:0|[1-9][0-9]?)$/)
@@ -54,6 +55,16 @@ export const EditorialPublicGeometrySchema = z
           })
           .strict()
           .superRefine((feature, context) => {
+            if (
+              feature.properties.captionPosition !== undefined &&
+              (feature.geometry.type !== 'Point' || !feature.properties.iconCaption?.trim())
+            ) {
+              context.addIssue({
+                code: 'custom',
+                path: ['properties', 'captionPosition'],
+                message: 'captionPosition requires a Point with a nonblank iconCaption'
+              });
+            }
             if (
               feature.properties.captionOnly !== undefined &&
               (feature.geometry.type !== 'Point' ||

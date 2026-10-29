@@ -288,12 +288,12 @@ it('renders and refits the point and all separate polygons, including a distant 
     {
       "bounds": [
         [
-          8.2,
-          18.2,
+          9.1,
+          19.1,
         ],
         [
-          17.8,
-          27.8,
+          16.9,
+          26.9,
         ],
       ],
       "duration": 0,
