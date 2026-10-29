@@ -14,7 +14,6 @@
     "SHF-M71",
     "SHF-N24",
     "SHF-M36",
-    "SHF-W58",
     "SHF-V4"
   ],
   "places": ["forest-park"],
@@ -256,24 +255,6 @@
           [37.716952, 55.06176],
           [37.71684, 55.06177],
           [37.716772, 55.061785],
-          [37.716745, 55.061729],
-          [37.716502, 55.061224],
-          [37.716459, 55.061114],
-          [37.716427, 55.061],
-          [37.716399, 55.060871],
-          [37.716351, 55.060616],
-          [37.716213, 55.060023],
-          [37.716607, 55.059991],
-          [37.717779, 55.059906],
-          [37.716607, 55.059991],
-          [37.716213, 55.060023],
-          [37.716351, 55.060616],
-          [37.716399, 55.060871],
-          [37.716427, 55.061],
-          [37.716459, 55.061114],
-          [37.716502, 55.061224],
-          [37.716745, 55.061729],
-          [37.716772, 55.061785],
           [37.717061, 55.062377],
           [37.717379, 55.063029],
           [37.71672, 55.063152],
@@ -397,19 +378,9 @@
     },
     {
       "type": "Feature",
-      "id": "stop-12",
-      "properties": {
-        "iconContent": "11",
-        "description": "Форест: W58",
-        "marker-color": "#7c3aed"
-      },
-      "geometry": { "type": "Point", "coordinates": [37.717779, 55.059906] }
-    },
-    {
-      "type": "Feature",
       "id": "stop-13",
       "properties": {
-        "iconContent": "12",
+        "iconContent": "11",
         "description": "Форест: M36",
         "marker-color": "#7c3aed"
       },
@@ -419,7 +390,7 @@
       "type": "Feature",
       "id": "stop-14",
       "properties": {
-        "iconContent": "13",
+        "iconContent": "12",
         "description": "Форест: N24",
         "marker-color": "#7c3aed"
       },
@@ -428,14 +399,14 @@
     {
       "type": "Feature",
       "id": "stop-15",
-      "properties": { "iconContent": "14", "description": "Форест: V4", "marker-color": "#7c3aed" },
+      "properties": { "iconContent": "13", "description": "Форест: V4", "marker-color": "#7c3aed" },
       "geometry": { "type": "Point", "coordinates": [37.70816598, 55.06334206] }
     },
     {
       "type": "Feature",
       "id": "stop-16",
       "properties": {
-        "iconContent": "15",
+        "iconContent": "14",
         "description": "Финиш",
         "marker-color": "#7c3aed",
         "iconCaption": "Финиш"
