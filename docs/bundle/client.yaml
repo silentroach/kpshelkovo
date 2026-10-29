@@ -55,14 +55,14 @@ static/InfrastructureTable.XXXXXXXX.js:
     rendered: 3583
 static/MapPreview.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/components/maps/map-preview.ts:
-    rendered: 6067
+    rendered: 6072
   apps/www/src/components/maps/MapPreview.astro?astro&type=script&index=0&lang.ts:
     rendered: 191
 static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/marker-images.ts:
     rendered: 308
   apps/www/src/components/places/place-map-geometry.ts:
-    rendered: 2877
+    rendered: 2932
   apps/www/src/components/places/place-map-url.ts:
     rendered: 1407
   apps/www/src/components/places/PlaceMap.svelte:
@@ -340,7 +340,7 @@ static/editorial-map.XXXXXXXX.js:
   apps/www/src/components/maps/editorial-map.css:
     rendered: 0
   apps/www/src/components/maps/editorial-map.ts:
-    rendered: 3592
+    rendered: 3765
 static/esm.XXXXXXXX.js:
   node_modules/.pnpm/@yandex+ymaps3-clusterer@0.0.12/node_modules/@yandex/ymaps3-clusterer/dist/esm/index.js:
     rendered: 0
@@ -445,7 +445,7 @@ static/lazy.XXXXXXXX.js:
   apps/www/src/components/search/search-dialog.events.ts:
     rendered: 120
   apps/www/src/components/search/SearchDialog.svelte:
-    rendered: 22438
+    rendered: 22157
   apps/www/src/components/search/SearchDialog.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/search/client.ts:
