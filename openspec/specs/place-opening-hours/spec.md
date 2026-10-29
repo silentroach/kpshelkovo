@@ -10,11 +10,6 @@
 
 `opening_hours` SHALL быть необязательным. HTML SHALL показывать полную неделю из `opening_hours.periods` без JavaScript и раскрытия блока, независимо от общей карты. Markdown SHALL передавать те же интервалы во frontmatter `opening_hours.periods` (`days`, `opens_at`, `closes_at`) и `opening_hours.timezone: Europe/Moscow`, без generated-печатной недели и текущего статуса. Дни `mon`, `tue`, `wed`, `thu`, `fri`, `sat`, `sun` без интервалов SHALL означать выходные, не неизвестные часы.
 
-#### Scenario: Расписание не задано
-
-- **WHEN** у места отсутствует `opening_hours`
-- **THEN** карточки и общая карта не показывают часы, статус работы и заглушку отсутствия расписания; Markdown frontmatter не содержит `opening_hours`
-
 #### Scenario: Чтение без JavaScript
 
 - **WHEN** пользователь открывает карточку места с расписанием при отключённом JavaScript
