@@ -10,11 +10,6 @@
 
 Точка с Markdown negotiation SHALL сохранять прямой URL объявленного документа и возвращать его при явном приемлемом `Accept: text/markdown`. Обычный HTML-запрос SHALL получать HTML, если оно опубликовано. Markdown SHALL иметь `Content-Type: text/markdown; charset=utf-8` и явную политику кеширования; прямой URL SHALL выбирать ресурс путём. Без объявленного Markdown точка SHALL NOT обещать его или имитировать negotiation.
 
-#### Scenario: Общее или единственное Markdown-представление
-
-- **WHEN** несколько HTML-страниц объявляют общий документ раздела либо точка входа имеет только Markdown
-- **THEN** negotiation допустима и возвращает объявленный документ
-
 #### Scenario: Два способа чтения
 
 - **WHEN** у публичной точки входа есть HTML и объявленное Markdown-представление

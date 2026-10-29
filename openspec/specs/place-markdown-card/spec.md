@@ -4,17 +4,13 @@
 
 Давать читателям и машинным потребителям отдельную Markdown-карточку места со структурированными метаданными, редакционным описанием и контекстом публичных упоминаний.
 
+Связанные контракты: [public-coordinate-precision](/openspec/specs/public-coordinate-precision/spec.md) — точность координат; [place-opening-hours](/openspec/specs/place-opening-hours/spec.md) — расписание.
+
 ## Requirements
 
 ### Requirement: Метаданные карточки доступны во frontmatter
 
-`/map/[slug]/index.md` SHALL начинаться с YAML frontmatter: название в `title`, машинный `category`, lifecycle `status` (`existing`, `planned`, `underConstruction`), числовые `coordinates.lat` и `coordinates.lng` по [public-coordinate-precision](/openspec/specs/public-coordinate-precision/spec.md), `address` при наличии. `status` SHALL NOT означать текущую открытость. Неизвестные optional-сведения и внутренние поля SHALL NOT публиковаться автоматически.
-
-#### Scenario: Необязательное поле отсутствует
-
-- **WHEN** у места нет необязательных сведений
-- **THEN** frontmatter не содержит для них пустых полей, `null` или строки `undefined`
-- **THEN** внутренние редакционные и технические поля также не переносятся автоматически
+`/map/[slug]/index.md` SHALL начинаться с YAML frontmatter: название в `title`, машинный `category`, lifecycle `status` (`existing`, `planned`, `underConstruction`), числовые `coordinates.lat` и `coordinates.lng` по `public-coordinate-precision`, `address` при наличии. `status` SHALL NOT означать текущую открытость. Расписание SHALL передаваться по `place-opening-hours`. Неизвестные необязательные сведения и внутренние редакционные или технические поля SHALL NOT публиковаться автоматически.
 
 #### Scenario: Карточка с адресом
 
@@ -26,6 +22,7 @@
 
 - **WHEN** у места нет адреса, связанного контакта и расписания
 - **THEN** frontmatter не содержит ключей `address`, `contact_url` и `opening_hours`
+- **AND** отсутствующие сведения не заменяются пустыми полями, `null` или строкой `undefined`
 - **AND** название, категория, lifecycle-статус, координаты и обязательные ссылки остаются доступны
 
 ### Requirement: Собственные ссылки карточки являются метаданными
