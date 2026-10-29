@@ -34,6 +34,7 @@ const place: Place = {
   category: 'water',
   marker: 'fish',
   status: 'existing',
+  mapPreview: 'square',
   summary: 'Два пруда на территории Шелково',
   body: 'Описание места.',
   mentions: [],
@@ -219,7 +220,7 @@ describe('place map public DTO', () => {
   it('publishes prepared pond coordinates and explicit styling without expansion instructions', () => {
     const geometry = buildPlaceMapPublicPayload([place]).places[0]?.geometry;
     const parsed = EditorialPublicGeometrySchema.parse(JSON.parse(JSON.stringify(geometry)));
-    const feature = parsed.features[0];
+    const feature = parsed.features.find((item) => item.id === 'area');
     if (feature?.geometry.type !== 'MultiPolygon') throw new Error('pond geometry missing');
 
     expect(feature.geometry.coordinates).toHaveLength(2);

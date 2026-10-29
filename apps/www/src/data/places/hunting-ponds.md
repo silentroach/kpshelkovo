@@ -4,6 +4,7 @@ category: water
 marker: fish
 status: existing
 show_on_map: true
+map_preview: square
 summary: Каскад озёр для рыбалки рядом с Шелково
 search_aliases:
   - рыболовные пруды

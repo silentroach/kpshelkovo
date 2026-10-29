@@ -32,6 +32,11 @@ const place = {
 } as const;
 
 describe('RawPlaceSchema', () => {
+  it.each([undefined, 'square'] as const)('maps preview shape %s', (mapPreview) => {
+    const data = RawPlaceSchema.parse({ ...place, map_preview: mapPreview });
+    expect(mapRawPlace({ id: 'preview-place', body: '', data }).mapPreview).toBe(mapPreview);
+  });
+
   it.each([undefined, 'infra'] as const)(
     'maps layer %s independently of category and publication',
     (mapLayer) => {

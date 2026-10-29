@@ -168,7 +168,7 @@ describe('parsePlaceGeometryFiles', () => {
     const geometry = parsePlaceGeometryFiles({ 'hunting-ponds.geojson': source }).get(
       'hunting-ponds'
     );
-    const feature = geometry?.features[0];
+    const feature = geometry?.features.find((item) => item.id === 'area');
     if (feature?.geometry.type !== 'MultiPolygon') throw new Error('pond geometry missing');
 
     expect(feature.geometry.coordinates).toHaveLength(2);

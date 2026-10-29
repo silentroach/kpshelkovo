@@ -41,6 +41,7 @@ const properties = z
     description: z.string().optional(),
     iconCaption: z.string().optional(),
     captionOnly: z.boolean().optional(),
+    captionPosition: z.enum(['top', 'right', 'bottom', 'left']).optional(),
     iconContent: z
       .string()
       .regex(/^(?:0|[1-9][0-9]?)$/)
@@ -72,6 +73,16 @@ const feature = z
   })
   .strict()
   .superRefine((value, context) => {
+    if (
+      value.properties.captionPosition !== undefined &&
+      (value.geometry.type !== 'Point' || !value.properties.iconCaption?.trim())
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['properties', 'captionPosition'],
+        message: 'captionPosition requires a Point with a nonblank iconCaption'
+      });
+    }
     if (
       value.properties.captionOnly !== undefined &&
       (value.geometry.type !== 'Point' ||

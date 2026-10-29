@@ -24,7 +24,12 @@ const preview = {
 } satisfies MapPreviewData;
 ---
 
-<div class="place-preview">
+<div
+  class:list={[
+    'place-preview',
+    { 'place-preview--square': place.mapPreview === 'square' },
+  ]}
+>
   <MapPreview preview={preview} label={`Местоположение: ${place.name}`}>
     <a
       class="place-preview__marker"
@@ -35,19 +40,17 @@ const preview = {
       aria-label={markerLabel}
       title={markerLabel}
     >
-      {
-        marker ? (
-          <img
-            src={marker.src}
-            width={marker.width}
-            height={marker.height}
-            alt=""
-            draggable="false"
-          />
-        ) : (
-          <span class="ui-map-marker" />
-        )
-      }
+      {marker ? (
+        <img
+          src={marker.src}
+          width={marker.width}
+          height={marker.height}
+          alt=""
+          draggable="false"
+        />
+      ) : (
+        <span class="ui-map-marker" />
+      )}
       {place.openingHours && <span class="place-preview__closed-indicator" />}
     </a>
   </MapPreview>
@@ -146,5 +149,10 @@ const preview = {
     .place-preview {
       height: 20rem;
     }
+  }
+
+  .place-preview--square {
+    height: auto;
+    aspect-ratio: 1;
   }
 </style>

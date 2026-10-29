@@ -42,6 +42,7 @@ export const mapEditorialGeometry = (
       description: feature.properties.description,
       iconCaption: feature.properties.iconCaption,
       captionOnly: feature.properties.captionOnly,
+      captionPosition: feature.properties.captionPosition,
       iconContent: feature.properties.iconContent,
       markerColor: feature.properties['marker-color'],
       stroke: feature.properties.stroke,

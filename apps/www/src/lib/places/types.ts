@@ -69,6 +69,7 @@ export type PlaceBacklinks = SiteBacklinks;
 export interface Place {
   readonly showOnMap: boolean;
   readonly mapLayer?: PlaceMapLayer;
+  readonly mapPreview?: 'square';
   readonly slug: string;
   readonly name: string;
   readonly nameCases?: PlaceNameCaseForms;
