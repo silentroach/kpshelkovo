@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Отзывы: выбранный вариант Г</title>
+    <link rel="stylesheet" href="gallery.css" />
+    <script src="gallery.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <h1>Отзывы: выбранный вариант Г</h1>
+      <p>Слева исходный сайт, справа выбранное оформление списка.</p>
+      <div class="controls">
+        <label
+          >Что смотрим
+          <select id="review">
+            <option value="list">Весь список</option>
+            <option value="2026-08-22-promised-infrastructure-remains-in-booklets">
+              Ульяна Тарасова · без оценок
+            </option>
+            <option value="2026-08-20-tariff-increase-and-missing-infrastructure">
+              Алексей Морев
+            </option>
+            <option value="2026-08-20-two-years-of-unfulfilled-promises">
+              Алексей Кузнецов · без оценок
+            </option>
+            <option value="2026-08-13-shelkovo-eco-club-otzyv-zhitelya-shelkovo-park">
+              Алексей Дымов
+            </option>
+            <option value="2026-08-12-maintenance-does-not-exist">Артём Агафонов</option>
+            <option value="2026-08-11-think-before-buying">Екатерина Илинич</option>
+            <option value="2026-08-10-why-i-do-not-recommend-shelkovo">Игорь Калашников</option>
+          </select>
+        </label>
+        <label
+          >Экран
+          <select id="width">
+            <option value="390">Телефон · 390 px</option>
+            <option value="1440">Компьютер · 1440 px</option>
+            <option value="320">Узкий телефон · 320 px</option>
+          </select>
+        </label>
+      </div>
+      <p class="hint">Нажми на снимок для просмотра в полном размере.</p>
+      <a id="pair" href="images/list-390-pair.webp">Открыть сравнение одним изображением</a>
+    </header>
+    <main class="comparison">
+      <figure>
+        <figcaption>А · Исходный сайт</figcaption>
+        <a id="before-link" href="images/list-390-before.webp"
+          ><img
+            id="before"
+            src="images/list-390-before.webp"
+            alt="Список отзывов: исходное оформление"
+        /></a>
+      </figure>
+      <figure>
+        <figcaption>Г · Выбранный вариант</figcaption>
+        <a id="after-link" href="images/list-390-after.webp"
+          ><img
+            id="after"
+            src="images/list-390-after.webp"
+            alt="Список отзывов: автор сверху, оценки под текстом"
+        /></a>
+      </figure>
+    </main>
+  </body>
+</html>
