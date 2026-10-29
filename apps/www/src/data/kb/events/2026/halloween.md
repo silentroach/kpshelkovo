@@ -32,12 +32,12 @@ sources:
 - Машина [coloristka_me](https://t.me/coloristka_me): 4 ребёнка + 2 от [katerinailinich](https://t.me/katerinailinich); **1 свободное место**.
 - Машина [AstakhovAleksei](https://t.me/AstakhovAleksei): 3 ребёнка; **2 свободных места**.
 - Машина [anastasiya_a_kalinina](https://t.me/anastasiya_a_kalinina): 2 ребёнка.
+- Машина Irina Zenyuk, Еловая, 78: 2 ребёнка.
 
 **По машинам пока нет информации**
 
 - Ольга, Парковая, 46: 1 ребёнок.
 - [polistolyarova](https://t.me/polistolyarova): 1 ребёнок.
-- Irina Zenyuk, Еловая, 78: 2 ребёнка.
 - [OlgaBOS87](https://t.me/OlgaBOS87), [E50](/map/?p=SHV-E50): 3 ребёнка.
 
 ## :toc-omit[🔵] Синяя группа

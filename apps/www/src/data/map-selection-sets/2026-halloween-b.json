@@ -128,6 +128,7 @@
       "properties": {
         "iconContent": "1",
         "iconCaption": "Старт Б",
+        "captionPosition": "right",
         "description": "Группа Б. Вилладж: G84, G36, G38",
         "marker-color": "#1d4ed8"
       },
@@ -188,6 +189,7 @@
       "id": "finish",
       "properties": {
         "iconCaption": "Общий финиш",
+        "captionPosition": "bottom",
         "description": "Лесной парк Фореста. Здесь встречаются обе группы.",
         "marker-color": "#334155"
       },
