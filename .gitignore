@@ -8,6 +8,8 @@ apps/*/.astro/
 .cache/pagefind/
 .cache/bundle/
 .agents/skills/*
+!.agents/skills/backlog/
+!.agents/skills/backlog/**
 !.agents/skills/news-maker/
 !.agents/skills/news-maker/**
 !.agents/skills/project-issues/
