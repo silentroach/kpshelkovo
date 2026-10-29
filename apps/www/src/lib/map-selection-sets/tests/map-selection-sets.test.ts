@@ -60,6 +60,7 @@ describe('map selection sets loader', () => {
               "id": undefined,
               "properties": {
                 "captionOnly": undefined,
+                "captionPosition": undefined,
                 "description": undefined,
                 "fill": undefined,
                 "fill-opacity": undefined,
@@ -91,6 +92,7 @@ describe('map selection sets loader', () => {
               "id": undefined,
               "properties": {
                 "captionOnly": undefined,
+                "captionPosition": undefined,
                 "description": undefined,
                 "fill": undefined,
                 "fill-opacity": undefined,
