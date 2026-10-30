@@ -170,8 +170,8 @@ importers:
   .:
     devDependencies:
       '@fission-ai/openspec':
-        specifier: 1.14.3
-        version: 1.14.3(@types/node@26.5.0)
+        specifier: 1.15.0
+        version: 1.15.0(@types/node@26.5.0)
       '@lhci/cli':
         specifier: ^0.15.1
         version: 0.15.1(supports-color@5.5.0)
@@ -920,8 +920,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@fission-ai/openspec@1.14.3':
-    resolution: {integrity: sha512-ALFW1d5bSm6t27Kmcle93SDFuqUc8fLwy5ZdBfIiNffo0Yk9AEOJxw6xDqBv38eMM7l7TeOZBB/7C08luxYGfg==}
+  '@fission-ai/openspec@1.15.0':
+    resolution: {integrity: sha512-lG/EPEiL22bB70yKJhWWSPk1UQGLnwO7Dp+hNc/jUmBwb0qxPLzHCUkXEfkny4iYDOsgnsNQmc39/g9QcvnBnA==}
     engines: {node: '>=20.19.0'}
     hasBin: true
 
@@ -5019,7 +5019,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@fission-ai/openspec@1.14.3(@types/node@26.5.0)':
+  '@fission-ai/openspec@1.15.0(@types/node@26.5.0)':
     dependencies:
       '@inquirer/core': 12.0.3(@types/node@26.5.0)
       '@inquirer/prompts': 8.7.2(@types/node@26.5.0)
