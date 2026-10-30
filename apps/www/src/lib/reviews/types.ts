@@ -14,6 +14,8 @@ export interface Review {
   readonly id: string;
   readonly slug: string;
   readonly title?: string;
+  /** Editor-selected plain-text passage from the readable main body. */
+  readonly excerpt?: string;
   readonly seo?: {
     readonly description?: string;
   };

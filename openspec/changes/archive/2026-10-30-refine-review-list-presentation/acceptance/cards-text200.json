@@ -1,0 +1,683 @@
+{
+  "success": true,
+  "data": {
+    "lifecycle": {
+      "effectiveLaunch": {
+        "browserLaunched": true,
+        "engine": "chrome",
+        "launchHash": 11677035664275010974
+      },
+      "launched": false,
+      "relaunchedBrowser": false,
+      "restartedBackground": false,
+      "restoreStatus": "not_configured",
+      "reused": true,
+      "saveStatus": "not_attempted"
+    },
+    "origin": "http://127.0.0.1:4361/reviews/",
+    "result": {
+      "cards": [
+        {
+          "nodes": [
+            {
+              "class": "ui-entry-title",
+              "clientHeight": 416,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 1562.125, "left": 72, "right": 248, "top": 1146.125 },
+              "scrollHeight": 416,
+              "scrollWidth": 176,
+              "text": "Обещанная инфраструктура осталась в буклетах"
+            },
+            {
+              "class": "review-meta",
+              "clientHeight": 216,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 1794.125, "left": 72, "right": 248, "top": 1578.125 },
+              "scrollHeight": 216,
+              "scrollWidth": 176,
+              "text": "Ульяна Тарасова\n22 августа"
+            },
+            {
+              "class": "review-card__excerpt",
+              "clientHeight": 1075,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 2901.0625, "left": 72, "right": 248, "top": 1826.125 },
+              "scrollHeight": 1075,
+              "scrollWidth": 176,
+              "text": "Настоятельно рекомендую перед покупкой участка: ищите в популярных мессенджерах чаты посёлков, там в полной мере можно узнать, как живётся в посёлках Земли МО."
+            }
+          ],
+          "order": ["review-card__summary", "review-card__excerpt"],
+          "title": "Обещанная инфраструктура осталась в буклетах"
+        },
+        {
+          "nodes": [
+            {
+              "class": "ui-entry-title",
+              "clientHeight": 416,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 3430.0625, "left": 72, "right": 248, "top": 3014.0625 },
+              "scrollHeight": 416,
+              "scrollWidth": 176,
+              "text": "Обман покупателей со стороны управляющей компании"
+            },
+            {
+              "class": "review-meta",
+              "clientHeight": 216,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 3662.0625, "left": 72, "right": 248, "top": 3446.0625 },
+              "scrollHeight": 216,
+              "scrollWidth": 176,
+              "text": "Алексей Морев\n20 августа"
+            },
+            {
+              "class": "review-card__excerpt",
+              "clientHeight": 768,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 4461.875, "left": 72, "right": 248, "top": 3694.0625 },
+              "scrollHeight": 768,
+              "scrollWidth": 176,
+              "text": "Из плюсов — очень добрые и активные люди, которые живут в посёлке и добиваются от ОК Комфорт, чтобы она хоть как-то работала."
+            },
+            {
+              "class": "review-card__aspects",
+              "clientHeight": 252,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 4745.875, "left": 72, "right": 248, "top": 4493.875 },
+              "scrollHeight": 252,
+              "scrollWidth": 176,
+              "text": "Место и среда\nЗастройщик\nОбслуживание"
+            },
+            {
+              "class": "review-card__aspect-label",
+              "clientHeight": 32,
+              "clientWidth": 160,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 4525.875, "left": 72, "right": 231.609375, "top": 4493.875 },
+              "scrollHeight": 32,
+              "scrollWidth": 160,
+              "text": "Место и среда"
+            },
+            {
+              "class": "star-rating",
+              "clientHeight": 28,
+              "clientWidth": 148,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 4561.875, "left": 72, "right": 220, "top": 4533.875 },
+              "scrollHeight": 28,
+              "scrollWidth": 148,
+              "text": ""
+            },
+            {
+              "class": "review-card__aspect-label",
+              "clientHeight": 32,
+              "clientWidth": 137,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 4617.875, "left": 72, "right": 208.5, "top": 4585.875 },
+              "scrollHeight": 32,
+              "scrollWidth": 137,
+              "text": "Застройщик"
+            },
+            {
+              "class": "star-rating",
+              "clientHeight": 28,
+              "clientWidth": 148,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 4653.875, "left": 72, "right": 220, "top": 4625.875 },
+              "scrollHeight": 28,
+              "scrollWidth": 148,
+              "text": ""
+            },
+            {
+              "class": "review-card__aspect-label",
+              "clientHeight": 32,
+              "clientWidth": 167,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 4709.875, "left": 72, "right": 239.328125, "top": 4677.875 },
+              "scrollHeight": 32,
+              "scrollWidth": 167,
+              "text": "Обслуживание"
+            },
+            {
+              "class": "star-rating",
+              "clientHeight": 28,
+              "clientWidth": 148,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 4745.875, "left": 72, "right": 220, "top": 4717.875 },
+              "scrollHeight": 28,
+              "scrollWidth": 148,
+              "text": ""
+            }
+          ],
+          "order": ["review-card__summary", "review-card__excerpt", "review-card__aspects"],
+          "title": "Обман покупателей со стороны управляющей компании"
+        },
+        {
+          "nodes": [
+            {
+              "class": "ui-entry-title",
+              "clientHeight": 260,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 5118.875, "left": 72, "right": 248, "top": 4858.875 },
+              "scrollHeight": 260,
+              "scrollWidth": 176,
+              "text": "Два года обещаний без результата"
+            },
+            {
+              "class": "review-meta",
+              "clientHeight": 216,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 5350.875, "left": 72, "right": 248, "top": 5134.875 },
+              "scrollHeight": 216,
+              "scrollWidth": 176,
+              "text": "Алексей Кузнецов\n20 августа"
+            },
+            {
+              "class": "review-card__excerpt",
+              "clientHeight": 1075,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 6457.8125, "left": 72, "right": 248, "top": 5382.875 },
+              "scrollHeight": 1075,
+              "scrollWidth": 176,
+              "text": "К нашему участку дорогу пока не заасфальтировали. Мы покупали участок рассчитывая на то, что все это будет построено, но пока в апреле 2026 года только обещания в устном и письменном виде."
+            }
+          ],
+          "order": ["review-card__summary", "review-card__excerpt"],
+          "title": "Два года обещаний без результата"
+        },
+        {
+          "nodes": [
+            {
+              "class": "ui-entry-title",
+              "clientHeight": 260,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 6830.8125, "left": 72, "right": 248, "top": 6570.8125 },
+              "scrollHeight": 260,
+              "scrollWidth": 176,
+              "text": "Честный опыт жителя Shelkovo Park"
+            },
+            {
+              "class": "review-meta",
+              "clientHeight": 216,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 7062.8125, "left": 72, "right": 248, "top": 6846.8125 },
+              "scrollHeight": 216,
+              "scrollWidth": 176,
+              "text": "Алексей Дымов\n13 августа"
+            },
+            {
+              "class": "review-card__excerpt",
+              "clientHeight": 921,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 8016.1875, "left": 72, "right": 248, "top": 7094.8125 },
+              "scrollHeight": 921,
+              "scrollWidth": 176,
+              "text": "Я по-прежнему хочу остаться здесь. Но хочу жить не только в красивом доме среди природы, а в том поселке, который нам обещали при продаже."
+            },
+            {
+              "class": "review-card__aspects",
+              "clientHeight": 252,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 8300.1875, "left": 72, "right": 248, "top": 8048.1875 },
+              "scrollHeight": 252,
+              "scrollWidth": 176,
+              "text": "Место и среда\nЗастройщик\nОбслуживание"
+            },
+            {
+              "class": "review-card__aspect-label",
+              "clientHeight": 32,
+              "clientWidth": 160,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 8080.1875, "left": 72, "right": 231.609375, "top": 8048.1875 },
+              "scrollHeight": 32,
+              "scrollWidth": 160,
+              "text": "Место и среда"
+            },
+            {
+              "class": "star-rating",
+              "clientHeight": 28,
+              "clientWidth": 148,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 8116.1875, "left": 72, "right": 220, "top": 8088.1875 },
+              "scrollHeight": 28,
+              "scrollWidth": 148,
+              "text": ""
+            },
+            {
+              "class": "review-card__aspect-label",
+              "clientHeight": 32,
+              "clientWidth": 137,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 8172.1875, "left": 72, "right": 208.5, "top": 8140.1875 },
+              "scrollHeight": 32,
+              "scrollWidth": 137,
+              "text": "Застройщик"
+            },
+            {
+              "class": "star-rating",
+              "clientHeight": 28,
+              "clientWidth": 148,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 8208.1875, "left": 72, "right": 220, "top": 8180.1875 },
+              "scrollHeight": 28,
+              "scrollWidth": 148,
+              "text": ""
+            },
+            {
+              "class": "review-card__aspect-label",
+              "clientHeight": 32,
+              "clientWidth": 167,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 8264.1875, "left": 72, "right": 239.328125, "top": 8232.1875 },
+              "scrollHeight": 32,
+              "scrollWidth": 167,
+              "text": "Обслуживание"
+            },
+            {
+              "class": "star-rating",
+              "clientHeight": 28,
+              "clientWidth": 148,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 8300.1875, "left": 72, "right": 220, "top": 8272.1875 },
+              "scrollHeight": 28,
+              "scrollWidth": 148,
+              "text": ""
+            }
+          ],
+          "order": ["review-card__summary", "review-card__excerpt", "review-card__aspects"],
+          "title": "Честный опыт жителя Shelkovo Park"
+        },
+        {
+          "nodes": [
+            {
+              "class": "ui-entry-title",
+              "clientHeight": 260,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 8673.1875, "left": 72, "right": 248, "top": 8413.1875 },
+              "scrollHeight": 260,
+              "scrollWidth": 176,
+              "text": "Обслуживания нет. От слова совсем"
+            },
+            {
+              "class": "review-meta",
+              "clientHeight": 216,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 8905.1875, "left": 72, "right": 248, "top": 8689.1875 },
+              "scrollHeight": 216,
+              "scrollWidth": 176,
+              "text": "Артём Агафонов\n12 августа"
+            },
+            {
+              "class": "review-card__excerpt",
+              "clientHeight": 1177,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 10114.5, "left": 72, "right": 248, "top": 8937.1875 },
+              "scrollHeight": 1177,
+              "scrollWidth": 176,
+              "text": "От менеджеров было много обещаний по инфраструктуре, так что в светлое будущее очень даже верилось, учитывая развитость других посёлков застройщика. Однако по факту оказалось, что все обещания так ими и остались."
+            },
+            {
+              "class": "review-card__aspects",
+              "clientHeight": 252,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 10398.5, "left": 72, "right": 248, "top": 10146.5 },
+              "scrollHeight": 252,
+              "scrollWidth": 176,
+              "text": "Место и среда\nЗастройщик\nОбслуживание"
+            },
+            {
+              "class": "review-card__aspect-label",
+              "clientHeight": 32,
+              "clientWidth": 160,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 10178.5, "left": 72, "right": 231.609375, "top": 10146.5 },
+              "scrollHeight": 32,
+              "scrollWidth": 160,
+              "text": "Место и среда"
+            },
+            {
+              "class": "star-rating",
+              "clientHeight": 28,
+              "clientWidth": 148,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 10214.5, "left": 72, "right": 220, "top": 10186.5 },
+              "scrollHeight": 28,
+              "scrollWidth": 148,
+              "text": ""
+            },
+            {
+              "class": "review-card__aspect-label",
+              "clientHeight": 32,
+              "clientWidth": 137,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 10270.5, "left": 72, "right": 208.5, "top": 10238.5 },
+              "scrollHeight": 32,
+              "scrollWidth": 137,
+              "text": "Застройщик"
+            },
+            {
+              "class": "star-rating",
+              "clientHeight": 28,
+              "clientWidth": 148,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 10306.5, "left": 72, "right": 220, "top": 10278.5 },
+              "scrollHeight": 28,
+              "scrollWidth": 148,
+              "text": ""
+            },
+            {
+              "class": "review-card__aspect-label",
+              "clientHeight": 32,
+              "clientWidth": 167,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 10362.5, "left": 72, "right": 239.328125, "top": 10330.5 },
+              "scrollHeight": 32,
+              "scrollWidth": 167,
+              "text": "Обслуживание"
+            },
+            {
+              "class": "star-rating",
+              "clientHeight": 28,
+              "clientWidth": 148,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 10398.5, "left": 72, "right": 220, "top": 10370.5 },
+              "scrollHeight": 28,
+              "scrollWidth": 148,
+              "text": ""
+            }
+          ],
+          "order": ["review-card__summary", "review-card__excerpt", "review-card__aspects"],
+          "title": "Обслуживания нет. От слова совсем"
+        },
+        {
+          "nodes": [
+            {
+              "class": "ui-entry-title",
+              "clientHeight": 468,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 10979.5, "left": 72, "right": 248, "top": 10511.5 },
+              "scrollHeight": 468,
+              "scrollWidth": 176,
+              "text": "Виды всё пересилили. А потом начались сюрпризы"
+            },
+            {
+              "class": "review-meta",
+              "clientHeight": 216,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 11211.5, "left": 72, "right": 248, "top": 10995.5 },
+              "scrollHeight": 216,
+              "scrollWidth": 176,
+              "text": "Екатерина Илинич\n11 августа"
+            },
+            {
+              "class": "review-card__excerpt",
+              "clientHeight": 665,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 11908.9375, "left": 72, "right": 248, "top": 11243.5 },
+              "scrollHeight": 665,
+              "scrollWidth": 176,
+              "text": "За сезон — только лежачие полицейские и пара зеркал на дорогах. Согласитесь, это сложно назвать инфраструктурой!"
+            },
+            {
+              "class": "review-card__aspects",
+              "clientHeight": 252,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 12192.9375, "left": 72, "right": 248, "top": 11940.9375 },
+              "scrollHeight": 252,
+              "scrollWidth": 176,
+              "text": "Место и среда\nЗастройщик\nОбслуживание"
+            },
+            {
+              "class": "review-card__aspect-label",
+              "clientHeight": 32,
+              "clientWidth": 160,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 11972.9375, "left": 72, "right": 231.609375, "top": 11940.9375 },
+              "scrollHeight": 32,
+              "scrollWidth": 160,
+              "text": "Место и среда"
+            },
+            {
+              "class": "star-rating",
+              "clientHeight": 28,
+              "clientWidth": 148,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 12008.9375, "left": 72, "right": 220, "top": 11980.9375 },
+              "scrollHeight": 28,
+              "scrollWidth": 148,
+              "text": ""
+            },
+            {
+              "class": "review-card__aspect-label",
+              "clientHeight": 32,
+              "clientWidth": 137,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 12064.9375, "left": 72, "right": 208.5, "top": 12032.9375 },
+              "scrollHeight": 32,
+              "scrollWidth": 137,
+              "text": "Застройщик"
+            },
+            {
+              "class": "star-rating",
+              "clientHeight": 28,
+              "clientWidth": 148,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 12100.9375, "left": 72, "right": 220, "top": 12072.9375 },
+              "scrollHeight": 28,
+              "scrollWidth": 148,
+              "text": ""
+            },
+            {
+              "class": "review-card__aspect-label",
+              "clientHeight": 32,
+              "clientWidth": 167,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 12156.9375, "left": 72, "right": 239.328125, "top": 12124.9375 },
+              "scrollHeight": 32,
+              "scrollWidth": 167,
+              "text": "Обслуживание"
+            },
+            {
+              "class": "star-rating",
+              "clientHeight": 28,
+              "clientWidth": 148,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 12192.9375, "left": 72, "right": 220, "top": 12164.9375 },
+              "scrollHeight": 28,
+              "scrollWidth": 148,
+              "text": ""
+            }
+          ],
+          "order": ["review-card__summary", "review-card__excerpt", "review-card__aspects"],
+          "title": "Виды всё пересилили. А потом начались сюрпризы"
+        },
+        {
+          "nodes": [
+            {
+              "class": "ui-entry-title",
+              "clientHeight": 520,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 12825.9375, "left": 72, "right": 248, "top": 12305.9375 },
+              "scrollHeight": 520,
+              "scrollWidth": 176,
+              "text": "Почему я не рекомендую покупать участок в Шелково"
+            },
+            {
+              "class": "review-meta",
+              "clientHeight": 216,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 13057.9375, "left": 72, "right": 248, "top": 12841.9375 },
+              "scrollHeight": 216,
+              "scrollWidth": 176,
+              "text": "Игорь Калашников\n10 августа"
+            },
+            {
+              "class": "review-card__excerpt",
+              "clientHeight": 1331,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 14420.8125, "left": 72, "right": 248, "top": 13089.9375 },
+              "scrollHeight": 1331,
+              "scrollWidth": 176,
+              "text": "По моему опыту, ни одну из заказанных у них работ не выполнили без нареканий. Высокая цена сама по себе нифига не гарантирует качество: ОК не контролирует результат и не согласовывает между собой связанные работы."
+            },
+            {
+              "class": "review-card__aspects",
+              "clientHeight": 252,
+              "clientWidth": 176,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 14704.8125, "left": 72, "right": 248, "top": 14452.8125 },
+              "scrollHeight": 252,
+              "scrollWidth": 176,
+              "text": "Место и среда\nЗастройщик\nОбслуживание"
+            },
+            {
+              "class": "review-card__aspect-label",
+              "clientHeight": 32,
+              "clientWidth": 160,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 14484.8125, "left": 72, "right": 231.609375, "top": 14452.8125 },
+              "scrollHeight": 32,
+              "scrollWidth": 160,
+              "text": "Место и среда"
+            },
+            {
+              "class": "star-rating",
+              "clientHeight": 28,
+              "clientWidth": 148,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 14520.8125, "left": 72, "right": 220, "top": 14492.8125 },
+              "scrollHeight": 28,
+              "scrollWidth": 148,
+              "text": ""
+            },
+            {
+              "class": "review-card__aspect-label",
+              "clientHeight": 32,
+              "clientWidth": 137,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 14576.8125, "left": 72, "right": 208.5, "top": 14544.8125 },
+              "scrollHeight": 32,
+              "scrollWidth": 137,
+              "text": "Застройщик"
+            },
+            {
+              "class": "star-rating",
+              "clientHeight": 28,
+              "clientWidth": 148,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 14612.8125, "left": 72, "right": 220, "top": 14584.8125 },
+              "scrollHeight": 28,
+              "scrollWidth": 148,
+              "text": ""
+            },
+            {
+              "class": "review-card__aspect-label",
+              "clientHeight": 32,
+              "clientWidth": 167,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 14668.8125, "left": 72, "right": 239.328125, "top": 14636.8125 },
+              "scrollHeight": 32,
+              "scrollWidth": 167,
+              "text": "Обслуживание"
+            },
+            {
+              "class": "star-rating",
+              "clientHeight": 28,
+              "clientWidth": 148,
+              "lineClamp": "none",
+              "overflow": "visible",
+              "rect": { "bottom": 14704.8125, "left": 72, "right": 220, "top": 14676.8125 },
+              "scrollHeight": 28,
+              "scrollWidth": 148,
+              "text": ""
+            }
+          ],
+          "order": ["review-card__summary", "review-card__excerpt", "review-card__aspects"],
+          "title": "Почему я не рекомендую покупать участок в Шелково"
+        }
+      ],
+      "viewport": 320
+    }
+  },
+  "error": null
+}

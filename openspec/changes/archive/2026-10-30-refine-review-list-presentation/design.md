@@ -2,7 +2,7 @@
 
 ## Context
 
-Причина и согласованный объём описаны в [proposal](/openspec/changes/refine-review-list-presentation/proposal.md); визуальный выбор Г и снимки находятся в [comparison](/openspec/changes/refine-review-list-presentation/comparison.md).
+Причина и согласованный объём описаны в [proposal](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/proposal.md); визуальный выбор Г и снимки находятся в [comparison](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/comparison.md).
 
 Сейчас [ReviewCard](/apps/www/src/components/reviews/ReviewCard.astro) показывает заголовок и `ReviewMeta`, а на широком экране выделяет оценкам половину строки. [RawReviewSchema](/apps/www/src/lib/reviews/raw-schema.ts) и [Review](/apps/www/src/lib/reviews/types.ts) не содержат поля фрагмента. [Markdown-индекс](/apps/www/src/lib/reviews/markdown.ts) перечисляет ссылки, даты, авторов и часть посёлка. `StarRating` используется карточкой и `ReviewAspectList`, `ReviewMeta` также входит в шапку отдельного отзыва.
 
@@ -36,7 +36,7 @@
 
 Добавить plain-text `excerpt` в raw-схему, readonly-домен и явный mapper. Поле задаёт один непрерывный фрагмент основного body. Оно необязательно: отсутствие оставляет обычную карточку без пустого абзаца. Внутри поля не вводятся Markdown-разметка, отдельный mention pipeline или искусственные кавычки.
 
-Редактор выбирает законченную мысль и сохраняет существенные оговорки. В ходе примерки независимая вычитка потребовала вернуть временной ориентир в один фрагмент и рамку личного опыта в другой. Эти уточнения уже входят в [quotes.json](/openspec/changes/refine-review-list-presentation/preview/quotes.json). Семь фрагментов переносятся из него в frontmatter существующих отзывов; body, аспекты, оценки и авторы не редактируются.
+Редактор выбирает законченную мысль и сохраняет существенные оговорки. В ходе примерки независимая вычитка потребовала вернуть временной ориентир в один фрагмент и рамку личного опыта в другой. Эти уточнения уже входят в [quotes.json](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/preview/quotes.json). Семь фрагментов переносятся из него в frontmatter существующих отзывов; body, аспекты, оценки и авторы не редактируются.
 
 Отклонённые варианты:
 

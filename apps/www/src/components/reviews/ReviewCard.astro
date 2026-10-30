@@ -1,5 +1,6 @@
 ---
 import StarRating from '@shelkovo/ui/StarRating.astro';
+import { formatText } from '@shelkovo/typography';
 
 import type { Review, ReviewAspect } from '@/lib/reviews/types';
 import {
@@ -22,12 +23,7 @@ const ratedAspects = sortReviewAspects(review.aspects).filter(
 ---
 
 <article class="ui-shell review-card">
-  <div
-    class:list={[
-      'review-card__layout',
-      ratedAspects.length > 0 && 'review-card__layout--rated',
-    ]}
-  >
+  <div class="review-card__layout">
     <div class="review-card__summary">
       <h3 class="ui-entry-title">
         <a href={review.url} class="ui-title-link">
@@ -35,9 +31,15 @@ const ratedAspects = sortReviewAspects(review.aspects).filter(
         </a>
       </h3>
       <div class="review-card__meta">
-        <ReviewMeta review={review} />
+        <ReviewMeta review={review} authorFirst />
       </div>
     </div>
+
+    {review.excerpt && (
+      <blockquote class="review-card__excerpt" cite={review.url}>
+        {formatText(review.excerpt)}
+      </blockquote>
+    )}
 
     {ratedAspects.length > 0 && (
       <ul class="review-card__aspects">
@@ -64,8 +66,11 @@ const ratedAspects = sortReviewAspects(review.aspects).filter(
 
 <style>
   .review-card {
+    container-type: inline-size;
+    min-width: 0;
     height: 100%;
     padding: 1.25rem;
+    overflow-wrap: anywhere;
   }
 
   .review-card__layout {
@@ -74,65 +79,77 @@ const ratedAspects = sortReviewAspects(review.aspects).filter(
   }
 
   .review-card__summary > * + * {
-    margin-block-start: 0.75rem;
+    margin-block-start: 0.5rem;
+  }
+
+  .review-card__excerpt {
+    max-width: 76ch;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-text);
+    font-size: 1rem;
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1.6;
   }
 
   .review-card__aspects {
     display: grid;
-    column-gap: 1.5rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: 28rem;
+    column-gap: 0.75rem;
     row-gap: 0.75rem;
+    --star-rating-size: 0.875rem;
+    --star-rating-gap: 0.0625rem;
+    --star-rating-fill: oklch(58% 0.065 84);
   }
 
   .review-card__aspect {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    column-gap: 0.75rem;
+    min-width: 0;
   }
 
   .review-card__aspect-label {
     display: block;
-    grid-column: 2;
-    grid-row: 1;
     color: var(--color-text-muted);
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 400;
     line-height: 1rem;
   }
 
   .review-card__rating {
-    display: contents;
+    display: flex;
+    margin-block-start: 0.25rem;
   }
 
   @media (min-width: 40rem) {
     .review-card__aspects {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 1.5rem;
+    }
+  }
+
+  @container (max-width: 18rem) {
+    .review-card__aspects {
+      grid-template-columns: minmax(0, 1fr);
     }
 
     .review-card__aspect {
-      display: block;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.25rem 0.75rem;
     }
 
     .review-card__rating {
-      display: block;
-      margin-block-start: 0.25rem;
+      margin-block-start: 0;
     }
   }
 
   @media (min-width: 48rem) {
     .review-card {
       padding: 1.5rem;
-    }
-  }
-
-  @media (min-width: 80rem) {
-    .review-card__layout {
-      align-items: center;
-      gap: 2rem;
-    }
-
-    .review-card__layout--rated {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 </style>

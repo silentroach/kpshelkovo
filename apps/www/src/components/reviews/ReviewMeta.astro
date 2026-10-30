@@ -8,17 +8,25 @@ import { formatReviewAuthor, formatReviewDate } from '@/lib/reviews/view';
 interface Props {
   readonly review: Pick<Review, 'author' | 'area' | 'publishedIso'>;
   readonly showVerified?: boolean;
+  /** Author precedes the date in list cards; detail headers keep date first. */
+  readonly authorFirst?: boolean;
   readonly className?: string;
 }
 
-const { review, showVerified = false, className } = Astro.props;
+const {
+  review,
+  showVerified = false,
+  authorFirst = false,
+  className,
+} = Astro.props;
 ---
 
 <div class:list={['review-meta', className]}>
+  {authorFirst && <span>{formatReviewAuthor(review)}</span>}
   <time datetime={review.publishedIso} class="review-meta-date">
     {formatReviewDate(review)}
   </time>
-  <span>{formatReviewAuthor(review)}</span>
+  {!authorFirst && <span>{formatReviewAuthor(review)}</span>}
   <ShelkovoAreaIcon area={review.area} />
   {showVerified && (
     <span class="review-meta-verified">

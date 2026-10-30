@@ -6,7 +6,7 @@
 - `LinkWithIcon.astro`: `--color-primary`, `--color-primary-hover`, `--color-telegram`;
 - `NotFoundView.astro`: `--font-body`, `--font-heading`; без этих ролей использует системные generic fallback `system-ui` и `serif`;
 - `SiteFooter.astro`: `--color-border`, `--color-primary-hover`, `--color-text`, `--color-text-muted`, `--font-body`, `--page-max`, `--page-padding`;
-- `StarRating.astro`: `--color-border-strong`, `--color-star`.
+- `StarRating.astro`: `--color-border-strong`, `--color-star`. Локальные opt-in свойства: `--star-rating-size` (ширина и высота звезды, по умолчанию `1.25rem`), `--star-rating-gap` (промежуток, `0.125rem`), `--star-rating-fill` (цвет заполненных звёзд, `var(--color-star)`). Пустые звёзды сохраняют `--color-border-strong`; доступное имя задаёт обязательный `label`.
 
 `Breadcrumbs.astro` сохраняет один SSR-список и полную microdata. До `64rem` показывает только родителей между главной и текущей страницей; пустой путь скрывает вместе с `nav`. До `40rem` родители размещаются вертикально, от `40rem` до `64rem` — горизонтально с естественным переносом, от `64rem` видна полная цепочка. Стабильный класс корневого элемента — `breadcrumbs`, пустого сокращённого пути — `breadcrumbs--desktop-only`. Хост отвечает за мобильный фон, полноширинную геометрию и отсутствие пустых внешних обёрток до `64rem`; `--color-breadcrumb-surface` принадлежит оформлению хоста и не читается компонентом. Мобильные ссылки используют `--color-text-muted`, при наведении и видимом фокусе — `--color-primary`; средний режим сохраняет цвета и оформление горизонтального вида, включая светлые ссылки над обложкой новости.
 

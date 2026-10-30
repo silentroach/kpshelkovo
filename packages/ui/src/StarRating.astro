@@ -20,28 +20,26 @@ const stars = Array.from({ length: STAR_COUNT }, (_, index) => index < rating);
 ---
 
 <span class:list={['star-rating', className]} role="img" aria-label={label}>
-  {
-    stars.map((filled) => (
-      <StarIcon class={filled ? 'star-rating__star--filled' : undefined} />
-    ))
-  }
+  {stars.map((filled) => (
+    <StarIcon class={filled ? 'star-rating__star--filled' : undefined} />
+  ))}
 </span>
 
 <style>
   .star-rating {
     display: inline-flex;
     align-items: center;
-    gap: 0.125rem;
+    gap: var(--star-rating-gap, 0.125rem);
   }
 
   .star-rating > :global(svg) {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: var(--star-rating-size, 1.25rem);
+    height: var(--star-rating-size, 1.25rem);
     color: var(--color-border-strong);
   }
 
   .star-rating > :global(.star-rating__star--filled) {
-    color: var(--color-star);
+    color: var(--star-rating-fill, var(--color-star));
     fill: currentColor;
   }
 </style>

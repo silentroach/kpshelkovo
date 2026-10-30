@@ -1,3 +1,4 @@
+import { parseMarkdownFragment } from '@shelkovo/markdown';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Review } from '../types';
@@ -42,6 +43,56 @@ const review = {
 } satisfies Review;
 
 describe('reviews markdown companions', () => {
+  it('keeps each selected quote with its attribution and full Markdown link', () => {
+    const withExcerpt: Review = { ...review, excerpt: 'Цена < 5, условия *прежние*.' };
+    const withoutExcerpt: Review = {
+      ...review,
+      id: '2026-06-25-anonymous',
+      title: 'Другой отзыв',
+      author: undefined,
+      markdownUrl: '/reviews/2026-06-25-anonymous/index.md',
+      seo: { description: 'Do not use this SEO fallback.' }
+    };
+    const markdown = buildReviewsHomeMarkdown({
+      reviews: [withExcerpt, withoutExcerpt],
+      byId: new Map()
+    });
+    const list = parseMarkdownFragment(markdown).find((node) => node.type === 'list');
+    const quotedItem = list?.children[0];
+    const plainItem = list?.children[1];
+
+    expect(quotedItem?.children).toMatchObject([
+      {
+        type: 'paragraph',
+        children: [
+          { type: 'link', url: `https://example.com${review.markdownUrl}` },
+          { type: 'text', value: ' — 25 июня; Алексей; Шелково Форест.' }
+        ]
+      },
+      {
+        type: 'blockquote',
+        children: [{ type: 'paragraph', children: [{ type: 'text', value: withExcerpt.excerpt }] }]
+      }
+    ]);
+    expect(plainItem?.children).toMatchObject([
+      {
+        type: 'paragraph',
+        children: [
+          { type: 'link', url: `https://example.com${withoutExcerpt.markdownUrl}` },
+          { type: 'text', value: ' — 25 июня; Анонимный собственник; Шелково Форест.' }
+        ]
+      }
+    ]);
+    expect(markdown).not.toContain(withoutExcerpt.body);
+    expect(markdown).not.toContain(withoutExcerpt.seo?.description);
+  });
+
+  it('does not replace or duplicate the full Markdown body with the list excerpt', () => {
+    expect(buildReviewMarkdown({ ...review, excerpt: 'текст отзыва.' })).toBe(
+      buildReviewMarkdown(review)
+    );
+  });
+
   it('renders empty launch home without internal paths', () => {
     const markdown = buildReviewsHomeMarkdown({ reviews: [], byId: new Map() });
 

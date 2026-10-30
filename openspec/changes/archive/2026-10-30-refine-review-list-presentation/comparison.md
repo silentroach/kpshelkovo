@@ -24,18 +24,18 @@
 
 ## Сравнение
 
-[Галерея выбранного варианта](/openspec/changes/refine-review-list-presentation/preview/index.html) позволяет выбрать всю страницу либо отдельную запись и ширину 1440, 390 или 320 px. Слева исходный сайт, справа Г. [Запуск галереи](/openspec/changes/refine-review-list-presentation/preview/README.md).
+[Галерея выбранного варианта](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/preview/index.html) позволяет выбрать всю страницу либо отдельную запись и ширину 1440, 390 или 320 px. Слева исходный сайт, справа Г. [Запуск галереи](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/preview/README.md).
 
-- [Весь список, телефон 390 px](/openspec/changes/refine-review-list-presentation/preview/images/list-390-pair.webp).
-- [Весь список, компьютер 1440 px](/openspec/changes/refine-review-list-presentation/preview/images/list-1440-pair.webp).
-- [Весь список, узкий телефон 320 px](/openspec/changes/refine-review-list-presentation/preview/images/list-320-pair.webp).
+- [Весь список, телефон 390 px](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/preview/images/list-390-pair.webp).
+- [Весь список, компьютер 1440 px](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/preview/images/list-1440-pair.webp).
+- [Весь список, узкий телефон 320 px](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/preview/images/list-320-pair.webp).
 
-![Отзыв с оценками, 390 px: исходный сайт слева, вариант Г справа](/openspec/changes/refine-review-list-presentation/preview/images/2026-08-20-tariff-increase-and-missing-infrastructure-390-pair.webp)
+![Отзыв с оценками, 390 px: исходный сайт слева, вариант Г справа](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/preview/images/2026-08-20-tariff-increase-and-missing-infrastructure-390-pair.webp)
 
 ## Тексты и проверка примерки
 
-- Семь выбранных фрагментов сохранены в [quotes.json](/openspec/changes/refine-review-list-presentation/preview/quotes.json). Это исходные данные примерки для последующего переноса в метаданные отзывов.
+- Семь выбранных фрагментов сохранены в [quotes.json](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/preview/quotes.json). Это исходные данные примерки для последующего переноса в метаданные отзывов.
 - Автоматическая сверка подтвердила дословное вхождение каждого фрагмента в соответствующий исходник после нормализации пробелов. Заголовки, авторы, даты, часть посёлка, ссылки и оценки сохранены.
 - `editorial-reviewer` проверил все семь фрагментов по полным локальным оригиналам. По его замечаниям в фрагмент Кузнецова вернули ориентир на апрель 2026 года, в фрагмент Калашникова добавили рамку личного опыта. Адресный повтор закрыл оба замечания. Далее менялось только оформление, тексты остались прежними. Опубликованные страницы редактор отдельно не сверял; стилистический сканер к защищённым дословным цитатам не применялся.
-- Снимки получены в Chromium через временные DOM/CSS-изменения после загрузки шрифтов. На 1440, 390 и 320 px горизонтального переполнения нет. [Измерения](/openspec/changes/refine-review-list-presentation/preview/checks.json).
-- Галерея содержит статические изображения. Примерка подтверждает визуальный выбор; проверка реальных Astro-компонентов, keyboard focus, увеличенного текста, неполного набора оценок и доступных имён запланирована в [tasks.md](/openspec/changes/refine-review-list-presentation/tasks.md).
+- Снимки получены в Chromium через временные DOM/CSS-изменения после загрузки шрифтов. На 1440, 390 и 320 px горизонтального переполнения нет. [Измерения](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/preview/checks.json).
+- Галерея содержит статические изображения. Примерка подтверждает визуальный выбор; проверка реальных Astro-компонентов, keyboard focus, увеличенного текста, неполного набора оценок и доступных имён запланирована в [tasks.md](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/tasks.md).

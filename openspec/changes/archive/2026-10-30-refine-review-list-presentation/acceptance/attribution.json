@@ -1,0 +1,71 @@
+{
+  "success": true,
+  "data": {
+    "lifecycle": {
+      "effectiveLaunch": {
+        "browserLaunched": true,
+        "engine": "chrome",
+        "launchHash": 11677035664275010974
+      },
+      "launched": false,
+      "relaunchedBrowser": false,
+      "restartedBackground": false,
+      "restoreStatus": "not_configured",
+      "reused": true,
+      "saveStatus": "not_attempted"
+    },
+    "origin": "http://127.0.0.1:4361/reviews/",
+    "result": [
+      {
+        "author": "Ульяна Тарасова",
+        "cite": "/reviews/2026-08-22-promised-infrastructure-remains-in-booklets/",
+        "href": "/reviews/2026-08-22-promised-infrastructure-remains-in-booklets/",
+        "quote": "Настоятельно рекомендую перед покупкой участка: ищите в популярных мессенджерах чаты посёлков, там в полной мере можно узнать, как живётся в посёлках Земли МО.",
+        "title": "Обещанная инфраструктура осталась в буклетах"
+      },
+      {
+        "author": "Алексей Морев",
+        "cite": "/reviews/2026-08-20-tariff-increase-and-missing-infrastructure/",
+        "href": "/reviews/2026-08-20-tariff-increase-and-missing-infrastructure/",
+        "quote": "Из плюсов — очень добрые и активные люди, которые живут в посёлке и добиваются от ОК Комфорт, чтобы она хоть как-то работала.",
+        "title": "Обман покупателей со стороны управляющей компании"
+      },
+      {
+        "author": "Алексей Кузнецов",
+        "cite": "/reviews/2026-08-20-two-years-of-unfulfilled-promises/",
+        "href": "/reviews/2026-08-20-two-years-of-unfulfilled-promises/",
+        "quote": "К нашему участку дорогу пока не заасфальтировали. Мы покупали участок рассчитывая на то, что все это будет построено, но пока в апреле 2026 года только обещания в устном и письменном виде.",
+        "title": "Два года обещаний без результата"
+      },
+      {
+        "author": "Алексей Дымов",
+        "cite": "/reviews/2026-08-13-shelkovo-eco-club-otzyv-zhitelya-shelkovo-park/",
+        "href": "/reviews/2026-08-13-shelkovo-eco-club-otzyv-zhitelya-shelkovo-park/",
+        "quote": "Я по-прежнему хочу остаться здесь. Но хочу жить не только в красивом доме среди природы, а в том поселке, который нам обещали при продаже.",
+        "title": "Честный опыт жителя Shelkovo Park"
+      },
+      {
+        "author": "Артём Агафонов",
+        "cite": "/reviews/2026-08-12-maintenance-does-not-exist/",
+        "href": "/reviews/2026-08-12-maintenance-does-not-exist/",
+        "quote": "От менеджеров было много обещаний по инфраструктуре, так что в светлое будущее очень даже верилось, учитывая развитость других посёлков застройщика. Однако по факту оказалось, что все обещания так ими и остались.",
+        "title": "Обслуживания нет. От слова совсем"
+      },
+      {
+        "author": "Екатерина Илинич",
+        "cite": "/reviews/2026-08-11-think-before-buying/",
+        "href": "/reviews/2026-08-11-think-before-buying/",
+        "quote": "За сезон — только лежачие полицейские и пара зеркал на дорогах. Согласитесь, это сложно назвать инфраструктурой!",
+        "title": "Виды всё пересилили. А потом начались сюрпризы"
+      },
+      {
+        "author": "Игорь Калашников",
+        "cite": "/reviews/2026-08-10-why-i-do-not-recommend-shelkovo/",
+        "href": "/reviews/2026-08-10-why-i-do-not-recommend-shelkovo/",
+        "quote": "По моему опыту, ни одну из заказанных у них работ не выполнили без нареканий. Высокая цена сама по себе нифига не гарантирует качество: ОК не контролирует результат и не согласовывает между собой связанные работы.",
+        "title": "Почему я не рекомендую покупать участок в Шелково"
+      }
+    ]
+  },
+  "error": null
+}

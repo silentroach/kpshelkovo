@@ -3,6 +3,8 @@ published_at: 2026-08-13
 slug: shelkovo-eco-club-otzyv-zhitelya-shelkovo-park
 area: park
 title: Честный опыт жителя Shelkovo Park
+excerpt: >-
+  Я по-прежнему хочу остаться здесь. Но хочу жить не только в красивом доме среди природы, а в том поселке, который нам обещали при продаже.
 author: Алексей Дымов
 seo:
   description: >-

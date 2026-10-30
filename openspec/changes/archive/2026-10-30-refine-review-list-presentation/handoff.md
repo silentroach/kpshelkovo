@@ -1,5 +1,7 @@
 # Передача реализации в следующую сессию
 
+> Историческая передача плана. 30 октября 2026 года владелец разрешил реализацию PR #1195 в этой же ветке. Ветка перебазирована на `origin/master`; актуальное выполнение отражено в `tasks.md`.
+
 ## Разрешения и состояние
 
 - Рабочая ветка: `plan/1060-review-list`.
@@ -11,8 +13,8 @@
 ## С чего продолжить
 
 1. Найти PR ветки `plan/1060-review-list`, прочитать обсуждение и фактическое состояние рабочей копии. Получить явную команду владельца начать реализацию; публикация плана сама по себе её не разрешает.
-2. Прочитать [proposal](/openspec/changes/refine-review-list-presentation/proposal.md), [design](/openspec/changes/refine-review-list-presentation/design.md), [delta](/openspec/changes/refine-review-list-presentation/specs/owner-reviews/spec.md) и [tasks](/openspec/changes/refine-review-list-presentation/tasks.md).
-3. Использовать [сохранённую примерку Г](/openspec/changes/refine-review-list-presentation/comparison.md) как визуальный ориентир. [quotes.json](/openspec/changes/refine-review-list-presentation/preview/quotes.json) содержит уже вычитанные дословные фрагменты; после переноса production-источником становится frontmatter.
+2. Прочитать [proposal](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/proposal.md), [design](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/design.md), [delta](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/specs/owner-reviews/spec.md) и [tasks](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/tasks.md).
+3. Использовать [сохранённую примерку Г](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/comparison.md) как визуальный ориентир. [quotes.json](/openspec/changes/archive/2026-10-30-refine-review-list-presentation/preview/quotes.json) содержит уже вычитанные дословные фрагменты; после переноса production-источником становится frontmatter.
 4. Продолжить штатным apply workflow в той же ветке. Существующий draft PR пополняется кодом, приёмкой, синхронизированными specs и архивом; второй PR для реализации не нужен.
 
 Текущий статус:

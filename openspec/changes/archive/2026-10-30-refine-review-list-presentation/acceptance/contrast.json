@@ -1,0 +1,26 @@
+{
+  "success": true,
+  "data": {
+    "lifecycle": {
+      "effectiveLaunch": {
+        "browserLaunched": true,
+        "engine": "chrome",
+        "launchHash": 11677035664275010974
+      },
+      "launched": false,
+      "relaunchedBrowser": false,
+      "restartedBackground": false,
+      "restoreStatus": "not_configured",
+      "reused": true,
+      "saveStatus": "not_attempted"
+    },
+    "origin": "http://127.0.0.1:4361/reviews/",
+    "result": {
+      "background": { "css": "oklch(0.9865 0.0041 121.6)", "rgb": [250, 251, 248] },
+      "label": { "css": "oklch(0.5124 0.0183 154.1)", "rgb": [95, 106, 98] },
+      "ratios": { "label": 5.4285945797337005, "star": 4.144590930372078 },
+      "star": { "css": "oklch(0.58 0.065 84)", "rgb": [141, 119, 77] }
+    }
+  },
+  "error": null
+}

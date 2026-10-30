@@ -3,6 +3,8 @@ published_at: 2026-08-20
 slug: tariff-increase-and-missing-infrastructure
 area: village
 title: Обман покупателей со стороны управляющей компании
+excerpt: >-
+  Из плюсов — очень добрые и активные люди, которые живут в посёлке и добиваются от ОК Комфорт, чтобы она хоть как-то работала.
 author: Алексей Морев
 seo:
   description: >-

@@ -1,3 +1,4 @@
+import { z } from 'astro/zod';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import type { ReviewEntry } from '../load';
@@ -46,6 +47,118 @@ const entry = (input: {
 });
 
 describe('reviews data', () => {
+  it.each([
+    { body: 'До. Точная цитата. После.', excerpt: 'Точная цитата.' },
+    { body: 'До. Точная\n\nцитата. После.', excerpt: 'Точная  \tцитата.' },
+    { body: 'До. Точная\u00a0цитата. После.', excerpt: 'Точная\nцитата.' },
+    { body: 'До. Точная цитата. После.', excerpt: 'Точная\u00a0цитата.' },
+    {
+      body: 'До. [Точная](/kb/) **цитата**. После.',
+      excerpt: 'Точная цитата.'
+    }
+  ])('maps a verbatim readable excerpt: $body', ({ body, excerpt }) => {
+    const data = buildReviewsDataset([
+      entry({
+        id: '2026-06-25-with-excerpt',
+        body,
+        data: {
+          published_at: '2026-06-25',
+          slug: 'with-excerpt',
+          area: 'forest',
+          excerpt
+        }
+      })
+    ]);
+
+    expect(data.reviews[0]?.excerpt).toBe(excerpt);
+  });
+
+  it.each([undefined, ' \n\u00a0 '])('does not choose a fallback excerpt for %j', (excerpt) => {
+    const data = buildReviewsDataset([
+      entry({
+        id: '2026-06-25-no-excerpt',
+        data: {
+          published_at: '2026-06-25',
+          slug: 'no-excerpt',
+          area: 'forest',
+          seo: { description: 'SEO description is not a quote.' },
+          excerpt
+        }
+      })
+    ]);
+
+    expect(data.reviews[0]?.excerpt).toBeUndefined();
+  });
+
+  it.each([
+    'Изменённая цитата.',
+    'точная цитата.',
+    'Точная цитата!',
+    'Точная … цитата.',
+    '**Точная** цитата.',
+    'Только в аспекте.'
+  ])('rejects an excerpt not present verbatim in the main body: %s', (excerpt) => {
+    const load = () =>
+      buildReviewsDataset([
+        entry({
+          id: '2026-06-25-invalid-excerpt',
+          body: 'Точная цитата.',
+          data: {
+            published_at: '2026-06-25',
+            slug: 'invalid-excerpt',
+            area: 'forest',
+            excerpt,
+            aspects: [{ type: 'place', body: 'Только в аспекте.' }]
+          }
+        })
+      ]);
+
+    expect(load).toThrow(z.ZodError);
+    expect(load).toThrow(
+      expect.objectContaining({
+        issues: [
+          {
+            code: 'custom',
+            path: ['excerpt'],
+            message:
+              'review "2026-06-25-invalid-excerpt" excerpt must occur in the readable main body'
+          }
+        ]
+      })
+    );
+  });
+
+  it('matches expanded mentions without adding mention refs or ratings', () => {
+    const mentionRegistry = createSiteMentionRegistry([
+      createPersonMentionTarget('kschemelinin', 'Кирилл Щемелинин')
+    ]);
+    const source = entry({
+      id: '2026-06-25-mention-excerpt',
+      body: 'Рядом @kschemelinin. Основной текст.',
+      data: {
+        published_at: '2026-06-25',
+        slug: 'mention-excerpt',
+        area: 'forest',
+        aspects: [{ type: 'management', rating: 2 }]
+      }
+    });
+    const baseline = buildReviewsDataset([source], { mentionRegistry }).reviews[0]!;
+    const selected = buildReviewsDataset(
+      [{ ...source, data: { ...source.data, excerpt: 'Рядом Кирилл Щемелинин.' } }],
+      { mentionRegistry }
+    ).reviews[0]!;
+
+    expect(selected.excerpt).toBe('Рядом Кирилл Щемелинин.');
+    expect({ body: selected.body, mentions: selected.mentions, aspects: selected.aspects }).toEqual(
+      {
+        body: baseline.body,
+        mentions: baseline.mentions,
+        aspects: baseline.aspects
+      }
+    );
+    expect(createReviewMentionRefs(selected)).toEqual(createReviewMentionRefs(baseline));
+  });
+
   it('accepts an empty launch dataset', () => {
     const data = buildReviewsDataset([]);
 
