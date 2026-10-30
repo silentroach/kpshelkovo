@@ -83,8 +83,11 @@
   .news-article-layout .ui-prose > .ui-editorial-map,
   .kb-body .ui-prose > .ui-editorial-map {
     width: auto;
-    margin-inline: calc(-1 * (var(--page-padding) + 1.25rem));
     border-radius: 0;
+  }
+
+  .news-article-layout .ui-prose > .ui-editorial-map {
+    margin-inline: calc(-1 * (var(--page-padding) + 1.25rem));
   }
 
   .news-article-layout .ui-prose > .ui-editorial-map > editorial-map,
