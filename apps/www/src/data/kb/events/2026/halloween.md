@@ -29,7 +29,7 @@ sources:
 }
 ```
 
-[Маршрут красной группы в Яндекс Навигаторе](yandexnavi://build_route_on_map?lat_from=55.069083&lon_from=37.738282&lat_to=55.062483&lon_to=37.708384&lat_via_0=55.06729903&lon_via_0=37.74148255&lat_via_1=55.065544&lon_via_1=37.74327&lat_via_2=55.06321486&lon_via_2=37.74221172&lat_via_3=55.06109713&lon_via_3=37.74306179&lat_via_4=55.06227097&lon_via_4=37.73912013&lat_via_5=55.06651877&lon_via_5=37.73273254&lat_via_6=55.06129976&lon_via_6=37.719183)
+[Маршрут в Яндекс Навигаторе](yandexnavi://build_route_on_map?lat_from=55.069083&lon_from=37.738282&lat_to=55.062483&lon_to=37.708384&lat_via_0=55.06729903&lon_via_0=37.74148255&lat_via_1=55.065544&lon_via_1=37.74327&lat_via_2=55.06321486&lon_via_2=37.74221172&lat_via_3=55.06109713&lon_via_3=37.74306179&lat_via_4=55.06227097&lon_via_4=37.73912013&lat_via_5=55.06651877&lon_via_5=37.73273254&lat_via_6=55.06129976&lon_via_6=37.719183)
 
 - Машина [coloristka_me](https://t.me/coloristka_me): 4 ребёнка + 2 от [katerinailinich](https://t.me/katerinailinich); **1 свободное место**.
 - Машина [AstakhovAleksei](https://t.me/AstakhovAleksei): 3 ребёнка; **2 свободных места**.
@@ -55,7 +55,7 @@ sources:
 }
 ```
 
-[Маршрут синей группы в Яндекс Навигаторе](yandexnavi://build_route_on_map?lat_from=55.05705601&lon_from=37.71887506&lat_to=55.062483&lon_to=37.708384&lat_via_0=55.06175133&lon_via_0=37.71725805&lat_via_1=55.06269849&lon_via_1=37.71583349&lat_via_2=55.062789&lon_via_2=37.711875&lat_via_3=55.06334206&lon_via_3=37.70816598)
+[Маршрут в Яндекс Навигаторе](yandexnavi://build_route_on_map?lat_from=55.05705601&lon_from=37.71887506&lat_to=55.062483&lon_to=37.708384&lat_via_0=55.06175133&lon_via_0=37.71725805&lat_via_1=55.06269849&lon_via_1=37.71583349&lat_via_2=55.062789&lon_via_2=37.711875&lat_via_3=55.06334206&lon_via_3=37.70816598)
 
 [G84](/map/?p=SHV-G84), [G36](/map/?p=SHV-G36) и [G38](/map/?p=SHV-G38) посещаем пешком с одной стоянки.
 
