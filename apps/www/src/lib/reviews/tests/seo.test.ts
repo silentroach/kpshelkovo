@@ -41,6 +41,23 @@ const review = {
 } satisfies Review;
 
 describe('reviews schema', () => {
+  it('leaves detail and collection JSON-LD unchanged when a list excerpt is selected', () => {
+    const selected: Review = { ...review, excerpt: 'Второй абзац.' };
+    const description = 'Отзыв Алексея о жизни в Шелково.';
+    const collectionInput = {
+      name: 'Отзывы собственников',
+      description,
+      url: '/reviews/'
+    };
+
+    expect(reviewPageSchema({ review: selected, description })).toEqual(
+      reviewPageSchema({ review, description })
+    );
+    expect(reviewsCollectionPageSchema({ ...collectionInput, items: [selected] })).toEqual(
+      reviewsCollectionPageSchema({ ...collectionInput, items: [review] })
+    );
+  });
+
   it('shortens generated names without shortening JSON-LD dates or URLs', () => {
     const schema = reviewPageSchema({
       review: { ...review, title: undefined },

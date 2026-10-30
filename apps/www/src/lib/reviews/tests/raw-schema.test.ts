@@ -3,6 +3,17 @@ import { describe, expect, it } from 'vitest';
 import { RawReviewSchema } from '../raw-schema';
 
 describe('RawReviewSchema', () => {
+  it('accepts a selected plain-text excerpt without parsing its punctuation as Markdown', () => {
+    const data = RawReviewSchema.parse({
+      published_at: '2026-06-25',
+      slug: 'with-excerpt',
+      area: 'forest',
+      excerpt: '  Цена < 5, условия *прежние*.  '
+    });
+
+    expect(data.excerpt).toBe('Цена < 5, условия *прежние*.');
+  });
+
   it('accepts a minimal review frontmatter', () => {
     expect(
       RawReviewSchema.parse({

@@ -1,0 +1,36 @@
+{
+  "success": true,
+  "data": {
+    "lifecycle": {
+      "effectiveLaunch": {
+        "browserLaunched": true,
+        "engine": "chrome",
+        "launchHash": 11677035664275010974
+      },
+      "launched": false,
+      "relaunchedBrowser": false,
+      "restartedBackground": false,
+      "restoreStatus": "not_configured",
+      "reused": true,
+      "saveStatus": "not_attempted"
+    },
+    "origin": "http://127.0.0.1:4361/reviews/",
+    "result": {
+      "boxShadow": "none",
+      "focusVisible": true,
+      "outerHTML": "<a href=\"/reviews/2026-08-20-tariff-increase-and-missing-infrastructure/\" class=\"ui-title-link\" data-astro-cid-cobunvtb=\"\">Обман покупателей со стороны управляющей компании</a>",
+      "outline": "oklch(0.3846 0.065 157.9) solid 2px",
+      "rect": {
+        "bottom": 653.8125,
+        "height": 79,
+        "left": 36,
+        "right": 287.046875,
+        "top": 574.8125,
+        "width": 251.046875,
+        "x": 36,
+        "y": 574.8125
+      }
+    }
+  },
+  "error": null
+}

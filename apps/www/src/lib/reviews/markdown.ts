@@ -34,7 +34,15 @@ const reviewLine = (review: Review): MarkdownListItem =>
       md.text(
         ` — ${formatReviewDate(review)}; ${formatReviewAuthor(review)}; ${formatReviewArea(review.area)}.`
       )
-    ])
+    ]),
+    ...(review.excerpt
+      ? [
+          md.blockquote([md.paragraph(review.excerpt)]) as Extract<
+            MarkdownNode,
+            { type: 'blockquote' }
+          >
+        ]
+      : [])
   ]);
 
 const aspectNodes = (aspect: ReviewAspect): readonly MarkdownNode[] => [

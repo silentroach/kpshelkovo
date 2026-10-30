@@ -1,3 +1,6 @@
+import { extractMarkdownText } from '@shelkovo/markdown';
+import { z } from 'astro/zod';
+
 import {
   preprocessSiteMarkdownContent,
   type PreprocessedSiteMarkdown
@@ -89,11 +92,24 @@ export const mapRawReview = (entry: ReviewEntry, mentionRegistry?: SiteMentionRe
   const mappedAspects =
     entry.data.aspects?.map((aspect, index) => mapAspect(entry, aspect, index, mentionRegistry)) ??
     [];
+  const excerpt = normalizeOptionalText(entry.data.excerpt);
+
+  if (excerpt) {
+    const readableBody = extractMarkdownText(body.markdown);
+    z.object({
+      excerpt: z
+        .string()
+        .refine((value) => readableBody?.includes(value.replace(/\s+/gu, ' ').trim()), {
+          message: `review "${entry.id}" excerpt must occur in the readable main body`
+        })
+    }).parse({ excerpt });
+  }
 
   return {
     id: entry.id,
     slug: entry.data.slug,
     title: normalizeOptionalText(entry.data.title),
+    excerpt,
     seo: entry.data.seo,
     author: normalizeOptionalText(entry.data.author),
     area: entry.data.area,

@@ -1,0 +1,134 @@
+{
+  "success": true,
+  "data": {
+    "lifecycle": {
+      "effectiveLaunch": {
+        "browserLaunched": true,
+        "engine": "chrome",
+        "launchHash": 11677035664275010974
+      },
+      "launched": false,
+      "relaunchedBrowser": false,
+      "restartedBackground": false,
+      "restoreStatus": "not_configured",
+      "reused": true,
+      "saveStatus": "not_attempted"
+    },
+    "origin": "http://127.0.0.1:4361/reviews/",
+    "result": {
+      "offenders": [
+        {
+          "class": "",
+          "cw": 320,
+          "overflow": "visible",
+          "rect": { "left": 0, "right": 320, "width": 320 },
+          "sw": 597,
+          "tag": "HTML",
+          "text": "Markdown-версия этой страницы доступна по адресу https://kpshelkovo.online/revie"
+        },
+        {
+          "class": "ui-root-site site-has-header",
+          "cw": 320,
+          "overflow": "visible",
+          "rect": { "left": 0, "right": 320, "width": 320 },
+          "sw": 597,
+          "tag": "BODY",
+          "text": "Markdown-версия этой страницы доступна по адресу https://kpshelkovo.online/revie"
+        },
+        {
+          "class": "ui-visually-hidden",
+          "cw": 1,
+          "overflow": "hidden",
+          "rect": { "left": -1, "right": 0, "width": 1 },
+          "sw": 1470,
+          "tag": "DIV",
+          "text": "Markdown-версия этой страницы доступна по адресу https://kpshelkovo.online/revie"
+        },
+        {
+          "class": "site-page-shell",
+          "cw": 320,
+          "overflow": "visible",
+          "rect": { "left": 0, "right": 320, "width": 320 },
+          "sw": 597,
+          "tag": "DIV",
+          "text": "Шелково Онлайн\nОтзывы собственников\n\nВы собственник участка или дома в Шелково? "
+        },
+        {
+          "class": "site-page-content",
+          "cw": 320,
+          "overflow": "visible",
+          "rect": { "left": 0, "right": 320, "width": 320 },
+          "sw": 597,
+          "tag": "DIV",
+          "text": "Отзывы собственников\n\nВы собственник участка или дома в Шелково? Оставьте свой о"
+        },
+        {
+          "class": "ui-page reviews-page",
+          "cw": 256,
+          "overflow": "visible",
+          "rect": { "left": 32, "right": 288, "width": 256 },
+          "sw": 565,
+          "tag": "MAIN",
+          "text": "Отзывы собственников\n\nВы собственник участка или дома в Шелково? Оставьте свой о"
+        },
+        {
+          "class": "ui-page-header",
+          "cw": 256,
+          "overflow": "visible",
+          "rect": { "left": 32, "right": 288, "width": 256 },
+          "sw": 565,
+          "tag": "SECTION",
+          "text": "Отзывы собственников\n\nВы собственник участка или дома в Шелково? Оставьте свой о"
+        },
+        {
+          "class": "ui-page-header-stack",
+          "cw": 176,
+          "overflow": "visible",
+          "rect": { "left": 72, "right": 248, "width": 176 },
+          "sw": 525,
+          "tag": "DIV",
+          "text": "Отзывы собственников\n\nВы собственник участка или дома в Шелково? Оставьте свой о"
+        },
+        {
+          "class": "",
+          "cw": 176,
+          "overflow": "visible",
+          "rect": { "left": 72, "right": 248, "width": 176 },
+          "sw": 525,
+          "tag": "DIV",
+          "text": "Отзывы собственников\n\nВы собственник участка или дома в Шелково? Оставьте свой о"
+        },
+        {
+          "class": "ui-page-title",
+          "cw": 176,
+          "overflow": "visible",
+          "rect": { "left": 72, "right": 248, "width": 176 },
+          "sw": 525,
+          "tag": "H1",
+          "text": "Отзывы собственников"
+        },
+        {
+          "class": "ui-copy reviews-intro",
+          "cw": 176,
+          "overflow": "visible",
+          "rect": { "left": 72, "right": 248, "width": 176 },
+          "sw": 203,
+          "tag": "P",
+          "text": "Вы собственник участка или дома в Шелково? Оставьте свой отзыв!"
+        },
+        {
+          "class": "ui-visually-hidden",
+          "cw": 1,
+          "overflow": "hidden",
+          "rect": { "left": 31, "right": 32, "width": 1 },
+          "sw": 254,
+          "tag": "H2",
+          "text": "Список отзывов"
+        }
+      ],
+      "root": 597,
+      "viewport": 320
+    }
+  },
+  "error": null
+}

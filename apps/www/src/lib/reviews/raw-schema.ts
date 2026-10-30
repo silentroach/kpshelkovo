@@ -84,6 +84,7 @@ export const RawReviewSchema = z
     }),
     area: z.enum(AREAS),
     title: text.optional(),
+    excerpt: text.optional(),
     seo: seo.optional(),
     author: text.optional(),
     aspects: z.array(aspect).min(1).optional()

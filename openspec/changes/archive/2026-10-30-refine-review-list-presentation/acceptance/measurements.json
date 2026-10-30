@@ -1,0 +1,246 @@
+{
+  "success": true,
+  "data": {
+    "lifecycle": {
+      "effectiveLaunch": {
+        "browserLaunched": true,
+        "engine": "chrome",
+        "launchHash": 11677035664275010974
+      },
+      "launched": false,
+      "relaunchedBrowser": false,
+      "restartedBackground": false,
+      "restoreStatus": "not_configured",
+      "reused": true,
+      "saveStatus": "not_attempted"
+    },
+    "origin": "http://127.0.0.1:4361/reviews/",
+    "result": {
+      "articles": [
+        {
+          "children": ["review-card__summary", "review-card__excerpt"],
+          "meta": "Ульяна Тарасова\n22 августа",
+          "quote": "Настоятельно рекомендую перед покупкой участка: ищите в популярных мессенджерах чаты посёлков, там в полной мере можно узнать, как живётся в посёлках Земли МО.",
+          "ratings": ["Шелково Форест"],
+          "title": "Обещанная инфраструктура осталась в буклетах"
+        },
+        {
+          "children": ["review-card__summary", "review-card__excerpt", "review-card__aspects"],
+          "meta": "Алексей Морев\n20 августа",
+          "quote": "Из плюсов — очень добрые и активные люди, которые живут в посёлке и добиваются от ОК Комфорт, чтобы она хоть как-то работала.",
+          "ratings": ["Шелково Вилладж", "Оценка 5 из 5", "Оценка 1 из 5", "Оценка 1 из 5"],
+          "title": "Обман покупателей со стороны управляющей компании"
+        },
+        {
+          "children": ["review-card__summary", "review-card__excerpt"],
+          "meta": "Алексей Кузнецов\n20 августа",
+          "quote": "К нашему участку дорогу пока не заасфальтировали. Мы покупали участок рассчитывая на то, что все это будет построено, но пока в апреле 2026 года только обещания в устном и письменном виде.",
+          "ratings": ["Шелково Ривер"],
+          "title": "Два года обещаний без результата"
+        },
+        {
+          "children": ["review-card__summary", "review-card__excerpt", "review-card__aspects"],
+          "meta": "Алексей Дымов\n13 августа",
+          "quote": "Я по-прежнему хочу остаться здесь. Но хочу жить не только в красивом доме среди природы, а в том поселке, который нам обещали при продаже.",
+          "ratings": ["Шелково Парк", "Оценка 5 из 5", "Оценка 1 из 5", "Оценка 2 из 5"],
+          "title": "Честный опыт жителя Shelkovo Park"
+        },
+        {
+          "children": ["review-card__summary", "review-card__excerpt", "review-card__aspects"],
+          "meta": "Артём Агафонов\n12 августа",
+          "quote": "От менеджеров было много обещаний по инфраструктуре, так что в светлое будущее очень даже верилось, учитывая развитость других посёлков застройщика. Однако по факту оказалось, что все обещания так ими и остались.",
+          "ratings": ["Шелково Парк", "Оценка 5 из 5", "Оценка 1 из 5", "Оценка 1 из 5"],
+          "title": "Обслуживания нет. От слова совсем"
+        },
+        {
+          "children": ["review-card__summary", "review-card__excerpt", "review-card__aspects"],
+          "meta": "Екатерина Илинич\n11 августа",
+          "quote": "За сезон — только лежачие полицейские и пара зеркал на дорогах. Согласитесь, это сложно назвать инфраструктурой!",
+          "ratings": ["Шелково Парк", "Оценка 4 из 5", "Оценка 1 из 5", "Оценка 2 из 5"],
+          "title": "Виды всё пересилили. А потом начались сюрпризы"
+        },
+        {
+          "children": ["review-card__summary", "review-card__excerpt", "review-card__aspects"],
+          "meta": "Игорь Калашников\n10 августа",
+          "quote": "По моему опыту, ни одну из заказанных у них работ не выполнили без нареканий. Высокая цена сама по себе нифига не гарантирует качество: ОК не контролирует результат и не согласовывает между собой связанные работы.",
+          "ratings": ["Шелково Ривер", "Оценка 4 из 5", "Оценка 2 из 5", "Оценка 1 из 5"],
+          "title": "Почему я не рекомендую покупать участок в Шелково"
+        }
+      ],
+      "body": {
+        "background": "oklch(0.9865 0.0041 121.6)",
+        "class": "ui-root-site site-has-header",
+        "clientWidth": 390,
+        "color": "oklch(0.2821 0.0101 164.2)",
+        "fill": "rgb(0, 0, 0)",
+        "fontSize": "16px",
+        "gap": "normal",
+        "height": 2574.21875,
+        "overflow": "visible",
+        "scrollWidth": 390,
+        "tag": "BODY",
+        "width": 390
+      },
+      "label": {
+        "background": "rgba(0, 0, 0, 0)",
+        "class": "review-card__aspect-label",
+        "clientWidth": 98,
+        "color": "oklch(0.5124 0.0183 154.1)",
+        "fill": "rgb(0, 0, 0)",
+        "fontSize": "12px",
+        "gap": "normal",
+        "height": 16,
+        "overflow": "visible",
+        "scrollWidth": 98,
+        "tag": "SPAN",
+        "width": 98
+      },
+      "pageWidth": 390,
+      "star": [
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "class": {},
+          "clientWidth": 14,
+          "color": "oklch(0.58 0.065 84)",
+          "fill": "oklch(0.58 0.065 84)",
+          "fontSize": "16px",
+          "gap": "normal",
+          "height": 14,
+          "overflow": "hidden",
+          "scrollWidth": 14,
+          "tag": "svg",
+          "width": 14
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "class": {},
+          "clientWidth": 14,
+          "color": "oklch(0.58 0.065 84)",
+          "fill": "oklch(0.58 0.065 84)",
+          "fontSize": "16px",
+          "gap": "normal",
+          "height": 14,
+          "overflow": "hidden",
+          "scrollWidth": 14,
+          "tag": "svg",
+          "width": 14
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "class": {},
+          "clientWidth": 14,
+          "color": "oklch(0.6272 0.023 140.9)",
+          "fill": "none",
+          "fontSize": "16px",
+          "gap": "normal",
+          "height": 14,
+          "overflow": "hidden",
+          "scrollWidth": 14,
+          "tag": "svg",
+          "width": 14
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "class": {},
+          "clientWidth": 14,
+          "color": "oklch(0.6272 0.023 140.9)",
+          "fill": "none",
+          "fontSize": "16px",
+          "gap": "normal",
+          "height": 14,
+          "overflow": "hidden",
+          "scrollWidth": 14,
+          "tag": "svg",
+          "width": 14
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "class": {},
+          "clientWidth": 14,
+          "color": "oklch(0.6272 0.023 140.9)",
+          "fill": "none",
+          "fontSize": "16px",
+          "gap": "normal",
+          "height": 14,
+          "overflow": "hidden",
+          "scrollWidth": 14,
+          "tag": "svg",
+          "width": 14
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "class": {},
+          "clientWidth": 14,
+          "color": "oklch(0.58 0.065 84)",
+          "fill": "oklch(0.58 0.065 84)",
+          "fontSize": "16px",
+          "gap": "normal",
+          "height": 14,
+          "overflow": "hidden",
+          "scrollWidth": 14,
+          "tag": "svg",
+          "width": 14
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "class": {},
+          "clientWidth": 14,
+          "color": "oklch(0.6272 0.023 140.9)",
+          "fill": "none",
+          "fontSize": "16px",
+          "gap": "normal",
+          "height": 14,
+          "overflow": "hidden",
+          "scrollWidth": 14,
+          "tag": "svg",
+          "width": 14
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "class": {},
+          "clientWidth": 14,
+          "color": "oklch(0.6272 0.023 140.9)",
+          "fill": "none",
+          "fontSize": "16px",
+          "gap": "normal",
+          "height": 14,
+          "overflow": "hidden",
+          "scrollWidth": 14,
+          "tag": "svg",
+          "width": 14
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "class": {},
+          "clientWidth": 14,
+          "color": "oklch(0.6272 0.023 140.9)",
+          "fill": "none",
+          "fontSize": "16px",
+          "gap": "normal",
+          "height": 14,
+          "overflow": "hidden",
+          "scrollWidth": 14,
+          "tag": "svg",
+          "width": 14
+        },
+        {
+          "background": "rgba(0, 0, 0, 0)",
+          "class": {},
+          "clientWidth": 14,
+          "color": "oklch(0.6272 0.023 140.9)",
+          "fill": "none",
+          "fontSize": "16px",
+          "gap": "normal",
+          "height": 14,
+          "overflow": "hidden",
+          "scrollWidth": 14,
+          "tag": "svg",
+          "width": 14
+        }
+      ],
+      "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/147.0.0.0 Safari/537.36",
+      "viewport": [390, 844]
+    }
+  },
+  "error": null
+}
