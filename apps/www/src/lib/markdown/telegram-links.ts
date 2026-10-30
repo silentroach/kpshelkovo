@@ -1,32 +1,14 @@
-import { md, resolveMarkdownResourceReferences } from '@shelkovo/markdown';
+import { resolveMarkdownResourceReferences } from '@shelkovo/markdown';
 import type { MarkdownAstTransform } from '@shelkovo/markdown';
 import { TELEGRAM_ICON_PATH } from '@shelkovo/ui/telegram-icon';
 import { isTelegramUrl } from '@shelkovo/url';
 
-import type { TelegramMarkdownNode } from './telegram-links.types';
+import { decorateMarkdownLink } from './link-icon';
+import type { MarkdownIconNode } from './link-icon.types';
 
 const ICON_CLASS = 'ui-markdown-telegram-icon';
 
-const telegramIcon = () => {
-  const icon = md.text('');
-  icon.data = {
-    hName: 'svg',
-    hProperties: {
-      xmlns: 'http://www.w3.org/2000/svg',
-      viewBox: '0 0 24 24',
-      className: ICON_CLASS,
-      fill: 'currentColor',
-      ariaHidden: 'true',
-      focusable: 'false'
-    },
-    hChildren: [
-      { type: 'element', tagName: 'path', properties: { d: TELEGRAM_ICON_PATH }, children: [] }
-    ]
-  };
-  return icon;
-};
-
-const transformLinks = (nodes: readonly TelegramMarkdownNode[]): void => {
+const transformLinks = (nodes: readonly MarkdownIconNode[]): void => {
   for (const node of nodes) {
     if (node.type === 'link' && isTelegramUrl(node.url)) {
       const first = node.children[0];
@@ -45,17 +27,9 @@ const transformLinks = (nodes: readonly TelegramMarkdownNode[]): void => {
       ) {
         first.value = first.value.slice(1);
       }
-      node.children = [
-        telegramIcon(),
-        {
-          type: 'emphasis',
-          children: node.children,
-          data: {
-            hName: 'span',
-            hProperties: { className: 'ui-markdown-telegram-label' }
-          }
-        }
-      ];
+      decorateMarkdownLink(node, ICON_CLASS, 'ui-markdown-telegram-label', [
+        { d: TELEGRAM_ICON_PATH }
+      ]);
     }
 
     if (node.children) transformLinks(node.children);
