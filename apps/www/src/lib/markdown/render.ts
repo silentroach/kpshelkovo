@@ -6,6 +6,7 @@ import { normalizeContentDiffMarkdown, renderContentDiffBlocks } from './content
 import { transformContentEmphasis } from './content-emphasis';
 import { transformEditorialMaps } from './editorial-maps-html';
 import { renderFileLinks } from './file-links';
+import { transformNavigatorLinks } from './navigator-links';
 import type { PreprocessedSiteMarkdown, RenderSiteMarkdownOptions } from './render.types';
 import { transformTelegramLinks } from './telegram-links';
 
@@ -267,6 +268,7 @@ export const renderMarkdownWithMetadata = (
     transform: (document, reserveId) => {
       transformContentEmphasis(document.children, 'html');
       transformTelegramLinks(document, reserveId);
+      transformNavigatorLinks(document, reserveId);
       if (options?.editorialMaps) {
         transformEditorialMaps(
           options.editorialMapSource ?? options.mentions?.context ?? 'site markdown',

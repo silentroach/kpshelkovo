@@ -227,20 +227,25 @@
     font-weight: 600;
   }
 
-  a:has(> .ui-markdown-telegram-icon) {
+  a:has(> :is(.ui-markdown-telegram-icon, .ui-markdown-navigator-icon)) {
     white-space: nowrap;
   }
 
-  .ui-markdown-telegram-label {
+  .ui-markdown-telegram-label,
+  .ui-markdown-navigator-label {
     white-space: normal;
   }
 
-  .ui-markdown-telegram-icon {
+  .ui-markdown-telegram-icon,
+  .ui-markdown-navigator-icon {
     display: inline-block;
     width: 0.875rem;
     height: 0.875rem;
     margin-inline-end: 0.25rem;
     vertical-align: -1px;
+  }
+
+  .ui-markdown-telegram-icon {
     color: var(--color-telegram);
   }
 
@@ -302,7 +307,11 @@
 
   .ui-prose .ui-markdown-figure > img,
   .ui-prose .ui-markdown-figure > a > img,
-  .ui-prose .ui-markdown-figure > a > .ui-markdown-telegram-label > img {
+  .ui-prose
+    .ui-markdown-figure
+    > a
+    > :is(.ui-markdown-telegram-label, .ui-markdown-navigator-label)
+    > img {
     display: block;
     width: 100%;
   }
