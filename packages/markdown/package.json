@@ -28,7 +28,7 @@
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
-    "satteri": "^0.11.5",
+    "satteri": "^0.10.5",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.2.0",
     "yaml": "^2.9.1",
