@@ -1,7 +1,7 @@
 {
   "part": "shp",
   "page": "https://genplan.zmotech.ru/shelkovo-park/",
-  "capturedAt": "2026-10-29T19:02:58.491Z",
+  "capturedAt": "2026-10-31T19:07:39.158Z",
   "plots": [
     {
       "id": "B1",
@@ -3310,7 +3310,7 @@
     {
       "id": "А28",
       "cadastralReference": "50:33:0010101:2572",
-      "status": "Забронирован",
+      "status": "Продан",
       "location": "луговой",
       "objectprice": 4728900
     },
