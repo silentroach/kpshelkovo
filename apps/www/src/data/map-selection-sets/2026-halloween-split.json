@@ -301,7 +301,7 @@
       "type": "Feature",
       "id": "route-b",
       "properties": {
-        "description": "Группа Б. Вилладж и Форест. 7 домов, остановки 1–5.",
+        "description": "Группа Б. Вилладж и Форест. 6 домов, остановки 1–5.",
         "stroke": "#1d4ed8",
         "stroke-width": 3,
         "stroke-opacity": 1
@@ -480,7 +480,7 @@
         "iconContent": "1",
         "iconCaption": "Старт Б",
         "captionPosition": "right",
-        "description": "Группа Б. Вилладж: G84, G36, G38",
+        "description": "Группа Б. Вилладж: G84, G38",
         "marker-color": "#1d4ed8"
       },
       "geometry": { "type": "Point", "coordinates": [37.71887506, 55.05705601] }

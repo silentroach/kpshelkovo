@@ -10,7 +10,6 @@
     "SHV-E50",
     "SHV-G84",
     "SHV-G38",
-    "SHV-G36",
     "SHF-M71",
     "SHF-N24",
     "SHF-M36",
@@ -351,7 +350,7 @@
       "id": "stop-9",
       "properties": {
         "iconContent": "8",
-        "description": "Вилладж: G84, G36, G38",
+        "description": "Вилладж: G84, G38",
         "marker-color": "#7c3aed"
       },
       "geometry": { "type": "Point", "coordinates": [37.71887506, 55.05705601] }
