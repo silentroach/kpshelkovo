@@ -352,7 +352,8 @@
     padding-left: 1.75rem;
   }
 
-  .ui-prose .task-list-item > input[type='checkbox'] {
+  .ui-prose .task-list-item > input[type='checkbox'],
+  .ui-prose .task-list-item > p > input[type='checkbox'] {
     position: absolute;
     top: 0.35em;
     left: 0;
@@ -364,6 +365,32 @@
 
   .ui-prose li > p {
     margin-block: 0.35rem;
+  }
+
+  .ui-prose .task-list-item > blockquote {
+    margin: 0.125rem 0 0;
+    padding: 0;
+    border: 0;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .ui-prose .task-list-item:has(> blockquote) {
+    margin-block: 0.875rem;
+  }
+
+  .ui-prose .task-list-item:has(> blockquote) > p,
+  .ui-prose .task-list-item > blockquote > p {
+    margin-block: 0;
+  }
+
+  .ui-prose .task-list-item > blockquote a {
+    color: inherit;
+  }
+
+  .ui-prose .task-list-item > blockquote a:is(:hover, :focus-visible) {
+    color: var(--color-primary);
   }
 
   .ui-prose li > :is(ul, ol):first-child {
