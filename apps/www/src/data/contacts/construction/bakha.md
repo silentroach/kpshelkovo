@@ -2,11 +2,15 @@
 title: Баха
 slug: bakha
 category: construction
-updated_at: 2026-10-20
+updated_at: 2026-11-02
 summary: 'Бригада разнорабочих: строительство, отделка и работы на участке'
 contacts:
   phone: '+7 926 983-01-21'
 reviews:
+  - sentiment: positive
+    summary: 'Облицевали фасад мягкой плиткой «Итальянский травертин». Качество, сроки и цена устроили. Дополнительно помогли установить светильники и вытяжку.'
+    published_at: 2026-11-01
+    url: https://t.me/shelkovoecoclub/15262/58645
   - sentiment: positive
     summary: 'Черновое выравнивание участка: после звонка в воскресенье Баха прислал видеоотчёт уже в понедельник.'
     published_at: 2026-10-19
