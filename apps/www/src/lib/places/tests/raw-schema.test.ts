@@ -37,7 +37,7 @@ describe('RawPlaceSchema', () => {
     expect(mapRawPlace({ id: 'preview-place', body: '', data }).mapPreview).toBe(mapPreview);
   });
 
-  it.each([undefined, 'infra'] as const)(
+  it.each([undefined, 'infra', 'club'] as const)(
     'maps layer %s independently of category and publication',
     (mapLayer) => {
       const data = RawPlaceSchema.parse({ ...place, show_on_map: true, map_layer: mapLayer });

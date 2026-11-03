@@ -7,6 +7,7 @@ import {
   KPP_MARKER,
   KTP_MARKER,
   PARK_MARKER,
+  RACKET_MARKER,
   TITANIC_MARKER
 } from '@shelkovo/ui/markers';
 
@@ -23,5 +24,6 @@ export const PLACE_MARKER_IMAGES = {
   kpp: KPP_MARKER,
   ktp: KTP_MARKER,
   park: PARK_MARKER,
+  racket: RACKET_MARKER,
   titanic: TITANIC_MARKER
 } as const satisfies Readonly<Record<PlaceMarker, PlaceMarkerImage>>;

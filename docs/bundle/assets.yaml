@@ -1,34 +1,34 @@
 - file: static/404.XXXXXXXX.css
   bytes: 1547
-  brotli: 592
-  gzip: 701
+  brotli: 593
+  gzip: 700
 - file: static/BaseLayout.XXXXXXXX.css
-  bytes: 56733
-  brotli: 9029
-  gzip: 10101
+  bytes: 57408
+  brotli: 9083
+  gzip: 10190
 - file: static/BaseLayout.astro_astro_type_script_index_0_lang.XXXXXXXX.js
-  bytes: 11190
-  brotli: 3530
-  gzip: 4069
+  bytes: 11142
+  brotli: 3524
+  gzip: 4061
 - file: static/Breadcrumbs.XXXXXXXX.css
   bytes: 2418
   brotli: 534
-  gzip: 627
+  gzip: 628
 - file: static/ClientRouter.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 13908
   brotli: 4270
   gzip: 4782
 - file: static/CommonSpacesTable.XXXXXXXX.js
   bytes: 1322
-  brotli: 630
-  gzip: 783
+  brotli: 651
+  gzip: 784
 - file: static/ComparisonTable.XXXXXXXX.css
   bytes: 1443
   brotli: 430
   gzip: 550
 - file: static/ComparisonTable.XXXXXXXX.js
   bytes: 3602
-  brotli: 1416
+  brotli: 1417
   gzip: 1698
 - file: static/ContactListItem.XXXXXXXX.css
   bytes: 700
@@ -60,8 +60,8 @@
   gzip: 939
 - file: static/InfrastructureTable.XXXXXXXX.js
   bytes: 2533
-  brotli: 954
-  gzip: 1148
+  brotli: 955
+  gzip: 1150
 - file: static/InventoryKindList.XXXXXXXX.css
   bytes: 461
   brotli: 170
@@ -76,16 +76,16 @@
   gzip: 290
 - file: static/LinkWithIcon.XXXXXXXX.css
   bytes: 488
-  brotli: 196
-  gzip: 243
+  brotli: 200
+  gzip: 244
 - file: static/MapPreview.XXXXXXXX.css
   bytes: 1200
   brotli: 350
   gzip: 457
 - file: static/MapPreview.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 4179
-  brotli: 1515
-  gzip: 1755
+  brotli: 1516
+  gzip: 1756
 - file: static/NewsArchiveSummary.XXXXXXXX.css
   bytes: 261
   brotli: 115
@@ -107,21 +107,21 @@
   brotli: 2685
   gzip: 3104
 - file: static/PlaceMap.XXXXXXXX.js
-  bytes: 31380
-  brotli: 9941
-  gzip: 11176
+  bytes: 32390
+  brotli: 10203
+  gzip: 11427
 - file: static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 693
   brotli: 338
   gzip: 433
 - file: static/ReviewMeta.XXXXXXXX.css
-  bytes: 768
-  brotli: 241
-  gzip: 294
+  bytes: 863
+  brotli: 267
+  gzip: 324
 - file: static/ServiceTable.XXXXXXXX.js
   bytes: 920
-  brotli: 477
-  gzip: 562
+  brotli: 493
+  gzip: 564
 - file: static/ShelkovoAreaIcon.XXXXXXXX.css
   bytes: 204
   brotli: 111
@@ -174,21 +174,21 @@
   brotli: 984
   gzip: 1120
 - file: static/client.XXXXXXXX.js
-  bytes: 46167
-  brotli: 16030
-  gzip: 17574
+  bytes: 46133
+  brotli: 16018
+  gzip: 17602
 - file: static/client.svelte.XXXXXXXX.js
   bytes: 889
-  brotli: 438
-  gzip: 503
+  brotli: 437
+  gzip: 502
 - file: static/date.XXXXXXXX.js
   bytes: 429
   brotli: 235
   gzip: 267
 - file: static/editorial-map.XXXXXXXX.css
-  bytes: 3834
-  brotli: 876
-  gzip: 1068
+  bytes: 3883
+  brotli: 883
+  gzip: 1076
 - file: static/editorial-map.XXXXXXXX.js
   bytes: 2192
   brotli: 787
@@ -205,8 +205,8 @@
   gzip: 2398
 - file: static/explorer-component.XXXXXXXX.js
   bytes: 23952
-  brotli: 7972
-  gzip: 9153
+  brotli: 7985
+  gzip: 9156
 - file: static/index-1.XXXXXXXX.css
   bytes: 15520
   brotli: 2671
@@ -280,9 +280,9 @@
   brotli: 339
   gzip: 410
 - file: static/index-19.XXXXXXXX.css
-  bytes: 1961
-  brotli: 420
-  gzip: 498
+  bytes: 2240
+  brotli: 539
+  gzip: 650
 - file: static/index-20.XXXXXXXX.css
   bytes: 505
   brotli: 137
@@ -352,16 +352,16 @@
   gzip: 1162
 - file: static/index.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 2107
-  brotli: 1002
+  brotli: 998
   gzip: 1155
 - file: static/lazy.XXXXXXXX.css
   bytes: 2112
   brotli: 550
   gzip: 666
 - file: static/lazy.XXXXXXXX.js
-  bytes: 16849
-  brotli: 6161
-  gzip: 6993
+  bytes: 16789
+  brotli: 6129
+  gzip: 6958
 - file: static/lifecycle.XXXXXXXX.js
   bytes: 1229
   brotli: 493
@@ -386,12 +386,12 @@
   gzip: 182
 - file: static/parcel-layer.XXXXXXXX.js
   bytes: 4539
-  brotli: 1820
-  gzip: 2094
+  brotli: 1816
+  gzip: 2092
 - file: static/parcel-set-outline.XXXXXXXX.js
-  bytes: 42207
-  brotli: 13640
-  gzip: 15045
+  bytes: 42203
+  brotli: 13692
+  gzip: 15038
 - file: static/prefetch.XXXXXXXX.js
   bytes: 2491
   brotli: 964

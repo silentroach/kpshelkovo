@@ -208,6 +208,7 @@ describe('PlaceMap', () => {
     'kpp',
     'ktp',
     'park',
+    'racket',
     'titanic'
   ] as const)(
     'uses the full-size %s image and preserves the place link and status',

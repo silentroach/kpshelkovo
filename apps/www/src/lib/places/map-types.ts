@@ -4,6 +4,10 @@ import type { Snippet } from 'svelte';
 import type { PlaceMapLayer, PlaceMarker, PlaceStatus } from './schema';
 import type { PlaceCoordinates, PlaceGeometry, PlaceOpeningHours } from './types';
 
+export interface PlaceMapLayerOptions {
+  readonly fit?: boolean;
+}
+
 export interface PlaceMapItem {
   readonly slug: string;
   readonly mapLayer?: PlaceMapLayer;

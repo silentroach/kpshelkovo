@@ -47,6 +47,7 @@
     "./markers/Kpp.webp": "./src/markers/Kpp.webp",
     "./markers/Ktp.webp": "./src/markers/Ktp.webp",
     "./markers/Park.webp": "./src/markers/Park.webp",
+    "./markers/Racket.webp": "./src/markers/Racket.webp",
     "./markers/Titanic.webp": "./src/markers/Titanic.webp",
     "./SiteFooter.astro": "./src/SiteFooter.astro",
     "./standalone-error.css": "./standalone-error.css",
