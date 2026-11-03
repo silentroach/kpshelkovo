@@ -22,6 +22,7 @@
   import type { PlaceMapItem, PlaceMapProps } from '@/lib/places/map-types';
   import { getPlaceClosingTime } from '@/lib/places/opening-hours';
   import { placeUrl } from '@/lib/places/routes';
+  import { PLACE_MAP_LAYERS, type PlaceMapLayer } from '@/lib/places/schema';
   import { createOpenMapsControl } from '@/lib/yandex-maps/open-maps-control';
   import {
     installYandexMapsRuntimeHeadPersistence,
@@ -144,10 +145,10 @@
   let mapReady = $state(false);
   let error: string | undefined = $state(undefined);
   let selectedParts = $state<ParcelPart[]>([]);
-  let infrastructureEnabled = $state(false);
-  let toggleInfrastructure = $state<(checked: boolean) => void>(() => {});
+  let enabledPlaceLayers = $state<readonly PlaceMapLayer[]>([]);
+  let togglePlaceLayer = $state<(layer: PlaceMapLayer, checked: boolean) => void>(() => {});
   const isPlaceVisible = (place: PlaceMapItem): boolean =>
-    isPlaceLayerVisible(place, infrastructureEnabled);
+    isPlaceLayerVisible(place, enabledPlaceLayers);
   let failedParts = $state<ParcelPart[]>([]);
   let allParcelsSelected = $derived(selectedParts.length === PARCEL_PARTS.length);
   let someParcelsSelected = $derived(selectedParts.length > 0 && !allParcelsSelected);
@@ -501,7 +502,7 @@
     let pointerMoved = false;
     const initialUrl = new URL(window.location.href);
     const initialLayers = getInitialMapLayers(initialUrl.searchParams);
-    infrastructureEnabled = initialLayers.includes('infra');
+    enabledPlaceLayers = PLACE_MAP_LAYERS.filter((layer) => initialLayers.includes(layer));
     requestedSet = initialUrl.searchParams.get(SELECTION_SET_QUERY_PARAM) || undefined;
     // Even an invalid p/h owns the initial focus; the set never becomes a fallback target.
     const preserveSetCamera = Boolean(requestedSet);
@@ -513,7 +514,11 @@
     let activeSet: MapSelectionSetPublicDto | undefined;
     let setGeometry: EditorialFeatureCollection | undefined;
     const disabledSetParts = new Set<ParcelPart>();
-    let infrastructureDisabled = false;
+    const disabledPlaceLayers = new Set<PlaceMapLayer>();
+    const enablePlaceLayer = (layer: PlaceMapLayer): void => {
+      if (!disabledPlaceLayers.has(layer) && !enabledPlaceLayers.includes(layer))
+        enabledPlaceLayers = [...enabledPlaceLayers, layer];
+    };
     const readyParcelParts = new Set<ParcelPart>();
     const cancelSetFit = (): void => {
       pendingSetFit = false;
@@ -1087,13 +1092,16 @@
       removeHighlightQuery(place.slug);
     };
 
-    toggleInfrastructure = (checked): void => {
-      infrastructureEnabled = checked;
-      infrastructureDisabled = !checked;
+    togglePlaceLayer = (layer, checked): void => {
+      enabledPlaceLayers = enabledPlaceLayers.filter((candidate) => candidate !== layer);
+      if (checked) {
+        disabledPlaceLayers.delete(layer);
+        enablePlaceLayer(layer);
+      } else disabledPlaceLayers.add(layer);
       if (!checked) {
         cancelSetFit();
         cancelClusterFocus();
-        if (highlightedPlace?.mapLayer === 'infra') clearPlaceHighlight();
+        if (highlightedPlace?.mapLayer === layer) clearPlaceHighlight();
         for (const [place, content] of markerContents) {
           if (isPlaceVisible(place)) continue;
           if (content === document.activeElement) mapContainer?.focus({ preventScroll: true });
@@ -1187,9 +1195,9 @@
         highlightedPlace = requestedSlug
           ? places.find((place) => place.slug === requestedSlug)
           : undefined;
-        if (highlightedPlace?.mapLayer === 'infra') {
-          if (infrastructureDisabled) highlightedPlace = undefined;
-          else infrastructureEnabled = true;
+        if (highlightedPlace?.mapLayer) {
+          if (disabledPlaceLayers.has(highlightedPlace.mapLayer)) highlightedPlace = undefined;
+          else enablePlaceLayer(highlightedPlace.mapLayer);
         }
         if (
           !requestedParcelCode &&
@@ -1287,8 +1295,9 @@
             void enableParcelPart(pendingParcelPart, parcelCode, true);
           }
         }
-        for (const layer of initialLayers) {
-          if (layer !== 'infra' && layer !== pendingParcelPart) void enableParcelPart(layer);
+        for (const part of PARCEL_PARTS) {
+          if (initialLayers.includes(part) && part !== pendingParcelPart)
+            void enableParcelPart(part);
         }
         const setId = requestedSet;
         if (setId) {
@@ -1320,13 +1329,10 @@
                 setGeometry = geometry;
               }
               activeSet = definition;
-              if (
-                !infrastructureDisabled &&
-                places.some(
-                  (place) => place.mapLayer === 'infra' && definition.places.includes(place.slug)
-                )
-              )
-                infrastructureEnabled = true;
+              for (const place of places) {
+                if (place.mapLayer && definition.places.includes(place.slug))
+                  enablePlaceLayer(place.mapLayer);
+              }
               syncSetPlaces();
               parcelLayer?.setMembership(definition.parcels, definition.outline);
               const parts = new Set(
@@ -1530,7 +1536,7 @@
               stroke-linejoin="round"
             />
           </svg>
-          {#if selectedParts.length > 0 || infrastructureEnabled}
+          {#if selectedParts.length > 0 || enabledPlaceLayers.length > 0}
             <span class="parcel-map-selection-marker" aria-hidden="true">✓</span>
           {/if}
         </button>
@@ -1583,8 +1589,8 @@
           <label class="parcel-map-layer">
             <input
               type="checkbox"
-              checked={infrastructureEnabled}
-              onchange={(event) => toggleInfrastructure(event.currentTarget.checked)}
+              checked={enabledPlaceLayers.includes('infra')}
+              onchange={(event) => togglePlaceLayer('infra', event.currentTarget.checked)}
             />
             <img
               class="parcel-map-layer-icon"
@@ -1595,6 +1601,14 @@
               aria-hidden="true"
             />
             Инфраструктура
+          </label>
+          <label class="parcel-map-layer">
+            <input
+              type="checkbox"
+              checked={enabledPlaceLayers.includes('club')}
+              onchange={(event) => togglePlaceLayer('club', event.currentTarget.checked)}
+            />
+            Клубные места
           </label>
         </div>
       </div>

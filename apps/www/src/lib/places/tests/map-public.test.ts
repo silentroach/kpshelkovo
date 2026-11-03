@@ -66,36 +66,31 @@ describe('place map public DTO', () => {
     ).toBe(false);
   });
 
-  it('publishes infrastructure while keeping it out of the initial frame', () => {
-    const infrastructure: Place = {
-      ...place,
-      slug: 'ktp-16',
-      markdownUrl: '/map/ktp-16/index.md',
-      mapLayer: 'infra',
-      coordinates: { lat: 0, lng: 0 }
-    };
-    const places = selectMapPlaces([place, infrastructure]);
-    const initialPlaces = places.filter((item) => isPlaceLayerVisible(item));
-    expect(
-      buildPlaceMapPublicPayload(places).places.map(({ slug, mapLayer }) => ({ slug, mapLayer }))
-    ).toMatchInlineSnapshot(`
-        [
-          {
-            "mapLayer": undefined,
-            "slug": "hunting-ponds",
-          },
-          {
-            "mapLayer": "infra",
-            "slug": "ktp-16",
-          },
-        ]
-      `);
-    expect(getPlaceBounds(initialPlaces)).toEqual(getPlaceBounds([place]));
-    expect(buildPlacesMarkdown(places)).toContain('/map/ktp-16/');
-    expect(getPlaceBounds([infrastructure].filter((item) => isPlaceLayerVisible(item)))).toEqual(
-      getPlaceBounds([])
-    );
-  });
+  it.each(['infra', 'club'] as const)(
+    'publishes %s while keeping it out of the initial frame',
+    (mapLayer) => {
+      const infrastructure: Place = {
+        ...place,
+        slug: 'ktp-16',
+        markdownUrl: '/map/ktp-16/index.md',
+        mapLayer,
+        coordinates: { lat: 0, lng: 0 }
+      };
+      const places = selectMapPlaces([place, infrastructure]);
+      const initialPlaces = places.filter((item) => isPlaceLayerVisible(item));
+      expect(
+        buildPlaceMapPublicPayload(places).places.map(({ slug, mapLayer }) => ({ slug, mapLayer }))
+      ).toEqual([
+        { slug: place.slug, mapLayer: undefined },
+        { slug: infrastructure.slug, mapLayer }
+      ]);
+      expect(getPlaceBounds(initialPlaces)).toEqual(getPlaceBounds([place]));
+      expect(buildPlacesMarkdown(places)).toContain('/map/ktp-16/');
+      expect(getPlaceBounds([infrastructure].filter((item) => isPlaceLayerVisible(item)))).toEqual(
+        getPlaceBounds([])
+      );
+    }
+  );
 
   it('validates the prepared payload before publishing it', () => {
     expect(() =>

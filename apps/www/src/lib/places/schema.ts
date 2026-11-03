@@ -20,11 +20,12 @@ export const PLACE_MARKERS = [
   'fish',
   'kpp',
   'ktp',
-  'park'
+  'park',
+  'racket'
 ] as const;
 export type PlaceMarker = (typeof PLACE_MARKERS)[number];
 
-export const PLACE_MAP_LAYERS = ['infra'] as const;
+export const PLACE_MAP_LAYERS = ['infra', 'club'] as const;
 export type PlaceMapLayer = (typeof PLACE_MAP_LAYERS)[number];
 
 export const PLACE_STATUSES = ['existing', 'planned', 'underConstruction'] as const;

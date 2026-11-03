@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивировка и границы первого этапа описаны в [proposal.md](/openspec/changes/add-club-places-layer/proposal.md). Сейчас `PLACE_MAP_LAYERS` содержит только `infra`. В [PlaceMap.svelte](/apps/www/src/components/places/PlaceMap.svelte) состояние, ручное выключение, прямой фокус и загрузка набора отдельно проверяют инфраструктуру. [map-layers.ts](/apps/www/src/lib/places/map-layers.ts) определяет видимость и используется для начального кадра.
+Мотивировка и границы первого этапа описаны в [proposal.md](/openspec/changes/archive/2026-11-03-add-club-places-layer/proposal.md). До изменения `PLACE_MAP_LAYERS` содержал только `infra`. В [PlaceMap.svelte](/apps/www/src/components/places/PlaceMap.svelte) состояние, ручное выключение, прямой фокус и загрузка набора отдельно проверяли инфраструктуру. [map-layers.ts](/apps/www/src/lib/places/map-layers.ts) определяет видимость и используется для начального кадра.
 
 Редакторская запись уже отделяет `show_on_map`, `map_layer`, категорию и маркер. [Парсер `l`](/apps/www/src/components/places/place-map-url.ts) читает допустимые слои из общего enum; публичная схема использует тот же набор значений. Контракт [map-selection-sets](/openspec/specs/map-selection-sets/spec.md) уже требует включать слои участников и уважать последующее ручное выключение.
 
@@ -61,7 +61,7 @@ Green Dreams исключён владельцем после первонача
 
 ### 4. Маркер ракетки использует действующую подготовку изображений
 
-Владелец передал `/rocket.png` размером 1280 × 1280 с изображением ракетки. Сохранить оригинал как `/packages/ui/src/markers/Racket-source.png`, подготовить lossless WebP по ADR-028 с очисткой низкоальфового ореола, безопасными полями и достаточной плотностью для действующего размера маркеров. Тип `racket` описывает предмет; исходное имя файла не задаёт публичный идентификатор.
+Владелец передал `/rocket.png` размером 1254 × 1254 с изображением ракетки. Сохранить оригинал как `/packages/ui/src/markers/Racket-source.png`, подготовить lossless WebP по ADR-028 с очисткой низкоальфового ореола, безопасными полями и достаточной плотностью для действующего размера маркеров. Тип `racket` описывает предмет; исходное имя файла не задаёт публичный идентификатор.
 
 Добавить изображение в экспорт `/packages/ui/src/markers/index.ts`, asset-export UI-пакета, enum маркеров, исчерпывающий `PLACE_MARKER_IMAGES` и каталог `/packages/ui/tests/icons-visual/src/pages/index.astro`. Проверить центр рисунка, читаемость в фактическом размере, прозрачность и закрытое состояние с часами. При расширении импортов проверить `sideEffects` пакета и сравнить отчёты бандлов по [инструкции](/docs/development.md#анализ-клиентских-бандлов).
 

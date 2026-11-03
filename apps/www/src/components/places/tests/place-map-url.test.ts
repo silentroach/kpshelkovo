@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { getInitialMapLayers, getUrlWithoutPlaceHighlight } from '../place-map-url';
 
 describe('place map URL', () => {
-  it.each(['infra', 'shr', 'shf', 'shp', 'shv'])(
+  it.each(['infra', 'club', 'shr', 'shf', 'shp', 'shv'])(
     'selects the single requested layer %s',
     (layer) => {
       expect(getInitialMapLayers(new URLSearchParams({ l: layer }))).toEqual([layer]);
@@ -12,7 +12,7 @@ describe('place map URL', () => {
 
   it('unions repeated lists and expands all parcels without rewriting the query', () => {
     const url = new URL(
-      'https://kpshelkovo.online/map/?flag&l=shf,,unknown&l=parcels,infra,shf#map'
+      'https://kpshelkovo.online/map/?flag&l=shf,,unknown,club&l=parcels,infra,club,shf#map'
     );
     const href = url.href;
     expect(getInitialMapLayers(url.searchParams)).toMatchInlineSnapshot(`
@@ -22,6 +22,7 @@ describe('place map URL', () => {
         "shp",
         "shv",
         "infra",
+        "club",
       ]
     `);
     expect(url.href).toBe(href);
