@@ -14,7 +14,7 @@
     PARCEL_QUERY_PARAM
   } from '@/lib/parcels/parcel-url';
   import { PARCEL_CODE, type ParcelPart } from '@/lib/parcels/schema';
-  import { isPlaceLayerVisible } from '@/lib/places/map-layers';
+  import { isPlaceLayerVisible, PLACE_MAP_LAYER_OPTIONS } from '@/lib/places/map-layers';
   import type {
     PlaceMapPublicItemDto,
     PlaceMapPublicPayloadDto
@@ -515,6 +515,7 @@
     let setGeometry: EditorialFeatureCollection | undefined;
     const disabledSetParts = new Set<ParcelPart>();
     const disabledPlaceLayers = new Set<PlaceMapLayer>();
+    let preserveLayerCamera = false;
     const enablePlaceLayer = (layer: PlaceMapLayer): void => {
       if (!disabledPlaceLayers.has(layer) && !enabledPlaceLayers.includes(layer))
         enabledPlaceLayers = [...enabledPlaceLayers, layer];
@@ -1092,7 +1093,33 @@
       removeHighlightQuery(place.slug);
     };
 
+    const fitVisiblePlaceLayer = (layer: PlaceMapLayer): void => {
+      if (
+        !map ||
+        !PLACE_MAP_LAYER_OPTIONS[layer]?.fit ||
+        requestedSet ||
+        highlightedPlace ||
+        selectedParcel ||
+        pendingParcelCode ||
+        !places.some((place) => place.mapLayer === layer && isPlaceVisible(place))
+      )
+        return;
+      const visiblePlaces = places.filter(isPlaceVisible).map((place) => ({
+        ...place,
+        geometry: visibleGeometry.has(place.slug) ? place.geometry : undefined
+      }));
+      const visibleParcels = selectedParts
+        .filter((part) => readyParcelParts.has(part))
+        .flatMap((part) => parcelData.get(part) ?? []);
+      const bounds = getSelectionSetBounds(visibleParcels, visiblePlaces);
+      if (!bounds) return;
+      cancelClusterFocus();
+      preserveLayerCamera = true;
+      map.update({ location: { bounds, duration: 0 }, margin: getViewMargin() });
+    };
+
     togglePlaceLayer = (layer, checked): void => {
+      const newlyEnabled = checked && !enabledPlaceLayers.includes(layer);
       enabledPlaceLayers = enabledPlaceLayers.filter((candidate) => candidate !== layer);
       if (checked) {
         disabledPlaceLayers.delete(layer);
@@ -1110,6 +1137,7 @@
         }
       }
       syncSetPlaces();
+      if (newlyEnabled) fitVisiblePlaceLayer(layer);
     };
 
     const startPlaceHighlight = (place: PlaceMapItem): void => {
@@ -1134,7 +1162,8 @@
       if (destroyed || setupFailed) return;
 
       positionPopup();
-      if (preserveSetCamera || preserveParcelCamera || selectedParcel) return;
+      if (preserveLayerCamera || preserveSetCamera || preserveParcelCamera || selectedParcel)
+        return;
 
       if (highlightedPlace) {
         focusPlace(highlightedPlace, 0);
@@ -1607,6 +1636,14 @@
               type="checkbox"
               checked={enabledPlaceLayers.includes('club')}
               onchange={(event) => togglePlaceLayer('club', event.currentTarget.checked)}
+            />
+            <img
+              class="parcel-map-layer-icon"
+              src="/icons/club.webp"
+              width="22"
+              height="22"
+              alt=""
+              aria-hidden="true"
             />
             Клубные места
           </label>

@@ -66,13 +66,13 @@ static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/place-map-url.ts:
     rendered: 1387
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 59114
+    rendered: 60261
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:
     rendered: 931
   apps/www/src/lib/places/map-layers.ts:
-    rendered: 148
+    rendered: 203
   apps/www/src/lib/places/routes.ts:
     rendered: 324
   apps/www/src/lib/places/schema.ts:

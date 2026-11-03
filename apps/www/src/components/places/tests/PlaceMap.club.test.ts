@@ -1,7 +1,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { ParcelMapPublicSchema } from '@/lib/parcels/map-public-schema';
 import type { PlaceMapItem } from '@/lib/places/map-types';
 
 import { getPlaceBounds, getSelectionSetBounds } from '../place-map-geometry';
@@ -11,12 +12,21 @@ import {
   clustererUpdates,
   map,
   mapProps,
+  mapElements,
+  areaFeatures,
   markerElements,
   nativeControl,
   place,
+  parcel,
   pondsPlace,
   registerPlaceMapSetup
 } from './support';
+
+const layerOptions = vi.hoisted(() => ({ club: { fit: true as boolean | undefined } }));
+vi.mock(import('@/lib/places/map-layers'), async (importOriginal) => ({
+  ...(await importOriginal()),
+  PLACE_MAP_LAYER_OPTIONS: layerOptions
+}));
 
 const club: PlaceMapItem = {
   ...pondsPlace,
@@ -56,8 +66,11 @@ vi.mock(import('@/lib/yandex-maps/runtime'), async (importOriginal) => ({
 
 describe('club place layer', () => {
   registerPlaceMapSetup();
+  beforeEach(() => {
+    layerOptions.club.fit = true;
+  });
 
-  it('starts disabled and toggles independently of infrastructure without moving the camera', async () => {
+  it('fits visible places on club enable and preserves the camera for other toggles', async () => {
     render(PlaceMap, { props: { places: [place, club, infrastructure] } });
     const checkbox = await ready();
     expect(checkbox.checked).toBe(false);
@@ -66,11 +79,142 @@ describe('club place layer', () => {
     const calls = map.update.mock.calls.length;
     await fireEvent.click(checkbox);
     expect(clusterIds()).toEqual([place.slug, club.slug]);
+    expect(map.update.mock.lastCall?.[0]).toEqual({
+      location: { bounds: getPlaceBounds([place, club]), duration: 0 },
+      margin: [112, 80, 32, 80]
+    });
     await fireEvent.click(screen.getByRole('checkbox', { name: 'Инфраструктура' }));
     expect(clusterIds()).toEqual([place.slug, club.slug, infrastructure.slug]);
     await fireEvent.click(checkbox);
     expect(clusterIds()).toEqual([place.slug, infrastructure.slug]);
+    expect(map.update).toHaveBeenCalledTimes(calls + 1);
+  });
+
+  it.each([undefined, false])('does not fit when fit is %s', async (fit) => {
+    layerOptions.club.fit = fit;
+    render(PlaceMap, { props: { places: [place, club] } });
+    const checkbox = await ready();
+    const calls = map.update.mock.calls.length;
+    await fireEvent.click(checkbox);
+    expect(clusterIds()).toEqual([place.slug, club.slug]);
     expect(map.update).toHaveBeenCalledTimes(calls);
+  });
+
+  it('does not fit a layer without published places', async () => {
+    render(PlaceMap, { props: { places: [place] } });
+    const checkbox = await ready();
+    const calls = map.update.mock.calls.length;
+    await fireEvent.click(checkbox);
+    expect(map.update).toHaveBeenCalledTimes(calls);
+  });
+
+  it('includes already visible infrastructure and excludes geometry that is not displayed', async () => {
+    render(PlaceMap, { props: { places: [place, club, infrastructure] } });
+    const checkbox = await ready();
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Инфраструктура' }));
+    await fireEvent.click(checkbox);
+    expect(map.update.mock.lastCall?.[0].location.bounds).toEqual(
+      getPlaceBounds([place, club, infrastructure])
+    );
+  });
+
+  it('keeps the fitted camera on layout refresh without repeated fitting', async () => {
+    render(PlaceMap, { props: { places: [place, club] } });
+    const checkbox = await ready();
+    await fireEvent.click(checkbox);
+    const calls = map.update.mock.calls.length;
+    await fireEvent.change(checkbox, { target: { checked: true } });
+    document.dispatchEvent(new Event('astro:page-load'));
+    await tick();
+    expect(map.update).toHaveBeenCalledTimes(calls);
+  });
+
+  it('fits already displayed parcel contours without revealing hidden geometry', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Response.json([parcel]))
+    );
+    window.history.replaceState({}, '', '/map/?l=shr');
+    render(PlaceMap, { props: { places: [place, club] } });
+    const checkbox = await ready();
+    await waitFor(() =>
+      expect(areaFeatures.some(({ props }) => props.id === `parcel-${parcel.code}`)).toBe(true)
+    );
+    await fireEvent.click(checkbox);
+    expect(map.update.mock.lastCall?.[0].location.bounds).toEqual(
+      getSelectionSetBounds(ParcelMapPublicSchema.parse([parcel]), [
+        { ...place, geometry: undefined },
+        { ...club, geometry: undefined }
+      ])
+    );
+  });
+
+  it('includes currently revealed geometry of a visible place', async () => {
+    const localPlace = { ...club, slug: 'local', mapLayer: undefined, url: '/map/local/' };
+    render(PlaceMap, { props: { places: [place, localPlace, club] } });
+    const checkbox = await ready();
+    const marker = markerElements.find(
+      (element) => element.getAttribute('href') === localPlace.url
+    )!;
+    mapElements[0]?.append(marker);
+    marker.focus();
+    await fireEvent.click(checkbox);
+    expect(map.update.mock.lastCall?.[0].location.bounds).toEqual(
+      getSelectionSetBounds(
+        [],
+        [{ ...place, geometry: undefined }, localPlace, { ...club, geometry: undefined }]
+      )
+    );
+  });
+
+  it('does not refit when a previously requested parcel part arrives later', async () => {
+    const pending = Promise.withResolvers<Response>();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => pending.promise)
+    );
+    window.history.replaceState({}, '', '/map/?l=shr');
+    render(PlaceMap, { props: { places: [place, club] } });
+    const checkbox = await ready();
+    await fireEvent.click(checkbox);
+    expect(map.update.mock.lastCall?.[0].location.bounds).toEqual(getPlaceBounds([place, club]));
+    const calls = map.update.mock.calls.length;
+    pending.resolve(Response.json([parcel]));
+    await waitFor(() =>
+      expect(areaFeatures.some(({ props }) => props.id === `parcel-${parcel.code}`)).toBe(true)
+    );
+    expect(map.update).toHaveBeenCalledTimes(calls);
+  });
+
+  it('does not override a current direct place highlight', async () => {
+    window.history.replaceState({}, '', `/map/?h=${place.slug}`);
+    render(PlaceMap, { props: { places: [place, club] } });
+    const checkbox = await ready();
+    const calls = map.update.mock.calls.length;
+    await fireEvent.click(checkbox);
+    expect(map.update).toHaveBeenCalledTimes(calls);
+  });
+
+  it('does not fit while a direct parcel is pending or selected', async () => {
+    const pending = Promise.withResolvers<Response>();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => pending.promise)
+    );
+    window.history.replaceState({}, '', `/map/?p=${parcel.code}`);
+    render(PlaceMap, { props: { places: [place, club] } });
+    const checkbox = await ready();
+    const calls = map.update.mock.calls.length;
+    await fireEvent.click(checkbox);
+    expect(map.update).toHaveBeenCalledTimes(calls);
+    pending.resolve(Response.json([parcel]));
+    await waitFor(() =>
+      expect(areaFeatures.some(({ update }) => update.mock.calls.length)).toBe(true)
+    );
+    await fireEvent.click(checkbox);
+    const selectedCalls = map.update.mock.calls.length;
+    await fireEvent.click(checkbox);
+    expect(map.update).toHaveBeenCalledTimes(selectedCalls);
   });
 
   it.each(['club', 'club,infra'])(
@@ -155,7 +299,7 @@ describe('club place layer', () => {
     ).toBe(false);
     const calls = map.update.mock.calls.length;
     await fireEvent.click(checkbox);
-    expect(map.update).toHaveBeenCalledTimes(calls);
+    expect(map.update).toHaveBeenCalledTimes(calls + 1);
   });
 
   it('enables both layers of a set, frames its members and preserves visibility after clearing', async () => {
