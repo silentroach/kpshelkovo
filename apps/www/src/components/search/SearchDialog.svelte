@@ -96,6 +96,11 @@
 
   let resultRows = $derived(results.map((result) => resultRow(result)));
   let hasMoreResults = $derived(!isSearching && requestedLimit < total);
+  let emptyMessage = $derived(
+    query.trim().length > 30
+      ? 'Ничего не нашли. Попробуйте другие слова или сократите запрос'
+      : 'Ничего не нашли. Попробуйте другие слова'
+  );
   let announcement = $derived.by(() => {
     switch (viewState) {
       case 'loading':
@@ -103,7 +108,7 @@
       case 'results':
         return `${pluralize(total, FOUND_FORMS)} ${count(total, RESULT_FORMS)}`;
       case 'empty':
-        return 'По вашему запросу ничего не найдено';
+        return emptyMessage;
       case 'error':
         return SEARCH_ERROR_MESSAGE;
       case 'dev-unavailable':
@@ -592,7 +597,7 @@
         {#if viewState === 'loading'}
           <p class="state-message">Ищем…</p>
         {:else if viewState === 'empty'}
-          <p class="state-message">Ничего не нашли</p>
+          <p class="state-message">{emptyMessage}</p>
         {:else if viewState === 'error'}
           <div class="action-row">
             <p class="action-message">{SEARCH_ERROR_MESSAGE}</p>

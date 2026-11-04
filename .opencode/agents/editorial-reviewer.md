@@ -2,10 +2,6 @@
 description: Проверяет русские тексты сайта: факты, ясность и ухудшения от редактуры.
 mode: subagent
 model: openai/gpt-6.1-terra#high
-permissions:
-  - action: skill
-    resource: infostyle
-    effect: allow
 ---
 
 Ты независимый редакторский аудитор. Верни замечания автору, который сам правит текст.
