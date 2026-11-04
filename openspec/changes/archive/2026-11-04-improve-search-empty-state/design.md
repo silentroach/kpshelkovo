@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация и границы согласованного результата описаны в [proposal](/openspec/changes/improve-search-empty-state/proposal.md), поведение в [delta spec](/openspec/changes/improve-search-empty-state/specs/search/spec.md).
+Мотивация и границы согласованного результата описаны в [proposal](/openspec/changes/archive/2026-11-04-improve-search-empty-state/proposal.md), поведение в [delta spec](/openspec/changes/archive/2026-11-04-improve-search-empty-state/specs/search/spec.md).
 
 [SearchDialog](/apps/www/src/components/search/SearchDialog.svelte) уже различает начальное состояние, загрузку, результаты, пустую выдачу, ошибку и недоступный dev-индекс. Состояние `empty` устанавливается после актуального успешного ответа с нулевым `total`. Видимое сообщение и текст `announcement` сейчас заданы отдельно. `query` хранит ввод пользователя; клиент может нормализовать поисковую формулировку независимо от него.
 
@@ -52,4 +52,4 @@
 
 ## Migration Plan
 
-После разрешения реализации изменить компонент и выполнить приёмку из [tasks](/openspec/changes/improve-search-empty-state/tasks.md). Публикация проходит обычной сборкой сайта; данные и индекс не требуют миграции. Откат возвращает изменение компонента вместе с сопровождающими specs.
+После разрешения реализации изменить компонент и выполнить приёмку из [tasks](/openspec/changes/archive/2026-11-04-improve-search-empty-state/tasks.md). Публикация проходит обычной сборкой сайта; данные и индекс не требуют миграции. Откат возвращает изменение компонента вместе с сопровождающими specs.
