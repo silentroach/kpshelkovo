@@ -43,8 +43,14 @@ const logoSrcset = logoImages
       fetchpriority="high"
     />
     <h1 id="not-found-title">{title}</h1>
-    {description && <p>{description}</p>}
-    <a href={homeHref}>{homeLabel}</a>
+    {(description || Astro.slots.has('description')) && (
+      <p>
+        <slot name="description">{description}</slot>
+      </p>
+    )}
+    <a class="home-link" href={homeHref}>
+      {homeLabel}
+    </a>
   </section>
 </main>
 
@@ -110,22 +116,26 @@ const logoSrcset = logoImages
     text-wrap: pretty;
   }
 
-  a {
-    margin-top: 1.75rem;
+  .not-found :global(a) {
     color: oklch(36% 0.115 143);
     font-family: var(--font-body, system-ui);
-    font-weight: 600;
+    text-decoration-line: underline;
     text-decoration-color: oklch(36% 0.115 143 / 0.45);
     text-decoration-thickness: 0.08em;
     text-underline-offset: 0.22em;
   }
 
-  a:hover {
+  .home-link {
+    margin-top: 1.75rem;
+    font-weight: 600;
+  }
+
+  .not-found :global(a:hover) {
     color: oklch(30% 0.105 143);
     text-decoration-color: currentColor;
   }
 
-  a:focus-visible {
+  .not-found :global(a:focus-visible) {
     border-radius: 0.15rem;
     outline: 0.2rem solid oklch(83% 0.155 78);
     outline-offset: 0.25rem;

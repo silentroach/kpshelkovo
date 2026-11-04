@@ -15,8 +15,13 @@ const description =
 >
   <NotFoundView
     title="Страница не найдена"
-    description="Адрес мог измениться, а ссылка устареть. Начните с главной страницы или откройте новости и статус сервисов."
     homeHref="/"
     homeLabel="Вернуться на главную"
-  />
+  >
+    <Fragment slot="description">
+      Адрес мог измениться, а ссылка устареть. Начните с главной страницы или
+      откройте
+      <a href="/news/">новости</a> и <a href="/status/">статус сервисов</a>.
+    </Fragment>
+  </NotFoundView>
 </BaseLayout>
