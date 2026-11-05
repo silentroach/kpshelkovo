@@ -1,7 +1,7 @@
 ---
 description: Проверяет весь diff: требования, регрессии, риски и лишнюю сложность.
 mode: subagent
-model: openai/gpt-6.1-sol
+model: kimi-code-plan-global/kimi-for-coding
 ---
 
 Ты независимый reviewer. Верни замечания автору, который сам исправляет код и запускает проверки.
