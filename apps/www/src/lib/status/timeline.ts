@@ -1,61 +1,21 @@
-import { compareRuText } from '@shelkovo/format';
+import { compareRuText, dateTimeFromISO } from '@shelkovo/format';
 
-import type { StatusArea, StatusKind } from './schema';
-import type { StatusDuration, StatusIncident, StatusIncidentPhase } from './types';
+import { buildStatusCalendarProjection } from './calendar';
+import type {
+  StatusTimelineDay,
+  StatusTimelineIncidentInput,
+  StatusTimelineRecord
+} from './timeline.types';
+import type { StatusIncident } from './types';
 
-export const STATUS_TIMELINE_DAY_MS = 24 * 60 * 60 * 1000;
-
-export interface StatusTimelineIncidentInput {
-  readonly id: string;
-  readonly href?: string;
-  readonly title: string;
-  readonly kind: StatusKind;
-  readonly startedIso: string;
-  readonly startedHasTime: boolean;
-  readonly endedIso?: string;
-  readonly endedHasTime: boolean;
-  readonly phase: StatusIncidentPhase;
-  readonly areas?: readonly StatusArea[];
-  readonly duration?: StatusDuration;
-}
-
-export interface StatusTimelineRange {
-  readonly startMs: number;
-  readonly endMs: number;
-  readonly days: number;
-  readonly spanMs: number;
-}
-
-export interface StatusTimelineSpan {
-  readonly startMs: number;
-  readonly endMs: number;
-}
-
-export interface StatusTimelineProblemSegment extends StatusTimelineSpan {
-  readonly id: string;
-  readonly href?: string;
-  readonly tone: 'amber' | 'red';
-  readonly leftPercent: number;
-  readonly widthPercent: number;
-  readonly startedIso: string;
-  readonly endedIso?: string;
-}
-
-export interface StatusTimelineStableSegment extends StatusTimelineSpan {
-  readonly leftPercent: number;
-  readonly widthPercent: number;
-}
-
-export interface StatusTimelineSegmentGeometry {
-  readonly leftPercent: number;
-  readonly widthPercent: number;
-}
+// Kept as a type export for existing component consumers.
+export type { StatusTimelineIncidentInput } from './timeline.types';
 
 export const toStatusTimelineIncidentInput = (
   incident: StatusIncident
 ): StatusTimelineIncidentInput => ({
   id: incident.id,
-  href: incident.url,
+  href: incident.hasPage ? incident.url : undefined,
   title: incident.title,
   kind: incident.kind,
   startedIso: incident.started.iso,
@@ -67,215 +27,84 @@ export const toStatusTimelineIncidentInput = (
   duration: incident.duration
 });
 
-interface BuildStatusTimelineProblemSegmentsInput {
-  readonly incidents: readonly StatusTimelineIncidentInput[];
-  readonly range: StatusTimelineRange;
-}
+export const statusTimelineStart = (nowMs: number, days: number) =>
+  dateTimeFromISO(new Date(nowMs).toISOString())
+    .startOf('day')
+    .minus({ days: days - 1 });
 
-interface ClipStatusTimelineSpanInput {
-  readonly startMs: number;
-  readonly endMs?: number;
-}
-
-const hasValidRange = (range: StatusTimelineRange): boolean =>
-  Number.isFinite(range.startMs) &&
-  Number.isFinite(range.endMs) &&
-  range.spanMs > 0 &&
-  range.endMs > range.startMs;
-
-const toStatusTimelinePercent = (valueMs: number, range: StatusTimelineRange): number =>
-  ((valueMs - range.startMs) / range.spanMs) * 100;
-
-export const getStatusTimelineSegmentGeometry = (
-  span: StatusTimelineSpan,
-  range: StatusTimelineRange
-): StatusTimelineSegmentGeometry => ({
-  leftPercent: toStatusTimelinePercent(span.startMs, range),
-  widthPercent: ((span.endMs - span.startMs) / range.spanMs) * 100
-});
-
-const toStatusTimelineSegment = <T extends StatusTimelineSpan>(
-  span: T,
-  range: StatusTimelineRange
-): T & StatusTimelineSegmentGeometry => ({
-  ...span,
-  ...getStatusTimelineSegmentGeometry(span, range)
-});
-
-export const getStatusTimelineRange = (nowMs: number, days: number): StatusTimelineRange => {
-  if (!Number.isFinite(nowMs) || !Number.isFinite(days) || days <= 0) {
+export const buildStatusTimelineDays = (
+  records: readonly Pick<StatusTimelineRecord, 'id' | 'kind' | 'startedIso' | 'endedIso'>[],
+  nowMs: number,
+  count: number
+): readonly StatusTimelineDay[] => {
+  if (!Number.isFinite(nowMs) || !Number.isInteger(count) || count < 1) {
+    throw new Error('Invalid status timeline window');
+  }
+  const first = statusTimelineStart(nowMs, count);
+  const startMs = first.toMillis();
+  const endMs = first.plus({ days: count }).toMillis();
+  const starts = new Map(records.map((record) => [record.id, Date.parse(record.startedIso)]));
+  const calendar = buildStatusCalendarProjection(
+    records.flatMap((record) => {
+      const start = Date.parse(record.startedIso);
+      const end = record.endedIso ? Date.parse(record.endedIso) : endMs;
+      if (start > nowMs || end <= start || end <= startMs) return [];
+      return [
+        {
+          id: record.id,
+          kind: record.kind,
+          startedAt: Math.max(start, startMs),
+          endedAt: Math.min(end, endMs)
+        }
+      ];
+    }),
+    nowMs
+  );
+  return Array.from({ length: count }, (_, index) => {
+    const id = first.plus({ days: index }).toISODate()!;
+    const day = calendar.byDay.get(id);
     return {
-      startMs: 0,
-      endMs: 0,
-      days: 0,
-      spanMs: 0
-    };
-  }
-
-  const spanMs = days * STATUS_TIMELINE_DAY_MS;
-
-  return {
-    startMs: nowMs - spanMs,
-    endMs: nowMs,
-    days,
-    spanMs
-  };
-};
-
-export const clipStatusTimelineSpan = (
-  input: ClipStatusTimelineSpanInput,
-  range: StatusTimelineRange
-): StatusTimelineSpan | undefined => {
-  if (!hasValidRange(range) || !Number.isFinite(input.startMs)) {
-    return undefined;
-  }
-
-  const endMs = input.endMs ?? range.endMs;
-
-  if (!Number.isFinite(endMs) || endMs <= input.startMs) {
-    return undefined;
-  }
-
-  if (endMs <= range.startMs || input.startMs >= range.endMs) {
-    return undefined;
-  }
-
-  const startMs = Math.max(range.startMs, input.startMs);
-  const clippedEndMs = Math.min(range.endMs, endMs);
-
-  if (clippedEndMs <= startMs) {
-    return undefined;
-  }
-
-  return {
-    startMs,
-    endMs: clippedEndMs
-  };
-};
-
-export const buildStatusTimelineProblemSegments = ({
-  incidents,
-  range
-}: BuildStatusTimelineProblemSegmentsInput): readonly StatusTimelineProblemSegment[] => {
-  if (!hasValidRange(range)) {
-    return [];
-  }
-
-  return incidents
-    .map((incident) => {
-      const startMs = Date.parse(incident.startedIso);
-      const endMs = incident.endedIso ? Date.parse(incident.endedIso) : undefined;
-      const span = clipStatusTimelineSpan(
-        {
-          startMs,
-          endMs
-        },
-        range
-      );
-
-      if (!span) {
-        return undefined;
-      }
-
-      return toStatusTimelineSegment(
-        {
-          id: incident.id,
-          href: incident.href,
-          tone: incident.kind === 'maintenance' ? 'amber' : 'red',
-          startedIso: incident.startedIso,
-          endedIso: incident.endedIso,
-          ...span
-        },
-        range
-      ) satisfies StatusTimelineProblemSegment;
-    })
-    .filter((segment) => segment !== undefined)
-    .sort((a, b) => a.startMs - b.startMs || a.endMs - b.endMs || compareRuText(a.id, b.id));
-};
-
-export const mergeStatusTimelineSpans = (
-  spans: readonly StatusTimelineSpan[]
-): readonly StatusTimelineSpan[] => {
-  const sorted = spans
-    .filter(
-      (span) =>
-        Number.isFinite(span.startMs) && Number.isFinite(span.endMs) && span.endMs > span.startMs
-    )
-    .toSorted((a, b) => a.startMs - b.startMs || a.endMs - b.endMs);
-
-  if (sorted.length === 0) {
-    return [];
-  }
-
-  return sorted.reduce<StatusTimelineSpan[]>((merged, span) => {
-    const last = merged.at(-1);
-
-    if (!last || span.startMs > last.endMs) {
-      merged.push(span);
-      return merged;
-    }
-
-    merged[merged.length - 1] = {
-      startMs: last.startMs,
-      endMs: Math.max(last.endMs, span.endMs)
-    };
-
-    return merged;
-  }, []);
-};
-
-export const buildStatusTimelineStableSegments = (
-  problemSegments: readonly StatusTimelineSpan[],
-  range: StatusTimelineRange
-): readonly StatusTimelineStableSegment[] => {
-  if (!hasValidRange(range)) {
-    return [];
-  }
-
-  const merged = mergeStatusTimelineSpans(problemSegments);
-
-  if (merged.length === 0) {
-    return [
-      toStatusTimelineSegment(
-        {
-          startMs: range.startMs,
-          endMs: range.endMs
-        },
-        range
+      id,
+      tone: !day ? 'green' : day.kind === 'maintenance' ? 'amber' : 'red',
+      recordIds: (day?.recordIds ?? []).toSorted(
+        (a, b) => starts.get(a)! - starts.get(b)! || compareRuText(a, b)
       )
-    ];
-  }
-
-  const stable: StatusTimelineStableSegment[] = [];
-  let cursor = range.startMs;
-
-  merged.forEach((span) => {
-    if (span.startMs > cursor) {
-      stable.push(
-        toStatusTimelineSegment(
-          {
-            startMs: cursor,
-            endMs: span.startMs
-          },
-          range
-        )
-      );
-    }
-
-    cursor = Math.max(cursor, span.endMs);
+    };
   });
-
-  if (cursor < range.endMs) {
-    stable.push(
-      toStatusTimelineSegment(
-        {
-          startMs: cursor,
-          endMs: range.endMs
-        },
-        range
-      )
-    );
-  }
-
-  return stable;
 };
+
+const fullDate = new Intl.DateTimeFormat('ru-RU', {
+  timeZone: 'Europe/Moscow',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric'
+});
+const shortDate = new Intl.DateTimeFormat('ru-RU', {
+  timeZone: 'Europe/Moscow',
+  day: 'numeric',
+  month: 'short'
+});
+export const formatTimelineDate = (id: string, short = false): string =>
+  (short ? shortDate : fullDate).format(new Date(`${id}T12:00:00+03:00`));
+
+export const formatTimelineCount = (count: number): string => {
+  const mod100 = count % 100;
+  const mod10 = count % 10;
+  return `${count} ${mod100 >= 11 && mod100 <= 14 ? 'событий' : mod10 === 1 ? 'событие' : mod10 >= 2 && mod10 <= 4 ? 'события' : 'событий'}`;
+};
+
+export const formatTimelineDay = (
+  day: StatusTimelineDay,
+  records: readonly StatusTimelineRecord[]
+): string =>
+  `${formatTimelineDate(day.id)} · ${
+    day.recordIds.length
+      ? records
+          .filter((record) => day.recordIds.includes(record.id))
+          .map(
+            (record) =>
+              `${record.kind === 'maintenance' ? 'Плановые работы' : 'Инцидент'}: ${record.title}`
+          )
+          .join('. ')
+      : 'Нет записей'
+  }`;

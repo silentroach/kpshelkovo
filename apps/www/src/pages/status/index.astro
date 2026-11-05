@@ -1,6 +1,7 @@
 ---
 import StatusIncidentRow from '@/components/status/StatusIncidentRow.astro';
 import StatusServiceCard from '@/components/status/StatusServiceCard.astro';
+import StatusTimelineLegend from '@/components/status/StatusTimelineLegend.astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import { CalendarIcon } from '@shelkovo/ui/icons';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -23,7 +24,6 @@ const data = await loadStatusData();
 const calendarYear = data.calendar.buildYear;
 const calendarHeading = `Проблемы и плановые работы за ${calendarYear} год`;
 const overviewTimelineDays = 30;
-const mobileOverviewTimelineDays = 7;
 const recentIncidents = data.incidents.slice(0, 10);
 const activeIncidents = data.active.filter((item) => item.kind === 'incident');
 const plannedWorks = data.incidents.filter(isActiveOrScheduledMaintenance);
@@ -73,7 +73,9 @@ const schema = collectionPageSchema({
 
         <div class="status-header__copy" data-status-page-header-copy>
           <div class="status-title-row">
-            <h1 class="ui-page-title" data-pagefind-body>Статус КП Шелково</h1>
+            <h1 class="ui-page-title" data-pagefind-body>
+              Статус КП Шелково
+            </h1>
 
             <span class="status-calendar-entry">
               <a
@@ -106,68 +108,62 @@ const schema = collectionPageSchema({
         <div>
           <div class="status-services__header">
             <p>Сервис</p>
-            <p>Хронология за месяц</p>
+            <p>Хронология по дням</p>
             <p>Статус</p>
             <p>Последняя запись</p>
           </div>
 
           <div>
-            {
-              data.services.map((summary) => (
-                <StatusServiceCard
-                  summary={summary}
-                  serviceHref={statusServiceUrl(summary.service)}
-                  timelineDays={overviewTimelineDays}
-                  mobileTimelineDays={mobileOverviewTimelineDays}
-                />
-              ))
-            }
+            {data.services.map((summary) => (
+              <StatusServiceCard
+                summary={summary}
+                serviceHref={statusServiceUrl(summary.service)}
+                timelineDays={overviewTimelineDays}
+              />
+            ))}
           </div>
+          <StatusTimelineLegend />
         </div>
       </div>
     </section>
 
-    {
-      activeIncidents.length > 0 && (
-        <section class="status-section">
-          <div class="status-section__content">
-            <div class="status-section__heading">
-              <h2 class="ui-section-title">Активные инциденты</h2>
-              <p class="status-section__description">
-                Отключения и ограничения, которые еще не закрыты.
-              </p>
-            </div>
-
-            <div class="status-rows">
-              {activeIncidents.map((incident) => (
-                <StatusIncidentRow incident={incident} />
-              ))}
-            </div>
+    {activeIncidents.length > 0 && (
+      <section class="status-section">
+        <div class="status-section__content">
+          <div class="status-section__heading">
+            <h2 class="ui-section-title">Активные инциденты</h2>
+            <p class="status-section__description">
+              Отключения и ограничения, которые еще не закрыты.
+            </p>
           </div>
-        </section>
-      )
-    }
 
-    {
-      plannedWorks.length > 0 && (
-        <section class="status-section">
-          <div class="status-section__content">
-            <div>
-              <h2 class="ui-section-title">Плановые работы</h2>
-              <p class="status-section__description">
-                Запланированные или уже идущие работы по сервисам поселка.
-              </p>
-            </div>
-
-            <div class="status-rows">
-              {plannedWorks.map((incident) => (
-                <StatusIncidentRow incident={incident} />
-              ))}
-            </div>
+          <div class="status-rows">
+            {activeIncidents.map((incident) => (
+              <StatusIncidentRow incident={incident} />
+            ))}
           </div>
-        </section>
-      )
-    }
+        </div>
+      </section>
+    )}
+
+    {plannedWorks.length > 0 && (
+      <section class="status-section">
+        <div class="status-section__content">
+          <div>
+            <h2 class="ui-section-title">Плановые работы</h2>
+            <p class="status-section__description">
+              Запланированные или уже идущие работы по сервисам поселка.
+            </p>
+          </div>
+
+          <div class="status-rows">
+            {plannedWorks.map((incident) => (
+              <StatusIncidentRow incident={incident} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
 
     <section
       class="status-section"
@@ -182,11 +178,9 @@ const schema = collectionPageSchema({
         </div>
 
         <div class="status-rows">
-          {
-            recentIncidents.map((incident) => (
-              <StatusIncidentRow incident={incident} />
-            ))
-          }
+          {recentIncidents.map((incident) => (
+            <StatusIncidentRow incident={incident} />
+          ))}
         </div>
 
         <p>

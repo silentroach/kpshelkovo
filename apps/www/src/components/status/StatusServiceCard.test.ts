@@ -60,7 +60,7 @@ afterEach(() => {
 });
 
 describe('StatusServiceCard', () => {
-  it('keeps overview timeline tooltips available', async () => {
+  it('embeds one set of timeline records and keeps the service URL', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(StatusServiceCard, {
       props: {
@@ -69,25 +69,22 @@ describe('StatusServiceCard', () => {
       }
     });
 
-    expect(html).toContain('data-status-timeline-tooltip');
-    expect(html).toContain('data-tooltip-title="Проверка tooltip');
-    expect(html).toContain('aria-label="Вода. Инцидент');
+    expect(html.match(/data-timeline-records=/gu)).toHaveLength(1);
+    expect(html).toContain('href="/status/water/"');
+    expect(html.match(/data-timeline-control/gu)).toHaveLength(1);
   });
 
-  it('renders separate mobile and desktop timeline ranges when requested', async () => {
+  it('uses a single component for both thirty-day views', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(StatusServiceCard, {
       props: {
         summary: summary(),
         serviceHref: '/status/water/',
-        timelineDays: 30,
-        mobileTimelineDays: 7
+        timelineDays: 30
       }
     });
 
-    expect(html.match(/data-range-days="7"/gu)?.length ?? 0).toBe(1);
-    expect(html.match(/data-range-days="30"/gu)?.length ?? 0).toBe(1);
-    expect(html).toContain('data-status-timeline-viewport="mobile"');
-    expect(html).toContain('data-status-timeline-viewport="desktop"');
+    expect(html.match(/data-day="/gu)).toHaveLength(60);
+    expect(html.match(/data-range-days="30"/gu)).toHaveLength(1);
   });
 });

@@ -1,4 +1,5 @@
-export { dateTimeFromISO, dateTimeFromParts, formatDate, formatMonth } from './date';
+export { dateTimeFromISO, dateTimeFromParts, formatMonth } from './date';
+export { formatDate } from './format-date';
 export { formatCurrency, formatDistance, formatPercentage, formatTariff } from './currency';
 export {
   createNumberFormatterRu,

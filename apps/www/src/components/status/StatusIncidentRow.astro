@@ -31,7 +31,11 @@ const titleIcon =
 const TitleIcon = titleIcon?.Icon;
 ---
 
-<article class="ui-shell status-incident-row">
+<article
+  class="ui-shell status-incident-row"
+  data-status-kind={incident.kind}
+  data-status-phase={incident.phase}
+>
   <div class="status-incident-row__content">
     <div class="status-incident-row__header">
       <h3 class="ui-entry-title">
@@ -69,6 +73,24 @@ const TitleIcon = titleIcon?.Icon;
 <style>
   .status-incident-row {
     padding: 1.25rem;
+  }
+
+  .status-incident-row[data-status-kind='maintenance'][data-status-phase='active'] {
+    background: color-mix(
+      in oklab,
+      var(--color-warning-soft) 55%,
+      var(--color-bg) 45%
+    );
+    box-shadow: inset 3px 0 var(--color-warning-graphic);
+  }
+
+  .status-incident-row[data-status-kind='incident'][data-status-phase='active'] {
+    background: color-mix(
+      in oklab,
+      var(--color-danger-soft) 55%,
+      var(--color-bg) 45%
+    );
+    box-shadow: inset 3px 0 var(--color-danger);
   }
 
   .status-incident-row__content {

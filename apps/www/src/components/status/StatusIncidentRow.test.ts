@@ -41,6 +41,57 @@ const incident = {
 } satisfies StatusIncident;
 
 describe('StatusIncidentRow', () => {
+  it('exposes snapshot kind and phase for active-only row styling', async () => {
+    const container = await createAstroContainer();
+    const variants = [
+      { kind: 'incident', phase: 'active' },
+      { kind: 'maintenance', phase: 'active' },
+      { kind: 'incident', phase: 'scheduled' },
+      { kind: 'maintenance', phase: 'scheduled' },
+      { kind: 'incident', phase: 'resolved' },
+      { kind: 'maintenance', phase: 'resolved' }
+    ] as const;
+    const attributes = await Promise.all(
+      variants.map(async (variant) => {
+        const html = await container.renderToString(StatusIncidentRow, {
+          props: { incident: { ...incident, ...variant } }
+        });
+        return {
+          kind: html.match(/data-status-kind="([^"]+)"/u)?.[1],
+          phase: html.match(/data-status-phase="([^"]+)"/u)?.[1]
+        };
+      })
+    );
+    expect(attributes).toMatchInlineSnapshot(`
+      [
+        {
+          "kind": "incident",
+          "phase": "active",
+        },
+        {
+          "kind": "maintenance",
+          "phase": "active",
+        },
+        {
+          "kind": "incident",
+          "phase": "scheduled",
+        },
+        {
+          "kind": "maintenance",
+          "phase": "scheduled",
+        },
+        {
+          "kind": "incident",
+          "phase": "resolved",
+        },
+        {
+          "kind": "maintenance",
+          "phase": "resolved",
+        },
+      ]
+    `);
+  });
+
   it('renders incident title links without leading whitespace', async () => {
     const container = await createAstroContainer();
     const html = await container.renderToString(StatusIncidentRow, {

@@ -6,6 +6,7 @@ import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import StatusIncidentRow from '@/components/status/StatusIncidentRow.astro';
 import StatusServiceState from '@/components/status/StatusServiceState.astro';
 import StatusServiceTimeline from '@/components/status/StatusServiceTimeline.astro';
+import StatusTimelineLegend from '@/components/status/StatusTimelineLegend.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import {
   withHomeBreadcrumbs,
@@ -17,6 +18,7 @@ import { loadStatusService } from '@/lib/status/load';
 import { STATUS_SERVICES, type StatusService } from '@/lib/status/schema';
 import {
   statusServiceCanonical,
+  statusHistoryUrl,
   statusServiceUrl,
   statusUrl,
 } from '@/lib/status/routes';
@@ -119,6 +121,7 @@ const schema = collectionPageSchema({
           incidents={timelineIncidents}
           timelineDays={90}
         />
+        <StatusTimelineLegend />
       </div>
     </section>
 
@@ -139,6 +142,11 @@ const schema = collectionPageSchema({
             Пока без записей по этому сервису.
           </p>
         )}
+        <p>
+          <a class="ui-link" href={statusHistoryUrl()}>
+            Вся история статусов
+          </a>
+        </p>
       </div>
     </section>
   </main>
