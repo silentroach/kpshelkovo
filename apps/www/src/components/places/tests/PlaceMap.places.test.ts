@@ -202,6 +202,7 @@ describe('PlaceMap', () => {
   it.each([
     'apple',
     'animals',
+    'beach',
     'construction',
     'fish',
     'foodtruck',
@@ -789,7 +790,7 @@ describe('PlaceMap', () => {
     ]);
   });
 
-  it.each(['titanik', 'green-dreams'])(
+  it.each(['titanik', 'greenwood-green-dreams'])(
     'removes unpublished highlight %s without changing the map view',
     async (slug) => {
       vi.stubGlobal('matchMedia', () => ({ matches: false }));

@@ -1,6 +1,7 @@
 import {
   ANIMALS_MARKER,
   APPLE_MARKER,
+  BEACH_MARKER,
   CONSTRUCTION_MARKER,
   FISH_MARKER,
   FOODTRUCK_MARKER,
@@ -19,6 +20,7 @@ import type { PlaceMarkerImage } from './marker-images.types';
 export const PLACE_MARKER_IMAGES = {
   apple: APPLE_MARKER,
   animals: ANIMALS_MARKER,
+  beach: BEACH_MARKER,
   construction: CONSTRUCTION_MARKER,
   fish: FISH_MARKER,
   foodtruck: FOODTRUCK_MARKER,
