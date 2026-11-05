@@ -2,7 +2,7 @@
 
 ## Context
 
-Объём и связь с [#1263](https://github.com/silentroach/kpshelkovo/issues/1263) заданы в [proposal](/openspec/changes/add-search-excerpt-ellipsis/proposal.md). Архитектура следует [ADR-025](/docs/decisions/025-static-full-text-search-with-pagefind.md), оформление принадлежит приложению по [ADR-034](/docs/decisions/034-native-css-architecture.md).
+Объём и связь с [#1263](https://github.com/silentroach/kpshelkovo/issues/1263) заданы в [proposal](/openspec/changes/archive/2026-11-05-add-search-excerpt-ellipsis/proposal.md). Архитектура следует [ADR-025](/docs/decisions/025-static-full-text-search-with-pagefind.md), оформление принадлежит приложению по [ADR-034](/docs/decisions/034-native-css-architecture.md).
 
 У [SearchDialog](/apps/www/src/components/search/SearchDialog.svelte) `resultRow` сравнивает основной и секционный excerpts после нормализации пробелов. Якорь выбирается только при единственной цели. [Клиент](/apps/www/src/lib/search/client.ts) передаёт HTML, экранированный Pagefind, а UI декодирует текст и отдельно выводит разрешённую подсветку `<mark>`.
 

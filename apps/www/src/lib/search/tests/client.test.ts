@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createPagefindSearchClient } from '../client';
 import type { PagefindRuntime, PagefindSearchResponse } from '../client.internal.types';
 import { SEARCH_QUERY_MAX_LENGTH, SEARCH_RESULT_DEFAULT_LIMIT } from '../client.types';
+import { SearchResultLoadError } from '../result-load-error';
 
 const responseWith = (...data: readonly unknown[]): PagefindSearchResponse => ({
   results: data.map((value, index) => ({
@@ -47,6 +48,62 @@ const runtimeWith = (response: PagefindSearchResponse) => {
 };
 
 describe('Pagefind search client', () => {
+  it.each([
+    [false, false],
+    [true, false],
+    [false, true],
+    [true, true]
+  ])(
+    'separates raw excerpt cuts (%j, %j) from primary and section text',
+    async (cutStart, cutEnd) => {
+      const marker = '<!--pagefind-excerpt-cut-->';
+      const html = '<mark>Текст</mark> <mark>рядом</mark> &lt;script&gt; &amp;';
+      const { runtime } = runtimeWith(
+        responseWith({
+          ...validResult(1),
+          excerpt: `${cutStart ? marker : ''} ${html} ${cutEnd ? marker : ''}`,
+          sub_results: [
+            {
+              url: '/news/result-1/#section',
+              title: 'Секция',
+              excerpt: `${marker}${html}${marker}`
+            }
+          ]
+        })
+      );
+      const client = createPagefindSearchClient({
+        available: true,
+        loadPagefind: async () => runtime
+      });
+      const response = await client.search('два слова');
+      expect(response?.state === 'ready' ? response.results[0] : undefined).toMatchObject({
+        excerptHtml: html,
+        excerptCutStart: cutStart,
+        excerptCutEnd: cutEnd,
+        subResults: [{ excerptHtml: html }]
+      });
+    }
+  );
+
+  it.each([
+    '…<mark>Текст</mark>...',
+    '...<mark>Текст</mark>…',
+    '&lt;!--pagefind-excerpt-cut--&gt;<mark>Текст</mark>&lt;!--pagefind-excerpt-cut--&gt;',
+    'Текст <!--pagefind-excerpt-cut--> внутри',
+    '<!--PAGEFIND-EXCERPT-CUT-->Текст'
+  ])('preserves authored punctuation and non-edge or escaped markers in %j', async (html) => {
+    const marker = '<!--pagefind-excerpt-cut-->';
+    const { runtime } = runtimeWith(
+      responseWith({ ...validResult(1), excerpt: `${marker}${html}${marker}` })
+    );
+    const client = createPagefindSearchClient({
+      available: true,
+      loadPagefind: async () => runtime
+    });
+    const response = await client.search('два слова');
+    expect(response?.state === 'ready' ? response.results[0]?.excerptHtml : undefined).toBe(html);
+  });
+
   it('loads, configures, and initializes one runtime lazily without applying sort', async () => {
     const { init, options, runtime, search } = runtimeWith(responseWith());
     const loadPagefind = vi.fn(async () => runtime);
@@ -77,6 +134,7 @@ describe('Pagefind search client', () => {
       [
         [
           {
+            "excerptEllipsis": "<!--pagefind-excerpt-cut-->",
             "highlightParam": "h",
             "ranking": {
               "metaWeights": {
@@ -386,6 +444,8 @@ describe('Pagefind search client', () => {
         "results": [
           {
             "description": "Короткое описание",
+            "excerptCutEnd": false,
+            "excerptCutStart": false,
             "excerptHtml": "Текст с <mark>совпадением</mark> и &lt;script&gt;alert(1)&lt;/script&gt;",
             "matchContext": undefined,
             "publishedAt": "2026-08-14",
@@ -415,6 +475,8 @@ describe('Pagefind search client', () => {
           },
           {
             "description": undefined,
+            "excerptCutEnd": undefined,
+            "excerptCutStart": undefined,
             "excerptHtml": undefined,
             "matchContext": undefined,
             "publishedAt": undefined,
@@ -602,9 +664,10 @@ describe('Pagefind search client', () => {
   });
 
   it('evicts rejected result data so the same query can retry', async () => {
+    const cause = new Error('fragment failed');
     const data = vi
       .fn<() => Promise<unknown>>()
-      .mockRejectedValueOnce(new Error('fragment failed'))
+      .mockRejectedValueOnce(cause)
       .mockResolvedValue(validResult(1));
     const response: PagefindSearchResponse = {
       results: [{ id: 'retry-result', data }]
@@ -615,12 +678,127 @@ describe('Pagefind search client', () => {
       loadPagefind: async () => runtime
     });
 
-    await expect(client.search('ошибка', 1)).rejects.toThrow('fragment failed');
+    await expect(client.search('ошибка', 1)).rejects.toMatchObject({
+      name: 'SearchResultLoadError',
+      cause
+    });
     await expect(client.search('ошибка', 1)).resolves.toMatchObject({
       state: 'ready',
       results: { length: 1 }
     });
     expect(data).toHaveBeenCalledTimes(2);
+  });
+
+  it('retains successful result data while retrying a failed expansion at the same limit', async () => {
+    const successful = vi.fn(async () => validResult(1));
+    const cause = new Error('fragment failed');
+    const failing = vi
+      .fn<() => Promise<unknown>>()
+      .mockRejectedValueOnce(cause)
+      .mockResolvedValue(validResult(2));
+    const { runtime, init } = runtimeWith({
+      results: [
+        { id: 'first', data: successful },
+        { id: 'second', data: failing }
+      ]
+    });
+    const loadPagefind = vi.fn(async () => runtime);
+    const client = createPagefindSearchClient({ available: true, loadPagefind });
+    await client.search('два слова', 1);
+    await expect(client.search('два слова', 2)).rejects.toMatchObject({
+      name: 'SearchResultLoadError',
+      cause
+    });
+    const response = await client.search('два слова', 2);
+    expect({
+      urls: response?.state === 'ready' ? response.results.map((result) => result.url) : [],
+      dataCalls: [successful.mock.calls.length, failing.mock.calls.length],
+      initCalls: init.mock.calls.length,
+      loadCalls: loadPagefind.mock.calls.length
+    }).toMatchInlineSnapshot(`
+      {
+        "dataCalls": [
+          1,
+          2,
+        ],
+        "initCalls": 1,
+        "loadCalls": 1,
+        "urls": [
+          "/news/result-1/",
+          "/news/result-2/",
+        ],
+      }
+    `);
+  });
+
+  it.each([false, true])(
+    'marks only the data read and retries it (inverse-prefix: %j)',
+    async (inverse) => {
+      const cause = new Error('fragment failed');
+      const data = vi
+        .fn<() => Promise<unknown>>()
+        .mockRejectedValueOnce(cause)
+        .mockResolvedValue({
+          ...validResult(1),
+          content: 'Калькулятор',
+          locations: [0]
+        });
+      const response = { results: [{ id: 'first', data }] };
+      const { runtime, search } = runtimeWith(response);
+      if (inverse)
+        search.mockImplementation(async (query) =>
+          query.startsWith('"') ? responseWith() : response
+        );
+      const client = createPagefindSearchClient({
+        available: true,
+        loadPagefind: async () => runtime
+      });
+      const query = inverse ? 'калькуля' : 'два слова';
+      const failure = await client.search(query).catch((error: unknown) => error);
+      expect(failure instanceof SearchResultLoadError ? failure.cause : undefined).toBe(cause);
+      await expect(client.search(query)).resolves.toMatchObject({ results: { length: 1 } });
+      expect(data).toHaveBeenCalledTimes(2);
+    }
+  );
+
+  it.each([
+    'import',
+    'options',
+    'init',
+    'broad',
+    'exact',
+    'normalization',
+    'inverse normalization'
+  ] as const)('does not mark a failure in %s as a retryable result read', async (stage) => {
+    const cause = new Error(stage);
+    const value = {
+      ...validResult(1),
+      get content() {
+        if (stage === 'inverse normalization') throw cause;
+        return 'Текст';
+      },
+      get meta() {
+        if (stage === 'normalization') throw cause;
+        return validResult(1).meta;
+      }
+    };
+    const { runtime, options, init, search } = runtimeWith(responseWith(value));
+    const loadPagefind = vi.fn(async () => runtime);
+    if (stage === 'import') loadPagefind.mockRejectedValue(cause);
+    if (stage === 'options') options.mockRejectedValue(cause);
+    if (stage === 'init') init.mockRejectedValue(cause);
+    if (stage === 'broad') search.mockRejectedValue(cause);
+    if (stage === 'exact')
+      search.mockImplementation(async (query) => {
+        if (query.startsWith('"')) throw cause;
+        return responseWith(value);
+      });
+    if (stage === 'inverse normalization')
+      search.mockImplementation(async (query) =>
+        query.startsWith('"') ? responseWith() : responseWith(value)
+      );
+    const client = createPagefindSearchClient({ available: true, loadPagefind });
+    await expect(client.search('калькуля')).rejects.toBe(cause);
   });
 
   it('evicts a stale rejection only from its captured query cache', async () => {
@@ -652,9 +830,10 @@ describe('Pagefind search client', () => {
     const olderRequest = client.search('старый', 1);
     await vi.waitFor(() => expect(olderData).toHaveBeenCalledOnce());
     await client.search('новый', 1);
-    rejectOlder(new Error('stale fragment failed'));
+    const cause = new Error('stale fragment failed');
+    rejectOlder(cause);
 
-    await expect(olderRequest).rejects.toThrow('stale fragment failed');
+    await expect(olderRequest).rejects.toMatchObject({ name: 'SearchResultLoadError', cause });
     await client.search('новый', 1);
     expect(newerData).toHaveBeenCalledOnce();
   });
@@ -862,6 +1041,8 @@ describe('Pagefind search client', () => {
           "results": [
             {
               "description": undefined,
+              "excerptCutEnd": false,
+              "excerptCutStart": false,
               "excerptHtml": "Результат 1",
               "matchContext": undefined,
               "publishedAt": undefined,
@@ -875,6 +1056,8 @@ describe('Pagefind search client', () => {
             },
             {
               "description": undefined,
+              "excerptCutEnd": false,
+              "excerptCutStart": false,
               "excerptHtml": "Результат 2",
               "matchContext": undefined,
               "publishedAt": undefined,
@@ -976,6 +1159,8 @@ describe('Pagefind search client', () => {
           "results": [
             {
               "description": undefined,
+              "excerptCutEnd": false,
+              "excerptCutStart": false,
               "excerptHtml": "Точное совпадение 1",
               "matchContext": undefined,
               "publishedAt": undefined,
@@ -989,6 +1174,8 @@ describe('Pagefind search client', () => {
             },
             {
               "description": undefined,
+              "excerptCutEnd": false,
+              "excerptCutStart": false,
               "excerptHtml": "Точное совпадение 3",
               "matchContext": undefined,
               "publishedAt": undefined,

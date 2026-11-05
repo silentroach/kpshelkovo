@@ -22,6 +22,9 @@ export interface SearchResult {
   readonly matchContext?: string;
   /** Pagefind-escaped text with Pagefind-added highlight <mark> elements. */
   readonly excerptHtml?: string;
+  /** Confirmed Pagefind truncation, independent of the undecorated excerpt text. */
+  readonly excerptCutStart?: boolean;
+  readonly excerptCutEnd?: boolean;
   readonly subResults: readonly SearchSubResult[];
 }
 

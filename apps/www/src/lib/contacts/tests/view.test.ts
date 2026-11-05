@@ -39,6 +39,7 @@ describe('contact view helpers', () => {
   it('formats review dates', () => {
     expect(
       formatContactReviewDate({
+        anchorId: 'contact-review-e04fdc091950367e',
         sentiment: 'positive',
         summary: 'Помогли с электричеством.',
         publishedAt: new Date('2026-04-07T00:00:00.000Z'),

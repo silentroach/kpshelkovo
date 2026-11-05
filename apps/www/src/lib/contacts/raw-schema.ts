@@ -3,6 +3,7 @@ import { z } from 'astro/zod';
 import { RawContactMethodsSchema } from '@/lib/contact-methods/raw-schema';
 import { RawSearchAliasesSchema } from '@/lib/search/raw-schema';
 
+import { contactReviewAnchorId } from './review-anchor';
 import {
   CONTACT_CATEGORIES,
   CONTACT_REVIEW_SENTIMENTS,
@@ -125,7 +126,23 @@ export const RawContactSchema = z
     search_aliases: RawSearchAliasesSchema.optional(),
     contacts: RawContactMethodsSchema,
     location: location.optional(),
-    reviews: z.array(review).optional(),
+    reviews: z
+      .array(review)
+      .superRefine((reviews, ctx) => {
+        const ids = new Set<string>();
+        reviews.forEach((review, index) => {
+          const id = contactReviewAnchorId(review.url);
+          if (ids.has(id)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [index, 'url'],
+              message: `Review source must have a unique anchor: ${id}`
+            });
+          }
+          ids.add(id);
+        });
+      })
+      .optional(),
     seo: seo.optional(),
     vcf: vcf.optional()
   })

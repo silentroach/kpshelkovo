@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createPagefindSearchClient } from '@/lib/search/client';
 import type { PagefindRuntime, PagefindSearchResponse } from '@/lib/search/client.internal.types';
 import type { SearchClient, SearchResponse, SearchResult } from '@/lib/search/client.types';
+import { SearchResultLoadError } from '@/lib/search/result-load-error';
 
 import { SEARCH_DIALOG_OPEN_EVENT } from '../search-dialog.events';
 import SearchDialog from '../SearchDialog.svelte';
@@ -93,6 +94,288 @@ afterEach(() => {
 });
 
 describe('SearchDialog', () => {
+  it.each(['retry', 'input'] as const)(
+    'retries the initial batch and respects focus on %s',
+    async (focusTarget) => {
+      const pending = deferred<SearchResponse | undefined>();
+      const error = new SearchResultLoadError(new Error('fragment failed'));
+      const search = vi
+        .fn<SearchClient['search']>()
+        .mockRejectedValueOnce(error)
+        .mockRejectedValueOnce(error)
+        .mockImplementationOnce(() => pending.promise);
+      const view = render(SearchDialog, { props: { client: { search } } });
+      const opener = addOpener('Поиск');
+      await requestOpen(opener);
+      const input = view.getByRole('searchbox');
+      await enterDebouncedQuery(input, 'вода');
+      const retryButton = await waitFor(() => view.getByRole('button', { name: 'Повторить' }));
+      expect(dialogFrom(view.container).querySelector('[aria-live]')?.textContent?.trim()).toBe(
+        'Не удалось загрузить результаты поиска. Повторить'
+      );
+      retryButton.focus();
+      await fireEvent.click(retryButton);
+      await waitFor(() => expect(retryButton.getAttribute('aria-disabled')).toBe('false'));
+      expect(view.getByRole('button', { name: 'Повторить' })).toBe(retryButton);
+      await fireEvent.click(retryButton);
+      expect(retryButton.getAttribute('aria-disabled')).toBe('true');
+      expect(retryButton.hasAttribute('disabled')).toBe(false);
+      expect(view.getByRole('button', { name: 'Повторить' })).toBe(retryButton);
+      expect(view.getByRole('region').getAttribute('aria-busy')).toBe('true');
+      expect(dialogFrom(view.container).querySelector('[aria-live]')?.textContent?.trim()).toBe(
+        'Ищем по сайту'
+      );
+      await fireEvent.click(retryButton);
+      await fireEvent.keyDown(retryButton, { key: 'Enter' });
+      await fireEvent.click(retryButton, { detail: 0 });
+      expect(search).toHaveBeenCalledTimes(3);
+      expect(document.activeElement).toBe(retryButton);
+      if (focusTarget === 'input') input.focus();
+      pending.resolve(readyResponse('вода', [resultAt(1)]));
+      await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(1));
+      await waitFor(() =>
+        expect(document.activeElement).toBe(
+          focusTarget === 'retry' ? view.getByRole('link') : input
+        )
+      );
+      expect(view.queryByRole('button', { name: 'Повторить' })).toBeNull();
+      expect((input as HTMLInputElement).value).toBe('вода');
+      expect(search.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "вода",
+          8,
+        ],
+        [
+          "вода",
+          8,
+        ],
+        [
+          "вода",
+          8,
+        ],
+      ]
+    `);
+      await fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'Escape' });
+      expect(document.activeElement).toBe(opener);
+      expect(dialogFrom(view.container).open).toBe(false);
+    }
+  );
+
+  it.each(['retry', 'close'] as const)(
+    'restores focus after an empty retry only when it remained on %s',
+    async (focusTarget) => {
+      const pending = deferred<SearchResponse | undefined>();
+      const search = vi
+        .fn<SearchClient['search']>()
+        .mockRejectedValueOnce(new SearchResultLoadError(new Error('fragment failed')))
+        .mockImplementationOnce(() => pending.promise);
+      const view = render(SearchDialog, { props: { client: { search } } });
+      await requestOpen(addOpener('Поиск'));
+      const input = view.getByRole('searchbox');
+      await enterDebouncedQuery(input, 'вода');
+      const retryButton = await waitFor(() => view.getByRole('button', { name: 'Повторить' }));
+      retryButton.focus();
+      await fireEvent.click(retryButton);
+      const closeButton = view.getByRole('button', { name: 'Закрыть' });
+      if (focusTarget === 'close') closeButton.focus();
+      pending.resolve(readyResponse('вода', []));
+      await waitFor(() => expect(view.queryByRole('button', { name: 'Повторить' })).toBeNull());
+      await waitFor(() =>
+        expect(document.activeElement).toBe(focusTarget === 'retry' ? input : closeButton)
+      );
+    }
+  );
+
+  it('preserves a successful batch and the failed limit, stops automatic retries and focuses the first addition', async () => {
+    const intersections: Array<() => void> = [];
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        readonly root = null;
+        readonly rootMargin = '0px';
+        readonly scrollMargin = '0px';
+        readonly thresholds: readonly number[] = [];
+        constructor(callback: IntersectionObserverCallback) {
+          intersections.push(() =>
+            callback([{ isIntersecting: true } as IntersectionObserverEntry], this)
+          );
+        }
+        readonly observe = vi.fn();
+        readonly disconnect = vi.fn();
+        readonly takeRecords = (): IntersectionObserverEntry[] => [];
+        readonly unobserve = vi.fn();
+      }
+    );
+    const first = Array.from({ length: 8 }, (_, index) => resultAt(index + 1));
+    const more = [...first, resultAt(9), resultAt(10)];
+    const pendingFailure = deferred<SearchResponse | undefined>();
+    const pendingSuccess = deferred<SearchResponse | undefined>();
+    const error = new SearchResultLoadError(new Error('fragment failed'));
+    const search = vi
+      .fn<SearchClient['search']>()
+      .mockResolvedValueOnce(readyResponse('вода', first, 10))
+      .mockRejectedValueOnce(error)
+      .mockImplementationOnce(() => pendingFailure.promise)
+      .mockImplementationOnce(() => pendingSuccess.promise);
+    const view = render(SearchDialog, { props: { client: { search } } });
+    await requestOpen(addOpener('Поиск'));
+    await enterDebouncedQuery(view.getByRole('searchbox'), 'вода');
+    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(8));
+    const firstLink = view.getAllByRole('link')[0];
+    intersections[0]?.();
+    const retryButton = await waitFor(() => view.getByRole('button', { name: 'Повторить' }));
+    expect(view.getAllByRole('link')).toHaveLength(8);
+    intersections[0]?.();
+    expect(search).toHaveBeenCalledTimes(2);
+    retryButton.focus();
+    await fireEvent.click(retryButton);
+    await fireEvent.click(retryButton);
+    intersections[0]?.();
+    expect(search).toHaveBeenCalledTimes(3);
+    expect(view.getAllByRole('link')[0]).toBe(firstLink);
+    pendingFailure.reject(error);
+    await waitFor(() => expect(retryButton.getAttribute('aria-disabled')).toBe('false'));
+    expect(view.getAllByRole('link')).toHaveLength(8);
+    intersections[0]?.();
+    expect(search).toHaveBeenCalledTimes(3);
+    await fireEvent.click(retryButton);
+    pendingSuccess.resolve(readyResponse('вода', more, 10));
+    await waitFor(() => expect(document.activeElement).toBe(view.getAllByRole('link')[8]));
+    expect(view.getAllByRole('link')).toHaveLength(10);
+    expect(view.getAllByRole('link')[0]).toBe(firstLink);
+    expect(search.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "вода",
+          8,
+        ],
+        [
+          "вода",
+          16,
+        ],
+        [
+          "вода",
+          16,
+        ],
+        [
+          "вода",
+          16,
+        ],
+      ]
+    `);
+  });
+
+  it.each([
+    ['change', 'resolve'],
+    ['change', 'reject'],
+    ['reopen', 'resolve'],
+    ['reopen', 'reject']
+  ] as const)('ignores an old retry %s / %s', async (action, settlement) => {
+    const pending = deferred<SearchResponse | undefined>();
+    const error = new SearchResultLoadError(new Error('fragment failed'));
+    const search = vi
+      .fn<SearchClient['search']>()
+      .mockRejectedValueOnce(error)
+      .mockImplementationOnce(() => pending.promise)
+      .mockResolvedValue(readyResponse('новый', [resultAt(2)]));
+    const view = render(SearchDialog, { props: { client: { search } } });
+    const opener = addOpener('Поиск');
+    await requestOpen(opener);
+    const input = view.getByRole('searchbox');
+    await enterDebouncedQuery(input, 'старый');
+    const retryButton = await waitFor(() => view.getByRole('button', { name: 'Повторить' }));
+    retryButton.focus();
+    await fireEvent.click(retryButton);
+    if (action === 'reopen') {
+      await fireEvent.keyDown(retryButton, { key: 'Escape' });
+      await requestOpen(opener);
+    }
+    await enterDebouncedQuery(input, action === 'reopen' ? 'старый' : 'новый');
+    await waitFor(() =>
+      expect(view.getByRole('link').getAttribute('href')).toBe('/news/result-2/')
+    );
+    input.focus();
+    if (settlement === 'reject') pending.reject(error);
+    else pending.resolve(readyResponse('старый', [resultAt(1)]));
+    await pending.promise.catch(() => {});
+    expect(view.getByRole('link').getAttribute('href')).toBe('/news/result-2/');
+    expect(view.queryByRole('button', { name: 'Повторить' })).toBeNull();
+    expect(document.activeElement).toBe(input);
+  });
+
+  it.each([
+    [false, false, 'Начало & текст'],
+    [true, false, '… Начало & текст'],
+    [false, true, 'Начало & текст …'],
+    [true, true, '… Начало & текст …']
+  ] as const)(
+    'renders confirmed primary cuts (%j, %j) without changing the section target',
+    async (cutStart, cutEnd, text) => {
+      const marker = '<!--pagefind-excerpt-cut-->';
+      const html = '<mark>Начало</mark> &amp; <mark>текст</mark>';
+      const client = createPagefindSearchClient({
+        available: true,
+        loadPagefind: async () => ({
+          init: async () => {},
+          options: async () => {},
+          preload: async () => {},
+          search: async () => ({
+            results: [
+              {
+                data: async () => ({
+                  url: '/news/fragment/',
+                  meta: { title: 'Страница', sectionId: 'news', sectionLabel: 'Новости' },
+                  excerpt: `${cutStart ? marker : ''}${html}${cutEnd ? marker : ''}`,
+                  sub_results: [{ url: '/news/fragment/#details', title: 'Начало', excerpt: html }]
+                })
+              }
+            ]
+          })
+        })
+      });
+      const view = render(SearchDialog, { props: { client } });
+      await requestOpen(addOpener('Поиск'));
+      await enterDebouncedQuery(view.getByRole('searchbox'), 'два слова');
+      await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(1));
+      const link = view.getByRole('link');
+      expect({
+        href: link.getAttribute('href'),
+        text: link.querySelector('.result-excerpt')?.textContent,
+        context: link.querySelector('.result-context')?.textContent,
+        highlights: [...link.querySelectorAll('mark')].map((mark) => mark.textContent)
+      }).toEqual({
+        href: '/news/fragment/#details',
+        text,
+        context: undefined,
+        highlights: ['Начало', 'текст']
+      });
+      expect(link.innerHTML).not.toContain(marker);
+    }
+  );
+
+  it('keeps authored ellipses and escaped literal markers as safe text alongside confirmed cuts', async () => {
+    const result: SearchResult = {
+      url: '/news/fragment/',
+      title: 'Страница',
+      section: { id: 'news', label: 'Новости' },
+      excerptHtml:
+        '…&lt;!--pagefind-excerpt-cut--&gt;<mark>текст</mark> <mark>рядом</mark>&lt;script&gt;...',
+      excerptCutStart: true,
+      excerptCutEnd: true,
+      subResults: []
+    };
+    const client: SearchClient = { search: async (query) => readyResponse(query, [result]) };
+    const view = render(SearchDialog, { props: { client } });
+    await requestOpen(addOpener('Поиск'));
+    await enterDebouncedQuery(view.getByRole('searchbox'), 'два слова');
+    await waitFor(() => expect(view.getAllByRole('link')).toHaveLength(1));
+    const excerpt = view.getByRole('link').querySelector('.result-excerpt');
+    expect(excerpt?.textContent).toBe('… …<!--pagefind-excerpt-cut-->текст рядом<script>... …');
+    expect(excerpt?.querySelector('script')).toBeNull();
+    expect(excerpt?.querySelectorAll('mark')).toHaveLength(2);
+  });
+
   it('formats raw date metadata and leaves normalized missing dates absent without rendering HTML', async () => {
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-10-01T12:00:00Z'));
@@ -1072,6 +1355,8 @@ describe('SearchDialog', () => {
       title: 'Основная страница',
       section: { id: 'news', label: 'Новости' },
       excerptHtml: primaryExcerpt,
+      excerptCutStart: true,
+      excerptCutEnd: true,
       subResults: excerpts.map((excerptHtml, index) => ({
         url: `${url}${targets[index]}`,
         title: 'Контекст секции',
@@ -1090,7 +1375,7 @@ describe('SearchDialog', () => {
       anchored ? 'Контекст секции' : undefined
     );
     expect(link.querySelector('.site-search-result-excerpt')?.textContent).toBe(
-      'Текст с совпадением и <script>'
+      '… Текст с совпадением и <script> …'
     );
     expect(link.querySelector('mark')?.textContent).toBe('совпадением');
     expect(link.querySelector('script')).toBeNull();

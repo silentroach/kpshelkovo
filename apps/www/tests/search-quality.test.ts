@@ -242,6 +242,150 @@ test('#355 preserves results and pagination across ClientRouter navigations', as
   }
 });
 
+test.each(['initial', 'pagination'] as const)(
+  '#1263 retries real %s fragments without reloading the document or engine',
+  async (phase) => {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    try {
+      let blocked = phase === 'initial';
+      const loadedFragments = new Set<string>();
+      const failedFragments: string[] = [];
+      const engineRequests: string[] = [];
+      let documents = 0;
+      page.on('request', (request) => {
+        if (request.isNavigationRequest() && request.frame() === page.mainFrame()) documents += 1;
+        if (
+          /\/search\/.*(?:pagefind\.js|pagefind-entry\.json|wasm\.[^/]+\.pagefind|\.pf_meta)(?:\?[^#]*)?$/u.test(
+            request.url()
+          )
+        ) {
+          engineRequests.push(request.url());
+        }
+      });
+      await page.route('**/search/fragment/**', async (route) => {
+        const url = route.request().url();
+        if (blocked && !loadedFragments.has(url)) {
+          failedFragments.push(url);
+          await route.abort('failed');
+        } else {
+          loadedFragments.add(url);
+          await route.continue();
+        }
+      });
+      await page.clock.setFixedTime('2026-08-16T12:00:00Z');
+      await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
+      const opener = page.locator('[data-search-trigger]:visible').first();
+      await opener.click();
+      const dialog = page.locator('[data-search-dialog]');
+      const input = dialog.getByRole('searchbox');
+      const links = dialog.locator('[data-search-result]');
+      const retry = dialog.getByRole('button', { name: 'Повторить', exact: true });
+      await input.fill('тариф');
+
+      let previousUrls: readonly (string | undefined)[] = [];
+      if (phase === 'pagination') {
+        await expectPage(links).toHaveCount(8);
+        previousUrls = await links.evaluateAll((elements) =>
+          elements.map((element) => element.getAttribute('href') ?? undefined)
+        );
+        blocked = true;
+        await links.last().scrollIntoViewIfNeeded();
+      }
+
+      await expectPage(
+        dialog
+          .getByRole('region', { name: 'Результаты поиска' })
+          .getByText('Не удалось загрузить результаты поиска.', { exact: true })
+      ).toBeVisible();
+      await expectPage(retry).toBeVisible();
+      await expectPage(links).toHaveCount(previousUrls.length);
+      expect(failedFragments.length).toBeGreaterThan(0);
+      const engineBeforeRetry = [...engineRequests];
+      expect(engineBeforeRetry.length).toBeGreaterThan(0);
+
+      // A second manual attempt must fail visibly, without triggering an automatic loop.
+      const failedBeforeRetry = failedFragments.length;
+      await retry.focus();
+      await retry.press('Enter');
+      await expect.poll(() => failedFragments.length).toBeGreaterThan(failedBeforeRetry);
+      await expectPage(retry).toBeEnabled();
+      const failedAfterRetry = failedFragments.length;
+      await page.waitForTimeout(400);
+      expect(failedFragments).toHaveLength(failedAfterRetry);
+      await expectPage(input).toHaveValue('тариф');
+      expect(
+        await links.evaluateAll((elements) =>
+          elements.map((element) => element.getAttribute('href') ?? undefined)
+        )
+      ).toEqual(previousUrls);
+
+      blocked = false;
+      await retry.press('Enter');
+      const expectedCount = phase === 'initial' ? 8 : 16;
+      await expectPage(links).toHaveCount(expectedCount);
+      await expectPage(retry).toHaveCount(0);
+      const urls = await links.evaluateAll((elements) =>
+        elements.map((element) => element.getAttribute('href'))
+      );
+      expect(urls).toEqual(expect.arrayContaining(previousUrls));
+      expect(new Set(urls).size).toBe(expectedCount);
+      await expectPage(links.nth(previousUrls.length)).toBeFocused();
+      await expectPage(input).toHaveValue('тариф');
+      expect(engineRequests).toEqual(engineBeforeRetry);
+      expect(documents).toBe(1);
+      await page.keyboard.press('Escape');
+      await expectPage(opener).toBeFocused();
+    } finally {
+      await page.close();
+    }
+  }
+);
+
+test.each([
+  ['entry', /\/search\/pagefind-entry\.json(?:\?[^#]*)?$/u],
+  ['WASM', /\/search\/wasm\.[^/]+\.pagefind(?:\?[^#]*)?$/u],
+  ['meta', /\/search\/.*\.pf_meta(?:\?[^#]*)?$/u],
+  ['unknown search error', /\/search\/pagefind\.js(?:\?[^#]*)?$/u]
+] as const)(
+  '#1263 recommends reload for %s failure without a local retry',
+  async (stage, resource) => {
+    const page = await browser.newPage();
+    try {
+      let failures = 0;
+      await page.route(resource, async (route) => {
+        failures += 1;
+        if (stage === 'unknown search error') {
+          await route.fulfill({
+            contentType: 'text/javascript',
+            body: `export const options = async () => {};
+export const init = async () => {};
+export const preload = async () => {};
+export const search = async () => { throw new Error('Unexpected search failure'); };`
+          });
+        } else {
+          await route.abort('failed');
+        }
+      });
+      await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
+      await page.locator('[data-search-trigger]:visible').first().click();
+      const dialog = page.locator('[data-search-dialog]');
+      await dialog.getByRole('searchbox').fill('тариф');
+      await expectPage(
+        dialog
+          .getByRole('region', { name: 'Результаты поиска' })
+          .getByText('Поиск не работает. Попробуйте обновить страницу.', { exact: true })
+      ).toBeVisible();
+      await expectPage(dialog.getByRole('button', { name: 'Повторить', exact: true })).toHaveCount(
+        0
+      );
+      await expectPage(dialog.locator('[data-search-result]')).toHaveCount(0);
+      expect(failures).toBeGreaterThan(0);
+    } finally {
+      await page.close();
+    }
+  }
+);
+
 test('status, #224 events, #372 KB and news archive indexing policy in the production corpus', async () => {
   const page = await browser.newPage({
     viewport: { width: 1280, height: 800 }

@@ -1,19 +1,21 @@
 <script lang="ts">
   import { count, formatDate, pluralize } from '@shelkovo/format';
   import SearchIcon from '@shelkovo/ui/icons/system/Search.svelte';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import type { Attachment } from 'svelte/attachments';
   import { on } from 'svelte/events';
 
   import { pagefindSearchClient } from '@/lib/search/client';
   import type { SearchResult } from '@/lib/search/client.types';
   import { SEARCH_QUERY_MAX_LENGTH, SEARCH_RESULT_DEFAULT_LIMIT } from '@/lib/search/client.types';
+  import { SearchResultLoadError } from '@/lib/search/result-load-error';
 
   import { SEARCH_DIALOG_OPEN_EVENT } from './search-dialog.events';
   import type {
     SearchDialogProps,
     SearchDialogRequestMode,
     SearchDialogResultRow,
+    SearchDialogRetry,
     SearchDialogState,
     SearchExcerptSegment
   } from './search-dialog.types';
@@ -24,6 +26,7 @@
   const RESULT_FORMS = ['результат', 'результата', 'результатов'] as const;
   const FOUND_FORMS = ['Найден', 'Найдено', 'Найдено'] as const;
   const SEARCH_ERROR_MESSAGE = 'Поиск не работает. Попробуйте обновить страницу.';
+  const SEARCH_DATA_ERROR_MESSAGE = 'Не удалось загрузить результаты поиска.';
 
   let { client = pagefindSearchClient, initialQuery = '' }: SearchDialogProps = $props();
 
@@ -49,6 +52,7 @@
   let isSearching = $state(false);
   let isLoadingMore = $state(false);
   let loadMoreFailed = $state(false);
+  let retry = $state.raw<SearchDialogRetry>();
 
   const reachMetrikaGoal = (
     target: string,
@@ -102,6 +106,8 @@
       : 'Ничего не нашли. Попробуйте другие слова'
   );
   let announcement = $derived.by(() => {
+    if (isSearching || isLoadingMore) return 'Ищем по сайту';
+    if (retry) return `${SEARCH_DATA_ERROR_MESSAGE} Повторить`;
     switch (viewState) {
       case 'loading':
         return 'Ищем по сайту';
@@ -126,6 +132,7 @@
     isSearching = false;
     isLoadingMore = false;
     loadMoreFailed = false;
+    retry = undefined;
   };
 
   const clearPendingSearch = (): void => {
@@ -201,6 +208,7 @@
     isSearching = true;
     isLoadingMore = false;
     loadMoreFailed = false;
+    retry = undefined;
     if (results.length === 0) {
       viewState = 'loading';
     }
@@ -218,7 +226,8 @@
   const runSearch = async (
     requestedQuery: string,
     limit: number,
-    mode: SearchDialogRequestMode
+    mode: SearchDialogRequestMode,
+    retryButton?: HTMLButtonElement
   ): Promise<void> => {
     if (!dialogElement?.open || !requestedQuery.trim()) {
       return;
@@ -247,9 +256,18 @@
         return;
       }
 
+      const shouldFocusResult = retryButton && document.activeElement === retryButton;
+      const focusResult = shouldFocusResult
+        ? response.results.find(
+            (result) =>
+              mode === 'initial' || !results.some((previous) => previous.url === result.url)
+          )
+        : undefined;
       results = response.results;
       total = response.total;
       requestedLimit = limit;
+      retry = undefined;
+      loadMoreFailed = false;
       if (mode === 'initial') {
         const goalParams =
           response.searchQuery === response.query
@@ -268,17 +286,28 @@
         isLoadingMore = false;
       }
       viewState = total > 0 ? 'results' : 'empty';
-    } catch {
+      if (shouldFocusResult) {
+        await tick();
+        if (requestId === currentRequestId && isCurrentVisibleQuery(requestedQuery)) {
+          const focusTarget = focusResult
+            ? resultLinks()[response.results.indexOf(focusResult)]
+            : inputElement;
+          focusTarget?.focus();
+        }
+      }
+    } catch (error) {
       if (!isCurrentRequest(requestedQuery, mode, currentRequestId)) {
         return;
       }
       if (mode === 'more') {
         isLoadingMore = false;
         loadMoreFailed = true;
+        retry = error instanceof SearchResultLoadError ? { mode, limit } : undefined;
         return;
       }
 
       clearResults();
+      retry = error instanceof SearchResultLoadError ? { mode, limit } : undefined;
       viewState = 'error';
     }
   };
@@ -298,13 +327,28 @@
   };
 
   const loadMore = (): void => {
-    if (isLoadingMore || !hasMoreResults) {
+    if (isLoadingMore || loadMoreFailed || retry || !hasMoreResults) {
       return;
     }
 
     isLoadingMore = true;
     loadMoreFailed = false;
     void runSearch(query, requestedLimit + SEARCH_RESULT_DEFAULT_LIMIT, 'more');
+  };
+
+  const retrySearch = (event: MouseEvent): void => {
+    if (
+      !retry ||
+      isSearching ||
+      isLoadingMore ||
+      !(event.currentTarget instanceof HTMLButtonElement)
+    ) {
+      return;
+    }
+
+    if (retry.mode === 'initial') isSearching = true;
+    else isLoadingMore = true;
+    void runSearch(query, retry.limit, retry.mode, event.currentTarget);
   };
 
   const loadMoreOnIntersect: Attachment<HTMLElement> = (element) => {
@@ -528,6 +572,17 @@
   });
 </script>
 
+{#snippet retryAction()}
+  <button
+    type="button"
+    class="retry-button"
+    aria-disabled={isSearching || isLoadingMore}
+    onclick={retrySearch}
+  >
+    Повторить
+  </button>
+{/snippet}
+
 <dialog
   bind:this={dialogElement}
   id={dialogId}
@@ -600,7 +655,8 @@
           <p class="state-message">{emptyMessage}</p>
         {:else if viewState === 'error'}
           <div class="action-row">
-            <p class="action-message">{SEARCH_ERROR_MESSAGE}</p>
+            <p class="action-message">{retry ? SEARCH_DATA_ERROR_MESSAGE : SEARCH_ERROR_MESSAGE}</p>
+            {#if retry}{@render retryAction()}{/if}
           </div>
         {:else if viewState === 'dev-unavailable'}
           <p class="state-message">Локальный поиск недоступен</p>
@@ -641,11 +697,13 @@
                         row.result.section.id === 'compare' ? 'result-excerpt--compare' : undefined
                       ]}
                     >
-                      {#each segments as segment, segmentIndex (segmentIndex)}
+                      {row.result.excerptCutStart
+                        ? '… '
+                        : ''}{#each segments as segment, segmentIndex (segmentIndex)}
                         {#if segment.breakBefore}<br />{/if}{#if segment.highlighted}<mark
                             >{segment.text}</mark
                           >{:else}{segment.text}{/if}
-                      {/each}
+                      {/each}{row.result.excerptCutEnd ? ' …' : ''}
                     </p>
                   {:else if row.result.matchContext}
                     <p class="site-search-result-excerpt result-excerpt">
@@ -665,8 +723,10 @@
             {#if loadMoreFailed}
               <div class="action-row" role="status">
                 <p class="action-message">
-                  Не удалось загрузить остальные результаты. Попробуйте обновить страницу.
+                  {#if retry}{SEARCH_DATA_ERROR_MESSAGE}{:else}Не удалось загрузить остальные
+                    результаты. Попробуйте обновить страницу.{/if}
                 </p>
+                {#if retry}{@render retryAction()}{/if}
               </div>
             {:else}
               {#key requestedLimit}
@@ -752,6 +812,24 @@
     font-size: 0.875rem;
     font-weight: 600;
     line-height: 1.25rem;
+  }
+
+  .retry-button {
+    flex-shrink: 0;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    color: var(--color-text);
+    background: var(--color-surface);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .retry-button[aria-disabled='true'] {
+    opacity: 0.6;
+    cursor: wait;
   }
 
   .result-item {

@@ -9,6 +9,7 @@ import { createAstroContainer } from '@/test/astro-container';
 import ContactListItem from '../ContactListItem.astro';
 
 const positiveReview = {
+  anchorId: 'contact-review-e04fdc091950367e',
   sentiment: 'positive',
   summary: 'Работу оценили положительно.',
   publishedAt: new Date('2026-08-01T00:00:00.000Z'),

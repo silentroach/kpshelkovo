@@ -4,6 +4,7 @@ import { isTelegramUrl } from '@shelkovo/url';
 
 import type { ContactReview } from '@/lib/contacts/types';
 import {
+  contactReviewSearchTitle,
   formatContactReviewDate,
   formatContactReviewSentiment,
 } from '@/lib/contacts/view';
@@ -41,11 +42,14 @@ const sentimentEmoji = {
             {formatContactReviewSentiment(review.sentiment)}:{' '}
           </span>
           <div class="contact-review__content">
-            <div
-              class="contact-review__summary"
-              data-pagefind-body
-              set:html={renderMarkdown(review.summary)}
-            />
+            <div data-pagefind-body>
+              <div
+                class="contact-review__summary"
+                id={review.anchorId}
+                data-pagefind-title={contactReviewSearchTitle(review)}
+                set:html={renderMarkdown(review.summary)}
+              />
+            </div>
             <span class="contact-review__meta">
               {isTelegramUrl(review.url) ? (
                 <TelegramIcon class="contact-review__telegram-icon" />
@@ -135,6 +139,7 @@ const sentimentEmoji = {
   }
 
   .contact-review__summary {
+    scroll-margin-block-start: 5rem;
     color: var(--color-text-muted);
     font-size: 0.875rem;
     line-height: 1.25rem;

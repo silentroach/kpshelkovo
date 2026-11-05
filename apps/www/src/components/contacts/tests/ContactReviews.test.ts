@@ -20,6 +20,7 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 const review = {
+  anchorId: 'contact-review-8c6fc0f7f7357249',
   sentiment: 'positive',
   summary: 'Помог с **электричеством** в "Шелково Парк".\n\n<script>alert(1)</script>',
   publishedAt: new Date('2026-04-07T00:00:00.000Z'),
@@ -76,13 +77,19 @@ describe('ContactReviews', () => {
         props: { reviews: [review] }
       })
     );
-    const summary = component.querySelector('[data-pagefind-body]');
+    const body = component.querySelector('[data-pagefind-body]');
+    const summary = body?.querySelector('.contact-review__summary');
     if (!summary) {
       throw new Error('review summary not found');
     }
+    expect(body?.hasAttribute('id')).toBe(false);
+    expect(body?.hasAttribute('data-pagefind-title')).toBe(false);
+    expect(body?.textContent).toBe(summary.textContent);
 
     expect(
       visibleWhitespace({
+        id: summary.id,
+        title: summary.getAttribute('data-pagefind-title'),
         html: summary.innerHTML,
         scripts: summary.querySelectorAll('script').length,
         text: summary.textContent
@@ -90,8 +97,10 @@ describe('ContactReviews', () => {
     ).toMatchInlineSnapshot(`
       {
         "html": "<p>Помог с <strong>электричеством</strong> в&nbsp;«Шелково&nbsp;Парк».</p>",
+        "id": "contact-review-8c6fc0f7f7357249",
         "scripts": 0,
         "text": "Помог с электричеством в·«Шелково·Парк».",
+        "title": "Отзыв от 7 апреля 2026",
       }
     `);
   });

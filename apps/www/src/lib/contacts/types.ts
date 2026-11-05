@@ -19,6 +19,7 @@ export interface ContactLocation {
 }
 
 export interface ContactReview {
+  readonly anchorId: string;
   readonly sentiment: ContactReviewSentiment;
   readonly summary: string;
   readonly publishedAt: Date;

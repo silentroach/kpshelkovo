@@ -121,6 +121,9 @@ describe('editorial map HTML', () => {
     expect(figcaption?.textContent?.replace('#', '').trim()).toBe(caption);
     expect(figcaption?.querySelector('a:not(.ui-heading-anchor)')?.getAttribute('href')).toBe(href);
     expect(figcaption?.closest('[data-pagefind-ignore]')).toBeFalsy();
+    expect(figure?.id).toBe('editorial-map-1');
+    expect(figure?.getAttribute('data-pagefind-title') ?? undefined).toBe(name);
+    expect(figcaption?.querySelector('h3, .ui-heading-anchor')).toBeFalsy();
     expect(page.querySelector('script, img')).toBeFalsy();
     expect(page.body.textContent).not.toContain('hidden');
     expect(page.body.textContent).not.toContain('alert(1)');
@@ -138,7 +141,8 @@ describe('editorial map HTML', () => {
     expect(html).not.toContain('</script><script>');
     expect(html).toContain('\\u003c/script\\u003e');
     expect(page.querySelector('svg, script')).toBeFalsy();
-    expect(page.querySelector('figcaption h3')?.textContent).toContain(name);
+    expect(page.querySelector('figcaption')?.textContent).toContain(name);
+    expect(page.querySelector('figure')?.getAttribute('data-pagefind-title')).toBe(name);
     expect(page.querySelector('figcaption strong')).toBeFalsy();
   });
 
@@ -169,10 +173,10 @@ describe('editorial map HTML', () => {
       { reservedIds: ['editorial-map-1', 'editorial-map-2'] }
     );
     const ids = [...page.querySelectorAll('[id]')].map((element) => element.id);
-    const mapHeadings = [...page.querySelectorAll('figcaption h3')];
+    const mapFigures = [...page.querySelectorAll('figure.ui-editorial-map')];
 
     expect(ids).toHaveLength(new Set(ids).size);
-    expect(mapHeadings.map((element) => element.id)).toMatchInlineSnapshot(`
+    expect(mapFigures.map((element) => element.id)).toMatchInlineSnapshot(`
       [
         "editorial-map-1-3",
         "editorial-map-2-2",

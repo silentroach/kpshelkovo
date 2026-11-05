@@ -637,8 +637,8 @@
     block-size: var(--ui-editorial-map-height);
   }
 
-  .ui-prose .ui-editorial-map .ui-editorial-map__title {
-    scroll-margin-block-start: calc(5rem + var(--ui-editorial-map-height) + 1.5rem);
+  .ui-prose figure.ui-editorial-map[id] {
+    scroll-margin-block-start: 5rem;
   }
 
   .ui-prose .ui-heading-anchor {

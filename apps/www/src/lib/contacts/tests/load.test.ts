@@ -201,6 +201,7 @@ describe('buildContactsDataset', () => {
     expect(data.contacts[0]?.reviews).toMatchInlineSnapshot(`
       [
         {
+          "anchorId": "contact-review-e04fdc091950367e",
           "publishedAt": 2026-04-07T00:00:00.000Z,
           "publishedIso": "2026-04-07",
           "sentiment": "positive",
@@ -210,6 +211,30 @@ describe('buildContactsDataset', () => {
       ]
     `);
     expect(mocks.renderMarkdown).not.toHaveBeenCalled();
+  });
+
+  it('keeps source-derived review anchors through edits, reordering and new reviews', () => {
+    const first = {
+      sentiment: 'positive' as const,
+      summary: 'Сделал лестницу.',
+      published_at: '2026-04-07',
+      url: 'https://t.me/example/1'
+    };
+    const second = { ...first, url: 'https://t.me/example/2' };
+    const anchors = (reviews: NonNullable<ContactEntry['data']['reviews']>) =>
+      buildContactsDataset([
+        entry({ id: 'fence/with-reviews', data: { reviews } })
+      ]).contacts[0]!.reviews.map(({ url, anchorId }) => ({ url, anchorId }));
+    const before = anchors([first, second]);
+    const after = anchors([
+      { ...first, url: 'https://t.me/example/3', published_at: '2026-10-01' },
+      second,
+      { ...first, summary: 'Лестницу сделали аккуратно.' }
+    ]);
+
+    expect(before[0]?.anchorId).toBe('contact-review-e04fdc091950367e');
+    expect(new Set(before.map(({ anchorId }) => anchorId)).size).toBe(2);
+    expect(after.slice(1)).toEqual([...before].reverse());
   });
 
   it('sorts reviews newest first, preserving ties and source order', () => {

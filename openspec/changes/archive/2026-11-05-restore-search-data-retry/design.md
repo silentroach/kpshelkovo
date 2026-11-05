@@ -2,7 +2,7 @@
 
 ## Context
 
-Причина и общий тикет описаны в [proposal](/openspec/changes/restore-search-data-retry/proposal.md). Действуют [ADR-025](/docs/decisions/025-static-full-text-search-with-pagefind.md) и [ADR-002](/docs/decisions/002-client-transitions-prefetch-cache.md); пользовательский контракт восстановления принадлежит [client-load-recovery](/openspec/specs/client-load-recovery/spec.md).
+Причина и общий тикет описаны в [proposal](/openspec/changes/archive/2026-11-05-restore-search-data-retry/proposal.md). Действуют [ADR-025](/docs/decisions/025-static-full-text-search-with-pagefind.md) и [ADR-002](/docs/decisions/002-client-transitions-prefetch-cache.md); пользовательский контракт восстановления принадлежит [client-load-recovery](/openspec/specs/client-load-recovery/spec.md).
 
 В [SearchDialog](/apps/www/src/components/search/SearchDialog.svelte) различаются ошибка первой выдачи и `loadMoreFailed`; при второй уже показанные ссылки сохраняются. Кеш клиента удаляет отклонённые promises. Pagefind 1.6.0 делает то же для fragments, но не исправляет все виды отказов. [Исследование](/docs/research/pagefind-1.6.0-upstream.md) и консультация `advisor` определили границу пригодного повтора.
 
@@ -67,4 +67,4 @@
 
 ## Migration Plan
 
-Выполнить после обновления до 1.6.0 и явных секций в общей ветке. Положительный сетевой прогон служит основанием для выпуска кнопки. Если повтор fragments не работает без дополнительного механизма, остановить этот этап и согласовать дальнейший объём с владельцем. Общая приёмка, sync/archive, один PR и откат описаны в [первом change](/openspec/changes/add-search-excerpt-ellipsis/design.md#migration-plan).
+Выполнить после обновления до 1.6.0 и явных секций в общей ветке. Положительный сетевой прогон служит основанием для выпуска кнопки. Если повтор fragments не работает без дополнительного механизма, остановить этот этап и согласовать дальнейший объём с владельцем. Общая приёмка, sync/archive, один PR и откат описаны в [первом change](/openspec/changes/archive/2026-11-05-add-search-excerpt-ellipsis/design.md#migration-plan).

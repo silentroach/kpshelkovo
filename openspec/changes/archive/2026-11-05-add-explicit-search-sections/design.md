@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация и общий тикет описаны в [proposal](/openspec/changes/add-explicit-search-sections/proposal.md). Применимы [ADR-025](/docs/decisions/025-static-full-text-search-with-pagefind.md), [ADR-018](/docs/decisions/018-markdown-first-useful-contacts.md), [ADR-013](/docs/decisions/013-raw-domain-public-data-boundary.md) и [ADR-034](/docs/decisions/034-native-css-architecture.md). Публичное поведение поиска карт уже задано в [search](/openspec/specs/search/spec.md); новая delta добавляет поведение отзывов.
+Мотивация и общий тикет описаны в [proposal](/openspec/changes/archive/2026-11-05-add-explicit-search-sections/proposal.md). Применимы [ADR-025](/docs/decisions/025-static-full-text-search-with-pagefind.md), [ADR-018](/docs/decisions/018-markdown-first-useful-contacts.md), [ADR-013](/docs/decisions/013-raw-domain-public-data-boundary.md) и [ADR-034](/docs/decisions/034-native-css-architecture.md). Публичное поведение поиска карт уже задано в [search](/openspec/specs/search/spec.md); новая delta добавляет поведение отзывов.
 
 [Рендер карт](/apps/www/src/lib/markdown/editorial-maps-html.ts) резервирует `editorial-map-N`, помещает ID на `h3` в подписи именованной карты и исключает клиентский host через `data-pagefind-ignore="all"`. [global.css](/apps/www/src/styles/global.css) компенсирует положение подписи отступом прокрутки, зависящим от высоты карты. Ссылка-якорь heading скрывается в [editorial-map.css](/apps/www/src/components/maps/editorial-map.css).
 
@@ -42,7 +42,7 @@ Zod-граница карточки проверяет уникальность 
 
 ### 3. Секция отзыва начинается на индексируемой выжимке
 
-В [ContactReviews](/apps/www/src/components/contacts/ContactReviews.astro) поместить `id` и `data-pagefind-title` на существующий блок summary с `data-pagefind-body`. Название секции: «Отзыв от <дата с годом>», дата берётся из `publishedIso` через действующий formatter. Имя автора не выдумывается. Это поисковый контекст; новый постоянный заголовок в карточке не нужен.
+В [ContactReviews](/apps/www/src/components/contacts/ContactReviews.astro) поместить `id` и `data-pagefind-title` на существующий блок summary внутри обёртки `data-pagefind-body`. При production-проверке выяснилось, что Pagefind 1.6.0 не сохраняет якорь на самом элементе opt-in body: текст находится, но `anchors` пуст. Отдельная обёртка делает summary обычным дочерним якорем, не меняя индексируемого текста. Название секции: «Отзыв от <дата с годом>», дата берётся из `publishedIso` через действующий formatter. Имя автора не выдумывается. Это поисковый контекст; новый постоянный заголовок в карточке не нужен.
 
 Служебное название и дата не добавляются в body; оценка, ссылка-оверлей и метаданные продолжают находиться вне индексируемой выжимки. Добавить локальный отступ прокрутки под шапку. Ссылка результата сайта остаётся внутренней; существующая ссылка карточки отзыва на внешний источник сохраняет своё действие.
 
@@ -63,4 +63,4 @@ Fixtures проверяют сохранность ID карты и коллиз
 
 ## Migration Plan
 
-Выполнить после `add-search-excerpt-ellipsis`. Существующие строки ID карт переносятся без изменения; review ID вычисляются при чтении данных без редакционной миграции. После этого выполняется `restore-search-data-retry`. Проверки, sync/archive, итоговый PR и откат общие по [плану первого change](/openspec/changes/add-search-excerpt-ellipsis/design.md#migration-plan).
+Выполнить после `add-search-excerpt-ellipsis`. Существующие строки ID карт переносятся без изменения; review ID вычисляются при чтении данных без редакционной миграции. После этого выполняется `restore-search-data-retry`. Проверки, sync/archive, итоговый PR и откат общие по [плану первого change](/openspec/changes/archive/2026-11-05-add-search-excerpt-ellipsis/design.md#migration-plan).

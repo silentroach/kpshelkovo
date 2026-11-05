@@ -447,11 +447,13 @@ static/lazy.XXXXXXXX.js:
   apps/www/src/components/search/search-dialog.events.ts:
     rendered: 100
   apps/www/src/components/search/SearchDialog.svelte:
-    rendered: 22137
+    rendered: 25562
   apps/www/src/components/search/SearchDialog.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/search/client.ts:
-    rendered: 12228
+    rendered: 12891
+  apps/www/src/lib/search/result-load-error.ts:
+    rendered: 208
   packages/ui/src/icons/system/Search.svelte:
     rendered: 497
 static/lifecycle.XXXXXXXX.js:

@@ -1,10 +1,17 @@
 import type { SearchResult } from './client.types';
 
 export interface PagefindOptions {
+  readonly excerptEllipsis: string;
   readonly highlightParam: string;
   readonly ranking: {
     readonly metaWeights: Readonly<Record<string, number>>;
   };
+}
+
+export interface NormalizedPagefindExcerpt {
+  readonly html: string;
+  readonly cutStart: boolean;
+  readonly cutEnd: boolean;
 }
 
 export interface PagefindResultReference {

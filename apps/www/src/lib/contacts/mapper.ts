@@ -6,6 +6,7 @@ import {
 import type { SiteMentionRegistry } from '@/lib/mentions';
 
 import type { ContactEntry } from './load';
+import { contactReviewAnchorId } from './review-anchor';
 import { contactCanonical, contactMarkdownUrl, contactUrl, contactVcfUrl } from './routes';
 import type { Contact, ContactLocation, ContactReview, ContactVcf } from './types';
 
@@ -39,6 +40,7 @@ const mapLocation = (location: ContactEntry['data']['location']): ContactLocatio
 const mapReviews = (reviews: ContactEntry['data']['reviews']): readonly ContactReview[] =>
   reviews
     ?.map((review) => ({
+      anchorId: contactReviewAnchorId(review.url),
       sentiment: review.sentiment,
       summary: review.summary,
       publishedAt: new Date(`${review.published_at}T00:00:00.000Z`),

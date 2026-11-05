@@ -39,8 +39,10 @@ it('keeps labels wrappable and groups the caption with the map and its focusable
   prose.style.setProperty('--radius-xl', '12px');
   const figure = document.createElement('figure');
   figure.className = 'ui-editorial-map map-frame';
+  figure.id = 'editorial-map-1';
+  figure.dataset.pagefindTitle = 'Схема прохода';
   figure.innerHTML =
-    '<editorial-map></editorial-map><figcaption class="ui-editorial-map__caption map-frame__caption"><h3 class="ui-editorial-map__title" id="editorial-map-1"><a href="https://example.org/map">Схема прохода</a></h3></figcaption>';
+    '<editorial-map></editorial-map><figcaption class="ui-editorial-map__caption map-frame__caption"><a href="https://example.org/map">Схема прохода</a></figcaption>';
   const marker = document.createElement('span');
   marker.className = 'editorial-map-marker__caption';
   marker.textContent = 'Длинное название проезда через ворота';
@@ -50,15 +52,14 @@ it('keeps labels wrappable and groups the caption with the map and its focusable
 
   const labelStyle = getComputedStyle(marker);
   const caption = figure.querySelector('figcaption')!;
-  const title = caption.querySelector('h3')!;
-  const link = title.querySelector('a')!;
+  const link = caption.querySelector('a')!;
   expect(labelStyle.whiteSpace).toBe('normal');
   expect(labelStyle.overflowWrap).toBe('anywhere');
   expect(labelStyle.maxInlineSize).toContain('10rem');
   expect(labelStyle.fontSize).toBe('12px');
   expect(labelStyle.fontWeight).toBe('400');
-  expect(getComputedStyle(title).fontSize).toBe('0.875rem');
-  expect(getComputedStyle(title).fontWeight).toBe('400');
+  expect(getComputedStyle(caption).fontSize).toBe('14px');
+  expect(getComputedStyle(caption).fontWeight).toBe('normal');
   expect(getComputedStyle(caption).borderBottomLeftRadius).toBe('calc(12px - 1px)');
   link.focus();
   expect(document.activeElement).toBe(link);
@@ -68,6 +69,8 @@ it('keeps labels wrappable and groups the caption with the map and its focusable
       rule.selectorText.includes('.ui-editorial-map__caption a:focus-visible')
   ) as CSSStyleRule | undefined;
   expect(focusRule?.style.getPropertyValue('outline-offset')).toBe('0.125rem');
-  expect(title.id).toBe('editorial-map-1');
+  expect(figure.id).toBe('editorial-map-1');
+  expect(link.textContent).toBe(figure.dataset.pagefindTitle);
+  expect(link.getAttribute('href')).toBe('https://example.org/map');
   expect(figure.querySelectorAll('a')).toHaveLength(1);
 });
