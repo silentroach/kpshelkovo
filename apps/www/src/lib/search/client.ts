@@ -3,6 +3,7 @@ import { PARCEL_CODE } from '@/lib/parcels/schema';
 import type {
   PagefindClientDependencies,
   LoadedPagefindResult,
+  NormalizedPagefindExcerpt,
   PagefindOptions,
   PagefindResultReference,
   PagefindRuntime,
@@ -11,8 +12,10 @@ import type {
 import type { SearchClient, SearchResponse, SearchResult, SearchSubResult } from './client.types';
 import { SEARCH_QUERY_MAX_LENGTH, SEARCH_RESULT_DEFAULT_LIMIT } from './client.types';
 import { normalizeSearchHighlightQuery, SEARCH_HIGHLIGHT_PARAM } from './highlight';
+import { SearchResultLoadError } from './result-load-error';
 
 const pagefindEntrypoint = '/search/pagefind.js';
+const excerptCutMarker = '<!--pagefind-excerpt-cut-->';
 const canonicalUrlBase = 'https://kpshelkovo.online';
 const prefixFallbackMaxLength = 3;
 const parcelDesignation = /^(?:(?:SHR|SHF|SHP|SHV)-[A-Z]+[0-9]*|[A-Z]+[0-9]+)$/;
@@ -23,6 +26,7 @@ const partNames: Readonly<Record<string, string>> = {
   shv: 'Шелково Вилладж'
 };
 const pagefindOptions = {
+  excerptEllipsis: excerptCutMarker,
   highlightParam: SEARCH_HIGHLIGHT_PARAM,
   ranking: {
     metaWeights: {
@@ -44,11 +48,24 @@ const cleanText = (value: unknown): string | undefined => {
 };
 
 /**
- * Trusted HTML boundary: Pagefind 1.5.2 documents that excerpt source HTML is
- * escaped before it adds highlight <mark> elements. Raw content and arbitrary
- * metadata never pass through this helper.
+ * Trusted HTML boundary: Pagefind 1.6.0 escapes source text before adding
+ * highlight <mark> elements and the configured raw edge marker. Recognize the
+ * exact marker before decoding so an escaped literal stays authored text.
+ * Raw content and arbitrary metadata never pass through this helper.
  */
-const trustedPagefindExcerpt = (value: unknown): string | undefined => cleanText(value);
+const trustedPagefindExcerpt = (value: unknown): NormalizedPagefindExcerpt | undefined => {
+  const excerpt = cleanText(value);
+  if (!excerpt) return;
+
+  const cutStart = excerpt.startsWith(excerptCutMarker);
+  const cutEnd = excerpt.endsWith(excerptCutMarker);
+  const html = excerpt
+    .slice(cutStart ? excerptCutMarker.length : 0, cutEnd ? -excerptCutMarker.length : undefined)
+    .trim();
+  if (!html) return;
+
+  return { html, cutStart, cutEnd };
+};
 
 const asRecord = (value: unknown): Readonly<Record<string, unknown>> | undefined => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
@@ -115,7 +132,7 @@ const normalizeSubResults = (value: unknown, pageUrl: string): readonly SearchSu
       {
         url,
         title,
-        excerptHtml: trustedPagefindExcerpt(rawSubResult?.excerpt)
+        excerptHtml: trustedPagefindExcerpt(rawSubResult?.excerpt)?.html
       }
     ];
   });
@@ -141,6 +158,7 @@ const normalizeResult = (
     matchedMetaFields.includes('tags')
       ? newsTagContext(meta?.tags)
       : undefined;
+  const excerpt = matchContext ? undefined : trustedPagefindExcerpt(rawResult?.excerpt);
 
   return {
     url,
@@ -152,7 +170,9 @@ const normalizeResult = (
     },
     publishedAt: cleanText(meta?.publishedAt),
     matchContext,
-    excerptHtml: matchContext ? undefined : trustedPagefindExcerpt(rawResult?.excerpt),
+    excerptHtml: excerpt?.html,
+    excerptCutStart: excerpt?.cutStart,
+    excerptCutEnd: excerpt?.cutEnd,
     subResults: normalizeSubResults(rawResult?.sub_results, url)
   };
 };
@@ -298,6 +318,14 @@ const cacheableResultId = (value: unknown): string | undefined => {
   return value;
 };
 
+const loadResultData = async (reference: PagefindResultReference): Promise<unknown> => {
+  try {
+    return await reference.data();
+  } catch (cause) {
+    throw new SearchResultLoadError(cause);
+  }
+};
+
 const searchPagefind = async (
   pagefind: PagefindRuntime,
   query: string,
@@ -322,7 +350,7 @@ const searchPagefind = async (
 
     // Pagefind uses either forward extensions or one inverse prefix for the
     // whole term, so the first result identifies the direction of the set.
-    const firstData = await firstResult.data();
+    const firstData = await loadResultData(firstResult);
     return hasForwardPrefixMatch(firstData, firstResult, token)
       ? [{ ...firstResult, data: async () => firstData }, ...remainingResults]
       : [];
@@ -437,7 +465,7 @@ export const createPagefindSearchClient = (
     reference: PagefindResultReference,
     query: string
   ): Promise<LoadedPagefindResult | undefined> => {
-    const data = await reference.data();
+    const data = await loadResultData(reference);
     const result =
       cleanText(asRecord(asRecord(data)?.meta)?.sectionId) === 'parcels'
         ? normalizeParcelResult(data, query.toUpperCase())

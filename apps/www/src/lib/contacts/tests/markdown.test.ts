@@ -33,6 +33,7 @@ const contact = {
   },
   reviews: [
     {
+      anchorId: 'contact-review-e04fdc091950367e',
       sentiment: 'positive',
       summary: 'Помог с **электричеством**.',
       publishedAt: new Date('2026-04-07T00:00:00.000Z'),
@@ -170,6 +171,7 @@ describe('contacts markdown companions', () => {
       "
     `);
     expect(markdown).not.toContain('служебный поисковый алиас');
+    expect(markdown).not.toContain(contact.reviews[0]?.anchorId);
   });
 
   it('renders a detail page for a contact with an empty body', () => {

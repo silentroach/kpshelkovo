@@ -65,7 +65,8 @@ const mapFigure = (
     hName: 'figure',
     hProperties: {
       className: ['ui-editorial-map', 'map-frame'],
-      id: hasName ? undefined : id
+      id,
+      dataPagefindTitle: hasName ? caption : undefined
     },
     hChildren: [
       {
@@ -87,16 +88,7 @@ const mapFigure = (
               type: 'element' as const,
               tagName: 'figcaption',
               properties: { className: ['ui-editorial-map__caption', 'map-frame__caption'] },
-              children: hasName
-                ? [
-                    {
-                      type: 'element' as const,
-                      tagName: 'h3',
-                      properties: { className: ['ui-editorial-map__title'], id },
-                      children: captionContent
-                    }
-                  ]
-                : captionContent
+              children: captionContent
             }
           ]
         : [])

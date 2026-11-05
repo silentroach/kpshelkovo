@@ -140,6 +140,7 @@ describe('/sarafan/[category]/[slug]/', () => {
       body: '',
       seo: { description: 'Текст только для метаданных.' },
       reviews: (['positive', 'neutral', 'negative'] as const).map((sentiment) => ({
+        anchorId: `contact-review-${sentiment}`,
         sentiment,
         summary: `${sentiment} опыт.`,
         publishedAt: new Date('2026-09-19T00:00:00.000Z'),

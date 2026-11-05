@@ -119,19 +119,6 @@
   border-radius: calc(var(--radius-xl) - 1px);
 }
 
-.ui-prose .ui-editorial-map__title {
-  margin: 0;
-  font-family: inherit;
-  font-weight: 400;
-  font-size: inherit;
-  line-height: inherit;
-  letter-spacing: normal;
-}
-
-.ui-prose .ui-editorial-map__title > .ui-heading-anchor {
-  display: none;
-}
-
 .ui-prose .ui-editorial-map__caption a:focus-visible {
   border-radius: 0.125rem;
   outline: 0.1875rem solid var(--color-focus);

@@ -120,6 +120,38 @@ describe('RawContactSchema', () => {
     `);
   });
 
+  it('rejects repeated review targets with the offending source path', () => {
+    const review = {
+      sentiment: 'positive',
+      summary: 'Помог с электричеством.',
+      published_at: '2026-04-07',
+      url: 'https://t.me/example/1'
+    };
+    const result = RawContactSchema.safeParse({
+      title: 'Электрик',
+      slug: 'electrician',
+      category: 'electricity',
+      updated_at: '2026-07-08',
+      summary: 'Электромонтажные работы.',
+      contacts: { phone: '+7 900 000-00-00' },
+      reviews: [review, { ...review, summary: 'Другой текст.', published_at: '2026-05-01' }]
+    });
+    if (result.success) throw new Error('duplicate review source was accepted');
+    expect(result.error.issues).toMatchInlineSnapshot(`
+      [
+        {
+          "code": "custom",
+          "message": "Review source must have a unique anchor: contact-review-e04fdc091950367e",
+          "path": [
+            "reviews",
+            1,
+            "url",
+          ],
+        },
+      ]
+    `);
+  });
+
   it('accepts opt-in vCard overrides', () => {
     expect(
       RawContactSchema.parse({

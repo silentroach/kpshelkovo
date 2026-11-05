@@ -20,6 +20,11 @@ export interface SearchDialogResultRow {
 
 export type SearchDialogRequestMode = 'initial' | 'more';
 
+export interface SearchDialogRetry {
+  readonly mode: SearchDialogRequestMode;
+  readonly limit: number;
+}
+
 export type SearchDialogState =
   | 'initial'
   | 'loading'

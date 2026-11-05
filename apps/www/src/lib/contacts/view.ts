@@ -71,6 +71,9 @@ export const formatContactReviewSentiment = (sentiment: ContactReview['sentiment
 export const formatContactReviewDate = (review: ContactReview): string =>
   formatDate(review.publishedIso);
 
+export const contactReviewSearchTitle = (review: ContactReview): string =>
+  `Отзыв от ${dateTimeFromISO(review.publishedIso).toFormat('d MMMM yyyy')}`;
+
 export const hasManyPositiveContactReviews = (
   reviews: readonly Pick<ContactReview, 'sentiment' | 'publishedIso'>[],
   now: Date = new Date()

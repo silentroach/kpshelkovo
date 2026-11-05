@@ -68,7 +68,7 @@
     "astro-compressor": "^2.0.1",
     "css-tree": "^3.2.1",
     "happy-dom": "^21.0.4",
-    "pagefind": "1.5.2",
+    "pagefind": "1.6.0",
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "rollup-plugin-visualizer": "^7.1.1",
