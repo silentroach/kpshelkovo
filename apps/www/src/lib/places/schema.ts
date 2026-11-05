@@ -14,6 +14,7 @@ export type PlaceCategory = (typeof PLACE_CATEGORIES)[number];
 export const PLACE_MARKERS = [
   'apple',
   'animals',
+  'beach',
   'foodtruck',
   'titanic',
   'construction',
