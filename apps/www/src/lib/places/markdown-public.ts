@@ -15,12 +15,14 @@ export const toPlaceMarkdownPublic = (place: Place): PlaceMarkdownPublicDto => {
     category: place.category,
     status: place.status,
     address: place.address,
-    coordinates: {
-      lat: normalizeCoordinate(place.coordinates.lat),
-      lng: normalizeCoordinate(place.coordinates.lng)
+    map: {
+      url: absoluteUrl(place.mapUrl),
+      coordinates: {
+        lat: normalizeCoordinate(place.coordinates.lat),
+        lng: normalizeCoordinate(place.coordinates.lng)
+      }
     },
     html_url: place.canonical,
-    map_url: absoluteUrl(place.mapUrl),
     contact_url: place.contact ? absoluteUrl(place.contact.url) : undefined,
     index_url: absoluteUrl(placesMarkdownUrl()),
     opening_hours: openingHours

@@ -10,7 +10,7 @@
 
 ### Requirement: Метаданные карточки доступны во frontmatter
 
-`/map/[slug]/index.md` SHALL начинаться с YAML frontmatter: название в `title`, машинный `category`, lifecycle `status` (`existing`, `planned`, `underConstruction`), числовые `coordinates.lat` и `coordinates.lng` по `public-coordinate-precision`, `address` при наличии. `status` SHALL NOT означать текущую открытость. Расписание SHALL передаваться по `place-opening-hours`. Неизвестные необязательные сведения и внутренние редакционные или технические поля SHALL NOT публиковаться автоматически.
+`/map/[slug]/index.md` SHALL начинаться с YAML frontmatter: название в `title`, машинный `category`, lifecycle `status` (`existing`, `planned`, `underConstruction`), `map.coordinates` с числовыми `lat` и `lng` по `public-coordinate-precision`, `address` при наличии. `status` SHALL NOT означать текущую открытость. Расписание SHALL передаваться по `place-opening-hours`. Неизвестные необязательные сведения и внутренние редакционные или технические поля SHALL NOT публиковаться автоматически.
 
 #### Scenario: Карточка с адресом
 
@@ -27,7 +27,7 @@
 
 ### Requirement: Собственные ссылки карточки являются метаданными
 
-Frontmatter SHALL содержать абсолютные `html_url` с canonical HTML URL места, `map_url` с внешней картой и `index_url` с `/map/index.md`. При наличии связанной карточки «Сарафана» он SHALL содержать абсолютный `contact_url` её HTML-страницы. Эти ссылки SHALL не дублироваться в автоматически сформированном разделе «Ссылки» body. `index_url` SHALL обозначать навигацию к индексу раздела, а не фокус на месте или гарантию его присутствия в индексе.
+Frontmatter SHALL содержать абсолютные `html_url` с canonical HTML URL места, `map.url` с внешней картой и `index_url` с `/map/index.md`. При наличии связанной карточки «Сарафана» он SHALL содержать абсолютный `contact_url` её HTML-страницы. Эти ссылки SHALL не дублироваться в автоматически сформированном разделе «Ссылки» body. `index_url` SHALL обозначать навигацию к индексу раздела, а не фокус на месте или гарантию его присутствия в индексе.
 
 #### Scenario: Место со связанным контактом
 

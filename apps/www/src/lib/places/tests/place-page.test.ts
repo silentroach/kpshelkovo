@@ -228,7 +228,7 @@ describe('/map/[slug]/', () => {
       preview: preview.coordinates,
       geo: schema.geo,
       json: buildPlaceMapPublicPayload([fixture.place]).places[0]?.coordinates,
-      markdown: toPlaceMarkdownPublic(fixture.place).coordinates,
+      markdown: toPlaceMarkdownPublic(fixture.place).map.coordinates,
       sameAs: schema.sameAs,
       source: coordinates
     }).toMatchInlineSnapshot(`

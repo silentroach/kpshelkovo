@@ -31,9 +31,11 @@ const frontmatterSchema = z.strictObject({
   ]),
   status: z.enum(['existing', 'planned', 'underConstruction']),
   address: z.string().min(1).optional(),
-  coordinates: z.strictObject({ lat: z.number(), lng: z.number() }),
+  map: z.strictObject({
+    url: z.url(),
+    coordinates: z.strictObject({ lat: z.number(), lng: z.number() })
+  }),
   html_url: z.url(),
-  map_url: z.url(),
   contact_url: z.url().optional(),
   index_url: z.url(),
   opening_hours: z
@@ -244,8 +246,8 @@ describe('places Markdown', () => {
     const { frontmatter } = readCard({ ...place, coordinates, mapUrl });
 
     expect({
-      coordinates: frontmatter.coordinates,
-      mapUrl: frontmatter.map_url,
+      coordinates: frontmatter.map.coordinates,
+      mapUrl: frontmatter.map.url,
       source: coordinates
     }).toMatchInlineSnapshot(`
         {
@@ -294,13 +296,15 @@ describe('places Markdown', () => {
         "address": "Шелково Форест, Берёзовая улица, 21А",
         "category": "food",
         "contact_url": "https://example.com/sarafan/food/burzhuyka/",
-        "coordinates": {
-          "lat": 55.060526,
-          "lng": 37.716242,
-        },
         "html_url": "https://kpshelkovo.online/map/burzhuyka/",
         "index_url": "https://example.com/map/index.md",
-        "map_url": "https://yandex.ru/navi/-/CTfgq-5r",
+        "map": {
+          "coordinates": {
+            "lat": 55.060526,
+            "lng": 37.716242,
+          },
+          "url": "https://yandex.ru/navi/-/CTfgq-5r",
+        },
         "opening_hours": {
           "description": "С 10:00 до 22:00, вторник — выходной",
           "periods": [
@@ -344,10 +348,9 @@ describe('places Markdown', () => {
       expect(Object.keys(frontmatter).sort()).toMatchInlineSnapshot(`
         [
           "category",
-          "coordinates",
           "html_url",
           "index_url",
-          "map_url",
+          "map",
           "status",
           "title",
         ]
@@ -469,7 +472,7 @@ describe('places Markdown', () => {
         ]
       }
     });
-    expect({ html: frontmatter.html_url, map: frontmatter.map_url, index: frontmatter.index_url })
+    expect({ html: frontmatter.html_url, map: frontmatter.map.url, index: frontmatter.index_url })
       .toMatchInlineSnapshot(`
       {
         "html": "https://kpshelkovo.online/map/burzhuyka/",
