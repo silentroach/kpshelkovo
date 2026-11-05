@@ -8,6 +8,7 @@ import ktpMarkerUrl from './Ktp.webp?url';
 import parkMarkerUrl from './Park.webp?url';
 import racketMarkerUrl from './Racket.webp?url';
 import titanicMarkerUrl from './Titanic.webp?url';
+import vzuMarkerUrl from './Vzu.webp?url';
 
 export const APPLE_MARKER = {
   src: appleMarkerUrl,
@@ -67,4 +68,10 @@ export const RACKET_MARKER = {
   src: racketMarkerUrl,
   width: 144,
   height: 144
+} as const;
+
+export const VZU_MARKER = {
+  src: vzuMarkerUrl,
+  width: 144,
+  height: 106
 } as const;

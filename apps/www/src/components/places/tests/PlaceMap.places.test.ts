@@ -209,7 +209,8 @@ describe('PlaceMap', () => {
     'ktp',
     'park',
     'racket',
-    'titanic'
+    'titanic',
+    'vzu'
   ] as const)(
     'uses the full-size %s image and preserves the place link and status',
     async (markerType) => {
