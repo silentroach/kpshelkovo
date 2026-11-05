@@ -2,6 +2,8 @@
 title: Проезд через КПП Шелково Ривер перекроют
 service: dam
 kind: maintenance
+affected_places:
+  - river-checkpoint
 started_at: 26.08.2026 10:00
 ended_at: 26.08.2026 13:00
 areas:

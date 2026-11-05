@@ -2,6 +2,8 @@
 title: Реконструкция дамбы
 service: dam
 kind: maintenance
+affected_places:
+  - river-checkpoint
 started_at: 24.09.2026
 ended_at: 15.11.2026
 areas:

@@ -1,6 +1,8 @@
 ---
 service: electricity
 kind: incident
+affected_places:
+  - ktp-2079
 title: Проблемы с электричеством в Шелково Вилладж
 started_at: 17.10.2026 08:00
 ended_at: 17.10.2026 16:10

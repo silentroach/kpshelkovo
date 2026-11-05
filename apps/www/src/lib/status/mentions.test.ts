@@ -13,12 +13,21 @@ const target = createPersonMentionTarget('kschemelinin', 'Кирилл Щеме�
 
 const incident = (input?: {
   readonly mentions?: StatusIncidentWithDetail['mentions'];
-}): Pick<
-  StatusIncidentWithDetail,
-  'id' | 'title' | 'url' | 'markdownUrl' | 'excerpt' | 'mentions' | 'started' | 'sortLastChangeAt'
-> => ({
+}): StatusIncidentWithDetail => ({
   id: '2026/04/electricity-river-10kv-line-damage',
   title: 'Отключение электричества в Шелково Ривер',
+  hasPage: true,
+  canonical: 'https://example.com/status/incidents/2026/04/electricity-river-10kv-line-damage/',
+  service: 'electricity',
+  kind: 'incident',
+  year: 2026,
+  month: 4,
+  slug: 'electricity-river-10kv-line-damage',
+  phase: 'active',
+  appliesToAllAreas: true,
+  areas: ['river', 'forest', 'park', 'village'],
+  body: '' as StatusIncidentWithDetail['body'],
+  sortStartedAt: 1770000000000,
   url: '/status/incidents/2026/04/electricity-river-10kv-line-damage/',
   markdownUrl: '/status/incidents/2026/04/electricity-river-10kv-line-damage/index.md',
   excerpt: 'Как отметил Кирилл Щемелинин, повреждение было редким.',

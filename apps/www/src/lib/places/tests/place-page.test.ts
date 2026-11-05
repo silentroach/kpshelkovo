@@ -10,10 +10,12 @@ import PlacePreview from '@/components/places/PlacePreview.astro';
 import { buildPlaceMapPublicPayload } from '@/lib/places/map-public';
 import { toPlaceMarkdownPublic } from '@/lib/places/markdown-public';
 import type { PlaceMarker } from '@/lib/places/schema';
-import type { PlaceContact, PlaceOpeningHours } from '@/lib/places/types';
+import type { PlaceBacklinks, PlaceContact, PlaceOpeningHours } from '@/lib/places/types';
+import type { StatusIncident } from '@/lib/status/types';
 import { createAstroContainer } from '@/test/astro-container';
 
 import { testPlace } from './place.test-helper';
+import { testRelatedPlace, testRelatedStatus } from './related.test-helper';
 
 const fixture = vi.hoisted(() => ({
   place: {
@@ -35,6 +37,7 @@ const fixture = vi.hoisted(() => ({
     canonical: 'https://example.com/map/apple-garden/',
     backlinks: {
       events: [],
+      kb: [],
       news: [
         {
           section: 'news' as const,
@@ -52,8 +55,9 @@ const fixture = vi.hoisted(() => ({
       places: [],
       people: [],
       contacts: []
-    }
+    } as PlaceBacklinks
   },
+  incidents: [] as StatusIncident[],
   neighbors: [] as {
     readonly slug: string;
     readonly status: 'planned' | 'underConstruction';
@@ -77,6 +81,13 @@ vi.mock('@/lib/places/load', () => ({
   loadPlaceWithBacklinks: async () => fixture.place
 }));
 
+vi.mock('@/lib/status/load', () => ({
+  loadStatusData: async () => ({
+    incidents: fixture.incidents,
+    byId: new Map(fixture.incidents.map((incident) => [incident.id, incident]))
+  })
+}));
+
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import PlacePage from '@/pages/map/[slug]/index.astro';
 
@@ -95,6 +106,7 @@ const originalPlace = { ...fixture.place };
 afterEach(() => {
   Object.assign(fixture.place, originalPlace);
   fixture.neighbors = [];
+  fixture.incidents = [];
 });
 
 describe('place preview marker', () => {
@@ -216,7 +228,7 @@ describe('/map/[slug]/', () => {
       preview: preview.coordinates,
       geo: schema.geo,
       json: buildPlaceMapPublicPayload([fixture.place]).places[0]?.coordinates,
-      markdown: toPlaceMarkdownPublic(fixture.place).coordinates,
+      markdown: toPlaceMarkdownPublic(fixture.place).map.coordinates,
       sameAs: schema.sameAs,
       source: coordinates
     }).toMatchInlineSnapshot(`
@@ -349,7 +361,7 @@ describe('/map/[slug]/', () => {
       { slug: 'construction-place', status: 'underConstruction', marker: 'construction' }
     ];
     const document = await renderPage();
-    const nearby = document.querySelector('aside section[aria-labelledby]');
+    const nearby = document.querySelector('section[aria-labelledby="nearby-heading"]');
     for (const neighbor of fixture.neighbors) {
       const image = nearby?.querySelector(`a[href="/map/${neighbor.slug}/"] img`);
       const expected = PLACE_MARKER_IMAGES[neighbor.marker!];
@@ -396,17 +408,122 @@ describe('/map/[slug]/', () => {
     `);
   });
 
-  it('hides incoming links', async () => {
+  it('renders compact incoming news links outside the indexed body without excerpts', async () => {
     const document = await renderPage();
 
     expect({
       hasBacklink: !!document.querySelector('a[href="/news/2026/05/apple-garden/"]'),
-      hasBacklinkHeading: !!document.querySelector('#place-backlinks')
+      excludedFromIndex: !!document
+        .querySelector('a[href="/news/2026/05/apple-garden/"]')
+        ?.closest('[data-pagefind-ignore="all"]'),
+      hasExcerpt: document.body.textContent.includes('Жители высадили первые яблони.')
     }).toMatchInlineSnapshot(`
       {
-        "hasBacklink": false,
-        "hasBacklinkHeading": false,
+        "excludedFromIndex": true,
+        "hasBacklink": true,
+        "hasExcerpt": false,
       }
     `);
+  });
+
+  it.each([1, 30])(
+    'keeps the primary content together and the mobile navigation order with %i paragraphs',
+    async (paragraphs) => {
+      fixture.place.body = Array.from(
+        { length: paragraphs },
+        () => 'Описание места для посетителей.'
+      ).join('\n\n');
+      fixture.incidents = [
+        testRelatedStatus('current-incident', { kind: 'incident' }),
+        testRelatedStatus('current-work', {}),
+        testRelatedStatus('future', { started_at: '06.11.2026' }),
+        testRelatedStatus('ended', { ended_at: '05.11.2026 11:00' }),
+        testRelatedStatus('indirect', { affected_places: [] }, '@club')
+      ];
+      const place = testRelatedPlace(fixture.incidents);
+      fixture.place.slug = 'club';
+      fixture.neighbors = [{ slug: 'neighbor', status: 'planned', marker: 'kpp' }];
+      fixture.place.backlinks = {
+        ...place.backlinks,
+        news: Array.from({ length: 4 }, (_, index) => ({
+          ...originalPlace.backlinks.news[0]!,
+          sourceId: `news-${index}`,
+          htmlUrl: `/news/item-${index}/`,
+          mentionedAt: '2026-11-05T09:00:00+03:00'
+        })),
+        kb: Array.from({ length: 5 }, (_, index) => ({
+          section: 'kb',
+          kind: 'guide',
+          sourceId: `/kb/item-${index}/`,
+          title: `Справка ${index}`,
+          htmlUrl: `/kb/item-${index}/`,
+          markdownUrl: `/kb/item-${index}/index.md`,
+          excerpt: 'Hidden KB excerpt'
+        }))
+      };
+      const document = await renderPage();
+      const layout = document.querySelector('.place-layout')!;
+      expect({
+        primaryFlow: [...layout.querySelector('.place-main')!.children].map((node) =>
+          node.tagName.toLowerCase()
+        ),
+        lowerNavigationOrder: [
+          ...layout.querySelectorAll(
+            'aside, section[aria-labelledby="nearby-heading"], section[aria-labelledby="place-knowledge"], section[aria-labelledby="place-history"]'
+          )
+        ].map((node) => node.getAttribute('aria-label') ?? node.getAttribute('aria-labelledby')),
+        neighborsOutsideLocation: !document.querySelector(
+          'aside section[aria-labelledby="nearby-heading"]'
+        ),
+        alerts: document.querySelectorAll('.place-alerts li').length,
+        kb: document.querySelectorAll('[aria-labelledby="place-knowledge"] a').length,
+        history: document.querySelectorAll('[aria-labelledby="place-history"] li').length,
+        calendarLink: document.querySelector('.place-alerts a')?.getAttribute('href'),
+        indexedRelated: [...document.querySelectorAll('.place-alerts a, .place-related a')].some(
+          (link) =>
+            !link.closest('[data-pagefind-ignore="all"]') || !!link.closest('[data-pagefind-body]')
+        ),
+        maintenanceCompletionNote:
+          document.querySelector('.place-related')?.textContent.includes('Заявленный период') ||
+          document.querySelector('.place-related')?.textContent.includes('Завершено'),
+        hiddenExcerpts: !document.body.textContent.includes('Hidden KB excerpt'),
+        clientClock: !!document.querySelector(
+          '.place-alerts [data-status-windows], .place-alerts script, .place-related script'
+        )
+      }).toMatchInlineSnapshot(`
+      {
+        "alerts": 3,
+        "calendarLink": "/status/calendar/2026/11/#2026-11-05",
+        "clientClock": false,
+        "hiddenExcerpts": true,
+        "history": 3,
+        "indexedRelated": false,
+        "kb": 3,
+        "lowerNavigationOrder": [
+          "Расположение",
+          "nearby-heading",
+          "place-knowledge",
+          "place-history",
+        ],
+        "maintenanceCompletionNote": false,
+        "neighborsOutsideLocation": true,
+        "primaryFlow": [
+          "header",
+          "section",
+          "article",
+        ],
+      }
+    `);
+    }
+  );
+
+  it('omits all empty related sections and separators', async () => {
+    fixture.place.backlinks = testRelatedPlace().backlinks;
+    const document = await renderPage();
+    expect(
+      document.querySelector(
+        '.place-alerts, .place-related, section[aria-labelledby="nearby-heading"]'
+      )
+    ).toBeFalsy();
   });
 });

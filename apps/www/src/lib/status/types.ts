@@ -55,6 +55,8 @@ interface StatusIncidentBase {
   readonly excerpt?: string;
   readonly body: PreprocessedSiteMarkdownBody;
   readonly mentions: readonly EntityMentionTarget[];
+  /** Explicitly affected place slugs, independent of incidental body mentions. */
+  readonly affectedPlaces?: readonly string[];
   readonly sortStartedAt: number;
   readonly sortLastChangeAt: number;
   readonly duration?: StatusDuration;

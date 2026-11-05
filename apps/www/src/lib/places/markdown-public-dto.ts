@@ -7,12 +7,14 @@ export type PlaceMarkdownPublicDto = {
   readonly category: PlaceCategory;
   readonly status: PlaceStatus;
   readonly address?: string;
-  readonly coordinates: {
-    readonly lat: number;
-    readonly lng: number;
+  readonly map: {
+    readonly url: string;
+    readonly coordinates: {
+      readonly lat: number;
+      readonly lng: number;
+    };
   };
   readonly html_url: string;
-  readonly map_url: string;
   readonly contact_url?: string;
   readonly index_url: string;
   readonly opening_hours?: PlaceMapPublicOpeningHoursDto & {

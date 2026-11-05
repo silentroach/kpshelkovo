@@ -117,6 +117,15 @@ export const mapRawStatusIncident = (
   }
 
   const service = mapRawStatusService(entry.data.service);
+  const affectedPlaces = entry.data.affected_places ?? [];
+  for (const slug of affectedPlaces) {
+    const target = opts.mentionRegistry.get(slug);
+    if (!target || target.type !== 'place') {
+      throw new Error(
+        `status incident "${entry.id}" affected_places target "${slug}" must reference an existing place`
+      );
+    }
+  }
   const kind = mapRawStatusKind(entry.data.kind);
   const area = mapRawStatusAreas(entry.data.areas);
   const body = preprocessSiteMarkdownContent(
@@ -162,6 +171,7 @@ export const mapRawStatusIncident = (
     excerpt: extractFirstMarkdownText(body.markdown),
     body: body.markdown,
     mentions: body.mentions,
+    affectedPlaces,
     sortStartedAt: started.at.valueOf(),
     sortLastChangeAt: changeAt.valueOf(),
     duration: ended ? duration(started.at, ended.at) : undefined

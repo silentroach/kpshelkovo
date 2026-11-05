@@ -1,0 +1,124 @@
+---
+import { formatTextHtml } from '@shelkovo/typography';
+
+import { getPlaceStatusContext } from '@/lib/places/related';
+import type { PlaceRelatedMaterials } from '@/lib/places/related-types';
+import { formatStatusKind } from '@/lib/status/view';
+import {
+  formatPlaceBacklinkDate,
+  formatPlaceBacklinkSection,
+} from '@/lib/places/view';
+
+interface Props {
+  readonly related: PlaceRelatedMaterials;
+}
+const { related } = Astro.props;
+---
+
+{(related.knowledge.length > 0 || related.history.length > 0) && (
+  <div class="place-related" data-pagefind-ignore="all">
+    {related.knowledge.length > 0 && (
+      <section aria-labelledby="place-knowledge">
+        <h2 id="place-knowledge" class="ui-section-label">
+          База знаний
+        </h2>
+        <ul>
+          {related.knowledge.map((ref) => (
+            <li>
+              <a
+                href={ref.htmlUrl}
+                class="site-text-link"
+                set:html={formatTextHtml(ref.title)}
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+    {related.history.length > 0 && (
+      <section aria-labelledby="place-history">
+        <h2 id="place-history" class="ui-section-label">
+          Материалы по теме
+        </h2>
+        <ul>
+          {related.history.map(({ ref, incident }) => {
+            const context = incident
+              ? getPlaceStatusContext(incident)
+              : undefined;
+            return (
+              <li>
+                <a
+                  href={ref.htmlUrl}
+                  class="site-text-link"
+                  set:html={formatTextHtml(ref.title)}
+                />
+                <p class="place-related__meta">
+                  <span>
+                    {incident
+                      ? formatStatusKind(incident.kind)
+                      : formatPlaceBacklinkSection(ref.section)}
+                  </span>
+                  {context ? (
+                    <>
+                      <span set:html={formatTextHtml(context.period)} />
+                      {incident?.kind !== 'maintenance' && (
+                        <span>{context.state.label}</span>
+                      )}
+                    </>
+                  ) : (
+                    ref.mentionedAt && (
+                      <time datetime={ref.mentionedAt}>
+                        {formatPlaceBacklinkDate(ref)}
+                      </time>
+                    )
+                  )}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    )}
+  </div>
+)}
+
+<style>
+  .place-related {
+    display: grid;
+    gap: 1.75rem;
+    border-block-start: 1px solid var(--color-border);
+    padding-block-start: 1.5rem;
+    overflow-wrap: anywhere;
+  }
+  h2 {
+    margin-block-end: 0.625rem;
+    color: var(--color-text-muted);
+  }
+  ul {
+    display: grid;
+    gap: 0.875rem;
+  }
+  a {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-text);
+    text-decoration-color: var(--color-border);
+  }
+  a:is(:hover, :active, :focus-visible) {
+    color: var(--color-primary);
+    text-decoration-color: currentColor;
+  }
+  .place-related__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.125rem 0.625rem;
+    margin-block-start: 0.25rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  a:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+</style>

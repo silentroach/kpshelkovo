@@ -6,9 +6,12 @@ import {
 } from '@shelkovo/markdown';
 
 import { absoluteUrl } from '@/lib/site';
+import type { StatusDataset } from '@/lib/status/types';
+import { formatStatusKind } from '@/lib/status/view';
 
 import { selectMapPlaces } from './map-selection';
 import { toPlaceMarkdownPublic } from './markdown-public';
+import { getPlaceStatusContext } from './related';
 import { placesDataUrl, placesUrl } from './routes';
 import type { Place, PlaceMentionRef, PlaceWithBacklinks } from './types';
 import { formatPlaceBacklinkDate, formatPlaceBacklinkKind, placeBacklinkGroups } from './view';
@@ -24,10 +27,14 @@ const placeLine = (place: Place) =>
     ])
   ]);
 
-const backlinkLine = (backlink: PlaceMentionRef) => {
-  const meta = [formatPlaceBacklinkKind(backlink.kind), formatPlaceBacklinkDate(backlink)].filter(
-    (value): value is string => Boolean(value)
-  );
+const backlinkLine = (backlink: PlaceMentionRef, status?: Pick<StatusDataset, 'byId'>) => {
+  const incident = backlink.section === 'status' ? status?.byId.get(backlink.sourceId) : undefined;
+  const context = incident ? getPlaceStatusContext(incident) : undefined;
+  const meta = [
+    incident ? formatStatusKind(incident.kind) : formatPlaceBacklinkKind(backlink.kind),
+    context?.period ?? formatPlaceBacklinkDate(backlink),
+    incident?.kind !== 'maintenance' ? context?.state.label : undefined
+  ].filter((value): value is string => Boolean(value));
   const details = meta.length > 0 ? ` — ${meta.join('; ')}` : '';
 
   return md.listItem([
@@ -39,7 +46,7 @@ const backlinkLine = (backlink: PlaceMentionRef) => {
   ]);
 };
 
-const backlinksSection = (place: PlaceWithBacklinks) => {
+const backlinksSection = (place: PlaceWithBacklinks, status?: Pick<StatusDataset, 'byId'>) => {
   const groups = placeBacklinkGroups(place.backlinks);
 
   return [
@@ -47,7 +54,7 @@ const backlinksSection = (place: PlaceWithBacklinks) => {
     ...(groups.length > 0
       ? groups.flatMap((group) => [
           md.heading(3, group.label),
-          md.list(group.items.map(backlinkLine))
+          md.list(group.items.map((backlink) => backlinkLine(backlink, status)))
         ])
       : [md.list([md.listItem('Пока публичных упоминаний не найдено.')])])
   ];
@@ -75,7 +82,10 @@ export const buildPlacesMarkdown = (places: readonly Place[]): string => {
   ]);
 };
 
-export const buildPlaceMarkdown = (place: PlaceWithBacklinks): string =>
+export const buildPlaceMarkdown = (
+  place: PlaceWithBacklinks,
+  status?: Pick<StatusDataset, 'byId'>
+): string =>
   serializeMarkdownDocument(
     createMarkdownDocument({
       frontmatter: toPlaceMarkdownPublic(place),
@@ -83,7 +93,7 @@ export const buildPlaceMarkdown = (place: PlaceWithBacklinks): string =>
         md.heading(1, place.name),
         md.paragraph(place.summary),
         ...(place.body ? parseMarkdownFragment(place.body) : []),
-        ...backlinksSection(place)
+        ...backlinksSection(place, status)
       ]
     })
   );

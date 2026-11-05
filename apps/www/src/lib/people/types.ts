@@ -1,13 +1,8 @@
 import type { PreprocessedSiteMarkdownBody } from '../markdown/render';
-import type {
-  EntityMentionTarget,
-  SiteBacklinkKind,
-  SiteBacklinks,
-  SiteMentionRef,
-  SiteMentionSection
-} from '../mentions';
+import type { EntityMentionTarget, SiteMentionRef } from '../mentions';
 import type { PeopleMentionRegistry } from './mentions';
 import type { PersonNameCaseForms } from './name-cases';
+import type { PERSON_BACKLINK_KINDS, PERSON_MENTION_SECTIONS } from './schema';
 
 export type PersonContactType = 'phone' | 'telegram';
 
@@ -18,10 +13,13 @@ export interface PersonContact {
   readonly href: string;
 }
 
-export type PersonMentionSection = SiteMentionSection;
-export type PersonBacklinkKind = SiteBacklinkKind;
-export type PersonMentionRef = SiteMentionRef;
-export type PersonBacklinks = SiteBacklinks;
+export type PersonMentionSection = (typeof PERSON_MENTION_SECTIONS)[number];
+export type PersonBacklinkKind = (typeof PERSON_BACKLINK_KINDS)[number];
+export interface PersonMentionRef extends Omit<SiteMentionRef, 'section' | 'kind'> {
+  readonly section: PersonMentionSection;
+  readonly kind: PersonBacklinkKind;
+}
+export type PersonBacklinks = Readonly<Record<PersonMentionSection, readonly PersonMentionRef[]>>;
 
 export interface PersonPhoto {
   readonly src: string;
