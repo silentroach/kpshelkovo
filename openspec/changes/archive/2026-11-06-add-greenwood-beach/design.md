@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация и границы задачи описаны в [proposal](/openspec/changes/add-greenwood-beach/proposal.md). Исследована база `d13ff21d` из `origin/master`; работа ведётся в отдельном worktree `ok-compare-greenwood-beach`, ветка `feat/greenwood-beach`.
+Мотивация и границы задачи описаны в [proposal](/openspec/changes/archive/2026-11-06-add-greenwood-beach/proposal.md). Исследована база `d13ff21d` из `origin/master`; работа ведётся в отдельном worktree `ok-compare-greenwood-beach`, ветка `feat/greenwood-beach`.
 
 Модель places уже выводит slug из имени Markdown-файла, а маршруты, публичные данные и реестр упоминаний используют его напрямую. Слой `club` и фокус `h` готовы. Новый рисунок подключается через существующий enum и реестр, как маркер `racket`.
 
