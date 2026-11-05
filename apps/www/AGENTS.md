@@ -92,7 +92,7 @@ pnpm typecheck
 - Профиль человека и место не могут упоминать сами себя в собственном Markdown body.
 - Если у профиля есть `position` и/или `company`, они должны попадать в title markdown-ссылки mention как контекст человека.
 - Для атрибуции к внешнему источнику ссылку ставь на вводную фразу, например `[По словам](https://t.me/...) @kschemelinin, ...`.
-- Source refs публикуют адаптеры источников, подключённые в [composition root](/apps/www/src/lib/site-mention-graph.ts); общий graph не импортирует доменные datasets. Структурные связи мероприятий определяет [news-event-places](/openspec/specs/news-event-places/spec.md), формат Markdown-карточки места — [place-markdown-card](/openspec/specs/place-markdown-card/spec.md).
+- Source refs публикуют адаптеры источников, подключённые в [composition root](/apps/www/src/lib/site-mention-graph.ts); общий graph не импортирует доменные datasets. Для статуса различай явную затронутость `affected_places` и обычное упоминание; KB публикует обратные ссылки только на места. Компактные HTML-подборки не усекают полный граф и Markdown-карточку. Структурные связи мероприятий определяет [news-event-places](/openspec/specs/news-event-places/spec.md), формат Markdown-карточки места — [place-markdown-card](/openspec/specs/place-markdown-card/spec.md).
 
 ## Data Boundaries
 

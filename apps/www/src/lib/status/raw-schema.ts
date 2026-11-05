@@ -25,6 +25,10 @@ export const RawStatusIncidentSchema = z
     started_at: contentDateSchema('started_at'),
     ended_at: contentDateSchema('ended_at').optional(),
     areas: z.array(z.enum(STATUS_AREAS)).min(1).optional(),
+    affected_places: z
+      .array(text.min(1))
+      .refine((values) => new Set(values).size === values.length, 'affected_places must be unique')
+      .optional(),
     source_url: absoluteUrl('source_url').optional()
   })
   .superRefine((data, ctx) => {

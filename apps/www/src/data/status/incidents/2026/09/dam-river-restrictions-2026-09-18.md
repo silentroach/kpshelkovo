@@ -2,6 +2,8 @@
 title: Возможны ограничения проезда через КПП Шелково Ривер
 service: dam
 kind: maintenance
+affected_places:
+  - river-checkpoint
 started_at: 18.09.2026
 ended_at: 19.09.2026
 areas:

@@ -145,6 +145,9 @@ export const statusServiceMarkdownUrl = (service: StatusService): string =>
 export const statusCalendarMonthUrl = (input: StatusCalendarMonthRouteInput): string =>
   withBase(statusCalendarMonthPath(input));
 
+export const statusCalendarMonthMarkdownUrl = (input: StatusCalendarMonthRouteInput): string =>
+  withBase(`${statusCalendarMonthPath(input)}index.md`);
+
 export const statusCalendarYearUrl = (input: StatusCalendarYearRouteInput): string =>
   withBase(statusCalendarYearPath(input));
 

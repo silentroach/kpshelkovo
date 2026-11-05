@@ -7,6 +7,8 @@ import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import { PLACE_MARKER_IMAGES } from '@/components/places/marker-images';
 import PlaceOpeningHours from '@/components/places/PlaceOpeningHours.astro';
 import PlacePreview from '@/components/places/PlacePreview.astro';
+import PlaceRelatedLinks from '@/components/places/PlaceRelatedLinks.astro';
+import PlaceStatusAlerts from '@/components/places/PlaceStatusAlerts.astro';
 import '@/components/maps/map-frame.css';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
@@ -14,16 +16,12 @@ import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
 import { renderMarkdown } from '@/lib/markdown/render';
 import { loadPlaces, loadPlaceWithBacklinks } from '@/lib/places/load';
 import { getNearbyPlaces } from '@/lib/places/nearby';
+import { selectPlaceRelatedMaterials } from '@/lib/places/related';
 import { placeHighlightUrl, placesUrl } from '@/lib/places/routes';
-import {
-  formatPlaceBacklinkDate,
-  formatPlaceBacklinkKind,
-  formatPlaceCategory,
-  formatPlaceStatus,
-  placeBacklinkGroups,
-} from '@/lib/places/view';
+import { formatPlaceCategory, formatPlaceStatus } from '@/lib/places/view';
 import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
+import { loadStatusData } from '@/lib/status/load';
 
 export const getStaticPaths = (async () => {
   const places = await loadPlaces();
@@ -55,8 +53,7 @@ const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Карта', href: placesUrl() },
   { label: place.name },
 ]);
-const showBacklinks = false;
-const backlinkGroups = placeBacklinkGroups(place.backlinks);
+const related = selectPlaceRelatedMaterials(place, await loadStatusData());
 const search = {
   scope: 'manual',
   title: place.name,
@@ -157,6 +154,8 @@ const schema = {
           </div>
         </header>
 
+        <PlaceStatusAlerts items={related.priority} />
+
         <article class="place-details" aria-label="О месте">
           {place.openingHours && (
             <dl class="place-facts">
@@ -179,69 +178,6 @@ const schema = {
               set:html={summaryHtml}
             />
           )}
-
-          {showBacklinks && backlinkGroups.length > 0 && (
-            <section
-              aria-labelledby="place-backlinks"
-              class="place-backlinks"
-              data-pagefind-ignore="all"
-            >
-              <div class="place-backlinks__heading">
-                <h2 id="place-backlinks" class="ui-section-label">
-                  Где упоминается
-                </h2>
-                <p class="place-backlinks__description">
-                  Материалы сайта, в которых упомянуто это место.
-                </p>
-              </div>
-
-              <div class="place-backlink-groups">
-                {backlinkGroups.map((group) => (
-                  <section
-                    aria-labelledby={`place-backlinks-${group.section}`}
-                    class="place-backlink-group"
-                  >
-                    <h3
-                      id={`place-backlinks-${group.section}`}
-                      class="place-backlink-group__title"
-                    >
-                      {group.label}
-                    </h3>
-
-                    <ul class="place-backlink-list">
-                      {group.items.map((backlink) => (
-                        <li class="place-backlink">
-                          <div class="place-backlink__meta">
-                            <span class="place-backlink__kind">
-                              {formatPlaceBacklinkKind(backlink.kind)}
-                            </span>
-                            {backlink.mentionedAt && (
-                              <time datetime={backlink.mentionedAt}>
-                                {formatPlaceBacklinkDate(backlink)}
-                              </time>
-                            )}
-                          </div>
-
-                          <a
-                            href={backlink.htmlUrl}
-                            class="site-text-link place-backlink__title"
-                            set:html={formatTextHtml(backlink.title)}
-                          />
-
-                          {backlink.excerpt && (
-                            <p
-                              class="place-backlink__excerpt"
-                              set:html={formatTextHtml(backlink.excerpt)}
-                            />
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                ))}
-              </div>
-            </section>
-          )}
         </article>
       </div>
       <aside
@@ -255,50 +191,55 @@ const schema = {
             <figcaption class="map-frame__caption" set:html={addressHtml} />
           )}
         </figure>
-        {neighbors.length > 0 && (
-          <section class="place-nearby" aria-labelledby="nearby-heading">
-            <h2 id="nearby-heading" class="ui-section-label">
-              Рядом
-            </h2>
-            <ul class="place-nearby__list">
-              {neighbors.map((neighbor) => {
-                const marker = neighbor.marker
-                  ? PLACE_MARKER_IMAGES[neighbor.marker]
-                  : undefined;
-                return (
-                  <li>
-                    <a href={neighbor.url} class="place-nearby__link">
-                      <span class="place-nearby__icon" aria-hidden="true">
-                        {marker ? (
-                          <img
-                            src={marker.src}
-                            width={marker.width}
-                            height={marker.height}
-                            alt=""
-                          />
-                        ) : (
-                          <span class="place-nearby__point" />
-                        )}
-                      </span>
-                      <span class="place-nearby__name">
-                        <span set:html={formatTextHtml(neighbor.name)} />
-                        {neighbor.status !== 'existing' && (
-                          <span class="ui-visually-hidden">
-                            , {formatPlaceStatus(neighbor.status)}
-                          </span>
-                        )}
-                      </span>
-                      <span class="place-nearby__arrow" aria-hidden="true">
-                        ↗
-                      </span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        )}
       </aside>
+      {neighbors.length > 0 && (
+        <section
+          class="place-nearby"
+          aria-labelledby="nearby-heading"
+          data-pagefind-ignore="all"
+        >
+          <h2 id="nearby-heading" class="ui-section-label">
+            Рядом
+          </h2>
+          <ul class="place-nearby__list">
+            {neighbors.map((neighbor) => {
+              const marker = neighbor.marker
+                ? PLACE_MARKER_IMAGES[neighbor.marker]
+                : undefined;
+              return (
+                <li>
+                  <a href={neighbor.url} class="place-nearby__link">
+                    <span class="place-nearby__icon" aria-hidden="true">
+                      {marker ? (
+                        <img
+                          src={marker.src}
+                          width={marker.width}
+                          height={marker.height}
+                          alt=""
+                        />
+                      ) : (
+                        <span class="place-nearby__point" />
+                      )}
+                    </span>
+                    <span class="place-nearby__name">
+                      <span set:html={formatTextHtml(neighbor.name)} />
+                      {neighbor.status !== 'existing' && (
+                        <span class="ui-visually-hidden">
+                          , {formatPlaceStatus(neighbor.status)}
+                        </span>
+                      )}
+                    </span>
+                    <span class="place-nearby__arrow" aria-hidden="true">
+                      ↗
+                    </span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+      <PlaceRelatedLinks {related} />
     </div>
   </main>
 </BaseLayout>
@@ -310,19 +251,27 @@ const schema = {
 
   .place-layout {
     display: grid;
-    gap: 2.25rem;
+    gap: 1.5rem;
     padding-block-end: 0;
   }
 
+  .place-main {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+  }
+
   .place-main,
+  .place-header,
   .place-details,
-  .place-location {
+  .place-location,
+  .place-nearby {
     min-width: 0;
     overflow-wrap: anywhere;
   }
 
   .place-header {
-    padding: 0 0 1.5rem;
+    padding: 0;
   }
 
   .place-heading h1 {
@@ -347,13 +296,13 @@ const schema = {
     border-bottom: 1px solid var(--color-border);
   }
 
+  :global(.place-alerts) + .place-details {
+    margin-block-start: 1rem;
+  }
+
   .place-facts :global(.place-opening-hours-row) {
     border-top: 0;
     padding-block-start: 0;
-  }
-
-  .place-backlink-list {
-    border-block: 1px solid var(--color-border);
   }
 
   .place-body,
@@ -370,91 +319,12 @@ const schema = {
     color: var(--color-text);
   }
 
-  .place-backlinks {
-    margin-block-start: 2.5rem;
-    border-block-start: 1px solid var(--color-border);
-    padding-block-start: 2rem;
-  }
-
-  .place-backlinks__heading > :not(:last-child) {
-    margin-block-end: 0.375rem;
-  }
-
-  .place-backlinks__description,
-  .place-backlink__excerpt {
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-    line-height: 1.5rem;
-  }
-
-  .place-backlink-groups {
-    margin-block-start: 1.5rem;
-  }
-
-  .place-backlink-groups > :not(:last-child) {
-    margin-block-end: 1.75rem;
-  }
-
-  .place-backlink-group > :not(:last-child) {
-    margin-block-end: 0.5rem;
-  }
-
-  .place-backlink-group__title,
-  .place-backlink__kind {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  .place-backlink-group__title {
-    color: var(--color-text-muted);
-    font-family: var(--font-body);
-  }
-
-  .place-backlink + .place-backlink {
-    border-block-start: 1px solid var(--color-border);
-  }
-
-  .place-backlink {
-    padding-block: 1rem;
-  }
-
-  .place-backlink__meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    column-gap: 0.5rem;
-    row-gap: 0.25rem;
-    color: var(--color-text-muted);
-    font-size: 0.75rem;
-    line-height: 1.25rem;
-  }
-
-  .place-backlink__title {
-    display: block;
-    max-width: 65ch;
-    margin-block-start: 0.25rem;
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1.5rem;
-  }
-
-  .place-backlink__excerpt {
-    max-width: 65ch;
-    margin-block-start: 0.375rem;
-  }
-
   .place-map {
     overflow: hidden;
   }
 
-  .place-nearby {
-    margin-block-start: 1.5rem;
-  }
-
   .place-nearby h2 {
-    margin-block-end: 0.5rem;
+    margin-block-end: 0.625rem;
     color: var(--color-text-muted);
   }
 
@@ -526,23 +396,36 @@ const schema = {
     .place-page {
       padding-block-end: 4rem;
     }
-
-    .place-header {
-      padding-block-end: 2rem;
-    }
   }
 
   @media (min-width: 60rem) {
     .place-layout {
       grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
       align-items: start;
-      gap: clamp(2rem, 5vw, 4.5rem);
+      column-gap: clamp(2rem, 5vw, 4.5rem);
+      row-gap: 2.5rem;
     }
-  }
 
-  @media (min-width: 64rem) {
-    .place-header {
-      padding-block-end: 2.5rem;
+    .place-main {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .place-location {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .place-nearby {
+      grid-column: 2;
+      grid-row: 2;
+      border-block-start: 1px solid var(--color-border);
+      padding-block-start: 1.5rem;
+    }
+
+    .place-layout > :global(.place-related) {
+      grid-column: 1;
+      grid-row: 2;
     }
   }
 </style>

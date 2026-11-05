@@ -1,6 +1,8 @@
 ---
 service: electricity
 kind: maintenance
+affected_places:
+  - ktp-1933
 started_at: 11.09.2026 10:00
 ended_at: 11.09.2026 18:00
 areas:

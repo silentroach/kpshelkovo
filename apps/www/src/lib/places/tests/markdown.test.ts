@@ -6,6 +6,9 @@ import type { PlaceOpeningHours, PlaceWithBacklinks } from '../types';
 
 let buildPlaceMarkdown: typeof import('../markdown').buildPlaceMarkdown;
 let buildPlacesMarkdown: typeof import('../markdown').buildPlacesMarkdown;
+let selectPlaceRelatedMaterials: typeof import('../related').selectPlaceRelatedMaterials;
+let statusBacklink: typeof import('./related.test-helper').statusBacklink;
+let testRelatedStatus: typeof import('./related.test-helper').testRelatedStatus;
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
@@ -84,7 +87,8 @@ const place: PlaceWithBacklinks = {
     reviews: [],
     places: [],
     people: [],
-    contacts: []
+    contacts: [],
+    kb: []
   },
   address: 'Шелково Форест, Берёзовая улица, 21А',
   coordinates: { lat: 55.060526, lng: 37.716242 },
@@ -115,9 +119,125 @@ beforeAll(async () => {
   });
 
   ({ buildPlaceMarkdown, buildPlacesMarkdown } = await import('../markdown'));
+  ({ selectPlaceRelatedMaterials } = await import('../related'));
+  ({ statusBacklink, testRelatedStatus } = await import('./related.test-helper'));
 });
 
 describe('places Markdown', () => {
+  it('keeps the complete graph and context independently of the compact HTML selection', () => {
+    const incidents = [
+      testRelatedStatus('short-a', { ended_at: '05.11.2026 11:00' }),
+      testRelatedStatus('short-b', { kind: 'incident', started_at: '05.11.2026 10:30' }),
+      testRelatedStatus('detailed', {}, 'Описание с @club.')
+    ];
+    const status = { byId: new Map(incidents.map((incident) => [incident.id, incident])) };
+    const refs = Array.from({ length: 5 }, (_, index) => ({
+      section: 'kb' as const,
+      kind: 'guide' as const,
+      sourceId: `/kb/guide-${index}/`,
+      title: `Справка ${index}`,
+      htmlUrl: `/kb/guide-${index}/`,
+      markdownUrl: `/kb/guide-${index}/index.md`,
+      excerpt: `Контекст ${index}`
+    }));
+    const card: PlaceWithBacklinks = {
+      ...place,
+      slug: 'club',
+      backlinks: {
+        ...place.backlinks,
+        kb: refs,
+        status: incidents.map(statusBacklink),
+        news: Array.from({ length: 5 }, (_, index) => ({
+          ...place.backlinks.news[0]!,
+          sourceId: `news-${index}`,
+          markdownUrl: `/news/item-${index}/index.md`
+        })),
+        events: [
+          {
+            section: 'events',
+            kind: 'event',
+            sourceId: 'event',
+            title: 'Встреча',
+            htmlUrl: '/events/event/',
+            markdownUrl: '/events/event/index.md'
+          }
+        ],
+        reviews: [
+          {
+            section: 'reviews',
+            kind: 'review',
+            sourceId: 'review',
+            title: 'Отзыв',
+            htmlUrl: '/reviews/review/',
+            markdownUrl: '/reviews/review/index.md'
+          }
+        ],
+        people: [
+          {
+            section: 'people',
+            kind: 'person',
+            sourceId: 'person',
+            title: 'Человек',
+            htmlUrl: '/people/person/',
+            markdownUrl: '/people/person/index.md'
+          }
+        ],
+        places: [
+          {
+            section: 'places',
+            kind: 'place',
+            sourceId: 'place',
+            title: 'Сосед',
+            htmlUrl: '/map/place/',
+            markdownUrl: '/map/place/index.md'
+          }
+        ],
+        contacts: [
+          {
+            section: 'contacts',
+            kind: 'contact',
+            sourceId: 'contact',
+            title: 'Контакт',
+            htmlUrl: '/sarafan/contact/',
+            markdownUrl: '/sarafan/contact/index.md'
+          }
+        ]
+      }
+    };
+    const before = buildPlaceMarkdown(card, status);
+    selectPlaceRelatedMaterials(card, status, () => 0.5);
+    const markdown = buildPlaceMarkdown(card, status);
+    expect(markdown).toBe(before);
+    for (const ref of Object.values(card.backlinks).flat()) {
+      expect(markdown).toContain(`](https://example.com${ref.markdownUrl})`);
+      if (ref.excerpt) expect(markdown).toContain(ref.excerpt);
+    }
+    expect({
+      sharedCalendarLinks: markdown.match(
+        /\]\(https:\/\/example.com\/status\/calendar\/2026\/11\/index.md\)/gu
+      )?.length,
+      detailCompanion: markdown.includes('/status/incidents/2026/11/detailed/index.md'),
+      noCalendarFragment: !markdown.includes('index.md#2026-11-05'),
+      period: markdown.includes('5 ноября, 10:00'),
+      maintenanceCompletionNote:
+        markdown.includes('Заявленный период') || markdown.includes('; Завершено'),
+      maintenanceKind: markdown.includes('Плановые работы; 5 ноября'),
+      authorBody: markdown.includes('Описание **места**.'),
+      frontmatter: markdown.startsWith('---\n')
+    }).toMatchInlineSnapshot(`
+      {
+        "authorBody": true,
+        "detailCompanion": true,
+        "frontmatter": true,
+        "maintenanceCompletionNote": false,
+        "maintenanceKind": true,
+        "noCalendarFragment": true,
+        "period": true,
+        "sharedCalendarLinks": 2,
+      }
+    `);
+  });
+
   it('publishes the rounded point but leaves the editorial map URL unchanged', () => {
     const coordinates = { lat: 55.06070312345, lng: 37.74689498765 };
     const mapUrl = 'https://yandex.ru/maps/?pt=37.74689498765,55.06070312345&source=editor';
@@ -393,7 +513,8 @@ describe('places Markdown', () => {
         reviews: [],
         places: [],
         people: [],
-        contacts: []
+        contacts: [],
+        kb: []
       }
     });
 
