@@ -50,6 +50,8 @@ static/HomeServiceSummary.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
     rendered: 1722
   apps/www/src/lib/home/service-summary.ts:
     rendered: 1551
+  apps/www/src/lib/status/schema.ts:
+    rendered: 101
 static/InfrastructureTable.XXXXXXXX.js:
   apps/www/src/compare/components/InfrastructureTable.svelte:
     rendered: 3563
@@ -122,35 +124,11 @@ static/StatusServiceTimeline.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/lib/status/calendar.ts:
     rendered: 4796
   apps/www/src/lib/status/timeline.lazy.ts:
-    rendered: 6190
-  apps/www/src/lib/status/timeline.schema.ts:
-    rendered: 611
+    rendered: 5840
   apps/www/src/lib/status/timeline.ts:
     rendered: 2319
   node_modules/.pnpm/luxon@3.7.2/node_modules/luxon/build/es6/luxon.mjs:
-    rendered: 125843
-  node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/core/api.js:
-    rendered: 876
-  node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/core/checks.js:
-    rendered: 1336
-  node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/core/core.js:
-    rendered: 2844
-  node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/core/errors.js:
-    rendered: 1429
-  node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/core/parse.js:
-    rendered: 2412
-  node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/core/regexes.js:
-    rendered: 1092
-  node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/core/schemas.js:
-    rendered: 14463
-  node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/core/util.js:
-    rendered: 6524
-  node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/core/versions.js:
-    rendered: 126
-  node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/mini/iso.js:
-    rendered: 341
-  node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/mini/schemas.js:
-    rendered: 3541
+    rendered: 125813
   packages/format/src/date.ts:
     rendered: 192
 static/StickyTableScript.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
@@ -542,11 +520,6 @@ static/runtime.XXXXXXXX.js:
   apps/www/src/lib/yandex-maps/runtime.ts:
     rendered: 3635
 static/schema.XXXXXXXX.js:
-  apps/www/src/lib/areas.ts:
-    rendered: 78
-  apps/www/src/lib/status/schema.ts:
-    rendered: 127
-static/schema-2.XXXXXXXX.js:
   apps/www/src/lib/parcels/schema.ts:
     rendered: 140
   packages/format/src/plural.ts:

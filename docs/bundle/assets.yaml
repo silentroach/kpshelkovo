@@ -55,9 +55,9 @@
   brotli: 977
   gzip: 1171
 - file: static/HomeServiceSummary.astro_astro_type_script_index_0_lang.XXXXXXXX.js
-  bytes: 2038
-  brotli: 802
-  gzip: 943
+  bytes: 2045
+  brotli: 811
+  gzip: 952
 - file: static/InfrastructureTable.XXXXXXXX.js
   bytes: 2533
   brotli: 955
@@ -143,9 +143,9 @@
   brotli: 385
   gzip: 455
 - file: static/StatusServiceTimeline.astro_astro_type_script_index_0_lang.XXXXXXXX.js
-  bytes: 96118
-  brotli: 27164
-  gzip: 30511
+  bytes: 77301
+  brotli: 21901
+  gzip: 24572
 - file: static/StatusTimelineLegend.XXXXXXXX.css
   bytes: 5337
   brotli: 1154
@@ -414,19 +414,15 @@
   bytes: 2158
   brotli: 1012
   gzip: 1178
-- file: static/schema-2.XXXXXXXX.js
+- file: static/schema.XXXXXXXX.js
   bytes: 250
   brotli: 197
   gzip: 221
-- file: static/schema.XXXXXXXX.js
-  bytes: 107
-  brotli: 90
-  gzip: 106
 - file: static/src.XXXXXXXX.js
   bytes: 194
   brotli: 132
   gzip: 160
 - file: static/timeline.dom.XXXXXXXX.js
   bytes: 3371
-  brotli: 1319
-  gzip: 1561
+  brotli: 1317
+  gzip: 1563

@@ -1,9 +1,8 @@
-import { STATUS_SERVICES } from './schema';
 import { buildStatusTimelineDays, formatTimelineDate, formatTimelineDay } from './timeline';
-import { statusTimelineRecordsSchema } from './timeline.schema';
 import type {
   StatusTimelineBalloonLoader,
   StatusTimelineBalloonModule,
+  StatusTimelineRecords,
   StatusTimelineSnapshot
 } from './timeline.types';
 
@@ -47,22 +46,12 @@ export const bindStatusTimelineLazyHydration = (
     const nowMs = typeof override === 'number' && Number.isFinite(override) ? override : Date.now();
     for (const root of rootDocument.querySelectorAll<HTMLElement>('[data-status-timeline]')) {
       if (connected.has(root)) continue;
-      const service = STATUS_SERVICES.find((value) => value === root.dataset.statusService);
       const control = root.querySelector<HTMLInputElement>('[data-timeline-control]');
       const error = root.querySelector<HTMLElement>('[data-timeline-error]');
-      if (!service || !control || !error) continue;
-      let raw: unknown;
-      try {
-        raw = JSON.parse(root.dataset.timelineRecords ?? '');
-      } catch {
-        continue;
-      }
-      const result = statusTimelineRecordsSchema.safeParse(raw);
-      if (!result.success) continue;
+      if (!control || !error) continue;
+      const records = JSON.parse(root.dataset.timelineRecords!) as StatusTimelineRecords;
       const count = Number(root.dataset.rangeDays);
-      if (!Number.isInteger(count) || count < 1 || count > 90) continue;
       connected.add(root);
-      const records = result.data;
       const snapshot: StatusTimelineSnapshot = {
         nowMs,
         records,

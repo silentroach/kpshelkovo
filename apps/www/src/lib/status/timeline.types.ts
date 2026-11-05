@@ -1,5 +1,7 @@
+import type * as z from 'zod/mini';
+
 import type { StatusArea, StatusKind } from './schema';
-import type { StatusTimelineTooltipItemDto } from './timeline-tooltip.types';
+import type { statusTimelineRecordsSchema } from './timeline.schema';
 import type { StatusDuration, StatusIncidentPhase } from './types';
 
 export interface StatusTimelineIncidentInput {
@@ -16,13 +18,9 @@ export interface StatusTimelineIncidentInput {
   readonly duration?: StatusDuration;
 }
 
-/** Internal component data, not a public status DTO. */
-export interface StatusTimelineRecord extends StatusTimelineTooltipItemDto {
-  readonly id: string;
-  readonly href?: string;
-  readonly startedHasTime: boolean;
-  readonly endedHasTime: boolean;
-}
+/** Trusted internal SSR data; schema imports are erased from the client. */
+export type StatusTimelineRecords = z.infer<typeof statusTimelineRecordsSchema>;
+export type StatusTimelineRecord = StatusTimelineRecords[number];
 
 export interface StatusTimelineDay {
   readonly id: string;
