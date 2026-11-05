@@ -60,7 +60,7 @@ static/MapPreview.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
     rendered: 171
 static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/marker-images.ts:
-    rendered: 312
+    rendered: 330
   apps/www/src/components/places/place-map-geometry.ts:
     rendered: 2912
   apps/www/src/components/places/place-map-url.ts:
@@ -90,7 +90,7 @@ static/PlaceMap.XXXXXXXX.js:
   packages/ui/src/markers/Foodtruck.webp?url:
     rendered: 111
   packages/ui/src/markers/index.ts:
-    rendered: 772
+    rendered: 839
   packages/ui/src/markers/Kpp.webp?url:
     rendered: 93
   packages/ui/src/markers/Ktp.webp?url:
@@ -101,6 +101,8 @@ static/PlaceMap.XXXXXXXX.js:
     rendered: 102
   packages/ui/src/markers/Titanic.webp?url:
     rendered: 105
+  packages/ui/src/markers/Vzu.webp?url:
+    rendered: 93
 static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/components/places/PlaceOpeningHours.astro?astro&type=script&index=0&lang.ts:
     rendered: 1147

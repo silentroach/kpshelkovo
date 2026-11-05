@@ -49,6 +49,7 @@
     "./markers/Park.webp": "./src/markers/Park.webp",
     "./markers/Racket.webp": "./src/markers/Racket.webp",
     "./markers/Titanic.webp": "./src/markers/Titanic.webp",
+    "./markers/Vzu.webp": "./src/markers/Vzu.webp",
     "./SiteFooter.astro": "./src/SiteFooter.astro",
     "./standalone-error.css": "./standalone-error.css",
     "./icons/system/Domyland.astro": "./src/icons/system/Domyland.astro",
