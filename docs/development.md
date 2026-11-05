@@ -24,7 +24,7 @@
 
 ## Чистый checkout
 
-Нужны Git, Node.js 24+ и pnpm версии из `packageManager` в корневом `package.json`. Поддерживаемые среды проверки — macOS и Linux. Установка внешних skills требует доступа к GitHub.
+Нужны Git, Node.js 26+ и pnpm версии из `packageManager` в корневом `package.json`. Поддерживаемые среды проверки — macOS и Linux. Установка внешних skills требует доступа к GitHub.
 
 Из корня репозитория выполни:
 
