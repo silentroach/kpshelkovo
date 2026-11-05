@@ -18,7 +18,9 @@ export const statusTimelineRecordsSchema = z.readonly(
         areas: z.optional(z.readonly(z.array(z.enum(STATUS_AREAS)))),
         areaLabel: z.optional(z.string()),
         periodLabel: z.string(),
-        activePeriodLabel: z.optional(z.string())
+        activePeriodLabel: z.optional(z.string()),
+        singleDayDate: z.optional(z.string()),
+        singleDayPeriodLabel: z.optional(z.string())
       })
     )
   )

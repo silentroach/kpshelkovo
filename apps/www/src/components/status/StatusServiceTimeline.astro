@@ -99,7 +99,7 @@ const views = [
       <h3 id={`${balloonId}-title`} data-timeline-balloon-title />
       <button
         type="button"
-        class="ui-icon-action"
+        class="ui-btn ui-icon-action"
         data-timeline-close
         aria-label="Закрыть подробности дня"
       >
@@ -270,9 +270,12 @@ const views = [
     margin-bottom: 0.5rem;
   }
   .status-service-timeline__balloon h3 {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    line-height: 1.4;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: normal;
+    color: var(--color-text-muted);
     margin: 0;
   }
   .status-service-timeline__balloon button {
@@ -282,9 +285,9 @@ const views = [
     padding: 3px;
     color: var(--color-text);
   }
-  .status-service-timeline__balloon button svg {
-    width: 18px;
-    height: 18px;
+  .status-service-timeline__balloon [data-timeline-close] > span {
+    display: block;
+    line-height: 1;
   }
   .status-service-timeline__balloon [data-timeline-balloon-list] {
     overflow-y: auto;

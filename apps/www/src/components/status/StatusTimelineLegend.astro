@@ -1,5 +1,4 @@
 <div class="status-timeline-legend">
-  <p>Одна ячейка: один день.</p>
   <ul aria-label="Записи за день">
     <li>
       <span data-tone="green" aria-hidden="true" />
@@ -18,19 +17,16 @@
 <style>
   .status-timeline-legend {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.25rem;
+    justify-content: flex-start;
     color: var(--color-text-muted);
     font-size: 0.8125rem;
     line-height: 1.5;
     margin-top: 0.75rem;
   }
-  p {
-    margin: 0;
-  }
   ul {
     display: flex;
     flex-wrap: wrap;
+    justify-content: inherit;
     gap: 0.5rem 1rem;
     list-style: none;
     padding: 0;

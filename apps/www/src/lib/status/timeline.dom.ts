@@ -1,5 +1,5 @@
 import { resolveStatusIncidentPhase } from './lifecycle';
-import { formatTimelineCount, formatTimelineDate } from './timeline';
+import { formatTimelineDate } from './timeline';
 import type { StatusTimelineBalloonInput } from './timeline.types';
 
 let dismiss: (() => void) | undefined;
@@ -28,7 +28,7 @@ export const openStatusTimelineDay = ({
   const icons = root.querySelector<HTMLTemplateElement>('[data-timeline-icons]');
   const cloneIcon = (selector: string): Node | undefined =>
     icons?.content.querySelector(selector)?.cloneNode(true);
-  title.textContent = `${formatTimelineDate(day.id)} · ${formatTimelineCount(day.recordIds.length)}`;
+  title.textContent = formatTimelineDate(day.id);
   const items = day.recordIds.flatMap((id) => {
     const record = snapshot.records.find((item) => item.id === id);
     if (!record) return [];
@@ -70,7 +70,20 @@ export const openStatusTimelineDay = ({
           : phase === 'resolved'
             ? 'завершён'
             : 'ожидается';
-    meta.textContent = `${kind} ${phaseLabel}. ${phase === 'active' ? (record.activePeriodLabel ?? record.periodLabel) : record.periodLabel}`;
+    const phaseText = doc.createElement('span');
+    phaseText.textContent =
+      record.kind === 'maintenance' && phase === 'active'
+        ? 'Работы продолжаются. '
+        : `${kind} ${phaseLabel}. `;
+    if (phase === 'resolved') phaseText.className = 'ui-visually-hidden';
+    const singleDayPeriod =
+      record.singleDayDate === day.id && (record.endedIso || day.id === snapshot.days.at(-1)?.id)
+        ? record.singleDayPeriodLabel
+        : undefined;
+    const period =
+      singleDayPeriod ??
+      (phase === 'active' ? (record.activePeriodLabel ?? record.periodLabel) : record.periodLabel);
+    meta.append(phaseText, doc.createTextNode(period));
     record.areas?.forEach((area) => {
       const icon = cloneIcon(`[data-area-icon="${area}"]`);
       if (icon) meta.append(icon);

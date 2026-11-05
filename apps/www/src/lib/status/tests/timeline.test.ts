@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildStatusTimelineDays, formatTimelineCount } from '../timeline';
+import { buildStatusTimelineDays } from '../timeline';
 import { buildStatusTimelineRecords } from '../timeline-data';
 import type { StatusTimelineIncidentInput } from '../timeline.types';
 
@@ -12,6 +12,38 @@ const record = (
 ) => ({ id, startedIso, endedIso, kind });
 
 describe('daily status projection', () => {
+  it('includes leap day and interprets different ISO offsets as Moscow calendar dates', () => {
+    expect(
+      buildStatusTimelineDays(
+        [record('leap', '2024-02-29T01:00:00+05:00', '2024-03-01T00:00:00+03:00')],
+        Date.parse('2024-03-01T12:00:00+03:00'),
+        3
+      )
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "id": "2024-02-28",
+          "recordIds": [
+            "leap",
+          ],
+          "tone": "red",
+        },
+        {
+          "id": "2024-02-29",
+          "recordIds": [
+            "leap",
+          ],
+          "tone": "red",
+        },
+        {
+          "id": "2024-03-01",
+          "recordIds": [],
+          "tone": "green",
+        },
+      ]
+    `);
+  });
+
   it('uses Moscow dates over month and year boundaries, excludes midnight end and zero intervals', () => {
     const now = Date.parse('2026-01-01T21:30:00Z'); // January 2 in Moscow
     const days = buildStatusTimelineDays(
@@ -189,18 +221,56 @@ it('retains every intersecting and future record rather than a recent-ten slice'
   `);
 });
 
-it('declines event counts', () => {
-  expect([0, 1, 2, 5, 11, 21, 22, 25, 111].map(formatTimelineCount)).toMatchInlineSnapshot(`
+it('prepares date-free periods without inventing unknown times or shortening multi-day ranges', () => {
+  const base: StatusTimelineIncidentInput = {
+    id: 'timed',
+    title: 'Timed',
+    kind: 'incident',
+    phase: 'resolved',
+    startedIso: '2026-05-09T10:00:00+03:00',
+    startedHasTime: true,
+    endedIso: '2026-05-09T11:30:00+03:00',
+    endedHasTime: true,
+    duration: { totalMinutes: 90 }
+  };
+  const records = buildStatusTimelineRecords(
     [
-      "0 событий",
-      "1 событие",
-      "2 события",
-      "5 событий",
-      "11 событий",
-      "21 событие",
-      "22 события",
-      "25 событий",
-      "111 событий",
-    ]
-  `);
+      base,
+      { ...base, id: 'unknown-start', startedHasTime: false },
+      { ...base, id: 'midnight-end', endedIso: '2026-05-10T00:00:00+03:00' },
+      {
+        ...base,
+        id: 'offsets',
+        startedIso: '2026-05-09T23:00:00+05:00',
+        endedIso: '2026-05-10T01:00:00+05:00',
+        duration: { totalMinutes: 120 }
+      },
+      {
+        ...base,
+        id: 'open',
+        phase: 'active',
+        endedIso: undefined,
+        endedHasTime: false,
+        duration: undefined
+      },
+      {
+        ...base,
+        id: 'date-only-open',
+        phase: 'active',
+        startedHasTime: false,
+        endedIso: undefined,
+        endedHasTime: false,
+        duration: undefined
+      }
+    ],
+    Date.parse('2026-05-10T12:00:00+03:00'),
+    30
+  );
+  expect(
+    records.map((record) => ({
+      id: record.id,
+      date: record.singleDayDate,
+      period: record.singleDayPeriodLabel?.replaceAll('\u00a0', '·')
+    }))
+  ).toMatchInlineSnapshot();
 });

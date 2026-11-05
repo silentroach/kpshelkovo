@@ -1,6 +1,5 @@
-import { compareRuText, dateTimeFromISO } from '@shelkovo/format';
+import { compareRuText } from '@shelkovo/format';
 
-import { buildStatusCalendarProjection } from './calendar';
 import type {
   StatusTimelineDay,
   StatusTimelineIncidentInput,
@@ -27,10 +26,21 @@ export const toStatusTimelineIncidentInput = (
   duration: incident.duration
 });
 
-export const statusTimelineStart = (nowMs: number, days: number) =>
-  dateTimeFromISO(new Date(nowMs).toISOString())
-    .startOf('day')
-    .minus({ days: days - 1 });
+const DAY_MS = 24 * 60 * 60 * 1000;
+const calendarDate = new Intl.DateTimeFormat('en-GB', {
+  timeZone: 'Europe/Moscow',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit'
+});
+
+const moscowDateKey = (timestamp: number): string => {
+  const parts = calendarDate.formatToParts(timestamp);
+  const year = parts.find((part) => part.type === 'year')!.value.padStart(4, '0');
+  const month = parts.find((part) => part.type === 'month')!.value;
+  const day = parts.find((part) => part.type === 'day')!.value;
+  return `${year}-${month}-${day}`;
+};
 
 export const buildStatusTimelineDays = (
   records: readonly Pick<StatusTimelineRecord, 'id' | 'kind' | 'startedIso' | 'endedIso'>[],
@@ -40,35 +50,37 @@ export const buildStatusTimelineDays = (
   if (!Number.isFinite(nowMs) || !Number.isInteger(count) || count < 1) {
     throw new Error('Invalid status timeline window');
   }
-  const first = statusTimelineStart(nowMs, count);
-  const startMs = first.toMillis();
-  const endMs = first.plus({ days: count }).toMillis();
-  const starts = new Map(records.map((record) => [record.id, Date.parse(record.startedIso)]));
-  const calendar = buildStatusCalendarProjection(
-    records.flatMap((record) => {
+  const today = moscowDateKey(nowMs);
+  // UTC here represents a calendar date, not a real Moscow midnight.
+  const first = Date.parse(`${today}T00:00:00Z`) - (count - 1) * DAY_MS;
+  const intervals = [...new Map(records.map((record) => [record.id, record])).values()]
+    .flatMap((record) => {
       const start = Date.parse(record.startedIso);
-      const end = record.endedIso ? Date.parse(record.endedIso) : endMs;
-      if (start > nowMs || end <= start || end <= startMs) return [];
+      const end = record.endedIso ? Date.parse(record.endedIso) : undefined;
+      if (start > nowMs || (end !== undefined && end <= start)) return [];
       return [
         {
           id: record.id,
           kind: record.kind,
-          startedAt: Math.max(start, startMs),
-          endedAt: Math.min(end, endMs)
+          start,
+          firstDay: moscowDateKey(start),
+          lastDay: end === undefined ? today : moscowDateKey(end - 1)
         }
       ];
-    }),
-    nowMs
-  );
+    })
+    .toSorted((a, b) => a.start - b.start || compareRuText(a.id, b.id));
+
   return Array.from({ length: count }, (_, index) => {
-    const id = first.plus({ days: index }).toISODate()!;
-    const day = calendar.byDay.get(id);
+    const id = new Date(first + index * DAY_MS).toISOString().slice(0, 10);
+    const entries = intervals.filter((record) => record.firstDay <= id && id <= record.lastDay);
     return {
       id,
-      tone: !day ? 'green' : day.kind === 'maintenance' ? 'amber' : 'red',
-      recordIds: (day?.recordIds ?? []).toSorted(
-        (a, b) => starts.get(a)! - starts.get(b)! || compareRuText(a, b)
-      )
+      tone: entries.some((record) => record.kind === 'incident')
+        ? 'red'
+        : entries.length
+          ? 'amber'
+          : 'green',
+      recordIds: entries.map((record) => record.id)
     };
   });
 };
@@ -86,12 +98,6 @@ const shortDate = new Intl.DateTimeFormat('ru-RU', {
 });
 export const formatTimelineDate = (id: string, short = false): string =>
   (short ? shortDate : fullDate).format(new Date(`${id}T12:00:00+03:00`));
-
-export const formatTimelineCount = (count: number): string => {
-  const mod100 = count % 100;
-  const mod10 = count % 10;
-  return `${count} ${mod100 >= 11 && mod100 <= 14 ? 'событий' : mod10 === 1 ? 'событие' : mod10 >= 2 && mod10 <= 4 ? 'события' : 'событий'}`;
-};
 
 export const formatTimelineDay = (
   day: StatusTimelineDay,

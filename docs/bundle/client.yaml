@@ -121,16 +121,10 @@ static/StatusServiceState.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
 static/StatusServiceTimeline.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/components/status/StatusServiceTimeline.astro?astro&type=script&index=0&lang.ts:
     rendered: 122
-  apps/www/src/lib/status/calendar.ts:
-    rendered: 4796
   apps/www/src/lib/status/timeline.lazy.ts:
     rendered: 5840
   apps/www/src/lib/status/timeline.ts:
-    rendered: 2319
-  node_modules/.pnpm/luxon@3.7.2/node_modules/luxon/build/es6/luxon.mjs:
-    rendered: 125813
-  packages/format/src/date.ts:
-    rendered: 192
+    rendered: 2407
 static/StickyTableScript.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/components/common/StickyTableScript.astro?astro&type=script&index=0&lang.ts:
     rendered: 112
@@ -477,7 +471,7 @@ static/map-gestures.XXXXXXXX.js:
     rendered: 1329
 static/number.XXXXXXXX.js:
   packages/format/src/number.ts:
-    rendered: 929
+    rendered: 857
 static/opening-hours.XXXXXXXX.js:
   apps/www/src/lib/places/opening-hours.ts:
     rendered: 1421
@@ -529,4 +523,4 @@ static/src.XXXXXXXX.js:
     rendered: 359
 static/timeline.dom.XXXXXXXX.js:
   apps/www/src/lib/status/timeline.dom.ts:
-    rendered: 5063
+    rendered: 5233

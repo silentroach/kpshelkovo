@@ -123,6 +123,67 @@ it('does not load on mobile and discards a pending desktop result after mode cha
   }
 });
 
+it('updates phases within the same Moscow day only on connection and keeps completed history', async () => {
+  const { local, doc, html } = await setup([
+    {
+      ...openRecord,
+      id: 'same-day',
+      startedIso: '2026-05-10T10:00:00+03:00',
+      endedIso: '2026-05-10T11:00:00+03:00',
+      endedHasTime: true,
+      phase: 'scheduled'
+    }
+  ]);
+  try {
+    const cells = () => doc.querySelector('[data-timeline-view="desktop"] [data-timeline-grid]')!;
+    const read = () => ({
+      day: cells().lastElementChild?.getAttribute('data-day'),
+      tone: cells().lastElementChild?.getAttribute('data-tone'),
+      icon: doc
+        .querySelector('[data-timeline-balloon] [data-phase-icon]')
+        ?.getAttribute('data-phase-icon')
+    });
+    expect(read().tone).toBe('green');
+    window.__STATUS_TIMELINE_NOW__ = Date.parse('2026-05-10T10:30:00+03:00');
+    bindStatusTimelineLazyHydration(doc, async () => ({
+      openStatusTimelineDay,
+      closeStatusTimelineDay
+    }));
+    doc.querySelector<HTMLInputElement>('[data-timeline-control]')!.click();
+    await vi.waitFor(() => expect(read().icon).toBe('alert'));
+    const active = read();
+
+    window.__STATUS_TIMELINE_NOW__ = Date.parse('2026-05-10T12:00:00+03:00');
+    local.dispatchEvent(new local.Event('resize'));
+    doc.dispatchEvent(new Event('visibilitychange'));
+    doc.querySelector<HTMLInputElement>('[data-timeline-control]')!.click();
+    await vi.waitFor(() => expect(read().icon).toBe('alert'));
+    expect(read()).toEqual(active);
+
+    doc.dispatchEvent(new Event('astro:before-swap'));
+    doc.body.innerHTML = html;
+    doc.dispatchEvent(new Event('astro:after-swap'));
+    doc.querySelector<HTMLInputElement>('[data-timeline-control]')!.click();
+    await vi.waitFor(() => expect(read().icon).toBe('check'));
+    expect({ active, completed: read() }).toMatchInlineSnapshot(`
+      {
+        "active": {
+          "day": "2026-05-10",
+          "icon": "alert",
+          "tone": "red",
+        },
+        "completed": {
+          "day": "2026-05-10",
+          "icon": "check",
+          "tone": "red",
+        },
+      }
+    `);
+  } finally {
+    await local.happyDOM.close();
+  }
+});
+
 it('announces a loading failure, clears selection and does not retry the failed module', async () => {
   const { local, doc } = await setup([openRecord]);
   try {
@@ -205,13 +266,19 @@ it('keeps both SSR windows readable, encodes titles once and opens all records w
     expect(shell.querySelector('a')?.getAttribute('href')).toBe('/status/incidents/open/');
     expect(shell.querySelector('img')).toBeNull();
     expect(shell.textContent?.replaceAll('\u00a0', '·')).toMatchInlineSnapshot(
-      `"9 мая 2026 г. · 3 события×List onlyПлановые работы идут. Начиная с·8·мая, 10:00<img src=x onerror=alert(1)>Инцидент продолжается. Начиная с·8·мая, 10:00OpenИнцидент завершён. 9·мая, 10:00·—·11:30 (1·ч. 30·мин.)"`
+      `"9 мая 2026 г.×List onlyПлановые работы идут. Начиная с·8·мая, 10:00<img src=x onerror=alert(1)>Инцидент продолжается. Начиная с·8·мая, 10:00OpenИнцидент завершён. 9·мая, 10:00·—·11:30 (1·ч. 30·мин.)"`
     );
     const close = shell.querySelector<HTMLButtonElement>('button')!;
     close.focus();
     close.click();
     expect(doc.activeElement).toBe(control);
     expect(shell.hidden).toBe(true);
+    openStatusTimelineDay({ root, control, snapshot, index: 87 });
+    expect(
+      shell
+        .querySelector('.status-service-timeline__event-meta')
+        ?.textContent.replaceAll('\u00a0', '·')
+    ).toContain('8·мая');
     openStatusTimelineDay({ root, control, snapshot, index: 0 });
     expect(shell.querySelectorAll('a')).toHaveLength(0);
     expect(shell.querySelector('[data-timeline-balloon-list]')?.textContent).toContain(

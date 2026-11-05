@@ -24,7 +24,9 @@ const data = await loadStatusData();
 const calendarYear = data.calendar.buildYear;
 const calendarHeading = `Проблемы и плановые работы за ${calendarYear} год`;
 const overviewTimelineDays = 30;
-const recentIncidents = data.incidents.slice(0, 10);
+const recentIncidents = data.incidents
+  .filter((item) => !isActiveOrScheduledMaintenance(item))
+  .slice(0, 10);
 const activeIncidents = data.active.filter((item) => item.kind === 'incident');
 const plannedWorks = data.incidents.filter(isActiveOrScheduledMaintenance);
 const title = 'Статус поселка — Шелково Онлайн';
@@ -122,7 +124,9 @@ const schema = collectionPageSchema({
               />
             ))}
           </div>
-          <StatusTimelineLegend />
+          <div class="status-services__legend">
+            <StatusTimelineLegend />
+          </div>
         </div>
       </div>
     </section>
@@ -264,7 +268,14 @@ const schema = collectionPageSchema({
     font-weight: 600;
   }
 
+  .status-services__legend {
+    padding-inline: 1.25rem;
+  }
+
   @media (min-width: 48rem) {
+    .status-services__legend {
+      padding-inline: 1.5rem;
+    }
     .status-page {
       padding-block-end: 2.5rem;
     }
@@ -296,13 +307,22 @@ const schema = collectionPageSchema({
       padding-block-end: 3rem;
     }
 
-    .status-services__header {
+    .status-services__header,
+    .status-services__legend {
       display: grid;
       grid-template-columns:
         minmax(0, 15rem) minmax(0, 1fr) minmax(0, 11rem)
         minmax(0, 21rem);
-      gap: 1.5rem;
+      gap: 1.25rem;
       padding: 0.75rem 1.5rem;
+    }
+
+    .status-services__legend {
+      padding-block: 0;
+    }
+
+    .status-services__legend :global(.status-timeline-legend) {
+      grid-column: 2 / -1;
     }
 
     .status-services__header p {
