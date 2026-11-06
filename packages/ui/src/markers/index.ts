@@ -1,5 +1,6 @@
 import animalsMarkerUrl from './Animals.webp?url';
 import appleMarkerUrl from './Apple.webp?url';
+import beachMarkerUrl from './Beach.webp?url';
 import constructionMarkerUrl from './Construction.webp?url';
 import fishMarkerUrl from './Fish.webp?url';
 import foodtruckMarkerUrl from './Foodtruck.webp?url';
@@ -18,6 +19,12 @@ export const APPLE_MARKER = {
 
 export const ANIMALS_MARKER = {
   src: animalsMarkerUrl,
+  width: 144,
+  height: 144
+} as const;
+
+export const BEACH_MARKER = {
+  src: beachMarkerUrl,
   width: 144,
   height: 144
 } as const;

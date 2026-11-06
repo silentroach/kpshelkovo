@@ -30,11 +30,11 @@ vi.mock(import('@/lib/places/map-layers'), async (importOriginal) => ({
 
 const club: PlaceMapItem = {
   ...pondsPlace,
-  slug: 'squash-time',
+  slug: 'greenforest-squash-time',
   mapLayer: 'club',
   marker: 'racket',
   coordinates: { lat: 55.029404, lng: 37.745748 },
-  url: '/map/squash-time/'
+  url: '/map/greenforest-squash-time/'
 };
 const infrastructure: PlaceMapItem = {
   ...place,
@@ -242,7 +242,7 @@ describe('club place layer', () => {
       vi.stubGlobal('matchMedia', () => ({ matches: reduced }));
       const timeout = vi.spyOn(window, 'setTimeout');
       const state = { from: 'club' };
-      window.history.replaceState(state, '', '/map/?flag&l=infra&h=squash-time#map');
+      window.history.replaceState(state, '', '/map/?flag&l=infra&h=greenforest-squash-time#map');
       render(PlaceMap, { props: { places: [place, club, infrastructure] } });
       const checkbox = await ready();
       expect(checkbox.checked).toBe(true);
@@ -276,7 +276,7 @@ describe('club place layer', () => {
     }
   );
 
-  it.each(['h=unknown', 'p=unknown&h=squash-time'])(
+  it.each(['h=unknown', 'p=unknown&h=greenforest-squash-time'])(
     'does not enable club for suppressed or invalid target %s',
     async (query) => {
       window.history.replaceState({}, '', `/map/?${query}`);
@@ -287,7 +287,7 @@ describe('club place layer', () => {
   );
 
   it('clears an active club highlight when hidden and does not restore it on re-enable', async () => {
-    window.history.replaceState({}, '', '/map/?h=squash-time');
+    window.history.replaceState({}, '', '/map/?h=greenforest-squash-time');
     render(PlaceMap, { props: { places: [place, club] } });
     const checkbox = await ready();
     await fireEvent.click(checkbox);

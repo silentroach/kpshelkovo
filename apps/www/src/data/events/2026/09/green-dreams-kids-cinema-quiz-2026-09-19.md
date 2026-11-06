@@ -7,7 +7,7 @@ status: announced
 source_url: https://t.me/green_events/290
 price: 700 ₽
 audience: 7+
-place: green-dreams
+place: greenwood-green-dreams
 location_details: в большой беседке
 ---
 

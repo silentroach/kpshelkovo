@@ -5,7 +5,7 @@ category: meetings
 starts_at: 13.06.2026 16:00
 status: cancelled
 source_url: https://t.me/shelkovoecoclub/20423/46589
-place: green-dreams
+place: greenwood-green-dreams
 location_details: в беседке
 organizer:
   name: ОК Комфорт
