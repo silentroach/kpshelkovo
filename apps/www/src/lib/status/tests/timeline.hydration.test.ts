@@ -123,6 +123,36 @@ it('does not load on mobile and discards a pending desktop result after mode cha
   }
 });
 
+it.each(['body', '[data-timeline-start]'])(
+  'cancels a pending day on pointerdown at %s and allows a fresh selection after loading',
+  async (selector) => {
+    const { local, doc } = await setup([openRecord]);
+    try {
+      const pending = Promise.withResolvers<StatusTimelineBalloonModule>();
+      const open = vi.fn();
+      const loader = vi.fn(() => pending.promise);
+      bindStatusTimelineLazyHydration(doc, loader);
+      const control = doc.querySelector<HTMLInputElement>('[data-timeline-control]')!;
+      control.click();
+      expect(doc.querySelector('[data-selected]')).toBeTruthy();
+
+      local.document
+        .querySelector(selector)!
+        .dispatchEvent(new local.PointerEvent('pointerdown', { bubbles: true }));
+      expect(doc.querySelector('[data-selected]')).toBeNull();
+      pending.resolve({ openStatusTimelineDay: open, closeStatusTimelineDay: vi.fn() });
+      await local.happyDOM.whenAsyncComplete();
+      expect(open).not.toHaveBeenCalled();
+
+      control.click();
+      await vi.waitFor(() => expect(open).toHaveBeenCalledTimes(1));
+      expect(loader).toHaveBeenCalledTimes(1);
+    } finally {
+      await local.happyDOM.close();
+    }
+  }
+);
+
 it('updates phases within the same Moscow day only on connection and keeps completed history', async () => {
   const { local, doc, html } = await setup([
     {

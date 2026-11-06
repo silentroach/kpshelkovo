@@ -143,9 +143,9 @@
   brotli: 385
   gzip: 455
 - file: static/StatusServiceTimeline.astro_astro_type_script_index_0_lang.XXXXXXXX.js
-  bytes: 4711
-  brotli: 1931
-  gzip: 2193
+  bytes: 4822
+  brotli: 1961
+  gzip: 2229
 - file: static/StatusTimelineLegend.XXXXXXXX.css
   bytes: 5682
   brotli: 1216
@@ -424,5 +424,5 @@
   gzip: 160
 - file: static/timeline.dom.XXXXXXXX.js
   bytes: 3797
-  brotli: 1458
-  gzip: 1687
+  brotli: 1454
+  gzip: 1689
