@@ -261,6 +261,7 @@ describe('people discovery payload', () => {
       'article',
       'event',
       'incident',
+      'maintenance',
       'review',
       'place',
       'person',

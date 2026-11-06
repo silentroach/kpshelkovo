@@ -49,6 +49,7 @@ const PLACE_BACKLINK_KIND_LABELS = {
   article: 'Новость',
   event: 'Мероприятие',
   incident: 'Инцидент',
+  maintenance: 'Плановые работы',
   review: 'Отзыв',
   place: 'Место',
   person: 'Профиль',

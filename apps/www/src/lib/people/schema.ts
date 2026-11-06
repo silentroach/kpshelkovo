@@ -12,6 +12,7 @@ export const PERSON_BACKLINK_KINDS = [
   'article',
   'event',
   'incident',
+  'maintenance',
   'review',
   'place',
   'person',

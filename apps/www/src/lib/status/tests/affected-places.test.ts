@@ -73,7 +73,7 @@ describe('status affected places', () => {
           "sortKey": 1777757400000,
           "source": {
             "id": "2026/05/works",
-            "kind": "incident",
+            "kind": "maintenance",
             "section": "status",
           },
           "target": {
@@ -106,6 +106,11 @@ describe('status affected places', () => {
       ]
     `);
     expect(record.affectedPlaces).toEqual(['gate']);
+    expect(refs.map((ref) => ref.source.kind)).toEqual([
+      'maintenance',
+      'maintenance',
+      'maintenance'
+    ]);
     expect(refs.every((ref) => ref.htmlUrl === '/status/incidents/2026/05/works/')).toBe(true);
     expect(
       refs.every((ref) => ref.markdownUrl === '/status/incidents/2026/05/works/index.md')
@@ -149,6 +154,7 @@ describe('status affected places', () => {
     );
     expect(graphRefs.map((ref) => ref.source.id)).toEqual(['2026/05/other', '2026/05/works']);
     expect(new Set(graphRefs.map((ref) => ref.htmlUrl)).size).toBe(1);
+    expect(graphRefs.map((ref) => ref.source.kind)).toEqual(['maintenance', 'maintenance']);
   });
 
   it('does not extend the public JSON contract with explicit relations', () => {

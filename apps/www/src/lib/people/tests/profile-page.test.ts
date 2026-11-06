@@ -49,6 +49,26 @@ afterEach(async () => {
 });
 
 describe('/people/[slug]/ presentation', () => {
+  it('keeps backlinks hidden until their separate editorial rollout', async () => {
+    const document = await renderPage({
+      backlinks: {
+        ...EMPTY_PERSON_BACKLINKS,
+        status: [
+          {
+            section: 'status',
+            kind: 'maintenance',
+            sourceId: '2026/11/works',
+            title: 'Водоснабжение',
+            htmlUrl: '/status/incidents/2026/11/works/',
+            markdownUrl: '/status/incidents/2026/11/works/index.md'
+          }
+        ]
+      }
+    });
+    expect(document.querySelector('a[href="/status/incidents/2026/11/works/"]')).toBeNull();
+    expect(document.querySelector('.person-profile__backlinks')).toBeNull();
+  });
+
   it.each([
     { position: 'Service manager', company: 'Example company' },
     { position: 'Service manager', company: undefined },

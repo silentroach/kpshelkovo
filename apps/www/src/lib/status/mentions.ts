@@ -17,7 +17,7 @@ export const createStatusIncidentMentionRefs = (
   const source = {
     source: {
       section: 'status' as const,
-      kind: 'incident' as const,
+      kind: incident.kind,
       id: incident.id
     },
     title: incident.title,
