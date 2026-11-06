@@ -41,6 +41,7 @@
     "./markers": "./src/markers/index.ts",
     "./markers/Apple.webp": "./src/markers/Apple.webp",
     "./markers/Animals.webp": "./src/markers/Animals.webp",
+    "./markers/Beach.webp": "./src/markers/Beach.webp",
     "./markers/Construction.webp": "./src/markers/Construction.webp",
     "./markers/Fish.webp": "./src/markers/Fish.webp",
     "./markers/Foodtruck.webp": "./src/markers/Foodtruck.webp",
