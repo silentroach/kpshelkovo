@@ -4,7 +4,7 @@ import '@/styles/site.css';
 
 import Fonts from '@shelkovo/ui/Fonts.astro';
 import StatusServiceTimeline from '@/components/status/StatusServiceTimeline.astro';
-import type { StatusTimelineIncidentInput } from '@/lib/status/timeline';
+import type { StatusTimelineIncidentInput } from '@/lib/status/timeline.types';
 
 const fixedNowIso = '2026-05-10T12:00:00Z';
 const fixedNowMs = Date.parse(fixedNowIso);
@@ -134,13 +134,13 @@ const denseProblemIncidents: readonly StatusTimelineIncidentInput[] = [
       <section class="status-timeline-visual-card">
         <p class="status-timeline-visual-label">Mixed timeline</p>
         <div
-          class="status-timeline-visual-target status-timeline-visual-target--tooltip"
+          class="status-timeline-visual-target"
           data-testid="status-timeline-mixed"
         >
           <StatusServiceTimeline
             service="water"
             incidents={mixedIncidents}
-            timelineDays={10}
+            timelineDays={90}
           />
         </div>
       </section>
@@ -152,9 +152,9 @@ const denseProblemIncidents: readonly StatusTimelineIncidentInput[] = [
           data-testid="status-timeline-empty"
         >
           <StatusServiceTimeline
-            service="water"
+            service="internet"
             incidents={emptyIncidents}
-            timelineDays={10}
+            timelineDays={90}
           />
         </div>
       </section>
@@ -168,7 +168,7 @@ const denseProblemIncidents: readonly StatusTimelineIncidentInput[] = [
           <StatusServiceTimeline
             service="electricity"
             incidents={activeEdgeIncidents}
-            timelineDays={10}
+            timelineDays={90}
           />
         </div>
       </section>
@@ -178,13 +178,13 @@ const denseProblemIncidents: readonly StatusTimelineIncidentInput[] = [
           Dense problems near range end
         </p>
         <div
-          class="status-timeline-visual-target status-timeline-visual-target--tooltip status-timeline-visual-target--group-tooltip"
+          class="status-timeline-visual-target"
           data-testid="status-timeline-dense-problems"
         >
           <StatusServiceTimeline
-            service="electricity"
+            service="dam"
             incidents={denseProblemIncidents}
-            timelineDays={10}
+            timelineDays={30}
           />
         </div>
       </section>
@@ -207,12 +207,14 @@ const denseProblemIncidents: readonly StatusTimelineIncidentInput[] = [
     gap: 1.5rem;
     width: min(100%, 64rem);
     margin: 0 auto;
-    padding: 3rem;
+    padding: clamp(1rem, 4vw, 3rem);
   }
 
   .status-timeline-visual-card {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.75rem;
+    min-width: 0;
   }
 
   .status-timeline-visual-label {
@@ -236,23 +238,7 @@ const denseProblemIncidents: readonly StatusTimelineIncidentInput[] = [
   }
 
   /* Keep Chromium element screenshots out of the backdrop compositing path. */
-  .status-timeline-visual-target :global(.status-service-timeline__tooltip) {
+  .status-timeline-visual-target :global(.status-service-timeline__balloon) {
     backdrop-filter: none;
-  }
-
-  .status-timeline-visual-target--tooltip {
-    padding-bottom: 1.1rem;
-  }
-
-  .status-timeline-visual-target--tooltip:has(
-    [data-status-timeline][data-status-tooltip-open='true']
-  ) {
-    padding-bottom: 5.2rem;
-  }
-
-  .status-timeline-visual-target--group-tooltip:has(
-    [data-status-timeline][data-status-tooltip-open='true']
-  ) {
-    padding-bottom: 19rem;
   }
 </style>

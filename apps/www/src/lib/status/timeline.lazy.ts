@@ -47,6 +47,7 @@ export const bindStatusTimelineLazyHydration = (
     for (const root of rootDocument.querySelectorAll<HTMLElement>('[data-status-timeline]')) {
       if (connected.has(root)) continue;
       const control = root.querySelector<HTMLInputElement>('[data-timeline-control]');
+      const balloon = root.querySelector('[data-timeline-balloon]');
       const error = root.querySelector<HTMLElement>('[data-timeline-error]');
       if (!control || !error) continue;
       const records = JSON.parse(root.dataset.timelineRecords!) as StatusTimelineRecords;
@@ -84,11 +85,13 @@ export const bindStatusTimelineLazyHydration = (
       rootDocument.addEventListener(
         'pointerdown',
         (event) => {
-          if (
-            event.target instanceof rootDocument.defaultView!.Node &&
-            !root.contains(event.target)
-          )
-            focusWithin = false;
+          if (!(event.target instanceof rootDocument.defaultView!.Node)) return;
+          if (!root.contains(event.target)) focusWithin = false;
+          if (selected && !control.contains(event.target) && !balloon?.contains(event.target)) {
+            revision++;
+            selected = false;
+            updateValue();
+          }
         },
         options
       );
