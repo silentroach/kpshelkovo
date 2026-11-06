@@ -53,10 +53,9 @@ const calendarWorkOutsideRoute = (page: Page) =>
     const button = document.createElement('button');
 
     root.dataset.statusCalendarTooltipRoot = '';
-    root.dataset.statusCalendarTooltipSummary = 'Обычная страница';
     root.innerHTML = `
       <span aria-hidden="true" data-status-calendar-tooltip>
-        <span data-status-calendar-tooltip-text>Fallback</span>
+        <span aria-hidden="true">Обычная страница</span>
       </span>
     `;
     button.type = 'button';

@@ -2,7 +2,6 @@ const TOOLTIP_ROOT_SELECTOR = '[data-status-calendar-tooltip-root]';
 const YEAR_CALENDAR_SELECTOR = '[data-status-calendar-year]';
 const YEAR_CALENDAR_LIFECYCLE_ELEMENT = 'status-year-calendar-lifecycle';
 const TOOLTIP_SELECTOR = '[data-status-calendar-tooltip]';
-const TOOLTIP_TEXT_SELECTOR = '[data-status-calendar-tooltip-text]';
 const TOOLTIP_OPEN_ATTRIBUTE = 'data-status-calendar-tooltip-open';
 const TOOLTIP_HOVER_ATTRIBUTE = 'data-status-calendar-tooltip-hovered';
 const TOOLTIP_FOCUS_ATTRIBUTE = 'data-status-calendar-tooltip-focused';
@@ -112,14 +111,10 @@ const openStatusCalendarTooltip = (root: HTMLElement): void => {
   }
 
   const tooltip = root.querySelector<HTMLElement>(TOOLTIP_SELECTOR);
-  const tooltipText = tooltip?.querySelector<HTMLElement>(TOOLTIP_TEXT_SELECTOR);
-  const summary = root.dataset.statusCalendarTooltipSummary;
-
-  if (!tooltip || !tooltipText || !summary) {
+  if (!tooltip) {
     return;
   }
 
-  tooltipText.textContent = summary;
   tooltip.setAttribute('aria-hidden', 'false');
   root.setAttribute(TOOLTIP_OPEN_ATTRIBUTE, '');
   positionStatusCalendarTooltip(root);

@@ -209,18 +209,20 @@ describe('formatStatusIncidentPeriodText', () => {
 
   it('supports non-breaking spaces for UI period labels', () => {
     expect(
-      formatStatusIncidentPeriodText(
-        period({
-          isActive: false,
-          startedIso: `${currentYear}-05-01T07:32:00+03:00`,
-          startedHasTime: true,
-          endedIso: `${currentYear}-05-01T16:38:00+03:00`,
-          endedHasTime: true,
-          duration: { totalMinutes: 9 * 60 + 6 }
-        }),
-        { nonBreaking: true }
+      visibleWhitespace(
+        formatStatusIncidentPeriodText(
+          period({
+            isActive: false,
+            startedIso: `${currentYear}-05-01T07:32:00+03:00`,
+            startedHasTime: true,
+            endedIso: `${currentYear}-05-01T16:38:00+03:00`,
+            endedHasTime: true,
+            duration: { totalMinutes: 9 * 60 + 6 }
+          }),
+          { nonBreaking: true }
+        )
       )
-    ).toBe(`1${NBSP}мая, 07:32 -${NBSP}16:38 (9${NBSP}ч. 6${NBSP}мин.)`);
+    ).toMatchInlineSnapshot(`"1·мая, 07:32 —·16:38 (9·ч. 6·мин.)"`);
   });
 });
 

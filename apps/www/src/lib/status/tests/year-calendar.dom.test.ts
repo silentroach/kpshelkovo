@@ -97,7 +97,6 @@ describe('registerStatusCalendarYearInteractions', () => {
         <span
           data-status-calendar-date="${dayId}"
           data-status-calendar-tooltip-root="${dayId}"
-          data-status-calendar-tooltip-summary="24 августа ${String(year)}: 2 проблемы, 1 плановая работа"
         >
           <a
             href="#${dayId}"
@@ -111,7 +110,13 @@ describe('registerStatusCalendarYearInteractions', () => {
             aria-label="Откроется журнал за этот день"
             aria-hidden="true"
             data-status-calendar-tooltip
-          ><span aria-hidden="true" data-status-calendar-tooltip-text>Fallback</span></span>
+          >
+            <span aria-hidden="true">
+              <time datetime="${dayId}">24 августа</time>
+              <span data-status-calendar-tooltip-kind="incident"><span aria-hidden="true"></span><span>2 проблемы</span></span>
+              <span data-status-calendar-tooltip-kind="maintenance"><span aria-hidden="true"></span><span>1 плановая работа</span></span>
+            </span>
+          </span>
         </span>
       </div>
       <status-year-calendar-lifecycle hidden></status-year-calendar-lifecycle>
@@ -139,6 +144,7 @@ describe('registerStatusCalendarYearInteractions', () => {
 
   it('opens on mouse hover, remains hoverable, and reopens after Escape', () => {
     const { root, link, tooltip, button } = renderTooltip();
+    const serverElements = [...tooltip.querySelectorAll('*')];
 
     registerStatusCalendarYearInteractions();
     link.dispatchEvent(
@@ -177,18 +183,27 @@ describe('registerStatusCalendarYearInteractions', () => {
       openOverTooltip,
       closedOnEscape,
       reopened: root.hasAttribute('data-status-calendar-tooltip-open'),
-      summary: visibleWhitespace(tooltip.textContent),
+      lines: [...tooltip.querySelectorAll('time, [data-status-calendar-tooltip-kind]')].map(
+        (line) => visibleWhitespace(line.textContent.trim())
+      ),
       ariaHidden: tooltip.getAttribute('aria-hidden')
     }).toMatchInlineSnapshot(`
       {
         "ariaHidden": "false",
         "closedOnEscape": true,
+        "lines": [
+          "24·августа",
+          "2·проблемы",
+          "1·плановая·работа",
+        ],
         "openOverTooltip": true,
         "opened": true,
         "reopened": true,
-        "summary": "24·августа·2026: 2·проблемы, 1·плановая работа",
       }
     `);
+    serverElements.forEach((element, index) => {
+      expect(tooltip.querySelectorAll('*')[index]).toBe(element);
+    });
   });
 
   it('opens and closes for a pen pointer', () => {
@@ -223,6 +238,7 @@ describe('registerStatusCalendarYearInteractions', () => {
 
   it('opens on keyboard focus and reopens after Escape and blur', () => {
     const { root, link, tooltip, button } = renderTooltip();
+    const serverElements = [...tooltip.querySelectorAll('*')];
 
     registerStatusCalendarYearInteractions();
     link.focus();
@@ -247,13 +263,13 @@ describe('registerStatusCalendarYearInteractions', () => {
         "reopened": true,
       }
     `);
+    serverElements.forEach((element, index) => {
+      expect(tooltip.querySelectorAll('*')[index]).toBe(element);
+    });
   });
 
-  it('ignores touch hover, preserves the first click, and inserts text safely', () => {
-    const { root, link, tooltip } = renderTooltip();
-    const unsafeSummary = '<img src=x onerror="alert(1)">';
-
-    root.dataset.statusCalendarTooltipSummary = unsafeSummary;
+  it('ignores touch hover and preserves the first click', () => {
+    const { root, link } = renderTooltip();
     registerStatusCalendarYearInteractions();
     link.dispatchEvent(
       new PointerEvent('pointerover', {
@@ -268,28 +284,15 @@ describe('registerStatusCalendarYearInteractions', () => {
     });
     const clickAllowed = link.dispatchEvent(click);
 
-    link.dispatchEvent(
-      new PointerEvent('pointerover', {
-        bubbles: true,
-        pointerType: 'mouse'
-      })
-    );
-
     expect({
       openAfterTouch,
       clickAllowed,
-      clickPrevented: click.defaultPrevented,
-      text: tooltip.textContent,
-      html: tooltip.querySelector('[data-status-calendar-tooltip-text]')?.innerHTML,
-      injectedImage: Boolean(tooltip.querySelector('img'))
+      clickPrevented: click.defaultPrevented
     }).toMatchInlineSnapshot(`
       {
         "clickAllowed": true,
         "clickPrevented": false,
-        "html": "&lt;img src=x onerror=\"alert(1)\"&gt;",
-        "injectedImage": false,
         "openAfterTouch": false,
-        "text": "<img src=x onerror=\"alert(1)\">",
       }
     `);
   });
@@ -363,11 +366,10 @@ describe('registerStatusCalendarYearInteractions', () => {
       <main>
         <span
           data-status-calendar-tooltip-root
-          data-status-calendar-tooltip-summary="Обычная страница"
         >
           <button type="button">Обычная страница</button>
           <span aria-hidden="true" data-status-calendar-tooltip>
-            <span data-status-calendar-tooltip-text>Fallback</span>
+            <span aria-hidden="true">Обычная страница</span>
           </span>
         </span>
       </main>
@@ -397,6 +399,7 @@ describe('registerStatusCalendarYearInteractions', () => {
     querySelectorAll.mockClear();
     vi.setSystemTime(new Date('2027-08-24T12:00:00.000Z'));
     const returnedCalendar = renderTooltip(2027);
+    const serverElements = [...returnedCalendar.tooltip.querySelectorAll('*')];
     const tooltipBounds = vi
       .spyOn(returnedCalendar.tooltip, 'getBoundingClientRect')
       .mockReturnValue({ left: 20, right: 200 } as DOMRect);
@@ -437,5 +440,8 @@ describe('registerStatusCalendarYearInteractions', () => {
         "todayInitializationsOutsideCalendar": 0,
       }
     `);
+    serverElements.forEach((element, index) => {
+      expect(returnedCalendar.tooltip.querySelectorAll('*')[index]).toBe(element);
+    });
   });
 });

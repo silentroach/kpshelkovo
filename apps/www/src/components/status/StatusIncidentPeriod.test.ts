@@ -35,7 +35,7 @@ describe('StatusIncidentPeriod', () => {
 
     expect(html).toMatch(
       new RegExp(
-        `<span[^>]*><time[^>]*>1${NBSP}мая, 07:32</time> -${NBSP}<time[^>]*>16:38</time> \\(9${NBSP}ч\\. 6${NBSP}мин\\.\\)</span>`
+        `<span[^>]*><time[^>]*>1${NBSP}мая, 07:32</time> —${NBSP}<time[^>]*>16:38</time> \\(9${NBSP}ч\\. 6${NBSP}мин\\.\\)</span>`
       )
     );
     expect(html).not.toMatch(/>\s+16:38</u);
