@@ -2,7 +2,7 @@
 
 ## Context
 
-Причина и согласованный объём — в [proposal](/openspec/changes/show-people-related-materials/proposal.md). [Страница профиля](/apps/www/src/pages/people/[slug]/index.astro) уже загружает backlinks, но `showBacklinks = false` скрывает карточный список с группами и выдержками. [Тест страницы](/apps/www/src/lib/people/tests/profile-page.test.ts) явно закрепляет это временное отключение.
+Причина и согласованный объём — в [proposal](/openspec/changes/archive/2026-11-06-show-people-related-materials/proposal.md). На момент подготовки плана [страница профиля](/apps/www/src/pages/people/[slug]/index.astro) уже загружала backlinks, но `showBacklinks = false` скрывал карточный список с группами и выдержками. [Тест страницы](/apps/www/src/lib/people/tests/profile-page.test.ts) закреплял это временное отключение.
 
 [Карточки мест](/apps/www/src/components/places/PlaceRelatedLinks.astro) используют компактные списки ссылок. Их [селектор](/apps/www/src/lib/places/related.ts) решает собственные задачи: приоритет явно затронутых мест, три новости/статуса и случайная подборка KB. У людей источники шире, а семантики `affected_places` нет.
 

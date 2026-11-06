@@ -1,0 +1,93 @@
+---
+import { formatTextHtml } from '@shelkovo/typography';
+
+import type { PersonMentionRef } from '@/lib/people/types';
+import {
+  formatPersonBacklinkDate,
+  formatPersonBacklinkKind,
+} from '@/lib/people/view';
+
+interface Props {
+  readonly items: readonly PersonMentionRef[];
+}
+const { items } = Astro.props;
+---
+
+{items.length > 0 && (
+  <section
+    class="person-related"
+    aria-labelledby="person-related-heading"
+    data-pagefind-ignore="all"
+  >
+    <h2 id="person-related-heading" class="ui-section-label">
+      Где упоминается
+    </h2>
+    <ul>
+      {items.map((ref) => (
+        <li>
+          <a
+            href={ref.htmlUrl}
+            class="site-text-link"
+            set:html={formatTextHtml(ref.title)}
+          />
+          <p class="person-related__meta">
+            <span>{formatPersonBacklinkKind(ref.kind)}</span>
+            {ref.mentionedAt && (
+              <time
+                datetime={ref.mentionedAt}
+                set:html={formatTextHtml(formatPersonBacklinkDate(ref)!)}
+              />
+            )}
+          </p>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
+
+<style>
+  .person-related {
+    max-width: 56rem;
+    margin: 2rem 1.25rem 0;
+    border-block-start: 1px solid var(--color-border);
+    padding-block-start: 1.5rem;
+    overflow-wrap: anywhere;
+  }
+  h2 {
+    margin-block-end: 0.625rem;
+    color: var(--color-text-muted);
+  }
+  ul {
+    display: grid;
+    gap: 0.875rem;
+  }
+  a {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-text);
+    text-decoration-color: var(--color-border);
+  }
+  a:is(:hover, :active, :focus-visible) {
+    color: var(--color-primary);
+    text-decoration-color: currentColor;
+  }
+  .person-related__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.125rem 0.625rem;
+    margin-block-start: 0.25rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  a:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+  @media (min-width: 48rem) {
+    .person-related {
+      margin-block-start: 2.5rem;
+      margin-inline: 1.5rem;
+    }
+  }
+</style>
