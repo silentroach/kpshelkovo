@@ -75,7 +75,8 @@ export const openStatusTimelineDay = ({
       record.kind === 'maintenance' && phase === 'active'
         ? 'Работы продолжаются. '
         : `${kind} ${phaseLabel}. `;
-    if (phase === 'resolved') phaseText.className = 'ui-visually-hidden';
+    phaseText.className =
+      phase === 'resolved' ? 'ui-visually-hidden' : 'status-service-timeline__event-phase';
     const singleDayPeriod =
       record.singleDayDate === day.id && (record.endedIso || day.id === snapshot.days.at(-1)?.id)
         ? record.singleDayPeriodLabel
@@ -84,11 +85,14 @@ export const openStatusTimelineDay = ({
       singleDayPeriod ??
       (phase === 'active' ? (record.activePeriodLabel ?? record.periodLabel) : record.periodLabel);
     meta.append(phaseText, doc.createTextNode(period));
+    const areas = doc.createElement('p');
+    areas.className = 'status-service-timeline__event-areas';
     record.areas?.forEach((area) => {
       const icon = cloneIcon(`[data-area-icon="${area}"]`);
-      if (icon) meta.append(icon);
+      if (icon) areas.append(icon, doc.createTextNode(' '));
     });
     item.append(heading, meta);
+    if (areas.childNodes.length) item.append(areas);
     return [item];
   });
   if (!items.length) {

@@ -245,6 +245,7 @@ it('keeps both SSR windows readable, encodes titles once and opens all records w
       endedIso: '2026-05-09T11:30:00+03:00',
       endedHasTime: true,
       duration: { totalMinutes: 90 },
+      areas: ['river', 'forest'],
       phase: 'resolved'
     }
   ];
@@ -265,8 +266,23 @@ it('keeps both SSR windows readable, encodes titles once and opens all records w
     expect(shell.querySelectorAll('a').length).toBe(1);
     expect(shell.querySelector('a')?.getAttribute('href')).toBe('/status/incidents/open/');
     expect(shell.querySelector('img')).toBeNull();
+    const territories = shell.querySelector('.status-service-timeline__event-areas')!;
+    expect({
+      labels: [...territories.querySelectorAll('[data-area-icon]')].map((area) =>
+        area.textContent?.trim()
+      ),
+      hiddenSymbols: territories.querySelectorAll('[data-area-icon] > [aria-hidden="true"]').length
+    }).toMatchInlineSnapshot(`
+      {
+        "hiddenSymbols": 2,
+        "labels": [
+          "Ривер",
+          "Форест",
+        ],
+      }
+    `);
     expect(shell.textContent?.replaceAll('\u00a0', '·')).toMatchInlineSnapshot(
-      `"9 мая 2026 г.×List onlyРаботы продолжаются. Начиная с·8·мая, 10:00<img src=x onerror=alert(1)>Инцидент продолжается. Начиная с·8·мая, 10:00OpenИнцидент завершён. 10:00·— 11:30 (1·ч. 30·мин.)"`
+      `"9 мая 2026 г.×List onlyРаботы продолжаются. Начиная с·8·мая, 10:00<img src=x onerror=alert(1)>Инцидент продолжается. Начиная с·8·мая, 10:00OpenИнцидент завершён. 10:00·— 11:30 (1·ч. 30·мин.)Ривер Форест "`
     );
     const close = shell.querySelector<HTMLButtonElement>('button')!;
     close.focus();
