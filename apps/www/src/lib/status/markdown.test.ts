@@ -92,7 +92,7 @@ describe('buildStatusHomeMarkdown', () => {
 
       ## История
 
-      - [Отключение электричества в Шелково Ривер](https://example.com/status/incidents/2026/05/electricity-river-outage/index.md) — Электричество; Инцидент; восстановлено; 1 мая, 07:32 - 16:38 (9 ч. 6 мин.)
+      - [Отключение электричества в Шелково Ривер](https://example.com/status/incidents/2026/05/electricity-river-outage/index.md) — Электричество; Инцидент; восстановлено; 1 мая, 07:32 — 16:38 (9 ч. 6 мин.)
       "
     `);
   });
@@ -252,12 +252,12 @@ describe('buildStatusMonthMarkdown', () => {
 
       ## 2 мая
 
-      - [Продолжающееся отключение](https://example.com/status/incidents/2026/05/carryover/index.md) — Электричество; Инцидент; восстановлено; 1 мая, 23:00 - 2 мая, 02:30 (3 ч. 30 мин.)
-      - [Новое отключение](https://example.com/status/incidents/2026/05/new-incident/index.md) — Электричество; Инцидент; восстановлено; 2 мая, 01:00 - 02:00 (1 ч.)
+      - [Продолжающееся отключение](https://example.com/status/incidents/2026/05/carryover/index.md) — Электричество; Инцидент; восстановлено; 1 мая, 23:00 — 2 мая, 02:30 (3 ч. 30 мин.)
+      - [Новое отключение](https://example.com/status/incidents/2026/05/new-incident/index.md) — Электричество; Инцидент; восстановлено; 2 мая, 01:00 — 02:00 (1 ч.)
 
       ## 1 мая
 
-      - [Продолжающееся отключение](https://example.com/status/incidents/2026/05/carryover/index.md) — Электричество; Инцидент; восстановлено; 1 мая, 23:00 - 2 мая, 02:30 (3 ч. 30 мин.)
+      - [Продолжающееся отключение](https://example.com/status/incidents/2026/05/carryover/index.md) — Электричество; Инцидент; восстановлено; 1 мая, 23:00 — 2 мая, 02:30 (3 ч. 30 мин.)
       "
     `);
   });

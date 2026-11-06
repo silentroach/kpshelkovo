@@ -267,7 +267,7 @@ export const formatStatusIncidentPeriodText = (
     : period.start.text;
 
   if (period.end) {
-    text += opts?.nonBreaking ? ` -${NBSP}${period.end.text}` : ` - ${period.end.text}`;
+    text += opts?.nonBreaking ? ` —${NBSP}${period.end.text}` : ` — ${period.end.text}`;
   }
 
   if (period.duration) {
