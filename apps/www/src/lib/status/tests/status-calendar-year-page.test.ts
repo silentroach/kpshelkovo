@@ -455,8 +455,13 @@ describe('/status/calendar/YYYY/', () => {
         role: tooltip.getAttribute('role'),
         label: tooltip.getAttribute('aria-label'),
         ariaHidden: tooltip.getAttribute('aria-hidden'),
-        text: visibleWhitespace(
-          tooltip.querySelector('[data-status-calendar-tooltip-text]')?.textContent.trim() ?? ''
+        date: visibleWhitespace(tooltip.querySelector('time')?.textContent.trim() ?? ''),
+        counts: [...tooltip.querySelectorAll('[data-status-calendar-tooltip-kind]')].map(
+          (line) => ({
+            kind: line.getAttribute('data-status-calendar-tooltip-kind'),
+            text: visibleWhitespace(line.textContent.trim()),
+            decorativeMarker: line.firstElementChild?.getAttribute('aria-hidden') === 'true'
+          })
         ),
         interactiveElements: tooltip.querySelectorAll(
           'a, button, input, select, textarea, [tabindex]'
@@ -513,31 +518,53 @@ describe('/status/calendar/YYYY/', () => {
         "tooltips": [
           {
             "ariaHidden": "true",
+            "counts": [
+              {
+                "decorativeMarker": true,
+                "kind": "maintenance",
+                "text": "1·плановая работа",
+              },
+            ],
+            "date": "1·января",
             "id": "status-calendar-tooltip-2026-01-01",
             "interactiveElements": 0,
             "label": "Откроется журнал за этот день",
             "role": "tooltip",
-            "text": "1·января
-      1·плановая·работа",
           },
           {
             "ariaHidden": "true",
+            "counts": [
+              {
+                "decorativeMarker": true,
+                "kind": "incident",
+                "text": "1·проблема",
+              },
+            ],
+            "date": "23·августа",
             "id": "status-calendar-tooltip-2026-08-23",
             "interactiveElements": 0,
             "label": "Откроется журнал за этот день",
             "role": "tooltip",
-            "text": "23·августа
-      1·проблема",
           },
           {
             "ariaHidden": "true",
+            "counts": [
+              {
+                "decorativeMarker": true,
+                "kind": "incident",
+                "text": "2·проблемы",
+              },
+              {
+                "decorativeMarker": true,
+                "kind": "maintenance",
+                "text": "1·плановая работа",
+              },
+            ],
+            "date": "24·августа",
             "id": "status-calendar-tooltip-2026-08-24",
             "interactiveElements": 0,
             "label": "Откроется журнал за этот день",
             "role": "tooltip",
-            "text": "24·августа
-      2·проблемы
-      1·плановая·работа",
           },
         ],
       }

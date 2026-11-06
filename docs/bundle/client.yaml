@@ -442,7 +442,7 @@ static/index.astro_astro_type_script_index_0_lang-4.XXXXXXXX.js:
     rendered: 125
 static/index.astro_astro_type_script_index_0_lang-5.XXXXXXXX.js:
   apps/www/src/lib/status/year-calendar.dom.ts:
-    rendered: 6165
+    rendered: 5906
   apps/www/src/pages/status/calendar/[year]/index.astro?astro&type=script&index=0&lang.ts:
     rendered: 124
 static/lazy.XXXXXXXX.js:
@@ -523,4 +523,4 @@ static/src.XXXXXXXX.js:
     rendered: 359
 static/timeline.dom.XXXXXXXX.js:
   apps/www/src/lib/status/timeline.dom.ts:
-    rendered: 5709
+    rendered: 5825

@@ -43,7 +43,7 @@ export const openStatusTimelineDay = ({
     const item = doc.createElement('div');
     item.className = 'status-service-timeline__event';
     const heading = doc.createElement('p');
-    heading.className = 'status-service-timeline__event-title';
+    heading.className = 'ui-floating-surface__heading status-service-timeline__event-title';
     if (record.kind === 'incident') {
       const icon = cloneIcon(`[data-phase-icon="${phase === 'active' ? 'alert' : 'check'}"]`);
       if (icon) heading.append(icon);
@@ -56,7 +56,7 @@ export const openStatusTimelineDay = ({
       heading.append(link);
     } else heading.append(doc.createTextNode(record.title));
     const meta = doc.createElement('p');
-    meta.className = 'status-service-timeline__event-meta';
+    meta.className = 'ui-floating-surface__context status-service-timeline__event-meta';
     const kind = record.kind === 'maintenance' ? 'Плановые работы' : 'Инцидент';
     const phaseLabel =
       record.kind === 'maintenance'
@@ -86,7 +86,7 @@ export const openStatusTimelineDay = ({
       (phase === 'active' ? (record.activePeriodLabel ?? record.periodLabel) : record.periodLabel);
     meta.append(phaseText, doc.createTextNode(period));
     const areas = doc.createElement('p');
-    areas.className = 'status-service-timeline__event-areas';
+    areas.className = 'ui-floating-surface__context status-service-timeline__event-areas';
     record.areas?.forEach((area) => {
       const icon = cloneIcon(`[data-area-icon="${area}"]`);
       if (icon) areas.append(icon, doc.createTextNode(' '));
@@ -97,7 +97,7 @@ export const openStatusTimelineDay = ({
   });
   if (!items.length) {
     const empty = doc.createElement('p');
-    empty.className = 'status-service-timeline__event-meta';
+    empty.className = 'ui-floating-surface__context status-service-timeline__event-meta';
     empty.textContent = 'За этот день нет записей.';
     items.push(empty);
   }

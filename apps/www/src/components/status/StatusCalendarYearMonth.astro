@@ -3,7 +3,8 @@ import type { StatusCalendarMonthGrid } from '@/lib/status/calendar.types';
 import { statusCalendarDayUrl } from '@/lib/status/routes';
 import {
   formatStatusCalendarDayLabel,
-  formatStatusCalendarDayTooltipSummary,
+  formatStatusCalendarDayDate,
+  formatStatusCalendarDayCountLines,
 } from '@/lib/status/view';
 
 interface Props {
@@ -51,9 +52,9 @@ const weekdays = [
             const linkLabel = status
               ? formatStatusCalendarDayLabel(status)
               : undefined;
-            const tooltipSummary = status
-              ? formatStatusCalendarDayTooltipSummary(status)
-              : undefined;
+            const tooltipLines = status
+              ? formatStatusCalendarDayCountLines(status)
+              : [];
             const tooltipId = status
               ? `status-calendar-tooltip-${day.id}`
               : undefined;
@@ -73,7 +74,6 @@ const weekdays = [
                   data-status-calendar-tooltip-root={
                     status ? day.id : undefined
                   }
-                  data-status-calendar-tooltip-summary={tooltipSummary}
                 >
                   {!day.isInMonth ? (
                     <span class="ui-num status-calendar-date__adjacent-day">
@@ -114,14 +114,35 @@ const weekdays = [
                       role="tooltip"
                       aria-label={tooltipDescription}
                       aria-hidden="true"
-                      class="status-calendar-date__tooltip"
+                      class="ui-floating-surface status-calendar-date__tooltip"
                       data-status-calendar-tooltip={day.id}
                     >
-                      <span
-                        aria-hidden="true"
-                        data-status-calendar-tooltip-text
-                      >
-                        {tooltipSummary}
+                      <span aria-hidden="true">
+                        <time
+                          datetime={day.id}
+                          class="ui-floating-surface__context status-calendar-date__tooltip-date"
+                        >
+                          {formatStatusCalendarDayDate(status).replaceAll(
+                            ' ',
+                            '\u00a0',
+                          )}
+                        </time>
+                        {tooltipLines.map((line, index) => (
+                          <span
+                            class="ui-floating-surface__heading status-calendar-date__tooltip-count"
+                            data-status-calendar-tooltip-kind={
+                              status.incidentCount && index === 0
+                                ? 'incident'
+                                : 'maintenance'
+                            }
+                          >
+                            <span
+                              aria-hidden="true"
+                              class="status-calendar-date__tooltip-marker"
+                            />
+                            <span>{line.replace(' ', '\u00a0')}</span>
+                          </span>
+                        ))}
                       </span>
                     </span>
                   )}
@@ -246,22 +267,40 @@ const weekdays = [
     left: 50%;
     width: max-content;
     max-width: min(15rem, calc(100vw - 2rem));
-    padding: 0.5rem 0.625rem;
     translate: calc(-50% + var(--status-calendar-tooltip-shift-x, 0px)) 0;
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius-2xl);
-    background: var(--surface-glass-reading);
-    -webkit-backdrop-filter: var(--surface-glass-filter);
-    backdrop-filter: var(--surface-glass-filter);
-    box-shadow: var(--surface-glass-highlight), var(--shadow-2);
-    color: var(--color-text);
     display: none;
-    font-size: 0.8125rem;
-    font-weight: 400;
-    line-height: 1.4;
     pointer-events: auto;
     text-align: left;
-    white-space: pre-line;
+  }
+
+  .status-calendar-date__tooltip-date {
+    display: block;
+    margin-block-end: 0.25rem;
+  }
+
+  .status-calendar-date__tooltip-count {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .status-calendar-date__tooltip-count > span:last-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .status-calendar-date__tooltip-marker {
+    flex: 0 0 0.65rem;
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 2px;
+    background: var(--color-danger);
+  }
+
+  [data-status-calendar-tooltip-kind='maintenance']
+    .status-calendar-date__tooltip-marker {
+    background: var(--color-warning);
+    box-shadow: inset 0 -2px 0 var(--color-warning-graphic);
   }
 
   .status-calendar-date__tooltip::before {

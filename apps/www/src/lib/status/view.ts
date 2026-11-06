@@ -174,11 +174,6 @@ export const formatStatusCalendarDayDate = (day: Pick<StatusCalendarDay, 'id'>):
 export const formatStatusCalendarDayLabel = (day: StatusCalendarDay): string =>
   `${formatStatusCalendarDayDate(day)}: ${formatStatusCalendarIncidentCount(day.incidentCount)}, ${formatStatusCalendarMaintenanceCount(day.maintenanceCount)}`;
 
-export const formatStatusCalendarDayTooltipSummary = (day: StatusCalendarDay): string =>
-  [formatStatusCalendarDayDate(day), ...formatStatusCalendarDayCountLines(day)]
-    .map(formatStatusNbsp)
-    .join('\n');
-
 export const formatStatusDuration = (
   duration: StatusDuration,
   opts?: StatusTypographyOptions

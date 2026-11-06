@@ -2,7 +2,7 @@
 
 ## Context
 
-Проблема и объём описаны в [proposal](/openspec/changes/unify-status-floating-surfaces/proposal.md). Основа для реализации — `af1230c0` в ветке PR #1272 или её последующая версия после merge; чужие изменения сохраняются.
+Проблема и объём описаны в [proposal](/openspec/changes/archive/2026-11-06-unify-status-floating-surfaces/proposal.md). Основа реализации — `af1230c0` в ветке PR #1272; отдельная ветка `feat/status-floating-surfaces` сохраняет его изменения и не дополняет предыдущий PR.
 
 - [StatusCalendarYearMonth.astro](/apps/www/src/components/status/StatusCalendarYearMonth.astro) выводит плоскую строку даты и счётчиков с `white-space: pre-line`. При открытии [year-calendar.dom.ts](/apps/www/src/lib/status/year-calendar.dom.ts) заново присваивает её через `textContent`. Псевдоэлемент `::before` служит проходом указателя от даты к подсказке, а не стрелкой.
 - [StatusServiceTimeline.astro](/apps/www/src/components/status/StatusServiceTimeline.astro) содержит скрытую оболочку немодального диалога; [timeline.dom.ts](/apps/www/src/lib/status/timeline.dom.ts) наполняет её безопасными DOM-операциями. Оформление создаваемых узлов принадлежит этому компоненту.
@@ -70,5 +70,5 @@ Advisor исследовал оба сценария и рекомендовал
 ## Migration Plan
 
 - Изменения CSS, обеих поверхностей, тестов и дизайн-гайда доставляются вместе, без изменения данных и внешних URL.
-- После локальной приёмки завершить обычный sync/archive workflow (delta specs отсутствуют) и открыть PR по #1274. Способ ветвления относительно PR #1272 определить по его состоянию перед реализацией; в уже опубликованный PR код этого change молча не добавлять.
+- После локальной приёмки завершить обычный sync/archive workflow (delta specs отсутствуют) и открыть PR по #1274 с базой `feat/status-daily-timeline`. До merge #1272 это зависимый PR; его реализация не добавляется в предыдущую ветку.
 - Откатить весь PR: общую основу, подключения, разметку календаря, его DOM-изменения и документацию. Миграции данных нет.
