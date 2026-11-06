@@ -1,7 +1,7 @@
 {
   "part": "shv",
   "page": "https://genplan.zmotech.ru/shelkovo-village/",
-  "capturedAt": "2026-11-05T20:14:43.935Z",
+  "capturedAt": "2026-11-06T19:04:18.212Z",
   "plots": [
     {
       "id": "A3",
@@ -76,7 +76,7 @@
     {
       "id": "A14",
       "cadastralReference": "50:33:0010101:1451",
-      "status": "Свободен",
+      "status": "Продан",
       "location": "луговой",
       "objectprice": 3568950
     },
