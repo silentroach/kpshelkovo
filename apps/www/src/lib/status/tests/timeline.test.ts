@@ -214,6 +214,8 @@ it('retains every intersecting and future record rather than a recent-ten slice'
       "kind": "incident",
       "periodLabel": "9 мая, 10:00 — 11:30 (1 ч. 30 мин.)",
       "phase": "resolved",
+      "singleDayDate": "2026-05-09",
+      "singleDayPeriodLabel": "10:00 — 11:30 (1 ч. 30 мин.)",
       "startedHasTime": true,
       "startedIso": "2026-05-09T10:00:00+03:00",
       "title": "<script>Title</script>",
@@ -272,5 +274,38 @@ it('prepares date-free periods without inventing unknown times or shortening mul
       date: record.singleDayDate,
       period: record.singleDayPeriodLabel?.replaceAll('\u00a0', '·')
     }))
-  ).toMatchInlineSnapshot();
+  ).toMatchInlineSnapshot(`
+    [
+      {
+        "date": "2026-05-09",
+        "id": "timed",
+        "period": "10:00·— 11:30 (1·ч. 30·мин.)",
+      },
+      {
+        "date": "2026-05-09",
+        "id": "unknown-start",
+        "period": "До·11:30 (1·ч. 30·мин.)",
+      },
+      {
+        "date": undefined,
+        "id": "midnight-end",
+        "period": undefined,
+      },
+      {
+        "date": "2026-05-09",
+        "id": "offsets",
+        "period": "21:00·— 23:00 (2·ч.)",
+      },
+      {
+        "date": "2026-05-09",
+        "id": "open",
+        "period": "С·10:00",
+      },
+      {
+        "date": "2026-05-09",
+        "id": "date-only-open",
+        "period": "",
+      },
+    ]
+  `);
 });

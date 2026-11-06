@@ -266,7 +266,7 @@ it('keeps both SSR windows readable, encodes titles once and opens all records w
     expect(shell.querySelector('a')?.getAttribute('href')).toBe('/status/incidents/open/');
     expect(shell.querySelector('img')).toBeNull();
     expect(shell.textContent?.replaceAll('\u00a0', '·')).toMatchInlineSnapshot(
-      `"9 мая 2026 г.×List onlyПлановые работы идут. Начиная с·8·мая, 10:00<img src=x onerror=alert(1)>Инцидент продолжается. Начиная с·8·мая, 10:00OpenИнцидент завершён. 9·мая, 10:00·—·11:30 (1·ч. 30·мин.)"`
+      `"9 мая 2026 г.×List onlyРаботы продолжаются. Начиная с·8·мая, 10:00<img src=x onerror=alert(1)>Инцидент продолжается. Начиная с·8·мая, 10:00OpenИнцидент завершён. 10:00·— 11:30 (1·ч. 30·мин.)"`
     );
     const close = shell.querySelector<HTMLButtonElement>('button')!;
     close.focus();
