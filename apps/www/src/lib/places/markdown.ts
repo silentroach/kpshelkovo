@@ -7,7 +7,6 @@ import {
 
 import { absoluteUrl } from '@/lib/site';
 import type { StatusDataset } from '@/lib/status/types';
-import { formatStatusKind } from '@/lib/status/view';
 
 import { selectMapPlaces } from './map-selection';
 import { toPlaceMarkdownPublic } from './markdown-public';
@@ -31,7 +30,7 @@ const backlinkLine = (backlink: PlaceMentionRef, status?: Pick<StatusDataset, 'b
   const incident = backlink.section === 'status' ? status?.byId.get(backlink.sourceId) : undefined;
   const context = incident ? getPlaceStatusContext(incident) : undefined;
   const meta = [
-    incident ? formatStatusKind(incident.kind) : formatPlaceBacklinkKind(backlink.kind),
+    formatPlaceBacklinkKind(backlink.kind),
     context?.period ?? formatPlaceBacklinkDate(backlink),
     incident?.kind !== 'maintenance' ? context?.state.label : undefined
   ].filter((value): value is string => Boolean(value));

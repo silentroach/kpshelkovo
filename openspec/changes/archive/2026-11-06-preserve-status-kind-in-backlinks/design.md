@@ -2,7 +2,7 @@
 
 ## Context
 
-Причина изменения — в [proposal](/openspec/changes/preserve-status-kind-in-backlinks/proposal.md#why).
+Причина изменения — в [proposal](/openspec/changes/archive/2026-11-06-preserve-status-kind-in-backlinks/proposal.md#why).
 
 - [Адаптер статуса](/apps/www/src/lib/status/mentions.ts) создаёт одинаковый `source.kind: 'incident'` для обоих видов событий. Общий граф и проекции людей и мест передают это значение дальше.
 - После [PR #1265](https://github.com/silentroach/kpshelkovo/pull/1265) HTML и Markdown мест получают правильный вид через исходный dataset статуса. HTML, Markdown и JSON людей используют только backlinks.

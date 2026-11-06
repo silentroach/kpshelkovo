@@ -118,6 +118,8 @@ export function schema(root: string): Record<string, unknown> {
         enum: PERSON_MENTION_SECTIONS
       },
       kind: {
+        description:
+          'Вид источника. Для backlinks.status: incident означает инцидент, maintenance означает плановые работы.',
         enum: PERSON_BACKLINK_KINDS
       },
       nameCases: obj(

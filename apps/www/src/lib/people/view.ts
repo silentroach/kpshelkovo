@@ -41,6 +41,7 @@ const BACKLINK_KIND_LABELS: Record<PersonBacklinkKind, string> = {
   article: 'Новость',
   event: 'Мероприятие',
   incident: 'Инцидент',
+  maintenance: 'Плановые работы',
   review: 'Отзыв',
   place: 'Место',
   person: 'Профиль',

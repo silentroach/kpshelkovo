@@ -18,6 +18,15 @@ export const build = (): string =>
         md.text(
           ' нет. Отсутствующее необязательное поле означает, что сведений нет в опубликованных данных.'
         )
+      ]),
+      md.paragraph([
+        md.text('В обратных ссылках статуса поле '),
+        md.inlineCode('backlinks.status[].kind'),
+        md.text(' различает инциденты ('),
+        md.inlineCode('incident'),
+        md.text(') и плановые работы ('),
+        md.inlineCode('maintenance'),
+        md.text(').')
       ])
     ],
     sections: [

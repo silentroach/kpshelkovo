@@ -17,6 +17,7 @@ export const SITE_BACKLINK_KINDS = [
   'article',
   'event',
   'incident',
+  'maintenance',
   'review',
   'place',
   'person',
