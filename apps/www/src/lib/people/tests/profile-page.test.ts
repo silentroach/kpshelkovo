@@ -4,7 +4,7 @@ import { Window } from 'happy-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { EMPTY_PERSON_BACKLINKS } from '@/lib/people/types';
-import type { PersonProfile } from '@/lib/people/types';
+import type { PersonMentionRef, PersonProfile } from '@/lib/people/types';
 import { createAstroContainer } from '@/test/astro-container';
 
 const fixture = vi.hoisted(() => ({ profile: undefined as PersonProfile | undefined }));
@@ -49,7 +49,7 @@ afterEach(async () => {
 });
 
 describe('/people/[slug]/ presentation', () => {
-  it('keeps backlinks hidden until their separate editorial rollout', async () => {
+  it('shows a single related HTML link after the profile and excludes it from search', async () => {
     const document = await renderPage({
       backlinks: {
         ...EMPTY_PERSON_BACKLINKS,
@@ -65,8 +65,112 @@ describe('/people/[slug]/ presentation', () => {
         ]
       }
     });
-    expect(document.querySelector('a[href="/status/incidents/2026/11/works/"]')).toBeNull();
-    expect(document.querySelector('.person-profile__backlinks')).toBeNull();
+    const related = document.querySelector('section[aria-labelledby="person-related-heading"]')!;
+    expect({
+      links: [...related.querySelectorAll('a')].map((link) => link.getAttribute('href')),
+      lists: related.querySelectorAll('ul').length,
+      nestedSections: related.querySelectorAll('section').length,
+      times: related.querySelectorAll('time').length,
+      kind: related.querySelector('li p')?.textContent.trim(),
+      ignored: related.getAttribute('data-pagefind-ignore'),
+      afterProfile: !!(document.querySelector('article')!.compareDocumentPosition(related) & 4)
+    }).toMatchInlineSnapshot(`
+      {
+        "afterProfile": true,
+        "ignored": "all",
+        "kind": "Плановые работы",
+        "links": [
+          "/status/incidents/2026/11/works/",
+        ],
+        "lists": 1,
+        "nestedSections": 0,
+        "times": 0,
+      }
+    `);
+  });
+
+  it('limits the combined HTML list and preserves kind, dates and safe full titles', async () => {
+    const news: readonly PersonMentionRef[] = Array.from({ length: 6 }, (_, index) => ({
+      section: 'news',
+      kind: 'article',
+      sourceId: `news-${index}`,
+      title: `News ${index}`,
+      htmlUrl: `/news/item-${index}/`,
+      markdownUrl: `/news/item-${index}/index.md`,
+      mentionedAt: `2026-10-0${index + 1}T09:00:00+03:00`,
+      excerpt: 'Excerpt must not appear in HTML'
+    }));
+    const document = await renderPage({
+      backlinks: {
+        ...EMPTY_PERSON_BACKLINKS,
+        news,
+        status: [
+          {
+            section: 'status',
+            kind: 'incident',
+            sourceId: 'incident',
+            title: 'Вода <script>опасный текст</script>',
+            htmlUrl: '/status/incidents/incident/',
+            markdownUrl: '/status/incidents/incident/index.md',
+            mentionedAt: '2026-11-05T09:00:00+03:00'
+          },
+          {
+            section: 'status',
+            kind: 'maintenance',
+            sourceId: 'works',
+            title: 'Вода',
+            htmlUrl: '/status/incidents/works/',
+            markdownUrl: '/status/incidents/works/index.md',
+            mentionedAt: '2026-11-04T09:00:00+03:00'
+          }
+        ]
+      }
+    });
+    const related = document.querySelector('section[aria-labelledby="person-related-heading"]')!;
+    const rows = [...related.querySelectorAll('li')];
+    expect(
+      rows.map((row) => ({
+        href: row.querySelector('a')?.getAttribute('href'),
+        kind: row.querySelector('p span')?.textContent.trim(),
+        date: row.querySelector('time')?.getAttribute('datetime')
+      }))
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "date": "2026-11-05T09:00:00+03:00",
+          "href": "/status/incidents/incident/",
+          "kind": "Инцидент",
+        },
+        {
+          "date": "2026-11-04T09:00:00+03:00",
+          "href": "/status/incidents/works/",
+          "kind": "Плановые работы",
+        },
+        {
+          "date": "2026-10-06T09:00:00+03:00",
+          "href": "/news/item-5/",
+          "kind": "Новость",
+        },
+        {
+          "date": "2026-10-05T09:00:00+03:00",
+          "href": "/news/item-4/",
+          "kind": "Новость",
+        },
+        {
+          "date": "2026-10-04T09:00:00+03:00",
+          "href": "/news/item-3/",
+          "kind": "Новость",
+        },
+        {
+          "date": "2026-10-03T09:00:00+03:00",
+          "href": "/news/item-2/",
+          "kind": "Новость",
+        },
+      ]
+    `);
+    expect(rows[0]!.querySelector('a')?.textContent).toContain('<script>опасный текст</script>');
+    expect(related.querySelectorAll('script').length).toBe(0);
+    expect(related.textContent).not.toContain('Excerpt must not appear in HTML');
   });
 
   it.each([

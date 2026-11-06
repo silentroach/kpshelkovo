@@ -4,6 +4,7 @@ import type { GetStaticPaths } from 'astro';
 import { formatTextHtml } from '@shelkovo/typography';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import { PhoneIcon, TelegramIcon } from '@shelkovo/ui/icons';
+import PersonRelatedLinks from '@/components/people/PersonRelatedLinks.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import {
   withHomeBreadcrumbs,
@@ -15,14 +16,11 @@ import {
   loadPersonProfileWithBacklinks,
 } from '@/lib/people/load';
 import { personProfilePageSchema } from '@/lib/people/seo';
+import { selectPersonRelatedMaterials } from '@/lib/people/related';
 import {
   describePersonProfile,
-  formatPersonBacklinkDate,
-  formatPersonBacklinkKind,
-  formatPersonBacklinkSection,
   formatPersonContactCompactDisplay,
   formatPersonContactType,
-  personBacklinkGroups,
   PEOPLE_PROSE,
 } from '@/lib/people/view';
 import { SEARCH_SECTIONS } from '@/lib/search/sections';
@@ -69,9 +67,7 @@ const breadcrumbs = withHomeBreadcrumbs([
   { label: 'Люди' },
   { label: profile.name },
 ]);
-// Future: reopen public backlinks on person pages once editorial rules are finalized.
-const showBacklinks = false;
-const backlinkGroups = personBacklinkGroups(profile.backlinks);
+const related = selectPersonRelatedMaterials(profile.backlinks);
 const schema = personProfilePageSchema({
   name: profile.name,
   description,
@@ -181,73 +177,7 @@ const schema = personProfilePageSchema({
       </div>
     </div>
 
-    {showBacklinks && (
-      <section class="person-profile__backlinks" data-pagefind-ignore="all">
-        <div class="person-profile__backlinks-inner">
-          <div class="person-profile__backlinks-heading">
-            <h2 class="ui-section-label">Где упоминается</h2>
-            <p class="person-profile__backlinks-description">
-              Упоминания в новостях, статусе поселка, отзывах, карте мест,
-              других публичных профилях и сарафане.
-            </p>
-          </div>
-
-          {backlinkGroups.length > 0 ? (
-            <div class="person-profile__backlink-groups">
-              {backlinkGroups.map((group) => (
-                <section
-                  aria-labelledby={`person-backlinks-${group.section}`}
-                  class="person-profile__backlink-group"
-                >
-                  <h3
-                    id={`person-backlinks-${group.section}`}
-                    class="person-profile__backlink-section"
-                  >
-                    {formatPersonBacklinkSection(group.section)}
-                  </h3>
-
-                  <ul class="person-profile__backlink-list">
-                    {group.items.map((backlink) => (
-                      <li>
-                        <a
-                          href={backlink.htmlUrl}
-                          class="person-profile__backlink-card"
-                        >
-                          <div class="person-profile__backlink-meta">
-                            <span class="person-profile__backlink-kind">
-                              {formatPersonBacklinkKind(backlink.kind)}
-                            </span>
-                            {backlink.mentionedAt && (
-                              <time datetime={backlink.mentionedAt}>
-                                {formatPersonBacklinkDate(backlink)}
-                              </time>
-                            )}
-                          </div>
-
-                          <h4 class="person-profile__backlink-title">
-                            {backlink.title}
-                          </h4>
-
-                          {backlink.excerpt && (
-                            <p class="person-profile__backlink-excerpt">
-                              {backlink.excerpt}
-                            </p>
-                          )}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ))}
-            </div>
-          ) : (
-            <div class="person-profile__empty person-profile__empty--backlinks">
-              Публичных упоминаний пока не найдено.
-            </div>
-          )}
-        </div>
-      </section>
-    )}
+    <PersonRelatedLinks items={related} />
   </main>
 </BaseLayout>
 
@@ -257,8 +187,7 @@ const schema = personProfilePageSchema({
   }
 
   .person-profile__header-inner,
-  .person-profile__body,
-  .person-profile__backlinks-inner {
+  .person-profile__body {
     max-width: 56rem;
   }
 
@@ -317,14 +246,6 @@ const schema = personProfilePageSchema({
     font-size: 0.875rem;
     font-weight: 400;
     line-height: 1.5;
-  }
-
-  .person-profile__backlinks-description,
-  .person-profile__backlink-excerpt,
-  .person-profile__empty {
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-    line-height: 1.5rem;
   }
 
   .person-profile__contacts > :not(:last-child) {
@@ -387,113 +308,8 @@ const schema = personProfilePageSchema({
     outline-offset: 3px;
   }
 
-  .person-profile__empty {
-    border: 1px dashed color-mix(in oklab, var(--color-border) 80%, transparent);
-    border-radius: var(--radius-xl);
-  }
-
   .person-profile__article {
     align-self: start;
-  }
-
-  .person-profile__backlinks {
-    padding: 2rem 1.25rem 0;
-  }
-
-  .person-profile__backlinks-inner > :not(:last-child) {
-    margin-block-end: 1.25rem;
-  }
-
-  .person-profile__backlinks-heading > :not(:last-child) {
-    margin-block-end: 0.375rem;
-  }
-
-  .person-profile__backlink-groups > :not(:last-child) {
-    margin-block-end: 1.5rem;
-  }
-
-  .person-profile__backlink-group > :not(:last-child) {
-    margin-block-end: 0.75rem;
-  }
-
-  .person-profile__backlink-section {
-    color: var(--color-text-muted);
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 600;
-    line-height: 1rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  .person-profile__backlink-list {
-    display: grid;
-    gap: 0.75rem;
-  }
-
-  .person-profile__backlink-card {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    height: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
-    border-radius: var(--radius-xl);
-    background: color-mix(in oklab, var(--color-surface) 70%, transparent);
-    transition:
-      background-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
-      border-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .person-profile__backlink-card:hover {
-    border-color: color-mix(in oklab, var(--color-text) 20%, transparent);
-    background: var(--color-surface);
-  }
-
-  .person-profile__backlink-meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--color-text-muted);
-    font-size: 0.75rem;
-    line-height: 1rem;
-  }
-
-  .person-profile__backlink-kind {
-    display: inline-flex;
-    padding: 0.25rem 0.625rem;
-    border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
-    border-radius: var(--radius-full);
-    background: color-mix(
-      in oklab,
-      var(--color-surface-muted) 40%,
-      transparent
-    );
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .person-profile__backlink-title {
-    color: var(--color-text);
-    font-family: var(--font-body);
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1.5rem;
-    transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .person-profile__backlink-card:is(:hover, :focus-visible)
-    .person-profile__backlink-title {
-    color: var(--color-primary);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.2em;
-  }
-
-  .person-profile__empty--backlinks {
-    padding: 1rem;
   }
 
   @media (min-width: 48rem) {
@@ -525,15 +341,6 @@ const schema = personProfilePageSchema({
 
     .person-profile {
       padding-block-end: 3rem;
-    }
-
-    .person-profile__backlinks {
-      padding-block-start: 2.5rem;
-      padding-inline: 1.5rem;
-    }
-
-    .person-profile__empty--backlinks {
-      padding-inline: 1.25rem;
     }
   }
 
