@@ -1,715 +1,371 @@
 ---
-import { dateTimeFromISO } from '@shelkovo/format';
 import { AlertCircleIcon, CheckCircleIcon } from '@shelkovo/ui/icons';
-
 import ShelkovoAreaIcon from '@/components/ShelkovoAreaIcon.astro';
+import { formatArea } from '@/lib/areas';
+import { STATUS_AREAS, type StatusService } from '@/lib/status/schema';
 import {
-  STATUS_AREAS,
-  type StatusArea,
-  type StatusService,
-} from '@/lib/status/schema';
-import {
-  buildStatusTimelineProblemSegments,
-  getStatusTimelineSegmentGeometry,
-  getStatusTimelineRange,
-  type StatusTimelineIncidentInput,
-  type StatusTimelineSpan,
+  buildStatusTimelineDays,
+  formatTimelineDate,
+  formatTimelineDay,
 } from '@/lib/status/timeline';
-import {
-  buildStatusTimelineTooltipData,
-  formatStatusService,
-  formatStatusTimelineGroupTitle,
-  formatStatusTimelineTooltipLabel,
-} from '@/lib/status/view';
-import { toStatusTimelineTooltipItemDto } from '@/lib/status/timeline-tooltip-dto';
-import {
-  formatStatusTimelineTooltipGroupLabel,
-  toStatusTimelineTooltipListItemData,
-} from '@/lib/status/timeline-tooltip';
+import { buildStatusTimelineRecords } from '@/lib/status/timeline-data';
+import type { StatusTimelineIncidentInput } from '@/lib/status/timeline.types';
+import { formatStatusService } from '@/lib/status/view';
 
 interface Props {
   readonly service: StatusService;
   readonly incidents: readonly StatusTimelineIncidentInput[];
   readonly timelineDays?: number;
 }
-
 const { service, incidents, timelineDays = 90 } = Astro.props;
-
-const range = getStatusTimelineRange(Date.now(), timelineDays);
-const tooltipId = `status-service-timeline-tooltip-${service}-${timelineDays}`;
-const serviceLabel = formatStatusService(service);
-const visibleSegmentsById = new Map(
-  buildStatusTimelineProblemSegments({ incidents, range }).map((segment) => [
-    segment.id,
-    segment,
-  ]),
+const nowMs = Date.now();
+const records = buildStatusTimelineRecords(
+  incidents,
+  nowMs,
+  Math.max(30, timelineDays),
 );
-
-interface TimelineGroup {
-  readonly dayKey: string;
-  readonly compact: boolean;
-  readonly isFuture: boolean;
-  readonly items: StatusTimelineIncidentInput[];
-  readonly visibleSegments: StatusTimelineSpan[];
-}
-
-const toTimelineSortMs = (value?: string): number => {
-  const parsed = Date.parse(value ?? '');
-
-  return Number.isFinite(parsed) ? parsed : Number.POSITIVE_INFINITY;
-};
-
-const getTimelineDayKey = (value: string): string =>
-  dateTimeFromISO(value).toISODate() ?? value.slice(0, 10);
-
-const getTimelineDayStartMs = (valueMs: number): number =>
-  dateTimeFromISO(new Date(valueMs).toISOString()).startOf('day').toMillis();
-
-const getTimelineNextDayStartMs = (valueMs: number): number =>
-  dateTimeFromISO(new Date(valueMs).toISOString())
-    .startOf('day')
-    .plus({ days: 1 })
-    .toMillis();
-
-const visibleAreas = (
-  item: Pick<StatusTimelineIncidentInput, 'areas'>,
-): readonly StatusArea[] => item.areas ?? [];
-
-const serializeAreas = (areas: readonly StatusArea[]): string | undefined =>
-  areas.length > 0 ? JSON.stringify(areas) : undefined;
-
-const isCompactTimelineCandidate = (
-  item: StatusTimelineIncidentInput,
-  visibleSegment?: StatusTimelineSpan,
-): boolean => {
-  if (!visibleSegment) {
-    return false;
-  }
-
-  const endIso = item.endedIso ?? new Date(visibleSegment.endMs).toISOString();
-
-  return getTimelineDayKey(item.startedIso) === getTimelineDayKey(endIso);
-};
-
-const fitTimelineSpanToRange = (
-  span: StatusTimelineSpan,
-): StatusTimelineSpan | undefined => {
-  const spanMs = Math.min(range.spanMs, span.endMs - span.startMs);
-
-  if (spanMs <= 0) {
-    return undefined;
-  }
-
-  let { startMs, endMs } = span;
-
-  if (startMs < range.startMs) {
-    startMs = range.startMs;
-    endMs = Math.min(range.endMs, startMs + spanMs);
-  }
-
-  if (endMs > range.endMs) {
-    endMs = range.endMs;
-    startMs = Math.max(range.startMs, endMs - spanMs);
-  }
-
-  if (endMs <= startMs) {
-    return undefined;
-  }
-
-  return {
-    startMs,
-    endMs,
-  };
-};
-
-const buildTimelineProblemDaySpan = (
-  span: StatusTimelineSpan,
-): StatusTimelineSpan | undefined =>
-  fitTimelineSpanToRange({
-    startMs: getTimelineDayStartMs(span.startMs),
-    endMs: getTimelineNextDayStartMs(Math.max(span.startMs, span.endMs - 1)),
-  });
-
-const timelineGroups = incidents
-  .filter((item) => {
-    const visibleSegment = visibleSegmentsById.get(item.id);
-
-    return (
-      visibleSegment !== undefined ||
-      toTimelineSortMs(item.startedIso) >= range.endMs
-    );
-  })
-  .toSorted(
-    (a, b) =>
-      toTimelineSortMs(a.startedIso) - toTimelineSortMs(b.startedIso) ||
-      toTimelineSortMs(a.endedIso) - toTimelineSortMs(b.endedIso) ||
-      a.id.localeCompare(b.id),
-  )
-  .reduce<TimelineGroup[]>((groups, item) => {
-    const visibleSegment = visibleSegmentsById.get(item.id);
-    const isCompactCandidate = isCompactTimelineCandidate(item, visibleSegment);
-    const last = groups.at(-1);
-    const dayKey = getTimelineDayKey(item.startedIso);
-    const isFuture = visibleSegment === undefined;
-
-    if (
-      last &&
-      last.compact &&
-      last.isFuture === isFuture &&
-      isCompactCandidate &&
-      last.dayKey === dayKey
-    ) {
-      last.items.push(item);
-
-      if (visibleSegment) {
-        last.visibleSegments.push(visibleSegment);
-      }
-
-      return groups;
-    }
-
-    groups.push({
-      dayKey,
-      compact: isCompactCandidate,
-      isFuture,
-      items: [item],
-      visibleSegments: visibleSegment ? [visibleSegment] : [],
-    });
-
-    return groups;
-  }, [])
-  .map((group) => {
-    const [firstItem] = group.items;
-    const hasVisibleSpan = group.visibleSegments.length > 0;
-    const tooltipItemDtos = group.items.map(toStatusTimelineTooltipItemDto);
-    const tooltipItems = tooltipItemDtos.map(
-      toStatusTimelineTooltipListItemData,
-    );
-    const tooltipTitle =
-      group.items.length === 1
-        ? firstItem.title
-        : formatStatusTimelineGroupTitle({
-            count: group.items.length,
-            startedIso: firstItem.startedIso,
-            nonBreaking: true,
-          });
-    const reachesRangeEnd = group.visibleSegments.some(
-      (item) => item.endMs === range.endMs,
-    );
-    const actualSpan = hasVisibleSpan
-      ? {
-          startMs: Math.min(
-            ...group.visibleSegments.map((item) => item.startMs),
-          ),
-          endMs: Math.max(...group.visibleSegments.map((item) => item.endMs)),
-        }
-      : undefined;
-    const useCompactMarker = group.compact;
-    const geometrySpan = actualSpan
-      ? buildTimelineProblemDaySpan(actualSpan)
-      : undefined;
-    const geometry = geometrySpan
-      ? getStatusTimelineSegmentGeometry(geometrySpan, range)
-      : undefined;
-    const geometryStartIso = geometrySpan
-      ? new Date(geometrySpan.startMs).toISOString()
-      : undefined;
-    const geometryEndIso = geometrySpan
-      ? new Date(geometrySpan.endMs).toISOString()
-      : undefined;
-    const latestEndedIso = group.items
-      .map((item) => item.endedIso)
-      .filter((item) => item !== undefined)
-      .toSorted((a, b) => toTimelineSortMs(a) - toTimelineSortMs(b))
-      .at(-1);
-    const groupEndIso = group.items.some((item) => !item.endedIso)
-      ? undefined
-      : latestEndedIso;
-
-    if (group.items.length === 1) {
-      const areas = visibleAreas(firstItem);
-      const tooltip = buildStatusTimelineTooltipData({
-        service,
-        incident: firstItem,
-        nonBreaking: true,
-      });
-      const phaseIcon =
-        firstItem.kind !== 'incident'
-          ? undefined
-          : firstItem.phase === 'active'
-            ? 'alert'
-            : firstItem.endedIso
-              ? 'check'
-              : undefined;
-
-      return {
-        href: firstItem.href,
-        hidden: !hasVisibleSpan,
-        id: firstItem.id,
-        left: geometry?.leftPercent,
-        compactMarker: useCompactMarker,
-        geometryStartIso,
-        geometryEndIso,
-        reachesRangeEnd,
-        startIso: firstItem.startedIso,
-        endIso: groupEndIso,
-        statusKind: firstItem.kind,
-        tone: firstItem.kind === 'maintenance' ? 'amber' : 'red',
-        tooltip,
-        tooltipAreas: areas,
-        tooltipAreaLabel: tooltip.areaLabel,
-        tooltipLabel: formatStatusTimelineTooltipLabel(tooltip),
-        tooltipItems: undefined,
-        tooltipServiceLabel: undefined,
-        tooltipTitle,
-        phaseIcon,
-        width: geometry?.widthPercent,
-      };
-    }
-
-    return {
-      href: undefined,
-      hidden: !hasVisibleSpan,
-      id: firstItem.id,
-      left: geometry?.leftPercent,
-      compactMarker: useCompactMarker,
-      geometryStartIso,
-      geometryEndIso,
-      reachesRangeEnd,
-      startIso: firstItem.startedIso,
-      endIso: groupEndIso,
-      statusKind: group.items.some((item) => item.kind === 'incident')
-        ? 'incident'
-        : 'maintenance',
-      tone: group.items.some((item) => item.kind === 'incident')
-        ? 'red'
-        : 'amber',
-      tooltipAreaLabel: undefined,
-      tooltipAreas: undefined,
-      tooltipItems: JSON.stringify(tooltipItemDtos),
-      tooltipLabel: formatStatusTimelineTooltipGroupLabel({
-        serviceLabel,
-        title: tooltipTitle,
-        items: tooltipItems,
-      }),
-      tooltipServiceLabel: serviceLabel,
-      tooltipTitle,
-      width: geometry?.widthPercent,
-    };
-  });
+const serviceLabel = formatStatusService(service);
+const balloonId = `status-day-${service}`;
+const views = [
+  { mode: 'mobile', count: 30 },
+  { mode: 'desktop', count: timelineDays },
+].map((view) => ({
+  ...view,
+  days: buildStatusTimelineDays(records, nowMs, view.count),
+}));
 ---
 
 <div
-  class="js-status-service-timeline status-service-timeline"
+  class="status-service-timeline"
   data-status-timeline
-  data-range-days={String(timelineDays)}
+  data-status-service={service}
+  data-timeline-records={JSON.stringify(records)}
+  data-range-days={timelineDays}
 >
-  <div class="status-service-timeline__track">
-    <div class="status-service-timeline__segments" data-status-timeline-track>
-      {timelineGroups.map(
-        ({
-          compactMarker,
-          endIso,
-          geometryEndIso,
-          geometryStartIso,
-          href,
-          hidden,
-          id,
-          left,
-          phaseIcon,
-          reachesRangeEnd,
-          statusKind,
-          tone,
-          tooltip,
-          tooltipAreaLabel,
-          tooltipAreas,
-          tooltipLabel,
-          tooltipItems,
-          tooltipServiceLabel,
-          tooltipTitle,
-          startIso,
-          width,
-        }) => {
-          const TimelineSegment = href ? 'a' : 'button';
-
-          return (
-            <TimelineSegment
-              href={href}
-              type={href ? undefined : 'button'}
-              title={tooltipLabel}
-              aria-label={tooltipLabel}
-              data-incident-id={id}
-              data-status-problem
-              data-status-kind={statusKind}
-              data-status-service={service}
-              data-start={startIso}
-              data-end={endIso}
-              data-geometry-start={geometryStartIso}
-              data-geometry-end={geometryEndIso}
-              data-tooltip-service-label={
-                tooltip?.serviceLabel ?? tooltipServiceLabel
-              }
-              data-tooltip-kind-label={tooltip?.kindLabel}
-              data-tooltip-title={tooltip?.title}
-              data-tooltip-phase-label={tooltip?.phaseLabel}
-              data-tooltip-phase-icon={tooltip ? phaseIcon : undefined}
-              data-tooltip-period-label={tooltip?.periodLabel}
-              data-tooltip-area-label={tooltipAreaLabel}
-              data-tooltip-areas={
-                tooltipAreas ? serializeAreas(tooltipAreas) : undefined
-              }
-              data-tooltip-group-title={tooltip ? undefined : tooltipTitle}
-              data-tooltip-items={tooltipItems}
-              class:list={[
-                'status-service-timeline__segment status-service-timeline__segment--problem',
-                compactMarker &&
-                  'status-service-timeline__segment--compact-marker',
-                reachesRangeEnd &&
-                  'status-service-timeline__segment--problem-active-end',
-                tone === 'amber'
-                  ? 'status-service-timeline__segment--amber'
-                  : 'status-service-timeline__segment--red',
-              ]}
-              hidden={hidden}
-              style={
-                hidden || left === undefined || width === undefined
-                  ? undefined
-                  : `--segment-left: ${left}; --segment-width: ${width};`
-              }
-            >
-              <span
-                class="status-service-timeline__segment-marker"
-                aria-hidden="true"
-              />
-            </TimelineSegment>
-          );
-        },
-      )}
+  {views.map(({ mode, count, days }) => (
+    <div data-timeline-view={mode}>
+      <div class="status-service-timeline__track" style={`--days: ${count}`}>
+        <div
+          class="status-service-timeline__grid"
+          data-timeline-grid
+          aria-hidden="true"
+        >
+          {days.map((day) => (
+            <span data-day={day.id} data-tone={day.tone} />
+          ))}
+        </div>
+        {mode === 'desktop' && (
+          <input
+            type="range"
+            min="0"
+            max={count - 1}
+            value={count - 1}
+            step="1"
+            data-timeline-control
+            aria-label={`${serviceLabel}: выбрать день`}
+            aria-valuetext={formatTimelineDay(days.at(-1)!, records)}
+            aria-controls={balloonId}
+            aria-haspopup="dialog"
+            hidden
+          />
+        )}
+      </div>
+      <div class="status-service-timeline__dates">
+        <span data-timeline-start>{formatTimelineDate(days[0].id, true)}</span>
+        <span>{count} дней</span>
+        <span data-timeline-end>
+          {formatTimelineDate(days.at(-1)!.id, true)}
+        </span>
+      </div>
+      <ol
+        class="ui-visually-hidden"
+        data-timeline-text
+        aria-label={`${serviceLabel}: хронология по дням`}
+      >
+        {days.map((day) => (
+          <li>{formatTimelineDay(day, records)}</li>
+        ))}
+      </ol>
     </div>
-  </div>
-
-  <div
-    id={tooltipId}
-    class="status-service-timeline__tooltip tooltip-glass"
-    data-status-timeline-tooltip
-    role="tooltip"
-    aria-hidden="true"
+  ))}
+  <section
+    id={balloonId}
+    class="status-service-timeline__balloon"
+    data-timeline-balloon
+    role="dialog"
+    aria-labelledby={`${balloonId}-title`}
     hidden
   >
-    <p class="status-service-timeline__tooltip-title">
-      <span
-        class="status-service-timeline__tooltip-phase-icon status-service-timeline__tooltip-phase-icon--alert"
-        data-status-tooltip-phase-icon-alert
-        aria-hidden="true"
-        hidden
+    <header>
+      <h3 id={`${balloonId}-title`} data-timeline-balloon-title />
+      <button
+        type="button"
+        class="ui-btn ui-btn-ghost"
+        data-timeline-close
+        aria-label="Закрыть подробности дня"
       >
-        <AlertCircleIcon />
-      </span>
-      <span
-        class="status-service-timeline__tooltip-phase-icon status-service-timeline__tooltip-phase-icon--check"
-        data-status-tooltip-phase-icon-check
-        aria-hidden="true"
-        hidden
-      >
-        <CheckCircleIcon />
-      </span>
-      <span data-status-tooltip-title></span>
-      <span
-        class="status-service-timeline__tooltip-areas"
-        data-status-tooltip-title-areas
-        hidden
-      ></span>
-    </p>
-    <p
-      class="status-service-timeline__tooltip-row"
-      data-status-tooltip-period
-    ></p>
-    <div
-      class="status-service-timeline__tooltip-list"
-      data-status-tooltip-list
-      hidden
-    ></div>
-    <div data-status-tooltip-area-templates hidden>
-      {STATUS_AREAS.map((area) => (
-        <span data-status-tooltip-area-template={area}>
+        <span aria-hidden="true">×</span>
+      </button>
+    </header>
+    <div data-timeline-balloon-list />
+  </section>
+  <p
+    class="status-service-timeline__error"
+    data-timeline-error
+    role="status"
+    hidden
+  >
+    Не удалось открыть подробности, попробуйте обновить страницу
+  </p>
+  <template data-timeline-icons>
+    <span data-phase-icon="alert" aria-hidden="true">
+      <AlertCircleIcon />
+    </span>
+    <span data-phase-icon="check" aria-hidden="true">
+      <CheckCircleIcon />
+    </span>
+    {STATUS_AREAS.map((area) => (
+      <span data-area-icon={area}>
+        <span aria-hidden="true">
           <ShelkovoAreaIcon area={area} />
         </span>
-      ))}
-    </div>
-  </div>
+        <span>{formatArea(area).replace(/^Шелково /u, '')}</span>
+      </span>
+    ))}
+  </template>
 </div>
 
-<style>
+<style is:global>
   .status-service-timeline {
     position: relative;
-    z-index: 0;
-    display: grid;
-    gap: 0.45rem;
-    isolation: isolate;
+    min-width: 0;
   }
-
-  .status-service-timeline[data-status-tooltip-open='true'] {
-    z-index: 30;
+  .status-service-timeline [hidden] {
+    display: none !important;
   }
-
-  .status-service-timeline__track {
-    position: relative;
-    overflow: visible;
-    border: 1px solid
-      color-mix(
-        in oklab,
-        var(--color-border) 92%,
-        var(--color-surface-raised) 8%
-      );
-    border-radius: 999px;
-    background: color-mix(
-      in oklab,
-      var(--color-success) 14%,
-      var(--color-surface-raised) 86%
-    );
-    box-shadow: inset 0 1px 2px oklch(24% 0.04 145 / 0.05);
-    height: 1rem;
-  }
-
-  .status-service-timeline__segments {
-    position: absolute;
-    inset: 0 0.2rem;
-    container-type: inline-size;
-    height: 100%;
-  }
-
-  .status-service-timeline__segment {
-    --segment-resolved-width: max(
-      calc(var(--segment-width) * 1cqw),
-      var(--segment-min-width, 0.45rem)
-    );
-    --segment-bleed-end: 0px;
-    position: absolute;
-    top: 50%;
-    left: max(
-      0px,
-      min(
-        calc(var(--segment-left) * 1%),
-        calc(100% - var(--segment-resolved-width))
-      )
-    );
-    width: calc(var(--segment-resolved-width) + var(--segment-bleed-end));
-    height: 0.62rem;
-    border-radius: 999px;
-    transform: translateY(-50%) scaleY(var(--segment-scale, 1));
-    transform-origin: center;
-    margin: 0;
-    border: 0;
-    padding: 0;
-    font: inherit;
-    text-decoration: none;
-    appearance: none;
-  }
-
-  .status-service-timeline__segment--green {
-    background: color-mix(
-      in oklab,
-      var(--color-success) 82%,
-      var(--color-surface-raised) 18%
-    );
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .status-service-timeline__segment--amber {
-    --segment-marker-color: var(--color-warning);
-    background: var(--segment-marker-color);
-    z-index: 2;
-  }
-
-  .status-service-timeline__segment--red {
-    --segment-marker-color: var(--color-danger);
-    background: var(--segment-marker-color);
-    z-index: 3;
-  }
-
-  .status-service-timeline__segment--problem {
-    --segment-hit-size: 24px;
-    --segment-hit-inline-padding: max(
-      0px,
-      calc(
-        (
-            var(--segment-hit-size) - var(--segment-resolved-width) -
-              var(--segment-bleed-end)
-          ) /
-          2
-      )
-    );
-    height: 0.62rem;
-    padding: calc((var(--segment-hit-size) - 0.62rem) / 2)
-      var(--segment-hit-inline-padding);
-    box-sizing: content-box;
-    margin-left: calc(var(--segment-hit-inline-padding) * -1);
-    background: transparent;
-    box-shadow: none;
-    cursor: pointer;
-    transform: translateY(-50%);
-    transition:
-      filter 160ms ease,
-      transform 160ms ease;
-  }
-
-  .status-service-timeline__segment-marker {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border-radius: inherit;
-    background: var(--segment-marker-color);
-    box-shadow: 0 0 0 1px
-      color-mix(
-        in oklab,
-        var(--color-success) 14%,
-        var(--color-surface-raised) 86%
-      );
-    pointer-events: none;
-    transform: scaleY(var(--segment-scale, 1));
-    transform-origin: center;
-    transition: transform 160ms ease;
-  }
-
-  .status-service-timeline__segment--problem:hover,
-  .status-service-timeline__segment--problem:focus-visible {
-    --segment-scale: 1.16;
-    filter: saturate(1.15) brightness(0.97);
-  }
-
-  .status-service-timeline__segment--problem:focus-visible {
-    outline: 2px solid var(--color-text);
-    outline-offset: 2px;
-  }
-
-  .status-service-timeline__segment--problem-active-end {
-    --segment-bleed-end: 0.2rem;
-  }
-
-  .status-service-timeline__segment--compact-marker {
-    --segment-min-width: 0.65rem;
-  }
-
-  .status-service-timeline__tooltip {
-    position: absolute;
-    top: calc(100% + 0.6rem);
-    left: 50%;
-    z-index: 20;
-    display: grid;
-    gap: 0.4rem;
-    width: min(22rem, calc(100% - 0.5rem));
-    max-width: calc(100vw - 1.5rem);
-    padding: 0.75rem 0.85rem;
-    border: 1px solid var(--surface-glass-border);
-    border-radius: var(--radius-2xl);
-    background: var(--surface-glass-reading);
-    color: var(--color-text);
-    -webkit-backdrop-filter: var(--surface-glass-filter);
-    backdrop-filter: var(--surface-glass-filter);
-    box-shadow: var(--surface-glass-highlight), var(--shadow-2);
-    pointer-events: none;
-    transform: translateX(-50%);
-  }
-
-  .status-service-timeline__tooltip[data-side='above'] {
-    top: auto;
-    bottom: calc(100% + 0.6rem);
-  }
-
-  .status-service-timeline__tooltip-title {
-    margin: 0;
-    font-size: 0.95rem;
-    font-weight: 600;
-    line-height: 1.35;
-    color: var(--color-text);
-  }
-
-  .status-service-timeline__tooltip-row {
-    margin: 0;
-    font-size: 0.78rem;
-    line-height: 1.45;
-    color: var(--color-text-muted);
-  }
-
-  .status-service-timeline__tooltip-areas {
-    display: inline-flex;
-    flex-wrap: wrap;
-    gap: 0.24rem;
-    margin-left: 0.35rem;
-    align-items: center;
-    color: var(--color-text-muted);
-    vertical-align: -0.15em;
-  }
-
-  .status-service-timeline__tooltip-areas[hidden] {
+  .status-service-timeline [data-timeline-view='desktop'] {
     display: none;
   }
-
-  .status-service-timeline__tooltip-areas :global(span[role='img']) {
-    inline-size: 1.15rem;
-    block-size: 1.15rem;
-    border-radius: 999px;
+  .status-service-timeline__track {
+    position: relative;
+    height: 24px;
+    container-type: inline-size;
+  }
+  .status-service-timeline__grid {
+    position: absolute;
+    inset: 3px 0;
+    display: grid;
+    grid-template-columns: repeat(var(--days), minmax(0, 1fr));
+    gap: 3px;
+  }
+  .status-service-timeline__grid > span {
+    border-radius: 2px;
     background: color-mix(
       in oklab,
-      var(--color-surface-muted) 78%,
-      var(--color-surface-raised) 22%
+      var(--color-success) 27%,
+      var(--color-surface) 73%
     );
   }
-
-  .status-service-timeline__tooltip-areas :global(svg) {
-    max-inline-size: 0.78rem;
-    max-block-size: 0.78rem;
+  .status-service-timeline__grid [data-tone='amber'] {
+    background: var(--color-warning);
+    box-shadow: inset 0 -3px var(--color-warning-graphic);
+  }
+  .status-service-timeline__grid [data-tone='red'] {
+    background: var(--color-danger);
+  }
+  .status-service-timeline__grid [data-selected] {
+    outline: 2px solid var(--color-text);
+    outline-offset: 1px;
+  }
+  .status-service-timeline input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 24px;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    --thumb: calc((100cqw - (var(--days) - 1) * 3px) / var(--days));
+  }
+  .status-service-timeline input::-webkit-slider-runnable-track {
+    height: 24px;
+    border: 0;
+    background: transparent;
+  }
+  .status-service-timeline input::-webkit-slider-thumb {
+    appearance: none;
+    width: var(--thumb);
+    height: 24px;
+    border: 0;
+    background: transparent;
+  }
+  .status-service-timeline input::-moz-range-track {
+    height: 24px;
+    border: 0;
+    background: transparent;
+  }
+  .status-service-timeline input::-moz-range-thumb {
+    width: var(--thumb);
+    height: 24px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+  .status-service-timeline input:focus-visible {
+    outline: 2px solid var(--color-text);
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+  .status-service-timeline__dates {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.25rem;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    margin-top: 0.25rem;
   }
 
-  .status-service-timeline__tooltip-list {
-    display: grid;
-    gap: 0.55rem;
+  .status-service-timeline__error {
+    margin-top: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.8125rem;
+    line-height: 1.5;
   }
-
-  .status-service-timeline__tooltip-item {
-    display: grid;
-    gap: 0.4rem;
+  .status-service-timeline__balloon {
+    position: fixed;
+    z-index: 50;
+    width: 348px;
+    max-width: calc(100vw - 16px);
+    padding: 0.75rem;
+    border: 1px solid var(--surface-glass-border);
+    border-radius: var(--radius-xl);
+    background: var(--surface-glass-reading);
+    color: var(--color-text);
+    box-shadow: var(--surface-glass-highlight), var(--shadow-2);
+    -webkit-backdrop-filter: var(--surface-glass-filter);
+    backdrop-filter: var(--surface-glass-filter);
   }
-
-  .status-service-timeline__tooltip-item
-    + .status-service-timeline__tooltip-item {
-    padding-top: 0.7rem;
-    border-top: 1px solid
-      color-mix(
-        in oklab,
-        var(--color-border) 76%,
-        var(--color-surface-raised) 24%
-      );
+  .status-service-timeline__balloon::before {
+    content: '';
+    position: absolute;
+    left: var(--arrow-left);
+    top: -5px;
+    width: 8px;
+    height: 8px;
+    background: var(--color-surface);
+    border-left: 1px solid var(--surface-glass-border);
+    border-top: 1px solid var(--surface-glass-border);
+    transform: rotate(45deg);
   }
-
-  .status-service-timeline__tooltip-phase-icon {
-    display: inline-flex;
-    inline-size: 1rem;
-    block-size: 1rem;
-    flex: none;
-    margin-right: 0.18rem;
+  .status-service-timeline__balloon[data-side='above']::before {
+    top: auto;
+    bottom: -5px;
+    transform: rotate(225deg);
+  }
+  .status-service-timeline__balloon header {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    vertical-align: -0.17em;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
   }
-
-  .status-service-timeline__tooltip-phase-icon :global(svg) {
+  .status-service-timeline__balloon h3 {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: normal;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+  .status-service-timeline__balloon button {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    padding: 3px;
+    color: var(--color-text);
+  }
+  .status-service-timeline__balloon [data-timeline-close] > span {
+    display: block;
+    line-height: 1;
+  }
+  .status-service-timeline__balloon [data-timeline-balloon-list] {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    max-height: var(--list-height, 50vh);
+  }
+  .status-service-timeline__event + .status-service-timeline__event {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-border);
+  }
+  .status-service-timeline__event-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  .status-service-timeline__event-meta {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    overflow-wrap: anywhere;
+  }
+  .status-service-timeline__event-phase {
+    display: block;
+  }
+  .status-service-timeline__event-areas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    margin-top: 0.375rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+  .status-service-timeline__event-title svg {
     width: 1rem;
     height: 1rem;
+    display: inline-block;
+    vertical-align: -0.15em;
+    margin-right: 0.25rem;
   }
-
-  .status-service-timeline__tooltip-phase-icon--alert {
+  .status-service-timeline__event [data-phase-icon='alert'] {
     color: var(--color-danger);
   }
-
-  .status-service-timeline__tooltip-phase-icon--check {
+  .status-service-timeline__event [data-phase-icon='check'] {
     color: var(--color-success);
+  }
+  .status-service-timeline__event [data-area-icon] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+  .status-service-timeline__event [data-area-icon] > [aria-hidden='true'] {
+    position: relative;
+    top: 1px;
+  }
+  @media (min-width: 64rem) {
+    .status-service-timeline [data-timeline-view='mobile'] {
+      display: none;
+    }
+    .status-service-timeline [data-timeline-view='desktop'] {
+      display: block;
+    }
+  }
+  @media (max-width: 63.999rem) {
+    .status-service-timeline__balloon {
+      display: none;
+    }
   }
 </style>
 
 <script>
   import { bindStatusTimelineLazyHydration } from '@/lib/status/timeline.lazy';
-
   bindStatusTimelineLazyHydration();
 </script>

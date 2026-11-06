@@ -20,16 +20,10 @@ import {
 interface Props {
   readonly summary: StatusServiceSummary;
   readonly timelineDays?: number;
-  readonly mobileTimelineDays?: number;
   readonly serviceHref?: string;
 }
 
-const {
-  summary,
-  timelineDays = 30,
-  mobileTimelineDays,
-  serviceHref,
-} = Astro.props;
+const { summary, timelineDays = 30, serviceHref } = Astro.props;
 
 const serviceLabel = formatStatusService(summary.service);
 const latestRecord = summary.incidents[0];
@@ -53,8 +47,6 @@ const serviceIcons = {
   dam: DamIcon,
 } as const;
 const ServiceIcon = serviceIcons[summary.service];
-const resolvedMobileTimelineDays = mobileTimelineDays ?? timelineDays;
-const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
 ---
 
 <article class="status-service-row ui-shell" data-status-service-card>
@@ -94,31 +86,11 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
     )}
 
     <div class="status-service-row__timeline">
-      {hasResponsiveTimeline ? (
-        <>
-          <div data-status-timeline-viewport="mobile">
-            <StatusServiceTimeline
-              service={summary.service}
-              incidents={timelineIncidents}
-              timelineDays={resolvedMobileTimelineDays}
-            />
-          </div>
-
-          <div data-status-timeline-viewport="desktop">
-            <StatusServiceTimeline
-              service={summary.service}
-              incidents={timelineIncidents}
-              timelineDays={timelineDays}
-            />
-          </div>
-        </>
-      ) : (
-        <StatusServiceTimeline
-          service={summary.service}
-          incidents={timelineIncidents}
-          timelineDays={timelineDays}
-        />
-      )}
+      <StatusServiceTimeline
+        service={summary.service}
+        incidents={timelineIncidents}
+        timelineDays={timelineDays}
+      />
     </div>
 
     <div class="status-service-row__state">
@@ -169,6 +141,24 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
 <style>
   .status-service-row {
     padding: 1rem 1.25rem;
+  }
+
+  .status-service-row:has(:global([data-status-service-state='amber'])) {
+    background: color-mix(
+      in oklab,
+      var(--color-warning-soft) 55%,
+      var(--color-bg) 45%
+    );
+    box-shadow: inset 3px 0 var(--color-warning-graphic);
+  }
+
+  .status-service-row:has(:global([data-status-service-state='red'])) {
+    background: color-mix(
+      in oklab,
+      var(--color-danger-soft) 55%,
+      var(--color-bg) 45%
+    );
+    box-shadow: inset 3px 0 var(--color-danger);
   }
 
   .status-service-row__layout {
@@ -249,7 +239,6 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
     text-underline-offset: 0.2em;
   }
 
-  [data-status-timeline-viewport='desktop'],
   .status-service-row__latest,
   .status-service-row__latest-label {
     display: none;
@@ -326,11 +315,6 @@ const hasResponsiveTimeline = resolvedMobileTimelineDays !== timelineDays;
       gap: 0;
     }
 
-    [data-status-timeline-viewport='mobile'] {
-      display: none;
-    }
-
-    [data-status-timeline-viewport='desktop'],
     .status-service-row__latest {
       display: block;
     }

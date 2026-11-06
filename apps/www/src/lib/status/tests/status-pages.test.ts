@@ -89,7 +89,28 @@ const fixtures = vi.hoisted(() => {
     sortLastChangeAt: maintenanceStarted.valueOf(),
     hasPage: false as const
   };
-  const allIncidents = [scheduledMaintenance, ...incidents];
+  const activeMaintenance = {
+    ...scheduledMaintenance,
+    id: '2026/08/active-maintenance',
+    slug: 'active-maintenance',
+    title: 'Текущая профилактика',
+    phase: 'active' as const
+  };
+  const completedMaintenance = {
+    ...incidents[0],
+    id: '2026/08/completed-maintenance',
+    slug: 'completed-maintenance',
+    title: 'Завершённая профилактика',
+    kind: 'maintenance' as const,
+    phase: 'resolved' as const,
+    hasPage: false as const
+  };
+  const allIncidents = [
+    scheduledMaintenance,
+    activeMaintenance,
+    completedMaintenance,
+    ...incidents
+  ];
   const service = {
     service: 'electricity' as const,
     serviceStatus: 'green' as const,
@@ -110,7 +131,10 @@ const fixtures = vi.hoisted(() => {
       byId: new Map(),
       byService: new Map([['electricity', service]])
     },
-    scheduledMaintenance
+    scheduledMaintenance,
+    activeMaintenance,
+    completedMaintenance,
+    incidents
   };
 });
 
@@ -188,7 +212,7 @@ describe('/status/', () => {
 
     expect(Boolean(document.querySelector('[data-pagefind-root]'))).toBe(true);
     expect(document.querySelector('meta[name="robots"]')?.getAttribute('content')).toBeUndefined();
-    expect(indexedText).toContain('Шелково');
+    expect(indexedText).toContain(document.querySelector('h1')!.textContent);
     expect(indexedText).not.toContain('Тестовая запись');
     expect(document.querySelector('main')?.textContent).toContain('Тестовая запись');
   });
@@ -215,6 +239,39 @@ describe('/status/', () => {
 
     expect(history?.querySelectorAll('article')).toHaveLength(Math.min(10, data.incidents.length));
     expect(history?.querySelector(`a[href="${statusHistoryUrl()}"]`)).not.toBeNull();
+    expectItemListMatchesHistory(document);
+  });
+
+  it('fills ten recent slots after excluding the separate planned-works block', async () => {
+    const container = await createAstroContainer();
+    const document = parseHtml(await container.renderToString(StatusPage));
+    const history = document.querySelector('[data-status-history]');
+    const text = history?.textContent ?? '';
+    const planned = [...document.querySelectorAll('h2')]
+      .find((heading) => heading.textContent.trim() === 'Плановые работы')
+      ?.closest('section');
+
+    expect({
+      recentCount: history?.querySelectorAll('article').length,
+      scheduledInRecent: text.includes(fixtures.scheduledMaintenance.title),
+      activeWorkInRecent: text.includes(fixtures.activeMaintenance.title),
+      completedWorkInRecent: text.includes(fixtures.completedMaintenance.title),
+      tenthIncluded: text.includes(fixtures.incidents[8].title),
+      eleventhIncluded: text.includes(fixtures.incidents[9].title),
+      scheduledInPlanned: planned?.textContent.includes(fixtures.scheduledMaintenance.title),
+      activeInPlanned: planned?.textContent.includes(fixtures.activeMaintenance.title)
+    }).toMatchInlineSnapshot(`
+      {
+        "activeInPlanned": true,
+        "activeWorkInRecent": false,
+        "completedWorkInRecent": true,
+        "eleventhIncluded": false,
+        "recentCount": 10,
+        "scheduledInPlanned": true,
+        "scheduledInRecent": false,
+        "tenthIncluded": true,
+      }
+    `);
     expectItemListMatchesHistory(document);
   });
 

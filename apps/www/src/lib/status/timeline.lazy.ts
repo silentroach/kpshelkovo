@@ -1,139 +1,235 @@
-const STATUS_TIMELINE_SELECTOR = '[data-status-timeline]';
-const STATUS_TIMELINE_PROBLEM_SELECTOR = '[data-status-problem]';
-const STATUS_TIMELINE_INTENT_EVENTS = ['pointerover', 'focusin', 'touchstart'] as const;
+import { buildStatusTimelineDays, formatTimelineDate, formatTimelineDay } from './timeline';
+import type {
+  StatusTimelineBalloonLoader,
+  StatusTimelineBalloonModule,
+  StatusTimelineRecords,
+  StatusTimelineSnapshot
+} from './timeline.types';
 
-type StatusTimelineDomModule = Pick<typeof import('./timeline.dom'), 'hydrateStatusTimelines'>;
-
-type StatusTimelineDomLoader = () => Promise<StatusTimelineDomModule>;
+declare global {
+  interface Window {
+    __STATUS_TIMELINE_NOW__?: unknown;
+  }
+}
 
 const boundDocuments = new WeakSet<Document>();
 
-const hasStatusTimelines = (rootDocument: Document): boolean =>
-  Boolean(rootDocument.querySelector(STATUS_TIMELINE_SELECTOR));
-
-const getStatusTimelineTrigger = (target: EventTarget | undefined): HTMLElement | undefined => {
-  if (!(target instanceof Element)) {
-    return undefined;
-  }
-
-  const trigger = target.closest(STATUS_TIMELINE_PROBLEM_SELECTOR);
-
-  if (!(trigger instanceof HTMLElement)) {
-    return undefined;
-  }
-
-  return trigger.closest(STATUS_TIMELINE_SELECTOR) ? trigger : undefined;
-};
-
-const replayStatusTimelineIntent = (
-  trigger: HTMLElement,
-  sourceEventType: string | undefined
-): void => {
-  if (!trigger.isConnected) {
-    return;
-  }
-
-  if (sourceEventType === 'focusin') {
-    trigger.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
-    return;
-  }
-
-  if (sourceEventType === 'touchstart') {
-    trigger.dispatchEvent(new Event('touchstart', { bubbles: true }));
-    return;
-  }
-
-  trigger.dispatchEvent(new Event('mouseenter'));
-};
-
 export const bindStatusTimelineLazyHydration = (
   rootDocument: Document = document,
-  loadStatusTimelineDom: StatusTimelineDomLoader = () => import('./timeline.dom')
+  loadBalloon: StatusTimelineBalloonLoader = () => import('./timeline.dom')
 ): void => {
-  if (boundDocuments.has(rootDocument)) {
-    return;
-  }
-
+  if (boundDocuments.has(rootDocument)) return;
   boundDocuments.add(rootDocument);
+  const connected = new WeakSet<HTMLElement>();
+  const cleanups = new Set<() => void>();
+  let pending: Promise<StatusTimelineBalloonModule> | undefined;
+  let loaded: StatusTimelineBalloonModule | undefined;
+  let failed = false;
+  let revision = 0;
 
-  let domModulePromise: Promise<StatusTimelineDomModule> | undefined;
-  let hasIntentListeners = false;
-
-  const removeIntentListeners = (): void => {
-    if (!hasIntentListeners) {
-      return;
-    }
-
-    STATUS_TIMELINE_INTENT_EVENTS.forEach((eventName) => {
-      rootDocument.removeEventListener(eventName, handleIntent, true);
-    });
-    hasIntentListeners = false;
+  const load = (): Promise<StatusTimelineBalloonModule | undefined> => {
+    if (failed) return Promise.resolve(undefined);
+    pending ??= loadBalloon();
+    return pending
+      .then((module) => {
+        loaded = module;
+        return module;
+      })
+      .catch(() => {
+        failed = true;
+        return undefined;
+      });
   };
 
-  const addIntentListeners = (): void => {
-    if (hasIntentListeners) {
-      return;
-    }
+  const connect = (): void => {
+    const override = rootDocument.defaultView?.__STATUS_TIMELINE_NOW__;
+    const nowMs = typeof override === 'number' && Number.isFinite(override) ? override : Date.now();
+    for (const root of rootDocument.querySelectorAll<HTMLElement>('[data-status-timeline]')) {
+      if (connected.has(root)) continue;
+      const control = root.querySelector<HTMLInputElement>('[data-timeline-control]');
+      const balloon = root.querySelector('[data-timeline-balloon]');
+      const error = root.querySelector<HTMLElement>('[data-timeline-error]');
+      if (!control || !error) continue;
+      const records = JSON.parse(root.dataset.timelineRecords!) as StatusTimelineRecords;
+      const count = Number(root.dataset.rangeDays);
+      connected.add(root);
+      const snapshot: StatusTimelineSnapshot = {
+        nowMs,
+        records,
+        days: buildStatusTimelineDays(records, nowMs, count)
+      };
+      const media = rootDocument.defaultView!.matchMedia('(min-width: 64rem)');
+      const abort = new AbortController();
+      const options = { signal: abort.signal };
+      let selected = false;
+      let focusWithin = false;
 
-    STATUS_TIMELINE_INTENT_EVENTS.forEach((eventName) => {
-      rootDocument.addEventListener(eventName, handleIntent, true);
-    });
-    hasIntentListeners = true;
-  };
+      root.addEventListener(
+        'focusin',
+        () => {
+          focusWithin = true;
+        },
+        options
+      );
+      root.addEventListener(
+        'focusout',
+        (event) => {
+          if (
+            event.relatedTarget instanceof rootDocument.defaultView!.Node &&
+            !root.contains(event.relatedTarget)
+          )
+            focusWithin = false;
+        },
+        options
+      );
+      rootDocument.addEventListener(
+        'pointerdown',
+        (event) => {
+          if (!(event.target instanceof rootDocument.defaultView!.Node)) return;
+          if (!root.contains(event.target)) focusWithin = false;
+          if (selected && !control.contains(event.target) && !balloon?.contains(event.target)) {
+            revision++;
+            selected = false;
+            updateValue();
+          }
+        },
+        options
+      );
 
-  const loadDomModule = async (): Promise<StatusTimelineDomModule | undefined> => {
-    try {
-      domModulePromise ??= loadStatusTimelineDom();
-
-      return await domModulePromise;
-    } catch {
-      domModulePromise = undefined;
-      bindOrHydrate();
-
-      return undefined;
-    }
-  };
-
-  const hydrateLoadedTimelines = async (): Promise<void> => {
-    const domModule = await loadDomModule();
-
-    domModule?.hydrateStatusTimelines(rootDocument);
-  };
-
-  function handleIntent(event: Event): void {
-    const trigger = getStatusTimelineTrigger(event.target || undefined);
-
-    if (!trigger) {
-      return;
-    }
-
-    removeIntentListeners();
-
-    void loadDomModule().then((domModule) => {
-      if (!domModule) {
-        return;
+      for (const view of root.querySelectorAll<HTMLElement>('[data-timeline-view]')) {
+        const days =
+          view.dataset.timelineView === 'desktop'
+            ? snapshot.days
+            : buildStatusTimelineDays(records, nowMs, 30);
+        const grid = view.querySelector('[data-timeline-grid]');
+        const text = view.querySelector('[data-timeline-text]');
+        const start = view.querySelector('[data-timeline-start]');
+        const end = view.querySelector('[data-timeline-end]');
+        if (!grid || !text || !start || !end) continue;
+        grid.replaceChildren(
+          ...days.map((day) => {
+            const cell = rootDocument.createElement('span');
+            cell.dataset.day = day.id;
+            cell.dataset.tone = day.tone;
+            return cell;
+          })
+        );
+        text.replaceChildren(
+          ...days.map((day) => {
+            const item = rootDocument.createElement('li');
+            item.textContent = formatTimelineDay(day, records);
+            return item;
+          })
+        );
+        start.textContent = formatTimelineDate(days[0].id, true);
+        end.textContent = formatTimelineDate(days.at(-1)!.id, true);
       }
 
-      domModule.hydrateStatusTimelines(rootDocument);
-      replayStatusTimelineIntent(trigger, event.type);
-    });
-  }
+      const updateValue = (): void => {
+        const day = snapshot.days[Number(control.value)];
+        if (!day) return;
+        control.setAttribute('aria-valuetext', formatTimelineDay(day, records));
+        root
+          .querySelectorAll('[data-selected]')
+          .forEach((cell) => cell.removeAttribute('data-selected'));
+        if (selected)
+          root
+            .querySelector(`[data-timeline-view="desktop"] [data-day="${day.id}"]`)
+            ?.setAttribute('data-selected', '');
+      };
 
-  function bindOrHydrate(): void {
-    if (!hasStatusTimelines(rootDocument)) {
-      removeIntentListeners();
-      return;
+      const open = async (): Promise<void> => {
+        if (!media.matches || !root.isConnected) return;
+        selected = true;
+        updateValue();
+        const request = ++revision;
+        const index = Number(control.value);
+        const module = await load();
+        if (request !== revision || !root.isConnected || !media.matches || !selected) return;
+        if (!module) {
+          selected = false;
+          updateValue();
+          error.hidden = false;
+          return;
+        }
+        module.openStatusTimelineDay({ root, control, snapshot, index });
+      };
+
+      const modeChanged = (): void => {
+        if (!media.matches) {
+          const focused = rootDocument.activeElement;
+          // A CSS media change can blur the hidden control before this callback.
+          if (focusWithin || (focused && root.contains(focused))) {
+            const context =
+              root.closest('[data-status-service-card]')?.querySelector<HTMLElement>('h3') ??
+              rootDocument.querySelector<HTMLElement>('h1');
+            if (context) {
+              context.tabIndex = -1;
+              context.focus();
+            }
+          }
+          revision++;
+          loaded?.closeStatusTimelineDay();
+          selected = false;
+          focusWithin = false;
+          control.value = String(count - 1);
+          error.hidden = true;
+        }
+        control.hidden = !media.matches;
+        updateValue();
+      };
+      const warm = (): void => {
+        if (media.matches) void load();
+      };
+      control.addEventListener('pointerover', warm, options);
+      control.addEventListener('focus', warm, options);
+      control.addEventListener(
+        'input',
+        () => {
+          void open();
+        },
+        options
+      );
+      control.addEventListener(
+        'click',
+        () => {
+          void open();
+        },
+        options
+      );
+      control.addEventListener(
+        'keydown',
+        (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            void open();
+          }
+          if (event.key === 'Escape') {
+            revision++;
+            selected = false;
+            loaded?.closeStatusTimelineDay();
+            updateValue();
+          }
+        },
+        options
+      );
+      media.addEventListener('change', modeChanged);
+      cleanups.add(() => {
+        abort.abort();
+        media.removeEventListener('change', modeChanged);
+        connected.delete(root);
+      });
+      modeChanged();
     }
+  };
 
-    if (domModulePromise) {
-      void hydrateLoadedTimelines();
-      return;
-    }
-
-    addIntentListeners();
-  }
-
-  bindOrHydrate();
-  rootDocument.addEventListener('astro:after-swap', bindOrHydrate);
-  rootDocument.addEventListener('astro:page-load', bindOrHydrate);
+  rootDocument.addEventListener('astro:before-swap', () => {
+    revision++;
+    loaded?.closeStatusTimelineDay();
+    cleanups.forEach((cleanup) => cleanup());
+    cleanups.clear();
+  });
+  rootDocument.addEventListener('astro:after-swap', connect);
+  rootDocument.addEventListener('astro:page-load', connect);
+  connect();
 };
