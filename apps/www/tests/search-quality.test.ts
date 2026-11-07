@@ -329,7 +329,9 @@ test.each(['initial', 'pagination'] as const)(
       );
       expect(urls).toEqual(expect.arrayContaining(previousUrls));
       expect(new Set(urls).size).toBe(expectedCount);
-      await expectPage(links.nth(previousUrls.length)).toBeFocused();
+      const firstAddedIndex = urls.findIndex((url) => !previousUrls.includes(url ?? undefined));
+      expect(firstAddedIndex).toBeGreaterThanOrEqual(0);
+      await expectPage(links.nth(firstAddedIndex)).toBeFocused();
       await expectPage(input).toHaveValue('тариф');
       expect(engineRequests).toEqual(engineBeforeRetry);
       expect(documents).toBe(1);
@@ -412,6 +414,7 @@ test('status, #224 events, #372 KB and news archive indexing policy in the produ
       .parse(JSON.parse((await root.getAttribute('data-pagefind-urls')) ?? '[]'));
 
     expect(urls.length).toBeGreaterThan(0);
+    expect(urls).toContain('/815/tldr/');
     expect(urls.filter((url) => /^\/news\/\d{4}\/(?:\d{2}\/)?$/u.test(url))).toEqual([]);
     const eventUrls = urls.filter((url) => url.startsWith('/events/'));
     // Compare the filtered corpus: the root plus current/recent event details,

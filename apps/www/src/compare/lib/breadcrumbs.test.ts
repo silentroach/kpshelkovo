@@ -60,7 +60,46 @@ const assertPageContract = (breadcrumbs: readonly Required<BreadcrumbItem>[]) =>
 
 describe('compare breadcrumbs', () => {
   it('keeps the canonical compare route', () => {
-    expect(compareBreadcrumbs()[1].href).toBe('/815/compare/');
+    expect(compareBreadcrumbs()).toMatchInlineSnapshot(`
+      [
+        {
+          "href": "/",
+          "label": "Главная",
+        },
+        {
+          "href": "/815/tldr/",
+          "label": "Тариф 815",
+        },
+        {
+          "href": "/815/compare/",
+          "label": "Сравнение тарифов",
+        },
+      ]
+    `);
+  });
+
+  it('preserves nested compare routes below the tariff and compare parents', () => {
+    expect(
+      [
+        comparePageBreadcrumbs(FIXTURE_LABEL, '/fixture-rating/'),
+        settlementBreadcrumbs(FIXTURE_LABEL, 'fixture-settlement')
+      ].map((items) => items.map((item) => `${item.label}: ${item.href}`))
+    ).toMatchInlineSnapshot(`
+      [
+        [
+          "Главная: /",
+          "Тариф 815: /815/tldr/",
+          "Сравнение тарифов: /815/compare/",
+          "Fixture: /815/compare/fixture-rating/",
+        ],
+        [
+          "Главная: /",
+          "Тариф 815: /815/tldr/",
+          "Сравнение тарифов: /815/compare/",
+          "Fixture: /815/compare/settlements/fixture-settlement/",
+        ],
+      ]
+    `);
   });
 
   it.each([

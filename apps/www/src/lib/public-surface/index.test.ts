@@ -163,6 +163,26 @@ const compareSlice: PublicSurfaceSlice = {
 };
 
 describe('public surface registry', () => {
+  it('registers the tariff overview with its Markdown companion', () => {
+    expect(
+      publicSurfaceRegistry.surfacesByOwner('tariff').map((surface) => ({
+        path: surface.path,
+        type: surface.mediaType
+      }))
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "path": "/815/tldr/",
+          "type": "text/html",
+        },
+        {
+          "path": "/815/tldr/index.md",
+          "type": "text/markdown",
+        },
+      ]
+    `);
+  });
+
   it('preserves slice and surface order for valid fragments', () => {
     const registry = createPublicSurfaceRegistry([newsSlice, compareSlice]);
 

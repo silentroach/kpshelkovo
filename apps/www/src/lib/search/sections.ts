@@ -41,6 +41,10 @@ export const SEARCH_SECTIONS = {
     id: 'inventory',
     label: 'У кого есть'
   },
+  tariff: {
+    id: 'tariff',
+    label: 'Тариф 815'
+  },
   compare: {
     id: 'compare',
     label: 'Сравнение поселков'

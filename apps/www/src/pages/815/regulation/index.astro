@@ -5,10 +5,6 @@ import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 import StickyTableScript from '@/components/common/StickyTableScript.astro';
 import { estimate2026 } from '@/data/reglament/estimate-2026';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import {
-  withHomeBreadcrumbs,
-  withHomeSchemaBreadcrumbs,
-} from '@/lib/breadcrumbs';
 import { collectionPageSchema } from '@/lib/json-ld';
 import { projectEstimateCalculationInput } from '@/lib/reglament/calculation-projection';
 import type { ReglamentEditorConfig } from '@/lib/reglament/calculator-editor.types';
@@ -32,6 +28,10 @@ import type { CostBreakdown, EditableFieldKey } from '@/lib/reglament/schema';
 import { formatEstimateSourceRefLabel } from '@/lib/reglament/source-labels';
 import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
+import {
+  tariffBreadcrumbs,
+  tariffSchemaBreadcrumbs,
+} from '@/lib/tariff-tldr/breadcrumbs';
 
 export const prerender = true;
 
@@ -61,14 +61,15 @@ const keywords = [
   'публичный договор ОК Шелково',
   'спор по тарифу Шелково',
 ];
-const breadcrumbs = withHomeBreadcrumbs([{ label: 'Регламент' }]);
+const breadcrumbs = [
+  ...tariffBreadcrumbs(),
+  { label: 'Регламент', href: reglamentUrl() },
+];
 const schema = collectionPageSchema({
   name: title,
   description,
   url: reglamentUrl(),
-  breadcrumbs: withHomeSchemaBreadcrumbs([
-    { name: 'Регламент', url: reglamentUrl() },
-  ]),
+  breadcrumbs: tariffSchemaBreadcrumbs(breadcrumbs),
   items: htmlSections.map((section) => ({
     name: section.title,
     url: `${reglamentUrl()}#${section.id}`,
