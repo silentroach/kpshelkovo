@@ -1,7 +1,7 @@
 /// <reference types="astro/client" />
 
 import { Window } from 'happy-dom';
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
@@ -13,6 +13,21 @@ import ServicesPage from '@/pages/815/regulation/services/index.astro';
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import OverviewPage from '@/pages/815/tldr/index.astro';
 import { createAstroContainer } from '@/test/astro-container';
+
+vi.mock('@/lib/mentions/registry', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/mentions/registry')>();
+  return {
+    ...actual,
+    loadSiteMentionRegistry: async () =>
+      actual.buildSiteMentionRegistry(
+        [],
+        [
+          { id: 'beach', data: { title: 'Пляж' } },
+          { id: 'titanic', data: { title: 'Титаник' } }
+        ]
+      )
+  };
+});
 
 const window = new Window();
 afterAll(() => window.happyDOM.close());
@@ -55,6 +70,10 @@ describe('tariff section page breadcrumbs', () => {
     const request = new Request(new URL(path, import.meta.env.SITE));
     window.document.body.innerHTML = await container.renderToString(page, { request });
     const document = window.document;
+    if (path === '/815/tldr/') {
+      expect(document.querySelector('article a[href="/map/beach/"]')).toBeTruthy();
+      expect(document.querySelector('article a[href="/map/titanic/"]')).toBeTruthy();
+    }
     const nav = document.querySelector('nav[aria-label="Хлебные крошки"]');
     if (!nav) throw new Error('Expected page breadcrumbs');
 
