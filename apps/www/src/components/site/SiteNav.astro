@@ -35,6 +35,7 @@ const newsCurrent = getCurrent('/news/');
 // Temporarily hidden until the events section is ready for the main menu.
 // const eventsCurrent = getCurrent('/events/');
 const placesCurrent = getCurrent('/map/');
+const tldrCurrent = getCurrent('/815/tldr/');
 const compareCurrent = getCurrent('/815/compare/');
 const regulationCurrent = getCurrent('/815/regulation/');
 const kbCurrent = getCurrent('/kb/');
@@ -42,7 +43,9 @@ const sarafanCurrent = getCurrent('/sarafan/');
 const inventoryCurrent = getCurrent('/ukogo/');
 const reviewsCurrent = getCurrent('/reviews/');
 const statusCurrent = getCurrent('/status/');
-const isTariffCurrent = Boolean(compareCurrent || regulationCurrent);
+const isTariffCurrent = Boolean(
+  tldrCurrent || compareCurrent || regulationCurrent,
+);
 const isDirectoryCurrent = Boolean(
   placesCurrent || kbCurrent || sarafanCurrent || inventoryCurrent,
 );
@@ -70,6 +73,13 @@ const isDirectoryCurrent = Boolean(
           <span class="ui-visually-hidden">, текущий раздел</span>
         )}
       </p>
+      <a
+        href="/815/tldr/"
+        aria-current={tldrCurrent}
+        class="site-nav-mobile-link site-nav-mobile-nested"
+      >
+        Вкратце
+      </a>
       <a
         href="/815/compare/"
         aria-current={compareCurrent}
@@ -185,6 +195,13 @@ const isDirectoryCurrent = Boolean(
         class="site-nav-submenu"
       >
         <div class="site-nav-glass-panel">
+          <a
+            href="/815/tldr/"
+            aria-current={tldrCurrent}
+            class="site-nav-submenu-link"
+          >
+            Вкратце
+          </a>
           <a
             href="/815/compare/"
             aria-current={compareCurrent}

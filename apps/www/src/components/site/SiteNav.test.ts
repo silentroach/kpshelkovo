@@ -94,6 +94,7 @@ describe('SiteNav', () => {
       ).toMatchInlineSnapshot(`
         [
           [
+            "/815/tldr/",
             "/815/compare/",
             "/815/regulation/",
           ],
@@ -119,6 +120,18 @@ describe('SiteNav', () => {
         ).toBe(true);
       }
     });
+
+    it.each(['/815/tldr/', '/815/tldr'])(
+      'marks the overview and tariff group at %s',
+      async (pathname) => {
+        const element = await renderNavElement(pathname, variant);
+        const link = element.querySelector('a[href="/815/tldr/"]');
+
+        expect(link?.getAttribute('aria-current')).toBe('page');
+        expect(link?.closest('[data-current-section]')?.textContent).toContain('Тариф 815');
+        expect(element.querySelectorAll('[aria-current]')).toHaveLength(1);
+      }
+    );
 
     it.each(
       directoryDestinations.flatMap(

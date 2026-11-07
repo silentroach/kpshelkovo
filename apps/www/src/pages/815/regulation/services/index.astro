@@ -9,10 +9,6 @@ import type {
   FullReglamentService,
   FullReglamentServiceToEstimateMapItem,
 } from '@/lib/reglament/full-schema';
-import {
-  withHomeBreadcrumbs,
-  withHomeSchemaBreadcrumbs,
-} from '@/lib/breadcrumbs';
 import { collectionPageSchema } from '@/lib/json-ld';
 import {
   reglamentFullSourcePdfUrl,
@@ -21,6 +17,10 @@ import {
 } from '@/lib/reglament/routes';
 import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
+import {
+  tariffBreadcrumbs,
+  tariffSchemaBreadcrumbs,
+} from '@/lib/tariff-tldr/breadcrumbs';
 
 type ServiceGroup = FullReglamentService['group'];
 type MappingStatus = FullReglamentServiceToEstimateMapItem['status'];
@@ -34,10 +34,11 @@ const search = {
   description,
   section: SEARCH_SECTIONS.regulation,
 } satisfies SearchDocument;
-const breadcrumbs = withHomeBreadcrumbs([
+const breadcrumbs = [
+  ...tariffBreadcrumbs(),
   { label: 'Регламент', href: reglamentUrl() },
-  { label: 'Услуги' },
-]);
+  { label: 'Услуги', href: reglamentServicesUrl() },
+];
 const groupLabels = {
   year_round: 'Круглогодично',
   winter_period: 'В зимний период',
@@ -77,10 +78,7 @@ const schema = collectionPageSchema({
   name: title,
   description,
   url: reglamentServicesUrl(),
-  breadcrumbs: withHomeSchemaBreadcrumbs([
-    { name: 'Регламент', url: reglamentUrl() },
-    { name: 'Услуги', url: reglamentServicesUrl() },
-  ]),
+  breadcrumbs: tariffSchemaBreadcrumbs(breadcrumbs),
   items: groups.map((group) => ({
     name: group.title,
     url: `${reglamentServicesUrl()}#${group.group}`,

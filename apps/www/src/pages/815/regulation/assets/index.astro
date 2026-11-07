@@ -11,10 +11,6 @@ import {
 import StickyTableScript from '@/components/common/StickyTableScript.astro';
 import { fullReglamentDataset2026 } from '@/data/reglament/full-2026';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import {
-  withHomeBreadcrumbs,
-  withHomeSchemaBreadcrumbs,
-} from '@/lib/breadcrumbs';
 import { collectionPageSchema } from '@/lib/json-ld';
 import type {
   FullReglamentCommonAsset,
@@ -28,6 +24,10 @@ import {
 } from '@/lib/reglament/routes';
 import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import type { SearchDocument } from '@/lib/search/types';
+import {
+  tariffBreadcrumbs,
+  tariffSchemaBreadcrumbs,
+} from '@/lib/tariff-tldr/breadcrumbs';
 
 type AssetCategory = FullReglamentCommonAsset['category'];
 
@@ -40,10 +40,11 @@ const search = {
   description,
   section: SEARCH_SECTIONS.regulation,
 } satisfies SearchDocument;
-const breadcrumbs = withHomeBreadcrumbs([
+const breadcrumbs = [
+  ...tariffBreadcrumbs(),
   { label: 'Регламент', href: reglamentUrl() },
-  { label: 'Общее имущество' },
-]);
+  { label: 'Общее имущество', href: reglamentAssetsUrl() },
+];
 const categoryLabels = {
   roads: 'Дороги и тротуары',
   stormwater: 'Ливневые траншеи',
@@ -75,10 +76,7 @@ const schema = collectionPageSchema({
   name: title,
   description,
   url: reglamentAssetsUrl(),
-  breadcrumbs: withHomeSchemaBreadcrumbs([
-    { name: 'Регламент', url: reglamentUrl() },
-    { name: 'Общее имущество', url: reglamentAssetsUrl() },
-  ]),
+  breadcrumbs: tariffSchemaBreadcrumbs(breadcrumbs),
   items: groups.map((group) => ({
     name: group.title,
     url: `${reglamentAssetsUrl()}#${group.category}`,

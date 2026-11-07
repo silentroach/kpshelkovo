@@ -12,6 +12,7 @@ import { reviewsPublicSurfaceSlice } from '@/lib/reviews/public-surface';
 import { rootPublicSurfaceSlice } from '@/lib/root-public-surface';
 import { siteLlmsPath } from '@/lib/root-routes';
 import { statusPublicSurfaceSlice } from '@/lib/status/public-surface';
+import { tariffPublicSurfaceSlice } from '@/lib/tariff-public-surface';
 
 import type {
   PublicSurface,
@@ -96,6 +97,7 @@ export const publicSurfaceRegistry = createPublicSurfaceRegistry([
   peoplePublicSurfaceSlice,
   placesPublicSurfaceSlice,
   reviewsPublicSurfaceSlice,
+  tariffPublicSurfaceSlice,
   reglamentPublicSurfaceSlice,
   comparePublicSurfaceSlice
 ]);
@@ -123,6 +125,7 @@ export { reglamentPublicSurfaceSlice } from '@/lib/reglament/public-surface';
 export { reviewsPublicSurfaceSlice } from '@/lib/reviews/public-surface';
 export { rootPublicSurfaceSlice } from '@/lib/root-public-surface';
 export { statusPublicSurfaceSlice } from '@/lib/status/public-surface';
+export { tariffPublicSurfaceSlice } from '@/lib/tariff-public-surface';
 
 export type {
   PublicSurface,
