@@ -56,4 +56,17 @@ describe('LinkWithIcon', () => {
     expect(html).not.toContain('viewBox="0 0 133 141"');
     expect(html).toContain('>Подробнее<');
   });
+
+  it('opens the source in the same tab without target or rel', async () => {
+    const container = await createAstroContainer();
+    const html = await container.renderToString(LinkWithIcon, {
+      props: {
+        href: 'https://example.com/article',
+        ariaLabelPrefix: 'Источник'
+      }
+    });
+
+    expect(html).not.toContain('target=');
+    expect(html).not.toContain('rel=');
+  });
 });
