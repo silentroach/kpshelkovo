@@ -29,6 +29,16 @@ vi.mock('@/lib/mentions/registry', async (importOriginal) => {
   };
 });
 
+// SiteHeader загружает настоящий статусный датасет; без подмены тест зависит
+// от локального dev-кеша Astro (.astro/data-store.json) рабочей копии.
+vi.mock('@/lib/status/load', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/status/load')>();
+  return {
+    ...actual,
+    loadStatusData: async () => actual.buildStatusDataset([])
+  };
+});
+
 const window = new Window();
 afterAll(() => window.happyDOM.close());
 
