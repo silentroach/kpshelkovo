@@ -17,10 +17,10 @@
     },
     "animate": {
       "source": "emilkowalski/skills",
-      "ref": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d",
+      "ref": "5206a950b715e0cabe7043ea0b2304332b91494e",
       "sourceType": "github",
       "skillPath": "skills/animate/SKILL.md",
-      "computedHash": "7598d33e7f60dd5c24531eaaa897621cc3bdb48e8050324211627973bc59c4ce"
+      "computedHash": "f76ddd3d4446c3c56a143ea98650c370b3e8f88e6203d1e22082d2082bf1eed7"
     },
     "apple-design": {
       "source": "emilkowalski/skills",
@@ -66,10 +66,10 @@
     },
     "grilling": {
       "source": "mattpocock/skills",
-      "ref": "49dd158d1076134a641b33efb035946536778336",
+      "ref": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
       "sourceType": "github",
       "skillPath": "skills/productivity/grilling/SKILL.md",
-      "computedHash": "ef1641a2047b71b60f1942cd35efb47d3afc9d584dff5a0b01f8c7db923aaa08"
+      "computedHash": "e40cc1d348f6d935e28f1e24474302d7368f0a400429271a43b35fe154891dc5"
     },
     "humanizer-ru": {
       "source": "ilyautov/humanizer-ru",
@@ -115,10 +115,10 @@
     },
     "research": {
       "source": "mattpocock/skills",
-      "ref": "49dd158d1076134a641b33efb035946536778336",
+      "ref": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
       "sourceType": "github",
       "skillPath": "skills/engineering/research/SKILL.md",
-      "computedHash": "c8c1cba327a6f824b554cd978079a3dadd7406d73174f8fb9bfef58824691970"
+      "computedHash": "5d85b64ecceed6b3f6d5996dc8af07180be8d1ff11ef3d26eda2acff078fbd39"
     },
     "seo": {
       "source": "addyosmani/web-quality-skills",
@@ -129,10 +129,10 @@
     },
     "svelte-code-writer": {
       "source": "sveltejs/ai-tools",
-      "ref": "6b5d0dab3c9c083387247ab20dc684573481076b",
+      "ref": "d3e755be770277d8c75fe61109b103b801b12775",
       "sourceType": "github",
-      "skillPath": "plugins/claude/svelte/skills/svelte-code-writer/SKILL.md",
-      "computedHash": "6f78193a79906175595ce8e4ca8d726da350eb99035a9544b6553620df5673a1"
+      "skillPath": "tools/skills/svelte-code-writer/SKILL.md",
+      "computedHash": "abe888cce357ab0fa0104ff2266edaf9c3a8382320b303f920cd777762a6bc85"
     },
     "svelte-core-bestpractices": {
       "source": "sveltejs/ai-tools",
@@ -143,10 +143,10 @@
     },
     "wayfinder": {
       "source": "mattpocock/skills",
-      "ref": "49dd158d1076134a641b33efb035946536778336",
+      "ref": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
       "sourceType": "github",
       "skillPath": "skills/engineering/wayfinder/SKILL.md",
-      "computedHash": "71d1296ae9f1ea0397f385f72d11ca3473827f5d067df4d06c58eb03377a57ce"
+      "computedHash": "22338d9356ef84430c5ca916f2632f226583d9d7366433f62bfde5b1b6781e9e"
     },
     "web-quality-audit": {
       "source": "addyosmani/web-quality-skills",

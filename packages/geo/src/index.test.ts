@@ -36,7 +36,7 @@ describe('geo package', () => {
       dusk: twilight.dusk.toISOString()
     }).toMatchInlineSnapshot(`
       {
-        "dawn": "2026-05-11T00:42:34.126Z",
+        "dawn": "2026-05-11T00:42:34.129Z",
         "dusk": "2026-05-11T18:09:59.254Z",
       }
     `);

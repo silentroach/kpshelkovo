@@ -14,17 +14,17 @@ static/BaseLayout.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
 static/ClientRouter.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   astro:transitions/client:
     rendered: 0
-  node_modules/.pnpm/astro@7.4.2_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/components/ClientRouter.astro?astro&type=script&index=0&lang.ts:
+  node_modules/.pnpm/astro@7.4.7_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/components/ClientRouter.astro?astro&type=script&index=0&lang.ts:
     rendered: 2783
-  node_modules/.pnpm/astro@7.4.2_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/runtime/server/render/server-islands-shared.js:
+  node_modules/.pnpm/astro@7.4.7_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/runtime/server/render/server-islands-shared.js:
     rendered: 225
-  node_modules/.pnpm/astro@7.4.2_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/transitions/events.js:
+  node_modules/.pnpm/astro@7.4.7_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/transitions/events.js:
     rendered: 3400
-  node_modules/.pnpm/astro@7.4.2_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/transitions/router.js:
-    rendered: 13609
-  node_modules/.pnpm/astro@7.4.2_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/transitions/swap-functions.js:
+  node_modules/.pnpm/astro@7.4.7_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/transitions/router.js:
+    rendered: 13997
+  node_modules/.pnpm/astro@7.4.7_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/transitions/swap-functions.js:
     rendered: 5848
-  node_modules/.pnpm/astro@7.4.2_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/virtual-modules/transitions-router.js:
+  node_modules/.pnpm/astro@7.4.7_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/virtual-modules/transitions-router.js:
     rendered: 0
 static/CommonSpacesTable.XXXXXXXX.js:
   apps/www/src/compare/components/CommonSpacesTable.svelte:
@@ -341,8 +341,10 @@ static/client.XXXXXXXX.js:
   node_modules/.pnpm/svelte@5.57.3/node_modules/svelte/src/utils.js:
     rendered: 1267
 static/client.svelte.XXXXXXXX.js:
-  node_modules/.pnpm/@astrojs+svelte@9.1.1_@types+node@26.5.0_astro@7.4.2_@types+node@26.5.0_esbuild@0.28.2__0ebf2667fd0e765e079febf998baeb45/node_modules/@astrojs/svelte/dist/client.svelte.js:
-    rendered: 2002
+  node_modules/.pnpm/@astrojs+svelte@9.1.2_@types+node@26.5.0_astro@7.4.7_@types+node@26.5.0_esbuild@0.28.2__90ff0563839819e2f8d4f554ed068060/node_modules/@astrojs/svelte/dist/client.svelte.js:
+    rendered: 2034
+  node_modules/.pnpm/@astrojs+svelte@9.1.2_@types+node@26.5.0_astro@7.4.7_@types+node@26.5.0_esbuild@0.28.2__90ff0563839819e2f8d4f554ed068060/node_modules/@astrojs/svelte/dist/escape.js:
+    rendered: 332
 static/editorial-map.XXXXXXXX.js:
   apps/www/src/components/maps/editorial-map.css:
     rendered: 0
@@ -428,8 +430,8 @@ static/index.astro_astro_type_script_index_0_lang-2.XXXXXXXX.js:
     rendered: 1142
   apps/www/src/pages/index.astro?astro&type=script&index=0&lang.ts:
     rendered: 87
-  node_modules/.pnpm/suncalc@2.1.1/node_modules/suncalc/index.js:
-    rendered: 8366
+  node_modules/.pnpm/suncalc@2.1.2/node_modules/suncalc/index.js:
+    rendered: 8827
   packages/geo/src/solar.ts:
     rendered: 414
 static/index.astro_astro_type_script_index_0_lang-3.XXXXXXXX.js:
@@ -500,13 +502,13 @@ static/parcel-set-outline.XXXXXXXX.js:
   packages/geo/src/polygon-union.ts:
     rendered: 444
 static/prefetch.XXXXXXXX.js:
-  node_modules/.pnpm/astro@7.4.2_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/prefetch/index.js:
+  node_modules/.pnpm/astro@7.4.7_@types+node@26.5.0_esbuild@0.28.2_yaml@2.9.1/node_modules/astro/dist/prefetch/index.js:
     rendered: 5004
   virtual:astro:adapter-config/client:
     rendered: 72
 static/preload-helper.XXXXXXXX.js:
   vite/preload-helper.js:
-    rendered: 3201
+    rendered: 3419
 static/rating.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/pages/815/compare/rating.astro?astro&type=script&index=0&lang.ts:
     rendered: 1074
