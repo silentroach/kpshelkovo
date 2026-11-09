@@ -57,16 +57,14 @@ const schema = collectionPageSchema({
         }))}
       />
 
-      {
-        tags.length === 0 && (
-          <div class="ui-shell news-tags-empty">
-            <p class="ui-copy news-tags-empty__copy">
-              Пока ни одна публикация не получила редакционный тег. Индекс
-              появится автоматически после первых новостей.
-            </p>
-          </div>
-        )
-      }
+      {tags.length === 0 && (
+        <div class="ui-shell news-tags-empty">
+          <p class="ui-copy news-tags-empty__copy">
+            Пока ни одна публикация не получила редакционный тег. Индекс
+            появится автоматически после первых новостей.
+          </p>
+        </div>
+      )}
     </section>
   </main>
 </BaseLayout>

@@ -22,40 +22,38 @@ function external(url: string): boolean {
 }
 ---
 
-{
-  items.length > 0 && (
-    <section
-      class:list={[
-        'news-attachments',
-        framed && 'ui-shell news-attachments--framed',
-      ]}
-    >
-      <div>
-        <Heading class="ui-prose-title">{title}</Heading>
+{items.length > 0 && (
+  <section
+    class:list={[
+      'news-attachments',
+      framed && 'ui-shell news-attachments--framed',
+    ]}
+  >
+    <div>
+      <Heading class="ui-prose-title">{title}</Heading>
 
-        <ul class="news-attachments__list">
-          {items.map((item) => (
-            <li>
-              <a
-                href={item.url}
-                target={external(item.url) ? '_blank' : undefined}
-                rel={external(item.url) ? 'noreferrer noopener' : undefined}
-                class="ui-shell news-attachment"
-              >
-                <span class="news-attachment__title">{item.title}</span>
-                {(item.type || item.size) && (
-                  <span class="news-attachment__meta">
-                    {[item.type, item.size].filter(Boolean).join(' · ')}
-                  </span>
-                )}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  )
-}
+      <ul class="news-attachments__list">
+        {items.map((item) => (
+          <li>
+            <a
+              href={item.url}
+              target={external(item.url) ? '_blank' : undefined}
+              rel={external(item.url) ? 'noreferrer noopener' : undefined}
+              class="ui-shell news-attachment"
+            >
+              <span class="news-attachment__title">{item.title}</span>
+              {(item.type || item.size) && (
+                <span class="news-attachment__meta">
+                  {[item.type, item.size].filter(Boolean).join(' · ')}
+                </span>
+              )}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
 
 <style>
   .news-attachments--framed {

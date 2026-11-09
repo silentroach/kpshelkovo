@@ -64,27 +64,25 @@ const schema = reviewsCollectionPageSchema({
 
     <section class="reviews-content">
       <h2 class="ui-visually-hidden">Список отзывов</h2>
-      {
-        data.reviews.length > 0 ? (
-          <ul class="reviews-list--flush-first reviews-list">
-            {data.reviews.map((review) => (
-              <li>
-                <ReviewCard review={review} />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div class="reviews-empty">
-            <p class="ui-copy reviews-muted">
-              Если вы собственник участка или дома в Шелково,{' '}
-              <a href={reviewsRulesUrl()} class="site-text-link">
-                посмотрите, как оставить свой отзыв
-              </a>
-              .
-            </p>
-          </div>
-        )
-      }
+      {data.reviews.length > 0 ? (
+        <ul class="reviews-list--flush-first reviews-list">
+          {data.reviews.map((review) => (
+            <li>
+              <ReviewCard review={review} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="reviews-empty">
+          <p class="ui-copy reviews-muted">
+            Если вы собственник участка или дома в Шелково,{' '}
+            <a href={reviewsRulesUrl()} class="site-text-link">
+              посмотрите, как оставить свой отзыв
+            </a>
+            .
+          </p>
+        </div>
+      )}
     </section>
   </main>
 </BaseLayout>

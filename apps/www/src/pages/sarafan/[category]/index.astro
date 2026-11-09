@@ -78,11 +78,9 @@ const schema = contactsCollectionPageSchema({
       <h2 class="ui-visually-hidden">Контакты в категории {label}</h2>
       <div class="sarafan-category-list">
         <div class="sarafan-category-grid">
-          {
-            category.contacts.map((contact) => (
-              <ContactListItem contact={contact} />
-            ))
-          }
+          {category.contacts.map((contact) => (
+            <ContactListItem contact={contact} />
+          ))}
         </div>
       </div>
     </section>

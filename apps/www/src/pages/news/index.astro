@@ -51,15 +51,13 @@ const schema = collectionPageSchema({
       />
     </section>
 
-    {
-      data.archives.years.length > 0 && (
-        <section class="news-archive" data-pagefind-ignore>
-          <a class="ui-link news-archive__link" href={newsArchiveUrl()}>
-            Архив новостей
-          </a>
-        </section>
-      )
-    }
+    {data.archives.years.length > 0 && (
+      <section class="news-archive" data-pagefind-ignore>
+        <a class="ui-link news-archive__link" href={newsArchiveUrl()}>
+          Архив новостей
+        </a>
+      </section>
+    )}
   </main>
 </BaseLayout>
 

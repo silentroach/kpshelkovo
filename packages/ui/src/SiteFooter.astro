@@ -16,13 +16,11 @@ const hasRight = Astro.slots.has('right');
       </a>
     </p>
 
-    {
-      hasRight && (
-        <div class="site-footer__side">
-          <slot name="right" />
-        </div>
-      )
-    }
+    {hasRight && (
+      <div class="site-footer__side">
+        <slot name="right" />
+      </div>
+    )}
   </div>
 </footer>
 
