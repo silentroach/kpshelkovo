@@ -77,14 +77,14 @@ const schema = collectionPageSchema({
       aria-labelledby="status-history-title"
       data-status-history
     >
-      <h2 id="status-history-title" class="ui-visually-hidden">Все записи</h2>
+      <h2 id="status-history-title" class="ui-visually-hidden">
+        Все записи
+      </h2>
 
       <div class="status-history__rows">
-        {
-          data.incidents.map((incident) => (
-            <StatusIncidentRow incident={incident} />
-          ))
-        }
+        {data.incidents.map((incident) => (
+          <StatusIncidentRow incident={incident} />
+        ))}
       </div>
     </section>
   </main>

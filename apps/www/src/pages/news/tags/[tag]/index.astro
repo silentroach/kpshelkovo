@@ -61,9 +61,7 @@ const schema = collectionPageSchema({
         <Breadcrumbs items={breadcrumbs} />
 
         <div class="news-tag-heading">
-          <h1 class="ui-page-title">
-            #{tag.label}
-          </h1>
+          <h1 class="ui-page-title">#{tag.label}</h1>
           <p class="ui-copy news-tag-heading__summary">
             Последние новости по тегу
           </p>
@@ -73,14 +71,12 @@ const schema = collectionPageSchema({
 
     <section class="news-tag-feed">
       <h2 class="ui-visually-hidden">Публикации по тегу {tag.label}</h2>
-      {
-        tag.count > tag.latest.length && (
-          <p class="news-tag-feed__note">
-            На этой странице показаны последние {latestPublicationsLabel} по
-            тегу. Более ранние материалы доступны в месячных и годовых архивах.
-          </p>
-        )
-      }
+      {tag.count > tag.latest.length && (
+        <p class="news-tag-feed__note">
+          На этой странице показаны последние {latestPublicationsLabel} по тегу.
+          Более ранние материалы доступны в месячных и годовых архивах.
+        </p>
+      )}
 
       <NewsList articles={tag.latest} empty="" />
     </section>

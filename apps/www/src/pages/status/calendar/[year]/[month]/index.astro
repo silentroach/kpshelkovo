@@ -67,32 +67,30 @@ const breadcrumbs = withHomeBreadcrumbs([
     </header>
 
     <div class="status-calendar-month" data-status-calendar-month={journal.id}>
-      {
-        journal.days.map(({ day, incidents }, dayIndex) => (
-          <section
-            class:list={[
-              'status-calendar-day',
-              dayIndex > 0 && 'status-calendar-day--divided',
-            ]}
-            data-status-calendar-day={day.id}
+      {journal.days.map(({ day, incidents }, dayIndex) => (
+        <section
+          class:list={[
+            'status-calendar-day',
+            dayIndex > 0 && 'status-calendar-day--divided',
+          ]}
+          data-status-calendar-day={day.id}
+        >
+          <h2
+            id={day.id}
+            tabindex="-1"
+            class="ui-group-title status-calendar-day__heading"
           >
-            <h2
-              id={day.id}
-              tabindex="-1"
-              class="ui-group-title status-calendar-day__heading"
-            >
-              <StatusCalendarDayMarker kind={day.kind} />
-              <time datetime={day.id}>{formatDate(day.id)}</time>
-            </h2>
+            <StatusCalendarDayMarker kind={day.kind} />
+            <time datetime={day.id}>{formatDate(day.id)}</time>
+          </h2>
 
-            <div class="status-calendar-day-records">
-              {incidents.map((incident) => (
-                <StatusIncidentRow incident={incident} />
-              ))}
-            </div>
-          </section>
-        ))
-      }
+          <div class="status-calendar-day-records">
+            {incidents.map((incident) => (
+              <StatusIncidentRow incident={incident} />
+            ))}
+          </div>
+        </section>
+      ))}
     </div>
   </main>
 </BaseLayout>

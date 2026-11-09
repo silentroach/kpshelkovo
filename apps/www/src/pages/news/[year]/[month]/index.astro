@@ -76,9 +76,7 @@ const schema = collectionPageSchema({
         <Breadcrumbs items={breadcrumbs} />
 
         <div>
-          <h1 class="ui-page-title">
-            {heading}
-          </h1>
+          <h1 class="ui-page-title">{heading}</h1>
         </div>
 
         <NewsArchiveSummary
@@ -98,23 +96,19 @@ const schema = collectionPageSchema({
       aria-label="Навигация по архиву новостей"
       data-pagefind-ignore
     >
-      {
-        older && olderMonthName && (
-          <a href={older.url} class="ui-link news-month-navigation__older">
-            <span aria-hidden="true">← </span>
-            {olderMonthName}
-          </a>
-        )
-      }
+      {older && olderMonthName && (
+        <a href={older.url} class="ui-link news-month-navigation__older">
+          <span aria-hidden="true">← </span>
+          {olderMonthName}
+        </a>
+      )}
 
-      {
-        newer && newerMonthName && (
-          <a href={newer.url} class="ui-link news-month-navigation__newer">
-            {newerMonthName}
-            <span aria-hidden="true"> →</span>
-          </a>
-        )
-      }
+      {newer && newerMonthName && (
+        <a href={newer.url} class="ui-link news-month-navigation__newer">
+          {newerMonthName}
+          <span aria-hidden="true"> →</span>
+        </a>
+      )}
 
       <a
         href={yearUrl(archive.year)}

@@ -96,22 +96,18 @@ const schema = techArticleSchema({
         <Breadcrumbs items={breadcrumbs} />
 
         <div class="status-incident-header__summary">
-          <h1 class="ui-page-title">
-            {incident.title}
-          </h1>
+          <h1 class="ui-page-title">{incident.title}</h1>
 
           <StatusIncidentMeta incident={incident} variant="prominent" />
         </div>
       </div>
     </header>
 
-    {
-      incident.body && (
-        <article class="status-incident-body">
-          <div class="ui-prose" set:html={bodyHtml} />
-        </article>
-      )
-    }
+    {incident.body && (
+      <article class="status-incident-body">
+        <div class="ui-prose" set:html={bodyHtml} />
+      </article>
+    )}
   </main>
 </BaseLayout>
 

@@ -13,5 +13,7 @@ const { href, reload = false, ...attrs }: Props = Astro.props;
   {...attrs}
   href={href}
   data-astro-prefetch="false"
-  data-astro-reload={reload ? '' : undefined}><slot /></a
+  data-astro-reload={reload ? '' : undefined}
 >
+  <slot />
+</a>

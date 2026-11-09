@@ -19,44 +19,44 @@ const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   class="event-calendar"
 >
   <div class="weekdays" aria-hidden="true">
-    {weekdays.map((day) => <span>{day}</span>)}
+    {weekdays.map((day) => (
+      <span>{day}</span>
+    ))}
   </div>
   <ol class="days" role="list">
-    {
-      buildEventMonthCells(month).map(({ number, date, inMonth, day }) => {
-        const cancelled = day?.events.every(
-          (event) => event.status === 'cancelled',
-        );
-        const label = day
-          ? `${formatDate(date)}: ${formatEventCount(day.events.length)}${cancelled ? ', все отменены' : ''}`
-          : undefined;
-        return (
-          <li aria-hidden={!inMonth ? 'true' : undefined}>
-            {!inMonth ? (
-              <span class="adjacent-day ui-num">{number}</span>
-            ) : day ? (
-              <a
-                href={day.url}
-                aria-label={label}
-                title={label}
-                data-cancelled={cancelled || undefined}
-              >
-                <span class="ui-num" aria-hidden="true">
-                  {number}
-                </span>
-              </a>
-            ) : (
-              <span class="empty-day ui-num">
-                <span aria-hidden="true">{number}</span>
-                <span class="ui-visually-hidden">
-                  {formatDate(date)}: нет опубликованных событий
-                </span>
+    {buildEventMonthCells(month).map(({ number, date, inMonth, day }) => {
+      const cancelled = day?.events.every(
+        (event) => event.status === 'cancelled',
+      );
+      const label = day
+        ? `${formatDate(date)}: ${formatEventCount(day.events.length)}${cancelled ? ', все отменены' : ''}`
+        : undefined;
+      return (
+        <li aria-hidden={!inMonth ? 'true' : undefined}>
+          {!inMonth ? (
+            <span class="adjacent-day ui-num">{number}</span>
+          ) : day ? (
+            <a
+              href={day.url}
+              aria-label={label}
+              title={label}
+              data-cancelled={cancelled || undefined}
+            >
+              <span class="ui-num" aria-hidden="true">
+                {number}
               </span>
-            )}
-          </li>
-        );
-      })
-    }
+            </a>
+          ) : (
+            <span class="empty-day ui-num">
+              <span aria-hidden="true">{number}</span>
+              <span class="ui-visually-hidden">
+                {formatDate(date)}: нет опубликованных событий
+              </span>
+            </span>
+          )}
+        </li>
+      );
+    })}
   </ol>
 </section>
 

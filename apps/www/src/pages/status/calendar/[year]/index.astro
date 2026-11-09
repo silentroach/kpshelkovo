@@ -55,11 +55,9 @@ const breadcrumbs = withHomeBreadcrumbs([
 
     <div class="status-calendar-year-content">
       <div class="status-calendar-year-grid" data-status-calendar-year={year}>
-        {
-          calendar.months.map((month) => (
-            <StatusCalendarYearMonth month={month} />
-          ))
-        }
+        {calendar.months.map((month) => (
+          <StatusCalendarYearMonth month={month} />
+        ))}
       </div>
       <status-year-calendar-lifecycle hidden></status-year-calendar-lifecycle>
 
@@ -70,29 +68,27 @@ const breadcrumbs = withHomeBreadcrumbs([
         class="status-calendar-year-navigation"
         data-status-calendar-year-navigation
       >
-        {
-          previousYear !== undefined ? (
-            <a
-              href={statusCalendarYearUrl({ year: previousYear })}
-              aria-label={`Календарь за ${previousYear} год`}
-              class="ui-btn ui-btn-sm ui-btn-ghost ui-num status-calendar-year-navigation__button"
-              data-status-calendar-previous
-            >
-              <span aria-hidden="true">←</span>
-              <span>{previousYear}</span>
-            </a>
-          ) : (
-            <button
-              type="button"
-              disabled
-              aria-label="Нет данных за предыдущий год"
-              class="ui-btn ui-btn-sm ui-btn-ghost ui-num status-calendar-year-navigation__button"
-              data-status-calendar-previous
-            >
-              <span aria-hidden="true">←</span>
-            </button>
-          )
-        }
+        {previousYear !== undefined ? (
+          <a
+            href={statusCalendarYearUrl({ year: previousYear })}
+            aria-label={`Календарь за ${previousYear} год`}
+            class="ui-btn ui-btn-sm ui-btn-ghost ui-num status-calendar-year-navigation__button"
+            data-status-calendar-previous
+          >
+            <span aria-hidden="true">←</span>
+            <span>{previousYear}</span>
+          </a>
+        ) : (
+          <button
+            type="button"
+            disabled
+            aria-label="Нет данных за предыдущий год"
+            class="ui-btn ui-btn-sm ui-btn-ghost ui-num status-calendar-year-navigation__button"
+            data-status-calendar-previous
+          >
+            <span aria-hidden="true">←</span>
+          </button>
+        )}
 
         <span
           class="ui-num status-calendar-year-navigation__current"
@@ -101,29 +97,27 @@ const breadcrumbs = withHomeBreadcrumbs([
           {year}
         </span>
 
-        {
-          nextYear !== undefined ? (
-            <a
-              href={statusCalendarYearUrl({ year: nextYear })}
-              aria-label={`Календарь за ${nextYear} год`}
-              class="ui-btn ui-btn-sm ui-btn-ghost ui-num status-calendar-year-navigation__button"
-              data-status-calendar-next
-            >
-              <span>{nextYear}</span>
-              <span aria-hidden="true">→</span>
-            </a>
-          ) : (
-            <button
-              type="button"
-              disabled
-              aria-label="Нет данных за следующий год"
-              class="ui-btn ui-btn-sm ui-btn-ghost ui-num status-calendar-year-navigation__button"
-              data-status-calendar-next
-            >
-              <span aria-hidden="true">→</span>
-            </button>
-          )
-        }
+        {nextYear !== undefined ? (
+          <a
+            href={statusCalendarYearUrl({ year: nextYear })}
+            aria-label={`Календарь за ${nextYear} год`}
+            class="ui-btn ui-btn-sm ui-btn-ghost ui-num status-calendar-year-navigation__button"
+            data-status-calendar-next
+          >
+            <span>{nextYear}</span>
+            <span aria-hidden="true">→</span>
+          </a>
+        ) : (
+          <button
+            type="button"
+            disabled
+            aria-label="Нет данных за следующий год"
+            class="ui-btn ui-btn-sm ui-btn-ghost ui-num status-calendar-year-navigation__button"
+            data-status-calendar-next
+          >
+            <span aria-hidden="true">→</span>
+          </button>
+        )}
       </nav>
     </div>
   </main>

@@ -18,29 +18,27 @@ const {
 const flushFirstBorder = !featured && hideFirstBorder;
 ---
 
-{
-  articles.length > 0 ? (
-    <ul
-      role={featured ? 'list' : undefined}
-      class:list={[
-        featured ? 'news-list--grid' : 'news-list--stacked',
-        flushFirstBorder && 'news-list--flush-first',
-      ]}
-    >
-      {articles.map((article) => (
-        <li>
-          <NewsCard article={article} featured={featured} />
-        </li>
-      ))}
-    </ul>
-  ) : (
-    empty && (
-      <div class="ui-shell news-list__empty">
-        <p class="ui-copy news-list__empty-message">{empty}</p>
-      </div>
-    )
+{articles.length > 0 ? (
+  <ul
+    role={featured ? 'list' : undefined}
+    class:list={[
+      featured ? 'news-list--grid' : 'news-list--stacked',
+      flushFirstBorder && 'news-list--flush-first',
+    ]}
+  >
+    {articles.map((article) => (
+      <li>
+        <NewsCard article={article} featured={featured} />
+      </li>
+    ))}
+  </ul>
+) : (
+  empty && (
+    <div class="ui-shell news-list__empty">
+      <p class="ui-copy news-list__empty-message">{empty}</p>
+    </div>
   )
-}
+)}
 
 <style>
   .news-list--grid {

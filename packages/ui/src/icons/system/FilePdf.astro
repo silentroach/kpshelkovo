@@ -19,9 +19,7 @@ const { class: className }: Props = Astro.props;
   stroke-linejoin="round"
   aria-hidden="true"
 >
-  {
-    FILE_PDF_ICON_PATHS.map(({ className, d }) => (
-      <path class={className} d={d} />
-    ))
-  }
+  {FILE_PDF_ICON_PATHS.map(({ className, d }) => (
+    <path class={className} d={d} />
+  ))}
 </svg>
