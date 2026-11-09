@@ -1,7 +1,7 @@
 {
   "part": "shp",
   "page": "https://genplan.zmotech.ru/shelkovo-park/",
-  "capturedAt": "2026-11-07T19:03:11.677Z",
+  "capturedAt": "2026-11-09T19:03:13.744Z",
   "plots": [
     {
       "id": "B1",
@@ -881,7 +881,7 @@
     {
       "id": "C78",
       "cadastralReference": "50:33:0010101:2646",
-      "status": "Забронирован",
+      "status": "Свободен",
       "location": "с видом на лес",
       "objectprice": 4299000
     },
