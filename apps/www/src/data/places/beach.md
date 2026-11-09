@@ -1,10 +1,10 @@
 ---
 title: Пляж
 category: water
-marker: construction
-status: underConstruction
+marker: beach
+status: existing
 show_on_map: true
-summary: Пляж пока строят
+summary: Главный пляж в Шелково Ривере
 location:
   coordinates:
     lat: 55.065070
