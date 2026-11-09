@@ -38,7 +38,7 @@
     "test:visual:sticky-table:serve": "node ../../scripts/visual-fixture-launcher.mjs tests/sticky-table-visual 4329"
   },
   "dependencies": {
-    "@astrojs/markdown-satteri": "^0.4.6",
+    "@astrojs/markdown-satteri": "^0.4.7",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
     "@astrojs/svelte": "^9.1.2",
@@ -51,7 +51,7 @@
     "@shelkovo/ui": "workspace:*",
     "@shelkovo/url": "workspace:*",
     "@yandex/ymaps3-clusterer": "^0.0.13",
-    "astro": "^7.4.5",
+    "astro": "^7.4.7",
     "diff": "^9.0.0",
     "parse5": "^8.1.0",
     "svelte": "^5.57.3",
@@ -60,7 +60,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@playwright/test": "^1.64.1",
+    "@playwright/test": "^1.65.0",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@testing-library/svelte": "^5.4.2",
     "@types/css-tree": "^3.2.0",
@@ -71,11 +71,11 @@
     "pagefind": "1.6.0",
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
-    "rollup-plugin-visualizer": "^7.1.1",
+    "rollup-plugin-visualizer": "^7.1.2",
     "sharp": "^0.35.5",
     "typescript": "^7.0.2",
     "unified": "^11.0.5",
-    "vite": "^8.3.5",
+    "vite": "^8.3.6",
     "vitest": "^5.1.0"
   }
 }

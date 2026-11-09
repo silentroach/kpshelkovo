@@ -105,7 +105,13 @@ const navigateWithClientRouter = async (page: Page, pathname: string): Promise<v
     link.setAttribute('data-sticky-lifecycle-navigation', '');
     document.body.append(link);
   }, pathname);
-  await page.locator('[data-sticky-lifecycle-navigation]').click();
+  const pageLoad = page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        document.addEventListener('astro:page-load', () => resolve(), { once: true });
+      })
+  );
+  await Promise.all([pageLoad, page.locator('[data-sticky-lifecycle-navigation]').click()]);
   await page.waitForURL(pathname);
 };
 
