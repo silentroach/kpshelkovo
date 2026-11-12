@@ -1,4 +1,5 @@
 ---
+import PageHeading from '@/components/PageHeading.astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import StatusIncidentRow from '@/components/status/StatusIncidentRow.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -54,11 +55,12 @@ const schema = collectionPageSchema({
         <Breadcrumbs items={breadcrumbs} />
 
         <div class="status-history-header__copy">
-          <h1 class="ui-page-title">История статусов</h1>
-          <p class="status-history-intro">
-            Все записи об отключениях, ограничениях и плановых работах — от
-            новых к старым.
-          </p>
+          <PageHeading title="История статусов">
+            <p slot="subtitle">
+              Все записи об отключениях, ограничениях и плановых работах — от
+              новых к старым.
+            </p>
+          </PageHeading>
           <nav aria-label="Представление истории статусов">
             <a
               class="ui-link status-history-calendar"
@@ -101,13 +103,6 @@ const schema = collectionPageSchema({
 
   .status-history-header__copy > * + * {
     margin-block-start: 0.75rem;
-  }
-
-  .status-history-intro {
-    max-width: 48rem;
-    color: var(--color-text-muted);
-    font-size: 1rem;
-    line-height: 1.75rem;
   }
 
   .status-history-calendar {

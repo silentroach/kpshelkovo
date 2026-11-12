@@ -1,4 +1,5 @@
 ---
+import PageHeading from '@/components/PageHeading.astro';
 import type { GetStaticPaths } from 'astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 
@@ -49,7 +50,7 @@ const breadcrumbs = withHomeBreadcrumbs([
     <header class="ui-page-header">
       <div class="ui-page-header-stack status-calendar-year-header">
         <Breadcrumbs items={breadcrumbs} />
-        <h1 class="ui-page-title">{heading}</h1>
+        <PageHeading title={heading} />
       </div>
     </header>
 

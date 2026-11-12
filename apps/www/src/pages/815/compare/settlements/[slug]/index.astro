@@ -7,7 +7,10 @@ import StickyTableScript from '@/components/common/StickyTableScript.astro';
 import MapPreview from '@/components/maps/MapPreview.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
-import { GlobeIcon, MapPinIcon, TelegramIcon } from '@shelkovo/ui/icons';
+import PageHeading from '@/components/PageHeading.astro';
+import HeadingActionWebsite from '@/components/heading-actions/HeadingActionWebsite.astro';
+import HeadingActionTelegram from '@/components/heading-actions/HeadingActionTelegram.astro';
+import HeadingActionMap from '@/components/heading-actions/HeadingActionMap.astro';
 import {
   formatCurrency,
   formatDistance,
@@ -165,7 +168,6 @@ const assumption = tariffCalc?.assumption;
   search={search}
 >
   <main class="ui-page settlement-page">
-    <h1 class="ui-visually-hidden">{settlement.name}</h1>
     <p class="ui-visually-hidden" data-pagefind-body>
       {searchDescription}
     </p>
@@ -205,86 +207,18 @@ const assumption = tariffCalc?.assumption;
       </div>
 
       <div class="ui-page settlement-hero-content">
-        <div class="settlement-hero-label-row">
-          <div class="settlement-labels">
-            {waterInc && (
-              <span class="ui-badge ui-badge-water" title={waterTitle}>
-                Вода в тарифе
-              </span>
-            )}
-            {obman && (
-              <a
-                href={obmanUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="ui-badge ui-badge-danger settlement-badge-link"
-                title="Открыть Telegram-канал Коттеджное рабство"
-              >
-                Коттеджное рабство
-              </a>
-            )}
-            {isBaseline && (
-              <span class="ui-badge ui-badge-info">Наш посёлок</span>
-            )}
-          </div>
-        </div>
-
-        <div
-          class:list={[
-            'settlement-hero-summary',
-            { 'settlement-hero-summary--spaced': !hasLabels },
-          ]}
-        >
+        <div class="settlement-hero-summary">
           <div class="settlement-hero-heading">
-            <div class="settlement-hero-title-row">
-              <div class="settlement-hero-title-wrap">
-                <div
-                  aria-hidden="true"
-                  class="settlement-hero-title-shadow ui-page-title"
-                >
-                  {settlement.name}
-                </div>
-              </div>
-              <div class="settlement-hero-actions">
+            <PageHeading title={settlement.name}>
+              <Fragment slot="actions">
                 {settlement.website && (
-                  <a
-                    href={settlement.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Открыть сайт поселка"
-                    class="ui-icon-btn"
-                    title="Перейти на сайт поселка"
-                  >
-                    <GlobeIcon class="settlement-icon settlement-icon--desktop" />
-                  </a>
+                  <HeadingActionWebsite href={settlement.website} />
                 )}
-                {tg && (
-                  <a
-                    href={tg}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Открыть Telegram-канал поселка"
-                    class="ui-icon-btn"
-                    title="Перейти в Telegram-канал"
-                  >
-                    <TelegramIcon class="settlement-icon settlement-icon--desktop settlement-icon--telegram" />
-                  </a>
-                )}
-                <a
-                  href={mapUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Открыть поселок на Яндекс.Картах"
-                  class="ui-icon-btn"
-                  title="Открыть на Яндекс.Картах"
-                >
-                  <MapPinIcon class="settlement-icon settlement-icon--desktop" />
-                </a>
-              </div>
-            </div>
-            <p class="settlement-hero-district settlement-hero-text-shadow">
-              {settlement.location.district}
-            </p>
+                {tg && <HeadingActionTelegram href={tg} />}
+                <HeadingActionMap href={mapUrl} />
+              </Fragment>
+              <p slot="subtitle">{settlement.location.district}</p>
+            </PageHeading>
             {companyTitle && (
               <div class="settlement-hero-glass-pill settlement-company-pill">
                 <span class="settlement-company-label">Обслуживается</span>
@@ -300,6 +234,29 @@ const assumption = tariffCalc?.assumption;
                   </a>
                 ) : (
                   <span class="settlement-company-name">{companyTitle}</span>
+                )}
+              </div>
+            )}
+            {hasLabels && (
+              <div class="settlement-labels">
+                {waterInc && (
+                  <span class="ui-badge ui-badge-water" title={waterTitle}>
+                    Вода в тарифе
+                  </span>
+                )}
+                {obman && (
+                  <a
+                    href={obmanUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="ui-badge ui-badge-danger settlement-badge-link"
+                    title="Открыть Telegram-канал Коттеджное рабство"
+                  >
+                    Коттеджное рабство
+                  </a>
+                )}
+                {isBaseline && (
+                  <span class="ui-badge ui-badge-info">Наш посёлок</span>
                 )}
               </div>
             )}
@@ -431,102 +388,6 @@ const assumption = tariffCalc?.assumption;
         </div>
       </div>
     </section>
-
-    <header class="settlement-mobile-header">
-      <div class="settlement-mobile-heading">
-        <div>
-          <div class="settlement-mobile-title-group">
-            <div class="settlement-mobile-title-wrap">
-              <div aria-hidden="true" class="ui-page-title">
-                {settlement.name}
-              </div>
-            </div>
-            <div class="settlement-mobile-actions">
-              {settlement.website && (
-                <a
-                  href={settlement.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Открыть сайт поселка"
-                  class="ui-btn ui-btn-sm ui-btn-outline settlement-mobile-action"
-                  title="Перейти на сайт поселка"
-                >
-                  <GlobeIcon class="settlement-icon" />
-                  <span>Сайт</span>
-                </a>
-              )}
-              {tg && (
-                <a
-                  href={tg}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Открыть Telegram-канал поселка"
-                  class="ui-btn ui-btn-sm ui-btn-outline settlement-mobile-action"
-                  title="Перейти в Telegram-канал"
-                >
-                  <TelegramIcon class="settlement-icon settlement-icon--telegram" />
-                  <span>Telegram</span>
-                </a>
-              )}
-              <a
-                href={mapUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Открыть поселок на Яндекс.Картах"
-                class="ui-btn ui-btn-sm ui-btn-outline settlement-mobile-action"
-                title="Открыть на Яндекс.Картах"
-              >
-                <MapPinIcon class="settlement-icon" />
-                <span>Карта</span>
-              </a>
-            </div>
-          </div>
-        </div>
-        <p class="settlement-mobile-district">{settlement.location.district}</p>
-        {companyTitle && (
-          <p class="settlement-mobile-company">
-            Обслуживается:{' '}
-            {companyUrl ? (
-              <a
-                href={companyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="settlement-company-link settlement-company-link--mobile"
-                title="Перейти на сайт управляющей компании"
-              >
-                {companyTitle}
-              </a>
-            ) : (
-              <span class="settlement-company-name">{companyTitle}</span>
-            )}
-          </p>
-        )}
-      </div>
-
-      {hasLabels && (
-        <div class="settlement-mobile-labels">
-          {waterInc && (
-            <span class="ui-badge ui-badge-water" title={waterTitle}>
-              Вода в тарифе
-            </span>
-          )}
-          {obman && (
-            <a
-              href={obmanUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="ui-badge ui-badge-danger settlement-badge-link"
-              title="Открыть Telegram-канал Коттеджное рабство"
-            >
-              Коттеджное рабство
-            </a>
-          )}
-          {isBaseline && (
-            <span class="ui-badge ui-badge-info">Наш посёлок</span>
-          )}
-        </div>
-      )}
-    </header>
 
     <section class="settlement-passport" data-testid="base-info-section">
       <h2 class="ui-visually-hidden">Паспорт поселка</h2>
@@ -701,10 +562,10 @@ const assumption = tariffCalc?.assumption;
   .settlement-hero {
     position: relative;
     z-index: 20;
-    display: none;
   }
 
   .settlement-hero-map {
+    display: none;
     container-type: size;
     position: absolute;
     inset: 0;
@@ -773,7 +634,7 @@ const assumption = tariffCalc?.assumption;
     z-index: 10;
     display: flex;
     flex-direction: column;
-    padding: 2rem 1.25rem 3rem;
+    padding: 0.25rem 1.5rem 1rem;
     pointer-events: none;
   }
 
@@ -782,22 +643,11 @@ const assumption = tariffCalc?.assumption;
     pointer-events: auto;
   }
 
-  .settlement-hero-label-row {
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
-    gap: 1rem;
-  }
-
-  .settlement-labels,
-  .settlement-mobile-labels {
+  .settlement-labels {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-  }
-
-  .settlement-labels {
-    justify-content: flex-end;
+    margin-top: 1rem;
   }
 
   .settlement-badge-link {
@@ -810,60 +660,8 @@ const assumption = tariffCalc?.assumption;
 
   .settlement-hero-summary {
     width: 100%;
-    max-width: min(48rem, 65vw);
-    align-self: flex-start;
-  }
-
-  .settlement-hero-summary--spaced {
-    margin-top: 2rem;
-  }
-
-  .settlement-hero-heading {
-    margin-bottom: 1rem;
-  }
-
-  .settlement-hero-title-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  .settlement-hero-title-wrap,
-  .settlement-mobile-title-wrap {
     min-width: 0;
-  }
-
-  .settlement-mobile-title-wrap {
-    flex: 1 1 0%;
-  }
-
-  .settlement-hero-actions {
-    display: flex;
-    flex-shrink: 0;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.25rem;
-  }
-
-  .settlement-page :global(.settlement-icon) {
-    width: 1rem;
-    height: 1rem;
-  }
-
-  .settlement-page :global(.settlement-icon--desktop) {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-
-  .settlement-page :global(.settlement-icon--telegram) {
-    color: var(--color-telegram);
-  }
-
-  .settlement-hero-district {
-    margin-top: 0.5rem;
-    color: var(--color-text-muted);
-    font-size: 1rem;
-    line-height: 1.5rem;
+    align-self: flex-start;
   }
 
   .settlement-company-pill {
@@ -916,12 +714,8 @@ const assumption = tariffCalc?.assumption;
     color: var(--color-primary);
   }
 
-  .settlement-company-link--mobile {
-    text-underline-offset: 2px;
-  }
-
   .settlement-hero-facts {
-    display: grid;
+    display: none;
     grid-template-columns: repeat(2, minmax(0, 17rem));
     gap: 0.75rem;
   }
@@ -1074,52 +868,10 @@ const assumption = tariffCalc?.assumption;
     line-height: 1.25rem;
   }
 
-  .settlement-mobile-header {
-    margin-bottom: 1rem;
-    padding: 0.25rem 1.5rem 1rem;
-  }
-
-  .settlement-mobile-heading {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .settlement-mobile-title-group {
-    margin-bottom: 0.5rem;
-  }
-
-  .settlement-mobile-title-group > * + * {
-    margin-top: 0.75rem;
-  }
-
-  .settlement-mobile-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .settlement-mobile-action {
-    min-height: 2.25rem;
-  }
-
-  .settlement-mobile-district,
-  .settlement-mobile-company,
   .settlement-passport-detail,
   .settlement-passport-comparison,
   .settlement-passport-location {
     color: var(--color-text-muted);
-  }
-
-  .settlement-mobile-company {
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-  }
-
-  .settlement-mobile-labels {
-    margin-top: 1rem;
   }
 
   .settlement-passport {
@@ -1201,16 +953,6 @@ const assumption = tariffCalc?.assumption;
     line-height: 1.75rem;
   }
 
-  .settlement-hero-title-shadow {
-    text-shadow: 0 2px 10px
-      color-mix(in oklab, var(--color-surface-raised) 75%, transparent);
-  }
-
-  .settlement-hero-text-shadow {
-    text-shadow: 0 1px 6px
-      color-mix(in oklab, var(--color-surface-raised) 72%, transparent);
-  }
-
   .settlement-hero-glass-pill,
   .settlement-hero-glass-card {
     border-color: color-mix(
@@ -1265,18 +1007,8 @@ const assumption = tariffCalc?.assumption;
     }
 
     .settlement-hero-content {
-      padding-inline: 1.5rem;
-    }
-
-    .settlement-mobile-header {
       margin-bottom: 2rem;
       padding: 0.25rem 2rem 2rem;
-    }
-
-    .settlement-mobile-heading {
-      flex-direction: row;
-      align-items: flex-start;
-      justify-content: space-between;
     }
 
     .settlement-passport {
@@ -1308,11 +1040,30 @@ const assumption = tariffCalc?.assumption;
       pointer-events: auto;
     }
 
-    .settlement-hero {
+    .settlement-hero-map {
       display: block;
     }
 
-    .settlement-mobile-header,
+    .settlement-hero-content {
+      margin-bottom: 0;
+      padding: 2rem 1.5rem 3rem;
+    }
+
+    .settlement-hero-summary {
+      max-width: min(48rem, 65vw);
+    }
+
+    .settlement-hero-heading {
+      margin-bottom: 1rem;
+      border-radius: var(--radius-xl);
+      padding: 1rem;
+      background: var(--surface-glass-reading);
+    }
+
+    .settlement-hero-facts {
+      display: grid;
+    }
+
     .settlement-passport {
       display: none;
     }

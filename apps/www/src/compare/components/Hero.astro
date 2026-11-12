@@ -1,0 +1,44 @@
+---
+import PageHeading from '@/components/PageHeading.astro';
+import type { HeroProps } from './hero.types';
+
+type Props = HeroProps;
+const { title } = Astro.props;
+---
+
+<div class="hero">
+  <PageHeading title={title}>
+    <slot name="subtitle" slot="subtitle" />
+  </PageHeading>
+  {Astro.slots.has('default') && (
+    <div class="hero-aside">
+      <slot />
+    </div>
+  )}
+</div>
+
+<style>
+  .hero {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .hero-aside {
+    border-top: 1px solid var(--color-border);
+    padding-top: 1rem;
+  }
+
+  @media (min-width: 64rem) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr) minmax(18rem, 28rem);
+      align-items: end;
+    }
+
+    .hero-aside {
+      border-top: 0;
+      border-left: 1px solid var(--color-border);
+      padding-top: 0;
+      padding-left: 1.5rem;
+    }
+  }
+</style>

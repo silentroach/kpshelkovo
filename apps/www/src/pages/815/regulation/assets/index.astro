@@ -1,4 +1,5 @@
 ---
+import PageHeading from '@/components/PageHeading.astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 import {
@@ -139,16 +140,13 @@ const villageIcons = {
         <Breadcrumbs items={breadcrumbs} />
 
         <div class="assets-intro" data-pagefind-body>
-          <h1 class="ui-page-title assets-title">
-            Что входит в общее имущество
-          </h1>
-          <div class="assets-intro-copy">
-            <p>
+          <PageHeading title="Что входит в общее имущество">
+            <p slot="subtitle">
               Справочник по Приложению №2 полного регламента: дороги, ливневые
               траншеи, зеленые насаждения, благоустройство, электроснабжение и
               охрана по поселкам.
             </p>
-          </div>
+          </PageHeading>
         </div>
       </div>
     </section>
@@ -270,27 +268,12 @@ const villageIcons = {
       max-width: 64rem;
     }
 
-    .assets-intro > * + * {
-      margin-block-start: 1rem;
-    }
-
-    .assets-title {
+    .assets-intro {
       max-width: 56rem;
     }
 
-    .assets-intro-copy,
     .assets-group-header {
       max-width: 48rem;
-    }
-
-    .assets-intro-copy {
-      color: var(--color-text-muted);
-      font-size: 0.875rem;
-      line-height: 1.5rem;
-    }
-
-    .assets-intro-copy > * + * {
-      margin-block-start: 0.75rem;
     }
 
     .assets-content {
@@ -437,10 +420,6 @@ const villageIcons = {
     @media (min-width: 48rem) {
       .assets-page {
         padding-block-end: 3rem;
-      }
-
-      .assets-intro-copy {
-        font-size: 0.9375rem;
       }
 
       .assets-content {

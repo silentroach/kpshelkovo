@@ -1,4 +1,5 @@
 ---
+import PageHeading from '@/components/PageHeading.astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 
 import ReviewCard from '@/components/reviews/ReviewCard.astro';
@@ -50,15 +51,14 @@ const schema = reviewsCollectionPageSchema({
       <div class="ui-page-header-stack">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div>
-          <h1 class="ui-page-title">Отзывы собственников</h1>
-          <p class="ui-copy reviews-intro">
+        <PageHeading title="Отзывы собственников">
+          <p slot="subtitle">
             Вы собственник участка или дома в Шелково?{' '}
             <a href={reviewsRulesUrl()} class="site-text-link">
               Оставьте свой отзыв!
             </a>
           </p>
-        </div>
+        </PageHeading>
       </div>
     </section>
 
@@ -90,12 +90,6 @@ const schema = reviewsCollectionPageSchema({
 <style>
   .reviews-page {
     padding-block-end: 1.5rem;
-  }
-
-  .reviews-intro {
-    max-width: 48rem;
-    margin-block-start: 0.75rem;
-    color: var(--color-text-muted);
   }
 
   .reviews-content {
