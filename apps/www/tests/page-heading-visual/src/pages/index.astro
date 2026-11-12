@@ -1,0 +1,175 @@
+---
+import '../../../config/visual-foundation.css';
+import '@/styles/site.css';
+
+import Fonts from '@shelkovo/ui/Fonts.astro';
+import { GlobeIcon, TelegramIcon, MapPinIcon } from '@shelkovo/ui/icons';
+import PageHeading from '@/components/PageHeading.astro';
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <Fonts />
+    <title>PageHeading visual fixture</title>
+  </head>
+  <body class="ui-root-site">
+    <main class="site-page-content fixture-canvas">
+      <section data-testid="title-only">
+        <PageHeading title="Новости" />
+      </section>
+
+      <section data-testid="one-action">
+        <PageHeading title="Торжественное открытие дамбы и встреча жителей у реки">
+          <a
+            slot="actions"
+            class="ui-btn ui-icon-action fixture-action"
+            href="#details"
+            aria-label="Показать на карте"
+          >
+            <MapPinIcon />
+          </a>
+          <p slot="subtitle">
+            Вымышленная страница мероприятия для проверки длинного заголовка.
+          </p>
+        </PageHeading>
+        <p class="fixture-meta">
+          12 ноября 2026 · Пример дополнительных сведений
+        </p>
+      </section>
+
+      <section data-testid="three-actions">
+        <PageHeading title="Лесной посёлок на берегу реки">
+          <nav slot="actions" aria-label="Ссылки посёлка">
+            <a
+              class="ui-btn ui-icon-action fixture-action"
+              href="#details"
+              aria-label="Сайт посёлка"
+            >
+              <GlobeIcon />
+            </a>
+            <a
+              class="ui-btn ui-icon-action fixture-action"
+              href="#details"
+              aria-label="Канал посёлка"
+            >
+              <TelegramIcon />
+            </a>
+            <a
+              class="ui-btn ui-icon-action fixture-action"
+              href="#details"
+              aria-label="Карта посёлка"
+            >
+              <MapPinIcon />
+            </a>
+          </nav>
+          <p slot="subtitle">Район и краткое пояснение под названием.</p>
+        </PageHeading>
+      </section>
+
+      <section data-testid="date-range">
+        <PageHeading title={'Встречи "У реки" 12-14 ноября'}>
+          <Fragment slot="actions">
+            <a
+              class="ui-btn ui-icon-action fixture-action"
+              href="#details"
+              aria-label="Сайт встреч"
+            >
+              <GlobeIcon />
+            </a>
+            <a
+              class="ui-btn ui-icon-action fixture-action"
+              href="#details"
+              aria-label="Карта встреч"
+            >
+              <MapPinIcon />
+            </a>
+          </Fragment>
+        </PageHeading>
+      </section>
+
+      <section data-testid="paragraphs">
+        <PageHeading title="Инструменты для соседей">
+          <Fragment slot="subtitle">
+            <p>
+              Первый абзац пояснения с <strong>важной подробностью</strong>.
+            </p>
+            <p>
+              Во втором есть{' '}
+              <a class="ui-link" href="#details">
+                ссылка на условия
+              </a>
+              . Оба абзаца относятся к одному заголовку.
+            </p>
+          </Fragment>
+        </PageHeading>
+        <p class="fixture-meta">
+          Дополнительные сведения следуют после пояснения
+        </p>
+      </section>
+
+      <section data-testid="long-word">
+        <PageHeading title="Сверхдлинноенеразрывноеназваниевымышленногопосёлка">
+          <Fragment slot="actions">
+            <a
+              class="ui-btn ui-icon-action fixture-action"
+              href="#details"
+              aria-label="Сайт"
+            >
+              <GlobeIcon />
+            </a>
+            <a
+              class="ui-btn ui-icon-action fixture-action"
+              href="#details"
+              aria-label="Канал"
+            >
+              <TelegramIcon />
+            </a>
+            <a
+              class="ui-btn ui-icon-action fixture-action"
+              href="#details"
+              aria-label="Карта"
+            >
+              <MapPinIcon />
+            </a>
+          </Fragment>
+        </PageHeading>
+      </section>
+      <p id="details" class="fixture-meta">
+        Конец тестового холста
+      </p>
+    </main>
+  </body>
+</html>
+
+<style>
+  .fixture-canvas {
+    width: min(100%, 72rem);
+    margin-inline: auto;
+    padding: 2rem 1.25rem;
+  }
+
+  section {
+    padding-block: 2rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .fixture-meta {
+    margin-top: 1rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  /* Slot stand-ins only, replaced with HeadingAction when task 1.3 is ready. */
+  .fixture-action {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .fixture-action :global(svg) {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+</style>
