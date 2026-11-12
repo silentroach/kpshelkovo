@@ -1,0 +1,17 @@
+---
+import { GlobeIcon } from '@shelkovo/ui/icons';
+import HeadingAction from '../HeadingAction.astro';
+import type { HeadingActionLinkProps } from './heading-actions.types';
+
+type Props = HeadingActionLinkProps;
+const { href }: Props = Astro.props;
+---
+
+<HeadingAction
+  href={href}
+  icon={GlobeIcon}
+  label="Открыть сайт поселка"
+  title="Перейти на сайт поселка"
+  target="_blank"
+  rel="noopener noreferrer"
+/>

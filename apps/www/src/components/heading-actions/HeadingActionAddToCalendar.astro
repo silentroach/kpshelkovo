@@ -1,0 +1,16 @@
+---
+import { CalendarPlusIcon } from '@shelkovo/ui/icons';
+import HeadingAction from '../HeadingAction.astro';
+import type { HeadingActionAddToCalendarProps } from './heading-actions.types';
+
+type Props = HeadingActionAddToCalendarProps;
+const { href, filename }: Props = Astro.props;
+---
+
+<HeadingAction
+  href={href}
+  download={filename}
+  resource
+  icon={CalendarPlusIcon}
+  label="Добавить в календарь"
+/>

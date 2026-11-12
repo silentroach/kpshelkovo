@@ -1,0 +1,16 @@
+---
+import { CalendarIcon } from '@shelkovo/ui/icons';
+import { statusCalendarYearUrl } from '@/lib/status/routes';
+import HeadingAction from '../HeadingAction.astro';
+import type { HeadingActionStatusCalendarProps } from './heading-actions.types';
+
+type Props = HeadingActionStatusCalendarProps;
+const { year }: Props = Astro.props;
+---
+
+<HeadingAction
+  href={statusCalendarYearUrl({ year })}
+  icon={CalendarIcon}
+  label={`Проблемы и плановые работы за ${year} год`}
+  data-status-calendar-entry
+/>

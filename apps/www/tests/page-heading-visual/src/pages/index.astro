@@ -3,9 +3,10 @@ import '../../../config/visual-foundation.css';
 import '@/styles/site.css';
 
 import Fonts from '@shelkovo/ui/Fonts.astro';
-import { GlobeIcon, TelegramIcon, MapPinIcon } from '@shelkovo/ui/icons';
 import PageHeading from '@/components/PageHeading.astro';
-import HeadingAction from '@/components/HeadingAction.astro';
+import HeadingActionWebsite from '@/components/heading-actions/HeadingActionWebsite.astro';
+import HeadingActionTelegram from '@/components/heading-actions/HeadingActionTelegram.astro';
+import HeadingActionMap from '@/components/heading-actions/HeadingActionMap.astro';
 ---
 
 <!doctype html>
@@ -24,12 +25,7 @@ import HeadingAction from '@/components/HeadingAction.astro';
 
       <section data-testid="one-action">
         <PageHeading title="Торжественное открытие дамбы и встреча жителей у реки">
-          <HeadingAction
-            slot="actions"
-            href="#details"
-            label="Показать на карте"
-            icon={MapPinIcon}
-          />
+          <HeadingActionMap slot="actions" href="#details" />
           <p slot="subtitle">
             Вымышленная страница мероприятия для проверки длинного заголовка.
           </p>
@@ -42,21 +38,9 @@ import HeadingAction from '@/components/HeadingAction.astro';
       <section data-testid="three-actions">
         <PageHeading title="Лесной посёлок на берегу реки">
           <nav slot="actions" aria-label="Ссылки посёлка">
-            <HeadingAction
-              href="#details"
-              label="Сайт посёлка"
-              icon={GlobeIcon}
-            />
-            <HeadingAction
-              href="#details"
-              label="Канал посёлка"
-              icon={TelegramIcon}
-            />
-            <HeadingAction
-              href="#details"
-              label="Карта посёлка"
-              icon={MapPinIcon}
-            />
+            <HeadingActionWebsite href="#details" />
+            <HeadingActionTelegram href="#details" />
+            <HeadingActionMap href="#details" />
           </nav>
           <p slot="subtitle">Район и краткое пояснение под названием.</p>
         </PageHeading>
@@ -65,16 +49,8 @@ import HeadingAction from '@/components/HeadingAction.astro';
       <section data-testid="date-range">
         <PageHeading title={'Встречи "У реки" 12-14 ноября'}>
           <Fragment slot="actions">
-            <HeadingAction
-              href="#details"
-              label="Сайт встреч"
-              icon={GlobeIcon}
-            />
-            <HeadingAction
-              href="#details"
-              label="Карта встреч"
-              icon={MapPinIcon}
-            />
+            <HeadingActionWebsite href="#details" />
+            <HeadingActionMap href="#details" />
           </Fragment>
         </PageHeading>
       </section>
@@ -102,9 +78,9 @@ import HeadingAction from '@/components/HeadingAction.astro';
       <section data-testid="long-word">
         <PageHeading title="Сверхдлинноенеразрывноеназваниевымышленногопосёлка">
           <Fragment slot="actions">
-            <HeadingAction href="#details" label="Сайт" icon={GlobeIcon} />
-            <HeadingAction href="#details" label="Канал" icon={TelegramIcon} />
-            <HeadingAction href="#details" label="Карта" icon={MapPinIcon} />
+            <HeadingActionWebsite href="#details" />
+            <HeadingActionTelegram href="#details" />
+            <HeadingActionMap href="#details" />
           </Fragment>
         </PageHeading>
       </section>
