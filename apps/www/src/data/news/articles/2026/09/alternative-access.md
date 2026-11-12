@@ -4,12 +4,15 @@ summary: На время реконструкции дамбы жители см
 date: 19.09.2026
 author: ok-comfort
 pinned: true
+pinned_until: 13.11.2026
 tags:
   - дамба
   - кпп
   - проезд
 source_url: https://okkomfort.domyland.app/news?targetId=119187&entityName=news&t=okkomfort
 ---
+
+**Обновление от 12 ноября:** основные работы на дамбе завершены. ОК Комфорт [объявила об открытии проезда через КПП Ривера с 13 ноября](/news/2026/11/dam-reconstruction-complete/).
 
 На время [реконструкции дамбы](/status/incidents/2026/09/dam-river-reconstruction/) жители поселка смогут пользоваться **[техническим въездом в Шелково Парк](@park-checkpoint)** (КПП № 4). [КПП Шелково Ривер](@river-checkpoint) на период работ закроют для проезда. Ниже показана схема объезда из Семеновского.
 
