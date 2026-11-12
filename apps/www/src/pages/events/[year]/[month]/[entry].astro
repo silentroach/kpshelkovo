@@ -1,8 +1,8 @@
 ---
 import type { InferGetStaticPropsType } from 'astro';
 import { formatDate } from '@shelkovo/format';
-import { formatTextHtml } from '@shelkovo/typography';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import PageHeading from '@/components/PageHeading.astro';
 import EventCard from '@/components/events/EventCard.astro';
 import EventList from '@/components/events/EventList.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -112,7 +112,7 @@ const breadcrumbs = withHomeBreadcrumbs([
         <header class="ui-page-header">
           <div class="ui-page-header-stack">
             <Breadcrumbs items={breadcrumbs} />
-            <h1 class="ui-page-title" set:html={formatTextHtml(heading)} />
+            <PageHeading title={heading} />
           </div>
         </header>
         <div class="day-content">
