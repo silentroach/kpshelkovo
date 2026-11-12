@@ -155,13 +155,13 @@
   brotli: 424
   gzip: 499
 - file: static/_..XXXXXXXX.css
-  bytes: 6167
-  brotli: 1078
-  gzip: 1247
+  bytes: 6526
+  brotli: 1115
+  gzip: 1276
 - file: static/_entry_.XXXXXXXX.css
-  bytes: 2064
-  brotli: 517
-  gzip: 624
+  bytes: 1845
+  brotli: 499
+  gzip: 606
 - file: static/async.XXXXXXXX.js
   bytes: 111
   brotli: 98
