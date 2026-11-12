@@ -5,6 +5,7 @@ import '@/styles/site.css';
 import Fonts from '@shelkovo/ui/Fonts.astro';
 import { GlobeIcon, TelegramIcon, MapPinIcon } from '@shelkovo/ui/icons';
 import PageHeading from '@/components/PageHeading.astro';
+import HeadingAction from '@/components/HeadingAction.astro';
 ---
 
 <!doctype html>
@@ -23,14 +24,12 @@ import PageHeading from '@/components/PageHeading.astro';
 
       <section data-testid="one-action">
         <PageHeading title="Торжественное открытие дамбы и встреча жителей у реки">
-          <a
+          <HeadingAction
             slot="actions"
-            class="ui-btn ui-icon-action fixture-action"
             href="#details"
-            aria-label="Показать на карте"
-          >
-            <MapPinIcon />
-          </a>
+            label="Показать на карте"
+            icon={MapPinIcon}
+          />
           <p slot="subtitle">
             Вымышленная страница мероприятия для проверки длинного заголовка.
           </p>
@@ -43,27 +42,21 @@ import PageHeading from '@/components/PageHeading.astro';
       <section data-testid="three-actions">
         <PageHeading title="Лесной посёлок на берегу реки">
           <nav slot="actions" aria-label="Ссылки посёлка">
-            <a
-              class="ui-btn ui-icon-action fixture-action"
+            <HeadingAction
               href="#details"
-              aria-label="Сайт посёлка"
-            >
-              <GlobeIcon />
-            </a>
-            <a
-              class="ui-btn ui-icon-action fixture-action"
+              label="Сайт посёлка"
+              icon={GlobeIcon}
+            />
+            <HeadingAction
               href="#details"
-              aria-label="Канал посёлка"
-            >
-              <TelegramIcon />
-            </a>
-            <a
-              class="ui-btn ui-icon-action fixture-action"
+              label="Канал посёлка"
+              icon={TelegramIcon}
+            />
+            <HeadingAction
               href="#details"
-              aria-label="Карта посёлка"
-            >
-              <MapPinIcon />
-            </a>
+              label="Карта посёлка"
+              icon={MapPinIcon}
+            />
           </nav>
           <p slot="subtitle">Район и краткое пояснение под названием.</p>
         </PageHeading>
@@ -72,20 +65,16 @@ import PageHeading from '@/components/PageHeading.astro';
       <section data-testid="date-range">
         <PageHeading title={'Встречи "У реки" 12-14 ноября'}>
           <Fragment slot="actions">
-            <a
-              class="ui-btn ui-icon-action fixture-action"
+            <HeadingAction
               href="#details"
-              aria-label="Сайт встреч"
-            >
-              <GlobeIcon />
-            </a>
-            <a
-              class="ui-btn ui-icon-action fixture-action"
+              label="Сайт встреч"
+              icon={GlobeIcon}
+            />
+            <HeadingAction
               href="#details"
-              aria-label="Карта встреч"
-            >
-              <MapPinIcon />
-            </a>
+              label="Карта встреч"
+              icon={MapPinIcon}
+            />
           </Fragment>
         </PageHeading>
       </section>
@@ -113,27 +102,9 @@ import PageHeading from '@/components/PageHeading.astro';
       <section data-testid="long-word">
         <PageHeading title="Сверхдлинноенеразрывноеназваниевымышленногопосёлка">
           <Fragment slot="actions">
-            <a
-              class="ui-btn ui-icon-action fixture-action"
-              href="#details"
-              aria-label="Сайт"
-            >
-              <GlobeIcon />
-            </a>
-            <a
-              class="ui-btn ui-icon-action fixture-action"
-              href="#details"
-              aria-label="Канал"
-            >
-              <TelegramIcon />
-            </a>
-            <a
-              class="ui-btn ui-icon-action fixture-action"
-              href="#details"
-              aria-label="Карта"
-            >
-              <MapPinIcon />
-            </a>
+            <HeadingAction href="#details" label="Сайт" icon={GlobeIcon} />
+            <HeadingAction href="#details" label="Канал" icon={TelegramIcon} />
+            <HeadingAction href="#details" label="Карта" icon={MapPinIcon} />
           </Fragment>
         </PageHeading>
       </section>
@@ -160,16 +131,5 @@ import PageHeading from '@/components/PageHeading.astro';
     margin-top: 1rem;
     color: var(--color-text-muted);
     font-size: 0.875rem;
-  }
-
-  /* Slot stand-ins only, replaced with HeadingAction when task 1.3 is ready. */
-  .fixture-action {
-    width: 2.75rem;
-    height: 2.75rem;
-  }
-
-  .fixture-action :global(svg) {
-    width: 1.125rem;
-    height: 1.125rem;
   }
 </style>
