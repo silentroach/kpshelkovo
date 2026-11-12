@@ -170,6 +170,10 @@ describe('event cards', () => {
         "widgetActions": false,
       }
     `);
+    expect(document.querySelector('article')?.getAttribute('aria-labelledby')).toBe(
+      document.querySelector('h1')?.id
+    );
+    expect(download?.closest('[data-pagefind-ignore]')).toBeTruthy();
     expect(document.querySelector('aside time')?.getAttribute('datetime')).toBe(record.startsIso);
     expect(document.querySelector('header time, aside a[download]')).toBeFalsy();
     expect(document.body.textContent).not.toContain('19:00');

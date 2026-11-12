@@ -3,6 +3,9 @@ import type { GetStaticPaths } from 'astro';
 
 import { formatTextHtml } from '@shelkovo/typography';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import PageHeading from '@/components/PageHeading.astro';
+import HeadingActionSiteMap from '@/components/heading-actions/HeadingActionSiteMap.astro';
+import HeadingActionContactReviews from '@/components/heading-actions/HeadingActionContactReviews.astro';
 
 import { PLACE_MARKER_IMAGES } from '@/components/places/marker-images';
 import PlaceOpeningHours from '@/components/places/PlaceOpeningHours.astro';
@@ -94,63 +97,28 @@ const schema = {
           <div class="ui-page-header-stack">
             <Breadcrumbs items={breadcrumbs} />
 
-            <div class="ui-page-title place-heading">
-              <h1
-                class="ui-page-title"
-                data-pagefind-ignore="all"
-                set:html={formatTextHtml(place.name)}
-              />
-              {(place.showOnMap || place.contact) && (
-                <nav
-                  aria-label="Действия с местом"
-                  class="place-heading__actions"
-                  data-pagefind-ignore="all"
-                >
-                  {place.showOnMap && (
-                    <a
-                      href={placeHighlightUrl(place.slug)}
-                      class="ui-btn ui-icon-action"
-                      aria-label="Показать на общей карте"
-                      title="Показать на общей карте"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.6"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                      >
-                        <path d="m9 18-6 3V6l6-3 6 3 6-3v15l-6 3-6-3Zm0 0V3m6 18V6" />
-                      </svg>
-                    </a>
-                  )}
-                  {place.contact && (
-                    <a
-                      href={place.contact.url}
-                      class="ui-btn ui-icon-action"
-                      aria-label="Контакты и отзывы"
-                      title="Контакты и отзывы"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.6"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                      >
-                        <rect x="3" y="4" width="18" height="16" rx="2" />
-                        <circle cx="8" cy="9" r="2" />
-                        <path d="M5 17v-1a3 3 0 0 1 6 0v1m3-9h4m-4 4h4m-4 4h3" />
-                      </svg>
-                    </a>
-                  )}
-                </nav>
-              )}
-            </div>
+            <PageHeading
+              title={place.name}
+              headingAttributes={{ 'data-pagefind-ignore': 'all' }}
+            >
+              <Fragment slot="actions">
+                {(place.showOnMap || place.contact) && (
+                  <nav
+                    aria-label="Действия с местом"
+                    data-pagefind-ignore="all"
+                  >
+                    {place.showOnMap && (
+                      <HeadingActionSiteMap
+                        href={placeHighlightUrl(place.slug)}
+                      />
+                    )}
+                    {place.contact && (
+                      <HeadingActionContactReviews href={place.contact.url} />
+                    )}
+                  </nav>
+                )}
+              </Fragment>
+            </PageHeading>
           </div>
         </header>
 
@@ -274,23 +242,6 @@ const schema = {
     padding: 0;
   }
 
-  .place-heading h1 {
-    display: inline;
-    text-wrap: inherit;
-  }
-
-  .place-heading__actions {
-    display: inline-flex;
-    margin-inline-start: 1.25rem;
-    gap: 0.5rem;
-    vertical-align: middle;
-  }
-
-  .place-heading__actions a {
-    width: 2.75rem;
-    height: 2.75rem;
-  }
-
   .place-facts {
     margin-block-end: 1.75rem;
     border-bottom: 1px solid var(--color-border);
@@ -389,10 +340,6 @@ const schema = {
   }
 
   @media (min-width: 48rem) {
-    .place-heading__actions {
-      margin-inline-start: 1.75rem;
-    }
-
     .place-page {
       padding-block-end: 4rem;
     }

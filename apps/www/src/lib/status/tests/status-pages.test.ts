@@ -316,6 +316,9 @@ describe('/status/', () => {
     expect(link?.getAttribute('href')).toBe(
       statusCalendarYearUrl({ year: data.calendar.buildYear })
     );
+    expect(document.querySelector('h1')?.hasAttribute('data-pagefind-body')).toBe(true);
+    expect(document.querySelector('.status-intro')?.hasAttribute('data-pagefind-body')).toBe(true);
+    expect(document.querySelector('h1 a')).toBeFalsy();
   });
 
   it('keeps the overview service state on the shared hydration contract', async () => {

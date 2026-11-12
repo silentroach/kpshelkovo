@@ -3,7 +3,8 @@ import StatusIncidentRow from '@/components/status/StatusIncidentRow.astro';
 import StatusServiceCard from '@/components/status/StatusServiceCard.astro';
 import StatusTimelineLegend from '@/components/status/StatusTimelineLegend.astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
-import { CalendarIcon } from '@shelkovo/ui/icons';
+import PageHeading from '@/components/PageHeading.astro';
+import HeadingActionStatusCalendar from '@/components/heading-actions/HeadingActionStatusCalendar.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import {
   withHomeBreadcrumbs,
@@ -14,7 +15,6 @@ import { SEARCH_SECTIONS } from '@/lib/search/sections';
 import { isActiveOrScheduledMaintenance } from '@/lib/status/lifecycle';
 import { loadStatusData } from '@/lib/status/load';
 import {
-  statusCalendarYearUrl,
   statusHistoryUrl,
   statusServiceUrl,
   statusUrl,
@@ -22,7 +22,6 @@ import {
 
 const data = await loadStatusData();
 const calendarYear = data.calendar.buildYear;
-const calendarHeading = `Проблемы и плановые работы за ${calendarYear} год`;
 const overviewTimelineDays = 30;
 const recentIncidents = data.incidents
   .filter((item) => !isActiveOrScheduledMaintenance(item))
@@ -74,29 +73,17 @@ const schema = collectionPageSchema({
         <Breadcrumbs items={breadcrumbs} />
 
         <div class="status-header__copy" data-status-page-header-copy>
-          <div class="status-title-row">
-            <h1 class="ui-page-title" data-pagefind-body>
-              Статус КП Шелково
-            </h1>
-
-            <span class="status-calendar-entry">
-              <a
-                class="ui-btn ui-icon-action"
-                href={statusCalendarYearUrl({ year: calendarYear })}
-                aria-label={calendarHeading}
-                title={calendarHeading}
-                data-status-calendar-entry
-              >
-                <CalendarIcon />
-              </a>
-            </span>
-          </div>
-
-          <p class="status-intro" data-pagefind-body>
-            Журнал отключений и ограничений в КП Шелково: электричество, вода,
-            интернет и проезд через дамбу. Фиксируем время, зону, источник и ход
-            восстановления.
-          </p>
+          <PageHeading
+            title="Статус КП Шелково"
+            headingAttributes={{ 'data-pagefind-body': true }}
+          >
+            <HeadingActionStatusCalendar slot="actions" year={calendarYear} />
+            <p slot="subtitle" class="status-intro" data-pagefind-body>
+              Журнал отключений и ограничений в КП Шелково: электричество, вода,
+              интернет и проезд через дамбу. Фиксируем время, зону, источник и
+              ход восстановления.
+            </p>
+          </PageHeading>
         </div>
       </div>
     </section>
@@ -206,28 +193,6 @@ const schema = collectionPageSchema({
     max-width: 56rem;
   }
 
-  .status-header__copy > * + * {
-    margin-block-start: 0.75rem;
-  }
-
-  .status-title-row {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-  }
-
-  .status-calendar-entry {
-    display: inline-flex;
-    transform: translateY(0.25rem);
-  }
-
-  .status-intro {
-    max-width: 48rem;
-    color: var(--color-text-muted);
-    font-size: 1rem;
-    line-height: 1.75rem;
-  }
-
   .status-services {
     margin-block-start: 2rem;
   }
@@ -278,14 +243,6 @@ const schema = collectionPageSchema({
     }
     .status-page {
       padding-block-end: 2.5rem;
-    }
-
-    .status-title-row {
-      gap: 1.75rem;
-    }
-
-    .status-calendar-entry {
-      transform: translateY(0.375rem);
     }
 
     .status-section {

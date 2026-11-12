@@ -293,7 +293,11 @@ describe('/map/[slug]/', () => {
       addressInArticle: article?.textContent.includes(fixture.place.address!),
       addressAfterPreview:
         figure?.querySelector('.place-preview ~ figcaption')?.textContent === fixture.place.address,
-      actionsByHeading: !!document.querySelector('h1 + nav a[href="/map/?h=apple-garden"]')
+      actionsByHeading: !!document
+        .querySelector('h1')
+        ?.parentElement?.querySelector(
+          'nav[aria-label="Действия с местом"] a[href="/map/?h=apple-garden"]'
+        )
     }).toMatchInlineSnapshot(`
       {
         "actionsByHeading": true,
@@ -317,7 +321,7 @@ describe('/map/[slug]/', () => {
         document.querySelector('article [data-pagefind-body]')?.textContent.replace(/\s/g, ' ') ===
         fixture.place.summary,
       emptyBlocks: document.querySelectorAll(
-        'article dl, aside figcaption, h1 + nav, aside section'
+        'article dl, aside figcaption, nav[aria-label="Действия с местом"], aside section'
       ).length,
       fallback: !!preview?.querySelector('[data-fallback], a'),
       markerUrl: preview
@@ -340,7 +344,7 @@ describe('/map/[slug]/', () => {
       fixture.place.showOnMap = visible;
       fixture.place.contact = { id: 'food/cafe', url: '/sarafan/food/cafe/' };
       const document = await renderPage();
-      const actions = document.querySelector('h1 + nav');
+      const actions = document.querySelector('nav[aria-label="Действия с местом"]');
       expect(actions?.querySelectorAll('a').length).toBe(visible ? 2 : 1);
       expect(actions?.querySelector('a[href="/sarafan/food/cafe/"]')).toBeTruthy();
       expect(
