@@ -8,6 +8,7 @@ const { href }: Props = Astro.props;
 ---
 
 <HeadingAction
+  class="heading-action-telegram"
   href={href}
   icon={TelegramIcon}
   label="Открыть Telegram-канал поселка"
@@ -15,3 +16,9 @@ const { href }: Props = Astro.props;
   target="_blank"
   rel="noopener noreferrer"
 />
+
+<style>
+  :global(.heading-action-telegram > svg) {
+    translate: -0.125rem 0;
+  }
+</style>

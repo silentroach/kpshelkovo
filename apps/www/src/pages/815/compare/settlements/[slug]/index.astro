@@ -207,7 +207,35 @@ const assumption = tariffCalc?.assumption;
       </div>
 
       <div class="ui-page settlement-hero-content">
-        <div class="settlement-hero-summary">
+        {hasLabels && (
+          <div class="settlement-labels">
+            {waterInc && (
+              <span class="ui-badge ui-badge-water" title={waterTitle}>
+                Вода в тарифе
+              </span>
+            )}
+            {obman && (
+              <a
+                href={obmanUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="ui-badge ui-badge-danger settlement-badge-link"
+                title="Открыть Telegram-канал Коттеджное рабство"
+              >
+                Коттеджное рабство
+              </a>
+            )}
+            {isBaseline && (
+              <span class="ui-badge ui-badge-info">Наш посёлок</span>
+            )}
+          </div>
+        )}
+        <div
+          class:list={[
+            'settlement-hero-summary',
+            { 'settlement-hero-summary--spaced': !hasLabels },
+          ]}
+        >
           <div class="settlement-hero-heading">
             <PageHeading title={settlement.name}>
               <Fragment slot="actions">
@@ -234,29 +262,6 @@ const assumption = tariffCalc?.assumption;
                   </a>
                 ) : (
                   <span class="settlement-company-name">{companyTitle}</span>
-                )}
-              </div>
-            )}
-            {hasLabels && (
-              <div class="settlement-labels">
-                {waterInc && (
-                  <span class="ui-badge ui-badge-water" title={waterTitle}>
-                    Вода в тарифе
-                  </span>
-                )}
-                {obman && (
-                  <a
-                    href={obmanUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="ui-badge ui-badge-danger settlement-badge-link"
-                    title="Открыть Telegram-канал Коттеджное рабство"
-                  >
-                    Коттеджное рабство
-                  </a>
-                )}
-                {isBaseline && (
-                  <span class="ui-badge ui-badge-info">Наш посёлок</span>
                 )}
               </div>
             )}
@@ -646,6 +651,7 @@ const assumption = tariffCalc?.assumption;
   .settlement-labels {
     display: flex;
     flex-wrap: wrap;
+    order: 1;
     gap: 0.5rem;
     margin-top: 1rem;
   }
@@ -1049,15 +1055,22 @@ const assumption = tariffCalc?.assumption;
       padding: 2rem 1.5rem 3rem;
     }
 
+    .settlement-labels {
+      order: 0;
+      justify-content: flex-end;
+      margin-top: 0;
+    }
+
     .settlement-hero-summary {
       max-width: min(48rem, 65vw);
     }
 
+    .settlement-hero-summary--spaced {
+      margin-top: 2rem;
+    }
+
     .settlement-hero-heading {
       margin-bottom: 1rem;
-      border-radius: var(--radius-xl);
-      padding: 1rem;
-      background: var(--surface-glass-reading);
     }
 
     .settlement-hero-facts {
