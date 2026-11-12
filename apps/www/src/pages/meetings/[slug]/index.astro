@@ -1,4 +1,5 @@
 ---
+import PageHeading from '@/components/PageHeading.astro';
 import type { GetStaticPaths } from 'astro';
 
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
@@ -88,29 +89,26 @@ const schema = techArticleSchema({
         <Breadcrumbs items={breadcrumbs} />
 
         <div class="meeting-summary">
-          <div class="meeting-heading">
-            <h1 class="ui-page-title">{meeting.title}</h1>
+          <PageHeading title={meeting.title} />
 
-            <div class="meeting-meta">
-              <time
-                datetime={formatMeetingMetaDate(meeting.date)}
-                class="meeting-meta__date"
-              >
-                {formatMeetingDate(meeting.date)}
-              </time>
+          <div class="meeting-meta">
+            <time
+              datetime={formatMeetingMetaDate(meeting.date)}
+              class="meeting-meta__date"
+            >
+              {formatMeetingDate(meeting.date)}
+            </time>
 
-              {sourceLinks.map((source) => (
-                <span data-pagefind-ignore="all">
-                  <LinkWithIcon
-                    href={source.href}
-                    label={source.label}
-                    ariaLabelPrefix={source.label}
-                  />
-                </span>
-              ))}
-            </div>
+            {sourceLinks.map((source) => (
+              <span data-pagefind-ignore="all">
+                <LinkWithIcon
+                  href={source.href}
+                  label={source.label}
+                  ariaLabelPrefix={source.label}
+                />
+              </span>
+            ))}
           </div>
-
           <p class="ui-copy meeting-context">{meeting.context}</p>
         </div>
       </div>
@@ -227,10 +225,6 @@ const schema = techArticleSchema({
 
   .meeting-summary > :global(:not(:last-child)) {
     margin-block-end: 1rem;
-  }
-
-  .meeting-heading > :global(:not(:last-child)) {
-    margin-block-end: 0.75rem;
   }
 
   .meeting-meta {

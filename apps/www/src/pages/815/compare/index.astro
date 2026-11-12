@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import Hero from '@/compare/components/Hero.svelte';
+import Hero from '@/compare/components/Hero.astro';
 import KPIStats from '@/compare/components/KPIStats.svelte';
 import SettlementsExplorer from '@/compare/components/SettlementsExplorer.svelte';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
@@ -61,12 +61,14 @@ const schema = {
       <div class="ui-page-header-stack">
         <Breadcrumbs items={breadcrumbs} />
 
-        <Hero
-          title="Сравнение тарифов"
-          subtitle="Структурированное сравнение тарифов поселков: цена, инфраструктура, сервисы, расстояние до Москвы и"
-          subtitleLinkHref={ratingUrl}
-          subtitleLinkText="рейтингу"
-        >
+        <Hero title="Сравнение тарифов">
+          <p slot="subtitle">
+            Структурированное сравнение тарифов поселков: цена, инфраструктура,
+            сервисы, расстояние до Москвы и{' '}
+            <a href={ratingUrl} class="site-text-link hero-link">
+              рейтингу
+            </a>
+          </p>
           <KPIStats stats={stats} embed />
         </Hero>
       </div>
@@ -111,6 +113,10 @@ const schema = {
 </script>
 
 <style>
+  .hero-link {
+    font-weight: 600;
+  }
+
   .compare-page {
     padding-block-end: 1.5rem;
   }

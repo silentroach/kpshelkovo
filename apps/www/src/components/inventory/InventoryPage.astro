@@ -1,6 +1,6 @@
 ---
-import { formatTextHtml } from '@shelkovo/typography';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
+import PageHeading from '@/components/PageHeading.astro';
 import { withHomeBreadcrumbs } from '@/lib/breadcrumbs';
 
 interface Props {
@@ -28,16 +28,12 @@ const breadcrumbs = withHomeBreadcrumbs([
   <header class="ui-page-header">
     <div class="ui-page-header-stack">
       <Breadcrumbs items={breadcrumbs} />
-      <div>
-        <h1
-          class="ui-page-title"
-          data-pagefind-body={searchable || undefined}
-          set:html={formatTextHtml(title)}
-        />
-        <div class="inventory-page__intro">
-          <slot name="intro" />
-        </div>
-      </div>
+      <PageHeading
+        title={title}
+        headingAttributes={{ 'data-pagefind-body': searchable || undefined }}
+      >
+        <slot name="intro" slot="subtitle" />
+      </PageHeading>
     </div>
   </header>
   <div class="inventory-page__content">
@@ -53,15 +49,6 @@ const breadcrumbs = withHomeBreadcrumbs([
   .inventory-page .ui-page-header {
     padding-block-end: 1.5rem;
   }
-  .inventory-page .ui-page-title {
-    max-width: 48rem;
-    font-size: clamp(2rem, calc(0.857142857rem + 5.714285714vw), 2.25rem);
-    overflow-wrap: anywhere;
-  }
-  .inventory-page__intro:not(:empty) {
-    max-width: 48rem;
-    margin-block-start: 0.75rem;
-  }
   .inventory-page__content {
     padding-inline: 1.25rem;
   }
@@ -69,9 +56,6 @@ const breadcrumbs = withHomeBreadcrumbs([
     margin-block-end: 2rem;
   }
   @media (min-width: 48rem) {
-    .inventory-page .ui-page-title {
-      font-size: 3rem;
-    }
     .inventory-page__content {
       padding-inline: 1.5rem;
     }

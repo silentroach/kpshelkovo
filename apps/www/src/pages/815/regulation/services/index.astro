@@ -1,4 +1,5 @@
 ---
+import PageHeading from '@/components/PageHeading.astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 
@@ -142,16 +143,13 @@ const serviceSearchText = (
         <Breadcrumbs items={breadcrumbs} />
 
         <div class="services-intro" data-pagefind-body>
-          <h1 class="ui-page-title services-title">
-            Какие услуги указаны в регламенте
-          </h1>
-          <div class="services-intro-copy">
-            <p>
+          <PageHeading title="Какие услуги указаны в регламенте">
+            <p slot="subtitle">
               Перечень взят из Приложения №4 полного регламента, стр. 135. Ниже
               показана сверка со строками текущей сметы. Частичное совпадение
               или отсутствие явной строки не является юридическим выводом.
             </p>
-          </div>
+          </PageHeading>
         </div>
       </div>
     </section>
@@ -295,27 +293,12 @@ const serviceSearchText = (
       max-width: 64rem;
     }
 
-    .services-intro > * + * {
-      margin-block-start: 1rem;
-    }
-
-    .services-title {
+    .services-intro {
       max-width: 56rem;
     }
 
-    .services-intro-copy,
     .services-group-header {
       max-width: 48rem;
-    }
-
-    .services-intro-copy {
-      color: var(--color-text-muted);
-      font-size: 0.875rem;
-      line-height: 1.5rem;
-    }
-
-    .services-intro-copy > * + * {
-      margin-block-start: 0.75rem;
     }
 
     .services-content {
@@ -474,10 +457,6 @@ const serviceSearchText = (
     @media (min-width: 48rem) {
       .services-page {
         padding-block-end: 3rem;
-      }
-
-      .services-intro-copy {
-        font-size: 0.9375rem;
       }
 
       .services-content {

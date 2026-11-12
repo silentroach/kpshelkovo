@@ -316,6 +316,9 @@ describe('/status/', () => {
     expect(link?.getAttribute('href')).toBe(
       statusCalendarYearUrl({ year: data.calendar.buildYear })
     );
+    expect(document.querySelector('h1')?.hasAttribute('data-pagefind-body')).toBe(true);
+    expect(document.querySelector('.status-intro')?.hasAttribute('data-pagefind-body')).toBe(true);
+    expect(document.querySelector('h1 a')).toBeFalsy();
   });
 
   it('keeps the overview service state on the shared hydration contract', async () => {
@@ -442,7 +445,7 @@ describe('/status/incidents/[year]/[month]/[entry]/', () => {
       .parse(JSON.parse(document.querySelector('script[type="application/ld+json"]')!.textContent));
     expect({
       documentTitle: document.title,
-      heading: document.querySelector('h1')?.textContent.trim(),
+      heading: document.querySelector('h1')?.textContent.trim().replaceAll('\u00a0', '·'),
       canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href'),
       datePublished: articleSchema.datePublished,
       dateModified: articleSchema.dateModified
@@ -452,7 +455,7 @@ describe('/status/incidents/[year]/[month]/[entry]/', () => {
         "dateModified": "2026-08-02T13:00:00+03:00",
         "datePublished": "2026-08-02T12:00:00+03:00",
         "documentTitle": "Тестовая запись 2, 2 августа — Шелково Онлайн",
-        "heading": "Тестовая запись 2",
+        "heading": "Тестовая запись·2",
       }
     `);
   });

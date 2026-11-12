@@ -1,0 +1,66 @@
+---
+import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
+import type { HeadingActionProps } from './heading-action.types';
+
+type Props = HeadingActionProps;
+
+const {
+  icon: Icon,
+  label,
+  title = label,
+  class: className,
+  href,
+  resource,
+  ...attributes
+}: Props = Astro.props;
+const Element = href !== undefined ? (resource ? ResourceLink : 'a') : 'button';
+---
+
+<Element
+  {...attributes}
+  href={href}
+  type={href === undefined ? (attributes.type ?? 'button') : attributes.type}
+  class:list={['ui-btn', 'ui-icon-action', 'heading-action', className]}
+  aria-label={label}
+  title={title}
+>
+  <Icon />
+</Element>
+
+<style>
+  .heading-action {
+    position: relative;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 0;
+    background: transparent;
+  }
+
+  .heading-action::before {
+    position: absolute;
+    inset: 0.125rem;
+    border: 1px solid
+      color-mix(in oklch, var(--color-accent-text) 18%, transparent);
+    border-radius: inherit;
+    background: color-mix(in oklch, var(--color-accent-soft) 48%, transparent);
+    content: '';
+    pointer-events: none;
+  }
+
+  .heading-action:hover,
+  .heading-action:focus-visible {
+    background: transparent;
+  }
+
+  .heading-action:hover::before,
+  .heading-action:focus-visible::before {
+    border-color: var(--color-accent-hover);
+    background: var(--color-accent-soft);
+  }
+
+  .heading-action > :global(svg) {
+    position: relative;
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+</style>

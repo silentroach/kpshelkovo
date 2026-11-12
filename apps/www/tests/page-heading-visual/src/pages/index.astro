@@ -1,0 +1,111 @@
+---
+import '../../../config/visual-foundation.css';
+import '@/styles/site.css';
+
+import Fonts from '@shelkovo/ui/Fonts.astro';
+import PageHeading from '@/components/PageHeading.astro';
+import HeadingActionWebsite from '@/components/heading-actions/HeadingActionWebsite.astro';
+import HeadingActionTelegram from '@/components/heading-actions/HeadingActionTelegram.astro';
+import HeadingActionMap from '@/components/heading-actions/HeadingActionMap.astro';
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <Fonts />
+    <title>PageHeading visual fixture</title>
+  </head>
+  <body class="ui-root-site">
+    <main class="site-page-content fixture-canvas">
+      <section data-testid="title-only">
+        <PageHeading title="Новости" />
+      </section>
+
+      <section data-testid="one-action">
+        <PageHeading title="Торжественное открытие дамбы и встреча жителей у реки">
+          <HeadingActionMap slot="actions" href="#details" />
+          <p slot="subtitle">
+            Вымышленная страница мероприятия для проверки длинного заголовка.
+          </p>
+        </PageHeading>
+        <p class="fixture-meta">
+          12 ноября 2026 · Пример дополнительных сведений
+        </p>
+      </section>
+
+      <section data-testid="three-actions">
+        <PageHeading title="Лесной посёлок на берегу реки">
+          <nav slot="actions" aria-label="Ссылки посёлка">
+            <HeadingActionWebsite href="#details" />
+            <HeadingActionTelegram href="#details" />
+            <HeadingActionMap href="#details" />
+          </nav>
+          <p slot="subtitle">Район и краткое пояснение под названием.</p>
+        </PageHeading>
+      </section>
+
+      <section data-testid="date-range">
+        <PageHeading title={'Встречи "У реки" 12-14 ноября'}>
+          <Fragment slot="actions">
+            <HeadingActionWebsite href="#details" />
+            <HeadingActionMap href="#details" />
+          </Fragment>
+        </PageHeading>
+      </section>
+
+      <section data-testid="paragraphs">
+        <PageHeading title="Инструменты для соседей">
+          <Fragment slot="subtitle">
+            <p>
+              Первый абзац пояснения с <strong>важной подробностью</strong>.
+            </p>
+            <p>
+              Во втором есть{' '}
+              <a class="ui-link" href="#details">
+                ссылка на условия
+              </a>
+              . Оба абзаца относятся к одному заголовку.
+            </p>
+          </Fragment>
+        </PageHeading>
+        <p class="fixture-meta">
+          Дополнительные сведения следуют после пояснения
+        </p>
+      </section>
+
+      <section data-testid="long-word">
+        <PageHeading title="Сверхдлинноенеразрывноеназваниевымышленногопосёлка">
+          <Fragment slot="actions">
+            <HeadingActionWebsite href="#details" />
+            <HeadingActionTelegram href="#details" />
+            <HeadingActionMap href="#details" />
+          </Fragment>
+        </PageHeading>
+      </section>
+      <p id="details" class="fixture-meta">
+        Конец тестового холста
+      </p>
+    </main>
+  </body>
+</html>
+
+<style>
+  .fixture-canvas {
+    width: min(100%, 72rem);
+    margin-inline: auto;
+    padding: 2rem 1.25rem;
+  }
+
+  section {
+    padding-block: 2rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .fixture-meta {
+    margin-top: 1rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+</style>

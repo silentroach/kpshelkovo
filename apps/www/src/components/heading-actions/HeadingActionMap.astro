@@ -1,0 +1,17 @@
+---
+import { MapPinIcon } from '@shelkovo/ui/icons';
+import HeadingAction from '../HeadingAction.astro';
+import type { HeadingActionLinkProps } from './heading-actions.types';
+
+type Props = HeadingActionLinkProps;
+const { href }: Props = Astro.props;
+---
+
+<HeadingAction
+  href={href}
+  icon={MapPinIcon}
+  label="Открыть поселок на Яндекс.Картах"
+  title="Открыть на Яндекс.Картах"
+  target="_blank"
+  rel="noopener noreferrer"
+/>

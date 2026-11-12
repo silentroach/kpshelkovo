@@ -1,0 +1,99 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`heading action wrappers > preserves the ICS link contract with one native interactive element 1`] = `
+{
+  "decorative": "true",
+  "filename": "meeting.ics",
+  "href": "/events/meeting.ics",
+  "interactiveElements": 1,
+  "label": "Добавить в календарь",
+  "prefetch": "false",
+  "rel": undefined,
+  "target": undefined,
+  "tooltip": "Добавить в календарь",
+}
+`;
+
+exports[`heading action wrappers > preserves the Telegram link contract with one native interactive element 1`] = `
+{
+  "decorative": "true",
+  "filename": undefined,
+  "href": "https://t.me/example",
+  "interactiveElements": 1,
+  "label": "Открыть Telegram-канал поселка",
+  "prefetch": undefined,
+  "rel": "noopener noreferrer",
+  "target": "_blank",
+  "tooltip": "Перейти в Telegram-канал",
+}
+`;
+
+exports[`heading action wrappers > preserves the VCF link contract with one native interactive element 1`] = `
+{
+  "decorative": "true",
+  "filename": "example.vcf",
+  "href": "/sarafan/example/contact.vcf",
+  "interactiveElements": 1,
+  "label": "Добавить в контакты",
+  "prefetch": "false",
+  "rel": undefined,
+  "target": undefined,
+  "tooltip": "Добавить в контакты",
+}
+`;
+
+exports[`heading action wrappers > preserves the contact reviews link contract with one native interactive element 1`] = `
+{
+  "decorative": "true",
+  "filename": undefined,
+  "href": "/sarafan/food/example/",
+  "interactiveElements": 1,
+  "label": "Контакты и отзывы",
+  "prefetch": undefined,
+  "rel": undefined,
+  "target": undefined,
+  "tooltip": "Контакты и отзывы",
+}
+`;
+
+exports[`heading action wrappers > preserves the external map link contract with one native interactive element 1`] = `
+{
+  "decorative": "true",
+  "filename": undefined,
+  "href": "https://yandex.ru/maps/?pt=37,55",
+  "interactiveElements": 1,
+  "label": "Открыть поселок на Яндекс.Картах",
+  "prefetch": undefined,
+  "rel": "noopener noreferrer",
+  "target": "_blank",
+  "tooltip": "Открыть на Яндекс.Картах",
+}
+`;
+
+exports[`heading action wrappers > preserves the site map link contract with one native interactive element 1`] = `
+{
+  "decorative": "true",
+  "filename": undefined,
+  "href": "/map/?h=club",
+  "interactiveElements": 1,
+  "label": "Показать на общей карте",
+  "prefetch": undefined,
+  "rel": undefined,
+  "target": undefined,
+  "tooltip": "Показать на общей карте",
+}
+`;
+
+exports[`heading action wrappers > preserves the website link contract with one native interactive element 1`] = `
+{
+  "decorative": "true",
+  "filename": undefined,
+  "href": "https://example.com/",
+  "interactiveElements": 1,
+  "label": "Открыть сайт поселка",
+  "prefetch": undefined,
+  "rel": "noopener noreferrer",
+  "target": "_blank",
+  "tooltip": "Перейти на сайт поселка",
+}
+`;

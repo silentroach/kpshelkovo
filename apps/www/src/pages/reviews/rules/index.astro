@@ -1,4 +1,5 @@
 ---
+import PageHeading from '@/components/PageHeading.astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -42,7 +43,7 @@ const schema = reviewsCollectionPageSchema({
     <header class="ui-page-header">
       <div class="ui-page-header-stack review-rules-header">
         <Breadcrumbs items={breadcrumbs} />
-        <h1 class="ui-page-title">{REVIEW_RULES.title}</h1>
+        <PageHeading title={REVIEW_RULES.title} />
       </div>
     </header>
 

@@ -44,6 +44,73 @@ const parsePage = (html: string) => {
 };
 
 describe('/sarafan/[category]/[slug]/', () => {
+  it('keeps the conditional VCF download outside the H1 and indexed summary', async () => {
+    const original = fixture.contact;
+    const results = [];
+    try {
+      const container = await createAstroContainer();
+      for (const available of [false, true]) {
+        fixture.contact = {
+          ...original,
+          vcf: available
+            ? {
+                kind: 'person',
+                name: { family: 'Примеров', given: 'Сергей' },
+                downloadUrl: '/sarafan/construction/sergey/contact.vcf',
+                filename: 'sergey.vcf'
+              }
+            : undefined
+        };
+        const page = parsePage(
+          await container.renderToString(ContactPage, {
+            params: { category: fixture.contact.category, slug: fixture.contact.slug },
+            request: new Request(fixture.contact.canonical)
+          })
+        );
+        const heading = page.querySelector('h1');
+        const download = page.querySelector('header a[download]');
+        results.push({
+          downloads: page.querySelectorAll('a[download]').length,
+          href: download?.getAttribute('href'),
+          filename: download?.getAttribute('download'),
+          prefetch: download?.getAttribute('data-astro-prefetch'),
+          actionsInHeading: heading?.querySelectorAll('a, button').length,
+          ignoredHeading: heading?.getAttribute('data-pagefind-ignore'),
+          indexedSummary: page
+            .querySelector('.sarafan-contact-summary')
+            ?.hasAttribute('data-pagefind-body'),
+          downloadInSearch: !!download?.closest('[data-pagefind-body]')
+        });
+      }
+      expect(results).toMatchInlineSnapshot(`
+        [
+          {
+            "actionsInHeading": 0,
+            "downloadInSearch": false,
+            "downloads": 0,
+            "filename": undefined,
+            "href": undefined,
+            "ignoredHeading": "all",
+            "indexedSummary": true,
+            "prefetch": undefined,
+          },
+          {
+            "actionsInHeading": 0,
+            "downloadInSearch": false,
+            "downloads": 1,
+            "filename": "sergey.vcf",
+            "href": "/sarafan/construction/sergey/contact.vcf",
+            "ignoredHeading": "all",
+            "indexedSummary": true,
+            "prefetch": "false",
+          },
+        ]
+      `);
+    } finally {
+      fixture.contact = original;
+    }
+  });
+
   it('indexes the summary and body without indexing contact methods', async () => {
     const container = await createAstroContainer();
     const page = parsePage(

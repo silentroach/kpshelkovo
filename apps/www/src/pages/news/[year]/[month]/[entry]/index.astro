@@ -1,4 +1,5 @@
 ---
+import PageHeading from '@/components/PageHeading.astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import NewsAttachments from '@/components/news/NewsAttachments.astro';
@@ -123,7 +124,7 @@ const schema = newsArticleSchema({
       </div>
       <header class="news-article-header__content">
         <div class="news-article-heading">
-          <h1 class="ui-page-title">{article.title}</h1>
+          <PageHeading title={article.title} />
           {article.tags.length > 0 && (
             <ul class="news-article-tags">
               {article.tags.map((item) => (

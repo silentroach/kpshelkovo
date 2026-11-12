@@ -1,0 +1,14 @@
+---
+import { FoldedMapIcon } from '@shelkovo/ui/icons';
+import HeadingAction from '../HeadingAction.astro';
+import type { HeadingActionLinkProps } from './heading-actions.types';
+
+type Props = HeadingActionLinkProps;
+const { href }: Props = Astro.props;
+---
+
+<HeadingAction
+  href={href}
+  icon={FoldedMapIcon}
+  label="Показать на общей карте"
+/>

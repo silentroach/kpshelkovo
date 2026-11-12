@@ -146,6 +146,7 @@ describe('inventory HTML pages', () => {
       })
     );
     const bodies = [...page.querySelectorAll('[data-pagefind-body]')];
+    expect(page.querySelector('header h1[data-pagefind-body]')).toBeTruthy();
     const indexed = bodies.map((node) => node.textContent).join(' ');
     expect({
       kindTitle: indexed.includes('Дрели'),
@@ -522,6 +523,9 @@ describe('inventory HTML pages', () => {
       })
     );
     const invitation = root.querySelector('a[href="https://t.me/silentroach"]');
+    expect(root.querySelectorAll('header .page-heading-subtitle > p')).toHaveLength(2);
+    expect(root.querySelector('header p p')).toBeFalsy();
+    expect(group.querySelector('.page-heading-subtitle')).toBeFalsy();
     expect({
       rootKinds: [...root.querySelectorAll('main .inventory-kinds li a')].map((node) =>
         node.getAttribute('href')

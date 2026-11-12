@@ -17,11 +17,11 @@ const groups = inventoryContentsGroups(await loadInventoryData());
 >
   <InventoryPage title="У кого есть">
     <Fragment slot="intro">
-      <p class="ui-copy">
+      <p>
         Нужен инструмент или инвентарь на время? Посмотрите, что можно взять у
         соседей в аренду или бесплатно.
       </p>
-      <p class="ui-copy ui-muted inventory-invitation">
+      <p class="inventory-invitation">
         Хотите добавить свою вещь? Напишите{' '}
         <LinkWithIcon
           href="https://t.me/silentroach"
@@ -74,12 +74,6 @@ const groups = inventoryContentsGroups(await loadInventoryData());
 </BaseLayout>
 
 <style>
-  .inventory-invitation {
-    margin-block-start: 0.75rem;
-    font-size: 0.9375rem;
-    line-height: 1.6;
-  }
-
   .inventory-contents {
     max-width: 48rem;
   }

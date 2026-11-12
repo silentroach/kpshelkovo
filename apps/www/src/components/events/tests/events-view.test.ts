@@ -170,6 +170,10 @@ describe('event cards', () => {
         "widgetActions": false,
       }
     `);
+    expect(document.querySelector('article')?.getAttribute('aria-labelledby')).toBe(
+      document.querySelector('h1')?.id
+    );
+    expect(download?.closest('[data-pagefind-ignore]')).toBeTruthy();
     expect(document.querySelector('aside time')?.getAttribute('datetime')).toBe(record.startsIso);
     expect(document.querySelector('header time, aside a[download]')).toBeFalsy();
     expect(document.body.textContent).not.toContain('19:00');
@@ -350,6 +354,20 @@ describe('event calendar pages', () => {
   const calendar = buildEventCalendar(records);
   const month = calendar.byMonth.get('2026-09')!;
 
+  it.each([true, false])(
+    'keeps conditional heading indexing and the month subtitle for root=%s',
+    async (root) => {
+      const container = await createAstroContainer();
+      const document = documentFor(
+        await container.renderToString(EventMonthPage, {
+          props: { calendar, month, now: new Date('2026-09-16'), root }
+        })
+      );
+      expect(document.querySelector('h1')?.hasAttribute('data-pagefind-body')).toBe(root);
+      expect(document.querySelectorAll('.page-heading-subtitle > p')).toHaveLength(root ? 1 : 0);
+    }
+  );
+
   it.each([
     ['2026-08-31T21:00:00Z', 'calendar', '2026-08', '/events/2026/09/'],
     ['2026-08-31T21:00:00Z', 'list', '2026-08', '/events/2026/09/list/'],
@@ -457,6 +475,7 @@ describe('event calendar pages', () => {
       })
     );
     expect(document.querySelector('main a[href^="/events/"]')).toBeFalsy();
+    expect(document.querySelector('.page-heading-subtitle')).toBeFalsy();
     expect(document.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(
       'https://kpshelkovo.online/events/'
     );

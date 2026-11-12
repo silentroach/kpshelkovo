@@ -32,6 +32,8 @@
     "./icons/system/Email.astro": "./src/icons/system/Email.astro",
     "./icons/system/FilePdf.astro": "./src/icons/system/FilePdf.astro",
     "./icons/system/Globe.astro": "./src/icons/system/Globe.astro",
+    "./icons/system/FoldedMap.astro": "./src/icons/system/FoldedMap.astro",
+    "./icons/system/ContactCard.astro": "./src/icons/system/ContactCard.astro",
     "./icons/system/MapPin.astro": "./src/icons/system/MapPin.astro",
     "./icons/system/Search.astro": "./src/icons/system/Search.astro",
     "./icons/system/Search.svelte": "./src/icons/system/Search.svelte",

@@ -1,22 +1,16 @@
 ---
-import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
 import { ContactPlusIcon } from '@shelkovo/ui/icons';
+import HeadingAction from '../HeadingAction.astro';
+import type { ContactVcfLinkProps } from './contact-vcf-link.types';
 
-import type { ContactVcf } from '@/lib/contacts/types';
-
-interface Props {
-  readonly vcf: ContactVcf;
-}
-
-const { vcf } = Astro.props;
+type Props = ContactVcfLinkProps;
+const { vcf }: Props = Astro.props;
 ---
 
-<ResourceLink
+<HeadingAction
   href={vcf.downloadUrl}
   download={vcf.filename}
-  class="ui-btn ui-icon-action"
-  aria-label="Добавить в контакты"
-  title="Добавить в контакты"
->
-  <ContactPlusIcon />
-</ResourceLink>
+  resource
+  icon={ContactPlusIcon}
+  label="Добавить в контакты"
+/>

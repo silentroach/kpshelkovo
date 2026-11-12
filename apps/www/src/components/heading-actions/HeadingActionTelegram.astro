@@ -1,0 +1,24 @@
+---
+import { TelegramIcon } from '@shelkovo/ui/icons';
+import HeadingAction from '../HeadingAction.astro';
+import type { HeadingActionLinkProps } from './heading-actions.types';
+
+type Props = HeadingActionLinkProps;
+const { href }: Props = Astro.props;
+---
+
+<HeadingAction
+  class="heading-action-telegram"
+  href={href}
+  icon={TelegramIcon}
+  label="Открыть Telegram-канал поселка"
+  title="Перейти в Telegram-канал"
+  target="_blank"
+  rel="noopener noreferrer"
+/>
+
+<style>
+  :global(.heading-action-telegram > svg) {
+    translate: -0.125rem 0;
+  }
+</style>

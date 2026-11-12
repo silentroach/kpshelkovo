@@ -6,6 +6,7 @@ import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import ContactMethods from '@/components/contacts/ContactMethods.astro';
 import ContactReviews from '@/components/contacts/ContactReviews.astro';
 import ContactVcfLink from '@/components/contacts/ContactVcfLink.astro';
+import PageHeading from '@/components/PageHeading.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import {
   withHomeBreadcrumbs,
@@ -83,21 +84,20 @@ const schema = contactPageSchema({
       <div class="ui-page-header-stack sarafan-contact-header">
         <Breadcrumbs items={breadcrumbs} linkLast />
 
-        <div class="sarafan-contact-heading">
-          <h1 class="ui-page-title" data-pagefind-ignore="all">
-            {contact.title}
-          </h1>
-          {contact.vcf ? (
-            <span class="sarafan-contact-vcf">
-              <ContactVcfLink vcf={contact.vcf} />
-            </span>
-          ) : null}
-        </div>
-        <p
-          class="sarafan-contact-summary"
-          data-pagefind-body
-          set:html={summaryHtml}
-        />
+        <PageHeading
+          title={contact.title}
+          headingAttributes={{ 'data-pagefind-ignore': 'all' }}
+        >
+          <Fragment slot="actions">
+            {contact.vcf && <ContactVcfLink vcf={contact.vcf} />}
+          </Fragment>
+          <p
+            slot="subtitle"
+            class="sarafan-contact-summary"
+            data-pagefind-body
+            set:html={summaryHtml}
+          />
+        </PageHeading>
       </div>
     </header>
 
@@ -139,25 +139,6 @@ const schema = contactPageSchema({
     max-width: 56rem;
   }
 
-  .sarafan-contact-heading {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-  }
-
-  .sarafan-contact-vcf {
-    display: inline-flex;
-    transform: translateY(0.25rem);
-  }
-
-  .sarafan-contact-summary {
-    max-width: 65ch;
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-    line-height: 1.5rem;
-    text-wrap: pretty;
-  }
-
   .sarafan-contact-content {
     padding-inline: 1.25rem;
   }
@@ -178,18 +159,6 @@ const schema = contactPageSchema({
   @media (min-width: 48rem) {
     .sarafan-contact-page {
       padding-block-end: 3rem;
-    }
-
-    .sarafan-contact-heading {
-      gap: 1.75rem;
-    }
-
-    .sarafan-contact-vcf {
-      transform: translateY(0.375rem);
-    }
-
-    .sarafan-contact-summary {
-      font-size: 1rem;
     }
 
     .sarafan-contact-content {

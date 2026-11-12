@@ -1,0 +1,93 @@
+---
+import { formatTextHtml } from '@shelkovo/typography';
+import type { PageHeadingProps } from './page-heading.types';
+
+type Props = PageHeadingProps;
+
+const {
+  title,
+  class: className,
+  headingAttributes,
+  subtitleAttributes,
+} = Astro.props;
+const actions = (await Astro.slots.render('actions'))?.trim();
+const subtitle = (await Astro.slots.render('subtitle'))?.trim();
+---
+
+<div class:list={['page-heading', className]}>
+  <div class="page-heading-line ui-page-title">
+    <h1
+      {...headingAttributes}
+      class:list={['ui-page-title', headingAttributes?.class]}
+      set:html={formatTextHtml(title)}
+    />
+    {actions && <div class="page-heading-actions" set:html={actions} />}
+  </div>
+  {subtitle && (
+    <div
+      {...subtitleAttributes}
+      class:list={[
+        'page-heading-subtitle',
+        'ui-copy',
+        subtitleAttributes?.class,
+      ]}
+      set:html={subtitle}
+    />
+  )}
+</div>
+
+<style>
+  .page-heading {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .page-heading-line h1 {
+    display: inline;
+  }
+
+  .page-heading-line :global(.nowrap-date-range) {
+    /* Keep the range together unless it is wider than the whole heading. */
+    display: inline-block;
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .page-heading-actions {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    line-height: 0;
+    max-width: calc(100% - 0.5em);
+    margin-inline-start: 0.5em;
+    vertical-align: middle;
+  }
+
+  .page-heading-actions :global(nav) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: inherit;
+    max-width: 100%;
+  }
+
+  .page-heading-subtitle {
+    display: grid;
+    gap: 0.75rem;
+    max-width: 65ch;
+    margin-top: 0.75rem;
+    font-family: var(--font-body);
+    color: var(--color-text-muted);
+  }
+
+  .page-heading-subtitle > :global(p) {
+    margin: 0;
+  }
+
+  @media screen {
+    .page-heading-subtitle {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+  }
+</style>

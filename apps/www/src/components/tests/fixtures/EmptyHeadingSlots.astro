@@ -1,0 +1,10 @@
+---
+import PageHeading from '../../PageHeading.astro';
+
+const showContent = false;
+---
+
+<PageHeading title="Название">
+  <Fragment slot="actions">{showContent && <a href="/map/">Карта</a>}</Fragment>
+  <Fragment slot="subtitle">{showContent && <p>Пояснение</p>}</Fragment>
+</PageHeading>

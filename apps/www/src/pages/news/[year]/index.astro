@@ -1,4 +1,5 @@
 ---
+import PageHeading from '@/components/PageHeading.astro';
 import { count } from '@shelkovo/format';
 import { formatTextHtml } from '@shelkovo/typography';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
@@ -63,7 +64,7 @@ const schema = collectionPageSchema({
       <div class="ui-page-header-stack">
         <Breadcrumbs items={breadcrumbs} />
 
-        <h1 class="ui-page-title">Новости за {archive.year} год</h1>
+        <PageHeading title={`Новости за ${archive.year} год`} />
 
         <NewsArchiveSummary
           summary={archive.summary}
