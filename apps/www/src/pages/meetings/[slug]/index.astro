@@ -89,9 +89,7 @@ const schema = techArticleSchema({
         <Breadcrumbs items={breadcrumbs} />
 
         <div class="meeting-summary">
-          <PageHeading title={meeting.title}>
-            <p slot="subtitle">{meeting.context}</p>
-          </PageHeading>
+          <PageHeading title={meeting.title} />
 
           <div class="meeting-meta">
             <time
@@ -111,6 +109,7 @@ const schema = techArticleSchema({
               </span>
             ))}
           </div>
+          <p class="ui-copy meeting-context">{meeting.context}</p>
         </div>
       </div>
     </header>
@@ -259,6 +258,11 @@ const schema = techArticleSchema({
   .meeting-meta :global(.link-with-icon:focus-visible) {
     outline: 2px solid currentColor;
     outline-offset: 3px;
+  }
+
+  .meeting-context {
+    max-width: 48rem;
+    color: var(--color-text);
   }
 
   .meeting-content {

@@ -252,9 +252,9 @@
   brotli: 2805
   gzip: 3228
 - file: static/index-10.XXXXXXXX.css
-  bytes: 6498
-  brotli: 1124
-  gzip: 1298
+  bytes: 6580
+  brotli: 1137
+  gzip: 1309
 - file: static/index-11.XXXXXXXX.css
   bytes: 1153
   brotli: 288
