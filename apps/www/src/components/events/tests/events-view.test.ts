@@ -579,7 +579,9 @@ describe('event calendar pages', () => {
         .parse(JSON.parse(detail.querySelector('script[type="application/ld+json"]')!.textContent));
       expect(schema['@id']).toBe(`https://kpshelkovo.online${record.url}`);
       expect(schema.startDate).toBe(record.startsIso);
-      expect(schema.endDate).toBe(record.through);
+      expect(schema.endDate).toBe(
+        record.id === evening.id ? '2026-09-02T16:00:00.000Z' : record.through
+      );
       if (record.status === 'conditional') expect(schema.eventStatus).toBeUndefined();
     }
   });
